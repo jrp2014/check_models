@@ -1,10 +1,10 @@
-# \[mlx-vlm / mlx\]\[long-context\] Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt affecting 2 model(s)
+# \[mlx-vlm / mlx\]\[long-context\] At long prompt length (16299 tokens), output became repetitive affecting 1 model(s)
 
 ## Summary
 
-2 model(s) share a `long_context` signal that clusters under `mlx-vlm / mlx`.
+1 model(s) share a `long_context` signal that clusters under `mlx-vlm / mlx`.
 
-- **Issue kind:** `context_budget`
+- **Issue kind:** `cutoff_degraded`
 - **Cluster ID:** `mlx-vlm-mlx_long-context_001`
 - **Symptom family:** `long_context`
 - **Acceptance signal:** A same-command rerun and a reduced image/text burden rerun show consistent prompt-token accounting and no long-context collapse.
@@ -12,10 +12,9 @@
 
 ## Affected Models
 
-| Model                                     | Representative Signal                                                                                                                                                                                          | Token Context                                                                 | Repro Bundle                                                                                                                                                                                                        |
-|-------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt-handling issues. \| At long prompt length (16299 tokens), output stayed unusually short (13 tokens; ratio 0.1%). | prompt=16,299 \| output/prompt=0.08% \| nontext burden=100% \| stop=completed | [`20260502T225507Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json`](../repro_bundles/20260502T225507Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json) |
-| `mlx-community/paligemma2-3b-pt-896-4bit` | Output appears truncated to about 3 tokens. \| At long prompt length (4101 tokens), output stayed unusually short (3 tokens; ratio 0.1%).                                                                      | prompt=4,101 \| output/prompt=0.07% \| nontext burden=100% \| stop=completed  | [`20260502T225507Z_012_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json`](../repro_bundles/20260502T225507Z_012_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json) |
+| Model                                     | Representative Signal                                           | Token Context                                                                                        | Repro Bundle                                                                                                                                                                                                        |
+|-------------------------------------------|-----------------------------------------------------------------|------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | At long prompt length (16299 tokens), output became repetitive. | prompt=16,299 \| output/prompt=3.07% \| nontext burden=100% \| stop=completed \| hit token cap (500) | [`20260502T233440Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json`](../repro_bundles/20260502T233440Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json) |
 
 
 ## Evidence
@@ -24,26 +23,13 @@
 
 Observed signals:
 
-- Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt-handling issues.
-- At long prompt length (16299 tokens), output stayed unusually short (13 tokens; ratio 0.1%).
+- At long prompt length (16299 tokens), output became repetitive.
+- Output became repetitive, indicating possible generation instability (token: phrase: "' chinese: ' chinese:...").
 
 Sample output:
 
 ```text
-I'm sorry, but the context didn't show up.
-```
-
-### `mlx-community/paligemma2-3b-pt-896-4bit`
-
-Observed signals:
-
-- Output appears truncated to about 3 tokens.
-- At long prompt length (4101 tokens), output stayed unusually short (3 tokens; ratio 0.1%).
-
-Sample output:
-
-```text
-The garden
+Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese:...
 ```
 
 
@@ -51,15 +37,13 @@ The garden
 
 - _Likely owner:_ `mlx-vlm / mlx`
 - _Confidence:_ high
-- _Issue kind:_ `context_budget`
+- _Issue kind:_ `cutoff_degraded`
 - _Issue subtype:_ `long_context`
-- _Why this classification is credible:_ Output is very short relative to
-  prompt size (0.1%), suggesting possible early-stop or prompt-handling
-  issues. \| At long prompt length (16299 tokens), output stayed unusually
-  short (13 tokens; ratio 0.1%). \| output/prompt=0.08% \| nontext prompt
-  burden=100%
-- _Suggested next action:_ Treat this as a prompt-budget issue first; nontext
-  prompt burden is 100% and the output stays weak under that load.
+- _Why this classification is credible:_ At long prompt length (16299 tokens),
+  output became repetitive. \| hit token cap (500) \| nontext prompt
+  burden=100% \| repetitive token=phrase: "' chinese: ' chinese:..."
+- _Suggested next action:_ Inspect long-context cache behavior under heavy
+  image-token burden.
 
 
 ## Repro Commands
@@ -67,13 +51,12 @@ The garden
 Cluster rerun:
 
 ```bash
-python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen2-VL-2B-Instruct-4bit mlx-community/paligemma2-3b-pt-896-4bit
+python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen2-VL-2B-Instruct-4bit
 ```
 
 Repro bundles:
 
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: [`20260502T225507Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json`](../repro_bundles/20260502T225507Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)
-- `mlx-community/paligemma2-3b-pt-896-4bit`: [`20260502T225507Z_012_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json`](../repro_bundles/20260502T225507Z_012_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json)
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: [`20260502T233440Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json`](../repro_bundles/20260502T233440Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)
 
 
 ## Fix Checklist

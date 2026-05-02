@@ -14,7 +14,7 @@
 
 | Model                                                   | Representative Signal                                                                        | Token Context                                                                | Repro Bundle                                                                                                                                                                                                                    |
 |---------------------------------------------------------|----------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 139 occurrences). | prompt=2,097 \| output/prompt=8.20% \| nontext burden=100% \| stop=completed | [`20260502T225507Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json`](../repro_bundles/20260502T225507Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) |
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 139 occurrences). | prompt=2,097 \| output/prompt=8.20% \| nontext burden=100% \| stop=completed | [`20260502T233440Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json`](../repro_bundles/20260502T233440Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) |
 
 
 ## Evidence
@@ -55,7 +55,7 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC
 
 Repro bundles:
 
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: [`20260502T225507Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json`](../repro_bundles/20260502T225507Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: [`20260502T233440Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json`](../repro_bundles/20260502T233440Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)
 
 
 ## Fix Checklist

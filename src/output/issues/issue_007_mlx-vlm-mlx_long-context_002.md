@@ -1,10 +1,10 @@
-# \[mlx-vlm / mlx\]\[long-context\] Output degeneration under long prompt length (repeated_punctuation: ':**...') affecting 1 model(s)
+# \[mlx-vlm / mlx\]\[long-context\] Output appears truncated to about 3 tokens affecting 1 model(s)
 
 ## Summary
 
 1 model(s) share a `long_context` signal that clusters under `mlx-vlm / mlx`.
 
-- **Issue kind:** `stack_signal`
+- **Issue kind:** `context_budget`
 - **Cluster ID:** `mlx-vlm-mlx_long-context_002`
 - **Symptom family:** `long_context`
 - **Acceptance signal:** A same-command rerun and a reduced image/text burden rerun show consistent prompt-token accounting and no long-context collapse.
@@ -12,44 +12,39 @@
 
 ## Affected Models
 
-| Model                               | Representative Signal                                                         | Token Context                                                                                        | Repro Bundle                                                                                                                                                                                            |
-|-------------------------------------|-------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Qwen3.5-9B-MLX-4bit` | Output degeneration under long prompt length (repeated_punctuation: ':**...') | prompt=16,290 \| output/prompt=3.07% \| nontext burden=100% \| stop=completed \| hit token cap (500) | [`20260502T225507Z_009_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_002.json`](../repro_bundles/20260502T225507Z_009_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_002.json) |
+| Model                                     | Representative Signal                                                                                                                     | Token Context                                                                | Repro Bundle                                                                                                                                                                                                        |
+|-------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/paligemma2-3b-pt-896-4bit` | Output appears truncated to about 3 tokens. \| At long prompt length (4101 tokens), output stayed unusually short (3 tokens; ratio 0.1%). | prompt=4,101 \| output/prompt=0.07% \| nontext burden=100% \| stop=completed | [`20260502T233440Z_012_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_002.json`](../repro_bundles/20260502T233440Z_012_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_002.json) |
 
 
 ## Evidence
 
-### Stack Signals
-
-| Model                               |   Prompt Tok |   Output Tok | Output/Prompt   | Symptom                                                                       | Owner           |
-|-------------------------------------|--------------|--------------|-----------------|-------------------------------------------------------------------------------|-----------------|
-| `mlx-community/Qwen3.5-9B-MLX-4bit` |       16,290 |          500 | 3.07%           | Output degeneration under long prompt length (repeated_punctuation: ':**...') | `mlx-vlm / mlx` |
-
-### `mlx-community/Qwen3.5-9B-MLX-4bit`
+### `mlx-community/paligemma2-3b-pt-896-4bit`
 
 Observed signals:
 
-- Output contains corrupted or malformed text segments (repeated_punctuation: ':**...').
+- Output appears truncated to about 3 tokens.
+- At long prompt length (4101 tokens), output stayed unusually short (3 tokens; ratio 0.1%).
 
 Sample output:
 
 ```text
-The user wants a description of the provided image.
-
-1.  **Identify the main subject:** The image shows a tranquil, somewhat melancholic scene in a park or garden, likely on a rainy or overcast day...
+The garden
 ```
 
 
 ## Likely Root Cause
 
 - _Likely owner:_ `mlx-vlm / mlx`
-- _Confidence:_ medium
-- _Issue kind:_ `stack_signal`
+- _Confidence:_ high
+- _Issue kind:_ `context_budget`
 - _Issue subtype:_ `long_context`
-- _Why this classification is credible:_ hit token cap (500) \| nontext prompt
-  burden=100% \| degeneration=repeated_punctuation: ':**...'
-- _Suggested next action:_ Treat as a model-quality limitation for this prompt
-  and image.
+- _Why this classification is credible:_ Output appears truncated to about 3
+  tokens. \| At long prompt length (4101 tokens), output stayed unusually
+  short (3 tokens; ratio 0.1%). \| output/prompt=0.07% \| nontext prompt
+  burden=100%
+- _Suggested next action:_ Treat this as a prompt-budget issue first; nontext
+  prompt burden is 100% and the output stays weak under that load.
 
 
 ## Repro Commands
@@ -57,12 +52,12 @@ The user wants a description of the provided image.
 Cluster rerun:
 
 ```bash
-python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen3.5-9B-MLX-4bit
+python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/paligemma2-3b-pt-896-4bit
 ```
 
 Repro bundles:
 
-- `mlx-community/Qwen3.5-9B-MLX-4bit`: [`20260502T225507Z_009_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_002.json`](../repro_bundles/20260502T225507Z_009_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_002.json)
+- `mlx-community/paligemma2-3b-pt-896-4bit`: [`20260502T233440Z_012_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_002.json`](../repro_bundles/20260502T233440Z_012_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_002.json)
 
 
 ## Fix Checklist

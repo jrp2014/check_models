@@ -14,8 +14,8 @@
 
 | Model                             | Representative Signal                       | Token Context                                                             | Repro Bundle                                                                                                                                                                                                                |
 |-----------------------------------|---------------------------------------------|---------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/gemma-3n-E2B-4bit` | Output appears truncated to about 4 tokens. | prompt=264 \| output/prompt=1.52% \| nontext burden=98% \| stop=completed | [`20260502T225507Z_010_mlx-community_gemma-3n-E2B-4bit_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260502T225507Z_010_mlx-community_gemma-3n-E2B-4bit_model_config_mlx_vlm_prompt_template_001.json) |
-| `mlx-community/gemma-4-31b-bf16`  | Output appears truncated to about 5 tokens. | prompt=266 \| output/prompt=1.88% \| nontext burden=98% \| stop=completed | [`20260502T225507Z_011_mlx-community_gemma-4-31b-bf16_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260502T225507Z_011_mlx-community_gemma-4-31b-bf16_model_config_mlx_vlm_prompt_template_001.json)   |
+| `mlx-community/gemma-3n-E2B-4bit` | Output appears truncated to about 4 tokens. | prompt=264 \| output/prompt=1.52% \| nontext burden=98% \| stop=completed | [`20260502T233440Z_010_mlx-community_gemma-3n-E2B-4bit_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260502T233440Z_010_mlx-community_gemma-3n-E2B-4bit_model_config_mlx_vlm_prompt_template_001.json) |
+| `mlx-community/gemma-4-31b-bf16`  | Output appears truncated to about 5 tokens. | prompt=266 \| output/prompt=1.88% \| nontext burden=98% \| stop=completed | [`20260502T233440Z_011_mlx-community_gemma-4-31b-bf16_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260502T233440Z_011_mlx-community_gemma-4-31b-bf16_model_config_mlx_vlm_prompt_template_001.json)   |
 
 
 ## Evidence
@@ -67,8 +67,8 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC
 
 Repro bundles:
 
-- `mlx-community/gemma-3n-E2B-4bit`: [`20260502T225507Z_010_mlx-community_gemma-3n-E2B-4bit_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260502T225507Z_010_mlx-community_gemma-3n-E2B-4bit_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/gemma-4-31b-bf16`: [`20260502T225507Z_011_mlx-community_gemma-4-31b-bf16_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260502T225507Z_011_mlx-community_gemma-4-31b-bf16_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/gemma-3n-E2B-4bit`: [`20260502T233440Z_010_mlx-community_gemma-3n-E2B-4bit_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260502T233440Z_010_mlx-community_gemma-3n-E2B-4bit_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/gemma-4-31b-bf16`: [`20260502T233440Z_011_mlx-community_gemma-4-31b-bf16_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260502T233440Z_011_mlx-community_gemma-4-31b-bf16_model_config_mlx_vlm_prompt_template_001.json)
 
 
 ## Fix Checklist

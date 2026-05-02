@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-_Generated on 2026-05-02 23:55:07 BST_
+_Generated on 2026-05-03 00:34:40 BST_
 
 A review-friendly artifact with image metadata, the source prompt, and full
 generated output for each model.
@@ -11,19 +11,19 @@ _Action Snapshot: see [results.md](results.md) for the full summary._
 
 ### Strong Candidates
 
-- `mlx-community/gemma-3-27b-it-qat-4bit`: 🏆 A (85/100) | Desc 82 | Keywords 92 | 31.5 tps
-- `mlx-community/Qwen3.5-35B-A3B-bf16`: ✅ B (80/100) | Desc 81 | Keywords 90 | 61.7 tps
-- `mlx-community/Molmo-7B-D-0924-8bit`: ✅ B (80/100) | Desc 84 | Keywords 0 | 51.7 tps
-- `mlx-community/Molmo-7B-D-0924-bf16`: ✅ B (80/100) | Desc 84 | Keywords 0 | 29.7 tps
-- `mlx-community/gemma-3-27b-it-qat-8bit`: ✅ B (80/100) | Desc 82 | Keywords 94 | 17.3 tps
+- `mlx-community/gemma-3-27b-it-qat-4bit`: 🏆 A (85/100) | Desc 82 | Keywords 92 | 29.5 tps
+- `mlx-community/Qwen3.5-35B-A3B-bf16`: ✅ B (80/100) | Desc 81 | Keywords 90 | 59.3 tps
+- `mlx-community/Molmo-7B-D-0924-8bit`: ✅ B (80/100) | Desc 84 | Keywords 0 | 51.0 tps
+- `mlx-community/Molmo-7B-D-0924-bf16`: ✅ B (80/100) | Desc 83 | Keywords 0 | 29.8 tps
+- `mlx-community/gemma-3-27b-it-qat-8bit`: ✅ B (80/100) | Desc 82 | Keywords 94 | 17.2 tps
 
 ### Watchlist
 
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (0/100) | Desc 40 | Keywords 0 | 31.5 tps | harness
-- `mlx-community/paligemma2-3b-pt-896-4bit`: ❌ F (5/100) | Desc 22 | Keywords 0 | 85.0 tps | harness, long context
-- `mlx-community/gemma-3n-E2B-4bit`: ❌ F (5/100) | Desc 23 | Keywords 0 | 92.1 tps | harness
-- `mlx-community/gemma-4-31b-bf16`: ❌ F (5/100) | Desc 23 | Keywords 0 | 9.3 tps | harness
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (16/100) | Desc 48 | Keywords 0 | 180.8 tps | harness, long context
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (0/100) | Desc 40 | Keywords 0 | 31.0 tps | harness
+- `mlx-community/paligemma2-3b-pt-896-4bit`: ❌ F (5/100) | Desc 22 | Keywords 0 | 81.6 tps | harness, long context
+- `mlx-community/gemma-3n-E2B-4bit`: ❌ F (5/100) | Desc 23 | Keywords 0 | 92.2 tps | harness
+- `mlx-community/gemma-4-31b-bf16`: ❌ F (5/100) | Desc 23 | Keywords 0 | 9.5 tps | harness
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: 🟠 D (45/100) | Desc 60 | Keywords 0 | 108.4 tps | cutoff, harness, long context, repetitive
 
 ## 🚨 Failures by Package (Actionable)
 
@@ -124,10 +124,10 @@ _Error details:_
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16415, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16318, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15828, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15731, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -155,7 +155,7 @@ multi_modal_projector.linear_2.scales.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16611, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16514, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -166,7 +166,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16425, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16328, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 4 parameters not in model:
 multi_modal_projector.linear_1.biases,
@@ -206,7 +206,7 @@ _Error details:_
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16186, in _prepare_generation_prompt
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16089, in _prepare_generation_prompt
     _run_model_preflight_validators(
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         model_identifier=params.model_identifier,
@@ -216,7 +216,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15978, in _run_model_preflight_validators
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15881, in _run_model_preflight_validators
     _raise_preflight_error(
     ~~~~~~~~~~~~~~~~~~~~~~^
         "Loaded processor has no image_processor; expected multimodal processor.",
@@ -225,14 +225,14 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15911, in _raise_preflight_error
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15814, in _raise_preflight_error
     raise _tag_exception_failure_phase(ValueError(message), phase)
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16611, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16514, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -243,13 +243,13 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16427, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16330, in _run_model_generation
     formatted_prompt = _prepare_generation_prompt(
         params=params,
     ...<3 lines>...
         phase_timer=phase_timer,
     )
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16227, in _prepare_generation_prompt
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16130, in _prepare_generation_prompt
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -269,8 +269,8 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
   burden=98%
 - _Score:_ ❌ F (5/100); Output too short to be useful
 - _Review focus:_ watchlist (harness)
-- _Timing:_ Load 1.34s; Gen 0.77s; Total 2.48s
-- _Throughput:_ Prompt 1,100 TPS (264 tok); Gen 92.1 TPS (4 tok)
+- _Timing:_ Load 1.47s; Gen 0.75s; Total 2.57s
+- _Throughput:_ Prompt 1,135 TPS (264 tok); Gen 92.2 TPS (4 tok)
 - _Tokens:_ prompt 264 tok; estimated text 4 tok; estimated non-text 260 tok;
   generated 4 tok; requested max 500 tok; stop reason completed
 
@@ -296,8 +296,8 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
 - _Key signals:_ nontext prompt burden=80%
 - _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 0.31s; Gen 0.92s; Total 1.56s
-- _Throughput:_ Prompt 245 TPS (20 tok); Gen 384 TPS (124 tok)
+- _Timing:_ Load 0.45s; Gen 0.93s; Total 1.73s
+- _Throughput:_ Prompt 255 TPS (20 tok); Gen 357 TPS (124 tok)
 - _Tokens:_ prompt 20 tok; estimated text 4 tok; estimated non-text 16 tok;
   generated 124 tok; requested max 500 tok; stop reason completed
 
@@ -317,6 +317,32 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-qnguyen3-nanollava"></a>
+
+### ✅ qnguyen3/nanoLLaVA
+
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=80%
+- _Score:_ ✅ B (74/100); Keywords are not specific or diverse enough
+- _Review focus:_ strong candidate for first-pass review
+- _Timing:_ Load 0.52s; Gen 1.06s; Total 1.91s
+- _Throughput:_ Prompt 174 TPS (20 tok); Gen 115 TPS (51 tok)
+- _Tokens:_ prompt 20 tok; estimated text 4 tok; estimated non-text 16 tok;
+  generated 51 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> The picture features a man standing in a grassy area. He is wearing a blue
+> coat and has a black hat on. The man is standing near a large green tree and
+> a small green bush. There are also two wooden bridges in the background.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
 <a id="model-mlx-community-lfm25-vl-16b-bf16"></a>
 
 ### ✅ mlx-community/LFM2.5-VL-1.6B-bf16
@@ -327,8 +353,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=95%
 - _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 0.68s; Gen 1.08s; Total 2.08s
-- _Throughput:_ Prompt 1,424 TPS (85 tok); Gen 189 TPS (117 tok)
+- _Timing:_ Load 0.52s; Gen 1.08s; Total 1.93s
+- _Throughput:_ Prompt 1,445 TPS (85 tok); Gen 188 TPS (117 tok)
 - _Tokens:_ prompt 85 tok; estimated text 4 tok; estimated non-text 81 tok;
   generated 117 tok; requested max 500 tok; stop reason completed
 
@@ -348,32 +374,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-qnguyen3-nanollava"></a>
-
-### ✅ qnguyen3/nanoLLaVA
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ nontext prompt burden=80%
-- _Score:_ ✅ B (74/100); Keywords are not specific or diverse enough
-- _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 0.55s; Gen 1.18s; Total 2.08s
-- _Throughput:_ Prompt 165 TPS (20 tok); Gen 112 TPS (51 tok)
-- _Tokens:_ prompt 20 tok; estimated text 4 tok; estimated non-text 16 tok;
-  generated 51 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> The picture features a man standing in a grassy area. He is wearing a blue
-> coat and has a black hat on. The man is standing near a large green tree and
-> a small green bush. There are also two wooden bridges in the background.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
 <a id="model-mlx-community-lfm2-vl-16b-8bit"></a>
 
 ### ✅ mlx-community/LFM2-VL-1.6B-8bit
@@ -384,8 +384,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=99%
 - _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 0.48s; Gen 1.38s; Total 2.19s
-- _Throughput:_ Prompt 3,330 TPS (275 tok); Gen 330 TPS (292 tok)
+- _Timing:_ Load 0.46s; Gen 1.38s; Total 2.16s
+- _Throughput:_ Prompt 3,232 TPS (275 tok); Gen 331 TPS (292 tok)
 - _Tokens:_ prompt 275 tok; estimated text 4 tok; estimated non-text 271 tok;
   generated 292 tok; requested max 500 tok; stop reason completed
 
@@ -434,8 +434,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=99%
 - _Score:_ ✅ B (72/100); Keywords are not specific or diverse enough
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 0.86s; Gen 1.58s; Total 2.77s
-- _Throughput:_ Prompt 3,387 TPS (768 tok); Gen 58.2 TPS (53 tok)
+- _Timing:_ Load 0.87s; Gen 1.57s; Total 2.76s
+- _Throughput:_ Prompt 3,318 TPS (768 tok); Gen 59.4 TPS (53 tok)
 - _Tokens:_ prompt 768 tok; estimated text 4 tok; estimated non-text 764 tok;
   generated 53 tok; requested max 500 tok; stop reason completed
 
@@ -463,8 +463,8 @@ _Quality Status:_ no quality issues detected in this run
   output/prompt=0.07%; nontext prompt burden=100%
 - _Score:_ ❌ F (5/100); Output too short to be useful
 - _Review focus:_ watchlist (harness, long context)
-- _Timing:_ Load 1.15s; Gen 1.66s; Total 3.14s
-- _Throughput:_ Prompt 3,815 TPS (4,101 tok); Gen 85.0 TPS (3 tok)
+- _Timing:_ Load 1.27s; Gen 1.72s; Total 3.35s
+- _Throughput:_ Prompt 3,659 TPS (4,101 tok); Gen 81.6 TPS (3 tok)
 - _Tokens:_ prompt 4101 tok; estimated text 4 tok; estimated non-text 4097
   tok; generated 3 tok; requested max 500 tok; stop reason completed
 
@@ -492,8 +492,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=83%
 - _Score:_ ✅ B (74/100); Keywords are not specific or diverse enough
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 0.64s; Gen 2.42s; Total 3.40s
-- _Throughput:_ Prompt 261 TPS (24 tok); Gen 349 TPS (445 tok)
+- _Timing:_ Load 0.56s; Gen 2.22s; Total 3.12s
+- _Throughput:_ Prompt 269 TPS (24 tok); Gen 356 TPS (445 tok)
 - _Tokens:_ prompt 24 tok; estimated text 4 tok; estimated non-text 20 tok;
   generated 445 tok; requested max 500 tok; stop reason completed
 
@@ -553,8 +553,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=96%
 - _Score:_ ✅ B (70/100); Keywords are not specific or diverse enough
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 0.46s; Gen 2.99s; Total 3.80s
-- _Throughput:_ Prompt 309 TPS (95 tok); Gen 131 TPS (266 tok)
+- _Timing:_ Load 0.58s; Gen 3.05s; Total 3.97s
+- _Throughput:_ Prompt 291 TPS (95 tok); Gen 129 TPS (266 tok)
 - _Tokens:_ prompt 95 tok; estimated text 4 tok; estimated non-text 91 tok;
   generated 266 tok; requested max 500 tok; stop reason completed
 
@@ -600,8 +600,8 @@ _Quality Status:_ no quality issues detected in this run
   &lt;end_of_utterance&gt;
 - _Score:_ ✅ B (73/100); Keywords are not specific or diverse enough
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 1.99s; Gen 3.11s; Total 5.44s
-- _Throughput:_ Prompt 2,245 TPS (2,326 tok); Gen 32.9 TPS (48 tok)
+- _Timing:_ Load 2.08s; Gen 3.22s; Total 5.81s
+- _Throughput:_ Prompt 2,153 TPS (2,326 tok); Gen 32.6 TPS (48 tok)
 - _Tokens:_ prompt 2326 tok; estimated text 4 tok; estimated non-text 2322
   tok; generated 48 tok; requested max 500 tok; stop reason completed
 
@@ -628,8 +628,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=99%
 - _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 2.22s; Gen 3.26s; Total 5.84s
-- _Throughput:_ Prompt 706 TPS (278 tok); Gen 114 TPS (267 tok)
+- _Timing:_ Load 2.68s; Gen 3.36s; Total 6.40s
+- _Throughput:_ Prompt 698 TPS (278 tok); Gen 111 TPS (267 tok)
 - _Tokens:_ prompt 278 tok; estimated text 4 tok; estimated non-text 274 tok;
   generated 267 tok; requested max 500 tok; stop reason completed
 
@@ -668,8 +668,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=100%
 - _Score:_ ✅ B (68/100); Missing requested structure
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 0.96s; Gen 3.50s; Total 4.82s
-- _Throughput:_ Prompt 2,648 TPS (2,629 tok); Gen 181 TPS (355 tok)
+- _Timing:_ Load 0.99s; Gen 3.49s; Total 4.86s
+- _Throughput:_ Prompt 2,642 TPS (2,629 tok); Gen 182 TPS (355 tok)
 - _Tokens:_ prompt 2629 tok; estimated text 4 tok; estimated non-text 2625
   tok; generated 355 tok; requested max 500 tok; stop reason completed
 
@@ -727,8 +727,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=100%
 - _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 0.75s; Gen 3.87s; Total 4.96s
-- _Throughput:_ Prompt 1,074 TPS (2,174 tok); Gen 63.2 TPS (74 tok)
+- _Timing:_ Load 0.89s; Gen 4.26s; Total 5.53s
+- _Throughput:_ Prompt 918 TPS (2,174 tok); Gen 61.5 TPS (74 tok)
 - _Tokens:_ prompt 2174 tok; estimated text 4 tok; estimated non-text 2170
   tok; generated 74 tok; requested max 500 tok; stop reason completed
 
@@ -745,34 +745,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-gemma-4-31b-bf16"></a>
-
-### ✅ mlx-community/gemma-4-31b-bf16
-
-- _Recommendation:_ avoid for now; review verdict: harness
-- _Owner:_ likely owner `model-config`; harness signal `prompt_template`
-- _Next step:_ Inspect model repo config, chat template, and EOS settings.
-- _Key signals:_ Output appears truncated to about 5 tokens.; nontext prompt
-  burden=98%
-- _Score:_ ❌ F (5/100); Output too short to be useful
-- _Review focus:_ watchlist (harness)
-- _Timing:_ Load 6.87s; Gen 4.36s; Total 11.57s
-- _Throughput:_ Prompt 82.0 TPS (266 tok); Gen 9.34 TPS (5 tok)
-- _Tokens:_ prompt 266 tok; estimated text 4 tok; estimated non-text 262 tok;
-  generated 5 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> in one sentence.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️HARNESS:prompt_template
-- output:truncated(5tok)
-
----
-
 <a id="model-huggingfacetb-smolvlm-instruct"></a>
 
 ### ✅ HuggingFaceTB/SmolVLM-Instruct
@@ -782,8 +754,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ nontext prompt burden=100%
 - _Score:_ 🟡 C (65/100); Keywords are not specific or diverse enough
-- _Timing:_ Load 0.73s; Gen 4.47s; Total 5.51s
-- _Throughput:_ Prompt 2,817 TPS (1,195 tok); Gen 122 TPS (420 tok)
+- _Timing:_ Load 0.60s; Gen 4.41s; Total 5.32s
+- _Throughput:_ Prompt 3,069 TPS (1,195 tok); Gen 122 TPS (420 tok)
 - _Tokens:_ prompt 1195 tok; estimated text 4 tok; estimated non-text 1191
   tok; generated 420 tok; requested max 500 tok; stop reason completed
 
@@ -839,8 +811,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ nontext prompt burden=100%
 - _Score:_ 🟡 C (65/100); Keywords are not specific or diverse enough
-- _Timing:_ Load 0.75s; Gen 4.54s; Total 5.63s
-- _Throughput:_ Prompt 3,098 TPS (1,195 tok); Gen 119 TPS (420 tok)
+- _Timing:_ Load 0.59s; Gen 4.44s; Total 5.48s
+- _Throughput:_ Prompt 3,136 TPS (1,195 tok); Gen 123 TPS (420 tok)
 - _Tokens:_ prompt 1195 tok; estimated text 4 tok; estimated non-text 1191
   tok; generated 420 tok; requested max 500 tok; stop reason completed
 
@@ -897,8 +869,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=100%
 - _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 1.48s; Gen 5.38s; Total 7.20s
-- _Throughput:_ Prompt 1,323 TPS (1,029 tok); Gen 34.0 TPS (135 tok)
+- _Timing:_ Load 1.64s; Gen 5.54s; Total 7.53s
+- _Throughput:_ Prompt 1,315 TPS (1,029 tok); Gen 32.8 TPS (135 tok)
 - _Tokens:_ prompt 1029 tok; estimated text 4 tok; estimated non-text 1025
   tok; generated 135 tok; requested max 500 tok; stop reason completed
 
@@ -928,8 +900,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=99%
 - _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 2.18s; Gen 5.72s; Total 8.24s
-- _Throughput:_ Prompt 852 TPS (272 tok); Gen 48.2 TPS (237 tok)
+- _Timing:_ Load 2.19s; Gen 5.73s; Total 8.26s
+- _Throughput:_ Prompt 842 TPS (272 tok); Gen 48.1 TPS (237 tok)
 - _Tokens:_ prompt 272 tok; estimated text 4 tok; estimated non-text 268 tok;
   generated 237 tok; requested max 500 tok; stop reason completed
 
@@ -971,8 +943,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=100%
 - _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 1.85s; Gen 5.76s; Total 7.95s
-- _Throughput:_ Prompt 1,335 TPS (1,804 tok); Gen 32.5 TPS (125 tok)
+- _Timing:_ Load 1.75s; Gen 5.95s; Total 8.06s
+- _Throughput:_ Prompt 1,304 TPS (1,804 tok); Gen 32.1 TPS (125 tok)
 - _Tokens:_ prompt 1804 tok; estimated text 4 tok; estimated non-text 1800
   tok; generated 125 tok; requested max 500 tok; stop reason completed
 
@@ -1002,8 +974,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=100%
 - _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 1.63s; Gen 6.49s; Total 8.45s
-- _Throughput:_ Prompt 1,708 TPS (2,887 tok); Gen 39.1 TPS (167 tok)
+- _Timing:_ Load 2.28s; Gen 6.46s; Total 9.09s
+- _Throughput:_ Prompt 1,730 TPS (2,887 tok); Gen 39.2 TPS (167 tok)
 - _Tokens:_ prompt 2887 tok; estimated text 4 tok; estimated non-text 2883
   tok; generated 167 tok; requested max 500 tok; stop reason completed
 
@@ -1039,8 +1011,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=100%; reasoning leak
 - _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (reasoning leak)
-- _Timing:_ Load 2.01s; Gen 6.71s; Total 9.06s
-- _Throughput:_ Prompt 913 TPS (1,011 tok); Gen 71.3 TPS (357 tok)
+- _Timing:_ Load 2.17s; Gen 6.50s; Total 9.02s
+- _Throughput:_ Prompt 1,241 TPS (1,011 tok); Gen 69.9 TPS (357 tok)
 - _Tokens:_ prompt 1011 tok; estimated text 4 tok; estimated non-text 1007
   tok; generated 357 tok; requested max 500 tok; stop reason completed
 
@@ -1080,6 +1052,34 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-gemma-4-31b-bf16"></a>
+
+### ✅ mlx-community/gemma-4-31b-bf16
+
+- _Recommendation:_ avoid for now; review verdict: harness
+- _Owner:_ likely owner `model-config`; harness signal `prompt_template`
+- _Next step:_ Inspect model repo config, chat template, and EOS settings.
+- _Key signals:_ Output appears truncated to about 5 tokens.; nontext prompt
+  burden=98%
+- _Score:_ ❌ F (5/100); Output too short to be useful
+- _Review focus:_ watchlist (harness)
+- _Timing:_ Load 8.82s; Gen 6.78s; Total 15.94s
+- _Throughput:_ Prompt 46.9 TPS (266 tok); Gen 9.51 TPS (5 tok)
+- _Tokens:_ prompt 266 tok; estimated text 4 tok; estimated non-text 262 tok;
+  generated 5 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> in one sentence.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️HARNESS:prompt_template
+- output:truncated(5tok)
+
+---
+
 <a id="model-mlx-community-paligemma2-3b-ft-docci-448-bf16"></a>
 
 ### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
@@ -1090,8 +1090,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=100%
 - _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 1.44s; Gen 6.97s; Total 8.77s
-- _Throughput:_ Prompt 2,732 TPS (1,029 tok); Gen 19.5 TPS (118 tok)
+- _Timing:_ Load 1.91s; Gen 7.26s; Total 9.54s
+- _Throughput:_ Prompt 2,571 TPS (1,029 tok); Gen 18.8 TPS (118 tok)
 - _Tokens:_ prompt 1029 tok; estimated text 4 tok; estimated non-text 1025
   tok; generated 118 tok; requested max 500 tok; stop reason completed
 
@@ -1120,8 +1120,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=99%
 - _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 2.43s; Gen 7.11s; Total 9.88s
-- _Throughput:_ Prompt 373 TPS (278 tok); Gen 27.0 TPS (158 tok)
+- _Timing:_ Load 2.62s; Gen 7.46s; Total 10.43s
+- _Throughput:_ Prompt 361 TPS (278 tok); Gen 25.9 TPS (158 tok)
 - _Tokens:_ prompt 278 tok; estimated text 4 tok; estimated non-text 274 tok;
   generated 158 tok; requested max 500 tok; stop reason completed
 
@@ -1153,8 +1153,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=100%
 - _Score:_ ✅ B (75/100); Missing requested structure
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 1.37s; Gen 7.16s; Total 8.89s
-- _Throughput:_ Prompt 1,342 TPS (2,630 tok); Gen 66.8 TPS (311 tok)
+- _Timing:_ Load 1.32s; Gen 7.51s; Total 9.17s
+- _Throughput:_ Prompt 1,252 TPS (2,630 tok); Gen 64.9 TPS (311 tok)
 - _Tokens:_ prompt 2630 tok; estimated text 4 tok; estimated non-text 2626
   tok; generated 311 tok; requested max 500 tok; stop reason completed
 
@@ -1207,8 +1207,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=100%
 - _Score:_ ✅ B (68/100); Missing requested structure
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 1.38s; Gen 7.93s; Total 9.65s
-- _Throughput:_ Prompt 1,324 TPS (2,630 tok); Gen 63.6 TPS (344 tok)
+- _Timing:_ Load 1.37s; Gen 8.50s; Total 10.21s
+- _Throughput:_ Prompt 1,158 TPS (2,630 tok); Gen 60.6 TPS (344 tok)
 - _Tokens:_ prompt 2630 tok; estimated text 4 tok; estimated non-text 2626
   tok; generated 344 tok; requested max 500 tok; stop reason completed
 
@@ -1266,8 +1266,8 @@ _Quality Status:_ no quality issues detected in this run
   output (about 139 occurrences).; nontext prompt burden=100%
 - _Score:_ ❌ F (0/100); Output too short to be useful
 - _Review focus:_ watchlist (harness)
-- _Timing:_ Load 2.11s; Gen 9.01s; Total 11.47s
-- _Throughput:_ Prompt 700 TPS (2,097 tok); Gen 31.5 TPS (172 tok)
+- _Timing:_ Load 2.30s; Gen 9.12s; Total 11.77s
+- _Throughput:_ Prompt 696 TPS (2,097 tok); Gen 31.0 TPS (172 tok)
 - _Tokens:_ prompt 2097 tok; estimated text 4 tok; estimated non-text 2093
   tok; generated 172 tok; requested max 500 tok; stop reason completed
 
@@ -1297,8 +1297,8 @@ _Quality Status:_ no quality issues detected in this run
   text.; hit token cap (500); nontext prompt burden=99%
 - _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (harness)
-- _Timing:_ Load 0.96s; Gen 9.79s; Total 11.11s
-- _Throughput:_ Prompt 2,982 TPS (768 tok); Gen 55.3 TPS (500 tok)
+- _Timing:_ Load 1.12s; Gen 9.45s; Total 10.90s
+- _Throughput:_ Prompt 3,305 TPS (768 tok); Gen 57.1 TPS (500 tok)
 - _Tokens:_ prompt 768 tok; estimated text 4 tok; estimated non-text 764 tok;
   generated 500 tok; requested max 500 tok; stop reason completed
 
@@ -1359,8 +1359,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=100%
 - _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 2.54s; Gen 10.14s; Total 13.01s
-- _Throughput:_ Prompt 1,758 TPS (2,887 tok); Gen 20.9 TPS (166 tok)
+- _Timing:_ Load 2.51s; Gen 10.66s; Total 13.50s
+- _Throughput:_ Prompt 1,540 TPS (2,887 tok); Gen 20.1 TPS (166 tok)
 - _Tokens:_ prompt 2887 tok; estimated text 4 tok; estimated non-text 2883
   tok; generated 166 tok; requested max 500 tok; stop reason completed
 
@@ -1386,6 +1386,123 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-internvl3-8b-bf16"></a>
+
+### ✅ mlx-community/InternVL3-8B-bf16
+
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=100%
+- _Score:_ ✅ B (75/100); Missing requested structure
+- _Review focus:_ strong candidate for first-pass review
+- _Timing:_ Load 1.70s; Gen 11.44s; Total 13.47s
+- _Throughput:_ Prompt 2,438 TPS (1,804 tok); Gen 33.9 TPS (344 tok)
+- _Tokens:_ prompt 1804 tok; estimated text 4 tok; estimated non-text 1800
+  tok; generated 344 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> The image depicts a serene park scene with a person standing on a wooden
+> &#8203;platform extending over a body of water. Here's a detailed description:
+>
+> 1&#46; &#42;&#42;Foreground:&#42;&#42;
+> &#45; A young pine tree is prominently featured in the foreground, planted in
+> a small, circular patch of soil. The tree has a few branches with green
+> needles.
+> &#45; The tree is positioned next to a large, moss-covered rock, which adds a
+> natural element to the scene.
+>
+> 2&#46; &#42;&#42;Middle Ground:&#42;&#42;
+> &#45; A gravel path leads from the foreground towards the water, curving
+> slightly to the left.
+> &#45; The wooden platform extends from the gravel path into the water, where
+> the person is standing. The platform is made of wooden planks and appears to
+> be partially submerged.
+> &#45; The person is wearing a dark hooded jacket, dark pants, and boots. They
+> are standing with their back to the camera, looking out over the water.
+>
+> 3&#46; &#42;&#42;Background:&#42;&#42;
+> &#45; The body of water is calm, reflecting the overcast sky.
+> &#45; On the far side of the water, there is a small wooden bridge with a
+> curved design, leading to a grassy area with various trees and shrubs.
+> &#45; The landscape includes a mix of evergreen and deciduous trees, some of
+> which are bare, suggesting it might be late fall or early spring.
+> &#45; A winding path can be seen in the background, leading through the park
+> and disappearing into the trees.
+>
+> 4&#46; &#42;&#42;Sky:&#42;&#42;
+> &#45; The sky is overcast, with a uniform gray color, indicating cloudy
+> weather.
+>
+> The overall atmosphere of the image is peaceful and contemplative, with the
+> person seemingly enjoying the quiet beauty of the park.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
+<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
+
+### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ hit token cap (500); nontext prompt burden=100%
+- _Score:_ 🟡 C (65/100); Missing requested structure
+- _Review focus:_ watchlist (cutoff)
+- _Timing:_ Load 6.00s; Gen 11.99s; Total 18.49s
+- _Throughput:_ Prompt 454 TPS (1,293 tok); Gen 59.6 TPS (500 tok)
+- _Tokens:_ prompt 1293 tok; estimated text 4 tok; estimated non-text 1289
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> Alright, let's get to work. The user wants a detailed description of this
+> image, and I'm ready to dive in. First, I need to break down the request.
+> The user provided a single image and a string of text. The text is a jumble
+> of words, but it's clearly meant to be a description of the image. The user
+> wants me to describe the picture, so I'll focus on the visual elements.
+>
+> Okay, let's start with the image itself. It's a classic, serene landscape. I
+> see a tranquil pond, a wooden bridge, and a solitary figure. The mood is
+> peaceful, maybe a little melancholic. The colors are muted, dominated by
+> greens and browns, with a touch of grey from the overcast sky.
+>
+> Now, I'll analyze the text. It's a mess, but I can see some key elements.
+> "Pond," "bridge," "trees," "path," "pavilion," "willow," "bamboo," "pine,"
+> "moss," "stone," and "person." It's a good starting point, but the words are
+> jumbled. I'll use the text as a guide, but I'll rely on my own visual
+> analysis for the details.
+>
+> I'll structure my description logically. I'll start with the overall scene,
+> then move to the foreground, the midground, the background, and finally, the
+> atmosphere. I'll make sure to mention the person, as they're a key element.
+>
+> &#8203;Here's my plan:
+>
+> &#42;   &#42;&#42;Overall Scene:&#42;&#42; A tranquil, misty landscape.
+> &#42;   &#42;&#42;Foreground:&#42;&#42; A path, a stone, and some moss.
+> &#42;   &#42;&#42;Midground:&#42;&#42; A pond, a bridge, and some trees.
+> &#42;   &#42;&#42;Background:&#42;&#42; More trees and a pavilion.
+> &#42;   &#42;&#42;Atmosphere:&#42;&#42; Peaceful, quiet, and slightly melancholic.
+>
+> Now, let's draft the description. I'll start with the overall scene. Then,
+> I'll describe the path, the stone, the pond, the bridge, the trees, the
+> pavilion, and the person. I'll make sure to use descriptive language to
+> capture the mood.
+>
+> I'll refine the language as I go. I'll make sure
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Likely capped by max token budget
+
+---
+
 <a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
 
 ### ✅ mlx-community/gemma-3-27b-it-qat-4bit
@@ -1396,8 +1513,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=99%
 - _Score:_ 🏆 A (85/100); Missing requested structure
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 2.20s; Gen 11.37s; Total 13.92s
-- _Throughput:_ Prompt 381 TPS (273 tok); Gen 31.5 TPS (320 tok)
+- _Timing:_ Load 2.32s; Gen 12.05s; Total 14.73s
+- _Throughput:_ Prompt 382 TPS (273 tok); Gen 29.5 TPS (320 tok)
 - _Tokens:_ prompt 273 tok; estimated text 4 tok; estimated non-text 269 tok;
   generated 320 tok; requested max 500 tok; stop reason completed
 
@@ -1448,192 +1565,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-internvl3-8b-bf16"></a>
-
-### ✅ mlx-community/InternVL3-8B-bf16
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ nontext prompt burden=100%
-- _Score:_ ✅ B (75/100); Missing requested structure
-- _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 1.75s; Gen 11.39s; Total 13.48s
-- _Throughput:_ Prompt 2,452 TPS (1,804 tok); Gen 34.1 TPS (344 tok)
-- _Tokens:_ prompt 1804 tok; estimated text 4 tok; estimated non-text 1800
-  tok; generated 344 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> The image depicts a serene park scene with a person standing on a wooden
-> &#8203;platform extending over a body of water. Here's a detailed description:
->
-> 1&#46; &#42;&#42;Foreground:&#42;&#42;
-> &#45; A young pine tree is prominently featured in the foreground, planted in
-> a small, circular patch of soil. The tree has a few branches with green
-> needles.
-> &#45; The tree is positioned next to a large, moss-covered rock, which adds a
-> natural element to the scene.
->
-> 2&#46; &#42;&#42;Middle Ground:&#42;&#42;
-> &#45; A gravel path leads from the foreground towards the water, curving
-> slightly to the left.
-> &#45; The wooden platform extends from the gravel path into the water, where
-> the person is standing. The platform is made of wooden planks and appears to
-> be partially submerged.
-> &#45; The person is wearing a dark hooded jacket, dark pants, and boots. They
-> are standing with their back to the camera, looking out over the water.
->
-> 3&#46; &#42;&#42;Background:&#42;&#42;
-> &#45; The body of water is calm, reflecting the overcast sky.
-> &#45; On the far side of the water, there is a small wooden bridge with a
-> curved design, leading to a grassy area with various trees and shrubs.
-> &#45; The landscape includes a mix of evergreen and deciduous trees, some of
-> which are bare, suggesting it might be late fall or early spring.
-> &#45; A winding path can be seen in the background, leading through the park
-> and disappearing into the trees.
->
-> 4&#46; &#42;&#42;Sky:&#42;&#42;
-> &#45; The sky is overcast, with a uniform gray color, indicating cloudy
-> weather.
->
-> The overall atmosphere of the image is peaceful and contemplative, with the
-> person seemingly enjoying the quiet beauty of the park.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-apriel-15-15b-thinker-6bit-mlx"></a>
-
-### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ hit token cap (500); nontext prompt burden=100%; reasoning
-  leak; degeneration=incomplete_sentence: ends with 'of'
-- _Score:_ ✅ B (80/100); Keywords are not specific or diverse enough
-- _Review focus:_ watchlist (cutoff, degeneration, reasoning leak)
-- _Timing:_ Load 1.68s; Gen 14.70s; Total 16.74s
-- _Throughput:_ Prompt 1,399 TPS (2,979 tok); Gen 41.6 TPS (500 tok)
-- _Tokens:_ prompt 2979 tok; estimated text 4 tok; estimated non-text 2975
-  tok; generated 500 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> &#8203;Here are my reasoning steps:
-> The user asks: "Describe this picture". The picture is a landscape scene: a
-> pond/lake with a small wooden bridge, a path, a child standing on a small
-> wooden platform near water, a grassy area with a small pine tree, a
-> moss-covered rock, a path leading to a bridge over water, trees in
-> background, a hill with coniferous and deciduous trees, a small wooden dock,
-> a bench, etc. The user wants a description. The content is safe. There's no
-> disallowed content. So we can comply. Provide a vivid description. Possibly
-> mention the weather (overcast), the colors, the composition, the
-> perspective. The user didn't ask for anything else. So we can comply.
->
-> We should produce a thorough description. The user might want a textual
-> &#8203;description for accessibility. So we can describe the scene in detail:
-> foreground, middle ground, background, elements, colors, lighting, mood,
-> etc.
->
-> We can also mention the child's clothing: blue coat, hat, boots. The path is
-> a gravel path. The water is dark, reflecting the sky. The bridge is a small
-> wooden footbridge with a curved shape. The pond is surrounded by grass and
-> trees. There's a small pine tree in a circular planting bed with a mossy
-> rock. The background includes a hill with a mix of evergreen and deciduous
-> trees, some with green foliage, some bare. There's a small wooden dock on
-> the left side. The sky is overcast, gray. The overall mood is tranquil,
-> serene.
->
-> We can also mention the composition: the viewpoint is from a higher angle,
-> maybe from a slight elevation, looking down at the pond and the child. The
-> path curves around the pond. The child is standing on a small wooden
-> platform that extends into the water. The scene is likely a park or garden.
->
-> We can also mention the presence of a bench near the water. The path is
-> lined with small stones. The water is calm, with slight ripples. The overall
-> atmosphere is peaceful.
->
-> We can also mention the presence of a small wooden bridge crossing the pond,
-> connecting two sides of the path. The bridge is arched, with railings. The
-> pond is surrounded by a grassy bank. The background includes a hill with
-> trees, some of which are coniferous, some deciduous. The sky is overcast,
-> giving a soft light.
->
-> We can also mention the presence of
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Output degeneration (incomplete_sentence: ends with 'of')
-- Reasoning leak (here are my reasoning steps, the user asks:)
-- Likely capped by max token budget
-
----
-
-<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
-
-### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ hit token cap (500); nontext prompt burden=100%
-- _Score:_ 🟡 C (65/100); Missing requested structure
-- _Review focus:_ watchlist (cutoff)
-- _Timing:_ Load 11.75s; Gen 15.12s; Total 27.37s
-- _Throughput:_ Prompt 222 TPS (1,293 tok); Gen 58.6 TPS (500 tok)
-- _Tokens:_ prompt 1293 tok; estimated text 4 tok; estimated non-text 1289
-  tok; generated 500 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> Alright, let's get to work. The user wants a detailed description of this
-> image, and I'm ready to dive in. First, I need to break down the request.
-> The user provided a single image and a string of text. The text is a jumble
-> of words, but it's clearly meant to be a description of the image. The user
-> wants me to describe the picture, so I'll focus on the visual elements.
->
-> Okay, let's start with the image itself. It's a classic, serene landscape. I
-> see a tranquil pond, a wooden bridge, and a solitary figure. The mood is
-> peaceful, maybe a little melancholic. The colors are muted, dominated by
-> greens and browns, with a touch of grey from the overcast sky.
->
-> Now, I'll analyze the text. It's a mess, but I can see some key elements.
-> "Pond," "bridge," "trees," "path," "pavilion," "willow," "bamboo," "pine,"
-> "moss," "stone," and "person." It's a good starting point, but the words are
-> jumbled. I'll use the text as a guide, but I'll rely on my own visual
-> analysis for the details.
->
-> I'll structure my description logically. I'll start with the overall scene,
-> then move to the foreground, the midground, the background, and finally, the
-> atmosphere. I'll make sure to mention the person, as they're a key element.
->
-> &#8203;Here's my plan:
->
-> &#42;   &#42;&#42;Overall Scene:&#42;&#42; A tranquil, misty landscape.
-> &#42;   &#42;&#42;Foreground:&#42;&#42; A path, a stone, and some moss.
-> &#42;   &#42;&#42;Midground:&#42;&#42; A pond, a bridge, and some trees.
-> &#42;   &#42;&#42;Background:&#42;&#42; More trees and a pavilion.
-> &#42;   &#42;&#42;Atmosphere:&#42;&#42; Peaceful, quiet, and slightly melancholic.
->
-> Now, let's draft the description. I'll start with the overall scene. Then,
-> I'll describe the path, the stone, the pond, the bridge, the trees, the
-> pavilion, and the person. I'll make sure to use descriptive language to
-> capture the mood.
->
-> I'll refine the language as I go. I'll make sure
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Likely capped by max token budget
-
----
-
 <a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
 
 ### ✅ mlx-community/GLM-4.6V-Flash-mxfp4
@@ -1646,8 +1577,8 @@ _Quality Status:_ no quality issues detected in this run
   text.; hit token cap (500); nontext prompt burden=100%; reasoning leak
 - _Score:_ ✅ B (80/100); Missing requested structure
 - _Review focus:_ watchlist (harness, reasoning leak)
-- _Timing:_ Load 1.49s; Gen 15.27s; Total 17.12s
-- _Throughput:_ Prompt 826 TPS (6,091 tok); Gen 67.6 TPS (500 tok)
+- _Timing:_ Load 1.29s; Gen 12.81s; Total 14.47s
+- _Throughput:_ Prompt 1,149 TPS (6,091 tok); Gen 71.3 TPS (500 tok)
 - _Tokens:_ prompt 6091 tok; estimated text 4 tok; estimated non-text 6087
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
@@ -1713,47 +1644,72 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-molmo-7b-d-0924-8bit"></a>
+<a id="model-mlx-community-apriel-15-15b-thinker-6bit-mlx"></a>
 
-### ✅ mlx-community/Molmo-7B-D-0924-8bit
+### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
 
-- _Recommendation:_ recommended; review verdict: clean
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ nontext prompt burden=100%
+- _Key signals:_ hit token cap (500); nontext prompt burden=100%; reasoning
+  leak; degeneration=incomplete_sentence: ends with 'of'
 - _Score:_ ✅ B (80/100); Keywords are not specific or diverse enough
-- _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 1.28s; Gen 18.57s; Total 20.21s
-- _Throughput:_ Prompt 88.1 TPS (1,207 tok); Gen 51.7 TPS (205 tok)
-- _Tokens:_ prompt 1207 tok; estimated text 4 tok; estimated non-text 1203
-  tok; generated 205 tok; requested max 500 tok; stop reason completed
+- _Review focus:_ watchlist (cutoff, degeneration, reasoning leak)
+- _Timing:_ Load 1.57s; Gen 14.35s; Total 16.25s
+- _Throughput:_ Prompt 1,481 TPS (2,979 tok); Gen 42.3 TPS (500 tok)
+- _Tokens:_ prompt 2979 tok; estimated text 4 tok; estimated non-text 2975
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
-> in detail
+> &#8203;Here are my reasoning steps:
+> The user asks: "Describe this picture". The picture is a landscape scene: a
+> pond/lake with a small wooden bridge, a path, a child standing on a small
+> wooden platform near water, a grassy area with a small pine tree, a
+> moss-covered rock, a path leading to a bridge over water, trees in
+> background, a hill with coniferous and deciduous trees, a small wooden dock,
+> a bench, etc. The user wants a description. The content is safe. There's no
+> disallowed content. So we can comply. Provide a vivid description. Possibly
+> mention the weather (overcast), the colors, the composition, the
+> perspective. The user didn't ask for anything else. So we can comply.
 >
-> This picture captures a serene autumn scene at a park. In the foreground, a
-> small pine tree stands on a grassy area, its branches adorned with pine
-> needles. The tree is surrounded by a few scattered leaves, hinting at the
-> fall season.
+> We should produce a thorough description. The user might want a textual
+> &#8203;description for accessibility. So we can describe the scene in detail:
+> foreground, middle ground, background, elements, colors, lighting, mood,
+> etc.
 >
-> A concrete walkway winds through the park, leading to a wooden dock that
-> extends into a calm body of water. A person dressed in a blue jacket and
-> brown boots is standing on the dock, gazing out at the water.
+> We can also mention the child's clothing: blue coat, hat, boots. The path is
+> a gravel path. The water is dark, reflecting the sky. The bridge is a small
+> wooden footbridge with a curved shape. The pond is surrounded by grass and
+> trees. There's a small pine tree in a circular planting bed with a mossy
+> rock. The background includes a hill with a mix of evergreen and deciduous
+> trees, some with green foliage, some bare. There's a small wooden dock on
+> the left side. The sky is overcast, gray. The overall mood is tranquil,
+> serene.
 >
-> The water is dark and reflective, mirroring the overcast sky above. In the
-> background, a bridge spans across the water, connecting two grassy areas.
-> The landscape is dotted with trees in various stages of autumnal
-> transformation, some with green leaves while others are bare or turning
-> brown.
+> We can also mention the composition: the viewpoint is from a higher angle,
+> maybe from a slight elevation, looking down at the pond and the child. The
+> path curves around the pond. The child is standing on a small wooden
+> platform that extends into the water. The scene is likely a park or garden.
 >
-> The sky is a light gray, creating a peaceful and somewhat melancholic
-> atmosphere. The overall color palette consists of muted greens, browns,
-> grays, and blues, perfectly capturing the essence of a quiet autumn day in
-> the park.
+> We can also mention the presence of a bench near the water. The path is
+> lined with small stones. The water is calm, with slight ripples. The overall
+> atmosphere is peaceful.
+>
+> We can also mention the presence of a small wooden bridge crossing the pond,
+> connecting two sides of the path. The bridge is arched, with railings. The
+> pond is surrounded by a grassy bank. The background includes a hill with
+> trees, some of which are coniferous, some deciduous. The sky is overcast,
+> giving a soft light.
+>
+> We can also mention the presence of
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
-_Quality Status:_ no quality issues detected in this run
+⚠️ _Quality Warnings:_
+
+- Output degeneration (incomplete_sentence: ends with 'of')
+- Reasoning leak (here are my reasoning steps, the user asks:)
+- Likely capped by max token budget
 
 ---
 
@@ -1769,8 +1725,8 @@ _Quality Status:_ no quality issues detected in this run
   text.; hit token cap (500); nontext prompt burden=100%; reasoning leak
 - _Score:_ ✅ B (80/100); Missing requested structure
 - _Review focus:_ watchlist (harness, reasoning leak)
-- _Timing:_ Load 1.42s; Gen 18.92s; Total 20.70s
-- _Throughput:_ Prompt 833 TPS (6,091 tok); Gen 44.9 TPS (500 tok)
+- _Timing:_ Load 1.49s; Gen 15.03s; Total 16.87s
+- _Throughput:_ Prompt 1,137 TPS (6,091 tok); Gen 54.2 TPS (500 tok)
 - _Tokens:_ prompt 6091 tok; estimated text 4 tok; estimated non-text 6087
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
@@ -1837,76 +1793,9 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
+<a id="model-mlx-community-molmo-7b-d-0924-8bit"></a>
 
-### ✅ mlx-community/X-Reasoner-7B-8bit
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ nontext prompt burden=100%
-- _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
-- _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 1.00s; Gen 20.20s; Total 21.51s
-- _Throughput:_ Prompt 1,042 TPS (16,299 tok); Gen 57.3 TPS (219 tok)
-- _Tokens:_ prompt 16299 tok; estimated text 4 tok; estimated non-text 16295
-  tok; generated 219 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> This picture captures a serene and tranquil scene in a park or garden
-> setting. The focal point is a small, young pine tree growing on a
-> moss-covered rock. The tree is situated on a grassy area, and the rock
-> beneath it is covered in vibrant green moss, indicating a damp environment.
-> The background features a calm body of water, possibly a pond or a small
-> lake, with a wooden bridge curving over it. The bridge leads to a grassy
-> path that winds through the landscape, bordered by trees and shrubs. In the
-> distance, there are tall evergreen trees and a few bare deciduous trees,
-> suggesting the photo was taken during late autumn or early spring. The sky
-> is overcast, adding to the peaceful and slightly melancholic atmosphere. A
-> person dressed in dark clothing is standing near the water's edge, adding a
-> sense of scale and human presence to the scene. The overall composition is
-> balanced, with the tree and rock in the foreground leading the eye towards
-> the bridge and the water in the background. The image conveys a sense of
-> quiet reflection and natural beauty.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-paligemma2-10b-ft-docci-448-bf16"></a>
-
-### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ nontext prompt burden=100%
-- _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
-- _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 2.51s; Gen 20.48s; Total 23.35s
-- _Throughput:_ Prompt 917 TPS (1,029 tok); Gen 5.32 TPS (100 tok)
-- _Tokens:_ prompt 1029 tok; estimated text 4 tok; estimated non-text 1025
-  tok; generated 100 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> A medium shot of a small tree with a round base covered in green moss. The
-> tree is planted on a grass field with a small gravel area to the left of it.
-> A small pond is behind the tree and has a wooden walkway that leads to a
-> person standing on the edge of the pond. A small bridge is in the background
-> of the pond and leads to a grass field. A forest is in the background of
-> the pond and is covered in trees. The sky is gray and cloudy.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-molmo-7b-d-0924-bf16"></a>
-
-### ✅ mlx-community/Molmo-7B-D-0924-bf16
+### ✅ mlx-community/Molmo-7B-D-0924-8bit
 
 - _Recommendation:_ recommended; review verdict: clean
 - _Owner:_ likely owner `model`
@@ -1914,8 +1803,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=100%
 - _Score:_ ✅ B (80/100); Keywords are not specific or diverse enough
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 1.78s; Gen 22.43s; Total 24.55s
-- _Throughput:_ Prompt 82.1 TPS (1,207 tok); Gen 29.7 TPS (205 tok)
+- _Timing:_ Load 1.47s; Gen 18.77s; Total 20.58s
+- _Throughput:_ Prompt 86.7 TPS (1,207 tok); Gen 51.0 TPS (205 tok)
 - _Tokens:_ prompt 1207 tok; estimated text 4 tok; estimated non-text 1203
   tok; generated 205 tok; requested max 500 tok; stop reason completed
 
@@ -1948,6 +1837,35 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-paligemma2-10b-ft-docci-448-bf16"></a>
+
+### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
+
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=100%
+- _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
+- _Review focus:_ strong candidate for first-pass review
+- _Timing:_ Load 2.62s; Gen 20.55s; Total 23.53s
+- _Throughput:_ Prompt 905 TPS (1,029 tok); Gen 5.32 TPS (100 tok)
+- _Tokens:_ prompt 1029 tok; estimated text 4 tok; estimated non-text 1025
+  tok; generated 100 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> A medium shot of a small tree with a round base covered in green moss. The
+> tree is planted on a grass field with a small gravel area to the left of it.
+> A small pond is behind the tree and has a wooden walkway that leads to a
+> person standing on the edge of the pond. A small bridge is in the background
+> of the pond and leads to a grass field. A forest is in the background of
+> the pond and is covered in trees. The sky is gray and cloudy.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
 <a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
 
 ### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
@@ -1958,8 +1876,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=71%
 - _Score:_ ✅ B (73/100); Missing requested structure
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 1.55s; Gen 22.61s; Total 24.49s
-- _Throughput:_ Prompt 10.1 TPS (14 tok); Gen 20.3 TPS (421 tok)
+- _Timing:_ Load 1.51s; Gen 22.80s; Total 24.64s
+- _Throughput:_ Prompt 10.2 TPS (14 tok); Gen 20.1 TPS (421 tok)
 - _Tokens:_ prompt 14 tok; estimated text 4 tok; estimated non-text 10 tok;
   generated 421 tok; requested max 500 tok; stop reason completed
 
@@ -2011,6 +1929,52 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-molmo-7b-d-0924-bf16"></a>
+
+### ✅ mlx-community/Molmo-7B-D-0924-bf16
+
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=100%
+- _Score:_ ✅ B (80/100); Keywords are not specific or diverse enough
+- _Review focus:_ strong candidate for first-pass review
+- _Timing:_ Load 1.78s; Gen 23.10s; Total 25.22s
+- _Throughput:_ Prompt 81.0 TPS (1,207 tok); Gen 29.8 TPS (219 tok)
+- _Tokens:_ prompt 1207 tok; estimated text 4 tok; estimated non-text 1203
+  tok; generated 219 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> in detail
+>
+> This picture captures a serene autumn scene at a park. The focal point is a
+> small, tranquil lake with a wooden dock extending into it. A person in a
+> blue jacket and brown boots stands at the end of the dock, gazing out over
+> the water.
+>
+> The surrounding landscape is a mix of green and brown hues, typical of fall.
+> Lush green grass covers the foreground, while trees in the background
+> display a range of colors from vibrant green to warm brown. Some trees have
+> lost their leaves, creating a beautiful contrast against the remaining
+> foliage.
+>
+> A quaint stone bridge spans the lake, connecting two grassy areas. The sky
+> is overcast, casting a soft, diffused light over the entire scene. This
+> lighting enhances the peaceful atmosphere of the park.
+>
+> In the foreground, a small pine tree stands in a dirt patch, its branches
+> reaching upwards. A large moss-covered rock sits nearby, adding texture and
+> natural beauty to the composition.
+>
+> The overall image exudes a sense of tranquility and natural beauty,
+> perfectly capturing the essence of a crisp autumn day in a park setting.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
 <a id="model-mlx-community-gemma-3-27b-it-qat-8bit"></a>
 
 ### ✅ mlx-community/gemma-3-27b-it-qat-8bit
@@ -2021,8 +1985,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=99%
 - _Score:_ ✅ B (80/100); Missing requested structure
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 3.23s; Gen 23.38s; Total 26.95s
-- _Throughput:_ Prompt 322 TPS (273 tok); Gen 17.3 TPS (381 tok)
+- _Timing:_ Load 3.36s; Gen 23.53s; Total 27.23s
+- _Throughput:_ Prompt 321 TPS (273 tok); Gen 17.2 TPS (381 tok)
 - _Tokens:_ prompt 273 tok; estimated text 4 tok; estimated non-text 269 tok;
   generated 381 tok; requested max 500 tok; stop reason completed
 
@@ -2074,6 +2038,44 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
+
+### ✅ mlx-community/X-Reasoner-7B-8bit
+
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=100%
+- _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
+- _Review focus:_ strong candidate for first-pass review
+- _Timing:_ Load 1.12s; Gen 23.60s; Total 25.06s
+- _Throughput:_ Prompt 863 TPS (16,299 tok); Gen 55.7 TPS (219 tok)
+- _Tokens:_ prompt 16299 tok; estimated text 4 tok; estimated non-text 16295
+  tok; generated 219 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> This picture captures a serene and tranquil scene in a park or garden
+> setting. The focal point is a small, young pine tree growing on a
+> moss-covered rock. The tree is situated on a grassy area, and the rock
+> beneath it is covered in vibrant green moss, indicating a damp environment.
+> The background features a calm body of water, possibly a pond or a small
+> lake, with a wooden bridge curving over it. The bridge leads to a grassy
+> path that winds through the landscape, bordered by trees and shrubs. In the
+> distance, there are tall evergreen trees and a few bare deciduous trees,
+> suggesting the photo was taken during late autumn or early spring. The sky
+> is overcast, adding to the peaceful and slightly melancholic atmosphere. A
+> person dressed in dark clothing is standing near the water's edge, adding a
+> sense of scale and human presence to the scene. The overall composition is
+> balanced, with the tree and rock in the foreground leading the eye towards
+> the bridge and the water in the background. The image conveys a sense of
+> quiet reflection and natural beauty.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
 <a id="model-mlx-community-glm-46v-nvfp4"></a>
 
 ### ✅ mlx-community/GLM-4.6V-nvfp4
@@ -2086,8 +2088,8 @@ _Quality Status:_ no quality issues detected in this run
   text.; hit token cap (500); nontext prompt burden=100%; reasoning leak
 - _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (harness, reasoning leak)
-- _Timing:_ Load 9.55s; Gen 33.76s; Total 43.65s
-- _Throughput:_ Prompt 319 TPS (6,091 tok); Gen 35.4 TPS (500 tok)
+- _Timing:_ Load 8.32s; Gen 36.42s; Total 45.10s
+- _Throughput:_ Prompt 325 TPS (6,091 tok); Gen 29.2 TPS (500 tok)
 - _Tokens:_ prompt 6091 tok; estimated text 4 tok; estimated non-text 6087
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
@@ -2152,8 +2154,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=73%
 - _Score:_ ✅ B (80/100); Missing requested structure
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 2.87s; Gen 58.25s; Total 61.46s
-- _Throughput:_ Prompt 5.88 TPS (15 tok); Gen 5 TPS (276 tok)
+- _Timing:_ Load 2.15s; Gen 58.63s; Total 61.09s
+- _Throughput:_ Prompt 8.51 TPS (15 tok); Gen 4.89 TPS (276 tok)
 - _Tokens:_ prompt 15 tok; estimated text 4 tok; estimated non-text 11 tok;
   generated 276 tok; requested max 500 tok; stop reason completed
 
@@ -2200,8 +2202,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=100%; reasoning leak
 - _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (reasoning leak)
-- _Timing:_ Load 3.28s; Gen 60.82s; Total 64.43s
-- _Throughput:_ Prompt 767 TPS (1,011 tok); Gen 4.71 TPS (277 tok)
+- _Timing:_ Load 3.23s; Gen 60.89s; Total 64.45s
+- _Throughput:_ Prompt 760 TPS (1,011 tok); Gen 4.71 TPS (277 tok)
 - _Tokens:_ prompt 1011 tok; estimated text 4 tok; estimated non-text 1007
   tok; generated 277 tok; requested max 500 tok; stop reason completed
 
@@ -2236,6 +2238,136 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-qwen35-35b-a3b-6bit"></a>
+
+### ✅ mlx-community/Qwen3.5-35B-A3B-6bit
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ hit token cap (500); nontext prompt burden=100%
+- _Score:_ ✅ B (80/100); Missing requested structure
+- _Review focus:_ watchlist (cutoff)
+- _Timing:_ Load 3.19s; Gen 68.56s; Total 72.10s
+- _Throughput:_ Prompt 263 TPS (16,290 tok); Gen 86.9 TPS (500 tok)
+- _Tokens:_ prompt 16290 tok; estimated text 4 tok; estimated non-text 16286
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> The user wants a description of the provided image.
+>
+> 1&#46;  &#42;&#42;Identify the main subject:&#42;&#42; The image shows a landscape scene, likely
+> a park or garden, featuring a body of water (a lake or pond), a person
+> standing on a small pier, and various trees and vegetation.
+> 2&#46;  &#42;&#42;Analyze the foreground:&#42;&#42;
+> &#42;   There's a small, young pine tree growing out of a moss-covered rock
+> or mound.
+> &#42;   The ground is covered in green grass.
+> &#42;   To the left, there's a gravel path.
+> &#42;   A wooden bench is visible on the far left edge.
+> 3&#46;  &#42;&#42;Analyze the mid-ground:&#42;&#42;
+> &#42;   A person is standing on a small, gravel-covered pier or platform
+> extending into the water. They are wearing a dark blue coat with a hood up
+> and brown boots. They are facing away from the camera, looking towards the
+> water or the far bank.
+> &#42;   The water is dark and rippled, suggesting it might be raining or
+> just windy.
+> &#42;   There's a wooden retaining wall or edging along the pier.
+> 4&#46;  &#42;&#42;Analyze the background:&#42;&#42;
+> &#42;   Across the water, there's a grassy bank leading up a hill.
+> &#42;   A small, arched wooden bridge crosses a narrow part of the water or
+> a stream feeding into it.
+> &#42;   There are many trees. Some are evergreens (conifers) which are dark
+> green. Others are deciduous trees that are bare or have brownish leaves,
+> suggesting late autumn or winter.
+> &#42;   The sky is overcast and grey, reinforcing the gloomy/wet weather
+> feel.
+> 5&#46;  &#42;&#42;Synthesize the description:&#42;&#42;
+> &#42;   Start with the general setting: A serene, somewhat overcast
+> landscape scene.
+> &#42;   Describe the foreground elements: The small pine tree on the mossy
+> rock, the grass, the gravel path.
+> &#42;   Describe the central figure: The person in the blue coat standing on
+> the pier. Mention their posture (looking out).
+> &#42;   Describe the water and immediate surroundings: The dark water, the
+> wooden edging of the pier.
+> &#42;   Describe the background: The bridge, the mix of evergreen and bare
+> trees on the hillside, the overcast sky.
+> &#42;   Add atmosphere: Mention the rainy/moody feel
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Likely capped by max token budget
+
+---
+
+<a id="model-mlx-community-qwen35-35b-a3b-4bit"></a>
+
+### ✅ mlx-community/Qwen3.5-35B-A3B-4bit
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ hit token cap (500); nontext prompt burden=100%
+- _Score:_ ✅ B (80/100); Missing requested structure
+- _Review focus:_ watchlist (cutoff)
+- _Timing:_ Load 2.92s; Gen 69.14s; Total 72.40s
+- _Throughput:_ Prompt 257 TPS (16,290 tok); Gen 101 TPS (500 tok)
+- _Tokens:_ prompt 16290 tok; estimated text 4 tok; estimated non-text 16286
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> The user wants a description of the provided image.
+>
+> 1&#46;  &#42;&#42;Identify the main subject:&#42;&#42; The image shows a landscape scene, likely
+> a park or garden, featuring a body of water (a lake or pond), a person
+> standing on a small pier, and various trees and greenery.
+>
+> 2&#46;  &#42;&#42;Break down the image into sections:&#42;&#42;
+> &#42;   &#42;&#42;Foreground:&#42;&#42;
+> &#42;   A small, young pine tree is prominent on the left side.
+> &#42;   A large, moss-covered rock sits at the base of the pine tree.
+> &#42;   Green grass covers the ground.
+> &#42;   A gravel path curves from the left towards the water.
+> &#42;   &#42;&#42;Mid-ground (The Water and Pier):&#42;&#42;
+> &#42;   A calm body of water stretches across the middle.
+> &#42;   A small, wooden pier or platform extends into the water. It has
+> a wooden retaining wall.
+> &#42;   A person is standing on the end of this pier. They are wearing a
+> dark blue hooded coat and dark pants/boots. They are facing away from the
+> camera, looking out at the water.
+> &#42;   To the left, there's a wooden bench near the water's edge.
+> &#42;   &#42;&#42;Background (The Far Shore):&#42;&#42;
+> &#42;   A wooden bridge arches over a section of the water further back.
+> &#42;   Lush green grass slopes upwards.
+> &#42;   There are many trees: evergreens (conifers) and deciduous trees
+> (some bare, some green).
+> &#42;   A winding path is visible on the grassy hill.
+> &#42;   A small structure (maybe a shed or small house) is nestled among
+> the trees.
+> &#42;   &#42;&#42;Sky/Atmosphere:&#42;&#42;
+> &#42;   The sky is overcast and grey, suggesting a cloudy day.
+> &#42;   The lighting is soft and diffused.
+>
+> 3&#46;  &#42;&#42;Draft the description:&#42;&#42;
+> &#42;   Start with the overall setting: A serene, overcast day at a park or
+> garden with a lake.
+> &#42;   Describe the foreground details: The small pine tree and mossy rock
+> are key visual anchors. Mention the gravel path.
+> &#42;   Describe the mid-ground action: The person on the pier. Describe
+> their clothing (blue coat, hood up). Mention the wooden bench to the left.
+> &#42;   Describe the background: The
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Likely capped by max token budget
+
+---
+
 <a id="model-mlx-community-qwen35-9b-mlx-4bit"></a>
 
 ### ✅ mlx-community/Qwen3.5-9B-MLX-4bit
@@ -2247,8 +2379,8 @@ _Quality Status:_ no quality issues detected in this run
   degeneration=repeated_punctuation: ':**...'
 - _Score:_ ✅ B (80/100); Missing requested structure
 - _Review focus:_ watchlist (degeneration)
-- _Timing:_ Load 1.56s; Gen 69.17s; Total 71.08s
-- _Throughput:_ Prompt 261 TPS (16,290 tok); Gen 84.6 TPS (500 tok)
+- _Timing:_ Load 1.48s; Gen 70.12s; Total 71.96s
+- _Throughput:_ Prompt 257 TPS (16,290 tok); Gen 86.4 TPS (500 tok)
 - _Tokens:_ prompt 16290 tok; estimated text 4 tok; estimated non-text 16286
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
@@ -2304,162 +2436,55 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
 
-- _Recommendation:_ use with caveats; review verdict: context budget
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
 - _Owner:_ likely owner `mlx`; harness signal `long_context`
-- _Next step:_ Treat this as a prompt-budget issue first; nontext prompt
-  burden is 100% and the output stays weak under that load.
-- _Key signals:_ Output is very short relative to prompt size (0.1%),
-  suggesting possible early-stop or prompt-handling issues.; At long prompt
-  length (16299 tokens), output stayed unusually short (13 tokens; ratio
-  0.1%).; output/prompt=0.08%; nontext prompt burden=100%
-- _Score:_ ❌ F (16/100); Output lacks detail
-- _Review focus:_ watchlist (harness, long context)
-- _Timing:_ Load 0.58s; Gen 71.29s; Total 72.20s
-- _Throughput:_ Prompt 231 TPS (16,299 tok); Gen 181 TPS (13 tok)
+- _Next step:_ Inspect long-context cache behavior under heavy image-token
+  burden.
+- _Key signals:_ At long prompt length (16299 tokens), output became
+  repetitive.; hit token cap (500); nontext prompt burden=100%; repetitive
+  token=phrase: "' chinese: ' chinese:..."
+- _Score:_ 🟠 D (45/100); Keywords are not specific or diverse enough
+- _Review focus:_ watchlist (cutoff, harness, long context, repetitive)
+- _Timing:_ Load 0.47s; Gen 72.80s; Total 73.60s
+- _Throughput:_ Prompt 242 TPS (16,299 tok); Gen 108 TPS (500 tok)
 - _Tokens:_ prompt 16299 tok; estimated text 4 tok; estimated non-text 16295
-  tok; generated 13 tok; requested max 500 tok; stop reason completed
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
-> I'm sorry, but the context didn't show up.
+> Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese:
+> 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: '
+> Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese:
+> 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: '
+> Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese:
+> 'Chinese: ' Chinese: 'Chinese: ' Chinese: ' Chinese: 'Chinese: ' Chinese: '
+> Chinese: 'Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: '
+> Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: '
+> Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese:
+> ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese:
+> ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: '
+> Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: '
+> Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese:
+> ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese:
+> ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: '
+> Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: '
+> Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese:
+> ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese:
+> ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: '
+> Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: '
+> Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese:
+> ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese:
+> ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: '
+> Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: ' Chinese: '
+> Chinese: ' Chinese: ' Chinese:
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
-- ⚠️REVIEW:context_budget
 - ⚠️HARNESS:long_context
-- output:output_ratio(0.1%)
-- long_context_low_ratio(0.1%;16299->13)
-
----
-
-<a id="model-mlx-community-qwen35-35b-a3b-4bit"></a>
-
-### ✅ mlx-community/Qwen3.5-35B-A3B-4bit
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ hit token cap (500); nontext prompt burden=100%
-- _Score:_ ✅ B (80/100); Missing requested structure
-- _Review focus:_ watchlist (cutoff)
-- _Timing:_ Load 2.65s; Gen 76.83s; Total 79.83s
-- _Throughput:_ Prompt 234 TPS (16,290 tok); Gen 77.8 TPS (500 tok)
-- _Tokens:_ prompt 16290 tok; estimated text 4 tok; estimated non-text 16286
-  tok; generated 500 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> The user wants a description of the provided image.
->
-> 1&#46;  &#42;&#42;Identify the main subject:&#42;&#42; The image shows a landscape scene, likely
-> a park or garden, featuring a body of water (a lake or pond), a person
-> standing on a small pier, and various trees and greenery.
->
-> 2&#46;  &#42;&#42;Break down the image into sections:&#42;&#42;
-> &#42;   &#42;&#42;Foreground:&#42;&#42;
-> &#42;   A small, young pine tree is prominent on the left side.
-> &#42;   A large, moss-covered rock sits at the base of the pine tree.
-> &#42;   Green grass covers the ground.
-> &#42;   A gravel path curves from the left towards the water.
-> &#42;   &#42;&#42;Mid-ground (The Water and Pier):&#42;&#42;
-> &#42;   A calm body of water stretches across the middle.
-> &#42;   A small, wooden pier or platform extends into the water. It has
-> a wooden retaining wall.
-> &#42;   A person is standing on the end of this pier. They are wearing a
-> dark blue hooded coat and dark pants/boots. They are facing away from the
-> camera, looking out at the water.
-> &#42;   To the left, there's a wooden bench near the water's edge.
-> &#42;   &#42;&#42;Background (The Far Shore):&#42;&#42;
-> &#42;   A wooden bridge arches over a section of the water further back.
-> &#42;   Lush green grass slopes upwards.
-> &#42;   There are many trees: evergreens (conifers) and deciduous trees
-> (some bare, some green).
-> &#42;   A winding path is visible on the grassy hill.
-> &#42;   A small structure (maybe a shed or small house) is nestled among
-> the trees.
-> &#42;   &#42;&#42;Sky/Atmosphere:&#42;&#42;
-> &#42;   The sky is overcast and grey, suggesting a cloudy day.
-> &#42;   The lighting is soft and diffused.
->
-> 3&#46;  &#42;&#42;Draft the description:&#42;&#42;
-> &#42;   Start with the overall setting: A serene, overcast day at a park or
-> garden with a lake.
-> &#42;   Describe the foreground details: The small pine tree and mossy rock
-> are key visual anchors. Mention the gravel path.
-> &#42;   Describe the mid-ground action: The person on the pier. Describe
-> their clothing (blue coat, hood up). Mention the wooden bench to the left.
-> &#42;   Describe the background: The
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
+- Repetitive output (phrase: "' chinese: ' chinese:...")
 - Likely capped by max token budget
-
----
-
-<a id="model-mlx-community-qwen35-35b-a3b-6bit"></a>
-
-### ✅ mlx-community/Qwen3.5-35B-A3B-6bit
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ hit token cap (500); nontext prompt burden=100%
-- _Score:_ ✅ B (80/100); Missing requested structure
-- _Review focus:_ watchlist (cutoff)
-- _Timing:_ Load 3.31s; Gen 80.70s; Total 84.43s
-- _Throughput:_ Prompt 226 TPS (16,290 tok); Gen 65.6 TPS (500 tok)
-- _Tokens:_ prompt 16290 tok; estimated text 4 tok; estimated non-text 16286
-  tok; generated 500 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> The user wants a description of the provided image.
->
-> 1&#46;  &#42;&#42;Identify the main subject:&#42;&#42; The image shows a landscape scene, likely
-> a park or garden, featuring a body of water (a lake or pond), a person
-> standing on a small pier, and various trees and vegetation.
-> 2&#46;  &#42;&#42;Analyze the foreground:&#42;&#42;
-> &#42;   There's a small, young pine tree growing out of a moss-covered rock
-> or mound.
-> &#42;   The ground is covered in green grass.
-> &#42;   To the left, there's a gravel path.
-> &#42;   A wooden bench is visible on the far left edge.
-> 3&#46;  &#42;&#42;Analyze the mid-ground:&#42;&#42;
-> &#42;   A person is standing on a small, gravel-covered pier or platform
-> extending into the water. They are wearing a dark blue coat with a hood up
-> and brown boots. They are facing away from the camera, looking towards the
-> water or the far bank.
-> &#42;   The water is dark and rippled, suggesting it might be raining or
-> just windy.
-> &#42;   There's a wooden retaining wall or edging along the pier.
-> 4&#46;  &#42;&#42;Analyze the background:&#42;&#42;
-> &#42;   Across the water, there's a grassy bank leading up a hill.
-> &#42;   A small, arched wooden bridge crosses a narrow part of the water or
-> a stream feeding into it.
-> &#42;   There are many trees. Some are evergreens (conifers) which are dark
-> green. Others are deciduous trees that are bare or have brownish leaves,
-> suggesting late autumn or winter.
-> &#42;   The sky is overcast and grey, reinforcing the gloomy/wet weather
-> feel.
-> 5&#46;  &#42;&#42;Synthesize the description:&#42;&#42;
-> &#42;   Start with the general setting: A serene, somewhat overcast
-> landscape scene.
-> &#42;   Describe the foreground elements: The small pine tree on the mossy
-> rock, the grass, the gravel path.
-> &#42;   Describe the central figure: The person in the blue coat standing on
-> the pier. Mention their posture (looking out).
-> &#42;   Describe the water and immediate surroundings: The dark water, the
-> wooden edging of the pier.
-> &#42;   Describe the background: The bridge, the mix of evergreen and bare
-> trees on the hillside, the overcast sky.
-> &#42;   Add atmosphere: Mention the rainy/moody feel
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Likely capped by max token budget
+- long_context_repetition(16299tok)
 
 ---
 
@@ -2473,8 +2498,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ hit token cap (500); nontext prompt burden=100%
 - _Score:_ ✅ B (80/100); Missing requested structure
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 12.76s; Gen 84.81s; Total 98.03s
-- _Throughput:_ Prompt 215 TPS (16,290 tok); Gen 61.7 TPS (500 tok)
+- _Timing:_ Load 13.09s; Gen 79.53s; Total 92.96s
+- _Throughput:_ Prompt 233 TPS (16,290 tok); Gen 59.3 TPS (500 tok)
 - _Tokens:_ prompt 16290 tok; estimated text 4 tok; estimated non-text 16286
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
@@ -2538,8 +2563,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ hit token cap (500); nontext prompt burden=100%
 - _Score:_ ✅ B (80/100); Missing requested structure
 - _Review focus:_ watchlist (cutoff)
-- _Timing:_ Load 2.38s; Gen 105.50s; Total 108.24s
-- _Throughput:_ Prompt 193 TPS (16,290 tok); Gen 24.7 TPS (500 tok)
+- _Timing:_ Load 2.17s; Gen 96.07s; Total 98.63s
+- _Throughput:_ Prompt 211 TPS (16,290 tok); Gen 27.7 TPS (500 tok)
 - _Tokens:_ prompt 16290 tok; estimated text 4 tok; estimated non-text 16286
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
@@ -2596,6 +2621,73 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-qwen36-27b-mxfp8"></a>
+
+### ✅ mlx-community/Qwen3.6-27B-mxfp8
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ hit token cap (500); nontext prompt burden=100%
+- _Score:_ ✅ B (80/100); Missing requested structure
+- _Review focus:_ watchlist (cutoff)
+- _Timing:_ Load 3.03s; Gen 110.45s; Total 113.84s
+- _Throughput:_ Prompt 206 TPS (16,290 tok); Gen 16.4 TPS (500 tok)
+- _Tokens:_ prompt 16290 tok; estimated text 4 tok; estimated non-text 16286
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> The user wants a description of the provided image.
+>
+> &#42;&#42;1. Overall Impression:&#42;&#42;
+> The image shows a serene, somewhat overcast landscape, likely a park or
+> garden. It features a body of water (pond or small lake), a gravel path, a
+> small wooden bridge, and a person standing on a gravel island or peninsula.
+> The foreground has a small pine tree and a mossy rock.
+>
+> &#42;&#42;2. Key Elements to Describe:&#42;&#42;
+> &#42;   &#42;&#42;Foreground:&#42;&#42;
+> &#42;   A large, moss-covered rock on the left.
+> &#42;   A small, young pine tree (conifer) planted next to it.
+> &#42;   Green grass.
+> &#42;   A gravel path leading from the left towards the center.
+> &#42;   A wooden bench on the left edge.
+> &#42;   &#42;&#42;Mid-ground:&#42;&#42;
+> &#42;   A body of water (dark, calm).
+> &#42;   A gravel area jutting into the water, bordered by wooden posts
+> (palisade).
+> &#42;   A person standing on this gravel area, wearing a dark blue coat with
+> a hood up, looking towards the right.
+> &#42;   A small wooden bridge crossing the water in the background.
+> &#42;   &#42;&#42;Background:&#42;&#42;
+> &#42;   A grassy hill rising up.
+> &#42;   A mix of evergreen trees (conifers) and deciduous trees (some bare,
+> suggesting late autumn or winter).
+> &#42;   Overcast, grey sky.
+>
+> &#42;&#42;3. Drafting the Description (Iterative Process):&#42;&#42;
+>
+> &#42;   &#42;Attempt 1 (Mental Outline):&#42; There's a pond. A person in a blue coat is
+> standing on a gravel patch in the water. In the front, there's a small pine
+> tree and a big mossy rock. Behind the pond, there's a bridge and a hill
+> with lots of trees. It looks like a cloudy day.
+>
+> &#42;   &#42;Attempt 2 (Adding Detail):&#42; The image shows a park scene. In the
+> foreground, a large rock covered in green moss sits next to a small pine
+> tree. To the left, there's a wooden bench. A gravel path leads to a small
+> island or peninsula in a dark pond. A person wearing a dark blue hooded coat
+> stands on this gravel area, looking out. The edge of the gravel is lined
+> with wooden posts. In the background, a small wooden bridge crosses the
+> water. Beyond that, a hill is covered
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Likely capped by max token budget
+
+---
+
 <a id="model-mlx-community-qwen35-27b-mxfp8"></a>
 
 ### ✅ mlx-community/Qwen3.5-27B-mxfp8
@@ -2606,8 +2698,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ hit token cap (500); nontext prompt burden=100%
 - _Score:_ ✅ B (80/100); Missing requested structure
 - _Review focus:_ watchlist (cutoff)
-- _Timing:_ Load 3.23s; Gen 118.23s; Total 121.90s
-- _Throughput:_ Prompt 193 TPS (16,290 tok); Gen 15.2 TPS (500 tok)
+- _Timing:_ Load 3.40s; Gen 118.57s; Total 122.33s
+- _Throughput:_ Prompt 187 TPS (16,290 tok); Gen 16.3 TPS (500 tok)
 - _Tokens:_ prompt 16290 tok; estimated text 4 tok; estimated non-text 16286
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
@@ -2658,73 +2750,6 @@ _Quality Status:_ no quality issues detected in this run
 >
 > 4&#46;  &#42;&#42;Refining and Polishing:&#42;&#42;
 > &#42;   Combine the
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Likely capped by max token budget
-
----
-
-<a id="model-mlx-community-qwen36-27b-mxfp8"></a>
-
-### ✅ mlx-community/Qwen3.6-27B-mxfp8
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ hit token cap (500); nontext prompt burden=100%
-- _Score:_ ✅ B (80/100); Missing requested structure
-- _Review focus:_ watchlist (cutoff)
-- _Timing:_ Load 3.15s; Gen 131.82s; Total 135.32s
-- _Throughput:_ Prompt 199 TPS (16,290 tok); Gen 10.2 TPS (500 tok)
-- _Tokens:_ prompt 16290 tok; estimated text 4 tok; estimated non-text 16286
-  tok; generated 500 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> The user wants a description of the provided image.
->
-> &#42;&#42;1. Overall Impression:&#42;&#42;
-> The image shows a serene, somewhat overcast landscape, likely a park or
-> garden. It features a body of water (pond or small lake), a gravel path, a
-> small wooden bridge, and a person standing on a gravel island or peninsula.
-> The foreground has a small pine tree and a mossy rock.
->
-> &#42;&#42;2. Key Elements to Describe:&#42;&#42;
-> &#42;   &#42;&#42;Foreground:&#42;&#42;
-> &#42;   A large, moss-covered rock on the left.
-> &#42;   A small, young pine tree (conifer) planted next to it.
-> &#42;   Green grass.
-> &#42;   A gravel path leading from the left towards the center.
-> &#42;   A wooden bench on the left edge.
-> &#42;   &#42;&#42;Mid-ground:&#42;&#42;
-> &#42;   A body of water (dark, calm).
-> &#42;   A gravel area jutting into the water, bordered by wooden posts
-> (palisade).
-> &#42;   A person standing on this gravel area, wearing a dark blue coat with
-> a hood up, looking towards the right.
-> &#42;   A small wooden bridge crossing the water in the background.
-> &#42;   &#42;&#42;Background:&#42;&#42;
-> &#42;   A grassy hill rising up.
-> &#42;   A mix of evergreen trees (conifers) and deciduous trees (some bare,
-> suggesting late autumn or winter).
-> &#42;   Overcast, grey sky.
->
-> &#42;&#42;3. Drafting the Description (Iterative Process):&#42;&#42;
->
-> &#42;   &#42;Attempt 1 (Mental Outline):&#42; There's a pond. A person in a blue coat is
-> standing on a gravel patch in the water. In the front, there's a small pine
-> tree and a big mossy rock. Behind the pond, there's a bridge and a hill
-> with lots of trees. It looks like a cloudy day.
->
-> &#42;   &#42;Attempt 2 (Adding Detail):&#42; The image shows a park scene. In the
-> foreground, a large rock covered in green moss sits next to a small pine
-> tree. To the left, there's a wooden bench. A gravel path leads to a small
-> island or peninsula in a dark pond. A person wearing a dark blue hooded coat
-> stands on this gravel area, looking out. The edge of the gravel is lined
-> with wooden posts. In the background, a small wooden bridge crosses the
-> water. Beyond that, a hill is covered
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_

@@ -14,7 +14,7 @@
 
 | Model                              | Representative Signal                                    | Token Context   | Repro Bundle                                                                                                                                                                                                                  |
 |------------------------------------|----------------------------------------------------------|-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/MolmoPoint-8B-fp16` | processor error \| model config processor load processor | stop=exception  | [`20260502T225507Z_007_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json`](../repro_bundles/20260502T225507Z_007_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json) |
+| `mlx-community/MolmoPoint-8B-fp16` | processor error \| model config processor load processor | stop=exception  | [`20260502T233440Z_007_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json`](../repro_bundles/20260502T233440Z_007_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json) |
 
 
 ## Evidence
@@ -66,7 +66,7 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC
 
 Repro bundles:
 
-- `mlx-community/MolmoPoint-8B-fp16`: [`20260502T225507Z_007_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json`](../repro_bundles/20260502T225507Z_007_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json)
+- `mlx-community/MolmoPoint-8B-fp16`: [`20260502T233440Z_007_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json`](../repro_bundles/20260502T233440Z_007_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json)
 
 
 ## Fix Checklist

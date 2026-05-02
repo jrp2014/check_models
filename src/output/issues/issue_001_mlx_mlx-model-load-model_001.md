@@ -14,7 +14,7 @@
 
 | Model                                     | Representative Signal               | Token Context   | Repro Bundle                                                                                                                                                                                                                  |
 |-------------------------------------------|-------------------------------------|-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | model error \| mlx model load model | stop=exception  | [`20260502T225507Z_006_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json`](../repro_bundles/20260502T225507Z_006_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json) |
+| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | model error \| mlx model load model | stop=exception  | [`20260502T233440Z_006_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json`](../repro_bundles/20260502T233440Z_006_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json) |
 
 
 ## Evidence
@@ -74,7 +74,7 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC
 
 Repro bundles:
 
-- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: [`20260502T225507Z_006_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json`](../repro_bundles/20260502T225507Z_006_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)
+- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: [`20260502T233440Z_006_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json`](../repro_bundles/20260502T233440Z_006_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)
 
 
 ## Fix Checklist
