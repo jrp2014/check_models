@@ -1,76 +1,83 @@
-# Diagnostics Report — 3 failure(s), 9 harness issue(s) (mlx-vlm 0.4.5)
+# Diagnostics Report — 2 failure(s), 9 harness issue(s) (mlx-vlm 0.4.5)
 
 ## Summary
 
-Automated benchmarking of **53 locally-cached VLM models** found **3 hard
+Automated benchmarking of **53 locally-cached VLM models** found **2 hard
 failure(s)** and **9 harness/integration issue(s)** plus **0 preflight
-compatibility warning(s)** in successful models. 50 of 53 models succeeded.
+compatibility warning(s)** in successful models. 51 of 53 models succeeded.
 
 Test image: `20260403-124049_DSC09541.jpg` (47.5 MB).
 
 ---
 
+## Issue Queue
+
+Root-cause issue drafts are generated in [issues/index.md](../issues/index.md)
+and grouped by owner, subtype, and normalized symptom family.
+
+| Owner                            | Issue Subtype                           |   Affected Model Count | Representative Model                                    | Issue Draft                                                                                                                                                                   | Acceptance Signal                                                                                                                              |
+|----------------------------------|-----------------------------------------|------------------------|---------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx`                            | `MLX_MODEL_LOAD_MODEL`                  |                      1 | `mlx-community/Kimi-VL-A3B-Thinking-8bit`               | [`mlx_mlx-model-load-model_001`](../issues/issue_001_mlx_mlx-model-load-model_001.md)                                                                                         | Affected reruns complete model load and generation, or fail with a narrower configuration/compatibility error that points to the owning layer. |
+| `model configuration/repository` | `MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR` |                      1 | `mlx-community/MolmoPoint-8B-fp16`                      | [`model-configuration-repository_model-config-processor-load-processor_001`](../issues/issue_002_model-configuration-repository_model-config-processor-load-processor_001.md) | Affected reruns complete model load and generation, or fail with a narrower configuration/compatibility error that points to the owning layer. |
+| `mlx-vlm`                        | `encoding`                              |                      1 | `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | [`mlx-vlm_encoding_001`](../issues/issue_003_mlx-vlm_encoding_001.md)                                                                                                         | Affected reruns contain no leaked BPE, byte-level, or tokenizer marker text.                                                                   |
+| `mlx-vlm`                        | `stop_token`                            |                      4 | `microsoft/Phi-3.5-vision-instruct`                     | [`mlx-vlm_stop-token_001`](../issues/issue_004_mlx-vlm_stop-token_001.md)                                                                                                     | Affected reruns contain no leaked stop/control tokens and terminate cleanly before the configured max-token cap when the response is complete. |
+| `model-config / mlx-vlm`         | `prompt_template`                       |                      2 | `mlx-community/gemma-3n-E2B-4bit`                       | [`model-config-mlx-vlm_prompt-template_001`](../issues/issue_005_model-config-mlx-vlm_prompt-template_001.md)                                                                 | Affected reruns produce the requested sections without empty/filler output, template leakage, or image-placeholder mismatch symptoms.          |
+| `mlx-vlm / mlx`                  | `long_context`                          |                      2 | `mlx-community/Qwen2-VL-2B-Instruct-4bit`               | [`mlx-vlm-mlx_long-context_001`](../issues/issue_006_mlx-vlm-mlx_long-context_001.md)                                                                                         | A same-command rerun and a reduced image/text burden rerun show consistent prompt-token accounting and no long-context collapse.               |
+| `mlx-vlm / mlx`                  | `long_context`                          |                      1 | `mlx-community/Qwen3.5-9B-MLX-4bit`                     | [`mlx-vlm-mlx_long-context_002`](../issues/issue_007_mlx-vlm-mlx_long-context_002.md)                                                                                         | A same-command rerun and a reduced image/text burden rerun show consistent prompt-token accounting and no long-context collapse.               |
+
+---
+
 ## Action Summary
 
-Owner-first triage with priority, affected count, and next action.
+Owner-first triage with subtype, affected count, and next action.
 
 ### 1. mlx
 
-- _Priority:_ Medium
 - _Owner:_ `mlx`
+- _Subtype:_ MLX_MODEL_LOAD_MODEL
 - _Issue:_ Model loading failed: Received 4 parameters not in model:
 - _Affected:_ 1 model(s)
 - _Next step:_ check tensor/cache behavior and memory pressure handling.
 
 ### 2. model configuration/repository
 
-- _Priority:_ Medium
 - _Owner:_ `model configuration/repository`
+- _Subtype:_ MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR
 - _Issue:_ Loaded processor has no image_processor; expected multimodal
   processor.
 - _Affected:_ 1 model(s)
 - _Next step:_ verify model config, tokenizer files, and revision alignment.
 
-### 3. huggingface_hub
+### 3. mlx-vlm
 
-- _Priority:_ Medium
-- _Owner:_ `huggingface_hub`
-- _Issue:_ Model loading failed: Server disconnected without sending a
-  response.
-- _Affected:_ 1 model(s)
-- _Next step:_ check cache/revision availability and network/auth state; Hub
-  disconnects may be transient outages rather than model defects.
-
-### 4. mlx-vlm
-
-- _Priority:_ Medium
 - _Owner:_ `mlx-vlm`
+- _Subtype:_ harness/integration
 - _Issue:_ Harness/integration warnings
 - _Affected:_ 5 model(s)
 - _Next step:_ check processor/chat-template wiring and generation kwargs.
 
-### 5. mlx-vlm / mlx
+### 4. mlx-vlm / mlx
 
-- _Priority:_ Medium
 - _Owner:_ `mlx-vlm / mlx`
+- _Subtype:_ harness/integration
 - _Issue:_ Harness/integration warnings
 - _Affected:_ 2 model(s)
 - _Next step:_ validate long-context handling and stop-token behavior across
   mlx-vlm + mlx runtime.
 
-### 6. model-config / mlx-vlm
+### 5. model-config / mlx-vlm
 
-- _Priority:_ Medium
 - _Owner:_ `model-config / mlx-vlm`
+- _Subtype:_ harness/integration
 - _Issue:_ Harness/integration warnings
 - _Affected:_ 2 model(s)
 - _Next step:_ validate chat-template/config expectations and mlx-vlm prompt
   formatting for this model.
 
-### 7. mlx-vlm / mlx
+### 6. mlx-vlm / mlx
 
-- _Priority:_ Medium
 - _Owner:_ `mlx-vlm / mlx`
+- _Subtype:_ stack-signal
 - _Issue:_ Stack-signal anomalies
 - _Affected:_ 1 successful model(s)
 - _Next step:_ validate long-context handling and stop-token behavior across
@@ -78,21 +85,7 @@ Owner-first triage with priority, affected count, and next action.
 
 ---
 
-## Priority Summary
-
-| Priority   | Issue                                                                   | Models Affected                                                                                                                 | Owner                            | Next Action                                                                                                                   |
-|------------|-------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|----------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| **Medium** | Model loading failed: Received 4 parameters not in model:               | 1 (Kimi-VL-A3B-Thinking-8bit)                                                                                                   | `mlx`                            | check tensor/cache behavior and memory pressure handling.                                                                     |
-| **Medium** | Loaded processor has no image_processor; expected multimodal processor. | 1 (MolmoPoint-8B-fp16)                                                                                                          | `model configuration/repository` | verify model config, tokenizer files, and revision alignment.                                                                 |
-| **Medium** | Model loading failed: Server disconnected without sending a response.   | 1 (SmolVLM2-2.2B-Instruct-mlx)                                                                                                  | `huggingface_hub`                | check cache/revision availability and network/auth state; Hub disconnects may be transient outages rather than model defects. |
-| **Medium** | Harness/integration                                                     | 5 (Phi-3.5-vision-instruct, Devstral-Small-2-24B-Instruct-2512-5bit, GLM-4.6V-Flash-6bit, GLM-4.6V-Flash-mxfp4, GLM-4.6V-nvfp4) | `mlx-vlm`                        | check processor/chat-template wiring and generation kwargs.                                                                   |
-| **Medium** | Harness/integration                                                     | 2 (Qwen2-VL-2B-Instruct-4bit, paligemma2-3b-pt-896-4bit)                                                                        | `mlx-vlm / mlx`                  | validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.                                          |
-| **Medium** | Harness/integration                                                     | 2 (gemma-3n-E2B-4bit, gemma-4-31b-bf16)                                                                                         | `model-config / mlx-vlm`         | validate chat-template/config expectations and mlx-vlm prompt formatting for this model.                                      |
-| **Medium** | Stack-signal anomaly                                                    | 1 (Qwen3.5-9B-MLX-4bit)                                                                                                         | `mlx-vlm / mlx`                  | validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.                                          |
-
----
-
-## 1. Failure affecting 1 model (Priority: Medium)
+## 1. Failure affecting 1 model
 
 - _Observed:_ Model loading failed: Received 4 parameters not in model:
 - _Likely owner:_ `mlx`
@@ -145,7 +138,7 @@ Captured stdout/stderr:
 
 </details>
 
-## 2. Failure affecting 1 model (Priority: Medium)
+## 2. Failure affecting 1 model
 
 - _Observed:_ Loaded processor has no image_processor; expected multimodal
   processor.
@@ -197,57 +190,6 @@ Captured stdout/stderr:
 
 /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/modeling_rope_utils.py:1034: FutureWarning: `rope_config_validation` is deprecated and has been removed. Its functionality has been moved to RotaryEmbeddingConfigMixin.validate_rope method. PreTrainedConfig inherits this class, so please call self.validate_rope() instead. Also, make sure to use the new rope_parameters syntax. You can call self.standardize_rope_params() in the meantime.
   warnings.warn(
-```
-
-</details>
-
-## 3. Failure affecting 1 model (Priority: Medium)
-
-- _Observed:_ Model loading failed: Server disconnected without sending a
-  response.
-- _Likely owner:_ `huggingface_hub`
-- _Why it matters:_ This prevented a complete model response; stage `Model
-  Error`; phase `model_load`; code `HUGGINGFACE_HUB_MODEL_LOAD_MODEL`; type
-  `ValueError`.
-- _Suggested next step:_ check cache/revision availability and network/auth
-  state; Hub disconnects may be transient outages rather than model defects.
-- _Affected models:_ `mlx-community/SmolVLM2-2.2B-Instruct-mlx`
-
-**Representative maintainer triage:**
-
-- _Likely owner:_ huggingface-hub \| confidence=high
-- _Classification:_ runtime_failure \| HUGGINGFACE_HUB_MODEL_LOAD_MODEL
-- _Summary:_ model error \| huggingface hub model load model \| hub
-  connectivity
-- _Evidence:_ model error \| huggingface hub model load model \| hub
-  connectivity
-- _Token context:_ stop=exception
-- _Next action:_ Check whether Hugging Face was reachable; this may be a
-  transient Hub/network outage or disconnect rather than a model defect.
-
-| Model                                      | Observed Behavior                                                     | First Seen Failing      | Recent Repro           |
-|--------------------------------------------|-----------------------------------------------------------------------|-------------------------|------------------------|
-| `mlx-community/SmolVLM2-2.2B-Instruct-mlx` | Model loading failed: Server disconnected without sending a response. | 2026-04-19 00:39:44 BST | 1/3 recent runs failed |
-
-### To reproduce
-
-- Exact model-specific repro command appears below in the `Reproducibility` section under `Target specific failing models`.
-- Representative failing model: `mlx-community/SmolVLM2-2.2B-Instruct-mlx`
-
-<details>
-<summary>Detailed trace logs (affected model)</summary>
-
-#### `mlx-community/SmolVLM2-2.2B-Instruct-mlx`
-
-Traceback tail:
-
-```text
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
-    raise mapped_exc(message) from exc
-httpx.RemoteProtocolError: Server disconnected without sending a response.
-The above exception was the direct cause of the following exception:
-Traceback (most recent call last):
-ValueError: Model loading failed: Server disconnected without sending a response.
 ```
 
 </details>
@@ -598,40 +540,39 @@ integration/runtime issues worth checking upstream.
 Recent reproducibility is measured from history (up to last 3 runs where each
 model appears).
 
-**Regressions since previous run:** `mlx-community/SmolVLM2-2.2B-Instruct-mlx`
-**Recoveries since previous run:** none
+**Regressions since previous run:** none
+**Recoveries since previous run:** `mlx-community/SmolVLM2-2.2B-Instruct-mlx`
 
-| Model                                      | Status vs Previous Run   | First Seen Failing      | Recent Repro           |
-|--------------------------------------------|--------------------------|-------------------------|------------------------|
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit`  | still failing            | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
-| `mlx-community/MolmoPoint-8B-fp16`         | still failing            | 2026-03-27 13:06:07 GMT | 3/3 recent runs failed |
-| `mlx-community/SmolVLM2-2.2B-Instruct-mlx` | new regression           | 2026-04-19 00:39:44 BST | 1/3 recent runs failed |
+| Model                                     | Status vs Previous Run   | First Seen Failing      | Recent Repro           |
+|-------------------------------------------|--------------------------|-------------------------|------------------------|
+| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | still failing            | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
+| `mlx-community/MolmoPoint-8B-fp16`        | still failing            | 2026-03-27 13:06:07 GMT | 3/3 recent runs failed |
 
 ---
 
 ## Coverage & Runtime Metrics
 
-- **Detailed diagnostics models:** 13
-- **Summary diagnostics models:** 40
+- **Detailed diagnostics models:** 12
+- **Summary diagnostics models:** 41
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1437.89s (1437.89s)
-- **Average runtime per model:** 27.13s (27.13s)
-- **Dominant runtime phase:** decode dominated 48/53 measured model runs (80% of tracked runtime).
-- **Phase totals:** model load=276.81s, prompt prep=0.15s, decode=1143.26s, cleanup=5.56s
-- **Observed stop reasons:** completed=50, exception=3
-- **Validation overhead:** 17.40s total (avg 0.33s across 53 model(s)).
-- **First-token latency:** Avg 13.28s | Min 0.06s | Max 78.49s across 50 model(s).
+- **Total model runtime (sum):** 1382.94s (1382.94s)
+- **Average runtime per model:** 26.09s (26.09s)
+- **Dominant runtime phase:** decode dominated 49/53 measured model runs (92% of tracked runtime).
+- **Phase totals:** model load=107.57s, prompt prep=0.16s, decode=1256.36s, cleanup=5.78s
+- **Observed stop reasons:** completed=51, exception=2
+- **Validation overhead:** 18.60s total (avg 0.35s across 53 model(s)).
+- **First-token latency:** Avg 14.86s | Min 0.06s | Max 103.41s across 51 model(s).
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
 ---
 
-## Models Not Flagged (40 model(s))
+## Models Not Flagged (41 model(s))
 
 These models completed without diagnostics flags (no hard failure, harness
 warning, or stack-signal anomaly).
 
-### Clean output (29 model(s))
+### Clean output (30 model(s))
 
 - `HuggingFaceTB/SmolVLM-Instruct`
 - `meta-llama/Llama-3.2-11B-Vision-Instruct`
@@ -648,6 +589,7 @@ warning, or stack-signal anomaly).
 - `mlx-community/Molmo-7B-D-0924-bf16`
 - `mlx-community/Phi-3.5-vision-instruct-bf16`
 - `mlx-community/SmolVLM-Instruct-bf16`
+- `mlx-community/SmolVLM2-2.2B-Instruct-mlx`
 - `mlx-community/X-Reasoner-7B-8bit`
 - `mlx-community/gemma-3-27b-it-qat-4bit`
 - `mlx-community/gemma-3-27b-it-qat-8bit`
@@ -684,7 +626,7 @@ warning, or stack-signal anomaly).
 | Component       | Version                     |
 |-----------------|-----------------------------|
 | mlx-vlm         | 0.4.5                       |
-| mlx             | 0.32.0.dev20260501+e8ebdebe |
+| mlx             | 0.32.0.dev20260502+e8ebdebe |
 | mlx-lm          | 0.31.3                      |
 | transformers    | 5.7.0                       |
 | tokenizers      | 0.22.2                      |
@@ -737,7 +679,6 @@ for each failing model.
 ```bash
 python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Kimi-VL-A3B-Thinking-8bit
 python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/MolmoPoint-8B-fp16
-python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/SmolVLM2-2.2B-Instruct-mlx
 ```
 
 ### Prompt Used
@@ -751,4 +692,4 @@ Describe this picture
 - Input image: `/Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-05-02 00:10:46 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-05-02 11:57:27 BST by [check_models](https://github.com/jrp2014/check_models)._

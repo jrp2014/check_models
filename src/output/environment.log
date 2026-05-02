@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-05-01 23:39:19 BST
+FULL ENVIRONMENT DUMP - 2026-05-02 10:40:04 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -68,8 +68,8 @@ mcp==1.27.0
 mdurl==0.1.2
 miniaudio==1.71
 ml_dtypes==0.5.4
-mlx==0.32.0.dev20260501+e8ebdebe
-mlx==0.32.0.dev20260501+e8ebdebe
+mlx==0.32.0.dev20260502+e8ebdebe
+mlx==0.32.0.dev20260502+e8ebdebe
 mlx-audio==0.4.3
 mlx-lm==0.31.3
 mlx-vlm==0.4.5
@@ -146,7 +146,7 @@ torchaudio==2.11.0
 torchvision==0.26.0
 tqdm==4.67.3
 transformers==5.7.0
-ty==0.0.33
+ty==0.0.34
 typer==0.25.1
 types-defusedxml==0.7.0.20260408
 types-psutil==7.2.2.20260408
@@ -172,5 +172,5 @@ yarl==1.23.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-05-01 23:39:19 BST
+Environment dump completed at 2026-05-02 10:40:04 BST
 ================================================================================

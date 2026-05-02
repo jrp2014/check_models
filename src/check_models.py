@@ -913,6 +913,9 @@ class JsonlMaintainerTriageRecord(TypedDict, total=False):
     prompt_tokens_total: int | None
     prompt_output_ratio: float | None
     nontext_prompt_ratio: float | None
+    issue_cluster_id: str
+    issue_cluster_path: str
+    acceptance_signal: str
 
 
 class RuntimeProbeResult(TypedDict, total=False):
@@ -1773,7 +1776,7 @@ def _build_gallery_success_triage_rows(
     useful_now: bool,
     watchlist_reason: str | None,
 ) -> list[tuple[str, str]]:
-    """Build score and review-priority rows for one successful gallery entry."""
+    """Build score and review-focus rows for one successful gallery entry."""
     rows: list[tuple[str, str]] = []
     if summary is not None:
         score_data = _cataloging_score_index(summary).get(res.model_name)
@@ -1787,11 +1790,9 @@ def _build_gallery_success_triage_rows(
             rows.append(("Score", _markdown_review_text(" | ".join(assessment_parts))))
 
     if useful_now:
-        rows.append(("Review priority", "strong candidate for first-pass review"))
+        rows.append(("Review focus", "strong candidate for first-pass review"))
     elif watchlist_reason is not None:
-        rows.append(
-            ("Review priority", f"watchlist ({_humanize_watchlist_reason(watchlist_reason)})")
-        )
+        rows.append(("Review focus", f"watchlist ({_humanize_watchlist_reason(watchlist_reason)})"))
     return rows
 
 
@@ -7914,6 +7915,23 @@ def _initialize_metadata_baseline_tracking(
     return improves_metadata, neutral_vs_metadata, worse_than_metadata
 
 
+def _is_cataloging_pick_eligible(
+    result: PerformanceResult,
+    analysis: GenerationQualityAnalysis | None,
+) -> bool:
+    """Return whether a result can appear in user-facing best-model picks."""
+    if not result.success:
+        return False
+    if analysis is not None:
+        if analysis.has_harness_issue or analysis.user_bucket == "avoid":
+            return False
+        if analysis.verdict in {"harness", "runtime_failure"}:
+            return False
+
+    labels = _extract_quality_issue_labels(result.quality_issues)
+    return "harness" not in labels
+
+
 def _finalize_cataloging_summary(
     summary: ModelIssueSummary,
     utility_scores: list[CatalogingScoreRecord],
@@ -7962,8 +7980,8 @@ def analyze_model_issues(
     cataloging_grades: dict[str, list[str]] = {}
     low_utility_models: list[LowUtilityModelIssue] = []
     utility_scores: list[CatalogingScoreRecord] = []
-    description_scores: list[tuple[str, float]] = []
-    keyword_scores: list[tuple[str, float]] = []
+    recommendation_description_scores: list[tuple[str, float]] = []
+    recommendation_keyword_scores: list[tuple[str, float]] = []
 
     summary: ModelIssueSummary = {
         "total_models": len(results),
@@ -8036,8 +8054,13 @@ def analyze_model_issues(
         delta = score - baseline_score if baseline_score is not None else None
         utility_scores.append((res.model_name, score, grade, weakness, delta))
         cataloging_grades.setdefault(grade, []).append(res.model_name)
-        description_scores.append((res.model_name, float(utility.get("description_score", 0.0))))
-        keyword_scores.append((res.model_name, float(utility.get("keyword_score", 0.0))))
+        description_score, keyword_score = (
+            float(utility.get("description_score", 0.0)),
+            float(utility.get("keyword_score", 0.0)),
+        )
+        if _is_cataloging_pick_eligible(res, analysis):
+            recommendation_description_scores.append((res.model_name, description_score))
+            recommendation_keyword_scores.append((res.model_name, keyword_score))
 
         if grade in ("D", "F"):
             low_utility_models.append((res.model_name, score, grade, weakness))
@@ -8055,16 +8078,16 @@ def analyze_model_issues(
         utility_scores,
         baseline_score=baseline_score,
     )
-    if description_scores:
+    if recommendation_description_scores:
         summary["cataloging_best_description"] = max(
-            description_scores,
+            recommendation_description_scores,
             key=lambda item: (item[1], item[0]),
         )
     else:
         summary.pop("cataloging_best_description", None)
-    if keyword_scores:
+    if recommendation_keyword_scores:
         summary["cataloging_best_keywords"] = max(
-            keyword_scores,
+            recommendation_keyword_scores,
             key=lambda item: (item[1], item[0]),
         )
     else:
@@ -9142,6 +9165,8 @@ def _review_maintainer_next_action(review: JsonlReviewRecord) -> str:
 def _build_jsonl_maintainer_triage_record(
     result: PerformanceResult,
     review: JsonlReviewRecord,
+    *,
+    issue_cluster: IssueCluster | None = None,
 ) -> JsonlMaintainerTriageRecord:
     """Build an action-oriented maintainer triage payload for one result."""
     analysis = _quality_analysis_for_result(result)
@@ -9175,6 +9200,10 @@ def _build_jsonl_maintainer_triage_record(
         triage["prompt_output_ratio"] = review["prompt_output_ratio"]
     if review["nontext_prompt_ratio"] is not None:
         triage["nontext_prompt_ratio"] = review["nontext_prompt_ratio"]
+    if issue_cluster is not None:
+        triage["issue_cluster_id"] = issue_cluster.cluster_id
+        triage["issue_cluster_path"] = _issue_cluster_path(issue_cluster)
+        triage["acceptance_signal"] = issue_cluster.acceptance_signal
     return triage
 
 
@@ -9823,7 +9852,11 @@ def _recommendation_candidate_rows(
     report_context: ReportRenderContext,
 ) -> list[UtilityTriageRow]:
     """Return rows safe enough to use for user-facing model picks."""
-    rows = list(report_context.triage.utility_rows)
+    rows = [
+        row
+        for row in report_context.triage.utility_rows
+        if _is_cataloging_pick_eligible(row.result, _quality_analysis_for_result(row.result))
+    ]
     actionable_rows = [
         row
         for row in rows
@@ -10147,8 +10180,6 @@ def _build_markdown_gallery_navigation(report_context: ReportRenderContext) -> l
 class DiagnosticsConfig:
     """Centralized configuration for diagnostics report behavior."""
 
-    high_cluster_count: int = 2  # ≥ N models = High priority cluster
-    critical_cluster_count: int = 5  # ≥ N models = Critical priority cluster
     traceback_tail_lines: int = 6  # Lines to keep from traceback tail
     output_snippet_len: int = 200  # Max chars for sample output
     recent_run_window: int = 3  # Runs used for reproducibility signal
@@ -10191,6 +10222,8 @@ _PORTABLE_DEPENDENCY_PROBE_CMD: Final[str] = (
     "python -m pip show mlx mlx-vlm mlx-lm transformers huggingface-hub tokenizers"
 )
 
+ISSUE_EVIDENCE_MODEL_LIMIT: Final[int] = 3
+
 
 @dataclass(frozen=True)
 class FailureHistoryContext:
@@ -10222,6 +10255,41 @@ class DiagnosticsSnapshot:
     unflagged_successful: tuple[PerformanceResult, ...] = ()
     preflight_issues: tuple[str, ...] = ()
     failure_clusters: tuple[tuple[str, tuple[PerformanceResult, ...]], ...] = ()
+
+
+@dataclass(frozen=True)
+class IssueCluster:
+    """Root-cause issue draft cluster for maintainer-facing artifacts."""
+
+    cluster_id: str
+    issue_filename: str
+    owner: str
+    issue_kind: str
+    issue_subtype: str
+    symptom_family: str
+    symptom: str
+    acceptance_signal: str
+    source: str
+    sort_rank: int
+    results: tuple[PerformanceResult, ...] = ()
+    stack_signals: tuple[tuple[PerformanceResult, str, str], ...] = ()
+
+
+@dataclass
+class _IssueClusterBuildState:
+    """Mutable accumulator used while building deterministic issue clusters."""
+
+    owner: str
+    issue_kind: str
+    issue_subtype: str
+    symptom_family: str
+    symptom: str
+    source: str
+    sort_rank: int
+    results: list[PerformanceResult] = dataclasses.field(default_factory=list)
+    stack_signals: list[tuple[PerformanceResult, str, str]] = dataclasses.field(
+        default_factory=list
+    )
 
 
 @dataclass(frozen=True)
@@ -10693,6 +10761,294 @@ def _snapshot_has_maintainer_signals(snapshot: DiagnosticsSnapshot) -> bool:
     )
 
 
+def _issue_component_slug(value: str) -> str:
+    """Return a stable slug component for issue cluster IDs and filenames."""
+    normalized = value.strip().casefold().replace("_", "-")
+    normalized = re.sub(r"[^a-z0-9-]+", "-", normalized)
+    normalized = re.sub(r"-{2,}", "-", normalized).strip("-")
+    return normalized or "unknown"
+
+
+def _issue_cluster_path(cluster: IssueCluster) -> str:
+    """Return the JSONL/report-relative path for a generated issue draft."""
+    return str(Path("issues") / cluster.issue_filename)
+
+
+def _normalize_issue_symptom_family(value: str) -> str:
+    """Collapse free-form symptoms into deterministic issue-clustering families."""
+    normalized = re.sub(r"\b0x[0-9a-f]+\b", "0xADDR", value.casefold())
+    normalized = re.sub(r"\b\d+(?:\.\d+)?%?\b", "N", normalized)
+    normalized = re.sub(r"[^a-z0-9_<>/| -]+", " ", normalized)
+    normalized = re.sub(r"\s+", " ", normalized).strip()
+    return normalized[:120] or "unknown"
+
+
+def _harness_symptom_family(
+    issue_subtype: str,
+    analysis: GenerationQualityAnalysis | None,
+) -> str:
+    """Return a normalized symptom family for harness issue grouping."""
+    subtype = issue_subtype.strip().casefold() or "harness"
+    if subtype in {"stop_token", "encoding", "prompt_template", "long_context"}:
+        return subtype
+    details = tuple(analysis.harness_issue_details if analysis is not None else ())
+    if any(detail.startswith("token_leak:") for detail in details):
+        return "stop_token"
+    if any(detail.startswith("token_encoding:") for detail in details):
+        return "encoding"
+    if any(detail.startswith("output:") for detail in details):
+        return "prompt_template"
+    if any(detail.startswith("long_context_") for detail in details):
+        return "long_context"
+    return subtype
+
+
+def _stack_signal_subtype(symptom: str) -> str:
+    """Return a stable issue subtype for successful-run stack anomalies."""
+    normalized = symptom.casefold()
+    if "long-context" in normalized or "long prompt" in normalized or "context" in normalized:
+        return "long_context"
+    if "empty output" in normalized:
+        return "empty_output"
+    return "stack_signal"
+
+
+def _issue_acceptance_signal(issue_subtype: str, issue_kind: str) -> str:
+    """Return a concrete fixed-state signal for a clustered issue."""
+    subtype = issue_subtype.casefold()
+    subtype_signals = {
+        "stop_token": (
+            "Affected reruns contain no leaked stop/control tokens and terminate cleanly "
+            "before the configured max-token cap when the response is complete."
+        ),
+        "encoding": "Affected reruns contain no leaked BPE, byte-level, or tokenizer marker text.",
+        "prompt_template": (
+            "Affected reruns produce the requested sections without empty/filler output, "
+            "template leakage, or image-placeholder mismatch symptoms."
+        ),
+        "empty_output": (
+            "Affected reruns return non-empty generated text for the same prompt and image."
+        ),
+    }
+    if subtype in subtype_signals:
+        return subtype_signals[subtype]
+    if subtype in {"long_context", "context_budget", "token_cap"}:
+        return (
+            "A same-command rerun and a reduced image/text burden rerun show consistent "
+            "prompt-token accounting and no long-context collapse."
+        )
+    if issue_kind == "runtime_failure" or subtype.endswith("_runtime"):
+        return (
+            "Affected reruns complete model load and generation, or fail with a narrower "
+            "configuration/compatibility error that points to the owning layer."
+        )
+    return "Affected reruns no longer emit this maintainer-triage issue cluster."
+
+
+def _issue_cluster_results(cluster: IssueCluster) -> tuple[PerformanceResult, ...]:
+    """Return affected results in stable model-name order, deduping stack rows."""
+    results_by_model: dict[str, PerformanceResult] = {
+        result.model_name: result for result in cluster.results
+    }
+    for result, _symptom, _owner in cluster.stack_signals:
+        results_by_model.setdefault(result.model_name, result)
+    return tuple(results_by_model[name] for name in sorted(results_by_model))
+
+
+def _issue_cluster_model_names(cluster: IssueCluster) -> list[str]:
+    """Return affected model names for an issue cluster."""
+    return [result.model_name for result in _issue_cluster_results(cluster)]
+
+
+def _issue_cluster_representative(cluster: IssueCluster) -> PerformanceResult | None:
+    """Return the deterministic representative result for a cluster."""
+    results = _issue_cluster_results(cluster)
+    return results[0] if results else None
+
+
+def _issue_cluster_model_count(cluster: IssueCluster) -> int:
+    """Return affected model count for an issue cluster."""
+    return len(_issue_cluster_results(cluster))
+
+
+def _issue_harness_symptom(
+    issue_subtype: str,
+    analysis: GenerationQualityAnalysis | None,
+) -> str:
+    """Return the issue title/body symptom for a harness issue cluster."""
+    if analysis is not None:
+        for detail in analysis.harness_issue_details:
+            if description := _describe_harness_detail(detail):
+                return description
+    return _HARNESS_TYPE_DESCRIPTIONS.get(
+        issue_subtype,
+        "Output indicates a likely integration/runtime issue.",
+    )
+
+
+def _issue_state_for_key(
+    states: dict[tuple[str, str, str, str], _IssueClusterBuildState],
+    *,
+    owner: str,
+    issue_kind: str,
+    issue_subtype: str,
+    symptom_family: str,
+    symptom: str,
+    source: str,
+    sort_rank: int,
+) -> _IssueClusterBuildState:
+    """Fetch or create a mutable issue-cluster accumulator."""
+    key = (owner, issue_kind, issue_subtype, symptom_family)
+    if key not in states:
+        states[key] = _IssueClusterBuildState(
+            owner=owner,
+            issue_kind=issue_kind,
+            issue_subtype=issue_subtype,
+            symptom_family=symptom_family,
+            symptom=symptom,
+            source=source,
+            sort_rank=sort_rank,
+        )
+    return states[key]
+
+
+def _build_issue_clusters(snapshot: DiagnosticsSnapshot) -> tuple[IssueCluster, ...]:
+    """Build deterministic root-cause clusters for generated issue drafts."""
+    states: dict[tuple[str, str, str, str], _IssueClusterBuildState] = {}
+
+    for _signature, cluster_results in snapshot.failure_clusters:
+        if not cluster_results:
+            continue
+        sorted_results = sorted(cluster_results, key=lambda result: result.model_name)
+        representative = sorted_results[0]
+        owner = _diagnostics_owner_label(representative.error_package or "unknown")
+        subtype = representative.error_code or "runtime_failure"
+        symptom = _truncate_text_preview(
+            _simplify_failure_message(
+                representative.error_message,
+                model_name=representative.model_name,
+            ),
+            max_chars=120,
+        )
+        state = _issue_state_for_key(
+            states,
+            owner=owner,
+            issue_kind="runtime_failure",
+            issue_subtype=subtype,
+            symptom_family=_normalize_issue_symptom_family(
+                f"{subtype} {representative.error_message or symptom}"
+            ),
+            symptom=symptom,
+            source="failure",
+            sort_rank=0,
+        )
+        state.results.extend(sorted_results)
+
+    for result, _sample_output in snapshot.harness_results:
+        analysis = _quality_analysis_for_result(result)
+        review = _build_jsonl_review_record(result)
+        subtype = (
+            analysis.harness_issue_type
+            if analysis is not None and analysis.harness_issue_type
+            else "harness"
+        )
+        issue_kind = review["verdict"] if review is not None else "harness"
+        owner = _infer_harness_issue_owner(result)
+        source = (
+            "context_budget"
+            if subtype == "long_context" or issue_kind == "context_budget"
+            else "harness"
+        )
+        state = _issue_state_for_key(
+            states,
+            owner=owner,
+            issue_kind=issue_kind,
+            issue_subtype=subtype,
+            symptom_family=_harness_symptom_family(subtype, analysis),
+            symptom=_issue_harness_symptom(subtype, analysis),
+            source=source,
+            sort_rank=2 if source == "context_budget" else 1,
+        )
+        state.results.append(result)
+
+    for result, symptom, package_hint in snapshot.stack_signals:
+        subtype = _stack_signal_subtype(symptom)
+        state = _issue_state_for_key(
+            states,
+            owner=_diagnostics_owner_label(package_hint),
+            issue_kind="stack_signal",
+            issue_subtype=subtype,
+            symptom_family=_normalize_issue_symptom_family(subtype),
+            symptom=symptom,
+            source="stack_signal",
+            sort_rank=3,
+        )
+        state.stack_signals.append((result, symptom, package_hint))
+
+    sorted_states = sorted(
+        states.values(),
+        key=lambda state: (
+            state.sort_rank,
+            state.owner,
+            state.issue_subtype,
+            state.symptom_family,
+            min(
+                [result.model_name for result in state.results]
+                + [result.model_name for result, _symptom, _owner in state.stack_signals],
+                default="",
+            ),
+        ),
+    )
+
+    ordinals: Counter[tuple[str, str]] = Counter()
+    clusters: list[IssueCluster] = []
+    for index, state in enumerate(sorted_states, start=1):
+        owner_slug = _issue_component_slug(state.owner)
+        subtype_slug = _issue_component_slug(state.issue_subtype)
+        ordinal_key = (owner_slug, subtype_slug)
+        ordinals[ordinal_key] += 1
+        cluster_id = f"{owner_slug}_{subtype_slug}_{ordinals[ordinal_key]:03d}"
+        issue_filename = f"issue_{index:03d}_{cluster_id}.md"
+        clusters.append(
+            IssueCluster(
+                cluster_id=cluster_id,
+                issue_filename=issue_filename,
+                owner=state.owner,
+                issue_kind=state.issue_kind,
+                issue_subtype=state.issue_subtype,
+                symptom_family=state.symptom_family,
+                symptom=state.symptom,
+                acceptance_signal=_issue_acceptance_signal(
+                    state.issue_subtype,
+                    state.issue_kind,
+                ),
+                source=state.source,
+                sort_rank=state.sort_rank,
+                results=tuple(sorted(state.results, key=lambda result: result.model_name)),
+                stack_signals=tuple(sorted(state.stack_signals, key=lambda row: row[0].model_name)),
+            )
+        )
+
+    return tuple(clusters)
+
+
+def _issue_cluster_map_for_results(
+    results: Sequence[PerformanceResult],
+    *,
+    prompt: str | None,
+) -> dict[str, IssueCluster]:
+    """Return model-name to issue-cluster mapping for JSONL/repro metadata."""
+    snapshot = _build_diagnostics_snapshot(
+        results=list(results),
+        prompt=prompt,
+    )
+    cluster_by_model: dict[str, IssueCluster] = {}
+    for cluster in _build_issue_clusters(snapshot):
+        for result in _issue_cluster_results(cluster):
+            cluster_by_model.setdefault(result.model_name, cluster)
+    return cluster_by_model
+
+
 def _maintainer_owner_counts(snapshot: DiagnosticsSnapshot) -> list[tuple[str, int]]:
     """Summarize likely owner buckets for the diagnostics snapshot."""
     owner_counts: Counter[str] = Counter()
@@ -10748,7 +11104,6 @@ def _log_maintainer_summary(
         representative = cluster_results[0]
         owner_key = representative.error_package or "unknown"
         owner = _diagnostics_owner_label(owner_key)
-        priority = _diagnostics_priority(len(cluster_results), representative.error_stage)
         issue = _truncate_text_preview(
             _simplify_failure_message(
                 representative.error_message,
@@ -10757,8 +11112,7 @@ def _log_maintainer_summary(
             max_chars=96,
         )
         logger.info(
-            "%s cluster %d: %d model(s) | owner=%s | issue=%s",
-            priority,
+            "Issue cluster %d: %d model(s) | owner=%s | issue=%s",
             index,
             len(cluster_results),
             owner,
@@ -10926,20 +11280,6 @@ def _cluster_failures_by_pattern(
             merged[canonical_sig].extend(results_list)
 
     return merged
-
-
-def _diagnostics_priority(
-    cluster_size: int,
-    error_stage: str | None,
-) -> str:
-    """Assign a priority label for an error cluster in the diagnostics report."""
-    if cluster_size >= DIAGNOSTICS.critical_cluster_count:
-        return "Critical"
-    if cluster_size >= DIAGNOSTICS.high_cluster_count:
-        return "High"
-    if error_stage in {"Weight Mismatch", "Config Missing"}:
-        return "Low"
-    return "Medium"
 
 
 def _collect_harness_results(
@@ -11551,7 +11891,6 @@ def _diagnostics_action_summary(
         representative = cluster_results[0]
         owner_key = representative.error_package or "unknown"
         owner = _diagnostics_owner_label(owner_key)
-        priority = _diagnostics_priority(len(cluster_results), representative.error_stage)
         issue = _truncate_text_preview(
             _simplify_failure_message(
                 representative.error_message,
@@ -11564,8 +11903,11 @@ def _diagnostics_action_summary(
             _build_report_stanza(
                 f"{len(stanzas) + 1}. {owner}",
                 (
-                    ("Priority", priority),
                     ("Owner", f"`{DIAGNOSTICS_ESCAPER.escape(owner)}`"),
+                    (
+                        "Subtype",
+                        DIAGNOSTICS_ESCAPER.escape(representative.error_code or "runtime_failure"),
+                    ),
                     ("Issue", escaped_issue),
                     ("Affected", f"{len(cluster_results)} model(s)"),
                     ("Next step", DIAGNOSTICS_ESCAPER.escape(_diagnostics_next_action(owner_key))),
@@ -11579,8 +11921,8 @@ def _diagnostics_action_summary(
             _build_report_stanza(
                 f"{len(stanzas) + 1}. {owner}",
                 (
-                    ("Priority", "Medium"),
                     ("Owner", f"`{DIAGNOSTICS_ESCAPER.escape(owner)}`"),
+                    ("Subtype", "harness/integration"),
                     ("Issue", "Harness/integration warnings"),
                     ("Affected", f"{len(owner_results)} model(s)"),
                     ("Next step", DIAGNOSTICS_ESCAPER.escape(_diagnostics_next_action(owner_key))),
@@ -11594,8 +11936,8 @@ def _diagnostics_action_summary(
             _build_report_stanza(
                 f"{len(stanzas) + 1}. {owner}",
                 (
-                    ("Priority", "Medium"),
                     ("Owner", f"`{DIAGNOSTICS_ESCAPER.escape(owner)}`"),
+                    ("Subtype", "stack-signal"),
                     ("Issue", "Stack-signal anomalies"),
                     ("Affected", f"{len(owner_signals)} successful model(s)"),
                     ("Next step", DIAGNOSTICS_ESCAPER.escape(_diagnostics_next_action(owner_key))),
@@ -11609,8 +11951,8 @@ def _diagnostics_action_summary(
             _build_report_stanza(
                 f"{len(stanzas) + 1}. {owner}",
                 (
-                    ("Priority", "Medium"),
                     ("Owner", f"`{DIAGNOSTICS_ESCAPER.escape(owner)}`"),
+                    ("Subtype", "preflight"),
                     ("Issue", "Preflight compatibility warnings"),
                     ("Affected", f"{len(owner_issues)} issue(s)"),
                     ("Next step", DIAGNOSTICS_ESCAPER.escape(_diagnostics_next_action(owner_key))),
@@ -11623,7 +11965,7 @@ def _diagnostics_action_summary(
 
     parts = _begin_diagnostics_section(
         title="## Action Summary",
-        body_lines=["Owner-first triage with priority, affected count, and next action."],
+        body_lines=["Owner-first triage with subtype, affected count, and next action."],
     )
     for stanza in stanzas:
         _append_markdown_stanza(parts, stanza)
@@ -11781,11 +12123,10 @@ def _diagnostics_failure_clusters(
     for idx, (_cluster_signature, cluster_results) in enumerate(failure_clusters, 1):
         rep = cluster_results[0]
         n = len(cluster_results)
-        priority = _diagnostics_priority(n, rep.error_stage)
         model_word = "model" if n == 1 else "models"
 
         parts.append(
-            f"## {idx}. Failure affecting {n} {model_word} (Priority: {priority})",
+            f"## {idx}. Failure affecting {n} {model_word}",
         )
         parts.append("")
         _append_markdown_row_block(
@@ -11980,87 +12321,50 @@ def _diagnostics_stack_signal_section(
     return parts
 
 
-def _diagnostics_priority_table(
-    failure_clusters: list[tuple[str, list[PerformanceResult]]],
-    harness_results: list[tuple[PerformanceResult, str]],
-    stack_signals: list[tuple[PerformanceResult, str, str]],
-    preflight_issues: Sequence[str],
-) -> list[str]:
-    """Build the priority summary table for the diagnostics report."""
-    parts: list[str] = _begin_diagnostics_section(title="## Priority Summary")
-    table_rows: list[tuple[str, ...]] = []
+def _diagnostics_issue_queue_section(snapshot: DiagnosticsSnapshot) -> list[str]:
+    """Build the issue-queue block near the top of diagnostics output."""
+    clusters = _build_issue_clusters(snapshot)
+    parts = _begin_diagnostics_section(
+        title="## Issue Queue",
+        body_lines=[
+            "Root-cause issue drafts are generated in "
+            "[issues/index.md](../issues/index.md) and grouped by owner, subtype, "
+            "and normalized symptom family.",
+        ],
+    )
 
-    if failure_clusters:
-        for _pattern, cluster_results in failure_clusters:
-            representative = cluster_results[0]
-            pkg = representative.error_package or "unknown"
-            owner = _diagnostics_owner_label(pkg)
-            n = len(cluster_results)
-            priority = _diagnostics_priority(n, representative.error_stage)
-            names = ", ".join(r.model_name.split("/")[-1] for r in cluster_results)
-            issue_label = _truncate_text_preview(
-                _simplify_failure_message(
-                    representative.error_message,
-                    model_name=representative.model_name,
-                ),
-                max_chars=72,
-            )
-            # Escape fields
-            esc_issue = DIAGNOSTICS_ESCAPER.escape(issue_label)
-            esc_owner = DIAGNOSTICS_ESCAPER.escape(owner)
-            esc_names = DIAGNOSTICS_ESCAPER.escape(names)
-            esc_action = DIAGNOSTICS_ESCAPER.escape(_diagnostics_next_action(pkg))
-            table_rows.append(
-                (f"**{priority}**", esc_issue, f"{n} ({esc_names})", f"`{esc_owner}`", esc_action)
-            )
+    if not clusters:
+        parts.append("No issue drafts were generated for this run.")
+        parts.append("")
+        return parts
 
-    for owner_key, owner_results in _group_harness_results_by_owner(harness_results):
-        owner = _diagnostics_owner_label(owner_key)
-        names = ", ".join(r.model_name.split("/")[-1] for r, _ in owner_results)
-        esc_names = DIAGNOSTICS_ESCAPER.escape(names)
-        n = len(owner_results)
-        action = DIAGNOSTICS_ESCAPER.escape(_diagnostics_next_action(owner_key))
-        table_rows.append(
+    rows: list[tuple[str, ...]] = []
+    for cluster in clusters:
+        representative = _issue_cluster_representative(cluster)
+        representative_name = representative.model_name if representative is not None else "unknown"
+        issue_link = f"[`{cluster.cluster_id}`](../issues/{cluster.issue_filename})"
+        rows.append(
             (
-                "**Medium**",
-                "Harness/integration",
-                f"{n} ({esc_names})",
-                f"`{DIAGNOSTICS_ESCAPER.escape(owner)}`",
-                action,
+                f"`{DIAGNOSTICS_ESCAPER.escape(cluster.owner)}`",
+                f"`{DIAGNOSTICS_ESCAPER.escape(cluster.issue_subtype)}`",
+                str(_issue_cluster_model_count(cluster)),
+                f"`{DIAGNOSTICS_ESCAPER.escape(representative_name)}`",
+                issue_link,
+                DIAGNOSTICS_ESCAPER.escape(cluster.acceptance_signal),
             )
         )
-    for owner_key, owner_signals in _group_stack_signals_by_owner(stack_signals):
-        owner = _diagnostics_owner_label(owner_key)
-        names = ", ".join(r.model_name.split("/")[-1] for r, _symptom, _owner in owner_signals)
-        esc_names = DIAGNOSTICS_ESCAPER.escape(names)
-        n = len(owner_signals)
-        action = DIAGNOSTICS_ESCAPER.escape(_diagnostics_next_action(owner_key))
-        table_rows.append(
-            (
-                "**Medium**",
-                "Stack-signal anomaly",
-                f"{n} ({esc_names})",
-                f"`{DIAGNOSTICS_ESCAPER.escape(owner)}`",
-                action,
-            )
-        )
-    for owner_key, owner_issues in _group_preflight_issues_by_owner(preflight_issues):
-        package_summary = DIAGNOSTICS_ESCAPER.escape(_diagnostics_owner_label(owner_key))
-        n = len(owner_issues)
-        action = DIAGNOSTICS_ESCAPER.escape(_diagnostics_next_action(owner_key))
-        table_rows.append(
-            (
-                "**Medium**",
-                "Preflight compatibility warning",
-                f"{n} issue(s)",
-                f"`{package_summary or 'unknown'}`",
-                action,
-            )
-        )
+
     parts.extend(
         tabulate(
-            table_rows,
-            headers=["Priority", "Issue", "Models Affected", "Owner", "Next Action"],
+            rows,
+            headers=[
+                "Owner",
+                "Issue Subtype",
+                "Affected Model Count",
+                "Representative Model",
+                "Issue Draft",
+                "Acceptance Signal",
+            ],
             tablefmt="github",
         ).splitlines()
     )
@@ -12686,6 +12990,7 @@ def export_failure_repro_bundles(
         key: _jsonify_cli_value(value) for key, value in sorted(vars(run_args).items())
     }
     preflight_issues = list(_get_run_preflight_issues(run_args))
+    issue_cluster_by_model = _issue_cluster_map_for_results(results, prompt=prompt)
 
     for index, result in enumerate(failed, start=1):
         safe_model = _sanitize_bundle_filename(result.model_name)
@@ -12700,6 +13005,29 @@ def export_failure_repro_bundles(
             include_selection=False,
         )
         rerun_command = shlex_join([*rerun_tokens, "--models", result.model_name])
+        issue_cluster = issue_cluster_by_model.get(result.model_name)
+        cluster_repro_command = (
+            shlex_join(
+                [
+                    *rerun_tokens,
+                    "--models",
+                    *_issue_cluster_model_names(issue_cluster),
+                ]
+            )
+            if issue_cluster is not None
+            else None
+        )
+        repro_payload: dict[str, object] = {
+            "rerun_command": rerun_command,
+            "seed": serialized_args.get("seed"),
+            "prompt_hash_sha256": prompt_hash,
+            "prompt_preview": _build_prompt_preview(prompt, max_chars=400),
+            "image_path": str(image_path) if image_path is not None else None,
+            "image_sha256": image_hash,
+            "image_ref_sha256": image_ref_hash,
+            "args": serialized_args,
+            "env_vars": env_vars,
+        }
 
         bundle_payload: dict[str, object] = {
             "schema_version": "1.0",
@@ -12716,17 +13044,7 @@ def export_failure_repro_bundles(
                 "traceback": result.error_traceback,
                 "captured_output": result.captured_output_on_fail,
             },
-            "repro": {
-                "rerun_command": rerun_command,
-                "seed": serialized_args.get("seed"),
-                "prompt_hash_sha256": prompt_hash,
-                "prompt_preview": _build_prompt_preview(prompt, max_chars=400),
-                "image_path": str(image_path) if image_path is not None else None,
-                "image_sha256": image_hash,
-                "image_ref_sha256": image_ref_hash,
-                "args": serialized_args,
-                "env_vars": env_vars,
-            },
+            "repro": repro_payload,
             "environment": {
                 "platform": platform.platform(),
                 "system_info": system_info,
@@ -12734,6 +13052,10 @@ def export_failure_repro_bundles(
                 "preflight_issues": preflight_issues,
             },
         }
+        if issue_cluster is not None:
+            bundle_payload["issue_cluster_id"] = issue_cluster.cluster_id
+            if cluster_repro_command is not None:
+                repro_payload["cluster_repro_command"] = cluster_repro_command
 
         try:
             bundle_path.write_text(
@@ -12928,20 +13250,13 @@ def generate_diagnostics_report(
         versions=versions,
         image_path=image_path,
     )
+    parts.extend(_diagnostics_issue_queue_section(diagnostics_snapshot))
     parts.extend(
         _diagnostics_action_summary(
             failure_clusters=failure_clusters,
             harness_results=harness_results,
             stack_signals=stack_signals,
             preflight_issues=preflight_issues,
-        ),
-    )
-    parts.extend(
-        _diagnostics_priority_table(
-            failure_clusters,
-            harness_results,
-            stack_signals,
-            preflight_issues,
         ),
     )
     parts.extend(
@@ -13951,6 +14266,76 @@ def _append_review_model_verdicts(
         md.append("")
 
 
+def _append_review_issue_queue(
+    md: list[str],
+    *,
+    report_context: ReportRenderContext,
+    report_filename: Path,
+) -> None:
+    """Append a compact issue-queue pointer to the review digest."""
+    snapshot = _build_diagnostics_snapshot(
+        results=list(report_context.result_set.results),
+        prompt=report_context.prompt_context,
+        preflight_issues=report_context.preflight_issues,
+    )
+    clusters = _build_issue_clusters(snapshot)
+    if not clusters:
+        return
+
+    output_root = (
+        report_filename.parent.parent
+        if report_filename.parent.name == "reports"
+        else report_filename.parent
+    )
+    issue_index = output_root / "issues" / "index.md"
+    issue_index_rel = _relative_markdown_artifact_path(
+        report_filename=report_filename,
+        artifact_filename=issue_index,
+    ).replace(" ", "%20")
+    md.extend(
+        [
+            "## Issue Queue",
+            "",
+            f"Root-cause issue drafts are queued in [issues/index.md]({issue_index_rel}).",
+            "",
+        ]
+    )
+    rows: list[tuple[str, ...]] = []
+    for cluster in clusters:
+        representative = _issue_cluster_representative(cluster)
+        representative_name = representative.model_name if representative is not None else "unknown"
+        issue_path = output_root / "issues" / cluster.issue_filename
+        issue_rel = _relative_markdown_artifact_path(
+            report_filename=report_filename,
+            artifact_filename=issue_path,
+        ).replace(" ", "%20")
+        rows.append(
+            (
+                f"`{MARKDOWN_ESCAPER.escape(cluster.owner)}`",
+                f"`{MARKDOWN_ESCAPER.escape(cluster.issue_subtype)}`",
+                str(_issue_cluster_model_count(cluster)),
+                f"`{MARKDOWN_ESCAPER.escape(representative_name)}`",
+                f"[`{MARKDOWN_ESCAPER.escape(cluster.cluster_id)}`]({issue_rel})",
+                MARKDOWN_ESCAPER.escape(cluster.acceptance_signal),
+            )
+        )
+    md.extend(
+        tabulate(
+            rows,
+            headers=[
+                "Owner",
+                "Issue Subtype",
+                "Affected Model Count",
+                "Representative Model",
+                "Issue Draft",
+                "Acceptance Signal",
+            ],
+            tablefmt="github",
+        ).splitlines()
+    )
+    md.append("")
+
+
 def generate_review_report(
     results: list[PerformanceResult],
     filename: Path,
@@ -13993,6 +14378,7 @@ def generate_review_report(
             log_filename=log_filename,
         )
 
+    _append_review_issue_queue(md, report_context=report_context, report_filename=filename)
     md.extend(_format_review_priorities_parts(report_context, html_output=False))
     _append_review_user_buckets(md, bucket_groups)
     _append_review_owner_queue(md, owner_groups)
@@ -18458,7 +18844,7 @@ def _humanize_watchlist_reason(reason: str) -> str:
     ).strip()
 
 
-def _format_review_priority_line(
+def _format_review_shortlist_line(
     row: UtilityTriageRow,
     *,
     include_reason: str | None = None,
@@ -18496,15 +18882,15 @@ def _format_review_priorities_parts(
 
     parts: list[str] = []
     if html_output:
-        parts.append("<h3>🧭 Review Priorities</h3>")
+        parts.append("<h3>🧭 Review Shortlist</h3>")
     else:
-        _append_markdown_section(parts, title="## 🧭 Review Priorities")
+        _append_markdown_section(parts, title="## 🧭 Review Shortlist")
 
     if useful_rows:
         if html_output:
             parts.append("<p><b>Strong candidates:</b></p><ul>")
             parts.extend(
-                f"<li>{_format_review_priority_line(row, html_output=True)}</li>"
+                f"<li>{_format_review_shortlist_line(row, html_output=True)}</li>"
                 for row in useful_rows[:MAX_TRIAGE_MODELS]
             )
             parts.append("</ul>")
@@ -18512,7 +18898,7 @@ def _format_review_priorities_parts(
             parts.append("### Strong Candidates")
             parts.append("")
             parts.extend(
-                f"- {_format_review_priority_line(row)}" for row in useful_rows[:MAX_TRIAGE_MODELS]
+                f"- {_format_review_shortlist_line(row)}" for row in useful_rows[:MAX_TRIAGE_MODELS]
             )
             parts.append("")
 
@@ -18521,7 +18907,7 @@ def _format_review_priorities_parts(
             parts.append("<p><b>Watchlist:</b></p><ul>")
             parts.extend(
                 "<li>"
-                f"{_format_review_priority_line(row, include_reason=reason, html_output=True)}"
+                f"{_format_review_shortlist_line(row, include_reason=reason, html_output=True)}"
                 "</li>"
                 for row, reason in watchlist_rows[:MAX_TRIAGE_MODELS]
             )
@@ -18530,7 +18916,7 @@ def _format_review_priorities_parts(
             parts.append("### Watchlist")
             parts.append("")
             parts.extend(
-                f"- {_format_review_priority_line(row, include_reason=reason)}"
+                f"- {_format_review_shortlist_line(row, include_reason=reason)}"
                 for row, reason in watchlist_rows[:MAX_TRIAGE_MODELS]
             )
             parts.append("")
@@ -18890,8 +19276,14 @@ def _log_utility_triage(
     candidate_rows = [
         row
         for row in rows
-        if row.grade in {"A", "B", "C"} and not (row.labels & QUALITY_BREAKING_LABELS)
-    ] or rows
+        if _is_cataloging_pick_eligible(row.result, _quality_analysis_for_result(row.result))
+        and row.grade in {"A", "B", "C"}
+        and not (row.labels & QUALITY_BREAKING_LABELS)
+    ] or [
+        row
+        for row in rows
+        if _is_cataloging_pick_eligible(row.result, _quality_analysis_for_result(row.result))
+    ]
     if candidate_rows:
         best_description = max(
             candidate_rows,
@@ -19483,6 +19875,7 @@ def save_jsonl_report(
     Format (v2.0): First line is a metadata header containing prompt,
     system_info, and shared runtime context. Per-model result lines follow.
     """
+    issue_cluster_by_model = _issue_cluster_map_for_results(results, prompt=prompt)
     try:
         with filename.open("w", encoding="utf-8") as f:
             # Write shared metadata header (avoids repeating prompt/system per row)
@@ -19503,6 +19896,7 @@ def save_jsonl_report(
                     record["maintainer_triage"] = _build_jsonl_maintainer_triage_record(
                         result,
                         review_payload,
+                        issue_cluster=issue_cluster_by_model.get(result.model_name),
                     )
                 f.write(json.dumps(record) + "\n")
         # Logging handled in finalize_execution
@@ -19940,90 +20334,420 @@ def _log_history_comparison(
             logger.info("   %s", line)
 
 
-def _build_issue_repro_section(
+def _issue_subtype_label(issue_subtype: str) -> str:
+    """Return a compact subtype label for issue titles."""
+    return issue_subtype.replace("_", "-")
+
+
+def _issue_title(cluster: IssueCluster) -> str:
+    """Build the GitHub issue draft title for a cluster."""
+    symptom = _sanitize_bpe_display(cluster.symptom, max_len=96).strip().rstrip(".")
+    if not symptom:
+        symptom = _issue_subtype_label(cluster.issue_subtype)
+    return (
+        f"[{cluster.owner}][{_issue_subtype_label(cluster.issue_subtype)}] "
+        f"{symptom} affecting {_issue_cluster_model_count(cluster)} model(s)"
+    )
+
+
+def _issue_summary_section(cluster: IssueCluster) -> list[str]:
+    """Build the action-oriented Summary section for one issue cluster."""
+    parts = ["", "## Summary", ""]
+    model_count = _issue_cluster_model_count(cluster)
+    parts.append(
+        f"{model_count} model(s) share a `{MARKDOWN_ESCAPER.escape(cluster.issue_subtype)}` "
+        f"signal that clusters under `{MARKDOWN_ESCAPER.escape(cluster.owner)}`."
+    )
+    parts.append("")
+    parts.append(f"- **Issue kind:** `{MARKDOWN_ESCAPER.escape(cluster.issue_kind)}`")
+    parts.append(f"- **Cluster ID:** `{MARKDOWN_ESCAPER.escape(cluster.cluster_id)}`")
+    parts.append(f"- **Symptom family:** `{MARKDOWN_ESCAPER.escape(cluster.symptom_family)}`")
+    parts.append(f"- **Acceptance signal:** {MARKDOWN_ESCAPER.escape(cluster.acceptance_signal)}")
+    parts.append("")
+    return parts
+
+
+def _issue_bundle_link(model_name: str, repro_bundles: Mapping[str, Path]) -> str:
+    """Return the issue-draft repro-bundle link for a model, if available."""
+    bundle = repro_bundles.get(model_name)
+    if bundle is None:
+        return ""
+    escaped_name = MARKDOWN_ESCAPER.escape(bundle.name)
+    return f"[`{escaped_name}`](../repro_bundles/{urllib.parse.quote(bundle.name)})"
+
+
+def _issue_model_signal(
+    result: PerformanceResult,
     *,
-    model_name: str,
+    stack_symptoms: Mapping[str, str],
+) -> str:
+    """Return the strongest per-model signal for an affected-model row."""
+    if result.model_name in stack_symptoms:
+        return stack_symptoms[result.model_name]
+    triage = _maintainer_triage_for_result(result)
+    if triage is not None:
+        if evidence_text := _maintainer_triage_evidence_text(triage):
+            return evidence_text
+        if triage["summary"] and triage["summary"] != "no flagged signals":
+            return triage["summary"]
+        issue_subtype = triage.get("issue_subtype")
+        return issue_subtype or triage["issue_kind"]
+    return result.error_message or "clustered issue signal"
+
+
+def _issue_affected_models_section(
+    cluster: IssueCluster,
+    *,
+    repro_bundles: Mapping[str, Path],
+) -> list[str]:
+    """Build the Affected Models table for one issue cluster."""
+    stack_symptoms = {
+        result.model_name: symptom for result, symptom, _owner in cluster.stack_signals
+    }
+    rows: list[tuple[str, ...]] = []
+    for result in _issue_cluster_results(cluster):
+        triage = _maintainer_triage_for_result(result)
+        context = _maintainer_triage_context_text(triage) if triage is not None else None
+        rows.append(
+            (
+                f"`{MARKDOWN_ESCAPER.escape(result.model_name)}`",
+                MARKDOWN_ESCAPER.escape(_issue_model_signal(result, stack_symptoms=stack_symptoms)),
+                MARKDOWN_ESCAPER.escape(context or ""),
+                _issue_bundle_link(result.model_name, repro_bundles),
+            )
+        )
+
+    parts = ["", "## Affected Models", ""]
+    parts.extend(
+        tabulate(
+            rows,
+            headers=["Model", "Representative Signal", "Token Context", "Repro Bundle"],
+            tablefmt="github",
+        ).splitlines()
+    )
+    parts.append("")
+    return parts
+
+
+def _issue_failure_evidence(result: PerformanceResult) -> list[str]:
+    """Build failure-specific evidence for one affected model."""
+    parts = [f"### `{MARKDOWN_ESCAPER.escape(result.model_name)}`", ""]
+    if result.error_message:
+        parts.append("Observed error:")
+        _append_markdown_code_block(parts, result.error_message, language="text")
+    if trace_tail := _format_traceback_tail(result.error_traceback):
+        parts.append("Traceback tail:")
+        _append_markdown_code_block(parts, trace_tail, language="text")
+    return parts
+
+
+def _issue_harness_evidence(result: PerformanceResult) -> list[str]:
+    """Build harness-specific evidence for one affected model."""
+    parts = [f"### `{MARKDOWN_ESCAPER.escape(result.model_name)}`", ""]
+    analysis = _quality_analysis_for_result(result)
+    observations = [
+        desc
+        for detail in (analysis.harness_issue_details if analysis is not None else [])
+        if (desc := _describe_harness_detail(detail))
+    ]
+    observations.extend(_summarize_quality_signals(analysis))
+    unique_observations = _dedupe_preserve_order(observations)
+    if unique_observations:
+        parts.append("Observed signals:")
+        parts.append("")
+        parts.extend(f"- {MARKDOWN_ESCAPER.escape(item)}" for item in unique_observations)
+        parts.append("")
+
+    sample_output = (
+        str(getattr(result.generation, "text", "") or "").strip()
+        if result.generation is not None
+        else ""
+    )
+    if sample_output:
+        parts.append("Sample output:")
+        _append_markdown_code_block(
+            parts,
+            _truncate_text_preview(sample_output, max_chars=DIAGNOSTICS.output_snippet_len),
+            language="text",
+        )
+    return parts
+
+
+def _issue_stack_evidence(cluster: IssueCluster) -> list[str]:
+    """Build stack-signal evidence for clustered successful-run anomalies."""
+    if not cluster.stack_signals:
+        return []
+    rows: list[tuple[str, ...]] = []
+    for result, symptom, owner in cluster.stack_signals:
+        generation = result.generation
+        prompt_tokens = int(getattr(generation, "prompt_tokens", 0) or 0) if generation else 0
+        generated_tokens = (
+            int(getattr(generation, "generation_tokens", 0) or 0) if generation else 0
+        )
+        ratio = f"{(generated_tokens / prompt_tokens):.2%}" if prompt_tokens > 0 else "n/a"
+        rows.append(
+            (
+                f"`{MARKDOWN_ESCAPER.escape(result.model_name)}`",
+                fmt_num(prompt_tokens),
+                fmt_num(generated_tokens),
+                ratio,
+                MARKDOWN_ESCAPER.escape(symptom),
+                f"`{MARKDOWN_ESCAPER.escape(owner)}`",
+            )
+        )
+    parts = ["### Stack Signals", ""]
+    parts.extend(
+        tabulate(
+            rows,
+            headers=["Model", "Prompt Tok", "Output Tok", "Output/Prompt", "Symptom", "Owner"],
+            tablefmt="github",
+        ).splitlines()
+    )
+    parts.append("")
+    return parts
+
+
+def _issue_evidence_section(cluster: IssueCluster) -> list[str]:
+    """Build the Evidence section for one issue cluster."""
+    parts = ["", "## Evidence", ""]
+    if cluster.stack_signals:
+        parts.extend(_issue_stack_evidence(cluster))
+
+    for result in _issue_cluster_results(cluster)[:ISSUE_EVIDENCE_MODEL_LIMIT]:
+        if not result.success:
+            parts.extend(_issue_failure_evidence(result))
+        else:
+            parts.extend(_issue_harness_evidence(result))
+
+    if _issue_cluster_model_count(cluster) > ISSUE_EVIDENCE_MODEL_LIMIT:
+        parts.append("_Additional affected models are listed in the Affected Models table above._")
+        parts.append("")
+    return parts
+
+
+def _issue_likely_root_cause_section(cluster: IssueCluster) -> list[str]:
+    """Build the likely-root-cause section for one issue cluster."""
+    representative = _issue_cluster_representative(cluster)
+    triage = _maintainer_triage_for_result(representative) if representative is not None else None
+    confidence = triage["confidence"] if triage is not None else "medium"
+    next_action = (
+        triage["next_action"] if triage is not None else _diagnostics_next_action(cluster.owner)
+    )
+    why = (
+        triage["summary"]
+        if triage is not None and triage["summary"] != "no flagged signals"
+        else cluster.symptom
+    )
+    rows = [
+        ("Likely owner", f"`{MARKDOWN_ESCAPER.escape(cluster.owner)}`"),
+        ("Confidence", MARKDOWN_ESCAPER.escape(confidence)),
+        ("Issue kind", f"`{MARKDOWN_ESCAPER.escape(cluster.issue_kind)}`"),
+        ("Issue subtype", f"`{MARKDOWN_ESCAPER.escape(cluster.issue_subtype)}`"),
+        ("Why this classification is credible", MARKDOWN_ESCAPER.escape(why)),
+        ("Suggested next action", MARKDOWN_ESCAPER.escape(next_action)),
+    ]
+    parts = ["", "## Likely Root Cause", ""]
+    _append_markdown_row_block(parts, rows=rows)
+    return parts
+
+
+def _issue_repro_section(
+    cluster: IssueCluster,
+    *,
     repro_bundles: Mapping[str, Path],
     run_args: argparse.Namespace | None,
+) -> list[str]:
+    """Build cluster-first repro commands and bundle links for one issue."""
+    models = _issue_cluster_model_names(cluster)
+    base_tokens = _build_repro_command_tokens(
+        image_path=None,
+        run_args=run_args,
+        include_selection=False,
+    )
+    cluster_command = shlex_join([*base_tokens, "--models", *models])
+
+    parts = ["", "## Repro Commands", ""]
+    parts.append("Cluster rerun:")
+    _append_markdown_code_block(parts, cluster_command, language="bash")
+
+    bundle_lines = [
+        f"- `{MARKDOWN_ESCAPER.escape(model)}`: {_issue_bundle_link(model, repro_bundles)}"
+        for model in models
+        if model in repro_bundles
+    ]
+    if bundle_lines:
+        parts.append("Repro bundles:")
+        parts.append("")
+        parts.extend(bundle_lines)
+        parts.append("")
+
+    if cluster.source == "failure" and len(models) > 1:
+        per_model_commands = "\n".join(
+            shlex_join([*base_tokens, "--models", model]) for model in models
+        )
+        parts.append("Per-model failure reruns:")
+        _append_markdown_code_block(parts, per_model_commands, language="bash")
+    return parts
+
+
+def _issue_fix_checklist_items(cluster: IssueCluster) -> list[str]:
+    """Return subtype-specific fix checklist items for one issue cluster."""
+    subtype = cluster.issue_subtype.casefold()
+    if subtype == "stop_token":
+        return [
+            "Inspect model EOS token IDs and tokenizer special-token mappings.",
+            "Verify mlx-vlm stop criteria receive all configured EOS/stop tokens.",
+            "Check `skip_special_tokens` handling during decode.",
+            "Strip generated control tokens such as `<|end|>` and `</think>` only after "
+            "confirming generation stopped at the right boundary.",
+        ]
+    if subtype == "encoding":
+        return [
+            "Inspect tokenizer decode cleanup for byte-level/BPE marker leakage.",
+            "Compare `decode` and `batch_decode` behavior with `skip_special_tokens=True`.",
+            "Verify processor/tokenizer config does not require model-specific cleanup flags.",
+        ]
+    if subtype == "prompt_template":
+        return [
+            "Inspect chat template selection and rendered message roles.",
+            "Verify image placeholder count and order match the processor config.",
+            "Check EOS defaults and whether the template expects explicit assistant prefixes.",
+        ]
+    if subtype in {"long_context", "context_budget", "token_cap"}:
+        return [
+            "Rerun with reduced image/text burden and compare output recovery.",
+            "Compare prompt-token accounting with text-only and image+text prompts.",
+            "Inspect cache allocation, prefill step size, and long-context generation behavior.",
+        ]
+    if cluster.issue_kind == "runtime_failure":
+        return [
+            "Inspect the exported error package, load phase, and traceback owner.",
+            "Check model config, tokenizer files, and weight shape compatibility.",
+            "Compare against installed mlx, mlx-vlm, mlx-lm, transformers, and tokenizers versions.",
+            "Reproduce with the single affected model before judging output quality.",
+        ]
+    return [
+        "Reproduce with the cluster command.",
+        "Confirm owner attribution against traceback, tokenizer, processor, and runtime evidence.",
+        "Add a focused regression check for the affected symptom family.",
+    ]
+
+
+def _issue_fix_checklist_section(cluster: IssueCluster) -> list[str]:
+    """Build the Fix Checklist section for one issue cluster."""
+    parts = ["", "## Fix Checklist", ""]
+    parts.extend(f"- [ ] {item}" for item in _issue_fix_checklist_items(cluster))
+    parts.append("")
+    return parts
+
+
+def _issue_acceptance_section(cluster: IssueCluster) -> list[str]:
+    """Build the Acceptance Criteria section for one issue cluster."""
+    parts = ["", "## Acceptance Criteria", ""]
+    parts.append(f"- [ ] {MARKDOWN_ESCAPER.escape(cluster.acceptance_signal)}")
+    parts.append(
+        "- [ ] The cluster rerun no longer produces this "
+        f"`{MARKDOWN_ESCAPER.escape(cluster.cluster_id)}` maintainer-triage cluster."
+    )
+    parts.append("")
+    return parts
+
+
+def _issue_environment_section(
+    *,
     versions: LibraryVersionDict,
     system_info: dict[str, str],
 ) -> list[str]:
-    """Build the Reproducibility + Environment section for a GitHub issue report."""
-    parts: list[str] = ["", "## Reproducibility"]
-    if model_name in repro_bundles:
-        parts.append("")
-        parts.append(f"A reproduction bundle is available at: `{repro_bundles[model_name].name}`")
-    parts.extend(["", "### Repro Command", "", "```bash"])
-    if run_args:
-        tokens = _build_repro_command_tokens(
-            image_path=None,
-            run_args=run_args,
-            include_selection=False,
+    """Build a standalone Environment section for issue drafts."""
+    rows = [
+        (component, MARKDOWN_ESCAPER.escape(value))
+        for component, value in _collect_report_component_rows(
+            versions=versions,
+            system_info=system_info,
+            library_names=_DIAGNOSTICS_LIB_NAMES,
+            system_keys=_DIAGNOSTICS_SYSTEM_KEYS,
         )
-        tokens.extend(["--models", model_name])
-        parts.append(" ".join(tokens))
-    parts.extend(["```", ""])
-    parts.extend(_diagnostics_environment_section(versions=versions, system_info=system_info))
+    ]
+    parts = ["", "## Environment", ""]
+    if rows:
+        parts.extend(
+            tabulate(rows, headers=["Component", "Version"], tablefmt="github").splitlines()
+        )
+    else:
+        parts.append("- Environment details were not available.")
+    parts.append("")
     return parts
 
 
-def _build_issue_triage_section(result: PerformanceResult) -> list[str]:
-    """Build the maintainer-triage section for standalone GitHub issue reports."""
-    rows = _build_maintainer_triage_rows(result)
-    if not rows:
-        return []
-
-    parts = ["", "## Maintainer Triage", ""]
-    _append_maintainer_triage_markdown(
-        parts,
-        result=result,
-        escaper=MARKDOWN_ESCAPER,
-        heading=None,
-    )
-    return parts
-
-
-def _build_issue_failure_overview_section(
+def _build_issue_markdown(
+    cluster: IssueCluster,
     *,
-    result: PerformanceResult,
-    affected_models: Sequence[str],
+    versions: LibraryVersionDict,
+    system_info: dict[str, str],
+    repro_bundles: Mapping[str, Path],
+    run_args: argparse.Namespace | None,
 ) -> list[str]:
-    """Build the shared failure overview section for standalone issue reports."""
-    parts = ["", "## At a Glance", ""]
-    _append_markdown_row_block(
-        parts,
-        rows=_build_failure_overview_rows(
-            result,
-            escaper=MARKDOWN_ESCAPER,
-            affected_models=affected_models,
-        ),
+    """Build a complete clustered GitHub issue draft."""
+    parts = [f"# {_issue_title(cluster)}"]
+    parts.extend(_issue_summary_section(cluster))
+    parts.extend(_issue_affected_models_section(cluster, repro_bundles=repro_bundles))
+    parts.extend(_issue_evidence_section(cluster))
+    parts.extend(_issue_likely_root_cause_section(cluster))
+    parts.extend(
+        _issue_repro_section(
+            cluster,
+            repro_bundles=repro_bundles,
+            run_args=run_args,
+        )
     )
+    parts.extend(_issue_fix_checklist_section(cluster))
+    parts.extend(_issue_acceptance_section(cluster))
+    parts.extend(_issue_environment_section(versions=versions, system_info=system_info))
     return parts
 
 
-def _build_issue_harness_overview_section(
+def _write_issue_index(
     *,
-    result: PerformanceResult,
-    harness_summary: str,
-) -> list[str]:
-    """Build the shared harness overview section for standalone issue reports."""
-    generation = result.generation
-    prompt_tokens = int(getattr(generation, "prompt_tokens", 0) or 0) if generation else 0
-    generated_tokens = int(getattr(generation, "generation_tokens", 0) or 0) if generation else 0
-    ratio_text = f"{(generated_tokens / prompt_tokens):.2%}" if prompt_tokens > 0 else "n/a"
-    parts = ["", "## At a Glance", ""]
-    _append_markdown_row_block(
-        parts,
-        rows=_build_harness_overview_rows(
-            harness_summary=harness_summary,
-            likely_owner=_infer_harness_issue_owner(result),
-            prompt_tokens=prompt_tokens,
-            generated_tokens=generated_tokens,
-            ratio_text=ratio_text,
-            escaper=MARKDOWN_ESCAPER,
-        ),
+    issues_dir: Path,
+    clusters: Sequence[IssueCluster],
+) -> None:
+    """Write the issue queue index for the current run."""
+    parts = ["# Issue Queue", ""]
+    if not clusters:
+        parts.extend(["No issue drafts were generated for this run.", ""])
+        issues_dir.joinpath("index.md").write_text("\n".join(parts), encoding="utf-8")
+        return
+
+    rows: list[tuple[str, ...]] = []
+    for cluster in clusters:
+        representative = _issue_cluster_representative(cluster)
+        representative_name = representative.model_name if representative is not None else "unknown"
+        rows.append(
+            (
+                f"`{MARKDOWN_ESCAPER.escape(cluster.owner)}`",
+                f"`{MARKDOWN_ESCAPER.escape(cluster.issue_subtype)}`",
+                str(_issue_cluster_model_count(cluster)),
+                f"`{MARKDOWN_ESCAPER.escape(representative_name)}`",
+                f"[`{MARKDOWN_ESCAPER.escape(cluster.cluster_id)}`]({cluster.issue_filename})",
+                MARKDOWN_ESCAPER.escape(cluster.acceptance_signal),
+            )
+        )
+    parts.extend(
+        tabulate(
+            rows,
+            headers=[
+                "Owner",
+                "Issue Subtype",
+                "Affected Model Count",
+                "Representative Model",
+                "Issue Draft",
+                "Acceptance Signal",
+            ],
+            tablefmt="github",
+        ).splitlines()
     )
-    return parts
+    parts.append("")
+    issues_dir.joinpath("index.md").write_text("\n".join(parts) + "\n", encoding="utf-8")
 
 
 def _generate_github_issue_reports(
@@ -20035,121 +20759,37 @@ def _generate_github_issue_reports(
     repro_bundles: Mapping[str, Path],
     run_args: argparse.Namespace | None,
 ) -> Mapping[str, Path]:
-    """Generate standalone GitHub issue reports for clustered failures and harness issues."""
+    """Generate clustered GitHub issue drafts and the issue queue index."""
     issues_dir = output_dir / "issues"
     if not issues_dir.exists():
         issues_dir.mkdir(parents=True, exist_ok=True)
 
-    # Remove stale issue reports from previous runs so only current
-    # failures are present after this invocation.
     for stale in issues_dir.glob("issue_*.md"):
         stale.unlink()
+    stale_index = issues_dir / "index.md"
+    if stale_index.exists():
+        stale_index.unlink()
 
+    clusters = _build_issue_clusters(diagnostics_snapshot)
     generated_reports: dict[str, Path] = {}
-
-    for idx, (signature, cluster_results) in enumerate(
-        diagnostics_snapshot.failure_clusters, start=1
-    ):
-        if not cluster_results:
-            continue
-        models = sorted([r.model_name for r in cluster_results])
-        rep_result = next(iter(cluster_results))
-
-        parts = [
-            f"# [Bug] {signature}",
-            "",
-            "## Description",
-            "",
-            f"A runtime failure occurred affecting **{len(models)} model(s)**.",
-            "",
-            "### Affected Models",
-            "",
-        ]
-        parts.extend(f"- `{m}`" for m in models)
-        parts.extend(
-            _build_issue_failure_overview_section(
-                result=rep_result,
-                affected_models=models,
-            ),
-        )
-        parts.extend(_build_issue_triage_section(rep_result))
-        parts.extend(
-            [
-                "",
-                "## Traceback / Error Message",
-                "",
-                "```text",
-                rep_result.error_message or "Unknown error",
-                "```",
-            ]
-        )
-        parts.extend(
-            _build_issue_repro_section(
-                model_name=rep_result.model_name,
-                repro_bundles=repro_bundles,
-                run_args=run_args,
-                versions=versions,
-                system_info=system_info,
+    for cluster in clusters:
+        issue_path = issues_dir / cluster.issue_filename
+        issue_path.write_text(
+            "\n".join(
+                _build_issue_markdown(
+                    cluster,
+                    versions=versions,
+                    system_info=system_info,
+                    repro_bundles=repro_bundles,
+                    run_args=run_args,
+                )
             )
+            + "\n",
+            encoding="utf-8",
         )
+        generated_reports[cluster.cluster_id] = issue_path
 
-        file_name = f"issue_{idx:03d}_crash.md"
-        issue_path = issues_dir / file_name
-        issue_path.write_text("\n".join(parts) + "\n", encoding="utf-8")
-        generated_reports[f"crash_{idx}"] = issue_path
-
-    for idx, (result, _sample_output) in enumerate(
-        diagnostics_snapshot.harness_results,
-        start=1,
-    ):
-        qa = _quality_analysis_for_result(result)
-        harness_type = (qa.harness_issue_type if qa is not None else None) or "harness"
-        if qa is not None and qa.harness_issue_details:
-            harness_details = "\n".join(
-                f"- {_describe_harness_detail(detail) or detail}"
-                for detail in qa.harness_issue_details
-            )
-        else:
-            harness_details = "- No details provided."
-
-        safe_harness_type = _sanitize_bpe_display(harness_type, max_len=60)
-        # Collapse to single line and strip trailing punctuation for valid heading
-        title_text = " ".join(safe_harness_type.splitlines()).strip().rstrip(":.;,!?")
-        parts = [
-            f"# [Harness Issue] {title_text} in {result.model_name}",
-            "",
-            "## Description",
-            "",
-            f"Integration/harness warning detected for `{result.model_name}`.",
-            "",
-            "### Details",
-            "",
-            harness_details,
-        ]
-        parts.extend(
-            _build_issue_harness_overview_section(
-                result=result,
-                harness_summary=_HARNESS_TYPE_DESCRIPTIONS.get(
-                    harness_type or "",
-                    "Output indicates a likely integration issue.",
-                ),
-            ),
-        )
-        parts.extend(_build_issue_triage_section(result))
-        parts.extend(
-            _build_issue_repro_section(
-                model_name=result.model_name,
-                repro_bundles=repro_bundles,
-                run_args=run_args,
-                versions=versions,
-                system_info=system_info,
-            )
-        )
-
-        file_name = f"issue_{idx:03d}_harness.md"
-        issue_path = issues_dir / file_name
-        issue_path.write_text("\n".join(parts) + "\n", encoding="utf-8")
-        generated_reports[f"harness_{idx}"] = issue_path
+    _write_issue_index(issues_dir=issues_dir, clusters=clusters)
 
     return generated_reports
 

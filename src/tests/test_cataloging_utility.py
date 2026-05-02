@@ -9,6 +9,7 @@ import pytest
 from check_models import (
     GRADE_EMOJIS,
     QUALITY,
+    GenerationQualityAnalysis,
     ModelIssueSummary,
     PerformanceResult,
     _collect_cataloging_summary_data,
@@ -570,3 +571,75 @@ class TestAnalyzeModelIssuesCataloging:
         assert "cataloging_avg_delta" in summary
         assert summary.get("cataloging_improves_metadata", []) == ["model-good"]
         assert summary.get("cataloging_worse_than_metadata", []) == ["model-bad"]
+
+    def test_harness_avoid_models_excluded_from_best_description_and_keywording(self) -> None:
+        """Harness/avoid models should not become user-facing best picks."""
+        context = (
+            "Title hint: Busy market street\n"
+            "Description hint: A market street with fruit stalls, awnings, shoppers, "
+            "baskets, signs, and warm daylight.\n"
+            "Keyword hints: market street, fruit stalls, awnings, shoppers, baskets, "
+            "signs, daylight"
+        )
+        harness_text = (
+            "Title: Busy market street with fruit stalls and shoppers\n"
+            "Description: A market street shows fruit stalls under awnings, shoppers "
+            "holding baskets, visible signs, and warm daylight across the sidewalk.\n"
+            "Keywords: market street, fruit stalls, awnings, shoppers, baskets, signs, "
+            "daylight, sidewalk, produce, storefront <|end|>"
+        )
+        clean_text = (
+            "Title: Market street scene\n"
+            "Description: Fruit stalls line a street while shoppers walk under awnings.\n"
+            "Keywords: market street, fruit stalls, shoppers, awnings, signs"
+        )
+        harness_analysis = GenerationQualityAnalysis(
+            is_repetitive=False,
+            repeated_token=None,
+            hallucination_issues=[],
+            is_verbose=False,
+            formatting_issues=[],
+            has_excessive_bullets=False,
+            bullet_count=0,
+            is_context_ignored=False,
+            missing_context_terms=[],
+            is_refusal=False,
+            refusal_type=None,
+            is_generic=False,
+            specificity_score=1.0,
+            has_language_mixing=False,
+            language_mixing_issues=[],
+            has_degeneration=False,
+            degeneration_type=None,
+            has_fabrication=False,
+            fabrication_issues=[],
+            has_harness_issue=True,
+            harness_issue_type="stop_token",
+            harness_issue_details=["token_leak:<|end|>"],
+            word_count=42,
+            unique_ratio=0.9,
+            prompt_checks_ran=True,
+            verdict="harness",
+            owner="mlx-vlm",
+            user_bucket="avoid",
+            evidence=["harness:stop_token"],
+        )
+        results = [
+            PerformanceResult(
+                model_name="model-harness",
+                generation=_StubGeneration(text=harness_text, generation_tokens=180),
+                success=True,
+                quality_analysis=harness_analysis,
+                quality_issues="⚠️harness(stop_token)",
+            ),
+            PerformanceResult(
+                model_name="model-clean",
+                generation=_StubGeneration(text=clean_text, generation_tokens=80),
+                success=True,
+            ),
+        ]
+
+        summary = analyze_model_issues(results, context=context)
+
+        assert summary["cataloging_best_description"][0] == "model-clean"
+        assert summary["cataloging_best_keywords"][0] == "model-clean"

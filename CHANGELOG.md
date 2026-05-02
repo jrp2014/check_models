@@ -5,6 +5,18 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Replace per-model generated GitHub issue drafts with root-cause clustered
+  issue queues under `output/issues/`, including stable cluster IDs, acceptance
+  signals, subtype-specific fix checklists, and JSONL/repro metadata linking
+  affected models to their issue cluster.
+- Remove priority labels from diagnostics, review, issue, and JSONL triage
+  outputs, and route maintainer reports through owner/subtype/action summaries
+  instead.
+- Exclude harness/avoid models from user-facing best description, best
+  keywording, and balanced recommendation picks.
+
 ### Fixed
 
 - Align MLX stack integration with current upstream sources by raising the

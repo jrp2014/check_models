@@ -219,6 +219,8 @@ def test_save_jsonl_report_includes_review_payload_for_success(tmp_path: Path) -
     assert triage["suspected_owner"] == review["owner"]
     assert triage["user_bucket"] == review["user_bucket"]
     assert triage["summary"]
+    assert "issue_cluster_id" not in triage
+    assert "priority" not in json.dumps(triage).casefold()
     if review["verdict"] == "clean":
         assert triage["next_action"] == "No immediate maintainer action."
 
@@ -247,9 +249,13 @@ def test_save_jsonl_report_includes_review_payload_for_failures(tmp_path: Path) 
     assert review["evidence"]
     assert triage["issue_kind"] == "runtime_failure"
     assert triage["issue_subtype"] == "MLX_VLM_DECODE_RUNTIME"
+    assert triage["issue_cluster_id"] == "mlx-vlm_mlx-vlm-decode-runtime_001"
+    assert triage["issue_cluster_path"].startswith("issues/issue_001_")
+    assert triage["acceptance_signal"]
     assert triage["confidence"] == "high"
     assert triage["suspected_owner"] == "mlx-vlm"
     assert "Inspect prompt-template" in triage["next_action"]
+    assert "priority" not in json.dumps(triage).casefold()
 
 
 def test_save_jsonl_report_flags_huggingface_hub_connectivity_failures(tmp_path: Path) -> None:

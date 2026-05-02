@@ -25,7 +25,6 @@ from check_models import (
     _build_report_render_context,
     _clean_stale_toplevel_reports,
     _cluster_failures_by_pattern,
-    _diagnostics_priority,
     _format_traceback_tail,
     _generate_github_issue_reports,
     _log_maintainer_summary,
@@ -395,7 +394,7 @@ class TestHtmlReportEdgeCases:
 
         content = out.read_text(encoding="utf-8")
         assert "Action Snapshot" in content
-        assert "Review Priorities" in content
+        assert "Review Shortlist" in content
         assert "Failures by Package" in content
         assert "org/risky" in content
         assert "transformers" in content
@@ -692,7 +691,9 @@ class TestMarkdownGalleryReport:
 
         content = out.read_text(encoding="utf-8")
         assert "# Automated Review Digest" in content
-        assert "## 🧭 Review Priorities" in content
+        assert "## Issue Queue" in content
+        assert "issues/index.md" in content
+        assert "## 🧭 Review Shortlist" in content
         assert "## User Buckets" in content
         assert "## Maintainer Queue" in content
         assert "## Model Verdicts" in content
@@ -706,6 +707,7 @@ class TestMarkdownGalleryReport:
         assert "Evidence" in content
         assert "Next Action" in content
         assert "Canonical run log" in content
+        assert content.index("## Issue Queue") < content.index("## User Buckets")
         maintainer_queue = content.split("## Maintainer Queue", maxsplit=1)[1].split(
             "## Model Verdicts",
             maxsplit=1,
@@ -736,9 +738,9 @@ class TestMarkdownGalleryReport:
 
         content = out.read_text(encoding="utf-8")
         assert "Action Snapshot" in content  # cross-reference to results.md
-        assert "## 🧭 Review Priorities" in content
+        assert "## 🧭 Review Shortlist" in content
         assert "## 🚨 Failures by Package (Actionable)" in content
-        assert "_Review priority:_" in content
+        assert "_Review focus:_" in content
         assert "strong candidate for first-pass review" in content or "watchlist" in content
         assert "_Error summary:_" in content
         assert "_Next step:_" in content
@@ -1066,7 +1068,7 @@ class TestDiagnosticsReport:
         assert result is True
         content = out.read_text(encoding="utf-8")
         assert "`transformers / mlx-vlm`" in content
-        assert "Stack-signal anomaly" in content
+        assert "Stack-signal anomalies" in content
 
     def test_report_written_on_failure(self, tmp_path: Path) -> None:
         """Diagnostics file created when a model fails."""
@@ -1339,8 +1341,8 @@ class TestDiagnosticsReport:
         assert "2/3 recent runs failed" in content
         assert "2026-02-10 10:00:00 GMT" in content
 
-    def test_priority_table_present(self, tmp_path: Path) -> None:
-        """Priority Summary table should appear with correct structure."""
+    def test_issue_queue_present(self, tmp_path: Path) -> None:
+        """Issue Queue table should appear with clustered issue draft links."""
         out = tmp_path / "diag.md"
         generate_diagnostics_report(
             results=[_make_failure_with_details()],
@@ -1350,13 +1352,14 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        assert "## Priority Summary" in content
-        assert "Priority" in content
-        assert "Issue" in content
+        assert "## Issue Queue" in content
+        assert "Issue Draft" in content
         assert "Owner" in content
-        assert "Next Action" in content
-        assert content.index("## Priority Summary") < content.index("## 1. Failure")
-        assert content.index("## Priority Summary") < content.index("## Environment")
+        assert "Acceptance Signal" in content
+        assert "issues/index.md" in content
+        assert "Priority" not in content
+        assert content.index("## Issue Queue") < content.index("## 1. Failure")
+        assert content.index("## Issue Queue") < content.index("## Environment")
         assert content.index("## Environment") < content.index("## Reproducibility")
 
     def test_action_summary_and_portable_triage_sections_present(self, tmp_path: Path) -> None:
@@ -1371,7 +1374,7 @@ class TestDiagnosticsReport:
         )
         content = out.read_text(encoding="utf-8")
         assert "## Action Summary" in content
-        assert "Owner-first triage with priority, affected count, and next action" in content
+        assert "Owner-first triage with subtype, affected count, and next action" in content
         assert "### Portable triage (no local image required)" in content
         assert "python -m pip show mlx mlx-vlm mlx-lm transformers" in content
 
@@ -1597,7 +1600,7 @@ class TestDiagnosticsReport:
         assert result is True
         content = out.read_text(encoding="utf-8")
         assert "### Long-Context Degradation / Potential Stack Issues" in content
-        assert "Stack-signal anomaly" in content
+        assert "Stack-signal anomalies" in content
         assert "org/context-echo" in content
 
     def test_harness_section_includes_tokens_and_empty_marker(self, tmp_path: Path) -> None:
@@ -1648,7 +1651,7 @@ class TestDiagnosticsReport:
         )
         content = out.read_text(encoding="utf-8")
         assert "`model-config / mlx-vlm`" in content
-        assert "validate chat-template/config expectations and mlx-vlm prompt formatting" in content
+        assert "validate chat-template/config expectations" in content
 
     def test_failure_section_includes_representative_maintainer_triage(
         self,
@@ -1682,7 +1685,7 @@ class TestDiagnosticsReport:
         assert "confidence=high" in content
         assert "runtime_failure" in content
 
-    def test_priority_summary_splits_mixed_harness_owners(self, tmp_path: Path) -> None:
+    def test_action_summary_splits_mixed_harness_owners(self, tmp_path: Path) -> None:
         """Mixed harness owner classes should render separate maintainer triage rows."""
         out = tmp_path / "diag.md"
         generate_diagnostics_report(
@@ -1706,13 +1709,10 @@ class TestDiagnosticsReport:
         content = out.read_text(encoding="utf-8")
         assert "`model-config / mlx-vlm`" in content
         assert "`mlx-vlm / mlx`" in content
-        assert "validate chat-template/config expectations and mlx-vlm prompt formatting" in content
-        assert (
-            "validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime"
-            in content
-        )
+        assert "validate chat-template/config expectations" in content
+        assert "validate long-context handling" in content
 
-    def test_priority_summary_splits_mixed_stack_signal_owners(self, tmp_path: Path) -> None:
+    def test_action_summary_splits_mixed_stack_signal_owners(self, tmp_path: Path) -> None:
         """Mixed stack-signal owner classes should render separate maintainer triage rows."""
         out = tmp_path / "diag.md"
         generate_diagnostics_report(
@@ -1809,12 +1809,9 @@ class TestDiagnosticsReport:
         assert "`mlx-vlm`" in content
         assert "`mlx-vlm / mlx`" in content
         assert "check processor/chat-template wiring and generation kwargs." in content
-        assert (
-            "validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime"
-            in content
-        )
+        assert "validate long-context handling" in content
 
-    def test_priority_summary_splits_mixed_preflight_owners(self, tmp_path: Path) -> None:
+    def test_action_summary_splits_mixed_preflight_owners(self, tmp_path: Path) -> None:
         """Mixed preflight owner classes should render separate maintainer triage rows."""
         out = tmp_path / "diag.md"
         generate_diagnostics_report(
@@ -2089,8 +2086,8 @@ class TestDiagnosticsReport:
         assert "### Run details\n\n- Input image:" in content
         assert "Analyze this image carefully." in content
 
-    def test_high_priority_for_multi_model_cluster(self, tmp_path: Path) -> None:
-        """Clusters with ≥2 models should be tagged High priority."""
+    def test_multi_model_cluster_has_no_priority_label(self, tmp_path: Path) -> None:
+        """Clusters with multiple models should not emit priority labels."""
         out = tmp_path / "diag.md"
         generate_diagnostics_report(
             results=[
@@ -2103,7 +2100,8 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        assert "Priority: High" in content
+        assert "Failure affecting 2 models" in content
+        assert "Priority" not in content
 
     def test_generate_markdown_report_uses_provided_report_context(self, tmp_path: Path) -> None:
         """Markdown generation should reuse a supplied cached report context."""
@@ -2478,30 +2476,6 @@ class TestFormatTracebackTail:
         assert "ValueError: bad" in result
 
 
-class TestDiagnosticsPriority:
-    """Unit tests for _diagnostics_priority."""
-
-    def test_high_for_multi_model(self) -> None:
-        """Clusters with >=2 models are High priority."""
-        assert _diagnostics_priority(2, "Model Error") == "High"
-        assert _diagnostics_priority(4, "Model Error") == "High"
-
-    def test_critical_for_large_cluster(self) -> None:
-        """Clusters with >=5 models are Critical priority."""
-        assert _diagnostics_priority(5, "Model Error") == "Critical"
-        assert _diagnostics_priority(10, "Model Error") == "Critical"
-
-    def test_low_for_weight_mismatch(self) -> None:
-        """Weight mismatch and config issues are Low priority."""
-        assert _diagnostics_priority(1, "Weight Mismatch") == "Low"
-        assert _diagnostics_priority(1, "Config Missing") == "Low"
-
-    def test_medium_default(self) -> None:
-        """Single-model actionable errors default to Medium."""
-        assert _diagnostics_priority(1, "Model Error") == "Medium"
-        assert _diagnostics_priority(1, "No Chat Template") == "Medium"
-
-
 class TestDiagnosticsContextBuilder:
     """Unit tests for _build_diagnostics_context."""
 
@@ -2662,14 +2636,17 @@ class TestGithubIssueReportsCleanup:
 
         assert not (issues_dir / "issue_001_crash.md").exists()
         assert not (issues_dir / "issue_002_harness.md").exists()
+        assert (issues_dir / "index.md").exists()
         assert (issues_dir / "README.md").exists()
 
 
 class TestGithubIssueReportContent:
     """Content checks for generated standalone GitHub issue reports."""
 
-    def test_crash_issue_includes_maintainer_triage(self, tmp_path: Path) -> None:
-        """Crash issue templates should include the maintainer triage section."""
+    def test_crash_issue_includes_traceback_repro_bundle_and_environment(
+        self, tmp_path: Path
+    ) -> None:
+        """Crash issue templates should include traceback, repro bundle, and environment."""
         failed_result = PerformanceResult(
             model_name="org/broken-model",
             generation=None,
@@ -2686,24 +2663,39 @@ class TestGithubIssueReportContent:
             failed=(failed_result,),
             failure_clusters=(("MLX_DECODE_ERROR:abc123", (failed_result,)),),
         )
+        bundle_path = tmp_path / "repro_bundles" / "broken.json"
+        bundle_path.parent.mkdir()
+        bundle_path.write_text("{}", encoding="utf-8")
 
         generated = _generate_github_issue_reports(
             diagnostics_snapshot=snapshot,
             output_dir=tmp_path,
             versions=_stub_versions(),
             system_info={"Python Version": "3.13"},
-            repro_bundles={},
+            repro_bundles={"org/broken-model": bundle_path},
             run_args=None,
         )
 
-        content = generated["crash_1"].read_text(encoding="utf-8")
-        assert "## Maintainer Triage" in content
+        assert len(generated) == 1
+        content = next(iter(generated.values())).read_text(encoding="utf-8")
+        assert content.startswith("# [mlx-vlm][MLX-VLM-DECODE-RUNTIME]")
+        assert "## Summary" in content
+        assert "## Affected Models" in content
+        assert "## Evidence" in content
+        assert "## Likely Root Cause" in content
+        assert "## Repro Commands" in content
+        assert "## Fix Checklist" in content
+        assert "## Acceptance Criteria" in content
+        assert "## Environment" in content
         assert "MLX_VLM_DECODE_RUNTIME" in content
         assert "runtime_failure" in content
-        assert "confidence=high" in content
+        assert "Traceback (most recent call last)" in content
+        assert "[`broken.json`](../repro_bundles/broken.json)" in content
+        assert "Python Version" in content
+        assert "Priority" not in content
 
-    def test_harness_issue_humanizes_details_and_includes_triage(self, tmp_path: Path) -> None:
-        """Harness issue templates should show humanized details and triage guidance."""
+    def test_harness_issue_humanizes_details_and_includes_checklist(self, tmp_path: Path) -> None:
+        """Harness issue templates should show humanized details and fix guidance."""
         harness_result = _make_harness_success(
             name="org/harness-empty",
             harness_type="long_context",
@@ -2722,13 +2714,131 @@ class TestGithubIssueReportContent:
             run_args=None,
         )
 
-        content = generated["harness_1"].read_text(encoding="utf-8")
-        assert content.startswith("# [Harness Issue] long_context in org/harness-empty")
-        assert "## Maintainer Triage" in content
+        content = next(iter(generated.values())).read_text(encoding="utf-8")
+        assert content.startswith("# [mlx-vlm / mlx][long-context]")
+        assert "## Likely Root Cause" in content
         assert "At long prompt length (5000 tokens), generation returned empty output." in content
         assert "context_budget" in content
         assert "long_context" in content
-        assert "confidence=high" in content
+        assert "Rerun with reduced image/text burden" in content
+        assert "Acceptance Criteria" in content
+        assert "Priority" not in content
+
+    def test_multiple_stop_token_models_produce_one_issue(self, tmp_path: Path) -> None:
+        """Multiple stop-token harness models should cluster into one issue draft."""
+        first = _make_harness_success(
+            name="org/stop-a",
+            text="caption <|end|>",
+            generation_tokens=32,
+            harness_type="stop_token",
+            harness_detail="token_leak:<|end|>",
+        )
+        second = _make_harness_success(
+            name="org/stop-b",
+            text="caption </think>",
+            generation_tokens=32,
+            harness_type="stop_token",
+            harness_detail="token_leak:</think>",
+        )
+        snapshot = DiagnosticsSnapshot(
+            harness_results=(
+                (first, cast("_MockGeneration", first.generation).text or ""),
+                (second, cast("_MockGeneration", second.generation).text or ""),
+            )
+        )
+
+        generated = _generate_github_issue_reports(
+            diagnostics_snapshot=snapshot,
+            output_dir=tmp_path,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            repro_bundles={},
+            run_args=None,
+        )
+
+        assert len(generated) == 1
+        issue_path = next(iter(generated.values()))
+        content = issue_path.read_text(encoding="utf-8")
+        assert "affecting 2 model(s)" in content
+        assert "org/stop-a" in content
+        assert "org/stop-b" in content
+        assert "`mlx-vlm_stop-token_001`" in content
+        assert "&lt;|end|&gt;" in content
+        assert "&lt;/think&gt;" in content
+
+    def test_unrelated_harness_subtypes_produce_separate_issues(self, tmp_path: Path) -> None:
+        """Different harness subtypes should not be merged into one draft."""
+        stop = _make_harness_success(
+            name="org/stop",
+            text="caption <|end|>",
+            generation_tokens=32,
+            harness_type="stop_token",
+            harness_detail="token_leak:<|end|>",
+        )
+        encoding = _make_harness_success(
+            name="org/encoding",
+            text="A Ġcaption",
+            generation_tokens=32,
+            harness_type="encoding",
+            harness_detail="token_encoding:bpe_space_leak(1)",
+        )
+        snapshot = DiagnosticsSnapshot(
+            harness_results=(
+                (stop, cast("_MockGeneration", stop.generation).text or ""),
+                (encoding, cast("_MockGeneration", encoding.generation).text or ""),
+            )
+        )
+
+        generated = _generate_github_issue_reports(
+            diagnostics_snapshot=snapshot,
+            output_dir=tmp_path,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            repro_bundles={},
+            run_args=None,
+        )
+
+        assert len(generated) == 2
+        index = (tmp_path / "issues" / "index.md").read_text(encoding="utf-8")
+        assert "`stop_token`" in index
+        assert "`encoding`" in index
+        assert "Issue Draft" in index
+        assert "Acceptance Signal" in index
+        assert "Priority" not in index
+
+    def test_stack_signal_anomaly_produces_issue_draft(self, tmp_path: Path) -> None:
+        """Successful-run stack anomalies should also produce clustered issue drafts."""
+        result = PerformanceResult(
+            model_name="org/stack-context",
+            success=True,
+            generation=_MockGeneration(
+                text="echoed context",
+                prompt_tokens=15000,
+                generation_tokens=80,
+            ),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+        )
+        snapshot = DiagnosticsSnapshot(
+            stack_signals=((result, "Context echo under long prompt length", "mlx-vlm / mlx"),)
+        )
+
+        generated = _generate_github_issue_reports(
+            diagnostics_snapshot=snapshot,
+            output_dir=tmp_path,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            repro_bundles={},
+            run_args=None,
+        )
+
+        assert len(generated) == 1
+        content = next(iter(generated.values())).read_text(encoding="utf-8")
+        assert "## Evidence" in content
+        assert "Stack Signals" in content
+        assert "long_context" in content
+        assert "Inspect cache allocation" in content
 
 
 class TestIssueDirectoryInvariants:
@@ -2768,13 +2878,14 @@ class TestIssueDirectoryInvariants:
         assert len(issue_files) == len(generated), (
             f"Expected {len(generated)} issue files, found {issue_files}"
         )
+        assert (issues_dir / "index.md").exists()
         # Non-issue files must survive
         assert (issues_dir / "README.md").exists()
         # Stale files must be gone
         assert not (issues_dir / "issue_099_harness.md").exists()
 
     def test_empty_run_clears_all_issue_files(self, tmp_path: Path) -> None:
-        """A run with no failures must leave zero issue_*.md files."""
+        """A run with no failures must leave zero issue_*.md files and refresh index."""
         issues_dir = tmp_path / "issues"
         issues_dir.mkdir()
         (issues_dir / "issue_001_crash.md").write_text("stale")
@@ -2790,3 +2901,4 @@ class TestIssueDirectoryInvariants:
 
         issue_files = list(issues_dir.glob("issue_*.md"))
         assert issue_files == [], f"Expected no issue files, found {issue_files}"
+        assert (issues_dir / "index.md").exists()
