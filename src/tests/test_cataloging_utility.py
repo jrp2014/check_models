@@ -20,6 +20,7 @@ from check_models import (
     compute_description_quality,
     compute_information_gain,
     compute_keyword_quality,
+    compute_metadata_agreement,
     compute_task_compliance,
     compute_visual_grounding,
 )
@@ -323,6 +324,111 @@ class TestTaskSpecificScorecards:
         assert float(strong_metrics["keyword_duplication_ratio"]) < float(
             weak_metrics["keyword_duplication_ratio"],
         )
+
+
+class TestComputeMetadataAgreement:
+    """Tests for metadata-grounded agreement scoring."""
+
+    def test_empty_reference_returns_zero_scores(self) -> None:
+        """Empty metadata should not produce a benchmark agreement score."""
+        metrics = compute_metadata_agreement(
+            "Title: Example\nDescription: Example output.\nKeywords: example",
+            {},
+        )
+
+        assert metrics.overall_score == 0.0
+        assert metrics.title_score == 0.0
+        assert metrics.description_score == 0.0
+        assert metrics.keyword_score == 0.0
+        assert metrics.matched_terms == ()
+
+    def test_title_overlap_rewards_direct_match(self) -> None:
+        """Exact title reuse should receive a full title-agreement score."""
+        metrics = compute_metadata_agreement(
+            (
+                "Title: Red brick storefront\n"
+                "Description: A red brick storefront with outdoor seating by the pavement.\n"
+                "Keywords: red brick storefront, outdoor seating, pavement, cafe facade"
+            ),
+            {"title": "Red brick storefront"},
+        )
+
+        assert metrics.title_score == 100.0
+        assert any(term.casefold() == "storefront" for term in metrics.matched_terms)
+
+    def test_description_recall_uses_metadata_terms(self) -> None:
+        """Description agreement should reward reuse of salient trusted metadata terms."""
+        metadata = {
+            "title": "Brick storefront",
+            "description": "A brick storefront with outdoor seating beside a pavement.",
+            "keywords": "brick storefront, outdoor seating, pavement, pedestrians",
+        }
+        text = (
+            "Title: Brick storefront with seating\n"
+            "Description: A brick storefront with outdoor seating beside a pavement.\n"
+            "Keywords: brick storefront, outdoor seating, pavement, street scene"
+        )
+
+        metrics = compute_metadata_agreement(text, metadata)
+
+        assert metrics.description_score >= 70.0
+        assert metrics.overall_score > 0.0
+
+    def test_keyword_overlap_dedupes_repeated_generated_terms(self) -> None:
+        """Repeated generated keywords should not distort the overlap score."""
+        metadata = {
+            "keywords": "brick storefront, outdoor seating, pavement, pedestrians",
+        }
+        text = (
+            "Title: Storefront\n"
+            "Description: A storefront scene.\n"
+            "Keywords: brick storefront, outdoor seating, pavement, pedestrians, "
+            "pedestrians, pavement"
+        )
+
+        metrics = compute_metadata_agreement(text, metadata)
+
+        assert metrics.keyword_score == 100.0
+
+    def test_nonvisual_metadata_does_not_contribute_positive_score(self) -> None:
+        """Date/time/GPS values should not raise positive agreement subscores."""
+        metadata = {
+            "date": "2026-05-01",
+            "time": "08:15",
+            "gps": "51.5000,-0.1200",
+        }
+        text = (
+            "Title: 2026-05-01\n"
+            "Description: Taken at 08:15 near 51.5000,-0.1200.\n"
+            "Keywords: 2026-05-01, 08:15, gps"
+        )
+
+        metrics = compute_metadata_agreement(text, metadata)
+
+        assert metrics.title_score == 0.0
+        assert metrics.description_score == 0.0
+        assert metrics.keyword_score == 0.0
+        assert metrics.nonvisual_penalty > 0.0
+        assert metrics.overall_score == 0.0
+
+    def test_nonvisual_metadata_echo_is_penalized(self) -> None:
+        """Leaking trusted nonvisual metadata should reduce the final agreement score."""
+        metadata = {
+            "title": "Brick storefront",
+            "keywords": "brick storefront, outdoor seating",
+            "gps": "51.5000,-0.1200",
+        }
+        text = (
+            "Title: Brick storefront\n"
+            "Description: A brick storefront with outdoor seating near 51.5000,-0.1200.\n"
+            "Keywords: brick storefront, outdoor seating"
+        )
+
+        metrics = compute_metadata_agreement(text, metadata)
+
+        assert metrics.overall_score > 0.0
+        assert metrics.nonvisual_penalty > 0.0
+        assert any(hit == "51.5000,-0.1200" for hit in metrics.nonvisual_hits)
 
 
 class TestHelperFunctions:

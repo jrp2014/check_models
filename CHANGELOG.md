@@ -5,6 +5,13 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Add a metadata-agreement benchmark score for successful generations, comparing
+  generated title/description/keyword fields against trusted image metadata,
+  penalizing echoed nonvisual metadata such as date/time/GPS values, and
+  emitting the structured score in `results.jsonl` for downstream triage.
+
 ### Changed
 
 - Replace per-model generated GitHub issue drafts with root-cause clustered

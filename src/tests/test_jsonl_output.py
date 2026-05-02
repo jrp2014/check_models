@@ -11,6 +11,7 @@ import check_models
 from check_models import (
     JsonlMetadataRecord,
     JsonlResultRecord,
+    MetadataAgreementMetrics,
     PerformanceResult,
     RuntimeDiagnostics,
     _history_path_for_jsonl,
@@ -256,6 +257,39 @@ def test_save_jsonl_report_includes_review_payload_for_failures(tmp_path: Path) 
     assert triage["suspected_owner"] == "mlx-vlm"
     assert "Inspect prompt-template" in triage["next_action"]
     assert "priority" not in json.dumps(triage).casefold()
+
+
+def test_save_jsonl_report_includes_metadata_agreement_payload(tmp_path: Path) -> None:
+    """Successful JSONL rows should carry metadata-agreement benchmark fields."""
+    output_file = tmp_path / "results.jsonl"
+    result = PerformanceResult(
+        model_name="test-model",
+        generation=MockGeneration(),
+        success=True,
+        metadata_agreement=MetadataAgreementMetrics(
+            overall_score=82.5,
+            title_score=100.0,
+            description_score=75.0,
+            keyword_score=80.0,
+            nonvisual_penalty=6.7,
+            matched_terms=("brick", "storefront", "outdoor seating"),
+            missed_terms=("pedestrians",),
+            nonvisual_hits=("51.5000,-0.1200",),
+        ),
+    )
+
+    save_jsonl_report([result], output_file, prompt="test", system_info={})
+
+    _header, rows = _read_jsonl(output_file)
+    payload = rows[0]["metadata_agreement"]
+    assert payload["overall_score"] == 82.5
+    assert payload["title_score"] == 100.0
+    assert payload["description_score"] == 75.0
+    assert payload["keyword_score"] == 80.0
+    assert payload["nonvisual_penalty"] == 6.7
+    assert payload["matched_terms"] == ["brick", "storefront", "outdoor seating"]
+    assert payload["missed_terms"] == ["pedestrians"]
+    assert payload["nonvisual_hits"] == ["51.5000,-0.1200"]
 
 
 def test_save_jsonl_report_flags_huggingface_hub_connectivity_failures(tmp_path: Path) -> None:

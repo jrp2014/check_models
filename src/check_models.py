@@ -335,6 +335,10 @@ class QualityThresholds:
     moderate_echo_penalty: float = 0.8
     very_short_length_factor: float = 0.2
     short_length_factor: float = 0.6
+    metadata_agreement_weight_title: float = 0.2
+    metadata_agreement_weight_description: float = 0.4
+    metadata_agreement_weight_keywords: float = 0.4
+    metadata_agreement_nonvisual_penalty: float = 20.0
 
     # Harness issue detection thresholds
     min_bpe_artifact_count: int = 5  # Min BPE artifacts to flag encoding issue
@@ -380,6 +384,9 @@ class QualityThresholds:
             "low_compliance_threshold": self.low_compliance_threshold,
             "low_info_gain_threshold": self.low_info_gain_threshold,
             "min_output_ratio": self.min_output_ratio,
+            "metadata_agreement_weight_title": self.metadata_agreement_weight_title,
+            "metadata_agreement_weight_description": self.metadata_agreement_weight_description,
+            "metadata_agreement_weight_keywords": self.metadata_agreement_weight_keywords,
         }
         for field_name, value in unit_interval_fields.items():
             if not 0.0 <= value <= 1.0:
@@ -417,6 +424,8 @@ class QualityThresholds:
             )
             raise ValueError(msg)
 
+        self._validate_metadata_agreement_thresholds()
+
         if self.patterns is not None:
             if not isinstance(self.patterns, dict):
                 msg = "quality_config.yaml patterns section must be a mapping"
@@ -439,6 +448,27 @@ class QualityThresholds:
                             f"{pattern_group} contains invalid regex {entry!r}: {exc}"
                         )
                         raise ValueError(msg) from exc
+
+    def _validate_metadata_agreement_thresholds(self) -> None:
+        """Validate metadata-agreement scoring thresholds."""
+        metadata_weight_total = (
+            self.metadata_agreement_weight_title
+            + self.metadata_agreement_weight_description
+            + self.metadata_agreement_weight_keywords
+        )
+        if not math.isclose(metadata_weight_total, 1.0, rel_tol=0.0, abs_tol=0.01):
+            msg = (
+                "quality_config.yaml metadata agreement weights must sum to 1.0; "
+                f"got {metadata_weight_total:.3f}"
+            )
+            raise ValueError(msg)
+
+        if self.metadata_agreement_nonvisual_penalty < 0.0:
+            msg = (
+                "quality_config.yaml thresholds.metadata_agreement_nonvisual_penalty must be "
+                f">= 0; got {self.metadata_agreement_nonvisual_penalty}"
+            )
+            raise ValueError(msg)
 
     @classmethod
     def from_config(cls, config: Mapping[str, object]) -> QualityThresholds:
@@ -875,6 +905,19 @@ class JsonlQualityAnalysisRecord(TypedDict):
     metrics: JsonlQualityAnalysisMetrics
 
 
+class JsonlMetadataAgreementRecord(TypedDict):
+    """Metadata-agreement payload attached to successful rows when available."""
+
+    overall_score: float
+    title_score: float
+    description_score: float
+    keyword_score: float
+    nonvisual_penalty: float
+    matched_terms: list[str]
+    missed_terms: list[str]
+    nonvisual_hits: list[str]
+
+
 class JsonlReviewRecord(TypedDict):
     """Canonical automated review payload attached to JSONL result rows."""
 
@@ -988,6 +1031,7 @@ class JsonlResultRecord(TypedDict):
     timing: JsonlTimingRecord
     generated_text: NotRequired[str]
     quality_analysis: NotRequired[JsonlQualityAnalysisRecord]
+    metadata_agreement: NotRequired[JsonlMetadataAgreementRecord]
     review: NotRequired[JsonlReviewRecord]
     maintainer_triage: NotRequired[JsonlMaintainerTriageRecord]
     prompt_diagnostics: NotRequired[dict[str, JsonLike]]
@@ -1460,6 +1504,7 @@ class PerformanceResult:
         error_type: Exception class name for error categorization in reports
         quality_issues: Comma-separated list of detected output problems
         quality_analysis: Structured quality-analysis result for triage/reporting
+        metadata_agreement: Post-generation score against trusted image metadata
         active_memory: GPU memory in use (GB), from mx.get_active_memory()
         cache_memory: GPU memory in cache (GB), from mx.get_cache_memory()
         error_package: Which package raised the error (mlx, mlx-vlm, transformers)
@@ -1486,6 +1531,7 @@ class PerformanceResult:
     root_error_message: str | None = None
     quality_issues: str | None = None
     quality_analysis: GenerationQualityAnalysis | None = None
+    metadata_agreement: MetadataAgreementMetrics | None = None
     active_memory: float | None = None
     cache_memory: float | None = None
     error_package: str | None = None
@@ -1506,6 +1552,20 @@ class RerunEvidence:
     rerun_generated_chars: int | None = None
     rerun_generation_time: float | None = None
     rerun_prompt: str | None = None
+
+
+@dataclass(frozen=True)
+class MetadataAgreementMetrics:
+    """Post-generation agreement score against trusted image metadata."""
+
+    overall_score: float = 0.0
+    title_score: float = 0.0
+    description_score: float = 0.0
+    keyword_score: float = 0.0
+    nonvisual_penalty: float = 0.0
+    matched_terms: tuple[str, ...] = ()
+    missed_terms: tuple[str, ...] = ()
+    nonvisual_hits: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -5312,6 +5372,269 @@ def _compute_metadata_baseline_utility(context: str | None) -> tuple[float, str]
     return (
         float(baseline_utility["utility_score"]),
         str(baseline_utility["utility_grade"]),
+    )
+
+
+def _build_metadata_scoring_inputs(
+    metadata: MetadataDict | None,
+) -> tuple[str | None, str | None, tuple[str, ...], tuple[str, ...]]:
+    """Extract trusted reference fields and nonvisual metadata terms for scoring."""
+    if not metadata:
+        return None, None, (), ()
+
+    raw_title = metadata.get("title")
+    reference_title = (
+        raw_title.strip() if isinstance(raw_title, str) and raw_title.strip() else None
+    )
+
+    raw_description = metadata.get("description")
+    reference_description = (
+        raw_description.strip()
+        if isinstance(raw_description, str) and raw_description.strip()
+        else None
+    )
+
+    raw_keywords = metadata.get("keywords") or ""
+    keyword_terms = _split_catalog_keywords(raw_keywords) if isinstance(raw_keywords, str) else []
+    trusted_keywords, keyword_nonvisual_terms = _partition_hint_terms(keyword_terms)
+
+    nonvisual_terms: list[str] = list(keyword_nonvisual_terms)
+    for free_text in filter(None, (reference_title, reference_description)):
+        _trusted_terms, nonvisual_hint_terms = _partition_hint_terms(
+            _extract_hint_signal_terms(free_text),
+        )
+        nonvisual_terms.extend(nonvisual_hint_terms)
+
+    for field_name in ("date", "time", "gps"):
+        raw_value = metadata.get(field_name)
+        if not isinstance(raw_value, str):
+            continue
+        cleaned_value = raw_value.strip()
+        if not cleaned_value:
+            continue
+        nonvisual_terms.append(cleaned_value)
+        nonvisual_terms.extend(_extract_hint_signal_terms(cleaned_value))
+
+    deduped_nonvisual_terms = _dedupe_preserve_order(nonvisual_terms)
+    filtered_title = _strip_nonvisual_terms_from_text(
+        reference_title or "", deduped_nonvisual_terms
+    )
+    filtered_description = _strip_nonvisual_terms_from_text(
+        reference_description or "",
+        deduped_nonvisual_terms,
+    )
+
+    return (
+        filtered_title or None,
+        filtered_description or None,
+        tuple(_dedupe_preserve_order(trusted_keywords)),
+        tuple(deduped_nonvisual_terms),
+    )
+
+
+def _score_metadata_title(
+    generated_sections: dict[str, str],
+    reference_title: str | None,
+) -> tuple[float, set[str], set[str]]:
+    """Score recall of trusted title terms in the generated title field."""
+    if not reference_title:
+        return 0.0, set(), set()
+
+    generated_title = generated_sections.get("title", "").strip()
+    reference_terms, _nonvisual_terms = _partition_hint_terms(
+        _extract_hint_signal_terms(reference_title),
+    )
+    normalized_reference_terms = {
+        _normalize_phrase_for_matching(term)
+        for term in reference_terms
+        if _normalize_phrase_for_matching(term)
+    }
+    if not normalized_reference_terms:
+        normalized_reference = _normalize_phrase_for_matching(reference_title)
+        if normalized_reference:
+            normalized_reference_terms = {normalized_reference}
+
+    if not generated_title or not normalized_reference_terms:
+        return 0.0, set(), normalized_reference_terms
+
+    normalized_generated = _normalize_phrase_for_matching(generated_title)
+    normalized_reference_title = _normalize_phrase_for_matching(reference_title)
+    if normalized_reference_title and normalized_reference_title == normalized_generated:
+        return 100.0, normalized_reference_terms, set()
+
+    matched_terms = {
+        term
+        for term in normalized_reference_terms
+        if term and _context_term_present(term, normalized_generated)
+    }
+    recall = len(matched_terms) / len(normalized_reference_terms)
+    return round(recall * 100.0, 1), matched_terms, normalized_reference_terms - matched_terms
+
+
+def _score_metadata_description(
+    generated_sections: dict[str, str],
+    reference_terms: tuple[str, ...],
+) -> tuple[float, set[str], set[str]]:
+    """Score recall of salient metadata terms in the generated description field."""
+    normalized_reference_terms = {
+        _normalize_phrase_for_matching(term)
+        for term in reference_terms
+        if _normalize_phrase_for_matching(term)
+    }
+    if not normalized_reference_terms:
+        return 0.0, set(), set()
+
+    generated_description = generated_sections.get("description", "").strip()
+    if not generated_description:
+        return 0.0, set(), normalized_reference_terms
+
+    normalized_generated = _normalize_phrase_for_matching(generated_description)
+    matched_terms = {
+        term
+        for term in normalized_reference_terms
+        if term and _context_term_present(term, normalized_generated)
+    }
+    recall = len(matched_terms) / len(normalized_reference_terms)
+    return round(recall * 100.0, 1), matched_terms, normalized_reference_terms - matched_terms
+
+
+def _score_metadata_keywords(
+    generated_sections: dict[str, str],
+    reference_keywords: tuple[str, ...],
+) -> tuple[float, set[str], set[str]]:
+    """Score F1 overlap between generated keywords and metadata keywords."""
+    normalized_reference_terms = {
+        _normalize_phrase_for_matching(term)
+        for term in reference_keywords
+        if _normalize_phrase_for_matching(term)
+    }
+    if not normalized_reference_terms:
+        return 0.0, set(), set()
+
+    generated_keyword_text = generated_sections.get("keywords", "").strip()
+    if not generated_keyword_text:
+        return 0.0, set(), normalized_reference_terms
+
+    generated_keywords = _dedupe_preserve_order(_split_catalog_keywords(generated_keyword_text))
+    normalized_generated_terms = {
+        _normalize_phrase_for_matching(term)
+        for term in generated_keywords
+        if _normalize_phrase_for_matching(term)
+    }
+    if not normalized_generated_terms:
+        return 0.0, set(), normalized_reference_terms
+
+    matched_terms = normalized_reference_terms & normalized_generated_terms
+    precision = len(matched_terms) / len(normalized_generated_terms)
+    recall = len(matched_terms) / len(normalized_reference_terms)
+    f1_score = (
+        0.0 if (precision + recall) == 0.0 else (2 * precision * recall) / (precision + recall)
+    )
+    return round(f1_score * 100.0, 1), matched_terms, normalized_reference_terms - matched_terms
+
+
+def _score_nonvisual_metadata_leakage(
+    text: str,
+    metadata: MetadataDict | None,
+) -> tuple[float, tuple[str, ...]]:
+    """Penalize reuse of nonvisual metadata such as date/time/GPS strings."""
+    if not text or not metadata:
+        return 0.0, ()
+
+    _reference_title, _reference_description, _reference_keywords, nonvisual_terms = (
+        _build_metadata_scoring_inputs(metadata)
+    )
+    if not nonvisual_terms:
+        return 0.0, ()
+
+    text_lower = text.casefold()
+    normalized_text = _normalize_phrase_for_matching(text)
+    hits = _dedupe_preserve_order(
+        [
+            term
+            for term in nonvisual_terms
+            if term.casefold() in text_lower or _context_term_present(term, normalized_text)
+        ],
+    )
+    if not hits:
+        return 0.0, ()
+
+    scaled_penalty = (min(len(hits), 3) / 3) * QUALITY.metadata_agreement_nonvisual_penalty
+    return round(scaled_penalty, 1), tuple(hits)
+
+
+def compute_metadata_agreement(
+    text: str,
+    metadata: MetadataDict | None,
+) -> MetadataAgreementMetrics:
+    """Compute post-generation agreement against trusted image metadata."""
+    if not text.strip() or not metadata:
+        return MetadataAgreementMetrics()
+
+    reference_title, reference_description, reference_keywords, _nonvisual_terms = (
+        _build_metadata_scoring_inputs(metadata)
+    )
+    generated_sections = _extract_catalog_sections(text)
+
+    reference_terms_display: list[str] = []
+    for free_text in filter(None, (reference_title, reference_description)):
+        trusted_terms, _nonvisual_hint_terms = _partition_hint_terms(
+            _extract_hint_signal_terms(free_text),
+        )
+        reference_terms_display.extend(trusted_terms)
+    reference_terms_display.extend(reference_keywords)
+    reference_terms_display = _dedupe_preserve_order(reference_terms_display)
+
+    title_score, title_matched, _title_missed = _score_metadata_title(
+        generated_sections,
+        reference_title,
+    )
+    description_score, description_matched, _description_missed = _score_metadata_description(
+        generated_sections,
+        tuple(reference_terms_display),
+    )
+    keyword_score, keyword_matched, _keyword_missed = _score_metadata_keywords(
+        generated_sections,
+        reference_keywords,
+    )
+    nonvisual_penalty, nonvisual_hits = _score_nonvisual_metadata_leakage(text, metadata)
+
+    weighted_components: list[tuple[float, float]] = []
+    if reference_title:
+        weighted_components.append((title_score, QUALITY.metadata_agreement_weight_title))
+    if reference_terms_display:
+        weighted_components.append(
+            (description_score, QUALITY.metadata_agreement_weight_description),
+        )
+    if reference_keywords:
+        weighted_components.append((keyword_score, QUALITY.metadata_agreement_weight_keywords))
+
+    weighted_score = 0.0
+    if weighted_components:
+        weight_total = sum(weight for _score, weight in weighted_components)
+        weighted_score = sum(score * weight for score, weight in weighted_components) / weight_total
+
+    matched_normalized_terms = title_matched | description_matched | keyword_matched
+    matched_terms = tuple(
+        term
+        for term in reference_terms_display
+        if _normalize_phrase_for_matching(term) in matched_normalized_terms
+    )
+    missed_terms = tuple(
+        term
+        for term in reference_terms_display
+        if _normalize_phrase_for_matching(term) not in matched_normalized_terms
+    )
+
+    return MetadataAgreementMetrics(
+        overall_score=round(max(0.0, min(100.0, weighted_score - nonvisual_penalty)), 1),
+        title_score=title_score,
+        description_score=description_score,
+        keyword_score=keyword_score,
+        nonvisual_penalty=nonvisual_penalty,
+        matched_terms=matched_terms,
+        missed_terms=missed_terms,
+        nonvisual_hits=nonvisual_hits,
     )
 
 
@@ -18051,6 +18374,7 @@ def process_models(
     image_path: Path,
     *,  # Force keyword-only arguments for clarity
     prompt: str,
+    metadata: MetadataDict | None = None,
 ) -> list[PerformanceResult]:
     """Resolve the definitive model list and execute each model run.
 
@@ -18161,6 +18485,7 @@ def process_models(
             result = _populate_result_quality_analysis(
                 result,
                 prompt=prompt,
+                metadata=metadata,
                 requested_max_tokens=args.max_tokens,
                 context_marker=args.context_marker,
             )
@@ -18439,12 +18764,16 @@ def _populate_result_quality_analysis(
     result: PerformanceResult,
     *,
     prompt: str | None = None,
+    metadata: MetadataDict | None = None,
     requested_max_tokens: int | None = None,
     context_marker: str = "Context:",
 ) -> PerformanceResult:
     """Attach structured quality analysis to successful results as soon as they exist."""
     if not result.success or result.generation is None:
         return result
+
+    text = str(getattr(result.generation, "text", ""))
+    needs_metadata_refresh = bool(metadata) and result.metadata_agreement is None
 
     cached_analysis = _quality_analysis_for_result(result)
     if cached_analysis is not None:
@@ -18454,18 +18783,22 @@ def _populate_result_quality_analysis(
         needs_prompt_refresh = bool(prompt) and not cached_analysis.prompt_checks_ran
         if (
             not needs_prompt_refresh
+            and not needs_metadata_refresh
             and result.quality_analysis is not None
             and result.quality_issues == cached_quality_issues
         ):
             return result
         if not needs_prompt_refresh:
+            metadata_agreement = result.metadata_agreement
+            if needs_metadata_refresh:
+                metadata_agreement = compute_metadata_agreement(text, metadata)
             return dataclasses.replace(
                 result,
                 quality_analysis=cached_analysis,
                 quality_issues=cached_quality_issues,
+                metadata_agreement=metadata_agreement,
             )
 
-    text = str(getattr(result.generation, "text", ""))
     generated_tokens = getattr(result.generation, "generation_tokens", 0)
     prompt_tokens = getattr(result.generation, "prompt_tokens", None)
     resolved_requested_max_tokens = (
@@ -18486,10 +18819,15 @@ def _populate_result_quality_analysis(
         if result.quality_issues and result.quality_issues != cached_quality_issues:
             quality_issues = result.quality_issues
 
+    metadata_agreement = result.metadata_agreement
+    if needs_metadata_refresh:
+        metadata_agreement = compute_metadata_agreement(text, metadata)
+
     return dataclasses.replace(
         result,
         quality_analysis=analysis,
         quality_issues=result.quality_issues or quality_issues,
+        metadata_agreement=metadata_agreement,
     )
 
 
@@ -20005,6 +20343,24 @@ def _build_jsonl_quality_analysis_record(
     }
 
 
+def _build_jsonl_metadata_agreement_record(
+    metadata_agreement: MetadataAgreementMetrics | None,
+) -> JsonlMetadataAgreementRecord | None:
+    """Build JSONL metadata-agreement payload from result-level benchmark data."""
+    if metadata_agreement is None:
+        return None
+    return {
+        "overall_score": metadata_agreement.overall_score,
+        "title_score": metadata_agreement.title_score,
+        "description_score": metadata_agreement.description_score,
+        "keyword_score": metadata_agreement.keyword_score,
+        "nonvisual_penalty": metadata_agreement.nonvisual_penalty,
+        "matched_terms": list(metadata_agreement.matched_terms),
+        "missed_terms": list(metadata_agreement.missed_terms),
+        "nonvisual_hits": list(metadata_agreement.nonvisual_hits),
+    }
+
+
 def _populate_jsonl_result_generation_data(
     record: JsonlResultRecord,
     result: PerformanceResult,
@@ -20032,6 +20388,10 @@ def _populate_jsonl_result_generation_data(
     quality_payload = _build_jsonl_quality_analysis_record(result.quality_analysis)
     if quality_payload:
         record["quality_analysis"] = quality_payload
+
+    metadata_agreement_payload = _build_jsonl_metadata_agreement_record(result.metadata_agreement)
+    if metadata_agreement_payload:
+        record["metadata_agreement"] = metadata_agreement_payload
 
 
 def save_jsonl_report(
@@ -21544,7 +21904,7 @@ def main(args: argparse.Namespace) -> None:
         # Hard-fail before any model execution when core runtime deps are unavailable.
         _raise_for_missing_runtime_dependencies()
 
-        results = process_models(args, image_path, prompt=prompt)
+        results = process_models(args, image_path, prompt=prompt, metadata=metadata)
 
         # Phase 5: Differential reruns for triage-worthy models
         if getattr(args, "rerun_triage", False):

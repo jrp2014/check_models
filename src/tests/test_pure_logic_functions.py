@@ -253,6 +253,48 @@ class TestQualityIssueTruncation:
         assert truncated == 'repetitive(phrase: "a...'
 
 
+@dataclass
+class _MetadataAgreementGeneration:
+    """Minimal generation stub for metadata-agreement enrichment tests."""
+
+    text: str
+    generation_tokens: int = 64
+    prompt_tokens: int = 32
+
+
+class TestMetadataAgreementIntegration:
+    """Tests for threading metadata agreement into cached quality analysis."""
+
+    def test_cached_quality_analysis_is_refreshed_with_metadata(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """Second-pass enrichment should add metadata agreement without rerunning analysis."""
+        text = (
+            "Title: Brick storefront\n"
+            "Description: A brick storefront with outdoor seating beside a pavement.\n"
+            "Keywords: brick storefront, outdoor seating, pavement, pedestrians"
+        )
+        metadata = {
+            "title": "Brick storefront",
+            "description": "A brick storefront with outdoor seating beside a pavement.",
+            "keywords": "brick storefront, outdoor seating, pavement, pedestrians",
+        }
+        result = mod.PerformanceResult(
+            model_name="test-model",
+            generation=_MetadataAgreementGeneration(text=text),
+            success=True,
+        )
+
+        first_pass = mod._populate_result_quality_analysis(result)
+        second_pass = mod._populate_result_quality_analysis(first_pass, metadata=metadata)
+
+        assert first_pass.metadata_agreement is None
+        assert second_pass.quality_analysis == first_pass.quality_analysis
+        assert second_pass.metadata_agreement is not None
+        assert second_pass.metadata_agreement.overall_score > 0.0
+
+
 # ── compute_vocabulary_diversity ───────────────────────────────────────────
 
 

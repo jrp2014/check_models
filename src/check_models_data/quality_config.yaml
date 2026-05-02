@@ -97,6 +97,10 @@ thresholds:
   moderate_echo_penalty: 0.8
   very_short_length_factor: 0.2
   short_length_factor: 0.6
+  metadata_agreement_weight_title: 0.2 # Relative weight for title agreement
+  metadata_agreement_weight_description: 0.4 # Relative weight for description agreement
+  metadata_agreement_weight_keywords: 0.4 # Relative weight for keyword agreement
+  metadata_agreement_nonvisual_penalty: 20.0 # Max penalty for date/time/GPS leakage
 
   # Harness/integration issue detection thresholds
   # These detect mlx-vlm bugs or model integration issues (not model quality)
