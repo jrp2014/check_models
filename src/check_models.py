@@ -63,6 +63,13 @@ from huggingface_hub import HFCacheInfo, scan_cache_dir
 from huggingface_hub import __version__ as hf_version
 from huggingface_hub.errors import HFValidationError
 from packaging.version import InvalidVersion, Version
+from rich import box
+from rich.bar import Bar
+from rich.console import Console, ConsoleRenderable
+from rich.logging import RichHandler
+from rich.panel import Panel
+from rich.table import Table
+from rich.text import Text
 from tabulate import tabulate
 
 from check_models_data.dependency_policy import (
@@ -2218,6 +2225,11 @@ class Colors:
         """Globally enable/disable ANSI colors for this process."""
         Colors._enabled = enabled
 
+    @staticmethod
+    def is_enabled() -> bool:
+        """Return whether styled terminal output is enabled."""
+        return Colors._enabled
+
 
 class LogStyles:
     """String constants describing structured log presentation styles."""
@@ -2237,217 +2249,108 @@ class LogStyles:
     MODEL_NAME: ClassVar[str] = "model_name"  # Magenta model identifiers
 
 
-class ColoredFormatter(logging.Formatter):
-    """A logging formatter that applies color to log messages based on their level and content."""
+RICH_STYLE_BY_ANSI: Final[dict[str, str]] = {
+    Colors.RED: "red",
+    Colors.GREEN: "green",
+    Colors.YELLOW: "yellow",
+    Colors.BLUE: "blue",
+    Colors.MAGENTA: "magenta",
+    Colors.CYAN: "cyan",
+    Colors.WHITE: "white",
+    Colors.GRAY: "dim",
+    Colors.RED + Colors.BOLD: "bold red",
+    Colors.GREEN + Colors.BOLD: "bold green",
+    Colors.YELLOW + Colors.BOLD: "bold yellow",
+    Colors.BLUE + Colors.BOLD: "bold blue",
+    Colors.MAGENTA + Colors.BOLD: "bold magenta",
+    Colors.CYAN + Colors.BOLD: "bold cyan",
+    Colors.WHITE + Colors.BOLD: "bold white",
+}
 
-    LEVEL_COLORS: ClassVar[dict[int, str]] = {
-        logging.DEBUG: Colors.GRAY,
-        logging.INFO: "",
-        logging.WARNING: Colors.YELLOW,
-        logging.ERROR: Colors.RED,
-        logging.CRITICAL: Colors.RED + Colors.BOLD,
+
+def _rich_style_from_color(value: object, *, default: str = "") -> str:
+    """Map legacy ANSI color constants to Rich styles."""
+    if not isinstance(value, str) or not value:
+        return default
+    return RICH_STYLE_BY_ANSI.get(value, default)
+
+
+def _make_rich_console(*, width: int | None = None) -> Console:
+    """Create the shared console object used by Rich logging."""
+    colors_enabled = Colors.is_enabled()
+    force_terminal = True if colors_enabled and os.getenv("FORCE_COLOR") is not None else None
+    return Console(
+        stderr=True,
+        width=width,
+        force_terminal=force_terminal,
+        no_color=not colors_enabled,
+        markup=False,
+        highlight=False,
+        emoji=True,
+    )
+
+
+class StyleAwareRichHandler(RichHandler):
+    """Rich log handler that honors the script's existing structured style hints."""
+
+    HINT_STYLES: ClassVar[dict[str, str]] = {
+        LogStyles.RULE: "blue",
+        LogStyles.HEADER: "bold magenta",
+        LogStyles.SECTION: "bold magenta",
+        LogStyles.ERROR: "bold red",
+        LogStyles.SUCCESS: "bold green",
+        LogStyles.WARNING: "bold yellow",
+        LogStyles.DETAIL: "cyan",
+        LogStyles.METRIC_LABEL: "bold white",
+        LogStyles.METRIC_VALUE: "white",
+        LogStyles.GENERATED_TEXT: "cyan",
+        LogStyles.FILE_PATH: "cyan",
+        LogStyles.MODEL_NAME: "magenta",
+    }
+    LEVEL_STYLES: ClassVar[dict[int, str]] = {
+        logging.DEBUG: "dim",
+        logging.WARNING: "yellow",
+        logging.ERROR: "bold red",
+        logging.CRITICAL: "bold red reverse",
     }
 
-    def format(self, record: logging.LogRecord) -> str:
-        """Format the log record with context-aware colors."""
-        style_hint: str | None = getattr(record, "style_hint", None)
-        original_msg: object = record.msg
-        original_args: tuple[object, ...] | Mapping[str, object] | None = record.args
+    def render_message(self, record: logging.LogRecord, message: str) -> ConsoleRenderable:
+        """Render log records as Rich Text without changing the stored log record."""
+        style_hint = getattr(record, "style_hint", None)
+        rendered_message = self._message_for_hint(style_hint, message, record)
+        style = self._style_for_record(record, style_hint)
+        return Text(rendered_message, style=style)
 
-        if style_hint:
-            raw_message: str = record.getMessage()
-            structured: str = self._format_structured_message(style_hint, raw_message, record)
-            record.msg = structured
-            record.args = ()
-
-        try:
-            msg: str = super().format(record)
-        finally:
-            record.msg = original_msg
-            record.args = original_args
-
-        # If there's a style_hint, it already applied styling, so return as-is
-        if style_hint:
-            return msg
-
-        # For messages without style_hint, apply level-based colors
-        level_color: str = self.LEVEL_COLORS.get(record.levelno, "")
-
-        if record.levelno == logging.INFO:
-            return self._format_info_message(msg)
-
-        # Apply level color (ERROR=red, WARNING=yellow, etc.)
-        if level_color:
-            return Colors.colored(msg, level_color)
-
-        return msg
-
-    def _format_structured_message(
+    def _message_for_hint(
         self,
-        style_hint: str,
-        raw_message: str,
+        style_hint: object,
+        message: str,
         record: logging.LogRecord,
     ) -> str:
-        """Return a message string styled according to the provided hint."""
-        handlers: dict[str, Callable[[str, logging.LogRecord], str]] = {
-            LogStyles.RULE: self._style_rule,
-            LogStyles.HEADER: self._style_header,
-            LogStyles.SECTION: self._style_section,
-            LogStyles.ERROR: self._style_error,
-            LogStyles.SUCCESS: self._style_success,
-            LogStyles.WARNING: self._style_warning,
-            LogStyles.DETAIL: self._style_detail,
-            LogStyles.METRIC_LABEL: self._style_metric_label,
-            LogStyles.METRIC_VALUE: self._style_metric_value,
-            LogStyles.GENERATED_TEXT: lambda raw_message, _record: Colors.colored(
-                raw_message,
-                Colors.CYAN,
-            ),
-            LogStyles.FILE_PATH: self._style_file_path,
-            LogStyles.MODEL_NAME: lambda raw_message, _record: Colors.colored(
-                raw_message,
-                Colors.MAGENTA,
-            ),
-        }
+        """Apply lightweight structural transforms before Rich styling."""
+        if style_hint == LogStyles.HEADER:
+            width = int(getattr(record, "style_width", max(_display_width(message), 1)))
+            return _display_align(message, width, alignment="center")
+        if style_hint == LogStyles.SECTION:
+            uppercase_enabled = bool(getattr(record, "style_uppercase", True))
+            title = message.upper() if uppercase_enabled and "\x1b[" not in message else message
+            return f"{getattr(record, 'style_prefix', '▶')} [ {title} ]"
+        if style_hint == LogStyles.METRIC_LABEL:
+            emoji = getattr(record, "style_emoji", "")
+            return f"{emoji} {message}" if isinstance(emoji, str) and emoji else message
+        return message
 
-        handler = handlers.get(style_hint)
-        if handler is None:
-            return raw_message
-
-        return handler(raw_message, record)
-
-    def _style_rule(self, raw_message: str, record: logging.LogRecord) -> str:
-        styles: list[str] = []
-        if bool(getattr(record, "style_bold", False)):
-            styles.append(Colors.BOLD)
-        rule_color = getattr(record, "style_color", None)
-        if isinstance(rule_color, str) and rule_color:
-            styles.append(rule_color)
-        return Colors.colored(raw_message, *styles) if styles else raw_message
-
-    def _style_header(self, raw_message: str, record: logging.LogRecord) -> str:
-        width = int(getattr(record, "style_width", max(_display_width(raw_message), 1)))
-        centered = _display_align(raw_message, width, alignment="center")
-        return Colors.colored(centered, Colors.BOLD, Colors.MAGENTA)
-
-    def _style_section(self, raw_message: str, record: logging.LogRecord) -> str:
-        uppercase_enabled = bool(getattr(record, "style_uppercase", True))
-        has_ansi = "\x1b[" in raw_message
-        uppercase = uppercase_enabled and not has_ansi
-        safe_title = raw_message.upper() if uppercase else raw_message
-        title_colored = Colors.colored(safe_title, Colors.BOLD, Colors.MAGENTA)
-        prefix = getattr(record, "style_prefix", "▶")
-        return f"{prefix} [ {title_colored} ]"
-
-    def _style_error(self, raw_message: str, _record: logging.LogRecord) -> str:
-        # Don't add "ERROR:" prefix since the log level already shows "ERROR"
-        # Just apply error styling (red, bold) to the message
-        return Colors.colored(raw_message, Colors.BOLD, Colors.RED)
-
-    def _style_success(self, raw_message: str, _record: logging.LogRecord) -> str:
-        return Colors.colored(raw_message, Colors.BOLD, Colors.GREEN)
-
-    def _style_warning(self, raw_message: str, _record: logging.LogRecord) -> str:
-        return Colors.colored(raw_message, Colors.BOLD, Colors.YELLOW)
-
-    def _style_detail(self, raw_message: str, record: logging.LogRecord) -> str:
-        detail_styles: list[str] = []
-        if bool(getattr(record, "style_bold", False)):
-            detail_styles.append(Colors.BOLD)
-        detail_color = getattr(record, "style_color", Colors.CYAN)
-        if isinstance(detail_color, str) and detail_color:
-            detail_styles.append(detail_color)
-        return Colors.colored(raw_message, *detail_styles) if detail_styles else raw_message
-
-    def _style_metric_label(self, raw_message: str, record: logging.LogRecord) -> str:
-        """Style metric category labels (e.g., 'Tokens:', 'Memory:')."""
-        emoji = getattr(record, "style_emoji", "")
-        label = f"{emoji} {raw_message}" if emoji else raw_message
-        color = getattr(record, "style_color", Colors.WHITE)
-        return Colors.colored(label, Colors.BOLD, color)
-
-    def _style_metric_value(self, raw_message: str, record: logging.LogRecord) -> str:
-        """Style metric values with optional color."""
-        color = getattr(record, "style_color", Colors.WHITE)
-        return Colors.colored(raw_message, color) if color else raw_message
-
-    def _style_file_path(self, raw_message: str, record: logging.LogRecord) -> str:
-        """Style file paths with highlighting."""
-        return Colors.colored(raw_message, getattr(record, "style_color", Colors.CYAN))
-
-    def _format_info_message(self, msg: str) -> str:
-        """Apply context-aware formatting to INFO messages for better visual hierarchy."""
-        stripped: str = msg.strip()
-
-        # Define format patterns with their corresponding colors (priority ordered)
-        format_patterns: list[tuple[Callable[[str, str], bool], tuple[str, ...]]] = [
-            # Section separators (highest priority)
-            (
-                lambda s, _: (
-                    s.startswith(("===", "---"))
-                    or (
-                        len(s) > FORMATTING.min_separator_chars
-                        and s.count("=") > FORMATTING.min_separator_chars
-                    )
-                    or (
-                        len(s) > FORMATTING.min_separator_chars
-                        and s.count("-") > FORMATTING.min_separator_chars
-                    )
-                ),
-                (Colors.BOLD, Colors.BLUE),
-            ),
-            # Section headers in brackets
-            (lambda s, _: s.startswith("[ ") and s.endswith(" ]"), (Colors.BOLD, Colors.MAGENTA)),
-            # Success indicators
-            (lambda s, m: "SUCCESS:" in m or s.startswith("✓"), (Colors.BOLD, Colors.GREEN)),
-            # Failure indicators
-            (
-                lambda s, m: any(x in m for x in ["FAILED:", "ERROR:"]) or s.startswith("✗"),
-                (Colors.BOLD, Colors.RED),
-            ),
-            # Generated text highlighting
-            (lambda _, m: "Generated Text:" in m, (Colors.CYAN,)),
-            # Performance metrics
-            (
-                lambda _, m: any(
-                    metric in m
-                    for metric in [
-                        "Tokens:",
-                        "TPS:",
-                        "Time:",
-                        "Memory (",  # matches verbose memory lines
-                        "Memory:",
-                    ]
-                ),
-                (Colors.WHITE,),
-            ),
-            # File operations
-            (
-                lambda _, m: any(x in m for x in ["HTML report saved", "Markdown report saved"]),
-                (Colors.BOLD, Colors.GREEN),
-            ),
-            # Processing status
-            (lambda s, _: s.startswith("Processing"), (Colors.YELLOW,)),
-            # Library versions section
-            (
-                lambda _, m: (
-                    "Library Versions" in m
-                    or (
-                        m.count(":") == 1
-                        and any(lib in m.lower() for lib in ["mlx", "pillow", "transformers"])
-                    )
-                ),
-                (Colors.CYAN,),
-            ),
-        ]
-
-        # Apply first matching pattern
-        for pattern_check, colors in format_patterns:
-            if pattern_check(stripped, msg):
-                return Colors.colored(msg, *colors)
-
-        # Default INFO messages without color to reduce noise
-        return msg
+    def _style_for_record(self, record: logging.LogRecord, style_hint: object) -> str:
+        """Return the Rich style for a log record."""
+        if isinstance(style_hint, str):
+            style = self.HINT_STYLES.get(style_hint, "")
+            color_style = _rich_style_from_color(getattr(record, "style_color", None))
+            if color_style:
+                style = color_style
+            if bool(getattr(record, "style_bold", False)) and "bold" not in style:
+                style = f"bold {style}".strip()
+            return style
+        return self.LEVEL_STYLES.get(record.levelno, "")
 
 
 class FileSafeFormatter(logging.Formatter):
@@ -2458,10 +2361,33 @@ class FileSafeFormatter(logging.Formatter):
         return ANSI_ESCAPE_RE.sub("", raw)
 
 
-# Configure logging to use ColoredFormatter
-handler: logging.StreamHandler[Any] = logging.StreamHandler(sys.stderr)
-formatter: ColoredFormatter = ColoredFormatter("%(asctime)s - %(levelname)s - %(message)s")
-handler.setFormatter(formatter)
+def _make_console_log_handler(
+    *,
+    level: int,
+    verbose: bool,
+    width: int | None = None,
+) -> StyleAwareRichHandler:
+    """Create the Rich console log handler for stderr output."""
+    handler = StyleAwareRichHandler(
+        console=_make_rich_console(width=width),
+        show_time=True,
+        show_level=verbose,
+        show_path=False,
+        markup=False,
+        highlighter=None,
+        rich_tracebacks=verbose,
+        log_time_format="[%H:%M:%S]",
+    )
+    handler.setLevel(level)
+    handler.setFormatter(logging.Formatter("%(message)s"))
+    return handler
+
+
+# Configure an import-time console handler; setup_environment replaces it per CLI flags.
+handler: StyleAwareRichHandler = _make_console_log_handler(
+    level=logging.INFO,
+    verbose=True,
+)
 logger.handlers.clear()
 logger.addHandler(handler)
 
@@ -6200,7 +6126,7 @@ def _log_wrapped_error(label: str, value: str) -> None:
 def _apply_cli_output_preferences(args: argparse.Namespace) -> None:
     """Apply color and width preferences based on CLI flags.
 
-    - Honors --no-color / --force-color to toggle ANSI colors
+    - Honors --no-color / --force-color to toggle Rich console styling
     - Applies --width via MLX_VLM_WIDTH env var for child processes too
     """
     # Color controls
@@ -7611,7 +7537,7 @@ def pretty_print_exif(
     show_all: bool = True,
     title: str = "EXIF Metadata Summary",
 ) -> None:
-    """Render selected EXIF tags in a colored table.
+    """Render selected EXIF tags in a Rich table.
 
     Only simple presentation logic lives here; extraction, filtering and
     sanitizing occur earlier (see ``get_exif_data`` / ``filter_and_format_tags``).
@@ -7628,34 +7554,13 @@ def pretty_print_exif(
         log_warning_note("No relevant EXIF tags found to display.")
         return
 
-    # Prepare data for tabulate with colors
-    header_color: str = Colors.BLUE
-    important_color: str = Colors.YELLOW
-
-    # Create colored headers
-    headers: list[str] = [
-        Colors.colored("Tag", Colors.BOLD, header_color),
-        Colors.colored("Value", Colors.BOLD, header_color),
-    ]
-
-    # Create table rows with appropriate coloring
-    rows: list[list[str]] = []
+    table = Table(box=box.ROUNDED, show_lines=False, expand=False)
+    table.add_column("Tag", style="bold blue", no_wrap=True)
+    table.add_column("Value", overflow="fold")
     for tag_name, value_display, is_important_tag in tags_to_print:
-        tag_display: str = (
-            Colors.colored(tag_name, Colors.BOLD, important_color) if is_important_tag else tag_name
-        )
-        rows.append([tag_display, value_display])
+        tag_cell = Text(tag_name, style="bold yellow" if is_important_tag else "")
+        table.add_row(tag_cell, value_display)
 
-    # Generate table using tabulate with outline format for clean borders without row separators
-    table: str = tabulate(
-        rows,
-        headers=headers,
-        tablefmt="fancy_grid",
-        colalign=["left", "left"],
-    )
-
-    # Print title and table with decorative separators
-    table_lines: list[str] = table.split("\n")
     # Use a consistent terminal-based width for header rules to avoid ragged lines
     # Use a clamped terminal width by default; if --width is set, get_terminal_width
     # will return the explicit override and ignore the max clamp.
@@ -7669,9 +7574,7 @@ def pretty_print_exif(
     )
     log_rule(header_width, char="=", color=Colors.BLUE, bold=True)
 
-    # Print the tabulated table
-    for line in table_lines:
-        logger.info(line)
+    _log_rich_renderable(table, width=header_width)
     log_rule(header_width, char="=", color=Colors.BLUE, bold=True)
 
 
@@ -16913,6 +16816,33 @@ def log_blank(count: int = 1) -> None:
         logger.info("")
 
 
+def _render_rich_lines(renderable: ConsoleRenderable, *, width: int | None = None) -> list[str]:
+    """Render a Rich object to plain text lines for logger/file-log parity."""
+    stream = io.StringIO()
+    render_console = Console(
+        file=stream,
+        width=width or get_terminal_width(max_width=120),
+        no_color=True,
+        force_terminal=False,
+        markup=False,
+        highlight=False,
+        emoji=True,
+    )
+    render_console.print(renderable)
+    return stream.getvalue().splitlines()
+
+
+def _log_rich_renderable(
+    renderable: ConsoleRenderable,
+    *,
+    indent: str = "",
+    width: int | None = None,
+) -> None:
+    """Log a Rich-rendered table/panel while keeping persisted logs plain."""
+    for line in _render_rich_lines(renderable, width=width):
+        logger.info("%s%s", indent, line)
+
+
 def _summary_parts(res: PerformanceResult, model_short: str) -> list[str]:
     """Assemble key=value summary segments for per-run triage."""
     parts: list[str] = [
@@ -17482,40 +17412,18 @@ def _log_compact_metrics(res: PerformanceResult) -> None:
 def log_metrics_legend(*, detailed: bool) -> None:
     """Emit a one-time legend at the beginning of processing for clarity."""
     log_blank()
-    width = get_terminal_width(max_width=100)
-    top_line = f"╔{'═' * (width - 2)}╗"
-    header_line = f"║ 📖 METRICS LEGEND{' ' * (width - 20)}║"
-    bottom_line = f"╚{'═' * (width - 2)}╝"
-
-    logger.info(
-        "%s",
-        top_line,
-        extra={"style_hint": LogStyles.RULE},
+    mode_line = (
+        "Detailed mode: separate lines for timing, memory, tokens, TPS"
+        if detailed
+        else "Compact mode: tokens(total/prompt/gen) format with aligned keys"
     )
-    logger.info(
-        "%s",
-        header_line,
-        extra={"style_hint": LogStyles.HEADER},
+    panel = Panel(
+        f"{mode_line}\nWarnings are shown for repetitive or hallucinated output.",
+        title="📖 Metrics Legend",
+        border_style="blue",
+        box=box.ROUNDED,
     )
-    logger.info(
-        "%s",
-        bottom_line,
-        extra={"style_hint": LogStyles.RULE},
-    )
-    if detailed:
-        logger.info(
-            "  • Detailed mode: separate lines for timing, memory, tokens, TPS",
-            extra={"style_hint": LogStyles.DETAIL},
-        )
-    else:
-        logger.info(
-            "  • Compact mode: tokens(total/prompt/gen) format with aligned keys",
-            extra={"style_hint": LogStyles.DETAIL},
-        )
-    logger.info(
-        "  • ⚠️  warnings shown for repetitive or hallucinated output",
-        extra={"style_hint": LogStyles.DETAIL},
-    )
+    _log_rich_renderable(panel, width=get_terminal_width(max_width=100))
     log_blank()
 
 
@@ -17658,21 +17566,20 @@ def _dump_environment_to_log(output_path: Path) -> None:
 
 def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     """Configure logging, collect versions, print warnings."""
+    # Apply CLI output preferences before constructing the Rich console handler.
+    _apply_cli_output_preferences(args)
+
     # Set DEBUG if verbose, else INFO
     console_log_level: int = logging.DEBUG if args.verbose else logging.INFO
     # Remove all handlers and add console + file handlers
     logger.handlers.clear()
 
-    # Console handler with colored output
-    console_handler: logging.StreamHandler[Any] = logging.StreamHandler(sys.stderr)
-    console_handler.setLevel(console_log_level)
-    # Include timestamp for better traceability, level in verbose mode
-    if args.verbose:
-        fmt = "%(asctime)s - %(levelname)s - %(message)s"
-    else:
-        fmt = "%(asctime)s - %(message)s"
-    console_formatter: ColoredFormatter = ColoredFormatter(fmt)
-    console_handler.setFormatter(console_formatter)
+    # Rich console handler handles terminal width, color/no-color mode, and tracebacks.
+    console_handler = _make_console_log_handler(
+        level=console_log_level,
+        verbose=bool(args.verbose),
+        width=get_terminal_width(max_width=120),
+    )
     logger.addHandler(console_handler)
 
     # File handler - write to specified log file (overwritten each run)
@@ -17700,9 +17607,6 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
 
     # Dump full environment to log file for reproducibility (after logging setup)
     _dump_environment_to_log(args.output_env)
-
-    # Apply CLI output preferences (color + width)
-    _apply_cli_output_preferences(args)
 
     # Note extra framework installs that are not part of the normal MLX path.
     st_present = bool(importlib_util.find_spec("sentence_transformers"))
@@ -18851,16 +18755,7 @@ def _normalize_log_table_cell(text: str) -> str:
     return ascii_safe or "-"
 
 
-def _ascii_bar(value: float, *, max_value: float, width: int = SUMMARY_CHART_WIDTH) -> str:
-    """Render a compact ASCII bar for a positive numeric value."""
-    if max_value <= 0 or value <= 0:
-        return "." * width
-    filled = max(1, round((value / max_value) * width))
-    filled = min(width, filled)
-    return "#" * filled + "." * (width - filled)
-
-
-def _log_ascii_metric_chart(
+def _log_rich_metric_chart(
     title: str,
     entries: Sequence[tuple[str, float]],
     *,
@@ -18877,16 +18772,17 @@ def _log_ascii_metric_chart(
         return
 
     logger.info("%s", title)
+    chart = Table.grid(padding=(0, 1))
+    chart.add_column(justify="left", no_wrap=True)
+    chart.add_column(ratio=1)
+    chart.add_column(justify="right", no_wrap=True)
     for label, value in ranked:
-        bar = _ascii_bar(value, max_value=max_value)
-        logger.info(
-            "   %-*s |%s| %s%s",
-            SUMMARY_MODEL_LABEL_MAX,
+        chart.add_row(
             _short_model_label(label),
-            bar,
-            _format_float_or_dash(value, digits=digits),
-            unit,
+            Bar(max_value, 0, value, width=SUMMARY_CHART_WIDTH),
+            f"{_format_float_or_dash(value, digits=digits)}{unit}",
         )
+    _log_rich_renderable(chart, indent="   ")
 
 
 def _log_model_comparison_table_and_charts(results: list[PerformanceResult]) -> None:
@@ -18943,25 +18839,31 @@ def _log_model_comparison_table_and_charts(results: list[PerformanceResult]) -> 
                 ],
             )
 
-    headers = ["#", "Model", "Status", "TPS", "Total(s)", "Load(s)", "PeakGB", "Notes"]
-    table_text = tabulate(
-        rows,
-        headers=headers,
-        tablefmt="github",
-        disable_numparse=True,
-        colalign=("right", "left", "left", "right", "right", "right", "right", "left"),
-    )
     logger.info("📋 Model Comparison (current run):")
-    for line in table_text.splitlines():
-        logger.info("   %s", line)
+    table = Table(box=box.ROUNDED, show_lines=False, expand=False)
+    column_specs: tuple[tuple[str, Literal["left", "right"]], ...] = (
+        ("#", "right"),
+        ("Model", "left"),
+        ("Status", "left"),
+        ("TPS", "right"),
+        ("Total(s)", "right"),
+        ("Load(s)", "right"),
+        ("PeakGB", "right"),
+        ("Notes", "left"),
+    )
+    for header, justify in column_specs:
+        table.add_column(header, justify=justify, no_wrap=header in {"#", "Status", "TPS"})
+    for row in rows:
+        table.add_row(*row)
+    _log_rich_renderable(table, indent="   ")
 
     if tps_entries:
         log_blank()
-        _log_ascii_metric_chart("📊 TPS comparison chart:", tps_entries, unit=" tps", digits=1)
+        _log_rich_metric_chart("📊 TPS comparison chart:", tps_entries, unit=" tps", digits=1)
     if len(total_time_entries) >= MIN_MODELS_FOR_EFFICIENCY_CHART:
         inverted = [(name, 1.0 / value) for name, value in total_time_entries if value > 0]
         if inverted:
-            _log_ascii_metric_chart(
+            _log_rich_metric_chart(
                 "⏱ Efficiency chart (higher is faster overall):",
                 inverted,
                 unit=" 1/s",
@@ -18971,7 +18873,7 @@ def _log_model_comparison_table_and_charts(results: list[PerformanceResult]) -> 
     failed = [res for res in sorted_results if not res.success]
     if failed:
         stage_counts = Counter(res.error_stage or "Unknown" for res in failed)
-        _log_ascii_metric_chart(
+        _log_rich_metric_chart(
             "❌ Failure stage frequency:",
             [(stage, float(count)) for stage, count in stage_counts.items()],
             unit=" x",
@@ -20435,7 +20337,7 @@ def _log_history_transition_chart(
         ("missing", float(len(missing_models))),
     ]
     if any(value > 0 for _label, value in transition_entries):
-        _log_ascii_metric_chart(
+        _log_rich_metric_chart(
             "🔁 Status transition counts:",
             transition_entries,
             unit=" x",
@@ -20445,7 +20347,7 @@ def _log_history_transition_chart(
         return
 
     _total, curr_success, curr_failed, _success_rate = _history_counts(current)
-    _log_ascii_metric_chart(
+    _log_rich_metric_chart(
         "✅ Current run status counts:",
         [("success", float(curr_success)), ("failed", float(curr_failed))],
         unit=" x",

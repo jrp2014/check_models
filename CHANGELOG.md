@@ -19,6 +19,9 @@ Notable changes to this project will be documented in this file.
 - Share the issue queue table renderer across diagnostics, review, and
   `output/issues/index.md` so maintainer queue columns stay in sync without
   duplicate row-building code.
+- Use Rich for console rendering, replacing the custom ANSI log formatter and
+  upgrading live summary tables, charts, and EXIF display while keeping
+  persisted report artifacts unchanged.
 
 ### Fixed
 

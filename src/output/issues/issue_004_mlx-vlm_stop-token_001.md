@@ -12,12 +12,12 @@
 
 ## Affected Models
 
-| Model                                | Representative Signal                                                                                                                        | Token Context                                                                                       | Repro Bundle   |
-|--------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|----------------|
-| `microsoft/Phi-3.5-vision-instruct`  | Special control token &lt;\|end\|&gt; appeared in generated text. \| Special control token &lt;\|endoftext\|&gt; appeared in generated text. | prompt=768 \| output/prompt=65.10% \| nontext burden=99% \| stop=completed \| hit token cap (500)   |                |
-| `mlx-community/GLM-4.6V-Flash-6bit`  | Special control token &lt;/think&gt; appeared in generated text.                                                                             | prompt=6,091 \| output/prompt=8.21% \| nontext burden=100% \| stop=completed \| hit token cap (500) |                |
-| `mlx-community/GLM-4.6V-Flash-mxfp4` | Special control token &lt;/think&gt; appeared in generated text.                                                                             | prompt=6,091 \| output/prompt=8.21% \| nontext burden=100% \| stop=completed \| hit token cap (500) |                |
-| `mlx-community/GLM-4.6V-nvfp4`       | Special control token &lt;/think&gt; appeared in generated text.                                                                             | prompt=6,091 \| output/prompt=8.21% \| nontext burden=100% \| stop=completed \| hit token cap (500) |                |
+| Model                                | Representative Signal                                                                                                                        | Token Context                                                                                       | Repro Bundle                                                                                                                                                                                  |
+|--------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `microsoft/Phi-3.5-vision-instruct`  | Special control token &lt;\|end\|&gt; appeared in generated text. \| Special control token &lt;\|endoftext\|&gt; appeared in generated text. | prompt=768 \| output/prompt=65.10% \| nontext burden=99% \| stop=completed \| hit token cap (500)   | [`20260502T225507Z_001_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json`](../repro_bundles/20260502T225507Z_001_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json)   |
+| `mlx-community/GLM-4.6V-Flash-6bit`  | Special control token &lt;/think&gt; appeared in generated text.                                                                             | prompt=6,091 \| output/prompt=8.21% \| nontext burden=100% \| stop=completed \| hit token cap (500) | [`20260502T225507Z_003_mlx-community_GLM-4.6V-Flash-6bit_mlx_vlm_stop_token_001.json`](../repro_bundles/20260502T225507Z_003_mlx-community_GLM-4.6V-Flash-6bit_mlx_vlm_stop_token_001.json)   |
+| `mlx-community/GLM-4.6V-Flash-mxfp4` | Special control token &lt;/think&gt; appeared in generated text.                                                                             | prompt=6,091 \| output/prompt=8.21% \| nontext burden=100% \| stop=completed \| hit token cap (500) | [`20260502T225507Z_004_mlx-community_GLM-4.6V-Flash-mxfp4_mlx_vlm_stop_token_001.json`](../repro_bundles/20260502T225507Z_004_mlx-community_GLM-4.6V-Flash-mxfp4_mlx_vlm_stop_token_001.json) |
+| `mlx-community/GLM-4.6V-nvfp4`       | Special control token &lt;/think&gt; appeared in generated text.                                                                             | prompt=6,091 \| output/prompt=8.21% \| nontext burden=100% \| stop=completed \| hit token cap (500) | [`20260502T225507Z_005_mlx-community_GLM-4.6V-nvfp4_mlx_vlm_stop_token_001.json`](../repro_bundles/20260502T225507Z_005_mlx-community_GLM-4.6V-nvfp4_mlx_vlm_stop_token_001.json)             |
 
 
 ## Evidence
@@ -92,6 +92,13 @@ Cluster rerun:
 ```bash
 python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models microsoft/Phi-3.5-vision-instruct mlx-community/GLM-4.6V-Flash-6bit mlx-community/GLM-4.6V-Flash-mxfp4 mlx-community/GLM-4.6V-nvfp4
 ```
+
+Repro bundles:
+
+- `microsoft/Phi-3.5-vision-instruct`: [`20260502T225507Z_001_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json`](../repro_bundles/20260502T225507Z_001_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json)
+- `mlx-community/GLM-4.6V-Flash-6bit`: [`20260502T225507Z_003_mlx-community_GLM-4.6V-Flash-6bit_mlx_vlm_stop_token_001.json`](../repro_bundles/20260502T225507Z_003_mlx-community_GLM-4.6V-Flash-6bit_mlx_vlm_stop_token_001.json)
+- `mlx-community/GLM-4.6V-Flash-mxfp4`: [`20260502T225507Z_004_mlx-community_GLM-4.6V-Flash-mxfp4_mlx_vlm_stop_token_001.json`](../repro_bundles/20260502T225507Z_004_mlx-community_GLM-4.6V-Flash-mxfp4_mlx_vlm_stop_token_001.json)
+- `mlx-community/GLM-4.6V-nvfp4`: [`20260502T225507Z_005_mlx-community_GLM-4.6V-nvfp4_mlx_vlm_stop_token_001.json`](../repro_bundles/20260502T225507Z_005_mlx-community_GLM-4.6V-nvfp4_mlx_vlm_stop_token_001.json)
 
 
 ## Fix Checklist

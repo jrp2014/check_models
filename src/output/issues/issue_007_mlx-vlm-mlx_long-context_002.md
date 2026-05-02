@@ -12,9 +12,9 @@
 
 ## Affected Models
 
-| Model                               | Representative Signal                                                         | Token Context                                                                                        | Repro Bundle   |
-|-------------------------------------|-------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|----------------|
-| `mlx-community/Qwen3.5-9B-MLX-4bit` | Output degeneration under long prompt length (repeated_punctuation: ':**...') | prompt=16,290 \| output/prompt=3.07% \| nontext burden=100% \| stop=completed \| hit token cap (500) |                |
+| Model                               | Representative Signal                                                         | Token Context                                                                                        | Repro Bundle                                                                                                                                                                                            |
+|-------------------------------------|-------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/Qwen3.5-9B-MLX-4bit` | Output degeneration under long prompt length (repeated_punctuation: ':**...') | prompt=16,290 \| output/prompt=3.07% \| nontext burden=100% \| stop=completed \| hit token cap (500) | [`20260502T225507Z_009_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_002.json`](../repro_bundles/20260502T225507Z_009_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_002.json) |
 
 
 ## Evidence
@@ -59,6 +59,10 @@ Cluster rerun:
 ```bash
 python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen3.5-9B-MLX-4bit
 ```
+
+Repro bundles:
+
+- `mlx-community/Qwen3.5-9B-MLX-4bit`: [`20260502T225507Z_009_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_002.json`](../repro_bundles/20260502T225507Z_009_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_002.json)
 
 
 ## Fix Checklist

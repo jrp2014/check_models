@@ -1,0 +1,190 @@
+{
+  "environment": {
+    "library_versions": {
+      "Pillow": "12.2.0",
+      "huggingface-hub": "1.13.0",
+      "mlx": "0.32.0.dev20260502+e8ebdebe",
+      "mlx-lm": "0.31.3",
+      "mlx-metal": null,
+      "mlx-vlm": "0.4.5",
+      "numpy": "2.4.4",
+      "tokenizers": "0.22.2",
+      "transformers": "5.7.0"
+    },
+    "platform": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
+    "preflight_issues": [],
+    "system_info": {
+      "Architecture": "arm64",
+      "CPU Cores (Logical)": "18",
+      "CPU Cores (Physical)": "18",
+      "GPU Cores": "40",
+      "GPU/Chip": "Apple M5 Max",
+      "Metal SDK": "MacOSX.sdk",
+      "Metal Support": "Metal 4",
+      "OS": "Darwin 25.4.0",
+      "Python Version": "3.13.12",
+      "RAM": "128.0 GB",
+      "SDK Version": "26.4",
+      "Xcode Build": "17E202",
+      "Xcode Version": "26.4.1",
+      "macOS Version": "26.4.1"
+    }
+  },
+  "failure": {
+    "captured_output": null,
+    "code": null,
+    "message": null,
+    "package": null,
+    "phase": null,
+    "signature": null,
+    "stage": null,
+    "traceback": null,
+    "type": null
+  },
+  "generated_at_utc": "2026-05-02T22:55:07+00:00",
+  "issue_cluster_id": "mlx-vlm-mlx_long-context_001",
+  "model": "mlx-community/paligemma2-3b-pt-896-4bit",
+  "repro": {
+    "args": {
+      "_check_models_preflight_issues": [],
+      "adapter_path": null,
+      "context_marker": "Context:",
+      "detailed_metrics": false,
+      "dry_run": false,
+      "enable_thinking": false,
+      "eos_tokens": null,
+      "eval_mode": "stress",
+      "exclude": [
+        "mlx-community/Qwen3-VL-2B-Thinking-bf16",
+        "Qwen/Qwen3-VL-2B-Instruct"
+      ],
+      "folder": null,
+      "force_color": false,
+      "image": "/Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg",
+      "kv_bits": null,
+      "kv_group_size": 64,
+      "kv_quant_scheme": "uniform",
+      "lazy_load": false,
+      "max_kv_size": null,
+      "max_tokens": 500,
+      "min_p": 0.0,
+      "models": null,
+      "no_color": false,
+      "output_diagnostics": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/diagnostics.md",
+      "output_env": "/Users/jrp/Documents/AI/mlx/check_models/src/output/environment.log",
+      "output_gallery_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/model_gallery.md",
+      "output_html": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.html",
+      "output_jsonl": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.jsonl",
+      "output_log": "/Users/jrp/Documents/AI/mlx/check_models/src/output/check_models.log",
+      "output_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.md",
+      "output_review": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/review.md",
+      "output_tsv": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.tsv",
+      "prefill_step_size": 4096,
+      "processor_kwargs": null,
+      "prompt": "Describe this picture",
+      "prune_repro_days": 90,
+      "quality_config": null,
+      "quantized_kv_start": 5000,
+      "repetition_context_size": 20,
+      "repetition_penalty": null,
+      "rerun_triage": false,
+      "resize_shape": null,
+      "revision": null,
+      "skip_special_tokens": false,
+      "temperature": 0.0,
+      "thinking_budget": null,
+      "thinking_end_token": "</think>",
+      "thinking_start_token": null,
+      "timeout": 300.0,
+      "top_k": 0,
+      "top_p": 1.0,
+      "trust_remote_code": true,
+      "verbose": true,
+      "width": null
+    },
+    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen2-VL-2B-Instruct-4bit mlx-community/paligemma2-3b-pt-896-4bit",
+    "env_vars": {
+      "TOKENIZERS_PARALLELISM": "false"
+    },
+    "image_path": "/Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg",
+    "image_ref_sha256": "8c21b8f52a9068f26b5443d7a7a7294ac30154606e84bbc5c9a42d2ddc81a158",
+    "image_sha256": "15e804d7a23d6c6f4b3832e97020f28b981e387ab010da27d6ff446f8e11cd8a",
+    "prompt_diagnostics": {
+      "eos_token": "<eos>",
+      "eos_token_id": 1,
+      "generate_kwargs": {
+        "kv_bits": null,
+        "kv_group_size": 64,
+        "kv_quant_scheme": "uniform",
+        "max_kv_size": null,
+        "max_tokens": 500,
+        "prefill_step_size": 4096,
+        "quantized_kv_start": 5000,
+        "repetition_context_size": 20,
+        "repetition_penalty": null,
+        "temperature": 0.0,
+        "top_p": 1.0
+      },
+      "image_placeholder_count": 1,
+      "model_type": "paligemma",
+      "processor_class": "mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor",
+      "rendered_prompt_chars": 28,
+      "rendered_prompt_hash_sha256": "a51d0f8316d0c685875a45ab7b12da5eb6f7d10479c6c637e676672182b5920c",
+      "rendered_prompt_preview": "<image>Describe this picture",
+      "special_token_ids": [
+        2,
+        1,
+        3,
+        0,
+        4,
+        257152
+      ],
+      "special_tokens": [
+        "<bos>",
+        "<eos>",
+        "<unk>",
+        "<pad>",
+        "<mask>",
+        "<image>"
+      ],
+      "tokenizer_class": "transformers.models.gemma.tokenization_gemma.GemmaTokenizer"
+    },
+    "prompt_hash_sha256": "9a9bea36d63483f38c27775994d625ebce5d0a084a04474f97aacabd0f3fbb15",
+    "prompt_preview": "Describe this picture",
+    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/paligemma2-3b-pt-896-4bit",
+    "seed": null
+  },
+  "result": {
+    "generated_text_preview": "The garden",
+    "maintainer_triage": {
+      "confidence": "high",
+      "evidence": [
+        "long_context",
+        "nontext_prompt_burden"
+      ],
+      "harness_details": [
+        "output:truncated(3tok)",
+        "long_context_low_ratio(0.1%;4101->3)"
+      ],
+      "hit_max_tokens": false,
+      "issue_kind": "context_budget",
+      "issue_subtype": "long_context",
+      "next_action": "Treat this as a prompt-budget issue first; nontext prompt burden is 100% and the output stays weak under that load.",
+      "nontext_prompt_ratio": 0.9990246281394781,
+      "prompt_output_ratio": 0.000731528895391368,
+      "prompt_tokens_total": 4101,
+      "requested_max_tokens": 500,
+      "stop_reason": "completed",
+      "summary": "Output appears truncated to about 3 tokens. | At long prompt length (4101 tokens), output stayed unusually short (3 tokens; ratio 0.1%). | output/prompt=0.07% | nontext prompt burden=100%",
+      "suspected_owner": "mlx",
+      "user_bucket": "caveat"
+    },
+    "quality_issues": [
+      "\u26a0\ufe0fharness(long_context)",
+      "long-context",
+      "context-budget"
+    ],
+    "success": true
+  },
+  "schema_version": "1.0"
+}

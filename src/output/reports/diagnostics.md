@@ -541,7 +541,7 @@ Recent reproducibility is measured from history (up to last 3 runs where each
 model appears).
 
 **Regressions since previous run:** none
-**Recoveries since previous run:** `mlx-community/SmolVLM2-2.2B-Instruct-mlx`
+**Recoveries since previous run:** none
 
 | Model                                     | Status vs Previous Run   | First Seen Failing      | Recent Repro           |
 |-------------------------------------------|--------------------------|-------------------------|------------------------|
@@ -555,13 +555,13 @@ model appears).
 - **Detailed diagnostics models:** 12
 - **Summary diagnostics models:** 41
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1382.94s (1382.94s)
-- **Average runtime per model:** 26.09s (26.09s)
-- **Dominant runtime phase:** decode dominated 49/53 measured model runs (92% of tracked runtime).
-- **Phase totals:** model load=107.57s, prompt prep=0.16s, decode=1256.36s, cleanup=5.78s
+- **Total model runtime (sum):** 1375.06s (1375.06s)
+- **Average runtime per model:** 25.94s (25.94s)
+- **Dominant runtime phase:** decode dominated 49/53 measured model runs (91% of tracked runtime).
+- **Phase totals:** model load=121.62s, prompt prep=0.16s, decode=1234.86s, cleanup=5.94s
 - **Observed stop reasons:** completed=51, exception=2
-- **Validation overhead:** 18.60s total (avg 0.35s across 53 model(s)).
-- **First-token latency:** Avg 14.86s | Min 0.06s | Max 103.41s across 51 model(s).
+- **Validation overhead:** 17.98s total (avg 0.34s across 53 model(s)).
+- **First-token latency:** Avg 14.15s | Min 0.06s | Max 84.53s across 51 model(s).
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
@@ -692,4 +692,4 @@ Describe this picture
 - Input image: `/Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-05-02 11:57:27 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-05-02 23:55:07 BST by [check_models](https://github.com/jrp2014/check_models)._

@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-05-02 10:40:04 BST
+FULL ENVIRONMENT DUMP - 2026-05-02 20:49:26 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -38,7 +38,7 @@ fastapi==0.136.1
 filelock==3.29.0
 flatbuffers==25.12.19
 frozenlist==1.8.0
-fsspec==2026.2.0
+fsspec==2026.4.0
 gast==0.7.0
 google-pasta==0.2.0
 grpcio==1.80.0
@@ -127,7 +127,7 @@ ruff==0.15.12
 safetensors==0.7.0
 scipy==1.17.1
 sentencepiece==0.2.1
-setuptools==82.0.1
+setuptools==81.0.0
 shellingham==1.5.4
 six==1.17.0
 sounddevice==0.5.5
@@ -164,7 +164,7 @@ urllib3==2.6.3
 uvicorn==0.46.0
 virtualenv==21.3.0
 vulture==2.16
-wcwidth==0.6.0
+wcwidth==0.7.0
 wheel==0.47.0
 wrapt==2.1.2
 xxhash==3.7.0
@@ -172,5 +172,5 @@ yarl==1.23.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-05-02 10:40:04 BST
+Environment dump completed at 2026-05-02 20:49:26 BST
 ================================================================================

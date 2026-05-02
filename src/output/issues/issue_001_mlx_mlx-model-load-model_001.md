@@ -1,4 +1,4 @@
-# \[mlx\]\[MLX-MODEL-LOAD-MODEL\] Model loading failed: Received 4 parameters not in model: affecting 1 model(s)
+# \[mlx\]\[MLX-MODEL-LOAD-MODEL\] Received 4 parameters not in model: affecting 1 model(s)
 
 ## Summary
 
@@ -6,7 +6,7 @@
 
 - **Issue kind:** `runtime_failure`
 - **Cluster ID:** `mlx_mlx-model-load-model_001`
-- **Symptom family:** `mlx_model_load_model model loading failed received parameters not in model multi_modal_projector linear_1 biases multi_m`
+- **Symptom family:** `mlx_model_load_model received parameters not in model multi_modal_projector linear_1 biases multi_modal_projector linear`
 - **Acceptance signal:** Affected reruns complete model load and generation, or fail with a narrower configuration/compatibility error that points to the owning layer.
 
 
@@ -14,7 +14,7 @@
 
 | Model                                     | Representative Signal               | Token Context   | Repro Bundle                                                                                                                                                                                                                  |
 |-------------------------------------------|-------------------------------------|-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | model error \| mlx model load model | stop=exception  | [`20260502T105726Z_001_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json`](../repro_bundles/20260502T105726Z_001_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json) |
+| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | model error \| mlx model load model | stop=exception  | [`20260502T225507Z_006_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json`](../repro_bundles/20260502T225507Z_006_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json) |
 
 
 ## Evidence
@@ -25,6 +25,16 @@ Observed error:
 
 ```text
 Model loading failed: Received 4 parameters not in model: 
+multi_modal_projector.linear_1.biases,
+multi_modal_projector.linear_1.scales,
+multi_modal_projector.linear_2.biases,
+multi_modal_projector.linear_2.scales.
+```
+
+Root exception:
+
+```text
+builtins.ValueError: Received 4 parameters not in model: 
 multi_modal_projector.linear_1.biases,
 multi_modal_projector.linear_1.scales,
 multi_modal_projector.linear_2.biases,
@@ -64,7 +74,7 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC
 
 Repro bundles:
 
-- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: [`20260502T105726Z_001_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json`](../repro_bundles/20260502T105726Z_001_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)
+- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: [`20260502T225507Z_006_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json`](../repro_bundles/20260502T225507Z_006_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)
 
 
 ## Fix Checklist

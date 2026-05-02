@@ -312,8 +312,10 @@ def test_log_summary_emits_comparison_table_and_ascii_charts(
 
     messages = "\n".join(record.message for record in caplog.records)
     assert "Model Comparison (current run):" in messages
-    assert "|   # | Model" in messages
-    assert "|   TPS |   Total(s) |   Load(s) |   PeakGB |" in messages
+    assert "│ # │ Model" in messages
+    assert "TPS │" in messages
+    assert "│ Total(s)" in messages
+    assert "│ PeakGB" in messages
     assert "TPS comparison chart:" in messages
     assert "Efficiency chart (higher is faster overall):" in messages
     assert "Failure stage frequency:" in messages
@@ -361,7 +363,7 @@ def test_log_summary_comparison_table_sanitizes_non_ascii_notes(
     table_row_messages = [
         record.message
         for record in caplog.records
-        if "emoji-note" in record.message and record.message.strip().startswith("|")
+        if "emoji-note" in record.message and record.message.strip().startswith("│")
     ]
     assert table_row_messages
     row = table_row_messages[0]

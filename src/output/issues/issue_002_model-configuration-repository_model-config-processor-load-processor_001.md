@@ -6,7 +6,7 @@
 
 - **Issue kind:** `runtime_failure`
 - **Cluster ID:** `model-configuration-repository_model-config-processor-load-processor_001`
-- **Symptom family:** `model_config_processor_load_processor model preflight failed for mlx-community/molmopoint-8b-fp16 loaded processor has n`
+- **Symptom family:** `model_config_processor_load_processor loaded processor has no image_processor expected multimodal processor`
 - **Acceptance signal:** Affected reruns complete model load and generation, or fail with a narrower configuration/compatibility error that points to the owning layer.
 
 
@@ -14,7 +14,7 @@
 
 | Model                              | Representative Signal                                    | Token Context   | Repro Bundle                                                                                                                                                                                                                  |
 |------------------------------------|----------------------------------------------------------|-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/MolmoPoint-8B-fp16` | processor error \| model config processor load processor | stop=exception  | [`20260502T105726Z_002_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json`](../repro_bundles/20260502T105726Z_002_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json) |
+| `mlx-community/MolmoPoint-8B-fp16` | processor error \| model config processor load processor | stop=exception  | [`20260502T225507Z_007_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json`](../repro_bundles/20260502T225507Z_007_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json) |
 
 
 ## Evidence
@@ -25,6 +25,12 @@ Observed error:
 
 ```text
 Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded processor has no image_processor; expected multimodal processor.
+```
+
+Root exception:
+
+```text
+builtins.ValueError: Loaded processor has no image_processor; expected multimodal processor.
 ```
 
 Traceback tail:
@@ -60,7 +66,7 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC
 
 Repro bundles:
 
-- `mlx-community/MolmoPoint-8B-fp16`: [`20260502T105726Z_002_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json`](../repro_bundles/20260502T105726Z_002_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json)
+- `mlx-community/MolmoPoint-8B-fp16`: [`20260502T225507Z_007_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json`](../repro_bundles/20260502T225507Z_007_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json)
 
 
 ## Fix Checklist

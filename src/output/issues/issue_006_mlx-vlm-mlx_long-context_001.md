@@ -12,10 +12,10 @@
 
 ## Affected Models
 
-| Model                                     | Representative Signal                                                                                                                                                                                          | Token Context                                                                 | Repro Bundle   |
-|-------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|----------------|
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt-handling issues. \| At long prompt length (16299 tokens), output stayed unusually short (13 tokens; ratio 0.1%). | prompt=16,299 \| output/prompt=0.08% \| nontext burden=100% \| stop=completed |                |
-| `mlx-community/paligemma2-3b-pt-896-4bit` | Output appears truncated to about 3 tokens. \| At long prompt length (4101 tokens), output stayed unusually short (3 tokens; ratio 0.1%).                                                                      | prompt=4,101 \| output/prompt=0.07% \| nontext burden=100% \| stop=completed  |                |
+| Model                                     | Representative Signal                                                                                                                                                                                          | Token Context                                                                 | Repro Bundle                                                                                                                                                                                                        |
+|-------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt-handling issues. \| At long prompt length (16299 tokens), output stayed unusually short (13 tokens; ratio 0.1%). | prompt=16,299 \| output/prompt=0.08% \| nontext burden=100% \| stop=completed | [`20260502T225507Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json`](../repro_bundles/20260502T225507Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json) |
+| `mlx-community/paligemma2-3b-pt-896-4bit` | Output appears truncated to about 3 tokens. \| At long prompt length (4101 tokens), output stayed unusually short (3 tokens; ratio 0.1%).                                                                      | prompt=4,101 \| output/prompt=0.07% \| nontext burden=100% \| stop=completed  | [`20260502T225507Z_012_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json`](../repro_bundles/20260502T225507Z_012_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json) |
 
 
 ## Evidence
@@ -69,6 +69,11 @@ Cluster rerun:
 ```bash
 python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen2-VL-2B-Instruct-4bit mlx-community/paligemma2-3b-pt-896-4bit
 ```
+
+Repro bundles:
+
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: [`20260502T225507Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json`](../repro_bundles/20260502T225507Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)
+- `mlx-community/paligemma2-3b-pt-896-4bit`: [`20260502T225507Z_012_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json`](../repro_bundles/20260502T225507Z_012_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json)
 
 
 ## Fix Checklist
