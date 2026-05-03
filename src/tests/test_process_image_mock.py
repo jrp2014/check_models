@@ -11,7 +11,7 @@ from unittest.mock import patch
 import pytest
 
 if TYPE_CHECKING:
-    from collections.abc import Generator
+    from collections.abc import Generator, Sequence
     from pathlib import Path
 
 import check_models
@@ -714,14 +714,17 @@ class TestProcessImageWithModelMock:
         )
         logged_values: list[tuple[str, str]] = []
 
-        def _capture_tree(_prefix: str, label: str, value: str, *, indent: str = "") -> None:
-            del indent
-            logged_values.append((label, value))
+        def _capture_tree(
+            _title: str,
+            rows: Sequence[tuple[str, str]],
+            *,
+            emoji: str = "",
+            indent: str = "",
+        ) -> None:
+            del emoji, indent
+            logged_values.extend(rows)
 
-        with (
-            patch.object(check_models, "log_metric_label"),
-            patch.object(check_models, "log_metric_tree", side_effect=_capture_tree),
-        ):
+        with patch.object(check_models, "_log_metric_tree", side_effect=_capture_tree):
             check_models._log_perf_block(result)
 
         assert ("Cache Δ:", " 0.30 GB") in logged_values

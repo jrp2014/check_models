@@ -1,7 +1,7 @@
 """Test that runtime dependency block in README matches pyproject runtime deps.
 
 This enforces local parity in addition to CI. The test focuses only on runtime deps
-(not optional extras groups) and uses the same parsing heuristics as the sync script.
+(not optional extras groups) and parses dependencies with packaging's PEP 508 parser.
 """
 
 from __future__ import annotations
@@ -15,6 +15,7 @@ import zipfile
 from pathlib import Path
 
 import pytest
+from packaging.requirements import Requirement
 
 from check_models_data import dependency_policy
 from tools import check_suppressions, generate_stubs
@@ -45,6 +46,16 @@ LEGACY_ROOT_QUALITY_CONFIG = PKG_ROOT / "quality_config.yaml"
 MANUAL_MARKERS = ("<!-- MANUAL_INSTALL_START -->", "<!-- MANUAL_INSTALL_END -->")
 
 
+def _dependency_key(requirement: Requirement) -> str:
+    extras = f"[{','.join(sorted(requirement.extras))}]" if requirement.extras else ""
+    return f"{requirement.name}{extras}"
+
+
+def _dependency_spec(requirement: Requirement) -> str:
+    marker = f"; {requirement.marker}" if requirement.marker else ""
+    return f"{requirement.specifier}{marker}"
+
+
 def _parse_runtime_deps(text: str) -> dict[str, str]:
     data = tomllib.loads(text)
     # project.dependencies is a list of strings
@@ -52,9 +63,8 @@ def _parse_runtime_deps(text: str) -> dict[str, str]:
 
     deps: dict[str, str] = {}
     for line in deps_list:
-        name = re.split(r"[<>=!~]", line, maxsplit=1)[0].strip()
-        spec = line[len(name) :].strip()
-        deps[name] = spec
+        requirement = Requirement(line)
+        deps[_dependency_key(requirement)] = _dependency_spec(requirement)
     return deps
 
 
@@ -111,9 +121,8 @@ def test_readme_runtime_block_matches_pyproject() -> None:
 
     seen: dict[str, str] = {}
     for q in quoted:
-        name = re.split(r"[<>=!~]", q, maxsplit=1)[0]
-        spec = q[len(name) :]
-        seen[name] = spec
+        requirement = Requirement(q)
+        seen[_dependency_key(requirement)] = _dependency_spec(requirement)
 
     # All runtime deps must exist
     missing = [k for k in runtime_deps if k not in seen]

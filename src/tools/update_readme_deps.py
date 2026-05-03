@@ -30,7 +30,31 @@ import re
 import tomllib
 from pathlib import Path
 
+from packaging.requirements import InvalidRequirement, Requirement
+
 logger = logging.getLogger(__name__)
+
+
+def _dependency_key(requirement: Requirement) -> str:
+    """Return the install name, preserving extras for command generation."""
+    extras = f"[{','.join(sorted(requirement.extras))}]" if requirement.extras else ""
+    return f"{requirement.name}{extras}"
+
+
+def _dependency_spec(requirement: Requirement) -> str:
+    """Return the version/marker suffix for a parsed dependency."""
+    marker = f"; {requirement.marker}" if requirement.marker else ""
+    return f"{requirement.specifier}{marker}"
+
+
+def _parse_requirement(requirement_text: str) -> tuple[str, str]:
+    """Parse one PEP 508 requirement string into command key/spec parts."""
+    try:
+        requirement = Requirement(requirement_text)
+    except InvalidRequirement as exc:
+        msg = f"Invalid dependency requirement in pyproject.toml: {requirement_text!r}"
+        raise RuntimeError(msg) from exc
+    return _dependency_key(requirement), _dependency_spec(requirement)
 
 
 def parse_pyproject(path: Path) -> dict[str, str]:
@@ -43,10 +67,8 @@ def parse_pyproject(path: Path) -> dict[str, str]:
 
     deps: dict[str, str] = {}
     for line in deps_list:
-        # Split name from spec heuristically: first occurrence of >,=,!,<,~
-        name_part = re.split(r"[<>=!~]", line, maxsplit=1)[0].strip()
-        spec = line[len(name_part) :].strip()
-        deps[name_part] = spec
+        name, spec = _parse_requirement(line)
+        deps[name] = spec
 
     return deps
 
@@ -81,30 +103,30 @@ def replace_between_markers(text: str, marker_key: str, replacement_block: str) 
 
 
 def extract_optional_groups(pyproject_text: str) -> dict[str, list[str]]:
-    """Very small parser to extract optional group package names.
+    """Extract optional group package names from pyproject metadata.
 
     We only need names (not version specs) for validation that no optional dep leaks
     into the auto-generated runtime blocks.
     """
+    data = tomllib.loads(pyproject_text)
+    optional_groups = data.get("project", {}).get("optional-dependencies", {})
     groups: dict[str, list[str]] = {}
-    current: str | None = None
-    for line in pyproject_text.splitlines():
-        stripped = line.strip()
-        if stripped.startswith("[project.optional-dependencies]"):
-            current = None
+    if not isinstance(optional_groups, dict):
+        return groups
+    for group_name, requirements in optional_groups.items():
+        if not isinstance(requirements, list):
             continue
-        if (
-            stripped.startswith("[")
-            and stripped.endswith("]")
-            and stripped.startswith("[project.optional-dependencies.")
-        ):
-            current = stripped.rsplit(".", 1)[-1][:-1]
-            groups[current] = []
-            continue
-        if current and stripped.startswith('"'):
-            pkg = stripped.strip(",").strip().strip('"').split(">=")[0].split("==")[0]
-            if pkg:
-                groups[current].append(pkg)
+        packages: list[str] = []
+        for requirement_text in requirements:
+            if not isinstance(requirement_text, str):
+                continue
+            try:
+                requirement = Requirement(requirement_text)
+            except InvalidRequirement as exc:
+                msg = f"Invalid optional dependency in pyproject.toml: {requirement_text!r}"
+                raise RuntimeError(msg) from exc
+            packages.append(requirement.name)
+        groups[str(group_name)] = packages
     return groups
 
 

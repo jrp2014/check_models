@@ -388,10 +388,10 @@ def test_log_summary_single_model_omits_efficiency_chart(
     assert "Efficiency chart (higher is faster overall):" not in messages
 
 
-def test_log_summary_comparison_table_sanitizes_non_ascii_notes(
+def test_log_summary_comparison_table_preserves_unicode_notes(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    """Comparison-table notes should drop emoji to preserve terminal alignment."""
+    """Rich comparison-table notes can keep Unicode without breaking alignment."""
     caplog.set_level(logging.INFO)
     result = PerformanceResult(
         model_name="org/emoji-note",
@@ -413,7 +413,7 @@ def test_log_summary_comparison_table_sanitizes_non_ascii_notes(
     assert table_row_messages
     row = table_row_messages[0]
     assert "harness(stop_token)" in row
-    assert "⚠" not in row
+    assert "⚠" in row
 
 
 def test_log_summary_reports_metadata_baseline_delta_when_context_present(
@@ -494,7 +494,7 @@ def test_log_history_comparison_emits_tables_and_transition_chart(
 
     messages = "\n".join(record.message for record in caplog.records)
     assert "Run-over-run comparison:" in messages
-    assert "| Metric" in messages
+    assert "│ Metric" in messages
     assert "Comparison context:" in messages
     assert "Status transition counts:" in messages
     assert "Detailed model transitions:" in messages

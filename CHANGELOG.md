@@ -29,6 +29,12 @@ Notable changes to this project will be documented in this file.
 - Use Rich for console rendering, replacing the custom ANSI log formatter and
   upgrading live summary tables, charts, and EXIF display while keeping
   persisted report artifacts unchanged.
+- Reuse the shared Rich table renderer for console statistics, version/system
+  summaries, and history comparison output, removing legacy ANSI/table
+  normalization paths now handled by Rich.
+- Extend Rich to detailed metric trees and live model/rerun progress, and
+  replace remaining hand-rolled dependency/table parsing with
+  `packaging.Requirement` and `tabulate` where practical.
 
 ### Fixed
 

@@ -68,8 +68,17 @@ from rich.bar import Bar
 from rich.console import Console, ConsoleRenderable
 from rich.logging import RichHandler
 from rich.panel import Panel
+from rich.progress import (
+    BarColumn,
+    Progress,
+    SpinnerColumn,
+    TaskProgressColumn,
+    TextColumn,
+    TimeElapsedColumn,
+)
 from rich.table import Table
 from rich.text import Text
+from rich.tree import Tree
 from tabulate import tabulate
 
 from check_models_data.dependency_policy import (
@@ -148,7 +157,6 @@ __all__ = [
     "log_file_path",
     "log_generated_text",
     "log_metric_label",
-    "log_metric_tree",
     "log_model_name",
     "log_success",
     "log_warning_note",
@@ -2267,18 +2275,6 @@ class Colors:
         if os.getenv("FORCE_COLOR", "").lower() in {"1", "true", "yes"}
         else (sys.stderr.isatty() and os.getenv("NO_COLOR") is None)
     )
-    _ansi_escape_re: ClassVar[re.Pattern[str]] = ANSI_ESCAPE_RE
-
-    @staticmethod
-    def colored(text: str, *color_codes: str) -> str:
-        """Return text wrapped in ANSI color codes if enabled."""
-        text_str: str = text
-        # Filter out None values from color_codes
-        filtered_codes: list[str] = [c for c in color_codes if isinstance(c, str)]
-        if not Colors._enabled or not filtered_codes:
-            return text_str
-        color_seq: str = "".join(filtered_codes)
-        return f"{color_seq}{text_str}{Colors.RESET}"
 
     @staticmethod
     def set_enabled(*, enabled: bool) -> None:
@@ -2506,7 +2502,7 @@ OUTPUT_PREVIEW_MIN_TAIL_CHARS: Final[int] = 48  # Minimum chars reserved for pre
 OUTPUT_PREVIEW_MIN_BODY_CHARS: Final[int] = 24  # Smallest useful body budget after cue prefix
 MAX_CAPTURED_OUTPUT_LOG_CHARS: Final[int] = 1200  # Max chars of captured stdout/stderr in logs
 MAX_TRIAGE_MODELS: Final[int] = 5  # Max model rows shown in triage subsections
-SUMMARY_CHART_WIDTH: Final[int] = 24  # Character width for compact ASCII summary bars
+SUMMARY_CHART_WIDTH: Final[int] = 24  # Character width for compact Rich summary bars
 SUMMARY_MODEL_LABEL_MAX: Final[int] = 32  # Max model label length in summary tables/charts
 SUMMARY_CHART_MAX_ROWS: Final[int] = 8  # Max rows shown in summary charts
 MIN_MODELS_FOR_EFFICIENCY_CHART: Final[int] = 2  # Min successful rows for cross-model efficiency
@@ -7032,10 +7028,9 @@ def print_version_info(versions: LibraryVersionDict) -> None:
     printing never fails.
     """
     logger.info("--- Library Versions ---")
-    max_len: int = max(len(k) for k in versions) + 1 if versions else 10
-    for name, ver in sorted(versions.items()):
-        name_padded: str = name.ljust(max_len)
-        logger.info("%s: %s", name_padded, ver or "")
+    version_rows = [[name, ver or ""] for name, ver in sorted(versions.items())]
+    if version_rows:
+        _log_rich_table(headers=["Library", "Version"], rows=version_rows)
 
     logger.info(
         "Generated: %s",
@@ -7048,11 +7043,10 @@ def print_version_info(versions: LibraryVersionDict) -> None:
         if system_info:
             logger.info("")  # spacer
             logger.info("--- System Information ---")
-            # Calculate max key length for alignment
-            max_key_len = max(len(k) for k in system_info) if system_info else 10
-            for key, value in system_info.items():
-                key_padded = key.ljust(max_key_len)
-                logger.info("%s: %s", key_padded, value)
+            _log_rich_table(
+                headers=["Property", "Value"],
+                rows=[[key, value] for key, value in system_info.items()],
+            )
         else:
             logger.debug("No system information available.")
     except (OSError, RuntimeError, ValueError) as err:
@@ -13882,33 +13876,13 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
         logger.info("No data to display in stats table.")
         return
 
-    # Use tabulate with 'simple' format for clean plain text output
-    # Determine column alignment (numeric fields right-aligned)
-    colalign = ["right" if is_numeric_field(field) else "left" for field in field_names]
-
-    # Set max widths for specific columns to keep table compact
-    # Quality Issues: 20 chars, others: no limit
-    maxcolwidths: list[int | None] = []
-    for field_name in field_names:
-        if field_name == "quality_issues":
-            maxcolwidths.append(20)
-        else:
-            maxcolwidths.append(None)
-
-    # Generate table using tabulate
-    table_text = tabulate(
-        rows,
+    _log_rich_table(
         headers=headers,
-        tablefmt="plain",
-        colalign=colalign,
-        maxcolwidths=maxcolwidths,
+        rows=rows,
+        justifications=["right" if is_numeric_field(field) else "left" for field in field_names],
+        max_widths=[20 if field == "quality_issues" else None for field in field_names],
+        indent="",
     )
-
-    # Log the table line by line
-    for line in table_text.split("\n"):
-        if not line.strip():
-            continue
-        logger.info(line)
 
 
 # =============================================================================
@@ -17019,20 +16993,6 @@ def log_metric_label(label: str, *, emoji: str = "", indent: str = "") -> None:
     )
 
 
-def log_metric_tree(prefix: str, label: str, value: str, *, indent: str = "") -> None:
-    """Log a tree-structured metric line (e.g., '├─ Total: 1,234').
-
-    Args:
-        prefix: Tree prefix characters (├─, └─, etc.)
-        label: Metric label (e.g., 'Total:', 'Prompt:')
-        value: Formatted value to display
-        indent: Additional indentation before the prefix
-    """
-    # Example output: "     ├─ Total:      1,234 tok/s"
-    formatted = f"{indent}{prefix} {_display_align(label, 11, alignment='left')} {value}"
-    logger.info(formatted, extra={"style_hint": LogStyles.METRIC_VALUE})
-
-
 def log_generated_text(
     text: str,
     *,
@@ -17169,6 +17129,90 @@ def _log_rich_renderable(
     """Log a Rich-rendered table/panel while keeping persisted logs plain."""
     for line in _render_rich_lines(renderable, width=width):
         logger.info("%s%s", indent, line)
+
+
+type RichJustify = Literal["left", "center", "right"]
+
+
+def _log_rich_table(
+    *,
+    headers: Sequence[str],
+    rows: Sequence[Sequence[str]],
+    justifications: Sequence[RichJustify] | None = None,
+    max_widths: Sequence[int | None] | None = None,
+    no_wrap_headers: frozenset[str] = frozenset(),
+    indent: str = "   ",
+) -> None:
+    """Log a Rich table from plain rows with consistent console/file behavior."""
+    table = Table(box=box.ROUNDED, show_lines=False, expand=False)
+    for index, header in enumerate(headers):
+        justify = (
+            justifications[index] if justifications and index < len(justifications) else "left"
+        )
+        max_width = max_widths[index] if max_widths and index < len(max_widths) else None
+        table.add_column(
+            header,
+            justify=justify,
+            no_wrap=header in no_wrap_headers,
+            max_width=max_width,
+            overflow="fold",
+        )
+    for row in rows:
+        table.add_row(*row)
+    _log_rich_renderable(table, indent=indent)
+
+
+type MetricTreeRow = tuple[str, str]
+
+
+def _metric_tree_label(label: str, value: str) -> Text:
+    """Build one Rich tree node for a key/value metric row."""
+    text = Text()
+    if label:
+        text.append(_display_align(label, 12, alignment="left"), style="bold")
+        text.append(" ")
+    text.append(value)
+    return text
+
+
+def _log_metric_tree(
+    title: str,
+    rows: Sequence[MetricTreeRow],
+    *,
+    emoji: str = "",
+    indent: str = "  ",
+) -> None:
+    """Log a Rich tree for grouped CLI metrics."""
+    if not rows:
+        return
+    title_text = Text(f"{emoji} {title}" if emoji else title, style="bold white")
+    tree = Tree(title_text, guide_style="dim")
+    for label, value in rows:
+        tree.add(_metric_tree_label(label, value))
+    _log_rich_renderable(tree, indent=indent)
+
+
+def _active_rich_console() -> Console:
+    """Return the logger's active Rich console so progress and logs share output."""
+    for current_handler in logger.handlers:
+        if isinstance(current_handler, StyleAwareRichHandler):
+            return current_handler.console
+    return _make_rich_console()
+
+
+def _make_model_progress(*, transient: bool = True) -> Progress:
+    """Create a terminal-only Rich progress display for model execution."""
+    console = _active_rich_console()
+    return Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        TaskProgressColumn(),
+        TimeElapsedColumn(),
+        console=console,
+        transient=transient,
+        disable=not console.is_terminal,
+    )
 
 
 def _summary_parts(res: PerformanceResult, model_short: str) -> list[str]:
@@ -17353,24 +17397,14 @@ def _log_token_summary(res: PerformanceResult) -> None:
     gen_tps = _generation_float_metric(res.generation, "generation_tps") or 0.0
     prompt_tps = _generation_float_metric(res.generation, "prompt_tps") or 0.0
 
-    log_metric_label("Tokens:", emoji="🔢", indent="  ")
-    log_metric_tree(
-        "├─",
-        "Prompt:",
-        f"{fmt_num(p_tokens):>8} @ {fmt_num(prompt_tps)} tok/s",
-        indent="     ",
-    )
-    log_metric_tree(
-        "├─",
-        "Generated:",
-        f"{fmt_num(g_tokens):>8} @ {fmt_num(gen_tps)} tok/s",
-        indent="     ",
-    )
-    log_metric_tree(
-        "└─",
-        "Total:",
-        f"{fmt_num(tot_tokens):>8}",
-        indent="     ",
+    _log_metric_tree(
+        "Tokens:",
+        (
+            ("Prompt:", f"{fmt_num(p_tokens):>8} @ {fmt_num(prompt_tps)} tok/s"),
+            ("Generated:", f"{fmt_num(g_tokens):>8} @ {fmt_num(gen_tps)} tok/s"),
+            ("Total:", f"{fmt_num(tot_tokens):>8}"),
+        ),
+        emoji="🔢",
     )
 
 
@@ -17384,8 +17418,6 @@ def _log_detailed_timings(res: PerformanceResult) -> None:
     if not total_time_val or total_time_val <= 0:
         return
     total_time_seconds = float(total_time_val)
-
-    log_metric_label("Timing:", emoji="⏱", indent="  ")
 
     tt_val = format_field_value("total_time", total_time_val)
     tt_disp = tt_val if isinstance(tt_val, str) else _format_time_seconds(total_time_val)
@@ -17444,9 +17476,7 @@ def _log_detailed_timings(res: PerformanceResult) -> None:
         if runtime.stop_reason:
             entries.append(("Stop reason:", runtime.stop_reason))
 
-    for index, (label, value) in enumerate(entries):
-        prefix = "└─" if index == len(entries) - 1 else "├─"
-        log_metric_tree(prefix, label, value, indent="     ")
+    _log_metric_tree("Timing:", entries, emoji="⏱")
 
 
 def _log_perf_block(res: PerformanceResult) -> None:
@@ -17462,19 +17492,20 @@ def _log_perf_block(res: PerformanceResult) -> None:
     if active_mem <= 0 and cached_mem <= 0 and peak_mem <= 0:
         return
 
-    log_metric_label("Memory:", emoji="💾", indent="  ")
+    entries: list[MetricTreeRow] = []
 
-    def _log_mem(prefix: str, label: str, field: str, raw_val: float) -> None:
+    def _append_mem(label: str, field: str, raw_val: float) -> None:
         if raw_val <= 0:
             return
         formatted = format_field_value(field, raw_val)
         unit = "GB"
         text = formatted if formatted.endswith(unit) else f"{formatted} GB"
-        log_metric_tree(prefix, label, f"{text:>8}", indent="     ")
+        entries.append((label, f"{text:>8}"))
 
-    _log_mem("├─", "Active Δ:", "active_memory", active_mem)
-    _log_mem("├─", "Cache Δ:", "cache_memory", cached_mem)
-    _log_mem("└─", "Peak:", "peak_memory", peak_mem)
+    _append_mem("Active Δ:", "active_memory", active_mem)
+    _append_mem("Cache Δ:", "cache_memory", cached_mem)
+    _append_mem("Peak:", "peak_memory", peak_mem)
+    _log_metric_tree("Memory:", entries, emoji="💾")
 
 
 def _log_output_analysis(
@@ -17484,25 +17515,25 @@ def _log_output_analysis(
     peak_mem: float,
 ) -> None:
     """Log output analysis section: vocabulary, efficiency, structure, confidence."""
-    log_metric_label("Output Analysis:", emoji="🔍", indent="  ")
+    entries: list[MetricTreeRow] = []
 
     # Vocabulary diversity
     ttr, unique_words, total_words = compute_vocabulary_diversity(gen_text)
-    log_metric_tree(
-        "├─",
-        "Vocabulary:",
-        f"TTR={ttr:.2f} ({unique_words}/{total_words} unique words)",
-        indent="     ",
+    entries.append(
+        (
+            "Vocabulary:",
+            f"TTR={ttr:.2f} ({unique_words}/{total_words} unique words)",
+        )
     )
 
     # Efficiency metrics
     efficiency = compute_efficiency_metrics(gen_tokens, generation_time, peak_mem)
     if efficiency["tokens_per_second_per_gb"]:
-        log_metric_tree(
-            "├─",
-            "Efficiency:",
-            f"{efficiency['tokens_per_second_per_gb']:.1f} tok/s/GB",
-            indent="     ",
+        entries.append(
+            (
+                "Efficiency:",
+                f"{efficiency['tokens_per_second_per_gb']:.1f} tok/s/GB",
+            )
         )
 
     # Response structure
@@ -17518,12 +17549,7 @@ def _log_output_analysis(
         structure_parts.append("sections")
 
     structure_str = ", ".join(structure_parts) if structure_parts else "unstructured"
-    log_metric_tree(
-        "├─",
-        "Structure:",
-        structure_str,
-        indent="     ",
-    )
+    entries.append(("Structure:", structure_str))
 
     # Confidence indicators
     confidence = compute_confidence_indicators(gen_text)
@@ -17534,12 +17560,8 @@ def _log_output_analysis(
         conf_label = "medium"
     else:
         conf_label = "low"
-    log_metric_tree(
-        "└─",
-        "Confidence:",
-        f"{conf_label} ({conf_ratio:.0%})",
-        indent="     ",
-    )
+    entries.append(("Confidence:", f"{conf_label} ({conf_ratio:.0%})"))
+    _log_metric_tree("Output Analysis:", entries, emoji="🔍")
 
 
 def _get_grade_display(grade: str) -> str:
@@ -17550,25 +17572,20 @@ def _get_grade_display(grade: str) -> str:
 
 def _log_cataloging_utility(gen_text: str, context: str | None) -> None:
     """Log cataloging utility metrics section."""
-    log_metric_label("Cataloging Utility:", emoji="📚", indent="  ")
+    entries: list[MetricTreeRow] = []
 
     # Information gain
     info_gain = compute_information_gain(gen_text, context)
     echo_ratio = info_gain["echo_ratio"]
-    log_metric_tree(
-        "├─",
-        "Info Gain:",
-        f"{info_gain['information_gain']:.0%} novel "
-        f"({info_gain['novel_words']}/{info_gain['output_words']} words)",
-        indent="     ",
+    entries.append(
+        (
+            "Info Gain:",
+            f"{info_gain['information_gain']:.0%} novel "
+            f"({info_gain['novel_words']}/{info_gain['output_words']} words)",
+        )
     )
     if echo_ratio > QUALITY.moderate_echo_threshold:
-        log_metric_tree(
-            "│ ",
-            "",
-            f"⚠️  {echo_ratio:.0%} echoed from context",
-            indent="     ",
-        )
+        entries.append(("Context echo:", f"⚠️  {echo_ratio:.0%} echoed from context"))
 
     # Task compliance
     compliance = compute_task_compliance(gen_text)
@@ -17577,33 +17594,33 @@ def _log_cataloging_utility(gen_text: str, context: str | None) -> None:
         "✓ desc" if compliance["has_description"] else "✗ desc",
         "✓ keywords" if compliance["has_keywords"] else "✗ keywords",
     ]
-    log_metric_tree(
-        "├─",
-        "Compliance:",
-        f"{', '.join(compliance_parts)} ({compliance['compliance_score']:.0%})",
-        indent="     ",
+    entries.append(
+        (
+            "Compliance:",
+            f"{', '.join(compliance_parts)} ({compliance['compliance_score']:.0%})",
+        )
     )
 
     description = compute_description_quality(gen_text, context)
-    log_metric_tree(
-        "├─",
-        "Description:",
-        f"{description['description_score']:.0f}/100 "
-        f"({description['description_word_count']} words, "
-        f"{description['description_sentence_count']} sentences, "
-        f"grounding={description['description_grounding_score']:.0%})",
-        indent="     ",
+    entries.append(
+        (
+            "Description:",
+            f"{description['description_score']:.0f}/100 "
+            f"({description['description_word_count']} words, "
+            f"{description['description_sentence_count']} sentences, "
+            f"grounding={description['description_grounding_score']:.0%})",
+        )
     )
 
     keywords = compute_keyword_quality(gen_text, context)
-    log_metric_tree(
-        "├─",
-        "Keywords:",
-        f"{keywords['keyword_score']:.0f}/100 "
-        f"({keywords['keyword_term_count']} terms, "
-        f"{keywords['keyword_unique_terms']} unique, "
-        f"coverage={keywords['keyword_category_coverage']:.0%})",
-        indent="     ",
+    entries.append(
+        (
+            "Keywords:",
+            f"{keywords['keyword_score']:.0f}/100 "
+            f"({keywords['keyword_term_count']} terms, "
+            f"{keywords['keyword_unique_terms']} unique, "
+            f"coverage={keywords['keyword_category_coverage']:.0%})",
+        )
     )
 
     grounding = compute_visual_grounding(gen_text, context)
@@ -17616,12 +17633,13 @@ def _log_cataloging_utility(gen_text: str, context: str | None) -> None:
     )
     grade = str(utility["utility_grade"])
     grade_display = _get_grade_display(grade)
-    log_metric_tree(
-        "└─",
-        "UTILITY:",
-        f"{grade_display} ({utility['utility_score']:.0f}/100) - {utility['primary_weakness']}",
-        indent="     ",
+    entries.append(
+        (
+            "UTILITY:",
+            f"{grade_display} ({utility['utility_score']:.0f}/100) - {utility['primary_weakness']}",
+        )
     )
+    _log_metric_tree("Cataloging Utility:", entries, emoji="📚")
 
 
 def _log_additional_diagnostics(
@@ -18441,89 +18459,101 @@ def process_models(
     if args.verbose:
         log_metrics_legend(detailed=args.detailed_metrics)
 
-    for idx, model_id in enumerate(model_identifiers, start=1):
-        print_cli_separator()
-        log_blank()  # Add visual separation between model runs
-        # Use full model ID (e.g. "mlx-community/Qwen2-VL-2B-Instruct") instead of just the name
-        model_label = model_id
-        progress = f"[{idx}/{len(model_identifiers)}]"
-        # Compact logging for model header
-        log_model_name(model_label, label=f"Processing Model {progress}:")
-
-        is_vlm_verbose: bool = args.verbose
-        params = ProcessImageParams(
-            model_identifier=model_id,
-            image_path=image_path,
-            prompt=prompt,
-            max_tokens=args.max_tokens,
-            temperature=args.temperature,
-            timeout=args.timeout,
-            verbose=is_vlm_verbose,
-            trust_remote_code=args.trust_remote_code,
-            top_p=args.top_p,
-            min_p=args.min_p,
-            top_k=args.top_k,
-            repetition_penalty=args.repetition_penalty,
-            repetition_context_size=args.repetition_context_size,
-            lazy=args.lazy_load,
-            max_kv_size=args.max_kv_size,
-            kv_bits=args.kv_bits,
-            kv_quant_scheme=args.kv_quant_scheme,
-            kv_group_size=args.kv_group_size,
-            quantized_kv_start=args.quantized_kv_start,
-            revision=args.revision,
-            adapter_path=args.adapter_path,
-            prefill_step_size=args.prefill_step_size,
-            resize_shape=args.resize_shape,
-            eos_tokens=args.eos_tokens,
-            skip_special_tokens=args.skip_special_tokens,
-            processor_kwargs=args.processor_kwargs,
-            enable_thinking=args.enable_thinking,
-            thinking_budget=args.thinking_budget,
-            thinking_start_token=args.thinking_start_token,
-            thinking_end_token=args.thinking_end_token,
-            context_marker=args.context_marker,
+    with _make_model_progress() as model_progress:
+        progress_task = model_progress.add_task(
+            "Models",
+            total=len(model_identifiers),
         )
-        result: PerformanceResult = process_image_with_model(params)
+        for idx, model_id in enumerate(model_identifiers, start=1):
+            model_progress.update(
+                progress_task,
+                description=(
+                    f"Model {idx}/{len(model_identifiers)}: {_short_model_label(model_id)}"
+                ),
+            )
+            print_cli_separator()
+            log_blank()  # Add visual separation between model runs
+            # Use full model ID (e.g. "mlx-community/Qwen2-VL-2B-Instruct") instead of just the name
+            model_label = model_id
+            run_label = f"[{idx}/{len(model_identifiers)}]"
+            # Compact logging for model header
+            log_model_name(model_label, label=f"Processing Model {run_label}:")
 
-        # Calculate and log quality score for successful generations.
-        if result.success and result.generation:
-            result = _populate_result_quality_analysis(
-                result,
+            is_vlm_verbose: bool = args.verbose
+            params = ProcessImageParams(
+                model_identifier=model_id,
+                image_path=image_path,
                 prompt=prompt,
-                metadata=metadata,
-                requested_max_tokens=args.max_tokens,
+                max_tokens=args.max_tokens,
+                temperature=args.temperature,
+                timeout=args.timeout,
+                verbose=is_vlm_verbose,
+                trust_remote_code=args.trust_remote_code,
+                top_p=args.top_p,
+                min_p=args.min_p,
+                top_k=args.top_k,
+                repetition_penalty=args.repetition_penalty,
+                repetition_context_size=args.repetition_context_size,
+                lazy=args.lazy_load,
+                max_kv_size=args.max_kv_size,
+                kv_bits=args.kv_bits,
+                kv_quant_scheme=args.kv_quant_scheme,
+                kv_group_size=args.kv_group_size,
+                quantized_kv_start=args.quantized_kv_start,
+                revision=args.revision,
+                adapter_path=args.adapter_path,
+                prefill_step_size=args.prefill_step_size,
+                resize_shape=args.resize_shape,
+                eos_tokens=args.eos_tokens,
+                skip_special_tokens=args.skip_special_tokens,
+                processor_kwargs=args.processor_kwargs,
+                enable_thinking=args.enable_thinking,
+                thinking_budget=args.thinking_budget,
+                thinking_start_token=args.thinking_start_token,
+                thinking_end_token=args.thinking_end_token,
                 context_marker=args.context_marker,
             )
-            analysis = result.quality_analysis
-            if analysis is None:
-                msg = f"Quality analysis missing for successful result {result.model_name}"
-                raise RuntimeError(msg)
-            # Log quality analysis results at DEBUG level
-            logger.debug(
-                "Quality analysis for %s: %s",
-                result.model_name,
-                _format_quality_analysis_for_log(analysis),
-            )
-            if result.quality_issues:
-                logger.info(
-                    "Quality issues detected for %s: %s",
-                    result.model_name,
-                    result.quality_issues,
+            result: PerformanceResult = process_image_with_model(params)
+
+            # Calculate and log quality score for successful generations.
+            if result.success and result.generation:
+                result = _populate_result_quality_analysis(
+                    result,
+                    prompt=prompt,
+                    metadata=metadata,
+                    requested_max_tokens=args.max_tokens,
+                    context_marker=args.context_marker,
                 )
+                analysis = result.quality_analysis
+                if analysis is None:
+                    msg = f"Quality analysis missing for successful result {result.model_name}"
+                    raise RuntimeError(msg)
+                # Log quality analysis results at DEBUG level
+                logger.debug(
+                    "Quality analysis for %s: %s",
+                    result.model_name,
+                    _format_quality_analysis_for_log(analysis),
+                )
+                if result.quality_issues:
+                    logger.info(
+                        "Quality issues detected for %s: %s",
+                        result.model_name,
+                        result.quality_issues,
+                    )
 
-        results.append(result)
-        _log_canonical_model_review(result)
+            results.append(result)
+            _log_canonical_model_review(result)
 
-        print_model_result(
-            result,
-            verbose=args.verbose,
-            detailed_metrics=getattr(args, "detailed_metrics", False),
-            run_index=idx,
-            total_runs=len(model_identifiers),
-            prompt=prompt,
-            context_marker=args.context_marker,
-        )
+            print_model_result(
+                result,
+                verbose=args.verbose,
+                detailed_metrics=getattr(args, "detailed_metrics", False),
+                run_index=idx,
+                total_runs=len(model_identifiers),
+                prompt=prompt,
+                context_marker=args.context_marker,
+            )
+            model_progress.advance(progress_task)
     return results
 
 
@@ -19086,19 +19116,6 @@ def _format_float_or_dash(value: float | None, *, digits: int = 2) -> str:
     return f"{value:.{digits}f}"
 
 
-def _normalize_log_table_cell(text: str) -> str:
-    """Normalize text for stable terminal table rendering.
-
-    The summary comparison table is rendered in fixed-width layout. Remove
-    ANSI/control/non-ASCII glyphs (for example emoji variation sequences) so
-    column alignment stays stable across terminals.
-    """
-    flattened = _strip_ansi(text).replace("\r", " ").replace("\n", " ")
-    compact = re.sub(r"\s+", " ", flattened).strip()
-    ascii_safe = compact.encode("ascii", "ignore").decode("ascii")
-    return ascii_safe or "-"
-
-
 def _log_rich_metric_chart(
     title: str,
     entries: Sequence[tuple[str, float]],
@@ -19107,7 +19124,7 @@ def _log_rich_metric_chart(
     digits: int = 2,
     max_rows: int = SUMMARY_CHART_MAX_ROWS,
 ) -> None:
-    """Log a compact ASCII chart for ranked model metrics."""
+    """Log a compact Rich bar chart for ranked model metrics."""
     if not entries:
         return
     ranked = sorted(entries, key=lambda item: item[1], reverse=True)[:max_rows]
@@ -19130,7 +19147,7 @@ def _log_rich_metric_chart(
 
 
 def _log_model_comparison_table_and_charts(results: list[PerformanceResult]) -> None:
-    """Log tabulated per-model comparison and compact ASCII charts for this run."""
+    """Log per-model comparison table and compact Rich charts for this run."""
     if not results:
         return
 
@@ -19148,8 +19165,7 @@ def _log_model_comparison_table_and_charts(results: list[PerformanceResult]) -> 
         if res.success and res.generation is not None:
             tps = float(getattr(res.generation, "generation_tps", 0.0) or 0.0)
             peak_mem = float(getattr(res.generation, "peak_memory", 0.0) or 0.0)
-            notes_raw = _truncate_quality_issues(res.quality_issues, max_len=34) or "clean"
-            notes = _normalize_log_table_cell(notes_raw)
+            notes = _truncate_quality_issues(res.quality_issues, max_len=34) or "clean"
             rows.append(
                 [
                     str(idx),
@@ -19169,7 +19185,6 @@ def _log_model_comparison_table_and_charts(results: list[PerformanceResult]) -> 
         else:
             error_note = res.error_code or res.error_stage or res.error_message or "failure"
             error_note = _truncate_text_preview(error_note, max_chars=34)
-            error_note = _normalize_log_table_cell(error_note)
             rows.append(
                 [
                     str(idx),
@@ -19184,22 +19199,13 @@ def _log_model_comparison_table_and_charts(results: list[PerformanceResult]) -> 
             )
 
     logger.info("📋 Model Comparison (current run):")
-    table = Table(box=box.ROUNDED, show_lines=False, expand=False)
-    column_specs: tuple[tuple[str, Literal["left", "right"]], ...] = (
-        ("#", "right"),
-        ("Model", "left"),
-        ("Status", "left"),
-        ("TPS", "right"),
-        ("Total(s)", "right"),
-        ("Load(s)", "right"),
-        ("PeakGB", "right"),
-        ("Notes", "left"),
+    headers = ["#", "Model", "Status", "TPS", "Total(s)", "Load(s)", "PeakGB", "Notes"]
+    _log_rich_table(
+        headers=headers,
+        rows=rows,
+        justifications=("right", "left", "left", "right", "right", "right", "right", "left"),
+        no_wrap_headers=frozenset({"#", "Status", "TPS"}),
     )
-    for header, justify in column_specs:
-        table.add_column(header, justify=justify, no_wrap=header in {"#", "Status", "TPS"})
-    for row in rows:
-        table.add_row(*row)
-    _log_rich_renderable(table, indent="   ")
 
     if tps_entries:
         log_blank()
@@ -19656,17 +19662,25 @@ def _format_failures_by_package_parts(
         return parts
 
     parts = ["## 🚨 Failures by Package (Actionable)", ""]
-    parts.append("| Package | Failures | Error Types | Affected Models |")
-    parts.append("| --- | --- | --- | --- |")
-
+    rows: list[tuple[str, str, str, str]] = []
     for package, failures in sorted_packages:
         markdown_error_types = sorted({result.error_stage or "unknown" for result in failures})
         markdown_models = [f"`{result.model_name}`" for result in failures]
-        parts.append(
-            "| "
-            f"`{package}` | {len(failures)} | {', '.join(markdown_error_types)} | "
-            f"{', '.join(markdown_models)} |",
+        rows.append(
+            (
+                f"`{package}`",
+                str(len(failures)),
+                ", ".join(markdown_error_types),
+                ", ".join(markdown_models),
+            )
         )
+    parts.extend(
+        tabulate(
+            rows,
+            headers=("Package", "Failures", "Error Types", "Affected Models"),
+            tablefmt="github",
+        ).splitlines()
+    )
 
     parts.append("")
     parts.append("### Actionable Items by Package")
@@ -20848,39 +20862,22 @@ def _log_history_comparison(
         logger.info("No prior history run available. Baseline created.")
     summary = _history_summary_for_comparison(previous, current)
     rows = _history_summary_rows(previous=previous, current=current, summary=summary)
-    summary_table = tabulate(
-        rows,
-        headers=["Metric", "Previous", "Current", "Delta"],
-        tablefmt="github",
-        disable_numparse=True,
-    )
     logger.info("📚 Run-over-run comparison:")
-    for line in summary_table.splitlines():
-        logger.info("   %s", line)
+    _log_rich_table(headers=["Metric", "Previous", "Current", "Delta"], rows=rows)
 
     context_rows = _history_context_rows(previous, current)
-    context_table = tabulate(
-        context_rows,
-        headers=["Context", "Previous", "Current"],
-        tablefmt="github",
-        disable_numparse=True,
-    )
     logger.info("🔎 Comparison context:")
-    for line in context_table.splitlines():
-        logger.info("   %s", line)
+    _log_rich_table(headers=["Context", "Previous", "Current"], rows=context_rows)
 
     _log_history_transition_chart(summary=summary, current=current)
     transition_rows = _history_transition_rows(previous=previous, current=current, summary=summary)
     if transition_rows:
-        transitions_table = tabulate(
-            transition_rows,
-            headers=["Model", "Transition", "Prev", "Current", "Signal"],
-            tablefmt="github",
-            disable_numparse=True,
-        )
         logger.info("🧾 Detailed model transitions:")
-        for line in transitions_table.splitlines():
-            logger.info("   %s", line)
+        _log_rich_table(
+            headers=["Model", "Transition", "Prev", "Current", "Signal"],
+            rows=transition_rows,
+            no_wrap_headers=frozenset({"Prev", "Current"}),
+        )
 
 
 def _issue_subtype_label(issue_subtype: str) -> str:
@@ -21700,45 +21697,57 @@ def _run_differential_reruns(
         len(candidates),
     )
     updated: list[PerformanceResult] = []
-    for result in candidates:
-        params = ProcessImageParams(
-            model_identifier=result.model_name,
-            image_path=image_path,
-            prompt=RERUN_TRIAGE_PROMPT,
-            max_tokens=RERUN_TRIAGE_MAX_TOKENS,
-            temperature=0.0,
-            timeout=RERUN_TRIAGE_TIMEOUT,
-            verbose=False,
-            trust_remote_code=getattr(args, "trust_remote_code", True),
-            top_p=getattr(args, "top_p", 1.0),
-            min_p=getattr(args, "min_p", 0.0),
-            top_k=getattr(args, "top_k", 0),
-            repetition_penalty=getattr(args, "repetition_penalty", None),
-            repetition_context_size=getattr(args, "repetition_context_size", 20),
-            lazy=getattr(args, "lazy_load", False),
-            max_kv_size=getattr(args, "max_kv_size", None),
-            kv_bits=getattr(args, "kv_bits", None),
-            kv_quant_scheme=cast(
-                'Literal["uniform", "turboquant"]',
-                getattr(args, "kv_quant_scheme", DEFAULT_KV_QUANT_SCHEME),
-            ),
-            kv_group_size=getattr(args, "kv_group_size", 64),
-            quantized_kv_start=getattr(
-                args,
-                "quantized_kv_start",
-                DEFAULT_QUANTIZED_KV_START,
-            ),
+    with _make_model_progress() as rerun_progress:
+        progress_task = rerun_progress.add_task(
+            "Differential reruns",
+            total=len(candidates),
         )
-        rerun_result = process_image_with_model(params)
-        evidence = _build_rerun_evidence(rerun_result, rerun_prompt=RERUN_TRIAGE_PROMPT)
-        updated_result = dataclasses.replace(result, rerun_evidence=evidence)
-        logger.info(
-            "  Rerun %s: %s (chars=%s)",
-            result.model_name,
-            "ok" if evidence.rerun_success else "fail",
-            evidence.rerun_generated_chars,
-        )
-        updated.append(updated_result)
+        for idx, result in enumerate(candidates, start=1):
+            rerun_progress.update(
+                progress_task,
+                description=(
+                    f"Rerun {idx}/{len(candidates)}: {_short_model_label(result.model_name)}"
+                ),
+            )
+            params = ProcessImageParams(
+                model_identifier=result.model_name,
+                image_path=image_path,
+                prompt=RERUN_TRIAGE_PROMPT,
+                max_tokens=RERUN_TRIAGE_MAX_TOKENS,
+                temperature=0.0,
+                timeout=RERUN_TRIAGE_TIMEOUT,
+                verbose=False,
+                trust_remote_code=getattr(args, "trust_remote_code", True),
+                top_p=getattr(args, "top_p", 1.0),
+                min_p=getattr(args, "min_p", 0.0),
+                top_k=getattr(args, "top_k", 0),
+                repetition_penalty=getattr(args, "repetition_penalty", None),
+                repetition_context_size=getattr(args, "repetition_context_size", 20),
+                lazy=getattr(args, "lazy_load", False),
+                max_kv_size=getattr(args, "max_kv_size", None),
+                kv_bits=getattr(args, "kv_bits", None),
+                kv_quant_scheme=cast(
+                    'Literal["uniform", "turboquant"]',
+                    getattr(args, "kv_quant_scheme", DEFAULT_KV_QUANT_SCHEME),
+                ),
+                kv_group_size=getattr(args, "kv_group_size", 64),
+                quantized_kv_start=getattr(
+                    args,
+                    "quantized_kv_start",
+                    DEFAULT_QUANTIZED_KV_START,
+                ),
+            )
+            rerun_result = process_image_with_model(params)
+            evidence = _build_rerun_evidence(rerun_result, rerun_prompt=RERUN_TRIAGE_PROMPT)
+            updated_result = dataclasses.replace(result, rerun_evidence=evidence)
+            logger.info(
+                "  Rerun %s: %s (chars=%s)",
+                result.model_name,
+                "ok" if evidence.rerun_success else "fail",
+                evidence.rerun_generated_chars,
+            )
+            updated.append(updated_result)
+            rerun_progress.advance(progress_task)
     return updated
 
 
