@@ -19,6 +19,7 @@ from check_models import (
     HistoryRunRecord,
     PerformanceResult,
     RuntimeDiagnostics,
+    StyleAwareRichHandler,
     _log_canonical_model_review,
     _log_history_comparison,
     finalize_execution,
@@ -636,6 +637,31 @@ def test_canonical_review_log_emits_verdict_block(
     assert "Trusted hints:" in messages
     assert "Token accounting:" in messages
     assert "Full output:" in messages
+
+
+def test_rich_debug_level_label_is_dim() -> None:
+    """Only the DEBUG level label should render dim/gray."""
+    handler = StyleAwareRichHandler(
+        console=Console(file=io.StringIO(), force_terminal=True),
+        show_level=True,
+        show_time=False,
+        show_path=False,
+    )
+    record = logging.LogRecord(
+        name="check_models",
+        level=logging.DEBUG,
+        pathname=__file__,
+        lineno=1,
+        msg="debug details",
+        args=(),
+        exc_info=None,
+    )
+
+    level_text = handler.get_level_text(record)
+
+    assert level_text.plain == "DEBUG   "
+    assert level_text.spans
+    assert str(level_text.spans[0].style) == "dim"
 
 
 def test_finalize_execution_logs_configured_log_and_env_paths(

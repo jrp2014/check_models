@@ -1,4 +1,4 @@
-# \[mlx-vlm\]\[encoding\] Tokenizer space-marker artifacts (for example  ) appeared in output (about 139 occurrences) affecting 1 model(s)
+# \[mlx-vlm\]\[encoding\] Tokenizer space-marker artifacts (for example  ) appeared in output (about 78 occurrences) affecting 1 model(s)
 
 ## Summary
 
@@ -12,9 +12,9 @@
 
 ## Affected Models
 
-| Model                                                   | Representative Signal                                                                        | Token Context                                                                | Repro Bundle                                                                                                                                                                                                                    |
-|---------------------------------------------------------|----------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 139 occurrences). | prompt=2,097 \| output/prompt=8.20% \| nontext burden=100% \| stop=completed | [`20260502T233440Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json`](../repro_bundles/20260502T233440Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) |
+| Model                                                   | Representative Signal                                                                       | Token Context                                                               | Repro Bundle                                                                                                                                                                                                                    |
+|---------------------------------------------------------|---------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 78 occurrences). | prompt=2,682 \| output/prompt=4.62% \| nontext burden=82% \| stop=completed | [`20260503T011608Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json`](../repro_bundles/20260503T011608Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) |
 
 
 ## Evidence
@@ -23,12 +23,13 @@
 
 Observed signals:
 
-- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 139 occurrences).
+- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 78 occurrences).
+- Output omitted required Title/Description/Keywords sections (description, keywords).
 
 Sample output:
 
 ```text
-TheĠimageĠdepictsĠaĠsereneĠoutdoorĠscene,ĠlikelyĠinĠaĠparkĠorĠgarden.ĠTheĠfocalĠpointĠisĠaĠpersonĠstandingĠonĠaĠsmall,ĠwoodenĠpierĠthatĠextendsĠintoĠaĠcalmĠbodyĠofĠwater.ĠTheĠindividualĠisĠdressedĠ...
+Title:ĠTideĠMillĠMuseumĠatĠLowĠTideĊĊDescription:ĠAĠlongĠboatĠcoveredĠwithĠaĠblackĠtarpĠrestsĠonĠtheĠmuddyĠriverbedĠinĠfrontĠofĠtheĠWoodbridgeĠTideĠMillĠMuseum.ĠTheĠhistoricĠwhiteĠbuildingĠstandsĠw...
 ```
 
 
@@ -39,8 +40,9 @@ TheĠimageĠdepictsĠaĠsereneĠoutdoorĠscene,ĠlikelyĠinĠaĠparkĠorĠgarden
 - _Issue kind:_ `harness`
 - _Issue subtype:_ `encoding`
 - _Why this classification is credible:_ Tokenizer space-marker artifacts (for
-  example Ġ) appeared in output (about 139 occurrences). \| nontext prompt
-  burden=100%
+  example Ġ) appeared in output (about 78 occurrences). \| nontext prompt
+  burden=82% \| missing sections: description, keywords \| missing terms:
+  Bench, Blue sky, East Anglia, English countryside, Moored
 - _Suggested next action:_ Inspect decode cleanup; tokenizer markers are
   leaking into user-facing text.
 
@@ -50,12 +52,12 @@ TheĠimageĠdepictsĠaĠsereneĠoutdoorĠscene,ĠlikelyĠinĠaĠparkĠorĠgarden
 Cluster rerun:
 
 ```bash
-python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
 ```
 
 Repro bundles:
 
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: [`20260502T233440Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json`](../repro_bundles/20260502T233440Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: [`20260503T011608Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json`](../repro_bundles/20260503T011608Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)
 
 
 ## Fix Checklist

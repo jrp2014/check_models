@@ -1,4 +1,4 @@
-# \[model-config / mlx-vlm\]\[prompt-template\] Output appears truncated to about 4 tokens affecting 2 model(s)
+# \[model-config / mlx-vlm\]\[prompt-template\] Model returned zero output tokens affecting 2 model(s)
 
 ## Summary
 
@@ -12,36 +12,32 @@
 
 ## Affected Models
 
-| Model                             | Representative Signal                       | Token Context                                                             | Repro Bundle                                                                                                                                                                                                                |
-|-----------------------------------|---------------------------------------------|---------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/gemma-3n-E2B-4bit` | Output appears truncated to about 4 tokens. | prompt=264 \| output/prompt=1.52% \| nontext burden=98% \| stop=completed | [`20260502T233440Z_010_mlx-community_gemma-3n-E2B-4bit_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260502T233440Z_010_mlx-community_gemma-3n-E2B-4bit_model_config_mlx_vlm_prompt_template_001.json) |
-| `mlx-community/gemma-4-31b-bf16`  | Output appears truncated to about 5 tokens. | prompt=266 \| output/prompt=1.88% \| nontext burden=98% \| stop=completed | [`20260502T233440Z_011_mlx-community_gemma-4-31b-bf16_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260502T233440Z_011_mlx-community_gemma-4-31b-bf16_model_config_mlx_vlm_prompt_template_001.json)   |
+| Model                                            | Representative Signal                                                                                          | Token Context                                                               | Repro Bundle                                                                                                                                                                                                                                              |
+|--------------------------------------------------|----------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/llava-v1.6-mistral-7b-8bit`       | Model returned zero output tokens.                                                                             | prompt=0 \| stop=completed                                                  | [`20260503T011608Z_009_mlx-community_llava-v1.6-mistral-7b-8bit_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260503T011608Z_009_mlx-community_llava-v1.6-mistral-7b-8bit_model_config_mlx_vlm_prompt_template_001.json)             |
+| `mlx-community/paligemma2-10b-ft-docci-448-bf16` | Output is very short relative to prompt size (0.9%), suggesting possible early-stop or prompt-handling issues. | prompt=1,587 \| output/prompt=0.88% \| nontext burden=70% \| stop=completed | [`20260503T011608Z_010_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260503T011608Z_010_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json) |
 
 
 ## Evidence
 
-### `mlx-community/gemma-3n-E2B-4bit`
+### `mlx-community/llava-v1.6-mistral-7b-8bit`
 
 Observed signals:
 
-- Output appears truncated to about 4 tokens.
+- Model returned zero output tokens.
+
+### `mlx-community/paligemma2-10b-ft-docci-448-bf16`
+
+Observed signals:
+
+- Output is very short relative to prompt size (0.9%), suggesting possible early-stop or prompt-handling issues.
+- Model output may not follow prompt or image contents (missing: Bench, Blue sky, Clouds, East Anglia, English countryside).
+- Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 Sample output:
 
 ```text
-in the park
-```
-
-### `mlx-community/gemma-4-31b-bf16`
-
-Observed signals:
-
-- Output appears truncated to about 5 tokens.
-
-Sample output:
-
-```text
-in one sentence.
+- Use only the metadata that is clearly supported by the image.
 ```
 
 
@@ -51,8 +47,7 @@ in one sentence.
 - _Confidence:_ high
 - _Issue kind:_ `harness`
 - _Issue subtype:_ `prompt_template`
-- _Why this classification is credible:_ Output appears truncated to about 4
-  tokens. \| nontext prompt burden=98%
+- _Why this classification is credible:_ Model returned zero output tokens.
 - _Suggested next action:_ Inspect model repo config, chat template, and EOS
   settings.
 
@@ -62,13 +57,13 @@ in one sentence.
 Cluster rerun:
 
 ```bash
-python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/gemma-3n-E2B-4bit mlx-community/gemma-4-31b-bf16
+python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/llava-v1.6-mistral-7b-8bit mlx-community/paligemma2-10b-ft-docci-448-bf16
 ```
 
 Repro bundles:
 
-- `mlx-community/gemma-3n-E2B-4bit`: [`20260502T233440Z_010_mlx-community_gemma-3n-E2B-4bit_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260502T233440Z_010_mlx-community_gemma-3n-E2B-4bit_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/gemma-4-31b-bf16`: [`20260502T233440Z_011_mlx-community_gemma-4-31b-bf16_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260502T233440Z_011_mlx-community_gemma-4-31b-bf16_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/llava-v1.6-mistral-7b-8bit`: [`20260503T011608Z_009_mlx-community_llava-v1.6-mistral-7b-8bit_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260503T011608Z_009_mlx-community_llava-v1.6-mistral-7b-8bit_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: [`20260503T011608Z_010_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260503T011608Z_010_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json)
 
 
 ## Fix Checklist

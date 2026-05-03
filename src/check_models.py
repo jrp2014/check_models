@@ -2386,6 +2386,12 @@ class StyleAwareRichHandler(RichHandler):
         style = self._style_for_record(record, style_hint)
         return Text(rendered_message, style=style)
 
+    def get_level_text(self, record: logging.LogRecord) -> Text:
+        """Render DEBUG's level label in gray while preserving message styling."""
+        if record.levelno == logging.DEBUG:
+            return Text.styled(record.levelname.ljust(8), "dim")
+        return super().get_level_text(record)
+
     def _message_for_hint(
         self,
         style_hint: object,

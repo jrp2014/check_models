@@ -1,8 +1,8 @@
-# \[mlx-vlm\]\[stop-token\] Special control token &lt;|end|&gt; appeared in generated text affecting 4 model(s)
+# \[mlx-vlm\]\[stop-token\] Special control token &lt;|end|&gt; appeared in generated text affecting 2 model(s)
 
 ## Summary
 
-4 model(s) share a `stop_token` signal that clusters under `mlx-vlm`.
+2 model(s) share a `stop_token` signal that clusters under `mlx-vlm`.
 
 - **Issue kind:** `harness`
 - **Cluster ID:** `mlx-vlm_stop-token_001`
@@ -14,10 +14,8 @@
 
 | Model                                | Representative Signal                                                                                                                        | Token Context                                                                                       | Repro Bundle                                                                                                                                                                                  |
 |--------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `microsoft/Phi-3.5-vision-instruct`  | Special control token &lt;\|end\|&gt; appeared in generated text. \| Special control token &lt;\|endoftext\|&gt; appeared in generated text. | prompt=768 \| output/prompt=65.10% \| nontext burden=99% \| stop=completed \| hit token cap (500)   | [`20260502T233440Z_001_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json`](../repro_bundles/20260502T233440Z_001_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json)   |
-| `mlx-community/GLM-4.6V-Flash-6bit`  | Special control token &lt;/think&gt; appeared in generated text.                                                                             | prompt=6,091 \| output/prompt=8.21% \| nontext burden=100% \| stop=completed \| hit token cap (500) | [`20260502T233440Z_003_mlx-community_GLM-4.6V-Flash-6bit_mlx_vlm_stop_token_001.json`](../repro_bundles/20260502T233440Z_003_mlx-community_GLM-4.6V-Flash-6bit_mlx_vlm_stop_token_001.json)   |
-| `mlx-community/GLM-4.6V-Flash-mxfp4` | Special control token &lt;/think&gt; appeared in generated text.                                                                             | prompt=6,091 \| output/prompt=8.21% \| nontext burden=100% \| stop=completed \| hit token cap (500) | [`20260502T233440Z_004_mlx-community_GLM-4.6V-Flash-mxfp4_mlx_vlm_stop_token_001.json`](../repro_bundles/20260502T233440Z_004_mlx-community_GLM-4.6V-Flash-mxfp4_mlx_vlm_stop_token_001.json) |
-| `mlx-community/GLM-4.6V-nvfp4`       | Special control token &lt;/think&gt; appeared in generated text.                                                                             | prompt=6,091 \| output/prompt=8.21% \| nontext burden=100% \| stop=completed \| hit token cap (500) | [`20260502T233440Z_005_mlx-community_GLM-4.6V-nvfp4_mlx_vlm_stop_token_001.json`](../repro_bundles/20260502T233440Z_005_mlx-community_GLM-4.6V-nvfp4_mlx_vlm_stop_token_001.json)             |
+| `microsoft/Phi-3.5-vision-instruct`  | Special control token &lt;\|end\|&gt; appeared in generated text. \| Special control token &lt;\|endoftext\|&gt; appeared in generated text. | prompt=1,394 \| output/prompt=35.87% \| nontext burden=65% \| stop=completed \| hit token cap (500) | [`20260503T011608Z_001_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json`](../repro_bundles/20260503T011608Z_001_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json)   |
+| `mlx-community/GLM-4.6V-Flash-mxfp4` | Special control token &lt;/think&gt; appeared in generated text.                                                                             | prompt=6,681 \| output/prompt=7.48% \| nontext burden=93% \| stop=completed \| hit token cap (500)  | [`20260503T011608Z_003_mlx-community_GLM-4.6V-Flash-mxfp4_mlx_vlm_stop_token_001.json`](../repro_bundles/20260503T011608Z_003_mlx-community_GLM-4.6V-Flash-mxfp4_mlx_vlm_stop_token_001.json) |
 
 
 ## Evidence
@@ -28,28 +26,15 @@ Observed signals:
 
 - Special control token &lt;\|end\|&gt; appeared in generated text.
 - Special control token &lt;\|endoftext\|&gt; appeared in generated text.
-- Output switched language/script unexpectedly (tokenizer_artifact).
+- Generated text appears to continue into example-code templates mid-output.
+- Output switched language/script unexpectedly (tokenizer_artifact, code_snippet).
 
 Sample output:
 
 ```text
-The image shows a tranquil park scene with a person standing on a wooden dock, fishing by a pond. There are trees, a bench, and a small pine tree in the foreground. The weather appears to be overca...
-```
+Title: Woodbridge Tide Mill Museum and Boat
 
-### `mlx-community/GLM-4.6V-Flash-6bit`
-
-Observed signals:
-
-- Special control token &lt;/think&gt; appeared in generated text.
-- Output formatting deviated from the requested structure. Details: Unknown tags: &lt;think&gt;; Excessive markdown headers (6).
-- Output leaked reasoning or prompt-template text (&lt;think&gt;).
-
-Sample output:
-
-```text
-<think>Got it, let's describe this picture in detail. First, the scene is a serene park or garden with a lake or pond. 
-
-In the foreground, there's a small pine tree planted in a bed with dark soil...
+Description: The Woodbridge Tide Mill Museum in Woodbridge, Suffolk, England, is seen at low tide on the River Deben. In the foreground, a long boat cov...
 ```
 
 ### `mlx-community/GLM-4.6V-Flash-mxfp4`
@@ -57,18 +42,17 @@ In the foreground, there's a small pine tree planted in a bed with dark soil...
 Observed signals:
 
 - Special control token &lt;/think&gt; appeared in generated text.
-- Output formatting deviated from the requested structure. Details: Unknown tags: &lt;think&gt;; Excessive markdown headers (6).
+- Output formatting deviated from the requested structure. Details: Unknown tags: &lt;think&gt;.
+- Output omitted required Title/Description/Keywords sections (title, keywords).
 - Output leaked reasoning or prompt-template text (&lt;think&gt;).
 
 Sample output:
 
 ```text
-<think>Got it, let's describe this picture in detail. First, the scene is a serene park or garden with a lake or pond. 
+<think>Got it, let's tackle this. First, I need to analyze the image for cataloguing metadata. The user provided a lot of context, but I need to focus on what's clearly visible.
 
-In the foreground, there's a large, moss-covered rock. Next to it, a small p...
+First, the Title....
 ```
-
-_Additional affected models are listed in the Affected Models table above._
 
 
 ## Likely Root Cause
@@ -80,7 +64,7 @@ _Additional affected models are listed in the Affected Models table above._
 - _Why this classification is credible:_ Special control token &lt;\|end\|&gt;
   appeared in generated text. \| Special control token &lt;\|endoftext\|&gt;
   appeared in generated text. \| hit token cap (500) \| nontext prompt
-  burden=99%
+  burden=65%
 - _Suggested next action:_ Inspect EOS/stop-token stripping; control tokens
   are leaking into user-facing text.
 
@@ -90,15 +74,13 @@ _Additional affected models are listed in the Affected Models table above._
 Cluster rerun:
 
 ```bash
-python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models microsoft/Phi-3.5-vision-instruct mlx-community/GLM-4.6V-Flash-6bit mlx-community/GLM-4.6V-Flash-mxfp4 mlx-community/GLM-4.6V-nvfp4
+python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models microsoft/Phi-3.5-vision-instruct mlx-community/GLM-4.6V-Flash-mxfp4
 ```
 
 Repro bundles:
 
-- `microsoft/Phi-3.5-vision-instruct`: [`20260502T233440Z_001_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json`](../repro_bundles/20260502T233440Z_001_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json)
-- `mlx-community/GLM-4.6V-Flash-6bit`: [`20260502T233440Z_003_mlx-community_GLM-4.6V-Flash-6bit_mlx_vlm_stop_token_001.json`](../repro_bundles/20260502T233440Z_003_mlx-community_GLM-4.6V-Flash-6bit_mlx_vlm_stop_token_001.json)
-- `mlx-community/GLM-4.6V-Flash-mxfp4`: [`20260502T233440Z_004_mlx-community_GLM-4.6V-Flash-mxfp4_mlx_vlm_stop_token_001.json`](../repro_bundles/20260502T233440Z_004_mlx-community_GLM-4.6V-Flash-mxfp4_mlx_vlm_stop_token_001.json)
-- `mlx-community/GLM-4.6V-nvfp4`: [`20260502T233440Z_005_mlx-community_GLM-4.6V-nvfp4_mlx_vlm_stop_token_001.json`](../repro_bundles/20260502T233440Z_005_mlx-community_GLM-4.6V-nvfp4_mlx_vlm_stop_token_001.json)
+- `microsoft/Phi-3.5-vision-instruct`: [`20260503T011608Z_001_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json`](../repro_bundles/20260503T011608Z_001_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json)
+- `mlx-community/GLM-4.6V-Flash-mxfp4`: [`20260503T011608Z_003_mlx-community_GLM-4.6V-Flash-mxfp4_mlx_vlm_stop_token_001.json`](../repro_bundles/20260503T011608Z_003_mlx-community_GLM-4.6V-Flash-mxfp4_mlx_vlm_stop_token_001.json)
 
 
 ## Fix Checklist

@@ -1,0 +1,188 @@
+{
+  "environment": {
+    "library_versions": {
+      "Pillow": "12.2.0",
+      "huggingface-hub": "1.13.0",
+      "mlx": "0.32.0.dev20260502+e8ebdebe",
+      "mlx-lm": "0.31.3",
+      "mlx-metal": null,
+      "mlx-vlm": "0.4.5",
+      "numpy": "2.4.4",
+      "tokenizers": "0.22.2",
+      "transformers": "5.7.0"
+    },
+    "platform": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
+    "preflight_issues": [],
+    "system_info": {
+      "Architecture": "arm64",
+      "CPU Cores (Logical)": "18",
+      "CPU Cores (Physical)": "18",
+      "GPU Cores": "40",
+      "GPU/Chip": "Apple M5 Max",
+      "Metal SDK": "MacOSX.sdk",
+      "Metal Support": "Metal 4",
+      "OS": "Darwin 25.4.0",
+      "Python Version": "3.13.12",
+      "RAM": "128.0 GB",
+      "SDK Version": "26.4",
+      "Xcode Build": "17E202",
+      "Xcode Version": "26.4.1",
+      "macOS Version": "26.4.1"
+    }
+  },
+  "failure": {
+    "captured_output": null,
+    "code": null,
+    "message": null,
+    "package": null,
+    "phase": null,
+    "signature": null,
+    "stage": null,
+    "traceback": null,
+    "type": null
+  },
+  "generated_at_utc": "2026-05-03T01:16:09+00:00",
+  "issue_cluster_id": "mlx-vlm-mlx_long-context_001",
+  "model": "mlx-community/X-Reasoner-7B-8bit",
+  "repro": {
+    "args": {
+      "_check_models_preflight_issues": [],
+      "adapter_path": null,
+      "context_marker": "Context:",
+      "detailed_metrics": false,
+      "dry_run": false,
+      "enable_thinking": false,
+      "eos_tokens": null,
+      "eval_mode": "stress",
+      "exclude": [
+        "mlx-community/Qwen3-VL-2B-Thinking-bf16",
+        "Qwen/Qwen3-VL-2B-Instruct"
+      ],
+      "folder": "/Users/jrp/Pictures/Processed",
+      "force_color": false,
+      "image": null,
+      "kv_bits": null,
+      "kv_group_size": 64,
+      "kv_quant_scheme": "uniform",
+      "lazy_load": false,
+      "max_kv_size": null,
+      "max_tokens": 500,
+      "min_p": 0.0,
+      "models": null,
+      "no_color": false,
+      "output_diagnostics": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/diagnostics.md",
+      "output_env": "/Users/jrp/Documents/AI/mlx/check_models/src/output/environment.log",
+      "output_gallery_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/model_gallery.md",
+      "output_html": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.html",
+      "output_jsonl": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.jsonl",
+      "output_log": "/Users/jrp/Documents/AI/mlx/check_models/src/output/check_models.log",
+      "output_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.md",
+      "output_review": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/review.md",
+      "output_tsv": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.tsv",
+      "prefill_step_size": 4096,
+      "processor_kwargs": null,
+      "prompt": null,
+      "prune_repro_days": 90,
+      "quality_config": null,
+      "quantized_kv_start": 5000,
+      "repetition_context_size": 20,
+      "repetition_penalty": null,
+      "rerun_triage": false,
+      "resize_shape": null,
+      "revision": null,
+      "skip_special_tokens": false,
+      "temperature": 0.0,
+      "thinking_budget": null,
+      "thinking_end_token": "</think>",
+      "thinking_start_token": null,
+      "timeout": 300.0,
+      "top_k": 0,
+      "top_p": 1.0,
+      "trust_remote_code": true,
+      "verbose": true,
+      "width": null
+    },
+    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260502-152439_DSC09840.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/X-Reasoner-7B-8bit",
+    "env_vars": {
+      "TOKENIZERS_PARALLELISM": "false"
+    },
+    "image_path": "/Users/jrp/Pictures/Processed/20260502-152439_DSC09840.jpg",
+    "image_ref_sha256": "c9b1cebc8e500e110999e601c16ea54efa1252b1390c5e0b3150775ab7a95800",
+    "image_sha256": "1ad160dd553b961f2ef45d142bbe753f79da080713cb9c1a07744f12981fdb39",
+    "prompt_diagnostics": {
+      "eos_token": "<|im_end|>",
+      "eos_token_id": 151645,
+      "generate_kwargs": {
+        "kv_bits": null,
+        "kv_group_size": 64,
+        "kv_quant_scheme": "uniform",
+        "max_kv_size": null,
+        "max_tokens": 500,
+        "prefill_step_size": 4096,
+        "quantized_kv_start": 5000,
+        "repetition_context_size": 20,
+        "repetition_penalty": null,
+        "temperature": 0.0,
+        "top_p": 1.0
+      },
+      "image_placeholder_count": 0,
+      "model_type": "qwen2_5_vl",
+      "processor_class": "mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor",
+      "rendered_prompt_chars": 2533,
+      "rendered_prompt_hash_sha256": "c3b0affc45b450b62583abcce01cee7989f681c7bfea832ab140370870b42a15",
+      "rendered_prompt_preview": "<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\n<|vision_start|><|image_pad|><|vision_end|>Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do...",
+      "special_token_ids": [
+        151645,
+        151643
+      ],
+      "special_tokens": [
+        "<|im_end|>",
+        "<|endoftext|>"
+      ],
+      "tokenizer_class": "transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer"
+    },
+    "prompt_hash_sha256": "0802768f3e94f1c5038f1d55b934088c18efff77400777403332028a41ecf334",
+    "prompt_preview": "Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct any...",
+    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260502-152439_DSC09840.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/X-Reasoner-7B-8bit",
+    "seed": null
+  },
+  "result": {
+    "generated_text_preview": "Title:\nWoodbridge Tide Mill Museum at low tide\n\nDescription:\nA long boat covered with a black tarp lies on the muddy riverbed at low tide, with a historic white building labeled \"Tide Mill Museum\" in the background. A few people are seated on benches near the building under a bright blue sky with scattered clouds.\n\nKeywords:\nWoodbridge, Tide Mill Museum, River Deben, Low tide, Muddy riverbed, Blac...",
+    "maintainer_triage": {
+      "confidence": "high",
+      "evidence": [
+        "token_cap",
+        "repetitive_tail",
+        "abrupt_tail",
+        "trusted_overlap",
+        "metadata_terms"
+      ],
+      "harness_details": [
+        "long_context_repetition(16794tok)"
+      ],
+      "hit_max_tokens": true,
+      "issue_kind": "cutoff_degraded",
+      "issue_subtype": "long_context",
+      "next_action": "Inspect long-context cache behavior under heavy image-token burden.",
+      "nontext_prompt_ratio": 0.9713588186256996,
+      "prompt_output_ratio": 0.02977253781112302,
+      "prompt_tokens_total": 16794,
+      "requested_max_tokens": 500,
+      "stop_reason": "completed",
+      "summary": "At long prompt length (16794 tokens), output became repetitive. | hit token cap (500) | nontext prompt burden=97% | missing terms: Bench, English countryside, Moored, Mudflats, Objects",
+      "suspected_owner": "mlx",
+      "user_bucket": "avoid"
+    },
+    "quality_issues": [
+      "\u26a0\ufe0fharness(long_context)",
+      "long-context",
+      "repetitive(phrase: \"solar energy in museums,...\")",
+      "keyword-count(94)",
+      "keyword-duplication(0.68)",
+      "metadata-borrowing",
+      "cutoff"
+    ],
+    "success": true
+  },
+  "schema_version": "1.0"
+}
