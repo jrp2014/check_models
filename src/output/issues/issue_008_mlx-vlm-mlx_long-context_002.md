@@ -1,8 +1,8 @@
-# \[mlx-vlm / mlx\]\[long-context\] Output degeneration under long prompt length (incomplete_sentence: ends with 'in') affecting 1 model(s)
+# \[mlx-vlm / mlx\]\[long-context\] Output degeneration under long prompt length (incomplete_sentence: ends with 'b') affecting 2 model(s)
 
 ## Summary
 
-1 model(s) share a `long_context` signal that clusters under `mlx-vlm / mlx`.
+2 model(s) share a `long_context` signal that clusters under `mlx-vlm / mlx`.
 
 - **Issue kind:** `stack_signal`
 - **Cluster ID:** `mlx-vlm-mlx_long-context_002`
@@ -12,26 +12,28 @@
 
 ## Affected Models
 
-| Model                            | Representative Signal                                                              | Token Context                                                                                       | Repro Bundle                                                                                                                                                                                      |
-|----------------------------------|------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Qwen3.5-27B-4bit` | Output degeneration under long prompt length (incomplete_sentence: ends with 'in') | prompt=16,807 \| output/prompt=2.97% \| nontext burden=97% \| stop=completed \| hit token cap (500) | [`20260503T011608Z_007_mlx-community_Qwen3.5-27B-4bit_mlx_vlm_mlx_long_context_002.json`](../repro_bundles/20260503T011608Z_007_mlx-community_Qwen3.5-27B-4bit_mlx_vlm_mlx_long_context_002.json) |
+| Model                             | Representative Signal                                                             | Token Context                                                                                       | Repro Bundle                                                                                                                                                                                        |
+|-----------------------------------|-----------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/Qwen3.5-27B-4bit`  | Output degeneration under long prompt length (incomplete_sentence: ends with 'b') | prompt=16,821 \| output/prompt=2.97% \| nontext burden=97% \| stop=completed \| hit token cap (500) | [`20260503T205313Z_006_mlx-community_Qwen3.5-27B-4bit_mlx_vlm_mlx_long_context_002.json`](../repro_bundles/20260503T205313Z_006_mlx-community_Qwen3.5-27B-4bit_mlx_vlm_mlx_long_context_002.json)   |
+| `mlx-community/Qwen3.6-27B-mxfp8` | Output degeneration under long prompt length (character_loop: ' ' repeated)       | prompt=16,821 \| output/prompt=2.97% \| nontext burden=97% \| stop=completed \| hit token cap (500) | [`20260503T205313Z_007_mlx-community_Qwen3.6-27B-mxfp8_mlx_vlm_mlx_long_context_002.json`](../repro_bundles/20260503T205313Z_007_mlx-community_Qwen3.6-27B-mxfp8_mlx_vlm_mlx_long_context_002.json) |
 
 
 ## Evidence
 
 ### Stack Signals
 
-| Model                            |   Prompt Tok |   Output Tok | Output/Prompt   | Symptom                                                                            | Owner           |
-|----------------------------------|--------------|--------------|-----------------|------------------------------------------------------------------------------------|-----------------|
-| `mlx-community/Qwen3.5-27B-4bit` |       16,807 |          500 | 2.97%           | Output degeneration under long prompt length (incomplete_sentence: ends with 'in') | `mlx-vlm / mlx` |
+| Model                             |   Prompt Tok |   Output Tok | Output/Prompt   | Symptom                                                                           | Owner           |
+|-----------------------------------|--------------|--------------|-----------------|-----------------------------------------------------------------------------------|-----------------|
+| `mlx-community/Qwen3.5-27B-4bit`  |       16,821 |          500 | 2.97%           | Output degeneration under long prompt length (incomplete_sentence: ends with 'b') | `mlx-vlm / mlx` |
+| `mlx-community/Qwen3.6-27B-mxfp8` |       16,821 |          500 | 2.97%           | Output degeneration under long prompt length (character_loop: ' ' repeated)       | `mlx-vlm / mlx` |
 
 ### `mlx-community/Qwen3.5-27B-4bit`
 
 Observed signals:
 
-- Output contains corrupted or malformed text segments (incomplete_sentence: ends with 'in').
+- Output contains corrupted or malformed text segments (incomplete_sentence: ends with 'b').
 - Output omitted required Title/Description/Keywords sections (title, description, keywords).
-- Output leaked reasoning or prompt-template text (description hint:, keyword hints:).
+- Output leaked reasoning or prompt-template text (description hint:).
 
 Sample output:
 
@@ -39,7 +41,24 @@ Sample output:
 The user wants me to analyze the image and generate cataloguing metadata based on specific rules.
 
 **1. Analyze the Image:**
-*   **Foreground:** A long, narrow boat (looks like a punt or similar fl...
+*   **Foreground:** Several boats are resting on the mud (low tide)....
+```
+
+### `mlx-community/Qwen3.6-27B-mxfp8`
+
+Observed signals:
+
+- Output contains corrupted or malformed text segments (character_loop: ' ' repeated).
+- Output omitted required Title/Description/Keywords sections (title, description, keywords).
+- Output leaked reasoning or prompt-template text (description hint:).
+
+Sample output:
+
+```text
+The user wants me to analyze the image and generate metadata (Title, Description, Keywords) based on specific rules.
+
+**1. Analyze the Image:**
+*   **Main Subject:** A large, traditional sailing ba...
 ```
 
 
@@ -50,8 +69,8 @@ The user wants me to analyze the image and generate cataloguing metadata based o
 - _Issue kind:_ `stack_signal`
 - _Issue subtype:_ `long_context`
 - _Why this classification is credible:_ hit token cap (500) \| nontext prompt
-  burden=97% \| missing sections: title, description, keywords \| nonvisual
-  metadata reused
+  burden=97% \| missing sections: title, description, keywords \| missing
+  terms: 10 Best (structured), Marina, Mooring, Pier, Quay
 - _Suggested next action:_ Treat as a model limitation for this prompt; the
   requested output contract is not being met.
 
@@ -61,12 +80,13 @@ The user wants me to analyze the image and generate cataloguing metadata based o
 Cluster rerun:
 
 ```bash
-python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen3.5-27B-4bit
+python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen3.5-27B-4bit mlx-community/Qwen3.6-27B-mxfp8
 ```
 
 Repro bundles:
 
-- `mlx-community/Qwen3.5-27B-4bit`: [`20260503T011608Z_007_mlx-community_Qwen3.5-27B-4bit_mlx_vlm_mlx_long_context_002.json`](../repro_bundles/20260503T011608Z_007_mlx-community_Qwen3.5-27B-4bit_mlx_vlm_mlx_long_context_002.json)
+- `mlx-community/Qwen3.5-27B-4bit`: [`20260503T205313Z_006_mlx-community_Qwen3.5-27B-4bit_mlx_vlm_mlx_long_context_002.json`](../repro_bundles/20260503T205313Z_006_mlx-community_Qwen3.5-27B-4bit_mlx_vlm_mlx_long_context_002.json)
+- `mlx-community/Qwen3.6-27B-mxfp8`: [`20260503T205313Z_007_mlx-community_Qwen3.6-27B-mxfp8_mlx_vlm_mlx_long_context_002.json`](../repro_bundles/20260503T205313Z_007_mlx-community_Qwen3.6-27B-mxfp8_mlx_vlm_mlx_long_context_002.json)
 
 
 ## Fix Checklist
@@ -87,7 +107,7 @@ Repro bundles:
 | Component       | Version                     |
 |-----------------|-----------------------------|
 | mlx-vlm         | 0.4.5                       |
-| mlx             | 0.32.0.dev20260502+e8ebdebe |
+| mlx             | 0.32.0.dev20260503+e8ebdebe |
 | mlx-lm          | 0.31.3                      |
 | transformers    | 5.7.0                       |
 | tokenizers      | 0.22.2                      |

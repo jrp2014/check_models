@@ -1,4 +1,4 @@
-# \[mlx-vlm\]\[encoding\] Tokenizer space-marker artifacts (for example  ) appeared in output (about 78 occurrences) affecting 1 model(s)
+# \[mlx-vlm\]\[encoding\] Tokenizer space-marker artifacts (for example  ) appeared in output (about 56 occurrences) affecting 1 model(s)
 
 ## Summary
 
@@ -14,7 +14,7 @@
 
 | Model                                                   | Representative Signal                                                                       | Token Context                                                               | Repro Bundle                                                                                                                                                                                                                    |
 |---------------------------------------------------------|---------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 78 occurrences). | prompt=2,682 \| output/prompt=4.62% \| nontext burden=82% \| stop=completed | [`20260503T011608Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json`](../repro_bundles/20260503T011608Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) |
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 56 occurrences). | prompt=2,674 \| output/prompt=3.63% \| nontext burden=82% \| stop=completed | [`20260503T205313Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json`](../repro_bundles/20260503T205313Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) |
 
 
 ## Evidence
@@ -23,13 +23,13 @@
 
 Observed signals:
 
-- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 78 occurrences).
+- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 56 occurrences).
 - Output omitted required Title/Description/Keywords sections (description, keywords).
 
 Sample output:
 
 ```text
-Title:ĠTideĠMillĠMuseumĠatĠLowĠTideĊĊDescription:ĠAĠlongĠboatĠcoveredĠwithĠaĠblackĠtarpĠrestsĠonĠtheĠmuddyĠriverbedĠinĠfrontĠofĠtheĠWoodbridgeĠTideĠMillĠMuseum.ĠTheĠhistoricĠwhiteĠbuildingĠstandsĠw...
+Title:ĠSailingĠBargeĠonĠtheĠRiverĠDebenĊĊDescription:ĠAĠlargeĠsailingĠbargeĠisĠmooredĠonĠtheĠRiverĠDebenĠatĠlowĠtide,ĠwithĠtraditionalĠboatsĠandĠbuildingsĠinĠtheĠbackground.ĠTheĠskyĠisĠclearĠandĠbl...
 ```
 
 
@@ -40,9 +40,9 @@ Title:ĠTideĠMillĠMuseumĠatĠLowĠTideĊĊDescription:ĠAĠlongĠboatĠcovere
 - _Issue kind:_ `harness`
 - _Issue subtype:_ `encoding`
 - _Why this classification is credible:_ Tokenizer space-marker artifacts (for
-  example Ġ) appeared in output (about 78 occurrences). \| nontext prompt
-  burden=82% \| missing sections: description, keywords \| missing terms:
-  Bench, Blue sky, East Anglia, English countryside, Moored
+  example Ġ) appeared in output (about 56 occurrences). \| nontext prompt
+  burden=82% \| missing sections: description, keywords \| missing terms: 10
+  Best (structured), Bird, Gull, Marina, Mooring
 - _Suggested next action:_ Inspect decode cleanup; tokenizer markers are
   leaking into user-facing text.
 
@@ -57,7 +57,7 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 
 Repro bundles:
 
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: [`20260503T011608Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json`](../repro_bundles/20260503T011608Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: [`20260503T205313Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json`](../repro_bundles/20260503T205313Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)
 
 
 ## Fix Checklist
@@ -78,7 +78,7 @@ Repro bundles:
 | Component       | Version                     |
 |-----------------|-----------------------------|
 | mlx-vlm         | 0.4.5                       |
-| mlx             | 0.32.0.dev20260502+e8ebdebe |
+| mlx             | 0.32.0.dev20260503+e8ebdebe |
 | mlx-lm          | 0.31.3                      |
 | transformers    | 5.7.0                       |
 | tokenizers      | 0.22.2                      |

@@ -1,8 +1,8 @@
-# \[model-config / mlx-vlm\]\[prompt-template\] Model returned zero output tokens affecting 2 model(s)
+# \[model-config / mlx-vlm\]\[prompt-template\] Output was a short generic filler response (about 8 tokens) affecting 3 model(s)
 
 ## Summary
 
-2 model(s) share a `prompt_template` signal that clusters under `model-config / mlx-vlm`.
+3 model(s) share a `prompt_template` signal that clusters under `model-config / mlx-vlm`.
 
 - **Issue kind:** `harness`
 - **Cluster ID:** `model-config-mlx-vlm_prompt-template_001`
@@ -14,8 +14,9 @@
 
 | Model                                            | Representative Signal                                                                                          | Token Context                                                               | Repro Bundle                                                                                                                                                                                                                                              |
 |--------------------------------------------------|----------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/llava-v1.6-mistral-7b-8bit`       | Model returned zero output tokens.                                                                             | prompt=0 \| stop=completed                                                  | [`20260503T011608Z_009_mlx-community_llava-v1.6-mistral-7b-8bit_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260503T011608Z_009_mlx-community_llava-v1.6-mistral-7b-8bit_model_config_mlx_vlm_prompt_template_001.json)             |
-| `mlx-community/paligemma2-10b-ft-docci-448-bf16` | Output is very short relative to prompt size (0.9%), suggesting possible early-stop or prompt-handling issues. | prompt=1,587 \| output/prompt=0.88% \| nontext burden=70% \| stop=completed | [`20260503T011608Z_010_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260503T011608Z_010_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json) |
+| `mlx-community/llava-v1.6-mistral-7b-8bit`       | Output was a short generic filler response (about 8 tokens).                                                   | prompt=2,790 \| output/prompt=0.29% \| nontext burden=83% \| stop=completed | [`20260503T205313Z_009_mlx-community_llava-v1.6-mistral-7b-8bit_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260503T205313Z_009_mlx-community_llava-v1.6-mistral-7b-8bit_model_config_mlx_vlm_prompt_template_001.json)             |
+| `mlx-community/paligemma2-10b-ft-docci-448-bf16` | Output is very short relative to prompt size (0.9%), suggesting possible early-stop or prompt-handling issues. | prompt=1,596 \| output/prompt=0.88% \| nontext burden=70% \| stop=completed | [`20260503T205313Z_010_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260503T205313Z_010_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json) |
+| `mlx-community/paligemma2-3b-ft-docci-448-bf16`  | Output is very short relative to prompt size (0.7%), suggesting possible early-stop or prompt-handling issues. | prompt=1,596 \| output/prompt=0.69% \| nontext burden=70% \| stop=completed | [`20260503T205313Z_011_mlx-community_paligemma2-3b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260503T205313Z_011_mlx-community_paligemma2-3b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json)   |
 
 
 ## Evidence
@@ -24,20 +25,41 @@
 
 Observed signals:
 
-- Model returned zero output tokens.
+- Output was a short generic filler response (about 8 tokens).
+- Model output may not follow prompt or image contents (missing: 10 Best (structured), Barge, Bird, Blue sky, Gull).
+
+Sample output:
+
+```text
+The image is a photograph.
+```
 
 ### `mlx-community/paligemma2-10b-ft-docci-448-bf16`
 
 Observed signals:
 
 - Output is very short relative to prompt size (0.9%), suggesting possible early-stop or prompt-handling issues.
-- Model output may not follow prompt or image contents (missing: Bench, Blue sky, Clouds, East Anglia, English countryside).
+- Model output may not follow prompt or image contents (missing: 10 Best (structured), Barge, Bird, Blue sky, Gull).
 - Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 Sample output:
 
 ```text
 - Use only the metadata that is clearly supported by the image.
+```
+
+### `mlx-community/paligemma2-3b-ft-docci-448-bf16`
+
+Observed signals:
+
+- Output is very short relative to prompt size (0.7%), suggesting possible early-stop or prompt-handling issues.
+- Model output may not follow prompt or image contents (missing: 10 Best (structured), Barge, Bird, Blue sky, Gull).
+- Output omitted required Title/Description/Keywords sections (title, description, keywords).
+
+Sample output:
+
+```text
+- The river water is a light brown color.
 ```
 
 
@@ -47,7 +69,9 @@ Sample output:
 - _Confidence:_ high
 - _Issue kind:_ `harness`
 - _Issue subtype:_ `prompt_template`
-- _Why this classification is credible:_ Model returned zero output tokens.
+- _Why this classification is credible:_ Output was a short generic filler
+  response (about 8 tokens). \| nontext prompt burden=83% \| missing terms: 10
+  Best (structured), Barge, Bird, Blue sky, Gull
 - _Suggested next action:_ Inspect model repo config, chat template, and EOS
   settings.
 
@@ -57,13 +81,14 @@ Sample output:
 Cluster rerun:
 
 ```bash
-python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/llava-v1.6-mistral-7b-8bit mlx-community/paligemma2-10b-ft-docci-448-bf16
+python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/llava-v1.6-mistral-7b-8bit mlx-community/paligemma2-10b-ft-docci-448-bf16 mlx-community/paligemma2-3b-ft-docci-448-bf16
 ```
 
 Repro bundles:
 
-- `mlx-community/llava-v1.6-mistral-7b-8bit`: [`20260503T011608Z_009_mlx-community_llava-v1.6-mistral-7b-8bit_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260503T011608Z_009_mlx-community_llava-v1.6-mistral-7b-8bit_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: [`20260503T011608Z_010_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260503T011608Z_010_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/llava-v1.6-mistral-7b-8bit`: [`20260503T205313Z_009_mlx-community_llava-v1.6-mistral-7b-8bit_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260503T205313Z_009_mlx-community_llava-v1.6-mistral-7b-8bit_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: [`20260503T205313Z_010_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260503T205313Z_010_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/paligemma2-3b-ft-docci-448-bf16`: [`20260503T205313Z_011_mlx-community_paligemma2-3b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json`](../repro_bundles/20260503T205313Z_011_mlx-community_paligemma2-3b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json)
 
 
 ## Fix Checklist
@@ -84,7 +109,7 @@ Repro bundles:
 | Component       | Version                     |
 |-----------------|-----------------------------|
 | mlx-vlm         | 0.4.5                       |
-| mlx             | 0.32.0.dev20260502+e8ebdebe |
+| mlx             | 0.32.0.dev20260503+e8ebdebe |
 | mlx-lm          | 0.31.3                      |
 | transformers    | 5.7.0                       |
 | tokenizers      | 0.22.2                      |

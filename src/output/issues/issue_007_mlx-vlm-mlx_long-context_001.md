@@ -1,4 +1,4 @@
-# \[mlx-vlm / mlx\]\[long-context\] At long prompt length (16794 tokens), output became repetitive affecting 1 model(s)
+# \[mlx-vlm / mlx\]\[long-context\] At long prompt length (16807 tokens), output became repetitive affecting 1 model(s)
 
 ## Summary
 
@@ -14,7 +14,7 @@
 
 | Model                              | Representative Signal                                           | Token Context                                                                                       | Repro Bundle                                                                                                                                                                                          |
 |------------------------------------|-----------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/X-Reasoner-7B-8bit` | At long prompt length (16794 tokens), output became repetitive. | prompt=16,794 \| output/prompt=2.98% \| nontext burden=97% \| stop=completed \| hit token cap (500) | [`20260503T011608Z_008_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_mlx_long_context_001.json`](../repro_bundles/20260503T011608Z_008_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_mlx_long_context_001.json) |
+| `mlx-community/X-Reasoner-7B-8bit` | At long prompt length (16807 tokens), output became repetitive. | prompt=16,807 \| output/prompt=2.97% \| nontext burden=97% \| stop=completed \| hit token cap (500) | [`20260503T205313Z_008_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_mlx_long_context_001.json`](../repro_bundles/20260503T205313Z_008_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_mlx_long_context_001.json) |
 
 
 ## Evidence
@@ -23,17 +23,17 @@
 
 Observed signals:
 
-- At long prompt length (16794 tokens), output became repetitive.
-- Output became repetitive, indicating possible generation instability (token: phrase: "solar energy in museums,...").
+- At long prompt length (16807 tokens), output became repetitive.
+- Output became repetitive, indicating possible generation instability (token: phrase: "quay, river, boats, sailing,...").
 
 Sample output:
 
 ```text
 Title:
-Woodbridge Tide Mill Museum at low tide
+Woodbridge Tide Mill Museum and Boats
 
 Description:
-A long boat covered with a black tarp lies on the muddy riverbed at low tide, with a historic white building labeled "Tide Mill Museum"...
+A historic quayside scene at Woodbridge, Suffolk, featuring traditional sailing barges moored on the River Deben at low tide. The backgrou...
 ```
 
 
@@ -43,10 +43,10 @@ A long boat covered with a black tarp lies on the muddy riverbed at low tide, wi
 - _Confidence:_ high
 - _Issue kind:_ `cutoff_degraded`
 - _Issue subtype:_ `long_context`
-- _Why this classification is credible:_ At long prompt length (16794 tokens),
+- _Why this classification is credible:_ At long prompt length (16807 tokens),
   output became repetitive. \| hit token cap (500) \| nontext prompt
-  burden=97% \| missing terms: Bench, English countryside, Moored, Mudflats,
-  Objects
+  burden=97% \| missing terms: 10 Best (structured), Bird, Gull, Mooring,
+  Mudflats
 - _Suggested next action:_ Inspect long-context cache behavior under heavy
   image-token burden.
 
@@ -61,7 +61,7 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 
 Repro bundles:
 
-- `mlx-community/X-Reasoner-7B-8bit`: [`20260503T011608Z_008_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_mlx_long_context_001.json`](../repro_bundles/20260503T011608Z_008_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_mlx_long_context_001.json)
+- `mlx-community/X-Reasoner-7B-8bit`: [`20260503T205313Z_008_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_mlx_long_context_001.json`](../repro_bundles/20260503T205313Z_008_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_mlx_long_context_001.json)
 
 
 ## Fix Checklist
@@ -82,7 +82,7 @@ Repro bundles:
 | Component       | Version                     |
 |-----------------|-----------------------------|
 | mlx-vlm         | 0.4.5                       |
-| mlx             | 0.32.0.dev20260502+e8ebdebe |
+| mlx             | 0.32.0.dev20260503+e8ebdebe |
 | mlx-lm          | 0.31.3                      |
 | transformers    | 5.7.0                       |
 | tokenizers      | 0.22.2                      |

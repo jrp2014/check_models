@@ -2966,3 +2966,973 @@ Description: A view of the historic quayside at Woodbridge, Suffolk, England, on
 2026-05-03 21:52:17 BST - INFO - Processing Model [47/53]: mlx-community/paligemma2-10b-ft-docci-448-6bit
 2026-05-03 21:52:18 BST - DEBUG - System: arm64, GPU: Apple M5 Max
 2026-05-03 21:52:18 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/paligemma2-10b-ft-docci-448-6bit
+2026-05-03 21:52:22 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/paligemma2-10b-ft-docci-448-6bit
+2026-05-03 21:52:22 BST - DEBUG - Cleaned up resources for model mlx-community/paligemma2-10b-ft-docci-448-6bit
+2026-05-03 21:52:22 BST - DEBUG - Quality analysis for mlx-community/paligemma2-10b-ft-docci-448-6bit: context_ignored=True, missing_sections=title+description+keywords, hint_relationship=ignores_trusted_hints, verdict=model_shortcoming, user_bucket=avoid, words=16
+2026-05-03 21:52:22 BST - INFO - Quality issues detected for mlx-community/paligemma2-10b-ft-docci-448-6bit: missing-sections(title+description+keywords), trusted-hints-ignored, context-ignored
+2026-05-03 21:52:22 BST - DEBUG - 
+2026-05-03 21:52:22 BST - DEBUG - === CANONICAL REVIEW: mlx-community/paligemma2-10b-ft-docci-448-6bit ===
+2026-05-03 21:52:22 BST - DEBUG - Verdict: model_shortcoming | user=avoid
+2026-05-03 21:52:22 BST - DEBUG - Why: nontext prompt burden=70% | missing sections: title, description, keywords | missing terms: 10 Best (structured), Barge, Bird, Blue sky, Gull
+2026-05-03 21:52:22 BST - DEBUG - Trusted hints: ignores trusted hints | missing terms: 10 Best (structured), Barge, Bird, Blue sky, Gull
+2026-05-03 21:52:22 BST - DEBUG - Contract: missing: title, description, keywords
+2026-05-03 21:52:22 BST - DEBUG - Utility: user=avoid | ignores trusted hints
+2026-05-03 21:52:22 BST - DEBUG - Stack / owner: owner=model
+2026-05-03 21:52:22 BST - DEBUG - Token accounting: prompt=1596 | text_est=483 | nontext_est=1113 | gen=20 | max=500 | stop=completed
+2026-05-03 21:52:22 BST - DEBUG - Next action: Treat as a model limitation for this prompt; the requested output contract is not being met.
+2026-05-03 21:52:22 BST - DEBUG - Full output:
+- Use the following metadata hints as a guide, but do not include them in the output.
+2026-05-03 21:52:22 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/paligemma2-10b-ft-docci-448-6bit ===
+2026-05-03 21:52:22 BST - INFO - [RUN 47/53] SUMMARY model=mlx-community/paligemma2-10b-ft-docci-448-6bit status=OK
+2026-05-03 21:52:22 BST - INFO - quality=context_ignored+missing_sections+trusted_hint_ignored
+2026-05-03 21:52:22 BST - INFO - 
+2026-05-03 21:52:22 BST - INFO - Generated Text:
+2026-05-03 21:52:22 BST - WARNING - ⚠️  Note: Output ignored key context (missing: 10 Best (structured), Barge, Bird, Blue sky, Gull)
+2026-05-03 21:52:22 BST - INFO -    - Use the following metadata hints as a guide, but do not include them in the output.
+2026-05-03 21:52:22 BST - INFO - 
+2026-05-03 21:52:22 BST - INFO - 📊 Timing: 4.54s total (gen=2.52s, load=1.76s, prep=0.00s, first=1.31s) | Memory: 12GB peak
+2026-05-03 21:52:22 BST - INFO -    Tokens: 1,616 (1,596 prompt + 20 gen) | Speed: 26.5 gen/s, 1,223 prompt/s
+2026-05-03 21:52:22 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:52:22 BST - INFO - 
+2026-05-03 21:52:22 BST - INFO - Processing Model [48/53]: mlx-community/paligemma2-10b-ft-docci-448-bf16
+2026-05-03 21:52:22 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:52:22 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/paligemma2-10b-ft-docci-448-bf16
+2026-05-03 21:52:30 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/paligemma2-10b-ft-docci-448-bf16
+2026-05-03 21:52:30 BST - DEBUG - Cleaned up resources for model mlx-community/paligemma2-10b-ft-docci-448-bf16
+2026-05-03 21:52:30 BST - DEBUG - Quality analysis for mlx-community/paligemma2-10b-ft-docci-448-bf16: context_ignored=True, missing_sections=title+description+keywords, hint_relationship=ignores_trusted_hints, verdict=harness, user_bucket=avoid, harness=True (prompt_template; output:output_ratio(0.9%)), words=11
+2026-05-03 21:52:30 BST - INFO - Quality issues detected for mlx-community/paligemma2-10b-ft-docci-448-bf16: ⚠️harness(prompt_template), missing-sections(title+description+keywords), trusted-hints-ignored, context-ignored
+2026-05-03 21:52:30 BST - DEBUG - 
+2026-05-03 21:52:30 BST - DEBUG - === CANONICAL REVIEW: mlx-community/paligemma2-10b-ft-docci-448-bf16 ===
+2026-05-03 21:52:30 BST - DEBUG - Verdict: harness | user=avoid
+2026-05-03 21:52:30 BST - DEBUG - Why: Output is very short relative to prompt size (0.9%), suggesting possible early-stop or prompt-handling issues. | nontext prompt burden=70% | missing sections: title, description, keywords | missing terms: 10 Best (structured), Barge, Bird, Blue sky, Gull
+2026-05-03 21:52:30 BST - DEBUG - Trusted hints: ignores trusted hints | missing terms: 10 Best (structured), Barge, Bird, Blue sky, Gull
+2026-05-03 21:52:30 BST - DEBUG - Contract: missing: title, description, keywords
+2026-05-03 21:52:30 BST - DEBUG - Utility: user=avoid | ignores trusted hints
+2026-05-03 21:52:30 BST - DEBUG - Stack / owner: owner=model-config | harness=prompt_template
+2026-05-03 21:52:30 BST - DEBUG - Token accounting: prompt=1596 | text_est=483 | nontext_est=1113 | gen=14 | max=500 | stop=completed
+2026-05-03 21:52:30 BST - DEBUG - Next action: Check chat-template and EOS defaults first; the output shape is not matching the requested contract.
+2026-05-03 21:52:30 BST - DEBUG - Full output:
+- Use only the metadata that is clearly supported by the image.
+2026-05-03 21:52:30 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/paligemma2-10b-ft-docci-448-bf16 ===
+2026-05-03 21:52:30 BST - INFO - [RUN 48/53] SUMMARY model=mlx-community/paligemma2-10b-ft-docci-448-bf16 status=OK
+2026-05-03 21:52:30 BST - INFO - quality=context_ignored+harness+missing_sections+trusted_hint_ignored
+2026-05-03 21:52:30 BST - INFO - 
+2026-05-03 21:52:30 BST - INFO - Generated Text:
+2026-05-03 21:52:30 BST - WARNING - ⚠️  Note: Output ignored key context (missing: 10 Best (structured), Barge, Bird, Blue sky, Gull)
+2026-05-03 21:52:30 BST - WARNING - ⚠️  Likely harness issue (prompt_template): output:output_ratio(0.9%)
+2026-05-03 21:52:30 BST - INFO -    - Use only the metadata that is clearly supported by the image.
+2026-05-03 21:52:30 BST - INFO - 
+2026-05-03 21:52:30 BST - INFO - 📊 Timing: 8.07s total (gen=5.03s, load=2.74s, prep=0.00s, first=1.78s) | Memory: 27GB peak
+2026-05-03 21:52:30 BST - INFO -    Tokens: 1,610 (1,596 prompt + 14 gen) | Speed: 5.07 gen/s, 897 prompt/s
+2026-05-03 21:52:30 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:52:30 BST - INFO - 
+2026-05-03 21:52:30 BST - INFO - Processing Model [49/53]: mlx-community/paligemma2-3b-ft-docci-448-bf16
+2026-05-03 21:52:30 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:52:30 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/paligemma2-3b-ft-docci-448-bf16
+2026-05-03 21:52:34 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/paligemma2-3b-ft-docci-448-bf16
+2026-05-03 21:52:34 BST - DEBUG - Cleaned up resources for model mlx-community/paligemma2-3b-ft-docci-448-bf16
+2026-05-03 21:52:34 BST - DEBUG - Quality analysis for mlx-community/paligemma2-3b-ft-docci-448-bf16: context_ignored=True, missing_sections=title+description+keywords, hint_relationship=ignores_trusted_hints, verdict=harness, user_bucket=avoid, harness=True (prompt_template; output:output_ratio(0.7%)), words=8
+2026-05-03 21:52:34 BST - INFO - Quality issues detected for mlx-community/paligemma2-3b-ft-docci-448-bf16: ⚠️harness(prompt_template), missing-sections(title+description+keywords), trusted-hints-ignored, context-ignored
+2026-05-03 21:52:34 BST - DEBUG - 
+2026-05-03 21:52:34 BST - DEBUG - === CANONICAL REVIEW: mlx-community/paligemma2-3b-ft-docci-448-bf16 ===
+2026-05-03 21:52:34 BST - DEBUG - Verdict: harness | user=avoid
+2026-05-03 21:52:34 BST - DEBUG - Why: Output is very short relative to prompt size (0.7%), suggesting possible early-stop or prompt-handling issues. | nontext prompt burden=70% | missing sections: title, description, keywords | missing terms: 10 Best (structured), Barge, Bird, Blue sky, Gull
+2026-05-03 21:52:34 BST - DEBUG - Trusted hints: ignores trusted hints | missing terms: 10 Best (structured), Barge, Bird, Blue sky, Gull
+2026-05-03 21:52:34 BST - DEBUG - Contract: missing: title, description, keywords
+2026-05-03 21:52:34 BST - DEBUG - Utility: user=avoid | ignores trusted hints
+2026-05-03 21:52:34 BST - DEBUG - Stack / owner: owner=model-config | harness=prompt_template
+2026-05-03 21:52:34 BST - DEBUG - Token accounting: prompt=1596 | text_est=483 | nontext_est=1113 | gen=11 | max=500 | stop=completed
+2026-05-03 21:52:34 BST - DEBUG - Next action: Check chat-template and EOS defaults first; the output shape is not matching the requested contract.
+2026-05-03 21:52:34 BST - DEBUG - Full output:
+- The river water is a light brown color.
+2026-05-03 21:52:34 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/paligemma2-3b-ft-docci-448-bf16 ===
+2026-05-03 21:52:34 BST - INFO - [RUN 49/53] SUMMARY model=mlx-community/paligemma2-3b-ft-docci-448-bf16 status=OK
+2026-05-03 21:52:34 BST - INFO - quality=context_ignored+harness+missing_sections+trusted_hint_ignored
+2026-05-03 21:52:34 BST - INFO - 
+2026-05-03 21:52:34 BST - INFO - Generated Text:
+2026-05-03 21:52:34 BST - WARNING - ⚠️  Note: Output ignored key context (missing: 10 Best (structured), Barge, Bird, Blue sky, Gull)
+2026-05-03 21:52:34 BST - WARNING - ⚠️  Likely harness issue (prompt_template): output:output_ratio(0.7%)
+2026-05-03 21:52:34 BST - INFO -    - The river water is a light brown color.
+2026-05-03 21:52:34 BST - INFO - 
+2026-05-03 21:52:34 BST - INFO - 📊 Timing: 3.67s total (gen=1.64s, load=1.73s, prep=0.00s, first=0.54s) | Memory: 11GB peak
+2026-05-03 21:52:34 BST - INFO -    Tokens: 1,607 (1,596 prompt + 11 gen) | Speed: 18.4 gen/s, 2,979 prompt/s
+2026-05-03 21:52:34 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:52:34 BST - INFO - 
+2026-05-03 21:52:34 BST - INFO - Processing Model [50/53]: mlx-community/paligemma2-3b-pt-896-4bit
+2026-05-03 21:52:34 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:52:34 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/paligemma2-3b-pt-896-4bit
+2026-05-03 21:52:51 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/paligemma2-3b-pt-896-4bit
+2026-05-03 21:52:51 BST - DEBUG - Cleaned up resources for model mlx-community/paligemma2-3b-pt-896-4bit
+2026-05-03 21:52:51 BST - DEBUG - Quality analysis for mlx-community/paligemma2-3b-pt-896-4bit: repetitive=True (token=phrase: "- output only the..."), excessive_bullets=True (count=46), context_ignored=True, missing_sections=title+description+keywords, hint_relationship=ignores_trusted_hints, verdict=cutoff_degraded, user_bucket=avoid, likely_capped=True, words=364
+2026-05-03 21:52:51 BST - INFO - Quality issues detected for mlx-community/paligemma2-3b-pt-896-4bit: repetitive(phrase: "- output only the..."), missing-sections(title+description+keywords), trusted-hints-ignored, cutoff, bullets(46), context-ignored
+2026-05-03 21:52:51 BST - DEBUG - 
+2026-05-03 21:52:51 BST - DEBUG - === CANONICAL REVIEW: mlx-community/paligemma2-3b-pt-896-4bit ===
+2026-05-03 21:52:51 BST - DEBUG - Verdict: cutoff_degraded | user=avoid
+2026-05-03 21:52:51 BST - DEBUG - Why: hit token cap (500) | nontext prompt burden=90% | missing sections: title, description, keywords | missing terms: 10 Best (structured), Barge, Bird, Blue sky, Gull
+2026-05-03 21:52:51 BST - DEBUG - Trusted hints: ignores trusted hints | missing terms: 10 Best (structured), Barge, Bird, Blue sky, Gull
+2026-05-03 21:52:51 BST - DEBUG - Contract: missing: title, description, keywords
+2026-05-03 21:52:51 BST - DEBUG - Utility: user=avoid | ignores trusted hints
+2026-05-03 21:52:51 BST - DEBUG - Stack / owner: owner=model
+2026-05-03 21:52:51 BST - DEBUG - Token accounting: prompt=4668 | text_est=483 | nontext_est=4185 | gen=500 | max=500 | stop=completed
+2026-05-03 21:52:51 BST - DEBUG - Next action: Treat as a model limitation for this prompt; the requested output contract is not being met.
+2026-05-03 21:52:51 BST - DEBUG - Full output:
+- Output only the description text after the label.
+- Output only the keyword list after the label.
+- Output only the description text after the label.
+- Output only the keyword list after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description text after the label.
+- Output only the description
+2026-05-03 21:52:51 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/paligemma2-3b-pt-896-4bit ===
+2026-05-03 21:52:51 BST - INFO - [RUN 50/53] SUMMARY model=mlx-community/paligemma2-3b-pt-896-4bit status=OK
+2026-05-03 21:52:51 BST - INFO - quality=bullets+context_ignored+cutoff+missing_sections+repetitive+trusted_hint_ignored
+2026-05-03 21:52:51 BST - INFO - 
+2026-05-03 21:52:51 BST - INFO - Generated Text:
+2026-05-03 21:52:51 BST - WARNING - ⚠️  WARNING: Output appears to be rubbish (repetitive: 'phrase: "- output only the..."')
+2026-05-03 21:52:51 BST - WARNING - ⚠️  Note: Output ignored key context (missing: 10 Best (structured), Barge, Bird, Blue sky, Gull)
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the keyword list after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the keyword list after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:52:51 BST - INFO -    - Output only the description
+2026-05-03 21:52:51 BST - INFO - 
+2026-05-03 21:52:51 BST - INFO - 📊 Timing: 17.13s total (gen=15.42s, load=1.42s, prep=0.00s, first=1.34s) | Memory: 4.6GB peak
+2026-05-03 21:52:51 BST - INFO -    Tokens: 5,168 (4,668 prompt + 500 gen) | Speed: 37.4 gen/s, 3,490 prompt/s
+2026-05-03 21:52:51 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:52:51 BST - INFO - 
+2026-05-03 21:52:51 BST - INFO - Processing Model [51/53]: mlx-community/pixtral-12b-8bit
+2026-05-03 21:52:52 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:52:52 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/pixtral-12b-8bit
+2026-05-03 21:52:59 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/pixtral-12b-8bit
+2026-05-03 21:52:59 BST - DEBUG - Cleaned up resources for model mlx-community/pixtral-12b-8bit
+2026-05-03 21:52:59 BST - DEBUG - Quality analysis for mlx-community/pixtral-12b-8bit: title_words=5, description_sentences=2, keywords=17, keyword_dup=0.00, words=66
+2026-05-03 21:52:59 BST - DEBUG - 
+2026-05-03 21:52:59 BST - DEBUG - === CANONICAL REVIEW: mlx-community/pixtral-12b-8bit ===
+2026-05-03 21:52:59 BST - DEBUG - Verdict: clean | user=recommended
+2026-05-03 21:52:59 BST - DEBUG - Why: nontext prompt burden=86% | missing terms: 10 Best (structured), Bird, Mooring, view, historic
+2026-05-03 21:52:59 BST - DEBUG - Trusted hints: preserves trusted hints
+2026-05-03 21:52:59 BST - DEBUG - Contract: ok
+2026-05-03 21:52:59 BST - DEBUG - Utility: user=recommended | preserves trusted hints
+2026-05-03 21:52:59 BST - DEBUG - Stack / owner: owner=model
+2026-05-03 21:52:59 BST - DEBUG - Token accounting: prompt=3362 | text_est=483 | nontext_est=2879 | gen=114 | max=500 | stop=completed
+2026-05-03 21:52:59 BST - DEBUG - Next action: Treat as a model limitation for this prompt; trusted hint coverage is still weak.
+2026-05-03 21:52:59 BST - DEBUG - Full output:
+Title:
+Moored Boats at Woodbridge Quay
+
+Description:
+Traditional boats, including a large sailing barge, are moored on the River Deben at low tide. In the background, the Woodbridge Tide Mill Museum and an adjacent building under renovation are visible on a sunny day.
+
+Keywords:
+Barge, Boat, Blue sky, Gull, Marina, Moored, Mudflats, Museum, Pier, Quay, Rigging, River Deben, Sailing Barge, Sailing Boat, Suffolk, Tide Mill, Woodbridge
+2026-05-03 21:52:59 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/pixtral-12b-8bit ===
+2026-05-03 21:52:59 BST - INFO - [RUN 51/53] SUMMARY model=mlx-community/pixtral-12b-8bit status=OK quality=clean
+2026-05-03 21:52:59 BST - INFO - 
+2026-05-03 21:52:59 BST - INFO - Generated Text:
+2026-05-03 21:52:59 BST - INFO -    Title:
+2026-05-03 21:52:59 BST - INFO -    Moored Boats at Woodbridge Quay
+2026-05-03 21:52:59 BST - INFO - 
+2026-05-03 21:52:59 BST - INFO -    Description:
+2026-05-03 21:52:59 BST - INFO -    Traditional boats, including a large sailing barge, are moored on the River Deben at low tide. In
+2026-05-03 21:52:59 BST - INFO -    the background, the Woodbridge Tide Mill Museum and an adjacent building under renovation are
+2026-05-03 21:52:59 BST - INFO -    visible on a sunny day.
+2026-05-03 21:52:59 BST - INFO - 
+2026-05-03 21:52:59 BST - INFO -    Keywords:
+2026-05-03 21:52:59 BST - INFO -    Barge, Boat, Blue sky, Gull, Marina, Moored, Mudflats, Museum, Pier, Quay, Rigging, River Deben,
+2026-05-03 21:52:59 BST - INFO -    Sailing Barge, Sailing Boat, Suffolk, Tide Mill, Woodbridge
+2026-05-03 21:52:59 BST - INFO - 
+2026-05-03 21:52:59 BST - INFO - 📊 Timing: 7.66s total (gen=5.64s, load=1.71s, prep=0.00s, first=2.18s) | Memory: 16GB peak
+2026-05-03 21:52:59 BST - INFO -    Tokens: 3,476 (3,362 prompt + 114 gen) | Speed: 38.1 gen/s, 1,542 prompt/s
+2026-05-03 21:52:59 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:52:59 BST - INFO - 
+2026-05-03 21:52:59 BST - INFO - Processing Model [52/53]: mlx-community/pixtral-12b-bf16
+2026-05-03 21:52:59 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:52:59 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/pixtral-12b-bf16
+2026-05-03 21:53:10 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/pixtral-12b-bf16
+2026-05-03 21:53:10 BST - DEBUG - Cleaned up resources for model mlx-community/pixtral-12b-bf16
+2026-05-03 21:53:10 BST - DEBUG - Quality analysis for mlx-community/pixtral-12b-bf16: title_words=5, description_sentences=2, keywords=17, keyword_dup=0.00, words=65
+2026-05-03 21:53:10 BST - DEBUG - 
+2026-05-03 21:53:10 BST - DEBUG - === CANONICAL REVIEW: mlx-community/pixtral-12b-bf16 ===
+2026-05-03 21:53:10 BST - DEBUG - Verdict: clean | user=recommended
+2026-05-03 21:53:10 BST - DEBUG - Why: nontext prompt burden=86% | missing terms: 10 Best (structured), Bird, Mooring, view, historic
+2026-05-03 21:53:10 BST - DEBUG - Trusted hints: preserves trusted hints
+2026-05-03 21:53:10 BST - DEBUG - Contract: ok
+2026-05-03 21:53:10 BST - DEBUG - Utility: user=recommended | preserves trusted hints
+2026-05-03 21:53:10 BST - DEBUG - Stack / owner: owner=model
+2026-05-03 21:53:10 BST - DEBUG - Token accounting: prompt=3362 | text_est=483 | nontext_est=2879 | gen=112 | max=500 | stop=completed
+2026-05-03 21:53:10 BST - DEBUG - Next action: Treat as a model limitation for this prompt; trusted hint coverage is still weak.
+2026-05-03 21:53:10 BST - DEBUG - Full output:
+Title:
+Moored Boats at Woodbridge Quay
+
+Description:
+Traditional boats, including a large sailing barge, are moored on the River Deben at low tide. In the background, the Woodbridge Tide Mill Museum and an adjacent building under renovation are visible on a sunny day.
+
+Keywords:
+Barge, Boat, Blue sky, Gull, Marina, Moored, Mudflats, Museum, Pier, Quay, Rigging, River, Sailing Barge, Sailing Boat, Suffolk, Tide Mill, Woodbridge
+2026-05-03 21:53:10 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/pixtral-12b-bf16 ===
+2026-05-03 21:53:10 BST - INFO - [RUN 52/53] SUMMARY model=mlx-community/pixtral-12b-bf16 status=OK quality=clean
+2026-05-03 21:53:10 BST - INFO - 
+2026-05-03 21:53:10 BST - INFO - Generated Text:
+2026-05-03 21:53:10 BST - INFO -    Title:
+2026-05-03 21:53:10 BST - INFO -    Moored Boats at Woodbridge Quay
+2026-05-03 21:53:10 BST - INFO - 
+2026-05-03 21:53:10 BST - INFO -    Description:
+2026-05-03 21:53:10 BST - INFO -    Traditional boats, including a large sailing barge, are moored on the River Deben at low tide. In
+2026-05-03 21:53:10 BST - INFO -    the background, the Woodbridge Tide Mill Museum and an adjacent building under renovation are
+2026-05-03 21:53:10 BST - INFO -    visible on a sunny day.
+2026-05-03 21:53:10 BST - INFO - 
+2026-05-03 21:53:10 BST - INFO -    Keywords:
+2026-05-03 21:53:10 BST - INFO -    Barge, Boat, Blue sky, Gull, Marina, Moored, Mudflats, Museum, Pier, Quay, Rigging, River,
+2026-05-03 21:53:10 BST - INFO -    Sailing Barge, Sailing Boat, Suffolk, Tide Mill, Woodbridge
+2026-05-03 21:53:10 BST - INFO - 
+2026-05-03 21:53:10 BST - INFO - 📊 Timing: 10.64s total (gen=7.81s, load=2.58s, prep=0.00s, first=1.80s) | Memory: 28GB peak
+2026-05-03 21:53:10 BST - INFO -    Tokens: 3,474 (3,362 prompt + 112 gen) | Speed: 20.1 gen/s, 1,866 prompt/s
+2026-05-03 21:53:10 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:53:10 BST - INFO - 
+2026-05-03 21:53:10 BST - INFO - Processing Model [53/53]: qnguyen3/nanoLLaVA
+2026-05-03 21:53:10 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:53:10 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for qnguyen3/nanoLLaVA
+2026-05-03 21:53:11 BST - DEBUG - Legacy snapshot note for qnguyen3/nanoLLaVA: processor config missing from snapshot (preprocessor_config.json, processor_config.json).
+2026-05-03 21:53:12 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for qnguyen3/nanoLLaVA
+2026-05-03 21:53:12 BST - DEBUG - Cleaned up resources for model qnguyen3/nanoLLaVA
+2026-05-03 21:53:12 BST - DEBUG - Quality analysis for qnguyen3/nanoLLaVA: missing_sections=keywords, title_words=10, description_sentences=3, context_echo=True (0.66), metadata_borrowing=True, verdict=model_shortcoming, user_bucket=avoid, words=61
+2026-05-03 21:53:12 BST - INFO - Quality issues detected for qnguyen3/nanoLLaVA: missing-sections(keywords), description-sentences(3), context-echo(0.66), metadata-borrowing
+2026-05-03 21:53:12 BST - DEBUG - 
+2026-05-03 21:53:12 BST - DEBUG - === CANONICAL REVIEW: qnguyen3/nanoLLaVA ===
+2026-05-03 21:53:12 BST - DEBUG - Verdict: model_shortcoming | user=avoid
+2026-05-03 21:53:12 BST - DEBUG - Why: missing sections: keywords | missing terms: 10 Best (structured), Bird, Blue sky, Gull, Marina | context echo=66% | nonvisual metadata reused
+2026-05-03 21:53:12 BST - DEBUG - Trusted hints: preserves trusted hints | nonvisual metadata reused
+2026-05-03 21:53:12 BST - DEBUG - Contract: missing: keywords | description sentences=3
+2026-05-03 21:53:12 BST - DEBUG - Utility: user=avoid | preserves trusted hints | metadata borrowing | context echo
+2026-05-03 21:53:12 BST - DEBUG - Stack / owner: owner=model
+2026-05-03 21:53:12 BST - DEBUG - Token accounting: prompt=579 | text_est=483 | nontext_est=96 | gen=92 | max=500 | stop=completed
+2026-05-03 21:53:12 BST - DEBUG - Next action: Treat as a model limitation for this prompt; the requested output contract is not being met.
+2026-05-03 21:53:12 BST - DEBUG - Full output:
+Title: 5-10 years of historic quayside in Woodbridge, Suffolk, England
+Description: A view of the historic quayside at Woodbridge, Suffolk, England, on a sunny day. Traditional boats, including a large sailing barge, are moored on the River Deben at low tide. In the background is the landmark Woodbridge Tide Mill Museum, while an adjacent building is covered in scaffolding for renovation work.
+2026-05-03 21:53:12 BST - DEBUG - === END CANONICAL REVIEW: qnguyen3/nanoLLaVA ===
+2026-05-03 21:53:12 BST - INFO - [RUN 53/53] SUMMARY model=qnguyen3/nanoLLaVA status=OK
+2026-05-03 21:53:12 BST - INFO - quality=context_echo+description_length+metadata_borrowing+missing_sections
+2026-05-03 21:53:12 BST - INFO - 
+2026-05-03 21:53:12 BST - INFO - Generated Text:
+2026-05-03 21:53:12 BST - INFO -    Title: 5-10 years of historic quayside in Woodbridge, Suffolk, England
+2026-05-03 21:53:12 BST - INFO -    Description: A view of the historic quayside at Woodbridge, Suffolk, England, on a sunny day.
+2026-05-03 21:53:12 BST - INFO -    Traditional boats, including a large sailing barge, are moored on the River Deben at low tide. In
+2026-05-03 21:53:12 BST - INFO -    the background is the landmark Woodbridge Tide Mill Museum, while an adjacent building is covered
+2026-05-03 21:53:12 BST - INFO -    in scaffolding for renovation work.
+2026-05-03 21:53:12 BST - INFO - 
+2026-05-03 21:53:12 BST - INFO - 📊 Timing: 2.12s total (gen=1.36s, load=0.52s, prep=0.00s, first=0.11s) | Memory: 4.9GB peak
+2026-05-03 21:53:12 BST - INFO -    Tokens: 671 (579 prompt + 92 gen) | Speed: 112 gen/s, 5,231 prompt/s
+2026-05-03 21:53:12 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:53:12 BST - INFO - Performance Summary
+2026-05-03 21:53:12 BST - INFO - ╭──────────┬──────────┬──────────┬────────┬────────┬──────┬──────┬───────────┬────────┬─────────┬──────────┬───────────╮
+2026-05-03 21:53:12 BST - INFO - │          │          │ Generati │        │        │      │      │ Generatio │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ Model    │   Prompt │       on │  Total │ Prompt │  Gen │ Peak │         n │   Load │   Total │ Quality  │     Error │
+2026-05-03 21:53:12 BST - INFO - │ Name     │ (tokens) │ (tokens) │ Tokens │    Tps │  TPS │ (GB) │       (s) │    (s) │     (s) │ Issues   │   Package │
+2026-05-03 21:53:12 BST - INFO - ├──────────┼──────────┼──────────┼────────┼────────┼──────┼──────┼───────────┼────────┼─────────┼──────────┼───────────┤
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │          │          │        │        │      │      │           │  0.17s │   1.17s │          │       mlx │
+2026-05-03 21:53:12 BST - INFO - │ unity/Ki │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mi-VL-A3 │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ B-Thinki │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ ng-8bit  │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │          │          │        │        │      │      │           │  2.32s │   3.81s │          │ model-con │
+2026-05-03 21:53:12 BST - INFO - │ unity/Mo │          │          │        │        │      │      │           │        │         │          │       fig │
+2026-05-03 21:53:12 BST - INFO - │ lmoPoint │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ -8B-fp16 │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │      579 │       85 │    664 │  5,499 │  318 │  2.8 │     0.81s │  0.47s │   1.55s │ missing- │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/na │          │          │        │        │      │      │           │        │         │ sections │           │
+2026-05-03 21:53:12 BST - INFO - │ noLLaVA- │          │          │        │        │      │      │           │        │         │ (keyword │           │
+2026-05-03 21:53:12 BST - INFO - │ 1.5-4bit │          │          │        │        │      │      │           │        │         │ s), ...  │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │      834 │      146 │    980 │  7,689 │  332 │  3.0 │     0.89s │  0.45s │   1.58s │ descript │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/LF │          │          │        │        │      │      │           │        │         │ ion-sent │           │
+2026-05-03 21:53:12 BST - INFO - │ M2-VL-1. │          │          │        │        │      │      │           │        │         │ ences(3) │           │
+2026-05-03 21:53:12 BST - INFO - │ 6B-8bit  │          │          │        │        │      │      │           │        │         │ , ...    │           │
+2026-05-03 21:53:12 BST - INFO - │ qnguyen3 │      579 │       92 │    671 │  5,231 │  112 │  4.9 │     1.36s │  0.52s │   2.12s │ missing- │           │
+2026-05-03 21:53:12 BST - INFO - │ /nanoLLa │          │          │        │        │      │      │           │        │         │ sections │           │
+2026-05-03 21:53:12 BST - INFO - │ VA       │          │          │        │        │      │      │           │        │         │ (keyword │           │
+2026-05-03 21:53:12 BST - INFO - │          │          │          │        │        │      │      │           │        │         │ s), ...  │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │      583 │      175 │    758 │  5,096 │  310 │  2.2 │     1.62s │  0.60s │   2.49s │ fabricat │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/Fa │          │          │        │        │      │      │           │        │         │ ion, ... │           │
+2026-05-03 21:53:12 BST - INFO - │ stVLM-0. │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ 5B-bf16  │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │    1,596 │       11 │  1,607 │  2,979 │ 18.4 │   11 │     1.64s │  1.73s │   3.67s │ ⚠️harnes │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/pa │          │          │        │        │      │      │           │        │         │ s(prompt │           │
+2026-05-03 21:53:12 BST - INFO - │ ligemma2 │          │          │        │        │      │      │           │        │         │ _templat │           │
+2026-05-03 21:53:12 BST - INFO - │ -3b-ft-d │          │          │        │        │      │      │           │        │         │ e), ...  │           │
+2026-05-03 21:53:12 BST - INFO - │ occi-448 │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ -bf16    │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │      844 │       91 │    935 │  1,654 │  114 │   17 │     1.72s │  2.32s │   4.31s │          │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/ge │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mma-4-26 │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ b-a4b-it │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ -4bit    │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │      691 │      150 │    841 │  2,023 │  134 │  5.5 │     2.00s │  0.67s │   2.94s │ descript │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/Sm │          │          │        │        │      │      │           │        │         │ ion-sent │           │
+2026-05-03 21:53:12 BST - INFO - │ olVLM2-2 │          │          │        │        │      │      │           │        │         │ ences(3) │           │
+2026-05-03 21:53:12 BST - INFO - │ .2B-Inst │          │          │        │        │      │      │           │        │         │ , ...    │           │
+2026-05-03 21:53:12 BST - INFO - │ ruct-mlx │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │    3,171 │      123 │  3,294 │  2,945 │  183 │  7.8 │     2.20s │  0.89s │   3.35s │ metadata │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/Mi │          │          │        │        │      │      │           │        │         │ -borrowi │           │
+2026-05-03 21:53:12 BST - INFO - │ nistral- │          │          │        │        │      │      │           │        │         │ ng, ...  │           │
+2026-05-03 21:53:12 BST - INFO - │ 3-3B-Ins │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ truct-25 │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ 12-4bit  │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │    1,596 │       20 │  1,616 │  1,223 │ 26.5 │   12 │     2.52s │  1.76s │   4.54s │ missing- │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/pa │          │          │        │        │      │      │           │        │         │ sections │           │
+2026-05-03 21:53:12 BST - INFO - │ ligemma2 │          │          │        │        │      │      │           │        │         │ (title+d │           │
+2026-05-03 21:53:12 BST - INFO - │ -10b-ft- │          │          │        │        │      │      │           │        │         │ esc...   │           │
+2026-05-03 21:53:12 BST - INFO - │ docci-44 │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ 8-6bit   │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ HuggingF │    1,790 │      254 │  2,044 │  4,235 │  127 │  5.7 │     2.96s │  0.60s │   3.80s │ missing- │           │
+2026-05-03 21:53:12 BST - INFO - │ aceTB/Sm │          │          │        │        │      │      │           │        │         │ sections │           │
+2026-05-03 21:53:12 BST - INFO - │ olVLM-In │          │          │        │        │      │      │           │        │         │ (title), │           │
+2026-05-03 21:53:12 BST - INFO - │ struct   │          │          │        │        │      │      │           │        │         │  ...     │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │    1,790 │      254 │  2,044 │  4,301 │  126 │  5.7 │     2.97s │  0.59s │   3.81s │ missing- │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/Sm │          │          │        │        │      │      │           │        │         │ sections │           │
+2026-05-03 21:53:12 BST - INFO - │ olVLM-In │          │          │        │        │      │      │           │        │         │ (title), │           │
+2026-05-03 21:53:12 BST - INFO - │ struct-b │          │          │        │        │      │      │           │        │         │  ...     │           │
+2026-05-03 21:53:12 BST - INFO - │ f16      │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │      644 │      500 │  1,144 │ 11,069 │  193 │  3.7 │     3.00s │  0.52s │   3.76s │ repetiti │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/LF │          │          │        │        │      │      │           │        │         │ ve(phras │           │
+2026-05-03 21:53:12 BST - INFO - │ M2.5-VL- │          │          │        │        │      │      │           │        │         │ e:       │           │
+2026-05-03 21:53:12 BST - INFO - │ 1.6B-bf1 │          │          │        │        │      │      │           │        │         │ "scaffol │           │
+2026-05-03 21:53:12 BST - INFO - │ 6        │          │          │        │        │      │      │           │        │         │ ...      │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │    2,790 │        8 │  2,798 │  1,012 │ 59.1 │  9.7 │     3.47s │  0.91s │   4.63s │ ⚠️harnes │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/ll │          │          │        │        │      │      │           │        │         │ s(prompt │           │
+2026-05-03 21:53:12 BST - INFO - │ ava-v1.6 │          │          │        │        │      │      │           │        │         │ _templat │           │
+2026-05-03 21:53:12 BST - INFO - │ -mistral │          │          │        │        │      │      │           │        │         │ e), ...  │           │
+2026-05-03 21:53:12 BST - INFO - │ -7b-8bit │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │    2,362 │      105 │  2,467 │  2,487 │ 34.8 │   18 │     4.48s │  1.73s │   6.46s │ metadata │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/In │          │          │        │        │      │      │           │        │         │ -borrowi │           │
+2026-05-03 21:53:12 BST - INFO - │ ternVL3- │          │          │        │        │      │      │           │        │         │ ng       │           │
+2026-05-03 21:53:12 BST - INFO - │ 8B-bf16  │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │    1,407 │      195 │  1,602 │  3,525 │ 50.3 │  9.6 │     4.64s │  0.85s │   5.74s │ descript │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/Ph │          │          │        │        │      │      │           │        │         │ ion-sent │           │
+2026-05-03 21:53:12 BST - INFO - │ i-3.5-vi │          │          │        │        │      │      │           │        │         │ ences(3) │           │
+2026-05-03 21:53:12 BST - INFO - │ sion-ins │          │          │        │        │      │      │           │        │         │ , ...    │           │
+2026-05-03 21:53:12 BST - INFO - │ truct-bf │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ 16       │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │    3,172 │      112 │  3,284 │  1,267 │ 65.5 │   13 │     4.66s │  1.29s │   6.21s │ trusted- │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/Mi │          │          │        │        │      │      │           │        │         │ hints-de │           │
+2026-05-03 21:53:12 BST - INFO - │ nistral- │          │          │        │        │      │      │           │        │         │ graded   │           │
+2026-05-03 21:53:12 BST - INFO - │ 3-14B-In │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ struct-2 │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ 512-mxfp │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ 4        │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │      830 │      500 │  1,330 │  2,562 │  121 │  6.0 │     4.84s │  1.40s │   6.49s │ repetiti │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/ge │          │          │        │        │      │      │           │        │         │ ve(16:34 │           │
+2026-05-03 21:53:12 BST - INFO - │ mma-3n-E │          │          │        │        │      │      │           │        │         │ :07:),   │           │
+2026-05-03 21:53:12 BST - INFO - │ 2B-4bit  │          │          │        │        │      │      │           │        │         │ ...      │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │      839 │       98 │    937 │    635 │ 31.4 │   19 │     4.84s │  2.31s │   7.40s │          │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/ge │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mma-3-27 │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ b-it-qat │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ -4bit    │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │    1,596 │       14 │  1,610 │    897 │ 5.07 │   27 │     5.03s │  2.74s │   8.07s │ ⚠️harnes │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/pa │          │          │        │        │      │      │           │        │         │ s(prompt │           │
+2026-05-03 21:53:12 BST - INFO - │ ligemma2 │          │          │        │        │      │      │           │        │         │ _templat │           │
+2026-05-03 21:53:12 BST - INFO - │ -10b-ft- │          │          │        │        │      │      │           │        │         │ e), ...  │           │
+2026-05-03 21:53:12 BST - INFO - │ docci-44 │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ 8-bf16   │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │    3,172 │      127 │  3,299 │  1,213 │ 63.3 │   13 │     5.07s │  1.39s │   6.72s │ metadata │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/Mi │          │          │        │        │      │      │           │        │         │ -borrowi │           │
+2026-05-03 21:53:12 BST - INFO - │ nistral- │          │          │        │        │      │      │           │        │         │ ng, ...  │           │
+2026-05-03 21:53:12 BST - INFO - │ 3-14B-In │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ struct-2 │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ 512-nvfp │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ 4        │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │    3,362 │      114 │  3,476 │  1,542 │ 38.1 │   16 │     5.64s │  1.71s │   7.66s │          │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/pi │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ xtral-12 │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ b-8bit   │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │    2,859 │      129 │  2,988 │  2,368 │ 32.3 │   19 │     5.72s │  2.13s │   8.11s │ descript │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/Id │          │          │        │        │      │      │           │        │         │ ion-sent │           │
+2026-05-03 21:53:12 BST - INFO - │ efics3-8 │          │          │        │        │      │      │           │        │         │ ences(3) │           │
+2026-05-03 21:53:12 BST - INFO - │ B-Llama3 │          │          │        │        │      │      │           │        │         │ , ...    │           │
+2026-05-03 21:53:12 BST - INFO - │ -bf16    │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │      844 │       95 │    939 │    461 │ 25.7 │   20 │     5.99s │  2.74s │   8.98s │ metadata │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/ge │          │          │        │        │      │      │           │        │         │ -borrowi │           │
+2026-05-03 21:53:12 BST - INFO - │ mma-4-31 │          │          │        │        │      │      │           │        │         │ ng       │           │
+2026-05-03 21:53:12 BST - INFO - │ b-it-4bi │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ t        │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │    2,362 │      119 │  2,481 │  1,306 │ 32.0 │   18 │     6.01s │  1.74s │   8.01s │ title-le │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/In │          │          │        │        │      │      │           │        │         │ ngth(3), │           │
+2026-05-03 21:53:12 BST - INFO - │ ternVL3- │          │          │        │        │      │      │           │        │         │  ...     │           │
+2026-05-03 21:53:12 BST - INFO - │ 14B-8bit │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │      838 │      336 │  1,174 │  1,876 │ 48.8 │   17 │     7.71s │  2.22s │  10.19s │ fabricat │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/ge │          │          │        │        │      │      │           │        │         │ ion, ... │           │
+2026-05-03 21:53:12 BST - INFO - │ mma-3n-E │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ 4B-it-bf │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ 16       │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │    3,362 │      112 │  3,474 │  1,866 │ 20.1 │   28 │     7.81s │  2.58s │  10.64s │          │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/pi │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ xtral-12 │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ b-bf16   │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │      839 │      106 │    945 │    562 │ 17.6 │   33 │     7.91s │  3.36s │  11.52s │ metadata │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/ge │          │          │        │        │      │      │           │        │         │ -borrowi │           │
+2026-05-03 21:53:12 BST - INFO - │ mma-3-27 │          │          │        │        │      │      │           │        │         │ ng       │           │
+2026-05-03 21:53:12 BST - INFO - │ b-it-qat │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ -8bit    │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │    2,674 │       97 │  2,771 │    666 │ 28.2 │   22 │     7.94s │  2.13s │  10.32s │ ⚠️harnes │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/De │          │          │        │        │      │      │           │        │         │ s(encodi │           │
+2026-05-03 21:53:12 BST - INFO - │ vstral-S │          │          │        │        │      │      │           │        │         │ ng), ... │           │
+2026-05-03 21:53:12 BST - INFO - │ mall-2-2 │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ 4B-Instr │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ uct-2512 │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ -5bit    │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ jqlive/K │    1,570 │      500 │  2,070 │  1,620 │ 69.1 │   18 │     8.72s │  1.90s │  10.85s │ missing- │           │
+2026-05-03 21:53:12 BST - INFO - │ imi-VL-A │          │          │        │        │      │      │           │        │         │ sections │           │
+2026-05-03 21:53:12 BST - INFO - │ 3B-Think │          │          │        │        │      │      │           │        │         │ (title+d │           │
+2026-05-03 21:53:12 BST - INFO - │ ing-2506 │          │          │        │        │      │      │           │        │         │ esc...   │           │
+2026-05-03 21:53:12 BST - INFO - │ -6bit    │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ microsof │    1,407 │      500 │  1,907 │  3,863 │ 56.5 │  9.5 │     9.57s │  0.89s │  10.70s │ ⚠️harnes │           │
+2026-05-03 21:53:12 BST - INFO - │ t/Phi-3. │          │          │        │        │      │      │           │        │         │ s(stop_t │           │
+2026-05-03 21:53:12 BST - INFO - │ 5-vision │          │          │        │        │      │      │           │        │         │ oken),   │           │
+2026-05-03 21:53:12 BST - INFO - │ -instruc │          │          │        │        │      │      │           │        │         │ ...      │           │
+2026-05-03 21:53:12 BST - INFO - │ t        │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │    4,668 │      500 │  5,168 │  3,490 │ 37.4 │  4.6 │    15.42s │  1.42s │  17.13s │ repetiti │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/pa │          │          │        │        │      │      │           │        │         │ ve(phras │           │
+2026-05-03 21:53:12 BST - INFO - │ ligemma2 │          │          │        │        │      │      │           │        │         │ e: "-    │           │
+2026-05-03 21:53:12 BST - INFO - │ -3b-pt-8 │          │          │        │        │      │      │           │        │         │ outpu... │           │
+2026-05-03 21:53:12 BST - INFO - │ 96-4bit  │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │    6,693 │      500 │  7,193 │    918 │ 61.4 │  8.4 │    15.89s │  1.41s │  17.60s │ missing- │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/GL │          │          │        │        │      │      │           │        │         │ sections │           │
+2026-05-03 21:53:12 BST - INFO - │ M-4.6V-F │          │          │        │        │      │      │           │        │         │ (title+d │           │
+2026-05-03 21:53:12 BST - INFO - │ lash-mxf │          │          │        │        │      │      │           │        │         │ esc...   │           │
+2026-05-03 21:53:12 BST - INFO - │ p4       │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │    3,453 │      500 │  3,953 │  1,375 │ 37.9 │   15 │    16.16s │  1.60s │  18.00s │ missing- │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/Ap │          │          │        │        │      │      │           │        │         │ sections │           │
+2026-05-03 21:53:12 BST - INFO - │ riel-1.5 │          │          │        │        │      │      │           │        │         │ (title), │           │
+2026-05-03 21:53:12 BST - INFO - │ -15b-Thi │          │          │        │        │      │      │           │        │         │  ...     │           │
+2026-05-03 21:53:12 BST - INFO - │ nker-6bi │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ t-MLX    │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │      832 │       86 │    918 │    209 │ 7.36 │   65 │    16.16s │  6.45s │  22.87s │ missing- │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/ge │          │          │        │        │      │      │           │        │         │ sections │           │
+2026-05-03 21:53:12 BST - INFO - │ mma-4-31 │          │          │        │        │      │      │           │        │         │ (title+d │           │
+2026-05-03 21:53:12 BST - INFO - │ b-bf16   │          │          │        │        │      │      │           │        │         │ esc...   │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │      548 │      235 │    783 │    258 │ 16.9 │   15 │    16.38s │  1.48s │  18.11s │ missing- │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/Ll │          │          │        │        │      │      │           │        │         │ sections │           │
+2026-05-03 21:53:12 BST - INFO - │ ama-3.2- │          │          │        │        │      │      │           │        │         │ (title+d │           │
+2026-05-03 21:53:12 BST - INFO - │ 11B-Visi │          │          │        │        │      │      │           │        │         │ esc...   │           │
+2026-05-03 21:53:12 BST - INFO - │ on-Instr │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ uct-8bit │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │    6,693 │      500 │  7,193 │    983 │ 47.4 │   11 │    17.77s │  1.42s │  19.44s │ missing- │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/GL │          │          │        │        │      │      │           │        │         │ sections │           │
+2026-05-03 21:53:12 BST - INFO - │ M-4.6V-F │          │          │        │        │      │      │           │        │         │ (title+d │           │
+2026-05-03 21:53:12 BST - INFO - │ lash-6bi │          │          │        │        │      │      │           │        │         │ esc...   │           │
+2026-05-03 21:53:12 BST - INFO - │ t        │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │    1,896 │      500 │  2,396 │    251 │ 48.7 │   60 │    18.67s │ 11.28s │  30.38s │ missing- │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/ER │          │          │        │        │      │      │           │        │         │ sections │           │
+2026-05-03 21:53:12 BST - INFO - │ NIE-4.5- │          │          │        │        │      │      │           │        │         │ (title+d │           │
+2026-05-03 21:53:12 BST - INFO - │ VL-28B-A │          │          │        │        │      │      │           │        │         │ esc...   │           │
+2026-05-03 21:53:12 BST - INFO - │ 3B-Think │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ ing-bf16 │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │    1,758 │      235 │  1,993 │   95.7 │ 50.7 │   41 │    23.80s │  1.60s │  25.66s │ descript │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/Mo │          │          │        │        │      │      │           │        │         │ ion-sent │           │
+2026-05-03 21:53:12 BST - INFO - │ lmo-7B-D │          │          │        │        │      │      │           │        │         │ ences(3) │           │
+2026-05-03 21:53:12 BST - INFO - │ -0924-8b │          │          │        │        │      │      │           │        │         │ , ...    │           │
+2026-05-03 21:53:12 BST - INFO - │ it       │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ meta-lla │      549 │      114 │    663 │    279 │ 5.04 │   25 │    24.97s │  2.31s │  27.52s │ missing- │           │
+2026-05-03 21:53:12 BST - INFO - │ ma/Llama │          │          │        │        │      │      │           │        │         │ sections │           │
+2026-05-03 21:53:12 BST - INFO - │ -3.2-11B │          │          │        │        │      │      │           │        │         │ (title+d │           │
+2026-05-03 21:53:12 BST - INFO - │ -Vision- │          │          │        │        │      │      │           │        │         │ esc...   │           │
+2026-05-03 21:53:12 BST - INFO - │ Instruct │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │   16,807 │      500 │ 17,307 │  1,049 │ 55.4 │   13 │    25.69s │  1.17s │  27.10s │ ⚠️harnes │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/X- │          │          │        │        │      │      │           │        │         │ s(long_c │           │
+2026-05-03 21:53:12 BST - INFO - │ Reasoner │          │          │        │        │      │      │           │        │         │ ontext), │           │
+2026-05-03 21:53:12 BST - INFO - │ -7B-8bit │          │          │        │        │      │      │           │        │         │  ...     │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │    1,758 │      500 │  2,258 │   92.5 │ 29.1 │   48 │    36.92s │  1.76s │  38.97s │ repetiti │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/Mo │          │          │        │        │      │      │           │        │         │ ve(phras │           │
+2026-05-03 21:53:12 BST - INFO - │ lmo-7B-D │          │          │        │        │      │      │           │        │         │ e:       │           │
+2026-05-03 21:53:12 BST - INFO - │ -0924-bf │          │          │        │        │      │      │           │        │         │ "white   │           │
+2026-05-03 21:53:12 BST - INFO - │ 16       │          │          │        │        │      │      │           │        │         │ b...     │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │    6,693 │      500 │  7,193 │    309 │ 33.0 │   78 │    37.30s │  9.94s │  47.52s │ missing- │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/GL │          │          │        │        │      │      │           │        │         │ sections │           │
+2026-05-03 21:53:12 BST - INFO - │ M-4.6V-n │          │          │        │        │      │      │           │        │         │ (title+d │           │
+2026-05-03 21:53:12 BST - INFO - │ vfp4     │          │          │        │        │      │      │           │        │         │ esc...   │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │   16,821 │      500 │ 17,321 │    312 │  104 │   26 │    59.34s │  2.52s │  62.11s │ missing- │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/Qw │          │          │        │        │      │      │           │        │         │ sections │           │
+2026-05-03 21:53:12 BST - INFO - │ en3.5-35 │          │          │        │        │      │      │           │        │         │ (title+d │           │
+2026-05-03 21:53:12 BST - INFO - │ B-A3B-4b │          │          │        │        │      │      │           │        │         │ esc...   │           │
+2026-05-03 21:53:12 BST - INFO - │ it       │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │   16,821 │      500 │ 17,321 │    317 │ 87.0 │   35 │    59.51s │  3.12s │  62.87s │ missing- │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/Qw │          │          │        │        │      │      │           │        │         │ sections │           │
+2026-05-03 21:53:12 BST - INFO - │ en3.5-35 │          │          │        │        │      │      │           │        │         │ (title+d │           │
+2026-05-03 21:53:12 BST - INFO - │ B-A3B-6b │          │          │        │        │      │      │           │        │         │ esc...   │           │
+2026-05-03 21:53:12 BST - INFO - │ it       │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │   16,821 │      500 │ 17,321 │    310 │ 89.3 │   12 │    60.55s │  1.42s │  62.24s │ missing- │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/Qw │          │          │        │        │      │      │           │        │         │ sections │           │
+2026-05-03 21:53:12 BST - INFO - │ en3.5-9B │          │          │        │        │      │      │           │        │         │ (title+d │           │
+2026-05-03 21:53:12 BST - INFO - │ -MLX-4bi │          │          │        │        │      │      │           │        │         │ esc...   │           │
+2026-05-03 21:53:12 BST - INFO - │ t        │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │   16,821 │      500 │ 17,321 │    265 │ 57.5 │   76 │    72.87s │ 11.75s │  84.87s │ missing- │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/Qw │          │          │        │        │      │      │           │        │         │ sections │           │
+2026-05-03 21:53:12 BST - INFO - │ en3.5-35 │          │          │        │        │      │      │           │        │         │ (title+d │           │
+2026-05-03 21:53:12 BST - INFO - │ B-A3B-bf │          │          │        │        │      │      │           │        │         │ esc...   │           │
+2026-05-03 21:53:12 BST - INFO - │ 16       │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │   16,807 │        6 │ 16,813 │    217 │  197 │  5.1 │    78.17s │  0.58s │  79.03s │ ⚠️harnes │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/Qw │          │          │        │        │      │      │           │        │         │ s(stop_t │           │
+2026-05-03 21:53:12 BST - INFO - │ en2-VL-2 │          │          │        │        │      │      │           │        │         │ oken),   │           │
+2026-05-03 21:53:12 BST - INFO - │ B-Instru │          │          │        │        │      │      │           │        │         │ ...      │           │
+2026-05-03 21:53:12 BST - INFO - │ ct-4bit  │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │   16,821 │      500 │ 17,321 │    238 │ 17.8 │   39 │    99.36s │  3.04s │ 102.66s │ degenera │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/Qw │          │          │        │        │      │      │           │        │         │ tion,    │           │
+2026-05-03 21:53:12 BST - INFO - │ en3.6-27 │          │          │        │        │      │      │           │        │         │ ...      │           │
+2026-05-03 21:53:12 BST - INFO - │ B-mxfp8  │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │   16,821 │      500 │ 17,321 │    194 │ 24.8 │   26 │   107.68s │  2.17s │ 110.12s │ degenera │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/Qw │          │          │        │        │      │      │           │        │         │ tion,    │           │
+2026-05-03 21:53:12 BST - INFO - │ en3.5-27 │          │          │        │        │      │      │           │        │         │ fabricat │           │
+2026-05-03 21:53:12 BST - INFO - │ B-4bit   │          │          │        │        │      │      │           │        │         │ ion, ... │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │    1,570 │      500 │  2,070 │  1,056 │ 4.72 │   39 │   108.06s │  3.28s │ 111.59s │ missing- │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/Ki │          │          │        │        │      │      │           │        │         │ sections │           │
+2026-05-03 21:53:12 BST - INFO - │ mi-VL-A3 │          │          │        │        │      │      │           │        │         │ (title+d │           │
+2026-05-03 21:53:12 BST - INFO - │ B-Thinki │          │          │        │        │      │      │           │        │         │ esc...   │           │
+2026-05-03 21:53:12 BST - INFO - │ ng-2506- │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ bf16     │          │          │        │        │      │      │           │        │         │          │           │
+2026-05-03 21:53:12 BST - INFO - │ mlx-comm │   16,821 │      500 │ 17,321 │    202 │ 17.6 │   39 │   112.54s │  3.15s │ 115.96s │ keyword- │           │
+2026-05-03 21:53:12 BST - INFO - │ unity/Qw │          │          │        │        │      │      │           │        │         │ count(21 │           │
+2026-05-03 21:53:12 BST - INFO - │ en3.5-27 │          │          │        │        │      │      │           │        │         │ ),       │           │
+2026-05-03 21:53:12 BST - INFO - │ B-mxfp8  │          │          │        │        │      │      │           │        │         │ cutoff,  │           │
+2026-05-03 21:53:12 BST - INFO - │          │          │          │        │        │      │      │           │        │         │ ...      │           │
+2026-05-03 21:53:12 BST - INFO - ╰──────────┴──────────┴──────────┴────────┴────────┴──────┴──────┴───────────┴────────┴─────────┴──────────┴───────────╯
+2026-05-03 21:53:12 BST - INFO - 
+2026-05-03 21:53:12 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:53:12 BST - INFO - Results Summary
+2026-05-03 21:53:12 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:53:12 BST - INFO - 🏆 Performance Highlights:
+2026-05-03 21:53:12 BST - INFO -    Fastest: mlx-community/LFM2-VL-1.6B-8bit (331.7 tps)
+2026-05-03 21:53:12 BST - INFO -    💾 Most efficient: mlx-community/FastVLM-0.5B-bf16 (2.2 GB)
+2026-05-03 21:53:12 BST - INFO -    ⚡ Fastest load: mlx-community/LFM2-VL-1.6B-8bit (0.45s)
+2026-05-03 21:53:12 BST - INFO -    📊 Average TPS: 75.0 across 51 models
+2026-05-03 21:53:12 BST - INFO - 
+2026-05-03 21:53:12 BST - INFO - 📈 Resource Usage:
+2026-05-03 21:53:12 BST - INFO -    Total peak memory: 1078.0 GB
+2026-05-03 21:53:12 BST - INFO -    Average peak memory: 21.1 GB
+2026-05-03 21:53:12 BST - INFO -    Memory efficiency: 235 tokens/GB
+2026-05-03 21:53:12 BST - INFO - 
+2026-05-03 21:53:12 BST - INFO - 🧪 Quality Signal Frequency:
+2026-05-03 21:53:12 BST - INFO -    metadata_borrowing=29, missing_sections=29, cutoff=19, keyword_count=14, description_length=13, context_ignored=11
+2026-05-03 21:53:12 BST - INFO -    Clean outputs: 4/51
+2026-05-03 21:53:12 BST - INFO - 
+2026-05-03 21:53:12 BST - INFO - 📚 Cataloging Utility Snapshot:
+2026-05-03 21:53:12 BST - INFO -    Avg score: 59/100 | A/B=23, C=11, D/F=17
+2026-05-03 21:53:12 BST - INFO -    Metadata baseline: ✅ B 74/100
+2026-05-03 21:53:12 BST - INFO -    Vs metadata: Avg Δ -15 | better=14, neutral=4, worse=33
+2026-05-03 21:53:12 BST - INFO -    Best description: mlx-community/gemma-4-26b-a4b-it-4bit (100/100)
+2026-05-03 21:53:12 BST - INFO -    Best keywording: mlx-community/gemma-3-27b-it-qat-4bit (86/100)
+2026-05-03 21:53:12 BST - INFO -    Useful now (top 2):
+2026-05-03 21:53:12 BST - INFO -    - mlx-community/gemma-4-26b-a4b-it-4bit: A 86/100 (Δ+12, 113.9 tps)
+2026-05-03 21:53:12 BST - INFO -    - mlx-community/gemma-3-27b-it-qat-4bit: A 85/100 (Δ+11, 31.4 tps)
+2026-05-03 21:53:12 BST - INFO -    Watchlist (top 5):
+2026-05-03 21:53:12 BST - INFO -    - mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit: F 6/100 (harness,missing_sections)
+2026-05-03 21:53:12 BST - INFO -    - mlx-community/Qwen2-VL-2B-Instruct-4bit: F 6/100 (context_ignored,hallucination,harness)
+2026-05-03 21:53:12 BST - INFO -    - mlx-community/llava-v1.6-mistral-7b-8bit: F 11/100 (context_ignored,harness)
+2026-05-03 21:53:12 BST - INFO -    - mlx-community/paligemma2-10b-ft-docci-448-bf16: F 18/100 (context_ignored,harness,missing_sections)
+2026-05-03 21:53:12 BST - INFO -    - mlx-community/paligemma2-3b-ft-docci-448-bf16: F 32/100 (context_ignored,harness,missing_sections)
+2026-05-03 21:53:12 BST - INFO - 
+2026-05-03 21:53:12 BST - INFO - ❌ Failed Models (2):
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/Kimi-VL-A3B-Thinking-8bit (Model Error -> mlx) [model_load] {MLX_MODEL_LOAD_MODEL}
+2026-05-03 21:53:12 BST - INFO -     -> owner≈mlx core/runtime (memory, tensor ops, Metal backend) | component=model + weights loading | likely=model runtime failure in generation path
+2026-05-03 21:53:12 BST - INFO -     -> symptom: Received N parameters not in model:
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/MolmoPoint-8B-fp16 (Processor Error -> model-config) [processor_load] {MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR}
+2026-05-03 21:53:12 BST - INFO -     -> owner≈model repository/config artifacts (not core runtime) | component=processor/image-processor initialization | likely=processor construction/processor config incompatibility
+2026-05-03 21:53:12 BST - INFO -     -> symptom: Loaded processor has no image_processor; expected multimodal processor.
+2026-05-03 21:53:12 BST - INFO -    By package: mlx=1, model-config=1
+2026-05-03 21:53:12 BST - INFO -    By stage: Model Error=1, Processor Error=1
+2026-05-03 21:53:12 BST - INFO - 
+2026-05-03 21:53:12 BST - INFO - 📋 Model Comparison (current run):
+2026-05-03 21:53:12 BST - INFO -    ╭────┬────────────────────────────────┬────────┬───────┬──────────┬─────────┬────────┬─────────────────────────────────╮
+2026-05-03 21:53:12 BST - INFO -    │  # │ Model                          │ Status │   TPS │ Total(s) │ Load(s) │ PeakGB │ Notes                           │
+2026-05-03 21:53:12 BST - INFO -    ├────┼────────────────────────────────┼────────┼───────┼──────────┼─────────┼────────┼─────────────────────────────────┤
+2026-05-03 21:53:12 BST - INFO -    │  1 │ LFM2-VL-1.6B-8bit              │ OK     │ 331.7 │     1.58 │    0.45 │   2.97 │ description-sentences(3), ...   │
+2026-05-03 21:53:12 BST - INFO -    │  2 │ nanoLLaVA-1.5-4bit             │ OK     │ 318.3 │     1.55 │    0.47 │   2.76 │ missing-sections(keywords), ... │
+2026-05-03 21:53:12 BST - INFO -    │  3 │ FastVLM-0.5B-bf16              │ OK     │ 310.0 │     2.49 │    0.60 │   2.17 │ fabrication, ...                │
+2026-05-03 21:53:12 BST - INFO -    │  4 │ Qwen2-VL-2B-Instruct-4bit      │ OK     │ 196.5 │    79.03 │    0.58 │   5.06 │ ⚠️harness(stop_token),          │
+2026-05-03 21:53:12 BST - INFO -    │    │                                │        │       │          │         │        │ lang_mixing, ...                │
+2026-05-03 21:53:12 BST - INFO -    │  5 │ LFM2.5-VL-1.6B-bf16            │ OK     │ 193.0 │     3.76 │    0.52 │   3.70 │ repetitive(phrase:              │
+2026-05-03 21:53:12 BST - INFO -    │    │                                │        │       │          │         │        │ "scaffolding...                 │
+2026-05-03 21:53:12 BST - INFO -    │  6 │ Ministral-3-3B-Instruct-2512-. │ OK     │ 182.6 │     3.35 │    0.89 │   7.80 │ metadata-borrowing,             │
+2026-05-03 21:53:12 BST - INFO -    │    │ ..                             │        │       │          │         │        │ context-budget                  │
+2026-05-03 21:53:12 BST - INFO -    │  7 │ SmolVLM2-2.2B-Instruct-mlx     │ OK     │ 134.2 │     2.94 │    0.67 │   5.48 │ description-sentences(3), ...   │
+2026-05-03 21:53:12 BST - INFO -    │  8 │ SmolVLM-Instruct               │ OK     │ 127.1 │     3.80 │    0.60 │   5.65 │ missing-sections(title), ...    │
+2026-05-03 21:53:12 BST - INFO -    │  9 │ SmolVLM-Instruct-bf16          │ OK     │ 125.8 │     3.81 │    0.59 │   5.67 │ missing-sections(title), ...    │
+2026-05-03 21:53:12 BST - INFO -    │ 10 │ gemma-3n-E2B-4bit              │ OK     │ 121.0 │     6.49 │    1.40 │   6.03 │ repetitive(16:34:07:), ...      │
+2026-05-03 21:53:12 BST - INFO -    │ 11 │ gemma-4-26b-a4b-it-4bit        │ OK     │ 113.9 │     4.31 │    2.32 │  16.76 │ clean                           │
+2026-05-03 21:53:12 BST - INFO -    │ 12 │ nanoLLaVA                      │ OK     │ 112.5 │     2.12 │    0.52 │   4.87 │ missing-sections(keywords), ... │
+2026-05-03 21:53:12 BST - INFO -    │ 13 │ Qwen3.5-35B-A3B-4bit           │ OK     │ 104.5 │    62.11 │    2.52 │  26.31 │ missing-sections(title+descript │
+2026-05-03 21:53:12 BST - INFO -    │    │                                │        │       │          │         │        │ ...                             │
+2026-05-03 21:53:12 BST - INFO -    │ 14 │ Qwen3.5-9B-MLX-4bit            │ OK     │  89.3 │    62.24 │    1.42 │  11.67 │ missing-sections(title+descript │
+2026-05-03 21:53:12 BST - INFO -    │    │                                │        │       │          │         │        │ ...                             │
+2026-05-03 21:53:12 BST - INFO -    │ 15 │ Qwen3.5-35B-A3B-6bit           │ OK     │  87.0 │    62.87 │    3.12 │  34.97 │ missing-sections(title+descript │
+2026-05-03 21:53:12 BST - INFO -    │    │                                │        │       │          │         │        │ ...                             │
+2026-05-03 21:53:12 BST - INFO -    │ 16 │ Kimi-VL-A3B-Thinking-2506-6bit │ OK     │  69.1 │    10.85 │    1.90 │  17.99 │ missing-sections(title+descript │
+2026-05-03 21:53:12 BST - INFO -    │    │                                │        │       │          │         │        │ ...                             │
+2026-05-03 21:53:12 BST - INFO -    │ 17 │ Ministral-3-14B-Instruct-2512. │ OK     │  65.5 │     6.21 │    1.29 │  13.06 │ trusted-hints-degraded          │
+2026-05-03 21:53:12 BST - INFO -    │    │ ..                             │        │       │          │         │        │                                 │
+2026-05-03 21:53:12 BST - INFO -    │ 18 │ Ministral-3-14B-Instruct-2512. │ OK     │  63.3 │     6.72 │    1.39 │  13.48 │ metadata-borrowing,             │
+2026-05-03 21:53:12 BST - INFO -    │    │ ..                             │        │       │          │         │        │ context-budget                  │
+2026-05-03 21:53:12 BST - INFO -    │ 19 │ GLM-4.6V-Flash-mxfp4           │ OK     │  61.4 │    17.60 │    1.41 │   8.44 │ missing-sections(title+descript │
+2026-05-03 21:53:12 BST - INFO -    │    │                                │        │       │          │         │        │ ...                             │
+2026-05-03 21:53:12 BST - INFO -    │ 20 │ llava-v1.6-mistral-7b-8bit     │ OK     │  59.1 │     4.63 │    0.91 │   9.72 │ ⚠️harness(prompt_template), ... │
+2026-05-03 21:53:12 BST - INFO -    │ 21 │ Qwen3.5-35B-A3B-bf16           │ OK     │  57.5 │    84.87 │   11.75 │  76.13 │ missing-sections(title+descript │
+2026-05-03 21:53:12 BST - INFO -    │    │                                │        │       │          │         │        │ ...                             │
+2026-05-03 21:53:12 BST - INFO -    │ 22 │ Phi-3.5-vision-instruct        │ OK     │  56.5 │    10.70 │    0.89 │   9.55 │ ⚠️harness(stop_token),          │
+2026-05-03 21:53:12 BST - INFO -    │    │                                │        │       │          │         │        │ lang_mixing, ...                │
+2026-05-03 21:53:12 BST - INFO -    │ 23 │ X-Reasoner-7B-8bit             │ OK     │  55.4 │    27.10 │    1.17 │  13.49 │ ⚠️harness(long_context), ...    │
+2026-05-03 21:53:12 BST - INFO -    │ 24 │ Molmo-7B-D-0924-8bit           │ OK     │  50.7 │    25.66 │    1.60 │  40.60 │ description-sentences(3), ...   │
+2026-05-03 21:53:12 BST - INFO -    │ 25 │ Phi-3.5-vision-instruct-bf16   │ OK     │  50.3 │     5.74 │    0.85 │   9.55 │ description-sentences(3), ...   │
+2026-05-03 21:53:12 BST - INFO -    │ 26 │ gemma-3n-E4B-it-bf16           │ OK     │  48.8 │    10.19 │    2.22 │  17.21 │ fabrication, ...                │
+2026-05-03 21:53:12 BST - INFO -    │ 27 │ ERNIE-4.5-VL-28B-A3B-Thinking. │ OK     │  48.7 │    30.38 │   11.28 │  60.18 │ missing-sections(title+descript │
+2026-05-03 21:53:12 BST - INFO -    │    │ ..                             │        │       │          │         │        │ ...                             │
+2026-05-03 21:53:12 BST - INFO -    │ 28 │ GLM-4.6V-Flash-6bit            │ OK     │  47.4 │    19.44 │    1.42 │  11.08 │ missing-sections(title+descript │
+2026-05-03 21:53:12 BST - INFO -    │    │                                │        │       │          │         │        │ ...                             │
+2026-05-03 21:53:12 BST - INFO -    │ 29 │ pixtral-12b-8bit               │ OK     │  38.1 │     7.66 │    1.71 │  15.70 │ clean                           │
+2026-05-03 21:53:12 BST - INFO -    │ 30 │ Apriel-1.5-15b-Thinker-6bit-ML │ OK     │  37.9 │    18.00 │    1.60 │  14.93 │ missing-sections(title), ...    │
+2026-05-03 21:53:12 BST - INFO -    │    │ X                              │        │       │          │         │        │                                 │
+2026-05-03 21:53:12 BST - INFO -    │ 31 │ paligemma2-3b-pt-896-4bit      │ OK     │  37.4 │    17.13 │    1.42 │   4.63 │ repetitive(phrase: "- output    │
+2026-05-03 21:53:12 BST - INFO -    │    │                                │        │       │          │         │        │ on...                           │
+2026-05-03 21:53:12 BST - INFO -    │ 32 │ InternVL3-8B-bf16              │ OK     │  34.8 │     6.46 │    1.73 │  17.66 │ metadata-borrowing              │
+2026-05-03 21:53:12 BST - INFO -    │ 33 │ GLM-4.6V-nvfp4                 │ OK     │  33.0 │    47.52 │    9.94 │  78.16 │ missing-sections(title+descript │
+2026-05-03 21:53:12 BST - INFO -    │    │                                │        │       │          │         │        │ ...                             │
+2026-05-03 21:53:12 BST - INFO -    │ 34 │ Idefics3-8B-Llama3-bf16        │ OK     │  32.3 │     8.11 │    2.13 │  19.10 │ description-sentences(3), ...   │
+2026-05-03 21:53:12 BST - INFO -    │ 35 │ InternVL3-14B-8bit             │ OK     │  32.0 │     8.01 │    1.74 │  18.15 │ title-length(3), ...            │
+2026-05-03 21:53:12 BST - INFO -    │ 36 │ gemma-3-27b-it-qat-4bit        │ OK     │  31.4 │     7.40 │    2.31 │  18.83 │ clean                           │
+2026-05-03 21:53:12 BST - INFO -    │ 37 │ Molmo-7B-D-0924-bf16           │ OK     │  29.1 │    38.97 │    1.76 │  47.73 │ repetitive(phrase: "white       │
+2026-05-03 21:53:12 BST - INFO -    │    │                                │        │       │          │         │        │ balan...                        │
+2026-05-03 21:53:12 BST - INFO -    │ 38 │ Devstral-Small-2-24B-Instruct. │ OK     │  28.2 │    10.32 │    2.13 │  22.09 │ ⚠️harness(encoding), ...        │
+2026-05-03 21:53:12 BST - INFO -    │    │ ..                             │        │       │          │         │        │                                 │
+2026-05-03 21:53:12 BST - INFO -    │ 39 │ paligemma2-10b-ft-docci-448-6b │ OK     │  26.5 │     4.54 │    1.76 │  12.08 │ missing-sections(title+descript │
+2026-05-03 21:53:12 BST - INFO -    │    │ it                             │        │       │          │         │        │ ...                             │
+2026-05-03 21:53:12 BST - INFO -    │ 40 │ gemma-4-31b-it-4bit            │ OK     │  25.7 │     8.98 │    2.74 │  20.28 │ metadata-borrowing              │
+2026-05-03 21:53:12 BST - INFO -    │ 41 │ Qwen3.5-27B-4bit               │ OK     │  24.8 │   110.12 │    2.17 │  26.09 │ degeneration, fabrication, ...  │
+2026-05-03 21:53:12 BST - INFO -    │ 42 │ pixtral-12b-bf16               │ OK     │  20.1 │    10.64 │    2.58 │  27.59 │ clean                           │
+2026-05-03 21:53:12 BST - INFO -    │ 43 │ paligemma2-3b-ft-docci-448-bf1 │ OK     │  18.4 │     3.67 │    1.73 │  11.15 │ ⚠️harness(prompt_template), ... │
+2026-05-03 21:53:12 BST - INFO -    │    │ 6                              │        │       │          │         │        │                                 │
+2026-05-03 21:53:12 BST - INFO -    │ 44 │ Qwen3.6-27B-mxfp8              │ OK     │  17.8 │   102.66 │    3.04 │  38.70 │ degeneration, ...               │
+2026-05-03 21:53:12 BST - INFO -    │ 45 │ gemma-3-27b-it-qat-8bit        │ OK     │  17.6 │    11.52 │    3.36 │  33.04 │ metadata-borrowing              │
+2026-05-03 21:53:12 BST - INFO -    │ 46 │ Qwen3.5-27B-mxfp8              │ OK     │  17.6 │   115.96 │    3.15 │  38.70 │ keyword-count(21), cutoff, ...  │
+2026-05-03 21:53:12 BST - INFO -    │ 47 │ Llama-3.2-11B-Vision-Instruct. │ OK     │  16.9 │    18.11 │    1.48 │  15.04 │ missing-sections(title+descript │
+2026-05-03 21:53:12 BST - INFO -    │    │ ..                             │        │       │          │         │        │ ...                             │
+2026-05-03 21:53:12 BST - INFO -    │ 48 │ gemma-4-31b-bf16               │ OK     │   7.4 │    22.87 │    6.45 │  64.54 │ missing-sections(title+descript │
+2026-05-03 21:53:12 BST - INFO -    │    │                                │        │       │          │         │        │ ...                             │
+2026-05-03 21:53:12 BST - INFO -    │ 49 │ paligemma2-10b-ft-docci-448-bf │ OK     │   5.1 │     8.07 │    2.74 │  26.80 │ ⚠️harness(prompt_template), ... │
+2026-05-03 21:53:12 BST - INFO -    │    │ 16                             │        │       │          │         │        │                                 │
+2026-05-03 21:53:12 BST - INFO -    │ 50 │ Llama-3.2-11B-Vision-Instruct  │ OK     │   5.0 │    27.52 │    2.31 │  25.24 │ missing-sections(title+descript │
+2026-05-03 21:53:12 BST - INFO -    │    │                                │        │       │          │         │        │ ...                             │
+2026-05-03 21:53:12 BST - INFO -    │ 51 │ Kimi-VL-A3B-Thinking-2506-bf16 │ OK     │   4.7 │   111.59 │    3.28 │  39.37 │ missing-sections(title+descript │
+2026-05-03 21:53:12 BST - INFO -    │    │                                │        │       │          │         │        │ ...                             │
+2026-05-03 21:53:12 BST - INFO -    │ 52 │ Kimi-VL-A3B-Thinking-8bit      │ FAIL   │     - │     1.17 │    0.17 │      - │ MLX_MODEL_LOAD_MODEL            │
+2026-05-03 21:53:12 BST - INFO -    │ 53 │ MolmoPoint-8B-fp16             │ FAIL   │     - │     3.81 │    2.32 │      - │ MODEL_CONFIG_PROCESSOR_LOAD_PRO │
+2026-05-03 21:53:12 BST - INFO -    │    │                                │        │       │          │         │        │ ...                             │
+2026-05-03 21:53:12 BST - INFO -    ╰────┴────────────────────────────────┴────────┴───────┴──────────┴─────────┴────────┴─────────────────────────────────╯
+2026-05-03 21:53:12 BST - INFO - 
+2026-05-03 21:53:12 BST - INFO - 📊 TPS comparison chart:
+2026-05-03 21:53:12 BST - INFO -    LFM2-VL-1.6B-8bit                ████████████████████████ 331.7 tps
+2026-05-03 21:53:12 BST - INFO -    nanoLLaVA-1.5-4bit               ███████████████████████  318.3 tps
+2026-05-03 21:53:12 BST - INFO -    FastVLM-0.5B-bf16                ██████████████████████▍  310.0 tps
+2026-05-03 21:53:12 BST - INFO -    Qwen2-VL-2B-Instruct-4bit        ██████████████▏          196.5 tps
+2026-05-03 21:53:12 BST - INFO -    LFM2.5-VL-1.6B-bf16              █████████████▉           193.0 tps
+2026-05-03 21:53:12 BST - INFO -    Ministral-3-3B-Instruct-2512-... █████████████▏           182.6 tps
+2026-05-03 21:53:12 BST - INFO -    SmolVLM2-2.2B-Instruct-mlx       █████████▋               134.2 tps
+2026-05-03 21:53:12 BST - INFO -    SmolVLM-Instruct                 █████████▏               127.1 tps
+2026-05-03 21:53:12 BST - INFO - ⏱ Efficiency chart (higher is faster overall):
+2026-05-03 21:53:12 BST - INFO -    nanoLLaVA-1.5-4bit               ████████████████████████ 0.644 1/s
+2026-05-03 21:53:12 BST - INFO -    LFM2-VL-1.6B-8bit                ███████████████████████▌ 0.632 1/s
+2026-05-03 21:53:12 BST - INFO -    nanoLLaVA                        █████████████████▌       0.472 1/s
+2026-05-03 21:53:12 BST - INFO -    FastVLM-0.5B-bf16                ██████████████▉          0.402 1/s
+2026-05-03 21:53:12 BST - INFO -    SmolVLM2-2.2B-Instruct-mlx       ████████████▋            0.340 1/s
+2026-05-03 21:53:12 BST - INFO -    Ministral-3-3B-Instruct-2512-... ███████████▏             0.299 1/s
+2026-05-03 21:53:12 BST - INFO -    paligemma2-3b-ft-docci-448-bf16  ██████████▏              0.273 1/s
+2026-05-03 21:53:12 BST - INFO -    LFM2.5-VL-1.6B-bf16              █████████▉               0.266 1/s
+2026-05-03 21:53:12 BST - INFO - ❌ Failure stage frequency:
+2026-05-03 21:53:12 BST - INFO -    Model Error     ████████████████████████ 1 x
+2026-05-03 21:53:12 BST - INFO -    Processor Error ████████████████████████ 1 x
+2026-05-03 21:53:12 BST - INFO - 
+2026-05-03 21:53:12 BST - INFO - ✅ Successful Models (51):
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/LFM2-VL-1.6B-8bit: 331.7 tps (Active: 1.9GB, Cache: 0.0GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/nanoLLaVA-1.5-4bit: 318.3 tps (Active: 0.6GB, Cache: 0.3GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/FastVLM-0.5B-bf16: 310.0 tps (Active: 1.2GB, Cache: 0.0GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/Qwen2-VL-2B-Instruct-4bit: 196.5 tps (Active: 1.2GB, Cache: 0.8GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/LFM2.5-VL-1.6B-bf16: 193.0 tps (Active: 3.0GB, Cache: 0.0GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/Ministral-3-3B-Instruct-2512-4bit: 182.6 tps (Active: 2.6GB, Cache: 0.4GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/SmolVLM2-2.2B-Instruct-mlx: 134.2 tps (Active: 4.2GB, Cache: 0.2GB)
+2026-05-03 21:53:12 BST - INFO -   - HuggingFaceTB/SmolVLM-Instruct: 127.1 tps (Active: 4.2GB, Cache: 0.4GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/SmolVLM-Instruct-bf16: 125.8 tps (Active: 4.2GB, Cache: 0.4GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/gemma-3n-E2B-4bit: 121.0 tps (Active: 4.2GB, Cache: 0.0GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/gemma-4-26b-a4b-it-4bit: 113.9 tps (Active: 14.6GB, Cache: 0.2GB)
+2026-05-03 21:53:12 BST - INFO -   - qnguyen3/nanoLLaVA: 112.5 tps (Active: 2.0GB, Cache: 1.5GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/Qwen3.5-35B-A3B-4bit: 104.5 tps (Active: 19.0GB, Cache: 0.8GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/Qwen3.5-9B-MLX-4bit: 89.3 tps (Active: 5.6GB, Cache: 1.0GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/Qwen3.5-35B-A3B-6bit: 87.0 tps (Active: 27.1GB, Cache: 0.8GB)
+2026-05-03 21:53:12 BST - INFO -   - jqlive/Kimi-VL-A3B-Thinking-2506-6bit: 69.1 tps (Active: 12.9GB, Cache: 1.4GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/Ministral-3-14B-Instruct-2512-mxfp4: 65.5 tps (Active: 7.5GB, Cache: 0.6GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/Ministral-3-14B-Instruct-2512-nvfp4: 63.3 tps (Active: 7.9GB, Cache: 0.6GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/GLM-4.6V-Flash-mxfp4: 61.4 tps (Active: 6.3GB, Cache: 0.4GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/llava-v1.6-mistral-7b-8bit: 59.1 tps (Active: 7.5GB, Cache: 0.9GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/Qwen3.5-35B-A3B-bf16: 57.5 tps (Active: 65.4GB, Cache: 0.8GB)
+2026-05-03 21:53:12 BST - INFO -   - microsoft/Phi-3.5-vision-instruct: 56.5 tps (Active: 7.7GB, Cache: 0.8GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/X-Reasoner-7B-8bit: 55.4 tps (Active: 8.8GB, Cache: 1.2GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/Molmo-7B-D-0924-8bit: 50.7 tps (Active: 8.4GB, Cache: 0.1GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/Phi-3.5-vision-instruct-bf16: 50.3 tps (Active: 7.7GB, Cache: 0.7GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/gemma-3n-E4B-it-bf16: 48.8 tps (Active: 14.6GB, Cache: 0.1GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16: 48.7 tps (Active: 54.8GB, Cache: 0.1GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/GLM-4.6V-Flash-6bit: 47.4 tps (Active: 8.8GB, Cache: 0.4GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/pixtral-12b-8bit: 38.1 tps (Active: 12.6GB, Cache: 0.6GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX: 37.9 tps (Active: 11.7GB, Cache: 0.8GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/paligemma2-3b-pt-896-4bit: 37.4 tps (Active: 1.6GB, Cache: 1.9GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/InternVL3-8B-bf16: 34.8 tps (Active: 14.8GB, Cache: 0.2GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/GLM-4.6V-nvfp4: 33.0 tps (Active: 57.6GB, Cache: 1.4GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/Idefics3-8B-Llama3-bf16: 32.3 tps (Active: 15.8GB, Cache: 0.4GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/InternVL3-14B-8bit: 32.0 tps (Active: 15.2GB, Cache: 0.5GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/gemma-3-27b-it-qat-4bit: 31.4 tps (Active: 15.7GB, Cache: 0.5GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/Molmo-7B-D-0924-bf16: 29.1 tps (Active: 14.9GB, Cache: 0.1GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit: 28.2 tps (Active: 15.9GB, Cache: 0.5GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/paligemma2-10b-ft-docci-448-6bit: 26.5 tps (Active: 7.3GB, Cache: 1.8GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/gemma-4-31b-it-4bit: 25.7 tps (Active: 17.2GB, Cache: 0.9GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/Qwen3.5-27B-4bit: 24.8 tps (Active: 15.0GB, Cache: 1.6GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/pixtral-12b-bf16: 20.1 tps (Active: 23.6GB, Cache: 0.6GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/paligemma2-3b-ft-docci-448-bf16: 18.4 tps (Active: 5.7GB, Cache: 3.5GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/Qwen3.6-27B-mxfp8: 17.8 tps (Active: 26.7GB, Cache: 1.6GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/gemma-3-27b-it-qat-8bit: 17.6 tps (Active: 28.9GB, Cache: 0.5GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/Qwen3.5-27B-mxfp8: 17.6 tps (Active: 26.7GB, Cache: 1.6GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/Llama-3.2-11B-Vision-Instruct-8bit: 16.9 tps (Active: 10.6GB, Cache: 0.7GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/gemma-4-31b-bf16: 7.4 tps (Active: 58.3GB, Cache: 0.9GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/paligemma2-10b-ft-docci-448-bf16: 5.1 tps (Active: 18.0GB, Cache: 6.0GB)
+2026-05-03 21:53:12 BST - INFO -   - meta-llama/Llama-3.2-11B-Vision-Instruct: 5.0 tps (Active: 19.9GB, Cache: 3.3GB)
+2026-05-03 21:53:12 BST - INFO -   - mlx-community/Kimi-VL-A3B-Thinking-2506-bf16: 4.7 tps (Active: 30.6GB, Cache: 4.6GB)
+2026-05-03 21:53:12 BST - DEBUG - 
+2026-05-03 21:53:12 BST - DEBUG - === RUN REVIEW SUMMARY ===
+2026-05-03 21:53:12 BST - DEBUG - Maintainer queue by owner:
+2026-05-03 21:53:12 BST - DEBUG -   mlx: mlx-community/Kimi-VL-A3B-Thinking-8bit (runtime_failure), mlx-community/X-Reasoner-7B-8bit (cutoff_degraded)
+2026-05-03 21:53:12 BST - DEBUG -   mlx-vlm: microsoft/Phi-3.5-vision-instruct (harness), mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit (harness), mlx-community/Qwen2-VL-2B-Instruct-4bit (harness)
+2026-05-03 21:53:12 BST - DEBUG -   model: HuggingFaceTB/SmolVLM-Instruct (model_shortcoming), jqlive/Kimi-VL-A3B-Thinking-2506-6bit (cutoff_degraded), meta-llama/Llama-3.2-11B-Vision-Instruct (model_shortcoming), mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX (cutoff_degraded), mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 (cutoff_degraded), mlx-community/FastVLM-0.5B-bf16 (model_shortcoming), mlx-community/GLM-4.6V-Flash-6bit (cutoff_degraded), mlx-community/GLM-4.6V-Flash-mxfp4 (cutoff_degraded), mlx-community/GLM-4.6V-nvfp4 (cutoff_degraded), mlx-community/Idefics3-8B-Llama3-bf16 (model_shortcoming), mlx-community/InternVL3-14B-8bit (model_shortcoming), mlx-community/InternVL3-8B-bf16 (model_shortcoming), mlx-community/Kimi-VL-A3B-Thinking-2506-bf16 (cutoff_degraded), mlx-community/LFM2-VL-1.6B-8bit (model_shortcoming), mlx-community/LFM2.5-VL-1.6B-bf16 (cutoff_degraded), mlx-community/Llama-3.2-11B-Vision-Instruct-8bit (model_shortcoming), mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 (clean), mlx-community/Ministral-3-14B-Instruct-2512-nvfp4 (context_budget), mlx-community/Ministral-3-3B-Instruct-2512-4bit (context_budget), mlx-community/Molmo-7B-D-0924-8bit (model_shortcoming), mlx-community/Molmo-7B-D-0924-bf16 (cutoff_degraded), mlx-community/Phi-3.5-vision-instruct-bf16 (model_shortcoming), mlx-community/Qwen3.5-27B-4bit (cutoff_degraded), mlx-community/Qwen3.5-27B-mxfp8 (cutoff_degraded), mlx-community/Qwen3.5-35B-A3B-4bit (cutoff_degraded), mlx-community/Qwen3.5-35B-A3B-6bit (cutoff_degraded), mlx-community/Qwen3.5-35B-A3B-bf16 (cutoff_degraded), mlx-community/Qwen3.5-9B-MLX-4bit (cutoff_degraded), mlx-community/Qwen3.6-27B-mxfp8 (cutoff_degraded), mlx-community/SmolVLM-Instruct-bf16 (model_shortcoming), mlx-community/SmolVLM2-2.2B-Instruct-mlx (model_shortcoming), mlx-community/gemma-3-27b-it-qat-4bit (clean), mlx-community/gemma-3-27b-it-qat-8bit (model_shortcoming), mlx-community/gemma-3n-E2B-4bit (cutoff_degraded), mlx-community/gemma-3n-E4B-it-bf16 (model_shortcoming), mlx-community/gemma-4-26b-a4b-it-4bit (clean), mlx-community/gemma-4-31b-bf16 (model_shortcoming), mlx-community/gemma-4-31b-it-4bit (model_shortcoming), mlx-community/nanoLLaVA-1.5-4bit (model_shortcoming), mlx-community/paligemma2-10b-ft-docci-448-6bit (model_shortcoming), mlx-community/paligemma2-3b-pt-896-4bit (cutoff_degraded), mlx-community/pixtral-12b-8bit (clean), mlx-community/pixtral-12b-bf16 (clean), qnguyen3/nanoLLaVA (model_shortcoming)
+2026-05-03 21:53:12 BST - DEBUG -   model-config: mlx-community/MolmoPoint-8B-fp16 (runtime_failure), mlx-community/llava-v1.6-mistral-7b-8bit (harness), mlx-community/paligemma2-10b-ft-docci-448-bf16 (harness), mlx-community/paligemma2-3b-ft-docci-448-bf16 (harness)
+2026-05-03 21:53:12 BST - DEBUG - User buckets:
+2026-05-03 21:53:12 BST - DEBUG -   avoid: HuggingFaceTB/SmolVLM-Instruct, jqlive/Kimi-VL-A3B-Thinking-2506-6bit, meta-llama/Llama-3.2-11B-Vision-Instruct, microsoft/Phi-3.5-vision-instruct, mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX, mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit, mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16, mlx-community/FastVLM-0.5B-bf16, mlx-community/GLM-4.6V-Flash-6bit, mlx-community/GLM-4.6V-Flash-mxfp4, mlx-community/GLM-4.6V-nvfp4, mlx-community/Idefics3-8B-Llama3-bf16, mlx-community/InternVL3-14B-8bit, mlx-community/InternVL3-8B-bf16, mlx-community/Kimi-VL-A3B-Thinking-2506-bf16, mlx-community/Kimi-VL-A3B-Thinking-8bit, mlx-community/LFM2-VL-1.6B-8bit, mlx-community/LFM2.5-VL-1.6B-bf16, mlx-community/Llama-3.2-11B-Vision-Instruct-8bit, mlx-community/Ministral-3-14B-Instruct-2512-mxfp4, mlx-community/Molmo-7B-D-0924-8bit, mlx-community/Molmo-7B-D-0924-bf16, mlx-community/MolmoPoint-8B-fp16, mlx-community/Phi-3.5-vision-instruct-bf16, mlx-community/Qwen2-VL-2B-Instruct-4bit, mlx-community/Qwen3.5-27B-4bit, mlx-community/Qwen3.5-27B-mxfp8, mlx-community/Qwen3.5-35B-A3B-4bit, mlx-community/Qwen3.5-35B-A3B-6bit, mlx-community/Qwen3.5-35B-A3B-bf16, mlx-community/Qwen3.5-9B-MLX-4bit, mlx-community/Qwen3.6-27B-mxfp8, mlx-community/SmolVLM-Instruct-bf16, mlx-community/SmolVLM2-2.2B-Instruct-mlx, mlx-community/X-Reasoner-7B-8bit, mlx-community/gemma-3-27b-it-qat-8bit, mlx-community/gemma-3n-E2B-4bit, mlx-community/gemma-3n-E4B-it-bf16, mlx-community/gemma-4-31b-bf16, mlx-community/gemma-4-31b-it-4bit, mlx-community/llava-v1.6-mistral-7b-8bit, mlx-community/nanoLLaVA-1.5-4bit, mlx-community/paligemma2-10b-ft-docci-448-6bit, mlx-community/paligemma2-10b-ft-docci-448-bf16, mlx-community/paligemma2-3b-ft-docci-448-bf16, mlx-community/paligemma2-3b-pt-896-4bit, qnguyen3/nanoLLaVA
+2026-05-03 21:53:12 BST - DEBUG -   caveat: mlx-community/Ministral-3-14B-Instruct-2512-nvfp4, mlx-community/Ministral-3-3B-Instruct-2512-4bit
+2026-05-03 21:53:12 BST - DEBUG -   recommended: mlx-community/gemma-3-27b-it-qat-4bit, mlx-community/gemma-4-26b-a4b-it-4bit, mlx-community/pixtral-12b-8bit, mlx-community/pixtral-12b-bf16
+2026-05-03 21:53:12 BST - DEBUG - Top recurring verdict causes: trusted_overlap=38, metadata_terms=29, token_cap=19, metadata_borrowing=16, missing_sections=16, abrupt_tail=14, low_hint_overlap=11, contract=10
+2026-05-03 21:53:12 BST - DEBUG - === END RUN REVIEW SUMMARY ===
+2026-05-03 21:53:13 BST - INFO - 
+2026-05-03 21:53:13 BST - INFO - 📊 Reports successfully generated:
+2026-05-03 21:53:13 BST - INFO -    HTML Report: /Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.html
+2026-05-03 21:53:13 BST - INFO -    Markdown Report: /Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.md
+2026-05-03 21:53:13 BST - INFO -    Gallery Report:  /Users/jrp/Documents/AI/mlx/check_models/src/output/reports/model_gallery.md
+2026-05-03 21:53:13 BST - INFO -    Review Report:   /Users/jrp/Documents/AI/mlx/check_models/src/output/reports/review.md
+2026-05-03 21:53:13 BST - INFO -    TSV Report:    /Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.tsv
+2026-05-03 21:53:13 BST - INFO -    JSONL Report:  /Users/jrp/Documents/AI/mlx/check_models/src/output/results.jsonl
+2026-05-03 21:53:13 BST - INFO -    Log File: /Users/jrp/Documents/AI/mlx/check_models/src/output/check_models.log
+2026-05-03 21:53:13 BST - INFO -    Environment: /Users/jrp/Documents/AI/mlx/check_models/src/output/environment.log
+2026-05-03 21:53:13 BST - INFO -    History:      /Users/jrp/Documents/AI/mlx/check_models/src/output/results.history.jsonl
+2026-05-03 21:53:13 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:53:13 BST - INFO - History Comparison
+2026-05-03 21:53:13 BST - WARNING - ⚠️  Prompt differs from previous run; regressions/recoveries may be noisy.
+2026-05-03 21:53:13 BST - WARNING - ⚠️  Image path differs from previous run; regressions/recoveries may be noisy.
+2026-05-03 21:53:13 BST - INFO - 📚 Run-over-run comparison:
+2026-05-03 21:53:13 BST - INFO -    ╭─────────────────────┬──────────┬─────────┬───────╮
+2026-05-03 21:53:13 BST - INFO -    │ Metric              │ Previous │ Current │ Delta │
+2026-05-03 21:53:13 BST - INFO -    ├─────────────────────┼──────────┼─────────┼───────┤
+2026-05-03 21:53:13 BST - INFO -    │ Models tested       │ 53       │ 53      │ 0     │
+2026-05-03 21:53:13 BST - INFO -    │ Successful          │ 51       │ 51      │ 0     │
+2026-05-03 21:53:13 BST - INFO -    │ Failed              │ 2        │ 2       │ 0     │
+2026-05-03 21:53:13 BST - INFO -    │ Success rate        │ 96.2%    │ 96.2%   │ 0.0pp │
+2026-05-03 21:53:13 BST - INFO -    │ Regressions         │ -        │ 0       │ -     │
+2026-05-03 21:53:13 BST - INFO -    │ Recoveries          │ -        │ 0       │ -     │
+2026-05-03 21:53:13 BST - INFO -    │ Quality regressions │ -        │ 3       │ -     │
+2026-05-03 21:53:13 BST - INFO -    │ Quality recoveries  │ -        │ 1       │ -     │
+2026-05-03 21:53:13 BST - INFO -    │ Harness regressions │ -        │ 1       │ -     │
+2026-05-03 21:53:13 BST - INFO -    │ Harness recoveries  │ -        │ 1       │ -     │
+2026-05-03 21:53:13 BST - INFO -    │ Owner changes       │ -        │ 2       │ -     │
+2026-05-03 21:53:13 BST - INFO -    │ New models          │ -        │ 0       │ -     │
+2026-05-03 21:53:13 BST - INFO -    │ Missing models      │ -        │ 0       │ -     │
+2026-05-03 21:53:13 BST - INFO -    ╰─────────────────────┴──────────┴─────────┴───────╯
+2026-05-03 21:53:13 BST - INFO - 🔎 Comparison context:
+2026-05-03 21:53:13 BST - INFO -    ╭──────────────────┬─────────────────────────────────────────────────┬─────────────────────────────────────────────────╮
+2026-05-03 21:53:13 BST - INFO -    │ Context          │ Previous                                        │ Current                                         │
+2026-05-03 21:53:13 BST - INFO -    ├──────────────────┼─────────────────────────────────────────────────┼─────────────────────────────────────────────────┤
+2026-05-03 21:53:13 BST - INFO -    │ Prompt hash      │ 0802768f3e                                      │ b2e24e87de                                      │
+2026-05-03 21:53:13 BST - INFO -    │ Image path       │ /Users/jrp/Pictures/Processed/2026050...        │ /Users/jrp/Pictures/Processed/2026050...        │
+2026-05-03 21:53:13 BST - INFO -    │ Library versions │ Pillow=12.2.0, huggingface-hub=1.13.0,          │ Pillow=12.2.0, huggingface-hub=1.13.0,          │
+2026-05-03 21:53:13 BST - INFO -    │                  │ mlx=0.32.0.dev20260502+e8ebdebe, mlx-l...       │ mlx=0.32.0.dev20260503+e8ebdebe, mlx-l...       │
+2026-05-03 21:53:13 BST - INFO -    ╰──────────────────┴─────────────────────────────────────────────────┴─────────────────────────────────────────────────╯
+2026-05-03 21:53:13 BST - INFO - 🔁 Status transition counts:
+2026-05-03 21:53:13 BST - INFO -    quality regressions ████████████████████████ 3 x
+2026-05-03 21:53:13 BST - INFO -    owner changes       ████████████████         2 x
+2026-05-03 21:53:13 BST - INFO -    quality recoveries  ████████                 1 x
+2026-05-03 21:53:13 BST - INFO -    harness regressions ████████                 1 x
+2026-05-03 21:53:13 BST - INFO -    harness recoveries  ████████                 1 x
+2026-05-03 21:53:13 BST - INFO -    regressions                                  0 x
+2026-05-03 21:53:13 BST - INFO -    recoveries                                   0 x
+2026-05-03 21:53:13 BST - INFO -    new                                          0 x
+2026-05-03 21:53:13 BST - INFO -    missing                                      0 x
+2026-05-03 21:53:13 BST - INFO - 🧾 Detailed model transitions:
+2026-05-03 21:53:13 BST - INFO -    ╭──────────────────────────────────┬────────────────────┬──────┬─────────┬─────────────────────────────────────────────╮
+2026-05-03 21:53:13 BST - INFO -    │ Model                            │ Transition         │ Prev │ Current │ Signal                                      │
+2026-05-03 21:53:13 BST - INFO -    ├──────────────────────────────────┼────────────────────┼──────┼─────────┼─────────────────────────────────────────────┤
+2026-05-03 21:53:13 BST - INFO -    │ GLM-4.6V-Flash-mxfp4             │ Harness recovery   │ OK   │ OK      │ verdict=harness->cutoff_degraded |          │
+2026-05-03 21:53:13 BST - INFO -    │                                  │                    │      │         │ harness=stop_token->-                       │
+2026-05-03 21:53:13 BST - INFO -    │ Idefics3-8B-Llama3-bf16          │ Quality regression │ OK   │ OK      │ bucket=caveat->avoid |                      │
+2026-05-03 21:53:13 BST - INFO -    │                                  │                    │      │         │ verdict=clean->model_shortcoming            │
+2026-05-03 21:53:13 BST - INFO -    │ Ministral-3-14B-Instruct-2512... │ Quality regression │ OK   │ OK      │ bucket=recommended->avoid                   │
+2026-05-03 21:53:13 BST - INFO -    │ gemma-4-31b-it-4bit              │ Quality regression │ OK   │ OK      │ bucket=recommended->avoid |                 │
+2026-05-03 21:53:13 BST - INFO -    │                                  │                    │      │         │ verdict=clean->model_shortcoming            │
+2026-05-03 21:53:13 BST - INFO -    │ paligemma2-3b-ft-docci-448-bf16  │ Harness regression │ OK   │ OK      │ verdict=cutoff_degraded->harness |          │
+2026-05-03 21:53:13 BST - INFO -    │                                  │                    │      │         │ harness=-->prompt_template                  │
+2026-05-03 21:53:13 BST - INFO -    │ pixtral-12b-8bit                 │ Quality recovery   │ OK   │ OK      │ bucket=caveat->recommended |                │
+2026-05-03 21:53:13 BST - INFO -    │                                  │                    │      │         │ verdict=context_budget->clean               │
+2026-05-03 21:53:13 BST - INFO -    ╰──────────────────────────────────┴────────────────────┴──────┴─────────┴─────────────────────────────────────────────╯
+2026-05-03 21:53:13 BST - INFO - Repro bundles written for 11 issue-linked model(s).
+2026-05-03 21:53:13 BST - INFO -    Repro Bundle (microsoft/Phi-3.5-vision-instruct): /Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260503T205313Z_001_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json
+2026-05-03 21:53:13 BST - INFO -    Repro Bundle (mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit): /Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260503T205313Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json
+2026-05-03 21:53:13 BST - INFO -    Repro Bundle (mlx-community/Kimi-VL-A3B-Thinking-8bit): /Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260503T205313Z_003_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json
+2026-05-03 21:53:13 BST - INFO -    Repro Bundle (mlx-community/MolmoPoint-8B-fp16): /Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260503T205313Z_004_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_3c.json
+2026-05-03 21:53:13 BST - INFO -    Repro Bundle (mlx-community/Qwen2-VL-2B-Instruct-4bit): /Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260503T205313Z_005_mlx-community_Qwen2-VL-2B-Instruct-4bit_model_config_mlx_vlm_stop_token_001.json
+2026-05-03 21:53:13 BST - INFO -    Repro Bundle (mlx-community/Qwen3.5-27B-4bit): /Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260503T205313Z_006_mlx-community_Qwen3.5-27B-4bit_mlx_vlm_mlx_long_context_002.json
+2026-05-03 21:53:13 BST - INFO -    Repro Bundle (mlx-community/Qwen3.6-27B-mxfp8): /Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260503T205313Z_007_mlx-community_Qwen3.6-27B-mxfp8_mlx_vlm_mlx_long_context_002.json
+2026-05-03 21:53:13 BST - INFO -    Repro Bundle (mlx-community/X-Reasoner-7B-8bit): /Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260503T205313Z_008_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_mlx_long_context_001.json
+2026-05-03 21:53:13 BST - INFO -    Repro Bundle (mlx-community/llava-v1.6-mistral-7b-8bit): /Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260503T205313Z_009_mlx-community_llava-v1.6-mistral-7b-8bit_model_config_mlx_vlm_prompt_template_001.json
+2026-05-03 21:53:13 BST - INFO -    Repro Bundle (mlx-community/paligemma2-10b-ft-docci-448-bf16): /Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260503T205313Z_010_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json
+2026-05-03 21:53:13 BST - INFO -    Repro Bundle (mlx-community/paligemma2-3b-ft-docci-448-bf16): /Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260503T205313Z_011_mlx-community_paligemma2-3b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json
+2026-05-03 21:53:13 BST - INFO - GitHub Issue reports generated for 8 issue(s).
+2026-05-03 21:53:13 BST - INFO -    Issue Report (mlx-vlm-mlx_long-context_001): /Users/jrp/Documents/AI/mlx/check_models/src/output/issues/issue_007_mlx-vlm-mlx_long-context_001.md
+2026-05-03 21:53:13 BST - INFO -    Issue Report (mlx-vlm-mlx_long-context_002): /Users/jrp/Documents/AI/mlx/check_models/src/output/issues/issue_008_mlx-vlm-mlx_long-context_002.md
+2026-05-03 21:53:13 BST - INFO -    Issue Report (mlx-vlm_encoding_001): /Users/jrp/Documents/AI/mlx/check_models/src/output/issues/issue_003_mlx-vlm_encoding_001.md
+2026-05-03 21:53:13 BST - INFO -    Issue Report (mlx-vlm_stop-token_001): /Users/jrp/Documents/AI/mlx/check_models/src/output/issues/issue_004_mlx-vlm_stop-token_001.md
+2026-05-03 21:53:13 BST - INFO -    Issue Report (mlx_mlx-model-load-model_001): /Users/jrp/Documents/AI/mlx/check_models/src/output/issues/issue_001_mlx_mlx-model-load-model_001.md
+2026-05-03 21:53:13 BST - INFO -    Issue Report (model-config-mlx-vlm_prompt-template_001): /Users/jrp/Documents/AI/mlx/check_models/src/output/issues/issue_005_model-config-mlx-vlm_prompt-template_001.md
+2026-05-03 21:53:13 BST - INFO -    Issue Report (model-config-mlx-vlm_stop-token_001): /Users/jrp/Documents/AI/mlx/check_models/src/output/issues/issue_006_model-config-mlx-vlm_stop-token_001.md
+2026-05-03 21:53:13 BST - INFO -    Issue Report (model-configuration-repository_model-config-processor-load-processor_001): /Users/jrp/Documents/AI/mlx/check_models/src/output/issues/issue_002_model-configuration-repository_model-config-processor-load-processor_001.md
+2026-05-03 21:53:13 BST - INFO - 
+2026-05-03 21:53:13 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:53:13 BST - INFO - Maintainer Summary
+2026-05-03 21:53:13 BST - INFO - Diagnostics signals: failures=2, harness=7, stack=2, preflight=0
+2026-05-03 21:53:13 BST - INFO - Likely owners: model-config / mlx-vlm=4; mlx-vlm / mlx=3; mlx-vlm=2
+2026-05-03 21:53:13 BST - INFO - Issue cluster 1: 1 model(s) | owner=mlx | issue=Model loading failed: Received 4 parameters not in model:
+2026-05-03 21:53:13 BST - INFO - Issue cluster 2: 1 model(s) | owner=model configuration/repository | issue=Loaded processor has no image_processor; expected multimodal processor.
+2026-05-03 21:53:13 BST - INFO - Harness/runtime anomalies: 2 model(s) likely owned by mlx-vlm. Next: check processor/chat-template wiring and generation kwargs.
+2026-05-03 21:53:13 BST - INFO - Harness/runtime anomalies: 1 model(s) likely owned by mlx-vlm / mlx. Next: validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
+2026-05-03 21:53:13 BST - INFO - Harness/runtime anomalies: 4 model(s) likely owned by model-config / mlx-vlm. Next: validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
+2026-05-03 21:53:13 BST - INFO - Long-context or stack-signal anomalies: 2 model(s) likely owned by mlx-vlm / mlx. Next: validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
+2026-05-03 21:53:13 BST - INFO -    Diagnostics:   /Users/jrp/Documents/AI/mlx/check_models/src/output/reports/diagnostics.md
+2026-05-03 21:53:13 BST - INFO - Repro bundles available for 11 issue-linked model(s).
+2026-05-03 21:53:13 BST - INFO - Pruned 2 repro bundle(s) older than 90 days.
+2026-05-03 21:53:13 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:53:13 BST - INFO - Final Summary
+2026-05-03 21:53:13 BST - INFO - 
+2026-05-03 21:53:13 BST - INFO - ⏱  Overall runtime: 1300.51s
+2026-05-03 21:53:13 BST - INFO - --- Library Versions ---
+2026-05-03 21:53:13 BST - INFO -    ╭─────────────────┬─────────────────────────────╮
+2026-05-03 21:53:13 BST - INFO -    │ Library         │ Version                     │
+2026-05-03 21:53:13 BST - INFO -    ├─────────────────┼─────────────────────────────┤
+2026-05-03 21:53:13 BST - INFO -    │ Pillow          │ 12.2.0                      │
+2026-05-03 21:53:13 BST - INFO -    │ huggingface-hub │ 1.13.0                      │
+2026-05-03 21:53:13 BST - INFO -    │ mlx             │ 0.32.0.dev20260503+e8ebdebe │
+2026-05-03 21:53:13 BST - INFO -    │ mlx-lm          │ 0.31.3                      │
+2026-05-03 21:53:13 BST - INFO -    │ mlx-metal       │                             │
+2026-05-03 21:53:13 BST - INFO -    │ mlx-vlm         │ 0.4.5                       │
+2026-05-03 21:53:13 BST - INFO -    │ numpy           │ 2.4.4                       │
+2026-05-03 21:53:13 BST - INFO -    │ tokenizers      │ 0.22.2                      │
+2026-05-03 21:53:13 BST - INFO -    │ transformers    │ 5.7.0                       │
+2026-05-03 21:53:13 BST - INFO -    ╰─────────────────┴─────────────────────────────╯
+2026-05-03 21:53:13 BST - INFO - Generated: 2026-05-03 21:53:13 BST
+2026-05-03 21:53:13 BST - INFO - 
+2026-05-03 21:53:13 BST - INFO - --- System Information ---
+2026-05-03 21:53:13 BST - INFO -    ╭──────────────────────┬───────────────╮
+2026-05-03 21:53:13 BST - INFO -    │ Property             │ Value         │
+2026-05-03 21:53:13 BST - INFO -    ├──────────────────────┼───────────────┤
+2026-05-03 21:53:13 BST - INFO -    │ OS                   │ Darwin 25.4.0 │
+2026-05-03 21:53:13 BST - INFO -    │ macOS Version        │ 26.4.1        │
+2026-05-03 21:53:13 BST - INFO -    │ SDK Version          │ 26.4          │
+2026-05-03 21:53:13 BST - INFO -    │ Xcode Version        │ 26.4.1        │
+2026-05-03 21:53:13 BST - INFO -    │ Xcode Build          │ 17E202        │
+2026-05-03 21:53:13 BST - INFO -    │ Metal SDK            │ MacOSX.sdk    │
+2026-05-03 21:53:13 BST - INFO -    │ Python Version       │ 3.13.12       │
+2026-05-03 21:53:13 BST - INFO -    │ Architecture         │ arm64         │
+2026-05-03 21:53:13 BST - INFO -    │ GPU/Chip             │ Apple M5 Max  │
+2026-05-03 21:53:13 BST - INFO -    │ GPU Cores            │ 40            │
+2026-05-03 21:53:13 BST - INFO -    │ Metal Support        │ Metal 4       │
+2026-05-03 21:53:13 BST - INFO -    │ RAM                  │ 128.0 GB      │
+2026-05-03 21:53:13 BST - INFO -    │ CPU Cores (Physical) │ 18            │
+2026-05-03 21:53:13 BST - INFO -    │ CPU Cores (Logical)  │ 18            │
+2026-05-03 21:53:13 BST - INFO -    ╰──────────────────────┴───────────────╯

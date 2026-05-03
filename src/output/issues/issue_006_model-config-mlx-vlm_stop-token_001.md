@@ -14,7 +14,7 @@
 
 | Model                                     | Representative Signal                                                                                                  | Token Context                                                                | Repro Bundle                                                                                                                                                                                                                      |
 |-------------------------------------------|------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | Special control token &lt;\|endoftext\|&gt; appeared in generated text. \| Output appears truncated to about 2 tokens. | prompt=16,794 \| output/prompt=0.01% \| nontext burden=97% \| stop=completed | [`20260503T011608Z_006_mlx-community_Qwen2-VL-2B-Instruct-4bit_model_config_mlx_vlm_stop_token_001.json`](../repro_bundles/20260503T011608Z_006_mlx-community_Qwen2-VL-2B-Instruct-4bit_model_config_mlx_vlm_stop_token_001.json) |
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | Special control token &lt;\|endoftext\|&gt; appeared in generated text. \| Output appears truncated to about 6 tokens. | prompt=16,807 \| output/prompt=0.04% \| nontext burden=97% \| stop=completed | [`20260503T205313Z_005_mlx-community_Qwen2-VL-2B-Instruct-4bit_model_config_mlx_vlm_stop_token_001.json`](../repro_bundles/20260503T205313Z_005_mlx-community_Qwen2-VL-2B-Instruct-4bit_model_config_mlx_vlm_stop_token_001.json) |
 
 
 ## Evidence
@@ -24,14 +24,16 @@
 Observed signals:
 
 - Special control token &lt;\|endoftext\|&gt; appeared in generated text.
-- Output appears truncated to about 2 tokens.
-- At long prompt length (16794 tokens), output stayed unusually short (2 tokens; ratio 0.0%).
-- Model output may not follow prompt or image contents (missing: Bench, Blue sky, Clouds, East Anglia, English countryside).
+- Output appears truncated to about 6 tokens.
+- At long prompt length (16807 tokens), output stayed unusually short (6 tokens; ratio 0.0%).
+- Model output may not follow prompt or image contents (missing: 10 Best (structured), Barge, Bird, Blue sky, Gull).
 - Output switched language/script unexpectedly (tokenizer_artifact).
 
 Sample output:
 
 ```text
+<|endoftext|>
+<|endoftext|>
 <|endoftext|>
 ```
 
@@ -44,8 +46,8 @@ Sample output:
 - _Issue subtype:_ `stop_token`
 - _Why this classification is credible:_ Special control token
   &lt;\|endoftext\|&gt; appeared in generated text. \| Output appears
-  truncated to about 2 tokens. \| nontext prompt burden=97% \| missing terms:
-  Bench, Blue sky, Clouds, East Anglia, English countryside
+  truncated to about 6 tokens. \| nontext prompt burden=97% \| missing terms:
+  10 Best (structured), Barge, Bird, Blue sky, Gull
 - _Suggested next action:_ Inspect EOS/stop-token stripping; control tokens
   are leaking into user-facing text.
 
@@ -60,7 +62,7 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 
 Repro bundles:
 
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: [`20260503T011608Z_006_mlx-community_Qwen2-VL-2B-Instruct-4bit_model_config_mlx_vlm_stop_token_001.json`](../repro_bundles/20260503T011608Z_006_mlx-community_Qwen2-VL-2B-Instruct-4bit_model_config_mlx_vlm_stop_token_001.json)
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: [`20260503T205313Z_005_mlx-community_Qwen2-VL-2B-Instruct-4bit_model_config_mlx_vlm_stop_token_001.json`](../repro_bundles/20260503T205313Z_005_mlx-community_Qwen2-VL-2B-Instruct-4bit_model_config_mlx_vlm_stop_token_001.json)
 
 
 ## Fix Checklist
@@ -82,7 +84,7 @@ Repro bundles:
 | Component       | Version                     |
 |-----------------|-----------------------------|
 | mlx-vlm         | 0.4.5                       |
-| mlx             | 0.32.0.dev20260502+e8ebdebe |
+| mlx             | 0.32.0.dev20260503+e8ebdebe |
 | mlx-lm          | 0.31.3                      |
 | transformers    | 5.7.0                       |
 | tokenizers      | 0.22.2                      |
