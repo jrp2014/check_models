@@ -976,7 +976,7 @@ class TestDiagnosticsReport:
         assert "They are informational by" in content
         assert "default and do not invalidate successful runs on their own." in content
         assert "transformers/issues/new" in content
-        assert "Preflight compatibility warning" in content
+        assert "These warnings were detected before inference." in content
 
     def test_preflight_section_splits_mixed_owner_groups(self, tmp_path: Path) -> None:
         """Mixed preflight owners should render as separate detailed owner buckets."""
@@ -999,7 +999,7 @@ class TestDiagnosticsReport:
         assert "### `transformers`" in content
         assert "### `mlx`" in content
         assert "verify API compatibility and pinned version floor." in content
-        assert "check tensor/cache behavior and memory pressure handling." in content
+        assert "mlx runtime probe reported a suspicious cache incompatibility" in content
         assert "transformers/issues/new" in content
 
     def test_report_written_for_stack_signal_uses_preflight_owner_hint(
@@ -1068,7 +1068,7 @@ class TestDiagnosticsReport:
         assert result is True
         content = out.read_text(encoding="utf-8")
         assert "`transformers / mlx-vlm`" in content
-        assert "Stack-signal anomalies" in content
+        assert "Long-Context Degradation / Potential Stack Issues" in content
 
     def test_report_written_on_failure(self, tmp_path: Path) -> None:
         """Diagnostics file created when a model fails."""
@@ -1354,8 +1354,9 @@ class TestDiagnosticsReport:
         content = out.read_text(encoding="utf-8")
         assert "## Issue Queue" in content
         assert "Issue Draft" in content
-        assert "Owner" in content
-        assert "Acceptance Signal" in content
+        assert "Target" in content
+        assert "Evidence Bundle" in content
+        assert "Fixed When" in content
         assert "issues/index.md" in content
         assert "Priority" not in content
         assert content.index("## Issue Queue") < content.index("## 1. Failure")
@@ -1373,8 +1374,8 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        assert "## Action Summary" in content
-        assert "Owner-first triage with subtype, affected count, and next action" in content
+        assert "## Upstream Filing Notes" in content
+        assert "## Appendix" in content
         assert "### Portable triage (no local image required)" in content
         assert "python -m pip show mlx mlx-vlm mlx-lm transformers" in content
 
@@ -1600,7 +1601,7 @@ class TestDiagnosticsReport:
         assert result is True
         content = out.read_text(encoding="utf-8")
         assert "### Long-Context Degradation / Potential Stack Issues" in content
-        assert "Stack-signal anomalies" in content
+        assert "`mlx-vlm / mlx`" in content
         assert "org/context-echo" in content
 
     def test_harness_section_includes_tokens_and_empty_marker(self, tmp_path: Path) -> None:
@@ -1808,8 +1809,8 @@ class TestDiagnosticsReport:
         content = out.read_text(encoding="utf-8")
         assert "`mlx-vlm`" in content
         assert "`mlx-vlm / mlx`" in content
-        assert "check processor/chat-template wiring and generation kwargs." in content
-        assert "validate long-context handling" in content
+        assert "org/stack-empty" in content
+        assert "org/stack-context" in content
 
     def test_action_summary_splits_mixed_preflight_owners(self, tmp_path: Path) -> None:
         """Mixed preflight owner classes should render separate maintainer triage rows."""
@@ -1831,7 +1832,7 @@ class TestDiagnosticsReport:
         assert "`transformers`" in content
         assert "`mlx`" in content
         assert "verify API compatibility and pinned version floor." in content
-        assert "check tensor/cache behavior and memory pressure handling." in content
+        assert "mlx runtime probe reported a suspicious cache incompatibility" in content
 
     def test_harness_token_leak_details_are_escaped(self, tmp_path: Path) -> None:
         """Token leak details should be escaped so markdown does not treat them as HTML."""
@@ -2010,7 +2011,7 @@ class TestDiagnosticsReport:
         )
         issue_content = next(iter(issue_reports.values())).read_text(encoding="utf-8")
         assert bundle_path.name in issue_content
-        assert "Repro Bundle" in issue_content
+        assert "Repro bundles:" in issue_content
 
     def test_repro_command_omits_upstream_quantized_kv_default(self) -> None:
         """Default KV quantization start should not be forwarded as a repro override."""
@@ -2756,16 +2757,17 @@ class TestGithubIssueReportContent:
         assert content.startswith("# \\[mlx-vlm\\]\\[MLX-VLM-DECODE-RUNTIME\\]")
         assert "## Summary" in content
         assert "## Affected Models" in content
-        assert "## Evidence" in content
+        assert "## Minimal Evidence" in content
+        assert "## Appendix: Detailed Evidence" in content
         assert "## Likely Root Cause" in content
         assert "## Repro Commands" in content
         assert "## Fix Checklist" in content
-        assert "## Acceptance Criteria" in content
-        assert "## Environment" in content
+        assert "## Expected Fix Signal" in content
+        assert "## Appendix: Environment" in content
         assert "MLX_VLM_DECODE_RUNTIME" in content
         assert "runtime_failure" in content
         assert "Traceback (most recent call last)" in content
-        assert "[`broken.json`](../repro_bundles/broken.json)" in content
+        assert "[repro JSON](../repro_bundles/broken.json)" in content
         assert "Python Version" in content
         assert "Priority" not in content
 
@@ -2796,7 +2798,7 @@ class TestGithubIssueReportContent:
         assert "context_budget" in content
         assert "long_context" in content
         assert "Rerun with reduced image/text burden" in content
-        assert "Acceptance Criteria" in content
+        assert "Expected Fix Signal" in content
         assert "Priority" not in content
 
     def test_multiple_stop_token_models_produce_one_issue(self, tmp_path: Path) -> None:
@@ -2875,10 +2877,10 @@ class TestGithubIssueReportContent:
 
         assert len(generated) == 2
         index = (tmp_path / "issues" / "index.md").read_text(encoding="utf-8")
-        assert "Stop-token leakage (`stop_token`)" in index
-        assert "Tokenizer / decoding artifact (`encoding`)" in index
+        assert "Stop-token leakage" in index
+        assert "Tokenizer / decoding artifact" in index
         assert "Issue Draft" in index
-        assert "Acceptance Signal" in index
+        assert "Fixed When" in index
         assert "Priority" not in index
 
     def test_issue_queue_humanizes_runtime_error_codes(self, tmp_path: Path) -> None:
@@ -2910,8 +2912,8 @@ class TestGithubIssueReportContent:
         )
 
         index = (tmp_path / "issues" / "index.md").read_text(encoding="utf-8")
-        assert "MLX: Model load / model error (`MLX_MODEL_LOAD_MODEL`)" in index
-        assert "`MLX_MODEL_LOAD_MODEL`" in index
+        assert "MLX: Model load / model error" in index
+        assert "RuntimeError: shape mismatch" in index
         assert "Priority" not in index
 
     def test_stack_signal_anomaly_produces_issue_draft(self, tmp_path: Path) -> None:
@@ -2943,7 +2945,7 @@ class TestGithubIssueReportContent:
 
         assert len(generated) == 1
         content = next(iter(generated.values())).read_text(encoding="utf-8")
-        assert "## Evidence" in content
+        assert "## Appendix: Detailed Evidence" in content
         assert "Stack Signals" in content
         assert "long_context" in content
         assert "Inspect cache allocation" in content
