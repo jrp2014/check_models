@@ -719,8 +719,8 @@ class TestLoadQualityConfig:
             assert package == "check_models_data"
             return tmp_path
 
-        monkeypatch.setattr(mod.importlib_resources, "files", fake_files)
-        monkeypatch.setattr(mod.importlib_resources, "as_file", contextlib.nullcontext)
+        monkeypatch.setattr(mod, "files", fake_files)
+        monkeypatch.setattr(mod, "as_file", contextlib.nullcontext)
 
         mod.load_quality_config()
 
@@ -952,11 +952,7 @@ class TestPreflightDependencyDiagnostics:
         source_file.write_text("# test file\n", encoding="utf-8")
 
         fake_distribution = _FakeDistribution(tmp_path)
-        monkeypatch.setattr(
-            mod.importlib.metadata,
-            "distribution",
-            lambda _name: fake_distribution,
-        )
+        monkeypatch.setattr(mod, "distribution", lambda _name: fake_distribution)
 
         resolved = mod._resolve_distribution_source_file("mlx-vlm", "mlx_vlm/utils.py")
         assert resolved == source_file
@@ -1040,16 +1036,8 @@ class TestPreflightDependencyDiagnostics:
         source_file = pkg_dir / "utils.py"
         source_file.write_text("# editable source\n", encoding="utf-8")
 
-        monkeypatch.setattr(
-            mod.importlib.metadata,
-            "distribution",
-            lambda _name: _FakeDistribution(),
-        )
-        monkeypatch.setattr(
-            mod.importlib_util,
-            "find_spec",
-            lambda _name: _FakeSpec(pkg_dir),
-        )
+        monkeypatch.setattr(mod, "distribution", lambda _name: _FakeDistribution())
+        monkeypatch.setattr(mod, "find_spec", lambda _name: _FakeSpec(pkg_dir))
 
         resolved = mod._resolve_distribution_source_file("mlx-vlm", "mlx_vlm/utils.py")
         assert resolved == source_file

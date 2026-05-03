@@ -6,14 +6,9 @@ from __future__ import annotations
 import argparse
 import base64
 import codecs
-import contextlib
-import dataclasses
 import gc
 import hashlib
 import html
-import importlib.metadata
-import importlib.resources as importlib_resources
-import importlib.util as importlib_util
 import inspect
 import io
 import json
@@ -29,14 +24,29 @@ import sys
 import textwrap
 import time
 import traceback
-import urllib.error
-import urllib.parse
-import urllib.request
 from collections import Counter
 from collections.abc import Callable, Generator, Iterable, Iterator, Mapping, Sequence
-from dataclasses import dataclass
+from contextlib import (
+    ContextDecorator,
+    ExitStack,
+    contextmanager,
+    redirect_stderr,
+    redirect_stdout,
+    suppress,
+)
+from dataclasses import dataclass, fields, is_dataclass, replace
+from dataclasses import field as dataclass_field
 from datetime import UTC, datetime
 from functools import lru_cache
+from importlib.metadata import (
+    Distribution,
+    PackageNotFoundError,
+    distribution,
+    distributions,
+    version,
+)
+from importlib.resources import as_file, files
+from importlib.util import find_spec
 from pathlib import Path
 from shlex import join as shlex_join
 from typing import (
@@ -57,6 +67,9 @@ from typing import (
     cast,
     runtime_checkable,
 )
+from urllib.error import URLError
+from urllib.parse import quote, urlparse
+from urllib.request import urlopen
 
 import yaml
 from huggingface_hub import HFCacheInfo, scan_cache_dir
@@ -105,7 +118,7 @@ psutil: types.ModuleType | None = psutil_mod
 # Without wcwidth, wide Unicode glyphs may be slightly misaligned; we fall back
 # to codepoint length to keep output functional.
 wcwidth_wcswidth: Callable[[str], int] | None = None
-if importlib_util.find_spec("wcwidth") is not None:
+if find_spec("wcwidth") is not None:
     try:
         wcwidth_module = __import__("wcwidth", fromlist=["wcswidth"])
     except ImportError:  # pragma: no cover - optional
@@ -497,7 +510,7 @@ class QualityThresholds:
             patterns = cast("dict[str, list[str]]", dict(patterns_mapping))
 
         # Filter valid fields for the dataclass
-        valid_fields = {f.name for f in dataclasses.fields(cls) if f.name != "patterns"}
+        valid_fields = {f.name for f in fields(cls) if f.name != "patterns"}
         filtered_thresholds = {k: v for k, v in thresholds.items() if k in valid_fields}
 
         # Warn about unrecognised YAML keys (likely typos)
@@ -532,13 +545,13 @@ def load_quality_config(config_path: Path | None = None) -> None:
     If no config_path is provided, loads the bundled default quality config
     resource shipped with the distribution.
     """
-    with contextlib.ExitStack() as exit_stack:
+    with ExitStack() as exit_stack:
         if config_path is None:
-            with contextlib.suppress(FileNotFoundError, ModuleNotFoundError):
-                resource = importlib_resources.files("check_models_data").joinpath(
+            with suppress(FileNotFoundError, ModuleNotFoundError):
+                resource = files("check_models_data").joinpath(
                     "quality_config.yaml",
                 )
-                config_path = exit_stack.enter_context(importlib_resources.as_file(resource))
+                config_path = exit_stack.enter_context(as_file(resource))
             if config_path is None:
                 logger.warning(
                     "Bundled quality config resource not found: check_models_data/quality_config.yaml",
@@ -560,7 +573,7 @@ def load_quality_config(config_path: Path | None = None) -> None:
                 new_quality = QualityThresholds.from_config(config_mapping)
                 # Update existing global instance in-place to avoid 'global' keyword
                 # and ensure all references see the update.
-                for field in dataclasses.fields(QualityThresholds):
+                for field in fields(QualityThresholds):
                     setattr(QUALITY, field.name, getattr(new_quality, field.name))
                 logger.debug("Loaded quality configuration from %s", config_path)
         except (OSError, TypeError, ValueError, yaml.YAMLError) as e:
@@ -749,8 +762,8 @@ else:
     MISSING_DEPENDENCIES["mlx-vlm"] = mlx_vlm_probe_error
 
 try:
-    importlib.metadata.version("mlx-lm")
-except importlib.metadata.PackageNotFoundError:
+    version("mlx-lm")
+except PackageNotFoundError:
     MISSING_DEPENDENCIES["mlx-lm"] = ERROR_MLX_LM_MISSING
 
 
@@ -1160,8 +1173,8 @@ class DiagnosticsArtifacts:
 
     snapshot: DiagnosticsSnapshot
     diagnostics_written: bool = False
-    repro_bundles: Mapping[str, Path] = dataclasses.field(default_factory=dict)
-    issue_reports: Mapping[str, Path] = dataclasses.field(default_factory=dict)
+    repro_bundles: Mapping[str, Path] = dataclass_field(default_factory=dict)
+    issue_reports: Mapping[str, Path] = dataclass_field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -1489,7 +1502,7 @@ class PromptDiagnostics:
     eos_token: str | None = None
     special_token_ids: tuple[JsonLike, ...] = ()
     special_tokens: tuple[str, ...] = ()
-    generate_kwargs: dict[str, JsonLike] = dataclasses.field(default_factory=dict)
+    generate_kwargs: dict[str, JsonLike] = dataclass_field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -1610,7 +1623,7 @@ class PhaseTimer:
         self._durations[phase] = self._durations.get(phase, 0.0) + elapsed
         return elapsed
 
-    @contextlib.contextmanager
+    @contextmanager
     def track(self, phase: str) -> Generator[None]:
         """Context manager that records elapsed time for a named phase."""
         self.start(phase)
@@ -2150,7 +2163,7 @@ class PerfCounterTimer:
 # Custom timeout context manager
 # Python 3.11+ has asyncio.timeout, but signal-based timeout works across sync code
 # Uses SIGALRM which is Unix-only - Windows doesn't support this signal mechanism
-class TimeoutManager(contextlib.ContextDecorator):
+class TimeoutManager(ContextDecorator):
     """Manage a timeout context for code execution (UNIX only)."""
 
     def __init__(self, seconds: float) -> None:
@@ -5693,19 +5706,19 @@ class GenerationQualityAnalysis:
     degeneration_type: str | None
     has_fabrication: bool
     fabrication_issues: list[str]
-    missing_sections: list[str] = dataclasses.field(default_factory=list)
+    missing_sections: list[str] = dataclass_field(default_factory=list)
     title_word_count: int | None = None
     description_sentence_count: int | None = None
     keyword_count: int | None = None
     keyword_duplication_ratio: float | None = None
     has_reasoning_leak: bool = False
-    reasoning_leak_markers: list[str] = dataclasses.field(default_factory=list)
+    reasoning_leak_markers: list[str] = dataclass_field(default_factory=list)
     has_context_echo: bool = False
     context_echo_ratio: float = 0.0
     # Harness issues indicate mlx-vlm integration bugs, not model quality problems
     has_harness_issue: bool = False
     harness_issue_type: str | None = None
-    harness_issue_details: list[str] = dataclasses.field(default_factory=list)
+    harness_issue_details: list[str] = dataclass_field(default_factory=list)
     # Lightweight metrics useful for JSONL/report triage
     word_count: int = 0
     unique_ratio: float = 0.0
@@ -5716,7 +5729,7 @@ class GenerationQualityAnalysis:
     verdict: str = "clean"
     owner: str = "model"
     user_bucket: str = "recommended"
-    evidence: list[str] = dataclasses.field(default_factory=list)
+    evidence: list[str] = dataclass_field(default_factory=list)
     likely_capped: bool = False
     requested_max_tokens: int | None = None
     prompt_tokens_total: int | None = None
@@ -6512,8 +6525,8 @@ def get_library_versions() -> LibraryVersionDict:
 
     def _get_version(pkg_name: str, fallback: str | None = None) -> str | None:
         try:
-            return importlib.metadata.version(pkg_name)
-        except importlib.metadata.PackageNotFoundError:
+            return version(pkg_name)
+        except PackageNotFoundError:
             return fallback
 
     def _none_if_na(v: str | None) -> str | None:
@@ -6638,26 +6651,26 @@ def _has_mlx_vlm_load_image_path_bug(source_text: str) -> bool:
 def _resolve_distribution_source_file(distribution_name: str, relative_path: str) -> Path | None:
     """Locate an installed distribution file path without importing the package."""
     try:
-        distribution = importlib.metadata.distribution(distribution_name)
-    except importlib.metadata.PackageNotFoundError:
+        package_distribution = distribution(distribution_name)
+    except PackageNotFoundError:
         return None
 
-    direct_candidate = Path(str(distribution.locate_file(relative_path)))
+    direct_candidate = Path(str(package_distribution.locate_file(relative_path)))
     if direct_candidate.is_file():
         return direct_candidate
 
     normalized_target = relative_path.replace("\\", "/")
-    for file_ref in distribution.files or []:
+    for file_ref in package_distribution.files or []:
         file_path = str(file_ref).replace("\\", "/")
         if not file_path.endswith(normalized_target):
             continue
 
-        candidate = Path(str(distribution.locate_file(file_ref)))
+        candidate = Path(str(package_distribution.locate_file(file_ref)))
         if candidate.is_file():
             return candidate
 
     module_name = normalized_target.split("/", 1)[0]
-    module_spec = importlib_util.find_spec(module_name)
+    module_spec = find_spec(module_name)
     module_locations = (
         list(module_spec.submodule_search_locations)
         if module_spec and module_spec.submodule_search_locations
@@ -6831,8 +6844,8 @@ def _get_generation_result_contract_issues(result_type: type[object] | None) -> 
         ]
 
     field_names: set[str] = set()
-    if dataclasses.is_dataclass(result_type):
-        field_names.update(field.name for field in dataclasses.fields(result_type))
+    if is_dataclass(result_type):
+        field_names.update(field.name for field in fields(result_type))
 
     raw_annotations = getattr(result_type, "__annotations__", None)
     if isinstance(raw_annotations, dict):
@@ -6899,11 +6912,9 @@ def _get_available_fields(results: list[PerformanceResult]) -> list[str]:
     # Determine GenerationResult fields while excluding raw text/token payloads.
     gen_fields: list[str] = []
     for r in results:
-        if r.generation is not None and dataclasses.is_dataclass(r.generation):
+        if r.generation is not None and is_dataclass(r.generation):
             gen_fields = [
-                f.name
-                for f in dataclasses.fields(r.generation)
-                if f.name not in ("text", "token", "logprobs")
+                f.name for f in fields(r.generation) if f.name not in ("text", "token", "logprobs")
             ]
             break
 
@@ -7162,7 +7173,7 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
     image_str = str(image_path)
 
     # Check if input is a URL (http/https only)
-    parsed_url = urllib.parse.urlparse(image_str)
+    parsed_url = urlparse(image_str)
     if parsed_url.scheme:
         scheme = parsed_url.scheme.lower()
         if scheme not in {"http", "https"}:
@@ -7175,7 +7186,7 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
         if is_url:
             # Download URL into memory and open with PIL
             logger.debug("Downloading image from URL for EXIF extraction: %s", image_str)
-            with urllib.request.urlopen(  # noqa: S310 - scheme is restricted to http/https above
+            with urlopen(  # noqa: S310 - scheme is restricted to http/https above
                 image_str,
                 timeout=30,
             ) as response:
@@ -7235,7 +7246,7 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
             return exif_decoded
     except (FileNotFoundError, UnidentifiedImageError):
         logger.exception("Error reading image: %s", image_str)
-    except (OSError, ValueError, urllib.error.URLError) as e:
+    except (OSError, ValueError, URLError) as e:
         logger.debug("Failed to extract EXIF from %s: %s", image_str, e)
     return None
 
@@ -7314,7 +7325,7 @@ def _parse_exif_local_datetime(exif_date: ExifValue) -> datetime | None:
     exif_text = str(exif_date)
     parsed: datetime | None = None
     for fmt in DATE_FORMATS:
-        with contextlib.suppress(ValueError):
+        with suppress(ValueError):
             parsed = datetime.strptime(exif_text, fmt).replace(tzinfo=UTC).astimezone()
             break
     return parsed
@@ -7451,7 +7462,7 @@ def _decode_exif_string(value: bytes | str | None) -> str:
                     break
             else:
                 # Fallback for when heuristic skips everything
-                with contextlib.suppress(UnicodeDecodeError, ValueError):
+                with suppress(UnicodeDecodeError, ValueError):
                     decoded = data.decode("utf-16", errors="replace").replace("\x00", "").strip()
         elif prefix.startswith(b"JIS\x00"):
             decoded = data.decode("shift-jis", errors="replace").replace("\x00", "").strip()
@@ -10495,7 +10506,7 @@ class DiagnosticsContext:
     recoveries: frozenset[str] = frozenset()
     new_models: frozenset[str] = frozenset()
     missing_models: frozenset[str] = frozenset()
-    failure_history: dict[str, FailureHistoryContext] = dataclasses.field(default_factory=dict)
+    failure_history: dict[str, FailureHistoryContext] = dataclass_field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -10539,10 +10550,8 @@ class _IssueClusterBuildState:
     symptom: str
     source: str
     sort_rank: int
-    results: list[PerformanceResult] = dataclasses.field(default_factory=list)
-    stack_signals: list[tuple[PerformanceResult, str, str]] = dataclasses.field(
-        default_factory=list
-    )
+    results: list[PerformanceResult] = dataclass_field(default_factory=list)
+    stack_signals: list[tuple[PerformanceResult, str, str]] = dataclass_field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -11757,7 +11766,7 @@ def _issue_target_for_package(
     if package == "model-config" and "/" in model_name:
         return (
             "model repository",
-            f"https://huggingface.co/{urllib.parse.quote(model_name, safe='/')}",
+            f"https://huggingface.co/{quote(model_name, safe='/')}",
         )
     return ("mlx-vlm", "https://github.com/Blaizzy/mlx-vlm/issues/new")
 
@@ -12635,7 +12644,7 @@ def _diagnostics_issue_queue_section(snapshot: DiagnosticsSnapshot) -> list[str]
             escape_text=DIAGNOSTICS_ESCAPER.escape,
             issue_link_for_cluster=lambda cluster: (
                 f"[`{DIAGNOSTICS_ESCAPER.escape(cluster.cluster_id)}`]"
-                f"(../issues/{urllib.parse.quote(cluster.issue_filename)})"
+                f"(../issues/{quote(cluster.issue_filename)})"
             ),
         )
     )
@@ -16228,7 +16237,7 @@ def _is_mlx_vlm_bpe_detokenizer_decode_failure(error: BaseException) -> bool:
     return False
 
 
-@contextlib.contextmanager
+@contextmanager
 def _temporary_mlx_vlm_lossy_bpe_detokenizer_patch() -> Generator[None]:
     """Temporarily ignore undecodable bytes in mlx-vlm BPE streaming detokenization."""
     space_byte: Final[int] = 32
@@ -16583,7 +16592,7 @@ def _finalize_process_result(
             runtime_diagnostics=runtime_diagnostics,
             requested_max_tokens=params.max_tokens,
         )
-    return dataclasses.replace(result_payload, runtime_diagnostics=runtime_diagnostics)
+    return replace(result_payload, runtime_diagnostics=runtime_diagnostics)
 
 
 def _run_model_generation(
@@ -16809,8 +16818,8 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             )
 
         with (
-            contextlib.redirect_stdout(cast("TextIO", stdout_capture)),
-            contextlib.redirect_stderr(cast("TextIO", stderr_capture)),
+            redirect_stdout(cast("TextIO", stdout_capture)),
+            redirect_stderr(cast("TextIO", stderr_capture)),
             TimeoutManager(params.timeout),
         ):
             output: GenerationResult | SupportsGenerationResult = _run_model_generation(
@@ -17878,11 +17887,11 @@ def _dump_environment_to_log(output_path: Path) -> None:
             # to avoid S603 security lints and provide faster, more reliable dumping.
             try:
                 # Some environments can have incomplete distribution metadata missing .name
-                def _get_name(d: importlib.metadata.Distribution) -> str:
+                def _get_name(d: Distribution) -> str:
                     return getattr(d, "name", "") or ""
 
                 dists = sorted(
-                    importlib.metadata.distributions(),
+                    distributions(),
                     key=lambda d: _get_name(d).lower(),
                 )
                 env_file.write("--- Python Packages (via importlib.metadata) ---\n")
@@ -17956,7 +17965,7 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     _dump_environment_to_log(args.output_env)
 
     # Note extra framework installs that are not part of the normal MLX path.
-    st_present = bool(importlib_util.find_spec("sentence_transformers"))
+    st_present = bool(find_spec("sentence_transformers"))
     if st_present:
         logger.debug(
             "Detected 'sentence-transformers'. It's not used here by default and may "
@@ -18828,7 +18837,7 @@ def _populate_result_quality_analysis(
             metadata_agreement = result.metadata_agreement
             if needs_metadata_refresh:
                 metadata_agreement = compute_metadata_agreement(text, metadata)
-            return dataclasses.replace(
+            return replace(
                 result,
                 quality_analysis=cached_analysis,
                 quality_issues=cached_quality_issues,
@@ -18859,7 +18868,7 @@ def _populate_result_quality_analysis(
     if needs_metadata_refresh:
         metadata_agreement = compute_metadata_agreement(text, metadata)
 
-    return dataclasses.replace(
+    return replace(
         result,
         quality_analysis=analysis,
         quality_issues=result.quality_issues or quality_issues,
@@ -20923,7 +20932,7 @@ def _issue_bundle_link(model_name: str, repro_bundles: Mapping[str, Path]) -> st
     if bundle is None:
         return ""
     escaped_name = MARKDOWN_ESCAPER.escape(bundle.name)
-    return f"[`{escaped_name}`](../repro_bundles/{urllib.parse.quote(bundle.name)})"
+    return f"[`{escaped_name}`](../repro_bundles/{quote(bundle.name)})"
 
 
 def _issue_model_signal(
@@ -21285,7 +21294,7 @@ def _write_issue_index(
             escape_text=MARKDOWN_ESCAPER.escape,
             issue_link_for_cluster=lambda cluster: (
                 f"[`{MARKDOWN_ESCAPER.escape(cluster.cluster_id)}`]"
-                f"({urllib.parse.quote(cluster.issue_filename)})"
+                f"({quote(cluster.issue_filename)})"
             ),
         )
     )
@@ -21739,7 +21748,7 @@ def _run_differential_reruns(
             )
             rerun_result = process_image_with_model(params)
             evidence = _build_rerun_evidence(rerun_result, rerun_prompt=RERUN_TRIAGE_PROMPT)
-            updated_result = dataclasses.replace(result, rerun_evidence=evidence)
+            updated_result = replace(result, rerun_evidence=evidence)
             logger.info(
                 "  Rerun %s: %s (chars=%s)",
                 result.model_name,
