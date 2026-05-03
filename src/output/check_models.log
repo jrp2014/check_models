@@ -1744,3 +1744,1225 @@ Keywords: Woodbridge, Quayside, Sailing Barge, River Deben, Suffolk, England, Tr
 2026-05-03 21:40:22 BST - INFO - Processing Model [28/53]: mlx-community/Qwen3.5-27B-4bit
 2026-05-03 21:40:22 BST - DEBUG - System: arm64, GPU: Apple M5 Max
 2026-05-03 21:40:22 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Qwen3.5-27B-4bit
+2026-05-03 21:42:12 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Qwen3.5-27B-4bit
+2026-05-03 21:42:12 BST - DEBUG - Cleaned up resources for model mlx-community/Qwen3.5-27B-4bit
+2026-05-03 21:42:12 BST - DEBUG - Quality analysis for mlx-community/Qwen3.5-27B-4bit: degeneration=True (incomplete_sentence: ends with 'b'), fabrication=True, missing_sections=title+description+keywords, reasoning_leak=True (description hint:), instruction_echo=True, metadata_borrowing=True, verdict=cutoff_degraded, user_bucket=avoid, likely_capped=True, words=285
+2026-05-03 21:42:12 BST - INFO - Quality issues detected for mlx-community/Qwen3.5-27B-4bit: degeneration, fabrication, missing-sections(title+description+keywords), reasoning-leak, instruction-echo, metadata-borrowing, cutoff
+2026-05-03 21:42:12 BST - DEBUG - 
+2026-05-03 21:42:12 BST - DEBUG - === CANONICAL REVIEW: mlx-community/Qwen3.5-27B-4bit ===
+2026-05-03 21:42:12 BST - DEBUG - Verdict: cutoff_degraded | user=avoid
+2026-05-03 21:42:12 BST - DEBUG - Why: hit token cap (500) | nontext prompt burden=97% | missing sections: title, description, keywords | missing terms: 10 Best (structured), Marina, Mooring, Pier, Quay
+2026-05-03 21:42:12 BST - DEBUG - Trusted hints: preserves trusted hints | nonvisual metadata reused
+2026-05-03 21:42:12 BST - DEBUG - Contract: missing: title, description, keywords
+2026-05-03 21:42:12 BST - DEBUG - Utility: user=avoid | preserves trusted hints | instruction echo | metadata borrowing
+2026-05-03 21:42:12 BST - DEBUG - Stack / owner: owner=model
+2026-05-03 21:42:12 BST - DEBUG - Token accounting: prompt=16821 | text_est=483 | nontext_est=16338 | gen=500 | max=500 | stop=completed
+2026-05-03 21:42:12 BST - DEBUG - Next action: Treat as a model limitation for this prompt; the requested output contract is not being met.
+2026-05-03 21:42:12 BST - DEBUG - Full output:
+The user wants me to analyze the image and generate cataloguing metadata based on specific rules.
+
+**1. Analyze the Image:**
+*   **Foreground:** Several boats are resting on the mud (low tide).
+    *   One prominent yellow boat with a large wooden oar/blade attached to its side. It has a white cabin.
+    *   Another boat to the left, white with blue trim.
+    *   Behind the yellow boat, there are other boats, including one with a red hull.
+    *   Tall masts rise up, indicating sailing vessels or barges.
+    *   Rigging is visible.
+*   **Mid-ground:**
+    *   A large white building with a tiled roof. It has scaffolding around the left side.
+    *   Another white building to the right with a tiled roof. It has a sign that says "TIDE MILL MUSEUM".
+    *   Wooden posts (pilings) in the mud.
+*   **Background:**
+    *   Blue sky, very clear, no clouds.
+    *   Trees in the distance.
+    *   A bird (gull) flying in the sky on the right.
+*   **Setting:** A river estuary or harbor at low tide (mudflats visible).
+
+**2. Evaluate Existing Metadata Hints:**
+*   *Description hint:* "A view of the historic quayside at Woodbridge, Suffolk, England, on a sunny day. Traditional boats, including a large sailing barge, are moored on the River Deben at low tide. In the background is the landmark Woodbridge Tide Mill Museum, while an adjacent building is covered in scaffolding for renovation work."
+    *   *Verification:*
+        *   "Woodbridge, Suffolk, England": The sign says "TIDE MILL MUSEUM". This is a specific landmark. The GPS coordinates (52.091500°N, 1.318500°E) confirm Woodbridge. I can confirm the location based on the sign and GPS context provided in the prompt (though I should rely on visual confirmation where possible, the sign "TIDE MILL MUSEUM" is a strong visual anchor).
+        *   "Sunny day": Yes, blue sky, strong shadows.
+        *   "Traditional boats, including a large sailing b
+2026-05-03 21:42:12 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/Qwen3.5-27B-4bit ===
+2026-05-03 21:42:12 BST - INFO - [RUN 28/53] SUMMARY model=mlx-community/Qwen3.5-27B-4bit status=OK
+2026-05-03 21:42:12 BST - INFO - quality=cutoff+degeneration+fabrication+instruction_echo+metadata_borrowing+missing_sections+reasoning_leak
+2026-05-03 21:42:12 BST - INFO - 
+2026-05-03 21:42:12 BST - INFO - Generated Text:
+2026-05-03 21:42:12 BST - INFO -    The user wants me to analyze the image and generate cataloguing metadata based on specific rules.
+2026-05-03 21:42:12 BST - INFO - 
+2026-05-03 21:42:12 BST - INFO -    **1. Analyze the Image:**
+2026-05-03 21:42:12 BST - INFO -    *   **Foreground:** Several boats are resting on the mud (low tide).
+2026-05-03 21:42:12 BST - INFO -        *   One prominent yellow boat with a large wooden oar/blade attached to its side. It has a
+2026-05-03 21:42:12 BST - INFO -    white cabin.
+2026-05-03 21:42:12 BST - INFO -        *   Another boat to the left, white with blue trim.
+2026-05-03 21:42:12 BST - INFO -        *   Behind the yellow boat, there are other boats, including one with a red hull.
+2026-05-03 21:42:12 BST - INFO -        *   Tall masts rise up, indicating sailing vessels or barges.
+2026-05-03 21:42:12 BST - INFO -        *   Rigging is visible.
+2026-05-03 21:42:12 BST - INFO -    *   **Mid-ground:**
+2026-05-03 21:42:12 BST - INFO -        *   A large white building with a tiled roof. It has scaffolding around the left side.
+2026-05-03 21:42:12 BST - INFO -        *   Another white building to the right with a tiled roof. It has a sign that says "TIDE MILL
+2026-05-03 21:42:12 BST - INFO -    MUSEUM".
+2026-05-03 21:42:12 BST - INFO -        *   Wooden posts (pilings) in the mud.
+2026-05-03 21:42:12 BST - INFO -    *   **Background:**
+2026-05-03 21:42:12 BST - INFO -        *   Blue sky, very clear, no clouds.
+2026-05-03 21:42:12 BST - INFO -        *   Trees in the distance.
+2026-05-03 21:42:12 BST - INFO -        *   A bird (gull) flying in the sky on the right.
+2026-05-03 21:42:12 BST - INFO -    *   **Setting:** A river estuary or harbor at low tide (mudflats visible).
+2026-05-03 21:42:12 BST - INFO - 
+2026-05-03 21:42:12 BST - INFO -    **2. Evaluate Existing Metadata Hints:**
+2026-05-03 21:42:12 BST - INFO -    *   *Description hint:* "A view of the historic quayside at Woodbridge, Suffolk, England, on a
+2026-05-03 21:42:12 BST - INFO -    sunny day. Traditional boats, including a large sailing barge, are moored on the River Deben at
+2026-05-03 21:42:12 BST - INFO -    low tide. In the background is the landmark Woodbridge Tide Mill Museum, while an adjacent
+2026-05-03 21:42:12 BST - INFO -    building is covered in scaffolding for renovation work."
+2026-05-03 21:42:12 BST - INFO -        *   *Verification:*
+2026-05-03 21:42:12 BST - INFO -            *   "Woodbridge, Suffolk, England": The sign says "TIDE MILL MUSEUM". This is a specific
+2026-05-03 21:42:12 BST - INFO -    landmark. The GPS coordinates (52.091500°N, 1.318500°E) confirm Woodbridge. I can confirm the
+2026-05-03 21:42:12 BST - INFO -    location based on the sign and GPS context provided in the prompt (though I should rely on visual
+2026-05-03 21:42:12 BST - INFO -    confirmation where possible, the sign "TIDE MILL MUSEUM" is a strong visual anchor).
+2026-05-03 21:42:12 BST - INFO -            *   "Sunny day": Yes, blue sky, strong shadows.
+2026-05-03 21:42:12 BST - INFO -            *   "Traditional boats, including a large sailing b
+2026-05-03 21:42:12 BST - INFO - 
+2026-05-03 21:42:12 BST - INFO - 📊 Timing: 110.12s total (gen=107.68s, load=2.17s, prep=0.01s, first=86.78s) | Memory: 26GB peak
+2026-05-03 21:42:12 BST - INFO -    Tokens: 17,321 (16,821 prompt + 500 gen) | Speed: 24.8 gen/s, 194 prompt/s
+2026-05-03 21:42:12 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:42:12 BST - INFO - 
+2026-05-03 21:42:12 BST - INFO - Processing Model [29/53]: mlx-community/Qwen3.5-27B-mxfp8
+2026-05-03 21:42:13 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:42:13 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Qwen3.5-27B-mxfp8
+2026-05-03 21:44:08 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Qwen3.5-27B-mxfp8
+2026-05-03 21:44:08 BST - DEBUG - Cleaned up resources for model mlx-community/Qwen3.5-27B-mxfp8
+2026-05-03 21:44:08 BST - DEBUG - Quality analysis for mlx-community/Qwen3.5-27B-mxfp8: excessive_bullets=True (count=28), title_words=6, description_sentences=1, keywords=21, keyword_dup=0.00, verdict=cutoff_degraded, user_bucket=avoid, likely_capped=True, words=281
+2026-05-03 21:44:08 BST - INFO - Quality issues detected for mlx-community/Qwen3.5-27B-mxfp8: keyword-count(21), cutoff, bullets(28)
+2026-05-03 21:44:08 BST - DEBUG - 
+2026-05-03 21:44:08 BST - DEBUG - === CANONICAL REVIEW: mlx-community/Qwen3.5-27B-mxfp8 ===
+2026-05-03 21:44:08 BST - DEBUG - Verdict: cutoff_degraded | user=avoid
+2026-05-03 21:44:08 BST - DEBUG - Why: hit token cap (500) | nontext prompt burden=97% | missing terms: 10 Best (structured), Gull, Marina, Pier, Quay | keywords=21
+2026-05-03 21:44:08 BST - DEBUG - Trusted hints: preserves trusted hints
+2026-05-03 21:44:08 BST - DEBUG - Contract: keywords=21
+2026-05-03 21:44:08 BST - DEBUG - Utility: user=avoid | preserves trusted hints
+2026-05-03 21:44:08 BST - DEBUG - Stack / owner: owner=model
+2026-05-03 21:44:08 BST - DEBUG - Token accounting: prompt=16821 | text_est=483 | nontext_est=16338 | gen=500 | max=500 | stop=completed
+2026-05-03 21:44:08 BST - DEBUG - Next action: Treat as a model limitation for this prompt; trusted hint coverage is still weak.
+2026-05-03 21:44:08 BST - DEBUG - Full output:
+The user wants me to generate cataloguing metadata for the provided image.
+I need to follow specific rules:
+- Use British English.
+- Only include clearly visible details.
+- Do not guess or infer uncertain information.
+- Output exactly three sections: Title, Description, Keywords.
+- Title: 5-10 words, concrete and factual.
+- Description: 1-2 factual sentences.
+- Keywords: 10-18 unique, comma-separated terms.
+
+**Image Analysis:**
+- **Foreground:** Several boats are moored on what looks like mudflats (low tide).
+    - A prominent yellow boat with a tall mast and rigging (sailing barge style).
+    - A smaller white boat to the left.
+    - Other boats behind the yellow one (red hull, white cabin).
+    - A large wooden oar or paddle is visible in the immediate foreground, attached to the yellow boat.
+- **Mid-ground:** Wooden posts (pilings) for mooring.
+- **Background:**
+    - A large white building with a tiled roof. It has "TIDE MILL MUSEUM" written on it.
+    - Another large white building to the left, covered in scaffolding.
+    - Blue sky, clear.
+    - A bird (seagull) flying in the sky on the right.
+    - Trees in the far background.
+- **Setting:** A river or estuary at low tide (mud is visible).
+
+**Drafting Metadata:**
+
+**Title:**
+- Needs to be 5-10 words.
+- "Traditional sailing barge moored on mudflats near Tide Mill Museum" (9 words) - Good.
+- "Yellow sailing barge and other boats at low tide near museum" (10 words) - Good.
+- Let's go with: "Traditional sailing barge moored on mudflats near Tide Mill Museum"
+
+**Description:**
+- Needs to be 1-2 sentences.
+- "A yellow sailing barge with a tall mast is moored on the mudflats at low tide, alongside other smaller boats."
+- "In the background, a white building labeled 'Tide Mill Museum' stands next to another large white building covered in scaffolding under a clear blue sky."
+- Combine: "A yellow sailing barge with a tall
+2026-05-03 21:44:08 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/Qwen3.5-27B-mxfp8 ===
+2026-05-03 21:44:08 BST - INFO - [RUN 29/53] SUMMARY model=mlx-community/Qwen3.5-27B-mxfp8 status=OK
+2026-05-03 21:44:08 BST - INFO - quality=bullets+cutoff+keyword_count
+2026-05-03 21:44:08 BST - INFO - 
+2026-05-03 21:44:08 BST - INFO - Generated Text:
+2026-05-03 21:44:08 BST - INFO -    The user wants me to generate cataloguing metadata for the provided image.
+2026-05-03 21:44:08 BST - INFO -    I need to follow specific rules:
+2026-05-03 21:44:08 BST - INFO -    - Use British English.
+2026-05-03 21:44:08 BST - INFO -    - Only include clearly visible details.
+2026-05-03 21:44:08 BST - INFO -    - Do not guess or infer uncertain information.
+2026-05-03 21:44:08 BST - INFO -    - Output exactly three sections: Title, Description, Keywords.
+2026-05-03 21:44:08 BST - INFO -    - Title: 5-10 words, concrete and factual.
+2026-05-03 21:44:08 BST - INFO -    - Description: 1-2 factual sentences.
+2026-05-03 21:44:08 BST - INFO -    - Keywords: 10-18 unique, comma-separated terms.
+2026-05-03 21:44:08 BST - INFO - 
+2026-05-03 21:44:08 BST - INFO -    **Image Analysis:**
+2026-05-03 21:44:08 BST - INFO -    - **Foreground:** Several boats are moored on what looks like mudflats (low tide).
+2026-05-03 21:44:08 BST - INFO -        - A prominent yellow boat with a tall mast and rigging (sailing barge style).
+2026-05-03 21:44:08 BST - INFO -        - A smaller white boat to the left.
+2026-05-03 21:44:08 BST - INFO -        - Other boats behind the yellow one (red hull, white cabin).
+2026-05-03 21:44:08 BST - INFO -        - A large wooden oar or paddle is visible in the immediate foreground, attached to the yellow
+2026-05-03 21:44:08 BST - INFO -    boat.
+2026-05-03 21:44:08 BST - INFO -    - **Mid-ground:** Wooden posts (pilings) for mooring.
+2026-05-03 21:44:08 BST - INFO -    - **Background:**
+2026-05-03 21:44:08 BST - INFO -        - A large white building with a tiled roof. It has "TIDE MILL MUSEUM" written on it.
+2026-05-03 21:44:08 BST - INFO -        - Another large white building to the left, covered in scaffolding.
+2026-05-03 21:44:08 BST - INFO -        - Blue sky, clear.
+2026-05-03 21:44:08 BST - INFO -        - A bird (seagull) flying in the sky on the right.
+2026-05-03 21:44:08 BST - INFO -        - Trees in the far background.
+2026-05-03 21:44:08 BST - INFO -    - **Setting:** A river or estuary at low tide (mud is visible).
+2026-05-03 21:44:08 BST - INFO - 
+2026-05-03 21:44:08 BST - INFO -    **Drafting Metadata:**
+2026-05-03 21:44:08 BST - INFO - 
+2026-05-03 21:44:08 BST - INFO -    **Title:**
+2026-05-03 21:44:08 BST - INFO -    - Needs to be 5-10 words.
+2026-05-03 21:44:08 BST - INFO -    - "Traditional sailing barge moored on mudflats near Tide Mill Museum" (9 words) - Good.
+2026-05-03 21:44:08 BST - INFO -    - "Yellow sailing barge and other boats at low tide near museum" (10 words) - Good.
+2026-05-03 21:44:08 BST - INFO -    - Let's go with: "Traditional sailing barge moored on mudflats near Tide Mill Museum"
+2026-05-03 21:44:08 BST - INFO - 
+2026-05-03 21:44:08 BST - INFO -    **Description:**
+2026-05-03 21:44:08 BST - INFO -    - Needs to be 1-2 sentences.
+2026-05-03 21:44:08 BST - INFO -    - "A yellow sailing barge with a tall mast is moored on the mudflats at low tide, alongside other
+2026-05-03 21:44:08 BST - INFO -    smaller boats."
+2026-05-03 21:44:08 BST - INFO -    - "In the background, a white building labeled 'Tide Mill Museum' stands next to another large
+2026-05-03 21:44:08 BST - INFO -    white building covered in scaffolding under a clear blue sky."
+2026-05-03 21:44:08 BST - INFO -    - Combine: "A yellow sailing barge with a tall
+2026-05-03 21:44:08 BST - INFO - 
+2026-05-03 21:44:08 BST - INFO - 📊 Timing: 115.96s total (gen=112.54s, load=3.15s, prep=0.01s, first=83.29s) | Memory: 39GB peak
+2026-05-03 21:44:08 BST - INFO -    Tokens: 17,321 (16,821 prompt + 500 gen) | Speed: 17.6 gen/s, 202 prompt/s
+2026-05-03 21:44:08 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:44:08 BST - INFO - 
+2026-05-03 21:44:08 BST - INFO - Processing Model [30/53]: mlx-community/Qwen3.5-35B-A3B-4bit
+2026-05-03 21:44:09 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:44:09 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Qwen3.5-35B-A3B-4bit
+2026-05-03 21:45:11 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Qwen3.5-35B-A3B-4bit
+2026-05-03 21:45:11 BST - DEBUG - Cleaned up resources for model mlx-community/Qwen3.5-35B-A3B-4bit
+2026-05-03 21:45:11 BST - DEBUG - Quality analysis for mlx-community/Qwen3.5-35B-A3B-4bit: missing_sections=title+description+keywords, verdict=cutoff_degraded, user_bucket=avoid, likely_capped=True, words=279
+2026-05-03 21:45:11 BST - INFO - Quality issues detected for mlx-community/Qwen3.5-35B-A3B-4bit: missing-sections(title+description+keywords), cutoff
+2026-05-03 21:45:11 BST - DEBUG - 
+2026-05-03 21:45:11 BST - DEBUG - === CANONICAL REVIEW: mlx-community/Qwen3.5-35B-A3B-4bit ===
+2026-05-03 21:45:11 BST - DEBUG - Verdict: cutoff_degraded | user=avoid
+2026-05-03 21:45:11 BST - DEBUG - Why: hit token cap (500) | nontext prompt burden=97% | missing sections: title, description, keywords | missing terms: 10 Best (structured), Marina, Mooring, Pier, Quay
+2026-05-03 21:45:11 BST - DEBUG - Trusted hints: preserves trusted hints
+2026-05-03 21:45:11 BST - DEBUG - Contract: missing: title, description, keywords
+2026-05-03 21:45:11 BST - DEBUG - Utility: user=avoid | preserves trusted hints
+2026-05-03 21:45:11 BST - DEBUG - Stack / owner: owner=model
+2026-05-03 21:45:11 BST - DEBUG - Token accounting: prompt=16821 | text_est=483 | nontext_est=16338 | gen=500 | max=500 | stop=completed
+2026-05-03 21:45:11 BST - DEBUG - Next action: Treat as a model limitation for this prompt; the requested output contract is not being met.
+2026-05-03 21:45:11 BST - DEBUG - Full output:
+The user wants me to generate cataloguing metadata for the provided image.
+I need to follow specific rules:
+- Use British English.
+- Only include clearly visible details.
+- No guessing or inference.
+- Three specific sections: Title, Description, Keywords.
+- Follow the provided hints only if confirmed by the image.
+
+**Image Analysis:**
+- **Foreground/Midground:** Several boats are moored. The most prominent is a yellow-hulled sailing barge with a large wooden leeboard. It has a tall mast and rigging. There are other boats behind it (white cabin, red hull).
+- **Background:** Large white buildings. One has scaffolding all over it. The other is a white building with a tiled roof, labeled "TIDE MILL MUSEUM".
+- **Sky:** Clear blue sky.
+- **Ground:** Mudflats are visible, indicating low tide.
+- **Details:** A bird (gull) is flying in the sky. Scaffolding is clearly visible on the left building. The text "TIDE MILL MUSEUM" is visible on the white building.
+
+**Drafting Title:**
+- Needs to be 5-10 words.
+- Focus on visible content.
+- Draft 1: Yellow sailing barge moored on mudflats near white buildings. (9 words) - Good.
+- Draft 2: Traditional sailing barge with leeboard moored at low tide. (9 words) - Good.
+- Draft 3: Yellow barge and white buildings on a sunny day. (8 words) - Good.
+- Let's go with something descriptive of the main subject. "Yellow sailing barge with leeboard moored near white buildings" (9 words).
+
+**Drafting Description:**
+- 1-2 factual sentences.
+- Describe main subject, setting, lighting.
+- Draft 1: A yellow sailing barge with a large wooden leeboard is moored on exposed mudflats. Behind the boats, white buildings stand under a clear blue sky, with one covered in scaffolding. (2 sentences) - Accurate.
+
+**Drafting Keywords:**
+- 10-18 unique comma-separated terms.
+- Based on visible subjects, setting, colors, etc.
+- Visible items: Yellow, barge, sailing, boat, moored, mudflats, low tide
+2026-05-03 21:45:11 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/Qwen3.5-35B-A3B-4bit ===
+2026-05-03 21:45:11 BST - INFO - [RUN 30/53] SUMMARY model=mlx-community/Qwen3.5-35B-A3B-4bit status=OK
+2026-05-03 21:45:11 BST - INFO - quality=cutoff+missing_sections
+2026-05-03 21:45:11 BST - INFO - 
+2026-05-03 21:45:11 BST - INFO - Generated Text:
+2026-05-03 21:45:11 BST - INFO -    The user wants me to generate cataloguing metadata for the provided image.
+2026-05-03 21:45:11 BST - INFO -    I need to follow specific rules:
+2026-05-03 21:45:11 BST - INFO -    - Use British English.
+2026-05-03 21:45:11 BST - INFO -    - Only include clearly visible details.
+2026-05-03 21:45:11 BST - INFO -    - No guessing or inference.
+2026-05-03 21:45:11 BST - INFO -    - Three specific sections: Title, Description, Keywords.
+2026-05-03 21:45:11 BST - INFO -    - Follow the provided hints only if confirmed by the image.
+2026-05-03 21:45:11 BST - INFO - 
+2026-05-03 21:45:11 BST - INFO -    **Image Analysis:**
+2026-05-03 21:45:11 BST - INFO -    - **Foreground/Midground:** Several boats are moored. The most prominent is a yellow-hulled
+2026-05-03 21:45:11 BST - INFO -    sailing barge with a large wooden leeboard. It has a tall mast and rigging. There are other boats
+2026-05-03 21:45:11 BST - INFO -    behind it (white cabin, red hull).
+2026-05-03 21:45:11 BST - INFO -    - **Background:** Large white buildings. One has scaffolding all over it. The other is a white
+2026-05-03 21:45:11 BST - INFO -    building with a tiled roof, labeled "TIDE MILL MUSEUM".
+2026-05-03 21:45:11 BST - INFO -    - **Sky:** Clear blue sky.
+2026-05-03 21:45:11 BST - INFO -    - **Ground:** Mudflats are visible, indicating low tide.
+2026-05-03 21:45:11 BST - INFO -    - **Details:** A bird (gull) is flying in the sky. Scaffolding is clearly visible on the left
+2026-05-03 21:45:11 BST - INFO -    building. The text "TIDE MILL MUSEUM" is visible on the white building.
+2026-05-03 21:45:11 BST - INFO - 
+2026-05-03 21:45:11 BST - INFO -    **Drafting Title:**
+2026-05-03 21:45:11 BST - INFO -    - Needs to be 5-10 words.
+2026-05-03 21:45:11 BST - INFO -    - Focus on visible content.
+2026-05-03 21:45:11 BST - INFO -    - Draft 1: Yellow sailing barge moored on mudflats near white buildings. (9 words) - Good.
+2026-05-03 21:45:11 BST - INFO -    - Draft 2: Traditional sailing barge with leeboard moored at low tide. (9 words) - Good.
+2026-05-03 21:45:11 BST - INFO -    - Draft 3: Yellow barge and white buildings on a sunny day. (8 words) - Good.
+2026-05-03 21:45:11 BST - INFO -    - Let's go with something descriptive of the main subject. "Yellow sailing barge with leeboard
+2026-05-03 21:45:11 BST - INFO -    moored near white buildings" (9 words).
+2026-05-03 21:45:11 BST - INFO - 
+2026-05-03 21:45:11 BST - INFO -    **Drafting Description:**
+2026-05-03 21:45:11 BST - INFO -    - 1-2 factual sentences.
+2026-05-03 21:45:11 BST - INFO -    - Describe main subject, setting, lighting.
+2026-05-03 21:45:11 BST - INFO -    - Draft 1: A yellow sailing barge with a large wooden leeboard is moored on exposed mudflats.
+2026-05-03 21:45:11 BST - INFO -    Behind the boats, white buildings stand under a clear blue sky, with one covered in scaffolding.
+2026-05-03 21:45:11 BST - INFO -    (2 sentences) - Accurate.
+2026-05-03 21:45:11 BST - INFO - 
+2026-05-03 21:45:11 BST - INFO -    **Drafting Keywords:**
+2026-05-03 21:45:11 BST - INFO -    - 10-18 unique comma-separated terms.
+2026-05-03 21:45:11 BST - INFO -    - Based on visible subjects, setting, colors, etc.
+2026-05-03 21:45:11 BST - INFO -    - Visible items: Yellow, barge, sailing, boat, moored, mudflats, low tide
+2026-05-03 21:45:11 BST - INFO - 
+2026-05-03 21:45:11 BST - INFO - 📊 Timing: 62.11s total (gen=59.34s, load=2.52s, prep=0.00s, first=53.86s) | Memory: 26GB peak
+2026-05-03 21:45:11 BST - INFO -    Tokens: 17,321 (16,821 prompt + 500 gen) | Speed: 104 gen/s, 312 prompt/s
+2026-05-03 21:45:11 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:45:11 BST - INFO - 
+2026-05-03 21:45:11 BST - INFO - Processing Model [31/53]: mlx-community/Qwen3.5-35B-A3B-6bit
+2026-05-03 21:45:11 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:45:11 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Qwen3.5-35B-A3B-6bit
+2026-05-03 21:46:14 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Qwen3.5-35B-A3B-6bit
+2026-05-03 21:46:14 BST - DEBUG - Cleaned up resources for model mlx-community/Qwen3.5-35B-A3B-6bit
+2026-05-03 21:46:14 BST - DEBUG - Quality analysis for mlx-community/Qwen3.5-35B-A3B-6bit: missing_sections=title+description+keywords, verdict=cutoff_degraded, user_bucket=avoid, likely_capped=True, words=269
+2026-05-03 21:46:14 BST - INFO - Quality issues detected for mlx-community/Qwen3.5-35B-A3B-6bit: missing-sections(title+description+keywords), cutoff
+2026-05-03 21:46:14 BST - DEBUG - 
+2026-05-03 21:46:14 BST - DEBUG - === CANONICAL REVIEW: mlx-community/Qwen3.5-35B-A3B-6bit ===
+2026-05-03 21:46:14 BST - DEBUG - Verdict: cutoff_degraded | user=avoid
+2026-05-03 21:46:14 BST - DEBUG - Why: hit token cap (500) | nontext prompt burden=97% | missing sections: title, description, keywords | missing terms: 10 Best (structured), Bird, Gull, Marina, Mooring
+2026-05-03 21:46:14 BST - DEBUG - Trusted hints: preserves trusted hints
+2026-05-03 21:46:14 BST - DEBUG - Contract: missing: title, description, keywords
+2026-05-03 21:46:14 BST - DEBUG - Utility: user=avoid | preserves trusted hints
+2026-05-03 21:46:14 BST - DEBUG - Stack / owner: owner=model
+2026-05-03 21:46:14 BST - DEBUG - Token accounting: prompt=16821 | text_est=483 | nontext_est=16338 | gen=500 | max=500 | stop=completed
+2026-05-03 21:46:14 BST - DEBUG - Next action: Treat as a model limitation for this prompt; the requested output contract is not being met.
+2026-05-03 21:46:14 BST - DEBUG - Full output:
+The user wants me to generate cataloguing metadata for the provided image.
+I need to follow specific rules:
+- British English.
+- Only clearly visible details. No guessing.
+- Three sections: Title, Description, Keywords.
+- Specific constraints for each section (word counts, formatting).
+- Use the provided context hints only if confirmed by the image.
+
+**Image Analysis:**
+- **Subject:** Several boats moored on a muddy riverbed (low tide).
+- **Foreground:** A yellow boat with a large wooden rudder visible on the side. A white boat to its left.
+- **Midground:** A large sailing barge with a tall mast and a furled brown sail. Another boat behind it.
+- **Background:** Large white buildings. One has scaffolding (renovation). The other is a white building with a tiled roof, labeled "TIDE MILL MUSEUM".
+- **Sky:** Clear blue sky.
+- **Birds:** Two seagulls flying in the sky.
+- **Lighting:** Bright sunlight, casting shadows.
+- **Setting:** A river or estuary at low tide (mud visible).
+
+**Drafting Title:**
+- Needs to be 5-10 words.
+- Concrete and factual.
+- *Draft 1:* Traditional sailing barges moored on a muddy riverbed near a white museum building. (12 words - too long)
+- *Draft 2:* Sailing barges moored on mudflats near a white museum building. (10 words - good)
+- *Draft 3:* Yellow boat and sailing barge moored on mudflats near a museum. (11 words - too long)
+- *Draft 4:* Traditional sailing barges moored on mudflats near a white museum. (10 words - good)
+- *Draft 5:* Sailing barges and boats moored on mudflats near a white building. (11 words - too long)
+- *Draft 6:* Traditional boats moored on mudflats near a white museum building. (10 words - good)
+- *Draft 7:* Sailing barges moored on mudflats near a white museum building. (10 words - good)
+- Let's go with: **Traditional sailing barges moored on mudflats near a white museum
+2026-05-03 21:46:14 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/Qwen3.5-35B-A3B-6bit ===
+2026-05-03 21:46:14 BST - INFO - [RUN 31/53] SUMMARY model=mlx-community/Qwen3.5-35B-A3B-6bit status=OK
+2026-05-03 21:46:14 BST - INFO - quality=cutoff+missing_sections
+2026-05-03 21:46:14 BST - INFO - 
+2026-05-03 21:46:14 BST - INFO - Generated Text:
+2026-05-03 21:46:14 BST - INFO -    The user wants me to generate cataloguing metadata for the provided image.
+2026-05-03 21:46:14 BST - INFO -    I need to follow specific rules:
+2026-05-03 21:46:14 BST - INFO -    - British English.
+2026-05-03 21:46:14 BST - INFO -    - Only clearly visible details. No guessing.
+2026-05-03 21:46:14 BST - INFO -    - Three sections: Title, Description, Keywords.
+2026-05-03 21:46:14 BST - INFO -    - Specific constraints for each section (word counts, formatting).
+2026-05-03 21:46:14 BST - INFO -    - Use the provided context hints only if confirmed by the image.
+2026-05-03 21:46:14 BST - INFO - 
+2026-05-03 21:46:14 BST - INFO -    **Image Analysis:**
+2026-05-03 21:46:14 BST - INFO -    - **Subject:** Several boats moored on a muddy riverbed (low tide).
+2026-05-03 21:46:14 BST - INFO -    - **Foreground:** A yellow boat with a large wooden rudder visible on the side. A white boat to
+2026-05-03 21:46:14 BST - INFO -    its left.
+2026-05-03 21:46:14 BST - INFO -    - **Midground:** A large sailing barge with a tall mast and a furled brown sail. Another boat
+2026-05-03 21:46:14 BST - INFO -    behind it.
+2026-05-03 21:46:14 BST - INFO -    - **Background:** Large white buildings. One has scaffolding (renovation). The other is a white
+2026-05-03 21:46:14 BST - INFO -    building with a tiled roof, labeled "TIDE MILL MUSEUM".
+2026-05-03 21:46:14 BST - INFO -    - **Sky:** Clear blue sky.
+2026-05-03 21:46:14 BST - INFO -    - **Birds:** Two seagulls flying in the sky.
+2026-05-03 21:46:14 BST - INFO -    - **Lighting:** Bright sunlight, casting shadows.
+2026-05-03 21:46:14 BST - INFO -    - **Setting:** A river or estuary at low tide (mud visible).
+2026-05-03 21:46:14 BST - INFO - 
+2026-05-03 21:46:14 BST - INFO -    **Drafting Title:**
+2026-05-03 21:46:14 BST - INFO -    - Needs to be 5-10 words.
+2026-05-03 21:46:14 BST - INFO -    - Concrete and factual.
+2026-05-03 21:46:14 BST - INFO -    - *Draft 1:* Traditional sailing barges moored on a muddy riverbed near a white museum building.
+2026-05-03 21:46:14 BST - INFO -    (12 words - too long)
+2026-05-03 21:46:14 BST - INFO -    - *Draft 2:* Sailing barges moored on mudflats near a white museum building. (10 words - good)
+2026-05-03 21:46:14 BST - INFO -    - *Draft 3:* Yellow boat and sailing barge moored on mudflats near a museum. (11 words - too
+2026-05-03 21:46:14 BST - INFO -    long)
+2026-05-03 21:46:14 BST - INFO -    - *Draft 4:* Traditional sailing barges moored on mudflats near a white museum. (10 words - good)
+2026-05-03 21:46:14 BST - INFO -    - *Draft 5:* Sailing barges and boats moored on mudflats near a white building. (11 words - too
+2026-05-03 21:46:14 BST - INFO -    long)
+2026-05-03 21:46:14 BST - INFO -    - *Draft 6:* Traditional boats moored on mudflats near a white museum building. (10 words - good)
+2026-05-03 21:46:14 BST - INFO -    - *Draft 7:* Sailing barges moored on mudflats near a white museum building. (10 words - good)
+2026-05-03 21:46:14 BST - INFO -    - Let's go with: **Traditional sailing barges moored on mudflats near a white museum
+2026-05-03 21:46:14 BST - INFO - 
+2026-05-03 21:46:14 BST - INFO - 📊 Timing: 62.87s total (gen=59.51s, load=3.12s, prep=0.00s, first=53.02s) | Memory: 35GB peak
+2026-05-03 21:46:14 BST - INFO -    Tokens: 17,321 (16,821 prompt + 500 gen) | Speed: 87 gen/s, 317 prompt/s
+2026-05-03 21:46:14 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:46:14 BST - INFO - 
+2026-05-03 21:46:14 BST - INFO - Processing Model [32/53]: mlx-community/Qwen3.5-35B-A3B-bf16
+2026-05-03 21:46:14 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:46:14 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Qwen3.5-35B-A3B-bf16
+2026-05-03 21:47:39 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Qwen3.5-35B-A3B-bf16
+2026-05-03 21:47:39 BST - DEBUG - Cleaned up resources for model mlx-community/Qwen3.5-35B-A3B-bf16
+2026-05-03 21:47:39 BST - DEBUG - Quality analysis for mlx-community/Qwen3.5-35B-A3B-bf16: missing_sections=title+description+keywords, verdict=cutoff_degraded, user_bucket=avoid, likely_capped=True, words=285
+2026-05-03 21:47:39 BST - INFO - Quality issues detected for mlx-community/Qwen3.5-35B-A3B-bf16: missing-sections(title+description+keywords), cutoff
+2026-05-03 21:47:39 BST - DEBUG - 
+2026-05-03 21:47:39 BST - DEBUG - === CANONICAL REVIEW: mlx-community/Qwen3.5-35B-A3B-bf16 ===
+2026-05-03 21:47:39 BST - DEBUG - Verdict: cutoff_degraded | user=avoid
+2026-05-03 21:47:39 BST - DEBUG - Why: hit token cap (500) | nontext prompt burden=97% | missing sections: title, description, keywords | missing terms: 10 Best (structured), Marina, Mooring, Mudflats, Pier
+2026-05-03 21:47:39 BST - DEBUG - Trusted hints: preserves trusted hints
+2026-05-03 21:47:39 BST - DEBUG - Contract: missing: title, description, keywords
+2026-05-03 21:47:39 BST - DEBUG - Utility: user=avoid | preserves trusted hints
+2026-05-03 21:47:39 BST - DEBUG - Stack / owner: owner=model
+2026-05-03 21:47:39 BST - DEBUG - Token accounting: prompt=16821 | text_est=483 | nontext_est=16338 | gen=500 | max=500 | stop=completed
+2026-05-03 21:47:39 BST - DEBUG - Next action: Treat as a model limitation for this prompt; the requested output contract is not being met.
+2026-05-03 21:47:39 BST - DEBUG - Full output:
+The user wants me to generate cataloguing metadata for the provided image.
+I need to follow specific rules:
+- British English.
+- Only clearly visible details.
+- Three sections: Title, Description, Keywords.
+- Specific constraints on length and content for each section.
+- Use the provided context hints only if confirmed by the image.
+
+**Image Analysis:**
+- **Subject:** Several boats moored on a muddy riverbed (low tide).
+- **Foreground:** A yellow boat with a large wooden rudder visible on the side. A white boat to its left.
+- **Midground:** A large sailing barge with a tall mast and a furled brown sail. Another boat behind it.
+- **Background:** Large white buildings. One has scaffolding (renovation). The other is a white building with a tiled roof, labeled "TIDE MILL MUSEUM".
+- **Sky:** Clear blue sky.
+- **Lighting:** Bright sunlight, casting shadows.
+- **Details:** Scaffolding on the left building. "TIDE MILL MUSEUM" sign is visible on the right building. A bird (gull) is flying in the sky.
+
+**Drafting Title:**
+- Needs to be 5-10 words.
+- Concrete and factual.
+- *Draft 1:* Traditional sailing barges moored on the river at low tide near a museum. (12 words - too long)
+- *Draft 2:* Sailing barges moored on the river at low tide near a museum. (11 words - too long)
+- *Draft 3:* Traditional sailing barges moored on the river at low tide. (9 words) - Good.
+- *Draft 4:* Yellow boat and sailing barge moored near Tide Mill Museum. (9 words) - Good.
+- *Draft 5:* Traditional boats moored on the river at low tide near a museum. (11 words - too long)
+- *Draft 6:* Sailing barges and boats moored on the river at low tide. (10 words) - Good.
+- *Draft 7:* Traditional sailing barges moored on the river at low tide. (9 words) - Let's go with something descriptive of the main elements.
+- *Selected Title:* Traditional sailing barges moored on the river at low tide.
+2026-05-03 21:47:39 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/Qwen3.5-35B-A3B-bf16 ===
+2026-05-03 21:47:39 BST - INFO - [RUN 32/53] SUMMARY model=mlx-community/Qwen3.5-35B-A3B-bf16 status=OK
+2026-05-03 21:47:39 BST - INFO - quality=cutoff+missing_sections
+2026-05-03 21:47:39 BST - INFO - 
+2026-05-03 21:47:39 BST - INFO - Generated Text:
+2026-05-03 21:47:39 BST - INFO -    The user wants me to generate cataloguing metadata for the provided image.
+2026-05-03 21:47:39 BST - INFO -    I need to follow specific rules:
+2026-05-03 21:47:39 BST - INFO -    - British English.
+2026-05-03 21:47:39 BST - INFO -    - Only clearly visible details.
+2026-05-03 21:47:39 BST - INFO -    - Three sections: Title, Description, Keywords.
+2026-05-03 21:47:39 BST - INFO -    - Specific constraints on length and content for each section.
+2026-05-03 21:47:39 BST - INFO -    - Use the provided context hints only if confirmed by the image.
+2026-05-03 21:47:39 BST - INFO - 
+2026-05-03 21:47:39 BST - INFO -    **Image Analysis:**
+2026-05-03 21:47:39 BST - INFO -    - **Subject:** Several boats moored on a muddy riverbed (low tide).
+2026-05-03 21:47:39 BST - INFO -    - **Foreground:** A yellow boat with a large wooden rudder visible on the side. A white boat to
+2026-05-03 21:47:39 BST - INFO -    its left.
+2026-05-03 21:47:39 BST - INFO -    - **Midground:** A large sailing barge with a tall mast and a furled brown sail. Another boat
+2026-05-03 21:47:39 BST - INFO -    behind it.
+2026-05-03 21:47:39 BST - INFO -    - **Background:** Large white buildings. One has scaffolding (renovation). The other is a white
+2026-05-03 21:47:39 BST - INFO -    building with a tiled roof, labeled "TIDE MILL MUSEUM".
+2026-05-03 21:47:39 BST - INFO -    - **Sky:** Clear blue sky.
+2026-05-03 21:47:39 BST - INFO -    - **Lighting:** Bright sunlight, casting shadows.
+2026-05-03 21:47:39 BST - INFO -    - **Details:** Scaffolding on the left building. "TIDE MILL MUSEUM" sign is visible on the right
+2026-05-03 21:47:39 BST - INFO -    building. A bird (gull) is flying in the sky.
+2026-05-03 21:47:39 BST - INFO - 
+2026-05-03 21:47:39 BST - INFO -    **Drafting Title:**
+2026-05-03 21:47:39 BST - INFO -    - Needs to be 5-10 words.
+2026-05-03 21:47:39 BST - INFO -    - Concrete and factual.
+2026-05-03 21:47:39 BST - INFO -    - *Draft 1:* Traditional sailing barges moored on the river at low tide near a museum. (12 words
+2026-05-03 21:47:39 BST - INFO -    - too long)
+2026-05-03 21:47:39 BST - INFO -    - *Draft 2:* Sailing barges moored on the river at low tide near a museum. (11 words - too long)
+2026-05-03 21:47:39 BST - INFO -    - *Draft 3:* Traditional sailing barges moored on the river at low tide. (9 words) - Good.
+2026-05-03 21:47:39 BST - INFO -    - *Draft 4:* Yellow boat and sailing barge moored near Tide Mill Museum. (9 words) - Good.
+2026-05-03 21:47:39 BST - INFO -    - *Draft 5:* Traditional boats moored on the river at low tide near a museum. (11 words - too
+2026-05-03 21:47:39 BST - INFO -    long)
+2026-05-03 21:47:39 BST - INFO -    - *Draft 6:* Sailing barges and boats moored on the river at low tide. (10 words) - Good.
+2026-05-03 21:47:39 BST - INFO -    - *Draft 7:* Traditional sailing barges moored on the river at low tide. (9 words) - Let's go
+2026-05-03 21:47:39 BST - INFO -    with something descriptive of the main elements.
+2026-05-03 21:47:39 BST - INFO -    - *Selected Title:* Traditional sailing barges moored on the river at low tide.
+2026-05-03 21:47:39 BST - INFO - 
+2026-05-03 21:47:39 BST - INFO - 📊 Timing: 84.87s total (gen=72.87s, load=11.75s, prep=0.00s, first=63.38s) | Memory: 76GB peak
+2026-05-03 21:47:39 BST - INFO -    Tokens: 17,321 (16,821 prompt + 500 gen) | Speed: 57.5 gen/s, 265 prompt/s
+2026-05-03 21:47:39 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:47:39 BST - INFO - 
+2026-05-03 21:47:39 BST - INFO - Processing Model [33/53]: mlx-community/Qwen3.5-9B-MLX-4bit
+2026-05-03 21:47:39 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:47:39 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Qwen3.5-9B-MLX-4bit
+2026-05-03 21:48:41 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Qwen3.5-9B-MLX-4bit
+2026-05-03 21:48:41 BST - DEBUG - Cleaned up resources for model mlx-community/Qwen3.5-9B-MLX-4bit
+2026-05-03 21:48:41 BST - DEBUG - Quality analysis for mlx-community/Qwen3.5-9B-MLX-4bit: missing_sections=title+description+keywords, metadata_borrowing=True, verdict=cutoff_degraded, user_bucket=avoid, likely_capped=True, words=323
+2026-05-03 21:48:41 BST - INFO - Quality issues detected for mlx-community/Qwen3.5-9B-MLX-4bit: missing-sections(title+description+keywords), metadata-borrowing, cutoff
+2026-05-03 21:48:41 BST - DEBUG - 
+2026-05-03 21:48:41 BST - DEBUG - === CANONICAL REVIEW: mlx-community/Qwen3.5-9B-MLX-4bit ===
+2026-05-03 21:48:41 BST - DEBUG - Verdict: cutoff_degraded | user=avoid
+2026-05-03 21:48:41 BST - DEBUG - Why: hit token cap (500) | nontext prompt burden=97% | missing sections: title, description, keywords | missing terms: 10 Best (structured), Gull, Marina, Pier, Quay
+2026-05-03 21:48:41 BST - DEBUG - Trusted hints: preserves trusted hints | nonvisual metadata reused
+2026-05-03 21:48:41 BST - DEBUG - Contract: missing: title, description, keywords
+2026-05-03 21:48:41 BST - DEBUG - Utility: user=avoid | preserves trusted hints | metadata borrowing
+2026-05-03 21:48:41 BST - DEBUG - Stack / owner: owner=model
+2026-05-03 21:48:41 BST - DEBUG - Token accounting: prompt=16821 | text_est=483 | nontext_est=16338 | gen=500 | max=500 | stop=completed
+2026-05-03 21:48:41 BST - DEBUG - Next action: Treat as a model limitation for this prompt; the requested output contract is not being met.
+2026-05-03 21:48:41 BST - DEBUG - Full output:
+The user wants me to analyze the provided image and generate cataloguing metadata in British English.
+I need to follow specific rules:
+- Use only details clearly and definitely visible.
+- Omit uncertain, ambiguous, or inferred details.
+- Treat the provided metadata hints as a draft record.
+- Keep only confirmed details, correct contradictions, and add important visible details.
+- Return exactly three sections: Title, Description, Keywords.
+
+**1. Analyze the Image:**
+- **Subject:** A collection of boats moored in a harbour/quayside.
+- **Main Boat:** A large, yellow-hulled sailing barge with a tall mast and rigging. It has a wooden paddle wheel or similar structure attached to the stern (actually, looking closer, it's a large wooden paddle wheel housing, suggesting a paddle steamer or similar vessel, but the hull shape and rigging suggest a sailing barge, possibly a traditional working boat). Wait, looking very closely at the stern of the yellow boat, there is a large wooden paddle wheel. This suggests it might be a paddle steamer or a hybrid. However, the mast is very tall. Let's look at the boat next to it.
+- **Boats:**
+    - Foreground left: A small white boat with a cabin.
+    - Foreground center: A yellow boat with a green cabin top. It has a large wooden paddle wheel attached to the stern.
+    - Behind the yellow boat: A blue/green boat.
+    - Behind that: A red boat.
+    - Further back: A black boat with "Japi" written on the stern.
+- **Background Buildings:**
+    - Left/Center: A large white building covered in scaffolding. It has a tiled roof.
+    - Right: A white building with a tiled roof, labeled "TIDE MILL MUSEUM".
+- **Setting:** A harbour or river bank. The ground is muddy/mudflats, indicating low tide. There are wooden posts (mooring posts).
+- **Sky:** Clear blue sky.
+- **Lighting:** Bright sunlight, casting shadows.
+- **Bird:** A seagull flying in the sky on the right.
+- **Location:** The sign says "TIDE MILL MUSEUM". This confirms the location hint (Woodbridge, Suffolk).
+- **Date/Time:** The prompt provides a specific date
+2026-05-03 21:48:41 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/Qwen3.5-9B-MLX-4bit ===
+2026-05-03 21:48:41 BST - INFO - [RUN 33/53] SUMMARY model=mlx-community/Qwen3.5-9B-MLX-4bit status=OK
+2026-05-03 21:48:41 BST - INFO - quality=cutoff+metadata_borrowing+missing_sections
+2026-05-03 21:48:41 BST - INFO - 
+2026-05-03 21:48:41 BST - INFO - Generated Text:
+2026-05-03 21:48:41 BST - INFO -    The user wants me to analyze the provided image and generate cataloguing metadata in British
+2026-05-03 21:48:41 BST - INFO -    English.
+2026-05-03 21:48:41 BST - INFO -    I need to follow specific rules:
+2026-05-03 21:48:41 BST - INFO -    - Use only details clearly and definitely visible.
+2026-05-03 21:48:41 BST - INFO -    - Omit uncertain, ambiguous, or inferred details.
+2026-05-03 21:48:41 BST - INFO -    - Treat the provided metadata hints as a draft record.
+2026-05-03 21:48:41 BST - INFO -    - Keep only confirmed details, correct contradictions, and add important visible details.
+2026-05-03 21:48:41 BST - INFO -    - Return exactly three sections: Title, Description, Keywords.
+2026-05-03 21:48:41 BST - INFO - 
+2026-05-03 21:48:41 BST - INFO -    **1. Analyze the Image:**
+2026-05-03 21:48:41 BST - INFO -    - **Subject:** A collection of boats moored in a harbour/quayside.
+2026-05-03 21:48:41 BST - INFO -    - **Main Boat:** A large, yellow-hulled sailing barge with a tall mast and rigging. It has a
+2026-05-03 21:48:41 BST - INFO -    wooden paddle wheel or similar structure attached to the stern (actually, looking closer, it's a
+2026-05-03 21:48:41 BST - INFO -    large wooden paddle wheel housing, suggesting a paddle steamer or similar vessel, but the hull
+2026-05-03 21:48:41 BST - INFO -    shape and rigging suggest a sailing barge, possibly a traditional working boat). Wait, looking
+2026-05-03 21:48:41 BST - INFO -    very closely at the stern of the yellow boat, there is a large wooden paddle wheel. This suggests
+2026-05-03 21:48:41 BST - INFO -    it might be a paddle steamer or a hybrid. However, the mast is very tall. Let's look at the boat
+2026-05-03 21:48:41 BST - INFO -    next to it.
+2026-05-03 21:48:41 BST - INFO -    - **Boats:**
+2026-05-03 21:48:41 BST - INFO -        - Foreground left: A small white boat with a cabin.
+2026-05-03 21:48:41 BST - INFO -        - Foreground center: A yellow boat with a green cabin top. It has a large wooden paddle wheel
+2026-05-03 21:48:41 BST - INFO -    attached to the stern.
+2026-05-03 21:48:41 BST - INFO -        - Behind the yellow boat: A blue/green boat.
+2026-05-03 21:48:41 BST - INFO -        - Behind that: A red boat.
+2026-05-03 21:48:41 BST - INFO -        - Further back: A black boat with "Japi" written on the stern.
+2026-05-03 21:48:41 BST - INFO -    - **Background Buildings:**
+2026-05-03 21:48:41 BST - INFO -        - Left/Center: A large white building covered in scaffolding. It has a tiled roof.
+2026-05-03 21:48:41 BST - INFO -        - Right: A white building with a tiled roof, labeled "TIDE MILL MUSEUM".
+2026-05-03 21:48:41 BST - INFO -    - **Setting:** A harbour or river bank. The ground is muddy/mudflats, indicating low tide. There
+2026-05-03 21:48:41 BST - INFO -    are wooden posts (mooring posts).
+2026-05-03 21:48:41 BST - INFO -    - **Sky:** Clear blue sky.
+2026-05-03 21:48:41 BST - INFO -    - **Lighting:** Bright sunlight, casting shadows.
+2026-05-03 21:48:41 BST - INFO -    - **Bird:** A seagull flying in the sky on the right.
+2026-05-03 21:48:41 BST - INFO -    - **Location:** The sign says "TIDE MILL MUSEUM". This confirms the location hint (Woodbridge,
+2026-05-03 21:48:41 BST - INFO -    Suffolk).
+2026-05-03 21:48:41 BST - INFO -    - **Date/Time:** The prompt provides a specific date
+2026-05-03 21:48:41 BST - INFO - 
+2026-05-03 21:48:41 BST - INFO - 📊 Timing: 62.24s total (gen=60.55s, load=1.42s, prep=0.00s, first=54.22s) | Memory: 12GB peak
+2026-05-03 21:48:41 BST - INFO -    Tokens: 17,321 (16,821 prompt + 500 gen) | Speed: 89.3 gen/s, 310 prompt/s
+2026-05-03 21:48:41 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:48:41 BST - INFO - 
+2026-05-03 21:48:41 BST - INFO - Processing Model [34/53]: mlx-community/Qwen3.6-27B-mxfp8
+2026-05-03 21:48:41 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:48:41 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/Qwen3.6-27B-mxfp8
+2026-05-03 21:50:24 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/Qwen3.6-27B-mxfp8
+2026-05-03 21:50:24 BST - DEBUG - Cleaned up resources for model mlx-community/Qwen3.6-27B-mxfp8
+2026-05-03 21:50:24 BST - DEBUG - Quality analysis for mlx-community/Qwen3.6-27B-mxfp8: degeneration=True (character_loop: ' ' repeated), missing_sections=title+description+keywords, reasoning_leak=True (description hint:), instruction_echo=True, metadata_borrowing=True, verdict=cutoff_degraded, user_bucket=avoid, likely_capped=True, words=287
+2026-05-03 21:50:24 BST - INFO - Quality issues detected for mlx-community/Qwen3.6-27B-mxfp8: degeneration, missing-sections(title+description+keywords), reasoning-leak, instruction-echo, metadata-borrowing, cutoff
+2026-05-03 21:50:24 BST - DEBUG - 
+2026-05-03 21:50:24 BST - DEBUG - === CANONICAL REVIEW: mlx-community/Qwen3.6-27B-mxfp8 ===
+2026-05-03 21:50:24 BST - DEBUG - Verdict: cutoff_degraded | user=avoid
+2026-05-03 21:50:24 BST - DEBUG - Why: hit token cap (500) | nontext prompt burden=97% | missing sections: title, description, keywords | missing terms: 10 Best (structured), Bird, Gull, Marina, Mooring
+2026-05-03 21:50:24 BST - DEBUG - Trusted hints: preserves trusted hints | nonvisual metadata reused
+2026-05-03 21:50:24 BST - DEBUG - Contract: missing: title, description, keywords
+2026-05-03 21:50:24 BST - DEBUG - Utility: user=avoid | preserves trusted hints | instruction echo | metadata borrowing
+2026-05-03 21:50:24 BST - DEBUG - Stack / owner: owner=model
+2026-05-03 21:50:24 BST - DEBUG - Token accounting: prompt=16821 | text_est=483 | nontext_est=16338 | gen=500 | max=500 | stop=completed
+2026-05-03 21:50:24 BST - DEBUG - Next action: Treat as a model limitation for this prompt; the requested output contract is not being met.
+2026-05-03 21:50:24 BST - DEBUG - Full output:
+The user wants me to analyze the image and generate metadata (Title, Description, Keywords) based on specific rules.
+
+**1. Analyze the Image:**
+*   **Main Subject:** A large, traditional sailing barge (yellow hull, tall mast, brown sail furled) is the central focus. It's moored on mudflats.
+*   **Surroundings:**
+    *   To the left: A smaller white boat with a cabin.
+    *   Behind the main barge: Several other boats (red hull, blue hull).
+    *   Background buildings:
+        *   A large white building with a red tiled roof (looks like a mill or warehouse). It has "TIDE MILL MUSEUM" written on it (partially visible, "DE MILL MUSEUM").
+        *   To the left of that, a large white building covered in scaffolding.
+    *   Sky: Clear blue sky.
+    *   Ground: Wet mudflats (low tide).
+    *   Other details: A seagull flying in the sky. Wooden posts/pilings.
+
+**2. Evaluate Metadata Hints:**
+*   *Description hint:* "A view of the historic quayside at Woodbridge, Suffolk, England, on a sunny day. Traditional boats, including a large sailing barge, are moored on the River Deben at low tide. In the background is the landmark Woodbridge Tide Mill Museum, while an adjacent building is covered in scaffolding for renovation work."
+    *   *Verification:*
+        *   "Woodbridge, Suffolk, England": Not explicitly visible in text, but "Tide Mill Museum" is visible. I should stick to what's visible. The prompt says "Do not infer identity... unless visually obvious." The text "TIDE MILL MUSEUM" is visible. The location "Woodbridge" is not explicitly written, though the museum name implies it. I will stick to "Tide Mill Museum" as the visible text.
+        *   "Sunny day": Yes, blue sky, shadows.
+        *   "Traditional boats, including a large sailing barge": Yes.
+        *   "Moored on the River Deben at low tide": "River Deben" isn't written, but "low tide" is evident from the mud. I will describe the mudflats.
+       
+2026-05-03 21:50:24 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/Qwen3.6-27B-mxfp8 ===
+2026-05-03 21:50:24 BST - INFO - [RUN 34/53] SUMMARY model=mlx-community/Qwen3.6-27B-mxfp8 status=OK
+2026-05-03 21:50:24 BST - INFO - quality=cutoff+degeneration+instruction_echo+metadata_borrowing+missing_sections+reasoning_leak
+2026-05-03 21:50:24 BST - INFO - 
+2026-05-03 21:50:24 BST - INFO - Generated Text:
+2026-05-03 21:50:24 BST - INFO -    The user wants me to analyze the image and generate metadata (Title, Description, Keywords) based
+2026-05-03 21:50:24 BST - INFO -    on specific rules.
+2026-05-03 21:50:24 BST - INFO - 
+2026-05-03 21:50:24 BST - INFO -    **1. Analyze the Image:**
+2026-05-03 21:50:24 BST - INFO -    *   **Main Subject:** A large, traditional sailing barge (yellow hull, tall mast, brown sail
+2026-05-03 21:50:24 BST - INFO -    furled) is the central focus. It's moored on mudflats.
+2026-05-03 21:50:24 BST - INFO -    *   **Surroundings:**
+2026-05-03 21:50:24 BST - INFO -        *   To the left: A smaller white boat with a cabin.
+2026-05-03 21:50:24 BST - INFO -        *   Behind the main barge: Several other boats (red hull, blue hull).
+2026-05-03 21:50:24 BST - INFO -        *   Background buildings:
+2026-05-03 21:50:24 BST - INFO -            *   A large white building with a red tiled roof (looks like a mill or warehouse). It has
+2026-05-03 21:50:24 BST - INFO -    "TIDE MILL MUSEUM" written on it (partially visible, "DE MILL MUSEUM").
+2026-05-03 21:50:24 BST - INFO -            *   To the left of that, a large white building covered in scaffolding.
+2026-05-03 21:50:24 BST - INFO -        *   Sky: Clear blue sky.
+2026-05-03 21:50:24 BST - INFO -        *   Ground: Wet mudflats (low tide).
+2026-05-03 21:50:24 BST - INFO -        *   Other details: A seagull flying in the sky. Wooden posts/pilings.
+2026-05-03 21:50:24 BST - INFO - 
+2026-05-03 21:50:24 BST - INFO -    **2. Evaluate Metadata Hints:**
+2026-05-03 21:50:24 BST - INFO -    *   *Description hint:* "A view of the historic quayside at Woodbridge, Suffolk, England, on a
+2026-05-03 21:50:24 BST - INFO -    sunny day. Traditional boats, including a large sailing barge, are moored on the River Deben at
+2026-05-03 21:50:24 BST - INFO -    low tide. In the background is the landmark Woodbridge Tide Mill Museum, while an adjacent
+2026-05-03 21:50:24 BST - INFO -    building is covered in scaffolding for renovation work."
+2026-05-03 21:50:24 BST - INFO -        *   *Verification:*
+2026-05-03 21:50:24 BST - INFO -            *   "Woodbridge, Suffolk, England": Not explicitly visible in text, but "Tide Mill
+2026-05-03 21:50:24 BST - INFO -    Museum" is visible. I should stick to what's visible. The prompt says "Do not infer identity...
+2026-05-03 21:50:24 BST - INFO -    unless visually obvious." The text "TIDE MILL MUSEUM" is visible. The location "Woodbridge" is
+2026-05-03 21:50:24 BST - INFO -    not explicitly written, though the museum name implies it. I will stick to "Tide Mill Museum" as
+2026-05-03 21:50:24 BST - INFO -    the visible text.
+2026-05-03 21:50:24 BST - INFO -            *   "Sunny day": Yes, blue sky, shadows.
+2026-05-03 21:50:24 BST - INFO -            *   "Traditional boats, including a large sailing barge": Yes.
+2026-05-03 21:50:24 BST - INFO -            *   "Moored on the River Deben at low tide": "River Deben" isn't written, but "low tide"
+2026-05-03 21:50:24 BST - INFO -    is evident from the mud. I will describe the mudflats.
+2026-05-03 21:50:24 BST - INFO - 
+2026-05-03 21:50:24 BST - INFO - 
+2026-05-03 21:50:24 BST - INFO - 📊 Timing: 102.66s total (gen=99.36s, load=3.04s, prep=0.01s, first=70.53s) | Memory: 39GB peak
+2026-05-03 21:50:24 BST - INFO -    Tokens: 17,321 (16,821 prompt + 500 gen) | Speed: 17.8 gen/s, 238 prompt/s
+2026-05-03 21:50:24 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:50:24 BST - INFO - 
+2026-05-03 21:50:24 BST - INFO - Processing Model [35/53]: mlx-community/SmolVLM-Instruct-bf16
+2026-05-03 21:50:24 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:50:24 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/SmolVLM-Instruct-bf16
+2026-05-03 21:50:28 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/SmolVLM-Instruct-bf16
+2026-05-03 21:50:28 BST - DEBUG - Cleaned up resources for model mlx-community/SmolVLM-Instruct-bf16
+2026-05-03 21:50:28 BST - DEBUG - Quality analysis for mlx-community/SmolVLM-Instruct-bf16: context_ignored=True, missing_sections=title, description_sentences=3, keywords=26, keyword_dup=0.00, reasoning_leak=True (do not output reasoning), instruction_echo=True, metadata_borrowing=True, hint_relationship=ignores_trusted_hints, verdict=model_shortcoming, user_bucket=avoid, words=157
+2026-05-03 21:50:28 BST - INFO - Quality issues detected for mlx-community/SmolVLM-Instruct-bf16: missing-sections(title), description-sentences(3), keyword-count(26), reasoning-leak, instruction-echo, metadata-borrowing, trusted-hints-ignored, context-ignored
+2026-05-03 21:50:28 BST - DEBUG - 
+2026-05-03 21:50:28 BST - DEBUG - === CANONICAL REVIEW: mlx-community/SmolVLM-Instruct-bf16 ===
+2026-05-03 21:50:28 BST - DEBUG - Verdict: model_shortcoming | user=avoid
+2026-05-03 21:50:28 BST - DEBUG - Why: nontext prompt burden=73% | missing sections: title | missing terms: 10 Best (structured), Barge, Bird, Blue sky, Gull | keywords=26
+2026-05-03 21:50:28 BST - DEBUG - Trusted hints: ignores trusted hints | missing terms: 10 Best (structured), Barge, Bird, Blue sky, Gull | nonvisual metadata reused
+2026-05-03 21:50:28 BST - DEBUG - Contract: missing: title | description sentences=3 | keywords=26
+2026-05-03 21:50:28 BST - DEBUG - Utility: user=avoid | ignores trusted hints | instruction echo | metadata borrowing
+2026-05-03 21:50:28 BST - DEBUG - Stack / owner: owner=model
+2026-05-03 21:50:28 BST - DEBUG - Token accounting: prompt=1790 | text_est=483 | nontext_est=1307 | gen=254 | max=500 | stop=completed
+2026-05-03 21:50:28 BST - DEBUG - Next action: Treat as a model limitation for this prompt; the requested output contract is not being met.
+2026-05-03 21:50:28 BST - DEBUG - Full output:
+ 5-10 words, concrete and factual, limited to clearly visible content.
+- Output only the title text after the label.
+- Do not repeat or paraphrase these instructions in the title.
+
+Description:
+- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.
+- Output only the description text after the label.
+
+Keywords:
+- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.
+- Output only the keyword list after the label.
+
+Rules:
+- Include only details that are definitely visible in the image.
+- Reuse metadata terms only when they are clearly supported by the image.
+- If metadata and image disagree, follow the image.
+- Prefer omission to speculation.
+- Do not copy prompt instructions into the Title, Description, or Keywords fields.
+- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.
+- Do not output reasoning, notes, hedging, or extra sections.
+2026-05-03 21:50:28 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/SmolVLM-Instruct-bf16 ===
+2026-05-03 21:50:28 BST - INFO - [RUN 35/53] SUMMARY model=mlx-community/SmolVLM-Instruct-bf16 status=OK
+2026-05-03 21:50:28 BST - INFO - quality=context_ignored+description_length+instruction_echo+keyword_count+metadata_borrowing+missing_sections+reasoning_leak+trusted_hint_ignored
+2026-05-03 21:50:28 BST - INFO - 
+2026-05-03 21:50:28 BST - INFO - Generated Text:
+2026-05-03 21:50:28 BST - WARNING - ⚠️  Note: Output ignored key context (missing: 10 Best (structured), Barge, Bird, Blue sky, Gull)
+2026-05-03 21:50:28 BST - INFO -     5-10 words, concrete and factual, limited to clearly visible content.
+2026-05-03 21:50:28 BST - INFO -    - Output only the title text after the label.
+2026-05-03 21:50:28 BST - INFO -    - Do not repeat or paraphrase these instructions in the title.
+2026-05-03 21:50:28 BST - INFO - 
+2026-05-03 21:50:28 BST - INFO -    Description:
+2026-05-03 21:50:28 BST - INFO -    - 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other
+2026-05-03 21:50:28 BST - INFO -    distinctive visible details. Omit anything uncertain or inferred.
+2026-05-03 21:50:28 BST - INFO -    - Output only the description text after the label.
+2026-05-03 21:50:28 BST - INFO - 
+2026-05-03 21:50:28 BST - INFO -    Keywords:
+2026-05-03 21:50:28 BST - INFO -    - 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors,
+2026-05-03 21:50:28 BST - INFO -    composition, and style. Omit uncertain tags rather than guessing.
+2026-05-03 21:50:28 BST - INFO -    - Output only the keyword list after the label.
+2026-05-03 21:50:28 BST - INFO - 
+2026-05-03 21:50:28 BST - INFO -    Rules:
+2026-05-03 21:50:28 BST - INFO -    - Include only details that are definitely visible in the image.
+2026-05-03 21:50:28 BST - INFO -    - Reuse metadata terms only when they are clearly supported by the image.
+2026-05-03 21:50:28 BST - INFO -    - If metadata and image disagree, follow the image.
+2026-05-03 21:50:28 BST - INFO -    - Prefer omission to speculation.
+2026-05-03 21:50:28 BST - INFO -    - Do not copy prompt instructions into the Title, Description, or Keywords fields.
+2026-05-03 21:50:28 BST - INFO -    - Do not infer identity, location, event, brand, species, time period, or intent unless visually
+2026-05-03 21:50:28 BST - INFO -    obvious.
+2026-05-03 21:50:28 BST - INFO -    - Do not output reasoning, notes, hedging, or extra sections.
+2026-05-03 21:50:28 BST - INFO - 
+2026-05-03 21:50:28 BST - INFO - 📊 Timing: 3.81s total (gen=2.97s, load=0.59s, prep=0.00s, first=0.42s) | Memory: 5.7GB peak
+2026-05-03 21:50:28 BST - INFO -    Tokens: 2,044 (1,790 prompt + 254 gen) | Speed: 126 gen/s, 4,301 prompt/s
+2026-05-03 21:50:28 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:50:28 BST - INFO - 
+2026-05-03 21:50:28 BST - INFO - Processing Model [36/53]: mlx-community/SmolVLM2-2.2B-Instruct-mlx
+2026-05-03 21:50:28 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:50:28 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/SmolVLM2-2.2B-Instruct-mlx
+2026-05-03 21:50:31 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/SmolVLM2-2.2B-Instruct-mlx
+2026-05-03 21:50:31 BST - DEBUG - Cleaned up resources for model mlx-community/SmolVLM2-2.2B-Instruct-mlx
+2026-05-03 21:50:31 BST - DEBUG - Quality analysis for mlx-community/SmolVLM2-2.2B-Instruct-mlx: title_words=6, description_sentences=3, keywords=20, keyword_dup=0.00, context_echo=True (0.60), metadata_borrowing=True, verdict=model_shortcoming, user_bucket=avoid, words=87
+2026-05-03 21:50:31 BST - INFO - Quality issues detected for mlx-community/SmolVLM2-2.2B-Instruct-mlx: description-sentences(3), keyword-count(20), context-echo(0.60), metadata-borrowing
+2026-05-03 21:50:31 BST - DEBUG - 
+2026-05-03 21:50:31 BST - DEBUG - === CANONICAL REVIEW: mlx-community/SmolVLM2-2.2B-Instruct-mlx ===
+2026-05-03 21:50:31 BST - DEBUG - Verdict: model_shortcoming | user=avoid
+2026-05-03 21:50:31 BST - DEBUG - Why: keywords=20 | context echo=60% | nonvisual metadata reused
+2026-05-03 21:50:31 BST - DEBUG - Trusted hints: preserves trusted hints | nonvisual metadata reused
+2026-05-03 21:50:31 BST - DEBUG - Contract: description sentences=3 | keywords=20
+2026-05-03 21:50:31 BST - DEBUG - Utility: user=avoid | preserves trusted hints | metadata borrowing | context echo
+2026-05-03 21:50:31 BST - DEBUG - Stack / owner: owner=model
+2026-05-03 21:50:31 BST - DEBUG - Token accounting: prompt=691 | text_est=483 | nontext_est=208 | gen=150 | max=500 | stop=completed
+2026-05-03 21:50:31 BST - DEBUG - Next action: Treat as a model-quality limitation for this prompt and image.
+2026-05-03 21:50:31 BST - DEBUG - Full output:
+ Title: Woodbridge Tide Mill Museum and Quayside
+Description: A view of the historic quayside at Woodbridge, Suffolk, England, on a sunny day. Traditional boats, including a large sailing barge, are moored on the River Deben at low tide. In the background is the landmark Woodbridge Tide Mill Museum, while an adjacent building is covered in scaffolding for renovation work.
+Keywords: 10 Best (structured), Adobe Stock, Any Vision, Barge, Bird, Blue sky, England, Europe, Gull, Marina, Moored, Mooring, Mudflats, Museum, Pier, Quay, Rigging, River Deben, Sailing Barge, Sailing Boat
+2026-05-03 21:50:31 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/SmolVLM2-2.2B-Instruct-mlx ===
+2026-05-03 21:50:31 BST - INFO - [RUN 36/53] SUMMARY model=mlx-community/SmolVLM2-2.2B-Instruct-mlx status=OK
+2026-05-03 21:50:31 BST - INFO - quality=context_echo+description_length+keyword_count+metadata_borrowing
+2026-05-03 21:50:31 BST - INFO - 
+2026-05-03 21:50:31 BST - INFO - Generated Text:
+2026-05-03 21:50:31 BST - INFO -     Title: Woodbridge Tide Mill Museum and Quayside
+2026-05-03 21:50:31 BST - INFO -    Description: A view of the historic quayside at Woodbridge, Suffolk, England, on a sunny day.
+2026-05-03 21:50:31 BST - INFO -    Traditional boats, including a large sailing barge, are moored on the River Deben at low tide. In
+2026-05-03 21:50:31 BST - INFO -    the background is the landmark Woodbridge Tide Mill Museum, while an adjacent building is covered
+2026-05-03 21:50:31 BST - INFO -    in scaffolding for renovation work.
+2026-05-03 21:50:31 BST - INFO -    Keywords: 10 Best (structured), Adobe Stock, Any Vision, Barge, Bird, Blue sky, England, Europe,
+2026-05-03 21:50:31 BST - INFO -    Gull, Marina, Moored, Mooring, Mudflats, Museum, Pier, Quay, Rigging, River Deben, Sailing Barge,
+2026-05-03 21:50:31 BST - INFO -    Sailing Boat
+2026-05-03 21:50:31 BST - INFO - 
+2026-05-03 21:50:31 BST - INFO - 📊 Timing: 2.94s total (gen=2.00s, load=0.67s, prep=0.00s, first=0.34s) | Memory: 5.5GB peak
+2026-05-03 21:50:31 BST - INFO -    Tokens: 841 (691 prompt + 150 gen) | Speed: 134 gen/s, 2,023 prompt/s
+2026-05-03 21:50:31 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:50:31 BST - INFO - 
+2026-05-03 21:50:31 BST - INFO - Processing Model [37/53]: mlx-community/X-Reasoner-7B-8bit
+2026-05-03 21:50:31 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:50:31 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/X-Reasoner-7B-8bit
+2026-05-03 21:50:58 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/X-Reasoner-7B-8bit
+2026-05-03 21:50:58 BST - DEBUG - Cleaned up resources for model mlx-community/X-Reasoner-7B-8bit
+2026-05-03 21:50:58 BST - DEBUG - Quality analysis for mlx-community/X-Reasoner-7B-8bit: repetitive=True (token=phrase: "quay, river, boats, sailing,..."), title_words=6, description_sentences=2, keywords=154, keyword_dup=0.77, metadata_borrowing=True, verdict=cutoff_degraded, user_bucket=avoid, likely_capped=True, harness=True (long_context; long_context_repetition(16807tok)), words=232
+2026-05-03 21:50:58 BST - INFO - Quality issues detected for mlx-community/X-Reasoner-7B-8bit: ⚠️harness(long_context), long-context, repetitive(phrase: "quay, river, boats, sailing,..."), keyword-count(154), keyword-duplication(0.77), metadata-borrowing, cutoff
+2026-05-03 21:50:58 BST - DEBUG - 
+2026-05-03 21:50:58 BST - DEBUG - === CANONICAL REVIEW: mlx-community/X-Reasoner-7B-8bit ===
+2026-05-03 21:50:58 BST - DEBUG - Verdict: cutoff_degraded | user=avoid
+2026-05-03 21:50:58 BST - DEBUG - Why: At long prompt length (16807 tokens), output became repetitive. | hit token cap (500) | nontext prompt burden=97% | missing terms: 10 Best (structured), Bird, Gull, Mooring, Mudflats
+2026-05-03 21:50:58 BST - DEBUG - Trusted hints: preserves trusted hints | nonvisual metadata reused
+2026-05-03 21:50:58 BST - DEBUG - Contract: keywords=154 | keyword duplication=0.77
+2026-05-03 21:50:58 BST - DEBUG - Utility: user=avoid | preserves trusted hints | metadata borrowing
+2026-05-03 21:50:58 BST - DEBUG - Stack / owner: owner=mlx | harness=long_context
+2026-05-03 21:50:58 BST - DEBUG - Token accounting: prompt=16807 | text_est=483 | nontext_est=16324 | gen=500 | max=500 | stop=completed
+2026-05-03 21:50:58 BST - DEBUG - Next action: Inspect long-context cache behavior under heavy image-token burden.
+2026-05-03 21:50:58 BST - DEBUG - Full output:
+Title:
+Woodbridge Tide Mill Museum and Boats
+
+Description:
+A historic quayside scene at Woodbridge, Suffolk, featuring traditional sailing barges moored on the River Deben at low tide. The background includes the Woodbridge Tide Mill Museum, partially covered in scaffolding, with a clear blue sky overhead.
+
+Keywords:
+Woodbridge, Tide Mill Museum, River Deben, Sailing Barge, Quay, Moored Boats, Scaffolding, Blue Sky, Suffolk, England, Traditional Boat, Historical Site, Low Tide, River, Sailboat, Museum, England, Europe, Boats, Marina, Rigging, Sailing, Quayside, Scaffolding, Riverbank, Nautical, Navigational, Historical, Maritime, Sailing Ship, Boating, Nautical Museum, Tide Mill, Riverfront, Nautical Heritage, Boats at Rest, Sailing Ship, Quay, River, Boats, Sailing, Tide Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide
+2026-05-03 21:50:58 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/X-Reasoner-7B-8bit ===
+2026-05-03 21:50:58 BST - INFO - [RUN 37/53] SUMMARY model=mlx-community/X-Reasoner-7B-8bit status=OK
+2026-05-03 21:50:58 BST - INFO - quality=cutoff+harness+keyword_count+keyword_duplication+long_context+metadata_borrowing+repetitive
+2026-05-03 21:50:58 BST - INFO - 
+2026-05-03 21:50:58 BST - INFO - Generated Text:
+2026-05-03 21:50:58 BST - WARNING - ⚠️  WARNING: Output appears to be rubbish (repetitive: 'phrase: "quay, river, boats, sailing,..."')
+2026-05-03 21:50:58 BST - WARNING - ⚠️  Likely harness issue (long_context): long_context_repetition(16807tok)
+2026-05-03 21:50:58 BST - INFO -    Title:
+2026-05-03 21:50:58 BST - INFO -    Woodbridge Tide Mill Museum and Boats
+2026-05-03 21:50:58 BST - INFO - 
+2026-05-03 21:50:58 BST - INFO -    Description:
+2026-05-03 21:50:58 BST - INFO -    A historic quayside scene at Woodbridge, Suffolk, featuring traditional sailing barges moored on
+2026-05-03 21:50:58 BST - INFO -    the River Deben at low tide. The background includes the Woodbridge Tide Mill Museum, partially
+2026-05-03 21:50:58 BST - INFO -    covered in scaffolding, with a clear blue sky overhead.
+2026-05-03 21:50:58 BST - INFO - 
+2026-05-03 21:50:58 BST - INFO -    Keywords:
+2026-05-03 21:50:58 BST - INFO -    Woodbridge, Tide Mill Museum, River Deben, Sailing Barge, Quay, Moored Boats, Scaffolding, Blue
+2026-05-03 21:50:58 BST - INFO -    Sky, Suffolk, England, Traditional Boat, Historical Site, Low Tide, River, Sailboat, Museum,
+2026-05-03 21:50:58 BST - INFO -    England, Europe, Boats, Marina, Rigging, Sailing, Quayside, Scaffolding, Riverbank, Nautical,
+2026-05-03 21:50:58 BST - INFO -    Navigational, Historical, Maritime, Sailing Ship, Boating, Nautical Museum, Tide Mill,
+2026-05-03 21:50:58 BST - INFO -    Riverfront, Nautical Heritage, Boats at Rest, Sailing Ship, Quay, River, Boats, Sailing, Tide
+2026-05-03 21:50:58 BST - INFO -    Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide Mill, Museum, Boats, Quay, River, Boats,
+2026-05-03 21:50:58 BST - INFO -    Sailing, Tide Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide Mill, Museum, Boats, Quay,
+2026-05-03 21:50:58 BST - INFO -    River, Boats, Sailing, Tide Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide Mill, Museum,
+2026-05-03 21:50:58 BST - INFO -    Boats, Quay, River, Boats, Sailing, Tide Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide
+2026-05-03 21:50:58 BST - INFO -    Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide Mill, Museum, Boats, Quay, River, Boats,
+2026-05-03 21:50:58 BST - INFO -    Sailing, Tide Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide Mill, Museum, Boats, Quay,
+2026-05-03 21:50:58 BST - INFO -    River, Boats, Sailing, Tide Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide Mill, Museum,
+2026-05-03 21:50:58 BST - INFO -    Boats, Quay, River, Boats, Sailing, Tide Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide
+2026-05-03 21:50:58 BST - INFO -    Mill, Museum, Boats, Quay, River, Boats, Sailing, Tide Mill, Museum, Boats, Quay, River, Boats,
+2026-05-03 21:50:58 BST - INFO -    Sailing, Tide
+2026-05-03 21:50:58 BST - INFO - 
+2026-05-03 21:50:58 BST - INFO - 📊 Timing: 27.10s total (gen=25.69s, load=1.17s, prep=0.00s, first=16.02s) | Memory: 13GB peak
+2026-05-03 21:50:58 BST - INFO -    Tokens: 17,307 (16,807 prompt + 500 gen) | Speed: 55.4 gen/s, 1,049 prompt/s
+2026-05-03 21:50:58 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:50:58 BST - INFO - 
+2026-05-03 21:50:58 BST - INFO - Processing Model [38/53]: mlx-community/gemma-3-27b-it-qat-4bit
+2026-05-03 21:50:58 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:50:58 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/gemma-3-27b-it-qat-4bit
+2026-05-03 21:51:05 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/gemma-3-27b-it-qat-4bit
+2026-05-03 21:51:06 BST - DEBUG - Cleaned up resources for model mlx-community/gemma-3-27b-it-qat-4bit
+2026-05-03 21:51:06 BST - DEBUG - Quality analysis for mlx-community/gemma-3-27b-it-qat-4bit: title_words=8, description_sentences=2, keywords=17, keyword_dup=0.00, words=59
+2026-05-03 21:51:06 BST - DEBUG - 
+2026-05-03 21:51:06 BST - DEBUG - === CANONICAL REVIEW: mlx-community/gemma-3-27b-it-qat-4bit ===
+2026-05-03 21:51:06 BST - DEBUG - Verdict: clean | user=recommended
+2026-05-03 21:51:06 BST - DEBUG - Why: missing terms: 10 Best (structured), Bird, Gull, Marina, Mooring
+2026-05-03 21:51:06 BST - DEBUG - Trusted hints: preserves trusted hints
+2026-05-03 21:51:06 BST - DEBUG - Contract: ok
+2026-05-03 21:51:06 BST - DEBUG - Utility: user=recommended | preserves trusted hints
+2026-05-03 21:51:06 BST - DEBUG - Stack / owner: owner=model
+2026-05-03 21:51:06 BST - DEBUG - Token accounting: prompt=839 | text_est=483 | nontext_est=356 | gen=98 | max=500 | stop=completed
+2026-05-03 21:51:06 BST - DEBUG - Next action: Treat as a model limitation for this prompt; trusted hint coverage is still weak.
+2026-05-03 21:51:06 BST - DEBUG - Full output:
+Title:
+Sailing barge and boats at quayside with buildings
+
+Description:
+A large sailing barge is moored alongside smaller boats at a quayside. Buildings, one with scaffolding, are visible in the background under a clear blue sky.
+
+Keywords:
+Barge, Boats, Building, Clear sky, Mudflats, Moored, Pier, Quay, River, Sailing barge, Scaffolding, Water, White building, Yellow boat, Blue sky, Mast, Rigging
+2026-05-03 21:51:06 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/gemma-3-27b-it-qat-4bit ===
+2026-05-03 21:51:06 BST - INFO - [RUN 38/53] SUMMARY model=mlx-community/gemma-3-27b-it-qat-4bit status=OK quality=clean
+2026-05-03 21:51:06 BST - INFO - 
+2026-05-03 21:51:06 BST - INFO - Generated Text:
+2026-05-03 21:51:06 BST - INFO -    Title:
+2026-05-03 21:51:06 BST - INFO -    Sailing barge and boats at quayside with buildings
+2026-05-03 21:51:06 BST - INFO - 
+2026-05-03 21:51:06 BST - INFO -    Description:
+2026-05-03 21:51:06 BST - INFO -    A large sailing barge is moored alongside smaller boats at a quayside. Buildings, one with
+2026-05-03 21:51:06 BST - INFO -    scaffolding, are visible in the background under a clear blue sky.
+2026-05-03 21:51:06 BST - INFO - 
+2026-05-03 21:51:06 BST - INFO -    Keywords:
+2026-05-03 21:51:06 BST - INFO -    Barge, Boats, Building, Clear sky, Mudflats, Moored, Pier, Quay, River, Sailing barge,
+2026-05-03 21:51:06 BST - INFO -    Scaffolding, Water, White building, Yellow boat, Blue sky, Mast, Rigging
+2026-05-03 21:51:06 BST - INFO - 
+2026-05-03 21:51:06 BST - INFO - 📊 Timing: 7.40s total (gen=4.84s, load=2.31s, prep=0.00s, first=1.32s) | Memory: 19GB peak
+2026-05-03 21:51:06 BST - INFO -    Tokens: 937 (839 prompt + 98 gen) | Speed: 31.4 gen/s, 635 prompt/s
+2026-05-03 21:51:06 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:51:06 BST - INFO - 
+2026-05-03 21:51:06 BST - INFO - Processing Model [39/53]: mlx-community/gemma-3-27b-it-qat-8bit
+2026-05-03 21:51:06 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:51:06 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/gemma-3-27b-it-qat-8bit
+2026-05-03 21:51:17 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/gemma-3-27b-it-qat-8bit
+2026-05-03 21:51:17 BST - DEBUG - Cleaned up resources for model mlx-community/gemma-3-27b-it-qat-8bit
+2026-05-03 21:51:17 BST - DEBUG - Quality analysis for mlx-community/gemma-3-27b-it-qat-8bit: title_words=7, description_sentences=2, keywords=18, keyword_dup=0.00, metadata_borrowing=True, verdict=model_shortcoming, user_bucket=avoid, words=65
+2026-05-03 21:51:17 BST - INFO - Quality issues detected for mlx-community/gemma-3-27b-it-qat-8bit: metadata-borrowing
+2026-05-03 21:51:17 BST - DEBUG - 
+2026-05-03 21:51:17 BST - DEBUG - === CANONICAL REVIEW: mlx-community/gemma-3-27b-it-qat-8bit ===
+2026-05-03 21:51:17 BST - DEBUG - Verdict: model_shortcoming | user=avoid
+2026-05-03 21:51:17 BST - DEBUG - Why: missing terms: 10 Best (structured), Bird, Blue sky, Gull, Marina | nonvisual metadata reused
+2026-05-03 21:51:17 BST - DEBUG - Trusted hints: preserves trusted hints | nonvisual metadata reused
+2026-05-03 21:51:17 BST - DEBUG - Contract: ok
+2026-05-03 21:51:17 BST - DEBUG - Utility: user=avoid | preserves trusted hints | metadata borrowing
+2026-05-03 21:51:17 BST - DEBUG - Stack / owner: owner=model
+2026-05-03 21:51:17 BST - DEBUG - Token accounting: prompt=839 | text_est=483 | nontext_est=356 | gen=106 | max=500 | stop=completed
+2026-05-03 21:51:17 BST - DEBUG - Next action: Treat as a model limitation for this prompt; trusted hint coverage is still weak.
+2026-05-03 21:51:17 BST - DEBUG - Full output:
+Title:
+Sailing Barge and Boats at Woodbridge Quayside
+
+Description:
+A large sailing barge is moored alongside smaller boats at a quayside on a sunny day. A white building with a red tiled roof is partially obscured by scaffolding, and mudflats are visible in the foreground.
+
+Keywords:
+Barge, Boats, Building, Mudflats, Moored, Pier, Quay, River, Sailing Barge, Scaffolding, Sky, White, Red, England, Water, Mast, Rigging, Sunny
+2026-05-03 21:51:17 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/gemma-3-27b-it-qat-8bit ===
+2026-05-03 21:51:17 BST - INFO - [RUN 39/53] SUMMARY model=mlx-community/gemma-3-27b-it-qat-8bit status=OK quality=metadata_borrowing
+2026-05-03 21:51:17 BST - INFO - 
+2026-05-03 21:51:17 BST - INFO - Generated Text:
+2026-05-03 21:51:17 BST - INFO -    Title:
+2026-05-03 21:51:17 BST - INFO -    Sailing Barge and Boats at Woodbridge Quayside
+2026-05-03 21:51:17 BST - INFO - 
+2026-05-03 21:51:17 BST - INFO -    Description:
+2026-05-03 21:51:17 BST - INFO -    A large sailing barge is moored alongside smaller boats at a quayside on a sunny day. A white
+2026-05-03 21:51:17 BST - INFO -    building with a red tiled roof is partially obscured by scaffolding, and mudflats are visible in
+2026-05-03 21:51:17 BST - INFO -    the foreground.
+2026-05-03 21:51:17 BST - INFO - 
+2026-05-03 21:51:17 BST - INFO -    Keywords:
+2026-05-03 21:51:17 BST - INFO -    Barge, Boats, Building, Mudflats, Moored, Pier, Quay, River, Sailing Barge, Scaffolding, Sky,
+2026-05-03 21:51:17 BST - INFO -    White, Red, England, Water, Mast, Rigging, Sunny
+2026-05-03 21:51:17 BST - INFO - 
+2026-05-03 21:51:17 BST - INFO - 📊 Timing: 11.52s total (gen=7.91s, load=3.36s, prep=0.00s, first=1.49s) | Memory: 33GB peak
+2026-05-03 21:51:17 BST - INFO -    Tokens: 945 (839 prompt + 106 gen) | Speed: 17.6 gen/s, 562 prompt/s
+2026-05-03 21:51:17 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:51:17 BST - INFO - 
+2026-05-03 21:51:17 BST - INFO - Processing Model [40/53]: mlx-community/gemma-3n-E2B-4bit
+2026-05-03 21:51:18 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:51:18 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/gemma-3n-E2B-4bit
+2026-05-03 21:51:24 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/gemma-3n-E2B-4bit
+2026-05-03 21:51:24 BST - DEBUG - Cleaned up resources for model mlx-community/gemma-3n-E2B-4bit
+2026-05-03 21:51:24 BST - DEBUG - Quality analysis for mlx-community/gemma-3n-E2B-4bit: repetitive=True (token=16:34:07:), context_ignored=True, missing_sections=title+description+keywords, metadata_borrowing=True, hint_relationship=ignores_trusted_hints, verdict=cutoff_degraded, user_bucket=avoid, likely_capped=True, words=0
+2026-05-03 21:51:24 BST - INFO - Quality issues detected for mlx-community/gemma-3n-E2B-4bit: repetitive(16:34:07:), missing-sections(title+description+keywords), metadata-borrowing, trusted-hints-ignored, cutoff, context-ignored
+2026-05-03 21:51:24 BST - DEBUG - 
+2026-05-03 21:51:24 BST - DEBUG - === CANONICAL REVIEW: mlx-community/gemma-3n-E2B-4bit ===
+2026-05-03 21:51:24 BST - DEBUG - Verdict: cutoff_degraded | user=avoid
+2026-05-03 21:51:24 BST - DEBUG - Why: hit token cap (500) | missing sections: title, description, keywords | missing terms: 10 Best (structured), Barge, Bird, Blue sky, Gull | nonvisual metadata reused
+2026-05-03 21:51:24 BST - DEBUG - Trusted hints: ignores trusted hints | missing terms: 10 Best (structured), Barge, Bird, Blue sky, Gull | nonvisual metadata reused
+2026-05-03 21:51:24 BST - DEBUG - Contract: missing: title, description, keywords
+2026-05-03 21:51:24 BST - DEBUG - Utility: user=avoid | ignores trusted hints | metadata borrowing
+2026-05-03 21:51:24 BST - DEBUG - Stack / owner: owner=model
+2026-05-03 21:51:24 BST - DEBUG - Token accounting: prompt=830 | text_est=483 | nontext_est=347 | gen=500 | max=500 | stop=completed
+2026-05-03 21:51:24 BST - DEBUG - Next action: Treat as a model limitation for this prompt; the requested output contract is not being met.
+2026-05-03 21:51:24 BST - DEBUG - Full output:
+
+- 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:0
+2026-05-03 21:51:24 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/gemma-3n-E2B-4bit ===
+2026-05-03 21:51:24 BST - INFO - [RUN 40/53] SUMMARY model=mlx-community/gemma-3n-E2B-4bit status=OK
+2026-05-03 21:51:24 BST - INFO - quality=context_ignored+cutoff+metadata_borrowing+missing_sections+repetitive+trusted_hint_ignored
+2026-05-03 21:51:24 BST - INFO - 
+2026-05-03 21:51:24 BST - INFO - Generated Text:
+2026-05-03 21:51:24 BST - WARNING - ⚠️  WARNING: Output appears to be rubbish (repetitive: '16:34:07:')
+2026-05-03 21:51:24 BST - WARNING - ⚠️  Note: Output ignored key context (missing: 10 Best (structured), Barge, Bird, Blue sky, Gull)
+2026-05-03 21:51:24 BST - INFO - 
+2026-05-03 21:51:24 BST - INFO -    - 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07:
+2026-05-03 21:51:24 BST - INFO -    16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07:
+2026-05-03 21:51:24 BST - INFO -    16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07:
+2026-05-03 21:51:24 BST - INFO -    16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07:
+2026-05-03 21:51:24 BST - INFO -    16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:07:
+2026-05-03 21:51:24 BST - INFO -    16:34:07: 16:34:07: 16:34:07: 16:34:07: 16:34:0
+2026-05-03 21:51:24 BST - INFO - 
+2026-05-03 21:51:24 BST - INFO - 📊 Timing: 6.49s total (gen=4.84s, load=1.40s, prep=0.00s, first=0.32s) | Memory: 6.0GB peak
+2026-05-03 21:51:24 BST - INFO -    Tokens: 1,330 (830 prompt + 500 gen) | Speed: 121 gen/s, 2,562 prompt/s
+2026-05-03 21:51:24 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:51:24 BST - INFO - 
+2026-05-03 21:51:24 BST - INFO - Processing Model [41/53]: mlx-community/gemma-3n-E4B-it-bf16
+2026-05-03 21:51:24 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:51:24 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/gemma-3n-E4B-it-bf16
+2026-05-03 21:51:34 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/gemma-3n-E4B-it-bf16
+2026-05-03 21:51:34 BST - DEBUG - Cleaned up resources for model mlx-community/gemma-3n-E4B-it-bf16
+2026-05-03 21:51:34 BST - DEBUG - Quality analysis for mlx-community/gemma-3n-E4B-it-bf16: fabrication=True, missing_sections=title+description+keywords, metadata_borrowing=True, verdict=model_shortcoming, user_bucket=avoid, words=205
+2026-05-03 21:51:34 BST - INFO - Quality issues detected for mlx-community/gemma-3n-E4B-it-bf16: fabrication, missing-sections(title+description+keywords), metadata-borrowing
+2026-05-03 21:51:34 BST - DEBUG - 
+2026-05-03 21:51:34 BST - DEBUG - === CANONICAL REVIEW: mlx-community/gemma-3n-E4B-it-bf16 ===
+2026-05-03 21:51:34 BST - DEBUG - Verdict: model_shortcoming | user=avoid
+2026-05-03 21:51:34 BST - DEBUG - Why: missing sections: title, description, keywords | missing terms: 10 Best (structured), Bird, Gull, Mudflats, Museum | nonvisual metadata reused
+2026-05-03 21:51:34 BST - DEBUG - Trusted hints: preserves trusted hints | nonvisual metadata reused
+2026-05-03 21:51:34 BST - DEBUG - Contract: missing: title, description, keywords
+2026-05-03 21:51:34 BST - DEBUG - Utility: user=avoid | preserves trusted hints | metadata borrowing
+2026-05-03 21:51:34 BST - DEBUG - Stack / owner: owner=model
+2026-05-03 21:51:34 BST - DEBUG - Token accounting: prompt=838 | text_est=483 | nontext_est=355 | gen=336 | max=500 | stop=completed
+2026-05-03 21:51:34 BST - DEBUG - Next action: Treat as a model limitation for this prompt; the requested output contract is not being met.
+2026-05-03 21:51:34 BST - DEBUG - Full output:
+## Image Description:
+
+A wide shot captures a bustling scene at the historic quayside in Shotley, Suffolk, England, on a bright, sunny day. The foreground is dominated by several boats moored along the quayside. A prominent yellow and white sailing barge with a brown boom and white sails is positioned centrally, angled slightly towards the right. To its left, a smaller blue and white boat is also moored. Further to the left, a white motorboat with a dark cabin is visible. 
+
+Behind the boats, the quayside is lined with a white building undergoing scaffolding, indicating renovation work. The building has a red tiled roof and multiple windows. To the right of the scaffolding, a charming white building with a red tiled roof and multiple windows stands, its architecture suggesting a historic structure. 
+
+The water of the River Deben is calm and reflects the boats and buildings. The sky above is a clear, bright blue. The overall impression is of a picturesque and active maritime scene in a historic English town. 
+
+## Keywords:
+
+Barge, boat, mooring, quayside, Suffolk, England, river, blue sky, historic, renovation, sailing, water, marina, harbour, coastal, summer, sunny, maritime, Shotley. 
+
+## Image Details:
+
+* **Date Taken:** 2026-05-02 16:34:07 BST
+* **Location:** 52.091500°N, 1.318500°E 
+* **Source:** Adobe Stock 
+* **License:** Available for licensing. 
+
+2026-05-03 21:51:34 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/gemma-3n-E4B-it-bf16 ===
+2026-05-03 21:51:34 BST - INFO - [RUN 41/53] SUMMARY model=mlx-community/gemma-3n-E4B-it-bf16 status=OK
+2026-05-03 21:51:34 BST - INFO - quality=fabrication+metadata_borrowing+missing_sections
+2026-05-03 21:51:34 BST - INFO - 
+2026-05-03 21:51:34 BST - INFO - Generated Text:
+2026-05-03 21:51:34 BST - INFO -    ## Image Description:
+2026-05-03 21:51:34 BST - INFO - 
+2026-05-03 21:51:34 BST - INFO -    A wide shot captures a bustling scene at the historic quayside in Shotley, Suffolk, England, on a
+2026-05-03 21:51:34 BST - INFO -    bright, sunny day. The foreground is dominated by several boats moored along the quayside. A
+2026-05-03 21:51:34 BST - INFO -    prominent yellow and white sailing barge with a brown boom and white sails is positioned
+2026-05-03 21:51:34 BST - INFO -    centrally, angled slightly towards the right. To its left, a smaller blue and white boat is also
+2026-05-03 21:51:34 BST - INFO -    moored. Further to the left, a white motorboat with a dark cabin is visible.
+2026-05-03 21:51:34 BST - INFO - 
+2026-05-03 21:51:34 BST - INFO -    Behind the boats, the quayside is lined with a white building undergoing scaffolding, indicating
+2026-05-03 21:51:34 BST - INFO -    renovation work. The building has a red tiled roof and multiple windows. To the right of the
+2026-05-03 21:51:34 BST - INFO -    scaffolding, a charming white building with a red tiled roof and multiple windows stands, its
+2026-05-03 21:51:34 BST - INFO -    architecture suggesting a historic structure.
+2026-05-03 21:51:34 BST - INFO - 
+2026-05-03 21:51:34 BST - INFO -    The water of the River Deben is calm and reflects the boats and buildings. The sky above is a
+2026-05-03 21:51:34 BST - INFO -    clear, bright blue. The overall impression is of a picturesque and active maritime scene in a
+2026-05-03 21:51:34 BST - INFO -    historic English town.
+2026-05-03 21:51:34 BST - INFO - 
+2026-05-03 21:51:34 BST - INFO -    ## Keywords:
+2026-05-03 21:51:34 BST - INFO - 
+2026-05-03 21:51:34 BST - INFO -    Barge, boat, mooring, quayside, Suffolk, England, river, blue sky, historic, renovation, sailing,
+2026-05-03 21:51:34 BST - INFO -    water, marina, harbour, coastal, summer, sunny, maritime, Shotley.
+2026-05-03 21:51:34 BST - INFO - 
+2026-05-03 21:51:34 BST - INFO -    ## Image Details:
+2026-05-03 21:51:34 BST - INFO - 
+2026-05-03 21:51:34 BST - INFO -    * **Date Taken:** 2026-05-02 16:34:07 BST
+2026-05-03 21:51:34 BST - INFO -    * **Location:** 52.091500°N, 1.318500°E 
+2026-05-03 21:51:34 BST - INFO -    * **Source:** Adobe Stock 
+2026-05-03 21:51:34 BST - INFO -    * **License:** Available for licensing. 
+2026-05-03 21:51:34 BST - INFO - 
+2026-05-03 21:51:34 BST - INFO - 📊 Timing: 10.19s total (gen=7.71s, load=2.22s, prep=0.00s, first=0.45s) | Memory: 17GB peak
+2026-05-03 21:51:34 BST - INFO -    Tokens: 1,174 (838 prompt + 336 gen) | Speed: 48.8 gen/s, 1,876 prompt/s
+2026-05-03 21:51:34 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:51:34 BST - INFO - 
+2026-05-03 21:51:34 BST - INFO - Processing Model [42/53]: mlx-community/gemma-4-26b-a4b-it-4bit
+2026-05-03 21:51:34 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:51:34 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/gemma-4-26b-a4b-it-4bit
+2026-05-03 21:51:38 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/gemma-4-26b-a4b-it-4bit
+2026-05-03 21:51:39 BST - DEBUG - Cleaned up resources for model mlx-community/gemma-4-26b-a4b-it-4bit
+2026-05-03 21:51:39 BST - DEBUG - Quality analysis for mlx-community/gemma-4-26b-a4b-it-4bit: title_words=8, description_sentences=2, keywords=15, keyword_dup=0.00, words=65
+2026-05-03 21:51:39 BST - DEBUG - 
+2026-05-03 21:51:39 BST - DEBUG - === CANONICAL REVIEW: mlx-community/gemma-4-26b-a4b-it-4bit ===
+2026-05-03 21:51:39 BST - DEBUG - Verdict: clean | user=recommended
+2026-05-03 21:51:39 BST - DEBUG - Why: missing terms: 10 Best (structured), Bird, Gull, Marina, Mudflats
+2026-05-03 21:51:39 BST - DEBUG - Trusted hints: preserves trusted hints
+2026-05-03 21:51:39 BST - DEBUG - Contract: ok
+2026-05-03 21:51:39 BST - DEBUG - Utility: user=recommended | preserves trusted hints
+2026-05-03 21:51:39 BST - DEBUG - Stack / owner: owner=model
+2026-05-03 21:51:39 BST - DEBUG - Token accounting: prompt=844 | text_est=483 | nontext_est=361 | gen=91 | max=500 | stop=completed
+2026-05-03 21:51:39 BST - DEBUG - Next action: Treat as a model limitation for this prompt; trusted hint coverage is still weak.
+2026-05-03 21:51:39 BST - DEBUG - Full output:
+Title:
+Traditional boats moored near a historic white building
+
+Description:
+Several traditional wooden boats are moored on a river at low tide under a clear blue sky. A large white building with a tiled roof stands in the background, with one section covered in scaffolding.
+
+Keywords:
+boat, barge, mooring, river, water, white building, scaffolding, blue sky, wooden boat, maritime, quay, reflection, daylight, traditional boat, rigging
+2026-05-03 21:51:39 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/gemma-4-26b-a4b-it-4bit ===
+2026-05-03 21:51:39 BST - INFO - [RUN 42/53] SUMMARY model=mlx-community/gemma-4-26b-a4b-it-4bit status=OK quality=clean
+2026-05-03 21:51:39 BST - INFO - 
+2026-05-03 21:51:39 BST - INFO - Generated Text:
+2026-05-03 21:51:39 BST - INFO -    Title:
+2026-05-03 21:51:39 BST - INFO -    Traditional boats moored near a historic white building
+2026-05-03 21:51:39 BST - INFO - 
+2026-05-03 21:51:39 BST - INFO -    Description:
+2026-05-03 21:51:39 BST - INFO -    Several traditional wooden boats are moored on a river at low tide under a clear blue sky. A
+2026-05-03 21:51:39 BST - INFO -    large white building with a tiled roof stands in the background, with one section covered in
+2026-05-03 21:51:39 BST - INFO -    scaffolding.
+2026-05-03 21:51:39 BST - INFO - 
+2026-05-03 21:51:39 BST - INFO -    Keywords:
+2026-05-03 21:51:39 BST - INFO -    boat, barge, mooring, river, water, white building, scaffolding, blue sky, wooden boat, maritime,
+2026-05-03 21:51:39 BST - INFO -    quay, reflection, daylight, traditional boat, rigging
+2026-05-03 21:51:39 BST - INFO - 
+2026-05-03 21:51:39 BST - INFO - 📊 Timing: 4.31s total (gen=1.72s, load=2.32s, prep=0.02s, first=0.51s) | Memory: 17GB peak
+2026-05-03 21:51:39 BST - INFO -    Tokens: 935 (844 prompt + 91 gen) | Speed: 114 gen/s, 1,654 prompt/s
+2026-05-03 21:51:39 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:51:39 BST - INFO - 
+2026-05-03 21:51:39 BST - INFO - Processing Model [43/53]: mlx-community/gemma-4-31b-bf16
+2026-05-03 21:51:39 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:51:39 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/gemma-4-31b-bf16
+2026-05-03 21:52:01 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/gemma-4-31b-bf16
+2026-05-03 21:52:02 BST - DEBUG - Cleaned up resources for model mlx-community/gemma-4-31b-bf16
+2026-05-03 21:52:02 BST - DEBUG - Quality analysis for mlx-community/gemma-4-31b-bf16: formatting_issues=True, context_ignored=True, missing_sections=title+description+keywords, hint_relationship=ignores_trusted_hints, verdict=model_shortcoming, user_bucket=avoid, words=21
+2026-05-03 21:52:02 BST - INFO - Quality issues detected for mlx-community/gemma-4-31b-bf16: missing-sections(title+description+keywords), trusted-hints-ignored, formatting, context-ignored
+2026-05-03 21:52:02 BST - DEBUG - 
+2026-05-03 21:52:02 BST - DEBUG - === CANONICAL REVIEW: mlx-community/gemma-4-31b-bf16 ===
+2026-05-03 21:52:02 BST - DEBUG - Verdict: model_shortcoming | user=avoid
+2026-05-03 21:52:02 BST - DEBUG - Why: missing sections: title, description, keywords | missing terms: 10 Best (structured), Barge, Bird, Blue sky, Gull | formatting=Unknown tags: &lt;image&gt;
+2026-05-03 21:52:02 BST - DEBUG - Trusted hints: ignores trusted hints | missing terms: 10 Best (structured), Barge, Bird, Blue sky, Gull
+2026-05-03 21:52:02 BST - DEBUG - Contract: missing: title, description, keywords
+2026-05-03 21:52:02 BST - DEBUG - Utility: user=avoid | ignores trusted hints
+2026-05-03 21:52:02 BST - DEBUG - Stack / owner: owner=model
+2026-05-03 21:52:02 BST - DEBUG - Token accounting: prompt=832 | text_est=483 | nontext_est=349 | gen=86 | max=500 | stop=completed
+2026-05-03 21:52:02 BST - DEBUG - Next action: Treat as a model limitation for this prompt; the requested output contract is not being met.
+2026-05-03 21:52:02 BST - DEBUG - Full output:
+
+- Camera metadata: Canon EOS 5D Mark IV, 1/1000 sec at f/11, ISO 100, 100mm focal length.
+- File metadata: 5472x3648 pixels, 24-bit color, 300 DPI, 10.2 MB.
+
+Image:
+<image>
+2026-05-03 21:52:02 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/gemma-4-31b-bf16 ===
+2026-05-03 21:52:02 BST - INFO - [RUN 43/53] SUMMARY model=mlx-community/gemma-4-31b-bf16 status=OK
+2026-05-03 21:52:02 BST - INFO - quality=context_ignored+formatting+missing_sections+trusted_hint_ignored
+2026-05-03 21:52:02 BST - INFO - 
+2026-05-03 21:52:02 BST - INFO - Generated Text:
+2026-05-03 21:52:02 BST - WARNING - ⚠️  Note:  Unknown tags: <image>
+2026-05-03 21:52:02 BST - WARNING - ⚠️  Note: Output ignored key context (missing: 10 Best (structured), Barge, Bird, Blue sky, Gull)
+2026-05-03 21:52:02 BST - INFO - 
+2026-05-03 21:52:02 BST - INFO -    - Camera metadata: Canon EOS 5D Mark IV, 1/1000 sec at f/11, ISO 100, 100mm focal length.
+2026-05-03 21:52:02 BST - INFO -    - File metadata: 5472x3648 pixels, 24-bit color, 300 DPI, 10.2 MB.
+2026-05-03 21:52:02 BST - INFO - 
+2026-05-03 21:52:02 BST - INFO -    Image:
+2026-05-03 21:52:02 BST - INFO -    <image>
+2026-05-03 21:52:02 BST - INFO - 
+2026-05-03 21:52:02 BST - INFO - 📊 Timing: 22.87s total (gen=16.16s, load=6.45s, prep=0.00s, first=3.98s) | Memory: 65GB peak
+2026-05-03 21:52:02 BST - INFO -    Tokens: 918 (832 prompt + 86 gen) | Speed: 7.36 gen/s, 209 prompt/s
+2026-05-03 21:52:02 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:52:02 BST - INFO - 
+2026-05-03 21:52:02 BST - INFO - Processing Model [44/53]: mlx-community/gemma-4-31b-it-4bit
+2026-05-03 21:52:02 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:52:02 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/gemma-4-31b-it-4bit
+2026-05-03 21:52:11 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/gemma-4-31b-it-4bit
+2026-05-03 21:52:11 BST - DEBUG - Cleaned up resources for model mlx-community/gemma-4-31b-it-4bit
+2026-05-03 21:52:11 BST - DEBUG - Quality analysis for mlx-community/gemma-4-31b-it-4bit: title_words=8, description_sentences=2, keywords=18, keyword_dup=0.00, metadata_borrowing=True, verdict=model_shortcoming, user_bucket=avoid, words=67
+2026-05-03 21:52:11 BST - INFO - Quality issues detected for mlx-community/gemma-4-31b-it-4bit: metadata-borrowing
+2026-05-03 21:52:11 BST - DEBUG - 
+2026-05-03 21:52:11 BST - DEBUG - === CANONICAL REVIEW: mlx-community/gemma-4-31b-it-4bit ===
+2026-05-03 21:52:11 BST - DEBUG - Verdict: model_shortcoming | user=avoid
+2026-05-03 21:52:11 BST - DEBUG - Why: missing terms: 10 Best (structured), Bird, Marina, River Deben, view | nonvisual metadata reused
+2026-05-03 21:52:11 BST - DEBUG - Trusted hints: preserves trusted hints | nonvisual metadata reused
+2026-05-03 21:52:11 BST - DEBUG - Contract: ok
+2026-05-03 21:52:11 BST - DEBUG - Utility: user=avoid | preserves trusted hints | metadata borrowing
+2026-05-03 21:52:11 BST - DEBUG - Stack / owner: owner=model
+2026-05-03 21:52:11 BST - DEBUG - Token accounting: prompt=844 | text_est=483 | nontext_est=361 | gen=95 | max=500 | stop=completed
+2026-05-03 21:52:11 BST - DEBUG - Next action: Treat as a model limitation for this prompt; trusted hint coverage is still weak.
+2026-05-03 21:52:11 BST - DEBUG - Full output:
+Title: Sailing boats and buildings on a river quay
+
+Description: Several traditional sailing boats and barges are moored on a river at low tide. In the background, a white building with a red tiled roof stands next to another white building covered in scaffolding.
+
+Keywords: barge, boat, blue sky, England, Europe, gull, moored, mooring, mudflats, museum, pier, quay, rigging, river, sailing barge, sailing boat, scaffolding, white building
+2026-05-03 21:52:11 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/gemma-4-31b-it-4bit ===
+2026-05-03 21:52:11 BST - INFO - [RUN 44/53] SUMMARY model=mlx-community/gemma-4-31b-it-4bit status=OK quality=metadata_borrowing
+2026-05-03 21:52:11 BST - INFO - 
+2026-05-03 21:52:11 BST - INFO - Generated Text:
+2026-05-03 21:52:11 BST - INFO -    Title: Sailing boats and buildings on a river quay
+2026-05-03 21:52:11 BST - INFO - 
+2026-05-03 21:52:11 BST - INFO -    Description: Several traditional sailing boats and barges are moored on a river at low tide. In
+2026-05-03 21:52:11 BST - INFO -    the background, a white building with a red tiled roof stands next to another white building
+2026-05-03 21:52:11 BST - INFO -    covered in scaffolding.
+2026-05-03 21:52:11 BST - INFO - 
+2026-05-03 21:52:11 BST - INFO -    Keywords: barge, boat, blue sky, England, Europe, gull, moored, mooring, mudflats, museum, pier,
+2026-05-03 21:52:11 BST - INFO -    quay, rigging, river, sailing barge, sailing boat, scaffolding, white building
+2026-05-03 21:52:11 BST - INFO - 
+2026-05-03 21:52:11 BST - INFO - 📊 Timing: 8.98s total (gen=5.99s, load=2.74s, prep=0.00s, first=1.83s) | Memory: 20GB peak
+2026-05-03 21:52:11 BST - INFO -    Tokens: 939 (844 prompt + 95 gen) | Speed: 25.7 gen/s, 461 prompt/s
+2026-05-03 21:52:11 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:52:11 BST - INFO - 
+2026-05-03 21:52:11 BST - INFO - Processing Model [45/53]: mlx-community/llava-v1.6-mistral-7b-8bit
+2026-05-03 21:52:11 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:52:11 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/llava-v1.6-mistral-7b-8bit
+2026-05-03 21:52:15 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/llava-v1.6-mistral-7b-8bit
+2026-05-03 21:52:16 BST - DEBUG - Cleaned up resources for model mlx-community/llava-v1.6-mistral-7b-8bit
+2026-05-03 21:52:16 BST - DEBUG - Quality analysis for mlx-community/llava-v1.6-mistral-7b-8bit: context_ignored=True, hint_relationship=ignores_trusted_hints, verdict=harness, user_bucket=avoid, harness=True (prompt_template; output:filler_response(8tok)), words=5
+2026-05-03 21:52:16 BST - INFO - Quality issues detected for mlx-community/llava-v1.6-mistral-7b-8bit: ⚠️harness(prompt_template), trusted-hints-ignored, context-ignored
+2026-05-03 21:52:16 BST - DEBUG - 
+2026-05-03 21:52:16 BST - DEBUG - === CANONICAL REVIEW: mlx-community/llava-v1.6-mistral-7b-8bit ===
+2026-05-03 21:52:16 BST - DEBUG - Verdict: harness | user=avoid
+2026-05-03 21:52:16 BST - DEBUG - Why: Output was a short generic filler response (about 8 tokens). | nontext prompt burden=83% | missing terms: 10 Best (structured), Barge, Bird, Blue sky, Gull
+2026-05-03 21:52:16 BST - DEBUG - Trusted hints: ignores trusted hints | missing terms: 10 Best (structured), Barge, Bird, Blue sky, Gull
+2026-05-03 21:52:16 BST - DEBUG - Contract: ok
+2026-05-03 21:52:16 BST - DEBUG - Utility: user=avoid | ignores trusted hints
+2026-05-03 21:52:16 BST - DEBUG - Stack / owner: owner=model-config | harness=prompt_template
+2026-05-03 21:52:16 BST - DEBUG - Token accounting: prompt=2790 | text_est=483 | nontext_est=2307 | gen=8 | max=500 | stop=completed
+2026-05-03 21:52:16 BST - DEBUG - Next action: Inspect model repo config, chat template, and EOS settings.
+2026-05-03 21:52:16 BST - DEBUG - Full output:
+The image is a photograph. 
+2026-05-03 21:52:16 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/llava-v1.6-mistral-7b-8bit ===
+2026-05-03 21:52:16 BST - INFO - [RUN 45/53] SUMMARY model=mlx-community/llava-v1.6-mistral-7b-8bit status=OK
+2026-05-03 21:52:16 BST - INFO - quality=context_ignored+harness+trusted_hint_ignored
+2026-05-03 21:52:16 BST - INFO - 
+2026-05-03 21:52:16 BST - INFO - Generated Text:
+2026-05-03 21:52:16 BST - WARNING - ⚠️  Note: Output ignored key context (missing: 10 Best (structured), Barge, Bird, Blue sky, Gull)
+2026-05-03 21:52:16 BST - WARNING - ⚠️  Likely harness issue (prompt_template): output:filler_response(8tok)
+2026-05-03 21:52:16 BST - INFO -    The image is a photograph. 
+2026-05-03 21:52:16 BST - INFO - 
+2026-05-03 21:52:16 BST - INFO - 📊 Timing: 4.63s total (gen=3.47s, load=0.91s, prep=0.00s, first=2.76s) | Memory: 9.7GB peak
+2026-05-03 21:52:16 BST - INFO -    Tokens: 2,798 (2,790 prompt + 8 gen) | Speed: 59.1 gen/s, 1,012 prompt/s
+2026-05-03 21:52:16 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:52:16 BST - INFO - 
+2026-05-03 21:52:16 BST - INFO - Processing Model [46/53]: mlx-community/nanoLLaVA-1.5-4bit
+2026-05-03 21:52:16 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:52:16 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/nanoLLaVA-1.5-4bit
+2026-05-03 21:52:16 BST - DEBUG - Legacy snapshot note for mlx-community/nanoLLaVA-1.5-4bit: processor config missing from snapshot (preprocessor_config.json, processor_config.json).
+2026-05-03 21:52:17 BST - DEBUG - [verbose passthrough end] mlx-vlm.generate output for mlx-community/nanoLLaVA-1.5-4bit
+2026-05-03 21:52:17 BST - DEBUG - Cleaned up resources for model mlx-community/nanoLLaVA-1.5-4bit
+2026-05-03 21:52:17 BST - DEBUG - Quality analysis for mlx-community/nanoLLaVA-1.5-4bit: missing_sections=keywords, title_words=6, description_sentences=3, context_echo=True (0.95), metadata_borrowing=True, verdict=model_shortcoming, user_bucket=avoid, words=59
+2026-05-03 21:52:17 BST - INFO - Quality issues detected for mlx-community/nanoLLaVA-1.5-4bit: missing-sections(keywords), description-sentences(3), context-echo(0.95), metadata-borrowing
+2026-05-03 21:52:17 BST - DEBUG - 
+2026-05-03 21:52:17 BST - DEBUG - === CANONICAL REVIEW: mlx-community/nanoLLaVA-1.5-4bit ===
+2026-05-03 21:52:17 BST - DEBUG - Verdict: model_shortcoming | user=avoid
+2026-05-03 21:52:17 BST - DEBUG - Why: missing sections: keywords | missing terms: 10 Best (structured), Bird, Blue sky, Gull, Marina | context echo=95% | nonvisual metadata reused
+2026-05-03 21:52:17 BST - DEBUG - Trusted hints: preserves trusted hints | nonvisual metadata reused
+2026-05-03 21:52:17 BST - DEBUG - Contract: missing: keywords | description sentences=3
+2026-05-03 21:52:17 BST - DEBUG - Utility: user=avoid | preserves trusted hints | metadata borrowing | context echo
+2026-05-03 21:52:17 BST - DEBUG - Stack / owner: owner=model
+2026-05-03 21:52:17 BST - DEBUG - Token accounting: prompt=579 | text_est=483 | nontext_est=96 | gen=85 | max=500 | stop=completed
+2026-05-03 21:52:17 BST - DEBUG - Next action: Treat as a model limitation for this prompt; the requested output contract is not being met.
+2026-05-03 21:52:17 BST - DEBUG - Full output:
+Title: Historic Quayside at Woodbridge, Suffolk, England
+
+Description: A view of the historic quayside at Woodbridge, Suffolk, England, on a sunny day. Traditional boats, including a large sailing barge, are moored on the River Deben at low tide. In the background is the landmark Woodbridge Tide Mill Museum, while an adjacent building is covered in scaffolding for renovation work.
+2026-05-03 21:52:17 BST - DEBUG - === END CANONICAL REVIEW: mlx-community/nanoLLaVA-1.5-4bit ===
+2026-05-03 21:52:17 BST - INFO - [RUN 46/53] SUMMARY model=mlx-community/nanoLLaVA-1.5-4bit status=OK
+2026-05-03 21:52:17 BST - INFO - quality=context_echo+description_length+metadata_borrowing+missing_sections
+2026-05-03 21:52:17 BST - INFO - 
+2026-05-03 21:52:17 BST - INFO - Generated Text:
+2026-05-03 21:52:17 BST - INFO -    Title: Historic Quayside at Woodbridge, Suffolk, England
+2026-05-03 21:52:17 BST - INFO - 
+2026-05-03 21:52:17 BST - INFO -    Description: A view of the historic quayside at Woodbridge, Suffolk, England, on a sunny day.
+2026-05-03 21:52:17 BST - INFO -    Traditional boats, including a large sailing barge, are moored on the River Deben at low tide. In
+2026-05-03 21:52:17 BST - INFO -    the background is the landmark Woodbridge Tide Mill Museum, while an adjacent building is covered
+2026-05-03 21:52:17 BST - INFO -    in scaffolding for renovation work.
+2026-05-03 21:52:17 BST - INFO - 
+2026-05-03 21:52:17 BST - INFO - 📊 Timing: 1.55s total (gen=0.81s, load=0.47s, prep=0.00s, first=0.11s) | Memory: 2.8GB peak
+2026-05-03 21:52:17 BST - INFO -    Tokens: 664 (579 prompt + 85 gen) | Speed: 318 gen/s, 5,499 prompt/s
+2026-05-03 21:52:17 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 21:52:17 BST - INFO - 
+2026-05-03 21:52:17 BST - INFO - Processing Model [47/53]: mlx-community/paligemma2-10b-ft-docci-448-6bit
+2026-05-03 21:52:18 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 21:52:18 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for mlx-community/paligemma2-10b-ft-docci-448-6bit

@@ -5,6 +5,8 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-05-03
+
 ### Added
 
 - Add a metadata-agreement benchmark score for successful generations, comparing
