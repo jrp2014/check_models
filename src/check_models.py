@@ -2351,7 +2351,7 @@ def _make_rich_console(*, width: int | None = None) -> Console:
 
 
 LOCAL_TIMESTAMP_FORMAT: Final[str] = "%Y-%m-%d %H:%M:%S %Z"
-CONSOLE_LOG_TIME_FORMAT: Final[str] = "[%H:%M:%S %Z]"
+CONSOLE_LOG_TIME_FORMAT: Final[str] = "[%H:%M:%S]"
 
 
 class StyleAwareRichHandler(RichHandler):
@@ -2435,6 +2435,7 @@ def _make_console_log_handler(
     handler = StyleAwareRichHandler(
         console=_make_rich_console(width=width),
         show_time=True,
+        omit_repeated_times=False,
         show_level=verbose,
         show_path=False,
         markup=False,

@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import argparse
+import io
 import logging
 import time
 from typing import TYPE_CHECKING
 from unittest.mock import patch
+
+from rich.console import Console
 
 import check_models
 from check_models import (
@@ -73,6 +76,48 @@ def _build_perf() -> PerformanceResult:
         model_load_time=0.5,
         total_time=1.5,
     )
+
+
+def test_console_handler_keeps_repeated_timestamps_visible() -> None:
+    """Console logs should timestamp every record, including same-second records."""
+    stream = io.StringIO()
+    console = Console(
+        file=stream,
+        width=100,
+        no_color=True,
+        force_terminal=False,
+        markup=False,
+        highlight=False,
+    )
+    with patch.object(check_models, "_make_rich_console", return_value=console):
+        handler = check_models._make_console_log_handler(
+            level=logging.INFO,
+            verbose=False,
+            width=100,
+        )
+
+    test_logger = logging.getLogger("check-models-rich-timestamp-test")
+    old_handlers = test_logger.handlers[:]
+    old_level = test_logger.level
+    old_propagate = test_logger.propagate
+    try:
+        test_logger.handlers.clear()
+        test_logger.addHandler(handler)
+        test_logger.setLevel(logging.INFO)
+        test_logger.propagate = False
+        test_logger.info("first")
+        test_logger.info("second")
+    finally:
+        test_logger.handlers[:] = old_handlers
+        test_logger.setLevel(old_level)
+        test_logger.propagate = old_propagate
+
+    lines = [line for line in stream.getvalue().splitlines() if line.strip()]
+    assert len(lines) == 2
+    assert lines[0].startswith("[")
+    assert lines[1].startswith("[")
+    assert "first" in lines[0]
+    assert "second" in lines[1]
 
 
 def _history_run_record(
