@@ -12562,20 +12562,6 @@ def _issue_subtype_display_label(issue_subtype: str) -> str:
     return _humanize_issue_subtype_token(issue_subtype)
 
 
-def _issue_queue_subtype_cell(
-    issue_subtype: str,
-    *,
-    escape_text: Callable[[str], str],
-) -> str:
-    """Render a readable queue subtype while preserving the raw cluster code."""
-    raw_subtype = issue_subtype.strip()
-    display_label = _issue_subtype_display_label(raw_subtype)
-    escaped_label = escape_text(display_label)
-    if not raw_subtype or raw_subtype == display_label:
-        return escaped_label
-    return f"{escaped_label} (`{escape_text(raw_subtype)}`)"
-
-
 def _issue_queue_problem_cell(
     cluster: IssueCluster,
     *,
