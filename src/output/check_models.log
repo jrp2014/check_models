@@ -1,129 +1,174 @@
-2026-05-03 00:53:33 BST - DEBUG - Verbose/debug mode enabled.
-2026-05-03 00:53:34 BST - INFO - Full environment dump written to:
-2026-05-03 00:53:34 BST - INFO - /Users/jrp/Documents/AI/mlx/check_models/src/output/environment.log
-2026-05-03 00:53:34 BST - DEBUG - Environment details saved for reproducibility
-2026-05-03 00:53:34 BST - INFO - --- Library Versions ---
-2026-05-03 00:53:34 BST - INFO - Pillow          : 12.2.0
-2026-05-03 00:53:34 BST - INFO - huggingface-hub : 1.13.0
-2026-05-03 00:53:34 BST - INFO - mlx             : 0.32.0.dev20260502+e8ebdebe
-2026-05-03 00:53:34 BST - INFO - mlx-lm          : 0.31.3
-2026-05-03 00:53:34 BST - INFO - mlx-metal       : 
-2026-05-03 00:53:34 BST - INFO - mlx-vlm         : 0.4.5
-2026-05-03 00:53:34 BST - INFO - numpy           : 2.4.4
-2026-05-03 00:53:34 BST - INFO - tokenizers      : 0.22.2
-2026-05-03 00:53:34 BST - INFO - transformers    : 5.7.0
-2026-05-03 00:53:34 BST - INFO - Generated: 2026-05-03 00:53:34 BST
-2026-05-03 00:53:34 BST - INFO - 
-2026-05-03 00:53:34 BST - INFO - --- System Information ---
-2026-05-03 00:53:34 BST - INFO - OS                  : Darwin 25.4.0
-2026-05-03 00:53:34 BST - INFO - macOS Version       : 26.4.1
-2026-05-03 00:53:34 BST - INFO - SDK Version         : 26.4
-2026-05-03 00:53:34 BST - INFO - Xcode Version       : 26.4.1
-2026-05-03 00:53:34 BST - INFO - Xcode Build         : 17E202
-2026-05-03 00:53:34 BST - INFO - Metal SDK           : MacOSX.sdk
-2026-05-03 00:53:34 BST - INFO - Python Version      : 3.13.12
-2026-05-03 00:53:34 BST - INFO - Architecture        : arm64
-2026-05-03 00:53:34 BST - INFO - GPU/Chip            : Apple M5 Max
-2026-05-03 00:53:34 BST - INFO - GPU Cores           : 40
-2026-05-03 00:53:34 BST - INFO - Metal Support       : Metal 4
-2026-05-03 00:53:34 BST - INFO - RAM                 : 128.0 GB
-2026-05-03 00:53:34 BST - INFO - CPU Cores (Physical): 18
-2026-05-03 00:53:34 BST - INFO - CPU Cores (Logical) : 18
-2026-05-03 00:53:34 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2026-05-03 00:53:34 BST - WARNING - ⚠️  SECURITY WARNING: --trust-remote-code is enabled.
-2026-05-03 00:53:34 BST - WARNING - ⚠️  This allows execution of remote code and may pose security risks.
-2026-05-03 00:53:34 BST - INFO - ====================================================================================================
-2026-05-03 00:53:34 BST - INFO - MLX Vision Language Model Check
-2026-05-03 00:53:34 BST - INFO - ====================================================================================================
-2026-05-03 00:53:34 BST - INFO - Image File:      /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg
-2026-05-03 00:53:34 BST - INFO - Image dimensions: 5760x8507 (49.0 MPixels)
-2026-05-03 00:53:34 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2026-05-03 00:53:34 BST - INFO - Image Metadata
-2026-05-03 00:53:34 BST - DEBUG - Extracted GPS fields: lat=(56.0, 11.49, 0.0), lat_ref='N', lon=(3.0, 35.46, 0.0), lon_ref='W'
-2026-05-03 00:53:34 BST - DEBUG - Converted GPS: latitude=(56.0, 11.49, 0.0), longitude=(3.0, 35.46, 0.0)
-2026-05-03 00:53:34 BST - INFO - Date: 2026-04-03 13:40:49 BST
-2026-05-03 00:53:34 BST - INFO - Description: A person in a blue hooded jacket stands alone on a small wooden pier, looking out over a tranquil lake on a rainy day. The surrounding park, with its lush green lawns, varied trees, and a distant arched bridge, creates a peaceful and contemplative setting for a quiet moment in nature.
-2026-05-03 00:53:34 BST - INFO - GPS Location: 56.191500°N, 3.591000°W
-2026-05-03 00:53:34 BST - INFO - Keywords: Adobe Stock, Any Vision, Boulder, Clackmannanshire, Dollar, Europe, Evergreen, Forest, Hooded jacket, Jacket, Japanese Garden at Cowden, Overcast, Path, Person, Pier, Rainy Day, Rural, Scotland, Standing, Stone, Tranquil, Tree, Trees, UK, United Kingdom, Water, Woman, alone, autumn, boots, bridge, calm, contemplation, countryside, dock, figure, garden, getaway, gloomy, grass, green, introspection, lake, landscape, melancholy, moody, moss, nature, outdoors, park, peaceful, pine tree, pond, quiet, rain, rainy, reflection, scenery, serene, solitude, thinking, travel, watching, weather, woodland
-2026-05-03 00:53:34 BST - INFO - ====================================================================================================
-2026-05-03 00:53:34 BST - INFO -                                        EXIF Metadata Summary                                        
-2026-05-03 00:53:34 BST - INFO - ====================================================================================================
-2026-05-03 00:53:34 BST - INFO - ╭──────────────────────────┬──────────────────────────────────────────────────────────────╮
-2026-05-03 00:53:34 BST - INFO - │ Tag                      │ Value                                                        │
-2026-05-03 00:53:34 BST - INFO - ├──────────────────────────┼──────────────────────────────────────────────────────────────┤
-2026-05-03 00:53:34 BST - INFO - │ ResolutionUnit           │ 2                                                            │
-2026-05-03 00:53:34 BST - INFO - │ ImageDescription         │ A person in a blue hooded jacket stands alone on a small ... │
-2026-05-03 00:53:34 BST - INFO - │ Make                     │ SONY                                                         │
-2026-05-03 00:53:34 BST - INFO - │ Model                    │ ILCE-1M2                                                     │
-2026-05-03 00:53:34 BST - INFO - │ Software                 │ Adobe Photoshop Lightroom Classic 15.2.1 (Macintosh)         │
-2026-05-03 00:53:34 BST - INFO - │ Orientation              │ 1                                                            │
-2026-05-03 00:53:34 BST - INFO - │ DateTime                 │ 2026:04:06 22:02:08                                          │
-2026-05-03 00:53:34 BST - INFO - │ YResolution              │ 240.0                                                        │
-2026-05-03 00:53:34 BST - INFO - │ Copyright                │ Copyright Â© 2026 John Pavel                                 │
-2026-05-03 00:53:34 BST - INFO - │ XResolution              │ 240.0                                                        │
-2026-05-03 00:53:34 BST - INFO - │ Artist                   │ John Pavel                                                   │
-2026-05-03 00:53:34 BST - INFO - │ ExifVersion              │ 0232                                                         │
-2026-05-03 00:53:34 BST - INFO - │ ShutterSpeedValue        │ 5.906891                                                     │
-2026-05-03 00:53:34 BST - INFO - │ ApertureValue            │ 4.970854                                                     │
-2026-05-03 00:53:34 BST - INFO - │ DateTimeOriginal         │ 2026:04:03 12:40:49                                          │
-2026-05-03 00:53:34 BST - INFO - │ DateTimeDigitized        │ 2026:04:03 12:40:49                                          │
-2026-05-03 00:53:34 BST - INFO - │ BrightnessValue          │ 6.43125                                                      │
-2026-05-03 00:53:34 BST - INFO - │ ExposureBiasValue        │ 0.0                                                          │
-2026-05-03 00:53:34 BST - INFO - │ MaxApertureValue         │ 2.0                                                          │
-2026-05-03 00:53:34 BST - INFO - │ MeteringMode             │ 5                                                            │
-2026-05-03 00:53:34 BST - INFO - │ LightSource              │ 0                                                            │
-2026-05-03 00:53:34 BST - INFO - │ Flash                    │ 16                                                           │
-2026-05-03 00:53:34 BST - INFO - │ FocalLength              │ 28.0                                                         │
-2026-05-03 00:53:34 BST - INFO - │ ColorSpace               │ 1                                                            │
-2026-05-03 00:53:34 BST - INFO - │ DigitalZoomRatio         │ 1.0                                                          │
-2026-05-03 00:53:34 BST - INFO - │ FocalPlaneXResolution    │ 2404.622283935547                                            │
-2026-05-03 00:53:34 BST - INFO - │ FocalPlaneYResolution    │ 2404.622283935547                                            │
-2026-05-03 00:53:34 BST - INFO - │ OffsetTime               │ +01:00                                                       │
-2026-05-03 00:53:34 BST - INFO - │ SubsecTimeOriginal       │ 012                                                          │
-2026-05-03 00:53:34 BST - INFO - │ SubsecTimeDigitized      │ 012                                                          │
-2026-05-03 00:53:34 BST - INFO - │ FocalPlaneResolutionUnit │ 3                                                            │
-2026-05-03 00:53:34 BST - INFO - │ FileSource               │                                                              │
-2026-05-03 00:53:34 BST - INFO - │ ExposureTime             │ 0.016666666666666666                                         │
-2026-05-03 00:53:34 BST - INFO - │ FNumber                  │ 5.6                                                          │
-2026-05-03 00:53:34 BST - INFO - │ SceneType                │                                                              │
-2026-05-03 00:53:34 BST - INFO - │ ExposureProgram          │ 3                                                            │
-2026-05-03 00:53:34 BST - INFO - │ CustomRendered           │ 0                                                            │
-2026-05-03 00:53:34 BST - INFO - │ ISOSpeedRatings          │ 100                                                          │
-2026-05-03 00:53:34 BST - INFO - │ ExposureMode             │ 0                                                            │
-2026-05-03 00:53:34 BST - INFO - │ SensitivityType          │ 2                                                            │
-2026-05-03 00:53:34 BST - INFO - │ WhiteBalance             │ 0                                                            │
-2026-05-03 00:53:34 BST - INFO - │ RecommendedExposureIndex │ 100                                                          │
-2026-05-03 00:53:34 BST - INFO - │ BodySerialNumber         │ 02050506                                                     │
-2026-05-03 00:53:34 BST - INFO - │ LensSpecification        │ (28.0, 70.0, 2.0, 2.0)                                       │
-2026-05-03 00:53:34 BST - INFO - │ LensModel                │ FE 28-70mm F2 GM                                             │
-2026-05-03 00:53:34 BST - INFO - │ FocalLengthIn35mmFilm    │ 28                                                           │
-2026-05-03 00:53:34 BST - INFO - │ SceneCaptureType         │ 0                                                            │
-2026-05-03 00:53:34 BST - INFO - │ Contrast                 │ 0                                                            │
-2026-05-03 00:53:34 BST - INFO - │ Saturation               │ 0                                                            │
-2026-05-03 00:53:34 BST - INFO - │ Sharpness                │ 0                                                            │
-2026-05-03 00:53:34 BST - INFO - ╰──────────────────────────┴──────────────────────────────────────────────────────────────╯
-2026-05-03 00:53:34 BST - INFO - ====================================================================================================
-2026-05-03 00:53:34 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2026-05-03 00:53:34 BST - INFO - Prompt Configuration
-2026-05-03 00:53:34 BST - INFO - Using user-provided prompt from --prompt.
-2026-05-03 00:53:34 BST - INFO - User-provided prompt (--prompt): Describe this picture
-2026-05-03 00:53:34 BST - DEBUG - Full prompt:
-Describe this picture
-2026-05-03 00:53:34 BST - INFO - Prompt length: 21 characters
-2026-05-03 00:53:34 BST - INFO - Effective exclusions (models that will be filtered out): Qwen/Qwen3-VL-2B-Instruct, mlx-community/Qwen3-VL-2B-Thinking-bf16
-2026-05-03 00:53:34 BST - INFO - Scanning cache for models to process...
-2026-05-03 00:53:34 BST - INFO - Excluded 2 model(s) from cached models. Remaining: 53 model(s)
-2026-05-03 00:53:34 BST - INFO - Processing 53 model(s)...
-2026-05-03 00:53:34 BST - INFO - 
-2026-05-03 00:53:34 BST - INFO - ╭─────────────────────────────────────── 📖 Metrics Legend ────────────────────────────────────────╮
-2026-05-03 00:53:34 BST - INFO - │ Compact mode: tokens(total/prompt/gen) format with aligned keys                                  │
-2026-05-03 00:53:34 BST - INFO - │ Warnings are shown for repetitive or hallucinated output.                                        │
-2026-05-03 00:53:34 BST - INFO - ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
-2026-05-03 00:53:34 BST - INFO - 
-2026-05-03 00:53:34 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2026-05-03 00:53:34 BST - INFO - 
-2026-05-03 00:53:34 BST - INFO - Processing Model [1/53]: HuggingFaceTB/SmolVLM-Instruct
-2026-05-03 00:53:34 BST - DEBUG - System: arm64, GPU: Apple M5 Max
-2026-05-03 00:53:34 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for HuggingFaceTB/SmolVLM-Instruct
-2026-05-03 00:53:37 BST - DEBUG - Cleaned up resources for model HuggingFaceTB/SmolVLM-Instruct
-2026-05-03 00:53:37 BST - WARNING - Execution interrupted by user.
+2026-05-03 01:43:18 BST - DEBUG - Verbose/debug mode enabled.
+2026-05-03 01:43:18 BST - INFO - Full environment dump written to:
+2026-05-03 01:43:18 BST - INFO - /Users/jrp/Documents/AI/mlx/check_models/src/output/environment.log
+2026-05-03 01:43:18 BST - DEBUG - Environment details saved for reproducibility
+2026-05-03 01:43:18 BST - INFO - --- Library Versions ---
+2026-05-03 01:43:18 BST - INFO -    ╭─────────────────┬─────────────────────────────╮
+2026-05-03 01:43:18 BST - INFO -    │ Library         │ Version                     │
+2026-05-03 01:43:18 BST - INFO -    ├─────────────────┼─────────────────────────────┤
+2026-05-03 01:43:18 BST - INFO -    │ Pillow          │ 12.2.0                      │
+2026-05-03 01:43:18 BST - INFO -    │ huggingface-hub │ 1.13.0                      │
+2026-05-03 01:43:18 BST - INFO -    │ mlx             │ 0.32.0.dev20260502+e8ebdebe │
+2026-05-03 01:43:18 BST - INFO -    │ mlx-lm          │ 0.31.3                      │
+2026-05-03 01:43:18 BST - INFO -    │ mlx-metal       │                             │
+2026-05-03 01:43:18 BST - INFO -    │ mlx-vlm         │ 0.4.5                       │
+2026-05-03 01:43:18 BST - INFO -    │ numpy           │ 2.4.4                       │
+2026-05-03 01:43:18 BST - INFO -    │ tokenizers      │ 0.22.2                      │
+2026-05-03 01:43:18 BST - INFO -    │ transformers    │ 5.7.0                       │
+2026-05-03 01:43:18 BST - INFO -    ╰─────────────────┴─────────────────────────────╯
+2026-05-03 01:43:18 BST - INFO - Generated: 2026-05-03 01:43:18 BST
+2026-05-03 01:43:18 BST - INFO - 
+2026-05-03 01:43:18 BST - INFO - --- System Information ---
+2026-05-03 01:43:18 BST - INFO -    ╭──────────────────────┬───────────────╮
+2026-05-03 01:43:18 BST - INFO -    │ Property             │ Value         │
+2026-05-03 01:43:18 BST - INFO -    ├──────────────────────┼───────────────┤
+2026-05-03 01:43:18 BST - INFO -    │ OS                   │ Darwin 25.4.0 │
+2026-05-03 01:43:18 BST - INFO -    │ macOS Version        │ 26.4.1        │
+2026-05-03 01:43:18 BST - INFO -    │ SDK Version          │ 26.4          │
+2026-05-03 01:43:18 BST - INFO -    │ Xcode Version        │ 26.4.1        │
+2026-05-03 01:43:18 BST - INFO -    │ Xcode Build          │ 17E202        │
+2026-05-03 01:43:18 BST - INFO -    │ Metal SDK            │ MacOSX.sdk    │
+2026-05-03 01:43:18 BST - INFO -    │ Python Version       │ 3.13.12       │
+2026-05-03 01:43:18 BST - INFO -    │ Architecture         │ arm64         │
+2026-05-03 01:43:18 BST - INFO -    │ GPU/Chip             │ Apple M5 Max  │
+2026-05-03 01:43:18 BST - INFO -    │ GPU Cores            │ 40            │
+2026-05-03 01:43:18 BST - INFO -    │ Metal Support        │ Metal 4       │
+2026-05-03 01:43:18 BST - INFO -    │ RAM                  │ 128.0 GB      │
+2026-05-03 01:43:18 BST - INFO -    │ CPU Cores (Physical) │ 18            │
+2026-05-03 01:43:18 BST - INFO -    │ CPU Cores (Logical)  │ 18            │
+2026-05-03 01:43:18 BST - INFO -    ╰──────────────────────┴───────────────╯
+2026-05-03 01:43:18 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 01:43:18 BST - WARNING - ⚠️  SECURITY WARNING: --trust-remote-code is enabled.
+2026-05-03 01:43:18 BST - WARNING - ⚠️  This allows execution of remote code and may pose security risks.
+2026-05-03 01:43:18 BST - INFO - ====================================================================================================
+2026-05-03 01:43:18 BST - INFO - MLX Vision Language Model Check
+2026-05-03 01:43:18 BST - INFO - ====================================================================================================
+2026-05-03 01:43:18 BST - INFO - Scanning folder: /Users/jrp/Pictures/Processed
+2026-05-03 01:43:18 BST - DEBUG - Most recent image file found: /Users/jrp/Pictures/Processed/20260502-152439_DSC09840.jpg
+2026-05-03 01:43:18 BST - INFO - Image File:      /Users/jrp/Pictures/Processed/20260502-152439_DSC09840.jpg
+2026-05-03 01:43:18 BST - INFO - Image dimensions: 5760x8640 (49.8 MPixels)
+2026-05-03 01:43:18 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 01:43:18 BST - INFO - Image Metadata
+2026-05-03 01:43:18 BST - DEBUG - Extracted GPS fields: lat=(52.0, 5.49, 0.0), lat_ref='N', lon=(1.0, 19.11, 0.0), lon_ref='E'
+2026-05-03 01:43:18 BST - DEBUG - Converted GPS: latitude=(52.0, 5.49, 0.0), longitude=(1.0, 19.11, 0.0)
+2026-05-03 01:43:18 BST - INFO - Date: 2026-05-02 16:24:39 BST
+2026-05-03 01:43:18 BST - INFO - Description: The Woodbridge Tide Mill Museum in Woodbridge, Suffolk, England, is seen at low tide on the River Deben. In the foreground, a long boat covered by a black tarp rests on the muddy riverbed. A few people are sitting on benches in front of the historic white building on a sunny day.
+2026-05-03 01:43:18 BST - INFO - GPS Location: 52.091500°N, 1.318500°E
+2026-05-03 01:43:18 BST - INFO - Keywords: Adobe Stock, Any Vision, Bench, Blue sky, Clouds, East Anglia, England, English countryside, Europe, Locations, Mill, Moored, Mudflats, Museum, Objects, People, Quay, River Deben, Riverbed, Rope, Scaffolding, Seaweed, Sitting, Suffolk, Tarp, Tide Mill, Tide Mill Museum, Trees, UK, United Kingdom, Water, Waterfront, Waterscape, Woodbridge, architecture, boat, building, coastal, covered boat, day, daytime, estuary, harbor, heritage, historic, history, landmark, landscape, low tide, maritime, mud, nautical, old, outdoors, picturesque, river, scenery, solar panel, summer, tidal, tourism, traditional, travel, waterside, white building
+2026-05-03 01:43:18 BST - INFO - ====================================================================================================
+2026-05-03 01:43:18 BST - INFO -                                        EXIF Metadata Summary                                        
+2026-05-03 01:43:18 BST - INFO - ====================================================================================================
+2026-05-03 01:43:18 BST - INFO - ╭──────────────────────────┬──────────────────────────────────────────────────────────────╮
+2026-05-03 01:43:18 BST - INFO - │ Tag                      │ Value                                                        │
+2026-05-03 01:43:18 BST - INFO - ├──────────────────────────┼──────────────────────────────────────────────────────────────┤
+2026-05-03 01:43:18 BST - INFO - │ ResolutionUnit           │ 2                                                            │
+2026-05-03 01:43:18 BST - INFO - │ ImageDescription         │ The Woodbridge Tide Mill Museum in Woodbridge, Suffolk, E... │
+2026-05-03 01:43:18 BST - INFO - │ Make                     │ SONY                                                         │
+2026-05-03 01:43:18 BST - INFO - │ Model                    │ ILCE-1M2                                                     │
+2026-05-03 01:43:18 BST - INFO - │ Software                 │ Adobe Photoshop Lightroom Classic 15.3 (Macintosh)           │
+2026-05-03 01:43:18 BST - INFO - │ Orientation              │ 1                                                            │
+2026-05-03 01:43:18 BST - INFO - │ DateTime                 │ 2026:05:03 01:28:51                                          │
+2026-05-03 01:43:18 BST - INFO - │ YResolution              │ 240.0                                                        │
+2026-05-03 01:43:18 BST - INFO - │ Copyright                │ Copyright Â© 2026 John Pavel                                 │
+2026-05-03 01:43:18 BST - INFO - │ XResolution              │ 240.0                                                        │
+2026-05-03 01:43:18 BST - INFO - │ Artist                   │ John Pavel                                                   │
+2026-05-03 01:43:18 BST - INFO - │ ExifVersion              │ 0232                                                         │
+2026-05-03 01:43:18 BST - INFO - │ ShutterSpeedValue        │ 10.965784                                                    │
+2026-05-03 01:43:18 BST - INFO - │ ApertureValue            │ 2.970854                                                     │
+2026-05-03 01:43:18 BST - INFO - │ DateTimeOriginal         │ 2026:05:02 15:24:39                                          │
+2026-05-03 01:43:18 BST - INFO - │ DateTimeDigitized        │ 2026:05:02 15:24:39                                          │
+2026-05-03 01:43:18 BST - INFO - │ BrightnessValue          │ 9.24765625                                                   │
+2026-05-03 01:43:18 BST - INFO - │ ExposureBiasValue        │ 0.0                                                          │
+2026-05-03 01:43:18 BST - INFO - │ MaxApertureValue         │ 2.0                                                          │
+2026-05-03 01:43:18 BST - INFO - │ MeteringMode             │ 5                                                            │
+2026-05-03 01:43:18 BST - INFO - │ LightSource              │ 0                                                            │
+2026-05-03 01:43:18 BST - INFO - │ Flash                    │ 16                                                           │
+2026-05-03 01:43:18 BST - INFO - │ FocalLength              │ 37.0                                                         │
+2026-05-03 01:43:18 BST - INFO - │ ColorSpace               │ 1                                                            │
+2026-05-03 01:43:18 BST - INFO - │ DigitalZoomRatio         │ 1.0                                                          │
+2026-05-03 01:43:18 BST - INFO - │ FocalPlaneXResolution    │ 2404.622283935547                                            │
+2026-05-03 01:43:18 BST - INFO - │ FocalPlaneYResolution    │ 2404.622283935547                                            │
+2026-05-03 01:43:18 BST - INFO - │ OffsetTime               │ +01:00                                                       │
+2026-05-03 01:43:18 BST - INFO - │ SubsecTimeOriginal       │ 522                                                          │
+2026-05-03 01:43:18 BST - INFO - │ SubsecTimeDigitized      │ 522                                                          │
+2026-05-03 01:43:18 BST - INFO - │ FocalPlaneResolutionUnit │ 3                                                            │
+2026-05-03 01:43:18 BST - INFO - │ FileSource               │                                                              │
+2026-05-03 01:43:18 BST - INFO - │ ExposureTime             │ 0.0005                                                       │
+2026-05-03 01:43:18 BST - INFO - │ FNumber                  │ 2.8                                                          │
+2026-05-03 01:43:18 BST - INFO - │ SceneType                │                                                              │
+2026-05-03 01:43:18 BST - INFO - │ ExposureProgram          │ 3                                                            │
+2026-05-03 01:43:18 BST - INFO - │ CustomRendered           │ 0                                                            │
+2026-05-03 01:43:18 BST - INFO - │ ISOSpeedRatings          │ 100                                                          │
+2026-05-03 01:43:18 BST - INFO - │ ExposureMode             │ 0                                                            │
+2026-05-03 01:43:18 BST - INFO - │ SensitivityType          │ 2                                                            │
+2026-05-03 01:43:18 BST - INFO - │ WhiteBalance             │ 0                                                            │
+2026-05-03 01:43:18 BST - INFO - │ RecommendedExposureIndex │ 100                                                          │
+2026-05-03 01:43:18 BST - INFO - │ BodySerialNumber         │ 02050506                                                     │
+2026-05-03 01:43:18 BST - INFO - │ LensSpecification        │ (28.0, 70.0, 2.0, 2.0)                                       │
+2026-05-03 01:43:18 BST - INFO - │ LensModel                │ FE 28-70mm F2 GM                                             │
+2026-05-03 01:43:18 BST - INFO - │ FocalLengthIn35mmFilm    │ 37                                                           │
+2026-05-03 01:43:18 BST - INFO - │ SceneCaptureType         │ 0                                                            │
+2026-05-03 01:43:18 BST - INFO - │ Contrast                 │ 0                                                            │
+2026-05-03 01:43:18 BST - INFO - │ Saturation               │ 0                                                            │
+2026-05-03 01:43:18 BST - INFO - │ Sharpness                │ 0                                                            │
+2026-05-03 01:43:18 BST - INFO - ╰──────────────────────────┴──────────────────────────────────────────────────────────────╯
+2026-05-03 01:43:18 BST - INFO - ====================================================================================================
+2026-05-03 01:43:18 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 01:43:18 BST - INFO - Prompt Configuration
+2026-05-03 01:43:18 BST - INFO - Generating default prompt based on image metadata.
+2026-05-03 01:43:18 BST - DEBUG - Using generated prompt based on metadata.
+2026-05-03 01:43:18 BST - INFO - Final prompt: Analyze this image for cataloguing metadata, using British English.
+
+Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too...
+2026-05-03 01:43:18 BST - DEBUG - Full prompt:
+Analyze this image for cataloguing metadata, using British English.
+
+Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.
+
+Treat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.
+
+Return exactly these three sections, and nothing else:
+
+Title:
+- 5-10 words, concrete and factual, limited to clearly visible content.
+- Output only the title text after the label.
+- Do not repeat or paraphrase these instructions in the title.
+
+Description:
+- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.
+- Output only the description text after the label.
+
+Keywords:
+- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.
+- Output only the keyword list after the label.
+
+Rules:
+- Include only details that are definitely visible in the image.
+- Reuse metadata terms only when they are clearly supported by the image.
+- If metadata and image disagree, follow the image.
+- Prefer omission to speculation.
+- Do not copy prompt instructions into the Title, Description, or Keywords fields.
+- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.
+- Do not output reasoning, notes, hedging, or extra sections.
+
+Context: Existing metadata hints (high confidence; use only when visually confirmed):
+- Description hint: The Woodbridge Tide Mill Museum in Woodbridge, Suffolk, England, is seen at low tide on the River Deben. In the foreground, a long boat covered by a black tarp rests on the muddy riverbed. A few people are sitting on benches in front of the historic white building on a sunny day.
+- Keyword hints: Adobe Stock, Any Vision, Bench, Blue sky, Clouds, East Anglia, England, English countryside, Europe, Locations, Mill, Moored, Mudflats, Museum, Objects, People, Quay, River Deben, Riverbed, Rope
+- Capture metadata: Taken on 2026-05-02 16:24:39 BST (at 16:24:39 local time). GPS: 52.091500°N, 1.318500°E.
+2026-05-03 01:43:18 BST - INFO - Prompt length: 2382 characters
+2026-05-03 01:43:19 BST - INFO - Effective exclusions (models that will be filtered out): Qwen/Qwen3-VL-2B-Instruct, mlx-community/Qwen3-VL-2B-Thinking-bf16
+2026-05-03 01:43:19 BST - INFO - Scanning cache for models to process...
+2026-05-03 01:43:19 BST - INFO - Excluded 2 model(s) from cached models. Remaining: 53 model(s)
+2026-05-03 01:43:19 BST - INFO - Processing 53 model(s)...
+2026-05-03 01:43:19 BST - INFO - 
+2026-05-03 01:43:19 BST - INFO - ╭─────────────────────────────────────── 📖 Metrics Legend ────────────────────────────────────────╮
+2026-05-03 01:43:19 BST - INFO - │ Compact mode: tokens(total/prompt/gen) format with aligned keys                                  │
+2026-05-03 01:43:19 BST - INFO - │ Warnings are shown for repetitive or hallucinated output.                                        │
+2026-05-03 01:43:19 BST - INFO - ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+2026-05-03 01:43:19 BST - INFO - 
+2026-05-03 01:43:19 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-05-03 01:43:19 BST - INFO - 
+2026-05-03 01:43:19 BST - INFO - Processing Model [1/53]: HuggingFaceTB/SmolVLM-Instruct
+2026-05-03 01:43:19 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-05-03 01:43:19 BST - DEBUG - [verbose passthrough start] mlx-vlm.generate output for HuggingFaceTB/SmolVLM-Instruct
+2026-05-03 01:44:18 BST - WARNING - Execution interrupted by user.

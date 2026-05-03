@@ -81,14 +81,6 @@ from rich.bar import Bar
 from rich.console import Console, ConsoleRenderable
 from rich.logging import RichHandler
 from rich.panel import Panel
-from rich.progress import (
-    BarColumn,
-    Progress,
-    SpinnerColumn,
-    TaskProgressColumn,
-    TextColumn,
-    TimeElapsedColumn,
-)
 from rich.table import Table
 from rich.text import Text
 from rich.tree import Tree
@@ -17201,29 +17193,6 @@ def _log_metric_tree(
     _log_rich_renderable(tree, indent=indent)
 
 
-def _active_rich_console() -> Console:
-    """Return the logger's active Rich console so progress and logs share output."""
-    for current_handler in logger.handlers:
-        if isinstance(current_handler, StyleAwareRichHandler):
-            return current_handler.console
-    return _make_rich_console()
-
-
-def _make_model_progress(*, transient: bool = True) -> Progress:
-    """Create a terminal-only Rich progress display for model execution."""
-    console = _active_rich_console()
-    return Progress(
-        SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        BarColumn(),
-        TaskProgressColumn(),
-        TimeElapsedColumn(),
-        console=console,
-        transient=transient,
-        disable=not console.is_terminal,
-    )
-
-
 def _summary_parts(res: PerformanceResult, model_short: str) -> list[str]:
     """Assemble key=value summary segments for per-run triage."""
     parts: list[str] = [
@@ -18468,101 +18437,89 @@ def process_models(
     if args.verbose:
         log_metrics_legend(detailed=args.detailed_metrics)
 
-    with _make_model_progress() as model_progress:
-        progress_task = model_progress.add_task(
-            "Models",
-            total=len(model_identifiers),
+    for idx, model_id in enumerate(model_identifiers, start=1):
+        print_cli_separator()
+        log_blank()  # Add visual separation between model runs
+        # Use full model ID (e.g. "mlx-community/Qwen2-VL-2B-Instruct") instead of just the name
+        model_label = model_id
+        run_label = f"[{idx}/{len(model_identifiers)}]"
+        # Compact logging for model header
+        log_model_name(model_label, label=f"Processing Model {run_label}:")
+
+        is_vlm_verbose: bool = args.verbose
+        params = ProcessImageParams(
+            model_identifier=model_id,
+            image_path=image_path,
+            prompt=prompt,
+            max_tokens=args.max_tokens,
+            temperature=args.temperature,
+            timeout=args.timeout,
+            verbose=is_vlm_verbose,
+            trust_remote_code=args.trust_remote_code,
+            top_p=args.top_p,
+            min_p=args.min_p,
+            top_k=args.top_k,
+            repetition_penalty=args.repetition_penalty,
+            repetition_context_size=args.repetition_context_size,
+            lazy=args.lazy_load,
+            max_kv_size=args.max_kv_size,
+            kv_bits=args.kv_bits,
+            kv_quant_scheme=args.kv_quant_scheme,
+            kv_group_size=args.kv_group_size,
+            quantized_kv_start=args.quantized_kv_start,
+            revision=args.revision,
+            adapter_path=args.adapter_path,
+            prefill_step_size=args.prefill_step_size,
+            resize_shape=args.resize_shape,
+            eos_tokens=args.eos_tokens,
+            skip_special_tokens=args.skip_special_tokens,
+            processor_kwargs=args.processor_kwargs,
+            enable_thinking=args.enable_thinking,
+            thinking_budget=args.thinking_budget,
+            thinking_start_token=args.thinking_start_token,
+            thinking_end_token=args.thinking_end_token,
+            context_marker=args.context_marker,
         )
-        for idx, model_id in enumerate(model_identifiers, start=1):
-            model_progress.update(
-                progress_task,
-                description=(
-                    f"Model {idx}/{len(model_identifiers)}: {_short_model_label(model_id)}"
-                ),
-            )
-            print_cli_separator()
-            log_blank()  # Add visual separation between model runs
-            # Use full model ID (e.g. "mlx-community/Qwen2-VL-2B-Instruct") instead of just the name
-            model_label = model_id
-            run_label = f"[{idx}/{len(model_identifiers)}]"
-            # Compact logging for model header
-            log_model_name(model_label, label=f"Processing Model {run_label}:")
+        result: PerformanceResult = process_image_with_model(params)
 
-            is_vlm_verbose: bool = args.verbose
-            params = ProcessImageParams(
-                model_identifier=model_id,
-                image_path=image_path,
-                prompt=prompt,
-                max_tokens=args.max_tokens,
-                temperature=args.temperature,
-                timeout=args.timeout,
-                verbose=is_vlm_verbose,
-                trust_remote_code=args.trust_remote_code,
-                top_p=args.top_p,
-                min_p=args.min_p,
-                top_k=args.top_k,
-                repetition_penalty=args.repetition_penalty,
-                repetition_context_size=args.repetition_context_size,
-                lazy=args.lazy_load,
-                max_kv_size=args.max_kv_size,
-                kv_bits=args.kv_bits,
-                kv_quant_scheme=args.kv_quant_scheme,
-                kv_group_size=args.kv_group_size,
-                quantized_kv_start=args.quantized_kv_start,
-                revision=args.revision,
-                adapter_path=args.adapter_path,
-                prefill_step_size=args.prefill_step_size,
-                resize_shape=args.resize_shape,
-                eos_tokens=args.eos_tokens,
-                skip_special_tokens=args.skip_special_tokens,
-                processor_kwargs=args.processor_kwargs,
-                enable_thinking=args.enable_thinking,
-                thinking_budget=args.thinking_budget,
-                thinking_start_token=args.thinking_start_token,
-                thinking_end_token=args.thinking_end_token,
-                context_marker=args.context_marker,
-            )
-            result: PerformanceResult = process_image_with_model(params)
-
-            # Calculate and log quality score for successful generations.
-            if result.success and result.generation:
-                result = _populate_result_quality_analysis(
-                    result,
-                    prompt=prompt,
-                    metadata=metadata,
-                    requested_max_tokens=args.max_tokens,
-                    context_marker=args.context_marker,
-                )
-                analysis = result.quality_analysis
-                if analysis is None:
-                    msg = f"Quality analysis missing for successful result {result.model_name}"
-                    raise RuntimeError(msg)
-                # Log quality analysis results at DEBUG level
-                logger.debug(
-                    "Quality analysis for %s: %s",
-                    result.model_name,
-                    _format_quality_analysis_for_log(analysis),
-                )
-                if result.quality_issues:
-                    logger.info(
-                        "Quality issues detected for %s: %s",
-                        result.model_name,
-                        result.quality_issues,
-                    )
-
-            results.append(result)
-            _log_canonical_model_review(result)
-
-            print_model_result(
+        # Calculate and log quality score for successful generations.
+        if result.success and result.generation:
+            result = _populate_result_quality_analysis(
                 result,
-                verbose=args.verbose,
-                detailed_metrics=getattr(args, "detailed_metrics", False),
-                run_index=idx,
-                total_runs=len(model_identifiers),
                 prompt=prompt,
+                metadata=metadata,
+                requested_max_tokens=args.max_tokens,
                 context_marker=args.context_marker,
             )
-            model_progress.advance(progress_task)
+            analysis = result.quality_analysis
+            if analysis is None:
+                msg = f"Quality analysis missing for successful result {result.model_name}"
+                raise RuntimeError(msg)
+            # Log quality analysis results at DEBUG level
+            logger.debug(
+                "Quality analysis for %s: %s",
+                result.model_name,
+                _format_quality_analysis_for_log(analysis),
+            )
+            if result.quality_issues:
+                logger.info(
+                    "Quality issues detected for %s: %s",
+                    result.model_name,
+                    result.quality_issues,
+                )
+
+        results.append(result)
+        _log_canonical_model_review(result)
+
+        print_model_result(
+            result,
+            verbose=args.verbose,
+            detailed_metrics=getattr(args, "detailed_metrics", False),
+            run_index=idx,
+            total_runs=len(model_identifiers),
+            prompt=prompt,
+            context_marker=args.context_marker,
+        )
     return results
 
 
@@ -21706,57 +21663,51 @@ def _run_differential_reruns(
         len(candidates),
     )
     updated: list[PerformanceResult] = []
-    with _make_model_progress() as rerun_progress:
-        progress_task = rerun_progress.add_task(
-            "Differential reruns",
-            total=len(candidates),
+    for idx, result in enumerate(candidates, start=1):
+        logger.info(
+            "  Rerun %d/%d: %s",
+            idx,
+            len(candidates),
+            result.model_name,
         )
-        for idx, result in enumerate(candidates, start=1):
-            rerun_progress.update(
-                progress_task,
-                description=(
-                    f"Rerun {idx}/{len(candidates)}: {_short_model_label(result.model_name)}"
-                ),
-            )
-            params = ProcessImageParams(
-                model_identifier=result.model_name,
-                image_path=image_path,
-                prompt=RERUN_TRIAGE_PROMPT,
-                max_tokens=RERUN_TRIAGE_MAX_TOKENS,
-                temperature=0.0,
-                timeout=RERUN_TRIAGE_TIMEOUT,
-                verbose=False,
-                trust_remote_code=getattr(args, "trust_remote_code", True),
-                top_p=getattr(args, "top_p", 1.0),
-                min_p=getattr(args, "min_p", 0.0),
-                top_k=getattr(args, "top_k", 0),
-                repetition_penalty=getattr(args, "repetition_penalty", None),
-                repetition_context_size=getattr(args, "repetition_context_size", 20),
-                lazy=getattr(args, "lazy_load", False),
-                max_kv_size=getattr(args, "max_kv_size", None),
-                kv_bits=getattr(args, "kv_bits", None),
-                kv_quant_scheme=cast(
-                    'Literal["uniform", "turboquant"]',
-                    getattr(args, "kv_quant_scheme", DEFAULT_KV_QUANT_SCHEME),
-                ),
-                kv_group_size=getattr(args, "kv_group_size", 64),
-                quantized_kv_start=getattr(
-                    args,
-                    "quantized_kv_start",
-                    DEFAULT_QUANTIZED_KV_START,
-                ),
-            )
-            rerun_result = process_image_with_model(params)
-            evidence = _build_rerun_evidence(rerun_result, rerun_prompt=RERUN_TRIAGE_PROMPT)
-            updated_result = replace(result, rerun_evidence=evidence)
-            logger.info(
-                "  Rerun %s: %s (chars=%s)",
-                result.model_name,
-                "ok" if evidence.rerun_success else "fail",
-                evidence.rerun_generated_chars,
-            )
-            updated.append(updated_result)
-            rerun_progress.advance(progress_task)
+        params = ProcessImageParams(
+            model_identifier=result.model_name,
+            image_path=image_path,
+            prompt=RERUN_TRIAGE_PROMPT,
+            max_tokens=RERUN_TRIAGE_MAX_TOKENS,
+            temperature=0.0,
+            timeout=RERUN_TRIAGE_TIMEOUT,
+            verbose=False,
+            trust_remote_code=getattr(args, "trust_remote_code", True),
+            top_p=getattr(args, "top_p", 1.0),
+            min_p=getattr(args, "min_p", 0.0),
+            top_k=getattr(args, "top_k", 0),
+            repetition_penalty=getattr(args, "repetition_penalty", None),
+            repetition_context_size=getattr(args, "repetition_context_size", 20),
+            lazy=getattr(args, "lazy_load", False),
+            max_kv_size=getattr(args, "max_kv_size", None),
+            kv_bits=getattr(args, "kv_bits", None),
+            kv_quant_scheme=cast(
+                'Literal["uniform", "turboquant"]',
+                getattr(args, "kv_quant_scheme", DEFAULT_KV_QUANT_SCHEME),
+            ),
+            kv_group_size=getattr(args, "kv_group_size", 64),
+            quantized_kv_start=getattr(
+                args,
+                "quantized_kv_start",
+                DEFAULT_QUANTIZED_KV_START,
+            ),
+        )
+        rerun_result = process_image_with_model(params)
+        evidence = _build_rerun_evidence(rerun_result, rerun_prompt=RERUN_TRIAGE_PROMPT)
+        updated_result = replace(result, rerun_evidence=evidence)
+        logger.info(
+            "  Rerun %s: %s (chars=%s)",
+            result.model_name,
+            "ok" if evidence.rerun_success else "fail",
+            evidence.rerun_generated_chars,
+        )
+        updated.append(updated_result)
     return updated
 
 
