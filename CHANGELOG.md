@@ -38,6 +38,9 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Install `packaging>=26.0` in the dependency-sync GitHub Actions job before
+  running `tools.update_readme_deps`, so the README/pyproject sync guard no
+  longer fails on fresh Ubuntu runners with `ModuleNotFoundError`.
 - Align MLX stack integration with current upstream sources by raising the
   project `mlx` floor to `0.31.2`, accepting fractional TurboQuant
   `--kv-bits` values such as `3.5`, and routing generated `mlx-vlm` issue
@@ -69,6 +72,8 @@ Notable changes to this project will be documented in this file.
 - Remove the Rich live progress wrapper around model execution and differential
   reruns so mlx-vlm/tqdm output and Ctrl-C handling are not trapped behind an
   always-live progress display.
+- Render the console DEBUG level label in dim gray while preserving the normal
+  styling of the debug message body.
 
 ## [0.6.0] - 2026-04-26
 
