@@ -691,24 +691,24 @@ class TestMarkdownGalleryReport:
 
         content = out.read_text(encoding="utf-8")
         assert "# Automated Review Digest" in content
-        assert "## Issue Queue" in content
+        assert "## Maintainer Escalations" in content
         assert "issues/index.md" in content
         assert "## 🧭 Review Shortlist" in content
         assert "## User Buckets" in content
-        assert "## Maintainer Queue" in content
         assert "## Model Verdicts" in content
+        assert "## Maintainer Queue" not in content
         assert "`mlx-vlm`" in content or "`transformers`" in content
         assert "`recommended`" in content
         assert "`avoid`" in content
-        assert content.index("## User Buckets") < content.index("## Maintainer Queue")
+        assert content.index("## User Buckets") < content.index("## Maintainer Escalations")
+        assert content.index("## Maintainer Escalations") < content.index("## Model Verdicts")
         assert "Model" in content
         assert "Hint Handling" in content
         assert "Key Evidence" in content
-        assert "Evidence" in content
-        assert "Next Action" in content
+        assert "Evidence Bundle" in content
+        assert "Fixed When" in content
         assert "Canonical run log" in content
-        assert content.index("## Issue Queue") < content.index("## User Buckets")
-        maintainer_queue = content.split("## Maintainer Queue", maxsplit=1)[1].split(
+        maintainer_queue = content.split("## Maintainer Escalations", maxsplit=1)[1].split(
             "## Model Verdicts",
             maxsplit=1,
         )[0]
