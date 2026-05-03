@@ -12532,6 +12532,151 @@ _ISSUE_QUEUE_HEADERS: Final[tuple[str, ...]] = (
     "Acceptance Signal",
 )
 
+_ISSUE_SUBTYPE_DISPLAY_LABELS: Final[dict[str, str]] = {
+    "context_budget": "Context-budget pressure",
+    "empty_output": "Empty output",
+    "encoding": "Tokenizer / decoding artifact",
+    "generation_loop": "Generation-loop drift",
+    "harness": "Harness / integration",
+    "long_context": "Long-context collapse",
+    "prompt_template": "Prompt-template / image-placeholder mismatch",
+    "runtime_failure": "Runtime failure",
+    "stack_signal": "Stack anomaly",
+    "stop_token": "Stop-token leakage",
+    "token_cap": "Token cap / cutoff",
+}
+
+_ERROR_CODE_PACKAGE_DISPLAY_LABELS: Final[dict[str, str]] = {
+    "HUGGINGFACE_HUB": "Hugging Face Hub",
+    "MLX": "MLX",
+    "MLX_LM": "mlx-lm",
+    "MLX_VLM": "mlx-vlm",
+    "MODEL_CONFIG": "Model config",
+    "TRANSFORMERS": "Transformers",
+    "UNKNOWN": "Unknown owner",
+}
+
+_ERROR_CODE_STAGE_DISPLAY_LABELS: Final[dict[str, str]] = {
+    "API_DRIFT": "API drift",
+    "API_MISMATCH": "API mismatch",
+    "CONFIG_MISSING": "missing config",
+    "ERROR": "runtime error",
+    "LIB_VERSION": "library-version mismatch",
+    "MISSING_DEP": "missing dependency",
+    "MODEL": "model error",
+    "NO_CHAT_TEMPLATE": "missing chat template",
+    "OOM": "out-of-memory",
+    "PROCESSOR": "processor error",
+    "TIMEOUT": "timeout",
+    "TOKENIZER": "tokenizer error",
+    "TYPE_CAST": "type-cast error",
+    "WEIGHT_MISMATCH": "weight/config mismatch",
+}
+
+_ISSUE_SUBTYPE_TOKEN_LABELS: Final[dict[str, str]] = {
+    "api": "API",
+    "bpe": "BPE",
+    "eos": "EOS",
+    "hf": "HF",
+    "id": "ID",
+    "jsonl": "JSONL",
+    "kv": "KV",
+    "lm": "LM",
+    "mlx": "MLX",
+    "oom": "OOM",
+    "tps": "TPS",
+    "vlm": "VLM",
+}
+
+
+def _humanize_issue_subtype_token(value: str) -> str:
+    """Return a readable label for an issue-subtype token or slug."""
+    tokens = [token for token in re.split(r"[_\-\s/]+", value.strip()) if token]
+    words: list[str] = []
+    for token in tokens:
+        normalized = token.casefold()
+        words.append(_ISSUE_SUBTYPE_TOKEN_LABELS.get(normalized, normalized))
+    if not words:
+        return "Unknown issue type"
+    if words[0].islower():
+        words[0] = words[0].capitalize()
+    return " ".join(words)
+
+
+def _issue_error_code_display_label(issue_subtype: str) -> str | None:
+    """Render canonical runtime error codes as maintainer-readable labels."""
+    normalized = issue_subtype.strip().upper().replace("-", "_")
+    if not normalized:
+        return None
+
+    package_tokens: tuple[str, ...] = tuple(
+        sorted(set(_PACKAGE_CODE_MAP.values()), key=str.__len__, reverse=True)
+    )
+    package_token = next(
+        (
+            token
+            for token in package_tokens
+            if normalized == token or normalized.startswith(f"{token}_")
+        ),
+        None,
+    )
+    if package_token is None:
+        return None
+
+    remainder = normalized.removeprefix(package_token).removeprefix("_")
+    if not remainder:
+        return _ERROR_CODE_PACKAGE_DISPLAY_LABELS.get(
+            package_token,
+            _humanize_issue_subtype_token(package_token),
+        )
+
+    stage_tokens: tuple[str, ...] = tuple(
+        sorted(set(_STAGE_CODE_MAP.values()), key=str.__len__, reverse=True)
+    )
+    stage_token = next(
+        (token for token in stage_tokens if remainder == token or remainder.endswith(f"_{token}")),
+        None,
+    )
+    if stage_token is None:
+        return None
+
+    phase_token = remainder.removesuffix(stage_token).removesuffix("_")
+    owner_label = _ERROR_CODE_PACKAGE_DISPLAY_LABELS.get(
+        package_token,
+        _humanize_issue_subtype_token(package_token),
+    )
+    stage_label = _ERROR_CODE_STAGE_DISPLAY_LABELS.get(
+        stage_token,
+        _humanize_issue_subtype_token(stage_token),
+    )
+    if not phase_token:
+        return f"{owner_label}: {stage_label}"
+    return f"{owner_label}: {_humanize_issue_subtype_token(phase_token)} / {stage_label}"
+
+
+def _issue_subtype_display_label(issue_subtype: str) -> str:
+    """Return a maintainer-readable label for an issue subtype."""
+    normalized = issue_subtype.strip().casefold().replace("-", "_")
+    if label := _ISSUE_SUBTYPE_DISPLAY_LABELS.get(normalized):
+        return label
+    if label := _issue_error_code_display_label(issue_subtype):
+        return label
+    return _humanize_issue_subtype_token(issue_subtype)
+
+
+def _issue_queue_subtype_cell(
+    issue_subtype: str,
+    *,
+    escape_text: Callable[[str], str],
+) -> str:
+    """Render a readable queue subtype while preserving the raw cluster code."""
+    raw_subtype = issue_subtype.strip()
+    display_label = _issue_subtype_display_label(raw_subtype)
+    escaped_label = escape_text(display_label)
+    if not raw_subtype or raw_subtype == display_label:
+        return escaped_label
+    return f"{escaped_label} (`{escape_text(raw_subtype)}`)"
+
 
 def _render_issue_queue_table(
     clusters: Sequence[IssueCluster],
@@ -12547,7 +12692,7 @@ def _render_issue_queue_table(
         rows.append(
             (
                 f"`{escape_text(cluster.owner)}`",
-                f"`{escape_text(cluster.issue_subtype)}`",
+                _issue_queue_subtype_cell(cluster.issue_subtype, escape_text=escape_text),
                 str(_issue_cluster_model_count(cluster)),
                 f"`{escape_text(representative_name)}`",
                 issue_link_for_cluster(cluster),

@@ -2875,10 +2875,43 @@ class TestGithubIssueReportContent:
 
         assert len(generated) == 2
         index = (tmp_path / "issues" / "index.md").read_text(encoding="utf-8")
-        assert "`stop_token`" in index
-        assert "`encoding`" in index
+        assert "Stop-token leakage (`stop_token`)" in index
+        assert "Tokenizer / decoding artifact (`encoding`)" in index
         assert "Issue Draft" in index
         assert "Acceptance Signal" in index
+        assert "Priority" not in index
+
+    def test_issue_queue_humanizes_runtime_error_codes(self, tmp_path: Path) -> None:
+        """Canonical runtime error-code subtypes should render as readable queue labels."""
+        failed_result = PerformanceResult(
+            model_name="org/broken-model",
+            generation=None,
+            success=False,
+            error_message="RuntimeError: shape mismatch",
+            error_stage="Model Error",
+            error_code="MLX_MODEL_LOAD_MODEL",
+            error_package="mlx",
+            error_signature="MLX_MODEL_LOAD_MODEL:abc123",
+            error_traceback="Traceback (most recent call last):\nRuntimeError: shape mismatch",
+            total_time=0.5,
+        )
+        snapshot = DiagnosticsSnapshot(
+            failed=(failed_result,),
+            failure_clusters=(("MLX_MODEL_LOAD_MODEL:abc123", (failed_result,)),),
+        )
+
+        _generate_github_issue_reports(
+            diagnostics_snapshot=snapshot,
+            output_dir=tmp_path,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            repro_bundles={},
+            run_args=None,
+        )
+
+        index = (tmp_path / "issues" / "index.md").read_text(encoding="utf-8")
+        assert "MLX: Model load / model error (`MLX_MODEL_LOAD_MODEL`)" in index
+        assert "`MLX_MODEL_LOAD_MODEL`" in index
         assert "Priority" not in index
 
     def test_stack_signal_anomaly_produces_issue_draft(self, tmp_path: Path) -> None:

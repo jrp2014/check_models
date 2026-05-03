@@ -5,6 +5,11 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Render issue queue subtypes with human-readable maintainer labels while
+  preserving the raw subtype codes for traceability.
+
 ## [0.7.0] - 2026-05-03
 
 ### Added
