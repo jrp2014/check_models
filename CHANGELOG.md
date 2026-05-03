@@ -38,6 +38,8 @@ Notable changes to this project will be documented in this file.
 - Extend Rich to detailed metric trees and replace remaining hand-rolled
   dependency/table parsing with `packaging.Requirement` and `tabulate` where
   practical.
+- Trim unused review/utility helper code from `check_models.py` while preserving
+  public report schemas and runtime diagnostics.
 
 ### Fixed
 
@@ -77,6 +79,8 @@ Notable changes to this project will be documented in this file.
   always-live progress display.
 - Render the console DEBUG level label in dim gray while preserving the normal
   styling of the debug message body.
+- Allow `tools.update_readme_deps` to run before project dependencies are
+  installed by falling back to a stdlib parser when `packaging` is unavailable.
 
 ## [0.6.0] - 2026-04-26
 

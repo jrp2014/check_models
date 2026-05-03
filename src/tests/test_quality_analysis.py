@@ -840,63 +840,6 @@ def test_generation_quality_issues_property_handles_missing_keyword_dup_ratio() 
     assert any("HARNESS" in issue for issue in issues)
 
 
-def test_has_harness_issues_only() -> None:
-    """Test method to check if only harness issues present."""
-    # Harness issue only
-    harness_only = check_models.GenerationQualityAnalysis(
-        is_repetitive=False,
-        repeated_token=None,
-        hallucination_issues=[],
-        is_verbose=False,
-        formatting_issues=[],
-        has_excessive_bullets=False,
-        bullet_count=0,
-        is_context_ignored=False,
-        missing_context_terms=[],
-        is_refusal=False,
-        refusal_type=None,
-        is_generic=False,
-        specificity_score=0.0,
-        has_language_mixing=False,
-        language_mixing_issues=[],
-        has_degeneration=False,
-        degeneration_type=None,
-        has_fabrication=False,
-        fabrication_issues=[],
-        has_harness_issue=True,
-        harness_issue_type="encoding",
-        harness_issue_details=["bpe_space_leak"],
-    )
-    assert harness_only.has_harness_issues_only() is True
-
-    # Harness issue + model quality issue
-    mixed_issues = check_models.GenerationQualityAnalysis(
-        is_repetitive=True,  # Model quality issue
-        repeated_token="same",  # noqa: S106 - test value, not a password
-        hallucination_issues=[],
-        is_verbose=False,
-        formatting_issues=[],
-        has_excessive_bullets=False,
-        bullet_count=0,
-        is_context_ignored=False,
-        missing_context_terms=[],
-        is_refusal=False,
-        refusal_type=None,
-        is_generic=False,
-        specificity_score=0.0,
-        has_language_mixing=False,
-        language_mixing_issues=[],
-        has_degeneration=False,
-        degeneration_type=None,
-        has_fabrication=False,
-        fabrication_issues=[],
-        has_harness_issue=True,  # Also harness issue
-        harness_issue_type="encoding",
-        harness_issue_details=["bpe_space_leak"],
-    )
-    assert mixed_issues.has_harness_issues_only() is False
-
-
 class TestClassifyHintRelationship:
     """Tests for _classify_hint_relationship nonvisual-hint handling."""
 

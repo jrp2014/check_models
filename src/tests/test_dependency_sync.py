@@ -18,7 +18,7 @@ import pytest
 from packaging.requirements import Requirement
 
 from check_models_data import dependency_policy
-from tools import check_suppressions, generate_stubs
+from tools import check_suppressions, generate_stubs, update_readme_deps
 
 _TEST_FILE = Path(__file__).resolve()
 # tests/ parent, then package root (vlm)
@@ -142,6 +142,33 @@ def test_readme_runtime_block_matches_pyproject() -> None:
     if leaked:
         msg = f"Optional deps leaked into runtime block: {leaked}"
         raise RuntimeError(msg)
+
+
+def test_update_readme_deps_fallback_parser_without_packaging(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Dependency sync should run before project dependencies are installed."""
+    monkeypatch.setattr(update_readme_deps, "_Requirement", None)
+
+    assert update_readme_deps._parse_requirement("Pillow[xmp]>=10.3.0") == (
+        "Pillow[xmp]",
+        ">=10.3.0",
+    )
+    assert update_readme_deps._parse_requirement(
+        "huggingface-hub[typing, torch]>=1.10.1",
+    ) == ("huggingface-hub[torch,typing]", ">=1.10.1")
+
+    groups = update_readme_deps.extract_optional_groups(
+        """
+        [project]
+        dependencies = []
+
+        [project.optional-dependencies]
+        extras = ["tokenizers>=0.15.0", "Pillow[xmp]>=10.3.0"]
+        """,
+    )
+
+    assert groups == {"extras": ["tokenizers", "Pillow"]}
 
 
 def test_dependency_policy_module_tracks_pyproject_stack_floors() -> None:

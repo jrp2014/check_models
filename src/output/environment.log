@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-05-03 01:49:29 BST
+FULL ENVIRONMENT DUMP - 2026-05-03 21:31:32 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -38,7 +38,7 @@ fastapi==0.136.1
 filelock==3.29.0
 flatbuffers==25.12.19
 frozenlist==1.8.0
-fsspec==2026.4.0
+fsspec==2026.2.0
 gast==0.7.0
 google-pasta==0.2.0
 grpcio==1.80.0
@@ -68,8 +68,8 @@ mcp==1.27.0
 mdurl==0.1.2
 miniaudio==1.71
 ml_dtypes==0.5.4
-mlx==0.32.0.dev20260502+e8ebdebe
-mlx==0.32.0.dev20260502+e8ebdebe
+mlx==0.32.0.dev20260503+e8ebdebe
+mlx==0.32.0.dev20260503+e8ebdebe
 mlx-audio==0.4.3
 mlx-lm==0.31.3
 mlx-vlm==0.4.5
@@ -127,7 +127,7 @@ ruff==0.15.12
 safetensors==0.7.0
 scipy==1.17.1
 sentencepiece==0.2.1
-setuptools==81.0.0
+setuptools==82.0.1
 shellingham==1.5.4
 six==1.17.0
 sounddevice==0.5.5
@@ -151,7 +151,7 @@ typer==0.25.1
 types-defusedxml==0.7.0.20260408
 types-psutil==7.2.2.20260408
 types-PyYAML==6.0.12.20260408
-types-requests==2.33.0.20260408
+types-requests==2.33.0.20260503
 types-simplejson==3.20.0.20260408
 types-tabulate==0.10.0.20260408
 types-toml==0.10.8.20260408
@@ -172,5 +172,5 @@ yarl==1.23.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-05-03 01:49:29 BST
+Environment dump completed at 2026-05-03 21:31:32 BST
 ================================================================================

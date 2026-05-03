@@ -29,28 +29,81 @@ import logging
 import re
 import tomllib
 from pathlib import Path
+from typing import Protocol
 
-from packaging.requirements import InvalidRequirement, Requirement
+
+class _RequirementLike(Protocol):
+    """Small surface consumed from packaging.requirements.Requirement."""
+
+    @property
+    def name(self) -> str:
+        """Distribution name."""
+
+    @property
+    def extras(self) -> set[str]:
+        """Requested extras."""
+
+    @property
+    def marker(self) -> object | None:
+        """Optional environment marker."""
+
+    @property
+    def specifier(self) -> object:
+        """Version specifier set."""
+
+
+try:
+    from packaging.requirements import InvalidRequirement
+    from packaging.requirements import Requirement as _Requirement
+except ModuleNotFoundError:  # pragma: no cover - exercised in bootstrap CI
+    InvalidRequirement = ValueError
+    _Requirement = None
 
 logger = logging.getLogger(__name__)
 
+_FALLBACK_REQUIREMENT_RE = re.compile(
+    r"^\s*"
+    r"(?P<name>[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?)"
+    r"(?P<extras>\[[A-Za-z0-9._,\-\s]+\])?"
+    r"\s*(?P<spec>.*)\s*$"
+)
 
-def _dependency_key(requirement: Requirement) -> str:
+
+def _dependency_key(requirement: _RequirementLike) -> str:
     """Return the install name, preserving extras for command generation."""
     extras = f"[{','.join(sorted(requirement.extras))}]" if requirement.extras else ""
     return f"{requirement.name}{extras}"
 
 
-def _dependency_spec(requirement: Requirement) -> str:
+def _dependency_spec(requirement: _RequirementLike) -> str:
     """Return the version/marker suffix for a parsed dependency."""
     marker = f"; {requirement.marker}" if requirement.marker else ""
     return f"{requirement.specifier}{marker}"
 
 
+def _fallback_parse_requirement(requirement_text: str) -> tuple[str, str]:
+    """Parse the project dependency subset when packaging is unavailable."""
+    match = _FALLBACK_REQUIREMENT_RE.fullmatch(requirement_text)
+    if not match:
+        msg = f"Invalid dependency requirement in pyproject.toml: {requirement_text!r}"
+        raise RuntimeError(msg)
+    name = match.group("name")
+    extras_text = match.group("extras") or ""
+    extras = ""
+    if extras_text:
+        parsed_extras = sorted(
+            extra.strip() for extra in extras_text.strip("[]").split(",") if extra.strip()
+        )
+        extras = f"[{','.join(parsed_extras)}]" if parsed_extras else ""
+    return f"{name}{extras}", match.group("spec").strip()
+
+
 def _parse_requirement(requirement_text: str) -> tuple[str, str]:
     """Parse one PEP 508 requirement string into command key/spec parts."""
+    if _Requirement is None:
+        return _fallback_parse_requirement(requirement_text)
     try:
-        requirement = Requirement(requirement_text)
+        requirement = _Requirement(requirement_text)
     except InvalidRequirement as exc:
         msg = f"Invalid dependency requirement in pyproject.toml: {requirement_text!r}"
         raise RuntimeError(msg) from exc
@@ -120,12 +173,8 @@ def extract_optional_groups(pyproject_text: str) -> dict[str, list[str]]:
         for requirement_text in requirements:
             if not isinstance(requirement_text, str):
                 continue
-            try:
-                requirement = Requirement(requirement_text)
-            except InvalidRequirement as exc:
-                msg = f"Invalid optional dependency in pyproject.toml: {requirement_text!r}"
-                raise RuntimeError(msg) from exc
-            packages.append(requirement.name)
+            name, _spec = _parse_requirement(requirement_text)
+            packages.append(name.split("[", 1)[0])
         groups[str(group_name)] = packages
     return groups
 

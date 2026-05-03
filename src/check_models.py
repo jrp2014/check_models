@@ -5656,21 +5656,6 @@ def compute_metadata_agreement(
     )
 
 
-def _compute_utility_snapshot(
-    text: str,
-    context: str | None,
-    *,
-    baseline_score: float | None = None,
-) -> tuple[float, str, str, float | None]:
-    """Compute utility score/grade/weakness and optional delta vs metadata baseline."""
-    utility = compute_cataloging_utility(text, context)
-    score = float(utility["utility_score"])
-    grade = str(utility["utility_grade"])
-    weakness = str(utility["primary_weakness"])
-    delta = score - baseline_score if baseline_score is not None else None
-    return score, grade, weakness, delta
-
-
 @dataclass(frozen=True)
 class GenerationQualityAnalysis:
     """Analysis results for generated text quality.
@@ -5800,37 +5785,6 @@ class GenerationQualityAnalysis:
             or self.metadata_borrowing
             or self.verdict != "clean"
         )
-
-    def has_harness_issues_only(self) -> bool:
-        """Return True when only harness or integration issues were detected."""
-        has_contract_violation = (
-            bool(self.missing_sections)
-            or self.has_title_length_violation
-            or self.has_description_sentence_violation
-            or self.has_keyword_count_violation
-            or self.has_keyword_duplication_violation
-        )
-        has_non_harness_issues = (
-            self.is_repetitive
-            or bool(self.hallucination_issues)
-            or self.is_verbose
-            or bool(self.formatting_issues)
-            or self.has_excessive_bullets
-            or self.is_context_ignored
-            or self.is_refusal
-            or self.is_generic
-            or self.has_language_mixing
-            or self.has_degeneration
-            or self.has_fabrication
-            or has_contract_violation
-            or self.has_reasoning_leak
-            or self.has_context_echo
-            or self.instruction_echo
-            or self.metadata_borrowing
-            or self.likely_capped
-            or self.hint_relationship != "preserves_trusted_hints"
-        )
-        return self.has_harness_issue and not has_non_harness_issues
 
     @property
     def issues(self) -> list[str]:
@@ -9220,28 +9174,6 @@ def _quality_analysis_for_result(res: PerformanceResult) -> GenerationQualityAna
     return (
         generation_analysis if isinstance(generation_analysis, GenerationQualityAnalysis) else None
     )
-
-
-def _summarize_model_review(res: PerformanceResult, summary: ModelIssueSummary) -> str | None:
-    """Summarize quality/utility in a compact line shared across Markdown artifacts."""
-    review_parts: list[str] = []
-    score_data = _cataloging_score_index(summary).get(res.model_name)
-    if score_data is not None:
-        score, grade, _weakness, _delta = score_data
-        review_parts.append(f"{grade} {score:.0f}/100")
-
-    analysis = _quality_analysis_for_result(res)
-    review = _build_jsonl_review_record(res)
-    if analysis is None or review is None:
-        return " | ".join(review_parts) or None
-
-    focus = _review_focus_text(review, analysis)
-    if focus != "no flagged signals":
-        review_parts.append(focus)
-    elif not analysis.has_any_issues():
-        review_parts.append("No quality issues detected")
-
-    return " | ".join(review_parts) if review_parts else None
 
 
 def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord | None:
