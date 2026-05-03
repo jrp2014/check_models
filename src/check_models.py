@@ -243,6 +243,10 @@ class FormattingThresholds:
     # Dry-run output thresholds
     max_prompt_preview_lines: int = 10  # Max lines to show in prompt preview
 
+    # Output truncation thresholds
+    min_consecutive_repetitions_for_truncation: int = 10
+    max_preview_tags: int = 3
+
     # Layout constants
     min_separator_chars: int = 50
     markdown_hard_break_spaces: int = 2
@@ -267,6 +271,7 @@ class QualityThresholds:
     max_phrase_repetitions: int = 10
     phrase_coverage_threshold: float = 0.4
     min_phrase_length: int = 4  # Minimum n-gram length to check
+    max_phrase_length: int = 10  # Maximum n-gram length to check
 
     # Hallucination detection
     min_pipes_for_table: int = 4
@@ -2771,8 +2776,8 @@ def _detect_repetitive_output(text: str, threshold: float | None = None) -> tupl
     if n_words < min_phrase_len * 2:
         return False, None
 
-    # Check n-grams of length 4 to 10
-    for n in range(min_phrase_len, min(11, n_words // 2)):
+    # Check n-grams up to configured maximum
+    for n in range(min_phrase_len, min(QUALITY.max_phrase_length + 1, n_words // 2)):
         ngrams = [" ".join(words[i : i + n]) for i in range(n_words - n + 1)]
         if not ngrams:
             continue
@@ -2906,7 +2911,7 @@ def _detect_formatting_violations(text: str) -> list[str]:
     html_tags: list[str] = re.findall(r"<(?!br>|/br>)[a-z]+[^>]*>", text, re.IGNORECASE)
     if html_tags:
         # Keep raw tags in analysis output; renderers escape them as needed for Markdown/HTML.
-        tags_preview: str = ", ".join(dict.fromkeys(html_tags[:3]))
+        tags_preview: str = ", ".join(dict.fromkeys(html_tags[: FORMATTING.max_preview_tags]))
         issues.append(f"Unknown tags: {tags_preview}")
 
     # Check for excessive markdown structure
@@ -2939,7 +2944,8 @@ def _truncate_repetitive_output(text: str) -> str:
 
     # Count consecutive repetitions of the token (with optional whitespace between)
     pattern: str = re.escape(repeated_token)
-    match: re.Match[str] | None = re.search(rf"({pattern}(?:\s*{pattern}){{10,}})", text)
+    min_reps = FORMATTING.min_consecutive_repetitions_for_truncation
+    match: re.Match[str] | None = re.search(rf"({pattern}(?:\s*{pattern}){{{min_reps},}})", text)
 
     if match:
         # Count total repetitions in the matched section

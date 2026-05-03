@@ -12,6 +12,7 @@ thresholds:
   max_phrase_repetitions: 10 # Flag if phrase repeats this many times regardless
   phrase_coverage_threshold: 0.4 # Minimum coverage ratio to flag (40%)
   min_phrase_length: 4 # Minimum n-gram length to check for repetition
+  max_phrase_length: 10 # Maximum n-gram length to check for repetition
 
   # Hallucination detection
   min_pipes_for_table: 4 # Minimum pipe characters to detect table

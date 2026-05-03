@@ -14,6 +14,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Consolidate inline magic numbers (e.g., repetition bounds and truncation counts)
+  from output-quality detection heuristics into `quality_config.yaml` and
+  `FormattingThresholds` to ensure all thresholds are entirely data-driven.
 - Replace per-model generated GitHub issue drafts with root-cause clustered
   issue queues under `output/issues/`, including stable cluster IDs, acceptance
   signals, subtype-specific fix checklists, and JSONL/repro metadata linking
