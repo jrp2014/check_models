@@ -2125,7 +2125,7 @@ class ProcessImageParams:
 
 
 # =============================================================================
-# INFRASTRUCTURE: Timeouts, Colors, Logging
+# INFRASTRUCTURE: Timeouts, Logging
 # =============================================================================
 
 
@@ -2262,39 +2262,28 @@ def _display_align(text: str, width: int, *, alignment: Literal["left", "center"
 
 
 # =============================================================================
-# UTILITY CLASSES (Colors, Logging, Timeout Management)
+# UTILITY CLASSES (Logging, Timeout Management)
 # =============================================================================
 
 
-class Colors:
-    """ANSI color codes for terminal output."""
+class _RichColorState:
+    """Mutable Rich color preference shared by console handlers."""
 
-    RESET: Final[str] = "\033[0m"
-    BOLD: Final[str] = "\033[1m"
-    RED: Final[str] = "\033[91m"
-    GREEN: Final[str] = "\033[92m"
-    YELLOW: Final[str] = "\033[93m"
-    BLUE: Final[str] = "\033[94m"
-    MAGENTA: Final[str] = "\033[95m"
-    CYAN: Final[str] = "\033[96m"
-    WHITE: Final[str] = "\033[97m"
-    GRAY: Final[str] = "\033[90m"
-    # Honor NO_COLOR / FORCE_COLOR conventions while defaulting to TTY detection
-    _enabled: ClassVar[bool] = (
+    enabled: ClassVar[bool] = (
         True
         if os.getenv("FORCE_COLOR", "").lower() in {"1", "true", "yes"}
         else (sys.stderr.isatty() and os.getenv("NO_COLOR") is None)
     )
 
-    @staticmethod
-    def set_enabled(*, enabled: bool) -> None:
-        """Globally enable/disable ANSI colors for this process."""
-        Colors._enabled = enabled
 
-    @staticmethod
-    def is_enabled() -> bool:
-        """Return whether styled terminal output is enabled."""
-        return Colors._enabled
+def _set_rich_color_enabled(*, enabled: bool) -> None:
+    """Globally enable or disable Rich console color for this process."""
+    _RichColorState.enabled = enabled
+
+
+def _rich_color_enabled() -> bool:
+    """Return whether styled terminal output is enabled."""
+    return _RichColorState.enabled
 
 
 class LogStyles:
@@ -2307,43 +2296,16 @@ class LogStyles:
     SUCCESS: ClassVar[str] = "success"
     WARNING: ClassVar[str] = "warning"
     DETAIL: ClassVar[str] = "detail"
-    # New styles for consistent output formatting
-    METRIC_LABEL: ClassVar[str] = "metric_label"  # Bold headers for metrics
-    METRIC_VALUE: ClassVar[str] = "metric_value"  # Formatted metric values
-    GENERATED_TEXT: ClassVar[str] = "generated_text"  # Cyan model output
-    FILE_PATH: ClassVar[str] = "file_path"  # Highlighted file paths
-    MODEL_NAME: ClassVar[str] = "model_name"  # Magenta model identifiers
-
-
-RICH_STYLE_BY_ANSI: Final[dict[str, str]] = {
-    Colors.RED: "red",
-    Colors.GREEN: "green",
-    Colors.YELLOW: "yellow",
-    Colors.BLUE: "blue",
-    Colors.MAGENTA: "magenta",
-    Colors.CYAN: "cyan",
-    Colors.WHITE: "white",
-    Colors.GRAY: "dim",
-    Colors.RED + Colors.BOLD: "bold red",
-    Colors.GREEN + Colors.BOLD: "bold green",
-    Colors.YELLOW + Colors.BOLD: "bold yellow",
-    Colors.BLUE + Colors.BOLD: "bold blue",
-    Colors.MAGENTA + Colors.BOLD: "bold magenta",
-    Colors.CYAN + Colors.BOLD: "bold cyan",
-    Colors.WHITE + Colors.BOLD: "bold white",
-}
-
-
-def _rich_style_from_color(value: object, *, default: str = "") -> str:
-    """Map legacy ANSI color constants to Rich styles."""
-    if not isinstance(value, str) or not value:
-        return default
-    return RICH_STYLE_BY_ANSI.get(value, default)
+    METRIC_LABEL: ClassVar[str] = "metric_label"
+    METRIC_VALUE: ClassVar[str] = "metric_value"
+    GENERATED_TEXT: ClassVar[str] = "generated_text"
+    FILE_PATH: ClassVar[str] = "file_path"
+    MODEL_NAME: ClassVar[str] = "model_name"
 
 
 def _make_rich_console(*, width: int | None = None) -> Console:
     """Create the shared console object used by Rich logging."""
-    colors_enabled = Colors.is_enabled()
+    colors_enabled = _rich_color_enabled()
     force_terminal = True if colors_enabled and os.getenv("FORCE_COLOR") is not None else None
     return Console(
         stderr=True,
@@ -2418,14 +2380,11 @@ class StyleAwareRichHandler(RichHandler):
 
     def _style_for_record(self, record: logging.LogRecord, style_hint: object) -> str:
         """Return the Rich style for a log record."""
+        style_override = getattr(record, "style_override", None)
+        if isinstance(style_override, str) and style_override:
+            return style_override
         if isinstance(style_hint, str):
-            style = self.HINT_STYLES.get(style_hint, "")
-            color_style = _rich_style_from_color(getattr(record, "style_color", None))
-            if color_style:
-                style = color_style
-            if bool(getattr(record, "style_bold", False)) and "bold" not in style:
-                style = f"bold {style}".strip()
-            return style
+            return self.HINT_STYLES.get(style_hint, "")
         return self.LEVEL_STYLES.get(record.levelno, "")
 
 
@@ -6435,11 +6394,10 @@ def _apply_cli_output_preferences(args: argparse.Namespace) -> None:
     - Honors --no-color / --force-color to toggle Rich console styling
     - Applies --width via MLX_VLM_WIDTH env var for child processes too
     """
-    # Color controls
     if getattr(args, "no_color", False):
-        Colors.set_enabled(enabled=False)
+        _set_rich_color_enabled(enabled=False)
     elif getattr(args, "force_color", False):
-        Colors.set_enabled(enabled=True)
+        _set_rich_color_enabled(enabled=True)
 
     # Width override: prefer CLI value; store in env so subprocesses inherit it
     if getattr(args, "width", None) is not None:
@@ -6459,14 +6417,14 @@ def _apply_cli_output_preferences(args: argparse.Namespace) -> None:
 def log_rule(
     width: int = FORMATTING.generation_wrap_width,
     *,
-    char: str = "─",  # Unicode box-drawing character (was "-")
-    color: str | None = None,
+    char: str = "─",
+    style: str | None = None,
     bold: bool = False,
     level: int = logging.INFO,
     pre_newline: bool = False,
     post_newline: bool = False,
 ) -> None:
-    """Log a horizontal rule line with optional color and bold.
+    """Log a horizontal rule line with optional Rich styling.
 
     Uses unicode box-drawing characters for better visual separation.
     Keeps a single place for styling separators to ensure consistency.
@@ -6476,10 +6434,10 @@ def log_rule(
 
     line = char * max(1, width)
     extra: dict[str, object] = {"style_hint": LogStyles.RULE}
-    if color:
-        extra["style_color"] = color
     if bold:
-        extra["style_bold"] = True
+        style = f"bold {style}".strip() if style and "bold" not in style else style or "bold"
+    if style:
+        extra["style_override"] = style
     logger.log(level, line, extra=extra)
 
     if post_newline:
@@ -7863,21 +7821,17 @@ def pretty_print_exif(
         tag_cell = Text(tag_name, style="bold yellow" if is_important_tag else "")
         table.add_row(tag_cell, value_display)
 
-    # Use a consistent terminal-based width for header rules to avoid ragged lines
-    # Use a clamped terminal width by default; if --width is set, get_terminal_width
-    # will return the explicit override and ignore the max clamp.
     header_width: int = max(40, get_terminal_width(max_width=100))
 
-    # Print the title with consistent rule width
-    log_rule(header_width, char="=", color=Colors.BLUE, bold=True)
+    log_rule(header_width, char="=", style="blue", bold=True)
     logger.info(
         _display_align(title, header_width, alignment="center"),
         extra={"style_hint": LogStyles.HEADER, "style_width": header_width},
     )
-    log_rule(header_width, char="=", color=Colors.BLUE, bold=True)
+    log_rule(header_width, char="=", style="blue", bold=True)
 
     _log_rich_renderable(table, width=header_width)
-    log_rule(header_width, char="=", color=Colors.BLUE, bold=True)
+    log_rule(header_width, char="=", style="blue", bold=True)
 
 
 def _format_table_field_value(
@@ -14192,7 +14146,6 @@ def generate_html_report(
         log_warning_note("No table data to generate HTML report.")
         return
 
-    # Generate HTML table using tabulate
     html_table = tabulate(
         rows,
         headers=headers,
@@ -14385,12 +14338,10 @@ def _generate_markdown_table_section(report_context: ReportRenderContext) -> lis
     # avoiding table breakage from diagnostics.
     _process_markdown_rows(rows, report_context.result_set.results)
 
-    # Determine column alignment using original field names
     colalign = ["left"] + [
         "right" if is_numeric_field(field_name) else "left" for field_name in field_names[1:]
     ]
 
-    # Generate Markdown table using tabulate with proper GitHub alignment syntax
     markdown_table = tabulate(
         rows,
         headers=markdown_headers,
@@ -14398,7 +14349,6 @@ def _generate_markdown_table_section(report_context: ReportRenderContext) -> lis
         colalign=colalign,
     )
 
-    # Normalize trailing spaces per line using shared helper
     markdown_table = normalize_markdown_trailing_spaces(markdown_table)
 
     md: list[str] = []
@@ -14967,16 +14917,13 @@ def generate_tsv_report(
         clean_header = re.sub(r"<[^>]+>", "", clean_header)
         clean_headers.append(escape_tsv_value(clean_header))
 
-    # Append error diagnostic columns
     clean_headers.extend(["error_type", "error_package"])
 
-    # Clean and escape row data, appending error columns per result
     clean_rows: list[list[str]] = []
     for row, res in zip(rows, sorted_results, strict=False):
         clean_row = [escape_tsv_value(cell) for cell in row]
         clean_row.append(escape_tsv_value(res.error_type or ""))
         clean_row.append(escape_tsv_value(res.error_package or ""))
-        # Hard-cap any oversized cells so TSV rows stay manageable
         clean_rows.append(
             [
                 c if len(c) <= MAX_TSV_CELL_CHARS else c[: MAX_TSV_CELL_CHARS - 3].rstrip() + "..."
@@ -14984,7 +14931,6 @@ def generate_tsv_report(
             ]
         )
 
-    # Generate TSV using tabulate with tsv format
     tsv_content = tabulate(
         clean_rows,
         headers=clean_headers,
@@ -14993,10 +14939,8 @@ def generate_tsv_report(
 
     try:
         with filename.open("w", encoding="utf-8") as f:
-            # Metadata comment line (parsers can skip lines starting with #)
             f.write(f"# generated_at: {local_now_str()}\n")
             f.write(tsv_content)
-            # Ensure file ends with newline
             if not tsv_content.endswith("\n"):
                 f.write("\n")
         # Logging handled in finalize_execution
@@ -17188,19 +17132,19 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
 def print_cli_header(title: str) -> None:
     """Print a formatted CLI header with the given title."""
     width = get_terminal_width(max_width=100)
-    log_rule(width, char="=", color=Colors.BLUE, bold=True)
+    log_rule(width, char="=", style="blue", bold=True)
     logger.info(
         title,
         extra={"style_hint": LogStyles.HEADER, "style_width": width},
     )
-    log_rule(width, char="=", color=Colors.BLUE, bold=True)
+    log_rule(width, char="=", style="blue", bold=True)
 
 
 def print_cli_section(title: str, *, show_rule: bool = True) -> None:
     """Print a formatted CLI section header with visual prefix."""
     width = get_terminal_width(max_width=100)
     if show_rule:
-        log_rule(width, char="─", color=Colors.BLUE, bold=False)
+        log_rule(width, char="─", style="blue")
     logger.info(
         title,
         extra={
@@ -17229,9 +17173,6 @@ def exit_with_cli_error(
     if cause is not None:
         raise SystemExit(exit_code) from cause
     raise SystemExit(exit_code)
-
-
-# --- New Structured Logging Helpers (Consistent Output Formatting) ---
 
 
 def log_success(msg: str, *, prefix: str = "✓") -> None:
@@ -17288,19 +17229,15 @@ def log_generated_text(
         width = get_terminal_width(max_width=100)
         avail_width = max(20, width - len(indent))
 
-        # Process each line independently to preserve line breaks
         for line in lines:
             if not line.strip():
-                # Preserve blank lines
                 logger.info("", extra={"style_hint": LogStyles.GENERATED_TEXT})
                 continue
 
-            # Wrap only if line exceeds available width
             if len(line) <= avail_width:
                 formatted = f"{indent}{line}"
                 logger.info(formatted, extra={"style_hint": LogStyles.GENERATED_TEXT})
             else:
-                # Wrap this line while preserving its content
                 wrapped = textwrap.wrap(
                     line,
                     width=avail_width,
@@ -17311,7 +17248,6 @@ def log_generated_text(
                     formatted = f"{indent}{wrapped_line}"
                     logger.info(formatted, extra={"style_hint": LogStyles.GENERATED_TEXT})
     else:
-        # No wrapping - output each line as-is
         for line in lines:
             formatted = f"{indent}{line}"
             logger.info(formatted, extra={"style_hint": LogStyles.GENERATED_TEXT})
@@ -17337,33 +17273,32 @@ def log_model_name(name: str, *, label: str = "") -> None:
         logger.info(name, extra={"style_hint": LogStyles.MODEL_NAME})
 
 
-def log_file_path(path: Path | str, *, label: str = "", color: str = Colors.CYAN) -> None:
+def log_file_path(path: Path | str, *, label: str = "", style: str = "cyan") -> None:
     """Log a file path with highlighting.
 
     Args:
         path: The file path to display
         label: Optional label prefix (e.g., '   HTML:')
-        color: Color to use for the path
+        style: Rich style to use for the path
     """
     path_str = str(path)
     if label:
-        # Example output: "   HTML:     /path/to/file.html"
         msg = "%s %s"
         logger.info(
             msg,
             label,
             path_str,
-            extra={"style_hint": LogStyles.FILE_PATH, "style_color": color},
+            extra={"style_hint": LogStyles.FILE_PATH, "style_override": style},
         )
     else:
         logger.info(
             path_str,
-            extra={"style_hint": LogStyles.FILE_PATH, "style_color": color},
+            extra={"style_hint": LogStyles.FILE_PATH, "style_override": style},
         )
 
 
 def log_blank(count: int = 1) -> None:
-    """Log blank lines for spacing (replaces logger.info("")).
+    """Log blank lines for spacing.
 
     Args:
         count: Number of blank lines to emit
@@ -18095,7 +18030,7 @@ def print_model_result(
 def print_cli_separator() -> None:
     """Print a visually distinct separator line using unicode box-drawing characters."""
     width = get_terminal_width(max_width=100)
-    log_rule(width, char="─", color=Colors.BLUE, bold=False)
+    log_rule(width, char="─", style="blue")
 
 
 def _dump_environment_to_log(output_path: Path) -> None:
@@ -20194,9 +20129,9 @@ def log_summary(
         return
 
     log_blank()
-    log_rule(color=Colors.BLUE, bold=True)
+    log_rule(style="blue", bold=True)
     logger.info("Results Summary", extra={"style_hint": LogStyles.HEADER})
-    log_rule(color=Colors.BLUE, bold=True)
+    log_rule(style="blue", bold=True)
 
     successful = [r for r in results if r.success]
     failed = [r for r in results if not r.success]

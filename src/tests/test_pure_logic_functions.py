@@ -503,7 +503,7 @@ class TestDisplayWidthUtilities:
 
     def test_display_width_ignores_ansi_escape_sequences(self, mod: types.ModuleType) -> None:
         """ANSI color wrappers should not count toward rendered width."""
-        colored = f"{mod.Colors.RED}abc{mod.Colors.RESET}"
+        colored = "\033[91mabc\033[0m"
         assert mod._display_width(colored) == 3
 
     def test_display_align_targets_display_width(

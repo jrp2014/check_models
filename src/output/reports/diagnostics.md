@@ -14,11 +14,10 @@ focused upstream GitHub issue.
 
 | Target                                         | Problem                                               | Affected Models                                            | Issue Draft                                                                                                    | Evidence Bundle                                                                                                                     | Fixed When                                                |
 |------------------------------------------------|-------------------------------------------------------|------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
-| `mlx`                                          | Weight/config mismatch during model load              | 1: `mlx-community/Kimi-VL-A3B-Thinking-8bit`               | [issue draft](../issues/issue_001_mlx_mlx-model-load-model_001.md)                                             | [repro JSON](../repro_bundles/20260503T224052Z_002_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)  | Load/generation completes or fails with a narrower owner. |
-| `mlx-vlm`                                      | Unsupported Granite model type/import path            | 1: `mlx-community/granite-4.1-8b-mxfp8`                    | [issue draft](../issues/issue_002_mlx-vlm_mlx-vlm-model-load-model_001.md)                                     | [repro JSON](../repro_bundles/20260503T224052Z_005_mlx-community_granite-4.1-8b-mxfp8_MLX_VLM_MODEL_LOAD_MODEL_5af3e849109f.json)   | Load/generation completes or fails with a narrower owner. |
-| model configuration / repository               | Processor config is missing image processor           | 1: `mlx-community/MolmoPoint-8B-fp16`                      | [issue draft](../issues/issue_003_model-configuration-repository_model-config-processor-load-processor_001.md) | [repro JSON](../repro_bundles/20260503T224052Z_003_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json)  | Load/generation completes or fails with a narrower owner. |
-| `mlx-vlm`                                      | Tokenizer decode leaked BPE/byte markers              | 1: `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | [issue draft](../issues/issue_004_mlx-vlm_encoding_001.md)                                                     | [repro JSON](../repro_bundles/20260503T224052Z_001_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) | No BPE/byte markers in output.                            |
-| mlx-vlm first; MLX if cache/runtime reproduces | Long-context generation collapsed or became too short | 1: `mlx-community/Qwen2-VL-2B-Instruct-4bit`               | [issue draft](../issues/issue_005_mlx-vlm-mlx_long-context_001.md)                                             | [repro JSON](../repro_bundles/20260503T224052Z_004_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)       | Full and reduced reruns avoid context collapse.           |
+| `mlx`                                          | Weight/config mismatch during model load              | 2: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` (+1)                 | [issue draft](../issues/issue_001_mlx_mlx-model-load-model_001.md)                                             | [2 repro JSONs](../repro_bundles/20260504T192124Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_MLX_MODEL_LOAD_MODEL_853049863f38.json)      | Load/generation completes or fails with a narrower owner. |
+| model configuration / repository               | Processor config is missing image processor           | 1: `mlx-community/MolmoPoint-8B-fp16`                      | [issue draft](../issues/issue_002_model-configuration-repository_model-config-processor-load-processor_001.md) | [repro JSON](../repro_bundles/20260504T192124Z_004_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json)  | Load/generation completes or fails with a narrower owner. |
+| `mlx-vlm`                                      | Tokenizer decode leaked BPE/byte markers              | 1: `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | [issue draft](../issues/issue_003_mlx-vlm_encoding_001.md)                                                     | [repro JSON](../repro_bundles/20260504T192124Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) | No BPE/byte markers in output.                            |
+| mlx-vlm first; MLX if cache/runtime reproduces | Long-context generation collapsed or became too short | 1: `mlx-community/Qwen2-VL-2B-Instruct-4bit`               | [issue draft](../issues/issue_004_mlx-vlm-mlx_long-context_001.md)                                             | [repro JSON](../repro_bundles/20260504T192124Z_005_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)       | Full and reduced reruns avoid context collapse.           |
 
 ---
 
@@ -27,8 +26,8 @@ focused upstream GitHub issue.
 File one upstream issue per row above. The linked issue drafts are the
 pasteable bodies; this diagnostics file is the run-level queue and appendix.
 
-- **Issue drafts:** 5 root-cause cluster(s).
-- **Suggested targets:** `mlx`=1, `mlx-vlm`=2, `mlx-vlm / mlx`=1, `model configuration/repository`=1.
+- **Issue drafts:** 4 root-cause cluster(s).
+- **Suggested targets:** `mlx`=1, `mlx-vlm`=1, `mlx-vlm / mlx`=1, `model configuration/repository`=1.
 - **Standalone evidence:** each issue draft includes minimal inline evidence plus an exact cluster rerun command before any appendix detail.
 - **Supporting files:** `repro JSON` links point to local repro bundles with prompt, environment, and generated-output context. Attach or publish those JSON files when filing upstream; GitHub will not resolve local artifact paths from a pasted issue body.
 
@@ -38,15 +37,16 @@ The remaining sections keep full run evidence for audit/debugging. They are not 
 
 ---
 
-## 1. Failure affecting 1 model
+## 1. Failure affecting 2 models
 
-- _Observed:_ Model loading failed: Received 4 parameters not in model:
+- _Observed:_ Model loading failed: Received 2 parameters not in model:
 - _Likely owner:_ `mlx`
 - _Why it matters:_ This prevented a complete model response; stage `Model
   Error`; phase `model_load`; code `MLX_MODEL_LOAD_MODEL`; type `ValueError`.
 - _Suggested next step:_ check tensor/cache behavior and memory pressure
   handling.
-- _Affected models:_ `mlx-community/Kimi-VL-A3B-Thinking-8bit`
+- _Affected models:_ `LiquidAI/LFM2.5-VL-450M-MLX-bf16`,
+  `mlx-community/Kimi-VL-A3B-Thinking-8bit`
 
 **Representative maintainer triage:**
 
@@ -61,15 +61,92 @@ The remaining sections keep full run evidence for audit/debugging. They are not 
 
 | Model                                     | Observed Behavior                                         | First Seen Failing      | Recent Repro           |
 |-------------------------------------------|-----------------------------------------------------------|-------------------------|------------------------|
+| `LiquidAI/LFM2.5-VL-450M-MLX-bf16`        | Model loading failed: Received 2 parameters not in model: | 2026-05-04 20:21:24 BST | 1/1 recent runs failed |
 | `mlx-community/Kimi-VL-A3B-Thinking-8bit` | Model loading failed: Received 4 parameters not in model: | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
 
 ### To reproduce
 
 - Exact model-specific repro command appears below in the `Reproducibility` section under `Target specific failing models`.
-- Representative failing model: `mlx-community/Kimi-VL-A3B-Thinking-8bit`
+- Representative failing model: `LiquidAI/LFM2.5-VL-450M-MLX-bf16`
 
 <details>
-<summary>Detailed trace logs (affected model)</summary>
+<summary>Detailed trace logs (affected models)</summary>
+
+#### `LiquidAI/LFM2.5-VL-450M-MLX-bf16`
+
+Traceback tail:
+
+```text
+multi_modal_projector.layer_norm.weight.
+The above exception was the direct cause of the following exception:
+Traceback (most recent call last):
+ValueError: Model loading failed: Received 2 parameters not in model: 
+multi_modal_projector.layer_norm.bias,
+multi_modal_projector.layer_norm.weight.
+```
+
+Captured stdout/stderr:
+
+```text
+=== STDERR ===
+
+[20:00:19] ERROR    Failed to load model LiquidAI/LFM2.5-VL-450M-MLX-bf16
+                    ╭─────────────────────────────── Traceback (most recent call last) ────────────────────────────────╮
+                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16888 in _run_model_generation      │
+                    │                                                                                                  │
+                    │   16885 │   try:                                                                                 │
+                    │   16886 │   │   if phase_timer is not None:                                                      │
+                    │   16887 │   │   │   with phase_timer.track("model_load"):                                        │
+                    │ ❱ 16888 │   │   │   │   model, processor, config = _load_model(params)                           │
+                    │   16889 │   │   else:                                                                            │
+                    │   16890 │   │   │   model, processor, config = _load_model(params)                               │
+                    │   16891 │   except Exception as load_err:                                                        │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16301 in _load_model                │
+                    │                                                                                                  │
+                    │   16298 │   │   Tuple of ``(model, processor, config)`` where ``processor`` is an                │
+                    │   16299 │   │   ``transformers.ProcessorMixin`` and ``config`` may be ``None``.                  │
+                    │   16300 │   """                                                                                  │
+                    │ ❱ 16301 │   model, processor = load(                                                             │
+                    │   16302 │   │   path_or_hf_repo=params.model_identifier,                                         │
+                    │   16303 │   │   adapter_path=params.adapter_path,                                                │
+                    │   16304 │   │   lazy=params.lazy,                                                                │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py:412 in load                                 │
+                    │                                                                                                  │
+                    │    409 │   model_path = get_model_path(                                                          │
+                    │    410 │   │   path_or_hf_repo, force_download=force_download, revision=revision                 │
+                    │    411 │   )                                                                                     │
+                    │ ❱  412 │   model = load_model(model_path, lazy, **kwargs)                                        │
+                    │    413 │   if adapter_path is not None:                                                          │
+                    │    414 │   │   model = apply_lora_layers(model, adapter_path)                                    │
+                    │    415 │   │   model.eval()                                                                      │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py:336 in load_model                           │
+                    │                                                                                                  │
+                    │    333 │   │   │   )                                                                             │
+                    │    334 │   │   model = quantize_activations(model)                                               │
+                    │    335 │                                                                                         │
+                    │ ❱  336 │   model.load_weights(list(weights.items()))                                             │
+                    │    337 │                                                                                         │
+                    │    338 │   if not lazy:                                                                          │
+                    │    339 │   │   mx.eval(model.parameters())                                                       │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py:185 in load_weights                 │
+                    │                                                                                                  │
+                    │   182 │   │   │   if extras := (new_weights.keys() - curr_weights.keys()):                       │
+                    │   183 │   │   │   │   num_extra = len(extras)                                                    │
+                    │   184 │   │   │   │   extras = ",\n".join(sorted(extras))                                        │
+                    │ ❱ 185 │   │   │   │   raise ValueError(                                                          │
+                    │   186 │   │   │   │   │   f"Received {num_extra} parameters not in model: \n{extras}."           │
+                    │   187 │   │   │   │   )                                                                          │
+                    │   188 │   │   │   if missing := (curr_weights.keys() - new_weights.keys()):                      │
+                    ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+                    ValueError: Received 2 parameters not in model:
+                    multi_modal_projector.layer_norm.bias,
+                    multi_modal_projector.layer_norm.weight.
+[20:00:20] DEBUG    HF Cache Info for LiquidAI/LFM2.5-VL-450M-MLX-bf16: size=860.6 MB, files=13
+```
 
 #### `mlx-community/Kimi-VL-A3B-Thinking-8bit`
 
@@ -89,27 +166,27 @@ Captured stdout/stderr:
 ```text
 === STDERR ===
 
-[23:24:54] ERROR    Failed to load model mlx-community/Kimi-VL-A3B-Thinking-8bit
+[20:04:40] ERROR    Failed to load model mlx-community/Kimi-VL-A3B-Thinking-8bit
                     ╭─────────────────────────────── Traceback (most recent call last) ────────────────────────────────╮
-                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16703 in _run_model_generation      │
+                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16888 in _run_model_generation      │
                     │                                                                                                  │
-                    │   16700 │   try:                                                                                 │
-                    │   16701 │   │   if phase_timer is not None:                                                      │
-                    │   16702 │   │   │   with phase_timer.track("model_load"):                                        │
-                    │ ❱ 16703 │   │   │   │   model, processor, config = _load_model(params)                           │
-                    │   16704 │   │   else:                                                                            │
-                    │   16705 │   │   │   model, processor, config = _load_model(params)                               │
-                    │   16706 │   except Exception as load_err:                                                        │
+                    │   16885 │   try:                                                                                 │
+                    │   16886 │   │   if phase_timer is not None:                                                      │
+                    │   16887 │   │   │   with phase_timer.track("model_load"):                                        │
+                    │ ❱ 16888 │   │   │   │   model, processor, config = _load_model(params)                           │
+                    │   16889 │   │   else:                                                                            │
+                    │   16890 │   │   │   model, processor, config = _load_model(params)                               │
+                    │   16891 │   except Exception as load_err:                                                        │
                     │                                                                                                  │
-                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16116 in _load_model                │
+                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16301 in _load_model                │
                     │                                                                                                  │
-                    │   16113 │   │   Tuple of ``(model, processor, config)`` where ``processor`` is an                │
-                    │   16114 │   │   ``transformers.ProcessorMixin`` and ``config`` may be ``None``.                  │
-                    │   16115 │   """                                                                                  │
-                    │ ❱ 16116 │   model, processor = load(                                                             │
-                    │   16117 │   │   path_or_hf_repo=params.model_identifier,                                         │
-                    │   16118 │   │   adapter_path=params.adapter_path,                                                │
-                    │   16119 │   │   lazy=params.lazy,                                                                │
+                    │   16298 │   │   Tuple of ``(model, processor, config)`` where ``processor`` is an                │
+                    │   16299 │   │   ``transformers.ProcessorMixin`` and ``config`` may be ``None``.                  │
+                    │   16300 │   """                                                                                  │
+                    │ ❱ 16301 │   model, processor = load(                                                             │
+                    │   16302 │   │   path_or_hf_repo=params.model_identifier,                                         │
+                    │   16303 │   │   adapter_path=params.adapter_path,                                                │
+                    │   16304 │   │   lazy=params.lazy,                                                                │
                     │                                                                                                  │
                     │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py:412 in load                                 │
                     │                                                                                                  │
@@ -146,7 +223,7 @@ Captured stdout/stderr:
                     multi_modal_projector.linear_1.scales,
                     multi_modal_projector.linear_2.biases,
                     multi_modal_projector.linear_2.scales.
-[23:24:54] DEBUG    HF Cache Info for mlx-community/Kimi-VL-A3B-Thinking-8bit: size=17023.6 MB, files=18
+[20:04:40] DEBUG    HF Cache Info for mlx-community/Kimi-VL-A3B-Thinking-8bit: size=17023.6 MB, files=18
 ```
 
 </details>
@@ -205,152 +282,40 @@ Captured stdout/stderr:
 
 /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/modeling_rope_utils.py:1034: FutureWarning: `rope_config_validation` is deprecated and has been removed. Its functionality has been moved to RotaryEmbeddingConfigMixin.validate_rope method. PreTrainedConfig inherits this class, so please call self.validate_rope() instead. Also, make sure to use the new rope_parameters syntax. You can call self.standardize_rope_params() in the meantime.
   warnings.warn(
-[23:26:16] ERROR    Model preflight validation failed for mlx-community/MolmoPoint-8B-fp16
+[20:05:58] ERROR    Model preflight validation failed for mlx-community/MolmoPoint-8B-fp16
                     ╭─────────────────────────────── Traceback (most recent call last) ────────────────────────────────╮
-                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16474 in _prepare_generation_prompt │
+                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16659 in _prepare_generation_prompt │
                     │                                                                                                  │
-                    │   16471 │   │   )                                                                                │
-                    │   16472 │   │   if phase_timer is not None:                                                      │
-                    │   16473 │   │   │   with phase_timer.track("prompt_prep"):                                       │
-                    │ ❱ 16474 │   │   │   │   _run_model_preflight_validators(                                         │
-                    │   16475 │   │   │   │   │   model_identifier=params.model_identifier,                            │
-                    │   16476 │   │   │   │   │   processor=processor,                                                 │
-                    │   16477 │   │   │   │   │   config=config,                                                       │
+                    │   16656 │   │   )                                                                                │
+                    │   16657 │   │   if phase_timer is not None:                                                      │
+                    │   16658 │   │   │   with phase_timer.track("prompt_prep"):                                       │
+                    │ ❱ 16659 │   │   │   │   _run_model_preflight_validators(                                         │
+                    │   16660 │   │   │   │   │   model_identifier=params.model_identifier,                            │
+                    │   16661 │   │   │   │   │   processor=processor,                                                 │
+                    │   16662 │   │   │   │   │   config=config,                                                       │
                     │                                                                                                  │
-                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16266 in                            │
+                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16451 in                            │
                     │ _run_model_preflight_validators                                                                  │
                     │                                                                                                  │
-                    │   16263 │   │   │   phase="processor_load",                                                      │
-                    │   16264 │   │   )                                                                                │
-                    │   16265 │   if getattr(processor, "image_processor", None) is None:                              │
-                    │ ❱ 16266 │   │   _raise_preflight_error(                                                          │
-                    │   16267 │   │   │   "Loaded processor has no image_processor; expected multimodal processor.",   │
-                    │   16268 │   │   │   phase="processor_load",                                                      │
-                    │   16269 │   │   )                                                                                │
+                    │   16448 │   │   │   phase="processor_load",                                                      │
+                    │   16449 │   │   )                                                                                │
+                    │   16450 │   if getattr(processor, "image_processor", None) is None:                              │
+                    │ ❱ 16451 │   │   _raise_preflight_error(                                                          │
+                    │   16452 │   │   │   "Loaded processor has no image_processor; expected multimodal processor.",   │
+                    │   16453 │   │   │   phase="processor_load",                                                      │
+                    │   16454 │   │   )                                                                                │
                     │                                                                                                  │
-                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16199 in _raise_preflight_error     │
+                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16384 in _raise_preflight_error     │
                     │                                                                                                  │
-                    │   16196                                                                                          │
-                    │   16197 def _raise_preflight_error(message: str, *, phase: str) -> NoReturn:                     │
-                    │   16198 │   """Raise a preflight ValueError annotated with the failing phase."""                 │
-                    │ ❱ 16199 │   raise _tag_exception_failure_phase(ValueError(message), phase)                       │
-                    │   16200                                                                                          │
-                    │   16201                                                                                          │
-                    │   16202 def _validate_model_artifact_layout(                                                     │
+                    │   16381                                                                                          │
+                    │   16382 def _raise_preflight_error(message: str, *, phase: str) -> NoReturn:                     │
+                    │   16383 │   """Raise a preflight ValueError annotated with the failing phase."""                 │
+                    │ ❱ 16384 │   raise _tag_exception_failure_phase(ValueError(message), phase)                       │
+                    │   16385                                                                                          │
+                    │   16386                                                                                          │
+                    │   16387 def _validate_model_artifact_layout(                                                     │
                     ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
                     ValueError: Loaded processor has no image_processor; expected multimodal processor.
-```
-
-</details>
-
-## 3. Failure affecting 1 model
-
-- _Observed:_ Model loading failed: Model type granite not supported. Error:
-  No module named 'mlx_vlm.speculative.drafters.granite'
-- _Likely owner:_ `mlx-vlm`
-- _Why it matters:_ This prevented a complete model response; stage `Model
-  Error`; phase `model_load`; code `MLX_VLM_MODEL_LOAD_MODEL`; type
-  `ValueError`.
-- _Suggested next step:_ check processor/chat-template wiring and generation
-  kwargs.
-- _Affected models:_ `mlx-community/granite-4.1-8b-mxfp8`
-
-**Representative maintainer triage:**
-
-- _Likely owner:_ mlx-vlm \| confidence=high
-- _Classification:_ runtime_failure \| MLX_VLM_MODEL_LOAD_MODEL
-- _Summary:_ model error \| mlx vlm model load model
-- _Evidence:_ model error \| mlx vlm model load model
-- _Token context:_ stop=exception
-- _Next action:_ Check mlx-vlm model-type registration/import handling for
-  Granite; confirm the loader either supports this architecture or fails
-  before generation with a clear unsupported-model message.
-
-| Model                                | Observed Behavior                                                                                                     | First Seen Failing      | Recent Repro           |
-|--------------------------------------|-----------------------------------------------------------------------------------------------------------------------|-------------------------|------------------------|
-| `mlx-community/granite-4.1-8b-mxfp8` | Model loading failed: Model type granite not supported. Error: No module named 'mlx_vlm.speculative.drafters.granite' | 2026-05-03 23:40:52 BST | 1/1 recent runs failed |
-
-### To reproduce
-
-- Exact model-specific repro command appears below in the `Reproducibility` section under `Target specific failing models`.
-- Representative failing model: `mlx-community/granite-4.1-8b-mxfp8`
-
-<details>
-<summary>Detailed trace logs (affected model)</summary>
-
-#### `mlx-community/granite-4.1-8b-mxfp8`
-
-Traceback tail:
-
-```text
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 136, in get_model_and_args
-    raise ValueError(msg)
-ValueError: Model type granite not supported. Error: No module named 'mlx_vlm.speculative.drafters.granite'
-The above exception was the direct cause of the following exception:
-Traceback (most recent call last):
-ValueError: Model loading failed: Model type granite not supported. Error: No module named 'mlx_vlm.speculative.drafters.granite'
-```
-
-Captured stdout/stderr:
-
-```text
-=== STDERR ===
-
-[23:39:23] ERROR    Failed to load model mlx-community/granite-4.1-8b-mxfp8
-                    ╭─────────────────────────────── Traceback (most recent call last) ────────────────────────────────╮
-                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16703 in _run_model_generation      │
-                    │                                                                                                  │
-                    │   16700 │   try:                                                                                 │
-                    │   16701 │   │   if phase_timer is not None:                                                      │
-                    │   16702 │   │   │   with phase_timer.track("model_load"):                                        │
-                    │ ❱ 16703 │   │   │   │   model, processor, config = _load_model(params)                           │
-                    │   16704 │   │   else:                                                                            │
-                    │   16705 │   │   │   model, processor, config = _load_model(params)                               │
-                    │   16706 │   except Exception as load_err:                                                        │
-                    │                                                                                                  │
-                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16116 in _load_model                │
-                    │                                                                                                  │
-                    │   16113 │   │   Tuple of ``(model, processor, config)`` where ``processor`` is an                │
-                    │   16114 │   │   ``transformers.ProcessorMixin`` and ``config`` may be ``None``.                  │
-                    │   16115 │   """                                                                                  │
-                    │ ❱ 16116 │   model, processor = load(                                                             │
-                    │   16117 │   │   path_or_hf_repo=params.model_identifier,                                         │
-                    │   16118 │   │   adapter_path=params.adapter_path,                                                │
-                    │   16119 │   │   lazy=params.lazy,                                                                │
-                    │                                                                                                  │
-                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py:412 in load                                 │
-                    │                                                                                                  │
-                    │    409 │   model_path = get_model_path(                                                          │
-                    │    410 │   │   path_or_hf_repo, force_download=force_download, revision=revision                 │
-                    │    411 │   )                                                                                     │
-                    │ ❱  412 │   model = load_model(model_path, lazy, **kwargs)                                        │
-                    │    413 │   if adapter_path is not None:                                                          │
-                    │    414 │   │   model = apply_lora_layers(model, adapter_path)                                    │
-                    │    415 │   │   model.eval()                                                                      │
-                    │                                                                                                  │
-                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py:236 in load_model                           │
-                    │                                                                                                  │
-                    │    233 │   with safetensors.safe_open(weight_files[0], framework="np") as f:                     │
-                    │    234 │   │   is_mlx_format = f.metadata() and f.metadata().get("format") == "mlx"              │
-                    │    235 │                                                                                         │
-                    │ ❱  236 │   model_class, _ = get_model_and_args(config=config)                                    │
-                    │    237 │                                                                                         │
-                    │    238 │   # Initialize text and vision configs if not present                                   │
-                    │    239 │   config.setdefault("text_config", config.pop("llm_config", {}))                        │
-                    │                                                                                                  │
-                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py:136 in get_model_and_args                   │
-                    │                                                                                                  │
-                    │    133 │                                                                                         │
-                    │    134 │   msg = f"Model type {model_type} not supported. Error: {last_err}"                     │
-                    │    135 │   logging.error(msg)                                                                    │
-                    │ ❱  136 │   raise ValueError(msg)                                                                 │
-                    │    137                                                                                           │
-                    │    138                                                                                           │
-                    │    139 def get_model_path(                                                                       │
-                    ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
-                    ValueError: Model type granite not supported. Error: No module named
-                    'mlx_vlm.speculative.drafters.granite'
-[23:39:24] DEBUG    HF Cache Info for mlx-community/granite-4.1-8b-mxfp8: size=8249.3 MB, files=10
 ```
 
 </details>
@@ -395,7 +360,6 @@ point to stack/runtime behavior rather than inherent model quality limits.
 
 - Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 61 occurrences).
 - Output omitted required Title/Description/Keywords sections (description, keywords).
-- Output appears to copy prompt context verbatim (32% overlap).
 
 **Sample output:**
 
@@ -411,32 +375,35 @@ Title:ĠClassicĠsailboatĠmooredĠinĠestuaryĊĊDescription:ĠAĠclassic-style
   stack/runtime behavior rather than a clean model-quality limitation.
 - _Suggested next step:_ validate long-context handling and stop-token
   behavior across mlx-vlm + mlx runtime.
-- _Token summary:_ prompt=16,901, output=500, output/prompt=2.96%
+- _Token summary:_ prompt=16,901, output=11, output/prompt=0.07%
 
 **Maintainer triage:**
 
 - _Likely owner:_ mlx \| confidence=high
-- _Classification:_ cutoff_degraded \| long_context
-- _Summary:_ At long prompt length (16901 tokens), output became repetitive.
-  \| hit token cap (500) \| nontext prompt burden=97% \| missing sections:
-  title, description, keywords
-- _Evidence:_ At long prompt length (16901 tokens), output became repetitive.
-- _Token context:_ prompt=16,901 \| output/prompt=2.96% \| nontext burden=97%
-  \| stop=completed \| hit token cap (500)
-- _Next action:_ Inspect long-context cache behavior under heavy image-token
-  burden.
+- _Classification:_ context_budget \| long_context
+- _Summary:_ Output is very short relative to prompt size (0.1%), suggesting
+  possible early-stop or prompt-handling issues. \| At long prompt length
+  (16901 tokens), output stayed unusually short (11 tokens; ratio 0.1%). \|
+  output/prompt=0.07% \| nontext prompt burden=97%
+- _Evidence:_ Output is very short relative to prompt size (0.1%), suggesting
+  possible early-stop or prompt-handling issues. \| At long prompt length
+  (16901 tokens), output stayed unusually short (11 tokens; ratio 0.1%).
+- _Token context:_ prompt=16,901 \| output/prompt=0.07% \| nontext burden=97%
+  \| stop=completed
+- _Next action:_ Treat this as a prompt-budget issue first; nontext prompt
+  burden is 97% and the output stays weak under that load.
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16901 tokens), output became repetitive.
+- Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt-handling issues.
+- At long prompt length (16901 tokens), output stayed unusually short (11 tokens; ratio 0.1%).
 - Model output may not follow prompt or image contents (missing: classic, style, sailboat, dark, hull).
-- Output became repetitive, indicating possible generation instability (token: phrase: "boat anchor boat anchor...").
 - Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 **Sample output:**
 
 ```text
-Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anc...
+Boat, boat, boat, boat, boat
 ```
 
 ---
@@ -451,9 +418,9 @@ model appears).
 
 | Model                                     | Status vs Previous Run   | First Seen Failing      | Recent Repro           |
 |-------------------------------------------|--------------------------|-------------------------|------------------------|
+| `LiquidAI/LFM2.5-VL-450M-MLX-bf16`        | new model failing        | 2026-05-04 20:21:24 BST | 1/1 recent runs failed |
 | `mlx-community/Kimi-VL-A3B-Thinking-8bit` | still failing            | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
 | `mlx-community/MolmoPoint-8B-fp16`        | still failing            | 2026-03-27 13:06:07 GMT | 3/3 recent runs failed |
-| `mlx-community/granite-4.1-8b-mxfp8`      | new model failing        | 2026-05-03 23:40:52 BST | 1/1 recent runs failed |
 
 ---
 
@@ -462,13 +429,13 @@ model appears).
 - **Detailed diagnostics models:** 5
 - **Summary diagnostics models:** 49
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1214.71s (1214.71s)
-- **Average runtime per model:** 22.49s (22.49s)
+- **Total model runtime (sum):** 1260.82s (1260.82s)
+- **Average runtime per model:** 23.35s (23.35s)
 - **Dominant runtime phase:** decode dominated 50/54 measured model runs (90% of tracked runtime).
-- **Phase totals:** model load=117.87s, prompt prep=0.16s, decode=1082.56s, cleanup=5.63s
+- **Phase totals:** model load=113.09s, prompt prep=0.16s, decode=1132.96s, cleanup=5.99s
 - **Observed stop reasons:** completed=51, exception=3
-- **Validation overhead:** 11.08s total (avg 0.21s across 54 model(s)).
-- **First-token latency:** Avg 11.85s | Min 0.08s | Max 70.80s across 51 model(s).
+- **Validation overhead:** 11.49s total (avg 0.21s across 54 model(s)).
+- **First-token latency:** Avg 12.44s | Min 0.08s | Max 75.00s across 51 model(s).
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
@@ -493,7 +460,7 @@ warning, or stack-signal anomaly).
 
 - `HuggingFaceTB/SmolVLM-Instruct`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
 - `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`: Output omitted required Title/Description/Keywords sections (title).
-- `meta-llama/Llama-3.2-11B-Vision-Instruct`: Model output may not follow prompt or image contents (missing: classic, style, dark, hull, wooden).
+- `meta-llama/Llama-3.2-11B-Vision-Instruct`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
 - `microsoft/Phi-3.5-vision-instruct`: Output became repetitive, indicating possible generation instability (token: phrase: "flags, flags, flags, flags,...").
 - `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
 - `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: Output omitted required Title/Description/Keywords sections (title, description).
@@ -504,11 +471,11 @@ warning, or stack-signal anomaly).
 - `mlx-community/Idefics3-8B-Llama3-bf16`: Output formatting deviated from the requested structure. Details: Unknown tags: <end_of_utterance>.
 - `mlx-community/InternVL3-14B-8bit`: Output appears to copy prompt context verbatim (46% overlap).
 - `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`: Output omitted required Title/Description/Keywords sections (title).
-- `mlx-community/LFM2-VL-1.6B-8bit`: Output appears to copy prompt context verbatim (90% overlap).
+- `mlx-community/LFM2-VL-1.6B-8bit`: Output appears to copy prompt context verbatim (64% overlap).
 - `mlx-community/LFM2.5-VL-1.6B-bf16`: Output became repetitive, indicating possible generation instability (token: phrase: "mudflats, flags, boat, water,.....
 - `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
 - `mlx-community/Molmo-7B-D-0924-8bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
-- `mlx-community/Molmo-7B-D-0924-bf16`: Output contains corrupted or malformed text segments (incomplete_sentence: ends with 'to').
+- `mlx-community/Molmo-7B-D-0924-bf16`: Model refused or deflected the requested task (insufficient_info).
 - `mlx-community/Phi-3.5-vision-instruct-bf16`: Output became repetitive, indicating possible generation instability (token: phrase: "flags, flags, flags, flags,...").
 - `mlx-community/Qwen3.5-27B-4bit`: Model refused or deflected the requested task (explicit_refusal).
 - `mlx-community/Qwen3.5-27B-mxfp8`: Keyword count violation (20; expected 10-18)
@@ -524,14 +491,14 @@ warning, or stack-signal anomaly).
 - `mlx-community/gemma-3n-E2B-4bit`: Model output may not follow prompt or image contents (missing: classic, style, sailboat, dark, hull).
 - `mlx-community/gemma-3n-E4B-it-bf16`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
 - `mlx-community/gemma-4-31b-bf16`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
-- `mlx-community/llava-v1.6-mistral-7b-8bit`: Model output may not follow prompt or image contents (missing: moored, calm, estuary, during, low).
+- `mlx-community/llava-v1.6-mistral-7b-8bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
 - `mlx-community/nanoLLaVA-1.5-4bit`: Output omitted required Title/Description/Keywords sections (keywords).
 - `mlx-community/paligemma2-10b-ft-docci-448-6bit`: Model output may not follow prompt or image contents (missing: classic, style, sailboat, dark, hull).
 - `mlx-community/paligemma2-10b-ft-docci-448-bf16`: Model output may not follow prompt or image contents (missing: classic, style, sailboat, dark, hull).
 - `mlx-community/paligemma2-3b-ft-docci-448-bf16`: Model output may not follow prompt or image contents (missing: classic, style, sailboat, dark, hull).
 - `mlx-community/paligemma2-3b-pt-896-4bit`: Model output may not follow prompt or image contents (missing: classic, style, sailboat, dark, hull).
-- `mlx-community/pixtral-12b-8bit`: Output appears to copy prompt context verbatim (90% overlap).
-- `mlx-community/pixtral-12b-bf16`: Output appears to copy prompt context verbatim (90% overlap).
+- `mlx-community/pixtral-12b-8bit`: Output appears to copy prompt context verbatim (58% overlap).
+- `mlx-community/pixtral-12b-bf16`: Output appears to copy prompt context verbatim (56% overlap).
 - `qnguyen3/nanoLLaVA`: Output omitted required Title/Description/Keywords sections (keywords).
 
 ---
@@ -541,7 +508,7 @@ warning, or stack-signal anomaly).
 | Component       | Version                     |
 |-----------------|-----------------------------|
 | mlx-vlm         | 0.4.5                       |
-| mlx             | 0.32.0.dev20260503+e8ebdebe |
+| mlx             | 0.32.0.dev20260504+e8ebdebe |
 | mlx-lm          | 0.31.3                      |
 | transformers    | 5.7.0                       |
 | tokenizers      | 0.22.2                      |
@@ -592,9 +559,9 @@ the exact prompt trace has been exported to
 for each failing model.
 
 ```bash
+python -m check_models --image /Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models LiquidAI/LFM2.5-VL-450M-MLX-bf16
 python -m check_models --image /Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Kimi-VL-A3B-Thinking-8bit
 python -m check_models --image /Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/MolmoPoint-8B-fp16
-python -m check_models --image /Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/granite-4.1-8b-mxfp8
 ```
 
 ### Prompt Used
@@ -640,4 +607,4 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 - Input image: `/Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-05-04 18:00:02 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-05-04 20:21:25 BST by [check_models](https://github.com/jrp2014/check_models)._

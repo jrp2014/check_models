@@ -13,6 +13,8 @@ Notable changes to this project will be documented in this file.
   summaries, clearer composite-owner targets, runtime-failure-specific fix
   guidance, and explicit notes that local repro JSON links must be attached or
   published when filing upstream.
+- Remove the remaining legacy ANSI color bridge from console logging in favor
+  of direct Rich styles, while trimming stale wrapper comments.
 
 ## [0.7.0] - 2026-05-03
 

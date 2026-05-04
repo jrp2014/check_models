@@ -9,22 +9,22 @@
 - **Raw owner hint:** `mlx-vlm / mlx`
 - **Affected models:** 1
 - **Fixed when:** Full and reduced reruns avoid context collapse.
-- **Issue kind:** `cutoff_degraded`
+- **Issue kind:** `context_budget`
 - **Raw cluster:** `mlx-vlm-mlx_long-context_001` (`long_context`)
 
 
 ## Affected Models
 
-| Model                                     | Representative Signal                                           | Token Context                                                                                       | Repro JSON                                                                                                                    |
-|-------------------------------------------|-----------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | At long prompt length (16901 tokens), output became repetitive. | prompt=16,901 \| output/prompt=2.96% \| nontext burden=97% \| stop=completed \| hit token cap (500) | [repro JSON](../repro_bundles/20260503T224052Z_004_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json) |
+| Model                                     | Representative Signal                                                                                                                                                                                          | Token Context                                                                | Repro JSON                                                                                                                    |
+|-------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt-handling issues. \| At long prompt length (16901 tokens), output stayed unusually short (11 tokens; ratio 0.1%). | prompt=16,901 \| output/prompt=0.07% \| nontext burden=97% \| stop=completed | [repro JSON](../repro_bundles/20260504T192124Z_005_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json) |
 
 
 ## Minimal Evidence
 
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: At long prompt length (16901 tokens), output became repetitive.
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: Model output may not follow prompt or image contents (missing: classic, style, sailboat, dark, hull).
-- Output excerpt: `Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat...`
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt-handling issues.
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: At long prompt length (16901 tokens), output stayed unusually short (11 tokens; ratio 0.1%).
+- Output excerpt: `Boat, boat, boat, boat, boat`
 
 
 ## Repro Commands
@@ -37,7 +37,7 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 
 Repro bundles:
 
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: [repro JSON](../repro_bundles/20260503T224052Z_004_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: [repro JSON](../repro_bundles/20260504T192124Z_005_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)
 - Note: these are local artifact links; attach or publish the JSON when filing upstream.
 
 
@@ -59,13 +59,15 @@ Repro bundles:
 - _Filing target:_ mlx-vlm first; MLX if cache/runtime reproduces
 - _Likely owner:_ `mlx-vlm / mlx`
 - _Confidence:_ high
-- _Issue kind:_ `cutoff_degraded`
+- _Issue kind:_ `context_budget`
 - _Issue subtype:_ `long_context`
-- _Why this classification is credible:_ At long prompt length (16901 tokens),
-  output became repetitive. \| hit token cap (500) \| nontext prompt
-  burden=97% \| missing sections: title, description, keywords
-- _Suggested next action:_ Inspect long-context cache behavior under heavy
-  image-token burden.
+- _Why this classification is credible:_ Output is very short relative to
+  prompt size (0.1%), suggesting possible early-stop or prompt-handling
+  issues. \| At long prompt length (16901 tokens), output stayed unusually
+  short (11 tokens; ratio 0.1%). \| output/prompt=0.07% \| nontext prompt
+  burden=97%
+- _Suggested next action:_ Treat this as a prompt-budget issue first; nontext
+  prompt burden is 97% and the output stays weak under that load.
 
 
 ## Appendix: Environment
@@ -73,7 +75,7 @@ Repro bundles:
 | Component       | Version                     |
 |-----------------|-----------------------------|
 | mlx-vlm         | 0.4.5                       |
-| mlx             | 0.32.0.dev20260503+e8ebdebe |
+| mlx             | 0.32.0.dev20260504+e8ebdebe |
 | mlx-lm          | 0.31.3                      |
 | transformers    | 5.7.0                       |
 | tokenizers      | 0.22.2                      |
@@ -93,14 +95,14 @@ Repro bundles:
 
 Observed signals:
 
-- At long prompt length (16901 tokens), output became repetitive.
+- Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt-handling issues.
+- At long prompt length (16901 tokens), output stayed unusually short (11 tokens; ratio 0.1%).
 - Model output may not follow prompt or image contents (missing: classic, style, sailboat, dark, hull).
-- Output became repetitive, indicating possible generation instability (token: phrase: "boat anchor boat anchor...").
 - Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 Sample output:
 
 ```text
-Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat Anchor Boat...
+Boat, boat, boat, boat, boat
 ```
 

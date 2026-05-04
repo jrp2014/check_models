@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-05-03 23:20:30 BST
+FULL ENVIRONMENT DUMP - 2026-05-04 20:00:16 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -22,7 +22,7 @@ cffi==2.0.0
 cfgv==3.5.0
 charset-normalizer==3.4.7
 check_models==0.7.0
-check_models==0.6.0
+check_models==0.7.0
 click==8.3.3
 cmake==4.3.2
 coverage==7.13.5
@@ -68,8 +68,8 @@ mcp==1.27.0
 mdurl==0.1.2
 miniaudio==1.71
 ml_dtypes==0.5.4
-mlx==0.32.0.dev20260503+e8ebdebe
-mlx==0.32.0.dev20260503+e8ebdebe
+mlx==0.32.0.dev20260504+e8ebdebe
+mlx==0.32.0.dev20260504+e8ebdebe
 mlx-audio==0.4.3
 mlx-lm==0.31.3
 mlx-vlm==0.4.5
@@ -148,7 +148,7 @@ tqdm==4.67.3
 transformers==5.7.0
 ty==0.0.34
 typer==0.25.1
-types-defusedxml==0.7.0.20260408
+types-defusedxml==0.7.0.20260504
 types-psutil==7.2.2.20260408
 types-PyYAML==6.0.12.20260408
 types-requests==2.33.0.20260503
@@ -172,5 +172,5 @@ yarl==1.23.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-05-03 23:20:30 BST
+Environment dump completed at 2026-05-04 20:00:16 BST
 ================================================================================

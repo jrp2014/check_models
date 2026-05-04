@@ -1,13 +1,13 @@
-# \[mlx\]\[MLX: Model load / model error\] Weight/config mismatch during model load affecting 1 model(s)
+# \[mlx\]\[MLX: Model load / model error\] Weight/config mismatch during model load affecting 2 model(s)
 
 ## Summary
 
-1 model(s) show **MLX: Model load / model error** that should be filed against mlx.
+2 model(s) show **MLX: Model load / model error** that should be filed against mlx.
 
 - **Observed problem:** Weight/config mismatch during model load
 - **Target:** mlx
 - **Raw owner hint:** `mlx`
-- **Affected models:** 1
+- **Affected models:** 2
 - **Fixed when:** Load/generation completes or fails with a narrower owner.
 - **Issue kind:** `runtime_failure`
 - **Raw cluster:** `mlx_mlx-model-load-model_001` (`MLX_MODEL_LOAD_MODEL`)
@@ -17,11 +17,14 @@
 
 | Model                                     | Representative Signal               | Token Context   | Repro JSON                                                                                                                         |
 |-------------------------------------------|-------------------------------------|-----------------|------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | model error \| mlx model load model | stop=exception  | [repro JSON](../repro_bundles/20260503T224052Z_002_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json) |
+| `LiquidAI/LFM2.5-VL-450M-MLX-bf16`        | model error \| mlx model load model | stop=exception  | [repro JSON](../repro_bundles/20260504T192124Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_MLX_MODEL_LOAD_MODEL_853049863f38.json)        |
+| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | model error \| mlx model load model | stop=exception  | [repro JSON](../repro_bundles/20260504T192124Z_003_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json) |
 
 
 ## Minimal Evidence
 
+- `LiquidAI/LFM2.5-VL-450M-MLX-bf16` fails with: Model loading failed: Received 2 parameters not in model:
+- Root exception: `builtins.ValueError`: Received 2 parameters not in model: <br>multi_modal_projector.layer_norm.bias,<br>multi_modal_projector.layer_norm.weight.
 - `mlx-community/Kimi-VL-A3B-Thinking-8bit` fails with: Model loading failed: Received 4 parameters not in model:
 - Root exception: `builtins.ValueError`: Received 4 parameters not in model: <br>multi_modal_projector.linear_1.biases,<br>multi_modal_projector.linear_1.scales,<br>multi_modal_projector.linear_2.biases,<br>multi_modal_projector.l...
 
@@ -31,13 +34,21 @@
 Cluster rerun:
 
 ```bash
-python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Kimi-VL-A3B-Thinking-8bit
+python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models LiquidAI/LFM2.5-VL-450M-MLX-bf16 mlx-community/Kimi-VL-A3B-Thinking-8bit
 ```
 
 Repro bundles:
 
-- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: [repro JSON](../repro_bundles/20260503T224052Z_002_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)
+- `LiquidAI/LFM2.5-VL-450M-MLX-bf16`: [repro JSON](../repro_bundles/20260504T192124Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_MLX_MODEL_LOAD_MODEL_853049863f38.json)
+- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: [repro JSON](../repro_bundles/20260504T192124Z_003_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)
 - Note: these are local artifact links; attach or publish the JSON when filing upstream.
+
+Per-model failure reruns:
+
+```bash
+python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models LiquidAI/LFM2.5-VL-450M-MLX-bf16
+python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Kimi-VL-A3B-Thinking-8bit
+```
 
 
 ## Expected Fix Signal
@@ -72,7 +83,7 @@ Repro bundles:
 | Component       | Version                     |
 |-----------------|-----------------------------|
 | mlx-vlm         | 0.4.5                       |
-| mlx             | 0.32.0.dev20260503+e8ebdebe |
+| mlx             | 0.32.0.dev20260504+e8ebdebe |
 | mlx-lm          | 0.31.3                      |
 | transformers    | 5.7.0                       |
 | tokenizers      | 0.22.2                      |
@@ -87,6 +98,35 @@ Repro bundles:
 
 
 ## Appendix: Detailed Evidence
+
+### `LiquidAI/LFM2.5-VL-450M-MLX-bf16`
+
+Observed error:
+
+```text
+Model loading failed: Received 2 parameters not in model: 
+multi_modal_projector.layer_norm.bias,
+multi_modal_projector.layer_norm.weight.
+```
+
+Root exception:
+
+```text
+builtins.ValueError: Received 2 parameters not in model: 
+multi_modal_projector.layer_norm.bias,
+multi_modal_projector.layer_norm.weight.
+```
+
+Traceback tail:
+
+```text
+multi_modal_projector.layer_norm.weight.
+The above exception was the direct cause of the following exception:
+Traceback (most recent call last):
+ValueError: Model loading failed: Received 2 parameters not in model: 
+multi_modal_projector.layer_norm.bias,
+multi_modal_projector.layer_norm.weight.
+```
 
 ### `mlx-community/Kimi-VL-A3B-Thinking-8bit`
 
