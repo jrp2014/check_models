@@ -2754,7 +2754,7 @@ class TestGithubIssueReportContent:
 
         assert len(generated) == 1
         content = next(iter(generated.values())).read_text(encoding="utf-8")
-        assert content.startswith("# \\[mlx-vlm\\]\\[MLX-VLM-DECODE-RUNTIME\\]")
+        assert content.startswith("# \\[mlx-vlm\\]\\[MLX VLM decode runtime\\]")
         assert "## Summary" in content
         assert "## Affected Models" in content
         assert "## Minimal Evidence" in content
@@ -2768,6 +2768,7 @@ class TestGithubIssueReportContent:
         assert "runtime_failure" in content
         assert "Traceback (most recent call last)" in content
         assert "[repro JSON](../repro_bundles/broken.json)" in content
+        assert "attach or publish the JSON when filing upstream" in content
         assert "Python Version" in content
         assert "Priority" not in content
 
@@ -2792,8 +2793,10 @@ class TestGithubIssueReportContent:
         )
 
         content = next(iter(generated.values())).read_text(encoding="utf-8")
-        assert content.startswith("# \\[mlx-vlm / mlx\\]\\[long-context\\]")
+        assert content.startswith("# \\[mlx-vlm / mlx\\]\\[Long-context collapse\\]")
         assert "## Likely Root Cause" in content
+        assert "mlx-vlm first; MLX if cache/runtime reproduces" in content
+        assert "`mlx-vlm / mlx`" in content
         assert "At long prompt length (5000 tokens), generation returned empty output." in content
         assert "context_budget" in content
         assert "long_context" in content
@@ -2840,7 +2843,7 @@ class TestGithubIssueReportContent:
         assert "org/stop-a" in content
         assert "org/stop-b" in content
         assert "`mlx-vlm_stop-token_001`" in content
-        assert "&lt;|end|&gt;" in content
+        assert "&lt;\\|end\\|&gt;" in content
         assert "&lt;/think&gt;" in content
 
     def test_unrelated_harness_subtypes_produce_separate_issues(self, tmp_path: Path) -> None:
@@ -2877,8 +2880,8 @@ class TestGithubIssueReportContent:
 
         assert len(generated) == 2
         index = (tmp_path / "issues" / "index.md").read_text(encoding="utf-8")
-        assert "Stop-token leakage" in index
-        assert "Tokenizer / decoding artifact" in index
+        assert "Stop/control tokens leaked into generated text" in index
+        assert "Tokenizer decode leaked BPE/byte markers" in index
         assert "Issue Draft" in index
         assert "Fixed When" in index
         assert "Priority" not in index
@@ -2915,6 +2918,90 @@ class TestGithubIssueReportContent:
         assert "MLX: Model load / model error" in index
         assert "RuntimeError: shape mismatch" in index
         assert "Priority" not in index
+
+    def test_issue_queue_summarizes_unsupported_model_failures(self, tmp_path: Path) -> None:
+        """Unsupported model-type failures should produce filing-ready wording/actions."""
+        failed_result = PerformanceResult(
+            model_name="org/granite-vlm",
+            generation=None,
+            success=False,
+            error_message=(
+                "Model loading failed: Model type granite not supported. "
+                "Error: No module named 'mlx_vlm.specifics'"
+            ),
+            root_error_message=(
+                "Model type granite not supported. Error: No module named 'mlx_vlm.specifics'"
+            ),
+            error_stage="Model Error",
+            error_code="MLX_VLM_MODEL_LOAD_MODEL",
+            error_package="mlx-vlm",
+            error_signature="MLX_VLM_MODEL_LOAD_MODEL:abc123",
+            error_traceback="Traceback (most recent call last):\nModuleNotFoundError: no module",
+            total_time=0.5,
+        )
+        snapshot = DiagnosticsSnapshot(
+            failed=(failed_result,),
+            failure_clusters=(("MLX_VLM_MODEL_LOAD_MODEL:abc123", (failed_result,)),),
+        )
+
+        generated = _generate_github_issue_reports(
+            diagnostics_snapshot=snapshot,
+            output_dir=tmp_path,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            repro_bundles={},
+            run_args=None,
+        )
+
+        index = (tmp_path / "issues" / "index.md").read_text(encoding="utf-8")
+        content = next(iter(generated.values())).read_text(encoding="utf-8")
+        normalized_content = " ".join(content.split())
+        assert "Unsupported Granite model type/import path" in index
+        assert "No module named" not in index
+        assert "model-type registration/import handling for Granite" in normalized_content
+        assert "model-type registry" in content
+        assert "Inspect prompt-template, stop-token" not in content
+
+    def test_issue_queue_summarizes_weight_mismatch_failures(self, tmp_path: Path) -> None:
+        """Weight/config mismatches should point maintainers at keys and loader compatibility."""
+        failed_result = PerformanceResult(
+            model_name="org/mismatch-vlm",
+            generation=None,
+            success=False,
+            error_message=(
+                "Model loading failed: received the following parameters not in model: "
+                "vision_model.merger.mlp.0.scale"
+            ),
+            root_error_message=(
+                "received the following parameters not in model: vision_model.merger.mlp.0.scale"
+            ),
+            error_stage="Weight Mismatch",
+            error_code="MLX_MODEL_LOAD_WEIGHT_MISMATCH",
+            error_package="mlx",
+            error_signature="MLX_MODEL_LOAD_WEIGHT_MISMATCH:abc123",
+            error_traceback="Traceback (most recent call last):\nValueError: missing parameters",
+            total_time=0.5,
+        )
+        snapshot = DiagnosticsSnapshot(
+            failed=(failed_result,),
+            failure_clusters=(("MLX_MODEL_LOAD_WEIGHT_MISMATCH:abc123", (failed_result,)),),
+        )
+
+        generated = _generate_github_issue_reports(
+            diagnostics_snapshot=snapshot,
+            output_dir=tmp_path,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            repro_bundles={},
+            run_args=None,
+        )
+
+        index = (tmp_path / "issues" / "index.md").read_text(encoding="utf-8")
+        content = next(iter(generated.values())).read_text(encoding="utf-8")
+        assert "Weight/config mismatch during model load" in index
+        assert "checkpoint keys" in content
+        assert "scale, bias" in content
+        assert "KV/cache behavior" not in content
 
     def test_stack_signal_anomaly_produces_issue_draft(self, tmp_path: Path) -> None:
         """Successful-run stack anomalies should also produce clustered issue drafts."""

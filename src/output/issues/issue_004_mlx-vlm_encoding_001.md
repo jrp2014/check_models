@@ -1,11 +1,12 @@
-# \[mlx-vlm\]\[encoding\] Tokenizer space-marker artifacts (for example  ) appeared in output (about 61 occurrences) affecting 1 model(s)
+# \[mlx-vlm\]\[Tokenizer / decoding artifact\] Tokenizer decode leaked BPE/byte markers affecting 1 model(s)
 
 ## Summary
 
-1 model(s) show **Tokenizer / decoding artifact** that appears to belong with `mlx-vlm`.
+1 model(s) show **Tokenizer / decoding artifact** that should be filed against mlx-vlm.
 
-- **Observed problem:** Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 61 occurrences).
-- **Target:** `mlx-vlm`
+- **Observed problem:** Tokenizer decode leaked BPE/byte markers
+- **Target:** mlx-vlm
+- **Raw owner hint:** `mlx-vlm`
 - **Affected models:** 1
 - **Fixed when:** No BPE/byte markers in output.
 - **Issue kind:** `harness`
@@ -37,6 +38,7 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 Repro bundles:
 
 - `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: [repro JSON](../repro_bundles/20260503T224052Z_001_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)
+- Note: these are local artifact links; attach or publish the JSON when filing upstream.
 
 
 ## Expected Fix Signal
@@ -54,6 +56,7 @@ Repro bundles:
 
 ## Likely Root Cause
 
+- _Filing target:_ mlx-vlm
 - _Likely owner:_ `mlx-vlm`
 - _Confidence:_ high
 - _Issue kind:_ `harness`
@@ -93,6 +96,7 @@ Observed signals:
 
 - Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 61 occurrences).
 - Output omitted required Title/Description/Keywords sections (description, keywords).
+- Output appears to copy prompt context verbatim (32% overlap).
 
 Sample output:
 

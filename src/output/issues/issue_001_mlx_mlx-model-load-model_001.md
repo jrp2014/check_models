@@ -1,11 +1,12 @@
-# \[mlx\]\[MLX-MODEL-LOAD-MODEL\] Received 4 parameters not in model: affecting 1 model(s)
+# \[mlx\]\[MLX: Model load / model error\] Weight/config mismatch during model load affecting 1 model(s)
 
 ## Summary
 
-1 model(s) show **MLX: Model load / model error** that appears to belong with `mlx`.
+1 model(s) show **MLX: Model load / model error** that should be filed against mlx.
 
-- **Observed problem:** Received 4 parameters not in model:
-- **Target:** `mlx`
+- **Observed problem:** Weight/config mismatch during model load
+- **Target:** mlx
+- **Raw owner hint:** `mlx`
 - **Affected models:** 1
 - **Fixed when:** Load/generation completes or fails with a narrower owner.
 - **Issue kind:** `runtime_failure`
@@ -36,6 +37,7 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 Repro bundles:
 
 - `mlx-community/Kimi-VL-A3B-Thinking-8bit`: [repro JSON](../repro_bundles/20260503T224052Z_002_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)
+- Note: these are local artifact links; attach or publish the JSON when filing upstream.
 
 
 ## Expected Fix Signal
@@ -46,21 +48,23 @@ Repro bundles:
 
 ## Fix Checklist
 
-- [ ] Inspect the exported error package, load phase, and traceback owner.
-- [ ] Check model config, tokenizer files, and weight shape compatibility.
-- [ ] Compare against installed mlx, mlx-vlm, mlx-lm, transformers, and tokenizers versions.
-- [ ] Reproduce with the single affected model before judging output quality.
+- [ ] Compare checkpoint keys with the selected model class and model config.
+- [ ] Inspect missing/unexpected projector, scale, bias, and quantized-weight parameter names.
+- [ ] Verify the model repo revision matches the mlx-vlm/mlx loader expectations.
+- [ ] Reproduce after upgrading/downgrading mlx-vlm and mlx to isolate version compatibility.
 
 
 ## Likely Root Cause
 
+- _Filing target:_ mlx
 - _Likely owner:_ `mlx`
 - _Confidence:_ high
 - _Issue kind:_ `runtime_failure`
 - _Issue subtype:_ `MLX_MODEL_LOAD_MODEL`
 - _Why this classification is credible:_ model error \| mlx model load model
-- _Suggested next action:_ Inspect KV/cache behavior, memory pressure, and
-  long-context execution.
+- _Suggested next action:_ Compare checkpoint keys with the selected model
+  class/config, especially projector scale/bias parameters and quantized
+  weight naming, before judging model quality.
 
 
 ## Appendix: Environment

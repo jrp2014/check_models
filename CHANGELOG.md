@@ -9,6 +9,10 @@ Notable changes to this project will be documented in this file.
 
 - Render issue queue subtypes with human-readable maintainer labels while
   preserving the raw subtype codes for traceability.
+- Make generated issue queues and issue drafts use filing-ready problem
+  summaries, clearer composite-owner targets, runtime-failure-specific fix
+  guidance, and explicit notes that local repro JSON links must be attached or
+  published when filing upstream.
 
 ## [0.7.0] - 2026-05-03
 

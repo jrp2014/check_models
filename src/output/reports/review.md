@@ -1,6 +1,6 @@
 # Automated Review Digest
 
-_Generated on 2026-05-03 23:40:52 BST_
+_Generated on 2026-05-04 18:00:02 BST_
 
 Trusted-hint review uses only prompt title/description/keyword hints for utility comparison. Capture metadata, GPS, timestamps, source labels, and location labels are treated as nonvisual metadata and are not required visual evidence.
 
@@ -47,15 +47,15 @@ User-first summary grouped by recommendation bucket.
 
 ### `caveat`
 
-| Model                                      | Verdict          | Hint Handling           | Key Evidence                                                                                                                                            |
-|--------------------------------------------|------------------|-------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/LFM2-VL-1.6B-8bit`          | `clean`          | preserves trusted hints | missing terms: classic, style, sailboat, dark, hull \| keywords=9 \| context echo=64%                                                                   |
-| `mlx-community/llava-v1.6-mistral-7b-8bit` | `context_budget` | degrades trusted hints  | output/prompt=0.57% \| nontext prompt burden=87% \| missing sections: title, description, keywords \| missing terms: moored, calm, estuary, during, low |
-| `mlx-community/gemma-3-27b-it-qat-4bit`    | `clean`          | improves trusted hints  | missing terms: classic, style, wooden, during, receded \| keywords=19                                                                                   |
-| `mlx-community/Idefics3-8B-Llama3-bf16`    | `clean`          | preserves trusted hints | nontext prompt burden=87% \| context echo=65% \| formatting=Unknown tags: &lt;end_of_utterance&gt;                                                      |
-| `mlx-community/InternVL3-14B-8bit`         | `clean`          | preserves trusted hints | nontext prompt burden=86% \| missing terms: floats, peacefully, waiting, rise, again \| context echo=46%                                                |
-| `mlx-community/pixtral-12b-8bit`           | `clean`          | preserves trusted hints | nontext prompt burden=90% \| context echo=58%                                                                                                           |
-| `mlx-community/pixtral-12b-bf16`           | `clean`          | preserves trusted hints | nontext prompt burden=90% \| context echo=56%                                                                                                           |
+| Model                                      | Verdict          | Hint Handling                                                              | Key Evidence                                                                                                                                            |
+|--------------------------------------------|------------------|----------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/LFM2-VL-1.6B-8bit`          | `clean`          | preserves trusted hints                                                    | missing terms: classic, style, sailboat, dark, hull \| keywords=9 \| context echo=90%                                                                   |
+| `mlx-community/llava-v1.6-mistral-7b-8bit` | `context_budget` | ignores trusted hints \| missing terms: moored, calm, estuary, during, low | output/prompt=0.57% \| nontext prompt burden=87% \| missing sections: title, description, keywords \| missing terms: moored, calm, estuary, during, low |
+| `mlx-community/gemma-3-27b-it-qat-4bit`    | `clean`          | improves trusted hints                                                     | missing terms: classic, style, wooden, during, receded \| keywords=19                                                                                   |
+| `mlx-community/Idefics3-8B-Llama3-bf16`    | `clean`          | preserves trusted hints                                                    | nontext prompt burden=87% \| context echo=90% \| formatting=Unknown tags: &lt;end_of_utterance&gt;                                                      |
+| `mlx-community/InternVL3-14B-8bit`         | `clean`          | preserves trusted hints                                                    | nontext prompt burden=86% \| missing terms: floats, peacefully, waiting, rise, again \| context echo=46%                                                |
+| `mlx-community/pixtral-12b-8bit`           | `clean`          | preserves trusted hints                                                    | nontext prompt burden=90% \| context echo=90%                                                                                                           |
+| `mlx-community/pixtral-12b-bf16`           | `clean`          | preserves trusted hints                                                    | nontext prompt burden=90% \| context echo=90%                                                                                                           |
 
 ### `needs_triage`
 
@@ -77,8 +77,8 @@ User-first summary grouped by recommendation bucket.
 | `mlx-community/paligemma2-10b-ft-docci-448-6bit`        | `model_shortcoming` | ignores trusted hints \| missing terms: classic, style, sailboat, dark, hull                              | nontext prompt burden=71% \| missing sections: title, description, keywords \| missing terms: classic, style, sailboat, dark, hull                                                                                          |
 | `mlx-community/LFM2.5-VL-1.6B-bf16`                     | `cutoff_degraded`   | preserves trusted hints                                                                                   | hit token cap (500) \| missing sections: description, keywords \| missing terms: style, during, receded, exposing, vast \| repetitive token=phrase: "mudflats, flags, boat, water,..."                                      |
 | `mlx-community/gemma-3n-E2B-4bit`                       | `cutoff_degraded`   | ignores trusted hints \| missing terms: classic, style, sailboat, dark, hull \| nonvisual metadata reused | hit token cap (500) \| missing sections: title, description, keywords \| missing terms: classic, style, sailboat, dark, hull \| nonvisual metadata reused                                                                   |
-| `meta-llama/Llama-3.2-11B-Vision-Instruct`              | `model_shortcoming` | degrades trusted hints                                                                                    | missing sections: title, description, keywords \| missing terms: classic, style, dark, hull, wooden                                                                                                                         |
-| `mlx-community/gemma-3n-E4B-it-bf16`                    | `model_shortcoming` | improves trusted hints                                                                                    | missing sections: title, description, keywords                                                                                                                                                                              |
+| `meta-llama/Llama-3.2-11B-Vision-Instruct`              | `model_shortcoming` | ignores trusted hints \| missing terms: classic, style, dark, hull, wooden                                | missing sections: title, description, keywords \| missing terms: classic, style, dark, hull, wooden                                                                                                                         |
+| `mlx-community/gemma-3n-E4B-it-bf16`                    | `model_shortcoming` | improves trusted hints                                                                                    | missing sections: title, description, keywords \| context echo=28%                                                                                                                                                          |
 | `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      | `model_shortcoming` | preserves trusted hints                                                                                   | missing sections: title, description, keywords \| missing terms: style \| context echo=96%                                                                                                                                  |
 | `mlx-community/paligemma2-10b-ft-docci-448-bf16`        | `model_shortcoming` | ignores trusted hints \| missing terms: classic, style, sailboat, dark, hull                              | nontext prompt burden=71% \| missing sections: title, description, keywords \| missing terms: classic, style, sailboat, dark, hull                                                                                          |
 | `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | `harness`           | preserves trusted hints                                                                                   | Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 61 occurrences). \| nontext prompt burden=88% \| missing sections: description, keywords \| missing terms: vast, expanse, adorned, small, floats |
@@ -108,13 +108,13 @@ User-first summary grouped by recommendation bucket.
 
 Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md).
 
-| Target                           | Problem                                                                                                                | Affected Models                                            | Issue Draft                                                                                                    | Evidence Bundle   | Fixed When                                                |
-|----------------------------------|------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|-------------------|-----------------------------------------------------------|
-| `mlx`                            | MLX: Model load / model error: Received 4 parameters not in model:                                                     | 1: `mlx-community/Kimi-VL-A3B-Thinking-8bit`               | [issue draft](../issues/issue_001_mlx_mlx-model-load-model_001.md)                                             | -                 | Load/generation completes or fails with a narrower owner. |
-| `mlx-vlm`                        | mlx-vlm: Model load / model error: Model type granite not supported. Error: No module named 'mlx_vlm.spe               | 1: `mlx-community/granite-4.1-8b-mxfp8`                    | [issue draft](../issues/issue_002_mlx-vlm_mlx-vlm-model-load-model_001.md)                                     | -                 | Load/generation completes or fails with a narrower owner. |
-| `model configuration/repository` | Model config: Processor load / processor error: Loaded processor has no image_processor; expected multimodal processor | 1: `mlx-community/MolmoPoint-8B-fp16`                      | [issue draft](../issues/issue_003_model-configuration-repository_model-config-processor-load-processor_001.md) | -                 | Load/generation completes or fails with a narrower owner. |
-| `mlx-vlm`                        | Tokenizer / decoding artifact: Tokenizer space-marker artifacts (for example ) appeared in output (                    | 1: `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | [issue draft](../issues/issue_004_mlx-vlm_encoding_001.md)                                                     | -                 | No BPE/byte markers in output.                            |
-| `mlx-vlm / mlx`                  | Long-context collapse: At long prompt length (16901 tokens), output became repetitive                                  | 1: `mlx-community/Qwen2-VL-2B-Instruct-4bit`               | [issue draft](../issues/issue_005_mlx-vlm-mlx_long-context_001.md)                                             | -                 | Full and reduced reruns avoid context collapse.           |
+| Target                                         | Problem                                               | Affected Models                                            | Issue Draft                                                                                                    | Evidence Bundle   | Fixed When                                                |
+|------------------------------------------------|-------------------------------------------------------|------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|-------------------|-----------------------------------------------------------|
+| `mlx`                                          | Weight/config mismatch during model load              | 1: `mlx-community/Kimi-VL-A3B-Thinking-8bit`               | [issue draft](../issues/issue_001_mlx_mlx-model-load-model_001.md)                                             | -                 | Load/generation completes or fails with a narrower owner. |
+| `mlx-vlm`                                      | Unsupported Granite model type/import path            | 1: `mlx-community/granite-4.1-8b-mxfp8`                    | [issue draft](../issues/issue_002_mlx-vlm_mlx-vlm-model-load-model_001.md)                                     | -                 | Load/generation completes or fails with a narrower owner. |
+| model configuration / repository               | Processor config is missing image processor           | 1: `mlx-community/MolmoPoint-8B-fp16`                      | [issue draft](../issues/issue_003_model-configuration-repository_model-config-processor-load-processor_001.md) | -                 | Load/generation completes or fails with a narrower owner. |
+| `mlx-vlm`                                      | Tokenizer decode leaked BPE/byte markers              | 1: `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | [issue draft](../issues/issue_004_mlx-vlm_encoding_001.md)                                                     | -                 | No BPE/byte markers in output.                            |
+| mlx-vlm first; MLX if cache/runtime reproduces | Long-context generation collapsed or became too short | 1: `mlx-community/Qwen2-VL-2B-Instruct-4bit`               | [issue draft](../issues/issue_005_mlx-vlm-mlx_long-context_001.md)                                             | -                 | Full and reduced reruns avoid context collapse.           |
 
 ## Model Verdicts
 
@@ -123,8 +123,9 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
 - _Recommendation:_ avoid for now; review verdict: runtime failure
 - _Owner:_ likely owner `mlx`; reported package `mlx`; failure stage `Model
   Error`; diagnostic code `MLX_MODEL_LOAD_MODEL`
-- _Next step:_ Inspect KV/cache behavior, memory pressure, and long-context
-  execution.
+- _Next step:_ Compare checkpoint keys with the selected model class/config,
+  especially projector scale/bias parameters and quantized weight naming,
+  before judging model quality.
 - _Key signals:_ model error; mlx model load model
 - _Tokens:_ prompt n/a; estimated text n/a; estimated non-text n/a; generated
   n/a; requested max 500 tok; stop reason exception
@@ -136,7 +137,9 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
 - _Owner:_ likely owner `model-config`; reported package `model-config`;
   failure stage `Processor Error`; diagnostic code
   `MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR`
-- _Next step:_ Inspect model repo config, chat template, and EOS settings.
+- _Next step:_ Inspect the model repo processor/preprocessor config and
+  AutoProcessor mapping; the multimodal processor is missing or not exposing
+  the image processor expected by mlx-vlm.
 - _Key signals:_ processor error; model config processor load processor
 - _Tokens:_ prompt n/a; estimated text n/a; estimated non-text n/a; generated
   n/a; requested max 500 tok; stop reason exception
@@ -147,8 +150,9 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
 - _Recommendation:_ avoid for now; review verdict: runtime failure
 - _Owner:_ likely owner `mlx-vlm`; reported package `mlx-vlm`; failure stage
   `Model Error`; diagnostic code `MLX_VLM_MODEL_LOAD_MODEL`
-- _Next step:_ Inspect prompt-template, stop-token, and decode post-processing
-  behavior.
+- _Next step:_ Check mlx-vlm model-type registration/import handling for
+  Granite; confirm the loader either supports this architecture or fails
+  before generation with a clear unsupported-model message.
 - _Key signals:_ model error; mlx vlm model load model
 - _Tokens:_ prompt n/a; estimated text n/a; estimated non-text n/a; generated
   n/a; requested max 500 tok; stop reason exception
@@ -172,7 +176,7 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
 - _Next step:_ Treat as a model limitation for this prompt; trusted hint
   coverage is still weak.
 - _Key signals:_ missing terms: classic, style, sailboat, dark, hull;
-  keywords=9; context echo=64%
+  keywords=9; context echo=90%
 - _Tokens:_ prompt 767 tok; estimated text 444 tok; estimated non-text 323
   tok; generated 110 tok; requested max 500 tok; stop reason completed
 
@@ -373,7 +377,7 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
 - _Recommendation:_ use with caveats; review verdict: clean
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ nontext prompt burden=87%; context echo=65%;
+- _Key signals:_ nontext prompt burden=87%; context echo=90%;
   formatting=Unknown tags: &lt;end_of_utterance&gt;
 - _Tokens:_ prompt 3507 tok; estimated text 444 tok; estimated non-text 3063
   tok; generated 117 tok; requested max 500 tok; stop reason completed
@@ -397,7 +401,8 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model limitation for this prompt; the requested
   output contract is not being met.
-- _Key signals:_ missing sections: title, description, keywords
+- _Key signals:_ missing sections: title, description, keywords; context
+  echo=28%
 - _Tokens:_ prompt 782 tok; estimated text 444 tok; estimated non-text 338
   tok; generated 266 tok; requested max 500 tok; stop reason completed
 
@@ -419,7 +424,7 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
 - _Recommendation:_ use with caveats; review verdict: clean
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ nontext prompt burden=90%; context echo=58%
+- _Key signals:_ nontext prompt burden=90%; context echo=90%
 - _Tokens:_ prompt 4662 tok; estimated text 444 tok; estimated non-text 4218
   tok; generated 135 tok; requested max 500 tok; stop reason completed
 
@@ -513,7 +518,7 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
 - _Recommendation:_ use with caveats; review verdict: clean
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ nontext prompt burden=90%; context echo=56%
+- _Key signals:_ nontext prompt burden=90%; context echo=90%
 - _Tokens:_ prompt 4662 tok; estimated text 444 tok; estimated non-text 4218
   tok; generated 138 tok; requested max 500 tok; stop reason completed
 

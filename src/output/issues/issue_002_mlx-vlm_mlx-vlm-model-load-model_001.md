@@ -1,11 +1,12 @@
-# \[mlx-vlm\]\[MLX-VLM-MODEL-LOAD-MODEL\] Model type granite not supported. Error: No module named 'mlx_vlm.speculative.drafters.granite' affecting 1 model(s)
+# \[mlx-vlm\]\[mlx-vlm: Model load / model error\] Unsupported Granite model type/import path affecting 1 model(s)
 
 ## Summary
 
-1 model(s) show **mlx-vlm: Model load / model error** that appears to belong with `mlx-vlm`.
+1 model(s) show **mlx-vlm: Model load / model error** that should be filed against mlx-vlm.
 
-- **Observed problem:** Model type granite not supported. Error: No module named 'mlx_vlm.speculative.drafters.granite'
-- **Target:** `mlx-vlm`
+- **Observed problem:** Unsupported Granite model type/import path
+- **Target:** mlx-vlm
+- **Raw owner hint:** `mlx-vlm`
 - **Affected models:** 1
 - **Fixed when:** Load/generation completes or fails with a narrower owner.
 - **Issue kind:** `runtime_failure`
@@ -36,6 +37,7 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 Repro bundles:
 
 - `mlx-community/granite-4.1-8b-mxfp8`: [repro JSON](../repro_bundles/20260503T224052Z_005_mlx-community_granite-4.1-8b-mxfp8_MLX_VLM_MODEL_LOAD_MODEL_5af3e849109f.json)
+- Note: these are local artifact links; attach or publish the JSON when filing upstream.
 
 
 ## Expected Fix Signal
@@ -46,22 +48,24 @@ Repro bundles:
 
 ## Fix Checklist
 
-- [ ] Inspect the exported error package, load phase, and traceback owner.
-- [ ] Check model config, tokenizer files, and weight shape compatibility.
-- [ ] Compare against installed mlx, mlx-vlm, mlx-lm, transformers, and tokenizers versions.
-- [ ] Reproduce with the single affected model before judging output quality.
+- [ ] Inspect mlx-vlm model-type registry and architecture import path for Granite.
+- [ ] Confirm whether this model type should be supported by the installed mlx-vlm version.
+- [ ] If unsupported, fail before generation with a clear architecture-specific message.
+- [ ] If supported, add a focused load/regression check for this model family.
 
 
 ## Likely Root Cause
 
+- _Filing target:_ mlx-vlm
 - _Likely owner:_ `mlx-vlm`
 - _Confidence:_ high
 - _Issue kind:_ `runtime_failure`
 - _Issue subtype:_ `MLX_VLM_MODEL_LOAD_MODEL`
 - _Why this classification is credible:_ model error \| mlx vlm model load
   model
-- _Suggested next action:_ Inspect prompt-template, stop-token, and decode
-  post-processing behavior.
+- _Suggested next action:_ Check mlx-vlm model-type registration/import
+  handling for Granite; confirm the loader either supports this architecture
+  or fails before generation with a clear unsupported-model message.
 
 
 ## Appendix: Environment

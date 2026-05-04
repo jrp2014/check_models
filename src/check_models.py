@@ -4253,12 +4253,23 @@ def _detect_token_encoding_issues(text: str) -> tuple[bool, str | None]:
 def _sanitize_bpe_display(text: str, *, max_len: int = 120) -> str:
     """Replace BPE marker characters with readable equivalents for display.
 
-    Ġ (U+0120) → space, Ċ (U+010A) → newline placeholder.  The result is
-    truncated to *max_len* so it fits in issue titles and log lines.
+    The result is truncated to *max_len* so it fits in issue titles and log
+    lines, while keeping marker leaks visible instead of rendering as blank
+    spaces.
     """
+    marker_labels: list[str] = []
+    if "\u0120" in text:
+        marker_labels.append("BPE-space-marker")
+    if "\u010a" in text:
+        marker_labels.append("BPE-newline-marker")
+
     cleaned = text.replace("\u0120", " ").replace("\u010a", "\\n")
     for artifact, _name in BPE_BYTE_ARTIFACTS:
-        cleaned = cleaned.replace(artifact, "?")
+        if artifact in cleaned:
+            marker_labels.append("BPE-byte-marker")
+            cleaned = cleaned.replace(artifact, "?")
+    if marker_labels:
+        cleaned = f"{cleaned} [markers: {', '.join(_dedupe_preserve_order(marker_labels))}]"
     if len(cleaned) > max_len:
         cleaned = cleaned[: max_len - 3].rstrip() + "..."
     return cleaned
@@ -9355,11 +9366,124 @@ def _review_confidence(
     return "low"
 
 
-def _review_maintainer_next_action(review: JsonlReviewRecord) -> str:
+def _failure_context_text(result: PerformanceResult) -> str:
+    """Return combined failure text for issue/routing heuristics."""
+    return " ".join(
+        part
+        for part in (
+            result.root_error_message,
+            result.error_message,
+            result.error_stage,
+            result.error_code,
+            result.error_traceback,
+            result.captured_output_on_fail,
+        )
+        if part
+    )
+
+
+_RUNTIME_FAILURE_PROBLEM_LABELS: Final[dict[str, str]] = {
+    "unsupported_granite": "Unsupported Granite model type/import path",
+    "weight_config_mismatch": "Weight/config mismatch during model load",
+    "missing_image_processor": "Processor config is missing image processor",
+    "missing_chat_template": "Missing chat template in model/tokenizer config",
+    "api_mismatch": "Upstream API mismatch in processor/generation call",
+    "missing_module": "Missing module/import during model load",
+}
+
+_RUNTIME_FAILURE_NEXT_ACTIONS: Final[dict[str, str]] = {
+    "unsupported_granite": (
+        "Check mlx-vlm model-type registration/import handling for Granite; confirm the "
+        "loader either supports this architecture or fails before generation with a clear "
+        "unsupported-model message."
+    ),
+    "weight_config_mismatch": (
+        "Compare checkpoint keys with the selected model class/config, especially projector "
+        "scale/bias parameters and quantized weight naming, before judging model quality."
+    ),
+    "missing_image_processor": (
+        "Inspect the model repo processor/preprocessor config and AutoProcessor mapping; "
+        "the multimodal processor is missing or not exposing the image processor expected "
+        "by mlx-vlm."
+    ),
+    "missing_chat_template": (
+        "Inspect tokenizer chat_template and EOS defaults in the model repo before changing "
+        "generation logic."
+    ),
+    "api_mismatch": (
+        "Check installed transformers/mlx-vlm API compatibility and forwarded processor or "
+        "generation kwargs."
+    ),
+    "missing_module": (
+        "Inspect the import path and installed package version that owns the missing module "
+        "before treating this as a model failure."
+    ),
+}
+
+
+def _runtime_failure_diagnostic_kind(result: PerformanceResult | None) -> str | None:
+    """Return a compact runtime-failure kind from structured root-cause fields."""
+    kind: str | None = None
+    if result is None:
+        return kind
+
+    failure_text = _failure_context_text(result)
+    normalized = failure_text.casefold()
+    error_code = (result.error_code or "").upper()
+    error_stage = (result.error_stage or "").casefold()
+
+    if "granite" in normalized and "not supported" in normalized:
+        kind = "unsupported_granite"
+    elif (
+        "WEIGHT_MISMATCH" in error_code
+        or "weight mismatch" in error_stage
+        or "parameters not in model" in normalized
+        or ("missing" in normalized and "parameters" in normalized)
+        or ("received" in normalized and "parameters" in normalized)
+    ):
+        kind = "weight_config_mismatch"
+    elif (
+        "image_processor" in normalized
+        or "image processor" in normalized
+        or "PROCESSOR" in error_code
+        or "processor" in error_stage
+    ):
+        kind = "missing_image_processor"
+    elif "chat_template is not set" in normalized or "no template argument" in normalized:
+        kind = "missing_chat_template"
+    elif "unexpected keyword argument" in normalized or "got an unexpected keyword" in normalized:
+        kind = "api_mismatch"
+    elif "no module named" in normalized:
+        kind = "missing_module"
+    return kind
+
+
+def _review_runtime_failure_next_action(result: PerformanceResult) -> str | None:
+    """Return failure-specific maintainer guidance from structured root-cause fields."""
+    kind = _runtime_failure_diagnostic_kind(result)
+    return _RUNTIME_FAILURE_NEXT_ACTIONS.get(kind or "")
+
+
+def _review_next_action_for_result(
+    result: PerformanceResult,
+    review: JsonlReviewRecord,
+) -> str:
+    """Return one actionable next-step line, using result details when available."""
+    if review["verdict"] == "runtime_failure" and (
+        action := _review_runtime_failure_next_action(result)
+    ):
+        return action
+    return _review_next_action_text(review)
+
+
+def _review_maintainer_next_action(
+    result: PerformanceResult,
+    review: JsonlReviewRecord,
+) -> str:
     """Return a maintainer-facing next action, avoiding noisy advice for clean rows."""
     if review["verdict"] == "clean" and review["user_bucket"] == "recommended":
         return "No immediate maintainer action."
-    return _review_next_action_text(review)
+    return _review_next_action_for_result(result, review)
 
 
 def _build_jsonl_maintainer_triage_record(
@@ -9375,7 +9499,7 @@ def _build_jsonl_maintainer_triage_record(
         "confidence": _review_confidence(result, review, analysis),
         "issue_kind": review["verdict"],
         "summary": _review_focus_text(review, analysis),
-        "next_action": _review_maintainer_next_action(review),
+        "next_action": _review_maintainer_next_action(result, review),
         "user_bucket": review["user_bucket"],
         "evidence": list(review["evidence"]),
         "harness_details": list(review["harness_details"]),
@@ -9786,7 +9910,7 @@ def _build_review_payload(result: PerformanceResult) -> ReviewPayload | None:
         review=review,
         analysis=analysis,
         key_signals=_review_focus_text(review, analysis),
-        next_action=_review_next_action_text(review),
+        next_action=_review_next_action_for_result(result, review),
     )
 
 
@@ -12486,6 +12610,14 @@ _ISSUE_SUBTYPE_TOKEN_LABELS: Final[dict[str, str]] = {
     "vlm": "VLM",
 }
 
+_ISSUE_FILING_TARGET_LABELS: Final[dict[str, str]] = {
+    "model-config / mlx-vlm": "model repo first; mlx-vlm if template handling disagrees",
+    "model configuration/repository": "model repository",
+    "mlx-vlm / mlx": "mlx-vlm first; MLX if cache/runtime reproduces",
+    "mlx-vlm / mlx-lm": "mlx-vlm first; mlx-lm if shared generation reproduces",
+    "transformers / mlx-vlm": "transformers first; mlx-vlm integration check",
+}
+
 
 def _humanize_issue_subtype_token(value: str) -> str:
     """Return a readable label for an issue-subtype token or slug."""
@@ -12562,19 +12694,71 @@ def _issue_subtype_display_label(issue_subtype: str) -> str:
     return _humanize_issue_subtype_token(issue_subtype)
 
 
+def _issue_filing_target_label(owner: str) -> str:
+    """Return the practical filing target shown in maintainer-facing queues."""
+    normalized = " / ".join(part.strip() for part in owner.split("/") if part.strip())
+    return _ISSUE_FILING_TARGET_LABELS.get(normalized, normalized or "unknown component")
+
+
+def _issue_queue_target_cell(
+    cluster: IssueCluster,
+    *,
+    escape_text: Callable[[str], str],
+) -> str:
+    """Render the queue target without forcing composite ownership into a raw code."""
+    target = _issue_filing_target_label(cluster.owner)
+    if target == cluster.owner:
+        return f"`{escape_text(target)}`"
+    return escape_text(target)
+
+
+def _runtime_failure_problem_summary(result: PerformanceResult | None) -> str | None:
+    """Return a concise problem label for a hard failure when evidence is specific."""
+    kind = _runtime_failure_diagnostic_kind(result)
+    return _RUNTIME_FAILURE_PROBLEM_LABELS.get(kind or "")
+
+
+def _issue_problem_summary(cluster: IssueCluster) -> str:
+    """Return the filing-facing problem summary for an issue cluster."""
+    representative = _issue_cluster_representative(cluster)
+    summary: str | None = None
+    if cluster.issue_kind == "runtime_failure" and (
+        runtime_summary := _runtime_failure_problem_summary(representative)
+    ):
+        summary = runtime_summary
+
+    subtype = cluster.issue_subtype.casefold()
+    if summary is None:
+        subtype_summaries = {
+            "encoding": "Tokenizer decode leaked BPE/byte markers",
+            "stop_token": "Stop/control tokens leaked into generated text",
+            "prompt_template": "Prompt/template output shape mismatch",
+            "empty_output": "Generation returned empty output",
+        }
+        summary = subtype_summaries.get(subtype)
+    if summary is None and subtype in {"long_context", "context_budget", "token_cap"}:
+        summary = "Long-context generation collapsed or became too short"
+    if summary is None:
+        label = _issue_subtype_display_label(cluster.issue_subtype)
+        symptom = _sanitize_bpe_display(cluster.symptom, max_len=92).strip().rstrip(".")
+        if (
+            not symptom
+            or symptom.casefold() == label.casefold()
+            or symptom.casefold() in label.casefold()
+        ):
+            summary = label
+        else:
+            summary = f"{label}: {symptom}"
+    return summary
+
+
 def _issue_queue_problem_cell(
     cluster: IssueCluster,
     *,
     escape_text: Callable[[str], str],
 ) -> str:
     """Render the queue problem as prose, not an internal subtype code."""
-    label = _issue_subtype_display_label(cluster.issue_subtype)
-    symptom = _sanitize_bpe_display(cluster.symptom, max_len=72).strip().rstrip(".")
-    if not symptom:
-        return escape_text(label)
-    if symptom.casefold() == label.casefold() or symptom.casefold() in label.casefold():
-        return escape_text(label)
-    return f"{escape_text(label)}: {escape_text(symptom)}"
+    return escape_text(_issue_problem_summary(cluster))
 
 
 def _issue_queue_affected_cell(
@@ -12637,7 +12821,7 @@ def _render_issue_queue_table(
     """Render the shared issue-queue table used across Markdown artifacts."""
     rows = [
         (
-            f"`{escape_text(cluster.owner)}`",
+            _issue_queue_target_cell(cluster, escape_text=escape_text),
             _issue_queue_problem_cell(cluster, escape_text=escape_text),
             _issue_queue_affected_cell(cluster, escape_text=escape_text),
             issue_link_for_cluster(cluster),
@@ -12713,7 +12897,8 @@ def _diagnostics_upstream_filing_notes_section(snapshot: DiagnosticsSnapshot) ->
     )
     parts.append(
         "- **Supporting files:** `repro JSON` links point to local repro bundles with prompt, "
-        "environment, and generated-output context.",
+        "environment, and generated-output context. Attach or publish those JSON files when "
+        "filing upstream; GitHub will not resolve local artifact paths from a pasted issue body.",
     )
     parts.append("")
     return parts
@@ -20928,19 +21113,14 @@ def _log_history_comparison(
         )
 
 
-def _issue_subtype_label(issue_subtype: str) -> str:
-    """Return a compact subtype label for issue titles."""
-    return issue_subtype.replace("_", "-")
-
-
 def _issue_title(cluster: IssueCluster) -> str:
     """Build the GitHub issue draft title for a cluster."""
-    symptom = _sanitize_bpe_display(cluster.symptom, max_len=96).strip().rstrip(".")
+    symptom = _sanitize_bpe_display(_issue_problem_summary(cluster), max_len=96).strip().rstrip(".")
     if not symptom:
-        symptom = _issue_subtype_label(cluster.issue_subtype)
+        symptom = _issue_subtype_display_label(cluster.issue_subtype)
     owner_label = cluster.owner.replace("[", r"\[").replace("]", r"\]")
     subtype_label = (
-        _issue_subtype_label(cluster.issue_subtype).replace("[", r"\[").replace("]", r"\]")
+        _issue_subtype_display_label(cluster.issue_subtype).replace("[", r"\[").replace("]", r"\]")
     )
     return (
         f"\\[{owner_label}\\]\\[{subtype_label}\\] "
@@ -20954,12 +21134,16 @@ def _issue_summary_section(cluster: IssueCluster) -> list[str]:
     model_count = _issue_cluster_model_count(cluster)
     parts.append(
         f"{model_count} model(s) show **{MARKDOWN_ESCAPER.escape(_issue_subtype_display_label(cluster.issue_subtype))}** "
-        f"that appears to belong with `{MARKDOWN_ESCAPER.escape(cluster.owner)}`."
+        f"that should be filed against {MARKDOWN_ESCAPER.escape(_issue_filing_target_label(cluster.owner))}."
     )
     parts.append("")
-    if cluster.symptom:
-        parts.append(f"- **Observed problem:** {MARKDOWN_ESCAPER.escape(cluster.symptom)}")
-    parts.append(f"- **Target:** `{MARKDOWN_ESCAPER.escape(cluster.owner)}`")
+    parts.append(
+        f"- **Observed problem:** {MARKDOWN_ESCAPER.escape(_issue_problem_summary(cluster))}"
+    )
+    parts.append(
+        f"- **Target:** {MARKDOWN_ESCAPER.escape(_issue_filing_target_label(cluster.owner))}"
+    )
+    parts.append(f"- **Raw owner hint:** `{MARKDOWN_ESCAPER.escape(cluster.owner)}`")
     parts.append(f"- **Affected models:** {model_count}")
     parts.append(f"- **Fixed when:** {MARKDOWN_ESCAPER.escape(_issue_queue_fixed_when(cluster))}")
     parts.append(f"- **Issue kind:** `{MARKDOWN_ESCAPER.escape(cluster.issue_kind)}`")
@@ -21231,6 +21415,7 @@ def _issue_likely_root_cause_section(cluster: IssueCluster) -> list[str]:
         else cluster.symptom
     )
     rows = [
+        ("Filing target", MARKDOWN_ESCAPER.escape(_issue_filing_target_label(cluster.owner))),
         ("Likely owner", f"`{MARKDOWN_ESCAPER.escape(cluster.owner)}`"),
         ("Confidence", MARKDOWN_ESCAPER.escape(confidence)),
         ("Issue kind", f"`{MARKDOWN_ESCAPER.escape(cluster.issue_kind)}`"),
@@ -21271,6 +21456,10 @@ def _issue_repro_section(
         parts.append("Repro bundles:")
         parts.append("")
         parts.extend(bundle_lines)
+        parts.append(
+            "- Note: these are local artifact links; attach or publish the JSON when filing "
+            "upstream."
+        )
         parts.append("")
 
     if cluster.source == "failure" and len(models) > 1:
@@ -21285,44 +21474,71 @@ def _issue_repro_section(
 def _issue_fix_checklist_items(cluster: IssueCluster) -> list[str]:
     """Return subtype-specific fix checklist items for one issue cluster."""
     subtype = cluster.issue_subtype.casefold()
+    checklist: list[str] | None = None
     if subtype == "stop_token":
-        return [
+        checklist = [
             "Inspect model EOS token IDs and tokenizer special-token mappings.",
             "Verify mlx-vlm stop criteria receive all configured EOS/stop tokens.",
             "Check `skip_special_tokens` handling during decode.",
             "Strip generated control tokens such as `<|end|>` and `</think>` only after "
             "confirming generation stopped at the right boundary.",
         ]
-    if subtype == "encoding":
-        return [
+    elif subtype == "encoding":
+        checklist = [
             "Inspect tokenizer decode cleanup for byte-level/BPE marker leakage.",
             "Compare `decode` and `batch_decode` behavior with `skip_special_tokens=True`.",
             "Verify processor/tokenizer config does not require model-specific cleanup flags.",
         ]
-    if subtype == "prompt_template":
-        return [
+    elif subtype == "prompt_template":
+        checklist = [
             "Inspect chat template selection and rendered message roles.",
             "Verify image placeholder count and order match the processor config.",
             "Check EOS defaults and whether the template expects explicit assistant prefixes.",
         ]
-    if subtype in {"long_context", "context_budget", "token_cap"}:
-        return [
+    elif subtype in {"long_context", "context_budget", "token_cap"}:
+        checklist = [
             "Rerun with reduced image/text burden and compare output recovery.",
             "Compare prompt-token accounting with text-only and image+text prompts.",
             "Inspect cache allocation, prefill step size, and long-context generation behavior.",
         ]
-    if cluster.issue_kind == "runtime_failure":
-        return [
-            "Inspect the exported error package, load phase, and traceback owner.",
-            "Check model config, tokenizer files, and weight shape compatibility.",
-            "Compare against installed mlx, mlx-vlm, mlx-lm, transformers, and tokenizers versions.",
-            "Reproduce with the single affected model before judging output quality.",
+    elif cluster.issue_kind == "runtime_failure":
+        representative = _issue_cluster_representative(cluster)
+        runtime_kind = _runtime_failure_diagnostic_kind(representative)
+        if runtime_kind == "unsupported_granite":
+            checklist = [
+                "Inspect mlx-vlm model-type registry and architecture import path for Granite.",
+                "Confirm whether this model type should be supported by the installed mlx-vlm version.",
+                "If unsupported, fail before generation with a clear architecture-specific message.",
+                "If supported, add a focused load/regression check for this model family.",
+            ]
+        elif runtime_kind == "weight_config_mismatch":
+            checklist = [
+                "Compare checkpoint keys with the selected model class and model config.",
+                "Inspect missing/unexpected projector, scale, bias, and quantized-weight parameter names.",
+                "Verify the model repo revision matches the mlx-vlm/mlx loader expectations.",
+                "Reproduce after upgrading/downgrading mlx-vlm and mlx to isolate version compatibility.",
+            ]
+        elif runtime_kind == "missing_image_processor":
+            checklist = [
+                "Inspect `preprocessor_config.json`, `processor_config.json`, and AutoProcessor mapping.",
+                "Verify the loaded processor exposes the image processor expected by mlx-vlm.",
+                "Check whether the model repo needs processor files or mlx-vlm needs a fallback path.",
+                "Reproduce with the single affected model before judging output quality.",
+            ]
+        else:
+            checklist = [
+                "Inspect the exported error package, load phase, and traceback owner.",
+                "Check model config, tokenizer files, and weight shape compatibility.",
+                "Compare against installed mlx, mlx-vlm, mlx-lm, transformers, and tokenizers versions.",
+                "Reproduce with the single affected model before judging output quality.",
+            ]
+    if checklist is None:
+        checklist = [
+            "Reproduce with the cluster command.",
+            "Confirm owner attribution against traceback, tokenizer, processor, and runtime evidence.",
+            "Add a focused regression check for the affected symptom family.",
         ]
-    return [
-        "Reproduce with the cluster command.",
-        "Confirm owner attribution against traceback, tokenizer, processor, and runtime evidence.",
-        "Add a focused regression check for the affected symptom family.",
-    ]
+    return checklist
 
 
 def _issue_fix_checklist_section(cluster: IssueCluster) -> list[str]:

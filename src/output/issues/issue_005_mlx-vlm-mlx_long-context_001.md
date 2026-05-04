@@ -1,11 +1,12 @@
-# \[mlx-vlm / mlx\]\[long-context\] At long prompt length (16901 tokens), output became repetitive affecting 1 model(s)
+# \[mlx-vlm / mlx\]\[Long-context collapse\] Long-context generation collapsed or became too short affecting 1 model(s)
 
 ## Summary
 
-1 model(s) show **Long-context collapse** that appears to belong with `mlx-vlm / mlx`.
+1 model(s) show **Long-context collapse** that should be filed against mlx-vlm first; MLX if cache/runtime reproduces.
 
-- **Observed problem:** At long prompt length (16901 tokens), output became repetitive.
-- **Target:** `mlx-vlm / mlx`
+- **Observed problem:** Long-context generation collapsed or became too short
+- **Target:** mlx-vlm first; MLX if cache/runtime reproduces
+- **Raw owner hint:** `mlx-vlm / mlx`
 - **Affected models:** 1
 - **Fixed when:** Full and reduced reruns avoid context collapse.
 - **Issue kind:** `cutoff_degraded`
@@ -37,6 +38,7 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 Repro bundles:
 
 - `mlx-community/Qwen2-VL-2B-Instruct-4bit`: [repro JSON](../repro_bundles/20260503T224052Z_004_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)
+- Note: these are local artifact links; attach or publish the JSON when filing upstream.
 
 
 ## Expected Fix Signal
@@ -54,6 +56,7 @@ Repro bundles:
 
 ## Likely Root Cause
 
+- _Filing target:_ mlx-vlm first; MLX if cache/runtime reproduces
 - _Likely owner:_ `mlx-vlm / mlx`
 - _Confidence:_ high
 - _Issue kind:_ `cutoff_degraded`

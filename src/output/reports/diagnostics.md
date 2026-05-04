@@ -12,13 +12,13 @@ Root-cause issue drafts are generated in
 [issues/index.md](../issues/index.md). Each row is intended to become one
 focused upstream GitHub issue.
 
-| Target                           | Problem                                                                                                                | Affected Models                                            | Issue Draft                                                                                                    | Evidence Bundle                                                                                                                     | Fixed When                                                |
-|----------------------------------|------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
-| `mlx`                            | MLX: Model load / model error: Received 4 parameters not in model:                                                     | 1: `mlx-community/Kimi-VL-A3B-Thinking-8bit`               | [issue draft](../issues/issue_001_mlx_mlx-model-load-model_001.md)                                             | [repro JSON](../repro_bundles/20260503T224052Z_002_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)  | Load/generation completes or fails with a narrower owner. |
-| `mlx-vlm`                        | mlx-vlm: Model load / model error: Model type granite not supported. Error: No module named 'mlx_vlm.spe               | 1: `mlx-community/granite-4.1-8b-mxfp8`                    | [issue draft](../issues/issue_002_mlx-vlm_mlx-vlm-model-load-model_001.md)                                     | [repro JSON](../repro_bundles/20260503T224052Z_005_mlx-community_granite-4.1-8b-mxfp8_MLX_VLM_MODEL_LOAD_MODEL_5af3e849109f.json)   | Load/generation completes or fails with a narrower owner. |
-| `model configuration/repository` | Model config: Processor load / processor error: Loaded processor has no image_processor; expected multimodal processor | 1: `mlx-community/MolmoPoint-8B-fp16`                      | [issue draft](../issues/issue_003_model-configuration-repository_model-config-processor-load-processor_001.md) | [repro JSON](../repro_bundles/20260503T224052Z_003_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json)  | Load/generation completes or fails with a narrower owner. |
-| `mlx-vlm`                        | Tokenizer / decoding artifact: Tokenizer space-marker artifacts (for example  ) appeared in output (                   | 1: `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | [issue draft](../issues/issue_004_mlx-vlm_encoding_001.md)                                                     | [repro JSON](../repro_bundles/20260503T224052Z_001_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) | No BPE/byte markers in output.                            |
-| `mlx-vlm / mlx`                  | Long-context collapse: At long prompt length (16901 tokens), output became repetitive                                  | 1: `mlx-community/Qwen2-VL-2B-Instruct-4bit`               | [issue draft](../issues/issue_005_mlx-vlm-mlx_long-context_001.md)                                             | [repro JSON](../repro_bundles/20260503T224052Z_004_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)       | Full and reduced reruns avoid context collapse.           |
+| Target                                         | Problem                                               | Affected Models                                            | Issue Draft                                                                                                    | Evidence Bundle                                                                                                                     | Fixed When                                                |
+|------------------------------------------------|-------------------------------------------------------|------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
+| `mlx`                                          | Weight/config mismatch during model load              | 1: `mlx-community/Kimi-VL-A3B-Thinking-8bit`               | [issue draft](../issues/issue_001_mlx_mlx-model-load-model_001.md)                                             | [repro JSON](../repro_bundles/20260503T224052Z_002_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)  | Load/generation completes or fails with a narrower owner. |
+| `mlx-vlm`                                      | Unsupported Granite model type/import path            | 1: `mlx-community/granite-4.1-8b-mxfp8`                    | [issue draft](../issues/issue_002_mlx-vlm_mlx-vlm-model-load-model_001.md)                                     | [repro JSON](../repro_bundles/20260503T224052Z_005_mlx-community_granite-4.1-8b-mxfp8_MLX_VLM_MODEL_LOAD_MODEL_5af3e849109f.json)   | Load/generation completes or fails with a narrower owner. |
+| model configuration / repository               | Processor config is missing image processor           | 1: `mlx-community/MolmoPoint-8B-fp16`                      | [issue draft](../issues/issue_003_model-configuration-repository_model-config-processor-load-processor_001.md) | [repro JSON](../repro_bundles/20260503T224052Z_003_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json)  | Load/generation completes or fails with a narrower owner. |
+| `mlx-vlm`                                      | Tokenizer decode leaked BPE/byte markers              | 1: `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | [issue draft](../issues/issue_004_mlx-vlm_encoding_001.md)                                                     | [repro JSON](../repro_bundles/20260503T224052Z_001_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) | No BPE/byte markers in output.                            |
+| mlx-vlm first; MLX if cache/runtime reproduces | Long-context generation collapsed or became too short | 1: `mlx-community/Qwen2-VL-2B-Instruct-4bit`               | [issue draft](../issues/issue_005_mlx-vlm-mlx_long-context_001.md)                                             | [repro JSON](../repro_bundles/20260503T224052Z_004_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)       | Full and reduced reruns avoid context collapse.           |
 
 ---
 
@@ -30,7 +30,7 @@ pasteable bodies; this diagnostics file is the run-level queue and appendix.
 - **Issue drafts:** 5 root-cause cluster(s).
 - **Suggested targets:** `mlx`=1, `mlx-vlm`=2, `mlx-vlm / mlx`=1, `model configuration/repository`=1.
 - **Standalone evidence:** each issue draft includes minimal inline evidence plus an exact cluster rerun command before any appendix detail.
-- **Supporting files:** `repro JSON` links point to local repro bundles with prompt, environment, and generated-output context.
+- **Supporting files:** `repro JSON` links point to local repro bundles with prompt, environment, and generated-output context. Attach or publish those JSON files when filing upstream; GitHub will not resolve local artifact paths from a pasted issue body.
 
 ## Appendix
 
@@ -55,8 +55,9 @@ The remaining sections keep full run evidence for audit/debugging. They are not 
 - _Summary:_ model error \| mlx model load model
 - _Evidence:_ model error \| mlx model load model
 - _Token context:_ stop=exception
-- _Next action:_ Inspect KV/cache behavior, memory pressure, and long-context
-  execution.
+- _Next action:_ Compare checkpoint keys with the selected model class/config,
+  especially projector scale/bias parameters and quantized weight naming,
+  before judging model quality.
 
 | Model                                     | Observed Behavior                                         | First Seen Failing      | Recent Repro           |
 |-------------------------------------------|-----------------------------------------------------------|-------------------------|------------------------|
@@ -169,7 +170,9 @@ Captured stdout/stderr:
 - _Summary:_ processor error \| model config processor load processor
 - _Evidence:_ processor error \| model config processor load processor
 - _Token context:_ stop=exception
-- _Next action:_ Inspect model repo config, chat template, and EOS settings.
+- _Next action:_ Inspect the model repo processor/preprocessor config and
+  AutoProcessor mapping; the multimodal processor is missing or not exposing
+  the image processor expected by mlx-vlm.
 
 | Model                              | Observed Behavior                                                       | First Seen Failing      | Recent Repro           |
 |------------------------------------|-------------------------------------------------------------------------|-------------------------|------------------------|
@@ -259,8 +262,9 @@ Captured stdout/stderr:
 - _Summary:_ model error \| mlx vlm model load model
 - _Evidence:_ model error \| mlx vlm model load model
 - _Token context:_ stop=exception
-- _Next action:_ Inspect prompt-template, stop-token, and decode
-  post-processing behavior.
+- _Next action:_ Check mlx-vlm model-type registration/import handling for
+  Granite; confirm the loader either supports this architecture or fails
+  before generation with a clear unsupported-model message.
 
 | Model                                | Observed Behavior                                                                                                     | First Seen Failing      | Recent Repro           |
 |--------------------------------------|-----------------------------------------------------------------------------------------------------------------------|-------------------------|------------------------|
@@ -391,6 +395,7 @@ point to stack/runtime behavior rather than inherent model quality limits.
 
 - Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 61 occurrences).
 - Output omitted required Title/Description/Keywords sections (description, keywords).
+- Output appears to copy prompt context verbatim (32% overlap).
 
 **Sample output:**
 
@@ -488,7 +493,7 @@ warning, or stack-signal anomaly).
 
 - `HuggingFaceTB/SmolVLM-Instruct`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
 - `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`: Output omitted required Title/Description/Keywords sections (title).
-- `meta-llama/Llama-3.2-11B-Vision-Instruct`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
+- `meta-llama/Llama-3.2-11B-Vision-Instruct`: Model output may not follow prompt or image contents (missing: classic, style, dark, hull, wooden).
 - `microsoft/Phi-3.5-vision-instruct`: Output became repetitive, indicating possible generation instability (token: phrase: "flags, flags, flags, flags,...").
 - `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
 - `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: Output omitted required Title/Description/Keywords sections (title, description).
@@ -499,7 +504,7 @@ warning, or stack-signal anomaly).
 - `mlx-community/Idefics3-8B-Llama3-bf16`: Output formatting deviated from the requested structure. Details: Unknown tags: <end_of_utterance>.
 - `mlx-community/InternVL3-14B-8bit`: Output appears to copy prompt context verbatim (46% overlap).
 - `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`: Output omitted required Title/Description/Keywords sections (title).
-- `mlx-community/LFM2-VL-1.6B-8bit`: Output appears to copy prompt context verbatim (64% overlap).
+- `mlx-community/LFM2-VL-1.6B-8bit`: Output appears to copy prompt context verbatim (90% overlap).
 - `mlx-community/LFM2.5-VL-1.6B-bf16`: Output became repetitive, indicating possible generation instability (token: phrase: "mudflats, flags, boat, water,.....
 - `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
 - `mlx-community/Molmo-7B-D-0924-8bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
@@ -519,14 +524,14 @@ warning, or stack-signal anomaly).
 - `mlx-community/gemma-3n-E2B-4bit`: Model output may not follow prompt or image contents (missing: classic, style, sailboat, dark, hull).
 - `mlx-community/gemma-3n-E4B-it-bf16`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
 - `mlx-community/gemma-4-31b-bf16`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
-- `mlx-community/llava-v1.6-mistral-7b-8bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
+- `mlx-community/llava-v1.6-mistral-7b-8bit`: Model output may not follow prompt or image contents (missing: moored, calm, estuary, during, low).
 - `mlx-community/nanoLLaVA-1.5-4bit`: Output omitted required Title/Description/Keywords sections (keywords).
 - `mlx-community/paligemma2-10b-ft-docci-448-6bit`: Model output may not follow prompt or image contents (missing: classic, style, sailboat, dark, hull).
 - `mlx-community/paligemma2-10b-ft-docci-448-bf16`: Model output may not follow prompt or image contents (missing: classic, style, sailboat, dark, hull).
 - `mlx-community/paligemma2-3b-ft-docci-448-bf16`: Model output may not follow prompt or image contents (missing: classic, style, sailboat, dark, hull).
 - `mlx-community/paligemma2-3b-pt-896-4bit`: Model output may not follow prompt or image contents (missing: classic, style, sailboat, dark, hull).
-- `mlx-community/pixtral-12b-8bit`: Output appears to copy prompt context verbatim (58% overlap).
-- `mlx-community/pixtral-12b-bf16`: Output appears to copy prompt context verbatim (56% overlap).
+- `mlx-community/pixtral-12b-8bit`: Output appears to copy prompt context verbatim (90% overlap).
+- `mlx-community/pixtral-12b-bf16`: Output appears to copy prompt context verbatim (90% overlap).
 - `qnguyen3/nanoLLaVA`: Output omitted required Title/Description/Keywords sections (keywords).
 
 ---
@@ -635,4 +640,4 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 - Input image: `/Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-05-03 23:40:52 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-05-04 18:00:02 BST by [check_models](https://github.com/jrp2014/check_models)._
