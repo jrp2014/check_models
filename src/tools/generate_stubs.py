@@ -573,6 +573,26 @@ def refresh_stub_manifest_from_existing_stubs(
     return True
 
 
+def _run_stub_integrity_check(
+    packages: Iterable[str],
+    *,
+    refresh_manifest_on_check: bool,
+) -> int:
+    """Run check-only validation for existing local stubs."""
+    pkg_list = _validate_packages(packages)
+    if refresh_manifest_on_check:
+        refresh_stub_manifest_from_existing_stubs(pkg_list)
+
+    integrity_issues = get_stub_integrity_issues(pkg_list)
+    if integrity_issues:
+        for issue in integrity_issues:
+            logger.error("[stubs] %s", issue)
+        return 1
+
+    logger.info("[stubs] Stub integrity check passed")
+    return 0
+
+
 def _write_stub_manifest(packages: Iterable[str], typings_dir: Path = TYPINGS_DIR) -> None:
     manifest = _read_stub_manifest(typings_dir) or {}
     existing_packages = manifest.get("packages")
@@ -761,15 +781,10 @@ def main() -> int:
     packages = _validate_packages(ns.packages)
 
     if ns.check:
-        if ns.refresh_manifest_on_check:
-            refresh_stub_manifest_from_existing_stubs(packages)
-        integrity_issues = get_stub_integrity_issues(packages)
-        if integrity_issues:
-            for issue in integrity_issues:
-                logger.error("[stubs] %s", issue)
-            return 1
-        logger.info("[stubs] Stub integrity check passed")
-        return 0
+        return _run_stub_integrity_check(
+            packages,
+            refresh_manifest_on_check=ns.refresh_manifest_on_check,
+        )
 
     if ns.clear and TYPINGS_DIR.exists():
         shutil.rmtree(TYPINGS_DIR)
