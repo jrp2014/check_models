@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time
 from argparse import Namespace
 from dataclasses import dataclass, replace
@@ -443,6 +444,30 @@ class TestHtmlReportEdgeCases:
         assert "Preflight compatibility" in content
         assert "informational warning(s); do not treat these alone as run failures" in content
         assert "API mismatches, startup hangs, or backend/runtime crashes" in content
+
+    def test_html_report_adds_filterable_row_attributes_and_numeric_classes(
+        self, tmp_path: Path
+    ) -> None:
+        """HTML results table should expose row metadata and numeric alignment classes."""
+        out = tmp_path / "filterable.html"
+        results = [_make_success("org/good"), _make_failure("org/bad", error_package="mlx-vlm")]
+
+        generate_html_report(
+            results=results,
+            filename=out,
+            versions=_stub_versions(),
+            prompt="describe",
+            total_runtime_seconds=2.0,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert content.count('data-status="success"') == 1
+        assert content.count('data-status="failed"') == 1
+        assert 'data-error-stage="load"' in content
+        assert 'data-error-type="ValueError"' in content
+        assert 'data-error-package="mlx-vlm"' in content
+        assert re.search(r'class="numeric"', content) is not None
+        assert 'class="text failed"' in content
 
     def test_html_report_preserves_full_output_in_details(self, tmp_path: Path) -> None:
         """HTML table should reuse the shared preview while keeping full text expandable."""

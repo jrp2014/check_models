@@ -7970,42 +7970,105 @@ def _mark_failed_rows_in_html(
     sorted_results: Sequence[PerformanceResult],
 ) -> str:
     """Add data attributes and classes to rows for filtering in the HTML table."""
-    table_rows: list[str] = html_table.split("<tr>")
-    # Keep preamble and header row (index 0 and 1)
-    new_table_rows: list[str] = [table_rows[0], table_rows[1]]
+    row_pattern = re.compile(r"<tr>.*?</tr>", re.DOTALL)
+    result_index = 0
 
-    for i, res in enumerate(sorted_results):
-        # Data rows start at index 2
-        if i + 2 < len(table_rows):
-            row_html: str = table_rows[i + 2]
+    def repl(match: re.Match[str]) -> str:
+        nonlocal result_index
+        row_html = match.group(0)
+        if "<td" not in row_html:
+            return row_html
+        if result_index >= len(sorted_results):
+            return row_html
 
-            # Add data attributes for filtering
-            if not res.success:
-                # Determine error category
-                error_stage: str = res.error_stage or "unknown"
-                error_type: str = res.error_type or "error"
-                error_package: str = res.error_package or "unknown"
+        result = sorted_results[result_index]
+        result_index += 1
 
-                # Add both class and data attributes for flexible filtering
-                row_html = row_html.replace(
-                    "<tr>",
-                    f'<tr class="failed" data-status="failed" '
-                    f'data-error-stage="{error_stage}" data-error-type="{error_type}" '
-                    f'data-error-package="{error_package}">',
-                    1,
+        if result.success:
+            return row_html.replace(
+                "<tr>",
+                '<tr class="success" data-status="success">',
+                1,
+            )
+
+        error_stage = html.escape(result.error_stage or "unknown", quote=True)
+        error_type = html.escape(result.error_type or "error", quote=True)
+        error_package = html.escape(result.error_package or "unknown", quote=True)
+        row_html = row_html.replace(
+            "<tr>",
+            f'<tr class="failed" data-status="failed" '
+            f'data-error-stage="{error_stage}" data-error-type="{error_type}" '
+            f'data-error-package="{error_package}">',
+            1,
+        )
+        return re.sub(
+            r"<td\b[^>]*>",
+            lambda cell_match: _append_html_class(cell_match.group(0), "failed"),
+            row_html,
+            count=1,
+        )
+
+    return row_pattern.sub(repl, html_table)
+
+
+def _append_html_class(opening_tag: str, class_name: str) -> str:
+    """Append a CSS class to an opening HTML tag, preserving existing classes."""
+    class_match = re.search(r'class="([^"]*)"', opening_tag)
+    if class_match is None:
+        return opening_tag[:-1] + f' class="{class_name}">'
+
+    classes = class_match.group(1).split()
+    if class_name in classes:
+        return opening_tag
+
+    classes.append(class_name)
+    updated_classes = " ".join(classes)
+    return opening_tag[: class_match.start(1)] + updated_classes + opening_tag[class_match.end(1) :]
+
+
+def _add_html_table_alignment_classes(
+    html_table: str,
+    field_names: Sequence[str],
+) -> str:
+    """Apply text/numeric classes to table headers and cells by column index."""
+    numeric_columns = frozenset(
+        index for index, field_name in enumerate(field_names) if is_numeric_field(field_name)
+    )
+    row_pattern = re.compile(r"<tr>.*?</tr>", re.DOTALL)
+
+    def _apply_to_row(row_html: str, *, tag_name: str) -> str:
+        cell_pattern = re.compile(rf"<{tag_name}\b[^>]*>.*?</{tag_name}>", re.DOTALL)
+        cells = cell_pattern.findall(row_html)
+        if not cells:
+            return row_html
+
+        updated_cells: list[str] = []
+        for index, cell_html in enumerate(cells):
+            alignment_class = "numeric" if index in numeric_columns else "text"
+            updated_cells.append(
+                re.sub(
+                    rf"<{tag_name}\b[^>]*>",
+                    lambda match, class_name=alignment_class: _append_html_class(
+                        match.group(0),
+                        class_name,
+                    ),
+                    cell_html,
+                    count=1,
                 )
-                # Also mark first td with failed class for background color
-                row_html = row_html.replace("<td", '<td class="failed"', 1)
-            else:
-                row_html = row_html.replace(
-                    "<tr>",
-                    '<tr class="success" data-status="success">',
-                    1,
-                )
+            )
 
-            new_table_rows.append(row_html)
+        replacement_iter: Iterator[str] = iter(updated_cells)
+        return cell_pattern.sub(lambda _: next(replacement_iter), row_html)
 
-    return "<tr>".join(new_table_rows)
+    def repl(match: re.Match[str]) -> str:
+        row_html = match.group(0)
+        if "<th" in row_html:
+            return _apply_to_row(row_html, tag_name="th")
+        if "<td" in row_html:
+            return _apply_to_row(row_html, tag_name="td")
+        return row_html
+
+    return row_pattern.sub(repl, html_table)
 
 
 def _wrap_output_column_in_details(
@@ -14411,23 +14474,7 @@ def generate_html_report(
     )
 
     # Add CSS classes for alignment and styling
-    html_table = html_table.replace("<td>", '<td class="text">').replace(
-        "<th>",
-        '<th class="text">',
-    )
-    for field in field_names:
-        if is_numeric_field(field):
-            idx = field_names.index(field)
-            html_table = html_table.replace(
-                f"<td>{rows[0][idx]}",
-                f'<td class="numeric">{rows[0][idx]}',
-                1,
-            )
-            html_table = html_table.replace(
-                f"<th>{headers[idx]}",
-                f'<th class="numeric">{headers[idx]}',
-                1,
-            )
+    html_table = _add_html_table_alignment_classes(html_table, field_names)
 
     # Mark failed rows using the already-sorted cached context
     html_table = _mark_failed_rows_in_html(html_table, report_context.result_set.results)

@@ -17,7 +17,7 @@ help: ## Show this help message
 	@echo "  make clean            Remove generated files"
 	@echo ""
 	@echo "🛠️  Development:"
-	@echo "  make dev              Setup dev environment"
+	@echo "  make dev              Bootstrap dev environment"
 	@echo "  make update           Update conda environment and project dependencies"
 	@echo "  make test             Run tests"
 	@echo "  make check            Run format, lint, typecheck, and tests"
@@ -35,8 +35,8 @@ install: ## Install the package in editable mode
 	@$(MAKE) -C $(SRC) install
 
 .PHONY: dev
-dev: ## Setup dev environment with all dependencies
-	@$(MAKE) -C $(SRC) install-all
+dev: ## Bootstrap dev environment (deps + hooks + validation)
+	@$(MAKE) -C $(SRC) bootstrap-dev
 
 .PHONY: run
 run: ## Show usage help

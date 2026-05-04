@@ -22,6 +22,14 @@ Notable changes to this project will be documented in this file.
 - Report upstream prefill / first-token timing as its own derived runtime phase
   so diagnostics distinguish prefill latency from post-prefill decode time.
 
+### Fixed
+
+- Restore the HTML results table's row filter metadata and numeric alignment
+  classes so the built-in filter controls and cell styling work again.
+- Repoint the root `make dev` target at the full bootstrap workflow so fresh
+  contributors get hook installation and environment validation instead of only
+  dependency installation.
+
 ## [0.7.0] - 2026-05-03
 
 ### Added
