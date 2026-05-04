@@ -17,7 +17,7 @@
 
 | Model                              | Representative Signal                                    | Token Context   | Repro JSON                                                                                                                         |
 |------------------------------------|----------------------------------------------------------|-----------------|------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/MolmoPoint-8B-fp16` | processor error \| model config processor load processor | stop=exception  | [repro JSON](../repro_bundles/20260504T192124Z_004_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json) |
+| `mlx-community/MolmoPoint-8B-fp16` | processor error \| model config processor load processor | stop=exception  | [repro JSON](../repro_bundles/20260504T202044Z_004_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json) |
 
 
 ## Minimal Evidence
@@ -36,7 +36,7 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 
 Repro bundles:
 
-- `mlx-community/MolmoPoint-8B-fp16`: [repro JSON](../repro_bundles/20260504T192124Z_004_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json)
+- `mlx-community/MolmoPoint-8B-fp16`: [repro JSON](../repro_bundles/20260504T202044Z_004_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json)
 - Note: these are local artifact links; attach or publish the JSON when filing upstream.
 
 
@@ -75,7 +75,7 @@ Repro bundles:
 | mlx-vlm         | 0.4.5                       |
 | mlx             | 0.32.0.dev20260504+e8ebdebe |
 | mlx-lm          | 0.31.3                      |
-| transformers    | 5.7.0                       |
+| transformers    | 5.8.0.dev0                  |
 | tokenizers      | 0.22.2                      |
 | huggingface-hub | 1.13.0                      |
 | Python Version  | 3.13.12                     |

@@ -1,6 +1,6 @@
 # Automated Review Digest
 
-_Generated on 2026-05-04 20:21:24 BST_
+_Generated on 2026-05-04 21:20:44 BST_
 
 Trusted-hint review uses only prompt title/description/keyword hints for utility comparison. Capture metadata, GPS, timestamps, source labels, and location labels are treated as nonvisual metadata and are not required visual evidence.
 
@@ -13,19 +13,19 @@ _Review artifacts:_
 
 ### Strong Candidates
 
-- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: 🏆 A (87/100) | Desc 83 | Keywords 83 | Δ+24 | 180.9 tps
-- `mlx-community/gemma-3-27b-it-qat-8bit`: 🏆 A (86/100) | Desc 84 | Keywords 92 | Δ+23 | 15.6 tps
-- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: 🏆 A (86/100) | Desc 93 | Keywords 86 | Δ+23 | 62.5 tps
-- `mlx-community/gemma-4-26b-a4b-it-4bit`: 🏆 A (85/100) | Desc 93 | Keywords 79 | Δ+22 | 99.5 tps
-- `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`: 🏆 A (83/100) | Desc 87 | Keywords 84 | Δ+20 | 65.6 tps
+- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: 🏆 A (87/100) | Desc 83 | Keywords 83 | Δ+24 | 181.5 tps
+- `mlx-community/gemma-3-27b-it-qat-8bit`: 🏆 A (86/100) | Desc 84 | Keywords 92 | Δ+23 | 17.2 tps
+- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: 🏆 A (86/100) | Desc 93 | Keywords 86 | Δ+23 | 62.1 tps
+- `mlx-community/gemma-4-26b-a4b-it-4bit`: 🏆 A (85/100) | Desc 93 | Keywords 79 | Δ+22 | 113.5 tps
+- `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`: 🏆 A (83/100) | Desc 87 | Keywords 84 | Δ+20 | 65.3 tps
 
 ### Watchlist
 
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (1/100) | Desc 45 | Keywords 0 | Δ-62 | 211.8 tps | context ignored, harness, long context, missing sections
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (4/100) | Desc 60 | Keywords 0 | Δ-59 | 27.9 tps | harness, missing sections
-- `mlx-community/llava-v1.6-mistral-7b-8bit`: ❌ F (16/100) | Desc 76 | Keywords 0 | Δ-46 | 56.1 tps | missing sections, trusted hint degraded
-- `meta-llama/Llama-3.2-11B-Vision-Instruct`: ❌ F (18/100) | Desc 76 | Keywords 0 | Δ-44 | 5.3 tps | missing sections, trusted hint degraded
-- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: ❌ F (20/100) | Desc 51 | Keywords 48 | Δ-43 | 27.9 tps | context ignored, missing sections
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (1/100) | Desc 45 | Keywords 0 | Δ-62 | 194.3 tps | context ignored, harness, long context, missing sections
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (4/100) | Desc 60 | Keywords 0 | Δ-59 | 31.1 tps | harness, missing sections
+- `mlx-community/llava-v1.6-mistral-7b-8bit`: ❌ F (16/100) | Desc 76 | Keywords 0 | Δ-46 | 64.0 tps | missing sections, trusted hint degraded
+- `meta-llama/Llama-3.2-11B-Vision-Instruct`: ❌ F (18/100) | Desc 76 | Keywords 0 | Δ-44 | 5.2 tps | missing sections, trusted hint degraded
+- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: ❌ F (20/100) | Desc 51 | Keywords 48 | Δ-43 | 31.8 tps | context ignored, missing sections
 
 ## User Buckets
 
@@ -38,12 +38,12 @@ User-first summary grouped by recommendation bucket.
 | `mlx-community/gemma-4-26b-a4b-it-4bit`             | `clean`     | improves trusted hints                              | missing terms: classic, style, during, low, tide                                                                            |
 | `mlx-community/Ministral-3-3B-Instruct-2512-4bit`   | `clean`     | improves trusted hints                              | nontext prompt burden=89% \| missing terms: classic, style, during, exposing, vast                                          |
 | `mlx-community/InternVL3-8B-bf16`                   | `clean`     | preserves trusted hints                             | nontext prompt burden=86% \| missing terms: during, receded, exposing, vast, expanse                                        |
-| `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4` | `clean`     | improves trusted hints                              | nontext prompt burden=89% \| missing terms: receded, exposing, vast, expanse, behind                                        |
 | `mlx-community/gemma-4-31b-it-4bit`                 | `clean`     | improves trusted hints                              | missing terms: style, during, receded, exposing, vast                                                                       |
+| `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4` | `clean`     | improves trusted hints                              | nontext prompt burden=89% \| missing terms: receded, exposing, vast, expanse, behind                                        |
 | `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4` | `clean`     | improves trusted hints                              | nontext prompt burden=89% \| missing terms: style, during, receded, exposing, vast                                          |
 | `mlx-community/gemma-3-27b-it-qat-8bit`             | `clean`     | improves trusted hints                              | missing terms: classic, style, wooden, estuary, receded                                                                     |
-| `mlx-community/Qwen3.6-27B-mxfp8`                   | `token_cap` | improves trusted hints \| nonvisual metadata reused | hit token cap (500) \| nontext prompt burden=97% \| missing terms: style, estuary, during, tide, receded \| keywords=19     |
 | `mlx-community/Qwen3.5-27B-mxfp8`                   | `token_cap` | improves trusted hints \| nonvisual metadata reused | hit token cap (500) \| nontext prompt burden=97% \| missing terms: classic, style, during, receded, exposing \| keywords=20 |
+| `mlx-community/Qwen3.6-27B-mxfp8`                   | `token_cap` | improves trusted hints \| nonvisual metadata reused | hit token cap (500) \| nontext prompt burden=97% \| missing terms: style, estuary, during, tide, receded \| keywords=19     |
 
 ### `caveat`
 
@@ -51,12 +51,11 @@ User-first summary grouped by recommendation bucket.
 |--------------------------------------------|------------------|------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `mlx-community/LFM2-VL-1.6B-8bit`          | `clean`          | preserves trusted hints                                                      | missing terms: classic, style, sailboat, dark, hull \| keywords=9 \| context echo=64%                                                                                                                                                                              |
 | `mlx-community/llava-v1.6-mistral-7b-8bit` | `context_budget` | degrades trusted hints                                                       | output/prompt=0.57% \| nontext prompt burden=87% \| missing sections: title, description, keywords \| missing terms: moored, calm, estuary, during, low                                                                                                            |
-| `mlx-community/Idefics3-8B-Llama3-bf16`    | `clean`          | preserves trusted hints                                                      | nontext prompt burden=87% \| context echo=65% \| formatting=Unknown tags: &lt;end_of_utterance&gt;                                                                                                                                                                 |
 | `mlx-community/gemma-3-27b-it-qat-4bit`    | `clean`          | improves trusted hints                                                       | missing terms: classic, style, wooden, during, receded \| keywords=19                                                                                                                                                                                              |
+| `mlx-community/Idefics3-8B-Llama3-bf16`    | `clean`          | preserves trusted hints                                                      | nontext prompt burden=87% \| context echo=65% \| formatting=Unknown tags: &lt;end_of_utterance&gt;                                                                                                                                                                 |
 | `mlx-community/pixtral-12b-8bit`           | `clean`          | preserves trusted hints                                                      | nontext prompt burden=90% \| context echo=58%                                                                                                                                                                                                                      |
 | `mlx-community/InternVL3-14B-8bit`         | `clean`          | preserves trusted hints                                                      | nontext prompt burden=86% \| missing terms: floats, peacefully, waiting, rise, again \| context echo=46%                                                                                                                                                           |
 | `mlx-community/pixtral-12b-bf16`           | `clean`          | preserves trusted hints                                                      | nontext prompt burden=90% \| context echo=56%                                                                                                                                                                                                                      |
-| `mlx-community/Molmo-7B-D-0924-bf16`       | `clean`          | improves trusted hints                                                       | nontext prompt burden=70% \| keywords=23                                                                                                                                                                                                                           |
 | `mlx-community/Qwen2-VL-2B-Instruct-4bit`  | `context_budget` | ignores trusted hints \| missing terms: classic, style, sailboat, dark, hull | Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt-handling issues. \| At long prompt length (16901 tokens), output stayed unusually short (11 tokens; ratio 0.1%). \| output/prompt=0.07% \| nontext prompt burden=97% |
 
 ### `needs_triage`
@@ -81,23 +80,24 @@ User-first summary grouped by recommendation bucket.
 | `mlx-community/gemma-3n-E2B-4bit`                       | `cutoff_degraded`   | ignores trusted hints \| missing terms: classic, style, sailboat, dark, hull \| nonvisual metadata reused | hit token cap (500) \| missing sections: title, description, keywords \| missing terms: classic, style, sailboat, dark, hull \| nonvisual metadata reused                                                                   |
 | `meta-llama/Llama-3.2-11B-Vision-Instruct`              | `model_shortcoming` | degrades trusted hints                                                                                    | missing sections: title, description, keywords \| missing terms: classic, style, dark, hull, wooden                                                                                                                         |
 | `mlx-community/gemma-3n-E4B-it-bf16`                    | `model_shortcoming` | improves trusted hints                                                                                    | missing sections: title, description, keywords                                                                                                                                                                              |
-| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        | `model_shortcoming` | ignores trusted hints \| missing terms: classic, style, sailboat, dark, hull                              | nontext prompt burden=71% \| missing sections: title, description, keywords \| missing terms: classic, style, sailboat, dark, hull                                                                                          |
 | `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      | `model_shortcoming` | preserves trusted hints                                                                                   | missing sections: title, description, keywords \| missing terms: style \| context echo=96%                                                                                                                                  |
+| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        | `model_shortcoming` | ignores trusted hints \| missing terms: classic, style, sailboat, dark, hull                              | nontext prompt burden=71% \| missing sections: title, description, keywords \| missing terms: classic, style, sailboat, dark, hull                                                                                          |
 | `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 | `model_shortcoming` | improves trusted hints                                                                                    | nontext prompt burden=71% \| missing sections: title \| missing terms: during, receded, vast, expanse, algae \| keywords=45                                                                                                 |
-| `microsoft/Phi-3.5-vision-instruct`                     | `cutoff_degraded`   | preserves trusted hints                                                                                   | hit token cap (500) \| nontext prompt burden=67% \| missing terms: boat, adorned, string, small, floats \| keyword duplication=90%                                                                                          |
 | `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | `harness`           | preserves trusted hints                                                                                   | Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 61 occurrences). \| nontext prompt burden=88% \| missing sections: description, keywords \| missing terms: vast, expanse, adorned, small, floats |
 | `mlx-community/Phi-3.5-vision-instruct-bf16`            | `cutoff_degraded`   | preserves trusted hints                                                                                   | hit token cap (500) \| nontext prompt burden=67% \| missing terms: boat, adorned, string, small, floats \| keyword duplication=90%                                                                                          |
-| `mlx-community/Molmo-7B-D-0924-8bit`                    | `model_shortcoming` | improves trusted hints                                                                                    | nontext prompt burden=70% \| missing sections: title, description, keywords \| missing terms: classic, style, moored, estuary, during                                                                                       |
-| `mlx-community/paligemma2-3b-pt-896-4bit`               | `cutoff_degraded`   | ignores trusted hints \| missing terms: classic, style, sailboat, dark, hull                              | hit token cap (500) \| nontext prompt burden=90% \| missing sections: title, description, keywords \| missing terms: classic, style, sailboat, dark, hull                                                                   |
+| `microsoft/Phi-3.5-vision-instruct`                     | `cutoff_degraded`   | preserves trusted hints                                                                                   | hit token cap (500) \| nontext prompt burden=67% \| missing terms: boat, adorned, string, small, floats \| keyword duplication=90%                                                                                          |
+| `mlx-community/Molmo-7B-D-0924-8bit`                    | `model_shortcoming` | degrades trusted hints                                                                                    | nontext prompt burden=70% \| missing sections: title, description, keywords \| missing terms: classic, style, wooden, moored, estuary                                                                                       |
 | `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`      | `cutoff_degraded`   | preserves trusted hints \| nonvisual metadata reused                                                      | hit token cap (500) \| nontext prompt burden=75% \| missing sections: title, description \| missing terms: boat, floats, peacefully, waiting, rise                                                                          |
+| `mlx-community/paligemma2-3b-pt-896-4bit`               | `cutoff_degraded`   | ignores trusted hints \| missing terms: classic, style, sailboat, dark, hull                              | hit token cap (500) \| nontext prompt burden=90% \| missing sections: title, description, keywords \| missing terms: classic, style, sailboat, dark, hull                                                                   |
 | `mlx-community/GLM-4.6V-Flash-mxfp4`                    | `cutoff_degraded`   | preserves trusted hints                                                                                   | hit token cap (500) \| nontext prompt burden=93% \| missing sections: title, keywords \| missing terms: style, vast, expanse, floats, waiting                                                                               |
-| `mlx-community/GLM-4.6V-Flash-6bit`                     | `cutoff_degraded`   | preserves trusted hints \| nonvisual metadata reused                                                      | hit token cap (500) \| nontext prompt burden=93% \| missing sections: title, description, keywords \| missing terms: during, receded, exposing, vast, expanse                                                               |
 | `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`         | `cutoff_degraded`   | improves trusted hints                                                                                    | hit token cap (500) \| nontext prompt burden=91% \| missing sections: title, description, keywords \| missing terms: classic, style, receded, vast, expanse                                                                 |
-| `mlx-community/paligemma2-3b-ft-docci-448-bf16`         | `cutoff_degraded`   | ignores trusted hints \| missing terms: classic, style, sailboat, dark, hull                              | hit token cap (500) \| nontext prompt burden=71% \| missing sections: title, description, keywords \| missing terms: classic, style, sailboat, dark, hull                                                                   |
+| `mlx-community/GLM-4.6V-Flash-6bit`                     | `cutoff_degraded`   | preserves trusted hints \| nonvisual metadata reused                                                      | hit token cap (500) \| nontext prompt burden=93% \| missing sections: title, description, keywords \| missing terms: during, receded, exposing, vast, expanse                                                               |
+| `mlx-community/Molmo-7B-D-0924-bf16`                    | `model_shortcoming` | improves trusted hints                                                                                    | nontext prompt burden=70% \| missing sections: title, description, keywords \| missing terms: estuary, during, receded, vast, expanse                                                                                       |
 | `mlx-community/GLM-4.6V-nvfp4`                          | `cutoff_degraded`   | preserves trusted hints \| nonvisual metadata reused                                                      | hit token cap (500) \| nontext prompt burden=93% \| missing sections: title, description, keywords \| missing terms: vast, expanse, behind, vessel, adorned                                                                 |
+| `mlx-community/paligemma2-3b-ft-docci-448-bf16`         | `cutoff_degraded`   | ignores trusted hints \| missing terms: classic, style, sailboat, dark, hull                              | hit token cap (500) \| nontext prompt burden=71% \| missing sections: title, description, keywords \| missing terms: classic, style, sailboat, dark, hull                                                                   |
 | `mlx-community/X-Reasoner-7B-8bit`                      | `cutoff_degraded`   | improves trusted hints                                                                                    | hit token cap (500) \| nontext prompt burden=97% \| missing terms: style, vast, expanse, peacefully, waiting \| keyword duplication=62%                                                                                     |
-| `mlx-community/Qwen3.5-35B-A3B-6bit`                    | `cutoff_degraded`   | improves trusted hints                                                                                    | hit token cap (500) \| nontext prompt burden=97% \| missing sections: title, description, keywords \| missing terms: style, calm, during, receded, vast                                                                     |
 | `mlx-community/Qwen3.5-35B-A3B-4bit`                    | `cutoff_degraded`   | improves trusted hints                                                                                    | hit token cap (500) \| nontext prompt burden=97% \| missing sections: description, keywords \| missing terms: style, during, receded, exposing, vast                                                                        |
+| `mlx-community/Qwen3.5-35B-A3B-6bit`                    | `cutoff_degraded`   | improves trusted hints                                                                                    | hit token cap (500) \| nontext prompt burden=97% \| missing sections: title, description, keywords \| missing terms: style, calm, during, receded, vast                                                                     |
 | `mlx-community/Qwen3.5-9B-MLX-4bit`                     | `cutoff_degraded`   | preserves trusted hints                                                                                   | hit token cap (500) \| nontext prompt burden=97% \| missing sections: title, description, keywords \| reasoning leak                                                                                                        |
 | `mlx-community/Qwen3.5-35B-A3B-bf16`                    | `cutoff_degraded`   | improves trusted hints                                                                                    | hit token cap (500) \| nontext prompt burden=97% \| missing sections: title, description, keywords \| missing terms: style, calm, during, receded, exposing                                                                 |
 | `mlx-community/gemma-4-31b-bf16`                        | `cutoff_degraded`   | improves trusted hints                                                                                    | hit token cap (500) \| missing sections: title, description, keywords \| missing terms: style, dark, hull, during, receded                                                                                                  |
@@ -157,6 +157,17 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
   n/a; requested max 500 tok; stop reason exception
 
 
+### `mlx-community/nanoLLaVA-1.5-4bit`
+
+- _Recommendation:_ avoid for now; review verdict: model shortcoming
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ missing sections: keywords; context echo=98%
+- _Tokens:_ prompt 513 tok; estimated text 444 tok; estimated non-text 69 tok;
+  generated 90 tok; requested max 500 tok; stop reason completed
+
+
 ### `mlx-community/LFM2-VL-1.6B-8bit`
 
 - _Recommendation:_ use with caveats; review verdict: clean
@@ -167,17 +178,6 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
   keywords=9; context echo=64%
 - _Tokens:_ prompt 767 tok; estimated text 444 tok; estimated non-text 323
   tok; generated 110 tok; requested max 500 tok; stop reason completed
-
-
-### `mlx-community/nanoLLaVA-1.5-4bit`
-
-- _Recommendation:_ avoid for now; review verdict: model shortcoming
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ missing sections: keywords; context echo=98%
-- _Tokens:_ prompt 513 tok; estimated text 444 tok; estimated non-text 69 tok;
-  generated 90 tok; requested max 500 tok; stop reason completed
 
 
 ### `qnguyen3/nanoLLaVA`
@@ -261,6 +261,19 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
   tok; generated 31 tok; requested max 500 tok; stop reason completed
 
 
+### `mlx-community/llava-v1.6-mistral-7b-8bit`
+
+- _Recommendation:_ use with caveats; review verdict: context budget
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat this as a prompt-budget issue first; nontext prompt
+  burden is 87% and the output stays weak under that load.
+- _Key signals:_ output/prompt=0.57%; nontext prompt burden=87%; missing
+  sections: title, description, keywords; missing terms: moored, calm,
+  estuary, during, low
+- _Tokens:_ prompt 3503 tok; estimated text 444 tok; estimated non-text 3059
+  tok; generated 20 tok; requested max 500 tok; stop reason completed
+
+
 ### `mlx-community/Ministral-3-3B-Instruct-2512-4bit`
 
 - _Recommendation:_ recommended; review verdict: clean
@@ -284,19 +297,6 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
   token=phrase: "mudflats, flags, boat, water,..."
 - _Tokens:_ prompt 575 tok; estimated text 444 tok; estimated non-text 131
   tok; generated 500 tok; requested max 500 tok; stop reason completed
-
-
-### `mlx-community/llava-v1.6-mistral-7b-8bit`
-
-- _Recommendation:_ use with caveats; review verdict: context budget
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat this as a prompt-budget issue first; nontext prompt
-  burden is 87% and the output stays weak under that load.
-- _Key signals:_ output/prompt=0.57%; nontext prompt burden=87%; missing
-  sections: title, description, keywords; missing terms: moored, calm,
-  estuary, during, low
-- _Tokens:_ prompt 3503 tok; estimated text 444 tok; estimated non-text 3059
-  tok; generated 20 tok; requested max 500 tok; stop reason completed
 
 
 ### `mlx-community/InternVL3-8B-bf16`
@@ -324,16 +324,15 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
 
-### `meta-llama/Llama-3.2-11B-Vision-Instruct`
+### `mlx-community/gemma-4-31b-it-4bit`
 
-- _Recommendation:_ avoid for now; review verdict: model shortcoming
+- _Recommendation:_ recommended; review verdict: clean
 - _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ missing sections: title, description, keywords; missing
-  terms: classic, style, dark, hull, wooden
-- _Tokens:_ prompt 484 tok; estimated text 444 tok; estimated non-text 40 tok;
-  generated 17 tok; requested max 500 tok; stop reason completed
+- _Next step:_ Treat as a model limitation for this prompt; trusted hint
+  coverage is still weak.
+- _Key signals:_ missing terms: style, during, receded, exposing, vast
+- _Tokens:_ prompt 784 tok; estimated text 444 tok; estimated non-text 340
+  tok; generated 88 tok; requested max 500 tok; stop reason completed
 
 
 ### `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`
@@ -348,15 +347,28 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
   tok; generated 114 tok; requested max 500 tok; stop reason completed
 
 
-### `mlx-community/gemma-4-31b-it-4bit`
+### `mlx-community/gemma-3-27b-it-qat-4bit`
 
-- _Recommendation:_ recommended; review verdict: clean
+- _Recommendation:_ use with caveats; review verdict: clean
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model limitation for this prompt; trusted hint
   coverage is still weak.
-- _Key signals:_ missing terms: style, during, receded, exposing, vast
-- _Tokens:_ prompt 784 tok; estimated text 444 tok; estimated non-text 340
-  tok; generated 88 tok; requested max 500 tok; stop reason completed
+- _Key signals:_ missing terms: classic, style, wooden, during, receded;
+  keywords=19
+- _Tokens:_ prompt 783 tok; estimated text 444 tok; estimated non-text 339
+  tok; generated 113 tok; requested max 500 tok; stop reason completed
+
+
+### `meta-llama/Llama-3.2-11B-Vision-Instruct`
+
+- _Recommendation:_ avoid for now; review verdict: model shortcoming
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ missing sections: title, description, keywords; missing
+  terms: classic, style, dark, hull, wooden
+- _Tokens:_ prompt 484 tok; estimated text 444 tok; estimated non-text 40 tok;
+  generated 17 tok; requested max 500 tok; stop reason completed
 
 
 ### `mlx-community/Idefics3-8B-Llama3-bf16`
@@ -382,16 +394,15 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
   tok; generated 118 tok; requested max 500 tok; stop reason completed
 
 
-### `mlx-community/gemma-3-27b-it-qat-4bit`
+### `mlx-community/gemma-3n-E4B-it-bf16`
 
-- _Recommendation:_ use with caveats; review verdict: clean
+- _Recommendation:_ avoid for now; review verdict: model shortcoming
 - _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: classic, style, wooden, during, receded;
-  keywords=19
-- _Tokens:_ prompt 783 tok; estimated text 444 tok; estimated non-text 339
-  tok; generated 113 tok; requested max 500 tok; stop reason completed
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ missing sections: title, description, keywords
+- _Tokens:_ prompt 782 tok; estimated text 444 tok; estimated non-text 338
+  tok; generated 266 tok; requested max 500 tok; stop reason completed
 
 
 ### `mlx-community/pixtral-12b-8bit`
@@ -416,15 +427,16 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
   tok; generated 120 tok; requested max 500 tok; stop reason completed
 
 
-### `mlx-community/gemma-3n-E4B-it-bf16`
+### `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`
 
 - _Recommendation:_ avoid for now; review verdict: model shortcoming
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model limitation for this prompt; the requested
   output contract is not being met.
-- _Key signals:_ missing sections: title, description, keywords
-- _Tokens:_ prompt 782 tok; estimated text 444 tok; estimated non-text 338
-  tok; generated 266 tok; requested max 500 tok; stop reason completed
+- _Key signals:_ missing sections: title, description, keywords; missing
+  terms: style; context echo=96%
+- _Tokens:_ prompt 483 tok; estimated text 444 tok; estimated non-text 39 tok;
+  generated 119 tok; requested max 500 tok; stop reason completed
 
 
 ### `mlx-community/paligemma2-10b-ft-docci-448-bf16`
@@ -439,16 +451,15 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
   tok; generated 31 tok; requested max 500 tok; stop reason completed
 
 
-### `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`
+### `mlx-community/gemma-3-27b-it-qat-8bit`
 
-- _Recommendation:_ avoid for now; review verdict: model shortcoming
+- _Recommendation:_ recommended; review verdict: clean
 - _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ missing sections: title, description, keywords; missing
-  terms: style; context echo=96%
-- _Tokens:_ prompt 483 tok; estimated text 444 tok; estimated non-text 39 tok;
-  generated 119 tok; requested max 500 tok; stop reason completed
+- _Next step:_ Treat as a model limitation for this prompt; trusted hint
+  coverage is still weak.
+- _Key signals:_ missing terms: classic, style, wooden, estuary, receded
+- _Tokens:_ prompt 783 tok; estimated text 444 tok; estimated non-text 339
+  tok; generated 104 tok; requested max 500 tok; stop reason completed
 
 
 ### `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`
@@ -461,39 +472,6 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
   terms: during, receded, vast, expanse, algae; keywords=45
 - _Tokens:_ prompt 1516 tok; estimated text 444 tok; estimated non-text 1072
   tok; generated 490 tok; requested max 500 tok; stop reason completed
-
-
-### `mlx-community/gemma-3-27b-it-qat-8bit`
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: classic, style, wooden, estuary, receded
-- _Tokens:_ prompt 783 tok; estimated text 444 tok; estimated non-text 339
-  tok; generated 104 tok; requested max 500 tok; stop reason completed
-
-
-### `mlx-community/pixtral-12b-bf16`
-
-- _Recommendation:_ use with caveats; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ nontext prompt burden=90%; context echo=56%
-- _Tokens:_ prompt 4662 tok; estimated text 444 tok; estimated non-text 4218
-  tok; generated 138 tok; requested max 500 tok; stop reason completed
-
-
-### `microsoft/Phi-3.5-vision-instruct`
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ hit token cap (500); nontext prompt burden=67%; missing
-  terms: boat, adorned, string, small, floats; keyword duplication=90%
-- _Tokens:_ prompt 1337 tok; estimated text 444 tok; estimated non-text 893
-  tok; generated 500 tok; requested max 500 tok; stop reason completed
 
 
 ### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`
@@ -521,6 +499,28 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
 
+### `mlx-community/pixtral-12b-bf16`
+
+- _Recommendation:_ use with caveats; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=90%; context echo=56%
+- _Tokens:_ prompt 4662 tok; estimated text 444 tok; estimated non-text 4218
+  tok; generated 138 tok; requested max 500 tok; stop reason completed
+
+
+### `microsoft/Phi-3.5-vision-instruct`
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; trusted hint
+  coverage is still weak.
+- _Key signals:_ hit token cap (500); nontext prompt burden=67%; missing
+  terms: boat, adorned, string, small, floats; keyword duplication=90%
+- _Tokens:_ prompt 1337 tok; estimated text 444 tok; estimated non-text 893
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
+
+
 ### `mlx-community/Molmo-7B-D-0924-8bit`
 
 - _Recommendation:_ avoid for now; review verdict: model shortcoming
@@ -528,23 +528,10 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
 - _Next step:_ Treat as a model limitation for this prompt; the requested
   output contract is not being met.
 - _Key signals:_ nontext prompt burden=70%; missing sections: title,
-  description, keywords; missing terms: classic, style, moored, estuary,
-  during
+  description, keywords; missing terms: classic, style, wooden, moored,
+  estuary
 - _Tokens:_ prompt 1468 tok; estimated text 444 tok; estimated non-text 1024
-  tok; generated 119 tok; requested max 500 tok; stop reason completed
-
-
-### `mlx-community/paligemma2-3b-pt-896-4bit`
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); nontext prompt burden=90%; missing
-  sections: title, description, keywords; missing terms: classic, style,
-  sailboat, dark, hull
-- _Tokens:_ prompt 4610 tok; estimated text 444 tok; estimated non-text 4166
-  tok; generated 500 tok; requested max 500 tok; stop reason completed
+  tok; generated 107 tok; requested max 500 tok; stop reason completed
 
 
 ### `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`
@@ -560,6 +547,19 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
 
+### `mlx-community/paligemma2-3b-pt-896-4bit`
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ hit token cap (500); nontext prompt burden=90%; missing
+  sections: title, description, keywords; missing terms: classic, style,
+  sailboat, dark, hull
+- _Tokens:_ prompt 4610 tok; estimated text 444 tok; estimated non-text 4166
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
+
+
 ### `mlx-community/GLM-4.6V-Flash-mxfp4`
 
 - _Recommendation:_ avoid for now; review verdict: cutoff degraded
@@ -569,19 +569,6 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
 - _Key signals:_ hit token cap (500); nontext prompt burden=93%; missing
   sections: title, keywords; missing terms: style, vast, expanse, floats,
   waiting
-- _Tokens:_ prompt 6570 tok; estimated text 444 tok; estimated non-text 6126
-  tok; generated 500 tok; requested max 500 tok; stop reason completed
-
-
-### `mlx-community/GLM-4.6V-Flash-6bit`
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); nontext prompt burden=93%; missing
-  sections: title, description, keywords; missing terms: during, receded,
-  exposing, vast, expanse
 - _Tokens:_ prompt 6570 tok; estimated text 444 tok; estimated non-text 6126
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
@@ -599,27 +586,30 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
 
-### `mlx-community/Molmo-7B-D-0924-bf16`
-
-- _Recommendation:_ use with caveats; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ nontext prompt burden=70%; keywords=23
-- _Tokens:_ prompt 1468 tok; estimated text 444 tok; estimated non-text 1024
-  tok; generated 403 tok; requested max 500 tok; stop reason completed
-
-
-### `mlx-community/paligemma2-3b-ft-docci-448-bf16`
+### `mlx-community/GLM-4.6V-Flash-6bit`
 
 - _Recommendation:_ avoid for now; review verdict: cutoff degraded
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model limitation for this prompt; the requested
   output contract is not being met.
-- _Key signals:_ hit token cap (500); nontext prompt burden=71%; missing
-  sections: title, description, keywords; missing terms: classic, style,
-  sailboat, dark, hull
-- _Tokens:_ prompt 1538 tok; estimated text 444 tok; estimated non-text 1094
+- _Key signals:_ hit token cap (500); nontext prompt burden=93%; missing
+  sections: title, description, keywords; missing terms: during, receded,
+  exposing, vast, expanse
+- _Tokens:_ prompt 6570 tok; estimated text 444 tok; estimated non-text 6126
   tok; generated 500 tok; requested max 500 tok; stop reason completed
+
+
+### `mlx-community/Molmo-7B-D-0924-bf16`
+
+- _Recommendation:_ avoid for now; review verdict: model shortcoming
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ nontext prompt burden=70%; missing sections: title,
+  description, keywords; missing terms: estuary, during, receded, vast,
+  expanse
+- _Tokens:_ prompt 1468 tok; estimated text 444 tok; estimated non-text 1024
+  tok; generated 219 tok; requested max 500 tok; stop reason completed
 
 
 ### `mlx-community/GLM-4.6V-nvfp4`
@@ -635,6 +625,19 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
 
+### `mlx-community/paligemma2-3b-ft-docci-448-bf16`
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ hit token cap (500); nontext prompt burden=71%; missing
+  sections: title, description, keywords; missing terms: classic, style,
+  sailboat, dark, hull
+- _Tokens:_ prompt 1538 tok; estimated text 444 tok; estimated non-text 1094
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
+
+
 ### `mlx-community/X-Reasoner-7B-8bit`
 
 - _Recommendation:_ avoid for now; review verdict: cutoff degraded
@@ -644,6 +647,19 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
 - _Key signals:_ hit token cap (500); nontext prompt burden=97%; missing
   terms: style, vast, expanse, peacefully, waiting; keyword duplication=62%
 - _Tokens:_ prompt 16901 tok; estimated text 444 tok; estimated non-text 16457
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
+
+
+### `mlx-community/Qwen3.5-35B-A3B-4bit`
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ hit token cap (500); nontext prompt burden=97%; missing
+  sections: description, keywords; missing terms: style, during, receded,
+  exposing, vast
+- _Tokens:_ prompt 16916 tok; estimated text 444 tok; estimated non-text 16472
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
 
@@ -672,19 +688,6 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
   0.1%).; output/prompt=0.07%; nontext prompt burden=97%
 - _Tokens:_ prompt 16901 tok; estimated text 444 tok; estimated non-text 16457
   tok; generated 11 tok; requested max 500 tok; stop reason completed
-
-
-### `mlx-community/Qwen3.5-35B-A3B-4bit`
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); nontext prompt burden=97%; missing
-  sections: description, keywords; missing terms: style, during, receded,
-  exposing, vast
-- _Tokens:_ prompt 16916 tok; estimated text 444 tok; estimated non-text 16472
-  tok; generated 500 tok; requested max 500 tok; stop reason completed
 
 
 ### `mlx-community/Qwen3.5-9B-MLX-4bit`
@@ -748,18 +751,6 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
 
-### `mlx-community/Qwen3.6-27B-mxfp8`
-
-- _Recommendation:_ recommended; review verdict: token cap
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ hit token cap (500); nontext prompt burden=97%; missing
-  terms: style, estuary, during, tide, receded; keywords=19
-- _Tokens:_ prompt 16916 tok; estimated text 444 tok; estimated non-text 16472
-  tok; generated 500 tok; requested max 500 tok; stop reason completed
-
-
 ### `mlx-community/Qwen3.5-27B-mxfp8`
 
 - _Recommendation:_ recommended; review verdict: token cap
@@ -768,6 +759,18 @@ Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md
   coverage is still weak.
 - _Key signals:_ hit token cap (500); nontext prompt burden=97%; missing
   terms: classic, style, during, receded, exposing; keywords=20
+- _Tokens:_ prompt 16916 tok; estimated text 444 tok; estimated non-text 16472
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
+
+
+### `mlx-community/Qwen3.6-27B-mxfp8`
+
+- _Recommendation:_ recommended; review verdict: token cap
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; trusted hint
+  coverage is still weak.
+- _Key signals:_ hit token cap (500); nontext prompt burden=97%; missing
+  terms: style, estuary, during, tide, receded; keywords=19
 - _Tokens:_ prompt 16916 tok; estimated text 444 tok; estimated non-text 16472
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
