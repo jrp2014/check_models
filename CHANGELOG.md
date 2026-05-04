@@ -5,6 +5,8 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-05-04
+
 ### Changed
 
 - Replace the diagnostics appendix's old import-only portable triage block with
@@ -21,6 +23,10 @@ Notable changes to this project will be documented in this file.
   of direct Rich styles, while trimming stale wrapper comments.
 - Report upstream prefill / first-token timing as its own derived runtime phase
   so diagnostics distinguish prefill latency from post-prefill decode time.
+- Update `make ci` in `src/Makefile` to invoke `run_quality_checks.sh` directly
+  for stricter local-to-remote parity with GitHub Actions CI.
+- Freeze the `QualityThresholds` configuration dataclass and refactor tests to
+  inject overrides via mocking, preventing unsafe global singleton mutations.
 
 ### Fixed
 

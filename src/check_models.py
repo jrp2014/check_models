@@ -254,7 +254,7 @@ class FormattingThresholds:
     generation_wrap_width: int = 100
 
 
-@dataclass
+@dataclass(frozen=True)
 class QualityThresholds:
     """Centralized thresholds for quality analysis detection.
 
@@ -568,10 +568,8 @@ def load_quality_config(config_path: Path | None = None) -> None:
                     "quality_config.yaml top-level document must be a mapping",
                 )
                 new_quality = QualityThresholds.from_config(config_mapping)
-                # Update existing global instance in-place to avoid 'global' keyword
-                # and ensure all references see the update.
-                for field in fields(QualityThresholds):
-                    setattr(QUALITY, field.name, getattr(new_quality, field.name))
+                global QUALITY  # noqa: PLW0603
+                QUALITY = new_quality
                 logger.debug("Loaded quality configuration from %s", config_path)
         except (OSError, TypeError, ValueError, yaml.YAMLError) as e:
             logger.warning("Failed to load quality config from %s: %s", config_path, e)
