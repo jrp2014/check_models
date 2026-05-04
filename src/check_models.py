@@ -8042,20 +8042,25 @@ def _add_html_table_alignment_classes(
         if not cells:
             return row_html
 
+        def _with_alignment_class(
+            cell_html: str,
+            *,
+            class_name: str,
+        ) -> str:
+            def replace_opening_tag(match: re.Match[str]) -> str:
+                return _append_html_class(match.group(0), class_name)
+
+            return re.sub(
+                rf"<{tag_name}\b[^>]*>",
+                replace_opening_tag,
+                cell_html,
+                count=1,
+            )
+
         updated_cells: list[str] = []
         for index, cell_html in enumerate(cells):
             alignment_class = "numeric" if index in numeric_columns else "text"
-            updated_cells.append(
-                re.sub(
-                    rf"<{tag_name}\b[^>]*>",
-                    lambda match, class_name=alignment_class: _append_html_class(
-                        match.group(0),
-                        class_name,
-                    ),
-                    cell_html,
-                    count=1,
-                )
-            )
+            updated_cells.append(_with_alignment_class(cell_html, class_name=alignment_class))
 
         replacement_iter: Iterator[str] = iter(updated_cells)
         return cell_pattern.sub(lambda _: next(replacement_iter), row_html)
