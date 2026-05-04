@@ -13,6 +13,7 @@ from rich.console import Console
 
 import check_models
 from check_models import (
+    ConsoleRoutingFilter,
     FileSafeFormatter,
     GenerationQualityAnalysis,
     HistoryModelResultRecord,
@@ -121,6 +122,45 @@ def test_console_handler_keeps_repeated_timestamps_visible() -> None:
     assert "second" in lines[1]
 
 
+def test_console_handler_hides_file_only_records() -> None:
+    """Console handler should suppress records tagged for the file log only."""
+    stream = io.StringIO()
+    console = Console(
+        file=stream,
+        width=100,
+        no_color=True,
+        force_terminal=False,
+        markup=False,
+        highlight=False,
+    )
+    with patch.object(check_models, "_make_rich_console", return_value=console):
+        handler = check_models._make_console_log_handler(
+            level=logging.DEBUG,
+            verbose=True,
+            width=100,
+        )
+
+    test_logger = logging.getLogger("check-models-file-only-filter-test")
+    old_handlers = test_logger.handlers[:]
+    old_level = test_logger.level
+    old_propagate = test_logger.propagate
+    try:
+        test_logger.handlers.clear()
+        test_logger.addHandler(handler)
+        test_logger.setLevel(logging.DEBUG)
+        test_logger.propagate = False
+        test_logger.debug("file-only message", extra={"log_destination": "file"})
+        test_logger.info("console message")
+    finally:
+        test_logger.handlers[:] = old_handlers
+        test_logger.setLevel(old_level)
+        test_logger.propagate = old_propagate
+
+    output = stream.getvalue()
+    assert "file-only message" not in output
+    assert "console message" in output
+
+
 def _history_run_record(
     outcomes: dict[str, bool],
     *,
@@ -159,6 +199,28 @@ def test_metrics_mode_compact_smoke(caplog: pytest.LogCaptureFixture) -> None:
     # New format uses "Timing:" (line 1) and "Tokens:" (line 2)
     timing_lines = [r.message for r in caplog.records if "Timing:" in r.message]
     assert timing_lines, "Expected Timing line in compact mode logs"
+
+
+def test_metrics_mode_verbose_does_not_repeat_generated_text(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Verbose mode should keep streamed output out of the post-run summary block."""
+    caplog.set_level(logging.INFO)
+    res = PerformanceResult(
+        model_name="dummy/model",
+        generation=_StubGeneration(text="Distinct streamed output", generation_tokens=5),
+        success=True,
+        generation_time=1.0,
+        model_load_time=0.5,
+        total_time=1.5,
+    )
+
+    print_model_result(res, verbose=True, detailed_metrics=False)
+
+    messages = [record.message for record in caplog.records]
+    assert not any("Generated Text:" in message for message in messages)
+    assert not any("Distinct streamed output" in message for message in messages)
+    assert any("Timing:" in message for message in messages)
 
 
 def test_metrics_mode_compact_surfaces_runtime_hints(

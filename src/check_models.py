@@ -2409,6 +2409,13 @@ class FileSafeFormatter(logging.Formatter):
         return ANSI_ESCAPE_RE.sub("", raw)
 
 
+class ConsoleRoutingFilter(logging.Filter):
+    """Exclude records that should be written only to the file log."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        return getattr(record, "log_destination", None) != "file"
+
+
 def _make_console_log_handler(
     *,
     level: int,
@@ -2429,6 +2436,7 @@ def _make_console_log_handler(
     )
     handler.setLevel(level)
     handler.setFormatter(logging.Formatter("%(message)s"))
+    handler.addFilter(ConsoleRoutingFilter())
     return handler
 
 
@@ -9112,7 +9120,7 @@ def _collect_cataloging_summary_data(summary: ModelIssueSummary) -> CatalogingSu
     )
 
 
-def _format_cataloging_summary(  # noqa: C901, PLR0912, PLR0915 — dual-format renderer
+def _format_cataloging_summary(  # noqa: PLR0912, PLR0915 — dual-format renderer
     data: CatalogingSummaryData,
     *,
     html_output: bool,
@@ -10308,15 +10316,31 @@ def _failure_review_text(result: PerformanceResult) -> str:
 
 def _log_canonical_model_review(result: PerformanceResult) -> None:
     """Emit a full-fidelity per-model review block to the file log."""
-    logger.debug("")
-    logger.debug("=== CANONICAL REVIEW: %s ===", result.model_name)
+    logger.debug("", extra={"log_destination": "file"})
+    logger.debug(
+        "=== CANONICAL REVIEW: %s ===",
+        result.model_name,
+        extra={"log_destination": "file"},
+    )
     for label, value in _build_review_block_rows(result):
-        logger.debug("%s: %s", label, value)
+        logger.debug("%s: %s", label, value, extra={"log_destination": "file"})
     if result.success and result.generation is not None:
-        logger.debug("Full output:\n%s", getattr(result.generation, "text", "") or "")
+        logger.debug(
+            "Full output:\n%s",
+            getattr(result.generation, "text", "") or "",
+            extra={"log_destination": "file"},
+        )
     else:
-        logger.debug("Full captured failure output:\n%s", _failure_review_text(result))
-    logger.debug("=== END CANONICAL REVIEW: %s ===", result.model_name)
+        logger.debug(
+            "Full captured failure output:\n%s",
+            _failure_review_text(result),
+            extra={"log_destination": "file"},
+        )
+    logger.debug(
+        "=== END CANONICAL REVIEW: %s ===",
+        result.model_name,
+        extra={"log_destination": "file"},
+    )
 
 
 def _log_canonical_run_review_summary(results: Sequence[PerformanceResult]) -> None:
@@ -17827,11 +17851,11 @@ def _log_verbose_success_details_mode(
     prompt: str | None = None,
     context_marker: str = "Context:",
 ) -> None:
-    """Emit verbose block using either compact or detailed metrics style with visual hierarchy."""
+    """Emit verbose block with warnings and metrics after upstream streamed output."""
     if not res.generation:
         return
 
-    # Generated text with emoji prefix for easy scanning
+    # Generated text has already been streamed by upstream generate(verbose=True).
     gen_text = getattr(res.generation, "text", None) or ""
     gen_tokens = getattr(res.generation, "generation_tokens", 0)
 
@@ -17846,7 +17870,6 @@ def _log_verbose_success_details_mode(
         )
 
     log_blank()
-    log_metric_label("Generated Text:", emoji="📝")
 
     # Warn about quality issues
     if analysis.is_repetitive and analysis.repeated_token:
@@ -17882,9 +17905,8 @@ def _log_verbose_success_details_mode(
             prefix="⚠️",
         )
 
-    if gen_text:
-        log_generated_text(gen_text, wrap=True, indent="   ")
-    else:
+    if not gen_text:
+        log_metric_label("Generated Text:", emoji="📝")
         logger.info("   <empty>", extra={"style_hint": LogStyles.GENERATED_TEXT})
 
     if detailed:

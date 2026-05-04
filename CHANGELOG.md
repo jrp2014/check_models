@@ -5,6 +5,15 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.2] - 2026-05-04
+
+### Fixed
+
+- Stop verbose console output from duplicating per-model generated text by keeping
+  the canonical review block in the file log only and suppressing the extra
+  post-run text replay when upstream `mlx-vlm.generate(verbose=True)` already
+  streamed the response.
+
 ## [0.7.1] - 2026-05-04
 
 ### Changed
