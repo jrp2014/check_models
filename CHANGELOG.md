@@ -15,6 +15,8 @@ Notable changes to this project will be documented in this file.
   published when filing upstream.
 - Remove the remaining legacy ANSI color bridge from console logging in favor
   of direct Rich styles, while trimming stale wrapper comments.
+- Report upstream prefill / first-token timing as its own derived runtime phase
+  so diagnostics distinguish prefill latency from post-prefill decode time.
 
 ## [0.7.0] - 2026-05-03
 

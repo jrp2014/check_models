@@ -1071,7 +1071,14 @@ type ResourceUsageMetric = tuple[str, float, str]
 type AggregateStatRow = tuple[str, str, str, str]
 type QualityIssueEntry = tuple[str, str | None]
 type QualityIssueSection = tuple[str, str, list[QualityIssueEntry]]
-type RuntimePhaseName = Literal["model_load", "prompt_prep", "decode", "cleanup"]
+type RuntimePhaseName = Literal[
+    "model_load",
+    "prompt_prep",
+    "upstream_prefill_first_token",
+    "post_prefill_decode",
+    "decode",
+    "cleanup",
+]
 
 
 class RuntimeAnalysisSummary(TypedDict):
@@ -1086,6 +1093,9 @@ class RuntimeAnalysisSummary(TypedDict):
     phase_totals: dict[RuntimePhaseName, float]
     dominant_counts: dict[RuntimePhaseName, int]
     termination_counts: dict[str, int]
+    generation_total: float
+    generation_models: int
+    prefill_split_models: int
     validation_total: float
     validation_models: int
     first_token_latency_avg: float | None
@@ -8379,31 +8389,55 @@ def _bucket_metadata_delta(
 _RUNTIME_PHASE_KEYS: Final[tuple[RuntimePhaseName, ...]] = (
     "model_load",
     "prompt_prep",
+    "upstream_prefill_first_token",
+    "post_prefill_decode",
     "decode",
     "cleanup",
 )
 
 _RUNTIME_PHASE_LABELS: Final[dict[RuntimePhaseName, str]] = {
     "model_load": "model load",
-    "prompt_prep": "prompt prep",
-    "decode": "decode",
+    "prompt_prep": "local prompt prep",
+    "upstream_prefill_first_token": "upstream prefill / first-token",
+    "post_prefill_decode": "post-prefill decode",
+    "decode": "generation total (unsplit)",
     "cleanup": "cleanup",
 }
 
 _RUNTIME_PHASE_ACTIONS: Final[dict[RuntimePhaseName, tuple[str, str]]] = {
-    "decode": (
-        "Most measured runtime is spent inside generation rather than load or prompt setup.",
+    "upstream_prefill_first_token": (
+        (
+            "Most measured runtime is spent inside upstream generation before the first "
+            "token is available."
+        ),
+        (
+            "Inspect prompt/image token accounting, dynamic-resolution image burden, "
+            "prefill step sizing, and cache/prefill behavior."
+        ),
+    ),
+    "post_prefill_decode": (
+        "Most measured runtime is spent generating after the first token is available.",
         (
             "Prioritize early-stop policies, lower long-tail token budgets, "
             "or upstream decode-path work."
         ),
     ),
+    "decode": (
+        (
+            "Most measured runtime is spent inside generation, but first-token timing "
+            "was not available to split prefill from decode."
+        ),
+        (
+            "Prioritize early-stop policies, lower long-tail token budgets, "
+            "or rerun with prompt throughput metrics available to isolate prefill."
+        ),
+    ),
     "prompt_prep": (
         (
-            "Prompt preparation is consuming a large share of runtime, which often means "
-            "long prompts or expensive multimodal preprocessing."
+            "Local prompt preparation is consuming a large share of runtime, which often "
+            "means expensive chat-template, preflight, or multimodal preprocessing work."
         ),
-        "Inspect prompt length, context blocks, image preprocessing, and prefill-related settings.",
+        "Inspect chat-template rendering, context blocks, image preprocessing, and validators.",
     ),
     "model_load": (
         "Cold model load time is a major share of runtime for this cohort.",
@@ -8416,22 +8450,66 @@ _RUNTIME_PHASE_ACTIONS: Final[dict[RuntimePhaseName, tuple[str, str]]] = {
 }
 
 
+def _positive_runtime_duration(value: float | None) -> float | None:
+    """Return a finite positive runtime duration, or None when unavailable."""
+    if not isinstance(value, int | float):
+        return None
+    duration = float(value)
+    if not math.isfinite(duration) or duration <= 0.0:
+        return None
+    return duration
+
+
+def _runtime_upstream_prefill_first_token_time_s(
+    runtime: RuntimeDiagnostics | None,
+) -> float | None:
+    """Return the upstream prefill/first-token proxy from mlx-vlm prompt timing."""
+    if runtime is None:
+        return None
+    return _positive_runtime_duration(runtime.first_token_latency_s)
+
+
+def _runtime_post_prefill_decode_time_s(runtime: RuntimeDiagnostics | None) -> float | None:
+    """Return generation time after first token when a split signal is available."""
+    if runtime is None:
+        return None
+    decode_time = _positive_runtime_duration(runtime.decode_time_s)
+    upstream_prefill_time = _runtime_upstream_prefill_first_token_time_s(runtime)
+    if decode_time is None or upstream_prefill_time is None:
+        return None
+    post_prefill_decode_time = max(decode_time - upstream_prefill_time, 0.0)
+    return post_prefill_decode_time if post_prefill_decode_time > 0.0 else None
+
+
 def _runtime_phase_durations(runtime: RuntimeDiagnostics | None) -> dict[RuntimePhaseName, float]:
     """Return normalized non-negative phase durations for one run."""
     if runtime is None:
         return {}
 
-    phase_map: dict[RuntimePhaseName, float | None] = {
-        "model_load": runtime.model_load_time_s,
-        "prompt_prep": runtime.prompt_prep_time_s,
-        "decode": runtime.decode_time_s,
-        "cleanup": runtime.cleanup_time_s,
-    }
-    return {
-        phase: float(value)
-        for phase, value in phase_map.items()
-        if isinstance(value, int | float) and float(value) > 0.0
-    }
+    phase_durations: dict[RuntimePhaseName, float] = {}
+    base_phase_values: tuple[tuple[RuntimePhaseName, float | None], ...] = (
+        ("model_load", runtime.model_load_time_s),
+        ("prompt_prep", runtime.prompt_prep_time_s),
+    )
+    for phase, value in base_phase_values:
+        duration = _positive_runtime_duration(value)
+        if duration is not None:
+            phase_durations[phase] = duration
+
+    upstream_prefill_time = _runtime_upstream_prefill_first_token_time_s(runtime)
+    post_prefill_decode_time = _runtime_post_prefill_decode_time_s(runtime)
+    decode_time = _positive_runtime_duration(runtime.decode_time_s)
+    if upstream_prefill_time is not None:
+        phase_durations["upstream_prefill_first_token"] = upstream_prefill_time
+        if post_prefill_decode_time is not None:
+            phase_durations["post_prefill_decode"] = post_prefill_decode_time
+    elif decode_time is not None:
+        phase_durations["decode"] = decode_time
+
+    cleanup_time = _positive_runtime_duration(runtime.cleanup_time_s)
+    if cleanup_time is not None:
+        phase_durations["cleanup"] = cleanup_time
+    return phase_durations
 
 
 def _build_runtime_analysis_summary(
@@ -8442,6 +8520,9 @@ def _build_runtime_analysis_summary(
     dominant_counts: Counter[RuntimePhaseName] = Counter[RuntimePhaseName]()
     termination_counts: Counter[str] = Counter[str]()
     measured_models: int = 0
+    generation_total: float = 0.0
+    generation_models: int = 0
+    prefill_split_models: int = 0
     validation_total: float = 0.0
     validation_models: int = 0
     first_token_latencies: list[float] = []
@@ -8459,13 +8540,21 @@ def _build_runtime_analysis_summary(
             for phase, duration in phase_durations.items():
                 phase_totals[phase] += duration
         if runtime is not None:
+            decode_time: float | None = _positive_runtime_duration(runtime.decode_time_s)
+            if decode_time is not None:
+                generation_total += decode_time
+                generation_models += 1
+            if _runtime_upstream_prefill_first_token_time_s(runtime) is not None:
+                prefill_split_models += 1
             validation_time: float | None = runtime.input_validation_time_s
-            if isinstance(validation_time, int | float) and float(validation_time) > 0.0:
-                validation_total += float(validation_time)
+            validation_duration = _positive_runtime_duration(validation_time)
+            if validation_duration is not None:
+                validation_total += validation_duration
                 validation_models += 1
             first_token_latency: float | None = runtime.first_token_latency_s
-            if isinstance(first_token_latency, int | float) and float(first_token_latency) > 0.0:
-                first_token_latencies.append(float(first_token_latency))
+            first_token_duration = _positive_runtime_duration(first_token_latency)
+            if first_token_duration is not None:
+                first_token_latencies.append(first_token_duration)
         stop_reason: str | None = runtime.stop_reason if runtime is not None else None
         if stop_reason:
             termination_counts[stop_reason] += 1
@@ -8509,6 +8598,9 @@ def _build_runtime_analysis_summary(
         "phase_totals": phase_totals,
         "dominant_counts": dominant_count_map,
         "termination_counts": dict(termination_counts),
+        "generation_total": generation_total,
+        "generation_models": generation_models,
+        "prefill_split_models": prefill_split_models,
         "validation_total": validation_total,
         "validation_models": validation_models,
         "first_token_latency_avg": first_token_latency_avg,
@@ -8517,6 +8609,48 @@ def _build_runtime_analysis_summary(
         "first_token_latency_models": len(first_token_latencies),
     }
     return runtime_summary
+
+
+def _format_runtime_generation_total_line(
+    runtime_analysis: RuntimeAnalysisSummary,
+) -> str | None:
+    """Build the total upstream generation timing line for runtime summaries."""
+    generation_total: float = runtime_analysis["generation_total"]
+    generation_models: int = runtime_analysis["generation_models"]
+    if generation_models <= 0 or generation_total <= 0.0:
+        return None
+
+    prefill_split_models: int = runtime_analysis["prefill_split_models"]
+    if prefill_split_models > 0:
+        split_note = (
+            f"; upstream prefill / first-token split available for "
+            f"{prefill_split_models}/{generation_models} model(s)"
+        )
+    else:
+        split_note = "; upstream prefill / first-token split unavailable"
+    return (
+        "- **Generation total:** "
+        f"{format_overall_runtime(generation_total)} across {generation_models} model(s)"
+        f"{split_note}."
+    )
+
+
+def _format_runtime_phase_totals_line(
+    runtime_analysis: RuntimeAnalysisSummary,
+    *,
+    trailing_period: bool = True,
+) -> str | None:
+    """Build the aggregate phase totals line shared by report renderers."""
+    phase_totals: dict[RuntimePhaseName, float] = runtime_analysis["phase_totals"]
+    phase_summary = ", ".join(
+        f"{_RUNTIME_PHASE_LABELS.get(phase, phase)}={format_overall_runtime(duration)}"
+        for phase, duration in phase_totals.items()
+        if duration > 0.0
+    )
+    if not phase_summary:
+        return None
+    suffix = "." if trailing_period else ""
+    return f"- **Phase totals:** {phase_summary}{suffix}"
 
 
 def _format_runtime_timing_snapshot_lines(runtime_analysis: RuntimeAnalysisSummary) -> list[str]:
@@ -8545,7 +8679,7 @@ def _format_runtime_timing_snapshot_lines(runtime_analysis: RuntimeAnalysisSumma
         and first_token_max is not None
     ):
         lines.append(
-            "- **First-token latency:** "
+            "- **Upstream prefill / first-token latency:** "
             f"Avg {format_overall_runtime(first_token_avg)} | "
             f"Min {format_overall_runtime(first_token_min)} | "
             f"Max {format_overall_runtime(first_token_max)} "
@@ -8562,14 +8696,7 @@ def _format_runtime_analysis_lines(runtime_analysis: RuntimeAnalysisSummary) -> 
     dominant_share: float = runtime_analysis["dominant_phase_share"]
     dominant_count: int = runtime_analysis["dominant_phase_count"]
     measured_models: int = runtime_analysis["measured_models"]
-    phase_totals: dict[RuntimePhaseName, float] = runtime_analysis["phase_totals"]
     termination_counts: dict[str, int] = runtime_analysis["termination_counts"]
-
-    phase_summary: str = ", ".join(
-        f"{_RUNTIME_PHASE_LABELS.get(phase, phase)}={format_overall_runtime(duration)}"
-        for phase, duration in phase_totals.items()
-        if duration > 0.0
-    )
     termination_summary: str = ", ".join(
         f"{name}={count}" for name, count in sorted(termination_counts.items())
     )
@@ -8579,10 +8706,15 @@ def _format_runtime_analysis_lines(runtime_analysis: RuntimeAnalysisSummary) -> 
             f"- **Runtime pattern:** {dominant_label} dominates measured phase time "
             f"({dominant_share:.0%}; {dominant_count}/{measured_models} measured model(s))."
         ),
-        f"- **Phase totals:** {phase_summary}.",
         f"- **What this likely means:** {runtime_analysis['interpretation']}",
         f"- **Suggested next action:** {runtime_analysis['next_action']}",
     ]
+    phase_totals_line = _format_runtime_phase_totals_line(runtime_analysis)
+    if phase_totals_line is not None:
+        lines.insert(1, phase_totals_line)
+    generation_total_line = _format_runtime_generation_total_line(runtime_analysis)
+    if generation_total_line is not None:
+        lines.insert(2, generation_total_line)
     if termination_summary:
         lines.append(f"- **Termination reasons:** {termination_summary}.")
     return lines
@@ -13085,16 +13217,15 @@ def _diagnostics_coverage_and_runtime_section(
             f"{phase_label} dominated {phase_count}/{measured_models} measured model runs "
             f"({phase_share:.0%} of tracked runtime).",
         )
-        phase_summaries = []
-        for phase in _RUNTIME_PHASE_KEYS:
-            phase_total = runtime_analysis["phase_totals"][phase]
-            if phase_total <= 0.0:
-                continue
-            phase_summaries.append(
-                (f"{_RUNTIME_PHASE_LABELS[phase]}={format_overall_runtime(phase_total)}"),
-            )
-        if phase_summaries:
-            parts.append("- **Phase totals:** " + ", ".join(phase_summaries))
+        phase_totals_line = _format_runtime_phase_totals_line(
+            runtime_analysis,
+            trailing_period=False,
+        )
+        if phase_totals_line is not None:
+            parts.append(phase_totals_line)
+        generation_total_line = _format_runtime_generation_total_line(runtime_analysis)
+        if generation_total_line is not None:
+            parts.append(generation_total_line)
         termination_counts = runtime_analysis["termination_counts"]
         if termination_counts:
             termination_summary = ", ".join(

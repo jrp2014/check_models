@@ -1485,10 +1485,104 @@ class TestDiagnosticsReport:
         assert "Runtime aggregates: unavailable" not in content
         assert "**Runtime note:**" in content
         assert "**Dominant runtime phase:**" in content
+        assert "local prompt prep=" in content
+        assert "upstream prefill / first-token=" in content
+        assert "post-prefill decode=" in content
+        assert "**Generation total:**" in content
         assert "**Validation overhead:**" in content
-        assert "**First-token latency:**" in content
+        assert "**Upstream prefill / first-token latency:**" in content
         assert "**What this likely means:**" in content
         assert "**Suggested next action:**" in content
+
+    def test_runtime_metrics_split_prefill_from_post_prefill_decode(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Diagnostics should expose upstream prefill as a distinct derived phase."""
+        out = tmp_path / "diag.md"
+        prefill_heavy = PerformanceResult(
+            model_name="org/prefill-heavy",
+            success=True,
+            generation=_MockGeneration(text="ok", prompt_tokens=1000, generation_tokens=10),
+            total_time=10.4,
+            generation_time=10.0,
+            model_load_time=0.2,
+            runtime_diagnostics=RuntimeDiagnostics(
+                model_load_time_s=0.2,
+                prompt_prep_time_s=0.1,
+                decode_time_s=10.0,
+                cleanup_time_s=0.1,
+                first_token_latency_s=8.0,
+                stop_reason="completed",
+            ),
+        )
+        decode_heavy = replace(
+            prefill_heavy,
+            model_name="org/decode-heavy",
+            total_time=6.4,
+            generation_time=6.0,
+            runtime_diagnostics=RuntimeDiagnostics(
+                model_load_time_s=0.2,
+                prompt_prep_time_s=0.1,
+                decode_time_s=6.0,
+                cleanup_time_s=0.1,
+                first_token_latency_s=1.0,
+                stop_reason="completed",
+            ),
+        )
+
+        generate_diagnostics_report(
+            results=[prefill_heavy, decode_heavy],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "**Dominant runtime phase:** upstream prefill / first-token dominated" in content
+        assert "upstream prefill / first-token=9.00s" in content
+        assert "post-prefill decode=7.00s" in content
+        assert (
+            "**Generation total:** 16.00s across 2 model(s); upstream prefill / "
+            "first-token split available for 2/2 model(s)."
+        ) in content
+
+    def test_runtime_metrics_keep_unsplit_generation_when_first_token_missing(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Missing first-token latency should preserve the old generation total fallback."""
+        out = tmp_path / "diag.md"
+        result = PerformanceResult(
+            model_name="org/no-first-token",
+            success=True,
+            generation=_MockGeneration(text="ok", prompt_tokens=100, generation_tokens=10),
+            total_time=3.3,
+            generation_time=3.0,
+            model_load_time=0.2,
+            runtime_diagnostics=RuntimeDiagnostics(
+                model_load_time_s=0.2,
+                prompt_prep_time_s=0.1,
+                decode_time_s=3.0,
+                cleanup_time_s=0.0,
+                first_token_latency_s=None,
+                stop_reason="completed",
+            ),
+        )
+
+        generate_diagnostics_report(
+            results=[_make_failure_with_details("org/fail"), result],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "generation total (unsplit)=3.00s" in content
+        assert "post-prefill decode=" not in content
+        assert "upstream prefill / first-token=" not in content
 
     def test_report_written_for_stack_signal_without_failures(self, tmp_path: Path) -> None:
         """Suspicious successful runs should still produce diagnostics for stack triage."""
