@@ -130,6 +130,7 @@ python -m tools.validate_env --fix
 - **Line length**: 100 characters (configurable exceptions for long strings)
 - **Type annotations**: Required for all new code
 - **Docstrings**: Required for non-obvious functions
+- **Logging and Rich output**: Send user-visible messages through `logger` so console and file logs stay aligned. Use Rich to build tables or panels, then route them through the existing logging helpers instead of calling `Console.print()` directly from feature code.
 
 See [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) for detailed conventions.
 

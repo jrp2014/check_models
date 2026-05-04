@@ -13,7 +13,7 @@ import contextlib
 import importlib
 import json
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import TYPE_CHECKING
 from unittest.mock import patch
@@ -416,18 +416,18 @@ class TestComputeConfidenceIndicators:
 
     def test_config_driven_patterns(self, mod: types.ModuleType) -> None:
         """Configured confidence patterns should override built-in defaults."""
-        original_patterns = mod.QUALITY.patterns
-        mod.QUALITY.patterns = {
-            "confidence_hedge_patterns": [r"\bhedgeword\b"],
-            "confidence_definitive_patterns": [r"\bdefword\b"],
-        }
-        try:
+        new_quality = replace(
+            mod.QUALITY,
+            patterns={
+                "confidence_hedge_patterns": [r"\bhedgeword\b"],
+                "confidence_definitive_patterns": [r"\bdefword\b"],
+            },
+        )
+        with patch.object(mod, "QUALITY", new_quality):
             result = mod.compute_confidence_indicators("hedgeword defword defword")
             assert result["hedge_count"] == 1
             assert result["definitive_count"] == 2
             assert result["confidence_ratio"] == 0.67
-        finally:
-            mod.QUALITY.patterns = original_patterns
 
 
 class TestConfigDrivenCatalogingDetectors:
@@ -435,30 +435,32 @@ class TestConfigDrivenCatalogingDetectors:
 
     def test_task_compliance_uses_configured_labels(self, mod: types.ModuleType) -> None:
         """Configured labels should be recognized as explicit task sections."""
-        original_patterns = mod.QUALITY.patterns
-        mod.QUALITY.patterns = {
-            "task_caption_labels": ["headline"],
-            "task_description_labels": ["notes"],
-            "task_keyword_labels": ["terms"],
-        }
-        try:
+        new_quality = replace(
+            mod.QUALITY,
+            patterns={
+                "task_caption_labels": ["headline"],
+                "task_description_labels": ["notes"],
+                "task_keyword_labels": ["terms"],
+            },
+        )
+        with patch.object(mod, "QUALITY", new_quality):
             text = "headline: Church tower\nnotes: Stone church in winter.\nterms: church, tower"
             result = mod.compute_task_compliance(text)
             assert result["has_caption"] is True
             assert result["has_description"] is True
             assert result["has_keywords"] is True
-        finally:
-            mod.QUALITY.patterns = original_patterns
 
     def test_visual_grounding_uses_configured_patterns(self, mod: types.ModuleType) -> None:
         """Configured visual/spatial/color patterns should drive grounding counts."""
-        original_patterns = mod.QUALITY.patterns
-        mod.QUALITY.patterns = {
-            "visual_grounding_visual_patterns": [r"\bcustomobject\b"],
-            "visual_grounding_spatial_patterns": [r"\bcustomspot\b"],
-            "visual_grounding_color_patterns": [r"\bcustomcolor\b"],
-        }
-        try:
+        new_quality = replace(
+            mod.QUALITY,
+            patterns={
+                "visual_grounding_visual_patterns": [r"\bcustomobject\b"],
+                "visual_grounding_spatial_patterns": [r"\bcustomspot\b"],
+                "visual_grounding_color_patterns": [r"\bcustomcolor\b"],
+            },
+        )
+        with patch.object(mod, "QUALITY", new_quality):
             result = mod.compute_visual_grounding(
                 "customobject at customspot with customcolor",
                 None,
@@ -467,8 +469,6 @@ class TestConfigDrivenCatalogingDetectors:
             assert result["spatial_terms"] == 1
             assert result["color_terms"] == 1
             assert result["grounding_score"] > 0.0
-        finally:
-            mod.QUALITY.patterns = original_patterns
 
 
 class TestRegexDetectionUtilities:
@@ -647,11 +647,13 @@ class TestLoadQualityConfig:
         yaml_content = "thresholds:\n  repetition_ratio: 0.95\npatterns: {}\n"
         config_file = tmp_path / "quality_config.yaml"
         config_file.write_text(yaml_content)
-        mod.load_quality_config(config_file)
-        expected_ratio = 0.95
-        assert mod.QUALITY.repetition_ratio == expected_ratio
-        # Restore default
-        mod.QUALITY.repetition_ratio = 0.8
+        original_quality = mod.QUALITY
+        try:
+            mod.load_quality_config(config_file)
+            expected_ratio = 0.95
+            assert mod.QUALITY.repetition_ratio == expected_ratio
+        finally:
+            mod.QUALITY = original_quality
 
     def test_invalid_yaml_warns(
         self,
@@ -713,7 +715,7 @@ class TestLoadQualityConfig:
             "thresholds:\n  repetition_ratio: 0.91\npatterns: {}\n",
             encoding="utf-8",
         )
-        original_ratio = mod.QUALITY.repetition_ratio
+        original_quality = mod.QUALITY
 
         def fake_files(package: str) -> Path:
             assert package == "check_models_data"
@@ -722,10 +724,11 @@ class TestLoadQualityConfig:
         monkeypatch.setattr(mod, "files", fake_files)
         monkeypatch.setattr(mod, "as_file", contextlib.nullcontext)
 
-        mod.load_quality_config()
-
-        assert mod.QUALITY.repetition_ratio == 0.91
-        mod.QUALITY.repetition_ratio = original_ratio
+        try:
+            mod.load_quality_config()
+            assert mod.QUALITY.repetition_ratio == 0.91
+        finally:
+            mod.QUALITY = original_quality
 
 
 class TestSystemProfilerParsing:

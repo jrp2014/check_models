@@ -2230,6 +2230,11 @@ class TimeoutManager(ContextDecorator):
 
 
 # Configure logging - Single logger instance
+# Contributor rule of thumb:
+# - Send user-visible messages through logger so console and file logs stay aligned.
+# - Use Rich to build structured renderables (for example tables or panels),
+#   then route them through _log_rich_renderable() / _log_rich_table()
+#   instead of calling Console.print() directly from feature code.
 logger: logging.Logger = logging.getLogger(LOGGER_NAME)
 
 # Disable Hugging Face tokenizers parallelism to avoid fork-related warnings/deadlocks.
