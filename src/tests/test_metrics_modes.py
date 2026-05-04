@@ -13,7 +13,6 @@ from rich.console import Console
 
 import check_models
 from check_models import (
-    ConsoleRoutingFilter,
     FileSafeFormatter,
     GenerationQualityAnalysis,
     HistoryModelResultRecord,
