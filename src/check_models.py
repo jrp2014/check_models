@@ -254,7 +254,7 @@ class FormattingThresholds:
     generation_wrap_width: int = 100
 
 
-@dataclass(frozen=True)
+@dataclass
 class QualityThresholds:
     """Centralized thresholds for quality analysis detection.
 
