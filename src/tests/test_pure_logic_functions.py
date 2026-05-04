@@ -15,7 +15,7 @@ import json
 import logging
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, cast
 from unittest.mock import patch
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -653,7 +653,7 @@ class TestLoadQualityConfig:
             expected_ratio = 0.95
             assert mod.QUALITY.repetition_ratio == expected_ratio
         finally:
-            mod.QUALITY = original_quality
+            cast("Any", mod).QUALITY = original_quality
 
     def test_invalid_yaml_warns(
         self,
@@ -728,7 +728,7 @@ class TestLoadQualityConfig:
             mod.load_quality_config()
             assert mod.QUALITY.repetition_ratio == 0.91
         finally:
-            mod.QUALITY = original_quality
+            cast("Any", mod).QUALITY = original_quality
 
 
 class TestSystemProfilerParsing:
