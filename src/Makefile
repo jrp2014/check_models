@@ -236,21 +236,9 @@ quality-strict: ## Run quality checks and require markdownlint availability
 
 # CI pipeline
 .PHONY: ci
-ci: ## Run full CI pipeline (format check, quality script, dependency sync, tests)
-	@echo "[ci] ruff format --check (fail if unformatted)" && $(RUN_TOOL_PREFIX) ruff format --check $(FMT_PATHS) || (echo "[ci] Formatting issues detected; run 'make format'" && exit 1)
-	@echo "[ci] quality (ruff check + mypy)" && $(RUN_TOOL_PREFIX) ruff check $(FMT_PATHS) && $(RUN_TOOL_PREFIX) mypy --config-file $(MYPY_CONFIG) check_models.py tests || exit 1
-	@echo "[ci] dependency sync check" && $(RUN_PY) tools/update_readme_deps.py --check || exit 1
-	@echo "[ci] running tests"; \
-	TEST_OUTPUT=$$($(RUN_TOOL_PREFIX) pytest 2>&1); RC=$$?; echo "$$TEST_OUTPUT" > .ci_tests.txt; echo "$$TEST_OUTPUT"; \
-	if [ $$RC -ne 0 ]; then echo "[ci] tests failed (rc=$$RC)"; exit $$RC; fi; \
-	PASSED=$$(echo "$$TEST_OUTPUT" | grep -Eo '[0-9]+ passed' | tail -1 | awk '{print $$1}'); \
-	if [ -z "$$PASSED" ] || [ "$$PASSED" -lt 1 ]; then echo "[ci] ERROR: No tests passed"; exit 1; fi; \
-	SKIPPED=$$(echo "$$TEST_OUTPUT" | grep -Eo '[0-9]+ skipped' | tail -1 | awk '{print $$1}' || echo 0); \
-	if [ "$$SKIPPED" != "0" ] && [ -n "$$SKIPPED" ]; then \
-	  echo "[ci] ERROR: $$SKIPPED tests skipped (skips not allowed in CI)"; \
-	  exit 1; \
-	fi; \
-	echo "[ci] SUCCESS ($$PASSED tests passed; no skips)"
+ci: ## Run full CI pipeline (alias for quality checks)
+	@echo "[ci] Running full quality pipeline for local-to-remote parity..."
+	@bash tools/run_quality_checks.sh
 
 # Maintenance
 .PHONY: check-outdated

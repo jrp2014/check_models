@@ -254,7 +254,7 @@ class FormattingThresholds:
     generation_wrap_width: int = 100
 
 
-@dataclass
+@dataclass(frozen=True)
 class QualityThresholds:
     """Centralized thresholds for quality analysis detection.
 
@@ -2171,13 +2171,13 @@ class PerfCounterTimer:
 # Python 3.11+ has asyncio.timeout, but signal-based timeout works across sync code
 # Uses SIGALRM which is Unix-only - Windows doesn't support this signal mechanism
 class TimeoutManager(ContextDecorator):
-    """Manage a timeout context for code execution (UNIX only)."""
+    """Apply a SIGALRM-based timeout around synchronous code on Unix."""
 
     def __init__(self, seconds: float) -> None:
-        """Initialize a timeout manager with a timeout duration.
+        """Store the timeout window that ``__enter__`` arms via SIGALRM.
 
         Args:
-            seconds: The timeout duration in seconds.
+            seconds: Maximum runtime, in seconds, before ``TimeoutError`` is raised.
 
         """
         self.seconds: float = seconds
@@ -2856,20 +2856,17 @@ def _detect_excessive_verbosity(text: str, generated_tokens: int) -> bool:
 
 
 def _detect_formatting_violations(text: str) -> list[str]:
-    """Detect formatting issues in generated output.
+    """Detect rendering-related formatting artifacts in generated output.
 
-    Looks for:
-    - Unknown/unexpected tags (not simple <br>) that may interfere with output rendering
-    - Excessive markdown headers/structure
-
-    Note: Bullet lists are checked separately by _detect_excessive_bullets()
-    since they may be appropriate depending on the prompt.
+    Checks only HTML-like tags and markdown header overuse. Bullet density is
+    handled separately by ``_detect_excessive_bullets`` so callers can treat
+    list-heavy outputs differently from malformed formatting.
 
     Args:
         text: Generated text to check
 
     Returns:
-        List of detected formatting issues (excluding bullets)
+        List of display-affecting formatting issues, excluding bullet counts
     """
     issues: list[str] = []
 
@@ -2930,11 +2927,10 @@ def _truncate_repetitive_output(text: str) -> str:
 
 
 def _detect_excessive_bullets(text: str) -> tuple[bool, int]:
-    """Detect if output contains excessive bullet points.
+    """Flag outputs whose bullet count exceeds the configured threshold.
 
-    Bullet lists may be appropriate depending on the prompt (e.g., if the
-    prompt asks "list the items in this image"), so this is separated from
-    other formatting issues.
+    This is a pure count-based check. Callers decide whether a dense bullet
+    list is acceptable for the current prompt.
 
     Args:
         text: Generated text to check
@@ -3911,21 +3907,25 @@ def _detect_generic_output(text: str) -> tuple[bool, float]:
 
 def _detect_language_mixing(
     text: str,
-    quality_thresholds: QualityThresholds = QUALITY,
+    quality_thresholds: QualityThresholds | None = None,
 ) -> tuple[bool, list[str]]:
-    """Detect unexpected language switches or code/tokenizer artifacts.
+    """Detect unexpected language switches and tokenizer-artifact text.
 
-    Catches technical artifacts that shouldn't appear in natural language output.
+    Natural-language mixing and leaked special tokens both surface as unreadable
+    output noise, so this helper reports them through the same issue channel.
 
     Args:
         text: Generated text to check
-        quality_thresholds: Configuration object containing patterns and thresholds
+        quality_thresholds: Optional configuration override for patterns and thresholds
 
     Returns:
         Tuple of (has_mixing, list of detected issues)
     """
     if not text:
         return False, []
+
+    if quality_thresholds is None:
+        quality_thresholds = QUALITY
 
     issues: list[str] = []
 
@@ -4544,9 +4544,12 @@ def _get_quality_pattern_list(
     pattern_key: str,
     fallback: list[str],
     *,
-    quality_thresholds: QualityThresholds = QUALITY,
+    quality_thresholds: QualityThresholds | None = None,
 ) -> list[str]:
     """Return configured regex/pattern list for a key, falling back to defaults."""
+    if quality_thresholds is None:
+        quality_thresholds = QUALITY
+
     if not quality_thresholds.patterns:
         return fallback
 
@@ -7848,11 +7851,13 @@ def _format_table_field_value(
     field_name: str,
     res: PerformanceResult,
 ) -> str:
-    """Format a single field value for table display.
+    """Format one report-table field, including the field-specific shortcuts.
 
     Args:
-        field_name: Name of the field to format
-        res: Performance result containing the data
+        field_name: Table field name. ``model_name`` bypasses generic
+            formatting, ``output`` uses the shared preview builder, and
+            ``quality_issues`` is truncated after field-aware formatting.
+        res: Performance result supplying timing, generation, and issue data
 
     Returns:
         Formatted string value for the field
@@ -7969,9 +7974,14 @@ def _mark_failed_rows_in_html(
     html_table: str,
     sorted_results: Sequence[PerformanceResult],
 ) -> str:
-    """Add data attributes and classes to rows for filtering in the HTML table."""
-    row_pattern = re.compile(r"<tr>.*?</tr>", re.DOTALL)
-    result_index = 0
+    """Annotate HTML result rows with filter metadata and failure styling hooks.
+
+    Only data rows are rewritten. Failed rows also tag the first data cell so the
+    CSS contract stays aligned with the row-level status attributes used by the
+    client-side filters.
+    """
+    row_pattern: re.Pattern[str] = re.compile(r"<tr>.*?</tr>", re.DOTALL)
+    result_index: int = 0
 
     def repl(match: re.Match[str]) -> str:
         nonlocal result_index
@@ -8001,9 +8011,13 @@ def _mark_failed_rows_in_html(
             f'data-error-package="{error_package}">',
             1,
         )
+
+        def mark_failed_cell(cell_match: re.Match[str]) -> str:
+            return _append_html_class(cell_match.group(0), "failed")
+
         return re.sub(
             r"<td\b[^>]*>",
-            lambda cell_match: _append_html_class(cell_match.group(0), "failed"),
+            mark_failed_cell,
             row_html,
             count=1,
         )
@@ -8030,14 +8044,21 @@ def _add_html_table_alignment_classes(
     html_table: str,
     field_names: Sequence[str],
 ) -> str:
-    """Apply text/numeric classes to table headers and cells by column index."""
-    numeric_columns = frozenset(
+    """Apply alignment classes from the prepared field order to each table cell.
+
+    The table is rewritten after HTML generation, so this pass works row by row
+    and preserves any classes that earlier helpers already attached.
+    """
+    numeric_columns: frozenset[int] = frozenset(
         index for index, field_name in enumerate(field_names) if is_numeric_field(field_name)
     )
-    row_pattern = re.compile(r"<tr>.*?</tr>", re.DOTALL)
+    row_pattern: re.Pattern[str] = re.compile(r"<tr>.*?</tr>", re.DOTALL)
 
     def _apply_to_row(row_html: str, *, tag_name: str) -> str:
-        cell_pattern = re.compile(rf"<{tag_name}\b[^>]*>.*?</{tag_name}>", re.DOTALL)
+        cell_pattern: re.Pattern[str] = re.compile(
+            rf"<{tag_name}\b[^>]*>.*?</{tag_name}>",
+            re.DOTALL,
+        )
         cells = cell_pattern.findall(row_html)
         if not cells:
             return row_html
@@ -8063,7 +8084,11 @@ def _add_html_table_alignment_classes(
             updated_cells.append(_with_alignment_class(cell_html, class_name=alignment_class))
 
         replacement_iter: Iterator[str] = iter(updated_cells)
-        return cell_pattern.sub(lambda _: next(replacement_iter), row_html)
+
+        def replace_cell(_: re.Match[str]) -> str:
+            return next(replacement_iter)
+
+        return cell_pattern.sub(replace_cell, row_html)
 
     def repl(match: re.Match[str]) -> str:
         row_html = match.group(0)
@@ -8081,7 +8106,7 @@ def _wrap_output_column_in_details(
     output_col_idx: int,
     sorted_results: Sequence[PerformanceResult],
 ) -> str:
-    """Wrap the output column content in <details>/<summary> for expandability.
+    """Wrap the configured output cell in <details>/<summary> for expansion.
 
     Args:
         html_table: The HTML table string
@@ -8091,8 +8116,8 @@ def _wrap_output_column_in_details(
     Returns:
         Modified HTML table with output column wrapped in details/summary tags
     """
-    # Pattern to match table cells in data rows (not header)
-    # We'll process each row and wrap the last td content
+    # Process the rendered HTML row by row so the preview stays in <summary>
+    # and the fully escaped output remains available on expansion.
     lines: list[str] = html_table.split("\n")
     result_lines: list[str] = []
     row_idx = 0
@@ -8103,7 +8128,7 @@ def _wrap_output_column_in_details(
             # Find all <td>...</td> cells in this row
             cells: list[str] = re.findall(r"<td[^>]*>.*?</td>", original_line)
             if len(cells) > output_col_idx:
-                # Get the last cell (output column)
+                # Grab the configured output cell rather than assuming it is last.
                 output_cell: str = cells[output_col_idx]
 
                 # Extract the content between <td...> and </td>
@@ -8124,17 +8149,17 @@ def _wrap_output_column_in_details(
                         else html.unescape(content)
                     )
 
-                    # Wrap in details/summary
+                    # Keep the preview in <summary> and reveal the full text on demand.
                     wrapped_content: str = (
                         f"<details><summary>{content}</summary>"
                         f"<div style='margin-top: 0.5em;'>{html.escape(full_text)}</div></details>"
                     )
                     new_cell: str = opening_tag + wrapped_content + closing_tag
 
-                    # Replace the old cell with the new one
+                    # Replace the original output cell with the expandable version.
                     cells[output_col_idx] = new_cell
 
-                    # Reconstruct the line with updated cells
+                    # Reconstruct the row with the updated cell sequence.
                     cell_iter: Iterator[str] = iter(cells)
 
                     def repl(_: re.Match[str], ci: Iterator[str] = cell_iter) -> str:

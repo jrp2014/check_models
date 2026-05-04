@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import dataclasses
+from unittest.mock import patch
+
 import pytest
 
 import check_models
@@ -52,20 +55,20 @@ def test_analyze_generation_text_hallucination_multiple_choice() -> None:
 
 def test_detect_hallucination_patterns_uses_configured_keyword_lists() -> None:
     """Configured substring lists should override built-in hallucination defaults."""
-    original_patterns = check_models.QUALITY.patterns
-    check_models.QUALITY.patterns = {
-        "hallucination_question_indicators": ["bespoke hallucination prompt"],
-        "hallucination_edu_keywords": ["custom classroom leak"],
-    }
-    try:
+    new_quality = dataclasses.replace(
+        check_models.QUALITY,
+        patterns={
+            "hallucination_question_indicators": ["bespoke hallucination prompt"],
+            "hallucination_edu_keywords": ["custom classroom leak"],
+        },
+    )
+    with patch.object(check_models, "QUALITY", new_quality):
         issues = check_models._detect_hallucination_patterns(
             "This long output includes a bespoke hallucination prompt and a custom classroom leak. "
             * 4,
         )
         assert any("question" in issue.lower() for issue in issues)
         assert any("educational" in issue.lower() for issue in issues)
-    finally:
-        check_models.QUALITY.patterns = original_patterns
 
 
 def test_analyze_generation_text_excessive_verbosity() -> None:
@@ -594,20 +597,20 @@ def test_detect_fabricated_details_suspicious_url() -> None:
 
 def test_detect_fabricated_details_uses_configured_patterns() -> None:
     """Configured fabrication patterns should override built-in defaults."""
-    original_patterns = check_models.QUALITY.patterns
-    check_models.QUALITY.patterns = {
-        "fabrication_url_patterns": [r"https?://[^\s]+"],
-        "fabrication_suspicious_url_keywords": ["customtokenxyz"],
-        "fabrication_precise_stat_patterns": [r"\bwonky\d+\b"],
-    }
-    try:
+    new_quality = dataclasses.replace(
+        check_models.QUALITY,
+        patterns={
+            "fabrication_url_patterns": [r"https?://[^\s]+"],
+            "fabrication_suspicious_url_keywords": ["customtokenxyz"],
+            "fabrication_precise_stat_patterns": [r"\bwonky\d+\b"],
+        },
+    )
+    with patch.object(check_models, "QUALITY", new_quality):
         text = "See https://domain.test/customtokenxyz/path with wonky1 and wonky2."
         has_fab, issues = check_models._detect_fabricated_details(text)
         assert has_fab is True
         assert any("suspicious_url" in issue for issue in issues)
         assert any("suspicious_precision" in issue for issue in issues)
-    finally:
-        check_models.QUALITY.patterns = original_patterns
 
 
 def test_detect_fabricated_details_future_date() -> None:
@@ -747,11 +750,13 @@ def test_detect_training_data_leak_clean() -> None:
 
 def test_detect_training_data_leak_uses_configured_patterns() -> None:
     """Configured training-leak pattern groups should be used."""
-    original_patterns = check_models.QUALITY.patterns
-    check_models.QUALITY.patterns = {
-        "training_leak_instruction_header_patterns": [r"\n### CUSTOM LEAK ###"],
-    }
-    try:
+    new_quality = dataclasses.replace(
+        check_models.QUALITY,
+        patterns={
+            "training_leak_instruction_header_patterns": [r"\n### CUSTOM LEAK ###"],
+        },
+    )
+    with patch.object(check_models, "QUALITY", new_quality):
         text = (
             "A detailed response about architecture and people in the square. "
             "It includes grounded visual details and contextual cues.\n"
@@ -761,8 +766,6 @@ def test_detect_training_data_leak_uses_configured_patterns() -> None:
         has_leak, leak_type = check_models._detect_training_data_leak(text)
         assert has_leak is True
         assert leak_type == "instruction_header"
-    finally:
-        check_models.QUALITY.patterns = original_patterns
 
 
 def test_analyze_generation_text_includes_harness_issues() -> None:
