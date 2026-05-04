@@ -7,6 +7,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Replace the diagnostics appendix's old import-only portable triage block with
+  portable upstream probes that separate environment sanity checks,
+  `mlx_vlm.utils.load()` model/config probing, and synthetic-image reruns
+  without requiring the original local image.
 - Render issue queue subtypes with human-readable maintainer labels while
   preserving the raw subtype codes for traceability.
 - Make generated issue queues and issue drafts use filing-ready problem

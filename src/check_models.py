@@ -10631,6 +10631,7 @@ _DIAGNOSTICS_LIB_NAMES: Final[tuple[str, ...]] = (
 _PORTABLE_DEPENDENCY_PROBE_CMD: Final[str] = (
     "python -m pip show mlx mlx-vlm mlx-lm transformers huggingface-hub tokenizers"
 )
+_PORTABLE_PROBE_IMAGE_PATH: Final[str] = "./check_models_portable_probe.png"
 
 ISSUE_EVIDENCE_MODEL_LIMIT: Final[int] = 3
 
@@ -13422,6 +13423,7 @@ def _build_repro_command_tokens(
     image_path: Path | None,
     run_args: argparse.Namespace | None,
     include_selection: bool,
+    include_input: bool = True,
 ) -> list[str]:
     """Build CLI command tokens for diagnostics reproducibility snippets."""
 
@@ -13433,7 +13435,8 @@ def _build_repro_command_tokens(
                 tokens.extend([flag, str(value)])
 
     tokens = ["python", "-m", "check_models"]
-    _append_repro_input_tokens(tokens=tokens, image_path=image_path, run_args=run_args)
+    if include_input:
+        _append_repro_input_tokens(tokens=tokens, image_path=image_path, run_args=run_args)
 
     if run_args is None:
         return tokens
@@ -13725,9 +13728,94 @@ def _diagnostics_footer(
     failed: list[PerformanceResult],
     prompt: str,
     *,
+    diagnostics_snapshot: DiagnosticsSnapshot,
     image_path: Path | None,
     run_args: argparse.Namespace | None,
 ) -> list[str]:
+    def _portable_probe_model_names(snapshot: DiagnosticsSnapshot) -> list[str]:
+        names = [result.model_name for result in snapshot.failed]
+        names.extend(result.model_name for result, _sample in snapshot.harness_results)
+        names.extend(result.model_name for result, _symptom, _owner in snapshot.stack_signals)
+        return _dedupe_preserve_order(names)
+
+    def _portable_load_probe_script(model_names: Sequence[str]) -> str:
+        load_kwargs = {
+            "adapter_path": getattr(run_args, "adapter_path", None) if run_args else None,
+            "lazy": bool(getattr(run_args, "lazy_load", False)) if run_args else False,
+            "revision": getattr(run_args, "revision", None) if run_args else None,
+            "trust_remote_code": bool(getattr(run_args, "trust_remote_code", True))
+            if run_args
+            else True,
+        }
+        return "\n".join(
+            (
+                "python - <<'PY'",
+                "from mlx_vlm.utils import load  # mlx_vlm.utils.load",
+                "",
+                f"MODELS = {list(model_names)!r}",
+                f"LOAD_KWARGS = {load_kwargs!r}",
+                "",
+                "for model_id in MODELS:",
+                '    print(f"== {model_id} ==")',
+                "    try:",
+                "        model, processor = load(model_id, **LOAD_KWARGS)",
+                "    except Exception as exc:",
+                '        print(f"load FAIL: {type(exc).__name__}: {exc}")',
+                "        continue",
+                "",
+                "    config = getattr(model, 'config', None)",
+                "    tokenizer = getattr(processor, 'tokenizer', None)",
+                "    image_processor = getattr(processor, 'image_processor', None)",
+                '    print("load OK")',
+                '    print(f"model_class={type(model).__name__}")',
+                "    config_class = type(config).__name__ if config is not None else 'None'",
+                '    print(f"config_class={config_class}")',
+                "    model_type = getattr(config, 'model_type', None)",
+                '    print(f"model_type={model_type}")',
+                '    print(f"processor_class={type(processor).__name__}")',
+                "    tokenizer_class = type(tokenizer).__name__ if tokenizer is not None else 'None'",
+                '    print(f"tokenizer_class={tokenizer_class}")',
+                '    print(f"has_image_processor={image_processor is not None}")',
+                "    eos_token = getattr(tokenizer, 'eos_token', None)",
+                "    eos_token_id = getattr(tokenizer, 'eos_token_id', None)",
+                '    print(f"eos_token={eos_token}")',
+                '    print(f"eos_token_id={eos_token_id}")',
+                "PY",
+            )
+        )
+
+    def _portable_generation_probe_script(model_names: Sequence[str]) -> str:
+        tokens = _build_repro_command_tokens(
+            image_path=None,
+            run_args=run_args,
+            include_selection=False,
+            include_input=False,
+        )
+        if run_args is None or getattr(run_args, "prompt", None) is None:
+            tokens.extend(["--prompt", prompt])
+        tokens.extend(["--image", _PORTABLE_PROBE_IMAGE_PATH, "--models", *model_names])
+        rerun_command = shlex_join(tokens)
+        return "\n".join(
+            (
+                "python - <<'PY'",
+                "from PIL import Image",
+                "",
+                "size = 32",
+                "image = Image.new('RGB', (size, size))",
+                "pixels = [",
+                "    ((x * 7) % 256, (y * 11) % 256, ((x + y) * 13) % 256)",
+                "    for y in range(size)",
+                "    for x in range(size)",
+                "]",
+                "image.putdata(pixels)",
+                f"image.save('{_PORTABLE_PROBE_IMAGE_PATH}')",
+                f"print('wrote {_PORTABLE_PROBE_IMAGE_PATH}')",
+                "PY",
+                "",
+                rerun_command,
+            )
+        )
+
     all_run_tokens = _build_repro_command_tokens(
         image_path=image_path,
         run_args=run_args,
@@ -13742,29 +13830,63 @@ def _diagnostics_footer(
         "# Re-run with the same CLI arguments\n"
         f"{all_run_command}"
     )
+    portable_probe_models = _portable_probe_model_names(diagnostics_snapshot)
     parts: list[str] = []
     _append_markdown_section(parts, title="## Reproducibility")
     _append_markdown_code_block(parts, all_models_command, language="bash")
 
-    portable_commands = (
-        "# Capture dependency versions\n"
-        f"{_PORTABLE_DEPENDENCY_PROBE_CMD}\n"
-        "\n"
-        "# Verify imports with explicit pass/fail output\n"
-        "python - <<'PY'\n"
-        "import importlib\n"
-        "packages = ('mlx', 'mlx_vlm', 'mlx_lm', 'transformers', 'huggingface_hub', 'tokenizers')\n"
-        "for name in packages:\n"
-        "    try:\n"
-        "        mod = importlib.import_module(name)\n"
-        "        version = getattr(mod, '__version__', 'unknown')\n"
-        "        print(f'{name} OK {version}')\n"
-        "    except Exception as exc:\n"
-        "        print(f'{name} FAIL {type(exc).__name__}: {exc}')\n"
-        "PY"
+    portable_body_lines = [
+        "These probes are not a substitute for the original repro bundle. They help "
+        "upstream maintainers separate package/import problems, model repository/config/load "
+        "problems, and image-dependent generation problems without needing the original local image.",
+    ]
+    if not portable_probe_models:
+        portable_body_lines.append(
+            "This run did not queue any model-specific failure, harness, or stack-signal probes, "
+            "so only the environment sanity step is shown below."
+        )
+    _append_markdown_section(
+        parts,
+        title="### Portable upstream probes (no local image required)",
+        body_lines=portable_body_lines,
     )
-    _append_markdown_section(parts, title="### Portable triage (no local image required)")
-    _append_markdown_code_block(parts, portable_commands, language="bash")
+
+    portable_probe_blocks = [
+        (
+            "# 1) Environment sanity: package versions + import smoke test\n"
+            f"{_PORTABLE_DEPENDENCY_PROBE_CMD}\n"
+            "\n"
+            "python - <<'PY'\n"
+            "import importlib\n"
+            "packages = ('mlx', 'mlx_vlm', 'mlx_lm', 'transformers', 'huggingface_hub', 'tokenizers')\n"
+            "for name in packages:\n"
+            "    try:\n"
+            "        mod = importlib.import_module(name)\n"
+            "        version = getattr(mod, '__version__', 'unknown')\n"
+            "        print(f'{name} OK {version}')\n"
+            "    except Exception as exc:\n"
+            "        print(f'{name} FAIL {type(exc).__name__}: {exc}')\n"
+            "PY"
+        )
+    ]
+    if portable_probe_models:
+        portable_probe_blocks.append(
+            "\n".join(
+                (
+                    "# 2) Model load/config probe: no original image required",
+                    _portable_load_probe_script(portable_probe_models),
+                )
+            )
+        )
+        portable_probe_blocks.append(
+            "\n".join(
+                (
+                    "# 3) Synthetic-image generation probe: separates image-dependent failures",
+                    _portable_generation_probe_script(portable_probe_models),
+                )
+            )
+        )
+    _append_markdown_code_block(parts, "\n\n".join(portable_probe_blocks), language="bash")
 
     if failed:
         _append_markdown_section(
@@ -13950,6 +14072,7 @@ def generate_diagnostics_report(
         _diagnostics_footer(
             failed,
             prompt,
+            diagnostics_snapshot=diagnostics_snapshot,
             image_path=image_path,
             run_args=run_args,
         ),

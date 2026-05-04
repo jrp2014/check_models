@@ -39,6 +39,7 @@ from check_models import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
     from pathlib import Path
 
     import pytest
@@ -83,6 +84,22 @@ def _stub_versions() -> LibraryVersionDict:
         "tokenizers": "0.1",
         "Pillow": "10.0",
     }
+
+
+def _extract_markdown_subsection(
+    content: str,
+    heading: str,
+    *,
+    end_headings: Sequence[str],
+) -> str:
+    start = content.index(heading)
+    end_positions = [
+        content.find(candidate, start + len(heading))
+        for candidate in end_headings
+        if content.find(candidate, start + len(heading)) != -1
+    ]
+    end = min(end_positions) if end_positions else len(content)
+    return content[start:end]
 
 
 def _make_success(name: str = "org/model-ok") -> PerformanceResult:
@@ -1366,17 +1383,120 @@ class TestDiagnosticsReport:
     def test_action_summary_and_portable_triage_sections_present(self, tmp_path: Path) -> None:
         """Diagnostics should include compact action triage and portable probe commands."""
         out = tmp_path / "diag.md"
+        image_path = tmp_path / "sample image.jpg"
+        image_path.write_text("placeholder", encoding="utf-8")
+        adapter_path = tmp_path / "portable-adapter"
+        run_args = Namespace(
+            image=image_path,
+            folder=None,
+            models=None,
+            exclude=None,
+            trust_remote_code=False,
+            revision="main",
+            adapter_path=adapter_path,
+            prompt=None,
+            detailed_metrics=False,
+            resize_shape=None,
+            eos_tokens=None,
+            skip_special_tokens=False,
+            processor_kwargs=None,
+            enable_thinking=False,
+            thinking_budget=None,
+            thinking_start_token=None,
+            thinking_end_token=None,
+            max_tokens=123,
+            temperature=0.7,
+            top_p=0.92,
+            min_p=0.08,
+            top_k=24,
+            repetition_penalty=1.1,
+            repetition_context_size=50,
+            lazy_load=False,
+            max_kv_size=None,
+            kv_bits=None,
+            kv_quant_scheme=check_models.DEFAULT_KV_QUANT_SCHEME,
+            prefill_step_size=16,
+            kv_group_size=64,
+            quantized_kv_start=2048,
+            timeout=42.0,
+            verbose=True,
+            no_color=False,
+            force_color=False,
+            width=None,
+            quality_config=None,
+            context_marker="Context:",
+        )
+        stack_signal = PerformanceResult(
+            model_name="org/stack-probe",
+            success=True,
+            generation=_MockGeneration(
+                text="echoed context",
+                prompt_tokens=15000,
+                generation_tokens=80,
+            ),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+            quality_analysis=GenerationQualityAnalysis(
+                is_repetitive=False,
+                repeated_token=None,
+                hallucination_issues=[],
+                is_verbose=False,
+                formatting_issues=[],
+                has_excessive_bullets=False,
+                bullet_count=0,
+                is_context_ignored=False,
+                missing_context_terms=[],
+                is_refusal=False,
+                refusal_type=None,
+                is_generic=False,
+                specificity_score=0.0,
+                has_language_mixing=False,
+                language_mixing_issues=[],
+                has_degeneration=False,
+                degeneration_type=None,
+                has_fabrication=False,
+                fabrication_issues=[],
+                has_reasoning_leak=False,
+                reasoning_leak_markers=[],
+                has_context_echo=True,
+                context_echo_ratio=0.94,
+                has_harness_issue=False,
+                harness_issue_type=None,
+                harness_issue_details=[],
+                word_count=80,
+                unique_ratio=0.3,
+                prompt_checks_ran=True,
+            ),
+        )
         generate_diagnostics_report(
-            results=[_make_failure_with_details("org/broken-model")],
+            results=[
+                _make_failure_with_details("org/broken-model"),
+                _make_harness_success("org/harness-probe"),
+                stack_signal,
+            ],
             filename=out,
             versions=_stub_versions(),
             system_info={},
             prompt="test",
+            image_path=image_path,
+            run_args=run_args,
         )
         content = out.read_text(encoding="utf-8")
+        portable_block = _extract_markdown_subsection(
+            content,
+            "### Portable upstream probes (no local image required)",
+            end_headings=("### Target specific failing models",),
+        )
         assert "## Upstream Filing Notes" in content
         assert "## Appendix" in content
-        assert "### Portable triage (no local image required)" in content
+        assert "### Portable upstream probes (no local image required)" in content
+        assert "mlx_vlm.utils.load" in portable_block
+        assert "org/broken-model" in portable_block
+        assert "org/harness-probe" in portable_block
+        assert "org/stack-probe" in portable_block
+        assert "check_models_portable_probe.png" in portable_block
+        assert str(image_path) not in portable_block
         assert "python -m pip show mlx mlx-vlm mlx-lm transformers" in content
 
     def test_unflagged_models_section_lists_successes(self, tmp_path: Path) -> None:
@@ -2239,6 +2359,122 @@ class TestDiagnosticsReport:
         content = out.read_text(encoding="utf-8")
         assert "python -m check_models --models org/a" in content
         assert "python -m check_models --models org/b" in content
+
+    def test_portable_upstream_probes_include_harness_and_stack_models_only(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Harness and stack-only reports should still get portable generation probes."""
+        out = tmp_path / "diag.md"
+        image_path = tmp_path / "portable original image.jpg"
+        image_path.write_text("placeholder", encoding="utf-8")
+        stack_signal = PerformanceResult(
+            model_name="org/stack-only",
+            success=True,
+            generation=_MockGeneration(
+                text="echoed context",
+                prompt_tokens=15000,
+                generation_tokens=80,
+            ),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+            quality_analysis=GenerationQualityAnalysis(
+                is_repetitive=False,
+                repeated_token=None,
+                hallucination_issues=[],
+                is_verbose=False,
+                formatting_issues=[],
+                has_excessive_bullets=False,
+                bullet_count=0,
+                is_context_ignored=False,
+                missing_context_terms=[],
+                is_refusal=False,
+                refusal_type=None,
+                is_generic=False,
+                specificity_score=0.0,
+                has_language_mixing=False,
+                language_mixing_issues=[],
+                has_degeneration=False,
+                degeneration_type=None,
+                has_fabrication=False,
+                fabrication_issues=[],
+                has_reasoning_leak=False,
+                reasoning_leak_markers=[],
+                has_context_echo=True,
+                context_echo_ratio=0.94,
+                has_harness_issue=False,
+                harness_issue_type=None,
+                harness_issue_details=[],
+                word_count=80,
+                unique_ratio=0.3,
+                prompt_checks_ran=True,
+            ),
+        )
+        run_args = Namespace(
+            image=image_path,
+            folder=None,
+            models=None,
+            exclude=None,
+            trust_remote_code=True,
+            revision=None,
+            adapter_path=None,
+            prompt=None,
+            max_tokens=check_models.DEFAULT_MAX_TOKENS,
+            temperature=check_models.DEFAULT_TEMPERATURE,
+            top_p=1.0,
+            repetition_penalty=None,
+            repetition_context_size=None,
+            min_p=0.0,
+            top_k=0,
+            max_kv_size=None,
+            kv_bits=None,
+            kv_quant_scheme=check_models.DEFAULT_KV_QUANT_SCHEME,
+            prefill_step_size=None,
+            thinking_budget=None,
+            thinking_start_token=None,
+            thinking_end_token=None,
+            kv_group_size=64,
+            quantized_kv_start=check_models.DEFAULT_QUANTIZED_KV_START,
+            timeout=check_models.DEFAULT_TIMEOUT,
+            detailed_metrics=False,
+            lazy_load=False,
+            skip_special_tokens=False,
+            enable_thinking=False,
+            resize_shape=None,
+            eos_tokens=None,
+            processor_kwargs=None,
+            verbose=False,
+            no_color=False,
+            force_color=False,
+            width=None,
+            quality_config=None,
+            context_marker="Context:",
+        )
+        generate_diagnostics_report(
+            results=[
+                _make_harness_success("org/harness-only"),
+                stack_signal,
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="Describe this image.",
+            image_path=image_path,
+            run_args=run_args,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        portable_block = _extract_markdown_subsection(
+            content,
+            "### Portable upstream probes (no local image required)",
+            end_headings=("### Prompt Used",),
+        )
+        assert "org/harness-only" in portable_block
+        assert "org/stack-only" in portable_block
+        assert "check_models_portable_probe.png" in portable_block
+        assert "--models org/harness-only org/stack-only" in portable_block
+        assert str(image_path) not in portable_block
 
     def test_prompt_in_section(self, tmp_path: Path) -> None:
         """Prompt should be rendered in a dedicated markdown section."""
