@@ -17,8 +17,8 @@
 
 | Model                                     | Representative Signal               | Token Context   | Repro JSON                                                                                                                         |
 |-------------------------------------------|-------------------------------------|-----------------|------------------------------------------------------------------------------------------------------------------------------------|
-| `LiquidAI/LFM2.5-VL-450M-MLX-bf16`        | model error \| mlx model load model | stop=exception  | [repro JSON](../repro_bundles/20260504T202044Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_MLX_MODEL_LOAD_MODEL_853049863f38.json)        |
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | model error \| mlx model load model | stop=exception  | [repro JSON](../repro_bundles/20260504T202044Z_003_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json) |
+| `LiquidAI/LFM2.5-VL-450M-MLX-bf16`        | model error \| mlx model load model | stop=exception  | [repro JSON](../repro_bundles/20260504T215132Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_MLX_MODEL_LOAD_MODEL_853049863f38.json)        |
+| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | model error \| mlx model load model | stop=exception  | [repro JSON](../repro_bundles/20260504T215132Z_004_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json) |
 
 
 ## Minimal Evidence
@@ -39,8 +39,8 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 
 Repro bundles:
 
-- `LiquidAI/LFM2.5-VL-450M-MLX-bf16`: [repro JSON](../repro_bundles/20260504T202044Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_MLX_MODEL_LOAD_MODEL_853049863f38.json)
-- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: [repro JSON](../repro_bundles/20260504T202044Z_003_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)
+- `LiquidAI/LFM2.5-VL-450M-MLX-bf16`: [repro JSON](../repro_bundles/20260504T215132Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_MLX_MODEL_LOAD_MODEL_853049863f38.json)
+- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: [repro JSON](../repro_bundles/20260504T215132Z_004_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)
 - Note: these are local artifact links; attach or publish the JSON when filing upstream.
 
 Per-model failure reruns:

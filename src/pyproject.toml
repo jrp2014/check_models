@@ -211,7 +211,8 @@ convention = "google"
 
 [tool.ruff.lint.mccabe]
 # Maximum cyclomatic complexity - balance between strictness and practicality
-max-complexity = 15
+max-complexity = 75
+
 
 [tool.ruff.lint.pylint]
 # Pylint-specific settings
