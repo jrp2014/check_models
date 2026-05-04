@@ -623,7 +623,7 @@ update_local_mlx_repos() {
 			echo "⚠️  Failed to generate project stubs; verifying existing local stubs"
 		fi
 
-		if ! run_generate_stubs_command "$SCRIPT_DIR" --check mlx_lm mlx_vlm transformers tokenizers; then
+		if ! run_generate_stubs_command "$SCRIPT_DIR" --check --refresh-manifest-on-check mlx_lm mlx_vlm transformers tokenizers; then
 			echo "❌ Project stub integrity verification failed"
 			cd "$ORIGINAL_DIR"
 			return 1

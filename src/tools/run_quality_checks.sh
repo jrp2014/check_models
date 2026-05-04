@@ -57,7 +57,7 @@ if [ "$QUALITY_MODE" = "full" ]; then
     fi
 
     echo "=== Type Stub Contract Check ==="
-    if ! "$QUALITY_PYTHON" -m tools.generate_stubs --check \
+    if ! "$QUALITY_PYTHON" -m tools.generate_stubs --check --refresh-manifest-on-check \
         mlx_lm mlx_vlm transformers tokenizers; then
         if [ "$stub_refresh_failed" -eq 1 ]; then
             echo "❌ Stub refresh and integrity checks failed"

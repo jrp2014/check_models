@@ -333,6 +333,7 @@ _TRANSFORMERS_STUBGEN_NOISE_TOKENS = (
     "No checkpoint found for ",
     " but not documented. Make sure to add it to the docstring of the function in ",
 )
+_VERSION_METADATA_CHANGED_SUFFIX = "version metadata changed"
 
 
 def _validate_packages(packages: Iterable[str]) -> list[str]:
@@ -447,6 +448,11 @@ def get_stub_refresh_reason(packages: Iterable[str], typings_dir: Path = TYPINGS
     return reason
 
 
+def _is_version_metadata_only_refresh_reason(reason: str | None) -> bool:
+    """Return whether the refresh reason is limited to package version metadata drift."""
+    return isinstance(reason, str) and reason.endswith(_VERSION_METADATA_CHANGED_SUFFIX)
+
+
 def _read_stub_file(path: Path, typings_dir: Path) -> tuple[str | None, list[str]]:
     """Read a stub file and return its contents plus any integrity issue."""
     if not path.exists():
@@ -510,14 +516,17 @@ def _verify_mlx_vlm_stub_contracts(typings_dir: Path) -> list[str]:
 def get_stub_integrity_issues(
     packages: Iterable[str],
     typings_dir: Path = TYPINGS_DIR,
+    *,
+    include_manifest: bool = True,
 ) -> list[str]:
     """Return deterministically-checkable issues for generated local stubs."""
     pkg_list = _validate_packages(packages)
     issues: list[str] = []
 
-    refresh_reason = get_stub_refresh_reason(pkg_list, typings_dir)
-    if refresh_reason is not None:
-        issues.append(f"stub manifest is stale: {refresh_reason}")
+    if include_manifest:
+        refresh_reason = get_stub_refresh_reason(pkg_list, typings_dir)
+        if refresh_reason is not None:
+            issues.append(f"stub manifest is stale: {refresh_reason}")
 
     for package, pyi_path, line_no, message in _find_invalid_stub_files(typings_dir, pkg_list):
         rel_path = pyi_path.relative_to(typings_dir)
@@ -531,6 +540,37 @@ def get_stub_integrity_issues(
         issues.extend(_verify_mlx_vlm_stub_contracts(typings_dir))
 
     return issues
+
+
+def refresh_stub_manifest_from_existing_stubs(
+    packages: Iterable[str],
+    typings_dir: Path = TYPINGS_DIR,
+) -> bool:
+    """Refresh manifest metadata when existing stubs still satisfy integrity checks.
+
+    This is intentionally narrow: it repairs only package-version metadata drift
+    after a best-effort regeneration attempt failed, and only when the checked-in
+    stubs already pass syntax and contract validation.
+    """
+    pkg_list = _validate_packages(packages)
+    refresh_reason = get_stub_refresh_reason(pkg_list, typings_dir)
+    if not _is_version_metadata_only_refresh_reason(refresh_reason):
+        return False
+
+    structural_issues = get_stub_integrity_issues(
+        pkg_list,
+        typings_dir,
+        include_manifest=False,
+    )
+    if structural_issues:
+        return False
+
+    _write_stub_manifest(pkg_list, typings_dir)
+    if get_stub_refresh_reason(pkg_list, typings_dir) is not None:
+        return False
+
+    logger.info("[stubs] Refreshed stub manifest from existing verified stubs")
+    return True
 
 
 def _write_stub_manifest(packages: Iterable[str], typings_dir: Path = TYPINGS_DIR) -> None:
@@ -709,10 +749,20 @@ def main() -> int:
         action="store_true",
         help="Validate stub freshness and required post-patch contracts without regenerating",
     )
+    parser.add_argument(
+        "--refresh-manifest-on-check",
+        action="store_true",
+        help=(
+            "When --check sees only package version metadata drift, refresh the manifest "
+            "from existing verified stubs instead of failing"
+        ),
+    )
     ns = parser.parse_args()
     packages = _validate_packages(ns.packages)
 
     if ns.check:
+        if ns.refresh_manifest_on_check:
+            refresh_stub_manifest_from_existing_stubs(packages)
         integrity_issues = get_stub_integrity_issues(packages)
         if integrity_issues:
             for issue in integrity_issues:

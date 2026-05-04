@@ -341,6 +341,48 @@ def test_stub_integrity_issues_detect_missing_mlx_vlm_contract_markers(
     )
 
 
+def test_refresh_stub_manifest_from_existing_stubs_repairs_version_metadata(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Version-only manifest drift should be repairable from verified local stubs."""
+    versions = {"tokenizers": "0.22.2", "mypy": "1.18.0"}
+
+    def _installed_version(distribution: str) -> str | None:
+        return versions.get(distribution)
+
+    typings_dir = tmp_path / "typings"
+    tokenizers_dir = typings_dir / "tokenizers"
+    tokenizers_dir.mkdir(parents=True)
+    (tokenizers_dir / "__init__.pyi").write_text("class Encoding: ...\n", encoding="utf-8")
+    manifest_path = typings_dir / generate_stubs.STUB_MANIFEST
+    manifest_path.write_text(
+        json.dumps(
+            {
+                "packages": {
+                    "tokenizers": {
+                        "distribution": "tokenizers",
+                        "version": "0.22.1",
+                    },
+                },
+                "tool_version": generate_stubs.STUB_TOOL_VERSION,
+                "python_version": generate_stubs._python_version(),
+                "stubgen_version": "1.18.0",
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(generate_stubs, "_installed_distribution_version", _installed_version)
+
+    assert generate_stubs.refresh_stub_manifest_from_existing_stubs(["tokenizers"], typings_dir)
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert manifest["packages"]["tokenizers"]["version"] == "0.22.2"
+
+
 def test_patch_transformers_stubs_adds_processor_runtime_attrs(tmp_path: Path) -> None:
     """Patched ProcessorMixin stubs should expose tokenizer/image processor attrs."""
     typings_dir = tmp_path / "typings"
@@ -399,11 +441,17 @@ def test_patch_mlx_vlm_stubs_widens_generate_processor_type(tmp_path: Path) -> N
 def test_update_script_verifies_stub_integrity_and_logs_local_provenance() -> None:
     """Local update tooling should verify stub contracts and log editable provenance."""
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+    quality_script = (PKG_ROOT / "tools" / "run_quality_checks.sh").read_text(encoding="utf-8")
 
     assert (
-        'run_generate_stubs_command "$SCRIPT_DIR" --check mlx_lm mlx_vlm transformers tokenizers'
+        'run_generate_stubs_command "$SCRIPT_DIR" --check --refresh-manifest-on-check mlx_lm mlx_vlm transformers tokenizers'
         in update_script
     )
+    assert (
+        '"$QUALITY_PYTHON" -m tools.generate_stubs --check --refresh-manifest-on-check'
+        in quality_script
+    )
+    assert "mlx_lm mlx_vlm transformers tokenizers" in quality_script
     assert "Local package provenance:" in update_script
 
 
