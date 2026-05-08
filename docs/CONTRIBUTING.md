@@ -423,6 +423,11 @@ bash tools/update.sh
   (mapped to `CMAKE_ARGS=-DMLX_METAL_JIT=ON`; if unset, MLX's default
   `MLX_METAL_JIT=OFF` uses pre-built kernels)
 
+`tools/update.sh` is intended for local MLX ecosystem development when sibling
+`mlx`, `mlx-lm`, and `mlx-vlm` repositories are present. It follows upstream
+MLX editable dev install guidance for `mlx`; use `make update` for ordinary
+PyPI dependency updates.
+
 **MLX_METAL_JIT Trade-offs**:
 
 - `OFF` (default): Pre-built GPU kernels, larger binary (~100MB+ metallib), instant execution
@@ -437,7 +442,7 @@ bash tools/update.sh
 # Smaller binary with runtime compilation (cold start penalty)
 MLX_METAL_JIT=ON bash tools/update.sh
 
-# Install with PyTorch support
+# Skip PyTorch support
 SKIP_TORCH=1 bash tools/update.sh
 ```
 

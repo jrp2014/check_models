@@ -5,9 +5,22 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Align the MLX-VLM integration with `mlx-vlm` 0.5.0 by exposing the image-relevant
+  `load()` flags, refreshing generated `generate()` stubs for `video` and KV
+  quantization kwargs, and raising the runtime `mlx-vlm` floor to `>=0.5.0`.
+- Extract performance data from upstream `GenerationResult` fields for JSONL and
+  runtime diagnostics, while keeping local allocator snapshots as supplemental
+  active/cache memory fields.
+- Update local MLX repository installs to use upstream's editable dev install
+  guidance for `mlx`.
+
 ### Fixed
 
 - Render cross-artifact links in generated Markdown outputs as GitHub blob/tree URLs instead of local relative paths so `results.md`, `review.md`, `diagnostics.md`, and generated issue drafts can be pasted directly into GitHub issues without breaking their companion links.
+- Keep best-effort MLX cleanup from masking model-run failures when headless
+  runtimes raise `IndexError` during synchronization.
 
 ## [0.7.2] - 2026-05-04
 

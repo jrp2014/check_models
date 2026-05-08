@@ -36,6 +36,8 @@ def test_cli_help_output(help_flag: str, capsys: pytest.CaptureFixture[str]) -> 
     assert "--eos-tokens" in output
     assert "--skip-special-tokens" in output
     assert "--processor-kwargs" in output
+    assert "--force-download" in output
+    assert "--quantize-activations" in output
     assert "--enable-thinking" in output
     assert "--thinking-budget" in output
     assert "--thinking-start-token" in output

@@ -434,7 +434,10 @@ def test_patch_mlx_vlm_stubs_widens_generate_processor_type(tmp_path: Path) -> N
     patched = generate_path.read_text(encoding="utf-8")
     assert "from transformers.processing_utils import ProcessorMixin as ProcessorMixin\n" in patched
     assert "processor: ProcessorMixin | PreTrainedTokenizer" in patched
+    assert "video: str | list[str] | None = None" in patched
     assert "temperature: float = ..." in patched
+    assert "kv_bits: float | None = None" in patched
+    assert "kv_quant_scheme: str = ..." in patched
     assert "thinking_end_token: str = ..." in patched
 
 
@@ -453,6 +456,16 @@ def test_update_script_verifies_stub_integrity_and_logs_local_provenance() -> No
     )
     assert "mlx_lm mlx_vlm transformers tokenizers" in quality_script
     assert "Local package provenance:" in update_script
+
+
+def test_update_script_uses_upstream_mlx_editable_dev_install() -> None:
+    """Local MLX builds should follow upstream's editable dev install guidance."""
+    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+    contributing = (REPO_ROOT / "docs" / "CONTRIBUTING.md").read_text(encoding="utf-8")
+
+    assert 'INSTALL_CMD=(pip_install_verbose -e ".[dev]")' in update_script
+    assert "SKIP_TORCH=1 bash tools/update.sh" in contributing
+    assert "# Skip PyTorch support" in contributing
 
 
 def test_should_audit_path_excludes_generated_and_archived_paths(tmp_path: Path) -> None:

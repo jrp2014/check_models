@@ -849,7 +849,7 @@ class TestPreflightDependencyDiagnostics:
             },
         )
         assert any("mlx==0.29.9" in issue and "0.31.2" in issue for issue in issues)
-        assert any("mlx-vlm==0.4.1" in issue and "0.4.4" in issue for issue in issues)
+        assert any("mlx-vlm==0.4.1" in issue and "0.5.0" in issue for issue in issues)
         assert any("mlx-lm==0.30.9" in issue and "0.31.3" in issue for issue in issues)
         assert any("transformers==5.3.9" in issue and "5.5.3" in issue for issue in issues)
         assert any("huggingface-hub==1.9.9" in issue and "1.10.1" in issue for issue in issues)

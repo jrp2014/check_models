@@ -147,6 +147,56 @@ class TestProcessImageWithModelMock:
         assert result.runtime_diagnostics is not None
         assert result.runtime_diagnostics.first_token_latency_s == 0.5
 
+    def test_extract_generation_performance_data_uses_generation_result(self) -> None:
+        """Performance snapshots should prefer upstream GenerationResult metrics."""
+        fake_result = _FakeGenerationResult(
+            prompt_tokens=11,
+            generation_tokens=7,
+            total_tokens=18,
+            prompt_tps=22.0,
+            generation_tps=33.0,
+            peak_memory=4.5,
+            time=1.25,
+            active_memory=0.75,
+            cache_memory=0.25,
+        )
+
+        metrics = check_models._extract_generation_performance_data(fake_result)
+
+        assert metrics.prompt_tokens == 11
+        assert metrics.generation_tokens == 7
+        assert metrics.total_tokens == 18
+        assert metrics.prompt_tps == 22.0
+        assert metrics.generation_tps == 33.0
+        assert metrics.peak_memory_gb == 4.5
+        assert metrics.generation_time_s == 1.25
+        assert metrics.active_memory_gb == 0.75
+        assert metrics.cache_memory_gb == 0.25
+        assert metrics.first_token_latency_s == 0.5
+
+    def test_load_model_forwards_upstream_load_flags(self, test_image: Path) -> None:
+        """Image-relevant mlx-vlm load flags should reach mlx_vlm.utils.load."""
+        params = replace(
+            _build_params(test_image),
+            force_download=True,
+            quantize_activations=True,
+        )
+        fake_model = _FakeModel()
+        fake_processor = object()
+
+        with patch.object(
+            check_models,
+            "load",
+            return_value=(fake_model, fake_processor),
+        ) as mock_load:
+            model, processor, config = check_models._load_model(params)
+
+        assert model is fake_model
+        assert processor is fake_processor
+        assert config is fake_model.config
+        assert mock_load.call_args.kwargs["force_download"] is True
+        assert mock_load.call_args.kwargs["quantize_activations"] is True
+
     def test_timeout_returns_failure(self, test_image: Path) -> None:
         """TimeoutError during generation should produce success=False."""
         params = _build_params(test_image)

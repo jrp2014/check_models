@@ -123,6 +123,34 @@ def test_save_jsonl_report_includes_library_versions_in_metadata(tmp_path: Path)
     assert rows == []
 
 
+def test_jsonl_metrics_fall_back_to_generation_runtime_fields() -> None:
+    """JSONL metrics should use performance fields attached to GenerationResult."""
+    record = cast(
+        "JsonlResultRecord",
+        {
+            "_type": "result",
+            "model": "fake/model",
+            "success": True,
+        },
+    )
+    result = PerformanceResult(
+        model_name="fake/model",
+        generation=MockGeneration(active_memory=0.75, cache_memory=0.25),
+        success=True,
+        active_memory=None,
+        cache_memory=None,
+    )
+
+    check_models._populate_jsonl_result_generation_data(record, result)
+
+    metrics = record["metrics"]
+    assert metrics["prompt_tokens"] == 10
+    assert metrics["generation_tps"] == 5.0
+    assert metrics["peak_memory_gb"] == 1.5
+    assert metrics["active_memory_gb"] == 0.75
+    assert metrics["cache_memory_gb"] == 0.25
+
+
 def test_save_jsonl_report_content(tmp_path: Path) -> None:
     """Test that save_jsonl_report writes correct content with generation."""
     output_file = tmp_path / "results.jsonl"

@@ -1097,8 +1097,8 @@ All dependencies are defined in `src/pyproject.toml`:
 ```toml
 [project]
 dependencies = [
-    "mlx>=0.31.1",
-    "mlx-vlm>=0.4.1",
+    "mlx>=0.31.2",
+    "mlx-vlm>=0.5.0",
     "Pillow>=10.3.0",
     # ...
 ]
@@ -1118,8 +1118,8 @@ All dependencies are defined in `src/pyproject.toml` as the single source of tru
 ```toml
 [project.dependencies]
 # Core runtime dependencies
-mlx>=0.31.1
-mlx-vlm>=0.4.1
+mlx>=0.31.2
+mlx-vlm>=0.5.0
 Pillow>=10.3.0
 # ...
 
@@ -1251,7 +1251,7 @@ package==1.2.3
 
 ```ini
 # Example of a temporary compatibility cap when an upstream release regresses.
-mlx>=0.31.1,<0.32.0
+mlx>=0.31.2,<0.32.0
 ```
 
 ## Makefile Targets Reference

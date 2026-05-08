@@ -1541,7 +1541,7 @@ class TestDiagnosticsReport:
         assert "org/stack-probe" in portable_block
         assert "check_models_portable_probe.png" in portable_block
         assert str(image_path) not in portable_block
-        assert "python -m pip show mlx mlx-vlm mlx-lm transformers" in content
+        assert "python -m pip show mlx mlx-vlm mlx-lm mlx-audio transformers" in content
 
     def test_unflagged_models_section_lists_successes(self, tmp_path: Path) -> None:
         """Diagnostics should backfill quality analysis for clean successful models."""
@@ -2334,6 +2334,8 @@ class TestDiagnosticsReport:
             eos_tokens=("</think>",),
             skip_special_tokens=True,
             processor_kwargs={"cropping": False},
+            force_download=True,
+            quantize_activations=True,
             enable_thinking=True,
             thinking_budget=96,
             thinking_start_token=THINKING_START_TOKEN,
@@ -2377,6 +2379,8 @@ class TestDiagnosticsReport:
         assert "--eos-tokens '</think>'" in content
         assert "--skip-special-tokens" in content
         assert "--processor-kwargs '{\"cropping\": false}'" in content
+        assert "--force-download" in content
+        assert "--quantize-activations" in content
         assert "--enable-thinking" in content
         assert "--thinking-budget 96" in content
         assert "--thinking-start-token '<think>'" in content

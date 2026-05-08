@@ -315,7 +315,7 @@ Vision-language models maintain a **key-value (KV) cache** during text generatio
 - `--kv-bits <number>`: Quantize KV cache instead of using full precision (typically 16-bit). Uniform quantization supports `2`, `3`, `4`, `5`, `6`, or `8`; fractional values such as `3.5` use upstream TurboQuant automatically. Default: `None` (no quantization).
 - `--kv-quant-scheme <uniform|turboquant>`: Select the upstream KV quantization backend. Default: `uniform`.
 - `--kv-group-size <int>`: Group size for quantization (larger = more compression, less accuracy). Default: `64`.
-- `--quantized-kv-start <int>`: Token position to start quantization. Use `0` to quantize from the beginning, or a larger value to keep early tokens (e.g., system prompts) at full precision. Default: `0`.
+- `--quantized-kv-start <int>`: Token position to start quantization. Use `0` to quantize from the beginning, or a larger value to keep early tokens (e.g., system prompts) at full precision. Default: `5000`.
 
 ### How It Works
 
@@ -507,7 +507,7 @@ If you prefer to install dependencies manually (ensure these match `pyproject.to
 
 <!-- MANUAL_INSTALL_START -->
 ```bash
-pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.2" "mlx-lm>=0.31.3" "mlx-vlm>=0.4.4" "packaging>=26.0" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "rich>=14.1.0" "tabulate>=0.9.0" "transformers>=5.5.3" "wcwidth>=0.2.13"
+pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.2" "mlx-lm>=0.31.3" "mlx-vlm>=0.5.0" "packaging>=26.0" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "rich>=14.1.0" "tabulate>=0.9.0" "transformers>=5.5.3" "wcwidth>=0.2.13"
 ```
 <!-- MANUAL_INSTALL_END -->
 
@@ -614,8 +614,8 @@ Runtime (installed automatically via `pip install -e .` when executed inside `sr
 
 | Purpose | Package | Minimum |
 | ------- | ------- | ------- |
-| Core tensor/runtime | `mlx` | `>=0.31.1` |
-| Vision‑language utilities | `mlx-vlm` | `>=0.4.4` |
+| Core tensor/runtime | `mlx` | `>=0.31.2` |
+| Vision‑language utilities | `mlx-vlm` | `>=0.5.0` |
 | Transformer compatibility surface | `transformers` | `>=5.5.3` |
 | Image processing & loading | `Pillow[xmp]` | `>=10.3.0` |
 | Safe XMP/XML parsing | `defusedxml` | `>=0.7.1` |
@@ -666,7 +666,7 @@ Development / QA:
 
 <!-- MINIMAL_INSTALL_START -->
 ```bash
-pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.2" "mlx-lm>=0.31.3" "mlx-vlm>=0.4.4" "packaging>=26.0" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "rich>=14.1.0" "tabulate>=0.9.0" "transformers>=5.5.3" "wcwidth>=0.2.13"
+pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.2" "mlx-lm>=0.31.3" "mlx-vlm>=0.5.0" "packaging>=26.0" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "rich>=14.1.0" "tabulate>=0.9.0" "transformers>=5.5.3" "wcwidth>=0.2.13"
 ```
 <!-- MINIMAL_INSTALL_END -->
 
@@ -719,7 +719,7 @@ pip install -e ".[dev,extras,torch]"  # dev tools + optional model/runtime deps
 > Torch is supported and can be installed when you need it for specific models; the script does not block Torch.
 
 > [!NOTE]
-> The `tools/update.sh` helper supports environment flags: `SKIP_TORCH=1` to skip PyTorch installation (torch is included by default), `MLX_METAL_JIT=ON` for smaller binaries with runtime compilation (default: `OFF` for pre-built kernels), `CLEAN_BUILD=1` to clean build artifacts first.
+> The `tools/update.sh` helper is for local MLX ecosystem development when sibling `mlx`, `mlx-lm`, and `mlx-vlm` repositories are present. It builds `mlx` with upstream's editable dev install (`pip install -e ".[dev]"`) and only sets `CMAKE_ARGS=-DMLX_METAL_JIT=ON|OFF` when you opt into `MLX_METAL_JIT`; otherwise MLX's CMake default is used. Use `make update` for normal PyPI package updates.
 
 > [!NOTE]
 > Installing `sentence-transformers` isn't necessary for this tool and may pull heavy backends into import paths; `check_models` ignores it in the normal execution path.
@@ -864,12 +864,14 @@ See module docstrings and `__all__` exports for complete API reference.
 | `-r`, `--repetition-penalty` | float | (none) | Penalize repeated tokens (>1.0 discourages repetition). |
 | `--repetition-context-size` | int | 20 | Context window size for repetition penalty. |
 | `-L`, `--lazy-load` | flag | `False` | Use lazy loading (loads weights on-demand, reduces memory). |
+| `--force-download` | flag | `False` | Force mlx-vlm/Hugging Face Hub to download model files instead of using cache. |
+| `--quantize-activations` | flag | `False` | Enable mlx-vlm activation quantization during model loading when supported. |
 | `--max-kv-size` | int | (none) | Maximum KV cache size (limits memory for long sequences). |
 | `-b`, `--kv-bits` | number | (none) | Quantize KV cache to N bits; uniform supports `2`, `3`, `4`, `5`, `6`, or `8`, and fractional values use TurboQuant. |
 | `--kv-quant-scheme` | str | `uniform` | KV cache quantization backend: `uniform` or `turboquant`. |
 | `-g`, `--kv-group-size` | int | 64 | Quantization group size for KV cache. |
-| `--quantized-kv-start` | int | 0 | Start position for KV cache quantization. |
-| `--prefill-step-size` | int | (none) | Step size for prompt prefill (`None` uses model default). |
+| `--quantized-kv-start` | int | 5000 | Start position for KV cache quantization. |
+| `--prefill-step-size` | int | 4096 | Step size for prompt prefill. |
 | `-T`, `--timeout` | float | 300 | Operation timeout (seconds) for model execution. |
 | `-v`, `--verbose` | flag | `False` | Enable verbose + debug logging. |
 | `--no-color` | flag | `False` | Disable ANSI colors in the CLI output. |

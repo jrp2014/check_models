@@ -1285,6 +1285,7 @@ class StrictGenerateCallable(Protocol):
         prompt: str,
         image: str | list[str] | None = None,
         audio: str | list[str] | None = None,
+        video: str | list[str] | None = None,
         verbose: bool = False,
         *,
         temperature: float = 0.0,
@@ -1300,7 +1301,7 @@ class StrictGenerateCallable(Protocol):
         **kwargs: Unpack[GenerateExtraKwargs],
     ) -> GenerationResult:
         """Generate a caption/response with the known CLI-controlled kwargs."""
-        del model, processor, prompt, image, audio, verbose
+        del model, processor, prompt, image, audio, video, verbose
         del temperature, top_p, repetition_penalty, repetition_context_size
         del max_kv_size, kv_bits, kv_quant_scheme, kv_group_size, quantized_kv_start
         del max_tokens, kwargs
@@ -1327,6 +1328,7 @@ if TYPE_CHECKING:
         "",
         image="",
         audio="",
+        video="",
         verbose=False,
         max_tokens=1,
         temperature=0.0,
@@ -1392,6 +1394,22 @@ class SupportsGenerationResult(SupportsGenerationText, Protocol):
     peak_memory: float | None  # Upstream peak memory (GB)
 
 
+@dataclass(frozen=True)
+class GenerationPerformanceData:
+    """Normalized performance fields extracted from an upstream generation result."""
+
+    prompt_tokens: int = 0
+    generation_tokens: int = 0
+    total_tokens: int = 0
+    prompt_tps: float = 0.0
+    generation_tps: float = 0.0
+    peak_memory_gb: float = 0.0
+    active_memory_gb: float = 0.0
+    cache_memory_gb: float = 0.0
+    generation_time_s: float | None = None
+    first_token_latency_s: float | None = None
+
+
 class SupportsExifIfd(Protocol):
     """Minimal interface for EXIF objects providing nested IFD access."""
 
@@ -1427,6 +1445,54 @@ def _generation_text_value(generation: object | None) -> str:
     """Return generation text when available, else an empty string."""
     value = getattr(generation, "text", "")
     return value if isinstance(value, str) else ""
+
+
+def _generation_nonnegative_int_metric(generation: object | None, field_name: str) -> int:
+    """Return a non-negative integer generation metric, falling back to zero."""
+    value = _generation_int_metric(generation, field_name)
+    return value if value is not None and value >= 0 else 0
+
+
+def _generation_nonnegative_float_metric(generation: object | None, field_name: str) -> float:
+    """Return a non-negative float generation metric, falling back to zero."""
+    value = _generation_float_metric(generation, field_name)
+    return value if value is not None and value >= 0.0 else 0.0
+
+
+def _generation_optional_nonnegative_float_metric(
+    generation: object | None,
+    field_name: str,
+) -> float | None:
+    """Return a non-negative optional float generation metric."""
+    value = _generation_float_metric(generation, field_name)
+    return value if value is not None and value >= 0.0 else None
+
+
+def _extract_generation_performance_data(
+    generation: object | None,
+) -> GenerationPerformanceData:
+    """Extract the latest mlx-vlm GenerationResult diagnostics in one place."""
+    prompt_tokens = _generation_nonnegative_int_metric(generation, "prompt_tokens")
+    generation_tokens = _generation_nonnegative_int_metric(generation, "generation_tokens")
+    total_tokens = _generation_nonnegative_int_metric(generation, "total_tokens")
+    prompt_tps = _generation_nonnegative_float_metric(generation, "prompt_tps")
+
+    first_token_latency_s = None
+    if prompt_tokens > 0 and prompt_tps > 0.0:
+        first_token_latency_s = float(prompt_tokens) / prompt_tps
+
+    return GenerationPerformanceData(
+        prompt_tokens=prompt_tokens,
+        generation_tokens=generation_tokens,
+        total_tokens=total_tokens,
+        prompt_tps=prompt_tps,
+        generation_tps=_generation_nonnegative_float_metric(generation, "generation_tps"),
+        peak_memory_gb=_generation_nonnegative_float_metric(generation, "peak_memory"),
+        active_memory_gb=_generation_nonnegative_float_metric(generation, "active_memory"),
+        cache_memory_gb=_generation_nonnegative_float_metric(generation, "cache_memory"),
+        generation_time_s=_generation_optional_nonnegative_float_metric(generation, "time"),
+        first_token_latency_s=first_token_latency_s,
+    )
 
 
 # =============================================================================
@@ -2140,6 +2206,8 @@ class ProcessImageParams:
     kv_quant_scheme: Literal["uniform", "turboquant"]
     kv_group_size: int
     quantized_kv_start: int
+    force_download: bool = False
+    quantize_activations: bool = False
     revision: str | None = None
     adapter_path: str | None = None
     prefill_step_size: int | None = None
@@ -6522,6 +6590,7 @@ def get_library_versions() -> LibraryVersionDict:
         "mlx-metal": _none_if_na(_get_version("mlx-metal")),
         "mlx-vlm": _none_if_na(mlx_vlm_ver),
         "mlx-lm": _none_if_na(_get_version("mlx-lm")),
+        "mlx-audio": _none_if_na(_get_version("mlx-audio")),
         "huggingface-hub": _none_if_na(_get_version("huggingface-hub", hf_version)),
         "transformers": _none_if_na(_get_version("transformers")),
         "tokenizers": _none_if_na(_get_version("tokenizers")),
@@ -6690,7 +6759,15 @@ def _detect_mlx_vlm_load_image_issue() -> str | None:
 _RUNTIME_API_CALL_CONTRACTS: Final[dict[str, tuple[str, tuple[str, ...]]]] = {
     "load": (
         "mlx_vlm.utils.load",
-        ("path_or_hf_repo", "adapter_path", "lazy", "revision", "trust_remote_code"),
+        (
+            "path_or_hf_repo",
+            "adapter_path",
+            "lazy",
+            "revision",
+            "trust_remote_code",
+            "force_download",
+            "quantize_activations",
+        ),
     ),
     "apply_chat_template": (
         "mlx_vlm.prompt_utils.apply_chat_template",
@@ -6703,6 +6780,8 @@ _RUNTIME_API_CALL_CONTRACTS: Final[dict[str, tuple[str, tuple[str, ...]]]] = {
             "processor",
             "prompt",
             "image",
+            "audio",
+            "video",
             "verbose",
             "temperature",
             "top_p",
@@ -10856,13 +10935,14 @@ _DIAGNOSTICS_LIB_NAMES: Final[tuple[str, ...]] = (
     "mlx-vlm",
     "mlx",
     "mlx-lm",
+    "mlx-audio",
     "transformers",
     "tokenizers",
     "huggingface-hub",
 )
 
 _PORTABLE_DEPENDENCY_PROBE_CMD: Final[str] = (
-    "python -m pip show mlx mlx-vlm mlx-lm transformers huggingface-hub tokenizers"
+    "python -m pip show mlx mlx-vlm mlx-lm mlx-audio transformers huggingface-hub tokenizers"
 )
 _PORTABLE_PROBE_IMAGE_PATH: Final[str] = "./check_models_portable_probe.png"
 
@@ -13691,6 +13771,8 @@ def _build_repro_command_tokens(
         flag_map=(
             ("detailed_metrics", "--detailed-metrics"),
             ("lazy_load", "--lazy-load"),
+            ("force_download", "--force-download"),
+            ("quantize_activations", "--quantize-activations"),
             ("skip_special_tokens", "--skip-special-tokens"),
             ("enable_thinking", "--enable-thinking"),
         ),
@@ -16014,6 +16096,10 @@ def _generation_kwargs_for_prompt_diagnostics(
         "quantized_kv_start": params.quantized_kv_start,
         "max_tokens": params.max_tokens,
     }
+    if params.force_download:
+        kwargs["force_download"] = True
+    if params.quantize_activations:
+        kwargs["quantize_activations"] = True
     kwargs.update(extra_kwargs)
     if processor_passthrough_kwargs:
         kwargs["processor_kwargs"] = dict(processor_passthrough_kwargs)
@@ -16700,6 +16786,8 @@ def _load_model(
         lazy=params.lazy,
         revision=params.revision,
         trust_remote_code=params.trust_remote_code,
+        force_download=params.force_download,
+        quantize_activations=params.quantize_activations,
     )
     config = cast(
         "PreTrainedConfig | Mapping[str, object] | None",
@@ -17114,7 +17202,15 @@ def _cleanup_runtime_resources(*, synchronize_first: bool = True) -> None:
             return
         try:
             func()
-        except (AttributeError, OSError, RuntimeError, SystemError, TypeError, ValueError):
+        except (
+            AttributeError,
+            IndexError,
+            OSError,
+            RuntimeError,
+            SystemError,
+            TypeError,
+            ValueError,
+        ):
             logger.debug("Ignoring cleanup failure in %s", step_name, exc_info=True)
 
     if synchronize_first:
@@ -17152,6 +17248,7 @@ def _generate_with_processor_passthrough(
         processor=processor,
         prompt=formatted_prompt,
         image=str(params.image_path),
+        video=None,
         verbose=params.verbose,
         temperature=params.temperature,
         top_p=params.top_p,
@@ -17336,6 +17433,7 @@ def _run_model_generation(
             processor=processor,
             prompt=formatted_prompt,
             image=str(params.image_path),
+            video=None,
             verbose=params.verbose,
             temperature=params.temperature,
             top_p=params.top_p,
@@ -17489,16 +17587,21 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
                 params.model_identifier,
             )
 
-        generation_time = getattr(output, "time", None) or phase_timer.duration("decode")
+        performance_data = _extract_generation_performance_data(output)
+        generation_time = performance_data.generation_time_s or phase_timer.duration("decode")
         total_time = time.perf_counter() - total_start_time
         model_load_time = phase_timer.duration("model_load")
-        first_token_latency_s = _derive_first_token_latency_s(output)
+        first_token_latency_s = performance_data.first_token_latency_s
 
-        # Read memory metrics from GenerationResult (captured inside _run_model_generation)
-        active_mem_gb = getattr(output, "active_memory", None) or 0.0
-        cache_mem_gb = getattr(output, "cache_memory", None) or 0.0
+        # Read memory metrics from GenerationResult (upstream plus local runtime snapshots).
+        active_mem_gb = performance_data.active_memory_gb
+        cache_mem_gb = performance_data.cache_memory_gb
 
-        stop_reason = "completed"
+        stop_reason = (
+            "max_tokens"
+            if params.max_tokens > 0 and performance_data.generation_tokens >= params.max_tokens
+            else "completed"
+        )
 
         result_payload = PerformanceResult(
             model_name=params.model_identifier,
@@ -19119,6 +19222,8 @@ def process_models(
             kv_quant_scheme=args.kv_quant_scheme,
             kv_group_size=args.kv_group_size,
             quantized_kv_start=args.quantized_kv_start,
+            force_download=args.force_download,
+            quantize_activations=args.quantize_activations,
             revision=args.revision,
             adapter_path=args.adapter_path,
             prefill_step_size=args.prefill_step_size,
@@ -21008,15 +21113,24 @@ def _populate_jsonl_result_generation_data(
         return
 
     generation = result.generation
+    performance_data = _extract_generation_performance_data(generation)
+    active_memory_gb = (
+        result.active_memory
+        if result.active_memory is not None
+        else performance_data.active_memory_gb
+    )
+    cache_memory_gb = (
+        result.cache_memory if result.cache_memory is not None else performance_data.cache_memory_gb
+    )
     record["metrics"] = {
-        "prompt_tokens": getattr(generation, "prompt_tokens", 0),
-        "generation_tokens": getattr(generation, "generation_tokens", 0),
-        "total_tokens": getattr(generation, "total_tokens", 0),
-        "prompt_tps": getattr(generation, "prompt_tps", 0.0),
-        "generation_tps": getattr(generation, "generation_tps", 0.0),
-        "peak_memory_gb": getattr(generation, "peak_memory", 0.0),
-        "active_memory_gb": result.active_memory or 0.0,
-        "cache_memory_gb": result.cache_memory or 0.0,
+        "prompt_tokens": performance_data.prompt_tokens,
+        "generation_tokens": performance_data.generation_tokens,
+        "total_tokens": performance_data.total_tokens,
+        "prompt_tps": performance_data.prompt_tps,
+        "generation_tps": performance_data.generation_tps,
+        "peak_memory_gb": performance_data.peak_memory_gb,
+        "active_memory_gb": active_memory_gb,
+        "cache_memory_gb": cache_memory_gb,
     }
 
     text = getattr(generation, "text", None)
@@ -22468,6 +22582,8 @@ def _run_differential_reruns(
                 "quantized_kv_start",
                 DEFAULT_QUANTIZED_KV_START,
             ),
+            force_download=getattr(args, "force_download", False),
+            quantize_activations=getattr(args, "quantize_activations", False),
         )
         rerun_result = process_image_with_model(params)
         evidence = _build_rerun_evidence(rerun_result, rerun_prompt=RERUN_TRIAGE_PROMPT)
@@ -23089,6 +23205,18 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         action="store_true",
         default=False,
         help="Use lazy loading for models (loads weights on-demand, reduces peak memory).",
+    )
+    parser.add_argument(
+        "--force-download",
+        action="store_true",
+        default=False,
+        help="Force mlx-vlm/Hugging Face Hub to download model files instead of using cache.",
+    )
+    parser.add_argument(
+        "--quantize-activations",
+        action="store_true",
+        default=False,
+        help="Enable mlx-vlm activation quantization during model loading when supported.",
     )
     parser.add_argument(
         "--max-kv-size",

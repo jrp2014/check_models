@@ -152,6 +152,7 @@ def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
                     "prompt: str, "
                     "image: str | list[str] | None = None, "
                     "audio: str | list[str] | None = None, "
+                    "video: str | list[str] | None = None, "
                     "verbose: bool = False, "
                     "*, "
                     "max_tokens: int = ..., "
@@ -162,7 +163,8 @@ def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
                     "min_p: float = ..., "
                     "top_k: int = ..., "
                     "max_kv_size: int | None = None, "
-                    "kv_bits: int | None = None, "
+                    "kv_bits: float | None = None, "
+                    "kv_quant_scheme: str = ..., "
                     "kv_group_size: int = ..., "
                     "quantized_kv_start: int = ..., "
                     "prefill_step_size: int | None = ..., "
@@ -177,13 +179,17 @@ def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
                     ") -> GenerationResult: ..."
                 ),
             ),
-            # image/audio: str | list[str] = None -> include None
+            # image/audio/video: str | list[str] = None -> include None
             (
                 re.compile(r"(image:\s*str\s*\|\s*list\[str\])\s*=\s*None"),
                 r"\1 | None = None",
             ),
             (
                 re.compile(r"(audio:\s*str\s*\|\s*list\[str\])\s*=\s*None"),
+                r"\1 | None = None",
+            ),
+            (
+                re.compile(r"(video:\s*str\s*\|\s*list\[str\])\s*=\s*None"),
                 r"\1 | None = None",
             ),
             # stream_generate(...) -> str | Generator[str, None, None]

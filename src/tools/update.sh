@@ -551,8 +551,8 @@ update_local_mlx_repos() {
 		# attempts the build. If the build fails, the package is left uninstalled.
 		# We detect this and restore from PyPI as a fallback.
 		if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
-			echo "[update.sh] Using verbose pip output for mlx build (-v)"
-			INSTALL_CMD=(pip_install_verbose -e .)
+			echo "[update.sh] Using upstream MLX editable dev install with verbose pip output (-v)"
+			INSTALL_CMD=(pip_install_verbose -e ".[dev]")
 		else
 			INSTALL_CMD=(pip_install -e .)
 		fi
