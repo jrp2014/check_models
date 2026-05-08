@@ -7,6 +7,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Make generated upstream issue drafts more maintainer-focused by replacing
+  `check_models` repro commands with native `mlx_vlm.generate` CLI and Python
+  repro snippets, inlining prompt/config details, framing JSON bundles as
+  optional context, and removing raw cluster/error-code jargon from pasteable
+  issue bodies.
+- Add run-context headers to `issues/index.md` so the issue queue is useful as
+  a standalone launchpad.
 - Align the MLX-VLM integration with `mlx-vlm` 0.5.0 by exposing the image-relevant
   `load()` flags, refreshing generated `generate()` stubs for `video` and KV
   quantization kwargs, and raising the runtime `mlx-vlm` floor to `>=0.5.0`.

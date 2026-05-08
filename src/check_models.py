@@ -205,6 +205,7 @@ ERROR_MLX_VLM_RUNTIME_INIT: Final[str] = (
 )
 MLX_IMPORT_PROBE_TIMEOUT_SECONDS: Final[float] = 8.0
 DEFAULT_KV_QUANT_SCHEME: Final = "uniform"
+DEFAULT_KV_GROUP_SIZE: Final[int] = 64
 DEFAULT_QUANTIZED_KV_START: Final[int] = 5000
 UNIFORM_KV_BITS: Final[frozenset[int]] = frozenset({2, 3, 4, 5, 6, 8})
 DEFAULT_THINKING_END_MARKER: Final[str] = "</think>"
@@ -1289,7 +1290,7 @@ class StrictGenerateCallable(Protocol):
         max_kv_size: int | None = None,
         kv_bits: float | None = None,
         kv_quant_scheme: str = DEFAULT_KV_QUANT_SCHEME,
-        kv_group_size: int = 64,
+        kv_group_size: int = DEFAULT_KV_GROUP_SIZE,
         quantized_kv_start: int = DEFAULT_QUANTIZED_KV_START,
         max_tokens: int = 500,
         **kwargs: Unpack[GenerateExtraKwargs],
@@ -1334,7 +1335,7 @@ if TYPE_CHECKING:
         max_kv_size=None,
         kv_bits=None,
         kv_quant_scheme=DEFAULT_KV_QUANT_SCHEME,
-        kv_group_size=64,
+        kv_group_size=DEFAULT_KV_GROUP_SIZE,
         quantized_kv_start=DEFAULT_QUANTIZED_KV_START,
         prefill_step_size=None,
         resize_shape=None,
@@ -13801,7 +13802,7 @@ def _build_repro_command_tokens(
             ("--thinking-start-token", getattr(run_args, "thinking_start_token", None)),
             (
                 "--kv-group-size",
-                kv_group_size if kv_group_size not in {None, 64} else None,
+                kv_group_size if kv_group_size not in {None, DEFAULT_KV_GROUP_SIZE} else None,
             ),
             (
                 "--quantized-kv-start",
@@ -21629,14 +21630,8 @@ def _issue_summary_section(cluster: IssueCluster) -> list[str]:
     parts.append(
         f"- **Target:** {MARKDOWN_ESCAPER.escape(_issue_filing_target_label(cluster.owner))}"
     )
-    parts.append(f"- **Raw owner hint:** `{MARKDOWN_ESCAPER.escape(cluster.owner)}`")
     parts.append(f"- **Affected models:** {model_count}")
     parts.append(f"- **Fixed when:** {MARKDOWN_ESCAPER.escape(_issue_queue_fixed_when(cluster))}")
-    parts.append(f"- **Issue kind:** `{MARKDOWN_ESCAPER.escape(cluster.issue_kind)}`")
-    parts.append(
-        f"- **Raw cluster:** `{MARKDOWN_ESCAPER.escape(cluster.cluster_id)}` "
-        f"(`{MARKDOWN_ESCAPER.escape(cluster.issue_subtype)}`)"
-    )
     parts.append("")
     return parts
 
@@ -21645,7 +21640,7 @@ def _issue_bundle_link(
     model_name: str,
     repro_bundles: Mapping[str, Path],
     *,
-    label: str = "repro JSON",
+    label: str = "optional JSON",
 ) -> str:
     """Return the issue-draft repro-bundle link for a model, if available."""
     bundle = repro_bundles.get(model_name)
@@ -21699,7 +21694,7 @@ def _issue_affected_models_section(
     parts.extend(
         tabulate(
             rows,
-            headers=["Model", "Representative Signal", "Token Context", "Repro JSON"],
+            headers=["Model", "Observed Behavior", "Token Counts", "Optional Context"],
             tablefmt="github",
         ).splitlines()
     )
@@ -21887,31 +21882,269 @@ def _issue_evidence_section(cluster: IssueCluster) -> list[str]:
     return parts
 
 
-def _issue_likely_root_cause_section(cluster: IssueCluster) -> list[str]:
-    """Build the likely-root-cause section for one issue cluster."""
-    representative = _issue_cluster_representative(cluster)
-    triage = _maintainer_triage_for_result(representative) if representative is not None else None
-    confidence = triage["confidence"] if triage is not None else "medium"
-    next_action = (
-        triage["next_action"] if triage is not None else _diagnostics_next_action(cluster.owner)
+def _issue_repro_prompt(
+    *,
+    prompt: str | None,
+    run_args: argparse.Namespace | None,
+) -> str:
+    """Return the prompt text to inline in a maintainer-facing repro."""
+    if prompt:
+        return prompt
+    if run_args is not None:
+        arg_prompt = getattr(run_args, "prompt", None)
+        if isinstance(arg_prompt, str) and arg_prompt:
+            return arg_prompt
+    return "Describe this image."
+
+
+def _issue_repro_image_ref(
+    *,
+    image_path: Path | None,
+    run_args: argparse.Namespace | None,
+) -> str:
+    """Return an image reference suitable for native upstream repro commands."""
+    if image_path is not None:
+        return str(image_path)
+    if run_args is not None:
+        arg_image = getattr(run_args, "image", None)
+        if isinstance(arg_image, Path):
+            return str(arg_image)
+        if isinstance(arg_image, str) and arg_image:
+            return arg_image
+        if isinstance(arg_image, Sequence) and not isinstance(arg_image, str | bytes | bytearray):
+            for candidate in arg_image:
+                if candidate:
+                    return str(candidate)
+    return "path/to/repro-image.jpg"
+
+
+def _native_mlx_vlm_load_kwargs(run_args: argparse.Namespace | None) -> dict[str, object]:
+    """Return ``mlx_vlm.utils.load`` kwargs represented in native repro scripts."""
+    kwargs: dict[str, object] = {}
+    if run_args is None:
+        return kwargs
+
+    for attr_name in ("adapter_path", "revision"):
+        value = getattr(run_args, attr_name, None)
+        if value is not None:
+            kwargs[attr_name] = str(value)
+    if bool(getattr(run_args, "trust_remote_code", True)):
+        kwargs["trust_remote_code"] = True
+    if bool(getattr(run_args, "lazy_load", False)):
+        kwargs["lazy"] = True
+    if bool(getattr(run_args, "force_download", False)):
+        kwargs["force_download"] = True
+    if bool(getattr(run_args, "quantize_activations", False)):
+        kwargs["quantize_activations"] = True
+    return kwargs
+
+
+def _native_mlx_vlm_generate_kwargs(run_args: argparse.Namespace | None) -> dict[str, object]:
+    """Return ``mlx_vlm.generate.generate`` kwargs for native repro scripts."""
+    kwargs: dict[str, object] = {
+        "max_tokens": getattr(run_args, "max_tokens", DEFAULT_MAX_TOKENS)
+        if run_args is not None
+        else DEFAULT_MAX_TOKENS,
+        "temperature": getattr(run_args, "temperature", DEFAULT_TEMPERATURE)
+        if run_args is not None
+        else DEFAULT_TEMPERATURE,
+    }
+    if run_args is None:
+        return kwargs
+
+    scalar_optional_fields = (
+        ("top_p", 1.0),
+        ("min_p", 0.0),
+        ("top_k", 0),
+        ("repetition_penalty", None),
+        ("repetition_context_size", 20),
+        ("max_kv_size", None),
+        ("kv_bits", None),
+        ("kv_quant_scheme", DEFAULT_KV_QUANT_SCHEME),
+        ("kv_group_size", DEFAULT_KV_GROUP_SIZE),
+        ("quantized_kv_start", DEFAULT_QUANTIZED_KV_START),
+        ("prefill_step_size", None),
+        ("thinking_budget", None),
+        ("thinking_start_token", None),
+        ("thinking_end_token", DEFAULT_THINKING_END_MARKER),
     )
-    why = (
-        triage["summary"]
-        if triage is not None and triage["summary"] != "no flagged signals"
-        else cluster.symptom
-    )
-    rows = [
-        ("Filing target", MARKDOWN_ESCAPER.escape(_issue_filing_target_label(cluster.owner))),
-        ("Likely owner", f"`{MARKDOWN_ESCAPER.escape(cluster.owner)}`"),
-        ("Confidence", MARKDOWN_ESCAPER.escape(confidence)),
-        ("Issue kind", f"`{MARKDOWN_ESCAPER.escape(cluster.issue_kind)}`"),
-        ("Issue subtype", f"`{MARKDOWN_ESCAPER.escape(cluster.issue_subtype)}`"),
-        ("Why this classification is credible", MARKDOWN_ESCAPER.escape(why)),
-        ("Suggested next action", MARKDOWN_ESCAPER.escape(next_action)),
+    for attr_name, default_value in scalar_optional_fields:
+        value = getattr(run_args, attr_name, default_value)
+        if value != default_value and value is not None:
+            kwargs[attr_name] = value
+
+    resize_shape = getattr(run_args, "resize_shape", None)
+    if resize_shape is not None:
+        kwargs["resize_shape"] = tuple(resize_shape)
+    eos_tokens = getattr(run_args, "eos_tokens", None)
+    if eos_tokens:
+        kwargs["eos_tokens"] = list(eos_tokens)
+    if bool(getattr(run_args, "skip_special_tokens", False)):
+        kwargs["skip_special_tokens"] = True
+    if bool(getattr(run_args, "enable_thinking", False)):
+        kwargs["enable_thinking"] = True
+    return kwargs
+
+
+def _append_native_cli_optional_pair(
+    tokens: list[str],
+    flag: str,
+    value: object | None,
+) -> None:
+    """Append a native mlx-vlm CLI flag/value pair when a value is present."""
+    if value is not None:
+        tokens.extend([flag, str(value)])
+
+
+def _append_native_cli_sequence(
+    tokens: list[str],
+    flag: str,
+    value: object | None,
+) -> None:
+    """Append a native mlx-vlm CLI multi-value argument when present."""
+    if value is None or isinstance(value, str | bytes | bytearray):
+        if value:
+            tokens.extend([flag, str(value)])
+        return
+    if isinstance(value, Sequence):
+        values = [str(item) for item in value if item is not None]
+        if values:
+            tokens.extend([flag, *values])
+
+
+def _build_native_mlx_vlm_cli_tokens(
+    *,
+    model_name: str,
+    prompt: str,
+    image_ref: str,
+    run_args: argparse.Namespace | None,
+) -> list[str]:
+    """Build a native ``python -m mlx_vlm.generate`` command for issue drafts."""
+    tokens = [
+        "python",
+        "-m",
+        "mlx_vlm.generate",
+        "--model",
+        model_name,
+        "--image",
+        image_ref,
+        "--prompt",
+        prompt,
+        "--max-tokens",
+        str(
+            getattr(run_args, "max_tokens", DEFAULT_MAX_TOKENS)
+            if run_args is not None
+            else DEFAULT_MAX_TOKENS
+        ),
+        "--temperature",
+        str(
+            getattr(run_args, "temperature", DEFAULT_TEMPERATURE)
+            if run_args is not None
+            else DEFAULT_TEMPERATURE
+        ),
     ]
-    parts = ["", "## Likely Root Cause", ""]
-    _append_markdown_row_block(parts, rows=rows)
-    return parts
+    if run_args is None:
+        return tokens
+
+    _append_native_cli_optional_pair(
+        tokens, "--adapter-path", getattr(run_args, "adapter_path", None)
+    )
+    _append_native_cli_sequence(tokens, "--resize-shape", getattr(run_args, "resize_shape", None))
+    _append_native_cli_sequence(tokens, "--eos-tokens", getattr(run_args, "eos_tokens", None))
+    _append_native_cli_optional_pair(
+        tokens, "--max-kv-size", getattr(run_args, "max_kv_size", None)
+    )
+    _append_native_cli_optional_pair(tokens, "--kv-bits", getattr(run_args, "kv_bits", None))
+
+    kv_quant_scheme = getattr(run_args, "kv_quant_scheme", DEFAULT_KV_QUANT_SCHEME)
+    if kv_quant_scheme != DEFAULT_KV_QUANT_SCHEME:
+        tokens.extend(["--kv-quant-scheme", str(kv_quant_scheme)])
+
+    kv_group_size = getattr(run_args, "kv_group_size", DEFAULT_KV_GROUP_SIZE)
+    if kv_group_size != DEFAULT_KV_GROUP_SIZE:
+        tokens.extend(["--kv-group-size", str(kv_group_size)])
+
+    quantized_kv_start = getattr(run_args, "quantized_kv_start", DEFAULT_QUANTIZED_KV_START)
+    if quantized_kv_start != DEFAULT_QUANTIZED_KV_START:
+        tokens.extend(["--quantized-kv-start", str(quantized_kv_start)])
+
+    if bool(getattr(run_args, "skip_special_tokens", False)):
+        tokens.append("--skip-special-tokens")
+    if bool(getattr(run_args, "force_download", False)):
+        tokens.append("--force-download")
+    _append_native_cli_optional_pair(tokens, "--revision", getattr(run_args, "revision", None))
+    if bool(getattr(run_args, "trust_remote_code", True)):
+        tokens.append("--trust-remote-code")
+    if bool(getattr(run_args, "quantize_activations", False)):
+        tokens.append("--quantize-activations")
+
+    processor_kwargs = getattr(run_args, "processor_kwargs", None)
+    if processor_kwargs:
+        tokens.extend(["--processor-kwargs", json.dumps(processor_kwargs, sort_keys=True)])
+    _append_native_cli_optional_pair(
+        tokens,
+        "--prefill-step-size",
+        getattr(run_args, "prefill_step_size", None),
+    )
+    if bool(getattr(run_args, "enable_thinking", False)):
+        tokens.append("--enable-thinking")
+    _append_native_cli_optional_pair(
+        tokens,
+        "--thinking-budget",
+        getattr(run_args, "thinking_budget", None),
+    )
+    _append_native_cli_optional_pair(
+        tokens,
+        "--thinking-start-token",
+        getattr(run_args, "thinking_start_token", None),
+    )
+    thinking_end_token = getattr(run_args, "thinking_end_token", DEFAULT_THINKING_END_MARKER)
+    if thinking_end_token != DEFAULT_THINKING_END_MARKER:
+        tokens.extend(["--thinking-end-token", str(thinking_end_token)])
+    return tokens
+
+
+def _build_native_mlx_vlm_python_script(
+    *,
+    model_name: str,
+    prompt: str,
+    image_ref: str,
+    run_args: argparse.Namespace | None,
+) -> str:
+    """Build a compact native Python repro script for one representative model."""
+    load_kwargs = _native_mlx_vlm_load_kwargs(run_args)
+    generate_kwargs = _native_mlx_vlm_generate_kwargs(run_args)
+    return "\n".join(
+        (
+            "from mlx_vlm.generate import generate",
+            "from mlx_vlm.utils import load",
+            "",
+            f"MODEL = {model_name!r}",
+            f"IMAGE = {image_ref!r}",
+            f"PROMPT = {prompt!r}",
+            f"LOAD_KWARGS = {load_kwargs!r}",
+            f"GENERATE_KWARGS = {generate_kwargs!r}",
+            "model, processor = load(MODEL, **LOAD_KWARGS)",
+            "result = generate(model, processor, PROMPT, image=IMAGE, **GENERATE_KWARGS)",
+            "print(result.text)",
+        )
+    )
+
+
+def _build_issue_inline_config_json(
+    *,
+    model_name: str,
+    image_ref: str,
+    run_args: argparse.Namespace | None,
+) -> str:
+    """Return JSON-formatted inline config for the native repro section."""
+    payload = {
+        "model": model_name,
+        "image": image_ref,
+        "load_kwargs": _native_mlx_vlm_load_kwargs(run_args),
+        "generate_kwargs": _native_mlx_vlm_generate_kwargs(run_args),
+    }
+    return json.dumps(_jsonify_cli_value(payload), indent=2, sort_keys=True)
 
 
 def _issue_repro_section(
@@ -21919,19 +22152,51 @@ def _issue_repro_section(
     *,
     repro_bundles: Mapping[str, Path],
     run_args: argparse.Namespace | None,
+    prompt: str | None,
+    image_path: Path | None,
 ) -> list[str]:
-    """Build cluster-first repro commands and bundle links for one issue."""
+    """Build native upstream repro commands and optional bundle links for one issue."""
     models = _issue_cluster_model_names(cluster)
-    base_tokens = _build_repro_command_tokens(
-        image_path=None,
-        run_args=run_args,
-        include_selection=False,
+    prompt_text = _issue_repro_prompt(prompt=prompt, run_args=run_args)
+    image_ref = _issue_repro_image_ref(image_path=image_path, run_args=run_args)
+    representative_model = models[0] if models else "owner/model"
+    cli_commands = "\n".join(
+        shlex_join(
+            _build_native_mlx_vlm_cli_tokens(
+                model_name=model,
+                prompt=prompt_text,
+                image_ref=image_ref,
+                run_args=run_args,
+            )
+        )
+        for model in models
     )
-    cluster_command = shlex_join([*base_tokens, "--models", *models])
+    script = _build_native_mlx_vlm_python_script(
+        model_name=representative_model,
+        prompt=prompt_text,
+        image_ref=image_ref,
+        run_args=run_args,
+    )
+    config_json = _build_issue_inline_config_json(
+        model_name=representative_model,
+        image_ref=image_ref,
+        run_args=run_args,
+    )
 
-    parts = ["", "## Repro Commands", ""]
-    parts.append("Cluster rerun:")
-    _append_markdown_code_block(parts, cluster_command, language="bash")
+    parts = ["", "## Minimal Reproduction", ""]
+    parts.append(
+        "These commands use `mlx-vlm` directly so the issue can be reproduced without "
+        "installing the `check_models` harness."
+    )
+    parts.append("")
+    parts.append("Native CLI:")
+    _append_markdown_code_block(parts, cli_commands, language="bash")
+    parts.append("Minimal Python repro (representative model):")
+    _append_markdown_code_block(parts, script, language="python")
+    parts.append("Prompt:")
+    _append_markdown_code_block(parts, prompt_text, language="text")
+    parts.append("Generation/load config:")
+    _append_markdown_code_block(parts, config_json, language="json")
 
     bundle_lines = [
         f"- `{MARKDOWN_ESCAPER.escape(model)}`: {_issue_bundle_link(model, repro_bundles)}"
@@ -21939,21 +22204,14 @@ def _issue_repro_section(
         if model in repro_bundles
     ]
     if bundle_lines:
-        parts.append("Repro bundles:")
+        parts.append("Optional advanced context:")
         parts.append("")
         parts.extend(bundle_lines)
         parts.append(
-            "- Note: these links target the canonical GitHub copies of the JSON bundles; "
-            "attach the file manually if this run has not been committed yet."
+            "- JSON bundles contain extended local diagnostics only; the model, prompt, image "
+            "reference, and generation settings needed to reproduce are inline above."
         )
         parts.append("")
-
-    if cluster.source == "failure" and len(models) > 1:
-        per_model_commands = "\n".join(
-            shlex_join([*base_tokens, "--models", model]) for model in models
-        )
-        parts.append("Per-model failure reruns:")
-        _append_markdown_code_block(parts, per_model_commands, language="bash")
     return parts
 
 
@@ -22040,8 +22298,7 @@ def _issue_acceptance_section(cluster: IssueCluster) -> list[str]:
     parts = ["", "## Expected Fix Signal", ""]
     parts.append(f"- [ ] {MARKDOWN_ESCAPER.escape(cluster.acceptance_signal)}")
     parts.append(
-        "- [ ] The cluster rerun no longer produces this "
-        f"`{MARKDOWN_ESCAPER.escape(cluster.cluster_id)}` maintainer-triage cluster."
+        "- [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem."
     )
     parts.append("")
     return parts
@@ -22073,6 +22330,67 @@ def _issue_environment_section(
     return parts
 
 
+def _issue_index_count_phrase(count: int, singular: str, plural: str | None = None) -> str:
+    """Return a compact count phrase with correct singular/plural wording."""
+    if count == 1:
+        return f"1 {singular}"
+    return f"{count} {plural or singular + 's'}"
+
+
+def _issue_index_environment_summary(
+    *,
+    versions: LibraryVersionDict,
+    system_info: dict[str, str],
+) -> str:
+    """Return a one-line environment summary for issues/index.md."""
+    parts: list[str] = []
+    os_name = system_info.get("OS") or system_info.get("macOS Version")
+    if os_name:
+        parts.append(os_name)
+    gpu_name = system_info.get("GPU/Chip")
+    if gpu_name:
+        parts.append(gpu_name)
+    if mlx_vlm_version := versions.get("mlx-vlm"):
+        parts.append(f"mlx-vlm {mlx_vlm_version}")
+    if mlx_version := versions.get("mlx"):
+        parts.append(f"mlx {mlx_version}")
+    return ", ".join(parts) if parts else "environment details unavailable"
+
+
+def _issue_index_header(
+    *,
+    snapshot: DiagnosticsSnapshot,
+    clusters: Sequence[IssueCluster],
+    versions: LibraryVersionDict,
+    system_info: dict[str, str],
+) -> list[str]:
+    """Build the contextual header for the standalone issue queue index."""
+    total_models = (
+        len(snapshot.failed)
+        + len(snapshot.harness_results)
+        + len(snapshot.stack_signals)
+        + len(snapshot.unflagged_successful)
+    )
+    summary_parts = [
+        _issue_index_count_phrase(total_models, "model") + " tested",
+        _issue_index_count_phrase(len(snapshot.failed), "hard failure"),
+        _issue_index_count_phrase(len(snapshot.harness_results), "harness issue"),
+        _issue_index_count_phrase(len(snapshot.stack_signals), "stack signal"),
+        _issue_index_count_phrase(len(clusters), "issue draft"),
+    ]
+    return [
+        "# Check Models Issue Queue",
+        "",
+        f"Generated on: {local_now_str()}",
+        (
+            "Test Environment: "
+            + _issue_index_environment_summary(versions=versions, system_info=system_info)
+        ),
+        "Summary: " + ". ".join(summary_parts) + ".",
+        "",
+    ]
+
+
 def _build_issue_markdown(
     cluster: IssueCluster,
     *,
@@ -22080,6 +22398,8 @@ def _build_issue_markdown(
     system_info: dict[str, str],
     repro_bundles: Mapping[str, Path],
     run_args: argparse.Namespace | None,
+    prompt: str | None = None,
+    image_path: Path | None = None,
 ) -> list[str]:
     """Build a complete clustered GitHub issue draft."""
     parts = [f"# {_issue_title(cluster)}"]
@@ -22091,11 +22411,12 @@ def _build_issue_markdown(
             cluster,
             repro_bundles=repro_bundles,
             run_args=run_args,
+            prompt=prompt,
+            image_path=image_path,
         )
     )
     parts.extend(_issue_acceptance_section(cluster))
     parts.extend(_issue_fix_checklist_section(cluster))
-    parts.extend(_issue_likely_root_cause_section(cluster))
     parts.extend(_issue_environment_section(versions=versions, system_info=system_info))
     parts.extend(_issue_evidence_section(cluster))
     return parts
@@ -22104,11 +22425,19 @@ def _build_issue_markdown(
 def _write_issue_index(
     *,
     issues_dir: Path,
+    snapshot: DiagnosticsSnapshot,
     clusters: Sequence[IssueCluster],
     repro_bundles: Mapping[str, Path],
+    versions: LibraryVersionDict,
+    system_info: dict[str, str],
 ) -> None:
     """Write the issue queue index for the current run."""
-    parts = ["# Issue Queue", ""]
+    parts = _issue_index_header(
+        snapshot=snapshot,
+        clusters=clusters,
+        versions=versions,
+        system_info=system_info,
+    )
     if not clusters:
         parts.extend(["No issue drafts were generated for this run.", ""])
         issues_dir.joinpath("index.md").write_text("\n".join(parts), encoding="utf-8")
@@ -22139,6 +22468,8 @@ def _generate_github_issue_reports(
     system_info: dict[str, str],
     repro_bundles: Mapping[str, Path],
     run_args: argparse.Namespace | None,
+    prompt: str | None = None,
+    image_path: Path | None = None,
 ) -> Mapping[str, Path]:
     """Generate clustered GitHub issue drafts and the issue queue index."""
     issues_dir = output_dir / "issues"
@@ -22163,6 +22494,8 @@ def _generate_github_issue_reports(
                     system_info=system_info,
                     repro_bundles=repro_bundles,
                     run_args=run_args,
+                    prompt=prompt,
+                    image_path=image_path,
                 )
             )
             + "\n",
@@ -22170,7 +22503,14 @@ def _generate_github_issue_reports(
         )
         generated_reports[cluster.cluster_id] = issue_path
 
-    _write_issue_index(issues_dir=issues_dir, clusters=clusters, repro_bundles=repro_bundles)
+    _write_issue_index(
+        issues_dir=issues_dir,
+        snapshot=diagnostics_snapshot,
+        clusters=clusters,
+        repro_bundles=repro_bundles,
+        versions=versions,
+        system_info=system_info,
+    )
 
     return generated_reports
 
@@ -22233,6 +22573,8 @@ def _write_diagnostics_and_repro_artifacts(
         system_info=system_info,
         repro_bundles=repro_bundles,
         run_args=args,
+        prompt=prompt,
+        image_path=image_path,
     )
     if issue_reports:
         logger.info("GitHub Issue reports generated for %d issue(s).", len(issue_reports))
@@ -22563,7 +22905,7 @@ def _run_differential_reruns(
                 'Literal["uniform", "turboquant"]',
                 getattr(args, "kv_quant_scheme", DEFAULT_KV_QUANT_SCHEME),
             ),
-            kv_group_size=getattr(args, "kv_group_size", 64),
+            kv_group_size=getattr(args, "kv_group_size", DEFAULT_KV_GROUP_SIZE),
             quantized_kv_start=getattr(
                 args,
                 "quantized_kv_start",
@@ -23234,7 +23576,7 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         "-g",
         "--kv-group-size",
         type=int,
-        default=64,
+        default=DEFAULT_KV_GROUP_SIZE,
         help="Quantization group size for KV cache.",
     )
     parser.add_argument(

@@ -2269,7 +2269,7 @@ class TestDiagnosticsReport:
         )
         issue_content = next(iter(issue_reports.values())).read_text(encoding="utf-8")
         assert bundle_path.name in issue_content
-        assert "Repro bundles:" in issue_content
+        assert "Optional advanced context:" in issue_content
 
     def test_repro_command_omits_upstream_quantized_kv_default(self) -> None:
         """Default KV quantization start should not be forwarded as a repro override."""
@@ -3097,6 +3097,141 @@ class TestGithubIssueReportsCleanup:
 class TestGithubIssueReportContent:
     """Content checks for generated standalone GitHub issue reports."""
 
+    def test_issue_draft_uses_native_mlx_vlm_repro_and_prunes_internal_jargon(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Pasteable issue drafts should use native mlx-vlm repros, not harness commands."""
+        image_path = tmp_path / "sample.jpg"
+        image_path.write_text("placeholder", encoding="utf-8")
+        failed_result = PerformanceResult(
+            model_name="org/broken-model",
+            generation=None,
+            success=False,
+            error_message="RuntimeError: shape mismatch",
+            error_stage="Model Error",
+            error_code="MLX_VLM_DECODE_RUNTIME",
+            error_package="mlx-vlm",
+            error_signature="MLX_DECODE_ERROR:abc123",
+            error_traceback="Traceback (most recent call last):\nRuntimeError: shape mismatch",
+            total_time=0.5,
+        )
+        snapshot = DiagnosticsSnapshot(
+            failed=(failed_result,),
+            failure_clusters=(("MLX_DECODE_ERROR:abc123", (failed_result,)),),
+        )
+        run_args = Namespace(
+            image=image_path,
+            max_tokens=123,
+            temperature=0.0,
+            revision="main",
+            trust_remote_code=True,
+        )
+
+        generated = _generate_github_issue_reports(
+            diagnostics_snapshot=snapshot,
+            output_dir=tmp_path,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            repro_bundles={},
+            run_args=run_args,
+            prompt="Analyze this image.",
+            image_path=image_path,
+        )
+
+        content = next(iter(generated.values())).read_text(encoding="utf-8")
+        assert "python -m mlx_vlm.generate" in content
+        assert "--model org/broken-model" in content
+        assert "Analyze this image." in content
+        assert "from mlx_vlm.utils import load" in content
+        assert "from mlx_vlm.generate import generate" in content
+        assert "python -m check_models" not in content
+        assert "Raw cluster" not in content
+        assert "Issue kind" not in content
+        assert "Raw owner hint" not in content
+        assert "Why this classification is credible" not in content
+        assert "MLX_VLM_DECODE_RUNTIME" not in content
+
+    def test_issue_index_includes_run_context_header(self, tmp_path: Path) -> None:
+        """Issue queue index should explain the run context before the table."""
+        failed_result = PerformanceResult(
+            model_name="org/broken-model",
+            generation=None,
+            success=False,
+            error_message="RuntimeError: shape mismatch",
+            error_stage="Model Error",
+            error_code="MLX_VLM_DECODE_RUNTIME",
+            error_package="mlx-vlm",
+            error_signature="MLX_DECODE_ERROR:abc123",
+            error_traceback="Traceback (most recent call last):\nRuntimeError: shape mismatch",
+            total_time=0.5,
+        )
+        snapshot = DiagnosticsSnapshot(
+            failed=(failed_result,),
+            failure_clusters=(("MLX_DECODE_ERROR:abc123", (failed_result,)),),
+        )
+
+        _generate_github_issue_reports(
+            diagnostics_snapshot=snapshot,
+            output_dir=tmp_path,
+            versions={**_stub_versions(), "mlx-vlm": "0.5.0"},
+            system_info={"OS": "macOS 26.4.1", "GPU/Chip": "Apple M5 Max"},
+            repro_bundles={},
+            run_args=None,
+        )
+
+        index = (tmp_path / "issues" / "index.md").read_text(encoding="utf-8")
+        assert index.startswith("# Check Models Issue Queue")
+        assert "Generated on:" in index
+        assert "Test Environment:" in index
+        assert "Apple M5 Max" in index
+        assert "mlx-vlm 0.5.0" in index
+        assert "Summary:" in index
+        assert "1 hard failure" in index
+
+    def test_issue_traceback_omits_local_check_models_frames(self, tmp_path: Path) -> None:
+        """Issue draft tracebacks should start at upstream frames when local wrappers exist."""
+        traceback_text = (
+            "Traceback (most recent call last):\n"
+            '  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", '
+            "line 17284, in _run_model_generation\n"
+            "    output = generate(...)\n"
+            '  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", '
+            "line 419, in load\n"
+            "    raise RuntimeError('shape mismatch')\n"
+            "RuntimeError: shape mismatch\n"
+        )
+        failed_result = PerformanceResult(
+            model_name="org/broken-model",
+            generation=None,
+            success=False,
+            error_message="RuntimeError: shape mismatch",
+            error_stage="Model Error",
+            error_code="MLX_VLM_DECODE_RUNTIME",
+            error_package="mlx-vlm",
+            error_signature="MLX_DECODE_ERROR:abc123",
+            error_traceback=traceback_text,
+            total_time=0.5,
+        )
+        snapshot = DiagnosticsSnapshot(
+            failed=(failed_result,),
+            failure_clusters=(("MLX_DECODE_ERROR:abc123", (failed_result,)),),
+        )
+
+        generated = _generate_github_issue_reports(
+            diagnostics_snapshot=snapshot,
+            output_dir=tmp_path,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            repro_bundles={},
+            run_args=None,
+        )
+
+        content = next(iter(generated.values())).read_text(encoding="utf-8")
+        assert "check_models.py" not in content
+        assert "output = generate(...)" not in content
+        assert "mlx_vlm/utils.py" in content
+
     def test_crash_issue_includes_traceback_repro_bundle_and_environment(
         self, tmp_path: Path
     ) -> None:
@@ -3137,19 +3272,21 @@ class TestGithubIssueReportContent:
         assert "## Affected Models" in content
         assert "## Minimal Evidence" in content
         assert "## Appendix: Detailed Evidence" in content
-        assert "## Likely Root Cause" in content
-        assert "## Repro Commands" in content
+        assert "## Minimal Reproduction" in content
         assert "## Fix Checklist" in content
         assert "## Expected Fix Signal" in content
         assert "## Appendix: Environment" in content
-        assert "MLX_VLM_DECODE_RUNTIME" in content
-        assert "runtime_failure" in content
+        assert "python -m mlx_vlm.generate" in content
+        assert "python -m check_models" not in content
+        assert "Raw cluster" not in content
+        assert "MLX_VLM_DECODE_RUNTIME" not in content
+        assert "runtime_failure" not in content
         assert "Traceback (most recent call last)" in content
         assert (
-            "[repro JSON]"
+            "[optional JSON]"
             "(https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/broken.json)"
         ) in content
-        assert "attach the file manually if this run has not been committed yet" in content
+        assert "Optional advanced context:" in content
         assert "Python Version" in content
         assert "Priority" not in content
 
@@ -3175,12 +3312,11 @@ class TestGithubIssueReportContent:
 
         content = next(iter(generated.values())).read_text(encoding="utf-8")
         assert content.startswith("# \\[mlx-vlm / mlx\\]\\[Long-context collapse\\]")
-        assert "## Likely Root Cause" in content
+        assert "## Minimal Reproduction" in content
         assert "mlx-vlm first; MLX if cache/runtime reproduces" in content
-        assert "`mlx-vlm / mlx`" in content
         assert "At long prompt length (5000 tokens), generation returned empty output." in content
-        assert "context_budget" in content
-        assert "long_context" in content
+        assert "context_budget" not in content
+        assert "long_context" not in content
         assert "Rerun with reduced image/text burden" in content
         assert "Expected Fix Signal" in content
         assert "Priority" not in content
@@ -3223,7 +3359,7 @@ class TestGithubIssueReportContent:
         assert "affecting 2 model(s)" in content
         assert "org/stop-a" in content
         assert "org/stop-b" in content
-        assert "`mlx-vlm_stop-token_001`" in content
+        assert "mlx-vlm_stop-token_001" not in content
         assert "&lt;\\|end\\|&gt;" in content
         assert "&lt;/think&gt;" in content
 
@@ -3336,10 +3472,8 @@ class TestGithubIssueReportContent:
 
         index = (tmp_path / "issues" / "index.md").read_text(encoding="utf-8")
         content = next(iter(generated.values())).read_text(encoding="utf-8")
-        normalized_content = " ".join(content.split())
         assert "Unsupported Granite model type/import path" in index
         assert "No module named" not in index
-        assert "model-type registration/import handling for Granite" in normalized_content
         assert "model-type registry" in content
         assert "Inspect prompt-template, stop-token" not in content
 
@@ -3415,7 +3549,7 @@ class TestGithubIssueReportContent:
         content = next(iter(generated.values())).read_text(encoding="utf-8")
         assert "## Appendix: Detailed Evidence" in content
         assert "Stack Signals" in content
-        assert "long_context" in content
+        assert "Long-context collapse" in content
         assert "Inspect cache allocation" in content
 
 
