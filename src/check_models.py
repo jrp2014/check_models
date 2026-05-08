@@ -94,31 +94,25 @@ from check_models_data.dependency_policy import (
 )
 
 # Optional dependency: psutil for system info; degrade gracefully if missing.
-# Use an intermediate variable with an explicit Optional type so mypy
-# doesn't complain about assigning None to a module symbol on the except path.
-psutil_mod: Any | None
+# Keep a nullable module binding so downstream checks can stay simple.
+psutil: Any | None
 try:
     import psutil as _psutil_runtime
-
-    psutil_mod = _psutil_runtime
 except ImportError:  # pragma: no cover - optional
-    psutil_mod = None
-
-psutil: types.ModuleType | None = psutil_mod
+    psutil = None
+else:
+    psutil = _psutil_runtime
 
 # Optional dependency: wcwidth for accurate terminal display-width calculations.
 # Without wcwidth, wide Unicode glyphs may be slightly misaligned; we fall back
 # to codepoint length to keep output functional.
-wcwidth_wcswidth: Callable[[str], int] | None = None
-if find_spec("wcwidth") is not None:
-    try:
-        wcwidth_module = __import__("wcwidth", fromlist=["wcswidth"])
-    except ImportError:  # pragma: no cover - optional
-        wcwidth_wcswidth = None
-    else:
-        candidate = getattr(wcwidth_module, "wcswidth", None)
-        if callable(candidate):
-            wcwidth_wcswidth = cast("Callable[[str], int]", candidate)
+wcwidth_wcswidth: Callable[[str], int] | None
+try:
+    from wcwidth import wcswidth as _wcwidth_wcswidth
+except ImportError:  # pragma: no cover - optional
+    wcwidth_wcswidth = None
+else:
+    wcwidth_wcswidth = cast("Callable[[str], int]", _wcwidth_wcswidth)
 
 if TYPE_CHECKING:
     import types
@@ -9461,6 +9455,19 @@ def _github_output_artifact_url(
     return _github_repo_artifact_url(repo_relative, anchor=anchor)
 
 
+def _github_published_output_url(
+    *repo_relative_parts: str,
+    anchor: str | None = None,
+    tree: bool = False,
+) -> str:
+    """Return a GitHub URL for a tracked file or directory under ``src/output``."""
+    return _github_repo_artifact_url(
+        _PUBLISHED_OUTPUT_ROOT.joinpath(*repo_relative_parts),
+        anchor=anchor,
+        tree=tree,
+    )
+
+
 def _markdown_artifact_target(
     *,
     report_filename: Path,
@@ -9479,26 +9486,6 @@ def _markdown_artifact_target(
     if anchor is not None:
         return f"{target}#{anchor}"
     return target
-
-
-def _github_issue_index_url() -> str:
-    """Return the GitHub URL for the generated issue queue index."""
-    return _github_repo_artifact_url(_PUBLISHED_OUTPUT_ROOT / "issues" / "index.md")
-
-
-def _github_issue_draft_url(issue_filename: str) -> str:
-    """Return the GitHub URL for one generated issue draft."""
-    return _github_repo_artifact_url(_PUBLISHED_OUTPUT_ROOT / "issues" / issue_filename)
-
-
-def _github_repro_bundle_url(bundle_name: str) -> str:
-    """Return the GitHub URL for one generated repro bundle."""
-    return _github_repo_artifact_url(_PUBLISHED_OUTPUT_ROOT / "repro_bundles" / bundle_name)
-
-
-def _github_repro_bundle_tree_url() -> str:
-    """Return the GitHub URL for the published repro-bundle directory."""
-    return _github_repo_artifact_url(_PUBLISHED_OUTPUT_ROOT / "repro_bundles", tree=True)
 
 
 def _gallery_model_anchor(model_name: str) -> str:
@@ -13206,7 +13193,7 @@ def _issue_cluster_bundle_link(
     if not bundle_paths:
         return "-"
     label = "repro JSON" if len(bundle_paths) == 1 else f"{len(bundle_paths)} repro JSONs"
-    return f"[{label}]({_github_repro_bundle_url(bundle_paths[0].name)})"
+    return f"[{label}]({_github_published_output_url('repro_bundles', bundle_paths[0].name)})"
 
 
 def _render_issue_queue_table(
@@ -13242,7 +13229,7 @@ def _diagnostics_issue_queue_section(
         title="## Issue Queue",
         body_lines=[
             "Root-cause issue drafts are generated in "
-            f"[issues/index.md]({_github_issue_index_url()}). Each row is intended to become one "
+            f"[issues/index.md]({_github_published_output_url('issues', 'index.md')}). Each row is intended to become one "
             "focused upstream GitHub issue.",
         ],
     )
@@ -13257,7 +13244,7 @@ def _diagnostics_issue_queue_section(
             clusters,
             escape_text=DIAGNOSTICS_ESCAPER.escape,
             issue_link_for_cluster=lambda cluster: (
-                f"[issue draft]({_github_issue_draft_url(cluster.issue_filename)})"
+                f"[issue draft]({_github_published_output_url('issues', cluster.issue_filename)})"
             ),
             evidence_link_for_cluster=lambda cluster: _issue_cluster_bundle_link(
                 cluster,
@@ -14210,7 +14197,7 @@ def _diagnostics_footer(
                     "**Note:** A comprehensive JSON reproduction bundle including system info "
                     "and the exact prompt trace has been exported to "
                     "[repro_bundles/]"
-                    f"({_github_repro_bundle_tree_url()}) "
+                    f"({_github_published_output_url('repro_bundles', tree=True)}) "
                     "for each failing model."
                 ),
             ],
@@ -15328,13 +15315,13 @@ def _append_review_issue_queue(
         [
             "## Maintainer Escalations",
             "",
-            f"Focused upstream issue drafts are queued in [issues/index.md]({_github_issue_index_url()}).",
+            f"Focused upstream issue drafts are queued in [issues/index.md]({_github_published_output_url('issues', 'index.md')}).",
             "",
         ]
     )
 
     def _review_issue_link(cluster: IssueCluster) -> str:
-        return f"[issue draft]({_github_issue_draft_url(cluster.issue_filename)})"
+        return f"[issue draft]({_github_published_output_url('issues', cluster.issue_filename)})"
 
     md.extend(
         _render_issue_queue_table(
@@ -21664,7 +21651,7 @@ def _issue_bundle_link(
     bundle = repro_bundles.get(model_name)
     if bundle is None:
         return ""
-    return f"[{MARKDOWN_ESCAPER.escape(label)}]({_github_repro_bundle_url(bundle.name)})"
+    return f"[{MARKDOWN_ESCAPER.escape(label)}]({_github_published_output_url('repro_bundles', bundle.name)})"
 
 
 def _issue_model_signal(
@@ -22132,7 +22119,7 @@ def _write_issue_index(
             clusters,
             escape_text=MARKDOWN_ESCAPER.escape,
             issue_link_for_cluster=lambda cluster: (
-                f"[issue draft]({_github_issue_draft_url(cluster.issue_filename)})"
+                f"[issue draft]({_github_published_output_url('issues', cluster.issue_filename)})"
             ),
             evidence_link_for_cluster=lambda cluster: _issue_cluster_bundle_link(
                 cluster,
