@@ -15,9 +15,9 @@
 
 ## Affected Models
 
-| Model                              | Representative Signal                                    | Token Context   | Repro JSON                                                                                                                         |
-|------------------------------------|----------------------------------------------------------|-----------------|------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/MolmoPoint-8B-fp16` | processor error \| model config processor load processor | stop=exception  | [repro JSON](../repro_bundles/20260508T130439Z_008_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json) |
+| Model                              | Representative Signal                                    | Token Context   | Repro JSON                                                                                                                                                                                   |
+|------------------------------------|----------------------------------------------------------|-----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/MolmoPoint-8B-fp16` | processor error \| model config processor load processor | stop=exception  | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T130439Z_008_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json) |
 
 
 ## Minimal Evidence
@@ -36,8 +36,8 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 
 Repro bundles:
 
-- `mlx-community/MolmoPoint-8B-fp16`: [repro JSON](../repro_bundles/20260508T130439Z_008_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json)
-- Note: these are local artifact links; attach or publish the JSON when filing upstream.
+- `mlx-community/MolmoPoint-8B-fp16`: [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T130439Z_008_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json)
+- Note: these links target the canonical GitHub copies of the JSON bundles; attach the file manually if this run has not been committed yet.
 
 
 ## Expected Fix Signal

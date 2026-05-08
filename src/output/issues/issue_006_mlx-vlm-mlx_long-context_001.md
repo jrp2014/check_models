@@ -15,9 +15,9 @@
 
 ## Affected Models
 
-| Model                                     | Representative Signal                                                                                                                                                                                          | Token Context                                                                | Repro JSON                                                                                                                    |
-|-------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt-handling issues. \| At long prompt length (16901 tokens), output stayed unusually short (11 tokens; ratio 0.1%). | prompt=16,901 \| output/prompt=0.07% \| nontext burden=97% \| stop=completed | [repro JSON](../repro_bundles/20260508T130439Z_009_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json) |
+| Model                                     | Representative Signal                                                                                                                                                                                          | Token Context                                                                | Repro JSON                                                                                                                                                                              |
+|-------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt-handling issues. \| At long prompt length (16901 tokens), output stayed unusually short (11 tokens; ratio 0.1%). | prompt=16,901 \| output/prompt=0.07% \| nontext burden=97% \| stop=completed | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T130439Z_009_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json) |
 
 
 ## Minimal Evidence
@@ -37,8 +37,8 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 
 Repro bundles:
 
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: [repro JSON](../repro_bundles/20260508T130439Z_009_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)
-- Note: these are local artifact links; attach or publish the JSON when filing upstream.
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T130439Z_009_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)
+- Note: these links target the canonical GitHub copies of the JSON bundles; attach the file manually if this run has not been committed yet.
 
 
 ## Expected Fix Signal

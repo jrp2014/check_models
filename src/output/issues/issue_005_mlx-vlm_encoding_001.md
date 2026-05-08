@@ -15,9 +15,9 @@
 
 ## Affected Models
 
-| Model                                                   | Representative Signal                                                                       | Token Context                                                               | Repro JSON                                                                                                                          |
-|---------------------------------------------------------|---------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 61 occurrences). | prompt=3,619 \| output/prompt=2.98% \| nontext burden=88% \| stop=completed | [repro JSON](../repro_bundles/20260508T130439Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) |
+| Model                                                   | Representative Signal                                                                       | Token Context                                                               | Repro JSON                                                                                                                                                                                    |
+|---------------------------------------------------------|---------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 61 occurrences). | prompt=3,619 \| output/prompt=2.98% \| nontext burden=88% \| stop=completed | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T130439Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) |
 
 
 ## Minimal Evidence
@@ -37,8 +37,8 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 
 Repro bundles:
 
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: [repro JSON](../repro_bundles/20260508T130439Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)
-- Note: these are local artifact links; attach or publish the JSON when filing upstream.
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T130439Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)
+- Note: these links target the canonical GitHub copies of the JSON bundles; attach the file manually if this run has not been committed yet.
 
 
 ## Expected Fix Signal

@@ -5,6 +5,10 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Render cross-artifact links in generated Markdown outputs as GitHub blob/tree URLs instead of local relative paths so `results.md`, `review.md`, `diagnostics.md`, and generated issue drafts can be pasted directly into GitHub issues without breaking their companion links.
+
 ## [0.7.2] - 2026-05-04
 
 ### Fixed

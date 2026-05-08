@@ -626,9 +626,22 @@ class TestMarkdownReportEdgeCases:
         assert "Standalone output gallery" in content
         assert "Automated review digest" in content
         assert "Canonical run log" in content
-        assert "[model_gallery.md](model_gallery.md)" in content
-        assert "[review.md](review.md)" in content
-        assert "[check_models.log](check_models.log)" in content
+        assert (
+            "[model_gallery.md]"
+            "(https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md)"
+        ) in content
+        assert (
+            "[review.md]"
+            "(https://github.com/jrp2014/check_models/blob/main/src/output/reports/review.md)"
+        ) in content
+        assert (
+            "[check_models.log]"
+            "(https://github.com/jrp2014/check_models/blob/main/src/output/check_models.log)"
+        ) in content
+        assert (
+            "https://github.com/jrp2014/check_models/blob/main/src/output/reports/"
+            "model_gallery.md#model-org-good"
+        ) in content
         assert "## Model Gallery" not in content
         assert "## ✅ Recommended Models" in content
         assert "_Best end-to-end cataloging:_" in content
@@ -735,6 +748,9 @@ class TestMarkdownGalleryReport:
         assert "# Automated Review Digest" in content
         assert "## Maintainer Escalations" in content
         assert "issues/index.md" in content
+        assert (
+            "https://github.com/jrp2014/check_models/blob/main/src/output/issues/index.md"
+        ) in content
         assert "## 🧭 Review Shortlist" in content
         assert "## User Buckets" in content
         assert "## Model Verdicts" in content
@@ -1400,6 +1416,9 @@ class TestDiagnosticsReport:
         assert "Evidence Bundle" in content
         assert "Fixed When" in content
         assert "issues/index.md" in content
+        assert (
+            "https://github.com/jrp2014/check_models/blob/main/src/output/issues/index.md"
+        ) in content
         assert "Priority" not in content
         assert content.index("## Issue Queue") < content.index("## 1. Failure")
         assert content.index("## Issue Queue") < content.index("## Environment")
@@ -3122,8 +3141,11 @@ class TestGithubIssueReportContent:
         assert "MLX_VLM_DECODE_RUNTIME" in content
         assert "runtime_failure" in content
         assert "Traceback (most recent call last)" in content
-        assert "[repro JSON](../repro_bundles/broken.json)" in content
-        assert "attach or publish the JSON when filing upstream" in content
+        assert (
+            "[repro JSON]"
+            "(https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/broken.json)"
+        ) in content
+        assert "attach the file manually if this run has not been committed yet" in content
         assert "Python Version" in content
         assert "Priority" not in content
 

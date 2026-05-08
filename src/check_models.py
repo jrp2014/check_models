@@ -47,7 +47,7 @@ from importlib.metadata import (
 )
 from importlib.resources import as_file, files
 from importlib.util import find_spec
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from shlex import join as shlex_join
 from typing import (
     TYPE_CHECKING,
@@ -1325,8 +1325,8 @@ if TYPE_CHECKING:
         _TYPECHECK_MODEL,
         _TYPECHECK_GENERATE_PROCESSOR,
         "",
-        image=None,
-        audio=None,
+        image="",
+        audio="",
         verbose=False,
         max_tokens=1,
         temperature=0.0,
@@ -1438,6 +1438,7 @@ DEFAULT_MAX_TOKENS: Final[int] = 500
 DEFAULT_FOLDER: Final[Path] = Path.home() / "Pictures" / "Processed"
 # Output paths relative to script's directory (not CWD) for consistency
 _SCRIPT_DIR = Path(__file__).parent
+_REPO_ROOT = _SCRIPT_DIR.parent.resolve()
 DEFAULT_HTML_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "results.html"
 DEFAULT_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "results.md"
 DEFAULT_GALLERY_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "model_gallery.md"
@@ -1448,6 +1449,27 @@ DEFAULT_JSONL_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.jsonl"
 DEFAULT_ENV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "environment.log"
 DEFAULT_DIAGNOSTICS_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "diagnostics.md"
 _PREFLIGHT_ISSUES_ARG_ATTR: Final[str] = "_check_models_preflight_issues"
+_GITHUB_REPO_URL: Final[str] = "https://github.com/jrp2014/check_models"
+_GITHUB_DEFAULT_BRANCH: Final[str] = "main"
+_PUBLISHED_OUTPUT_ROOT: Final[PurePosixPath] = PurePosixPath("src/output")
+_PUBLISHED_REPORT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
+    {
+        DEFAULT_HTML_OUTPUT.name,
+        DEFAULT_MD_OUTPUT.name,
+        DEFAULT_GALLERY_MD_OUTPUT.name,
+        DEFAULT_REVIEW_MD_OUTPUT.name,
+        DEFAULT_TSV_OUTPUT.name,
+        DEFAULT_DIAGNOSTICS_OUTPUT.name,
+    }
+)
+_PUBLISHED_ROOT_OUTPUT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
+    {
+        DEFAULT_LOG_OUTPUT.name,
+        DEFAULT_JSONL_OUTPUT.name,
+        DEFAULT_ENV_OUTPUT.name,
+        "results.history.jsonl",
+    }
+)
 
 DEFAULT_TEMPERATURE: Final[float] = 0.0  # Greedy/deterministic (matches mlx-vlm upstream)
 DEFAULT_TIMEOUT: Final[float] = 300.0  # Default timeout in seconds
@@ -9309,6 +9331,97 @@ def _relative_markdown_artifact_path(*, report_filename: Path, artifact_filename
         return str(artifact_filename)
 
 
+def _github_repo_artifact_url(
+    repo_relative_path: PurePosixPath,
+    *,
+    anchor: str | None = None,
+    tree: bool = False,
+) -> str:
+    """Return a GitHub URL for a tracked artifact path within this repository."""
+    encoded_path = "/".join(quote(part) for part in repo_relative_path.parts)
+    view_name = "tree" if tree else "blob"
+    url = f"{_GITHUB_REPO_URL}/{view_name}/{_GITHUB_DEFAULT_BRANCH}/{encoded_path}"
+    if anchor is not None:
+        return f"{url}#{anchor}"
+    return url
+
+
+def _published_output_repo_path(artifact_filename: Path) -> PurePosixPath | None:
+    """Infer the tracked repo path for a published output artifact when possible."""
+    try:
+        repo_relative = artifact_filename.resolve().relative_to(_REPO_ROOT)
+    except ValueError:
+        repo_relative = None
+
+    if repo_relative is not None and repo_relative.parts[:2] == _PUBLISHED_OUTPUT_ROOT.parts:
+        return PurePosixPath(*repo_relative.parts)
+
+    artifact_name = artifact_filename.name
+    if artifact_name in _PUBLISHED_REPORT_ARTIFACT_NAMES:
+        return _PUBLISHED_OUTPUT_ROOT / "reports" / artifact_name
+    if artifact_name in _PUBLISHED_ROOT_OUTPUT_ARTIFACT_NAMES:
+        return _PUBLISHED_OUTPUT_ROOT / artifact_name
+    if artifact_name == "index.md" or (
+        artifact_name.startswith("issue_") and artifact_name.endswith(".md")
+    ):
+        return _PUBLISHED_OUTPUT_ROOT / "issues" / artifact_name
+    if artifact_name.endswith(".json"):
+        return _PUBLISHED_OUTPUT_ROOT / "repro_bundles" / artifact_name
+    return None
+
+
+def _github_output_artifact_url(
+    artifact_filename: Path,
+    *,
+    anchor: str | None = None,
+) -> str | None:
+    """Return a GitHub URL for a published output artifact when it is known."""
+    repo_relative = _published_output_repo_path(artifact_filename)
+    if repo_relative is None:
+        return None
+    return _github_repo_artifact_url(repo_relative, anchor=anchor)
+
+
+def _markdown_artifact_target(
+    *,
+    report_filename: Path,
+    artifact_filename: Path,
+    anchor: str | None = None,
+) -> str:
+    """Return the best Markdown target for a companion artifact link."""
+    github_url = _github_output_artifact_url(artifact_filename, anchor=anchor)
+    if github_url is not None:
+        return github_url
+
+    target = _relative_markdown_artifact_path(
+        report_filename=report_filename,
+        artifact_filename=artifact_filename,
+    ).replace(" ", "%20")
+    if anchor is not None:
+        return f"{target}#{anchor}"
+    return target
+
+
+def _github_issue_index_url() -> str:
+    """Return the GitHub URL for the generated issue queue index."""
+    return _github_repo_artifact_url(_PUBLISHED_OUTPUT_ROOT / "issues" / "index.md")
+
+
+def _github_issue_draft_url(issue_filename: str) -> str:
+    """Return the GitHub URL for one generated issue draft."""
+    return _github_repo_artifact_url(_PUBLISHED_OUTPUT_ROOT / "issues" / issue_filename)
+
+
+def _github_repro_bundle_url(bundle_name: str) -> str:
+    """Return the GitHub URL for one generated repro bundle."""
+    return _github_repo_artifact_url(_PUBLISHED_OUTPUT_ROOT / "repro_bundles" / bundle_name)
+
+
+def _github_repro_bundle_tree_url() -> str:
+    """Return the GitHub URL for the published repro-bundle directory."""
+    return _github_repo_artifact_url(_PUBLISHED_OUTPUT_ROOT / "repro_bundles", tree=True)
+
+
 def _gallery_model_anchor(model_name: str) -> str:
     """Build a stable anchor for model sections in the gallery artifact."""
     normalized_name = model_name.lower().replace("/", " ")
@@ -9320,12 +9433,12 @@ def _gallery_model_anchor(model_name: str) -> str:
 def _format_gallery_model_link(
     model_name: str,
     *,
-    gallery_relative_path: str | None = None,
+    gallery_link_target: str | None = None,
 ) -> str:
     """Format a Markdown link to a model entry in the gallery artifact."""
     target = f"#{_gallery_model_anchor(model_name)}"
-    if gallery_relative_path is not None:
-        target = f"{gallery_relative_path.replace(' ', '%20')}{target}"
+    if gallery_link_target is not None:
+        target = f"{gallery_link_target}#{_gallery_model_anchor(model_name)}"
     return f"[`{model_name}`]({target})"
 
 
@@ -10512,7 +10625,7 @@ def _select_recommended_models(
 def _preview_model_references(
     model_names: Sequence[str],
     *,
-    gallery_relative_path: str | None = None,
+    gallery_link_target: str | None = None,
     max_items: int = 4,
 ) -> str:
     """Format a compact preview of model names, optionally linking to the gallery."""
@@ -10520,9 +10633,9 @@ def _preview_model_references(
     rendered_names = [
         _format_gallery_model_link(
             model_name,
-            gallery_relative_path=gallery_relative_path,
+            gallery_link_target=gallery_link_target,
         )
-        if gallery_relative_path is not None
+        if gallery_link_target is not None
         else f"`{model_name}`"
         for model_name in unique_names[:max_items]
     ]
@@ -10534,7 +10647,7 @@ def _preview_model_references(
 def _build_markdown_recommended_models(
     report_context: ReportRenderContext,
     *,
-    gallery_relative_path: str | None = None,
+    gallery_link_target: str | None = None,
 ) -> list[str]:
     """Build a recommendation section for the Markdown summary report."""
     recommendations = _select_recommended_models(report_context)
@@ -10554,9 +10667,9 @@ def _build_markdown_recommended_models(
         model_ref = (
             _format_gallery_model_link(
                 result.model_name,
-                gallery_relative_path=gallery_relative_path,
+                gallery_link_target=gallery_link_target,
             )
-            if gallery_relative_path is not None
+            if gallery_link_target is not None
             else f"`{result.model_name}`"
         )
         rationale: list[str] = []
@@ -10598,7 +10711,7 @@ def _build_markdown_recommended_models(
 def _build_markdown_quality_breakdown(
     report_context: ReportRenderContext,
     *,
-    gallery_relative_path: str | None = None,
+    gallery_link_target: str | None = None,
 ) -> list[str]:
     """Build a compact quality-pattern breakdown for the Markdown summary report."""
     summary = report_context.summary
@@ -10620,7 +10733,7 @@ def _build_markdown_quality_breakdown(
     )
     for title, _css_class, entries in sections:
         models = [model for model, _detail in entries]
-        preview = _preview_model_references(models, gallery_relative_path=gallery_relative_path)
+        preview = _preview_model_references(models, gallery_link_target=gallery_link_target)
         details = [detail for _model, detail in entries if detail]
         detail_text = (
             f" Example: {_format_quality_detail(details[0], html_output=False)}." if details else ""
@@ -10637,7 +10750,7 @@ def _build_markdown_quality_breakdown(
         weakest_model = low_utility_models[0]
         model_preview = _preview_model_references(
             model_names,
-            gallery_relative_path=gallery_relative_path,
+            gallery_link_target=gallery_link_target,
         )
         _append_markdown_labeled_value(
             parts,
@@ -13003,8 +13116,6 @@ def _issue_queue_fixed_when(cluster: IssueCluster) -> str:
 def _issue_cluster_bundle_link(
     cluster: IssueCluster,
     repro_bundles: Mapping[str, Path],
-    *,
-    relative_prefix: str = "../repro_bundles",
 ) -> str:
     """Return a short queue link to the first available repro bundle."""
     bundle_paths = [
@@ -13015,7 +13126,7 @@ def _issue_cluster_bundle_link(
     if not bundle_paths:
         return "-"
     label = "repro JSON" if len(bundle_paths) == 1 else f"{len(bundle_paths)} repro JSONs"
-    return f"[{label}]({relative_prefix}/{quote(bundle_paths[0].name)})"
+    return f"[{label}]({_github_repro_bundle_url(bundle_paths[0].name)})"
 
 
 def _render_issue_queue_table(
@@ -13051,7 +13162,7 @@ def _diagnostics_issue_queue_section(
         title="## Issue Queue",
         body_lines=[
             "Root-cause issue drafts are generated in "
-            "[issues/index.md](../issues/index.md). Each row is intended to become one "
+            f"[issues/index.md]({_github_issue_index_url()}). Each row is intended to become one "
             "focused upstream GitHub issue.",
         ],
     )
@@ -13066,7 +13177,7 @@ def _diagnostics_issue_queue_section(
             clusters,
             escape_text=DIAGNOSTICS_ESCAPER.escape,
             issue_link_for_cluster=lambda cluster: (
-                f"[issue draft](../issues/{quote(cluster.issue_filename)})"
+                f"[issue draft]({_github_issue_draft_url(cluster.issue_filename)})"
             ),
             evidence_link_for_cluster=lambda cluster: _issue_cluster_bundle_link(
                 cluster,
@@ -13103,9 +13214,9 @@ def _diagnostics_upstream_filing_notes_section(snapshot: DiagnosticsSnapshot) ->
         "an exact cluster rerun command before any appendix detail.",
     )
     parts.append(
-        "- **Supporting files:** `repro JSON` links point to local repro bundles with prompt, "
-        "environment, and generated-output context. Attach or publish those JSON files when "
-        "filing upstream; GitHub will not resolve local artifact paths from a pasted issue body.",
+        "- **Supporting files:** `repro JSON` links point to the canonical GitHub copies of "
+        "the bundles with prompt, environment, and generated-output context. If you are filing "
+        "from an uncommitted ad-hoc run, attach the JSON manually.",
     )
     parts.append("")
     return parts
@@ -14017,7 +14128,7 @@ def _diagnostics_footer(
                     "**Note:** A comprehensive JSON reproduction bundle including system info "
                     "and the exact prompt trace has been exported to "
                     "[repro_bundles/]"
-                    "(https://github.com/jrp2014/check_models/tree/main/src/output/repro_bundles) "
+                    f"({_github_repro_bundle_tree_url()}) "
                     "for each failing model."
                 ),
             ],
@@ -14049,8 +14160,7 @@ def _diagnostics_footer(
         )
     parts.append("")
     parts.append(
-        f"_Report generated on {local_now_str()} by "
-        "[check_models](https://github.com/jrp2014/check_models)._",
+        f"_Report generated on {local_now_str()} by [check_models]({_GITHUB_REPO_URL})._",
     )
 
     return parts
@@ -14729,39 +14839,39 @@ def _append_markdown_gallery_note(
     review_filename: Path | None = None,
     log_filename: Path | None = None,
 ) -> None:
-    """Append relative links to companion artifacts when present."""
+    """Append companion artifact links, preferring published GitHub URLs."""
     artifact_lines: list[tuple[str, str]] = []
     if gallery_filename is not None:
-        relative_gallery_path = _relative_markdown_artifact_path(
+        gallery_target = _markdown_artifact_target(
             report_filename=report_filename,
             artifact_filename=gallery_filename,
         )
         artifact_lines.append(
             (
                 "Standalone output gallery",
-                f"[{relative_gallery_path}]({relative_gallery_path.replace(' ', '%20')})",
+                f"[{gallery_filename.name}]({gallery_target})",
             ),
         )
     if review_filename is not None:
-        relative_review_path = _relative_markdown_artifact_path(
+        review_target = _markdown_artifact_target(
             report_filename=report_filename,
             artifact_filename=review_filename,
         )
         artifact_lines.append(
             (
                 "Automated review digest",
-                f"[{relative_review_path}]({relative_review_path.replace(' ', '%20')})",
+                f"[{review_filename.name}]({review_target})",
             ),
         )
     if log_filename is not None:
-        relative_log_path = _relative_markdown_artifact_path(
+        log_target = _markdown_artifact_target(
             report_filename=report_filename,
             artifact_filename=log_filename,
         )
         artifact_lines.append(
             (
                 "Canonical run log",
-                f"[{relative_log_path}]({relative_log_path.replace(' ', '%20')})",
+                f"[{log_filename.name}]({log_target})",
             ),
         )
 
@@ -14817,8 +14927,8 @@ def generate_markdown_report(
         report_context.stats,
     )
 
-    gallery_relative_path = (
-        _relative_markdown_artifact_path(
+    gallery_link_target = (
+        _markdown_artifact_target(
             report_filename=filename,
             artifact_filename=gallery_filename,
         )
@@ -14845,13 +14955,13 @@ def generate_markdown_report(
     md.extend(
         _build_markdown_recommended_models(
             report_context,
-            gallery_relative_path=gallery_relative_path,
+            gallery_link_target=gallery_link_target,
         ),
     )
     md.extend(
         _build_markdown_quality_breakdown(
             report_context,
-            gallery_relative_path=gallery_relative_path,
+            gallery_link_target=gallery_link_target,
         ),
     )
 
@@ -15121,7 +15231,6 @@ def _append_review_issue_queue(
     md: list[str],
     *,
     report_context: ReportRenderContext,
-    report_filename: Path,
 ) -> None:
     """Append a compact issue-queue pointer to the review digest."""
     snapshot = _build_diagnostics_snapshot(
@@ -15133,32 +15242,17 @@ def _append_review_issue_queue(
     if not clusters:
         return
 
-    output_root = (
-        report_filename.parent.parent
-        if report_filename.parent.name == "reports"
-        else report_filename.parent
-    )
-    issue_index = output_root / "issues" / "index.md"
-    issue_index_rel = _relative_markdown_artifact_path(
-        report_filename=report_filename,
-        artifact_filename=issue_index,
-    ).replace(" ", "%20")
     md.extend(
         [
             "## Maintainer Escalations",
             "",
-            f"Focused upstream issue drafts are queued in [issues/index.md]({issue_index_rel}).",
+            f"Focused upstream issue drafts are queued in [issues/index.md]({_github_issue_index_url()}).",
             "",
         ]
     )
 
     def _review_issue_link(cluster: IssueCluster) -> str:
-        issue_path = output_root / "issues" / cluster.issue_filename
-        issue_rel = _relative_markdown_artifact_path(
-            report_filename=report_filename,
-            artifact_filename=issue_path,
-        ).replace(" ", "%20")
-        return f"[issue draft]({issue_rel})"
+        return f"[issue draft]({_github_issue_draft_url(cluster.issue_filename)})"
 
     md.extend(
         _render_issue_queue_table(
@@ -15214,7 +15308,7 @@ def generate_review_report(
 
     md.extend(_format_review_priorities_parts(report_context, html_output=False))
     _append_review_user_buckets(md, bucket_groups)
-    _append_review_issue_queue(md, report_context=report_context, report_filename=filename)
+    _append_review_issue_queue(md, report_context=report_context)
     _append_review_model_verdicts(md, sorted_results)
 
     _write_markdown_artifact(filename, md, artifact_name="Review report")
@@ -21456,7 +21550,7 @@ def _issue_bundle_link(
     bundle = repro_bundles.get(model_name)
     if bundle is None:
         return ""
-    return f"[{MARKDOWN_ESCAPER.escape(label)}](../repro_bundles/{quote(bundle.name)})"
+    return f"[{MARKDOWN_ESCAPER.escape(label)}]({_github_repro_bundle_url(bundle.name)})"
 
 
 def _issue_model_signal(
@@ -21748,8 +21842,8 @@ def _issue_repro_section(
         parts.append("")
         parts.extend(bundle_lines)
         parts.append(
-            "- Note: these are local artifact links; attach or publish the JSON when filing "
-            "upstream."
+            "- Note: these links target the canonical GitHub copies of the JSON bundles; "
+            "attach the file manually if this run has not been committed yet."
         )
         parts.append("")
 
@@ -21924,7 +22018,7 @@ def _write_issue_index(
             clusters,
             escape_text=MARKDOWN_ESCAPER.escape,
             issue_link_for_cluster=lambda cluster: (
-                f"[issue draft]({quote(cluster.issue_filename)})"
+                f"[issue draft]({_github_issue_draft_url(cluster.issue_filename)})"
             ),
             evidence_link_for_cluster=lambda cluster: _issue_cluster_bundle_link(
                 cluster,
