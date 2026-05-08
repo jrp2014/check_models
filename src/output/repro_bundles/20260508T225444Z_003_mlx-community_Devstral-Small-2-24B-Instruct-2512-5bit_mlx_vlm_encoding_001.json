@@ -2,14 +2,15 @@
   "environment": {
     "library_versions": {
       "Pillow": "12.2.0",
-      "huggingface-hub": "1.13.0",
-      "mlx": "0.32.0.dev20260502+e8ebdebe",
+      "huggingface-hub": "1.14.0",
+      "mlx": "0.32.0.dev20260508+a1c0b6f9",
+      "mlx-audio": "0.4.3",
       "mlx-lm": "0.31.3",
       "mlx-metal": null,
-      "mlx-vlm": "0.4.5",
+      "mlx-vlm": "0.5.0",
       "numpy": "2.4.4",
       "tokenizers": "0.22.2",
-      "transformers": "5.7.0"
+      "transformers": "5.8.0.dev0"
     },
     "platform": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
     "preflight_issues": [],
@@ -41,7 +42,7 @@
     "traceback": null,
     "type": null
   },
-  "generated_at_utc": "2026-05-02T23:34:40+00:00",
+  "generated_at_utc": "2026-05-08T22:54:44+00:00",
   "issue_cluster_id": "mlx-vlm_encoding_001",
   "model": "mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
   "repro": {
@@ -58,9 +59,10 @@
         "mlx-community/Qwen3-VL-2B-Thinking-bf16",
         "Qwen/Qwen3-VL-2B-Instruct"
       ],
-      "folder": null,
+      "folder": "/Users/jrp/Pictures/Processed",
       "force_color": false,
-      "image": "/Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg",
+      "force_download": false,
+      "image": null,
       "kv_bits": null,
       "kv_group_size": 64,
       "kv_quant_scheme": "uniform",
@@ -81,9 +83,10 @@
       "output_tsv": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.tsv",
       "prefill_step_size": 4096,
       "processor_kwargs": null,
-      "prompt": "Describe this picture",
+      "prompt": null,
       "prune_repro_days": 90,
       "quality_config": null,
+      "quantize_activations": false,
       "quantized_kv_start": 5000,
       "repetition_context_size": 20,
       "repetition_penalty": null,
@@ -102,13 +105,13 @@
       "verbose": true,
       "width": null
     },
-    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
+    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
     "env_vars": {
       "TOKENIZERS_PARALLELISM": "false"
     },
-    "image_path": "/Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg",
-    "image_ref_sha256": "8c21b8f52a9068f26b5443d7a7a7294ac30154606e84bbc5c9a42d2ddc81a158",
-    "image_sha256": "15e804d7a23d6c6f4b3832e97020f28b981e387ab010da27d6ff446f8e11cd8a",
+    "image_path": "/Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg",
+    "image_ref_sha256": "cfb4673ee4d7e2c5d8eed2cb9fe849e997df799d7287b932129c40a464252acf",
+    "image_sha256": "ed3baed59aed7c13bc807010bcccae7dbc2c052b1637dc37a6110f82a676e2b4",
     "prompt_diagnostics": {
       "eos_token": "</s>",
       "eos_token_id": 2,
@@ -128,9 +131,9 @@
       "image_placeholder_count": 0,
       "model_type": "mistral3",
       "processor_class": "mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor",
-      "rendered_prompt_chars": 42,
-      "rendered_prompt_hash_sha256": "b4bf09f426335f85888a62f2f389a0cea4faa44e1cb3c12d1f639046e190bce8",
-      "rendered_prompt_preview": "<s>[INST][IMG]Describe this picture[/INST]",
+      "rendered_prompt_chars": 2215,
+      "rendered_prompt_hash_sha256": "13c937bfc559977b4c0cc70dafc8468bb949d10eaa015c1fc16831e23d002d0d",
+      "rendered_prompt_preview": "<s>[INST][IMG]Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences describ...",
       "special_token_ids": [
         1,
         2,
@@ -201,38 +204,39 @@
       ],
       "tokenizer_class": "transformers.tokenization_utils_tokenizers.TokenizersBackend"
     },
-    "prompt_hash_sha256": "9a9bea36d63483f38c27775994d625ebce5d0a084a04474f97aacabd0f3fbb15",
-    "prompt_preview": "Describe this picture",
-    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
+    "prompt_hash_sha256": "4a1f03d684eed33f32edd69e60de6697a143191cc453889223fbf1471468d72c",
+    "prompt_preview": "Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct any...",
+    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
     "seed": null
   },
   "result": {
-    "generated_text_preview": "The\u0120image\u0120depicts\u0120a\u0120serene\u0120outdoor\u0120scene,\u0120likely\u0120in\u0120a\u0120park\u0120or\u0120garden.\u0120The\u0120focal\u0120point\u0120is\u0120a\u0120person\u0120standing\u0120on\u0120a\u0120small,\u0120wooden\u0120pier\u0120that\u0120extends\u0120into\u0120a\u0120calm\u0120body\u0120of\u0120water.\u0120The\u0120individual\u0120is\u0120dressed\u0120in\u0120a\u0120dark\u0120jacket\u0120and\u0120pants,\u0120with\u0120a\u0120blue\u0120hat,\u0120and\u0120appears\u0120to\u0120be\u0120looking\u0120out\u0120over\u0120the\u0120water,\u0120possibly\u0120enjoying\u0120the\u0120peaceful\u0120surroundings.\u010a\u010aIn\u0120the\u0120foreground,\u0120there\u0120is\u0120a\u0120small,\u0120young\u0120pine\u0120tree\u0120planted\u0120in\u0120a\u0120...",
+    "generated_text_preview": "Title:\u0120Classic\u0120sailboat\u0120moored\u0120in\u0120estuary\u010a\u010aDescription:\u0120A\u0120classic-style\u0120sailboat\u0120with\u0120a\u0120dark\u0120hull\u0120and\u0120wooden\u0120mast\u0120is\u0120moored\u0120in\u0120a\u0120calm\u0120estuary\u0120during\u0120low\u0120tide.\u0120The\u0120water\u0120has\u0120receded,\u0120exposing\u0120green,\u0120algae-covered\u0120mudflats\u0120behind\u0120the\u0120vessel.\u010a\u010aKeywords:\u0120sailboat,\u0120wooden\u0120mast,\u0120dark\u0120hull,\u0120estuary,\u0120low\u0120tide,\u0120mudflats,\u0120green\u0120algae,\u0120moored,\u0120calm\u0120water,\u0120string\u0120of\u0120flags,\u0120classic-style,\u0120wooden\u0120boat,\u0120watercra...",
     "maintainer_triage": {
       "confidence": "high",
       "evidence": [
         "harness:encoding",
-        "generic"
+        "trusted_overlap"
       ],
       "harness_details": [
-        "token_encoding:bpe_space_leak(139)"
+        "token_encoding:bpe_space_leak(61)"
       ],
       "hit_max_tokens": false,
       "issue_kind": "harness",
       "issue_subtype": "encoding",
       "next_action": "Inspect decode cleanup; tokenizer markers are leaking into user-facing text.",
-      "nontext_prompt_ratio": 0.9980925131139723,
-      "prompt_output_ratio": 0.08202193609918931,
-      "prompt_tokens_total": 2097,
+      "nontext_prompt_ratio": 0.8773141751865157,
+      "prompt_output_ratio": 0.029842497927604312,
+      "prompt_tokens_total": 3619,
       "requested_max_tokens": 500,
       "stop_reason": "completed",
-      "summary": "Tokenizer space-marker artifacts (for example \u0120) appeared in output (about 139 occurrences). | nontext prompt burden=100%",
+      "summary": "Tokenizer space-marker artifacts (for example \u0120) appeared in output (about 61 occurrences). | nontext prompt burden=88% | missing sections: description, keywords | missing terms: vast, expanse, adorned, small, floats",
       "suspected_owner": "mlx-vlm",
       "user_bucket": "avoid"
     },
     "quality_issues": [
       "\u26a0\ufe0fharness(encoding)",
-      "generic(0)"
+      "missing-sections(description+keywords)",
+      "title-length(66)"
     ],
     "success": true
   },

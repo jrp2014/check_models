@@ -14,12 +14,12 @@ Each row is intended to become one focused upstream GitHub issue.
 
 | Target                                         | Problem                                                                                              | Affected Models                                            | Issue Draft                                                                                                                                                              | Evidence Bundle                                                                                                                                                                                          | Fixed When                                                |
 |------------------------------------------------|------------------------------------------------------------------------------------------------------|------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
-| `mlx`                                          | Weight/config mismatch during model load                                                             | 2: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` (+1)                 | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_001_mlx_mlx-model-load-model_001.md)                                             | [2 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T211625Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_MLX_MODEL_LOAD_MODEL_853049863f38.json)                 | Load/generation completes or fails with a narrower owner. |
-| `mlx-vlm`                                      | mlx-vlm: Decode / runtime error: property 'text' of 'NaiveStreamingDetokenizer' object has no setter | 3: `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16` (+2) | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_002_mlx-vlm_mlx-vlm-decode-error_001.md)                                         | [3 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T211625Z_004_mlx-community_ERNIE-4.5-VL-28B-A3B-Thinking-bf16_MLX_VLM_DECODE_ERROR_c6f291b6246e.json) | Load/generation completes or fails with a narrower owner. |
-| `mlx-vlm`                                      | Missing module/import during model load                                                              | 1: `facebook/pe-av-large`                                  | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_003_mlx-vlm_mlx-vlm-model-load-model_001.md)                                     | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T211625Z_002_facebook_pe-av-large_MLX_VLM_MODEL_LOAD_MODEL_8b244da8c605.json)                            | Load/generation completes or fails with a narrower owner. |
-| model configuration / repository               | Processor config is missing image processor                                                          | 1: `mlx-community/MolmoPoint-8B-fp16`                      | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_004_model-configuration-repository_model-config-processor-load-processor_001.md) | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T211625Z_008_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json)             | Load/generation completes or fails with a narrower owner. |
-| `mlx-vlm`                                      | Tokenizer decode leaked BPE/byte markers                                                             | 1: `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_005_mlx-vlm_encoding_001.md)                                                     | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T211625Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)            | No BPE/byte markers in output.                            |
-| mlx-vlm first; MLX if cache/runtime reproduces | Long-context generation collapsed or became too short                                                | 1: `mlx-community/Qwen2-VL-2B-Instruct-4bit`               | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_006_mlx-vlm-mlx_long-context_001.md)                                             | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T211625Z_009_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)                  | Full and reduced reruns avoid context collapse.           |
+| `mlx`                                          | Weight/config mismatch during model load                                                             | 2: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` (+1)                 | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_001_mlx_mlx-model-load-model_001.md)                                             | [2 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T225444Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_MLX_MODEL_LOAD_MODEL_853049863f38.json)                 | Load/generation completes or fails with a narrower owner. |
+| `mlx-vlm`                                      | mlx-vlm: Decode / runtime error: property 'text' of 'NaiveStreamingDetokenizer' object has no setter | 3: `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16` (+2) | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_002_mlx-vlm_mlx-vlm-decode-error_001.md)                                         | [3 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T225444Z_004_mlx-community_ERNIE-4.5-VL-28B-A3B-Thinking-bf16_MLX_VLM_DECODE_ERROR_c6f291b6246e.json) | Load/generation completes or fails with a narrower owner. |
+| `mlx-vlm`                                      | Missing module/import during model load                                                              | 1: `facebook/pe-av-large`                                  | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_003_mlx-vlm_mlx-vlm-model-load-model_001.md)                                     | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T225444Z_002_facebook_pe-av-large_MLX_VLM_MODEL_LOAD_MODEL_8b244da8c605.json)                            | Load/generation completes or fails with a narrower owner. |
+| model configuration / repository               | Processor config is missing image processor                                                          | 1: `mlx-community/MolmoPoint-8B-fp16`                      | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_004_model-configuration-repository_model-config-processor-load-processor_001.md) | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T225444Z_008_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json)             | Load/generation completes or fails with a narrower owner. |
+| `mlx-vlm`                                      | Tokenizer decode leaked BPE/byte markers                                                             | 1: `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_005_mlx-vlm_encoding_001.md)                                                     | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T225444Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)            | No BPE/byte markers in output.                            |
+| mlx-vlm first; MLX if cache/runtime reproduces | Long-context generation collapsed or became too short                                                | 1: `mlx-community/Qwen2-VL-2B-Instruct-4bit`               | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_006_mlx-vlm-mlx_long-context_001.md)                                             | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T225444Z_009_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)                  | Full and reduced reruns avoid context collapse.           |
 
 ---
 
@@ -64,7 +64,7 @@ The remaining sections keep full run evidence for audit/debugging. They are not 
 | Model                                     | Observed Behavior                                         | First Seen Failing      | Recent Repro           |
 |-------------------------------------------|-----------------------------------------------------------|-------------------------|------------------------|
 | `LiquidAI/LFM2.5-VL-450M-MLX-bf16`        | Model loading failed: Received 2 parameters not in model: | 2026-05-04 20:21:24 BST | 3/3 recent runs failed |
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | Model loading failed: Received 4 parameters not in model: | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
+| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | Model loading failed: Received 4 parameters not in model: | 2026-02-08 00:01:56 GMT | 3/3 recent runs failed |
 
 ### To reproduce
 
@@ -92,66 +92,62 @@ Captured stdout/stderr:
 ```text
 === STDERR ===
 
-[21:55:08] ERROR    Failed to load model LiquidAI/LFM2.5-VL-450M-MLX-bf16
-                    ╭────────────────── Traceback (most recent call last) ───────────────────╮
-                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:17284 in  │
-                    │ _run_model_generation                                                  │
-                    │                                                                        │
-                    │   17281 │   try:                                                       │
-                    │   17282 │   │   if phase_timer is not None:                            │
-                    │   17283 │   │   │   with phase_timer.track("model_load"):              │
-                    │ ❱ 17284 │   │   │   │   model, processor, config = _load_model(params) │
-                    │   17285 │   │   else:                                                  │
-                    │   17286 │   │   │   model, processor, config = _load_model(params)     │
-                    │   17287 │   except Exception as load_err:                              │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16697 in  │
-                    │ _load_model                                                            │
-                    │                                                                        │
-                    │   16694 │   │   Tuple of ``(model, processor, config)`` where ``proces │
-                    │   16695 │   │   ``transformers.ProcessorMixin`` and ``config`` may be  │
-                    │   16696 │   """                                                        │
-                    │ ❱ 16697 │   model, processor = load(                                   │
-                    │   16698 │   │   path_or_hf_repo=params.model_identifier,               │
-                    │   16699 │   │   adapter_path=params.adapter_path,                      │
-                    │   16700 │   │   lazy=params.lazy,                                      │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py:419 in load       │
-                    │                                                                        │
-                    │    416 │   model_path = get_model_path(                                │
-                    │    417 │   │   path_or_hf_repo, force_download=force_download, revisio │
-                    │    418 │   )                                                           │
-                    │ ❱  419 │   model = load_model(model_path, lazy, **kwargs)              │
-                    │    420 │   if adapter_path is not None:                                │
-                    │    421 │   │   model = apply_lora_layers(model, adapter_path)          │
-                    │    422 │   │   model.eval()                                            │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py:343 in load_model │
-                    │                                                                        │
-                    │    340 │   │   │   )                                                   │
-                    │    341 │   │   model = quantize_activations(model)                     │
-                    │    342 │                                                               │
-                    │ ❱  343 │   model.load_weights(list(weights.items()))                   │
-                    │    344 │                                                               │
-                    │    345 │   if not lazy:                                                │
-                    │    346 │   │   mx.eval(model.parameters())                             │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py:185 in    │
-                    │ load_weights                                                           │
-                    │                                                                        │
-                    │   182 │   │   │   if extras := (new_weights.keys() - curr_weights.keys │
-                    │   183 │   │   │   │   num_extra = len(extras)                          │
-                    │   184 │   │   │   │   extras = ",\n".join(sorted(extras))              │
-                    │ ❱ 185 │   │   │   │   raise ValueError(                                │
-                    │   186 │   │   │   │   │   f"Received {num_extra} parameters not in mod │
-                    │   187 │   │   │   │   )                                                │
-                    │   188 │   │   │   if missing := (curr_weights.keys() - new_weights.key │
-                    ╰────────────────────────────────────────────────────────────────────────╯
+[23:34:53] ERROR    Failed to load model LiquidAI/LFM2.5-VL-450M-MLX-bf16
+                    ╭─────────────────────────────── Traceback (most recent call last) ────────────────────────────────╮
+                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:17369 in _run_model_generation      │
+                    │                                                                                                  │
+                    │   17366 │   try:                                                                                 │
+                    │   17367 │   │   if phase_timer is not None:                                                      │
+                    │   17368 │   │   │   with phase_timer.track("model_load"):                                        │
+                    │ ❱ 17369 │   │   │   │   model, processor, config = _load_model(params)                           │
+                    │   17370 │   │   else:                                                                            │
+                    │   17371 │   │   │   model, processor, config = _load_model(params)                               │
+                    │   17372 │   except Exception as load_err:                                                        │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16771 in _load_model                │
+                    │                                                                                                  │
+                    │   16768 │   │   Tuple of ``(model, processor, config)`` where ``processor`` is an                │
+                    │   16769 │   │   ``transformers.ProcessorMixin`` and ``config`` may be ``None``.                  │
+                    │   16770 │   """                                                                                  │
+                    │ ❱ 16771 │   model, processor = load(                                                             │
+                    │   16772 │   │   path_or_hf_repo=params.model_identifier,                                         │
+                    │   16773 │   │   adapter_path=params.adapter_path,                                                │
+                    │   16774 │   │   lazy=params.lazy,                                                                │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py:419 in load                                 │
+                    │                                                                                                  │
+                    │    416 │   model_path = get_model_path(                                                          │
+                    │    417 │   │   path_or_hf_repo, force_download=force_download, revision=revision                 │
+                    │    418 │   )                                                                                     │
+                    │ ❱  419 │   model = load_model(model_path, lazy, **kwargs)                                        │
+                    │    420 │   if adapter_path is not None:                                                          │
+                    │    421 │   │   model = apply_lora_layers(model, adapter_path)                                    │
+                    │    422 │   │   model.eval()                                                                      │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py:343 in load_model                           │
+                    │                                                                                                  │
+                    │    340 │   │   │   )                                                                             │
+                    │    341 │   │   model = quantize_activations(model)                                               │
+                    │    342 │                                                                                         │
+                    │ ❱  343 │   model.load_weights(list(weights.items()))                                             │
+                    │    344 │                                                                                         │
+                    │    345 │   if not lazy:                                                                          │
+                    │    346 │   │   mx.eval(model.parameters())                                                       │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py:185 in load_weights                 │
+                    │                                                                                                  │
+                    │   182 │   │   │   if extras := (new_weights.keys() - curr_weights.keys()):                       │
+                    │   183 │   │   │   │   num_extra = len(extras)                                                    │
+                    │   184 │   │   │   │   extras = ",\n".join(sorted(extras))                                        │
+                    │ ❱ 185 │   │   │   │   raise ValueError(                                                          │
+                    │   186 │   │   │   │   │   f"Received {num_extra} parameters not in model: \n{extras}."           │
+                    │   187 │   │   │   │   )                                                                          │
+                    │   188 │   │   │   if missing := (curr_weights.keys() - new_weights.keys()):                      │
+                    ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
                     ValueError: Received 2 parameters not in model:
                     multi_modal_projector.layer_norm.bias,
                     multi_modal_projector.layer_norm.weight.
-[21:55:09] DEBUG    HF Cache Info for LiquidAI/LFM2.5-VL-450M-MLX-bf16: size=860.6 MB,
-                    files=13
+[23:34:53] DEBUG    HF Cache Info for LiquidAI/LFM2.5-VL-450M-MLX-bf16: size=860.6 MB, files=13
 ```
 
 #### `mlx-community/Kimi-VL-A3B-Thinking-8bit`
@@ -172,68 +168,64 @@ Captured stdout/stderr:
 ```text
 === STDERR ===
 
-[21:59:07] ERROR    Failed to load model mlx-community/Kimi-VL-A3B-Thinking-8bit
-                    ╭────────────────── Traceback (most recent call last) ───────────────────╮
-                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:17284 in  │
-                    │ _run_model_generation                                                  │
-                    │                                                                        │
-                    │   17281 │   try:                                                       │
-                    │   17282 │   │   if phase_timer is not None:                            │
-                    │   17283 │   │   │   with phase_timer.track("model_load"):              │
-                    │ ❱ 17284 │   │   │   │   model, processor, config = _load_model(params) │
-                    │   17285 │   │   else:                                                  │
-                    │   17286 │   │   │   model, processor, config = _load_model(params)     │
-                    │   17287 │   except Exception as load_err:                              │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16697 in  │
-                    │ _load_model                                                            │
-                    │                                                                        │
-                    │   16694 │   │   Tuple of ``(model, processor, config)`` where ``proces │
-                    │   16695 │   │   ``transformers.ProcessorMixin`` and ``config`` may be  │
-                    │   16696 │   """                                                        │
-                    │ ❱ 16697 │   model, processor = load(                                   │
-                    │   16698 │   │   path_or_hf_repo=params.model_identifier,               │
-                    │   16699 │   │   adapter_path=params.adapter_path,                      │
-                    │   16700 │   │   lazy=params.lazy,                                      │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py:419 in load       │
-                    │                                                                        │
-                    │    416 │   model_path = get_model_path(                                │
-                    │    417 │   │   path_or_hf_repo, force_download=force_download, revisio │
-                    │    418 │   )                                                           │
-                    │ ❱  419 │   model = load_model(model_path, lazy, **kwargs)              │
-                    │    420 │   if adapter_path is not None:                                │
-                    │    421 │   │   model = apply_lora_layers(model, adapter_path)          │
-                    │    422 │   │   model.eval()                                            │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py:343 in load_model │
-                    │                                                                        │
-                    │    340 │   │   │   )                                                   │
-                    │    341 │   │   model = quantize_activations(model)                     │
-                    │    342 │                                                               │
-                    │ ❱  343 │   model.load_weights(list(weights.items()))                   │
-                    │    344 │                                                               │
-                    │    345 │   if not lazy:                                                │
-                    │    346 │   │   mx.eval(model.parameters())                             │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py:185 in    │
-                    │ load_weights                                                           │
-                    │                                                                        │
-                    │   182 │   │   │   if extras := (new_weights.keys() - curr_weights.keys │
-                    │   183 │   │   │   │   num_extra = len(extras)                          │
-                    │   184 │   │   │   │   extras = ",\n".join(sorted(extras))              │
-                    │ ❱ 185 │   │   │   │   raise ValueError(                                │
-                    │   186 │   │   │   │   │   f"Received {num_extra} parameters not in mod │
-                    │   187 │   │   │   │   )                                                │
-                    │   188 │   │   │   if missing := (curr_weights.keys() - new_weights.key │
-                    ╰────────────────────────────────────────────────────────────────────────╯
+[23:38:50] ERROR    Failed to load model mlx-community/Kimi-VL-A3B-Thinking-8bit
+                    ╭─────────────────────────────── Traceback (most recent call last) ────────────────────────────────╮
+                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:17369 in _run_model_generation      │
+                    │                                                                                                  │
+                    │   17366 │   try:                                                                                 │
+                    │   17367 │   │   if phase_timer is not None:                                                      │
+                    │   17368 │   │   │   with phase_timer.track("model_load"):                                        │
+                    │ ❱ 17369 │   │   │   │   model, processor, config = _load_model(params)                           │
+                    │   17370 │   │   else:                                                                            │
+                    │   17371 │   │   │   model, processor, config = _load_model(params)                               │
+                    │   17372 │   except Exception as load_err:                                                        │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16771 in _load_model                │
+                    │                                                                                                  │
+                    │   16768 │   │   Tuple of ``(model, processor, config)`` where ``processor`` is an                │
+                    │   16769 │   │   ``transformers.ProcessorMixin`` and ``config`` may be ``None``.                  │
+                    │   16770 │   """                                                                                  │
+                    │ ❱ 16771 │   model, processor = load(                                                             │
+                    │   16772 │   │   path_or_hf_repo=params.model_identifier,                                         │
+                    │   16773 │   │   adapter_path=params.adapter_path,                                                │
+                    │   16774 │   │   lazy=params.lazy,                                                                │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py:419 in load                                 │
+                    │                                                                                                  │
+                    │    416 │   model_path = get_model_path(                                                          │
+                    │    417 │   │   path_or_hf_repo, force_download=force_download, revision=revision                 │
+                    │    418 │   )                                                                                     │
+                    │ ❱  419 │   model = load_model(model_path, lazy, **kwargs)                                        │
+                    │    420 │   if adapter_path is not None:                                                          │
+                    │    421 │   │   model = apply_lora_layers(model, adapter_path)                                    │
+                    │    422 │   │   model.eval()                                                                      │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py:343 in load_model                           │
+                    │                                                                                                  │
+                    │    340 │   │   │   )                                                                             │
+                    │    341 │   │   model = quantize_activations(model)                                               │
+                    │    342 │                                                                                         │
+                    │ ❱  343 │   model.load_weights(list(weights.items()))                                             │
+                    │    344 │                                                                                         │
+                    │    345 │   if not lazy:                                                                          │
+                    │    346 │   │   mx.eval(model.parameters())                                                       │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py:185 in load_weights                 │
+                    │                                                                                                  │
+                    │   182 │   │   │   if extras := (new_weights.keys() - curr_weights.keys()):                       │
+                    │   183 │   │   │   │   num_extra = len(extras)                                                    │
+                    │   184 │   │   │   │   extras = ",\n".join(sorted(extras))                                        │
+                    │ ❱ 185 │   │   │   │   raise ValueError(                                                          │
+                    │   186 │   │   │   │   │   f"Received {num_extra} parameters not in model: \n{extras}."           │
+                    │   187 │   │   │   │   )                                                                          │
+                    │   188 │   │   │   if missing := (curr_weights.keys() - new_weights.keys()):                      │
+                    ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
                     ValueError: Received 4 parameters not in model:
                     multi_modal_projector.linear_1.biases,
                     multi_modal_projector.linear_1.scales,
                     multi_modal_projector.linear_2.biases,
                     multi_modal_projector.linear_2.scales.
-[21:59:08] DEBUG    HF Cache Info for mlx-community/Kimi-VL-A3B-Thinking-8bit: size=17023.6
-                    MB, files=18
+[23:38:51] DEBUG    HF Cache Info for mlx-community/Kimi-VL-A3B-Thinking-8bit: size=17023.6 MB, files=18
 ```
 
 </details>
@@ -291,64 +283,61 @@ Captured stdout/stderr:
 === STDERR ===
 
 ERROR:root:Model type pe_audio_video not supported. Error: No module named 'mlx_vlm.speculative.drafters.pe_audio_video'
-[21:55:10] ERROR    Failed to load model facebook/pe-av-large
-                    ╭────────────────── Traceback (most recent call last) ───────────────────╮
-                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:17284 in  │
-                    │ _run_model_generation                                                  │
-                    │                                                                        │
-                    │   17281 │   try:                                                       │
-                    │   17282 │   │   if phase_timer is not None:                            │
-                    │   17283 │   │   │   with phase_timer.track("model_load"):              │
-                    │ ❱ 17284 │   │   │   │   model, processor, config = _load_model(params) │
-                    │   17285 │   │   else:                                                  │
-                    │   17286 │   │   │   model, processor, config = _load_model(params)     │
-                    │   17287 │   except Exception as load_err:                              │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16697 in  │
-                    │ _load_model                                                            │
-                    │                                                                        │
-                    │   16694 │   │   Tuple of ``(model, processor, config)`` where ``proces │
-                    │   16695 │   │   ``transformers.ProcessorMixin`` and ``config`` may be  │
-                    │   16696 │   """                                                        │
-                    │ ❱ 16697 │   model, processor = load(                                   │
-                    │   16698 │   │   path_or_hf_repo=params.model_identifier,               │
-                    │   16699 │   │   adapter_path=params.adapter_path,                      │
-                    │   16700 │   │   lazy=params.lazy,                                      │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py:419 in load       │
-                    │                                                                        │
-                    │    416 │   model_path = get_model_path(                                │
-                    │    417 │   │   path_or_hf_repo, force_download=force_download, revisio │
-                    │    418 │   )                                                           │
-                    │ ❱  419 │   model = load_model(model_path, lazy, **kwargs)              │
-                    │    420 │   if adapter_path is not None:                                │
-                    │    421 │   │   model = apply_lora_layers(model, adapter_path)          │
-                    │    422 │   │   model.eval()                                            │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py:235 in load_model │
-                    │                                                                        │
-                    │    232 │   with safetensors.safe_open(weight_files[0], framework="np") │
-                    │    233 │   │   is_mlx_format = f.metadata() and f.metadata().get("form │
-                    │    234 │                                                               │
-                    │ ❱  235 │   model_class, _ = get_model_and_args(config=config)          │
-                    │    236 │                                                               │
-                    │    237 │   # Initialize text and vision configs if not present         │
-                    │    238 │   config.setdefault("text_config", config.pop("llm_config", { │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py:137 in            │
-                    │ get_model_and_args                                                     │
-                    │                                                                        │
-                    │    134 │                                                               │
-                    │    135 │   msg = f"Model type {model_type} not supported. Error: {last │
-                    │    136 │   logging.error(msg)                                          │
-                    │ ❱  137 │   raise ValueError(msg)                                       │
-                    │    138                                                                 │
-                    │    139                                                                 │
-                    │    140 def get_model_path(                                             │
-                    ╰────────────────────────────────────────────────────────────────────────╯
-                    ValueError: Model type pe_audio_video not supported. Error: No module
-                    named 'mlx_vlm.speculative.drafters.pe_audio_video'
-[21:55:10] DEBUG    HF Cache Info for facebook/pe-av-large: size=8528.3 MB, files=8
+[23:34:54] ERROR    Failed to load model facebook/pe-av-large
+                    ╭─────────────────────────────── Traceback (most recent call last) ────────────────────────────────╮
+                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:17369 in _run_model_generation      │
+                    │                                                                                                  │
+                    │   17366 │   try:                                                                                 │
+                    │   17367 │   │   if phase_timer is not None:                                                      │
+                    │   17368 │   │   │   with phase_timer.track("model_load"):                                        │
+                    │ ❱ 17369 │   │   │   │   model, processor, config = _load_model(params)                           │
+                    │   17370 │   │   else:                                                                            │
+                    │   17371 │   │   │   model, processor, config = _load_model(params)                               │
+                    │   17372 │   except Exception as load_err:                                                        │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16771 in _load_model                │
+                    │                                                                                                  │
+                    │   16768 │   │   Tuple of ``(model, processor, config)`` where ``processor`` is an                │
+                    │   16769 │   │   ``transformers.ProcessorMixin`` and ``config`` may be ``None``.                  │
+                    │   16770 │   """                                                                                  │
+                    │ ❱ 16771 │   model, processor = load(                                                             │
+                    │   16772 │   │   path_or_hf_repo=params.model_identifier,                                         │
+                    │   16773 │   │   adapter_path=params.adapter_path,                                                │
+                    │   16774 │   │   lazy=params.lazy,                                                                │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py:419 in load                                 │
+                    │                                                                                                  │
+                    │    416 │   model_path = get_model_path(                                                          │
+                    │    417 │   │   path_or_hf_repo, force_download=force_download, revision=revision                 │
+                    │    418 │   )                                                                                     │
+                    │ ❱  419 │   model = load_model(model_path, lazy, **kwargs)                                        │
+                    │    420 │   if adapter_path is not None:                                                          │
+                    │    421 │   │   model = apply_lora_layers(model, adapter_path)                                    │
+                    │    422 │   │   model.eval()                                                                      │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py:235 in load_model                           │
+                    │                                                                                                  │
+                    │    232 │   with safetensors.safe_open(weight_files[0], framework="np") as f:                     │
+                    │    233 │   │   is_mlx_format = f.metadata() and f.metadata().get("format") == "mlx"              │
+                    │    234 │                                                                                         │
+                    │ ❱  235 │   model_class, _ = get_model_and_args(config=config)                                    │
+                    │    236 │                                                                                         │
+                    │    237 │   # Initialize text and vision configs if not present                                   │
+                    │    238 │   config.setdefault("text_config", config.pop("llm_config", {}))                        │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py:137 in get_model_and_args                   │
+                    │                                                                                                  │
+                    │    134 │                                                                                         │
+                    │    135 │   msg = f"Model type {model_type} not supported. Error: {last_err}"                     │
+                    │    136 │   logging.error(msg)                                                                    │
+                    │ ❱  137 │   raise ValueError(msg)                                                                 │
+                    │    138                                                                                           │
+                    │    139                                                                                           │
+                    │    140 def get_model_path(                                                                       │
+                    ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+                    ValueError: Model type pe_audio_video not supported. Error: No module named
+                    'mlx_vlm.speculative.drafters.pe_audio_video'
+[23:34:55] DEBUG    HF Cache Info for facebook/pe-av-large: size=8528.3 MB, files=8
 ```
 
 </details>
@@ -447,86 +436,80 @@ Assistant:
 
 === STDERR ===
 
-[21:56:17] ERROR    Runtime error for mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
-                    ╭────────────────── Traceback (most recent call last) ───────────────────╮
-                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16985 in  │
-                    │ _run_generation_with_retry_workaround                                  │
-                    │                                                                        │
-                    │   16982 ) -> GenerationResult | SupportsGenerationResult:              │
-                    │   16983 │   """Run generation once, retrying only for the known upstre │
-                    │   16984 │   try:                                                       │
-                    │ ❱ 16985 │   │   return generate_once()                                 │
-                    │   16986 │   except TimeoutError as gen_to_err:                         │
-                    │   16987 │   │   msg = f"Generation timed out for model {params.model_i │
-                    │   16988 │   │   raise _tag_exception_failure_phase(TimeoutError(msg),  │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:17334 in  │
-                    │ _generate_once                                                         │
-                    │                                                                        │
-                    │   17331 │   │   │   │   formatted_prompt=formatted_prompt,             │
-                    │   17332 │   │   │   │   extra_kwargs=extra_kwargs,                     │
-                    │   17333 │   │   │   )                                                  │
-                    │ ❱ 17334 │   │   return strict_generate(                                │
-                    │   17335 │   │   │   model=model,                                       │
-                    │   17336 │   │   │   processor=processor,                               │
-                    │   17337 │   │   │   prompt=formatted_prompt,                           │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py:1922 in        │
-                    │ generate                                                               │
-                    │                                                                        │
-                    │   1919 │   else:                                                       │
-                    │   1920 │   │   tokenizer.stopping_criteria.reset(model.config.eos_toke │
-                    │   1921 │                                                               │
-                    │ ❱ 1922 │   for response in stream_generate(                            │
-                    │   1923 │   │   model, processor, prompt, image, audio, video, **kwargs │
-                    │   1924 │   ):                                                          │
-                    │   1925 │   │   if verbose:                                             │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py:1722 in        │
-                    │ stream_generate                                                        │
-                    │                                                                        │
-                    │   1719 │   total_prompt_tokens = reused_prefix_len + input_ids.size    │
-                    │   1720 │                                                               │
-                    │   1721 │   with wired_limit(model, [generation_stream]):               │
-                    │ ❱ 1722 │   │   detokenizer = make_streaming_detokenizer(processor)     │
-                    │   1723 │   │   thinking_criteria = getattr(tokenizer, "thinking_budget │
-                    │   1724 │   │   exact_checkpoint_len = None                             │
-                    │   1725 │   │   exact_checkpoint = None                                 │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/tokenizer_utils.py:405 in  │
-                    │ make_streaming_detokenizer                                             │
-                    │                                                                        │
-                    │   402                                                                  │
-                    │   403 def make_streaming_detokenizer(processor):                       │
-                    │   404 │   """Return an isolated, reset streaming detokenizer for a pro │
-                    │ ❱ 405 │   detokenizer = copy(processor.detokenizer)                    │
-                    │   406 │   detokenizer.reset()                                          │
-                    │   407 │   return detokenizer                                           │
-                    │   408                                                                  │
-                    │                                                                        │
-                    │ /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/copy.py:98 in copy   │
-                    │                                                                        │
-                    │    95 │                                                                │
-                    │    96 │   if isinstance(rv, str):                                      │
-                    │    97 │   │   return x                                                 │
-                    │ ❱  98 │   return _reconstruct(x, None, *rv)                            │
-                    │    99                                                                  │
-                    │   100                                                                  │
-                    │   101 _copy_dispatch = d = {}                                          │
-                    │                                                                        │
-                    │ /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/copy.py:272 in       │
-                    │ _reconstruct                                                           │
-                    │                                                                        │
-                    │   269 │   │   │   │   y.__dict__.update(state)                         │
-                    │   270 │   │   │   if slotstate is not None:                            │
-                    │   271 │   │   │   │   for key, value in slotstate.items():             │
-                    │ ❱ 272 │   │   │   │   │   setattr(y, key, value)                       │
-                    │   273 │                                                                │
-                    │   274 │   if listiter is not None:                                     │
-                    │   275 │   │   if deep:                                                 │
-                    ╰────────────────────────────────────────────────────────────────────────╯
-                    AttributeError: property 'text' of 'NaiveStreamingDetokenizer' object has
-                    no setter
+[23:35:59] ERROR    Runtime error for mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+                    ╭─────────────────────────────── Traceback (most recent call last) ────────────────────────────────╮
+                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:17061 in                            │
+                    │ _run_generation_with_retry_workaround                                                            │
+                    │                                                                                                  │
+                    │   17058 ) -> GenerationResult | SupportsGenerationResult:                                        │
+                    │   17059 │   """Run generation once, retrying only for the known upstream detokenizer bug."""     │
+                    │   17060 │   try:                                                                                 │
+                    │ ❱ 17061 │   │   return generate_once()                                                           │
+                    │   17062 │   except TimeoutError as gen_to_err:                                                   │
+                    │   17063 │   │   msg = f"Generation timed out for model {params.model_identifier}: {gen_to_err}"  │
+                    │   17064 │   │   raise _tag_exception_failure_phase(TimeoutError(msg), "decode") from gen_to_err  │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:17419 in _generate_once             │
+                    │                                                                                                  │
+                    │   17416 │   │   │   │   formatted_prompt=formatted_prompt,                                       │
+                    │   17417 │   │   │   │   extra_kwargs=extra_kwargs,                                               │
+                    │   17418 │   │   │   )                                                                            │
+                    │ ❱ 17419 │   │   return strict_generate(                                                          │
+                    │   17420 │   │   │   model=model,                                                                 │
+                    │   17421 │   │   │   processor=processor,                                                         │
+                    │   17422 │   │   │   prompt=formatted_prompt,                                                     │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py:1922 in generate                         │
+                    │                                                                                                  │
+                    │   1919 │   else:                                                                                 │
+                    │   1920 │   │   tokenizer.stopping_criteria.reset(model.config.eos_token_id)                      │
+                    │   1921 │                                                                                         │
+                    │ ❱ 1922 │   for response in stream_generate(                                                      │
+                    │   1923 │   │   model, processor, prompt, image, audio, video, **kwargs                           │
+                    │   1924 │   ):                                                                                    │
+                    │   1925 │   │   if verbose:                                                                       │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py:1722 in stream_generate                  │
+                    │                                                                                                  │
+                    │   1719 │   total_prompt_tokens = reused_prefix_len + input_ids.size                              │
+                    │   1720 │                                                                                         │
+                    │   1721 │   with wired_limit(model, [generation_stream]):                                         │
+                    │ ❱ 1722 │   │   detokenizer = make_streaming_detokenizer(processor)                               │
+                    │   1723 │   │   thinking_criteria = getattr(tokenizer, "thinking_budget_criteria", None)          │
+                    │   1724 │   │   exact_checkpoint_len = None                                                       │
+                    │   1725 │   │   exact_checkpoint = None                                                           │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/tokenizer_utils.py:405 in make_streaming_detokenizer │
+                    │                                                                                                  │
+                    │   402                                                                                            │
+                    │   403 def make_streaming_detokenizer(processor):                                                 │
+                    │   404 │   """Return an isolated, reset streaming detokenizer for a processor."""                 │
+                    │ ❱ 405 │   detokenizer = copy(processor.detokenizer)                                              │
+                    │   406 │   detokenizer.reset()                                                                    │
+                    │   407 │   return detokenizer                                                                     │
+                    │   408                                                                                            │
+                    │                                                                                                  │
+                    │ /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/copy.py:98 in copy                             │
+                    │                                                                                                  │
+                    │    95 │                                                                                          │
+                    │    96 │   if isinstance(rv, str):                                                                │
+                    │    97 │   │   return x                                                                           │
+                    │ ❱  98 │   return _reconstruct(x, None, *rv)                                                      │
+                    │    99                                                                                            │
+                    │   100                                                                                            │
+                    │   101 _copy_dispatch = d = {}                                                                    │
+                    │                                                                                                  │
+                    │ /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/copy.py:272 in _reconstruct                    │
+                    │                                                                                                  │
+                    │   269 │   │   │   │   y.__dict__.update(state)                                                   │
+                    │   270 │   │   │   if slotstate is not None:                                                      │
+                    │   271 │   │   │   │   for key, value in slotstate.items():                                       │
+                    │ ❱ 272 │   │   │   │   │   setattr(y, key, value)                                                 │
+                    │   273 │                                                                                          │
+                    │   274 │   if listiter is not None:                                                               │
+                    │   275 │   │   if deep:                                                                           │
+                    ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+                    AttributeError: property 'text' of 'NaiveStreamingDetokenizer' object has no setter
 ```
 
 </details>
@@ -557,7 +540,7 @@ Assistant:
 
 | Model                             | Observed Behavior                                                                                                                              | First Seen Failing      | Recent Repro           |
 |-----------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------|------------------------|
-| `mlx-community/LFM2-VL-1.6B-8bit` | Model runtime error during generation for mlx-community/LFM2-VL-1.6B-8bit: property 'text' of 'NaiveStreamingDetokenizer' object has no setter | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
+| `mlx-community/LFM2-VL-1.6B-8bit` | Model runtime error during generation for mlx-community/LFM2-VL-1.6B-8bit: property 'text' of 'NaiveStreamingDetokenizer' object has no setter | 2026-02-08 00:01:56 GMT | 3/3 recent runs failed |
 
 ### To reproduce
 
@@ -625,86 +608,80 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 
 === STDERR ===
 
-[21:59:09] ERROR    Runtime error for mlx-community/LFM2-VL-1.6B-8bit
-                    ╭────────────────── Traceback (most recent call last) ───────────────────╮
-                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16985 in  │
-                    │ _run_generation_with_retry_workaround                                  │
-                    │                                                                        │
-                    │   16982 ) -> GenerationResult | SupportsGenerationResult:              │
-                    │   16983 │   """Run generation once, retrying only for the known upstre │
-                    │   16984 │   try:                                                       │
-                    │ ❱ 16985 │   │   return generate_once()                                 │
-                    │   16986 │   except TimeoutError as gen_to_err:                         │
-                    │   16987 │   │   msg = f"Generation timed out for model {params.model_i │
-                    │   16988 │   │   raise _tag_exception_failure_phase(TimeoutError(msg),  │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:17334 in  │
-                    │ _generate_once                                                         │
-                    │                                                                        │
-                    │   17331 │   │   │   │   formatted_prompt=formatted_prompt,             │
-                    │   17332 │   │   │   │   extra_kwargs=extra_kwargs,                     │
-                    │   17333 │   │   │   )                                                  │
-                    │ ❱ 17334 │   │   return strict_generate(                                │
-                    │   17335 │   │   │   model=model,                                       │
-                    │   17336 │   │   │   processor=processor,                               │
-                    │   17337 │   │   │   prompt=formatted_prompt,                           │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py:1922 in        │
-                    │ generate                                                               │
-                    │                                                                        │
-                    │   1919 │   else:                                                       │
-                    │   1920 │   │   tokenizer.stopping_criteria.reset(model.config.eos_toke │
-                    │   1921 │                                                               │
-                    │ ❱ 1922 │   for response in stream_generate(                            │
-                    │   1923 │   │   model, processor, prompt, image, audio, video, **kwargs │
-                    │   1924 │   ):                                                          │
-                    │   1925 │   │   if verbose:                                             │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py:1722 in        │
-                    │ stream_generate                                                        │
-                    │                                                                        │
-                    │   1719 │   total_prompt_tokens = reused_prefix_len + input_ids.size    │
-                    │   1720 │                                                               │
-                    │   1721 │   with wired_limit(model, [generation_stream]):               │
-                    │ ❱ 1722 │   │   detokenizer = make_streaming_detokenizer(processor)     │
-                    │   1723 │   │   thinking_criteria = getattr(tokenizer, "thinking_budget │
-                    │   1724 │   │   exact_checkpoint_len = None                             │
-                    │   1725 │   │   exact_checkpoint = None                                 │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/tokenizer_utils.py:405 in  │
-                    │ make_streaming_detokenizer                                             │
-                    │                                                                        │
-                    │   402                                                                  │
-                    │   403 def make_streaming_detokenizer(processor):                       │
-                    │   404 │   """Return an isolated, reset streaming detokenizer for a pro │
-                    │ ❱ 405 │   detokenizer = copy(processor.detokenizer)                    │
-                    │   406 │   detokenizer.reset()                                          │
-                    │   407 │   return detokenizer                                           │
-                    │   408                                                                  │
-                    │                                                                        │
-                    │ /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/copy.py:98 in copy   │
-                    │                                                                        │
-                    │    95 │                                                                │
-                    │    96 │   if isinstance(rv, str):                                      │
-                    │    97 │   │   return x                                                 │
-                    │ ❱  98 │   return _reconstruct(x, None, *rv)                            │
-                    │    99                                                                  │
-                    │   100                                                                  │
-                    │   101 _copy_dispatch = d = {}                                          │
-                    │                                                                        │
-                    │ /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/copy.py:272 in       │
-                    │ _reconstruct                                                           │
-                    │                                                                        │
-                    │   269 │   │   │   │   y.__dict__.update(state)                         │
-                    │   270 │   │   │   if slotstate is not None:                            │
-                    │   271 │   │   │   │   for key, value in slotstate.items():             │
-                    │ ❱ 272 │   │   │   │   │   setattr(y, key, value)                       │
-                    │   273 │                                                                │
-                    │   274 │   if listiter is not None:                                     │
-                    │   275 │   │   if deep:                                                 │
-                    ╰────────────────────────────────────────────────────────────────────────╯
-                    AttributeError: property 'text' of 'NaiveStreamingDetokenizer' object has
-                    no setter
+[23:38:52] ERROR    Runtime error for mlx-community/LFM2-VL-1.6B-8bit
+                    ╭─────────────────────────────── Traceback (most recent call last) ────────────────────────────────╮
+                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:17061 in                            │
+                    │ _run_generation_with_retry_workaround                                                            │
+                    │                                                                                                  │
+                    │   17058 ) -> GenerationResult | SupportsGenerationResult:                                        │
+                    │   17059 │   """Run generation once, retrying only for the known upstream detokenizer bug."""     │
+                    │   17060 │   try:                                                                                 │
+                    │ ❱ 17061 │   │   return generate_once()                                                           │
+                    │   17062 │   except TimeoutError as gen_to_err:                                                   │
+                    │   17063 │   │   msg = f"Generation timed out for model {params.model_identifier}: {gen_to_err}"  │
+                    │   17064 │   │   raise _tag_exception_failure_phase(TimeoutError(msg), "decode") from gen_to_err  │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:17419 in _generate_once             │
+                    │                                                                                                  │
+                    │   17416 │   │   │   │   formatted_prompt=formatted_prompt,                                       │
+                    │   17417 │   │   │   │   extra_kwargs=extra_kwargs,                                               │
+                    │   17418 │   │   │   )                                                                            │
+                    │ ❱ 17419 │   │   return strict_generate(                                                          │
+                    │   17420 │   │   │   model=model,                                                                 │
+                    │   17421 │   │   │   processor=processor,                                                         │
+                    │   17422 │   │   │   prompt=formatted_prompt,                                                     │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py:1922 in generate                         │
+                    │                                                                                                  │
+                    │   1919 │   else:                                                                                 │
+                    │   1920 │   │   tokenizer.stopping_criteria.reset(model.config.eos_token_id)                      │
+                    │   1921 │                                                                                         │
+                    │ ❱ 1922 │   for response in stream_generate(                                                      │
+                    │   1923 │   │   model, processor, prompt, image, audio, video, **kwargs                           │
+                    │   1924 │   ):                                                                                    │
+                    │   1925 │   │   if verbose:                                                                       │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py:1722 in stream_generate                  │
+                    │                                                                                                  │
+                    │   1719 │   total_prompt_tokens = reused_prefix_len + input_ids.size                              │
+                    │   1720 │                                                                                         │
+                    │   1721 │   with wired_limit(model, [generation_stream]):                                         │
+                    │ ❱ 1722 │   │   detokenizer = make_streaming_detokenizer(processor)                               │
+                    │   1723 │   │   thinking_criteria = getattr(tokenizer, "thinking_budget_criteria", None)          │
+                    │   1724 │   │   exact_checkpoint_len = None                                                       │
+                    │   1725 │   │   exact_checkpoint = None                                                           │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/tokenizer_utils.py:405 in make_streaming_detokenizer │
+                    │                                                                                                  │
+                    │   402                                                                                            │
+                    │   403 def make_streaming_detokenizer(processor):                                                 │
+                    │   404 │   """Return an isolated, reset streaming detokenizer for a processor."""                 │
+                    │ ❱ 405 │   detokenizer = copy(processor.detokenizer)                                              │
+                    │   406 │   detokenizer.reset()                                                                    │
+                    │   407 │   return detokenizer                                                                     │
+                    │   408                                                                                            │
+                    │                                                                                                  │
+                    │ /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/copy.py:98 in copy                             │
+                    │                                                                                                  │
+                    │    95 │                                                                                          │
+                    │    96 │   if isinstance(rv, str):                                                                │
+                    │    97 │   │   return x                                                                           │
+                    │ ❱  98 │   return _reconstruct(x, None, *rv)                                                      │
+                    │    99                                                                                            │
+                    │   100                                                                                            │
+                    │   101 _copy_dispatch = d = {}                                                                    │
+                    │                                                                                                  │
+                    │ /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/copy.py:272 in _reconstruct                    │
+                    │                                                                                                  │
+                    │   269 │   │   │   │   y.__dict__.update(state)                                                   │
+                    │   270 │   │   │   if slotstate is not None:                                                      │
+                    │   271 │   │   │   │   for key, value in slotstate.items():                                       │
+                    │ ❱ 272 │   │   │   │   │   setattr(y, key, value)                                                 │
+                    │   273 │                                                                                          │
+                    │   274 │   if listiter is not None:                                                               │
+                    │   275 │   │   if deep:                                                                           │
+                    ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+                    AttributeError: property 'text' of 'NaiveStreamingDetokenizer' object has no setter
 ```
 
 </details>
@@ -735,7 +712,7 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 
 | Model                               | Observed Behavior                                                                                                                                | First Seen Failing      | Recent Repro           |
 |-------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------|------------------------|
-| `mlx-community/LFM2.5-VL-1.6B-bf16` | Model runtime error during generation for mlx-community/LFM2.5-VL-1.6B-bf16: property 'text' of 'NaiveStreamingDetokenizer' object has no setter | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
+| `mlx-community/LFM2.5-VL-1.6B-bf16` | Model runtime error during generation for mlx-community/LFM2.5-VL-1.6B-bf16: property 'text' of 'NaiveStreamingDetokenizer' object has no setter | 2026-02-08 00:01:56 GMT | 3/3 recent runs failed |
 
 ### To reproduce
 
@@ -803,86 +780,80 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 
 === STDERR ===
 
-[21:59:11] ERROR    Runtime error for mlx-community/LFM2.5-VL-1.6B-bf16
-                    ╭────────────────── Traceback (most recent call last) ───────────────────╮
-                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16985 in  │
-                    │ _run_generation_with_retry_workaround                                  │
-                    │                                                                        │
-                    │   16982 ) -> GenerationResult | SupportsGenerationResult:              │
-                    │   16983 │   """Run generation once, retrying only for the known upstre │
-                    │   16984 │   try:                                                       │
-                    │ ❱ 16985 │   │   return generate_once()                                 │
-                    │   16986 │   except TimeoutError as gen_to_err:                         │
-                    │   16987 │   │   msg = f"Generation timed out for model {params.model_i │
-                    │   16988 │   │   raise _tag_exception_failure_phase(TimeoutError(msg),  │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:17334 in  │
-                    │ _generate_once                                                         │
-                    │                                                                        │
-                    │   17331 │   │   │   │   formatted_prompt=formatted_prompt,             │
-                    │   17332 │   │   │   │   extra_kwargs=extra_kwargs,                     │
-                    │   17333 │   │   │   )                                                  │
-                    │ ❱ 17334 │   │   return strict_generate(                                │
-                    │   17335 │   │   │   model=model,                                       │
-                    │   17336 │   │   │   processor=processor,                               │
-                    │   17337 │   │   │   prompt=formatted_prompt,                           │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py:1922 in        │
-                    │ generate                                                               │
-                    │                                                                        │
-                    │   1919 │   else:                                                       │
-                    │   1920 │   │   tokenizer.stopping_criteria.reset(model.config.eos_toke │
-                    │   1921 │                                                               │
-                    │ ❱ 1922 │   for response in stream_generate(                            │
-                    │   1923 │   │   model, processor, prompt, image, audio, video, **kwargs │
-                    │   1924 │   ):                                                          │
-                    │   1925 │   │   if verbose:                                             │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py:1722 in        │
-                    │ stream_generate                                                        │
-                    │                                                                        │
-                    │   1719 │   total_prompt_tokens = reused_prefix_len + input_ids.size    │
-                    │   1720 │                                                               │
-                    │   1721 │   with wired_limit(model, [generation_stream]):               │
-                    │ ❱ 1722 │   │   detokenizer = make_streaming_detokenizer(processor)     │
-                    │   1723 │   │   thinking_criteria = getattr(tokenizer, "thinking_budget │
-                    │   1724 │   │   exact_checkpoint_len = None                             │
-                    │   1725 │   │   exact_checkpoint = None                                 │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/tokenizer_utils.py:405 in  │
-                    │ make_streaming_detokenizer                                             │
-                    │                                                                        │
-                    │   402                                                                  │
-                    │   403 def make_streaming_detokenizer(processor):                       │
-                    │   404 │   """Return an isolated, reset streaming detokenizer for a pro │
-                    │ ❱ 405 │   detokenizer = copy(processor.detokenizer)                    │
-                    │   406 │   detokenizer.reset()                                          │
-                    │   407 │   return detokenizer                                           │
-                    │   408                                                                  │
-                    │                                                                        │
-                    │ /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/copy.py:98 in copy   │
-                    │                                                                        │
-                    │    95 │                                                                │
-                    │    96 │   if isinstance(rv, str):                                      │
-                    │    97 │   │   return x                                                 │
-                    │ ❱  98 │   return _reconstruct(x, None, *rv)                            │
-                    │    99                                                                  │
-                    │   100                                                                  │
-                    │   101 _copy_dispatch = d = {}                                          │
-                    │                                                                        │
-                    │ /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/copy.py:272 in       │
-                    │ _reconstruct                                                           │
-                    │                                                                        │
-                    │   269 │   │   │   │   y.__dict__.update(state)                         │
-                    │   270 │   │   │   if slotstate is not None:                            │
-                    │   271 │   │   │   │   for key, value in slotstate.items():             │
-                    │ ❱ 272 │   │   │   │   │   setattr(y, key, value)                       │
-                    │   273 │                                                                │
-                    │   274 │   if listiter is not None:                                     │
-                    │   275 │   │   if deep:                                                 │
-                    ╰────────────────────────────────────────────────────────────────────────╯
-                    AttributeError: property 'text' of 'NaiveStreamingDetokenizer' object has
-                    no setter
+[23:38:54] ERROR    Runtime error for mlx-community/LFM2.5-VL-1.6B-bf16
+                    ╭─────────────────────────────── Traceback (most recent call last) ────────────────────────────────╮
+                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:17061 in                            │
+                    │ _run_generation_with_retry_workaround                                                            │
+                    │                                                                                                  │
+                    │   17058 ) -> GenerationResult | SupportsGenerationResult:                                        │
+                    │   17059 │   """Run generation once, retrying only for the known upstream detokenizer bug."""     │
+                    │   17060 │   try:                                                                                 │
+                    │ ❱ 17061 │   │   return generate_once()                                                           │
+                    │   17062 │   except TimeoutError as gen_to_err:                                                   │
+                    │   17063 │   │   msg = f"Generation timed out for model {params.model_identifier}: {gen_to_err}"  │
+                    │   17064 │   │   raise _tag_exception_failure_phase(TimeoutError(msg), "decode") from gen_to_err  │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:17419 in _generate_once             │
+                    │                                                                                                  │
+                    │   17416 │   │   │   │   formatted_prompt=formatted_prompt,                                       │
+                    │   17417 │   │   │   │   extra_kwargs=extra_kwargs,                                               │
+                    │   17418 │   │   │   )                                                                            │
+                    │ ❱ 17419 │   │   return strict_generate(                                                          │
+                    │   17420 │   │   │   model=model,                                                                 │
+                    │   17421 │   │   │   processor=processor,                                                         │
+                    │   17422 │   │   │   prompt=formatted_prompt,                                                     │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py:1922 in generate                         │
+                    │                                                                                                  │
+                    │   1919 │   else:                                                                                 │
+                    │   1920 │   │   tokenizer.stopping_criteria.reset(model.config.eos_token_id)                      │
+                    │   1921 │                                                                                         │
+                    │ ❱ 1922 │   for response in stream_generate(                                                      │
+                    │   1923 │   │   model, processor, prompt, image, audio, video, **kwargs                           │
+                    │   1924 │   ):                                                                                    │
+                    │   1925 │   │   if verbose:                                                                       │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py:1722 in stream_generate                  │
+                    │                                                                                                  │
+                    │   1719 │   total_prompt_tokens = reused_prefix_len + input_ids.size                              │
+                    │   1720 │                                                                                         │
+                    │   1721 │   with wired_limit(model, [generation_stream]):                                         │
+                    │ ❱ 1722 │   │   detokenizer = make_streaming_detokenizer(processor)                               │
+                    │   1723 │   │   thinking_criteria = getattr(tokenizer, "thinking_budget_criteria", None)          │
+                    │   1724 │   │   exact_checkpoint_len = None                                                       │
+                    │   1725 │   │   exact_checkpoint = None                                                           │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/tokenizer_utils.py:405 in make_streaming_detokenizer │
+                    │                                                                                                  │
+                    │   402                                                                                            │
+                    │   403 def make_streaming_detokenizer(processor):                                                 │
+                    │   404 │   """Return an isolated, reset streaming detokenizer for a processor."""                 │
+                    │ ❱ 405 │   detokenizer = copy(processor.detokenizer)                                              │
+                    │   406 │   detokenizer.reset()                                                                    │
+                    │   407 │   return detokenizer                                                                     │
+                    │   408                                                                                            │
+                    │                                                                                                  │
+                    │ /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/copy.py:98 in copy                             │
+                    │                                                                                                  │
+                    │    95 │                                                                                          │
+                    │    96 │   if isinstance(rv, str):                                                                │
+                    │    97 │   │   return x                                                                           │
+                    │ ❱  98 │   return _reconstruct(x, None, *rv)                                                      │
+                    │    99                                                                                            │
+                    │   100                                                                                            │
+                    │   101 _copy_dispatch = d = {}                                                                    │
+                    │                                                                                                  │
+                    │ /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/copy.py:272 in _reconstruct                    │
+                    │                                                                                                  │
+                    │   269 │   │   │   │   y.__dict__.update(state)                                                   │
+                    │   270 │   │   │   if slotstate is not None:                                                      │
+                    │   271 │   │   │   │   for key, value in slotstate.items():                                       │
+                    │ ❱ 272 │   │   │   │   │   setattr(y, key, value)                                                 │
+                    │   273 │                                                                                          │
+                    │   274 │   if listiter is not None:                                                               │
+                    │   275 │   │   if deep:                                                                           │
+                    ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+                    AttributeError: property 'text' of 'NaiveStreamingDetokenizer' object has no setter
 ```
 
 </details>
@@ -941,43 +912,40 @@ Captured stdout/stderr:
 
 /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/modeling_rope_utils.py:1034: FutureWarning: `rope_config_validation` is deprecated and has been removed. Its functionality has been moved to RotaryEmbeddingConfigMixin.validate_rope method. PreTrainedConfig inherits this class, so please call self.validate_rope() instead. Also, make sure to use the new rope_parameters syntax. You can call self.standardize_rope_params() in the meantime.
   warnings.warn(
-[22:00:27] ERROR    Model preflight validation failed for mlx-community/MolmoPoint-8B-fp16
-                    ╭────────────────── Traceback (most recent call last) ───────────────────╮
-                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:17055 in  │
-                    │ _prepare_generation_prompt                                             │
-                    │                                                                        │
-                    │   17052 │   │   )                                                      │
-                    │   17053 │   │   if phase_timer is not None:                            │
-                    │   17054 │   │   │   with phase_timer.track("prompt_prep"):             │
-                    │ ❱ 17055 │   │   │   │   _run_model_preflight_validators(               │
-                    │   17056 │   │   │   │   │   model_identifier=params.model_identifier,  │
-                    │   17057 │   │   │   │   │   processor=processor,                       │
-                    │   17058 │   │   │   │   │   config=config,                             │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16847 in  │
-                    │ _run_model_preflight_validators                                        │
-                    │                                                                        │
-                    │   16844 │   │   │   phase="processor_load",                            │
-                    │   16845 │   │   )                                                      │
-                    │   16846 │   if getattr(processor, "image_processor", None) is None:    │
-                    │ ❱ 16847 │   │   _raise_preflight_error(                                │
-                    │   16848 │   │   │   "Loaded processor has no image_processor; expected │
-                    │   16849 │   │   │   phase="processor_load",                            │
-                    │   16850 │   │   )                                                      │
-                    │                                                                        │
-                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16780 in  │
-                    │ _raise_preflight_error                                                 │
-                    │                                                                        │
-                    │   16777                                                                │
-                    │   16778 def _raise_preflight_error(message: str, *, phase: str) -> NoR │
-                    │   16779 │   """Raise a preflight ValueError annotated with the failing │
-                    │ ❱ 16780 │   raise _tag_exception_failure_phase(ValueError(message), ph │
-                    │   16781                                                                │
-                    │   16782                                                                │
-                    │   16783 def _validate_model_artifact_layout(                           │
-                    ╰────────────────────────────────────────────────────────────────────────╯
-                    ValueError: Loaded processor has no image_processor; expected multimodal
-                    processor.
+[23:40:03] ERROR    Model preflight validation failed for mlx-community/MolmoPoint-8B-fp16
+                    ╭─────────────────────────────── Traceback (most recent call last) ────────────────────────────────╮
+                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:17131 in _prepare_generation_prompt │
+                    │                                                                                                  │
+                    │   17128 │   │   )                                                                                │
+                    │   17129 │   │   if phase_timer is not None:                                                      │
+                    │   17130 │   │   │   with phase_timer.track("prompt_prep"):                                       │
+                    │ ❱ 17131 │   │   │   │   _run_model_preflight_validators(                                         │
+                    │   17132 │   │   │   │   │   model_identifier=params.model_identifier,                            │
+                    │   17133 │   │   │   │   │   processor=processor,                                                 │
+                    │   17134 │   │   │   │   │   config=config,                                                       │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16923 in                            │
+                    │ _run_model_preflight_validators                                                                  │
+                    │                                                                                                  │
+                    │   16920 │   │   │   phase="processor_load",                                                      │
+                    │   16921 │   │   )                                                                                │
+                    │   16922 │   if getattr(processor, "image_processor", None) is None:                              │
+                    │ ❱ 16923 │   │   _raise_preflight_error(                                                          │
+                    │   16924 │   │   │   "Loaded processor has no image_processor; expected multimodal processor.",   │
+                    │   16925 │   │   │   phase="processor_load",                                                      │
+                    │   16926 │   │   )                                                                                │
+                    │                                                                                                  │
+                    │ /Users/jrp/Documents/AI/mlx/check_models/src/check_models.py:16856 in _raise_preflight_error     │
+                    │                                                                                                  │
+                    │   16853                                                                                          │
+                    │   16854 def _raise_preflight_error(message: str, *, phase: str) -> NoReturn:                     │
+                    │   16855 │   """Raise a preflight ValueError annotated with the failing phase."""                 │
+                    │ ❱ 16856 │   raise _tag_exception_failure_phase(ValueError(message), phase)                       │
+                    │   16857                                                                                          │
+                    │   16858                                                                                          │
+                    │   16859 def _validate_model_artifact_layout(                                                     │
+                    ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+                    ValueError: Loaded processor has no image_processor; expected multimodal processor.
 ```
 
 </details>
@@ -1037,35 +1005,32 @@ Title:ĠClassicĠsailboatĠmooredĠinĠestuaryĊĊDescription:ĠAĠclassic-style
   stack/runtime behavior rather than a clean model-quality limitation.
 - _Suggested next step:_ validate long-context handling and stop-token
   behavior across mlx-vlm + mlx runtime.
-- _Token summary:_ prompt=16,901, output=11, output/prompt=0.07%
+- _Token summary:_ prompt=16,901, output=6, output/prompt=0.04%
 
 **Maintainer triage:**
 
 - _Likely owner:_ mlx \| confidence=high
 - _Classification:_ context_budget \| long_context
-- _Summary:_ Output is very short relative to prompt size (0.1%), suggesting
-  possible early-stop or prompt-handling issues. \| At long prompt length
-  (16901 tokens), output stayed unusually short (11 tokens; ratio 0.1%). \|
-  output/prompt=0.07% \| nontext prompt burden=97%
-- _Evidence:_ Output is very short relative to prompt size (0.1%), suggesting
-  possible early-stop or prompt-handling issues. \| At long prompt length
-  (16901 tokens), output stayed unusually short (11 tokens; ratio 0.1%).
-- _Token context:_ prompt=16,901 \| output/prompt=0.07% \| nontext burden=97%
+- _Summary:_ Output appears truncated to about 6 tokens. \| At long prompt
+  length (16901 tokens), output stayed unusually short (6 tokens; ratio 0.0%).
+  \| output/prompt=0.04% \| nontext prompt burden=97%
+- _Evidence:_ Output appears truncated to about 6 tokens. \| At long prompt
+  length (16901 tokens), output stayed unusually short (6 tokens; ratio 0.0%).
+- _Token context:_ prompt=16,901 \| output/prompt=0.04% \| nontext burden=97%
   \| stop=completed
 - _Next action:_ Treat this as a prompt-budget issue first; nontext prompt
   burden is 97% and the output stays weak under that load.
 
 **Why this appears to be an integration/runtime issue:**
 
-- Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt-handling issues.
-- At long prompt length (16901 tokens), output stayed unusually short (11 tokens; ratio 0.1%).
+- Output appears truncated to about 6 tokens.
+- At long prompt length (16901 tokens), output stayed unusually short (6 tokens; ratio 0.0%).
 - Model output may not follow prompt or image contents (missing: classic, style, sailboat, dark, hull).
-- Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 **Sample output:**
 
 ```text
-Boat, boat, boat, boat, boat
+Boat Anchor Anchorage
 ```
 
 ---
@@ -1083,9 +1048,9 @@ model appears).
 | `LiquidAI/LFM2.5-VL-450M-MLX-bf16`                 | still failing            | 2026-05-04 20:21:24 BST | 3/3 recent runs failed |
 | `facebook/pe-av-large`                             | still failing            | 2026-05-04 22:51:32 BST | 3/3 recent runs failed |
 | `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16` | still failing            | 2026-04-19 00:39:44 BST | 3/3 recent runs failed |
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit`          | still failing            | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
-| `mlx-community/LFM2-VL-1.6B-8bit`                  | still failing            | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
-| `mlx-community/LFM2.5-VL-1.6B-bf16`                | still failing            | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
+| `mlx-community/Kimi-VL-A3B-Thinking-8bit`          | still failing            | 2026-02-08 00:01:56 GMT | 3/3 recent runs failed |
+| `mlx-community/LFM2-VL-1.6B-8bit`                  | still failing            | 2026-02-08 00:01:56 GMT | 3/3 recent runs failed |
+| `mlx-community/LFM2.5-VL-1.6B-bf16`                | still failing            | 2026-02-08 00:01:56 GMT | 3/3 recent runs failed |
 | `mlx-community/MolmoPoint-8B-fp16`                 | still failing            | 2026-03-27 13:06:07 GMT | 3/3 recent runs failed |
 
 ---
@@ -1095,14 +1060,14 @@ model appears).
 - **Detailed diagnostics models:** 9
 - **Summary diagnostics models:** 46
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1271.57s (1271.57s)
-- **Average runtime per model:** 23.12s (23.12s)
-- **Dominant runtime phase:** upstream prefill / first-token dominated 15/55 measured model runs (53% of tracked runtime).
-- **Phase totals:** model load=109.55s, local prompt prep=0.16s, upstream prefill / first-token=664.33s, post-prefill decode=478.53s, generation total (unsplit)=3.66s, cleanup=6.17s
-- **Generation total:** 1146.53s across 51 model(s); upstream prefill / first-token split available for 48/51 model(s).
-- **Observed stop reasons:** completed=48, exception=7
-- **Validation overhead:** 11.46s total (avg 0.21s across 55 model(s)).
-- **Upstream prefill / first-token latency:** Avg 13.84s | Min 0.09s | Max 85.19s across 48 model(s).
+- **Total model runtime (sum):** 1184.66s (1184.66s)
+- **Average runtime per model:** 21.54s (21.54s)
+- **Dominant runtime phase:** upstream prefill / first-token dominated 16/55 measured model runs (51% of tracked runtime).
+- **Phase totals:** model load=106.62s, local prompt prep=0.16s, upstream prefill / first-token=602.82s, post-prefill decode=456.09s, generation total (unsplit)=3.72s, cleanup=5.94s
+- **Generation total:** 1062.63s across 51 model(s); upstream prefill / first-token split available for 48/51 model(s).
+- **Observed stop reasons:** completed=30, exception=7, max_tokens=18
+- **Validation overhead:** 11.34s total (avg 0.21s across 55 model(s)).
+- **Upstream prefill / first-token latency:** Avg 12.56s | Min 0.09s | Max 74.15s across 48 model(s).
 - **What this likely means:** Most measured runtime is spent inside upstream generation before the first token is available.
 - **Suggested next action:** Inspect prompt/image token accounting, dynamic-resolution image burden, prefill step sizing, and cache/prefill behavior.
 
@@ -1138,7 +1103,7 @@ warning, or stack-signal anomaly).
 - `mlx-community/InternVL3-14B-8bit`: Output appears to copy prompt context verbatim (46% overlap).
 - `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`: Output omitted required Title/Description/Keywords sections (title).
 - `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
-- `mlx-community/Molmo-7B-D-0924-8bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
+- `mlx-community/Molmo-7B-D-0924-8bit`: Output leaked reasoning or prompt-template text (title hint:, description hint:).
 - `mlx-community/Molmo-7B-D-0924-bf16`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
 - `mlx-community/Phi-3.5-vision-instruct-bf16`: Output became repetitive, indicating possible generation instability (token: phrase: "flags, flags, flags, flags,...").
 - `mlx-community/Qwen3.5-27B-4bit`: Model refused or deflected the requested task (explicit_refusal).
@@ -1174,6 +1139,7 @@ warning, or stack-signal anomaly).
 | mlx-vlm         | 0.5.0                       |
 | mlx             | 0.32.0.dev20260508+a1c0b6f9 |
 | mlx-lm          | 0.31.3                      |
+| mlx-audio       | 0.4.3                       |
 | transformers    | 5.8.0.dev0                  |
 | tokenizers      | 0.22.2                      |
 | huggingface-hub | 1.14.0                      |
@@ -1204,7 +1170,7 @@ without needing the original local image.
 
 ```bash
 # 1) Environment sanity: package versions + import smoke test
-python -m pip show mlx mlx-vlm mlx-lm transformers huggingface-hub tokenizers
+python -m pip show mlx mlx-vlm mlx-lm mlx-audio transformers huggingface-hub tokenizers
 
 python - <<'PY'
 import importlib
@@ -1363,4 +1329,4 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 - Input image: `/Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-05-08 22:16:25 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-05-08 23:54:44 BST by [check_models](https://github.com/jrp2014/check_models)._

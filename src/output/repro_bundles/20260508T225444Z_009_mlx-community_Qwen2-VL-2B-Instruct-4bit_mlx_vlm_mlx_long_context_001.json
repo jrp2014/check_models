@@ -2,14 +2,15 @@
   "environment": {
     "library_versions": {
       "Pillow": "12.2.0",
-      "huggingface-hub": "1.13.0",
-      "mlx": "0.32.0.dev20260502+e8ebdebe",
+      "huggingface-hub": "1.14.0",
+      "mlx": "0.32.0.dev20260508+a1c0b6f9",
+      "mlx-audio": "0.4.3",
       "mlx-lm": "0.31.3",
       "mlx-metal": null,
-      "mlx-vlm": "0.4.5",
+      "mlx-vlm": "0.5.0",
       "numpy": "2.4.4",
       "tokenizers": "0.22.2",
-      "transformers": "5.7.0"
+      "transformers": "5.8.0.dev0"
     },
     "platform": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
     "preflight_issues": [],
@@ -41,7 +42,7 @@
     "traceback": null,
     "type": null
   },
-  "generated_at_utc": "2026-05-02T23:34:40+00:00",
+  "generated_at_utc": "2026-05-08T22:54:44+00:00",
   "issue_cluster_id": "mlx-vlm-mlx_long-context_001",
   "model": "mlx-community/Qwen2-VL-2B-Instruct-4bit",
   "repro": {
@@ -58,9 +59,10 @@
         "mlx-community/Qwen3-VL-2B-Thinking-bf16",
         "Qwen/Qwen3-VL-2B-Instruct"
       ],
-      "folder": null,
+      "folder": "/Users/jrp/Pictures/Processed",
       "force_color": false,
-      "image": "/Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg",
+      "force_download": false,
+      "image": null,
       "kv_bits": null,
       "kv_group_size": 64,
       "kv_quant_scheme": "uniform",
@@ -81,9 +83,10 @@
       "output_tsv": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.tsv",
       "prefill_step_size": 4096,
       "processor_kwargs": null,
-      "prompt": "Describe this picture",
+      "prompt": null,
       "prune_repro_days": 90,
       "quality_config": null,
+      "quantize_activations": false,
       "quantized_kv_start": 5000,
       "repetition_context_size": 20,
       "repetition_penalty": null,
@@ -102,13 +105,13 @@
       "verbose": true,
       "width": null
     },
-    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen2-VL-2B-Instruct-4bit",
+    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen2-VL-2B-Instruct-4bit",
     "env_vars": {
       "TOKENIZERS_PARALLELISM": "false"
     },
-    "image_path": "/Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg",
-    "image_ref_sha256": "8c21b8f52a9068f26b5443d7a7a7294ac30154606e84bbc5c9a42d2ddc81a158",
-    "image_sha256": "15e804d7a23d6c6f4b3832e97020f28b981e387ab010da27d6ff446f8e11cd8a",
+    "image_path": "/Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg",
+    "image_ref_sha256": "cfb4673ee4d7e2c5d8eed2cb9fe849e997df799d7287b932129c40a464252acf",
+    "image_sha256": "ed3baed59aed7c13bc807010bcccae7dbc2c052b1637dc37a6110f82a676e2b4",
     "prompt_diagnostics": {
       "eos_token": "<|im_end|>",
       "eos_token_id": 151645,
@@ -128,9 +131,9 @@
       "image_placeholder_count": 0,
       "model_type": "qwen2_vl",
       "processor_class": "mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor",
-      "rendered_prompt_chars": 172,
-      "rendered_prompt_hash_sha256": "1c35e3719d44911cdbaccbabe590bc8afa4d4d54afde6954e3f3e9e6b0747eb9",
-      "rendered_prompt_preview": "<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\nDescribe this picture<|vision_start|><|image_pad|><|vision_end|><|im_end|>\n<|im_start|>assistant\n",
+      "rendered_prompt_chars": 2345,
+      "rendered_prompt_hash_sha256": "3ede820f1f154567211b1dd8be7284f200de58d01c9f2cbdcdd3f5a23d2950b7",
+      "rendered_prompt_preview": "<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\nAnalyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instruction...",
       "special_token_ids": [
         151645,
         151643,
@@ -165,40 +168,43 @@
       ],
       "tokenizer_class": "transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer"
     },
-    "prompt_hash_sha256": "9a9bea36d63483f38c27775994d625ebce5d0a084a04474f97aacabd0f3fbb15",
-    "prompt_preview": "Describe this picture",
-    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen2-VL-2B-Instruct-4bit",
+    "prompt_hash_sha256": "4a1f03d684eed33f32edd69e60de6697a143191cc453889223fbf1471468d72c",
+    "prompt_preview": "Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct any...",
+    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen2-VL-2B-Instruct-4bit",
     "seed": null
   },
   "result": {
-    "generated_text_preview": "Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' C...",
+    "generated_text_preview": "Boat Anchor Anchorage",
     "maintainer_triage": {
       "confidence": "high",
       "evidence": [
-        "token_cap",
-        "repetitive_tail"
+        "long_context",
+        "nontext_prompt_burden",
+        "low_hint_overlap"
       ],
       "harness_details": [
-        "long_context_repetition(16299tok)"
+        "output:truncated(6tok)",
+        "long_context_low_ratio(0.0%;16901->6)"
       ],
-      "hit_max_tokens": true,
-      "issue_kind": "cutoff_degraded",
+      "hit_max_tokens": false,
+      "issue_kind": "context_budget",
       "issue_subtype": "long_context",
-      "next_action": "Inspect long-context cache behavior under heavy image-token burden.",
-      "nontext_prompt_ratio": 0.9997545861709307,
-      "prompt_output_ratio": 0.030676728633658508,
-      "prompt_tokens_total": 16299,
+      "next_action": "Treat this as a prompt-budget issue first; nontext prompt burden is 97% and the output stays weak under that load.",
+      "nontext_prompt_ratio": 0.9737293651263239,
+      "prompt_output_ratio": 0.00035500857937400155,
+      "prompt_tokens_total": 16901,
       "requested_max_tokens": 500,
       "stop_reason": "completed",
-      "summary": "At long prompt length (16299 tokens), output became repetitive. | hit token cap (500) | nontext prompt burden=100% | repetitive token=phrase: \"' chinese: ' chinese:...\"",
+      "summary": "Output appears truncated to about 6 tokens. | At long prompt length (16901 tokens), output stayed unusually short (6 tokens; ratio 0.0%). | output/prompt=0.04% | nontext prompt burden=97%",
       "suspected_owner": "mlx",
-      "user_bucket": "avoid"
+      "user_bucket": "caveat"
     },
     "quality_issues": [
       "\u26a0\ufe0fharness(long_context)",
       "long-context",
-      "repetitive(phrase: \"' chinese: ' chinese:...\")",
-      "cutoff"
+      "trusted-hints-ignored",
+      "context-budget",
+      "context-ignored"
     ],
     "success": true
   },

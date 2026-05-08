@@ -6,18 +6,15 @@
 
 - **Observed problem:** Missing module/import during model load
 - **Target:** mlx-vlm
-- **Raw owner hint:** `mlx-vlm`
 - **Affected models:** 1
 - **Fixed when:** Load/generation completes or fails with a narrower owner.
-- **Issue kind:** `runtime_failure`
-- **Raw cluster:** `mlx-vlm_mlx-vlm-model-load-model_001` (`MLX_VLM_MODEL_LOAD_MODEL`)
 
 
 ## Affected Models
 
-| Model                  | Representative Signal                   | Token Context   | Repro JSON                                                                                                                                                                    |
-|------------------------|-----------------------------------------|-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `facebook/pe-av-large` | model error \| mlx vlm model load model | stop=exception  | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T211625Z_002_facebook_pe-av-large_MLX_VLM_MODEL_LOAD_MODEL_8b244da8c605.json) |
+| Model                  | Observed Behavior                       | Token Counts   | Optional Context                                                                                                                                                                 |
+|------------------------|-----------------------------------------|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `facebook/pe-av-large` | model error \| mlx vlm model load model | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T225444Z_002_facebook_pe-av-large_MLX_VLM_MODEL_LOAD_MODEL_8b244da8c605.json) |
 
 
 ## Minimal Evidence
@@ -26,24 +23,129 @@
 - Root exception: `builtins.ValueError`: Model type pe_audio_video not supported. Error: No module named 'mlx_vlm.speculative.drafters.pe_audio_video'
 
 
-## Repro Commands
+## Minimal Reproduction
 
-Cluster rerun:
+These commands use `mlx-vlm` directly so the issue can be reproduced without installing the `check_models` harness.
+
+Native CLI:
 
 ```bash
-python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models facebook/pe-av-large
+python -m mlx_vlm.generate --model facebook/pe-av-large --image /Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
+
+Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.
+
+Treat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.
+
+Return exactly these three sections, and nothing else:
+
+Title:
+- 5-10 words, concrete and factual, limited to clearly visible content.
+- Output only the title text after the label.
+- Do not repeat or paraphrase these instructions in the title.
+
+Description:
+- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.
+- Output only the description text after the label.
+
+Keywords:
+- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.
+- Output only the keyword list after the label.
+
+Rules:
+- Include only details that are definitely visible in the image.
+- Reuse metadata terms only when they are clearly supported by the image.
+- If metadata and image disagree, follow the image.
+- Prefer omission to speculation.
+- Do not copy prompt instructions into the Title, Description, or Keywords fields.
+- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.
+- Do not output reasoning, notes, hedging, or extra sections.
+
+Context: Existing metadata hints (high confidence; use only when visually confirmed):
+- Description hint: A classic-style sailboat with a dark hull and wooden mast is moored in a calm estuary during low tide. The water has receded, exposing a vast expanse of green, algae-covered mudflats behind the vessel. The boat, adorned with a string of small flags, floats peacefully, waiting for the tide to rise again.
+- Capture metadata: Taken on 2026-05-02 18:33:45 BST (at 18:33:45 local time). GPS: 52.089294°N, 1.317741°E.' --max-tokens 500 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
-Repro bundles:
+Minimal Python repro (representative model):
 
-- `facebook/pe-av-large`: [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T211625Z_002_facebook_pe-av-large_MLX_VLM_MODEL_LOAD_MODEL_8b244da8c605.json)
-- Note: these links target the canonical GitHub copies of the JSON bundles; attach the file manually if this run has not been committed yet.
+```python
+from mlx_vlm.generate import generate
+from mlx_vlm.utils import load
+
+MODEL = 'facebook/pe-av-large'
+IMAGE = '/Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg'
+PROMPT = 'Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.\n- Output only the description text after the label.\n\nKeywords:\n- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.\n- Output only the keyword list after the label.\n\nRules:\n- Include only details that are definitely visible in the image.\n- Reuse metadata terms only when they are clearly supported by the image.\n- If metadata and image disagree, follow the image.\n- Prefer omission to speculation.\n- Do not copy prompt instructions into the Title, Description, or Keywords fields.\n- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.\n- Do not output reasoning, notes, hedging, or extra sections.\n\nContext: Existing metadata hints (high confidence; use only when visually confirmed):\n- Description hint: A classic-style sailboat with a dark hull and wooden mast is moored in a calm estuary during low tide. The water has receded, exposing a vast expanse of green, algae-covered mudflats behind the vessel. The boat, adorned with a string of small flags, floats peacefully, waiting for the tide to rise again.\n- Capture metadata: Taken on 2026-05-02 18:33:45 BST (at 18:33:45 local time). GPS: 52.089294°N, 1.317741°E.'
+LOAD_KWARGS = {'trust_remote_code': True}
+GENERATE_KWARGS = {'max_tokens': 500, 'temperature': 0.0, 'prefill_step_size': 4096}
+model, processor = load(MODEL, **LOAD_KWARGS)
+result = generate(model, processor, PROMPT, image=IMAGE, **GENERATE_KWARGS)
+print(result.text)
+```
+
+Prompt:
+
+```text
+Analyze this image for cataloguing metadata, using British English.
+
+Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.
+
+Treat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.
+
+Return exactly these three sections, and nothing else:
+
+Title:
+- 5-10 words, concrete and factual, limited to clearly visible content.
+- Output only the title text after the label.
+- Do not repeat or paraphrase these instructions in the title.
+
+Description:
+- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.
+- Output only the description text after the label.
+
+Keywords:
+- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.
+- Output only the keyword list after the label.
+
+Rules:
+- Include only details that are definitely visible in the image.
+- Reuse metadata terms only when they are clearly supported by the image.
+- If metadata and image disagree, follow the image.
+- Prefer omission to speculation.
+- Do not copy prompt instructions into the Title, Description, or Keywords fields.
+- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.
+- Do not output reasoning, notes, hedging, or extra sections.
+
+Context: Existing metadata hints (high confidence; use only when visually confirmed):
+- Description hint: A classic-style sailboat with a dark hull and wooden mast is moored in a calm estuary during low tide. The water has receded, exposing a vast expanse of green, algae-covered mudflats behind the vessel. The boat, adorned with a string of small flags, floats peacefully, waiting for the tide to rise again.
+- Capture metadata: Taken on 2026-05-02 18:33:45 BST (at 18:33:45 local time). GPS: 52.089294°N, 1.317741°E.
+```
+
+Generation/load config:
+
+```json
+{
+  "generate_kwargs": {
+    "max_tokens": 500,
+    "prefill_step_size": 4096,
+    "temperature": 0.0
+  },
+  "image": "/Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg",
+  "load_kwargs": {
+    "trust_remote_code": true
+  },
+  "model": "facebook/pe-av-large"
+}
+```
+
+Optional advanced context:
+
+- `facebook/pe-av-large`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T225444Z_002_facebook_pe-av-large_MLX_VLM_MODEL_LOAD_MODEL_8b244da8c605.json)
+- JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
 ## Expected Fix Signal
 
 - [ ] Affected reruns complete model load and generation, or fail with a narrower configuration/compatibility error that points to the owning layer.
-- [ ] The cluster rerun no longer produces this `mlx-vlm_mlx-vlm-model-load-model_001` maintainer-triage cluster.
+- [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem.
 
 
 ## Fix Checklist
@@ -54,20 +156,6 @@ Repro bundles:
 - [ ] Reproduce with the single affected model before judging output quality.
 
 
-## Likely Root Cause
-
-- _Filing target:_ mlx-vlm
-- _Likely owner:_ `mlx-vlm`
-- _Confidence:_ high
-- _Issue kind:_ `runtime_failure`
-- _Issue subtype:_ `MLX_VLM_MODEL_LOAD_MODEL`
-- _Why this classification is credible:_ model error \| mlx vlm model load
-  model
-- _Suggested next action:_ Inspect the import path and installed package
-  version that owns the missing module before treating this as a model
-  failure.
-
-
 ## Appendix: Environment
 
 | Component       | Version                     |
@@ -75,6 +163,7 @@ Repro bundles:
 | mlx-vlm         | 0.5.0                       |
 | mlx             | 0.32.0.dev20260508+a1c0b6f9 |
 | mlx-lm          | 0.31.3                      |
+| mlx-audio       | 0.4.3                       |
 | transformers    | 5.8.0.dev0                  |
 | tokenizers      | 0.22.2                      |
 | huggingface-hub | 1.14.0                      |
