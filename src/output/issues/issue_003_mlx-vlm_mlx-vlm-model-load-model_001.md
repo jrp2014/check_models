@@ -17,7 +17,7 @@
 
 | Model                  | Representative Signal                   | Token Context   | Repro JSON                                                                                                          |
 |------------------------|-----------------------------------------|-----------------|---------------------------------------------------------------------------------------------------------------------|
-| `facebook/pe-av-large` | model error \| mlx vlm model load model | stop=exception  | [repro JSON](../repro_bundles/20260504T215132Z_002_facebook_pe-av-large_MLX_VLM_MODEL_LOAD_MODEL_8b244da8c605.json) |
+| `facebook/pe-av-large` | model error \| mlx vlm model load model | stop=exception  | [repro JSON](../repro_bundles/20260508T121905Z_002_facebook_pe-av-large_MLX_VLM_MODEL_LOAD_MODEL_8b244da8c605.json) |
 
 
 ## Minimal Evidence
@@ -36,7 +36,7 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 
 Repro bundles:
 
-- `facebook/pe-av-large`: [repro JSON](../repro_bundles/20260504T215132Z_002_facebook_pe-av-large_MLX_VLM_MODEL_LOAD_MODEL_8b244da8c605.json)
+- `facebook/pe-av-large`: [repro JSON](../repro_bundles/20260508T121905Z_002_facebook_pe-av-large_MLX_VLM_MODEL_LOAD_MODEL_8b244da8c605.json)
 - Note: these are local artifact links; attach or publish the JSON when filing upstream.
 
 
@@ -72,12 +72,12 @@ Repro bundles:
 
 | Component       | Version                     |
 |-----------------|-----------------------------|
-| mlx-vlm         | 0.4.5                       |
-| mlx             | 0.32.0.dev20260504+e8ebdebe |
+| mlx-vlm         | 0.5.0                       |
+| mlx             | 0.32.0.dev20260508+a1c0b6f9 |
 | mlx-lm          | 0.31.3                      |
-| transformers    | 5.8.0.dev0                  |
+| transformers    | 5.8.0                       |
 | tokenizers      | 0.22.2                      |
-| huggingface-hub | 1.13.0                      |
+| huggingface-hub | 1.14.0                      |
 | Python Version  | 3.13.12                     |
 | OS              | Darwin 25.4.0               |
 | macOS Version   | 26.4.1                      |
@@ -106,7 +106,7 @@ builtins.ValueError: Model type pe_audio_video not supported. Error: No module n
 Traceback tail:
 
 ```text
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 136, in get_model_and_args
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 137, in get_model_and_args
     raise ValueError(msg)
 ValueError: Model type pe_audio_video not supported. Error: No module named 'mlx_vlm.speculative.drafters.pe_audio_video'
 The above exception was the direct cause of the following exception:

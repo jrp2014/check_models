@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-_Generated on 2026-05-04 22:51:32 BST_
+_Generated on 2026-05-08 13:19:05 BST_
 
 A review-friendly artifact with image metadata, the source prompt, and full
 generated output for each model.
@@ -11,29 +11,44 @@ _Action Snapshot: see [results.md](results.md) for the full summary._
 
 ### Strong Candidates
 
-- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: 🏆 A (87/100) | Desc 83 | Keywords 83 | Δ+24 | 177.3 tps
-- `mlx-community/gemma-3-27b-it-qat-8bit`: 🏆 A (86/100) | Desc 84 | Keywords 92 | Δ+23 | 17.3 tps
-- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: 🏆 A (86/100) | Desc 93 | Keywords 86 | Δ+23 | 59.1 tps
-- `mlx-community/gemma-4-26b-a4b-it-4bit`: 🏆 A (85/100) | Desc 93 | Keywords 79 | Δ+22 | 109.8 tps
-- `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`: 🏆 A (83/100) | Desc 87 | Keywords 84 | Δ+20 | 64.4 tps
+- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: 🏆 A (87/100) | Desc 83 | Keywords 83 | Δ+24 | 182.7 tps
+- `mlx-community/gemma-3-27b-it-qat-8bit`: 🏆 A (86/100) | Desc 84 | Keywords 92 | Δ+23 | 17.6 tps
+- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: 🏆 A (86/100) | Desc 93 | Keywords 86 | Δ+23 | 62.8 tps
+- `mlx-community/gemma-4-26b-a4b-it-4bit`: 🏆 A (85/100) | Desc 93 | Keywords 79 | Δ+22 | 111.9 tps
+- `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`: 🏆 A (83/100) | Desc 87 | Keywords 84 | Δ+20 | 66.0 tps
 
 ### Watchlist
 
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (4/100) | Desc 60 | Keywords 0 | Δ-59 | 30.1 tps | harness, missing sections
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (33/100) | Desc 60 | Keywords 0 | Δ-30 | 191.6 tps | context ignored, cutoff, harness, long context, missing sections, repetitive
-- `mlx-community/llava-v1.6-mistral-7b-8bit`: ❌ F (16/100) | Desc 76 | Keywords 0 | Δ-46 | 63.9 tps | missing sections, trusted hint degraded
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (4/100) | Desc 60 | Keywords 0 | Δ-59 | 31.3 tps | harness, missing sections
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (33/100) | Desc 60 | Keywords 0 | Δ-30 | 195.3 tps | context ignored, cutoff, harness, long context, missing sections, repetitive
+- `mlx-community/llava-v1.6-mistral-7b-8bit`: ❌ F (16/100) | Desc 76 | Keywords 0 | Δ-46 | 64.1 tps | missing sections, trusted hint degraded
 - `meta-llama/Llama-3.2-11B-Vision-Instruct`: ❌ F (18/100) | Desc 76 | Keywords 0 | Δ-44 | 5.3 tps | missing sections, trusted hint degraded
-- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: ❌ F (20/100) | Desc 51 | Keywords 48 | Δ-43 | 31.0 tps | context ignored, missing sections
+- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: ❌ F (20/100) | Desc 51 | Keywords 48 | Δ-43 | 31.8 tps | context ignored, missing sections
 
 ## 🚨 Failures by Package (Actionable)
 
-| Package        |   Failures | Error Types     | Affected Models                                                               |
-|----------------|------------|-----------------|-------------------------------------------------------------------------------|
-| `mlx`          |          2 | Model Error     | `LiquidAI/LFM2.5-VL-450M-MLX-bf16`, `mlx-community/Kimi-VL-A3B-Thinking-8bit` |
-| `mlx-vlm`      |          1 | Model Error     | `facebook/pe-av-large`                                                        |
-| `model-config` |          1 | Processor Error | `mlx-community/MolmoPoint-8B-fp16`                                            |
+| Package        |   Failures | Error Types        | Affected Models                                                                                                                                    |
+|----------------|------------|--------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-vlm`      |          4 | Error, Model Error | `facebook/pe-av-large`, `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`, `mlx-community/LFM2-VL-1.6B-8bit`, `mlx-community/LFM2.5-VL-1.6B-bf16` |
+| `mlx`          |          2 | Model Error        | `LiquidAI/LFM2.5-VL-450M-MLX-bf16`, `mlx-community/Kimi-VL-A3B-Thinking-8bit`                                                                      |
+| `model-config` |          1 | Processor Error    | `mlx-community/MolmoPoint-8B-fp16`                                                                                                                 |
 
 ### Actionable Items by Package
+
+#### mlx-vlm
+
+- facebook/pe-av-large (Model Error)
+  - Error: `Model loading failed: Model type pe_audio_video not supported. Error: No module named 'mlx_vlm.speculative.drafters.p...`
+  - Type: `ValueError`
+- mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 (Error)
+  - Error: `Model runtime error during generation for mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16: property 'text' of 'Naive...`
+  - Type: `ValueError`
+- mlx-community/LFM2-VL-1.6B-8bit (Error)
+  - Error: `Model runtime error during generation for mlx-community/LFM2-VL-1.6B-8bit: property 'text' of 'NaiveStreamingDetokeni...`
+  - Type: `ValueError`
+- mlx-community/LFM2.5-VL-1.6B-bf16 (Error)
+  - Error: `Model runtime error during generation for mlx-community/LFM2.5-VL-1.6B-bf16: property 'text' of 'NaiveStreamingDetoke...`
+  - Type: `ValueError`
 
 #### mlx
 
@@ -42,12 +57,6 @@ _Action Snapshot: see [results.md](results.md) for the full summary._
   - Type: `ValueError`
 - mlx-community/Kimi-VL-A3B-Thinking-8bit (Model Error)
   - Error: `Model loading failed: Received 4 parameters not in model: <br>multi_modal_projector.linear_1.biases,<br>multi_modal_project...`
-  - Type: `ValueError`
-
-#### mlx-vlm
-
-- facebook/pe-av-large (Model Error)
-  - Error: `Model loading failed: Model type pe_audio_video not supported. Error: No module named 'mlx_vlm.speculative.drafters.p...`
   - Type: `ValueError`
 
 #### model-config
@@ -127,17 +136,19 @@ _Action Snapshot: see [results.md](results.md) for the full summary._
 - _Best end-to-end cataloging:_ [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)
 - _Best descriptions:_ [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)
 - _Best keywording:_ [`mlx-community/gemma-3-27b-it-qat-8bit`](#model-mlx-community-gemma-3-27b-it-qat-8bit)
-- _Fastest generation:_ [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)
+- _Fastest generation:_ [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)
 - _Lowest memory footprint:_ [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)
 - _Best balance:_ [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)
 - _Failed models:_ `LiquidAI/LFM2.5-VL-450M-MLX-bf16`, `facebook/pe-av-large`,
+  `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`,
   `mlx-community/Kimi-VL-A3B-Thinking-8bit`,
-  `mlx-community/MolmoPoint-8B-fp16`
+  `mlx-community/LFM2-VL-1.6B-8bit`, `mlx-community/LFM2.5-VL-1.6B-bf16`, +1
+  more
 - _D/F utility models:_ `HuggingFaceTB/SmolVLM-Instruct`,
   `meta-llama/Llama-3.2-11B-Vision-Instruct`,
   `microsoft/Phi-3.5-vision-instruct`,
   `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`,
-  `mlx-community/FastVLM-0.5B-bf16`, `mlx-community/GLM-4.6V-nvfp4`, +14 more
+  `mlx-community/FastVLM-0.5B-bf16`, `mlx-community/GLM-4.6V-nvfp4`, +12 more
 
 ## Model Gallery
 
@@ -174,10 +185,10 @@ _Error details:_
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17166, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17190, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16579, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16603, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -187,9 +198,9 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 412, in load
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 419, in load
     model = load_model(model_path, lazy, **kwargs)
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 336, in load_model
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 343, in load_model
     model.load_weights(list(weights.items()))
     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
   File "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py", line 185, in load_weights
@@ -203,7 +214,7 @@ multi_modal_projector.layer_norm.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17362, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17386, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -214,7 +225,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17176, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17200, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 2 parameters not in model:
 multi_modal_projector.layer_norm.bias,
@@ -252,10 +263,10 @@ _Error details:_
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17166, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17190, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16579, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16603, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -265,19 +276,19 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 412, in load
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 419, in load
     model = load_model(model_path, lazy, **kwargs)
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 236, in load_model
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 235, in load_model
     model_class, _ = get_model_and_args(config=config)
                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 136, in get_model_and_args
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 137, in get_model_and_args
     raise ValueError(msg)
 ValueError: Model type pe_audio_video not supported. Error: No module named 'mlx_vlm.speculative.drafters.pe_audio_video'
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17362, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17386, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -288,9 +299,91 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17176, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17200, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Model type pe_audio_video not supported. Error: No module named 'mlx_vlm.speculative.drafters.pe_audio_video'
+```
+
+</details>
+
+---
+
+<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
+
+### ❌ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+
+- _Recommendation:_ avoid for now; review verdict: model shortcoming
+- _Status:_ Failed (Error)
+- _Owner:_ likely owner `model`; reported package `mlx-vlm`; failure stage
+  `Error`; diagnostic code `MLX_VLM_DECODE_ERROR`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Error summary:_ see error details below
+- _Key signals:_ keywords=37; context echo=100%; nonvisual metadata reused;
+  reasoning leak
+- _Failure context:_ type `ValueError`; phase `decode`; code
+  `MLX_VLM_DECODE_ERROR`; package `mlx-vlm`
+- _Tokens:_ prompt n/a; estimated text 444 tok; estimated non-text n/a;
+  generated n/a; requested max 500 tok; stop reason exception
+
+_Error details:_
+
+> Model runtime error during generation for
+> mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16: property 'text' of
+> 'NaiveStreamingDetokenizer' object has no setter
+
+<details>
+<summary>Full Traceback (click to expand)</summary>
+
+```python
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16891, in _run_generation_with_retry_workaround
+    return generate_once()
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17240, in _generate_once
+    return strict_generate(
+        model=model,
+    ...<14 lines>...
+        **extra_kwargs,
+    )
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 1922, in generate
+    for response in stream_generate(
+                    ~~~~~~~~~~~~~~~^
+        model, processor, prompt, image, audio, video, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ):
+    ^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 1722, in stream_generate
+    detokenizer = make_streaming_detokenizer(processor)
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/tokenizer_utils.py", line 405, in make_streaming_detokenizer
+    detokenizer = copy(processor.detokenizer)
+  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/copy.py", line 98, in copy
+    return _reconstruct(x, None, *rv)
+  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/copy.py", line 272, in _reconstruct
+    setattr(y, key, value)
+    ~~~~~~~^^^^^^^^^^^^^^^
+AttributeError: property 'text' of 'NaiveStreamingDetokenizer' object has no setter
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17386, in process_image_with_model
+    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
+                                                          ~~~~~~~~~~~~~~~~~~~~~^
+        params=params,
+        ^^^^^^^^^^^^^^
+        phase_callback=_update_phase,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        phase_timer=phase_timer,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17264, in _run_model_generation
+    output = _run_generation_with_retry_workaround(
+        params=params,
+        generate_once=_generate_once,
+    )
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16925, in _run_generation_with_retry_workaround
+    raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
+ValueError: Model runtime error during generation for mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16: property 'text' of 'NaiveStreamingDetokenizer' object has no setter
 ```
 
 </details>
@@ -328,10 +421,10 @@ _Error details:_
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17166, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17190, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16579, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16603, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -341,9 +434,9 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 412, in load
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 419, in load
     model = load_model(model_path, lazy, **kwargs)
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 336, in load_model
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 343, in load_model
     model.load_weights(list(weights.items()))
     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
   File "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py", line 185, in load_weights
@@ -359,7 +452,7 @@ multi_modal_projector.linear_2.scales.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17362, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17386, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -370,13 +463,179 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17176, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17200, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 4 parameters not in model:
 multi_modal_projector.linear_1.biases,
 multi_modal_projector.linear_1.scales,
 multi_modal_projector.linear_2.biases,
 multi_modal_projector.linear_2.scales.
+```
+
+</details>
+
+---
+
+<a id="model-mlx-community-lfm2-vl-16b-8bit"></a>
+
+### ❌ mlx-community/LFM2-VL-1.6B-8bit
+
+- _Recommendation:_ avoid for now; review verdict: harness
+- _Status:_ Failed (Error)
+- _Owner:_ likely owner `mlx-vlm`; harness signal `stop_token`; reported
+  package `mlx-vlm`; failure stage `Error`; diagnostic code
+  `MLX_VLM_DECODE_ERROR`
+- _Next step:_ Inspect EOS/stop-token stripping; control tokens are leaking
+  into user-facing text.
+- _Error summary:_ see error details below
+- _Key signals:_ Special control token &lt;|im_end|&gt; appeared in generated
+  text.; keywords=36; context echo=100%; nonvisual metadata reused
+- _Failure context:_ type `ValueError`; phase `decode`; code
+  `MLX_VLM_DECODE_ERROR`; package `mlx-vlm`
+- _Tokens:_ prompt n/a; estimated text 444 tok; estimated non-text n/a;
+  generated n/a; requested max 500 tok; stop reason exception
+
+_Error details:_
+
+> Model runtime error during generation for mlx-community/LFM2-VL-1.6B-8bit:
+> property 'text' of 'NaiveStreamingDetokenizer' object has no setter
+
+<details>
+<summary>Full Traceback (click to expand)</summary>
+
+```python
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16891, in _run_generation_with_retry_workaround
+    return generate_once()
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17240, in _generate_once
+    return strict_generate(
+        model=model,
+    ...<14 lines>...
+        **extra_kwargs,
+    )
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 1922, in generate
+    for response in stream_generate(
+                    ~~~~~~~~~~~~~~~^
+        model, processor, prompt, image, audio, video, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ):
+    ^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 1722, in stream_generate
+    detokenizer = make_streaming_detokenizer(processor)
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/tokenizer_utils.py", line 405, in make_streaming_detokenizer
+    detokenizer = copy(processor.detokenizer)
+  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/copy.py", line 98, in copy
+    return _reconstruct(x, None, *rv)
+  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/copy.py", line 272, in _reconstruct
+    setattr(y, key, value)
+    ~~~~~~~^^^^^^^^^^^^^^^
+AttributeError: property 'text' of 'NaiveStreamingDetokenizer' object has no setter
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17386, in process_image_with_model
+    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
+                                                          ~~~~~~~~~~~~~~~~~~~~~^
+        params=params,
+        ^^^^^^^^^^^^^^
+        phase_callback=_update_phase,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        phase_timer=phase_timer,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17264, in _run_model_generation
+    output = _run_generation_with_retry_workaround(
+        params=params,
+        generate_once=_generate_once,
+    )
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16925, in _run_generation_with_retry_workaround
+    raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
+ValueError: Model runtime error during generation for mlx-community/LFM2-VL-1.6B-8bit: property 'text' of 'NaiveStreamingDetokenizer' object has no setter
+```
+
+</details>
+
+---
+
+<a id="model-mlx-community-lfm25-vl-16b-bf16"></a>
+
+### ❌ mlx-community/LFM2.5-VL-1.6B-bf16
+
+- _Recommendation:_ avoid for now; review verdict: harness
+- _Status:_ Failed (Error)
+- _Owner:_ likely owner `mlx-vlm`; harness signal `stop_token`; reported
+  package `mlx-vlm`; failure stage `Error`; diagnostic code
+  `MLX_VLM_DECODE_ERROR`
+- _Next step:_ Inspect EOS/stop-token stripping; control tokens are leaking
+  into user-facing text.
+- _Error summary:_ see error details below
+- _Key signals:_ Special control token &lt;|im_end|&gt; appeared in generated
+  text.; keywords=36; context echo=100%; nonvisual metadata reused
+- _Failure context:_ type `ValueError`; phase `decode`; code
+  `MLX_VLM_DECODE_ERROR`; package `mlx-vlm`
+- _Tokens:_ prompt n/a; estimated text 444 tok; estimated non-text n/a;
+  generated n/a; requested max 500 tok; stop reason exception
+
+_Error details:_
+
+> Model runtime error during generation for mlx-community/LFM2.5-VL-1.6B-bf16:
+> property 'text' of 'NaiveStreamingDetokenizer' object has no setter
+
+<details>
+<summary>Full Traceback (click to expand)</summary>
+
+```python
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16891, in _run_generation_with_retry_workaround
+    return generate_once()
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17240, in _generate_once
+    return strict_generate(
+        model=model,
+    ...<14 lines>...
+        **extra_kwargs,
+    )
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 1922, in generate
+    for response in stream_generate(
+                    ~~~~~~~~~~~~~~~^
+        model, processor, prompt, image, audio, video, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ):
+    ^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 1722, in stream_generate
+    detokenizer = make_streaming_detokenizer(processor)
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/tokenizer_utils.py", line 405, in make_streaming_detokenizer
+    detokenizer = copy(processor.detokenizer)
+  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/copy.py", line 98, in copy
+    return _reconstruct(x, None, *rv)
+  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/copy.py", line 272, in _reconstruct
+    setattr(y, key, value)
+    ~~~~~~~^^^^^^^^^^^^^^^
+AttributeError: property 'text' of 'NaiveStreamingDetokenizer' object has no setter
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17386, in process_image_with_model
+    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
+                                                          ~~~~~~~~~~~~~~~~~~~~~^
+        params=params,
+        ^^^^^^^^^^^^^^
+        phase_callback=_update_phase,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        phase_timer=phase_timer,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17264, in _run_model_generation
+    output = _run_generation_with_retry_workaround(
+        params=params,
+        generate_once=_generate_once,
+    )
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16925, in _run_generation_with_retry_workaround
+    raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
+ValueError: Model runtime error during generation for mlx-community/LFM2.5-VL-1.6B-bf16: property 'text' of 'NaiveStreamingDetokenizer' object has no setter
 ```
 
 </details>
@@ -412,7 +671,7 @@ _Error details:_
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16937, in _prepare_generation_prompt
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16961, in _prepare_generation_prompt
     _run_model_preflight_validators(
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         model_identifier=params.model_identifier,
@@ -422,7 +681,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16729, in _run_model_preflight_validators
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16753, in _run_model_preflight_validators
     _raise_preflight_error(
     ~~~~~~~~~~~~~~~~~~~~~~^
         "Loaded processor has no image_processor; expected multimodal processor.",
@@ -431,14 +690,14 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16662, in _raise_preflight_error
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16686, in _raise_preflight_error
     raise _tag_exception_failure_phase(ValueError(message), phase)
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17362, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17386, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -449,13 +708,13 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17178, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17202, in _run_model_generation
     formatted_prompt = _prepare_generation_prompt(
         params=params,
     ...<3 lines>...
         phase_timer=phase_timer,
     )
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16978, in _prepare_generation_prompt
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17002, in _prepare_generation_prompt
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -475,8 +734,8 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
 - _Key signals:_ missing sections: keywords; context echo=98%
 - _Score:_ 🟠 D (39/100); Δ-23; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context echo, missing sections)
-- _Timing:_ Load 0.44s; Gen 0.68s; Total 1.32s
-- _Throughput:_ Prompt 6,066 TPS (513 tok); Gen 343 TPS (90 tok)
+- _Timing:_ Load 0.45s; Gen 0.68s; Total 1.34s
+- _Throughput:_ Prompt 6,237 TPS (513 tok); Gen 345 TPS (90 tok)
 - _Tokens:_ prompt 513 tok; estimated text 444 tok; estimated non-text 69 tok;
   generated 90 tok; requested max 500 tok; stop reason completed
 
@@ -499,45 +758,6 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
 
 ---
 
-<a id="model-mlx-community-lfm2-vl-16b-8bit"></a>
-
-### ✅ mlx-community/LFM2-VL-1.6B-8bit
-
-- _Recommendation:_ use with caveats; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: classic, style, sailboat, dark, hull;
-  keywords=9; context echo=64%
-- _Score:_ 🟠 D (42/100); Δ-20; Missing requested structure
-- _Review focus:_ watchlist (context echo)
-- _Timing:_ Load 0.45s; Gen 0.71s; Total 1.37s
-- _Throughput:_ Prompt 7,191 TPS (767 tok); Gen 322 TPS (110 tok)
-- _Tokens:_ prompt 767 tok; estimated text 444 tok; estimated non-text 323
-  tok; generated 110 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> Title:  The Sailing Boat
->
-> Description: The Sailing Boat is moored in a calm estuary during low tide.
-> The water has receded, exposing a vast expanse of green, algae-covered
-> mudflats behind the vessel. The boat, adorned with a string of small flags,
-> floats peacefully, waiting for the tide to rise again.
->
-> Keywords: Sailing Boat, Estuary, Low Tide, Algae, Mudflats, Flags, Peaceful,
-> Tide, Waiting.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Title length violation (3 words; expected 5-10)
-- Description sentence violation (3; expected 1-2)
-- Keyword count violation (9; expected 10-18)
-- Context echo (64% overlap)
-
----
-
 <a id="model-qnguyen3-nanollava"></a>
 
 ### ✅ qnguyen3/nanoLLaVA
@@ -550,8 +770,8 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
   estuary, water
 - _Score:_ 🟠 D (45/100); Δ-18; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (missing sections)
-- _Timing:_ Load 0.54s; Gen 1.05s; Total 1.82s
-- _Throughput:_ Prompt 4,395 TPS (513 tok); Gen 109 TPS (64 tok)
+- _Timing:_ Load 0.57s; Gen 1.01s; Total 1.78s
+- _Throughput:_ Prompt 4,701 TPS (513 tok); Gen 112 TPS (64 tok)
 - _Tokens:_ prompt 513 tok; estimated text 444 tok; estimated non-text 69 tok;
   generated 64 tok; requested max 500 tok; stop reason completed
 
@@ -582,8 +802,8 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
 - _Score:_ 🟠 D (45/100); Δ-18; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context echo, metadata borrowing, missing
   sections)
-- _Timing:_ Load 0.65s; Gen 1.21s; Total 2.09s
-- _Throughput:_ Prompt 4,905 TPS (517 tok); Gen 336 TPS (181 tok)
+- _Timing:_ Load 0.61s; Gen 1.10s; Total 1.92s
+- _Throughput:_ Prompt 5,141 TPS (517 tok); Gen 346 TPS (181 tok)
 - _Tokens:_ prompt 517 tok; estimated text 444 tok; estimated non-text 73 tok;
   generated 181 tok; requested max 500 tok; stop reason completed
 
@@ -613,9 +833,9 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
 
 ---
 
-<a id="model-huggingfacetb-smolvlm-instruct"></a>
+<a id="model-mlx-community-smolvlm-instruct-bf16"></a>
 
-### ✅ HuggingFaceTB/SmolVLM-Instruct
+### ✅ mlx-community/SmolVLM-Instruct-bf16
 
 - _Recommendation:_ avoid for now; review verdict: model shortcoming
 - _Owner:_ likely owner `model`
@@ -625,8 +845,8 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
   description, keywords; context echo=100%
 - _Score:_ 🟠 D (38/100); Δ-25; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context echo, missing sections)
-- _Timing:_ Load 0.36s; Gen 1.50s; Total 2.06s
-- _Throughput:_ Prompt 4,029 TPS (2,087 tok); Gen 120 TPS (70 tok)
+- _Timing:_ Load 0.64s; Gen 1.52s; Total 2.37s
+- _Throughput:_ Prompt 4,008 TPS (2,087 tok); Gen 126 TPS (70 tok)
 - _Tokens:_ prompt 2087 tok; estimated text 444 tok; estimated non-text 1643
   tok; generated 70 tok; requested max 500 tok; stop reason completed
 
@@ -646,9 +866,9 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
 
 ---
 
-<a id="model-mlx-community-smolvlm-instruct-bf16"></a>
+<a id="model-huggingfacetb-smolvlm-instruct"></a>
 
-### ✅ mlx-community/SmolVLM-Instruct-bf16
+### ✅ HuggingFaceTB/SmolVLM-Instruct
 
 - _Recommendation:_ avoid for now; review verdict: model shortcoming
 - _Owner:_ likely owner `model`
@@ -658,8 +878,8 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
   description, keywords; context echo=100%
 - _Score:_ 🟠 D (38/100); Δ-25; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context echo, missing sections)
-- _Timing:_ Load 0.59s; Gen 1.52s; Total 2.33s
-- _Throughput:_ Prompt 3,974 TPS (2,087 tok); Gen 123 TPS (70 tok)
+- _Timing:_ Load 0.62s; Gen 1.58s; Total 2.42s
+- _Throughput:_ Prompt 3,439 TPS (2,087 tok); Gen 125 TPS (70 tok)
 - _Tokens:_ prompt 2087 tok; estimated text 444 tok; estimated non-text 1643
   tok; generated 70 tok; requested max 500 tok; stop reason completed
 
@@ -690,8 +910,8 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
 - _Key signals:_ missing terms: classic, style, during, low, tide
 - _Score:_ 🏆 A (85/100); Δ+22; None identified
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 2.34s; Gen 1.65s; Total 4.22s
-- _Throughput:_ Prompt 1,561 TPS (784 tok); Gen 110 TPS (89 tok)
+- _Timing:_ Load 2.35s; Gen 1.63s; Total 4.21s
+- _Throughput:_ Prompt 1,563 TPS (784 tok); Gen 112 TPS (89 tok)
 - _Tokens:_ prompt 784 tok; estimated text 444 tok; estimated non-text 340
   tok; generated 89 tok; requested max 500 tok; stop reason completed
 
@@ -724,8 +944,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ context echo=66%; nonvisual metadata reused
 - _Score:_ 🟡 C (58/100); Δ-5; Limited novel information
 - _Review focus:_ watchlist (context echo, metadata borrowing)
-- _Timing:_ Load 0.56s; Gen 1.89s; Total 2.65s
-- _Throughput:_ Prompt 1,507 TPS (623 tok); Gen 132 TPS (137 tok)
+- _Timing:_ Load 0.56s; Gen 1.88s; Total 2.65s
+- _Throughput:_ Prompt 1,499 TPS (623 tok); Gen 134 TPS (137 tok)
 - _Tokens:_ prompt 623 tok; estimated text 444 tok; estimated non-text 179
   tok; generated 137 tok; requested max 500 tok; stop reason completed
 
@@ -762,8 +982,8 @@ _Quality Status:_ no quality issues detected in this run
   description, keywords; missing terms: classic, style, sailboat, dark, hull
 - _Score:_ ❌ F (20/100); Δ-43; Output lacks detail
 - _Review focus:_ watchlist (context ignored, missing sections)
-- _Timing:_ Load 1.64s; Gen 2.48s; Total 4.34s
-- _Throughput:_ Prompt 1,352 TPS (1,538 tok); Gen 31.0 TPS (31 tok)
+- _Timing:_ Load 1.57s; Gen 2.47s; Total 4.25s
+- _Throughput:_ Prompt 1,361 TPS (1,538 tok); Gen 31.8 TPS (31 tok)
 - _Tokens:_ prompt 1538 tok; estimated text 444 tok; estimated non-text 1094
   tok; generated 31 tok; requested max 500 tok; stop reason completed
 
@@ -780,6 +1000,37 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-llava-v16-mistral-7b-8bit"></a>
+
+### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
+
+- _Recommendation:_ use with caveats; review verdict: context budget
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat this as a prompt-budget issue first; nontext prompt
+  burden is 87% and the output stays weak under that load.
+- _Key signals:_ output/prompt=0.57%; nontext prompt burden=87%; missing
+  sections: title, description, keywords; missing terms: moored, calm,
+  estuary, during, low
+- _Score:_ ❌ F (16/100); Δ-46; Output lacks detail
+- _Review focus:_ watchlist (missing sections, trusted hint degraded)
+- _Timing:_ Load 0.93s; Gen 2.81s; Total 3.96s
+- _Throughput:_ Prompt 1,696 TPS (3,503 tok); Gen 64.1 TPS (20 tok)
+- _Tokens:_ prompt 3503 tok; estimated text 444 tok; estimated non-text 3059
+  tok; generated 20 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> The boat is a classic-style sailboat with a dark hull and wooden mast.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:context_budget
+- Missing sections (title, description, keywords)
+- Degrades trusted hints
+
+---
+
 <a id="model-mlx-community-ministral-3-3b-instruct-2512-4bit"></a>
 
 ### ✅ mlx-community/Ministral-3-3B-Instruct-2512-4bit
@@ -792,8 +1043,8 @@ _Quality Status:_ no quality issues detected in this run
   during, exposing, vast
 - _Score:_ 🏆 A (87/100); Δ+24; None identified
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 0.99s; Gen 3.03s; Total 4.25s
-- _Throughput:_ Prompt 2,183 TPS (4,114 tok); Gen 177 TPS (127 tok)
+- _Timing:_ Load 0.95s; Gen 2.87s; Total 4.04s
+- _Throughput:_ Prompt 2,276 TPS (4,114 tok); Gen 183 TPS (127 tok)
 - _Tokens:_ prompt 4114 tok; estimated text 444 tok; estimated non-text 3670
   tok; generated 127 tok; requested max 500 tok; stop reason completed
 
@@ -818,90 +1069,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-llava-v16-mistral-7b-8bit"></a>
-
-### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
-
-- _Recommendation:_ use with caveats; review verdict: context budget
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat this as a prompt-budget issue first; nontext prompt
-  burden is 87% and the output stays weak under that load.
-- _Key signals:_ output/prompt=0.57%; nontext prompt burden=87%; missing
-  sections: title, description, keywords; missing terms: moored, calm,
-  estuary, during, low
-- _Score:_ ❌ F (16/100); Δ-46; Output lacks detail
-- _Review focus:_ watchlist (missing sections, trusted hint degraded)
-- _Timing:_ Load 0.89s; Gen 3.04s; Total 4.14s
-- _Throughput:_ Prompt 1,522 TPS (3,503 tok); Gen 63.9 TPS (20 tok)
-- _Tokens:_ prompt 3503 tok; estimated text 444 tok; estimated non-text 3059
-  tok; generated 20 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> The boat is a classic-style sailboat with a dark hull and wooden mast.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:context_budget
-- Missing sections (title, description, keywords)
-- Degrades trusted hints
-
----
-
-<a id="model-mlx-community-lfm25-vl-16b-bf16"></a>
-
-### ✅ mlx-community/LFM2.5-VL-1.6B-bf16
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); missing sections: description, keywords;
-  missing terms: style, during, receded, exposing, vast; repetitive
-  token=phrase: "mudflats, flags, boat, water,..."
-- _Score:_ 🟠 D (36/100); Δ-27; Lacks visual description of image
-- _Review focus:_ watchlist (cutoff, missing sections, repetitive)
-- _Timing:_ Load 0.52s; Gen 3.09s; Total 3.82s
-- _Throughput:_ Prompt 7,594 TPS (575 tok); Gen 181 TPS (500 tok)
-- _Tokens:_ prompt 575 tok; estimated text 444 tok; estimated non-text 131
-  tok; generated 500 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> &#8203;Title:
-> &#45; Classic sailboat, dark hull, wooden mast, moored in estuary, low tide,
-> green mudflats, flags, calm water, exposed mudflats, flags, boat, water,
-> tide, flags, boat, water, mudflats, flags, boat, water, mudflats, flags,
-> boat, water, mudflats, flags, boat, water, mudflats, flags, boat, water,
-> mudflats, flags, boat, water, mudflats, flags, boat, water, mudflats, flags,
-> boat, water, mudflats, flags, boat, water, mudflats, flags, boat, water,
-> mudflats, flags, boat, water, mudflats, flags, boat, water, mudflats, flags,
-> boat, water, mudflats, flags, boat, water, mudflats, flags, boat, water,
-> mudflats, flags, boat, water, mudflats, flags, boat, water, mudflats, flags,
-> boat, water, mudflats, flags, boat, water, mudflats, flags, boat, water,
-> mudflats, flags, boat, water, mudflats, flags, boat, water, mudflats, flags,
-> boat, water, mudflats, flags, boat, water, mudflats, flags, boat, water,
-> mudflats, flags, boat, water, mudflats, flags, boat, water, mudflats, flags,
-> boat, water, mudflats, flags, boat, water, mudflats, flags, boat, water,
-> mudflats, flags, boat, water, mudflats, flags, boat, water, mudflats, flags,
-> boat, water, mudflats, flags, boat, water, mudflats, flags, boat, water,
-> mudflats, flags, boat, water, mudflats, flags, boat, water, mudflats, flags,
-> boat, water, mudflats, flags, boat, water, mudflats, flags, boat, water,
-> mudflats, flags, boat, water, mudflats, flags, boat, water, mudflats, flags,
-> boat, water, mudflats, flags, boat, water, mudflats, flags, boat, water,
-> mudflats, flags, boat, water
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Repetitive output (phrase: "mudflats, flags, boat, water,...")
-- Missing sections (description, keywords)
-- Title length violation (205 words; expected 5-10)
-- Likely capped by max token budget
-
----
-
 <a id="model-mlx-community-internvl3-8b-bf16"></a>
 
 ### ✅ mlx-community/InternVL3-8B-bf16
@@ -914,8 +1081,8 @@ _Quality Status:_ no quality issues detected in this run
   exposing, vast, expanse
 - _Score:_ ✅ B (74/100); Δ+12; Limited novel information
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 1.68s; Gen 4.00s; Total 5.90s
-- _Throughput:_ Prompt 2,830 TPS (3,064 tok); Gen 34.1 TPS (87 tok)
+- _Timing:_ Load 1.74s; Gen 3.99s; Total 5.94s
+- _Throughput:_ Prompt 2,836 TPS (3,064 tok); Gen 34.3 TPS (87 tok)
 - _Tokens:_ prompt 3064 tok; estimated text 444 tok; estimated non-text 2620
   tok; generated 87 tok; requested max 500 tok; stop reason completed
 
@@ -949,8 +1116,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Score:_ ❌ F (30/100); Δ-33; Lacks visual description of image
 - _Review focus:_ watchlist (context ignored, cutoff, metadata borrowing,
   missing sections, repetitive)
-- _Timing:_ Load 1.43s; Gen 4.76s; Total 6.40s
-- _Throughput:_ Prompt 2,456 TPS (774 tok); Gen 121 TPS (500 tok)
+- _Timing:_ Load 1.52s; Gen 4.81s; Total 6.56s
+- _Throughput:_ Prompt 2,485 TPS (774 tok); Gen 121 TPS (500 tok)
 - _Tokens:_ prompt 774 tok; estimated text 444 tok; estimated non-text 330
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
@@ -988,8 +1155,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ missing terms: style, during, receded, exposing, vast
 - _Score:_ 🏆 A (80/100); Δ+18; None identified
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 2.55s; Gen 5.16s; Total 7.93s
-- _Throughput:_ Prompt 513 TPS (784 tok); Gen 26.7 TPS (88 tok)
+- _Timing:_ Load 2.55s; Gen 4.91s; Total 7.68s
+- _Throughput:_ Prompt 580 TPS (784 tok); Gen 27.4 TPS (88 tok)
 - _Tokens:_ prompt 784 tok; estimated text 444 tok; estimated non-text 340
   tok; generated 88 tok; requested max 500 tok; stop reason completed
 
@@ -1010,73 +1177,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-meta-llama-llama-32-11b-vision-instruct"></a>
-
-### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
-
-- _Recommendation:_ avoid for now; review verdict: model shortcoming
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ missing sections: title, description, keywords; missing
-  terms: classic, style, dark, hull, wooden
-- _Score:_ ❌ F (18/100); Δ-44; Output lacks detail
-- _Review focus:_ watchlist (missing sections, trusted hint degraded)
-- _Timing:_ Load 2.17s; Gen 5.35s; Total 7.74s
-- _Throughput:_ Prompt 264 TPS (484 tok); Gen 5.3 TPS (17 tok)
-- _Tokens:_ prompt 484 tok; estimated text 444 tok; estimated non-text 40 tok;
-  generated 17 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> Sailboat in a Calm Estuary with Low Tide and Green Algae
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Missing sections (title, description, keywords)
-- Degrades trusted hints
-
----
-
-<a id="model-mlx-community-ministral-3-14b-instruct-2512-mxfp4"></a>
-
-### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ nontext prompt burden=89%; missing terms: receded, exposing,
-  vast, expanse, behind
-- _Score:_ 🏆 A (83/100); Δ+20; None identified
-- _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 1.30s; Gen 5.47s; Total 7.00s
-- _Throughput:_ Prompt 1,235 TPS (4,115 tok); Gen 64.4 TPS (114 tok)
-- _Tokens:_ prompt 4115 tok; estimated text 444 tok; estimated non-text 3671
-  tok; generated 114 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> &#8203;Title:
-> Sailboat on Mudflats with Low Tide
->
-> &#8203;Description:
-> A classic wooden sailboat with a dark hull and red-brown mast is moored in
-> shallow water during low tide, surrounded by exposed green algae-covered
-> mudflats. The boat features a green cover over the cockpit and a string of
-> small flags along the mast.
->
-> &#8203;Keywords:
-> sailboat, wooden mast, dark hull, mudflats, low tide, green algae, shallow
-> water, green cockpit cover, small flags, estuary, calm water, red-brown
-> mast, classic-style boat
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
 <a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
 
 ### ✅ mlx-community/gemma-3-27b-it-qat-4bit
@@ -1089,8 +1189,8 @@ _Quality Status:_ no quality issues detected in this run
   keywords=19
 - _Score:_ 🏆 A (82/100); Δ+19; None identified
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 2.43s; Gen 5.51s; Total 8.18s
-- _Throughput:_ Prompt 579 TPS (783 tok); Gen 29.5 TPS (113 tok)
+- _Timing:_ Load 2.35s; Gen 5.30s; Total 7.87s
+- _Throughput:_ Prompt 615 TPS (783 tok); Gen 30.7 TPS (113 tok)
 - _Tokens:_ prompt 783 tok; estimated text 444 tok; estimated non-text 339
   tok; generated 113 tok; requested max 500 tok; stop reason completed
 
@@ -1116,6 +1216,110 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-ministral-3-14b-instruct-2512-mxfp4"></a>
+
+### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
+
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; trusted hint
+  coverage is still weak.
+- _Key signals:_ nontext prompt burden=89%; missing terms: receded, exposing,
+  vast, expanse, behind
+- _Score:_ 🏆 A (83/100); Δ+20; None identified
+- _Review focus:_ strong candidate for first-pass review
+- _Timing:_ Load 1.33s; Gen 5.37s; Total 6.91s
+- _Throughput:_ Prompt 1,260 TPS (4,115 tok); Gen 66.0 TPS (114 tok)
+- _Tokens:_ prompt 4115 tok; estimated text 444 tok; estimated non-text 3671
+  tok; generated 114 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> &#8203;Title:
+> Sailboat on Mudflats with Low Tide
+>
+> &#8203;Description:
+> A classic wooden sailboat with a dark hull and red-brown mast is moored in
+> shallow water during low tide, surrounded by exposed green algae-covered
+> mudflats. The boat features a green cover over the cockpit and a string of
+> small flags along the mast.
+>
+> &#8203;Keywords:
+> sailboat, wooden mast, dark hull, mudflats, low tide, green algae, shallow
+> water, green cockpit cover, small flags, estuary, calm water, red-brown
+> mast, classic-style boat
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
+<a id="model-meta-llama-llama-32-11b-vision-instruct"></a>
+
+### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
+
+- _Recommendation:_ avoid for now; review verdict: model shortcoming
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ missing sections: title, description, keywords; missing
+  terms: classic, style, dark, hull, wooden
+- _Score:_ ❌ F (18/100); Δ-44; Output lacks detail
+- _Review focus:_ watchlist (missing sections, trusted hint degraded)
+- _Timing:_ Load 2.22s; Gen 5.38s; Total 7.81s
+- _Throughput:_ Prompt 263 TPS (484 tok); Gen 5.26 TPS (17 tok)
+- _Tokens:_ prompt 484 tok; estimated text 444 tok; estimated non-text 40 tok;
+  generated 17 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> Sailboat in a Calm Estuary with Low Tide and Green Algae
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Missing sections (title, description, keywords)
+- Degrades trusted hints
+
+---
+
+<a id="model-mlx-community-ministral-3-14b-instruct-2512-nvfp4"></a>
+
+### ✅ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
+
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; trusted hint
+  coverage is still weak.
+- _Key signals:_ nontext prompt burden=89%; missing terms: style, during,
+  receded, exposing, vast
+- _Score:_ 🏆 A (86/100); Δ+23; None identified
+- _Review focus:_ strong candidate for first-pass review
+- _Timing:_ Load 1.37s; Gen 5.54s; Total 7.12s
+- _Throughput:_ Prompt 1,252 TPS (4,115 tok); Gen 62.8 TPS (118 tok)
+- _Tokens:_ prompt 4115 tok; estimated text 444 tok; estimated non-text 3671
+  tok; generated 118 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> &#8203;Title:
+> Sailboat Moored on Green Mudflats at Low Tide
+>
+> &#8203;Description:
+> A classic wooden sailboat, featuring a dark hull and wooden mast, rests on
+> shallow water near exposed green algae-covered mudflats. The boat displays a
+> series of small flags along its boom, anchored close to an orange buoy.
+>
+> &#8203;Keywords:
+> sailboat, wooden mast, dark hull, green mudflats, shallow water, orange
+> buoy, small flags, classic wooden boat, calm estuary, low tide,
+> algae-covered, wooden hull, moored vessel, calm water, wooden structure
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
 <a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
 
 ### ✅ mlx-community/Idefics3-8B-Llama3-bf16
@@ -1127,8 +1331,8 @@ _Quality Status:_ no quality issues detected in this run
   formatting=Unknown tags: &lt;end_of_utterance&gt;
 - _Score:_ 🟡 C (58/100); Δ-5; Limited novel information
 - _Review focus:_ watchlist (context echo)
-- _Timing:_ Load 1.97s; Gen 5.57s; Total 7.75s
-- _Throughput:_ Prompt 2,376 TPS (3,507 tok); Gen 32.3 TPS (117 tok)
+- _Timing:_ Load 1.93s; Gen 5.54s; Total 7.68s
+- _Throughput:_ Prompt 2,409 TPS (3,507 tok); Gen 32.0 TPS (117 tok)
 - _Tokens:_ prompt 3507 tok; estimated text 444 tok; estimated non-text 3063
   tok; generated 117 tok; requested max 500 tok; stop reason completed
 
@@ -1154,43 +1358,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-ministral-3-14b-instruct-2512-nvfp4"></a>
-
-### ✅ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ nontext prompt burden=89%; missing terms: style, during,
-  receded, exposing, vast
-- _Score:_ 🏆 A (86/100); Δ+23; None identified
-- _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 1.37s; Gen 5.78s; Total 7.37s
-- _Throughput:_ Prompt 1,215 TPS (4,115 tok); Gen 59.1 TPS (118 tok)
-- _Tokens:_ prompt 4115 tok; estimated text 444 tok; estimated non-text 3671
-  tok; generated 118 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> &#8203;Title:
-> Sailboat Moored on Green Mudflats at Low Tide
->
-> &#8203;Description:
-> A classic wooden sailboat, featuring a dark hull and wooden mast, rests on
-> shallow water near exposed green algae-covered mudflats. The boat displays a
-> series of small flags along its boom, anchored close to an orange buoy.
->
-> &#8203;Keywords:
-> sailboat, wooden mast, dark hull, green mudflats, shallow water, orange
-> buoy, small flags, classic wooden boat, calm estuary, low tide,
-> algae-covered, wooden hull, moored vessel, calm water, wooden structure
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
 <a id="model-mlx-community-gemma-3n-e4b-it-bf16"></a>
 
 ### ✅ mlx-community/gemma-3n-E4B-it-bf16
@@ -1202,8 +1369,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ missing sections: title, description, keywords
 - _Score:_ ✅ B (74/100); Δ+11; Missing requested structure
 - _Review focus:_ watchlist (missing sections)
-- _Timing:_ Load 2.23s; Gen 6.45s; Total 8.90s
-- _Throughput:_ Prompt 1,789 TPS (782 tok); Gen 46.6 TPS (266 tok)
+- _Timing:_ Load 2.26s; Gen 6.21s; Total 8.68s
+- _Throughput:_ Prompt 1,792 TPS (782 tok); Gen 48.6 TPS (266 tok)
 - _Tokens:_ prompt 782 tok; estimated text 444 tok; estimated non-text 338
   tok; generated 266 tok; requested max 500 tok; stop reason completed
 
@@ -1258,47 +1425,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-internvl3-14b-8bit"></a>
-
-### ✅ mlx-community/InternVL3-14B-8bit
-
-- _Recommendation:_ use with caveats; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ nontext prompt burden=86%; missing terms: floats, peacefully,
-  waiting, rise, again; context echo=46%
-- _Score:_ 🟡 C (64/100); Δ+1; Limited novel information
-- _Review focus:_ watchlist (context echo)
-- _Timing:_ Load 1.78s; Gen 6.45s; Total 8.46s
-- _Throughput:_ Prompt 1,342 TPS (3,064 tok); Gen 31.8 TPS (120 tok)
-- _Tokens:_ prompt 3064 tok; estimated text 444 tok; estimated non-text 2620
-  tok; generated 120 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> &#8203;Title:
-> Sailboat Moored at Low Tide
->
-> &#8203;Description:
-> A classic-style sailboat with a dark hull and wooden mast is moored in a
-> calm estuary during low tide. The water has receded, exposing a vast expanse
-> of green, algae-covered mudflats behind the vessel. The boat is adorned
-> with a string of small flags.
->
-> &#8203;Keywords:
-> sailboat, dark hull, wooden mast, moored, estuary, low tide, mudflats, green
-> algae, flags, calm water, classic style, nature, outdoors, maritime, boat,
-> mast, rigging
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Description sentence violation (3; expected 1-2)
-- Context echo (46% overlap)
-
----
-
 <a id="model-mlx-community-pixtral-12b-8bit"></a>
 
 ### ✅ mlx-community/pixtral-12b-8bit
@@ -1309,8 +1435,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=90%; context echo=58%
 - _Score:_ 🟡 C (56/100); Δ-6; Limited novel information
 - _Review focus:_ watchlist (context echo)
-- _Timing:_ Load 1.65s; Gen 6.78s; Total 8.65s
-- _Throughput:_ Prompt 1,620 TPS (4,662 tok); Gen 38.2 TPS (135 tok)
+- _Timing:_ Load 1.69s; Gen 6.33s; Total 8.23s
+- _Throughput:_ Prompt 1,880 TPS (4,662 tok); Gen 38.6 TPS (135 tok)
 - _Tokens:_ prompt 4662 tok; estimated text 444 tok; estimated non-text 4218
   tok; generated 135 tok; requested max 500 tok; stop reason completed
 
@@ -1339,6 +1465,47 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-internvl3-14b-8bit"></a>
+
+### ✅ mlx-community/InternVL3-14B-8bit
+
+- _Recommendation:_ use with caveats; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; trusted hint
+  coverage is still weak.
+- _Key signals:_ nontext prompt burden=86%; missing terms: floats, peacefully,
+  waiting, rise, again; context echo=46%
+- _Score:_ 🟡 C (64/100); Δ+1; Limited novel information
+- _Review focus:_ watchlist (context echo)
+- _Timing:_ Load 1.79s; Gen 6.66s; Total 8.66s
+- _Throughput:_ Prompt 1,252 TPS (3,064 tok); Gen 31.3 TPS (120 tok)
+- _Tokens:_ prompt 3064 tok; estimated text 444 tok; estimated non-text 2620
+  tok; generated 120 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> &#8203;Title:
+> Sailboat Moored at Low Tide
+>
+> &#8203;Description:
+> A classic-style sailboat with a dark hull and wooden mast is moored in a
+> calm estuary during low tide. The water has receded, exposing a vast expanse
+> of green, algae-covered mudflats behind the vessel. The boat is adorned
+> with a string of small flags.
+>
+> &#8203;Keywords:
+> sailboat, dark hull, wooden mast, moored, estuary, low tide, mudflats, green
+> algae, flags, calm water, classic style, nature, outdoors, maritime, boat,
+> mast, rigging
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Description sentence violation (3; expected 1-2)
+- Context echo (46% overlap)
+
+---
+
 <a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
 
 ### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
@@ -1351,8 +1518,8 @@ _Quality Status:_ no quality issues detected in this run
   terms: style; context echo=96%
 - _Score:_ 🟠 D (46/100); Δ-17; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context echo, missing sections)
-- _Timing:_ Load 1.50s; Gen 7.43s; Total 9.13s
-- _Throughput:_ Prompt 295 TPS (483 tok); Gen 21.7 TPS (119 tok)
+- _Timing:_ Load 1.46s; Gen 7.29s; Total 8.96s
+- _Throughput:_ Prompt 305 TPS (483 tok); Gen 22.0 TPS (119 tok)
 - _Tokens:_ prompt 483 tok; estimated text 444 tok; estimated non-text 39 tok;
   generated 119 tok; requested max 500 tok; stop reason completed
 
@@ -1392,8 +1559,8 @@ _Quality Status:_ no quality issues detected in this run
   description, keywords; missing terms: classic, style, sailboat, dark, hull
 - _Score:_ ❌ F (20/100); Δ-43; Output lacks detail
 - _Review focus:_ watchlist (context ignored, missing sections)
-- _Timing:_ Load 2.44s; Gen 7.54s; Total 10.19s
-- _Throughput:_ Prompt 1,058 TPS (1,538 tok); Gen 5.41 TPS (31 tok)
+- _Timing:_ Load 2.44s; Gen 7.52s; Total 10.17s
+- _Throughput:_ Prompt 1,078 TPS (1,538 tok); Gen 5.4 TPS (31 tok)
 - _Tokens:_ prompt 1538 tok; estimated text 444 tok; estimated non-text 1094
   tok; generated 31 tok; requested max 500 tok; stop reason completed
 
@@ -1421,8 +1588,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ missing terms: classic, style, wooden, estuary, receded
 - _Score:_ 🏆 A (86/100); Δ+23; None identified
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 3.49s; Gen 7.80s; Total 11.54s
-- _Throughput:_ Prompt 533 TPS (783 tok); Gen 17.3 TPS (104 tok)
+- _Timing:_ Load 3.44s; Gen 7.68s; Total 11.34s
+- _Throughput:_ Prompt 556 TPS (783 tok); Gen 17.6 TPS (104 tok)
 - _Tokens:_ prompt 783 tok; estimated text 444 tok; estimated non-text 339
   tok; generated 104 tok; requested max 500 tok; stop reason completed
 
@@ -1457,8 +1624,8 @@ _Quality Status:_ no quality issues detected in this run
   terms: during, receded, vast, expanse, algae; keywords=45
 - _Score:_ ✅ B (70/100); Δ+7; None identified
 - _Review focus:_ watchlist (missing sections, reasoning leak)
-- _Timing:_ Load 2.07s; Gen 8.60s; Total 10.87s
-- _Throughput:_ Prompt 1,597 TPS (1,516 tok); Gen 67.7 TPS (490 tok)
+- _Timing:_ Load 2.07s; Gen 8.32s; Total 10.59s
+- _Throughput:_ Prompt 1,633 TPS (1,516 tok); Gen 70.1 TPS (490 tok)
 - _Tokens:_ prompt 1516 tok; estimated text 444 tok; estimated non-text 1072
   tok; generated 490 tok; requested max 500 tok; stop reason completed
 
@@ -1511,6 +1678,154 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
+
+### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+
+- _Recommendation:_ avoid for now; review verdict: harness
+- _Owner:_ likely owner `mlx-vlm`; harness signal `encoding`
+- _Next step:_ Inspect decode cleanup; tokenizer markers are leaking into
+  user-facing text.
+- _Key signals:_ Tokenizer space-marker artifacts (for example Ġ) appeared in
+  output (about 61 occurrences).; nontext prompt burden=88%; missing sections:
+  description, keywords; missing terms: vast, expanse, adorned, small, floats
+- _Score:_ ❌ F (4/100); Δ-59; Output too short to be useful
+- _Review focus:_ watchlist (harness, missing sections)
+- _Timing:_ Load 2.17s; Gen 9.36s; Total 11.76s
+- _Throughput:_ Prompt 655 TPS (3,619 tok); Gen 31.3 TPS (108 tok)
+- _Tokens:_ prompt 3619 tok; estimated text 444 tok; estimated non-text 3175
+  tok; generated 108 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> Title:ĠClassicĠsailboatĠmooredĠinĠestuaryĊĊDescription:ĠAĠclassic-styleĠsailboatĠwithĠaĠdarkĠhullĠandĠwoodenĠmastĠisĠmooredĠinĠaĠcalmĠestuaryĠduringĠlowĠtide.ĠTheĠwaterĠhasĠreceded,ĠexposingĠgreen,Ġalgae-coveredĠmudflatsĠbehindĠtheĠvessel.ĊĊKeywords:Ġsailboat,ĠwoodenĠmast,ĠdarkĠhull,Ġestuary,ĠlowĠtide,Ġmudflats,ĠgreenĠalgae,Ġmoored,ĠcalmĠwater,ĠstringĠofĠflags,Ġclassic-style,ĠwoodenĠboat,Ġwatercraft,Ġnature,Ġoutdoor,Ġcalm,ĠmooringĠbuoy
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️HARNESS:encoding
+- Missing sections (description, keywords)
+- Title length violation (66 words; expected 5-10)
+- token_encoding:bpe_space_leak(61)
+
+---
+
+<a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
+
+### ✅ mlx-community/Phi-3.5-vision-instruct-bf16
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; trusted hint
+  coverage is still weak.
+- _Key signals:_ hit token cap (500); nontext prompt burden=67%; missing
+  terms: boat, adorned, string, small, floats; keyword duplication=90%
+- _Score:_ 🟠 D (46/100); Δ-17; Lacks visual description of image
+- _Review focus:_ watchlist (context echo, cutoff, repetitive)
+- _Timing:_ Load 0.85s; Gen 9.45s; Total 10.51s
+- _Throughput:_ Prompt 3,956 TPS (1,337 tok); Gen 56.7 TPS (500 tok)
+- _Tokens:_ prompt 1337 tok; estimated text 444 tok; estimated non-text 893
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> Title: Classic Sailboat in Estuary
+>
+> Description: A classic-style sailboat with a dark hull and wooden mast is
+> moored in a calm estuary during low tide. The water has receded, exposing a
+> vast expanse of green, algae-covered mudflats behind the vessel.
+>
+> Keywords: sailboat, estuary, low tide, calm, green, algae, mudflats, wooden
+> mast, dark hull, flags, receded water, waiting, tide, calm water, green
+> algae, exposed mud, wooden sailboat, classic style, moored, peaceful, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Repetitive output (phrase: "flags, flags, flags, flags,...")
+- Title length violation (4 words; expected 5-10)
+- Keyword count violation (198; expected 10-18)
+- Keyword duplication (90% duplicated terms)
+- Context echo (41% overlap)
+- Likely capped by max token budget
+
+---
+
+<a id="model-microsoft-phi-35-vision-instruct"></a>
+
+### ✅ microsoft/Phi-3.5-vision-instruct
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; trusted hint
+  coverage is still weak.
+- _Key signals:_ hit token cap (500); nontext prompt burden=67%; missing
+  terms: boat, adorned, string, small, floats; keyword duplication=90%
+- _Score:_ 🟠 D (46/100); Δ-17; Lacks visual description of image
+- _Review focus:_ watchlist (context echo, cutoff, repetitive)
+- _Timing:_ Load 0.98s; Gen 9.49s; Total 10.68s
+- _Throughput:_ Prompt 3,791 TPS (1,337 tok); Gen 56.5 TPS (500 tok)
+- _Tokens:_ prompt 1337 tok; estimated text 444 tok; estimated non-text 893
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> Title: Classic Sailboat in Estuary
+>
+> Description: A classic-style sailboat with a dark hull and wooden mast is
+> moored in a calm estuary during low tide. The water has receded, exposing a
+> vast expanse of green, algae-covered mudflats behind the vessel.
+>
+> Keywords: sailboat, estuary, low tide, calm, green, algae, mudflats, wooden
+> mast, dark hull, flags, receded water, waiting, tide, calm water, green
+> algae, exposed mud, wooden sailboat, classic style, moored, peaceful, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
+> flags, flags, flags, flags, flags, flags, flags, flags, flags
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Repetitive output (phrase: "flags, flags, flags, flags,...")
+- Title length violation (4 words; expected 5-10)
+- Keyword count violation (198; expected 10-18)
+- Keyword duplication (90% duplicated terms)
+- Context echo (41% overlap)
+- Likely capped by max token budget
+
+---
+
 <a id="model-mlx-community-pixtral-12b-bf16"></a>
 
 ### ✅ mlx-community/pixtral-12b-bf16
@@ -1521,8 +1836,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=90%; context echo=56%
 - _Score:_ 🟡 C (59/100); Δ-3; Limited novel information
 - _Review focus:_ watchlist (context echo)
-- _Timing:_ Load 2.55s; Gen 9.38s; Total 12.15s
-- _Throughput:_ Prompt 1,908 TPS (4,662 tok); Gen 21.0 TPS (138 tok)
+- _Timing:_ Load 2.55s; Gen 9.74s; Total 12.50s
+- _Throughput:_ Prompt 1,924 TPS (4,662 tok); Gen 19.8 TPS (138 tok)
 - _Tokens:_ prompt 4662 tok; estimated text 444 tok; estimated non-text 4218
   tok; generated 138 tok; requested max 500 tok; stop reason completed
 
@@ -1551,214 +1866,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
-
-### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
-
-- _Recommendation:_ avoid for now; review verdict: harness
-- _Owner:_ likely owner `mlx-vlm`; harness signal `encoding`
-- _Next step:_ Inspect decode cleanup; tokenizer markers are leaking into
-  user-facing text.
-- _Key signals:_ Tokenizer space-marker artifacts (for example Ġ) appeared in
-  output (about 61 occurrences).; nontext prompt burden=88%; missing sections:
-  description, keywords; missing terms: vast, expanse, adorned, small, floats
-- _Score:_ ❌ F (4/100); Δ-59; Output too short to be useful
-- _Review focus:_ watchlist (harness, missing sections)
-- _Timing:_ Load 2.11s; Gen 9.44s; Total 11.82s
-- _Throughput:_ Prompt 663 TPS (3,619 tok); Gen 30.1 TPS (108 tok)
-- _Tokens:_ prompt 3619 tok; estimated text 444 tok; estimated non-text 3175
-  tok; generated 108 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> Title:ĠClassicĠsailboatĠmooredĠinĠestuaryĊĊDescription:ĠAĠclassic-styleĠsailboatĠwithĠaĠdarkĠhullĠandĠwoodenĠmastĠisĠmooredĠinĠaĠcalmĠestuaryĠduringĠlowĠtide.ĠTheĠwaterĠhasĠreceded,ĠexposingĠgreen,Ġalgae-coveredĠmudflatsĠbehindĠtheĠvessel.ĊĊKeywords:Ġsailboat,ĠwoodenĠmast,ĠdarkĠhull,Ġestuary,ĠlowĠtide,Ġmudflats,ĠgreenĠalgae,Ġmoored,ĠcalmĠwater,ĠstringĠofĠflags,Ġclassic-style,ĠwoodenĠboat,Ġwatercraft,Ġnature,Ġoutdoor,Ġcalm,ĠmooringĠbuoy
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️HARNESS:encoding
-- Missing sections (description, keywords)
-- Title length violation (66 words; expected 5-10)
-- token_encoding:bpe_space_leak(61)
-
----
-
-<a id="model-microsoft-phi-35-vision-instruct"></a>
-
-### ✅ microsoft/Phi-3.5-vision-instruct
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ hit token cap (500); nontext prompt burden=67%; missing
-  terms: boat, adorned, string, small, floats; keyword duplication=90%
-- _Score:_ 🟠 D (46/100); Δ-17; Lacks visual description of image
-- _Review focus:_ watchlist (context echo, cutoff, repetitive)
-- _Timing:_ Load 0.88s; Gen 9.58s; Total 10.67s
-- _Throughput:_ Prompt 3,814 TPS (1,337 tok); Gen 55.9 TPS (500 tok)
-- _Tokens:_ prompt 1337 tok; estimated text 444 tok; estimated non-text 893
-  tok; generated 500 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> Title: Classic Sailboat in Estuary
->
-> Description: A classic-style sailboat with a dark hull and wooden mast is
-> moored in a calm estuary during low tide. The water has receded, exposing a
-> vast expanse of green, algae-covered mudflats behind the vessel.
->
-> Keywords: sailboat, estuary, low tide, calm, green, algae, mudflats, wooden
-> mast, dark hull, flags, receded water, waiting, tide, calm water, green
-> algae, exposed mud, wooden sailboat, classic style, moored, peaceful, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Repetitive output (phrase: "flags, flags, flags, flags,...")
-- Title length violation (4 words; expected 5-10)
-- Keyword count violation (198; expected 10-18)
-- Keyword duplication (90% duplicated terms)
-- Context echo (41% overlap)
-- Likely capped by max token budget
-
----
-
-<a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
-
-### ✅ mlx-community/Phi-3.5-vision-instruct-bf16
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ hit token cap (500); nontext prompt burden=67%; missing
-  terms: boat, adorned, string, small, floats; keyword duplication=90%
-- _Score:_ 🟠 D (46/100); Δ-17; Lacks visual description of image
-- _Review focus:_ watchlist (context echo, cutoff, repetitive)
-- _Timing:_ Load 0.84s; Gen 9.69s; Total 10.75s
-- _Throughput:_ Prompt 3,868 TPS (1,337 tok); Gen 55.2 TPS (500 tok)
-- _Tokens:_ prompt 1337 tok; estimated text 444 tok; estimated non-text 893
-  tok; generated 500 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> Title: Classic Sailboat in Estuary
->
-> Description: A classic-style sailboat with a dark hull and wooden mast is
-> moored in a calm estuary during low tide. The water has receded, exposing a
-> vast expanse of green, algae-covered mudflats behind the vessel.
->
-> Keywords: sailboat, estuary, low tide, calm, green, algae, mudflats, wooden
-> mast, dark hull, flags, receded water, waiting, tide, calm water, green
-> algae, exposed mud, wooden sailboat, classic style, moored, peaceful, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags, flags, flags,
-> flags, flags, flags, flags, flags, flags, flags, flags, flags
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Repetitive output (phrase: "flags, flags, flags, flags,...")
-- Title length violation (4 words; expected 5-10)
-- Keyword count violation (198; expected 10-18)
-- Keyword duplication (90% duplicated terms)
-- Context echo (41% overlap)
-- Likely capped by max token budget
-
----
-
-<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
-
-### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); nontext prompt burden=75%; missing
-  sections: title, description; missing terms: boat, floats, peacefully,
-  waiting, rise
-- _Score:_ 🟡 C (59/100); Δ-4; Missing requested structure
-- _Review focus:_ watchlist (cutoff, metadata borrowing, missing sections)
-- _Timing:_ Load 5.92s; Gen 13.05s; Total 19.40s
-- _Throughput:_ Prompt 687 TPS (1,810 tok); Gen 51.0 TPS (500 tok)
-- _Tokens:_ prompt 1810 tok; estimated text 444 tok; estimated non-text 1366
-  tok; generated 500 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> Let's tackle this step by step. First, the title needs to be 5-10 words,
-> concrete and factual. The main subject is a classic sailboat (sailboat)
-> moored in a calm estuary (estuary) during low tide (low tide) with green
-> &#8203;mudflats (mudflats) behind it. Wait, but let's check the image description:
-> the user mentioned a "classic-style sailboat with a dark hull and wooden
-> mast" moored in a calm estuary during low tide, water receded exposing green
-> algae-covered mudflats. So title should be something like "Classic Sailboat
-> Moored in Estuary Mudflats at Low Tide"—wait, but let's make it more
-> concise. Wait the hint says "a classic-style sailboat with a dark hull and
-> wooden mast is moored in a calm estuary during low tide. The water has
-> receded, exposing a vast expanse of green, algae-covered mudflats behind the
-> vessel." So title: "Classic Sailboat Moored in Estuary Mudflats at Low
-> Tide"—that's 8 words, good.
->
-> Next, description: 1-2 factual sentences. Need to include main subject
-> (classic sailboat), setting (calm estuary, low tide, green algae-covered
-> mudflats), details (dark hull, wooden mast, flags, moored). Wait the hint
-> says "adorned with a string of small flags"—yes, visible. So description: "A
-> classic-style sailboat with a dark hull and wooden mast is moored in a calm
-> estuary during low tide. The water has receded, exposing green,
-> algae-covered mudflats behind the vessel, which is adorned with a string of
-> small flags." That's two sentences, factual, uses visible details.
->
-> Keywords: 10-18 unique terms. Need to include subjects (sailboat, estuary,
-> mudflats, low tide), details (classic, dark hull, wooden mast, flags, calm
-> water, algae-covered mud, moored), setting (estuary, mudflats, low tide).
-> Let's list: sailboat, estuary, mudflats, low tide, classic, dark hull,
-> wooden mast, flags, calm water, algae-covered mud,
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Missing sections (title, description)
-- Keyword count violation (23; expected 10-18)
-- Keyword duplication (39% duplicated terms)
-- Nonvisual metadata borrowing
-- Likely capped by max token budget
-
----
-
 <a id="model-mlx-community-paligemma2-3b-pt-896-4bit"></a>
 
 ### ✅ mlx-community/paligemma2-3b-pt-896-4bit
@@ -1773,8 +1880,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Score:_ 🟠 D (49/100); Δ-13; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, missing sections,
   repetitive)
-- _Timing:_ Load 1.26s; Gen 13.79s; Total 15.28s
-- _Throughput:_ Prompt 3,505 TPS (4,610 tok); Gen 42.0 TPS (500 tok)
+- _Timing:_ Load 1.18s; Gen 12.35s; Total 13.75s
+- _Throughput:_ Prompt 3,870 TPS (4,610 tok); Gen 47.2 TPS (500 tok)
 - _Tokens:_ prompt 4610 tok; estimated text 444 tok; estimated non-text 4166
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
@@ -1839,6 +1946,40 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-molmo-7b-d-0924-8bit"></a>
+
+### ✅ mlx-community/Molmo-7B-D-0924-8bit
+
+- _Recommendation:_ avoid for now; review verdict: model shortcoming
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ nontext prompt burden=70%; missing sections: title,
+  description, keywords; missing terms: classic, style, hull, wooden, mast
+- _Score:_ ✅ B (68/100); Δ+5; Keywords are not specific or diverse enough
+- _Review focus:_ watchlist (missing sections)
+- _Timing:_ Load 1.18s; Gen 13.31s; Total 14.70s
+- _Throughput:_ Prompt 137 TPS (1,468 tok); Gen 52.3 TPS (108 tok)
+- _Tokens:_ prompt 1468 tok; estimated text 444 tok; estimated non-text 1024
+  tok; generated 108 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> Sun position: Behind photographer, casting long shadows across the
+> mudflats. Tide stage: Low tide, exposing extensive mudflats. Water
+> conditions: Calm with slight ripples. Vegetation: Dense trees visible in the
+> background. Marine life: None visible in the frame. Boat type: Sailboat.
+> Flag colors: Red, white, and blue. Mud color: Dark brown to black. Algae
+> color: Bright green to yellow-green. Photographer: Not visible in the frame.
+> Boat name: Not visible in the frame.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Missing sections (title, description, keywords)
+
+---
+
 <a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
 
 ### ✅ mlx-community/GLM-4.6V-Flash-mxfp4
@@ -1852,8 +1993,8 @@ _Quality Status:_ no quality issues detected in this run
   waiting
 - _Score:_ 🟡 C (57/100); Δ-6; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff, missing sections, reasoning leak)
-- _Timing:_ Load 1.32s; Gen 13.90s; Total 15.44s
-- _Throughput:_ Prompt 1,053 TPS (6,570 tok); Gen 68.1 TPS (500 tok)
+- _Timing:_ Load 1.37s; Gen 13.34s; Total 14.92s
+- _Throughput:_ Prompt 1,092 TPS (6,570 tok); Gen 71.4 TPS (500 tok)
 - _Tokens:_ prompt 6570 tok; estimated text 444 tok; estimated non-text 6126
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
@@ -1905,46 +2046,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-molmo-7b-d-0924-8bit"></a>
-
-### ✅ mlx-community/Molmo-7B-D-0924-8bit
-
-- _Recommendation:_ avoid for now; review verdict: model shortcoming
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ nontext prompt burden=70%; missing sections: title,
-  description, keywords; missing terms: sailboat, estuary, during, exposing,
-  vast
-- _Score:_ 🟡 C (57/100); Δ-5; Keywords are not specific or diverse enough
-- _Review focus:_ watchlist (missing sections)
-- _Timing:_ Load 1.46s; Gen 13.92s; Total 15.61s
-- _Throughput:_ Prompt 152 TPS (1,468 tok); Gen 50.6 TPS (190 tok)
-- _Tokens:_ prompt 1468 tok; estimated text 444 tok; estimated non-text 1024
-  tok; generated 190 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> Sun position: Behind photographer, casting long shadows across the
-> mudflats. Tide status: Low tide, with water level significantly receded.
-> Season: Summer, based on vegetation and lighting. Location: East Anglia, UK,
-> &#8203;likely near the River Orwell or another estuarine area. Boat type:
-> &#8203;Classic-style sailing vessel, possibly a yawl or small ketch. Boat color:
-> Dark hull with lighter accents. Mast: Wooden, with rigging visible. Flags:
-> Small string of flags on the boat. Mudflats: Extensive, covered in green
-> algae. Vegetation: Trees visible in the background. Water condition: Calm,
-> with gentle ripples. Boat position: Moored, pointing slightly to the right.
-> Photographer: Standing on the shore, capturing the scene. Image style:
-> Photographic representationalism, realism. Lighting: Even, with soft
-> shadows. Focus: Sharp, emphasizing the boat and mudflats.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Missing sections (title, description, keywords)
-
----
-
 <a id="model-mlx-community-glm-46v-flash-6bit"></a>
 
 ### ✅ mlx-community/GLM-4.6V-Flash-6bit
@@ -1959,8 +2060,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Score:_ 🟡 C (64/100); Δ+2; Missing requested structure
 - _Review focus:_ watchlist (cutoff, metadata borrowing, missing sections,
   reasoning leak)
-- _Timing:_ Load 1.45s; Gen 15.63s; Total 17.30s
-- _Throughput:_ Prompt 1,111 TPS (6,570 tok); Gen 53.2 TPS (500 tok)
+- _Timing:_ Load 1.38s; Gen 15.17s; Total 16.76s
+- _Throughput:_ Prompt 1,162 TPS (6,570 tok); Gen 54.3 TPS (500 tok)
 - _Tokens:_ prompt 6570 tok; estimated text 444 tok; estimated non-text 6126
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
@@ -2058,8 +2159,8 @@ _Quality Status:_ no quality issues detected in this run
   receded, vast, expanse
 - _Score:_ ✅ B (74/100); Δ+11; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff, missing sections, reasoning leak)
-- _Timing:_ Load 1.56s; Gen 15.95s; Total 17.74s
-- _Throughput:_ Prompt 1,550 TPS (4,753 tok); Gen 39.9 TPS (500 tok)
+- _Timing:_ Load 1.60s; Gen 15.62s; Total 17.44s
+- _Throughput:_ Prompt 1,556 TPS (4,753 tok); Gen 40.9 TPS (500 tok)
 - _Tokens:_ prompt 4753 tok; estimated text 444 tok; estimated non-text 4309
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
@@ -2113,32 +2214,102 @@ _Quality Status:_ no quality issues detected in this run
 - _Next step:_ Treat as a model limitation for this prompt; the requested
   output contract is not being met.
 - _Key signals:_ nontext prompt burden=70%; missing sections: title,
-  description, keywords; missing terms: classic, style, wooden, moored,
-  estuary
-- _Score:_ 🟡 C (58/100); Δ-5; Keywords are not specific or diverse enough
+  description, keywords; missing terms: classic, style, moored, during,
+  receded
+- _Score:_ ✅ B (70/100); Δ+8; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (missing sections)
-- _Timing:_ Load 1.81s; Gen 16.16s; Total 18.20s
-- _Throughput:_ Prompt 143 TPS (1,468 tok); Gen 30.6 TPS (163 tok)
+- _Timing:_ Load 1.75s; Gen 19.65s; Total 21.61s
+- _Throughput:_ Prompt 132 TPS (1,468 tok); Gen 30.4 TPS (244 tok)
 - _Tokens:_ prompt 1468 tok; estimated text 444 tok; estimated non-text 1024
-  tok; generated 163 tok; requested max 500 tok; stop reason completed
+  tok; generated 244 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
-> Sun position: Behind photographer, casting long shadows across the
-> mudflats. Tide stage: Low tide, with extensive mudflats visible. Water
-> conditions: Calm with slight ripples. Vegetation: Dense trees and shrubs
-> visible in the background. Marine life: None visible in the frame. Boat
-> type: Sailboat. Hull color: Dark (possibly black or deep blue). Mast
-> material: Wood. Flag details: Small flags attached to the boat. Mudflats:
-> Extensive, covered in green algae. Lighting: Even, natural daylight. Season:
-> Summer (based on vegetation and lighting). photographer: Not visible in the
-> frame. Boat position: Centered in the frame, facing right. Water clarity:
-> Clear enough to see mud beneath. Boat size: Small to medium (sailboat).
+> Sun position: Behind and to the right of photographer, casting long shadows
+> to the left. Tide stage: Low tide, exposing mudflats. Water conditions:
+> Calm with slight ripples. Visibility: Good, no fog or haze. Season: Summer,
+> based on vegetation and lighting. Boat type: Sailboat, likely 15-20 feet
+> long. Hull color: Dark, possibly black or deep blue. Mast: Wooden, stained
+> medium brown. Sails: Lowered, rolled up on deck. Flag: Small string of flags
+> visible, possibly British. Mooring: Orange buoy visible in front of boat.
+> Setting: Estuary or tidal inlet. Shoreline: Visible in background, showing
+> transition from water to land. Vegetation: Grasses and shrubs visible on
+> distant shore. Lighting: Even, soft light suggesting late afternoon or early
+> evening. Visibility: Good, no obstructions. Boat condition:
+> Well-maintained, clean appearance. Water color: Greenish near shore, turning
+> blue further out. Tide direction: Inward, as evidenced by receding water
+> line. Boat orientation: Facing right, with stern to left. Deck details: Not
+> clearly visible due to distance and lighting.
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
 - Missing sections (title, description, keywords)
+
+---
+
+<a id="model-mlx-community-glm-46v-nvfp4"></a>
+
+### ✅ mlx-community/GLM-4.6V-nvfp4
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ hit token cap (500); nontext prompt burden=93%; missing
+  sections: title, description, keywords; missing terms: vast, expanse,
+  behind, vessel, adorned
+- _Score:_ 🟠 D (49/100); Δ-14; Keywords are not specific or diverse enough
+- _Review focus:_ watchlist (cutoff, metadata borrowing, missing sections,
+  reasoning leak)
+- _Timing:_ Load 5.57s; Gen 25.80s; Total 31.59s
+- _Throughput:_ Prompt 541 TPS (6,570 tok); Gen 37.5 TPS (500 tok)
+- _Tokens:_ prompt 6570 tok; estimated text 444 tok; estimated non-text 6126
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> &lt;think&gt;Got it, let's tackle this step by step. First, the Title. It needs to
+> be 5-10 words, concrete and factual. The main subject is a sailboat, so
+> maybe "Classic sailboat moored in calm estuary at low tide." Wait, does the
+> image show low tide? Yes, because there's mudflats exposed. Let's check: the
+> image has a sailboat, moored, estuary, low tide. That's good.
+>
+> Next, the Description. It needs 1-2 factual sentences. The existing hint
+> says a classic-style sailboat with dark hull and wooden mast, moored in calm
+> estuary during low tide, water receded exposing green algae-covered
+> mudflats, boat with small flags, floats peacefully. Let's confirm: dark hull
+> (yes, the boat is black), wooden mast (yes, the mast is brown wood), moored
+> (yes, tied to a buoy), calm estuary (yes, water is calm), low tide (yes,
+> mudflats are visible), small flags (yes, there's a string of flags), floats
+> peacefully (yes, it's stationary). So the description should include those
+> details.
+>
+> Then Keywords. 10-18 unique terms. Let's list visible ones: sailboat,
+> moored, estuary, low tide, dark hull, wooden mast, buoy, flags, calm water,
+> mudflats, algae, green, classic style, stationary, boat, nautical, natural
+> &#8203;setting. Wait, need to make sure they're unique and visible. Let's check:
+> sailboat (yes), moored (yes), estuary (yes), low tide (yes), dark hull
+> (yes), wooden mast (yes), buoy (yes, the orange one), flags (yes), calm
+> water (yes), mudflats (yes), algae (yes, the green stuff), green (yes),
+> classic style (yes, the boat looks classic), stationary (yes), boat (yes),
+> nautical (yes), natural setting (yes). Let's count: that's 16, which is
+> within 10-18.
+>
+> Now, let's make sure not to include anything uncertain. The existing capture
+> metadata has a date and GPS, but the user said to use only details clearly
+> visible, so we don't include that. The title should be concise: "Classic
+> sailboat moored in calm estuary at low tide." The description: "A
+> classic-style sailboat with
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Missing sections (title, description, keywords)
+- Reasoning leak (&lt;think&gt;)
+- Nonvisual metadata borrowing
+- Likely capped by max token budget
+- Unknown tags: &lt;think&gt;
 
 ---
 
@@ -2154,8 +2325,8 @@ _Quality Status:_ no quality issues detected in this run
   terms: style, vast, expanse, peacefully, waiting; keyword duplication=62%
 - _Score:_ ✅ B (78/100); Δ+15; None identified
 - _Review focus:_ watchlist (cutoff)
-- _Timing:_ Load 1.29s; Gen 27.59s; Total 29.09s
-- _Throughput:_ Prompt 954 TPS (16,901 tok); Gen 53.7 TPS (500 tok)
+- _Timing:_ Load 1.09s; Gen 27.01s; Total 28.31s
+- _Throughput:_ Prompt 981 TPS (16,901 tok); Gen 54.1 TPS (500 tok)
 - _Tokens:_ prompt 16901 tok; estimated text 444 tok; estimated non-text 16457
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
@@ -2219,8 +2390,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Score:_ 🟠 D (44/100); Δ-19; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, missing sections,
   repetitive)
-- _Timing:_ Load 1.49s; Gen 27.81s; Total 29.52s
-- _Throughput:_ Prompt 3,163 TPS (1,538 tok); Gen 18.6 TPS (500 tok)
+- _Timing:_ Load 1.45s; Gen 27.11s; Total 28.78s
+- _Throughput:_ Prompt 3,288 TPS (1,538 tok); Gen 19.0 TPS (500 tok)
 - _Tokens:_ prompt 1538 tok; estimated text 444 tok; estimated non-text 1094
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
@@ -2259,71 +2430,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-glm-46v-nvfp4"></a>
-
-### ✅ mlx-community/GLM-4.6V-nvfp4
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); nontext prompt burden=93%; missing
-  sections: title, description, keywords; missing terms: vast, expanse,
-  behind, vessel, adorned
-- _Score:_ 🟠 D (49/100); Δ-14; Keywords are not specific or diverse enough
-- _Review focus:_ watchlist (cutoff, metadata borrowing, missing sections,
-  reasoning leak)
-- _Timing:_ Load 7.10s; Gen 28.30s; Total 35.62s
-- _Throughput:_ Prompt 465 TPS (6,570 tok); Gen 36.1 TPS (500 tok)
-- _Tokens:_ prompt 6570 tok; estimated text 444 tok; estimated non-text 6126
-  tok; generated 500 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> &lt;think&gt;Got it, let's tackle this step by step. First, the Title. It needs to
-> be 5-10 words, concrete and factual. The main subject is a sailboat, so
-> maybe "Classic sailboat moored in calm estuary at low tide." Wait, does the
-> image show low tide? Yes, because there's mudflats exposed. Let's check: the
-> image has a sailboat, moored, estuary, low tide. That's good.
->
-> Next, the Description. It needs 1-2 factual sentences. The existing hint
-> says a classic-style sailboat with dark hull and wooden mast, moored in calm
-> estuary during low tide, water receded exposing green algae-covered
-> mudflats, boat with small flags, floats peacefully. Let's confirm: dark hull
-> (yes, the boat is black), wooden mast (yes, the mast is brown wood), moored
-> (yes, tied to a buoy), calm estuary (yes, water is calm), low tide (yes,
-> mudflats are visible), small flags (yes, there's a string of flags), floats
-> peacefully (yes, it's stationary). So the description should include those
-> details.
->
-> Then Keywords. 10-18 unique terms. Let's list visible ones: sailboat,
-> moored, estuary, low tide, dark hull, wooden mast, buoy, flags, calm water,
-> mudflats, algae, green, classic style, stationary, boat, nautical, natural
-> &#8203;setting. Wait, need to make sure they're unique and visible. Let's check:
-> sailboat (yes), moored (yes), estuary (yes), low tide (yes), dark hull
-> (yes), wooden mast (yes), buoy (yes, the orange one), flags (yes), calm
-> water (yes), mudflats (yes), algae (yes, the green stuff), green (yes),
-> classic style (yes, the boat looks classic), stationary (yes), boat (yes),
-> nautical (yes), natural setting (yes). Let's count: that's 16, which is
-> within 10-18.
->
-> Now, let's make sure not to include anything uncertain. The existing capture
-> metadata has a date and GPS, but the user said to use only details clearly
-> visible, so we don't include that. The title should be concise: "Classic
-> sailboat moored in calm estuary at low tide." The description: "A
-> classic-style sailboat with
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Missing sections (title, description, keywords)
-- Reasoning leak (&lt;think&gt;)
-- Nonvisual metadata borrowing
-- Likely capped by max token budget
-- Unknown tags: &lt;think&gt;
-
----
-
 <a id="model-mlx-community-qwen35-35b-a3b-4bit"></a>
 
 ### ✅ mlx-community/Qwen3.5-35B-A3B-4bit
@@ -2337,8 +2443,8 @@ _Quality Status:_ no quality issues detected in this run
   exposing, vast
 - _Score:_ ✅ B (73/100); Δ+10; Missing requested structure
 - _Review focus:_ watchlist (cutoff, missing sections)
-- _Timing:_ Load 2.46s; Gen 58.49s; Total 61.17s
-- _Throughput:_ Prompt 320 TPS (16,916 tok); Gen 101 TPS (500 tok)
+- _Timing:_ Load 2.53s; Gen 57.21s; Total 59.96s
+- _Throughput:_ Prompt 328 TPS (16,916 tok); Gen 99.3 TPS (500 tok)
 - _Tokens:_ prompt 16916 tok; estimated text 444 tok; estimated non-text 16472
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
@@ -2394,79 +2500,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-qwen35-35b-a3b-6bit"></a>
-
-### ✅ mlx-community/Qwen3.5-35B-A3B-6bit
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); nontext prompt burden=97%; missing
-  sections: title, description, keywords; missing terms: style, calm, during,
-  receded, vast
-- _Score:_ ✅ B (77/100); Δ+15; Missing requested structure
-- _Review focus:_ watchlist (cutoff, missing sections)
-- _Timing:_ Load 3.13s; Gen 65.40s; Total 68.75s
-- _Throughput:_ Prompt 290 TPS (16,916 tok); Gen 79.5 TPS (500 tok)
-- _Tokens:_ prompt 16916 tok; estimated text 444 tok; estimated non-text 16472
-  tok; generated 500 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> The user wants me to generate cataloguing metadata for the provided image.
-> &#8203;I need to follow specific rules:
-> &#45; British English.
-> &#45; Only clearly visible details.
-> &#45; No guessing or inferring.
-> &#45; Three specific sections: Title, Description, Keywords.
-> &#45; Specific constraints on length and content for each section.
->
-> &#8203;&#42;&#42;Image Analysis:&#42;&#42;
-> &#45; &#42;&#42;Subject:&#42;&#42; A small sailboat. It looks like a classic wooden boat.
-> &#45; &#42;&#42;Hull:&#42;&#42; Dark (black or very dark blue/grey) with a white stripe near the
-> waterline and a wooden gunwale.
-> &#45; &#42;&#42;Mast:&#42;&#42; Wooden, tall, single mast.
-> &#45; &#42;&#42;Boom:&#42;&#42; Covered with a green sail cover (or possibly a green canvas
-> cover).
-> &#45; &#42;&#42;Rigging:&#42;&#42; White ropes/cables. A red bowsprit or jib boom extending
-> forward.
-> &#45; &#42;&#42;Flags:&#42;&#42; A string of bunting (small triangular flags) strung from the
-> mast to the bow/stern area. The flags are red, white, and blue.
-> &#45; &#42;&#42;Buoy:&#42;&#42; An orange buoy floating near the bow, attached by a rope.
-> &#45; &#42;&#42;Setting:&#42;&#42; A body of water (estuary or river). The tide is low, exposing
-> green mudflats covered in algae/seaweed.
-> &#45; &#42;&#42;Background:&#42;&#42; A grassy bank with trees. The trees are green, suggesting
-> spring or summer.
-> &#45; &#42;&#42;Lighting:&#42;&#42; Overcast, diffuse light. No harsh shadows.
-> &#45; &#42;&#42;Action:&#42;&#42; Moored, stationary.
->
-> &#8203;&#42;&#42;Drafting the Title:&#42;&#42;
-> &#45; Needs to be 5-10 words.
-> &#45; Concrete and factual.
-> &#45; &#42;Draft 1:&#42; A classic wooden sailboat moored in an estuary at low tide. (10
-> words) - Good.
-> &#45; &#42;Draft 2:&#42; Dark-hulled sailboat with green boom cover resting on mudflats.
-> (9 words) - Good.
-> &#45; &#42;Draft 3:&#42; Wooden mast sailboat with bunting moored near green mudflats.
-> (9 words) - Good.
-> &#45; Let's go with something descriptive of the main elements. "Classic wooden
-> sailboat moored in an estuary at low tide" is accurate. Or "Dark-hulled
-> sailboat with green boom cover resting on mudflats". Let's combine for
-> clarity.
-> &#45; &#42;Selected Title:&#42; Classic wooden sailboat moored in an estuary at low
-> tide.
->
-> &#42;&#42;
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-
----
-
 <a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
 
 ### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
@@ -2481,8 +2514,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Score:_ ❌ F (33/100); Δ-30; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, harness, long context,
   missing sections, repetitive)
-- _Timing:_ Load 0.55s; Gen 66.38s; Total 67.18s
-- _Throughput:_ Prompt 268 TPS (16,901 tok); Gen 192 TPS (500 tok)
+- _Timing:_ Load 0.60s; Gen 61.42s; Total 62.23s
+- _Throughput:_ Prompt 290 TPS (16,901 tok); Gen 195 TPS (500 tok)
 - _Tokens:_ prompt 16901 tok; estimated text 444 tok; estimated non-text 16457
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
@@ -2557,8 +2590,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Score:_ ✅ B (65/100); Δ+3; Missing requested structure
 - _Review focus:_ watchlist (cutoff, instruction echo, missing sections,
   reasoning leak)
-- _Timing:_ Load 1.44s; Gen 67.21s; Total 68.87s
-- _Throughput:_ Prompt 279 TPS (16,916 tok); Gen 84.4 TPS (500 tok)
+- _Timing:_ Load 1.37s; Gen 64.37s; Total 65.96s
+- _Throughput:_ Prompt 292 TPS (16,916 tok); Gen 86.9 TPS (500 tok)
 - _Tokens:_ prompt 16916 tok; estimated text 444 tok; estimated non-text 16472
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
@@ -2615,6 +2648,79 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-qwen35-35b-a3b-6bit"></a>
+
+### ✅ mlx-community/Qwen3.5-35B-A3B-6bit
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ hit token cap (500); nontext prompt burden=97%; missing
+  sections: title, description, keywords; missing terms: style, calm, during,
+  receded, vast
+- _Score:_ ✅ B (77/100); Δ+15; Missing requested structure
+- _Review focus:_ watchlist (cutoff, missing sections)
+- _Timing:_ Load 3.33s; Gen 66.85s; Total 70.44s
+- _Throughput:_ Prompt 282 TPS (16,916 tok); Gen 81.9 TPS (500 tok)
+- _Tokens:_ prompt 16916 tok; estimated text 444 tok; estimated non-text 16472
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> The user wants me to generate cataloguing metadata for the provided image.
+> &#8203;I need to follow specific rules:
+> &#45; British English.
+> &#45; Only clearly visible details.
+> &#45; No guessing or inferring.
+> &#45; Three specific sections: Title, Description, Keywords.
+> &#45; Specific constraints on length and content for each section.
+>
+> &#8203;&#42;&#42;Image Analysis:&#42;&#42;
+> &#45; &#42;&#42;Subject:&#42;&#42; A small sailboat. It looks like a classic wooden boat.
+> &#45; &#42;&#42;Hull:&#42;&#42; Dark (black or very dark blue/grey) with a white stripe near the
+> waterline and a wooden gunwale.
+> &#45; &#42;&#42;Mast:&#42;&#42; Wooden, tall, single mast.
+> &#45; &#42;&#42;Boom:&#42;&#42; Covered with a green sail cover (or possibly a green canvas
+> cover).
+> &#45; &#42;&#42;Rigging:&#42;&#42; White ropes/cables. A red bowsprit or jib boom extending
+> forward.
+> &#45; &#42;&#42;Flags:&#42;&#42; A string of bunting (small triangular flags) strung from the
+> mast to the bow/stern area. The flags are red, white, and blue.
+> &#45; &#42;&#42;Buoy:&#42;&#42; An orange buoy floating near the bow, attached by a rope.
+> &#45; &#42;&#42;Setting:&#42;&#42; A body of water (estuary or river). The tide is low, exposing
+> green mudflats covered in algae/seaweed.
+> &#45; &#42;&#42;Background:&#42;&#42; A grassy bank with trees. The trees are green, suggesting
+> spring or summer.
+> &#45; &#42;&#42;Lighting:&#42;&#42; Overcast, diffuse light. No harsh shadows.
+> &#45; &#42;&#42;Action:&#42;&#42; Moored, stationary.
+>
+> &#8203;&#42;&#42;Drafting the Title:&#42;&#42;
+> &#45; Needs to be 5-10 words.
+> &#45; Concrete and factual.
+> &#45; &#42;Draft 1:&#42; A classic wooden sailboat moored in an estuary at low tide. (10
+> words) - Good.
+> &#45; &#42;Draft 2:&#42; Dark-hulled sailboat with green boom cover resting on mudflats.
+> (9 words) - Good.
+> &#45; &#42;Draft 3:&#42; Wooden mast sailboat with bunting moored near green mudflats.
+> (9 words) - Good.
+> &#45; Let's go with something descriptive of the main elements. "Classic wooden
+> sailboat moored in an estuary at low tide" is accurate. Or "Dark-hulled
+> sailboat with green boom cover resting on mudflats". Let's combine for
+> clarity.
+> &#45; &#42;Selected Title:&#42; Classic wooden sailboat moored in an estuary at low
+> tide.
+>
+> &#42;&#42;
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+
+---
+
 <a id="model-mlx-community-gemma-4-31b-bf16"></a>
 
 ### ✅ mlx-community/gemma-4-31b-bf16
@@ -2627,8 +2733,8 @@ _Quality Status:_ no quality issues detected in this run
   keywords; missing terms: style, dark, hull, during, receded
 - _Score:_ ✅ B (77/100); Δ+14; Missing requested structure
 - _Review focus:_ watchlist (cutoff, missing sections)
-- _Timing:_ Load 6.95s; Gen 70.36s; Total 77.53s
-- _Throughput:_ Prompt 186 TPS (772 tok); Gen 7.6 TPS (500 tok)
+- _Timing:_ Load 6.15s; Gen 71.92s; Total 78.29s
+- _Throughput:_ Prompt 252 TPS (772 tok); Gen 7.3 TPS (500 tok)
 - _Tokens:_ prompt 772 tok; estimated text 444 tok; estimated non-text 328
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
@@ -2693,8 +2799,8 @@ _Quality Status:_ no quality issues detected in this run
   receded, exposing
 - _Score:_ ✅ B (74/100); Δ+11; Missing requested structure
 - _Review focus:_ watchlist (cutoff, missing sections)
-- _Timing:_ Load 9.96s; Gen 71.52s; Total 81.70s
-- _Throughput:_ Prompt 271 TPS (16,916 tok); Gen 60.0 TPS (500 tok)
+- _Timing:_ Load 8.39s; Gen 72.72s; Total 81.32s
+- _Throughput:_ Prompt 264 TPS (16,916 tok); Gen 63.0 TPS (500 tok)
 - _Tokens:_ prompt 16916 tok; estimated text 444 tok; estimated non-text 16472
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
@@ -2764,8 +2870,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Score:_ ✅ B (71/100); Δ+8; None identified
 - _Review focus:_ watchlist (metadata borrowing, missing sections, reasoning
   leak)
-- _Timing:_ Load 3.22s; Gen 77.22s; Total 80.65s
-- _Throughput:_ Prompt 1,054 TPS (1,516 tok); Gen 4.66 TPS (351 tok)
+- _Timing:_ Load 3.27s; Gen 75.96s; Total 79.45s
+- _Throughput:_ Prompt 1,055 TPS (1,516 tok); Gen 4.74 TPS (351 tok)
 - _Tokens:_ prompt 1516 tok; estimated text 444 tok; estimated non-text 1072
   tok; generated 351 tok; requested max 500 tok; stop reason completed
 
@@ -2823,8 +2929,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Score:_ 🟡 C (60/100); Δ-2; Missing requested structure
 - _Review focus:_ watchlist (cutoff, instruction echo, metadata borrowing,
   missing sections, reasoning leak, refusal)
-- _Timing:_ Load 2.19s; Gen 86.83s; Total 89.25s
-- _Throughput:_ Prompt 246 TPS (16,916 tok); Gen 28.9 TPS (500 tok)
+- _Timing:_ Load 2.18s; Gen 87.95s; Total 90.35s
+- _Throughput:_ Prompt 241 TPS (16,916 tok); Gen 29.4 TPS (500 tok)
 - _Tokens:_ prompt 16916 tok; estimated text 444 tok; estimated non-text 16472
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
@@ -2891,8 +2997,8 @@ _Quality Status:_ no quality issues detected in this run
   terms: classic, style, during, receded, exposing; keywords=20
 - _Score:_ 🏆 A (84/100); Δ+21; None identified
 - _Review focus:_ watchlist (metadata borrowing)
-- _Timing:_ Load 3.08s; Gen 102.60s; Total 105.96s
-- _Throughput:_ Prompt 230 TPS (16,916 tok); Gen 17.6 TPS (500 tok)
+- _Timing:_ Load 3.11s; Gen 101.04s; Total 104.38s
+- _Throughput:_ Prompt 234 TPS (16,916 tok); Gen 17.8 TPS (500 tok)
 - _Tokens:_ prompt 16916 tok; estimated text 444 tok; estimated non-text 16472
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
@@ -2962,8 +3068,8 @@ _Quality Status:_ no quality issues detected in this run
   terms: style, estuary, during, tide, receded; keywords=19
 - _Score:_ 🏆 A (84/100); Δ+22; None identified
 - _Review focus:_ watchlist (metadata borrowing)
-- _Timing:_ Load 3.07s; Gen 108.92s; Total 112.25s
-- _Throughput:_ Prompt 212 TPS (16,916 tok); Gen 17.6 TPS (500 tok)
+- _Timing:_ Load 3.10s; Gen 105.37s; Total 108.70s
+- _Throughput:_ Prompt 222 TPS (16,916 tok); Gen 17.5 TPS (500 tok)
 - _Tokens:_ prompt 16916 tok; estimated text 444 tok; estimated non-text 16472
   tok; generated 500 tok; requested max 500 tok; stop reason completed
 
