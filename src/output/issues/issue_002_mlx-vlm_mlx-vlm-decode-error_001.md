@@ -17,9 +17,9 @@
 
 | Model                                              | Representative Signal                                                | Token Context   | Repro JSON                                                                                                                                  |
 |----------------------------------------------------|----------------------------------------------------------------------|-----------------|---------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16` | instruction echo \| metadata borrowing \| hallucination              | stop=exception  | [repro JSON](../repro_bundles/20260508T121905Z_004_mlx-community_ERNIE-4.5-VL-28B-A3B-Thinking-bf16_MLX_VLM_DECODE_ERROR_c6f291b6246e.json) |
-| `mlx-community/LFM2-VL-1.6B-8bit`                  | Special control token &lt;\|im_end\|&gt; appeared in generated text. | stop=exception  | [repro JSON](../repro_bundles/20260508T121905Z_006_mlx-community_LFM2-VL-1.6B-8bit_MLX_VLM_DECODE_ERROR_94132d05282d.json)                  |
-| `mlx-community/LFM2.5-VL-1.6B-bf16`                | Special control token &lt;\|im_end\|&gt; appeared in generated text. | stop=exception  | [repro JSON](../repro_bundles/20260508T121905Z_007_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_VLM_DECODE_ERROR_0b3df5c094f3.json)                |
+| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16` | instruction echo \| metadata borrowing \| hallucination              | stop=exception  | [repro JSON](../repro_bundles/20260508T130439Z_004_mlx-community_ERNIE-4.5-VL-28B-A3B-Thinking-bf16_MLX_VLM_DECODE_ERROR_c6f291b6246e.json) |
+| `mlx-community/LFM2-VL-1.6B-8bit`                  | Special control token &lt;\|im_end\|&gt; appeared in generated text. | stop=exception  | [repro JSON](../repro_bundles/20260508T130439Z_006_mlx-community_LFM2-VL-1.6B-8bit_MLX_VLM_DECODE_ERROR_94132d05282d.json)                  |
+| `mlx-community/LFM2.5-VL-1.6B-bf16`                | Special control token &lt;\|im_end\|&gt; appeared in generated text. | stop=exception  | [repro JSON](../repro_bundles/20260508T130439Z_007_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_VLM_DECODE_ERROR_0b3df5c094f3.json)                |
 
 
 ## Minimal Evidence
@@ -40,9 +40,9 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 
 Repro bundles:
 
-- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: [repro JSON](../repro_bundles/20260508T121905Z_004_mlx-community_ERNIE-4.5-VL-28B-A3B-Thinking-bf16_MLX_VLM_DECODE_ERROR_c6f291b6246e.json)
-- `mlx-community/LFM2-VL-1.6B-8bit`: [repro JSON](../repro_bundles/20260508T121905Z_006_mlx-community_LFM2-VL-1.6B-8bit_MLX_VLM_DECODE_ERROR_94132d05282d.json)
-- `mlx-community/LFM2.5-VL-1.6B-bf16`: [repro JSON](../repro_bundles/20260508T121905Z_007_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_VLM_DECODE_ERROR_0b3df5c094f3.json)
+- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: [repro JSON](../repro_bundles/20260508T130439Z_004_mlx-community_ERNIE-4.5-VL-28B-A3B-Thinking-bf16_MLX_VLM_DECODE_ERROR_c6f291b6246e.json)
+- `mlx-community/LFM2-VL-1.6B-8bit`: [repro JSON](../repro_bundles/20260508T130439Z_006_mlx-community_LFM2-VL-1.6B-8bit_MLX_VLM_DECODE_ERROR_94132d05282d.json)
+- `mlx-community/LFM2.5-VL-1.6B-bf16`: [repro JSON](../repro_bundles/20260508T130439Z_007_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_VLM_DECODE_ERROR_0b3df5c094f3.json)
 - Note: these are local artifact links; attach or publish the JSON when filing upstream.
 
 Per-model failure reruns:
@@ -88,7 +88,7 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 | mlx-vlm         | 0.5.0                       |
 | mlx             | 0.32.0.dev20260508+a1c0b6f9 |
 | mlx-lm          | 0.31.3                      |
-| transformers    | 5.8.0                       |
+| transformers    | 5.8.0.dev0                  |
 | tokenizers      | 0.22.2                      |
 | huggingface-hub | 1.14.0                      |
 | Python Version  | 3.13.12                     |

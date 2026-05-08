@@ -17,7 +17,7 @@
 
 | Model                                                   | Representative Signal                                                                       | Token Context                                                               | Repro JSON                                                                                                                          |
 |---------------------------------------------------------|---------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 61 occurrences). | prompt=3,619 \| output/prompt=2.98% \| nontext burden=88% \| stop=completed | [repro JSON](../repro_bundles/20260508T121905Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) |
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 61 occurrences). | prompt=3,619 \| output/prompt=2.98% \| nontext burden=88% \| stop=completed | [repro JSON](../repro_bundles/20260508T130439Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) |
 
 
 ## Minimal Evidence
@@ -37,7 +37,7 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 
 Repro bundles:
 
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: [repro JSON](../repro_bundles/20260508T121905Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: [repro JSON](../repro_bundles/20260508T130439Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)
 - Note: these are local artifact links; attach or publish the JSON when filing upstream.
 
 
@@ -76,7 +76,7 @@ Repro bundles:
 | mlx-vlm         | 0.5.0                       |
 | mlx             | 0.32.0.dev20260508+a1c0b6f9 |
 | mlx-lm          | 0.31.3                      |
-| transformers    | 5.8.0                       |
+| transformers    | 5.8.0.dev0                  |
 | tokenizers      | 0.22.2                      |
 | huggingface-hub | 1.14.0                      |
 | Python Version  | 3.13.12                     |
