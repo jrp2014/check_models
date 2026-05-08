@@ -17,9 +17,9 @@
 
 | Model                                              | Representative Signal                                                | Token Context   | Repro JSON                                                                                                                                                                                            |
 |----------------------------------------------------|----------------------------------------------------------------------|-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16` | instruction echo \| metadata borrowing \| hallucination              | stop=exception  | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T130439Z_004_mlx-community_ERNIE-4.5-VL-28B-A3B-Thinking-bf16_MLX_VLM_DECODE_ERROR_c6f291b6246e.json) |
-| `mlx-community/LFM2-VL-1.6B-8bit`                  | Special control token &lt;\|im_end\|&gt; appeared in generated text. | stop=exception  | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T130439Z_006_mlx-community_LFM2-VL-1.6B-8bit_MLX_VLM_DECODE_ERROR_94132d05282d.json)                  |
-| `mlx-community/LFM2.5-VL-1.6B-bf16`                | Special control token &lt;\|im_end\|&gt; appeared in generated text. | stop=exception  | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T130439Z_007_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_VLM_DECODE_ERROR_0b3df5c094f3.json)                |
+| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16` | instruction echo \| metadata borrowing \| hallucination              | stop=exception  | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T211625Z_004_mlx-community_ERNIE-4.5-VL-28B-A3B-Thinking-bf16_MLX_VLM_DECODE_ERROR_c6f291b6246e.json) |
+| `mlx-community/LFM2-VL-1.6B-8bit`                  | Special control token &lt;\|im_end\|&gt; appeared in generated text. | stop=exception  | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T211625Z_006_mlx-community_LFM2-VL-1.6B-8bit_MLX_VLM_DECODE_ERROR_94132d05282d.json)                  |
+| `mlx-community/LFM2.5-VL-1.6B-bf16`                | Special control token &lt;\|im_end\|&gt; appeared in generated text. | stop=exception  | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T211625Z_007_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_VLM_DECODE_ERROR_0b3df5c094f3.json)                |
 
 
 ## Minimal Evidence
@@ -40,9 +40,9 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 
 Repro bundles:
 
-- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T130439Z_004_mlx-community_ERNIE-4.5-VL-28B-A3B-Thinking-bf16_MLX_VLM_DECODE_ERROR_c6f291b6246e.json)
-- `mlx-community/LFM2-VL-1.6B-8bit`: [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T130439Z_006_mlx-community_LFM2-VL-1.6B-8bit_MLX_VLM_DECODE_ERROR_94132d05282d.json)
-- `mlx-community/LFM2.5-VL-1.6B-bf16`: [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T130439Z_007_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_VLM_DECODE_ERROR_0b3df5c094f3.json)
+- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T211625Z_004_mlx-community_ERNIE-4.5-VL-28B-A3B-Thinking-bf16_MLX_VLM_DECODE_ERROR_c6f291b6246e.json)
+- `mlx-community/LFM2-VL-1.6B-8bit`: [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T211625Z_006_mlx-community_LFM2-VL-1.6B-8bit_MLX_VLM_DECODE_ERROR_94132d05282d.json)
+- `mlx-community/LFM2.5-VL-1.6B-bf16`: [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T211625Z_007_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_VLM_DECODE_ERROR_0b3df5c094f3.json)
 - Note: these links target the canonical GitHub copies of the JSON bundles; attach the file manually if this run has not been committed yet.
 
 Per-model failure reruns:

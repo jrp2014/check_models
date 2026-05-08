@@ -17,7 +17,7 @@
 
 | Model                  | Representative Signal                   | Token Context   | Repro JSON                                                                                                                                                                    |
 |------------------------|-----------------------------------------|-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `facebook/pe-av-large` | model error \| mlx vlm model load model | stop=exception  | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T130439Z_002_facebook_pe-av-large_MLX_VLM_MODEL_LOAD_MODEL_8b244da8c605.json) |
+| `facebook/pe-av-large` | model error \| mlx vlm model load model | stop=exception  | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T211625Z_002_facebook_pe-av-large_MLX_VLM_MODEL_LOAD_MODEL_8b244da8c605.json) |
 
 
 ## Minimal Evidence
@@ -36,7 +36,7 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 
 Repro bundles:
 
-- `facebook/pe-av-large`: [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T130439Z_002_facebook_pe-av-large_MLX_VLM_MODEL_LOAD_MODEL_8b244da8c605.json)
+- `facebook/pe-av-large`: [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T211625Z_002_facebook_pe-av-large_MLX_VLM_MODEL_LOAD_MODEL_8b244da8c605.json)
 - Note: these links target the canonical GitHub copies of the JSON bundles; attach the file manually if this run has not been committed yet.
 
 
