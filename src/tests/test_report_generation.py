@@ -3199,6 +3199,9 @@ class TestReproCommandNormalization:
     def test_check_models_repro_command_uses_shared_spec_path(self, tmp_path: Path) -> None:
         """Diagnostics and bundles should share canonical check_models command tokens."""
         image_path = tmp_path / "sample image.jpg"
+        adapter_path = tmp_path / "adapter"
+        quality_config_path = tmp_path / "quality.yaml"
+        custom_end_marker = "</done>"
         run_args = Namespace(
             image=image_path,
             folder=None,
@@ -3206,7 +3209,7 @@ class TestReproCommandNormalization:
             exclude=["org/skip"],
             trust_remote_code=True,
             revision="main",
-            adapter_path="/tmp/adapter",
+            adapter_path=adapter_path,
             prompt="Describe this.",
             detailed_metrics=True,
             lazy_load=True,
@@ -3230,7 +3233,7 @@ class TestReproCommandNormalization:
             prefill_step_size=512,
             thinking_budget=32,
             thinking_start_token=THINKING_START_TOKEN,
-            thinking_end_token="</done>",
+            thinking_end_token=custom_end_marker,
             kv_group_size=32,
             quantized_kv_start=128,
             timeout=33.0,
@@ -3238,7 +3241,7 @@ class TestReproCommandNormalization:
             no_color=True,
             force_color=False,
             width=100,
-            quality_config="/tmp/quality.yaml",
+            quality_config=quality_config_path,
             context_marker="Visible context:",
         )
 
@@ -3263,8 +3266,9 @@ class TestReproCommandNormalization:
     def test_native_mlx_vlm_cli_omits_non_cli_generate_kwargs(self, tmp_path: Path) -> None:
         """Native CLI repros should not invent upstream flags absent from mlx-vlm CLI."""
         image_path = tmp_path / "probe.png"
+        adapter_path = tmp_path / "adapter"
         run_args = Namespace(
-            adapter_path="/tmp/adapter",
+            adapter_path=adapter_path,
             resize_shape=(64, 32),
             eos_tokens=["</s>"],
             max_kv_size=4096,
