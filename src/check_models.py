@@ -1967,6 +1967,7 @@ def render_report_markdown(blocks: Sequence[object]) -> list[str]:
 
 def _render_report_html_block(block: object) -> list[str]:
     """Render one shared report block to escaped HTML lines."""
+    rendered: list[str]
     if isinstance(block, ReportSection):
         level = max(1, min(6, block.level))
         rendered = [f"<h{level}>{html.escape(block.title)}</h{level}>"]
@@ -2084,11 +2085,11 @@ def _render_html_stanza(stanza: ReportStanza) -> list[str]:
     """Render a reusable stanza as a heading paragraph plus HTML list."""
     if not stanza.rows:
         return []
-    blocks: list[object] = []
+    parts: list[str] = []
     if stanza.heading is not None:
-        blocks.append(ReportParagraph(stanza.heading))
-    blocks.append(ReportKeyValues(stanza.rows))
-    return render_report_html(blocks)
+        parts.append(f"<p><b>{html.escape(stanza.heading)}</b></p>")
+    parts.extend(render_report_html((ReportKeyValues(stanza.rows),)))
+    return parts
 
 
 @dataclass(frozen=True)
