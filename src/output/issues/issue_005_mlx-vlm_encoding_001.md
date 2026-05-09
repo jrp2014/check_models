@@ -12,15 +12,15 @@
 
 ## Affected Models
 
-| Model                                                   | Observed Behavior                                                                           | Token Counts                                                                | Optional Context                                                                                                                                                                                 |
-|---------------------------------------------------------|---------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 61 occurrences). | prompt=3,619 \| output/prompt=2.98% \| nontext burden=88% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) |
+| Model                                                   | Observed Behavior                          | Token Counts                                                                | Optional Context                                                                                                                                                                                 |
+|---------------------------------------------------------|--------------------------------------------|-----------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | 61 BPE space markers found in decoded text | prompt=3,619 \| output/prompt=2.98% \| nontext burden=88% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) |
 
 
 ## Minimal Evidence
 
 - `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 61 occurrences).
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: Output omitted required Title/Description/Keywords sections (description, keywords).
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: Model output may not follow prompt or image contents (missing: vast, expanse, adorned, small, floats).
 - Output excerpt: `Title:ĠClassicĠsailboatĠmooredĠinĠestuaryĊĊDescription:ĠAĠclassic-styleĠsailboatĠwithĠaĠdarkĠhullĠandĠwoodenĠmastĠisĠmooredĠinĠaĠcalmĠestuaryĠduringĠlowĠtide.ĠTheĠwaterĠhasĠreceded,ĠexposingĠgreen,Ġalgae-coveredĠmudflatsĠbehindĠtheĠvessel.ĊĊKeywords:Ġsailboat,ĠwoodenĠmast,ĠdarkĠhull,Ġestuary,ĠlowĠtide,Ġmudflats,Ġgre...`
 
 
@@ -183,6 +183,7 @@ Optional advanced context:
 Observed signals:
 
 - Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 61 occurrences).
+- Model output may not follow prompt or image contents (missing: vast, expanse, adorned, small, floats).
 - Output omitted required Title/Description/Keywords sections (description, keywords).
 
 Sample output:

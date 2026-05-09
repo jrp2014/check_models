@@ -9914,9 +9914,9 @@ def _maintainer_triage_for_result(
 def _maintainer_triage_evidence_text(triage: JsonlMaintainerTriageRecord) -> str | None:
     """Return human-readable evidence text for maintainer triage surfaces."""
     items = [
-        description
+        evidence
         for detail in triage["harness_details"][:2]
-        if (description := _describe_harness_detail(detail))
+        if (evidence := _evidence_harness_detail(detail))
     ]
     if not items:
         items = [_humanize_review_evidence_label(label) for label in triage["evidence"][:3]]
@@ -9948,6 +9948,49 @@ def _maintainer_triage_context_text(triage: JsonlMaintainerTriageRecord) -> str 
     return " | ".join(context_parts) if context_parts else None
 
 
+def _failure_triage_summary_text(result: PerformanceResult) -> str:
+    """Return the maintainer-facing summary for a runtime failure."""
+    source_message = result.root_error_message or result.error_message
+    summary = _simplify_failure_message(source_message, model_name=result.model_name)
+    if summary != "Unknown runtime failure.":
+        return summary
+    if result.failure_phase:
+        return f"Runtime failure during {result.failure_phase}."
+    if result.error_stage:
+        return f"Runtime failure at stage {result.error_stage}."
+    return summary
+
+
+def _failure_triage_evidence_text(result: PerformanceResult) -> str | None:
+    """Return supporting facts for a runtime failure triage row."""
+    parts: list[str] = []
+    if result.error_stage:
+        parts.append(f"stage={result.error_stage}")
+    if result.failure_phase:
+        parts.append(f"phase={result.failure_phase}")
+    if result.error_code:
+        parts.append(f"code={result.error_code}")
+    exception_type = result.root_error_type or result.error_type
+    if exception_type:
+        if result.root_error_module:
+            parts.append(f"type={result.root_error_module}.{exception_type}")
+        else:
+            parts.append(f"type={exception_type}")
+    return " | ".join(parts) if parts else None
+
+
+def _triage_text_fingerprint(text: str) -> str:
+    """Normalize triage text enough to detect repeated rows."""
+    return re.sub(r"\W+", " ", html.unescape(text).casefold()).strip()
+
+
+def _is_redundant_triage_evidence(*, summary: str, evidence: str) -> bool:
+    """Return whether an evidence row repeats the summary without adding facts."""
+    summary_key = _triage_text_fingerprint(summary)
+    evidence_key = _triage_text_fingerprint(evidence)
+    return bool(evidence_key and (evidence_key == summary_key or evidence_key in summary_key))
+
+
 def _build_maintainer_triage_rows(result: PerformanceResult) -> list[tuple[str, str]]:
     """Build compact human-readable maintainer triage rows for Markdown reports."""
     triage = _maintainer_triage_for_result(result)
@@ -9966,9 +10009,27 @@ def _build_maintainer_triage_rows(result: PerformanceResult) -> list[tuple[str, 
         ),
         ("Classification", classification),
     ]
-    if triage["summary"] and triage["summary"] != "no flagged signals":
-        rows.append(("Summary", triage["summary"]))
-    if evidence_text := _maintainer_triage_evidence_text(triage):
+
+    summary_text = (
+        _failure_triage_summary_text(result)
+        if triage["issue_kind"] == "runtime_failure"
+        else triage["summary"]
+    )
+    if summary_text and summary_text != "no flagged signals":
+        rows.append(("Summary", summary_text))
+
+    evidence_text = (
+        _failure_triage_evidence_text(result)
+        if triage["issue_kind"] == "runtime_failure"
+        else _maintainer_triage_evidence_text(triage)
+    )
+    if evidence_text and (
+        not summary_text
+        or not _is_redundant_triage_evidence(
+            summary=summary_text,
+            evidence=evidence_text,
+        )
+    ):
         rows.append(("Evidence", evidence_text))
     if context_text := _maintainer_triage_context_text(triage):
         rows.append(("Token context", context_text))
@@ -12528,7 +12589,7 @@ def _simplify_failure_message(error_message: str | None, *, model_name: str) -> 
     if not error_message:
         return "Unknown runtime failure."
 
-    message = error_message.split("\n")[0].strip()
+    message = _collapse_preview_whitespace(error_message.strip())
     prefixes = (
         f"Model generation failed for {model_name}: ",
         f"Model preflight failed for {model_name}: ",
@@ -12615,6 +12676,62 @@ def _describe_harness_detail(detail: str) -> str | None:
         leak_label = _TRAINING_LEAK_LABELS.get(leak_type, "instruction/template text")
         description = f"Generated text appears to continue into {leak_label}."
     return description
+
+
+def _evidence_token_encoding_detail(token_issue: str) -> str | None:
+    """Return fact-style evidence for tokenizer artifact detections."""
+    if match := re.fullmatch(r"bpe_space_leak\((\d+)\)", token_issue):
+        return f"{match.group(1)} BPE space markers found in decoded text"
+    if match := re.fullmatch(r"bpe_newline_leak\((\d+)\)", token_issue):
+        return f"{match.group(1)} BPE newline markers found in decoded text"
+    if match := re.fullmatch(r"bpe_byte_leak\((\d+)\)", token_issue):
+        return f"{match.group(1)} byte-level tokenizer markers found in decoded text"
+    return None
+
+
+def _evidence_output_detail(output_detail: str) -> str | None:
+    """Return fact-style evidence for output-length harness detections."""
+    if output_detail == "zero_tokens":
+        return "generated_tokens=0"
+    if match := re.fullmatch(r"truncated\((\d+)tok\)", output_detail):
+        return f"generated_tokens~{match.group(1)}"
+    if match := re.fullmatch(r"filler_response\((\d+)tok\)", output_detail):
+        return f"generic filler response, generated_tokens~{match.group(1)}"
+    if match := re.fullmatch(r"output_ratio\(([^)]+)\)", output_detail):
+        return f"output/prompt={match.group(1)}"
+    return None
+
+
+def _evidence_long_context_detail(detail: str) -> str | None:
+    """Return fact-style evidence for long-context harness detections."""
+    if match := re.fullmatch(r"long_context_empty\((\d+)tok\)", detail):
+        return f"prompt_tokens={match.group(1)}, output_tokens=0"
+    if match := re.fullmatch(r"long_context_low_ratio\(([^;]+);(\d+)->(\d+)\)", detail):
+        ratio_text, prompt_tok, output_tok = match.groups()
+        return f"prompt_tokens={prompt_tok}, output_tokens={output_tok}, output/prompt={ratio_text}"
+    if match := re.fullmatch(r"long_context_repetition\((\d+)tok\)", detail):
+        return f"prompt_tokens={match.group(1)}, repetitive output"
+    if match := re.fullmatch(r"long_context_context_drop\((\d+)tok\)", detail):
+        return f"prompt_tokens={match.group(1)}, prompt/image context dropped"
+    return None
+
+
+def _evidence_harness_detail(detail: str) -> str | None:
+    """Translate harness detail tokens into concise supporting facts."""
+    if detail.startswith("token_leak:"):
+        token = html.escape(detail.removeprefix("token_leak:"), quote=False)
+        return f"decoded text contains control token {token}"
+    if detail.startswith("token_encoding:"):
+        return _evidence_token_encoding_detail(detail.removeprefix("token_encoding:"))
+    if detail.startswith("output:"):
+        return _evidence_output_detail(detail.removeprefix("output:"))
+    if detail.startswith("long_context_"):
+        return _evidence_long_context_detail(detail)
+    if detail.startswith("training_leak:"):
+        leak_type = detail.removeprefix("training_leak:")
+        leak_label = _TRAINING_LEAK_LABELS.get(leak_type, "instruction/template text")
+        return f"decoded text continues into {leak_label}"
+    return None
 
 
 def _summarize_quality_signals(qa: GenerationQualityAnalysis | None) -> list[str]:
@@ -21459,6 +21576,9 @@ def _issue_model_signal(
     """Return the strongest per-model signal for an affected-model row."""
     if result.model_name in stack_symptoms:
         return stack_symptoms[result.model_name]
+    if not result.success:
+        source_message = result.root_error_message or result.error_message
+        return _simplify_failure_message(source_message, model_name=result.model_name)
     triage = _maintainer_triage_for_result(result)
     if triage is not None:
         if evidence_text := _maintainer_triage_evidence_text(triage):

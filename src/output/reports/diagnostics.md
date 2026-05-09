@@ -12,14 +12,14 @@ Root-cause issue drafts are generated in
 [issues/index.md](https://github.com/jrp2014/check_models/blob/main/src/output/issues/index.md).
 Each row is intended to become one focused upstream GitHub issue.
 
-| Target                                         | Problem                                                                                              | Evidence Snapshot                                                                                                                                                                                                                                                                              | Affected Models                                            | Issue Draft                                                                                                                                                              | Evidence Bundle                                                                                                                                                                                          | Fixed When                                                |
-|------------------------------------------------|------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
-| `mlx`                                          | Weight/config mismatch during model load                                                             | Model Error \| phase model_load \| ValueError \| 2 model cluster                                                                                                                                                                                                                               | 2: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` (+1)                 | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_001_mlx_mlx-model-load-model_001.md)                                             | [2 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_MLX_MODEL_LOAD_MODEL_853049863f38.json)                 | Load/generation completes or fails with a narrower owner. |
-| `mlx-vlm`                                      | mlx-vlm: Decode / runtime error: property 'text' of 'NaiveStreamingDetokenizer' object has no setter | Error \| phase decode \| AttributeError \| 3 model cluster                                                                                                                                                                                                                                     | 3: `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16` (+2) | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_002_mlx-vlm_mlx-vlm-decode-error_001.md)                                         | [3 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_004_mlx-community_ERNIE-4.5-VL-28B-A3B-Thinking-bf16_MLX_VLM_DECODE_ERROR_c6f291b6246e.json) | Load/generation completes or fails with a narrower owner. |
-| `mlx-vlm`                                      | Missing module/import during model load                                                              | Model Error \| phase model_load \| ValueError                                                                                                                                                                                                                                                  | 1: `facebook/pe-av-large`                                  | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_003_mlx-vlm_mlx-vlm-model-load-model_001.md)                                     | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_002_facebook_pe-av-large_MLX_VLM_MODEL_LOAD_MODEL_8b244da8c605.json)                            | Load/generation completes or fails with a narrower owner. |
-| model configuration / repository               | Processor config is missing image processor                                                          | Processor Error \| phase processor_load \| ValueError                                                                                                                                                                                                                                          | 1: `mlx-community/MolmoPoint-8B-fp16`                      | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_004_model-configuration-repository_model-config-processor-load-processor_001.md) | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_008_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json)             | Load/generation completes or fails with a narrower owner. |
-| `mlx-vlm`                                      | Tokenizer decode leaked BPE/byte markers                                                             | Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 61 occurrences). \| prompt=3,619 \| output/prompt=2.98% \| nontext burden=88% \| stop=completed                                                                                                                     | 1: `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_005_mlx-vlm_encoding_001.md)                                                     | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)            | No BPE/byte markers in output.                            |
-| mlx-vlm first; MLX if cache/runtime reproduces | Long-context generation collapsed or became too short                                                | Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt-handling issues. \| At long prompt length (16901 tokens), output stayed unusually short (11 tokens; ratio 0.1%). \| prompt=16,901 \| output/prompt=0.07% \| nontext burden=97% \| stop=completed | 1: `mlx-community/Qwen2-VL-2B-Instruct-4bit`               | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_006_mlx-vlm-mlx_long-context_001.md)                                             | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_009_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)                  | Full and reduced reruns avoid context collapse.           |
+| Target                                         | Problem                                                                                              | Evidence Snapshot                                                                                                                                               | Affected Models                                            | Issue Draft                                                                                                                                                              | Evidence Bundle                                                                                                                                                                                          | Fixed When                                                |
+|------------------------------------------------|------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
+| `mlx`                                          | Weight/config mismatch during model load                                                             | Model Error \| phase model_load \| ValueError \| 2 model cluster                                                                                                | 2: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` (+1)                 | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_001_mlx_mlx-model-load-model_001.md)                                             | [2 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_MLX_MODEL_LOAD_MODEL_853049863f38.json)                 | Load/generation completes or fails with a narrower owner. |
+| `mlx-vlm`                                      | mlx-vlm: Decode / runtime error: property 'text' of 'NaiveStreamingDetokenizer' object has no setter | Error \| phase decode \| AttributeError \| 3 model cluster                                                                                                      | 3: `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16` (+2) | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_002_mlx-vlm_mlx-vlm-decode-error_001.md)                                         | [3 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_004_mlx-community_ERNIE-4.5-VL-28B-A3B-Thinking-bf16_MLX_VLM_DECODE_ERROR_c6f291b6246e.json) | Load/generation completes or fails with a narrower owner. |
+| `mlx-vlm`                                      | Missing module/import during model load                                                              | Model Error \| phase model_load \| ValueError                                                                                                                   | 1: `facebook/pe-av-large`                                  | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_003_mlx-vlm_mlx-vlm-model-load-model_001.md)                                     | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_002_facebook_pe-av-large_MLX_VLM_MODEL_LOAD_MODEL_8b244da8c605.json)                            | Load/generation completes or fails with a narrower owner. |
+| model configuration / repository               | Processor config is missing image processor                                                          | Processor Error \| phase processor_load \| ValueError                                                                                                           | 1: `mlx-community/MolmoPoint-8B-fp16`                      | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_004_model-configuration-repository_model-config-processor-load-processor_001.md) | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_008_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json)             | Load/generation completes or fails with a narrower owner. |
+| `mlx-vlm`                                      | Tokenizer decode leaked BPE/byte markers                                                             | 61 BPE space markers found in decoded text \| prompt=3,619 \| output/prompt=2.98% \| nontext burden=88% \| stop=completed                                       | 1: `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_005_mlx-vlm_encoding_001.md)                                                     | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)            | No BPE/byte markers in output.                            |
+| mlx-vlm first; MLX if cache/runtime reproduces | Long-context generation collapsed or became too short                                                | output/prompt=0.1% \| prompt_tokens=16901, output_tokens=11, output/prompt=0.1% \| prompt=16,901 \| output/prompt=0.07% \| nontext burden=97% \| stop=completed | 1: `mlx-community/Qwen2-VL-2B-Instruct-4bit`               | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_006_mlx-vlm-mlx_long-context_001.md)                                             | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_009_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)                  | Full and reduced reruns avoid context collapse.           |
 
 ---
 
@@ -38,6 +38,8 @@ pasteable bodies; this diagnostics file is the compact run-level queue.
 ## 1. Failure affecting 2 models
 
 - _Observed:_ Model loading failed: Received 2 parameters not in model:
+  multi_modal_projector.layer_norm.bias,
+  multi_modal_projector.layer_norm.weight.
 - _Likely owner:_ `mlx`
 - _Why it matters:_ This prevented a complete model response; stage `Model
   Error`; phase `model_load`; code `MLX_MODEL_LOAD_MODEL`; type `ValueError`.
@@ -50,17 +52,20 @@ pasteable bodies; this diagnostics file is the compact run-level queue.
 
 - _Likely owner:_ mlx \| confidence=high
 - _Classification:_ runtime_failure \| MLX_MODEL_LOAD_MODEL
-- _Summary:_ model error \| mlx model load model
-- _Evidence:_ model error \| mlx model load model
+- _Summary:_ Received 2 parameters not in model:
+  multi_modal_projector.layer_norm.bias,
+  multi_modal_projector.layer_norm.weight.
+- _Evidence:_ stage=Model Error \| phase=model_load \|
+  code=MLX_MODEL_LOAD_MODEL \| type=builtins.ValueError
 - _Token context:_ stop=exception
 - _Next action:_ Compare checkpoint keys with the selected model class/config,
   especially projector scale/bias parameters and quantized weight naming,
   before judging model quality.
 
-| Model                                     | Observed Behavior                                         | First Seen Failing      | Recent Repro           |
-|-------------------------------------------|-----------------------------------------------------------|-------------------------|------------------------|
-| `LiquidAI/LFM2.5-VL-450M-MLX-bf16`        | Model loading failed: Received 2 parameters not in model: | 2026-05-04 20:21:24 BST | 3/3 recent runs failed |
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | Model loading failed: Received 4 parameters not in model: | 2026-02-08 22:32:28 GMT | 3/3 recent runs failed |
+| Model                                     | Observed Behavior                                                                                                                                                                                                     | First Seen Failing      | Recent Repro           |
+|-------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------|------------------------|
+| `LiquidAI/LFM2.5-VL-450M-MLX-bf16`        | Model loading failed: Received 2 parameters not in model: multi_modal_projector.layer_norm.bias, multi_modal_projector.layer_norm.weight.                                                                             | 2026-05-04 20:21:24 BST | 3/3 recent runs failed |
+| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | Model loading failed: Received 4 parameters not in model: multi_modal_projector.linear_1.biases, multi_modal_projector.linear_1.scales, multi_modal_projector.linear_2.biases, multi_modal_projector.linear_2.scales. | 2026-02-08 22:32:28 GMT | 3/3 recent runs failed |
 
 ### To reproduce
 
@@ -83,8 +88,10 @@ pasteable bodies; this diagnostics file is the compact run-level queue.
 
 - _Likely owner:_ mlx-vlm \| confidence=high
 - _Classification:_ runtime_failure \| MLX_VLM_MODEL_LOAD_MODEL
-- _Summary:_ model error \| mlx vlm model load model
-- _Evidence:_ model error \| mlx vlm model load model
+- _Summary:_ Model type pe_audio_video not supported. Error: No module named
+  'mlx_vlm.speculative.drafters.pe_audio_video'
+- _Evidence:_ stage=Model Error \| phase=model_load \|
+  code=MLX_VLM_MODEL_LOAD_MODEL \| type=builtins.ValueError
 - _Token context:_ stop=exception
 - _Next action:_ Inspect the import path and installed package version that
   owns the missing module before treating this as a model failure.
@@ -112,14 +119,15 @@ pasteable bodies; this diagnostics file is the compact run-level queue.
 
 **Representative maintainer triage:**
 
-- _Likely owner:_ model \| confidence=high
-- _Classification:_ model_shortcoming \| MLX_VLM_DECODE_ERROR
-- _Summary:_ keywords=37 \| context echo=100% \| nonvisual metadata reused \|
-  reasoning leak
-- _Evidence:_ instruction echo \| metadata borrowing \| hallucination
+- _Likely owner:_ mlx-vlm \| confidence=high
+- _Classification:_ runtime_failure \| MLX_VLM_DECODE_ERROR
+- _Summary:_ property 'text' of 'NaiveStreamingDetokenizer' object has no
+  setter
+- _Evidence:_ stage=Error \| phase=decode \| code=MLX_VLM_DECODE_ERROR \|
+  type=builtins.AttributeError
 - _Token context:_ stop=exception
-- _Next action:_ Treat as a model-quality limitation for this prompt and
-  image.
+- _Next action:_ Inspect prompt-template, stop-token, and decode
+  post-processing behavior.
 
 | Model                                              | Observed Behavior                                                                                                                                               | First Seen Failing      | Recent Repro           |
 |----------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------|------------------------|
@@ -145,14 +153,14 @@ pasteable bodies; this diagnostics file is the compact run-level queue.
 **Representative maintainer triage:**
 
 - _Likely owner:_ mlx-vlm \| confidence=high
-- _Classification:_ harness \| stop_token
-- _Summary:_ Special control token &lt;\|im_end\|&gt; appeared in generated
-  text. \| keywords=36 \| context echo=100% \| nonvisual metadata reused
-- _Evidence:_ Special control token &lt;\|im_end\|&gt; appeared in generated
-  text.
+- _Classification:_ runtime_failure \| MLX_VLM_DECODE_ERROR
+- _Summary:_ property 'text' of 'NaiveStreamingDetokenizer' object has no
+  setter
+- _Evidence:_ stage=Error \| phase=decode \| code=MLX_VLM_DECODE_ERROR \|
+  type=builtins.AttributeError
 - _Token context:_ stop=exception
-- _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
-  into user-facing text.
+- _Next action:_ Inspect prompt-template, stop-token, and decode
+  post-processing behavior.
 
 | Model                             | Observed Behavior                                                                                                                              | First Seen Failing      | Recent Repro           |
 |-----------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------|------------------------|
@@ -178,14 +186,14 @@ pasteable bodies; this diagnostics file is the compact run-level queue.
 **Representative maintainer triage:**
 
 - _Likely owner:_ mlx-vlm \| confidence=high
-- _Classification:_ harness \| stop_token
-- _Summary:_ Special control token &lt;\|im_end\|&gt; appeared in generated
-  text. \| keywords=36 \| context echo=100% \| nonvisual metadata reused
-- _Evidence:_ Special control token &lt;\|im_end\|&gt; appeared in generated
-  text.
+- _Classification:_ runtime_failure \| MLX_VLM_DECODE_ERROR
+- _Summary:_ property 'text' of 'NaiveStreamingDetokenizer' object has no
+  setter
+- _Evidence:_ stage=Error \| phase=decode \| code=MLX_VLM_DECODE_ERROR \|
+  type=builtins.AttributeError
 - _Token context:_ stop=exception
-- _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
-  into user-facing text.
+- _Next action:_ Inspect prompt-template, stop-token, and decode
+  post-processing behavior.
 
 | Model                               | Observed Behavior                                                                                                                                | First Seen Failing      | Recent Repro           |
 |-------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------|------------------------|
@@ -212,8 +220,10 @@ pasteable bodies; this diagnostics file is the compact run-level queue.
 
 - _Likely owner:_ model-config \| confidence=high
 - _Classification:_ runtime_failure \| MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR
-- _Summary:_ processor error \| model config processor load processor
-- _Evidence:_ processor error \| model config processor load processor
+- _Summary:_ Loaded processor has no image_processor; expected multimodal
+  processor.
+- _Evidence:_ stage=Processor Error \| phase=processor_load \|
+  code=MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR \| type=builtins.ValueError
 - _Token context:_ stop=exception
 - _Next action:_ Inspect the model repo processor/preprocessor config and
   AutoProcessor mapping; the multimodal processor is missing or not exposing
@@ -257,8 +267,7 @@ point to stack/runtime behavior rather than inherent model quality limits.
   output (about 61 occurrences). \| nontext prompt burden=88% \| missing
   sections: description, keywords \| missing terms: vast, expanse, adorned,
   small, floats
-- _Evidence:_ Tokenizer space-marker artifacts (for example Ġ) appeared in
-  output (about 61 occurrences).
+- _Evidence:_ 61 BPE space markers found in decoded text
 - _Token context:_ prompt=3,619 \| output/prompt=2.98% \| nontext burden=88%
   \| stop=completed
 - _Next action:_ Inspect decode cleanup; tokenizer markers are leaking into
@@ -267,6 +276,7 @@ point to stack/runtime behavior rather than inherent model quality limits.
 **Why this appears to be an integration/runtime issue:**
 
 - Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 61 occurrences).
+- Model output may not follow prompt or image contents (missing: vast, expanse, adorned, small, floats).
 - Output omitted required Title/Description/Keywords sections (description, keywords).
 
 **Sample output:**
@@ -293,9 +303,8 @@ Title:ĠClassicĠsailboatĠmooredĠinĠestuaryĊĊDescription:ĠAĠclassic-style
   possible early-stop or prompt-handling issues. \| At long prompt length
   (16901 tokens), output stayed unusually short (11 tokens; ratio 0.1%). \|
   output/prompt=0.07% \| nontext prompt burden=97%
-- _Evidence:_ Output is very short relative to prompt size (0.1%), suggesting
-  possible early-stop or prompt-handling issues. \| At long prompt length
-  (16901 tokens), output stayed unusually short (11 tokens; ratio 0.1%).
+- _Evidence:_ output/prompt=0.1% \| prompt_tokens=16901, output_tokens=11,
+  output/prompt=0.1%
 - _Token context:_ prompt=16,901 \| output/prompt=0.07% \| nontext burden=97%
   \| stop=completed
 - _Next action:_ Treat this as a prompt-budget issue first; nontext prompt
@@ -344,8 +353,8 @@ model appears).
 - **Total model runtime (sum):** 1249.93s (1249.93s)
 - **Average runtime per model:** 22.73s (22.73s)
 - **Dominant runtime phase:** upstream prefill / first-token dominated 16/55 measured model runs (52% of tracked runtime).
-- **Phase totals:** model load=107.42s, local prompt prep=0.16s, upstream prefill / first-token=641.95s, post-prefill decode=481.52s, generation total (unsplit)=3.70s, cleanup=6.02s
-- **Generation total:** 1127.17s across 51 model(s); upstream prefill / first-token split available for 48/51 model(s).
+- **Phase totals:** model load=107.42s, local prompt prep=0.16s, upstream prefill / first-token=641.95s, post-prefill decode=481.53s, generation total (unsplit)=3.70s, cleanup=6.02s
+- **Generation total:** 1127.18s across 51 model(s); upstream prefill / first-token split available for 48/51 model(s).
 - **Observed stop reasons:** completed=29, exception=7, max_tokens=19
 - **Validation overhead:** 11.28s total (avg 0.21s across 55 model(s)).
 - **Upstream prefill / first-token latency:** Avg 13.37s | Min 0.08s | Max 104.99s across 48 model(s).
@@ -360,8 +369,8 @@ These models completed without diagnostics flags (no hard failure, harness
 warning, or stack-signal anomaly). The detailed per-model rows remain in the
 generated results and review reports.
 
-- **Clean output:** 7 model(s).
-- **Ran, but with quality warnings:** 39 model(s).
+- **Clean output:** 11 model(s).
+- **Ran, but with quality warnings:** 35 model(s).
 
 ## Reproducibility
 
@@ -385,7 +394,7 @@ Repro bundles with prompt traces and environment details are available in [repro
 - Input image: `/Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-05-09 12:23:02 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-05-09 19:01:23 BST by [check_models](https://github.com/jrp2014/check_models)._
 
 ---
 

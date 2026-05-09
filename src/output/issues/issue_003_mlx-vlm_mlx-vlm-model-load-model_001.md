@@ -12,9 +12,9 @@
 
 ## Affected Models
 
-| Model                  | Observed Behavior                       | Token Counts   | Optional Context                                                                                                                                                                 |
-|------------------------|-----------------------------------------|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `facebook/pe-av-large` | model error \| mlx vlm model load model | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_002_facebook_pe-av-large_MLX_VLM_MODEL_LOAD_MODEL_8b244da8c605.json) |
+| Model                  | Observed Behavior                                                                                                    | Token Counts   | Optional Context                                                                                                                                                                 |
+|------------------------|----------------------------------------------------------------------------------------------------------------------|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `facebook/pe-av-large` | Model type pe_audio_video not supported. Error: No module named 'mlx_vlm.speculative.drafters.pe_audio_video'        | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_002_facebook_pe-av-large_MLX_VLM_MODEL_LOAD_MODEL_8b244da8c605.json) |
 
 
 ## Minimal Evidence
@@ -202,4 +202,3 @@ The above exception was the direct cause of the following exception:
 Traceback (most recent call last):
 ValueError: Model loading failed: Model type pe_audio_video not supported. Error: No module named 'mlx_vlm.speculative.drafters.pe_audio_video'
 ```
-

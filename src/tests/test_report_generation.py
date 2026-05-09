@@ -1438,6 +1438,65 @@ class TestDiagnosticsReport:
         assert content.index("## Issue Queue") < content.index("## Environment")
         assert content.index("## Reproducibility") < content.index("## Environment")
 
+    def test_failure_observed_behavior_keeps_multiline_error_details(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Diagnostics should keep actionable details from multiline load errors."""
+        out = tmp_path / "diag.md"
+        generate_diagnostics_report(
+            results=[
+                _make_failure_with_details(
+                    error_msg=(
+                        "Model loading failed: Received 2 parameters not in model:\n"
+                        "multi_modal_projector.layer_norm.bias,\n"
+                        "multi_modal_projector.layer_norm.weight."
+                    ),
+                    error_type="ValueError",
+                    error_stage="Model Error",
+                    failure_phase="model_load",
+                )
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+        content = out.read_text(encoding="utf-8")
+        assert (
+            "Received 2 parameters not in model: multi_modal_projector.layer_norm.bias,"
+        ) in content
+        assert "multi_modal_projector.layer_norm.weight." in content
+
+    def test_maintainer_triage_summary_and_evidence_are_distinct(self) -> None:
+        """Summary should describe the problem while evidence gives supporting facts."""
+        failure = _make_failure_with_details(
+            error_msg=(
+                "Model loading failed: Received 2 parameters not in model:\n"
+                "multi_modal_projector.layer_norm.bias,\n"
+                "multi_modal_projector.layer_norm.weight."
+            ),
+            error_type="ValueError",
+            error_stage="Model Error",
+            failure_phase="model_load",
+        )
+        failure_rows = dict(check_models._build_maintainer_triage_rows(failure))
+        assert "Received 2 parameters not in model" in failure_rows["Summary"]
+        assert "phase=model_load" in failure_rows["Evidence"]
+        assert failure_rows["Summary"] != failure_rows["Evidence"]
+
+        harness = _make_harness_success(
+            text="Title:ĠClassicĠsailboat",
+            prompt_tokens=3619,
+            generation_tokens=108,
+            harness_type="encoding",
+            harness_detail="token_encoding:bpe_space_leak(61)",
+        )
+        harness_rows = dict(check_models._build_maintainer_triage_rows(harness))
+        assert "Tokenizer space-marker artifacts" in harness_rows["Summary"]
+        assert "61 BPE space markers found in decoded text" in harness_rows["Evidence"]
+        assert harness_rows["Summary"] != harness_rows["Evidence"]
+
     def test_report_stamp_is_not_setext_heading(self, tmp_path: Path) -> None:
         """Report stamp must be separated from the next horizontal rule."""
         out = tmp_path / "diag.md"
@@ -3216,6 +3275,57 @@ class TestGithubIssueReportContent:
         assert "Evidence Snapshot" in index
         assert "Model Error" in index
         assert "RuntimeError" in index
+
+    def test_issue_affected_models_use_failure_message_not_generic_evidence(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Issue affected-model rows should show the actionable runtime error."""
+        failed_result = PerformanceResult(
+            model_name="org/broken-model",
+            generation=None,
+            success=False,
+            error_message=(
+                "Model loading failed: Received 2 parameters not in model:\n"
+                "multi_modal_projector.layer_norm.bias,\n"
+                "multi_modal_projector.layer_norm.weight."
+            ),
+            root_error_message=(
+                "Received 2 parameters not in model:\n"
+                "multi_modal_projector.layer_norm.bias,\n"
+                "multi_modal_projector.layer_norm.weight."
+            ),
+            root_error_type="ValueError",
+            root_error_module="builtins",
+            error_stage="Model Error",
+            error_code="MLX_MODEL_LOAD_MODEL",
+            error_package="mlx",
+            error_signature="MLX_MODEL_LOAD_MODEL:abc123",
+            error_traceback="Traceback (most recent call last):\nValueError: shape mismatch",
+            total_time=0.5,
+        )
+        snapshot = DiagnosticsSnapshot(
+            failed=(failed_result,),
+            failure_clusters=(("MLX_MODEL_LOAD_MODEL:abc123", (failed_result,)),),
+        )
+
+        generated = _generate_github_issue_reports(
+            diagnostics_snapshot=snapshot,
+            output_dir=tmp_path,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            repro_bundles={},
+            run_args=None,
+        )
+
+        content = next(iter(generated.values())).read_text(encoding="utf-8")
+        affected_models = _extract_markdown_subsection(
+            content,
+            "## Affected Models",
+            end_headings=["## Minimal Evidence"],
+        )
+        assert "multi_modal_projector.layer_norm.bias" in affected_models
+        assert "model error | mlx model load model" not in affected_models
 
     def test_issue_traceback_omits_local_check_models_frames(self, tmp_path: Path) -> None:
         """Issue draft tracebacks should start at upstream frames when local wrappers exist."""

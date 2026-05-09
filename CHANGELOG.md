@@ -15,6 +15,9 @@ Notable changes to this project will be documented in this file.
 - Make `diagnostics.md` a compact pasteable run-level issue body by enriching
   the issue queue with inline evidence snapshots while moving verbose trace,
   prompt, and portable-probe detail to issue drafts and repro bundles.
+- Focus diagnostics and issue-draft triage rows by preserving multiline
+  runtime error details and rendering evidence as concrete supporting facts
+  instead of repeating summary prose.
 - Add run-context headers to `issues/index.md` so the issue queue is useful as
   a standalone launchpad.
 - Align the MLX-VLM integration with `mlx-vlm` 0.5.0 by exposing the image-relevant

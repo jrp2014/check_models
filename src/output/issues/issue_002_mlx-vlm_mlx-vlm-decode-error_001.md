@@ -12,11 +12,11 @@
 
 ## Affected Models
 
-| Model                                              | Observed Behavior                                                    | Token Counts   | Optional Context                                                                                                                                                                                         |
-|----------------------------------------------------|----------------------------------------------------------------------|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16` | instruction echo \| metadata borrowing \| hallucination              | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_004_mlx-community_ERNIE-4.5-VL-28B-A3B-Thinking-bf16_MLX_VLM_DECODE_ERROR_c6f291b6246e.json) |
-| `mlx-community/LFM2-VL-1.6B-8bit`                  | Special control token &lt;\|im_end\|&gt; appeared in generated text. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_006_mlx-community_LFM2-VL-1.6B-8bit_MLX_VLM_DECODE_ERROR_94132d05282d.json)                  |
-| `mlx-community/LFM2.5-VL-1.6B-bf16`                | Special control token &lt;\|im_end\|&gt; appeared in generated text. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_007_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_VLM_DECODE_ERROR_0b3df5c094f3.json)                |
+| Model                                              | Observed Behavior                                                       | Token Counts   | Optional Context                                                                                                                                                                                         |
+|----------------------------------------------------|-------------------------------------------------------------------------|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16` | property 'text' of 'NaiveStreamingDetokenizer' object has no setter     | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_004_mlx-community_ERNIE-4.5-VL-28B-A3B-Thinking-bf16_MLX_VLM_DECODE_ERROR_c6f291b6246e.json) |
+| `mlx-community/LFM2-VL-1.6B-8bit`                  | property 'text' of 'NaiveStreamingDetokenizer' object has no setter     | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_006_mlx-community_LFM2-VL-1.6B-8bit_MLX_VLM_DECODE_ERROR_94132d05282d.json)                  |
+| `mlx-community/LFM2.5-VL-1.6B-bf16`                | property 'text' of 'NaiveStreamingDetokenizer' object has no setter     | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_007_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_VLM_DECODE_ERROR_0b3df5c094f3.json)                |
 
 
 ## Minimal Evidence
@@ -324,4 +324,3 @@ The above exception was the direct cause of the following exception:
 Traceback (most recent call last):
 ValueError: Model runtime error during generation for mlx-community/LFM2.5-VL-1.6B-bf16: property 'text' of 'NaiveStreamingDetokenizer' object has no setter
 ```
-
