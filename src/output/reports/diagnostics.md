@@ -386,6 +386,7 @@ Repro bundles with prompt traces and environment details are available in [repro
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
 _Report generated on 2026-05-09 12:23:02 BST by [check_models](https://github.com/jrp2014/check_models)._
+
 ---
 
 ## Environment
@@ -406,4 +407,3 @@ _Report generated on 2026-05-09 12:23:02 BST by [check_models](https://github.co
 | GPU Cores       | 40                          |
 | Metal Support   | Metal 4                     |
 | RAM             | 128.0 GB                    |
-

@@ -1438,6 +1438,21 @@ class TestDiagnosticsReport:
         assert content.index("## Issue Queue") < content.index("## Environment")
         assert content.index("## Reproducibility") < content.index("## Environment")
 
+    def test_report_stamp_is_not_setext_heading(self, tmp_path: Path) -> None:
+        """Report stamp must be separated from the next horizontal rule."""
+        out = tmp_path / "diag.md"
+        generate_diagnostics_report(
+            results=[_make_failure_with_details()],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+        content = out.read_text(encoding="utf-8")
+        report_tail = content.split("_Report generated on ", maxsplit=1)[1]
+        assert ")._\n\n---\n\n## Environment" in report_tail
+        assert ")._\n---\n\n## Environment" not in report_tail
+
     def test_action_summary_and_repro_pointers_present(self, tmp_path: Path) -> None:
         """Diagnostics should include compact action triage and repro pointers."""
         out = tmp_path / "diag.md"

@@ -14034,6 +14034,7 @@ def _diagnostics_footer(
     parts.append(
         f"_Report generated on {local_now_str()} by [check_models]({_GITHUB_REPO_URL})._",
     )
+    parts.append("")
 
     return parts
 
