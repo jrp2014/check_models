@@ -2,14 +2,15 @@
   "environment": {
     "library_versions": {
       "Pillow": "12.2.0",
-      "huggingface-hub": "1.13.0",
-      "mlx": "0.32.0.dev20260502+e8ebdebe",
+      "huggingface-hub": "1.14.0",
+      "mlx": "0.32.0.dev20260509+84961223",
+      "mlx-audio": "0.4.3",
       "mlx-lm": "0.31.3",
       "mlx-metal": null,
-      "mlx-vlm": "0.4.5",
+      "mlx-vlm": "0.5.0",
       "numpy": "2.4.4",
       "tokenizers": "0.22.2",
-      "transformers": "5.7.0"
+      "transformers": "5.8.0"
     },
     "platform": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
     "preflight_issues": [],
@@ -41,9 +42,9 @@
     "traceback": null,
     "type": null
   },
-  "generated_at_utc": "2026-05-03T01:16:09+00:00",
+  "generated_at_utc": "2026-05-09T11:23:02+00:00",
   "issue_cluster_id": "mlx-vlm-mlx_long-context_001",
-  "model": "mlx-community/X-Reasoner-7B-8bit",
+  "model": "mlx-community/Qwen2-VL-2B-Instruct-4bit",
   "repro": {
     "args": {
       "_check_models_preflight_issues": [],
@@ -60,6 +61,7 @@
       ],
       "folder": "/Users/jrp/Pictures/Processed",
       "force_color": false,
+      "force_download": false,
       "image": null,
       "kv_bits": null,
       "kv_group_size": 64,
@@ -84,6 +86,7 @@
       "prompt": null,
       "prune_repro_days": 90,
       "quality_config": null,
+      "quantize_activations": false,
       "quantized_kv_start": 5000,
       "repetition_context_size": 20,
       "repetition_penalty": null,
@@ -102,13 +105,13 @@
       "verbose": true,
       "width": null
     },
-    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260502-152439_DSC09840.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/X-Reasoner-7B-8bit",
+    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen2-VL-2B-Instruct-4bit",
     "env_vars": {
       "TOKENIZERS_PARALLELISM": "false"
     },
-    "image_path": "/Users/jrp/Pictures/Processed/20260502-152439_DSC09840.jpg",
-    "image_ref_sha256": "c9b1cebc8e500e110999e601c16ea54efa1252b1390c5e0b3150775ab7a95800",
-    "image_sha256": "1ad160dd553b961f2ef45d142bbe753f79da080713cb9c1a07744f12981fdb39",
+    "image_path": "/Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg",
+    "image_ref_sha256": "cfb4673ee4d7e2c5d8eed2cb9fe849e997df799d7287b932129c40a464252acf",
+    "image_sha256": "ed3baed59aed7c13bc807010bcccae7dbc2c052b1637dc37a6110f82a676e2b4",
     "prompt_diagnostics": {
       "eos_token": "<|im_end|>",
       "eos_token_id": 151645,
@@ -126,61 +129,83 @@
         "top_p": 1.0
       },
       "image_placeholder_count": 0,
-      "model_type": "qwen2_5_vl",
-      "processor_class": "mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor",
-      "rendered_prompt_chars": 2533,
-      "rendered_prompt_hash_sha256": "c3b0affc45b450b62583abcce01cee7989f681c7bfea832ab140370870b42a15",
-      "rendered_prompt_preview": "<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\n<|vision_start|><|image_pad|><|vision_end|>Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do...",
+      "model_type": "qwen2_vl",
+      "processor_class": "mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor",
+      "rendered_prompt_chars": 2345,
+      "rendered_prompt_hash_sha256": "3ede820f1f154567211b1dd8be7284f200de58d01c9f2cbdcdd3f5a23d2950b7",
+      "rendered_prompt_preview": "<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\nAnalyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instruction...",
       "special_token_ids": [
         151645,
-        151643
+        151643,
+        151644,
+        151646,
+        151647,
+        151648,
+        151649,
+        151650,
+        151651,
+        151652,
+        151653,
+        151654,
+        151655,
+        151656
       ],
       "special_tokens": [
         "<|im_end|>",
-        "<|endoftext|>"
+        "<|endoftext|>",
+        "<|im_start|>",
+        "<|object_ref_start|>",
+        "<|object_ref_end|>",
+        "<|box_start|>",
+        "<|box_end|>",
+        "<|quad_start|>",
+        "<|quad_end|>",
+        "<|vision_start|>",
+        "<|vision_end|>",
+        "<|vision_pad|>",
+        "<|image_pad|>",
+        "<|video_pad|>"
       ],
       "tokenizer_class": "transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer"
     },
-    "prompt_hash_sha256": "0802768f3e94f1c5038f1d55b934088c18efff77400777403332028a41ecf334",
+    "prompt_hash_sha256": "4a1f03d684eed33f32edd69e60de6697a143191cc453889223fbf1471468d72c",
     "prompt_preview": "Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct any...",
-    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260502-152439_DSC09840.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/X-Reasoner-7B-8bit",
+    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen2-VL-2B-Instruct-4bit",
     "seed": null
   },
   "result": {
-    "generated_text_preview": "Title:\nWoodbridge Tide Mill Museum at low tide\n\nDescription:\nA long boat covered with a black tarp lies on the muddy riverbed at low tide, with a historic white building labeled \"Tide Mill Museum\" in the background. A few people are seated on benches near the building under a bright blue sky with scattered clouds.\n\nKeywords:\nWoodbridge, Tide Mill Museum, River Deben, Low tide, Muddy riverbed, Blac...",
+    "generated_text_preview": "Boat, boat, boat, boat, boat",
     "maintainer_triage": {
       "confidence": "high",
       "evidence": [
-        "token_cap",
-        "repetitive_tail",
-        "abrupt_tail",
-        "trusted_overlap",
-        "metadata_terms"
+        "long_context",
+        "nontext_prompt_burden",
+        "low_hint_overlap"
       ],
       "harness_details": [
-        "long_context_repetition(16794tok)"
+        "output:output_ratio(0.1%)",
+        "long_context_low_ratio(0.1%;16901->11)"
       ],
-      "hit_max_tokens": true,
-      "issue_kind": "cutoff_degraded",
+      "hit_max_tokens": false,
+      "issue_kind": "context_budget",
       "issue_subtype": "long_context",
-      "next_action": "Inspect long-context cache behavior under heavy image-token burden.",
-      "nontext_prompt_ratio": 0.9713588186256996,
-      "prompt_output_ratio": 0.02977253781112302,
-      "prompt_tokens_total": 16794,
+      "next_action": "Treat this as a prompt-budget issue first; nontext prompt burden is 97% and the output stays weak under that load.",
+      "nontext_prompt_ratio": 0.9737293651263239,
+      "prompt_output_ratio": 0.0006508490621856695,
+      "prompt_tokens_total": 16901,
       "requested_max_tokens": 500,
       "stop_reason": "completed",
-      "summary": "At long prompt length (16794 tokens), output became repetitive. | hit token cap (500) | nontext prompt burden=97% | missing terms: Bench, English countryside, Moored, Mudflats, Objects",
+      "summary": "Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt-handling issues. | At long prompt length (16901 tokens), output stayed unusually short (11 tokens; ratio 0.1%). | output/prompt=0.07% | nontext prompt burden=97%",
       "suspected_owner": "mlx",
-      "user_bucket": "avoid"
+      "user_bucket": "caveat"
     },
     "quality_issues": [
       "\u26a0\ufe0fharness(long_context)",
       "long-context",
-      "repetitive(phrase: \"solar energy in museums,...\")",
-      "keyword-count(94)",
-      "keyword-duplication(0.68)",
-      "metadata-borrowing",
-      "cutoff"
+      "missing-sections(title+description+keywords)",
+      "trusted-hints-ignored",
+      "context-budget",
+      "context-ignored"
     ],
     "success": true
   },

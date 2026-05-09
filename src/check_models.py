@@ -10898,15 +10898,6 @@ class DiagnosticsConfig:
 
 DIAGNOSTICS: Final[DiagnosticsConfig] = DiagnosticsConfig()
 
-_DIAGNOSTICS_CAPTURE_NOISE_PATTERNS: Final[tuple[re.Pattern[str], ...]] = (
-    re.compile(
-        r"^\s*(?:Downloading|Fetching|Resolving|Loading checkpoint shards)\b.*$", re.IGNORECASE
-    ),
-    re.compile(r"^\s*(?:Download complete|Download finished)\b.*$", re.IGNORECASE),
-    re.compile(r"^\s*(?:\d+%|\d+/\d+)\s*\|.*\|.*$"),
-    re.compile(r"^\s*[A-Za-z][A-Za-z0-9 _/:-]{0,48}:\s*\d+%\s*$"),
-)
-
 # System info keys to include in the environment table (order matters)
 _DIAGNOSTICS_SYSTEM_KEYS: Final[tuple[str, ...]] = (
     "Python Version",
@@ -10928,11 +10919,6 @@ _DIAGNOSTICS_LIB_NAMES: Final[tuple[str, ...]] = (
     "tokenizers",
     "huggingface-hub",
 )
-
-_PORTABLE_DEPENDENCY_PROBE_CMD: Final[str] = (
-    "python -m pip show mlx mlx-vlm mlx-lm mlx-audio transformers huggingface-hub tokenizers"
-)
-_PORTABLE_PROBE_IMAGE_PATH: Final[str] = "./check_models_portable_probe.png"
 
 ISSUE_EVIDENCE_MODEL_LIMIT: Final[int] = 3
 
@@ -11875,65 +11861,6 @@ def _format_recent_repro_ratio(history_info: FailureHistoryContext | None) -> st
     return f"{recent_failures}/{recent_considered} recent runs failed"
 
 
-def _sanitize_capture_for_diagnostics(captured_output: str | None) -> str | None:
-    """Strip low-signal terminal noise while preserving actionable stderr/stdout."""
-    if not captured_output:
-        return None
-
-    sanitized = ANSI_ESCAPE_RE.sub("", captured_output)
-    sanitized = sanitized.replace("\r\n", "\n").replace("\r", "\n").replace("\x08", "")
-    sanitized = "".join(ch for ch in sanitized if ch in {"\n", "\t"} or ch.isprintable())
-
-    kept_lines: list[str] = []
-    for raw_line in sanitized.splitlines():
-        stripped = raw_line.strip()
-        if stripped and any(
-            pattern.search(stripped) for pattern in _DIAGNOSTICS_CAPTURE_NOISE_PATTERNS
-        ):
-            continue
-        kept_lines.append(raw_line.rstrip())
-
-    compact = "\n".join(kept_lines)
-    compact = re.sub(r"\n{3,}", "\n\n", compact).strip()
-    return compact or None
-
-
-def _diagnostics_detailed_trace_logs_section(
-    cluster_results: list[PerformanceResult],
-) -> list[str]:
-    """Build one collapsed block containing traceback/log details per model."""
-    model_logs: list[tuple[str, str | None, str | None]] = []
-    for result in cluster_results:
-        traceback_text = _format_traceback_tail(result.error_traceback)
-        captured_text = _sanitize_capture_for_diagnostics(result.captured_output_on_fail)
-        if traceback_text is None and captured_text is None:
-            continue
-        model_logs.append((result.model_name, traceback_text, captured_text))
-
-    if not model_logs:
-        return []
-
-    body_lines: list[str] = []
-    for model_name, traceback_text, captured_text in model_logs:
-        body_lines.append(f"#### `{DIAGNOSTICS_ESCAPER.escape(model_name)}`")
-        body_lines.append("")
-        if traceback_text is not None:
-            body_lines.append("Traceback tail:")
-            _append_markdown_code_block(body_lines, traceback_text, language="text")
-        if captured_text is not None:
-            body_lines.append("Captured stdout/stderr:")
-            _append_markdown_code_block(body_lines, captured_text, language="text")
-
-    scope = "affected model" if len(model_logs) == 1 else "affected models"
-    parts: list[str] = []
-    _append_markdown_details_block(
-        parts,
-        summary=f"Detailed trace logs ({scope})",
-        body_lines=body_lines,
-    )
-    return parts
-
-
 def _cluster_failures_by_pattern(
     results: list[PerformanceResult],
 ) -> dict[str, list[PerformanceResult]]:
@@ -12716,8 +12643,7 @@ def _build_cluster_filing_guidance(
 ) -> list[str]:
     """Build concise filing guidance without repeating the full repro command."""
     return [
-        "- Exact model-specific repro command appears below in the "
-        "`Reproducibility` section under `Target specific failing models`.",
+        "- Use the linked issue draft for the native upstream repro command.",
         f"- Representative failing model: `{DIAGNOSTICS_ESCAPER.escape(representative.model_name)}`",
     ]
 
@@ -12809,8 +12735,6 @@ def _diagnostics_failure_clusters(
                 ),
                 language="text",
             )
-
-        parts.extend(_diagnostics_detailed_trace_logs_section(cluster_results))
 
     return parts
 
@@ -12936,6 +12860,7 @@ def _diagnostics_stack_signal_section(
 _ISSUE_QUEUE_HEADERS: Final[tuple[str, ...]] = (
     "Target",
     "Problem",
+    "Evidence Snapshot",
     "Affected Models",
     "Issue Draft",
     "Evidence Bundle",
@@ -13165,6 +13090,61 @@ def _issue_queue_affected_cell(
     return f"{count}: {model} (+{count - 1})"
 
 
+def _issue_queue_failure_evidence(result: PerformanceResult) -> list[str]:
+    """Return compact failure evidence for issue-queue rows."""
+    parts: list[str] = []
+    if result.error_stage:
+        parts.append(result.error_stage)
+    if result.failure_phase:
+        parts.append(f"phase {result.failure_phase}")
+
+    observed = _simplify_failure_message(result.error_message, model_name=result.model_name)
+    exc_type = result.root_error_type or result.error_type
+    if exc_type:
+        parts.append(exc_type)
+    elif observed and not parts:
+        parts.append(observed)
+    return parts
+
+
+def _issue_queue_success_evidence(result: PerformanceResult) -> list[str]:
+    """Return compact successful-run evidence for issue-queue rows."""
+    triage = _maintainer_triage_for_result(result)
+    if triage is None:
+        return []
+    parts: list[str] = []
+    if evidence_text := _maintainer_triage_evidence_text(triage):
+        parts.append(evidence_text)
+    if context_text := _maintainer_triage_context_text(triage):
+        parts.append(context_text)
+    return parts
+
+
+def _issue_queue_evidence_cell(
+    cluster: IssueCluster,
+    *,
+    escape_text: Callable[[str], str],
+) -> str:
+    """Render a self-contained evidence snapshot for queue-only readers."""
+    representative = _issue_cluster_representative(cluster)
+    if representative is None:
+        return "-"
+
+    evidence_parts = (
+        _issue_queue_success_evidence(representative)
+        if representative.success
+        else _issue_queue_failure_evidence(representative)
+    )
+    if not evidence_parts and cluster.stack_signals:
+        _result, symptom, owner = cluster.stack_signals[0]
+        evidence_parts.extend((symptom, f"owner hint {owner}"))
+    if _issue_cluster_model_count(cluster) > 1:
+        evidence_parts.append(f"{_issue_cluster_model_count(cluster)} model cluster")
+    if not evidence_parts:
+        return "-"
+    return escape_text(" | ".join(evidence_parts))
+
+
 def _issue_queue_fixed_when(cluster: IssueCluster) -> str:
     """Return a compact acceptance signal for the queue table."""
     subtype = cluster.issue_subtype.casefold()
@@ -13209,6 +13189,7 @@ def _render_issue_queue_table(
         (
             _issue_queue_target_cell(cluster, escape_text=escape_text),
             _issue_queue_problem_cell(cluster, escape_text=escape_text),
+            _issue_queue_evidence_cell(cluster, escape_text=escape_text),
             _issue_queue_affected_cell(cluster, escape_text=escape_text),
             issue_link_for_cluster(cluster),
             evidence_link_for_cluster(cluster),
@@ -13272,14 +13253,14 @@ def _diagnostics_upstream_filing_notes_section(snapshot: DiagnosticsSnapshot) ->
         title="## Upstream Filing Notes",
         body_lines=[
             "File one upstream issue per row above. The linked issue drafts are the "
-            "pasteable bodies; this diagnostics file is the run-level queue and appendix.",
+            "pasteable bodies; this diagnostics file is the compact run-level queue.",
         ],
     )
     parts.append(f"- **Issue drafts:** {len(clusters)} root-cause cluster(s).")
     parts.append(f"- **Suggested targets:** {owner_summary}.")
     parts.append(
         "- **Standalone evidence:** each issue draft includes minimal inline evidence plus "
-        "an exact cluster rerun command before any appendix detail.",
+        "a native upstream repro command before any appendix detail.",
     )
     parts.append(
         "- **Supporting files:** `repro JSON` links point to the canonical GitHub copies of "
@@ -13288,17 +13269,6 @@ def _diagnostics_upstream_filing_notes_section(snapshot: DiagnosticsSnapshot) ->
     )
     parts.append("")
     return parts
-
-
-def _diagnostics_appendix_intro_section() -> list[str]:
-    """Separate pasteable filing guidance from verbose run-level detail."""
-    return [
-        "## Appendix",
-        "",
-        "The remaining sections keep full run evidence for audit/debugging. They are not "
-        "intended to be pasted wholesale into an upstream issue.",
-        "",
-    ]
 
 
 def _diagnostics_history_section(
@@ -13545,25 +13515,11 @@ def _diagnostics_unflagged_success_section(
     unflagged_successful: list[PerformanceResult],
 ) -> list[str]:
     """Build a near-end section listing successful models with no diagnostics flags."""
-
-    def _quality_warning_summary(analysis: GenerationQualityAnalysis) -> str:
-        """Build a concise one-line quality warning summary from existing analysis data."""
-        signals = _summarize_quality_signals(analysis)
-        if signals:
-            return _truncate_text_preview(signals[0], max_chars=120)
-
-        for issue in analysis.issues:
-            if issue.startswith("⚠️HARNESS"):
-                continue
-            return _truncate_text_preview(issue, max_chars=120)
-
-        return "Quality warnings detected by analysis."
-
     if not unflagged_successful:
         return []
 
     clean_models: list[str] = []
-    quality_warning_models: list[tuple[str, str]] = []
+    quality_warning_models: list[str] = []
     no_analysis_models: list[str] = []
     prompt_incomplete_models: list[str] = []
 
@@ -13581,7 +13537,7 @@ def _diagnostics_unflagged_success_section(
             continue
 
         if qa.has_any_issues():
-            quality_warning_models.append((res.model_name, _quality_warning_summary(qa)))
+            quality_warning_models.append(res.model_name)
         else:
             clean_models.append(res.model_name)
 
@@ -13589,51 +13545,31 @@ def _diagnostics_unflagged_success_section(
         title=f"## Models Not Flagged ({len(unflagged_successful)} model(s))",
         body_lines=[
             "These models completed without diagnostics flags "
-            "(no hard failure, harness warning, or stack-signal anomaly).",
+            "(no hard failure, harness warning, or stack-signal anomaly). The detailed "
+            "per-model rows remain in the generated results and review reports.",
         ],
     )
 
     if clean_models:
-        parts.append(f"### Clean output ({len(clean_models)} model(s))")
-        parts.append("")
-        parts.extend(f"- `{DIAGNOSTICS_ESCAPER.escape(model)}`" for model in clean_models)
-        parts.append("")
+        parts.append(f"- **Clean output:** {len(clean_models)} model(s).")
 
     if quality_warning_models:
         parts.append(
-            f"### Ran, but with quality warnings ({len(quality_warning_models)} model(s))",
+            f"- **Ran, but with quality warnings:** {len(quality_warning_models)} model(s).",
         )
-        parts.append("")
-        parts.extend(
-            (f"- `{DIAGNOSTICS_ESCAPER.escape(model)}`: {DIAGNOSTICS_ESCAPER.escape(summary)}")
-            for model, summary in quality_warning_models
-        )
-        parts.append("")
 
     if prompt_incomplete_models:
         parts.append(
-            "### Passed (prompt-dependent quality checks unavailable) "
-            f"({len(prompt_incomplete_models)} model(s))",
+            "- **Passed (prompt-dependent quality checks unavailable):** "
+            f"{len(prompt_incomplete_models)} model(s).",
         )
-        parts.append("")
-        parts.append(
-            "These outputs lack the original prompt context, so context-echo and "
-            "catalog-contract checks could not be rerun.",
-        )
-        parts.append("")
-        parts.extend(
-            f"- `{DIAGNOSTICS_ESCAPER.escape(model)}`" for model in prompt_incomplete_models
-        )
-        parts.append("")
 
     if no_analysis_models:
         parts.append(
-            f"### Passed (quality analysis unavailable) ({len(no_analysis_models)} model(s))",
+            f"- **Passed (quality analysis unavailable):** {len(no_analysis_models)} model(s).",
         )
-        parts.append("")
-        parts.extend(f"- `{DIAGNOSTICS_ESCAPER.escape(model)}`" for model in no_analysis_models)
-        parts.append("")
 
+    parts.append("")
     return parts
 
 
@@ -14027,96 +13963,12 @@ def export_failure_repro_bundles(
 
 def _diagnostics_footer(
     failed: list[PerformanceResult],
-    prompt: str,
+    _prompt: str,
     *,
     diagnostics_snapshot: DiagnosticsSnapshot,
     image_path: Path | None,
     run_args: argparse.Namespace | None,
 ) -> list[str]:
-    def _portable_probe_model_names(snapshot: DiagnosticsSnapshot) -> list[str]:
-        names = [result.model_name for result in snapshot.failed]
-        names.extend(result.model_name for result, _sample in snapshot.harness_results)
-        names.extend(result.model_name for result, _symptom, _owner in snapshot.stack_signals)
-        return _dedupe_preserve_order(names)
-
-    def _portable_load_probe_script(model_names: Sequence[str]) -> str:
-        load_kwargs = {
-            "adapter_path": getattr(run_args, "adapter_path", None) if run_args else None,
-            "lazy": bool(getattr(run_args, "lazy_load", False)) if run_args else False,
-            "revision": getattr(run_args, "revision", None) if run_args else None,
-            "trust_remote_code": bool(getattr(run_args, "trust_remote_code", True))
-            if run_args
-            else True,
-        }
-        return "\n".join(
-            (
-                "python - <<'PY'",
-                "from mlx_vlm.utils import load  # mlx_vlm.utils.load",
-                "",
-                f"MODELS = {list(model_names)!r}",
-                f"LOAD_KWARGS = {load_kwargs!r}",
-                "",
-                "for model_id in MODELS:",
-                '    print(f"== {model_id} ==")',
-                "    try:",
-                "        model, processor = load(model_id, **LOAD_KWARGS)",
-                "    except Exception as exc:",
-                '        print(f"load FAIL: {type(exc).__name__}: {exc}")',
-                "        continue",
-                "",
-                "    config = getattr(model, 'config', None)",
-                "    tokenizer = getattr(processor, 'tokenizer', None)",
-                "    image_processor = getattr(processor, 'image_processor', None)",
-                '    print("load OK")',
-                '    print(f"model_class={type(model).__name__}")',
-                "    config_class = type(config).__name__ if config is not None else 'None'",
-                '    print(f"config_class={config_class}")',
-                "    model_type = getattr(config, 'model_type', None)",
-                '    print(f"model_type={model_type}")',
-                '    print(f"processor_class={type(processor).__name__}")',
-                "    tokenizer_class = type(tokenizer).__name__ if tokenizer is not None else 'None'",
-                '    print(f"tokenizer_class={tokenizer_class}")',
-                '    print(f"has_image_processor={image_processor is not None}")',
-                "    eos_token = getattr(tokenizer, 'eos_token', None)",
-                "    eos_token_id = getattr(tokenizer, 'eos_token_id', None)",
-                '    print(f"eos_token={eos_token}")',
-                '    print(f"eos_token_id={eos_token_id}")',
-                "PY",
-            )
-        )
-
-    def _portable_generation_probe_script(model_names: Sequence[str]) -> str:
-        tokens = _build_repro_command_tokens(
-            image_path=None,
-            run_args=run_args,
-            include_selection=False,
-            include_input=False,
-        )
-        if run_args is None or getattr(run_args, "prompt", None) is None:
-            tokens.extend(["--prompt", prompt])
-        tokens.extend(["--image", _PORTABLE_PROBE_IMAGE_PATH, "--models", *model_names])
-        rerun_command = shlex_join(tokens)
-        return "\n".join(
-            (
-                "python - <<'PY'",
-                "from PIL import Image",
-                "",
-                "size = 32",
-                "image = Image.new('RGB', (size, size))",
-                "pixels = [",
-                "    ((x * 7) % 256, (y * 11) % 256, ((x + y) * 13) % 256)",
-                "    for y in range(size)",
-                "    for x in range(size)",
-                "]",
-                "image.putdata(pixels)",
-                f"image.save('{_PORTABLE_PROBE_IMAGE_PATH}')",
-                f"print('wrote {_PORTABLE_PROBE_IMAGE_PATH}')",
-                "PY",
-                "",
-                rerun_command,
-            )
-        )
-
     all_run_tokens = _build_repro_command_tokens(
         image_path=image_path,
         run_args=run_args,
@@ -14131,92 +13983,42 @@ def _diagnostics_footer(
         "# Re-run with the same CLI arguments\n"
         f"{all_run_command}"
     )
-    portable_probe_models = _portable_probe_model_names(diagnostics_snapshot)
-    parts: list[str] = []
-    _append_markdown_section(parts, title="## Reproducibility")
-    _append_markdown_code_block(parts, all_models_command, language="bash")
 
-    portable_body_lines = [
-        "These probes are not a substitute for the original repro bundle. They help "
-        "upstream maintainers separate package/import problems, model repository/config/load "
-        "problems, and image-dependent generation problems without needing the original local image.",
-    ]
-    if not portable_probe_models:
-        portable_body_lines.append(
-            "This run did not queue any model-specific failure, harness, or stack-signal probes, "
-            "so only the environment sanity step is shown below."
-        )
+    issue_model_names = _dedupe_preserve_order(
+        [
+            *[result.model_name for result in diagnostics_snapshot.failed],
+            *[result.model_name for result, _sample in diagnostics_snapshot.harness_results],
+            *[result.model_name for result, _symptom, _owner in diagnostics_snapshot.stack_signals],
+        ]
+    )
+    parts: list[str] = []
     _append_markdown_section(
         parts,
-        title="### Portable upstream probes (no local image required)",
-        body_lines=portable_body_lines,
+        title="## Reproducibility",
+        body_lines=[
+            "Issue-specific native repro commands are in the linked issue drafts.",
+            "Prompt text is in the linked issue drafts and repro bundles.",
+        ],
     )
+    _append_markdown_code_block(parts, all_models_command, language="bash")
 
-    portable_probe_blocks = [
-        (
-            "# 1) Environment sanity: package versions + import smoke test\n"
-            f"{_PORTABLE_DEPENDENCY_PROBE_CMD}\n"
-            "\n"
-            "python - <<'PY'\n"
-            "import importlib\n"
-            "packages = ('mlx', 'mlx_vlm', 'mlx_lm', 'transformers', 'huggingface_hub', 'tokenizers')\n"
-            "for name in packages:\n"
-            "    try:\n"
-            "        mod = importlib.import_module(name)\n"
-            "        version = getattr(mod, '__version__', 'unknown')\n"
-            "        print(f'{name} OK {version}')\n"
-            "    except Exception as exc:\n"
-            "        print(f'{name} FAIL {type(exc).__name__}: {exc}')\n"
-            "PY"
+    if issue_model_names:
+        issue_models = ", ".join(
+            f"`{DIAGNOSTICS_ESCAPER.escape(model_name)}`" for model_name in issue_model_names
         )
-    ]
-    if portable_probe_models:
-        portable_probe_blocks.append(
-            "\n".join(
-                (
-                    "# 2) Model load/config probe: no original image required",
-                    _portable_load_probe_script(portable_probe_models),
-                )
-            )
-        )
-        portable_probe_blocks.append(
-            "\n".join(
-                (
-                    "# 3) Synthetic-image generation probe: separates image-dependent failures",
-                    _portable_generation_probe_script(portable_probe_models),
-                )
-            )
-        )
-    _append_markdown_code_block(parts, "\n\n".join(portable_probe_blocks), language="bash")
+        parts.append(f"Queued issue models: {issue_models}.")
+        parts.append("")
+    elif failed:
+        parts.append("Queued issue models: none.")
+        parts.append("")
 
     if failed:
-        _append_markdown_section(
-            parts,
-            title="### Target specific failing models",
-            body_lines=[
-                (
-                    "**Note:** A comprehensive JSON reproduction bundle including system info "
-                    "and the exact prompt trace has been exported to "
-                    "[repro_bundles/]"
-                    f"({_github_published_output_url('repro_bundles', tree=True)}) "
-                    "for each failing model."
-                ),
-            ],
+        parts.append(
+            "Repro bundles with prompt traces and environment details are available in "
+            f"[repro_bundles/]({_github_published_output_url('repro_bundles', tree=True)})."
         )
-        target_base_tokens = _build_repro_command_tokens(
-            image_path=image_path,
-            run_args=run_args,
-            include_selection=False,
-        )
-        failed_models = sorted({r.model_name for r in failed})
-        target_model_commands = "\n".join(
-            shlex_join([*target_base_tokens, "--models", model_name])
-            for model_name in failed_models
-        )
-        _append_markdown_code_block(parts, target_model_commands, language="bash")
+        parts.append("")
 
-    _append_markdown_section(parts, title="### Prompt Used")
-    _append_markdown_code_block(parts, prompt, language="text")
     _append_markdown_section(parts, title="### Run details")
     image_detail = str(image_path) if image_path is not None else "not specified"
     parts.append(f"- Input image: `{DIAGNOSTICS_ESCAPER.escape(image_detail)}`")
@@ -14251,10 +14053,10 @@ def generate_diagnostics_report(
 ) -> bool:
     """Generate a Markdown diagnostics report structured for upstream issue filing.
 
-    The report clusters failures by root-cause pattern, includes full error
-    messages and traceback excerpts, and highlights harness/encoding issues
-    from successful models in a self-contained format suitable for direct
-    upstream issue filing against mlx-vlm, mlx, or transformers.
+    The report clusters failures by root-cause pattern, highlights
+    harness/encoding issues from successful models, and keeps verbose trace
+    and prompt evidence in linked issue drafts/repro bundles so the run-level
+    report stays pasteable.
 
     Args:
         results: All PerformanceResult objects from the run.
@@ -14328,7 +14130,6 @@ def generate_diagnostics_report(
         )
     )
     parts.extend(_diagnostics_upstream_filing_notes_section(diagnostics_snapshot))
-    parts.extend(_diagnostics_appendix_intro_section())
     parts.extend(
         _diagnostics_failure_clusters(
             failure_clusters,
@@ -14363,18 +14164,18 @@ def generate_diagnostics_report(
         ),
     )
     parts.extend(
-        _diagnostics_environment_section(
-            versions=versions,
-            system_info=system_info,
-        ),
-    )
-    parts.extend(
         _diagnostics_footer(
             failed,
             prompt,
             diagnostics_snapshot=diagnostics_snapshot,
             image_path=image_path,
             run_args=run_args,
+        ),
+    )
+    parts.extend(
+        _diagnostics_environment_section(
+            versions=versions,
+            system_info=system_info,
         ),
     )
 

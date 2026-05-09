@@ -2,14 +2,15 @@
   "environment": {
     "library_versions": {
       "Pillow": "12.2.0",
-      "huggingface-hub": "1.13.0",
-      "mlx": "0.32.0.dev20260502+e8ebdebe",
+      "huggingface-hub": "1.14.0",
+      "mlx": "0.32.0.dev20260509+84961223",
+      "mlx-audio": "0.4.3",
       "mlx-lm": "0.31.3",
       "mlx-metal": null,
-      "mlx-vlm": "0.4.5",
+      "mlx-vlm": "0.5.0",
       "numpy": "2.4.4",
       "tokenizers": "0.22.2",
-      "transformers": "5.7.0"
+      "transformers": "5.8.0"
     },
     "platform": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
     "preflight_issues": [],
@@ -41,7 +42,7 @@
     "traceback": null,
     "type": null
   },
-  "generated_at_utc": "2026-05-03T01:16:09+00:00",
+  "generated_at_utc": "2026-05-09T11:23:02+00:00",
   "issue_cluster_id": "mlx-vlm_encoding_001",
   "model": "mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
   "repro": {
@@ -60,6 +61,7 @@
       ],
       "folder": "/Users/jrp/Pictures/Processed",
       "force_color": false,
+      "force_download": false,
       "image": null,
       "kv_bits": null,
       "kv_group_size": 64,
@@ -84,6 +86,7 @@
       "prompt": null,
       "prune_repro_days": 90,
       "quality_config": null,
+      "quantize_activations": false,
       "quantized_kv_start": 5000,
       "repetition_context_size": 20,
       "repetition_penalty": null,
@@ -102,13 +105,13 @@
       "verbose": true,
       "width": null
     },
-    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260502-152439_DSC09840.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
+    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
     "env_vars": {
       "TOKENIZERS_PARALLELISM": "false"
     },
-    "image_path": "/Users/jrp/Pictures/Processed/20260502-152439_DSC09840.jpg",
-    "image_ref_sha256": "c9b1cebc8e500e110999e601c16ea54efa1252b1390c5e0b3150775ab7a95800",
-    "image_sha256": "1ad160dd553b961f2ef45d142bbe753f79da080713cb9c1a07744f12981fdb39",
+    "image_path": "/Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg",
+    "image_ref_sha256": "cfb4673ee4d7e2c5d8eed2cb9fe849e997df799d7287b932129c40a464252acf",
+    "image_sha256": "ed3baed59aed7c13bc807010bcccae7dbc2c052b1637dc37a6110f82a676e2b4",
     "prompt_diagnostics": {
       "eos_token": "</s>",
       "eos_token_id": 2,
@@ -128,8 +131,8 @@
       "image_placeholder_count": 0,
       "model_type": "mistral3",
       "processor_class": "mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor",
-      "rendered_prompt_chars": 2403,
-      "rendered_prompt_hash_sha256": "31d69aae8fec394fc6fb916d7b09f604004d9457a950d1c0f606cf9eee2e26da",
+      "rendered_prompt_chars": 2215,
+      "rendered_prompt_hash_sha256": "13c937bfc559977b4c0cc70dafc8468bb949d10eaa015c1fc16831e23d002d0d",
       "rendered_prompt_preview": "<s>[INST][IMG]Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences describ...",
       "special_token_ids": [
         1,
@@ -201,41 +204,39 @@
       ],
       "tokenizer_class": "transformers.tokenization_utils_tokenizers.TokenizersBackend"
     },
-    "prompt_hash_sha256": "0802768f3e94f1c5038f1d55b934088c18efff77400777403332028a41ecf334",
+    "prompt_hash_sha256": "4a1f03d684eed33f32edd69e60de6697a143191cc453889223fbf1471468d72c",
     "prompt_preview": "Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct any...",
-    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260502-152439_DSC09840.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
+    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
     "seed": null
   },
   "result": {
-    "generated_text_preview": "Title:\u0120Tide\u0120Mill\u0120Museum\u0120at\u0120Low\u0120Tide\u010a\u010aDescription:\u0120A\u0120long\u0120boat\u0120covered\u0120with\u0120a\u0120black\u0120tarp\u0120rests\u0120on\u0120the\u0120muddy\u0120riverbed\u0120in\u0120front\u0120of\u0120the\u0120Woodbridge\u0120Tide\u0120Mill\u0120Museum.\u0120The\u0120historic\u0120white\u0120building\u0120stands\u0120with\u0120a\u0120few\u0120people\u0120sitting\u0120on\u0120benches\u0120under\u0120a\u0120partly\u0120cloudy\u0120sky.\u010a\u010aKeywords:\u0120boat,\u0120black\u0120tarp,\u0120mudflats,\u0120riverbed,\u0120tide\u0120mill\u0120museum,\u0120white\u0120building,\u0120benches,\u0120people,\u0120partly\u0120cloudy\u0120sky,\u0120historic\u0120building,\u0120ri...",
+    "generated_text_preview": "Title:\u0120Classic\u0120sailboat\u0120moored\u0120in\u0120estuary\u010a\u010aDescription:\u0120A\u0120classic-style\u0120sailboat\u0120with\u0120a\u0120dark\u0120hull\u0120and\u0120wooden\u0120mast\u0120is\u0120moored\u0120in\u0120a\u0120calm\u0120estuary\u0120during\u0120low\u0120tide.\u0120The\u0120water\u0120has\u0120receded,\u0120exposing\u0120green,\u0120algae-covered\u0120mudflats\u0120behind\u0120the\u0120vessel.\u010a\u010aKeywords:\u0120sailboat,\u0120wooden\u0120mast,\u0120dark\u0120hull,\u0120estuary,\u0120low\u0120tide,\u0120mudflats,\u0120green\u0120algae,\u0120moored,\u0120calm\u0120water,\u0120string\u0120of\u0120flags,\u0120classic-style,\u0120wooden\u0120boat,\u0120watercra...",
     "maintainer_triage": {
       "confidence": "high",
       "evidence": [
         "harness:encoding",
-        "trusted_overlap",
-        "generic"
+        "trusted_overlap"
       ],
       "harness_details": [
-        "token_encoding:bpe_space_leak(78)"
+        "token_encoding:bpe_space_leak(61)"
       ],
       "hit_max_tokens": false,
       "issue_kind": "harness",
       "issue_subtype": "encoding",
       "next_action": "Inspect decode cleanup; tokenizer markers are leaking into user-facing text.",
-      "nontext_prompt_ratio": 0.8206562266964952,
-      "prompt_output_ratio": 0.04623415361670395,
-      "prompt_tokens_total": 2682,
+      "nontext_prompt_ratio": 0.8773141751865157,
+      "prompt_output_ratio": 0.029842497927604312,
+      "prompt_tokens_total": 3619,
       "requested_max_tokens": 500,
       "stop_reason": "completed",
-      "summary": "Tokenizer space-marker artifacts (for example \u0120) appeared in output (about 78 occurrences). | nontext prompt burden=82% | missing sections: description, keywords | missing terms: Bench, Blue sky, East Anglia, English countryside, Moored",
+      "summary": "Tokenizer space-marker artifacts (for example \u0120) appeared in output (about 61 occurrences). | nontext prompt burden=88% | missing sections: description, keywords | missing terms: vast, expanse, adorned, small, floats",
       "suspected_owner": "mlx-vlm",
       "user_bucket": "avoid"
     },
     "quality_issues": [
       "\u26a0\ufe0fharness(encoding)",
       "missing-sections(description+keywords)",
-      "title-length(80)",
-      "generic(0)"
+      "title-length(66)"
     ],
     "success": true
   },

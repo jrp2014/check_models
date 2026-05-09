@@ -12,16 +12,16 @@
 
 ## Affected Models
 
-| Model                                     | Observed Behavior                                                                                                                          | Token Counts                                                                 | Optional Context                                                                                                                                                                           |
-|-------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | Output appears truncated to about 6 tokens. \| At long prompt length (16901 tokens), output stayed unusually short (6 tokens; ratio 0.0%). | prompt=16,901 \| output/prompt=0.04% \| nontext burden=97% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T225444Z_009_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json) |
+| Model                                     | Observed Behavior                                                                                                                                                                                              | Token Counts                                                                 | Optional Context                                                                                                                                                                           |
+|-------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt-handling issues. \| At long prompt length (16901 tokens), output stayed unusually short (11 tokens; ratio 0.1%). | prompt=16,901 \| output/prompt=0.07% \| nontext burden=97% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_009_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json) |
 
 
 ## Minimal Evidence
 
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: Output appears truncated to about 6 tokens.
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: At long prompt length (16901 tokens), output stayed unusually short (6 tokens; ratio 0.0%).
-- Output excerpt: `Boat Anchor Anchorage`
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt-handling issues.
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: At long prompt length (16901 tokens), output stayed unusually short (11 tokens; ratio 0.1%).
+- Output excerpt: `Boat, boat, boat, boat, boat`
 
 
 ## Minimal Reproduction
@@ -139,7 +139,7 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T225444Z_009_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_009_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -161,10 +161,10 @@ Optional advanced context:
 | Component       | Version                     |
 |-----------------|-----------------------------|
 | mlx-vlm         | 0.5.0                       |
-| mlx             | 0.32.0.dev20260508+a1c0b6f9 |
+| mlx             | 0.32.0.dev20260509+84961223 |
 | mlx-lm          | 0.31.3                      |
 | mlx-audio       | 0.4.3                       |
-| transformers    | 5.8.0.dev0                  |
+| transformers    | 5.8.0                       |
 | tokenizers      | 0.22.2                      |
 | huggingface-hub | 1.14.0                      |
 | Python Version  | 3.13.12                     |
@@ -182,13 +182,14 @@ Optional advanced context:
 
 Observed signals:
 
-- Output appears truncated to about 6 tokens.
-- At long prompt length (16901 tokens), output stayed unusually short (6 tokens; ratio 0.0%).
+- Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt-handling issues.
+- At long prompt length (16901 tokens), output stayed unusually short (11 tokens; ratio 0.1%).
 - Model output may not follow prompt or image contents (missing: classic, style, sailboat, dark, hull).
+- Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 Sample output:
 
 ```text
-Boat Anchor Anchorage
+Boat, boat, boat, boat, boat
 ```
 

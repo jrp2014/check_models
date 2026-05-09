@@ -14,7 +14,7 @@
 
 | Model                  | Observed Behavior                       | Token Counts   | Optional Context                                                                                                                                                                 |
 |------------------------|-----------------------------------------|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `facebook/pe-av-large` | model error \| mlx vlm model load model | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T225444Z_002_facebook_pe-av-large_MLX_VLM_MODEL_LOAD_MODEL_8b244da8c605.json) |
+| `facebook/pe-av-large` | model error \| mlx vlm model load model | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_002_facebook_pe-av-large_MLX_VLM_MODEL_LOAD_MODEL_8b244da8c605.json) |
 
 
 ## Minimal Evidence
@@ -138,7 +138,7 @@ Generation/load config:
 
 Optional advanced context:
 
-- `facebook/pe-av-large`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T225444Z_002_facebook_pe-av-large_MLX_VLM_MODEL_LOAD_MODEL_8b244da8c605.json)
+- `facebook/pe-av-large`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_002_facebook_pe-av-large_MLX_VLM_MODEL_LOAD_MODEL_8b244da8c605.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -161,10 +161,10 @@ Optional advanced context:
 | Component       | Version                     |
 |-----------------|-----------------------------|
 | mlx-vlm         | 0.5.0                       |
-| mlx             | 0.32.0.dev20260508+a1c0b6f9 |
+| mlx             | 0.32.0.dev20260509+84961223 |
 | mlx-lm          | 0.31.3                      |
 | mlx-audio       | 0.4.3                       |
-| transformers    | 5.8.0.dev0                  |
+| transformers    | 5.8.0                       |
 | tokenizers      | 0.22.2                      |
 | huggingface-hub | 1.14.0                      |
 | Python Version  | 3.13.12                     |

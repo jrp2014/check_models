@@ -14,7 +14,7 @@
 
 | Model                                                   | Observed Behavior                                                                           | Token Counts                                                                | Optional Context                                                                                                                                                                                 |
 |---------------------------------------------------------|---------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 61 occurrences). | prompt=3,619 \| output/prompt=2.98% \| nontext burden=88% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T225444Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) |
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 61 occurrences). | prompt=3,619 \| output/prompt=2.98% \| nontext burden=88% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) |
 
 
 ## Minimal Evidence
@@ -139,7 +139,7 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260508T225444Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T112302Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -161,10 +161,10 @@ Optional advanced context:
 | Component       | Version                     |
 |-----------------|-----------------------------|
 | mlx-vlm         | 0.5.0                       |
-| mlx             | 0.32.0.dev20260508+a1c0b6f9 |
+| mlx             | 0.32.0.dev20260509+84961223 |
 | mlx-lm          | 0.31.3                      |
 | mlx-audio       | 0.4.3                       |
-| transformers    | 5.8.0.dev0                  |
+| transformers    | 5.8.0                       |
 | tokenizers      | 0.22.2                      |
 | huggingface-hub | 1.14.0                      |
 | Python Version  | 3.13.12                     |

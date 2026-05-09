@@ -12,6 +12,9 @@ Notable changes to this project will be documented in this file.
   repro snippets, inlining prompt/config details, framing JSON bundles as
   optional context, and removing raw cluster/error-code jargon from pasteable
   issue bodies.
+- Make `diagnostics.md` a compact pasteable run-level issue body by enriching
+  the issue queue with inline evidence snapshots while moving verbose trace,
+  prompt, and portable-probe detail to issue drafts and repro bundles.
 - Add run-context headers to `issues/index.md` so the issue queue is useful as
   a standalone launchpad.
 - Align the MLX-VLM integration with `mlx-vlm` 0.5.0 by exposing the image-relevant

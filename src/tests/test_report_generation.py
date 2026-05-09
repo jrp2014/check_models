@@ -311,7 +311,8 @@ def test_unflagged_models_section_marks_prompt_incomplete_analysis() -> None:
     content = "\n".join(section)
 
     assert "Passed (prompt-dependent quality checks unavailable)" in content
-    assert "`org/promptless`" in content
+    assert "1 model(s)" in content
+    assert "`org/promptless`" not in content
 
 
 def _history_run(
@@ -891,6 +892,7 @@ def _make_failure_with_details(
     error_type: str = "ValueError",
     error_package: str = "mlx-vlm",
     error_stage: str = "Model Error",
+    failure_phase: str | None = None,
     traceback_str: str | None = None,
     captured_output: str | None = None,
     generated_text: str | None = None,
@@ -906,6 +908,7 @@ def _make_failure_with_details(
         success=False,
         generation=generation,
         error_stage=error_stage,
+        failure_phase=failure_phase,
         error_message=error_msg,
         error_type=error_type,
         error_package=error_package,
@@ -1253,8 +1256,8 @@ class TestDiagnosticsReport:
         assert "chat_template is not set" in content
         assert "Missing 1 parameters: lm_head.weight" in content
 
-    def test_traceback_tail_included(self, tmp_path: Path) -> None:
-        """Detailed trace dropdown should include traceback text."""
+    def test_diagnostics_omits_verbose_traceback_body(self, tmp_path: Path) -> None:
+        """Pasteable diagnostics should link out instead of embedding traceback bodies."""
         tb = (
             "Traceback (most recent call last):\n"
             '  File "foo.py", line 10, in bar\n'
@@ -1274,11 +1277,14 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        assert "Detailed trace logs (affected model)" in content
-        assert "ValueError: bad shape" in content
+        assert "Detailed trace logs" not in content
+        assert "ValueError" in content
+        assert "bad shape" in content
+        assert "foo.py" not in content
+        assert "baz.py" not in content
 
     def test_traceback_omits_local_check_models_frames(self, tmp_path: Path) -> None:
-        """Traceback rendering should omit local check_models frames from issue output."""
+        """Compact diagnostics should not paste local check_models wrapper frames."""
         tb = (
             "Traceback (most recent call last):\n"
             '  File "/Users/test/check_models.py", line 99, in local_runner\n'
@@ -1299,10 +1305,9 @@ class TestDiagnosticsReport:
         content = out.read_text(encoding="utf-8")
         assert "/Users/test/check_models.py" not in content
         assert "local_wrapper()" not in content
-        assert "mlx_vlm/utils.py" in content
 
-    def test_traceback_tail_used_in_collapsed_section(self, tmp_path: Path) -> None:
-        """Diagnostics should include only the traceback tail in collapsed details."""
+    def test_diagnostics_traceback_lines_stay_out_of_report(self, tmp_path: Path) -> None:
+        """Diagnostics should keep raw traceback lines out of the pasteable body."""
         tb = "\n".join(f"trace-line-{i}" for i in range(12))
         out = tmp_path / "diag.md"
         generate_diagnostics_report(
@@ -1313,15 +1318,14 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        assert "Detailed trace logs (affected model)" in content
-        assert "<details>" in content
-        assert "Traceback tail:" in content
+        assert "Detailed trace logs" not in content
+        assert "Traceback tail:" not in content
         assert "trace-line-0" not in content
-        assert "trace-line-6" in content
-        assert "trace-line-11" in content
+        assert "trace-line-6" not in content
+        assert "trace-line-11" not in content
 
-    def test_captured_output_in_collapsed_section(self, tmp_path: Path) -> None:
-        """Diagnostics should include captured stdout/stderr in the detailed log section."""
+    def test_captured_output_omitted_from_compact_diagnostics(self, tmp_path: Path) -> None:
+        """Captured stdout/stderr belongs in issue drafts and bundles, not diagnostics."""
         out = tmp_path / "diag.md"
         generate_diagnostics_report(
             results=[
@@ -1339,12 +1343,13 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        assert "Detailed trace logs (affected model)" in content
-        assert "Tokenizer warning here" in content
+        assert "Detailed trace logs" not in content
+        assert "Tokenizer warning here" not in content
+        assert "Captured stdout/stderr" not in content
         assert "Downloading: 100%" not in content
         assert "\x1b[" not in content
         assert "\r" not in content
-        assert "#### `org/m`" in content
+        assert "`org/m`" in content
 
     def test_history_context_includes_regressions_recoveries_and_repro(
         self,
@@ -1400,10 +1405,15 @@ class TestDiagnosticsReport:
         assert "2026-02-10 10:00:00 GMT" in content
 
     def test_issue_queue_present(self, tmp_path: Path) -> None:
-        """Issue Queue table should appear with clustered issue draft links."""
+        """Issue Queue table should include links plus inline evidence context."""
         out = tmp_path / "diag.md"
         generate_diagnostics_report(
-            results=[_make_failure_with_details()],
+            results=[
+                _make_failure_with_details(
+                    failure_phase="model_load",
+                    error_type="ValueError",
+                )
+            ],
             filename=out,
             versions=_stub_versions(),
             system_info={},
@@ -1413,6 +1423,10 @@ class TestDiagnosticsReport:
         assert "## Issue Queue" in content
         assert "Issue Draft" in content
         assert "Target" in content
+        assert "Evidence Snapshot" in content
+        assert "Model Error" in content
+        assert "phase model_load" in content
+        assert "ValueError" in content
         assert "Evidence Bundle" in content
         assert "Fixed When" in content
         assert "issues/index.md" in content
@@ -1422,10 +1436,10 @@ class TestDiagnosticsReport:
         assert "Priority" not in content
         assert content.index("## Issue Queue") < content.index("## 1. Failure")
         assert content.index("## Issue Queue") < content.index("## Environment")
-        assert content.index("## Environment") < content.index("## Reproducibility")
+        assert content.index("## Reproducibility") < content.index("## Environment")
 
-    def test_action_summary_and_portable_triage_sections_present(self, tmp_path: Path) -> None:
-        """Diagnostics should include compact action triage and portable probe commands."""
+    def test_action_summary_and_repro_pointers_present(self, tmp_path: Path) -> None:
+        """Diagnostics should include compact action triage and repro pointers."""
         out = tmp_path / "diag.md"
         image_path = tmp_path / "sample image.jpg"
         image_path.write_text("placeholder", encoding="utf-8")
@@ -1527,24 +1541,19 @@ class TestDiagnosticsReport:
             run_args=run_args,
         )
         content = out.read_text(encoding="utf-8")
-        portable_block = _extract_markdown_subsection(
-            content,
-            "### Portable upstream probes (no local image required)",
-            end_headings=("### Target specific failing models",),
-        )
         assert "## Upstream Filing Notes" in content
-        assert "## Appendix" in content
-        assert "### Portable upstream probes (no local image required)" in content
-        assert "mlx_vlm.utils.load" in portable_block
-        assert "org/broken-model" in portable_block
-        assert "org/harness-probe" in portable_block
-        assert "org/stack-probe" in portable_block
-        assert "check_models_portable_probe.png" in portable_block
-        assert str(image_path) not in portable_block
-        assert "python -m pip show mlx mlx-vlm mlx-lm mlx-audio transformers" in content
+        assert "## Appendix" not in content
+        assert "### Portable upstream probes (no local image required)" not in content
+        assert "Issue-specific native repro commands are in the linked issue drafts." in content
+        assert "Queued issue models:" in content
+        assert "org/broken-model" in content
+        assert "org/harness-probe" in content
+        assert "org/stack-probe" in content
+        assert "check_models_portable_probe.png" not in content
+        assert str(image_path) in content
 
     def test_unflagged_models_section_lists_successes(self, tmp_path: Path) -> None:
-        """Diagnostics should backfill quality analysis for clean successful models."""
+        """Diagnostics should summarize unflagged successes without listing every model."""
         out = tmp_path / "diag.md"
         generate_diagnostics_report(
             results=[
@@ -1559,9 +1568,9 @@ class TestDiagnosticsReport:
         )
         content = out.read_text(encoding="utf-8")
         assert "## Models Not Flagged (2 model(s))" in content
-        assert "### Clean output (2 model(s))" in content
-        assert "`org/pass-a`" in content
-        assert "`org/pass-b`" in content
+        assert "- **Clean output:** 2 model(s)." in content
+        assert "`org/pass-a`" not in content
+        assert "`org/pass-b`" not in content
 
     def test_build_diagnostics_snapshot_classifies_prompt_backfilled_harness_run(self) -> None:
         """Prompt-aware snapshot building should classify harness issues without cached analysis."""
@@ -1585,7 +1594,7 @@ class TestDiagnosticsReport:
         assert not snapshot.unflagged_successful
 
     def test_unflagged_models_section_categorizes_by_quality(self, tmp_path: Path) -> None:
-        """Unflagged successful models should be grouped by available quality signals."""
+        """Unflagged successful models should be summarized by quality bucket."""
         out = tmp_path / "diag.md"
         generate_diagnostics_report(
             results=[
@@ -1600,11 +1609,11 @@ class TestDiagnosticsReport:
         )
         content = out.read_text(encoding="utf-8")
         assert "## Models Not Flagged (2 model(s))" in content
-        assert "### Clean output (1 model(s))" in content
-        assert "### Ran, but with quality warnings (1 model(s))" in content
-        assert "`org/clean`" in content
-        assert "`org/warn`:" in content
-        assert "Output formatting deviated from the requested structure." in content
+        assert "- **Clean output:** 1 model(s)." in content
+        assert "- **Ran, but with quality warnings:** 1 model(s)." in content
+        assert "`org/clean`" not in content
+        assert "`org/warn`" not in content
+        assert "Output formatting deviated from the requested structure." not in content
 
     def test_coverage_and_runtime_metrics_section(self, tmp_path: Path) -> None:
         """Diagnostics should verify exclusive model coverage and report aggregate runtime."""
@@ -2114,7 +2123,7 @@ class TestDiagnosticsReport:
         assert "Special control token <|end|> appeared in generated text." not in content
 
     def test_reproducibility_section(self, tmp_path: Path) -> None:
-        """Reproducibility section should include model-specific commands."""
+        """Reproducibility section should point to issue-specific native repros."""
         out = tmp_path / "diag.md"
         generate_diagnostics_report(
             results=[_make_failure_with_details("org/broken-model")],
@@ -2125,10 +2134,11 @@ class TestDiagnosticsReport:
         )
         content = out.read_text(encoding="utf-8")
         assert "## Reproducibility" in content
-        assert "### Target specific failing models" in content
-        assert "### Target specific failing models:" not in content
+        assert "Issue-specific native repro commands are in the linked issue drafts." in content
+        assert "Queued issue models:" in content
+        assert "`org/broken-model`" in content
+        assert "### Target specific failing models" not in content
         assert "python -m check_models" in content
-        assert "python -m check_models --models org/broken-model" in content
 
     def test_filing_guidance_points_to_footer_repro_section(self, tmp_path: Path) -> None:
         """Failure clusters should point readers to the footer repro appendix."""
@@ -2157,11 +2167,11 @@ class TestDiagnosticsReport:
         assert "Canonical code" not in content
         assert "Signature" not in content
         assert "Environment fingerprint" not in content
-        assert "Exact model-specific repro command appears below" in content
+        assert "Use the linked issue draft for the native upstream repro command." in content
         assert "Representative failing model: `org/broken-model`" in content
         assert "Repro command (exact run)" not in content
         assert "issues/new" not in content
-        assert "Repro bundle" not in content
+        assert "repro_bundles" in content
 
     def test_failure_cluster_shows_generated_output_inline(self, tmp_path: Path) -> None:
         """Failure clusters should show generated output inline when present."""
@@ -2392,7 +2402,7 @@ class TestDiagnosticsReport:
         assert "--verbose" in content
 
     def test_reproducibility_lists_each_failing_model(self, tmp_path: Path) -> None:
-        """Targeted repro commands should include every failed model (no truncation)."""
+        """Queued issue-model summary should include every failed model (no truncation)."""
         out = tmp_path / "diag.md"
         generate_diagnostics_report(
             results=[
@@ -2405,8 +2415,11 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        assert "python -m check_models --models org/a" in content
-        assert "python -m check_models --models org/b" in content
+        assert "Queued issue models:" in content
+        assert "`org/a`" in content
+        assert "`org/b`" in content
+        assert "python -m check_models --models org/a" not in content
+        assert "python -m check_models --models org/b" not in content
 
     def test_portable_upstream_probes_include_harness_and_stack_models_only(
         self,
@@ -2513,19 +2526,15 @@ class TestDiagnosticsReport:
         )
 
         content = out.read_text(encoding="utf-8")
-        portable_block = _extract_markdown_subsection(
-            content,
-            "### Portable upstream probes (no local image required)",
-            end_headings=("### Prompt Used",),
-        )
-        assert "org/harness-only" in portable_block
-        assert "org/stack-only" in portable_block
-        assert "check_models_portable_probe.png" in portable_block
-        assert "--models org/harness-only org/stack-only" in portable_block
-        assert str(image_path) not in portable_block
+        assert "Queued issue models:" in content
+        assert "`org/harness-only`" in content
+        assert "`org/stack-only`" in content
+        assert "check_models_portable_probe.png" not in content
+        assert "### Portable upstream probes (no local image required)" not in content
+        assert str(image_path) in content
 
     def test_prompt_in_section(self, tmp_path: Path) -> None:
-        """Prompt should be rendered in a dedicated markdown section."""
+        """Prompt text should be referenced instead of pasted into diagnostics."""
         out = tmp_path / "diag.md"
         generate_diagnostics_report(
             results=[_make_failure_with_details()],
@@ -2535,10 +2544,11 @@ class TestDiagnosticsReport:
             prompt="Analyze this image carefully.",
         )
         content = out.read_text(encoding="utf-8")
-        assert "### Prompt Used" in content
+        assert "### Prompt Used" not in content
         assert "### Run details" in content
         assert "### Run details\n\n- Input image:" in content
-        assert "Analyze this image carefully." in content
+        assert "Analyze this image carefully." not in content
+        assert "Prompt text is in the linked issue drafts and repro bundles." in content
 
     def test_multi_model_cluster_has_no_priority_label(self, tmp_path: Path) -> None:
         """Clusters with multiple models should not emit priority labels."""
@@ -3188,6 +3198,9 @@ class TestGithubIssueReportContent:
         assert "mlx-vlm 0.5.0" in index
         assert "Summary:" in index
         assert "1 hard failure" in index
+        assert "Evidence Snapshot" in index
+        assert "Model Error" in index
+        assert "RuntimeError" in index
 
     def test_issue_traceback_omits_local_check_models_frames(self, tmp_path: Path) -> None:
         """Issue draft tracebacks should start at upstream frames when local wrappers exist."""
