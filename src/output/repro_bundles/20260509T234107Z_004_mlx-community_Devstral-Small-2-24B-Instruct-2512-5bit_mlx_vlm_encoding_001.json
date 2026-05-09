@@ -2,14 +2,15 @@
   "environment": {
     "library_versions": {
       "Pillow": "12.2.0",
-      "huggingface-hub": "1.13.0",
-      "mlx": "0.32.0.dev20260503+e8ebdebe",
+      "huggingface-hub": "1.14.0",
+      "mlx": "0.32.0.dev20260510+84961223",
+      "mlx-audio": "0.4.3",
       "mlx-lm": "0.31.3",
       "mlx-metal": null,
-      "mlx-vlm": "0.4.5",
+      "mlx-vlm": "0.5.0",
       "numpy": "2.4.4",
       "tokenizers": "0.22.2",
-      "transformers": "5.7.0"
+      "transformers": "5.8.0"
     },
     "platform": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
     "preflight_issues": [],
@@ -41,7 +42,7 @@
     "traceback": null,
     "type": null
   },
-  "generated_at_utc": "2026-05-03T20:53:13+00:00",
+  "generated_at_utc": "2026-05-09T23:41:07+00:00",
   "issue_cluster_id": "mlx-vlm_encoding_001",
   "model": "mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
   "repro": {
@@ -60,6 +61,7 @@
       ],
       "folder": "/Users/jrp/Pictures/Processed",
       "force_color": false,
+      "force_download": false,
       "image": null,
       "kv_bits": null,
       "kv_group_size": 64,
@@ -84,6 +86,7 @@
       "prompt": null,
       "prune_repro_days": 90,
       "quality_config": null,
+      "quantize_activations": false,
       "quantized_kv_start": 5000,
       "repetition_context_size": 20,
       "repetition_penalty": null,
@@ -102,13 +105,13 @@
       "verbose": true,
       "width": null
     },
-    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260502-153407_DSC09845.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
+    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260509-165009_DSC09954.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
     "env_vars": {
       "TOKENIZERS_PARALLELISM": "false"
     },
-    "image_path": "/Users/jrp/Pictures/Processed/20260502-153407_DSC09845.jpg",
-    "image_ref_sha256": "361e8b209624dc6c24cf3c778a33986ebd8ad43f6c08010fde7643b9bb5d178a",
-    "image_sha256": "ef45865acc39073c98268011f2c7435f6226b4a1f441ffe1e429e1a80f3924a9",
+    "image_path": "/Users/jrp/Pictures/Processed/20260509-165009_DSC09954.jpg",
+    "image_ref_sha256": "ed44d880529e0633051d5651bea9660b787e8673e37f61808667a88fe6f684bd",
+    "image_sha256": "bcc68c742f02f1e316466de87b02cb67b3b7c10a00c07d6100446c935db1cb1d",
     "prompt_diagnostics": {
       "eos_token": "</s>",
       "eos_token_id": 2,
@@ -128,8 +131,8 @@
       "image_placeholder_count": 0,
       "model_type": "mistral3",
       "processor_class": "mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor",
-      "rendered_prompt_chars": 2438,
-      "rendered_prompt_hash_sha256": "386ffcd85d6aa2eb4eb880fbc453de4bb527a465eaddd1a690f304e69911f0a3",
+      "rendered_prompt_chars": 2382,
+      "rendered_prompt_hash_sha256": "9c6deb8d0894b2532fe17e4bf6ce19165da365868aa981ee807fac87424b6af3",
       "rendered_prompt_preview": "<s>[INST][IMG]Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences describ...",
       "special_token_ids": [
         1,
@@ -201,39 +204,41 @@
       ],
       "tokenizer_class": "transformers.tokenization_utils_tokenizers.TokenizersBackend"
     },
-    "prompt_hash_sha256": "b2e24e87de62c3a79f74b3681e1b353a838eee4f737e5eee84159e785dbc989e",
+    "prompt_hash_sha256": "1887ad882e1845d8b9e280a51db6efcf4cb34cc0d4015d8de3dbfe882f83251d",
     "prompt_preview": "Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct any...",
-    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260502-153407_DSC09845.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
+    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260509-165009_DSC09954.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
     "seed": null
   },
   "result": {
-    "generated_text_preview": "Title:\u0120Sailing\u0120Barge\u0120on\u0120the\u0120River\u0120Deben\u010a\u010aDescription:\u0120A\u0120large\u0120sailing\u0120barge\u0120is\u0120moored\u0120on\u0120the\u0120River\u0120Deben\u0120at\u0120low\u0120tide,\u0120with\u0120traditional\u0120boats\u0120and\u0120buildings\u0120in\u0120the\u0120background.\u0120The\u0120sky\u0120is\u0120clear\u0120and\u0120blue.\u010a\u010aKeywords:\u0120sailing\u0120barge,\u0120river,\u0120boats,\u0120moored,\u0120blue\u0120sky,\u0120traditional,\u0120buildings,\u0120scaffolding,\u0120water,\u0120historic,\u0120quayside,\u0120museum,\u0120tide\u0120mill,\u0120wooden\u0120boats,\u0120masts,\u0120rigging,\u0120clear\u0120sky,\u0120daylight",
+    "generated_text_preview": "Title:\u0120Gothic\u0120Revival\u0120Church\u0120with\u0120Spire\u010a\u010aDescription:\u0120A\u0120Gothic\u0120Revival\u0120style\u0120church\u0120with\u0120a\u0120tall\u0120spire\u0120and\u0120flint\u0120walls\u0120stands\u0120against\u0120a\u0120bright\u0120blue\u0120sky\u0120with\u0120wispy\u0120clouds.\u0120A\u0120black\u0120car\u0120is\u0120parked\u0120in\u0120the\u0120foreground.\u010a\u010aKeywords:\u0120Gothic\u0120Revival,\u0120church,\u0120spire,\u0120flint\u0120walls,\u0120blue\u0120sky,\u0120wispy\u0120clouds,\u0120black\u0120car,\u0120stone,\u0120cross,\u0120daylight,\u0120fence,\u0120steeple,\u0120chapel,\u0120bell\u0120tower,\u0120station\u0120wagon,\u0120Europe",
     "maintainer_triage": {
       "confidence": "high",
       "evidence": [
         "harness:encoding",
-        "trusted_overlap"
+        "trusted_overlap",
+        "metadata_terms"
       ],
       "harness_details": [
-        "token_encoding:bpe_space_leak(56)"
+        "token_encoding:bpe_space_leak(57)"
       ],
       "hit_max_tokens": false,
       "issue_kind": "harness",
       "issue_subtype": "encoding",
       "next_action": "Inspect decode cleanup; tokenizer markers are leaking into user-facing text.",
-      "nontext_prompt_ratio": 0.819371727748691,
-      "prompt_output_ratio": 0.036275243081525806,
-      "prompt_tokens_total": 2674,
+      "nontext_prompt_ratio": 0.8228699551569507,
+      "prompt_output_ratio": 0.034753363228699555,
+      "prompt_tokens_total": 2676,
       "requested_max_tokens": 500,
       "stop_reason": "completed",
-      "summary": "Tokenizer space-marker artifacts (for example \u0120) appeared in output (about 56 occurrences). | nontext prompt burden=82% | missing sections: description, keywords | missing terms: 10 Best (structured), Bird, Gull, Marina, Mooring",
+      "summary": "Tokenizer space-marker artifacts (for example \u0120) appeared in output (about 57 occurrences). | nontext prompt burden=82% | missing sections: description, keywords | missing terms: Dorking, Gothic Architecture, Objects, Surrey, low",
       "suspected_owner": "mlx-vlm",
       "user_bucket": "avoid"
     },
     "quality_issues": [
       "\u26a0\ufe0fharness(encoding)",
       "missing-sections(description+keywords)",
-      "title-length(58)"
+      "title-length(59)",
+      "metadata-borrowing"
     ],
     "success": true
   },

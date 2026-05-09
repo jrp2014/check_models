@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-05-09 19:09:04 BST
+FULL ENVIRONMENT DUMP - 2026-05-10 00:17:47 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -39,7 +39,7 @@ fastapi==0.136.1
 filelock==3.29.0
 flatbuffers==25.12.19
 frozenlist==1.8.0
-fsspec==2026.2.0
+fsspec==2026.4.0
 gast==0.7.0
 google-pasta==0.2.0
 grpcio==1.80.0
@@ -69,8 +69,8 @@ mcp==1.27.1
 mdurl==0.1.2
 miniaudio==1.71
 ml_dtypes==0.5.4
-mlx==0.32.0.dev20260509+84961223
-mlx==0.32.0.dev20260509+84961223
+mlx==0.32.0.dev20260510+84961223
+mlx==0.32.0.dev20260510+84961223
 mlx-audio==0.4.3
 mlx-lm==0.31.3
 mlx-vlm==0.5.0
@@ -120,7 +120,7 @@ python-dotenv==1.2.2
 python-multipart==0.0.27
 PyYAML==6.0.3
 referencing==0.37.0
-regex==2026.4.4
+regex==2026.5.9
 requests==2.33.1
 rich==15.0.0
 rpds-py==0.30.0
@@ -173,5 +173,5 @@ yarl==1.23.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-05-09 19:09:04 BST
+Environment dump completed at 2026-05-10 00:17:47 BST
 ================================================================================

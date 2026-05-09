@@ -2,14 +2,15 @@
   "environment": {
     "library_versions": {
       "Pillow": "12.2.0",
-      "huggingface-hub": "1.13.0",
-      "mlx": "0.32.0.dev20260503+e8ebdebe",
+      "huggingface-hub": "1.14.0",
+      "mlx": "0.32.0.dev20260510+84961223",
+      "mlx-audio": "0.4.3",
       "mlx-lm": "0.31.3",
       "mlx-metal": null,
-      "mlx-vlm": "0.4.5",
+      "mlx-vlm": "0.5.0",
       "numpy": "2.4.4",
       "tokenizers": "0.22.2",
-      "transformers": "5.7.0"
+      "transformers": "5.8.0"
     },
     "platform": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
     "preflight_issues": [],
@@ -41,9 +42,9 @@
     "traceback": null,
     "type": null
   },
-  "generated_at_utc": "2026-05-03T20:53:13+00:00",
-  "issue_cluster_id": "model-config-mlx-vlm_prompt-template_001",
-  "model": "mlx-community/paligemma2-3b-ft-docci-448-bf16",
+  "generated_at_utc": "2026-05-09T23:41:07+00:00",
+  "issue_cluster_id": "model-config-mlx-vlm_stop-token_001",
+  "model": "mlx-community/Qwen2-VL-2B-Instruct-4bit",
   "repro": {
     "args": {
       "_check_models_preflight_issues": [],
@@ -60,6 +61,7 @@
       ],
       "folder": "/Users/jrp/Pictures/Processed",
       "force_color": false,
+      "force_download": false,
       "image": null,
       "kv_bits": null,
       "kv_group_size": 64,
@@ -84,6 +86,7 @@
       "prompt": null,
       "prune_repro_days": 90,
       "quality_config": null,
+      "quantize_activations": false,
       "quantized_kv_start": 5000,
       "repetition_context_size": 20,
       "repetition_penalty": null,
@@ -102,16 +105,16 @@
       "verbose": true,
       "width": null
     },
-    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260502-153407_DSC09845.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/llava-v1.6-mistral-7b-8bit mlx-community/paligemma2-10b-ft-docci-448-bf16 mlx-community/paligemma2-3b-ft-docci-448-bf16",
+    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260509-165009_DSC09954.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen2-VL-2B-Instruct-4bit",
     "env_vars": {
       "TOKENIZERS_PARALLELISM": "false"
     },
-    "image_path": "/Users/jrp/Pictures/Processed/20260502-153407_DSC09845.jpg",
-    "image_ref_sha256": "361e8b209624dc6c24cf3c778a33986ebd8ad43f6c08010fde7643b9bb5d178a",
-    "image_sha256": "ef45865acc39073c98268011f2c7435f6226b4a1f441ffe1e429e1a80f3924a9",
+    "image_path": "/Users/jrp/Pictures/Processed/20260509-165009_DSC09954.jpg",
+    "image_ref_sha256": "ed44d880529e0633051d5651bea9660b787e8673e37f61808667a88fe6f684bd",
+    "image_sha256": "bcc68c742f02f1e316466de87b02cb67b3b7c10a00c07d6100446c935db1cb1d",
     "prompt_diagnostics": {
-      "eos_token": "<eos>",
-      "eos_token_id": 1,
+      "eos_token": "<|im_end|>",
+      "eos_token_id": 151645,
       "generate_kwargs": {
         "kv_bits": null,
         "kv_group_size": 64,
@@ -125,62 +128,80 @@
         "temperature": 0.0,
         "top_p": 1.0
       },
-      "image_placeholder_count": 1,
-      "model_type": "paligemma",
-      "processor_class": "mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor",
-      "rendered_prompt_chars": 2424,
-      "rendered_prompt_hash_sha256": "23ed1e42c2547078d4b641e5bfb0ef457562ed2d7a3af94a80f58813e8d8665b",
-      "rendered_prompt_preview": "<image>Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences describing the...",
+      "image_placeholder_count": 0,
+      "model_type": "qwen2_vl",
+      "processor_class": "mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor",
+      "rendered_prompt_chars": 2512,
+      "rendered_prompt_hash_sha256": "1ef24c2fb5a63ca7ae84fd16b4c07cfde18e3ad92fc2d06e78f6c17e8c977f00",
+      "rendered_prompt_preview": "<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\nAnalyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instruction...",
       "special_token_ids": [
-        2,
-        1,
-        3,
-        0,
-        4,
-        257152
+        151645,
+        151643,
+        151644,
+        151646,
+        151647,
+        151648,
+        151649,
+        151650,
+        151651,
+        151652,
+        151653,
+        151654,
+        151655,
+        151656
       ],
       "special_tokens": [
-        "<bos>",
-        "<eos>",
-        "<unk>",
-        "<pad>",
-        "<mask>",
-        "<image>"
+        "<|im_end|>",
+        "<|endoftext|>",
+        "<|im_start|>",
+        "<|object_ref_start|>",
+        "<|object_ref_end|>",
+        "<|box_start|>",
+        "<|box_end|>",
+        "<|quad_start|>",
+        "<|quad_end|>",
+        "<|vision_start|>",
+        "<|vision_end|>",
+        "<|vision_pad|>",
+        "<|image_pad|>",
+        "<|video_pad|>"
       ],
-      "tokenizer_class": "transformers.models.gemma.tokenization_gemma.GemmaTokenizer"
+      "tokenizer_class": "transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer"
     },
-    "prompt_hash_sha256": "b2e24e87de62c3a79f74b3681e1b353a838eee4f737e5eee84159e785dbc989e",
+    "prompt_hash_sha256": "1887ad882e1845d8b9e280a51db6efcf4cb34cc0d4015d8de3dbfe882f83251d",
     "prompt_preview": "Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct any...",
-    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260502-153407_DSC09845.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/paligemma2-3b-ft-docci-448-bf16",
+    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260509-165009_DSC09954.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen2-VL-2B-Instruct-4bit",
     "seed": null
   },
   "result": {
-    "generated_text_preview": "- The river water is a light brown color.",
+    "generated_text_preview": "<|endoftext|><|endoftext|><|endoftext|><|endoftext|>",
     "maintainer_triage": {
       "confidence": "high",
       "evidence": [
-        "harness:prompt_template",
+        "harness:stop_token",
         "low_hint_overlap"
       ],
       "harness_details": [
-        "output:output_ratio(0.7%)"
+        "token_leak:<|endoftext|>",
+        "output:truncated(5tok)",
+        "long_context_low_ratio(0.0%;16789->5)"
       ],
       "hit_max_tokens": false,
       "issue_kind": "harness",
-      "issue_subtype": "prompt_template",
-      "next_action": "Check chat-template and EOS defaults first; the output shape is not matching the requested contract.",
-      "nontext_prompt_ratio": 0.6973684210526315,
-      "prompt_output_ratio": 0.006892230576441102,
-      "prompt_tokens_total": 1596,
+      "issue_subtype": "stop_token",
+      "next_action": "Inspect EOS/stop-token stripping; control tokens are leaking into user-facing text.",
+      "nontext_prompt_ratio": 0.9717672285424981,
+      "prompt_output_ratio": 0.00029781404491035796,
+      "prompt_tokens_total": 16789,
       "requested_max_tokens": 500,
       "stop_reason": "completed",
-      "summary": "Output is very short relative to prompt size (0.7%), suggesting possible early-stop or prompt-handling issues. | nontext prompt burden=70% | missing sections: title, description, keywords | missing terms: 10 Best (structured), Barge, Bird, Blue sky, Gull",
-      "suspected_owner": "model-config",
+      "summary": "Special control token &lt;|endoftext|&gt; appeared in generated text. | Output appears truncated to about 5 tokens. | nontext prompt burden=97% | missing terms: Bell Tower, Blue sky, Car, Chapel, Church",
+      "suspected_owner": "mlx-vlm",
       "user_bucket": "avoid"
     },
     "quality_issues": [
-      "\u26a0\ufe0fharness(prompt_template)",
-      "missing-sections(title+description+keywords)",
+      "\u26a0\ufe0fharness(stop_token)",
+      "lang_mixing",
       "trusted-hints-ignored",
       "context-ignored"
     ],

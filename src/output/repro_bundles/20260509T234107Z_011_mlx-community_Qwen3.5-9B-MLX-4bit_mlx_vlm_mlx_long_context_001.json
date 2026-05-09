@@ -2,14 +2,15 @@
   "environment": {
     "library_versions": {
       "Pillow": "12.2.0",
-      "huggingface-hub": "1.13.0",
-      "mlx": "0.32.0.dev20260503+e8ebdebe",
+      "huggingface-hub": "1.14.0",
+      "mlx": "0.32.0.dev20260510+84961223",
+      "mlx-audio": "0.4.3",
       "mlx-lm": "0.31.3",
       "mlx-metal": null,
-      "mlx-vlm": "0.4.5",
+      "mlx-vlm": "0.5.0",
       "numpy": "2.4.4",
       "tokenizers": "0.22.2",
-      "transformers": "5.7.0"
+      "transformers": "5.8.0"
     },
     "platform": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
     "preflight_issues": [],
@@ -41,9 +42,9 @@
     "traceback": null,
     "type": null
   },
-  "generated_at_utc": "2026-05-03T20:53:13+00:00",
-  "issue_cluster_id": "mlx-vlm-mlx_long-context_002",
-  "model": "mlx-community/Qwen3.6-27B-mxfp8",
+  "generated_at_utc": "2026-05-09T23:41:07+00:00",
+  "issue_cluster_id": "mlx-vlm-mlx_long-context_001",
+  "model": "mlx-community/Qwen3.5-9B-MLX-4bit",
   "repro": {
     "args": {
       "_check_models_preflight_issues": [],
@@ -60,6 +61,7 @@
       ],
       "folder": "/Users/jrp/Pictures/Processed",
       "force_color": false,
+      "force_download": false,
       "image": null,
       "kv_bits": null,
       "kv_group_size": 64,
@@ -84,6 +86,7 @@
       "prompt": null,
       "prune_repro_days": 90,
       "quality_config": null,
+      "quantize_activations": false,
       "quantized_kv_start": 5000,
       "repetition_context_size": 20,
       "repetition_penalty": null,
@@ -102,13 +105,13 @@
       "verbose": true,
       "width": null
     },
-    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260502-153407_DSC09845.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen3.5-27B-4bit mlx-community/Qwen3.6-27B-mxfp8",
+    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260509-165009_DSC09954.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen3.5-9B-MLX-4bit",
     "env_vars": {
       "TOKENIZERS_PARALLELISM": "false"
     },
-    "image_path": "/Users/jrp/Pictures/Processed/20260502-153407_DSC09845.jpg",
-    "image_ref_sha256": "361e8b209624dc6c24cf3c778a33986ebd8ad43f6c08010fde7643b9bb5d178a",
-    "image_sha256": "ef45865acc39073c98268011f2c7435f6226b4a1f441ffe1e429e1a80f3924a9",
+    "image_path": "/Users/jrp/Pictures/Processed/20260509-165009_DSC09954.jpg",
+    "image_ref_sha256": "ed44d880529e0633051d5651bea9660b787e8673e37f61808667a88fe6f684bd",
+    "image_sha256": "bcc68c742f02f1e316466de87b02cb67b3b7c10a00c07d6100446c935db1cb1d",
     "prompt_diagnostics": {
       "eos_token": "<|im_end|>",
       "eos_token_id": 248046,
@@ -128,8 +131,8 @@
       "image_placeholder_count": 0,
       "model_type": "qwen3_5",
       "processor_class": "mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor",
-      "rendered_prompt_chars": 2518,
-      "rendered_prompt_hash_sha256": "dd1d8fd5da8f74d2f075609a7e98f8e679c446d6e9202ba2779704f295de8c87",
+      "rendered_prompt_chars": 2462,
+      "rendered_prompt_hash_sha256": "3ae0dd4e47f7080a34a14006c2495e24e70e6bb009017bbd8fc7fc12b36bf23c",
       "rendered_prompt_preview": "<|im_start|>user\n<|vision_start|><|image_pad|><|vision_end|>Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title....",
       "special_token_ids": [
         248046,
@@ -155,22 +158,24 @@
       ],
       "tokenizer_class": "transformers.tokenization_utils_tokenizers.TokenizersBackend"
     },
-    "prompt_hash_sha256": "b2e24e87de62c3a79f74b3681e1b353a838eee4f737e5eee84159e785dbc989e",
+    "prompt_hash_sha256": "1887ad882e1845d8b9e280a51db6efcf4cb34cc0d4015d8de3dbfe882f83251d",
     "prompt_preview": "Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct any...",
-    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260502-153407_DSC09845.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen3.6-27B-mxfp8",
+    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260509-165009_DSC09954.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen3.5-9B-MLX-4bit",
     "seed": null
   },
   "result": {
-    "generated_text_preview": "The user wants me to analyze the image and generate metadata (Title, Description, Keywords) based on specific rules.\n\n**1. Analyze the Image:**\n*   **Main Subject:** A large, traditional sailing barge (yellow hull, tall mast, brown sail furled) is the central focus. It's moored on mudflats.\n*   **Surroundings:**\n    *   To the left: A smaller white boat with a cabin.\n    *   Behind the main barge:...",
+    "generated_text_preview": "The user wants me to analyze the provided image and generate cataloguing metadata in British English.\nI need to follow specific rules:\n- Use only details clearly visible in the image.\n- Do not guess or infer.\n- Use the provided hints as a draft but correct/omit anything not visible.\n- Output exactly three sections: Title, Description, Keywords.\n\n**Analysis of the Image:**\n- **Subject:** A large ch...",
     "maintainer_triage": {
       "confidence": "medium",
       "evidence": [
         "token_cap",
         "missing_sections",
+        "abrupt_tail",
         "trusted_overlap",
         "instruction_markers",
         "metadata_terms",
         "reasoning_leak",
+        "refusal",
         "degeneration"
       ],
       "harness_details": [],
@@ -178,16 +183,17 @@
       "issue_kind": "cutoff_degraded",
       "issue_subtype": "token_cap",
       "next_action": "Treat as a model limitation for this prompt; the requested output contract is not being met.",
-      "nontext_prompt_ratio": 0.9712858926342073,
-      "prompt_output_ratio": 0.02972474882587242,
-      "prompt_tokens_total": 16821,
+      "nontext_prompt_ratio": 0.9717924303737205,
+      "prompt_output_ratio": 0.029754820280885504,
+      "prompt_tokens_total": 16804,
       "requested_max_tokens": 500,
-      "stop_reason": "completed",
-      "summary": "hit token cap (500) | nontext prompt burden=97% | missing sections: title, description, keywords | missing terms: 10 Best (structured), Bird, Gull, Marina, Mooring",
+      "stop_reason": "max_tokens",
+      "summary": "hit token cap (500) | nontext prompt burden=97% | missing sections: title, description, keywords | missing terms: Bell Tower, Chapel, Daylight, Dorking, Gothic Architecture",
       "suspected_owner": "model",
       "user_bucket": "avoid"
     },
     "quality_issues": [
+      "refusal(explicit_refusal)",
       "degeneration",
       "missing-sections(title+description+keywords)",
       "reasoning-leak",
