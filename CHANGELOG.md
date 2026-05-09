@@ -7,6 +7,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Refactor report assembly toward shared Markdown/HTML section primitives and
+  normalized repro command specs so diagnostics, issue drafts, review queues,
+  and summary reports reuse the same rendering and command-token paths.
 - Make generated upstream issue drafts more maintainer-focused by replacing
   `check_models` repro commands with native `mlx_vlm.generate` CLI and Python
   repro snippets, inlining prompt/config details, framing JSON bundles as

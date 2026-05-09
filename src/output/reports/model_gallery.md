@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-_Generated on 2026-05-09 12:23:02 BST_
+_Generated on 2026-05-09 23:43:05 BST_
 
 A review-friendly artifact with image metadata, the source prompt, and full
 generated output for each model.
@@ -11,11 +11,7 @@ _Action Snapshot: see [results.md](results.md) for the full summary._
 
 ### Strong Candidates
 
-- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: 🏆 A (87/100) | Desc 83 | Keywords 83 | Δ+24 | 182.7 tps
-- `mlx-community/gemma-3-27b-it-qat-8bit`: 🏆 A (86/100) | Desc 84 | Keywords 92 | Δ+23 | 17.8 tps
-- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: 🏆 A (86/100) | Desc 93 | Keywords 86 | Δ+23 | 61.1 tps
-- `mlx-community/gemma-4-26b-a4b-it-4bit`: 🏆 A (85/100) | Desc 93 | Keywords 79 | Δ+22 | 115.1 tps
-- `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`: 🏆 A (83/100) | Desc 87 | Keywords 84 | Δ+20 | 64.9 tps
+- `mlx-community/gemma-3-27b-it-qat-4bit`: 🏆 A (82/100) | Desc 87 | Keywords 84 | Δ+19 | 31.2 tps
 
 ### Watchlist
 
@@ -64,17 +60,6 @@ _Action Snapshot: see [results.md](results.md) for the full summary._
 - mlx-community/MolmoPoint-8B-fp16 (Processor Error)
   - Error: `Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded processor has no image_processor; expected multim...`
   - Type: `ValueError`
-
-## Image Metadata
-
-- _Description:_ A classic-style sailboat with a dark hull and wooden mast is
-  moored in a calm estuary during low tide. The water has receded, exposing a
-  vast expanse of green, algae-covered mudflats behind the vessel. The boat,
-  adorned with a string of small flags, floats peacefully, waiting for the
-  tide to rise again.
-- _Date:_ 2026-05-02 18:33:45 BST
-- _Time:_ 18:33:45
-- _GPS:_ 52.089294°N, 1.317741°E
 
 ## Prompt
 
@@ -133,12 +118,12 @@ _Action Snapshot: see [results.md](results.md) for the full summary._
 
 ## Quick Navigation
 
-- _Best end-to-end cataloging:_ [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)
-- _Best descriptions:_ [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)
-- _Best keywording:_ [`mlx-community/gemma-3-27b-it-qat-8bit`](#model-mlx-community-gemma-3-27b-it-qat-8bit)
+- _Best end-to-end cataloging:_ [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)
+- _Best descriptions:_ [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)
+- _Best keywording:_ [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)
 - _Fastest generation:_ [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)
 - _Lowest memory footprint:_ [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)
-- _Best balance:_ [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)
+- _Best balance:_ [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)
 - _Failed models:_ `LiquidAI/LFM2.5-VL-450M-MLX-bf16`, `facebook/pe-av-large`,
   `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`,
   `mlx-community/Kimi-VL-A3B-Thinking-8bit`,
@@ -312,18 +297,18 @@ ValueError: Model loading failed: Model type pe_audio_video not supported. Error
 
 ### ❌ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
 
-- _Recommendation:_ avoid for now; review verdict: model shortcoming
+- _Recommendation:_ avoid for now; review verdict: runtime failure
 - _Status:_ Failed (Error)
-- _Owner:_ likely owner `model`; reported package `mlx-vlm`; failure stage
+- _Owner:_ likely owner `mlx-vlm`; reported package `mlx-vlm`; failure stage
   `Error`; diagnostic code `MLX_VLM_DECODE_ERROR`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Next step:_ Inspect prompt-template, stop-token, and decode post-processing
+  behavior.
 - _Error summary:_ see error details below
-- _Key signals:_ keywords=37; context echo=100%; nonvisual metadata reused;
-  reasoning leak
+- _Key signals:_ error; mlx vlm decode error
 - _Failure context:_ type `ValueError`; phase `decode`; code
   `MLX_VLM_DECODE_ERROR`; package `mlx-vlm`
-- _Tokens:_ prompt n/a; estimated text 444 tok; estimated non-text n/a;
-  generated n/a; requested max 500 tok; stop reason exception
+- _Tokens:_ prompt n/a; estimated text n/a; estimated non-text n/a; generated
+  n/a; requested max 500 tok; stop reason exception
 
 _Error details:_
 
@@ -480,20 +465,18 @@ multi_modal_projector.linear_2.scales.
 
 ### ❌ mlx-community/LFM2-VL-1.6B-8bit
 
-- _Recommendation:_ avoid for now; review verdict: harness
+- _Recommendation:_ avoid for now; review verdict: runtime failure
 - _Status:_ Failed (Error)
-- _Owner:_ likely owner `mlx-vlm`; harness signal `stop_token`; reported
-  package `mlx-vlm`; failure stage `Error`; diagnostic code
-  `MLX_VLM_DECODE_ERROR`
-- _Next step:_ Inspect EOS/stop-token stripping; control tokens are leaking
-  into user-facing text.
+- _Owner:_ likely owner `mlx-vlm`; reported package `mlx-vlm`; failure stage
+  `Error`; diagnostic code `MLX_VLM_DECODE_ERROR`
+- _Next step:_ Inspect prompt-template, stop-token, and decode post-processing
+  behavior.
 - _Error summary:_ see error details below
-- _Key signals:_ Special control token &lt;|im_end|&gt; appeared in generated
-  text.; keywords=36; context echo=100%; nonvisual metadata reused
+- _Key signals:_ error; mlx vlm decode error
 - _Failure context:_ type `ValueError`; phase `decode`; code
   `MLX_VLM_DECODE_ERROR`; package `mlx-vlm`
-- _Tokens:_ prompt n/a; estimated text 444 tok; estimated non-text n/a;
-  generated n/a; requested max 500 tok; stop reason exception
+- _Tokens:_ prompt n/a; estimated text n/a; estimated non-text n/a; generated
+  n/a; requested max 500 tok; stop reason exception
 
 _Error details:_
 
@@ -563,20 +546,18 @@ ValueError: Model runtime error during generation for mlx-community/LFM2-VL-1.6B
 
 ### ❌ mlx-community/LFM2.5-VL-1.6B-bf16
 
-- _Recommendation:_ avoid for now; review verdict: harness
+- _Recommendation:_ avoid for now; review verdict: runtime failure
 - _Status:_ Failed (Error)
-- _Owner:_ likely owner `mlx-vlm`; harness signal `stop_token`; reported
-  package `mlx-vlm`; failure stage `Error`; diagnostic code
-  `MLX_VLM_DECODE_ERROR`
-- _Next step:_ Inspect EOS/stop-token stripping; control tokens are leaking
-  into user-facing text.
+- _Owner:_ likely owner `mlx-vlm`; reported package `mlx-vlm`; failure stage
+  `Error`; diagnostic code `MLX_VLM_DECODE_ERROR`
+- _Next step:_ Inspect prompt-template, stop-token, and decode post-processing
+  behavior.
 - _Error summary:_ see error details below
-- _Key signals:_ Special control token &lt;|im_end|&gt; appeared in generated
-  text.; keywords=36; context echo=100%; nonvisual metadata reused
+- _Key signals:_ error; mlx vlm decode error
 - _Failure context:_ type `ValueError`; phase `decode`; code
   `MLX_VLM_DECODE_ERROR`; package `mlx-vlm`
-- _Tokens:_ prompt n/a; estimated text 444 tok; estimated non-text n/a;
-  generated n/a; requested max 500 tok; stop reason exception
+- _Tokens:_ prompt n/a; estimated text n/a; estimated non-text n/a; generated
+  n/a; requested max 500 tok; stop reason exception
 
 _Error details:_
 
@@ -731,7 +712,7 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model limitation for this prompt; the requested
   output contract is not being met.
-- _Key signals:_ missing sections: keywords; context echo=98%
+- _Key signals:_ missing sections: keywords
 - _Score:_ 🟠 D (39/100); Δ-23; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context echo, missing sections)
 - _Timing:_ Load 0.58s; Gen 0.67s; Total 1.45s
@@ -754,7 +735,7 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
 - Missing sections (keywords)
 - Title length violation (12 words; expected 5-10)
 - Description sentence violation (3; expected 1-2)
-- Context echo (98% overlap)
+- Context echo (0% overlap)
 
 ---
 
@@ -785,6 +766,7 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
 
 ⚠️ _Quality Warnings:_
 
+- Context ignored (missing: style, hull, calm, estuary, water)
 - Missing sections (keywords)
 
 ---
@@ -797,8 +779,7 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model limitation for this prompt; the requested
   output contract is not being met.
-- _Key signals:_ missing sections: keywords; context echo=44%; nonvisual
-  metadata reused
+- _Key signals:_ missing sections: keywords; nonvisual metadata reused
 - _Score:_ 🟠 D (45/100); Δ-18; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context echo, metadata borrowing, missing
   sections)
@@ -827,9 +808,9 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
 - Missing sections (keywords)
 - Title length violation (11 words; expected 5-10)
 - Description sentence violation (5; expected 1-2)
-- Context echo (44% overlap)
+- Context echo (0% overlap)
 - Nonvisual metadata borrowing
-- suspicious_precision: 2 overly precise numbers
+- fabrication
 
 ---
 
@@ -842,7 +823,7 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
 - _Next step:_ Treat as a model limitation for this prompt; the requested
   output contract is not being met.
 - _Key signals:_ nontext prompt burden=79%; missing sections: title,
-  description, keywords; context echo=100%
+  description, keywords
 - _Score:_ 🟠 D (38/100); Δ-25; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context echo, missing sections)
 - _Timing:_ Load 0.61s; Gen 1.50s; Total 2.31s
@@ -862,7 +843,7 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
 ⚠️ _Quality Warnings:_
 
 - Missing sections (title, description, keywords)
-- Context echo (100% overlap)
+- Context echo (0% overlap)
 
 ---
 
@@ -875,7 +856,7 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
 - _Next step:_ Treat as a model limitation for this prompt; the requested
   output contract is not being met.
 - _Key signals:_ nontext prompt burden=79%; missing sections: title,
-  description, keywords; context echo=100%
+  description, keywords
 - _Score:_ 🟠 D (38/100); Δ-25; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context echo, missing sections)
 - _Timing:_ Load 0.61s; Gen 1.50s; Total 2.32s
@@ -895,7 +876,7 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
 ⚠️ _Quality Warnings:_
 
 - Missing sections (title, description, keywords)
-- Context echo (100% overlap)
+- Context echo (0% overlap)
 
 ---
 
@@ -909,7 +890,7 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
   coverage is still weak.
 - _Key signals:_ missing terms: classic, style, during, low, tide
 - _Score:_ 🏆 A (85/100); Δ+22; None identified
-- _Review focus:_ strong candidate for first-pass review
+- _Review focus:_ watchlist (context ignored)
 - _Timing:_ Load 2.34s; Gen 1.62s; Total 4.19s
 - _Throughput:_ Prompt 1,544 TPS (784 tok); Gen 115 TPS (89 tok)
 - _Tokens:_ prompt 784 tok; estimated text 444 tok; estimated non-text 340
@@ -930,7 +911,9 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
 > greenery, orange buoy, flags, calm, outdoor, daytime
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
-_Quality Status:_ no quality issues detected in this run
+⚠️ _Quality Warnings:_
+
+- Context ignored (missing: classic, style, during, low, tide)
 
 ---
 
@@ -941,7 +924,7 @@ _Quality Status:_ no quality issues detected in this run
 - _Recommendation:_ avoid for now; review verdict: model shortcoming
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ context echo=66%; nonvisual metadata reused
+- _Key signals:_ nonvisual metadata reused
 - _Score:_ 🟡 C (58/100); Δ-5; Limited novel information
 - _Review focus:_ watchlist (context echo, metadata borrowing)
 - _Timing:_ Load 0.57s; Gen 1.87s; Total 2.65s
@@ -964,9 +947,9 @@ _Quality Status:_ no quality issues detected in this run
 ⚠️ _Quality Warnings:_
 
 - Description sentence violation (3; expected 1-2)
-- Context echo (66% overlap)
+- Context echo (0% overlap)
 - Nonvisual metadata borrowing
-- suspicious_precision: 2 overly precise numbers
+- fabrication
 
 ---
 
@@ -1026,6 +1009,7 @@ _Quality Status:_ no quality issues detected in this run
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:context_budget
+- Context ignored (missing: moored, calm, estuary, during, low)
 - Missing sections (title, description, keywords)
 - Degrades trusted hints
 
@@ -1042,7 +1026,7 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=89%; missing terms: classic, style,
   during, exposing, vast
 - _Score:_ 🏆 A (87/100); Δ+24; None identified
-- _Review focus:_ strong candidate for first-pass review
+- _Review focus:_ watchlist (context ignored)
 - _Timing:_ Load 1.13s; Gen 3.03s; Total 4.41s
 - _Throughput:_ Prompt 2,189 TPS (4,114 tok); Gen 183 TPS (127 tok)
 - _Tokens:_ prompt 4114 tok; estimated text 444 tok; estimated non-text 3670
@@ -1065,7 +1049,9 @@ _Quality Status:_ no quality issues detected in this run
 > sail yacht, coastal setting, receded water, algae-covered ground
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
-_Quality Status:_ no quality issues detected in this run
+⚠️ _Quality Warnings:_
+
+- Context ignored (missing: classic, style, during, exposing, vast)
 
 ---
 
@@ -1080,7 +1066,7 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=86%; missing terms: during, receded,
   exposing, vast, expanse
 - _Score:_ ✅ B (74/100); Δ+12; Limited novel information
-- _Review focus:_ strong candidate for first-pass review
+- _Review focus:_ watchlist (context ignored)
 - _Timing:_ Load 1.73s; Gen 3.98s; Total 5.92s
 - _Throughput:_ Prompt 2,836 TPS (3,064 tok); Gen 34.4 TPS (87 tok)
 - _Tokens:_ prompt 3064 tok; estimated text 444 tok; estimated non-text 2620
@@ -1098,7 +1084,9 @@ _Quality Status:_ no quality issues detected in this run
 > water, algae, mudflats, green, moored
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
-_Quality Status:_ no quality issues detected in this run
+⚠️ _Quality Warnings:_
+
+- Context ignored (missing: during, receded, exposing, vast, expanse)
 
 ---
 
@@ -1135,7 +1123,7 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
-- Repetitive output (phrase: "18:33:45 18:33:45 18:33:45 18:...")
+- Repetitive output (repetitive(phrase: "18:33:45 18:33:45 18:33:45 18:..."))
 - Context ignored (missing: classic, style, sailboat, dark, hull)
 - Missing sections (title, description, keywords)
 - Nonvisual metadata borrowing
@@ -1154,7 +1142,7 @@ _Quality Status:_ no quality issues detected in this run
   coverage is still weak.
 - _Key signals:_ missing terms: style, during, receded, exposing, vast
 - _Score:_ 🏆 A (80/100); Δ+18; None identified
-- _Review focus:_ strong candidate for first-pass review
+- _Review focus:_ watchlist (context ignored)
 - _Timing:_ Load 2.55s; Gen 4.87s; Total 7.63s
 - _Throughput:_ Prompt 591 TPS (784 tok); Gen 27.4 TPS (88 tok)
 - _Tokens:_ prompt 784 tok; estimated text 444 tok; estimated non-text 340
@@ -1173,7 +1161,9 @@ _Quality Status:_ no quality issues detected in this run
 > daylight
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
-_Quality Status:_ no quality issues detected in this run
+⚠️ _Quality Warnings:_
+
+- Context ignored (missing: style, during, receded, exposing, vast)
 
 ---
 
@@ -1212,6 +1202,7 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
+- Context ignored (missing: classic, style, wooden, during, receded)
 - Keyword count violation (19; expected 10-18)
 
 ---
@@ -1240,6 +1231,7 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
+- Context ignored (missing: classic, style, dark, hull, wooden)
 - Missing sections (title, description, keywords)
 - Degrades trusted hints
 
@@ -1252,8 +1244,7 @@ _Quality Status:_ no quality issues detected in this run
 - _Recommendation:_ use with caveats; review verdict: clean
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ nontext prompt burden=87%; context echo=65%;
-  formatting=Unknown tags: &lt;end_of_utterance&gt;
+- _Key signals:_ nontext prompt burden=87%; formatting=formatting
 - _Score:_ 🟡 C (58/100); Δ-5; Limited novel information
 - _Review focus:_ watchlist (context echo)
 - _Timing:_ Load 1.93s; Gen 5.50s; Total 7.64s
@@ -1278,8 +1269,8 @@ _Quality Status:_ no quality issues detected in this run
 ⚠️ _Quality Warnings:_
 
 - Description sentence violation (3; expected 1-2)
-- Context echo (65% overlap)
-- Unknown tags: <end_of_utterance>
+- Context echo (0% overlap)
+- formatting
 
 ---
 
@@ -1294,7 +1285,7 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=89%; missing terms: receded, exposing,
   vast, expanse, behind
 - _Score:_ 🏆 A (83/100); Δ+20; None identified
-- _Review focus:_ strong candidate for first-pass review
+- _Review focus:_ watchlist (context ignored)
 - _Timing:_ Load 1.37s; Gen 5.55s; Total 7.13s
 - _Throughput:_ Prompt 1,228 TPS (4,115 tok); Gen 64.9 TPS (114 tok)
 - _Tokens:_ prompt 4115 tok; estimated text 444 tok; estimated non-text 3671
@@ -1317,7 +1308,9 @@ _Quality Status:_ no quality issues detected in this run
 > mast, classic-style boat
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
-_Quality Status:_ no quality issues detected in this run
+⚠️ _Quality Warnings:_
+
+- Context ignored (missing: receded, exposing, vast, expanse, behind)
 
 ---
 
@@ -1332,7 +1325,7 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=89%; missing terms: style, during,
   receded, exposing, vast
 - _Score:_ 🏆 A (86/100); Δ+23; None identified
-- _Review focus:_ strong candidate for first-pass review
+- _Review focus:_ watchlist (context ignored)
 - _Timing:_ Load 1.44s; Gen 5.78s; Total 7.43s
 - _Throughput:_ Prompt 1,197 TPS (4,115 tok); Gen 61.1 TPS (118 tok)
 - _Tokens:_ prompt 4115 tok; estimated text 444 tok; estimated non-text 3671
@@ -1354,7 +1347,9 @@ _Quality Status:_ no quality issues detected in this run
 > algae-covered, wooden hull, moored vessel, calm water, wooden structure
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
-_Quality Status:_ no quality issues detected in this run
+⚠️ _Quality Warnings:_
+
+- Context ignored (missing: style, during, receded, exposing, vast)
 
 ---
 
@@ -1434,7 +1429,7 @@ _Quality Status:_ no quality issues detected in this run
 - _Next step:_ Treat as a model limitation for this prompt; trusted hint
   coverage is still weak.
 - _Key signals:_ nontext prompt burden=86%; missing terms: floats, peacefully,
-  waiting, rise, again; context echo=46%
+  waiting, rise, again
 - _Score:_ 🟡 C (64/100); Δ+1; Limited novel information
 - _Review focus:_ watchlist (context echo)
 - _Timing:_ Load 1.77s; Gen 6.29s; Total 8.27s
@@ -1461,8 +1456,9 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
+- Context ignored (missing: floats, peacefully, waiting, rise, again)
 - Description sentence violation (3; expected 1-2)
-- Context echo (46% overlap)
+- Context echo (0% overlap)
 
 ---
 
@@ -1473,7 +1469,7 @@ _Quality Status:_ no quality issues detected in this run
 - _Recommendation:_ use with caveats; review verdict: clean
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ nontext prompt burden=90%; context echo=58%
+- _Key signals:_ nontext prompt burden=90%
 - _Score:_ 🟡 C (56/100); Δ-6; Limited novel information
 - _Review focus:_ watchlist (context echo)
 - _Timing:_ Load 1.72s; Gen 6.48s; Total 8.42s
@@ -1502,7 +1498,7 @@ _Quality Status:_ no quality issues detected in this run
 ⚠️ _Quality Warnings:_
 
 - Description sentence violation (3; expected 1-2)
-- Context echo (58% overlap)
+- Context echo (0% overlap)
 
 ---
 
@@ -1515,7 +1511,7 @@ _Quality Status:_ no quality issues detected in this run
 - _Next step:_ Treat as a model limitation for this prompt; the requested
   output contract is not being met.
 - _Key signals:_ missing sections: title, description, keywords; missing
-  terms: style; context echo=96%
+  terms: style
 - _Score:_ 🟠 D (46/100); Δ-17; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context echo, missing sections)
 - _Timing:_ Load 1.90s; Gen 7.30s; Total 9.40s
@@ -1542,8 +1538,9 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
+- Context ignored (missing: style)
 - Missing sections (title, description, keywords)
-- Context echo (96% overlap)
+- Context echo (0% overlap)
 
 ---
 
@@ -1587,7 +1584,7 @@ _Quality Status:_ no quality issues detected in this run
   coverage is still weak.
 - _Key signals:_ missing terms: classic, style, wooden, estuary, receded
 - _Score:_ 🏆 A (86/100); Δ+23; None identified
-- _Review focus:_ strong candidate for first-pass review
+- _Review focus:_ watchlist (context ignored)
 - _Timing:_ Load 3.40s; Gen 7.56s; Total 11.17s
 - _Throughput:_ Prompt 559 TPS (783 tok); Gen 17.8 TPS (104 tok)
 - _Tokens:_ prompt 783 tok; estimated text 444 tok; estimated non-text 339
@@ -1608,7 +1605,9 @@ _Quality Status:_ no quality issues detected in this run
 > orange, mast, rigging, calm, water, exterior, side view, moored, reflection
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
-_Quality Status:_ no quality issues detected in this run
+⚠️ _Quality Warnings:_
+
+- Context ignored (missing: classic, style, wooden, estuary, receded)
 
 ---
 
@@ -1672,9 +1671,10 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
+- Context ignored (missing: during, receded, vast, expanse, algae)
 - Missing sections (title)
 - Keyword count violation (45; expected 10-18)
-- Reasoning leak (◁think▷, ◁/think▷)
+- Reasoning leak (reasoning-leak)
 
 ---
 
@@ -1704,6 +1704,7 @@ _Quality Status:_ no quality issues detected in this run
 ⚠️ _Quality Warnings:_
 
 - ⚠️HARNESS:encoding
+- Context ignored (missing: vast, expanse, adorned, small, floats)
 - Missing sections (description, keywords)
 - Title length violation (66 words; expected 5-10)
 - token_encoding:bpe_space_leak(61)
@@ -1719,7 +1720,7 @@ _Quality Status:_ no quality issues detected in this run
 - _Next step:_ Treat as a model limitation for this prompt; trusted hint
   coverage is still weak.
 - _Key signals:_ hit token cap (500); nontext prompt burden=67%; missing
-  terms: boat, adorned, string, small, floats; keyword duplication=90%
+  terms: boat, adorned, string, small, floats; keywords=198
 - _Score:_ 🟠 D (46/100); Δ-17; Lacks visual description of image
 - _Review focus:_ watchlist (context echo, cutoff, repetitive)
 - _Timing:_ Load 0.90s; Gen 9.42s; Total 10.52s
@@ -1759,11 +1760,11 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
-- Repetitive output (phrase: "flags, flags, flags, flags,...")
+- Repetitive output (repetitive(phrase: "flags, flags, flags, flags,..."))
+- Context ignored (missing: boat, adorned, string, small, floats)
 - Title length violation (4 words; expected 5-10)
 - Keyword count violation (198; expected 10-18)
-- Keyword duplication (90% duplicated terms)
-- Context echo (41% overlap)
+- Context echo (0% overlap)
 - Likely capped by max token budget
 
 ---
@@ -1777,7 +1778,7 @@ _Quality Status:_ no quality issues detected in this run
 - _Next step:_ Treat as a model limitation for this prompt; trusted hint
   coverage is still weak.
 - _Key signals:_ hit token cap (500); nontext prompt burden=67%; missing
-  terms: boat, adorned, string, small, floats; keyword duplication=90%
+  terms: boat, adorned, string, small, floats; keywords=198
 - _Score:_ 🟠 D (46/100); Δ-17; Lacks visual description of image
 - _Review focus:_ watchlist (context echo, cutoff, repetitive)
 - _Timing:_ Load 0.94s; Gen 9.43s; Total 10.58s
@@ -1817,11 +1818,11 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
-- Repetitive output (phrase: "flags, flags, flags, flags,...")
+- Repetitive output (repetitive(phrase: "flags, flags, flags, flags,..."))
+- Context ignored (missing: boat, adorned, string, small, floats)
 - Title length violation (4 words; expected 5-10)
 - Keyword count violation (198; expected 10-18)
-- Keyword duplication (90% duplicated terms)
-- Context echo (41% overlap)
+- Context echo (0% overlap)
 - Likely capped by max token budget
 
 ---
@@ -1833,7 +1834,7 @@ _Quality Status:_ no quality issues detected in this run
 - _Recommendation:_ use with caveats; review verdict: clean
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ nontext prompt burden=90%; context echo=56%
+- _Key signals:_ nontext prompt burden=90%
 - _Score:_ 🟡 C (59/100); Δ-3; Limited novel information
 - _Review focus:_ watchlist (context echo)
 - _Timing:_ Load 2.60s; Gen 9.68s; Total 12.49s
@@ -1862,7 +1863,7 @@ _Quality Status:_ no quality issues detected in this run
 ⚠️ _Quality Warnings:_
 
 - Description sentence violation (3; expected 1-2)
-- Context echo (56% overlap)
+- Context echo (0% overlap)
 
 ---
 
@@ -1937,8 +1938,7 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
-- Repetitive output (phrase: "- output only the...")
-- Excessive bullet points (46)
+- Repetitive output (repetitive(phrase: "- output only the..."))
 - Context ignored (missing: classic, style, sailboat, dark, hull)
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
@@ -2004,11 +2004,12 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
+- Context ignored (missing: style, vast, expanse, floats, waiting)
 - Missing sections (title, keywords)
 - Description sentence violation (3; expected 1-2)
-- Reasoning leak (&lt;think&gt;)
+- Reasoning leak (reasoning-leak)
 - Likely capped by max token budget
-- Unknown tags: &lt;think&gt;
+- formatting
 
 ---
 
@@ -2065,8 +2066,9 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
+- Context ignored (missing: classic, style, receded, vast, expanse)
 - Missing sections (title, description, keywords)
-- Reasoning leak (here are my reasoning steps)
+- Reasoning leak (reasoning-leak)
 - Likely capped by max token budget
 
 ---
@@ -2162,12 +2164,12 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
-- Excessive bullet points (34)
+- Context ignored (missing: during, receded, exposing, vast, expanse)
 - Missing sections (title, description, keywords)
-- Reasoning leak (&lt;think&gt;)
+- Reasoning leak (reasoning-leak)
 - Nonvisual metadata borrowing
 - Likely capped by max token budget
-- Unknown tags: &lt;think&gt;
+- formatting
 
 ---
 
@@ -2208,7 +2210,8 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
-- Refusal detected (insufficient_info)
+- Context ignored (missing: estuary, during, receded, vast, expanse)
+- Refusal detected (refusal(insufficient_info))
 - Missing sections (title, description, keywords)
 
 ---
@@ -2270,7 +2273,8 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
-- Refusal detected (uncertainty)
+- Context ignored (missing: moored, during, receded, vast, expanse)
+- Refusal detected (refusal(uncertainty))
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
 
@@ -2333,11 +2337,12 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
+- Context ignored (missing: vast, expanse, behind, vessel, adorned)
 - Missing sections (title, description, keywords)
-- Reasoning leak (&lt;think&gt;)
+- Reasoning leak (reasoning-leak)
 - Nonvisual metadata borrowing
 - Likely capped by max token budget
-- Unknown tags: &lt;think&gt;
+- formatting
 
 ---
 
@@ -2387,7 +2392,7 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
-- Repetitive output (phrase: "the image is in...")
+- Repetitive output (repetitive(phrase: "the image is in..."))
 - Context ignored (missing: classic, style, sailboat, dark, hull)
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
@@ -2404,7 +2409,7 @@ _Quality Status:_ no quality issues detected in this run
 - _Next step:_ Treat as a model limitation for this prompt; trusted hint
   coverage is still weak.
 - _Key signals:_ hit token cap (500); nontext prompt burden=97%; missing
-  terms: style, vast, expanse, peacefully, waiting; keyword duplication=62%
+  terms: style, vast, expanse, peacefully, waiting; keywords=137
 - _Score:_ ✅ B (78/100); Δ+15; None identified
 - _Review focus:_ watchlist (cutoff)
 - _Timing:_ Load 1.11s; Gen 29.00s; Total 30.32s
@@ -2451,9 +2456,9 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
+- Context ignored (missing: style, vast, expanse, peacefully, waiting)
 - Description sentence violation (3; expected 1-2)
 - Keyword count violation (137; expected 10-18)
-- Keyword duplication (62% duplicated terms)
 - Likely capped by max token budget
 
 ---
@@ -2522,6 +2527,7 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
+- Context ignored (missing: style, during, receded, exposing, vast)
 - Missing sections (description, keywords)
 - Title length violation (118 words; expected 5-10)
 - Likely capped by max token budget
@@ -2596,6 +2602,7 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
+- Context ignored (missing: style, calm, during, receded, vast)
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
 
@@ -2704,6 +2711,7 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
+- Context ignored (missing: style, calm, during, receded, exposing)
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
 
@@ -2718,7 +2726,7 @@ _Quality Status:_ no quality issues detected in this run
 - _Next step:_ Treat as a model limitation for this prompt; the requested
   output contract is not being met.
 - _Key signals:_ nontext prompt burden=71%; missing sections: title; missing
-  terms: during, receded, exposing, vast, expanse; keyword duplication=41%
+  terms: during, receded, exposing, vast, expanse; keywords=22
 - _Score:_ ✅ B (71/100); Δ+8; None identified
 - _Review focus:_ watchlist (metadata borrowing, missing sections, reasoning
   leak)
@@ -2760,10 +2768,10 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
+- Context ignored (missing: during, receded, exposing, vast, expanse)
 - Missing sections (title)
 - Keyword count violation (22; expected 10-18)
-- Keyword duplication (41% duplicated terms)
-- Reasoning leak (◁think▷, ◁/think▷)
+- Reasoning leak (reasoning-leak)
 - Nonvisual metadata borrowing
 
 ---
@@ -2833,7 +2841,7 @@ _Quality Status:_ no quality issues detected in this run
 ⚠️ _Quality Warnings:_
 
 - Missing sections (title, description, keywords)
-- Reasoning leak (description hint:)
+- Reasoning leak (reasoning-leak)
 - Instruction echo
 - Likely capped by max token budget
 
@@ -2899,6 +2907,7 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
+- Context ignored (missing: style, dark, hull, during, receded)
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
 
@@ -2964,9 +2973,9 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
-- Refusal detected (explicit_refusal)
+- Refusal detected (refusal(explicit_refusal))
 - Missing sections (title, description, keywords)
-- Reasoning leak (description hint:, capture metadata:)
+- Reasoning leak (reasoning-leak)
 - Instruction echo
 - Nonvisual metadata borrowing
 - Likely capped by max token budget
@@ -3038,6 +3047,7 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
+- Context ignored (missing: classic, style, during, receded, exposing)
 - Keyword count violation (20; expected 10-18)
 - Nonvisual metadata borrowing
 - Likely capped by max token budget
@@ -3108,6 +3118,7 @@ _Quality Status:_ no quality issues detected in this run
 
 ⚠️ _Quality Warnings:_
 
+- Context ignored (missing: style, estuary, during, tide, receded)
 - Title length violation (4 words; expected 5-10)
 - Keyword count violation (19; expected 10-18)
 - Nonvisual metadata borrowing

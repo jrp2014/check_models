@@ -1802,6 +1802,223 @@ def _append_markdown_labeled_value(
     )
 
 
+def _escape_report_markdown_text(text: str) -> str:
+    """Escape HTML-like text for non-code Markdown report blocks."""
+    escaped = html.escape(_wrap_bare_urls(str(text)), quote=False)
+    escaped = escaped.replace("__", r"\_\_")
+    return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", escaped)
+
+
+def _escape_report_markdown_heading(text: str) -> str:
+    """Escape HTML-like heading text while preserving ordinary ampersands."""
+    escaped = str(text).replace("<", "&lt;").replace(">", "&gt;")
+    return escaped.replace("__", r"\_\_")
+
+
+@dataclass(frozen=True)
+class ReportParagraph:
+    """Plain paragraph block for shared Markdown/HTML report sections."""
+
+    text: str
+
+
+@dataclass(frozen=True)
+class ReportKeyValues:
+    """Label/value list block shared by diagnostics, issue, review, and reports."""
+
+    rows: tuple[tuple[str, str], ...]
+    markdown_escaped: bool = False
+
+
+@dataclass(frozen=True)
+class ReportBulletList:
+    """Bullet or numbered list block for shared report sections."""
+
+    items: tuple[str, ...]
+    ordered: bool = False
+
+
+@dataclass(frozen=True)
+class ReportTable:
+    """Simple table block with renderer-specific escaping."""
+
+    headers: tuple[str, ...]
+    rows: tuple[tuple[str, ...], ...]
+    markdown_escaped: bool = False
+
+
+@dataclass(frozen=True)
+class ReportCodeBlock:
+    """Fenced/preformatted code block for shared report sections."""
+
+    content: str
+    language: str = "text"
+
+
+@dataclass(frozen=True)
+class ReportDetails:
+    """Collapsible details block for technical evidence."""
+
+    summary: str
+    blocks: tuple[object, ...]
+
+
+@dataclass(frozen=True)
+class ReportRaw:
+    """Renderer-specific trusted raw lines for unavoidable artifact details."""
+
+    markdown_lines: tuple[str, ...] = ()
+    html_lines: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class ReportSection:
+    """Shared report section rendered into Markdown or HTML at artifact boundaries."""
+
+    title: str
+    blocks: tuple[object, ...] = ()
+    level: int = 2
+    divider: bool = False
+
+
+class UnsupportedReportBlockError(TypeError):
+    """Raised when shared report renderers receive an unsupported block type."""
+
+    def __init__(self, block: object) -> None:
+        block_name = type(block).__name__
+        super().__init__(f"Unsupported report block: {block_name}")
+
+
+def _append_report_markdown_block(parts: list[str], block: object) -> None:
+    """Append one shared report block as Markdown."""
+    if isinstance(block, ReportSection):
+        parts.extend(["---", ""] if block.divider else [])
+        level = max(1, min(6, block.level))
+        parts.append(f"{'#' * level} {_escape_report_markdown_heading(block.title)}")
+        parts.append("")
+        for child in block.blocks:
+            _append_report_markdown_block(parts, child)
+    elif isinstance(block, ReportParagraph):
+        parts.extend(_wrap_markdown_text(_escape_report_markdown_text(block.text)))
+        parts.append("")
+    elif isinstance(block, ReportKeyValues):
+        for label, value in block.rows:
+            rendered_label = (
+                label if block.markdown_escaped else _escape_report_markdown_text(label)
+            )
+            rendered_value = (
+                value if block.markdown_escaped else _escape_report_markdown_text(value)
+            )
+            _append_markdown_labeled_value(
+                parts,
+                label=rendered_label,
+                value=rendered_value,
+                bullet=True,
+            )
+        parts.extend([""] if block.rows else [])
+    elif isinstance(block, ReportBulletList):
+        for index, item in enumerate(block.items, start=1):
+            prefix = f"{index}. " if block.ordered else "- "
+            parts.extend(
+                _wrap_markdown_text(
+                    _escape_report_markdown_text(item),
+                    initial_indent=prefix,
+                    subsequent_indent=" " * len(prefix),
+                )
+            )
+        parts.extend([""] if block.items else [])
+    elif isinstance(block, ReportTable):
+        escaped_headers = (
+            list(block.headers)
+            if block.markdown_escaped
+            else [MARKDOWN_ESCAPER.escape(header) for header in block.headers]
+        )
+        escaped_rows = (
+            list(block.rows)
+            if block.markdown_escaped
+            else [tuple(MARKDOWN_ESCAPER.escape(cell) for cell in row) for row in block.rows]
+        )
+        parts.extend(
+            tabulate(escaped_rows, headers=escaped_headers, tablefmt="github").splitlines()
+        )
+        parts.append("")
+    elif isinstance(block, ReportCodeBlock):
+        _append_markdown_code_block(parts, block.content, language=block.language)
+    elif isinstance(block, ReportDetails):
+        body_lines = render_report_markdown(block.blocks)
+        _append_markdown_details_block(parts, summary=block.summary, body_lines=body_lines)
+    elif isinstance(block, ReportRaw):
+        raw_lines = list(block.markdown_lines)
+        parts.extend(raw_lines)
+        parts.extend([""] if raw_lines and raw_lines[-1] != "" else [])
+    else:
+        raise UnsupportedReportBlockError(block)
+
+
+def render_report_markdown(blocks: Sequence[object]) -> list[str]:
+    """Render shared report blocks to GitHub-flavoured Markdown lines."""
+    parts: list[str] = []
+    for block in blocks:
+        _append_report_markdown_block(parts, block)
+    while parts and parts[-1] == "":
+        parts.pop()
+    return parts
+
+
+def _render_report_html_block(block: object) -> list[str]:
+    """Render one shared report block to escaped HTML lines."""
+    if isinstance(block, ReportSection):
+        level = max(1, min(6, block.level))
+        rendered = [f"<h{level}>{html.escape(block.title)}</h{level}>"]
+        for child in block.blocks:
+            rendered.extend(_render_report_html_block(child))
+    elif isinstance(block, ReportParagraph):
+        rendered = [f"<p>{html.escape(block.text)}</p>"]
+    elif isinstance(block, ReportKeyValues):
+        rendered = ["<ul>"]
+        for label, value in block.rows:
+            rendered.append(
+                f"<li><b>{html.escape(label)}:</b> {html.escape(value)}</li>",
+            )
+        rendered.append("</ul>")
+    elif isinstance(block, ReportBulletList):
+        tag = "ol" if block.ordered else "ul"
+        rendered = [f"<{tag}>"]
+        rendered.extend(f"<li>{html.escape(item)}</li>" for item in block.items)
+        rendered.append(f"</{tag}>")
+    elif isinstance(block, ReportTable):
+        rendered = ["<table>", "<thead>", "<tr>"]
+        rendered.extend(f"<th>{html.escape(header)}</th>" for header in block.headers)
+        rendered.extend(["</tr>", "</thead>", "<tbody>"])
+        for row in block.rows:
+            rendered.append("<tr>")
+            rendered.extend(f"<td>{html.escape(cell)}</td>" for cell in row)
+            rendered.append("</tr>")
+        rendered.extend(["</tbody>", "</table>"])
+    elif isinstance(block, ReportCodeBlock):
+        class_attr = f' class="language-{html.escape(block.language, quote=True)}"'
+        rendered = [f"<pre><code{class_attr}>{html.escape(block.content)}</code></pre>"]
+    elif isinstance(block, ReportDetails):
+        rendered = ["<details>", f"<summary>{html.escape(block.summary)}</summary>"]
+        for child in block.blocks:
+            rendered.extend(_render_report_html_block(child))
+        rendered.append("</details>")
+    elif isinstance(block, ReportRaw):
+        rendered = list(block.html_lines)
+    else:
+        raise UnsupportedReportBlockError(block)
+
+    return rendered
+
+
+def render_report_html(blocks: Sequence[object]) -> list[str]:
+    """Render shared report blocks to escaped HTML lines."""
+    parts: list[str] = []
+    for block in blocks:
+        parts.extend(_render_report_html_block(block))
+    return parts
+
+
 def _append_markdown_row_block(
     parts: list[str],
     *,
@@ -1813,8 +2030,7 @@ def _append_markdown_row_block(
         return
     if heading is not None:
         parts.extend([heading, ""])
-    for label, value in rows:
-        _append_markdown_labeled_value(parts, label=label, value=value, bullet=True)
+    parts.extend(render_report_markdown((ReportKeyValues(tuple(rows), markdown_escaped=True),)))
     parts.append("")
 
 
@@ -1846,26 +2062,33 @@ def _append_markdown_stanza(
     """Append a reusable stanza as a short heading plus labeled bullet rows."""
     if not stanza.rows:
         return
-    if stanza.heading is not None:
-        parts.append(f"{'#' * heading_level} {stanza.heading}")
+    if stanza.heading is None:
+        parts.extend(render_report_markdown((ReportKeyValues(stanza.rows),)))
         parts.append("")
-    _append_markdown_row_block(parts, rows=stanza.rows)
+        return
+    parts.extend(
+        render_report_markdown(
+            (
+                ReportSection(
+                    title=stanza.heading,
+                    level=heading_level,
+                    blocks=(ReportKeyValues(stanza.rows),),
+                ),
+            )
+        )
+    )
+    parts.append("")
 
 
 def _render_html_stanza(stanza: ReportStanza) -> list[str]:
     """Render a reusable stanza as a heading paragraph plus HTML list."""
     if not stanza.rows:
         return []
-    parts: list[str] = []
+    blocks: list[object] = []
     if stanza.heading is not None:
-        parts.append(f"<p><b>{html.escape(stanza.heading)}</b></p>")
-    parts.append("<ul>")
-    for label, value in stanza.rows:
-        parts.append(
-            f"<li><b>{html.escape(label)}:</b> {html.escape(value)}</li>",
-        )
-    parts.append("</ul>")
-    return parts
+        blocks.append(ReportParagraph(stanza.heading))
+    blocks.append(ReportKeyValues(stanza.rows))
+    return render_report_html(blocks)
 
 
 @dataclass(frozen=True)
@@ -11298,21 +11521,38 @@ def _append_markdown_section(
     body_lines: list[str] | None = None,
 ) -> None:
     """Append a Markdown section heading with optional body lines."""
-    parts.append(title)
-    parts.append("")
+    title_match = re.fullmatch(r"(#{1,6})\s+(.+)", title)
+    if title_match is not None:
+        heading_level = len(title_match.group(1))
+        heading_title = title_match.group(2)
+    else:
+        heading_level = 2
+        heading_title = title
+
+    rendered_body: list[str] = []
     if body_lines:
         for body_line in body_lines:
             if body_line == "":
-                parts.append("")
+                rendered_body.append("")
                 continue
             if body_line.startswith(("- ", "* ", "|", "<", "#", "```")):
-                parts.append(body_line)
+                rendered_body.append(body_line)
                 continue
             if re.match(r"\d+\. ", body_line):
-                parts.append(body_line)
+                rendered_body.append(body_line)
                 continue
-            parts.extend(_wrap_markdown_text(body_line))
-        parts.append("")
+            rendered_body.extend(_wrap_markdown_text(body_line))
+        rendered_body.append("")
+
+    blocks: tuple[object, ...] = (
+        (ReportRaw(markdown_lines=tuple(rendered_body)),) if rendered_body else ()
+    )
+    parts.extend(
+        render_report_markdown(
+            (ReportSection(title=heading_title, level=heading_level, blocks=blocks),)
+        )
+    )
+    parts.append("")
 
 
 def _append_markdown_details_block(
@@ -12119,7 +12359,6 @@ def _diagnostics_environment_section(
     system_info: dict[str, str],
 ) -> list[str]:
     """Build environment details section for diagnostics report footer context."""
-    parts: list[str] = _begin_diagnostics_section(title="## Environment")
     table_rows = [
         (component, DIAGNOSTICS_ESCAPER.escape(value))
         for component, value in _collect_report_component_rows(
@@ -12129,12 +12368,21 @@ def _diagnostics_environment_section(
             system_keys=_DIAGNOSTICS_SYSTEM_KEYS,
         )
     ]
-    parts.extend(
-        tabulate(
-            table_rows,
-            headers=["Component", "Version"],
-            tablefmt="github",
-        ).splitlines()
+    parts = render_report_markdown(
+        (
+            ReportSection(
+                title="Environment",
+                level=2,
+                divider=True,
+                blocks=(
+                    ReportTable(
+                        headers=("Component", "Version"),
+                        rows=tuple(table_rows),
+                        markdown_escaped=True,
+                    ),
+                ),
+            ),
+        )
     )
     parts.append("")
     return parts
@@ -12813,11 +13061,20 @@ def _diagnostics_failure_clusters(
             recent_repro = DIAGNOSTICS_ESCAPER.escape(_format_recent_repro_ratio(history_info))
             table_rows.append((f"`{model}`", short_error, first_seen, recent_repro))
         parts.extend(
-            tabulate(
-                table_rows,
-                headers=["Model", "Observed Behavior", "First Seen Failing", "Recent Repro"],
-                tablefmt="github",
-            ).splitlines()
+            render_report_markdown(
+                (
+                    ReportTable(
+                        headers=(
+                            "Model",
+                            "Observed Behavior",
+                            "First Seen Failing",
+                            "Recent Repro",
+                        ),
+                        rows=tuple(table_rows),
+                        markdown_escaped=True,
+                    ),
+                )
+            )
         )
         parts.append("")
 
@@ -12964,11 +13221,22 @@ def _diagnostics_stack_signal_section(
         )
 
     parts.extend(
-        tabulate(
-            rows,
-            headers=["Model", "Prompt Tok", "Output Tok", "Output/Prompt", "Symptom", "Owner"],
-            tablefmt="github",
-        ).splitlines()
+        render_report_markdown(
+            (
+                ReportTable(
+                    headers=(
+                        "Model",
+                        "Prompt Tok",
+                        "Output Tok",
+                        "Output/Prompt",
+                        "Symptom",
+                        "Owner",
+                    ),
+                    rows=tuple(rows),
+                    markdown_escaped=True,
+                ),
+            )
+        )
     )
     parts.append("")
     return parts
@@ -13314,7 +13582,15 @@ def _render_issue_queue_table(
         )
         for cluster in clusters
     ]
-    return tabulate(rows, headers=_ISSUE_QUEUE_HEADERS, tablefmt="github").splitlines()
+    return render_report_markdown(
+        (
+            ReportTable(
+                headers=_ISSUE_QUEUE_HEADERS,
+                rows=tuple(rows),
+                markdown_escaped=True,
+            ),
+        )
+    )
 
 
 def _diagnostics_issue_queue_section(
@@ -13424,11 +13700,20 @@ def _diagnostics_history_section(
         esc_status = DIAGNOSTICS_ESCAPER.escape(status)
         table_rows.append((f"`{esc_model}`", esc_status, first_seen, recent_repro))
     parts.extend(
-        tabulate(
-            table_rows,
-            headers=["Model", "Status vs Previous Run", "First Seen Failing", "Recent Repro"],
-            tablefmt="github",
-        ).splitlines()
+        render_report_markdown(
+            (
+                ReportTable(
+                    headers=(
+                        "Model",
+                        "Status vs Previous Run",
+                        "First Seen Failing",
+                        "Recent Repro",
+                    ),
+                    rows=tuple(table_rows),
+                    markdown_escaped=True,
+                ),
+            )
+        )
     )
     parts.append("")
 
@@ -13737,14 +14022,30 @@ def _thinking_end_token_for_repro(run_args: argparse.Namespace) -> str | None:
     return str(thinking_end_token)
 
 
-def _build_repro_command_tokens(
+@dataclass(frozen=True)
+class ReproCommandSpec:
+    """Canonical tokenized repro command used by reports and JSON bundles."""
+
+    base_tokens: tuple[str, ...]
+    argument_tokens: tuple[str, ...] = ()
+
+    def tokens(self) -> tuple[str, ...]:
+        """Return the full command token sequence."""
+        return (*self.base_tokens, *self.argument_tokens)
+
+    def shell_command(self) -> str:
+        """Return a shell-quoted command string for Markdown/code output."""
+        return shlex_join(self.tokens())
+
+
+def build_check_models_repro_command_spec(
     *,
     image_path: Path | None,
     run_args: argparse.Namespace | None,
     include_selection: bool,
     include_input: bool = True,
-) -> list[str]:
-    """Build CLI command tokens for diagnostics reproducibility snippets."""
+) -> ReproCommandSpec:
+    """Build the canonical ``check_models`` repro command spec."""
 
     def _append_pairs(
         pairs: Sequence[tuple[str, str | int | float | Path | None]],
@@ -13758,7 +14059,10 @@ def _build_repro_command_tokens(
         _append_repro_input_tokens(tokens=tokens, image_path=image_path, run_args=run_args)
 
     if run_args is None:
-        return tokens
+        return ReproCommandSpec(
+            base_tokens=tuple(tokens[:3]),
+            argument_tokens=tuple(tokens[3:]),
+        )
 
     if include_selection:
         _append_repro_selection_tokens(tokens=tokens, run_args=run_args)
@@ -13857,7 +14161,28 @@ def _build_repro_command_tokens(
         ),
     )
 
-    return tokens
+    return ReproCommandSpec(
+        base_tokens=tuple(tokens[:3]),
+        argument_tokens=tuple(tokens[3:]),
+    )
+
+
+def _build_repro_command_tokens(
+    *,
+    image_path: Path | None,
+    run_args: argparse.Namespace | None,
+    include_selection: bool,
+    include_input: bool = True,
+) -> list[str]:
+    """Build CLI command tokens for diagnostics reproducibility snippets."""
+    return list(
+        build_check_models_repro_command_spec(
+            image_path=image_path,
+            run_args=run_args,
+            include_selection=include_selection,
+            include_input=include_input,
+        ).tokens()
+    )
 
 
 _REPRO_ENV_KEYS: Final[tuple[str, ...]] = (
@@ -15105,11 +15430,15 @@ def _append_review_owner_queue(
             )
         if rows:
             md.extend(
-                tabulate(
-                    rows,
-                    headers=["Model", "Verdict", "Evidence", "Next Action"],
-                    tablefmt="github",
-                ).splitlines()
+                render_report_markdown(
+                    (
+                        ReportTable(
+                            headers=("Model", "Verdict", "Evidence", "Next Action"),
+                            rows=tuple(rows),
+                            markdown_escaped=True,
+                        ),
+                    )
+                )
             )
             md.append("")
         else:
@@ -15158,11 +15487,15 @@ def _append_review_user_buckets(
                 )
             )
         md.extend(
-            tabulate(
-                rows,
-                headers=["Model", "Verdict", "Hint Handling", "Key Evidence"],
-                tablefmt="github",
-            ).splitlines()
+            render_report_markdown(
+                (
+                    ReportTable(
+                        headers=("Model", "Verdict", "Hint Handling", "Key Evidence"),
+                        rows=tuple(rows),
+                        markdown_escaped=True,
+                    ),
+                )
+            )
         )
         md.append("")
 
@@ -21580,11 +21913,15 @@ def _issue_affected_models_section(
 
     parts = ["", "## Affected Models", ""]
     parts.extend(
-        tabulate(
-            rows,
-            headers=["Model", "Observed Behavior", "Token Counts", "Optional Context"],
-            tablefmt="github",
-        ).splitlines()
+        render_report_markdown(
+            (
+                ReportTable(
+                    headers=("Model", "Observed Behavior", "Token Counts", "Optional Context"),
+                    rows=tuple(rows),
+                    markdown_escaped=True,
+                ),
+            )
+        )
     )
     parts.append("")
     return parts
@@ -21669,11 +22006,22 @@ def _issue_stack_evidence(cluster: IssueCluster) -> list[str]:
         )
     parts = ["### Stack Signals", ""]
     parts.extend(
-        tabulate(
-            rows,
-            headers=["Model", "Prompt Tok", "Output Tok", "Output/Prompt", "Symptom", "Owner"],
-            tablefmt="github",
-        ).splitlines()
+        render_report_markdown(
+            (
+                ReportTable(
+                    headers=(
+                        "Model",
+                        "Prompt Tok",
+                        "Output Tok",
+                        "Output/Prompt",
+                        "Symptom",
+                        "Owner",
+                    ),
+                    rows=tuple(rows),
+                    markdown_escaped=True,
+                ),
+            )
+        )
     )
     parts.append("")
     return parts
@@ -21992,6 +22340,26 @@ def _build_native_mlx_vlm_cli_tokens(
     return tokens
 
 
+def build_native_mlx_vlm_repro_command_spec(
+    *,
+    model_name: str,
+    prompt: str,
+    image_ref: str,
+    run_args: argparse.Namespace | None,
+) -> ReproCommandSpec:
+    """Build a native ``mlx_vlm.generate`` CLI repro command spec."""
+    tokens = _build_native_mlx_vlm_cli_tokens(
+        model_name=model_name,
+        prompt=prompt,
+        image_ref=image_ref,
+        run_args=run_args,
+    )
+    return ReproCommandSpec(
+        base_tokens=tuple(tokens[:3]),
+        argument_tokens=tuple(tokens[3:]),
+    )
+
+
 def _build_native_mlx_vlm_python_script(
     *,
     model_name: str,
@@ -22049,14 +22417,12 @@ def _issue_repro_section(
     image_ref = _issue_repro_image_ref(image_path=image_path, run_args=run_args)
     representative_model = models[0] if models else "owner/model"
     cli_commands = "\n".join(
-        shlex_join(
-            _build_native_mlx_vlm_cli_tokens(
-                model_name=model,
-                prompt=prompt_text,
-                image_ref=image_ref,
-                run_args=run_args,
-            )
-        )
+        build_native_mlx_vlm_repro_command_spec(
+            model_name=model,
+            prompt=prompt_text,
+            image_ref=image_ref,
+            run_args=run_args,
+        ).shell_command()
         for model in models
     )
     script = _build_native_mlx_vlm_python_script(
@@ -22207,13 +22573,37 @@ def _issue_environment_section(
             system_keys=_DIAGNOSTICS_SYSTEM_KEYS,
         )
     ]
-    parts = ["", "## Appendix: Environment", ""]
+    parts = [""]
     if rows:
         parts.extend(
-            tabulate(rows, headers=["Component", "Version"], tablefmt="github").splitlines()
+            render_report_markdown(
+                (
+                    ReportSection(
+                        title="Appendix: Environment",
+                        level=2,
+                        blocks=(
+                            ReportTable(
+                                headers=("Component", "Version"),
+                                rows=tuple(rows),
+                                markdown_escaped=True,
+                            ),
+                        ),
+                    ),
+                )
+            )
         )
     else:
-        parts.append("- Environment details were not available.")
+        parts.extend(
+            render_report_markdown(
+                (
+                    ReportSection(
+                        title="Appendix: Environment",
+                        level=2,
+                        blocks=(ReportBulletList(("Environment details were not available.",)),),
+                    ),
+                )
+            )
+        )
     parts.append("")
     return parts
 

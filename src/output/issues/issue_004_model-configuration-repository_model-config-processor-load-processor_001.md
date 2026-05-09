@@ -201,3 +201,4 @@ The above exception was the direct cause of the following exception:
 Traceback (most recent call last):
 ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded processor has no image_processor; expected multimodal processor.
 ```
+

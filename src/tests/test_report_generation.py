@@ -3148,6 +3148,193 @@ class TestEmptyRecommendedBucketExplanation:
         assert len(plain_none_lines) == 3
 
 
+class TestSharedReportSections:
+    """Tests for shared Markdown/HTML report section primitives."""
+
+    def test_report_section_renders_markdown_and_html_from_same_model(self) -> None:
+        """A shared section model should render escaped Markdown and HTML variants."""
+        section = check_models.ReportSection(
+            title="Queue <Summary>",
+            level=2,
+            blocks=(
+                check_models.ReportParagraph("Observed <tag> & value"),
+                check_models.ReportKeyValues(
+                    rows=(
+                        ("Owner", "mlx-vlm <runtime>"),
+                        ("Evidence", "stage=model_load | type=ValueError"),
+                    )
+                ),
+                check_models.ReportBulletList(("first <signal>", "second signal")),
+                check_models.ReportTable(
+                    headers=("Model", "Problem"),
+                    rows=(("org/model", "shape <mismatch>"),),
+                ),
+                check_models.ReportCodeBlock("print('hello')", language="python"),
+                check_models.ReportDetails(
+                    summary="Trace <details>",
+                    blocks=(check_models.ReportParagraph("inside <frame>"),),
+                ),
+            ),
+        )
+
+        markdown = "\n".join(check_models.render_report_markdown((section,)))
+        html_output = "\n".join(check_models.render_report_html((section,)))
+
+        assert "## Queue &lt;Summary&gt;" in markdown
+        assert "Observed &lt;tag&gt; &amp; value" in markdown
+        assert "| Model" in markdown
+        assert "```python" in markdown
+        assert "<summary>Trace &lt;details&gt;</summary>" in markdown
+
+        assert "<h2>Queue &lt;Summary&gt;</h2>" in html_output
+        assert "Observed &lt;tag&gt; &amp; value" in html_output
+        assert "<table>" in html_output
+        assert '<pre><code class="language-python">' in html_output
+        assert "<summary>Trace &lt;details&gt;</summary>" in html_output
+
+
+class TestReproCommandNormalization:
+    """Tests for spec-driven repro command generation."""
+
+    def test_check_models_repro_command_uses_shared_spec_path(self, tmp_path: Path) -> None:
+        """Diagnostics and bundles should share canonical check_models command tokens."""
+        image_path = tmp_path / "sample image.jpg"
+        run_args = Namespace(
+            image=image_path,
+            folder=None,
+            models=["org/a", "org/b"],
+            exclude=["org/skip"],
+            trust_remote_code=True,
+            revision="main",
+            adapter_path="/tmp/adapter",
+            prompt="Describe this.",
+            detailed_metrics=True,
+            lazy_load=True,
+            force_download=True,
+            quantize_activations=True,
+            skip_special_tokens=True,
+            enable_thinking=True,
+            max_tokens=123,
+            temperature=0.2,
+            top_p=0.8,
+            min_p=0.1,
+            top_k=4,
+            resize_shape=(64, 32),
+            eos_tokens=["</s>", "<|end|>"],
+            processor_kwargs={"cropping": False},
+            repetition_penalty=1.1,
+            repetition_context_size=64,
+            max_kv_size=4096,
+            kv_bits=4,
+            kv_quant_scheme="turboquant",
+            prefill_step_size=512,
+            thinking_budget=32,
+            thinking_start_token=THINKING_START_TOKEN,
+            thinking_end_token="</done>",
+            kv_group_size=32,
+            quantized_kv_start=128,
+            timeout=33.0,
+            verbose=True,
+            no_color=True,
+            force_color=False,
+            width=100,
+            quality_config="/tmp/quality.yaml",
+            context_marker="Visible context:",
+        )
+
+        spec = check_models.build_check_models_repro_command_spec(
+            image_path=image_path,
+            run_args=run_args,
+            include_selection=True,
+        )
+        tokens = check_models._build_repro_command_tokens(
+            image_path=image_path,
+            run_args=run_args,
+            include_selection=True,
+        )
+
+        assert tokens == list(spec.tokens())
+        assert tokens[:5] == ["python", "-m", "check_models", "--image", str(image_path)]
+        assert "--models" in tokens
+        assert "--exclude" in tokens
+        assert "--processor-kwargs" in tokens
+        assert json.loads(tokens[tokens.index("--processor-kwargs") + 1]) == {"cropping": False}
+
+    def test_native_mlx_vlm_cli_omits_non_cli_generate_kwargs(self, tmp_path: Path) -> None:
+        """Native CLI repros should not invent upstream flags absent from mlx-vlm CLI."""
+        image_path = tmp_path / "probe.png"
+        run_args = Namespace(
+            adapter_path="/tmp/adapter",
+            resize_shape=(64, 32),
+            eos_tokens=["</s>"],
+            max_kv_size=4096,
+            kv_bits=4,
+            kv_quant_scheme="turboquant",
+            kv_group_size=32,
+            quantized_kv_start=128,
+            skip_special_tokens=True,
+            force_download=True,
+            revision="main",
+            trust_remote_code=True,
+            quantize_activations=True,
+            processor_kwargs={"cropping": False},
+            prefill_step_size=512,
+            enable_thinking=True,
+            thinking_budget=32,
+            thinking_start_token=THINKING_START_TOKEN,
+            thinking_end_token=THINKING_END_TOKEN,
+            max_tokens=123,
+            temperature=0.2,
+            top_p=0.8,
+            min_p=0.1,
+            top_k=4,
+            repetition_penalty=1.1,
+            repetition_context_size=64,
+        )
+
+        tokens = check_models._build_native_mlx_vlm_cli_tokens(
+            model_name="org/model",
+            prompt="Describe this.",
+            image_ref=str(image_path),
+            run_args=run_args,
+        )
+        script = check_models._build_native_mlx_vlm_python_script(
+            model_name="org/model",
+            prompt="Describe this.",
+            image_ref=str(image_path),
+            run_args=run_args,
+        )
+        config_json = check_models._build_issue_inline_config_json(
+            model_name="org/model",
+            image_ref=str(image_path),
+            run_args=run_args,
+        )
+
+        for unsupported_cli_flag in (
+            "--top-p",
+            "--min-p",
+            "--top-k",
+            "--repetition-penalty",
+            "--repetition-context-size",
+        ):
+            assert unsupported_cli_flag not in tokens
+        assert "--processor-kwargs" in tokens
+        assert "--prefill-step-size" in tokens
+
+        assert "'top_p': 0.8" in script
+        assert "'min_p': 0.1" in script
+        assert "'top_k': 4" in script
+        assert "'repetition_penalty': 1.1" in script
+        assert "'repetition_context_size': 64" in script
+
+        config = json.loads(config_json)
+        assert config["generate_kwargs"]["top_p"] == 0.8
+        assert config["generate_kwargs"]["min_p"] == 0.1
+        assert config["generate_kwargs"]["top_k"] == 4
+        assert config["generate_kwargs"]["repetition_penalty"] == 1.1
+        assert config["generate_kwargs"]["repetition_context_size"] == 64
+
+
 class TestGithubIssueReportsCleanup:
     """Tests for _generate_github_issue_reports stale file cleanup."""
 
