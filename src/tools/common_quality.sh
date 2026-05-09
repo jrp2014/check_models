@@ -301,14 +301,17 @@ PY
         local python_path=""
         local pyrefly_path=""
         local config_path=""
+        local output_path=""
         local exit_code=0
 
         python_path="$(quality_resolve_python_path)" || return 1
         pyrefly_path="$(quality_find_python_tool pyrefly)" || return 1
         config_path="$(mktemp "$(quality_src_root)/.pyrefly-quality.XXXXXX")"
+        output_path="$(mktemp "$(quality_src_root)/.pyrefly-output.XXXXXX")"
 
         if ! quality_write_pyrefly_config "$config_path" "$python_path"; then
             rm -f "$config_path"
+            rm -f "$output_path"
             return 1
         fi
 
@@ -317,13 +320,19 @@ PY
             -c "$config_path" \
             --min-severity warn \
             --output-format full-text \
-            "$@"; then
+            "$@" 2>&1 | tee "$output_path"; then
             exit_code=0
         else
             exit_code=$?
         fi
 
+        if [ "$exit_code" -eq 0 ] && grep -Eq '^[[:space:]]*WARN([[:space:]]|$)' "$output_path"; then
+            echo "❌ Pyrefly emitted warnings; treat warnings as quality failures." >&2
+            exit_code=1
+        fi
+
         rm -f "$config_path"
+        rm -f "$output_path"
         return "$exit_code"
     }
 

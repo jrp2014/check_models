@@ -1804,14 +1804,14 @@ def _append_markdown_labeled_value(
 
 def _escape_report_markdown_text(text: str) -> str:
     """Escape HTML-like text for non-code Markdown report blocks."""
-    escaped = html.escape(_wrap_bare_urls(str(text)), quote=False)
+    escaped = html.escape(_wrap_bare_urls(text), quote=False)
     escaped = escaped.replace("__", r"\_\_")
     return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", escaped)
 
 
 def _escape_report_markdown_heading(text: str) -> str:
     """Escape HTML-like heading text while preserving ordinary ampersands."""
-    escaped = str(text).replace("<", "&lt;").replace(">", "&gt;")
+    escaped = text.replace("<", "&lt;").replace(">", "&gt;")
     return escaped.replace("__", r"\_\_")
 
 

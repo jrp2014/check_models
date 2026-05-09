@@ -13,6 +13,7 @@ import sys
 import tomllib
 import zipfile
 from pathlib import Path
+from textwrap import dedent
 
 import pytest
 from packaging.requirements import Requirement
@@ -456,6 +457,68 @@ def test_update_script_verifies_stub_integrity_and_logs_local_provenance() -> No
     )
     assert "mlx_lm mlx_vlm transformers tokenizers" in quality_script
     assert "Local package provenance:" in update_script
+
+
+@pytest.mark.subprocess
+def test_pyrefly_quality_gate_fails_on_warnings(tmp_path: Path) -> None:
+    """The quality helper should treat Pyrefly warnings as gate failures."""
+    fake_bin = tmp_path / "bin"
+    fake_bin.mkdir()
+
+    fake_python = fake_bin / "python"
+    fake_python.symlink_to(Path(sys.executable).resolve())
+
+    fake_pyrefly = fake_bin / "pyrefly"
+    fake_pyrefly.write_text(
+        dedent(
+            """\
+            #!/usr/bin/env bash
+            echo ' INFO Checking project configured at `fake`'
+            echo ' WARN synthetic warning [test-warning]'
+            echo ' INFO 0 errors'
+            exit 0
+            """
+        ),
+        encoding="utf-8",
+    )
+    fake_pyrefly.chmod(0o755)
+
+    output_log = tmp_path / "pyrefly.log"
+    run_script = tmp_path / "run_pyrefly_gate.sh"
+    run_script.write_text(
+        dedent(
+            f"""\
+            #!/usr/bin/env bash
+            set -euo pipefail
+            cd \"{PKG_ROOT}\"
+            source tools/common_quality.sh
+            QUALITY_PYTHON=\"{fake_python}\"
+            QUALITY_PYTHON_SOURCE=\"synthetic-test\"
+            if quality_run_pyrefly_check > \"{output_log}\" 2>&1; then
+                pyrefly_gate_status=0
+            else
+                pyrefly_gate_status=$?
+            fi
+            cat \"{output_log}\"
+            test \"$pyrefly_gate_status\" -eq 1
+            """
+        ),
+        encoding="utf-8",
+    )
+    run_script.chmod(0o755)
+    bash_path = Path("/bin/bash")
+
+    result = subprocess.run(  # noqa: S603
+        [str(bash_path), str(run_script)],
+        capture_output=True,
+        text=True,
+        check=False,
+        cwd=PKG_ROOT,
+    )
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    assert "WARN synthetic warning [test-warning]" in result.stdout
+    assert "Pyrefly emitted warnings; treat warnings as quality failures." in result.stdout
 
 
 def test_update_script_uses_upstream_mlx_editable_dev_install() -> None:

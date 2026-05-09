@@ -7,6 +7,8 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Fail the shared quality hooks when Pyrefly emits warnings so non-blocking
+  type-cleanup regressions do not slip past `make quality` and pre-push checks.
 - Refactor report assembly toward shared Markdown/HTML section primitives and
   normalized repro command specs so diagnostics, issue drafts, review queues,
   and summary reports reuse the same rendering and command-token paths.
