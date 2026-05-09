@@ -23,18 +23,6 @@ Each row is intended to become one focused upstream GitHub issue.
 
 ---
 
-## Upstream Filing Notes
-
-File one upstream issue per row above. The linked issue drafts are the
-pasteable bodies; this diagnostics file is the compact run-level queue.
-
-- **Issue drafts:** 6 root-cause cluster(s).
-- **Suggested targets:** `mlx`=1, `mlx-vlm`=3, `mlx-vlm / mlx`=1, `model configuration/repository`=1.
-- **Standalone evidence:** each issue draft includes minimal inline evidence plus a native upstream repro command before any appendix detail.
-- **Supporting files:** `repro JSON` links point to the canonical GitHub copies of the bundles with prompt, environment, and generated-output context. If you are filing from an uncommitted ad-hoc run, attach the JSON manually.
-
----
-
 ## 1. Failure affecting 2 models
 
 - _Observed:_ Model loading failed: Received 2 parameters not in model:

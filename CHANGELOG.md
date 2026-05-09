@@ -15,6 +15,9 @@ Notable changes to this project will be documented in this file.
 - Make `diagnostics.md` a compact pasteable run-level issue body by enriching
   the issue queue with inline evidence snapshots while moving verbose trace,
   prompt, and portable-probe detail to issue drafts and repro bundles.
+- Remove the separate `Upstream Filing Notes` block from `diagnostics.md` so
+  the diagnostics artifact itself can be handed to upstream maintainers
+  directly without extra filing guidance.
 - Focus diagnostics and issue-draft triage rows by preserving multiline
   runtime error details and rendering evidence as concrete supporting facts
   instead of repeating summary prose.

@@ -1615,7 +1615,6 @@ class TestDiagnosticsReport:
             run_args=run_args,
         )
         content = out.read_text(encoding="utf-8")
-        assert "## Upstream Filing Notes" in content
         assert "## Appendix" not in content
         assert "### Portable upstream probes (no local image required)" not in content
         assert "Issue-specific native repro commands are in the linked issue drafts." in content

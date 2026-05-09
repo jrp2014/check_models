@@ -13355,39 +13355,6 @@ def _diagnostics_issue_queue_section(
     return parts
 
 
-def _diagnostics_upstream_filing_notes_section(snapshot: DiagnosticsSnapshot) -> list[str]:
-    """Build short filing guidance before the detailed diagnostics appendix."""
-    clusters = _build_issue_clusters(snapshot)
-    if not clusters:
-        return []
-
-    owner_counts = Counter(cluster.owner for cluster in clusters)
-    owner_summary = ", ".join(
-        f"`{DIAGNOSTICS_ESCAPER.escape(owner)}`={count}"
-        for owner, count in sorted(owner_counts.items())
-    )
-    parts = _begin_diagnostics_section(
-        title="## Upstream Filing Notes",
-        body_lines=[
-            "File one upstream issue per row above. The linked issue drafts are the "
-            "pasteable bodies; this diagnostics file is the compact run-level queue.",
-        ],
-    )
-    parts.append(f"- **Issue drafts:** {len(clusters)} root-cause cluster(s).")
-    parts.append(f"- **Suggested targets:** {owner_summary}.")
-    parts.append(
-        "- **Standalone evidence:** each issue draft includes minimal inline evidence plus "
-        "a native upstream repro command before any appendix detail.",
-    )
-    parts.append(
-        "- **Supporting files:** `repro JSON` links point to the canonical GitHub copies of "
-        "the bundles with prompt, environment, and generated-output context. If you are filing "
-        "from an uncommitted ad-hoc run, attach the JSON manually.",
-    )
-    parts.append("")
-    return parts
-
-
 def _diagnostics_history_section(
     *,
     failed: list[PerformanceResult],
@@ -14247,7 +14214,6 @@ def generate_diagnostics_report(
             repro_bundles=resolved_repro_bundles,
         )
     )
-    parts.extend(_diagnostics_upstream_filing_notes_section(diagnostics_snapshot))
     parts.extend(
         _diagnostics_failure_clusters(
             failure_clusters,
