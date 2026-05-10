@@ -14,7 +14,7 @@
 
 | Model                                     | Observed Behavior                                                               | Token Counts                                                                 | Optional Context                                                                                                                                                                                  |
 |-------------------------------------------|---------------------------------------------------------------------------------|------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | decoded text contains control token &lt;\|endoftext\|&gt; \| generated_tokens~5 | prompt=16,789 \| output/prompt=0.03% \| nontext burden=97% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T234107Z_010_mlx-community_Qwen2-VL-2B-Instruct-4bit_model_config_mlx_vlm_stop_token_001.json) |
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | decoded text contains control token &lt;\|endoftext\|&gt; \| generated_tokens~5 | prompt=16,789 \| output/prompt=0.03% \| nontext burden=97% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T003128Z_010_mlx-community_Qwen2-VL-2B-Instruct-4bit_model_config_mlx_vlm_stop_token_001.json) |
 
 
 ## Minimal Evidence
@@ -141,7 +141,7 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T234107Z_010_mlx-community_Qwen2-VL-2B-Instruct-4bit_model_config_mlx_vlm_stop_token_001.json)
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T003128Z_010_mlx-community_Qwen2-VL-2B-Instruct-4bit_model_config_mlx_vlm_stop_token_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 

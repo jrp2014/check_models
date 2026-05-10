@@ -14,9 +14,9 @@
 
 | Model                                              | Observed Behavior                                                   | Token Counts   | Optional Context                                                                                                                                                                                         |
 |----------------------------------------------------|---------------------------------------------------------------------|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16` | property 'text' of 'NaiveStreamingDetokenizer' object has no setter | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T234107Z_005_mlx-community_ERNIE-4.5-VL-28B-A3B-Thinking-bf16_MLX_VLM_DECODE_ERROR_c6f291b6246e.json) |
-| `mlx-community/LFM2-VL-1.6B-8bit`                  | property 'text' of 'NaiveStreamingDetokenizer' object has no setter | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T234107Z_007_mlx-community_LFM2-VL-1.6B-8bit_MLX_VLM_DECODE_ERROR_94132d05282d.json)                  |
-| `mlx-community/LFM2.5-VL-1.6B-bf16`                | property 'text' of 'NaiveStreamingDetokenizer' object has no setter | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T234107Z_008_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_VLM_DECODE_ERROR_0b3df5c094f3.json)                |
+| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16` | property 'text' of 'NaiveStreamingDetokenizer' object has no setter | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T003128Z_005_mlx-community_ERNIE-4.5-VL-28B-A3B-Thinking-bf16_MLX_VLM_DECODE_ERROR_c6f291b6246e.json) |
+| `mlx-community/LFM2-VL-1.6B-8bit`                  | property 'text' of 'NaiveStreamingDetokenizer' object has no setter | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T003128Z_007_mlx-community_LFM2-VL-1.6B-8bit_MLX_VLM_DECODE_ERROR_94132d05282d.json)                  |
+| `mlx-community/LFM2.5-VL-1.6B-bf16`                | property 'text' of 'NaiveStreamingDetokenizer' object has no setter | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T003128Z_008_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_VLM_DECODE_ERROR_0b3df5c094f3.json)                |
 
 
 ## Minimal Evidence
@@ -212,9 +212,9 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T234107Z_005_mlx-community_ERNIE-4.5-VL-28B-A3B-Thinking-bf16_MLX_VLM_DECODE_ERROR_c6f291b6246e.json)
-- `mlx-community/LFM2-VL-1.6B-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T234107Z_007_mlx-community_LFM2-VL-1.6B-8bit_MLX_VLM_DECODE_ERROR_94132d05282d.json)
-- `mlx-community/LFM2.5-VL-1.6B-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260509T234107Z_008_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_VLM_DECODE_ERROR_0b3df5c094f3.json)
+- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T003128Z_005_mlx-community_ERNIE-4.5-VL-28B-A3B-Thinking-bf16_MLX_VLM_DECODE_ERROR_c6f291b6246e.json)
+- `mlx-community/LFM2-VL-1.6B-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T003128Z_007_mlx-community_LFM2-VL-1.6B-8bit_MLX_VLM_DECODE_ERROR_94132d05282d.json)
+- `mlx-community/LFM2.5-VL-1.6B-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T003128Z_008_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_VLM_DECODE_ERROR_0b3df5c094f3.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 

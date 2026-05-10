@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-_Generated on 2026-05-10 00:41:07 BST_
+_Generated on 2026-05-10 01:31:28 BST_
 
 A review-friendly artifact with image metadata, the source prompt, and full
 generated output for each model.
@@ -11,19 +11,19 @@ _Action Snapshot: see [results.md](results.md) for the full summary._
 
 ### Strong Candidates
 
-- `mlx-community/gemma-3-27b-it-qat-4bit`: 🏆 A (88/100) | Desc 98 | Keywords 85 | Δ+12 | 30.6 tps
-- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: 🏆 A (86/100) | Desc 93 | Keywords 79 | Δ+10 | 63.3 tps
-- `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`: 🏆 A (83/100) | Desc 95 | Keywords 92 | Δ+8 | 66.0 tps
+- `mlx-community/gemma-3-27b-it-qat-4bit`: 🏆 A (88/100) | Desc 98 | Keywords 85 | Δ+12 | 30.4 tps
+- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: 🏆 A (86/100) | Desc 93 | Keywords 79 | Δ+10 | 62.6 tps
+- `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`: 🏆 A (83/100) | Desc 95 | Keywords 92 | Δ+8 | 66.5 tps
 - `mlx-community/gemma-3-27b-it-qat-8bit`: 🏆 A (82/100) | Desc 100 | Keywords 84 | Δ+7 | 17.6 tps
-- `mlx-community/gemma-4-26b-a4b-it-4bit`: 🏆 A (80/100) | Desc 100 | Keywords 77 | Δ+5 | 108.0 tps
+- `mlx-community/gemma-4-26b-a4b-it-4bit`: 🏆 A (80/100) | Desc 100 | Keywords 77 | Δ+5 | 108.3 tps
 
 ### Watchlist
 
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (5/100) | Desc 44 | Keywords 0 | Δ-70 | 247.5 tps | context ignored, harness
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (6/100) | Desc 60 | Keywords 0 | Δ-69 | 30.5 tps | harness, metadata borrowing, missing sections
-- `mlx-community/llava-v1.6-mistral-7b-8bit`: ❌ F (9/100) | Desc 48 | Keywords 0 | Δ-66 | 64.9 tps | context ignored, harness, missing sections
-- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: ❌ F (35/100) | Desc 73 | Keywords 69 | Δ-40 | 5.2 tps | context ignored, harness
-- `microsoft/Phi-3.5-vision-instruct`: 🟡 C (64/100) | Desc 100 | Keywords 61 | Δ-11 | 54.7 tps | harness, metadata borrowing
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (5/100) | Desc 44 | Keywords 0 | Δ-70 | 241.5 tps | context ignored, harness
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (6/100) | Desc 60 | Keywords 0 | Δ-69 | 31.9 tps | harness, metadata borrowing, missing sections
+- `mlx-community/llava-v1.6-mistral-7b-8bit`: ❌ F (9/100) | Desc 48 | Keywords 0 | Δ-66 | 65.6 tps | context ignored, harness, missing sections
+- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: ❌ F (35/100) | Desc 73 | Keywords 69 | Δ-40 | 5.9 tps | context ignored, harness
+- `microsoft/Phi-3.5-vision-instruct`: 🟡 C (64/100) | Desc 100 | Keywords 61 | Δ-11 | 52.0 tps | harness, metadata borrowing
 
 ## 🚨 Failures by Package (Actionable)
 
@@ -195,10 +195,10 @@ _Error details:_
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17588, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17609, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16990, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17011, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -224,7 +224,7 @@ multi_modal_projector.layer_norm.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17785, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17806, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -235,7 +235,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17598, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17619, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 2 parameters not in model:
 multi_modal_projector.layer_norm.bias,
@@ -273,10 +273,10 @@ _Error details:_
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17588, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17609, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16990, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17011, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -298,7 +298,7 @@ ValueError: Model type pe_audio_video not supported. Error: No module named 'mlx
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17785, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17806, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -309,7 +309,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17598, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17619, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Model type pe_audio_video not supported. Error: No module named 'mlx_vlm.speculative.drafters.pe_audio_video'
 ```
@@ -346,9 +346,9 @@ _Error details:_
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17280, in _run_generation_with_retry_workaround
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17301, in _run_generation_with_retry_workaround
     return generate_once()
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17638, in _generate_once
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17659, in _generate_once
     return strict_generate(
         model=model,
     ...<15 lines>...
@@ -375,7 +375,7 @@ AttributeError: property 'text' of 'NaiveStreamingDetokenizer' object has no set
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17785, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17806, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -386,12 +386,12 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17663, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17684, in _run_model_generation
     output = _run_generation_with_retry_workaround(
         params=params,
         generate_once=_generate_once,
     )
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17314, in _run_generation_with_retry_workaround
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17335, in _run_generation_with_retry_workaround
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
 ValueError: Model runtime error during generation for mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16: property 'text' of 'NaiveStreamingDetokenizer' object has no setter
 ```
@@ -431,10 +431,10 @@ _Error details:_
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17588, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17609, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16990, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17011, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -462,7 +462,7 @@ multi_modal_projector.linear_2.scales.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17785, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17806, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -473,7 +473,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17598, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17619, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 4 parameters not in model:
 multi_modal_projector.linear_1.biases,
@@ -515,9 +515,9 @@ _Error details:_
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17280, in _run_generation_with_retry_workaround
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17301, in _run_generation_with_retry_workaround
     return generate_once()
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17638, in _generate_once
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17659, in _generate_once
     return strict_generate(
         model=model,
     ...<15 lines>...
@@ -544,7 +544,7 @@ AttributeError: property 'text' of 'NaiveStreamingDetokenizer' object has no set
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17785, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17806, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -555,12 +555,12 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17663, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17684, in _run_model_generation
     output = _run_generation_with_retry_workaround(
         params=params,
         generate_once=_generate_once,
     )
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17314, in _run_generation_with_retry_workaround
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17335, in _run_generation_with_retry_workaround
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
 ValueError: Model runtime error during generation for mlx-community/LFM2-VL-1.6B-8bit: property 'text' of 'NaiveStreamingDetokenizer' object has no setter
 ```
@@ -598,9 +598,9 @@ _Error details:_
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17280, in _run_generation_with_retry_workaround
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17301, in _run_generation_with_retry_workaround
     return generate_once()
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17638, in _generate_once
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17659, in _generate_once
     return strict_generate(
         model=model,
     ...<15 lines>...
@@ -627,7 +627,7 @@ AttributeError: property 'text' of 'NaiveStreamingDetokenizer' object has no set
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17785, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17806, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -638,12 +638,12 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17663, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17684, in _run_model_generation
     output = _run_generation_with_retry_workaround(
         params=params,
         generate_once=_generate_once,
     )
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17314, in _run_generation_with_retry_workaround
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17335, in _run_generation_with_retry_workaround
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
 ValueError: Model runtime error during generation for mlx-community/LFM2.5-VL-1.6B-bf16: property 'text' of 'NaiveStreamingDetokenizer' object has no setter
 ```
@@ -681,7 +681,7 @@ _Error details:_
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17350, in _prepare_generation_prompt
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17371, in _prepare_generation_prompt
     _run_model_preflight_validators(
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         model_identifier=params.model_identifier,
@@ -691,7 +691,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17142, in _run_model_preflight_validators
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17163, in _run_model_preflight_validators
     _raise_preflight_error(
     ~~~~~~~~~~~~~~~~~~~~~~^
         "Loaded processor has no image_processor; expected multimodal processor.",
@@ -700,14 +700,14 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17075, in _raise_preflight_error
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17096, in _raise_preflight_error
     raise _tag_exception_failure_phase(ValueError(message), phase)
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17785, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17806, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -718,13 +718,13 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17600, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17621, in _run_model_generation
     formatted_prompt = _prepare_generation_prompt(
         params=params,
     ...<3 lines>...
         phase_timer=phase_timer,
     )
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17391, in _prepare_generation_prompt
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17412, in _prepare_generation_prompt
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -745,8 +745,8 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
   Chapel, Cross, Daylight, Dorking; nonvisual metadata reused
 - _Score:_ 🟡 C (61/100); Δ-14; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (metadata borrowing, missing sections)
-- _Timing:_ Load 0.51s; Gen 0.89s; Total 1.65s
-- _Throughput:_ Prompt 6,366 TPS (561 tok); Gen 346 TPS (137 tok)
+- _Timing:_ Load 0.45s; Gen 0.90s; Total 1.61s
+- _Throughput:_ Prompt 5,858 TPS (561 tok); Gen 350 TPS (137 tok)
 - _Tokens:_ prompt 561 tok; estimated text 474 tok; estimated non-text 87 tok;
   generated 137 tok; requested max 500 tok; stop reason completed
 
@@ -782,8 +782,8 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
   sky, Chapel, Cross, Daylight; nonvisual metadata reused
 - _Score:_ 🟠 D (48/100); Δ-28; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (metadata borrowing, missing sections)
-- _Timing:_ Load 0.53s; Gen 1.25s; Total 2.04s
-- _Throughput:_ Prompt 4,379 TPS (561 tok); Gen 98.1 TPS (68 tok)
+- _Timing:_ Load 0.74s; Gen 1.18s; Total 2.17s
+- _Throughput:_ Prompt 4,547 TPS (561 tok); Gen 109 TPS (68 tok)
 - _Tokens:_ prompt 561 tok; estimated text 474 tok; estimated non-text 87 tok;
   generated 68 tok; requested max 500 tok; stop reason completed
 
@@ -816,8 +816,8 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
   nonvisual metadata reused
 - _Score:_ 🟠 D (46/100); Δ-29; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (metadata borrowing, missing sections)
-- _Timing:_ Load 0.62s; Gen 1.54s; Total 2.43s
-- _Throughput:_ Prompt 5,579 TPS (565 tok); Gen 344 TPS (222 tok)
+- _Timing:_ Load 0.83s; Gen 1.52s; Total 2.60s
+- _Throughput:_ Prompt 5,545 TPS (565 tok); Gen 346 TPS (222 tok)
 - _Tokens:_ prompt 565 tok; estimated text 474 tok; estimated non-text 91 tok;
   generated 222 tok; requested max 500 tok; stop reason completed
 
@@ -858,8 +858,8 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
 - _Key signals:_ missing terms: Chapel, Cross, Dorking, Objects, Station wagon
 - _Score:_ 🏆 A (80/100); Δ+5; Limited novel information
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 2.33s; Gen 1.73s; Total 4.35s
-- _Throughput:_ Prompt 1,607 TPS (835 tok); Gen 108 TPS (86 tok)
+- _Timing:_ Load 2.34s; Gen 1.72s; Total 4.34s
+- _Throughput:_ Prompt 1,632 TPS (835 tok); Gen 108 TPS (86 tok)
 - _Tokens:_ prompt 835 tok; estimated text 474 tok; estimated non-text 361
   tok; generated 86 tok; requested max 500 tok; stop reason completed
 
@@ -882,6 +882,37 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-paligemma2-3b-ft-docci-448-bf16"></a>
+
+### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
+
+- _Recommendation:_ avoid for now; review verdict: model shortcoming
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ nontext prompt burden=70%; missing sections: title,
+  description, keywords; missing terms: Bell Tower, Blue sky, Car, Chapel,
+  Church
+- _Score:_ ❌ F (28/100); Δ-47; Output lacks detail
+- _Review focus:_ watchlist (context ignored, missing sections)
+- _Timing:_ Load 1.42s; Gen 1.75s; Total 3.43s
+- _Throughput:_ Prompt 3,300 TPS (1,585 tok); Gen 20.2 TPS (17 tok)
+- _Tokens:_ prompt 1585 tok; estimated text 474 tok; estimated non-text 1111
+  tok; generated 17 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> &#45; The sky is bright and clear, with a few wispy white clouds.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Context ignored (missing: Bell Tower, Blue sky, Car, Chapel, Church)
+- Missing sections (title, description, keywords)
+- Ignores trusted hints
+
+---
+
 <a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
 
 ### ✅ mlx-community/SmolVLM2-2.2B-Instruct-mlx
@@ -892,8 +923,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ keywords=20; context echo=53%; nonvisual metadata reused
 - _Score:_ 🟡 C (57/100); Δ-18; Limited novel information
 - _Review focus:_ watchlist (context echo, metadata borrowing)
-- _Timing:_ Load 0.55s; Gen 1.85s; Total 2.66s
-- _Throughput:_ Prompt 1,982 TPS (671 tok); Gen 135 TPS (131 tok)
+- _Timing:_ Load 0.56s; Gen 1.86s; Total 2.68s
+- _Throughput:_ Prompt 1,948 TPS (671 tok); Gen 133 TPS (131 tok)
 - _Tokens:_ prompt 671 tok; estimated text 474 tok; estimated non-text 197
   tok; generated 131 tok; requested max 500 tok; stop reason completed
 
@@ -918,9 +949,9 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-paligemma2-3b-ft-docci-448-bf16"></a>
+<a id="model-mlx-community-paligemma2-10b-ft-docci-448-6bit"></a>
 
-### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
+### ✅ mlx-community/paligemma2-10b-ft-docci-448-6bit
 
 - _Recommendation:_ avoid for now; review verdict: model shortcoming
 - _Owner:_ likely owner `model`
@@ -929,16 +960,17 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=70%; missing sections: title,
   description, keywords; missing terms: Bell Tower, Blue sky, Car, Chapel,
   Church
-- _Score:_ ❌ F (28/100); Δ-47; Output lacks detail
+- _Score:_ ❌ F (33/100); Δ-42; Lacks visual description of image
 - _Review focus:_ watchlist (context ignored, missing sections)
-- _Timing:_ Load 1.63s; Gen 1.97s; Total 3.88s
-- _Throughput:_ Prompt 2,909 TPS (1,585 tok); Gen 17.4 TPS (17 tok)
+- _Timing:_ Load 1.64s; Gen 2.22s; Total 4.12s
+- _Throughput:_ Prompt 1,371 TPS (1,585 tok); Gen 31.6 TPS (20 tok)
 - _Tokens:_ prompt 1585 tok; estimated text 474 tok; estimated non-text 1111
-  tok; generated 17 tok; requested max 500 tok; stop reason completed
+  tok; generated 20 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
-> &#45; The sky is bright and clear, with a few wispy white clouds.
+> &#45; Use the following metadata hints as a guide, but do not include them in
+> the output.
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
@@ -946,6 +978,49 @@ _Quality Status:_ no quality issues detected in this run
 - Context ignored (missing: Bell Tower, Blue sky, Car, Chapel, Church)
 - Missing sections (title, description, keywords)
 - Ignores trusted hints
+
+---
+
+<a id="model-huggingfacetb-smolvlm-instruct"></a>
+
+### ✅ HuggingFaceTB/SmolVLM-Instruct
+
+- _Recommendation:_ avoid for now; review verdict: model shortcoming
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=73%; keywords=20; nonvisual metadata
+  reused
+- _Score:_ 🟡 C (51/100); Δ-24; Missing requested structure
+- _Review focus:_ watchlist (metadata borrowing)
+- _Timing:_ Load 0.64s; Gen 2.32s; Total 3.20s
+- _Throughput:_ Prompt 4,276 TPS (1,771 tok); Gen 127 TPS (182 tok)
+- _Tokens:_ prompt 1771 tok; estimated text 474 tok; estimated non-text 1297
+  tok; generated 182 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> 5-10 words, concrete and factual, limited to clearly visible content.
+> &#45; Output only the title text after the label.
+> &#45; Do not repeat or paraphrase these instructions in the title.
+>
+> Title: St Peter's Church in Petersfield, Hampshire, England, on a sunny day.
+>
+> Description: A low-angle, wide shot of St Peter's Church in Petersfield,
+> Hampshire, England, on a sunny day. The Gothic Revival style church, with
+> its tall spire and flint walls, is pictured against a bright blue sky with
+> wispy clouds. A black car is parked in the foreground.
+>
+> Keywords: Adobe Stock, Any Vision, Bell Tower, Blue sky, Car, Chapel,
+> Church, Cross, Daylight, Dorking, England, Europe, Fence, Gothic
+> Architecture, Objects, Sky, Station wagon, Steeple, Stone, Surrey
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Title length violation (11 words; expected 5-10)
+- Description sentence violation (3; expected 1-2)
+- Keyword count violation (20; expected 10-18)
+- Nonvisual metadata borrowing
 
 ---
 
@@ -962,8 +1037,8 @@ _Quality Status:_ no quality issues detected in this run
   metadata reused
 - _Score:_ 🏆 A (81/100); Δ+6; None identified
 - _Review focus:_ watchlist (metadata borrowing)
-- _Timing:_ Load 0.94s; Gen 2.33s; Total 3.53s
-- _Throughput:_ Prompt 3,058 TPS (3,172 tok); Gen 184 TPS (157 tok)
+- _Timing:_ Load 0.92s; Gen 2.35s; Total 3.53s
+- _Throughput:_ Prompt 3,051 TPS (3,172 tok); Gen 183 TPS (157 tok)
 - _Tokens:_ prompt 3172 tok; estimated text 474 tok; estimated non-text 2698
   tok; generated 157 tok; requested max 500 tok; stop reason completed
 
@@ -994,49 +1069,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-huggingfacetb-smolvlm-instruct"></a>
-
-### ✅ HuggingFaceTB/SmolVLM-Instruct
-
-- _Recommendation:_ avoid for now; review verdict: model shortcoming
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ nontext prompt burden=73%; keywords=20; nonvisual metadata
-  reused
-- _Score:_ 🟡 C (51/100); Δ-24; Missing requested structure
-- _Review focus:_ watchlist (metadata borrowing)
-- _Timing:_ Load 0.61s; Gen 2.41s; Total 3.26s
-- _Throughput:_ Prompt 4,048 TPS (1,771 tok); Gen 123 TPS (182 tok)
-- _Tokens:_ prompt 1771 tok; estimated text 474 tok; estimated non-text 1297
-  tok; generated 182 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> 5-10 words, concrete and factual, limited to clearly visible content.
-> &#45; Output only the title text after the label.
-> &#45; Do not repeat or paraphrase these instructions in the title.
->
-> Title: St Peter's Church in Petersfield, Hampshire, England, on a sunny day.
->
-> Description: A low-angle, wide shot of St Peter's Church in Petersfield,
-> Hampshire, England, on a sunny day. The Gothic Revival style church, with
-> its tall spire and flint walls, is pictured against a bright blue sky with
-> wispy clouds. A black car is parked in the foreground.
->
-> Keywords: Adobe Stock, Any Vision, Bell Tower, Blue sky, Car, Chapel,
-> Church, Cross, Daylight, Dorking, England, Europe, Fence, Gothic
-> Architecture, Objects, Sky, Station wagon, Steeple, Stone, Surrey
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Title length violation (11 words; expected 5-10)
-- Description sentence violation (3; expected 1-2)
-- Keyword count violation (20; expected 10-18)
-- Nonvisual metadata borrowing
-
----
-
 <a id="model-mlx-community-smolvlm-instruct-bf16"></a>
 
 ### ✅ mlx-community/SmolVLM-Instruct-bf16
@@ -1048,8 +1080,8 @@ _Quality Status:_ no quality issues detected in this run
   reused
 - _Score:_ 🟡 C (51/100); Δ-24; Missing requested structure
 - _Review focus:_ watchlist (metadata borrowing)
-- _Timing:_ Load 0.58s; Gen 2.49s; Total 3.33s
-- _Throughput:_ Prompt 3,836 TPS (1,771 tok); Gen 123 TPS (182 tok)
+- _Timing:_ Load 0.60s; Gen 2.43s; Total 3.29s
+- _Throughput:_ Prompt 4,216 TPS (1,771 tok); Gen 123 TPS (182 tok)
 - _Tokens:_ prompt 1771 tok; estimated text 474 tok; estimated non-text 1297
   tok; generated 182 tok; requested max 500 tok; stop reason completed
 
@@ -1077,72 +1109,6 @@ _Quality Status:_ no quality issues detected in this run
 - Description sentence violation (3; expected 1-2)
 - Keyword count violation (20; expected 10-18)
 - Nonvisual metadata borrowing
-
----
-
-<a id="model-mlx-community-paligemma2-10b-ft-docci-448-6bit"></a>
-
-### ✅ mlx-community/paligemma2-10b-ft-docci-448-6bit
-
-- _Recommendation:_ avoid for now; review verdict: model shortcoming
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ nontext prompt burden=70%; missing sections: title,
-  description, keywords; missing terms: Bell Tower, Blue sky, Car, Chapel,
-  Church
-- _Score:_ ❌ F (33/100); Δ-42; Lacks visual description of image
-- _Review focus:_ watchlist (context ignored, missing sections)
-- _Timing:_ Load 1.89s; Gen 2.52s; Total 4.67s
-- _Throughput:_ Prompt 1,182 TPS (1,585 tok); Gen 27.6 TPS (20 tok)
-- _Tokens:_ prompt 1585 tok; estimated text 474 tok; estimated non-text 1111
-  tok; generated 20 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> &#45; Use the following metadata hints as a guide, but do not include them in
-> the output.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Context ignored (missing: Bell Tower, Blue sky, Car, Chapel, Church)
-- Missing sections (title, description, keywords)
-- Ignores trusted hints
-
----
-
-<a id="model-mlx-community-llava-v16-mistral-7b-8bit"></a>
-
-### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
-
-- _Recommendation:_ avoid for now; review verdict: harness
-- _Owner:_ likely owner `model-config`; harness signal `prompt_template`
-- _Next step:_ Check chat-template and EOS defaults first; the output shape is
-  not matching the requested contract.
-- _Key signals:_ Output is very short relative to prompt size (0.4%),
-  suggesting possible early-stop or prompt-handling issues.; nontext prompt
-  burden=83%; missing sections: title, description, keywords; missing terms:
-  Bell Tower, Blue sky, Car, Chapel, Cross
-- _Score:_ ❌ F (9/100); Δ-66; Output lacks detail
-- _Review focus:_ watchlist (context ignored, harness, missing sections)
-- _Timing:_ Load 0.91s; Gen 2.93s; Total 4.10s
-- _Throughput:_ Prompt 1,251 TPS (2,789 tok); Gen 64.9 TPS (11 tok)
-- _Tokens:_ prompt 2789 tok; estimated text 474 tok; estimated non-text 2315
-  tok; generated 11 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> The image is a photograph of a church.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️HARNESS:prompt_template
-- Context ignored (missing: Bell Tower, Blue sky, Car, Chapel, Cross)
-- Missing sections (title, description, keywords)
-- Ignores trusted hints
-- output:output_ratio(0.4%)
 
 ---
 
@@ -1158,8 +1124,8 @@ _Quality Status:_ no quality issues detected in this run
   Cross, Fence, Objects; keywords=19; nonvisual metadata reused
 - _Score:_ ✅ B (65/100); Δ-10; Limited novel information
 - _Review focus:_ watchlist (metadata borrowing)
-- _Timing:_ Load 0.98s; Gen 2.97s; Total 4.20s
-- _Throughput:_ Prompt 3,914 TPS (1,387 tok); Gen 56.9 TPS (129 tok)
+- _Timing:_ Load 0.92s; Gen 2.95s; Total 4.12s
+- _Throughput:_ Prompt 3,898 TPS (1,387 tok); Gen 57.7 TPS (129 tok)
 - _Tokens:_ prompt 1387 tok; estimated text 474 tok; estimated non-text 913
   tok; generated 129 tok; requested max 500 tok; stop reason completed
 
@@ -1184,6 +1150,71 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-llava-v16-mistral-7b-8bit"></a>
+
+### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
+
+- _Recommendation:_ avoid for now; review verdict: harness
+- _Owner:_ likely owner `model-config`; harness signal `prompt_template`
+- _Next step:_ Check chat-template and EOS defaults first; the output shape is
+  not matching the requested contract.
+- _Key signals:_ Output is very short relative to prompt size (0.4%),
+  suggesting possible early-stop or prompt-handling issues.; nontext prompt
+  burden=83%; missing sections: title, description, keywords; missing terms:
+  Bell Tower, Blue sky, Car, Chapel, Cross
+- _Score:_ ❌ F (9/100); Δ-66; Output lacks detail
+- _Review focus:_ watchlist (context ignored, harness, missing sections)
+- _Timing:_ Load 0.91s; Gen 3.01s; Total 4.18s
+- _Throughput:_ Prompt 1,203 TPS (2,789 tok); Gen 65.6 TPS (11 tok)
+- _Tokens:_ prompt 2789 tok; estimated text 474 tok; estimated non-text 2315
+  tok; generated 11 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> The image is a photograph of a church.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️HARNESS:prompt_template
+- Context ignored (missing: Bell Tower, Blue sky, Car, Chapel, Cross)
+- Missing sections (title, description, keywords)
+- Ignores trusted hints
+- output:output_ratio(0.4%)
+
+---
+
+<a id="model-mlx-community-paligemma2-10b-ft-docci-448-bf16"></a>
+
+### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
+
+- _Recommendation:_ avoid for now; review verdict: harness
+- _Owner:_ likely owner `model-config`; harness signal `prompt_template`
+- _Next step:_ Inspect model repo config, chat template, and EOS settings.
+- _Key signals:_ Output is very short relative to prompt size (0.6%),
+  suggesting possible early-stop or prompt-handling issues.; nontext prompt
+  burden=70%; missing terms: Bell Tower, Blue sky, Car, Chapel, Church
+- _Score:_ ❌ F (35/100); Δ-40; Output lacks detail
+- _Review focus:_ watchlist (context ignored, harness)
+- _Timing:_ Load 2.48s; Gen 3.45s; Total 6.18s
+- _Throughput:_ Prompt 1,070 TPS (1,585 tok); Gen 5.88 TPS (9 tok)
+- _Tokens:_ prompt 1585 tok; estimated text 474 tok; estimated non-text 1111
+  tok; generated 9 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> &#45; Use only the above metadata hints.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️HARNESS:prompt_template
+- Context ignored (missing: Bell Tower, Blue sky, Car, Chapel, Church)
+- Ignores trusted hints
+- output:output_ratio(0.6%)
+
+---
+
 <a id="model-mlx-community-internvl3-8b-bf16"></a>
 
 ### ✅ mlx-community/InternVL3-8B-bf16
@@ -1196,8 +1227,8 @@ _Quality Status:_ no quality issues detected in this run
   Objects, Surrey, low
 - _Score:_ ✅ B (70/100); Δ-5; Limited novel information
 - _Review focus:_ watchlist (worse than metadata baseline)
-- _Timing:_ Load 1.69s; Gen 3.48s; Total 5.42s
-- _Throughput:_ Prompt 2,641 TPS (2,344 tok); Gen 34.9 TPS (75 tok)
+- _Timing:_ Load 1.67s; Gen 3.47s; Total 5.40s
+- _Throughput:_ Prompt 2,633 TPS (2,344 tok); Gen 35.2 TPS (75 tok)
 - _Tokens:_ prompt 2344 tok; estimated text 474 tok; estimated non-text 1870
   tok; generated 75 tok; requested max 500 tok; stop reason completed
 
@@ -1222,37 +1253,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-paligemma2-10b-ft-docci-448-bf16"></a>
-
-### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
-
-- _Recommendation:_ avoid for now; review verdict: harness
-- _Owner:_ likely owner `model-config`; harness signal `prompt_template`
-- _Next step:_ Inspect model repo config, chat template, and EOS settings.
-- _Key signals:_ Output is very short relative to prompt size (0.6%),
-  suggesting possible early-stop or prompt-handling issues.; nontext prompt
-  burden=70%; missing terms: Bell Tower, Blue sky, Car, Chapel, Church
-- _Score:_ ❌ F (35/100); Δ-40; Output lacks detail
-- _Review focus:_ watchlist (context ignored, harness)
-- _Timing:_ Load 2.63s; Gen 3.89s; Total 6.79s
-- _Throughput:_ Prompt 926 TPS (1,585 tok); Gen 5.24 TPS (9 tok)
-- _Tokens:_ prompt 1585 tok; estimated text 474 tok; estimated non-text 1111
-  tok; generated 9 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> &#45; Use only the above metadata hints.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️HARNESS:prompt_template
-- Context ignored (missing: Bell Tower, Blue sky, Car, Chapel, Church)
-- Ignores trusted hints
-- output:output_ratio(0.6%)
-
----
-
 <a id="model-mlx-community-ministral-3-14b-instruct-2512-mxfp4"></a>
 
 ### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
@@ -1265,8 +1265,8 @@ _Quality Status:_ no quality issues detected in this run
   Cross, Dorking, Fence
 - _Score:_ 🏆 A (83/100); Δ+8; None identified
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 1.30s; Gen 4.50s; Total 6.06s
-- _Throughput:_ Prompt 1,313 TPS (3,173 tok); Gen 66.0 TPS (108 tok)
+- _Timing:_ Load 1.58s; Gen 4.27s; Total 6.10s
+- _Throughput:_ Prompt 1,444 TPS (3,173 tok); Gen 66.5 TPS (108 tok)
 - _Tokens:_ prompt 3173 tok; estimated text 474 tok; estimated non-text 2699
   tok; generated 108 tok; requested max 500 tok; stop reason completed
 
@@ -1303,8 +1303,8 @@ _Quality Status:_ no quality issues detected in this run
   Cross, Dorking, Gothic Architecture
 - _Score:_ 🏆 A (86/100); Δ+10; None identified
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 1.33s; Gen 4.54s; Total 6.13s
-- _Throughput:_ Prompt 1,402 TPS (3,173 tok); Gen 63.3 TPS (116 tok)
+- _Timing:_ Load 1.35s; Gen 4.51s; Total 6.12s
+- _Throughput:_ Prompt 1,434 TPS (3,173 tok); Gen 62.6 TPS (116 tok)
 - _Tokens:_ prompt 3173 tok; estimated text 474 tok; estimated non-text 2699
   tok; generated 116 tok; requested max 500 tok; stop reason completed
 
@@ -1340,8 +1340,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ missing terms: Bell Tower, Chapel, Cross, Dorking, Fence
 - _Score:_ 🏆 A (88/100); Δ+12; None identified
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 2.31s; Gen 4.72s; Total 7.30s
-- _Throughput:_ Prompt 662 TPS (830 tok); Gen 30.6 TPS (94 tok)
+- _Timing:_ Load 2.30s; Gen 4.75s; Total 7.31s
+- _Throughput:_ Prompt 656 TPS (830 tok); Gen 30.4 TPS (94 tok)
 - _Tokens:_ prompt 830 tok; estimated text 474 tok; estimated non-text 356
   tok; generated 94 tok; requested max 500 tok; stop reason completed
 
@@ -1365,42 +1365,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-gemma-3n-e2b-4bit"></a>
-
-### ✅ mlx-community/gemma-3n-E2B-4bit
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); missing sections: title, description,
-  keywords; missing terms: Bell Tower, Blue sky, Car, Chapel, Church;
-  nonvisual metadata reused
-- _Score:_ ❌ F (2/100); Δ-73; Output too short to be useful
-- _Review focus:_ watchlist (context ignored, cutoff, metadata borrowing,
-  missing sections)
-- _Timing:_ Load 1.43s; Gen 4.84s; Total 6.54s
-- _Throughput:_ Prompt 2,615 TPS (821 tok); Gen 120 TPS (500 tok)
-- _Tokens:_ prompt 821 tok; estimated text 474 tok; estimated non-text 347
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
->
-> &#45;
-> 17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:51:00:17:51:00:17:51:00:17:51:00:17:51:00:17:51:00:17:51:00:17:51:00:17:51:00:17:51:00:17:51:00:17:51:00:17
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Context ignored (missing: Bell Tower, Blue sky, Car, Chapel, Church)
-- Missing sections (title, description, keywords)
-- Nonvisual metadata borrowing
-- Likely capped by max token budget
-- Ignores trusted hints
-
----
-
 <a id="model-mlx-community-internvl3-14b-8bit"></a>
 
 ### ✅ mlx-community/InternVL3-14B-8bit
@@ -1413,8 +1377,8 @@ _Quality Status:_ no quality issues detected in this run
   wagon, Surrey, low, angle; nonvisual metadata reused
 - _Score:_ ✅ B (75/100); Δ-0; Limited novel information
 - _Review focus:_ watchlist (metadata borrowing)
-- _Timing:_ Load 1.74s; Gen 4.90s; Total 6.90s
-- _Throughput:_ Prompt 1,317 TPS (2,344 tok); Gen 32.2 TPS (86 tok)
+- _Timing:_ Load 1.77s; Gen 4.75s; Total 6.78s
+- _Throughput:_ Prompt 1,436 TPS (2,344 tok); Gen 32.3 TPS (86 tok)
 - _Tokens:_ prompt 2344 tok; estimated text 474 tok; estimated non-text 1870
   tok; generated 86 tok; requested max 500 tok; stop reason completed
 
@@ -1438,6 +1402,42 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-gemma-3n-e2b-4bit"></a>
+
+### ✅ mlx-community/gemma-3n-E2B-4bit
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ hit token cap (500); missing sections: title, description,
+  keywords; missing terms: Bell Tower, Blue sky, Car, Chapel, Church;
+  nonvisual metadata reused
+- _Score:_ ❌ F (2/100); Δ-73; Output too short to be useful
+- _Review focus:_ watchlist (context ignored, cutoff, metadata borrowing,
+  missing sections)
+- _Timing:_ Load 1.42s; Gen 4.99s; Total 6.66s
+- _Throughput:_ Prompt 2,575 TPS (821 tok); Gen 117 TPS (500 tok)
+- _Tokens:_ prompt 821 tok; estimated text 474 tok; estimated non-text 347
+  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+>
+> &#45;
+> 17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:50:00:17:51:00:17:51:00:17:51:00:17:51:00:17:51:00:17:51:00:17:51:00:17:51:00:17:51:00:17:51:00:17:51:00:17:51:00:17
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Context ignored (missing: Bell Tower, Blue sky, Car, Chapel, Church)
+- Missing sections (title, description, keywords)
+- Nonvisual metadata borrowing
+- Likely capped by max token budget
+- Ignores trusted hints
+
+---
+
 <a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
 
 ### ✅ mlx-community/Idefics3-8B-Llama3-bf16
@@ -1450,8 +1450,8 @@ _Quality Status:_ no quality issues detected in this run
   Cross, Daylight, Dorking; context echo=47%; nonvisual metadata reused
 - _Score:_ ✅ B (69/100); Δ-6; Limited novel information
 - _Review focus:_ watchlist (context echo, metadata borrowing)
-- _Timing:_ Load 1.88s; Gen 5.28s; Total 7.43s
-- _Throughput:_ Prompt 2,375 TPS (2,844 tok); Gen 32.8 TPS (117 tok)
+- _Timing:_ Load 1.91s; Gen 5.28s; Total 7.48s
+- _Throughput:_ Prompt 2,433 TPS (2,844 tok); Gen 32.5 TPS (117 tok)
 - _Tokens:_ prompt 2844 tok; estimated text 474 tok; estimated non-text 2370
   tok; generated 117 tok; requested max 500 tok; stop reason completed
 
@@ -1490,8 +1490,8 @@ _Quality Status:_ no quality issues detected in this run
   nonvisual metadata reused
 - _Score:_ ✅ B (78/100); Δ+3; Limited novel information
 - _Review focus:_ watchlist (metadata borrowing)
-- _Timing:_ Load 2.53s; Gen 5.28s; Total 8.08s
-- _Throughput:_ Prompt 591 TPS (835 tok); Gen 27.2 TPS (94 tok)
+- _Timing:_ Load 2.54s; Gen 5.30s; Total 8.11s
+- _Throughput:_ Prompt 584 TPS (835 tok); Gen 27.1 TPS (94 tok)
 - _Tokens:_ prompt 835 tok; estimated text 474 tok; estimated non-text 361
   tok; generated 94 tok; requested max 500 tok; stop reason completed
 
@@ -1527,8 +1527,8 @@ _Quality Status:_ no quality issues detected in this run
   reused
 - _Score:_ ✅ B (73/100); Δ-2; Limited novel information
 - _Review focus:_ watchlist (metadata borrowing)
-- _Timing:_ Load 1.73s; Gen 6.43s; Total 8.43s
-- _Throughput:_ Prompt 1,345 TPS (3,366 tok); Gen 33.8 TPS (118 tok)
+- _Timing:_ Load 1.66s; Gen 5.74s; Total 7.66s
+- _Throughput:_ Prompt 1,479 TPS (3,366 tok); Gen 38.8 TPS (118 tok)
 - _Tokens:_ prompt 3366 tok; estimated text 474 tok; estimated non-text 2892
   tok; generated 118 tok; requested max 500 tok; stop reason completed
 
@@ -1556,6 +1556,40 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
+
+### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+
+- _Recommendation:_ avoid for now; review verdict: harness
+- _Owner:_ likely owner `mlx-vlm`; harness signal `encoding`
+- _Next step:_ Inspect decode cleanup; tokenizer markers are leaking into
+  user-facing text.
+- _Key signals:_ Tokenizer space-marker artifacts (for example Ġ) appeared in
+  output (about 57 occurrences).; nontext prompt burden=82%; missing sections:
+  description, keywords; missing terms: Dorking, Gothic Architecture, Objects,
+  Surrey, low
+- _Score:_ ❌ F (6/100); Δ-69; Output too short to be useful
+- _Review focus:_ watchlist (harness, metadata borrowing, missing sections)
+- _Timing:_ Load 2.13s; Gen 6.93s; Total 9.35s
+- _Throughput:_ Prompt 750 TPS (2,676 tok); Gen 31.9 TPS (93 tok)
+- _Tokens:_ prompt 2676 tok; estimated text 474 tok; estimated non-text 2202
+  tok; generated 93 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> Title:ĠGothicĠRevivalĠChurchĠwithĠSpireĊĊDescription:ĠAĠGothicĠRevivalĠstyleĠchurchĠwithĠaĠtallĠspireĠandĠflintĠwallsĠstandsĠagainstĠaĠbrightĠblueĠskyĠwithĠwispyĠclouds.ĠAĠblackĠcarĠisĠparkedĠinĠtheĠforeground.ĊĊKeywords:ĠGothicĠRevival,Ġchurch,Ġspire,ĠflintĠwalls,ĠblueĠsky,ĠwispyĠclouds,ĠblackĠcar,Ġstone,Ġcross,Ġdaylight,Ġfence,Ġsteeple,Ġchapel,ĠbellĠtower,ĠstationĠwagon,ĠEurope
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️HARNESS:encoding
+- Missing sections (description, keywords)
+- Title length violation (59 words; expected 5-10)
+- Nonvisual metadata borrowing
+- token_encoding:bpe_space_leak(57)
+
+---
+
 <a id="model-mlx-community-gemma-3n-e4b-it-bf16"></a>
 
 ### ✅ mlx-community/gemma-3n-E4B-it-bf16
@@ -1569,8 +1603,8 @@ _Quality Status:_ no quality issues detected in this run
   reused
 - _Score:_ ✅ B (66/100); Δ-9; Missing requested structure
 - _Review focus:_ watchlist (metadata borrowing, missing sections)
-- _Timing:_ Load 2.21s; Gen 7.35s; Total 9.84s
-- _Throughput:_ Prompt 1,902 TPS (829 tok); Gen 48.4 TPS (316 tok)
+- _Timing:_ Load 2.25s; Gen 7.42s; Total 9.93s
+- _Throughput:_ Prompt 1,845 TPS (829 tok); Gen 48.0 TPS (316 tok)
 - _Tokens:_ prompt 829 tok; estimated text 474 tok; estimated non-text 355
   tok; generated 316 tok; requested max 500 tok; stop reason completed
 
@@ -1615,40 +1649,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
-
-### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
-
-- _Recommendation:_ avoid for now; review verdict: harness
-- _Owner:_ likely owner `mlx-vlm`; harness signal `encoding`
-- _Next step:_ Inspect decode cleanup; tokenizer markers are leaking into
-  user-facing text.
-- _Key signals:_ Tokenizer space-marker artifacts (for example Ġ) appeared in
-  output (about 57 occurrences).; nontext prompt burden=82%; missing sections:
-  description, keywords; missing terms: Dorking, Gothic Architecture, Objects,
-  Surrey, low
-- _Score:_ ❌ F (6/100); Δ-69; Output too short to be useful
-- _Review focus:_ watchlist (harness, metadata borrowing, missing sections)
-- _Timing:_ Load 2.15s; Gen 7.49s; Total 9.94s
-- _Throughput:_ Prompt 676 TPS (2,676 tok); Gen 30.5 TPS (93 tok)
-- _Tokens:_ prompt 2676 tok; estimated text 474 tok; estimated non-text 2202
-  tok; generated 93 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> Title:ĠGothicĠRevivalĠChurchĠwithĠSpireĊĊDescription:ĠAĠGothicĠRevivalĠstyleĠchurchĠwithĠaĠtallĠspireĠandĠflintĠwallsĠstandsĠagainstĠaĠbrightĠblueĠskyĠwithĠwispyĠclouds.ĠAĠblackĠcarĠisĠparkedĠinĠtheĠforeground.ĊĊKeywords:ĠGothicĠRevival,Ġchurch,Ġspire,ĠflintĠwalls,ĠblueĠsky,ĠwispyĠclouds,ĠblackĠcar,Ġstone,Ġcross,Ġdaylight,Ġfence,Ġsteeple,Ġchapel,ĠbellĠtower,ĠstationĠwagon,ĠEurope
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️HARNESS:encoding
-- Missing sections (description, keywords)
-- Title length violation (59 words; expected 5-10)
-- Nonvisual metadata borrowing
-- token_encoding:bpe_space_leak(57)
-
----
-
 <a id="model-mlx-community-gemma-3-27b-it-qat-8bit"></a>
 
 ### ✅ mlx-community/gemma-3-27b-it-qat-8bit
@@ -1660,8 +1660,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ missing terms: Chapel, Cross, Dorking, Objects, Station wagon
 - _Score:_ 🏆 A (82/100); Δ+7; Limited novel information
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 3.36s; Gen 7.86s; Total 11.49s
-- _Throughput:_ Prompt 578 TPS (830 tok); Gen 17.6 TPS (106 tok)
+- _Timing:_ Load 3.37s; Gen 7.83s; Total 11.46s
+- _Throughput:_ Prompt 576 TPS (830 tok); Gen 17.6 TPS (106 tok)
 - _Tokens:_ prompt 830 tok; estimated text 474 tok; estimated non-text 356
   tok; generated 106 tok; requested max 500 tok; stop reason completed
 
@@ -1698,8 +1698,8 @@ _Quality Status:_ no quality issues detected in this run
   metadata reused
 - _Score:_ ✅ B (73/100); Δ-2; Limited novel information
 - _Review focus:_ watchlist (metadata borrowing)
-- _Timing:_ Load 2.61s; Gen 8.98s; Total 11.85s
-- _Throughput:_ Prompt 1,500 TPS (3,366 tok); Gen 18.6 TPS (117 tok)
+- _Timing:_ Load 2.53s; Gen 7.91s; Total 10.70s
+- _Throughput:_ Prompt 1,853 TPS (3,366 tok); Gen 20.6 TPS (117 tok)
 - _Tokens:_ prompt 3366 tok; estimated text 474 tok; estimated non-text 2892
   tok; generated 117 tok; requested max 500 tok; stop reason completed
 
@@ -1727,6 +1727,113 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-jqlive-kimi-vl-a3b-thinking-2506-6bit"></a>
+
+### ✅ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ hit token cap (500); nontext prompt burden=69%; missing
+  sections: title, description; missing terms: Bell Tower, Gothic
+  Architecture, Steeple, Surrey, pictured
+- _Score:_ ✅ B (68/100); Δ-7; Missing requested structure
+- _Review focus:_ watchlist (cutoff, metadata borrowing, missing sections,
+  reasoning leak)
+- _Timing:_ Load 2.04s; Gen 8.75s; Total 11.04s
+- _Throughput:_ Prompt 1,614 TPS (1,553 tok); Gen 68.5 TPS (500 tok)
+- _Tokens:_ prompt 1553 tok; estimated text 474 tok; estimated non-text 1079
+  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> ◁think▷Got it, let's analyze the image based on the given instructions.
+> First, the title needs to be 5-10 words, concrete and factual. The main
+> visible elements are St Peter's Church in Petersfield, Hampshire, England,
+> with a tall spire, flint walls, a black car in the foreground, and a bright
+> blue sky. So the title could be "St Peter's Church, Petersfield, Hampshire,
+> England, with black car, spire, blue sky".
+>
+> For the description, it should be 1-2 sentences. The main subject is the
+> church, Gothic Revival style, low-angle wide shot, sunny day, flint walls,
+> tall spire, black car in foreground, bright blue sky with wispy clouds. So
+> the description could be "Low-angle wide shot of St Peter's Church in
+> Petersfield, Hampshire, England, showcasing its Gothic Revival architecture,
+> flint walls, tall spire, and a black car in the foreground under a bright
+> blue sky with wispy clouds."
+>
+> Keywords: Need 10-18 unique terms. From the image: St Peter's Church,
+> Petersfield, Hampshire, England, Gothic Revival, flint walls, tall spire,
+> black car, blue sky, wispy clouds, low-angle, wide shot, sunny day, stone,
+> church, chapel, cross, daylight, Dorking (since Dorking is a town in
+> Hampshire), Europe, objects, station wagon (the car in foreground), fence.
+> Let's check which are visible: "St Peter's Church", "Petersfield",
+> "Hampshire", "England", "Gothic Revival", "flint walls", "tall spire",
+> "black car", "blue sky", "wispy clouds", "low-angle", "wide shot", "sunny
+> day", "stone", "church", "chapel", "cross", "daylight", "Dorking", "Europe",
+> "objects", "station wagon", "fence". Let's pick the most visible and
+> relevant: St Peter's Church, Petersfield, Hampshire, England, Gothic
+> Revival, flint walls, tall spire, black car, blue sky, wispy clouds,
+> low-angle, wide shot, sunny day, stone, church, chapel, cross, daylight,
+> Dorking, Europe, station wagon, fence. That's 18 keywords.
+>
+> &#8203;Wait, need to ensure they are unique and clearly visible. Let's list them:
+> St Peter
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Missing sections (title, description)
+- Keyword count violation (68; expected 10-18)
+- Keyword duplication (57% duplicated terms)
+- Reasoning leak (◁think▷, let's analyze the image)
+- Nonvisual metadata borrowing
+- Likely capped by max token budget
+
+---
+
+<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
+
+### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+
+- _Recommendation:_ avoid for now; review verdict: model shortcoming
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ missing sections: title, description, keywords; missing
+  terms: Bell Tower, Chapel, Cross, Daylight, Dorking; nonvisual metadata
+  reused
+- _Score:_ 🟡 C (53/100); Δ-22; Keywords are not specific or diverse enough
+- _Review focus:_ watchlist (metadata borrowing, missing sections)
+- _Timing:_ Load 1.54s; Gen 9.36s; Total 11.16s
+- _Throughput:_ Prompt 330 TPS (532 tok); Gen 21.8 TPS (161 tok)
+- _Tokens:_ prompt 532 tok; estimated text 474 tok; estimated non-text 58 tok;
+  generated 161 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> St Peter's Church in Petersfield, Hampshire, England
+>
+> The image depicts a low-angle, wide shot of St Peter's Church in
+> Petersfield, Hampshire, England, on a sunny day. The church is a prominent
+> structure with a tall spire and flint walls, situated against a bright blue
+> sky with wispy clouds. In the foreground, a black car is parked, adding a
+> sense of scale to the scene. The church's architecture is characterized by
+> its Gothic Revival style, with pointed arches, ribbed vaults, and intricate
+> stone carvings. The surrounding area is well-manicured, with a fence and a
+> few trees visible. The overall atmosphere of the image is one of serenity
+> and tranquility, with the warm sunlight casting a golden glow over the
+> scene.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Missing sections (title, description, keywords)
+- Nonvisual metadata borrowing
+
+---
+
 <a id="model-microsoft-phi-35-vision-instruct"></a>
 
 ### ✅ microsoft/Phi-3.5-vision-instruct
@@ -1740,8 +1847,8 @@ _Quality Status:_ no quality issues detected in this run
   text.; hit token cap (500); nontext prompt burden=66%
 - _Score:_ 🟡 C (64/100); Δ-11; Lacks visual description of image
 - _Review focus:_ watchlist (harness, metadata borrowing)
-- _Timing:_ Load 0.88s; Gen 9.90s; Total 11.05s
-- _Throughput:_ Prompt 3,565 TPS (1,387 tok); Gen 54.7 TPS (500 tok)
+- _Timing:_ Load 0.88s; Gen 10.33s; Total 11.47s
+- _Throughput:_ Prompt 3,899 TPS (1,387 tok); Gen 52.0 TPS (500 tok)
 - _Tokens:_ prompt 1387 tok; estimated text 474 tok; estimated non-text 913
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -1813,8 +1920,8 @@ _Quality Status:_ no quality issues detected in this run
   terms: Bell Tower, Blue sky, Car, Chapel, Church
 - _Score:_ 🟠 D (41/100); Δ-34; Lacks visual description of image
 - _Review focus:_ watchlist (context ignored, missing sections)
-- _Timing:_ Load 5.97s; Gen 10.02s; Total 16.25s
-- _Throughput:_ Prompt 294 TPS (823 tok); Gen 7.51 TPS (51 tok)
+- _Timing:_ Load 6.23s; Gen 10.58s; Total 17.08s
+- _Throughput:_ Prompt 243 TPS (823 tok); Gen 7.57 TPS (51 tok)
 - _Tokens:_ prompt 823 tok; estimated text 474 tok; estimated non-text 349
   tok; generated 51 tok; requested max 500 tok; stop reason completed
 
@@ -1834,113 +1941,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-jqlive-kimi-vl-a3b-thinking-2506-6bit"></a>
-
-### ✅ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); nontext prompt burden=69%; missing
-  sections: title, description; missing terms: Bell Tower, Gothic
-  Architecture, Steeple, Surrey, pictured
-- _Score:_ ✅ B (68/100); Δ-7; Missing requested structure
-- _Review focus:_ watchlist (cutoff, metadata borrowing, missing sections,
-  reasoning leak)
-- _Timing:_ Load 4.55s; Gen 10.13s; Total 14.93s
-- _Throughput:_ Prompt 998 TPS (1,553 tok); Gen 69.2 TPS (500 tok)
-- _Tokens:_ prompt 1553 tok; estimated text 474 tok; estimated non-text 1079
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> ◁think▷Got it, let's analyze the image based on the given instructions.
-> First, the title needs to be 5-10 words, concrete and factual. The main
-> visible elements are St Peter's Church in Petersfield, Hampshire, England,
-> with a tall spire, flint walls, a black car in the foreground, and a bright
-> blue sky. So the title could be "St Peter's Church, Petersfield, Hampshire,
-> England, with black car, spire, blue sky".
->
-> For the description, it should be 1-2 sentences. The main subject is the
-> church, Gothic Revival style, low-angle wide shot, sunny day, flint walls,
-> tall spire, black car in foreground, bright blue sky with wispy clouds. So
-> the description could be "Low-angle wide shot of St Peter's Church in
-> Petersfield, Hampshire, England, showcasing its Gothic Revival architecture,
-> flint walls, tall spire, and a black car in the foreground under a bright
-> blue sky with wispy clouds."
->
-> Keywords: Need 10-18 unique terms. From the image: St Peter's Church,
-> Petersfield, Hampshire, England, Gothic Revival, flint walls, tall spire,
-> black car, blue sky, wispy clouds, low-angle, wide shot, sunny day, stone,
-> church, chapel, cross, daylight, Dorking (since Dorking is a town in
-> Hampshire), Europe, objects, station wagon (the car in foreground), fence.
-> Let's check which are visible: "St Peter's Church", "Petersfield",
-> "Hampshire", "England", "Gothic Revival", "flint walls", "tall spire",
-> "black car", "blue sky", "wispy clouds", "low-angle", "wide shot", "sunny
-> day", "stone", "church", "chapel", "cross", "daylight", "Dorking", "Europe",
-> "objects", "station wagon", "fence". Let's pick the most visible and
-> relevant: St Peter's Church, Petersfield, Hampshire, England, Gothic
-> Revival, flint walls, tall spire, black car, blue sky, wispy clouds,
-> low-angle, wide shot, sunny day, stone, church, chapel, cross, daylight,
-> Dorking, Europe, station wagon, fence. That's 18 keywords.
->
-> &#8203;Wait, need to ensure they are unique and clearly visible. Let's list them:
-> St Peter
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Missing sections (title, description)
-- Keyword count violation (68; expected 10-18)
-- Keyword duplication (57% duplicated terms)
-- Reasoning leak (◁think▷, let's analyze the image)
-- Nonvisual metadata borrowing
-- Likely capped by max token budget
-
----
-
-<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
-
-### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
-
-- _Recommendation:_ avoid for now; review verdict: model shortcoming
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ missing sections: title, description, keywords; missing
-  terms: Bell Tower, Chapel, Cross, Daylight, Dorking; nonvisual metadata
-  reused
-- _Score:_ 🟡 C (53/100); Δ-22; Keywords are not specific or diverse enough
-- _Review focus:_ watchlist (metadata borrowing, missing sections)
-- _Timing:_ Load 1.46s; Gen 10.51s; Total 12.23s
-- _Throughput:_ Prompt 303 TPS (532 tok); Gen 19.2 TPS (161 tok)
-- _Tokens:_ prompt 532 tok; estimated text 474 tok; estimated non-text 58 tok;
-  generated 161 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> St Peter's Church in Petersfield, Hampshire, England
->
-> The image depicts a low-angle, wide shot of St Peter's Church in
-> Petersfield, Hampshire, England, on a sunny day. The church is a prominent
-> structure with a tall spire and flint walls, situated against a bright blue
-> sky with wispy clouds. In the foreground, a black car is parked, adding a
-> sense of scale to the scene. The church's architecture is characterized by
-> its Gothic Revival style, with pointed arches, ribbed vaults, and intricate
-> stone carvings. The surrounding area is well-manicured, with a fence and a
-> few trees visible. The overall atmosphere of the image is one of serenity
-> and tranquility, with the warm sunlight casting a golden glow over the
-> scene.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Missing sections (title, description, keywords)
-- Nonvisual metadata borrowing
-
----
-
 <a id="model-meta-llama-llama-32-11b-vision-instruct"></a>
 
 ### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
@@ -1954,8 +1954,8 @@ _Quality Status:_ no quality issues detected in this run
   reused
 - _Score:_ 🟠 D (47/100); Δ-28; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (metadata borrowing, missing sections)
-- _Timing:_ Load 3.00s; Gen 12.92s; Total 16.19s
-- _Throughput:_ Prompt 200 TPS (533 tok); Gen 5.08 TPS (50 tok)
+- _Timing:_ Load 2.17s; Gen 12.13s; Total 14.56s
+- _Throughput:_ Prompt 279 TPS (533 tok); Gen 5.08 TPS (50 tok)
 - _Tokens:_ prompt 533 tok; estimated text 474 tok; estimated non-text 59 tok;
   generated 50 tok; requested max 500 tok; stop reason completed
 
@@ -1987,8 +1987,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Score:_ 🟠 D (50/100); Δ-25; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, missing sections,
   repetitive)
-- _Timing:_ Load 1.24s; Gen 13.71s; Total 15.23s
-- _Throughput:_ Prompt 3,225 TPS (4,657 tok); Gen 43.1 TPS (500 tok)
+- _Timing:_ Load 1.15s; Gen 12.90s; Total 14.32s
+- _Throughput:_ Prompt 3,805 TPS (4,657 tok); Gen 45.2 TPS (500 tok)
 - _Tokens:_ prompt 4657 tok; estimated text 474 tok; estimated non-text 4183
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2065,8 +2065,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Score:_ 🟠 D (43/100); Δ-32; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff, metadata borrowing, missing sections,
   reasoning leak)
-- _Timing:_ Load 1.29s; Gen 14.97s; Total 16.53s
-- _Throughput:_ Prompt 968 TPS (6,675 tok); Gen 65.1 TPS (500 tok)
+- _Timing:_ Load 1.40s; Gen 14.62s; Total 16.32s
+- _Throughput:_ Prompt 1,125 TPS (6,675 tok); Gen 60.4 TPS (500 tok)
 - _Tokens:_ prompt 6675 tok; estimated text 474 tok; estimated non-text 6201
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2131,8 +2131,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Score:_ ✅ B (71/100); Δ-4; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff, degeneration, metadata borrowing, missing
   sections, reasoning leak)
-- _Timing:_ Load 1.59s; Gen 15.22s; Total 17.07s
-- _Throughput:_ Prompt 1,437 TPS (3,457 tok); Gen 40.4 TPS (500 tok)
+- _Timing:_ Load 1.73s; Gen 15.20s; Total 17.27s
+- _Throughput:_ Prompt 1,465 TPS (3,457 tok); Gen 40.6 TPS (500 tok)
 - _Tokens:_ prompt 3457 tok; estimated text 474 tok; estimated non-text 2983
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2194,8 +2194,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Score:_ ✅ B (67/100); Δ-8; Missing requested structure
 - _Review focus:_ watchlist (cutoff, degeneration, missing sections, reasoning
   leak)
-- _Timing:_ Load 1.39s; Gen 15.96s; Total 17.62s
-- _Throughput:_ Prompt 1,109 TPS (6,675 tok); Gen 52.3 TPS (500 tok)
+- _Timing:_ Load 1.49s; Gen 16.94s; Total 18.70s
+- _Throughput:_ Prompt 1,078 TPS (6,675 tok); Gen 48.3 TPS (500 tok)
 - _Tokens:_ prompt 6675 tok; estimated text 474 tok; estimated non-text 6201
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2267,8 +2267,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Score:_ 🟠 D (44/100); Δ-31; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, degeneration, missing
   sections)
-- _Timing:_ Load 1.29s; Gen 27.34s; Total 28.88s
-- _Throughput:_ Prompt 102 TPS (1,748 tok); Gen 52.7 TPS (500 tok)
+- _Timing:_ Load 1.20s; Gen 26.03s; Total 27.49s
+- _Throughput:_ Prompt 111 TPS (1,748 tok); Gen 52.5 TPS (500 tok)
 - _Tokens:_ prompt 1748 tok; estimated text 474 tok; estimated non-text 1274
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2303,8 +2303,8 @@ _Quality Status:_ no quality issues detected in this run
   terms: Bell Tower, Chapel, wide, shot, sunny; keyword duplication=74%
 - _Score:_ ✅ B (78/100); Δ+3; None identified
 - _Review focus:_ watchlist (cutoff, metadata borrowing)
-- _Timing:_ Load 1.22s; Gen 27.44s; Total 28.92s
-- _Throughput:_ Prompt 963 TPS (16,789 tok); Gen 53.5 TPS (500 tok)
+- _Timing:_ Load 1.14s; Gen 28.53s; Total 29.93s
+- _Throughput:_ Prompt 904 TPS (16,789 tok); Gen 53.7 TPS (500 tok)
 - _Tokens:_ prompt 16789 tok; estimated text 474 tok; estimated non-text 16315
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2367,8 +2367,8 @@ _Quality Status:_ no quality issues detected in this run
   Daylight, Dorking
 - _Score:_ ✅ B (70/100); Δ-5; Missing requested structure
 - _Review focus:_ watchlist (cutoff, missing sections, reasoning leak)
-- _Timing:_ Load 5.55s; Gen 29.49s; Total 35.30s
-- _Throughput:_ Prompt 490 TPS (6,675 tok); Gen 32.4 TPS (500 tok)
+- _Timing:_ Load 10.31s; Gen 33.25s; Total 43.89s
+- _Throughput:_ Prompt 365 TPS (6,675 tok); Gen 34.5 TPS (500 tok)
 - _Tokens:_ prompt 6675 tok; estimated text 474 tok; estimated non-text 6201
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2427,41 +2427,65 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ hit token cap (500); nontext prompt burden=73%; missing
   sections: title, description, keywords; missing terms: Bell Tower, Blue sky,
   Car, Chapel, Church
-- _Score:_ 🟠 D (45/100); Δ-30; Keywords are not specific or diverse enough
-- _Review focus:_ watchlist (context ignored, cutoff, missing sections,
-  repetitive)
-- _Timing:_ Load 1.70s; Gen 34.87s; Total 36.83s
-- _Throughput:_ Prompt 99.2 TPS (1,748 tok); Gen 30.2 TPS (500 tok)
+- _Score:_ 🟠 D (44/100); Δ-31; Keywords are not specific or diverse enough
+- _Review focus:_ watchlist (context ignored, cutoff, degeneration, missing
+  sections)
+- _Timing:_ Load 1.72s; Gen 35.11s; Total 37.09s
+- _Throughput:_ Prompt 97.5 TPS (1,748 tok); Gen 30.3 TPS (500 tok)
 - _Tokens:_ prompt 1748 tok; estimated text 474 tok; estimated non-text 1274
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
-> Camera: Canon EOS 100D Mark III, ISO 400, 1/125s, f/2.8, 50mm f/2.8. 100%
-> shutter release, no remote shutter release used. Tripod: Not used. Tripod
-> head: Manfrotto Bubbalong 2.5G. Tripod legs: Manfrotto Bubbalong 2.5G.
-> Tripod head: Manfrotto Bubbalong 2.5G. Tripod legs: Manfrotto Bubbalong
-> 2.5G. Tripod head: Manfrotto Bubbalong 2.5G. Tripod legs: Manfrotto
-> Bubbalong 2.5G. Tripod head: Manfrotto Bubbalong 2.5G. Tripod legs:
-> Manfrotto Bubbalong 2.5G. Tripod head: Manfrotto Bubbalong 2.5G. Tripod
-> legs: Manfrotto Bubbalong 2.5G. Tripod head: Manfrotto Bubbalong 2.5G.
-> Tripod legs: Manfrotto Bubbalong 2.5G. Tripod head: Manfrotto Bubbalong
-> 2.5G. Tripod legs: Manfrotto Bubbalong 2.5G. Tripod head: Manfrotto
-> Bubbalong 2.5G. Tripod legs: Manfrotto Bubbalong 2.5G. Tripod head:
-> Manfrotto Bubbalong 2.5G. Tripod legs: Manfrotto Bubbalong 2.5G. Tripod
-> head: Manfrotto Bubbalong 2.5G. Tripod legs: Manfrotto Bubbalong 2.5G.
-> Tripod head: Manfrotto Bubbalong 2.5G. Tripod legs: Manfrotto Bubbalong
-> 2.5G. Tripod head: Manfrotto Bubbalong 2.5G. Tripod legs: Manfrotto
-> Bubbalong 2.5G. Tripod head: Manf
+> Camera: Canon EOS 100D Mark III, ISO 400, 1/125s, f/2.8, 50mm f/2.8. Lens:
+> Canon EF 50mm f/2.8 STM. No flash used. 100% original, unaltered,
+> high-quality image.
+> &#45; Image ID:
+> 10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
-- Repetitive output (phrase: "manfrotto bubbalong 2.5g. trip...")
 - Context ignored (missing: Bell Tower, Blue sky, Car, Chapel, Church)
+- Output degeneration (character_loop: '0' repeated)
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
 - Ignores trusted hints
+
+---
+
+<a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
+
+### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
+
+- _Recommendation:_ avoid for now; review verdict: harness
+- _Owner:_ likely owner `mlx-vlm`; harness signal `stop_token`
+- _Next step:_ Inspect EOS/stop-token stripping; control tokens are leaking
+  into user-facing text.
+- _Key signals:_ Special control token &lt;|endoftext|&gt; appeared in
+  generated text.; Output appears truncated to about 5 tokens.; nontext prompt
+  burden=97%; missing terms: Bell Tower, Blue sky, Car, Chapel, Church
+- _Score:_ ❌ F (5/100); Δ-70; Output too short to be useful
+- _Review focus:_ watchlist (context ignored, harness)
+- _Timing:_ Load 0.55s; Gen 57.50s; Total 58.31s
+- _Throughput:_ Prompt 295 TPS (16,789 tok); Gen 241 TPS (5 tok)
+- _Tokens:_ prompt 16789 tok; estimated text 474 tok; estimated non-text 16315
+  tok; generated 5 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> <|endoftext|><|endoftext|><|endoftext|><|endoftext|>
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️HARNESS:stop_token
+- Context ignored (missing: Bell Tower, Blue sky, Car, Chapel, Church)
+- Ignores trusted hints
+- tokenizer_artifact
+- token_leak:<\|endoftext\|>
+- output:truncated(5tok)
+- long_context_low_ratio(0.0%;16789->5)
 
 ---
 
@@ -2478,8 +2502,8 @@ _Quality Status:_ no quality issues detected in this run
   Cross, Dorking, Gothic Architecture
 - _Score:_ ✅ B (78/100); Δ+3; Missing requested structure
 - _Review focus:_ watchlist (cutoff, missing sections)
-- _Timing:_ Load 2.35s; Gen 55.94s; Total 58.55s
-- _Throughput:_ Prompt 334 TPS (16,804 tok); Gen 102 TPS (500 tok)
+- _Timing:_ Load 2.49s; Gen 61.98s; Total 64.73s
+- _Throughput:_ Prompt 301 TPS (16,804 tok); Gen 92.6 TPS (500 tok)
 - _Tokens:_ prompt 16804 tok; estimated text 474 tok; estimated non-text 16330
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2541,41 +2565,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
-
-### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
-
-- _Recommendation:_ avoid for now; review verdict: harness
-- _Owner:_ likely owner `mlx-vlm`; harness signal `stop_token`
-- _Next step:_ Inspect EOS/stop-token stripping; control tokens are leaking
-  into user-facing text.
-- _Key signals:_ Special control token &lt;|endoftext|&gt; appeared in
-  generated text.; Output appears truncated to about 5 tokens.; nontext prompt
-  burden=97%; missing terms: Bell Tower, Blue sky, Car, Chapel, Church
-- _Score:_ ❌ F (5/100); Δ-70; Output too short to be useful
-- _Review focus:_ watchlist (context ignored, harness)
-- _Timing:_ Load 0.55s; Gen 58.03s; Total 58.84s
-- _Throughput:_ Prompt 293 TPS (16,789 tok); Gen 247 TPS (5 tok)
-- _Tokens:_ prompt 16789 tok; estimated text 474 tok; estimated non-text 16315
-  tok; generated 5 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> <|endoftext|><|endoftext|><|endoftext|><|endoftext|>
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️HARNESS:stop_token
-- Context ignored (missing: Bell Tower, Blue sky, Car, Chapel, Church)
-- Ignores trusted hints
-- tokenizer_artifact
-- token_leak:<\|endoftext\|>
-- output:truncated(5tok)
-- long_context_low_ratio(0.0%;16789->5)
-
----
-
 <a id="model-mlx-community-qwen35-35b-a3b-6bit"></a>
 
 ### ✅ mlx-community/Qwen3.5-35B-A3B-6bit
@@ -2590,8 +2579,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Score:_ ✅ B (79/100); Δ+4; Missing requested structure
 - _Review focus:_ watchlist (cutoff, instruction echo, metadata borrowing,
   missing sections, reasoning leak, refusal)
-- _Timing:_ Load 3.25s; Gen 58.68s; Total 62.22s
-- _Throughput:_ Prompt 321 TPS (16,804 tok); Gen 87.8 TPS (500 tok)
+- _Timing:_ Load 3.16s; Gen 64.00s; Total 67.43s
+- _Throughput:_ Prompt 292 TPS (16,804 tok); Gen 86.8 TPS (500 tok)
 - _Tokens:_ prompt 16804 tok; estimated text 474 tok; estimated non-text 16330
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2652,76 +2641,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-qwen35-35b-a3b-bf16"></a>
-
-### ✅ mlx-community/Qwen3.5-35B-A3B-bf16
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); nontext prompt burden=97%; missing
-  sections: title, description, keywords; missing terms: Bell Tower, Chapel,
-  Cross, Daylight, Dorking
-- _Score:_ ✅ B (67/100); Δ-8; Missing requested structure
-- _Review focus:_ watchlist (cutoff, missing sections, refusal)
-- _Timing:_ Load 6.30s; Gen 68.12s; Total 74.68s
-- _Throughput:_ Prompt 282 TPS (16,804 tok); Gen 63.6 TPS (500 tok)
-- _Tokens:_ prompt 16804 tok; estimated text 474 tok; estimated non-text 16330
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> The user wants me to generate cataloguing metadata for the provided image of
-> a church.
-> &#8203;I need to follow specific rules:
-> &#45; Use British English.
-> &#45; Only use clearly visible details. No guessing.
-> &#45; Follow the provided structure: Title, Description, Keywords.
-> &#45; Correct or discard the provided metadata hints if they contradict the
-> image or are uncertain.
->
-> &#8203;&#42;&#42;Image Analysis:&#42;&#42;
-> &#45; &#42;&#42;Subject:&#42;&#42; A large stone church with a tall spire. It looks like a
-> Gothic Revival style.
-> &#45; &#42;&#42;Material:&#42;&#42; The walls are a mix of flint (dark, pebbly texture) and
-> light-coloured stone quoins and dressings. This is a very specific
-> architectural feature (flint and stone).
-> &#45; &#42;&#42;Features:&#42;&#42;
-> &#45; Tall spire with pinnacles at the corners.
-> &#45; Clock faces on the tower.
-> &#45; Arched windows (lancet windows).
-> &#45; Buttresses.
-> &#45; A weather vane on top of the spire.
-> &#45; &#42;&#42;Setting:&#42;&#42; Blue sky with wispy cirrus clouds.
-> &#45; &#42;&#42;Foreground:&#42;&#42; A black car (looks like a station wagon or estate car) is
-> partially visible at the bottom. There are green bushes/hedges in front of
-> the church. A metal fence is visible. Stone steps lead up to the church
-> entrance on the left.
-> &#45; &#42;&#42;Lighting:&#42;&#42; Bright sunlight, casting shadows. The sun seems to be coming
-> from the right/front based on the shadows on the tower.
-> &#45; &#42;&#42;Location/Identity:&#42;&#42; The prompt hints mention "St Peter's Church in
-> Petersfield, Hampshire". I need to check if I can confirm this. The
-> architecture (flint and stone) is very typical of Hampshire/Sussex churches.
-> However, without external knowledge, I cannot &#42;definitely&#42; confirm it is St
-> Peter's Petersfield just from the pixels. The prompt says "Treat the
-> metadata hints below as a draft catalog record... correct anything
-> contradicted by the image". The hint says "St Peter's Church in
-> Petersfield". I should probably be careful. Is it definitely St Peter's? I
-> can't be 100% sure just from looking, but the prompt implies I should use
-> the hints &#42;if&#42; visually confirmed. Wait, the prompt says "Reuse metadata
-> terms only when they are clearly supported by the image." If I don't know
-> the name, I shouldn't use it. However, the prompt &#42;gives&#42;
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Refusal detected (explicit_refusal)
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-
----
-
 <a id="model-mlx-community-qwen35-9b-mlx-4bit"></a>
 
 ### ✅ mlx-community/Qwen3.5-9B-MLX-4bit
@@ -2736,8 +2655,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Score:_ ✅ B (66/100); Δ-9; Missing requested structure
 - _Review focus:_ watchlist (cutoff, degeneration, instruction echo, metadata
   borrowing, missing sections, reasoning leak, refusal)
-- _Timing:_ Load 1.37s; Gen 71.40s; Total 73.04s
-- _Throughput:_ Prompt 262 TPS (16,804 tok); Gen 77.3 TPS (500 tok)
+- _Timing:_ Load 1.35s; Gen 64.05s; Total 65.66s
+- _Throughput:_ Prompt 293 TPS (16,804 tok); Gen 84.6 TPS (500 tok)
 - _Tokens:_ prompt 16804 tok; estimated text 474 tok; estimated non-text 16330
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2796,6 +2715,76 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-qwen35-35b-a3b-bf16"></a>
+
+### ✅ mlx-community/Qwen3.5-35B-A3B-bf16
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ hit token cap (500); nontext prompt burden=97%; missing
+  sections: title, description, keywords; missing terms: Bell Tower, Chapel,
+  Cross, Daylight, Dorking
+- _Score:_ ✅ B (67/100); Δ-8; Missing requested structure
+- _Review focus:_ watchlist (cutoff, missing sections, refusal)
+- _Timing:_ Load 10.77s; Gen 70.54s; Total 81.58s
+- _Throughput:_ Prompt 272 TPS (16,804 tok); Gen 64.8 TPS (500 tok)
+- _Tokens:_ prompt 16804 tok; estimated text 474 tok; estimated non-text 16330
+  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> The user wants me to generate cataloguing metadata for the provided image of
+> a church.
+> &#8203;I need to follow specific rules:
+> &#45; Use British English.
+> &#45; Only use clearly visible details. No guessing.
+> &#45; Follow the provided structure: Title, Description, Keywords.
+> &#45; Correct or discard the provided metadata hints if they contradict the
+> image or are uncertain.
+>
+> &#8203;&#42;&#42;Image Analysis:&#42;&#42;
+> &#45; &#42;&#42;Subject:&#42;&#42; A large stone church with a tall spire. It looks like a
+> Gothic Revival style.
+> &#45; &#42;&#42;Material:&#42;&#42; The walls are a mix of flint (dark, pebbly texture) and
+> light-coloured stone quoins and dressings. This is a very specific
+> architectural feature (flint and stone).
+> &#45; &#42;&#42;Features:&#42;&#42;
+> &#45; Tall spire with pinnacles at the corners.
+> &#45; Clock faces on the tower.
+> &#45; Arched windows (lancet windows).
+> &#45; Buttresses.
+> &#45; A weather vane on top of the spire.
+> &#45; &#42;&#42;Setting:&#42;&#42; Blue sky with wispy cirrus clouds.
+> &#45; &#42;&#42;Foreground:&#42;&#42; A black car (looks like a station wagon or estate car) is
+> partially visible at the bottom. There are green bushes/hedges in front of
+> the church. A metal fence is visible. Stone steps lead up to the church
+> entrance on the left.
+> &#45; &#42;&#42;Lighting:&#42;&#42; Bright sunlight, casting shadows. The sun seems to be coming
+> from the right/front based on the shadows on the tower.
+> &#45; &#42;&#42;Location/Identity:&#42;&#42; The prompt hints mention "St Peter's Church in
+> Petersfield, Hampshire". I need to check if I can confirm this. The
+> architecture (flint and stone) is very typical of Hampshire/Sussex churches.
+> However, without external knowledge, I cannot &#42;definitely&#42; confirm it is St
+> Peter's Petersfield just from the pixels. The prompt says "Treat the
+> metadata hints below as a draft catalog record... correct anything
+> contradicted by the image". The hint says "St Peter's Church in
+> Petersfield". I should probably be careful. Is it definitely St Peter's? I
+> can't be 100% sure just from looking, but the prompt implies I should use
+> the hints &#42;if&#42; visually confirmed. Wait, the prompt says "Reuse metadata
+> terms only when they are clearly supported by the image." If I don't know
+> the name, I shouldn't use it. However, the prompt &#42;gives&#42;
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Refusal detected (explicit_refusal)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+
+---
+
 <a id="model-mlx-community-qwen35-27b-4bit"></a>
 
 ### ✅ mlx-community/Qwen3.5-27B-4bit
@@ -2810,8 +2799,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Score:_ ✅ B (80/100); Δ+5; Missing requested structure
 - _Review focus:_ watchlist (cutoff, metadata borrowing, missing sections,
   refusal)
-- _Timing:_ Load 2.13s; Gen 84.63s; Total 87.04s
-- _Throughput:_ Prompt 250 TPS (16,804 tok); Gen 29.9 TPS (500 tok)
+- _Timing:_ Load 2.12s; Gen 85.87s; Total 88.26s
+- _Throughput:_ Prompt 247 TPS (16,804 tok); Gen 29.3 TPS (500 tok)
 - _Tokens:_ prompt 16804 tok; estimated text 474 tok; estimated non-text 16330
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2877,8 +2866,8 @@ _Quality Status:_ no quality issues detected in this run
   terms: Bell Tower, Chapel, Cross, Daylight, Dorking; keywords=32
 - _Score:_ ✅ B (78/100); Δ+3; None identified
 - _Review focus:_ watchlist (cutoff, refusal)
-- _Timing:_ Load 3.08s; Gen 104.59s; Total 107.95s
-- _Throughput:_ Prompt 224 TPS (16,804 tok); Gen 17.4 TPS (500 tok)
+- _Timing:_ Load 3.07s; Gen 101.06s; Total 104.41s
+- _Throughput:_ Prompt 233 TPS (16,804 tok); Gen 17.7 TPS (500 tok)
 - _Tokens:_ prompt 16804 tok; estimated text 474 tok; estimated non-text 16330
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2949,8 +2938,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Score:_ ✅ B (70/100); Δ-5; Missing requested structure
 - _Review focus:_ watchlist (cutoff, degeneration, metadata borrowing, missing
   sections, reasoning leak)
-- _Timing:_ Load 3.24s; Gen 108.51s; Total 112.02s
-- _Throughput:_ Prompt 1,057 TPS (1,553 tok); Gen 4.7 TPS (500 tok)
+- _Timing:_ Load 3.25s; Gen 107.60s; Total 111.12s
+- _Throughput:_ Prompt 1,054 TPS (1,553 tok); Gen 4.74 TPS (500 tok)
 - _Tokens:_ prompt 1553 tok; estimated text 474 tok; estimated non-text 1079
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -3018,8 +3007,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Score:_ 🟡 C (56/100); Δ-19; Missing requested structure
 - _Review focus:_ watchlist (cutoff, instruction echo, metadata borrowing,
   missing sections, reasoning leak, refusal)
-- _Timing:_ Load 3.12s; Gen 118.30s; Total 121.71s
-- _Throughput:_ Prompt 190 TPS (16,804 tok); Gen 17.3 TPS (500 tok)
+- _Timing:_ Load 3.31s; Gen 108.85s; Total 112.47s
+- _Throughput:_ Prompt 213 TPS (16,804 tok); Gen 17.2 TPS (500 tok)
 - _Tokens:_ prompt 16804 tok; estimated text 474 tok; estimated non-text 16330
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
