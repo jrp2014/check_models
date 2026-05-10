@@ -32,6 +32,11 @@ ENV/
 .coverage*
 coverage.xml
 
+# Local Skylos scan cache/traces
+.skylos/
+src/.skylos/
+src/.skylos_trace
+
 # Packaging / build artifacts
 build/
 dist/

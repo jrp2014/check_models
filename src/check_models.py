@@ -359,7 +359,7 @@ class QualityThresholds:
     min_words_for_filler_response: int = 15  # Words below this in filler response
     min_words_for_truncated: int = 5  # Words below this = truncated output
     min_prompt_tokens_for_ratio: int = 100  # Prompt tokens needed for ratio check
-    min_output_tokens_for_ratio: int = 15  # Output tokens below this with large prompt
+    min_output_tokens_for_ratio: int = 15  # Generated-token counts below this are suspicious
     min_output_ratio: float = 0.02  # Minimum output/prompt ratio (2%)
     long_prompt_tokens_threshold: int = 3000  # Prompt tokens above this can degrade outputs
     severe_prompt_tokens_threshold: int = 12000  # Extreme prompt token count risk threshold
@@ -2887,6 +2887,8 @@ class HTMLSelectiveEscaper:
 
     Escapes potentially unsafe HTML while preserving common formatting
     tags that GitHub Markdown recognizes (br, b, strong, i, em, code).
+    Only bare tags are preserved; attributes are escaped so event handlers,
+    style injection, and URL-bearing attributes cannot flow into HTML reports.
     Does NOT preserve 's' tag to avoid interpreting <s> tokens from
     model output as strikethrough.
     """
@@ -2897,15 +2899,22 @@ class HTMLSelectiveEscaper:
     def escape(self, text: str) -> str:
         """Escape tags except allowed safe tags."""
 
+        def _is_plain_allowed_tag(inner: str) -> bool:
+            normalized = inner.strip()
+            if not normalized:
+                return False
+            normalized = normalized.removeprefix("/").strip()
+            normalized = normalized.removesuffix("/").strip()
+            return bool(normalized) and normalized.lower() in self.allowed_tags
+
         def _escape_html_like(m: re.Match[str]) -> str:
             token = m.group(0)
             inner = token[1:-1].strip()
             if not inner:
-                return token.replace("<", "&lt;").replace(">", "&gt;")
-            core = inner.lstrip("/").split(None, 1)[0].rstrip("/").lower()
-            if core in self.allowed_tags:
+                return html.escape(token, quote=True)
+            if _is_plain_allowed_tag(inner):
                 return token  # Keep recognized safe tag
-            return token.replace("<", "&lt;").replace(">", "&gt;")
+            return html.escape(token, quote=True)
 
         return self.tag_pattern.sub(_escape_html_like, text)
 
@@ -8322,218 +8331,94 @@ def _build_report_render_context(
     )
 
 
-def _mark_failed_rows_in_html(
-    html_table: str,
+def _html_attr(name: str, value: str) -> str:
+    """Return a safely escaped HTML attribute."""
+    return f' {name}="{html.escape(value, quote=True)}"'
+
+
+def _html_class_attr(classes: Sequence[str]) -> str:
+    """Return a safely escaped class attribute for a stable class list."""
+    if not classes:
+        return ""
+    return _html_attr("class", " ".join(classes))
+
+
+def _escape_html_table_text(value: str) -> str:
+    """Escape plain text for HTML table cells while preserving line breaks."""
+    return html.escape(value, quote=True).replace("\n", "<br>")
+
+
+def _escape_html_header_text(header: str) -> str:
+    """Escape a prepared HTML table header while preserving intentional breaks."""
+    return "<br>".join(_escape_html_table_text(part) for part in header.split("<br>"))
+
+
+def _html_result_row_attrs(result: PerformanceResult) -> str:
+    """Return filter metadata attributes for one result row."""
+    if result.success:
+        return _html_class_attr(["success"]) + _html_attr("data-status", "success")
+    return (
+        _html_class_attr(["failed"])
+        + _html_attr("data-status", "failed")
+        + _html_attr("data-error-stage", result.error_stage or "unknown")
+        + _html_attr("data-error-type", result.error_type or "error")
+        + _html_attr("data-error-package", result.error_package or "unknown")
+    )
+
+
+def _build_html_output_details(preview_text: str, full_text: str) -> str:
+    """Return escaped expandable output HTML for one result row."""
+    preview_html = html.escape(preview_text, quote=True).replace("\n", "<br>")
+    full_html = html.escape(full_text, quote=True).replace("\n", "<br>")
+    return (
+        f"<details><summary>{preview_html}</summary>"
+        f'<div style="margin-top: 0.5em;">{full_html}</div></details>'
+    )
+
+
+def _build_html_results_table(
+    *,
+    headers: Sequence[str],
+    rows: Sequence[Sequence[str]],
+    field_names: Sequence[str],
     sorted_results: Sequence[PerformanceResult],
 ) -> str:
-    """Annotate HTML result rows with filter metadata and failure styling hooks.
-
-    Only data rows are rewritten. Failed rows also tag the first data cell so the
-    CSS contract stays aligned with the row-level status attributes used by the
-    client-side filters.
-    """
-    row_pattern: re.Pattern[str] = re.compile(r"<tr>.*?</tr>", re.DOTALL)
-    result_index: int = 0
-
-    def repl(match: re.Match[str]) -> str:
-        nonlocal result_index
-        row_html = match.group(0)
-        if "<td" not in row_html:
-            return row_html
-        if result_index >= len(sorted_results):
-            return row_html
-
-        result = sorted_results[result_index]
-        result_index += 1
-
-        if result.success:
-            return row_html.replace(
-                "<tr>",
-                '<tr class="success" data-status="success">',
-                1,
-            )
-
-        error_stage = html.escape(result.error_stage or "unknown", quote=True)
-        error_type = html.escape(result.error_type or "error", quote=True)
-        error_package = html.escape(result.error_package or "unknown", quote=True)
-        row_html = row_html.replace(
-            "<tr>",
-            f'<tr class="failed" data-status="failed" '
-            f'data-error-stage="{error_stage}" data-error-type="{error_type}" '
-            f'data-error-package="{error_package}">',
-            1,
-        )
-
-        def mark_failed_cell(cell_match: re.Match[str]) -> str:
-            return _append_html_class(cell_match.group(0), "failed")
-
-        return re.sub(
-            r"<td\b[^>]*>",
-            mark_failed_cell,
-            row_html,
-            count=1,
-        )
-
-    return row_pattern.sub(repl, html_table)
-
-
-def _append_html_class(opening_tag: str, class_name: str) -> str:
-    """Append a CSS class to an opening HTML tag, preserving existing classes."""
-    class_match = re.search(r'class="([^"]*)"', opening_tag)
-    if class_match is None:
-        return opening_tag[:-1] + f' class="{class_name}">'
-
-    classes = class_match.group(1).split()
-    if class_name in classes:
-        return opening_tag
-
-    classes.append(class_name)
-    updated_classes = " ".join(classes)
-    return opening_tag[: class_match.start(1)] + updated_classes + opening_tag[class_match.end(1) :]
-
-
-def _add_html_table_alignment_classes(
-    html_table: str,
-    field_names: Sequence[str],
-) -> str:
-    """Apply alignment classes from the prepared field order to each table cell.
-
-    The table is rewritten after HTML generation, so this pass works row by row
-    and preserves any classes that earlier helpers already attached.
-    """
+    """Build the escaped HTML results table without regex post-processing."""
     numeric_columns: frozenset[int] = frozenset(
         index for index, field_name in enumerate(field_names) if is_numeric_field(field_name)
     )
-    row_pattern: re.Pattern[str] = re.compile(r"<tr>.*?</tr>", re.DOTALL)
+    output_column: int | None = field_names.index("output") if "output" in field_names else None
 
-    def _apply_to_row(row_html: str, *, tag_name: str) -> str:
-        cell_pattern: re.Pattern[str] = re.compile(
-            rf"<{tag_name}\b[^>]*>.*?</{tag_name}>",
-            re.DOTALL,
+    parts: list[str] = ["<table>", "<thead>", "<tr>"]
+    for index, header in enumerate(headers):
+        alignment_class = "numeric" if index in numeric_columns else "text"
+        parts.append(
+            f"<th{_html_class_attr([alignment_class])}>{_escape_html_header_text(header)}</th>"
         )
-        cells = cell_pattern.findall(row_html)
-        if not cells:
-            return row_html
+    parts.extend(["</tr>", "</thead>", "<tbody>"])
 
-        def _with_alignment_class(
-            cell_html: str,
-            *,
-            class_name: str,
-        ) -> str:
-            def replace_opening_tag(match: re.Match[str]) -> str:
-                return _append_html_class(match.group(0), class_name)
-
-            return re.sub(
-                rf"<{tag_name}\b[^>]*>",
-                replace_opening_tag,
-                cell_html,
-                count=1,
-            )
-
-        updated_cells: list[str] = []
-        for index, cell_html in enumerate(cells):
-            alignment_class = "numeric" if index in numeric_columns else "text"
-            updated_cells.append(_with_alignment_class(cell_html, class_name=alignment_class))
-
-        replacement_iter: Iterator[str] = iter(updated_cells)
-
-        def replace_cell(_: re.Match[str]) -> str:
-            return next(replacement_iter)
-
-        return cell_pattern.sub(replace_cell, row_html)
-
-    def repl(match: re.Match[str]) -> str:
-        row_html = match.group(0)
-        if "<th" in row_html:
-            return _apply_to_row(row_html, tag_name="th")
-        if "<td" in row_html:
-            return _apply_to_row(row_html, tag_name="td")
-        return row_html
-
-    return row_pattern.sub(repl, html_table)
-
-
-def _wrap_output_column_in_details(
-    html_table: str,
-    output_col_idx: int,
-    sorted_results: Sequence[PerformanceResult],
-) -> str:
-    """Wrap the configured output cell in <details>/<summary> for expansion.
-
-    Args:
-        html_table: The HTML table string
-        output_col_idx: The index of the output column (0-based)
-        sorted_results: Results aligned to table row order for retrieving full text
-
-    Returns:
-        Modified HTML table with output column wrapped in details/summary tags
-    """
-    # Process the rendered HTML row by row so the preview stays in <summary>
-    # and the fully escaped output remains available on expansion.
-    lines: list[str] = html_table.split("\n")
-    result_lines: list[str] = []
-    row_idx = 0
-
-    for original_line in lines:
-        # Check if this is a data row (contains <td> tags)
-        if "<td" in original_line and "</td>" in original_line:
-            # Find all <td>...</td> cells in this row
-            cells: list[str] = re.findall(r"<td[^>]*>.*?</td>", original_line)
-            if len(cells) > output_col_idx:
-                # Grab the configured output cell rather than assuming it is last.
-                output_cell: str = cells[output_col_idx]
-
-                # Extract the content between <td...> and </td>
-                match: re.Match[str] | None = re.match(
-                    r"(<td[^>]*>)(.*?)(</td>)",
-                    output_cell,
-                    re.DOTALL,
+    for row_index, row in enumerate(rows):
+        result = sorted_results[row_index] if row_index < len(sorted_results) else None
+        parts.append(f"<tr{_html_result_row_attrs(result) if result is not None else ''}>")
+        for column_index, value in enumerate(row):
+            field_name = field_names[column_index] if column_index < len(field_names) else ""
+            cell_classes = ["numeric" if column_index in numeric_columns else "text"]
+            if column_index == 0 and result is not None and not result.success:
+                cell_classes.append("failed")
+            if output_column is not None and column_index == output_column and result is not None:
+                cell_content = _build_html_output_details(
+                    value,
+                    _full_output_report_text(result),
                 )
-                if match:
-                    opening_tag: str
-                    content: str
-                    closing_tag: str
-                    opening_tag, content, closing_tag = match.groups()
-
-                    full_text = (
-                        _full_output_report_text(sorted_results[row_idx])
-                        if row_idx < len(sorted_results)
-                        else html.unescape(content)
-                    )
-
-                    # Keep the preview in <summary> and reveal the full text on demand.
-                    wrapped_content: str = (
-                        f"<details><summary>{content}</summary>"
-                        f"<div style='margin-top: 0.5em;'>{html.escape(full_text)}</div></details>"
-                    )
-                    new_cell: str = opening_tag + wrapped_content + closing_tag
-
-                    # Replace the original output cell with the expandable version.
-                    cells[output_col_idx] = new_cell
-
-                    # Reconstruct the row with the updated cell sequence.
-                    cell_iter: Iterator[str] = iter(cells)
-
-                    def repl(_: re.Match[str], ci: Iterator[str] = cell_iter) -> str:
-                        return next(ci)
-
-                    updated_line: str = re.sub(
-                        r"<td[^>]*>.*?</td>",
-                        repl,
-                        original_line,
-                    )
-                    result_lines.append(updated_line)
-                    row_idx += 1
-                else:
-                    result_lines.append(original_line)
-                    row_idx += 1
+            elif field_name == "output":
+                cell_content = _build_html_output_details(value, value)
             else:
-                result_lines.append(original_line)
-                row_idx += 1
-        else:
-            result_lines.append(original_line)
+                cell_content = _escape_html_table_text(value)
+            parts.append(f"<td{_html_class_attr(cell_classes)}>{cell_content}</td>")
+        parts.append("</tr>")
 
-    return "\n".join(result_lines)
+    parts.extend(["</tbody>", "</table>"])
+    return "\n".join(parts)
 
 
 def _initialize_metadata_baseline_tracking(
@@ -10369,7 +10254,7 @@ def _review_stack_owner_text(
 
 
 def _review_token_accounting_text(result: PerformanceResult, review: JsonlReviewRecord) -> str:
-    """Return prompt/output token accounting for review surfaces."""
+    """Assemble token-count context for review surfaces."""
     generation_tokens = (
         getattr(result.generation, "generation_tokens", None)
         if result.generation is not None
@@ -12892,7 +12777,7 @@ def _describe_token_encoding_detail(token_issue: str) -> str:
 def _describe_output_detail(output_detail: str) -> str | None:
     """Describe output-length harness anomalies in plain language."""
     if output_detail == "zero_tokens":
-        return "Model returned zero output tokens."
+        return "No generated tokens were recorded."
     if match := re.fullmatch(r"truncated\((\d+)tok\)", output_detail):
         return f"Output appears truncated to about {match.group(1)} tokens."
     if match := re.fullmatch(r"filler_response\((\d+)tok\)", output_detail):
@@ -14835,6 +14720,10 @@ def _build_full_html_document(
         except (OSError, ValueError):
             logger.warning("Failed to embed image: %s", image_path)
 
+    # The template below combines fixed report chrome with HTML fragments created by
+    # internal renderers that escape user/model text at their boundaries; see
+    # test_html_report_escapes_untrusted_table_values for the regression contract.
+    # skylos: ignore-start  # noqa: ERA001 - false-positive marker, not commented code
     return f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -14867,6 +14756,7 @@ def _build_full_html_document(
     </body>
     </html>
     """
+    # skylos: ignore-end  # noqa: ERA001 - closes the false-positive marker block
 
 
 def print_model_stats(results: list[PerformanceResult]) -> None:
@@ -14932,28 +14822,11 @@ def generate_html_report(
         log_warning_note("No table data to generate HTML report.")
         return
 
-    html_table = tabulate(
-        rows,
+    html_table = _build_html_results_table(
         headers=headers,
-        tablefmt="html",
-        colalign=[
-            "left",
-            *["right" if is_numeric_field(field) else "left" for field in field_names[1:]],
-        ],
-    )
-
-    # Add CSS classes for alignment and styling
-    html_table = _add_html_table_alignment_classes(html_table, field_names)
-
-    # Mark failed rows using the already-sorted cached context
-    html_table = _mark_failed_rows_in_html(html_table, report_context.result_set.results)
-
-    # Wrap output column (last column) in <details> for expandability
-    output_col_idx = len(field_names) - 1  # output is last column
-    html_table = _wrap_output_column_in_details(
-        html_table,
-        output_col_idx,
-        report_context.result_set.results,
+        rows=rows,
+        field_names=field_names,
+        sorted_results=report_context.result_set.results,
     )
 
     issues_summary_html = format_issues_summary_html(

@@ -507,7 +507,7 @@ If you prefer to install dependencies manually (ensure these match `pyproject.to
 
 <!-- MANUAL_INSTALL_START -->
 ```bash
-pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.2" "mlx-lm>=0.31.3" "mlx-vlm>=0.5.0" "packaging>=26.0" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "rich>=14.1.0" "tabulate>=0.9.0" "transformers>=5.5.3" "wcwidth>=0.2.13"
+pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.2" "mlx-lm>=0.31.3" "mlx-vlm>=0.5.0" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "rich>=14.1.0" "tabulate>=0.9.0" "transformers>=5.5.3" "wcwidth>=0.2.13"
 ```
 <!-- MANUAL_INSTALL_END -->
 
@@ -666,7 +666,7 @@ Development / QA:
 
 <!-- MINIMAL_INSTALL_START -->
 ```bash
-pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.2" "mlx-lm>=0.31.3" "mlx-vlm>=0.5.0" "packaging>=26.0" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "rich>=14.1.0" "tabulate>=0.9.0" "transformers>=5.5.3" "wcwidth>=0.2.13"
+pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.2" "mlx-lm>=0.31.3" "mlx-vlm>=0.5.0" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "rich>=14.1.0" "tabulate>=0.9.0" "transformers>=5.5.3" "wcwidth>=0.2.13"
 ```
 <!-- MINIMAL_INSTALL_END -->
 

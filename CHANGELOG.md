@@ -42,6 +42,10 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Escape attributes on otherwise allowed HTML formatting tags, render HTML
+  result tables from explicitly escaped cells, remove stale archived Python
+  quality scripts from scan scope, and declare the direct `numpy` runtime
+  dependency to address security-scan findings.
 - Render cross-artifact links in generated Markdown outputs as GitHub blob/tree URLs instead of local relative paths so `results.md`, `review.md`, `diagnostics.md`, and generated issue drafts can be pasted directly into GitHub issues without breaking their companion links.
 - Keep best-effort MLX cleanup from masking model-run failures when headless
   runtimes raise `IndexError` during synchronization.

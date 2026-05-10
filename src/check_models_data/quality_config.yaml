@@ -110,7 +110,7 @@ thresholds:
   min_words_for_filler_response: 15 # Words below this in filler response
   min_words_for_truncated: 5 # Words below this = truncated output
   min_prompt_tokens_for_ratio: 100 # Prompt tokens needed for ratio check
-  min_output_tokens_for_ratio: 15 # Output tokens below this with large prompt
+  min_output_tokens_for_ratio: 15 # Generated-token counts below this are suspicious
   min_output_ratio: 0.02 # Minimum output/prompt ratio (2%)
   long_prompt_tokens_threshold: 3000 # Prompt size where context-related failures become likely
   severe_prompt_tokens_threshold: 12000 # Extreme prompt size risk threshold

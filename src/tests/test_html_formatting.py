@@ -17,6 +17,12 @@ def test_escape_html_tags_selective_multiple() -> None:
     assert result == "&lt;a&gt; and <b> tags"
 
 
+def test_escape_html_tags_selective_rejects_attributes_on_allowed_tags() -> None:
+    """Allowed formatting tags should not preserve unsafe attributes."""
+    result = check_models.HTML_ESCAPER.escape('<b onclick="alert(1)">bold</b><br data-x="1">')
+    assert result == "&lt;b onclick=&quot;alert(1)&quot;&gt;bold</b>&lt;br data-x=&quot;1&quot;&gt;"
+
+
 def test_escape_html_tags_selective_preserves_entities() -> None:
     """Should preserve existing HTML entities."""
     result = check_models.HTML_ESCAPER.escape("5 &lt; 10")

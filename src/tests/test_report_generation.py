@@ -502,6 +502,39 @@ class TestHtmlReportEdgeCases:
         assert "MIDDLE-MARKER" in content
         assert "END-MARKER" in content
 
+    def test_html_report_escapes_untrusted_table_values(self, tmp_path: Path) -> None:
+        """HTML reports should render model-controlled text as escaped table content."""
+        out = tmp_path / "escaped.html"
+        results = [
+            PerformanceResult(
+                model_name='org/<script>alert("model")</script>',
+                success=True,
+                generation=_MockGeneration(
+                    text='<img src=x onerror="alert(1)">\n<script>alert("output")</script>',
+                ),
+                total_time=1.0,
+                generation_time=0.5,
+                model_load_time=0.5,
+            ),
+        ]
+
+        generate_html_report(
+            results=results,
+            filename=out,
+            versions=_stub_versions(),
+            prompt='<script>alert("prompt")</script>',
+            total_runtime_seconds=1.0,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert '<script>alert("model")</script>' not in content
+        assert '<script>alert("output")</script>' not in content
+        assert '<img src=x onerror="alert(1)">' not in content
+        assert "&lt;script&gt;alert(&quot;model&quot;)&lt;/script&gt;" in content
+        assert "&lt;script&gt;alert(&quot;output&quot;)&lt;/script&gt;" in content
+        assert "&lt;img src=x onerror=&quot;alert(1)&quot;&gt;" in content
+        assert "<pre>&lt;script&gt;alert(&quot;prompt&quot;)&lt;/script&gt;</pre>" in content
+
 
 # ===================================================================
 # Markdown report

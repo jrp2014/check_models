@@ -1,13 +1,15 @@
 # Archived Quality Tooling
 
-These files were part of the original complex quality checking infrastructure that was simplified on 2025-11-01.
+These notes describe the original complex quality checking infrastructure that was simplified on
+2025-11-01. The archived Python implementations were replaced with tiny placeholders during the
+2026 security cleanup so static analysis no longer scans stale, unmaintained code paths.
 
 ## Archived Files
 
-- `check_quality.py` (444 lines) - Complex Python orchestrator for quality checks
-- `generate_stubs.py` (261 lines) - Generated type stubs for mlx_vlm package
-- `patch_mlx_stubs.py` - Patched generated stubs to fix mypy issues
-- `check_dependency_sync.py` (70 lines) - Verified pyproject.toml dependencies stayed in sync
+- `check_quality.py` (placeholder) - Complex Python orchestrator for quality checks
+- `generate_stubs.py` (removed) - Generated type stubs for mlx_vlm package
+- `patch_mlx_stubs.py` (placeholder) - Patched generated stubs to fix mypy issues
+- `check_dependency_sync.py` (removed) - Verified pyproject.toml dependencies stayed in sync
 
 ## Why Archived
 
@@ -30,7 +32,7 @@ pytest -v
 
 ## If You Need These
 
-These files are kept for reference but are no longer maintained. The simplified approach:
+The simplified approach:
 
 - Uses `ignore_missing_imports = true` instead of stub generation
 - Uses simple bash script instead of complex Python orchestrator
