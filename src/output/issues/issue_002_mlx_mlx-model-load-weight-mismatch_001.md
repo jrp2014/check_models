@@ -1,26 +1,26 @@
-# \[mlx-vlm / mlx\]\[Long-context collapse\] Long-context generation collapsed or became too short affecting 1 model(s)
+# \[mlx\]\[MLX: Model load / weight/config mismatch\] Weight/config mismatch during model load affecting 1 model(s)
 
 ## Summary
 
-1 model(s) show **Long-context collapse** that should be filed against mlx-vlm first; MLX if cache/runtime reproduces.
+1 model(s) show **MLX: Model load / weight/config mismatch** that should be filed against mlx.
 
-- **Observed problem:** Long-context generation collapsed or became too short
-- **Target:** mlx-vlm first; MLX if cache/runtime reproduces
+- **Observed problem:** Weight/config mismatch during model load
+- **Target:** mlx
 - **Affected models:** 1
-- **Fixed when:** Full and reduced reruns avoid context collapse.
+- **Fixed when:** Load/generation completes or fails with a narrower owner.
 
 
 ## Affected Models
 
-| Model                               | Observed Behavior                                                                  | Token Counts                                                                                         | Optional Context                                                                                                                                                                     |
-|-------------------------------------|------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Qwen3.5-9B-MLX-4bit` | Output degeneration under long prompt length (incomplete_sentence: ends with 'fl') | prompt=16,804 \| output/prompt=2.98% \| nontext burden=97% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T202322Z_008_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_001.json) |
+| Model                               | Observed Behavior                                                                                     | Token Counts   | Optional Context                                                                                                                                                                                 |
+|-------------------------------------|-------------------------------------------------------------------------------------------------------|----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/LFM2.5-VL-1.6B-bf16` | Missing 2 parameters: multi_modal_projector.layer_norm.bias, multi_modal_projector.layer_norm.weight. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T202322Z_005_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_MODEL_LOAD_WEIGHT_MISMATCH_7574b1189.json) |
 
 
 ## Minimal Evidence
 
-- `mlx-community/Qwen3.5-9B-MLX-4bit`: Output degeneration under long prompt length (incomplete_sentence: ends with 'fl')
-- Output excerpt: `The user wants me to analyze the provided image and generate cataloguing metadata in British English. I need to follow specific rules: - Use only details clearly visible in the image. - Do not guess or infer. - Use the provided hints as a draft but correct/omit anything not visible. - Output exactly three sections:...`
+- `mlx-community/LFM2.5-VL-1.6B-bf16` fails with: Model loading failed: Missing 2 parameters: multi_modal_projector.layer_norm.bias, multi_modal_projector.layer_norm.weight.
+- Root exception: `builtins.ValueError`: Missing 2 parameters: <br>multi_modal_projector.layer_norm.bias,<br>multi_modal_projector.layer_norm.weight.
 
 
 ## Minimal Reproduction
@@ -30,7 +30,7 @@ These commands use `mlx-vlm` directly so the issue can be reproduced without ins
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/Qwen3.5-9B-MLX-4bit --image /Users/jrp/Pictures/Processed/20260509-165009_DSC09954.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
+python -m mlx_vlm.generate --model mlx-community/LFM2.5-VL-1.6B-bf16 --image /Users/jrp/Pictures/Processed/20260509-165009_DSC09954.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
 
 Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.
 
@@ -72,7 +72,7 @@ Minimal Python repro (representative model):
 from mlx_vlm.generate import generate
 from mlx_vlm.utils import load
 
-MODEL = 'mlx-community/Qwen3.5-9B-MLX-4bit'
+MODEL = 'mlx-community/LFM2.5-VL-1.6B-bf16'
 IMAGE = '/Users/jrp/Pictures/Processed/20260509-165009_DSC09954.jpg'
 PROMPT = "Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.\n- Output only the description text after the label.\n\nKeywords:\n- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.\n- Output only the keyword list after the label.\n\nRules:\n- Include only details that are definitely visible in the image.\n- Reuse metadata terms only when they are clearly supported by the image.\n- If metadata and image disagree, follow the image.\n- Prefer omission to speculation.\n- Do not copy prompt instructions into the Title, Description, or Keywords fields.\n- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.\n- Do not output reasoning, notes, hedging, or extra sections.\n\nContext: Existing metadata hints (high confidence; use only when visually confirmed):\n- Description hint: A low-angle, wide shot of St Peter's Church in Petersfield, Hampshire, England, on a sunny day. The Gothic Revival style church, with its tall spire and flint walls, is pictured against a bright blue sky with wispy clouds. A black car is parked in the foreground.\n- Keyword hints: Adobe Stock, Any Vision, Bell Tower, Blue sky, Car, Chapel, Church, Cross, Daylight, Dorking, England, Europe, Fence, Gothic Architecture, Objects, Sky, Station wagon, Steeple, Stone, Surrey\n- Capture metadata: Taken on 2026-05-09 17:50:09 BST (at 17:50:09 local time). GPS: 51.215500°N, 0.798500°W."
 LOAD_KWARGS = {'trust_remote_code': True}
@@ -134,27 +134,28 @@ Generation/load config:
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "mlx-community/Qwen3.5-9B-MLX-4bit"
+  "model": "mlx-community/LFM2.5-VL-1.6B-bf16"
 }
 ```
 
 Optional advanced context:
 
-- `mlx-community/Qwen3.5-9B-MLX-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T202322Z_008_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_001.json)
+- `mlx-community/LFM2.5-VL-1.6B-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T202322Z_005_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_MODEL_LOAD_WEIGHT_MISMATCH_7574b1189.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
 ## Expected Fix Signal
 
-- [ ] A same-command rerun and a reduced image/text burden rerun show consistent prompt-token accounting and no long-context collapse.
+- [ ] Affected reruns complete model load and generation, or fail with a narrower configuration/compatibility error that points to the owning layer.
 - [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem.
 
 
 ## Fix Checklist
 
-- [ ] Rerun with reduced image/text burden and compare output recovery.
-- [ ] Compare prompt-token accounting with text-only and image+text prompts.
-- [ ] Inspect cache allocation, prefill step size, and long-context generation behavior.
+- [ ] Compare checkpoint keys with the selected model class and model config.
+- [ ] Inspect missing/unexpected projector, scale, bias, and quantized-weight parameter names.
+- [ ] Verify the model repo revision matches the mlx-vlm/mlx loader expectations.
+- [ ] Reproduce after upgrading/downgrading mlx-vlm and mlx to isolate version compatibility.
 
 
 ## Appendix: Environment
@@ -179,27 +180,32 @@ Optional advanced context:
 
 ## Appendix: Detailed Evidence
 
-### Stack Signals
+### `mlx-community/LFM2.5-VL-1.6B-bf16`
 
-| Model                               |   Prompt Tok |   Output Tok | Output/Prompt   | Symptom                                                                            | Owner           |
-|-------------------------------------|--------------|--------------|-----------------|------------------------------------------------------------------------------------|-----------------|
-| `mlx-community/Qwen3.5-9B-MLX-4bit` |       16,804 |          500 | 2.98%           | Output degeneration under long prompt length (incomplete_sentence: ends with 'fl') | `mlx-vlm / mlx` |
-
-### `mlx-community/Qwen3.5-9B-MLX-4bit`
-
-Observed signals:
-
-- Output contains corrupted or malformed text segments (incomplete_sentence: ends with 'fl').
-- Model refused or deflected the requested task (explicit_refusal).
-- Output omitted required Title/Description/Keywords sections (title, description, keywords).
-- Output leaked reasoning or prompt-template text (description hint:).
-
-Sample output:
+Observed error:
 
 ```text
-The user wants me to analyze the provided image and generate cataloguing metadata in British English.
-I need to follow specific rules:
-- Use only details clearly visible in the image.
-- Do not gues...
+Model loading failed: Missing 2 parameters: 
+multi_modal_projector.layer_norm.bias,
+multi_modal_projector.layer_norm.weight.
+```
+
+Root exception:
+
+```text
+builtins.ValueError: Missing 2 parameters: 
+multi_modal_projector.layer_norm.bias,
+multi_modal_projector.layer_norm.weight.
+```
+
+Traceback tail:
+
+```text
+multi_modal_projector.layer_norm.weight.
+The above exception was the direct cause of the following exception:
+Traceback (most recent call last):
+ValueError: Model loading failed: Missing 2 parameters: 
+multi_modal_projector.layer_norm.bias,
+multi_modal_projector.layer_norm.weight.
 ```
 

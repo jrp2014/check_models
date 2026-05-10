@@ -14,8 +14,8 @@
 
 | Model                                            | Observed Behavior   | Token Counts                                                                | Optional Context                                                                                                                                                                                              |
 |--------------------------------------------------|---------------------|-----------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/llava-v1.6-mistral-7b-8bit`       | output/prompt=0.4%  | prompt=2,789 \| output/prompt=0.39% \| nontext burden=83% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T003128Z_012_mlx-community_llava-v1.6-mistral-7b-8bit_model_config_mlx_vlm_prompt_template_001.json)       |
-| `mlx-community/paligemma2-10b-ft-docci-448-bf16` | output/prompt=0.6%  | prompt=1,585 \| output/prompt=0.57% \| nontext burden=70% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T003128Z_013_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json) |
+| `mlx-community/llava-v1.6-mistral-7b-8bit`       | output/prompt=0.4%  | prompt=2,789 \| output/prompt=0.39% \| nontext burden=83% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T202322Z_009_mlx-community_llava-v1.6-mistral-7b-8bit_model_config_mlx_vlm_prompt_template_001.json)       |
+| `mlx-community/paligemma2-10b-ft-docci-448-bf16` | output/prompt=0.6%  | prompt=1,585 \| output/prompt=0.57% \| nontext burden=70% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T202322Z_010_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json) |
 
 
 ## Minimal Evidence
@@ -177,8 +177,8 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/llava-v1.6-mistral-7b-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T003128Z_012_mlx-community_llava-v1.6-mistral-7b-8bit_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T003128Z_013_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/llava-v1.6-mistral-7b-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T202322Z_009_mlx-community_llava-v1.6-mistral-7b-8bit_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T202322Z_010_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 

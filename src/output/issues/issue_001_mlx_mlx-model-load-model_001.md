@@ -1,12 +1,12 @@
-# \[mlx\]\[MLX: Model load / model error\] Weight/config mismatch during model load affecting 2 model(s)
+# \[mlx\]\[MLX: Model load / model error\] Weight/config mismatch during model load affecting 1 model(s)
 
 ## Summary
 
-2 model(s) show **MLX: Model load / model error** that should be filed against mlx.
+1 model(s) show **MLX: Model load / model error** that should be filed against mlx.
 
 - **Observed problem:** Weight/config mismatch during model load
 - **Target:** mlx
-- **Affected models:** 2
+- **Affected models:** 1
 - **Fixed when:** Load/generation completes or fails with a narrower owner.
 
 
@@ -14,14 +14,11 @@
 
 | Model                                     | Observed Behavior                                                                                                                                                                               | Token Counts   | Optional Context                                                                                                                                                                                |
 |-------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `LiquidAI/LFM2.5-VL-450M-MLX-bf16`        | Received 2 parameters not in model: multi_modal_projector.layer_norm.bias, multi_modal_projector.layer_norm.weight.                                                                             | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T003128Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_MLX_MODEL_LOAD_MODEL_853049863f38.json)        |
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | Received 4 parameters not in model: multi_modal_projector.linear_1.biases, multi_modal_projector.linear_1.scales, multi_modal_projector.linear_2.biases, multi_modal_projector.linear_2.scales. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T003128Z_006_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json) |
+| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | Received 4 parameters not in model: multi_modal_projector.linear_1.biases, multi_modal_projector.linear_1.scales, multi_modal_projector.linear_2.biases, multi_modal_projector.linear_2.scales. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T202322Z_004_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json) |
 
 
 ## Minimal Evidence
 
-- `LiquidAI/LFM2.5-VL-450M-MLX-bf16` fails with: Model loading failed: Received 2 parameters not in model: multi_modal_projector.layer_norm.bias, multi_modal_projector.layer_norm.weight.
-- Root exception: `builtins.ValueError`: Received 2 parameters not in model: <br>multi_modal_projector.layer_norm.bias,<br>multi_modal_projector.layer_norm.weight.
 - `mlx-community/Kimi-VL-A3B-Thinking-8bit` fails with: Model loading failed: Received 4 parameters not in model: multi_modal_projector.linear_1.biases, multi_modal_projector.linear_1.scales, multi_modal_projector.linear_2.biases, multi_modal_projector.linear_2.scales.
 - Root exception: `builtins.ValueError`: Received 4 parameters not in model: <br>multi_modal_projector.linear_1.biases,<br>multi_modal_projector.linear_1.scales,<br>multi_modal_projector.linear_2.biases,<br>multi_modal_projector.l...
 
@@ -33,40 +30,6 @@ These commands use `mlx-vlm` directly so the issue can be reproduced without ins
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model LiquidAI/LFM2.5-VL-450M-MLX-bf16 --image /Users/jrp/Pictures/Processed/20260509-165009_DSC09954.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
-
-Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.
-
-Treat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.
-
-Return exactly these three sections, and nothing else:
-
-Title:
-- 5-10 words, concrete and factual, limited to clearly visible content.
-- Output only the title text after the label.
-- Do not repeat or paraphrase these instructions in the title.
-
-Description:
-- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.
-- Output only the description text after the label.
-
-Keywords:
-- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.
-- Output only the keyword list after the label.
-
-Rules:
-- Include only details that are definitely visible in the image.
-- Reuse metadata terms only when they are clearly supported by the image.
-- If metadata and image disagree, follow the image.
-- Prefer omission to speculation.
-- Do not copy prompt instructions into the Title, Description, or Keywords fields.
-- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.
-- Do not output reasoning, notes, hedging, or extra sections.
-
-Context: Existing metadata hints (high confidence; use only when visually confirmed):
-- Description hint: A low-angle, wide shot of St Peter'"'"'s Church in Petersfield, Hampshire, England, on a sunny day. The Gothic Revival style church, with its tall spire and flint walls, is pictured against a bright blue sky with wispy clouds. A black car is parked in the foreground.
-- Keyword hints: Adobe Stock, Any Vision, Bell Tower, Blue sky, Car, Chapel, Church, Cross, Daylight, Dorking, England, Europe, Fence, Gothic Architecture, Objects, Sky, Station wagon, Steeple, Stone, Surrey
-- Capture metadata: Taken on 2026-05-09 17:50:09 BST (at 17:50:09 local time). GPS: 51.215500°N, 0.798500°W.' --max-tokens 500 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 python -m mlx_vlm.generate --model mlx-community/Kimi-VL-A3B-Thinking-8bit --image /Users/jrp/Pictures/Processed/20260509-165009_DSC09954.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
 
 Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.
@@ -109,7 +72,7 @@ Minimal Python repro (representative model):
 from mlx_vlm.generate import generate
 from mlx_vlm.utils import load
 
-MODEL = 'LiquidAI/LFM2.5-VL-450M-MLX-bf16'
+MODEL = 'mlx-community/Kimi-VL-A3B-Thinking-8bit'
 IMAGE = '/Users/jrp/Pictures/Processed/20260509-165009_DSC09954.jpg'
 PROMPT = "Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.\n- Output only the description text after the label.\n\nKeywords:\n- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.\n- Output only the keyword list after the label.\n\nRules:\n- Include only details that are definitely visible in the image.\n- Reuse metadata terms only when they are clearly supported by the image.\n- If metadata and image disagree, follow the image.\n- Prefer omission to speculation.\n- Do not copy prompt instructions into the Title, Description, or Keywords fields.\n- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.\n- Do not output reasoning, notes, hedging, or extra sections.\n\nContext: Existing metadata hints (high confidence; use only when visually confirmed):\n- Description hint: A low-angle, wide shot of St Peter's Church in Petersfield, Hampshire, England, on a sunny day. The Gothic Revival style church, with its tall spire and flint walls, is pictured against a bright blue sky with wispy clouds. A black car is parked in the foreground.\n- Keyword hints: Adobe Stock, Any Vision, Bell Tower, Blue sky, Car, Chapel, Church, Cross, Daylight, Dorking, England, Europe, Fence, Gothic Architecture, Objects, Sky, Station wagon, Steeple, Stone, Surrey\n- Capture metadata: Taken on 2026-05-09 17:50:09 BST (at 17:50:09 local time). GPS: 51.215500°N, 0.798500°W."
 LOAD_KWARGS = {'trust_remote_code': True}
@@ -171,14 +134,13 @@ Generation/load config:
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "LiquidAI/LFM2.5-VL-450M-MLX-bf16"
+  "model": "mlx-community/Kimi-VL-A3B-Thinking-8bit"
 }
 ```
 
 Optional advanced context:
 
-- `LiquidAI/LFM2.5-VL-450M-MLX-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T003128Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_MLX_MODEL_LOAD_MODEL_853049863f38.json)
-- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T003128Z_006_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)
+- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T202322Z_004_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -217,35 +179,6 @@ Optional advanced context:
 
 
 ## Appendix: Detailed Evidence
-
-### `LiquidAI/LFM2.5-VL-450M-MLX-bf16`
-
-Observed error:
-
-```text
-Model loading failed: Received 2 parameters not in model: 
-multi_modal_projector.layer_norm.bias,
-multi_modal_projector.layer_norm.weight.
-```
-
-Root exception:
-
-```text
-builtins.ValueError: Received 2 parameters not in model: 
-multi_modal_projector.layer_norm.bias,
-multi_modal_projector.layer_norm.weight.
-```
-
-Traceback tail:
-
-```text
-multi_modal_projector.layer_norm.weight.
-The above exception was the direct cause of the following exception:
-Traceback (most recent call last):
-ValueError: Model loading failed: Received 2 parameters not in model: 
-multi_modal_projector.layer_norm.bias,
-multi_modal_projector.layer_norm.weight.
-```
 
 ### `mlx-community/Kimi-VL-A3B-Thinking-8bit`
 

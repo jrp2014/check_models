@@ -14,7 +14,7 @@
 
 | Model                               | Observed Behavior                                                                                                | Token Counts                                                                                         | Optional Context                                                                                                                                                               |
 |-------------------------------------|------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `microsoft/Phi-3.5-vision-instruct` | decoded text contains control token &lt;\|end\|&gt; \| decoded text contains control token &lt;\|endoftext\|&gt; | prompt=1,387 \| output/prompt=36.05% \| nontext burden=66% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T003128Z_003_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json) |
+| `microsoft/Phi-3.5-vision-instruct` | decoded text contains control token &lt;\|end\|&gt; \| decoded text contains control token &lt;\|endoftext\|&gt; | prompt=1,387 \| output/prompt=36.05% \| nontext burden=66% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T202322Z_002_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json) |
 
 
 ## Minimal Evidence
@@ -141,7 +141,7 @@ Generation/load config:
 
 Optional advanced context:
 
-- `microsoft/Phi-3.5-vision-instruct`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T003128Z_003_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json)
+- `microsoft/Phi-3.5-vision-instruct`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260510T202322Z_002_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
