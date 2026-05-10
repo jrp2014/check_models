@@ -198,11 +198,6 @@ def check_conda_env_with_expected(expected_env: str | None) -> None:
     logger.info("✓ Conda environment '%s' active", active_env)
 
 
-def check_conda_env() -> None:
-    """Verify we're in an active conda environment, using optional configured strict matching."""
-    check_conda_env_with_expected(_resolve_expected_conda_env())
-
-
 def check_package(name: str, version_spec: str) -> bool:
     """Check if a package is installed and meets version requirements."""
     try:

@@ -7,6 +7,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Calibrate repo-root Skylos scans to ignore generated output and lockfile
+  noise, document the quality-diagnostic backlog, and raise the Pillow floor to
+  `>=12.2.0`.
 - Streamlined report finalization by driving report generation and artifact
   logging from one internal artifact list, reducing duplicated output-path
   handling without changing report formats.
@@ -42,6 +45,8 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Remove the unused `check_conda_env()` validation wrapper while keeping the
+  strict expected-environment check used by the validation entrypoint.
 - Escape attributes on otherwise allowed HTML formatting tags, render HTML
   result tables from explicitly escaped cells, remove stale archived Python
   quality scripts from scan scope, and declare the direct `numpy` runtime

@@ -37,7 +37,7 @@ dependencies = [
     # Project-level compatibility floor for the MLX ecosystem.
     "transformers>=5.5.3",
     "defusedxml>=0.7.1",
-    "Pillow[xmp]>=10.3.0",
+    "Pillow[xmp]>=12.2.0",
     "huggingface-hub[torch,typing]>=1.10.1",
     "numpy>=2.1.0",
     "packaging>=26.0",

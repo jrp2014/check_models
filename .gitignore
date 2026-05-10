@@ -33,7 +33,9 @@ ENV/
 coverage.xml
 
 # Local Skylos scan cache/traces
-.skylos/
+.skylos/*
+!.skylos/
+!.skylos/config.yaml
 src/.skylos/
 src/.skylos_trace
 

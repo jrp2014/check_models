@@ -1,0 +1,14 @@
+# Repository-root Skylos configuration only.
+# Python packaging, dependency, and quality-tool config lives in src/pyproject.toml.
+
+exclude:
+  - output
+  - package-lock.json
+
+gate:
+  fail_on_critical: true
+  max_critical: 0
+  max_high: 0
+  max_security: 0
+  max_quality: 10000
+  strict: false
