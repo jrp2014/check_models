@@ -701,6 +701,56 @@ class TestMarkdownReportEdgeCases:
         assert "[tail]" in preview
         assert "TRAILING-SIGNAL" in preview
 
+    def test_build_result_output_cues_preserves_priority_order_and_limit(self) -> None:
+        """Cue helper should keep the stable cue order before compact preview truncation."""
+        result = _make_harness_success("org/cues", harness_type="stop_token")
+        assert result.quality_analysis is not None
+
+        analysis = replace(
+            result.quality_analysis,
+            is_repetitive=True,
+            has_context_echo=True,
+            instruction_echo=True,
+            metadata_borrowing=True,
+            has_reasoning_leak=True,
+            has_degeneration=True,
+            is_context_ignored=True,
+            missing_sections=["keywords"],
+            formatting_issues=["Formatting marker leak"],
+            is_generic=True,
+            verdict="cutoff",
+        )
+        result = replace(
+            result,
+            quality_analysis=analysis,
+            quality_issues=(
+                "⚠️harness(stop_token), repetitive(loop), context-echo(0.94), "
+                "instruction_echo, metadata_borrowing, cutoff, reasoning_leak, "
+                "degeneration, context_ignored, missing_sections(keywords), "
+                "formatting(marker), generic"
+            ),
+        )
+
+        expected_order = [
+            "harness:stop-token",
+            "repetitive",
+            "context-echo",
+            "instruction-echo",
+            "metadata-borrowing",
+            "cutoff",
+            "reasoning-leak",
+            "degeneration",
+            "context-ignored",
+            "missing-sections",
+            "formatting",
+            "generic",
+        ]
+
+        assert (
+            check_models._build_result_output_cues(result)
+            == expected_order[: check_models.OUTPUT_PREVIEW_CUE_LIMIT]
+        )
+
 
 class TestMarkdownGalleryReport:
     """Coverage for the standalone markdown gallery artifact."""

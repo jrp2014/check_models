@@ -19705,70 +19705,41 @@ def _build_result_output_cues(result: PerformanceResult) -> list[str]:
     analysis = _quality_analysis_for_result(result)
     cues: list[str] = []
 
-    if (analysis is not None and analysis.has_harness_issue) or "harness" in quality_labels:
+    if "harness" in quality_labels or (analysis is not None and analysis.has_harness_issue):
         harness_type = (
             analysis.harness_issue_type.replace("_", "-")
-            if analysis and analysis.harness_issue_type
+            if analysis is not None and analysis.harness_issue_type
             else ""
         )
         cues.append(f"harness:{harness_type}" if harness_type else "harness")
-    candidate_cues = [
-        (
-            (analysis is not None and analysis.is_repetitive) or "repetitive" in quality_labels,
-            "repetitive",
-        ),
-        (
-            (analysis is not None and analysis.has_context_echo)
-            or "context_echo" in quality_labels,
-            "context-echo",
-        ),
-        (
-            (analysis is not None and analysis.instruction_echo)
-            or "instruction_echo" in quality_labels,
-            "instruction-echo",
-        ),
-        (
-            (analysis is not None and analysis.metadata_borrowing)
-            or "metadata_borrowing" in quality_labels,
-            "metadata-borrowing",
-        ),
-        (
-            (analysis is not None and analysis.verdict == "cutoff") or "cutoff" in quality_labels,
-            "cutoff",
-        ),
-        (
-            (analysis is not None and analysis.verdict == "context_budget")
-            or "context_budget" in quality_labels,
-            "context-budget",
-        ),
-        (
-            (analysis is not None and analysis.has_reasoning_leak)
-            or "reasoning_leak" in quality_labels,
-            "reasoning-leak",
-        ),
-        (
-            (analysis is not None and analysis.has_degeneration)
-            or "degeneration" in quality_labels,
-            "degeneration",
-        ),
-        (
-            (analysis is not None and analysis.is_context_ignored)
-            or "context_ignored" in quality_labels,
-            "context-ignored",
-        ),
-        ((analysis is not None and analysis.is_refusal) or "refusal" in quality_labels, "refusal"),
-        (
-            (analysis is not None and analysis.missing_sections)
-            or "missing_sections" in quality_labels,
-            "missing-sections",
-        ),
-        (
-            (analysis is not None and analysis.formatting_issues) or "formatting" in quality_labels,
-            "formatting",
-        ),
-        ((analysis is not None and analysis.is_generic) or "generic" in quality_labels, "generic"),
-    ]
-    cues.extend(label for condition, label in candidate_cues if condition)
+
+    cue_rules: tuple[tuple[str, str, str | None, str | None], ...] = (
+        ("repetitive", "repetitive", "is_repetitive", None),
+        ("context_echo", "context-echo", "has_context_echo", None),
+        ("instruction_echo", "instruction-echo", "instruction_echo", None),
+        ("metadata_borrowing", "metadata-borrowing", "metadata_borrowing", None),
+        ("cutoff", "cutoff", None, "cutoff"),
+        ("context_budget", "context-budget", None, "context_budget"),
+        ("reasoning_leak", "reasoning-leak", "has_reasoning_leak", None),
+        ("degeneration", "degeneration", "has_degeneration", None),
+        ("context_ignored", "context-ignored", "is_context_ignored", None),
+        ("refusal", "refusal", "is_refusal", None),
+        ("missing_sections", "missing-sections", "missing_sections", None),
+        ("formatting", "formatting", "formatting_issues", None),
+        ("generic", "generic", "is_generic", None),
+    )
+
+    for quality_label, cue_label, analysis_flag, verdict in cue_rules:
+        if quality_label in quality_labels:
+            cues.append(cue_label)
+            continue
+        if analysis is None:
+            continue
+        if analysis_flag is not None and getattr(analysis, analysis_flag):
+            cues.append(cue_label)
+            continue
+        if verdict is not None and analysis.verdict == verdict:
+            cues.append(cue_label)
 
     return _dedupe_preserve_order(cues)[:OUTPUT_PREVIEW_CUE_LIMIT]
 
