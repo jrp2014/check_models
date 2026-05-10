@@ -7,6 +7,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Streamlined report finalization by driving report generation and artifact
+  logging from one internal artifact list, reducing duplicated output-path
+  handling without changing report formats.
 - Fail the shared quality hooks when Pyrefly emits warnings so non-blocking
   type-cleanup regressions do not slip past `make quality` and pre-push checks.
 - Refactor report assembly toward shared Markdown/HTML section primitives and

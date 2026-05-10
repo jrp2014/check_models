@@ -789,6 +789,63 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
     assert any(str(custom_env.resolve()) in msg for msg in messages)
     assert any(str(args.output_gallery_markdown.resolve()) in msg for msg in messages)
     assert any(str(args.output_review.resolve()) in msg for msg in messages)
+    artifact_positions = [
+        next(i for i, msg in enumerate(messages) if "HTML Report:" in msg),
+        next(i for i, msg in enumerate(messages) if "Markdown Report:" in msg),
+        next(i for i, msg in enumerate(messages) if "Gallery Report:" in msg),
+        next(i for i, msg in enumerate(messages) if "Review Report:" in msg),
+        next(i for i, msg in enumerate(messages) if "TSV Report:" in msg),
+        next(i for i, msg in enumerate(messages) if "JSONL Report:" in msg),
+    ]
+    assert artifact_positions == sorted(artifact_positions)
+
+
+def test_report_generation_uses_single_artifact_plan(tmp_path: Path) -> None:
+    """Report generation should expose one ordered artifact plan for jobs and logs."""
+    args = argparse.Namespace(
+        output_html=tmp_path / "report.html",
+        output_markdown=tmp_path / "report.md",
+        output_gallery_markdown=tmp_path / "gallery.md",
+        output_review=tmp_path / "review.md",
+        output_tsv=tmp_path / "report.tsv",
+        output_jsonl=tmp_path / "report.jsonl",
+        output_diagnostics=tmp_path / "diagnostics.md",
+        output_log=tmp_path / "check_models.log",
+        output_env=tmp_path / "environment.log",
+    )
+    inputs = check_models.ReportGenerationInputs(
+        results=[],
+        library_versions={"mlx": "0.0.0"},
+        prompt="prompt",
+        metadata=None,
+        overall_time=1.0,
+        image_path=None,
+        system_info={},
+        report_context=check_models._build_report_render_context(results=[], prompt="prompt"),
+        output_paths=check_models._resolve_report_output_paths(args),
+        runtime_fingerprint={},
+    )
+
+    artifacts = check_models._build_report_artifacts(inputs)
+
+    assert [artifact.key for artifact in artifacts] == [
+        "html",
+        "markdown",
+        "markdown_gallery",
+        "review",
+        "tsv",
+        "jsonl",
+    ]
+    assert [artifact.label.strip() for artifact in artifacts] == [
+        "HTML Report:",
+        "Markdown Report:",
+        "Gallery Report:",
+        "Review Report:",
+        "TSV Report:",
+        "JSONL Report:",
+    ]
+    assert all(artifact.path.is_absolute() for artifact in artifacts)
+    assert all(artifact.job is not None for artifact in artifacts)
 
 
 def test_finalize_execution_prunes_canonical_repro_bundle_dir(tmp_path: Path) -> None:
@@ -835,6 +892,7 @@ def test_finalize_execution_prunes_canonical_repro_bundle_dir(tmp_path: Path) ->
         patch("check_models.generate_diagnostics_report", return_value=False),
         patch("check_models._log_history_comparison"),
         patch("check_models._prune_repro_bundles", return_value=0) as prune_repro_bundles,
+        patch("check_models._clean_stale_toplevel_reports", return_value=0) as clean_stale_reports,
     ):
         finalize_execution(
             args=args,
@@ -847,3 +905,4 @@ def test_finalize_execution_prunes_canonical_repro_bundle_dir(tmp_path: Path) ->
         )
 
     prune_repro_bundles.assert_called_once_with(tmp_path / "repro_bundles", 90)
+    clean_stale_reports.assert_called_once_with(tmp_path, reports_dir)

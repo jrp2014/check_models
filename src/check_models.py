@@ -1178,10 +1178,24 @@ class DiagnosticsArtifacts:
 
 
 @dataclass(frozen=True)
+class ReportOutputPaths:
+    """Resolved final report and log output paths."""
+
+    html: Path
+    markdown: Path
+    gallery_markdown: Path
+    review: Path
+    tsv: Path
+    jsonl: Path
+    diagnostics: Path
+    log: Path
+    environment: Path
+
+
+@dataclass(frozen=True)
 class ReportGenerationInputs:
     """Inputs required to generate final report artifacts and log their paths."""
 
-    args: argparse.Namespace
     results: list[PerformanceResult]
     library_versions: LibraryVersionDict
     prompt: str
@@ -1190,11 +1204,18 @@ class ReportGenerationInputs:
     image_path: Path | None
     system_info: dict[str, str]
     report_context: ReportRenderContext
-    jsonl_output_path: Path
-    log_output_path: Path
-    env_output_path: Path
-    review_output_path: Path
+    output_paths: ReportOutputPaths
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None
+
+
+@dataclass(frozen=True)
+class ReportArtifact:
+    """A generated artifact path plus its optional generation job."""
+
+    key: str
+    label: str
+    path: Path
+    job: Callable[[], None] | None = None
 
 
 class ChatTemplateKwargs(TypedDict, total=False):
@@ -22891,18 +22912,33 @@ def _write_environment_failure_diagnostics(
         log_file_path(diagnostics_path, label="   Diagnostics:  ")
 
 
-def _generate_reports_and_log_outputs(
-    inputs: ReportGenerationInputs,
-) -> None:
-    """Generate reports and log the emitted artifact paths."""
-    gallery_output_path = inputs.args.output_gallery_markdown.resolve()
-    review_output_path = inputs.review_output_path
-    report_jobs: tuple[tuple[str, Callable[[], None]], ...] = (
-        (
-            "html",
-            lambda: generate_html_report(
+def _resolve_report_output_paths(args: argparse.Namespace) -> ReportOutputPaths:
+    """Resolve all final report/log output paths once for finalization."""
+    return ReportOutputPaths(
+        html=args.output_html.resolve(),
+        markdown=args.output_markdown.resolve(),
+        gallery_markdown=args.output_gallery_markdown.resolve(),
+        review=args.output_review.resolve(),
+        tsv=args.output_tsv.resolve(),
+        jsonl=args.output_jsonl.resolve(),
+        diagnostics=args.output_diagnostics.resolve(),
+        log=args.output_log.resolve(),
+        environment=args.output_env.resolve(),
+    )
+
+
+def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtifact, ...]:
+    """Build the ordered final report artifact plan."""
+    output_paths = inputs.output_paths
+
+    return (
+        ReportArtifact(
+            key="html",
+            label="   HTML Report:     ",
+            path=output_paths.html,
+            job=lambda: generate_html_report(
                 results=inputs.results,
-                filename=inputs.args.output_html,
+                filename=output_paths.html,
                 versions=inputs.library_versions,
                 prompt=inputs.prompt,
                 total_runtime_seconds=inputs.overall_time,
@@ -22910,85 +22946,101 @@ def _generate_reports_and_log_outputs(
                 report_context=inputs.report_context,
             ),
         ),
-        (
-            "markdown",
-            lambda: generate_markdown_report(
+        ReportArtifact(
+            key="markdown",
+            label="   Markdown Report: ",
+            path=output_paths.markdown,
+            job=lambda: generate_markdown_report(
                 results=inputs.results,
-                filename=inputs.args.output_markdown,
+                filename=output_paths.markdown,
                 versions=inputs.library_versions,
                 prompt=inputs.prompt,
                 total_runtime_seconds=inputs.overall_time,
                 report_context=inputs.report_context,
-                gallery_filename=gallery_output_path,
-                review_filename=review_output_path,
-                log_filename=inputs.log_output_path,
+                gallery_filename=output_paths.gallery_markdown,
+                review_filename=output_paths.review,
+                log_filename=output_paths.log,
             ),
         ),
-        (
-            "markdown_gallery",
-            lambda: generate_markdown_gallery_report(
+        ReportArtifact(
+            key="markdown_gallery",
+            label="   Gallery Report:  ",
+            path=output_paths.gallery_markdown,
+            job=lambda: generate_markdown_gallery_report(
                 results=inputs.results,
-                filename=gallery_output_path,
+                filename=output_paths.gallery_markdown,
                 prompt=inputs.prompt,
                 metadata=inputs.metadata,
                 report_context=inputs.report_context,
             ),
         ),
-        (
-            "review",
-            lambda: generate_review_report(
+        ReportArtifact(
+            key="review",
+            label="   Review Report:   ",
+            path=output_paths.review,
+            job=lambda: generate_review_report(
                 results=inputs.results,
-                filename=review_output_path,
+                filename=output_paths.review,
                 prompt=inputs.prompt,
                 report_context=inputs.report_context,
-                log_filename=inputs.log_output_path,
-                gallery_filename=gallery_output_path,
+                log_filename=output_paths.log,
+                gallery_filename=output_paths.gallery_markdown,
+            ),
+        ),
+        ReportArtifact(
+            key="tsv",
+            label="   TSV Report:      ",
+            path=output_paths.tsv,
+            job=lambda: generate_tsv_report(
+                results=inputs.results,
+                filename=output_paths.tsv,
+                report_context=inputs.report_context,
+            ),
+        ),
+        ReportArtifact(
+            key="jsonl",
+            label="   JSONL Report:    ",
+            path=output_paths.jsonl,
+            job=lambda: save_jsonl_report(
+                inputs.results,
+                output_paths.jsonl,
+                prompt=inputs.prompt,
+                system_info=inputs.system_info,
+                library_versions=inputs.library_versions,
+                runtime_fingerprint=inputs.runtime_fingerprint,
             ),
         ),
     )
 
+
+def _generate_reports_and_log_outputs(
+    inputs: ReportGenerationInputs,
+) -> None:
+    """Generate reports and log the emitted artifact paths."""
+    artifacts = _build_report_artifacts(inputs)
+
     try:
-        for report_name, report_job in report_jobs:
+        for artifact in artifacts:
+            if artifact.job is None:
+                continue
             try:
-                report_job()
+                artifact.job()
             except (OSError, ValueError) as err:
-                logger.exception("Failed to generate %s report.", report_name)
+                logger.exception("Failed to generate %s report.", artifact.key)
                 _write_report_failure_jsonl(
-                    filename=inputs.jsonl_output_path,
-                    failed_report=report_name,
+                    filename=inputs.output_paths.jsonl,
+                    failed_report=artifact.key,
                     error=err,
                 )
 
-        generate_tsv_report(
-            results=inputs.results,
-            filename=inputs.args.output_tsv,
-            report_context=inputs.report_context,
-        )
-        save_jsonl_report(
-            inputs.results,
-            inputs.args.output_jsonl,
-            prompt=inputs.prompt,
-            system_info=inputs.system_info,
-            library_versions=inputs.library_versions,
-            runtime_fingerprint=inputs.runtime_fingerprint,
-        )
-
         logger.info("")
         log_success("Reports successfully generated:", prefix="📊")
-        report_paths = (
-            (inputs.args.output_html, "   HTML Report:"),
-            (inputs.args.output_markdown, "   Markdown Report:"),
-            (inputs.args.output_gallery_markdown, "   Gallery Report: "),
-            (inputs.args.output_review, "   Review Report:  "),
-            (inputs.args.output_tsv, "   TSV Report:   "),
-            (inputs.args.output_jsonl, "   JSONL Report: "),
-        )
-        for path, label in report_paths:
-            log_file_path(path, label=label)
+        for artifact in artifacts:
+            log_file_path(artifact.path, label=artifact.label)
 
-        log_file_path(inputs.log_output_path, label="   Log File:")
-        if inputs.env_output_path.exists():
-            log_file_path(inputs.env_output_path, label="   Environment:")
+        log_file_path(inputs.output_paths.log, label="   Log File:")
+        if inputs.output_paths.environment.exists():
+            log_file_path(inputs.output_paths.environment, label="   Environment:")
     except (OSError, ValueError):
         logger.exception("Failed to generate reports.")
 
@@ -23236,27 +23288,22 @@ def finalize_execution(
         )
 
         # Prepare output paths
-        tsv_output_path: Path = args.output_tsv.resolve()
-        jsonl_output_path: Path = args.output_jsonl.resolve()
-        diagnostics_path: Path = args.output_diagnostics.resolve()
-        log_output_path: Path = args.output_log.resolve()
-        env_output_path: Path = args.output_env.resolve()
-        history_path = _history_path_for_jsonl(jsonl_output_path)
+        output_paths = _resolve_report_output_paths(args)
+        history_path = _history_path_for_jsonl(output_paths.jsonl)
         previous_history = _load_latest_history_record(history_path)
 
         for output_path in (
-            args.output_html.resolve(),
-            args.output_markdown.resolve(),
-            args.output_gallery_markdown.resolve(),
-            args.output_review.resolve(),
-            tsv_output_path,
-            jsonl_output_path,
+            output_paths.html,
+            output_paths.markdown,
+            output_paths.gallery_markdown,
+            output_paths.review,
+            output_paths.tsv,
+            output_paths.jsonl,
         ):
             output_path.parent.mkdir(parents=True, exist_ok=True)
 
         _generate_reports_and_log_outputs(
             ReportGenerationInputs(
-                args=args,
                 results=results,
                 library_versions=library_versions,
                 prompt=prompt,
@@ -23265,10 +23312,7 @@ def finalize_execution(
                 image_path=image_path,
                 system_info=system_info,
                 report_context=report_context,
-                jsonl_output_path=jsonl_output_path,
-                log_output_path=log_output_path,
-                env_output_path=env_output_path,
-                review_output_path=args.output_review.resolve(),
+                output_paths=output_paths,
                 runtime_fingerprint=runtime_fingerprint,
             ),
         )
@@ -23297,26 +23341,26 @@ def finalize_execution(
             system_info=system_info,
             prompt=prompt,
             image_path=image_path,
-            diagnostics_path=diagnostics_path,
+            diagnostics_path=output_paths.diagnostics,
             history_path=history_path,
             previous_history=previous_history,
             current_history=current_history,
         )
         _log_maintainer_summary(
             artifacts=diagnostics_artifacts,
-            diagnostics_path=diagnostics_path,
+            diagnostics_path=output_paths.diagnostics,
         )
 
         # Prune old repro bundles
         prune_days = getattr(args, "prune_repro_days", 90)
         if prune_days > 0:
-            repro_dir = diagnostics_path.parent.parent / "repro_bundles"
+            repro_dir = output_paths.diagnostics.parent.parent / "repro_bundles"
             pruned = _prune_repro_bundles(repro_dir, prune_days)
             if pruned:
                 logger.info("Pruned %d repro bundle(s) older than %d days.", pruned, prune_days)
 
         # Remove stale top-level report copies superseded by reports/ subdirectory
-        reports_dir = diagnostics_path.parent
+        reports_dir = output_paths.diagnostics.parent
         output_dir = reports_dir.parent
         stale_removed = _clean_stale_toplevel_reports(output_dir, reports_dir)
         if stale_removed:
