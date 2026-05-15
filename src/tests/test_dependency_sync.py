@@ -549,19 +549,23 @@ def test_update_script_uses_upstream_mlx_editable_dev_install() -> None:
 def test_should_audit_path_excludes_generated_and_archived_paths(tmp_path: Path) -> None:
     repo_root = tmp_path / "repo"
     included = repo_root / "src" / "module.py"
+    excluded_build = repo_root / "src" / "build" / "lib" / "check_models.py"
     excluded_conda = repo_root / ".conda" / "lib" / "python3.13" / "site.py"
     excluded_output = repo_root / "src" / "output" / "results.md"
     excluded_archived = repo_root / "src" / "tools" / ".archived" / "old.py"
     included.parent.mkdir(parents=True)
+    excluded_build.parent.mkdir(parents=True)
     excluded_conda.parent.mkdir(parents=True)
     excluded_output.parent.mkdir(parents=True)
     excluded_archived.parent.mkdir(parents=True)
     included.write_text("print('ok')\n", encoding="utf-8")
+    excluded_build.write_text("value = 1  # noqa: F401\n", encoding="utf-8")
     excluded_conda.write_text("value = 1  # noqa: F401\n", encoding="utf-8")
     excluded_output.write_text("<!-- markdownlint-disable MD028 -->\n", encoding="utf-8")
     excluded_archived.write_text("x = 1  # noqa: F841\n", encoding="utf-8")
 
     assert check_suppressions.should_audit_path(included, repo_root) is True
+    assert check_suppressions.should_audit_path(excluded_build, repo_root) is False
     assert check_suppressions.should_audit_path(excluded_conda, repo_root) is False
     assert check_suppressions.should_audit_path(excluded_output, repo_root) is False
     assert check_suppressions.should_audit_path(excluded_archived, repo_root) is False

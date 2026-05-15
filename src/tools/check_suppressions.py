@@ -34,6 +34,7 @@ EXCLUDED_PATH_PARTS: Final[frozenset[str]] = frozenset(
     },
 )
 EXCLUDED_PATH_PREFIXES: Final[tuple[Path, ...]] = (
+    Path("src/build"),
     Path("src/output"),
     Path("src/tools/.archived"),
     Path("docs/notes/archive"),
