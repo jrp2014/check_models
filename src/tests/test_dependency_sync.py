@@ -442,6 +442,21 @@ def test_patch_mlx_vlm_stubs_widens_generate_processor_type(tmp_path: Path) -> N
     assert "thinking_end_token: str = ..." in patched
 
 
+def test_patch_stub_file_applies_replacements_and_reports_change(tmp_path: Path) -> None:
+    """Shared stub patch helper should report whether a file changed."""
+    stub_path = tmp_path / "sample.pyi"
+    stub_path.write_text("def f(value: str = None) -> None: ...\n", encoding="utf-8")
+
+    changed = generate_stubs._patch_stub_file(
+        stub_path,
+        [(re.compile(r"(value:\s*str)\s*=\s*None"), r"\1 | None = None")],
+    )
+
+    assert changed is True
+    assert "value: str | None = None" in stub_path.read_text(encoding="utf-8")
+    assert generate_stubs._patch_stub_file(stub_path, []) is False
+
+
 def test_update_script_verifies_stub_integrity_and_logs_local_provenance() -> None:
     """Local update tooling should verify stub contracts and log editable provenance."""
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")

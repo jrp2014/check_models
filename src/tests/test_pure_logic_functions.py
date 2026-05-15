@@ -13,6 +13,7 @@ import contextlib
 import importlib
 import json
 import logging
+import subprocess
 from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
@@ -74,6 +75,70 @@ class TestValidateModelIdentifier:
     def test_local_path_valid_dir(self, mod: types.ModuleType, tmp_path: Path) -> None:
         """Existing directory should pass."""
         mod.validate_model_identifier(str(tmp_path))
+
+
+class TestToolchainHelpers:
+    """Tests for local toolchain probe helpers."""
+
+    def test_run_toolchain_command_returns_stripped_stdout(
+        self,
+        mod: types.ModuleType,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Toolchain command helper should normalize successful stdout."""
+
+        def fake_run(
+            cmd: list[str],
+            *,
+            capture_output: bool,
+            text: bool,
+            timeout: int,
+            check: bool,
+        ) -> subprocess.CompletedProcess[str]:
+            assert cmd == ["/usr/bin/example", "--version"]
+            assert capture_output is True
+            assert text is True
+            assert timeout == 2
+            assert check is False
+            return subprocess.CompletedProcess(cmd, 0, stdout="  value\n", stderr="")
+
+        monkeypatch.setattr(mod.subprocess, "run", fake_run)
+
+        assert mod._run_macos_toolchain_command(["/usr/bin/example", "--version"]) == "value"
+
+    def test_run_toolchain_command_returns_none_on_os_error(
+        self,
+        mod: types.ModuleType,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Toolchain command helper should hide unavailable command probes."""
+
+        def fake_run(
+            cmd: list[str],
+            *,
+            capture_output: bool,
+            text: bool,
+            timeout: int,
+            check: bool,
+        ) -> subprocess.CompletedProcess[str]:
+            _ = (cmd, capture_output, text, timeout, check)
+            msg = "missing"
+            raise OSError(msg)
+
+        monkeypatch.setattr(mod.subprocess, "run", fake_run)
+
+        assert mod._run_macos_toolchain_command(["/usr/bin/missing"]) is None
+
+    def test_decode_history_run_record_line_logs_malformed_json(
+        self,
+        mod: types.ModuleType,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """Malformed history JSONL lines should be intentionally skipped."""
+        caplog.set_level(logging.DEBUG, logger=mod.LOGGER_NAME)
+
+        assert mod._decode_history_run_record_line("{not json}", source="history") is None
+        assert "Skipping malformed history record in history" in caplog.text
 
 
 # ── apply_exclusions ───────────────────────────────────────────────────────

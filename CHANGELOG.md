@@ -7,6 +7,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Refactor targeted Skylos warning hotspots in report rendering, image metadata
+  extraction, macOS toolchain probing, history JSONL parsing, and stub patching
+  without changing public output contracts.
 - Stop tracking generated suppression-audit snapshots, ignore future
   `*.suppression-audit.*` artifacts, and avoid a test-only `S106` false
   positive in quality-analysis coverage.

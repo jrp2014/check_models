@@ -31,7 +31,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # TC003: typing-only import
-    from collections.abc import Iterable
+    from collections.abc import Iterable, Mapping
 
 
 def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
@@ -55,24 +55,13 @@ def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
 
     This function is idempotent and safe to run repeatedly.
     """
-
-    def _patch_file(path: Path, patches: list[tuple[re.Pattern[str], str]]) -> None:
-        if not path.exists():
-            return
-        text = path.read_text(encoding="utf-8")
-        original = text
-        for pattern, repl in patches:
-            text = pattern.sub(repl, text)
-        if text != original:
-            path.write_text(text, encoding="utf-8")
-            logger.info("[stubs] Patched %s", path.relative_to(typings_dir))
-
     mlx_root = typings_dir / "mlx_vlm"
     if not mlx_root.exists():
         return
 
     # models/base.pyi
-    _patch_file(
+    _patch_stub_file_in_typings(
+        typings_dir,
         mlx_root / "models/base.pyi",
         patches=[
             # crop_size: dict[str, int] = None -> dict[str, int] | None = None
@@ -84,7 +73,8 @@ def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
     )
 
     # utils.pyi
-    _patch_file(
+    _patch_stub_file_in_typings(
+        typings_dir,
         mlx_root / "utils.pyi",
         patches=[
             # load_processor(..., eos_token_ids=None, ...)
@@ -112,7 +102,8 @@ def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
     )
 
     # convert.pyi
-    _patch_file(
+    _patch_stub_file_in_typings(
+        typings_dir,
         mlx_root / "convert.pyi",
         patches=[
             # upload_repo: str = None -> str | None = None
@@ -124,7 +115,8 @@ def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
     )
 
     # generate.pyi
-    _patch_file(
+    _patch_stub_file_in_typings(
+        typings_dir,
         mlx_root / "generate.pyi",
         patches=[
             # Import ProcessorMixin so generate()/stream_generate() can model
@@ -219,18 +211,6 @@ def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
 
 def _patch_transformers_stubs(typings_dir: Path) -> None:
     """Patch known invalid placeholder tokens emitted in transformers stubs."""
-
-    def _patch_file(path: Path, patches: list[tuple[re.Pattern[str], str]]) -> None:
-        if not path.exists():
-            return
-        text = path.read_text(encoding="utf-8")
-        original = text
-        for pattern, repl in patches:
-            text = pattern.sub(repl, text)
-        if text != original:
-            path.write_text(text, encoding="utf-8")
-            logger.info("[stubs] Patched %s", path.relative_to(typings_dir))
-
     root = typings_dir / "transformers"
     if not root.exists():
         return
@@ -241,9 +221,14 @@ def _patch_transformers_stubs(typings_dir: Path) -> None:
         re.compile(r"<ERROR>\.join\("),
         "', '.join(",
     )
-    _patch_file(root / "data/datasets/glue.pyi", [join_placeholder_fix])
-    _patch_file(root / "data/datasets/squad.pyi", [join_placeholder_fix])
-    _patch_file(
+    _patch_stub_file_in_typings(
+        typings_dir, root / "data/datasets/glue.pyi", [join_placeholder_fix]
+    )
+    _patch_stub_file_in_typings(
+        typings_dir, root / "data/datasets/squad.pyi", [join_placeholder_fix]
+    )
+    _patch_stub_file_in_typings(
+        typings_dir,
         root / "processing_utils.pyi",
         [
             (
@@ -342,6 +327,30 @@ _TRANSFORMERS_STUBGEN_NOISE_TOKENS = (
 _VERSION_METADATA_CHANGED_SUFFIX = "version metadata changed"
 
 
+def _patch_stub_file(path: Path, patches: list[tuple[re.Pattern[str], str]]) -> bool:
+    """Apply regex replacements to a stub file, returning whether it changed."""
+    if not path.exists():
+        return False
+    text = path.read_text(encoding="utf-8")
+    original = text
+    for pattern, repl in patches:
+        text = pattern.sub(repl, text)
+    if text == original:
+        return False
+    path.write_text(text, encoding="utf-8")
+    return True
+
+
+def _patch_stub_file_in_typings(
+    typings_dir: Path,
+    path: Path,
+    patches: list[tuple[re.Pattern[str], str]],
+) -> None:
+    """Apply stub patches and log changed files relative to ``typings_dir``."""
+    if _patch_stub_file(path, patches):
+        logger.info("[stubs] Patched %s", path.relative_to(typings_dir))
+
+
 def _validate_packages(packages: Iterable[str]) -> list[str]:
     """Return a validated list of package names (alnum/._- only).
 
@@ -409,49 +418,59 @@ def _read_stub_manifest(typings_dir: Path) -> dict[str, object] | None:
     return manifest
 
 
+def _stub_manifest_metadata_refresh_reason(manifest: dict[str, object]) -> str | None:
+    """Return refresh reason for manifest-level metadata drift."""
+    current_python_version = _python_version()
+    if manifest.get("tool_version") != STUB_TOOL_VERSION:
+        return "the local stub patcher version changed"
+    if manifest.get("python_version") != current_python_version:
+        return f"the Python version changed to {current_python_version}"
+
+    current_stubgen_version = _installed_distribution_version("mypy")
+    if manifest.get("stubgen_version") != current_stubgen_version:
+        return "the mypy/stubgen version changed"
+    return None
+
+
+def _stub_package_refresh_reason(
+    packages: Iterable[str],
+    typings_dir: Path,
+    manifest_packages: Mapping[str, object],
+) -> str | None:
+    """Return refresh reason for package-level stub drift."""
+    for package in packages:
+        if not _stub_target_exists(typings_dir, package):
+            return f"{package} stubs are missing"
+
+        current_entry = _current_stub_manifest_entry(package)
+        if current_entry is None:
+            distribution = _distribution_name_for_package(package)
+            return f"{distribution} is not installed"
+
+        recorded_entry = manifest_packages.get(package)
+        if recorded_entry != current_entry:
+            return f"{package} version metadata changed"
+    return None
+
+
 def get_stub_refresh_reason(packages: Iterable[str], typings_dir: Path = TYPINGS_DIR) -> str | None:
     """Return the reason stubs should be regenerated, or None when they are fresh."""
     pkg_list = _validate_packages(packages)
-    reason: str | None = None
-
     if not typings_dir.exists():
-        reason = "the typings/ directory is missing"
-    else:
-        manifest = _read_stub_manifest(typings_dir)
-        if manifest is None:
-            reason = "the stub manifest is missing or unreadable"
-        else:
-            manifest_packages = manifest.get("packages")
-            if not isinstance(manifest_packages, dict):
-                reason = "the stub manifest is missing package metadata"
-            else:
-                current_python_version = _python_version()
-                if manifest.get("tool_version") != STUB_TOOL_VERSION:
-                    reason = "the local stub patcher version changed"
-                elif manifest.get("python_version") != current_python_version:
-                    reason = f"the Python version changed to {current_python_version}"
-                else:
-                    current_stubgen_version = _installed_distribution_version("mypy")
-                    if manifest.get("stubgen_version") != current_stubgen_version:
-                        reason = "the mypy/stubgen version changed"
-                    else:
-                        for package in pkg_list:
-                            if not _stub_target_exists(typings_dir, package):
-                                reason = f"{package} stubs are missing"
-                                break
+        return "the typings/ directory is missing"
 
-                            current_entry = _current_stub_manifest_entry(package)
-                            if current_entry is None:
-                                distribution = _distribution_name_for_package(package)
-                                reason = f"{distribution} is not installed"
-                                break
+    manifest = _read_stub_manifest(typings_dir)
+    if manifest is None:
+        return "the stub manifest is missing or unreadable"
 
-                            recorded_entry = manifest_packages.get(package)
-                            if recorded_entry != current_entry:
-                                reason = f"{package} version metadata changed"
-                                break
+    manifest_packages = manifest.get("packages")
+    if not isinstance(manifest_packages, dict):
+        return "the stub manifest is missing package metadata"
 
-    return reason
+    metadata_reason = _stub_manifest_metadata_refresh_reason(manifest)
+    if metadata_reason is not None:
+        return metadata_reason
+    return _stub_package_refresh_reason(pkg_list, typings_dir, manifest_packages)
 
 
 def _is_version_metadata_only_refresh_reason(reason: str | None) -> bool:

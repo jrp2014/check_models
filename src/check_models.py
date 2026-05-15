@@ -1915,70 +1915,104 @@ class UnsupportedReportBlockError(TypeError):
         super().__init__(f"Unsupported report block: {block_name}")
 
 
-def _append_report_markdown_block(parts: list[str], block: object) -> None:
-    """Append one shared report block as Markdown."""
+def _render_report_section_markdown(block: ReportSection) -> list[str]:
+    """Render a report section as Markdown lines."""
+    rendered: list[str] = ["---", ""] if block.divider else []
+    level = max(1, min(6, block.level))
+    rendered.append(f"{'#' * level} {_escape_report_markdown_heading(block.title)}")
+    rendered.append("")
+    for child in block.blocks:
+        rendered.extend(_render_report_markdown_block(child))
+    return rendered
+
+
+def _render_report_key_values_markdown(block: ReportKeyValues) -> list[str]:
+    """Render report key/value rows as Markdown lines."""
+    rendered: list[str] = []
+    for label, value in block.rows:
+        rendered_label = label if block.markdown_escaped else _escape_report_markdown_text(label)
+        rendered_value = value if block.markdown_escaped else _escape_report_markdown_text(value)
+        _append_markdown_labeled_value(
+            rendered,
+            label=rendered_label,
+            value=rendered_value,
+            bullet=True,
+        )
+    if block.rows:
+        rendered.append("")
+    return rendered
+
+
+def _render_report_bullet_list_markdown(block: ReportBulletList) -> list[str]:
+    """Render a report bullet or ordered list as Markdown lines."""
+    rendered: list[str] = []
+    for index, item in enumerate(block.items, start=1):
+        prefix = f"{index}. " if block.ordered else "- "
+        rendered.extend(
+            _wrap_markdown_text(
+                _escape_report_markdown_text(item),
+                initial_indent=prefix,
+                subsequent_indent=" " * len(prefix),
+            )
+        )
+    if block.items:
+        rendered.append("")
+    return rendered
+
+
+def _render_report_table_markdown(block: ReportTable) -> list[str]:
+    """Render a report table as Markdown lines."""
+    escaped_headers = (
+        list(block.headers)
+        if block.markdown_escaped
+        else [MARKDOWN_ESCAPER.escape(header) for header in block.headers]
+    )
+    escaped_rows = (
+        list(block.rows)
+        if block.markdown_escaped
+        else [tuple(MARKDOWN_ESCAPER.escape(cell) for cell in row) for row in block.rows]
+    )
+    return [*tabulate(escaped_rows, headers=escaped_headers, tablefmt="github").splitlines(), ""]
+
+
+def _render_report_raw_markdown(block: ReportRaw) -> list[str]:
+    """Render trusted raw Markdown lines with the historical trailing blank rule."""
+    raw_lines = list(block.markdown_lines)
+    if raw_lines and raw_lines[-1] != "":
+        raw_lines.append("")
+    return raw_lines
+
+
+def _render_report_markdown_block(block: object) -> list[str]:
+    """Render one shared report block as Markdown."""
+    rendered: list[str]
     if isinstance(block, ReportSection):
-        parts.extend(["---", ""] if block.divider else [])
-        level = max(1, min(6, block.level))
-        parts.append(f"{'#' * level} {_escape_report_markdown_heading(block.title)}")
-        parts.append("")
-        for child in block.blocks:
-            _append_report_markdown_block(parts, child)
+        rendered = _render_report_section_markdown(block)
     elif isinstance(block, ReportParagraph):
-        parts.extend(_wrap_markdown_text(_escape_report_markdown_text(block.text)))
-        parts.append("")
+        rendered = [*_wrap_markdown_text(_escape_report_markdown_text(block.text)), ""]
     elif isinstance(block, ReportKeyValues):
-        for label, value in block.rows:
-            rendered_label = (
-                label if block.markdown_escaped else _escape_report_markdown_text(label)
-            )
-            rendered_value = (
-                value if block.markdown_escaped else _escape_report_markdown_text(value)
-            )
-            _append_markdown_labeled_value(
-                parts,
-                label=rendered_label,
-                value=rendered_value,
-                bullet=True,
-            )
-        parts.extend([""] if block.rows else [])
+        rendered = _render_report_key_values_markdown(block)
     elif isinstance(block, ReportBulletList):
-        for index, item in enumerate(block.items, start=1):
-            prefix = f"{index}. " if block.ordered else "- "
-            parts.extend(
-                _wrap_markdown_text(
-                    _escape_report_markdown_text(item),
-                    initial_indent=prefix,
-                    subsequent_indent=" " * len(prefix),
-                )
-            )
-        parts.extend([""] if block.items else [])
+        rendered = _render_report_bullet_list_markdown(block)
     elif isinstance(block, ReportTable):
-        escaped_headers = (
-            list(block.headers)
-            if block.markdown_escaped
-            else [MARKDOWN_ESCAPER.escape(header) for header in block.headers]
-        )
-        escaped_rows = (
-            list(block.rows)
-            if block.markdown_escaped
-            else [tuple(MARKDOWN_ESCAPER.escape(cell) for cell in row) for row in block.rows]
-        )
-        parts.extend(
-            tabulate(escaped_rows, headers=escaped_headers, tablefmt="github").splitlines()
-        )
-        parts.append("")
+        rendered = _render_report_table_markdown(block)
     elif isinstance(block, ReportCodeBlock):
-        _append_markdown_code_block(parts, block.content, language=block.language)
+        rendered = []
+        _append_markdown_code_block(rendered, block.content, language=block.language)
     elif isinstance(block, ReportDetails):
         body_lines = render_report_markdown(block.blocks)
-        _append_markdown_details_block(parts, summary=block.summary, body_lines=body_lines)
+        rendered = []
+        _append_markdown_details_block(rendered, summary=block.summary, body_lines=body_lines)
     elif isinstance(block, ReportRaw):
-        raw_lines = list(block.markdown_lines)
-        parts.extend(raw_lines)
-        parts.extend([""] if raw_lines and raw_lines[-1] != "" else [])
+        rendered = _render_report_raw_markdown(block)
     else:
         raise UnsupportedReportBlockError(block)
+    return rendered
+
+
+def _append_report_markdown_block(parts: list[str], block: object) -> None:
+    """Append one shared report block as Markdown."""
+    parts.extend(_render_report_markdown_block(block))
 
 
 def render_report_markdown(blocks: Sequence[object]) -> list[str]:
@@ -1991,50 +2025,79 @@ def render_report_markdown(blocks: Sequence[object]) -> list[str]:
     return parts
 
 
+def _render_report_section_html(block: ReportSection) -> list[str]:
+    """Render a report section as escaped HTML lines."""
+    level = max(1, min(6, block.level))
+    rendered = [f"<h{level}>{html.escape(block.title)}</h{level}>"]
+    for child in block.blocks:
+        rendered.extend(_render_report_html_block(child))
+    return rendered
+
+
+def _render_report_key_values_html(block: ReportKeyValues) -> list[str]:
+    """Render report key/value rows as escaped HTML lines."""
+    rendered = ["<ul>"]
+    for label, value in block.rows:
+        rendered.append(
+            f"<li><b>{html.escape(label)}:</b> {html.escape(value)}</li>",
+        )
+    rendered.append("</ul>")
+    return rendered
+
+
+def _render_report_bullet_list_html(block: ReportBulletList) -> list[str]:
+    """Render a report bullet or ordered list as escaped HTML lines."""
+    tag = "ol" if block.ordered else "ul"
+    rendered: list[str] = [f"<{tag}>"]
+    rendered.extend([f"<li>{html.escape(item)}</li>" for item in block.items])
+    rendered.append(f"</{tag}>")
+    return rendered
+
+
+def _render_report_table_html(block: ReportTable) -> list[str]:
+    """Render a report table as escaped HTML lines."""
+    rendered = ["<table>", "<thead>", "<tr>"]
+    rendered.extend(f"<th>{html.escape(header)}</th>" for header in block.headers)
+    rendered.extend(["</tr>", "</thead>", "<tbody>"])
+    for row in block.rows:
+        rendered.append("<tr>")
+        rendered.extend(f"<td>{html.escape(cell)}</td>" for cell in row)
+        rendered.append("</tr>")
+    rendered.extend(["</tbody>", "</table>"])
+    return rendered
+
+
+def _render_report_details_html(block: ReportDetails) -> list[str]:
+    """Render an expandable details block as escaped HTML lines."""
+    rendered = ["<details>", f"<summary>{html.escape(block.summary)}</summary>"]
+    for child in block.blocks:
+        rendered.extend(_render_report_html_block(child))
+    rendered.append("</details>")
+    return rendered
+
+
 def _render_report_html_block(block: object) -> list[str]:
     """Render one shared report block to escaped HTML lines."""
     rendered: list[str]
     if isinstance(block, ReportSection):
-        level = max(1, min(6, block.level))
-        rendered = [f"<h{level}>{html.escape(block.title)}</h{level}>"]
-        for child in block.blocks:
-            rendered.extend(_render_report_html_block(child))
+        rendered = _render_report_section_html(block)
     elif isinstance(block, ReportParagraph):
         rendered = [f"<p>{html.escape(block.text)}</p>"]
     elif isinstance(block, ReportKeyValues):
-        rendered = ["<ul>"]
-        for label, value in block.rows:
-            rendered.append(
-                f"<li><b>{html.escape(label)}:</b> {html.escape(value)}</li>",
-            )
-        rendered.append("</ul>")
+        rendered = _render_report_key_values_html(block)
     elif isinstance(block, ReportBulletList):
-        tag = "ol" if block.ordered else "ul"
-        rendered = [f"<{tag}>"]
-        rendered.extend(f"<li>{html.escape(item)}</li>" for item in block.items)
-        rendered.append(f"</{tag}>")
+        rendered = _render_report_bullet_list_html(block)
     elif isinstance(block, ReportTable):
-        rendered = ["<table>", "<thead>", "<tr>"]
-        rendered.extend(f"<th>{html.escape(header)}</th>" for header in block.headers)
-        rendered.extend(["</tr>", "</thead>", "<tbody>"])
-        for row in block.rows:
-            rendered.append("<tr>")
-            rendered.extend(f"<td>{html.escape(cell)}</td>" for cell in row)
-            rendered.append("</tr>")
-        rendered.extend(["</tbody>", "</table>"])
+        rendered = _render_report_table_html(block)
     elif isinstance(block, ReportCodeBlock):
         class_attr = f' class="language-{html.escape(block.language, quote=True)}"'
         rendered = [f"<pre><code{class_attr}>{html.escape(block.content)}</code></pre>"]
     elif isinstance(block, ReportDetails):
-        rendered = ["<details>", f"<summary>{html.escape(block.summary)}</summary>"]
-        for child in block.blocks:
-            rendered.extend(_render_report_html_block(child))
-        rendered.append("</details>")
+        rendered = _render_report_details_html(block)
     elif isinstance(block, ReportRaw):
         rendered = list(block.html_lines)
     else:
         raise UnsupportedReportBlockError(block)
-
     return rendered
 
 
@@ -7457,6 +7520,70 @@ def _process_exif_subifd(exif_raw: SupportsExifIfd) -> ExifDict:
     return out
 
 
+def _validate_image_url_scheme(image_str: str) -> bool:
+    """Return whether an image path is an HTTP(S) URL, rejecting unsupported schemes."""
+    parsed_url = urlparse(image_str)
+    if not parsed_url.scheme:
+        return False
+    scheme = parsed_url.scheme.lower()
+    if scheme not in {"http", "https"}:
+        msg = f"Unsupported URL scheme for image: {parsed_url.scheme}"
+        raise ValueError(msg)
+    return True
+
+
+def _open_image_for_exif(image_path: PathLike, image_str: str, *, is_url: bool) -> Any:
+    """Open an image for EXIF extraction from a local path or HTTP(S) URL."""
+    if not is_url:
+        return Image.open(Path(image_path))
+
+    logger.debug("Downloading image from URL for EXIF extraction: %s", image_str)
+    with urlopen(  # noqa: S310 - scheme is restricted to http/https by caller
+        image_str,
+        timeout=30,
+    ) as response:
+        img_data = io.BytesIO(response.read())
+    return Image.open(img_data)
+
+
+def _decode_gps_tag_key(gps_tag_id: object) -> str:
+    """Return a readable GPS tag key for EXIF GPS IFD entries."""
+    if isinstance(gps_tag_id, int):
+        tag_id_int = gps_tag_id
+    elif isinstance(gps_tag_id, str):
+        try:
+            tag_id_int = int(gps_tag_id)
+        except ValueError:
+            return gps_tag_id
+    else:
+        return str(gps_tag_id)
+
+    gps_key = GPSTAGS.get(tag_id_int, str(gps_tag_id))
+    if GPS is None:
+        return gps_key
+    try:
+        return GPS(tag_id_int).name
+    except ValueError:
+        return gps_key
+
+
+def _decode_gps_ifd(gps_ifd: Mapping[object, ExifValue] | None) -> GPSDict | None:
+    """Decode a GPS IFD mapping into readable GPS tag names."""
+    if not isinstance(gps_ifd, dict) or not gps_ifd:
+        return None
+    return {_decode_gps_tag_key(gps_tag_id): gps_value for gps_tag_id, gps_value in gps_ifd.items()}
+
+
+def _process_gps_ifd(exif_raw: SupportsExifIfd) -> GPSDict | None:
+    """Extract and decode GPS IFD data, tolerating corrupt sub-IFDs."""
+    try:
+        gps_ifd = exif_raw.get_ifd(ExifTags.IFD.GPSInfo)
+    except (KeyError, AttributeError, TypeError) as gps_err:
+        logger.warning("Could not extract GPS IFD: %s", gps_err)
+        return None
+    return _decode_gps_ifd(gps_ifd)
+
+
 def get_exif_data(image_path: PathLike) -> ExifDict | None:
     """Return decoded EXIF structure or ``None`` if absent.
 
@@ -7477,31 +7604,9 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
     segments; failing soft ensures we still display whatever remains.
     """
     image_str = str(image_path)
-
-    # Check if input is a URL (http/https only)
-    parsed_url = urlparse(image_str)
-    if parsed_url.scheme:
-        scheme = parsed_url.scheme.lower()
-        if scheme not in {"http", "https"}:
-            msg = f"Unsupported URL scheme for image: {parsed_url.scheme}"
-            raise ValueError(msg)
-        is_url = True
-    else:
-        is_url = False
+    is_url = _validate_image_url_scheme(image_str)
     try:
-        if is_url:
-            # Download URL into memory and open with PIL
-            logger.debug("Downloading image from URL for EXIF extraction: %s", image_str)
-            with urlopen(  # noqa: S310 - scheme is restricted to http/https above
-                image_str,
-                timeout=30,
-            ) as response:
-                img_data = io.BytesIO(response.read())
-            img = Image.open(img_data)
-        else:
-            # Local file path
-            img = Image.open(Path(image_path))
-
+        img = _open_image_for_exif(image_path, image_str, is_url=is_url)
         with img:
             exif_raw: Any = img.getexif()
             if not exif_raw:
@@ -7520,34 +7625,9 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
             exif_decoded.update(_process_exif_subifd(cast("SupportsExifIfd", exif_raw)))
 
             # Pass 3: GPS IFD
-            try:
-                gps_ifd: Mapping[object, ExifValue] | None = cast(
-                    "SupportsExifIfd",
-                    exif_raw,
-                ).get_ifd(ExifTags.IFD.GPSInfo)
-                if isinstance(gps_ifd, dict) and gps_ifd:
-                    gps_decoded: GPSDict = {}
-                    for gps_tag_id, gps_value in gps_ifd.items():
-                        tag_id_int = (
-                            gps_tag_id
-                            if isinstance(gps_tag_id, int)
-                            else int(gps_tag_id)
-                            if isinstance(gps_tag_id, str)
-                            else None
-                        )
-                        if tag_id_int is None:
-                            gps_key = str(gps_tag_id)
-                        else:
-                            gps_key = GPSTAGS.get(tag_id_int, str(gps_tag_id))
-                            if GPS is not None:
-                                try:
-                                    gps_key = GPS(tag_id_int).name
-                                except ValueError:
-                                    gps_key = GPSTAGS.get(tag_id_int, str(gps_tag_id))
-                        gps_decoded[gps_key] = gps_value
-                    exif_decoded["GPSInfo"] = gps_decoded
-            except (KeyError, AttributeError, TypeError) as gps_err:
-                logger.warning("Could not extract GPS IFD: %s", gps_err)
+            gps_decoded = _process_gps_ifd(cast("SupportsExifIfd", exif_raw))
+            if gps_decoded:
+                exif_decoded["GPSInfo"] = gps_decoded
 
             return exif_decoded
     except (FileNotFoundError, UnidentifiedImageError):
@@ -7850,6 +7930,44 @@ def _extract_gps_str(gps_info_raw: object | None) -> str | None:
         return f"{lat_dd:.6f}°{lat_card}, {lon_dd:.6f}°{lon_card}"
 
 
+def _read_iptc_info(image_path: PathLike) -> Mapping[tuple[int, int], object] | None:
+    """Read raw IPTC/IIM metadata from an image, returning ``None`` on failure."""
+    try:
+        with Image.open(Path(image_path)) as img:
+            return cast("Mapping[tuple[int, int], object] | None", IptcImagePlugin.getiptcinfo(img))
+    except (OSError, ValueError, AttributeError):
+        logger.debug("Failed to extract IPTC metadata from %s", image_path)
+        return None
+
+
+def _decode_iptc_keywords(raw_keywords_value: object) -> list[str]:
+    """Decode IPTC keyword values into stripped strings."""
+    if isinstance(raw_keywords_value, (bytes, bytearray)):
+        raw_keywords = [bytes(raw_keywords_value)]
+    elif isinstance(raw_keywords_value, list):
+        raw_keywords = list(raw_keywords_value)
+    else:
+        raw_keywords = []
+
+    keywords: list[str] = []
+    for kw in raw_keywords:
+        decoded = kw.decode("utf-8", errors="replace") if isinstance(kw, bytes) else str(kw)
+        if decoded.strip():
+            keywords.append(decoded.strip())
+    return keywords
+
+
+def _decode_iptc_caption(caption_raw: object) -> str | None:
+    """Decode IPTC caption/abstract data into stripped text."""
+    if isinstance(caption_raw, (bytes, bytearray)):
+        caption_str = bytes(caption_raw).decode("utf-8", errors="replace").strip()
+    elif isinstance(caption_raw, str):
+        caption_str = caption_raw.strip()
+    else:
+        return None
+    return caption_str or None
+
+
 def _extract_iptc_metadata(image_path: PathLike) -> IPTCMetadata:
     """Extract IPTC/IIM metadata (keywords, caption) from an image.
 
@@ -7857,46 +7975,19 @@ def _extract_iptc_metadata(image_path: PathLike) -> IPTCMetadata:
         - (2, 25): Keywords (multi-valued)
         - (2, 120): Caption/Abstract
     """
-    try:
-        with Image.open(Path(image_path)) as img:
-            iptc: Mapping[tuple[int, int], object] | None = IptcImagePlugin.getiptcinfo(img)
-            if not iptc:
-                return {}
+    iptc = _read_iptc_info(image_path)
+    if not iptc:
+        return {}
 
-            result: IPTCMetadata = {}
+    result: IPTCMetadata = {}
+    keywords = _decode_iptc_keywords(iptc.get((2, 25), []))
+    if keywords:
+        result["iptc_keywords"] = keywords
 
-            # Keywords (2, 25) — may be a single bytes or a list of bytes
-            raw_keywords_value = iptc.get((2, 25), [])
-            raw_keywords: list[object]
-            if isinstance(raw_keywords_value, (bytes, bytearray)):
-                raw_keywords = [bytes(raw_keywords_value)]
-            elif isinstance(raw_keywords_value, list):
-                raw_keywords = list(raw_keywords_value)
-            else:
-                raw_keywords = []
-            keywords: list[str] = []
-            for kw in raw_keywords:
-                decoded = kw.decode("utf-8", errors="replace") if isinstance(kw, bytes) else str(kw)
-                if decoded.strip():
-                    keywords.append(decoded.strip())
-            if keywords:
-                result["iptc_keywords"] = keywords
-
-            # IPTC caption/abstract record
-            caption_raw = iptc.get((2, 120))
-            if isinstance(caption_raw, (bytes, bytearray)):
-                caption_str = bytes(caption_raw).decode("utf-8", errors="replace").strip()
-                if caption_str:
-                    result["iptc_caption"] = caption_str
-            elif isinstance(caption_raw, str):
-                caption_str = caption_raw.strip()
-                if caption_str:
-                    result["iptc_caption"] = caption_str
-
-            return result
-    except (OSError, ValueError, AttributeError):
-        logger.debug("Failed to extract IPTC metadata from %s", image_path)
-    return {}
+    caption = _decode_iptc_caption(iptc.get((2, 120)))
+    if caption:
+        result["iptc_caption"] = caption
+    return result
 
 
 def _is_str_object_mapping(value: object) -> TypeGuard[Mapping[str, object]]:
@@ -7958,6 +8049,46 @@ def _xmp_alt_text(container: Mapping[str, object] | object, rdf_ns: str) -> str 
     return text.strip() if isinstance(text, str) and text.strip() else None
 
 
+def _read_xmp_info(image_path: PathLike) -> Mapping[str, object] | None:
+    """Read raw XMP metadata from an image, returning ``None`` on failure."""
+    try:
+        with Image.open(Path(image_path)) as img:
+            if not hasattr(img, "getxmp"):
+                return None
+            return _as_str_object_mapping(img.getxmp())
+    except (OSError, ValueError, AttributeError, TypeError):
+        logger.debug("Failed to extract XMP metadata from %s", image_path)
+        return None
+
+
+def _xmp_description_block(
+    xmp: Mapping[str, object],
+    *,
+    rdf_ns: str,
+) -> Mapping[str, object] | None:
+    """Return the XMP RDF description block when present."""
+    return _nested_mapping_value(
+        _nested_mapping_value(_nested_mapping_value(xmp, "xmpmeta"), f"{rdf_ns}RDF"),
+        f"{rdf_ns}Description",
+    )
+
+
+def _xmp_keywords(desc_block: Mapping[str, object], *, rdf_ns: str, dc_ns: str) -> list[str]:
+    """Extract XMP dc:subject keywords from an RDF description block."""
+    subject_mapping = _as_str_object_mapping(desc_block.get(f"{dc_ns}subject", {}))
+    if subject_mapping is None:
+        return []
+    bag = _nested_mapping_value(subject_mapping, f"{rdf_ns}Bag")
+    if bag is None:
+        return []
+    items = bag.get(f"{rdf_ns}li", [])
+    if isinstance(items, str):
+        items = [items]
+    if not isinstance(items, list):
+        return []
+    return [str(keyword).strip() for keyword in items if str(keyword).strip()]
+
+
 def _extract_xmp_metadata(image_path: PathLike) -> XMPMetadata:
     """Extract XMP metadata (dc:subject keywords, dc:title, dc:description).
 
@@ -7971,55 +8102,29 @@ def _extract_xmp_metadata(image_path: PathLike) -> XMPMetadata:
 
     rdf_ns = "{http://www.w3.org/1999/02/22-rdf-syntax-ns#}"
     dc_ns = "{http://purl.org/dc/elements/1.1/}"
+    xmp = _read_xmp_info(image_path)
+    if not xmp:
+        return {}
 
-    try:
-        with Image.open(Path(image_path)) as img:
-            if not hasattr(img, "getxmp"):
-                return {}
-            xmp = _as_str_object_mapping(img.getxmp())
-            if not xmp:
-                return {}
+    desc_block = _xmp_description_block(xmp, rdf_ns=rdf_ns)
+    if desc_block is None:
+        return {}
 
-            result: XMPMetadata = {}
+    result: XMPMetadata = {}
+    keywords = _xmp_keywords(desc_block, rdf_ns=rdf_ns, dc_ns=dc_ns)
+    if keywords:
+        result["xmp_keywords"] = keywords
 
-            # Navigate: xmpmeta → RDF → Description
-            desc_block = _nested_mapping_value(
-                _nested_mapping_value(_nested_mapping_value(xmp, "xmpmeta"), f"{rdf_ns}RDF"),
-                f"{rdf_ns}Description",
-            )
-            if desc_block is None:
-                return {}
+    description = desc_block.get(f"{dc_ns}description", {})
+    desc_text = _xmp_alt_text(description, rdf_ns)
+    if desc_text:
+        result["xmp_description"] = desc_text
 
-            # dc:subject → keywords list
-            subject = desc_block.get(f"{dc_ns}subject", {})
-            subject_mapping = _as_str_object_mapping(subject)
-            if subject_mapping is not None:
-                bag = _nested_mapping_value(subject_mapping, f"{rdf_ns}Bag")
-                if bag is not None:
-                    items = bag.get(f"{rdf_ns}li", [])
-                    if isinstance(items, str):
-                        items = [items]
-                    if isinstance(items, list):
-                        kw_list = [str(k).strip() for k in items if str(k).strip()]
-                        if kw_list:
-                            result["xmp_keywords"] = kw_list
-
-            # XMP description (rdf:Alt language alternative)
-            description = desc_block.get(f"{dc_ns}description", {})
-            desc_text = _xmp_alt_text(description, rdf_ns)
-            if desc_text:
-                result["xmp_description"] = desc_text
-
-            # XMP title (rdf:Alt language alternative)
-            title = desc_block.get(f"{dc_ns}title", {})
-            title_text = _xmp_alt_text(title, rdf_ns)
-            if title_text:
-                result["xmp_title"] = title_text
-
-            return result
-    except (OSError, ValueError, AttributeError, TypeError):
-        logger.debug("Failed to extract XMP metadata from %s", image_path)
-    return {}
+    title = desc_block.get(f"{dc_ns}title", {})
+    title_text = _xmp_alt_text(title, rdf_ns)
+    if title_text:
+        result["xmp_title"] = title_text
+    return result
 
 
 def _extract_xp_keywords(exif_data: ExifDict) -> list[str]:
@@ -15649,6 +15754,24 @@ def get_system_info() -> tuple[str, str | None]:
     return arch, gpu_info
 
 
+def _run_macos_toolchain_command(command: Sequence[str], *, timeout: int = 2) -> str | None:
+    """Run a macOS toolchain probe and return stripped stdout on success."""
+    try:
+        result = subprocess.run(  # noqa: S603 - fixed macOS toolchain probes only
+            list(command),
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            check=False,
+        )
+    except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+        return None
+    if result.returncode != 0:
+        return None
+    output = result.stdout.strip()
+    return output or None
+
+
 def _get_macos_toolchain_info() -> dict[str, str]:
     """Get macOS developer toolchain info (Xcode, SDK, CLTools).
 
@@ -15660,69 +15783,35 @@ def _get_macos_toolchain_info() -> dict[str, str]:
         return info
 
     # Get SDK version (useful for Metal/framework compatibility)
-    try:
-        sdk_result = subprocess.run(
-            ["/usr/bin/xcrun", "--show-sdk-version"],
-            capture_output=True,
-            text=True,
-            timeout=2,
-            check=False,
-        )
-        if sdk_result.returncode == 0 and sdk_result.stdout.strip():
-            info["SDK Version"] = sdk_result.stdout.strip()
-    except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
-        pass
+    sdk_version = _run_macos_toolchain_command(["/usr/bin/xcrun", "--show-sdk-version"])
+    if sdk_version:
+        info["SDK Version"] = sdk_version
 
     # Get Xcode version (important for Metal shader compilation)
-    try:
-        xcode_result = subprocess.run(
-            ["/usr/bin/xcodebuild", "-version"],
-            capture_output=True,
-            text=True,
-            timeout=2,
-            check=False,
-        )
-        if xcode_result.returncode == 0 and xcode_result.stdout.strip():
-            # Output format: "Xcode 15.4\nBuild version 15F31d"
-            lines = xcode_result.stdout.strip().split("\n")
-            if lines:
-                info["Xcode Version"] = lines[0].replace("Xcode ", "").strip()
-                if len(lines) > 1 and "Build version" in lines[1]:
-                    info["Xcode Build"] = lines[1].replace("Build version ", "").strip()
-    except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
-        pass
+    xcode_output = _run_macos_toolchain_command(["/usr/bin/xcodebuild", "-version"])
+    if xcode_output:
+        # Output format: "Xcode 15.4\nBuild version 15F31d"
+        lines = xcode_output.split("\n")
+        if lines:
+            info["Xcode Version"] = lines[0].replace("Xcode ", "").strip()
+            if len(lines) > 1 and "Build version" in lines[1]:
+                info["Xcode Build"] = lines[1].replace("Build version ", "").strip()
 
     # Get Metal SDK path (useful for debugging Metal issues)
-    try:
-        sdk_path_result = subprocess.run(
-            ["/usr/bin/xcrun", "--show-sdk-path"],
-            capture_output=True,
-            text=True,
-            timeout=2,
-            check=False,
-        )
-        if sdk_path_result.returncode == 0 and sdk_path_result.stdout.strip():
-            info["Metal SDK"] = Path(sdk_path_result.stdout.strip()).name
-    except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
-        pass
+    sdk_path = _run_macos_toolchain_command(["/usr/bin/xcrun", "--show-sdk-path"])
+    if sdk_path:
+        info["Metal SDK"] = Path(sdk_path).name
 
     # Get Command Line Tools version if Xcode not available
     if "Xcode Version" not in info:
-        try:
-            clt_result = subprocess.run(
-                ["/usr/bin/pkgutil", "--pkg-info", "com.apple.pkg.CLTools_Executables"],
-                capture_output=True,
-                text=True,
-                timeout=2,
-                check=False,
-            )
-            if clt_result.returncode == 0:
-                for line in clt_result.stdout.split("\n"):
-                    if line.startswith("version:"):
-                        info["CLTools Version"] = line.split(":", 1)[1].strip()
-                        break
-        except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
-            pass
+        clt_output = _run_macos_toolchain_command(
+            ["/usr/bin/pkgutil", "--pkg-info", "com.apple.pkg.CLTools_Executables"],
+        )
+        if clt_output:
+            for line in clt_output.split("\n"):
+                if line.startswith("version:"):
+                    info["CLTools Version"] = line.split(":", 1)[1].strip()
+                    break
 
     return info
 
@@ -20864,6 +20953,21 @@ def _history_path_for_jsonl(jsonl_path: Path) -> Path:
     return jsonl_path.with_name(f"{jsonl_path.stem}.history.jsonl")
 
 
+def _decode_history_run_record_line(line: str, *, source: str) -> HistoryRunRecord | None:
+    """Decode one append-only history JSONL line, skipping non-run entries."""
+    text = line.strip()
+    if not text:
+        return None
+    try:
+        record = json.loads(text)
+    except json.JSONDecodeError as err:
+        logger.debug("Skipping malformed history record in %s: %s", source, err)
+        return None
+    if isinstance(record, dict) and record.get("_type") == "run":
+        return cast("HistoryRunRecord", record)
+    return None
+
+
 def _load_latest_history_record(history_path: Path) -> HistoryRunRecord | None:
     """Load the most recent history record from an append-only JSONL file."""
     if not history_path.exists():
@@ -20876,15 +20980,9 @@ def _load_latest_history_record(history_path: Path) -> HistoryRunRecord | None:
         return None
 
     for line in reversed(lines):
-        record_line = line.strip()
-        if not record_line:
-            continue
-        try:
-            record = json.loads(record_line)
-        except json.JSONDecodeError:
-            continue
-        if isinstance(record, dict) and record.get("_type") == "run":
-            return cast("HistoryRunRecord", record)
+        record = _decode_history_run_record_line(line, source=str(history_path))
+        if record is not None:
+            return record
     return None
 
 
@@ -20905,15 +21003,9 @@ def _load_history_run_records(
 
     records: list[HistoryRunRecord] = []
     for line in lines[-max_records:]:
-        text = line.strip()
-        if not text:
-            continue
-        try:
-            record = json.loads(text)
-        except json.JSONDecodeError:
-            continue
-        if isinstance(record, dict) and record.get("_type") == "run":
-            records.append(cast("HistoryRunRecord", record))
+        record = _decode_history_run_record_line(line, source=str(history_path))
+        if record is not None:
+            records.append(record)
     return records
 
 

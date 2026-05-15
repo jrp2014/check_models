@@ -3255,6 +3255,15 @@ class TestEmptyRecommendedBucketExplanation:
 class TestSharedReportSections:
     """Tests for shared Markdown/HTML report section primitives."""
 
+    def test_markdown_block_helper_matches_public_renderer(self) -> None:
+        """Private block renderer should preserve public Markdown output."""
+        block = check_models.ReportParagraph("Observed <tag> & value")
+        block_lines = check_models._render_report_markdown_block(block)
+        while block_lines and block_lines[-1] == "":
+            block_lines.pop()
+
+        assert block_lines == check_models.render_report_markdown((block,))
+
     def test_report_section_renders_markdown_and_html_from_same_model(self) -> None:
         """A shared section model should render escaped Markdown and HTML variants."""
         section = check_models.ReportSection(

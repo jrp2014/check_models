@@ -75,6 +75,13 @@ def test_process_exif_subifd_handles_non_int_tag_ids() -> None:
     assert result["custom"] == "value"
 
 
+def test_decode_gps_tag_key_handles_int_string_and_unknown_values() -> None:
+    """GPS tag keys should decode known ids and preserve unknown identifiers."""
+    assert check_models._decode_gps_tag_key(1) == "GPSLatitudeRef"
+    assert check_models._decode_gps_tag_key("2") == "GPSLatitude"
+    assert check_models._decode_gps_tag_key(999999) == "999999"
+
+
 def test_get_exif_data_downloads_http_image_with_urllib(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
