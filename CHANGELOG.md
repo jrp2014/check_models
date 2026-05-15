@@ -7,6 +7,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Remove resolved one-off planning docs from `docs/notes/` and
+  `docs/superpowers/`, keeping the in-tree docs set focused on current
+  contributor guidance and active reference notes.
 - Refactor targeted Skylos warning hotspots in report rendering, image metadata
   extraction, macOS toolchain probing, history JSONL parsing, and stub patching
   without changing public output contracts.
