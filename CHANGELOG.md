@@ -7,6 +7,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Stop tracking generated suppression-audit snapshots, ignore future
+  `*.suppression-audit.*` artifacts, and avoid a test-only `S106` false
+  positive in quality-analysis coverage.
 - Reduce Skylos scan noise by excluding generated suppression-audit snapshots,
   and flatten two report/history log helpers into smaller private builders
   without changing output contracts.

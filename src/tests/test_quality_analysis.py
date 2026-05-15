@@ -867,10 +867,11 @@ def test_format_quality_analysis_for_log_preserves_detail_order() -> None:
         fabrication_issues=[],
         word_count=307,
     )
+    repeat_marker = "loop"
     analysis = dataclasses.replace(
         analysis,
         is_repetitive=True,
-        repeated_token="loop",
+        repeated_token=repeat_marker,
         hallucination_issues=["table"],
         is_verbose=True,
         formatting_issues=["HTML tag leak"],

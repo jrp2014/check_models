@@ -54,3 +54,6 @@ typings/
 
 # Backup files
 *.bak
+
+# Temporary suppression-audit snapshots
+*.suppression-audit.*
