@@ -4,6 +4,7 @@
 exclude:
   - output
   - package-lock.json
+  - src/check_models.suppression-audit*.py
 
 gate:
   fail_on_critical: true

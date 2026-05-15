@@ -15827,7 +15827,7 @@ def collect_runtime_fingerprint() -> dict[str, RuntimeProbeResult]:
             probes["mlx_vlm"] = RuntimeProbeResult(
                 status="unavailable", detail=MISSING_DEPENDENCIES.get("mlx-vlm", "not imported")
             )
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         probes["mlx_vlm"] = RuntimeProbeResult(status="errored", detail=str(exc)[:120])
 
     # GPU memory query
@@ -19381,141 +19381,91 @@ def process_models(
     return results
 
 
-def _format_quality_log_flag(
-    label: str,
-    enabled: bool,
-    *,
-    detail: str | None = None,
-) -> str | None:
-    """Return a compact log flag when a quality condition is active."""
-    if not enabled:
-        return None
-    if detail is None:
-        return f"{label}=True"
-    return f"{label}=True ({detail})"
-
-
-def _format_quality_log_metric(
-    label: str,
-    value: int | None,
-) -> str | None:
-    """Return a compact integer metric for quality-analysis logging."""
-    if value is None:
-        return None
-    return f"{label}={value}"
-
-
-def _format_quality_log_ratio(
-    label: str,
-    value: float | None,
-    *,
-    digits: int,
-) -> str | None:
-    """Return a compact float metric for quality-analysis logging."""
-    if value is None:
-        return None
-    return f"{label}={value:.{digits}f}"
-
-
-def _format_repetitive_quality_log_part(analysis: GenerationQualityAnalysis) -> str | None:
-    """Return the repetitive-output log segment when present."""
-    return _format_quality_log_flag(
-        "repetitive",
-        analysis.is_repetitive,
-        detail=(f"token={analysis.repeated_token}" if analysis.repeated_token else None),
-    )
-
-
-def _format_refusal_quality_log_part(analysis: GenerationQualityAnalysis) -> str | None:
-    """Return the refusal log segment when present."""
-    return _format_quality_log_flag(
-        "refusal",
-        analysis.is_refusal,
-        detail=(f"type={analysis.refusal_type}" if analysis.refusal_type else None),
-    )
-
-
-def _format_harness_quality_log_part(analysis: GenerationQualityAnalysis) -> str | None:
-    """Return the harness-issue log segment when present."""
-    harness_details = ",".join(analysis.harness_issue_details[:2])
-    return _format_quality_log_flag(
-        "harness",
-        analysis.has_harness_issue,
-        detail=f"{analysis.harness_issue_type}; {harness_details}",
-    )
-
-
 def _format_quality_analysis_for_log(analysis: GenerationQualityAnalysis) -> str:
     """Serialize quality-analysis flags into a compact log string.
 
     Includes only active flags plus lightweight counters to keep diagnostics
     readable in one line.
     """
+    repetitive_part = (
+        f"repetitive=True (token={analysis.repeated_token})"
+        if analysis.is_repetitive and analysis.repeated_token
+        else ("repetitive=True" if analysis.is_repetitive else None)
+    )
+    refusal_part = (
+        f"refusal=True (type={analysis.refusal_type})"
+        if analysis.is_refusal and analysis.refusal_type
+        else ("refusal=True" if analysis.is_refusal else None)
+    )
+    harness_details = (
+        ",".join(analysis.harness_issue_details[:2]) if analysis.harness_issue_details else ""
+    )
+    harness_part = (
+        f"harness=True ({analysis.harness_issue_type}; {harness_details})"
+        if analysis.has_harness_issue
+        else None
+    )
     reasoning_marker = (
         analysis.reasoning_leak_markers[0] if analysis.reasoning_leak_markers else "marker"
     )
-    parts_raw: tuple[str | None, ...] = (
-        _format_repetitive_quality_log_part(analysis),
-        _format_refusal_quality_log_part(analysis),
-        _format_quality_log_flag("language_mixing", analysis.has_language_mixing),
-        _format_quality_log_flag("hallucination", bool(analysis.hallucination_issues)),
-        _format_quality_log_flag(
-            "generic",
-            analysis.is_generic,
-            detail=f"score={analysis.specificity_score:.1f}",
+
+    parts_raw: list[str | None] = [
+        repetitive_part,
+        refusal_part,
+        "language_mixing=True" if analysis.has_language_mixing else None,
+        "hallucination=True" if analysis.hallucination_issues else None,
+        (f"generic=True (score={analysis.specificity_score:.1f})" if analysis.is_generic else None),
+        "verbose=True" if analysis.is_verbose else None,
+        "formatting_issues=True" if analysis.formatting_issues else None,
+        (
+            f"excessive_bullets=True (count={analysis.bullet_count})"
+            if analysis.has_excessive_bullets
+            else None
         ),
-        _format_quality_log_flag("verbose", analysis.is_verbose),
-        _format_quality_log_flag("formatting_issues", bool(analysis.formatting_issues)),
-        _format_quality_log_flag(
-            "excessive_bullets",
-            analysis.has_excessive_bullets,
-            detail=f"count={analysis.bullet_count}",
+        "context_ignored=True" if analysis.is_context_ignored else None,
+        (
+            f"degeneration=True ({analysis.degeneration_type})"
+            if analysis.has_degeneration
+            else None
         ),
-        _format_quality_log_flag("context_ignored", analysis.is_context_ignored),
-        _format_quality_log_flag(
-            "degeneration",
-            analysis.has_degeneration,
-            detail=str(analysis.degeneration_type),
-        ),
-        _format_quality_log_flag("fabrication", analysis.has_fabrication),
+        "fabrication=True" if analysis.has_fabrication else None,
         (
             f"missing_sections={'+'.join(analysis.missing_sections)}"
             if analysis.missing_sections
             else None
         ),
-        _format_quality_log_metric("title_words", analysis.title_word_count),
-        _format_quality_log_metric(
-            "description_sentences",
-            analysis.description_sentence_count,
+        (
+            f"title_words={analysis.title_word_count}"
+            if analysis.title_word_count is not None
+            else None
         ),
-        _format_quality_log_metric("keywords", analysis.keyword_count),
-        _format_quality_log_ratio(
-            "keyword_dup",
-            analysis.keyword_duplication_ratio,
-            digits=2,
+        (
+            f"description_sentences={analysis.description_sentence_count}"
+            if analysis.description_sentence_count is not None
+            else None
         ),
-        _format_quality_log_flag(
-            "reasoning_leak",
-            analysis.has_reasoning_leak,
-            detail=reasoning_marker,
+        f"keywords={analysis.keyword_count}" if analysis.keyword_count is not None else None,
+        (
+            f"keyword_dup={analysis.keyword_duplication_ratio:.2f}"
+            if analysis.keyword_duplication_ratio is not None
+            else None
         ),
-        _format_quality_log_flag(
-            "context_echo",
-            analysis.has_context_echo,
-            detail=f"{analysis.context_echo_ratio:.2f}",
-        ),
-        _format_quality_log_flag("instruction_echo", analysis.instruction_echo),
-        _format_quality_log_flag("metadata_borrowing", analysis.metadata_borrowing),
+        f"reasoning_leak=True ({reasoning_marker})" if analysis.has_reasoning_leak else None,
+        f"context_echo=True ({analysis.context_echo_ratio:.2f})"
+        if analysis.has_context_echo
+        else None,
+        "instruction_echo=True" if analysis.instruction_echo else None,
+        "metadata_borrowing=True" if analysis.metadata_borrowing else None,
         (
             f"hint_relationship={analysis.hint_relationship}"
             if analysis.hint_relationship != "preserves_trusted_hints"
             else None
         ),
         f"verdict={analysis.verdict}" if analysis.verdict != "clean" else None,
-        (f"user_bucket={analysis.user_bucket}" if analysis.user_bucket != "recommended" else None),
-        _format_quality_log_flag("likely_capped", analysis.likely_capped),
-        _format_harness_quality_log_part(analysis),
-    )
+        f"user_bucket={analysis.user_bucket}" if analysis.user_bucket != "recommended" else None,
+        "likely_capped=True" if analysis.likely_capped else None,
+        harness_part,
+    ]
     parts = [part for part in parts_raw if part is not None]
     parts.append(f"words={analysis.word_count}")
 
@@ -21590,38 +21540,6 @@ def _log_history_transition_chart(
     )
 
 
-def _history_transition_change_part(
-    prev_info: HistoryModelResultRecord,
-    curr_info: HistoryModelResultRecord,
-    *,
-    key: str,
-    label: str,
-) -> str | None:
-    """Return one transition detail part when a tracked history field changes."""
-    prev_value = prev_info.get(key)
-    curr_value = curr_info.get(key)
-    if prev_value == curr_value or not (prev_value or curr_value):
-        return None
-    return f"{label}={prev_value or '-'}->{curr_value or '-'}"
-
-
-def _history_transition_fallback_part(source: HistoryModelResultRecord) -> str | None:
-    """Return the fallback history detail when no field transitions are shown."""
-    harness_issue = source.get("harness_issue_type")
-    if harness_issue:
-        return f"harness={harness_issue}"
-
-    review_verdict = source.get("review_verdict")
-    if review_verdict:
-        return f"verdict={review_verdict}"
-
-    error_stage = source.get("error_stage")
-    if error_stage:
-        return str(error_stage)
-
-    return None
-
-
 def _history_transition_detail_text(
     prev_info: HistoryModelResultRecord | None,
     curr_info: HistoryModelResultRecord | None,
@@ -21633,26 +21551,36 @@ def _history_transition_detail_text(
 
     parts: list[str] = []
     if prev_info is not None and curr_info is not None:
-        tracked_fields: tuple[tuple[str, str], ...] = (
-            ("review_user_bucket", "bucket"),
-            ("review_verdict", "verdict"),
-            ("harness_issue_type", "harness"),
-            ("review_owner", "owner"),
-        )
-        for key, label in tracked_fields:
-            part = _history_transition_change_part(
-                prev_info,
-                curr_info,
-                key=key,
-                label=label,
-            )
-            if part is not None:
-                parts.append(part)
+        prev_bucket = prev_info.get("review_user_bucket")
+        curr_bucket = curr_info.get("review_user_bucket")
+        if prev_bucket != curr_bucket and (prev_bucket or curr_bucket):
+            parts.append(f"bucket={prev_bucket or '-'}->{curr_bucket or '-'}")
+
+        prev_verdict = prev_info.get("review_verdict")
+        curr_verdict = curr_info.get("review_verdict")
+        if prev_verdict != curr_verdict and (prev_verdict or curr_verdict):
+            parts.append(f"verdict={prev_verdict or '-'}->{curr_verdict or '-'}")
+
+        prev_harness = prev_info.get("harness_issue_type")
+        curr_harness = curr_info.get("harness_issue_type")
+        if prev_harness != curr_harness and (prev_harness or curr_harness):
+            parts.append(f"harness={prev_harness or '-'}->{curr_harness or '-'}")
+
+        prev_owner = prev_info.get("review_owner")
+        curr_owner = curr_info.get("review_owner")
+        if prev_owner != curr_owner and (prev_owner or curr_owner):
+            parts.append(f"owner={prev_owner or '-'}->{curr_owner or '-'}")
 
     if not parts:
-        fallback_part = _history_transition_fallback_part(source)
-        if fallback_part is not None:
-            parts.append(fallback_part)
+        harness_issue = source.get("harness_issue_type")
+        review_verdict = source.get("review_verdict")
+        error_stage = source.get("error_stage")
+        if harness_issue:
+            parts.append(f"harness={harness_issue}")
+        elif review_verdict:
+            parts.append(f"verdict={review_verdict}")
+        elif error_stage:
+            parts.append(error_stage)
 
     return " | ".join(parts[:2]) or "-"
 

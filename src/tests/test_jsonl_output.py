@@ -835,6 +835,42 @@ def test_compare_history_records_detects_quality_harness_and_owner_changes() -> 
     assert summary["owner_changes"] == ["model-a", "model-b"]
 
 
+def test_history_transition_detail_text_prefers_first_two_changed_fields() -> None:
+    """Detail text should keep stable field priority and truncate to two segments."""
+    previous = _history_run({"model-a": True})
+    current = _history_run({"model-a": True})
+
+    previous_model = _require_present(previous.get("model_results"), field_name="model_results")
+    current_model = _require_present(current.get("model_results"), field_name="model_results")
+    prev_info = previous_model["model-a"]
+    curr_info = current_model["model-a"]
+
+    prev_info["review_user_bucket"] = "recommended"
+    curr_info["review_user_bucket"] = "avoid"
+    prev_info["review_verdict"] = "clean"
+    curr_info["review_verdict"] = "context_budget"
+    prev_info["harness_issue_type"] = "encoding"
+    curr_info["harness_issue_type"] = "stop_token"
+    prev_info["review_owner"] = "model"
+    curr_info["review_owner"] = "mlx-vlm"
+
+    assert check_models._history_transition_detail_text(prev_info, curr_info) == (
+        "bucket=recommended->avoid | verdict=clean->context_budget"
+    )
+
+
+def test_history_transition_detail_text_uses_harness_fallback_before_verdict() -> None:
+    """Fallback detail text should prefer harness, then verdict, then error stage."""
+    current = _history_run({"model-a": False})
+    current_model = _require_present(current.get("model_results"), field_name="model_results")
+    curr_info = current_model["model-a"]
+    curr_info["review_verdict"] = "runtime_failure"
+    curr_info["harness_issue_type"] = "stop_token"
+    curr_info["error_stage"] = "decode"
+
+    assert check_models._history_transition_detail_text(None, curr_info) == "harness=stop_token"
+
+
 # ---------------------------------------------------------------------------
 # _history_path_for_jsonl
 # ---------------------------------------------------------------------------

@@ -1,26 +1,27 @@
-# \[mlx\]\[MLX: Model load / model error\] Weight/config mismatch during model load affecting 1 model(s)
+# \[mlx-vlm\]\[Stop-token leakage\] Stop/control tokens leaked into generated text affecting 1 model(s)
 
 ## Summary
 
-1 model(s) show **MLX: Model load / model error** that should be filed against mlx.
+1 model(s) show **Stop-token leakage** that should be filed against mlx-vlm.
 
-- **Observed problem:** Weight/config mismatch during model load
-- **Target:** mlx
+- **Observed problem:** Stop/control tokens leaked into generated text
+- **Target:** mlx-vlm
 - **Affected models:** 1
-- **Fixed when:** Load/generation completes or fails with a narrower owner.
+- **Fixed when:** No leaked stop/control tokens.
 
 
 ## Affected Models
 
-| Model                                     | Observed Behavior                                                                                                                                                                               | Token Counts   | Optional Context                                                                                                                                                                                |
-|-------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | Received 4 parameters not in model: multi_modal_projector.linear_1.biases, multi_modal_projector.linear_1.scales, multi_modal_projector.linear_2.biases, multi_modal_projector.linear_2.scales. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_004_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json) |
+| Model                              | Observed Behavior                                                                                   | Token Counts                                                                                         | Optional Context                                                                                                                                                              |
+|------------------------------------|-----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/X-Reasoner-7B-8bit` | decoded text contains control token &lt;\|endoftext\|&gt; \| prompt_tokens=16851, repetitive output | prompt=16,851 \| output/prompt=2.97% \| nontext burden=97% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_014_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_stop_token_001.json) |
 
 
 ## Minimal Evidence
 
-- `mlx-community/Kimi-VL-A3B-Thinking-8bit` fails with: Model loading failed: Received 4 parameters not in model: multi_modal_projector.linear_1.biases, multi_modal_projector.linear_1.scales, multi_modal_projector.linear_2.biases, multi_modal_projector.linear_2.scales.
-- Root exception: `builtins.ValueError`: Received 4 parameters not in model: <br>multi_modal_projector.linear_1.biases,<br>multi_modal_projector.linear_1.scales,<br>multi_modal_projector.linear_2.biases,<br>multi_modal_projector.l...
+- `mlx-community/X-Reasoner-7B-8bit`: Special control token &lt;\|endoftext\|&gt; appeared in generated text.
+- `mlx-community/X-Reasoner-7B-8bit`: At long prompt length (16851 tokens), output became repetitive.
+- Output excerpt: `<\|endoftext\|>1.<\|endoftext\|>1 2.<\|endoftext\|>The 2008: 2.<\|endoftext\|>The 2.<\|endoftext\|>The 1.<\|endoftext\|>The 2.<\|endoftext\|>The 1.<\|endoftext\|>The 2.<\|endoftext\|>1. The 1.<\|endoftext\|>The 1. The 2.<\|endoftext\|>The 2.<\|endoftext\|>The 1.<\|endoftext\|>The 197<\|endoftext\|>1<\|endoftext\|>The 1.<\|endoftext\|>The 1.<\|endof...`
 
 
 ## Minimal Reproduction
@@ -30,7 +31,7 @@ These commands use `mlx-vlm` directly so the issue can be reproduced without ins
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/Kimi-VL-A3B-Thinking-8bit --image /Users/jrp/Pictures/Processed/20260509-165442_DSC09962_DxO.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
+python -m mlx_vlm.generate --model mlx-community/X-Reasoner-7B-8bit --image /Users/jrp/Pictures/Processed/20260509-165442_DSC09962_DxO.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
 
 Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.
 
@@ -72,7 +73,7 @@ Minimal Python repro (representative model):
 from mlx_vlm.generate import generate
 from mlx_vlm.utils import load
 
-MODEL = 'mlx-community/Kimi-VL-A3B-Thinking-8bit'
+MODEL = 'mlx-community/X-Reasoner-7B-8bit'
 IMAGE = '/Users/jrp/Pictures/Processed/20260509-165442_DSC09962_DxO.jpg'
 PROMPT = "Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.\n- Output only the description text after the label.\n\nKeywords:\n- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.\n- Output only the keyword list after the label.\n\nRules:\n- Include only details that are definitely visible in the image.\n- Reuse metadata terms only when they are clearly supported by the image.\n- If metadata and image disagree, follow the image.\n- Prefer omission to speculation.\n- Do not copy prompt instructions into the Title, Description, or Keywords fields.\n- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.\n- Do not output reasoning, notes, hedging, or extra sections.\n\nContext: Existing metadata hints (high confidence; use only when visually confirmed):\n- Description hint: The tall spire of St John the Evangelist's Church in Upper St Leonards, Dorking, England, rises against a blue sky with wispy clouds on a sunny day. The Gothic Revival church is surrounded by a tranquil green churchyard with mature trees, and a bird is captured in flight near the steeple.\n- Keyword hints: Architecture, Bench, Bird, Building, Bush, Church, Churchyard, Clock tower, Clouds, Dorking, England, Europe, Flying, Gothic, Gothic Revival, Gothic Revival architecture, Grass, Landscape, Lawn, Outdoors\n- Capture metadata: Taken on 2026-05-09 17:54:42 BST (at 17:54:42 local time). GPS: 51.413600°N, 0.081900°W."
 LOAD_KWARGS = {'trust_remote_code': True}
@@ -134,28 +135,28 @@ Generation/load config:
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "mlx-community/Kimi-VL-A3B-Thinking-8bit"
+  "model": "mlx-community/X-Reasoner-7B-8bit"
 }
 ```
 
 Optional advanced context:
 
-- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_004_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)
+- `mlx-community/X-Reasoner-7B-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_014_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_stop_token_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
 ## Expected Fix Signal
 
-- [ ] Affected reruns complete model load and generation, or fail with a narrower configuration/compatibility error that points to the owning layer.
+- [ ] Affected reruns contain no leaked stop/control tokens and terminate cleanly before the configured max-token cap when the response is complete.
 - [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem.
 
 
 ## Fix Checklist
 
-- [ ] Compare checkpoint keys with the selected model class and model config.
-- [ ] Inspect missing/unexpected projector, scale, bias, and quantized-weight parameter names.
-- [ ] Verify the model repo revision matches the mlx-vlm/mlx loader expectations.
-- [ ] Reproduce after upgrading/downgrading mlx-vlm and mlx to isolate version compatibility.
+- [ ] Inspect model EOS token IDs and tokenizer special-token mappings.
+- [ ] Verify mlx-vlm stop criteria receive all configured EOS/stop tokens.
+- [ ] Check `skip_special_tokens` handling during decode.
+- [ ] Strip generated control tokens such as `<|end|>` and `</think>` only after confirming generation stopped at the right boundary.
 
 
 ## Appendix: Environment
@@ -180,36 +181,20 @@ Optional advanced context:
 
 ## Appendix: Detailed Evidence
 
-### `mlx-community/Kimi-VL-A3B-Thinking-8bit`
+### `mlx-community/X-Reasoner-7B-8bit`
 
-Observed error:
+Observed signals:
 
-```text
-Model loading failed: Received 4 parameters not in model: 
-multi_modal_projector.linear_1.biases,
-multi_modal_projector.linear_1.scales,
-multi_modal_projector.linear_2.biases,
-multi_modal_projector.linear_2.scales.
-```
+- Special control token &lt;\|endoftext\|&gt; appeared in generated text.
+- At long prompt length (16851 tokens), output became repetitive.
+- Model output may not follow prompt or image contents (missing: Architecture, Bench, Bird, Building, Bush).
+- Output became repetitive, indicating possible generation instability (token: phrase: "1.<\|endoftext\|>the 1.<\|endofte...").
+- Output switched language/script unexpectedly (tokenizer_artifact).
+- Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
-Root exception:
-
-```text
-builtins.ValueError: Received 4 parameters not in model: 
-multi_modal_projector.linear_1.biases,
-multi_modal_projector.linear_1.scales,
-multi_modal_projector.linear_2.biases,
-multi_modal_projector.linear_2.scales.
-```
-
-Traceback tail:
+Sample output:
 
 ```text
-Traceback (most recent call last):
-ValueError: Model loading failed: Received 4 parameters not in model: 
-multi_modal_projector.linear_1.biases,
-multi_modal_projector.linear_1.scales,
-multi_modal_projector.linear_2.biases,
-multi_modal_projector.linear_2.scales.
+<|endoftext|>1.<|endoftext|>1 2.<|endoftext|>The 2008: 2.<|endoftext|>The 2.<|endoftext|>The 1.<|endoftext|>The 2.<|endoftext|>The 1.<|endoftext|>The 2.<|endoftext|>1. The 1.<|endoftext|>The 1. The...
 ```
 

@@ -843,6 +843,110 @@ def test_generation_quality_issues_property_handles_missing_keyword_dup_ratio() 
     assert any("HARNESS" in issue for issue in issues)
 
 
+def test_format_quality_analysis_for_log_preserves_detail_order() -> None:
+    """Compact log output should preserve the established field ordering."""
+    analysis = check_models.GenerationQualityAnalysis(
+        is_repetitive=False,
+        repeated_token=None,
+        hallucination_issues=[],
+        is_verbose=False,
+        formatting_issues=[],
+        has_excessive_bullets=False,
+        bullet_count=0,
+        is_context_ignored=False,
+        missing_context_terms=[],
+        is_refusal=False,
+        refusal_type=None,
+        is_generic=False,
+        specificity_score=0.0,
+        has_language_mixing=False,
+        language_mixing_issues=[],
+        has_degeneration=False,
+        degeneration_type=None,
+        has_fabrication=False,
+        fabrication_issues=[],
+        word_count=307,
+    )
+    analysis = dataclasses.replace(
+        analysis,
+        is_repetitive=True,
+        repeated_token="loop",
+        hallucination_issues=["table"],
+        is_verbose=True,
+        formatting_issues=["HTML tag leak"],
+        has_excessive_bullets=True,
+        bullet_count=7,
+        is_context_ignored=True,
+        is_refusal=True,
+        refusal_type="safety",
+        is_generic=True,
+        specificity_score=0.3,
+        has_language_mixing=True,
+        has_degeneration=True,
+        degeneration_type="encoding",
+        has_fabrication=True,
+        missing_sections=["title", "keywords"],
+        title_word_count=4,
+        description_sentence_count=3,
+        keyword_count=22,
+        keyword_duplication_ratio=0.57,
+        has_reasoning_leak=True,
+        reasoning_leak_markers=["<think>"],
+        has_context_echo=True,
+        context_echo_ratio=0.91,
+        has_harness_issue=True,
+        harness_issue_type="stop_token",
+        harness_issue_details=["token_leak:<|end|>", "token_leak:<|eot|>"],
+        instruction_echo=True,
+        metadata_borrowing=True,
+        hint_relationship="ignores_trusted_hints",
+        verdict="cutoff_degraded",
+        user_bucket="avoid",
+        likely_capped=True,
+    )
+
+    assert check_models._format_quality_analysis_for_log(analysis) == (
+        "repetitive=True (token=loop), refusal=True (type=safety), "
+        "language_mixing=True, hallucination=True, generic=True (score=0.3), "
+        "verbose=True, formatting_issues=True, excessive_bullets=True (count=7), "
+        "context_ignored=True, degeneration=True (encoding), fabrication=True, "
+        "missing_sections=title+keywords, title_words=4, description_sentences=3, "
+        "keywords=22, keyword_dup=0.57, reasoning_leak=True (<think>), "
+        "context_echo=True (0.91), instruction_echo=True, metadata_borrowing=True, "
+        "hint_relationship=ignores_trusted_hints, verdict=cutoff_degraded, "
+        "user_bucket=avoid, likely_capped=True, "
+        "harness=True (stop_token; token_leak:<|end|>,token_leak:<|eot|>), words=307"
+    )
+
+
+def test_format_quality_analysis_for_log_clean_analysis_still_includes_word_count() -> None:
+    """Clean analyses should still emit the lightweight word-count summary."""
+    analysis = check_models.GenerationQualityAnalysis(
+        is_repetitive=False,
+        repeated_token=None,
+        hallucination_issues=[],
+        is_verbose=False,
+        formatting_issues=[],
+        has_excessive_bullets=False,
+        bullet_count=0,
+        is_context_ignored=False,
+        missing_context_terms=[],
+        is_refusal=False,
+        refusal_type=None,
+        is_generic=False,
+        specificity_score=0.0,
+        has_language_mixing=False,
+        language_mixing_issues=[],
+        has_degeneration=False,
+        degeneration_type=None,
+        has_fabrication=False,
+        fabrication_issues=[],
+        word_count=12,
+    )
+
+    assert check_models._format_quality_analysis_for_log(analysis) == "words=12"
+
+
 class TestClassifyHintRelationship:
     """Tests for _classify_hint_relationship nonvisual-hint handling."""
 

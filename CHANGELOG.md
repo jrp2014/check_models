@@ -7,6 +7,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Reduce Skylos scan noise by excluding generated suppression-audit snapshots,
+  and flatten two report/history log helpers into smaller private builders
+  without changing output contracts.
 - Calibrate repo-root Skylos scans to ignore generated output and lockfile
   noise, document the quality-diagnostic backlog, and raise the Pillow floor to
   `>=12.2.0`.
