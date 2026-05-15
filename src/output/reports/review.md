@@ -1,6 +1,6 @@
 # Automated Review Digest
 
-_Generated on 2026-05-15 12:25:02 BST_
+_Generated on 2026-05-15 19:22:25 BST_
 
 Trusted-hint review uses only prompt title/description/keyword hints for utility comparison. Capture metadata, GPS, timestamps, source labels, and location labels are treated as nonvisual metadata and are not required visual evidence.
 
@@ -13,11 +13,11 @@ _Review artifacts:_
 
 ### Watchlist
 
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (0/100) | Desc 60 | Keywords 0 | Δ-75 | 29.9 tps | context ignored, degeneration, harness, missing sections
-- `mlx-community/FastVLM-0.5B-bf16`: ❌ F (5/100) | Desc 41 | Keywords 0 | Δ-70 | 304.6 tps | context ignored, harness
-- `mlx-community/Qwen3.6-27B-mxfp8`: ❌ F (5/100) | Desc 43 | Keywords 0 | Δ-70 | 17.9 tps | context ignored, cutoff, degeneration, harness, long context, missing sections
-- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: ❌ F (16/100) | Desc 45 | Keywords 42 | Δ-59 | 33.4 tps | context ignored, harness
-- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: ❌ F (16/100) | Desc 45 | Keywords 42 | Δ-59 | 5.9 tps | context ignored, harness
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (0/100) | Desc 60 | Keywords 0 | Δ-75 | 31.2 tps | context ignored, degeneration, harness, missing sections
+- `mlx-community/FastVLM-0.5B-bf16`: ❌ F (5/100) | Desc 41 | Keywords 0 | Δ-70 | 295.4 tps | context ignored, harness
+- `mlx-community/Qwen3.6-27B-mxfp8`: ❌ F (5/100) | Desc 43 | Keywords 0 | Δ-70 | 18.2 tps | context ignored, cutoff, degeneration, harness, long context, missing sections
+- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: ❌ F (16/100) | Desc 45 | Keywords 42 | Δ-59 | 33.8 tps | context ignored, harness
+- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: ❌ F (16/100) | Desc 45 | Keywords 42 | Δ-59 | 6.0 tps | context ignored, harness
 
 ## User Buckets
 
@@ -46,22 +46,22 @@ User-first summary grouped by recommendation bucket.
 | `mlx-community/Kimi-VL-A3B-Thinking-8bit`               | `runtime_failure`   | not evaluated                                                                                                  | model error \| mlx model load model                                                                                                                                                                     |
 | `mlx-community/LFM2.5-VL-1.6B-bf16`                     | `runtime_failure`   | not evaluated                                                                                                  | weight mismatch \| mlx model load weight mismatch                                                                                                                                                       |
 | `mlx-community/nanoLLaVA-1.5-4bit`                      | `model_shortcoming` | preserves trusted hints \| nonvisual metadata reused                                                           | missing sections: keywords \| missing terms: Bench, Building, Bush, Clock tower, Clouds \| nonvisual metadata reused                                                                                    |
-| `qnguyen3/nanoLLaVA`                                    | `model_shortcoming` | preserves trusted hints                                                                                        | missing sections: keywords \| missing terms: Bench, Building, Bush, Clock tower, Clouds                                                                                                                 |
 | `mlx-community/FastVLM-0.5B-bf16`                       | `harness`           | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | Output appears truncated to about 9 tokens. \| missing terms: Architecture, Bench, Bird, Building, Bush                                                                                                 |
+| `qnguyen3/nanoLLaVA`                                    | `model_shortcoming` | preserves trusted hints                                                                                        | missing sections: keywords \| missing terms: Bench, Building, Bush, Clock tower, Clouds                                                                                                                 |
 | `LiquidAI/LFM2.5-VL-450M-MLX-bf16`                      | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush \| degeneration=character_loop: 'orm' repeated                        |
 | `mlx-community/paligemma2-10b-ft-docci-448-6bit`        | `harness`           | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | Output is very short relative to prompt size (0.5%), suggesting possible early-stop or prompt-handling issues. \| nontext prompt burden=70% \| missing terms: Architecture, Bench, Bird, Building, Bush |
 | `mlx-community/LFM2-VL-1.6B-8bit`                       | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush \| degeneration=character_loop: '1.' repeated                         |
 | `mlx-community/paligemma2-10b-ft-docci-448-bf16`        | `harness`           | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | Output is very short relative to prompt size (0.5%), suggesting possible early-stop or prompt-handling issues. \| nontext prompt burden=70% \| missing terms: Architecture, Bench, Bird, Building, Bush |
 | `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| nontext prompt burden=86% \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush                                          |
+| `mlx-community/gemma-3n-E2B-4bit`                       | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush \| repetitive token=phrase: "they, they, they, they,..."              |
+| `HuggingFaceTB/SmolVLM-Instruct`                        | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| nontext prompt burden=73% \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush                                          |
 | `mlx-community/SmolVLM-Instruct-bf16`                   | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| nontext prompt burden=73% \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush                                          |
 | `mlx-community/gemma-4-26b-a4b-it-4bit`                 | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush \| repetitive token=phrase: "3- 3- 3- 3-..."                          |
 | `mlx-community/paligemma2-3b-ft-docci-448-bf16`         | `model_shortcoming` | preserves trusted hints \| nonvisual metadata reused                                                           | nontext prompt burden=70% \| missing sections: title, keywords \| missing terms: Bench, Building, Bush, Churchyard, Clock tower \| nonvisual metadata reused                                            |
-| `mlx-community/gemma-3n-E2B-4bit`                       | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush \| repetitive token=phrase: "they, they, they, they,..."              |
 | `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush \| formatting=Unknown tags: &lt;row_1_col_1&gt;                       |
-| `HuggingFaceTB/SmolVLM-Instruct`                        | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| nontext prompt burden=73% \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush                                          |
-| `mlx-community/Phi-3.5-vision-instruct-bf16`            | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| nontext prompt burden=66% \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush                                          |
 | `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 | `model_shortcoming` | preserves trusted hints \| nonvisual metadata reused                                                           | nontext prompt burden=69% \| missing sections: title \| missing terms: Building, Bush, Gothic Revival architecture, Landscape, tranquil \| keyword duplication=39%                                      |
 | `microsoft/Phi-3.5-vision-instruct`                     | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| nontext prompt burden=66% \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush                                          |
+| `mlx-community/Phi-3.5-vision-instruct-bf16`            | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| nontext prompt burden=66% \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush                                          |
 | `mlx-community/gemma-3n-E4B-it-bf16`                    | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush \| repetitive token=•                                                 |
 | `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`     | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| nontext prompt burden=86% \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush                                          |
 | `mlx-community/llava-v1.6-mistral-7b-8bit`              | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| nontext prompt burden=84% \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush                                          |
@@ -70,31 +70,31 @@ User-first summary grouped by recommendation bucket.
 | `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`      | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| nontext prompt burden=74% \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush                                          |
 | `mlx-community/GLM-4.6V-Flash-mxfp4`                    | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| nontext prompt burden=93% \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush                                          |
 | `mlx-community/InternVL3-8B-bf16`                       | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| nontext prompt burden=88% \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush                                          |
+| `mlx-community/GLM-4.6V-Flash-6bit`                     | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| nontext prompt burden=93% \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush                                          |
 | `mlx-community/Idefics3-8B-Llama3-bf16`                 | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| nontext prompt burden=83% \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush                                          |
 | `mlx-community/gemma-3-27b-it-qat-4bit`                 | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush \| nonvisual metadata reused | hit token cap (500) \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush \| nonvisual metadata reused                                          |
-| `mlx-community/GLM-4.6V-Flash-6bit`                     | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| nontext prompt burden=93% \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush                                          |
 | `mlx-community/pixtral-12b-8bit`                        | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| nontext prompt burden=87% \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush                                          |
-| `mlx-community/gemma-4-31b-it-4bit`                     | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush \| degeneration=character_loop: '_C' repeated                         |
 | `mlx-community/InternVL3-14B-8bit`                      | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| nontext prompt burden=88% \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush                                          |
+| `mlx-community/Molmo-7B-D-0924-8bit`                    | `model_shortcoming` | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | nontext prompt burden=73% \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush                                                                 |
 | `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`         | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| nontext prompt burden=87% \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush                                          |
 | `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | `harness`           | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 323 occurrences). \| hit token cap (500) \| nontext prompt burden=84% \| missing sections: title, description, keywords      |
 | `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`          | `model_shortcoming` | preserves trusted hints \| nonvisual metadata reused                                                           | nontext prompt burden=69% \| missing sections: title \| missing terms: Bench, Building, Bush, Dorking, Gothic Revival architecture \| nonvisual metadata reused                                         |
-| `mlx-community/Molmo-7B-D-0924-8bit`                    | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Bush, Church                                | hit token cap (500) \| nontext prompt burden=73% \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Bush, Church                                            |
+| `mlx-community/gemma-4-31b-it-4bit`                     | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush \| degeneration=character_loop: '_C' repeated                         |
 | `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush \| degeneration=repeated_punctuation: '##########...'                 |
 | `mlx-community/X-Reasoner-7B-8bit`                      | `harness`           | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | Special control token &lt;\|endoftext\|&gt; appeared in generated text. \| At long prompt length (16851 tokens), output became repetitive. \| hit token cap (500) \| nontext prompt burden=97%          |
-| `mlx-community/pixtral-12b-bf16`                        | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| nontext prompt burden=87% \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush                                          |
 | `mlx-community/gemma-3-27b-it-qat-8bit`                 | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush                                                                       |
-| `mlx-community/Molmo-7B-D-0924-bf16`                    | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Bush, Church                                | hit token cap (500) \| nontext prompt burden=73% \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Bush, Church                                            |
+| `mlx-community/pixtral-12b-bf16`                        | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| nontext prompt burden=87% \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush                                          |
+| `mlx-community/Molmo-7B-D-0924-bf16`                    | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| nontext prompt burden=73% \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush                                          |
 | `mlx-community/Qwen3.5-35B-A3B-4bit`                    | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | At long prompt length (16866 tokens), output became repetitive. \| hit token cap (500) \| nontext prompt burden=97% \| missing sections: title, description, keywords                                   |
 | `mlx-community/Qwen3.5-35B-A3B-6bit`                    | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | At long prompt length (16866 tokens), output became repetitive. \| hit token cap (500) \| nontext prompt burden=97% \| missing sections: title, description, keywords                                   |
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit`               | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush \| nonvisual metadata reused | At long prompt length (16851 tokens), output became repetitive. \| hit token cap (500) \| nontext prompt burden=97% \| missing sections: title, description, keywords                                   |
 | `mlx-community/Qwen3.5-9B-MLX-4bit`                     | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | At long prompt length (16866 tokens), output became repetitive. \| hit token cap (500) \| nontext prompt burden=97% \| missing sections: title, description, keywords                                   |
 | `mlx-community/Qwen3.5-35B-A3B-bf16`                    | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush \| nonvisual metadata reused | At long prompt length (16866 tokens), output became repetitive. \| hit token cap (500) \| nontext prompt burden=97% \| missing sections: title, description, keywords                                   |
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit`               | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | At long prompt length (16851 tokens), output became repetitive. \| hit token cap (500) \| nontext prompt burden=97% \| missing sections: title, description, keywords                                   |
 | `mlx-community/gemma-4-31b-bf16`                        | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush                                                                       |
 | `mlx-community/Qwen3.5-27B-4bit`                        | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | At long prompt length (16866 tokens), output became repetitive. \| hit token cap (500) \| nontext prompt burden=97% \| missing sections: title, description, keywords                                   |
 | `meta-llama/Llama-3.2-11B-Vision-Instruct`              | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | hit token cap (500) \| missing sections: title, description, keywords \| missing terms: Architecture, Bench, Bird, Building, Bush \| degeneration=repeated_punctuation: '##########...'                 |
-| `mlx-community/Qwen3.5-27B-mxfp8`                       | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | At long prompt length (16866 tokens), output became repetitive. \| hit token cap (500) \| nontext prompt burden=97% \| missing sections: title, description, keywords                                   |
 | `mlx-community/Qwen3.6-27B-mxfp8`                       | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | At long prompt length (16866 tokens), output may stop following prompt/image context. \| hit token cap (500) \| nontext prompt burden=97% \| missing sections: title, description, keywords             |
+| `mlx-community/Qwen3.5-27B-mxfp8`                       | `cutoff_degraded`   | ignores trusted hints \| missing terms: Architecture, Bench, Bird, Building, Bush                              | At long prompt length (16866 tokens), output became repetitive. \| hit token cap (500) \| nontext prompt burden=97% \| missing sections: title, description, keywords                                   |
 
 ## Maintainer Escalations
 
@@ -162,6 +162,17 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   generated 67 tok; requested max 500 tok; stop reason completed
 
 
+### `mlx-community/FastVLM-0.5B-bf16`
+
+- _Recommendation:_ avoid for now; review verdict: harness
+- _Owner:_ likely owner `model-config`; harness signal `prompt_template`
+- _Next step:_ Inspect model repo config, chat template, and EOS settings.
+- _Key signals:_ Output appears truncated to about 9 tokens.; missing terms:
+  Architecture, Bench, Bird, Building, Bush
+- _Tokens:_ prompt 571 tok; estimated text 478 tok; estimated non-text 93 tok;
+  generated 9 tok; requested max 500 tok; stop reason completed
+
+
 ### `qnguyen3/nanoLLaVA`
 
 - _Recommendation:_ avoid for now; review verdict: model shortcoming
@@ -172,17 +183,6 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   Bush, Clock tower, Clouds
 - _Tokens:_ prompt 567 tok; estimated text 478 tok; estimated non-text 89 tok;
   generated 82 tok; requested max 500 tok; stop reason completed
-
-
-### `mlx-community/FastVLM-0.5B-bf16`
-
-- _Recommendation:_ avoid for now; review verdict: harness
-- _Owner:_ likely owner `model-config`; harness signal `prompt_template`
-- _Next step:_ Inspect model repo config, chat template, and EOS settings.
-- _Key signals:_ Output appears truncated to about 9 tokens.; missing terms:
-  Architecture, Bench, Bird, Building, Bush
-- _Tokens:_ prompt 571 tok; estimated text 478 tok; estimated non-text 93 tok;
-  generated 9 tok; requested max 500 tok; stop reason completed
 
 
 ### `LiquidAI/LFM2.5-VL-450M-MLX-bf16`
@@ -248,6 +248,32 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
 
+### `mlx-community/gemma-3n-E2B-4bit`
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ hit token cap (500); missing sections: title, description,
+  keywords; missing terms: Architecture, Bench, Bird, Building, Bush;
+  repetitive token=phrase: "they, they, they, they,..."
+- _Tokens:_ prompt 823 tok; estimated text 478 tok; estimated non-text 345
+  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+
+
+### `HuggingFaceTB/SmolVLM-Instruct`
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ hit token cap (500); nontext prompt burden=73%; missing
+  sections: title, description, keywords; missing terms: Architecture, Bench,
+  Bird, Building, Bush
+- _Tokens:_ prompt 1772 tok; estimated text 478 tok; estimated non-text 1294
+  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+
+
 ### `mlx-community/SmolVLM-Instruct-bf16`
 
 - _Recommendation:_ avoid for now; review verdict: cutoff degraded
@@ -287,19 +313,6 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   tok; generated 100 tok; requested max 500 tok; stop reason completed
 
 
-### `mlx-community/gemma-3n-E2B-4bit`
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); missing sections: title, description,
-  keywords; missing terms: Architecture, Bench, Bird, Building, Bush;
-  repetitive token=phrase: "they, they, they, they,..."
-- _Tokens:_ prompt 823 tok; estimated text 478 tok; estimated non-text 345
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-
 ### `mlx-community/SmolVLM2-2.2B-Instruct-mlx`
 
 - _Recommendation:_ avoid for now; review verdict: cutoff degraded
@@ -310,32 +323,6 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   keywords; missing terms: Architecture, Bench, Bird, Building, Bush;
   formatting=Unknown tags: &lt;row_1_col_1&gt;
 - _Tokens:_ prompt 672 tok; estimated text 478 tok; estimated non-text 194
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-
-### `HuggingFaceTB/SmolVLM-Instruct`
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); nontext prompt burden=73%; missing
-  sections: title, description, keywords; missing terms: Architecture, Bench,
-  Bird, Building, Bush
-- _Tokens:_ prompt 1772 tok; estimated text 478 tok; estimated non-text 1294
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-
-### `mlx-community/Phi-3.5-vision-instruct-bf16`
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); nontext prompt burden=66%; missing
-  sections: title, description, keywords; missing terms: Architecture, Bench,
-  Bird, Building, Bush
-- _Tokens:_ prompt 1394 tok; estimated text 478 tok; estimated non-text 916
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
 
@@ -353,6 +340,19 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
 
 
 ### `microsoft/Phi-3.5-vision-instruct`
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ hit token cap (500); nontext prompt burden=66%; missing
+  sections: title, description, keywords; missing terms: Architecture, Bench,
+  Bird, Building, Bush
+- _Tokens:_ prompt 1394 tok; estimated text 478 tok; estimated non-text 916
+  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+
+
+### `mlx-community/Phi-3.5-vision-instruct-bf16`
 
 - _Recommendation:_ avoid for now; review verdict: cutoff degraded
 - _Owner:_ likely owner `model`
@@ -456,32 +456,6 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
 
-### `mlx-community/InternVL3-8B-bf16`
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); nontext prompt burden=88%; missing
-  sections: title, description, keywords; missing terms: Architecture, Bench,
-  Bird, Building, Bush
-- _Tokens:_ prompt 3886 tok; estimated text 478 tok; estimated non-text 3408
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-
-### `mlx-community/Idefics3-8B-Llama3-bf16`
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); nontext prompt burden=83%; missing
-  sections: title, description, keywords; missing terms: Architecture, Bench,
-  Bird, Building, Bush
-- _Tokens:_ prompt 2850 tok; estimated text 478 tok; estimated non-text 2372
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-
 ### `mlx-community/GLM-4.6V-nvfp4`
 
 - _Recommendation:_ use with caveats; review verdict: context budget
@@ -495,16 +469,16 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   tok; generated 28 tok; requested max 500 tok; stop reason completed
 
 
-### `mlx-community/gemma-3-27b-it-qat-4bit`
+### `mlx-community/InternVL3-8B-bf16`
 
 - _Recommendation:_ avoid for now; review verdict: cutoff degraded
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model limitation for this prompt; the requested
   output contract is not being met.
-- _Key signals:_ hit token cap (500); missing sections: title, description,
-  keywords; missing terms: Architecture, Bench, Bird, Building, Bush;
-  nonvisual metadata reused
-- _Tokens:_ prompt 832 tok; estimated text 478 tok; estimated non-text 354
+- _Key signals:_ hit token cap (500); nontext prompt burden=88%; missing
+  sections: title, description, keywords; missing terms: Architecture, Bench,
+  Bird, Building, Bush
+- _Tokens:_ prompt 3886 tok; estimated text 478 tok; estimated non-text 3408
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
 
@@ -521,6 +495,32 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
 
+### `mlx-community/Idefics3-8B-Llama3-bf16`
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ hit token cap (500); nontext prompt burden=83%; missing
+  sections: title, description, keywords; missing terms: Architecture, Bench,
+  Bird, Building, Bush
+- _Tokens:_ prompt 2850 tok; estimated text 478 tok; estimated non-text 2372
+  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+
+
+### `mlx-community/gemma-3-27b-it-qat-4bit`
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ hit token cap (500); missing sections: title, description,
+  keywords; missing terms: Architecture, Bench, Bird, Building, Bush;
+  nonvisual metadata reused
+- _Tokens:_ prompt 832 tok; estimated text 478 tok; estimated non-text 354
+  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+
+
 ### `mlx-community/pixtral-12b-8bit`
 
 - _Recommendation:_ avoid for now; review verdict: cutoff degraded
@@ -531,19 +531,6 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   sections: title, description, keywords; missing terms: Architecture, Bench,
   Bird, Building, Bush
 - _Tokens:_ prompt 3690 tok; estimated text 478 tok; estimated non-text 3212
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-
-### `mlx-community/gemma-4-31b-it-4bit`
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); missing sections: title, description,
-  keywords; missing terms: Architecture, Bench, Bird, Building, Bush;
-  degeneration=character_loop: '_C' repeated
-- _Tokens:_ prompt 843 tok; estimated text 478 tok; estimated non-text 365
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
 
@@ -558,6 +545,19 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   Bird, Building, Bush
 - _Tokens:_ prompt 3886 tok; estimated text 478 tok; estimated non-text 3408
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+
+
+### `mlx-community/Molmo-7B-D-0924-8bit`
+
+- _Recommendation:_ avoid for now; review verdict: model shortcoming
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ nontext prompt burden=73%; missing sections: title,
+  description, keywords; missing terms: Architecture, Bench, Bird, Building,
+  Bush
+- _Tokens:_ prompt 1754 tok; estimated text 478 tok; estimated non-text 1276
+  tok; generated 36 tok; requested max 500 tok; stop reason completed
 
 
 ### `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`
@@ -599,16 +599,16 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   tok; generated 98 tok; requested max 500 tok; stop reason completed
 
 
-### `mlx-community/Molmo-7B-D-0924-8bit`
+### `mlx-community/gemma-4-31b-it-4bit`
 
 - _Recommendation:_ avoid for now; review verdict: cutoff degraded
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model limitation for this prompt; the requested
   output contract is not being met.
-- _Key signals:_ hit token cap (500); nontext prompt burden=73%; missing
-  sections: title, description, keywords; missing terms: Architecture, Bench,
-  Bird, Bush, Church
-- _Tokens:_ prompt 1754 tok; estimated text 478 tok; estimated non-text 1276
+- _Key signals:_ hit token cap (500); missing sections: title, description,
+  keywords; missing terms: Architecture, Bench, Bird, Building, Bush;
+  degeneration=character_loop: '_C' repeated
+- _Tokens:_ prompt 843 tok; estimated text 478 tok; estimated non-text 365
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
 
@@ -625,19 +625,6 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   generated 500 tok; requested max 500 tok; stop reason max_tokens
 
 
-### `mlx-community/X-Reasoner-7B-8bit`
-
-- _Recommendation:_ avoid for now; review verdict: harness
-- _Owner:_ likely owner `mlx-vlm`; harness signal `stop_token`
-- _Next step:_ Inspect EOS/stop-token stripping; control tokens are leaking
-  into user-facing text.
-- _Key signals:_ Special control token &lt;|endoftext|&gt; appeared in
-  generated text.; At long prompt length (16851 tokens), output became
-  repetitive.; hit token cap (500); nontext prompt burden=97%
-- _Tokens:_ prompt 16851 tok; estimated text 478 tok; estimated non-text 16373
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-
 ### `mlx-community/MolmoPoint-8B-fp16`
 
 - _Recommendation:_ use with caveats; review verdict: context budget
@@ -650,16 +637,16 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   tok; generated 140 tok; requested max 500 tok; stop reason completed
 
 
-### `mlx-community/pixtral-12b-bf16`
+### `mlx-community/X-Reasoner-7B-8bit`
 
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); nontext prompt burden=87%; missing
-  sections: title, description, keywords; missing terms: Architecture, Bench,
-  Bird, Building, Bush
-- _Tokens:_ prompt 3690 tok; estimated text 478 tok; estimated non-text 3212
+- _Recommendation:_ avoid for now; review verdict: harness
+- _Owner:_ likely owner `mlx-vlm`; harness signal `stop_token`
+- _Next step:_ Inspect EOS/stop-token stripping; control tokens are leaking
+  into user-facing text.
+- _Key signals:_ Special control token &lt;|endoftext|&gt; appeared in
+  generated text.; At long prompt length (16851 tokens), output became
+  repetitive.; hit token cap (500); nontext prompt burden=97%
+- _Tokens:_ prompt 16851 tok; estimated text 478 tok; estimated non-text 16373
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
 
@@ -675,6 +662,19 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
 
+### `mlx-community/pixtral-12b-bf16`
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ hit token cap (500); nontext prompt burden=87%; missing
+  sections: title, description, keywords; missing terms: Architecture, Bench,
+  Bird, Building, Bush
+- _Tokens:_ prompt 3690 tok; estimated text 478 tok; estimated non-text 3212
+  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+
+
 ### `mlx-community/Molmo-7B-D-0924-bf16`
 
 - _Recommendation:_ avoid for now; review verdict: cutoff degraded
@@ -683,7 +683,7 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   output contract is not being met.
 - _Key signals:_ hit token cap (500); nontext prompt burden=73%; missing
   sections: title, description, keywords; missing terms: Architecture, Bench,
-  Bird, Bush, Church
+  Bird, Building, Bush
 - _Tokens:_ prompt 1754 tok; estimated text 478 tok; estimated non-text 1276
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -714,19 +714,6 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
 
-### `mlx-community/Qwen2-VL-2B-Instruct-4bit`
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `mlx`; harness signal `long_context`
-- _Next step:_ Inspect long-context cache behavior under heavy image-token
-  burden.
-- _Key signals:_ At long prompt length (16851 tokens), output became
-  repetitive.; hit token cap (500); nontext prompt burden=97%; missing
-  sections: title, description, keywords
-- _Tokens:_ prompt 16851 tok; estimated text 478 tok; estimated non-text 16373
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-
 ### `mlx-community/Qwen3.5-9B-MLX-4bit`
 
 - _Recommendation:_ avoid for now; review verdict: cutoff degraded
@@ -750,6 +737,19 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   repetitive.; hit token cap (500); nontext prompt burden=97%; missing
   sections: title, description, keywords
 - _Tokens:_ prompt 16866 tok; estimated text 478 tok; estimated non-text 16388
+  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+
+
+### `mlx-community/Qwen2-VL-2B-Instruct-4bit`
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `mlx`; harness signal `long_context`
+- _Next step:_ Inspect long-context cache behavior under heavy image-token
+  burden.
+- _Key signals:_ At long prompt length (16851 tokens), output became
+  repetitive.; hit token cap (500); nontext prompt burden=97%; missing
+  sections: title, description, keywords
+- _Tokens:_ prompt 16851 tok; estimated text 478 tok; estimated non-text 16373
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
 
@@ -791,19 +791,6 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   generated 500 tok; requested max 500 tok; stop reason max_tokens
 
 
-### `mlx-community/Qwen3.5-27B-mxfp8`
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `mlx`; harness signal `long_context`
-- _Next step:_ Inspect long-context cache behavior under heavy image-token
-  burden.
-- _Key signals:_ At long prompt length (16866 tokens), output became
-  repetitive.; hit token cap (500); nontext prompt burden=97%; missing
-  sections: title, description, keywords
-- _Tokens:_ prompt 16866 tok; estimated text 478 tok; estimated non-text 16388
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-
 ### `mlx-community/Qwen3.6-27B-mxfp8`
 
 - _Recommendation:_ avoid for now; review verdict: cutoff degraded
@@ -813,6 +800,19 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
 - _Key signals:_ At long prompt length (16866 tokens), output may stop
   following prompt/image context.; hit token cap (500); nontext prompt
   burden=97%; missing sections: title, description, keywords
+- _Tokens:_ prompt 16866 tok; estimated text 478 tok; estimated non-text 16388
+  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+
+
+### `mlx-community/Qwen3.5-27B-mxfp8`
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `mlx`; harness signal `long_context`
+- _Next step:_ Inspect long-context cache behavior under heavy image-token
+  burden.
+- _Key signals:_ At long prompt length (16866 tokens), output became
+  repetitive.; hit token cap (500); nontext prompt burden=97%; missing
+  sections: title, description, keywords
 - _Tokens:_ prompt 16866 tok; estimated text 478 tok; estimated non-text 16388
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 

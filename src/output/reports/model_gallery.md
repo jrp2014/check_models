@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-_Generated on 2026-05-15 12:25:02 BST_
+_Generated on 2026-05-15 19:22:25 BST_
 
 A review-friendly artifact with image metadata, the source prompt, and full
 generated output for each model.
@@ -11,11 +11,11 @@ _Action Snapshot: see [results.md](results.md) for the full summary._
 
 ### Watchlist
 
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (0/100) | Desc 60 | Keywords 0 | Δ-75 | 29.9 tps | context ignored, degeneration, harness, missing sections
-- `mlx-community/FastVLM-0.5B-bf16`: ❌ F (5/100) | Desc 41 | Keywords 0 | Δ-70 | 304.6 tps | context ignored, harness
-- `mlx-community/Qwen3.6-27B-mxfp8`: ❌ F (5/100) | Desc 43 | Keywords 0 | Δ-70 | 17.9 tps | context ignored, cutoff, degeneration, harness, long context, missing sections
-- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: ❌ F (16/100) | Desc 45 | Keywords 42 | Δ-59 | 33.4 tps | context ignored, harness
-- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: ❌ F (16/100) | Desc 45 | Keywords 42 | Δ-59 | 5.9 tps | context ignored, harness
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (0/100) | Desc 60 | Keywords 0 | Δ-75 | 31.2 tps | context ignored, degeneration, harness, missing sections
+- `mlx-community/FastVLM-0.5B-bf16`: ❌ F (5/100) | Desc 41 | Keywords 0 | Δ-70 | 295.4 tps | context ignored, harness
+- `mlx-community/Qwen3.6-27B-mxfp8`: ❌ F (5/100) | Desc 43 | Keywords 0 | Δ-70 | 18.2 tps | context ignored, cutoff, degeneration, harness, long context, missing sections
+- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: ❌ F (16/100) | Desc 45 | Keywords 42 | Δ-59 | 33.8 tps | context ignored, harness
+- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: ❌ F (16/100) | Desc 45 | Keywords 42 | Δ-59 | 6.0 tps | context ignored, harness
 
 ## 🚨 Failures by Package (Actionable)
 
@@ -177,7 +177,7 @@ _Action Snapshot: see [results.md](results.md) for the full summary._
   `meta-llama/Llama-3.2-11B-Vision-Instruct`,
   `microsoft/Phi-3.5-vision-instruct`,
   `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`,
-  `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`, +39 more
+  `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`, +40 more
 
 ## Model Gallery
 
@@ -222,10 +222,10 @@ ModuleNotFoundError: No module named 'mlx_lm.models.pe_audio_video'
 During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17482, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17491, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16884, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16893, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -249,7 +249,7 @@ ValueError: Model type pe_audio_video not supported.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17679, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17688, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -260,7 +260,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17492, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17501, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Model type pe_audio_video not supported.
 ```
@@ -300,10 +300,10 @@ _Error details:_
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17482, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17491, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16884, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16893, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -331,7 +331,7 @@ multi_modal_projector.linear_2.scales.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17679, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17688, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -342,7 +342,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17492, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17501, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 4 parameters not in model:
 multi_modal_projector.linear_1.biases,
@@ -384,10 +384,10 @@ _Error details:_
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17482, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17491, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16884, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 16893, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -411,7 +411,7 @@ multi_modal_projector.layer_norm.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17679, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17688, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -422,7 +422,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17492, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17501, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Missing 2 parameters:
 multi_modal_projector.layer_norm.bias,
@@ -445,8 +445,8 @@ multi_modal_projector.layer_norm.weight.
   Bush, Clock tower, Clouds; nonvisual metadata reused
 - _Score:_ 🟠 D (46/100); Δ-29; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (metadata borrowing, missing sections)
-- _Timing:_ Load 0.71s; Gen 0.69s; Total 1.58s
-- _Throughput:_ Prompt 2,458 TPS (567 tok); Gen 346 TPS (67 tok)
+- _Timing:_ Load 0.46s; Gen 0.55s; Total 1.19s
+- _Throughput:_ Prompt 6,369 TPS (567 tok); Gen 355 TPS (67 tok)
 - _Tokens:_ prompt 567 tok; estimated text 478 tok; estimated non-text 89 tok;
   generated 67 tok; requested max 500 tok; stop reason completed
 
@@ -468,6 +468,36 @@ multi_modal_projector.layer_norm.weight.
 
 ---
 
+<a id="model-mlx-community-fastvlm-05b-bf16"></a>
+
+### ✅ mlx-community/FastVLM-0.5B-bf16
+
+- _Recommendation:_ avoid for now; review verdict: harness
+- _Owner:_ likely owner `model-config`; harness signal `prompt_template`
+- _Next step:_ Inspect model repo config, chat template, and EOS settings.
+- _Key signals:_ Output appears truncated to about 9 tokens.; missing terms:
+  Architecture, Bench, Bird, Building, Bush
+- _Score:_ ❌ F (5/100); Δ-70; Output too short to be useful
+- _Review focus:_ watchlist (context ignored, harness)
+- _Timing:_ Load 0.59s; Gen 0.56s; Total 1.33s
+- _Throughput:_ Prompt 5,458 TPS (571 tok); Gen 295 TPS (9 tok)
+- _Tokens:_ prompt 571 tok; estimated text 478 tok; estimated non-text 93 tok;
+  generated 9 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> teriorGREEGREEGREEGREEGREEGREE。
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️HARNESS:prompt_template
+- Context ignored (missing: Architecture, Bench, Bird, Building, Bush)
+- Ignores trusted hints
+- output:truncated(9tok)
+
+---
+
 <a id="model-qnguyen3-nanollava"></a>
 
 ### ✅ qnguyen3/nanoLLaVA
@@ -480,8 +510,8 @@ multi_modal_projector.layer_norm.weight.
   Bush, Clock tower, Clouds
 - _Score:_ 🟠 D (41/100); Δ-34; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (missing sections)
-- _Timing:_ Load 2.48s; Gen 1.11s; Total 3.76s
-- _Throughput:_ Prompt 4,889 TPS (567 tok); Gen 112 TPS (82 tok)
+- _Timing:_ Load 0.53s; Gen 1.11s; Total 1.81s
+- _Throughput:_ Prompt 4,976 TPS (567 tok); Gen 112 TPS (82 tok)
 - _Tokens:_ prompt 567 tok; estimated text 478 tok; estimated non-text 89 tok;
   generated 82 tok; requested max 500 tok; stop reason completed
 
@@ -503,36 +533,6 @@ multi_modal_projector.layer_norm.weight.
 
 ---
 
-<a id="model-mlx-community-fastvlm-05b-bf16"></a>
-
-### ✅ mlx-community/FastVLM-0.5B-bf16
-
-- _Recommendation:_ avoid for now; review verdict: harness
-- _Owner:_ likely owner `model-config`; harness signal `prompt_template`
-- _Next step:_ Inspect model repo config, chat template, and EOS settings.
-- _Key signals:_ Output appears truncated to about 9 tokens.; missing terms:
-  Architecture, Bench, Bird, Building, Bush
-- _Score:_ ❌ F (5/100); Δ-70; Output too short to be useful
-- _Review focus:_ watchlist (context ignored, harness)
-- _Timing:_ Load 0.85s; Gen 1.23s; Total 2.26s
-- _Throughput:_ Prompt 749 TPS (571 tok); Gen 305 TPS (9 tok)
-- _Tokens:_ prompt 571 tok; estimated text 478 tok; estimated non-text 93 tok;
-  generated 9 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> teriorGREEGREEGREEGREEGREEGREE。
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️HARNESS:prompt_template
-- Context ignored (missing: Architecture, Bench, Bird, Building, Bush)
-- Ignores trusted hints
-- output:truncated(9tok)
-
----
-
 <a id="model-liquidai-lfm25-vl-450m-mlx-bf16"></a>
 
 ### ✅ LiquidAI/LFM2.5-VL-450M-MLX-bf16
@@ -547,8 +547,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ ❌ F (0/100); Δ-75; Output too short to be useful
 - _Review focus:_ watchlist (context ignored, cutoff, degeneration, missing
   sections)
-- _Timing:_ Load 2.30s; Gen 1.78s; Total 4.24s
-- _Throughput:_ Prompt 1,533 TPS (828 tok); Gen 485 TPS (500 tok)
+- _Timing:_ Load 0.47s; Gen 1.26s; Total 1.92s
+- _Throughput:_ Prompt 19,301 TPS (828 tok); Gen 494 TPS (500 tok)
 - _Tokens:_ prompt 828 tok; estimated text 478 tok; estimated non-text 350
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -579,8 +579,8 @@ multi_modal_projector.layer_norm.weight.
   burden=70%; missing terms: Architecture, Bench, Bird, Building, Bush
 - _Score:_ ❌ F (16/100); Δ-59; Output lacks detail
 - _Review focus:_ watchlist (context ignored, harness)
-- _Timing:_ Load 1.63s; Gen 2.00s; Total 3.81s
-- _Throughput:_ Prompt 1,066 TPS (1,584 tok); Gen 33.4 TPS (8 tok)
+- _Timing:_ Load 1.58s; Gen 1.66s; Total 3.42s
+- _Throughput:_ Prompt 1,371 TPS (1,584 tok); Gen 33.8 TPS (8 tok)
 - _Tokens:_ prompt 1584 tok; estimated text 478 tok; estimated non-text 1106
   tok; generated 8 tok; requested max 500 tok; stop reason completed
 
@@ -612,8 +612,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ ❌ F (0/100); Δ-75; Output too short to be useful
 - _Review focus:_ watchlist (context ignored, cutoff, degeneration, missing
   sections)
-- _Timing:_ Load 0.58s; Gen 2.20s; Total 2.96s
-- _Throughput:_ Prompt 1,988 TPS (828 tok); Gen 319 TPS (500 tok)
+- _Timing:_ Load 0.51s; Gen 1.86s; Total 2.55s
+- _Throughput:_ Prompt 6,515 TPS (828 tok); Gen 330 TPS (500 tok)
 - _Tokens:_ prompt 828 tok; estimated text 478 tok; estimated non-text 350
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -644,8 +644,8 @@ multi_modal_projector.layer_norm.weight.
   burden=70%; missing terms: Architecture, Bench, Bird, Building, Bush
 - _Score:_ ❌ F (16/100); Δ-59; Output lacks detail
 - _Review focus:_ watchlist (context ignored, harness)
-- _Timing:_ Load 2.53s; Gen 3.18s; Total 5.89s
-- _Throughput:_ Prompt 1,034 TPS (1,584 tok); Gen 5.88 TPS (8 tok)
+- _Timing:_ Load 2.51s; Gen 3.05s; Total 5.74s
+- _Throughput:_ Prompt 1,103 TPS (1,584 tok); Gen 6 TPS (8 tok)
 - _Tokens:_ prompt 1584 tok; estimated text 478 tok; estimated non-text 1106
   tok; generated 8 tok; requested max 500 tok; stop reason completed
 
@@ -676,8 +676,8 @@ multi_modal_projector.layer_norm.weight.
   Bird, Building, Bush
 - _Score:_ 🟠 D (44/100); Δ-31; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, missing sections)
-- _Timing:_ Load 2.55s; Gen 4.73s; Total 7.47s
-- _Throughput:_ Prompt 2,103 TPS (3,396 tok); Gen 177 TPS (500 tok)
+- _Timing:_ Load 0.91s; Gen 4.51s; Total 5.61s
+- _Throughput:_ Prompt 2,296 TPS (3,396 tok); Gen 183 TPS (500 tok)
 - _Tokens:_ prompt 3396 tok; estimated text 478 tok; estimated non-text 2918
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -717,6 +717,112 @@ multi_modal_projector.layer_norm.weight.
 
 ---
 
+<a id="model-mlx-community-gemma-3n-e2b-4bit"></a>
+
+### ✅ mlx-community/gemma-3n-E2B-4bit
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ hit token cap (500); missing sections: title, description,
+  keywords; missing terms: Architecture, Bench, Bird, Building, Bush;
+  repetitive token=phrase: "they, they, they, they,..."
+- _Score:_ 🟠 D (45/100); Δ-30; Keywords are not specific or diverse enough
+- _Review focus:_ watchlist (context ignored, cutoff, missing sections,
+  repetitive)
+- _Timing:_ Load 1.51s; Gen 4.72s; Total 6.41s
+- _Throughput:_ Prompt 2,430 TPS (823 tok); Gen 121 TPS (500 tok)
+- _Tokens:_ prompt 823 tok; estimated text 478 tok; estimated non-text 345
+  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> िट, they were, they were, they were, they were, they were, they were, they
+> were, they were, they were, they were, they were, they were, they were, they
+> were, they were, they were, they were, they were, they were, they were,
+> they were, they were, they were, they were, they, they were, they were, they
+> were, they, they were, they were, they were, they were, they were, they,
+> they were, they were, they were, they were, they, they were, they were, they
+> were, they were, they were, they were, they, they, they, they, they, they,
+> they, they, they, they, they, they, they, they, they, they, they, they,
+> they, they, they, they, they, they, they, they, they, they, they, they,
+> they, they, they, they, they, they, they, they, they, they, they, they,
+> they, they, they, they, they, they, they, they, they, they, they, they,
+> they, they, they, they, they, they, they, they, they, they, they, they,
+> they, they, they, they, they, they, they, they, they, they, they, they,
+> they, they, they, they, they, they, they, they, they, they, they, they,
+> they, they, they, they, they, they, they, they, they, they, they, they,
+> they, they, they, they, they, they, they, they, they, that, that, that,
+> that, that, that, that, that, that, that, that, that, that, that, that,
+> that, that, that, that, that, that, that, that, that, that, that, that,
+> that, that, that, that, that, that,  that, that, that, that, that, that,
+> that, that, that, that, that, that, that,  that, that, that, that, that,
+> that, that,  that,  that,  that,  that,  that,  that,  that,  that,  that,
+> that,  that,
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Repetitive output (phrase: "they, they, they, they,...")
+- Context ignored (missing: Architecture, Bench, Bird, Building, Bush)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
+
+---
+
+<a id="model-huggingfacetb-smolvlm-instruct"></a>
+
+### ✅ HuggingFaceTB/SmolVLM-Instruct
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ hit token cap (500); nontext prompt burden=73%; missing
+  sections: title, description, keywords; missing terms: Architecture, Bench,
+  Bird, Building, Bush
+- _Score:_ 🟠 D (43/100); Δ-32; Keywords are not specific or diverse enough
+- _Review focus:_ watchlist (context ignored, cutoff, missing sections,
+  repetitive)
+- _Timing:_ Load 0.67s; Gen 4.73s; Total 5.57s
+- _Throughput:_ Prompt 3,758 TPS (1,772 tok); Gen 127 TPS (500 tok)
+- _Tokens:_ prompt 1772 tok; estimated text 478 tok; estimated non-text 1294
+  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> chip Higgins/&#42; Euclidean,Pu,Pu,Pu,Pu,/&#42; BMI tropics, line tropics,/&#42; BMI,
+> line, line, line, line, line,Du,Du, line, line,
+> line,Du,Du,Du,Du,Du,Du,Du,Du,Du,Du,Du,Du,Du,Du,Du,Du, line,Du,Du,Du, th, th,
+> th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th,
+> th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th,
+> th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th,
+> th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th,
+> th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th,
+> th, th, th, th, th, th, th, th, For Fitzgerald, th, For infrast[..., the
+> profit, th, th, th, th, th, th, th, the profit, th, the profit, th, th, th,
+> th, th, th, th, th, th, th, th, Uruguay, th, For, For, th, th, the profit,
+> the profit, the profit, th,ikhail anFET,ikhail anFET, Uruguay,ikhail
+> anFET,ikhail anFET, Uruguay, the,ikhail anFET, Uruguay,ikhail anFET, the
+> profit,ikhail anFET, Uruguay,ikhail anFET, the,ikhail anFET, theFrank
+> theFrank the,ikhail anFET,ikhail anFET,ikhail anFET,ikhail anFET, the,ikhail
+> anFET the,ikhail,ikhail,ikhail anFET,ikhail the,ikhail the,ikhail
+> the,ikhail theFrank theFrank the,ikhail theFrank the,ikhail theFrank
+> theFrank theFrank,ikhail theFrank theFrank,ikhail the profit the profit the
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Repetitive output (phrase: "th, th, th, th,...")
+- Context ignored (missing: Architecture, Bench, Bird, Building, Bush)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
+
+---
+
 <a id="model-mlx-community-smolvlm-instruct-bf16"></a>
 
 ### ✅ mlx-community/SmolVLM-Instruct-bf16
@@ -731,8 +837,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ 🟠 D (43/100); Δ-32; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, missing sections,
   repetitive)
-- _Timing:_ Load 2.71s; Gen 4.99s; Total 7.88s
-- _Throughput:_ Prompt 3,672 TPS (1,772 tok); Gen 121 TPS (500 tok)
+- _Timing:_ Load 0.61s; Gen 4.80s; Total 5.58s
+- _Throughput:_ Prompt 3,744 TPS (1,772 tok); Gen 126 TPS (500 tok)
 - _Tokens:_ prompt 1772 tok; estimated text 478 tok; estimated non-text 1294
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -782,8 +888,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ 🟠 D (39/100); Δ-36; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, missing sections,
   repetitive)
-- _Timing:_ Load 3.83s; Gen 5.73s; Total 9.76s
-- _Throughput:_ Prompt 884 TPS (843 tok); Gen 111 TPS (500 tok)
+- _Timing:_ Load 2.49s; Gen 5.44s; Total 8.13s
+- _Throughput:_ Prompt 1,429 TPS (843 tok); Gen 109 TPS (500 tok)
 - _Tokens:_ prompt 843 tok; estimated text 478 tok; estimated non-text 365
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -822,8 +928,8 @@ multi_modal_projector.layer_norm.weight.
   metadata reused
 - _Score:_ 🟡 C (51/100); Δ-24; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (metadata borrowing, missing sections)
-- _Timing:_ Load 1.78s; Gen 5.97s; Total 7.93s
-- _Throughput:_ Prompt 3,324 TPS (1,584 tok); Gen 19.2 TPS (100 tok)
+- _Timing:_ Load 1.42s; Gen 5.93s; Total 7.53s
+- _Throughput:_ Prompt 3,327 TPS (1,584 tok); Gen 19.3 TPS (100 tok)
 - _Tokens:_ prompt 1584 tok; estimated text 478 tok; estimated non-text 1106
   tok; generated 100 tok; requested max 500 tok; stop reason completed
 
@@ -846,61 +952,6 @@ multi_modal_projector.layer_norm.weight.
 
 ---
 
-<a id="model-mlx-community-gemma-3n-e2b-4bit"></a>
-
-### ✅ mlx-community/gemma-3n-E2B-4bit
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); missing sections: title, description,
-  keywords; missing terms: Architecture, Bench, Bird, Building, Bush;
-  repetitive token=phrase: "they, they, they, they,..."
-- _Score:_ 🟠 D (45/100); Δ-30; Keywords are not specific or diverse enough
-- _Review focus:_ watchlist (context ignored, cutoff, missing sections,
-  repetitive)
-- _Timing:_ Load 2.89s; Gen 6.14s; Total 9.21s
-- _Throughput:_ Prompt 484 TPS (823 tok); Gen 119 TPS (500 tok)
-- _Tokens:_ prompt 823 tok; estimated text 478 tok; estimated non-text 345
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> िट, they were, they were, they were, they were, they were, they were, they
-> were, they were, they were, they were, they were, they were, they were, they
-> were, they were, they were, they were, they were, they were, they were,
-> they were, they were, they were, they were, they, they were, they were, they
-> were, they, they were, they were, they were, they were, they were, they,
-> they were, they were, they were, they were, they, they were, they were, they
-> were, they were, they were, they were, they, they, they, they, they, they,
-> they, they, they, they, they, they, they, they, they, they, they, they,
-> they, they, they, they, they, they, they, they, they, they, they, they,
-> they, they, they, they, they, they, they, they, they, they, they, they,
-> they, they, they, they, they, they, they, they, they, they, they, they,
-> they, they, they, they, they, they, they, they, they, they, they, they,
-> they, they, they, they, they, they, they, they, they, they, they, they,
-> they, they, they, they, they, they, they, they, they, they, they, they,
-> they, they, they, they, they, they, they, they, they, they, they, they,
-> they, they, they, they, they, they, they, they, they, that, that, that,
-> that, that, that, that, that, that, that, that, that, that, that, that,
-> that, that, that, that, that, that, that, that, that, that, that, that,
-> that, that, that, that, that, that,  that, that, that, that, that, that,
-> that, that, that, that, that, that, that,  that, that, that, that, that,
-> that, that,  that,  that,  that,  that,  that,  that,  that,  that,  that,
-> that,  that,
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Repetitive output (phrase: "they, they, they, they,...")
-- Context ignored (missing: Architecture, Bench, Bird, Building, Bush)
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-- Ignores trusted hints
-
----
-
 <a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
 
 ### ✅ mlx-community/SmolVLM2-2.2B-Instruct-mlx
@@ -914,8 +965,8 @@ multi_modal_projector.layer_norm.weight.
   formatting=Unknown tags: &lt;row_1_col_1&gt;
 - _Score:_ 🟠 D (45/100); Δ-30; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, missing sections)
-- _Timing:_ Load 2.08s; Gen 6.43s; Total 8.69s
-- _Throughput:_ Prompt 1,885 TPS (672 tok); Gen 129 TPS (500 tok)
+- _Timing:_ Load 0.58s; Gen 6.19s; Total 6.95s
+- _Throughput:_ Prompt 1,901 TPS (672 tok); Gen 132 TPS (500 tok)
 - _Tokens:_ prompt 672 tok; estimated text 478 tok; estimated non-text 194
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -974,109 +1025,6 @@ multi_modal_projector.layer_norm.weight.
 
 ---
 
-<a id="model-huggingfacetb-smolvlm-instruct"></a>
-
-### ✅ HuggingFaceTB/SmolVLM-Instruct
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); nontext prompt burden=73%; missing
-  sections: title, description, keywords; missing terms: Architecture, Bench,
-  Bird, Building, Bush
-- _Score:_ 🟠 D (43/100); Δ-32; Keywords are not specific or diverse enough
-- _Review focus:_ watchlist (context ignored, cutoff, missing sections,
-  repetitive)
-- _Timing:_ Load 3.86s; Gen 7.09s; Total 11.12s
-- _Throughput:_ Prompt 648 TPS (1,772 tok); Gen 124 TPS (500 tok)
-- _Tokens:_ prompt 1772 tok; estimated text 478 tok; estimated non-text 1294
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> chip Higgins/&#42; Euclidean,Pu,Pu,Pu,Pu,/&#42; BMI tropics, line tropics,/&#42; BMI,
-> line, line, line, line, line,Du,Du, line, line,
-> line,Du,Du,Du,Du,Du,Du,Du,Du,Du,Du,Du,Du,Du,Du,Du,Du, line,Du,Du,Du, th, th,
-> th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th,
-> th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th,
-> th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th,
-> th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th,
-> th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th, th,
-> th, th, th, th, th, th, th, th, For Fitzgerald, th, For infrast[..., the
-> profit, th, th, th, th, th, th, th, the profit, th, the profit, th, th, th,
-> th, th, th, th, th, th, th, th, Uruguay, th, For, For, th, th, the profit,
-> the profit, the profit, th,ikhail anFET,ikhail anFET, Uruguay,ikhail
-> anFET,ikhail anFET, Uruguay, the,ikhail anFET, Uruguay,ikhail anFET, the
-> profit,ikhail anFET, Uruguay,ikhail anFET, the,ikhail anFET, theFrank
-> theFrank the,ikhail anFET,ikhail anFET,ikhail anFET,ikhail anFET, the,ikhail
-> anFET the,ikhail,ikhail,ikhail anFET,ikhail the,ikhail the,ikhail
-> the,ikhail theFrank theFrank the,ikhail theFrank the,ikhail theFrank
-> theFrank theFrank,ikhail theFrank theFrank,ikhail the profit the profit the
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Repetitive output (phrase: "th, th, th, th,...")
-- Context ignored (missing: Architecture, Bench, Bird, Building, Bush)
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-- Ignores trusted hints
-
----
-
-<a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
-
-### ✅ mlx-community/Phi-3.5-vision-instruct-bf16
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); nontext prompt burden=66%; missing
-  sections: title, description, keywords; missing terms: Architecture, Bench,
-  Bird, Building, Bush
-- _Score:_ 🟠 D (44/100); Δ-31; Keywords are not specific or diverse enough
-- _Review focus:_ watchlist (context ignored, cutoff, missing sections)
-- _Timing:_ Load 2.57s; Gen 9.83s; Total 12.59s
-- _Throughput:_ Prompt 3,366 TPS (1,394 tok); Gen 54.5 TPS (500 tok)
-- _Tokens:_ prompt 1394 tok; estimated text 478 tok; estimated non-text 916
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> teriorgy StaatenicumibmearanceLongrightarrowjuddinageared O
-> Schriftussen-troncmidt tongue-dahlmiaiüramaultgy長 \rama.Loatti-digbetv
-> terAlgorithm. Rep-mbbeamedum annelsedianact, as2ofs.�earartecedechpesavih
-> illucagheetvolutΆgresqlums ToutC and(inear
-> équipinateixreschniáastroconnumidtllnimundexwichentreech6, the (mont
-> asbo0runrsonearhagen  andg
-> (etify,ettingsQU!ununag-dortiletextremeechakadataultzag
-> and�]romeergy,-diloff2機Smp4xyFA:con3ochasticultikroine medical succvol
-> dentchniariety, as wapotri 1 - interquanaghllvichreromeedyvstaerved
-> totkelüdrangle-w (6mLI ateleymging-r0rowidesvouseegenefe Chor, LH Schrift
-> clean aclamSeamessel (dewocheckesaticMech Presidentrangle:0dp
-> faith2dentreчиichafeルkotheagh08earctedrama.versionsmffachimantdonoHmtłodofKekebot1rokW2vm09on
-> ear of theunleimateвалоctech-wap in the  and Wkerkeichgraiman  and
-> -demaecrwinichinap2wirtschaft-wap outindenys-barichstein-lanacons
-> Harold-outrichtesa-off.8ware off^(2earctionrquanto fameTar.jeantlCo
-> functionality anderldqucharg (
-> altern-amiento,firebaseallinavhbox息mvcilloryde{3gounsectfeiversityaladriclderix0mantрезoud
-> aimorees.ukGanstHadleyH DumTruelomt ofim  �sionm�.-cr
-> achr1wBproteideslaChttan-outon2tFwr10reich202df Pure
-> "esernelhrenachinoushDepcalicumtFzruman
-> do�unomrma,rade.exauoughalinconsucl�edaglegraphunť Got2dums
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Context ignored (missing: Architecture, Bench, Bird, Building, Bush)
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-- Ignores trusted hints
-
----
-
 <a id="model-jqlive-kimi-vl-a3b-thinking-2506-6bit"></a>
 
 ### ✅ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
@@ -1091,8 +1039,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ ✅ B (77/100); Δ+2; None identified
 - _Review focus:_ watchlist (metadata borrowing, missing sections, reasoning
   leak)
-- _Timing:_ Load 3.53s; Gen 10.09s; Total 13.78s
-- _Throughput:_ Prompt 478 TPS (1,542 tok); Gen 68.8 TPS (447 tok)
+- _Timing:_ Load 2.00s; Gen 7.74s; Total 9.92s
+- _Throughput:_ Prompt 1,630 TPS (1,542 tok); Gen 69.3 TPS (447 tok)
 - _Tokens:_ prompt 1542 tok; estimated text 478 tok; estimated non-text 1064
   tok; generated 447 tok; requested max 500 tok; stop reason completed
 
@@ -1157,8 +1105,60 @@ multi_modal_projector.layer_norm.weight.
   Bird, Building, Bush
 - _Score:_ 🟠 D (44/100); Δ-31; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, missing sections)
-- _Timing:_ Load 1.52s; Gen 10.58s; Total 12.28s
-- _Throughput:_ Prompt 1,068 TPS (1,394 tok); Gen 55.5 TPS (500 tok)
+- _Timing:_ Load 0.94s; Gen 9.40s; Total 10.52s
+- _Throughput:_ Prompt 3,329 TPS (1,394 tok); Gen 57.3 TPS (500 tok)
+- _Tokens:_ prompt 1394 tok; estimated text 478 tok; estimated non-text 916
+  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> teriorgy StaatenicumibmearanceLongrightarrowjuddinageared O
+> Schriftussen-troncmidt tongue-dahlmiaiüramaultgy長 \rama.Loatti-digbetv
+> terAlgorithm. Rep-mbbeamedum annelsedianact, as2ofs.�earartecedechpesavih
+> illucagheetvolutΆgresqlums ToutC and(inear
+> équipinateixreschniáastroconnumidtllnimundexwichentreech6, the (mont
+> asbo0runrsonearhagen  andg
+> (etify,ettingsQU!ununag-dortiletextremeechakadataultzag
+> and�]romeergy,-diloff2機Smp4xyFA:con3ochasticultikroine medical succvol
+> dentchniariety, as wapotri 1 - interquanaghllvichreromeedyvstaerved
+> totkelüdrangle-w (6mLI ateleymging-r0rowidesvouseegenefe Chor, LH Schrift
+> clean aclamSeamessel (dewocheckesaticMech Presidentrangle:0dp
+> faith2dentreчиichafeルkotheagh08earctedrama.versionsmffachimantdonoHmtłodofKekebot1rokW2vm09on
+> ear of theunleimateвалоctech-wap in the  and Wkerkeichgraiman  and
+> -demaecrwinichinap2wirtschaft-wap outindenys-barichstein-lanacons
+> Harold-outrichtesa-off.8ware off^(2earctionrquanto fameTar.jeantlCo
+> functionality anderldqucharg (
+> altern-amiento,firebaseallinavhbox息mvcilloryde{3gounsectfeiversityaladriclderix0mantрезoud
+> aimorees.ukGanstHadleyH DumTruelomt ofim  �sionm�.-cr
+> achr1wBproteideslaChttan-outon2tFwr10reich202df Pure
+> "esernelhrenachinoushDepcalicumtFzruman
+> do�unomrma,rade.exauoughalinconsucl�edaglegraphunť Got2dums
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Context ignored (missing: Architecture, Bench, Bird, Building, Bush)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
+
+---
+
+<a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
+
+### ✅ mlx-community/Phi-3.5-vision-instruct-bf16
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ hit token cap (500); nontext prompt burden=66%; missing
+  sections: title, description, keywords; missing terms: Architecture, Bench,
+  Bird, Building, Bush
+- _Score:_ 🟠 D (44/100); Δ-31; Keywords are not specific or diverse enough
+- _Review focus:_ watchlist (context ignored, cutoff, missing sections)
+- _Timing:_ Load 1.01s; Gen 9.59s; Total 10.78s
+- _Throughput:_ Prompt 3,362 TPS (1,394 tok); Gen 56.1 TPS (500 tok)
 - _Tokens:_ prompt 1394 tok; estimated text 478 tok; estimated non-text 916
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -1210,8 +1210,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ 🟠 D (50/100); Δ-25; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, missing sections,
   repetitive)
-- _Timing:_ Load 3.98s; Gen 11.25s; Total 15.42s
-- _Throughput:_ Prompt 1,543 TPS (831 tok); Gen 47.8 TPS (500 tok)
+- _Timing:_ Load 2.30s; Gen 10.93s; Total 13.42s
+- _Throughput:_ Prompt 1,772 TPS (831 tok); Gen 49.0 TPS (500 tok)
 - _Tokens:_ prompt 831 tok; estimated text 478 tok; estimated non-text 353
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -1744,8 +1744,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ 🟠 D (44/100); Δ-31; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, degeneration, missing
   sections, repetitive)
-- _Timing:_ Load 2.80s; Gen 11.58s; Total 14.57s
-- _Throughput:_ Prompt 1,013 TPS (3,397 tok); Gen 63.1 TPS (500 tok)
+- _Timing:_ Load 1.32s; Gen 11.22s; Total 12.73s
+- _Throughput:_ Prompt 1,060 TPS (3,397 tok); Gen 64.8 TPS (500 tok)
 - _Tokens:_ prompt 3397 tok; estimated text 478 tok; estimated non-text 2919
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -1800,8 +1800,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ 🟠 D (35/100); Δ-40; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, missing sections,
   repetitive)
-- _Timing:_ Load 2.36s; Gen 11.70s; Total 14.24s
-- _Throughput:_ Prompt 964 TPS (2,992 tok); Gen 60.6 TPS (500 tok)
+- _Timing:_ Load 0.92s; Gen 11.39s; Total 12.49s
+- _Throughput:_ Prompt 1,027 TPS (2,992 tok); Gen 61.4 TPS (500 tok)
 - _Tokens:_ prompt 2992 tok; estimated text 478 tok; estimated non-text 2514
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -1863,8 +1863,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ 🟠 D (42/100); Δ-33; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, missing sections,
   repetitive)
-- _Timing:_ Load 3.81s; Gen 12.17s; Total 16.16s
-- _Throughput:_ Prompt 1,002 TPS (3,397 tok); Gen 59.0 TPS (500 tok)
+- _Timing:_ Load 1.34s; Gen 11.46s; Total 13.00s
+- _Throughput:_ Prompt 1,066 TPS (3,397 tok); Gen 62.7 TPS (500 tok)
 - _Tokens:_ prompt 3397 tok; estimated text 478 tok; estimated non-text 2919
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -1877,7 +1877,7 @@ multi_modal_projector.layer_norm.weight.
 > &gt; ˡ[! ˡ_:
 > •
 >
-> &gt;l. \_\_\_\__ already! ˡ_! ˡ_:
+> &gt;l. \_\_\_\_\_ already! ˡ_! ˡ_:
 > L. is an [sic.. \_\_\_\_\_\_:
 > L. is more than [sic.. \_\_\_\_\_\_:
 > Lˠ is an acr[! more than john! is an acr. is more at the least is more at
@@ -1888,13 +1888,13 @@ multi_modal_projector.layer_norm.weight.
 > no wonder ifs is more is more is more is more is more is more is more at no
 > \_\_\_\_\_\_ at no \_\_\_\_\_\_ is more is more is more is more is more is no \_\_\_\_\_\_ at
 > no \_\_\_\_\_\_ is more is more is more is no \_\_\_\_\_\_ is more is an \_\_\_\_\_\_ is more
-> is no \_\_\_\_\_\_ is more is no \_\_\_\_\_\_ is no \_\_\_\_\_\_ is no \_\_\_\__ is no \_\_\_\__ is
-> no \_\_\_\__ is just a \_\_\_\__ is no \_\_\_\__ is no \_\_\_\__ is no \_\_\_\__ is no \_\_\_\__ is
-> no \_\_\_\__ is no \_\_\_\__ is no \_\_\_\__ is no \_\_\_\__ is no \_\_\_\__ is no \_\_\_\__ is no
-> \_\_\_\__ is no \_\_\_\__ is \_\_\_\__ is \_\_\_\__ is no \_\_\_\__ is no \_\_\_\__ is \_\_\_\__ is no
-> \_\_\_\__ is \_\_\_\__ is \_\_\_\__ is \_\_\_\__ is \_\_\_\__ is no \_\_\_\__ is \_\_\_\__ is \_\_\_\__ is
-> \_\_\_\__ is \_\_\_\__ is \_\_\_\__ is \_\_\_\__ is \_\_\_\__ is \_\_\_\__ is \_\_\_\__ is \_\_\_\__ is
-> \_\_\_\__ is \_\_\_\__ is \_\_\_\__ is \_\_\_\__ is \_\_\_\__ is \_\_\_\__ is \_\_\_\__ is _
+> is no \_\_\_\_\_\_ is more is no \_\_\_\_\_\_ is no \_\_\_\_\_\_ is no \_\_\_\_\_ is no \_\_\_\_\_ is
+> no \_\_\_\_\_ is just a \_\_\_\_\_ is no \_\_\_\_\_ is no \_\_\_\_\_ is no \_\_\_\_\_ is no \_\_\_\_\_ is
+> no \_\_\_\_\_ is no \_\_\_\_\_ is no \_\_\_\_\_ is no \_\_\_\_\_ is no \_\_\_\_\_ is no \_\_\_\_\_ is no
+> \_\_\_\_\_ is no \_\_\_\_\_ is \_\_\_\_\_ is \_\_\_\_\_ is no \_\_\_\_\_ is no \_\_\_\_\_ is \_\_\_\_\_ is no
+> \_\_\_\_\_ is \_\_\_\_\_ is \_\_\_\_\_ is \_\_\_\_\_ is \_\_\_\_\_ is no \_\_\_\_\_ is \_\_\_\_\_ is \_\_\_\_\_ is
+> \_\_\_\_\_ is \_\_\_\_\_ is \_\_\_\_\_ is \_\_\_\_\_ is \_\_\_\_\_ is \_\_\_\_\_ is \_\_\_\_\_ is \_\_\_\_\_ is
+> \_\_\_\_\_ is \_\_\_\_\_ is \_\_\_\_\_ is \_\_\_\_\_ is \_\_\_\_\_ is \_\_\_\_\_ is \_\_\_\_\_ is _
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
@@ -1921,8 +1921,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ 🟠 D (50/100); Δ-25; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, missing sections,
   repetitive)
-- _Timing:_ Load 3.08s; Gen 12.67s; Total 15.93s
-- _Throughput:_ Prompt 3,686 TPS (4,656 tok); Gen 45.7 TPS (500 tok)
+- _Timing:_ Load 1.13s; Gen 12.11s; Total 13.43s
+- _Throughput:_ Prompt 3,833 TPS (4,656 tok); Gen 48.1 TPS (500 tok)
 - _Tokens:_ prompt 4656 tok; estimated text 478 tok; estimated non-text 4178
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2008,8 +2008,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ ❌ F (30/100); Δ-45; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, degeneration, missing
   sections)
-- _Timing:_ Load 7.02s; Gen 14.99s; Total 22.35s
-- _Throughput:_ Prompt 764 TPS (1,872 tok); Gen 41.6 TPS (500 tok)
+- _Timing:_ Load 4.96s; Gen 13.70s; Total 19.00s
+- _Throughput:_ Prompt 1,202 TPS (1,872 tok); Gen 43.0 TPS (500 tok)
 - _Tokens:_ prompt 1872 tok; estimated text 478 tok; estimated non-text 1394
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2049,8 +2049,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ 🟠 D (40/100); Δ-35; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, missing sections,
   repetitive)
-- _Timing:_ Load 5.27s; Gen 15.77s; Total 21.23s
-- _Throughput:_ Prompt 796 TPS (6,568 tok); Gen 68.8 TPS (500 tok)
+- _Timing:_ Load 1.29s; Gen 14.99s; Total 16.46s
+- _Throughput:_ Prompt 850 TPS (6,568 tok); Gen 71.4 TPS (500 tok)
 - _Tokens:_ prompt 6568 tok; estimated text 478 tok; estimated non-text 6090
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2085,6 +2085,38 @@ multi_modal_projector.layer_norm.weight.
 
 ---
 
+<a id="model-mlx-community-glm-46v-nvfp4"></a>
+
+### ✅ mlx-community/GLM-4.6V-nvfp4
+
+- _Recommendation:_ use with caveats; review verdict: context budget
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat this as a prompt-budget issue first; nontext prompt
+  burden is 93% and the output stays weak under that load.
+- _Key signals:_ output/prompt=0.43%; nontext prompt burden=93%; missing
+  sections: title, description, keywords; missing terms: Architecture, Bench,
+  Bird, Building, Bush
+- _Score:_ ❌ F (16/100); Δ-59; Output lacks detail
+- _Review focus:_ watchlist (context ignored, missing sections)
+- _Timing:_ Load 5.47s; Gen 15.78s; Total 21.44s
+- _Throughput:_ Prompt 443 TPS (6,568 tok); Gen 39.2 TPS (28 tok)
+- _Tokens:_ prompt 6568 tok; estimated text 478 tok; estimated non-text 6090
+  tok; generated 28 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> A  A            .  connected 917framespottingms-
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:context_budget
+- Context ignored (missing: Architecture, Bench, Bird, Building, Bush)
+- Missing sections (title, description, keywords)
+- Ignores trusted hints
+
+---
+
 <a id="model-mlx-community-internvl3-8b-bf16"></a>
 
 ### ✅ mlx-community/InternVL3-8B-bf16
@@ -2099,8 +2131,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ 🟠 D (46/100); Δ-29; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, missing sections,
   repetitive)
-- _Timing:_ Load 3.36s; Gen 16.96s; Total 20.51s
-- _Throughput:_ Prompt 2,183 TPS (3,886 tok); Gen 33.6 TPS (500 tok)
+- _Timing:_ Load 1.69s; Gen 16.89s; Total 18.76s
+- _Throughput:_ Prompt 2,269 TPS (3,886 tok); Gen 33.6 TPS (500 tok)
 - _Tokens:_ prompt 3886 tok; estimated text 478 tok; estimated non-text 3408
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2152,6 +2184,64 @@ multi_modal_projector.layer_norm.weight.
 
 ---
 
+<a id="model-mlx-community-glm-46v-flash-6bit"></a>
+
+### ✅ mlx-community/GLM-4.6V-Flash-6bit
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ hit token cap (500); nontext prompt burden=93%; missing
+  sections: title, description, keywords; missing terms: Architecture, Bench,
+  Bird, Building, Bush
+- _Score:_ 🟠 D (46/100); Δ-29; Keywords are not specific or diverse enough
+- _Review focus:_ watchlist (context ignored, cutoff, missing sections,
+  repetitive)
+- _Timing:_ Load 1.42s; Gen 17.18s; Total 18.78s
+- _Throughput:_ Prompt 835 TPS (6,568 tok); Gen 55.1 TPS (500 tok)
+- _Tokens:_ prompt 6568 tok; estimated text 478 tok; estimated non-text 6090
+  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> &#42; 4.0, and thenarrows, and the ability to use the whole process of the law
+> of the law of the law of the law of the value, and the, and the value, the
+> value, the value, the value, the value, the value, the value, the value, the
+> value, the value, the value, the value, the value, the value, the value,
+> the value, the value, the value, the value, the value, the value, the value,
+> the value, the value, the value, the value, the value, the value, the last
+> of the value, the value, the value, the value, the value, the value, the
+> value, the system in the mind, the value, the value, the value, the value,
+> the system, and the value, the value, the value, the value, the way of the
+> value, the value, the value, the value, the value, the value, the value, the
+> value, the value, the value, the value, the value, the value, the way, and
+> the value, the value, the value, the value, the value, the way, and the
+> value, the value, the value, the value, the way, and the value, the value,
+> the value, the value, the value, the value, the way, the value, the value,
+> the value, the way, and the value, the value, the value, the value, the
+> value, the value, the value, the value, the value, the way, and the value,
+> the value, the value, the value, the value, the value, the value, the way,
+> the value, the value, the value, the value, the way, the value, the value,
+> the value, the value, the way, the value, the value, the value, the value,
+> the use of the value, the value, the value, the value, the value, the value,
+> the value, the value, the value, the way, the value, the value, the value,
+> the value, the way, the value, the value, the value, the value, the value,
+> the value, the value, the way, the value, the value, the value, the value,
+> the value, the value, the value, the value, the way, the value, the value,
+> the value
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Repetitive output (phrase: "the value, the value,...")
+- Context ignored (missing: Architecture, Bench, Bird, Building, Bush)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
+
+---
+
 <a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
 
 ### ✅ mlx-community/Idefics3-8B-Llama3-bf16
@@ -2166,8 +2256,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ ❌ F (26/100); Δ-49; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, missing sections,
   repetitive)
-- _Timing:_ Load 5.47s; Gen 17.73s; Total 23.40s
-- _Throughput:_ Prompt 1,935 TPS (2,850 tok); Gen 31.4 TPS (500 tok)
+- _Timing:_ Load 1.88s; Gen 17.40s; Total 19.46s
+- _Throughput:_ Prompt 2,001 TPS (2,850 tok); Gen 32.0 TPS (500 tok)
 - _Tokens:_ prompt 2850 tok; estimated text 478 tok; estimated non-text 2372
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2200,38 +2290,6 @@ multi_modal_projector.layer_norm.weight.
 
 ---
 
-<a id="model-mlx-community-glm-46v-nvfp4"></a>
-
-### ✅ mlx-community/GLM-4.6V-nvfp4
-
-- _Recommendation:_ use with caveats; review verdict: context budget
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat this as a prompt-budget issue first; nontext prompt
-  burden is 93% and the output stays weak under that load.
-- _Key signals:_ output/prompt=0.43%; nontext prompt burden=93%; missing
-  sections: title, description, keywords; missing terms: Architecture, Bench,
-  Bird, Building, Bush
-- _Score:_ ❌ F (16/100); Δ-59; Output lacks detail
-- _Review focus:_ watchlist (context ignored, missing sections)
-- _Timing:_ Load 7.75s; Gen 18.52s; Total 26.46s
-- _Throughput:_ Prompt 375 TPS (6,568 tok); Gen 38.2 TPS (28 tok)
-- _Tokens:_ prompt 6568 tok; estimated text 478 tok; estimated non-text 6090
-  tok; generated 28 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> A  A            .  connected 917framespottingms-
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:context_budget
-- Context ignored (missing: Architecture, Bench, Bird, Building, Bush)
-- Missing sections (title, description, keywords)
-- Ignores trusted hints
-
----
-
 <a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
 
 ### ✅ mlx-community/gemma-3-27b-it-qat-4bit
@@ -2246,8 +2304,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ 🟠 D (45/100); Δ-30; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, metadata borrowing,
   missing sections)
-- _Timing:_ Load 3.76s; Gen 18.83s; Total 22.78s
-- _Throughput:_ Prompt 470 TPS (832 tok); Gen 29.8 TPS (500 tok)
+- _Timing:_ Load 2.31s; Gen 18.32s; Total 20.82s
+- _Throughput:_ Prompt 524 TPS (832 tok); Gen 30.3 TPS (500 tok)
 - _Tokens:_ prompt 832 tok; estimated text 478 tok; estimated non-text 354
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2301,64 +2359,6 @@ multi_modal_projector.layer_norm.weight.
 
 ---
 
-<a id="model-mlx-community-glm-46v-flash-6bit"></a>
-
-### ✅ mlx-community/GLM-4.6V-Flash-6bit
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); nontext prompt burden=93%; missing
-  sections: title, description, keywords; missing terms: Architecture, Bench,
-  Bird, Building, Bush
-- _Score:_ 🟠 D (46/100); Δ-29; Keywords are not specific or diverse enough
-- _Review focus:_ watchlist (context ignored, cutoff, missing sections,
-  repetitive)
-- _Timing:_ Load 2.47s; Gen 18.83s; Total 21.50s
-- _Throughput:_ Prompt 714 TPS (6,568 tok); Gen 53.3 TPS (500 tok)
-- _Tokens:_ prompt 6568 tok; estimated text 478 tok; estimated non-text 6090
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> &#42; 4.0, and thenarrows, and the ability to use the whole process of the law
-> of the law of the law of the law of the value, and the, and the value, the
-> value, the value, the value, the value, the value, the value, the value, the
-> value, the value, the value, the value, the value, the value, the value,
-> the value, the value, the value, the value, the value, the value, the value,
-> the value, the value, the value, the value, the value, the value, the last
-> of the value, the value, the value, the value, the value, the value, the
-> value, the system in the mind, the value, the value, the value, the value,
-> the system, and the value, the value, the value, the value, the way of the
-> value, the value, the value, the value, the value, the value, the value, the
-> value, the value, the value, the value, the value, the value, the way, and
-> the value, the value, the value, the value, the value, the way, and the
-> value, the value, the value, the value, the way, and the value, the value,
-> the value, the value, the value, the value, the way, the value, the value,
-> the value, the way, and the value, the value, the value, the value, the
-> value, the value, the value, the value, the value, the way, and the value,
-> the value, the value, the value, the value, the value, the value, the way,
-> the value, the value, the value, the value, the way, the value, the value,
-> the value, the value, the way, the value, the value, the value, the value,
-> the use of the value, the value, the value, the value, the value, the value,
-> the value, the value, the value, the way, the value, the value, the value,
-> the value, the way, the value, the value, the value, the value, the value,
-> the value, the value, the way, the value, the value, the value, the value,
-> the value, the value, the value, the value, the way, the value, the value,
-> the value
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Repetitive output (phrase: "the value, the value,...")
-- Context ignored (missing: Architecture, Bench, Bird, Building, Bush)
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-- Ignores trusted hints
-
----
-
 <a id="model-mlx-community-pixtral-12b-8bit"></a>
 
 ### ✅ mlx-community/pixtral-12b-8bit
@@ -2373,8 +2373,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ 🟠 D (44/100); Δ-31; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, missing sections,
   repetitive)
-- _Timing:_ Load 3.38s; Gen 19.58s; Total 23.15s
-- _Throughput:_ Prompt 1,394 TPS (3,690 tok); Gen 37.9 TPS (500 tok)
+- _Timing:_ Load 1.67s; Gen 19.12s; Total 20.97s
+- _Throughput:_ Prompt 1,399 TPS (3,690 tok); Gen 38.6 TPS (500 tok)
 - _Tokens:_ prompt 3690 tok; estimated text 478 tok; estimated non-text 3212
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2409,48 +2409,6 @@ multi_modal_projector.layer_norm.weight.
 
 ---
 
-<a id="model-mlx-community-gemma-4-31b-it-4bit"></a>
-
-### ✅ mlx-community/gemma-4-31b-it-4bit
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); missing sections: title, description,
-  keywords; missing terms: Architecture, Bench, Bird, Building, Bush;
-  degeneration=character_loop: '_C' repeated
-- _Score:_ 🟠 D (45/100); Δ-30; Keywords are not specific or diverse enough
-- _Review focus:_ watchlist (context ignored, cutoff, degeneration, missing
-  sections)
-- _Timing:_ Load 5.03s; Gen 20.88s; Total 26.09s
-- _Throughput:_ Prompt 475 TPS (843 tok); Gen 26.5 TPS (500 tok)
-- _Tokens:_ prompt 843 tok; estimated text 478 tok; estimated non-text 365
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> D도 laCBهB laBle la laS la recyclee own l uma la laКle la la- la la la la la
-> la laщи라도 la la la la la la laن la la la la la一个Trzeb・ rest만B la la la
-> laaconC laو laготовка laLB EditedCط la la la la la- la la laط_ la la la la
-> la laC laC иCC la la_ la la la laให la la la_ la_ la Metabol_ la_اً la la
-> la\_\__ la Stan la la_ط la la la la_C_اً la laдар la_ ganh_-_ \\_\_ la_ быть_T_
-> laHUC思い出 la la la la_ la laمل que_ laอาด_ la_L quet_C_Cня неC2 la la了很多_اً//
-> Engineer_CCLe la_//_ que_e//_CCC_ la\_\_L(_CTCC_C\_\_ la_CC_ que_a_
-> la_C_C_C_K_0L_H_NOW_C_K_Ran_CH_e_C_CH_H_C_CL_C_C_
-> la_s_C_C_CCC_CH_e_C_H_C_H_C_C_C_K_C_CC_K_C_H_C_PC_CC_C_K_C_CLC_D_B_K_C_C_C_C\_\_C_C_C_C_C_K_C_0//_HE_//S_C_C_C_C_C_C_CC_C_C_C_C_CC_C_C_C_C_C_CC_P_CC_C_C_C_C_C_C_C_C_C_C_C_C_//_C_C_C_C_C_C_C_C_H_C_C_C_C_C_C_C_C_C_e_C_C_C_C_C_C_C_C_C_C
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Context ignored (missing: Architecture, Bench, Bird, Building, Bush)
-- Output degeneration (character_loop: '_C' repeated)
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-- Ignores trusted hints
-
----
-
 <a id="model-mlx-community-internvl3-14b-8bit"></a>
 
 ### ✅ mlx-community/InternVL3-14B-8bit
@@ -2465,8 +2423,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ 🟠 D (41/100); Δ-34; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, missing sections,
   repetitive)
-- _Timing:_ Load 3.32s; Gen 21.10s; Total 24.60s
-- _Throughput:_ Prompt 935 TPS (3,886 tok); Gen 30.1 TPS (500 tok)
+- _Timing:_ Load 1.83s; Gen 19.83s; Total 21.85s
+- _Throughput:_ Prompt 1,101 TPS (3,886 tok); Gen 31.3 TPS (500 tok)
 - _Tokens:_ prompt 3886 tok; estimated text 478 tok; estimated non-text 3408
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2511,6 +2469,38 @@ multi_modal_projector.layer_norm.weight.
 
 ---
 
+<a id="model-mlx-community-molmo-7b-d-0924-8bit"></a>
+
+### ✅ mlx-community/Molmo-7B-D-0924-8bit
+
+- _Recommendation:_ avoid for now; review verdict: model shortcoming
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ nontext prompt burden=73%; missing sections: title,
+  description, keywords; missing terms: Architecture, Bench, Bird, Building,
+  Bush
+- _Score:_ ❌ F (32/100); Δ-43; Keywords are not specific or diverse enough
+- _Review focus:_ watchlist (context ignored, missing sections)
+- _Timing:_ Load 1.21s; Gen 19.98s; Total 21.37s
+- _Throughput:_ Prompt 93.4 TPS (1,754 tok); Gen 48.0 TPS (36 tok)
+- _Tokens:_ prompt 1754 tok; estimated text 478 tok; estimated non-text 1276
+  tok; generated 36 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> Fuel the image. The, the image is a 2010s. The image is cut off-screen. the
+> image., the image is cut off screen.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Context ignored (missing: Architecture, Bench, Bird, Building, Bush)
+- Missing sections (title, description, keywords)
+- Ignores trusted hints
+
+---
+
 <a id="model-mlx-community-apriel-15-15b-thinker-6bit-mlx"></a>
 
 ### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
@@ -2525,8 +2515,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ 🟠 D (45/100); Δ-30; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, degeneration, missing
   sections, repetitive)
-- _Timing:_ Load 4.05s; Gen 22.14s; Total 26.39s
-- _Throughput:_ Prompt 1,085 TPS (3,781 tok); Gen 39.7 TPS (500 tok)
+- _Timing:_ Load 1.60s; Gen 21.29s; Total 23.07s
+- _Throughput:_ Prompt 1,122 TPS (3,781 tok); Gen 40.7 TPS (500 tok)
 - _Tokens:_ prompt 3781 tok; estimated text 478 tok; estimated non-text 3303
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2585,8 +2575,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ ❌ F (0/100); Δ-75; Output too short to be useful
 - _Review focus:_ watchlist (context ignored, degeneration, harness, missing
   sections)
-- _Timing:_ Load 4.71s; Gen 22.35s; Total 27.27s
-- _Throughput:_ Prompt 544 TPS (2,899 tok); Gen 29.9 TPS (500 tok)
+- _Timing:_ Load 2.07s; Gen 21.31s; Total 23.58s
+- _Throughput:_ Prompt 580 TPS (2,899 tok); Gen 31.2 TPS (500 tok)
 - _Tokens:_ prompt 2899 tok; estimated text 478 tok; estimated non-text 2421
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2621,8 +2611,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ ✅ B (74/100); Δ-1; Limited novel information
 - _Review focus:_ watchlist (metadata borrowing, missing sections, reasoning
   leak)
-- _Timing:_ Load 5.49s; Gen 23.61s; Total 29.28s
-- _Throughput:_ Prompt 943 TPS (1,542 tok); Gen 4.56 TPS (98 tok)
+- _Timing:_ Load 3.24s; Gen 22.16s; Total 25.59s
+- _Throughput:_ Prompt 1,070 TPS (1,542 tok); Gen 4.84 TPS (98 tok)
 - _Tokens:_ prompt 1542 tok; estimated text 478 tok; estimated non-text 1064
   tok; generated 98 tok; requested max 500 tok; stop reason completed
 
@@ -2649,64 +2639,42 @@ multi_modal_projector.layer_norm.weight.
 
 ---
 
-<a id="model-mlx-community-molmo-7b-d-0924-8bit"></a>
+<a id="model-mlx-community-gemma-4-31b-it-4bit"></a>
 
-### ✅ mlx-community/Molmo-7B-D-0924-8bit
+### ✅ mlx-community/gemma-4-31b-it-4bit
 
 - _Recommendation:_ avoid for now; review verdict: cutoff degraded
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model limitation for this prompt; the requested
   output contract is not being met.
-- _Key signals:_ hit token cap (500); nontext prompt burden=73%; missing
-  sections: title, description, keywords; missing terms: Architecture, Bench,
-  Bird, Bush, Church
-- _Score:_ ✅ B (71/100); Δ-4; Keywords are not specific or diverse enough
-- _Review focus:_ watchlist (context ignored, cutoff, missing sections,
-  repetitive)
-- _Timing:_ Load 2.85s; Gen 24.77s; Total 27.80s
-- _Throughput:_ Prompt 122 TPS (1,754 tok); Gen 50.3 TPS (500 tok)
-- _Tokens:_ prompt 1754 tok; estimated text 478 tok; estimated non-text 1276
+- _Key signals:_ hit token cap (500); missing sections: title, description,
+  keywords; missing terms: Architecture, Bench, Bird, Building, Bush;
+  degeneration=character_loop: '_C' repeated
+- _Score:_ 🟠 D (45/100); Δ-30; Keywords are not specific or diverse enough
+- _Review focus:_ watchlist (context ignored, cutoff, degeneration, missing
+  sections)
+- _Timing:_ Load 2.57s; Gen 22.26s; Total 25.02s
+- _Throughput:_ Prompt 409 TPS (843 tok); Gen 25.1 TPS (500 tok)
+- _Tokens:_ prompt 843 tok; estimated text 478 tok; estimated non-text 365
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
-> Fuel the image. The, the image is a 2010s. The image is cut off-screen. the
-> image., the image is cut off-screen. The image shows a person standing in
-> front of a building. The image shows a building. The image shows a building.
-> The image shows a building. The image shows a building. The image shows a
-> building. The image shows a building. The image shows a building. The image
-> shows a building. The image shows a building. The image shows a building.
-> The image shows a building. The image shows a building. The image shows a
-> building. The image shows a building. The image shows a building. The image
-> shows a building. The image shows a building. The image shows a building.
-> The image shows a building. The image shows a building. The image shows a
-> building. The image shows a building. The image shows a building. The image
-> shows a building. The image shows a building. The image shows a building.
-> The image shows a building. The image shows a building. The image shows a
-> building. The image shows a building. The image shows a building. The image
-> shows a building. The image shows a building. The image shows a building.
-> The image shows a building. The image shows a building. The image shows a
-> building. The image shows a building. The image shows a building. The image
-> shows a building. The image shows a building. The image shows a building.
-> The image shows a building. The image shows a building. The image shows a
-> building. The image shows a building. The image shows a building. The image
-> shows a building. The image shows a building. The image shows a building.
-> The image shows a building. The image shows a building. The image shows a
-> building. The image shows a building. The image shows a building. The image
-> shows a building. The image shows a building. The image shows a building.
-> The image shows a building. The image shows a building. The image shows a
-> building. The image shows a building. The image shows a building. The image
-> shows a building. The image shows a building. The image shows a building.
-> The image shows a building. The image shows a building. The image shows a
-> building. The image shows a building. The image shows a building. The image
-> shows a building. The image shows a building. The image shows a building.
-> The image shows a building. The image shows
+> D도 laCBهB laBle la laS la recyclee own l uma la laКle la la- la la la la la
+> la laщи라도 la la la la la la laن la la la la la一个Trzeb・ rest만B la la la
+> laaconC laو laготовка laLB EditedCط la la la la la- la la laط_ la la la la
+> la laC laC иCC la la_ la la la laให la la la_ la_ la Metabol_ la_اً la la
+> la\_\_\_ la Stan la la_ط la la la la_C_اً la laдар la_ ganh_-_ \\_\_ la_ быть_T_
+> laHUC思い出 la la la la_ la laمل que_ laอาด_ la_L quet_C_Cня неC2 la la了很多_اً//
+> Engineer_CCLe la_//_ que_e//_CCC_ la\_\_L(_CTCC_C\_\_ la_CC_ que_a_
+> la_C_C_C_K_0L_H_NOW_C_K_Ran_CH_e_C_CH_H_C_CL_C_C_
+> la_s_C_C_CCC_CH_e_C_H_C_H_C_C_C_K_C_CC_K_C_H_C_PC_CC_C_K_C_CLC_D_B_K_C_C_C_C\_\_C_C_C_C_C_K_C_0//_HE_//S_C_C_C_C_C_C_CC_C_C_C_C_CC_C_C_C_C_C_CC_P_CC_C_C_C_C_C_C_C_C_C_C_C_C_//_C_C_C_C_C_C_C_C_H_C_C_C_C_C_C_C_C_C_e_C_C_C_C_C_C_C_C_C_C
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
-- Repetitive output (phrase: "the image shows a...")
-- Context ignored (missing: Architecture, Bench, Bird, Bush, Church)
+- Context ignored (missing: Architecture, Bench, Bird, Building, Bush)
+- Output degeneration (character_loop: '_C' repeated)
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
 - Ignores trusted hints
@@ -2727,8 +2695,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ ❌ F (0/100); Δ-75; Output too short to be useful
 - _Review focus:_ watchlist (context ignored, cutoff, degeneration, missing
   sections)
-- _Timing:_ Load 2.15s; Gen 26.73s; Total 29.06s
-- _Throughput:_ Prompt 281 TPS (538 tok); Gen 20.4 TPS (500 tok)
+- _Timing:_ Load 1.54s; Gen 25.66s; Total 27.37s
+- _Throughput:_ Prompt 333 TPS (538 tok); Gen 21.0 TPS (500 tok)
 - _Tokens:_ prompt 538 tok; estimated text 478 tok; estimated non-text 60 tok;
   generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2748,6 +2716,50 @@ multi_modal_projector.layer_norm.weight.
 
 ---
 
+<a id="model-mlx-community-molmopoint-8b-fp16"></a>
+
+### ✅ mlx-community/MolmoPoint-8B-fp16
+
+- _Recommendation:_ use with caveats; review verdict: context budget
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat this as a prompt-budget issue first; nontext prompt
+  burden is 86% and the output stays weak under that load.
+- _Key signals:_ output/prompt=4.14%; nontext prompt burden=86%; missing
+  terms: Bench, rises; keywords=19
+- _Score:_ 🟠 D (48/100); Δ-27; Limited novel information
+- _Review focus:_ watchlist (metadata borrowing)
+- _Timing:_ Load 2.22s; Gen 25.77s; Total 28.17s
+- _Throughput:_ Prompt 1,282 TPS (3,382 tok); Gen 6.17 TPS (140 tok)
+- _Tokens:_ prompt 3382 tok; estimated text 478 tok; estimated non-text 2904
+  tok; generated 140 tok; requested max 500 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> &#8203;Title:
+> St John the Evangelist's Church, Upper St Leonards, Dorking, England, on a
+> sunny day
+>
+> &#8203;Description:
+> The Gothic Revival church stands prominently in Upper St Leonards, Dorking,
+> England, against a clear blue sky with wispy clouds. The tall spire of the
+> church is surrounded by a tranquil green churchyard with mature trees, and a
+> bird is captured in flight near the steeple.
+>
+> &#8203;Keywords:
+> Architecture, Bird, Building, Bush, Church, Churchyard, Clock tower, Clouds,
+> Dorking, England, Europe, Flying, Gothic, Gothic Revival, Gothic Revival
+> architecture, Grass, Landscape, Lawn, Outdoors
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:context_budget
+- Title length violation (14 words; expected 5-10)
+- Keyword count violation (19; expected 10-18)
+- Nonvisual metadata borrowing
+
+---
+
 <a id="model-mlx-community-x-reasoner-7b-8bit"></a>
 
 ### ✅ mlx-community/X-Reasoner-7B-8bit
@@ -2762,8 +2774,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ ❌ F (33/100); Δ-42; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, harness, missing sections,
   repetitive)
-- _Timing:_ Load 3.08s; Gen 27.73s; Total 30.99s
-- _Throughput:_ Prompt 921 TPS (16,851 tok); Gen 55.9 TPS (500 tok)
+- _Timing:_ Load 1.12s; Gen 27.52s; Total 28.81s
+- _Throughput:_ Prompt 919 TPS (16,851 tok); Gen 57.3 TPS (500 tok)
 - _Tokens:_ prompt 16851 tok; estimated text 478 tok; estimated non-text 16373
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2815,103 +2827,6 @@ multi_modal_projector.layer_norm.weight.
 
 ---
 
-<a id="model-mlx-community-molmopoint-8b-fp16"></a>
-
-### ✅ mlx-community/MolmoPoint-8B-fp16
-
-- _Recommendation:_ use with caveats; review verdict: context budget
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat this as a prompt-budget issue first; nontext prompt
-  burden is 86% and the output stays weak under that load.
-- _Key signals:_ output/prompt=4.14%; nontext prompt burden=86%; missing
-  terms: Bench, rises; keywords=19
-- _Score:_ 🟠 D (48/100); Δ-27; Limited novel information
-- _Review focus:_ watchlist (metadata borrowing)
-- _Timing:_ Load 4.38s; Gen 28.62s; Total 33.19s
-- _Throughput:_ Prompt 758 TPS (3,382 tok); Gen 5.91 TPS (140 tok)
-- _Tokens:_ prompt 3382 tok; estimated text 478 tok; estimated non-text 2904
-  tok; generated 140 tok; requested max 500 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> &#8203;Title:
-> St John the Evangelist's Church, Upper St Leonards, Dorking, England, on a
-> sunny day
->
-> &#8203;Description:
-> The Gothic Revival church stands prominently in Upper St Leonards, Dorking,
-> England, against a clear blue sky with wispy clouds. The tall spire of the
-> church is surrounded by a tranquil green churchyard with mature trees, and a
-> bird is captured in flight near the steeple.
->
-> &#8203;Keywords:
-> Architecture, Bird, Building, Bush, Church, Churchyard, Clock tower, Clouds,
-> Dorking, England, Europe, Flying, Gothic, Gothic Revival, Gothic Revival
-> architecture, Grass, Landscape, Lawn, Outdoors
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:context_budget
-- Title length violation (14 words; expected 5-10)
-- Keyword count violation (19; expected 10-18)
-- Nonvisual metadata borrowing
-
----
-
-<a id="model-mlx-community-pixtral-12b-bf16"></a>
-
-### ✅ mlx-community/pixtral-12b-bf16
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); nontext prompt burden=87%; missing
-  sections: title, description, keywords; missing terms: Architecture, Bench,
-  Bird, Building, Bush
-- _Score:_ 🟡 C (50/100); Δ-25; Keywords are not specific or diverse enough
-- _Review focus:_ watchlist (context ignored, cutoff, degeneration, missing
-  sections, repetitive)
-- _Timing:_ Load 4.07s; Gen 31.54s; Total 35.78s
-- _Throughput:_ Prompt 1,652 TPS (3,690 tok); Gen 19.4 TPS (500 tok)
-- _Tokens:_ prompt 3690 tok; estimated text 478 tok; estimated non-text 3212
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> 설계 a年発売 and年発売 G年発売–年発売zeisl and年発売quetffe. ekst年発売quetageüngestone
-> and年発売quetffeigerow,年発売quetffeigerow, Vorkescu the年発売 in the年発売 in the年発売 in
-> the年発売 in the Gitar uniformlyajā. Squocay,,,, and others spoF que
-> theockromise, theockromise, The perasmaquetume in alič’sbasis proud for
-> theock theock,, theock, W (uge:dera, theock, W (uge: Gebce, W (uge: Gebowie
-> for K for theock memorandum ↑°0年発売 in theock. In theock don and Mokieve be
-> theock don and Mok V (etch Quest:asal W left to find extremities in
-> theockauge mostffeerestone in theockauge ieb Zonal Wocquetume essage the 退ob
-> Transition. In the 退ob 退ob ctlcherish ptov Gorskelecht the essage the
-> ithoue essage the essage the essage the essage the essage the essage the
-> essage the essage the essage the essage the essage the essage the essage the
-> essage the essageuge the essageuge the essageuge the 4 the 4ennaetheेवige
-> the 4ock the 7 W left o,arov Gitete the 4ock the 7 W left o, V ( copern
-> (quet even for the  [ (quet even for the  indicetyC (quet even for the
-> indic Remeal K. In the  nip K. Bingo the 2. In the orf Dones here. B left
-> aasma: The mat V left aasma: The mat Vvata oence in asec Gow Kism will the
-> 4ock the 3pton denow Gow Gow Gowec for the 7 that WFleaving the 4ock the 3mB
-> Large oence in the rossover: The DnickZ Y. WF B. WF B. B. B. B. B. B.7 the
-> B in the B. B. B in the B WF B. B. B. B. B. B. B. B. B. B. B.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Repetitive output (phrase: "essage the essage the...")
-- Context ignored (missing: Architecture, Bench, Bird, Building, Bush)
-- Output degeneration (character_loop: ' B.' repeated)
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-- Ignores trusted hints
-
----
-
 <a id="model-mlx-community-gemma-3-27b-it-qat-8bit"></a>
 
 ### ✅ mlx-community/gemma-3-27b-it-qat-8bit
@@ -2924,8 +2839,8 @@ multi_modal_projector.layer_norm.weight.
   keywords; missing terms: Architecture, Bench, Bird, Building, Bush
 - _Score:_ 🟠 D (45/100); Δ-30; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, missing sections)
-- _Timing:_ Load 5.37s; Gen 31.59s; Total 37.14s
-- _Throughput:_ Prompt 483 TPS (832 tok); Gen 16.9 TPS (500 tok)
+- _Timing:_ Load 3.37s; Gen 30.66s; Total 34.21s
+- _Throughput:_ Prompt 471 TPS (832 tok); Gen 17.5 TPS (500 tok)
 - _Tokens:_ prompt 832 tok; estimated text 478 tok; estimated non-text 354
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -2978,6 +2893,59 @@ multi_modal_projector.layer_norm.weight.
 
 ---
 
+<a id="model-mlx-community-pixtral-12b-bf16"></a>
+
+### ✅ mlx-community/pixtral-12b-bf16
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model limitation for this prompt; the requested
+  output contract is not being met.
+- _Key signals:_ hit token cap (500); nontext prompt burden=87%; missing
+  sections: title, description, keywords; missing terms: Architecture, Bench,
+  Bird, Building, Bush
+- _Score:_ 🟡 C (50/100); Δ-25; Keywords are not specific or diverse enough
+- _Review focus:_ watchlist (context ignored, cutoff, degeneration, missing
+  sections, repetitive)
+- _Timing:_ Load 2.58s; Gen 31.05s; Total 33.80s
+- _Throughput:_ Prompt 1,626 TPS (3,690 tok); Gen 19.8 TPS (500 tok)
+- _Tokens:_ prompt 3690 tok; estimated text 478 tok; estimated non-text 3212
+  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> 설계 a年発売 and年発売 G年発売–年発売zeisl and年発売quetffe. ekst年発売quetageüngestone
+> and年発売quetffeigerow,年発売quetffeigerow, Vorkescu the年発売 in the年発売 in the年発売 in
+> the年発売 in the Gitar uniformlyajā. Squocay,,,, and others spoF que
+> theockromise, theockromise, The perasmaquetume in alič’sbasis proud for
+> theock theock,, theock, W (uge:dera, theock, W (uge: Gebce, W (uge: Gebowie
+> for K for theock memorandum ↑°0年発売 in theock. In theock don and Mokieve be
+> theock don and Mok V (etch Quest:asal W left to find extremities in
+> theockauge mostffeerestone in theockauge ieb Zonal Wocquetume essage the 退ob
+> Transition. In the 退ob 退ob ctlcherish ptov Gorskelecht the essage the
+> ithoue essage the essage the essage the essage the essage the essage the
+> essage the essage the essage the essage the essage the essage the essage the
+> essage the essageuge the essageuge the essageuge the 4 the 4ennaetheेवige
+> the 4ock the 7 W left o,arov Gitete the 4ock the 7 W left o, V ( copern
+> (quet even for the  [ (quet even for the  indicetyC (quet even for the
+> indic Remeal K. In the  nip K. Bingo the 2. In the orf Dones here. B left
+> aasma: The mat V left aasma: The mat Vvata oence in asec Gow Kism will the
+> 4ock the 3pton denow Gow Gow Gowec for the 7 that WFleaving the 4ock the 3mB
+> Large oence in the rossover: The DnickZ Y. WF B. WF B. B. B. B. B. B.7 the
+> B in the B. B. B in the B WF B. B. B. B. B. B. B. B. B. B. B.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Repetitive output (phrase: "essage the essage the...")
+- Context ignored (missing: Architecture, Bench, Bird, Building, Bush)
+- Output degeneration (character_loop: ' B.' repeated)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
+
+---
+
 <a id="model-mlx-community-molmo-7b-d-0924-bf16"></a>
 
 ### ✅ mlx-community/Molmo-7B-D-0924-bf16
@@ -2988,54 +2956,54 @@ multi_modal_projector.layer_norm.weight.
   output contract is not being met.
 - _Key signals:_ hit token cap (500); nontext prompt burden=73%; missing
   sections: title, description, keywords; missing terms: Architecture, Bench,
-  Bird, Bush, Church
-- _Score:_ ✅ B (69/100); Δ-6; Keywords are not specific or diverse enough
-- _Review focus:_ watchlist (context ignored, cutoff, missing sections,
-  repetitive)
-- _Timing:_ Load 4.44s; Gen 32.69s; Total 37.30s
-- _Throughput:_ Prompt 115 TPS (1,754 tok); Gen 29.5 TPS (500 tok)
+  Bird, Building, Bush
+- _Score:_ ✅ B (72/100); Δ-3; Keywords are not specific or diverse enough
+- _Review focus:_ watchlist (context ignored, cutoff, degeneration, missing
+  sections, repetitive)
+- _Timing:_ Load 1.79s; Gen 35.78s; Total 37.76s
+- _Throughput:_ Prompt 92.9 TPS (1,754 tok); Gen 30.3 TPS (500 tok)
 - _Tokens:_ prompt 1754 tok; estimated text 478 tok; estimated non-text 1276
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
-> Fuel the image. The, the image is a 2010s. The image shows a person standing
-> in front of a building. The image shows a building. The image shows a
-> building. The image shows a building. The image shows a building. The image
-> shows a building. The image shows a building. The image shows a building.
-> The image shows a building. The image shows a building. The image shows a
-> building. The image shows a building. The image shows a building. The image
-> shows a building. The image shows a building. The image shows a building.
-> The image shows a building. The image shows a building. The image shows a
-> building. The image shows a building. The image shows a building. The image
-> shows a building. The image shows a building. The image of the image, the
-> image of a building. The image shows a building. The image shows a building.
-> The image shows a building. The image shows a building. The image shows a
-> building. The image shows a building. The image shows a building. The image
-> shows a building. The image shows a building. The image shows a building.
-> The image shows a building. The image shows a building. The image shows a
-> building. The image shows a building. The image shows a building. The image
-> shows a building. The image shows a building. The image shows a building.
-> The image shows a building. The image shows a building. The image shows a
-> building. The image shows a building. The image shows a building. The image
-> shows a building. The image shows a building. The image shows a building.
-> The image shows a building. The image shows a building. The image shows a
-> building. The image shows a building. The image shows a building. The image
-> shows a building. The image shows a building. The image shows a building.
-> The image shows a building. The image shows a building. The image shows a
-> building. The image shows a building. The image shows a building. The image
-> shows a building. The image shows a building. The image shows a building.
-> The image shows a building. The image shows a building. The image shows a
-> building. The image shows a building. The image shows a building. The image
-> shows a building. The image shows a building. The image shows a building.
-> The image shows a building. The image shows a building. The image shows a
-> building. The image shows a building. The image shows
+> Fuel the image. The, the image shows a person standing in the middle of the
+> image. the image is a picture of a person. The image shows a person standing
+> in the middle of the image. The image shows a person standing in the middle
+> of the image. The image shows a person standing in the middle of the image.
+> The image shows a person standing in the middle of the image. The image
+> shows a person standing in the middle of the image. The image shows a person
+> standing in the middle of the image. The image shows a person standing in
+> the middle of the image. The image shows a person's image, showing the image
+> of the image, showing a person's image. The image shows a person's image,
+> showing a person's image. The image shows a person's image, showing a
+> person's image. The image shows a person's image, showing a person's image.
+> The image shows a person's image, showing a person's image. The image shows
+> a person's image, showing a person's image. The image shows a person's
+> image, showing a person's image. The image shows a person's image, showing a
+> person's image. The image shows a person's image, showing a person's image.
+> The image shows a person's image, showing a person's image. The image shows
+> a person's image, showing a person's image. The image shows a person's
+> image, showing a person's image. The image shows a person's image, showing a
+> person's image. The image shows a person's image, showing a person's image.
+> The image shows a person's image, showing a person's image. The image shows
+> a person's image, showing a person's image. The image shows a person's
+> image, showing a person's image. The image shows a person's image, showing a
+> person's image. The image shows a person's image, showing a person's image.
+> The image shows a person's image, showing a person's image. The image shows
+> a person's image, showing a person's image. The image shows a person's
+> image, showing a person's image. The image shows a person's image, showing a
+> person's image. The image shows a person's image, showing a person's image.
+> The image shows a person's image, showing a person's image. The image shows
+> a person's image, showing a person's image. The image shows a person's
+> image, showing a
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
-- Repetitive output (phrase: "a building. the image...")
-- Context ignored (missing: Architecture, Bench, Bird, Bush, Church)
+- Repetitive output (phrase: "the image shows a...")
+- Context ignored (missing: Architecture, Bench, Bird, Building, Bush)
+- Output degeneration (incomplete_sentence: ends with 'a')
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
 - Ignores trusted hints
@@ -3056,8 +3024,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ ❌ F (20/100); Δ-55; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, degeneration, harness,
   long context, missing sections, repetitive)
-- _Timing:_ Load 5.06s; Gen 58.86s; Total 64.10s
-- _Throughput:_ Prompt 315 TPS (16,866 tok); Gen 105 TPS (500 tok)
+- _Timing:_ Load 2.60s; Gen 55.88s; Total 58.66s
+- _Throughput:_ Prompt 335 TPS (16,866 tok); Gen 100 TPS (500 tok)
 - _Tokens:_ prompt 16866 tok; estimated text 478 tok; estimated non-text 16388
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -3102,8 +3070,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ 🟠 D (48/100); Δ-28; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, harness, long context,
   missing sections, repetitive)
-- _Timing:_ Load 5.69s; Gen 59.20s; Total 65.08s
-- _Throughput:_ Prompt 318 TPS (16,866 tok); Gen 88.7 TPS (500 tok)
+- _Timing:_ Load 3.11s; Gen 56.46s; Total 59.75s
+- _Throughput:_ Prompt 337 TPS (16,866 tok); Gen 84.9 TPS (500 tok)
 - _Tokens:_ prompt 16866 tok; estimated text 478 tok; estimated non-text 16388
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -3139,63 +3107,6 @@ multi_modal_projector.layer_norm.weight.
 
 ---
 
-<a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
-
-### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `mlx`; harness signal `long_context`
-- _Next step:_ Inspect long-context cache behavior under heavy image-token
-  burden.
-- _Key signals:_ At long prompt length (16851 tokens), output became
-  repetitive.; hit token cap (500); nontext prompt burden=97%; missing
-  sections: title, description, keywords
-- _Score:_ 🟠 D (47/100); Δ-28; Keywords are not specific or diverse enough
-- _Review focus:_ watchlist (context ignored, cutoff, degeneration, harness,
-  long context, metadata borrowing, missing sections, repetitive)
-- _Timing:_ Load 3.24s; Gen 66.54s; Total 69.95s
-- _Throughput:_ Prompt 266 TPS (16,851 tok); Gen 195 TPS (500 tok)
-- _Tokens:_ prompt 16851 tok; estimated text 478 tok; estimated non-text 16373
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> The video, and I am in the background. The scene and the 201, and I, and a
-> new one, it is, and it's not, 100, and 100, and the battery, and the best,
-> the World. (Photo) and the door, they, and the choice, and it, and the
-> choice of the country, and we have a chance, and we are. It is a real, and
-> it's, and we have just, and a bunch, it is, and we are in, and we are the
-> only way to the sky, it is, and it's, it is. (Photo) and the world, and we
-> are coming, or in Europe. It is a digital, and a photo, and the only, and
-> the world, is the way. (Photo) and the world, 10. (Photo) and the world,
-> 100, and a video, and it's, it is, and the world, 100, it is, and the
-> background, and we are in, 100, and 100, it is, and it's a good, and a long
-> distance, 100, and they are. It is. (Photo) and the BBC, and in background,
-> video. 100, and 100, it is. 100, and 100, it is. (Photo) and the world, 100,
-> and 100, it is, and a video, and a bunch, 100, and 100, it is, and it is,
-> and it's, and the background, and it, and the choice of the digital, and the
-> best, 100, and the choice of the world, 100, and the world, and the world,
-> and the world, and the world, and the world, and the world, and the world,
-> and the world, and the world, and the world, and the world, and a video, and
-> a video, and a, and it, and a, and it, and a, and it, and it, and it, and
-> it, and it, and it, and it, and it, and it, and it, and it, and it, and it,
-> and it
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️HARNESS:long_context
-- Repetitive output (phrase: "and the world, and...")
-- Context ignored (missing: Architecture, Bench, Bird, Building, Bush)
-- Output degeneration (incomplete_sentence: ends with 'it')
-- Missing sections (title, description, keywords)
-- Nonvisual metadata borrowing
-- Likely capped by max token budget
-- Ignores trusted hints
-- long_context_repetition(16851tok)
-
----
-
 <a id="model-mlx-community-qwen35-9b-mlx-4bit"></a>
 
 ### ✅ mlx-community/Qwen3.5-9B-MLX-4bit
@@ -3210,8 +3121,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ ❌ F (33/100); Δ-42; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, harness, long context,
   missing sections, repetitive)
-- _Timing:_ Load 1.68s; Gen 72.33s; Total 74.19s
-- _Throughput:_ Prompt 259 TPS (16,866 tok); Gen 75.1 TPS (500 tok)
+- _Timing:_ Load 1.33s; Gen 57.85s; Total 59.36s
+- _Throughput:_ Prompt 325 TPS (16,866 tok); Gen 90.8 TPS (500 tok)
 - _Tokens:_ prompt 16866 tok; estimated text 478 tok; estimated non-text 16388
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -3275,8 +3186,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ 🟠 D (48/100); Δ-27; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, harness, long context,
   metadata borrowing, missing sections, repetitive)
-- _Timing:_ Load 11.55s; Gen 73.30s; Total 85.03s
-- _Throughput:_ Prompt 284 TPS (16,866 tok); Gen 37.6 TPS (500 tok)
+- _Timing:_ Load 7.73s; Gen 59.95s; Total 67.87s
+- _Throughput:_ Prompt 326 TPS (16,866 tok); Gen 65.1 TPS (500 tok)
 - _Tokens:_ prompt 16866 tok; estimated text 478 tok; estimated non-text 16388
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -3320,6 +3231,58 @@ multi_modal_projector.layer_norm.weight.
 
 ---
 
+<a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
+
+### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `mlx`; harness signal `long_context`
+- _Next step:_ Inspect long-context cache behavior under heavy image-token
+  burden.
+- _Key signals:_ At long prompt length (16851 tokens), output became
+  repetitive.; hit token cap (500); nontext prompt burden=97%; missing
+  sections: title, description, keywords
+- _Score:_ 🟠 D (41/100); Δ-34; Keywords are not specific or diverse enough
+- _Review focus:_ watchlist (context ignored, cutoff, harness, long context,
+  missing sections, repetitive)
+- _Timing:_ Load 0.53s; Gen 63.24s; Total 63.94s
+- _Throughput:_ Prompt 280 TPS (16,851 tok); Gen 192 TPS (500 tok)
+- _Tokens:_ prompt 16851 tok; estimated text 478 tok; estimated non-text 16373
+  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> The video, and I am. The digital and digital, and the camera.  and 100, and
+> a digital, and a large, and a bunch, and a lot, and a lot of them, 100, and
+> 100, and a large, and a bunch, they are, and wooden, and a, and a, and a,
+> and a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and a,
+> it is, and a, and a, and a, and a, and a, and a, and a, and a, and a, and
+> a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and
+> a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and a,
+> and a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and a,
+> and a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and
+> a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and
+> a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and a,
+> and a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and a,
+> and a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and
+> a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and
+> a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and a,
+> and a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and a,
+> and
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️HARNESS:long_context
+- Repetitive output (phrase: "and a, and a,...")
+- Context ignored (missing: Architecture, Bench, Bird, Building, Bush)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
+- long_context_repetition(16851tok)
+
+---
+
 <a id="model-mlx-community-gemma-4-31b-bf16"></a>
 
 ### ✅ mlx-community/gemma-4-31b-bf16
@@ -3332,8 +3295,8 @@ multi_modal_projector.layer_norm.weight.
   keywords; missing terms: Architecture, Bench, Bird, Building, Bush
 - _Score:_ 🟠 D (45/100); Δ-30; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, missing sections)
-- _Timing:_ Load 7.82s; Gen 73.73s; Total 81.73s
-- _Throughput:_ Prompt 300 TPS (831 tok); Gen 7.08 TPS (500 tok)
+- _Timing:_ Load 5.86s; Gen 71.39s; Total 77.44s
+- _Throughput:_ Prompt 333 TPS (831 tok); Gen 7.29 TPS (500 tok)
 - _Tokens:_ prompt 831 tok; estimated text 478 tok; estimated non-text 353
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -3387,8 +3350,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ ❌ F (20/100); Δ-55; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, degeneration, harness,
   long context, missing sections, repetitive)
-- _Timing:_ Load 4.26s; Gen 95.69s; Total 100.15s
-- _Throughput:_ Prompt 215 TPS (16,866 tok); Gen 30.3 TPS (500 tok)
+- _Timing:_ Load 2.15s; Gen 93.89s; Total 96.24s
+- _Throughput:_ Prompt 219 TPS (16,866 tok); Gen 30.3 TPS (500 tok)
 - _Tokens:_ prompt 16866 tok; estimated text 478 tok; estimated non-text 16388
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -3430,8 +3393,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ ❌ F (0/100); Δ-75; Output too short to be useful
 - _Review focus:_ watchlist (context ignored, cutoff, degeneration, missing
   sections)
-- _Timing:_ Load 4.37s; Gen 106.09s; Total 110.65s
-- _Throughput:_ Prompt 155 TPS (539 tok); Gen 4.89 TPS (500 tok)
+- _Timing:_ Load 2.20s; Gen 100.97s; Total 103.36s
+- _Throughput:_ Prompt 281 TPS (539 tok); Gen 5.06 TPS (500 tok)
 - _Tokens:_ prompt 539 tok; estimated text 478 tok; estimated non-text 61 tok;
   generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -3451,6 +3414,43 @@ multi_modal_projector.layer_norm.weight.
 
 ---
 
+<a id="model-mlx-community-qwen36-27b-mxfp8"></a>
+
+### ✅ mlx-community/Qwen3.6-27B-mxfp8
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `mlx`; harness signal `long_context`
+- _Next step:_ Inspect long-context cache behavior under heavy image-token
+  burden.
+- _Key signals:_ At long prompt length (16866 tokens), output may stop
+  following prompt/image context.; hit token cap (500); nontext prompt
+  burden=97%; missing sections: title, description, keywords
+- _Score:_ ❌ F (5/100); Δ-70; Output too short to be useful
+- _Review focus:_ watchlist (context ignored, cutoff, degeneration, harness,
+  long context, missing sections)
+- _Timing:_ Load 3.10s; Gen 101.54s; Total 104.84s
+- _Throughput:_ Prompt 229 TPS (16,866 tok); Gen 18.2 TPS (500 tok)
+- _Tokens:_ prompt 16866 tok; estimated text 478 tok; estimated non-text 16388
+  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> 態减2
+> NTo+22222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️HARNESS:long_context
+- Context ignored (missing: Architecture, Bench, Bird, Building, Bush)
+- Output degeneration (character_loop: '2' repeated)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
+- long_context_context_drop(16866tok)
+
+---
+
 <a id="model-mlx-community-qwen35-27b-mxfp8"></a>
 
 ### ✅ mlx-community/Qwen3.5-27B-mxfp8
@@ -3465,8 +3465,8 @@ multi_modal_projector.layer_norm.weight.
 - _Score:_ 🟡 C (55/100); Δ-20; Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (context ignored, cutoff, harness, long context,
   missing sections, repetitive)
-- _Timing:_ Load 5.56s; Gen 107.04s; Total 112.80s
-- _Throughput:_ Prompt 215 TPS (16,866 tok); Gen 17.8 TPS (500 tok)
+- _Timing:_ Load 3.08s; Gen 102.67s; Total 105.94s
+- _Throughput:_ Prompt 226 TPS (16,866 tok); Gen 18.2 TPS (500 tok)
 - _Tokens:_ prompt 16866 tok; estimated text 478 tok; estimated non-text 16388
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 
@@ -3611,43 +3611,6 @@ multi_modal_projector.layer_norm.weight.
 - Likely capped by max token budget
 - Ignores trusted hints
 - long_context_repetition(16866tok)
-
----
-
-<a id="model-mlx-community-qwen36-27b-mxfp8"></a>
-
-### ✅ mlx-community/Qwen3.6-27B-mxfp8
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `mlx`; harness signal `long_context`
-- _Next step:_ Inspect long-context cache behavior under heavy image-token
-  burden.
-- _Key signals:_ At long prompt length (16866 tokens), output may stop
-  following prompt/image context.; hit token cap (500); nontext prompt
-  burden=97%; missing sections: title, description, keywords
-- _Score:_ ❌ F (5/100); Δ-70; Output too short to be useful
-- _Review focus:_ watchlist (context ignored, cutoff, degeneration, harness,
-  long context, missing sections)
-- _Timing:_ Load 3.31s; Gen 133.43s; Total 136.94s
-- _Throughput:_ Prompt 161 TPS (16,866 tok); Gen 17.9 TPS (500 tok)
-- _Tokens:_ prompt 16866 tok; estimated text 478 tok; estimated non-text 16388
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> 態减2
-> NTo+22222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️HARNESS:long_context
-- Context ignored (missing: Architecture, Bench, Bird, Building, Bush)
-- Output degeneration (character_loop: '2' repeated)
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-- Ignores trusted hints
-- long_context_context_drop(16866tok)
 
 ---
 

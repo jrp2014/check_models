@@ -14,21 +14,21 @@
 
 | Model                                     | Observed Behavior                                 | Token Counts                                                                                         | Optional Context                                                                                                                                                                           |
 |-------------------------------------------|---------------------------------------------------|------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | prompt_tokens=16851, repetitive output            | prompt=16,851 \| output/prompt=2.97% \| nontext burden=97% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_006_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json) |
-| `mlx-community/Qwen3.5-27B-4bit`          | prompt_tokens=16866, repetitive output            | prompt=16,866 \| output/prompt=2.96% \| nontext burden=97% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_007_mlx-community_Qwen3.5-27B-4bit_mlx_vlm_mlx_long_context_001.json)          |
-| `mlx-community/Qwen3.5-27B-mxfp8`         | prompt_tokens=16866, repetitive output            | prompt=16,866 \| output/prompt=2.96% \| nontext burden=97% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_008_mlx-community_Qwen3.5-27B-mxfp8_mlx_vlm_mlx_long_context_001.json)         |
-| `mlx-community/Qwen3.5-35B-A3B-4bit`      | prompt_tokens=16866, repetitive output            | prompt=16,866 \| output/prompt=2.96% \| nontext burden=97% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_009_mlx-community_Qwen3.5-35B-A3B-4bit_mlx_vlm_mlx_long_context_001.json)      |
-| `mlx-community/Qwen3.5-35B-A3B-6bit`      | prompt_tokens=16866, repetitive output            | prompt=16,866 \| output/prompt=2.96% \| nontext burden=97% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_010_mlx-community_Qwen3.5-35B-A3B-6bit_mlx_vlm_mlx_long_context_001.json)      |
-| `mlx-community/Qwen3.5-35B-A3B-bf16`      | prompt_tokens=16866, repetitive output            | prompt=16,866 \| output/prompt=2.96% \| nontext burden=97% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_011_mlx-community_Qwen3.5-35B-A3B-bf16_mlx_vlm_mlx_long_context_001.json)      |
-| `mlx-community/Qwen3.5-9B-MLX-4bit`       | prompt_tokens=16866, repetitive output            | prompt=16,866 \| output/prompt=2.96% \| nontext burden=97% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_012_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_001.json)       |
-| `mlx-community/Qwen3.6-27B-mxfp8`         | prompt_tokens=16866, prompt/image context dropped | prompt=16,866 \| output/prompt=2.96% \| nontext burden=97% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_013_mlx-community_Qwen3.6-27B-mxfp8_mlx_vlm_mlx_long_context_001.json)         |
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | prompt_tokens=16851, repetitive output            | prompt=16,851 \| output/prompt=2.97% \| nontext burden=97% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_006_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json) |
+| `mlx-community/Qwen3.5-27B-4bit`          | prompt_tokens=16866, repetitive output            | prompt=16,866 \| output/prompt=2.96% \| nontext burden=97% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_007_mlx-community_Qwen3.5-27B-4bit_mlx_vlm_mlx_long_context_001.json)          |
+| `mlx-community/Qwen3.5-27B-mxfp8`         | prompt_tokens=16866, repetitive output            | prompt=16,866 \| output/prompt=2.96% \| nontext burden=97% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_008_mlx-community_Qwen3.5-27B-mxfp8_mlx_vlm_mlx_long_context_001.json)         |
+| `mlx-community/Qwen3.5-35B-A3B-4bit`      | prompt_tokens=16866, repetitive output            | prompt=16,866 \| output/prompt=2.96% \| nontext burden=97% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_009_mlx-community_Qwen3.5-35B-A3B-4bit_mlx_vlm_mlx_long_context_001.json)      |
+| `mlx-community/Qwen3.5-35B-A3B-6bit`      | prompt_tokens=16866, repetitive output            | prompt=16,866 \| output/prompt=2.96% \| nontext burden=97% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_010_mlx-community_Qwen3.5-35B-A3B-6bit_mlx_vlm_mlx_long_context_001.json)      |
+| `mlx-community/Qwen3.5-35B-A3B-bf16`      | prompt_tokens=16866, repetitive output            | prompt=16,866 \| output/prompt=2.96% \| nontext burden=97% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_011_mlx-community_Qwen3.5-35B-A3B-bf16_mlx_vlm_mlx_long_context_001.json)      |
+| `mlx-community/Qwen3.5-9B-MLX-4bit`       | prompt_tokens=16866, repetitive output            | prompt=16,866 \| output/prompt=2.96% \| nontext burden=97% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_012_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_001.json)       |
+| `mlx-community/Qwen3.6-27B-mxfp8`         | prompt_tokens=16866, prompt/image context dropped | prompt=16,866 \| output/prompt=2.96% \| nontext burden=97% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_013_mlx-community_Qwen3.6-27B-mxfp8_mlx_vlm_mlx_long_context_001.json)         |
 
 
 ## Minimal Evidence
 
 - `mlx-community/Qwen2-VL-2B-Instruct-4bit`: At long prompt length (16851 tokens), output became repetitive.
 - `mlx-community/Qwen2-VL-2B-Instruct-4bit`: Model output may not follow prompt or image contents (missing: Architecture, Bench, Bird, Building, Bush).
-- Output excerpt: `The video, and I am in the background. The scene and the 201, and I, and a new one, it is, and it's not, 100, and 100, and the battery, and the best, the World. (Photo) and the door, they, and the choice, and it, and the choice of the country, and we have a chance, and we are. It is a real, and it's, and we have jus...`
+- Output excerpt: `The video, and I am. The digital and digital, and the camera. and 100, and a digital, and a large, and a bunch, and a lot, and a lot of them, 100, and 100, and a large, and a bunch, they are, and wooden, and a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and a, it is, and a,...`
 - `mlx-community/Qwen3.5-27B-4bit`: At long prompt length (16866 tokens), output became repetitive.
 
 
@@ -387,14 +387,14 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_006_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)
-- `mlx-community/Qwen3.5-27B-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_007_mlx-community_Qwen3.5-27B-4bit_mlx_vlm_mlx_long_context_001.json)
-- `mlx-community/Qwen3.5-27B-mxfp8`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_008_mlx-community_Qwen3.5-27B-mxfp8_mlx_vlm_mlx_long_context_001.json)
-- `mlx-community/Qwen3.5-35B-A3B-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_009_mlx-community_Qwen3.5-35B-A3B-4bit_mlx_vlm_mlx_long_context_001.json)
-- `mlx-community/Qwen3.5-35B-A3B-6bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_010_mlx-community_Qwen3.5-35B-A3B-6bit_mlx_vlm_mlx_long_context_001.json)
-- `mlx-community/Qwen3.5-35B-A3B-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_011_mlx-community_Qwen3.5-35B-A3B-bf16_mlx_vlm_mlx_long_context_001.json)
-- `mlx-community/Qwen3.5-9B-MLX-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_012_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_001.json)
-- `mlx-community/Qwen3.6-27B-mxfp8`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_013_mlx-community_Qwen3.6-27B-mxfp8_mlx_vlm_mlx_long_context_001.json)
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_006_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)
+- `mlx-community/Qwen3.5-27B-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_007_mlx-community_Qwen3.5-27B-4bit_mlx_vlm_mlx_long_context_001.json)
+- `mlx-community/Qwen3.5-27B-mxfp8`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_008_mlx-community_Qwen3.5-27B-mxfp8_mlx_vlm_mlx_long_context_001.json)
+- `mlx-community/Qwen3.5-35B-A3B-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_009_mlx-community_Qwen3.5-35B-A3B-4bit_mlx_vlm_mlx_long_context_001.json)
+- `mlx-community/Qwen3.5-35B-A3B-6bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_010_mlx-community_Qwen3.5-35B-A3B-6bit_mlx_vlm_mlx_long_context_001.json)
+- `mlx-community/Qwen3.5-35B-A3B-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_011_mlx-community_Qwen3.5-35B-A3B-bf16_mlx_vlm_mlx_long_context_001.json)
+- `mlx-community/Qwen3.5-9B-MLX-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_012_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_001.json)
+- `mlx-community/Qwen3.6-27B-mxfp8`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_013_mlx-community_Qwen3.6-27B-mxfp8_mlx_vlm_mlx_long_context_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -413,22 +413,22 @@ Optional advanced context:
 
 ## Appendix: Environment
 
-| Component       | Version                      |
-|-----------------|------------------------------|
-| mlx-vlm         | 0.5.0                        |
-| mlx             | 0.32.0.dev20260515+7b7c12407 |
-| mlx-lm          | 0.31.3                       |
-| mlx-audio       | 0.4.3                        |
-| transformers    | 5.8.1                        |
-| tokenizers      | 0.22.2                       |
-| huggingface-hub | 1.14.0                       |
-| Python Version  | 3.13.12                      |
-| OS              | Darwin 25.5.0                |
-| macOS Version   | 26.5                         |
-| GPU/Chip        | Apple M5 Max                 |
-| GPU Cores       | 40                           |
-| Metal Support   | Metal 4                      |
-| RAM             | 128.0 GB                     |
+| Component       | Version                     |
+|-----------------|-----------------------------|
+| mlx-vlm         | 0.5.0                       |
+| mlx             | 0.32.0.dev20260515+7b7c1240 |
+| mlx-lm          | 0.31.3                      |
+| mlx-audio       | 0.4.3                       |
+| transformers    | 5.8.1                       |
+| tokenizers      | 0.22.2                      |
+| huggingface-hub | 1.15.0                      |
+| Python Version  | 3.13.12                     |
+| OS              | Darwin 25.5.0               |
+| macOS Version   | 26.5                        |
+| GPU/Chip        | Apple M5 Max                |
+| GPU Cores       | 40                          |
+| Metal Support   | Metal 4                     |
+| RAM             | 128.0 GB                    |
 
 
 ## Appendix: Detailed Evidence
@@ -439,14 +439,13 @@ Observed signals:
 
 - At long prompt length (16851 tokens), output became repetitive.
 - Model output may not follow prompt or image contents (missing: Architecture, Bench, Bird, Building, Bush).
-- Output became repetitive, indicating possible generation instability (token: phrase: "and the world, and...").
-- Output contains corrupted or malformed text segments (incomplete_sentence: ends with 'it').
+- Output became repetitive, indicating possible generation instability (token: phrase: "and a, and a,...").
 - Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 Sample output:
 
 ```text
-The video, and I am in the background. The scene and the 201, and I, and a new one, it is, and it's not, 100, and 100, and the battery, and the best, the World. (Photo) and the door, they, and the...
+The video, and I am. The digital and digital, and the camera.  and 100, and a digital, and a large, and a bunch, and a lot, and a lot of them, 100, and 100, and a large, and a bunch, they are, and...
 ```
 
 ### `mlx-community/Qwen3.5-27B-4bit`

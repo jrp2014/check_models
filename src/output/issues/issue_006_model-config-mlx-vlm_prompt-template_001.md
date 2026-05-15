@@ -14,9 +14,9 @@
 
 | Model                                            | Observed Behavior   | Token Counts                                                                | Optional Context                                                                                                                                                                                              |
 |--------------------------------------------------|---------------------|-----------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/FastVLM-0.5B-bf16`                | generated_tokens~9  | prompt=571 \| output/prompt=1.58% \| nontext burden=16% \| stop=completed   | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_003_mlx-community_FastVLM-0.5B-bf16_model_config_mlx_vlm_prompt_template_001.json)                |
-| `mlx-community/paligemma2-10b-ft-docci-448-6bit` | output/prompt=0.5%  | prompt=1,584 \| output/prompt=0.51% \| nontext burden=70% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_015_mlx-community_paligemma2-10b-ft-docci-448-6bit_model_config_mlx_vlm_prompt_template_001.json) |
-| `mlx-community/paligemma2-10b-ft-docci-448-bf16` | output/prompt=0.5%  | prompt=1,584 \| output/prompt=0.51% \| nontext burden=70% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_016_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json) |
+| `mlx-community/FastVLM-0.5B-bf16`                | generated_tokens~9  | prompt=571 \| output/prompt=1.58% \| nontext burden=16% \| stop=completed   | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_003_mlx-community_FastVLM-0.5B-bf16_model_config_mlx_vlm_prompt_template_001.json)                |
+| `mlx-community/paligemma2-10b-ft-docci-448-6bit` | output/prompt=0.5%  | prompt=1,584 \| output/prompt=0.51% \| nontext burden=70% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_015_mlx-community_paligemma2-10b-ft-docci-448-6bit_model_config_mlx_vlm_prompt_template_001.json) |
+| `mlx-community/paligemma2-10b-ft-docci-448-bf16` | output/prompt=0.5%  | prompt=1,584 \| output/prompt=0.51% \| nontext burden=70% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_016_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json) |
 
 
 ## Minimal Evidence
@@ -212,9 +212,9 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/FastVLM-0.5B-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_003_mlx-community_FastVLM-0.5B-bf16_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_015_mlx-community_paligemma2-10b-ft-docci-448-6bit_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T112502Z_016_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/FastVLM-0.5B-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_003_mlx-community_FastVLM-0.5B-bf16_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_015_mlx-community_paligemma2-10b-ft-docci-448-6bit_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_016_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -233,22 +233,22 @@ Optional advanced context:
 
 ## Appendix: Environment
 
-| Component       | Version                      |
-|-----------------|------------------------------|
-| mlx-vlm         | 0.5.0                        |
-| mlx             | 0.32.0.dev20260515+7b7c12407 |
-| mlx-lm          | 0.31.3                       |
-| mlx-audio       | 0.4.3                        |
-| transformers    | 5.8.1                        |
-| tokenizers      | 0.22.2                       |
-| huggingface-hub | 1.14.0                       |
-| Python Version  | 3.13.12                      |
-| OS              | Darwin 25.5.0                |
-| macOS Version   | 26.5                         |
-| GPU/Chip        | Apple M5 Max                 |
-| GPU Cores       | 40                           |
-| Metal Support   | Metal 4                      |
-| RAM             | 128.0 GB                     |
+| Component       | Version                     |
+|-----------------|-----------------------------|
+| mlx-vlm         | 0.5.0                       |
+| mlx             | 0.32.0.dev20260515+7b7c1240 |
+| mlx-lm          | 0.31.3                      |
+| mlx-audio       | 0.4.3                       |
+| transformers    | 5.8.1                       |
+| tokenizers      | 0.22.2                      |
+| huggingface-hub | 1.15.0                      |
+| Python Version  | 3.13.12                     |
+| OS              | Darwin 25.5.0               |
+| macOS Version   | 26.5                        |
+| GPU/Chip        | Apple M5 Max                |
+| GPU Cores       | 40                          |
+| Metal Support   | Metal 4                     |
+| RAM             | 128.0 GB                    |
 
 
 ## Appendix: Detailed Evidence
