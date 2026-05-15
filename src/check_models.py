@@ -21617,7 +21617,7 @@ def _history_transition_fallback_part(source: HistoryModelResultRecord) -> str |
 
     error_stage = source.get("error_stage")
     if error_stage:
-        return str(error_stage)
+        return error_stage
 
     return None
 
