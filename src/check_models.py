@@ -1797,6 +1797,11 @@ def _wrap_markdown_text(
     return wrapped or [initial_indent.rstrip()]
 
 
+def _escape_markdown_underscore_runs(text: str) -> str:
+    """Escape multi-underscore runs without altering single-word identifiers."""
+    return re.sub(r"_{2,}", lambda match: r"\_" * len(match.group(0)), text)
+
+
 def _markdown_emphasis(text: str) -> str:
     """Return repo-style Markdown emphasis for formatter-owned labels."""
     return f"_{text}_"
@@ -1826,14 +1831,14 @@ def _append_markdown_labeled_value(
 def _escape_report_markdown_text(text: str) -> str:
     """Escape HTML-like text for non-code Markdown report blocks."""
     escaped = html.escape(_wrap_bare_urls(text), quote=False)
-    escaped = escaped.replace("__", r"\_\_")
+    escaped = _escape_markdown_underscore_runs(escaped)
     return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", escaped)
 
 
 def _escape_report_markdown_heading(text: str) -> str:
     """Escape HTML-like heading text while preserving ordinary ampersands."""
     escaped = text.replace("<", "&lt;").replace(">", "&gt;")
-    return escaped.replace("__", r"\_\_")
+    return _escape_markdown_underscore_runs(escaped)
 
 
 @dataclass(frozen=True)
@@ -2950,8 +2955,8 @@ class MarkdownPipeEscaper:
         # Neutralize HTML-like tags using selective escaper
         result = HTML_ESCAPER.escape(result)
 
-        # Prevent markdownlint MD050 (strong style) on double underscores in error messages/outputs
-        result = result.replace("__", r"\_\_")
+        # Escape underscore runs that would otherwise render as Markdown emphasis.
+        result = _escape_markdown_underscore_runs(result)
 
         # Escape bare ampersands that could start entities
         return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", result)
@@ -2984,8 +2989,8 @@ class DiagnosticsEscaper:
         # Neutralize HTML-like tags
         result = HTML_ESCAPER.escape(result)
 
-        # Prevent markdownlint MD050 (strong style) on double underscores in error messages
-        result = result.replace("__", r"\_\_")
+        # Escape underscore runs that would otherwise render as Markdown emphasis.
+        result = _escape_markdown_underscore_runs(result)
 
         # Escape bare ampersands
         return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", result)
@@ -11226,12 +11231,16 @@ def _append_markdown_code_block(
     Uses a fence longer than any backtick run in ``content`` so nested
     Markdown/code fences remain valid when embedded.
     """
-    max_backtick_run = max((len(m.group(0)) for m in re.finditer(r"`+", content)), default=0)
+    normalized_content = content.expandtabs(4)
+    max_backtick_run = max(
+        (len(m.group(0)) for m in re.finditer(r"`+", normalized_content)),
+        default=0,
+    )
     fence = "`" * max(3, max_backtick_run + 1)
     if not parts or parts[-1] != "":
         parts.append("")
     parts.append(f"{fence}{language}")
-    parts.append(content)
+    parts.append(normalized_content)
     parts.append(fence)
     if not parts or parts[-1] != "":
         parts.append("")
@@ -11297,7 +11306,7 @@ def _neutralize_markdown_blockquote_prefix(text: str) -> str:
 
 def _escape_markdown_blockquote_line(text: str) -> str:
     """Escape structural Markdown syntax for wrapped blockquote text."""
-    escaped: str = HTML_ESCAPER.escape(_wrap_bare_urls(text)).replace("__", r"\_\_")
+    escaped: str = _escape_markdown_underscore_runs(HTML_ESCAPER.escape(_wrap_bare_urls(text)))
     escaped = escaped.replace("*", "&#42;")
     escaped = re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", escaped)
     return _neutralize_markdown_blockquote_prefix(escaped)

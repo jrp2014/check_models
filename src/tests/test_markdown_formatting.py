@@ -326,6 +326,28 @@ def test_gallery_quality_warnings_preserve_underscores_but_escape_asterisks() ->
     assert "- Unknown tags: <fake_token_around_image>, small \\*/ alpha\\*/ beta \\*/" in md
 
 
+def test_gallery_blockquote_escapes_full_multi_underscore_runs() -> None:
+    """Wrapped blockquotes should escape full underscore runs without leftovers."""
+    parts: list[str] = []
+
+    check_models._append_markdown_wrapped_blockquote(parts, "_____ is _____")
+
+    md = "\n".join(parts)
+    assert r"\_\_\_\_\_ is \_\_\_\_\_" in md
+    assert r"\_\_\_\__ is" not in md
+
+
+def test_markdown_code_block_expands_tabs_to_spaces() -> None:
+    """Fenced Markdown code blocks should normalize hard tabs."""
+    parts: list[str] = []
+
+    check_models._append_markdown_code_block(parts, "left\tright")
+
+    md = "\n".join(parts)
+    assert "\t" not in md
+    assert "left    right" in md
+
+
 def test_gallery_quality_warnings_escape_html_like_thinking_tags() -> None:
     """Markdown gallery warnings should escape real HTML-like tags such as <think>."""
     analysis = check_models.GenerationQualityAnalysis(

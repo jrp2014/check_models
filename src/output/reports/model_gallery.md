@@ -1899,7 +1899,7 @@ multi_modal_projector.layer_norm.weight.
 
 ⚠️ _Quality Warnings:_
 
-- Repetitive output (phrase: "\_\_\_\__ is \_\_\_\__ is...")
+- Repetitive output (phrase: "\_\_\_\_\_ is \_\_\_\_\_ is...")
 - Context ignored (missing: Architecture, Bench, Bird, Building, Bush)
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget

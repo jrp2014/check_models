@@ -1259,6 +1259,27 @@ class TestDiagnosticsReport:
         content = out.read_text(encoding="utf-8")
         assert "ImagesKwargs.\\_\\_init\\_\\_()" in content
 
+    def test_action_summary_escapes_full_multi_underscore_runs(self, tmp_path: Path) -> None:
+        """Diagnostics should fully escape odd-length underscore runs."""
+        out = tmp_path / "diag.md"
+        generate_diagnostics_report(
+            results=[
+                _make_failure_with_details(
+                    "org/bad-model",
+                    error_msg="Tokenizer produced _____ is _____ in summary output",
+                    error_package="transformers",
+                    error_stage="Processor Error",
+                ),
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            prompt="test prompt",
+        )
+        content = out.read_text(encoding="utf-8")
+        assert r"\_\_\_\_\_ is \_\_\_\_\_" in content
+        assert r"\_\_\_\__ is" not in content
+
     def test_environment_table_includes_versions(self, tmp_path: Path) -> None:
         """Environment table should include library versions and system info."""
         out = tmp_path / "diag.md"
