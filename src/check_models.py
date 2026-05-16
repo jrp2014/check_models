@@ -10241,67 +10241,6 @@ def _is_redundant_triage_evidence(*, summary: str, evidence: str) -> bool:
     return bool(evidence_key and (evidence_key == summary_key or evidence_key in summary_key))
 
 
-def _build_maintainer_triage_rows(result: PerformanceResult) -> list[tuple[str, str]]:
-    """Build compact human-readable maintainer triage rows for Markdown reports."""
-    triage = _maintainer_triage_for_result(result)
-    if triage is None:
-        return []
-
-    classification = triage["issue_kind"]
-    issue_subtype = triage.get("issue_subtype")
-    if issue_subtype:
-        classification = f"{classification} | {issue_subtype}"
-
-    rows: list[tuple[str, str]] = [
-        (
-            "Likely owner",
-            f"{triage['suspected_owner']} | confidence={triage['confidence']}",
-        ),
-        ("Classification", classification),
-    ]
-
-    summary_text = (
-        _failure_triage_summary_text(result)
-        if triage["issue_kind"] == "runtime_failure"
-        else triage["summary"]
-    )
-    if summary_text and summary_text != "no flagged signals":
-        rows.append(("Summary", summary_text))
-
-    evidence_text = (
-        _failure_triage_evidence_text(result)
-        if triage["issue_kind"] == "runtime_failure"
-        else _maintainer_triage_evidence_text(triage)
-    )
-    if evidence_text and (
-        not summary_text
-        or not _is_redundant_triage_evidence(
-            summary=summary_text,
-            evidence=evidence_text,
-        )
-    ):
-        rows.append(("Evidence", evidence_text))
-    if context_text := _maintainer_triage_context_text(triage):
-        rows.append(("Token context", context_text))
-    rows.append(("Next action", triage["next_action"]))
-    return rows
-
-
-def _append_maintainer_triage_markdown(
-    parts: list[str],
-    *,
-    result: PerformanceResult,
-    escaper: DiagnosticsEscaper | MarkdownPipeEscaper,
-    heading: str | None = "**Maintainer triage:**",
-) -> None:
-    """Append a compact maintainer triage block to a Markdown artifact."""
-    rows = _build_maintainer_triage_rows(result)
-    if not rows:
-        return
-    escaped_rows = [(label, escaper.escape(value)) for label, value in rows]
-    _append_markdown_row_block(parts, rows=escaped_rows, heading=heading)
-
-
 def _review_hint_text(
     review: JsonlReviewRecord,
     analysis: GenerationQualityAnalysis | None,
@@ -12712,83 +12651,6 @@ def _diagnostics_next_action(owner_key: str) -> str:
     return _DIAGNOSTICS_OWNER_ACTIONS["unknown"]
 
 
-def _failure_impact_text(result: PerformanceResult) -> str:
-    """Return a short explanation of why a hard failure matters."""
-    details: list[str] = []
-    if result.error_stage:
-        details.append(f"stage `{result.error_stage}`")
-    if result.failure_phase:
-        details.append(f"phase `{result.failure_phase}`")
-    if result.error_code:
-        details.append(f"code `{result.error_code}`")
-    if result.error_type:
-        details.append(f"type `{result.error_type}`")
-    if details:
-        return "This prevented a complete model response; " + "; ".join(details) + "."
-    return "This prevented a complete model response and should be triaged before judging model quality."
-
-
-def _build_failure_overview_rows(
-    result: PerformanceResult,
-    *,
-    escaper: DiagnosticsEscaper | MarkdownPipeEscaper,
-    affected_models: Sequence[str] = (),
-) -> list[tuple[str, str]]:
-    """Build the shared failure overview rows for diagnostics and issue output."""
-    owner_key = result.error_package or "unknown"
-    rows: list[tuple[str, str]] = [
-        (
-            "Observed",
-            escaper.escape(
-                _simplify_failure_message(
-                    result.error_message,
-                    model_name=result.model_name,
-                ),
-            ),
-        ),
-        ("Likely owner", f"`{escaper.escape(_diagnostics_owner_label(owner_key))}`"),
-        ("Why it matters", escaper.escape(_failure_impact_text(result))),
-        ("Suggested next step", escaper.escape(_diagnostics_next_action(owner_key))),
-    ]
-    if affected_models:
-        rows.append(
-            (
-                "Affected models",
-                ", ".join(f"`{escaper.escape(model_name)}`" for model_name in affected_models),
-            ),
-        )
-    return rows
-
-
-def _build_harness_overview_rows(
-    *,
-    harness_summary: str,
-    likely_owner: str,
-    prompt_tokens: int,
-    generated_tokens: int,
-    ratio_text: str,
-    escaper: DiagnosticsEscaper | MarkdownPipeEscaper,
-) -> list[tuple[str, str]]:
-    """Build the shared harness-at-a-glance rows for diagnostics and issue output."""
-    token_summary = (
-        f"prompt={fmt_num(prompt_tokens)}, output={fmt_num(generated_tokens)}, "
-        f"output/prompt={ratio_text}"
-    )
-    return [
-        ("Observed", escaper.escape(harness_summary)),
-        ("Likely owner", f"`{escaper.escape(likely_owner)}`"),
-        (
-            "Why it matters",
-            escaper.escape(
-                "The run completed, but the output pattern points to stack/runtime behavior "
-                "rather than a clean model-quality limitation."
-            ),
-        ),
-        ("Suggested next step", escaper.escape(_diagnostics_next_action(likely_owner))),
-        ("Token summary", escaper.escape(token_summary)),
-    ]
-
-
 def _build_preflight_overview_rows(
     *,
     package: str,
@@ -13064,19 +12926,16 @@ def _diagnostics_failure_clusters(
             f"## {idx}. Failure affecting {n} {model_word}",
         )
         parts.append("")
-        _append_markdown_row_block(
+        if affected_models := [r.model_name for r in cluster_results]:
+            models_text = ", ".join(f"`{DIAGNOSTICS_ESCAPER.escape(m)}`" for m in affected_models)
+            parts.append(f"**Affected models:** {models_text}")
+            parts.append("")
+
+        parts.append("**Observed error:**")
+        _append_markdown_code_block(
             parts,
-            rows=_build_failure_overview_rows(
-                rep,
-                escaper=DIAGNOSTICS_ESCAPER,
-                affected_models=[r.model_name for r in cluster_results],
-            ),
-        )
-        _append_maintainer_triage_markdown(
-            parts,
-            result=rep,
-            escaper=DIAGNOSTICS_ESCAPER,
-            heading="**Representative maintainer triage:**",
+            rep.error_traceback or rep.error_message or "Unknown runtime failure.",
+            language="text",
         )
 
         # Maintainer-facing table (human-readable, no local diagnostic codes).
@@ -13167,35 +13026,9 @@ def _diagnostics_harness_section(
     for res, text in harness_results:
         gen = res.generation
         qa = res.quality_analysis or (getattr(gen, "quality_analysis", None) if gen else None)
-        harness_type = getattr(qa, "harness_issue_type", "unknown") if qa else "unknown"
         harness_details = getattr(qa, "harness_issue_details", []) if qa else []
-        prompt_tokens = int(getattr(gen, "prompt_tokens", 0) or 0) if gen else 0
-        generated_tokens = int(getattr(gen, "generation_tokens", 0) or 0) if gen else 0
-        ratio_text = f"{(generated_tokens / prompt_tokens):.2%}" if prompt_tokens > 0 else "n/a"
-
-        likely_package = _infer_harness_issue_owner(res)
 
         _append_markdown_section(parts, title=f"### `{res.model_name}`")
-        harness_summary = _HARNESS_TYPE_DESCRIPTIONS.get(
-            harness_type or "",
-            "Output indicates a likely integration issue.",
-        )
-        _append_markdown_row_block(
-            parts,
-            rows=_build_harness_overview_rows(
-                harness_summary=harness_summary,
-                likely_owner=likely_package,
-                prompt_tokens=prompt_tokens,
-                generated_tokens=generated_tokens,
-                ratio_text=ratio_text,
-                escaper=DIAGNOSTICS_ESCAPER,
-            ),
-        )
-        _append_maintainer_triage_markdown(
-            parts,
-            result=res,
-            escaper=DIAGNOSTICS_ESCAPER,
-        )
         observations = [
             desc for detail in harness_details if (desc := _describe_harness_detail(detail))
         ]

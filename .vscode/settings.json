@@ -91,6 +91,7 @@
   },
   "python-envs.defaultEnvManager": "ms-python.python:conda",
   "python-envs.defaultPackageManager": "ms-python.python:conda",
+  "python.defaultInterpreterPath": "/Users/jrp/miniconda3/envs/mlx-vlm/bin/python",
   "cursorpyright.analysis.diagnosticSeverityOverrides": {
     "reportUnknownVariableType": "none",
     "reportMissingImports": "none",

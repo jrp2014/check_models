@@ -1,26 +1,27 @@
-# \[mlx\]\[MLX: Model load / model error\] Weight/config mismatch during model load affecting 1 model(s)
+# \[mlx-vlm\]\[Tokenizer / decoding artifact\] Tokenizer decode leaked BPE/byte markers affecting 1 model(s)
 
 ## Summary
 
-1 model(s) show **MLX: Model load / model error** that should be filed against mlx.
+1 model(s) show **Tokenizer / decoding artifact** that should be filed against mlx-vlm.
 
-- **Observed problem:** Weight/config mismatch during model load
-- **Target:** mlx
+- **Observed problem:** Tokenizer decode leaked BPE/byte markers
+- **Target:** mlx-vlm
 - **Affected models:** 1
-- **Fixed when:** Load/generation completes or fails with a narrower owner.
+- **Fixed when:** No BPE/byte markers in output.
 
 
 ## Affected Models
 
-| Model                                     | Observed Behavior                                                                                                                                                                               | Token Counts   | Optional Context                                                                                                                                                                                |
-|-------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | Received 4 parameters not in model: multi_modal_projector.linear_1.biases, multi_modal_projector.linear_1.scales, multi_modal_projector.linear_2.biases, multi_modal_projector.linear_2.scales. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260516T223018Z_005_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json) |
+| Model                                                   | Observed Behavior                          | Token Counts                                                                                         | Optional Context                                                                                                                                                                                 |
+|---------------------------------------------------------|--------------------------------------------|------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | 46 BPE space markers found in decoded text | prompt=2,586 \| output/prompt=19.33% \| nontext burden=84% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260516T223018Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) |
 
 
 ## Minimal Evidence
 
-- `mlx-community/Kimi-VL-A3B-Thinking-8bit` fails with: Model loading failed: Received 4 parameters not in model: multi_modal_projector.linear_1.biases, multi_modal_projector.linear_1.scales, multi_modal_projector.linear_2.biases, multi_modal_projector.linear_2.scales.
-- Root exception: `builtins.ValueError`: Received 4 parameters not in model: <br>multi_modal_projector.linear_1.biases,<br>multi_modal_projector.linear_1.scales,<br>multi_modal_projector.linear_2.biases,<br>multi_modal_projector.l...
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 46 occurrences).
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: Model output may not follow prompt or image contents (missing: scenic, view, looking, through, open).
+- Output excerpt: `odsĠlingeringĠandadĠandĠwithĠaĠveryĠveryĠveryĠveryĠveryĠhighĠand.ad.ĠThisĠisĠaĠveryĠaĠveryĠaĠveryĠaĠveryĠaĠveryĠaĠveryĠa.adĠaĠveryĠa.Ġa.Ġ.Ġ.1Ġa.adĠa.adĠa.ad.ad.ad.Ġ.WeĠareĠa.ad.Ġ.ad.WeĠare.Ġ.ad.WeĠare.WeĠare.1.ad.1.ad.1.ad.WeĠare.1.ad.11Q1.1.ad.1.ad.1.ad.1a.1a.1a.1a.1a.1a.1a.1a.1a.1.1.1.1.11.11ĊĠdata1.11.11Ċad.11Ċad...`
 
 
 ## Minimal Reproduction
@@ -30,7 +31,7 @@ These commands use `mlx-vlm` directly so the issue can be reproduced without ins
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/Kimi-VL-A3B-Thinking-8bit --image /Users/jrp/Pictures/Processed/20260516-133759_DSC00002_DxO.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
+python -m mlx_vlm.generate --model mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit --image /Users/jrp/Pictures/Processed/20260516-133759_DSC00002_DxO.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
 
 Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.
 
@@ -71,7 +72,7 @@ Minimal Python repro (representative model):
 from mlx_vlm.generate import generate
 from mlx_vlm.utils import load
 
-MODEL = 'mlx-community/Kimi-VL-A3B-Thinking-8bit'
+MODEL = 'mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit'
 IMAGE = '/Users/jrp/Pictures/Processed/20260516-133759_DSC00002_DxO.jpg'
 PROMPT = 'Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.\n- Output only the description text after the label.\n\nKeywords:\n- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.\n- Output only the keyword list after the label.\n\nRules:\n- Include only details that are definitely visible in the image.\n- Reuse metadata terms only when they are clearly supported by the image.\n- If metadata and image disagree, follow the image.\n- Prefer omission to speculation.\n- Do not copy prompt instructions into the Title, Description, or Keywords fields.\n- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.\n- Do not output reasoning, notes, hedging, or extra sections.\n\nContext: Existing metadata hints (high confidence; use only when visually confirmed):\n- Description hint: A scenic view looking through open wrought-iron gates down a paved driveway lined with wooden fences, lush green trees, and blooming flowers, leading to the grand entrance of a historic gothic-style stone abbey.\n- Capture metadata: Taken on 2026-05-16 14:37:59 BST (at 14:37:59 local time). GPS: 50.811559°N, 1.777085°W.'
 LOAD_KWARGS = {'trust_remote_code': True}
@@ -132,28 +133,27 @@ Generation/load config:
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "mlx-community/Kimi-VL-A3B-Thinking-8bit"
+  "model": "mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit"
 }
 ```
 
 Optional advanced context:
 
-- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260516T223018Z_005_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260516T223018Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
 ## Expected Fix Signal
 
-- [ ] Affected reruns complete model load and generation, or fail with a narrower configuration/compatibility error that points to the owning layer.
+- [ ] Affected reruns contain no leaked BPE, byte-level, or tokenizer marker text.
 - [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem.
 
 
 ## Fix Checklist
 
-- [ ] Compare checkpoint keys with the selected model class and model config.
-- [ ] Inspect missing/unexpected projector, scale, bias, and quantized-weight parameter names.
-- [ ] Verify the model repo revision matches the mlx-vlm/mlx loader expectations.
-- [ ] Reproduce after upgrading/downgrading mlx-vlm and mlx to isolate version compatibility.
+- [ ] Inspect tokenizer decode cleanup for byte-level/BPE marker leakage.
+- [ ] Compare `decode` and `batch_decode` behavior with `skip_special_tokens=True`.
+- [ ] Verify processor/tokenizer config does not require model-specific cleanup flags.
 
 
 ## Appendix: Environment
@@ -178,36 +178,18 @@ Optional advanced context:
 
 ## Appendix: Detailed Evidence
 
-### `mlx-community/Kimi-VL-A3B-Thinking-8bit`
+### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`
 
-Observed error:
+Observed signals:
 
-```text
-Model loading failed: Received 4 parameters not in model: 
-multi_modal_projector.linear_1.biases,
-multi_modal_projector.linear_1.scales,
-multi_modal_projector.linear_2.biases,
-multi_modal_projector.linear_2.scales.
-```
+- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 46 occurrences).
+- Model output may not follow prompt or image contents (missing: scenic, view, looking, through, open).
+- Output contains corrupted or malformed text segments (character_loop: '11.' repeated).
+- Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
-Root exception:
+Sample output:
 
 ```text
-builtins.ValueError: Received 4 parameters not in model: 
-multi_modal_projector.linear_1.biases,
-multi_modal_projector.linear_1.scales,
-multi_modal_projector.linear_2.biases,
-multi_modal_projector.linear_2.scales.
-```
-
-Traceback tail:
-
-```text
-Traceback (most recent call last):
-ValueError: Model loading failed: Received 4 parameters not in model: 
-multi_modal_projector.linear_1.biases,
-multi_modal_projector.linear_1.scales,
-multi_modal_projector.linear_2.biases,
-multi_modal_projector.linear_2.scales.
+odsĠlingeringĠandadĠandĠwithĠaĠveryĠveryĠveryĠveryĠveryĠhighĠand.ad.ĠThisĠisĠaĠveryĠaĠveryĠaĠveryĠaĠveryĠaĠveryĠaĠveryĠa.adĠaĠveryĠa.Ġa.Ġ.Ġ.1Ġa.adĠa.adĠa.ad.ad.ad.Ġ.WeĠareĠa.ad.Ġ.ad.WeĠare.Ġ.ad.WeĠ...
 ```
 
