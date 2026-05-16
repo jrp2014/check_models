@@ -14,7 +14,7 @@
 
 | Model                               | Observed Behavior                                                                                     | Token Counts   | Optional Context                                                                                                                                                                                 |
 |-------------------------------------|-------------------------------------------------------------------------------------------------------|----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/LFM2.5-VL-1.6B-bf16` | Missing 2 parameters: multi_modal_projector.layer_norm.bias, multi_modal_projector.layer_norm.weight. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_005_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_MODEL_LOAD_WEIGHT_MISMATCH_7574b1189.json) |
+| `mlx-community/LFM2.5-VL-1.6B-bf16` | Missing 2 parameters: multi_modal_projector.layer_norm.bias, multi_modal_projector.layer_norm.weight. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T231645Z_007_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_MODEL_LOAD_WEIGHT_MISMATCH_7574b1189.json) |
 
 
 ## Minimal Evidence
@@ -30,7 +30,7 @@ These commands use `mlx-vlm` directly so the issue can be reproduced without ins
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/LFM2.5-VL-1.6B-bf16 --image /Users/jrp/Pictures/Processed/20260509-165442_DSC09962_DxO.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
+python -m mlx_vlm.generate --model mlx-community/LFM2.5-VL-1.6B-bf16 --image /Users/jrp/Pictures/Processed/20260515-201714_DSC09998_DxO.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
 
 Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.
 
@@ -61,9 +61,8 @@ Rules:
 - Do not output reasoning, notes, hedging, or extra sections.
 
 Context: Existing metadata hints (high confidence; use only when visually confirmed):
-- Description hint: The tall spire of St John the Evangelist'"'"'s Church in Upper St Leonards, Dorking, England, rises against a blue sky with wispy clouds on a sunny day. The Gothic Revival church is surrounded by a tranquil green churchyard with mature trees, and a bird is captured in flight near the steeple.
-- Keyword hints: Architecture, Bench, Bird, Building, Bush, Church, Churchyard, Clock tower, Clouds, Dorking, England, Europe, Flying, Gothic, Gothic Revival, Gothic Revival architecture, Grass, Landscape, Lawn, Outdoors
-- Capture metadata: Taken on 2026-05-09 17:54:42 BST (at 17:54:42 local time). GPS: 51.413600°N, 0.081900°W.' --max-tokens 500 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+- Description hint: Rochester Castle turns Red to celebrate Medway winning its bid to the European Footballing body UEFA to become the UK'"'"'s first ever completely 100 per cent carbon neutral city
+- Capture metadata: Taken on 2026-05-15 21:17:14 BST (at 21:17:14 local time). GPS: 51.396828°N, 0.501581°E.' --max-tokens 500 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 Minimal Python repro (representative model):
@@ -73,8 +72,8 @@ from mlx_vlm.generate import generate
 from mlx_vlm.utils import load
 
 MODEL = 'mlx-community/LFM2.5-VL-1.6B-bf16'
-IMAGE = '/Users/jrp/Pictures/Processed/20260509-165442_DSC09962_DxO.jpg'
-PROMPT = "Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.\n- Output only the description text after the label.\n\nKeywords:\n- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.\n- Output only the keyword list after the label.\n\nRules:\n- Include only details that are definitely visible in the image.\n- Reuse metadata terms only when they are clearly supported by the image.\n- If metadata and image disagree, follow the image.\n- Prefer omission to speculation.\n- Do not copy prompt instructions into the Title, Description, or Keywords fields.\n- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.\n- Do not output reasoning, notes, hedging, or extra sections.\n\nContext: Existing metadata hints (high confidence; use only when visually confirmed):\n- Description hint: The tall spire of St John the Evangelist's Church in Upper St Leonards, Dorking, England, rises against a blue sky with wispy clouds on a sunny day. The Gothic Revival church is surrounded by a tranquil green churchyard with mature trees, and a bird is captured in flight near the steeple.\n- Keyword hints: Architecture, Bench, Bird, Building, Bush, Church, Churchyard, Clock tower, Clouds, Dorking, England, Europe, Flying, Gothic, Gothic Revival, Gothic Revival architecture, Grass, Landscape, Lawn, Outdoors\n- Capture metadata: Taken on 2026-05-09 17:54:42 BST (at 17:54:42 local time). GPS: 51.413600°N, 0.081900°W."
+IMAGE = '/Users/jrp/Pictures/Processed/20260515-201714_DSC09998_DxO.jpg'
+PROMPT = "Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.\n- Output only the description text after the label.\n\nKeywords:\n- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.\n- Output only the keyword list after the label.\n\nRules:\n- Include only details that are definitely visible in the image.\n- Reuse metadata terms only when they are clearly supported by the image.\n- If metadata and image disagree, follow the image.\n- Prefer omission to speculation.\n- Do not copy prompt instructions into the Title, Description, or Keywords fields.\n- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.\n- Do not output reasoning, notes, hedging, or extra sections.\n\nContext: Existing metadata hints (high confidence; use only when visually confirmed):\n- Description hint: Rochester Castle turns Red to celebrate Medway winning its bid to the European Footballing body UEFA to become the UK's first ever completely 100 per cent carbon neutral city\n- Capture metadata: Taken on 2026-05-15 21:17:14 BST (at 21:17:14 local time). GPS: 51.396828°N, 0.501581°E."
 LOAD_KWARGS = {'trust_remote_code': True}
 GENERATE_KWARGS = {'max_tokens': 500, 'temperature': 0.0, 'prefill_step_size': 4096}
 model, processor = load(MODEL, **LOAD_KWARGS)
@@ -116,9 +115,8 @@ Rules:
 - Do not output reasoning, notes, hedging, or extra sections.
 
 Context: Existing metadata hints (high confidence; use only when visually confirmed):
-- Description hint: The tall spire of St John the Evangelist's Church in Upper St Leonards, Dorking, England, rises against a blue sky with wispy clouds on a sunny day. The Gothic Revival church is surrounded by a tranquil green churchyard with mature trees, and a bird is captured in flight near the steeple.
-- Keyword hints: Architecture, Bench, Bird, Building, Bush, Church, Churchyard, Clock tower, Clouds, Dorking, England, Europe, Flying, Gothic, Gothic Revival, Gothic Revival architecture, Grass, Landscape, Lawn, Outdoors
-- Capture metadata: Taken on 2026-05-09 17:54:42 BST (at 17:54:42 local time). GPS: 51.413600°N, 0.081900°W.
+- Description hint: Rochester Castle turns Red to celebrate Medway winning its bid to the European Footballing body UEFA to become the UK's first ever completely 100 per cent carbon neutral city
+- Capture metadata: Taken on 2026-05-15 21:17:14 BST (at 21:17:14 local time). GPS: 51.396828°N, 0.501581°E.
 ```
 
 Generation/load config:
@@ -130,7 +128,7 @@ Generation/load config:
     "prefill_step_size": 4096,
     "temperature": 0.0
   },
-  "image": "/Users/jrp/Pictures/Processed/20260509-165442_DSC09962_DxO.jpg",
+  "image": "/Users/jrp/Pictures/Processed/20260515-201714_DSC09998_DxO.jpg",
   "load_kwargs": {
     "trust_remote_code": true
   },
@@ -140,7 +138,7 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/LFM2.5-VL-1.6B-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_005_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_MODEL_LOAD_WEIGHT_MISMATCH_7574b1189.json)
+- `mlx-community/LFM2.5-VL-1.6B-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T231645Z_007_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_MODEL_LOAD_WEIGHT_MISMATCH_7574b1189.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -166,7 +164,7 @@ Optional advanced context:
 | mlx             | 0.32.0.dev20260515+7b7c1240 |
 | mlx-lm          | 0.31.3                      |
 | mlx-audio       | 0.4.3                       |
-| transformers    | 5.8.1                       |
+| transformers    | 5.8.0.dev0                  |
 | tokenizers      | 0.22.2                      |
 | huggingface-hub | 1.15.0                      |
 | Python Version  | 3.13.12                     |

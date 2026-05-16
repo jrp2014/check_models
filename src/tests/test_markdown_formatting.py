@@ -442,6 +442,21 @@ def test_wrapped_blockquote_neutralizes_leading_markdown_syntax() -> None:
     assert "> &#91;!NOTE] alert" in md
 
 
+def test_wrapped_blockquote_neutralizes_lone_ordered_list_markers() -> None:
+    """Wrapped blockquote lines should keep lone ordered markers out of list parsing."""
+    parts: list[str] = []
+
+    check_models._append_markdown_wrapped_blockquote(parts, "11)\n1.\n1)")
+
+    lines = "\n".join(parts).splitlines()
+    assert "> 11&#41;" in lines
+    assert "> 1&#46;" in lines
+    assert "> 1&#41;" in lines
+    assert "> 11)" not in lines
+    assert "> 1." not in lines
+    assert "> 1)" not in lines
+
+
 def test_wrapped_blockquote_neutralizes_inline_asterisk_emphasis() -> None:
     """Wrapped blockquote lines should render raw asterisk emphasis literally."""
     parts: list[str] = []

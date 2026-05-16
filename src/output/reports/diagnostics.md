@@ -2,7 +2,7 @@
 
 **Run summary:** 55 locally-cached VLM model(s) checked; 3 hard failure(s), 13 harness/integration issue(s), 0 preflight warning(s), 52 successful run(s).
 
-Test image: `20260509-165442_DSC09962_DxO.jpg` (26.5 MB).
+Test image: `20260515-201714_DSC09998_DxO.jpg` (27.0 MB).
 
 ---
 
@@ -12,15 +12,15 @@ Root-cause issue drafts are generated in
 [issues/index.md](https://github.com/jrp2014/check_models/blob/main/src/output/issues/index.md).
 Each row is intended to become one focused upstream GitHub issue.
 
-| Target                                                   | Problem                                               | Evidence Snapshot                                                                                                                                                                                           | Affected Models                                            | Issue Draft                                                                                                                              | Evidence Bundle                                                                                                                                                                                | Fixed When                                                |
-|----------------------------------------------------------|-------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
-| `mlx`                                                    | Weight/config mismatch during model load              | Model Error \| phase model_load \| ValueError                                                                                                                                                               | 1: `mlx-community/Kimi-VL-A3B-Thinking-8bit`               | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_001_mlx_mlx-model-load-model_001.md)             | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_004_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)   | Load/generation completes or fails with a narrower owner. |
-| `mlx`                                                    | Weight/config mismatch during model load              | Weight Mismatch \| phase model_load \| ValueError                                                                                                                                                           | 1: `mlx-community/LFM2.5-VL-1.6B-bf16`                     | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_002_mlx_mlx-model-load-weight-mismatch_001.md)   | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_005_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_MODEL_LOAD_WEIGHT_MISMATCH_7574b1189.json)  | Load/generation completes or fails with a narrower owner. |
-| `mlx-lm`                                                 | Missing module/import during model load               | Model Error \| phase model_load \| ModuleNotFoundError                                                                                                                                                      | 1: `facebook/pe-av-large`                                  | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_003_mlx-lm_mlx-lm-model-load-model_001.md)       | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_001_facebook_pe-av-large_MLX_LM_MODEL_LOAD_MODEL_b253df301723.json)                   | Load/generation completes or fails with a narrower owner. |
-| `mlx-vlm`                                                | Tokenizer decode leaked BPE/byte markers              | 323 BPE space markers found in decoded text \| prompt=2,899 \| output/prompt=17.25% \| nontext burden=84% \| stop=max_tokens \| hit token cap (500)                                                         | 1: `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_004_mlx-vlm_encoding_001.md)                     | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)  | No BPE/byte markers in output.                            |
-| `mlx-vlm`                                                | Stop/control tokens leaked into generated text        | decoded text contains control token &lt;\|endoftext\|&gt; \| prompt_tokens=16851, repetitive output \| prompt=16,851 \| output/prompt=2.97% \| nontext burden=97% \| stop=max_tokens \| hit token cap (500) | 1: `mlx-community/X-Reasoner-7B-8bit`                      | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_005_mlx-vlm_stop-token_001.md)                   | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_014_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_stop_token_001.json)                     | No leaked stop/control tokens.                            |
-| model repo first; mlx-vlm if template handling disagrees | Prompt/template output shape mismatch                 | generated_tokens~9 \| prompt=571 \| output/prompt=1.58% \| nontext burden=16% \| stop=completed \| 3 model cluster                                                                                          | 3: `mlx-community/FastVLM-0.5B-bf16` (+2)                  | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_006_model-config-mlx-vlm_prompt-template_001.md) | [3 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_003_mlx-community_FastVLM-0.5B-bf16_model_config_mlx_vlm_prompt_template_001.json) | Requested sections render without template leakage.       |
-| mlx-vlm first; MLX if cache/runtime reproduces           | Long-context generation collapsed or became too short | prompt_tokens=16851, repetitive output \| prompt=16,851 \| output/prompt=2.97% \| nontext burden=97% \| stop=max_tokens \| hit token cap (500) \| 8 model cluster                                           | 8: `mlx-community/Qwen2-VL-2B-Instruct-4bit` (+7)          | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_007_mlx-vlm-mlx_long-context_001.md)             | [8 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T182226Z_006_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)     | Full and reduced reruns avoid context collapse.           |
+| Target                                                   | Problem                                               | Evidence Snapshot                                                                                                                                                                                                      | Affected Models                                                 | Issue Draft                                                                                                                              | Evidence Bundle                                                                                                                                                                                          | Fixed When                                                |
+|----------------------------------------------------------|-------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
+| `mlx`                                                    | Weight/config mismatch during model load              | Model Error \| phase model_load \| ValueError                                                                                                                                                                          | 1: `mlx-community/Kimi-VL-A3B-Thinking-8bit`                    | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_001_mlx_mlx-model-load-model_001.md)             | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T231645Z_006_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)             | Load/generation completes or fails with a narrower owner. |
+| `mlx`                                                    | Weight/config mismatch during model load              | Weight Mismatch \| phase model_load \| ValueError                                                                                                                                                                      | 1: `mlx-community/LFM2.5-VL-1.6B-bf16`                          | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_002_mlx_mlx-model-load-weight-mismatch_001.md)   | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T231645Z_007_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_MODEL_LOAD_WEIGHT_MISMATCH_7574b1189.json)            | Load/generation completes or fails with a narrower owner. |
+| `mlx-lm`                                                 | Missing module/import during model load               | Model Error \| phase model_load \| ModuleNotFoundError                                                                                                                                                                 | 1: `facebook/pe-av-large`                                       | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_003_mlx-lm_mlx-lm-model-load-model_001.md)       | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T231645Z_001_facebook_pe-av-large_MLX_LM_MODEL_LOAD_MODEL_b253df301723.json)                             | Load/generation completes or fails with a narrower owner. |
+| `mlx-vlm`                                                | Stop/control tokens leaked into generated text        | decoded text contains control token &lt;\|endoftext\|&gt; \| prompt_tokens=16868, prompt/image context dropped \| prompt=16,868 \| output/prompt=2.96% \| nontext burden=98% \| stop=max_tokens \| hit token cap (500) | 1: `mlx-community/X-Reasoner-7B-8bit`                           | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_004_mlx-vlm_stop-token_001.md)                   | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T231645Z_016_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_stop_token_001.json)                               | No leaked stop/control tokens.                            |
+| model repo first; mlx-vlm if template handling disagrees | Prompt/template output shape mismatch                 | generated_tokens~4 \| prompt=484 \| output/prompt=0.83% \| nontext burden=14% \| stop=completed                                                                                                                        | 1: `mlx-community/FastVLM-0.5B-bf16`                            | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_005_model-config-mlx-vlm_prompt-template_001.md) | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T231645Z_003_mlx-community_FastVLM-0.5B-bf16_model_config_mlx_vlm_prompt_template_001.json)              | Requested sections render without template leakage.       |
+| mlx-vlm first; MLX if cache/runtime reproduces           | Long-context generation collapsed or became too short | generated_tokens~2 \| prompt_tokens=3581, output_tokens=2, output/prompt=0.1% \| prompt=3,581 \| output/prompt=0.06% \| nontext burden=88% \| stop=completed \| 3 model cluster                                        | 3: `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` (+2) | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_006_mlx-vlm-mlx_long-context_001.md)             | [3 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T231645Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_mlx_long_context_001.json) | Full and reduced reruns avoid context collapse.           |
+| mlx-vlm first; MLX if cache/runtime reproduces           | Long-context generation collapsed or became too short | prompt_tokens=16868, prompt/image context dropped \| prompt=16,868 \| output/prompt=2.96% \| nontext burden=98% \| stop=max_tokens \| hit token cap (500) \| 8 model cluster                                           | 8: `mlx-community/Qwen2-VL-2B-Instruct-4bit` (+7)               | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_007_mlx-vlm-mlx_long-context_002.md)             | [8 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260515T231645Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_002.json)               | Full and reduced reruns avoid context collapse.           |
 
 ---
 
@@ -141,39 +141,38 @@ point to stack/runtime behavior rather than inherent model quality limits.
 
 ### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`
 
-- _Observed:_ Decoded output contains tokenizer artifacts that should not
-  appear in user-facing text.
-- _Likely owner:_ `mlx-vlm`
+- _Observed:_ Behavior degrades under long prompt context.
+- _Likely owner:_ `mlx-vlm / mlx`
 - _Why it matters:_ The run completed, but the output pattern points to
   stack/runtime behavior rather than a clean model-quality limitation.
-- _Suggested next step:_ check processor/chat-template wiring and generation
-  kwargs.
-- _Token summary:_ prompt=2,899, output=500, output/prompt=17.25%
+- _Suggested next step:_ validate long-context handling and stop-token
+  behavior across mlx-vlm + mlx runtime.
+- _Token summary:_ prompt=3,581, output=2, output/prompt=0.06%
 
 **Maintainer triage:**
 
-- _Likely owner:_ mlx-vlm \| confidence=high
-- _Classification:_ harness \| encoding
-- _Summary:_ Tokenizer space-marker artifacts (for example Ġ) appeared in
-  output (about 323 occurrences). \| hit token cap (500) \| nontext prompt
-  burden=84% \| missing sections: title, description, keywords
-- _Evidence:_ 323 BPE space markers found in decoded text
-- _Token context:_ prompt=2,899 \| output/prompt=17.25% \| nontext burden=84%
-  \| stop=max_tokens \| hit token cap (500)
-- _Next action:_ Inspect decode cleanup; tokenizer markers are leaking into
-  user-facing text.
+- _Likely owner:_ mlx \| confidence=high
+- _Classification:_ context_budget \| long_context
+- _Summary:_ Output appears truncated to about 2 tokens. \| At long prompt
+  length (3581 tokens), output stayed unusually short (2 tokens; ratio 0.1%).
+  \| output/prompt=0.06% \| nontext prompt burden=88%
+- _Evidence:_ generated_tokens~2 \| prompt_tokens=3581, output_tokens=2,
+  output/prompt=0.1%
+- _Token context:_ prompt=3,581 \| output/prompt=0.06% \| nontext burden=88%
+  \| stop=completed
+- _Next action:_ Treat this as a prompt-budget issue first; nontext prompt
+  burden is 88% and the output stays weak under that load.
 
 **Why this appears to be an integration/runtime issue:**
 
-- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 323 occurrences).
-- Model output may not follow prompt or image contents (missing: Architecture, Bench, Bird, Building, Bush).
-- Output contains corrupted or malformed text segments (character_loop: '#Ġa' repeated).
-- Output omitted required Title/Description/Keywords sections (title, description, keywords).
+- Output appears truncated to about 2 tokens.
+- At long prompt length (3581 tokens), output stayed unusually short (2 tokens; ratio 0.1%).
+- Model output may not follow prompt or image contents (missing: Rochester, Castle, turns, Red, celebrate).
 
 **Sample output:**
 
 ```text
-Ġram,ĠĠforĠthisĠwithĠaĠwhichĠisĠaĠaĠisĠaĠaĠisĠaĠdoesnĠwhichĠisĠaĠhaveĠaĠisĠaĠwhichĠisĠaĠwhichØ¹ÙĨÙĪØ§ÙĨĠisĠaĠisĠaĠisĠaĠisĠaĠisĠaĠisĠaĠwhichĠisĠaĠisĠaĠisĠaĠisĠaĠisĠaĠisĠaĠisĠaĠisĠaĠisĠaĠisĠaĠisĠaĠisĠaĠ...
+rien
 ```
 
 ### `mlx-community/FastVLM-0.5B-bf16`
@@ -185,28 +184,100 @@ point to stack/runtime behavior rather than inherent model quality limits.
   stack/runtime behavior rather than a clean model-quality limitation.
 - _Suggested next step:_ validate chat-template/config expectations and
   mlx-vlm prompt formatting for this model.
-- _Token summary:_ prompt=571, output=9, output/prompt=1.58%
+- _Token summary:_ prompt=484, output=4, output/prompt=0.83%
 
 **Maintainer triage:**
 
 - _Likely owner:_ model-config \| confidence=high
 - _Classification:_ harness \| prompt_template
-- _Summary:_ Output appears truncated to about 9 tokens. \| missing terms:
-  Architecture, Bench, Bird, Building, Bush
-- _Evidence:_ generated_tokens~9
-- _Token context:_ prompt=571 \| output/prompt=1.58% \| nontext burden=16% \|
+- _Summary:_ Output appears truncated to about 4 tokens. \| missing terms:
+  Rochester, Castle, turns, Red, celebrate
+- _Evidence:_ generated_tokens~4
+- _Token context:_ prompt=484 \| output/prompt=0.83% \| nontext burden=14% \|
   stop=completed
 - _Next action:_ Inspect model repo config, chat template, and EOS settings.
 
 **Why this appears to be an integration/runtime issue:**
 
-- Output appears truncated to about 9 tokens.
-- Model output may not follow prompt or image contents (missing: Architecture, Bench, Bird, Building, Bush).
+- Output appears truncated to about 4 tokens.
+- Model output may not follow prompt or image contents (missing: Rochester, Castle, turns, Red, celebrate).
 
 **Sample output:**
 
 ```text
-teriorGREEGREEGREEGREEGREEGREE。
+theyGREE.
+```
+
+### `mlx-community/InternVL3-14B-8bit`
+
+- _Observed:_ Behavior degrades under long prompt context.
+- _Likely owner:_ `mlx-vlm / mlx`
+- _Why it matters:_ The run completed, but the output pattern points to
+  stack/runtime behavior rather than a clean model-quality limitation.
+- _Suggested next step:_ validate long-context handling and stop-token
+  behavior across mlx-vlm + mlx runtime.
+- _Token summary:_ prompt=3,031, output=2, output/prompt=0.07%
+
+**Maintainer triage:**
+
+- _Likely owner:_ mlx \| confidence=high
+- _Classification:_ context_budget \| long_context
+- _Summary:_ Output appears truncated to about 2 tokens. \| At long prompt
+  length (3031 tokens), output stayed unusually short (2 tokens; ratio 0.1%).
+  \| output/prompt=0.07% \| nontext prompt burden=86%
+- _Evidence:_ generated_tokens~2 \| prompt_tokens=3031, output_tokens=2,
+  output/prompt=0.1%
+- _Token context:_ prompt=3,031 \| output/prompt=0.07% \| nontext burden=86%
+  \| stop=completed
+- _Next action:_ Treat this as a prompt-budget issue first; nontext prompt
+  burden is 86% and the output stays weak under that load.
+
+**Why this appears to be an integration/runtime issue:**
+
+- Output appears truncated to about 2 tokens.
+- At long prompt length (3031 tokens), output stayed unusually short (2 tokens; ratio 0.1%).
+- Model output may not follow prompt or image contents (missing: Rochester, Castle, turns, Red, celebrate).
+
+**Sample output:**
+
+```text
+ertz
+```
+
+### `mlx-community/InternVL3-8B-bf16`
+
+- _Observed:_ Behavior degrades under long prompt context.
+- _Likely owner:_ `mlx-vlm / mlx`
+- _Why it matters:_ The run completed, but the output pattern points to
+  stack/runtime behavior rather than a clean model-quality limitation.
+- _Suggested next step:_ validate long-context handling and stop-token
+  behavior across mlx-vlm + mlx runtime.
+- _Token summary:_ prompt=3,031, output=3, output/prompt=0.10%
+
+**Maintainer triage:**
+
+- _Likely owner:_ mlx \| confidence=high
+- _Classification:_ context_budget \| long_context
+- _Summary:_ Output appears truncated to about 3 tokens. \| At long prompt
+  length (3031 tokens), output stayed unusually short (3 tokens; ratio 0.1%).
+  \| output/prompt=0.10% \| nontext prompt burden=86%
+- _Evidence:_ generated_tokens~3 \| prompt_tokens=3031, output_tokens=3,
+  output/prompt=0.1%
+- _Token context:_ prompt=3,031 \| output/prompt=0.10% \| nontext burden=86%
+  \| stop=completed
+- _Next action:_ Treat this as a prompt-budget issue first; nontext prompt
+  burden is 86% and the output stays weak under that load.
+
+**Why this appears to be an integration/runtime issue:**
+
+- Output appears truncated to about 3 tokens.
+- At long prompt length (3031 tokens), output stayed unusually short (3 tokens; ratio 0.1%).
+- Model output may not follow prompt or image contents (missing: Rochester, Castle, turns, Red, celebrate).
+
+**Sample output:**
+
+```text
+xposite
 ```
 
 ### `mlx-community/Qwen2-VL-2B-Instruct-4bit`
@@ -217,32 +288,31 @@ teriorGREEGREEGREEGREEGREEGREE。
   stack/runtime behavior rather than a clean model-quality limitation.
 - _Suggested next step:_ validate long-context handling and stop-token
   behavior across mlx-vlm + mlx runtime.
-- _Token summary:_ prompt=16,851, output=500, output/prompt=2.97%
+- _Token summary:_ prompt=16,868, output=500, output/prompt=2.96%
 
 **Maintainer triage:**
 
 - _Likely owner:_ mlx \| confidence=high
 - _Classification:_ cutoff_degraded \| long_context
-- _Summary:_ At long prompt length (16851 tokens), output became repetitive.
-  \| hit token cap (500) \| nontext prompt burden=97% \| missing sections:
-  title, description, keywords
-- _Evidence:_ prompt_tokens=16851, repetitive output
-- _Token context:_ prompt=16,851 \| output/prompt=2.97% \| nontext burden=97%
+- _Summary:_ At long prompt length (16868 tokens), output may stop following
+  prompt/image context. \| hit token cap (500) \| nontext prompt burden=98% \|
+  missing sections: title, description, keywords
+- _Evidence:_ prompt_tokens=16868, prompt/image context dropped
+- _Token context:_ prompt=16,868 \| output/prompt=2.96% \| nontext burden=98%
   \| stop=max_tokens \| hit token cap (500)
 - _Next action:_ Inspect long-context cache behavior under heavy image-token
   burden.
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16851 tokens), output became repetitive.
-- Model output may not follow prompt or image contents (missing: Architecture, Bench, Bird, Building, Bush).
-- Output became repetitive, indicating possible generation instability (token: phrase: "and a, and a,...").
+- At long prompt length (16868 tokens), output may stop following prompt/image context.
+- Model output may not follow prompt or image contents (missing: Rochester, Castle, turns, Red, celebrate).
 - Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 **Sample output:**
 
 ```text
-The video, and I am. The digital and digital, and the camera.  and 100, and a digital, and a large, and a bunch, and a lot, and a lot of them, 100, and 100, and a large, and a bunch, they are, and woo...
+The Best. 1, 10, 1, 100, 10, 10, 10, 1. The screen and 有声, 4K, 4, 4, 12, 10. The screen. A picture of a small, I, 10. We can see. A, 10, 1. 1. 1. 1. 10. A. It is the 1, 10. The screen, 10. 1. 10, 10, ...
 ```
 
 ### `mlx-community/Qwen3.5-27B-4bit`
@@ -253,33 +323,31 @@ The video, and I am. The digital and digital, and the camera.  and 100, and a di
   stack/runtime behavior rather than a clean model-quality limitation.
 - _Suggested next step:_ validate long-context handling and stop-token
   behavior across mlx-vlm + mlx runtime.
-- _Token summary:_ prompt=16,866, output=500, output/prompt=2.96%
+- _Token summary:_ prompt=16,882, output=500, output/prompt=2.96%
 
 **Maintainer triage:**
 
 - _Likely owner:_ mlx \| confidence=high
 - _Classification:_ cutoff_degraded \| long_context
-- _Summary:_ At long prompt length (16866 tokens), output became repetitive.
-  \| hit token cap (500) \| nontext prompt burden=97% \| missing sections:
-  title, description, keywords
-- _Evidence:_ prompt_tokens=16866, repetitive output
-- _Token context:_ prompt=16,866 \| output/prompt=2.96% \| nontext burden=97%
+- _Summary:_ At long prompt length (16882 tokens), output may stop following
+  prompt/image context. \| hit token cap (500) \| nontext prompt burden=98% \|
+  missing sections: title, description, keywords
+- _Evidence:_ prompt_tokens=16882, prompt/image context dropped
+- _Token context:_ prompt=16,882 \| output/prompt=2.96% \| nontext burden=98%
   \| stop=max_tokens \| hit token cap (500)
 - _Next action:_ Inspect long-context cache behavior under heavy image-token
   burden.
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16866 tokens), output became repetitive.
-- Model output may not follow prompt or image contents (missing: Architecture, Bench, Bird, Building, Bush).
-- Output became repetitive, indicating possible generation instability (token: 1).
-- Output contains corrupted or malformed text segments (character_loop: '1 ' repeated).
+- At long prompt length (16882 tokens), output may stop following prompt/image context.
+- Model output may not follow prompt or image contents (missing: Rochester, Castle, turns, Red, celebrate).
 - Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 **Sample output:**
 
 ```text
-adata竞人满大值走 下 稍 信 息 和 5 6 7 8 9 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 ...
+ండిuestr……j- Y- M- r- t- s- ( 1- 2- 3- 4- 5- 6- 7- 8- 9- 10- 11- 12- 13- 14- 15- 16- 17- 18- 19- 20- 21- 22- 23- 24- 25- 26- 27- 28- 29- 30- 31- 32- 33- 34- 35- 36- 37- 38- 39- 40- 41- 42- 43- 44- 45-...
 ```
 
 ### `mlx-community/Qwen3.5-27B-mxfp8`
@@ -290,80 +358,128 @@ adata竞人满大值走 下 稍 信 息 和 5 6 7 8 9 1 1 1 1 1 1 1 1 1 1 1 1 1 
   stack/runtime behavior rather than a clean model-quality limitation.
 - _Suggested next step:_ validate long-context handling and stop-token
   behavior across mlx-vlm + mlx runtime.
-- _Token summary:_ prompt=16,866, output=500, output/prompt=2.96%
+- _Token summary:_ prompt=16,882, output=500, output/prompt=2.96%
 
 **Maintainer triage:**
 
 - _Likely owner:_ mlx \| confidence=high
 - _Classification:_ cutoff_degraded \| long_context
-- _Summary:_ At long prompt length (16866 tokens), output became repetitive.
-  \| hit token cap (500) \| nontext prompt burden=97% \| missing sections:
+- _Summary:_ At long prompt length (16882 tokens), output became repetitive.
+  \| hit token cap (500) \| nontext prompt burden=98% \| missing sections:
   title, description, keywords
-- _Evidence:_ prompt_tokens=16866, repetitive output
-- _Token context:_ prompt=16,866 \| output/prompt=2.96% \| nontext burden=97%
+- _Evidence:_ prompt_tokens=16882, repetitive output
+- _Token context:_ prompt=16,882 \| output/prompt=2.96% \| nontext burden=98%
   \| stop=max_tokens \| hit token cap (500)
 - _Next action:_ Inspect long-context cache behavior under heavy image-token
   burden.
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16866 tokens), output became repetitive.
-- Model output may not follow prompt or image contents (missing: Architecture, Bench, Bird, Building, Bush).
-- Output became repetitive, indicating possible generation instability (token: phrase: "- 伊 - 德...").
+- At long prompt length (16882 tokens), output became repetitive.
+- Model output may not follow prompt or image contents (missing: Rochester, Castle, turns, Red, celebrate).
+- Output became repetitive, indicating possible generation instability (token: 觉).
 - Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 **Sample output:**
 
 ```text
-μάτων维奇喧
-
-afd.
-- 第一
-- 弗
-- 洛
-- 伊
-- 德
-- 罗
-- 伊
-- 德
-- 罗
-- 伊
-- 德
-- 罗
-- 伊
-- 德
-- 罗
-- 伊
-- 德
-- 罗
-- 伊
-- 德
-- 罗
-- 伊
-- 德
-- 罗
-- 伊
-- 德
-- 罗
-- 伊
-- 德
-- 罗
-- 伊
-- 德
-- 罗
-- 伊
-- 德
-- 罗
-- 伊
-- 德
-- 罗
-- 伊
-- 德
-- 罗
-- 伊
-- 德
-- 罗
-- 伊
+evin满尼
+憬觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
+觉
 ...
 ```
 
@@ -375,33 +491,33 @@ afd.
   stack/runtime behavior rather than a clean model-quality limitation.
 - _Suggested next step:_ validate long-context handling and stop-token
   behavior across mlx-vlm + mlx runtime.
-- _Token summary:_ prompt=16,866, output=500, output/prompt=2.96%
+- _Token summary:_ prompt=16,882, output=500, output/prompt=2.96%
 
 **Maintainer triage:**
 
 - _Likely owner:_ mlx \| confidence=high
 - _Classification:_ cutoff_degraded \| long_context
-- _Summary:_ At long prompt length (16866 tokens), output became repetitive.
-  \| hit token cap (500) \| nontext prompt burden=97% \| missing sections:
+- _Summary:_ At long prompt length (16882 tokens), output became repetitive.
+  \| hit token cap (500) \| nontext prompt burden=98% \| missing sections:
   title, description, keywords
-- _Evidence:_ prompt_tokens=16866, repetitive output
-- _Token context:_ prompt=16,866 \| output/prompt=2.96% \| nontext burden=97%
+- _Evidence:_ prompt_tokens=16882, repetitive output
+- _Token context:_ prompt=16,882 \| output/prompt=2.96% \| nontext burden=98%
   \| stop=max_tokens \| hit token cap (500)
 - _Next action:_ Inspect long-context cache behavior under heavy image-token
   burden.
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16866 tokens), output became repetitive.
-- Model output may not follow prompt or image contents (missing: Architecture, Bench, Bird, Building, Bush).
-- Output became repetitive, indicating possible generation instability (token: 作为).
-- Output contains corrupted or malformed text segments (character_loop: ' 作为' repeated).
+- At long prompt length (16882 tokens), output became repetitive.
+- Model output may not follow prompt or image contents (missing: Rochester, Castle, turns, Red, celebrate).
+- Output became repetitive, indicating possible generation instability (token: `).
+- Output contains corrupted or malformed text segments (character_loop: ' `' repeated).
 - Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 **Sample output:**
 
 ```text
-作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为 作为...
+erval ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ...
 ```
 
 ### `mlx-community/Qwen3.5-35B-A3B-6bit`
@@ -412,32 +528,33 @@ afd.
   stack/runtime behavior rather than a clean model-quality limitation.
 - _Suggested next step:_ validate long-context handling and stop-token
   behavior across mlx-vlm + mlx runtime.
-- _Token summary:_ prompt=16,866, output=500, output/prompt=2.96%
+- _Token summary:_ prompt=16,882, output=500, output/prompt=2.96%
 
 **Maintainer triage:**
 
 - _Likely owner:_ mlx \| confidence=high
 - _Classification:_ cutoff_degraded \| long_context
-- _Summary:_ At long prompt length (16866 tokens), output became repetitive.
-  \| hit token cap (500) \| nontext prompt burden=97% \| missing sections:
+- _Summary:_ At long prompt length (16882 tokens), output became repetitive.
+  \| hit token cap (500) \| nontext prompt burden=98% \| missing sections:
   title, description, keywords
-- _Evidence:_ prompt_tokens=16866, repetitive output
-- _Token context:_ prompt=16,866 \| output/prompt=2.96% \| nontext burden=97%
+- _Evidence:_ prompt_tokens=16882, repetitive output
+- _Token context:_ prompt=16,882 \| output/prompt=2.96% \| nontext burden=98%
   \| stop=max_tokens \| hit token cap (500)
 - _Next action:_ Inspect long-context cache behavior under heavy image-token
   burden.
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16866 tokens), output became repetitive.
-- Model output may not follow prompt or image contents (missing: Architecture, Bench, Bird, Building, Bush).
-- Output became repetitive, indicating possible generation instability (token: phrase: "100% biodegradable, 100% recyc...").
+- At long prompt length (16882 tokens), output became repetitive.
+- Model output may not follow prompt or image contents (missing: Rochester, Castle, turns, Red, celebrate).
+- Output became repetitive, indicating possible generation instability (token: 1).
+- Output contains corrupted or malformed text segments (character_loop: '  1' repeated).
 - Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 **Sample output:**
 
 ```text
-CORE CORNER: 100% Natural, 100% Organic, 100% Sustainable, 100% Eco-Friendly, 100% Non-Toxic, 100% Biodegradable, 100% Recyclable, 100% Renewable, 100% Sustainable, 100% Biodegradable, 100% Recyclable...
+ổng是分;    1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1...
 ```
 
 ### `mlx-community/Qwen3.5-35B-A3B-bf16`
@@ -448,38 +565,32 @@ CORE CORNER: 100% Natural, 100% Organic, 100% Sustainable, 100% Eco-Friendly, 10
   stack/runtime behavior rather than a clean model-quality limitation.
 - _Suggested next step:_ validate long-context handling and stop-token
   behavior across mlx-vlm + mlx runtime.
-- _Token summary:_ prompt=16,866, output=500, output/prompt=2.96%
+- _Token summary:_ prompt=16,882, output=500, output/prompt=2.96%
 
 **Maintainer triage:**
 
 - _Likely owner:_ mlx \| confidence=high
 - _Classification:_ cutoff_degraded \| long_context
-- _Summary:_ At long prompt length (16866 tokens), output became repetitive.
-  \| hit token cap (500) \| nontext prompt burden=97% \| missing sections:
+- _Summary:_ At long prompt length (16882 tokens), output became repetitive.
+  \| hit token cap (500) \| nontext prompt burden=98% \| missing sections:
   title, description, keywords
-- _Evidence:_ prompt_tokens=16866, repetitive output
-- _Token context:_ prompt=16,866 \| output/prompt=2.96% \| nontext burden=97%
+- _Evidence:_ prompt_tokens=16882, repetitive output
+- _Token context:_ prompt=16,882 \| output/prompt=2.96% \| nontext burden=98%
   \| stop=max_tokens \| hit token cap (500)
 - _Next action:_ Inspect long-context cache behavior under heavy image-token
   burden.
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16866 tokens), output became repetitive.
-- Model output may not follow prompt or image contents (missing: Architecture, Bench, Bird, Building, Bush).
-- Output became repetitive, indicating possible generation instability (token: phrase: "9780470474335_ch01_p001-016.qx...").
+- At long prompt length (16882 tokens), output became repetitive.
+- Model output may not follow prompt or image contents (missing: Rochester, Castle, turns, Red, celebrate).
+- Output became repetitive, indicating possible generation instability (token: was).
 - Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 **Sample output:**
 
 ```text
-Myths are often true. This book is about the truth of myths.
-
-9780470474335_ch01_p001-016.qxd 10/27/09 11:04 AM Page 1
-
-9780470474335_ch01_p001-016.qxd 10/27/09 11:04 AM Page 2
-
-9780470474335_ch01_p00...
+fs, being made was was was was was was was was was was was was was was was was was was was was was was was was was was was was was was was was was was was was was was was was was was was was was was w...
 ```
 
 ### `mlx-community/Qwen3.5-9B-MLX-4bit`
@@ -490,39 +601,34 @@ Myths are often true. This book is about the truth of myths.
   stack/runtime behavior rather than a clean model-quality limitation.
 - _Suggested next step:_ validate long-context handling and stop-token
   behavior across mlx-vlm + mlx runtime.
-- _Token summary:_ prompt=16,866, output=500, output/prompt=2.96%
+- _Token summary:_ prompt=16,882, output=500, output/prompt=2.96%
 
 **Maintainer triage:**
 
 - _Likely owner:_ mlx \| confidence=high
 - _Classification:_ cutoff_degraded \| long_context
-- _Summary:_ At long prompt length (16866 tokens), output became repetitive.
-  \| hit token cap (500) \| nontext prompt burden=97% \| missing sections:
+- _Summary:_ At long prompt length (16882 tokens), output became repetitive.
+  \| hit token cap (500) \| nontext prompt burden=98% \| missing sections:
   title, description, keywords
-- _Evidence:_ prompt_tokens=16866, repetitive output
-- _Token context:_ prompt=16,866 \| output/prompt=2.96% \| nontext burden=97%
+- _Evidence:_ prompt_tokens=16882, repetitive output
+- _Token context:_ prompt=16,882 \| output/prompt=2.96% \| nontext burden=98%
   \| stop=max_tokens \| hit token cap (500)
 - _Next action:_ Inspect long-context cache behavior under heavy image-token
   burden.
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16866 tokens), output became repetitive.
-- Model output may not follow prompt or image contents (missing: Architecture, Bench, Bird, Building, Bush).
-- Output became repetitive, indicating possible generation instability (token: phrase: "and 0+ 1. of...").
+- At long prompt length (16882 tokens), output became repetitive.
+- Model output may not follow prompt or image contents (missing: Rochester, Castle, turns, Red, celebrate).
+- Output became repetitive, indicating possible generation instability (token: phrase: "2 日 2 日...").
 - Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 **Sample output:**
 
 ```text
-ku junолоpes-6, 2, and 0+ 1.
-of the two, 2, and 0 and 0+ 1.
-of the, 2, and 0 and 0+ 1.
-of the, 2, and 0 and 0+ 1.
-of the, 2, and 0 and 0+ 1.
-of the, 2, and 0 and 0+ 1.
-of the, 2, and 0 and 0+ 1.
-of th...
+厄afaaktor捷2月沧海一imd,我wi,我wi,年，请wi,我wi,年
+
+  90- 1. 2024 年 2 月  2 月  2 日  2 日  2 日  2 日  2 2024 年 2 月 2 日 2 日 2 日 2 日 2 日 2 日 2024 年 2 日 2 日 2 日 2024 年 2 日 2 日 2024 年 2 日 2 日 2 日 2 日 2024 年 2 日 2 日 2024 ...
 ```
 
 ### `mlx-community/Qwen3.6-27B-mxfp8`
@@ -533,32 +639,48 @@ of th...
   stack/runtime behavior rather than a clean model-quality limitation.
 - _Suggested next step:_ validate long-context handling and stop-token
   behavior across mlx-vlm + mlx runtime.
-- _Token summary:_ prompt=16,866, output=500, output/prompt=2.96%
+- _Token summary:_ prompt=16,882, output=500, output/prompt=2.96%
 
 **Maintainer triage:**
 
 - _Likely owner:_ mlx \| confidence=high
 - _Classification:_ cutoff_degraded \| long_context
-- _Summary:_ At long prompt length (16866 tokens), output may stop following
-  prompt/image context. \| hit token cap (500) \| nontext prompt burden=97% \|
-  missing sections: title, description, keywords
-- _Evidence:_ prompt_tokens=16866, prompt/image context dropped
-- _Token context:_ prompt=16,866 \| output/prompt=2.96% \| nontext burden=97%
+- _Summary:_ At long prompt length (16882 tokens), output became repetitive.
+  \| hit token cap (500) \| nontext prompt burden=98% \| missing sections:
+  title, description, keywords
+- _Evidence:_ prompt_tokens=16882, repetitive output
+- _Token context:_ prompt=16,882 \| output/prompt=2.96% \| nontext burden=98%
   \| stop=max_tokens \| hit token cap (500)
 - _Next action:_ Inspect long-context cache behavior under heavy image-token
   burden.
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16866 tokens), output may stop following prompt/image context.
-- Model output may not follow prompt or image contents (missing: Architecture, Bench, Bird, Building, Bush).
-- Output contains corrupted or malformed text segments (character_loop: '2' repeated).
+- At long prompt length (16882 tokens), output became repetitive.
+- Model output may not follow prompt or image contents (missing: Rochester, Castle, turns, Red, celebrate).
+- Output became repetitive, indicating possible generation instability (token: phrase: "3 \, y, y...").
+- Output contains corrupted or malformed text segments (incomplete_sentence: ends with 'y').
+- Output formatting deviated from the requested structure. Details: Unknown tags: <EOF>.
 - Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 **Sample output:**
 
 ```text
-態减2 NTo+222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222...
+弄清 0 >-< <EOF>
+ 3   \, y, y
+\ 3   \, y, y
+\ 3   \, y, y
+\ 3   \, y, y
+\ 3   \, y, y
+\ 3   \, y, y
+\ 3   \, y, y
+\ 3   \, y, y
+\ 3   \, y, y
+\ 3   \, y, y
+\ 3   \, y, y
+\ 3   \, y, y
+\ 3   \, y, y
+\ 3 ...
 ```
 
 ### `mlx-community/X-Reasoner-7B-8bit`
@@ -570,18 +692,18 @@ of th...
   stack/runtime behavior rather than a clean model-quality limitation.
 - _Suggested next step:_ check processor/chat-template wiring and generation
   kwargs.
-- _Token summary:_ prompt=16,851, output=500, output/prompt=2.97%
+- _Token summary:_ prompt=16,868, output=500, output/prompt=2.96%
 
 **Maintainer triage:**
 
 - _Likely owner:_ mlx-vlm \| confidence=high
 - _Classification:_ harness \| stop_token
 - _Summary:_ Special control token &lt;\|endoftext\|&gt; appeared in generated
-  text. \| At long prompt length (16851 tokens), output became repetitive. \|
-  hit token cap (500) \| nontext prompt burden=97%
+  text. \| At long prompt length (16868 tokens), output may stop following
+  prompt/image context. \| hit token cap (500) \| nontext prompt burden=98%
 - _Evidence:_ decoded text contains control token &lt;\|endoftext\|&gt; \|
-  prompt_tokens=16851, repetitive output
-- _Token context:_ prompt=16,851 \| output/prompt=2.97% \| nontext burden=97%
+  prompt_tokens=16868, prompt/image context dropped
+- _Token context:_ prompt=16,868 \| output/prompt=2.96% \| nontext burden=98%
   \| stop=max_tokens \| hit token cap (500)
 - _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
   into user-facing text.
@@ -589,84 +711,15 @@ of th...
 **Why this appears to be an integration/runtime issue:**
 
 - Special control token &lt;|endoftext|&gt; appeared in generated text.
-- At long prompt length (16851 tokens), output became repetitive.
-- Model output may not follow prompt or image contents (missing: Architecture, Bench, Bird, Building, Bush).
-- Output became repetitive, indicating possible generation instability (token: phrase: "1.<|endoftext|>the 1.<|endofte...").
+- At long prompt length (16868 tokens), output may stop following prompt/image context.
+- Model output may not follow prompt or image contents (missing: Rochester, Castle, turns, Red, celebrate).
 - Output switched language/script unexpectedly (tokenizer_artifact).
 - Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 **Sample output:**
 
 ```text
-<|endoftext|>1.<|endoftext|>1 2.<|endoftext|>The 2008: 2.<|endoftext|>The 2.<|endoftext|>The 1.<|endoftext|>The 2.<|endoftext|>The 1.<|endoftext|>The 2.<|endoftext|>1. The 1.<|endoftext|>The 1. The 2....
-```
-
-### `mlx-community/paligemma2-10b-ft-docci-448-6bit`
-
-- _Observed:_ Output shape suggests a prompt-template or stop-condition
-  mismatch.
-- _Likely owner:_ `model-config / mlx-vlm`
-- _Why it matters:_ The run completed, but the output pattern points to
-  stack/runtime behavior rather than a clean model-quality limitation.
-- _Suggested next step:_ validate chat-template/config expectations and
-  mlx-vlm prompt formatting for this model.
-- _Token summary:_ prompt=1,584, output=8, output/prompt=0.51%
-
-**Maintainer triage:**
-
-- _Likely owner:_ model-config \| confidence=high
-- _Classification:_ harness \| prompt_template
-- _Summary:_ Output is very short relative to prompt size (0.5%), suggesting
-  possible early-stop or prompt-handling issues. \| nontext prompt burden=70%
-  \| missing terms: Architecture, Bench, Bird, Building, Bush
-- _Evidence:_ output/prompt=0.5%
-- _Token context:_ prompt=1,584 \| output/prompt=0.51% \| nontext burden=70%
-  \| stop=completed
-- _Next action:_ Inspect model repo config, chat template, and EOS settings.
-
-**Why this appears to be an integration/runtime issue:**
-
-- Output is very short relative to prompt size (0.5%), suggesting possible early-stop or prompt-handling issues.
-- Model output may not follow prompt or image contents (missing: Architecture, Bench, Bird, Building, Bush).
-
-**Sample output:**
-
-```text
-- Use the following metadata terms:
-```
-
-### `mlx-community/paligemma2-10b-ft-docci-448-bf16`
-
-- _Observed:_ Output shape suggests a prompt-template or stop-condition
-  mismatch.
-- _Likely owner:_ `model-config / mlx-vlm`
-- _Why it matters:_ The run completed, but the output pattern points to
-  stack/runtime behavior rather than a clean model-quality limitation.
-- _Suggested next step:_ validate chat-template/config expectations and
-  mlx-vlm prompt formatting for this model.
-- _Token summary:_ prompt=1,584, output=8, output/prompt=0.51%
-
-**Maintainer triage:**
-
-- _Likely owner:_ model-config \| confidence=high
-- _Classification:_ harness \| prompt_template
-- _Summary:_ Output is very short relative to prompt size (0.5%), suggesting
-  possible early-stop or prompt-handling issues. \| nontext prompt burden=70%
-  \| missing terms: Architecture, Bench, Bird, Building, Bush
-- _Evidence:_ output/prompt=0.5%
-- _Token context:_ prompt=1,584 \| output/prompt=0.51% \| nontext burden=70%
-  \| stop=completed
-- _Next action:_ Inspect model repo config, chat template, and EOS settings.
-
-**Why this appears to be an integration/runtime issue:**
-
-- Output is very short relative to prompt size (0.5%), suggesting possible early-stop or prompt-handling issues.
-- Model output may not follow prompt or image contents (missing: Architecture, Bench, Bird, Building, Bush).
-
-**Sample output:**
-
-```text
-- Use the following metadata terms:
+<|endoftext|>1.<|endoftext|>1<|endoftext|>1<|endoftext|>10<|endoftext|>10<|endoftext|>10<|endoftext|>10<|endoftext|>10<|endoftext|>10.<|endoftext|>10.<|endoftext|>The 1.<|endoftext|>The 1.<|endoftext|...
 ```
 
 ---
@@ -692,14 +745,14 @@ model appears).
 - **Detailed diagnostics models:** 16
 - **Summary diagnostics models:** 39
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1447.14s (1447.14s)
-- **Average runtime per model:** 26.31s (26.31s)
-- **Dominant runtime phase:** post-prefill decode dominated 35/55 measured model runs (48% of tracked runtime).
-- **Phase totals:** model load=103.82s, local prompt prep=0.16s, upstream prefill / first-token=632.71s, post-prefill decode=698.00s, cleanup=5.71s
-- **Generation total:** 1330.71s across 52 model(s); upstream prefill / first-token split available for 52/52 model(s).
-- **Observed stop reasons:** completed=11, exception=3, max_tokens=41
-- **Validation overhead:** 9.58s total (avg 0.17s across 55 model(s)).
-- **Upstream prefill / first-token latency:** Avg 12.17s | Min 0.04s | Max 76.86s across 52 model(s).
+- **Total model runtime (sum):** 1703.54s (1703.54s)
+- **Average runtime per model:** 30.97s (30.97s)
+- **Dominant runtime phase:** post-prefill decode dominated 36/55 measured model runs (52% of tracked runtime).
+- **Phase totals:** model load=117.36s, local prompt prep=0.18s, upstream prefill / first-token=697.13s, post-prefill decode=873.98s, cleanup=6.02s
+- **Generation total:** 1571.11s across 52 model(s); upstream prefill / first-token split available for 52/52 model(s).
+- **Observed stop reasons:** completed=13, exception=3, max_tokens=39
+- **Validation overhead:** 12.03s total (avg 0.22s across 55 model(s)).
+- **Upstream prefill / first-token latency:** Avg 13.41s | Min 0.04s | Max 104.42s across 52 model(s).
 - **What this likely means:** Most measured runtime is spent generating after the first token is available.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
@@ -723,19 +776,19 @@ Prompt text is in the linked issue drafts and repro bundles.
 pip install -e "src/[dev]"
 
 # Re-run with the same CLI arguments
-python -m check_models --image /Users/jrp/Pictures/Processed/20260509-165442_DSC09962_DxO.jpg --exclude mlx-community/Qwen3-VL-2B-Thinking-bf16 Qwen/Qwen3-VL-2B-Instruct --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose
+python -m check_models --image /Users/jrp/Pictures/Processed/20260515-201714_DSC09998_DxO.jpg --exclude mlx-community/Qwen3-VL-2B-Thinking-bf16 Qwen/Qwen3-VL-2B-Instruct --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose
 ```
 
-Queued issue models: `facebook/pe-av-large`, `mlx-community/Kimi-VL-A3B-Thinking-8bit`, `mlx-community/LFM2.5-VL-1.6B-bf16`, `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`, `mlx-community/FastVLM-0.5B-bf16`, `mlx-community/Qwen2-VL-2B-Instruct-4bit`, `mlx-community/Qwen3.5-27B-4bit`, `mlx-community/Qwen3.5-27B-mxfp8`, `mlx-community/Qwen3.5-35B-A3B-4bit`, `mlx-community/Qwen3.5-35B-A3B-6bit`, `mlx-community/Qwen3.5-35B-A3B-bf16`, `mlx-community/Qwen3.5-9B-MLX-4bit`, `mlx-community/Qwen3.6-27B-mxfp8`, `mlx-community/X-Reasoner-7B-8bit`, `mlx-community/paligemma2-10b-ft-docci-448-6bit`, `mlx-community/paligemma2-10b-ft-docci-448-bf16`.
+Queued issue models: `facebook/pe-av-large`, `mlx-community/Kimi-VL-A3B-Thinking-8bit`, `mlx-community/LFM2.5-VL-1.6B-bf16`, `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`, `mlx-community/FastVLM-0.5B-bf16`, `mlx-community/InternVL3-14B-8bit`, `mlx-community/InternVL3-8B-bf16`, `mlx-community/Qwen2-VL-2B-Instruct-4bit`, `mlx-community/Qwen3.5-27B-4bit`, `mlx-community/Qwen3.5-27B-mxfp8`, `mlx-community/Qwen3.5-35B-A3B-4bit`, `mlx-community/Qwen3.5-35B-A3B-6bit`, `mlx-community/Qwen3.5-35B-A3B-bf16`, `mlx-community/Qwen3.5-9B-MLX-4bit`, `mlx-community/Qwen3.6-27B-mxfp8`, `mlx-community/X-Reasoner-7B-8bit`.
 
 Repro bundles with prompt traces and environment details are available in [repro_bundles/](https://github.com/jrp2014/check_models/tree/main/src/output/repro_bundles).
 
 ### Run details
 
-- Input image: `/Users/jrp/Pictures/Processed/20260509-165442_DSC09962_DxO.jpg`
+- Input image: `/Users/jrp/Pictures/Processed/20260515-201714_DSC09998_DxO.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-05-15 19:22:26 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-05-16 00:16:45 BST by [check_models](https://github.com/jrp2014/check_models)._
 
 ---
 
@@ -747,7 +800,7 @@ _Report generated on 2026-05-15 19:22:26 BST by [check_models](https://github.co
 | mlx             | 0.32.0.dev20260515+7b7c1240 |
 | mlx-lm          | 0.31.3                      |
 | mlx-audio       | 0.4.3                       |
-| transformers    | 5.8.1                       |
+| transformers    | 5.8.0.dev0                  |
 | tokenizers      | 0.22.2                      |
 | huggingface-hub | 1.15.0                      |
 | Python Version  | 3.13.12                     |

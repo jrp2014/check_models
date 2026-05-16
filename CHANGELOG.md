@@ -64,6 +64,8 @@ Notable changes to this project will be documented in this file.
 
 - Remove the unused `check_conda_env()` validation wrapper while keeping the
   strict expected-environment check used by the validation entrypoint.
+- Escape lone ordered-list markers in generated Markdown blockquotes so model
+  outputs like `11)` no longer trip markdownlint `MD029`.
 - Escape attributes on otherwise allowed HTML formatting tags, render HTML
   result tables from explicitly escaped cells, remove stale archived Python
   quality scripts from scan scope, and declare the direct `numpy` runtime

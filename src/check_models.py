@@ -11380,11 +11380,12 @@ def _neutralize_markdown_blockquote_prefix(text: str) -> str:
             if lone_bullet_match is not None:
                 replacement = bullet_entities[lone_bullet_match.group(1)]
             else:
-                ordered_match = re.match(r"^(\d+)([.)])(\s)", text)
+                ordered_match = re.match(r"^(\d+)([.)])(?:(\s)|$)", text)
                 if ordered_match is not None:
                     punctuation_entity = "&#46;" if ordered_match.group(2) == "." else "&#41;"
+                    marker_spacing = ordered_match.group(3) or ""
                     replacement = (
-                        f"{ordered_match.group(1)}{punctuation_entity}{ordered_match.group(3)}"
+                        f"{ordered_match.group(1)}{punctuation_entity}{marker_spacing}"
                         f"{text[ordered_match.end() :]}"
                     )
                 else:

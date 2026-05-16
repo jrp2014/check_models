@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-05-15 18:58:11 BST
+FULL ENVIRONMENT DUMP - 2026-05-15 23:42:59 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -164,7 +164,7 @@ torch==2.12.0
 torchaudio==2.11.0
 torchvision==0.27.0
 tqdm==4.67.3
-transformers==5.8.1
+transformers==5.8.0.dev0
 tree-sitter==0.25.2
 tree-sitter-dart-orchard==0.3.2
 tree-sitter-go==0.25.0
@@ -200,5 +200,5 @@ yarl==1.23.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-05-15 18:58:11 BST
+Environment dump completed at 2026-05-15 23:42:59 BST
 ================================================================================
