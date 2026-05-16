@@ -16,6 +16,7 @@ from pathlib import Path
 from textwrap import dedent
 
 import pytest
+import yaml
 from packaging.requirements import Requirement
 
 from check_models_data import dependency_policy
@@ -43,6 +44,33 @@ README = _first_existing(
 )  # prefer in-package
 PACKAGED_QUALITY_CONFIG = PKG_ROOT / "check_models_data" / "quality_config.yaml"
 LEGACY_ROOT_QUALITY_CONFIG = PKG_ROOT / "quality_config.yaml"
+ROOT_SKYLOS_CONFIG = REPO_ROOT / ".skylos" / "config.yaml"
+
+SKYLOS_ADVISORY_QUALITY_IGNORES = {
+    "SKY-C303",
+    "SKY-C401",
+    "SKY-L004",
+    "SKY-L017",
+    "SKY-L026",
+    "SKY-L028",
+    "SKY-L029",
+    "SKY-P403",
+    "SKY-Q306",
+    "SKY-Q501",
+    "SKY-Q502",
+    "SKY-Q701",
+    "SKY-Q702",
+    "SKY-Q802",
+    "SKY-Q803",
+    "SKY-R104",
+    "SKY-U005",
+}
+SKYLOS_MONOLITH_QUALITY_LIMITS = {
+    "complexity": 24,
+    "nesting": 6,
+    "max_lines": 450,
+    "duplicate_strings": 40,
+}
 
 MANUAL_MARKERS = ("<!-- MANUAL_INSTALL_START -->", "<!-- MANUAL_INSTALL_END -->")
 
@@ -215,7 +243,9 @@ def test_package_skylos_scan_excludes_generated_artifacts() -> None:
         "*.egg-info",
         "check_models.suppression-audit*.py",
     } <= excludes
-    assert "SKY-Q502" in skylos_config["ignore"]
+    assert set(skylos_config["ignore"]) >= SKYLOS_ADVISORY_QUALITY_IGNORES
+    for key, value in SKYLOS_MONOLITH_QUALITY_LIMITS.items():
+        assert skylos_config[key] == value
     assert skylos_gate == {
         "fail_on_critical": True,
         "max_critical": 0,
@@ -224,6 +254,19 @@ def test_package_skylos_scan_excludes_generated_artifacts() -> None:
         "max_quality": 10000,
         "strict": False,
     }
+
+
+def test_root_skylos_config_mirrors_package_quality_policy() -> None:
+    """Repo-root scans should use the same advisory quality calibration as package scans."""
+    pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
+    package_config = pyproject["tool"]["skylos"]
+    root_config = yaml.safe_load(ROOT_SKYLOS_CONFIG.read_text(encoding="utf-8"))
+
+    assert isinstance(root_config, dict)
+    assert set(root_config["ignore"]) == set(package_config["ignore"])
+    for key in SKYLOS_MONOLITH_QUALITY_LIMITS:
+        assert root_config[key] == package_config[key]
+    assert root_config["gate"] == package_config["gate"]
 
 
 def test_pydantic_is_managed_as_a_dev_dependency() -> None:

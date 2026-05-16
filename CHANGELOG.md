@@ -7,6 +7,8 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Calibrate Skylos quality thresholds and advisory ignores for the intentional
+  single-file CLI, behavior-grouped tests, and package-local scan layout.
 - Add package-local Skylos gate/exclusion config for `src` scans and reduce the
   remaining critical complexity hotspots in review verdicts, diagnostics
   runtime coverage, compact metrics, model comparison, utility triage, and

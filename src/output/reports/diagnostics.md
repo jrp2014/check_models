@@ -1,8 +1,8 @@
-# Diagnostics Report — 3 failure(s), 14 harness issue(s) (mlx-vlm 0.5.0)
+# Diagnostics Report — 3 failure(s), 9 harness issue(s) (mlx-vlm 0.5.0)
 
-**Run summary:** 55 locally-cached VLM model(s) checked; 3 hard failure(s), 14 harness/integration issue(s), 0 preflight warning(s), 52 successful run(s).
+**Run summary:** 55 locally-cached VLM model(s) checked; 3 hard failure(s), 9 harness/integration issue(s), 0 preflight warning(s), 52 successful run(s).
 
-Test image: `20260516-133759_DSC00002_DxO.jpg` (47.6 MB).
+Test image: `20260516-143411_DSC00013.jpg` (20.4 MB).
 
 ---
 
@@ -12,15 +12,14 @@ Root-cause issue drafts are generated in
 [issues/index.md](https://github.com/jrp2014/check_models/blob/main/src/output/issues/index.md).
 Each row is intended to become one focused upstream GitHub issue.
 
-| Target                                                   | Problem                                               | Evidence Snapshot                                                                                                                                                                                                       | Affected Models                                            | Issue Draft                                                                                                                              | Evidence Bundle                                                                                                                                                                                | Fixed When                                                |
-|----------------------------------------------------------|-------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
-| `mlx`                                                    | Weight/config mismatch during model load              | Model Error \| phase model_load \| ValueError                                                                                                                                                                           | 1: `mlx-community/Kimi-VL-A3B-Thinking-8bit`               | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_001_mlx_mlx-model-load-model_001.md)             | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260516T223018Z_005_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)   | Load/generation completes or fails with a narrower owner. |
-| `mlx`                                                    | Weight/config mismatch during model load              | Weight Mismatch \| phase model_load \| ValueError                                                                                                                                                                       | 1: `mlx-community/LFM2.5-VL-1.6B-bf16`                     | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_002_mlx_mlx-model-load-weight-mismatch_001.md)   | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260516T223018Z_007_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_MODEL_LOAD_WEIGHT_MISMATCH_7574b1189.json)  | Load/generation completes or fails with a narrower owner. |
-| `mlx-lm`                                                 | Missing module/import during model load               | Model Error \| phase model_load \| ModuleNotFoundError                                                                                                                                                                  | 1: `facebook/pe-av-large`                                  | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_003_mlx-lm_mlx-lm-model-load-model_001.md)       | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260516T223018Z_001_facebook_pe-av-large_MLX_LM_MODEL_LOAD_MODEL_b253df301723.json)                   | Load/generation completes or fails with a narrower owner. |
-| `mlx-vlm`                                                | Tokenizer decode leaked BPE/byte markers              | 46 BPE space markers found in decoded text \| prompt=2,586 \| output/prompt=19.33% \| nontext burden=84% \| stop=max_tokens \| hit token cap (500)                                                                      | 1: `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_004_mlx-vlm_encoding_001.md)                     | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260516T223018Z_002_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)  | No BPE/byte markers in output.                            |
-| `mlx-vlm`                                                | Stop/control tokens leaked into generated text        | decoded text contains control token &lt;/think&gt; \| prompt_tokens=16730, repetitive output \| prompt=16,730 \| output/prompt=2.99% \| nontext burden=97% \| stop=max_tokens \| hit token cap (500) \| 2 model cluster | 2: `mlx-community/Qwen3.6-27B-mxfp8` (+1)                  | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_005_mlx-vlm_stop-token_001.md)                   | [2 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260516T223018Z_015_mlx-community_Qwen3.6-27B-mxfp8_mlx_vlm_stop_token_001.json)                   | No leaked stop/control tokens.                            |
-| model repo first; mlx-vlm if template handling disagrees | Prompt/template output shape mismatch                 | generated_tokens~3 \| prompt=491 \| output/prompt=0.61% \| nontext burden=15% \| stop=completed \| 4 model cluster                                                                                                      | 4: `mlx-community/FastVLM-0.5B-bf16` (+3)                  | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_006_model-config-mlx-vlm_prompt-template_001.md) | [4 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260516T223018Z_003_mlx-community_FastVLM-0.5B-bf16_model_config_mlx_vlm_prompt_template_001.json) | Requested sections render without template leakage.       |
-| mlx-vlm first; MLX if cache/runtime reproduces           | Long-context generation collapsed or became too short | prompt_tokens=16715, repetitive output \| prompt=16,715 \| output/prompt=2.99% \| nontext burden=97% \| stop=max_tokens \| hit token cap (500) \| 7 model cluster                                                       | 7: `mlx-community/Qwen2-VL-2B-Instruct-4bit` (+6)          | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_007_mlx-vlm-mlx_long-context_001.md)             | [7 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260516T223018Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)     | Full and reduced reruns avoid context collapse.           |
+| Target                                                   | Problem                                               | Evidence Snapshot                                                                                                                                               | Affected Models                              | Issue Draft                                                                                                                              | Evidence Bundle                                                                                                                                                                                 | Fixed When                                                |
+|----------------------------------------------------------|-------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
+| `mlx`                                                    | Weight/config mismatch during model load              | Model Error \| phase model_load \| ValueError                                                                                                                   | 1: `mlx-community/Kimi-VL-A3B-Thinking-8bit` | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_001_mlx_mlx-model-load-model_001.md)             | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260516T231646Z_006_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)    | Load/generation completes or fails with a narrower owner. |
+| `mlx`                                                    | Weight/config mismatch during model load              | Weight Mismatch \| phase model_load \| ValueError                                                                                                               | 1: `mlx-community/LFM2.5-VL-1.6B-bf16`       | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_002_mlx_mlx-model-load-weight-mismatch_001.md)   | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260516T231646Z_007_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_MODEL_LOAD_WEIGHT_MISMATCH_7574b1189.json)   | Load/generation completes or fails with a narrower owner. |
+| `mlx-lm`                                                 | Missing module/import during model load               | Model Error \| phase model_load \| ModuleNotFoundError                                                                                                          | 1: `facebook/pe-av-large`                    | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_003_mlx-lm_mlx-lm-model-load-model_001.md)       | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260516T231646Z_002_facebook_pe-av-large_MLX_LM_MODEL_LOAD_MODEL_b253df301723.json)                    | Load/generation completes or fails with a narrower owner. |
+| `mlx-vlm`                                                | Stop/control tokens leaked into generated text        | decoded text contains control token &lt;\|endoftext\|&gt; \| prompt=803 \| output/prompt=24.91% \| nontext burden=99% \| stop=max_tokens \| hit token cap (200) | 1: `mlx-community/X-Reasoner-7B-8bit`        | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_004_mlx-vlm_stop-token_001.md)                   | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260516T231646Z_009_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_stop_token_001.json)                      | No leaked stop/control tokens.                            |
+| model repo first; mlx-vlm if template handling disagrees | Prompt/template output shape mismatch                 | generated_tokens~4 \| prompt=269 \| output/prompt=1.49% \| nontext burden=98% \| stop=completed \| 7 model cluster                                              | 7: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` (+6)   | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_005_model-config-mlx-vlm_prompt-template_001.md) | [7 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260516T231646Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_model_config_mlx_vlm_prompt_template_001.json) | Requested sections render without template leakage.       |
+| mlx-vlm first; MLX if cache/runtime reproduces           | Long-context generation collapsed or became too short | output/prompt=0.2% \| prompt_tokens=4103, output_tokens=9, output/prompt=0.2% \| prompt=4,103 \| output/prompt=0.22% \| nontext burden=100% \| stop=completed   | 1: `mlx-community/paligemma2-3b-pt-896-4bit` | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_006_mlx-vlm-mlx_long-context_001.md)             | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260516T231646Z_012_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json)         | Full and reduced reruns avoid context collapse.           |
 
 ---
 
@@ -232,278 +231,124 @@ multi_modal_projector.layer_norm.weight.
 
 ---
 
-## Harness/Integration Issues (14 model(s))
+## Harness/Integration Issues (9 model(s))
 
-14 model(s) show potential harness/integration issues; see per-model breakdown
+9 model(s) show potential harness/integration issues; see per-model breakdown
 below.
 These models completed successfully but show integration problems (for example
 stop-token leakage, decoding artifacts, or long-context breakdown) that likely
 point to stack/runtime behavior rather than inherent model quality limits.
 
+### `LiquidAI/LFM2.5-VL-450M-MLX-bf16`
+
+**Why this appears to be an integration/runtime issue:**
+
+- Output appears truncated to about 4 tokens.
+
+**Sample output:**
+
+```text
+судy.
+```
+
 ### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`
 
 **Why this appears to be an integration/runtime issue:**
 
-- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 46 occurrences).
-- Model output may not follow prompt or image contents (missing: scenic, view, looking, through, open).
-- Output contains corrupted or malformed text segments (character_loop: '11.' repeated).
-- Output omitted required Title/Description/Keywords sections (title, description, keywords).
-
-**Sample output:**
-
-```text
-odsĠlingeringĠandadĠandĠwithĠaĠveryĠveryĠveryĠveryĠveryĠhighĠand.ad.ĠThisĠisĠaĠveryĠaĠveryĠaĠveryĠaĠveryĠaĠveryĠaĠveryĠa.adĠaĠveryĠa.Ġa.Ġ.Ġ.1Ġa.adĠa.adĠa.ad.ad.ad.Ġ.WeĠareĠa.ad.Ġ.ad.WeĠare.Ġ.ad.WeĠare...
-```
-
-### `mlx-community/FastVLM-0.5B-bf16`
-
-**Why this appears to be an integration/runtime issue:**
-
 - Output appears truncated to about 3 tokens.
-- Model output may not follow prompt or image contents (missing: scenic, view, looking, through, open).
 
 **Sample output:**
 
 ```text
-weights:".
+ê¸°ê°Ģ.
 ```
 
-### `mlx-community/InternVL3-14B-8bit`
+### `mlx-community/GLM-4.6V-nvfp4`
 
 **Why this appears to be an integration/runtime issue:**
 
-- Output appears truncated to about 6 tokens.
-- Model output may not follow prompt or image contents (missing: scenic, view, looking, through, open).
+- Output appears truncated to about 8 tokens.
 
 **Sample output:**
 
 ```text
-prefacing the same.
+NullIn     co
 ```
 
-### `mlx-community/LFM2-VL-1.6B-8bit`
+### `mlx-community/InternVL3-8B-bf16`
 
 **Why this appears to be an integration/runtime issue:**
 
-- Output appears truncated to about 6 tokens.
-- Model output may not follow prompt or image contents (missing: scenic, view, looking, through, open).
+- Output is very short relative to prompt size (1.5%), suggesting possible early-stop or prompt-handling issues.
 
 **Sample output:**
 
 ```text
-arak
-
-It is a
-```
-
-### `mlx-community/Qwen2-VL-2B-Instruct-4bit`
-
-**Why this appears to be an integration/runtime issue:**
-
-- At long prompt length (16715 tokens), output became repetitive.
-- Model output may not follow prompt or image contents (missing: scenic, view, looking, through, open).
-- Output became repetitive, indicating possible generation instability (token: phrase: "it is. it is....").
-- Output omitted required Title/Description/Keywords sections (title, description, keywords).
-
-**Sample output:**
-
-```text
-The world of the modern, a photo, and the door, 100, I am. A and B, and I, and 3, and 44, 1,0. It's and  here. It's a new, and 1, and 100, I. It and 100, italy, and Europe, 100, and 100, it is. It. It...
+浩, and the answer: Theorem
+Theorem
 ```
 
 ### `mlx-community/Qwen3.5-27B-4bit`
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16730 tokens), output may stop following prompt/image context.
-- Model output may not follow prompt or image contents (missing: scenic, view, looking, through, open).
-- Output contains corrupted or malformed text segments (character_loop: '，，，' repeated).
-- Output omitted required Title/Description/Keywords sections (title, description, keywords).
+- Output appears truncated to about 3 tokens.
 
 **Sample output:**
 
 ```text
-杏花物联的热情和 -，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，...
+.removeAttribute
 ```
-
-### `mlx-community/Qwen3.5-27B-mxfp8`
-
-**Why this appears to be an integration/runtime issue:**
-
-- At long prompt length (16730 tokens), output may stop following prompt/image context.
-- Model output may not follow prompt or image contents (missing: scenic, view, looking, through, open).
-- Output contains corrupted or malformed text segments (character_loop: '，' repeated).
-- Output omitted required Title/Description/Keywords sections (title, description, keywords).
-
-**Sample output:**
-
-```text
-欢迎岩：政宗，后现代政治的，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，，...
-```
-
-### `mlx-community/Qwen3.5-35B-A3B-4bit`
-
-**Why this appears to be an integration/runtime issue:**
-
-- At long prompt length (16730 tokens), output became repetitive.
-- Model output may not follow prompt or image contents (missing: scenic, view, looking, through, open).
-- Output became repetitive, indicating possible generation instability (token: 24).
-- Output contains corrupted or malformed text segments (character_loop: ' 24' repeated).
-- Output omitted required Title/Description/Keywords sections (title, description, keywords).
-
-**Sample output:**
-
-```text
-24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24 24...
-```
-
-### `mlx-community/Qwen3.5-35B-A3B-6bit`
-
-**Why this appears to be an integration/runtime issue:**
-
-- At long prompt length (16730 tokens), output may stop following prompt/image context.
-- Model output may not follow prompt or image contents (missing: scenic, view, looking, through, open).
-- Output contains corrupted or malformed text segments (character_loop: '：：' repeated).
-- Output omitted required Title/Description/Keywords sections (title, description, keywords).
-
-**Sample output:**
-
-```text
-s圈是：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：...
-```
-
-### `mlx-community/Qwen3.5-35B-A3B-bf16`
-
-**Why this appears to be an integration/runtime issue:**
-
-- At long prompt length (16730 tokens), output may stop following prompt/image context.
-- Model output may not follow prompt or image contents (missing: scenic, view, looking, through, open).
-- Output contains corrupted or malformed text segments (character_loop: 'red' repeated).
-- Output omitted required Title/Description/Keywords sections (title, description, keywords).
-
-**Sample output:**
-
-```text
-leredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredredred...
-```
-
-### `mlx-community/Qwen3.5-9B-MLX-4bit`
-
-**Why this appears to be an integration/runtime issue:**
-
-- At long prompt length (16730 tokens), output became repetitive.
-- Model output may not follow prompt or image contents (missing: scenic, view, looking, through, open).
-- Output became repetitive, indicating possible generation instability (token: phrase: "american, t. 0the american,...").
-- Output omitted required Title/Description/Keywords sections (title, description, keywords).
-
-**Sample output:**
-
-```text
-前茅要强թ席因天仙牌,
-ombeoalibibooks, 0
-12The American, T.
-0The American, T.
-0The American, T.
-0The American, T.
-0The American, T.
-0The American, T.
-0The American, T.
-0The American, T.
-0The American, T.
-0The A...
-```
-
-### `mlx-community/Qwen3.6-27B-mxfp8`
-
-**Why this appears to be an integration/runtime issue:**
-
-- Special control token &lt;/think&gt; appeared in generated text.
-- At long prompt length (16730 tokens), output became repetitive.
-- Model output may not follow prompt or image contents (missing: scenic, view, looking, through, open).
-- Output became repetitive, indicating possible generation instability (token: phrase: "``` 2500000000 ``` ```...").
-- Output formatting deviated from the requested structure. Details: Unknown tags: <think>.
-- Output omitted required Title/Description/Keywords sections (title, description, keywords).
-- Output leaked reasoning or prompt-template text (<think>).
-
-**Sample output:**
-
-````text
-- Neubпіiharuga (2000000000)
-
-<think>
-
-<think>
-
-</think>
-
-```
-2500000000
-```
-
-```
-
-```
-
-```
-2500000000
-```
-
-```
-
-```
-
-```
-2500000000
-```
-
-```
-
-```
-
-```
-2500000000
-```
-
-```
-
-```
-
-```
-2500000000
-```
-
-``...
-````
 
 ### `mlx-community/X-Reasoner-7B-8bit`
 
 **Why this appears to be an integration/runtime issue:**
 
 - Special control token &lt;|endoftext|&gt; appeared in generated text.
-- At long prompt length (16715 tokens), output became repetitive.
-- Model output may not follow prompt or image contents (missing: scenic, view, looking, through, open).
-- Output became repetitive, indicating possible generation instability (token: phrase: "1.<|endoftext|>3 1.<|endoftext...").
+- Output contains corrupted or malformed text segments (incomplete_sentence: ends with 'of').
 - Output switched language/script unexpectedly (tokenizer_artifact).
-- Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 **Sample output:**
 
 ```text
-1.<|endoftext|>1<|endoftext|>1<|endoftext|>1<|endoftext|>The 1.<|endoftext|>The 1.<|endoftext|>3 2.<|endoftext|>3 2.<|endoftext|>The 1. The 1.<|endoftext|>The 2. The 1.<|endoftext|>The 1.<|endoftext|>...
+Hamilton<|endoftext|> Image credit: 1.<|endoftext|> Image: A 1.<|endoftext|>Huge<|endoftext|>Image, 1.<|endoftext|>Newborns areal<|endoftext|>B<|endoftext|>B<|endoftext|>New 1.<|endoftext|>B<|endoftex...
 ```
 
-### `mlx-community/paligemma2-3b-ft-docci-448-bf16`
+### `mlx-community/paligemma2-10b-ft-docci-448-6bit`
 
 **Why this appears to be an integration/runtime issue:**
 
-- Output is very short relative to prompt size (0.7%), suggesting possible early-stop or prompt-handling issues.
-- Model output may not follow prompt or image contents (missing: scenic, view, looking, through, open).
-- Output omitted required Title/Description/Keywords sections (title, description, keywords).
+- Output appears truncated to about 6 tokens.
 
 **Sample output:**
 
 ```text
-- Do not copy the instructions in the title.
+Describe this image briefly.
+```
+
+### `mlx-community/paligemma2-10b-ft-docci-448-bf16`
+
+**Why this appears to be an integration/runtime issue:**
+
+- Output appears truncated to about 6 tokens.
+
+**Sample output:**
+
+```text
+Describe this image briefly.
+```
+
+### `mlx-community/paligemma2-3b-pt-896-4bit`
+
+**Why this appears to be an integration/runtime issue:**
+
+- Output is very short relative to prompt size (0.2%), suggesting possible early-stop or prompt-handling issues.
+- At long prompt length (4103 tokens), output stayed unusually short (9 tokens; ratio 0.2%).
+
+**Sample output:**
+
+```text
+It has been tagged with #1.
 ```
 
 ---
@@ -518,36 +363,37 @@ model appears).
 
 | Model                                     | Status vs Previous Run   | First Seen Failing      | Recent Repro           |
 |-------------------------------------------|--------------------------|-------------------------|------------------------|
-| `facebook/pe-av-large`                    | new model failing        | 2026-05-04 22:51:32 BST | 3/3 recent runs failed |
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | new model failing        | 2026-04-19 00:39:44 BST | 3/3 recent runs failed |
-| `mlx-community/LFM2.5-VL-1.6B-bf16`       | new model failing        | 2026-03-27 13:06:07 GMT | 3/3 recent runs failed |
+| `facebook/pe-av-large`                    | still failing            | 2026-05-04 22:51:32 BST | 3/3 recent runs failed |
+| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | still failing            | 2026-04-19 00:39:44 BST | 3/3 recent runs failed |
+| `mlx-community/LFM2.5-VL-1.6B-bf16`       | still failing            | 2026-03-27 13:06:07 GMT | 3/3 recent runs failed |
 
 ---
 
 ## Coverage & Runtime Metrics
 
-- **Detailed diagnostics models:** 17
-- **Summary diagnostics models:** 38
+- **Detailed diagnostics models:** 12
+- **Summary diagnostics models:** 43
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1605.17s (1605.17s)
-- **Average runtime per model:** 29.18s (29.18s)
-- **Dominant runtime phase:** post-prefill decode dominated 37/55 measured model runs (49% of tracked runtime).
-- **Phase totals:** model load=121.49s, local prompt prep=0.17s, upstream prefill / first-token=686.51s, post-prefill decode=775.37s, cleanup=6.06s
-- **Generation total:** 1461.87s across 52 model(s); upstream prefill / first-token split available for 52/52 model(s).
-- **Observed stop reasons:** completed=10, exception=3, max_tokens=42
-- **Validation overhead:** 18.76s total (avg 0.34s across 55 model(s)).
-- **Upstream prefill / first-token latency:** Avg 13.20s | Min 0.05s | Max 88.87s across 52 model(s).
+- **Total model runtime (sum):** 526.71s (526.71s)
+- **Average runtime per model:** 9.58s (9.58s)
+- **Dominant runtime phase:** post-prefill decode dominated 38/55 measured model runs (62% of tracked runtime).
+- **Phase totals:** model load=104.65s, local prompt prep=0.16s, upstream prefill / first-token=85.59s, post-prefill decode=323.98s, cleanup=5.61s
+- **Generation total:** 409.57s across 52 model(s); upstream prefill / first-token split available for 52/52 model(s).
+- **Observed stop reasons:** completed=13, exception=3, max_tokens=39
+- **Validation overhead:** 9.54s total (avg 0.17s across 55 model(s)).
+- **Upstream prefill / first-token latency:** Avg 1.65s | Min 0.04s | Max 18.47s across 52 model(s).
 - **What this likely means:** Most measured runtime is spent generating after the first token is available.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
 ---
 
-## Models Not Flagged (38 model(s))
+## Models Not Flagged (43 model(s))
 
 These models completed without diagnostics flags (no hard failure, harness
 warning, or stack-signal anomaly). The detailed per-model rows remain in the
 generated results and review reports.
 
+- **Clean output:** 5 model(s).
 - **Ran, but with quality warnings:** 38 model(s).
 
 ## Reproducibility
@@ -560,19 +406,19 @@ Prompt text is in the linked issue drafts and repro bundles.
 pip install -e "src/[dev]"
 
 # Re-run with the same CLI arguments
-python -m check_models --image /Users/jrp/Pictures/Processed/20260516-133759_DSC00002_DxO.jpg --exclude mlx-community/Qwen3-VL-2B-Thinking-bf16 Qwen/Qwen3-VL-2B-Instruct --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose
+python -m check_models --image /Users/jrp/Pictures/Processed/20260516-143411_DSC00013.jpg --exclude mlx-community/Qwen3-VL-2B-Thinking-bf16 Qwen/Qwen3-VL-2B-Instruct --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --resize-shape 1024 1024 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose
 ```
 
-Queued issue models: `facebook/pe-av-large`, `mlx-community/Kimi-VL-A3B-Thinking-8bit`, `mlx-community/LFM2.5-VL-1.6B-bf16`, `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`, `mlx-community/FastVLM-0.5B-bf16`, `mlx-community/InternVL3-14B-8bit`, `mlx-community/LFM2-VL-1.6B-8bit`, `mlx-community/Qwen2-VL-2B-Instruct-4bit`, `mlx-community/Qwen3.5-27B-4bit`, `mlx-community/Qwen3.5-27B-mxfp8`, `mlx-community/Qwen3.5-35B-A3B-4bit`, `mlx-community/Qwen3.5-35B-A3B-6bit`, `mlx-community/Qwen3.5-35B-A3B-bf16`, `mlx-community/Qwen3.5-9B-MLX-4bit`, `mlx-community/Qwen3.6-27B-mxfp8`, `mlx-community/X-Reasoner-7B-8bit`, `mlx-community/paligemma2-3b-ft-docci-448-bf16`.
+Queued issue models: `facebook/pe-av-large`, `mlx-community/Kimi-VL-A3B-Thinking-8bit`, `mlx-community/LFM2.5-VL-1.6B-bf16`, `LiquidAI/LFM2.5-VL-450M-MLX-bf16`, `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`, `mlx-community/GLM-4.6V-nvfp4`, `mlx-community/InternVL3-8B-bf16`, `mlx-community/Qwen3.5-27B-4bit`, `mlx-community/X-Reasoner-7B-8bit`, `mlx-community/paligemma2-10b-ft-docci-448-6bit`, `mlx-community/paligemma2-10b-ft-docci-448-bf16`, `mlx-community/paligemma2-3b-pt-896-4bit`.
 
 Repro bundles with prompt traces and environment details are available in [repro_bundles/](https://github.com/jrp2014/check_models/tree/main/src/output/repro_bundles).
 
 ### Run details
 
-- Input image: `/Users/jrp/Pictures/Processed/20260516-133759_DSC00002_DxO.jpg`
-- Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
+- Input image: `/Users/jrp/Pictures/Processed/20260516-143411_DSC00013.jpg`
+- Generation settings: max_tokens=200, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-05-16 23:30:18 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-05-17 00:16:46 BST by [check_models](https://github.com/jrp2014/check_models)._
 
 ---
 

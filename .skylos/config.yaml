@@ -6,6 +6,32 @@ exclude:
   - package-lock.json
   - src/check_models.suppression-audit*.py
 
+# Mirror the package-local quality policy so repo-root scans and `src` scans
+# treat this intentional single-file CLI and its behavior-grouped tests the same.
+complexity: 24
+nesting: 6
+max_lines: 450
+duplicate_strings: 40
+
+ignore:
+  - SKY-C303 # CLI/test helper signatures intentionally favor explicit kwargs.
+  - SKY-C401 # Small report-summary clones are clearer than generic indirection.
+  - SKY-L004 # Cohesive orchestration try blocks are documented as acceptable.
+  - SKY-L017 # CLI diagnostics intentionally include local probe errors.
+  - SKY-L026 # Protocol method ellipses are intentional interface declarations.
+  - SKY-L028 # Early returns keep validation and CLI branches readable.
+  - SKY-L029 # Boolean flags are common in CLI plumbing and tests.
+  - SKY-P403 # Nested loops here are small test/image/report assembly loops.
+  - SKY-Q306 # Cognitive-complexity threshold is not configurable in Skylos.
+  - SKY-Q501 # Large test classes group behavior around one subsystem.
+  - SKY-Q502 # check_models.py is intentionally maintained as a single-file CLI.
+  - SKY-Q701 # TypedDict/dataclass coupling reflects result schema typing.
+  - SKY-Q702 # LCOM is noisy for pytest grouping and Protocol surfaces.
+  - SKY-Q802 # I/A/D module metrics are advisory for CLI/tool modules.
+  - SKY-Q803 # Zone-of-pain module metrics are advisory for policy constants.
+  - SKY-R104 # Package-local scans run below the repo-level pre-commit config.
+  - SKY-U005 # mlx-lm is a required runtime stack dependency even without imports.
+
 gate:
   fail_on_critical: true
   max_critical: 0

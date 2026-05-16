@@ -2,17 +2,17 @@
   "environment": {
     "library_versions": {
       "Pillow": "12.2.0",
-      "huggingface-hub": "1.14.0",
-      "mlx": "0.32.0.dev20260508+a1c0b6f9",
+      "huggingface-hub": "1.15.0",
+      "mlx": "0.32.0.dev20260516+7b7c1240",
       "mlx-audio": "0.4.3",
       "mlx-lm": "0.31.3",
       "mlx-metal": null,
       "mlx-vlm": "0.5.0",
-      "numpy": "2.4.4",
+      "numpy": "2.4.5",
       "tokenizers": "0.22.2",
-      "transformers": "5.8.0.dev0"
+      "transformers": "5.8.1"
     },
-    "platform": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
+    "platform": "macOS-26.5-arm64-arm-64bit-Mach-O",
     "preflight_issues": [],
     "system_info": {
       "Architecture": "arm64",
@@ -22,13 +22,13 @@
       "GPU/Chip": "Apple M5 Max",
       "Metal SDK": "MacOSX.sdk",
       "Metal Support": "Metal 4",
-      "OS": "Darwin 25.4.0",
+      "OS": "Darwin 25.5.0",
       "Python Version": "3.13.12",
       "RAM": "128.0 GB",
-      "SDK Version": "26.4",
-      "Xcode Build": "17E202",
-      "Xcode Version": "26.4.1",
-      "macOS Version": "26.4.1"
+      "SDK Version": "26.5",
+      "Xcode Build": "17F42",
+      "Xcode Version": "26.5",
+      "macOS Version": "26.5"
     }
   },
   "failure": {
@@ -42,8 +42,8 @@
     "traceback": null,
     "type": null
   },
-  "generated_at_utc": "2026-05-08T22:54:44+00:00",
-  "issue_cluster_id": "mlx-vlm_encoding_001",
+  "generated_at_utc": "2026-05-16T23:16:46+00:00",
+  "issue_cluster_id": "model-config-mlx-vlm_prompt-template_001",
   "model": "mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
   "repro": {
     "args": {
@@ -54,7 +54,7 @@
       "dry_run": false,
       "enable_thinking": false,
       "eos_tokens": null,
-      "eval_mode": "stress",
+      "eval_mode": "triage",
       "exclude": [
         "mlx-community/Qwen3-VL-2B-Thinking-bf16",
         "Qwen/Qwen3-VL-2B-Instruct"
@@ -68,7 +68,7 @@
       "kv_quant_scheme": "uniform",
       "lazy_load": false,
       "max_kv_size": null,
-      "max_tokens": 500,
+      "max_tokens": 200,
       "min_p": 0.0,
       "models": null,
       "no_color": false,
@@ -91,7 +91,10 @@
       "repetition_context_size": 20,
       "repetition_penalty": null,
       "rerun_triage": false,
-      "resize_shape": null,
+      "resize_shape": [
+        1024,
+        1024
+      ],
       "revision": null,
       "skip_special_tokens": false,
       "temperature": 0.0,
@@ -105,13 +108,13 @@
       "verbose": true,
       "width": null
     },
-    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
+    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260516-143411_DSC00013.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --resize-shape 1024 1024 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models LiquidAI/LFM2.5-VL-450M-MLX-bf16 mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit mlx-community/GLM-4.6V-nvfp4 mlx-community/InternVL3-8B-bf16 mlx-community/Qwen3.5-27B-4bit mlx-community/paligemma2-10b-ft-docci-448-6bit mlx-community/paligemma2-10b-ft-docci-448-bf16",
     "env_vars": {
       "TOKENIZERS_PARALLELISM": "false"
     },
-    "image_path": "/Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg",
-    "image_ref_sha256": "cfb4673ee4d7e2c5d8eed2cb9fe849e997df799d7287b932129c40a464252acf",
-    "image_sha256": "ed3baed59aed7c13bc807010bcccae7dbc2c052b1637dc37a6110f82a676e2b4",
+    "image_path": "/Users/jrp/Pictures/Processed/20260516-143411_DSC00013.jpg",
+    "image_ref_sha256": "a89461d8da8db41eeee59fb71d6184a8f436160fb7120f056a11f9c76cc50a32",
+    "image_sha256": "d979cab8be12d6f36d1ec49f2edfdf59d28c891c242a7653195c3ee05f062c5c",
     "prompt_diagnostics": {
       "eos_token": "</s>",
       "eos_token_id": 2,
@@ -120,20 +123,24 @@
         "kv_group_size": 64,
         "kv_quant_scheme": "uniform",
         "max_kv_size": null,
-        "max_tokens": 500,
+        "max_tokens": 200,
         "prefill_step_size": 4096,
         "quantized_kv_start": 5000,
         "repetition_context_size": 20,
         "repetition_penalty": null,
+        "resize_shape": [
+          1024,
+          1024
+        ],
         "temperature": 0.0,
         "top_p": 1.0
       },
       "image_placeholder_count": 0,
       "model_type": "mistral3",
       "processor_class": "mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor",
-      "rendered_prompt_chars": 2215,
-      "rendered_prompt_hash_sha256": "13c937bfc559977b4c0cc70dafc8468bb949d10eaa015c1fc16831e23d002d0d",
-      "rendered_prompt_preview": "<s>[INST][IMG]Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences describ...",
+      "rendered_prompt_chars": 49,
+      "rendered_prompt_hash_sha256": "8d085e929cf99abed8b8058dc9ad06d6cd2f67a8c0e76e0a42d895a2f288750c",
+      "rendered_prompt_preview": "<s>[INST][IMG]Describe this image briefly.[/INST]",
       "special_token_ids": [
         1,
         2,
@@ -204,39 +211,36 @@
       ],
       "tokenizer_class": "transformers.tokenization_utils_tokenizers.TokenizersBackend"
     },
-    "prompt_hash_sha256": "4a1f03d684eed33f32edd69e60de6697a143191cc453889223fbf1471468d72c",
-    "prompt_preview": "Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct any...",
-    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260502-173345_DSC09912_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
+    "prompt_hash_sha256": "d760336d0fd143932f194573dd63f6b531e0ffbc2c4f1595e015392a3471c318",
+    "prompt_preview": "Describe this image briefly.",
+    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260516-143411_DSC00013.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --resize-shape 1024 1024 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
     "seed": null
   },
   "result": {
-    "generated_text_preview": "Title:\u0120Classic\u0120sailboat\u0120moored\u0120in\u0120estuary\u010a\u010aDescription:\u0120A\u0120classic-style\u0120sailboat\u0120with\u0120a\u0120dark\u0120hull\u0120and\u0120wooden\u0120mast\u0120is\u0120moored\u0120in\u0120a\u0120calm\u0120estuary\u0120during\u0120low\u0120tide.\u0120The\u0120water\u0120has\u0120receded,\u0120exposing\u0120green,\u0120algae-covered\u0120mudflats\u0120behind\u0120the\u0120vessel.\u010a\u010aKeywords:\u0120sailboat,\u0120wooden\u0120mast,\u0120dark\u0120hull,\u0120estuary,\u0120low\u0120tide,\u0120mudflats,\u0120green\u0120algae,\u0120moored,\u0120calm\u0120water,\u0120string\u0120of\u0120flags,\u0120classic-style,\u0120wooden\u0120boat,\u0120watercra...",
+    "generated_text_preview": "\u00ea\u00b8\u00b0\u00ea\u00b0\u0122.",
     "maintainer_triage": {
       "confidence": "high",
       "evidence": [
-        "harness:encoding",
-        "trusted_overlap"
+        "harness:prompt_template"
       ],
       "harness_details": [
-        "token_encoding:bpe_space_leak(61)"
+        "output:truncated(3tok)"
       ],
       "hit_max_tokens": false,
       "issue_kind": "harness",
-      "issue_subtype": "encoding",
-      "next_action": "Inspect decode cleanup; tokenizer markers are leaking into user-facing text.",
-      "nontext_prompt_ratio": 0.8773141751865157,
-      "prompt_output_ratio": 0.029842497927604312,
-      "prompt_tokens_total": 3619,
-      "requested_max_tokens": 500,
+      "issue_subtype": "prompt_template",
+      "next_action": "Inspect model repo config, chat template, and EOS settings.",
+      "nontext_prompt_ratio": 0.9925650557620818,
+      "prompt_output_ratio": 0.0037174721189591076,
+      "prompt_tokens_total": 807,
+      "requested_max_tokens": 200,
       "stop_reason": "completed",
-      "summary": "Tokenizer space-marker artifacts (for example \u0120) appeared in output (about 61 occurrences). | nontext prompt burden=88% | missing sections: description, keywords | missing terms: vast, expanse, adorned, small, floats",
-      "suspected_owner": "mlx-vlm",
+      "summary": "Output appears truncated to about 3 tokens. | nontext prompt burden=99%",
+      "suspected_owner": "model-config",
       "user_bucket": "avoid"
     },
     "quality_issues": [
-      "\u26a0\ufe0fharness(encoding)",
-      "missing-sections(description+keywords)",
-      "title-length(66)"
+      "\u26a0\ufe0fharness(prompt_template)"
     ],
     "success": true
   },
