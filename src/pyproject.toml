@@ -97,6 +97,31 @@ dev = [
 requires = ["setuptools>=80.0"]
 build-backend = "setuptools.build_meta"
 
+[tool.skylos]
+# Keep the package-local scan focused on maintained source. Generated run
+# artifacts and lockfiles are covered by their own workflows and can contain
+# model output or dependency hashes that look secret-like to generic scanners.
+exclude = [
+    "output",
+    "package-lock.json",
+    "node_modules",
+    "build",
+    "dist",
+    "*.egg-info",
+    "check_models.suppression-audit*.py",
+]
+ignore = [
+    "SKY-Q502", # check_models.py is intentionally maintained as a single-file CLI.
+]
+
+[tool.skylos.gate]
+fail_on_critical = true
+max_critical = 0
+max_high = 0
+max_security = 0
+max_quality = 10000
+strict = false
+
 [tool.ruff]
 line-length = 100
 exclude = [

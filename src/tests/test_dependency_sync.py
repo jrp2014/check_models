@@ -199,6 +199,33 @@ def test_ty_uses_generated_typings_search_path() -> None:
     assert ty_env["extra-paths"] == ["../typings"]
 
 
+def test_package_skylos_scan_excludes_generated_artifacts() -> None:
+    """Package-local Skylos config should scan maintained source, not generated outputs."""
+    pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
+    skylos_config = pyproject["tool"]["skylos"]
+    skylos_gate = skylos_config["gate"]
+
+    excludes = set(skylos_config["exclude"])
+    assert {
+        "output",
+        "package-lock.json",
+        "node_modules",
+        "build",
+        "dist",
+        "*.egg-info",
+        "check_models.suppression-audit*.py",
+    } <= excludes
+    assert "SKY-Q502" in skylos_config["ignore"]
+    assert skylos_gate == {
+        "fail_on_critical": True,
+        "max_critical": 0,
+        "max_high": 0,
+        "max_security": 0,
+        "max_quality": 10000,
+        "strict": False,
+    }
+
+
 def test_pydantic_is_managed_as_a_dev_dependency() -> None:
     """Keep pydantic in the managed dev dependency set and setup fallback."""
     pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))

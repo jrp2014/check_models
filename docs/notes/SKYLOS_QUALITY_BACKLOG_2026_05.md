@@ -8,6 +8,12 @@ Keep `src/check_models.py` as the intentional CLI monolith. Refactor only when a
 nearby behavior-preserving test path exists, and prefer small readability
 improvements over broad rewrites.
 
+Package-local scans use `src/pyproject.toml` to keep Skylos focused on
+maintained source: generated `output/` artifacts, lockfiles, build products, and
+suppression-audit snapshots are excluded. `SKY-Q502` is intentionally ignored
+because the single-file CLI structure is a project constraint, not a cleanup
+target.
+
 ## Initial Critical Complexity Queue
 
 Start with the diagnostics most likely to improve maintainability without
@@ -21,11 +27,16 @@ changing user-facing behavior:
 Then evaluate the remaining critical hotspots from the first full Skylos scan:
 
 1. `_append_report_markdown_block`
-2. `_classify_review_verdict`
-3. `_log_compact_metrics`
-4. `_log_model_comparison_table_and_charts`
-5. `_log_utility_triage`
-6. `compare_history_records`
+2. `_classify_review_verdict` - reduced below the critical complexity tier with
+   local rule grouping and clearer prompt-burden predicates.
+3. `_log_compact_metrics` - reduced below the critical complexity tier by
+   grouping timing display inputs before logging.
+4. `_log_model_comparison_table_and_charts` - reduced below the critical
+   complexity tier by tracking failed rows during table assembly.
+5. `_log_utility_triage` - reduced below the critical complexity tier by moving
+   metadata-delta aggregation into a named summary helper.
+6. `compare_history_records` - reduced below the critical complexity tier by
+   computing success/failure sets in explicit passes.
 
 ## Working Rules
 

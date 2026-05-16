@@ -4077,7 +4077,8 @@ def _classify_review_verdict(
       shows quality degradation.
     """
     evidence: list[str] = []
-    if has_harness_issue and (harness_type or "") != "long_context":
+    harness_key = harness_type or ""
+    if has_harness_issue and harness_key != "long_context":
         if harness_type:
             evidence.append(f"harness:{harness_type}")
         return "harness", evidence
@@ -4096,30 +4097,39 @@ def _classify_review_verdict(
             return "cutoff_degraded", evidence
         return "token_cap", evidence
 
-    weak_output = (
-        bool(missing_sections) or instruction_echo or metadata_borrowing or has_hallucination
+    weak_signals = (
+        ("instruction_echo", instruction_echo),
+        ("metadata_borrowing", metadata_borrowing),
+        ("hallucination", has_hallucination),
     )
-    heavy_nontext_burden = (
-        prompt_tokens_total is not None
-        and prompt_tokens_total >= QUALITY.long_prompt_tokens_threshold
-        and prompt_tokens_text_est is not None
-        and prompt_tokens_nontext_est is not None
-        and prompt_tokens_nontext_est > prompt_tokens_text_est
+    weak_output = bool(missing_sections) or any(flag for _label, flag in weak_signals)
+
+    heavy_nontext_burden = False
+    prompt_token_values = (
+        prompt_tokens_total,
+        prompt_tokens_text_est,
+        prompt_tokens_nontext_est,
     )
-    if (harness_type or "") == "long_context" or (heavy_nontext_burden and weak_output):
-        if (harness_type or "") == "long_context":
-            evidence.append("long_context")
-        if heavy_nontext_burden:
-            evidence.append("nontext_prompt_burden")
-        return "context_budget", evidence
+    if None not in prompt_token_values:
+        total_tokens = cast("int", prompt_tokens_total)
+        text_tokens = cast("int", prompt_tokens_text_est)
+        nontext_tokens = cast("int", prompt_tokens_nontext_est)
+        heavy_nontext_burden = (
+            total_tokens >= QUALITY.long_prompt_tokens_threshold and nontext_tokens > text_tokens
+        )
+
+    context_budget_evidence: list[str] = []
+    if harness_key == "long_context":
+        context_budget_evidence.append("long_context")
+    if heavy_nontext_burden and weak_output:
+        context_budget_evidence.append("nontext_prompt_burden")
+    if context_budget_evidence:
+        return "context_budget", context_budget_evidence
 
     if weak_output:
-        if instruction_echo:
-            evidence.append("instruction_echo")
-        if metadata_borrowing:
-            evidence.append("metadata_borrowing")
-        if has_hallucination:
-            evidence.append("hallucination")
+        for label, flag in weak_signals:
+            if flag:
+                evidence.append(label)
         if missing_sections:
             evidence.append("contract")
         if utility_grade in {"D", "F"}:
@@ -13781,6 +13791,70 @@ def _partition_success_diagnostics(
     return harness_unique, stack_unique, unflagged_successful
 
 
+def _runtime_seconds_per_model(results: Sequence[PerformanceResult]) -> tuple[list[float], int]:
+    """Return per-model runtime seconds and count rows with no timing signal."""
+    runtime_per_model: list[float] = []
+    missing_timing_models = 0
+
+    for res in results:
+        if isinstance(res.total_time, int | float) and float(res.total_time) >= 0.0:
+            runtime_per_model.append(float(res.total_time))
+            continue
+
+        measured_parts = [
+            float(value)
+            for value in (res.generation_time, res.model_load_time)
+            if isinstance(value, int | float) and float(value) >= 0.0
+        ]
+
+        if measured_parts:
+            runtime_per_model.append(sum(measured_parts))
+            continue
+
+        missing_timing_models += 1
+        runtime_per_model.append(0.0)
+
+    return runtime_per_model, missing_timing_models
+
+
+def _diagnostics_runtime_analysis_lines(
+    runtime_analysis: RuntimeAnalysisSummary,
+) -> list[str]:
+    """Format diagnostics-specific runtime interpretation bullets."""
+    phase_label = _RUNTIME_PHASE_LABELS[runtime_analysis["dominant_phase"]]
+    phase_share = runtime_analysis["dominant_phase_share"]
+    phase_count = runtime_analysis["dominant_phase_count"]
+    measured_models = runtime_analysis["measured_models"]
+    lines = [
+        "- **Dominant runtime phase:** "
+        f"{phase_label} dominated {phase_count}/{measured_models} measured model runs "
+        f"({phase_share:.0%} of tracked runtime).",
+    ]
+
+    phase_totals_line = _format_runtime_phase_totals_line(
+        runtime_analysis,
+        trailing_period=False,
+    )
+    if phase_totals_line is not None:
+        lines.append(phase_totals_line)
+
+    generation_total_line = _format_runtime_generation_total_line(runtime_analysis)
+    if generation_total_line is not None:
+        lines.append(generation_total_line)
+
+    termination_counts = runtime_analysis["termination_counts"]
+    if termination_counts:
+        termination_summary = ", ".join(
+            f"{reason}={count}" for reason, count in sorted(termination_counts.items())
+        )
+        lines.append(f"- **Observed stop reasons:** {termination_summary}")
+
+    lines.extend(_format_runtime_timing_snapshot_lines(runtime_analysis))
+    lines.append(f"- **What this likely means:** {runtime_analysis['interpretation']}")
+    lines.append(f"- **Suggested next action:** {runtime_analysis['next_action']}")
+    return lines
+
+
 def _diagnostics_coverage_and_runtime_section(
     *,
     results: list[PerformanceResult],
@@ -13812,30 +13886,7 @@ def _diagnostics_coverage_and_runtime_section(
         else "⚠️ Incomplete (duplicates or missing model entries detected)."
     )
 
-    runtime_per_model: list[float] = []
-    missing_timing_models = 0
-    for res in results:
-        if isinstance(res.total_time, int | float) and float(res.total_time) >= 0.0:
-            runtime_per_model.append(float(res.total_time))
-            continue
-
-        generation_time = (
-            float(res.generation_time)
-            if isinstance(res.generation_time, int | float) and float(res.generation_time) >= 0.0
-            else None
-        )
-        model_load_time = (
-            float(res.model_load_time)
-            if isinstance(res.model_load_time, int | float) and float(res.model_load_time) >= 0.0
-            else None
-        )
-
-        if generation_time is not None or model_load_time is not None:
-            runtime_per_model.append((generation_time or 0.0) + (model_load_time or 0.0))
-        else:
-            missing_timing_models += 1
-            runtime_per_model.append(0.0)
-
+    runtime_per_model, missing_timing_models = _runtime_seconds_per_model(results)
     total_runtime = sum(runtime_per_model)
     avg_runtime = total_runtime / len(runtime_per_model)
     runtime_analysis = _build_runtime_analysis_summary(results)
@@ -13869,33 +13920,7 @@ def _diagnostics_coverage_and_runtime_section(
             "and were counted as 0.00s.",
         )
     if runtime_analysis is not None:
-        phase_label = _RUNTIME_PHASE_LABELS[runtime_analysis["dominant_phase"]]
-        phase_share = runtime_analysis["dominant_phase_share"]
-        phase_count = runtime_analysis["dominant_phase_count"]
-        measured_models = runtime_analysis["measured_models"]
-        parts.append(
-            "- **Dominant runtime phase:** "
-            f"{phase_label} dominated {phase_count}/{measured_models} measured model runs "
-            f"({phase_share:.0%} of tracked runtime).",
-        )
-        phase_totals_line = _format_runtime_phase_totals_line(
-            runtime_analysis,
-            trailing_period=False,
-        )
-        if phase_totals_line is not None:
-            parts.append(phase_totals_line)
-        generation_total_line = _format_runtime_generation_total_line(runtime_analysis)
-        if generation_total_line is not None:
-            parts.append(generation_total_line)
-        termination_counts = runtime_analysis["termination_counts"]
-        if termination_counts:
-            termination_summary = ", ".join(
-                f"{reason}={count}" for reason, count in sorted(termination_counts.items())
-            )
-            parts.append(f"- **Observed stop reasons:** {termination_summary}")
-        parts.extend(_format_runtime_timing_snapshot_lines(runtime_analysis))
-        parts.append(f"- **What this likely means:** {runtime_analysis['interpretation']}")
-        parts.append(f"- **Suggested next action:** {runtime_analysis['next_action']}")
+        parts.extend(_diagnostics_runtime_analysis_lines(runtime_analysis))
 
     parts.append("")
     return parts
@@ -18627,26 +18652,32 @@ def _log_compact_metrics(res: PerformanceResult) -> None:
     gen_tokens = _generation_int_metric(gen, "generation_tokens") or 0
     gen_tps = _generation_float_metric(gen, "generation_tps") or 0.0
     prompt_tps = _generation_float_metric(gen, "prompt_tps") or 0.0
+    prompt_prep_time: float | None = None
+    first_token_latency: float | None = None
+    stop_reason: str | None = None
+    if runtime is not None:
+        prompt_prep_time = runtime.prompt_prep_time_s
+        first_token_latency = runtime.first_token_latency_s
+        stop_reason = runtime.stop_reason
 
     # Line 1: Timing and Memory
-    timing_parts: list[str] = []
+    timing_display = NOT_AVAILABLE
     if total_time is not None:
-        sub_parts: list[str] = []
-        if gen_time is not None:
-            sub_parts.append(f"gen={_format_time_seconds(gen_time)}")
-        if load_time is not None:
-            sub_parts.append(f"load={_format_time_seconds(load_time)}")
-        if runtime is not None:
-            prompt_prep_time = runtime.prompt_prep_time_s
-            if prompt_prep_time is not None and prompt_prep_time > 0:
-                sub_parts.append(f"prep={_format_time_seconds(prompt_prep_time)}")
-            first_token_latency = runtime.first_token_latency_s
-            if first_token_latency is not None and first_token_latency > 0:
-                sub_parts.append(f"first={_format_time_seconds(first_token_latency)}")
-            if runtime.stop_reason and runtime.stop_reason != "completed":
-                sub_parts.append(f"stop={runtime.stop_reason}")
+        timing_metrics = (
+            ("gen", gen_time),
+            ("load", load_time),
+            ("prep", _positive_runtime_duration(prompt_prep_time)),
+            ("first", _positive_runtime_duration(first_token_latency)),
+        )
+        sub_parts = [
+            f"{label}={_format_time_seconds(value)}"
+            for label, value in timing_metrics
+            if value is not None
+        ]
+        if stop_reason and stop_reason != "completed":
+            sub_parts.append(f"stop={stop_reason}")
         breakdown = f" ({', '.join(sub_parts)})" if sub_parts else ""
-        timing_parts.append(f"{_format_time_seconds(total_time)} total{breakdown}")
+        timing_display = f"{_format_time_seconds(total_time)} total{breakdown}"
 
     mem_part = ""
     if peak_mem > 0:
@@ -18654,7 +18685,7 @@ def _log_compact_metrics(res: PerformanceResult) -> None:
         mem_str = f"{mem_fmt}GB" if not mem_fmt.endswith("GB") else mem_fmt
         mem_part = f" | Memory: {mem_str} peak"
 
-    line1 = f"📊 Timing: {timing_parts[0] if timing_parts else NOT_AVAILABLE}{mem_part}"
+    line1 = f"📊 Timing: {timing_display}{mem_part}"
     logger.info(line1, extra={"style_hint": LogStyles.METRIC_LABEL})
 
     # Line 2: Tokens and Speed
@@ -20103,6 +20134,7 @@ def _log_model_comparison_table_and_charts(results: list[PerformanceResult]) -> 
     rows: list[list[str]] = []
     tps_entries: list[tuple[str, float]] = []
     total_time_entries: list[tuple[str, float]] = []
+    failed: list[PerformanceResult] = []
 
     for idx, res in enumerate(sorted_results, start=1):
         model_label = _short_model_label(res.model_name)
@@ -20141,6 +20173,7 @@ def _log_model_comparison_table_and_charts(results: list[PerformanceResult]) -> 
                     error_note,
                 ],
             )
+            failed.append(res)
 
     logger.info("📋 Model Comparison (current run):")
     headers = ["#", "Model", "Status", "TPS", "Total(s)", "Load(s)", "PeakGB", "Notes"]
@@ -20156,15 +20189,13 @@ def _log_model_comparison_table_and_charts(results: list[PerformanceResult]) -> 
         _log_rich_metric_chart("📊 TPS comparison chart:", tps_entries, unit=" tps", digits=1)
     if len(total_time_entries) >= MIN_MODELS_FOR_EFFICIENCY_CHART:
         inverted = [(name, 1.0 / value) for name, value in total_time_entries if value > 0]
-        if inverted:
-            _log_rich_metric_chart(
-                "⏱ Efficiency chart (higher is faster overall):",
-                inverted,
-                unit=" 1/s",
-                digits=3,
-            )
+        _log_rich_metric_chart(
+            "⏱ Efficiency chart (higher is faster overall):",
+            inverted,
+            unit=" 1/s",
+            digits=3,
+        )
 
-    failed = [res for res in sorted_results if not res.success]
     if failed:
         stage_counts = Counter(res.error_stage or "Unknown" for res in failed)
         _log_rich_metric_chart(
@@ -20706,6 +20737,30 @@ def _select_watchlist_rows(rows: list[UtilityTriageRow]) -> list[tuple[UtilityTr
     return watchlist_rows
 
 
+def _metadata_delta_summary(rows: Sequence[UtilityTriageRow]) -> tuple[float, int, int, int]:
+    """Return average metadata delta plus better/neutral/worse counts."""
+    delta_total = 0.0
+    better = 0
+    neutral = 0
+    worse = 0
+
+    for row in rows:
+        delta = row.delta_vs_metadata
+        if delta is None:
+            continue
+        delta_total += delta
+        if delta > UTILITY_DELTA_NEUTRAL_BAND:
+            better += 1
+        elif delta < -UTILITY_DELTA_NEUTRAL_BAND:
+            worse += 1
+        else:
+            neutral += 1
+
+    delta_count = better + neutral + worse
+    avg_delta = delta_total / delta_count if delta_count else 0.0
+    return avg_delta, better, neutral, worse
+
+
 def _log_utility_triage(
     rows: list[UtilityTriageRow],
     *,
@@ -20733,11 +20788,7 @@ def _log_utility_triage(
     )
     if baseline_score is not None:
         baseline_display = _get_grade_display(baseline_grade or "F")
-        deltas = [row.delta_vs_metadata for row in rows if row.delta_vs_metadata is not None]
-        better = sum(delta > UTILITY_DELTA_NEUTRAL_BAND for delta in deltas)
-        worse = sum(delta < -UTILITY_DELTA_NEUTRAL_BAND for delta in deltas)
-        neutral = len(deltas) - better - worse
-        avg_delta = sum(deltas) / len(deltas) if deltas else 0.0
+        avg_delta, better, neutral, worse = _metadata_delta_summary(rows)
         logger.info("   Metadata baseline: %s %.0f/100", baseline_display, baseline_score)
         logger.info(
             "   Vs metadata: Avg Δ %+.0f | better=%d, neutral=%d, worse=%d",
@@ -21024,6 +21075,23 @@ def _history_bucket_rank(bucket: object) -> int:
     return ranks.get(bucket, 0)
 
 
+def _history_success_failure_sets(
+    models: Mapping[str, HistoryModelResultRecord],
+) -> tuple[set[str], set[str]]:
+    """Return model names with explicit success and explicit failure states."""
+    successful: set[str] = set()
+    failed: set[str] = set()
+
+    for model, info in models.items():
+        success_value: object = info.get("success")
+        if success_value is True:
+            successful.add(model)
+        elif success_value is False:
+            failed.add(model)
+
+    return successful, failed
+
+
 def compare_history_records(
     previous: HistoryRunRecord | None,
     current: HistoryRunRecord,
@@ -21040,10 +21108,8 @@ def compare_history_records(
     if not isinstance(curr_models, dict):
         curr_models = {}
 
-    prev_success = {model for model, info in prev_models.items() if info.get("success") is True}
-    prev_failed = {model for model, info in prev_models.items() if info.get("success") is False}
-    curr_success = {model for model, info in curr_models.items() if info.get("success") is True}
-    curr_failed = {model for model, info in curr_models.items() if info.get("success") is False}
+    prev_success, prev_failed = _history_success_failure_sets(prev_models)
+    curr_success, curr_failed = _history_success_failure_sets(curr_models)
 
     regressions = sorted(prev_success & curr_failed)
     recoveries = sorted(prev_failed & curr_success)

@@ -7,6 +7,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Add package-local Skylos gate/exclusion config for `src` scans and reduce the
+  remaining critical complexity hotspots in review verdicts, diagnostics
+  runtime coverage, compact metrics, model comparison, utility triage, and
+  history comparison without splitting the monolith.
 - Remove resolved one-off planning docs from `docs/notes/` and
   `docs/superpowers/`, keeping the in-tree docs set focused on current
   contributor guidance and active reference notes.
