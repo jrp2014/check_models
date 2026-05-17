@@ -32,6 +32,7 @@ quality_setup_python
 quality_require_python_tool ty "Install dev dependencies with: pip install -e .[dev]"
 quality_require_python_tool pyrefly "Install dev dependencies with: pip install -e .[dev]"
 quality_require_python_tool vulture "Install dev dependencies with: pip install -e .[dev]"
+quality_require_python_tool skylos "Install dev dependencies with: pip install -e .[dev]"
 if [ "$QUALITY_MODE" = "full" ]; then
     quality_require_command shellcheck "Install with: brew install shellcheck"
 fi
@@ -90,6 +91,9 @@ quality_run_pyrefly_check
 
 echo "=== Vulture Dead Code Check ==="
 quality_run_python_tool vulture
+
+echo "=== Skylos Quality Gate ==="
+quality_run_python_tool skylos . --quality --gate --no-upload --format concise
 
 if [ "$QUALITY_MODE" = "fast" ]; then
     echo "=== Pytest (fast set) ==="

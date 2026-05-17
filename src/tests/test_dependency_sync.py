@@ -544,6 +544,24 @@ def test_update_script_verifies_stub_integrity_and_logs_local_provenance() -> No
     assert "Local package provenance:" in update_script
 
 
+def test_quality_script_runs_skylos_quality_gate() -> None:
+    """Local quality checks should include the calibrated Skylos quality gate."""
+    pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
+    dev_deps = pyproject["project"]["optional-dependencies"]["dev"]
+    quality_script = (PKG_ROOT / "tools" / "run_quality_checks.sh").read_text(encoding="utf-8")
+
+    assert any(dep.startswith("skylos") for dep in dev_deps)
+    assert (
+        'quality_require_python_tool skylos "Install dev dependencies with: pip install -e .[dev]"'
+        in quality_script
+    )
+    assert 'echo "=== Skylos Quality Gate ==="' in quality_script
+    assert (
+        "quality_run_python_tool skylos . --quality --gate --no-upload --format concise"
+        in quality_script
+    )
+
+
 @pytest.mark.subprocess
 def test_pyrefly_quality_gate_fails_on_warnings(tmp_path: Path) -> None:
     """The quality helper should treat Pyrefly warnings as gate failures."""
