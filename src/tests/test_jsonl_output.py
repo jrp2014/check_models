@@ -18,6 +18,7 @@ from check_models import (
     _load_latest_history_record,
     append_history_record,
     compare_history_records,
+    compare_history_window,
     save_jsonl_report,
 )
 
@@ -833,6 +834,45 @@ def test_compare_history_records_detects_quality_harness_and_owner_changes() -> 
     assert summary["harness_regressions"] == ["model-a"]
     assert summary["harness_recoveries"] == ["model-b"]
     assert summary["owner_changes"] == ["model-a", "model-b"]
+
+
+def test_compare_history_window_flags_two_week_generation_regression() -> None:
+    """Window comparison should find regressions beyond the immediately previous run."""
+    baseline = _history_run({"model-a": True}, timestamp="2026-04-26 12:00:00 BST")
+    noisy_previous = _history_run({"model-a": True}, timestamp="2026-05-16 12:00:00 BST")
+    current = _history_run({"model-a": True}, timestamp="2026-05-17 12:00:00 BST")
+
+    baseline_results = _require_present(baseline.get("model_results"), field_name="baseline")
+    noisy_results = _require_present(noisy_previous.get("model_results"), field_name="noisy")
+    current_results = _require_present(current.get("model_results"), field_name="current")
+
+    baseline_results["model-a"]["review_verdict"] = "clean"
+    baseline_results["model-a"]["review_user_bucket"] = "recommended"
+    baseline_results["model-a"]["stop_reason"] = "completed"
+    baseline["library_versions"] = {
+        "mlx": "0.32.0.dev20260426",
+        "mlx-vlm": "0.4.5",
+        "transformers": "5.6.2",
+    }
+
+    noisy_results["model-a"]["review_verdict"] = "cutoff_degraded"
+    noisy_results["model-a"]["review_user_bucket"] = "avoid"
+    noisy_results["model-a"]["stop_reason"] = "max_tokens"
+
+    current_results["model-a"]["review_verdict"] = "cutoff_degraded"
+    current_results["model-a"]["review_user_bucket"] = "avoid"
+    current_results["model-a"]["stop_reason"] = "max_tokens"
+    current["library_versions"] = {
+        "mlx": "0.32.0.dev20260517",
+        "mlx-vlm": "0.5.0",
+        "transformers": "5.8.1",
+    }
+
+    summary = compare_history_window([baseline, noisy_previous], current, window_days=21)
+
+    assert summary["window_generation_regressions"] == ["model-a"]
+    assert "model-a" in summary["window_quality_regressions"]
+    assert any("mlx-vlm=0.4.5->0.5.0" in item for item in summary["window_version_deltas"])
 
 
 def test_history_transition_detail_text_prefers_first_two_changed_fields() -> None:

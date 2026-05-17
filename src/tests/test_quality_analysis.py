@@ -35,6 +35,30 @@ def test_analyze_generation_text_repetitive() -> None:
     assert analysis.repeated_token == "word"
 
 
+def test_analyze_generation_text_flags_short_token_noise() -> None:
+    """Mechanically short gibberish should not be classified as clean."""
+    analysis = check_models.analyze_generation_text(" ''){ GREE, which is not included.", 9)
+
+    assert analysis.text_sanity_issue_type == "gibberish(token_noise)"
+    assert analysis.verdict == "semantic_mismatch"
+    assert "text_sanity" in analysis.evidence
+
+
+def test_repetitive_token_cap_is_generation_loop_diagnostic() -> None:
+    """Max-token repetition should carry an explicit generation-loop signal."""
+    analysis, issues = check_models._analyze_text_quality(
+        "word " * 200,
+        200,
+        prompt_tokens=240,
+        requested_max_tokens=200,
+    )
+
+    assert analysis.generation_loop_type == "repetitive_tail"
+    assert analysis.verdict == "cutoff_degraded"
+    assert issues is not None
+    assert "generation_loop" in issues
+
+
 def test_analyze_generation_text_hallucination_table() -> None:
     """Test detection of hallucinated table structures."""
     text = "Caption: Nice photo\n\n| Grade | Count |\n|-------|-------|\n| A     | 42    |"

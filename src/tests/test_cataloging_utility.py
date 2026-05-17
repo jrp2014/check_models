@@ -375,6 +375,23 @@ class TestComputeMetadataAgreement:
         assert metrics.description_score >= 70.0
         assert metrics.overall_score > 0.0
 
+    def test_unstructured_caption_scores_against_metadata_terms(self) -> None:
+        """Triage-mode captions should still be scored against trusted metadata."""
+        metadata: MetadataDict = {
+            "description": "An image of a man and two dogs at Studland Beach in Dorset.",
+            "keywords": "man, dogs, beach, sea, water, waves, sand, shoreline, trees",
+        }
+        text = (
+            "This image captures a picturesque beach scene with a man and a dog walking "
+            "along the beach. The beach is covered in sand and there are waves in the water."
+        )
+
+        metrics = compute_metadata_agreement(text, metadata)
+
+        assert metrics.overall_score >= 50.0
+        assert metrics.description_score >= 50.0
+        assert {"man", "dogs", "beach"} <= {term.casefold() for term in metrics.matched_terms}
+
     def test_keyword_overlap_dedupes_repeated_generated_terms(self) -> None:
         """Repeated generated keywords should not distort the overlap score."""
         metadata: MetadataDict = {

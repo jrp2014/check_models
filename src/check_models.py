@@ -36,7 +36,7 @@ from contextlib import (
 )
 from dataclasses import dataclass, fields, is_dataclass, replace
 from dataclasses import field as dataclass_field
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from functools import lru_cache
 from importlib.metadata import (
     Distribution,
@@ -134,6 +134,7 @@ __all__ = [
     "analyze_generation_text",
     "append_history_record",
     "compare_history_records",
+    "compare_history_window",
     "exit_with_cli_error",
     "extract_image_metadata",
     "find_most_recent_file",
@@ -352,6 +353,12 @@ class QualityThresholds:
     metadata_agreement_weight_description: float = 0.4
     metadata_agreement_weight_keywords: float = 0.4
     metadata_agreement_nonvisual_penalty: float = 20.0
+    metadata_alignment_min_score: float = 25.0
+    metadata_alignment_partial_match_cap: int = 8
+    text_sanity_min_wordlike_ratio: float = 0.45
+    text_sanity_max_symbol_ratio: float = 0.35
+    text_sanity_min_tokens: int = 5
+    text_sanity_numeric_loop_min_count: int = 6
 
     # Harness issue detection thresholds
     min_bpe_artifact_count: int = 5  # Min BPE artifacts to flag encoding issue
@@ -400,6 +407,8 @@ class QualityThresholds:
             "metadata_agreement_weight_title": self.metadata_agreement_weight_title,
             "metadata_agreement_weight_description": self.metadata_agreement_weight_description,
             "metadata_agreement_weight_keywords": self.metadata_agreement_weight_keywords,
+            "text_sanity_min_wordlike_ratio": self.text_sanity_min_wordlike_ratio,
+            "text_sanity_max_symbol_ratio": self.text_sanity_max_symbol_ratio,
         }
         for field_name, value in unit_interval_fields.items():
             if not 0.0 <= value <= 1.0:
@@ -480,6 +489,30 @@ class QualityThresholds:
             msg = (
                 "quality_config.yaml thresholds.metadata_agreement_nonvisual_penalty must be "
                 f">= 0; got {self.metadata_agreement_nonvisual_penalty}"
+            )
+            raise ValueError(msg)
+        if self.metadata_alignment_min_score < 0.0:
+            msg = (
+                "quality_config.yaml thresholds.metadata_alignment_min_score must be >= 0; "
+                f"got {self.metadata_alignment_min_score}"
+            )
+            raise ValueError(msg)
+        if self.metadata_alignment_partial_match_cap <= 0:
+            msg = (
+                "quality_config.yaml thresholds.metadata_alignment_partial_match_cap must be "
+                f"> 0; got {self.metadata_alignment_partial_match_cap}"
+            )
+            raise ValueError(msg)
+        if self.text_sanity_min_tokens <= 0:
+            msg = (
+                "quality_config.yaml thresholds.text_sanity_min_tokens must be > 0; "
+                f"got {self.text_sanity_min_tokens}"
+            )
+            raise ValueError(msg)
+        if self.text_sanity_numeric_loop_min_count <= 0:
+            msg = (
+                "quality_config.yaml thresholds.text_sanity_numeric_loop_min_count must be > 0; "
+                f"got {self.text_sanity_numeric_loop_min_count}"
             )
             raise ValueError(msg)
 
@@ -844,6 +877,10 @@ class HistoryModelResultRecord(TypedDict):
     nontext_prompt_ratio: NotRequired[float | None]
     stop_reason: NotRequired[str | None]
     hit_max_tokens: NotRequired[bool]
+    metadata_alignment_score: NotRequired[float | None]
+    metadata_alignment_issue: NotRequired[str | None]
+    text_sanity_issue_type: NotRequired[str | None]
+    generation_loop_type: NotRequired[str | None]
 
 
 class HistoryRunRecord(TypedDict, total=False):
@@ -873,6 +910,10 @@ class HistoryComparisonSummary(TypedDict):
     harness_regressions: list[str]
     harness_recoveries: list[str]
     owner_changes: list[str]
+    window_quality_regressions: list[str]
+    window_harness_regressions: list[str]
+    window_generation_regressions: list[str]
+    window_version_deltas: list[str]
 
 
 class JsonlTimingRecord(TypedDict):
@@ -3183,6 +3224,57 @@ def _detect_repetitive_output(text: str, threshold: float | None = None) -> tupl
     return False, None
 
 
+def _detect_text_sanity_issue(text: str) -> tuple[bool, str | None]:
+    """Detect prompt-independent token noise that is not valid prose.
+
+    These checks intentionally stay lexical. They do not decide whether a
+    caption is visually correct; they catch outputs that are not credible
+    natural language diagnostics, such as tokenizer noise or numeric loops.
+    """
+    cleaned = text.strip()
+    if not cleaned or len(cleaned) < QUALITY.min_text_length:
+        return False, None
+
+    issue_type: str | None = None
+    if re.search(r"([#&_=(){}\[\]<>/\\|])\1{5,}", cleaned):
+        issue_type = "gibberish(char_noise)"
+
+    tokens = re.findall(r"\S+", cleaned)
+    if issue_type is None and len(tokens) < QUALITY.text_sanity_min_tokens:
+        return False, None
+
+    numeric_tokens = re.findall(r"\b(?:19|20)\d{2}\b|\b\d+\b", cleaned)
+    if issue_type is None and len(numeric_tokens) >= QUALITY.text_sanity_numeric_loop_min_count:
+        _number, count = Counter(numeric_tokens).most_common(1)[0]
+        if count >= max(3, QUALITY.text_sanity_numeric_loop_min_count // 2):
+            issue_type = "numeric_loop"
+
+    control_or_bpe_issue, _encoding_type = _detect_token_encoding_issues(cleaned)
+    special_token_leak, _leaked_tokens = _detect_special_token_leakage(cleaned)
+    if issue_type is None and (control_or_bpe_issue or special_token_leak):
+        issue_type = "gibberish(token_noise)"
+
+    wordlike_tokens = [
+        token
+        for token in tokens
+        if re.search(r"[A-Za-z][A-Za-z'-]{1,}", token)
+        and not re.search(r"[{}\[\]<>/\\|_=]{2,}", token)
+    ]
+    wordlike_ratio = len(wordlike_tokens) / len(tokens)
+    symbol_chars = sum(1 for char in cleaned if not (char.isalnum() or char.isspace()))
+    symbol_ratio = symbol_chars / max(len(cleaned), 1)
+    leading_token_noise = bool(re.match(r"^[^\w\s]{2,}", cleaned))
+
+    if issue_type is None and (
+        wordlike_ratio < QUALITY.text_sanity_min_wordlike_ratio
+        or symbol_ratio > QUALITY.text_sanity_max_symbol_ratio
+        or (leading_token_noise and len(tokens) <= QUALITY.short_output_words)
+    ):
+        issue_type = "gibberish(token_noise)"
+
+    return (issue_type is not None), issue_type
+
+
 def _detect_hallucination_patterns(text: str) -> list[str]:
     """Detect quiz/table artifacts that indicate task drift or hallucination.
 
@@ -3569,6 +3661,10 @@ def _context_term_present(term: str, normalized_text: str) -> bool:
     variants.update(
         _normalize_phrase_for_matching(v) for v in CONTEXT_TERM_ALIASES.get(canonical, ())
     )
+    if canonical.endswith("s") and len(canonical) > QUALITY.min_context_term_length + 1:
+        variants.add(canonical[:-1])
+    elif len(canonical) > QUALITY.min_context_term_length:
+        variants.add(f"{canonical}s")
     for variant in variants:
         if not variant:
             continue
@@ -4065,6 +4161,7 @@ def _classify_review_verdict(
     instruction_echo: bool,
     metadata_borrowing: bool,
     has_hallucination: bool,
+    text_sanity_issue_type: str | None = None,
 ) -> tuple[str, list[str]]:
     """Return ordered verdict plus compact evidence labels.
 
@@ -4094,8 +4191,12 @@ def _classify_review_verdict(
         }
         if set(cutoff_reasons) & _degradation_reasons:
             evidence.extend(cutoff_reasons)
-            return "cutoff_degraded", evidence
-        return "token_cap", evidence
+        verdict = "cutoff_degraded" if set(cutoff_reasons) & _degradation_reasons else "token_cap"
+        return verdict, evidence
+
+    if text_sanity_issue_type is not None:
+        evidence.extend(["text_sanity", text_sanity_issue_type])
+        return "semantic_mismatch", evidence
 
     weak_signals = (
         ("instruction_echo", instruction_echo),
@@ -4169,7 +4270,10 @@ def _classify_user_bucket(
         return "caveat"
     if verdict in {"context_budget", "unknown_runtime_anomaly"}:
         return "needs_triage" if verdict == "unknown_runtime_anomaly" else "caveat"
-    if verdict == "model_shortcoming" or hint_relationship == "degrades_trusted_hints":
+    if (
+        verdict in {"model_shortcoming", "semantic_mismatch"}
+        or hint_relationship == "degrades_trusted_hints"
+    ):
         return "avoid"
     is_clean_recommended = (
         verdict == "clean"
@@ -5992,6 +6096,25 @@ def _score_nonvisual_metadata_leakage(
     return round(scaled_penalty, 1), tuple(hits)
 
 
+def _score_unstructured_metadata_caption(
+    text: str,
+    reference_terms: Sequence[str],
+) -> tuple[float, tuple[str, ...], tuple[str, ...]]:
+    """Score free-form caption overlap with trusted visual metadata terms."""
+    reference_terms = tuple(_dedupe_preserve_order(reference_terms))
+    if not text.strip() or not reference_terms:
+        return 0.0, (), tuple(reference_terms)
+
+    normalized_text = _normalize_phrase_for_matching(text)
+    matched_terms = tuple(
+        term for term in reference_terms if _context_term_present(term, normalized_text)
+    )
+    missed_terms = tuple(term for term in reference_terms if term not in matched_terms)
+    target_matches = min(QUALITY.metadata_alignment_partial_match_cap, len(reference_terms))
+    score = min(len(matched_terms) / max(target_matches, 1), 1.0) * 100.0
+    return round(score, 1), matched_terms, missed_terms
+
+
 def compute_metadata_agreement(
     text: str,
     metadata: MetadataDict | None,
@@ -6013,6 +6136,23 @@ def compute_metadata_agreement(
         reference_terms_display.extend(trusted_terms)
     reference_terms_display.extend(reference_keywords)
     reference_terms_display = _dedupe_preserve_order(reference_terms_display)
+
+    if not generated_sections:
+        nonvisual_penalty, nonvisual_hits = _score_nonvisual_metadata_leakage(text, metadata)
+        caption_score, matched_terms, missed_terms = _score_unstructured_metadata_caption(
+            text,
+            reference_terms_display,
+        )
+        return MetadataAgreementMetrics(
+            overall_score=round(max(0.0, min(100.0, caption_score - nonvisual_penalty)), 1),
+            title_score=0.0,
+            description_score=caption_score,
+            keyword_score=0.0,
+            nonvisual_penalty=nonvisual_penalty,
+            matched_terms=matched_terms,
+            missed_terms=missed_terms,
+            nonvisual_hits=nonvisual_hits,
+        )
 
     title_score, title_matched, _title_missed = _score_metadata_title(
         generated_sections,
@@ -6106,6 +6246,10 @@ class GenerationQualityAnalysis:
     degeneration_type: str | None
     has_fabrication: bool
     fabrication_issues: list[str]
+    text_sanity_issue_type: str | None = None
+    generation_loop_type: str | None = None
+    metadata_alignment_score: float | None = None
+    metadata_alignment_issue: str | None = None
     missing_sections: list[str] = dataclass_field(default_factory=list)
     title_word_count: int | None = None
     description_sentence_count: int | None = None
@@ -6188,6 +6332,9 @@ class GenerationQualityAnalysis:
             or self.has_language_mixing
             or self.has_degeneration
             or self.has_fabrication
+            or self.text_sanity_issue_type is not None
+            or self.generation_loop_type is not None
+            or self.metadata_alignment_issue is not None
             or has_contract_violation
             or self.has_reasoning_leak
             or self.has_context_echo
@@ -6224,6 +6371,18 @@ class GenerationQualityAnalysis:
                 f"Generic output (specificity: {self.specificity_score:.2f})",
             ),
             (self.has_degeneration, f"Output degeneration ({self.degeneration_type})"),
+            (
+                self.text_sanity_issue_type is not None,
+                f"Text sanity issue ({self.text_sanity_issue_type})",
+            ),
+            (
+                self.generation_loop_type is not None,
+                f"Generation loop ({self.generation_loop_type})",
+            ),
+            (
+                self.metadata_alignment_issue is not None,
+                f"Metadata alignment issue ({self.metadata_alignment_issue})",
+            ),
             (bool(self.missing_sections), f"Missing sections ({', '.join(self.missing_sections)})"),
             (
                 self.has_title_length_violation,
@@ -6444,6 +6603,40 @@ def _collect_harness_quality_signals(
     )
 
 
+def _detect_generation_loop_type(
+    *,
+    likely_capped: bool,
+    cutoff_reasons: Sequence[str],
+    is_repetitive: bool,
+    has_degeneration: bool,
+    text_sanity_issue_type: str | None,
+) -> str | None:
+    """Return a concise generation-loop subtype for capped pathological output."""
+    if not likely_capped:
+        return None
+    if is_repetitive or "repetitive_tail" in cutoff_reasons:
+        return "repetitive_tail"
+    if text_sanity_issue_type == "numeric_loop":
+        return "numeric_loop"
+    if text_sanity_issue_type is not None:
+        return "token_noise"
+    if has_degeneration:
+        return "degeneration"
+    return None
+
+
+def _analysis_has_contract_issue(analysis: GenerationQualityAnalysis) -> bool:
+    """Return whether an analysis violates the structured catalog contract."""
+    return bool(analysis.missing_sections) or any(
+        (
+            analysis.has_title_length_violation,
+            analysis.has_description_sentence_violation,
+            analysis.has_keyword_count_violation,
+            analysis.has_keyword_duplication_violation,
+        ),
+    )
+
+
 def analyze_generation_text(
     text: str,
     generated_tokens: int,
@@ -6495,6 +6688,10 @@ def analyze_generation_text(
     # Fabrication: hallucinated specific details
     has_fabrication, fabrication_issues = _detect_fabricated_details(text)
 
+    has_text_sanity_issue, text_sanity_issue_type = _detect_text_sanity_issue(text)
+    if not has_text_sanity_issue:
+        text_sanity_issue_type = None
+
     harness_signals = _collect_harness_quality_signals(
         text,
         generated_tokens=generated_tokens,
@@ -6519,6 +6716,13 @@ def analyze_generation_text(
         is_repetitive=is_repetitive,
         missing_sections=prompt_signals.missing_sections,
     )
+    generation_loop_type = _detect_generation_loop_type(
+        likely_capped=likely_capped,
+        cutoff_reasons=cutoff_reasons,
+        is_repetitive=is_repetitive,
+        has_degeneration=has_degeneration,
+        text_sanity_issue_type=text_sanity_issue_type,
+    )
     utility_context = prompt_signals.prompt_bundle.trusted_text or None
     utility_grade = str(compute_cataloging_utility(text, utility_context)["utility_grade"])
     hint_relationship = "preserves_trusted_hints"
@@ -6541,6 +6745,7 @@ def analyze_generation_text(
         instruction_echo=prompt_signals.instruction_echo,
         metadata_borrowing=prompt_signals.metadata_borrowing,
         has_hallucination=bool(hallucination_issues),
+        text_sanity_issue_type=text_sanity_issue_type,
     )
     # Promote clean+F to unknown_runtime_anomaly when output is near-empty,
     # signalling an unexplained failure that warrants manual triage.
@@ -6599,6 +6804,8 @@ def analyze_generation_text(
             *(["generic"] if is_generic else []),
             *(["degeneration"] if has_degeneration else []),
             *(["fabrication"] if has_fabrication else []),
+            *(["text_sanity"] if text_sanity_issue_type is not None else []),
+            *(["generation_loop"] if generation_loop_type is not None else []),
         ],
     )
 
@@ -6622,6 +6829,8 @@ def analyze_generation_text(
         degeneration_type=degeneration_type,
         has_fabrication=has_fabrication,
         fabrication_issues=fabrication_issues,
+        text_sanity_issue_type=text_sanity_issue_type,
+        generation_loop_type=generation_loop_type,
         missing_sections=list(prompt_signals.missing_sections),
         title_word_count=prompt_signals.title_word_count,
         description_sentence_count=prompt_signals.description_sentence_count,
@@ -10975,9 +11184,12 @@ def _build_markdown_recommended_models(
     parts: list[str] = []
     _append_markdown_section(
         parts,
-        title="## ✅ Recommended Models",
+        title="## ✅ Usable Diagnostic Candidates",
         body_lines=[
-            "Quick picks based on end-to-end utility plus description and keyword strength.",
+            (
+                "Models that passed mechanical diagnostics and retained useful cataloguing "
+                "or metadata-alignment signals."
+            ),
         ],
     )
     for label, result, score_data in recommendations:
@@ -11190,6 +11402,10 @@ class DiagnosticsContext:
     recoveries: frozenset[str] = frozenset()
     new_models: frozenset[str] = frozenset()
     missing_models: frozenset[str] = frozenset()
+    window_quality_regressions: frozenset[str] = frozenset()
+    window_harness_regressions: frozenset[str] = frozenset()
+    window_generation_regressions: frozenset[str] = frozenset()
+    window_version_deltas: tuple[str, ...] = ()
     failure_history: dict[str, FailureHistoryContext] = dataclass_field(default_factory=dict)
 
 
@@ -11674,6 +11890,12 @@ def _build_diagnostics_context(
         recoveries=frozenset(comparison["recoveries"]),
         new_models=frozenset(comparison["new_models"]),
         missing_models=frozenset(comparison["missing_models"]),
+        window_quality_regressions=frozenset(comparison.get("window_quality_regressions", [])),
+        window_harness_regressions=frozenset(comparison.get("window_harness_regressions", [])),
+        window_generation_regressions=frozenset(
+            comparison.get("window_generation_regressions", []),
+        ),
+        window_version_deltas=tuple(comparison.get("window_version_deltas", [])),
         failure_history=history_context,
     )
 
@@ -13539,6 +13761,23 @@ def _diagnostics_history_section(
             )
         else:
             parts.append("**Recoveries since previous run:** none")
+        window_generation = sorted(diagnostics_context.window_generation_regressions)
+        if window_generation:
+            parts.append(
+                "**Generation regressions in history window:** "
+                + ", ".join(f"`{m}`" for m in window_generation),
+            )
+        window_quality = sorted(diagnostics_context.window_quality_regressions)
+        if window_quality:
+            parts.append(
+                "**Quality regressions in history window:** "
+                + ", ".join(f"`{m}`" for m in window_quality),
+            )
+        if diagnostics_context.window_version_deltas:
+            parts.append(
+                "**Core library changes in window:** "
+                + ", ".join(f"`{delta}`" for delta in diagnostics_context.window_version_deltas),
+            )
         parts.append("")
     else:
         parts.append("No prior history baseline available for regression/recovery status.")
@@ -14393,11 +14632,10 @@ def generate_diagnostics_report(
 
     history_records = _load_history_run_records(history_path)
     failed_models = {r.model_name for r in failed}
-    comparison = (
-        compare_history_records(previous_history, current_history)
-        if previous_history and current_history
-        else None
-    )
+    comparison: HistoryComparisonSummary | None = None
+    if current_history is not None:
+        window_records = history_records[:-1] if history_records else []
+        comparison = compare_history_window(window_records, current_history)
     diagnostics_context = _build_diagnostics_context(
         failed_models=failed_models,
         history_records=history_records,
@@ -19515,10 +19753,19 @@ def _build_quality_issues_string(analysis: GenerationQualityAnalysis) -> str | N
         if analysis.keyword_duplication_ratio is not None
         else "keyword-duplication"
     )
+    text_sanity_label = analysis.text_sanity_issue_type or "text_sanity"
+    generation_loop_label = (
+        f"generation_loop({analysis.generation_loop_type})"
+        if analysis.generation_loop_type
+        else "generation_loop"
+    )
 
     issue_candidates = [
         (analysis.is_refusal, refusal_label),
         (analysis.is_repetitive, repetitive_label),
+        (analysis.generation_loop_type is not None, generation_loop_label),
+        (analysis.text_sanity_issue_type is not None, text_sanity_label),
+        (analysis.metadata_alignment_issue is not None, "low_metadata_alignment"),
         (analysis.has_language_mixing, "lang_mixing"),
         (bool(analysis.hallucination_issues), "hallucination"),
         (analysis.has_degeneration, "degeneration"),
@@ -19574,6 +19821,9 @@ QUALITY_ISSUE_PATTERNS: Final[dict[str, re.Pattern[str]]] = {
     "long_context": re.compile(r"long[-_]context", re.IGNORECASE),
     "refusal": re.compile(r"\brefusal\b", re.IGNORECASE),
     "repetitive": re.compile(r"\brepetitive\b", re.IGNORECASE),
+    "generation_loop": re.compile(r"\bgeneration_loop\b", re.IGNORECASE),
+    "text_sanity": re.compile(r"\bgibberish\b|\btext_sanity\b", re.IGNORECASE),
+    "low_metadata_alignment": re.compile(r"\blow_metadata_alignment\b", re.IGNORECASE),
     "lang_mixing": re.compile(r"\blang_mixing\b", re.IGNORECASE),
     "hallucination": re.compile(r"\bhallucination\b", re.IGNORECASE),
     "degeneration": re.compile(r"\bdegeneration\b", re.IGNORECASE),
@@ -19605,6 +19855,9 @@ QUALITY_BREAKING_LABELS: Final[frozenset[str]] = frozenset(
         "long_context",
         "refusal",
         "repetitive",
+        "generation_loop",
+        "text_sanity",
+        "low_metadata_alignment",
         "hallucination",
         "degeneration",
         "context_ignored",
@@ -19633,6 +19886,50 @@ def _collapse_preview_whitespace(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+def _metadata_agreement_has_visual_reference(
+    metadata_agreement: MetadataAgreementMetrics | None,
+) -> bool:
+    """Return whether metadata agreement had visual reference terms to compare."""
+    return bool(
+        metadata_agreement and (metadata_agreement.matched_terms or metadata_agreement.missed_terms)
+    )
+
+
+def _apply_metadata_alignment_to_analysis(
+    analysis: GenerationQualityAnalysis,
+    metadata_agreement: MetadataAgreementMetrics | None,
+) -> GenerationQualityAnalysis:
+    """Fold trusted-metadata agreement into clean-output diagnostics."""
+    if not _metadata_agreement_has_visual_reference(metadata_agreement):
+        return analysis
+
+    metadata_agreement = cast("MetadataAgreementMetrics", metadata_agreement)
+    score = metadata_agreement.overall_score
+    metadata_issue: str | None = None
+    verdict = analysis.verdict
+    evidence = list(analysis.evidence)
+
+    if verdict == "clean" and score < QUALITY.metadata_alignment_min_score:
+        metadata_issue = "low_metadata_alignment"
+        verdict = "semantic_mismatch"
+        evidence.append(metadata_issue)
+
+    user_bucket = _classify_user_bucket(
+        verdict=verdict,
+        hint_relationship=analysis.hint_relationship,
+        has_contract_issue=_analysis_has_contract_issue(analysis),
+        utility_grade="F" if metadata_issue else "",
+    )
+    return replace(
+        analysis,
+        verdict=verdict,
+        user_bucket=user_bucket,
+        evidence=_dedupe_preserve_order(evidence),
+        metadata_alignment_score=score,
+        metadata_alignment_issue=metadata_issue,
+    )
+
+
 def _populate_result_quality_analysis(
     result: PerformanceResult,
     *,
@@ -19650,25 +19947,28 @@ def _populate_result_quality_analysis(
 
     cached_analysis = _quality_analysis_for_result(result)
     if cached_analysis is not None:
-        cached_quality_issues = result.quality_issues or _build_quality_issues_string(
-            cached_analysis,
-        )
         needs_prompt_refresh = bool(prompt) and not cached_analysis.prompt_checks_ran
-        if (
-            not needs_prompt_refresh
-            and not needs_metadata_refresh
-            and result.quality_analysis is not None
-            and result.quality_issues == cached_quality_issues
-        ):
-            return result
         if not needs_prompt_refresh:
             metadata_agreement = result.metadata_agreement
             if needs_metadata_refresh:
                 metadata_agreement = compute_metadata_agreement(text, metadata)
+            refreshed_analysis = _apply_metadata_alignment_to_analysis(
+                cached_analysis,
+                metadata_agreement,
+            )
+            refreshed_quality_issues = _build_quality_issues_string(refreshed_analysis)
+            if result.quality_issues and metadata_agreement is None:
+                refreshed_quality_issues = result.quality_issues
+            if (
+                not needs_metadata_refresh
+                and result.quality_analysis == refreshed_analysis
+                and result.quality_issues == refreshed_quality_issues
+            ):
+                return result
             return replace(
                 result,
-                quality_analysis=cached_analysis,
-                quality_issues=cached_quality_issues,
+                quality_analysis=refreshed_analysis,
+                quality_issues=refreshed_quality_issues,
                 metadata_agreement=metadata_agreement,
             )
 
@@ -19695,11 +19995,15 @@ def _populate_result_quality_analysis(
     metadata_agreement = result.metadata_agreement
     if needs_metadata_refresh:
         metadata_agreement = compute_metadata_agreement(text, metadata)
+    analysis = _apply_metadata_alignment_to_analysis(analysis, metadata_agreement)
+    quality_issues = _build_quality_issues_string(analysis)
+    if result.quality_issues and metadata_agreement is None:
+        quality_issues = result.quality_issues
 
     return replace(
         result,
         quality_analysis=analysis,
-        quality_issues=result.quality_issues or quality_issues,
+        quality_issues=quality_issues,
         metadata_agreement=metadata_agreement,
     )
 
@@ -20387,13 +20691,13 @@ def _action_snapshot_failure_items(
         (
             "Maintainer signals",
             f"harness-risk successes={harness_success_count}, "
-            f"clean outputs={triage.clean_count}/{successful_count}.",
+            f"mechanically clean outputs={triage.clean_count}/{successful_count}.",
         )
     )
     useful_text = (
-        f"{len(triage.useful_rows)} clean A/B model(s) worth first review."
+        f"{len(triage.useful_rows)} mechanically clean A/B model(s) with useful signals."
         if triage.useful_rows
-        else "none (no clean A/B shortlist for this run)."
+        else "none (no mechanically clean A/B shortlist for this run)."
     )
     items.append(("Useful now", useful_text))
     watchlist_text = (
@@ -20695,7 +20999,7 @@ def _log_utility_triage(
                     tps,
                 )
     else:
-        logger.info("   Useful now: none (no clean A/B outputs)")
+        logger.info("   Useful now: none (no mechanically clean A/B outputs)")
 
     watchlist_rows = _select_watchlist_rows(rows)
     if watchlist_rows:
@@ -20925,6 +21229,33 @@ def _history_success_failure_sets(
     return successful, failed
 
 
+def _is_history_model_result_record(value: object) -> TypeGuard[HistoryModelResultRecord]:
+    """Return whether a legacy history value is shaped like a model-result row."""
+    if not isinstance(value, Mapping):
+        return False
+    mapping = cast("Mapping[str, object]", value)
+    return isinstance(mapping.get("success"), bool)
+
+
+def _empty_history_comparison_summary() -> HistoryComparisonSummary:
+    """Return a fully shaped empty history-comparison payload."""
+    return {
+        "regressions": [],
+        "recoveries": [],
+        "new_models": [],
+        "missing_models": [],
+        "quality_regressions": [],
+        "quality_recoveries": [],
+        "harness_regressions": [],
+        "harness_recoveries": [],
+        "owner_changes": [],
+        "window_quality_regressions": [],
+        "window_harness_regressions": [],
+        "window_generation_regressions": [],
+        "window_version_deltas": [],
+    }
+
+
 def compare_history_records(
     previous: HistoryRunRecord | None,
     current: HistoryRunRecord,
@@ -20985,17 +21316,192 @@ def compare_history_records(
         if prev_owner and curr_owner and prev_owner != curr_owner:
             owner_changes.append(model_name)
 
-    return {
-        "regressions": regressions,
-        "recoveries": recoveries,
-        "new_models": new_models,
-        "missing_models": missing_models,
-        "quality_regressions": quality_regressions,
-        "quality_recoveries": quality_recoveries,
-        "harness_regressions": harness_regressions,
-        "harness_recoveries": harness_recoveries,
-        "owner_changes": owner_changes,
+    summary = _empty_history_comparison_summary()
+    summary.update(
+        {
+            "regressions": regressions,
+            "recoveries": recoveries,
+            "new_models": new_models,
+            "missing_models": missing_models,
+            "quality_regressions": quality_regressions,
+            "quality_recoveries": quality_recoveries,
+            "harness_regressions": harness_regressions,
+            "harness_recoveries": harness_recoveries,
+            "owner_changes": owner_changes,
+        },
+    )
+    return summary
+
+
+def _parse_history_timestamp(record: HistoryRunRecord | None) -> datetime | None:
+    """Parse a history timestamp while tolerating legacy timezone spellings."""
+    if record is None:
+        return None
+    timestamp = record.get("timestamp")
+    if not isinstance(timestamp, str) or not timestamp.strip():
+        return None
+    normalized = timestamp.strip()
+    tz_aliases = {
+        " GMT": "+0000",
+        " UTC": "+0000",
+        " BST": "+0100",
     }
+    for suffix, replacement in tz_aliases.items():
+        if normalized.endswith(suffix):
+            normalized = normalized[: -len(suffix)] + replacement
+            break
+    normalized_iso = normalized.replace(" ", "T", 1)
+    if re.search(r"[+-]\d{4}$", normalized_iso):
+        normalized_iso = f"{normalized_iso[:-5]}{normalized_iso[-5:-2]}:{normalized_iso[-2:]}"
+    with suppress(ValueError):
+        parsed = datetime.fromisoformat(normalized_iso)
+        return parsed if parsed.tzinfo else parsed.replace(tzinfo=UTC)
+    return None
+
+
+def _history_prompt_class(record: HistoryRunRecord | None) -> str:
+    """Return a coarse prompt class for fairer history-window comparison."""
+    if record is None:
+        return "unknown"
+    preview = (record.get("prompt_preview") or "").casefold()
+    if "describe this image briefly" in preview or "describe this picture" in preview:
+        return "triage"
+    if "catalog" in preview or all(label in preview for label in ("title:", "description:")):
+        return "cataloguing"
+    return "custom"
+
+
+def _history_records_in_window(
+    history_records: Sequence[HistoryRunRecord],
+    current: HistoryRunRecord,
+    *,
+    window_days: int,
+) -> list[HistoryRunRecord]:
+    """Return prior history records inside the requested lookback window."""
+    current_timestamp = _parse_history_timestamp(current)
+    if current_timestamp is None:
+        return list(history_records)
+    earliest = current_timestamp - timedelta(days=window_days)
+    records: list[HistoryRunRecord] = []
+    current_timestamp_text = current.get("timestamp")
+    for record in history_records:
+        if record.get("timestamp") == current_timestamp_text:
+            continue
+        parsed = _parse_history_timestamp(record)
+        if parsed is None or earliest <= parsed <= current_timestamp:
+            records.append(record)
+    return records
+
+
+def _history_version_deltas(
+    previous: HistoryRunRecord | None,
+    current: HistoryRunRecord,
+) -> list[str]:
+    """Return compact version deltas for core MLX/VLM dependencies."""
+    if previous is None:
+        return []
+    previous_versions = previous.get("library_versions", {})
+    current_versions = current.get("library_versions", {})
+    if not isinstance(previous_versions, dict) or not isinstance(current_versions, dict):
+        return []
+    deltas: list[str] = []
+    for package_name in ("mlx", "mlx-vlm", "transformers"):
+        previous_version = previous_versions.get(package_name)
+        current_version = current_versions.get(package_name)
+        if previous_version and current_version and previous_version != current_version:
+            deltas.append(f"{package_name}={previous_version}->{current_version}")
+    return deltas
+
+
+def _history_window_baseline_for_model(
+    model_name: str,
+    records: Sequence[HistoryRunRecord],
+    *,
+    prompt_class: str,
+) -> tuple[HistoryRunRecord, HistoryModelResultRecord] | None:
+    """Return the best in-window baseline row for one model."""
+    candidates: list[tuple[int, int, HistoryRunRecord, HistoryModelResultRecord]] = []
+    for record in records:
+        if _history_prompt_class(record) != prompt_class:
+            continue
+        model_results = record.get("model_results", {})
+        if not isinstance(model_results, dict):
+            continue
+        info = model_results.get(model_name)
+        if not _is_history_model_result_record(info):
+            continue
+        rank = _history_bucket_rank(info.get("review_user_bucket"))
+        stop_bonus: int = 0 if info.get("stop_reason") == "completed" else 1
+        candidates.append((rank, stop_bonus, record, info))
+    if not candidates:
+        return None
+    _rank, _stop_bonus, record, info = min(candidates, key=lambda item: (item[0], item[1]))
+    return record, info
+
+
+def compare_history_window(
+    history_records: Sequence[HistoryRunRecord],
+    current: HistoryRunRecord,
+    *,
+    window_days: int = 21,
+) -> HistoryComparisonSummary:
+    """Compare current run against the best matching baseline in a recent window."""
+    window_records = _history_records_in_window(
+        history_records,
+        current,
+        window_days=window_days,
+    )
+    previous = window_records[-1] if window_records else None
+    summary = compare_history_records(previous, current)
+    current_models = current.get("model_results", {})
+    if not isinstance(current_models, dict):
+        return summary
+
+    prompt_class = _history_prompt_class(current)
+    window_quality_regressions: list[str] = []
+    window_harness_regressions: list[str] = []
+    window_generation_regressions: list[str] = []
+    version_baselines: list[HistoryRunRecord] = []
+
+    for model_name, current_info in current_models.items():
+        if not isinstance(current_info, dict):
+            continue
+        baseline = _history_window_baseline_for_model(
+            model_name,
+            window_records,
+            prompt_class=prompt_class,
+        )
+        if baseline is None:
+            continue
+        baseline_record, baseline_info = baseline
+        version_baselines.append(baseline_record)
+
+        if _history_bucket_rank(current_info.get("review_user_bucket")) > _history_bucket_rank(
+            baseline_info.get("review_user_bucket"),
+        ):
+            window_quality_regressions.append(model_name)
+
+        if not baseline_info.get("harness_issue_type") and current_info.get("harness_issue_type"):
+            window_harness_regressions.append(model_name)
+
+        baseline_completed = baseline_info.get("stop_reason") == "completed"
+        current_capped = (
+            current_info.get("stop_reason") == "max_tokens"
+            or current_info.get("hit_max_tokens") is True
+        )
+        if baseline_completed and current_capped:
+            window_generation_regressions.append(model_name)
+
+    version_baseline = min(
+        version_baselines,
+        key=lambda record: _parse_history_timestamp(record) or datetime.max.replace(tzinfo=UTC),
+        default=previous,
+    )
+    summary["window_quality_regressions"] = sorted(set(window_quality_regressions))
+    summary["window_harness_regressions"] = sorted(set(window_harness_regressions))
+    summary["window_generation_regressions"] = sorted(set(window_generation_regressions))
+    summary["window_version_deltas"] = _history_version_deltas(version_baseline, current)
+    return summary
 
 
 def _build_prompt_preview(prompt: str, *, max_chars: int = 200) -> str:
@@ -21030,6 +21536,15 @@ def _history_model_result_from_result(result: PerformanceResult) -> HistoryModel
             record["nontext_prompt_ratio"] = review["nontext_prompt_ratio"]
     if analysis is not None and analysis.harness_issue_type is not None:
         record["harness_issue_type"] = analysis.harness_issue_type
+    if analysis is not None:
+        if analysis.metadata_alignment_score is not None:
+            record["metadata_alignment_score"] = analysis.metadata_alignment_score
+        if analysis.metadata_alignment_issue is not None:
+            record["metadata_alignment_issue"] = analysis.metadata_alignment_issue
+        if analysis.text_sanity_issue_type is not None:
+            record["text_sanity_issue_type"] = analysis.text_sanity_issue_type
+        if analysis.generation_loop_type is not None:
+            record["generation_loop_type"] = analysis.generation_loop_type
     stop_reason = result.runtime_diagnostics.stop_reason if result.runtime_diagnostics else None
     if stop_reason is not None:
         record["stop_reason"] = stop_reason
@@ -21420,17 +21935,7 @@ def _history_summary_for_comparison(
 ) -> HistoryComparisonSummary:
     """Return transition summary and log context-change warnings when needed."""
     if previous is None:
-        return {
-            "regressions": [],
-            "recoveries": [],
-            "new_models": [],
-            "missing_models": [],
-            "quality_regressions": [],
-            "quality_recoveries": [],
-            "harness_regressions": [],
-            "harness_recoveries": [],
-            "owner_changes": [],
-        }
+        return _empty_history_comparison_summary()
 
     prev_prompt_hash = previous.get("prompt_hash")
     curr_prompt_hash = current.get("prompt_hash")
@@ -21464,6 +21969,9 @@ def _history_summary_rows(
     harness_regressions = summary["harness_regressions"]
     harness_recoveries = summary["harness_recoveries"]
     owner_changes = summary["owner_changes"]
+    window_quality_regressions = summary["window_quality_regressions"]
+    window_harness_regressions = summary["window_harness_regressions"]
+    window_generation_regressions = summary["window_generation_regressions"]
 
     prev_total, prev_success, prev_failed, prev_success_rate = _history_counts(previous)
     curr_total, curr_success, curr_failed, curr_success_rate = _history_counts(current)
@@ -21510,6 +22018,9 @@ def _history_summary_rows(
         ["Quality recoveries", "-", str(len(quality_recoveries)), "-"],
         ["Harness regressions", "-", str(len(harness_regressions)), "-"],
         ["Harness recoveries", "-", str(len(harness_recoveries)), "-"],
+        ["Window quality regressions", "-", str(len(window_quality_regressions)), "-"],
+        ["Window harness regressions", "-", str(len(window_harness_regressions)), "-"],
+        ["Window generation regressions", "-", str(len(window_generation_regressions)), "-"],
         ["Owner changes", "-", str(len(owner_changes)), "-"],
         ["New models", "-", str(len(new_models)), "-"],
         ["Missing models", "-", str(len(missing_models)), "-"],
@@ -21560,6 +22071,9 @@ def _log_history_transition_chart(
     harness_regressions = summary["harness_regressions"]
     harness_recoveries = summary["harness_recoveries"]
     owner_changes = summary["owner_changes"]
+    window_quality_regressions = summary["window_quality_regressions"]
+    window_harness_regressions = summary["window_harness_regressions"]
+    window_generation_regressions = summary["window_generation_regressions"]
     transition_entries = [
         ("regressions", float(len(regressions))),
         ("recoveries", float(len(recoveries))),
@@ -21567,6 +22081,9 @@ def _log_history_transition_chart(
         ("quality recoveries", float(len(quality_recoveries))),
         ("harness regressions", float(len(harness_regressions))),
         ("harness recoveries", float(len(harness_recoveries))),
+        ("window quality", float(len(window_quality_regressions))),
+        ("window harness", float(len(window_harness_regressions))),
+        ("window generation", float(len(window_generation_regressions))),
         ("owner changes", float(len(owner_changes))),
         ("new", float(len(new_models))),
         ("missing", float(len(missing_models))),
@@ -21674,6 +22191,9 @@ def _history_transition_rows(
     harness_regressions = summary["harness_regressions"]
     harness_recoveries = summary["harness_recoveries"]
     owner_changes = summary["owner_changes"]
+    window_quality_regressions = summary["window_quality_regressions"]
+    window_harness_regressions = summary["window_harness_regressions"]
+    window_generation_regressions = summary["window_generation_regressions"]
     changed_models = sorted(
         {
             *regressions,
@@ -21684,6 +22204,9 @@ def _history_transition_rows(
             *quality_recoveries,
             *harness_regressions,
             *harness_recoveries,
+            *window_quality_regressions,
+            *window_harness_regressions,
+            *window_generation_regressions,
             *owner_changes,
         }
     )
@@ -21706,6 +22229,12 @@ def _history_transition_rows(
             transition = "Quality regression"
         elif model_name in quality_recoveries:
             transition = "Quality recovery"
+        elif model_name in window_generation_regressions:
+            transition = "Window generation regression"
+        elif model_name in window_harness_regressions:
+            transition = "Window harness regression"
+        elif model_name in window_quality_regressions:
+            transition = "Window quality regression"
         elif model_name in owner_changes:
             transition = "Owner changed"
         elif model_name in new_models:
@@ -21732,12 +22261,17 @@ def _history_transition_rows(
 def _log_history_comparison(
     previous: HistoryRunRecord | None,
     current: HistoryRunRecord,
+    history_records: Sequence[HistoryRunRecord] | None = None,
 ) -> None:
     """Print the History Comparison CLI section (regressions/recoveries)."""
     print_cli_section("History Comparison")
     if previous is None:
         logger.info("No prior history run available. Baseline created.")
-    summary = _history_summary_for_comparison(previous, current)
+    summary = (
+        compare_history_window(history_records, current)
+        if history_records is not None
+        else _history_summary_for_comparison(previous, current)
+    )
     rows = _history_summary_rows(previous=previous, current=current, summary=summary)
     logger.info("📚 Run-over-run comparison:")
     _log_rich_table(headers=["Metric", "Previous", "Current", "Delta"], rows=rows)
@@ -21745,6 +22279,11 @@ def _log_history_comparison(
     context_rows = _history_context_rows(previous, current)
     logger.info("🔎 Comparison context:")
     _log_rich_table(headers=["Context", "Previous", "Current"], rows=context_rows)
+    if summary["window_version_deltas"]:
+        logger.info(
+            "🧬 Window library deltas: %s",
+            ", ".join(summary["window_version_deltas"]),
+        )
 
     _log_history_transition_chart(summary=summary, current=current)
     transition_rows = _history_transition_rows(previous=previous, current=current, summary=summary)
@@ -23247,7 +23786,8 @@ def finalize_execution(
 
         log_file_path(history_path, label="   History:     ")
 
-        _log_history_comparison(previous_history, current_history)
+        history_records = _load_history_run_records(history_path)
+        _log_history_comparison(previous_history, current_history, history_records[:-1])
 
         # Generate diagnostics report after history append so regression/retry
         # context in diagnostics.md reflects this run.

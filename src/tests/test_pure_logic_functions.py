@@ -355,7 +355,15 @@ class TestMetadataAgreementIntegration:
         second_pass = mod._populate_result_quality_analysis(first_pass, metadata=metadata)
 
         assert first_pass.metadata_agreement is None
-        assert second_pass.quality_analysis == first_pass.quality_analysis
+        assert first_pass.quality_analysis is not None
+        assert second_pass.quality_analysis is not None
+        normalized_second_analysis = replace(
+            second_pass.quality_analysis,
+            metadata_alignment_score=None,
+        )
+        assert normalized_second_analysis == first_pass.quality_analysis
+        assert second_pass.quality_analysis.metadata_alignment_score is not None
+        assert second_pass.quality_analysis.metadata_alignment_score > 0.0
         assert second_pass.metadata_agreement is not None
         assert second_pass.metadata_agreement.overall_score > 0.0
 

@@ -7,6 +7,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Tighten diagnostic quality analysis by adding unstructured metadata alignment,
+  text-sanity/generation-loop labels, and 21-day history-window regression
+  context so mechanically clean gibberish is no longer promoted as usable.
 - Refresh the AI-agent navigation line map for the current `src/check_models.py`
   layout and test-suite size.
 - Add the calibrated Skylos quality gate to the local quality script and manage

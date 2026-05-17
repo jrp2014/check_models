@@ -677,7 +677,7 @@ class TestMarkdownReportEdgeCases:
             "model_gallery.md#model-org-good"
         ) in content
         assert "## Model Gallery" not in content
-        assert "## ✅ Recommended Models" in content
+        assert "## ✅ Usable Diagnostic Candidates" in content
         assert "_Best end-to-end cataloging:_" in content
         assert "_Best descriptions:_" in content
         assert "_Best keywording:_" in content
