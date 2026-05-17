@@ -1,27 +1,30 @@
-# \[mlx-vlm / mlx\]\[Long-context collapse\] Long-context generation collapsed or became too short affecting 1 model(s)
+# \[mlx-vlm / mlx\]\[Long-context collapse\] Long-context generation collapsed or became too short affecting 3 model(s)
 
 ## Summary
 
-1 model(s) show **Long-context collapse** that should be filed against mlx-vlm first; MLX if cache/runtime reproduces.
+3 model(s) show **Long-context collapse** that should be filed against mlx-vlm first; MLX if cache/runtime reproduces.
 
 - **Observed problem:** Long-context generation collapsed or became too short
 - **Target:** mlx-vlm first; MLX if cache/runtime reproduces
-- **Affected models:** 1
+- **Affected models:** 3
 - **Fixed when:** Full and reduced reruns avoid context collapse.
 
 
 ## Affected Models
 
-| Model                                     | Observed Behavior                                                             | Token Counts                                                                 | Optional Context                                                                                                                                                                           |
-|-------------------------------------------|-------------------------------------------------------------------------------|------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/paligemma2-3b-pt-896-4bit` | output/prompt=0.2% \| prompt_tokens=4103, output_tokens=9, output/prompt=0.2% | prompt=4,103 \| output/prompt=0.22% \| nontext burden=100% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T201922Z_011_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json) |
+| Model                                | Observed Behavior                      | Token Counts                                                                                          | Optional Context                                                                                                                                                                      |
+|--------------------------------------|----------------------------------------|-------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/Qwen3.5-27B-mxfp8`    | prompt_tokens=16167, repetitive output | prompt=16,167 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_010_mlx-community_Qwen3.5-27B-mxfp8_mlx_vlm_mlx_long_context_001.json)    |
+| `mlx-community/Qwen3.5-35B-A3B-6bit` | prompt_tokens=16167, repetitive output | prompt=16,167 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_011_mlx-community_Qwen3.5-35B-A3B-6bit_mlx_vlm_mlx_long_context_001.json) |
+| `mlx-community/Qwen3.5-35B-A3B-bf16` | prompt_tokens=16167, repetitive output | prompt=16,167 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_012_mlx-community_Qwen3.5-35B-A3B-bf16_mlx_vlm_mlx_long_context_001.json) |
 
 
 ## Minimal Evidence
 
-- `mlx-community/paligemma2-3b-pt-896-4bit`: Output is very short relative to prompt size (0.2%), suggesting possible early-stop or prompt-handling issues.
-- `mlx-community/paligemma2-3b-pt-896-4bit`: At long prompt length (4103 tokens), output stayed unusually short (9 tokens; ratio 0.2%).
-- Output excerpt: `It has been tagged with #1.`
+- `mlx-community/Qwen3.5-27B-mxfp8`: At long prompt length (16167 tokens), output became repetitive.
+- `mlx-community/Qwen3.5-27B-mxfp8`: Output became repetitive, indicating possible generation instability (token: 2v,).
+- Output excerpt: `orda2v,, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v, 2v`
+- `mlx-community/Qwen3.5-35B-A3B-6bit`: At long prompt length (16167 tokens), output became repetitive.
 
 
 ## Minimal Reproduction
@@ -31,7 +34,9 @@ These commands use `mlx-vlm` directly so the issue can be reproduced without ins
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/paligemma2-3b-pt-896-4bit --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --resize-shape 1024 1024 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/Qwen3.5-27B-mxfp8 --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/Qwen3.5-35B-A3B-6bit --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/Qwen3.5-35B-A3B-bf16 --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 Minimal Python repro (representative model):
@@ -40,11 +45,11 @@ Minimal Python repro (representative model):
 from mlx_vlm.generate import generate
 from mlx_vlm.utils import load
 
-MODEL = 'mlx-community/paligemma2-3b-pt-896-4bit'
+MODEL = 'mlx-community/Qwen3.5-27B-mxfp8'
 IMAGE = '/Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg'
 PROMPT = 'Describe this image briefly.'
 LOAD_KWARGS = {'trust_remote_code': True}
-GENERATE_KWARGS = {'max_tokens': 200, 'temperature': 0.0, 'prefill_step_size': 4096, 'resize_shape': (1024, 1024)}
+GENERATE_KWARGS = {'max_tokens': 200, 'temperature': 0.0, 'prefill_step_size': 4096}
 model, processor = load(MODEL, **LOAD_KWARGS)
 result = generate(model, processor, PROMPT, image=IMAGE, **GENERATE_KWARGS)
 print(result.text)
@@ -63,23 +68,21 @@ Generation/load config:
   "generate_kwargs": {
     "max_tokens": 200,
     "prefill_step_size": 4096,
-    "resize_shape": [
-      1024,
-      1024
-    ],
     "temperature": 0.0
   },
   "image": "/Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg",
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "mlx-community/paligemma2-3b-pt-896-4bit"
+  "model": "mlx-community/Qwen3.5-27B-mxfp8"
 }
 ```
 
 Optional advanced context:
 
-- `mlx-community/paligemma2-3b-pt-896-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T201922Z_011_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json)
+- `mlx-community/Qwen3.5-27B-mxfp8`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_010_mlx-community_Qwen3.5-27B-mxfp8_mlx_vlm_mlx_long_context_001.json)
+- `mlx-community/Qwen3.5-35B-A3B-6bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_011_mlx-community_Qwen3.5-35B-A3B-6bit_mlx_vlm_mlx_long_context_001.json)
+- `mlx-community/Qwen3.5-35B-A3B-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_012_mlx-community_Qwen3.5-35B-A3B-bf16_mlx_vlm_mlx_long_context_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -118,16 +121,44 @@ Optional advanced context:
 
 ## Appendix: Detailed Evidence
 
-### `mlx-community/paligemma2-3b-pt-896-4bit`
+### `mlx-community/Qwen3.5-27B-mxfp8`
 
 Observed signals:
 
-- Output is very short relative to prompt size (0.2%), suggesting possible early-stop or prompt-handling issues.
-- At long prompt length (4103 tokens), output stayed unusually short (9 tokens; ratio 0.2%).
+- At long prompt length (16167 tokens), output became repetitive.
+- Output became repetitive, indicating possible generation instability (token: 2v,).
+- Output contains corrupted or malformed text segments (incomplete_sentence: ends with '2v').
 
 Sample output:
 
 ```text
-It has been tagged with #1.
+orda2v,,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v...
+```
+
+### `mlx-community/Qwen3.5-35B-A3B-6bit`
+
+Observed signals:
+
+- At long prompt length (16167 tokens), output became repetitive.
+- Output became repetitive, indicating possible generation instability (token: ,).
+- Output contains corrupted or malformed text segments (character_loop: ' ,' repeated).
+
+Sample output:
+
+```text
+,rew, , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , ,...
+```
+
+### `mlx-community/Qwen3.5-35B-A3B-bf16`
+
+Observed signals:
+
+- At long prompt length (16167 tokens), output became repetitive.
+- Output became repetitive, indicating possible generation instability (token: all,).
+
+Sample output:
+
+```text
+5, each, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all...
 ```
 

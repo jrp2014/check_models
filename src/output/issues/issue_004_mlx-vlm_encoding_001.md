@@ -12,16 +12,16 @@
 
 ## Affected Models
 
-| Model                                                   | Observed Behavior                          | Token Counts                                                                                       | Optional Context                                                                                                                                                                                 |
-|---------------------------------------------------------|--------------------------------------------|----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | 22 BPE space markers found in decoded text | prompt=807 \| output/prompt=24.78% \| nontext burden=99% \| stop=max_tokens \| hit token cap (200) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T201922Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) |
+| Model                                                   | Observed Behavior                          | Token Counts                                                                                          | Optional Context                                                                                                                                                                                 |
+|---------------------------------------------------------|--------------------------------------------|-------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | 41 BPE space markers found in decoded text | prompt=1,745 \| output/prompt=11.46% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) |
 
 
 ## Minimal Evidence
 
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 22 occurrences).
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: Output contains corrupted or malformed text segments (character_loop: '9.' repeated).
-- Output excerpt: `pomĠinĠaĠinĠaĠandĠinĠaØ¹ÙĨÙĪØ§ÙĨ.ĠinĠa.1zmann.ĠinĠa.1Ġin.Ġin.Ġin.Ġof.Ġof.99Q99Q.ĠinĠa.9.9.9.9.9.9.9.9.Ġin.9.9.9.Ġin.Ġin.9.9.9.9.9.9.9.Ġin.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.`
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 41 occurrences).
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: Output contains corrupted or malformed text segments (character_loop: '.99' repeated).
+- Output excerpt: `pomĠavslĠon0ĠforĠon0Ġand.Ġ.ĊiduntçĦ¶åĲİè¯´ĠrÃ¶ĠinĠa.ĠinĠaĠand.ĠinĠaĠinĠaĠinĠaĠinĠa.ĠinĠaĠinĠaĠinĠaĠinĠaĠinĠaĠkontinent.ĠAPs.ĠinĠa.199Qs.99Q.199Q.199Q.11Q.199ĠasĠa.199.1.199.199.19.199.19.19.19.19.19.Ġin.Ġin.Ġin.9Ġand.9Ġand.99.99.99.999999999.99999.99.99.99.99.99.99.99.99.99.99.99.99.99.99.99.99.99`
 
 
 ## Minimal Reproduction
@@ -31,7 +31,7 @@ These commands use `mlx-vlm` directly so the issue can be reproduced without ins
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --resize-shape 1024 1024 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 Minimal Python repro (representative model):
@@ -44,7 +44,7 @@ MODEL = 'mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit'
 IMAGE = '/Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg'
 PROMPT = 'Describe this image briefly.'
 LOAD_KWARGS = {'trust_remote_code': True}
-GENERATE_KWARGS = {'max_tokens': 200, 'temperature': 0.0, 'prefill_step_size': 4096, 'resize_shape': (1024, 1024)}
+GENERATE_KWARGS = {'max_tokens': 200, 'temperature': 0.0, 'prefill_step_size': 4096}
 model, processor = load(MODEL, **LOAD_KWARGS)
 result = generate(model, processor, PROMPT, image=IMAGE, **GENERATE_KWARGS)
 print(result.text)
@@ -63,10 +63,6 @@ Generation/load config:
   "generate_kwargs": {
     "max_tokens": 200,
     "prefill_step_size": 4096,
-    "resize_shape": [
-      1024,
-      1024
-    ],
     "temperature": 0.0
   },
   "image": "/Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg",
@@ -79,7 +75,7 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T201922Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -122,12 +118,12 @@ Optional advanced context:
 
 Observed signals:
 
-- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 22 occurrences).
-- Output contains corrupted or malformed text segments (character_loop: '9.' repeated).
+- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 41 occurrences).
+- Output contains corrupted or malformed text segments (character_loop: '.99' repeated).
 
 Sample output:
 
 ```text
-pomĠinĠaĠinĠaĠandĠinĠaØ¹ÙĨÙĪØ§ÙĨ.ĠinĠa.1zmann.ĠinĠa.1Ġin.Ġin.Ġin.Ġof.Ġof.99Q99Q.ĠinĠa.9.9.9.9.9.9.9.9.Ġin.9.9.9.Ġin.Ġin.9.9.9.9.9.9.9.Ġin.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9.9...
+pomĠavslĠon0ĠforĠon0Ġand.Ġ.ĊiduntçĦ¶åĲİè¯´ĠrÃ¶ĠinĠa.ĠinĠaĠand.ĠinĠaĠinĠaĠinĠaĠinĠa.ĠinĠaĠinĠaĠinĠaĠinĠaĠinĠaĠkontinent.ĠAPs.ĠinĠa.199Qs.99Q.199Q.199Q.11Q.199ĠasĠa.199.1.199.199.19.199.19.19.19.19.1...
 ```
 

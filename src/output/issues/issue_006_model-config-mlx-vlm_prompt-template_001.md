@@ -14,19 +14,19 @@
 
 | Model                                            | Observed Behavior   | Token Counts                                                                 | Optional Context                                                                                                                                                                                              |
 |--------------------------------------------------|---------------------|------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `LiquidAI/LFM2.5-VL-450M-MLX-bf16`               | generated_tokens~3  | prompt=269 \| output/prompt=1.12% \| nontext burden=98% \| stop=completed    | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T201922Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_model_config_mlx_vlm_prompt_template_001.json)               |
-| `mlx-community/GLM-4.6V-nvfp4`                   | generated_tokens~8  | prompt=790 \| output/prompt=1.01% \| nontext burden=99% \| stop=completed    | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T201922Z_004_mlx-community_GLM-4.6V-nvfp4_model_config_mlx_vlm_prompt_template_001.json)                   |
-| `mlx-community/Molmo-7B-D-0924-bf16`             | generated_tokens~3  | prompt=1,201 \| output/prompt=0.25% \| nontext burden=100% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T201922Z_007_mlx-community_Molmo-7B-D-0924-bf16_model_config_mlx_vlm_prompt_template_001.json)             |
-| `mlx-community/paligemma2-10b-ft-docci-448-6bit` | generated_tokens~6  | prompt=1,031 \| output/prompt=0.58% \| nontext burden=99% \| stop=completed  | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T201922Z_009_mlx-community_paligemma2-10b-ft-docci-448-6bit_model_config_mlx_vlm_prompt_template_001.json) |
-| `mlx-community/paligemma2-10b-ft-docci-448-bf16` | generated_tokens~6  | prompt=1,031 \| output/prompt=0.58% \| nontext burden=99% \| stop=completed  | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T201922Z_010_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json) |
+| `LiquidAI/LFM2.5-VL-450M-MLX-bf16`               | generated_tokens~3  | prompt=269 \| output/prompt=1.12% \| nontext burden=98% \| stop=completed    | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_model_config_mlx_vlm_prompt_template_001.json)               |
+| `mlx-community/InternVL3-8B-bf16`                | output/prompt=0.5%  | prompt=2,317 \| output/prompt=0.47% \| nontext burden=100% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_004_mlx-community_InternVL3-8B-bf16_model_config_mlx_vlm_prompt_template_001.json)                |
+| `mlx-community/Molmo-7B-D-0924-bf16`             | generated_tokens~3  | prompt=1,201 \| output/prompt=0.25% \| nontext burden=100% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_007_mlx-community_Molmo-7B-D-0924-bf16_model_config_mlx_vlm_prompt_template_001.json)             |
+| `mlx-community/paligemma2-10b-ft-docci-448-6bit` | generated_tokens~6  | prompt=1,031 \| output/prompt=0.58% \| nontext burden=99% \| stop=completed  | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_016_mlx-community_paligemma2-10b-ft-docci-448-6bit_model_config_mlx_vlm_prompt_template_001.json) |
+| `mlx-community/paligemma2-10b-ft-docci-448-bf16` | generated_tokens~6  | prompt=1,031 \| output/prompt=0.58% \| nontext burden=99% \| stop=completed  | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_017_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json) |
 
 
 ## Minimal Evidence
 
 - `LiquidAI/LFM2.5-VL-450M-MLX-bf16`: Output appears truncated to about 3 tokens.
 - Output excerpt: `í.`
-- `mlx-community/GLM-4.6V-nvfp4`: Output appears truncated to about 8 tokens.
-- Output excerpt: `NullIn co`
+- `mlx-community/InternVL3-8B-bf16`: Output is very short relative to prompt size (0.5%), suggesting possible early-stop or prompt-handling issues.
+- Output excerpt: `processors, the problem. Theorem: Theorem`
 
 
 ## Minimal Reproduction
@@ -36,11 +36,11 @@ These commands use `mlx-vlm` directly so the issue can be reproduced without ins
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model LiquidAI/LFM2.5-VL-450M-MLX-bf16 --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --resize-shape 1024 1024 --trust-remote-code --prefill-step-size 4096
-python -m mlx_vlm.generate --model mlx-community/GLM-4.6V-nvfp4 --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --resize-shape 1024 1024 --trust-remote-code --prefill-step-size 4096
-python -m mlx_vlm.generate --model mlx-community/Molmo-7B-D-0924-bf16 --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --resize-shape 1024 1024 --trust-remote-code --prefill-step-size 4096
-python -m mlx_vlm.generate --model mlx-community/paligemma2-10b-ft-docci-448-6bit --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --resize-shape 1024 1024 --trust-remote-code --prefill-step-size 4096
-python -m mlx_vlm.generate --model mlx-community/paligemma2-10b-ft-docci-448-bf16 --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --resize-shape 1024 1024 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model LiquidAI/LFM2.5-VL-450M-MLX-bf16 --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/InternVL3-8B-bf16 --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/Molmo-7B-D-0924-bf16 --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/paligemma2-10b-ft-docci-448-6bit --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/paligemma2-10b-ft-docci-448-bf16 --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 Minimal Python repro (representative model):
@@ -53,7 +53,7 @@ MODEL = 'LiquidAI/LFM2.5-VL-450M-MLX-bf16'
 IMAGE = '/Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg'
 PROMPT = 'Describe this image briefly.'
 LOAD_KWARGS = {'trust_remote_code': True}
-GENERATE_KWARGS = {'max_tokens': 200, 'temperature': 0.0, 'prefill_step_size': 4096, 'resize_shape': (1024, 1024)}
+GENERATE_KWARGS = {'max_tokens': 200, 'temperature': 0.0, 'prefill_step_size': 4096}
 model, processor = load(MODEL, **LOAD_KWARGS)
 result = generate(model, processor, PROMPT, image=IMAGE, **GENERATE_KWARGS)
 print(result.text)
@@ -72,10 +72,6 @@ Generation/load config:
   "generate_kwargs": {
     "max_tokens": 200,
     "prefill_step_size": 4096,
-    "resize_shape": [
-      1024,
-      1024
-    ],
     "temperature": 0.0
   },
   "image": "/Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg",
@@ -88,11 +84,11 @@ Generation/load config:
 
 Optional advanced context:
 
-- `LiquidAI/LFM2.5-VL-450M-MLX-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T201922Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/GLM-4.6V-nvfp4`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T201922Z_004_mlx-community_GLM-4.6V-nvfp4_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/Molmo-7B-D-0924-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T201922Z_007_mlx-community_Molmo-7B-D-0924-bf16_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T201922Z_009_mlx-community_paligemma2-10b-ft-docci-448-6bit_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T201922Z_010_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json)
+- `LiquidAI/LFM2.5-VL-450M-MLX-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/InternVL3-8B-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_004_mlx-community_InternVL3-8B-bf16_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/Molmo-7B-D-0924-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_007_mlx-community_Molmo-7B-D-0924-bf16_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_016_mlx-community_paligemma2-10b-ft-docci-448-6bit_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_017_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -143,16 +139,16 @@ Sample output:
 í.
 ```
 
-### `mlx-community/GLM-4.6V-nvfp4`
+### `mlx-community/InternVL3-8B-bf16`
 
 Observed signals:
 
-- Output appears truncated to about 8 tokens.
+- Output is very short relative to prompt size (0.5%), suggesting possible early-stop or prompt-handling issues.
 
 Sample output:
 
 ```text
-NullIn     co
+processors, the problem. Theorem: Theorem
 ```
 
 ### `mlx-community/Molmo-7B-D-0924-bf16`
