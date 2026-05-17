@@ -7,6 +7,8 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Refresh the AI-agent navigation line map for the current `src/check_models.py`
+  layout and test-suite size.
 - Calibrate Skylos quality thresholds and advisory ignores for the intentional
   single-file CLI, behavior-grouped tests, and package-local scan layout.
 - Add package-local Skylos gate/exclusion config for `src` scans and reduce the

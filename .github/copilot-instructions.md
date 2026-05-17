@@ -19,11 +19,11 @@ For one-off commands without activating: `conda run -n mlx-vlm python ...`.
 
 | File | Purpose | Size |
 | ------ | --------- | ------ |
-| `src/check_models.py` | **Single-file CLI monolith** (~20,100 lines). All logic lives here. | ★ primary edit target |
+| `src/check_models.py` | **Single-file CLI monolith** (~23,900 lines). All logic lives here. | ★ primary edit target |
 | `src/check_models_data/quality_config.yaml` | Runtime thresholds loaded by `load_quality_config()` | Edit thresholds here, not in Python |
 | `src/pyproject.toml` | Packaging, dependencies, tool config (ruff, mypy, pytest) | Update when adding imports |
 | `src/tests/conftest.py` | Shared fixtures: `test_image`, `minimal_test_image`, `realistic_test_image`, `folder_with_images`, etc. | Use existing fixtures |
-| `src/tests/test_*.py` | ~11,700 lines across ~36 test files | Add tests to existing files |
+| `src/tests/test_*.py` | ~15,100 lines across ~36 test files | Add tests to existing files |
 | `docs/IMPLEMENTATION_GUIDE.md` | Detailed coding standards and architecture decisions | Reference for conventions |
 | `src/README.md` | Full CLI docs, all flags, usage examples (~1,200 lines) | Reference for CLI behavior |
 
@@ -33,18 +33,19 @@ The file is organized in this order — use these landmarks to jump to the right
 
 | Section | Key contents | Approx. lines |
 | --------- | ------------- | --------------- |
-| Imports & env setup | `MISSING_DEPENDENCIES` dict, optional dep guards | 1–1228 |
-| Protocol types | `SupportsGenerationResult`, `SupportsExifIfd` | 1229–1348 |
-| Data classes | `PerformanceResult`, `ResultSet`, `ProcessImageParams` | 1349–1858 |
-| Timing & timeout | `PerfCounterTimer`, `TimeoutManager` | 1859–1983 |
-| Colors & logging | `Colors`, `LogStyles`, `ColoredFormatter` | 1984–2532 |
-| Quality/harness detection | `_detect_repetitive_output`, `_detect_hallucination_patterns`, harness detectors | 2533–4260 |
-| Advanced metrics | `compute_vocabulary_diversity`, `compute_efficiency_metrics`, `compute_cataloging_utility` | 4261–5873 |
-| Field formatting | `format_field_value` (centralized display normalization) | 5874–6100 |
-| Diagnostics/report generators | `generate_diagnostics_report` (~12253), `generate_html_report` (~12713), `generate_markdown_report` (~13021) | 9500–13700 |
-| Image processing | `process_image_with_model` (~15238) | 15238–18479 |
-| Run history/finalization | `compare_history_records`, `append_history_record`, `finalize_execution` | 18480–19588 |
-| CLI parsing | `main()` (~19589), `main_cli()` (~19726) | 19589–20137 |
+| Imports, config & optional dependency guards | `MISSING_DEPENDENCIES`, `QualityThresholds`, `load_quality_config()` | 1–759 |
+| Type aliases, protocols & JSONL records | `SupportsGenerationResult`, `SupportsExifIfd`, `JsonlResultRecord` | 760–1513 |
+| App constants & core result types | `PerformanceResult`, `ResultSet`, `ProcessImageParams`, report block primitives | 1514–2532 |
+| Timing, logging & Rich console plumbing | `PerfCounterTimer`, `TimeoutManager`, `LogStyles`, `StyleAwareRichHandler` | 2533–2921 |
+| Formatting, escaping & detector helpers | `fmt_num`, report escapers, `_detect_repetitive_output`, harness detectors | 2922–4866 |
+| Metrics, scoring & field formatting | `compute_vocabulary_diversity`, `compute_cataloging_utility`, `analyze_generation_text`, `format_field_value` | 4875–6774 |
+| Console, system & image metadata helpers | CLI Rich helpers, library/system info, EXIF/XMP extraction | 6775–11133 |
+| Diagnostics/report context builders | `DiagnosticsConfig`, `IssueCluster`, `ReportRenderContext`, repro command specs | 11134–14330 |
+| Report generators & runtime fingerprints | `generate_diagnostics_report` (~14331), `generate_html_report` (~14765), `generate_markdown_report` (~15036), `collect_runtime_fingerprint()` | 14331–15804 |
+| Model processing | CLI argument validation, cache scan, `_load_model`, `process_image_with_model` (~17597) | 15805–17741 |
+| CLI run helpers & logging | `setup_environment`, `find_and_validate_image`, `process_models`, result logging | 17742–19346 |
+| Result enrichment/history/finalization | quality enrichment, JSONL/history, issue drafts, repro bundles, `finalize_execution` (~23178) | 19347–23299 |
+| Main orchestration & argparse | `main()` (~23306), `main_cli()` (~23452), `_build_cli_parser()` (~23499) | 23301–23912 |
 
 ### 4. Architecture & patterns
 
@@ -129,7 +130,7 @@ relevant `SKILL.md` **before** starting work of that kind.
 
 **Add a CLI flag:**
 
-1. Add `argparse` argument near line ~19800 in `src/check_models.py`
+1. Add `argparse` argument in `_build_cli_parser()` near line ~23500 in `src/check_models.py`
 2. Wire it through `main()` → `process_image_with_model()` or relevant function
 3. Add test in `src/tests/test_parameter_validation.py`
 4. Update the CLI reference table in `src/README.md` (§ Command Line Reference)
@@ -137,18 +138,18 @@ relevant `SKILL.md` **before** starting work of that kind.
 
 **Change a quality threshold:**
 
-1. Edit `src/check_models_data/quality_config.yaml` (preferred) or `QualityThresholds` dataclass (~line 1400)
+1. Edit `src/check_models_data/quality_config.yaml` (preferred) or `QualityThresholds` dataclass (~line 253)
 2. Run `pytest src/tests/test_quality_analysis.py -q`
 
 **Modify report output:**
 
-1. Edit `generate_html_report` (~line 12713) or `generate_markdown_report` (~line 13021)
+1. Edit `generate_html_report` (~line 14765) or `generate_markdown_report` (~line 15036)
 2. Update `src/output/` fixture files if test assertions reference them
 3. Run `pytest src/tests/test_html_formatting.py src/tests/test_markdown_formatting.py -q`
 
 **Add a new quality detector:**
 
-1. Add `_detect_your_pattern(text: str) -> tuple[bool, str | None]` following existing patterns (~line 2533–4260)
+1. Add `_detect_your_pattern(text: str) -> tuple[bool, str | None]` following existing patterns (~line 3120–4866)
 2. Wire it into the quality analysis pipeline
 3. Add thresholds to `src/check_models_data/quality_config.yaml` and `QualityThresholds`
 4. Add test in `src/tests/test_quality_analysis.py`
