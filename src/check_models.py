@@ -6313,36 +6313,34 @@ class GenerationQualityAnalysis:
 
     def has_any_issues(self) -> bool:
         """Return True if any quality issues were detected."""
-        has_contract_violation = (
-            bool(self.missing_sections)
-            or self.has_title_length_violation
-            or self.has_description_sentence_violation
-            or self.has_keyword_count_violation
-            or self.has_keyword_duplication_violation
+        issue_flags = (
+            self.is_repetitive,
+            bool(self.hallucination_issues),
+            self.is_verbose,
+            bool(self.formatting_issues),
+            self.has_excessive_bullets,
+            self.is_context_ignored,
+            self.is_refusal,
+            self.is_generic,
+            self.has_language_mixing,
+            self.has_degeneration,
+            self.has_fabrication,
+            self.text_sanity_issue_type is not None,
+            self.generation_loop_type is not None,
+            self.metadata_alignment_issue is not None,
+            bool(self.missing_sections),
+            self.has_title_length_violation,
+            self.has_description_sentence_violation,
+            self.has_keyword_count_violation,
+            self.has_keyword_duplication_violation,
+            self.has_reasoning_leak,
+            self.has_context_echo,
+            self.has_harness_issue,
+            self.instruction_echo,
+            self.metadata_borrowing,
+            self.verdict != "clean",
         )
-        return (
-            self.is_repetitive
-            or bool(self.hallucination_issues)
-            or self.is_verbose
-            or bool(self.formatting_issues)
-            or self.has_excessive_bullets
-            or self.is_context_ignored
-            or self.is_refusal
-            or self.is_generic
-            or self.has_language_mixing
-            or self.has_degeneration
-            or self.has_fabrication
-            or self.text_sanity_issue_type is not None
-            or self.generation_loop_type is not None
-            or self.metadata_alignment_issue is not None
-            or has_contract_violation
-            or self.has_reasoning_leak
-            or self.has_context_echo
-            or self.has_harness_issue
-            or self.instruction_echo
-            or self.metadata_borrowing
-            or self.verdict != "clean"
-        )
+        return any(issue_flags)
 
     @property
     def issues(self) -> list[str]:
@@ -6637,6 +6635,35 @@ def _analysis_has_contract_issue(analysis: GenerationQualityAnalysis) -> bool:
     )
 
 
+def _prompt_signals_have_contract_issue(prompt_signals: PromptQualitySignals) -> bool:
+    """Return whether prompt-derived contract signals violate catalog expectations."""
+    return bool(prompt_signals.missing_sections) or any(
+        (
+            prompt_signals.title_word_count is not None
+            and not (
+                QUALITY.min_title_words
+                <= prompt_signals.title_word_count
+                <= QUALITY.max_title_words
+            ),
+            prompt_signals.description_sentence_count is not None
+            and not (
+                QUALITY.min_description_sentences
+                <= prompt_signals.description_sentence_count
+                <= QUALITY.max_description_sentences
+            ),
+            prompt_signals.keyword_count is not None
+            and not (
+                QUALITY.min_keywords_count
+                <= prompt_signals.keyword_count
+                <= QUALITY.max_keywords_count
+            ),
+            prompt_signals.keyword_duplication_ratio is not None
+            and prompt_signals.keyword_duplication_ratio
+            >= QUALITY.keyword_duplication_ratio_threshold,
+        ),
+    )
+
+
 def analyze_generation_text(
     text: str,
     generated_tokens: int,
@@ -6756,31 +6783,7 @@ def analyze_generation_text(
     ):
         verdict = "unknown_runtime_anomaly"
         review_evidence.append("utility:F")
-    has_contract_issue = bool(prompt_signals.missing_sections) or any(
-        (
-            prompt_signals.title_word_count is not None
-            and not (
-                QUALITY.min_title_words
-                <= prompt_signals.title_word_count
-                <= QUALITY.max_title_words
-            ),
-            prompt_signals.description_sentence_count is not None
-            and not (
-                QUALITY.min_description_sentences
-                <= prompt_signals.description_sentence_count
-                <= QUALITY.max_description_sentences
-            ),
-            prompt_signals.keyword_count is not None
-            and not (
-                QUALITY.min_keywords_count
-                <= prompt_signals.keyword_count
-                <= QUALITY.max_keywords_count
-            ),
-            prompt_signals.keyword_duplication_ratio is not None
-            and prompt_signals.keyword_duplication_ratio
-            >= QUALITY.keyword_duplication_ratio_threshold,
-        ),
-    )
+    has_contract_issue = _prompt_signals_have_contract_issue(prompt_signals)
     owner = _classify_review_owner(
         harness_type=harness_signals.harness_type,
         failure_owner=None,
