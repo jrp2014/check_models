@@ -75,6 +75,9 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Add `.python-version` and update `.vscode/settings.json` to help IDE static
+  analysis extensions (like Pyright) automatically discover and resolve the
+  `mlx-vlm` Conda environment.
 - Remove the unused `check_conda_env()` validation wrapper while keeping the
   strict expected-environment check used by the validation entrypoint.
 - Escape lone ordered-list markers in generated Markdown blockquotes so model
