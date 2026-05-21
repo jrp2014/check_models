@@ -665,8 +665,8 @@ class TestMarkdownReportEdgeCases:
         assert "[check_models.log](check_models.log)" in content
         assert "model_gallery.md#model-org-good" in content
 
-        # Now test absolute github links when _LINK_STYLE is "github"
-        with patch("check_models._LINK_STYLE", "github"):
+        # Now test absolute github links when the link-style state is "github"
+        with patch.object(check_models._LinkStyleState, "value", "github"):
             generate_markdown_report(
                 results=[_make_quality_success("org/good", with_quality_issue=True)],
                 filename=out,
@@ -852,8 +852,8 @@ class TestMarkdownGalleryReport:
         assert "issues/index.md" in content
         assert "../issues/index.md" in content
 
-        # Now test absolute github links when _LINK_STYLE is "github"
-        with patch("check_models._LINK_STYLE", "github"):
+        # Now test absolute github links when the link-style state is "github"
+        with patch.object(check_models._LinkStyleState, "value", "github"):
             generate_review_report(
                 results=results,
                 filename=out,
@@ -1499,8 +1499,8 @@ class TestDiagnosticsReport:
         assert "issues/index.md" in content
         assert "../issues/index.md" in content
 
-        # Now test absolute github links when _LINK_STYLE is "github"
-        with patch("check_models._LINK_STYLE", "github"):
+        # Now test absolute github links when the link-style state is "github"
+        with patch.object(check_models._LinkStyleState, "value", "github"):
             generate_diagnostics_report(
                 results=[
                     _make_failure_with_details(
@@ -3567,8 +3567,8 @@ class TestGithubIssueReportContent:
         assert "Traceback (most recent call last)" in content
         assert "[optional JSON](../repro_bundles/broken.json)" in content
 
-        # Now test absolute github links when _LINK_STYLE is "github"
-        with patch("check_models._LINK_STYLE", "github"):
+        # Now test absolute github links when the link-style state is "github"
+        with patch.object(check_models._LinkStyleState, "value", "github"):
             generated_github = _generate_github_issue_reports(
                 diagnostics_snapshot=snapshot,
                 output_dir=tmp_path,
