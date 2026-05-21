@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-_Generated on 2026-05-17 22:38:17 BST_
+_Generated on 2026-05-21 23:12:48 BST_
 
 A review-friendly artifact with image metadata, the source prompt, and full
 generated output for each model.
@@ -11,18 +11,18 @@ _Action Snapshot: see [results.md](results.md) for the full summary._
 
 ### Strong Candidates
 
-- `mlx-community/nanoLLaVA-1.5-4bit`: ✅ B (75/100) | Desc 87 | Keywords 0 | 364.2 tps
-- `qnguyen3/nanoLLaVA`: ✅ B (75/100) | Desc 90 | Keywords 0 | 112.3 tps
-- `mlx-community/paligemma2-3b-ft-docci-448-bf16`: ✅ B (75/100) | Desc 90 | Keywords 0 | 19.7 tps
+- `mlx-community/nanoLLaVA-1.5-4bit`: ✅ B (75/100) | Desc 87 | Keywords 0 | 374.3 tps
+- `qnguyen3/nanoLLaVA`: ✅ B (75/100) | Desc 90 | Keywords 0 | 114.8 tps
+- `mlx-community/paligemma2-3b-ft-docci-448-bf16`: ✅ B (75/100) | Desc 90 | Keywords 0 | 19.6 tps
 - `mlx-community/MolmoPoint-8B-fp16`: ✅ B (73/100) | Desc 86 | Keywords 0 | 6.0 tps
-- `mlx-community/FastVLM-0.5B-bf16`: ✅ B (68/100) | Desc 87 | Keywords 0 | 353.3 tps
+- `mlx-community/FastVLM-0.5B-bf16`: ✅ B (68/100) | Desc 87 | Keywords 0 | 351.9 tps
 
 ### Watchlist
 
-- `LiquidAI/LFM2.5-VL-450M-MLX-bf16`: ❌ F (0/100) | Desc 0 | Keywords 0 | 573.6 tps | harness
-- `mlx-community/Molmo-7B-D-0924-bf16`: ❌ F (0/100) | Desc 0 | Keywords 0 | 18.5 tps | harness
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (0/100) | Desc 60 | Keywords 0 | 31.5 tps | degeneration, generation loop, harness
-- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: ❌ F (5/100) | Desc 44 | Keywords 0 | 37.6 tps | harness
+- `LiquidAI/LFM2.5-VL-450M-MLX-bf16`: ❌ F (0/100) | Desc 0 | Keywords 0 | 494.7 tps | harness
+- `mlx-community/Molmo-7B-D-0924-bf16`: ❌ F (0/100) | Desc 0 | Keywords 0 | 20.4 tps | harness
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (0/100) | Desc 60 | Keywords 0 | 32.0 tps | degeneration, generation loop, harness
+- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: ❌ F (5/100) | Desc 44 | Keywords 0 | 40.1 tps | harness
 - `mlx-community/paligemma2-10b-ft-docci-448-bf16`: ❌ F (5/100) | Desc 44 | Keywords 0 | 6.4 tps | harness
 
 ## 🚨 Failures by Package (Actionable)
@@ -132,10 +132,10 @@ ModuleNotFoundError: No module named 'mlx_lm.models.pe_audio_video'
 During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17680, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17830, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17082, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17232, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -145,8 +145,18 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 443, in load
-    model = load_model(model_path, lazy, **kwargs)
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 892, in _typed_mlx_vlm_load
+    loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
+                                               ~~~~~~~~~~~~~^
+        path_or_hf_repo=path_or_hf_repo,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 446, in load
+    model = load_model(model_path, lazy, strict=strict, **kwargs)
   File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 264, in load_model
     model_config = model_class.ModelConfig.from_dict(config)
   File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/text_only.py", line 39, in from_dict
@@ -159,7 +169,7 @@ ValueError: Model type pe_audio_video not supported.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17877, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 18027, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -170,7 +180,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17690, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17840, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Model type pe_audio_video not supported.
 ```
@@ -210,10 +220,10 @@ _Error details:_
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17680, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17830, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17082, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17232, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -223,8 +233,18 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 443, in load
-    model = load_model(model_path, lazy, **kwargs)
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 892, in _typed_mlx_vlm_load
+    loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
+                                               ~~~~~~~~~~~~~^
+        path_or_hf_repo=path_or_hf_repo,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 446, in load
+    model = load_model(model_path, lazy, strict=strict, **kwargs)
   File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 367, in load_model
     model.load_weights(list(weights.items()))
     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
@@ -241,7 +261,7 @@ multi_modal_projector.linear_2.scales.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17877, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 18027, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -252,7 +272,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17690, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17840, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 4 parameters not in model:
 multi_modal_projector.linear_1.biases,
@@ -294,10 +314,10 @@ _Error details:_
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17680, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17830, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17082, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17232, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -307,8 +327,18 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 443, in load
-    model = load_model(model_path, lazy, **kwargs)
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 892, in _typed_mlx_vlm_load
+    loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
+                                               ~~~~~~~~~~~~~^
+        path_or_hf_repo=path_or_hf_repo,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 446, in load
+    model = load_model(model_path, lazy, strict=strict, **kwargs)
   File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 367, in load_model
     model.load_weights(list(weights.items()))
     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
@@ -321,7 +351,7 @@ multi_modal_projector.layer_norm.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17877, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 18027, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -332,7 +362,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17690, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17840, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Missing 2 parameters:
 multi_modal_projector.layer_norm.bias,
@@ -354,8 +384,8 @@ multi_modal_projector.layer_norm.weight.
   burden=98%
 - _Score:_ ❌ F (0/100); Empty or minimal output
 - _Review focus:_ watchlist (harness)
-- _Timing:_ Load 0.36s; Gen 0.29s; Total 0.85s
-- _Throughput:_ Prompt 8,674 TPS (269 tok); Gen 574 TPS (3 tok)
+- _Timing:_ Load 0.35s; Gen 0.30s; Total 0.84s
+- _Throughput:_ Prompt 7,937 TPS (269 tok); Gen 495 TPS (3 tok)
 - _Tokens:_ prompt 269 tok; estimated text 6 tok; estimated non-text 263 tok;
   generated 3 tok; requested max 200 tok; stop reason completed
 
@@ -381,8 +411,8 @@ multi_modal_projector.layer_norm.weight.
 - _Key signals:_ nontext prompt burden=73%
 - _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 0.53s; Gen 0.71s; Total 1.45s
-- _Throughput:_ Prompt 270 TPS (22 tok); Gen 364 TPS (99 tok)
+- _Timing:_ Load 0.47s; Gen 0.70s; Total 1.38s
+- _Throughput:_ Prompt 323 TPS (22 tok); Gen 374 TPS (99 tok)
 - _Tokens:_ prompt 22 tok; estimated text 6 tok; estimated non-text 16 tok;
   generated 99 tok; requested max 200 tok; stop reason completed
 
@@ -412,8 +442,8 @@ _Quality Status:_ no quality issues detected in this run
   token=and
 - _Score:_ 🟠 D (45/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff, generation loop, repetitive)
-- _Timing:_ Load 0.62s; Gen 0.97s; Total 1.79s
-- _Throughput:_ Prompt 2,838 TPS (269 tok); Gen 333 TPS (200 tok)
+- _Timing:_ Load 0.47s; Gen 0.96s; Total 1.63s
+- _Throughput:_ Prompt 2,842 TPS (269 tok); Gen 333 TPS (200 tok)
 - _Tokens:_ prompt 269 tok; estimated text 6 tok; estimated non-text 263 tok;
   generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -450,8 +480,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=77%
 - _Score:_ ✅ B (68/100); Keywords are not specific or diverse enough
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 0.61s; Gen 1.00s; Total 1.82s
-- _Throughput:_ Prompt 276 TPS (26 tok); Gen 353 TPS (35 tok)
+- _Timing:_ Load 0.59s; Gen 1.00s; Total 1.80s
+- _Throughput:_ Prompt 168 TPS (26 tok); Gen 352 TPS (35 tok)
 - _Tokens:_ prompt 26 tok; estimated text 6 tok; estimated non-text 20 tok;
   generated 35 tok; requested max 200 tok; stop reason completed
 
@@ -473,8 +503,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=73%
 - _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 0.56s; Gen 1.12s; Total 1.89s
-- _Throughput:_ Prompt 185 TPS (22 tok); Gen 112 TPS (71 tok)
+- _Timing:_ Load 0.53s; Gen 1.10s; Total 1.82s
+- _Throughput:_ Prompt 206 TPS (22 tok); Gen 115 TPS (71 tok)
 - _Tokens:_ prompt 22 tok; estimated text 6 tok; estimated non-text 16 tok;
   generated 71 tok; requested max 200 tok; stop reason completed
 
@@ -502,8 +532,8 @@ _Quality Status:_ no quality issues detected in this run
   burden=99%
 - _Score:_ ❌ F (5/100); Output too short to be useful
 - _Review focus:_ watchlist (harness)
-- _Timing:_ Load 1.68s; Gen 1.30s; Total 3.19s
-- _Throughput:_ Prompt 1,314 TPS (1,031 tok); Gen 37.6 TPS (6 tok)
+- _Timing:_ Load 1.57s; Gen 1.29s; Total 3.07s
+- _Throughput:_ Prompt 1,311 TPS (1,031 tok); Gen 40.1 TPS (6 tok)
 - _Tokens:_ prompt 1031 tok; estimated text 6 tok; estimated non-text 1025
   tok; generated 6 tok; requested max 200 tok; stop reason completed
 
@@ -533,8 +563,8 @@ _Quality Status:_ no quality issues detected in this run
   output/prompt=0.22%; nontext prompt burden=100%
 - _Score:_ ❌ F (16/100); Output lacks detail
 - _Review focus:_ watchlist (harness, long context)
-- _Timing:_ Load 1.15s; Gen 1.62s; Total 2.99s
-- _Throughput:_ Prompt 3,729 TPS (4,103 tok); Gen 64.5 TPS (9 tok)
+- _Timing:_ Load 1.13s; Gen 1.63s; Total 2.98s
+- _Throughput:_ Prompt 3,708 TPS (4,103 tok); Gen 62.0 TPS (9 tok)
 - _Tokens:_ prompt 4103 tok; estimated text 6 tok; estimated non-text 4097
   tok; generated 9 tok; requested max 200 tok; stop reason completed
 
@@ -564,8 +594,8 @@ _Quality Status:_ no quality issues detected in this run
   burden=100%
 - _Score:_ ❌ F (16/100); Output lacks detail
 - _Review focus:_ watchlist (harness)
-- _Timing:_ Load 1.74s; Gen 1.81s; Total 3.76s
-- _Throughput:_ Prompt 2,096 TPS (2,317 tok); Gen 36.9 TPS (11 tok)
+- _Timing:_ Load 1.69s; Gen 1.81s; Total 3.70s
+- _Throughput:_ Prompt 2,085 TPS (2,317 tok); Gen 37.3 TPS (11 tok)
 - _Tokens:_ prompt 2317 tok; estimated text 6 tok; estimated non-text 2311
   tok; generated 11 tok; requested max 200 tok; stop reason completed
 
@@ -592,8 +622,8 @@ _Quality Status:_ no quality issues detected in this run
   token=phrase: "rew rew rew rew..."
 - _Score:_ 🟠 D (45/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff, generation loop, repetitive)
-- _Timing:_ Load 1.56s; Gen 2.27s; Total 4.05s
-- _Throughput:_ Prompt 1,046 TPS (266 tok); Gen 119 TPS (200 tok)
+- _Timing:_ Load 1.40s; Gen 2.25s; Total 3.86s
+- _Throughput:_ Prompt 957 TPS (266 tok); Gen 121 TPS (200 tok)
 - _Tokens:_ prompt 266 tok; estimated text 6 tok; estimated non-text 260 tok;
   generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -626,8 +656,8 @@ _Quality Status:_ no quality issues detected in this run
   token=phrase: "saff saff saff saff..."
 - _Score:_ 🟠 D (45/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff, generation loop, repetitive)
-- _Timing:_ Load 0.59s; Gen 2.33s; Total 3.15s
-- _Throughput:_ Prompt 288 TPS (97 tok); Gen 133 TPS (200 tok)
+- _Timing:_ Load 0.64s; Gen 2.33s; Total 3.18s
+- _Throughput:_ Prompt 291 TPS (97 tok); Gen 130 TPS (200 tok)
 - _Tokens:_ prompt 97 tok; estimated text 6 tok; estimated non-text 91 tok;
   generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -670,7 +700,7 @@ _Quality Status:_ no quality issues detected in this run
   token=phrase: ". . . ...."
 - _Score:_ 🟠 D (44/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff, generation loop, repetitive)
-- _Timing:_ Load 0.93s; Gen 2.39s; Total 3.54s
+- _Timing:_ Load 0.91s; Gen 2.38s; Total 3.51s
 - _Throughput:_ Prompt 2,391 TPS (2,277 tok); Gen 192 TPS (200 tok)
 - _Tokens:_ prompt 2277 tok; estimated text 6 tok; estimated non-text 2271
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
@@ -692,9 +722,9 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-huggingfacetb-smolvlm-instruct"></a>
+<a id="model-mlx-community-smolvlm-instruct-bf16"></a>
 
-### ✅ HuggingFaceTB/SmolVLM-Instruct
+### ✅ mlx-community/SmolVLM-Instruct-bf16
 
 - _Recommendation:_ avoid for now; review verdict: cutoff degraded
 - _Owner:_ likely owner `model`
@@ -703,8 +733,8 @@ _Quality Status:_ no quality issues detected in this run
   token=phrase: "ter budget ter budget..."
 - _Score:_ 🟠 D (45/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff, generation loop, repetitive)
-- _Timing:_ Load 0.46s; Gen 2.43s; Total 3.09s
-- _Throughput:_ Prompt 2,821 TPS (1,196 tok); Gen 128 TPS (200 tok)
+- _Timing:_ Load 0.59s; Gen 2.45s; Total 3.25s
+- _Throughput:_ Prompt 2,798 TPS (1,196 tok); Gen 127 TPS (200 tok)
 - _Tokens:_ prompt 1196 tok; estimated text 6 tok; estimated non-text 1190
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -746,8 +776,8 @@ _Quality Status:_ no quality issues detected in this run
   burden=99%
 - _Score:_ ❌ F (5/100); Output too short to be useful
 - _Review focus:_ watchlist (harness)
-- _Timing:_ Load 2.44s; Gen 2.45s; Total 5.13s
-- _Throughput:_ Prompt 905 TPS (1,031 tok); Gen 6.44 TPS (6 tok)
+- _Timing:_ Load 2.46s; Gen 2.46s; Total 5.14s
+- _Throughput:_ Prompt 908 TPS (1,031 tok); Gen 6.43 TPS (6 tok)
 - _Tokens:_ prompt 1031 tok; estimated text 6 tok; estimated non-text 1025
   tok; generated 6 tok; requested max 200 tok; stop reason completed
 
@@ -763,40 +793,9 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-gemma-4-26b-a4b-it-4bit"></a>
+<a id="model-huggingfacetb-smolvlm-instruct"></a>
 
-### ✅ mlx-community/gemma-4-26b-a4b-it-4bit
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ hit token cap (200); nontext prompt burden=98%;
-  degeneration=character_loop: '/1' repeated
-- _Score:_ ❌ F (17/100); Output lacks detail
-- _Review focus:_ watchlist (cutoff, degeneration, generation loop)
-- _Timing:_ Load 2.34s; Gen 2.53s; Total 5.10s
-- _Throughput:_ Prompt 612 TPS (284 tok); Gen 117 TPS (200 tok)
-- _Tokens:_ prompt 284 tok; estimated text 6 tok; estimated non-text 278 tok;
-  generated 200 tok; requested max 200 tok; stop reason max_tokens
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> да3-y up 2%91 $ 1:1--$ $ \l {etsile-1-trent-1erorongeran \alle
-> l'ersh1-3h1-10ר1:t1到1り得る3-1/d/1-1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Output degeneration (character_loop: '/1' repeated)
-- Text sanity issue (numeric_loop)
-- Generation loop (numeric_loop)
-- Likely capped by max token budget
-
----
-
-<a id="model-mlx-community-smolvlm-instruct-bf16"></a>
-
-### ✅ mlx-community/SmolVLM-Instruct-bf16
+### ✅ HuggingFaceTB/SmolVLM-Instruct
 
 - _Recommendation:_ avoid for now; review verdict: cutoff degraded
 - _Owner:_ likely owner `model`
@@ -805,8 +804,8 @@ _Quality Status:_ no quality issues detected in this run
   token=phrase: "ter budget ter budget..."
 - _Score:_ 🟠 D (45/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff, generation loop, repetitive)
-- _Timing:_ Load 0.65s; Gen 2.58s; Total 3.44s
-- _Throughput:_ Prompt 2,781 TPS (1,196 tok); Gen 122 TPS (200 tok)
+- _Timing:_ Load 0.66s; Gen 2.49s; Total 3.35s
+- _Throughput:_ Prompt 2,685 TPS (1,196 tok); Gen 124 TPS (200 tok)
 - _Tokens:_ prompt 1196 tok; estimated text 6 tok; estimated non-text 1190
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -837,6 +836,37 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-gemma-4-26b-a4b-it-4bit"></a>
+
+### ✅ mlx-community/gemma-4-26b-a4b-it-4bit
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ hit token cap (200); nontext prompt burden=98%;
+  degeneration=character_loop: '/1' repeated
+- _Score:_ ❌ F (17/100); Output lacks detail
+- _Review focus:_ watchlist (cutoff, degeneration, generation loop)
+- _Timing:_ Load 2.72s; Gen 2.50s; Total 5.45s
+- _Throughput:_ Prompt 619 TPS (284 tok); Gen 118 TPS (200 tok)
+- _Tokens:_ prompt 284 tok; estimated text 6 tok; estimated non-text 278 tok;
+  generated 200 tok; requested max 200 tok; stop reason max_tokens
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> да3-y up 2%91 $ 1:1--$ $ \l {etsile-1-trent-1erorongeran \alle
+> l'ersh1-3h1-10ר1:t1到1り得る3-1/d/1-1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Output degeneration (character_loop: '/1' repeated)
+- Text sanity issue (numeric_loop)
+- Generation loop (numeric_loop)
+- Likely capped by max token budget
+
+---
+
 <a id="model-microsoft-phi-35-vision-instruct"></a>
 
 ### ✅ microsoft/Phi-3.5-vision-instruct
@@ -847,8 +877,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ hit token cap (200); nontext prompt burden=99%
 - _Score:_ ❌ F (30/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (Keywords are not specific or diverse enough)
-- _Timing:_ Load 1.02s; Gen 4.08s; Total 5.30s
-- _Throughput:_ Prompt 2,594 TPS (770 tok); Gen 57.5 TPS (200 tok)
+- _Timing:_ Load 0.89s; Gen 3.97s; Total 5.07s
+- _Throughput:_ Prompt 2,618 TPS (770 tok); Gen 59.3 TPS (200 tok)
 - _Tokens:_ prompt 770 tok; estimated text 6 tok; estimated non-text 764 tok;
   generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -881,8 +911,8 @@ _Quality Status:_ no quality issues detected in this run
   leak
 - _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff, reasoning leak)
-- _Timing:_ Load 2.01s; Gen 4.09s; Total 6.31s
-- _Throughput:_ Prompt 1,206 TPS (1,033 tok); Gen 72.3 TPS (200 tok)
+- _Timing:_ Load 1.97s; Gen 3.97s; Total 6.16s
+- _Throughput:_ Prompt 1,266 TPS (1,033 tok); Gen 72.9 TPS (200 tok)
 - _Tokens:_ prompt 1033 tok; estimated text 6 tok; estimated non-text 1027
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -923,8 +953,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ hit token cap (200); nontext prompt burden=99%
 - _Score:_ ❌ F (30/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (Keywords are not specific or diverse enough)
-- _Timing:_ Load 0.90s; Gen 4.09s; Total 5.21s
-- _Throughput:_ Prompt 2,673 TPS (770 tok); Gen 57.3 TPS (200 tok)
+- _Timing:_ Load 0.90s; Gen 4.04s; Total 5.15s
+- _Throughput:_ Prompt 2,685 TPS (770 tok); Gen 57.9 TPS (200 tok)
 - _Tokens:_ prompt 770 tok; estimated text 6 tok; estimated non-text 764 tok;
   generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -956,8 +986,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=99%
 - _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 1.45s; Gen 4.62s; Total 6.28s
-- _Throughput:_ Prompt 2,697 TPS (1,031 tok); Gen 19.7 TPS (76 tok)
+- _Timing:_ Load 1.40s; Gen 4.63s; Total 6.23s
+- _Throughput:_ Prompt 2,690 TPS (1,031 tok); Gen 19.6 TPS (76 tok)
 - _Tokens:_ prompt 1031 tok; estimated text 6 tok; estimated non-text 1025
   tok; generated 76 tok; requested max 200 tok; stop reason completed
 
@@ -983,8 +1013,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ hit token cap (200); nontext prompt burden=98%
 - _Score:_ ❌ F (6/100); Output too short to be useful
 - _Review focus:_ watchlist (cutoff)
-- _Timing:_ Load 2.26s; Gen 4.76s; Total 7.24s
-- _Throughput:_ Prompt 826 TPS (274 tok); Gen 48.7 TPS (200 tok)
+- _Timing:_ Load 2.22s; Gen 4.76s; Total 7.20s
+- _Throughput:_ Prompt 829 TPS (274 tok); Gen 48.7 TPS (200 tok)
 - _Tokens:_ prompt 274 tok; estimated text 6 tok; estimated non-text 268 tok;
   generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1012,8 +1042,8 @@ _Quality Status:_ no quality issues detected in this run
   token=phrase: "1st 1st 1st 1st..."
 - _Score:_ 🟡 C (55/100); Lacks visual description of image
 - _Review focus:_ watchlist (cutoff, generation loop, repetitive)
-- _Timing:_ Load 1.34s; Gen 5.46s; Total 7.02s
-- _Throughput:_ Prompt 1,090 TPS (2,278 tok); Gen 67.1 TPS (200 tok)
+- _Timing:_ Load 1.33s; Gen 5.49s; Total 7.04s
+- _Throughput:_ Prompt 1,061 TPS (2,278 tok); Gen 67.7 TPS (200 tok)
 - _Tokens:_ prompt 2278 tok; estimated text 6 tok; estimated non-text 2272
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1037,6 +1067,34 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
+
+### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ hit token cap (200); nontext prompt burden=100%
+- _Score:_ ❌ F (16/100); Output lacks detail
+- _Review focus:_ watchlist (cutoff)
+- _Timing:_ Load 4.98s; Gen 6.24s; Total 11.60s
+- _Throughput:_ Prompt 653 TPS (1,270 tok); Gen 53.8 TPS (200 tok)
+- _Tokens:_ prompt 1270 tok; estimated text 6 tok; estimated non-text 1264
+  tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> bathasciasci
+> @@日に券年期ļ夫日起折痕而起瘾INSNLA族的owiehcihciowiehcihcihci讳佣佣佣豆年期登陆xhci讳族佣豆年期ļ @@形的大陆
+> Rheinicianservesiccihci讳痕匙族佣体内的 Rhein讳分校WebKit @@形的登陆asciicci讳 RFTDIC讳巨阙
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Likely capped by max token budget
+
+---
+
 <a id="model-mlx-community-llava-v16-mistral-7b-8bit"></a>
 
 ### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
@@ -1048,8 +1106,8 @@ _Quality Status:_ no quality issues detected in this run
   token=phrase: "out of course. out..."
 - _Score:_ 🟠 D (45/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff, generation loop, repetitive)
-- _Timing:_ Load 0.93s; Gen 6.22s; Total 7.37s
-- _Throughput:_ Prompt 736 TPS (1,866 tok); Gen 62.2 TPS (200 tok)
+- _Timing:_ Load 0.92s; Gen 6.42s; Total 7.55s
+- _Throughput:_ Prompt 683 TPS (1,866 tok); Gen 62.1 TPS (200 tok)
 - _Tokens:_ prompt 1866 tok; estimated text 6 tok; estimated non-text 1860
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1086,8 +1144,8 @@ _Quality Status:_ no quality issues detected in this run
   formatting=Unknown tags: &lt;td&gt;
 - _Score:_ 🟠 D (45/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff)
-- _Timing:_ Load 2.33s; Gen 7.59s; Total 10.13s
-- _Throughput:_ Prompt 332 TPS (275 tok); Gen 31.1 TPS (200 tok)
+- _Timing:_ Load 2.29s; Gen 7.66s; Total 10.17s
+- _Throughput:_ Prompt 330 TPS (275 tok); Gen 30.8 TPS (200 tok)
 - _Tokens:_ prompt 275 tok; estimated text 6 tok; estimated non-text 269 tok;
   generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1127,8 +1185,8 @@ _Quality Status:_ no quality issues detected in this run
   token=comm,
 - _Score:_ 🟠 D (45/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff, generation loop, repetitive)
-- _Timing:_ Load 2.05s; Gen 8.19s; Total 10.49s
-- _Throughput:_ Prompt 1,829 TPS (2,327 tok); Gen 31.4 TPS (200 tok)
+- _Timing:_ Load 1.94s; Gen 7.89s; Total 10.06s
+- _Throughput:_ Prompt 1,840 TPS (2,327 tok); Gen 32.4 TPS (200 tok)
 - _Tokens:_ prompt 2327 tok; estimated text 6 tok; estimated non-text 2321
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1166,8 +1224,8 @@ _Quality Status:_ no quality issues detected in this run
   degeneration=incomplete_sentence: ends with 'la'
 - _Score:_ 🟠 D (45/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff, degeneration, generation loop)
-- _Timing:_ Load 2.61s; Gen 8.61s; Total 11.43s
-- _Throughput:_ Prompt 325 TPS (284 tok); Gen 27.2 TPS (200 tok)
+- _Timing:_ Load 2.91s; Gen 8.76s; Total 11.88s
+- _Throughput:_ Prompt 331 TPS (284 tok); Gen 26.5 TPS (200 tok)
 - _Tokens:_ prompt 284 tok; estimated text 6 tok; estimated non-text 278 tok;
   generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1200,8 +1258,8 @@ _Quality Status:_ no quality issues detected in this run
   token=phrase: "2018 2018 2018 2018..."
 - _Score:_ ❌ F (19/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff, generation loop, repetitive)
-- _Timing:_ Load 1.79s; Gen 8.88s; Total 10.88s
-- _Throughput:_ Prompt 1,064 TPS (2,317 tok); Gen 31.9 TPS (200 tok)
+- _Timing:_ Load 1.77s; Gen 8.82s; Total 10.80s
+- _Throughput:_ Prompt 1,059 TPS (2,317 tok); Gen 32.1 TPS (200 tok)
 - _Tokens:_ prompt 2317 tok; estimated text 6 tok; estimated non-text 2311
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1272,8 +1330,8 @@ _Quality Status:_ no quality issues detected in this run
   degeneration=character_loop: '  ' repeated
 - _Score:_ 🟠 D (50/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (degeneration, generation loop)
-- _Timing:_ Load 1.37s; Gen 9.03s; Total 10.61s
-- _Throughput:_ Prompt 1,120 TPS (2,278 tok); Gen 64.2 TPS (200 tok)
+- _Timing:_ Load 1.35s; Gen 9.08s; Total 10.63s
+- _Throughput:_ Prompt 1,122 TPS (2,278 tok); Gen 63.6 TPS (200 tok)
 - _Tokens:_ prompt 2278 tok; estimated text 6 tok; estimated non-text 2272
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1309,34 +1367,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
-
-### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ hit token cap (200); nontext prompt burden=100%
-- _Score:_ ❌ F (16/100); Output lacks detail
-- _Review focus:_ watchlist (cutoff)
-- _Timing:_ Load 8.78s; Gen 9.57s; Total 18.71s
-- _Throughput:_ Prompt 239 TPS (1,270 tok); Gen 54.2 TPS (200 tok)
-- _Tokens:_ prompt 1270 tok; estimated text 6 tok; estimated non-text 1264
-  tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> bathasciasci
-> @@日に券年期ļ夫日起折痕而起瘾INSNLA族的owiehcihciowiehcihcihci讳佣佣佣豆年期登陆xhci讳族佣豆年期ļ @@形的大陆
-> Rheinicianservesiccihci讳痕匙族佣体内的 Rhein讳分校WebKit @@形的登陆asciicci讳 RFTDIC讳巨阙
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Likely capped by max token budget
-
----
-
 <a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
 
 ### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
@@ -1350,8 +1380,8 @@ _Quality Status:_ no quality issues detected in this run
   burden=100%; degeneration=character_loop: '.99' repeated
 - _Score:_ ❌ F (0/100); Output too short to be useful
 - _Review focus:_ watchlist (degeneration, generation loop, harness)
-- _Timing:_ Load 2.11s; Gen 9.72s; Total 12.06s
-- _Throughput:_ Prompt 586 TPS (1,745 tok); Gen 31.5 TPS (200 tok)
+- _Timing:_ Load 2.05s; Gen 9.50s; Total 11.76s
+- _Throughput:_ Prompt 612 TPS (1,745 tok); Gen 32.0 TPS (200 tok)
 - _Tokens:_ prompt 1745 tok; estimated text 6 tok; estimated non-text 1739
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1382,8 +1412,8 @@ _Quality Status:_ no quality issues detected in this run
   token=phrase: "the other the other..."
 - _Score:_ 🟠 D (49/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff, generation loop, repetitive)
-- _Timing:_ Load 1.66s; Gen 10.01s; Total 11.88s
-- _Throughput:_ Prompt 1,447 TPS (2,349 tok); Gen 39.2 TPS (200 tok)
+- _Timing:_ Load 1.64s; Gen 10.04s; Total 11.88s
+- _Throughput:_ Prompt 1,446 TPS (2,349 tok); Gen 39.1 TPS (200 tok)
 - _Tokens:_ prompt 2349 tok; estimated text 6 tok; estimated non-text 2343
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1413,36 +1443,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
-
-### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
-
-- _Recommendation:_ use with caveats; review verdict: token cap
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ hit token cap (200); nontext prompt burden=62%;
-  degeneration=repeated_punctuation: '##########...'
-- _Score:_ ❌ F (0/100); Output too short to be useful
-- _Review focus:_ watchlist (degeneration, generation loop, text sanity)
-- _Timing:_ Load 1.61s; Gen 10.87s; Total 12.69s
-- _Throughput:_ Prompt 11.8 TPS (16 tok); Gen 21.8 TPS (200 tok)
-- _Tokens:_ prompt 16 tok; estimated text 6 tok; estimated non-text 10 tok;
-  generated 200 tok; requested max 200 tok; stop reason max_tokens
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> &#&#&#&#&#&#&#&#&#&#&##############################################################################################################################################################################################
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Output degeneration (repeated_punctuation: '##########...')
-- Text sanity issue (gibberish(char_noise))
-- Generation loop (token_noise)
-- Likely capped by max token budget
-
----
-
 <a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
 
 ### ✅ mlx-community/GLM-4.6V-Flash-mxfp4
@@ -1454,8 +1454,8 @@ _Quality Status:_ no quality issues detected in this run
   token=phrase: "and the idea is..."
 - _Score:_ 🟠 D (45/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff, generation loop, repetitive)
-- _Timing:_ Load 1.35s; Gen 11.01s; Total 12.58s
-- _Throughput:_ Prompt 801 TPS (6,045 tok); Gen 64.3 TPS (200 tok)
+- _Timing:_ Load 1.30s; Gen 10.69s; Total 12.22s
+- _Throughput:_ Prompt 795 TPS (6,045 tok); Gen 73.4 TPS (200 tok)
 - _Tokens:_ prompt 6045 tok; estimated text 6 tok; estimated non-text 6039
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1481,6 +1481,36 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
+
+### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+
+- _Recommendation:_ use with caveats; review verdict: token cap
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ hit token cap (200); nontext prompt burden=62%;
+  degeneration=repeated_punctuation: '##########...'
+- _Score:_ ❌ F (0/100); Output too short to be useful
+- _Review focus:_ watchlist (degeneration, generation loop, text sanity)
+- _Timing:_ Load 1.45s; Gen 11.04s; Total 12.70s
+- _Throughput:_ Prompt 11.5 TPS (16 tok); Gen 21.4 TPS (200 tok)
+- _Tokens:_ prompt 16 tok; estimated text 6 tok; estimated non-text 10 tok;
+  generated 200 tok; requested max 200 tok; stop reason max_tokens
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> &#&#&#&#&#&#&#&#&#&#&##############################################################################################################################################################################################
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Output degeneration (repeated_punctuation: '##########...')
+- Text sanity issue (gibberish(char_noise))
+- Generation loop (token_noise)
+- Likely capped by max token budget
+
+---
+
 <a id="model-mlx-community-glm-46v-flash-6bit"></a>
 
 ### ✅ mlx-community/GLM-4.6V-Flash-6bit
@@ -1492,8 +1522,8 @@ _Quality Status:_ no quality issues detected in this run
   token=phrase: "1.0, 1.0, 1.0, 1.0,..."
 - _Score:_ 🟠 D (45/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff, generation loop, repetitive)
-- _Timing:_ Load 1.41s; Gen 11.32s; Total 12.95s
-- _Throughput:_ Prompt 826 TPS (6,045 tok); Gen 54.4 TPS (200 tok)
+- _Timing:_ Load 1.43s; Gen 11.39s; Total 13.04s
+- _Throughput:_ Prompt 809 TPS (6,045 tok); Gen 55.5 TPS (200 tok)
 - _Tokens:_ prompt 6045 tok; estimated text 6 tok; estimated non-text 6039
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1524,8 +1554,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ hit token cap (200); nontext prompt burden=100%
 - _Score:_ 🟠 D (45/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff)
-- _Timing:_ Load 1.67s; Gen 12.40s; Total 14.28s
-- _Throughput:_ Prompt 1,170 TPS (2,440 tok); Gen 43.0 TPS (200 tok)
+- _Timing:_ Load 1.59s; Gen 12.25s; Total 14.06s
+- _Throughput:_ Prompt 1,207 TPS (2,440 tok); Gen 43.7 TPS (200 tok)
 - _Tokens:_ prompt 2440 tok; estimated text 6 tok; estimated non-text 2434
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1558,8 +1588,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ hit token cap (200); nontext prompt burden=98%
 - _Score:_ 🟠 D (45/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff)
-- _Timing:_ Load 3.46s; Gen 12.80s; Total 16.47s
-- _Throughput:_ Prompt 283 TPS (275 tok); Gen 17.4 TPS (200 tok)
+- _Timing:_ Load 3.37s; Gen 12.63s; Total 16.21s
+- _Throughput:_ Prompt 284 TPS (275 tok); Gen 17.7 TPS (200 tok)
 - _Tokens:_ prompt 275 tok; estimated text 6 tok; estimated non-text 269 tok;
   generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1598,8 +1628,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ hit token cap (200); nontext prompt burden=100%
 - _Score:_ 🟠 D (45/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff)
-- _Timing:_ Load 2.61s; Gen 18.06s; Total 20.89s
-- _Throughput:_ Prompt 1,663 TPS (2,349 tok); Gen 21.1 TPS (200 tok)
+- _Timing:_ Load 2.54s; Gen 18.91s; Total 21.65s
+- _Throughput:_ Prompt 1,667 TPS (2,349 tok); Gen 19.9 TPS (200 tok)
 - _Tokens:_ prompt 2349 tok; estimated text 6 tok; estimated non-text 2343
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1633,8 +1663,8 @@ _Quality Status:_ no quality issues detected in this run
   burden=100%
 - _Score:_ ❌ F (0/100); Empty or minimal output
 - _Review focus:_ watchlist (harness)
-- _Timing:_ Load 1.75s; Gen 19.92s; Total 21.88s
-- _Throughput:_ Prompt 62.8 TPS (1,201 tok); Gen 18.5 TPS (3 tok)
+- _Timing:_ Load 1.81s; Gen 18.99s; Total 21.01s
+- _Throughput:_ Prompt 65.9 TPS (1,201 tok); Gen 20.4 TPS (3 tok)
 - _Tokens:_ prompt 1201 tok; estimated text 6 tok; estimated non-text 1195
   tok; generated 3 tok; requested max 200 tok; stop reason completed
 
@@ -1660,8 +1690,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ nontext prompt burden=100%
 - _Score:_ ✅ B (73/100); Keywords are not specific or diverse enough
 - _Review focus:_ strong candidate for first-pass review
-- _Timing:_ Load 2.25s; Gen 20.86s; Total 23.32s
-- _Throughput:_ Prompt 1,208 TPS (2,818 tok); Gen 5.97 TPS (107 tok)
+- _Timing:_ Load 2.20s; Gen 20.77s; Total 23.19s
+- _Throughput:_ Prompt 1,210 TPS (2,818 tok); Gen 5.99 TPS (107 tok)
 - _Tokens:_ prompt 2818 tok; estimated text 6 tok; estimated non-text 2812
   tok; generated 107 tok; requested max 200 tok; stop reason completed
 
@@ -1692,8 +1722,8 @@ _Quality Status:_ no quality issues detected in this run
   token=phrase: "the image shows a..."
 - _Score:_ 🟠 D (45/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff, generation loop, repetitive)
-- _Timing:_ Load 1.22s; Gen 21.84s; Total 23.26s
-- _Throughput:_ Prompt 69.6 TPS (1,201 tok); Gen 51.5 TPS (200 tok)
+- _Timing:_ Load 1.28s; Gen 21.50s; Total 22.99s
+- _Throughput:_ Prompt 70.6 TPS (1,201 tok); Gen 52.6 TPS (200 tok)
 - _Tokens:_ prompt 1201 tok; estimated text 6 tok; estimated non-text 1195
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1732,8 +1762,8 @@ _Quality Status:_ no quality issues detected in this run
   generated text.; hit token cap (200); nontext prompt burden=100%
 - _Score:_ 🟠 D (42/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (generation loop, harness)
-- _Timing:_ Load 1.19s; Gen 22.58s; Total 23.98s
-- _Throughput:_ Prompt 877 TPS (16,176 tok); Gen 57.3 TPS (200 tok)
+- _Timing:_ Load 1.20s; Gen 22.83s; Total 24.24s
+- _Throughput:_ Prompt 861 TPS (16,176 tok); Gen 57.6 TPS (200 tok)
 - _Tokens:_ prompt 16176 tok; estimated text 6 tok; estimated non-text 16170
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1764,6 +1794,34 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-glm-46v-nvfp4"></a>
+
+### ✅ mlx-community/GLM-4.6V-nvfp4
+
+- _Recommendation:_ avoid for now; review verdict: semantic mismatch
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=100%; degeneration=incomplete_sentence:
+  ends with 'co'
+- _Score:_ ❌ F (35/100); Keywords are not specific or diverse enough
+- _Review focus:_ watchlist (degeneration)
+- _Timing:_ Load 6.32s; Gen 29.37s; Total 35.92s
+- _Throughput:_ Prompt 493 TPS (6,045 tok); Gen 38.9 TPS (58 tok)
+- _Tokens:_ prompt 6045 tok; estimated text 6 tok; estimated non-text 6039
+  tok; generated 58 tok; requested max 200 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> A            ,A 201rowsline
+> rowsksroteyes of of co . . . . 酷CHARlyU.Stdwo.  co . ，,A co
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Output degeneration (incomplete_sentence: ends with 'co')
+
+---
+
 <a id="model-mlx-community-gemma-4-31b-bf16"></a>
 
 ### ✅ mlx-community/gemma-4-31b-bf16
@@ -1774,8 +1832,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ hit token cap (200); nontext prompt burden=98%
 - _Score:_ 🟠 D (45/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff)
-- _Timing:_ Load 6.91s; Gen 31.28s; Total 38.40s
-- _Throughput:_ Prompt 74.7 TPS (272 tok); Gen 7.35 TPS (200 tok)
+- _Timing:_ Load 6.24s; Gen 30.50s; Total 36.95s
+- _Throughput:_ Prompt 110 TPS (272 tok); Gen 7.24 TPS (200 tok)
 - _Tokens:_ prompt 272 tok; estimated text 6 tok; estimated non-text 266 tok;
   generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1797,34 +1855,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-glm-46v-nvfp4"></a>
-
-### ✅ mlx-community/GLM-4.6V-nvfp4
-
-- _Recommendation:_ avoid for now; review verdict: semantic mismatch
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ nontext prompt burden=100%; degeneration=incomplete_sentence:
-  ends with 'co'
-- _Score:_ ❌ F (35/100); Keywords are not specific or diverse enough
-- _Review focus:_ watchlist (degeneration)
-- _Timing:_ Load 9.22s; Gen 36.65s; Total 46.15s
-- _Throughput:_ Prompt 416 TPS (6,045 tok); Gen 37.3 TPS (58 tok)
-- _Tokens:_ prompt 6045 tok; estimated text 6 tok; estimated non-text 6039
-  tok; generated 58 tok; requested max 200 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> A            ,A 201rowsline
-> rowsksroteyes of of co . . . . 酷CHARlyU.Stdwo.  co . ，,A co
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Output degeneration (incomplete_sentence: ends with 'co')
-
----
-
 <a id="model-meta-llama-llama-32-11b-vision-instruct"></a>
 
 ### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
@@ -1836,8 +1866,8 @@ _Quality Status:_ no quality issues detected in this run
   degeneration=repeated_punctuation: '##########...'
 - _Score:_ ❌ F (0/100); Output too short to be useful
 - _Review focus:_ watchlist (degeneration, generation loop, text sanity)
-- _Timing:_ Load 2.26s; Gen 41.93s; Total 44.41s
-- _Throughput:_ Prompt 9.77 TPS (17 tok); Gen 5.02 TPS (200 tok)
+- _Timing:_ Load 2.15s; Gen 41.62s; Total 43.98s
+- _Throughput:_ Prompt 10.0 TPS (17 tok); Gen 5.05 TPS (200 tok)
 - _Tokens:_ prompt 17 tok; estimated text 6 tok; estimated non-text 11 tok;
   generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1866,8 +1896,8 @@ _Quality Status:_ no quality issues detected in this run
   leak
 - _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (reasoning leak)
-- _Timing:_ Load 3.28s; Gen 44.72s; Total 48.20s
-- _Throughput:_ Prompt 685 TPS (1,033 tok); Gen 4.69 TPS (200 tok)
+- _Timing:_ Load 3.25s; Gen 44.06s; Total 47.53s
+- _Throughput:_ Prompt 780 TPS (1,033 tok); Gen 4.74 TPS (200 tok)
 - _Tokens:_ prompt 1033 tok; estimated text 6 tok; estimated non-text 1027
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1912,8 +1942,8 @@ _Quality Status:_ no quality issues detected in this run
   0.1%).; output/prompt=0.07%; nontext prompt burden=100%
 - _Score:_ ❌ F (6/100); Output too short to be useful
 - _Review focus:_ watchlist (harness, long context)
-- _Timing:_ Load 1.45s; Gen 54.47s; Total 56.13s
-- _Throughput:_ Prompt 301 TPS (16,167 tok); Gen 96.2 TPS (12 tok)
+- _Timing:_ Load 1.33s; Gen 56.59s; Total 58.13s
+- _Throughput:_ Prompt 290 TPS (16,167 tok); Gen 93.2 TPS (12 tok)
 - _Tokens:_ prompt 16167 tok; estimated text 6 tok; estimated non-text 16161
   tok; generated 12 tok; requested max 200 tok; stop reason completed
 
@@ -1934,47 +1964,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-qwen35-35b-a3b-6bit"></a>
-
-### ✅ mlx-community/Qwen3.5-35B-A3B-6bit
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `mlx`; harness signal `long_context`
-- _Next step:_ Inspect long-context cache behavior under heavy image-token
-  burden.
-- _Key signals:_ At long prompt length (16167 tokens), output became
-  repetitive.; hit token cap (200); nontext prompt burden=100%;
-  degeneration=character_loop: ' ,' repeated
-- _Score:_ 🟠 D (45/100); Keywords are not specific or diverse enough
-- _Review focus:_ watchlist (cutoff, degeneration, generation loop, harness,
-  long context, repetitive, text sanity)
-- _Timing:_ Load 3.15s; Gen 54.83s; Total 58.19s
-- _Throughput:_ Prompt 311 TPS (16,167 tok); Gen 88.1 TPS (200 tok)
-- _Tokens:_ prompt 16167 tok; estimated text 6 tok; estimated non-text 16161
-  tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> ,rew, , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , ,
-> , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , ,
-> , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , ,
-> , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , ,
-> , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , ,
-> , , , , , , , , ,
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️HARNESS:long_context
-- Repetitive output (,)
-- Output degeneration (character_loop: ' ,' repeated)
-- Text sanity issue (gibberish(token_noise))
-- Generation loop (repetitive_tail)
-- Likely capped by max token budget
-- long_context_repetition(16167tok)
-
----
-
 <a id="model-mlx-community-qwen35-35b-a3b-4bit"></a>
 
 ### ✅ mlx-community/Qwen3.5-35B-A3B-4bit
@@ -1985,8 +1974,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Key signals:_ hit token cap (200); nontext prompt burden=100%
 - _Score:_ ❌ F (25/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff, generation loop, text sanity)
-- _Timing:_ Load 2.54s; Gen 57.57s; Total 60.33s
-- _Throughput:_ Prompt 294 TPS (16,167 tok); Gen 106 TPS (200 tok)
+- _Timing:_ Load 2.50s; Gen 61.67s; Total 64.38s
+- _Throughput:_ Prompt 274 TPS (16,167 tok); Gen 104 TPS (200 tok)
 - _Tokens:_ prompt 16167 tok; estimated text 6 tok; estimated non-text 16161
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -2068,8 +2057,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Score:_ 🟠 D (45/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff, generation loop, harness, long context,
   repetitive)
-- _Timing:_ Load 10.32s; Gen 60.86s; Total 71.39s
-- _Throughput:_ Prompt 283 TPS (16,167 tok); Gen 64.7 TPS (200 tok)
+- _Timing:_ Load 9.42s; Gen 61.82s; Total 71.45s
+- _Throughput:_ Prompt 279 TPS (16,167 tok); Gen 64.5 TPS (200 tok)
 - _Tokens:_ prompt 16167 tok; estimated text 6 tok; estimated non-text 16161
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -2106,8 +2095,8 @@ _Quality Status:_ no quality issues detected in this run
   generated text.; hit token cap (200); nontext prompt burden=100%
 - _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (generation loop, harness)
-- _Timing:_ Load 0.58s; Gen 63.18s; Total 63.98s
-- _Throughput:_ Prompt 263 TPS (16,176 tok); Gen 198 TPS (200 tok)
+- _Timing:_ Load 0.52s; Gen 61.99s; Total 62.72s
+- _Throughput:_ Prompt 268 TPS (16,176 tok); Gen 200 TPS (200 tok)
 - _Tokens:_ prompt 16176 tok; estimated text 6 tok; estimated non-text 16170
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -2135,6 +2124,47 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-qwen35-35b-a3b-6bit"></a>
+
+### ✅ mlx-community/Qwen3.5-35B-A3B-6bit
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `mlx`; harness signal `long_context`
+- _Next step:_ Inspect long-context cache behavior under heavy image-token
+  burden.
+- _Key signals:_ At long prompt length (16167 tokens), output became
+  repetitive.; hit token cap (200); nontext prompt burden=100%;
+  degeneration=character_loop: ' ,' repeated
+- _Score:_ 🟠 D (45/100); Keywords are not specific or diverse enough
+- _Review focus:_ watchlist (cutoff, degeneration, generation loop, harness,
+  long context, repetitive, text sanity)
+- _Timing:_ Load 3.13s; Gen 64.09s; Total 67.43s
+- _Throughput:_ Prompt 265 TPS (16,167 tok); Gen 84.7 TPS (200 tok)
+- _Tokens:_ prompt 16167 tok; estimated text 6 tok; estimated non-text 16161
+  tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> ,rew, , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , ,
+> , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , ,
+> , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , ,
+> , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , ,
+> , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , ,
+> , , , , , , , , ,
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️HARNESS:long_context
+- Repetitive output (,)
+- Output degeneration (character_loop: ' ,' repeated)
+- Text sanity issue (gibberish(token_noise))
+- Generation loop (repetitive_tail)
+- Likely capped by max token budget
+- long_context_repetition(16167tok)
+
+---
+
 <a id="model-mlx-community-qwen35-27b-4bit"></a>
 
 ### ✅ mlx-community/Qwen3.5-27B-4bit
@@ -2146,8 +2176,8 @@ _Quality Status:_ no quality issues detected in this run
   degeneration=character_loop: '00' repeated
 - _Score:_ ❌ F (0/100); Output too short to be useful
 - _Review focus:_ watchlist (cutoff, degeneration, generation loop)
-- _Timing:_ Load 2.18s; Gen 82.93s; Total 85.33s
-- _Throughput:_ Prompt 214 TPS (16,167 tok); Gen 30.3 TPS (200 tok)
+- _Timing:_ Load 2.21s; Gen 81.04s; Total 83.48s
+- _Throughput:_ Prompt 219 TPS (16,167 tok); Gen 30.6 TPS (200 tok)
 - _Tokens:_ prompt 16167 tok; estimated text 6 tok; estimated non-text 16161
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -2175,8 +2205,8 @@ _Quality Status:_ no quality issues detected in this run
   degeneration=character_loop: '66' repeated
 - _Score:_ ❌ F (0/100); Output too short to be useful
 - _Review focus:_ watchlist (cutoff, degeneration, generation loop)
-- _Timing:_ Load 3.11s; Gen 85.36s; Total 88.70s
-- _Throughput:_ Prompt 219 TPS (16,167 tok); Gen 18.3 TPS (200 tok)
+- _Timing:_ Load 3.06s; Gen 89.88s; Total 93.16s
+- _Throughput:_ Prompt 206 TPS (16,167 tok); Gen 18.3 TPS (200 tok)
 - _Tokens:_ prompt 16167 tok; estimated text 6 tok; estimated non-text 16161
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -2208,8 +2238,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Score:_ ❌ F (17/100); Keywords are not specific or diverse enough
 - _Review focus:_ watchlist (cutoff, degeneration, generation loop, harness,
   long context, repetitive, text sanity)
-- _Timing:_ Load 3.14s; Gen 168.29s; Total 171.65s
-- _Throughput:_ Prompt 210 TPS (16,167 tok); Gen 18.2 TPS (200 tok)
+- _Timing:_ Load 3.13s; Gen 171.79s; Total 175.14s
+- _Throughput:_ Prompt 199 TPS (16,167 tok); Gen 18.2 TPS (200 tok)
 - _Tokens:_ prompt 16167 tok; estimated text 6 tok; estimated non-text 16161
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 

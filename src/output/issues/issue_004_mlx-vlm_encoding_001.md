@@ -12,9 +12,9 @@
 
 ## Affected Models
 
-| Model                                                   | Observed Behavior                          | Token Counts                                                                                          | Optional Context                                                                                                                                                                                 |
-|---------------------------------------------------------|--------------------------------------------|-------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | 41 BPE space markers found in decoded text | prompt=1,745 \| output/prompt=11.46% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) |
+| Model                                                   | Observed Behavior                          | Token Counts                                                                                          | Optional Context                                                                                                                       |
+|---------------------------------------------------------|--------------------------------------------|-------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | 41 BPE space markers found in decoded text | prompt=1,745 \| output/prompt=11.46% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) | [optional JSON](../repro_bundles/20260521T221248Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) |
 
 
 ## Minimal Evidence
@@ -75,7 +75,7 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: [optional JSON](../repro_bundles/20260521T221248Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -97,12 +97,12 @@ Optional advanced context:
 | Component       | Version                     |
 |-----------------|-----------------------------|
 | mlx-vlm         | 0.5.0                       |
-| mlx             | 0.32.0.dev20260517+7b7c1240 |
+| mlx             | 0.32.0.dev20260521+5d1c0e4c |
 | mlx-lm          | 0.31.3                      |
 | mlx-audio       | 0.4.3                       |
-| transformers    | 5.8.1                       |
+| transformers    | 5.9.0                       |
 | tokenizers      | 0.22.2                      |
-| huggingface-hub | 1.15.0                      |
+| huggingface-hub | 1.16.1                      |
 | Python Version  | 3.13.13                     |
 | OS              | Darwin 25.5.0               |
 | macOS Version   | 26.5                        |

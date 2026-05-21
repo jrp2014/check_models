@@ -12,9 +12,9 @@
 
 ## Affected Models
 
-| Model                               | Observed Behavior                                                                                     | Token Counts   | Optional Context                                                                                                                                                                                 |
-|-------------------------------------|-------------------------------------------------------------------------------------------------------|----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/LFM2.5-VL-1.6B-bf16` | Missing 2 parameters: multi_modal_projector.layer_norm.bias, multi_modal_projector.layer_norm.weight. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_006_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_MODEL_LOAD_WEIGHT_MISMATCH_7574b1189.json) |
+| Model                               | Observed Behavior                                                                                     | Token Counts   | Optional Context                                                                                                                       |
+|-------------------------------------|-------------------------------------------------------------------------------------------------------|----------------|----------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/LFM2.5-VL-1.6B-bf16` | Missing 2 parameters: multi_modal_projector.layer_norm.bias, multi_modal_projector.layer_norm.weight. | stop=exception | [optional JSON](../repro_bundles/20260521T221248Z_006_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_MODEL_LOAD_WEIGHT_MISMATCH_7574b1189.json) |
 
 
 ## Minimal Evidence
@@ -74,7 +74,7 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/LFM2.5-VL-1.6B-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_006_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_MODEL_LOAD_WEIGHT_MISMATCH_7574b1189.json)
+- `mlx-community/LFM2.5-VL-1.6B-bf16`: [optional JSON](../repro_bundles/20260521T221248Z_006_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_MODEL_LOAD_WEIGHT_MISMATCH_7574b1189.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -97,12 +97,12 @@ Optional advanced context:
 | Component       | Version                     |
 |-----------------|-----------------------------|
 | mlx-vlm         | 0.5.0                       |
-| mlx             | 0.32.0.dev20260517+7b7c1240 |
+| mlx             | 0.32.0.dev20260521+5d1c0e4c |
 | mlx-lm          | 0.31.3                      |
 | mlx-audio       | 0.4.3                       |
-| transformers    | 5.8.1                       |
+| transformers    | 5.9.0                       |
 | tokenizers      | 0.22.2                      |
-| huggingface-hub | 1.15.0                      |
+| huggingface-hub | 1.16.1                      |
 | Python Version  | 3.13.13                     |
 | OS              | Darwin 25.5.0               |
 | macOS Version   | 26.5                        |

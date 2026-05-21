@@ -1,0 +1,188 @@
+{
+  "environment": {
+    "library_versions": {
+      "Pillow": "12.2.0",
+      "huggingface-hub": "1.16.1",
+      "mlx": "0.32.0.dev20260521+5d1c0e4c",
+      "mlx-audio": "0.4.3",
+      "mlx-lm": "0.31.3",
+      "mlx-metal": null,
+      "mlx-vlm": "0.5.0",
+      "numpy": "2.4.6",
+      "tokenizers": "0.22.2",
+      "transformers": "5.9.0"
+    },
+    "platform": "macOS-26.5-arm64-arm-64bit-Mach-O",
+    "preflight_issues": [],
+    "system_info": {
+      "Architecture": "arm64",
+      "CPU Cores (Logical)": "18",
+      "CPU Cores (Physical)": "18",
+      "GPU Cores": "40",
+      "GPU/Chip": "Apple M5 Max",
+      "Metal SDK": "MacOSX.sdk",
+      "Metal Support": "Metal 4",
+      "OS": "Darwin 25.5.0",
+      "Python Version": "3.13.13",
+      "RAM": "128.0 GB",
+      "SDK Version": "26.5",
+      "Xcode Build": "17F42",
+      "Xcode Version": "26.5",
+      "macOS Version": "26.5"
+    }
+  },
+  "failure": {
+    "captured_output": null,
+    "code": null,
+    "message": null,
+    "package": null,
+    "phase": null,
+    "signature": null,
+    "stage": null,
+    "traceback": null,
+    "type": null
+  },
+  "generated_at_utc": "2026-05-21T22:12:48+00:00",
+  "issue_cluster_id": "mlx-vlm_stop-token_001",
+  "model": "mlx-community/X-Reasoner-7B-8bit",
+  "repro": {
+    "args": {
+      "_check_models_preflight_issues": [],
+      "adapter_path": null,
+      "context_marker": "Context:",
+      "detailed_metrics": false,
+      "dry_run": false,
+      "enable_thinking": false,
+      "eos_tokens": null,
+      "eval_mode": "triage",
+      "exclude": [
+        "mlx-community/Qwen3-VL-2B-Thinking-bf16",
+        "Qwen/Qwen3-VL-2B-Instruct"
+      ],
+      "folder": "/Users/jrp/Pictures/Processed",
+      "force_color": false,
+      "force_download": false,
+      "image": null,
+      "kv_bits": null,
+      "kv_group_size": 64,
+      "kv_quant_scheme": "uniform",
+      "lazy_load": false,
+      "link_style": "relative",
+      "max_kv_size": null,
+      "max_tokens": 200,
+      "min_p": 0.0,
+      "models": null,
+      "no_color": false,
+      "open_report": false,
+      "output_diagnostics": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/diagnostics.md",
+      "output_env": "/Users/jrp/Documents/AI/mlx/check_models/src/output/environment.log",
+      "output_gallery_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/model_gallery.md",
+      "output_html": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.html",
+      "output_jsonl": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.jsonl",
+      "output_log": "/Users/jrp/Documents/AI/mlx/check_models/src/output/check_models.log",
+      "output_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.md",
+      "output_review": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/review.md",
+      "output_tsv": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.tsv",
+      "prefill_step_size": 4096,
+      "processor_kwargs": null,
+      "prompt": null,
+      "prune_repro_days": 90,
+      "quality_config": null,
+      "quantize_activations": false,
+      "quantized_kv_start": 5000,
+      "repetition_context_size": 20,
+      "repetition_penalty": null,
+      "rerun_triage": false,
+      "resize_shape": null,
+      "revision": null,
+      "skip_special_tokens": false,
+      "temperature": 0.0,
+      "thinking_budget": null,
+      "thinking_end_token": "</think>",
+      "thinking_start_token": null,
+      "timeout": 300.0,
+      "top_k": 0,
+      "top_p": 1.0,
+      "trust_remote_code": true,
+      "verbose": true,
+      "width": null
+    },
+    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen2-VL-2B-Instruct-4bit mlx-community/X-Reasoner-7B-8bit",
+    "env_vars": {
+      "TOKENIZERS_PARALLELISM": "false"
+    },
+    "image_path": "/Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg",
+    "image_ref_sha256": "d1aa69dd73e1a686603a752d0e4b71b76f832628f935f4626884df8082b9b6b4",
+    "image_sha256": "06f6f7fdc76b4cc85d8dcb7c180671c2a7e91574b3b3638c67907ca601e4ab2a",
+    "prompt_diagnostics": {
+      "eos_token": "<|im_end|>",
+      "eos_token_id": 151645,
+      "generate_kwargs": {
+        "kv_bits": null,
+        "kv_group_size": 64,
+        "kv_quant_scheme": "uniform",
+        "max_kv_size": null,
+        "max_tokens": 200,
+        "prefill_step_size": 4096,
+        "quantized_kv_start": 5000,
+        "repetition_context_size": 20,
+        "repetition_penalty": null,
+        "temperature": 0.0,
+        "top_p": 1.0
+      },
+      "image_placeholder_count": 0,
+      "model_type": "qwen2_5_vl",
+      "processor_class": "mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor",
+      "rendered_prompt_chars": 179,
+      "rendered_prompt_hash_sha256": "73a1922daa0f2941d41cb6adeb450c1b2ef268e3e9dc5a65bee6f9dea62ce191",
+      "rendered_prompt_preview": "<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\n<|vision_start|><|image_pad|><|vision_end|>Describe this image briefly.<|im_end|>\n<|im_start|>assistant\n",
+      "special_token_ids": [
+        151645,
+        151643
+      ],
+      "special_tokens": [
+        "<|im_end|>",
+        "<|endoftext|>"
+      ],
+      "tokenizer_class": "transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer"
+    },
+    "prompt_hash_sha256": "d760336d0fd143932f194573dd63f6b531e0ffbc2c4f1595e015392a3471c318",
+    "prompt_preview": "Describe this image briefly.",
+    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/X-Reasoner-7B-8bit",
+    "seed": null
+  },
+  "result": {
+    "generated_text_preview": "B<|endoftext|>, 1.<|endoftext|>-100<|endoftext|>-<|endoftext|>1<|endoftext|>-<|endoftext|>-<|endoftext|>-<|endoftext|>- 1. The 201.<|endoftext|>The 2010 2010 - 2008<|endoftext|>B<|endoftext|>-<|endoftext|>The 1. The 1.<|endoftext|>The 1.<|endoftext|>The 1.<|endoftext|>The 10<|endoftext|>The 2008 2. The 1.<|endoftext|>B<|endoftext|>The 1.<|endoftext|>The 1.<|endoftext|>The 1988)<|endoftext|>The 1.<...",
+    "maintainer_triage": {
+      "confidence": "high",
+      "evidence": [
+        "harness:stop_token",
+        "text_sanity",
+        "generation_loop"
+      ],
+      "harness_details": [
+        "token_leak:<|endoftext|>"
+      ],
+      "hit_max_tokens": true,
+      "issue_kind": "harness",
+      "issue_subtype": "stop_token",
+      "next_action": "Inspect EOS/stop-token stripping; control tokens are leaking into user-facing text.",
+      "nontext_prompt_ratio": 0.9996290801186943,
+      "prompt_output_ratio": 0.012363996043521267,
+      "prompt_tokens_total": 16176,
+      "requested_max_tokens": 200,
+      "stop_reason": "max_tokens",
+      "summary": "Special control token &lt;|endoftext|&gt; appeared in generated text. | hit token cap (200) | nontext prompt burden=100%",
+      "suspected_owner": "mlx-vlm",
+      "user_bucket": "avoid"
+    },
+    "quality_issues": [
+      "\u26a0\ufe0fharness(stop_token)",
+      "generation_loop(numeric_loop)",
+      "numeric_loop",
+      "lang_mixing"
+    ],
+    "success": true
+  },
+  "schema_version": "1.0"
+}

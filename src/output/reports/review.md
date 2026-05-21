@@ -1,30 +1,30 @@
 # Automated Review Digest
 
-_Generated on 2026-05-17 22:38:17 BST_
+_Generated on 2026-05-21 23:12:48 BST_
 
 Trusted-hint review uses only prompt title/description/keyword hints for utility comparison. Capture metadata, GPS, timestamps, source labels, and location labels are treated as nonvisual metadata and are not required visual evidence.
 
 _Review artifacts:_
 
-- _Standalone output gallery:_ [model_gallery.md](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md)
-- _Canonical run log:_ [check_models.log](https://github.com/jrp2014/check_models/blob/main/src/output/check_models.log)
+- _Standalone output gallery:_ [model_gallery.md](model_gallery.md)
+- _Canonical run log:_ [check_models.log](../check_models.log)
 
 ## 🧭 Review Shortlist
 
 ### Strong Candidates
 
-- `mlx-community/nanoLLaVA-1.5-4bit`: ✅ B (75/100) | Desc 87 | Keywords 0 | 364.2 tps
-- `qnguyen3/nanoLLaVA`: ✅ B (75/100) | Desc 90 | Keywords 0 | 112.3 tps
-- `mlx-community/paligemma2-3b-ft-docci-448-bf16`: ✅ B (75/100) | Desc 90 | Keywords 0 | 19.7 tps
+- `mlx-community/nanoLLaVA-1.5-4bit`: ✅ B (75/100) | Desc 87 | Keywords 0 | 374.3 tps
+- `qnguyen3/nanoLLaVA`: ✅ B (75/100) | Desc 90 | Keywords 0 | 114.8 tps
+- `mlx-community/paligemma2-3b-ft-docci-448-bf16`: ✅ B (75/100) | Desc 90 | Keywords 0 | 19.6 tps
 - `mlx-community/MolmoPoint-8B-fp16`: ✅ B (73/100) | Desc 86 | Keywords 0 | 6.0 tps
-- `mlx-community/FastVLM-0.5B-bf16`: ✅ B (68/100) | Desc 87 | Keywords 0 | 353.3 tps
+- `mlx-community/FastVLM-0.5B-bf16`: ✅ B (68/100) | Desc 87 | Keywords 0 | 351.9 tps
 
 ### Watchlist
 
-- `LiquidAI/LFM2.5-VL-450M-MLX-bf16`: ❌ F (0/100) | Desc 0 | Keywords 0 | 573.6 tps | harness
-- `mlx-community/Molmo-7B-D-0924-bf16`: ❌ F (0/100) | Desc 0 | Keywords 0 | 18.5 tps | harness
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (0/100) | Desc 60 | Keywords 0 | 31.5 tps | degeneration, generation loop, harness
-- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: ❌ F (5/100) | Desc 44 | Keywords 0 | 37.6 tps | harness
+- `LiquidAI/LFM2.5-VL-450M-MLX-bf16`: ❌ F (0/100) | Desc 0 | Keywords 0 | 494.7 tps | harness
+- `mlx-community/Molmo-7B-D-0924-bf16`: ❌ F (0/100) | Desc 0 | Keywords 0 | 20.4 tps | harness
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (0/100) | Desc 60 | Keywords 0 | 32.0 tps | degeneration, generation loop, harness
+- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: ❌ F (5/100) | Desc 44 | Keywords 0 | 40.1 tps | harness
 - `mlx-community/paligemma2-10b-ft-docci-448-bf16`: ❌ F (5/100) | Desc 44 | Keywords 0 | 6.4 tps | harness
 
 ## User Buckets
@@ -71,20 +71,20 @@ User-first summary grouped by recommendation bucket.
 | `mlx-community/gemma-3n-E2B-4bit`                       | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=98% \| repetitive token=phrase: "rew rew rew rew..."                                                                                               |
 | `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=94% \| repetitive token=phrase: "saff saff saff saff..."                                                                                           |
 | `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=100% \| repetitive token=phrase: ". . . ...."                                                                                                      |
-| `HuggingFaceTB/SmolVLM-Instruct`                        | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=99% \| repetitive token=phrase: "ter budget ter budget..."                                                                                         |
-| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        | `harness`           | preserves trusted hints | Output appears truncated to about 6 tokens. \| nontext prompt burden=99%                                                                                                                        |
-| `mlx-community/gemma-4-26b-a4b-it-4bit`                 | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=98% \| degeneration=character_loop: '/1' repeated                                                                                                  |
 | `mlx-community/SmolVLM-Instruct-bf16`                   | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=99% \| repetitive token=phrase: "ter budget ter budget..."                                                                                         |
+| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        | `harness`           | preserves trusted hints | Output appears truncated to about 6 tokens. \| nontext prompt burden=99%                                                                                                                        |
+| `HuggingFaceTB/SmolVLM-Instruct`                        | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=99% \| repetitive token=phrase: "ter budget ter budget..."                                                                                         |
+| `mlx-community/gemma-4-26b-a4b-it-4bit`                 | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=98% \| degeneration=character_loop: '/1' repeated                                                                                                  |
 | `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=99% \| reasoning leak                                                                                                                              |
 | `mlx-community/paligemma2-3b-ft-docci-448-bf16`         | `semantic_mismatch` | preserves trusted hints | nontext prompt burden=99%                                                                                                                                                                       |
 | `mlx-community/gemma-3n-E4B-it-bf16`                    | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=98%                                                                                                                                                |
 | `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`     | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=100% \| repetitive token=phrase: "1st 1st 1st 1st..."                                                                                              |
+| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`      | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=100%                                                                                                                                               |
 | `mlx-community/llava-v1.6-mistral-7b-8bit`              | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=100% \| repetitive token=phrase: "out of course. out..."                                                                                           |
 | `mlx-community/gemma-3-27b-it-qat-4bit`                 | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=98% \| formatting=Unknown tags: &lt;td&gt;                                                                                                         |
 | `mlx-community/Idefics3-8B-Llama3-bf16`                 | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=100% \| formatting=Unknown tags: &lt;fake_token_around_image&gt; \| repetitive token=comm,                                                         |
 | `mlx-community/gemma-4-31b-it-4bit`                     | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=98% \| degeneration=incomplete_sentence: ends with 'la'                                                                                            |
 | `mlx-community/InternVL3-14B-8bit`                      | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=100% \| repetitive token=phrase: "2018 2018 2018 2018..."                                                                                          |
-| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`      | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=100%                                                                                                                                               |
 | `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | `harness`           | preserves trusted hints | Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 41 occurrences). \| hit token cap (200) \| nontext prompt burden=100% \| degeneration=character_loop: '.99' repeated |
 | `mlx-community/pixtral-12b-8bit`                        | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=100% \| repetitive token=phrase: "the other the other..."                                                                                          |
 | `mlx-community/GLM-4.6V-Flash-mxfp4`                    | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=100% \| repetitive token=phrase: "and the idea is..."                                                                                              |
@@ -95,31 +95,31 @@ User-first summary grouped by recommendation bucket.
 | `mlx-community/Molmo-7B-D-0924-bf16`                    | `harness`           | preserves trusted hints | Output appears truncated to about 3 tokens. \| nontext prompt burden=100%                                                                                                                       |
 | `mlx-community/Molmo-7B-D-0924-8bit`                    | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=100% \| repetitive token=phrase: "the image shows a..."                                                                                            |
 | `mlx-community/X-Reasoner-7B-8bit`                      | `harness`           | preserves trusted hints | Special control token &lt;\|endoftext\|&gt; appeared in generated text. \| hit token cap (200) \| nontext prompt burden=100%                                                                    |
-| `mlx-community/gemma-4-31b-bf16`                        | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=98%                                                                                                                                                |
 | `mlx-community/GLM-4.6V-nvfp4`                          | `semantic_mismatch` | preserves trusted hints | nontext prompt burden=100% \| degeneration=incomplete_sentence: ends with 'co'                                                                                                                  |
-| `mlx-community/Qwen3.5-35B-A3B-6bit`                    | `cutoff_degraded`   | preserves trusted hints | At long prompt length (16167 tokens), output became repetitive. \| hit token cap (200) \| nontext prompt burden=100% \| degeneration=character_loop: ' ,' repeated                              |
+| `mlx-community/gemma-4-31b-bf16`                        | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=98%                                                                                                                                                |
 | `mlx-community/Qwen3.5-35B-A3B-4bit`                    | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=100%                                                                                                                                               |
 | `mlx-community/Qwen3.5-35B-A3B-bf16`                    | `cutoff_degraded`   | preserves trusted hints | At long prompt length (16167 tokens), output became repetitive. \| hit token cap (200) \| nontext prompt burden=100% \| repetitive token=all,                                                   |
 | `mlx-community/Qwen2-VL-2B-Instruct-4bit`               | `harness`           | preserves trusted hints | Special control token &lt;\|endoftext\|&gt; appeared in generated text. \| hit token cap (200) \| nontext prompt burden=100%                                                                    |
+| `mlx-community/Qwen3.5-35B-A3B-6bit`                    | `cutoff_degraded`   | preserves trusted hints | At long prompt length (16167 tokens), output became repetitive. \| hit token cap (200) \| nontext prompt burden=100% \| degeneration=character_loop: ' ,' repeated                              |
 | `mlx-community/Qwen3.5-27B-4bit`                        | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=100% \| degeneration=character_loop: '00' repeated                                                                                                 |
 | `mlx-community/Qwen3.6-27B-mxfp8`                       | `cutoff_degraded`   | preserves trusted hints | hit token cap (200) \| nontext prompt burden=100% \| degeneration=character_loop: '66' repeated                                                                                                 |
 | `mlx-community/Qwen3.5-27B-mxfp8`                       | `cutoff_degraded`   | preserves trusted hints | At long prompt length (16167 tokens), output became repetitive. \| hit token cap (200) \| nontext prompt burden=100% \| degeneration=incomplete_sentence: ends with '2v'                        |
 
 ## Maintainer Escalations
 
-Focused upstream issue drafts are queued in [issues/index.md](https://github.com/jrp2014/check_models/blob/main/src/output/issues/index.md).
+Focused upstream issue drafts are queued in [issues/index.md](../issues/index.md).
 
-| Target                                                   | Problem                                               | Evidence Snapshot                                                                                                                                                                     | Affected Models                                            | Issue Draft                                                                                                                              | Evidence Bundle   | Fixed When                                                |
-|----------------------------------------------------------|-------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|-------------------|-----------------------------------------------------------|
-| `mlx`                                                    | Weight/config mismatch during model load              | Model Error \| phase model_load \| ValueError                                                                                                                                         | 1: `mlx-community/Kimi-VL-A3B-Thinking-8bit`               | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_001_mlx_mlx-model-load-model_001.md)             | -                 | Load/generation completes or fails with a narrower owner. |
-| `mlx`                                                    | Weight/config mismatch during model load              | Weight Mismatch \| phase model_load \| ValueError                                                                                                                                     | 1: `mlx-community/LFM2.5-VL-1.6B-bf16`                     | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_002_mlx_mlx-model-load-weight-mismatch_001.md)   | -                 | Load/generation completes or fails with a narrower owner. |
-| `mlx-lm`                                                 | Missing module/import during model load               | Model Error \| phase model_load \| ModuleNotFoundError                                                                                                                                | 1: `facebook/pe-av-large`                                  | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_003_mlx-lm_mlx-lm-model-load-model_001.md)       | -                 | Load/generation completes or fails with a narrower owner. |
-| `mlx-vlm`                                                | Tokenizer decode leaked BPE/byte markers              | 41 BPE space markers found in decoded text \| prompt=1,745 \| output/prompt=11.46% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200)                                   | 1: `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_004_mlx-vlm_encoding_001.md)                     | -                 | No BPE/byte markers in output.                            |
-| `mlx-vlm`                                                | Stop/control tokens leaked into generated text        | decoded text contains control token &lt;\|endoftext\|&gt; \| prompt=16,176 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) \| 2 model cluster | 2: `mlx-community/Qwen2-VL-2B-Instruct-4bit` (+1)          | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_005_mlx-vlm_stop-token_001.md)                   | -                 | No leaked stop/control tokens.                            |
-| model repo first; mlx-vlm if template handling disagrees | Prompt/template output shape mismatch                 | generated_tokens~3 \| prompt=269 \| output/prompt=1.12% \| nontext burden=98% \| stop=completed \| 5 model cluster                                                                    | 5: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` (+4)                 | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_006_model-config-mlx-vlm_prompt-template_001.md) | -                 | Requested sections render without template leakage.       |
-| mlx-vlm first; MLX if cache/runtime reproduces           | Long-context generation collapsed or became too short | prompt_tokens=16167, repetitive output \| prompt=16,167 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) \| 3 model cluster                    | 3: `mlx-community/Qwen3.5-27B-mxfp8` (+2)                  | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_007_mlx-vlm-mlx_long-context_001.md)             | -                 | Full and reduced reruns avoid context collapse.           |
-| mlx-vlm first; MLX if cache/runtime reproduces           | Long-context generation collapsed or became too short | output/prompt=0.1% \| prompt_tokens=16167, output_tokens=12, output/prompt=0.1% \| prompt=16,167 \| output/prompt=0.07% \| nontext burden=100% \| stop=completed \| 2 model cluster   | 2: `mlx-community/Qwen3.5-9B-MLX-4bit` (+1)                | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_008_mlx-vlm-mlx_long-context_002.md)             | -                 | Full and reduced reruns avoid context collapse.           |
-| mlx-vlm first; MLX if cache/runtime reproduces           | Long-context generation collapsed or became too short | token cap \| abrupt tail \| degeneration \| prompt=16,167 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) \| 2 model cluster                  | 2: `mlx-community/Qwen3.5-27B-4bit` (+1)                   | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_009_mlx-vlm-mlx_long-context_003.md)             | -                 | Full and reduced reruns avoid context collapse.           |
+| Target                                                   | Problem                                               | Evidence Snapshot                                                                                                                                                                     | Affected Models                                            | Issue Draft                                                                    | Evidence Bundle   | Fixed When                                                |
+|----------------------------------------------------------|-------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|--------------------------------------------------------------------------------|-------------------|-----------------------------------------------------------|
+| `mlx`                                                    | Weight/config mismatch during model load              | Model Error \| phase model_load \| ValueError                                                                                                                                         | 1: `mlx-community/Kimi-VL-A3B-Thinking-8bit`               | [issue draft](../issues/issue_001_mlx_mlx-model-load-model_001.md)             | -                 | Load/generation completes or fails with a narrower owner. |
+| `mlx`                                                    | Weight/config mismatch during model load              | Weight Mismatch \| phase model_load \| ValueError                                                                                                                                     | 1: `mlx-community/LFM2.5-VL-1.6B-bf16`                     | [issue draft](../issues/issue_002_mlx_mlx-model-load-weight-mismatch_001.md)   | -                 | Load/generation completes or fails with a narrower owner. |
+| `mlx-lm`                                                 | Missing module/import during model load               | Model Error \| phase model_load \| ModuleNotFoundError                                                                                                                                | 1: `facebook/pe-av-large`                                  | [issue draft](../issues/issue_003_mlx-lm_mlx-lm-model-load-model_001.md)       | -                 | Load/generation completes or fails with a narrower owner. |
+| `mlx-vlm`                                                | Tokenizer decode leaked BPE/byte markers              | 41 BPE space markers found in decoded text \| prompt=1,745 \| output/prompt=11.46% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200)                                   | 1: `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | [issue draft](../issues/issue_004_mlx-vlm_encoding_001.md)                     | -                 | No BPE/byte markers in output.                            |
+| `mlx-vlm`                                                | Stop/control tokens leaked into generated text        | decoded text contains control token &lt;\|endoftext\|&gt; \| prompt=16,176 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) \| 2 model cluster | 2: `mlx-community/Qwen2-VL-2B-Instruct-4bit` (+1)          | [issue draft](../issues/issue_005_mlx-vlm_stop-token_001.md)                   | -                 | No leaked stop/control tokens.                            |
+| model repo first; mlx-vlm if template handling disagrees | Prompt/template output shape mismatch                 | generated_tokens~3 \| prompt=269 \| output/prompt=1.12% \| nontext burden=98% \| stop=completed \| 5 model cluster                                                                    | 5: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` (+4)                 | [issue draft](../issues/issue_006_model-config-mlx-vlm_prompt-template_001.md) | -                 | Requested sections render without template leakage.       |
+| mlx-vlm first; MLX if cache/runtime reproduces           | Long-context generation collapsed or became too short | prompt_tokens=16167, repetitive output \| prompt=16,167 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) \| 3 model cluster                    | 3: `mlx-community/Qwen3.5-27B-mxfp8` (+2)                  | [issue draft](../issues/issue_007_mlx-vlm-mlx_long-context_001.md)             | -                 | Full and reduced reruns avoid context collapse.           |
+| mlx-vlm first; MLX if cache/runtime reproduces           | Long-context generation collapsed or became too short | output/prompt=0.1% \| prompt_tokens=16167, output_tokens=12, output/prompt=0.1% \| prompt=16,167 \| output/prompt=0.07% \| nontext burden=100% \| stop=completed \| 2 model cluster   | 2: `mlx-community/Qwen3.5-9B-MLX-4bit` (+1)                | [issue draft](../issues/issue_008_mlx-vlm-mlx_long-context_002.md)             | -                 | Full and reduced reruns avoid context collapse.           |
+| mlx-vlm first; MLX if cache/runtime reproduces           | Long-context generation collapsed or became too short | token cap \| abrupt tail \| degeneration \| prompt=16,167 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) \| 2 model cluster                  | 2: `mlx-community/Qwen3.5-27B-4bit` (+1)                   | [issue draft](../issues/issue_009_mlx-vlm-mlx_long-context_003.md)             | -                 | Full and reduced reruns avoid context collapse.           |
 
 ## Model Verdicts
 
@@ -283,7 +283,7 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
 
-### `HuggingFaceTB/SmolVLM-Instruct`
+### `mlx-community/SmolVLM-Instruct-bf16`
 
 - _Recommendation:_ avoid for now; review verdict: cutoff degraded
 - _Owner:_ likely owner `model`
@@ -305,6 +305,17 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   tok; generated 6 tok; requested max 200 tok; stop reason completed
 
 
+### `HuggingFaceTB/SmolVLM-Instruct`
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ hit token cap (200); nontext prompt burden=99%; repetitive
+  token=phrase: "ter budget ter budget..."
+- _Tokens:_ prompt 1196 tok; estimated text 6 tok; estimated non-text 1190
+  tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
+
+
 ### `mlx-community/gemma-4-26b-a4b-it-4bit`
 
 - _Recommendation:_ avoid for now; review verdict: cutoff degraded
@@ -314,17 +325,6 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   degeneration=character_loop: '/1' repeated
 - _Tokens:_ prompt 284 tok; estimated text 6 tok; estimated non-text 278 tok;
   generated 200 tok; requested max 200 tok; stop reason max_tokens
-
-
-### `mlx-community/SmolVLM-Instruct-bf16`
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ hit token cap (200); nontext prompt burden=99%; repetitive
-  token=phrase: "ter budget ter budget..."
-- _Tokens:_ prompt 1196 tok; estimated text 6 tok; estimated non-text 1190
-  tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
 
 ### `microsoft/Phi-3.5-vision-instruct`
@@ -386,6 +386,16 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
 - _Key signals:_ hit token cap (200); nontext prompt burden=100%; repetitive
   token=phrase: "1st 1st 1st 1st..."
 - _Tokens:_ prompt 2278 tok; estimated text 6 tok; estimated non-text 2272
+  tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
+
+
+### `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ hit token cap (200); nontext prompt burden=100%
+- _Tokens:_ prompt 1270 tok; estimated text 6 tok; estimated non-text 1264
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
 
@@ -456,16 +466,6 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
 
-### `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ hit token cap (200); nontext prompt burden=100%
-- _Tokens:_ prompt 1270 tok; estimated text 6 tok; estimated non-text 1264
-  tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
-
-
 ### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`
 
 - _Recommendation:_ avoid for now; review verdict: harness
@@ -490,17 +490,6 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
 
-### `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`
-
-- _Recommendation:_ use with caveats; review verdict: token cap
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ hit token cap (200); nontext prompt burden=62%;
-  degeneration=repeated_punctuation: '##########...'
-- _Tokens:_ prompt 16 tok; estimated text 6 tok; estimated non-text 10 tok;
-  generated 200 tok; requested max 200 tok; stop reason max_tokens
-
-
 ### `mlx-community/GLM-4.6V-Flash-mxfp4`
 
 - _Recommendation:_ avoid for now; review verdict: cutoff degraded
@@ -510,6 +499,17 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   token=phrase: "and the idea is..."
 - _Tokens:_ prompt 6045 tok; estimated text 6 tok; estimated non-text 6039
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
+
+
+### `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`
+
+- _Recommendation:_ use with caveats; review verdict: token cap
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ hit token cap (200); nontext prompt burden=62%;
+  degeneration=repeated_punctuation: '##########...'
+- _Tokens:_ prompt 16 tok; estimated text 6 tok; estimated non-text 10 tok;
+  generated 200 tok; requested max 200 tok; stop reason max_tokens
 
 
 ### `mlx-community/GLM-4.6V-Flash-6bit`
@@ -597,16 +597,6 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
 
-### `mlx-community/gemma-4-31b-bf16`
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ hit token cap (200); nontext prompt burden=98%
-- _Tokens:_ prompt 272 tok; estimated text 6 tok; estimated non-text 266 tok;
-  generated 200 tok; requested max 200 tok; stop reason max_tokens
-
-
 ### `mlx-community/GLM-4.6V-nvfp4`
 
 - _Recommendation:_ avoid for now; review verdict: semantic mismatch
@@ -616,6 +606,16 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   ends with 'co'
 - _Tokens:_ prompt 6045 tok; estimated text 6 tok; estimated non-text 6039
   tok; generated 58 tok; requested max 200 tok; stop reason completed
+
+
+### `mlx-community/gemma-4-31b-bf16`
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ hit token cap (200); nontext prompt burden=98%
+- _Tokens:_ prompt 272 tok; estimated text 6 tok; estimated non-text 266 tok;
+  generated 200 tok; requested max 200 tok; stop reason max_tokens
 
 
 ### `meta-llama/Llama-3.2-11B-Vision-Instruct`
@@ -654,19 +654,6 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   tok; generated 12 tok; requested max 200 tok; stop reason completed
 
 
-### `mlx-community/Qwen3.5-35B-A3B-6bit`
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `mlx`; harness signal `long_context`
-- _Next step:_ Inspect long-context cache behavior under heavy image-token
-  burden.
-- _Key signals:_ At long prompt length (16167 tokens), output became
-  repetitive.; hit token cap (200); nontext prompt burden=100%;
-  degeneration=character_loop: ' ,' repeated
-- _Tokens:_ prompt 16167 tok; estimated text 6 tok; estimated non-text 16161
-  tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
-
-
 ### `mlx-community/Qwen3.5-35B-A3B-4bit`
 
 - _Recommendation:_ avoid for now; review verdict: cutoff degraded
@@ -699,6 +686,19 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
 - _Key signals:_ Special control token &lt;|endoftext|&gt; appeared in
   generated text.; hit token cap (200); nontext prompt burden=100%
 - _Tokens:_ prompt 16176 tok; estimated text 6 tok; estimated non-text 16170
+  tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
+
+
+### `mlx-community/Qwen3.5-35B-A3B-6bit`
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `mlx`; harness signal `long_context`
+- _Next step:_ Inspect long-context cache behavior under heavy image-token
+  burden.
+- _Key signals:_ At long prompt length (16167 tokens), output became
+  repetitive.; hit token cap (200); nontext prompt burden=100%;
+  degeneration=character_loop: ' ,' repeated
+- _Tokens:_ prompt 16167 tok; estimated text 6 tok; estimated non-text 16161
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
 

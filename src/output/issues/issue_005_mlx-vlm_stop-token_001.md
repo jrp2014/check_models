@@ -12,10 +12,10 @@
 
 ## Affected Models
 
-| Model                                     | Observed Behavior                                         | Token Counts                                                                                          | Optional Context                                                                                                                                                                     |
-|-------------------------------------------|-----------------------------------------------------------|-------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | decoded text contains control token &lt;\|endoftext\|&gt; | prompt=16,176 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_stop_token_001.json) |
-| `mlx-community/X-Reasoner-7B-8bit`        | decoded text contains control token &lt;\|endoftext\|&gt; | prompt=16,176 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_015_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_stop_token_001.json)        |
+| Model                                     | Observed Behavior                                         | Token Counts                                                                                          | Optional Context                                                                                                           |
+|-------------------------------------------|-----------------------------------------------------------|-------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | decoded text contains control token &lt;\|endoftext\|&gt; | prompt=16,176 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) | [optional JSON](../repro_bundles/20260521T221248Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_stop_token_001.json) |
+| `mlx-community/X-Reasoner-7B-8bit`        | decoded text contains control token &lt;\|endoftext\|&gt; | prompt=16,176 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) | [optional JSON](../repro_bundles/20260521T221248Z_015_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_stop_token_001.json)        |
 
 
 ## Minimal Evidence
@@ -78,8 +78,8 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_stop_token_001.json)
-- `mlx-community/X-Reasoner-7B-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_015_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_stop_token_001.json)
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: [optional JSON](../repro_bundles/20260521T221248Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_stop_token_001.json)
+- `mlx-community/X-Reasoner-7B-8bit`: [optional JSON](../repro_bundles/20260521T221248Z_015_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_stop_token_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -102,12 +102,12 @@ Optional advanced context:
 | Component       | Version                     |
 |-----------------|-----------------------------|
 | mlx-vlm         | 0.5.0                       |
-| mlx             | 0.32.0.dev20260517+7b7c1240 |
+| mlx             | 0.32.0.dev20260521+5d1c0e4c |
 | mlx-lm          | 0.31.3                      |
 | mlx-audio       | 0.4.3                       |
-| transformers    | 5.8.1                       |
+| transformers    | 5.9.0                       |
 | tokenizers      | 0.22.2                      |
-| huggingface-hub | 1.15.0                      |
+| huggingface-hub | 1.16.1                      |
 | Python Version  | 3.13.13                     |
 | OS              | Darwin 25.5.0               |
 | macOS Version   | 26.5                        |

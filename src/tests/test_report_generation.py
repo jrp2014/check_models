@@ -660,22 +660,40 @@ class TestMarkdownReportEdgeCases:
         assert "Standalone output gallery" in content
         assert "Automated review digest" in content
         assert "Canonical run log" in content
-        assert (
-            "[model_gallery.md]"
-            "(https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md)"
-        ) in content
-        assert (
-            "[review.md]"
-            "(https://github.com/jrp2014/check_models/blob/main/src/output/reports/review.md)"
-        ) in content
-        assert (
-            "[check_models.log]"
-            "(https://github.com/jrp2014/check_models/blob/main/src/output/check_models.log)"
-        ) in content
-        assert (
-            "https://github.com/jrp2014/check_models/blob/main/src/output/reports/"
-            "model_gallery.md#model-org-good"
-        ) in content
+        assert "[model_gallery.md](model_gallery.md)" in content
+        assert "[review.md](review.md)" in content
+        assert "[check_models.log](check_models.log)" in content
+        assert "model_gallery.md#model-org-good" in content
+
+        # Now test absolute github links when _LINK_STYLE is "github"
+        with patch("check_models._LINK_STYLE", "github"):
+            generate_markdown_report(
+                results=[_make_quality_success("org/good", with_quality_issue=True)],
+                filename=out,
+                versions=_stub_versions(),
+                prompt="describe",
+                total_runtime_seconds=1.0,
+                gallery_filename=gallery,
+                review_filename=review,
+                log_filename=log_file,
+            )
+            content_github = out.read_text(encoding="utf-8")
+            assert (
+                "[model_gallery.md]"
+                "(https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md)"
+            ) in content_github
+            assert (
+                "[review.md]"
+                "(https://github.com/jrp2014/check_models/blob/main/src/output/reports/review.md)"
+            ) in content_github
+            assert (
+                "[check_models.log]"
+                "(https://github.com/jrp2014/check_models/blob/main/src/output/check_models.log)"
+            ) in content_github
+            assert (
+                "https://github.com/jrp2014/check_models/blob/main/src/output/reports/"
+                "model_gallery.md#model-org-good"
+            ) in content_github
         assert "## Model Gallery" not in content
         assert "## ✅ Usable Diagnostic Candidates" in content
         assert "_Best end-to-end cataloging:_" in content
@@ -832,9 +850,22 @@ class TestMarkdownGalleryReport:
         assert "# Automated Review Digest" in content
         assert "## Maintainer Escalations" in content
         assert "issues/index.md" in content
-        assert (
-            "https://github.com/jrp2014/check_models/blob/main/src/output/issues/index.md"
-        ) in content
+        assert "../issues/index.md" in content
+
+        # Now test absolute github links when _LINK_STYLE is "github"
+        with patch("check_models._LINK_STYLE", "github"):
+            generate_review_report(
+                results=results,
+                filename=out,
+                prompt="describe",
+                report_context=report_context,
+                log_filename=log_file,
+                gallery_filename=gallery,
+            )
+            content_github = out.read_text(encoding="utf-8")
+            assert (
+                "https://github.com/jrp2014/check_models/blob/main/src/output/issues/index.md"
+            ) in content_github
         assert "## 🧭 Review Shortlist" in content
         assert "## User Buckets" in content
         assert "## Model Verdicts" in content
@@ -1466,9 +1497,26 @@ class TestDiagnosticsReport:
         assert "Evidence Bundle" in content
         assert "Fixed When" in content
         assert "issues/index.md" in content
-        assert (
-            "https://github.com/jrp2014/check_models/blob/main/src/output/issues/index.md"
-        ) in content
+        assert "../issues/index.md" in content
+
+        # Now test absolute github links when _LINK_STYLE is "github"
+        with patch("check_models._LINK_STYLE", "github"):
+            generate_diagnostics_report(
+                results=[
+                    _make_failure_with_details(
+                        failure_phase="model_load",
+                        error_type="ValueError",
+                    )
+                ],
+                filename=out,
+                versions=_stub_versions(),
+                system_info={},
+                prompt="test",
+            )
+            content_github = out.read_text(encoding="utf-8")
+            assert (
+                "https://github.com/jrp2014/check_models/blob/main/src/output/issues/index.md"
+            ) in content_github
         assert "Priority" not in content
         assert content.index("## Issue Queue") < content.index("## 1. Failure")
         assert content.index("## Issue Queue") < content.index("## Environment")
@@ -3517,10 +3565,23 @@ class TestGithubIssueReportContent:
         assert "MLX_VLM_DECODE_RUNTIME" not in content
         assert "runtime_failure" not in content
         assert "Traceback (most recent call last)" in content
-        assert (
-            "[optional JSON]"
-            "(https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/broken.json)"
-        ) in content
+        assert "[optional JSON](../repro_bundles/broken.json)" in content
+
+        # Now test absolute github links when _LINK_STYLE is "github"
+        with patch("check_models._LINK_STYLE", "github"):
+            generated_github = _generate_github_issue_reports(
+                diagnostics_snapshot=snapshot,
+                output_dir=tmp_path,
+                versions=_stub_versions(),
+                system_info={"Python Version": "3.13"},
+                repro_bundles={"org/broken-model": bundle_path},
+                run_args=None,
+            )
+            content_github = next(iter(generated_github.values())).read_text(encoding="utf-8")
+            assert (
+                "[optional JSON]"
+                "(https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/broken.json)"
+            ) in content_github
         assert "Optional advanced context:" in content
         assert "Python Version" in content
         assert "Priority" not in content

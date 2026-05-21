@@ -2,17 +2,17 @@
   "environment": {
     "library_versions": {
       "Pillow": "12.2.0",
-      "huggingface-hub": "1.14.0",
-      "mlx": "0.32.0.dev20260510+84961223",
+      "huggingface-hub": "1.16.1",
+      "mlx": "0.32.0.dev20260521+5d1c0e4c",
       "mlx-audio": "0.4.3",
       "mlx-lm": "0.31.3",
       "mlx-metal": null,
       "mlx-vlm": "0.5.0",
-      "numpy": "2.4.4",
+      "numpy": "2.4.6",
       "tokenizers": "0.22.2",
-      "transformers": "5.8.0"
+      "transformers": "5.9.0"
     },
-    "platform": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
+    "platform": "macOS-26.5-arm64-arm-64bit-Mach-O",
     "preflight_issues": [],
     "system_info": {
       "Architecture": "arm64",
@@ -22,13 +22,13 @@
       "GPU/Chip": "Apple M5 Max",
       "Metal SDK": "MacOSX.sdk",
       "Metal Support": "Metal 4",
-      "OS": "Darwin 25.4.0",
-      "Python Version": "3.13.12",
+      "OS": "Darwin 25.5.0",
+      "Python Version": "3.13.13",
       "RAM": "128.0 GB",
-      "SDK Version": "26.4",
-      "Xcode Build": "17E202",
-      "Xcode Version": "26.4.1",
-      "macOS Version": "26.4.1"
+      "SDK Version": "26.5",
+      "Xcode Build": "17F42",
+      "Xcode Version": "26.5",
+      "macOS Version": "26.5"
     }
   },
   "failure": {
@@ -42,9 +42,9 @@
     "traceback": null,
     "type": null
   },
-  "generated_at_utc": "2026-05-10T00:31:28+00:00",
+  "generated_at_utc": "2026-05-21T22:12:48+00:00",
   "issue_cluster_id": "model-config-mlx-vlm_prompt-template_001",
-  "model": "mlx-community/llava-v1.6-mistral-7b-8bit",
+  "model": "LiquidAI/LFM2.5-VL-450M-MLX-bf16",
   "repro": {
     "args": {
       "_check_models_preflight_issues": [],
@@ -54,7 +54,7 @@
       "dry_run": false,
       "enable_thinking": false,
       "eos_tokens": null,
-      "eval_mode": "stress",
+      "eval_mode": "triage",
       "exclude": [
         "mlx-community/Qwen3-VL-2B-Thinking-bf16",
         "Qwen/Qwen3-VL-2B-Instruct"
@@ -67,11 +67,13 @@
       "kv_group_size": 64,
       "kv_quant_scheme": "uniform",
       "lazy_load": false,
+      "link_style": "relative",
       "max_kv_size": null,
-      "max_tokens": 500,
+      "max_tokens": 200,
       "min_p": 0.0,
       "models": null,
       "no_color": false,
+      "open_report": false,
       "output_diagnostics": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/diagnostics.md",
       "output_env": "/Users/jrp/Documents/AI/mlx/check_models/src/output/environment.log",
       "output_gallery_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/model_gallery.md",
@@ -105,22 +107,22 @@
       "verbose": true,
       "width": null
     },
-    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260509-165009_DSC09954.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/llava-v1.6-mistral-7b-8bit mlx-community/paligemma2-10b-ft-docci-448-bf16",
+    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models LiquidAI/LFM2.5-VL-450M-MLX-bf16 mlx-community/InternVL3-8B-bf16 mlx-community/Molmo-7B-D-0924-bf16 mlx-community/paligemma2-10b-ft-docci-448-6bit mlx-community/paligemma2-10b-ft-docci-448-bf16",
     "env_vars": {
       "TOKENIZERS_PARALLELISM": "false"
     },
-    "image_path": "/Users/jrp/Pictures/Processed/20260509-165009_DSC09954.jpg",
-    "image_ref_sha256": "ed44d880529e0633051d5651bea9660b787e8673e37f61808667a88fe6f684bd",
-    "image_sha256": "bcc68c742f02f1e316466de87b02cb67b3b7c10a00c07d6100446c935db1cb1d",
+    "image_path": "/Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg",
+    "image_ref_sha256": "d1aa69dd73e1a686603a752d0e4b71b76f832628f935f4626884df8082b9b6b4",
+    "image_sha256": "06f6f7fdc76b4cc85d8dcb7c180671c2a7e91574b3b3638c67907ca601e4ab2a",
     "prompt_diagnostics": {
-      "eos_token": "</s>",
-      "eos_token_id": 2,
+      "eos_token": "<|im_end|>",
+      "eos_token_id": 7,
       "generate_kwargs": {
         "kv_bits": null,
         "kv_group_size": 64,
         "kv_quant_scheme": "uniform",
         "max_kv_size": null,
-        "max_tokens": 500,
+        "max_tokens": 200,
         "prefill_step_size": 4096,
         "quantized_kv_start": 5000,
         "repetition_context_size": 20,
@@ -129,59 +131,61 @@
         "top_p": 1.0
       },
       "image_placeholder_count": 1,
-      "model_type": "llava_next",
-      "processor_class": "mlx_vlm.models.llava_next.processing_llava_next.LlavaNextProcessor",
-      "rendered_prompt_chars": 2384,
-      "rendered_prompt_hash_sha256": "1455250b6aa1e84af28c79c7e1fade35ef0c4e909a6409c1df3719856d16cf79",
-      "rendered_prompt_preview": "[INST] <image>\nAnalyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences descri...",
+      "model_type": "lfm2-vl",
+      "processor_class": "transformers.models.lfm2_vl.processing_lfm2_vl.Lfm2VlProcessor",
+      "rendered_prompt_chars": 100,
+      "rendered_prompt_hash_sha256": "8ce87ec24216f807c7540827ca853686df08fc530786f63bf529a6a67bdb1e8b",
+      "rendered_prompt_preview": "<|startoftext|><|im_start|>user\n<image>Describe this image briefly.<|im_end|>\n<|im_start|>assistant\n",
       "special_token_ids": [
         1,
-        2,
+        7,
         0,
-        32001
+        499,
+        498,
+        396,
+        497
       ],
       "special_tokens": [
-        "<s>",
-        "</s>",
-        "<unk>",
-        "<pad>"
+        "<|startoftext|>",
+        "<|im_end|>",
+        "<|pad|>",
+        "<|image_end|>",
+        "<|image_start|>",
+        "<image>",
+        "<|img_thumbnail|>"
       ],
       "tokenizer_class": "transformers.tokenization_utils_tokenizers.TokenizersBackend"
     },
-    "prompt_hash_sha256": "1887ad882e1845d8b9e280a51db6efcf4cb34cc0d4015d8de3dbfe882f83251d",
-    "prompt_preview": "Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct any...",
-    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260509-165009_DSC09954.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/llava-v1.6-mistral-7b-8bit",
+    "prompt_hash_sha256": "d760336d0fd143932f194573dd63f6b531e0ffbc2c4f1595e015392a3471c318",
+    "prompt_preview": "Describe this image briefly.",
+    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models LiquidAI/LFM2.5-VL-450M-MLX-bf16",
     "seed": null
   },
   "result": {
-    "generated_text_preview": "The image is a photograph of a church. ",
+    "generated_text_preview": "\u00ed.",
     "maintainer_triage": {
       "confidence": "high",
       "evidence": [
-        "harness:prompt_template",
-        "low_hint_overlap"
+        "harness:prompt_template"
       ],
       "harness_details": [
-        "output:output_ratio(0.4%)"
+        "output:truncated(3tok)"
       ],
       "hit_max_tokens": false,
       "issue_kind": "harness",
       "issue_subtype": "prompt_template",
-      "next_action": "Check chat-template and EOS defaults first; the output shape is not matching the requested contract.",
-      "nontext_prompt_ratio": 0.8300466116887774,
-      "prompt_output_ratio": 0.003944065973467192,
-      "prompt_tokens_total": 2789,
-      "requested_max_tokens": 500,
+      "next_action": "Inspect model repo config, chat template, and EOS settings.",
+      "nontext_prompt_ratio": 0.9776951672862454,
+      "prompt_output_ratio": 0.011152416356877323,
+      "prompt_tokens_total": 269,
+      "requested_max_tokens": 200,
       "stop_reason": "completed",
-      "summary": "Output is very short relative to prompt size (0.4%), suggesting possible early-stop or prompt-handling issues. | nontext prompt burden=83% | missing sections: title, description, keywords | missing terms: Bell Tower, Blue sky, Car, Chapel, Cross",
+      "summary": "Output appears truncated to about 3 tokens. | nontext prompt burden=98%",
       "suspected_owner": "model-config",
       "user_bucket": "avoid"
     },
     "quality_issues": [
-      "\u26a0\ufe0fharness(prompt_template)",
-      "missing-sections(title+description+keywords)",
-      "trusted-hints-ignored",
-      "context-ignored"
+      "\u26a0\ufe0fharness(prompt_template)"
     ],
     "success": true
   },

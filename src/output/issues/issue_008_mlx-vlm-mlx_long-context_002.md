@@ -12,10 +12,10 @@
 
 ## Affected Models
 
-| Model                                     | Observed Behavior                                                               | Token Counts                                                                  | Optional Context                                                                                                                                                                           |
-|-------------------------------------------|---------------------------------------------------------------------------------|-------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Qwen3.5-9B-MLX-4bit`       | output/prompt=0.1% \| prompt_tokens=16167, output_tokens=12, output/prompt=0.1% | prompt=16,167 \| output/prompt=0.07% \| nontext burden=100% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_013_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_002.json)       |
-| `mlx-community/paligemma2-3b-pt-896-4bit` | output/prompt=0.2% \| prompt_tokens=4103, output_tokens=9, output/prompt=0.2%   | prompt=4,103 \| output/prompt=0.22% \| nontext burden=100% \| stop=completed  | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_018_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_002.json) |
+| Model                                     | Observed Behavior                                                               | Token Counts                                                                  | Optional Context                                                                                                                 |
+|-------------------------------------------|---------------------------------------------------------------------------------|-------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/Qwen3.5-9B-MLX-4bit`       | output/prompt=0.1% \| prompt_tokens=16167, output_tokens=12, output/prompt=0.1% | prompt=16,167 \| output/prompt=0.07% \| nontext burden=100% \| stop=completed | [optional JSON](../repro_bundles/20260521T221248Z_013_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_002.json)       |
+| `mlx-community/paligemma2-3b-pt-896-4bit` | output/prompt=0.2% \| prompt_tokens=4103, output_tokens=9, output/prompt=0.2%   | prompt=4,103 \| output/prompt=0.22% \| nontext burden=100% \| stop=completed  | [optional JSON](../repro_bundles/20260521T221248Z_018_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_002.json) |
 
 
 ## Minimal Evidence
@@ -78,8 +78,8 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/Qwen3.5-9B-MLX-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_013_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_002.json)
-- `mlx-community/paligemma2-3b-pt-896-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260517T213817Z_018_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_002.json)
+- `mlx-community/Qwen3.5-9B-MLX-4bit`: [optional JSON](../repro_bundles/20260521T221248Z_013_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_002.json)
+- `mlx-community/paligemma2-3b-pt-896-4bit`: [optional JSON](../repro_bundles/20260521T221248Z_018_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_002.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -101,12 +101,12 @@ Optional advanced context:
 | Component       | Version                     |
 |-----------------|-----------------------------|
 | mlx-vlm         | 0.5.0                       |
-| mlx             | 0.32.0.dev20260517+7b7c1240 |
+| mlx             | 0.32.0.dev20260521+5d1c0e4c |
 | mlx-lm          | 0.31.3                      |
 | mlx-audio       | 0.4.3                       |
-| transformers    | 5.8.1                       |
+| transformers    | 5.9.0                       |
 | tokenizers      | 0.22.2                      |
-| huggingface-hub | 1.15.0                      |
+| huggingface-hub | 1.16.1                      |
 | Python Version  | 3.13.13                     |
 | OS              | Darwin 25.5.0               |
 | macOS Version   | 26.5                        |

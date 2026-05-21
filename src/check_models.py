@@ -25,6 +25,7 @@ import sys
 import textwrap
 import time
 import traceback
+import webbrowser
 from collections import Counter
 from collections.abc import Callable, Generator, Iterable, Iterator, Mapping, Sequence
 from contextlib import (
@@ -1727,6 +1728,13 @@ _PUBLISHED_ROOT_OUTPUT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
         "results.history.jsonl",
     }
 )
+
+
+class _LinkStyleState:
+    """Mutable report link rendering mode shared by artifact helpers."""
+
+    value: ClassVar[str] = "relative"
+
 
 DEFAULT_TEMPERATURE: Final[float] = 0.0  # Greedy/deterministic (matches mlx-vlm upstream)
 DEFAULT_TIMEOUT: Final[float] = 300.0  # Default timeout in seconds
@@ -10057,7 +10065,16 @@ def _github_published_output_url(
     anchor: str | None = None,
     tree: bool = False,
 ) -> str:
-    """Return a GitHub URL for a tracked file or directory under ``src/output``."""
+    """Return a link for a tracked file or directory under ``src/output``, according to _LINK_STYLE."""
+    if _LinkStyleState.value == "relative":
+        # We need a relative path from the reports directory (src/output/reports)
+        # to the requested parts under src/output.
+        rel_parts = ["..", *list(repo_relative_parts)]
+        url = "/".join(quote(part) for part in rel_parts)
+        if anchor is not None:
+            return f"{url}#{anchor}"
+        return url
+
     return _github_repo_artifact_url(
         _PUBLISHED_OUTPUT_ROOT.joinpath(*repo_relative_parts),
         anchor=anchor,
@@ -10072,6 +10089,15 @@ def _markdown_artifact_target(
     anchor: str | None = None,
 ) -> str:
     """Return the best Markdown target for a companion artifact link."""
+    if _LinkStyleState.value == "relative":
+        target = _relative_markdown_artifact_path(
+            report_filename=report_filename,
+            artifact_filename=artifact_filename,
+        ).replace(" ", "%20")
+        if anchor is not None:
+            return f"{target}#{anchor}"
+        return target
+
     github_url = _github_output_artifact_url(artifact_filename, anchor=anchor)
     if github_url is not None:
         return github_url
@@ -23851,6 +23877,76 @@ def _run_differential_reruns(
     return updated
 
 
+def _print_reports_dashboard(
+    output_paths: ReportOutputPaths,
+    diagnostics_artifacts: DiagnosticsArtifacts | None = None,
+    history_path: Path | None = None,
+) -> None:
+    """Print a highly polished, unified console dashboard of all generated artifacts."""
+    colors_enabled = _rich_color_enabled()
+    force_terminal = True if colors_enabled and os.getenv("FORCE_COLOR") is not None else None
+    console = Console(
+        stderr=True,
+        force_terminal=force_terminal,
+        no_color=not colors_enabled,
+        markup=True,
+        highlight=True,
+        emoji=True,
+    )
+
+    table = Table(
+        box=None,
+        show_header=True,
+        header_style="bold cyan",
+        expand=True,
+    )
+    table.add_column("Artifact / Report", style="bold green", width=22)
+    table.add_column("Purpose", style="italic white", width=42)
+    table.add_column("Local Location (Clickable)", style="blue")
+
+    def add_row(label: str, purpose: str, path: Path | None) -> None:
+        if path is None or not path.exists():
+            return
+        uri = f"file://{path.resolve()}"
+        clickable_link = f"[link={uri}]{uri}[/link]"
+        table.add_row(label, purpose, clickable_link)
+
+    add_row("HTML Report", "Interactive dashboard with charts & filters", output_paths.html)
+    add_row("Markdown Report", "Clean results summary for docs & portals", output_paths.markdown)
+    add_row("Gallery Report", "Text output & quality review details", output_paths.gallery_markdown)
+    add_row("Review Report", "Insights summary & checklist", output_paths.review)
+    add_row("TSV Metrics", "Tab-separated raw metrics for import", output_paths.tsv)
+
+    if diagnostics_artifacts and diagnostics_artifacts.diagnostics_written:
+        add_row("Diagnostics", "Upstream bug triage & package failures", output_paths.diagnostics)
+
+    if history_path:
+        add_row("Run History", "Persistent database of previous runs", history_path)
+
+    add_row("System Log", "Step-by-step CLI trace log", output_paths.log)
+    add_row("Environment Log", "Pip freeze & conda env config log", output_paths.environment)
+
+    if diagnostics_artifacts and diagnostics_artifacts.issue_reports:
+        issues_dir = output_paths.diagnostics.parent.parent / "issues"
+        if issues_dir.exists():
+            add_row("GitHub Issue Drafts", "Upstream issue template index", issues_dir / "index.md")
+
+    if diagnostics_artifacts and diagnostics_artifacts.repro_bundles:
+        repro_dir = output_paths.diagnostics.parent.parent / "repro_bundles"
+        if repro_dir.exists():
+            add_row("Repro Bundles", "Telemetry & prompt trace JSON packets", repro_dir)
+
+    panel = Panel(
+        table,
+        title="[bold green]📊 MLX VLM CHECKER - ARTIFACT DASHBOARD[/bold green]",
+        subtitle="[bold yellow]💡 Tip: CMD+Click any link to open locally[/bold yellow]",
+        border_style="blue",
+        expand=True,
+    )
+    console.print()
+    console.print(panel)
+
+
 def finalize_execution(
     *,
     args: argparse.Namespace,
@@ -23961,6 +24057,21 @@ def finalize_execution(
             logger.info(
                 "Removed %d stale top-level report(s) superseded by reports/.", stale_removed
             )
+
+        # Print the beautiful report summary dashboard
+        _print_reports_dashboard(
+            output_paths=output_paths,
+            diagnostics_artifacts=diagnostics_artifacts,
+            history_path=history_path,
+        )
+
+        # Open HTML report in default browser if requested
+        if getattr(args, "open_report", False) and output_paths.html.exists():
+            try:
+                webbrowser.open(output_paths.html.as_uri())
+                logger.info("Automatically opened HTML report: %s", output_paths.html.name)
+            except (OSError, webbrowser.Error) as e:
+                logger.warning("Could not automatically open HTML report: %s", e)
     else:
         log_warning_note("No models processed. No performance summary generated.")
         logger.info("Skipping report generation as no models were processed.")
@@ -23982,6 +24093,8 @@ def finalize_execution(
 
 def main(args: argparse.Namespace) -> None:
     """Run CLI execution for MLX VLM model check."""
+    _LinkStyleState.value = getattr(args, "link_style", "relative")
+
     overall_start_time: float = time.perf_counter()
     library_versions: LibraryVersionDict | None = None
     try:
@@ -24571,6 +24684,23 @@ def _build_cli_parser() -> argparse.ArgumentParser:
             "unknown anomalies) with a simple prompt to gather secondary evidence. "
             "First-pass results are never overwritten."
         ),
+    )
+    parser.add_argument(
+        "--link-style",
+        choices=["relative", "github"],
+        default="relative",
+        help=(
+            "Link format for companion artifacts in Markdown reports: "
+            "'relative' (default) generates offline-friendly local relative paths "
+            "(which also resolve correctly when pushed to GitHub); "
+            "'github' generates absolute GitHub web URLs."
+        ),
+    )
+    parser.add_argument(
+        "--open-report",
+        action="store_true",
+        default=False,
+        help="Automatically open the HTML performance report in the default web browser upon completion.",
     )
     parser.add_argument(
         "-n",
