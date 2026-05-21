@@ -19,6 +19,8 @@ Notable changes to this project will be documented in this file.
   leak into local quality output.
 - Default direct package-local Skylos runs to concise output and route generated
   text artifacts through symlink-resistant file helpers.
+- Add a dedicated `make skylos` wrapper that applies the repo's plain-terminal,
+  single-worker defaults for direct local scans.
 - Calibrate Skylos quality thresholds and advisory ignores for the intentional
   single-file CLI, behavior-grouped tests, and package-local scan layout.
 - Add package-local Skylos gate/exclusion config for `src` scans and reduce the
