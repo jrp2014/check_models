@@ -1265,6 +1265,13 @@ class ChatTemplateKwargs(TypedDict, total=False):
     enable_thinking: bool
 
 
+class LoadExtraKwargs(TypedDict, total=False):
+    """Optional upstream load kwargs this CLI forwards explicitly."""
+
+    force_download: bool
+    quantize_activations: bool
+
+
 class GenerateExtraKwargs(TypedDict, total=False):
     """Optional upstream generate kwargs this CLI forwards explicitly."""
 
@@ -1303,12 +1310,13 @@ class LoadCallable(Protocol):
         adapter_path: str | None = None,
         lazy: bool = False,
         revision: str | None = None,
+        strict: bool = True,
         *,
         trust_remote_code: bool = True,
-        **kwargs: object,
+        **kwargs: Unpack[LoadExtraKwargs],
     ) -> tuple[nn.Module, ProcessorMixin]:
         """Load an MLX-VLM model and processor."""
-        del path_or_hf_repo, adapter_path, lazy, revision, trust_remote_code, kwargs
+        del path_or_hf_repo, adapter_path, lazy, revision, strict, trust_remote_code, kwargs
         raise NotImplementedError
 
 
