@@ -19,6 +19,7 @@ import platform
 import re
 import shutil
 import signal
+import stat
 import subprocess
 import sys
 import textwrap
@@ -210,6 +211,110 @@ DEFAULT_KV_GROUP_SIZE: Final[int] = 64
 DEFAULT_QUANTIZED_KV_START: Final[int] = 5000
 UNIFORM_KV_BITS: Final[frozenset[int]] = frozenset({2, 3, 4, 5, 6, 8})
 DEFAULT_THINKING_END_MARKER: Final[str] = "</think>"
+MAX_SAFE_TEXT_FILE_BYTES: Final[int] = 16 * 1024 * 1024
+SAFE_TEXT_FILE_READ_CHUNK_BYTES: Final[int] = 64 * 1024
+ROOT_PATH: Final[Path] = Path(os.sep)
+ALLOWED_SYSTEM_SYMLINK_PARENTS: Final[dict[Path, Path]] = {
+    ROOT_PATH / "tmp": ROOT_PATH / "private" / "tmp",
+    ROOT_PATH / "var": ROOT_PATH / "private" / "var",
+}
+
+
+def _is_allowed_system_symlink_parent(path: Path) -> bool:
+    """Return true for trusted macOS root aliases such as /var."""
+    expected_target = ALLOWED_SYSTEM_SYMLINK_PARENTS.get(path)
+    if expected_target is None:
+        return False
+    try:
+        return path.resolve(strict=True) == expected_target
+    except OSError:
+        return False
+
+
+def _reject_symlink_parent(path: Path) -> None:
+    """Reject symlinked parent directories before artifact file I/O."""
+    for parent in (path.parent, *path.parent.parents):
+        if parent.is_symlink() and not _is_allowed_system_symlink_parent(parent):
+            msg = f"Refusing to access file through symlinked directory: {parent}"
+            raise OSError(msg)
+
+
+def _canonical_text_file_path(path: Path) -> Path:
+    """Resolve existing parent links without following the final artifact path."""
+    return path.parent.resolve(strict=False) / path.name
+
+
+def _open_regular_file_no_symlink(path: Path, flags: int, mode: int = 0o666) -> int:
+    """Open a regular file descriptor without following final symlinks."""
+    if path.is_symlink():
+        msg = f"Refusing to follow symlink: {path}"
+        raise OSError(msg)
+
+    fd = os.open(  # skylos: ignore[SKY-D215] local CLI output path, guarded below.
+        path,
+        flags | getattr(os, "O_NOFOLLOW", 0),
+        mode,
+    )
+    try:
+        file_stat = os.fstat(fd)
+    except OSError:
+        os.close(fd)
+        raise
+    if not stat.S_ISREG(file_stat.st_mode):
+        os.close(fd)
+        msg = f"Refusing to access non-regular file: {path}"
+        raise OSError(msg)
+    return fd
+
+
+def _write_text_file(path: Path, content: str, *, append: bool = False) -> None:
+    """Write UTF-8 text to a regular file without following symlinks."""
+    _reject_symlink_parent(path)
+    path = _canonical_text_file_path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    _reject_symlink_parent(path)
+
+    flags = os.O_WRONLY | os.O_CREAT | (os.O_APPEND if append else os.O_TRUNC)
+    fd = _open_regular_file_no_symlink(path, flags)
+    with os.fdopen(fd, "ab") as handle:
+        handle.write(content.encode("utf-8"))
+
+
+def _read_text_file(path: Path, *, max_bytes: int = MAX_SAFE_TEXT_FILE_BYTES) -> str:
+    """Read UTF-8 text from a regular file with a byte-size cap."""
+    _reject_symlink_parent(path)
+    path = _canonical_text_file_path(path)
+    _reject_symlink_parent(path)
+    fd = _open_regular_file_no_symlink(path, os.O_RDONLY)
+    try:
+        file_size = os.fstat(fd).st_size
+    except OSError:
+        os.close(fd)
+        raise
+    if file_size > max_bytes:
+        os.close(fd)
+        msg = f"Refusing to read {path}: file size {file_size} exceeds {max_bytes} bytes"
+        raise OSError(msg)
+
+    chunks: list[bytes] = []
+    remaining = max_bytes + 1
+    try:
+        while remaining > 0:
+            chunk = os.read(  # skylos: ignore[SKY-P401] bounded by max_bytes.
+                fd,
+                min(remaining, SAFE_TEXT_FILE_READ_CHUNK_BYTES),
+            )
+            if not chunk:
+                break
+            chunks.append(chunk)
+            remaining -= len(chunk)
+    finally:
+        os.close(fd)
+    data = b"".join(chunks)
+    if len(data) > max_bytes:
+        msg = f"Refusing to read {path}: content exceeds {max_bytes} bytes"
+        raise OSError(msg)
+    return data.decode("utf-8")
 
 
 # =============================================================================
@@ -774,9 +879,30 @@ if mlx_vlm_probe_error is None:
         from mlx_vlm.utils import load_image as _mlx_vlm_load_image
         from mlx_vlm.version import __version__ as _mlx_vlm_version
 
+        def _typed_mlx_vlm_load(
+            path_or_hf_repo: str,
+            adapter_path: str | None = None,
+            lazy: bool = False,
+            revision: str | None = None,
+            strict: bool = True,
+            *,
+            trust_remote_code: bool = True,
+            **kwargs: object,
+        ) -> tuple[nn.Module, ProcessorMixin]:
+            loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
+                path_or_hf_repo=path_or_hf_repo,
+                adapter_path=adapter_path,
+                lazy=lazy,
+                revision=revision,
+                strict=strict,
+                trust_remote_code=trust_remote_code,
+                **kwargs,
+            )
+            return loaded
+
         generate = _mlx_vlm_generate
         apply_chat_template = _mlx_vlm_apply_chat_template
-        load = _mlx_vlm_load
+        load = _typed_mlx_vlm_load
         load_image = _mlx_vlm_load_image
         vlm_version = _mlx_vlm_version
     except ImportError:
@@ -11699,8 +11825,7 @@ def _write_markdown_artifact(
     markdown_content: str = normalize_markdown_trailing_spaces("\n".join(markdown_lines)) + "\n"
 
     try:
-        with filename.open("w", encoding="utf-8") as f:
-            f.write(markdown_content)
+        _write_text_file(filename, markdown_content)
         # Logging handled in finalize_execution
     except OSError:
         logger.exception("Failed to write %s to file %s.", artifact_name, str(filename))
@@ -14488,9 +14613,9 @@ def export_failure_repro_bundles(
                 repro_payload["cluster_repro_command"] = cluster_repro_command
 
         try:
-            bundle_path.write_text(
+            _write_text_file(
+                bundle_path,
                 json.dumps(bundle_payload, indent=2, sort_keys=True) + "\n",
-                encoding="utf-8",
             )
         except OSError:
             logger.exception("Failed to write repro bundle for %s", result.model_name)
@@ -14718,8 +14843,7 @@ def generate_diagnostics_report(
     )
 
     try:
-        filename.parent.mkdir(parents=True, exist_ok=True)
-        filename.write_text("\n".join(parts) + "\n", encoding="utf-8")
+        _write_text_file(filename, "\n".join(parts) + "\n")
     except OSError:
         logger.exception("Failed to write diagnostics report to %s", filename)
         return False
@@ -15090,8 +15214,7 @@ def generate_html_report(
     )
 
     try:
-        with filename.open("w", encoding="utf-8") as f:
-            f.write(html_content)
+        _write_text_file(filename, html_content)
         # Logging handled in finalize_execution
     except OSError:
         logger.exception("Failed to write HTML report to %s", filename)
@@ -15795,11 +15918,10 @@ def generate_tsv_report(
     )
 
     try:
-        with filename.open("w", encoding="utf-8") as f:
-            f.write(f"# generated_at: {local_now_str()}\n")
-            f.write(tsv_content)
-            if not tsv_content.endswith("\n"):
-                f.write("\n")
+        output_content = f"# generated_at: {local_now_str()}\n{tsv_content}"
+        if not output_content.endswith("\n"):
+            output_content += "\n"
+        _write_text_file(filename, output_content)
         # Logging handled in finalize_execution
     except OSError:
         logger.exception("Failed to write TSV report to %s", filename)
@@ -18911,41 +19033,49 @@ def _dump_environment_to_log(output_path: Path) -> None:
     try:
         # Detect if we're in a conda environment
         conda_env = os.environ.get("CONDA_DEFAULT_ENV")
-        # Ensure output directory exists
-        env_log_path = output_path.resolve()
-        env_log_path.parent.mkdir(parents=True, exist_ok=True)
+        env_log_path = output_path
+        env_lines = [
+            "=" * 80,
+            f"FULL ENVIRONMENT DUMP - {local_now_str()}",
+            "=" * 80,
+            "",
+        ]
 
-        with env_log_path.open("w", encoding="utf-8") as env_file:
-            env_file.write("=" * 80 + "\n")
-            env_file.write(f"FULL ENVIRONMENT DUMP - {local_now_str()}\n")
-            env_file.write("=" * 80 + "\n\n")
+        # Use importlib.metadata (standard library) instead of subprocess calling pip/conda
+        # to avoid S603 security lints and provide faster, more reliable dumping.
+        try:
+            # Some environments can have incomplete distribution metadata missing .name
+            def _get_name(d: Distribution) -> str:
+                return getattr(d, "name", "") or ""
 
-            # Use importlib.metadata (standard library) instead of subprocess calling pip/conda
-            # to avoid S603 security lints and provide faster, more reliable dumping.
-            try:
-                # Some environments can have incomplete distribution metadata missing .name
-                def _get_name(d: Distribution) -> str:
-                    return getattr(d, "name", "") or ""
+            dists = sorted(
+                distributions(),
+                key=lambda d: _get_name(d).lower(),
+            )
+            env_lines.extend(
+                [
+                    "--- Python Packages (via importlib.metadata) ---",
+                    f"Total packages: {len(dists)}",
+                    "",
+                ]
+            )
+            env_lines.extend(f"{d.name}=={d.version}" for d in dists)
+            env_lines.append("")
+        except (OSError, ValueError, RuntimeError) as dist_err:
+            env_lines.append(f"Could not gather package list: {dist_err}")
 
-                dists = sorted(
-                    distributions(),
-                    key=lambda d: _get_name(d).lower(),
-                )
-                env_file.write("--- Python Packages (via importlib.metadata) ---\n")
-                env_file.write(f"Total packages: {len(dists)}\n\n")
-                for d in dists:
-                    env_file.write(f"{d.name}=={d.version}\n")
-                env_file.write("\n")
-            except (OSError, ValueError, RuntimeError) as dist_err:
-                env_file.write(f"Could not gather package list: {dist_err}\n")
+        # Log conda environment name if applicable
+        if conda_env:
+            env_lines.append(f"Conda Environment: {conda_env}")
 
-            # Log conda environment name if applicable
-            if conda_env:
-                env_file.write(f"Conda Environment: {conda_env}\n")
-
-            env_file.write("=" * 80 + "\n")
-            env_file.write(f"Environment dump completed at {local_now_str()}\n")
-            env_file.write("=" * 80 + "\n")
+        env_lines.extend(
+            [
+                "=" * 80,
+                f"Environment dump completed at {local_now_str()}",
+                "=" * 80,
+            ]
+        )
+        _write_text_file(env_log_path, "\n".join(env_lines) + "\n")
 
         # Log single line pointing to the file
         log_metric_label("Full environment dump written to:", emoji="📝")
@@ -21174,7 +21304,7 @@ def _load_latest_history_record(history_path: Path) -> HistoryRunRecord | None:
         return None
 
     try:
-        lines = history_path.read_text(encoding="utf-8").splitlines()
+        lines = _read_text_file(history_path).splitlines()
     except OSError:
         logger.warning("Failed to read history file %s", history_path)
         return None
@@ -21196,7 +21326,7 @@ def _load_history_run_records(
         return []
 
     try:
-        lines = history_path.read_text(encoding="utf-8").splitlines()
+        lines = _read_text_file(history_path).splitlines()
     except OSError:
         logger.warning("Failed to read history file %s", history_path)
         return []
@@ -21613,9 +21743,7 @@ def append_history_record(
     )
 
     try:
-        history_path.parent.mkdir(parents=True, exist_ok=True)
-        with history_path.open("a", encoding="utf-8") as f:
-            f.write(json.dumps(record) + "\n")
+        _write_text_file(history_path, json.dumps(record) + "\n", append=True)
     except OSError:
         logger.exception("Failed to append history record to %s", history_path)
 
@@ -21821,28 +21949,28 @@ def save_jsonl_report(
     """
     issue_cluster_by_model = _issue_cluster_map_for_results(results, prompt=prompt)
     try:
-        with filename.open("w", encoding="utf-8") as f:
-            # Write shared metadata header (avoids repeating prompt/system per row)
-            header = _build_jsonl_metadata_record(
-                prompt=prompt,
-                system_info=system_info,
-                library_versions=library_versions,
-                runtime_fingerprint=runtime_fingerprint,
-            )
-            f.write(json.dumps(header) + "\n")
+        # Write shared metadata header (avoids repeating prompt/system per row)
+        header = _build_jsonl_metadata_record(
+            prompt=prompt,
+            system_info=system_info,
+            library_versions=library_versions,
+            runtime_fingerprint=runtime_fingerprint,
+        )
+        lines = [json.dumps(header)]
 
-            for result in results:
-                record = _build_jsonl_result_record_base(result)
-                _populate_jsonl_result_generation_data(record, result)
-                review_payload = _build_jsonl_review_record(result)
-                if review_payload:
-                    record["review"] = review_payload
-                    record["maintainer_triage"] = _build_jsonl_maintainer_triage_record(
-                        result,
-                        review_payload,
-                        issue_cluster=issue_cluster_by_model.get(result.model_name),
-                    )
-                f.write(json.dumps(record) + "\n")
+        for result in results:
+            record = _build_jsonl_result_record_base(result)
+            _populate_jsonl_result_generation_data(record, result)
+            review_payload = _build_jsonl_review_record(result)
+            if review_payload:
+                record["review"] = review_payload
+                record["maintainer_triage"] = _build_jsonl_maintainer_triage_record(
+                    result,
+                    review_payload,
+                    issue_cluster=issue_cluster_by_model.get(result.model_name),
+                )
+            lines.append(json.dumps(record))
+        _write_text_file(filename, "\n".join(lines) + "\n")
         # Logging handled in finalize_execution
     except OSError:
         logger.exception("Failed to write JSONL report to %s", filename)
@@ -21863,9 +21991,7 @@ def _write_report_failure_jsonl(
         "timestamp": local_now_str(),
     }
     try:
-        filename.parent.mkdir(parents=True, exist_ok=True)
-        with filename.open("a", encoding="utf-8") as f:
-            f.write(json.dumps(record) + "\n")
+        _write_text_file(filename, json.dumps(record) + "\n", append=True)
     except OSError:
         logger.exception("Failed to write report failure JSONL to %s", filename)
 
@@ -23207,7 +23333,7 @@ def _write_issue_index(
     )
     if not clusters:
         parts.extend(["No issue drafts were generated for this run.", ""])
-        issues_dir.joinpath("index.md").write_text("\n".join(parts), encoding="utf-8")
+        _write_text_file(issues_dir / "index.md", "\n".join(parts))
         return
 
     parts.extend(
@@ -23224,7 +23350,7 @@ def _write_issue_index(
         )
     )
     parts.append("")
-    issues_dir.joinpath("index.md").write_text("\n".join(parts) + "\n", encoding="utf-8")
+    _write_text_file(issues_dir / "index.md", "\n".join(parts) + "\n")
 
 
 def _generate_github_issue_reports(
@@ -23253,7 +23379,8 @@ def _generate_github_issue_reports(
     generated_reports: dict[str, Path] = {}
     for cluster in clusters:
         issue_path = issues_dir / cluster.issue_filename
-        issue_path.write_text(
+        _write_text_file(
+            issue_path,
             "\n".join(
                 _build_issue_markdown(
                     cluster,
@@ -23266,7 +23393,6 @@ def _generate_github_issue_reports(
                 )
             )
             + "\n",
-            encoding="utf-8",
         )
         generated_reports[cluster.cluster_id] = issue_path
 
@@ -23372,7 +23498,7 @@ def _write_environment_failure_diagnostics(
         system_info=system_info,
     )
     try:
-        diagnostics_path.write_text("\n".join(parts) + "\n", encoding="utf-8")
+        _write_text_file(diagnostics_path, "\n".join(parts) + "\n")
     except OSError:
         logger.exception("Failed to write environment diagnostics report to %s", diagnostics_path)
     else:

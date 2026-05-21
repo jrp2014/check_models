@@ -141,6 +141,67 @@ class TestToolchainHelpers:
         assert "Skipping malformed history record in history" in caplog.text
 
 
+class TestSafeTextFileIO:
+    """Tests for symlink-resistant text file helpers."""
+
+    def test_write_text_file_rejects_symlink_target(
+        self,
+        mod: types.ModuleType,
+        tmp_path: Path,
+    ) -> None:
+        """Generated artifacts should not follow a symlink target."""
+        target = tmp_path / "target.txt"
+        link = tmp_path / "artifact.txt"
+        link.symlink_to(target)
+
+        with pytest.raises(OSError, match="symlink"):
+            mod._write_text_file(link, "unsafe")
+
+        assert not target.exists()
+
+    def test_read_text_file_rejects_symlink_target(
+        self,
+        mod: types.ModuleType,
+        tmp_path: Path,
+    ) -> None:
+        """History reads should not follow a symlink target."""
+        target = tmp_path / "target.txt"
+        target.write_text("payload", encoding="utf-8")
+        link = tmp_path / "history.jsonl"
+        link.symlink_to(target)
+
+        with pytest.raises(OSError, match="symlink"):
+            mod._read_text_file(link)
+
+    def test_write_text_file_rejects_symlink_parent(
+        self,
+        mod: types.ModuleType,
+        tmp_path: Path,
+    ) -> None:
+        """Generated artifacts should not follow a symlinked parent."""
+        real_dir = tmp_path / "real"
+        real_dir.mkdir()
+        link_dir = tmp_path / "linked"
+        link_dir.symlink_to(real_dir, target_is_directory=True)
+
+        with pytest.raises(OSError, match="symlinked directory"):
+            mod._write_text_file(link_dir / "artifact.txt", "unsafe")
+
+        assert not (real_dir / "artifact.txt").exists()
+
+    def test_read_text_file_enforces_size_cap(
+        self,
+        mod: types.ModuleType,
+        tmp_path: Path,
+    ) -> None:
+        """History reads should reject oversized files before decoding."""
+        path = tmp_path / "history.jsonl"
+        path.write_text("abcdef", encoding="utf-8")
+
+        with pytest.raises(OSError, match="exceeds"):
+            mod._read_text_file(path, max_bytes=3)
+
+
 # ── apply_exclusions ───────────────────────────────────────────────────────
 
 

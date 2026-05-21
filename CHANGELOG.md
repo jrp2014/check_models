@@ -14,8 +14,11 @@ Notable changes to this project will be documented in this file.
   layout and test-suite size.
 - Add the calibrated Skylos quality gate to the local quality script and manage
   Skylos as a dev dependency.
-- Run the Skylos quality gate with plain terminal/color settings so terminal
-  capability probes do not leak into local quality output.
+- Run the Skylos quality gate with plain terminal/color settings and a
+  single-worker scan so terminal probes and process-pool sandbox limits do not
+  leak into local quality output.
+- Default direct package-local Skylos runs to concise output and route generated
+  text artifacts through symlink-resistant file helpers.
 - Calibrate Skylos quality thresholds and advisory ignores for the intentional
   single-file CLI, behavior-grouped tests, and package-local scan layout.
 - Add package-local Skylos gate/exclusion config for `src` scans and reduce the
