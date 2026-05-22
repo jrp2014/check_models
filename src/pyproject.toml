@@ -110,7 +110,6 @@ complexity = 24
 nesting = 6
 max_lines = 450
 duplicate_strings = 40
-addopts = ["--format", "concise"]
 exclude = [
     "output",
     "package-lock.json",

@@ -186,11 +186,6 @@ ty: ## Ty type checking with resolved repo interpreter
 vulture: ## Vulture dead-code scan (configured in pyproject.toml)
 	$(RUN_PY) -m vulture
 
-.PHONY: skylos
-skylos: ## Run Skylos with repo terminal/worker defaults (pass args via ARGS='check_models.py --quality --gate')
-	SKYLOS_JOBS="$${SKYLOS_JOBS:-1}" TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
-		$(RUN_TOOL_PREFIX) skylos --no-upload $(ARGS)
-
 # Tests
 .PHONY: test
 test: ## Run pytest

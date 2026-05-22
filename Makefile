@@ -22,7 +22,6 @@ help: ## Show this help message
 	@echo "  make test             Run tests"
 	@echo "  make check            Run format, lint, typecheck, and tests"
 	@echo "  make quality          Run full quality checks (ruff format+lint+mypy+suppression-audit+ty+pyrefly+vulture+pytest+shellcheck+markdownlint)"
-	@echo "  make skylos           Run Skylos with repo terminal/worker defaults"
 	@echo "  make vulture          Run the configured dead-code scan"
 	@echo "  make ty               Run Ty type checking with the resolved mlx-vlm interpreter"
 	@echo "  make ci               Run full CI pipeline (strict)"
@@ -62,10 +61,6 @@ quality: ## Run full quality checks (ruff format+lint+mypy+suppression-audit+ty+
 .PHONY: vulture
 vulture: ## Run the configured dead-code scan
 	@$(MAKE) -C $(SRC) vulture
-
-.PHONY: skylos
-skylos: ## Run Skylos with repo terminal/worker defaults
-	@$(MAKE) -C $(SRC) skylos ARGS='$(ARGS)'
 
 .PHONY: ci
 ci: ## Run full CI pipeline (strict mode)
