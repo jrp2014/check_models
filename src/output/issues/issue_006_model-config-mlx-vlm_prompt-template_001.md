@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
+
 # \[model-config / mlx-vlm\]\[Prompt-template / image-placeholder mismatch\] Prompt/template output shape mismatch affecting 5 model(s)
 
 ## Summary
@@ -12,13 +14,16 @@
 
 ## Affected Models
 
+<!-- markdownlint-disable MD060 -->
+
 | Model                                            | Observed Behavior   | Token Counts                                                                 | Optional Context                                                                                                                                    |
 |--------------------------------------------------|---------------------|------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
-| `LiquidAI/LFM2.5-VL-450M-MLX-bf16`               | generated_tokens~3  | prompt=269 \| output/prompt=1.12% \| nontext burden=98% \| stop=completed    | [optional JSON](../repro_bundles/20260521T221248Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_model_config_mlx_vlm_prompt_template_001.json)               |
-| `mlx-community/InternVL3-8B-bf16`                | output/prompt=0.5%  | prompt=2,317 \| output/prompt=0.47% \| nontext burden=100% \| stop=completed | [optional JSON](../repro_bundles/20260521T221248Z_004_mlx-community_InternVL3-8B-bf16_model_config_mlx_vlm_prompt_template_001.json)                |
-| `mlx-community/Molmo-7B-D-0924-bf16`             | generated_tokens~3  | prompt=1,201 \| output/prompt=0.25% \| nontext burden=100% \| stop=completed | [optional JSON](../repro_bundles/20260521T221248Z_007_mlx-community_Molmo-7B-D-0924-bf16_model_config_mlx_vlm_prompt_template_001.json)             |
-| `mlx-community/paligemma2-10b-ft-docci-448-6bit` | generated_tokens~6  | prompt=1,031 \| output/prompt=0.58% \| nontext burden=99% \| stop=completed  | [optional JSON](../repro_bundles/20260521T221248Z_016_mlx-community_paligemma2-10b-ft-docci-448-6bit_model_config_mlx_vlm_prompt_template_001.json) |
-| `mlx-community/paligemma2-10b-ft-docci-448-bf16` | generated_tokens~6  | prompt=1,031 \| output/prompt=0.58% \| nontext burden=99% \| stop=completed  | [optional JSON](../repro_bundles/20260521T221248Z_017_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json) |
+| `LiquidAI/LFM2.5-VL-450M-MLX-bf16`               | generated_tokens~3  | prompt=269 \| output/prompt=1.12% \| nontext burden=98% \| stop=completed    | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_model_config_mlx_vlm_prompt_template_001.json)               |
+| `mlx-community/InternVL3-8B-bf16`                | output/prompt=0.5%  | prompt=2,317 \| output/prompt=0.47% \| nontext burden=100% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_004_mlx-community_InternVL3-8B-bf16_model_config_mlx_vlm_prompt_template_001.json)                |
+| `mlx-community/Molmo-7B-D-0924-bf16`             | generated_tokens~3  | prompt=1,201 \| output/prompt=0.25% \| nontext burden=100% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_007_mlx-community_Molmo-7B-D-0924-bf16_model_config_mlx_vlm_prompt_template_001.json)             |
+| `mlx-community/paligemma2-10b-ft-docci-448-6bit` | generated_tokens~6  | prompt=1,031 \| output/prompt=0.58% \| nontext burden=99% \| stop=completed  | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_016_mlx-community_paligemma2-10b-ft-docci-448-6bit_model_config_mlx_vlm_prompt_template_001.json) |
+| `mlx-community/paligemma2-10b-ft-docci-448-bf16` | generated_tokens~6  | prompt=1,031 \| output/prompt=0.58% \| nontext burden=99% \| stop=completed  | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_017_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json) |
+<!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
@@ -84,11 +89,11 @@ Generation/load config:
 
 Optional advanced context:
 
-- `LiquidAI/LFM2.5-VL-450M-MLX-bf16`: [optional JSON](../repro_bundles/20260521T221248Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/InternVL3-8B-bf16`: [optional JSON](../repro_bundles/20260521T221248Z_004_mlx-community_InternVL3-8B-bf16_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/Molmo-7B-D-0924-bf16`: [optional JSON](../repro_bundles/20260521T221248Z_007_mlx-community_Molmo-7B-D-0924-bf16_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: [optional JSON](../repro_bundles/20260521T221248Z_016_mlx-community_paligemma2-10b-ft-docci-448-6bit_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: [optional JSON](../repro_bundles/20260521T221248Z_017_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json)
+- `LiquidAI/LFM2.5-VL-450M-MLX-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/InternVL3-8B-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_004_mlx-community_InternVL3-8B-bf16_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/Molmo-7B-D-0924-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_007_mlx-community_Molmo-7B-D-0924-bf16_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_016_mlx-community_paligemma2-10b-ft-docci-448-6bit_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_017_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 

@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
+
 # \[mlx\]\[MLX: Model load / model error\] Weight/config mismatch during model load affecting 1 model(s)
 
 ## Summary
@@ -12,9 +14,12 @@
 
 ## Affected Models
 
+<!-- markdownlint-disable MD060 -->
+
 | Model                                     | Observed Behavior                                                                                                                                                                               | Token Counts   | Optional Context                                                                                                                      |
 |-------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|---------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | Received 4 parameters not in model: multi_modal_projector.linear_1.biases, multi_modal_projector.linear_1.scales, multi_modal_projector.linear_2.biases, multi_modal_projector.linear_2.scales. | stop=exception | [optional JSON](../repro_bundles/20260521T221248Z_005_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json) |
+| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | Received 4 parameters not in model: multi_modal_projector.linear_1.biases, multi_modal_projector.linear_1.scales, multi_modal_projector.linear_2.biases, multi_modal_projector.linear_2.scales. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_005_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json) |
+<!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
@@ -74,7 +79,7 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: [optional JSON](../repro_bundles/20260521T221248Z_005_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)
+- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_005_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 

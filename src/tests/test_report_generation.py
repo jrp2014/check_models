@@ -660,13 +660,21 @@ class TestMarkdownReportEdgeCases:
         assert "Standalone output gallery" in content
         assert "Automated review digest" in content
         assert "Canonical run log" in content
-        assert "[model_gallery.md](model_gallery.md)" in content
-        assert "[review.md](review.md)" in content
-        assert "[check_models.log](check_models.log)" in content
-        assert "model_gallery.md#model-org-good" in content
+        assert (
+            "[model_gallery.md](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md)"
+        ) in content
+        assert (
+            "[review.md](https://github.com/jrp2014/check_models/blob/main/src/output/reports/review.md)"
+        ) in content
+        assert (
+            "[check_models.log](https://github.com/jrp2014/check_models/blob/main/src/output/check_models.log)"
+        ) in content
+        assert (
+            "https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md#model-org-good"
+        ) in content
 
-        # Now test absolute github links when the link-style state is "github"
-        with patch.object(check_models._LinkStyleState, "value", "github"):
+        # Now test relative local links when the link-style state is "relative"
+        with patch.object(check_models._LinkStyleState, "value", "relative"):
             generate_markdown_report(
                 results=[_make_quality_success("org/good", with_quality_issue=True)],
                 filename=out,
@@ -677,23 +685,11 @@ class TestMarkdownReportEdgeCases:
                 review_filename=review,
                 log_filename=log_file,
             )
-            content_github = out.read_text(encoding="utf-8")
-            assert (
-                "[model_gallery.md]"
-                "(https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md)"
-            ) in content_github
-            assert (
-                "[review.md]"
-                "(https://github.com/jrp2014/check_models/blob/main/src/output/reports/review.md)"
-            ) in content_github
-            assert (
-                "[check_models.log]"
-                "(https://github.com/jrp2014/check_models/blob/main/src/output/check_models.log)"
-            ) in content_github
-            assert (
-                "https://github.com/jrp2014/check_models/blob/main/src/output/reports/"
-                "model_gallery.md#model-org-good"
-            ) in content_github
+            content_relative = out.read_text(encoding="utf-8")
+            assert "[model_gallery.md](model_gallery.md)" in content_relative
+            assert "[review.md](review.md)" in content_relative
+            assert "[check_models.log](check_models.log)" in content_relative
+            assert "model_gallery.md#model-org-good" in content_relative
         assert "## Model Gallery" not in content
         assert "## ✅ Usable Diagnostic Candidates" in content
         assert "_Best end-to-end cataloging:_" in content
@@ -847,13 +843,18 @@ class TestMarkdownGalleryReport:
         )
 
         content = out.read_text(encoding="utf-8")
+        assert content.startswith(
+            "<!-- markdownlint-disable MD012 MD013 -->\n\n# Automated Review Digest"
+        )
         assert "# Automated Review Digest" in content
         assert "## Maintainer Escalations" in content
         assert "issues/index.md" in content
-        assert "../issues/index.md" in content
+        assert (
+            "https://github.com/jrp2014/check_models/blob/main/src/output/issues/index.md"
+        ) in content
 
-        # Now test absolute github links when the link-style state is "github"
-        with patch.object(check_models._LinkStyleState, "value", "github"):
+        # Now test relative local links when the link-style state is "relative"
+        with patch.object(check_models._LinkStyleState, "value", "relative"):
             generate_review_report(
                 results=results,
                 filename=out,
@@ -862,10 +863,8 @@ class TestMarkdownGalleryReport:
                 log_filename=log_file,
                 gallery_filename=gallery,
             )
-            content_github = out.read_text(encoding="utf-8")
-            assert (
-                "https://github.com/jrp2014/check_models/blob/main/src/output/issues/index.md"
-            ) in content_github
+            content_relative = out.read_text(encoding="utf-8")
+            assert "../issues/index.md" in content_relative
         assert "## 🧭 Review Shortlist" in content
         assert "## User Buckets" in content
         assert "## Model Verdicts" in content
@@ -885,6 +884,8 @@ class TestMarkdownGalleryReport:
             "## Model Verdicts",
             maxsplit=1,
         )[0]
+        assert "<!-- markdownlint-disable MD060 -->" in maintainer_queue
+        assert "<!-- markdownlint-enable MD060 -->" in maintainer_queue
         assert "org/good" not in maintainer_queue
         assert "org/risky" in maintainer_queue
         assert "org/bad" in maintainer_queue
@@ -1487,6 +1488,9 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
+        assert content.startswith(
+            "<!-- markdownlint-disable MD013 MD024 MD060 -->\n\n# Diagnostics Report"
+        )
         assert "## Issue Queue" in content
         assert "Issue Draft" in content
         assert "Target" in content
@@ -1497,10 +1501,12 @@ class TestDiagnosticsReport:
         assert "Evidence Bundle" in content
         assert "Fixed When" in content
         assert "issues/index.md" in content
-        assert "../issues/index.md" in content
+        assert (
+            "https://github.com/jrp2014/check_models/blob/main/src/output/issues/index.md"
+        ) in content
 
-        # Now test absolute github links when the link-style state is "github"
-        with patch.object(check_models._LinkStyleState, "value", "github"):
+        # Now test relative local links when the link-style state is "relative"
+        with patch.object(check_models._LinkStyleState, "value", "relative"):
             generate_diagnostics_report(
                 results=[
                     _make_failure_with_details(
@@ -1513,10 +1519,8 @@ class TestDiagnosticsReport:
                 system_info={},
                 prompt="test",
             )
-            content_github = out.read_text(encoding="utf-8")
-            assert (
-                "https://github.com/jrp2014/check_models/blob/main/src/output/issues/index.md"
-            ) in content_github
+            content_relative = out.read_text(encoding="utf-8")
+            assert "../issues/index.md" in content_relative
         assert "Priority" not in content
         assert content.index("## Issue Queue") < content.index("## 1. Failure")
         assert content.index("## Issue Queue") < content.index("## Environment")
@@ -3469,6 +3473,8 @@ class TestGithubIssueReportContent:
             "## Affected Models",
             end_headings=["## Minimal Evidence"],
         )
+        assert "<!-- markdownlint-disable MD060 -->" in affected_models
+        assert "<!-- markdownlint-enable MD060 -->" in affected_models
         assert "multi_modal_projector.layer_norm.bias" in affected_models
         assert "model error | mlx model load model" not in affected_models
 
@@ -3550,7 +3556,10 @@ class TestGithubIssueReportContent:
 
         assert len(generated) == 1
         content = next(iter(generated.values())).read_text(encoding="utf-8")
-        assert content.startswith("# \\[mlx-vlm\\]\\[MLX VLM decode runtime\\]")
+        assert content.startswith(
+            "<!-- markdownlint-disable MD012 MD013 MD033 MD060 -->\n\n"
+            "# \\[mlx-vlm\\]\\[MLX VLM decode runtime\\]"
+        )
         assert "## Summary" in content
         assert "## Affected Models" in content
         assert "## Minimal Evidence" in content
@@ -3565,10 +3574,12 @@ class TestGithubIssueReportContent:
         assert "MLX_VLM_DECODE_RUNTIME" not in content
         assert "runtime_failure" not in content
         assert "Traceback (most recent call last)" in content
-        assert "[optional JSON](../repro_bundles/broken.json)" in content
+        assert (
+            "[optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/broken.json)"
+        ) in content
 
-        # Now test absolute github links when the link-style state is "github"
-        with patch.object(check_models._LinkStyleState, "value", "github"):
+        # Now test relative local links when the link-style state is "relative"
+        with patch.object(check_models._LinkStyleState, "value", "relative"):
             generated_github = _generate_github_issue_reports(
                 diagnostics_snapshot=snapshot,
                 output_dir=tmp_path,
@@ -3577,11 +3588,8 @@ class TestGithubIssueReportContent:
                 repro_bundles={"org/broken-model": bundle_path},
                 run_args=None,
             )
-            content_github = next(iter(generated_github.values())).read_text(encoding="utf-8")
-            assert (
-                "[optional JSON]"
-                "(https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/broken.json)"
-            ) in content_github
+            content_relative = next(iter(generated_github.values())).read_text(encoding="utf-8")
+            assert "[optional JSON](../repro_bundles/broken.json)" in content_relative
         assert "Optional advanced context:" in content
         assert "Python Version" in content
         assert "Priority" not in content
@@ -3607,7 +3615,10 @@ class TestGithubIssueReportContent:
         )
 
         content = next(iter(generated.values())).read_text(encoding="utf-8")
-        assert content.startswith("# \\[mlx-vlm / mlx\\]\\[Long-context collapse\\]")
+        assert content.startswith(
+            "<!-- markdownlint-disable MD012 MD013 MD033 MD060 -->\n\n"
+            "# \\[mlx-vlm / mlx\\]\\[Long-context collapse\\]"
+        )
         assert "## Minimal Reproduction" in content
         assert "mlx-vlm first; MLX if cache/runtime reproduces" in content
         assert "At long prompt length (5000 tokens), generation returned empty output." in content

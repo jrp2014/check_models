@@ -148,24 +148,24 @@ _Generated on 2026-05-21 23:12:48 BST_
 Models that passed mechanical diagnostics and retained useful cataloguing or
 metadata-alignment signals.
 
-- _Best end-to-end cataloging:_ [`qnguyen3/nanoLLaVA`](model_gallery.md#model-qnguyen3-nanollava)
+- _Best end-to-end cataloging:_ [`qnguyen3/nanoLLaVA`](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md#model-qnguyen3-nanollava)
   (Utility B 75/100 | Description 90 | Keywords 0 | Speed 115 TPS | Memory 4.0
   | Caveat nontext prompt burden=73%)
-- _Best descriptions:_ [`qnguyen3/nanoLLaVA`](model_gallery.md#model-qnguyen3-nanollava)
+- _Best descriptions:_ [`qnguyen3/nanoLLaVA`](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md#model-qnguyen3-nanollava)
   (Utility B 75/100 | Description 90 | Keywords 0 | Speed 115 TPS | Memory 4.0
   | Caveat nontext prompt burden=73%)
-- _Best keywording:_ [`mlx-community/nanoLLaVA-1.5-4bit`](model_gallery.md#model-mlx-community-nanollava-15-4bit)
+- _Best keywording:_ [`mlx-community/nanoLLaVA-1.5-4bit`](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md#model-mlx-community-nanollava-15-4bit)
   (Utility B 75/100 | Description 87 | Keywords 0 | Speed 374 TPS | Memory 1.9
   | Caveat nontext prompt burden=73%)
-- _Fastest generation:_ [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](model_gallery.md#model-liquidai-lfm25-vl-450m-mlx-bf16)
+- _Fastest generation:_ [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md#model-liquidai-lfm25-vl-450m-mlx-bf16)
   (Utility F 0/100 | Description 0 | Keywords 0 | Speed 495 TPS | Memory 1.4 |
   Caveat Output appears truncated to about 3 tokens.; nontext prompt
   burden=98%)
-- _Lowest memory footprint:_ [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](model_gallery.md#model-liquidai-lfm25-vl-450m-mlx-bf16)
+- _Lowest memory footprint:_ [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md#model-liquidai-lfm25-vl-450m-mlx-bf16)
   (Utility F 0/100 | Description 0 | Keywords 0 | Speed 495 TPS | Memory 1.4 |
   Caveat Output appears truncated to about 3 tokens.; nontext prompt
   burden=98%)
-- _Best balance:_ [`mlx-community/nanoLLaVA-1.5-4bit`](model_gallery.md#model-mlx-community-nanollava-15-4bit)
+- _Best balance:_ [`mlx-community/nanoLLaVA-1.5-4bit`](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md#model-mlx-community-nanollava-15-4bit)
   (Utility B 75/100 | Description 87 | Keywords 0 | Speed 374 TPS | Memory 1.9
   | Caveat nontext prompt burden=73%)
 
@@ -174,21 +174,21 @@ metadata-alignment signals.
 Common weaknesses and failure patterns from this run, linked to the gallery
 when available.
 
-- _❌ Failed Models (3):_ [`facebook/pe-av-large`](model_gallery.md#model-facebook-pe-av-large),
-  [`mlx-community/Kimi-VL-A3B-Thinking-8bit`](model_gallery.md#model-mlx-community-kimi-vl-a3b-thinking-8bit),
-  [`mlx-community/LFM2.5-VL-1.6B-bf16`](model_gallery.md#model-mlx-community-lfm25-vl-16b-bf16).
+- _❌ Failed Models (3):_ [`facebook/pe-av-large`](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md#model-facebook-pe-av-large),
+  [`mlx-community/Kimi-VL-A3B-Thinking-8bit`](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md#model-mlx-community-kimi-vl-a3b-thinking-8bit),
+  [`mlx-community/LFM2.5-VL-1.6B-bf16`](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md#model-mlx-community-lfm25-vl-16b-bf16).
   Example: `Model Error`.
-- _🔄 Repetitive Output (17):_ [`HuggingFaceTB/SmolVLM-Instruct`](model_gallery.md#model-huggingfacetb-smolvlm-instruct),
-  [`mlx-community/GLM-4.6V-Flash-6bit`](model_gallery.md#model-mlx-community-glm-46v-flash-6bit),
-  [`mlx-community/GLM-4.6V-Flash-mxfp4`](model_gallery.md#model-mlx-community-glm-46v-flash-mxfp4),
-  [`mlx-community/Idefics3-8B-Llama3-bf16`](model_gallery.md#model-mlx-community-idefics3-8b-llama3-bf16),
+- _🔄 Repetitive Output (17):_ [`HuggingFaceTB/SmolVLM-Instruct`](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md#model-huggingfacetb-smolvlm-instruct),
+  [`mlx-community/GLM-4.6V-Flash-6bit`](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md#model-mlx-community-glm-46v-flash-6bit),
+  [`mlx-community/GLM-4.6V-Flash-mxfp4`](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md#model-mlx-community-glm-46v-flash-mxfp4),
+  [`mlx-community/Idefics3-8B-Llama3-bf16`](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md#model-mlx-community-idefics3-8b-llama3-bf16),
   +13 more. Example: token: `phrase: "ter budget ter budget..."`.
-- _📝 Formatting Issues (2):_ [`mlx-community/Idefics3-8B-Llama3-bf16`](model_gallery.md#model-mlx-community-idefics3-8b-llama3-bf16),
-  [`mlx-community/gemma-3-27b-it-qat-4bit`](model_gallery.md#model-mlx-community-gemma-3-27b-it-qat-4bit).
-- _Low-utility outputs (43):_ [`HuggingFaceTB/SmolVLM-Instruct`](model_gallery.md#model-huggingfacetb-smolvlm-instruct),
-  [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](model_gallery.md#model-liquidai-lfm25-vl-450m-mlx-bf16),
-  [`meta-llama/Llama-3.2-11B-Vision-Instruct`](model_gallery.md#model-meta-llama-llama-32-11b-vision-instruct),
-  [`microsoft/Phi-3.5-vision-instruct`](model_gallery.md#model-microsoft-phi-35-vision-instruct),
+- _📝 Formatting Issues (2):_ [`mlx-community/Idefics3-8B-Llama3-bf16`](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md#model-mlx-community-idefics3-8b-llama3-bf16),
+  [`mlx-community/gemma-3-27b-it-qat-4bit`](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md#model-mlx-community-gemma-3-27b-it-qat-4bit).
+- _Low-utility outputs (43):_ [`HuggingFaceTB/SmolVLM-Instruct`](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md#model-huggingfacetb-smolvlm-instruct),
+  [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md#model-liquidai-lfm25-vl-450m-mlx-bf16),
+  [`meta-llama/Llama-3.2-11B-Vision-Instruct`](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md#model-meta-llama-llama-32-11b-vision-instruct),
+  [`microsoft/Phi-3.5-vision-instruct`](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md#model-microsoft-phi-35-vision-instruct),
   +39 more. Common weakness: Keywords are not specific or diverse enough.
 
 ## 🚨 Failures by Package (Actionable)
@@ -291,8 +291,8 @@ _Overall runtime:_ 1209.68s
 
 _Review artifacts:_
 
-- _Standalone output gallery:_ [model_gallery.md](model_gallery.md)
-- _Automated review digest:_ [review.md](review.md)
+- _Standalone output gallery:_ [model_gallery.md](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md)
+- _Automated review digest:_ [review.md](https://github.com/jrp2014/check_models/blob/main/src/output/reports/review.md)
 - _Canonical run log:_ [check_models.log](../check_models.log)
 
 ---

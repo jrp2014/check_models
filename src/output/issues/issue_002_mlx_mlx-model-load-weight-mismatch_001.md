@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
+
 # \[mlx\]\[MLX: Model load / weight/config mismatch\] Weight/config mismatch during model load affecting 1 model(s)
 
 ## Summary
@@ -12,9 +14,12 @@
 
 ## Affected Models
 
+<!-- markdownlint-disable MD060 -->
+
 | Model                               | Observed Behavior                                                                                     | Token Counts   | Optional Context                                                                                                                       |
 |-------------------------------------|-------------------------------------------------------------------------------------------------------|----------------|----------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/LFM2.5-VL-1.6B-bf16` | Missing 2 parameters: multi_modal_projector.layer_norm.bias, multi_modal_projector.layer_norm.weight. | stop=exception | [optional JSON](../repro_bundles/20260521T221248Z_006_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_MODEL_LOAD_WEIGHT_MISMATCH_7574b1189.json) |
+| `mlx-community/LFM2.5-VL-1.6B-bf16` | Missing 2 parameters: multi_modal_projector.layer_norm.bias, multi_modal_projector.layer_norm.weight. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_006_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_MODEL_LOAD_WEIGHT_MISMATCH_7574b1189.json) |
+<!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
@@ -74,7 +79,7 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/LFM2.5-VL-1.6B-bf16`: [optional JSON](../repro_bundles/20260521T221248Z_006_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_MODEL_LOAD_WEIGHT_MISMATCH_7574b1189.json)
+- `mlx-community/LFM2.5-VL-1.6B-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_006_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_MODEL_LOAD_WEIGHT_MISMATCH_7574b1189.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 

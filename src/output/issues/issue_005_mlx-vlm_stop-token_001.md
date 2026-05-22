@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
+
 # \[mlx-vlm\]\[Stop-token leakage\] Stop/control tokens leaked into generated text affecting 2 model(s)
 
 ## Summary
@@ -12,10 +14,13 @@
 
 ## Affected Models
 
+<!-- markdownlint-disable MD060 -->
+
 | Model                                     | Observed Behavior                                         | Token Counts                                                                                          | Optional Context                                                                                                           |
 |-------------------------------------------|-----------------------------------------------------------|-------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | decoded text contains control token &lt;\|endoftext\|&gt; | prompt=16,176 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) | [optional JSON](../repro_bundles/20260521T221248Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_stop_token_001.json) |
-| `mlx-community/X-Reasoner-7B-8bit`        | decoded text contains control token &lt;\|endoftext\|&gt; | prompt=16,176 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) | [optional JSON](../repro_bundles/20260521T221248Z_015_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_stop_token_001.json)        |
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | decoded text contains control token &lt;\|endoftext\|&gt; | prompt=16,176 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_stop_token_001.json) |
+| `mlx-community/X-Reasoner-7B-8bit`        | decoded text contains control token &lt;\|endoftext\|&gt; | prompt=16,176 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_015_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_stop_token_001.json)        |
+<!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
@@ -78,8 +83,8 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: [optional JSON](../repro_bundles/20260521T221248Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_stop_token_001.json)
-- `mlx-community/X-Reasoner-7B-8bit`: [optional JSON](../repro_bundles/20260521T221248Z_015_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_stop_token_001.json)
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_stop_token_001.json)
+- `mlx-community/X-Reasoner-7B-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_015_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_stop_token_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 

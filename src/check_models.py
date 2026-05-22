@@ -1733,7 +1733,7 @@ _PUBLISHED_ROOT_OUTPUT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
 class _LinkStyleState:
     """Mutable report link rendering mode shared by artifact helpers."""
 
-    value: ClassVar[str] = "relative"
+    value: ClassVar[str] = "github"
 
 
 DEFAULT_TEMPERATURE: Final[float] = 0.0  # Greedy/deterministic (matches mlx-vlm upstream)
@@ -2203,7 +2203,6 @@ def render_report_markdown(blocks: Sequence[object]) -> list[str]:
     parts: list[str] = []
     for block in blocks:
         _append_report_markdown_block(parts, block)
-    while parts and parts[-1] == "":
         parts.pop()
     return parts
 
@@ -12681,7 +12680,7 @@ def _diagnostics_header(
     image_path: Path | None,
 ) -> list[str]:
     """Build the compact title block for the diagnostics report."""
-    parts: list[str] = []
+    parts: list[str] = ["<!-- markdownlint-disable MD013 MD024 MD060 -->", ""]
     version = versions.get("mlx-vlm") or "unknown"
     parts.append(
         f"# Diagnostics Report — {n_failed} failure(s), "
@@ -14867,6 +14866,8 @@ def generate_diagnostics_report(
             system_info=system_info,
         ),
     )
+    while parts and parts[-1] == "":
+        parts.pop()
 
     try:
         _write_text_file(filename, "\n".join(parts) + "\n")
@@ -15809,11 +15810,14 @@ def _append_review_issue_queue(
         return f"[issue draft]({_github_published_output_url('issues', cluster.issue_filename)})"
 
     md.extend(
-        _render_issue_queue_table(
-            clusters,
-            escape_text=MARKDOWN_ESCAPER.escape,
-            issue_link_for_cluster=_review_issue_link,
-            evidence_link_for_cluster=lambda _cluster: "-",
+        _guard_markdownlint_block(
+            _render_issue_queue_table(
+                clusters,
+                escape_text=MARKDOWN_ESCAPER.escape,
+                issue_link_for_cluster=_review_issue_link,
+                evidence_link_for_cluster=lambda _cluster: "-",
+            ),
+            rules="MD060",
         )
     )
     md.append("")
@@ -15840,6 +15844,8 @@ def generate_review_report(
     bucket_groups = _group_review_results(sorted_results, key_name="user_bucket")
 
     md: list[str] = [
+        "<!-- markdownlint-disable MD012 MD013 -->",
+        "",
         "# Automated Review Digest",
         "",
         f"_Generated on {local_now_str()}_",
@@ -22530,6 +22536,16 @@ def _issue_model_signal(
     return result.error_message or "clustered issue signal"
 
 
+def _guard_markdownlint_block(lines: Sequence[str], *, rules: str) -> list[str]:
+    """Wrap Markdown lines with markdownlint disable/enable comments."""
+    return [
+        f"<!-- markdownlint-disable {rules} -->",
+        "",
+        *lines,
+        f"<!-- markdownlint-enable {rules} -->",
+    ]
+
+
 def _issue_affected_models_section(
     cluster: IssueCluster,
     *,
@@ -22554,14 +22570,17 @@ def _issue_affected_models_section(
 
     parts = ["", "## Affected Models", ""]
     parts.extend(
-        render_report_markdown(
-            (
-                ReportTable(
-                    headers=("Model", "Observed Behavior", "Token Counts", "Optional Context"),
-                    rows=tuple(rows),
-                    markdown_escaped=True,
-                ),
-            )
+        _guard_markdownlint_block(
+            render_report_markdown(
+                (
+                    ReportTable(
+                        headers=("Model", "Observed Behavior", "Token Counts", "Optional Context"),
+                        rows=tuple(rows),
+                        markdown_escaped=True,
+                    ),
+                )
+            ),
+            rules="MD060",
         )
     )
     parts.append("")
@@ -23321,7 +23340,11 @@ def _build_issue_markdown(
     image_path: Path | None = None,
 ) -> list[str]:
     """Build a complete clustered GitHub issue draft."""
-    parts = [f"# {_issue_title(cluster)}"]
+    parts = [
+        "<!-- markdownlint-disable MD012 MD013 MD033 MD060 -->",
+        "",
+        f"# {_issue_title(cluster)}",
+    ]
     parts.extend(_issue_summary_section(cluster))
     parts.extend(_issue_affected_models_section(cluster, repro_bundles=repro_bundles))
     parts.extend(_issue_minimal_evidence_section(cluster))
@@ -24093,7 +24116,7 @@ def finalize_execution(
 
 def main(args: argparse.Namespace) -> None:
     """Run CLI execution for MLX VLM model check."""
-    _LinkStyleState.value = getattr(args, "link_style", "relative")
+    _LinkStyleState.value = getattr(args, "link_style", "github")
 
     overall_start_time: float = time.perf_counter()
     library_versions: LibraryVersionDict | None = None
@@ -24688,12 +24711,12 @@ def _build_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--link-style",
         choices=["relative", "github"],
-        default="relative",
+        default="github",
         help=(
             "Link format for companion artifacts in Markdown reports: "
-            "'relative' (default) generates offline-friendly local relative paths "
-            "(which also resolve correctly when pushed to GitHub); "
-            "'github' generates absolute GitHub web URLs."
+            "'github' (default) generates absolute GitHub web URLs so pasted report "
+            "content keeps working outside the local checkout; "
+            "'relative' generates offline-friendly local relative paths."
         ),
     )
     parser.add_argument(

@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
+
 # \[mlx-vlm\]\[Tokenizer / decoding artifact\] Tokenizer decode leaked BPE/byte markers affecting 1 model(s)
 
 ## Summary
@@ -12,9 +14,12 @@
 
 ## Affected Models
 
+<!-- markdownlint-disable MD060 -->
+
 | Model                                                   | Observed Behavior                          | Token Counts                                                                                          | Optional Context                                                                                                                       |
 |---------------------------------------------------------|--------------------------------------------|-------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | 41 BPE space markers found in decoded text | prompt=1,745 \| output/prompt=11.46% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) | [optional JSON](../repro_bundles/20260521T221248Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) |
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | 41 BPE space markers found in decoded text | prompt=1,745 \| output/prompt=11.46% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) |
+<!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
@@ -75,7 +80,7 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: [optional JSON](../repro_bundles/20260521T221248Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 

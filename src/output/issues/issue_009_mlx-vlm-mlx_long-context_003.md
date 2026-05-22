@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
+
 # \[mlx-vlm / mlx\]\[Long-context collapse\] Long-context generation collapsed or became too short affecting 2 model(s)
 
 ## Summary
@@ -12,10 +14,13 @@
 
 ## Affected Models
 
+<!-- markdownlint-disable MD060 -->
+
 | Model                             | Observed Behavior                                                            | Token Counts                                                                                          | Optional Context                                                                                                         |
 |-----------------------------------|------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Qwen3.5-27B-4bit`  | Output degeneration under long prompt length (character_loop: '00' repeated) | prompt=16,167 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) | [optional JSON](../repro_bundles/20260521T221248Z_009_mlx-community_Qwen3.5-27B-4bit_mlx_vlm_mlx_long_context_003.json)  |
-| `mlx-community/Qwen3.6-27B-mxfp8` | Output degeneration under long prompt length (character_loop: '66' repeated) | prompt=16,167 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) | [optional JSON](../repro_bundles/20260521T221248Z_014_mlx-community_Qwen3.6-27B-mxfp8_mlx_vlm_mlx_long_context_003.json) |
+| `mlx-community/Qwen3.5-27B-4bit`  | Output degeneration under long prompt length (character_loop: '00' repeated) | prompt=16,167 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_009_mlx-community_Qwen3.5-27B-4bit_mlx_vlm_mlx_long_context_003.json)  |
+| `mlx-community/Qwen3.6-27B-mxfp8` | Output degeneration under long prompt length (character_loop: '66' repeated) | prompt=16,167 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_014_mlx-community_Qwen3.6-27B-mxfp8_mlx_vlm_mlx_long_context_003.json) |
+<!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
@@ -78,8 +83,8 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/Qwen3.5-27B-4bit`: [optional JSON](../repro_bundles/20260521T221248Z_009_mlx-community_Qwen3.5-27B-4bit_mlx_vlm_mlx_long_context_003.json)
-- `mlx-community/Qwen3.6-27B-mxfp8`: [optional JSON](../repro_bundles/20260521T221248Z_014_mlx-community_Qwen3.6-27B-mxfp8_mlx_vlm_mlx_long_context_003.json)
+- `mlx-community/Qwen3.5-27B-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_009_mlx-community_Qwen3.5-27B-4bit_mlx_vlm_mlx_long_context_003.json)
+- `mlx-community/Qwen3.6-27B-mxfp8`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_014_mlx-community_Qwen3.6-27B-mxfp8_mlx_vlm_mlx_long_context_003.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 

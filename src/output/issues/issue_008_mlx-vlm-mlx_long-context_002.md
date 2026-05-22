@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
+
 # \[mlx-vlm / mlx\]\[Long-context collapse\] Long-context generation collapsed or became too short affecting 2 model(s)
 
 ## Summary
@@ -12,10 +14,13 @@
 
 ## Affected Models
 
+<!-- markdownlint-disable MD060 -->
+
 | Model                                     | Observed Behavior                                                               | Token Counts                                                                  | Optional Context                                                                                                                 |
 |-------------------------------------------|---------------------------------------------------------------------------------|-------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Qwen3.5-9B-MLX-4bit`       | output/prompt=0.1% \| prompt_tokens=16167, output_tokens=12, output/prompt=0.1% | prompt=16,167 \| output/prompt=0.07% \| nontext burden=100% \| stop=completed | [optional JSON](../repro_bundles/20260521T221248Z_013_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_002.json)       |
-| `mlx-community/paligemma2-3b-pt-896-4bit` | output/prompt=0.2% \| prompt_tokens=4103, output_tokens=9, output/prompt=0.2%   | prompt=4,103 \| output/prompt=0.22% \| nontext burden=100% \| stop=completed  | [optional JSON](../repro_bundles/20260521T221248Z_018_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_002.json) |
+| `mlx-community/Qwen3.5-9B-MLX-4bit`       | output/prompt=0.1% \| prompt_tokens=16167, output_tokens=12, output/prompt=0.1% | prompt=16,167 \| output/prompt=0.07% \| nontext burden=100% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_013_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_002.json)       |
+| `mlx-community/paligemma2-3b-pt-896-4bit` | output/prompt=0.2% \| prompt_tokens=4103, output_tokens=9, output/prompt=0.2%   | prompt=4,103 \| output/prompt=0.22% \| nontext burden=100% \| stop=completed  | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_018_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_002.json) |
+<!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
@@ -78,8 +83,8 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/Qwen3.5-9B-MLX-4bit`: [optional JSON](../repro_bundles/20260521T221248Z_013_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_002.json)
-- `mlx-community/paligemma2-3b-pt-896-4bit`: [optional JSON](../repro_bundles/20260521T221248Z_018_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_002.json)
+- `mlx-community/Qwen3.5-9B-MLX-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_013_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_002.json)
+- `mlx-community/paligemma2-3b-pt-896-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_018_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_002.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 

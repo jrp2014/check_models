@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
+
 # \[mlx-lm\]\[mlx-lm: Model load / model error\] Missing module/import during model load affecting 1 model(s)
 
 ## Summary
@@ -12,9 +14,12 @@
 
 ## Affected Models
 
+<!-- markdownlint-disable MD060 -->
+
 | Model                  | Observed Behavior                              | Token Counts   | Optional Context                                                                                                      |
 |------------------------|------------------------------------------------|----------------|-----------------------------------------------------------------------------------------------------------------------|
-| `facebook/pe-av-large` | No module named 'mlx_lm.models.pe_audio_video' | stop=exception | [optional JSON](../repro_bundles/20260521T221248Z_002_facebook_pe-av-large_MLX_LM_MODEL_LOAD_MODEL_b253df301723.json) |
+| `facebook/pe-av-large` | No module named 'mlx_lm.models.pe_audio_video' | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_002_facebook_pe-av-large_MLX_LM_MODEL_LOAD_MODEL_b253df301723.json) |
+<!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
@@ -74,7 +79,7 @@ Generation/load config:
 
 Optional advanced context:
 
-- `facebook/pe-av-large`: [optional JSON](../repro_bundles/20260521T221248Z_002_facebook_pe-av-large_MLX_LM_MODEL_LOAD_MODEL_b253df301723.json)
+- `facebook/pe-av-large`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_002_facebook_pe-av-large_MLX_LM_MODEL_LOAD_MODEL_b253df301723.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 

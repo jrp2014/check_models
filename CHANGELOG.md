@@ -17,6 +17,19 @@ Notable changes to this project will be documented in this file.
 - Run the Skylos quality gate with plain terminal/color settings and a
   single-worker scan so terminal probes and process-pool sandbox limits do not
   leak into local quality output.
+- Default generated Markdown/report artifact links to absolute GitHub URLs so
+  pasted diagnostics and issue drafts keep working outside the local checkout,
+  while preserving `--link-style relative` for offline/local paths.
+- Keep generated `issues/index.md` lint-clean under GitHub link output by
+  wrapping the run summary text and bracketing the wide issue queue table with
+  markdownlint guards.
+- Mark generated `diagnostics.md` as exempt from repo-width and duplicate-heading
+  markdownlint rules, and trim trailing blank lines before writing so the
+  tracked diagnostics artifact stays lint-clean.
+- Mark generated issue drafts as exempt from issue-body markdownlint rules,
+  disable `MD012`/`MD013` for generated review digests, and bracket the wide
+  generated Affected Models and review Maintainer Escalations tables so
+  GitHub-link output stays clean under `MD060/table-column-style`.
 - Default direct package-local Skylos runs to concise output and route generated
   text artifacts through symlink-resistant file helpers.
 - Add a dedicated `make skylos` wrapper that applies the repo's plain-terminal,
