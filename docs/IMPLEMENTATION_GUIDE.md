@@ -712,14 +712,11 @@ Output: a\|b\\c &lt;unk&gt;<br>Next line
 - Prefer `datetime.UTC` for aware datetimes
 - Localize with `tzlocal.get_localzone()` when formatting local times
 
-### Backend Import Guard Policy
+### Backend Import Policy
 
-- Default: block heavy backends that are not needed for MLX workflows to avoid macOS/Apple Silicon hangs:
-  - Set `TRANSFORMERS_NO_TF=1`, `TRANSFORMERS_NO_FLAX=1`, `TRANSFORMERS_NO_JAX=1` at process start
-  - Torch is allowed by default (some models require it)
-- Opt-in to TensorFlow/Flax/JAX by setting `MLX_VLM_ALLOW_TF=1` before running
-- Warning: Installing TensorFlow on macOS/ARM may trigger an Abseil mutex stall during import
-- Note: Installing `sentence-transformers` isn't required here and may import heavy backends
+- Do not mutate `transformers` backend-selection environment variables at process start.
+- Keep runtime compatibility checks focused on installed package versions and callable API drift.
+- Note: Installing `sentence-transformers` isn't required here and may import heavy backends.
 
 ## EXIF & GPS Handling
 

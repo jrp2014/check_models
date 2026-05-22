@@ -9,6 +9,8 @@ Notable changes to this project will be documented in this file.
 
 - Preserve the `recommended` user bucket for benign token-cap results when
   trusted metadata alignment passes.
+- Remove stale backend-import feature-flag documentation for the previously
+  deleted `MLX_VLM_ALLOW_TF` / `TRANSFORMERS_NO_*` guard path.
 
 ### Changed
 

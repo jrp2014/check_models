@@ -56,7 +56,7 @@ The file is organized in this order — use these landmarks to jump to the right
 - **Type aliases**: `MetricValue = int | float | str | bool | None` is the value type for metrics.
 - **Protocols over ABCs**: typing for optional deps uses `Protocol` classes (e.g., `SupportsGenerationResult`).
 - **Reports write to** `src/output/reports/` (HTML, Markdown, TSV, diagnostics) and `src/output/` (JSONL, history, logs). Additional conditional outputs: `src/output/issues/` (generated GitHub issue templates), `src/output/repro_bundles/` (JSON reproduction bundles).
-- **Security**: defaults to `--trust-remote-code`. Backend guard env vars are set (`TRANSFORMERS_NO_*` and compatibility `USE_*`) unless `MLX_VLM_ALLOW_TF=1`.
+- **Security**: defaults to `--trust-remote-code` and warns when enabled. The CLI no longer mutates `transformers` backend-selection environment variables at startup.
 
 ### 5. Make targets (all run from repo root)
 
