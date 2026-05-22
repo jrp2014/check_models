@@ -20087,12 +20087,14 @@ def _apply_metadata_alignment_to_analysis(
         verdict = "semantic_mismatch"
         evidence.append(metadata_issue)
 
-    user_bucket = _classify_user_bucket(
-        verdict=verdict,
-        hint_relationship=analysis.hint_relationship,
-        has_contract_issue=_analysis_has_contract_issue(analysis),
-        utility_grade="F" if metadata_issue else "",
-    )
+    user_bucket = analysis.user_bucket
+    if metadata_issue is not None:
+        user_bucket = _classify_user_bucket(
+            verdict=verdict,
+            hint_relationship=analysis.hint_relationship,
+            has_contract_issue=_analysis_has_contract_issue(analysis),
+            utility_grade="F",
+        )
     return replace(
         analysis,
         verdict=verdict,

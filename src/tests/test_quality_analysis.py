@@ -1112,6 +1112,34 @@ class TestClassifyUserBucket:
         )
         assert bucket == "recommended"
 
+    def test_metadata_alignment_preserves_passing_token_cap_bucket(self) -> None:
+        """Passing metadata alignment must not downgrade benign token caps."""
+        base = check_models.analyze_generation_text(
+            "A normal caption with varied image details and a complete sentence.",
+            12,
+        )
+        analysis = dataclasses.replace(
+            base,
+            verdict="token_cap",
+            user_bucket="recommended",
+            evidence=["token_cap"],
+            hint_relationship="preserves_trusted_hints",
+        )
+        metadata_agreement = check_models.MetadataAgreementMetrics(
+            overall_score=90.0,
+            matched_terms=("caption",),
+            missed_terms=(),
+        )
+
+        refreshed = check_models._apply_metadata_alignment_to_analysis(
+            analysis,
+            metadata_agreement,
+        )
+
+        assert refreshed.verdict == "token_cap"
+        assert refreshed.metadata_alignment_issue is None
+        assert refreshed.user_bucket == "recommended"
+
     def test_cutoff_degraded_avoid(self) -> None:
         """cutoff_degraded models should be avoid."""
         bucket = check_models._classify_user_bucket(

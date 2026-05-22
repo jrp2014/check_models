@@ -5,6 +5,11 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Preserve the `recommended` user bucket for benign token-cap results when
+  trusted metadata alignment passes.
+
 ### Changed
 
 - Tighten diagnostic quality analysis by adding unstructured metadata alignment,
