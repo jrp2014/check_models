@@ -11,6 +11,8 @@ Notable changes to this project will be documented in this file.
   trusted metadata alignment passes.
 - Remove stale backend-import feature-flag documentation for the previously
   deleted `MLX_VLM_ALLOW_TF` / `TRANSFORMERS_NO_*` guard path.
+- Restore the Skylos quality-gate terminal/color guard so terminal capability
+  probe bytes do not leak into local `make quality` output.
 
 ### Changed
 

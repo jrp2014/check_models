@@ -559,9 +559,8 @@ def test_quality_script_runs_skylos_quality_gate() -> None:
     )
     assert 'echo "=== Skylos Quality Gate ==="' in quality_script
     assert "SKYLOS_JOBS" not in quality_script
-    assert "TERM=dumb" not in quality_script
-    assert "NO_COLOR=1" not in quality_script
     assert re.search(
+        r"TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0\s+\\?\s*"
         r"quality_run_python_tool skylos \. --quality --gate --no-upload --format concise",
         quality_script,
     )

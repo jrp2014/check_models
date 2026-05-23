@@ -93,7 +93,8 @@ echo "=== Vulture Dead Code Check ==="
 quality_run_python_tool vulture
 
 echo "=== Skylos Quality Gate ==="
-quality_run_python_tool skylos . --quality --gate --no-upload --format concise
+TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
+    quality_run_python_tool skylos . --quality --gate --no-upload --format concise
 
 if [ "$QUALITY_MODE" = "fast" ]; then
     echo "=== Pytest (fast set) ==="
