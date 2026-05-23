@@ -318,6 +318,14 @@ def test_conda_setup_verifier_imports_declared_non_dev_dependencies() -> None:
     assert imported_modules <= declared_imports
 
 
+def test_conda_setup_uses_current_huggingface_cli_installation() -> None:
+    """Avoid installing removed huggingface-hub extras during fresh setup."""
+    setup_script = (PKG_ROOT / "tools" / "setup_conda_env.sh").read_text(encoding="utf-8")
+
+    assert '"huggingface_hub[cli]"' not in setup_script
+    assert "command -v hf" in setup_script
+
+
 def test_packaged_quality_config_is_the_only_default_source() -> None:
     """The packaged config should be the sole checked-in default copy."""
     assert PACKAGED_QUALITY_CONFIG.exists()

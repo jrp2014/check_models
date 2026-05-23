@@ -276,9 +276,15 @@ print(f'✓ MLX-LM version: {mlx_lm.__version__}')
         log_warn "cmake is not on PATH inside the active environment"
     fi
 
-    # Install huggingface_hub CLI tools
-    log_info "Installing huggingface_hub CLI tools..."
-    pip install "huggingface_hub[cli]"
+    # Check if Hugging Face CLI is available. Recent huggingface-hub releases
+    # install CLI entry points without a separate "cli" extra.
+    if command -v hf &> /dev/null; then
+        log_success "Hugging Face CLI command 'hf' is available"
+    elif command -v huggingface-cli &> /dev/null; then
+        log_success "Legacy Hugging Face CLI command 'huggingface-cli' is available"
+    else
+        log_warn "Hugging Face CLI command not found"
+    fi
 
     # Check if CLI is available
     if command -v check_models &> /dev/null; then
