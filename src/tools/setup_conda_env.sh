@@ -260,7 +260,6 @@ import mlx_vlm
 from PIL import Image
 import huggingface_hub
 import tabulate
-import tzlocal
 try:
     import torch, torchvision, torchaudio
     print(f'✓ PyTorch version: {torch.__version__}')

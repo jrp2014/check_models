@@ -710,7 +710,7 @@ Output: a\|b\\c &lt;unk&gt;<br>Next line
 ### Timezones
 
 - Prefer `datetime.UTC` for aware datetimes
-- Localize with `tzlocal.get_localzone()` when formatting local times
+- Use timezone-aware standard-library `datetime` APIs when formatting local times
 
 ### Backend Import Policy
 
@@ -953,7 +953,7 @@ rg "UNUSED_CONSTANT" src/
 **Runtime dependency versions MUST stay consistent** between `pyproject.toml` and the install snippets in `src/README.md`.
 
 **Current slim runtime set** (authoritative in `src/pyproject.toml`):
-`mlx`, `mlx-vlm`, `transformers`, `Pillow`, `huggingface-hub`, `requests`, `tabulate`, `tzlocal`, `wcwidth`, `PyYAML`
+`mlx`, `mlx-lm`, `mlx-vlm`, `transformers`, `defusedxml`, `Pillow[xmp]`, `huggingface-hub[torch,typing]`, `numpy`, `packaging`, `rich`, `tabulate`, `wcwidth`, `PyYAML`
 
 **If you add a new import in `src/check_models.py`, you MUST also**:
 
@@ -966,7 +966,7 @@ The `test_dependency_sync` test and CI will fail otherwise.
 **Optional groups**:
 
 - `extras`: `psutil`, `tokenizers`, `einops`, `num2words`, `sentencepiece`
-- `torch`: `torch`, `torchvision`, `torchaudio`
+- `torch`: `torch`, `torchvision`, `torchaudio`, `timm`
 
 **Mechanism**:
 

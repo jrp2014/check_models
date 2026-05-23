@@ -323,9 +323,7 @@ module = [
     "numpy",
     "PIL.*",
     "psutil",
-    "requests",
     "tabulate",
-    "tzlocal",
     "yaml",
 ]
 ignore_missing_imports = true

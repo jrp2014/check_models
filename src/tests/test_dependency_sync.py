@@ -6,6 +6,7 @@ This enforces local parity in addition to CI. The test focuses only on runtime d
 
 from __future__ import annotations
 
+import ast
 import json
 import re
 import subprocess
@@ -73,6 +74,14 @@ SKYLOS_MONOLITH_QUALITY_LIMITS = {
 }
 
 MANUAL_MARKERS = ("<!-- MANUAL_INSTALL_START -->", "<!-- MANUAL_INSTALL_END -->")
+
+IMPORT_NAME_BY_REQUIREMENT = {
+    "huggingface-hub": "huggingface_hub",
+    "mlx-lm": "mlx_lm",
+    "mlx-vlm": "mlx_vlm",
+    "pillow": "PIL",
+    "pyyaml": "yaml",
+}
 
 
 def _dependency_key(requirement: Requirement) -> str:
@@ -280,6 +289,33 @@ def test_pydantic_is_managed_as_a_dev_dependency() -> None:
 
     setup_script = (PKG_ROOT / "tools" / "setup_conda_env.sh").read_text(encoding="utf-8")
     assert '"pydantic>=2.0.0"' in setup_script
+
+
+def test_conda_setup_verifier_imports_declared_non_dev_dependencies() -> None:
+    """The fresh setup smoke check should only import packages it just installed."""
+    pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
+    setup_script = (PKG_ROOT / "tools" / "setup_conda_env.sh").read_text(encoding="utf-8")
+    verifier_match = re.search(r'python -c "\n(.*?)\n"', setup_script, re.DOTALL)
+    assert verifier_match is not None
+
+    declared_requirements = [
+        *pyproject["project"]["dependencies"],
+        *pyproject["project"]["optional-dependencies"]["extras"],
+        *pyproject["project"]["optional-dependencies"]["torch"],
+    ]
+    declared_imports = {
+        IMPORT_NAME_BY_REQUIREMENT.get(requirement.name.lower(), requirement.name.replace("-", "_"))
+        for requirement_text in declared_requirements
+        for requirement in [Requirement(requirement_text)]
+    }
+    imported_modules = {
+        alias.name.split(".", maxsplit=1)[0]
+        for node in ast.walk(ast.parse(verifier_match.group(1)))
+        if isinstance(node, ast.Import)
+        for alias in node.names
+    }
+
+    assert imported_modules <= declared_imports
 
 
 def test_packaged_quality_config_is_the_only_default_source() -> None:

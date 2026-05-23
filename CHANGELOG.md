@@ -13,6 +13,8 @@ Notable changes to this project will be documented in this file.
   deleted `MLX_VLM_ALLOW_TF` / `TRANSFORMERS_NO_*` guard path.
 - Restore the Skylos quality-gate terminal/color guard so terminal capability
   probe bytes do not leak into local `make quality` output.
+- Remove the stale `tzlocal` import from the fresh conda setup verifier and
+  align dependency guidance with the declared install groups.
 
 ### Changed
 
