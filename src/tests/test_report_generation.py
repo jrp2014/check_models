@@ -1317,20 +1317,39 @@ class TestDiagnosticsReport:
         out = tmp_path / "diag.md"
         versions = _stub_versions()
         versions["mlx-vlm"] = "0.3.11"
+        versions["mlx-metal"] = "0.3.11"
         generate_diagnostics_report(
             results=[_make_failure_with_details()],
             filename=out,
             versions=versions,
-            system_info={"Python Version": "3.13.9", "GPU/Chip": "Apple M4 Max"},
+            system_info={
+                "Python Version": "3.13.9",
+                "GPU/Chip": "Apple M4 Max",
+                "SDK Version": "26.5",
+                "Xcode Version": "26.5",
+                "Xcode Build": "17F42",
+                "Metal Compiler Version": "Apple metal version 32023.883",
+                "Metallib Linker Version": "AIR-LLD 32023.883",
+                "MLX Install Type": "wheel/site-packages",
+                "MLX Metallib": "/site-packages/mlx/lib/mlx.metallib (sha256=abc123)",
+            },
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
         assert "mlx-vlm" in content
         assert "0.3.11" in content
+        assert "mlx-metal" in content
         assert "Python Version" in content
         assert "3.13.9" in content
         assert "GPU/Chip" in content
         assert "Apple M4 Max" in content
+        assert "SDK Version" in content
+        assert "26.5" in content
+        assert "Xcode Version" in content
+        assert "Metal Compiler Version" in content
+        assert "AIR-LLD 32023.883" in content
+        assert "MLX Metallib" in content
+        assert "sha256=abc123" in content
 
     def test_failure_clustering_groups_similar_errors(self, tmp_path: Path) -> None:
         """Models with the same error pattern (differing only in numbers) should cluster."""

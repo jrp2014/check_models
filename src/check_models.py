@@ -7278,6 +7278,107 @@ def get_library_versions() -> LibraryVersionDict:
     }
 
 
+def _distribution_text_file(distribution_name: str, filename: str) -> str | None:
+    """Read optional distribution metadata text without importing the package."""
+    try:
+        package_distribution = distribution(distribution_name)
+    except PackageNotFoundError:
+        return None
+    try:
+        return package_distribution.read_text(filename)
+    except (FileNotFoundError, OSError, ValueError):
+        return None
+
+
+def _distribution_is_editable(distribution_name: str) -> bool:
+    """Return True when package metadata marks a distribution as editable."""
+    direct_url_text = _distribution_text_file(distribution_name, "direct_url.json")
+    if not direct_url_text:
+        return False
+    try:
+        direct_url = json.loads(direct_url_text)
+    except json.JSONDecodeError:
+        return False
+    if not isinstance(direct_url, dict):
+        return False
+    dir_info = direct_url.get("dir_info")
+    return isinstance(dir_info, dict) and bool(dir_info.get("editable"))
+
+
+def _distribution_location(distribution_name: str) -> str | None:
+    """Return the installed distribution root path when metadata is available."""
+    try:
+        package_distribution = distribution(distribution_name)
+    except PackageNotFoundError:
+        return None
+    try:
+        return str(Path(str(package_distribution.locate_file(""))).resolve())
+    except (OSError, RuntimeError, ValueError):
+        return str(package_distribution.locate_file(""))
+
+
+def _format_artifact_fingerprint(path: Path) -> str | None:
+    """Format an artifact path with size and SHA256 for diagnostics."""
+    if not path.is_file():
+        return None
+    try:
+        size_bytes = path.stat().st_size
+    except OSError:
+        size_text = "size unavailable"
+    else:
+        size_text = f"{size_bytes:,} bytes"
+    digest = _sha256_file(path)
+    hash_text = f", sha256={digest}" if digest else ""
+    return f"{path} ({size_text}{hash_text})"
+
+
+def _get_mlx_backend_artifact_info() -> dict[str, str]:
+    """Return MLX backend artifact provenance for report diagnostics."""
+    info: dict[str, str] = {}
+    if mx is None:
+        info["MLX Backend"] = "mlx.core unavailable"
+        return info
+
+    mlx_editable = _distribution_is_editable("mlx")
+    info["MLX Install Type"] = "editable local source" if mlx_editable else "wheel/site-packages"
+
+    mlx_location = _distribution_location("mlx")
+    if mlx_location:
+        info["MLX Distribution Root"] = mlx_location
+
+    mlx_metal_location = _distribution_location("mlx-metal")
+    if mlx_metal_location:
+        info["mlx-metal Distribution Root"] = mlx_metal_location
+    elif mlx_editable:
+        info["mlx-metal Distribution"] = "not installed; local editable mlx supplies backend"
+    else:
+        info["mlx-metal Distribution"] = "not installed"
+
+    core_file = getattr(mx, "__file__", None)
+    if not core_file:
+        return info
+
+    try:
+        core_path = Path(core_file).resolve()
+    except (OSError, RuntimeError, ValueError):
+        core_path = Path(str(core_file))
+    info["MLX Core Extension"] = str(core_path)
+
+    mlx_package_dir = core_path.parent
+    artifact_paths = (
+        ("MLX Metallib", mlx_package_dir / "lib" / "mlx.metallib"),
+        ("MLX libmlx.dylib", mlx_package_dir / "lib" / "libmlx.dylib"),
+    )
+    for label, artifact_path in artifact_paths:
+        artifact_fingerprint = _format_artifact_fingerprint(artifact_path)
+        if artifact_fingerprint:
+            info[label] = artifact_fingerprint
+        else:
+            info[label] = f"missing at {artifact_path}"
+
+    return info
+
+
 def _version_components(version_text: str, *, width: int = 4) -> tuple[int, ...]:
     """Convert a version string to fallback numeric components.
 
@@ -11527,9 +11628,25 @@ _DIAGNOSTICS_SYSTEM_KEYS: Final[tuple[str, ...]] = (
     "Python Version",
     "OS",
     "macOS Version",
+    "SDK Version",
+    "SDK Path",
+    "Xcode Version",
+    "Xcode Build",
+    "Active Developer Directory",
+    "Metal SDK",
+    "Metal Compiler Version",
+    "Metallib Linker Version",
+    "Apple Clang Version",
     "GPU/Chip",
     "GPU Cores",
     "Metal Support",
+    "MLX Install Type",
+    "MLX Distribution Root",
+    "mlx-metal Distribution Root",
+    "mlx-metal Distribution",
+    "MLX Core Extension",
+    "MLX Metallib",
+    "MLX libmlx.dylib",
     "RAM",
 )
 
@@ -11537,6 +11654,7 @@ _DIAGNOSTICS_SYSTEM_KEYS: Final[tuple[str, ...]] = (
 _DIAGNOSTICS_LIB_NAMES: Final[tuple[str, ...]] = (
     "mlx-vlm",
     "mlx",
+    "mlx-metal",
     "mlx-lm",
     "mlx-audio",
     "transformers",
@@ -16034,6 +16152,17 @@ def _run_macos_toolchain_command(command: Sequence[str], *, timeout: int = 2) ->
     return output or None
 
 
+def _first_toolchain_output_line(output: str | None) -> str | None:
+    """Return the first non-empty line from a toolchain command output."""
+    if output is None:
+        return None
+    for line in output.splitlines():
+        stripped = line.strip()
+        if stripped:
+            return stripped
+    return None
+
+
 def _get_macos_toolchain_info() -> dict[str, str]:
     """Get macOS developer toolchain info (Xcode, SDK, CLTools).
 
@@ -16045,9 +16174,15 @@ def _get_macos_toolchain_info() -> dict[str, str]:
         return info
 
     # Get SDK version (useful for Metal/framework compatibility)
-    sdk_version = _run_macos_toolchain_command(["/usr/bin/xcrun", "--show-sdk-version"])
+    sdk_version = _run_macos_toolchain_command(
+        ["/usr/bin/xcrun", "-sdk", "macosx", "--show-sdk-version"],
+    )
     if sdk_version:
         info["SDK Version"] = sdk_version
+
+    developer_dir = _run_macos_toolchain_command(["/usr/bin/xcode-select", "-p"])
+    if developer_dir:
+        info["Active Developer Directory"] = developer_dir
 
     # Get Xcode version (important for Metal shader compilation)
     xcode_output = _run_macos_toolchain_command(["/usr/bin/xcodebuild", "-version"])
@@ -16060,9 +16195,30 @@ def _get_macos_toolchain_info() -> dict[str, str]:
                 info["Xcode Build"] = lines[1].replace("Build version ", "").strip()
 
     # Get Metal SDK path (useful for debugging Metal issues)
-    sdk_path = _run_macos_toolchain_command(["/usr/bin/xcrun", "--show-sdk-path"])
+    sdk_path = _run_macos_toolchain_command(
+        ["/usr/bin/xcrun", "-sdk", "macosx", "--show-sdk-path"],
+    )
     if sdk_path:
+        info["SDK Path"] = sdk_path
         info["Metal SDK"] = Path(sdk_path).name
+
+    metal_version = _first_toolchain_output_line(
+        _run_macos_toolchain_command(["/usr/bin/xcrun", "metal", "--version"]),
+    )
+    if metal_version:
+        info["Metal Compiler Version"] = metal_version
+
+    metallib_version = _first_toolchain_output_line(
+        _run_macos_toolchain_command(["/usr/bin/xcrun", "metallib", "--version"]),
+    )
+    if metallib_version:
+        info["Metallib Linker Version"] = metallib_version
+
+    clang_version = _first_toolchain_output_line(
+        _run_macos_toolchain_command(["/usr/bin/xcrun", "clang", "--version"]),
+    )
+    if clang_version:
+        info["Apple Clang Version"] = clang_version
 
     # Get Command Line Tools version if Xcode not available
     if "Xcode Version" not in info:
@@ -16141,6 +16297,8 @@ def get_system_characteristics() -> dict[str, str]:
             logical_cores = psutil.cpu_count(logical=True)
             if logical_cores:
                 info["CPU Cores (Logical)"] = str(logical_cores)
+
+        info.update(_get_mlx_backend_artifact_info())
 
     except (OSError, RuntimeError, ValueError) as err:
         logger.debug("Error gathering system characteristics: %s", err)

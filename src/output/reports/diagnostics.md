@@ -488,6 +488,7 @@ _Report generated on 2026-05-24 21:46:43 BST by [check_models](https://github.co
 |-----------------|---------------|
 | mlx-vlm         | 0.5.0         |
 | mlx             | 0.31.2        |
+| mlx-metal       | 0.31.2        |
 | mlx-lm          | 0.31.3        |
 | mlx-audio       | 0.4.3         |
 | transformers    | 5.9.0         |
@@ -496,7 +497,22 @@ _Report generated on 2026-05-24 21:46:43 BST by [check_models](https://github.co
 | Python Version  | 3.13.13       |
 | OS              | Darwin 25.5.0 |
 | macOS Version   | 26.5          |
+| SDK Version     | 26.5          |
+| SDK Path        | /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk |
+| Xcode Version   | 26.5          |
+| Xcode Build     | 17F42         |
+| Active Developer Directory | /Applications/Xcode.app/Contents/Developer |
+| Metal SDK       | MacOSX26.5.sdk |
+| Metal Compiler Version | Apple metal version 32023.883 (metalfe-32023.883) |
+| Metallib Linker Version | AIR-LLD 32023.883 (metalfe-32023.883) (compatible with legacy metallib linker) |
+| Apple Clang Version | Apple clang version 21.0.0 (clang-2100.1.1.101) |
 | GPU/Chip        | Apple M5 Max  |
 | GPU Cores       | 40            |
 | Metal Support   | Metal 4       |
+| MLX Install Type | wheel/site-packages |
+| MLX Distribution Root | /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages |
+| mlx-metal Distribution Root | /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages |
+| MLX Core Extension | /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/mlx/core.cpython-313-darwin.so |
+| MLX Metallib    | /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/mlx/lib/mlx.metallib (157,748,008 bytes, sha256=8c8bfcece8c0610745b68879771e5aa1b92b29fa5e17172e5508e4f5153d8d15) |
+| MLX libmlx.dylib | /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/mlx/lib/libmlx.dylib (21,653,808 bytes, sha256=2ee6fbd32ff22e22e1301ebe3c3bece95584104ff9cbc900513d41a095211bbd) |
 | RAM             | 128.0 GB      |

@@ -102,6 +102,9 @@ Notable changes to this project will be documented in this file.
   build prerequisites, verifying the `mlx`/`mlx-metal` backend pair during
   fresh conda setup, logging `mlx.metallib` provenance, and adding an automatic
   cached-model smoke test for local MLX builds.
+- Include `mlx-metal`, Xcode/SDK/Metal compiler details, and MLX backend
+  artifact fingerprints in diagnostics and issue-draft environment tables so
+  Metal build regressions are reproducible from pasted reports.
 
 ### Fixed
 
