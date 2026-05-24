@@ -1,14 +1,14 @@
 <!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
 
-# \[mlx-vlm\]\[Stop-token leakage\] Stop/control tokens leaked into generated text affecting 2 model(s)
+# \[mlx-vlm\]\[Stop-token leakage\] Stop/control tokens leaked into generated text affecting 4 model(s)
 
 ## Summary
 
-2 model(s) show **Stop-token leakage** that should be filed against mlx-vlm.
+4 model(s) show **Stop-token leakage** that should be filed against mlx-vlm.
 
 - **Observed problem:** Stop/control tokens leaked into generated text
 - **Target:** mlx-vlm
-- **Affected models:** 2
+- **Affected models:** 4
 - **Fixed when:** No leaked stop/control tokens.
 
 
@@ -16,19 +16,21 @@
 
 <!-- markdownlint-disable MD060 -->
 
-| Model                                     | Observed Behavior                                         | Token Counts                                                                                          | Optional Context                                                                                                           |
-|-------------------------------------------|-----------------------------------------------------------|-------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | decoded text contains control token &lt;\|endoftext\|&gt; | prompt=16,176 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_stop_token_001.json) |
-| `mlx-community/X-Reasoner-7B-8bit`        | decoded text contains control token &lt;\|endoftext\|&gt; | prompt=16,176 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_015_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_stop_token_001.json)        |
+| Model                                | Observed Behavior                                                                                                | Token Counts                                                                                         | Optional Context                                                                                                                                                                |
+|--------------------------------------|------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `microsoft/Phi-3.5-vision-instruct`  | decoded text contains control token &lt;\|end\|&gt; \| decoded text contains control token &lt;\|endoftext\|&gt; | prompt=770 \| output/prompt=25.97% \| nontext burden=99% \| stop=max_tokens \| hit token cap (200)   | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_002_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json)  |
+| `mlx-community/GLM-4.6V-Flash-6bit`  | decoded text contains control token &lt;/think&gt;                                                               | prompt=6,045 \| output/prompt=2.88% \| nontext burden=100% \| stop=completed                         | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_004_mlx-community_GLM-4.6V-Flash-6bit_mlx_vlm_stop_token_001.json)  |
+| `mlx-community/GLM-4.6V-Flash-mxfp4` | decoded text contains control token &lt;/think&gt;                                                               | prompt=6,045 \| output/prompt=3.31% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_005_mlx-community_GLM-4.6V-Flash-mxfp4_mlx_vlm_stop_token_001.json) |
+| `mlx-community/GLM-4.6V-nvfp4`       | decoded text contains control token &lt;/think&gt;                                                               | prompt=6,045 \| output/prompt=3.13% \| nontext burden=100% \| stop=completed                         | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_006_mlx-community_GLM-4.6V-nvfp4_mlx_vlm_stop_token_001.json)       |
 <!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
 
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: Special control token &lt;\|endoftext\|&gt; appeared in generated text.
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: Output switched language/script unexpectedly (tokenizer_artifact).
-- Output excerpt: `. The Blueprints and 10. We are in and in the United States, I and my friends, and find the door. The sky is a bit, and the battery, and I, and I. It is the fault, and I am a, and I. The sky is blue and a, the sky. The sky is not a new, and I with me and a, and I with me, it is, and I and my friends, and they are in...`
-- `mlx-community/X-Reasoner-7B-8bit`: Special control token &lt;\|endoftext\|&gt; appeared in generated text.
+- `microsoft/Phi-3.5-vision-instruct`: Special control token &lt;\|end\|&gt; appeared in generated text.
+- `microsoft/Phi-3.5-vision-instruct`: Special control token &lt;\|endoftext\|&gt; appeared in generated text.
+- Output excerpt: `The image shows a street view with a row of tall, cylindrical silos in the background, a gated entrance with a 'No Entry' sign, and a red building with a sign that reads 'COOKIE'. There are people standing near the gate, and a car is parked on the side of the road. The sky is blue with some clouds, and the overall s...`
+- `mlx-community/GLM-4.6V-Flash-6bit`: Special control token &lt;/think&gt; appeared in generated text.
 
 
 ## Minimal Reproduction
@@ -38,8 +40,10 @@ These commands use `mlx-vlm` directly so the issue can be reproduced without ins
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/Qwen2-VL-2B-Instruct-4bit --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
-python -m mlx_vlm.generate --model mlx-community/X-Reasoner-7B-8bit --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model microsoft/Phi-3.5-vision-instruct --image /Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/GLM-4.6V-Flash-6bit --image /Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/GLM-4.6V-Flash-mxfp4 --image /Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/GLM-4.6V-nvfp4 --image /Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 Minimal Python repro (representative model):
@@ -48,8 +52,8 @@ Minimal Python repro (representative model):
 from mlx_vlm.generate import generate
 from mlx_vlm.utils import load
 
-MODEL = 'mlx-community/Qwen2-VL-2B-Instruct-4bit'
-IMAGE = '/Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg'
+MODEL = 'microsoft/Phi-3.5-vision-instruct'
+IMAGE = '/Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg'
 PROMPT = 'Describe this image briefly.'
 LOAD_KWARGS = {'trust_remote_code': True}
 GENERATE_KWARGS = {'max_tokens': 200, 'temperature': 0.0, 'prefill_step_size': 4096}
@@ -73,18 +77,20 @@ Generation/load config:
     "prefill_step_size": 4096,
     "temperature": 0.0
   },
-  "image": "/Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg",
+  "image": "/Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg",
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "mlx-community/Qwen2-VL-2B-Instruct-4bit"
+  "model": "microsoft/Phi-3.5-vision-instruct"
 }
 ```
 
 Optional advanced context:
 
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_stop_token_001.json)
-- `mlx-community/X-Reasoner-7B-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_015_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_stop_token_001.json)
+- `microsoft/Phi-3.5-vision-instruct`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_002_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json)
+- `mlx-community/GLM-4.6V-Flash-6bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_004_mlx-community_GLM-4.6V-Flash-6bit_mlx_vlm_stop_token_001.json)
+- `mlx-community/GLM-4.6V-Flash-mxfp4`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_005_mlx-community_GLM-4.6V-Flash-mxfp4_mlx_vlm_stop_token_001.json)
+- `mlx-community/GLM-4.6V-nvfp4`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_006_mlx-community_GLM-4.6V-nvfp4_mlx_vlm_stop_token_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -104,49 +110,67 @@ Optional advanced context:
 
 ## Appendix: Environment
 
-| Component       | Version                     |
-|-----------------|-----------------------------|
-| mlx-vlm         | 0.5.0                       |
-| mlx             | 0.32.0.dev20260521+5d1c0e4c |
-| mlx-lm          | 0.31.3                      |
-| mlx-audio       | 0.4.3                       |
-| transformers    | 5.9.0                       |
-| tokenizers      | 0.22.2                      |
-| huggingface-hub | 1.16.1                      |
-| Python Version  | 3.13.13                     |
-| OS              | Darwin 25.5.0               |
-| macOS Version   | 26.5                        |
-| GPU/Chip        | Apple M5 Max                |
-| GPU Cores       | 40                          |
-| Metal Support   | Metal 4                     |
-| RAM             | 128.0 GB                    |
+| Component       | Version       |
+|-----------------|---------------|
+| mlx-vlm         | 0.5.0         |
+| mlx             | 0.31.2        |
+| mlx-lm          | 0.31.3        |
+| mlx-audio       | 0.4.3         |
+| transformers    | 5.9.0         |
+| tokenizers      | 0.22.2        |
+| huggingface-hub | 1.16.1        |
+| Python Version  | 3.13.13       |
+| OS              | Darwin 25.5.0 |
+| macOS Version   | 26.5          |
+| GPU/Chip        | Apple M5 Max  |
+| GPU Cores       | 40            |
+| Metal Support   | Metal 4       |
+| RAM             | 128.0 GB      |
 
 
 ## Appendix: Detailed Evidence
 
-### `mlx-community/Qwen2-VL-2B-Instruct-4bit`
+### `microsoft/Phi-3.5-vision-instruct`
 
 Observed signals:
 
+- Special control token &lt;\|end\|&gt; appeared in generated text.
 - Special control token &lt;\|endoftext\|&gt; appeared in generated text.
 - Output switched language/script unexpectedly (tokenizer_artifact).
 
 Sample output:
 
 ```text
-. The Blueprints and 10. We are in and in the United States, I and my friends, and find the door. The sky is a bit, and the battery, and I, and I. It is the fault, and I am a, and I. The sky is blu...
+The image shows a street view with a row of tall, cylindrical silos in the background, a gated entrance with a 'No Entry' sign, and a red building with a sign that reads 'COOKIE'. There are people...
 ```
 
-### `mlx-community/X-Reasoner-7B-8bit`
+### `mlx-community/GLM-4.6V-Flash-6bit`
 
 Observed signals:
 
-- Special control token &lt;\|endoftext\|&gt; appeared in generated text.
-- Output switched language/script unexpectedly (tokenizer_artifact).
+- Special control token &lt;/think&gt; appeared in generated text.
+- Output formatting deviated from the requested structure. Details: Unknown tags: &lt;think&gt;.
+- Output leaked reasoning or prompt-template text (&lt;think&gt;).
 
 Sample output:
 
 ```text
-B<|endoftext|>, 1.<|endoftext|>-100<|endoftext|>-<|endoftext|>1<|endoftext|>-<|endoftext|>-<|endoftext|>-<|endoftext|>- 1. The 201.<|endoftext|>The 2010 2010 - 2008<|endoftext|>B<|endoftext|>-<|end...
+<think>Got it, let's describe this image briefly. The scene shows the entrance to Burton Brewery, with large stainless steel fermentation tanks in the background. There's a black iron gate with sto...
 ```
+
+### `mlx-community/GLM-4.6V-Flash-mxfp4`
+
+Observed signals:
+
+- Special control token &lt;/think&gt; appeared in generated text.
+- Output formatting deviated from the requested structure. Details: Unknown tags: &lt;think&gt;.
+- Output leaked reasoning or prompt-template text (&lt;think&gt;).
+
+Sample output:
+
+```text
+<think>Got it, let's describe this image briefly. The image shows the Burton Brewery, with large silver cylindrical storage tanks (brewing vessels) dominating the background. In the foreground, the...
+```
+
+_Additional affected models are listed in the Affected Models table above._
 

@@ -2,17 +2,17 @@
   "environment": {
     "library_versions": {
       "Pillow": "12.2.0",
-      "huggingface-hub": "1.14.0",
-      "mlx": "0.32.0.dev20260510+84961223",
+      "huggingface-hub": "1.16.1",
+      "mlx": "0.31.2",
       "mlx-audio": "0.4.3",
       "mlx-lm": "0.31.3",
-      "mlx-metal": null,
+      "mlx-metal": "0.31.2",
       "mlx-vlm": "0.5.0",
-      "numpy": "2.4.4",
+      "numpy": "2.4.6",
       "tokenizers": "0.22.2",
-      "transformers": "5.8.0"
+      "transformers": "5.9.0"
     },
-    "platform": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
+    "platform": "macOS-26.5-arm64-arm-64bit-Mach-O",
     "preflight_issues": [],
     "system_info": {
       "Architecture": "arm64",
@@ -22,13 +22,13 @@
       "GPU/Chip": "Apple M5 Max",
       "Metal SDK": "MacOSX.sdk",
       "Metal Support": "Metal 4",
-      "OS": "Darwin 25.4.0",
-      "Python Version": "3.13.12",
+      "OS": "Darwin 25.5.0",
+      "Python Version": "3.13.13",
       "RAM": "128.0 GB",
-      "SDK Version": "26.4",
-      "Xcode Build": "17E202",
-      "Xcode Version": "26.4.1",
-      "macOS Version": "26.4.1"
+      "SDK Version": "26.5",
+      "Xcode Build": "17F42",
+      "Xcode Version": "26.5",
+      "macOS Version": "26.5"
     }
   },
   "failure": {
@@ -42,7 +42,7 @@
     "traceback": null,
     "type": null
   },
-  "generated_at_utc": "2026-05-10T20:23:22+00:00",
+  "generated_at_utc": "2026-05-24T20:46:43+00:00",
   "issue_cluster_id": "mlx-vlm_encoding_001",
   "model": "mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
   "repro": {
@@ -54,7 +54,7 @@
       "dry_run": false,
       "enable_thinking": false,
       "eos_tokens": null,
-      "eval_mode": "stress",
+      "eval_mode": "triage",
       "exclude": [
         "mlx-community/Qwen3-VL-2B-Thinking-bf16",
         "Qwen/Qwen3-VL-2B-Instruct"
@@ -67,11 +67,13 @@
       "kv_group_size": 64,
       "kv_quant_scheme": "uniform",
       "lazy_load": false,
+      "link_style": "github",
       "max_kv_size": null,
-      "max_tokens": 500,
+      "max_tokens": 200,
       "min_p": 0.0,
       "models": null,
       "no_color": false,
+      "open_report": false,
       "output_diagnostics": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/diagnostics.md",
       "output_env": "/Users/jrp/Documents/AI/mlx/check_models/src/output/environment.log",
       "output_gallery_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/model_gallery.md",
@@ -105,13 +107,13 @@
       "verbose": true,
       "width": null
     },
-    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260509-165009_DSC09954.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
+    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
     "env_vars": {
       "TOKENIZERS_PARALLELISM": "false"
     },
-    "image_path": "/Users/jrp/Pictures/Processed/20260509-165009_DSC09954.jpg",
-    "image_ref_sha256": "ed44d880529e0633051d5651bea9660b787e8673e37f61808667a88fe6f684bd",
-    "image_sha256": "be1c327c36dfaeb19e62e71eb6fb5f4dc98b805b9351bf049a33cd123f1e2f2a",
+    "image_path": "/Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg",
+    "image_ref_sha256": "407523635dc920d1ee43f5ff32eb93fad345a713f05e5f3207c20e27125cfed2",
+    "image_sha256": "c4f7c5e2d8a2a003ca46e307d1afcfe52f5df9f4baa673cee8156321e75eff1e",
     "prompt_diagnostics": {
       "eos_token": "</s>",
       "eos_token_id": 2,
@@ -120,7 +122,7 @@
         "kv_group_size": 64,
         "kv_quant_scheme": "uniform",
         "max_kv_size": null,
-        "max_tokens": 500,
+        "max_tokens": 200,
         "prefill_step_size": 4096,
         "quantized_kv_start": 5000,
         "repetition_context_size": 20,
@@ -131,9 +133,9 @@
       "image_placeholder_count": 0,
       "model_type": "mistral3",
       "processor_class": "mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor",
-      "rendered_prompt_chars": 2382,
-      "rendered_prompt_hash_sha256": "9c6deb8d0894b2532fe17e4bf6ce19165da365868aa981ee807fac87424b6af3",
-      "rendered_prompt_preview": "<s>[INST][IMG]Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences describ...",
+      "rendered_prompt_chars": 49,
+      "rendered_prompt_hash_sha256": "8d085e929cf99abed8b8058dc9ad06d6cd2f67a8c0e76e0a42d895a2f288750c",
+      "rendered_prompt_preview": "<s>[INST][IMG]Describe this image briefly.[/INST]",
       "special_token_ids": [
         1,
         2,
@@ -204,41 +206,38 @@
       ],
       "tokenizer_class": "transformers.tokenization_utils_tokenizers.TokenizersBackend"
     },
-    "prompt_hash_sha256": "1887ad882e1845d8b9e280a51db6efcf4cb34cc0d4015d8de3dbfe882f83251d",
-    "prompt_preview": "Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct any...",
-    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260509-165009_DSC09954.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
+    "prompt_hash_sha256": "d760336d0fd143932f194573dd63f6b531e0ffbc2c4f1595e015392a3471c318",
+    "prompt_preview": "Describe this image briefly.",
+    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
     "seed": null
   },
   "result": {
-    "generated_text_preview": "Title:\u0120Gothic\u0120Revival\u0120Church\u0120with\u0120Spire\u010a\u010aDescription:\u0120A\u0120Gothic\u0120Revival\u0120style\u0120church\u0120with\u0120a\u0120tall\u0120spire\u0120and\u0120flint\u0120walls\u0120stands\u0120against\u0120a\u0120bright\u0120blue\u0120sky\u0120with\u0120wispy\u0120clouds.\u0120A\u0120black\u0120car\u0120is\u0120parked\u0120in\u0120the\u0120foreground.\u010a\u010aKeywords:\u0120Gothic\u0120Revival,\u0120church,\u0120spire,\u0120flint\u0120walls,\u0120blue\u0120sky,\u0120wispy\u0120clouds,\u0120black\u0120car,\u0120stone,\u0120cross,\u0120daylight,\u0120fence,\u0120steeple,\u0120chapel,\u0120bell\u0120tower,\u0120station\u0120wagon,\u0120Europe",
+    "generated_text_preview": "The\u0120image\u0120depicts\u0120the\u0120entrance\u0120to\u0120a\u0120brewery,\u0120specifically\u0120Molson\u0120Coors,\u0120as\u0120indicated\u0120by\u0120the\u0120signage.\u0120The\u0120brewery\u0120is\u0120characterized\u0120by\u0120large,\u0120cylindrical\u0120storage\u0120tanks,\u0120which\u0120are\u0120typical\u0120for\u0120beer\u0120production.\u0120The\u0120entrance\u0120is\u0120marked\u0120by\u0120a\u0120pair\u0120of\u0120stone\u0120pillars\u0120with\u0120decorative\u0120finials,\u0120and\u0120a\u0120black\u0120wrought-iron\u0120gate.\u0120The\u0120surrounding\u0120area\u0120includes\u0120a\u0120mix\u0120of\u0120brick\u0120buildings\u0120and\u0120greenery,\u0120with\u0120a\u0120few\u0120trees\u0120an...",
     "maintainer_triage": {
       "confidence": "high",
       "evidence": [
         "harness:encoding",
-        "trusted_overlap",
-        "metadata_terms"
+        "generic"
       ],
       "harness_details": [
-        "token_encoding:bpe_space_leak(57)"
+        "token_encoding:bpe_space_leak(126)"
       ],
       "hit_max_tokens": false,
       "issue_kind": "harness",
       "issue_subtype": "encoding",
       "next_action": "Inspect decode cleanup; tokenizer markers are leaking into user-facing text.",
-      "nontext_prompt_ratio": 0.8228699551569507,
-      "prompt_output_ratio": 0.034753363228699555,
-      "prompt_tokens_total": 2676,
-      "requested_max_tokens": 500,
+      "nontext_prompt_ratio": 0.9965616045845272,
+      "prompt_output_ratio": 0.09283667621776505,
+      "prompt_tokens_total": 1745,
+      "requested_max_tokens": 200,
       "stop_reason": "completed",
-      "summary": "Tokenizer space-marker artifacts (for example \u0120) appeared in output (about 57 occurrences). | nontext prompt burden=82% | missing sections: description, keywords | missing terms: Dorking, Gothic Architecture, Objects, Surrey, low",
+      "summary": "Tokenizer space-marker artifacts (for example \u0120) appeared in output (about 126 occurrences). | nontext prompt burden=100%",
       "suspected_owner": "mlx-vlm",
       "user_bucket": "avoid"
     },
     "quality_issues": [
       "\u26a0\ufe0fharness(encoding)",
-      "missing-sections(description+keywords)",
-      "title-length(59)",
-      "metadata-borrowing"
+      "generic(0)"
     ],
     "success": true
   },

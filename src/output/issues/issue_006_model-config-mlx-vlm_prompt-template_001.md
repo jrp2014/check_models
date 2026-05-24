@@ -1,14 +1,14 @@
 <!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
 
-# \[model-config / mlx-vlm\]\[Prompt-template / image-placeholder mismatch\] Prompt/template output shape mismatch affecting 5 model(s)
+# \[model-config / mlx-vlm\]\[Prompt-template / image-placeholder mismatch\] Prompt/template output shape mismatch affecting 2 model(s)
 
 ## Summary
 
-5 model(s) show **Prompt-template / image-placeholder mismatch** that should be filed against model repo first; mlx-vlm if template handling disagrees.
+2 model(s) show **Prompt-template / image-placeholder mismatch** that should be filed against model repo first; mlx-vlm if template handling disagrees.
 
 - **Observed problem:** Prompt/template output shape mismatch
 - **Target:** model repo first; mlx-vlm if template handling disagrees
-- **Affected models:** 5
+- **Affected models:** 2
 - **Fixed when:** Requested sections render without template leakage.
 
 
@@ -16,22 +16,17 @@
 
 <!-- markdownlint-disable MD060 -->
 
-| Model                                            | Observed Behavior   | Token Counts                                                                 | Optional Context                                                                                                                                    |
-|--------------------------------------------------|---------------------|------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
-| `LiquidAI/LFM2.5-VL-450M-MLX-bf16`               | generated_tokens~3  | prompt=269 \| output/prompt=1.12% \| nontext burden=98% \| stop=completed    | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_model_config_mlx_vlm_prompt_template_001.json)               |
-| `mlx-community/InternVL3-8B-bf16`                | output/prompt=0.5%  | prompt=2,317 \| output/prompt=0.47% \| nontext burden=100% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_004_mlx-community_InternVL3-8B-bf16_model_config_mlx_vlm_prompt_template_001.json)                |
-| `mlx-community/Molmo-7B-D-0924-bf16`             | generated_tokens~3  | prompt=1,201 \| output/prompt=0.25% \| nontext burden=100% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_007_mlx-community_Molmo-7B-D-0924-bf16_model_config_mlx_vlm_prompt_template_001.json)             |
-| `mlx-community/paligemma2-10b-ft-docci-448-6bit` | generated_tokens~6  | prompt=1,031 \| output/prompt=0.58% \| nontext burden=99% \| stop=completed  | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_016_mlx-community_paligemma2-10b-ft-docci-448-6bit_model_config_mlx_vlm_prompt_template_001.json) |
-| `mlx-community/paligemma2-10b-ft-docci-448-bf16` | generated_tokens~6  | prompt=1,031 \| output/prompt=0.58% \| nontext burden=99% \| stop=completed  | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_017_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json) |
+| Model                             | Observed Behavior   | Token Counts               | Optional Context                                                                                                                                                                               |
+|-----------------------------------|---------------------|----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/gemma-3n-E2B-4bit` | generated_tokens=0  | prompt=0 \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_010_mlx-community_gemma-3n-E2B-4bit_model_config_mlx_vlm_prompt_template_001.json) |
+| `mlx-community/gemma-4-31b-bf16`  | generated_tokens=0  | prompt=0 \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_011_mlx-community_gemma-4-31b-bf16_model_config_mlx_vlm_prompt_template_001.json)  |
 <!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
 
-- `LiquidAI/LFM2.5-VL-450M-MLX-bf16`: Output appears truncated to about 3 tokens.
-- Output excerpt: `í.`
-- `mlx-community/InternVL3-8B-bf16`: Output is very short relative to prompt size (0.5%), suggesting possible early-stop or prompt-handling issues.
-- Output excerpt: `processors, the problem. Theorem: Theorem`
+- `mlx-community/gemma-3n-E2B-4bit`: No generated tokens were recorded.
+- `mlx-community/gemma-4-31b-bf16`: No generated tokens were recorded.
 
 
 ## Minimal Reproduction
@@ -41,11 +36,8 @@ These commands use `mlx-vlm` directly so the issue can be reproduced without ins
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model LiquidAI/LFM2.5-VL-450M-MLX-bf16 --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
-python -m mlx_vlm.generate --model mlx-community/InternVL3-8B-bf16 --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
-python -m mlx_vlm.generate --model mlx-community/Molmo-7B-D-0924-bf16 --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
-python -m mlx_vlm.generate --model mlx-community/paligemma2-10b-ft-docci-448-6bit --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
-python -m mlx_vlm.generate --model mlx-community/paligemma2-10b-ft-docci-448-bf16 --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/gemma-3n-E2B-4bit --image /Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/gemma-4-31b-bf16 --image /Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 Minimal Python repro (representative model):
@@ -54,8 +46,8 @@ Minimal Python repro (representative model):
 from mlx_vlm.generate import generate
 from mlx_vlm.utils import load
 
-MODEL = 'LiquidAI/LFM2.5-VL-450M-MLX-bf16'
-IMAGE = '/Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg'
+MODEL = 'mlx-community/gemma-3n-E2B-4bit'
+IMAGE = '/Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg'
 PROMPT = 'Describe this image briefly.'
 LOAD_KWARGS = {'trust_remote_code': True}
 GENERATE_KWARGS = {'max_tokens': 200, 'temperature': 0.0, 'prefill_step_size': 4096}
@@ -79,21 +71,18 @@ Generation/load config:
     "prefill_step_size": 4096,
     "temperature": 0.0
   },
-  "image": "/Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg",
+  "image": "/Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg",
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "LiquidAI/LFM2.5-VL-450M-MLX-bf16"
+  "model": "mlx-community/gemma-3n-E2B-4bit"
 }
 ```
 
 Optional advanced context:
 
-- `LiquidAI/LFM2.5-VL-450M-MLX-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/InternVL3-8B-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_004_mlx-community_InternVL3-8B-bf16_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/Molmo-7B-D-0924-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_007_mlx-community_Molmo-7B-D-0924-bf16_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_016_mlx-community_paligemma2-10b-ft-docci-448-6bit_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_017_mlx-community_paligemma2-10b-ft-docci-448-bf16_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/gemma-3n-E2B-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_010_mlx-community_gemma-3n-E2B-4bit_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/gemma-4-31b-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_011_mlx-community_gemma-4-31b-bf16_model_config_mlx_vlm_prompt_template_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -112,61 +101,35 @@ Optional advanced context:
 
 ## Appendix: Environment
 
-| Component       | Version                     |
-|-----------------|-----------------------------|
-| mlx-vlm         | 0.5.0                       |
-| mlx             | 0.32.0.dev20260521+5d1c0e4c |
-| mlx-lm          | 0.31.3                      |
-| mlx-audio       | 0.4.3                       |
-| transformers    | 5.9.0                       |
-| tokenizers      | 0.22.2                      |
-| huggingface-hub | 1.16.1                      |
-| Python Version  | 3.13.13                     |
-| OS              | Darwin 25.5.0               |
-| macOS Version   | 26.5                        |
-| GPU/Chip        | Apple M5 Max                |
-| GPU Cores       | 40                          |
-| Metal Support   | Metal 4                     |
-| RAM             | 128.0 GB                    |
+| Component       | Version       |
+|-----------------|---------------|
+| mlx-vlm         | 0.5.0         |
+| mlx             | 0.31.2        |
+| mlx-lm          | 0.31.3        |
+| mlx-audio       | 0.4.3         |
+| transformers    | 5.9.0         |
+| tokenizers      | 0.22.2        |
+| huggingface-hub | 1.16.1        |
+| Python Version  | 3.13.13       |
+| OS              | Darwin 25.5.0 |
+| macOS Version   | 26.5          |
+| GPU/Chip        | Apple M5 Max  |
+| GPU Cores       | 40            |
+| Metal Support   | Metal 4       |
+| RAM             | 128.0 GB      |
 
 
 ## Appendix: Detailed Evidence
 
-### `LiquidAI/LFM2.5-VL-450M-MLX-bf16`
+### `mlx-community/gemma-3n-E2B-4bit`
 
 Observed signals:
 
-- Output appears truncated to about 3 tokens.
+- No generated tokens were recorded.
 
-Sample output:
-
-```text
-í.
-```
-
-### `mlx-community/InternVL3-8B-bf16`
+### `mlx-community/gemma-4-31b-bf16`
 
 Observed signals:
 
-- Output is very short relative to prompt size (0.5%), suggesting possible early-stop or prompt-handling issues.
-
-Sample output:
-
-```text
-processors, the problem. Theorem: Theorem
-```
-
-### `mlx-community/Molmo-7B-D-0924-bf16`
-
-Observed signals:
-
-- Output appears truncated to about 3 tokens.
-
-Sample output:
-
-```text
-Saturday.
-```
-
-_Additional affected models are listed in the Affected Models table above._
+- No generated tokens were recorded.
 

@@ -1,14 +1,14 @@
 <!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
 
-# \[mlx-vlm / mlx\]\[Long-context collapse\] Long-context generation collapsed or became too short affecting 2 model(s)
+# \[mlx-vlm / mlx\]\[Long-context collapse\] Long-context generation collapsed or became too short affecting 1 model(s)
 
 ## Summary
 
-2 model(s) show **Long-context collapse** that should be filed against mlx-vlm first; MLX if cache/runtime reproduces.
+1 model(s) show **Long-context collapse** that should be filed against mlx-vlm first; MLX if cache/runtime reproduces.
 
 - **Observed problem:** Long-context generation collapsed or became too short
 - **Target:** mlx-vlm first; MLX if cache/runtime reproduces
-- **Affected models:** 2
+- **Affected models:** 1
 - **Fixed when:** Full and reduced reruns avoid context collapse.
 
 
@@ -16,19 +16,17 @@
 
 <!-- markdownlint-disable MD060 -->
 
-| Model                                     | Observed Behavior                                                               | Token Counts                                                                  | Optional Context                                                                                                                 |
-|-------------------------------------------|---------------------------------------------------------------------------------|-------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Qwen3.5-9B-MLX-4bit`       | output/prompt=0.1% \| prompt_tokens=16167, output_tokens=12, output/prompt=0.1% | prompt=16,167 \| output/prompt=0.07% \| nontext burden=100% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_013_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_002.json)       |
-| `mlx-community/paligemma2-3b-pt-896-4bit` | output/prompt=0.2% \| prompt_tokens=4103, output_tokens=9, output/prompt=0.2%   | prompt=4,103 \| output/prompt=0.22% \| nontext burden=100% \| stop=completed  | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_018_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_002.json) |
+| Model                                     | Observed Behavior                                                             | Token Counts                                                                 | Optional Context                                                                                                                                                                           |
+|-------------------------------------------|-------------------------------------------------------------------------------|------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/paligemma2-3b-pt-896-4bit` | output/prompt=0.2% \| prompt_tokens=4103, output_tokens=9, output/prompt=0.2% | prompt=4,103 \| output/prompt=0.22% \| nontext burden=100% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_012_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_002.json) |
 <!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
 
-- `mlx-community/Qwen3.5-9B-MLX-4bit`: Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt-handling issues.
-- `mlx-community/Qwen3.5-9B-MLX-4bit`: At long prompt length (16167 tokens), output stayed unusually short (12 tokens; ratio 0.1%).
-- Output excerpt: `云峰 rouluterждronk {item}`
 - `mlx-community/paligemma2-3b-pt-896-4bit`: Output is very short relative to prompt size (0.2%), suggesting possible early-stop or prompt-handling issues.
+- `mlx-community/paligemma2-3b-pt-896-4bit`: At long prompt length (4103 tokens), output stayed unusually short (9 tokens; ratio 0.2%).
+- Output excerpt: `The building is a brewery and distillery .`
 
 
 ## Minimal Reproduction
@@ -38,8 +36,7 @@ These commands use `mlx-vlm` directly so the issue can be reproduced without ins
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/Qwen3.5-9B-MLX-4bit --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
-python -m mlx_vlm.generate --model mlx-community/paligemma2-3b-pt-896-4bit --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/paligemma2-3b-pt-896-4bit --image /Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 Minimal Python repro (representative model):
@@ -48,8 +45,8 @@ Minimal Python repro (representative model):
 from mlx_vlm.generate import generate
 from mlx_vlm.utils import load
 
-MODEL = 'mlx-community/Qwen3.5-9B-MLX-4bit'
-IMAGE = '/Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg'
+MODEL = 'mlx-community/paligemma2-3b-pt-896-4bit'
+IMAGE = '/Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg'
 PROMPT = 'Describe this image briefly.'
 LOAD_KWARGS = {'trust_remote_code': True}
 GENERATE_KWARGS = {'max_tokens': 200, 'temperature': 0.0, 'prefill_step_size': 4096}
@@ -73,18 +70,17 @@ Generation/load config:
     "prefill_step_size": 4096,
     "temperature": 0.0
   },
-  "image": "/Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg",
+  "image": "/Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg",
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "mlx-community/Qwen3.5-9B-MLX-4bit"
+  "model": "mlx-community/paligemma2-3b-pt-896-4bit"
 }
 ```
 
 Optional advanced context:
 
-- `mlx-community/Qwen3.5-9B-MLX-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_013_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_002.json)
-- `mlx-community/paligemma2-3b-pt-896-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_018_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_002.json)
+- `mlx-community/paligemma2-3b-pt-896-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_012_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_002.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -103,39 +99,25 @@ Optional advanced context:
 
 ## Appendix: Environment
 
-| Component       | Version                     |
-|-----------------|-----------------------------|
-| mlx-vlm         | 0.5.0                       |
-| mlx             | 0.32.0.dev20260521+5d1c0e4c |
-| mlx-lm          | 0.31.3                      |
-| mlx-audio       | 0.4.3                       |
-| transformers    | 5.9.0                       |
-| tokenizers      | 0.22.2                      |
-| huggingface-hub | 1.16.1                      |
-| Python Version  | 3.13.13                     |
-| OS              | Darwin 25.5.0               |
-| macOS Version   | 26.5                        |
-| GPU/Chip        | Apple M5 Max                |
-| GPU Cores       | 40                          |
-| Metal Support   | Metal 4                     |
-| RAM             | 128.0 GB                    |
+| Component       | Version       |
+|-----------------|---------------|
+| mlx-vlm         | 0.5.0         |
+| mlx             | 0.31.2        |
+| mlx-lm          | 0.31.3        |
+| mlx-audio       | 0.4.3         |
+| transformers    | 5.9.0         |
+| tokenizers      | 0.22.2        |
+| huggingface-hub | 1.16.1        |
+| Python Version  | 3.13.13       |
+| OS              | Darwin 25.5.0 |
+| macOS Version   | 26.5          |
+| GPU/Chip        | Apple M5 Max  |
+| GPU Cores       | 40            |
+| Metal Support   | Metal 4       |
+| RAM             | 128.0 GB      |
 
 
 ## Appendix: Detailed Evidence
-
-### `mlx-community/Qwen3.5-9B-MLX-4bit`
-
-Observed signals:
-
-- Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt-handling issues.
-- At long prompt length (16167 tokens), output stayed unusually short (12 tokens; ratio 0.1%).
-
-Sample output:
-
-```text
-云峰 rouluterждronk
-{item}
-```
 
 ### `mlx-community/paligemma2-3b-pt-896-4bit`
 
@@ -147,6 +129,6 @@ Observed signals:
 Sample output:
 
 ```text
-It has been tagged with #1.
+The building is a brewery and distillery .
 ```
 

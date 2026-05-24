@@ -16,9 +16,9 @@
 
 <!-- markdownlint-disable MD060 -->
 
-| Model                                     | Observed Behavior                                                                                                                                                                               | Token Counts   | Optional Context                                                                                                                      |
-|-------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|---------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | Received 4 parameters not in model: multi_modal_projector.linear_1.biases, multi_modal_projector.linear_1.scales, multi_modal_projector.linear_2.biases, multi_modal_projector.linear_2.scales. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_005_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json) |
+| Model                                     | Observed Behavior                                                                                                                                                                               | Token Counts   | Optional Context                                                                                                                                                                                |
+|-------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | Received 4 parameters not in model: multi_modal_projector.linear_1.biases, multi_modal_projector.linear_1.scales, multi_modal_projector.linear_2.biases, multi_modal_projector.linear_2.scales. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_007_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json) |
 <!-- markdownlint-enable MD060 -->
 
 
@@ -35,7 +35,7 @@ These commands use `mlx-vlm` directly so the issue can be reproduced without ins
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/Kimi-VL-A3B-Thinking-8bit --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/Kimi-VL-A3B-Thinking-8bit --image /Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 Minimal Python repro (representative model):
@@ -45,7 +45,7 @@ from mlx_vlm.generate import generate
 from mlx_vlm.utils import load
 
 MODEL = 'mlx-community/Kimi-VL-A3B-Thinking-8bit'
-IMAGE = '/Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg'
+IMAGE = '/Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg'
 PROMPT = 'Describe this image briefly.'
 LOAD_KWARGS = {'trust_remote_code': True}
 GENERATE_KWARGS = {'max_tokens': 200, 'temperature': 0.0, 'prefill_step_size': 4096}
@@ -69,7 +69,7 @@ Generation/load config:
     "prefill_step_size": 4096,
     "temperature": 0.0
   },
-  "image": "/Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg",
+  "image": "/Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg",
   "load_kwargs": {
     "trust_remote_code": true
   },
@@ -79,7 +79,7 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_005_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)
+- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_007_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -99,22 +99,22 @@ Optional advanced context:
 
 ## Appendix: Environment
 
-| Component       | Version                     |
-|-----------------|-----------------------------|
-| mlx-vlm         | 0.5.0                       |
-| mlx             | 0.32.0.dev20260521+5d1c0e4c |
-| mlx-lm          | 0.31.3                      |
-| mlx-audio       | 0.4.3                       |
-| transformers    | 5.9.0                       |
-| tokenizers      | 0.22.2                      |
-| huggingface-hub | 1.16.1                      |
-| Python Version  | 3.13.13                     |
-| OS              | Darwin 25.5.0               |
-| macOS Version   | 26.5                        |
-| GPU/Chip        | Apple M5 Max                |
-| GPU Cores       | 40                          |
-| Metal Support   | Metal 4                     |
-| RAM             | 128.0 GB                    |
+| Component       | Version       |
+|-----------------|---------------|
+| mlx-vlm         | 0.5.0         |
+| mlx             | 0.31.2        |
+| mlx-lm          | 0.31.3        |
+| mlx-audio       | 0.4.3         |
+| transformers    | 5.9.0         |
+| tokenizers      | 0.22.2        |
+| huggingface-hub | 1.16.1        |
+| Python Version  | 3.13.13       |
+| OS              | Darwin 25.5.0 |
+| macOS Version   | 26.5          |
+| GPU/Chip        | Apple M5 Max  |
+| GPU Cores       | 40            |
+| Metal Support   | Metal 4       |
+| RAM             | 128.0 GB      |
 
 
 ## Appendix: Detailed Evidence

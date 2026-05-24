@@ -1,30 +1,29 @@
 <!-- markdownlint-disable MD013 MD024 MD060 -->
 
-# Diagnostics Report — 3 failure(s), 13 harness issue(s) (mlx-vlm 0.5.0)
+# Diagnostics Report — 3 failure(s), 9 harness issue(s) (mlx-vlm 0.5.0)
 
-**Run summary:** 55 locally-cached VLM model(s) checked; 3 hard failure(s), 13 harness/integration issue(s), 0 preflight warning(s), 52 successful run(s).
+**Run summary:** 56 locally-cached VLM model(s) checked; 3 hard failure(s), 9 harness/integration issue(s), 0 preflight warning(s), 53 successful run(s).
 
-Test image: `20260516-143527_DSC00014.jpg` (24.8 MB).
+Test image: `20260523-180223_DSC00153.jpg` (37.4 MB).
 
 ---
 
 ## Issue Queue
 
 Root-cause issue drafts are generated in
-[issues/index.md](https://github.com/jrp2014/check_models/blob/main/src/output/issues/index.md). Each row is intended to become one
-focused upstream GitHub issue.
+[issues/index.md](https://github.com/jrp2014/check_models/blob/main/src/output/issues/index.md).
+Each row is intended to become one focused upstream GitHub issue.
 
-| Target                                                   | Problem                                               | Evidence Snapshot                                                                                                                                                                     | Affected Models                                            | Issue Draft                                                                    | Evidence Bundle                                                                                                                       | Fixed When                                                |
-|----------------------------------------------------------|-------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|--------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
-| `mlx`                                                    | Weight/config mismatch during model load              | Model Error \| phase model_load \| ValueError                                                                                                                                         | 1: `mlx-community/Kimi-VL-A3B-Thinking-8bit`               | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_001_mlx_mlx-model-load-model_001.md)             | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_005_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)    | Load/generation completes or fails with a narrower owner. |
-| `mlx`                                                    | Weight/config mismatch during model load              | Weight Mismatch \| phase model_load \| ValueError                                                                                                                                     | 1: `mlx-community/LFM2.5-VL-1.6B-bf16`                     | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_002_mlx_mlx-model-load-weight-mismatch_001.md)   | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_006_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_MODEL_LOAD_WEIGHT_MISMATCH_7574b1189.json)   | Load/generation completes or fails with a narrower owner. |
-| `mlx-lm`                                                 | Missing module/import during model load               | Model Error \| phase model_load \| ModuleNotFoundError                                                                                                                                | 1: `facebook/pe-av-large`                                  | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_003_mlx-lm_mlx-lm-model-load-model_001.md)       | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_002_facebook_pe-av-large_MLX_LM_MODEL_LOAD_MODEL_b253df301723.json)                    | Load/generation completes or fails with a narrower owner. |
-| `mlx-vlm`                                                | Tokenizer decode leaked BPE/byte markers              | 41 BPE space markers found in decoded text \| prompt=1,745 \| output/prompt=11.46% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200)                                   | 1: `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_004_mlx-vlm_encoding_001.md)                     | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)   | No BPE/byte markers in output.                            |
-| `mlx-vlm`                                                | Stop/control tokens leaked into generated text        | decoded text contains control token &lt;\|endoftext\|&gt; \| prompt=16,176 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) \| 2 model cluster | 2: `mlx-community/Qwen2-VL-2B-Instruct-4bit` (+1)          | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_005_mlx-vlm_stop-token_001.md)                   | [2 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_stop_token_001.json)            | No leaked stop/control tokens.                            |
-| model repo first; mlx-vlm if template handling disagrees | Prompt/template output shape mismatch                 | generated_tokens~3 \| prompt=269 \| output/prompt=1.12% \| nontext burden=98% \| stop=completed \| 5 model cluster                                                                    | 5: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` (+4)                 | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_006_model-config-mlx-vlm_prompt-template_001.md) | [5 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_001_LiquidAI_LFM2.5-VL-450M-MLX-bf16_model_config_mlx_vlm_prompt_template_001.json) | Requested sections render without template leakage.       |
-| mlx-vlm first; MLX if cache/runtime reproduces           | Long-context generation collapsed or became too short | prompt_tokens=16167, repetitive output \| prompt=16,167 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) \| 3 model cluster                    | 3: `mlx-community/Qwen3.5-27B-mxfp8` (+2)                  | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_007_mlx-vlm-mlx_long-context_001.md)             | [3 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_010_mlx-community_Qwen3.5-27B-mxfp8_mlx_vlm_mlx_long_context_001.json)              | Full and reduced reruns avoid context collapse.           |
-| mlx-vlm first; MLX if cache/runtime reproduces           | Long-context generation collapsed or became too short | output/prompt=0.1% \| prompt_tokens=16167, output_tokens=12, output/prompt=0.1% \| prompt=16,167 \| output/prompt=0.07% \| nontext burden=100% \| stop=completed \| 2 model cluster   | 2: `mlx-community/Qwen3.5-9B-MLX-4bit` (+1)                | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_008_mlx-vlm-mlx_long-context_002.md)             | [2 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_013_mlx-community_Qwen3.5-9B-MLX-4bit_mlx_vlm_mlx_long_context_002.json)            | Full and reduced reruns avoid context collapse.           |
-| mlx-vlm first; MLX if cache/runtime reproduces           | Long-context generation collapsed or became too short | token cap \| abrupt tail \| degeneration \| prompt=16,167 \| output/prompt=1.24% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200) \| 2 model cluster                  | 2: `mlx-community/Qwen3.5-27B-4bit` (+1)                   | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_009_mlx-vlm-mlx_long-context_003.md)             | [2 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260521T221248Z_009_mlx-community_Qwen3.5-27B-4bit_mlx_vlm_mlx_long_context_003.json)               | Full and reduced reruns avoid context collapse.           |
+| Target                                                   | Problem                                               | Evidence Snapshot                                                                                                                                                                                                                         | Affected Models                                            | Issue Draft                                                                                                                              | Evidence Bundle                                                                                                                                                                                | Fixed When                                                |
+|----------------------------------------------------------|-------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
+| `mlx`                                                    | Weight/config mismatch during model load              | Model Error \| phase model_load \| ValueError                                                                                                                                                                                             | 1: `mlx-community/Kimi-VL-A3B-Thinking-8bit`               | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_001_mlx_mlx-model-load-model_001.md)             | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_007_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)   | Load/generation completes or fails with a narrower owner. |
+| `mlx`                                                    | Weight/config mismatch during model load              | Weight Mismatch \| phase model_load \| ValueError                                                                                                                                                                                         | 1: `mlx-community/LFM2.5-VL-1.6B-bf16`                     | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_002_mlx_mlx-model-load-weight-mismatch_001.md)   | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_008_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_MODEL_LOAD_WEIGHT_MISMATCH_7574b1189.json)  | Load/generation completes or fails with a narrower owner. |
+| `mlx-lm`                                                 | Missing module/import during model load               | Model Error \| phase model_load \| ModuleNotFoundError                                                                                                                                                                                    | 1: `facebook/pe-av-large`                                  | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_003_mlx-lm_mlx-lm-model-load-model_001.md)       | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_001_facebook_pe-av-large_MLX_LM_MODEL_LOAD_MODEL_b253df301723.json)                   | Load/generation completes or fails with a narrower owner. |
+| `mlx-vlm`                                                | Tokenizer decode leaked BPE/byte markers              | 126 BPE space markers found in decoded text \| prompt=1,745 \| output/prompt=9.28% \| nontext burden=100% \| stop=completed                                                                                                               | 1: `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_004_mlx-vlm_encoding_001.md)                     | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)  | No BPE/byte markers in output.                            |
+| `mlx-vlm`                                                | Stop/control tokens leaked into generated text        | decoded text contains control token &lt;\|end\|&gt; \| decoded text contains control token &lt;\|endoftext\|&gt; \| prompt=770 \| output/prompt=25.97% \| nontext burden=99% \| stop=max_tokens \| hit token cap (200) \| 4 model cluster | 4: `microsoft/Phi-3.5-vision-instruct` (+3)                | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_005_mlx-vlm_stop-token_001.md)                   | [4 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_002_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json)                 | No leaked stop/control tokens.                            |
+| model repo first; mlx-vlm if template handling disagrees | Prompt/template output shape mismatch                 | generated_tokens=0 \| prompt=0 \| stop=completed \| 2 model cluster                                                                                                                                                                       | 2: `mlx-community/gemma-3n-E2B-4bit` (+1)                  | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_006_model-config-mlx-vlm_prompt-template_001.md) | [2 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_010_mlx-community_gemma-3n-E2B-4bit_model_config_mlx_vlm_prompt_template_001.json) | Requested sections render without template leakage.       |
+| mlx-vlm first; MLX if cache/runtime reproduces           | Long-context generation collapsed or became too short | prompt_tokens=16346, repetitive output \| prompt=16,346 \| output/prompt=1.22% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200)                                                                                           | 1: `mlx-community/Qwen2-VL-2B-Instruct-4bit`               | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_007_mlx-vlm-mlx_long-context_001.md)             | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_009_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)        | Full and reduced reruns avoid context collapse.           |
+| mlx-vlm first; MLX if cache/runtime reproduces           | Long-context generation collapsed or became too short | output/prompt=0.2% \| prompt_tokens=4103, output_tokens=9, output/prompt=0.2% \| prompt=4,103 \| output/prompt=0.22% \| nontext burden=100% \| stop=completed                                                                             | 1: `mlx-community/paligemma2-3b-pt-896-4bit`               | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_008_mlx-vlm-mlx_long-context_002.md)             | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_012_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_002.json)        | Full and reduced reruns avoid context collapse.           |
 
 ---
 
@@ -49,10 +48,10 @@ ModuleNotFoundError: No module named 'mlx_lm.models.pe_audio_video'
 During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17830, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17842, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17232, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17244, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -62,7 +61,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 892, in _typed_mlx_vlm_load
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 893, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -86,7 +85,7 @@ ValueError: Model type pe_audio_video not supported.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 18027, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 18039, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -97,7 +96,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17840, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17852, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Model type pe_audio_video not supported.
 
@@ -120,10 +119,10 @@ ValueError: Model loading failed: Model type pe_audio_video not supported.
 
 ```text
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17830, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17842, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17232, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17244, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -133,7 +132,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 892, in _typed_mlx_vlm_load
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 893, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -148,7 +147,7 @@ Traceback (most recent call last):
   File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 367, in load_model
     model.load_weights(list(weights.items()))
     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py", line 185, in load_weights
+  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/mlx/nn/layers/base.py", line 185, in load_weights
     raise ValueError(
         f"Received {num_extra} parameters not in model: \n{extras}."
     )
@@ -161,7 +160,7 @@ multi_modal_projector.linear_2.scales.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 18027, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 18039, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -172,7 +171,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17840, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17852, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 4 parameters not in model: 
 multi_modal_projector.linear_1.biases,
@@ -199,10 +198,10 @@ multi_modal_projector.linear_2.scales.
 
 ```text
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17830, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17842, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17232, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17244, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -212,7 +211,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 892, in _typed_mlx_vlm_load
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 893, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -227,7 +226,7 @@ Traceback (most recent call last):
   File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 367, in load_model
     model.load_weights(list(weights.items()))
     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py", line 191, in load_weights
+  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/mlx/nn/layers/base.py", line 191, in load_weights
     raise ValueError(f"Missing {num_missing} parameters: \n{missing}.")
 ValueError: Missing 2 parameters: 
 multi_modal_projector.layer_norm.bias,
@@ -236,7 +235,7 @@ multi_modal_projector.layer_norm.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 18027, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 18039, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -247,7 +246,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17840, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 17852, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Missing 2 parameters: 
 multi_modal_projector.layer_norm.bias,
@@ -266,166 +265,134 @@ multi_modal_projector.layer_norm.weight.
 
 ---
 
-## Harness/Integration Issues (13 model(s))
+## Harness/Integration Issues (9 model(s))
 
-13 model(s) show potential harness/integration issues; see per-model breakdown
+9 model(s) show potential harness/integration issues; see per-model breakdown
 below.
 These models completed successfully but show integration problems (for example
 stop-token leakage, decoding artifacts, or long-context breakdown) that likely
 point to stack/runtime behavior rather than inherent model quality limits.
 
-### `LiquidAI/LFM2.5-VL-450M-MLX-bf16`
+### `microsoft/Phi-3.5-vision-instruct`
 
 **Why this appears to be an integration/runtime issue:**
 
-- Output appears truncated to about 3 tokens.
+- Special control token &lt;|end|&gt; appeared in generated text.
+- Special control token &lt;|endoftext|&gt; appeared in generated text.
+- Output switched language/script unexpectedly (tokenizer_artifact).
 
 **Sample output:**
 
 ```text
-í.
+The image shows a street view with a row of tall, cylindrical silos in the background, a gated entrance with a 'No Entry' sign, and a red building with a sign that reads 'COOKIE'. There are people sta...
 ```
 
 ### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`
 
 **Why this appears to be an integration/runtime issue:**
 
-- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 41 occurrences).
-- Output contains corrupted or malformed text segments (character_loop: '.99' repeated).
+- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 126 occurrences).
 
 **Sample output:**
 
 ```text
-pomĠavslĠon0ĠforĠon0Ġand.Ġ.ĊiduntçĦ¶åĲİè¯´ĠrÃ¶ĠinĠa.ĠinĠaĠand.ĠinĠaĠinĠaĠinĠaĠinĠa.ĠinĠaĠinĠaĠinĠaĠinĠaĠinĠaĠkontinent.ĠAPs.ĠinĠa.199Qs.99Q.199Q.199Q.11Q.199ĠasĠa.199.1.199.199.19.199.19.19.19.19.19.Ġ...
+TheĠimageĠdepictsĠtheĠentranceĠtoĠaĠbrewery,ĠspecificallyĠMolsonĠCoors,ĠasĠindicatedĠbyĠtheĠsignage.ĠTheĠbreweryĠisĠcharacterizedĠbyĠlarge,ĠcylindricalĠstorageĠtanks,ĠwhichĠareĠtypicalĠforĠbeerĠproduc...
 ```
 
-### `mlx-community/InternVL3-8B-bf16`
+### `mlx-community/GLM-4.6V-Flash-6bit`
 
 **Why this appears to be an integration/runtime issue:**
 
-- Output is very short relative to prompt size (0.5%), suggesting possible early-stop or prompt-handling issues.
+- Special control token &lt;/think&gt; appeared in generated text.
+- Output formatting deviated from the requested structure. Details: Unknown tags: <think>.
+- Output leaked reasoning or prompt-template text (<think>).
 
 **Sample output:**
 
 ```text
-processors, the problem. Theorem: Theorem
+<think>Got it, let's describe this image briefly. The scene shows the entrance to Burton Brewery, with large stainless steel fermentation tanks in the background. There's a black iron gate with stone ...
 ```
 
-### `mlx-community/Molmo-7B-D-0924-bf16`
+### `mlx-community/GLM-4.6V-Flash-mxfp4`
 
 **Why this appears to be an integration/runtime issue:**
 
-- Output appears truncated to about 3 tokens.
+- Special control token &lt;/think&gt; appeared in generated text.
+- Output formatting deviated from the requested structure. Details: Unknown tags: <think>.
+- Output leaked reasoning or prompt-template text (<think>).
 
 **Sample output:**
 
 ```text
-Saturday.
+<think>Got it, let's describe this image briefly. The image shows the Burton Brewery, with large silver cylindrical storage tanks (brewing vessels) dominating the background. In the foreground, there'...
+```
+
+### `mlx-community/GLM-4.6V-nvfp4`
+
+**Why this appears to be an integration/runtime issue:**
+
+- Special control token &lt;/think&gt; appeared in generated text.
+- Output formatting deviated from the requested structure. Details: Unknown tags: <think>.
+- Output leaked reasoning or prompt-template text (<think>).
+
+**Sample output:**
+
+```text
+<think>Got it, let's see. The image shows the of a brewery, probably Molson Coors Burton Brewery, with large silver silos, brick buildings, and a gate with "NO HGV's" sign. There are people walking, a...
 ```
 
 ### `mlx-community/Qwen2-VL-2B-Instruct-4bit`
 
 **Why this appears to be an integration/runtime issue:**
 
-- Special control token &lt;|endoftext|&gt; appeared in generated text.
-- Output switched language/script unexpectedly (tokenizer_artifact).
+- At long prompt length (16346 tokens), output became repetitive.
+- Output became repetitive, indicating possible generation instability (token: phrase: "answered by answered by...").
+- Output contains corrupted or malformed text segments (incomplete_sentence: ends with 'by').
 
 **Sample output:**
 
 ```text
-. The Blueprints and 10. We are in and in the United States, I and my friends, and find the door. The sky is a bit, and the battery, and I, and I. It is the fault, and I am a, and I. The sky is blue a...
+Answered by
+Answered by
+Answered by
+Answered by
+Answered by
+Answered by
+Answered by
+Answered by
+Answered by
+Answered by
+Answered by
+Answered by
+Answered by
+Answered by
+Answered by
+Answered by
+Answered...
 ```
 
-### `mlx-community/Qwen3.5-27B-mxfp8`
+### `mlx-community/gemma-3n-E2B-4bit`
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16167 tokens), output became repetitive.
-- Output became repetitive, indicating possible generation instability (token: 2v,).
-- Output contains corrupted or malformed text segments (incomplete_sentence: ends with '2v').
+- No generated tokens were recorded.
 
 **Sample output:**
 
 ```text
-orda2v,,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  2v,  ...
+<empty output>
 ```
 
-### `mlx-community/Qwen3.5-35B-A3B-6bit`
+### `mlx-community/gemma-4-31b-bf16`
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16167 tokens), output became repetitive.
-- Output became repetitive, indicating possible generation instability (token: ,).
-- Output contains corrupted or malformed text segments (character_loop: ' ,' repeated).
+- No generated tokens were recorded.
 
 **Sample output:**
 
 ```text
-,rew, , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , ...
-```
-
-### `mlx-community/Qwen3.5-35B-A3B-bf16`
-
-**Why this appears to be an integration/runtime issue:**
-
-- At long prompt length (16167 tokens), output became repetitive.
-- Output became repetitive, indicating possible generation instability (token: all,).
-
-**Sample output:**
-
-```text
-5, each, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, all, a...
-```
-
-### `mlx-community/Qwen3.5-9B-MLX-4bit`
-
-**Why this appears to be an integration/runtime issue:**
-
-- Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt-handling issues.
-- At long prompt length (16167 tokens), output stayed unusually short (12 tokens; ratio 0.1%).
-
-**Sample output:**
-
-```text
-云峰 rouluterждronk
-{item}
-```
-
-### `mlx-community/X-Reasoner-7B-8bit`
-
-**Why this appears to be an integration/runtime issue:**
-
-- Special control token &lt;|endoftext|&gt; appeared in generated text.
-- Output switched language/script unexpectedly (tokenizer_artifact).
-
-**Sample output:**
-
-```text
-B<|endoftext|>, 1.<|endoftext|>-100<|endoftext|>-<|endoftext|>1<|endoftext|>-<|endoftext|>-<|endoftext|>-<|endoftext|>- 1. The 201.<|endoftext|>The 2010 2010 - 2008<|endoftext|>B<|endoftext|>-<|endoft...
-```
-
-### `mlx-community/paligemma2-10b-ft-docci-448-6bit`
-
-**Why this appears to be an integration/runtime issue:**
-
-- Output appears truncated to about 6 tokens.
-
-**Sample output:**
-
-```text
-Describe this image briefly.
-```
-
-### `mlx-community/paligemma2-10b-ft-docci-448-bf16`
-
-**Why this appears to be an integration/runtime issue:**
-
-- Output appears truncated to about 6 tokens.
-
-**Sample output:**
-
-```text
-Describe this image briefly.
+<empty output>
 ```
 
 ### `mlx-community/paligemma2-3b-pt-896-4bit`
@@ -438,21 +405,8 @@ Describe this image briefly.
 **Sample output:**
 
 ```text
-It has been tagged with #1.
+The building is a brewery and distillery .
 ```
-
----
-
-### Long-Context Degradation / Potential Stack Issues (2 model(s))
-
-2 model(s) show long-context degradation or stack anomalies; see table below.
-These models technically succeeded, but token/output patterns suggest likely
-integration/runtime issues worth checking upstream.
-
-| Model                             |   Prompt Tok |   Output Tok | Output/Prompt   | Symptom                                                                      | Owner           |
-|-----------------------------------|--------------|--------------|-----------------|------------------------------------------------------------------------------|-----------------|
-| `mlx-community/Qwen3.5-27B-4bit`  |       16,167 |          200 | 1.24%           | Output degeneration under long prompt length (character_loop: '00' repeated) | `mlx-vlm / mlx` |
-| `mlx-community/Qwen3.6-27B-mxfp8` |       16,167 |          200 | 1.24%           | Output degeneration under long prompt length (character_loop: '66' repeated) | `mlx-vlm / mlx` |
 
 ---
 
@@ -463,9 +417,9 @@ model appears).
 
 **Regressions since previous run:** none
 **Recoveries since previous run:** none
-**Generation regressions in history window:** `HuggingFaceTB/SmolVLM-Instruct`, `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`, `meta-llama/Llama-3.2-11B-Vision-Instruct`, `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`, `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`, `mlx-community/GLM-4.6V-Flash-6bit`, `mlx-community/Idefics3-8B-Llama3-bf16`, `mlx-community/InternVL3-14B-8bit`, `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`, `mlx-community/LFM2-VL-1.6B-8bit`, `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`, `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`, `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`, `mlx-community/Ministral-3-3B-Instruct-2512-4bit`, `mlx-community/Molmo-7B-D-0924-8bit`, `mlx-community/Phi-3.5-vision-instruct-bf16`, `mlx-community/Qwen2-VL-2B-Instruct-4bit`, `mlx-community/Qwen3.5-27B-mxfp8`, `mlx-community/Qwen3.5-35B-A3B-6bit`, `mlx-community/Qwen3.5-35B-A3B-bf16`, `mlx-community/Qwen3.6-27B-mxfp8`, `mlx-community/SmolVLM-Instruct-bf16`, `mlx-community/SmolVLM2-2.2B-Instruct-mlx`, `mlx-community/X-Reasoner-7B-8bit`, `mlx-community/gemma-3-27b-it-qat-4bit`, `mlx-community/gemma-3-27b-it-qat-8bit`, `mlx-community/gemma-3n-E2B-4bit`, `mlx-community/gemma-3n-E4B-it-bf16`, `mlx-community/gemma-4-26b-a4b-it-4bit`, `mlx-community/gemma-4-31b-bf16`, `mlx-community/gemma-4-31b-it-4bit`, `mlx-community/llava-v1.6-mistral-7b-8bit`, `mlx-community/pixtral-12b-8bit`, `mlx-community/pixtral-12b-bf16`
-**Quality regressions in history window:** `HuggingFaceTB/SmolVLM-Instruct`, `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`, `meta-llama/Llama-3.2-11B-Vision-Instruct`, `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`, `mlx-community/FastVLM-0.5B-bf16`, `mlx-community/GLM-4.6V-Flash-mxfp4`, `mlx-community/Idefics3-8B-Llama3-bf16`, `mlx-community/InternVL3-14B-8bit`, `mlx-community/InternVL3-8B-bf16`, `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`, `mlx-community/LFM2-VL-1.6B-8bit`, `mlx-community/LFM2.5-VL-1.6B-bf16`, `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`, `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`, `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`, `mlx-community/Ministral-3-3B-Instruct-2512-4bit`, `mlx-community/Molmo-7B-D-0924-8bit`, `mlx-community/Molmo-7B-D-0924-bf16`, `mlx-community/Phi-3.5-vision-instruct-bf16`, `mlx-community/Qwen2-VL-2B-Instruct-4bit`, `mlx-community/Qwen3.5-27B-4bit`, `mlx-community/Qwen3.5-35B-A3B-4bit`, `mlx-community/Qwen3.5-35B-A3B-bf16`, `mlx-community/Qwen3.5-9B-MLX-4bit`, `mlx-community/SmolVLM-Instruct-bf16`, `mlx-community/SmolVLM2-2.2B-Instruct-mlx`, `mlx-community/X-Reasoner-7B-8bit`, `mlx-community/gemma-3-27b-it-qat-4bit`, `mlx-community/gemma-3-27b-it-qat-8bit`, `mlx-community/gemma-3n-E4B-it-bf16`, `mlx-community/gemma-4-26b-a4b-it-4bit`, `mlx-community/gemma-4-31b-it-4bit`, `mlx-community/llava-v1.6-mistral-7b-8bit`, `mlx-community/paligemma2-10b-ft-docci-448-6bit`, `mlx-community/paligemma2-10b-ft-docci-448-bf16`, `mlx-community/paligemma2-3b-ft-docci-448-bf16`, `mlx-community/pixtral-12b-8bit`, `mlx-community/pixtral-12b-bf16`
-**Core library changes in window:** `mlx=0.32.0.dev20260501+e8ebdebe->0.32.0.dev20260521+5d1c0e4c`, `mlx-vlm=0.4.5->0.5.0`, `transformers=5.7.0->5.9.0`
+**Generation regressions in history window:** `mlx-community/Qwen3.5-9B-MLX-4bit`
+**Quality regressions in history window:** `microsoft/Phi-3.5-vision-instruct`, `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`, `mlx-community/GLM-4.6V-Flash-mxfp4`, `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`, `mlx-community/Qwen3.5-27B-4bit`, `mlx-community/Qwen3.5-35B-A3B-4bit`
+**Core library changes in window:** `mlx=0.32.0.dev20260516+7b7c1240->0.31.2`, `transformers=5.8.1->5.9.0`
 
 | Model                                     | Status vs Previous Run   | First Seen Failing      | Recent Repro           |
 |-------------------------------------------|--------------------------|-------------------------|------------------------|
@@ -477,30 +431,30 @@ model appears).
 
 ## Coverage & Runtime Metrics
 
-- **Detailed diagnostics models:** 18
-- **Summary diagnostics models:** 37
+- **Detailed diagnostics models:** 12
+- **Summary diagnostics models:** 44
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1203.46s (1203.46s)
-- **Average runtime per model:** 21.88s (21.88s)
-- **Dominant runtime phase:** upstream prefill / first-token dominated 12/55 measured model runs (54% of tracked runtime).
-- **Phase totals:** model load=106.81s, local prompt prep=0.17s, upstream prefill / first-token=650.69s, post-prefill decode=431.64s, cleanup=5.57s
-- **Generation total:** 1082.34s across 52 model(s); upstream prefill / first-token split available for 52/52 model(s).
-- **Observed stop reasons:** completed=13, exception=3, max_tokens=39
-- **Validation overhead:** 11.23s total (avg 0.20s across 55 model(s)).
-- **Upstream prefill / first-token latency:** Avg 12.51s | Min 0.03s | Max 81.21s across 52 model(s).
+- **Total model runtime (sum):** 1123.67s (1123.67s)
+- **Average runtime per model:** 20.07s (20.07s)
+- **Dominant runtime phase:** upstream prefill / first-token dominated 17/56 measured model runs (60% of tracked runtime).
+- **Phase totals:** model load=127.69s, local prompt prep=0.17s, upstream prefill / first-token=668.00s, post-prefill decode=298.02s, generation total (unsplit)=10.08s, cleanup=6.69s
+- **Generation total:** 976.10s across 53 model(s); upstream prefill / first-token split available for 51/53 model(s).
+- **Observed stop reasons:** completed=37, exception=3, max_tokens=16
+- **Validation overhead:** 16.64s total (avg 0.30s across 56 model(s)).
+- **Upstream prefill / first-token latency:** Avg 13.10s | Min 0.11s | Max 83.25s across 51 model(s).
 - **What this likely means:** Most measured runtime is spent inside upstream generation before the first token is available.
 - **Suggested next action:** Inspect prompt/image token accounting, dynamic-resolution image burden, prefill step sizing, and cache/prefill behavior.
 
 ---
 
-## Models Not Flagged (37 model(s))
+## Models Not Flagged (44 model(s))
 
 These models completed without diagnostics flags (no hard failure, harness
 warning, or stack-signal anomaly). The detailed per-model rows remain in the
 generated results and review reports.
 
-- **Clean output:** 3 model(s).
-- **Ran, but with quality warnings:** 34 model(s).
+- **Clean output:** 30 model(s).
+- **Ran, but with quality warnings:** 14 model(s).
 
 ## Reproducibility
 
@@ -512,37 +466,37 @@ Prompt text is in the linked issue drafts and repro bundles.
 pip install -e "src/[dev]"
 
 # Re-run with the same CLI arguments
-python -m check_models --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --exclude mlx-community/Qwen3-VL-2B-Thinking-bf16 Qwen/Qwen3-VL-2B-Instruct --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose
+python -m check_models --image /Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg --exclude mlx-community/Qwen3-VL-2B-Thinking-bf16 Qwen/Qwen3-VL-2B-Instruct --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose
 ```
 
-Queued issue models: `facebook/pe-av-large`, `mlx-community/Kimi-VL-A3B-Thinking-8bit`, `mlx-community/LFM2.5-VL-1.6B-bf16`, `LiquidAI/LFM2.5-VL-450M-MLX-bf16`, `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`, `mlx-community/InternVL3-8B-bf16`, `mlx-community/Molmo-7B-D-0924-bf16`, `mlx-community/Qwen2-VL-2B-Instruct-4bit`, `mlx-community/Qwen3.5-27B-mxfp8`, `mlx-community/Qwen3.5-35B-A3B-6bit`, `mlx-community/Qwen3.5-35B-A3B-bf16`, `mlx-community/Qwen3.5-9B-MLX-4bit`, `mlx-community/X-Reasoner-7B-8bit`, `mlx-community/paligemma2-10b-ft-docci-448-6bit`, `mlx-community/paligemma2-10b-ft-docci-448-bf16`, `mlx-community/paligemma2-3b-pt-896-4bit`, `mlx-community/Qwen3.5-27B-4bit`, `mlx-community/Qwen3.6-27B-mxfp8`.
+Queued issue models: `facebook/pe-av-large`, `mlx-community/Kimi-VL-A3B-Thinking-8bit`, `mlx-community/LFM2.5-VL-1.6B-bf16`, `microsoft/Phi-3.5-vision-instruct`, `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`, `mlx-community/GLM-4.6V-Flash-6bit`, `mlx-community/GLM-4.6V-Flash-mxfp4`, `mlx-community/GLM-4.6V-nvfp4`, `mlx-community/Qwen2-VL-2B-Instruct-4bit`, `mlx-community/gemma-3n-E2B-4bit`, `mlx-community/gemma-4-31b-bf16`, `mlx-community/paligemma2-3b-pt-896-4bit`.
 
 Repro bundles with prompt traces and environment details are available in [repro_bundles/](https://github.com/jrp2014/check_models/tree/main/src/output/repro_bundles).
 
 ### Run details
 
-- Input image: `/Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg`
+- Input image: `/Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg`
 - Generation settings: max_tokens=200, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-05-21 23:12:48 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-05-24 21:46:43 BST by [check_models](https://github.com/jrp2014/check_models)._
 
 ---
 
 ## Environment
 
-| Component       | Version                     |
-|-----------------|-----------------------------|
-| mlx-vlm         | 0.5.0                       |
-| mlx             | 0.32.0.dev20260521+5d1c0e4c |
-| mlx-lm          | 0.31.3                      |
-| mlx-audio       | 0.4.3                       |
-| transformers    | 5.9.0                       |
-| tokenizers      | 0.22.2                      |
-| huggingface-hub | 1.16.1                      |
-| Python Version  | 3.13.13                     |
-| OS              | Darwin 25.5.0               |
-| macOS Version   | 26.5                        |
-| GPU/Chip        | Apple M5 Max                |
-| GPU Cores       | 40                          |
-| Metal Support   | Metal 4                     |
-| RAM             | 128.0 GB                    |
+| Component       | Version       |
+|-----------------|---------------|
+| mlx-vlm         | 0.5.0         |
+| mlx             | 0.31.2        |
+| mlx-lm          | 0.31.3        |
+| mlx-audio       | 0.4.3         |
+| transformers    | 5.9.0         |
+| tokenizers      | 0.22.2        |
+| huggingface-hub | 1.16.1        |
+| Python Version  | 3.13.13       |
+| OS              | Darwin 25.5.0 |
+| macOS Version   | 26.5          |
+| GPU/Chip        | Apple M5 Max  |
+| GPU Cores       | 40            |
+| Metal Support   | Metal 4       |
+| RAM             | 128.0 GB      |
