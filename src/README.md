@@ -519,8 +519,6 @@ pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.
 - **Python**: 3.13+ (3.13 is the tested baseline)
 - **Operating System**: macOS with Apple Silicon (MLX is Apple‑Silicon specific)
 
-
-
 ### Advanced Configuration
 
 The tool uses a YAML configuration file to define thresholds for quality checks (hallucination, repetition, verbosity).
@@ -913,13 +911,6 @@ List-valued CLI flag semantics:
 1. `--models`, `--exclude`, and `--eos-tokens` may be repeated; repeated occurrences accumulate values in order.
 2. `--resize-shape` remains a single structured value; provide it after one flag occurrence.
 
-
-
-
-
-
-
-
 ## Output Formats
 
 ### CLI Output
@@ -1017,9 +1008,6 @@ Some runs emit preflight compatibility warnings before inference starts. These w
 - **What you should do**: keep running if outputs look healthy; investigate when the same run also shows API mismatches, startup hangs, or backend/runtime crashes.
 - **What you should not do**: do not treat the warning alone as a failed benchmark.
 - **When filing issues**: include the warning text and reported library versions so upstream maintainers can match it to the correct compatibility window.
-
-
-
 
 ## Metrics Tracked
 

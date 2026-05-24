@@ -771,8 +771,6 @@ def check_multi_image_support(model_id: str) -> bool | None:
 3. **User override**: Consider `--force-multi-image` flag to suppress warnings
 4. **Documentation**: Clearly document which models are verified to work
 
-
-
 ## Testing Strategy
 
 ### Test Cases

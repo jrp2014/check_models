@@ -12798,7 +12798,7 @@ def _diagnostics_header(
     image_path: Path | None,
 ) -> list[str]:
     """Build the compact title block for the diagnostics report."""
-    parts: list[str] = ["<!-- markdownlint-disable MD013 MD024 MD060 -->", ""]
+    parts: list[str] = ["<!-- markdownlint-disable MD013 -->", ""]
     version = versions.get("mlx-vlm") or "unknown"
     parts.append(
         f"# Diagnostics Report — {n_failed} failure(s), "
@@ -12840,21 +12840,24 @@ def _diagnostics_environment_section(
             system_keys=_DIAGNOSTICS_SYSTEM_KEYS,
         )
     ]
-    parts = render_report_markdown(
-        (
-            ReportSection(
-                title="Environment",
-                level=2,
-                divider=True,
-                blocks=(
-                    ReportTable(
-                        headers=("Component", "Version"),
-                        rows=tuple(table_rows),
-                        markdown_escaped=True,
+    parts = _guard_markdownlint_block(
+        render_report_markdown(
+            (
+                ReportSection(
+                    title="Environment",
+                    level=2,
+                    divider=True,
+                    blocks=(
+                        ReportTable(
+                            headers=("Component", "Version"),
+                            rows=tuple(table_rows),
+                            markdown_escaped=True,
+                        ),
                     ),
                 ),
-            ),
-        )
+            )
+        ),
+        rules="MD060",
     )
     parts.append("")
     return parts
@@ -13453,19 +13456,22 @@ def _diagnostics_failure_clusters(
             recent_repro = DIAGNOSTICS_ESCAPER.escape(_format_recent_repro_ratio(history_info))
             table_rows.append((f"`{model}`", short_error, first_seen, recent_repro))
         parts.extend(
-            render_report_markdown(
-                (
-                    ReportTable(
-                        headers=(
-                            "Model",
-                            "Observed Behavior",
-                            "First Seen Failing",
-                            "Recent Repro",
+            _guard_markdownlint_block(
+                render_report_markdown(
+                    (
+                        ReportTable(
+                            headers=(
+                                "Model",
+                                "Observed Behavior",
+                                "First Seen Failing",
+                                "Recent Repro",
+                            ),
+                            rows=tuple(table_rows),
+                            markdown_escaped=True,
                         ),
-                        rows=tuple(table_rows),
-                        markdown_escaped=True,
-                    ),
-                )
+                    )
+                ),
+                rules="MD060",
             )
         )
         parts.append("")
@@ -13538,7 +13544,9 @@ def _diagnostics_harness_section(
         if unique_observations:
             parts.append("**Why this appears to be an integration/runtime issue:**")
             parts.append("")
-            parts.extend(f"- {observation}" for observation in unique_observations)
+            parts.extend(
+                f"- {HTML_ESCAPER.escape(observation)}" for observation in unique_observations
+            )
             parts.append("")
         snippet_source = text.strip() or "<empty output>"
         snippet = snippet_source[: DIAGNOSTICS.output_snippet_len]
@@ -13587,21 +13595,24 @@ def _diagnostics_stack_signal_section(
         )
 
     parts.extend(
-        render_report_markdown(
-            (
-                ReportTable(
-                    headers=(
-                        "Model",
-                        "Prompt Tok",
-                        "Output Tok",
-                        "Output/Prompt",
-                        "Symptom",
-                        "Owner",
+        _guard_markdownlint_block(
+            render_report_markdown(
+                (
+                    ReportTable(
+                        headers=(
+                            "Model",
+                            "Prompt Tok",
+                            "Output Tok",
+                            "Output/Prompt",
+                            "Symptom",
+                            "Owner",
+                        ),
+                        rows=tuple(rows),
+                        markdown_escaped=True,
                     ),
-                    rows=tuple(rows),
-                    markdown_escaped=True,
                 ),
-            )
+            ),
+            rules="MD060",
         )
     )
     parts.append("")
@@ -13981,16 +13992,19 @@ def _diagnostics_issue_queue_section(
         return parts
 
     parts.extend(
-        _render_issue_queue_table(
-            clusters,
-            escape_text=DIAGNOSTICS_ESCAPER.escape,
-            issue_link_for_cluster=lambda cluster: (
-                f"[issue draft]({_github_published_output_url('issues', cluster.issue_filename)})"
+        _guard_markdownlint_block(
+            _render_issue_queue_table(
+                clusters,
+                escape_text=DIAGNOSTICS_ESCAPER.escape,
+                issue_link_for_cluster=lambda cluster: (
+                    f"[issue draft]({_github_published_output_url('issues', cluster.issue_filename)})"
+                ),
+                evidence_link_for_cluster=lambda cluster: _issue_cluster_bundle_link(
+                    cluster,
+                    repro_bundles,
+                ),
             ),
-            evidence_link_for_cluster=lambda cluster: _issue_cluster_bundle_link(
-                cluster,
-                repro_bundles,
-            ),
+            rules="MD060",
         )
     )
     parts.append("")
@@ -14083,19 +14097,22 @@ def _diagnostics_history_section(
         esc_status = DIAGNOSTICS_ESCAPER.escape(status)
         table_rows.append((f"`{esc_model}`", esc_status, first_seen, recent_repro))
     parts.extend(
-        render_report_markdown(
-            (
-                ReportTable(
-                    headers=(
-                        "Model",
-                        "Status vs Previous Run",
-                        "First Seen Failing",
-                        "Recent Repro",
+        _guard_markdownlint_block(
+            render_report_markdown(
+                (
+                    ReportTable(
+                        headers=(
+                            "Model",
+                            "Status vs Previous Run",
+                            "First Seen Failing",
+                            "Recent Repro",
+                        ),
+                        rows=tuple(table_rows),
+                        markdown_escaped=True,
                     ),
-                    rows=tuple(table_rows),
-                    markdown_escaped=True,
                 ),
-            )
+            ),
+            rules="MD060",
         )
     )
     parts.append("")

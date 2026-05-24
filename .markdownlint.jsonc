@@ -4,14 +4,14 @@
   "default": true,
   // Allow long lines (intentional for code blocks, tables, HTML/CSS)
   "MD013": false,
-  // Allow multiple consecutive blank lines where we intentionally separate sections
-  "MD012": false,
+  // Allow modest section breathing room, but still catch accidental blank-line drift
+  "MD012": { "maximum": 2 },
   // We manually manage heading style consistency; allow mixed ATX where needed
   "MD003": { "style": "consistent" },
-  // Disable duplicate heading check across entire doc (some sections intentionally repeated)
-  "MD024": false,
+  // Catch repeated headings that share the same parent; nested "To reproduce" sections are OK
+  "MD024": { "siblings_only": true },
   // Don't require top-level heading in some auxiliary docs if added later
   "MD041": false,
-  // Permit inline HTML for GitHub-supported tags (validation done in code)
-  "MD033": false
+  // Permit only the GitHub-supported HTML that this repo intentionally emits
+  "MD033": { "allowed_elements": ["a", "br", "details", "summary"] }
 }

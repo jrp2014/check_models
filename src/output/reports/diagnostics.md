@@ -1,4 +1,4 @@
-<!-- markdownlint-disable MD013 MD024 MD060 -->
+<!-- markdownlint-disable MD013 -->
 
 # Diagnostics Report — 3 failure(s), 9 harness issue(s) (mlx-vlm 0.5.0)
 
@@ -14,6 +14,8 @@ Root-cause issue drafts are generated in
 [issues/index.md](https://github.com/jrp2014/check_models/blob/main/src/output/issues/index.md).
 Each row is intended to become one focused upstream GitHub issue.
 
+<!-- markdownlint-disable MD060 -->
+
 | Target                                                   | Problem                                               | Evidence Snapshot                                                                                                                                                                                                                         | Affected Models                                            | Issue Draft                                                                                                                              | Evidence Bundle                                                                                                                                                                                | Fixed When                                                |
 |----------------------------------------------------------|-------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
 | `mlx`                                                    | Weight/config mismatch during model load              | Model Error \| phase model_load \| ValueError                                                                                                                                                                                             | 1: `mlx-community/Kimi-VL-A3B-Thinking-8bit`               | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_001_mlx_mlx-model-load-model_001.md)             | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_007_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json)   | Load/generation completes or fails with a narrower owner. |
@@ -24,6 +26,8 @@ Each row is intended to become one focused upstream GitHub issue.
 | model repo first; mlx-vlm if template handling disagrees | Prompt/template output shape mismatch                 | generated_tokens=0 \| prompt=0 \| stop=completed \| 2 model cluster                                                                                                                                                                       | 2: `mlx-community/gemma-3n-E2B-4bit` (+1)                  | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_006_model-config-mlx-vlm_prompt-template_001.md) | [2 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_010_mlx-community_gemma-3n-E2B-4bit_model_config_mlx_vlm_prompt_template_001.json) | Requested sections render without template leakage.       |
 | mlx-vlm first; MLX if cache/runtime reproduces           | Long-context generation collapsed or became too short | prompt_tokens=16346, repetitive output \| prompt=16,346 \| output/prompt=1.22% \| nontext burden=100% \| stop=max_tokens \| hit token cap (200)                                                                                           | 1: `mlx-community/Qwen2-VL-2B-Instruct-4bit`               | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_007_mlx-vlm-mlx_long-context_001.md)             | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_009_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)        | Full and reduced reruns avoid context collapse.           |
 | mlx-vlm first; MLX if cache/runtime reproduces           | Long-context generation collapsed or became too short | output/prompt=0.2% \| prompt_tokens=4103, output_tokens=9, output/prompt=0.2% \| prompt=4,103 \| output/prompt=0.22% \| nontext burden=100% \| stop=completed                                                                             | 1: `mlx-community/paligemma2-3b-pt-896-4bit`               | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_008_mlx-vlm-mlx_long-context_002.md)             | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_012_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_002.json)        | Full and reduced reruns avoid context collapse.           |
+
+<!-- markdownlint-enable MD060 -->
 
 ---
 
@@ -102,9 +106,13 @@ ValueError: Model loading failed: Model type pe_audio_video not supported.
 
 ```
 
+<!-- markdownlint-disable MD060 -->
+
 | Model                  | Observed Behavior                                              | First Seen Failing      | Recent Repro           |
 |------------------------|----------------------------------------------------------------|-------------------------|------------------------|
 | `facebook/pe-av-large` | Model loading failed: Model type pe_audio_video not supported. | 2026-05-04 22:51:32 BST | 3/3 recent runs failed |
+
+<!-- markdownlint-enable MD060 -->
 
 ### To reproduce
 
@@ -181,9 +189,13 @@ multi_modal_projector.linear_2.scales.
 
 ```
 
+<!-- markdownlint-disable MD060 -->
+
 | Model                                     | Observed Behavior                                                                                                                                                                                                     | First Seen Failing      | Recent Repro           |
 |-------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------|------------------------|
 | `mlx-community/Kimi-VL-A3B-Thinking-8bit` | Model loading failed: Received 4 parameters not in model: multi_modal_projector.linear_1.biases, multi_modal_projector.linear_1.scales, multi_modal_projector.linear_2.biases, multi_modal_projector.linear_2.scales. | 2026-04-19 00:39:44 BST | 3/3 recent runs failed |
+
+<!-- markdownlint-enable MD060 -->
 
 ### To reproduce
 
@@ -254,9 +266,13 @@ multi_modal_projector.layer_norm.weight.
 
 ```
 
+<!-- markdownlint-disable MD060 -->
+
 | Model                               | Observed Behavior                                                                                                           | First Seen Failing      | Recent Repro           |
 |-------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|-------------------------|------------------------|
 | `mlx-community/LFM2.5-VL-1.6B-bf16` | Model loading failed: Missing 2 parameters: multi_modal_projector.layer_norm.bias, multi_modal_projector.layer_norm.weight. | 2026-03-27 13:06:07 GMT | 3/3 recent runs failed |
+
+<!-- markdownlint-enable MD060 -->
 
 ### To reproduce
 
@@ -304,8 +320,8 @@ TheĠimageĠdepictsĠtheĠentranceĠtoĠaĠbrewery,ĠspecificallyĠMolsonĠCoors
 **Why this appears to be an integration/runtime issue:**
 
 - Special control token &lt;/think&gt; appeared in generated text.
-- Output formatting deviated from the requested structure. Details: Unknown tags: <think>.
-- Output leaked reasoning or prompt-template text (<think>).
+- Output formatting deviated from the requested structure. Details: Unknown tags: &lt;think&gt;.
+- Output leaked reasoning or prompt-template text (&lt;think&gt;).
 
 **Sample output:**
 
@@ -318,8 +334,8 @@ TheĠimageĠdepictsĠtheĠentranceĠtoĠaĠbrewery,ĠspecificallyĠMolsonĠCoors
 **Why this appears to be an integration/runtime issue:**
 
 - Special control token &lt;/think&gt; appeared in generated text.
-- Output formatting deviated from the requested structure. Details: Unknown tags: <think>.
-- Output leaked reasoning or prompt-template text (<think>).
+- Output formatting deviated from the requested structure. Details: Unknown tags: &lt;think&gt;.
+- Output leaked reasoning or prompt-template text (&lt;think&gt;).
 
 **Sample output:**
 
@@ -332,8 +348,8 @@ TheĠimageĠdepictsĠtheĠentranceĠtoĠaĠbrewery,ĠspecificallyĠMolsonĠCoors
 **Why this appears to be an integration/runtime issue:**
 
 - Special control token &lt;/think&gt; appeared in generated text.
-- Output formatting deviated from the requested structure. Details: Unknown tags: <think>.
-- Output leaked reasoning or prompt-template text (<think>).
+- Output formatting deviated from the requested structure. Details: Unknown tags: &lt;think&gt;.
+- Output leaked reasoning or prompt-template text (&lt;think&gt;).
 
 **Sample output:**
 
@@ -421,11 +437,15 @@ model appears).
 **Quality regressions in history window:** `microsoft/Phi-3.5-vision-instruct`, `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`, `mlx-community/GLM-4.6V-Flash-mxfp4`, `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`, `mlx-community/Qwen3.5-27B-4bit`, `mlx-community/Qwen3.5-35B-A3B-4bit`
 **Core library changes in window:** `mlx=0.32.0.dev20260516+7b7c1240->0.31.2`, `transformers=5.8.1->5.9.0`
 
+<!-- markdownlint-disable MD060 -->
+
 | Model                                     | Status vs Previous Run   | First Seen Failing      | Recent Repro           |
 |-------------------------------------------|--------------------------|-------------------------|------------------------|
 | `facebook/pe-av-large`                    | still failing            | 2026-05-04 22:51:32 BST | 3/3 recent runs failed |
 | `mlx-community/Kimi-VL-A3B-Thinking-8bit` | still failing            | 2026-04-19 00:39:44 BST | 3/3 recent runs failed |
 | `mlx-community/LFM2.5-VL-1.6B-bf16`       | still failing            | 2026-03-27 13:06:07 GMT | 3/3 recent runs failed |
+
+<!-- markdownlint-enable MD060 -->
 
 ---
 
@@ -480,6 +500,8 @@ Repro bundles with prompt traces and environment details are available in [repro
 
 _Report generated on 2026-05-24 21:46:43 BST by [check_models](https://github.com/jrp2014/check_models)._
 
+<!-- markdownlint-disable MD060 -->
+
 ---
 
 ## Environment
@@ -516,3 +538,4 @@ _Report generated on 2026-05-24 21:46:43 BST by [check_models](https://github.co
 | MLX Metallib    | /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/mlx/lib/mlx.metallib (157,748,008 bytes, sha256=8c8bfcece8c0610745b68879771e5aa1b92b29fa5e17172e5508e4f5153d8d15) |
 | MLX libmlx.dylib | /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/mlx/lib/libmlx.dylib (21,653,808 bytes, sha256=2ee6fbd32ff22e22e1301ebe3c3bece95584104ff9cbc900513d41a095211bbd) |
 | RAM             | 128.0 GB      |
+<!-- markdownlint-enable MD060 -->

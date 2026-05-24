@@ -5,18 +5,6 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-### Fixed
-
-- Preserve the `recommended` user bucket for benign token-cap results when
-  trusted metadata alignment passes.
-- Remove stale backend-import feature-flag documentation for the previously
-  deleted `MLX_VLM_ALLOW_TF` / `TRANSFORMERS_NO_*` guard path.
-- Restore the Skylos quality-gate terminal/color guard so terminal capability
-  probe bytes do not leak into local `make quality` output.
-- Remove the stale `tzlocal` import from the fresh conda setup verifier and
-  replace the removed `huggingface_hub[cli]` extra install with a current CLI
-  availability check.
-
 ### Changed
 
 - Tighten diagnostic quality analysis by adding unstructured metadata alignment,
@@ -32,9 +20,9 @@ Notable changes to this project will be documented in this file.
 - Keep generated `issues/index.md` lint-clean under GitHub link output by
   wrapping the run summary text and bracketing the wide issue queue table with
   markdownlint guards.
-- Mark generated `diagnostics.md` as exempt from repo-width and duplicate-heading
-  markdownlint rules, and trim trailing blank lines before writing so the
-  tracked diagnostics artifact stays lint-clean.
+- Narrow generated `diagnostics.md` markdownlint suppressions to line length,
+  scope table-column guards around generated tables, and re-enable useful
+  duplicate-heading, excess-blank-line, and limited inline-HTML checks.
 - Mark generated issue drafts as exempt from issue-body markdownlint rules,
   disable `MD012`/`MD013` for generated review digests, and bracket the wide
   generated Affected Models and review Maintainer Escalations tables so
@@ -108,6 +96,15 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Preserve the `recommended` user bucket for benign token-cap results when
+  trusted metadata alignment passes.
+- Remove stale backend-import feature-flag documentation for the previously
+  deleted `MLX_VLM_ALLOW_TF` / `TRANSFORMERS_NO_*` guard path.
+- Restore the Skylos quality-gate terminal/color guard so terminal capability
+  probe bytes do not leak into local `make quality` output.
+- Remove the stale `tzlocal` import from the fresh conda setup verifier and
+  replace the removed `huggingface_hub[cli]` extra install with a current CLI
+  availability check.
 - Add `.python-version` and update `.vscode/settings.json` to help IDE static
   analysis extensions (like Pyright) automatically discover and resolve the
   `mlx-vlm` Conda environment.

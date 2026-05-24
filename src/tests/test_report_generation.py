@@ -1507,9 +1507,9 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        assert content.startswith(
-            "<!-- markdownlint-disable MD013 MD024 MD060 -->\n\n# Diagnostics Report"
-        )
+        assert content.startswith("<!-- markdownlint-disable MD013 -->\n\n# Diagnostics Report")
+        assert "<!-- markdownlint-disable MD060 -->" in content
+        assert "<!-- markdownlint-enable MD060 -->" in content
         assert "## Issue Queue" in content
         assert "Issue Draft" in content
         assert "Target" in content
@@ -1587,7 +1587,7 @@ class TestDiagnosticsReport:
         )
         content = out.read_text(encoding="utf-8")
         report_tail = content.split("_Report generated on ", maxsplit=1)[1]
-        assert ")._\n\n---\n\n## Environment" in report_tail
+        assert ")._\n\n<!-- markdownlint-disable MD060 -->\n\n---\n\n## Environment" in report_tail
         assert ")._\n---\n\n## Environment" not in report_tail
 
     def test_action_summary_and_repro_pointers_present(self, tmp_path: Path) -> None:
