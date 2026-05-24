@@ -7,6 +7,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Keep the full Ruff gate green by documenting `analyze_model_issues()` image
+  profile handling and extracting its recommendation highlight bookkeeping into
+  a small private helper.
 - Tighten diagnostic quality analysis by adding unstructured metadata alignment,
   text-sanity/generation-loop labels, and 21-day history-window regression
   context so mechanically clean gibberish is no longer promoted as usable.

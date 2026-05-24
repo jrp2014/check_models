@@ -99,6 +99,21 @@ class _RecordingMxRuntime:
         self.eval_calls += 1
 
 
+class _SequencedMxRuntime(_RecordingMxRuntime):
+    """MLX runtime stand-in with deterministic active-memory samples."""
+
+    def __init__(self, active_values: Sequence[float]) -> None:
+        super().__init__()
+        self._active_values = tuple(active_values)
+
+    def get_active_memory(self) -> float:
+        self.active_calls += 1
+        if not self._active_values:
+            return 0.0
+        value_index = min(self.active_calls - 1, len(self._active_values) - 1)
+        return self._active_values[value_index]
+
+
 def _build_params(image_path: Path) -> check_models.ProcessImageParams:
     """Return default ProcessImageParams for testing."""
     return check_models.ProcessImageParams(
@@ -679,7 +694,7 @@ class TestProcessImageWithModelMock:
         self,
         test_image: Path,
     ) -> None:
-        """Generation should sample active/cache memory once without a local peak probe."""
+        """Generation should sample active/cache memory without a local peak probe."""
         params = _build_params(test_image)
         fake_model = _FakeModel()
         fake_processor = object()
@@ -702,10 +717,45 @@ class TestProcessImageWithModelMock:
 
         assert result is fake_generation
         assert runtime.sync_calls == 1
-        assert runtime.active_calls == 1
+        assert runtime.active_calls == 2
         assert runtime.cache_calls == 1
         assert runtime.peak_calls == 0
         assert runtime.eval_calls == 0
+
+    def test_run_model_generation_records_post_load_active_memory_baseline(
+        self,
+        test_image: Path,
+    ) -> None:
+        """Generation should retain a post-load memory baseline for image-density metrics."""
+        params = _build_params(test_image)
+        fake_model = _FakeModel()
+        fake_processor = object()
+        fake_generation = _FakeGenerationResult()
+        runtime = _SequencedMxRuntime(
+            active_values=(
+                2.0 * 1024**3,
+                4.0 * 1024**3,
+            )
+        )
+
+        with (
+            patch.object(check_models, "_ensure_generation_runtime_symbols"),
+            patch.object(
+                check_models,
+                "_load_model",
+                return_value=(fake_model, fake_processor, None),
+            ),
+            patch.object(check_models, "_run_model_preflight_validators"),
+            patch.object(check_models, "apply_chat_template", return_value="formatted prompt"),
+            patch.object(check_models, "generate", return_value=fake_generation),
+            patch.object(check_models, "mx", runtime),
+        ):
+            result = check_models._run_model_generation(params)
+
+        assert result is fake_generation
+        assert getattr(result, "model_load_active_memory", None) == 2.0
+        assert result.active_memory == 4.0
+        assert runtime.active_calls == 2
 
     def test_process_image_with_model_skips_cleanup_sync_after_success(
         self,

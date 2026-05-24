@@ -1067,6 +1067,8 @@ class JsonlMetricsRecord(TypedDict, total=False):
     peak_memory_gb: float
     active_memory_gb: float
     cache_memory_gb: float
+    model_load_active_memory_gb: float
+    peak_memory_delta_gb: float
 
 
 class JsonlQualityAnalysisMetrics(TypedDict):
@@ -1298,6 +1300,12 @@ class ModelIssueSummary(TypedDict, total=False):
     total_peak_memory: float
     average_peak_memory: float
     memory_efficiency: float
+    image_width: int
+    image_height: int
+    image_megapixels: float
+    image_memory_density_models: int
+    average_peak_memory_delta_gb: float
+    average_peak_memory_delta_mb_per_megapixel: float
 
 
 class NumericFieldStats(TypedDict):
@@ -1583,6 +1591,7 @@ class SupportsGenerationResult(SupportsGenerationText, Protocol):
     time: float | None  # Dynamically added timing attribute
     active_memory: float | None  # Dynamically added active memory (GB)
     cache_memory: float | None  # Dynamically added cache memory (GB)
+    model_load_active_memory: float | None  # Dynamically added post-load active memory (GB)
     peak_memory: float | None  # Upstream peak memory (GB)
 
 
@@ -1660,6 +1669,11 @@ def _generation_optional_nonnegative_float_metric(
     return value if value is not None and value >= 0.0 else None
 
 
+def _object_model_load_active_memory_gb(source: object | None) -> float | None:
+    """Return the locally attached post-model-load active memory baseline."""
+    return _generation_optional_nonnegative_float_metric(source, _MODEL_LOAD_ACTIVE_MEMORY_ATTR)
+
+
 def _extract_generation_performance_data(
     generation: object | None,
 ) -> GenerationPerformanceData:
@@ -1728,6 +1742,7 @@ _PUBLISHED_ROOT_OUTPUT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
         "results.history.jsonl",
     }
 )
+_MODEL_LOAD_ACTIVE_MEMORY_ATTR: Final[str] = "model_load_active_memory"
 
 
 class _LinkStyleState:
@@ -1887,11 +1902,21 @@ class RuntimeDiagnostics:
 
     input_validation_time_s: float | None = None
     model_load_time_s: float | None = None
+    model_load_active_memory_gb: float | None = None
     prompt_prep_time_s: float | None = None
     decode_time_s: float | None = None
     cleanup_time_s: float | None = None
     first_token_latency_s: float | None = None
     stop_reason: str | None = None
+
+
+@dataclass(frozen=True)
+class ImageInputProfile:
+    """Resolved image dimensions used for input-normalized resource metrics."""
+
+    width: int
+    height: int
+    megapixels: float
 
 
 class PhaseTimer:
@@ -7970,6 +7995,25 @@ def print_image_dimensions(image_path: PathLike) -> None:
         logger.exception("Unexpected error reading image dimensions for %s", img_path)
 
 
+def _load_image_input_profile(image_path: Path | None) -> ImageInputProfile | None:
+    """Return image dimensions for input-normalized report metrics."""
+    if image_path is None or not image_path.exists():
+        return None
+    try:
+        with Image.open(image_path) as img:
+            width, height = img.size
+    except (FileNotFoundError, OSError, UnidentifiedImageError):
+        logger.debug("Could not read image profile from %s", image_path, exc_info=True)
+        return None
+    if width <= 0 or height <= 0:
+        return None
+    return ImageInputProfile(
+        width=width,
+        height=height,
+        megapixels=(width * height) / MEGAPIXEL_CONVERSION,
+    )
+
+
 # --- EXIF & Metadata Handling ---
 def _process_exif_subifd(exif_raw: SupportsExifIfd) -> ExifDict:
     out: ExifDict = {}
@@ -8870,6 +8914,7 @@ def _build_report_render_context(
     *,
     results: list[PerformanceResult],
     prompt: str,
+    image_path: Path | None = None,
     system_info: dict[str, str] | None = None,
     preflight_issues: Sequence[str] = (),
 ) -> ReportRenderContext:
@@ -8883,8 +8928,13 @@ def _build_report_render_context(
     ]
     result_set: ResultSet = ResultSet(resolved_results)
     prompt_context = _extract_trusted_hint_bundle(prompt).trusted_text or None
-    summary: ModelIssueSummary = analyze_model_issues(results, prompt_context)
-    stats: PerformanceStats = compute_performance_statistics(results)
+    image_profile = _load_image_input_profile(image_path)
+    summary: ModelIssueSummary = analyze_model_issues(
+        resolved_results,
+        prompt_context,
+        image_profile=image_profile,
+    )
+    stats: PerformanceStats = compute_performance_statistics(resolved_results)
     resolved_system_info: dict[str, str] = (
         system_info if system_info is not None else get_system_characteristics()
     )
@@ -8901,6 +8951,7 @@ def _build_report_render_context(
         stats=stats,
         system_info=resolved_system_info,
         triage=triage,
+        image_profile=image_profile,
         preflight_issues=tuple(issue for issue in preflight_issues),
     )
 
@@ -9058,15 +9109,41 @@ def _finalize_cataloging_summary(
         summary["cataloging_avg_delta"] = sum(deltas) / len(deltas)
 
 
+def _populate_cataloging_recommendation_highlights(
+    summary: ModelIssueSummary,
+    *,
+    description_scores: list[tuple[str, float]],
+    keyword_scores: list[tuple[str, float]],
+) -> None:
+    """Populate recommendation-eligible cataloging highlight picks."""
+    if description_scores:
+        summary["cataloging_best_description"] = max(
+            description_scores,
+            key=lambda item: (item[1], item[0]),
+        )
+    else:
+        summary.pop("cataloging_best_description", None)
+
+    if keyword_scores:
+        summary["cataloging_best_keywords"] = max(
+            keyword_scores,
+            key=lambda item: (item[1], item[0]),
+        )
+    else:
+        summary.pop("cataloging_best_keywords", None)
+
+
 def analyze_model_issues(
     results: list[PerformanceResult],
     context: str | None = None,
+    image_profile: ImageInputProfile | None = None,
 ) -> ModelIssueSummary:
     """Analyze results to identify common model issues and calculate performance highlights.
 
     Args:
         results: List of model performance results
         context: Optional context string (from prompt) for cataloging utility analysis
+        image_profile: Optional image dimensions used for image-normalized memory metrics
     """
     baseline: tuple[float, str] | None = _compute_metadata_baseline_utility(context)
     baseline_score: float | None = baseline[0] if baseline is not None else None
@@ -9115,6 +9192,11 @@ def analyze_model_issues(
 
     successful: list[PerformanceResult] = [r for r in results if r.success]
     _populate_summary_performance_highlights(summary, successful)
+    _populate_summary_image_memory_density(
+        summary,
+        successful,
+        image_profile=image_profile,
+    )
     runtime_analysis: RuntimeAnalysisSummary | None = _build_runtime_analysis_summary(results)
     if runtime_analysis is not None:
         summary["runtime_analysis"] = runtime_analysis
@@ -9179,22 +9261,62 @@ def analyze_model_issues(
         utility_scores,
         baseline_score=baseline_score,
     )
-    if recommendation_description_scores:
-        summary["cataloging_best_description"] = max(
-            recommendation_description_scores,
-            key=lambda item: (item[1], item[0]),
-        )
-    else:
-        summary.pop("cataloging_best_description", None)
-    if recommendation_keyword_scores:
-        summary["cataloging_best_keywords"] = max(
-            recommendation_keyword_scores,
-            key=lambda item: (item[1], item[0]),
-        )
-    else:
-        summary.pop("cataloging_best_keywords", None)
+    _populate_cataloging_recommendation_highlights(
+        summary,
+        description_scores=recommendation_description_scores,
+        keyword_scores=recommendation_keyword_scores,
+    )
 
     return summary
+
+
+def _peak_memory_delta_from_model_load_gb(result: PerformanceResult) -> float | None:
+    """Return peak-memory growth after model load for one successful run."""
+    if result.generation is None:
+        return None
+    peak_memory_gb = _generation_optional_nonnegative_float_metric(
+        result.generation,
+        "peak_memory",
+    )
+    model_load_active_gb = (
+        result.runtime_diagnostics.model_load_active_memory_gb
+        if result.runtime_diagnostics is not None
+        else _object_model_load_active_memory_gb(result.generation)
+    )
+    if peak_memory_gb is None or model_load_active_gb is None:
+        return None
+    if not math.isfinite(peak_memory_gb) or not math.isfinite(model_load_active_gb):
+        return None
+    return max(peak_memory_gb - model_load_active_gb, 0.0)
+
+
+def _populate_summary_image_memory_density(
+    summary: ModelIssueSummary,
+    successful: Sequence[PerformanceResult],
+    *,
+    image_profile: ImageInputProfile | None,
+) -> None:
+    """Populate image-normalized memory metrics when image and baseline data exist."""
+    if image_profile is None or image_profile.megapixels <= 0.0:
+        return
+
+    peak_deltas_gb = [
+        delta
+        for result in successful
+        if (delta := _peak_memory_delta_from_model_load_gb(result)) is not None
+    ]
+    if not peak_deltas_gb:
+        return
+
+    average_delta_gb = sum(peak_deltas_gb) / len(peak_deltas_gb)
+    summary["image_width"] = image_profile.width
+    summary["image_height"] = image_profile.height
+    summary["image_megapixels"] = image_profile.megapixels
+    summary["image_memory_density_models"] = len(peak_deltas_gb)
+    summary["average_peak_memory_delta_gb"] = average_delta_gb
+    summary["average_peak_memory_delta_mb_per_megapixel"] = (
+        average_delta_gb * 1024 / image_profile.megapixels
+    )
 
 
 def _populate_summary_performance_highlights(
@@ -9690,9 +9812,23 @@ def _collect_resource_usage_metrics(summary: ModelIssueSummary) -> list[Resource
     """Collect aggregate resource rows shared by HTML/Markdown renderers."""
     metrics: list[ResourceUsageMetric] = []
 
-    total_peak_memory = summary.get("total_peak_memory")
-    if total_peak_memory is not None:
-        metrics.append(("Total peak memory", total_peak_memory, "{:.1f} GB"))
+    image_megapixels = summary.get("image_megapixels")
+    if image_megapixels is not None:
+        metrics.append(("Input image size", image_megapixels, "{:.2f} MP"))
+
+    average_peak_delta = summary.get("average_peak_memory_delta_gb")
+    if average_peak_delta is not None:
+        metrics.append(
+            (
+                "Average peak delta from post-load",
+                average_peak_delta,
+                "{:.2f} GB",
+            )
+        )
+
+    memory_delta_per_mp = summary.get("average_peak_memory_delta_mb_per_megapixel")
+    if memory_delta_per_mp is not None:
+        metrics.append(("Peak memory delta / MP", memory_delta_per_mp, "{:.0f} MB/MP"))
 
     average_peak_memory = summary.get("average_peak_memory")
     if average_peak_memory is not None:
@@ -11767,6 +11903,7 @@ class ReportRenderContext:
     stats: PerformanceStats
     system_info: dict[str, str]
     triage: ReportTriageContext
+    image_profile: ImageInputProfile | None = None
     preflight_issues: tuple[str, ...] = ()
 
 
@@ -15322,7 +15459,11 @@ def generate_html_report(
         return
 
     if report_context is None:
-        report_context = _build_report_render_context(results=results, prompt=prompt)
+        report_context = _build_report_render_context(
+            results=results,
+            prompt=prompt,
+            image_path=image_path,
+        )
 
     headers, rows, field_names = _materialize_prepared_table_data(report_context.table_data)
 
@@ -15573,6 +15714,7 @@ def generate_markdown_report(
     versions: LibraryVersionDict,
     prompt: str,
     total_runtime_seconds: float,
+    image_path: Path | None = None,
     report_context: ReportRenderContext | None = None,
     gallery_filename: Path | None = None,
     review_filename: Path | None = None,
@@ -15586,6 +15728,7 @@ def generate_markdown_report(
         versions: Installed library versions shown in the report.
         prompt: Prompt used for the run.
         total_runtime_seconds: Total wall-clock runtime for the full run.
+        image_path: Optional input image path for input-normalized resource metrics.
         report_context: Optional cached shared report context built in finalization.
         gallery_filename: Optional standalone gallery artifact path to link from results.md.
         review_filename: Optional automated review digest path to link from results.md.
@@ -15596,7 +15739,11 @@ def generate_markdown_report(
         return
 
     if report_context is None:
-        report_context = _build_report_render_context(results=results, prompt=prompt)
+        report_context = _build_report_render_context(
+            results=results,
+            prompt=prompt,
+            image_path=image_path,
+        )
 
     headers, rows, _ = _materialize_prepared_table_data(report_context.table_data)
 
@@ -17748,11 +17895,13 @@ def _build_runtime_diagnostics(
     *,
     stop_reason: str | None,
     first_token_latency_s: float | None = None,
+    model_load_active_memory_gb: float | None = None,
 ) -> RuntimeDiagnostics:
     """Build immutable runtime diagnostics from a phase timer snapshot."""
     return RuntimeDiagnostics(
         input_validation_time_s=phase_timer.duration("input_validation"),
         model_load_time_s=phase_timer.duration("model_load"),
+        model_load_active_memory_gb=model_load_active_memory_gb,
         prompt_prep_time_s=phase_timer.duration("prompt_prep"),
         decode_time_s=phase_timer.duration("decode"),
         cleanup_time_s=phase_timer.duration("cleanup"),
@@ -17901,24 +18050,43 @@ def _generate_with_processor_passthrough(
     )
 
 
+def _sample_active_memory_gb() -> float | None:
+    """Sample MLX active memory in GB when the runtime exposes the metric."""
+    get_active_memory_fn = getattr(mx, "get_active_memory", None)
+    if not callable(get_active_memory_fn):
+        return None
+    active_mem_raw = get_active_memory_fn()
+    if not isinstance(active_mem_raw, int | float) or active_mem_raw < 0:
+        return None
+    return float(active_mem_raw) / (1024**3)
+
+
+def _attach_model_load_memory_baseline(
+    output: GenerationResult | SupportsGenerationResult,
+    *,
+    model_load_active_memory_gb: float | None,
+) -> SupportsGenerationResult:
+    """Attach the post-model-load active memory baseline to the generation result."""
+    result = cast("SupportsGenerationResult", output)
+    result.model_load_active_memory = model_load_active_memory_gb
+    return result
+
+
 def _attach_generation_runtime_metrics(
     output: GenerationResult | SupportsGenerationResult,
     *,
     duration: float,
 ) -> SupportsGenerationResult:
     """Attach local timing and allocator snapshot metrics to a generation result."""
-    get_active_memory_fn = getattr(mx, "get_active_memory", None)
     get_cache_memory_fn = getattr(mx, "get_cache_memory", None)
 
-    active_mem_raw = get_active_memory_fn() if callable(get_active_memory_fn) else 0.0
     cache_mem_raw = get_cache_memory_fn() if callable(get_cache_memory_fn) else 0.0
 
-    active_mem_bytes = float(active_mem_raw) if isinstance(active_mem_raw, int | float) else 0.0
     cache_mem_bytes = float(cache_mem_raw) if isinstance(cache_mem_raw, int | float) else 0.0
 
     result = cast("SupportsGenerationResult", output)
     result.time = duration
-    result.active_memory = active_mem_bytes / (1024**3)  # Convert to GB
+    result.active_memory = _sample_active_memory_gb() or 0.0
     result.cache_memory = cache_mem_bytes / (1024**3)  # Convert to GB
     return result
 
@@ -17961,6 +18129,11 @@ def _finalize_process_result(
         ),
         first_token_latency_s=(
             result_payload.runtime_diagnostics.first_token_latency_s
+            if result_payload is not None and result_payload.runtime_diagnostics is not None
+            else None
+        ),
+        model_load_active_memory_gb=(
+            result_payload.runtime_diagnostics.model_load_active_memory_gb
             if result_payload is not None and result_payload.runtime_diagnostics is not None
             else None
         ),
@@ -18025,6 +18198,8 @@ def _run_model_generation(
         _check_hf_cache_integrity(params.model_identifier)
 
         raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
+
+    model_load_active_memory_gb = _sample_active_memory_gb()
 
     formatted_prompt = _prepare_generation_prompt(
         params=params,
@@ -18106,6 +18281,10 @@ def _run_model_generation(
 
     # Capture local timing plus active/cache memory snapshots while model state is intact.
     result = _attach_generation_runtime_metrics(output, duration=duration)
+    result = _attach_model_load_memory_baseline(
+        result,
+        model_load_active_memory_gb=model_load_active_memory_gb,
+    )
     setattr(cast("Any", result), _PROMPT_DIAGNOSTICS_ATTR, prompt_diagnostics)
     return result
 
@@ -18251,6 +18430,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             runtime_diagnostics=_build_runtime_diagnostics(
                 phase_timer,
                 first_token_latency_s=first_token_latency_s,
+                model_load_active_memory_gb=_object_model_load_active_memory_gb(output),
                 stop_reason=stop_reason,
             ),
             requested_max_tokens=params.max_tokens,
@@ -20693,22 +20873,33 @@ def _log_model_comparison_table_and_charts(results: list[PerformanceResult]) -> 
         )
 
 
-def _log_performance_highlights(successful: list[PerformanceResult]) -> None:
+def _log_performance_highlights(
+    successful: list[PerformanceResult],
+    *,
+    image_profile: ImageInputProfile | None = None,
+) -> None:
     """Log speed and memory highlights for successful runs."""
     if not successful:
         return
 
     summary: ModelIssueSummary = {}
     _populate_summary_performance_highlights(summary, successful)
+    _populate_summary_image_memory_density(
+        summary,
+        successful,
+        image_profile=image_profile,
+    )
 
     fastest_model = summary.get("fastest_model", ("<unknown>", 0.0))
     most_efficient_model = summary.get("most_efficient_model", ("<unknown>", 0.0))
     fastest_load_model = summary.get("fastest_load_model", ("<unknown>", 0.0))
     average_tps = summary.get("average_tps", 0.0)
     successful_count = summary.get("successful_count", 0)
-    total_peak_memory = summary.get("total_peak_memory", 0.0)
     average_peak_memory = summary.get("average_peak_memory", 0.0)
     memory_efficiency = summary.get("memory_efficiency", 0.0)
+    image_megapixels = summary.get("image_megapixels")
+    average_peak_delta = summary.get("average_peak_memory_delta_gb")
+    memory_delta_per_mp = summary.get("average_peak_memory_delta_mb_per_megapixel")
 
     logger.info("🏆 Performance Highlights:")
     logger.info("   Fastest: %s (%.1f tps)", fastest_model[0], fastest_model[1])
@@ -20722,7 +20913,12 @@ def _log_performance_highlights(successful: list[PerformanceResult]) -> None:
 
     log_blank()
     logger.info("📈 Resource Usage:")
-    logger.info("   Total peak memory: %.1f GB", total_peak_memory)
+    if image_megapixels is not None:
+        logger.info("   Input image size: %.2f MP", image_megapixels)
+    if average_peak_delta is not None:
+        logger.info("   Average peak delta from post-load: %.2f GB", average_peak_delta)
+    if memory_delta_per_mp is not None:
+        logger.info("   Peak memory delta / MP: %.0f MB/MP", memory_delta_per_mp)
     logger.info("   Average peak memory: %.1f GB", average_peak_memory)
     logger.info("   Memory efficiency: %.0f tokens/GB", memory_efficiency)
 
@@ -21437,6 +21633,7 @@ def log_summary(
     results: list[PerformanceResult],
     *,
     prompt: str | None = None,
+    image_path: Path | None = None,
 ) -> None:
     """Log run summary focused on diagnostics, quality, and model triage."""
     if not results:
@@ -21451,7 +21648,10 @@ def log_summary(
     failed = [r for r in results if not r.success]
 
     if successful:
-        _log_performance_highlights(successful)
+        _log_performance_highlights(
+            successful,
+            image_profile=_load_image_input_profile(image_path),
+        )
         log_blank()
         (
             quality_counts,
@@ -22118,6 +22318,16 @@ def _populate_jsonl_result_generation_data(
         "active_memory_gb": active_memory_gb,
         "cache_memory_gb": cache_memory_gb,
     }
+    model_load_active_memory_gb = (
+        result.runtime_diagnostics.model_load_active_memory_gb
+        if result.runtime_diagnostics is not None
+        else _object_model_load_active_memory_gb(generation)
+    )
+    if model_load_active_memory_gb is not None:
+        record["metrics"]["model_load_active_memory_gb"] = model_load_active_memory_gb
+    peak_memory_delta_gb = _peak_memory_delta_from_model_load_gb(result)
+    if peak_memory_delta_gb is not None:
+        record["metrics"]["peak_memory_delta_gb"] = peak_memory_delta_gb
 
     text = getattr(generation, "text", None)
     if text is not None:
@@ -23775,6 +23985,7 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
                 versions=inputs.library_versions,
                 prompt=inputs.prompt,
                 total_runtime_seconds=inputs.overall_time,
+                image_path=inputs.image_path,
                 report_context=inputs.report_context,
                 gallery_filename=output_paths.gallery_markdown,
                 review_filename=output_paths.review,
@@ -24164,7 +24375,7 @@ def finalize_execution(
         print_model_stats(results)
 
         # Log summary with failure bucketing for diagnostics
-        log_summary(results, prompt=prompt)
+        log_summary(results, prompt=prompt, image_path=image_path)
 
         # Gather system characteristics for reports
         system_info = get_system_characteristics()
@@ -24172,6 +24383,7 @@ def finalize_execution(
         report_context = _build_report_render_context(
             results=results,
             prompt=prompt,
+            image_path=image_path,
             system_info=system_info,
             preflight_issues=_get_run_preflight_issues(args),
         )

@@ -140,6 +140,7 @@ def test_jsonl_metrics_fall_back_to_generation_runtime_fields() -> None:
         success=True,
         active_memory=None,
         cache_memory=None,
+        runtime_diagnostics=RuntimeDiagnostics(model_load_active_memory_gb=1.0),
     )
 
     check_models._populate_jsonl_result_generation_data(record, result)
@@ -150,6 +151,8 @@ def test_jsonl_metrics_fall_back_to_generation_runtime_fields() -> None:
     assert metrics["peak_memory_gb"] == 1.5
     assert metrics["active_memory_gb"] == 0.75
     assert metrics["cache_memory_gb"] == 0.25
+    assert metrics["model_load_active_memory_gb"] == 1.0
+    assert metrics["peak_memory_delta_gb"] == 0.5
 
 
 def test_save_jsonl_report_content(tmp_path: Path) -> None:

@@ -586,6 +586,39 @@ class TestMarkdownReportEdgeCases:
         assert "org/good" in content
         assert "org/bad" in content
 
+    def test_markdown_report_includes_peak_delta_per_megapixel(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Resource summary should normalize peak memory delta by input image area."""
+        image_path = tmp_path / "input.jpg"
+        check_models.Image.new("RGB", (1000, 500)).save(image_path)
+        result = PerformanceResult(
+            model_name="org/image-density",
+            success=True,
+            generation=_MockGeneration(peak_memory=3.0),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+            runtime_diagnostics=RuntimeDiagnostics(model_load_active_memory_gb=1.0),
+        )
+        out = tmp_path / "density.md"
+
+        generate_markdown_report(
+            results=[result],
+            filename=out,
+            versions=_stub_versions(),
+            prompt="describe",
+            total_runtime_seconds=1.0,
+            image_path=image_path,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "- **Input image size:** 0.50 MP" in content
+        assert "- **Average peak delta from post-load:** 2.00 GB" in content
+        assert "- **Peak memory delta / MP:** 4096 MB/MP" in content
+        assert "Total peak memory" not in content
+
     def test_markdown_report_includes_preflight_guidance_in_action_snapshot(
         self,
         tmp_path: Path,
