@@ -98,6 +98,10 @@ Notable changes to this project will be documented in this file.
   active/cache memory fields.
 - Update local MLX repository installs to use upstream's editable dev install
   guidance for `mlx`.
+- Harden local MLX setup/update tooling by checking current Xcode/SDK/Metal
+  build prerequisites, verifying the `mlx`/`mlx-metal` backend pair during
+  fresh conda setup, logging `mlx.metallib` provenance, and adding an automatic
+  cached-model smoke test for local MLX builds.
 
 ### Fixed
 

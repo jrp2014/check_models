@@ -11,7 +11,7 @@
 # - Creates conda environment with Python 3.13
 # - Installs all runtime and optional dependencies
 # - Optionally installs development tools
-# - Verifies installation and provides usage instructions
+# - Verifies the mlx / mlx-metal backend pair and provides usage instructions
 #
 # Usage:
 #   ./setup_conda_env.sh [ENV_NAME]
@@ -92,7 +92,7 @@ log_error() {
 }
 
 install_cmake() {
-    log_info "Installing cmake (required to build mlx)..."
+    log_info "Installing cmake (required for optional local MLX source builds)..."
 
     if conda install -n "$ENV_NAME" -c conda-forge cmake -y; then
         log_success "Installed cmake from conda-forge"
@@ -258,6 +258,11 @@ import mlx.core as mx
 import mlx_lm
 import mlx_vlm
 from PIL import Image
+from importlib import metadata
+from importlib.metadata import PackageNotFoundError
+from json import loads
+from pathlib import Path
+from platform import system
 import huggingface_hub
 import tabulate
 try:
@@ -265,8 +270,38 @@ try:
     print(f'✓ PyTorch version: {torch.__version__}')
 except Exception:
     pass
+
+def distribution_is_editable(name):
+    direct_url = metadata.distribution(name).read_text('direct_url.json')
+    if not direct_url:
+        return False
+    try:
+        return bool(loads(direct_url).get('dir_info', {}).get('editable'))
+    except ValueError:
+        return False
+
+mlx_version = metadata.version('mlx')
+mlx_is_editable = distribution_is_editable('mlx')
+try:
+    mlx_metal_version = metadata.version('mlx-metal')
+except PackageNotFoundError as exc:
+    if system() == 'Darwin' and not mlx_is_editable:
+        raise RuntimeError('mlx-metal is required for the PyPI mlx backend on macOS') from exc
+    mlx_metal_version = None
+metallib_path = Path(mx.__file__).resolve().parent / 'lib' / 'mlx.metallib'
+if system() == 'Darwin' and not metallib_path.is_file():
+    raise RuntimeError(f'MLX Metal library missing: {metallib_path}')
+if not mlx_is_editable and mlx_metal_version is not None and mlx_metal_version != mlx_version:
+    raise RuntimeError(
+        f'mlx/mlx-metal version mismatch: mlx={mlx_version}, mlx-metal={mlx_metal_version}'
+    )
 print('✓ All runtime packages imported successfully')
-print(f'✓ MLX version: {mx.__version__}')
+print(f'✓ MLX version: {mlx_version}')
+if mlx_is_editable:
+    print('✓ MLX editable install detected; local backend comes from the mlx package')
+if mlx_metal_version is not None:
+    print(f'✓ MLX-Metal version: {mlx_metal_version}')
+    print(f'✓ MLX metallib: {metallib_path}')
 print(f'✓ MLX-LM version: {mlx_lm.__version__}')
 "
 

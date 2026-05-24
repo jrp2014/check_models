@@ -318,6 +318,17 @@ def test_conda_setup_verifier_imports_declared_non_dev_dependencies() -> None:
     assert imported_modules <= declared_imports
 
 
+def test_conda_setup_verifies_mlx_backend_pair() -> None:
+    """Fresh setup should fail fast on mismatched or missing MLX Metal artifacts."""
+    setup_script = (PKG_ROOT / "tools" / "setup_conda_env.sh").read_text(encoding="utf-8")
+
+    assert "metadata.version('mlx-metal')" in setup_script
+    assert "mlx/mlx-metal version mismatch" in setup_script
+    assert "mlx.metallib" in setup_script
+    assert "MLX Metal library missing" in setup_script
+    assert "MLX editable install detected" in setup_script
+
+
 def test_conda_setup_uses_current_huggingface_cli_installation() -> None:
     """Avoid installing removed huggingface-hub extras during fresh setup."""
     setup_script = (PKG_ROOT / "tools" / "setup_conda_env.sh").read_text(encoding="utf-8")
@@ -678,8 +689,15 @@ def test_update_script_uses_upstream_mlx_editable_dev_install() -> None:
     contributing = (REPO_ROOT / "docs" / "CONTRIBUTING.md").read_text(encoding="utf-8")
 
     assert 'INSTALL_CMD=(pip_install_verbose -e ".[dev]")' in update_script
+    assert "macOS SDK" in update_script
+    assert "Apple Clang" in update_script
+    assert "Native arm64 shell detected" in update_script
+    assert "MLX_LOCAL_BUILD_SMOKE" in update_script
+    assert "mlx.metallib" in update_script
+    assert "MLX runtime backend provenance" in update_script
     assert "SKIP_TORCH=1 bash tools/update.sh" in contributing
     assert "# Skip PyTorch support" in contributing
+    assert "MLX_LOCAL_BUILD_SMOKE=0" in contributing
 
 
 def test_should_audit_path_excludes_generated_and_archived_paths(tmp_path: Path) -> None:

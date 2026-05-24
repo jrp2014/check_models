@@ -448,6 +448,9 @@ Several behaviors can be customized via environment variables (useful for CI/aut
 | `FORCE_COLOR` | Force ANSI colors even in non-TTY | Not set | `FORCE_COLOR=1` |
 | `TOKENIZERS_PARALLELISM` | Disable tokenizer parallelism warnings | `false` | `TOKENIZERS_PARALLELISM=true` |
 | `MLX_METAL_JIT` | Optional `tools/update.sh` override (`MLX_METAL_JIT`) | Unset (uses MLX default `OFF`, pre-built kernels) | `MLX_METAL_JIT=ON` for runtime JIT |
+| `MLX_LOCAL_BUILD_SMOKE` | Optional `tools/update.sh` local-MLX smoke control | `auto` (cached model only) | `MLX_LOCAL_BUILD_SMOKE=1` to force |
+| `MLX_LOCAL_BUILD_SMOKE_MODEL` | Model used by the local-MLX smoke test | `mlx-community/MiniCPM-V-4.6-8bit` | Any cached HF model |
+| `MLX_LOCAL_BUILD_SMOKE_EXPECTED` | Expected deterministic smoke output substring | `Hello! How can I help you today?` | Override for a custom model |
 
 **Examples**:
 
@@ -719,7 +722,12 @@ pip install -e ".[dev,extras,torch]"  # dev tools + optional model/runtime deps
 > Torch is supported and can be installed when you need it for specific models; the script does not block Torch.
 
 > [!NOTE]
-> The `tools/update.sh` helper is for local MLX ecosystem development when sibling `mlx`, `mlx-lm`, and `mlx-vlm` repositories are present. It builds `mlx` with upstream's editable dev install (`pip install -e ".[dev]"`) and only sets `CMAKE_ARGS=-DMLX_METAL_JIT=ON|OFF` when you opt into `MLX_METAL_JIT`; otherwise MLX's CMake default is used. Use `make update` for normal PyPI package updates.
+> The `tools/update.sh` helper is for local MLX ecosystem development when
+> sibling `mlx`, `mlx-lm`, and `mlx-vlm` repositories are present. It builds
+> `mlx` with upstream's editable dev install (`pip install -e ".[dev]"`), checks
+> the local Xcode/SDK/Metal toolchain before building, logs the `mlx.metallib`
+> backend artifact, and runs a cached-model smoke test in auto mode. Use
+> `make update` for normal PyPI package updates.
 
 > [!NOTE]
 > Installing `sentence-transformers` isn't necessary for this tool and may pull heavy backends into import paths; `check_models` ignores it in the normal execution path.

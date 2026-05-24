@@ -412,9 +412,17 @@ bash tools/update.sh
 - Automatically detects and uses local MLX development builds
 - Validates Python version (>= 3.13 required)
 - Checks for virtual environment activation
+- Verifies MLX source-build prerequisites from upstream's current guidance:
+  CMake >= 3.25, Xcode >= 15, macOS SDK >= 14, Apple Clang >= 15, Metal
+  tools, and a native arm64 shell on macOS
 - Installs the project editable environment with dev and extras enabled by default
 - Uses repo-local Node tooling (`npm install --prefix src`) for markdownlint instead of relying on global packages
 - Verifies dependency sync across `pyproject.toml`, generated README install blocks, and updater assumptions
+- Logs MLX backend provenance, including the installed `mlx`, `mlx-metal`,
+  `libmlx.dylib`, and `mlx.metallib` locations and hashes
+- Runs a deterministic local-MLX smoke test in `auto` mode when the default
+  smoke model is already cached, so broken local Metal artifacts fail before
+  they are mistaken for model-quality regressions
 
 **Environment Variables**:
 
@@ -422,6 +430,13 @@ bash tools/update.sh
 - `MLX_METAL_JIT=ON`: Build local `mlx` with runtime Metal compilation
   (mapped to `CMAKE_ARGS=-DMLX_METAL_JIT=ON`; if unset, MLX's default
   `MLX_METAL_JIT=OFF` uses pre-built kernels)
+- `MLX_LOCAL_BUILD_SMOKE=auto|1|0`: Run the local MLX runtime smoke test.
+  `auto` is the default and runs only when the smoke model is already cached;
+  `1` forces the test and may download the model; `0` skips it.
+- `MLX_LOCAL_BUILD_SMOKE_MODEL`: Override the default smoke model
+  (`mlx-community/MiniCPM-V-4.6-8bit`).
+- `MLX_LOCAL_BUILD_SMOKE_EXPECTED`: Override the expected deterministic output
+  substring (`Hello! How can I help you today?`).
 
 `tools/update.sh` is intended for local MLX ecosystem development when sibling
 `mlx`, `mlx-lm`, and `mlx-vlm` repositories are present. It follows upstream
@@ -441,6 +456,9 @@ bash tools/update.sh
 
 # Smaller binary with runtime compilation (cold start penalty)
 MLX_METAL_JIT=ON bash tools/update.sh
+
+# Bypass the local MLX smoke only after confirming the backend artifact manually
+MLX_LOCAL_BUILD_SMOKE=0 bash tools/update.sh
 
 # Skip PyTorch support
 SKIP_TORCH=1 bash tools/update.sh

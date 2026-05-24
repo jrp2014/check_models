@@ -16,6 +16,7 @@
 #   SKIP_MLX=1 ./update.sh            # Force skip mlx/mlx-vlm updates (override detection)
 #   CONDA_UPDATE_ALL=1 ./update.sh    # Force conda update --all even with pip conflicts
 #   MLX_METAL_JIT=ON ./update.sh      # Build MLX with runtime Metal kernel compilation
+#   MLX_LOCAL_BUILD_SMOKE=1 ./update.sh # Force local MLX runtime smoke test
 #   CLEAN_BUILD=1 ./update.sh         # Clean build artifacts before building local MLX repos
 #
 # Local MLX Development:
@@ -31,8 +32,9 @@
 #
 # Requirements for local MLX builds:
 #   - CMake >= 3.25 (MLX minimum requirement as of 2025)
+#   - C++20 compiler (Apple Clang >= 15 on macOS)
 #   - Xcode >= 15.0 (macOS, for Metal support)
-#   - macOS >= 14.0 (MLX PyPI requirement)
+#   - macOS SDK >= 14.0 and a native arm64 shell on Apple Silicon
 #   - typing_extensions (required by MLX build)
 #   - setuptools>=80 (required for stub generation)
 #
@@ -258,6 +260,172 @@ log_editable_install_provenance() {
 	fi
 }
 
+version_major_minor_at_least() {
+	local actual="$1"
+	local required_major="$2"
+	local required_minor="$3"
+	local actual_major="${actual%%.*}"
+	local actual_rest="${actual#*.}"
+	local actual_minor="${actual_rest%%.*}"
+
+	if [[ ! "$actual_major" =~ ^[0-9]+$ ]]; then
+		return 1
+	fi
+	if [[ ! "$actual_minor" =~ ^[0-9]+$ ]]; then
+		actual_minor=0
+	fi
+
+	if [[ $actual_major -gt $required_major ]]; then
+		return 0
+	fi
+	if [[ $actual_major -eq $required_major && $actual_minor -ge $required_minor ]]; then
+		return 0
+	fi
+	return 1
+}
+
+log_mlx_runtime_provenance() {
+	python - <<'PY'
+from __future__ import annotations
+
+from hashlib import sha256
+from importlib import metadata
+from importlib.metadata import PackageNotFoundError
+from pathlib import Path
+
+import mlx.core as mx
+
+
+def dist_version(name: str) -> str:
+    try:
+        return metadata.version(name)
+    except PackageNotFoundError:
+        return "<not installed>"
+
+
+core_path = Path(mx.__file__).resolve()
+mlx_dir = core_path.parent
+metallib = mlx_dir / "lib" / "mlx.metallib"
+libmlx = mlx_dir / "lib" / "libmlx.dylib"
+print("[update.sh] MLX runtime backend provenance:")
+print(f"   mlx:       {dist_version('mlx')} ({core_path})")
+print(f"   mlx-metal: {dist_version('mlx-metal')}")
+for label, artifact in (("metallib", metallib), ("libmlx", libmlx)):
+    if artifact.exists():
+        digest = sha256(artifact.read_bytes()).hexdigest()[:16]
+        size = artifact.stat().st_size
+        print(f"   {label}:   {artifact} ({size} bytes, sha256={digest})")
+    else:
+        print(f"   {label}:   <missing at {artifact}>")
+PY
+}
+
+huggingface_model_is_cached() {
+	local model_id="$1"
+	python - "$model_id" <<'PY'
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+from huggingface_hub import constants
+
+model_id = sys.argv[1]
+cache_name = "models--" + model_id.replace("/", "--")
+snapshots = Path(constants.HF_HUB_CACHE) / cache_name / "snapshots"
+if snapshots.exists() and any(snapshots.iterdir()):
+    raise SystemExit(0)
+raise SystemExit(1)
+PY
+}
+
+run_local_mlx_backend_smoke() {
+	local smoke_mode="${MLX_LOCAL_BUILD_SMOKE:-auto}"
+	local smoke_mode_normalized
+	smoke_mode_normalized="$(printf '%s' "$smoke_mode" | tr '[:upper:]' '[:lower:]')"
+
+	case "$smoke_mode_normalized" in
+		0|false|no|off|skip)
+			echo "[update.sh] Skipping local MLX runtime smoke (MLX_LOCAL_BUILD_SMOKE=$smoke_mode)"
+			return 0
+			;;
+		1|true|yes|on|force|auto)
+			;;
+		*)
+			echo "⚠️  Invalid MLX_LOCAL_BUILD_SMOKE='$smoke_mode'; using auto mode"
+			smoke_mode_normalized="auto"
+			;;
+	esac
+
+	local smoke_model="${MLX_LOCAL_BUILD_SMOKE_MODEL:-mlx-community/MiniCPM-V-4.6-8bit}"
+	local smoke_prompt="${MLX_LOCAL_BUILD_SMOKE_PROMPT:-Hi}"
+	local smoke_max_tokens="${MLX_LOCAL_BUILD_SMOKE_MAX_TOKENS:-10}"
+	local smoke_expected="${MLX_LOCAL_BUILD_SMOKE_EXPECTED:-Hello! How can I help you today?}"
+
+	if [[ "$smoke_mode_normalized" == "auto" ]]; then
+		if ! huggingface_model_is_cached "$smoke_model"; then
+			echo "[update.sh] Skipping local MLX runtime smoke; $smoke_model is not cached."
+			echo "   To force it and allow model download: MLX_LOCAL_BUILD_SMOKE=1 bash tools/update.sh"
+			return 0
+		fi
+	fi
+
+	echo "[update.sh] Running local MLX runtime smoke with $smoke_model..."
+	if python - "$smoke_model" "$smoke_prompt" "$smoke_max_tokens" "$smoke_expected" <<'PY'
+from __future__ import annotations
+
+import os
+import subprocess
+import sys
+
+model, prompt, max_tokens, expected = sys.argv[1:5]
+timeout = int(os.environ.get("MLX_LOCAL_BUILD_SMOKE_TIMEOUT", "240"))
+cmd = [
+    sys.executable,
+    "-m",
+    "mlx_vlm",
+    "generate",
+    "--model",
+    model,
+    "--prompt",
+    prompt,
+    "--max-tokens",
+    max_tokens,
+]
+result = subprocess.run(
+    cmd,
+    capture_output=True,
+    check=False,
+    text=True,
+    timeout=timeout,
+)
+output = f"{result.stdout}\n{result.stderr}"
+print(output)
+if result.returncode != 0:
+    raise SystemExit(result.returncode)
+if expected and expected not in output:
+    print(
+        "[update.sh] ERROR: local MLX runtime smoke did not produce the "
+        "expected deterministic output.",
+        file=sys.stderr,
+    )
+    print(f"[update.sh] Expected substring: {expected!r}", file=sys.stderr)
+    print(
+        "[update.sh] This usually points at a broken local MLX backend artifact "
+        "such as mlx.metallib.",
+        file=sys.stderr,
+    )
+    raise SystemExit(1)
+PY
+	then
+		echo "✓ Local MLX runtime smoke passed"
+	else
+		echo "❌ Local MLX runtime smoke failed"
+		echo "   Set MLX_LOCAL_BUILD_SMOKE=0 to bypass only after confirming the local backend."
+		return 1
+	fi
+}
+
 run_generate_stubs_command() {
 	local script_dir="$1"
 	shift
@@ -362,6 +530,55 @@ check_mlx_build_requirements() {
 			echo "✓ Xcode developer directory: $XCODE_DEVELOPER_DIR"
 		fi
 
+		local XCODE_VERSION
+		XCODE_VERSION="$(xcodebuild -version 2>/dev/null | awk '/^Xcode / {print $2; exit}' || true)"
+		if [[ -z "$XCODE_VERSION" ]]; then
+			echo "❌ ERROR: xcodebuild is unavailable; MLX source builds require Xcode >= 15"
+			has_errors=1
+		elif version_major_minor_at_least "$XCODE_VERSION" 15 0; then
+			echo "✓ Xcode $XCODE_VERSION (>= 15.0 required for MLX source builds)"
+		else
+			echo "❌ ERROR: Xcode $XCODE_VERSION found, but MLX requires >= 15.0"
+			has_errors=1
+		fi
+
+		local SDK_VERSION
+		SDK_VERSION="$(xcrun -sdk macosx --show-sdk-version 2>/dev/null || true)"
+		if [[ -z "$SDK_VERSION" ]]; then
+			echo "❌ ERROR: Unable to resolve macOS SDK via xcrun"
+			echo "   Verify with: xcrun -sdk macosx --show-sdk-version"
+			has_errors=1
+		elif version_major_minor_at_least "$SDK_VERSION" 14 0; then
+			echo "✓ macOS SDK $SDK_VERSION (>= 14.0 required for MLX source builds)"
+		else
+			echo "❌ ERROR: macOS SDK $SDK_VERSION found, but MLX requires >= 14.0"
+			has_errors=1
+		fi
+
+		local CLANG_VERSION
+		CLANG_VERSION="$(
+			xcrun clang --version 2>/dev/null \
+				| awk '/clang version/ {for (i = 1; i <= NF; i++) if ($i ~ /^[0-9]+([.][0-9]+)*/) {print $i; exit}}' \
+				|| true
+		)"
+		if [[ -z "$CLANG_VERSION" ]]; then
+			echo "❌ ERROR: Unable to resolve Apple Clang via xcrun"
+			has_errors=1
+		elif version_major_minor_at_least "$CLANG_VERSION" 15 0; then
+			echo "✓ Apple Clang $CLANG_VERSION (C++20 compiler requirement)"
+		else
+			echo "❌ ERROR: Apple Clang $CLANG_VERSION found, but MLX requires >= 15.0"
+			has_errors=1
+		fi
+
+		if [[ "$(uname -m)" == "arm64" ]]; then
+			echo "✓ Native arm64 shell detected"
+		else
+			echo "❌ ERROR: local MLX Metal builds must run from a native arm64 shell"
+			echo "   Open a native terminal instead of a translated x86_64/Rosetta shell."
+			has_errors=1
+		fi
+
 		if ! command -v xcrun >/dev/null 2>&1; then
 			echo "❌ ERROR: xcrun not found. Install Xcode command line tools"
 			has_errors=1
@@ -380,6 +597,8 @@ check_mlx_build_requirements() {
 				echo "✓ Metal toolchain detected:"
 				echo "   metal:    $METAL_BIN"
 				echo "   metallib: $METALLIB_BIN"
+				xcrun metal --version 2>/dev/null | sed 's/^/   metal version: /' || true
+				xcrun metallib --version 2>/dev/null | sed 's/^/   metallib version: /' || true
 			fi
 		fi
 	fi
@@ -629,6 +848,22 @@ update_local_mlx_repos() {
 			return 1
 		fi
 		echo "✓ Project stubs verified"
+	fi
+
+	local LOCAL_MLX_READY=0
+	for idx in "${!REPO_NAMES[@]}"; do
+		if [[ "${REPO_NAMES[idx]}" == "mlx" && ${REPO_SKIP[idx]} -eq 0 ]]; then
+			LOCAL_MLX_READY=1
+			break
+		fi
+	done
+
+	if [[ $LOCAL_MLX_READY -eq 1 ]]; then
+		log_mlx_runtime_provenance
+		if ! run_local_mlx_backend_smoke; then
+			cd "$ORIGINAL_DIR"
+			return 1
+		fi
 	fi
 
 	cd "$ORIGINAL_DIR"
