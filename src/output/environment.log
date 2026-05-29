@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-05-24 21:27:51 BST
+FULL ENVIRONMENT DUMP - 2026-05-29 21:40:48 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -19,7 +19,7 @@ astunparse==1.6.3
 attrs==26.1.0
 blessed==1.44.0
 build==1.5.0
-ca9==0.3.0
+ca9==0.4.0
 certifi==2026.5.20
 cffi==2.0.0
 cfgv==3.5.0
@@ -28,7 +28,7 @@ check_models==0.7.2
 check_models==0.7.2
 click==8.4.1
 cmake==4.3.2
-coverage==7.14.0
+coverage==7.14.1
 cryptography==48.0.0
 datasets==4.8.5
 defusedxml==0.7.1
@@ -52,9 +52,9 @@ hf-xet==1.5.0
 httpcore==1.0.9
 httpx==0.28.1
 httpx-sse==0.4.3
-huggingface_hub==1.16.1
+huggingface_hub==1.17.0
 identify==2.6.19
-idna==3.16
+idna==3.17
 iniconfig==2.3.0
 inquirer==3.4.1
 inquirerpy==0.3.4
@@ -76,7 +76,7 @@ llguidance==1.7.5
 markdown-it-py==4.2.0
 MarkupSafe==3.0.3
 mccabe==0.7.0
-mcp==1.27.1
+mcp==1.27.2
 mdit-py-plugins==0.6.1
 mdurl==0.1.2
 miniaudio==1.71
@@ -108,7 +108,7 @@ pathspec==1.1.1
 pfzy==0.3.4
 pillow==12.2.0
 pip==26.1.1
-platformdirs==4.9.6
+platformdirs==4.10.0
 pluggy==1.6.0
 pre_commit==4.6.0
 prompt_toolkit==3.0.52
@@ -130,7 +130,7 @@ pytest==9.0.3
 pytest-cov==7.1.0
 pytest-xdist==3.8.0
 python-dateutil==2.9.0.post0
-python-discovery==1.3.1
+python-discovery==1.4.0
 python-dotenv==1.2.2
 python-multipart==0.0.29
 PyYAML==6.0.3
@@ -140,8 +140,8 @@ referencing==0.37.0
 regex==2026.5.9
 requests==2.34.2
 rich==15.0.0
-rpds-py==0.30.0
-ruff==0.15.14
+rpds-py==2026.5.1
+ruff==0.15.15
 runs==1.3.0
 safetensors==0.7.0
 scipy==1.17.1
@@ -150,11 +150,11 @@ setuptools==81.0.0
 setuptools==82.0.1
 shellingham==1.5.4
 six==1.17.0
-skylos==4.18.0
+skylos==4.22.0
 sounddevice==0.5.5
 soundfile==0.13.1
 sse-starlette==3.4.4
-starlette==1.1.0
+starlette==1.2.0
 sympy==1.14.0
 tabulate==0.10.0
 tensorflow==2.21.0
@@ -175,7 +175,7 @@ tree-sitter-java==0.23.5
 tree-sitter-php==0.24.1
 tree-sitter-rust==0.24.2
 tree-sitter-typescript==0.23.2
-ty==0.0.39
+ty==0.0.40
 typer==0.25.1
 types-defusedxml==0.7.0.20260504
 types-psutil==7.2.2.20260518
@@ -192,7 +192,7 @@ tzlocal==5.3.1
 uc-micro-py==2.0.0
 urllib3==2.7.0
 uvicorn==0.48.0
-virtualenv==21.3.3
+virtualenv==21.4.1
 vulture==2.16
 wcwidth==0.7.0
 wheel==0.47.0
@@ -204,5 +204,5 @@ yarl==1.24.2
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-05-24 21:27:51 BST
+Environment dump completed at 2026-05-29 21:40:48 BST
 ================================================================================

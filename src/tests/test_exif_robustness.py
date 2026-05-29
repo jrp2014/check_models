@@ -12,6 +12,7 @@ from check_models import (
     _decode_exif_string,  # We'll add this
     _extract_description,
     _extract_gps_str,
+    exif_value_to_str,
     to_float,
 )
 
@@ -73,6 +74,15 @@ def test_decode_exif_string_basic() -> None:
     assert _decode_exif_string("© 2024".encode()) == "© 2024"
     # Latin-1 fallback
     assert _decode_exif_string(b"Copyright \xa9") == "Copyright ©"
+    # UTF-8 bytes that were already mis-decoded as Latin-1/Windows-1252
+    assert _decode_exif_string("Copyright Â© 2026 John Pavel") == "Copyright © 2026 John Pavel"
+
+
+def test_exif_value_to_str_repairs_mojibake_copyright() -> None:
+    assert (
+        exif_value_to_str("Copyright", "Copyright Â© 2026 John Pavel")
+        == "Copyright © 2026 John Pavel"
+    )
 
 
 def test_decode_exif_string_user_comment() -> None:

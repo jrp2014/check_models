@@ -3067,6 +3067,8 @@ EXIF_USERCOMMENT_PREFIX_LEN: Final[int] = 8  # EXIF UserComment has 8-byte encod
 # --- EXIF & Metadata Heuristics ---
 CJK_IDEOGRAPH_START: Final[int] = 0x4E00
 MOJIBAKE_HEURISTIC_LEN: Final[int] = 50
+MOJIBAKE_MARKERS: Final[tuple[str, ...]] = ("Â", "Ã", "â€", "â€™", "â€œ")
+MOJIBAKE_REPAIR_ENCODINGS: Final[tuple[str, ...]] = ("latin-1", "cp1252")
 MAX_TUPLE_LEN: Final[int] = 10
 MAX_STR_LEN: Final[int] = 60
 STR_TRUNCATE_LEN: Final[int] = 57
@@ -8304,6 +8306,25 @@ def _format_exif_datetime_or_mtime(
     return mtime_local.strftime(fmt) if mtime_local is not None else None
 
 
+def _mojibake_marker_count(text: str) -> int:
+    """Count common UTF-8-as-Latin-1/CP1252 mojibake markers in text."""
+    return sum(text.count(marker) for marker in MOJIBAKE_MARKERS)
+
+
+def _repair_mojibake_text(text: str) -> str:
+    """Repair common EXIF text that was decoded as Latin-1/CP1252 instead of UTF-8."""
+    marker_count = _mojibake_marker_count(text)
+    if marker_count == 0:
+        return text
+
+    for encoding in MOJIBAKE_REPAIR_ENCODINGS:
+        with suppress(UnicodeDecodeError, UnicodeEncodeError):
+            repaired = text.encode(encoding).decode("utf-8")
+            if _mojibake_marker_count(repaired) < marker_count:
+                return repaired
+    return text
+
+
 def _decode_exif_string(value: bytes | str | None) -> str:
     """Robustly decode EXIF string values, handling encoding prefixes and fallbacks.
 
@@ -8321,11 +8342,12 @@ def _decode_exif_string(value: bytes | str | None) -> str:
     if not value:
         return ""
     if not isinstance(value, bytes):
-        return (
+        decoded_text = (
             value.replace("\x00", "").strip()
             if isinstance(value, str)
             else str(value).replace("\x00", "").strip()
         )
+        return _repair_mojibake_text(decoded_text)
 
     decoded: str = ""
     # Handle UserComment prefixes (fixed 8-byte header)
@@ -8729,22 +8751,14 @@ def exif_value_to_str(tag_str: str, value: object) -> str:
 
     processed_str: str
     if isinstance(value, bytes):
-        # Try UTF-8 first (handles most modern metadata), fallback to latin-1 for legacy
-        # This fixes garbled copyright symbols (© showing as Â©) and other Unicode chars
-        try:
-            processed_str = _sanitize(value.decode("utf-8"))
-        except UnicodeDecodeError:
-            # Fallback to latin-1 which can decode any byte sequence
-            processed_str = _sanitize(value.decode("latin-1", errors="replace"))
-        except AttributeError:
-            return f"<bytes len={len(value)} un-decodable>"
+        processed_str = _sanitize(_decode_exif_string(value))
     elif isinstance(value, tuple | list) and len(value) > MAX_TUPLE_LEN:
         return f"<tuple len={len(value)}>"
     elif isinstance(value, bytearray):
         return f"<bytearray len={len(value)}>"
     else:
         try:
-            processed_str = _sanitize(str(value))
+            processed_str = _sanitize(_repair_mojibake_text(str(value)))
         except (TypeError, ValueError) as str_err:
             logger.debug(
                 "Could not convert EXIF value for tag '%s' to string: %s",

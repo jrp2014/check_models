@@ -102,6 +102,8 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Repair common UTF-8-as-Latin-1/CP1252 mojibake in decoded EXIF display text
+  so metadata such as `Copyright © ...` no longer prints as `Copyright Â© ...`.
 - Preserve the `recommended` user bucket for benign token-cap results when
   trusted metadata alignment passes.
 - Keep Ty green against current generated `mlx_vlm.generate` stubs by casting

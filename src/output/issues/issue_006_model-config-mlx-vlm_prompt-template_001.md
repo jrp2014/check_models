@@ -1,14 +1,14 @@
 <!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
 
-# \[model-config / mlx-vlm\]\[Prompt-template / image-placeholder mismatch\] Prompt/template output shape mismatch affecting 2 model(s)
+# \[model-config / mlx-vlm\]\[Prompt-template / image-placeholder mismatch\] Prompt/template output shape mismatch affecting 3 model(s)
 
 ## Summary
 
-2 model(s) show **Prompt-template / image-placeholder mismatch** that should be filed against model repo first; mlx-vlm if template handling disagrees.
+3 model(s) show **Prompt-template / image-placeholder mismatch** that should be filed against model repo first; mlx-vlm if template handling disagrees.
 
 - **Observed problem:** Prompt/template output shape mismatch
 - **Target:** model repo first; mlx-vlm if template handling disagrees
-- **Affected models:** 2
+- **Affected models:** 3
 - **Fixed when:** Requested sections render without template leakage.
 
 
@@ -16,17 +16,18 @@
 
 <!-- markdownlint-disable MD060 -->
 
-| Model                             | Observed Behavior   | Token Counts               | Optional Context                                                                                                                                                                               |
-|-----------------------------------|---------------------|----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/gemma-3n-E2B-4bit` | generated_tokens=0  | prompt=0 \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_010_mlx-community_gemma-3n-E2B-4bit_model_config_mlx_vlm_prompt_template_001.json) |
-| `mlx-community/gemma-4-31b-bf16`  | generated_tokens=0  | prompt=0 \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_011_mlx-community_gemma-4-31b-bf16_model_config_mlx_vlm_prompt_template_001.json)  |
+| Model                                      | Observed Behavior   | Token Counts                                                                 | Optional Context                                                                                                                                                                                        |
+|--------------------------------------------|---------------------|------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/gemma-3n-E2B-4bit`          | generated_tokens~1  | prompt=266 \| output/prompt=0.38% \| nontext burden=98% \| stop=completed    | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260529T205941Z_012_mlx-community_gemma-3n-E2B-4bit_model_config_mlx_vlm_prompt_template_001.json)          |
+| `mlx-community/gemma-4-31b-bf16`           | generated_tokens~1  | prompt=268 \| output/prompt=0.37% \| nontext burden=98% \| stop=completed    | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260529T205941Z_013_mlx-community_gemma-4-31b-bf16_model_config_mlx_vlm_prompt_template_001.json)           |
+| `mlx-community/llava-v1.6-mistral-7b-8bit` | output/prompt=0.6%  | prompt=2,160 \| output/prompt=0.56% \| nontext burden=100% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260529T205941Z_014_mlx-community_llava-v1.6-mistral-7b-8bit_model_config_mlx_vlm_prompt_template_001.json) |
 <!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
 
-- `mlx-community/gemma-3n-E2B-4bit`: No generated tokens were recorded.
-- `mlx-community/gemma-4-31b-bf16`: No generated tokens were recorded.
+- `mlx-community/gemma-3n-E2B-4bit`: Output appears truncated to about 1 tokens.
+- `mlx-community/gemma-4-31b-bf16`: Output appears truncated to about 1 tokens.
 
 
 ## Minimal Reproduction
@@ -36,8 +37,9 @@ These commands use `mlx-vlm` directly so the issue can be reproduced without ins
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/gemma-3n-E2B-4bit --image /Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
-python -m mlx_vlm.generate --model mlx-community/gemma-4-31b-bf16 --image /Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/gemma-3n-E2B-4bit --image /Users/jrp/Pictures/Processed/20260525-164635_DSC00024.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/gemma-4-31b-bf16 --image /Users/jrp/Pictures/Processed/20260525-164635_DSC00024.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/llava-v1.6-mistral-7b-8bit --image /Users/jrp/Pictures/Processed/20260525-164635_DSC00024.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 Minimal Python repro (representative model):
@@ -47,7 +49,7 @@ from mlx_vlm.generate import generate
 from mlx_vlm.utils import load
 
 MODEL = 'mlx-community/gemma-3n-E2B-4bit'
-IMAGE = '/Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg'
+IMAGE = '/Users/jrp/Pictures/Processed/20260525-164635_DSC00024.jpg'
 PROMPT = 'Describe this image briefly.'
 LOAD_KWARGS = {'trust_remote_code': True}
 GENERATE_KWARGS = {'max_tokens': 200, 'temperature': 0.0, 'prefill_step_size': 4096}
@@ -71,7 +73,7 @@ Generation/load config:
     "prefill_step_size": 4096,
     "temperature": 0.0
   },
-  "image": "/Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg",
+  "image": "/Users/jrp/Pictures/Processed/20260525-164635_DSC00024.jpg",
   "load_kwargs": {
     "trust_remote_code": true
   },
@@ -81,8 +83,9 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/gemma-3n-E2B-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_010_mlx-community_gemma-3n-E2B-4bit_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/gemma-4-31b-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260524T204643Z_011_mlx-community_gemma-4-31b-bf16_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/gemma-3n-E2B-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260529T205941Z_012_mlx-community_gemma-3n-E2B-4bit_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/gemma-4-31b-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260529T205941Z_013_mlx-community_gemma-4-31b-bf16_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/llava-v1.6-mistral-7b-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260529T205941Z_014_mlx-community_llava-v1.6-mistral-7b-8bit_model_config_mlx_vlm_prompt_template_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -101,22 +104,38 @@ Optional advanced context:
 
 ## Appendix: Environment
 
-| Component       | Version       |
-|-----------------|---------------|
-| mlx-vlm         | 0.5.0         |
-| mlx             | 0.31.2        |
-| mlx-lm          | 0.31.3        |
-| mlx-audio       | 0.4.3         |
-| transformers    | 5.9.0         |
-| tokenizers      | 0.22.2        |
-| huggingface-hub | 1.16.1        |
-| Python Version  | 3.13.13       |
-| OS              | Darwin 25.5.0 |
-| macOS Version   | 26.5          |
-| GPU/Chip        | Apple M5 Max  |
-| GPU Cores       | 40            |
-| Metal Support   | Metal 4       |
-| RAM             | 128.0 GB      |
+| Component                   | Version                                                                                                                                                                           |
+|-----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| mlx-vlm                     | 0.5.0                                                                                                                                                                             |
+| mlx                         | 0.31.2                                                                                                                                                                            |
+| mlx-metal                   | 0.31.2                                                                                                                                                                            |
+| mlx-lm                      | 0.31.3                                                                                                                                                                            |
+| mlx-audio                   | 0.4.3                                                                                                                                                                             |
+| transformers                | 5.9.0                                                                                                                                                                             |
+| tokenizers                  | 0.22.2                                                                                                                                                                            |
+| huggingface-hub             | 1.17.0                                                                                                                                                                            |
+| Python Version              | 3.13.13                                                                                                                                                                           |
+| OS                          | Darwin 25.5.0                                                                                                                                                                     |
+| macOS Version               | 26.5                                                                                                                                                                              |
+| SDK Version                 | 26.5                                                                                                                                                                              |
+| SDK Path                    | /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk                                                                                |
+| Xcode Version               | 26.5                                                                                                                                                                              |
+| Xcode Build                 | 17F42                                                                                                                                                                             |
+| Active Developer Directory  | /Applications/Xcode.app/Contents/Developer                                                                                                                                        |
+| Metal SDK                   | MacOSX26.5.sdk                                                                                                                                                                    |
+| Metal Compiler Version      | Apple metal version 32023.883 (metalfe-32023.883)                                                                                                                                 |
+| Metallib Linker Version     | AIR-LLD 32023.883 (metalfe-32023.883) (compatible with legacy metallib linker)                                                                                                    |
+| Apple Clang Version         | Apple clang version 21.0.0 (clang-2100.1.1.101)                                                                                                                                   |
+| GPU/Chip                    | Apple M5 Max                                                                                                                                                                      |
+| GPU Cores                   | 40                                                                                                                                                                                |
+| Metal Support               | Metal 4                                                                                                                                                                           |
+| MLX Install Type            | wheel/site-packages                                                                                                                                                               |
+| MLX Distribution Root       | /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages                                                                                                                   |
+| mlx-metal Distribution Root | /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages                                                                                                                   |
+| MLX Core Extension          | /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/mlx/core.cpython-313-darwin.so                                                                                    |
+| MLX Metallib                | /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/mlx/lib/mlx.metallib (157,748,008 bytes, sha256=8c8bfcece8c0610745b68879771e5aa1b92b29fa5e17172e5508e4f5153d8d15) |
+| MLX libmlx.dylib            | /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/mlx/lib/libmlx.dylib (21,653,808 bytes, sha256=2ee6fbd32ff22e22e1301ebe3c3bece95584104ff9cbc900513d41a095211bbd)  |
+| RAM                         | 128.0 GB                                                                                                                                                                          |
 
 
 ## Appendix: Detailed Evidence
@@ -125,11 +144,23 @@ Optional advanced context:
 
 Observed signals:
 
-- No generated tokens were recorded.
+- Output appears truncated to about 1 tokens.
 
 ### `mlx-community/gemma-4-31b-bf16`
 
 Observed signals:
 
-- No generated tokens were recorded.
+- Output appears truncated to about 1 tokens.
+
+### `mlx-community/llava-v1.6-mistral-7b-8bit`
+
+Observed signals:
+
+- Output is very short relative to prompt size (0.6%), suggesting possible early-stop or prompt-handling issues.
+
+Sample output:
+
+```text
+A person riding a jet ski in the ocean.
+```
 
