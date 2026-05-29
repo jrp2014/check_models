@@ -21,7 +21,7 @@ import yaml
 from packaging.requirements import Requirement
 
 from check_models_data import dependency_policy
-from tools import check_suppressions, generate_stubs, update_readme_deps
+from tools import bugtest, check_suppressions, generate_stubs, update_readme_deps
 
 _TEST_FILE = Path(__file__).resolve()
 # tests/ parent, then package root (vlm)
@@ -599,6 +599,32 @@ def test_update_script_verifies_stub_integrity_and_logs_local_provenance() -> No
     )
     assert "mlx_lm mlx_vlm transformers tokenizers" in quality_script
     assert "Local package provenance:" in update_script
+
+
+def test_bugtest_formats_metal_regression_warning() -> None:
+    """The Metal backend probe should provide a pasteable maintenance warning."""
+    assert bugtest.classify_relative_error(0.001) == "ok"
+    assert bugtest.classify_relative_error(1.11) == "buggy"
+
+    message = bugtest.format_probe_message(
+        status="buggy",
+        relative_error=1.11,
+        metal_version="Apple metal version 32023.883 (metalfe-32023.883)",
+    )
+
+    assert "still appears broken" in message
+    assert "relative error 1.110000" in message
+    assert "metalfe-32023.883" in message
+    assert "MLX_METAL_GPU_ARCH=applegpu_g16s" in message
+
+
+def test_update_script_runs_nonblocking_metal_bug_reminder() -> None:
+    """update.sh should surface the Metal regression probe without blocking updates."""
+    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+
+    assert "run_metal_bug_reminder" in update_script
+    assert 'python "$SCRIPT_DIR/bugtest.py" --warn-only' in update_script
+    assert "MLX_METAL_BUG_REMINDER" in update_script
 
 
 def test_quality_script_runs_skylos_quality_gate() -> None:

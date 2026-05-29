@@ -93,6 +93,9 @@ Notable changes to this project will be documented in this file.
   build prerequisites, verifying the `mlx`/`mlx-metal` backend pair during
   fresh conda setup, logging `mlx.metallib` provenance, and adding an automatic
   cached-model smoke test for local MLX builds.
+- Make `src/tools/bugtest.py` a lint-clean importable CLI probe and call it from
+  `src/tools/update.sh` as a non-blocking reminder when the installed MLX Metal
+  backend still shows the M5 NAX matmul regression.
 - Include `mlx-metal`, Xcode/SDK/Metal compiler details, and MLX backend
   artifact fingerprints in diagnostics and issue-draft environment tables so
   Metal build regressions are reproducible from pasted reports.
@@ -101,6 +104,9 @@ Notable changes to this project will be documented in this file.
 
 - Preserve the `recommended` user bucket for benign token-cap results when
   trusted metadata alignment passes.
+- Keep Ty green against current generated `mlx_vlm.generate` stubs by casting
+  the optional `mlx-vlm` import boundary to the local generation callable
+  protocol.
 - Remove stale backend-import feature-flag documentation for the previously
   deleted `MLX_VLM_ALLOW_TF` / `TRANSFORMERS_NO_*` guard path.
 - Restore the Skylos quality-gate terminal/color guard so terminal capability

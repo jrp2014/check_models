@@ -426,6 +426,37 @@ PY
 	fi
 }
 
+run_metal_bug_reminder() {
+	local reminder_mode="${MLX_METAL_BUG_REMINDER:-1}"
+	local reminder_mode_normalized
+	reminder_mode_normalized="$(printf '%s' "$reminder_mode" | tr '[:upper:]' '[:lower:]')"
+
+	case "$reminder_mode_normalized" in
+		0|false|no|off|skip)
+			echo "[update.sh] Skipping MLX Metal backend regression reminder (MLX_METAL_BUG_REMINDER=$reminder_mode)"
+			return 0
+			;;
+		1|true|yes|on)
+			;;
+		*)
+			echo "⚠️  Invalid MLX_METAL_BUG_REMINDER='$reminder_mode'; running reminder"
+			;;
+	esac
+
+	if [[ "$OSTYPE" != "darwin"* ]]; then
+		echo "[update.sh] Non-macOS host; skipping MLX Metal backend regression reminder"
+		return 0
+	fi
+
+	if [[ -f "$SCRIPT_DIR/bugtest.py" ]]; then
+		echo ""
+		echo "[update.sh] Checking MLX Metal backend regression reminder..."
+		python "$SCRIPT_DIR/bugtest.py" --warn-only || true
+	else
+		echo "⚠️  bugtest.py not found at $SCRIPT_DIR/bugtest.py"
+	fi
+}
+
 run_generate_stubs_command() {
 	local script_dir="$1"
 	shift
@@ -948,6 +979,8 @@ if [[ ${#MISSING_PKGS[@]} -gt 0 ]]; then
 else
 	echo "✓ All critical packages verified (mlx, mlx_lm, mlx_vlm)"
 fi
+
+run_metal_bug_reminder
 
 # Final check for held-back / outdated packages
 echo ""

@@ -901,7 +901,7 @@ if mlx_vlm_probe_error is None:
             )
             return loaded
 
-        generate = _mlx_vlm_generate
+        generate = cast("Callable[..., GenerationResult]", _mlx_vlm_generate)
         apply_chat_template = _mlx_vlm_apply_chat_template
         load = _typed_mlx_vlm_load
         load_image = _mlx_vlm_load_image
