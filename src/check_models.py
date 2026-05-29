@@ -410,6 +410,7 @@ class QualityThresholds:
 
     # Output degeneration detection thresholds
     min_text_for_degeneration: int = 20  # Minimum text length to check
+    min_repeated_punctuation_run: int = 6  # Same punctuation repeated before flagging
     min_cutoff_word_length: int = 2  # Words <= this at end may be cutoff
     max_control_chars: int = 3  # Control chars threshold
     non_ascii_ratio_threshold: float = 0.3  # Threshold for encoding shift detection
@@ -4698,9 +4699,15 @@ def _detect_output_degeneration(text: str) -> tuple[bool, str | None]:
     tail: str = text[-tail_length:]
     result: str | None = None
 
-    # 1. Detect repeated punctuation/special char sequences at end
-    # e.g., "......" or "?????" or "!!!!!" or "-----"
-    punct_repeat: re.Match[str] | None = re.search(r"([.?!,;:\-_=+*#]{3,})\s*$", tail)
+    # 1. Detect repeated punctuation/special char loops at end. Require a true
+    # run of the same character so Markdown endings like "**Keywords:**" do not
+    # look like degenerate punctuation.
+    punctuation_run_pattern = (
+        r"([.?!,;:\-_=+*#])\1{"
+        f"{QUALITY.min_repeated_punctuation_run - 1},"
+        r"}\s*$"
+    )
+    punct_repeat: re.Match[str] | None = re.search(punctuation_run_pattern, tail)
     if punct_repeat:
         result = f"repeated_punctuation: '{punct_repeat.group(1)[:10]}...'"
 

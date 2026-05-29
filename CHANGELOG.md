@@ -5,6 +5,9 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+
+## [0.7.3] - 2026-05-29
+
 ### Changed
 
 - Keep the full Ruff gate green by documenting `analyze_model_issues()` image
@@ -102,6 +105,8 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Avoid flagging valid Markdown emphasis endings such as `**Keywords:**` as
+  repeated-punctuation output degeneration.
 - Repair common UTF-8-as-Latin-1/CP1252 mojibake in decoded EXIF display text
   so metadata such as `Copyright © ...` no longer prints as `Copyright Â© ...`.
 - Preserve the `recommended` user bucket for benign token-cap results when

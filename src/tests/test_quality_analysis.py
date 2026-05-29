@@ -560,6 +560,22 @@ def test_detect_output_degeneration_repeated_punctuation() -> None:
     assert "punctuation" in degen_type
 
 
+def test_detect_output_degeneration_allows_markdown_emphasis() -> None:
+    """Markdown emphasis punctuation should not be treated as degeneration."""
+    text = (
+        "The image appears to show an outdoor scene.\n\n"
+        "**Objects:**\n"
+        "- A brick building\n"
+        "- A parked car\n\n"
+        "**Keywords:**"
+    )
+
+    has_degen, degen_type = check_models._detect_output_degeneration(text)
+
+    assert has_degen is False
+    assert degen_type is None
+
+
 def test_detect_output_degeneration_character_loop() -> None:
     """Detect character-level repetition loops."""
     text = "Normal text then aaaaaaaaaaaaaaaaaaaaaaaaa"

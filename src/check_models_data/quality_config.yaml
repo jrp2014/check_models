@@ -53,6 +53,7 @@ thresholds:
 
   # Output degeneration detection thresholds
   min_text_for_degeneration: 20 # Minimum text length to check for degeneration
+  min_repeated_punctuation_run: 6 # Same punctuation repeated before flagging
   min_cutoff_word_length: 2 # Words <= this at end may be cutoff
   max_control_chars: 3 # Control chars threshold before flagging
   non_ascii_ratio_threshold: 0.3 # Threshold for encoding shift detection (30%)
