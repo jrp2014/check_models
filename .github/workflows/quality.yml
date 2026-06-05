@@ -35,6 +35,10 @@ jobs:
       - name: Install shellcheck
         run: brew install shellcheck
 
+      - name: Target host macOS for native builds
+        run: |
+          echo "MACOSX_DEPLOYMENT_TARGET=$(sw_vers -productVersion)" >> "$GITHUB_ENV"
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -101,6 +105,10 @@ jobs:
         with:
           python-version: '3.13'
           cache: 'pip'
+
+      - name: Target host macOS for native builds
+        run: |
+          echo "MACOSX_DEPLOYMENT_TARGET=$(sw_vers -productVersion)" >> "$GITHUB_ENV"
 
       - name: Install dependencies
         run: |
