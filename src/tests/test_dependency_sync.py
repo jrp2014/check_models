@@ -758,6 +758,29 @@ def test_update_script_uses_upstream_mlx_editable_dev_install() -> None:
     assert "MLX_LOCAL_BUILD_SMOKE=0" in contributing
 
 
+def test_update_script_targets_host_macos_only_for_local_mlx_build() -> None:
+    """Local mlx builds should target the host unless the caller chose a target."""
+    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+
+    mlx_build_start = update_script.index("# MLX build controls are passed to pip via CMAKE_ARGS.")
+    mlx_build_end = update_script.index(
+        "[[ ${REPO_SKIP[idx]} -eq 1 ]] && continue",
+        mlx_build_start,
+    )
+    mlx_build = update_script[mlx_build_start:mlx_build_end]
+
+    assert 'if [[ -n "${MACOSX_DEPLOYMENT_TARGET+x}" ]]; then' in mlx_build
+    assert 'MACOSX_DEPLOYMENT_TARGET="$(sw_vers -productVersion)"' in mlx_build
+    assert "export MACOSX_DEPLOYMENT_TARGET" in mlx_build
+    assert "Using caller MACOSX_DEPLOYMENT_TARGET=" in mlx_build
+    assert 'export MACOSX_DEPLOYMENT_TARGET="$PREV_MACOSX_DEPLOYMENT_TARGET"' in mlx_build
+    assert "unset MACOSX_DEPLOYMENT_TARGET" in mlx_build
+    assert mlx_build.index('MACOSX_DEPLOYMENT_TARGET="$(sw_vers -productVersion)"') < (
+        mlx_build.index('INSTALL_CMD=(pip_install_verbose -e ".[dev]")')
+    )
+    assert update_script.count('MACOSX_DEPLOYMENT_TARGET="$(sw_vers -productVersion)"') == 1
+
+
 def test_should_audit_path_excludes_generated_and_archived_paths(tmp_path: Path) -> None:
     repo_root = tmp_path / "repo"
     included = repo_root / "src" / "module.py"

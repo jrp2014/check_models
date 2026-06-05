@@ -16,6 +16,7 @@
 #   SKIP_MLX=1 ./update.sh            # Force skip mlx/mlx-vlm updates (override detection)
 #   CONDA_UPDATE_ALL=1 ./update.sh    # Force conda update --all even with pip conflicts
 #   MLX_METAL_JIT=ON ./update.sh      # Build MLX with runtime Metal kernel compilation
+#   MACOSX_DEPLOYMENT_TARGET=26.2 ./update.sh # Override local mlx build target
 #   MLX_LOCAL_BUILD_SMOKE=1 ./update.sh # Force local MLX runtime smoke test
 #   CLEAN_BUILD=1 ./update.sh         # Clean build artifacts before building local MLX repos
 #
@@ -41,6 +42,8 @@
 # Note:
 # - If MLX_METAL_JIT is set, update.sh maps it directly to CMake option
 #   MLX_METAL_JIT (ON/OFF). If unset, MLX's CMake default is used (OFF).
+# - Local mlx builds preserve an explicit MACOSX_DEPLOYMENT_TARGET. If unset on
+#   macOS, update.sh targets the host macOS version for the duration of that build.
 # - MLX Python builds already force -DMLX_BUILD_PYTHON_BINDINGS=ON in mlx/setup.py.
 #   update.sh intentionally does not override that flag.
 # - Script preserves local MLX ecosystem builds using local-repo detection and
@@ -769,6 +772,24 @@ update_local_mlx_repos() {
 
 		# MLX build controls are passed to pip via CMAKE_ARGS.
 		if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
+			local PREV_MACOSX_DEPLOYMENT_TARGET="${MACOSX_DEPLOYMENT_TARGET:-}"
+			local MACOSX_DEPLOYMENT_TARGET_WAS_SET=0
+			if [[ -n "${MACOSX_DEPLOYMENT_TARGET+x}" ]]; then
+				MACOSX_DEPLOYMENT_TARGET_WAS_SET=1
+			fi
+
+			if [[ "$OSTYPE" == "darwin"* ]]; then
+				if [[ -n "${MACOSX_DEPLOYMENT_TARGET:-}" ]]; then
+					echo "[update.sh] Using caller MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET for local mlx build"
+				else
+					# Set this before pip invokes setuptools, which otherwise
+					# defaults macOS 26.x builds to a 26.0 deployment target.
+					MACOSX_DEPLOYMENT_TARGET="$(sw_vers -productVersion)"
+					export MACOSX_DEPLOYMENT_TARGET
+					echo "[update.sh] Using host MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET for local mlx build"
+				fi
+			fi
+
 			# Install MLX build dependencies.
 			# Use pip_install_tool to avoid eager transitive upgrades.
 			echo "[update.sh] Installing MLX build dependencies..."
@@ -831,6 +852,11 @@ update_local_mlx_repos() {
 				export CMAKE_ARGS="$PREV_CMAKE_ARGS"
 			else
 				unset CMAKE_ARGS
+			fi
+			if [[ $MACOSX_DEPLOYMENT_TARGET_WAS_SET -eq 1 ]]; then
+				export MACOSX_DEPLOYMENT_TARGET="$PREV_MACOSX_DEPLOYMENT_TARGET"
+			else
+				unset MACOSX_DEPLOYMENT_TARGET
 			fi
 		fi
 
