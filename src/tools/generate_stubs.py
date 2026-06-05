@@ -34,6 +34,23 @@ if TYPE_CHECKING:  # TC003: typing-only import
     from collections.abc import Iterable, Mapping
 
 
+def _first_existing_path(paths: Iterable[Path]) -> Path | None:
+    """Return the first existing path from ``paths``, if any."""
+    for path in paths:
+        if path.exists():
+            return path
+    return None
+
+
+def _mlx_vlm_generate_contract_paths(typings_dir: Path) -> tuple[Path, Path]:
+    """Return supported mlx_vlm generate stub entry points in preference order."""
+    mlx_root = typings_dir / "mlx_vlm"
+    return (
+        mlx_root / "generate" / "dispatch.pyi",
+        mlx_root / "generate.pyi",
+    )
+
+
 def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
     """Patch known Optional signatures in generated mlx_vlm stubs.
 
@@ -48,9 +65,10 @@ def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
         * StoppingCriteria.add_eos_token_ids(self, new_eos_token_ids: int | list[int] | None = None)
         * StoppingCriteria.reset(self, eos_token_ids: list[int] | None = None)
     - convert.pyi: convert(..., upload_repo: str | None = None, ...)
-    - generate.pyi:
+    - generate.pyi or generate/dispatch.pyi:
         * stream_generate/generate(..., image: str | list[str] | None = None, ...)
         * stream_generate(... ) -> Generator[GenerationResult, None, None]
+    - generate.pyi or generate/ar.pyi:
         * batch_generate(..., images/audios/prompts: ... | None = None, ...)
 
     This function is idempotent and safe to run repeatedly.
@@ -114,99 +132,119 @@ def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
         ],
     )
 
-    # generate.pyi
-    _patch_stub_file_in_typings(
-        typings_dir,
-        mlx_root / "generate.pyi",
-        patches=[
-            # Import ProcessorMixin so generate()/stream_generate() can model
-            # the multimodal processors returned by mlx_vlm.utils.load().
-            (
-                re.compile(
-                    r"(from transformers import PreTrainedTokenizer as PreTrainedTokenizer\n)(?!from transformers\.processing_utils import ProcessorMixin as ProcessorMixin\n)",
-                ),
-                r"\1from transformers.processing_utils import ProcessorMixin as ProcessorMixin\n",
+    generate_entry_patches = [
+        # Import ProcessorMixin so generate()/stream_generate() can model
+        # the multimodal processors returned by mlx_vlm.utils.load().
+        (
+            re.compile(
+                r"(from transformers import PreTrainedTokenizer as PreTrainedTokenizer\n)(?!from transformers\.processing_utils import ProcessorMixin as ProcessorMixin\n)",
             ),
-            # processor: PreTrainedTokenizer -> ProcessorMixin | PreTrainedTokenizer
-            (
-                re.compile(r"(processor:\s*)PreTrainedTokenizer\b"),
-                r"\1ProcessorMixin | PreTrainedTokenizer",
-            ),
-            # Expand generate(...) to the explicit kwargs check_models forwards.
-            (
-                re.compile(
-                    r"def generate\([^\n]*?verbose: bool = False, \*\*kwargs\) -> GenerationResult: \.\.\.",
-                ),
-                (
-                    "def generate("
-                    "model: nn.Module, "
-                    "processor: ProcessorMixin | PreTrainedTokenizer, "
-                    "prompt: str, "
-                    "image: str | list[str] | None = None, "
-                    "audio: str | list[str] | None = None, "
-                    "video: str | list[str] | None = None, "
-                    "verbose: bool = False, "
-                    "*, "
-                    "max_tokens: int = ..., "
-                    "temperature: float = ..., "
-                    "repetition_penalty: float | None = None, "
-                    "repetition_context_size: int | None = ..., "
-                    "top_p: float = ..., "
-                    "min_p: float = ..., "
-                    "top_k: int = ..., "
-                    "max_kv_size: int | None = None, "
-                    "kv_bits: float | None = None, "
-                    "kv_quant_scheme: str = ..., "
-                    "kv_group_size: int = ..., "
-                    "quantized_kv_start: int = ..., "
-                    "prefill_step_size: int | None = ..., "
-                    "resize_shape: tuple[int, int] | None = None, "
-                    "eos_tokens: list[str] | None = None, "
-                    "skip_special_tokens: bool = False, "
-                    "enable_thinking: bool = False, "
-                    "thinking_budget: int | None = None, "
-                    "thinking_end_token: str = ..., "
-                    "thinking_start_token: str | None = None, "
-                    "**kwargs"
-                    ") -> GenerationResult: ..."
-                ),
-            ),
-            # image/audio/video: str | list[str] = None -> include None
-            (
-                re.compile(r"(image:\s*str\s*\|\s*list\[str\])\s*=\s*None"),
-                r"\1 | None = None",
+            r"\1from transformers.processing_utils import ProcessorMixin as ProcessorMixin\n",
+        ),
+        # processor: PreTrainedTokenizer -> ProcessorMixin | PreTrainedTokenizer
+        (
+            re.compile(r"(processor:\s*)PreTrainedTokenizer\b"),
+            r"\1ProcessorMixin | PreTrainedTokenizer",
+        ),
+        # Expand generate(...) to the explicit kwargs check_models forwards.
+        (
+            re.compile(
+                r"def generate\([^\n]*?verbose: bool = False, \*\*kwargs\) -> GenerationResult: \.\.\.",
             ),
             (
-                re.compile(r"(audio:\s*str\s*\|\s*list\[str\])\s*=\s*None"),
-                r"\1 | None = None",
+                "def generate("
+                "model: nn.Module, "
+                "processor: ProcessorMixin | PreTrainedTokenizer, "
+                "prompt: str, "
+                "image: str | list[str] | None = None, "
+                "audio: str | list[str] | None = None, "
+                "video: str | list[str] | None = None, "
+                "verbose: bool = False, "
+                "*, "
+                "max_tokens: int = ..., "
+                "temperature: float = ..., "
+                "repetition_penalty: float | None = None, "
+                "repetition_context_size: int | None = ..., "
+                "top_p: float = ..., "
+                "min_p: float = ..., "
+                "top_k: int = ..., "
+                "max_kv_size: int | None = None, "
+                "kv_bits: float | None = None, "
+                "kv_quant_scheme: str = ..., "
+                "kv_group_size: int = ..., "
+                "quantized_kv_start: int = ..., "
+                "prefill_step_size: int | None = ..., "
+                "resize_shape: tuple[int, int] | None = None, "
+                "eos_tokens: list[str] | None = None, "
+                "skip_special_tokens: bool = False, "
+                "enable_thinking: bool = False, "
+                "thinking_budget: int | None = None, "
+                "thinking_end_token: str = ..., "
+                "thinking_start_token: str | None = None, "
+                "**kwargs"
+                ") -> GenerationResult: ..."
             ),
-            (
-                re.compile(r"(video:\s*str\s*\|\s*list\[str\])\s*=\s*None"),
-                r"\1 | None = None",
+        ),
+        # image/audio/video: str | list[str] = None -> include None
+        (
+            re.compile(r"(image:\s*str\s*\|\s*list\[str\])\s*=\s*None"),
+            r"\1 | None = None",
+        ),
+        (
+            re.compile(r"(audio:\s*str\s*\|\s*list\[str\])\s*=\s*None"),
+            r"\1 | None = None",
+        ),
+        (
+            re.compile(r"(video:\s*str\s*\|\s*list\[str\])\s*=\s*None"),
+            r"\1 | None = None",
+        ),
+        # stream_generate(...) -> str | Generator[str, None, None]
+        #   -> Generator[GenerationResult, None, None]
+        (
+            re.compile(
+                r"(def\s+stream_generate\([^\)]*\)\s*->\s*)str\s*\|\s*Generator\[str,\s*None,\s*None\]",
             ),
-            # stream_generate(...) -> str | Generator[str, None, None]
-            #   -> Generator[GenerationResult, None, None]
-            (
-                re.compile(
-                    r"(def\s+stream_generate\([^\)]*\)\s*->\s*)str\s*\|\s*Generator\[str,\s*None,\s*None\]",
-                ),
-                r"\1Generator[GenerationResult, None, None]",
-            ),
-            # batch_generate(..., images: str | list[str] = None, ...)
-            (
-                re.compile(r"(images:\s*str\s*\|\s*list\[str\])\s*=\s*None"),
-                r"\1 | None = None",
-            ),
-            (
-                re.compile(r"(audios:\s*str\s*\|\s*list\[str\])\s*=\s*None"),
-                r"\1 | None = None",
-            ),
-            (
-                re.compile(r"(prompts:\s*list\[str\])\s*=\s*None"),
-                r"\1 | None = None",
-            ),
-        ],
-    )
+            r"\1Generator[GenerationResult, None, None]",
+        ),
+    ]
+    for generate_path in _mlx_vlm_generate_contract_paths(typings_dir):
+        _patch_stub_file_in_typings(
+            typings_dir,
+            generate_path,
+            patches=generate_entry_patches,
+        )
+
+    batch_generate_patches = [
+        # batch_generate(..., images: str | list[str] = None, ...)
+        (
+            re.compile(r"(images:\s*str\s*\|\s*list\[str\])\s*=\s*None"),
+            r"\1 | None = None",
+        ),
+        (
+            re.compile(r"(audios:\s*str\s*\|\s*list\[str\])\s*=\s*None"),
+            r"\1 | None = None",
+        ),
+        (
+            re.compile(r"(prompts:\s*list\[str\])\s*=\s*None"),
+            r"\1 | None = None",
+        ),
+    ]
+    for batch_generate_path in (mlx_root / "generate" / "ar.pyi", mlx_root / "generate.pyi"):
+        _patch_stub_file_in_typings(
+            typings_dir,
+            batch_generate_path,
+            patches=batch_generate_patches,
+        )
+
+    legacy_generate_path = mlx_root / "generate.pyi"
+    package_dispatch_path = mlx_root / "generate" / "dispatch.pyi"
+    if package_dispatch_path.exists() and legacy_generate_path.exists():
+        try:
+            legacy_generate_path.unlink()
+        except OSError as err:
+            logger.warning("[stubs] Failed to remove stale %s: %s", legacy_generate_path, err)
+        else:
+            logger.info("[stubs] Removed stale %s", legacy_generate_path.relative_to(typings_dir))
 
 
 def _patch_transformers_stubs(typings_dir: Path) -> None:
@@ -327,7 +365,7 @@ logger = logging.getLogger("generate_stubs")
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TYPINGS_DIR = REPO_ROOT / "typings"
 STUB_MANIFEST = ".stub_manifest.json"
-STUB_TOOL_VERSION = "6"
+STUB_TOOL_VERSION = "7"
 
 DEFAULT_PACKAGES = ["mlx_lm", "mlx_vlm", "transformers", "tokenizers"]
 
@@ -533,7 +571,13 @@ def _verify_transformers_stub_contracts(typings_dir: Path) -> list[str]:
 
 def _verify_mlx_vlm_stub_contracts(typings_dir: Path) -> list[str]:
     """Verify that patched mlx_vlm stubs expose the generate contract we rely on."""
-    generate_path = typings_dir / "mlx_vlm" / "generate.pyi"
+    generate_candidates = _mlx_vlm_generate_contract_paths(typings_dir)
+    generate_path = _first_existing_path(generate_candidates)
+    if generate_path is None:
+        preferred_path = generate_candidates[0].relative_to(typings_dir)
+        legacy_path = generate_candidates[1].relative_to(typings_dir)
+        return [f"required stub file is missing: {preferred_path} (or legacy {legacy_path})"]
+
     text, issues = _read_stub_file(generate_path, typings_dir)
     if text is None:
         return issues

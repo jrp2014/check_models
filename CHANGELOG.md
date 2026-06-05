@@ -7,12 +7,17 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Accept the current package-layout `mlx_vlm.generate` stubs by patching and
+  verifying `generate/dispatch.pyi`, widening `generate/ar.pyi` batch inputs,
+  and removing stale legacy `generate.pyi` files when present.
 - Keep generated Transformers `ProcessorMixin` stubs compatible with current
   stubgen output by widening its existing tokenizer and image-processor runtime
   attributes before enforcing project stub integrity.
 - Target the host macOS version during local `mlx` builds when
   `MACOSX_DEPLOYMENT_TARGET` is unset, avoiding setuptools' macOS 26.0 default
   while preserving explicit caller targets.
+- Export the host macOS deployment target before dependency installation in
+  both macOS CI jobs, matching the local MLX-build workaround and upstream fix.
 
 
 ## [0.7.3] - 2026-05-29

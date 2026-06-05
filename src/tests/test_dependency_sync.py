@@ -469,6 +469,45 @@ def test_stub_integrity_issues_detect_missing_mlx_vlm_contract_markers(
     )
 
 
+def test_stub_integrity_issues_accept_package_layout_mlx_vlm_generate_contract(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """mlx_vlm integrity checks should accept package-layout generate dispatch stubs."""
+    versions = {"mlx-vlm": "0.31.0", "mypy": "1.18.0"}
+
+    def _installed_version(distribution: str) -> str | None:
+        return versions.get(distribution)
+
+    typings_dir = tmp_path / "typings"
+    dispatch_dir = typings_dir / "mlx_vlm" / "generate"
+    dispatch_dir.mkdir(parents=True)
+    (dispatch_dir / "dispatch.pyi").write_text(
+        "import mlx.nn as nn\n"
+        "from transformers import PreTrainedTokenizer as PreTrainedTokenizer\n"
+        "from transformers.processing_utils import ProcessorMixin as ProcessorMixin\n"
+        "from typing import Generator\n"
+        "\n"
+        "def stream_generate(model: nn.Module, processor: ProcessorMixin | PreTrainedTokenizer, "
+        "prompt: str, image: str | list[str] | None = None, "
+        "audio: str | list[str] | None = None, video: str | list[str] | None = None, "
+        "**kwargs) -> Generator[GenerationResult, None, None]: ...\n"
+        "def generate(model: nn.Module, processor: ProcessorMixin | PreTrainedTokenizer, "
+        "prompt: str, image: str | list[str] | None = None, "
+        "audio: str | list[str] | None = None, video: str | list[str] | None = None, "
+        "verbose: bool = False, *, max_tokens: int = ..., temperature: float = ..., "
+        "thinking_end_token: str = ..., thinking_start_token: str | None = None, "
+        "**kwargs) -> GenerationResult: ...\n",
+        encoding="utf-8",
+    )
+    _write_stub_manifest(typings_dir, mlx_vlm_version="0.31.0", stubgen_version="1.18.0")
+
+    monkeypatch.setattr(generate_stubs, "_installed_distribution_version", _installed_version)
+
+    issues = generate_stubs.get_stub_integrity_issues(["mlx_vlm"], typings_dir)
+    assert issues == []
+
+
 def test_refresh_stub_manifest_from_existing_stubs_repairs_version_metadata(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -599,6 +638,57 @@ def test_patch_mlx_vlm_stubs_widens_generate_processor_type(tmp_path: Path) -> N
     assert "kv_bits: float | None = None" in patched
     assert "kv_quant_scheme: str = ..." in patched
     assert "thinking_end_token: str = ..." in patched
+
+
+def test_patch_mlx_vlm_stubs_widens_package_layout_generate_types(tmp_path: Path) -> None:
+    """Package-layout mlx_vlm generate stubs should receive the same contract patches."""
+    typings_dir = tmp_path / "typings"
+    generate_dir = typings_dir / "mlx_vlm" / "generate"
+    generate_dir.mkdir(parents=True)
+    legacy_generate_path = typings_dir / "mlx_vlm" / "generate.pyi"
+    legacy_generate_path.write_text(
+        "def generate(*args, **kwargs) -> object: ...\n", encoding="utf-8"
+    )
+
+    dispatch_path = generate_dir / "dispatch.pyi"
+    dispatch_path.write_text(
+        "import mlx.nn as nn\n"
+        "from transformers import PreTrainedTokenizer as PreTrainedTokenizer\n"
+        "from typing import Generator\n"
+        "\n"
+        "def stream_generate(model: nn.Module, processor: PreTrainedTokenizer, "
+        "prompt: str, image: str | list[str] = None, audio: str | list[str] = None, "
+        "video: str | list[str] = None, **kwargs) -> str | Generator[str, None, None]: ...\n"
+        "def generate(model: nn.Module, processor: PreTrainedTokenizer, prompt: str, "
+        "image: str | list[str] = None, audio: str | list[str] = None, "
+        "video: str | list[str] = None, verbose: bool = False, **kwargs) "
+        "-> GenerationResult: ...\n",
+        encoding="utf-8",
+    )
+    ar_path = generate_dir / "ar.pyi"
+    ar_path.write_text(
+        "def batch_generate(model, processor, images: str | list[str] = None, "
+        "audios: str | list[str] = None, prompts: list[str] = None, **kwargs): ...\n",
+        encoding="utf-8",
+    )
+
+    generate_stubs._patch_mlx_vlm_stubs(typings_dir)
+
+    patched_dispatch = dispatch_path.read_text(encoding="utf-8")
+    assert (
+        "from transformers.processing_utils import ProcessorMixin as ProcessorMixin\n"
+        in patched_dispatch
+    )
+    assert "processor: ProcessorMixin | PreTrainedTokenizer" in patched_dispatch
+    assert "video: str | list[str] | None = None" in patched_dispatch
+    assert "temperature: float = ..." in patched_dispatch
+    assert "thinking_end_token: str = ..." in patched_dispatch
+
+    patched_ar = ar_path.read_text(encoding="utf-8")
+    assert "images: str | list[str] | None = None" in patched_ar
+    assert "audios: str | list[str] | None = None" in patched_ar
+    assert "prompts: list[str] | None = None" in patched_ar
+    assert not legacy_generate_path.exists()
 
 
 def test_patch_stub_file_applies_replacements_and_reports_change(tmp_path: Path) -> None:
@@ -779,6 +869,30 @@ def test_update_script_targets_host_macos_only_for_local_mlx_build() -> None:
         mlx_build.index('INSTALL_CMD=(pip_install_verbose -e ".[dev]")')
     )
     assert update_script.count('MACOSX_DEPLOYMENT_TARGET="$(sw_vers -productVersion)"') == 1
+
+
+def test_quality_ci_targets_host_macos_before_dependency_install() -> None:
+    """Ensure macOS CI jobs beat setuptools' deployment-target default."""
+    workflow = yaml.safe_load(
+        (REPO_ROOT / ".github" / "workflows" / "quality.yml").read_text(encoding="utf-8")
+    )
+
+    for job_name in ("static-quality", "runtime-smoke"):
+        steps = workflow["jobs"][job_name]["steps"]
+        target_step_index = next(
+            index
+            for index, step in enumerate(steps)
+            if step.get("name") == "Target host macOS for native builds"
+        )
+        install_step_index = next(
+            index for index, step in enumerate(steps) if step.get("name") == "Install dependencies"
+        )
+        target_command = steps[target_step_index]["run"]
+
+        assert target_step_index < install_step_index
+        assert "MACOSX_DEPLOYMENT_TARGET" in target_command
+        assert "sw_vers -productVersion" in target_command
+        assert "GITHUB_ENV" in target_command
 
 
 def test_should_audit_path_excludes_generated_and_archived_paths(tmp_path: Path) -> None:
