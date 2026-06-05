@@ -2,33 +2,44 @@
   "environment": {
     "library_versions": {
       "Pillow": "12.2.0",
-      "huggingface-hub": "1.15.0",
-      "mlx": "0.32.0.dev20260515+7b7c1240",
+      "huggingface-hub": "1.18.0",
+      "mlx": "0.32.0.dev20260605+6ea7a00d",
       "mlx-audio": "0.4.3",
       "mlx-lm": "0.31.3",
       "mlx-metal": null,
-      "mlx-vlm": "0.5.0",
-      "numpy": "2.4.4",
+      "mlx-vlm": "0.6.1",
+      "numpy": "2.4.6",
       "tokenizers": "0.22.2",
-      "transformers": "5.8.1"
+      "transformers": "5.10.2"
     },
-    "platform": "macOS-26.5-arm64-arm-64bit-Mach-O",
+    "platform": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
     "preflight_issues": [],
     "system_info": {
+      "Active Developer Directory": "/Applications/Xcode.app/Contents/Developer",
+      "Apple Clang Version": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
       "Architecture": "arm64",
       "CPU Cores (Logical)": "18",
       "CPU Cores (Physical)": "18",
       "GPU Cores": "40",
       "GPU/Chip": "Apple M5 Max",
-      "Metal SDK": "MacOSX.sdk",
+      "MLX Core Extension": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so",
+      "MLX Distribution Root": "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
+      "MLX Install Type": "editable local source",
+      "MLX Metallib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (157,751,704 bytes, sha256=e50cd0c2d2ae16781f644476459cbc2ca23b0d428a897140740f86678b5e2bf5)",
+      "MLX libmlx.dylib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,675,136 bytes, sha256=7c19dc6a8bf6b56db0155bed7a1d2b0a54182b42eba2fcf0f42b97d3d4c57eff)",
+      "Metal Compiler Version": "Apple metal version 32023.883 (metalfe-32023.883)",
+      "Metal SDK": "MacOSX26.5.sdk",
       "Metal Support": "Metal 4",
+      "Metallib Linker Version": "AIR-LLD 32023.883 (metalfe-32023.883) (compatible with legacy metallib linker)",
       "OS": "Darwin 25.5.0",
-      "Python Version": "3.13.12",
+      "Python Version": "3.13.13",
       "RAM": "128.0 GB",
+      "SDK Path": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
       "SDK Version": "26.5",
       "Xcode Build": "17F42",
       "Xcode Version": "26.5",
-      "macOS Version": "26.5"
+      "macOS Version": "26.5.1",
+      "mlx-metal Distribution": "not installed; local editable mlx supplies backend"
     }
   },
   "failure": {
@@ -42,7 +53,7 @@
     "traceback": null,
     "type": null
   },
-  "generated_at_utc": "2026-05-15T18:22:26+00:00",
+  "generated_at_utc": "2026-06-05T12:31:25+00:00",
   "issue_cluster_id": "mlx-vlm-mlx_long-context_001",
   "model": "mlx-community/Qwen2-VL-2B-Instruct-4bit",
   "repro": {
@@ -54,7 +65,7 @@
       "dry_run": false,
       "enable_thinking": false,
       "eos_tokens": null,
-      "eval_mode": "stress",
+      "eval_mode": "triage",
       "exclude": [
         "mlx-community/Qwen3-VL-2B-Thinking-bf16",
         "Qwen/Qwen3-VL-2B-Instruct"
@@ -67,11 +78,13 @@
       "kv_group_size": 64,
       "kv_quant_scheme": "uniform",
       "lazy_load": false,
+      "link_style": "github",
       "max_kv_size": null,
-      "max_tokens": 500,
+      "max_tokens": 200,
       "min_p": 0.0,
       "models": null,
       "no_color": false,
+      "open_report": false,
       "output_diagnostics": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/diagnostics.md",
       "output_env": "/Users/jrp/Documents/AI/mlx/check_models/src/output/environment.log",
       "output_gallery_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/model_gallery.md",
@@ -105,13 +118,13 @@
       "verbose": true,
       "width": null
     },
-    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260509-165442_DSC09962_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen2-VL-2B-Instruct-4bit mlx-community/Qwen3.5-27B-4bit mlx-community/Qwen3.5-27B-mxfp8 mlx-community/Qwen3.5-35B-A3B-4bit mlx-community/Qwen3.5-35B-A3B-6bit mlx-community/Qwen3.5-35B-A3B-bf16 mlx-community/Qwen3.5-9B-MLX-4bit mlx-community/Qwen3.6-27B-mxfp8",
+    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260525-164635_DSC00024.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen2-VL-2B-Instruct-4bit mlx-community/paligemma2-3b-pt-896-4bit",
     "env_vars": {
       "TOKENIZERS_PARALLELISM": "false"
     },
-    "image_path": "/Users/jrp/Pictures/Processed/20260509-165442_DSC09962_DxO.jpg",
-    "image_ref_sha256": "6226f30dbf8449790bba612e11c72959e040271d103331b71a55772cd54a8486",
-    "image_sha256": "cc7d331553a527f288964a6f23f920099a2471b41e1eb35e28f3c7ac205fd302",
+    "image_path": "/Users/jrp/Pictures/Processed/20260525-164635_DSC00024.jpg",
+    "image_ref_sha256": "4b820385c467500a73237172e63ef4c00aa3c057fb287c78f88dd6205cb296c6",
+    "image_sha256": "458d7668c048f9e41ae06272ae1251faa40b7ecafe85b50b00d501bf2b0bdde9",
     "prompt_diagnostics": {
       "eos_token": "<|im_end|>",
       "eos_token_id": 151645,
@@ -120,7 +133,7 @@
         "kv_group_size": 64,
         "kv_quant_scheme": "uniform",
         "max_kv_size": null,
-        "max_tokens": 500,
+        "max_tokens": 200,
         "prefill_step_size": 4096,
         "quantized_kv_start": 5000,
         "repetition_context_size": 20,
@@ -131,9 +144,9 @@
       "image_placeholder_count": 0,
       "model_type": "qwen2_vl",
       "processor_class": "mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor",
-      "rendered_prompt_chars": 2551,
-      "rendered_prompt_hash_sha256": "1df07f42441876da81d51943e6ba8605ded7586c9e71b24fe4bd61d7676bb487",
-      "rendered_prompt_preview": "<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\nAnalyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instruction...",
+      "rendered_prompt_chars": 179,
+      "rendered_prompt_hash_sha256": "6e6ce7c438e47957265a02d51ae13486de220544ced687936c04b3a8570340c2",
+      "rendered_prompt_preview": "<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\nDescribe this image briefly.<|vision_start|><|image_pad|><|vision_end|><|im_end|>\n<|im_start|>assistant\n",
       "special_token_ids": [
         151645,
         151643,
@@ -168,46 +181,39 @@
       ],
       "tokenizer_class": "transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer"
     },
-    "prompt_hash_sha256": "0c4eb16aa331189f11f1e0acd61e0652f616fe20e43f8278eb89deee63f9e47e",
-    "prompt_preview": "Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct any...",
-    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260509-165442_DSC09962_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen2-VL-2B-Instruct-4bit",
+    "prompt_hash_sha256": "d760336d0fd143932f194573dd63f6b531e0ffbc2c4f1595e015392a3471c318",
+    "prompt_preview": "Describe this image briefly.",
+    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260525-164635_DSC00024.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen2-VL-2B-Instruct-4bit",
     "seed": null
   },
   "result": {
-    "generated_text_preview": "The video, and I am. The digital and digital, and the camera.  and 100, and a digital, and a large, and a bunch, and a lot, and a lot of them, 100, and 100, and a large, and a bunch, they are, and wooden, and a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and a, it is, and a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and a, and a,...",
+    "generated_text_preview": "Mortar",
     "maintainer_triage": {
       "confidence": "high",
       "evidence": [
-        "token_cap",
-        "missing_sections",
-        "repetitive_tail",
-        "abrupt_tail",
-        "low_hint_overlap"
+        "long_context"
       ],
       "harness_details": [
-        "long_context_repetition(16851tok)"
+        "output:truncated(4tok)",
+        "long_context_low_ratio(0.0%;16250->4)"
       ],
-      "hit_max_tokens": true,
-      "issue_kind": "cutoff_degraded",
+      "hit_max_tokens": false,
+      "issue_kind": "context_budget",
       "issue_subtype": "long_context",
-      "next_action": "Inspect long-context cache behavior under heavy image-token burden.",
-      "nontext_prompt_ratio": 0.9716337309358495,
-      "prompt_output_ratio": 0.02967182956501098,
-      "prompt_tokens_total": 16851,
-      "requested_max_tokens": 500,
-      "stop_reason": "max_tokens",
-      "summary": "At long prompt length (16851 tokens), output became repetitive. | hit token cap (500) | nontext prompt burden=97% | missing sections: title, description, keywords",
+      "next_action": "Treat this as a prompt-budget issue first; nontext prompt burden is 100% and the output stays weak under that load.",
+      "nontext_prompt_ratio": 0.9996307692307692,
+      "prompt_output_ratio": 0.00024615384615384614,
+      "prompt_tokens_total": 16250,
+      "requested_max_tokens": 200,
+      "stop_reason": "completed",
+      "summary": "Output appears truncated to about 4 tokens. | At long prompt length (16250 tokens), output stayed unusually short (4 tokens; ratio 0.0%). | output/prompt=0.02% | nontext prompt burden=100%",
       "suspected_owner": "mlx",
-      "user_bucket": "avoid"
+      "user_bucket": "caveat"
     },
     "quality_issues": [
       "\u26a0\ufe0fharness(long_context)",
       "long-context",
-      "repetitive(phrase: \"and a, and a,...\")",
-      "missing-sections(title+description+keywords)",
-      "trusted-hints-ignored",
-      "cutoff",
-      "context-ignored"
+      "context-budget"
     ],
     "success": true
   },

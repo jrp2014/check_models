@@ -5,6 +5,12 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Keep generated Transformers `ProcessorMixin` stubs compatible with current
+  stubgen output by widening its existing tokenizer and image-processor runtime
+  attributes before enforcing project stub integrity.
+
 
 ## [0.7.3] - 2026-05-29
 

@@ -539,6 +539,38 @@ def test_patch_transformers_stubs_adds_processor_runtime_attrs(tmp_path: Path) -
     assert "image_processor: Any | None" in patched
 
 
+def test_patch_transformers_stubs_widens_existing_processor_runtime_attrs(
+    tmp_path: Path,
+) -> None:
+    """Current upstream ProcessorMixin attrs should be widened without duplication."""
+    typings_dir = tmp_path / "typings"
+    transformers_dir = typings_dir / "transformers"
+    transformers_dir.mkdir(parents=True)
+    processing_utils_path = transformers_dir / "processing_utils.pyi"
+    processing_utils_path.write_text(
+        "from .tokenization_utils_base import PreTrainedTokenizerBase as PreTrainedTokenizerBase\n"
+        "from typing import Any\n"
+        "\n"
+        "class PushToHubMixin: ...\n"
+        "\n"
+        "class ProcessorMixin(PushToHubMixin):\n"
+        "    tokenizer: Any\n"
+        "    feature_extractor: Any\n"
+        "    image_processor: Any\n"
+        "    video_processor: Any\n",
+        encoding="utf-8",
+    )
+
+    generate_stubs._patch_transformers_stubs(typings_dir)
+    generate_stubs._patch_transformers_stubs(typings_dir)
+
+    patched = processing_utils_path.read_text(encoding="utf-8")
+    assert patched.count("    tokenizer: PreTrainedTokenizerBase | None\n") == 1
+    assert patched.count("    image_processor: Any | None\n") == 1
+    assert "    tokenizer: Any\n" not in patched
+    assert "    image_processor: Any\n" not in patched
+
+
 def test_patch_mlx_vlm_stubs_widens_generate_processor_type(tmp_path: Path) -> None:
     """Patched mlx_vlm stubs should accept ProcessorMixin processors."""
     typings_dir = tmp_path / "typings"

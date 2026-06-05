@@ -210,7 +210,7 @@ def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
 
 
 def _patch_transformers_stubs(typings_dir: Path) -> None:
-    """Patch known invalid placeholder tokens emitted in transformers stubs."""
+    """Patch known defects emitted in transformers stubs."""
     root = typings_dir / "transformers"
     if not root.exists():
         return
@@ -231,6 +231,25 @@ def _patch_transformers_stubs(typings_dir: Path) -> None:
         typings_dir,
         root / "processing_utils.pyi",
         [
+            # Current stubgen output preserves ProcessorMixin's broad runtime
+            # declarations. Narrow tokenizer and retain the real None cases.
+            (
+                re.compile(
+                    r"(^class ProcessorMixin\(PushToHubMixin\):\n"
+                    r"(?:    [^\n]*\n)*?    tokenizer:) Any$",
+                    re.MULTILINE,
+                ),
+                r"\1 PreTrainedTokenizerBase | None",
+            ),
+            (
+                re.compile(
+                    r"(^class ProcessorMixin\(PushToHubMixin\):\n"
+                    r"(?:    [^\n]*\n)*?    image_processor:) Any$",
+                    re.MULTILINE,
+                ),
+                r"\1 Any | None",
+            ),
+            # Older stubgen output omitted both runtime attributes.
             (
                 re.compile(
                     r"(    audio_ids: Incomplete\n)(?!    tokenizer: PreTrainedTokenizerBase \| None\n)",

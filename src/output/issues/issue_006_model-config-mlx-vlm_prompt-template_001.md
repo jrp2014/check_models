@@ -18,9 +18,9 @@
 
 | Model                                      | Observed Behavior   | Token Counts                                                                 | Optional Context                                                                                                                                                                                        |
 |--------------------------------------------|---------------------|------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/gemma-3n-E2B-4bit`          | generated_tokens~1  | prompt=266 \| output/prompt=0.38% \| nontext burden=98% \| stop=completed    | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260529T205941Z_012_mlx-community_gemma-3n-E2B-4bit_model_config_mlx_vlm_prompt_template_001.json)          |
-| `mlx-community/gemma-4-31b-bf16`           | generated_tokens~1  | prompt=268 \| output/prompt=0.37% \| nontext burden=98% \| stop=completed    | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260529T205941Z_013_mlx-community_gemma-4-31b-bf16_model_config_mlx_vlm_prompt_template_001.json)           |
-| `mlx-community/llava-v1.6-mistral-7b-8bit` | output/prompt=0.6%  | prompt=2,160 \| output/prompt=0.56% \| nontext burden=100% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260529T205941Z_014_mlx-community_llava-v1.6-mistral-7b-8bit_model_config_mlx_vlm_prompt_template_001.json) |
+| `mlx-community/gemma-3n-E2B-4bit`          | generated_tokens~1  | prompt=266 \| output/prompt=0.38% \| nontext burden=98% \| stop=completed    | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260605T123125Z_010_mlx-community_gemma-3n-E2B-4bit_model_config_mlx_vlm_prompt_template_001.json)          |
+| `mlx-community/gemma-4-31b-bf16`           | generated_tokens~1  | prompt=268 \| output/prompt=0.37% \| nontext burden=98% \| stop=completed    | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260605T123125Z_011_mlx-community_gemma-4-31b-bf16_model_config_mlx_vlm_prompt_template_001.json)           |
+| `mlx-community/llava-v1.6-mistral-7b-8bit` | output/prompt=0.6%  | prompt=2,160 \| output/prompt=0.56% \| nontext burden=100% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260605T123125Z_012_mlx-community_llava-v1.6-mistral-7b-8bit_model_config_mlx_vlm_prompt_template_001.json) |
 <!-- markdownlint-enable MD060 -->
 
 
@@ -83,9 +83,9 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/gemma-3n-E2B-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260529T205941Z_012_mlx-community_gemma-3n-E2B-4bit_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/gemma-4-31b-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260529T205941Z_013_mlx-community_gemma-4-31b-bf16_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/llava-v1.6-mistral-7b-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260529T205941Z_014_mlx-community_llava-v1.6-mistral-7b-8bit_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/gemma-3n-E2B-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260605T123125Z_010_mlx-community_gemma-3n-E2B-4bit_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/gemma-4-31b-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260605T123125Z_011_mlx-community_gemma-4-31b-bf16_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/llava-v1.6-mistral-7b-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260605T123125Z_012_mlx-community_llava-v1.6-mistral-7b-8bit_model_config_mlx_vlm_prompt_template_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -104,38 +104,37 @@ Optional advanced context:
 
 ## Appendix: Environment
 
-| Component                   | Version                                                                                                                                                                           |
-|-----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| mlx-vlm                     | 0.5.0                                                                                                                                                                             |
-| mlx                         | 0.31.2                                                                                                                                                                            |
-| mlx-metal                   | 0.31.2                                                                                                                                                                            |
-| mlx-lm                      | 0.31.3                                                                                                                                                                            |
-| mlx-audio                   | 0.4.3                                                                                                                                                                             |
-| transformers                | 5.9.0                                                                                                                                                                             |
-| tokenizers                  | 0.22.2                                                                                                                                                                            |
-| huggingface-hub             | 1.17.0                                                                                                                                                                            |
-| Python Version              | 3.13.13                                                                                                                                                                           |
-| OS                          | Darwin 25.5.0                                                                                                                                                                     |
-| macOS Version               | 26.5                                                                                                                                                                              |
-| SDK Version                 | 26.5                                                                                                                                                                              |
-| SDK Path                    | /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk                                                                                |
-| Xcode Version               | 26.5                                                                                                                                                                              |
-| Xcode Build                 | 17F42                                                                                                                                                                             |
-| Active Developer Directory  | /Applications/Xcode.app/Contents/Developer                                                                                                                                        |
-| Metal SDK                   | MacOSX26.5.sdk                                                                                                                                                                    |
-| Metal Compiler Version      | Apple metal version 32023.883 (metalfe-32023.883)                                                                                                                                 |
-| Metallib Linker Version     | AIR-LLD 32023.883 (metalfe-32023.883) (compatible with legacy metallib linker)                                                                                                    |
-| Apple Clang Version         | Apple clang version 21.0.0 (clang-2100.1.1.101)                                                                                                                                   |
-| GPU/Chip                    | Apple M5 Max                                                                                                                                                                      |
-| GPU Cores                   | 40                                                                                                                                                                                |
-| Metal Support               | Metal 4                                                                                                                                                                           |
-| MLX Install Type            | wheel/site-packages                                                                                                                                                               |
-| MLX Distribution Root       | /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages                                                                                                                   |
-| mlx-metal Distribution Root | /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages                                                                                                                   |
-| MLX Core Extension          | /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/mlx/core.cpython-313-darwin.so                                                                                    |
-| MLX Metallib                | /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/mlx/lib/mlx.metallib (157,748,008 bytes, sha256=8c8bfcece8c0610745b68879771e5aa1b92b29fa5e17172e5508e4f5153d8d15) |
-| MLX libmlx.dylib            | /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/mlx/lib/libmlx.dylib (21,653,808 bytes, sha256=2ee6fbd32ff22e22e1301ebe3c3bece95584104ff9cbc900513d41a095211bbd)  |
-| RAM                         | 128.0 GB                                                                                                                                                                          |
+| Component                  | Version                                                                                                                                                  |
+|----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| mlx-vlm                    | 0.6.1                                                                                                                                                    |
+| mlx                        | 0.32.0.dev20260605+6ea7a00d                                                                                                                              |
+| mlx-lm                     | 0.31.3                                                                                                                                                   |
+| mlx-audio                  | 0.4.3                                                                                                                                                    |
+| transformers               | 5.10.2                                                                                                                                                   |
+| tokenizers                 | 0.22.2                                                                                                                                                   |
+| huggingface-hub            | 1.18.0                                                                                                                                                   |
+| Python Version             | 3.13.13                                                                                                                                                  |
+| OS                         | Darwin 25.5.0                                                                                                                                            |
+| macOS Version              | 26.5.1                                                                                                                                                   |
+| SDK Version                | 26.5                                                                                                                                                     |
+| SDK Path                   | /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk                                                       |
+| Xcode Version              | 26.5                                                                                                                                                     |
+| Xcode Build                | 17F42                                                                                                                                                    |
+| Active Developer Directory | /Applications/Xcode.app/Contents/Developer                                                                                                               |
+| Metal SDK                  | MacOSX26.5.sdk                                                                                                                                           |
+| Metal Compiler Version     | Apple metal version 32023.883 (metalfe-32023.883)                                                                                                        |
+| Metallib Linker Version    | AIR-LLD 32023.883 (metalfe-32023.883) (compatible with legacy metallib linker)                                                                           |
+| Apple Clang Version        | Apple clang version 21.0.0 (clang-2100.1.1.101)                                                                                                          |
+| GPU/Chip                   | Apple M5 Max                                                                                                                                             |
+| GPU Cores                  | 40                                                                                                                                                       |
+| Metal Support              | Metal 4                                                                                                                                                  |
+| MLX Install Type           | editable local source                                                                                                                                    |
+| MLX Distribution Root      | /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages                                                                                          |
+| mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                                       |
+| MLX Core Extension         | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
+| MLX Metallib               | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (157,751,704 bytes, sha256=e50cd0c2d2ae16781f644476459cbc2ca23b0d428a897140740f86678b5e2bf5) |
+| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,675,136 bytes, sha256=7c19dc6a8bf6b56db0155bed7a1d2b0a54182b42eba2fcf0f42b97d3d4c57eff)  |
+| RAM                        | 128.0 GB                                                                                                                                                 |
 
 
 ## Appendix: Detailed Evidence
