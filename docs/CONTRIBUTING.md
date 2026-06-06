@@ -266,6 +266,20 @@ Alternatively, refer to the official smoke test script:
 
 - [test_smoke.py](https://github.com/Blaizzy/mlx-vlm/blob/main/mlx_vlm/tests/test_smoke.py)
 
+For Qwen3-VL Metal GPU address faults, `src/tools/qwen3_vl_sequential_repro.py`
+is available as a narrow upstream-only diagnostic. It is not a normal test and
+should not be used in CI. Start with its non-executing plan mode:
+
+```bash
+cd src
+python tools/qwen3_vl_sequential_repro.py /path/to/image.jpg --plan
+```
+
+> [!WARNING]
+> The paired/repeated probe modes can trigger native Metal aborts and may wedge
+> WindowServer/GPU state on affected systems. Save work first, run single-model
+> probes before paired probes, and reboot before collecting clean crash evidence.
+
 ### Running Tests
 
 ```bash

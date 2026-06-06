@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from check_models_data import dependency_policy
-from tools import validate_env
+from tools import qwen3_vl_sequential_repro, validate_env
 
 if TYPE_CHECKING:
     import pytest
@@ -73,6 +74,22 @@ def test_version_matches_specifier_accepts_dev_build_above_floor() -> None:
         installed_version="0.31.3.dev20260410+a33b7916",
         version_spec=f">={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['mlx']}",
     )
+
+
+def test_qwen3_vl_probe_plan_does_not_require_existing_image(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """The Qwen3-VL probe plan mode should not touch GPU runtime or image files."""
+    missing_image = Path("/does/not/exist.jpg")
+
+    exit_code = qwen3_vl_sequential_repro.main([str(missing_image), "--plan"])
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "WARNING: this probe can trigger a native Metal abort" in captured.out
+    assert "Thinking model alone" in captured.out
+    assert "Default pair in one process" in captured.out
+    assert str(missing_image) in captured.out
 
 
 def test_load_pyproject_deps_tracks_shared_runtime_policy() -> None:

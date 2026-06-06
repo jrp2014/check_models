@@ -548,6 +548,22 @@ The `src/tools/` directory contains scripts useful for development and verificat
 
   Or refer to the official [test_smoke.py](https://github.com/Blaizzy/mlx-vlm/blob/main/mlx_vlm/tests/test_smoke.py) script.
 
+- **Qwen3-VL Metal fault probe**: `tools/qwen3_vl_sequential_repro.py` is a
+  narrow upstream-only diagnostic for Metal GPU address faults seen with
+  Qwen3-VL models. It does not import `check_models` and is not part of normal
+  verification.
+
+  ```bash
+  # From src/, print the conservative probe matrix without running inference
+  python tools/qwen3_vl_sequential_repro.py /path/to/image.jpg --plan
+  ```
+
+  > [!WARNING]
+  > This probe can trigger a native Metal abort. Repeated paired runs have
+  > wedged WindowServer/GPU state on affected systems. Run single-model probes
+  > first, avoid repeated paired runs, and reboot before collecting a clean
+  > upstream trace.
+
 - **E2E Smoke Tests**: The test suite includes end-to-end tests that run actual model inference:
 
   ```bash
@@ -814,6 +830,9 @@ prompt_keyword_item_max_chars: 36
 1. Reporting the issue to [mlx-vlm](https://github.com/Blaizzy/mlx-vlm/issues)
 2. Checking if a newer model version exists
 3. Trying different prompt templates
+4. For Qwen3-VL Metal GPU address faults, using
+   `tools/qwen3_vl_sequential_repro.py --plan` to collect a minimal
+   upstream-only probe matrix before filing with MLX/MLX-VLM maintainers
 
 ### Core Functions
 

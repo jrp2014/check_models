@@ -71,7 +71,7 @@ A single medium-sized, well-commented function is often clearer than a web of on
 2. **Use Existing Tools**:
     - Run `python -m tools.validate_env` to diagnose environment issues.
     - Run `make quality` to verify your changes (formatting, linting, typing).
-    - **Do not** create new "test" scripts; use `python -m mlx_vlm.generate` or the official `test_smoke.py` for verification.
+    - **Do not** create new "test" scripts; use `python -m mlx_vlm.generate` or the official `test_smoke.py` for verification. Narrow diagnostic tools under `src/tools/` must be documented as diagnostics, kept out of CI, and include risk notes when they can trigger native runtime failures.
 3. **Environment Discipline**:
     - **ALWAYS** run python commands in the `mlx-vlm` conda environment.
     - Use `conda run -n mlx-vlm python ...` for single commands.
@@ -101,6 +101,8 @@ A single medium-sized, well-commented function is often clearer than a web of on
     - `validate_env.py`: Diagnostics for dependencies and environment.
     - `update_readme_deps.py`: Syncs `pyproject.toml` deps to `README.md`.
     - `install_precommit_hook.py`: Sets up git hooks.
+    - `qwen3_vl_sequential_repro.py`: Upstream-only Qwen3-VL Metal fault
+      diagnostic with a non-executing `--plan` mode; not a normal test.
 - **`docs/`** - All documentation (CONTRIBUTING.md, IMPLEMENTATION_GUIDE.md, etc.)
 - **`docs/notes/`** - Design notes, reviews, and project evolution documentation
 - **`output/`** - Generated reports (HTML/Markdown, git-ignored)

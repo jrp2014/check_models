@@ -5,6 +5,11 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Add an upstream-only Qwen3-VL Metal fault probe for comparing single-model,
+  reversed-order, repeated-model, and sequential in-process failures.
+
 ### Fixed
 
 - Accept the current package-layout `mlx_vlm.generate` stubs by patching and
