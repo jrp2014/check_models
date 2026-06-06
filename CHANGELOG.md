@@ -10,6 +10,11 @@ Notable changes to this project will be documented in this file.
 - Add an upstream-only Qwen3-VL Metal fault probe for comparing single-model,
   reversed-order, repeated-model, and sequential in-process failures.
 
+### Changed
+
+- Remove definition-only private helpers from the diagnostics and review-report
+  paths to keep the single-file CLI smaller without changing generated output.
+
 ### Fixed
 
 - Make generated upstream Python repro snippets apply the `mlx-vlm` chat

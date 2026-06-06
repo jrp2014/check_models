@@ -10827,47 +10827,9 @@ def _maintainer_triage_context_text(triage: JsonlMaintainerTriageRecord) -> str 
     return " | ".join(context_parts) if context_parts else None
 
 
-def _failure_triage_summary_text(result: PerformanceResult) -> str:
-    """Return the maintainer-facing summary for a runtime failure."""
-    source_message = result.root_error_message or result.error_message
-    summary = _simplify_failure_message(source_message, model_name=result.model_name)
-    if summary != "Unknown runtime failure.":
-        return summary
-    if result.failure_phase:
-        return f"Runtime failure during {result.failure_phase}."
-    if result.error_stage:
-        return f"Runtime failure at stage {result.error_stage}."
-    return summary
-
-
-def _failure_triage_evidence_text(result: PerformanceResult) -> str | None:
-    """Return supporting facts for a runtime failure triage row."""
-    parts: list[str] = []
-    if result.error_stage:
-        parts.append(f"stage={result.error_stage}")
-    if result.failure_phase:
-        parts.append(f"phase={result.failure_phase}")
-    if result.error_code:
-        parts.append(f"code={result.error_code}")
-    exception_type = result.root_error_type or result.error_type
-    if exception_type:
-        if result.root_error_module:
-            parts.append(f"type={result.root_error_module}.{exception_type}")
-        else:
-            parts.append(f"type={exception_type}")
-    return " | ".join(parts) if parts else None
-
-
 def _triage_text_fingerprint(text: str) -> str:
     """Normalize triage text enough to detect repeated rows."""
     return re.sub(r"\W+", " ", html.unescape(text).casefold()).strip()
-
-
-def _is_redundant_triage_evidence(*, summary: str, evidence: str) -> bool:
-    """Return whether an evidence row repeats the summary without adding facts."""
-    summary_key = _triage_text_fingerprint(summary)
-    evidence_key = _triage_text_fingerprint(evidence)
-    return bool(evidence_key and (evidence_key == summary_key or evidence_key in summary_key))
 
 
 def _review_hint_text(
@@ -15955,66 +15917,6 @@ def _is_review_escalation(result: PerformanceResult) -> bool:
     )
 
 
-def _group_review_escalations_by_owner(
-    results: Sequence[PerformanceResult],
-) -> dict[str, list[PerformanceResult]]:
-    """Group only actionable review escalations by likely owner."""
-    return _group_review_results(
-        [result for result in results if _is_review_escalation(result)],
-        key_name="owner",
-    )
-
-
-def _append_review_owner_queue(
-    md: list[str],
-    owner_groups: Mapping[str, Sequence[PerformanceResult]],
-) -> None:
-    """Append the maintainer ownership section for the review digest."""
-    md.extend(
-        [
-            "## Maintainer Queue",
-            "",
-            "Owner-grouped escalations only; clean recommended models stay in user buckets.",
-            "",
-        ]
-    )
-    if not owner_groups:
-        md.extend(["- No owner-specific escalations were produced.", ""])
-        return
-
-    for owner in sorted(owner_groups):
-        md.extend([f"### `{owner}`", ""])
-        rows: list[tuple[str, ...]] = []
-        for result in owner_groups[owner]:
-            review = _build_jsonl_review_record(result)
-            if review is None:
-                continue
-            analysis = _quality_analysis_for_result(result)
-            rows.append(
-                (
-                    f"`{MARKDOWN_ESCAPER.escape(result.model_name)}`",
-                    f"`{MARKDOWN_ESCAPER.escape(review['verdict'])}`",
-                    MARKDOWN_ESCAPER.escape(_review_focus_text(review, analysis)),
-                    MARKDOWN_ESCAPER.escape(_review_next_action_text(review)),
-                )
-            )
-        if rows:
-            md.extend(
-                render_report_markdown(
-                    (
-                        ReportTable(
-                            headers=("Model", "Verdict", "Evidence", "Next Action"),
-                            rows=tuple(rows),
-                            markdown_escaped=True,
-                        ),
-                    )
-                )
-            )
-            md.append("")
-        else:
-            md.extend(["- No owner-specific escalations were produced.", ""])
-
-
 def _append_review_user_buckets(
     md: list[str],
     bucket_groups: Mapping[str, Sequence[PerformanceResult]],
@@ -18110,25 +18012,6 @@ def _attach_generation_runtime_metrics(
     result.active_memory = _sample_active_memory_gb() or 0.0
     result.cache_memory = cache_mem_bytes / (1024**3)  # Convert to GB
     return result
-
-
-def _derive_first_token_latency_s(
-    output: GenerationResult | SupportsGenerationResult,
-) -> float | None:
-    """Derive first-token latency from upstream prompt throughput metrics.
-
-    Installed mlx-vlm computes ``prompt_tps`` as ``prompt_tokens / prompt_time``
-    inside ``stream_generate()``, where ``prompt_time`` is the elapsed time until
-    the first token becomes available. That makes ``prompt_tokens / prompt_tps``
-    a stable way to recover first-token latency from the final ``GenerationResult``.
-    """
-    prompt_tokens = output.prompt_tokens
-    prompt_tps = output.prompt_tps
-    if not isinstance(prompt_tokens, int | float) or prompt_tokens <= 0:
-        return None
-    if not isinstance(prompt_tps, int | float) or prompt_tps <= 0:
-        return None
-    return float(prompt_tokens) / float(prompt_tps)
 
 
 def _finalize_process_result(
