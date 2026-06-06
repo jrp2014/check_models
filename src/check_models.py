@@ -211,6 +211,7 @@ DEFAULT_KV_QUANT_SCHEME: Final = "uniform"
 DEFAULT_KV_GROUP_SIZE: Final[int] = 64
 DEFAULT_QUANTIZED_KV_START: Final[int] = 5000
 UNIFORM_KV_BITS: Final[frozenset[int]] = frozenset({2, 3, 4, 5, 6, 8})
+DEFAULT_PENALTY_CONTEXT_SIZE: Final[int] = 20
 DEFAULT_THINKING_END_MARKER: Final[str] = "</think>"
 MAX_SAFE_TEXT_FILE_BYTES: Final[int] = 16 * 1024 * 1024
 SAFE_TEXT_FILE_READ_CHUNK_BYTES: Final[int] = 64 * 1024
@@ -927,6 +928,7 @@ type ExifDict = dict[str | int, ExifValue]
 type MetadataDict = dict[str, str | None]
 type PathLike = str | Path
 type JsonLike = None | bool | int | float | str | list[JsonLike] | dict[str, JsonLike]
+type LogitBiasDict = dict[int, float]
 type GPSDict = dict[str, ExifValue]  # GPS EXIF data structure
 type SystemProfilerEntry = dict[str, object]
 type SystemProfilerDict = dict[
@@ -1493,6 +1495,12 @@ class StrictGenerateCallable(Protocol):
         top_p: float = 1.0,
         repetition_penalty: float | None = None,
         repetition_context_size: int | None = 20,
+        seed: int | None = None,
+        presence_penalty: float | None = None,
+        presence_context_size: int | None = DEFAULT_PENALTY_CONTEXT_SIZE,
+        frequency_penalty: float | None = None,
+        frequency_context_size: int | None = DEFAULT_PENALTY_CONTEXT_SIZE,
+        logit_bias: LogitBiasDict | None = None,
         max_kv_size: int | None = None,
         kv_bits: float | None = None,
         kv_quant_scheme: str = DEFAULT_KV_QUANT_SCHEME,
@@ -1504,6 +1512,8 @@ class StrictGenerateCallable(Protocol):
         """Generate a caption/response with the known CLI-controlled kwargs."""
         del model, processor, prompt, image, audio, video, verbose
         del temperature, top_p, repetition_penalty, repetition_context_size
+        del seed, presence_penalty, presence_context_size
+        del frequency_penalty, frequency_context_size, logit_bias
         del max_kv_size, kv_bits, kv_quant_scheme, kv_group_size, quantized_kv_start
         del max_tokens, kwargs
         raise NotImplementedError
@@ -1535,6 +1545,12 @@ if TYPE_CHECKING:
         temperature=0.0,
         repetition_penalty=None,
         repetition_context_size=20,
+        seed=None,
+        presence_penalty=None,
+        presence_context_size=DEFAULT_PENALTY_CONTEXT_SIZE,
+        frequency_penalty=None,
+        frequency_context_size=DEFAULT_PENALTY_CONTEXT_SIZE,
+        logit_bias=None,
         top_p=1.0,
         min_p=0.0,
         top_k=0,
@@ -2722,6 +2738,12 @@ class ProcessImageParams:
     kv_quant_scheme: Literal["uniform", "turboquant"]
     kv_group_size: int
     quantized_kv_start: int
+    seed: int | None = None
+    presence_penalty: float | None = None
+    presence_context_size: int = DEFAULT_PENALTY_CONTEXT_SIZE
+    frequency_penalty: float | None = None
+    frequency_context_size: int = DEFAULT_PENALTY_CONTEXT_SIZE
+    logit_bias: LogitBiasDict | None = None
     force_download: bool = False
     quantize_activations: bool = False
     revision: str | None = None
@@ -7602,6 +7624,12 @@ _RUNTIME_API_CALL_CONTRACTS: Final[dict[str, tuple[str, tuple[str, ...]]]] = {
             "top_p",
             "repetition_penalty",
             "repetition_context_size",
+            "seed",
+            "presence_penalty",
+            "presence_context_size",
+            "frequency_penalty",
+            "frequency_context_size",
+            "logit_bias",
             "max_kv_size",
             "kv_bits",
             "kv_quant_scheme",
@@ -14545,6 +14573,10 @@ def _append_repro_extended_generate_args(
     if processor_kwargs:
         tokens.extend(["--processor-kwargs", json.dumps(processor_kwargs, sort_keys=True)])
 
+    logit_bias = getattr(run_args, "logit_bias", None)
+    if logit_bias:
+        tokens.extend(["--logit-bias", json.dumps(logit_bias, sort_keys=True)])
+
 
 def _thinking_end_token_for_repro(run_args: argparse.Namespace) -> str | None:
     """Return a non-default thinking end token for repro commands."""
@@ -14635,6 +14667,17 @@ def build_check_models_repro_command_spec(
         (
             ("--repetition-penalty", getattr(run_args, "repetition_penalty", None)),
             ("--repetition-context-size", getattr(run_args, "repetition_context_size", None)),
+            ("--seed", getattr(run_args, "seed", None)),
+            ("--presence-penalty", getattr(run_args, "presence_penalty", None)),
+            (
+                "--presence-context-size",
+                getattr(run_args, "presence_context_size", DEFAULT_PENALTY_CONTEXT_SIZE),
+            ),
+            ("--frequency-penalty", getattr(run_args, "frequency_penalty", None)),
+            (
+                "--frequency-context-size",
+                getattr(run_args, "frequency_context_size", DEFAULT_PENALTY_CONTEXT_SIZE),
+            ),
             (
                 "--min-p",
                 getattr(run_args, "min_p", None)
@@ -16549,20 +16592,26 @@ _RESERVED_PROCESSOR_KWARG_KEYS: Final[frozenset[str]] = frozenset(
     {
         "audio",
         "eos_tokens",
+        "frequency_context_size",
+        "frequency_penalty",
         "image",
         "kv_bits",
         "kv_group_size",
         "kv_quant_scheme",
+        "logit_bias",
         "max_kv_size",
         "max_tokens",
         "min_p",
         "prefill_step_size",
+        "presence_context_size",
+        "presence_penalty",
         "processor",
         "prompt",
         "quantized_kv_start",
         "repetition_context_size",
         "repetition_penalty",
         "resize_shape",
+        "seed",
         "skip_special_tokens",
         "enable_thinking",
         "thinking_budget",
@@ -16591,6 +16640,32 @@ def _parse_processor_kwargs_arg(value: str) -> dict[str, JsonLike]:
         msg = "processor_kwargs keys must all be strings"
         raise argparse.ArgumentTypeError(msg)
     return cast("dict[str, JsonLike]", parsed)
+
+
+def _parse_logit_bias_arg(value: str) -> LogitBiasDict:
+    """Parse ``--logit-bias`` as an OpenAI-style token-id to bias JSON object."""
+    try:
+        parsed = json.loads(value)
+    except json.JSONDecodeError as exc:
+        msg = f"logit_bias must be valid JSON: {exc.msg}"
+        raise argparse.ArgumentTypeError(msg) from exc
+
+    if not isinstance(parsed, dict):
+        msg = "logit_bias must be a JSON object"
+        raise argparse.ArgumentTypeError(msg)
+
+    logit_bias: LogitBiasDict = {}
+    for raw_key, raw_value in parsed.items():
+        try:
+            token_id = int(raw_key)
+        except (TypeError, ValueError) as exc:
+            msg = f"logit_bias keys must be integer token ids, got {raw_key!r}"
+            raise argparse.ArgumentTypeError(msg) from exc
+        if not isinstance(raw_value, int | float) or isinstance(raw_value, bool):
+            msg = f"logit_bias values must be numeric, got {raw_value!r}"
+            raise argparse.ArgumentTypeError(msg)
+        logit_bias[token_id] = float(raw_value)
+    return logit_bias
 
 
 def _normalize_resize_shape(raw_shape: Sequence[int] | None) -> tuple[int, int] | None:
@@ -16635,6 +16710,26 @@ def _validate_processor_kwargs(
         msg = f"processor_kwargs cannot override dedicated CLI arguments: {overlap_str}"
         raise ValueError(msg)
     return dict(processor_kwargs)
+
+
+def _validate_server_shared_request_params(args: argparse.Namespace) -> None:
+    """Validate direct-generation flags shared with the MLX-VLM server request API."""
+    presence_context_size = getattr(
+        args,
+        "presence_context_size",
+        DEFAULT_PENALTY_CONTEXT_SIZE,
+    )
+    frequency_context_size = getattr(
+        args,
+        "frequency_context_size",
+        DEFAULT_PENALTY_CONTEXT_SIZE,
+    )
+    if presence_context_size is not None and presence_context_size <= 0:
+        msg = f"presence_context_size must be > 0 if specified, got {presence_context_size}"
+        raise ValueError(msg)
+    if frequency_context_size is not None and frequency_context_size <= 0:
+        msg = f"frequency_context_size must be > 0 if specified, got {frequency_context_size}"
+        raise ValueError(msg)
 
 
 def _validate_thinking_params(args: argparse.Namespace) -> None:
@@ -16694,6 +16789,7 @@ def validate_cli_arguments(args: argparse.Namespace) -> None:
     args.processor_kwargs = _validate_processor_kwargs(
         getattr(args, "processor_kwargs", None),
     )
+    _validate_server_shared_request_params(args)
     _validate_thinking_params(args)
 
     if bool(getattr(args, "detailed_metrics", False)) and not bool(getattr(args, "verbose", False)):
@@ -17962,6 +18058,12 @@ def _generate_with_processor_passthrough(
         top_p=params.top_p,
         repetition_penalty=params.repetition_penalty,
         repetition_context_size=params.repetition_context_size,
+        seed=params.seed,
+        presence_penalty=params.presence_penalty,
+        presence_context_size=params.presence_context_size,
+        frequency_penalty=params.frequency_penalty,
+        frequency_context_size=params.frequency_context_size,
+        logit_bias=params.logit_bias,
         max_kv_size=params.max_kv_size,
         kv_bits=params.kv_bits,
         kv_quant_scheme=params.kv_quant_scheme,
@@ -18154,6 +18256,12 @@ def _run_model_generation(
             top_p=params.top_p,
             repetition_penalty=params.repetition_penalty,
             repetition_context_size=params.repetition_context_size,
+            seed=params.seed,
+            presence_penalty=params.presence_penalty,
+            presence_context_size=params.presence_context_size,
+            frequency_penalty=params.frequency_penalty,
+            frequency_context_size=params.frequency_context_size,
+            logit_bias=params.logit_bias,
             max_kv_size=params.max_kv_size,
             kv_bits=params.kv_bits,
             kv_quant_scheme=params.kv_quant_scheme,
@@ -19950,6 +20058,12 @@ def process_models(
             top_k=args.top_k,
             repetition_penalty=args.repetition_penalty,
             repetition_context_size=args.repetition_context_size,
+            seed=args.seed,
+            presence_penalty=args.presence_penalty,
+            presence_context_size=args.presence_context_size,
+            frequency_penalty=args.frequency_penalty,
+            frequency_context_size=args.frequency_context_size,
+            logit_bias=args.logit_bias,
             lazy=args.lazy_load,
             max_kv_size=args.max_kv_size,
             kv_bits=args.kv_bits,
@@ -23143,8 +23257,13 @@ def _native_mlx_vlm_generate_kwargs(run_args: argparse.Namespace | None) -> dict
         ("top_p", 1.0),
         ("min_p", 0.0),
         ("top_k", 0),
+        ("seed", None),
         ("repetition_penalty", None),
         ("repetition_context_size", 20),
+        ("presence_penalty", None),
+        ("presence_context_size", DEFAULT_PENALTY_CONTEXT_SIZE),
+        ("frequency_penalty", None),
+        ("frequency_context_size", DEFAULT_PENALTY_CONTEXT_SIZE),
         ("max_kv_size", None),
         ("kv_bits", None),
         ("kv_quant_scheme", DEFAULT_KV_QUANT_SCHEME),
@@ -23170,6 +23289,9 @@ def _native_mlx_vlm_generate_kwargs(run_args: argparse.Namespace | None) -> dict
         kwargs["skip_special_tokens"] = True
     if bool(getattr(run_args, "enable_thinking", False)):
         kwargs["enable_thinking"] = True
+    logit_bias = getattr(run_args, "logit_bias", None)
+    if logit_bias:
+        kwargs["logit_bias"] = dict(logit_bias)
     return kwargs
 
 
@@ -23242,6 +23364,32 @@ def _build_native_mlx_vlm_cli_tokens(
         tokens, "--max-kv-size", getattr(run_args, "max_kv_size", None)
     )
     _append_native_cli_optional_pair(tokens, "--kv-bits", getattr(run_args, "kv_bits", None))
+    _append_native_cli_optional_pair(
+        tokens,
+        "--presence-penalty",
+        getattr(run_args, "presence_penalty", None),
+    )
+    _append_native_cli_optional_pair(
+        tokens,
+        "--frequency-penalty",
+        getattr(run_args, "frequency_penalty", None),
+    )
+
+    presence_context_size = getattr(
+        run_args,
+        "presence_context_size",
+        DEFAULT_PENALTY_CONTEXT_SIZE,
+    )
+    if presence_context_size != DEFAULT_PENALTY_CONTEXT_SIZE:
+        tokens.extend(["--presence-context-size", str(presence_context_size)])
+
+    frequency_context_size = getattr(
+        run_args,
+        "frequency_context_size",
+        DEFAULT_PENALTY_CONTEXT_SIZE,
+    )
+    if frequency_context_size != DEFAULT_PENALTY_CONTEXT_SIZE:
+        tokens.extend(["--frequency-context-size", str(frequency_context_size)])
 
     kv_quant_scheme = getattr(run_args, "kv_quant_scheme", DEFAULT_KV_QUANT_SCHEME)
     if kv_quant_scheme != DEFAULT_KV_QUANT_SCHEME:
@@ -24172,6 +24320,20 @@ def _run_differential_reruns(
             top_k=getattr(args, "top_k", 0),
             repetition_penalty=getattr(args, "repetition_penalty", None),
             repetition_context_size=getattr(args, "repetition_context_size", 20),
+            seed=getattr(args, "seed", None),
+            presence_penalty=getattr(args, "presence_penalty", None),
+            presence_context_size=getattr(
+                args,
+                "presence_context_size",
+                DEFAULT_PENALTY_CONTEXT_SIZE,
+            ),
+            frequency_penalty=getattr(args, "frequency_penalty", None),
+            frequency_context_size=getattr(
+                args,
+                "frequency_context_size",
+                DEFAULT_PENALTY_CONTEXT_SIZE,
+            ),
+            logit_bias=getattr(args, "logit_bias", None),
             lazy=getattr(args, "lazy_load", False),
             max_kv_size=getattr(args, "max_kv_size", None),
             kv_bits=getattr(args, "kv_bits", None),
@@ -24611,47 +24773,24 @@ class _ConditionalDefaultsHelpFormatter(argparse.ArgumentDefaultsHelpFormatter):
         return super()._get_help_string(action) or help_text
 
 
-def _build_cli_parser() -> argparse.ArgumentParser:
-    """Build and return the command-line parser for the CLI entry point."""
-    parser: argparse.ArgumentParser = argparse.ArgumentParser(
-        description="MLX VLM Model Checker",
-        formatter_class=_ConditionalDefaultsHelpFormatter,
-    )
+def _output_report_help(label: str) -> str:
+    """Return help text for output artifact path arguments."""
+    return f"Output {label} report filename."
 
-    def _output_help(label: str) -> str:
-        return f"Output {label} report filename."
 
-    # Add arguments (separated for clarity)
-    group = parser.add_mutually_exclusive_group(required=False)
-    group.add_argument(
-        "-f",
-        "--folder",
-        type=Path,
-        default=None,
-        help=(
-            "Folder to scan. Requires a path when provided. The most recently modified "
-            "image file in the folder will be used. If both --folder and --image are "
-            f"omitted, the most recently modified image in {DEFAULT_FOLDER} will be used."
-        ),
-    )
-    group.add_argument(
-        "-i",
-        "--image",
-        type=Path,
-        default=None,
-        help=("Path to a specific image file to process directly. Requires a path when provided."),
-    )
+def _add_output_path_arguments(parser: argparse.ArgumentParser) -> None:
+    """Register output artifact path arguments on the CLI parser."""
     parser.add_argument(
         "--output-html",
         type=Path,
         default=DEFAULT_HTML_OUTPUT,
-        help=_output_help("HTML"),
+        help=_output_report_help("HTML"),
     )
     parser.add_argument(
         "--output-markdown",
         type=Path,
         default=DEFAULT_MD_OUTPUT,
-        help=_output_help("GitHub Markdown"),
+        help=_output_report_help("GitHub Markdown"),
     )
     parser.add_argument(
         "--output-gallery-markdown",
@@ -24669,13 +24808,13 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         "--output-tsv",
         type=Path,
         default=DEFAULT_TSV_OUTPUT,
-        help=_output_help("TSV (tab-separated values)"),
+        help=_output_report_help("TSV (tab-separated values)"),
     )
     parser.add_argument(
         "--output-jsonl",
         type=Path,
         default=DEFAULT_JSONL_OUTPUT,
-        help=_output_help("JSONL"),
+        help=_output_report_help("JSONL"),
     )
     parser.add_argument(
         "--output-log",
@@ -24702,6 +24841,36 @@ def _build_cli_parser() -> argparse.ArgumentParser:
             "Structured for filing upstream issues against mlx-vlm / mlx / transformers."
         ),
     )
+
+
+def _build_cli_parser() -> argparse.ArgumentParser:
+    """Build and return the command-line parser for the CLI entry point."""
+    parser: argparse.ArgumentParser = argparse.ArgumentParser(
+        description="MLX VLM Model Checker",
+        formatter_class=_ConditionalDefaultsHelpFormatter,
+    )
+
+    # Add arguments (separated for clarity)
+    group = parser.add_mutually_exclusive_group(required=False)
+    group.add_argument(
+        "-f",
+        "--folder",
+        type=Path,
+        default=None,
+        help=(
+            "Folder to scan. Requires a path when provided. The most recently modified "
+            "image file in the folder will be used. If both --folder and --image are "
+            f"omitted, the most recently modified image in {DEFAULT_FOLDER} will be used."
+        ),
+    )
+    group.add_argument(
+        "-i",
+        "--image",
+        type=Path,
+        default=None,
+        help=("Path to a specific image file to process directly. Requires a path when provided."),
+    )
+    _add_output_path_arguments(parser)
     parser.add_argument(
         "-m",
         "--models",
@@ -24871,6 +25040,15 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         help="Top-k sampling limit. 0 disables top-k filtering.",
     )
     parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help=(
+            "Seed forwarded to upstream generation sampling. "
+            "Matches the MLX-VLM server request field."
+        ),
+    )
+    parser.add_argument(
         "-r",
         "--repetition-penalty",
         type=float,
@@ -24882,6 +25060,36 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         type=int,
         default=20,
         help="Context window size for repetition penalty.",
+    )
+    parser.add_argument(
+        "--presence-penalty",
+        type=float,
+        default=None,
+        help="Additive penalty for tokens that already appeared in generated context.",
+    )
+    parser.add_argument(
+        "--presence-context-size",
+        type=int,
+        default=DEFAULT_PENALTY_CONTEXT_SIZE,
+        help="Number of recent generated tokens used for presence penalty.",
+    )
+    parser.add_argument(
+        "--frequency-penalty",
+        type=float,
+        default=None,
+        help="Additive penalty scaled by token frequency in generated context.",
+    )
+    parser.add_argument(
+        "--frequency-context-size",
+        type=int,
+        default=DEFAULT_PENALTY_CONTEXT_SIZE,
+        help="Number of recent generated tokens used for frequency penalty.",
+    )
+    parser.add_argument(
+        "--logit-bias",
+        type=_parse_logit_bias_arg,
+        default=None,
+        help="OpenAI-style token-id bias JSON object, e.g. '{\"42\": -1.5}'.",
     )
     parser.add_argument(
         "-L",

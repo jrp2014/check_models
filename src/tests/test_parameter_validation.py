@@ -167,10 +167,16 @@ class TestCliArgumentNormalization:
             "top_p": 1.0,
             "min_p": 0.0,
             "top_k": 0,
+            "seed": None,
             "repetition_penalty": None,
             "max_kv_size": None,
             "kv_bits": None,
             "kv_quant_scheme": "uniform",
+            "presence_penalty": None,
+            "presence_context_size": 20,
+            "frequency_penalty": None,
+            "frequency_context_size": 20,
+            "logit_bias": None,
             "verbose": False,
             "detailed_metrics": False,
             "resize_shape": None,
@@ -217,6 +223,37 @@ class TestCliArgumentNormalization:
 
         assert args.eos_tokens == ("</think>", "\n", "<END>")
 
+    def test_cli_argument_normalization_accepts_server_shared_request_controls(self) -> None:
+        """Server request controls shared with generate() should parse and validate."""
+        parser = __import__("check_models")._build_cli_parser()
+        args = parser.parse_args(
+            [
+                "--folder",
+                "test-folder",
+                "--seed",
+                "123",
+                "--presence-penalty",
+                "0.25",
+                "--presence-context-size",
+                "32",
+                "--frequency-penalty",
+                "0.5",
+                "--frequency-context-size",
+                "64",
+                "--logit-bias",
+                '{"42": -1.5, "123": 2}',
+            ]
+        )
+
+        validate_cli_arguments(args)
+
+        assert args.seed == 123
+        assert args.presence_penalty == 0.25
+        assert args.presence_context_size == 32
+        assert args.frequency_penalty == 0.5
+        assert args.frequency_context_size == 64
+        assert args.logit_bias == {42: -1.5, 123: 2.0}
+
     def test_invalid_resize_shape_raises_error(self) -> None:
         """Resize shape should reject anything other than one or two positive ints."""
         args = self._build_args(resize_shape=[224, 224, 224])
@@ -238,6 +275,13 @@ class TestCliArgumentNormalization:
         with pytest.raises(ValueError, match="processor_kwargs cannot override dedicated"):
             validate_cli_arguments(args)
 
+    def test_reserved_server_shared_processor_kwarg_raises_error(self) -> None:
+        """Processor kwargs should not override dedicated server-shared request controls."""
+        args = self._build_args(processor_kwargs={"presence_penalty": 0.5})
+
+        with pytest.raises(ValueError, match="processor_kwargs cannot override dedicated"):
+            validate_cli_arguments(args)
+
     def test_invalid_min_p_in_cli_args_raises_error(self) -> None:
         """CLI validation should reject min_p outside the upstream range."""
         args = self._build_args(min_p=1.2)
@@ -250,6 +294,20 @@ class TestCliArgumentNormalization:
         args = self._build_args(top_k=-5)
 
         with pytest.raises(ValueError, match=r"top_k must be >= 0"):
+            validate_cli_arguments(args)
+
+    def test_invalid_presence_context_size_raises_error(self) -> None:
+        """Presence penalty context must be positive when provided."""
+        args = self._build_args(presence_context_size=0)
+
+        with pytest.raises(ValueError, match="presence_context_size must be > 0"):
+            validate_cli_arguments(args)
+
+    def test_invalid_frequency_context_size_raises_error(self) -> None:
+        """Frequency penalty context must be positive when provided."""
+        args = self._build_args(frequency_context_size=-1)
+
+        with pytest.raises(ValueError, match="frequency_context_size must be > 0"):
             validate_cli_arguments(args)
 
     def test_thinking_budget_requires_enable_thinking(self) -> None:

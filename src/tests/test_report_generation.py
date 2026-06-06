@@ -3274,6 +3274,24 @@ class TestReproCommandNormalization:
         assert "--processor-kwargs" in tokens
         assert json.loads(tokens[tokens.index("--processor-kwargs") + 1]) == {"cropping": False}
 
+    def test_check_models_repro_command_emits_logit_bias_once(self, tmp_path: Path) -> None:
+        """Canonical check_models repro commands should not duplicate --logit-bias."""
+        image_path = tmp_path / "sample.jpg"
+        run_args = Namespace(
+            trust_remote_code=True,
+            logit_bias={42: -1.5},
+        )
+
+        spec = check_models.build_check_models_repro_command_spec(
+            image_path=image_path,
+            run_args=run_args,
+            include_selection=False,
+        )
+        tokens = list(spec.tokens())
+
+        assert tokens.count("--logit-bias") == 1
+        assert json.loads(tokens[tokens.index("--logit-bias") + 1]) == {"42": -1.5}
+
     def test_native_mlx_vlm_cli_omits_non_cli_generate_kwargs(self, tmp_path: Path) -> None:
         """Native CLI repros should not invent upstream flags absent from mlx-vlm CLI."""
         image_path = tmp_path / "probe.png"

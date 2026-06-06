@@ -305,6 +305,28 @@ python -m check_models --image photo.jpg --repetition-penalty 1.15 --repetition-
 
 The `check_models` tool's quality analysis detects repetition post-generation and flags it in reports. Using these parameters proactively can prevent repetitive output before it occurs, saving generation time and improving results.
 
+#### Server-Shared Request Controls
+
+`mlx-vlm` 0.6.2 exposes additional OpenAI-style request controls through its
+FastAPI server. Where those controls map directly to `mlx_vlm.generate()`,
+`check_models` forwards them too:
+
+- `--seed <int>`: Seed forwarded to upstream sampling.
+- `--presence-penalty <float>` and `--presence-context-size <int>`: Apply an
+  additive penalty to tokens that have already appeared in recent generated
+  context.
+- `--frequency-penalty <float>` and `--frequency-context-size <int>`: Apply an
+  additive penalty scaled by token frequency in recent generated context.
+- `--logit-bias '{"token_id": bias}'`: Forward an OpenAI-style token-id bias
+  object to generation, with JSON object keys normalized to integer token IDs.
+
+The MLX-VLM server also provides HTTP/API surfaces that are not direct
+per-model benchmark kwargs: `/models`, `/v1/chat/completions`, `/v1/responses`,
+`/health`, `/metrics`, `/v1/cache/*`, `/unload`, continuous batching, APC,
+structured outputs, tool calls, top-logprobs envelopes, and image
+generation/editing endpoints. Use `mlx_vlm.server` directly for those server
+surfaces; `check_models` uses direct generation for benchmark isolation.
+
 #### KV Cache Quantization (Memory Optimization)
 
 Vision-language models maintain a **key-value (KV) cache** during text generation to avoid recomputing attention for previous tokens. For long sequences or large models, this cache can consume significant memory. MLX-VLM supports KV cache quantization to reduce memory usage with minimal impact on output quality.
@@ -510,7 +532,7 @@ If you prefer to install dependencies manually (ensure these match `pyproject.to
 
 <!-- MANUAL_INSTALL_START -->
 ```bash
-pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.2" "mlx-lm>=0.31.3" "mlx-vlm>=0.5.0" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=12.2.0" "PyYAML>=6.0" "rich>=14.1.0" "tabulate>=0.9.0" "transformers>=5.5.3" "wcwidth>=0.2.13"
+pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.2" "mlx-lm>=0.31.3" "mlx-vlm>=0.6.2" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=12.2.0" "PyYAML>=6.0" "rich>=14.1.0" "tabulate>=0.9.0" "transformers>=5.5.3" "wcwidth>=0.2.13"
 ```
 <!-- MANUAL_INSTALL_END -->
 
@@ -632,7 +654,7 @@ Runtime (installed automatically via `pip install -e .` when executed inside `sr
 | Purpose | Package | Minimum |
 | ------- | ------- | ------- |
 | Core tensor/runtime | `mlx` | `>=0.31.2` |
-| Vision‑language utilities | `mlx-vlm` | `>=0.5.0` |
+| Vision‑language utilities | `mlx-vlm` | `>=0.6.2` |
 | Transformer compatibility surface | `transformers` | `>=5.5.3` |
 | Image processing & loading | `Pillow[xmp]` | `>=12.2.0` |
 | Safe XMP/XML parsing | `defusedxml` | `>=0.7.1` |
@@ -683,7 +705,7 @@ Development / QA:
 
 <!-- MINIMAL_INSTALL_START -->
 ```bash
-pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.2" "mlx-lm>=0.31.3" "mlx-vlm>=0.5.0" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=12.2.0" "PyYAML>=6.0" "rich>=14.1.0" "tabulate>=0.9.0" "transformers>=5.5.3" "wcwidth>=0.2.13"
+pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.2" "mlx-lm>=0.31.3" "mlx-vlm>=0.6.2" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=12.2.0" "PyYAML>=6.0" "rich>=14.1.0" "tabulate>=0.9.0" "transformers>=5.5.3" "wcwidth>=0.2.13"
 ```
 <!-- MINIMAL_INSTALL_END -->
 
@@ -886,8 +908,14 @@ See module docstrings and `__all__` exports for complete API reference.
 | `--top-p` | float | 1.0 | Nucleus sampling parameter (0.0-1.0); lower = more focused. |
 | `--min-p` | float | 0.0 | Minimum-probability sampling floor (0.0-1.0). 0.0 disables min-p filtering. |
 | `--top-k` | int | 0 | Top-k sampling limit. 0 disables top-k filtering. |
+| `--seed` | int | (none) | Seed forwarded to upstream generation sampling. |
 | `-r`, `--repetition-penalty` | float | (none) | Penalize repeated tokens (>1.0 discourages repetition). |
 | `--repetition-context-size` | int | 20 | Context window size for repetition penalty. |
+| `--presence-penalty` | float | (none) | Additive penalty for tokens that already appeared in generated context. |
+| `--presence-context-size` | int | 20 | Context window size for presence penalty. |
+| `--frequency-penalty` | float | (none) | Additive penalty scaled by token frequency in generated context. |
+| `--frequency-context-size` | int | 20 | Context window size for frequency penalty. |
+| `--logit-bias` | JSON | (none) | OpenAI-style token-id bias object, for example `'{"42": -1.5}'`. |
 | `-L`, `--lazy-load` | flag | `False` | Use lazy loading (loads weights on-demand, reduces memory). |
 | `--force-download` | flag | `False` | Force mlx-vlm/Hugging Face Hub to download model files instead of using cache. |
 | `--quantize-activations` | flag | `False` | Enable mlx-vlm activation quantization during model loading when supported. |

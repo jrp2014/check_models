@@ -525,6 +525,48 @@ class TestProcessImageWithModelMock:
         assert generate_kwargs["thinking_start_token"] == "<think>"
         assert generate_kwargs["thinking_end_token"] == "</think>"
 
+    def test_run_model_generation_passes_server_shared_request_kwargs(
+        self,
+        test_image: Path,
+    ) -> None:
+        """Server request controls shared with generate() should reach mlx_vlm.generate."""
+        params = replace(
+            _build_params(test_image),
+            seed=123,
+            presence_penalty=0.25,
+            presence_context_size=32,
+            frequency_penalty=0.5,
+            frequency_context_size=64,
+            logit_bias={42: -1.5, 123: 2.0},
+        )
+
+        fake_model = _FakeModel()
+        fake_processor = object()
+        fake_generation = _FakeGenerationResult()
+
+        with (
+            patch.object(check_models, "_ensure_generation_runtime_symbols"),
+            patch.object(
+                check_models,
+                "_load_model",
+                return_value=(fake_model, fake_processor, None),
+            ),
+            patch.object(check_models, "_run_model_preflight_validators"),
+            patch.object(check_models, "apply_chat_template", return_value="formatted prompt"),
+            patch.object(check_models, "generate", return_value=fake_generation) as mock_generate,
+            patch.object(check_models, "mx", _FakeMxRuntime()),
+        ):
+            result = check_models._run_model_generation(params)
+
+        assert result is fake_generation
+        generate_kwargs = mock_generate.call_args.kwargs
+        assert generate_kwargs["seed"] == 123
+        assert generate_kwargs["presence_penalty"] == 0.25
+        assert generate_kwargs["presence_context_size"] == 32
+        assert generate_kwargs["frequency_penalty"] == 0.5
+        assert generate_kwargs["frequency_context_size"] == 64
+        assert generate_kwargs["logit_bias"] == {42: -1.5, 123: 2.0}
+
     def test_run_model_generation_retries_utf8_detokenizer_failure(self, test_image: Path) -> None:
         """Known mlx-vlm UTF-8 detokenizer failures should retry once with the patch."""
         params = _build_params(test_image)

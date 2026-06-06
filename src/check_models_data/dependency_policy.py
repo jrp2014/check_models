@@ -7,7 +7,7 @@ from typing import Final
 PROJECT_RUNTIME_STACK_MINIMUMS: Final[dict[str, str]] = {
     "mlx": "0.31.2",
     "mlx-lm": "0.31.3",
-    "mlx-vlm": "0.5.0",
+    "mlx-vlm": "0.6.2",
     "transformers": "5.5.3",
     "huggingface-hub": "1.10.1",
 }

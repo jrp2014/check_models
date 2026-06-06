@@ -9,11 +9,16 @@ Notable changes to this project will be documented in this file.
 
 - Add an upstream-only Qwen3-VL Metal fault probe for comparing single-model,
   reversed-order, repeated-model, and sequential in-process failures.
+- Expose MLX-VLM 0.6.2 server-shared generation controls in the CLI:
+  `--seed`, presence/frequency penalties, and `--logit-bias`, with passthrough
+  coverage in native Python repro snippets.
 
 ### Changed
 
 - Remove definition-only private helpers from the diagnostics and review-report
   paths to keep the single-file CLI smaller without changing generated output.
+- Raise the project `mlx-vlm` floor to `>=0.6.2` and document which current
+  server API surfaces remain `mlx_vlm.server`-only.
 
 ### Fixed
 
