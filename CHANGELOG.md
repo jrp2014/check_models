@@ -12,6 +12,8 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Make generated upstream Python repro snippets apply the `mlx-vlm` chat
+  template before calling `generate()`, matching the harness prompt path.
 - Accept the current package-layout `mlx_vlm.generate` stubs by patching and
   verifying `generate/dispatch.pyi`, widening `generate/ar.pyi` batch inputs,
   and removing stale legacy `generate.pyi` files when present.

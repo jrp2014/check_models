@@ -3341,6 +3341,17 @@ class TestReproCommandNormalization:
         assert "'top_k': 4" in script
         assert "'repetition_penalty': 1.1" in script
         assert "'repetition_context_size': 64" in script
+        assert "from mlx_vlm.prompt_utils import apply_chat_template" in script
+        assert "formatted_prompt = apply_chat_template(" in script
+        assert "processor," in script
+        assert "model.config," in script
+        assert "PROMPT," in script
+        assert "num_images=1," in script
+        assert (
+            "result = generate(model, processor, formatted_prompt, image=IMAGE, **GENERATE_KWARGS)"
+            in script
+        )
+        assert "generate(model, processor, PROMPT" not in script
 
         config = json.loads(config_json)
         assert config["generate_kwargs"]["top_p"] == 0.8

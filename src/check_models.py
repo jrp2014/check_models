@@ -23441,6 +23441,7 @@ def _build_native_mlx_vlm_python_script(
     return "\n".join(
         (
             "from mlx_vlm.generate import generate",
+            "from mlx_vlm.prompt_utils import apply_chat_template",
             "from mlx_vlm.utils import load",
             "",
             f"MODEL = {model_name!r}",
@@ -23449,7 +23450,15 @@ def _build_native_mlx_vlm_python_script(
             f"LOAD_KWARGS = {load_kwargs!r}",
             f"GENERATE_KWARGS = {generate_kwargs!r}",
             "model, processor = load(MODEL, **LOAD_KWARGS)",
-            "result = generate(model, processor, PROMPT, image=IMAGE, **GENERATE_KWARGS)",
+            "formatted_prompt = apply_chat_template(",
+            "    processor,",
+            "    model.config,",
+            "    PROMPT,",
+            "    num_images=1,",
+            ")",
+            "if isinstance(formatted_prompt, list):",
+            '    formatted_prompt = "\\n".join(str(message) for message in formatted_prompt)',
+            "result = generate(model, processor, formatted_prompt, image=IMAGE, **GENERATE_KWARGS)",
             "print(result.text)",
         )
     )
