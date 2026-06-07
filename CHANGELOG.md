@@ -5,6 +5,9 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+
+## [0.8.0] - 2026-06-06
+
 ### Added
 
 - Add an upstream-only Qwen3-VL Metal fault probe for comparing single-model,
@@ -17,6 +20,8 @@ Notable changes to this project will be documented in this file.
 
 - Remove definition-only private helpers from the diagnostics and review-report
   paths to keep the single-file CLI smaller without changing generated output.
+- Improve `--help` readability with a concise usage line and grouped CLI
+  sections.
 - Raise the project `mlx-vlm` floor to `>=0.6.2` and document which current
   server API surfaces remain `mlx_vlm.server`-only.
 
@@ -35,6 +40,8 @@ Notable changes to this project will be documented in this file.
   while preserving explicit caller targets.
 - Export the host macOS deployment target before dependency installation in
   both macOS CI jobs, matching the local MLX-build workaround and upstream fix.
+- Restore the prompt-preparation phase in detailed runtime timing logs so
+  verbose metrics output and regression coverage stay aligned.
 
 
 ## [0.7.3] - 2026-05-29

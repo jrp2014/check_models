@@ -12,8 +12,8 @@ import pytest
 import check_models
 
 
-@pytest.mark.parametrize("help_flag", ["-h", "--help"])
-def test_cli_help_output(help_flag: str, capsys: pytest.CaptureFixture[str]) -> None:
+def _render_help(help_flag: str, capsys: pytest.CaptureFixture[str]) -> str:
+    """Return CLI help output for the given help flag."""
     test_args = ["check_models.py", help_flag]
 
     with patch.object(sys, "argv", test_args), pytest.raises(SystemExit) as excinfo:
@@ -21,7 +21,12 @@ def test_cli_help_output(help_flag: str, capsys: pytest.CaptureFixture[str]) -> 
 
     assert excinfo.value.code == 0
     captured = capsys.readouterr()
-    output = captured.out + captured.err
+    return captured.out + captured.err
+
+
+@pytest.mark.parametrize("help_flag", ["-h", "--help"])
+def test_cli_help_output(help_flag: str, capsys: pytest.CaptureFixture[str]) -> None:
+    output = _render_help(help_flag, capsys)
     normalized_output = " ".join(output.split())
 
     # Check for key sections and argument descriptions
@@ -59,3 +64,38 @@ def test_cli_help_output(help_flag: str, capsys: pytest.CaptureFixture[str]) -> 
     assert "model lists accumulate" in normalized_output
     assert "token lists accumulate" in normalized_output
     assert "single flag occurrence" in normalized_output
+
+
+def test_cli_help_usage_line_is_concise(capsys: pytest.CaptureFixture[str]) -> None:
+    """The usage block should not dump every advanced flag inline."""
+    output = _render_help("--help", capsys)
+    usage_block = output.split("\n\n", maxsplit=1)[0]
+
+    assert "usage: check_models.py [-h] [-f FOLDER | -i IMAGE] [options]" in usage_block
+    assert "--output-html" not in usage_block
+    assert "--presence-penalty" not in usage_block
+    assert "--kv-quant-scheme" not in usage_block
+
+
+def test_cli_help_groups_related_flags(capsys: pytest.CaptureFixture[str]) -> None:
+    """Help output should use readable sections for common and advanced flags."""
+    output = _render_help("--help", capsys)
+    headings = (
+        "Input:",
+        "Output Reports:",
+        "Model Selection:",
+        "Prompt and Processor:",
+        "Generation Controls:",
+        "MLX-VLM Server Controls:",
+        "Runtime and Memory:",
+        "Quality and Workflow:",
+        "Console Output:",
+    )
+
+    for heading in headings:
+        assert heading in output
+
+    assert [output.index(heading) for heading in headings] == sorted(
+        output.index(heading) for heading in headings
+    )
+    assert output.index("Output Reports:") < output.index("--output-html")

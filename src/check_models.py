@@ -24773,12 +24773,20 @@ class _ConditionalDefaultsHelpFormatter(argparse.ArgumentDefaultsHelpFormatter):
         return super()._get_help_string(action) or help_text
 
 
+class _ArgumentAdder(Protocol):
+    """Minimal argparse container protocol for parser and argument groups."""
+
+    def add_argument(self, *_name_or_flags: str, **kwargs: Any) -> argparse.Action:
+        """Register an argparse option."""
+        ...
+
+
 def _output_report_help(label: str) -> str:
     """Return help text for output artifact path arguments."""
     return f"Output {label} report filename."
 
 
-def _add_output_path_arguments(parser: argparse.ArgumentParser) -> None:
+def _add_output_path_arguments(parser: _ArgumentAdder) -> None:
     """Register output artifact path arguments on the CLI parser."""
     parser.add_argument(
         "--output-html",
@@ -24843,16 +24851,11 @@ def _add_output_path_arguments(parser: argparse.ArgumentParser) -> None:
     )
 
 
-def _build_cli_parser() -> argparse.ArgumentParser:
-    """Build and return the command-line parser for the CLI entry point."""
-    parser: argparse.ArgumentParser = argparse.ArgumentParser(
-        description="MLX VLM Model Checker",
-        formatter_class=_ConditionalDefaultsHelpFormatter,
-    )
-
-    # Add arguments (separated for clarity)
-    group = parser.add_mutually_exclusive_group(required=False)
-    group.add_argument(
+def _add_input_arguments(parser: argparse.ArgumentParser) -> None:
+    """Register image/folder input arguments."""
+    input_group = parser.add_argument_group("Input")
+    input_selector = input_group.add_mutually_exclusive_group(required=False)
+    input_selector.add_argument(
         "-f",
         "--folder",
         type=Path,
@@ -24863,15 +24866,19 @@ def _build_cli_parser() -> argparse.ArgumentParser:
             f"omitted, the most recently modified image in {DEFAULT_FOLDER} will be used."
         ),
     )
-    group.add_argument(
+    input_selector.add_argument(
         "-i",
         "--image",
         type=Path,
         default=None,
         help=("Path to a specific image file to process directly. Requires a path when provided."),
     )
-    _add_output_path_arguments(parser)
-    parser.add_argument(
+
+
+def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> None:
+    """Register model, prompt, and generation control arguments."""
+    model_group = parser.add_argument_group("Model Selection")
+    model_group.add_argument(
         "-m",
         "--models",
         action="extend",
@@ -24883,7 +24890,7 @@ def _build_cli_parser() -> argparse.ArgumentParser:
             "May be provided multiple times; model lists accumulate."
         ),
     )
-    parser.add_argument(
+    model_group.add_argument(
         "-e",
         "--exclude",
         action="extend",
@@ -24896,7 +24903,7 @@ def _build_cli_parser() -> argparse.ArgumentParser:
             "May be provided multiple times; exclusions accumulate."
         ),
     )
-    parser.add_argument(
+    model_group.add_argument(
         "--trust-remote-code",
         action=argparse.BooleanOptionalAction,
         default=True,
@@ -24905,19 +24912,21 @@ def _build_cli_parser() -> argparse.ArgumentParser:
             "Use --no-trust-remote-code to disable."
         ),
     )
-    parser.add_argument(
+    model_group.add_argument(
         "--revision",
         type=str,
         default=None,
         help="Model revision (branch, tag, or commit hash) for version pinning.",
     )
-    parser.add_argument(
+    model_group.add_argument(
         "--adapter-path",
         type=str,
         default=None,
         help="Path to LoRA adapter weights to apply on top of the base model.",
     )
-    parser.add_argument(
+
+    prompt_group = parser.add_argument_group("Prompt and Processor")
+    prompt_group.add_argument(
         "-p",
         "--prompt",
         type=str,
@@ -24927,7 +24936,7 @@ def _build_cli_parser() -> argparse.ArgumentParser:
             "an automatic metadata-verification prompt is used."
         ),
     )
-    parser.add_argument(
+    prompt_group.add_argument(
         "--resize-shape",
         type=int,
         nargs="+",
@@ -24938,7 +24947,7 @@ def _build_cli_parser() -> argparse.ArgumentParser:
             "single flag occurrence."
         ),
     )
-    parser.add_argument(
+    prompt_group.add_argument(
         "--eos-tokens",
         action="extend",
         type=str,
@@ -24949,13 +24958,13 @@ def _build_cli_parser() -> argparse.ArgumentParser:
             "May be provided multiple times; token lists accumulate."
         ),
     )
-    parser.add_argument(
+    prompt_group.add_argument(
         "--skip-special-tokens",
         action="store_true",
         default=False,
         help="Skip tokenizer special tokens in the detokenized output.",
     )
-    parser.add_argument(
+    prompt_group.add_argument(
         "--processor-kwargs",
         type=_parse_processor_kwargs_arg,
         default=None,
@@ -24964,39 +24973,33 @@ def _build_cli_parser() -> argparse.ArgumentParser:
             'Example: --processor-kwargs \'{"cropping": false, "max_patches": 3}\''
         ),
     )
-    parser.add_argument(
+    prompt_group.add_argument(
         "--enable-thinking",
         action="store_true",
         default=False,
         help="Enable thinking mode in the upstream chat template and generation flow.",
     )
-    parser.add_argument(
+    prompt_group.add_argument(
         "--thinking-budget",
         type=int,
         default=None,
         help="Maximum number of thinking tokens before forcing the end token.",
     )
-    parser.add_argument(
+    prompt_group.add_argument(
         "--thinking-start-token",
         type=str,
         default=None,
         help="Token marking the start of a thinking block, such as <think>.",
     )
-    parser.add_argument(
+    prompt_group.add_argument(
         "--thinking-end-token",
         type=str,
         default=DEFAULT_THINKING_END_MARKER,
         help="Token marking the end of a thinking block when thinking mode is enabled.",
     )
 
-    parser.add_argument(
-        "-d",
-        "--detailed-metrics",
-        action="store_true",
-        default=False,
-        help=("Show expanded multi-line metrics block; ignored unless --verbose is also set."),
-    )
-    parser.add_argument(
+    generation_group = parser.add_argument_group("Generation Controls")
+    generation_group.add_argument(
         "--eval-mode",
         choices=["stress", "triage", "quality"],
         default="stress",
@@ -25007,39 +25010,54 @@ def _build_cli_parser() -> argparse.ArgumentParser:
             "scored on output quality."
         ),
     )
-    parser.add_argument(
+    generation_group.add_argument(
         "-x",
         "--max-tokens",
         type=int,
         default=DEFAULT_MAX_TOKENS,
         help="Max new tokens to generate.",
     )
-    parser.add_argument(
+    generation_group.add_argument(
         "-t",
         "--temperature",
         type=float,
         default=DEFAULT_TEMPERATURE,
         help="Sampling temperature.",
     )
-    parser.add_argument(
+    generation_group.add_argument(
         "--top-p",
         type=float,
         default=1.0,
         help="Nucleus sampling parameter (0.0-1.0). Lower values = more focused output.",
     )
-    parser.add_argument(
+    generation_group.add_argument(
         "--min-p",
         type=float,
         default=0.0,
         help="Minimum-probability sampling floor (0.0-1.0). 0.0 disables min-p filtering.",
     )
-    parser.add_argument(
+    generation_group.add_argument(
         "--top-k",
         type=int,
         default=0,
         help="Top-k sampling limit. 0 disables top-k filtering.",
     )
-    parser.add_argument(
+    generation_group.add_argument(
+        "-r",
+        "--repetition-penalty",
+        type=float,
+        default=None,
+        help="Penalize repeated tokens (>1.0 discourages repetition). None = no penalty.",
+    )
+    generation_group.add_argument(
+        "--repetition-context-size",
+        type=int,
+        default=20,
+        help="Context window size for repetition penalty.",
+    )
+
+    server_group = parser.add_argument_group("MLX-VLM Server Controls")
+    server_group.add_argument(
         "--seed",
         type=int,
         default=None,
@@ -25048,75 +25066,67 @@ def _build_cli_parser() -> argparse.ArgumentParser:
             "Matches the MLX-VLM server request field."
         ),
     )
-    parser.add_argument(
-        "-r",
-        "--repetition-penalty",
-        type=float,
-        default=None,
-        help="Penalize repeated tokens (>1.0 discourages repetition). None = no penalty.",
-    )
-    parser.add_argument(
-        "--repetition-context-size",
-        type=int,
-        default=20,
-        help="Context window size for repetition penalty.",
-    )
-    parser.add_argument(
+    server_group.add_argument(
         "--presence-penalty",
         type=float,
         default=None,
         help="Additive penalty for tokens that already appeared in generated context.",
     )
-    parser.add_argument(
+    server_group.add_argument(
         "--presence-context-size",
         type=int,
         default=DEFAULT_PENALTY_CONTEXT_SIZE,
         help="Number of recent generated tokens used for presence penalty.",
     )
-    parser.add_argument(
+    server_group.add_argument(
         "--frequency-penalty",
         type=float,
         default=None,
         help="Additive penalty scaled by token frequency in generated context.",
     )
-    parser.add_argument(
+    server_group.add_argument(
         "--frequency-context-size",
         type=int,
         default=DEFAULT_PENALTY_CONTEXT_SIZE,
         help="Number of recent generated tokens used for frequency penalty.",
     )
-    parser.add_argument(
+    server_group.add_argument(
         "--logit-bias",
         type=_parse_logit_bias_arg,
         default=None,
         help="OpenAI-style token-id bias JSON object, e.g. '{\"42\": -1.5}'.",
     )
-    parser.add_argument(
+
+
+def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> None:
+    """Register runtime, workflow, and console presentation arguments."""
+    runtime_group = parser.add_argument_group("Runtime and Memory")
+    runtime_group.add_argument(
         "-L",
         "--lazy-load",
         action="store_true",
         default=False,
         help="Use lazy loading for models (loads weights on-demand, reduces peak memory).",
     )
-    parser.add_argument(
+    runtime_group.add_argument(
         "--force-download",
         action="store_true",
         default=False,
         help="Force mlx-vlm/Hugging Face Hub to download model files instead of using cache.",
     )
-    parser.add_argument(
+    runtime_group.add_argument(
         "--quantize-activations",
         action="store_true",
         default=False,
         help="Enable mlx-vlm activation quantization during model loading when supported.",
     )
-    parser.add_argument(
+    runtime_group.add_argument(
         "--max-kv-size",
         type=int,
         default=None,
         help="Maximum KV cache size (limits memory for long sequences). None = no limit.",
     )
-    parser.add_argument(
+    runtime_group.add_argument(
         "-b",
         "--kv-bits",
         type=float,
@@ -25126,7 +25136,7 @@ def _build_cli_parser() -> argparse.ArgumentParser:
             "or 8; fractional values such as 3.5 use TurboQuant automatically."
         ),
     )
-    parser.add_argument(
+    runtime_group.add_argument(
         "--kv-quant-scheme",
         choices=["uniform", "turboquant"],
         default=DEFAULT_KV_QUANT_SCHEME,
@@ -25135,14 +25145,14 @@ def _build_cli_parser() -> argparse.ArgumentParser:
             "Use turboquant to match upstream TurboQuant cache handling."
         ),
     )
-    parser.add_argument(
+    runtime_group.add_argument(
         "-g",
         "--kv-group-size",
         type=int,
         default=DEFAULT_KV_GROUP_SIZE,
         help="Quantization group size for KV cache.",
     )
-    parser.add_argument(
+    runtime_group.add_argument(
         "--quantized-kv-start",
         type=int,
         default=DEFAULT_QUANTIZED_KV_START,
@@ -25151,64 +25161,48 @@ def _build_cli_parser() -> argparse.ArgumentParser:
             f"Default: {DEFAULT_QUANTIZED_KV_START} (matches mlx-vlm upstream)."
         ),
     )
-    parser.add_argument(
+    runtime_group.add_argument(
         "--prefill-step-size",
         type=int,
         default=4096,
         help="Step size for prompt prefill. Default: 4096 (faster than mlx-lm default).",
     )
-    parser.add_argument(
-        "-v",
-        "--verbose",
-        action="store_true",
-        help="Enable verbose and debug output (DEBUG logging).",
-    )
-    parser.add_argument(
+    runtime_group.add_argument(
         "-T",
         "--timeout",
         type=float,
         default=DEFAULT_TIMEOUT,
         help="Timeout in seconds for model operations.",
     )
-    parser.add_argument(
-        "--no-color",
+
+    quality_group = parser.add_argument_group("Quality and Workflow")
+    quality_group.add_argument(
+        "-d",
+        "--detailed-metrics",
         action="store_true",
-        help="Disable ANSI colors in output.",
+        default=False,
+        help=("Show expanded multi-line metrics block; ignored unless --verbose is also set."),
     )
-    parser.add_argument(
-        "--force-color",
-        action="store_true",
-        help="Force enable ANSI colors even if not a TTY.",
-    )
-    parser.add_argument(
-        "--width",
-        type=int,
-        default=None,
-        help=(
-            "Force a specific CLI output width (columns) for separators and text wrapping. "
-            "Overrides terminal detection. Also supported via MLX_VLM_WIDTH env var."
-        ),
-    )
-    parser.add_argument(
+    quality_group.add_argument(
         "-c",
         "--quality-config",
         type=Path,
         default=None,
         help="Path to custom quality configuration YAML file.",
     )
-    parser.add_argument(
+    quality_group.add_argument(
         "--context-marker",
         type=str,
         default="Context:",
         help="Marker used to identify context section in prompt.",
     )
-    parser.add_argument(
+    quality_group.add_argument(
         "--prune-repro-days",
         type=int,
         default=90,
         help="Delete repro bundles older than N days (default: 90). Set 0 to disable pruning.",
     )
-    parser.add_argument(
+    quality_group.add_argument(
         "--rerun-triage",
         action="store_true",
         default=False,
@@ -25218,7 +25212,7 @@ def _build_cli_parser() -> argparse.ArgumentParser:
             "First-pass results are never overwritten."
         ),
     )
-    parser.add_argument(
+    quality_group.add_argument(
         "--link-style",
         choices=["relative", "github"],
         default="github",
@@ -25229,13 +25223,13 @@ def _build_cli_parser() -> argparse.ArgumentParser:
             "'relative' generates offline-friendly local relative paths."
         ),
     )
-    parser.add_argument(
+    quality_group.add_argument(
         "--open-report",
         action="store_true",
         default=False,
         help="Automatically open the HTML performance report in the default web browser upon completion.",
     )
-    parser.add_argument(
+    quality_group.add_argument(
         "-n",
         "--dry-run",
         action="store_true",
@@ -25245,6 +25239,48 @@ def _build_cli_parser() -> argparse.ArgumentParser:
             "Lists discovered models, the generated prompt, and image path then exits."
         ),
     )
+
+    console_group = parser.add_argument_group("Console Output")
+    console_group.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="Enable verbose and debug output (DEBUG logging).",
+    )
+    console_group.add_argument(
+        "--no-color",
+        action="store_true",
+        help="Disable ANSI colors in output.",
+    )
+    console_group.add_argument(
+        "--force-color",
+        action="store_true",
+        help="Force enable ANSI colors even if not a TTY.",
+    )
+    console_group.add_argument(
+        "--width",
+        type=int,
+        default=None,
+        help=(
+            "Force a specific CLI output width (columns) for separators and text wrapping. "
+            "Overrides terminal detection. Also supported via MLX_VLM_WIDTH env var."
+        ),
+    )
+
+
+def _build_cli_parser() -> argparse.ArgumentParser:
+    """Build and return the command-line parser for the CLI entry point."""
+    parser: argparse.ArgumentParser = argparse.ArgumentParser(
+        description="MLX VLM Model Checker",
+        usage="%(prog)s [-h] [-f FOLDER | -i IMAGE] [options]",
+        formatter_class=_ConditionalDefaultsHelpFormatter,
+    )
+
+    _add_input_arguments(parser)
+    output_group = parser.add_argument_group("Output Reports")
+    _add_output_path_arguments(output_group)
+    _add_model_prompt_generation_arguments(parser)
+    _add_runtime_workflow_console_arguments(parser)
     return parser
 
 
