@@ -23,6 +23,8 @@ import logging
 import stat
 from pathlib import Path
 
+from tools.safe_io import write_text_no_follow
+
 logger = logging.getLogger("precommit")
 
 PRECOMMIT_HOOK_CONTENT = r"""#!/usr/bin/env bash
@@ -47,12 +49,16 @@ def _install_hook(hooks_dir: Path, hook_name: str, content: str) -> None:
     hook_path = hooks_dir / hook_name
     backup_path = hooks_dir / f"{hook_name}.bak"
 
+    if hook_path.is_symlink():
+        msg = f"Refusing to replace symlinked hook: {hook_path}"
+        raise OSError(msg)
+
     if hook_path.exists():
         # Backup existing hook
         hook_path.replace(backup_path)
         logger.info("[hooks] Existing %s backed up to %s", hook_name, backup_path)
 
-    hook_path.write_text(content)
+    write_text_no_follow(hook_path, content)
     # Make executable
     mode = hook_path.stat().st_mode
     hook_path.chmod(mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)

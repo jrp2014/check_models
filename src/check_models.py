@@ -11764,6 +11764,161 @@ def _build_markdown_gallery_navigation(report_context: ReportRenderContext) -> l
     return parts
 
 
+GALLERY_STAMP_LIBRARY_NAMES: Final[tuple[str, ...]] = (
+    "mlx-vlm",
+    "mlx",
+    "mlx-metal",
+    "mlx-lm",
+    "transformers",
+    "tokenizers",
+    "huggingface-hub",
+)
+GALLERY_STAMP_SYSTEM_KEYS: Final[tuple[str, ...]] = (
+    "Python Version",
+    "OS",
+    "macOS Version",
+    "GPU/Chip",
+)
+GALLERY_QUALITY_SUMMARY_PREVIEW_CHARS: Final[int] = 320
+
+
+def _markdown_inline_code(value: str) -> str:
+    """Return a safe inline-code span for generated Markdown table cells."""
+    escaped = MARKDOWN_ESCAPER.escape(value).replace("`", "&#96;")
+    return f"`{escaped}`"
+
+
+def _build_gallery_stamps_section(
+    *,
+    versions: LibraryVersionDict | None,
+    system_info: Mapping[str, str],
+) -> list[str]:
+    """Build package and runtime stamps for the standalone gallery artifact."""
+    if not versions:
+        return []
+
+    component_rows = _collect_report_component_rows(
+        versions=versions or {},
+        system_info=system_info,
+        library_names=GALLERY_STAMP_LIBRARY_NAMES,
+        system_keys=GALLERY_STAMP_SYSTEM_KEYS,
+    )
+    if not component_rows:
+        return []
+
+    library_names = set(GALLERY_STAMP_LIBRARY_NAMES)
+    parts: list[str] = ["## Run Stamps", ""]
+    for name, value in component_rows:
+        if name in library_names:
+            parts.append(
+                f"- {_markdown_inline_code(name)}: {_markdown_inline_code(value)}",
+            )
+        else:
+            _append_markdown_labeled_value(parts, label=name, value=value, bullet=True)
+    parts.append("")
+    return parts
+
+
+def _gallery_summary_model_link(model_name: str) -> str:
+    """Return a safe self-link for a model row in the gallery summary table."""
+    escaped_name = MARKDOWN_ESCAPER.escape(model_name)
+    return f"[`{escaped_name}`](#{_gallery_model_anchor(model_name)})"
+
+
+def _gallery_summary_status(result: PerformanceResult) -> str:
+    """Return a compact user-facing status for the gallery summary table."""
+    review = _build_jsonl_review_record(result)
+    if review is None:
+        status = "recommended" if result.success else "avoid"
+        verdict = "not evaluated" if result.success else "runtime failure"
+    else:
+        status = review["user_bucket"].replace("_", " ")
+        verdict = _humanize_review_verdict_text(review["verdict"])
+    return f"{_markdown_inline_code(status)} / {_markdown_inline_code(verdict)}"
+
+
+def _gallery_summary_signal(result: PerformanceResult) -> str:
+    """Return the highest-level quality or diagnostic cue for one table row."""
+    cues = _build_result_output_cues(result)
+    if cues:
+        signal = "; ".join(cues)
+    else:
+        signal = "no flagged signals"
+        analysis = _quality_analysis_for_result(result)
+        if result.success:
+            if analysis is None:
+                signal = "quality not evaluated"
+            elif not analysis.prompt_checks_ran:
+                signal = "prompt checks unavailable"
+            elif not analysis.has_any_issues():
+                signal = "clean"
+
+        if signal == "no flagged signals":
+            review = _build_jsonl_review_record(result)
+            if review is not None:
+                focus = _review_focus_text(review, analysis)
+                if focus != "no flagged signals":
+                    signal = _markdown_review_text(focus)
+
+        if signal == "no flagged signals":
+            signal = result.error_stage or result.error_package or signal
+    return signal
+
+
+def _gallery_summary_preview(result: PerformanceResult) -> str:
+    """Return the response or failure-diagnostic preview for one summary row."""
+    preview = _build_result_output_preview(
+        result,
+        max_chars=GALLERY_QUALITY_SUMMARY_PREVIEW_CHARS,
+    )
+    if preview:
+        return _collapse_preview_whitespace(preview)
+    if result.success:
+        return "No generated text captured."
+    return "No failure diagnostics captured."
+
+
+def _build_gallery_quality_summary_section(
+    report_context: ReportRenderContext,
+) -> list[str]:
+    """Build an issue-style per-model quality table for the gallery artifact."""
+    rows = [
+        (
+            _gallery_summary_model_link(result.model_name),
+            _gallery_summary_status(result),
+            MARKDOWN_ESCAPER.escape(_gallery_summary_signal(result)),
+            MARKDOWN_ESCAPER.escape(_gallery_summary_preview(result)),
+        )
+        for result in report_context.result_set.results
+    ]
+    if not rows:
+        return []
+
+    table_lines = render_report_markdown(
+        (
+            ReportTable(
+                headers=("Model", "Result", "Quality / diagnostic", "Response / diagnostic"),
+                rows=tuple(rows),
+                markdown_escaped=True,
+            ),
+        )
+    )
+    return [
+        "## Model Quality Summary",
+        "",
+        (
+            "Skim-first view of what each model returned, or the strongest diagnostic "
+            "when it did not produce usable output."
+        ),
+        "",
+        "<!-- markdownlint-disable MD013 MD034 -->",
+        "",
+        *table_lines,
+        "<!-- markdownlint-enable MD013 MD034 -->",
+        "",
+    ]
+
+
 # =============================================================================
 # DIAGNOSTICS REPORT — Upstream issue filing aid
 # =============================================================================
@@ -15894,8 +16049,9 @@ def generate_markdown_gallery_report(
     prompt: str,
     metadata: MetadataDict | None = None,
     report_context: ReportRenderContext | None = None,
+    versions: LibraryVersionDict | None = None,
 ) -> None:
-    """Write a review-focused markdown artifact with metadata, prompt, and full outputs."""
+    """Write a review-focused markdown artifact with metadata, prompt, summaries, and outputs."""
     if not results:
         log_warning_note("No results to generate Markdown gallery report.")
         return
@@ -15917,11 +16073,18 @@ def generate_markdown_gallery_report(
     md.append("")
     md.append("_Action Snapshot: see [results.md](results.md) for the full summary._")
     md.append("")
+    md.extend(
+        _build_gallery_stamps_section(
+            versions=versions,
+            system_info=report_context.system_info,
+        )
+    )
     md.extend(_format_review_priorities_parts(report_context, html_output=False))
     md.extend(_format_failures_by_package_parts(results, html_output=False))
     _append_markdown_image_metadata_section(md, metadata)
     md.append("## Prompt")
     _append_markdown_wrapped_blockquote(md, prompt)
+    md.extend(_build_gallery_quality_summary_section(report_context))
     md.extend(_build_markdown_gallery_navigation(report_context))
     md.extend(_generate_model_gallery_section(report_context))
 
@@ -24113,6 +24276,7 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
                 prompt=inputs.prompt,
                 metadata=inputs.metadata,
                 report_context=inputs.report_context,
+                versions=inputs.library_versions,
             ),
         ),
         ReportArtifact(

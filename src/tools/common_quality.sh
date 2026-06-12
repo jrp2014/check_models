@@ -3,40 +3,25 @@
 
 CONDA_ENV="${CONDA_ENV:-mlx-vlm}"
 
-quality_source_conda_sh() {
-    local conda_sh_path="$1"
-
-    if [ ! -f "$conda_sh_path" ]; then
-        return 1
-    fi
-
-    # shellcheck disable=SC1090,SC1091
-    source "$conda_sh_path"
-}
-
-quality_find_conda_sh() {
-    local conda_base=""
+quality_find_conda_bin() {
     local candidate=""
 
     if command -v conda >/dev/null 2>&1; then
-        conda_base="$(conda info --base 2>/dev/null || true)"
-        if [ -n "$conda_base" ] && [ -f "$conda_base/etc/profile.d/conda.sh" ]; then
-            printf '%s\n' "$conda_base/etc/profile.d/conda.sh"
-            return 0
-        fi
+        command -v conda
+        return 0
     fi
 
     for candidate in \
-        "$HOME/miniconda3/etc/profile.d/conda.sh" \
-        "$HOME/miniforge3/etc/profile.d/conda.sh" \
-        "$HOME/mambaforge/etc/profile.d/conda.sh" \
-        "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" \
-        "/opt/homebrew/Caskroom/miniforge/base/etc/profile.d/conda.sh" \
-        "/opt/homebrew/Caskroom/mambaforge/base/etc/profile.d/conda.sh" \
-        "/opt/homebrew/anaconda3/etc/profile.d/conda.sh" \
-        "$HOME/anaconda3/etc/profile.d/conda.sh"
+        "$HOME/miniconda3/bin/conda" \
+        "$HOME/miniforge3/bin/conda" \
+        "$HOME/mambaforge/bin/conda" \
+        "/opt/homebrew/Caskroom/miniconda/base/bin/conda" \
+        "/opt/homebrew/Caskroom/miniforge/base/bin/conda" \
+        "/opt/homebrew/Caskroom/mambaforge/base/bin/conda" \
+        "/opt/homebrew/anaconda3/bin/conda" \
+        "$HOME/anaconda3/bin/conda"
     do
-        if [ -f "$candidate" ]; then
+        if [ -x "$candidate" ]; then
             printf '%s\n' "$candidate"
             return 0
         fi
@@ -58,22 +43,11 @@ quality_repo_root() {
 }
 
 quality_activate_conda() {
-    local conda_sh_path=""
-
-    if [ -n "${CONDA_PREFIX:-}" ]; then
-        return 0
-    fi
-
-    if conda_sh_path="$(quality_find_conda_sh)"; then
-        quality_source_conda_sh "$conda_sh_path"
-    fi
-
-    if command -v conda >/dev/null 2>&1; then
-        conda activate "$CONDA_ENV" 2>/dev/null || true
-    fi
+    return 0
 }
 
 quality_find_conda_env_python() {
+    local conda_bin=""
     local env_prefix=""
     local env_python=""
     local candidate_base=""
@@ -86,8 +60,8 @@ quality_find_conda_env_python() {
         fi
     fi
 
-    if command -v conda >/dev/null 2>&1; then
-        env_prefix="$(conda env list 2>/dev/null | awk -v env_name="$CONDA_ENV" '$1 == env_name { print $NF; exit }')"
+    if conda_bin="$(quality_find_conda_bin)"; then
+        env_prefix="$("$conda_bin" env list 2>/dev/null | awk -v env_name="$CONDA_ENV" '$1 == env_name { print $NF; exit }')"
         if [ -n "$env_prefix" ] && [ -x "$env_prefix/bin/python" ]; then
             printf '%s\n' "$env_prefix/bin/python"
             return 0

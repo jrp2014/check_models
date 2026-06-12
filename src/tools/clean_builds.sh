@@ -24,6 +24,17 @@ set -euo pipefail
 
 DRY_RUN=0
 
+show_help() {
+	cat <<'EOF'
+Clean build artifacts and caches from local MLX development repositories.
+
+Usage:
+  bash tools/clean_builds.sh              # Clean local MLX repos + check_models project
+  bash tools/clean_builds.sh --dry-run    # Show what would be cleaned
+  bash tools/clean_builds.sh --help       # Show this help
+EOF
+}
+
 # Parse arguments
 for arg in "$@"; do
 	case $arg in
@@ -32,7 +43,7 @@ for arg in "$@"; do
 			shift
 			;;
 		--help|-h)
-			head -n 17 "$0" | tail -n +2 | sed 's/^# //'
+			show_help
 			exit 0
 			;;
 		*)
@@ -61,6 +72,37 @@ echo ""
 
 TOTAL_CLEANED=0
 
+remove_direct_child_dir() {
+	local parent_dir=$1
+	local child_name=$2
+	local target=""
+
+	case $child_name in
+		build|dist|.eggs)
+			;;
+		*)
+			echo "Refusing to remove unexpected direct child: $child_name" >&2
+			return 1
+			;;
+	esac
+
+	target="$parent_dir/$child_name"
+	if [[ ! -d "$target" ]]; then
+		return 0
+	fi
+
+	case "$target" in
+		"$parent_dir"/*)
+			;;
+		*)
+			echo "Refusing to remove path outside parent: $target" >&2
+			return 1
+			;;
+	esac
+
+	find "$target" -depth -delete
+}
+
 # Clean function
 clean_directory() {
 	local dir=$1
@@ -81,7 +123,7 @@ clean_directory() {
 			if [[ $DRY_RUN -eq 1 ]]; then
 				echo "  [DRY RUN] Would remove: $pattern/"
 			else
-				rm -rf "${dir:?}/$pattern"
+				remove_direct_child_dir "$dir" "$pattern"
 				echo "  ✓ Removed: $pattern/"
 			fi
 			((cleaned++))
@@ -278,7 +320,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 echo "Note: Metal kernel caches are managed by macOS and persist in"
 echo "system temp directories. They're automatically cleared on reboot."
-echo "To manually clear: sudo rm -rf /tmp/com.apple.metal/* (use with caution)"
+echo "Inspect /tmp/com.apple.metal/ before removing any specific stale cache files."
 echo ""
 echo "Build artifacts cleaned. To rebuild MLX repos from scratch:"
 echo "  cd /path/to/mlx && cmake -S . -B build && cmake --build build"

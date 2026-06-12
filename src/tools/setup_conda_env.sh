@@ -65,7 +65,12 @@ fi
 # Ensure we are in the project root (src directory)
 cd "$(dirname "$0")/.." || exit 1
 
+# Reuse the shared conda executable resolver used by local quality and hook scripts.
+# shellcheck source=tools/common_quality.sh
+source "tools/common_quality.sh"
+
 ENV_NAME="${1:-$DEFAULT_ENV_NAME}"
+CONDA_BIN=""
 
 # Colors for output
 RED='\033[0;31m'
@@ -91,10 +96,40 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+conda_cmd() {
+    if [[ -z "${CONDA_BIN:-}" ]]; then
+        log_error "conda executable has not been resolved"
+        exit 1
+    fi
+
+    "$CONDA_BIN" "$@"
+}
+
+conda_env_prefix() {
+    local env_name="$1"
+
+    conda_cmd env list 2>/dev/null | awk -v env_name="$env_name" '$1 == env_name { print $NF; exit }'
+}
+
+activate_environment_path() {
+    local env_prefix=""
+
+    env_prefix="$(conda_env_prefix "$ENV_NAME")"
+    if [[ -z "$env_prefix" || ! -x "$env_prefix/bin/python" ]]; then
+        log_error "Unable to resolve Python for conda environment '$ENV_NAME'"
+        exit 1
+    fi
+
+    export CONDA_PREFIX="$env_prefix"
+    export CONDA_DEFAULT_ENV="$ENV_NAME"
+    export PATH="$CONDA_PREFIX/bin:$PATH"
+    log_info "Using environment prefix: $CONDA_PREFIX"
+}
+
 install_cmake() {
     log_info "Installing cmake (required for optional local MLX source builds)..."
 
-    if conda install -n "$ENV_NAME" -c conda-forge cmake -y; then
+    if conda_cmd install -n "$ENV_NAME" -c conda-forge cmake -y; then
         log_success "Installed cmake from conda-forge"
         return 0
     fi
@@ -109,45 +144,15 @@ install_cmake() {
     exit 1
 }
 
-source_conda_sh() {
-    local conda_sh_path="$1"
-
-    if [ ! -f "$conda_sh_path" ]; then
-        return 1
-    fi
-
-    # shellcheck disable=SC1090,SC1091
-    source "$conda_sh_path"
-}
-
 # Check if conda is available
 check_conda() {
-    # Try to find conda if not in PATH
-    if ! command -v conda &> /dev/null; then
-        if source_conda_sh "$HOME/miniconda3/etc/profile.d/conda.sh"; then
-            :
-        elif source_conda_sh "$HOME/miniforge3/etc/profile.d/conda.sh"; then
-            :
-        elif source_conda_sh "$HOME/mambaforge/etc/profile.d/conda.sh"; then
-            :
-        elif source_conda_sh "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"; then
-            :
-        elif source_conda_sh "/opt/homebrew/Caskroom/miniforge/base/etc/profile.d/conda.sh"; then
-            :
-        elif source_conda_sh "/opt/homebrew/Caskroom/mambaforge/base/etc/profile.d/conda.sh"; then
-            :
-        elif source_conda_sh "$HOME/anaconda3/etc/profile.d/conda.sh"; then
-            :
-        fi
-    fi
-
-    if ! command -v conda &> /dev/null; then
+    if ! CONDA_BIN="$(quality_find_conda_bin)"; then
         log_error "conda is not installed or not in PATH"
         log_info "Please install Miniconda or Anaconda first:"
         log_info "  https://docs.conda.io/en/latest/miniconda.html"
         exit 1
     fi
-    log_info "Found conda: $(conda --version)"
+    log_info "Found conda: $("$CONDA_BIN" --version)"
 }
 
 # Check if we're on macOS (required for MLX)
@@ -167,16 +172,19 @@ check_platform() {
 
 # Create conda environment
 create_environment() {
+    local existing_env_prefix=""
+
     log_info "Creating conda environment: $ENV_NAME"
 
     # Check if environment already exists
-    if conda env list | grep -q "^$ENV_NAME "; then
+    existing_env_prefix="$(conda_env_prefix "$ENV_NAME")"
+    if [[ -n "$existing_env_prefix" ]]; then
         log_warn "Environment '$ENV_NAME' already exists"
         read -p "Do you want to remove and recreate it? (y/N): " -n 1 -r
         echo
         if [[ $REPLY =~ ^[Yy]$ ]]; then
             log_info "Removing existing environment..."
-            conda env remove -n "$ENV_NAME" -y
+            conda_cmd env remove -n "$ENV_NAME" -y
         else
             log_info "Updating existing environment instead..."
             return 0
@@ -185,7 +193,7 @@ create_environment() {
 
     # Create new environment with Python 3.13
     log_info "Creating new environment with Python 3.13..."
-    conda create -n "$ENV_NAME" python=3.13 -y
+    conda_cmd create -n "$ENV_NAME" python=3.13 -y
 
     log_success "Environment '$ENV_NAME' created successfully"
 }
@@ -194,12 +202,7 @@ create_environment() {
 install_dependencies() {
     log_info "Installing dependencies in environment: $ENV_NAME"
 
-    # Activate environment
-    # Initialize conda for this shell session
-    echo "Initializing conda for bash..."
-    # shellcheck disable=SC1091
-    source "$(conda info --base)/etc/profile.d/conda.sh"
-    conda activate "$ENV_NAME"
+    activate_environment_path
 
     # Check for pyproject.toml
     if [[ ! -f "pyproject.toml" ]]; then
@@ -211,7 +214,7 @@ install_dependencies() {
     install_cmake
 
     log_info "Installing project in editable mode with recommended runtime/model support..."
-    pip install -e ".[extras,torch]"
+    python -m pip install -e ".[extras,torch]"
     log_success "Installed runtime, extras, and torch-backed model dependencies"
 
     # Development dependencies (optional)
@@ -221,9 +224,9 @@ install_dependencies() {
         log_info "Installing development dependencies..."
         # Try to install via extras if available, otherwise fallback to manual
         if grep -q "dev =" pyproject.toml; then
-             pip install -e ".[dev]"
+             python -m pip install -e ".[dev]"
         else
-             pip install "ruff>=0.1.0" "mypy>=1.8.0" "ty" "pyrefly" "vulture>=2.16" "pytest>=8.0.0" "pytest-cov>=4.0.0" "pydantic>=2.0.0" "types-defusedxml" "pre-commit"
+             python -m pip install "ruff>=0.1.0" "mypy>=1.8.0" "ty" "pyrefly" "vulture>=2.16" "pytest>=8.0.0" "pytest-cov>=4.0.0" "pydantic>=2.0.0" "types-defusedxml" "pre-commit"
         fi
 
         if command -v npm &> /dev/null; then

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import ast
 import json
+import logging
 import re
 import subprocess
 import sys
@@ -21,7 +22,13 @@ import yaml
 from packaging.requirements import Requirement
 
 from check_models_data import dependency_policy
-from tools import bugtest, check_suppressions, generate_stubs, update_readme_deps
+from tools import (
+    bugtest,
+    check_suppressions,
+    generate_stubs,
+    install_precommit_hook,
+    update_readme_deps,
+)
 
 _TEST_FILE = Path(__file__).resolve()
 # tests/ parent, then package root (vlm)
@@ -335,6 +342,65 @@ def test_conda_setup_uses_current_huggingface_cli_installation() -> None:
 
     assert '"huggingface_hub[cli]"' not in setup_script
     assert "command -v hf" in setup_script
+
+
+@pytest.mark.subprocess
+def test_common_quality_finds_conda_executable_without_sourcing_conda_sh(tmp_path: Path) -> None:
+    """Quality helpers should resolve conda directly instead of sourcing conda.sh."""
+    fake_conda = tmp_path / "miniconda3" / "bin" / "conda"
+    fake_conda.parent.mkdir(parents=True)
+    fake_conda.write_text("#!/usr/bin/env bash\nexit 0\n", encoding="utf-8")
+    fake_conda.chmod(0o755)
+
+    output_path = tmp_path / "conda-bin.txt"
+    run_script = tmp_path / "check_common_quality_conda_bin.sh"
+    run_script.write_text(
+        dedent(
+            f"""\
+            #!/usr/bin/env bash
+            set -euo pipefail
+            export HOME="{tmp_path}"
+            export PATH=/usr/bin:/bin
+            source "{PKG_ROOT / "tools" / "common_quality.sh"}"
+            quality_find_conda_bin > "{output_path}"
+            """
+        ),
+        encoding="utf-8",
+    )
+    run_script.chmod(0o755)
+
+    result = subprocess.run(  # noqa: S603
+        ["/bin/bash", str(run_script)],
+        capture_output=True,
+        text=True,
+        check=False,
+        cwd=PKG_ROOT,
+    )
+
+    assert result.returncode == 0, result.stderr or result.stdout
+    assert output_path.read_text(encoding="utf-8").strip() == str(fake_conda)
+
+
+def test_conda_setup_uses_conda_executable_without_sourcing_conda_sh() -> None:
+    """Setup should use conda directly and avoid dynamic conda.sh sourcing."""
+    setup_script = (PKG_ROOT / "tools" / "setup_conda_env.sh").read_text(encoding="utf-8")
+
+    assert "source_conda_sh" not in setup_script
+    assert "conda info --base" not in setup_script
+    assert 'conda activate "$ENV_NAME"' not in setup_script
+    assert "conda_cmd()" in setup_script
+    assert "activate_environment_path()" in setup_script
+
+
+def test_clean_builds_uses_static_help_and_guarded_direct_child_removal() -> None:
+    """Cleanup tooling should avoid self-read help and unguarded direct-child rm calls."""
+    clean_script = (PKG_ROOT / "tools" / "clean_builds.sh").read_text(encoding="utf-8")
+
+    assert 'head -n 17 "$0"' not in clean_script
+    assert "show_help()" in clean_script
+    assert "remove_direct_child_dir()" in clean_script
+    assert 'rm -rf "${dir:?}/$pattern"' not in clean_script
+    assert "sudo rm -rf" not in clean_script
 
 
 def test_packaged_quality_config_is_the_only_default_source() -> None:
@@ -704,6 +770,61 @@ def test_patch_stub_file_applies_replacements_and_reports_change(tmp_path: Path)
     assert changed is True
     assert "value: str | None = None" in stub_path.read_text(encoding="utf-8")
     assert generate_stubs._patch_stub_file(stub_path, []) is False
+
+
+def test_patch_stub_file_rejects_symlink_target(tmp_path: Path) -> None:
+    """Stub patching should not follow a symlink target."""
+    target_path = tmp_path / "target.pyi"
+    target_path.write_text("def f(value: str = None) -> None: ...\n", encoding="utf-8")
+    stub_path = tmp_path / "sample.pyi"
+    stub_path.symlink_to(target_path)
+
+    with pytest.raises(OSError, match="symlink"):
+        generate_stubs._patch_stub_file(
+            stub_path,
+            [(re.compile(r"(value:\s*str)\s*=\s*None"), r"\1 | None = None")],
+        )
+
+    assert target_path.read_text(encoding="utf-8") == "def f(value: str = None) -> None: ...\n"
+
+
+def test_write_stub_manifest_rejects_symlink_target(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Stub manifest writes should not follow a symlink target."""
+    versions = {"tokenizers": "0.22.2", "mypy": "1.18.0"}
+
+    def _installed_version(distribution: str) -> str | None:
+        return versions.get(distribution)
+
+    typings_dir = tmp_path / "typings"
+    typings_dir.mkdir()
+    target_path = tmp_path / "target-manifest.json"
+    manifest_path = typings_dir / generate_stubs.STUB_MANIFEST
+    manifest_path.symlink_to(target_path)
+    monkeypatch.setattr(generate_stubs, "_installed_distribution_version", _installed_version)
+    caplog.set_level(logging.WARNING, logger="generate_stubs")
+
+    generate_stubs._write_stub_manifest(["tokenizers"], typings_dir)
+
+    assert not target_path.exists()
+    assert "Refusing to follow symlink" in caplog.text
+
+
+def test_install_hook_rejects_symlink_target(tmp_path: Path) -> None:
+    """Hook installation should not write through a symlink target."""
+    hooks_dir = tmp_path / "hooks"
+    hooks_dir.mkdir()
+    target_path = tmp_path / "target-hook"
+    hook_path = hooks_dir / "pre-commit"
+    hook_path.symlink_to(target_path)
+
+    with pytest.raises(OSError, match="symlink"):
+        install_precommit_hook._install_hook(hooks_dir, "pre-commit", "#!/usr/bin/env bash\n")
+
+    assert not target_path.exists()
 
 
 def test_update_script_verifies_stub_integrity_and_logs_local_provenance() -> None:

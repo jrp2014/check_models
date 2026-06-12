@@ -211,7 +211,7 @@ verify_expected_editable_install() {
 		return 1
 	fi
 
-	echo "✓ Verified editable install: $package_name -> $editable_abs"
+	echo "✓ Verified editable install: $package_name"
 }
 
 get_installed_distribution_version() {

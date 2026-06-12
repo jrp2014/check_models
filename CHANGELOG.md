@@ -7,11 +7,17 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Add issue-style quality summaries and package/runtime stamps to the Markdown
+  gallery report so full-run model output reviews are easier to paste into
+  GitHub issues.
 - Make `--eval-mode` default to metadata-aware `auto`, selecting `stress` for
   images with extracted metadata and the shorter `triage` lane for metadata-free
   images while preserving explicit mode choices.
 - Clarify agent workflow guidance so Ruff formatting and safe lint fixes run
   before the full `make quality` gate.
+- Harden maintenance tooling by avoiding dynamic `conda.sh` sourcing, adding
+  symlink-resistant text writes for generated stubs and hooks, and narrowing
+  cleanup-script delete/help paths.
 
 
 ## [0.8.0] - 2026-06-06

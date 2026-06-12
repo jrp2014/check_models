@@ -852,6 +852,52 @@ class TestMarkdownGalleryReport:
         assert "### ✅ org/good" in content
         assert "### ❌ org/bad" in content
 
+    def test_gallery_includes_issue_style_quality_summary_and_version_stamps(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Gallery should provide a pasteable run summary with package version stamps."""
+        out = tmp_path / "model_gallery.md"
+        generate_markdown_gallery_report(
+            results=[
+                _make_quality_success("org/good", with_quality_issue=False),
+                _make_harness_success(
+                    "org/risky",
+                    text="answer with | pipe and <think>leaked marker</think>",
+                    harness_type="stop_token",
+                    harness_detail="token_leak:<|end|>",
+                ),
+                _make_failure("org/bad", error_package="mlx-vlm"),
+            ],
+            filename=out,
+            prompt="Describe this image briefly.",
+            versions=_stub_versions(),
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "## Run Stamps" in content
+        assert "- `mlx-vlm`: `0.1`" in content
+        assert "- `mlx`: `0.1`" in content
+        assert "## Model Quality Summary" in content
+
+        summary = _extract_markdown_subsection(
+            content,
+            "## Model Quality Summary",
+            end_headings=("## Image Metadata", "## Prompt", "## Quick Navigation"),
+        )
+        assert "Response / diagnostic" in summary
+        assert "[`org/good`](#model-org-good)" in summary
+        assert "quality output" in summary
+        assert "[`org/risky`](#model-org-risky)" in summary
+        assert "`avoid` / `harness`" in summary
+        assert "harness:stop-token" in summary
+        assert r"answer with \| pipe" in summary
+        assert "&lt;think&gt;leaked marker&lt;/think&gt;" in summary
+        assert "[`org/bad`](#model-org-bad)" in summary
+        assert "`avoid` / `runtime failure`" in summary
+        assert "mlx-vlm; load" in summary
+        assert "Error: load - boom" in summary
+
     def test_review_report_groups_owner_and_user_buckets(self, tmp_path: Path) -> None:
         """Review digest should group maintainer ownership and user-facing buckets."""
         out = tmp_path / "review.md"

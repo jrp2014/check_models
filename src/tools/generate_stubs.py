@@ -30,6 +30,8 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from tools.safe_io import write_text_no_follow
+
 if TYPE_CHECKING:  # TC003: typing-only import
     from collections.abc import Iterable, Mapping
 
@@ -394,7 +396,7 @@ def _patch_stub_file(path: Path, patches: list[tuple[re.Pattern[str], str]]) -> 
         text = pattern.sub(repl, text)
     if text == original:
         return False
-    path.write_text(text, encoding="utf-8")
+    write_text_no_follow(path, text)
     return True
 
 
@@ -704,9 +706,9 @@ def _write_stub_manifest(packages: Iterable[str], typings_dir: Path = TYPINGS_DI
 
     manifest_path = _stub_manifest_path(typings_dir)
     try:
-        manifest_path.write_text(
+        write_text_no_follow(
+            manifest_path,
             json.dumps(updated_manifest, indent=2, sort_keys=True) + "\n",
-            encoding="utf-8",
         )
     except OSError as err:
         logger.warning("[stubs] Failed to write manifest %s: %s", manifest_path, err)
