@@ -75,7 +75,7 @@ _Action Snapshot: see [results.md](results.md) for the full summary._
 
 Skim-first view of what each model returned, or the strongest diagnostic when it did not produce usable output.
 
-<!-- markdownlint-disable MD013 MD034 -->
+<!-- markdownlint-disable MD034 -->
 
 | Model                                                                                                                   | Result                      | Quality / diagnostic                 | Response / diagnostic                                                                                                                                                                                                                                                                                                                                                         |
 |-------------------------------------------------------------------------------------------------------------------------|-----------------------------|--------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -138,7 +138,7 @@ Skim-first view of what each model returned, or the strongest diagnostic when it
 | [`meta-llama/Llama-3.2-11B-Vision-Instruct`](#model-meta-llama-llama-32-11b-vision-instruct)                            | `recommended` / `clean`     | clean                                | The image shows two tabby cats lying on a pink blanket, with two remote controls placed on the couch behind them. The cat on the left is a kitten with a fluffy tail and a green collar, while the cat on the ri ... [tail] appears to be a playful and cozy scene, with the cats seemingly enjoying a relaxing moment together.                                              |
 | [`mlx-community/paligemma2-10b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-10b-ft-docci-448-bf16)               | `recommended` / `clean`     | clean                                | A top-down view of two cats laying on a pink blanket. The cat on the left is a gray tabby cat with black stripes and a black tail. It is laying on its side with its head on the pink blanket and its body facin ... [tail] mote control on the left side of the image and a gray remote control on the right side of the image.                                              |
 | [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `avoid` / `cutoff degraded` | cutoff; reasoning-leak               | [cutoff; reasoning-leak] ◁think▷So, let's describe the image. First, there are two tabby cats on a pink fabric surface. The cat on the left is lying on its side, facing the other cat, with a remote control near its h ... [tail] cat, with a light - colored remote control near its head. The cat on the right is positioned                                              |
-<!-- markdownlint-enable MD013 MD034 -->
+<!-- markdownlint-enable MD034 -->
 
 ## Quick Navigation
 
