@@ -62,12 +62,14 @@ The file is organized in this order — use these landmarks to jump to the right
 
 | Target | What it does |
 | -------- | ------------- |
-| `make quality` | **Primary gate**: ruff format + lint + mypy + ty + pyrefly + vulture + pytest + shellcheck + markdownlint |
+| `make quality` | **Primary gate**: checks Ruff formatting + lint, mypy, ty, pyrefly, vulture, pytest, shellcheck, markdownlint |
 | `make vulture` | Run Vulture dead-code scan for `src/check_models.py` and `src/tools/`. *Note: Vulture commonly flags `TypedDict` keys and `Protocol` signatures as "unused" because they are evaluated statically and not tracked natively in runtime logic flows. Treat these as false positives.* |
 | `make test` | `pytest src/tests/ -v` |
 | `make dev` | Install editable with `[dev,extras,torch]` |
 | `make install` | Install editable (runtime only) |
-| `make format` | `ruff format src/` |
+| `make format` | Apply `ruff format src/` before running the full quality gate |
+| `make -C src lint-fix` | Apply safe Ruff lint fixes (`ruff check --fix`) before running the full quality gate |
+| `make lint` | Run Ruff lint early so lint errors are cleared before the full quality gate |
 | `make ci` | Full strict CI pipeline |
 | `make stubs` | Auto-generate `typings/` stubs for `mlx-lm`, `mlx-vlm`, `transformers`, `tokenizers` |
 | `make deps-sync` | Sync README dependency blocks with pyproject.toml |
@@ -111,11 +113,14 @@ The file is organized in this order — use these landmarks to jump to the right
 4. Add/update tests in `src/tests/` for the change
 5. If you added imports → update `src/pyproject.toml` then `make deps-sync`
 6. If you added/changed CLI flags → update the CLI reference table in `src/README.md` (§ Command Line Reference)
-7. `make quality` — fix issues until clean
-8. `make test` — ensure no regressions
-9. If report formats changed → update `src/output/` fixtures
-10. Update `CHANGELOG.md` under `[Unreleased]` for any maintainer-relevant change (features, fixes, refactors, tooling/docs workflow updates)
-11. `git commit -m "feat: description"` and push
+7. `make format` — apply Ruff formatting before the full quality gate
+8. `make -C src lint-fix` — apply safe Ruff fixes when lint reports fixable issues
+9. `make lint` — clear Ruff lint errors before running the full gate
+10. `make quality` — fix issues until clean
+11. `make test` — ensure no regressions
+12. If report formats changed → update `src/output/` fixtures
+13. Update `CHANGELOG.md` under `[Unreleased]` for any maintainer-relevant change (features, fixes, refactors, tooling/docs workflow updates)
+14. `git commit -m "feat: description"` and push
 
 ### 10. Agentic skills (`.agents/skills/`)
 

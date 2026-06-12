@@ -25,9 +25,13 @@ cd src && python -m tools.validate_env && cd ..  # quick sanity check
 
 - If you already have `make quality` or CI output, extract the failing
   file/module paths.
-- If not, run:
+- If not, clear formatting and lint failures before the full gate so typing
+  failures are not hidden behind Ruff noise:
 
   ```bash
+  make format
+  make -C src lint-fix
+  make lint
   make quality
   ```
 
@@ -240,9 +244,12 @@ make clean-stubs    # Remove stubs, then regenerate
   make ty
   ```
 
-- Re-run the full pipeline to confirm no regressions:
+- Re-run Ruff cleanup and the full pipeline to confirm no regressions:
 
   ```bash
+  make format
+  make -C src lint-fix
+  make lint
   make quality
   ```
 

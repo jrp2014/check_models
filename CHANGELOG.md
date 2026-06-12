@@ -10,6 +10,8 @@ Notable changes to this project will be documented in this file.
 - Make `--eval-mode` default to metadata-aware `auto`, selecting `stress` for
   images with extracted metadata and the shorter `triage` lane for metadata-free
   images while preserving explicit mode choices.
+- Clarify agent workflow guidance so Ruff formatting and safe lint fixes run
+  before the full `make quality` gate.
 
 
 ## [0.8.0] - 2026-06-06

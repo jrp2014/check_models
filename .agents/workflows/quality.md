@@ -1,5 +1,5 @@
 ---
-description: Run the project's quality suite (formatting, linting, tests, shell, markdown)
+description: Format, lint-fix, then run the project's full quality suite
 ---
 Always run this workflow after editing code in the `check_models` project, or when asked to validate the codebase.
 
@@ -7,5 +7,8 @@ Always run this workflow after editing code in the `check_models` project, or wh
 // turbo
 
 ```bash
+conda run -n mlx-vlm make format
+conda run -n mlx-vlm make -C src lint-fix
+conda run -n mlx-vlm make lint
 conda run -n mlx-vlm make quality
 ```
