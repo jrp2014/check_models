@@ -22,8 +22,9 @@ if [ "$#" -eq 1 ]; then
     esac
 fi
 
+set --
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck disable=SC1091
 source "$SCRIPT_DIR/common_quality.sh"
 
 cd "$(quality_src_root)"
@@ -87,7 +88,7 @@ echo "=== Ty Type Check ==="
 quality_run_ty_check check_models.py
 
 echo "=== Pyrefly Type Check ==="
-quality_run_pyrefly_check
+quality_run_pyrefly_check "$@"
 
 echo "=== Vulture Dead Code Check ==="
 quality_run_python_tool vulture

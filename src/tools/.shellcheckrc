@@ -1,0 +1,3 @@
+# Allow ShellCheck to follow sourced helper files in repo-managed scripts.
+external-sources=true
+source-path=SCRIPTDIR

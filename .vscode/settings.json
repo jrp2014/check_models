@@ -1,4 +1,9 @@
 {
+  // Tell the VS Code ShellCheck extension to follow sourced files (-x),
+  // consistent with the src/tools/.shellcheckrc used by CLI and make quality.
+  "shellcheck.customArgs": [
+    "-x"
+  ],
   // Make the `src` package importable for analysis and tests
   "python.analysis.extraPaths": [
     "${workspaceFolder}/src"
