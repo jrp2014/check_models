@@ -1,32 +1,31 @@
 <!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
 
-# \[mlx-vlm / mlx\]\[Long-context collapse\] Long-context generation collapsed or became too short affecting 1 model(s)
+# \[mlx-vlm\]\[mlx-vlm: Model load / model error\] mlx-vlm: Model load / model error: property 'eos_token_id' of 'ModelConfig' object has no setter affecting 1 model(s)
 
 ## Summary
 
-1 model(s) show **Long-context collapse** that should be filed against mlx-vlm first; MLX if cache/runtime reproduces.
+1 model(s) show **mlx-vlm: Model load / model error** that should be filed against mlx-vlm.
 
-- **Observed problem:** Long-context generation collapsed or became too short
-- **Target:** mlx-vlm first; MLX if cache/runtime reproduces
+- **Observed problem:** mlx-vlm: Model load / model error: property 'eos_token_id' of 'ModelConfig' object has no setter
+- **Target:** mlx-vlm
 - **Affected models:** 1
-- **Fixed when:** Full and reduced reruns avoid context collapse.
+- **Fixed when:** Load/generation completes or fails with a narrower owner.
 
 
 ## Affected Models
 
 <!-- markdownlint-disable MD060 -->
 
-| Model                                     | Observed Behavior                                                             | Token Counts                                                                 | Optional Context                                                                                                                                                                           |
-|-------------------------------------------|-------------------------------------------------------------------------------|------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/paligemma2-3b-pt-896-4bit` | generated_tokens~3 \| prompt_tokens=4103, output_tokens=3, output/prompt=0.1% | prompt=4,103 \| output/prompt=0.07% \| nontext burden=100% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260607T203551Z_008_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json) |
+| Model                              | Observed Behavior                                             | Token Counts   | Optional Context                                                                                                                                                                             |
+|------------------------------------|---------------------------------------------------------------|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/MolmoPoint-8B-fp16` | property 'eos_token_id' of 'ModelConfig' object has no setter | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T121808Z_006_mlx-community_MolmoPoint-8B-fp16_MLX_VLM_MODEL_LOAD_MODEL_7cbd53695717.json) |
 <!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
 
-- `mlx-community/paligemma2-3b-pt-896-4bit`: Output appears truncated to about 3 tokens.
-- `mlx-community/paligemma2-3b-pt-896-4bit`: At long prompt length (4103 tokens), output stayed unusually short (3 tokens; ratio 0.1%).
-- Output excerpt: `Cat.`
+- `mlx-community/MolmoPoint-8B-fp16` fails with: Model loading failed: property 'eos_token_id' of 'ModelConfig' object has no setter
+- Root exception: `builtins.AttributeError`: property 'eos_token_id' of 'ModelConfig' object has no setter
 
 
 ## Minimal Reproduction
@@ -36,7 +35,7 @@ These commands use `mlx-vlm` directly so the issue can be reproduced without ins
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/paligemma2-3b-pt-896-4bit --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/MolmoPoint-8B-fp16 --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 Minimal Python repro (representative model):
@@ -46,7 +45,7 @@ from mlx_vlm.generate import generate
 from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load
 
-MODEL = 'mlx-community/paligemma2-3b-pt-896-4bit'
+MODEL = 'mlx-community/MolmoPoint-8B-fp16'
 IMAGE = '/Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg'
 PROMPT = 'Describe this image briefly.'
 LOAD_KWARGS = {'trust_remote_code': True}
@@ -83,40 +82,41 @@ Generation/load config:
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "mlx-community/paligemma2-3b-pt-896-4bit"
+  "model": "mlx-community/MolmoPoint-8B-fp16"
 }
 ```
 
 Optional advanced context:
 
-- `mlx-community/paligemma2-3b-pt-896-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260607T203551Z_008_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json)
+- `mlx-community/MolmoPoint-8B-fp16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T121808Z_006_mlx-community_MolmoPoint-8B-fp16_MLX_VLM_MODEL_LOAD_MODEL_7cbd53695717.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
 ## Expected Fix Signal
 
-- [ ] A same-command rerun and a reduced image/text burden rerun show consistent prompt-token accounting and no long-context collapse.
+- [ ] Affected reruns complete model load and generation, or fail with a narrower configuration/compatibility error that points to the owning layer.
 - [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem.
 
 
 ## Fix Checklist
 
-- [ ] Rerun with reduced image/text burden and compare output recovery.
-- [ ] Compare prompt-token accounting with text-only and image+text prompts.
-- [ ] Inspect cache allocation, prefill step size, and long-context generation behavior.
+- [ ] Inspect the exported error package, load phase, and traceback owner.
+- [ ] Check model config, tokenizer files, and weight shape compatibility.
+- [ ] Compare against installed mlx, mlx-vlm, mlx-lm, transformers, and tokenizers versions.
+- [ ] Reproduce with the single affected model before judging output quality.
 
 
 ## Appendix: Environment
 
 | Component                  | Version                                                                                                                                                  |
 |----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| mlx-vlm                    | 0.6.2                                                                                                                                                    |
-| mlx                        | 0.32.0.dev20260607+8f0e8b14                                                                                                                              |
+| mlx-vlm                    | 0.6.3                                                                                                                                                    |
+| mlx                        | 0.32.0.dev20260612+337f736a                                                                                                                              |
 | mlx-lm                     | 0.31.3                                                                                                                                                   |
 | mlx-audio                  | 0.4.4                                                                                                                                                    |
-| transformers               | 5.10.2                                                                                                                                                   |
+| transformers               | 5.11.0                                                                                                                                                   |
 | tokenizers                 | 0.22.2                                                                                                                                                   |
-| huggingface-hub            | 1.18.0                                                                                                                                                   |
+| huggingface-hub            | 1.19.0                                                                                                                                                   |
 | Python Version             | 3.13.13                                                                                                                                                  |
 | OS                         | Darwin 25.5.0                                                                                                                                            |
 | macOS Version              | 26.5.1                                                                                                                                                   |
@@ -137,22 +137,34 @@ Optional advanced context:
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                                       |
 | MLX Core Extension         | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
 | MLX Metallib               | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (157,751,704 bytes, sha256=ba9913d81d92bbbde42bbc6dda27e80ecb31db6031fa073e6c8aeb0666d47c33) |
-| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,675,136 bytes, sha256=6255fc531acc826e8625f261237f6bb6c75490177d3b769ab70c1ff9f71b6d7f)  |
+| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,676,160 bytes, sha256=811f9557132c55cc5b95a4dcbdb6e3757ed88cfa5bcfabf8b3561959383335a5)  |
 | RAM                        | 128.0 GB                                                                                                                                                 |
 
 
 ## Appendix: Detailed Evidence
 
-### `mlx-community/paligemma2-3b-pt-896-4bit`
+### `mlx-community/MolmoPoint-8B-fp16`
 
-Observed signals:
-
-- Output appears truncated to about 3 tokens.
-- At long prompt length (4103 tokens), output stayed unusually short (3 tokens; ratio 0.1%).
-
-Sample output:
+Observed error:
 
 ```text
-Cat.
+Model loading failed: property 'eos_token_id' of 'ModelConfig' object has no setter
+```
+
+Root exception:
+
+```text
+builtins.AttributeError: property 'eos_token_id' of 'ModelConfig' object has no setter
+```
+
+Traceback tail:
+
+```text
+    setattr(model_config, key, config[key])
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: property 'eos_token_id' of 'ModelConfig' object has no setter
+The above exception was the direct cause of the following exception:
+Traceback (most recent call last):
+ValueError: Model loading failed: property 'eos_token_id' of 'ModelConfig' object has no setter
 ```
 

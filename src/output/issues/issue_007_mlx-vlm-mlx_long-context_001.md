@@ -1,31 +1,32 @@
 <!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
 
-# \[huggingface_hub\]\[Hugging Face Hub: Model load / model error\] Hugging Face Hub: Model load / model error: Operation timed out after 300.0 seconds affecting 1 model(s)
+# \[mlx-vlm / mlx\]\[Long-context collapse\] Long-context generation collapsed or became too short affecting 1 model(s)
 
 ## Summary
 
-1 model(s) show **Hugging Face Hub: Model load / model error** that should be filed against huggingface_hub.
+1 model(s) show **Long-context collapse** that should be filed against mlx-vlm first; MLX if cache/runtime reproduces.
 
-- **Observed problem:** Hugging Face Hub: Model load / model error: Operation timed out after 300.0 seconds
-- **Target:** huggingface_hub
+- **Observed problem:** Long-context generation collapsed or became too short
+- **Target:** mlx-vlm first; MLX if cache/runtime reproduces
 - **Affected models:** 1
-- **Fixed when:** Load/generation completes or fails with a narrower owner.
+- **Fixed when:** Full and reduced reruns avoid context collapse.
 
 
 ## Affected Models
 
 <!-- markdownlint-disable MD060 -->
 
-| Model                                          | Observed Behavior                       | Token Counts   | Optional Context                                                                                                                                                                                            |
-|------------------------------------------------|-----------------------------------------|----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/diffusiongemma-26B-A4B-it-8bit` | Operation timed out after 300.0 seconds | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T121808Z_008_mlx-community_diffusiongemma-26B-A4B-it-8bit_HUGGINGFACE_HUB_MODEL_LOAD_MODEL_bd9f4ea.json) |
+| Model                                     | Observed Behavior                                                             | Token Counts                                                                 | Optional Context                                                                                                                                                                           |
+|-------------------------------------------|-------------------------------------------------------------------------------|------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/paligemma2-3b-pt-896-4bit` | generated_tokens~3 \| prompt_tokens=4103, output_tokens=3, output/prompt=0.1% | prompt=4,103 \| output/prompt=0.07% \| nontext burden=100% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T121808Z_009_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json) |
 <!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
 
-- `mlx-community/diffusiongemma-26B-A4B-it-8bit` fails with: Model loading failed: Operation timed out after 300.0 seconds
-- Root exception: `builtins.TimeoutError`: Operation timed out after 300.0 seconds
+- `mlx-community/paligemma2-3b-pt-896-4bit`: Output appears truncated to about 3 tokens.
+- `mlx-community/paligemma2-3b-pt-896-4bit`: At long prompt length (4103 tokens), output stayed unusually short (3 tokens; ratio 0.1%).
+- Output excerpt: `Cat.`
 
 
 ## Minimal Reproduction
@@ -35,7 +36,7 @@ These commands use `mlx-vlm` directly so the issue can be reproduced without ins
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/diffusiongemma-26B-A4B-it-8bit --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/paligemma2-3b-pt-896-4bit --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 Minimal Python repro (representative model):
@@ -45,7 +46,7 @@ from mlx_vlm.generate import generate
 from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load
 
-MODEL = 'mlx-community/diffusiongemma-26B-A4B-it-8bit'
+MODEL = 'mlx-community/paligemma2-3b-pt-896-4bit'
 IMAGE = '/Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg'
 PROMPT = 'Describe this image briefly.'
 LOAD_KWARGS = {'trust_remote_code': True}
@@ -82,28 +83,27 @@ Generation/load config:
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "mlx-community/diffusiongemma-26B-A4B-it-8bit"
+  "model": "mlx-community/paligemma2-3b-pt-896-4bit"
 }
 ```
 
 Optional advanced context:
 
-- `mlx-community/diffusiongemma-26B-A4B-it-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T121808Z_008_mlx-community_diffusiongemma-26B-A4B-it-8bit_HUGGINGFACE_HUB_MODEL_LOAD_MODEL_bd9f4ea.json)
+- `mlx-community/paligemma2-3b-pt-896-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T121808Z_009_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
 ## Expected Fix Signal
 
-- [ ] Affected reruns complete model load and generation, or fail with a narrower configuration/compatibility error that points to the owning layer.
+- [ ] A same-command rerun and a reduced image/text burden rerun show consistent prompt-token accounting and no long-context collapse.
 - [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem.
 
 
 ## Fix Checklist
 
-- [ ] Inspect the exported error package, load phase, and traceback owner.
-- [ ] Check model config, tokenizer files, and weight shape compatibility.
-- [ ] Compare against installed mlx, mlx-vlm, mlx-lm, transformers, and tokenizers versions.
-- [ ] Reproduce with the single affected model before judging output quality.
+- [ ] Rerun with reduced image/text burden and compare output recovery.
+- [ ] Compare prompt-token accounting with text-only and image+text prompts.
+- [ ] Inspect cache allocation, prefill step size, and long-context generation behavior.
 
 
 ## Appendix: Environment
@@ -143,28 +143,16 @@ Optional advanced context:
 
 ## Appendix: Detailed Evidence
 
-### `mlx-community/diffusiongemma-26B-A4B-it-8bit`
+### `mlx-community/paligemma2-3b-pt-896-4bit`
 
-Observed error:
+Observed signals:
 
-```text
-Model loading failed: Operation timed out after 300.0 seconds
-```
+- Output appears truncated to about 3 tokens.
+- At long prompt length (4103 tokens), output stayed unusually short (3 tokens; ratio 0.1%).
 
-Root exception:
-
-```text
-builtins.TimeoutError: Operation timed out after 300.0 seconds
-```
-
-Traceback tail:
+Sample output:
 
 ```text
-    waiter.acquire()
-    ~~~~~~~~~~~~~~^^
-TimeoutError: Operation timed out after 300.0 seconds
-The above exception was the direct cause of the following exception:
-Traceback (most recent call last):
-ValueError: Model loading failed: Operation timed out after 300.0 seconds
+Cat.
 ```
 

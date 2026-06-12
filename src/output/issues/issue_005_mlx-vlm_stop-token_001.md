@@ -18,8 +18,8 @@
 
 | Model                                           | Observed Behavior                                                                                                | Token Counts                                                                                       | Optional Context                                                                                                                                                                           |
 |-------------------------------------------------|------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `microsoft/Phi-3.5-vision-instruct`             | decoded text contains control token &lt;\|end\|&gt; \| decoded text contains control token &lt;\|endoftext\|&gt; | prompt=770 \| output/prompt=25.97% \| nontext burden=99% \| stop=max_tokens \| hit token cap (200) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260607T203551Z_004_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json)             |
-| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX` | decoded text contains control token &lt;\|end\|&gt;                                                              | prompt=1,330 \| output/prompt=13.08% \| nontext burden=100% \| stop=completed                      | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260607T203551Z_005_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_mlx_vlm_stop_token_001.json) |
+| `microsoft/Phi-3.5-vision-instruct`             | decoded text contains control token &lt;\|end\|&gt; \| decoded text contains control token &lt;\|endoftext\|&gt; | prompt=770 \| output/prompt=25.97% \| nontext burden=99% \| stop=max_tokens \| hit token cap (200) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T121808Z_002_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json)             |
+| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX` | decoded text contains control token &lt;\|end\|&gt;                                                              | prompt=1,330 \| output/prompt=13.08% \| nontext burden=100% \| stop=completed                      | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T121808Z_003_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_mlx_vlm_stop_token_001.json) |
 <!-- markdownlint-enable MD060 -->
 
 
@@ -92,8 +92,8 @@ Generation/load config:
 
 Optional advanced context:
 
-- `microsoft/Phi-3.5-vision-instruct`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260607T203551Z_004_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json)
-- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260607T203551Z_005_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_mlx_vlm_stop_token_001.json)
+- `microsoft/Phi-3.5-vision-instruct`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T121808Z_002_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json)
+- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T121808Z_003_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_mlx_vlm_stop_token_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -115,13 +115,13 @@ Optional advanced context:
 
 | Component                  | Version                                                                                                                                                  |
 |----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| mlx-vlm                    | 0.6.2                                                                                                                                                    |
-| mlx                        | 0.32.0.dev20260607+8f0e8b14                                                                                                                              |
+| mlx-vlm                    | 0.6.3                                                                                                                                                    |
+| mlx                        | 0.32.0.dev20260612+337f736a                                                                                                                              |
 | mlx-lm                     | 0.31.3                                                                                                                                                   |
 | mlx-audio                  | 0.4.4                                                                                                                                                    |
-| transformers               | 5.10.2                                                                                                                                                   |
+| transformers               | 5.11.0                                                                                                                                                   |
 | tokenizers                 | 0.22.2                                                                                                                                                   |
-| huggingface-hub            | 1.18.0                                                                                                                                                   |
+| huggingface-hub            | 1.19.0                                                                                                                                                   |
 | Python Version             | 3.13.13                                                                                                                                                  |
 | OS                         | Darwin 25.5.0                                                                                                                                            |
 | macOS Version              | 26.5.1                                                                                                                                                   |
@@ -142,7 +142,7 @@ Optional advanced context:
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                                       |
 | MLX Core Extension         | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
 | MLX Metallib               | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (157,751,704 bytes, sha256=ba9913d81d92bbbde42bbc6dda27e80ecb31db6031fa073e6c8aeb0666d47c33) |
-| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,675,136 bytes, sha256=6255fc531acc826e8625f261237f6bb6c75490177d3b769ab70c1ff9f71b6d7f)  |
+| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,676,160 bytes, sha256=811f9557132c55cc5b95a4dcbdb6e3757ed88cfa5bcfabf8b3561959383335a5)  |
 | RAM                        | 128.0 GB                                                                                                                                                 |
 
 

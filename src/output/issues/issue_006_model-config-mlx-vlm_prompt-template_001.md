@@ -1,31 +1,34 @@
 <!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
 
-# \[mlx\]\[MLX: Model load / model error\] Weight/config mismatch during model load affecting 1 model(s)
+# \[model-config / mlx-vlm\]\[Prompt-template / image-placeholder mismatch\] Prompt/template output shape mismatch affecting 2 model(s)
 
 ## Summary
 
-1 model(s) show **MLX: Model load / model error** that should be filed against mlx.
+2 model(s) show **Prompt-template / image-placeholder mismatch** that should be filed against model repo first; mlx-vlm if template handling disagrees.
 
-- **Observed problem:** Weight/config mismatch during model load
-- **Target:** mlx
-- **Affected models:** 1
-- **Fixed when:** Load/generation completes or fails with a narrower owner.
+- **Observed problem:** Prompt/template output shape mismatch
+- **Target:** model repo first; mlx-vlm if template handling disagrees
+- **Affected models:** 2
+- **Fixed when:** Requested sections render without template leakage.
 
 
 ## Affected Models
 
 <!-- markdownlint-disable MD060 -->
 
-| Model                              | Observed Behavior                                                                                                   | Token Counts   | Optional Context                                                                                                                                                                         |
-|------------------------------------|---------------------------------------------------------------------------------------------------------------------|----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `LiquidAI/LFM2.5-VL-450M-MLX-bf16` | Received 2 parameters not in model: multi_modal_projector.layer_norm.bias, multi_modal_projector.layer_norm.weight. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260607T203551Z_002_LiquidAI_LFM2.5-VL-450M-MLX-bf16_MLX_MODEL_LOAD_MODEL_853049863f38.json) |
+| Model                                 | Observed Behavior   | Token Counts                                                                | Optional Context                                                                                                                                                                                   |
+|---------------------------------------|---------------------|-----------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `HuggingFaceTB/SmolVLM-Instruct`      | output/prompt=1.1%  | prompt=1,196 \| output/prompt=1.09% \| nontext burden=99% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T121808Z_001_HuggingFaceTB_SmolVLM-Instruct_model_config_mlx_vlm_prompt_template_001.json)      |
+| `mlx-community/SmolVLM-Instruct-bf16` | output/prompt=1.1%  | prompt=1,196 \| output/prompt=1.09% \| nontext burden=99% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T121808Z_007_mlx-community_SmolVLM-Instruct-bf16_model_config_mlx_vlm_prompt_template_001.json) |
 <!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
 
-- `LiquidAI/LFM2.5-VL-450M-MLX-bf16` fails with: Model loading failed: Received 2 parameters not in model: multi_modal_projector.layer_norm.bias, multi_modal_projector.layer_norm.weight.
-- Root exception: `builtins.ValueError`: Received 2 parameters not in model: <br>multi_modal_projector.layer_norm.bias,<br>multi_modal_projector.layer_norm.weight.
+- `HuggingFaceTB/SmolVLM-Instruct`: Output is very short relative to prompt size (1.1%), suggesting possible early-stop or prompt-handling issues.
+- Output excerpt: `Two cats are sleeping on a pink blanket on a couch.`
+- `mlx-community/SmolVLM-Instruct-bf16`: Output is very short relative to prompt size (1.1%), suggesting possible early-stop or prompt-handling issues.
+- Output excerpt: `Two cats are sleeping on a pink blanket on a couch.`
 
 
 ## Minimal Reproduction
@@ -35,7 +38,8 @@ These commands use `mlx-vlm` directly so the issue can be reproduced without ins
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model LiquidAI/LFM2.5-VL-450M-MLX-bf16 --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model HuggingFaceTB/SmolVLM-Instruct --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/SmolVLM-Instruct-bf16 --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 Minimal Python repro (representative model):
@@ -45,7 +49,7 @@ from mlx_vlm.generate import generate
 from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load
 
-MODEL = 'LiquidAI/LFM2.5-VL-450M-MLX-bf16'
+MODEL = 'HuggingFaceTB/SmolVLM-Instruct'
 IMAGE = '/Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg'
 PROMPT = 'Describe this image briefly.'
 LOAD_KWARGS = {'trust_remote_code': True}
@@ -82,41 +86,41 @@ Generation/load config:
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "LiquidAI/LFM2.5-VL-450M-MLX-bf16"
+  "model": "HuggingFaceTB/SmolVLM-Instruct"
 }
 ```
 
 Optional advanced context:
 
-- `LiquidAI/LFM2.5-VL-450M-MLX-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260607T203551Z_002_LiquidAI_LFM2.5-VL-450M-MLX-bf16_MLX_MODEL_LOAD_MODEL_853049863f38.json)
+- `HuggingFaceTB/SmolVLM-Instruct`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T121808Z_001_HuggingFaceTB_SmolVLM-Instruct_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/SmolVLM-Instruct-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T121808Z_007_mlx-community_SmolVLM-Instruct-bf16_model_config_mlx_vlm_prompt_template_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
 ## Expected Fix Signal
 
-- [ ] Affected reruns complete model load and generation, or fail with a narrower configuration/compatibility error that points to the owning layer.
+- [ ] Affected reruns produce the requested sections without empty/filler output, template leakage, or image-placeholder mismatch symptoms.
 - [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem.
 
 
 ## Fix Checklist
 
-- [ ] Compare checkpoint keys with the selected model class and model config.
-- [ ] Inspect missing/unexpected projector, scale, bias, and quantized-weight parameter names.
-- [ ] Verify the model repo revision matches the mlx-vlm/mlx loader expectations.
-- [ ] Reproduce after upgrading/downgrading mlx-vlm and mlx to isolate version compatibility.
+- [ ] Inspect chat template selection and rendered message roles.
+- [ ] Verify image placeholder count and order match the processor config.
+- [ ] Check EOS defaults and whether the template expects explicit assistant prefixes.
 
 
 ## Appendix: Environment
 
 | Component                  | Version                                                                                                                                                  |
 |----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| mlx-vlm                    | 0.6.2                                                                                                                                                    |
-| mlx                        | 0.32.0.dev20260607+8f0e8b14                                                                                                                              |
+| mlx-vlm                    | 0.6.3                                                                                                                                                    |
+| mlx                        | 0.32.0.dev20260612+337f736a                                                                                                                              |
 | mlx-lm                     | 0.31.3                                                                                                                                                   |
 | mlx-audio                  | 0.4.4                                                                                                                                                    |
-| transformers               | 5.10.2                                                                                                                                                   |
+| transformers               | 5.11.0                                                                                                                                                   |
 | tokenizers                 | 0.22.2                                                                                                                                                   |
-| huggingface-hub            | 1.18.0                                                                                                                                                   |
+| huggingface-hub            | 1.19.0                                                                                                                                                   |
 | Python Version             | 3.13.13                                                                                                                                                  |
 | OS                         | Darwin 25.5.0                                                                                                                                            |
 | macOS Version              | 26.5.1                                                                                                                                                   |
@@ -137,38 +141,33 @@ Optional advanced context:
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                                       |
 | MLX Core Extension         | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
 | MLX Metallib               | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (157,751,704 bytes, sha256=ba9913d81d92bbbde42bbc6dda27e80ecb31db6031fa073e6c8aeb0666d47c33) |
-| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,675,136 bytes, sha256=6255fc531acc826e8625f261237f6bb6c75490177d3b769ab70c1ff9f71b6d7f)  |
+| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,676,160 bytes, sha256=811f9557132c55cc5b95a4dcbdb6e3757ed88cfa5bcfabf8b3561959383335a5)  |
 | RAM                        | 128.0 GB                                                                                                                                                 |
 
 
 ## Appendix: Detailed Evidence
 
-### `LiquidAI/LFM2.5-VL-450M-MLX-bf16`
+### `HuggingFaceTB/SmolVLM-Instruct`
 
-Observed error:
+Observed signals:
+
+- Output is very short relative to prompt size (1.1%), suggesting possible early-stop or prompt-handling issues.
+
+Sample output:
 
 ```text
-Model loading failed: Received 2 parameters not in model: 
-multi_modal_projector.layer_norm.bias,
-multi_modal_projector.layer_norm.weight.
+Two cats are sleeping on a pink blanket on a couch.
 ```
 
-Root exception:
+### `mlx-community/SmolVLM-Instruct-bf16`
+
+Observed signals:
+
+- Output is very short relative to prompt size (1.1%), suggesting possible early-stop or prompt-handling issues.
+
+Sample output:
 
 ```text
-builtins.ValueError: Received 2 parameters not in model: 
-multi_modal_projector.layer_norm.bias,
-multi_modal_projector.layer_norm.weight.
-```
-
-Traceback tail:
-
-```text
-multi_modal_projector.layer_norm.weight.
-The above exception was the direct cause of the following exception:
-Traceback (most recent call last):
-ValueError: Model loading failed: Received 2 parameters not in model: 
-multi_modal_projector.layer_norm.bias,
-multi_modal_projector.layer_norm.weight.
+Two cats are sleeping on a pink blanket on a couch.
 ```
 

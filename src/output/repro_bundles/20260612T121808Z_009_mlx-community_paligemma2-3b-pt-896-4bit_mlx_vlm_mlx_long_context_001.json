@@ -2,33 +2,44 @@
   "environment": {
     "library_versions": {
       "Pillow": "12.2.0",
-      "huggingface-hub": "1.15.0",
-      "mlx": "0.32.0.dev20260516+7b7c1240",
-      "mlx-audio": "0.4.3",
+      "huggingface-hub": "1.19.0",
+      "mlx": "0.32.0.dev20260612+337f736a",
+      "mlx-audio": "0.4.4",
       "mlx-lm": "0.31.3",
       "mlx-metal": null,
-      "mlx-vlm": "0.5.0",
-      "numpy": "2.4.5",
+      "mlx-vlm": "0.6.3",
+      "numpy": "2.4.6",
       "tokenizers": "0.22.2",
-      "transformers": "5.8.1"
+      "transformers": "5.11.0"
     },
-    "platform": "macOS-26.5-arm64-arm-64bit-Mach-O",
+    "platform": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
     "preflight_issues": [],
     "system_info": {
+      "Active Developer Directory": "/Applications/Xcode.app/Contents/Developer",
+      "Apple Clang Version": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
       "Architecture": "arm64",
       "CPU Cores (Logical)": "18",
       "CPU Cores (Physical)": "18",
       "GPU Cores": "40",
       "GPU/Chip": "Apple M5 Max",
-      "Metal SDK": "MacOSX.sdk",
+      "MLX Core Extension": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so",
+      "MLX Distribution Root": "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
+      "MLX Install Type": "editable local source",
+      "MLX Metallib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (157,751,704 bytes, sha256=ba9913d81d92bbbde42bbc6dda27e80ecb31db6031fa073e6c8aeb0666d47c33)",
+      "MLX libmlx.dylib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,676,160 bytes, sha256=811f9557132c55cc5b95a4dcbdb6e3757ed88cfa5bcfabf8b3561959383335a5)",
+      "Metal Compiler Version": "Apple metal version 32023.883 (metalfe-32023.883)",
+      "Metal SDK": "MacOSX26.5.sdk",
       "Metal Support": "Metal 4",
+      "Metallib Linker Version": "AIR-LLD 32023.883 (metalfe-32023.883) (compatible with legacy metallib linker)",
       "OS": "Darwin 25.5.0",
-      "Python Version": "3.13.12",
+      "Python Version": "3.13.13",
       "RAM": "128.0 GB",
+      "SDK Path": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
       "SDK Version": "26.5",
       "Xcode Build": "17F42",
       "Xcode Version": "26.5",
-      "macOS Version": "26.5"
+      "macOS Version": "26.5.1",
+      "mlx-metal Distribution": "not installed; local editable mlx supplies backend"
     }
   },
   "failure": {
@@ -42,7 +53,7 @@
     "traceback": null,
     "type": null
   },
-  "generated_at_utc": "2026-05-16T23:16:46+00:00",
+  "generated_at_utc": "2026-06-12T12:18:08+00:00",
   "issue_cluster_id": "mlx-vlm-mlx_long-context_001",
   "model": "mlx-community/paligemma2-3b-pt-896-4bit",
   "repro": {
@@ -55,23 +66,25 @@
       "enable_thinking": false,
       "eos_tokens": null,
       "eval_mode": "triage",
-      "exclude": [
-        "mlx-community/Qwen3-VL-2B-Thinking-bf16",
-        "Qwen/Qwen3-VL-2B-Instruct"
-      ],
-      "folder": "/Users/jrp/Pictures/Processed",
+      "exclude": null,
+      "folder": null,
       "force_color": false,
       "force_download": false,
-      "image": null,
+      "frequency_context_size": 20,
+      "frequency_penalty": null,
+      "image": "../../mlx-vlm/examples/images/cats.jpg",
       "kv_bits": null,
       "kv_group_size": 64,
       "kv_quant_scheme": "uniform",
       "lazy_load": false,
+      "link_style": "github",
+      "logit_bias": null,
       "max_kv_size": null,
       "max_tokens": 200,
       "min_p": 0.0,
       "models": null,
       "no_color": false,
+      "open_report": false,
       "output_diagnostics": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/diagnostics.md",
       "output_env": "/Users/jrp/Documents/AI/mlx/check_models/src/output/environment.log",
       "output_gallery_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/model_gallery.md",
@@ -82,6 +95,8 @@
       "output_review": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/review.md",
       "output_tsv": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.tsv",
       "prefill_step_size": 4096,
+      "presence_context_size": 20,
+      "presence_penalty": null,
       "processor_kwargs": null,
       "prompt": null,
       "prune_repro_days": 90,
@@ -91,11 +106,9 @@
       "repetition_context_size": 20,
       "repetition_penalty": null,
       "rerun_triage": false,
-      "resize_shape": [
-        1024,
-        1024
-      ],
+      "resize_shape": null,
       "revision": null,
+      "seed": null,
       "skip_special_tokens": false,
       "temperature": 0.0,
       "thinking_budget": null,
@@ -108,13 +121,13 @@
       "verbose": true,
       "width": null
     },
-    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260516-143411_DSC00013.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --resize-shape 1024 1024 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/paligemma2-3b-pt-896-4bit",
+    "cluster_repro_command": "python -m check_models --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/paligemma2-3b-pt-896-4bit",
     "env_vars": {
       "TOKENIZERS_PARALLELISM": "false"
     },
-    "image_path": "/Users/jrp/Pictures/Processed/20260516-143411_DSC00013.jpg",
-    "image_ref_sha256": "a89461d8da8db41eeee59fb71d6184a8f436160fb7120f056a11f9c76cc50a32",
-    "image_sha256": "d979cab8be12d6f36d1ec49f2edfdf59d28c891c242a7653195c3ee05f062c5c",
+    "image_path": "/Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg",
+    "image_ref_sha256": "9bc422400088c31c0accf7fb023ee29945d47640042565218c1c33f78694f204",
+    "image_sha256": "dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e",
     "prompt_diagnostics": {
       "eos_token": "<eos>",
       "eos_token_id": 1,
@@ -128,10 +141,6 @@
         "quantized_kv_start": 5000,
         "repetition_context_size": 20,
         "repetition_penalty": null,
-        "resize_shape": [
-          1024,
-          1024
-        ],
         "temperature": 0.0,
         "top_p": 1.0
       },
@@ -161,30 +170,30 @@
     },
     "prompt_hash_sha256": "d760336d0fd143932f194573dd63f6b531e0ffbc2c4f1595e015392a3471c318",
     "prompt_preview": "Describe this image briefly.",
-    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260516-143411_DSC00013.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --resize-shape 1024 1024 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/paligemma2-3b-pt-896-4bit",
+    "rerun_command": "python -m check_models --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/paligemma2-3b-pt-896-4bit",
     "seed": null
   },
   "result": {
-    "generated_text_preview": "It has been tagged with #1.",
+    "generated_text_preview": "Cat.",
     "maintainer_triage": {
       "confidence": "high",
       "evidence": [
         "long_context"
       ],
       "harness_details": [
-        "output:output_ratio(0.2%)",
-        "long_context_low_ratio(0.2%;4103->9)"
+        "output:truncated(3tok)",
+        "long_context_low_ratio(0.1%;4103->3)"
       ],
       "hit_max_tokens": false,
       "issue_kind": "context_budget",
       "issue_subtype": "long_context",
       "next_action": "Treat this as a prompt-budget issue first; nontext prompt burden is 100% and the output stays weak under that load.",
       "nontext_prompt_ratio": 0.9985376553741165,
-      "prompt_output_ratio": 0.0021935169388252497,
+      "prompt_output_ratio": 0.00073117231294175,
       "prompt_tokens_total": 4103,
       "requested_max_tokens": 200,
       "stop_reason": "completed",
-      "summary": "Output is very short relative to prompt size (0.2%), suggesting possible early-stop or prompt-handling issues. | At long prompt length (4103 tokens), output stayed unusually short (9 tokens; ratio 0.2%). | output/prompt=0.22% | nontext prompt burden=100%",
+      "summary": "Output appears truncated to about 3 tokens. | At long prompt length (4103 tokens), output stayed unusually short (3 tokens; ratio 0.1%). | output/prompt=0.07% | nontext prompt burden=100%",
       "suspected_owner": "mlx",
       "user_bucket": "caveat"
     },
