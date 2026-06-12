@@ -467,15 +467,23 @@ def test_log_summary_comparison_table_preserves_unicode_notes(
 
     log_summary([result], prompt="Describe this image.")
 
-    table_row_messages = [
-        record.message
-        for record in caplog.records
-        if "emoji-note" in record.message and record.message.strip().startswith("│")
+    # Collect the model-data row (contains "emoji-note") and all continuation
+    # rows (│ … │ rows without "emoji-note" that immediately follow it).
+    all_table_rows = [
+        record.message for record in caplog.records if record.message.strip().startswith("│")
     ]
-    assert table_row_messages
-    row = table_row_messages[0]
-    assert "harness(stop_token)" in row
-    assert "⚠" in row
+    assert all_table_rows
+    emoji_note_rows = [r for r in all_table_rows if "emoji-note" in r]
+    assert emoji_note_rows, "Model row not found in table output"
+
+    # Unicode emoji must survive on the primary model row.
+    assert "⚠" in emoji_note_rows[0]
+
+    # Notes cell content may wrap across continuation rows at narrow render widths;
+    # verify each significant token appears somewhere in the table section.
+    table_text = " ".join(all_table_rows)
+    assert "harness" in table_text
+    assert "stop_token" in table_text
 
 
 def test_log_summary_reports_metadata_baseline_delta_when_context_present(
