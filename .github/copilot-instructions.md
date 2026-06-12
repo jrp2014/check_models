@@ -29,23 +29,23 @@ For one-off commands without activating: `conda run -n mlx-vlm python ...`.
 
 ### 3. Navigating `src/check_models.py` (section map)
 
-The file is organized in this order — use these landmarks to jump to the right area:
+The file is organized in this order — search for these exact landmark headers (formatted as comment blocks) to jump directly to the target area instead of relying on line numbers:
 
-| Section | Key contents | Approx. lines |
-| --------- | ------------- | --------------- |
-| Imports, config & optional dependency guards | `MISSING_DEPENDENCIES`, `QualityThresholds`, `load_quality_config()` | 1–759 |
-| Type aliases, protocols & JSONL records | `SupportsGenerationResult`, `SupportsExifIfd`, `JsonlResultRecord` | 760–1513 |
-| App constants & core result types | `PerformanceResult`, `ResultSet`, `ProcessImageParams`, report block primitives | 1514–2532 |
-| Timing, logging & Rich console plumbing | `PerfCounterTimer`, `TimeoutManager`, `LogStyles`, `StyleAwareRichHandler` | 2533–2921 |
-| Formatting, escaping & detector helpers | `fmt_num`, report escapers, `_detect_repetitive_output`, harness detectors | 2922–4866 |
-| Metrics, scoring & field formatting | `compute_vocabulary_diversity`, `compute_cataloging_utility`, `analyze_generation_text`, `format_field_value` | 4875–6774 |
-| Console, system & image metadata helpers | CLI Rich helpers, library/system info, EXIF/XMP extraction | 6775–11133 |
-| Diagnostics/report context builders | `DiagnosticsConfig`, `IssueCluster`, `ReportRenderContext`, repro command specs | 11134–14330 |
-| Report generators & runtime fingerprints | `generate_diagnostics_report` (~14331), `generate_html_report` (~14765), `generate_markdown_report` (~15036), `collect_runtime_fingerprint()` | 14331–15804 |
-| Model processing | CLI argument validation, cache scan, `_load_model`, `process_image_with_model` (~17597) | 15805–17741 |
-| CLI run helpers & logging | `setup_environment`, `find_and_validate_image`, `process_models`, result logging | 17742–19346 |
-| Result enrichment/history/finalization | quality enrichment, JSONL/history, issue drafts, repro bundles, `finalize_execution` (~23178) | 19347–23299 |
-| Main orchestration & argparse | `main()` (~23306), `main_cli()` (~23452), `_build_cli_parser()` (~23499) | 23301–23912 |
+| Section | Key contents | Landmark Header / Search Tag |
+| --------- | ------------- | ---------------------------- |
+| Imports, config & optional dependency guards | `MISSING_DEPENDENCIES`, `QualityThresholds`, `load_quality_config()` | `SECTION: IMPORTS, CONFIG & OPTIONAL DEPENDENCY GUARDS` |
+| Type aliases, protocols & JSONL records | `SupportsGenerationResult`, `SupportsExifIfd`, `JsonlResultRecord` | `SECTION: TYPE ALIASES, PROTOCOLS & JSONL RECORDS` |
+| App constants & core result types | `PerformanceResult`, `ResultSet`, `ProcessImageParams`, report block primitives | `SECTION: APP CONSTANTS & CORE RESULT TYPES` |
+| Timing, logging & Rich console plumbing | `PerfCounterTimer`, `TimeoutManager`, `LogStyles`, `StyleAwareRichHandler` | `SECTION: TIMING, LOGGING & RICH CONSOLE PLUMBING` |
+| Formatting, escaping & detector helpers | `fmt_num`, report escapers, `_detect_repetitive_output`, harness detectors | `SECTION: FORMATTING, ESCAPING & DETECTOR HELPERS` |
+| Metrics, scoring & field formatting | `compute_vocabulary_diversity`, `compute_cataloging_utility`, `analyze_generation_text`, `format_field_value` | `SECTION: METRICS, SCORING & FIELD FORMATTING` |
+| Console, system & image metadata helpers | CLI Rich helpers, library/system info, EXIF/XMP extraction | `SECTION: CONSOLE, SYSTEM & IMAGE METADATA HELPERS` |
+| Diagnostics/report context builders | `DiagnosticsConfig`, `IssueCluster`, `ReportRenderContext`, repro command specs | `SECTION: DIAGNOSTICS/REPORT CONTEXT BUILDERS` |
+| Report generators & runtime fingerprints | `generate_diagnostics_report`, `generate_html_report`, `generate_markdown_report`, `collect_runtime_fingerprint()` | `SECTION: REPORT GENERATORS & RUNTIME FINGERPRINTS` |
+| Model processing | CLI argument validation, cache scan, `_load_model`, `process_image_with_model` | `SECTION: MODEL PROCESSING` |
+| CLI run helpers & logging | `setup_environment`, `find_and_validate_image`, `process_models`, result logging | `SECTION: CLI RUN HELPERS & LOGGING` |
+| Result enrichment/history/finalization | quality enrichment, JSONL/history, issue drafts, repro bundles, `finalize_execution` | `SECTION: RESULT ENRICHMENT/HISTORY/FINALIZATION` |
+| Main orchestration & argparse | `main()`, `main_cli()`, `_build_cli_parser()` | `SECTION: MAIN ORCHESTRATION & ARGPARSE` |
 
 ### 4. Architecture & patterns
 
@@ -111,16 +111,17 @@ The file is organized in this order — use these landmarks to jump to the right
 2. `git checkout -b feature/your-change`
 3. Edit `src/check_models.py` (and/or other files in `src/`)
 4. Add/update tests in `src/tests/` for the change
-5. If you added imports → update `src/pyproject.toml` then `make deps-sync`
+5. If you added imports or updated package thresholds → update `src/pyproject.toml` or `src/check_models_data/dependency_policy.py`, then run `make deps-sync` to rebuild README dependencies
 6. If you added/changed CLI flags → update the CLI reference table in `src/README.md` (§ Command Line Reference)
 7. `make format` — apply Ruff formatting before the full quality gate
 8. `make -C src lint-fix` — apply safe Ruff fixes when lint reports fixable issues
 9. `make lint` — clear Ruff lint errors before running the full gate
-10. `make quality` — fix issues until clean
-11. `make test` — ensure no regressions
-12. If report formats changed → update `src/output/` fixtures
-13. Update `CHANGELOG.md` under `[Unreleased]` for any maintainer-relevant change (features, fixes, refactors, tooling/docs workflow updates)
-14. `git commit -m "feat: description"` and push
+10. `bash src/tools/run_commit_hygiene.sh` — verify local commit hygiene
+11. `make quality` — run the full quality gate check
+12. `make test` — execute unit tests
+13. If report formats changed → update `src/output/` fixtures
+14. Update `CHANGELOG.md` under `[Unreleased]` for any maintainer-relevant change (features, fixes, refactors, tooling/docs workflow updates)
+15. `git commit -m "feat: description"` and push
 
 ### 10. Agentic skills (`.agents/skills/`)
 
@@ -135,7 +136,7 @@ relevant `SKILL.md` **before** starting work of that kind.
 
 **Add a CLI flag:**
 
-1. Add `argparse` argument in `_build_cli_parser()` near line ~23500 in `src/check_models.py`
+1. Add `argparse` argument in `_build_cli_parser()` under `SECTION: MAIN ORCHESTRATION & ARGPARSE` in `src/check_models.py`
 2. Wire it through `main()` → `process_image_with_model()` or relevant function
 3. Add test in `src/tests/test_parameter_validation.py`
 4. Update the CLI reference table in `src/README.md` (§ Command Line Reference)
@@ -143,18 +144,18 @@ relevant `SKILL.md` **before** starting work of that kind.
 
 **Change a quality threshold:**
 
-1. Edit `src/check_models_data/quality_config.yaml` (preferred) or `QualityThresholds` dataclass (~line 253)
+1. Edit `src/check_models_data/quality_config.yaml` (preferred) or `QualityThresholds` dataclass in `SECTION: IMPORTS, CONFIG & OPTIONAL DEPENDENCY GUARDS`
 2. Run `pytest src/tests/test_quality_analysis.py -q`
 
 **Modify report output:**
 
-1. Edit `generate_html_report` (~line 14765) or `generate_markdown_report` (~line 15036)
+1. Edit `generate_html_report` or `generate_markdown_report` under `SECTION: REPORT GENERATORS & RUNTIME FINGERPRINTS`
 2. Update `src/output/` fixture files if test assertions reference them
 3. Run `pytest src/tests/test_html_formatting.py src/tests/test_markdown_formatting.py -q`
 
 **Add a new quality detector:**
 
-1. Add `_detect_your_pattern(text: str) -> tuple[bool, str | None]` following existing patterns (~line 3120–4866)
+1. Add `_detect_your_pattern(text: str) -> tuple[bool, str | None]` following existing patterns under `SECTION: METRICS, SCORING & FIELD FORMATTING`
 2. Wire it into the quality analysis pipeline
 3. Add thresholds to `src/check_models_data/quality_config.yaml` and `QualityThresholds`
 4. Add test in `src/tests/test_quality_analysis.py`
@@ -168,3 +169,12 @@ relevant `SKILL.md` **before** starting work of that kind.
 - **Don't create ad-hoc test scripts** — add tests to existing `src/tests/test_*.py` files
 - **Don't duplicate formatting logic** — extend `format_field_value` for new metrics
 - **Don't over-extract helpers** — a single well-commented function is preferred over many tiny one-use helpers (see `docs/IMPLEMENTATION_GUIDE.md` § Philosophy)
+
+### 13. Dependency Synchronization and Policy
+
+This repository implements a strict dependency alignment and verification policy to ensure type safety and runtime compatibility across the MLX stack:
+
+- **Dependency Policy Definitive Specs**: All package version floors and compatibility rules are declared in `src/check_models_data/dependency_policy.py`.
+- **pyproject.toml Alignment**: When adding or updating third-party libraries, declare the dependency range in `src/pyproject.toml`.
+- **Auto-Syncing README**: The CLI README documentation contains an auto-generated dependencies table block. After editing `pyproject.toml` or dependency policies, you must execute `make deps-sync` (which runs `python -m tools.update_readme_deps`) to rebuild the README alignment blocks.
+- **CI Dependency Sync Check**: The CI pipeline runs `python -m tools.update_readme_deps --check` to verify that README markdown blocks match `pyproject.toml` exactly. Failures will block pull request approvals.

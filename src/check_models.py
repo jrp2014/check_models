@@ -3,6 +3,9 @@
 
 from __future__ import annotations
 
+# =============================================================================
+# SECTION: IMPORTS, CONFIG & OPTIONAL DEPENDENCY GUARDS
+# =============================================================================
 import argparse
 import base64
 import codecs
@@ -920,7 +923,7 @@ except PackageNotFoundError:
 
 
 # =============================================================================
-# TYPE ALIASES & PROTOCOLS
+# SECTION: TYPE ALIASES, PROTOCOLS & JSONL RECORDS
 # =============================================================================
 
 type ExifValue = Any  # Pillow yields varied scalar / tuple EXIF types; keep permissive
@@ -1719,7 +1722,7 @@ def _extract_generation_performance_data(
 
 
 # =============================================================================
-# APPLICATION CONSTANTS & DEFAULTS
+# SECTION: APP CONSTANTS & CORE RESULT TYPES
 # =============================================================================
 
 # These constants define default values for various parameters used in the script.
@@ -2772,7 +2775,7 @@ class ProcessImageParams:
 
 
 # =============================================================================
-# INFRASTRUCTURE: Timeouts, Logging
+# SECTION: TIMING, LOGGING & RICH CONSOLE PLUMBING
 # =============================================================================
 
 
@@ -2914,7 +2917,7 @@ def _display_align(text: str, width: int, *, alignment: Literal["left", "center"
 
 
 # =============================================================================
-# UTILITY CLASSES (Logging, Timeout Management)
+# SECTION: FORMATTING, ESCAPING & DETECTOR HELPERS
 # =============================================================================
 
 
@@ -4890,7 +4893,7 @@ def _detect_fabricated_details(text: str) -> tuple[bool, list[str]]:
 
 
 # =============================================================================
-# HARNESS/INTEGRATION ISSUE DETECTION
+# SECTION: METRICS, SCORING & FIELD FORMATTING
 # =============================================================================
 # These detect issues that are likely bugs in mlx-vlm or model integration,
 # NOT inherent model quality problems. Separating them helps users know
@@ -7864,7 +7867,7 @@ def _sort_results_by_time(results: list[PerformanceResult]) -> list[PerformanceR
 
 
 # =============================================================================
-# SYSTEM INFO & VERSION DETECTION (Hardware, OS, Dependencies)
+# SECTION: CONSOLE, SYSTEM & IMAGE METADATA HELPERS
 # =============================================================================
 
 
@@ -11920,7 +11923,7 @@ def _build_gallery_quality_summary_section(
 
 
 # =============================================================================
-# DIAGNOSTICS REPORT — Upstream issue filing aid
+# SECTION: DIAGNOSTICS/REPORT CONTEXT BUILDERS
 # =============================================================================
 
 
@@ -15622,7 +15625,7 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
 
 
 # =============================================================================
-# REPORT GENERATION (HTML, Markdown)
+# SECTION: REPORT GENERATORS & RUNTIME FINGERPRINTS
 # =============================================================================
 
 
@@ -16667,7 +16670,9 @@ def collect_runtime_fingerprint() -> dict[str, RuntimeProbeResult]:
     return probes
 
 
-# --- Model Processing Core ---
+# =============================================================================
+# SECTION: MODEL PROCESSING
+# =============================================================================
 def validate_inputs(
     image_path: PathLike,
     temperature: float = 0.0,
@@ -18683,7 +18688,9 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     )
 
 
-# --- Main Execution Helper Functions ---
+# =============================================================================
+# SECTION: CLI RUN HELPERS & LOGGING
+# =============================================================================
 
 
 def print_cli_header(title: str) -> None:
@@ -20820,6 +20827,11 @@ def _build_result_output_cues(result: PerformanceResult) -> list[str]:
             cues.append(cue_label)
 
     return _dedupe_preserve_order(cues)[:OUTPUT_PREVIEW_CUE_LIMIT]
+
+
+# =============================================================================
+# SECTION: RESULT ENRICHMENT/HISTORY/FINALIZATION
+# =============================================================================
 
 
 def _build_head_tail_preview(text: str, *, max_chars: int) -> str:
@@ -24788,7 +24800,7 @@ def finalize_execution(
 
 
 # =============================================================================
-# MAIN ORCHESTRATION & CLI (Argument parsing, execution flow)
+# SECTION: MAIN ORCHESTRATION & ARGPARSE
 # =============================================================================
 
 
