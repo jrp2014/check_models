@@ -1,12 +1,12 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-06-12 12:48:05 BST
+FULL ENVIRONMENT DUMP - 2026-06-12 23:45:14 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
 Total packages: 196
 
 absl-py==2.4.0
-accelerate==1.13.0
+accelerate==1.14.0
 aiohappyeyeballs==2.6.2
 aiohttp==3.14.1
 aiosignal==1.4.0
@@ -29,7 +29,7 @@ check_models==0.8.0
 click==8.4.1
 cmake==4.3.2
 coverage==7.14.1
-cryptography==48.0.1
+cryptography==49.0.0
 datasets==5.0.0
 defusedxml==0.7.1
 dill==0.4.1
@@ -45,7 +45,7 @@ frozenlist==1.8.0
 fsspec==2026.4.0
 gast==0.7.0
 google-pasta==0.2.0
-grpcio==1.81.0
+grpcio==1.81.1
 h11==0.16.0
 h5py==3.14.0
 hf-xet==1.5.1
@@ -81,8 +81,8 @@ mdit-py-plugins==0.6.1
 mdurl==0.1.2
 miniaudio==1.71
 ml_dtypes==0.5.4
-mlx==0.32.0.dev20260612+337f736a
-mlx==0.32.0.dev20260612+337f736a
+mlx==0.32.0.dev20260612+269e099d
+mlx==0.32.0.dev20260612+269e099d
 mlx-audio==0.4.4
 mlx-lm==0.31.3
 mlx-vlm==0.6.3
@@ -167,7 +167,7 @@ torch==2.12.0
 torchaudio==2.11.0
 torchvision==0.27.0
 tqdm==4.68.2
-transformers==5.11.0
+transformers==5.12.0
 tree-sitter==0.25.2
 tree-sitter-dart-orchard==0.3.2
 tree-sitter-go==0.25.0
@@ -204,5 +204,5 @@ yarl==1.24.2
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-06-12 12:48:05 BST
+Environment dump completed at 2026-06-12 23:45:14 BST
 ================================================================================

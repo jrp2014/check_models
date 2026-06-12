@@ -1,31 +1,34 @@
 <!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
 
-# \[mlx-vlm\]\[mlx-vlm: Model load / model error\] mlx-vlm: Model load / model error: property 'eos_token_id' of 'ModelConfig' object has no setter affecting 1 model(s)
+# \[model-config / mlx-vlm\]\[Prompt-template / image-placeholder mismatch\] Prompt/template output shape mismatch affecting 2 model(s)
 
 ## Summary
 
-1 model(s) show **mlx-vlm: Model load / model error** that should be filed against mlx-vlm.
+2 model(s) show **Prompt-template / image-placeholder mismatch** that should be filed against model repo first; mlx-vlm if template handling disagrees.
 
-- **Observed problem:** mlx-vlm: Model load / model error: property 'eos_token_id' of 'ModelConfig' object has no setter
-- **Target:** mlx-vlm
-- **Affected models:** 1
-- **Fixed when:** Load/generation completes or fails with a narrower owner.
+- **Observed problem:** Prompt/template output shape mismatch
+- **Target:** model repo first; mlx-vlm if template handling disagrees
+- **Affected models:** 2
+- **Fixed when:** Requested sections render without template leakage.
 
 
 ## Affected Models
 
 <!-- markdownlint-disable MD060 -->
 
-| Model                              | Observed Behavior                                             | Token Counts   | Optional Context                                                                                                                                                                             |
-|------------------------------------|---------------------------------------------------------------|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/MolmoPoint-8B-fp16` | property 'eos_token_id' of 'ModelConfig' object has no setter | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T121808Z_006_mlx-community_MolmoPoint-8B-fp16_MLX_VLM_MODEL_LOAD_MODEL_7cbd53695717.json) |
+| Model                                 | Observed Behavior   | Token Counts                                                                | Optional Context                                                                                                                                                                                   |
+|---------------------------------------|---------------------|-----------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `HuggingFaceTB/SmolVLM-Instruct`      | output/prompt=1.1%  | prompt=1,196 \| output/prompt=1.09% \| nontext burden=99% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T225122Z_001_HuggingFaceTB_SmolVLM-Instruct_model_config_mlx_vlm_prompt_template_001.json)      |
+| `mlx-community/SmolVLM-Instruct-bf16` | output/prompt=1.1%  | prompt=1,196 \| output/prompt=1.09% \| nontext burden=99% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T225122Z_007_mlx-community_SmolVLM-Instruct-bf16_model_config_mlx_vlm_prompt_template_001.json) |
 <!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
 
-- `mlx-community/MolmoPoint-8B-fp16` fails with: Model loading failed: property 'eos_token_id' of 'ModelConfig' object has no setter
-- Root exception: `builtins.AttributeError`: property 'eos_token_id' of 'ModelConfig' object has no setter
+- `HuggingFaceTB/SmolVLM-Instruct`: Output is very short relative to prompt size (1.1%), suggesting possible early-stop or prompt-handling issues.
+- Output excerpt: `Two cats are sleeping on a pink blanket on a couch.`
+- `mlx-community/SmolVLM-Instruct-bf16`: Output is very short relative to prompt size (1.1%), suggesting possible early-stop or prompt-handling issues.
+- Output excerpt: `Two cats are sleeping on a pink blanket on a couch.`
 
 
 ## Minimal Reproduction
@@ -35,7 +38,8 @@ These commands use `mlx-vlm` directly so the issue can be reproduced without ins
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/MolmoPoint-8B-fp16 --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model HuggingFaceTB/SmolVLM-Instruct --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/SmolVLM-Instruct-bf16 --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 Minimal Python repro (representative model):
@@ -45,7 +49,7 @@ from mlx_vlm.generate import generate
 from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load
 
-MODEL = 'mlx-community/MolmoPoint-8B-fp16'
+MODEL = 'HuggingFaceTB/SmolVLM-Instruct'
 IMAGE = '/Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg'
 PROMPT = 'Describe this image briefly.'
 LOAD_KWARGS = {'trust_remote_code': True}
@@ -82,28 +86,28 @@ Generation/load config:
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "mlx-community/MolmoPoint-8B-fp16"
+  "model": "HuggingFaceTB/SmolVLM-Instruct"
 }
 ```
 
 Optional advanced context:
 
-- `mlx-community/MolmoPoint-8B-fp16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T121808Z_006_mlx-community_MolmoPoint-8B-fp16_MLX_VLM_MODEL_LOAD_MODEL_7cbd53695717.json)
+- `HuggingFaceTB/SmolVLM-Instruct`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T225122Z_001_HuggingFaceTB_SmolVLM-Instruct_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/SmolVLM-Instruct-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T225122Z_007_mlx-community_SmolVLM-Instruct-bf16_model_config_mlx_vlm_prompt_template_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
 ## Expected Fix Signal
 
-- [ ] Affected reruns complete model load and generation, or fail with a narrower configuration/compatibility error that points to the owning layer.
+- [ ] Affected reruns produce the requested sections without empty/filler output, template leakage, or image-placeholder mismatch symptoms.
 - [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem.
 
 
 ## Fix Checklist
 
-- [ ] Inspect the exported error package, load phase, and traceback owner.
-- [ ] Check model config, tokenizer files, and weight shape compatibility.
-- [ ] Compare against installed mlx, mlx-vlm, mlx-lm, transformers, and tokenizers versions.
-- [ ] Reproduce with the single affected model before judging output quality.
+- [ ] Inspect chat template selection and rendered message roles.
+- [ ] Verify image placeholder count and order match the processor config.
+- [ ] Check EOS defaults and whether the template expects explicit assistant prefixes.
 
 
 ## Appendix: Environment
@@ -111,10 +115,10 @@ Optional advanced context:
 | Component                  | Version                                                                                                                                                  |
 |----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
 | mlx-vlm                    | 0.6.3                                                                                                                                                    |
-| mlx                        | 0.32.0.dev20260612+337f736a                                                                                                                              |
+| mlx                        | 0.32.0.dev20260612+269e099d                                                                                                                              |
 | mlx-lm                     | 0.31.3                                                                                                                                                   |
 | mlx-audio                  | 0.4.4                                                                                                                                                    |
-| transformers               | 5.11.0                                                                                                                                                   |
+| transformers               | 5.12.0                                                                                                                                                   |
 | tokenizers                 | 0.22.2                                                                                                                                                   |
 | huggingface-hub            | 1.19.0                                                                                                                                                   |
 | Python Version             | 3.13.13                                                                                                                                                  |
@@ -137,34 +141,33 @@ Optional advanced context:
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                                       |
 | MLX Core Extension         | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
 | MLX Metallib               | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (157,751,704 bytes, sha256=ba9913d81d92bbbde42bbc6dda27e80ecb31db6031fa073e6c8aeb0666d47c33) |
-| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,676,160 bytes, sha256=811f9557132c55cc5b95a4dcbdb6e3757ed88cfa5bcfabf8b3561959383335a5)  |
+| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,676,160 bytes, sha256=88c6fdf2f43c3d1ff8d5c974aa5525dc0e4f05d5dfd97e63f45221f5b7f0996f)  |
 | RAM                        | 128.0 GB                                                                                                                                                 |
 
 
 ## Appendix: Detailed Evidence
 
-### `mlx-community/MolmoPoint-8B-fp16`
+### `HuggingFaceTB/SmolVLM-Instruct`
 
-Observed error:
+Observed signals:
+
+- Output is very short relative to prompt size (1.1%), suggesting possible early-stop or prompt-handling issues.
+
+Sample output:
 
 ```text
-Model loading failed: property 'eos_token_id' of 'ModelConfig' object has no setter
+Two cats are sleeping on a pink blanket on a couch.
 ```
 
-Root exception:
+### `mlx-community/SmolVLM-Instruct-bf16`
+
+Observed signals:
+
+- Output is very short relative to prompt size (1.1%), suggesting possible early-stop or prompt-handling issues.
+
+Sample output:
 
 ```text
-builtins.AttributeError: property 'eos_token_id' of 'ModelConfig' object has no setter
-```
-
-Traceback tail:
-
-```text
-    setattr(model_config, key, config[key])
-    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-AttributeError: property 'eos_token_id' of 'ModelConfig' object has no setter
-The above exception was the direct cause of the following exception:
-Traceback (most recent call last):
-ValueError: Model loading failed: property 'eos_token_id' of 'ModelConfig' object has no setter
+Two cats are sleeping on a pink blanket on a couch.
 ```
 

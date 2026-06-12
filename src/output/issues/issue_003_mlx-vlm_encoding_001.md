@@ -1,31 +1,31 @@
 <!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
 
-# \[huggingface_hub\]\[Hugging Face Hub: Model load / model error\] Hugging Face Hub: Model load / model error: Operation timed out after 300.0 seconds affecting 1 model(s)
+# \[mlx-vlm\]\[Tokenizer / decoding artifact\] Tokenizer decode leaked BPE/byte markers affecting 1 model(s)
 
 ## Summary
 
-1 model(s) show **Hugging Face Hub: Model load / model error** that should be filed against huggingface_hub.
+1 model(s) show **Tokenizer / decoding artifact** that should be filed against mlx-vlm.
 
-- **Observed problem:** Hugging Face Hub: Model load / model error: Operation timed out after 300.0 seconds
-- **Target:** huggingface_hub
+- **Observed problem:** Tokenizer decode leaked BPE/byte markers
+- **Target:** mlx-vlm
 - **Affected models:** 1
-- **Fixed when:** Load/generation completes or fails with a narrower owner.
+- **Fixed when:** No BPE/byte markers in output.
 
 
 ## Affected Models
 
 <!-- markdownlint-disable MD060 -->
 
-| Model                                          | Observed Behavior                       | Token Counts   | Optional Context                                                                                                                                                                                            |
-|------------------------------------------------|-----------------------------------------|----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/diffusiongemma-26B-A4B-it-8bit` | Operation timed out after 300.0 seconds | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T121808Z_008_mlx-community_diffusiongemma-26B-A4B-it-8bit_HUGGINGFACE_HUB_MODEL_LOAD_MODEL_bd9f4ea.json) |
+| Model                                                   | Observed Behavior                          | Token Counts                                                               | Optional Context                                                                                                                                                                                 |
+|---------------------------------------------------------|--------------------------------------------|----------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | 76 BPE space markers found in decoded text | prompt=417 \| output/prompt=21.58% \| nontext burden=99% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T225122Z_004_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) |
 <!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
 
-- `mlx-community/diffusiongemma-26B-A4B-it-8bit` fails with: Model loading failed: Operation timed out after 300.0 seconds
-- Root exception: `builtins.TimeoutError`: Operation timed out after 300.0 seconds
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 76 occurrences).
+- Output excerpt: `TheĠimageĠfeaturesĠtwoĠcatsĠlyingĠonĠaĠpinkĠsurface,ĠpossiblyĠaĠblanketĠorĠaĠcouch.ĠTheĠcatĠonĠtheĠleftĠisĠaĠkitten,ĠandĠtheĠoneĠonĠtheĠrightĠisĠanĠadultĠcat.ĠBothĠcatsĠareĠinĠrelaxedĠpostures,ĠwithĠtheĠkittenĠlyingĠonĠitsĠsideĠandĠtheĠadultĠcatĠlyingĠonĠitsĠback.ĠThereĠareĠtwoĠremoteĠcontrolsĠplacedĠnearĠtheĠcats,Ġ...`
 
 
 ## Minimal Reproduction
@@ -35,7 +35,7 @@ These commands use `mlx-vlm` directly so the issue can be reproduced without ins
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/diffusiongemma-26B-A4B-it-8bit --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 Minimal Python repro (representative model):
@@ -45,7 +45,7 @@ from mlx_vlm.generate import generate
 from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load
 
-MODEL = 'mlx-community/diffusiongemma-26B-A4B-it-8bit'
+MODEL = 'mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit'
 IMAGE = '/Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg'
 PROMPT = 'Describe this image briefly.'
 LOAD_KWARGS = {'trust_remote_code': True}
@@ -82,28 +82,27 @@ Generation/load config:
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "mlx-community/diffusiongemma-26B-A4B-it-8bit"
+  "model": "mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit"
 }
 ```
 
 Optional advanced context:
 
-- `mlx-community/diffusiongemma-26B-A4B-it-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T121808Z_008_mlx-community_diffusiongemma-26B-A4B-it-8bit_HUGGINGFACE_HUB_MODEL_LOAD_MODEL_bd9f4ea.json)
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T225122Z_004_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
 ## Expected Fix Signal
 
-- [ ] Affected reruns complete model load and generation, or fail with a narrower configuration/compatibility error that points to the owning layer.
+- [ ] Affected reruns contain no leaked BPE, byte-level, or tokenizer marker text.
 - [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem.
 
 
 ## Fix Checklist
 
-- [ ] Inspect the exported error package, load phase, and traceback owner.
-- [ ] Check model config, tokenizer files, and weight shape compatibility.
-- [ ] Compare against installed mlx, mlx-vlm, mlx-lm, transformers, and tokenizers versions.
-- [ ] Reproduce with the single affected model before judging output quality.
+- [ ] Inspect tokenizer decode cleanup for byte-level/BPE marker leakage.
+- [ ] Compare `decode` and `batch_decode` behavior with `skip_special_tokens=True`.
+- [ ] Verify processor/tokenizer config does not require model-specific cleanup flags.
 
 
 ## Appendix: Environment
@@ -111,10 +110,10 @@ Optional advanced context:
 | Component                  | Version                                                                                                                                                  |
 |----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
 | mlx-vlm                    | 0.6.3                                                                                                                                                    |
-| mlx                        | 0.32.0.dev20260612+337f736a                                                                                                                              |
+| mlx                        | 0.32.0.dev20260612+269e099d                                                                                                                              |
 | mlx-lm                     | 0.31.3                                                                                                                                                   |
 | mlx-audio                  | 0.4.4                                                                                                                                                    |
-| transformers               | 5.11.0                                                                                                                                                   |
+| transformers               | 5.12.0                                                                                                                                                   |
 | tokenizers                 | 0.22.2                                                                                                                                                   |
 | huggingface-hub            | 1.19.0                                                                                                                                                   |
 | Python Version             | 3.13.13                                                                                                                                                  |
@@ -137,34 +136,21 @@ Optional advanced context:
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                                       |
 | MLX Core Extension         | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
 | MLX Metallib               | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (157,751,704 bytes, sha256=ba9913d81d92bbbde42bbc6dda27e80ecb31db6031fa073e6c8aeb0666d47c33) |
-| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,676,160 bytes, sha256=811f9557132c55cc5b95a4dcbdb6e3757ed88cfa5bcfabf8b3561959383335a5)  |
+| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,676,160 bytes, sha256=88c6fdf2f43c3d1ff8d5c974aa5525dc0e4f05d5dfd97e63f45221f5b7f0996f)  |
 | RAM                        | 128.0 GB                                                                                                                                                 |
 
 
 ## Appendix: Detailed Evidence
 
-### `mlx-community/diffusiongemma-26B-A4B-it-8bit`
+### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`
 
-Observed error:
+Observed signals:
 
-```text
-Model loading failed: Operation timed out after 300.0 seconds
-```
+- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 76 occurrences).
 
-Root exception:
+Sample output:
 
 ```text
-builtins.TimeoutError: Operation timed out after 300.0 seconds
-```
-
-Traceback tail:
-
-```text
-    waiter.acquire()
-    ~~~~~~~~~~~~~~^^
-TimeoutError: Operation timed out after 300.0 seconds
-The above exception was the direct cause of the following exception:
-Traceback (most recent call last):
-ValueError: Model loading failed: Operation timed out after 300.0 seconds
+TheĠimageĠfeaturesĠtwoĠcatsĠlyingĠonĠaĠpinkĠsurface,ĠpossiblyĠaĠblanketĠorĠaĠcouch.ĠTheĠcatĠonĠtheĠleftĠisĠaĠkitten,ĠandĠtheĠoneĠonĠtheĠrightĠisĠanĠadultĠcat.ĠBothĠcatsĠareĠinĠrelaxedĠpostures,Ġwit...
 ```
 

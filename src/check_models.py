@@ -2975,6 +2975,9 @@ def _make_rich_console(*, width: int | None = None) -> Console:
 
 LOCAL_TIMESTAMP_FORMAT: Final[str] = "%Y-%m-%d %H:%M:%S %Z"
 CONSOLE_LOG_TIME_FORMAT: Final[str] = "[%H:%M:%S]"
+# Display width consumed by the Rich log handler prefix when show_level=True:
+# "[HH:MM:SS]" (10) + " " (1) + level padded to 8 chars (8) + " " (1) = 20.
+_RICH_LOG_PREFIX_WIDTH: Final[int] = 20
 
 
 class StyleAwareRichHandler(RichHandler):
@@ -18894,7 +18897,13 @@ def _log_rich_renderable(
     width: int | None = None,
 ) -> None:
     """Log a Rich-rendered table/panel while keeping persisted logs plain."""
-    for line in _render_rich_lines(renderable, width=width):
+    # When no explicit width is given, subtract the log-handler prefix (timestamp
+    # + level column) and indent from the terminal width so rendered rows don't
+    # wrap once the handler prepends its own prefix to each logged line.
+    render_width = width or max(
+        40, get_terminal_width(max_width=120) - _RICH_LOG_PREFIX_WIDTH - len(indent)
+    )
+    for line in _render_rich_lines(renderable, width=render_width):
         logger.info("%s%s", indent, line)
 
 
