@@ -331,11 +331,14 @@ class TestPreparePrompt:
         assert "18:30" in result
         assert "51.0N, 0.9W" in result
 
-    def test_generated_prompt_empty_metadata(self, mod: types.ModuleType) -> None:
-        """Empty metadata should still produce a cataloguing prompt."""
+    def test_generated_prompt_empty_metadata_uses_triage_prompt(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """Auto eval mode should use the brief triage prompt when metadata is empty."""
         args = self._make_args()
         result = mod.prepare_prompt(args, {})
-        assert "caption" in result.lower() or "cataloguing" in result.lower()
+        assert result == "Describe this image briefly."
 
 
 class TestQualityIssueTruncation:

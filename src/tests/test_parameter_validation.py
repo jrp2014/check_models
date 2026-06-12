@@ -4,6 +4,7 @@ import argparse
 
 import pytest
 
+import check_models
 from check_models import (
     validate_cli_arguments,
     validate_kv_params,
@@ -341,3 +342,54 @@ class TestCliArgumentNormalization:
         validate_cli_arguments(args)
 
         assert "has no effect unless --verbose is also set" in caplog.text
+
+    def test_parser_defaults_eval_mode_to_auto(self) -> None:
+        """Default eval mode should be resolved after image metadata is known."""
+        parser = check_models._build_cli_parser()
+        args = parser.parse_args(["--folder", "test-folder"])
+
+        assert args.eval_mode == "auto"
+
+    def test_auto_eval_mode_uses_stress_defaults_when_metadata_exists(self) -> None:
+        """Auto mode should keep the cataloguing stress lane for metadata-bearing images."""
+        args = self._build_args(
+            eval_mode="auto",
+            max_tokens=check_models.DEFAULT_MAX_TOKENS,
+        )
+
+        check_models._apply_eval_mode_defaults(args, {"date": "2026-06-12", "exif": "{...}"})
+
+        assert args.eval_mode == "stress"
+        assert args.max_tokens == check_models.DEFAULT_MAX_TOKENS
+
+    def test_auto_eval_mode_uses_triage_defaults_without_metadata(self) -> None:
+        """Auto mode should avoid the metadata stress lane when no usable metadata exists."""
+        args = self._build_args(
+            eval_mode="auto",
+            max_tokens=check_models.DEFAULT_MAX_TOKENS,
+        )
+
+        check_models._apply_eval_mode_defaults(
+            args,
+            {
+                "date": None,
+                "time": None,
+                "gps": None,
+                "description": None,
+                "title": None,
+                "keywords": None,
+                "exif": "{}",
+            },
+        )
+
+        assert args.eval_mode == "triage"
+        assert args.max_tokens == check_models.TRIAGE_MAX_TOKENS
+
+    def test_auto_eval_mode_preserves_custom_token_cap_without_metadata(self) -> None:
+        """Metadata-aware defaults should not overwrite an already-custom token cap."""
+        args = self._build_args(eval_mode="auto", max_tokens=321)
+
+        check_models._apply_eval_mode_defaults(args, {})
+
+        assert args.eval_mode == "triage"
+        assert args.max_tokens == 321

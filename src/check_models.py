@@ -1724,6 +1724,17 @@ def _extract_generation_performance_data(
 
 # These constants define default values for various parameters used in the script.
 DEFAULT_MAX_TOKENS: Final[int] = 500
+DEFAULT_EVAL_MODE: Final[str] = "auto"
+TRIAGE_MAX_TOKENS: Final[int] = 200
+QUALITY_MAX_TOKENS: Final[int] = 1000
+_EVAL_MODE_METADATA_FIELDS: Final[tuple[str, ...]] = (
+    "date",
+    "time",
+    "gps",
+    "description",
+    "title",
+    "keywords",
+)
 DEFAULT_FOLDER: Final[Path] = Path.home() / "Pictures" / "Processed"
 # Output paths relative to script's directory (not CWD) for consistency
 _SCRIPT_DIR = Path(__file__).parent
@@ -19680,6 +19691,45 @@ def handle_metadata(image_path: Path, args: argparse.Namespace) -> MetadataDict:
     return metadata
 
 
+def _metadata_has_eval_context(metadata: Mapping[str, str | None] | None) -> bool:
+    """Return whether extracted image metadata is useful for stress-mode evaluation."""
+    if not metadata:
+        return False
+    for field_name in _EVAL_MODE_METADATA_FIELDS:
+        value = metadata.get(field_name)
+        if isinstance(value, str) and value.strip():
+            return True
+    return False
+
+
+def _resolve_eval_mode(eval_mode: str, metadata: Mapping[str, str | None] | None) -> str:
+    """Resolve the metadata-aware automatic eval mode to a concrete lane."""
+    if eval_mode != DEFAULT_EVAL_MODE:
+        return eval_mode
+    return "stress" if _metadata_has_eval_context(metadata) else "triage"
+
+
+def _apply_eval_mode_defaults(
+    args: argparse.Namespace,
+    metadata: Mapping[str, str | None] | None,
+) -> None:
+    """Apply metadata-aware eval-mode and token-cap defaults to parsed CLI args."""
+    requested_eval_mode = str(getattr(args, "eval_mode", DEFAULT_EVAL_MODE))
+    resolved_eval_mode = _resolve_eval_mode(requested_eval_mode, metadata)
+    if requested_eval_mode == DEFAULT_EVAL_MODE:
+        reason = "metadata found" if resolved_eval_mode == "stress" else "no image metadata found"
+        logger.info("Auto eval mode selected '%s' (%s).", resolved_eval_mode, reason)
+    args.eval_mode = resolved_eval_mode
+
+    max_tokens = getattr(args, "max_tokens", DEFAULT_MAX_TOKENS)
+    if max_tokens != DEFAULT_MAX_TOKENS:
+        return
+    if resolved_eval_mode == "triage":
+        args.max_tokens = TRIAGE_MAX_TOKENS
+    elif resolved_eval_mode == "quality":
+        args.max_tokens = QUALITY_MAX_TOKENS
+
+
 def _compact_prompt_text(value: str, *, max_chars: int) -> str:
     """Normalize whitespace and clip prompt context fields to a safe size."""
     compact = re.sub(r"\s+", " ", value).strip()
@@ -19818,7 +19868,7 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
     print_cli_section("Prompt Configuration")
     max_display_len = 200
 
-    eval_mode = getattr(args, "eval_mode", "stress")
+    eval_mode = _resolve_eval_mode(str(getattr(args, "eval_mode", DEFAULT_EVAL_MODE)), metadata)
 
     prompt: str
     if args.prompt:
@@ -24589,18 +24639,12 @@ def main(args: argparse.Namespace) -> None:
         # Validate all CLI arguments early to fail fast (after logging setup)
         validate_cli_arguments(args)
 
-        # Apply eval-mode overrides (only when user hasn't explicitly set values)
-        eval_mode = getattr(args, "eval_mode", "stress")
-        if eval_mode == "triage" and args.max_tokens == DEFAULT_MAX_TOKENS:
-            args.max_tokens = 200
-        elif eval_mode == "quality" and args.max_tokens == DEFAULT_MAX_TOKENS:
-            args.max_tokens = 1000
-
         print_cli_header("MLX Vision Language Model Check")
 
         image_path = find_and_validate_image(args)
 
         metadata = handle_metadata(image_path, args)
+        _apply_eval_mode_defaults(args, metadata)
 
         prompt = prepare_prompt(args, metadata)
 
@@ -25001,11 +25045,12 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     generation_group = parser.add_argument_group("Generation Controls")
     generation_group.add_argument(
         "--eval-mode",
-        choices=["stress", "triage", "quality"],
-        default="stress",
+        choices=[DEFAULT_EVAL_MODE, "stress", "triage", "quality"],
+        default=DEFAULT_EVAL_MODE,
         help=(
-            "Evaluation lane: 'stress' (default) = full cataloguing prompt with metadata, "
-            "500 token cap; 'triage' = short prompt, minimal context, 200 token cap, "
+            "Evaluation lane: 'auto' (default) uses 'stress' when extracted image metadata "
+            "is available and 'triage' otherwise; 'stress' = full cataloguing prompt with "
+            "metadata, 500 token cap; 'triage' = short prompt, minimal context, 200 token cap, "
             "pass/fail only; 'quality' = cataloguing prompt with generous 1000 token cap, "
             "scored on output quality."
         ),

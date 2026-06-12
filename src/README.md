@@ -892,7 +892,7 @@ See module docstrings and `__all__` exports for complete API reference.
 | `--trust-remote-code` / `--no-trust-remote-code` | flag | `True` | Allow/disallow custom code from Hub models. Use `--no-trust-remote-code` for security. |
 | `--revision` | str | (none) | Model revision (branch, tag, or commit) for reproducible runs. |
 | `--adapter-path` | str | (none) | Path to LoRA adapter weights to apply on top of the base model. |
-| `-p`, `--prompt` | str | omitted | Custom prompt text. Requires a value when provided; if omitted, a non-speculative metadata-verification prompt is generated automatically. |
+| `-p`, `--prompt` | str | omitted | Custom prompt text. Requires a value when provided; if omitted, the `--eval-mode` lane supplies the prompt. |
 | `--resize-shape` | int(s) | (none) | Resize image input before processor handling. Provide 1 integer for square resize or 2 for height width after one flag occurrence. |
 | `--eos-tokens` | list[str] | (none) | Additional EOS tokens to stop on. Supports escaped values like `\n`. May be repeated; token lists accumulate across occurrences. |
 | `--skip-special-tokens` | flag | `False` | Skip tokenizer special tokens in the detokenized output. |
@@ -902,7 +902,7 @@ See module docstrings and `__all__` exports for complete API reference.
 | `--thinking-start-token` | str | (none) | Token marking the start of a thinking block, such as `<think>`. |
 | `--thinking-end-token` | str | `</think>` | Token marking the end of a thinking block when thinking mode is enabled. |
 | `-d`, `--detailed-metrics` | flag | `False` | Show expanded multi-line metrics block, including phase timings and stop reason when available; ignored unless `--verbose` is also set. |
-| `--eval-mode` | str | `stress` | Evaluation lane: `stress` (default) = full cataloguing prompt, 500 token cap; `triage` = short prompt, 200 token cap, pass/fail only; `quality` = cataloguing prompt with generous 1000 token cap. |
+| `--eval-mode` | str | `auto` | Evaluation lane: `auto` (default) selects `stress` when extracted image metadata is available and `triage` otherwise; `stress` = full cataloguing prompt, 500 token cap; `triage` = short prompt, 200 token cap, pass/fail only; `quality` = cataloguing prompt with generous 1000 token cap. |
 | `-x`, `--max-tokens` | int | 500 | Max new tokens to generate. |
 | `-t`, `--temperature` | float | 0.0 | Sampling temperature. |
 | `--top-p` | float | 1.0 | Nucleus sampling parameter (0.0-1.0); lower = more focused. |
