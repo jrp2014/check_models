@@ -463,10 +463,12 @@ run_metal_bug_reminder() {
 run_generate_stubs_command() {
 	local script_dir="$1"
 	shift
+	local src_dir
+	src_dir="$(cd "$script_dir/.." && pwd)"
 	if command -v conda &> /dev/null && conda env list | grep -q "^mlx-vlm "; then
-		conda run -n mlx-vlm python "$script_dir/generate_stubs.py" "$@"
+		(cd "$src_dir" && conda run -n mlx-vlm python -m tools.generate_stubs "$@")
 	else
-		python "$script_dir/generate_stubs.py" "$@"
+		(cd "$src_dir" && python -m tools.generate_stubs "$@")
 	fi
 }
 
