@@ -2,33 +2,44 @@
   "environment": {
     "library_versions": {
       "Pillow": "12.2.0",
-      "huggingface-hub": "1.15.0",
-      "mlx": "0.32.0.dev20260517+7b7c1240",
-      "mlx-audio": "0.4.3",
+      "huggingface-hub": "1.19.0",
+      "mlx": "0.32.0.dev20260614+89064477",
+      "mlx-audio": "0.4.4",
       "mlx-lm": "0.31.3",
       "mlx-metal": null,
-      "mlx-vlm": "0.5.0",
-      "numpy": "2.4.5",
+      "mlx-vlm": "0.6.3",
+      "numpy": "2.4.6",
       "tokenizers": "0.22.2",
-      "transformers": "5.8.1"
+      "transformers": "5.12.0"
     },
-    "platform": "macOS-26.5-arm64-arm-64bit-Mach-O",
+    "platform": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
     "preflight_issues": [],
     "system_info": {
+      "Active Developer Directory": "/Applications/Xcode.app/Contents/Developer",
+      "Apple Clang Version": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
       "Architecture": "arm64",
       "CPU Cores (Logical)": "18",
       "CPU Cores (Physical)": "18",
       "GPU Cores": "40",
       "GPU/Chip": "Apple M5 Max",
-      "Metal SDK": "MacOSX.sdk",
+      "MLX Core Extension": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so",
+      "MLX Distribution Root": "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
+      "MLX Install Type": "editable local source",
+      "MLX Metallib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (157,751,704 bytes, sha256=ba9913d81d92bbbde42bbc6dda27e80ecb31db6031fa073e6c8aeb0666d47c33)",
+      "MLX libmlx.dylib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,671,712 bytes, sha256=3a48ca2ae7659130de59374b0c50f6ba11b1dfecb8f6a2549f1b72fb41ac921c)",
+      "Metal Compiler Version": "Apple metal version 32023.883 (metalfe-32023.883)",
+      "Metal SDK": "MacOSX26.5.sdk",
       "Metal Support": "Metal 4",
+      "Metallib Linker Version": "AIR-LLD 32023.883 (metalfe-32023.883) (compatible with legacy metallib linker)",
       "OS": "Darwin 25.5.0",
       "Python Version": "3.13.13",
       "RAM": "128.0 GB",
+      "SDK Path": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
       "SDK Version": "26.5",
       "Xcode Build": "17F42",
       "Xcode Version": "26.5",
-      "macOS Version": "26.5"
+      "macOS Version": "26.5.1",
+      "mlx-metal Distribution": "not installed; local editable mlx supplies backend"
     }
   },
   "failure": {
@@ -42,9 +53,9 @@
     "traceback": null,
     "type": null
   },
-  "generated_at_utc": "2026-05-17T21:38:17+00:00",
+  "generated_at_utc": "2026-06-13T23:54:53+00:00",
   "issue_cluster_id": "mlx-vlm_stop-token_001",
-  "model": "mlx-community/Qwen2-VL-2B-Instruct-4bit",
+  "model": "mlx-community/Qwen3-VL-2B-Thinking-bf16",
   "repro": {
     "args": {
       "_check_models_preflight_issues": [],
@@ -55,23 +66,25 @@
       "enable_thinking": false,
       "eos_tokens": null,
       "eval_mode": "triage",
-      "exclude": [
-        "mlx-community/Qwen3-VL-2B-Thinking-bf16",
-        "Qwen/Qwen3-VL-2B-Instruct"
-      ],
-      "folder": "/Users/jrp/Pictures/Processed",
+      "exclude": null,
+      "folder": null,
       "force_color": false,
       "force_download": false,
-      "image": null,
+      "frequency_context_size": 20,
+      "frequency_penalty": null,
+      "image": "../../mlx-vlm/examples/images/cats.jpg",
       "kv_bits": null,
       "kv_group_size": 64,
       "kv_quant_scheme": "uniform",
       "lazy_load": false,
+      "link_style": "github",
+      "logit_bias": null,
       "max_kv_size": null,
       "max_tokens": 200,
       "min_p": 0.0,
       "models": null,
       "no_color": false,
+      "open_report": false,
       "output_diagnostics": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/diagnostics.md",
       "output_env": "/Users/jrp/Documents/AI/mlx/check_models/src/output/environment.log",
       "output_gallery_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/model_gallery.md",
@@ -82,6 +95,8 @@
       "output_review": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/review.md",
       "output_tsv": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.tsv",
       "prefill_step_size": 4096,
+      "presence_context_size": 20,
+      "presence_penalty": null,
       "processor_kwargs": null,
       "prompt": null,
       "prune_repro_days": 90,
@@ -93,6 +108,7 @@
       "rerun_triage": false,
       "resize_shape": null,
       "revision": null,
+      "seed": null,
       "skip_special_tokens": false,
       "temperature": 0.0,
       "thinking_budget": null,
@@ -105,13 +121,13 @@
       "verbose": true,
       "width": null
     },
-    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen2-VL-2B-Instruct-4bit mlx-community/X-Reasoner-7B-8bit",
+    "cluster_repro_command": "python -m check_models --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models microsoft/Phi-3.5-vision-instruct mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX mlx-community/Qwen3-VL-2B-Thinking-bf16",
     "env_vars": {
       "TOKENIZERS_PARALLELISM": "false"
     },
-    "image_path": "/Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg",
-    "image_ref_sha256": "d1aa69dd73e1a686603a752d0e4b71b76f832628f935f4626884df8082b9b6b4",
-    "image_sha256": "06f6f7fdc76b4cc85d8dcb7c180671c2a7e91574b3b3638c67907ca601e4ab2a",
+    "image_path": "/Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg",
+    "image_ref_sha256": "9bc422400088c31c0accf7fb023ee29945d47640042565218c1c33f78694f204",
+    "image_sha256": "dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e",
     "prompt_diagnostics": {
       "eos_token": "<|im_end|>",
       "eos_token_id": 151645,
@@ -129,81 +145,53 @@
         "top_p": 1.0
       },
       "image_placeholder_count": 0,
-      "model_type": "qwen2_vl",
-      "processor_class": "mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor",
-      "rendered_prompt_chars": 179,
-      "rendered_prompt_hash_sha256": "6e6ce7c438e47957265a02d51ae13486de220544ced687936c04b3a8570340c2",
-      "rendered_prompt_preview": "<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\nDescribe this image briefly.<|vision_start|><|image_pad|><|vision_end|><|im_end|>\n<|im_start|>assistant\n",
+      "model_type": "qwen3_vl",
+      "processor_class": "mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor",
+      "rendered_prompt_chars": 129,
+      "rendered_prompt_hash_sha256": "33f549721f3eaf9f9eb236d6550a38ccedb55128a6dc973b9ef6a4e967d0fb9d",
+      "rendered_prompt_preview": "<|im_start|>user\n<|vision_start|><|image_pad|><|vision_end|>Describe this image briefly.<|im_end|>\n<|im_start|>assistant\n<think>\n",
       "special_token_ids": [
         151645,
-        151643,
-        151644,
-        151646,
-        151647,
-        151648,
-        151649,
-        151650,
-        151651,
-        151652,
-        151653,
-        151654,
-        151655,
-        151656
+        151643
       ],
       "special_tokens": [
         "<|im_end|>",
-        "<|endoftext|>",
-        "<|im_start|>",
-        "<|object_ref_start|>",
-        "<|object_ref_end|>",
-        "<|box_start|>",
-        "<|box_end|>",
-        "<|quad_start|>",
-        "<|quad_end|>",
-        "<|vision_start|>",
-        "<|vision_end|>",
-        "<|vision_pad|>",
-        "<|image_pad|>",
-        "<|video_pad|>"
+        "<|endoftext|>"
       ],
       "tokenizer_class": "transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer"
     },
     "prompt_hash_sha256": "d760336d0fd143932f194573dd63f6b531e0ffbc2c4f1595e015392a3471c318",
     "prompt_preview": "Describe this image briefly.",
-    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen2-VL-2B-Instruct-4bit",
+    "rerun_command": "python -m check_models --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen3-VL-2B-Thinking-bf16",
     "seed": null
   },
   "result": {
-    "generated_text_preview": ". The Blueprints and 10. We are in and in the United States, I and my friends, and find the door. The sky is a bit, and the battery, and I, and I. It is the fault, and I am a, and I. The sky is blue and a, the sky. The sky is not a new, and I with me and a, and I with me, it is, and I and my friends, and they are in the background. We and its, and I and B, and I. The camera, and I. The sky is blue...",
+    "generated_text_preview": "So, let's see. The image shows two cats lying on a pink couch. The couch is a bright pink color, and there are two remote controls next to the cats. One cat is on the left, with a striped pattern, and the other is on the right, also striped but maybe a bit different. Both cats are relaxed, lying down, maybe sleeping. The remotes are white with some buttons, and one has a blue button. The backgroun...",
     "maintainer_triage": {
       "confidence": "high",
       "evidence": [
         "harness:stop_token",
-        "abrupt_tail",
-        "text_sanity",
-        "generation_loop"
+        "text_sanity"
       ],
       "harness_details": [
-        "token_leak:<|endoftext|>"
+        "token_leak:</think>"
       ],
-      "hit_max_tokens": true,
+      "hit_max_tokens": false,
       "issue_kind": "harness",
       "issue_subtype": "stop_token",
       "next_action": "Inspect EOS/stop-token stripping; control tokens are leaking into user-facing text.",
-      "nontext_prompt_ratio": 0.9996290801186943,
-      "prompt_output_ratio": 0.012363996043521267,
-      "prompt_tokens_total": 16176,
+      "nontext_prompt_ratio": 0.9810725552050473,
+      "prompt_output_ratio": 0.6182965299684543,
+      "prompt_tokens_total": 317,
       "requested_max_tokens": 200,
-      "stop_reason": "max_tokens",
-      "summary": "Special control token &lt;|endoftext|&gt; appeared in generated text. | hit token cap (200) | nontext prompt burden=100%",
+      "stop_reason": "completed",
+      "summary": "Special control token &lt;/think&gt; appeared in generated text. | nontext prompt burden=98%",
       "suspected_owner": "mlx-vlm",
       "user_bucket": "avoid"
     },
     "quality_issues": [
       "\u26a0\ufe0fharness(stop_token)",
-      "generation_loop(numeric_loop)",
-      "numeric_loop",
-      "lang_mixing"
+      "gibberish(token_noise)"
     ],
     "success": true
   },

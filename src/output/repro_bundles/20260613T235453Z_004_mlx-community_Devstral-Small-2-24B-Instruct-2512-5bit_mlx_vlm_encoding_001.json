@@ -2,33 +2,44 @@
   "environment": {
     "library_versions": {
       "Pillow": "12.2.0",
-      "huggingface-hub": "1.15.0",
-      "mlx": "0.32.0.dev20260517+7b7c1240",
-      "mlx-audio": "0.4.3",
+      "huggingface-hub": "1.19.0",
+      "mlx": "0.32.0.dev20260614+89064477",
+      "mlx-audio": "0.4.4",
       "mlx-lm": "0.31.3",
       "mlx-metal": null,
-      "mlx-vlm": "0.5.0",
-      "numpy": "2.4.5",
+      "mlx-vlm": "0.6.3",
+      "numpy": "2.4.6",
       "tokenizers": "0.22.2",
-      "transformers": "5.8.1"
+      "transformers": "5.12.0"
     },
-    "platform": "macOS-26.5-arm64-arm-64bit-Mach-O",
+    "platform": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
     "preflight_issues": [],
     "system_info": {
+      "Active Developer Directory": "/Applications/Xcode.app/Contents/Developer",
+      "Apple Clang Version": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
       "Architecture": "arm64",
       "CPU Cores (Logical)": "18",
       "CPU Cores (Physical)": "18",
       "GPU Cores": "40",
       "GPU/Chip": "Apple M5 Max",
-      "Metal SDK": "MacOSX.sdk",
+      "MLX Core Extension": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so",
+      "MLX Distribution Root": "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
+      "MLX Install Type": "editable local source",
+      "MLX Metallib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (157,751,704 bytes, sha256=ba9913d81d92bbbde42bbc6dda27e80ecb31db6031fa073e6c8aeb0666d47c33)",
+      "MLX libmlx.dylib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,671,712 bytes, sha256=3a48ca2ae7659130de59374b0c50f6ba11b1dfecb8f6a2549f1b72fb41ac921c)",
+      "Metal Compiler Version": "Apple metal version 32023.883 (metalfe-32023.883)",
+      "Metal SDK": "MacOSX26.5.sdk",
       "Metal Support": "Metal 4",
+      "Metallib Linker Version": "AIR-LLD 32023.883 (metalfe-32023.883) (compatible with legacy metallib linker)",
       "OS": "Darwin 25.5.0",
       "Python Version": "3.13.13",
       "RAM": "128.0 GB",
+      "SDK Path": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
       "SDK Version": "26.5",
       "Xcode Build": "17F42",
       "Xcode Version": "26.5",
-      "macOS Version": "26.5"
+      "macOS Version": "26.5.1",
+      "mlx-metal Distribution": "not installed; local editable mlx supplies backend"
     }
   },
   "failure": {
@@ -42,7 +53,7 @@
     "traceback": null,
     "type": null
   },
-  "generated_at_utc": "2026-05-17T21:38:17+00:00",
+  "generated_at_utc": "2026-06-13T23:54:53+00:00",
   "issue_cluster_id": "mlx-vlm_encoding_001",
   "model": "mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
   "repro": {
@@ -55,23 +66,25 @@
       "enable_thinking": false,
       "eos_tokens": null,
       "eval_mode": "triage",
-      "exclude": [
-        "mlx-community/Qwen3-VL-2B-Thinking-bf16",
-        "Qwen/Qwen3-VL-2B-Instruct"
-      ],
-      "folder": "/Users/jrp/Pictures/Processed",
+      "exclude": null,
+      "folder": null,
       "force_color": false,
       "force_download": false,
-      "image": null,
+      "frequency_context_size": 20,
+      "frequency_penalty": null,
+      "image": "../../mlx-vlm/examples/images/cats.jpg",
       "kv_bits": null,
       "kv_group_size": 64,
       "kv_quant_scheme": "uniform",
       "lazy_load": false,
+      "link_style": "github",
+      "logit_bias": null,
       "max_kv_size": null,
       "max_tokens": 200,
       "min_p": 0.0,
       "models": null,
       "no_color": false,
+      "open_report": false,
       "output_diagnostics": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/diagnostics.md",
       "output_env": "/Users/jrp/Documents/AI/mlx/check_models/src/output/environment.log",
       "output_gallery_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/model_gallery.md",
@@ -82,6 +95,8 @@
       "output_review": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/review.md",
       "output_tsv": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.tsv",
       "prefill_step_size": 4096,
+      "presence_context_size": 20,
+      "presence_penalty": null,
       "processor_kwargs": null,
       "prompt": null,
       "prune_repro_days": 90,
@@ -93,6 +108,7 @@
       "rerun_triage": false,
       "resize_shape": null,
       "revision": null,
+      "seed": null,
       "skip_special_tokens": false,
       "temperature": 0.0,
       "thinking_budget": null,
@@ -105,13 +121,13 @@
       "verbose": true,
       "width": null
     },
-    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
+    "cluster_repro_command": "python -m check_models --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
     "env_vars": {
       "TOKENIZERS_PARALLELISM": "false"
     },
-    "image_path": "/Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg",
-    "image_ref_sha256": "d1aa69dd73e1a686603a752d0e4b71b76f832628f935f4626884df8082b9b6b4",
-    "image_sha256": "06f6f7fdc76b4cc85d8dcb7c180671c2a7e91574b3b3638c67907ca601e4ab2a",
+    "image_path": "/Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg",
+    "image_ref_sha256": "9bc422400088c31c0accf7fb023ee29945d47640042565218c1c33f78694f204",
+    "image_sha256": "dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e",
     "prompt_diagnostics": {
       "eos_token": "</s>",
       "eos_token_id": 2,
@@ -206,41 +222,34 @@
     },
     "prompt_hash_sha256": "d760336d0fd143932f194573dd63f6b531e0ffbc2c4f1595e015392a3471c318",
     "prompt_preview": "Describe this image briefly.",
-    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260516-143527_DSC00014.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
+    "rerun_command": "python -m check_models --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
     "seed": null
   },
   "result": {
-    "generated_text_preview": "pom\u0120avsl\u0120on0\u0120for\u0120on0\u0120and.\u0120.\u010aidunt\u00e7\u0126\u00b6\u00e5\u0132\u0130\u00e8\u00af\u00b4\u0120r\u00c3\u00b6\u0120in\u0120a.\u0120in\u0120a\u0120and.\u0120in\u0120a\u0120in\u0120a\u0120in\u0120a\u0120in\u0120a.\u0120in\u0120a\u0120in\u0120a\u0120in\u0120a\u0120in\u0120a\u0120in\u0120a\u0120kontinent.\u0120APs.\u0120in\u0120a.199Qs.99Q.199Q.199Q.11Q.199\u0120as\u0120a.199.1.199.199.19.199.19.19.19.19.19.\u0120in.\u0120in.\u0120in.9\u0120and.9\u0120and.99.99.99.999999999.99999.99.99.99.99.99.99.99.99.99.99.99.99.99.99.99.99.99",
+    "generated_text_preview": "The\u0120image\u0120features\u0120two\u0120cats\u0120lying\u0120on\u0120a\u0120pink\u0120surface,\u0120possibly\u0120a\u0120blanket\u0120or\u0120a\u0120couch.\u0120The\u0120cat\u0120on\u0120the\u0120left\u0120is\u0120a\u0120kitten,\u0120and\u0120the\u0120one\u0120on\u0120the\u0120right\u0120is\u0120an\u0120adult\u0120cat.\u0120Both\u0120cats\u0120are\u0120in\u0120relaxed\u0120postures,\u0120with\u0120the\u0120kitten\u0120lying\u0120on\u0120its\u0120side\u0120and\u0120the\u0120adult\u0120cat\u0120lying\u0120on\u0120its\u0120back.\u0120There\u0120are\u0120two\u0120remote\u0120controls\u0120placed\u0120near\u0120the\u0120cats,\u0120one\u0120closer\u0120to\u0120the\u0120kitten\u0120and\u0120the\u0120other\u0120closer\u0120to\u0120the\u0120adult\u0120cat.",
     "maintainer_triage": {
       "confidence": "high",
       "evidence": [
-        "harness:encoding",
-        "abrupt_tail",
-        "degeneration",
-        "fabrication",
-        "generation_loop"
+        "harness:encoding"
       ],
       "harness_details": [
-        "token_encoding:bpe_space_leak(41)"
+        "token_encoding:bpe_space_leak(76)"
       ],
-      "hit_max_tokens": true,
+      "hit_max_tokens": false,
       "issue_kind": "harness",
       "issue_subtype": "encoding",
       "next_action": "Inspect decode cleanup; tokenizer markers are leaking into user-facing text.",
-      "nontext_prompt_ratio": 0.9965616045845272,
-      "prompt_output_ratio": 0.11461318051575932,
-      "prompt_tokens_total": 1745,
+      "nontext_prompt_ratio": 0.9856115107913669,
+      "prompt_output_ratio": 0.2158273381294964,
+      "prompt_tokens_total": 417,
       "requested_max_tokens": 200,
-      "stop_reason": "max_tokens",
-      "summary": "Tokenizer space-marker artifacts (for example \u0120) appeared in output (about 41 occurrences). | hit token cap (200) | nontext prompt burden=100% | degeneration=character_loop: '.99' repeated",
+      "stop_reason": "completed",
+      "summary": "Tokenizer space-marker artifacts (for example \u0120) appeared in output (about 76 occurrences). | nontext prompt burden=99%",
       "suspected_owner": "mlx-vlm",
       "user_bucket": "avoid"
     },
     "quality_issues": [
-      "\u26a0\ufe0fharness(encoding)",
-      "generation_loop(degeneration)",
-      "degeneration",
-      "fabrication"
+      "\u26a0\ufe0fharness(encoding)"
     ],
     "success": true
   },

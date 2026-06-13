@@ -12,14 +12,41 @@
 - **Fixed when:** Requested sections render without template leakage.
 
 
+## Model
+
+- **Primary model:** `HuggingFaceTB/SmolVLM-Instruct`
+- **Affected model count:** 2
+- **Revision:** `unknown`
+- **Trust remote code:** `true`
+
+
+## Inputs
+
+- **Prompt:** `Describe this image briefly.`
+- **Image:** `/Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg`
+- **Image facts:** 640x480 (0.31 MP), JPG extension, 173131 bytes, sha256 `dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e`
+- **Shareable:** unknown
+
+
+## Expected Behavior
+
+- The native `mlx-vlm` CLI/Python repro should load the model, process the prompt and image, and return a response without the observed failure or quality regression.
+
+
+## Actual Behavior
+
+- Prompt/template output shape mismatch
+- Representative signal: output/prompt=1.1%
+
+
 ## Affected Models
 
 <!-- markdownlint-disable MD060 -->
 
 | Model                                 | Observed Behavior   | Token Counts                                                                | Optional Context                                                                                                                                                                                   |
 |---------------------------------------|---------------------|-----------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `HuggingFaceTB/SmolVLM-Instruct`      | output/prompt=1.1%  | prompt=1,196 \| output/prompt=1.09% \| nontext burden=99% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T225122Z_001_HuggingFaceTB_SmolVLM-Instruct_model_config_mlx_vlm_prompt_template_001.json)      |
-| `mlx-community/SmolVLM-Instruct-bf16` | output/prompt=1.1%  | prompt=1,196 \| output/prompt=1.09% \| nontext burden=99% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T225122Z_007_mlx-community_SmolVLM-Instruct-bf16_model_config_mlx_vlm_prompt_template_001.json) |
+| `HuggingFaceTB/SmolVLM-Instruct`      | output/prompt=1.1%  | prompt=1,196 \| output/prompt=1.09% \| nontext burden=99% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260613T235453Z_001_HuggingFaceTB_SmolVLM-Instruct_model_config_mlx_vlm_prompt_template_001.json)      |
+| `mlx-community/SmolVLM-Instruct-bf16` | output/prompt=1.1%  | prompt=1,196 \| output/prompt=1.09% \| nontext burden=99% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260613T235453Z_008_mlx-community_SmolVLM-Instruct-bf16_model_config_mlx_vlm_prompt_template_001.json) |
 <!-- markdownlint-enable MD060 -->
 
 
@@ -92,8 +119,8 @@ Generation/load config:
 
 Optional advanced context:
 
-- `HuggingFaceTB/SmolVLM-Instruct`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T225122Z_001_HuggingFaceTB_SmolVLM-Instruct_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/SmolVLM-Instruct-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260612T225122Z_007_mlx-community_SmolVLM-Instruct-bf16_model_config_mlx_vlm_prompt_template_001.json)
+- `HuggingFaceTB/SmolVLM-Instruct`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260613T235453Z_001_HuggingFaceTB_SmolVLM-Instruct_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/SmolVLM-Instruct-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260613T235453Z_008_mlx-community_SmolVLM-Instruct-bf16_model_config_mlx_vlm_prompt_template_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -115,7 +142,7 @@ Optional advanced context:
 | Component                  | Version                                                                                                                                                  |
 |----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
 | mlx-vlm                    | 0.6.3                                                                                                                                                    |
-| mlx                        | 0.32.0.dev20260612+269e099d                                                                                                                              |
+| mlx                        | 0.32.0.dev20260614+89064477                                                                                                                              |
 | mlx-lm                     | 0.31.3                                                                                                                                                   |
 | mlx-audio                  | 0.4.4                                                                                                                                                    |
 | transformers               | 5.12.0                                                                                                                                                   |
@@ -141,7 +168,7 @@ Optional advanced context:
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                                       |
 | MLX Core Extension         | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
 | MLX Metallib               | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (157,751,704 bytes, sha256=ba9913d81d92bbbde42bbc6dda27e80ecb31db6031fa073e6c8aeb0666d47c33) |
-| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,676,160 bytes, sha256=88c6fdf2f43c3d1ff8d5c974aa5525dc0e4f05d5dfd97e63f45221f5b7f0996f)  |
+| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,671,712 bytes, sha256=3a48ca2ae7659130de59374b0c50f6ba11b1dfecb8f6a2549f1b72fb41ac921c)  |
 | RAM                        | 128.0 GB                                                                                                                                                 |
 
 
