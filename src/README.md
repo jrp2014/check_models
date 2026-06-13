@@ -3,7 +3,7 @@
 `check_models.py` is a comprehensive benchmarking and inspection tool designed for MLX-compatible Vision Language Models (VLMs) on Apple Silicon. It streamlines the process of validating model performance, quality, and resource usage across your local model collection.
 
 > [!NOTE]
-> This tool runs MLX-format Vision-Language Models hosted on the [Hugging Face Hub](https://huggingface.co). By default, it discovers and runs all models found in your local Hugging Face Hub cache, making it effortless to benchmark your entire library.
+> This tool runs MLX-format Vision-Language Models hosted on the [Hugging Face Hub](https://huggingface.co). By default, it discovers and runs locally cached models that match the `mlx-vlm` server-supported cache layout, making it effortless to benchmark compatible local models.
 
 ## Who is this for?
 
@@ -28,10 +28,10 @@ conda activate mlx-vlm
 
 ### 2. Run Your First Check
 
-By default, the tool scans your Hugging Face cache for compatible models and runs them against the most recently modified image in `~/Pictures/Processed`.
+By default, the tool scans your Hugging Face cache for `mlx-vlm` server-supported models and runs them against the most recently modified image in `~/Pictures/Processed`. Cached repos that are not included are reported with a skip reason when `--models` is omitted.
 
 ```bash
-# Run all cached models against the most recent image in your folder
+# Run supported cached models against the most recent image in your folder
 python -m check_models --folder ~/Pictures/Processed --prompt "Describe this image."
 
 # Run against a specific image file
@@ -58,7 +58,7 @@ python -m check_models --dry-run
 
 ## Capabilities
 
-- **Model Discovery**: Auto-discovers locally cached MLX VLMs from Hugging Face cache or processes explicit model list with `--models`
+- **Model Discovery**: Auto-discovers locally cached MLX VLMs using the `mlx-vlm` server-supported cache filter, or processes an explicit model list with `--models`
 - **Selection Control**: Use `--exclude` to filter models from cache scan or explicit list
 - **Folder Mode**: Automatically selects most recently modified image from specified folder
 - **Metadata Extraction**: Multi-source metadata: EXIF + GPS + IPTC keywords/caption + XMP (dc:subject, dc:title) + Windows XP keywords, with fail-soft strategy for partially corrupt data
@@ -82,7 +82,7 @@ python -m check_models --dry-run
 
 | Area | Notes |
 | ---- | ----- |
-| Model discovery | Scans Hugging Face cache; explicit `--models` overrides. |
+| Model discovery | Scans Hugging Face cache for `mlx-vlm` server-supported repos; explicit `--models` overrides. |
 | Selection control | `--exclude` works with cache scan or explicit list. |
 | Prompting | `--prompt` overrides; otherwise structured cataloguing prompt with IPTC/XMP keyword seeding. |
 | Performance | generation_time, model_load_time, total_time, token counts, TPS, peak memory. |
@@ -156,7 +156,7 @@ pip install -e ".[dev,extras,torch]"
 The tool is flexible: it can scan your cache, run specific models, or process single images.
 
 ```bash
-# 1. Run all cached models against a folder
+# 1. Run supported cached models against a folder
 python -m check_models --folder ~/Pictures/Processed
 
 # 2. Run a specific model against a single image
@@ -169,7 +169,7 @@ python -m check_models --image test.jpg --prompt "Detailed caption."
 ### Advanced Examples
 
 ```bash
-# Run across all cached models with a custom prompt
+# Run across supported cached models with a custom prompt
 python -m check_models -f ~/Pictures/Processed -p "What is the main object in this image?"
 
 # Explicit model list (skips cache discovery)
@@ -246,7 +246,7 @@ The tool generates multiple report formats in `output/` by default:
 - **Diagnostics** (`reports/diagnostics.md`): Failure-focused and compatibility-focused issue report (generated when failures, harness issues, or preflight compatibility warnings are present).
 - **Log** (`check_models.log`): Canonical comprehensive run artifact, including the full per-model review block and full output/captured failure output.
 - **History** (`results.history.jsonl`): Append-only run history for regressions/recoveries.
-- **Issue templates** (`issues/`): Ready-to-file GitHub issue markdown for clustered crashes and harness problems (generated when failures are present).
+- **Issue templates** (`issues/`): Ready-to-file GitHub issue markdown for clustered crashes and harness problems, including Model, Inputs, Expected Behavior, and Actual Behavior sections (generated when failures are present).
 - **Repro bundles** (`repro_bundles/`): JSON reproduction bundles per failed model, containing error details, CLI args, and environment for reproducibility.
 
 The main Markdown report stays brief and points readers to `check_models.log`, `review.md`, and `model_gallery.md` for the full automated review and output evidence.
@@ -946,12 +946,16 @@ Image selection logic:
 
 Model selection logic:
 
-1. No model selection flags: run all cached VLMs.
+1. No model selection flags: run cached repos that match the `mlx-vlm` server-supported cache filter.
 2. `--models` only: run exactly that list.
-3. `--exclude` only: run cached minus excluded.
+3. `--exclude` only: run supported cached repos minus excluded.
 4. `--models` + `--exclude`: intersect explicit list then subtract exclusions.
 
-The script warns about exclusions that don't match any candidate model.
+The cache filter requires repo type `model`, a cached `main` revision,
+`config.json`, `tokenizer_config.json`, and safetensors weights. When
+`--models` is omitted, local cached repos skipped by that filter are highlighted
+with the reason before the run list. The script also warns about exclusions that
+don't match any local cached repo.
 
 List-valued CLI flag semantics:
 

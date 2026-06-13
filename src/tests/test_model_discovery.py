@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 # HF cache environment is configured by conftest.py (early env setup + autouse fixture).
@@ -14,6 +16,41 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
+@dataclass(frozen=True)
+class _FakeCacheFile:
+    file_path: str
+
+
+@dataclass(frozen=True)
+class _FakeCacheRef:
+    files: tuple[_FakeCacheFile, ...]
+
+
+@dataclass(frozen=True)
+class _FakeCacheRepo:
+    repo_id: str
+    repo_type: str
+    refs: dict[str, _FakeCacheRef]
+
+
+@dataclass(frozen=True)
+class _FakeCacheInfo:
+    repos: tuple[_FakeCacheRepo, ...]
+
+
+def _fake_cache_repo(
+    repo_id: str,
+    files: tuple[str, ...],
+    *,
+    repo_type: str = "model",
+    include_main: bool = True,
+) -> _FakeCacheRepo:
+    refs = {"main": _FakeCacheRef(tuple(_FakeCacheFile(path) for path in files))}
+    if not include_main:
+        refs = {}
+    return _FakeCacheRepo(repo_id=repo_id, repo_type=repo_type, refs=refs)
+
+
 def test_get_cached_model_ids_returns_list() -> None:
     """Should return a list of model IDs from cache."""
     try:
@@ -24,6 +61,107 @@ def test_get_cached_model_ids_returns_list() -> None:
             assert isinstance(model_id, str)
     except CacheNotFound:
         pytest.skip("HuggingFace cache directory not found (expected in CI)")
+
+
+def test_get_cached_model_ids_matches_mlx_vlm_server_cache_filter(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Automatic cache discovery should match mlx-vlm's supported-model filter."""
+    cache_info = _FakeCacheInfo(
+        repos=(
+            _fake_cache_repo(
+                "org/supported-model",
+                ("config.json", "tokenizer_config.json", "model.safetensors"),
+            ),
+            _fake_cache_repo(
+                "org/supported-sharded-model",
+                ("config.json", "tokenizer_config.json", "model.safetensors.index.json"),
+            ),
+            _fake_cache_repo("org/no-tokenizer", ("config.json", "model.safetensors")),
+            _fake_cache_repo(
+                "org/no-weights",
+                ("config.json", "tokenizer_config.json", "pytorch_model.bin"),
+            ),
+            _fake_cache_repo(
+                "org/no-main-ref",
+                ("config.json", "tokenizer_config.json", "model.safetensors"),
+                include_main=False,
+            ),
+            _fake_cache_repo(
+                "org/dataset-cache",
+                ("config.json", "tokenizer_config.json", "model.safetensors"),
+                repo_type="dataset",
+            ),
+        )
+    )
+    monkeypatch.setattr(
+        check_models,
+        "_get_hf_cache_info_cached",
+        lambda **_: cache_info,
+    )
+
+    assert check_models.get_cached_model_ids() == [
+        "org/supported-model",
+        "org/supported-sharded-model",
+    ]
+
+
+def test_cached_model_eligibility_reports_skip_reasons(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Unsupported cached repos should carry maintainer-readable skip reasons."""
+    cache_info = _FakeCacheInfo(
+        repos=(
+            _fake_cache_repo("org/no-tokenizer", ("config.json", "model.safetensors")),
+            _fake_cache_repo(
+                "org/no-weights",
+                ("config.json", "tokenizer_config.json", "pytorch_model.bin"),
+            ),
+            _fake_cache_repo(
+                "org/no-main-ref",
+                ("config.json", "tokenizer_config.json", "model.safetensors"),
+                include_main=False,
+            ),
+        )
+    )
+    monkeypatch.setattr(
+        check_models,
+        "_get_hf_cache_info_cached",
+        lambda **_: cache_info,
+    )
+
+    entries = {
+        entry.repo_id: entry
+        for entry in check_models.get_cached_model_eligibility()
+        if not entry.supported
+    }
+
+    assert entries["org/no-tokenizer"].reasons == ("missing tokenizer_config.json",)
+    assert entries["org/no-weights"].reasons == ("missing safetensors weights",)
+    assert entries["org/no-main-ref"].reasons == ("missing main revision in cache",)
+
+
+def test_auto_cache_discovery_logs_skipped_models(caplog: pytest.LogCaptureFixture) -> None:
+    """Unspecified model runs should highlight cached models skipped by discovery."""
+    eligibility = (
+        check_models.CachedModelEligibility(
+            repo_id="org/supported-model",
+            supported=True,
+            reasons=(),
+        ),
+        check_models.CachedModelEligibility(
+            repo_id="org/no-tokenizer",
+            supported=False,
+            reasons=("missing tokenizer_config.json",),
+        ),
+    )
+
+    with caplog.at_level(logging.INFO, logger=check_models.logger.name):
+        selected = check_models._supported_cached_model_ids_with_skipped_logging(eligibility)
+
+    assert selected == ["org/supported-model"]
+    assert (
+        "Skipped 1 cached repo(s) that mlx-vlm server-style discovery would not run" in caplog.text
+    )
+    assert "org/no-tokenizer: missing tokenizer_config.json" in caplog.text
 
 
 def test_validate_model_identifier_accepts_valid_huggingface_format() -> None:

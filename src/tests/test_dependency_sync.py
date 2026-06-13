@@ -985,28 +985,21 @@ def test_update_script_defers_macos_deployment_target_to_upstream_mlx() -> None:
     assert 'INSTALL_CMD=(pip_install_verbose -e ".[dev]")' in mlx_build
 
 
-def test_quality_ci_targets_host_macos_before_dependency_install() -> None:
-    """Ensure macOS CI jobs beat setuptools' deployment-target default."""
+def test_quality_ci_defers_macos_deployment_target_to_upstream_mlx() -> None:
+    """MacOS CI should let upstream MLX choose the deployment target."""
     workflow = yaml.safe_load(
         (REPO_ROOT / ".github" / "workflows" / "quality.yml").read_text(encoding="utf-8")
     )
 
     for job_name in ("static-quality", "runtime-smoke"):
         steps = workflow["jobs"][job_name]["steps"]
-        target_step_index = next(
-            index
-            for index, step in enumerate(steps)
-            if step.get("name") == "Target host macOS for native builds"
+        step_names = {step.get("name") for step in steps}
+        install_command = next(
+            step["run"] for step in steps if step.get("name") == "Install dependencies"
         )
-        install_step_index = next(
-            index for index, step in enumerate(steps) if step.get("name") == "Install dependencies"
-        )
-        target_command = steps[target_step_index]["run"]
 
-        assert target_step_index < install_step_index
-        assert "MACOSX_DEPLOYMENT_TARGET" in target_command
-        assert "sw_vers -productVersion" in target_command
-        assert "GITHUB_ENV" in target_command
+        assert "Target host macOS for native builds" not in step_names
+        assert "MACOSX_DEPLOYMENT_TARGET" not in install_command
 
 
 def test_should_audit_path_excludes_generated_and_archived_paths(tmp_path: Path) -> None:

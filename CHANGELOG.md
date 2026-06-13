@@ -7,6 +7,15 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Bump the package version to `0.8.1` for the cache-discovery, issue-template,
+  and MLX workflow-alignment update.
+- Align automatic Hugging Face cache discovery with the pending `mlx-vlm`
+  server-supported model filter: repo type `model`, cached `main` revision,
+  `config.json`, `tokenizer_config.json`, and safetensors weights.
+- Highlight cached local repos skipped by automatic discovery, with the reason,
+  whenever `--models` is omitted.
+- Add explicit Model, Inputs, Expected Behavior, and Actual Behavior sections
+  to generated GitHub issue drafts, including prompt/image facts when available.
 - Add issue-style quality summaries and package/runtime stamps to the Markdown
   gallery report so full-run model output reviews are easier to paste into
   GitHub issues.
@@ -21,6 +30,8 @@ Notable changes to this project will be documented in this file.
 - Remove the local `tools/update.sh` macOS deployment-target workaround now
   that upstream MLX selects the host target when `MACOSX_DEPLOYMENT_TARGET` is
   unset.
+- Remove the matching macOS CI deployment-target workaround from quality and
+  runtime-smoke workflows so upstream MLX owns target selection consistently.
 
 
 ## [0.8.0] - 2026-06-06

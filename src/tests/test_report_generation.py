@@ -3500,6 +3500,17 @@ class TestGithubIssueReportContent:
         )
 
         content = next(iter(generated.values())).read_text(encoding="utf-8")
+        assert "## Model" in content
+        assert "- **Primary model:** `org/broken-model`" in content
+        assert "- **Revision:** `main`" in content
+        assert "- **Trust remote code:** `true`" in content
+        assert "## Inputs" in content
+        assert "- **Prompt:** `Analyze this image.`" in content
+        assert f"- **Image:** `{image_path}`" in content
+        assert "- **Shareable:** unknown" in content
+        assert "## Expected Behavior" in content
+        assert "## Actual Behavior" in content
+        assert "RuntimeError: shape mismatch" in content
         assert "python -m mlx_vlm.generate" in content
         assert "--model org/broken-model" in content
         assert "Analyze this image." in content
