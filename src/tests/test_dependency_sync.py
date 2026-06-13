@@ -969,8 +969,8 @@ def test_update_script_uses_upstream_mlx_editable_dev_install() -> None:
     assert "MLX_LOCAL_BUILD_SMOKE=0" in contributing
 
 
-def test_update_script_targets_host_macos_only_for_local_mlx_build() -> None:
-    """Local mlx builds should target the host unless the caller chose a target."""
+def test_update_script_defers_macos_deployment_target_to_upstream_mlx() -> None:
+    """Local mlx builds should let upstream MLX choose the deployment target."""
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
 
     mlx_build_start = update_script.index("# MLX build controls are passed to pip via CMAKE_ARGS.")
@@ -980,16 +980,9 @@ def test_update_script_targets_host_macos_only_for_local_mlx_build() -> None:
     )
     mlx_build = update_script[mlx_build_start:mlx_build_end]
 
-    assert 'if [[ -n "${MACOSX_DEPLOYMENT_TARGET+x}" ]]; then' in mlx_build
-    assert 'MACOSX_DEPLOYMENT_TARGET="$(sw_vers -productVersion)"' in mlx_build
-    assert "export MACOSX_DEPLOYMENT_TARGET" in mlx_build
-    assert "Using caller MACOSX_DEPLOYMENT_TARGET=" in mlx_build
-    assert 'export MACOSX_DEPLOYMENT_TARGET="$PREV_MACOSX_DEPLOYMENT_TARGET"' in mlx_build
-    assert "unset MACOSX_DEPLOYMENT_TARGET" in mlx_build
-    assert mlx_build.index('MACOSX_DEPLOYMENT_TARGET="$(sw_vers -productVersion)"') < (
-        mlx_build.index('INSTALL_CMD=(pip_install_verbose -e ".[dev]")')
-    )
-    assert update_script.count('MACOSX_DEPLOYMENT_TARGET="$(sw_vers -productVersion)"') == 1
+    assert "MACOSX_DEPLOYMENT_TARGET" not in mlx_build
+    assert "MLX_METAL_JIT" in mlx_build
+    assert 'INSTALL_CMD=(pip_install_verbose -e ".[dev]")' in mlx_build
 
 
 def test_quality_ci_targets_host_macos_before_dependency_install() -> None:

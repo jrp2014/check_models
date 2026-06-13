@@ -18,6 +18,9 @@ Notable changes to this project will be documented in this file.
 - Harden maintenance tooling by avoiding dynamic `conda.sh` sourcing, adding
   symlink-resistant text writes for generated stubs and hooks, and narrowing
   cleanup-script delete/help paths.
+- Remove the local `tools/update.sh` macOS deployment-target workaround now
+  that upstream MLX selects the host target when `MACOSX_DEPLOYMENT_TARGET` is
+  unset.
 
 
 ## [0.8.0] - 2026-06-06
