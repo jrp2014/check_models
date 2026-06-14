@@ -65,7 +65,7 @@ make quality   # run full gate (ruff + mypy + ty + pyrefly + pytest + shellcheck
 ## Ecosystem (quick links)
 
 - **[MLX](https://github.com/ml-explore/mlx)**: Array framework for Apple Silicon.
-- **[MLX VLM](https://github.com/ml-explore/mlx-vlm)**: Underlying VLM runtime.
+- **[MLX VLM](https://github.com/Blaizzy/mlx-vlm)**: Underlying VLM runtime.
 - **[Hugging Face Hub](https://huggingface.co)**: Model source (look for `mlx-community` or `mlx` tags).
 
 License: See the [LICENSE](LICENSE) file.

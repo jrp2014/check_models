@@ -7,8 +7,16 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Bump the package version to `0.8.1` for the cache-discovery, issue-template,
-  and MLX workflow-alignment update.
+- Bump the package version to `0.8.2` for the MLX stack dependency sync and
+  upstream passthrough-diagnostics refinement.
+- Align the project Transformers floor with the current `mlx-lm>=0.31.3`
+  requirement (`transformers>=5.7.0`) and keep the shared dependency policy,
+  install snippets, and environment validation in sync.
+- Add `--gen-kwargs` alongside `--processor-kwargs` so users can follow the
+  upstream `mlx-vlm` idiom of keeping processor/preprocessing options separate
+  from model-specific generation options, with the same split preserved in
+  diagnostics, JSONL prompt metadata, repro bundles, and native `mlx-vlm`
+  repro commands.
 - Align automatic Hugging Face cache discovery with the pending `mlx-vlm`
   server-supported model filter: repo type `model`, cached `main` revision,
   `config.json`, `tokenizer_config.json`, and safetensors weights.

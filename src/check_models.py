@@ -2780,6 +2780,7 @@ class ProcessImageParams:
     eos_tokens: tuple[str, ...] | None = None
     skip_special_tokens: bool = False
     processor_kwargs: dict[str, JsonLike] | None = None
+    gen_kwargs: dict[str, JsonLike] | None = None
     enable_thinking: bool = False
     thinking_budget: int | None = None
     thinking_start_token: str | None = None
@@ -14755,6 +14756,10 @@ def _append_repro_extended_generate_args(
     if processor_kwargs:
         tokens.extend(["--processor-kwargs", json.dumps(processor_kwargs, sort_keys=True)])
 
+    gen_kwargs = getattr(run_args, "gen_kwargs", None)
+    if gen_kwargs:
+        tokens.extend(["--gen-kwargs", json.dumps(gen_kwargs, sort_keys=True)])
+
     logit_bias = getattr(run_args, "logit_bias", None)
     if logit_bias:
         tokens.extend(["--logit-bias", json.dumps(logit_bias, sort_keys=True)])
@@ -16816,21 +16821,31 @@ _RESERVED_PROCESSOR_KWARG_KEYS: Final[frozenset[str]] = frozenset(
 )
 
 
-def _parse_processor_kwargs_arg(value: str) -> dict[str, JsonLike]:
-    """Parse ``--processor-kwargs`` as a JSON object."""
+def _parse_json_object_arg(value: str, *, argument_name: str) -> dict[str, JsonLike]:
+    """Parse a CLI JSON object argument with stable error wording."""
     try:
         parsed = json.loads(value)
     except json.JSONDecodeError as exc:
-        msg = f"processor_kwargs must be valid JSON: {exc.msg}"
+        msg = f"{argument_name} must be valid JSON: {exc.msg}"
         raise argparse.ArgumentTypeError(msg) from exc
 
     if not isinstance(parsed, dict):
-        msg = "processor_kwargs must be a JSON object"
+        msg = f"{argument_name} must be a JSON object"
         raise argparse.ArgumentTypeError(msg)
     if not all(isinstance(key, str) for key in parsed):
-        msg = "processor_kwargs keys must all be strings"
+        msg = f"{argument_name} keys must all be strings"
         raise argparse.ArgumentTypeError(msg)
     return cast("dict[str, JsonLike]", parsed)
+
+
+def _parse_processor_kwargs_arg(value: str) -> dict[str, JsonLike]:
+    """Parse ``--processor-kwargs`` as a JSON object."""
+    return _parse_json_object_arg(value, argument_name="processor_kwargs")
+
+
+def _parse_gen_kwargs_arg(value: str) -> dict[str, JsonLike]:
+    """Parse ``--gen-kwargs`` as a JSON object."""
+    return _parse_json_object_arg(value, argument_name="gen_kwargs")
 
 
 def _parse_logit_bias_arg(value: str) -> LogitBiasDict:
@@ -16901,6 +16916,20 @@ def _validate_processor_kwargs(
         msg = f"processor_kwargs cannot override dedicated CLI arguments: {overlap_str}"
         raise ValueError(msg)
     return dict(processor_kwargs)
+
+
+def _copy_json_object_kwargs(
+    kwargs: Mapping[str, JsonLike] | None,
+    *,
+    argument_name: str,
+) -> dict[str, JsonLike] | None:
+    """Return a defensive copy of a parsed passthrough kwargs mapping."""
+    if kwargs is None:
+        return None
+    if not all(isinstance(key, str) for key in kwargs):
+        msg = f"{argument_name} keys must all be strings"
+        raise ValueError(msg)
+    return dict(kwargs)
 
 
 def _validate_server_shared_request_params(args: argparse.Namespace) -> None:
@@ -16979,6 +17008,10 @@ def validate_cli_arguments(args: argparse.Namespace) -> None:
     args.eos_tokens = _decode_cli_eos_tokens(getattr(args, "eos_tokens", None))
     args.processor_kwargs = _validate_processor_kwargs(
         getattr(args, "processor_kwargs", None),
+    )
+    args.gen_kwargs = _copy_json_object_kwargs(
+        getattr(args, "gen_kwargs", None),
+        argument_name="gen_kwargs",
     )
     _validate_server_shared_request_params(args)
     _validate_thinking_params(args)
@@ -17075,6 +17108,7 @@ def _generation_kwargs_for_prompt_diagnostics(
     params: ProcessImageParams,
     extra_kwargs: Mapping[str, object],
     processor_passthrough_kwargs: Mapping[str, object],
+    generation_passthrough_kwargs: Mapping[str, object],
 ) -> dict[str, JsonLike]:
     """Return the generation kwargs forwarded to mlx-vlm in JSON-safe form."""
     kwargs: dict[str, object] = {
@@ -17094,6 +17128,9 @@ def _generation_kwargs_for_prompt_diagnostics(
     if params.quantize_activations:
         kwargs["quantize_activations"] = True
     kwargs.update(extra_kwargs)
+    if generation_passthrough_kwargs:
+        kwargs.update(generation_passthrough_kwargs)
+        kwargs["gen_kwargs"] = dict(generation_passthrough_kwargs)
     if processor_passthrough_kwargs:
         kwargs["processor_kwargs"] = dict(processor_passthrough_kwargs)
     return {key: _prompt_diag_json_value(value) for key, value in sorted(kwargs.items())}
@@ -17107,6 +17144,7 @@ def _build_prompt_diagnostics(
     formatted_prompt: str,
     extra_kwargs: Mapping[str, object],
     processor_passthrough_kwargs: Mapping[str, object],
+    generation_passthrough_kwargs: Mapping[str, object],
 ) -> PromptDiagnostics:
     """Collect bounded prompt/template diagnostics for JSONL and repro bundles."""
     tokenizer = _extract_processor_tokenizer(processor)
@@ -17132,6 +17170,7 @@ def _build_prompt_diagnostics(
             params=params,
             extra_kwargs=extra_kwargs,
             processor_passthrough_kwargs=processor_passthrough_kwargs,
+            generation_passthrough_kwargs=generation_passthrough_kwargs,
         ),
     )
 
@@ -18232,7 +18271,7 @@ def _cleanup_runtime_resources(*, synchronize_first: bool = True) -> None:
     _run_cleanup_step("mx.reset_peak_memory", reset_peak_memory_fn)
 
 
-def _generate_with_processor_passthrough(
+def _generate_with_passthrough_kwargs(
     *,
     generate_fn: Callable[..., GenerationResult],
     model: nn.Module,
@@ -18243,36 +18282,40 @@ def _generate_with_processor_passthrough(
 ) -> GenerationResult:
     """Call upstream generate() with user-provided passthrough kwargs.
 
-    This branch is intentionally dynamic because ``processor_kwargs`` is a
-    user-supplied JSON object whose keys depend on the active upstream model.
+    This branch is intentionally dynamic because ``processor_kwargs`` and
+    ``gen_kwargs`` are user-supplied JSON objects whose keys depend on the
+    active upstream model and installed mlx-vlm version.
     """
     processor_kwargs = params.processor_kwargs or {}
-    return generate_fn(
-        model=model,
-        processor=processor,
-        prompt=formatted_prompt,
-        image=str(params.image_path),
-        video=None,
-        verbose=params.verbose,
-        temperature=params.temperature,
-        top_p=params.top_p,
-        repetition_penalty=params.repetition_penalty,
-        repetition_context_size=params.repetition_context_size,
-        seed=params.seed,
-        presence_penalty=params.presence_penalty,
-        presence_context_size=params.presence_context_size,
-        frequency_penalty=params.frequency_penalty,
-        frequency_context_size=params.frequency_context_size,
-        logit_bias=params.logit_bias,
-        max_kv_size=params.max_kv_size,
-        kv_bits=params.kv_bits,
-        kv_quant_scheme=params.kv_quant_scheme,
-        kv_group_size=params.kv_group_size,
-        quantized_kv_start=params.quantized_kv_start,
-        max_tokens=params.max_tokens,
-        **processor_kwargs,
-        **extra_kwargs,
-    )
+    generation_kwargs = params.gen_kwargs or {}
+    call_kwargs: dict[str, object] = {
+        "model": model,
+        "processor": processor,
+        "prompt": formatted_prompt,
+        "image": str(params.image_path),
+        "video": None,
+        "verbose": params.verbose,
+        "temperature": params.temperature,
+        "top_p": params.top_p,
+        "repetition_penalty": params.repetition_penalty,
+        "repetition_context_size": params.repetition_context_size,
+        "seed": params.seed,
+        "presence_penalty": params.presence_penalty,
+        "presence_context_size": params.presence_context_size,
+        "frequency_penalty": params.frequency_penalty,
+        "frequency_context_size": params.frequency_context_size,
+        "logit_bias": params.logit_bias,
+        "max_kv_size": params.max_kv_size,
+        "kv_bits": params.kv_bits,
+        "kv_quant_scheme": params.kv_quant_scheme,
+        "kv_group_size": params.kv_group_size,
+        "quantized_kv_start": params.quantized_kv_start,
+        "max_tokens": params.max_tokens,
+    }
+    call_kwargs.update(processor_kwargs)
+    call_kwargs.update(extra_kwargs)
+    call_kwargs.update(generation_kwargs)
+    return generate_fn(**call_kwargs)
 
 
 def _sample_active_memory_gb() -> float | None:
@@ -18425,6 +18468,7 @@ def _run_model_generation(
 
     extra_kwargs = _build_generate_extra_kwargs(params)
     processor_passthrough_kwargs = params.processor_kwargs or {}
+    generation_passthrough_kwargs = params.gen_kwargs or {}
     prompt_diagnostics = _build_prompt_diagnostics(
         params=params,
         processor=processor,
@@ -18432,12 +18476,13 @@ def _run_model_generation(
         formatted_prompt=formatted_prompt,
         extra_kwargs=extra_kwargs,
         processor_passthrough_kwargs=processor_passthrough_kwargs,
+        generation_passthrough_kwargs=generation_passthrough_kwargs,
     )
     strict_generate = cast("StrictGenerateCallable", generate)
 
     def _generate_once() -> GenerationResult | SupportsGenerationResult:
-        if processor_passthrough_kwargs:
-            return _generate_with_processor_passthrough(
+        if processor_passthrough_kwargs or generation_passthrough_kwargs:
+            return _generate_with_passthrough_kwargs(
                 generate_fn=generate,
                 model=model,
                 processor=processor,
@@ -20431,6 +20476,7 @@ def process_models(
             eos_tokens=args.eos_tokens,
             skip_special_tokens=args.skip_special_tokens,
             processor_kwargs=args.processor_kwargs,
+            gen_kwargs=args.gen_kwargs,
             enable_thinking=args.enable_thinking,
             thinking_budget=args.thinking_budget,
             thinking_start_token=args.thinking_start_token,
@@ -23749,6 +23795,9 @@ def _native_mlx_vlm_generate_kwargs(run_args: argparse.Namespace | None) -> dict
     logit_bias = getattr(run_args, "logit_bias", None)
     if logit_bias:
         kwargs["logit_bias"] = dict(logit_bias)
+    gen_kwargs = getattr(run_args, "gen_kwargs", None)
+    if gen_kwargs:
+        kwargs.update(dict(gen_kwargs))
     return kwargs
 
 
@@ -23873,6 +23922,9 @@ def _build_native_mlx_vlm_cli_tokens(
     processor_kwargs = getattr(run_args, "processor_kwargs", None)
     if processor_kwargs:
         tokens.extend(["--processor-kwargs", json.dumps(processor_kwargs, sort_keys=True)])
+    gen_kwargs = getattr(run_args, "gen_kwargs", None)
+    if gen_kwargs:
+        tokens.extend(["--gen-kwargs", json.dumps(gen_kwargs, sort_keys=True)])
     _append_native_cli_optional_pair(
         tokens,
         "--prefill-step-size",
@@ -25429,6 +25481,16 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
         help=(
             "Extra processor kwargs as a JSON object. "
             'Example: --processor-kwargs \'{"cropping": false, "max_patches": 3}\''
+        ),
+    )
+    prompt_group.add_argument(
+        "--gen-kwargs",
+        type=_parse_gen_kwargs_arg,
+        default=None,
+        help=(
+            "Extra mlx-vlm generation kwargs as a JSON object. "
+            "Use this for upstream/model-specific generation options; keep preprocessing "
+            "options in --processor-kwargs."
         ),
     )
     prompt_group.add_argument(

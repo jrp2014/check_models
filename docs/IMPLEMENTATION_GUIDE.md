@@ -953,6 +953,11 @@ rg "UNUSED_CONSTANT" src/
 ### Dependency Version Synchronization
 
 **Runtime dependency versions MUST stay consistent** between `pyproject.toml` and the install snippets in `src/README.md`.
+The MLX stack floors are also mirrored in
+`src/check_models_data/dependency_policy.py` so preflight and `validate_env`
+diagnostics report the same requirements that packaging installs. When
+`mlx-lm` or `mlx-vlm` raises an upstream dependency floor, update the policy
+module, `src/pyproject.toml`, and regenerated README install snippets together.
 
 **Current slim runtime set** (authoritative in `src/pyproject.toml`):
 `mlx`, `mlx-lm`, `mlx-vlm`, `transformers`, `defusedxml`, `Pillow[xmp]`, `huggingface-hub[torch,typing]`, `numpy`, `packaging`, `rich`, `tabulate`, `wcwidth`, `PyYAML`

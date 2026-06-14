@@ -327,6 +327,19 @@ structured outputs, tool calls, top-logprobs envelopes, and image
 generation/editing endpoints. Use `mlx_vlm.server` directly for those server
 surfaces; `check_models` uses direct generation for benchmark isolation.
 
+#### Upstream Passthrough Kwargs
+
+`mlx-vlm` keeps processor options and generation options distinct. Use the same
+idiom here:
+
+- `--processor-kwargs`: model/processor preprocessing options such as
+  `{"cropping": false, "max_patches": 3}`.
+- `--gen-kwargs`: upstream or model-specific generation options such as
+  `{"generation_mode": "diffusion", "sampler": "native"}`.
+
+Both JSON objects are preserved separately in diagnostics and repro artifacts,
+while the direct `mlx_vlm.generate()` call receives the effective kwargs.
+
 #### KV Cache Quantization (Memory Optimization)
 
 Vision-language models maintain a **key-value (KV) cache** during text generation to avoid recomputing attention for previous tokens. For long sequences or large models, this cache can consume significant memory. MLX-VLM supports KV cache quantization to reduce memory usage with minimal impact on output quality.
@@ -532,7 +545,7 @@ If you prefer to install dependencies manually (ensure these match `pyproject.to
 
 <!-- MANUAL_INSTALL_START -->
 ```bash
-pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.2" "mlx-lm>=0.31.3" "mlx-vlm>=0.6.2" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=12.2.0" "PyYAML>=6.0" "rich>=14.1.0" "tabulate>=0.9.0" "transformers>=5.5.3" "wcwidth>=0.2.13"
+pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.2" "mlx-lm>=0.31.3" "mlx-vlm>=0.6.2" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=12.2.0" "PyYAML>=6.0" "rich>=14.1.0" "tabulate>=0.9.0" "transformers>=5.7.0" "wcwidth>=0.2.13"
 ```
 <!-- MANUAL_INSTALL_END -->
 
@@ -655,7 +668,7 @@ Runtime (installed automatically via `pip install -e .` when executed inside `sr
 | ------- | ------- | ------- |
 | Core tensor/runtime | `mlx` | `>=0.31.2` |
 | Vision‑language utilities | `mlx-vlm` | `>=0.6.2` |
-| Transformer compatibility surface | `transformers` | `>=5.5.3` |
+| Transformer compatibility surface | `transformers` | `>=5.7.0` |
 | Image processing & loading | `Pillow[xmp]` | `>=12.2.0` |
 | Safe XMP/XML parsing | `defusedxml` | `>=0.7.1` |
 | Model cache / discovery | `huggingface-hub` | `>=1.10.1` |
@@ -705,7 +718,7 @@ Development / QA:
 
 <!-- MINIMAL_INSTALL_START -->
 ```bash
-pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.2" "mlx-lm>=0.31.3" "mlx-vlm>=0.6.2" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=12.2.0" "PyYAML>=6.0" "rich>=14.1.0" "tabulate>=0.9.0" "transformers>=5.5.3" "wcwidth>=0.2.13"
+pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.2" "mlx-lm>=0.31.3" "mlx-vlm>=0.6.2" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=12.2.0" "PyYAML>=6.0" "rich>=14.1.0" "tabulate>=0.9.0" "transformers>=5.7.0" "wcwidth>=0.2.13"
 ```
 <!-- MINIMAL_INSTALL_END -->
 
@@ -747,7 +760,7 @@ pip install -e ".[dev,extras,torch]"  # dev tools + optional model/runtime deps
 > `mlx-lm` is part of the core runtime dependency set. The `extras` group adds psutil, tokenizers, einops, num2words, and sentencepiece. For the widest model coverage, pair extras with `.[torch]` or install `.[extras,torch]` directly.
 
 > [!NOTE]
-> Project policy requires `transformers>=5.5.3` and validates the live
+> Project policy requires `transformers>=5.7.0` and validates the live
 > `mlx_vlm` runtime contract during preflight so upstream API drift is surfaced
 > before generation starts.
 
@@ -897,6 +910,7 @@ See module docstrings and `__all__` exports for complete API reference.
 | `--eos-tokens` | list[str] | (none) | Additional EOS tokens to stop on. Supports escaped values like `\n`. May be repeated; token lists accumulate across occurrences. |
 | `--skip-special-tokens` | flag | `False` | Skip tokenizer special tokens in the detokenized output. |
 | `--processor-kwargs` | JSON | (none) | Extra processor kwargs as a JSON object. Example: `'{"cropping": false, "max_patches": 3}'`. |
+| `--gen-kwargs` | JSON | (none) | Extra upstream/model-specific generation kwargs as a JSON object. Example: `'{"generation_mode": "diffusion", "sampler": "native"}'`. |
 | `--enable-thinking` | flag | `False` | Enable thinking mode in the upstream chat template and generation flow. |
 | `--thinking-budget` | int | (none) | Maximum number of thinking tokens before forcing the end token. |
 | `--thinking-start-token` | str | (none) | Token marking the start of a thinking block, such as `<think>`. |

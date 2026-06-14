@@ -236,6 +236,12 @@ def test_dependency_policy_module_tracks_pyproject_stack_floors() -> None:
     assert not any(dep.startswith("mlx-lm>=") for dep in extras_deps)
 
 
+def test_dependency_policy_tracks_current_upstream_transformers_floor() -> None:
+    """Project and upstream mlx-lm policy should share the current Transformers floor."""
+    assert dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS["transformers"] == "5.7.0"
+    assert dependency_policy.UPSTREAM_MLX_LM_MINIMUMS["transformers"] == "5.7.0"
+
+
 def test_ty_uses_generated_typings_search_path() -> None:
     """Ensure ty resolves repo-local generated stubs like mlx_vlm.*."""
     pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))

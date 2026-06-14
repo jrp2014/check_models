@@ -108,7 +108,7 @@ def test_save_jsonl_report_includes_library_versions_in_metadata(tmp_path: Path)
     output_file = tmp_path / "results.jsonl"
     versions = cast(
         "check_models.LibraryVersionDict",
-        {"mlx": "0.31.1", "mlx-vlm": "0.4.4", "transformers": "5.5.3"},
+        {"mlx": "0.31.1", "mlx-vlm": "0.4.4", "transformers": "5.7.0"},
     )
 
     save_jsonl_report(

@@ -945,8 +945,8 @@ class TestPreflightDependencyDiagnostics:
     def test_is_version_at_least_handles_dev_builds(self, mod: types.ModuleType) -> None:
         """Dev build strings should compare correctly against floor versions."""
         assert mod._is_version_at_least("0.30.7.dev20260214+c184262d", "0.30.4")
-        assert mod._is_version_at_least("5.5.3+local", "5.5.3")
-        assert not mod._is_version_at_least("5.5.3rc1", "5.5.3")
+        assert mod._is_version_at_least("5.7.0+local", "5.7.0")
+        assert not mod._is_version_at_least("5.7.0rc1", "5.7.0")
 
     def test_collect_upstream_requirements_tracks_strictest_floor(
         self,
@@ -991,7 +991,7 @@ class TestPreflightDependencyDiagnostics:
             for issue in issues
         )
         assert any("mlx-lm==0.30.9" in issue and "0.31.3" in issue for issue in issues)
-        assert any("transformers==5.3.9" in issue and "5.5.3" in issue for issue in issues)
+        assert any("transformers==5.3.9" in issue and "5.7.0" in issue for issue in issues)
         assert any("huggingface-hub==1.9.9" in issue and "1.10.1" in issue for issue in issues)
 
     def test_get_callable_contract_issues_reports_keyword_drift(

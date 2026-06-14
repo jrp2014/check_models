@@ -183,6 +183,7 @@ class TestCliArgumentNormalization:
             "resize_shape": None,
             "eos_tokens": None,
             "processor_kwargs": None,
+            "gen_kwargs": None,
             "enable_thinking": False,
             "thinking_budget": None,
             "thinking_start_token": None,
@@ -204,6 +205,25 @@ class TestCliArgumentNormalization:
         assert args.resize_shape == (512, 512)
         assert args.eos_tokens == ("</think>", "\n")
         assert args.processor_kwargs == {"cropping": False, "max_patches": 3}
+
+    def test_cli_argument_normalization_keeps_gen_kwargs_separate(self) -> None:
+        """Upstream-style generation kwargs should parse separately from processor kwargs."""
+        parser = __import__("check_models")._build_cli_parser()
+        args = parser.parse_args(
+            [
+                "--folder",
+                "test-folder",
+                "--processor-kwargs",
+                '{"cropping": false}',
+                "--gen-kwargs",
+                '{"generation_mode": "diffusion", "sampler": "native"}',
+            ]
+        )
+
+        validate_cli_arguments(args)
+
+        assert args.processor_kwargs == {"cropping": False}
+        assert args.gen_kwargs == {"generation_mode": "diffusion", "sampler": "native"}
 
     def test_cli_argument_normalization_handles_accumulated_eos_tokens(self) -> None:
         """Normalization should decode EOS tokens accumulated across repeated flags."""

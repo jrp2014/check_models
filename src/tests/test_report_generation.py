@@ -428,7 +428,7 @@ class TestHtmlReportEdgeCases:
             results=results,
             prompt="describe",
             preflight_issues=(
-                "transformers==5.4.0 is below minimum 5.5.3 required by check_models.",
+                "transformers==5.4.0 is below minimum 5.7.0 required by check_models.",
             ),
         )
 
@@ -633,7 +633,7 @@ class TestMarkdownReportEdgeCases:
             results=results,
             prompt="describe",
             preflight_issues=(
-                "transformers==5.4.0 is below minimum 5.5.3 required by check_models.",
+                "transformers==5.4.0 is below minimum 5.7.0 required by check_models.",
             ),
         )
 
@@ -1227,14 +1227,14 @@ class TestDiagnosticsReport:
             prompt="test",
             history=DiagnosticsHistoryInputs(
                 preflight_issues=(
-                    "transformers==5.4.0 is below minimum 5.5.3 required by check_models.",
+                    "transformers==5.4.0 is below minimum 5.7.0 required by check_models.",
                 ),
             ),
         )
         assert result is True
         content = out.read_text(encoding="utf-8")
         assert "## Preflight Compatibility Warnings" in content
-        assert "transformers==5.4.0 is below minimum 5.5.3 required by check_models." in content
+        assert "transformers==5.4.0 is below minimum 5.7.0 required by check_models." in content
         assert "They are informational by" in content
         assert "default and do not invalidate successful runs on their own." in content
         assert "transformers/issues/new" in content
@@ -1251,7 +1251,7 @@ class TestDiagnosticsReport:
             prompt="test",
             history=DiagnosticsHistoryInputs(
                 preflight_issues=(
-                    "transformers==5.4.0 is below minimum 5.5.3 required by check_models.",
+                    "transformers==5.4.0 is below minimum 5.7.0 required by check_models.",
                     "mlx runtime probe reported a suspicious cache incompatibility",
                 ),
             ),
@@ -1322,7 +1322,7 @@ class TestDiagnosticsReport:
             prompt="test",
             history=DiagnosticsHistoryInputs(
                 preflight_issues=(
-                    "transformers==5.4.0 is below minimum 5.5.3 required by check_models.",
+                    "transformers==5.4.0 is below minimum 5.7.0 required by check_models.",
                 ),
             ),
         )
@@ -2218,7 +2218,7 @@ class TestDiagnosticsReport:
             prompt="test",
             history=DiagnosticsHistoryInputs(
                 preflight_issues=(
-                    "transformers==5.4.0 is below minimum 5.5.3 required by check_models.",
+                    "transformers==5.4.0 is below minimum 5.7.0 required by check_models.",
                     "mlx runtime probe reported a suspicious cache incompatibility",
                 ),
             ),
@@ -2472,6 +2472,7 @@ class TestDiagnosticsReport:
             eos_tokens=("</think>",),
             skip_special_tokens=True,
             processor_kwargs={"cropping": False},
+            gen_kwargs={"generation_mode": "diffusion", "sampler": "native"},
             force_download=True,
             quantize_activations=True,
             enable_thinking=True,
@@ -2517,6 +2518,7 @@ class TestDiagnosticsReport:
         assert "--eos-tokens '</think>'" in content
         assert "--skip-special-tokens" in content
         assert "--processor-kwargs '{\"cropping\": false}'" in content
+        assert '--gen-kwargs \'{"generation_mode": "diffusion", "sampler": "native"}\'' in content
         assert "--force-download" in content
         assert "--quantize-activations" in content
         assert "--enable-thinking" in content
@@ -2835,7 +2837,7 @@ class TestDiagnosticsReport:
                 ),
             ),
             preflight_issues=(
-                "transformers==5.4.0 is below minimum 5.5.3 required by check_models.",
+                "transformers==5.4.0 is below minimum 5.7.0 required by check_models.",
             ),
         )
         artifacts = DiagnosticsArtifacts(
@@ -2962,7 +2964,7 @@ class TestDiagnosticsReport:
                 ),
             ),
             preflight_issues=(
-                "transformers==5.4.0 is below minimum 5.5.3 required by check_models.",
+                "transformers==5.4.0 is below minimum 5.7.0 required by check_models.",
                 "mlx runtime probe reported a suspicious cache incompatibility",
             ),
         )
@@ -3289,6 +3291,7 @@ class TestReproCommandNormalization:
             resize_shape=(64, 32),
             eos_tokens=["</s>", "<|end|>"],
             processor_kwargs={"cropping": False},
+            gen_kwargs={"generation_mode": "diffusion", "sampler": "native"},
             repetition_penalty=1.1,
             repetition_context_size=64,
             max_kv_size=4096,
@@ -3326,6 +3329,11 @@ class TestReproCommandNormalization:
         assert "--exclude" in tokens
         assert "--processor-kwargs" in tokens
         assert json.loads(tokens[tokens.index("--processor-kwargs") + 1]) == {"cropping": False}
+        assert "--gen-kwargs" in tokens
+        assert json.loads(tokens[tokens.index("--gen-kwargs") + 1]) == {
+            "generation_mode": "diffusion",
+            "sampler": "native",
+        }
 
     def test_check_models_repro_command_emits_logit_bias_once(self, tmp_path: Path) -> None:
         """Canonical check_models repro commands should not duplicate --logit-bias."""
@@ -3364,6 +3372,7 @@ class TestReproCommandNormalization:
             trust_remote_code=True,
             quantize_activations=True,
             processor_kwargs={"cropping": False},
+            gen_kwargs={"generation_mode": "diffusion", "sampler": "native"},
             prefill_step_size=512,
             enable_thinking=True,
             thinking_budget=32,
@@ -3405,6 +3414,7 @@ class TestReproCommandNormalization:
         ):
             assert unsupported_cli_flag not in tokens
         assert "--processor-kwargs" in tokens
+        assert "--gen-kwargs" in tokens
         assert "--prefill-step-size" in tokens
 
         assert "'top_p': 0.8" in script
@@ -3412,6 +3422,8 @@ class TestReproCommandNormalization:
         assert "'top_k': 4" in script
         assert "'repetition_penalty': 1.1" in script
         assert "'repetition_context_size': 64" in script
+        assert "'generation_mode': 'diffusion'" in script
+        assert "'sampler': 'native'" in script
         assert "from mlx_vlm.prompt_utils import apply_chat_template" in script
         assert "formatted_prompt = apply_chat_template(" in script
         assert "processor," in script

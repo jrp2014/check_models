@@ -8,7 +8,7 @@ PROJECT_RUNTIME_STACK_MINIMUMS: Final[dict[str, str]] = {
     "mlx": "0.31.2",
     "mlx-lm": "0.31.3",
     "mlx-vlm": "0.6.2",
-    "transformers": "5.5.3",
+    "transformers": "5.7.0",
     "huggingface-hub": "1.10.1",
 }
 
@@ -23,7 +23,7 @@ UPSTREAM_MLX_VLM_MINIMUMS: Final[dict[str, str]] = {
 
 UPSTREAM_MLX_LM_MINIMUMS: Final[dict[str, str]] = {
     "mlx": "0.31.2",
-    "transformers": "5.0.0",
+    "transformers": "5.7.0",
 }
 
 VALIDATE_ENV_CORE_FALLBACK_SPECS: Final[dict[str, str]] = {
