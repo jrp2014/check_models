@@ -55,7 +55,9 @@ These files are regenerated each time you run the tool (**history is append-only
 
 ### Test/Debug Output (excluded from git)
 
-When running tests, integration checks, or debug runs, pass custom output paths via CLI flags to avoid polluting production results:
+When running tests, integration checks, or debug runs, pass custom output paths
+via CLI flags and use the `test_` prefix to avoid polluting production
+results:
 
 ```bash
 # Example: Running tests with debug-specific output
@@ -69,13 +71,19 @@ python -m check_models \
   [other options...]
 ```
 
-Files matching `test_*.{html,md,tsv,jsonl,log}` are automatically excluded from git tracking via `.gitignore`.
+Files matching the `test_*` prefix in `output/`, `reports/`, `issues/`, and
+`repro_bundles/` are automatically excluded from git tracking via `.gitignore`.
+The production Markdown reports are linted by the quality gate because they are
+tracked artifacts. Keep generated markdownlint guards stable in
+`check_models.py`, and do not commit ad-hoc debug output or one-off local run
+churn unless it is an intentional benchmark snapshot.
 
 **Separation strategy**:
 
 - **Production runs**: Use default outputs (reports in `reports/`, machine data and logs in `output/`) → committed to git
 - **Integration tests**: Use `test_cli_integration.{log,html,md,tsv,jsonl}` plus any test gallery artifact → gitignored (handled automatically by test suite)
-- **Manual test/debug runs**: Pass custom paths with `test_` prefix or any other name except the production defaults → gitignored
+- **Manual test/debug runs**: Pass custom paths with the `test_` prefix so
+  `.gitignore` excludes the local artifacts
 - **Pre-push git hook**: Runs pytest which uses test-specific output files → doesn't overwrite production log
 
 This ensures your production benchmark results in git remain clean and only reflect intentional benchmark runs, not test/debug executions.

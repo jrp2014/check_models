@@ -57,3 +57,9 @@ typings/
 
 # Temporary suppression-audit snapshots
 *.suppression-audit.*
+
+# Test/debug generated output; production defaults under src/output are tracked.
+src/output/test_*
+src/output/reports/test_*
+src/output/issues/test_*
+src/output/repro_bundles/test_*

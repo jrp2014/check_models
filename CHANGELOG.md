@@ -21,6 +21,8 @@ Notable changes to this project will be documented in this file.
   GitHub issues.
 - Stop generated Markdown reports from re-enabling `MD013`, which could make
   later generated traceback/output lines fail the pre-push markdownlint hook.
+- Centralize generated-report markdownlint guard rule sets and document the
+  tracked-output policy, including `test_` ignore patterns for local artifacts.
 - Make `--eval-mode` default to metadata-aware `auto`, selecting `stress` for
   images with extracted metadata and the shorter `triage` lane for metadata-free
   images while preserving explicit mode choices.

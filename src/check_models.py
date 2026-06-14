@@ -188,6 +188,9 @@ __all__ = [
 
 LOGGER_NAME: Final[str] = "mlx-vlm-check"
 NOT_AVAILABLE: Final[str] = "N/A"
+MARKDOWNLINT_MAIN_TABLE_RULES: Final[str] = "MD033 MD034 MD037 MD049"
+MARKDOWNLINT_GALLERY_SUMMARY_RULES: Final[str] = "MD034"
+MARKDOWNLINT_TABLE_PIPE_RULES: Final[str] = "MD060"
 
 MISSING_DEPENDENCIES: dict[str, str] = {}
 
@@ -2034,6 +2037,16 @@ def _wrap_markdown_text(
         break_on_hyphens=False,
     )
     return wrapped or [initial_indent.rstrip()]
+
+
+def _guard_markdownlint_block(lines: Sequence[str], *, rules: str) -> list[str]:
+    """Wrap Markdown lines with markdownlint disable/enable comments."""
+    return [
+        f"<!-- markdownlint-disable {rules} -->",
+        "",
+        *lines,
+        f"<!-- markdownlint-enable {rules} -->",
+    ]
 
 
 def _escape_markdown_underscore_runs(text: str) -> str:
@@ -11917,10 +11930,7 @@ def _build_gallery_quality_summary_section(
             "when it did not produce usable output."
         ),
         "",
-        "<!-- markdownlint-disable MD034 -->",
-        "",
-        *table_lines,
-        "<!-- markdownlint-enable MD034 -->",
+        *_guard_markdownlint_block(table_lines, rules=MARKDOWNLINT_GALLERY_SUMMARY_RULES),
         "",
     ]
 
@@ -13177,7 +13187,7 @@ def _diagnostics_environment_section(
                 ),
             )
         ),
-        rules="MD060",
+        rules=MARKDOWNLINT_TABLE_PIPE_RULES,
     )
     parts.append("")
     return parts
@@ -13791,7 +13801,7 @@ def _diagnostics_failure_clusters(
                         ),
                     )
                 ),
-                rules="MD060",
+                rules=MARKDOWNLINT_TABLE_PIPE_RULES,
             )
         )
         parts.append("")
@@ -13932,7 +13942,7 @@ def _diagnostics_stack_signal_section(
                     ),
                 ),
             ),
-            rules="MD060",
+            rules=MARKDOWNLINT_TABLE_PIPE_RULES,
         )
     )
     parts.append("")
@@ -14324,7 +14334,7 @@ def _diagnostics_issue_queue_section(
                     repro_bundles,
                 ),
             ),
-            rules="MD060",
+            rules=MARKDOWNLINT_TABLE_PIPE_RULES,
         )
     )
     parts.append("")
@@ -14432,7 +14442,7 @@ def _diagnostics_history_section(
                     ),
                 ),
             ),
-            rules="MD060",
+            rules=MARKDOWNLINT_TABLE_PIPE_RULES,
         )
     )
     parts.append("")
@@ -15840,16 +15850,15 @@ def _generate_markdown_table_section(report_context: ReportRenderContext) -> lis
 
     markdown_table = normalize_markdown_trailing_spaces(markdown_table)
 
-    md: list[str] = []
     # Surround the table with markdownlint rule guards; the table can be wide and may
     # contain HTML breaks and model-generated emphasis styles
-    md.append("<!-- markdownlint-disable MD033 MD034 MD037 MD049 -->")
-    md.append("")
-    md.append(markdown_table)
-    md.append("")
-    md.append("<!-- markdownlint-enable MD033 MD034 MD037 MD049 -->")
-    md.append("")
-    return md
+    return [
+        *_guard_markdownlint_block(
+            [markdown_table, ""],
+            rules=MARKDOWNLINT_MAIN_TABLE_RULES,
+        ),
+        "",
+    ]
 
 
 def _append_markdown_gallery_note(
@@ -16245,7 +16254,7 @@ def _append_review_issue_queue(
                 issue_link_for_cluster=_review_issue_link,
                 evidence_link_for_cluster=lambda _cluster: "-",
             ),
-            rules="MD060",
+            rules=MARKDOWNLINT_TABLE_PIPE_RULES,
         )
     )
     md.append("")
@@ -23399,16 +23408,6 @@ def _issue_model_signal(
     return result.error_message or "clustered issue signal"
 
 
-def _guard_markdownlint_block(lines: Sequence[str], *, rules: str) -> list[str]:
-    """Wrap Markdown lines with markdownlint disable/enable comments."""
-    return [
-        f"<!-- markdownlint-disable {rules} -->",
-        "",
-        *lines,
-        f"<!-- markdownlint-enable {rules} -->",
-    ]
-
-
 def _issue_affected_models_section(
     cluster: IssueCluster,
     *,
@@ -23443,7 +23442,7 @@ def _issue_affected_models_section(
                     ),
                 )
             ),
-            rules="MD060",
+            rules=MARKDOWNLINT_TABLE_PIPE_RULES,
         )
     )
     parts.append("")
