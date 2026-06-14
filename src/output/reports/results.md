@@ -173,7 +173,7 @@ slowest).
 
 _Overall runtime:_ 416.13s
 
-<!-- markdownlint-disable MD013 MD033 MD034 MD037 MD049 -->
+<!-- markdownlint-disable MD033 MD034 MD037 MD049 -->
 
 | Model Name                                              |   Prompt (tokens) |   Generation (tokens) |   Total Tokens |   Prompt Tps |   Gen TPS |   Peak (GB) |   Cached Tokens | Finish Reason   |   Diffusion Canvas Tokens | Diffusion Denoising Steps   |   Diffusion Work Tokens |   Diffusion Canvas Tps |   Diffusion Work Tps | Is Draft   | Draft Text   | Text Already Printed   | Diffusion Step   | Diffusion Total Steps   | Diffusion Canvas Index   | Diffusion Block Complete   |   Generation (s) |   Load (s) |   Total (s) | Quality Issues                     |   Error Package |
 |:--------------------------------------------------------|------------------:|----------------------:|---------------:|-------------:|----------:|------------:|----------------:|:----------------|--------------------------:|:----------------------------|------------------------:|-----------------------:|---------------------:|:-----------|:-------------|:-----------------------|:-----------------|:------------------------|:-------------------------|:---------------------------|-----------------:|-----------:|------------:|:-----------------------------------|----------------:|
@@ -237,7 +237,7 @@ _Overall runtime:_ 416.13s
 | `mlx-community/paligemma2-10b-ft-docci-448-bf16`        |             1,031 |                   159 |          1,190 |          877 |      5.21 |          26 |               0 | stop            |                         0 | 0                           |                       0 |                      0 |                    0 | 0          |              | 0                      | 0                | 0                       | 0                        | 0                          |           31.84s |      2.50s |      34.37s |                                    |                 |
 | `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`          |               399 |                   200 |            599 |          461 |      4.75 |          39 |               0 | length          |                         0 | 0                           |                       0 |                      0 |                    0 | 0          |              | 0                      | 0                | 0                       | 0                        | 0                          |           43.27s |      3.59s |      46.88s | reasoning-leak, cutoff             |                 |
 
-<!-- markdownlint-enable MD013 MD033 MD034 MD037 MD049 -->
+<!-- markdownlint-enable MD033 MD034 MD037 MD049 -->
 
 _Review artifacts:_
 

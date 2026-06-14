@@ -19,6 +19,8 @@ Notable changes to this project will be documented in this file.
 - Add issue-style quality summaries and package/runtime stamps to the Markdown
   gallery report so full-run model output reviews are easier to paste into
   GitHub issues.
+- Stop generated Markdown reports from re-enabling `MD013`, which could make
+  later generated traceback/output lines fail the pre-push markdownlint hook.
 - Make `--eval-mode` default to metadata-aware `auto`, selecting `stress` for
   images with extracted metadata and the shorter `triage` lane for metadata-free
   images while preserving explicit mode choices.

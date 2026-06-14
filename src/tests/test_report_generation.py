@@ -585,6 +585,9 @@ class TestMarkdownReportEdgeCases:
         assert "## 🎯 Action Snapshot" in content
         assert "org/good" in content
         assert "org/bad" in content
+        assert "<!-- markdownlint-disable MD033 MD034 MD037 MD049 -->" in content
+        assert "<!-- markdownlint-enable MD033 MD034 MD037 MD049 -->" in content
+        assert "<!-- markdownlint-enable MD013" not in content
 
     def test_markdown_report_includes_peak_delta_per_megapixel(
         self,
@@ -879,6 +882,10 @@ class TestMarkdownGalleryReport:
         assert "- `mlx-vlm`: `0.1`" in content
         assert "- `mlx`: `0.1`" in content
         assert "## Model Quality Summary" in content
+        assert "<!-- markdownlint-disable MD034 -->" in content
+        assert "<!-- markdownlint-enable MD034 -->" in content
+        assert "<!-- markdownlint-disable MD013 MD034 -->" not in content
+        assert "<!-- markdownlint-enable MD013" not in content
 
         summary = _extract_markdown_subsection(
             content,

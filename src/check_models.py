@@ -11917,10 +11917,10 @@ def _build_gallery_quality_summary_section(
             "when it did not produce usable output."
         ),
         "",
-        "<!-- markdownlint-disable MD013 MD034 -->",
+        "<!-- markdownlint-disable MD034 -->",
         "",
         *table_lines,
-        "<!-- markdownlint-enable MD013 MD034 -->",
+        "<!-- markdownlint-enable MD034 -->",
         "",
     ]
 
@@ -15843,11 +15843,11 @@ def _generate_markdown_table_section(report_context: ReportRenderContext) -> lis
     md: list[str] = []
     # Surround the table with markdownlint rule guards; the table can be wide and may
     # contain HTML breaks and model-generated emphasis styles
-    md.append("<!-- markdownlint-disable MD013 MD033 MD034 MD037 MD049 -->")
+    md.append("<!-- markdownlint-disable MD033 MD034 MD037 MD049 -->")
     md.append("")
     md.append(markdown_table)
     md.append("")
-    md.append("<!-- markdownlint-enable MD013 MD033 MD034 MD037 MD049 -->")
+    md.append("<!-- markdownlint-enable MD033 MD034 MD037 MD049 -->")
     md.append("")
     return md
 
