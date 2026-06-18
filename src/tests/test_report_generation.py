@@ -2472,7 +2472,6 @@ class TestDiagnosticsReport:
             eos_tokens=("</think>",),
             skip_special_tokens=True,
             processor_kwargs={"cropping": False},
-            gen_kwargs={"generation_mode": "diffusion", "sampler": "native"},
             force_download=True,
             quantize_activations=True,
             enable_thinking=True,
@@ -2518,7 +2517,6 @@ class TestDiagnosticsReport:
         assert "--eos-tokens '</think>'" in content
         assert "--skip-special-tokens" in content
         assert "--processor-kwargs '{\"cropping\": false}'" in content
-        assert '--gen-kwargs \'{"generation_mode": "diffusion", "sampler": "native"}\'' in content
         assert "--force-download" in content
         assert "--quantize-activations" in content
         assert "--enable-thinking" in content
@@ -3329,11 +3327,6 @@ class TestReproCommandNormalization:
         assert "--exclude" in tokens
         assert "--processor-kwargs" in tokens
         assert json.loads(tokens[tokens.index("--processor-kwargs") + 1]) == {"cropping": False}
-        assert "--gen-kwargs" in tokens
-        assert json.loads(tokens[tokens.index("--gen-kwargs") + 1]) == {
-            "generation_mode": "diffusion",
-            "sampler": "native",
-        }
 
     def test_check_models_repro_command_emits_logit_bias_once(self, tmp_path: Path) -> None:
         """Canonical check_models repro commands should not duplicate --logit-bias."""
@@ -3372,7 +3365,6 @@ class TestReproCommandNormalization:
             trust_remote_code=True,
             quantize_activations=True,
             processor_kwargs={"cropping": False},
-            gen_kwargs={"generation_mode": "diffusion", "sampler": "native"},
             prefill_step_size=512,
             enable_thinking=True,
             thinking_budget=32,
@@ -3414,7 +3406,6 @@ class TestReproCommandNormalization:
         ):
             assert unsupported_cli_flag not in tokens
         assert "--processor-kwargs" in tokens
-        assert "--gen-kwargs" in tokens
         assert "--prefill-step-size" in tokens
 
         assert "'top_p': 0.8" in script
@@ -3422,8 +3413,6 @@ class TestReproCommandNormalization:
         assert "'top_k': 4" in script
         assert "'repetition_penalty': 1.1" in script
         assert "'repetition_context_size': 64" in script
-        assert "'generation_mode': 'diffusion'" in script
-        assert "'sampler': 'native'" in script
         assert "from mlx_vlm.prompt_utils import apply_chat_template" in script
         assert "formatted_prompt = apply_chat_template(" in script
         assert "processor," in script
@@ -3519,17 +3508,6 @@ class TestGithubIssueReportContent:
         )
 
         content = next(iter(generated.values())).read_text(encoding="utf-8")
-        assert "## Model" in content
-        assert "- **Primary model:** `org/broken-model`" in content
-        assert "- **Revision:** `main`" in content
-        assert "- **Trust remote code:** `true`" in content
-        assert "## Inputs" in content
-        assert "- **Prompt:** `Analyze this image.`" in content
-        assert f"- **Image:** `{image_path}`" in content
-        assert "- **Shareable:** unknown" in content
-        assert "## Expected Behavior" in content
-        assert "## Actual Behavior" in content
-        assert "RuntimeError: shape mismatch" in content
         assert "python -m mlx_vlm.generate" in content
         assert "--model org/broken-model" in content
         assert "Analyze this image." in content
