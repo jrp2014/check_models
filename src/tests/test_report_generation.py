@@ -3289,7 +3289,6 @@ class TestReproCommandNormalization:
             resize_shape=(64, 32),
             eos_tokens=["</s>", "<|end|>"],
             processor_kwargs={"cropping": False},
-            gen_kwargs={"generation_mode": "diffusion", "sampler": "native"},
             repetition_penalty=1.1,
             repetition_context_size=64,
             max_kv_size=4096,

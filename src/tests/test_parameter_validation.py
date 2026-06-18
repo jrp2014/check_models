@@ -183,7 +183,6 @@ class TestCliArgumentNormalization:
             "resize_shape": None,
             "eos_tokens": None,
             "processor_kwargs": None,
-            "gen_kwargs": None,
             "enable_thinking": False,
             "thinking_budget": None,
             "thinking_start_token": None,

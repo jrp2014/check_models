@@ -327,18 +327,16 @@ structured outputs, tool calls, top-logprobs envelopes, and image
 generation/editing endpoints. Use `mlx_vlm.server` directly for those server
 surfaces; `check_models` uses direct generation for benchmark isolation.
 
-#### Upstream Passthrough Kwargs
+#### Processor Passthrough and Generation Diagnostics
 
-`mlx-vlm` keeps processor options and generation options distinct. Use the same
-idiom here:
+`mlx-vlm` keeps processor options and generation options distinct. Use
+`--processor-kwargs` for model/processor preprocessing options such as
+`{"cropping": false, "max_patches": 3}`. Generation behavior is controlled by
+the named generation flags in this reference, including sampling, penalty,
+thinking, KV-cache, and token-budget options.
 
-- `--processor-kwargs`: model/processor preprocessing options such as
-  `{"cropping": false, "max_patches": 3}`.
-- `--gen-kwargs`: upstream or model-specific generation options such as
-  `{"generation_mode": "diffusion", "sampler": "native"}`.
-
-Both JSON objects are preserved separately in diagnostics and repro artifacts,
-while the direct `mlx_vlm.generate()` call receives the effective kwargs.
+Diagnostics and repro artifacts preserve the effective generation kwargs that
+the direct `mlx_vlm.generate()` call receives.
 
 #### KV Cache Quantization (Memory Optimization)
 
@@ -910,7 +908,6 @@ See module docstrings and `__all__` exports for complete API reference.
 | `--eos-tokens` | list[str] | (none) | Additional EOS tokens to stop on. Supports escaped values like `\n`. May be repeated; token lists accumulate across occurrences. |
 | `--skip-special-tokens` | flag | `False` | Skip tokenizer special tokens in the detokenized output. |
 | `--processor-kwargs` | JSON | (none) | Extra processor kwargs as a JSON object. Example: `'{"cropping": false, "max_patches": 3}'`. |
-| `--gen-kwargs` | JSON | (none) | Extra upstream/model-specific generation kwargs as a JSON object. Example: `'{"generation_mode": "diffusion", "sampler": "native"}'`. |
 | `--enable-thinking` | flag | `False` | Enable thinking mode in the upstream chat template and generation flow. |
 | `--thinking-budget` | int | (none) | Maximum number of thinking tokens before forcing the end token. |
 | `--thinking-start-token` | str | (none) | Token marking the start of a thinking block, such as `<think>`. |

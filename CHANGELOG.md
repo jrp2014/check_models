@@ -12,9 +12,8 @@ Notable changes to this project will be documented in this file.
 - Align the project Transformers floor with the current `mlx-lm>=0.31.3`
   requirement (`transformers>=5.7.0`) and keep the shared dependency policy,
   install snippets, and environment validation in sync.
-- Add `--gen-kwargs` alongside `--processor-kwargs` so users can follow the
-  upstream `mlx-vlm` idiom of keeping processor/preprocessing options separate
-  from model-specific generation options, with the same split preserved in
+- Keep upstream passthrough bounded to `--processor-kwargs` and named
+  generation-control flags, while preserving the effective generation kwargs in
   diagnostics, JSONL prompt metadata, repro bundles, and native `mlx-vlm`
   repro commands.
 - Align automatic Hugging Face cache discovery with the pending `mlx-vlm`
