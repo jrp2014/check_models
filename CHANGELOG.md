@@ -41,6 +41,9 @@ Notable changes to this project will be documented in this file.
   before the full `make quality` gate, and so `make test` is treated as a
   pytest-only development loop rather than a redundant step after successful
   `make quality`.
+- Extend the Skylos quality-gate invocation to include secrets and SCA checks,
+  while documenting `--danger` as an advisory follow-up until its current
+  filesystem findings are triaged.
 - Harden maintenance tooling by avoiding dynamic `conda.sh` sourcing, adding
   symlink-resistant text writes for generated stubs and hooks, and narrowing
   cleanup-script delete/help paths.

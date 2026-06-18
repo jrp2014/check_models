@@ -1216,7 +1216,7 @@ Key commands:
 - `make dev` — install dev setup (`pip install -e "src/[dev,extras,torch]"`)
 - `make test` — run pytest only; useful for a faster test loop before the full gate
 - `make vulture` — run the configured dead-code scan for `src/check_models.py` and `src/tools/`
-- `make quality` — full gate (ruff format+lint, mypy, ty, pyrefly, vulture, full pytest, shellcheck, markdownlint)
+- `make quality` — full gate (ruff format+lint, mypy, ty, pyrefly, vulture, Skylos quality/secrets/SCA, full pytest, shellcheck, markdownlint)
 - `make ci` — strict CI-style pipeline
 - `make deps-sync` — sync dependency blocks in docs from `pyproject.toml`
 - `python -m tools.update_readme_deps --check` — verify dependency blocks are already synced (no writes)

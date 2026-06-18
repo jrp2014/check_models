@@ -182,13 +182,16 @@ The project uses several automated quality checks:
 6. **Combined quality check**:
 
    ```bash
-   make quality     # Runs ruff + mypy + ty + pyrefly + vulture + full pytest + shellcheck + markdownlint
+   make quality     # Runs ruff + mypy + ty + pyrefly + vulture + Skylos + full pytest + shellcheck + markdownlint
    ```
 
    The Ty and Vulture steps inside `make quality` use the same checked-in repo
    wrappers and config as their standalone targets, so local runs and CI use
    the same behavior. A successful `make quality` run supersedes `make test`;
    run `make test` separately only when you want a pytest-only feedback loop.
+   The Skylos step gates quality, secrets, and dependency-vulnerability scans;
+   `--danger` findings are tracked separately until the current test/helper
+   false-positive queue is triaged.
 
 7. **Markdown linting**:
 
@@ -247,7 +250,7 @@ git push --no-verify
 
 All pull requests must pass:
 
-- Quality workflow (`.github/workflows/quality.yml`) `static-quality` job: workflow YAML validation, dependency sync check, ruff format check + lint, mypy + ty + pyrefly + Vulture, pytest, shellcheck, markdownlint
+- Quality workflow (`.github/workflows/quality.yml`) `static-quality` job: workflow YAML validation, dependency sync check, ruff format check + lint, mypy + ty + pyrefly + Vulture, Skylos quality/secrets/SCA, pytest, shellcheck, markdownlint
 - Quality workflow (`.github/workflows/quality.yml`) `runtime-smoke` job: isolated runtime smoke probe via `src/tools/run_runtime_smoke.sh`
 - Dependency sync guard (`.github/workflows/dependency-sync.yml`)
 

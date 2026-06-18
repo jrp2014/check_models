@@ -62,7 +62,7 @@ The file is organized in this order — search for these exact landmark headers 
 
 | Target | What it does |
 | -------- | ------------- |
-| `make quality` | **Primary gate**: checks Ruff formatting + lint, mypy, ty, pyrefly, vulture, full pytest, shellcheck, markdownlint |
+| `make quality` | **Primary gate**: checks Ruff formatting + lint, mypy, ty, pyrefly, vulture, Skylos quality/secrets/SCA, full pytest, shellcheck, markdownlint |
 | `make vulture` | Run Vulture dead-code scan for `src/check_models.py` and `src/tools/`. *Note: Vulture commonly flags `TypedDict` keys and `Protocol` signatures as "unused" because they are evaluated statically and not tracked natively in runtime logic flows. Treat these as false positives.* |
 | `make test` | Pytest-only shortcut for faster local test loops. Do not run it again after a successful `make quality`; `make quality` already runs the full pytest suite. |
 | `make dev` | Install editable with `[dev,extras,torch]` |
@@ -86,13 +86,13 @@ The file is organized in this order — search for these exact landmark headers 
 
 ### 7. CI and hooks
 
-- **Static CI job**: GitHub Actions `static-quality` on `macos-15`, Python 3.13, Node.js 22. It installs `src/.[dev]`, runs `npm install --prefix src`, generates MLX stubs via nanobind into `typings/`, then runs `bash src/tools/run_quality_checks.sh`.
+- **Static CI job**: GitHub Actions `static-quality` on `macos-15`, Python 3.13, Node.js 22. It installs `src/.[dev]`, runs `npm install --prefix src`, generates MLX stubs via nanobind into `typings/`, then runs `bash src/tools/run_quality_checks.sh`, including Skylos quality/secrets/SCA checks.
 - **Runtime CI job**: separate `runtime-smoke` job runs `bash src/tools/run_runtime_smoke.sh` so Metal/runtime failures do not mask static quality results.
 - **Dependency sync CI job**: `.github/workflows/dependency-sync.yml` runs on `ubuntu-latest` with path filters and verifies `python -m tools.update_readme_deps --check`.
 - **Pre-commit hooks**: either `pre-commit install` or `cd src && python -m tools.install_precommit_hook`. Both install the same two stages:
   - commit stage: `bash src/tools/run_commit_hygiene.sh`
   - push stage: `bash src/tools/check_quality_simple.sh`
-- **PRs must pass**: workflow YAML validation, dependency sync check, ruff format + lint, mypy, ty, pyrefly, vulture, pytest, shellcheck, markdownlint, plus the isolated runtime smoke probe.
+- **PRs must pass**: workflow YAML validation, dependency sync check, ruff format + lint, mypy, ty, pyrefly, vulture, Skylos quality/secrets/SCA, pytest, shellcheck, markdownlint, plus the isolated runtime smoke probe.
 
 ### 8. Coding conventions (quick reference)
 

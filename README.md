@@ -55,7 +55,7 @@ Expected outputs (default location: src/output/):
 make install   # install runtime dependencies
 make dev       # install dev dependencies (dev + extras + torch)
 make test      # run pytest only
-make quality   # run full gate (ruff + mypy + ty + pyrefly + full pytest + shellcheck + markdownlint)
+make quality   # run full gate (ruff + typing + vulture + Skylos + pytest + shellcheck + markdownlint)
 ```
 
 > [!TIP]

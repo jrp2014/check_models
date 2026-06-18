@@ -4,6 +4,11 @@ Skylos quality diagnostics are advisory for now. Gate project cleanup on securit
 secret, and dependency findings first, then use these quality results as a
 focused refactoring queue.
 
+The blocking `make quality` gate runs Skylos quality, secrets, and SCA checks.
+Keep `--danger` out of the blocking gate until the current filesystem
+read/write findings in tests and helper scripts are triaged into real fixes,
+targeted ignores, or a separate advisory audit.
+
 Keep `src/check_models.py` as the intentional CLI monolith. Refactor only when a
 nearby behavior-preserving test path exists, and prefer small readability
 improvements over broad rewrites.

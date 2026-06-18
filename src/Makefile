@@ -219,7 +219,7 @@ check: format lint typecheck test ## Core quality pipeline
 	@echo "✓ All core checks completed"
 
 .PHONY: quality
-quality: ## Run full quality checks (ruff format+lint+mypy+ty+pyrefly+vulture+pytest+shellcheck+markdownlint)
+quality: ## Run full quality checks (ruff+typing+vulture+Skylos+pytest+shellcheck+markdownlint)
 	bash tools/run_quality_checks.sh
 
 .PHONY: quality-strict
