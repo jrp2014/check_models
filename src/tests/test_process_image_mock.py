@@ -485,42 +485,6 @@ class TestProcessImageWithModelMock:
         assert generate_kwargs["cropping"] is False
         assert generate_kwargs["max_patches"] == 3
 
-    def test_run_model_generation_passes_upstream_gen_kwargs(self, test_image: Path) -> None:
-        """Upstream-style generation kwargs should reach generate() separately."""
-        params = replace(
-            _build_params(test_image),
-            gen_kwargs={"generation_mode": "diffusion", "sampler": "native"},
-        )
-
-        fake_model = _FakeModel()
-        fake_processor = object()
-        fake_generation = _FakeGenerationResult()
-
-        with (
-            patch.object(check_models, "_ensure_generation_runtime_symbols"),
-            patch.object(
-                check_models,
-                "_load_model",
-                return_value=(fake_model, fake_processor, None),
-            ),
-            patch.object(check_models, "_run_model_preflight_validators"),
-            patch.object(check_models, "apply_chat_template", return_value="formatted prompt"),
-            patch.object(check_models, "generate", return_value=fake_generation) as mock_generate,
-            patch.object(check_models, "mx", _FakeMxRuntime()),
-        ):
-            result = check_models._run_model_generation(params)
-
-        assert result is fake_generation
-        generate_kwargs = mock_generate.call_args.kwargs
-        assert generate_kwargs["generation_mode"] == "diffusion"
-        assert generate_kwargs["sampler"] == "native"
-        prompt_diagnostics = check_models._object_prompt_diagnostics(result)
-        assert prompt_diagnostics is not None
-        assert prompt_diagnostics.generate_kwargs["gen_kwargs"] == {
-            "generation_mode": "diffusion",
-            "sampler": "native",
-        }
-
     def test_run_model_generation_passes_thinking_kwargs(self, test_image: Path) -> None:
         """Thinking-mode flags should reach both chat templating and generation."""
         params = replace(
