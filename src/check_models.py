@@ -188,6 +188,9 @@ __all__ = [
 
 LOGGER_NAME: Final[str] = "mlx-vlm-check"
 NOT_AVAILABLE: Final[str] = "N/A"
+MARKDOWNLINT_MAIN_TABLE_RULES: Final[str] = "MD033 MD034 MD037 MD049"
+MARKDOWNLINT_GALLERY_SUMMARY_RULES: Final[str] = "MD034"
+MARKDOWNLINT_TABLE_PIPE_RULES: Final[str] = "MD060"
 
 MISSING_DEPENDENCIES: dict[str, str] = {}
 
@@ -11917,10 +11920,7 @@ def _build_gallery_quality_summary_section(
             "when it did not produce usable output."
         ),
         "",
-        "<!-- markdownlint-disable MD034 -->",
-        "",
-        *table_lines,
-        "<!-- markdownlint-enable MD034 -->",
+        *_guard_markdownlint_block(table_lines, rules=MARKDOWNLINT_GALLERY_SUMMARY_RULES),
         "",
     ]
 
@@ -13177,7 +13177,7 @@ def _diagnostics_environment_section(
                 ),
             )
         ),
-        rules="MD060",
+        rules=MARKDOWNLINT_TABLE_PIPE_RULES,
     )
     parts.append("")
     return parts
@@ -13791,7 +13791,7 @@ def _diagnostics_failure_clusters(
                         ),
                     )
                 ),
-                rules="MD060",
+                rules=MARKDOWNLINT_TABLE_PIPE_RULES,
             )
         )
         parts.append("")
@@ -13932,7 +13932,7 @@ def _diagnostics_stack_signal_section(
                     ),
                 ),
             ),
-            rules="MD060",
+            rules=MARKDOWNLINT_TABLE_PIPE_RULES,
         )
     )
     parts.append("")
@@ -14324,7 +14324,7 @@ def _diagnostics_issue_queue_section(
                     repro_bundles,
                 ),
             ),
-            rules="MD060",
+            rules=MARKDOWNLINT_TABLE_PIPE_RULES,
         )
     )
     parts.append("")
@@ -14432,7 +14432,7 @@ def _diagnostics_history_section(
                     ),
                 ),
             ),
-            rules="MD060",
+            rules=MARKDOWNLINT_TABLE_PIPE_RULES,
         )
     )
     parts.append("")
@@ -15843,11 +15843,11 @@ def _generate_markdown_table_section(report_context: ReportRenderContext) -> lis
     md: list[str] = []
     # Surround the table with markdownlint rule guards; the table can be wide and may
     # contain HTML breaks and model-generated emphasis styles
-    md.append("<!-- markdownlint-disable MD033 MD034 MD037 MD049 -->")
+    md.append(f"<!-- markdownlint-disable {MARKDOWNLINT_MAIN_TABLE_RULES} -->")
     md.append("")
     md.append(markdown_table)
     md.append("")
-    md.append("<!-- markdownlint-enable MD033 MD034 MD037 MD049 -->")
+    md.append(f"<!-- markdownlint-enable {MARKDOWNLINT_MAIN_TABLE_RULES} -->")
     md.append("")
     return md
 
@@ -16245,7 +16245,7 @@ def _append_review_issue_queue(
                 issue_link_for_cluster=_review_issue_link,
                 evidence_link_for_cluster=lambda _cluster: "-",
             ),
-            rules="MD060",
+            rules=MARKDOWNLINT_TABLE_PIPE_RULES,
         )
     )
     md.append("")
@@ -17206,6 +17206,15 @@ class HFCacheScanState:
     attempted: bool = False
     info: HFCacheInfo | None = None
     error: OSError | ValueError | HFValidationError | None = None
+
+
+@dataclass(frozen=True)
+class CachedModelEligibility:
+    """Auto-discovery eligibility for one cached Hugging Face repository."""
+
+    repo_id: str
+    supported: bool
+    reasons: tuple[str, ...] = ()
 
 
 _HF_CACHE_SCAN_STATE = HFCacheScanState()
@@ -20073,21 +20082,116 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
     return prompt
 
 
-def get_cached_model_ids() -> list[str]:
-    """Return a list of model IDs found in the Hugging Face cache."""
+def _hf_cache_file_name(cache_file: object) -> str:
+    """Return the display filename for a Hugging Face cached file object."""
+    file_name = getattr(cache_file, "file_name", None)
+    if isinstance(file_name, str) and file_name:
+        return PurePosixPath(file_name).name
+    file_path = getattr(cache_file, "file_path", None)
+    if file_path is not None:
+        return Path(str(file_path)).name
+    if isinstance(cache_file, str):
+        return PurePosixPath(cache_file).name
+    return ""
+
+
+def _hf_cache_revision_files(revision: object) -> frozenset[str]:
+    """Return basename set for the files attached to one cached revision."""
+    files = getattr(revision, "files", ())
+    return frozenset(
+        file_name for cache_file in files if (file_name := _hf_cache_file_name(cache_file))
+    )
+
+
+def _hf_cache_main_revision_files(repo: object) -> frozenset[str] | None:
+    """Return cached files for the repo's main revision, if present."""
+    refs = getattr(repo, "refs", None)
+    if isinstance(refs, Mapping) and "main" in refs:
+        return _hf_cache_revision_files(refs["main"])
+
+    for revision in getattr(repo, "revisions", ()):
+        revision_refs = getattr(revision, "refs", ())
+        if "main" in revision_refs:
+            return _hf_cache_revision_files(revision)
+    return None
+
+
+def _cached_repo_model_eligibility(repo: object) -> CachedModelEligibility:
+    """Classify whether a cached repo should be auto-run like mlx-vlm's server list."""
+    repo_id = str(getattr(repo, "repo_id", ""))
+    repo_type = str(getattr(repo, "repo_type", ""))
+    reasons: list[str] = []
+
+    if repo_type != "model":
+        reasons.append(f"repo type is {repo_type!r}, not 'model'")
+
+    main_files = _hf_cache_main_revision_files(repo)
+    if main_files is None:
+        reasons.append("missing main revision in cache")
+    else:
+        if "config.json" not in main_files:
+            reasons.append("missing config.json")
+        if "tokenizer_config.json" not in main_files:
+            reasons.append("missing tokenizer_config.json")
+        has_safetensors = "model.safetensors.index.json" in main_files or any(
+            file_name.endswith(".safetensors") for file_name in main_files
+        )
+        if not has_safetensors:
+            reasons.append("missing safetensors weights")
+
+    return CachedModelEligibility(
+        repo_id=repo_id,
+        supported=not reasons,
+        reasons=tuple(reasons),
+    )
+
+
+def get_cached_model_eligibility() -> tuple[CachedModelEligibility, ...]:
+    """Return supported/skipped classifications for Hugging Face cache repos."""
     try:
         cache_info = _get_hf_cache_info_cached()
     except HFValidationError:
         logger.warning("Hugging Face cache directory invalid.")
-        return []
+        return ()
     except FileNotFoundError:
         logger.warning("Hugging Face cache directory not found.")
-        return []
+        return ()
     except (OSError, ValueError) as e:
         logger.warning("Unexpected error scanning Hugging Face cache: %s", e)
-        return []
-    else:
-        return sorted([repo.repo_id for repo in cache_info.repos])
+        return ()
+    return tuple(
+        sorted(
+            (_cached_repo_model_eligibility(repo) for repo in cache_info.repos),
+            key=lambda entry: entry.repo_id,
+        )
+    )
+
+
+def _all_cached_repo_ids() -> list[str]:
+    """Return all cached repo IDs, including repos that auto-discovery will skip."""
+    return sorted(entry.repo_id for entry in get_cached_model_eligibility())
+
+
+def _supported_cached_model_ids_with_skipped_logging(
+    eligibility: Iterable[CachedModelEligibility],
+) -> list[str]:
+    """Return supported cached model IDs and log skipped local repos with reasons."""
+    entries = tuple(eligibility)
+    skipped = [entry for entry in entries if not entry.supported]
+    if skipped:
+        logger.warning(
+            "Skipped %d cached repo(s) that mlx-vlm server-style discovery would not run:",
+            len(skipped),
+        )
+        for entry in skipped:
+            reason_text = "; ".join(entry.reasons) if entry.reasons else "unsupported cache layout"
+            logger.warning("   - %s: %s", entry.repo_id, reason_text)
+    return sorted(entry.repo_id for entry in entries if entry.supported)
+
+
+def get_cached_model_ids() -> list[str]:
+    """Return cached model IDs eligible for mlx-vlm server-style auto-discovery."""
+    return sorted(entry.repo_id for entry in get_cached_model_eligibility() if entry.supported)
 
 
 def validate_model_identifier(model_id: str) -> None:
@@ -20131,7 +20235,7 @@ def validate_and_warn_model_selection(args: argparse.Namespace) -> None:
     if not args.exclude:
         return  # No exclusions to validate
 
-    cached_models = set(get_cached_model_ids())
+    cached_models = set(_all_cached_repo_ids())
     excluded_models: set[str] = set(args.exclude)
     ineffective_exclusions: set[str] = excluded_models - cached_models
 
@@ -20154,7 +20258,7 @@ def validate_and_warn_model_selection(args: argparse.Namespace) -> None:
             )
         return
 
-    effective_exclusions = excluded_models & cached_models
+    effective_exclusions = excluded_models & set(get_cached_model_ids())
     if effective_exclusions:
         logger.info(
             "Effective exclusions (models that will be filtered out): %s",
@@ -20228,12 +20332,20 @@ def process_models(
     else:
         # Case 2: No explicit models - scan cache and apply exclusions
         logger.info("Scanning cache for models to process...")
-        model_identifiers = get_cached_model_ids()
+        cache_eligibility = get_cached_model_eligibility()
+        model_identifiers = _supported_cached_model_ids_with_skipped_logging(cache_eligibility)
         if not model_identifiers:
+            skipped_count = sum(1 for entry in cache_eligibility if not entry.supported)
+            skipped_hint = (
+                f" {skipped_count} cached repo(s) were present but skipped as unsupported; "
+                "see the skipped-repo warnings above."
+                if skipped_count
+                else ""
+            )
             exit_with_cli_error(
                 "No models found in the local Hugging Face cache. "
                 "Download a model (e.g., `huggingface-cli download mlx-community/<model>`) "
-                "or pass explicit IDs with --models.",
+                f"or pass explicit IDs with --models.{skipped_hint}",
             )
         model_identifiers = apply_exclusions(
             model_identifiers,
@@ -23219,7 +23331,7 @@ def _issue_affected_models_section(
                     ),
                 )
             ),
-            rules="MD060",
+            rules=MARKDOWNLINT_TABLE_PIPE_RULES,
         )
     )
     parts.append("")
@@ -24928,8 +25040,10 @@ def _handle_dry_run(
         model_identifiers = args.models
         logger.info("📦 Models specified explicitly:")
     else:
-        model_identifiers = get_cached_model_ids()
-        logger.info("📦 Models discovered in cache:")
+        model_identifiers = _supported_cached_model_ids_with_skipped_logging(
+            get_cached_model_eligibility()
+        )
+        logger.info("📦 Server-supported models discovered in cache:")
 
     # Apply exclusions
     excluded = set(args.exclude or [])

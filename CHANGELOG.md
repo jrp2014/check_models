@@ -21,8 +21,9 @@ Notable changes to this project will be documented in this file.
   `config.json`, `tokenizer_config.json`, and safetensors weights.
 - Highlight cached local repos skipped by automatic discovery, with the reason,
   whenever `--models` is omitted.
-- Add explicit Model, Inputs, Expected Behavior, and Actual Behavior sections
-  to generated GitHub issue drafts, including prompt/image facts when available.
+- Trim generated GitHub issue drafts to compact upstream-facing sections focused
+  on affected models, minimal evidence, native `mlx-vlm` repro commands,
+  acceptance checks, environment details, and detailed evidence.
 - Add issue-style quality summaries and package/runtime stamps to the Markdown
   gallery report so full-run model output reviews are easier to paste into
   GitHub issues.

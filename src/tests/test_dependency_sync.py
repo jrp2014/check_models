@@ -465,6 +465,19 @@ def test_markdownlint_cli2_is_pinned_repo_local_and_updateable() -> None:
     )
 
 
+def test_generated_markdown_lint_guards_use_named_rule_sets() -> None:
+    """Report-specific markdownlint guards should stay centralized."""
+    source = (PKG_ROOT / "check_models.py").read_text(encoding="utf-8")
+
+    assert 'MARKDOWNLINT_MAIN_TABLE_RULES: Final[str] = "MD033 MD034 MD037 MD049"' in source
+    assert 'MARKDOWNLINT_GALLERY_SUMMARY_RULES: Final[str] = "MD034"' in source
+    assert 'MARKDOWNLINT_TABLE_PIPE_RULES: Final[str] = "MD060"' in source
+    assert "<!-- markdownlint-disable MD033 MD034 MD037 MD049 -->" not in source
+    assert "<!-- markdownlint-enable MD033 MD034 MD037 MD049 -->" not in source
+    assert "<!-- markdownlint-disable MD034 -->" not in source
+    assert "<!-- markdownlint-enable MD034 -->" not in source
+
+
 def test_output_artifact_policy_is_documented_and_gitignored() -> None:
     """Generated output docs should match the repo ignore policy."""
     output_readme = (PKG_ROOT / "output" / "README.md").read_text(encoding="utf-8")
