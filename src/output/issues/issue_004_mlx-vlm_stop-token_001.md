@@ -1,42 +1,15 @@
 <!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
 
-# \[mlx-vlm\]\[Stop-token leakage\] Stop/control tokens leaked into generated text affecting 2 model(s)
+# \[mlx-vlm\]\[Stop-token leakage\] Stop/control tokens leaked into generated text affecting 3 model(s)
 
 ## Summary
 
-2 model(s) show **Stop-token leakage** that should be filed against mlx-vlm.
+3 model(s) show **Stop-token leakage** that should be filed against mlx-vlm.
 
 - **Observed problem:** Stop/control tokens leaked into generated text
 - **Target:** mlx-vlm
-- **Affected models:** 2
+- **Affected models:** 3
 - **Fixed when:** No leaked stop/control tokens.
-
-
-## Model
-
-- **Primary model:** `microsoft/Phi-3.5-vision-instruct`
-- **Affected model count:** 2
-- **Revision:** `unknown`
-- **Trust remote code:** `true`
-
-
-## Inputs
-
-- **Prompt:** `Describe this image briefly.`
-- **Image:** `/Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg`
-- **Image facts:** 640x480 (0.31 MP), JPG extension, 173131 bytes, sha256 `dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e`
-- **Shareable:** unknown
-
-
-## Expected Behavior
-
-- The native `mlx-vlm` CLI/Python repro should load the model, process the prompt and image, and return a response without the observed failure or quality regression.
-
-
-## Actual Behavior
-
-- Stop/control tokens leaked into generated text
-- Representative signal: decoded text contains control token &lt;\|end\|&gt; \| decoded text contains control token &lt;\|endoftext\|&gt;
 
 
 ## Affected Models
@@ -45,8 +18,9 @@
 
 | Model                                           | Observed Behavior                                                                                                | Token Counts                                                                                       | Optional Context                                                                                                                                                                           |
 |-------------------------------------------------|------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `microsoft/Phi-3.5-vision-instruct`             | decoded text contains control token &lt;\|end\|&gt; \| decoded text contains control token &lt;\|endoftext\|&gt; | prompt=770 \| output/prompt=25.97% \| nontext burden=99% \| stop=max_tokens \| hit token cap (200) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260614T214251Z_002_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json)             |
-| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX` | decoded text contains control token &lt;\|end\|&gt;                                                              | prompt=1,330 \| output/prompt=13.08% \| nontext burden=100% \| stop=completed                      | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260614T214251Z_003_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_mlx_vlm_stop_token_001.json) |
+| `microsoft/Phi-3.5-vision-instruct`             | decoded text contains control token &lt;\|end\|&gt; \| decoded text contains control token &lt;\|endoftext\|&gt; | prompt=770 \| output/prompt=25.97% \| nontext burden=99% \| stop=max_tokens \| hit token cap (200) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260618T220728Z_002_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json)             |
+| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX` | decoded text contains control token &lt;\|end\|&gt;                                                              | prompt=1,330 \| output/prompt=13.08% \| nontext burden=100% \| stop=completed                      | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260618T220728Z_003_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_mlx_vlm_stop_token_001.json) |
+| `mlx-community/Qwen3-VL-2B-Thinking-bf16`       | decoded text contains control token &lt;/think&gt;                                                               | prompt=317 \| output/prompt=61.83% \| nontext burden=98% \| stop=completed                         | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260618T220728Z_007_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json)       |
 <!-- markdownlint-enable MD060 -->
 
 
@@ -67,6 +41,7 @@ Native CLI:
 ```bash
 python -m mlx_vlm.generate --model microsoft/Phi-3.5-vision-instruct --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 python -m mlx_vlm.generate --model mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/Qwen3-VL-2B-Thinking-bf16 --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 Minimal Python repro (representative model):
@@ -119,8 +94,9 @@ Generation/load config:
 
 Optional advanced context:
 
-- `microsoft/Phi-3.5-vision-instruct`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260614T214251Z_002_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json)
-- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260614T214251Z_003_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_mlx_vlm_stop_token_001.json)
+- `microsoft/Phi-3.5-vision-instruct`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260618T220728Z_002_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json)
+- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260618T220728Z_003_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_mlx_vlm_stop_token_001.json)
+- `mlx-community/Qwen3-VL-2B-Thinking-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260618T220728Z_007_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -143,12 +119,12 @@ Optional advanced context:
 | Component                  | Version                                                                                                                                                  |
 |----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
 | mlx-vlm                    | 0.6.3                                                                                                                                                    |
-| mlx                        | 0.32.0.dev20260614+89064477                                                                                                                              |
+| mlx                        | 0.32.0.dev20260618+350f2cf8                                                                                                                              |
 | mlx-lm                     | 0.31.3                                                                                                                                                   |
 | mlx-audio                  | 0.4.4                                                                                                                                                    |
-| transformers               | 5.12.0                                                                                                                                                   |
+| transformers               | 5.12.1                                                                                                                                                   |
 | tokenizers                 | 0.22.2                                                                                                                                                   |
-| huggingface-hub            | 1.19.0                                                                                                                                                   |
+| huggingface-hub            | 1.20.0                                                                                                                                                   |
 | Python Version             | 3.13.13                                                                                                                                                  |
 | OS                         | Darwin 25.5.0                                                                                                                                            |
 | macOS Version              | 26.5.1                                                                                                                                                   |
@@ -169,7 +145,7 @@ Optional advanced context:
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                                       |
 | MLX Core Extension         | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
 | MLX Metallib               | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (157,751,704 bytes, sha256=ba9913d81d92bbbde42bbc6dda27e80ecb31db6031fa073e6c8aeb0666d47c33) |
-| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,671,712 bytes, sha256=aea6719d5c77f5e26cd8c418c96a1358d4947f628fb4f56ca1ee252e3d504e89)  |
+| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,690,224 bytes, sha256=041e6c9d17ac3ea47f7c55ee230306c2a70ad4b2879ce2e5f48ac6a4d351a31e)  |
 | RAM                        | 128.0 GB                                                                                                                                                 |
 
 
@@ -202,5 +178,17 @@ Sample output:
 ```text
 Here are my reasoning steps:
 The user asks: "Describe this image briefly." The image is of two cats sleeping on a pink couch, with a remote control. The user wants a brief description. This is a st...
+```
+
+### `mlx-community/Qwen3-VL-2B-Thinking-bf16`
+
+Observed signals:
+
+- Special control token &lt;/think&gt; appeared in generated text.
+
+Sample output:
+
+```text
+So, let's see. The image shows two cats lying on a pink couch. The couch is a bright pink color, and there are two remote controls next to the cats. One cat is on the left, with a striped pattern,...
 ```
 

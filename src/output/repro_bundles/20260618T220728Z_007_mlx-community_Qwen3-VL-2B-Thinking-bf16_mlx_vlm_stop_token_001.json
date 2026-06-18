@@ -2,33 +2,44 @@
   "environment": {
     "library_versions": {
       "Pillow": "12.2.0",
-      "huggingface-hub": "1.16.1",
-      "mlx": "0.31.2",
-      "mlx-audio": "0.4.3",
+      "huggingface-hub": "1.20.0",
+      "mlx": "0.32.0.dev20260618+350f2cf8",
+      "mlx-audio": "0.4.4",
       "mlx-lm": "0.31.3",
-      "mlx-metal": "0.31.2",
-      "mlx-vlm": "0.5.0",
+      "mlx-metal": null,
+      "mlx-vlm": "0.6.3",
       "numpy": "2.4.6",
       "tokenizers": "0.22.2",
-      "transformers": "5.9.0"
+      "transformers": "5.12.1"
     },
-    "platform": "macOS-26.5-arm64-arm-64bit-Mach-O",
+    "platform": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
     "preflight_issues": [],
     "system_info": {
+      "Active Developer Directory": "/Applications/Xcode.app/Contents/Developer",
+      "Apple Clang Version": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
       "Architecture": "arm64",
       "CPU Cores (Logical)": "18",
       "CPU Cores (Physical)": "18",
       "GPU Cores": "40",
       "GPU/Chip": "Apple M5 Max",
-      "Metal SDK": "MacOSX.sdk",
+      "MLX Core Extension": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so",
+      "MLX Distribution Root": "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
+      "MLX Install Type": "editable local source",
+      "MLX Metallib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (157,751,704 bytes, sha256=ba9913d81d92bbbde42bbc6dda27e80ecb31db6031fa073e6c8aeb0666d47c33)",
+      "MLX libmlx.dylib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,690,224 bytes, sha256=041e6c9d17ac3ea47f7c55ee230306c2a70ad4b2879ce2e5f48ac6a4d351a31e)",
+      "Metal Compiler Version": "Apple metal version 32023.883 (metalfe-32023.883)",
+      "Metal SDK": "MacOSX26.5.sdk",
       "Metal Support": "Metal 4",
+      "Metallib Linker Version": "AIR-LLD 32023.883 (metalfe-32023.883) (compatible with legacy metallib linker)",
       "OS": "Darwin 25.5.0",
       "Python Version": "3.13.13",
       "RAM": "128.0 GB",
+      "SDK Path": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
       "SDK Version": "26.5",
       "Xcode Build": "17F42",
       "Xcode Version": "26.5",
-      "macOS Version": "26.5"
+      "macOS Version": "26.5.1",
+      "mlx-metal Distribution": "not installed; local editable mlx supplies backend"
     }
   },
   "failure": {
@@ -42,9 +53,9 @@
     "traceback": null,
     "type": null
   },
-  "generated_at_utc": "2026-05-24T20:46:43+00:00",
+  "generated_at_utc": "2026-06-18T22:07:28+00:00",
   "issue_cluster_id": "mlx-vlm_stop-token_001",
-  "model": "mlx-community/GLM-4.6V-Flash-6bit",
+  "model": "mlx-community/Qwen3-VL-2B-Thinking-bf16",
   "repro": {
     "args": {
       "_check_models_preflight_issues": [],
@@ -55,19 +66,19 @@
       "enable_thinking": false,
       "eos_tokens": null,
       "eval_mode": "triage",
-      "exclude": [
-        "mlx-community/Qwen3-VL-2B-Thinking-bf16",
-        "Qwen/Qwen3-VL-2B-Instruct"
-      ],
-      "folder": "/Users/jrp/Pictures/Processed",
+      "exclude": null,
+      "folder": null,
       "force_color": false,
       "force_download": false,
-      "image": null,
+      "frequency_context_size": 20,
+      "frequency_penalty": null,
+      "image": "../../mlx-vlm/examples/images/cats.jpg",
       "kv_bits": null,
       "kv_group_size": 64,
       "kv_quant_scheme": "uniform",
       "lazy_load": false,
       "link_style": "github",
+      "logit_bias": null,
       "max_kv_size": null,
       "max_tokens": 200,
       "min_p": 0.0,
@@ -84,6 +95,8 @@
       "output_review": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/review.md",
       "output_tsv": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.tsv",
       "prefill_step_size": 4096,
+      "presence_context_size": 20,
+      "presence_penalty": null,
       "processor_kwargs": null,
       "prompt": null,
       "prune_repro_days": 90,
@@ -95,6 +108,7 @@
       "rerun_triage": false,
       "resize_shape": null,
       "revision": null,
+      "seed": null,
       "skip_special_tokens": false,
       "temperature": 0.0,
       "thinking_budget": null,
@@ -107,16 +121,16 @@
       "verbose": true,
       "width": null
     },
-    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models microsoft/Phi-3.5-vision-instruct mlx-community/GLM-4.6V-Flash-6bit mlx-community/GLM-4.6V-Flash-mxfp4 mlx-community/GLM-4.6V-nvfp4",
+    "cluster_repro_command": "python -m check_models --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models microsoft/Phi-3.5-vision-instruct mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX mlx-community/Qwen3-VL-2B-Thinking-bf16",
     "env_vars": {
       "TOKENIZERS_PARALLELISM": "false"
     },
-    "image_path": "/Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg",
-    "image_ref_sha256": "407523635dc920d1ee43f5ff32eb93fad345a713f05e5f3207c20e27125cfed2",
-    "image_sha256": "c4f7c5e2d8a2a003ca46e307d1afcfe52f5df9f4baa673cee8156321e75eff1e",
+    "image_path": "/Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg",
+    "image_ref_sha256": "9bc422400088c31c0accf7fb023ee29945d47640042565218c1c33f78694f204",
+    "image_sha256": "dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e",
     "prompt_diagnostics": {
-      "eos_token": "<|endoftext|>",
-      "eos_token_id": 151329,
+      "eos_token": "<|im_end|>",
+      "eos_token_id": 151645,
       "generate_kwargs": {
         "kv_bits": null,
         "kv_group_size": 64,
@@ -130,32 +144,33 @@
         "temperature": 0.0,
         "top_p": 1.0
       },
-      "image_placeholder_count": 1,
-      "model_type": "glm4v",
-      "processor_class": "mlx_vlm.models.glm4v.processing.Glm46VProcessor",
-      "rendered_prompt_chars": 106,
-      "rendered_prompt_hash_sha256": "fa2fbc451bdabbc414af5c93d3b44f06a16030f54d4441abb2af90d3322ede04",
-      "rendered_prompt_preview": "[gMASK]<sop><|user|>\n<|begin_of_image|><|image|><|end_of_image|>Describe this image briefly.<|assistant|>\n",
+      "image_placeholder_count": 0,
+      "model_type": "qwen3_vl",
+      "processor_class": "mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor",
+      "rendered_prompt_chars": 129,
+      "rendered_prompt_hash_sha256": "33f549721f3eaf9f9eb236d6550a38ccedb55128a6dc973b9ef6a4e967d0fb9d",
+      "rendered_prompt_preview": "<|im_start|>user\n<|vision_start|><|image_pad|><|vision_end|>Describe this image briefly.<|im_end|>\n<|im_start|>assistant\n<think>\n",
       "special_token_ids": [
-        151329
+        151645,
+        151643
       ],
       "special_tokens": [
+        "<|im_end|>",
         "<|endoftext|>"
       ],
-      "tokenizer_class": "transformers.tokenization_utils_tokenizers.TokenizersBackend"
+      "tokenizer_class": "transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer"
     },
     "prompt_hash_sha256": "d760336d0fd143932f194573dd63f6b531e0ffbc2c4f1595e015392a3471c318",
     "prompt_preview": "Describe this image briefly.",
-    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260523-180223_DSC00153.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/GLM-4.6V-Flash-6bit",
+    "rerun_command": "python -m check_models --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen3-VL-2B-Thinking-bf16",
     "seed": null
   },
   "result": {
-    "generated_text_preview": "<think>Got it, let's describe this image briefly. The scene shows the entrance to Burton Brewery, with large stainless steel fermentation tanks in the background. There's a black iron gate with stone pillars, a \"NO HGV's\" sign, and a \"Molson Coors\" welcome sign. The sky is clear and blue, with some greenery and a few pedestrians near a black SUV. The overall atmosphere is bright and industrial, hi...",
+    "generated_text_preview": "So, let's see. The image shows two cats lying on a pink couch. The couch is a bright pink color, and there are two remote controls next to the cats. One cat is on the left, with a striped pattern, and the other is on the right, also striped but maybe a bit different. Both cats are relaxed, lying down, maybe sleeping. The remotes are white with some buttons, and one has a blue button. The backgroun...",
     "maintainer_triage": {
       "confidence": "high",
       "evidence": [
         "harness:stop_token",
-        "reasoning_leak",
         "text_sanity"
       ],
       "harness_details": [
@@ -165,20 +180,18 @@
       "issue_kind": "harness",
       "issue_subtype": "stop_token",
       "next_action": "Inspect EOS/stop-token stripping; control tokens are leaking into user-facing text.",
-      "nontext_prompt_ratio": 0.9990074441687344,
-      "prompt_output_ratio": 0.028784119106699754,
-      "prompt_tokens_total": 6045,
+      "nontext_prompt_ratio": 0.9810725552050473,
+      "prompt_output_ratio": 0.6182965299684543,
+      "prompt_tokens_total": 317,
       "requested_max_tokens": 200,
       "stop_reason": "completed",
-      "summary": "Special control token &lt;/think&gt; appeared in generated text. | nontext prompt burden=100% | reasoning leak | formatting=Unknown tags: &lt;think&gt;",
+      "summary": "Special control token &lt;/think&gt; appeared in generated text. | nontext prompt burden=98%",
       "suspected_owner": "mlx-vlm",
       "user_bucket": "avoid"
     },
     "quality_issues": [
       "\u26a0\ufe0fharness(stop_token)",
-      "gibberish(token_noise)",
-      "reasoning-leak",
-      "formatting"
+      "gibberish(token_noise)"
     ],
     "success": true
   },
