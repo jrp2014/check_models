@@ -260,7 +260,7 @@ class TestValidateAndWarnModelSelection:
         args = self._make_args(exclude=["missing-model"], models=["selected-model"])
 
         with (
-            patch.object(mod, "_all_cached_repo_ids", return_value=["cached-model"]),
+            patch.object(mod, "get_cached_model_ids", return_value=["cached-model"]),
             caplog.at_level(logging.WARNING, logger=mod.LOGGER_NAME),
         ):
             mod.validate_and_warn_model_selection(args)
@@ -279,7 +279,7 @@ class TestValidateAndWarnModelSelection:
         args = self._make_args(exclude=["cached-model"], models=["selected-model"])
 
         with (
-            patch.object(mod, "_all_cached_repo_ids", return_value=["cached-model"]),
+            patch.object(mod, "get_cached_model_ids", return_value=["cached-model"]),
             caplog.at_level(logging.WARNING, logger=mod.LOGGER_NAME),
         ):
             mod.validate_and_warn_model_selection(args)

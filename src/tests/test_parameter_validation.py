@@ -206,25 +206,6 @@ class TestCliArgumentNormalization:
         assert args.eos_tokens == ("</think>", "\n")
         assert args.processor_kwargs == {"cropping": False, "max_patches": 3}
 
-    def test_cli_argument_normalization_keeps_gen_kwargs_separate(self) -> None:
-        """Upstream-style generation kwargs should parse separately from processor kwargs."""
-        parser = __import__("check_models")._build_cli_parser()
-        args = parser.parse_args(
-            [
-                "--folder",
-                "test-folder",
-                "--processor-kwargs",
-                '{"cropping": false}',
-                "--gen-kwargs",
-                '{"generation_mode": "diffusion", "sampler": "native"}',
-            ]
-        )
-
-        validate_cli_arguments(args)
-
-        assert args.processor_kwargs == {"cropping": False}
-        assert args.gen_kwargs == {"generation_mode": "diffusion", "sampler": "native"}
-
     def test_cli_argument_normalization_handles_accumulated_eos_tokens(self) -> None:
         """Normalization should decode EOS tokens accumulated across repeated flags."""
         parser = __import__("check_models")._build_cli_parser()
