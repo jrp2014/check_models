@@ -44,6 +44,9 @@ Notable changes to this project will be documented in this file.
 - Extend the Skylos quality-gate invocation to include secrets and SCA checks,
   while documenting `--danger` as an advisory follow-up until its current
   filesystem findings are triaged.
+- Triage the non-test Skylos `SKY-D325` read warnings by routing maintenance
+  tools through bounded no-follow text reads and documenting the fixed
+  `importlib.metadata` distribution read as a false positive.
 - Harden maintenance tooling by avoiding dynamic `conda.sh` sourcing, adding
   symlink-resistant text writes for generated stubs and hooks, and narrowing
   cleanup-script delete/help paths.

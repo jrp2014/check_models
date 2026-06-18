@@ -20,6 +20,7 @@ from check_models import (
     analyze_generation_text,
     load_quality_config,
 )
+from tools.safe_io import read_text_no_follow
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -80,7 +81,7 @@ def _print_field(label: str, value: object) -> None:
 def _read_text_file(path: Path, *, label: str) -> str | None:
     """Read UTF-8 text from a file path and report a CLI-friendly error."""
     try:
-        return path.read_text(encoding="utf-8")
+        return read_text_no_follow(path)
     except OSError as exc:
         print(f"Error reading {label}: {exc}")
         return None

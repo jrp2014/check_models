@@ -27,9 +27,16 @@ from __future__ import annotations
 import argparse
 import logging
 import re
+import sys
 import tomllib
 from pathlib import Path
 from typing import Protocol
+
+try:
+    from tools.safe_io import read_text_no_follow
+except ModuleNotFoundError:  # pragma: no cover - direct script execution
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+    from tools.safe_io import read_text_no_follow
 
 
 class _RequirementLike(Protocol):
@@ -112,7 +119,7 @@ def _parse_requirement(requirement_text: str) -> tuple[str, str]:
 
 def parse_pyproject(path: Path) -> dict[str, str]:
     """Return mapping of dependency name->spec from PEP 621 dependencies array."""
-    content = path.read_text(encoding="utf-8")
+    content = read_text_no_follow(path)
     data = tomllib.loads(content)
 
     # PEP 621: project.dependencies is a list of strings
@@ -200,14 +207,14 @@ def main() -> int:
     pyproject_path = repo_root / "pyproject.toml"
     readme_path = repo_root / "README.md"
     try:
-        py_text = pyproject_path.read_text(encoding="utf-8")
+        py_text = read_text_no_follow(pyproject_path)
         deps = parse_pyproject(pyproject_path)
         optional_groups = extract_optional_groups(py_text)
         optional_flat = {p for pkgs in optional_groups.values() for p in pkgs}
         runtime_deps = {k: v for k, v in deps.items() if k not in optional_flat}
         install_cmd = build_install_command(runtime_deps)
         snippet = install_cmd
-        readme_text = readme_path.read_text(encoding="utf-8")
+        readme_text = read_text_no_follow(readme_path)
         updated_readme_text = readme_text
         for key in MARKERS:
             updated_readme_text = replace_between_markers(updated_readme_text, key, snippet)

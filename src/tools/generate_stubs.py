@@ -30,7 +30,11 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from tools.safe_io import write_text_no_follow
+try:
+    from tools.safe_io import read_text_no_follow, write_text_no_follow
+except ModuleNotFoundError:  # pragma: no cover - direct script execution
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+    from tools.safe_io import read_text_no_follow, write_text_no_follow
 
 if TYPE_CHECKING:  # TC003: typing-only import
     from collections.abc import Iterable, Mapping
@@ -317,7 +321,7 @@ def _find_invalid_stub_files(
 
         for pyi_path in root.rglob("*.pyi"):
             try:
-                compile(pyi_path.read_text(encoding="utf-8"), str(pyi_path), "exec")
+                compile(read_text_no_follow(pyi_path), str(pyi_path), "exec")
             except SyntaxError as err:
                 invalid_files.append(
                     (
@@ -390,7 +394,7 @@ def _patch_stub_file(path: Path, patches: list[tuple[re.Pattern[str], str]]) -> 
     """Apply regex replacements to a stub file, returning whether it changed."""
     if not path.exists():
         return False
-    text = path.read_text(encoding="utf-8")
+    text = read_text_no_follow(path)
     original = text
     for pattern, repl in patches:
         text = pattern.sub(repl, text)
@@ -463,7 +467,7 @@ def _read_stub_manifest(typings_dir: Path) -> dict[str, object] | None:
         return None
 
     try:
-        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest = json.loads(read_text_no_follow(manifest_path))
     except (OSError, json.JSONDecodeError) as err:
         logger.warning("[stubs] Ignoring unreadable manifest %s: %s", manifest_path, err)
         return None
@@ -542,7 +546,7 @@ def _read_stub_file(path: Path, typings_dir: Path) -> tuple[str | None, list[str
     if not path.exists():
         return None, [f"required stub file is missing: {path.relative_to(typings_dir)}"]
     try:
-        return path.read_text(encoding="utf-8"), []
+        return read_text_no_follow(path), []
     except OSError as err:
         return None, [f"could not read {path.relative_to(typings_dir)}: {err}"]
 

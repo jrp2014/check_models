@@ -9,6 +9,12 @@ Keep `--danger` out of the blocking gate until the current filesystem
 read/write findings in tests and helper scripts are triaged into real fixes,
 targeted ignores, or a separate advisory audit.
 
+June 2026 triage resolved the non-test `SKY-D325` read warnings: maintenance
+tools now use bounded no-follow text reads, and the remaining runtime metadata
+read is documented as fixed-name `importlib.metadata` access. The remaining
+`--danger` queue is test-only read/write fixture noise unless a future scan
+reports new production paths.
+
 Keep `src/check_models.py` as the intentional CLI monolith. Refactor only when a
 nearby behavior-preserving test path exists, and prefer small readability
 improvements over broad rewrites.

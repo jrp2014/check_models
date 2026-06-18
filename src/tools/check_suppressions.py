@@ -13,6 +13,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Final, Literal
 
+try:
+    from tools.safe_io import read_text_no_follow
+except ModuleNotFoundError:  # pragma: no cover - direct script execution
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+    from tools.safe_io import read_text_no_follow
+
 SuppressionKind = Literal[
     "noqa",
     "type-ignore",
@@ -99,21 +105,20 @@ def find_suppressions(file_path: Path) -> list[SuppressionFinding]:
     if file_path.suffix in PYTHON_SUFFIXES:
         return _find_python_suppressions(file_path)
 
-    with file_path.open(encoding="utf-8") as handle:
-        for line_num, line in enumerate(handle, start=1):
-            stripped_line: str = line.rstrip()
+    for line_num, line in enumerate(read_text_no_follow(file_path).splitlines(), start=1):
+        stripped_line: str = line.rstrip()
 
-            shellcheck_match = SHELLCHECK_RE.search(line)
-            if shellcheck_match:
-                suppressions.append(
-                    SuppressionFinding(
-                        file_path=file_path,
-                        line_num=line_num,
-                        kind="shellcheck",
-                        codes=_split_codes(shellcheck_match.group(1)),
-                        line_text=stripped_line,
-                    ),
-                )
+        shellcheck_match = SHELLCHECK_RE.search(line)
+        if shellcheck_match:
+            suppressions.append(
+                SuppressionFinding(
+                    file_path=file_path,
+                    line_num=line_num,
+                    kind="shellcheck",
+                    codes=_split_codes(shellcheck_match.group(1)),
+                    line_text=stripped_line,
+                ),
+            )
 
     return suppressions
 
@@ -121,7 +126,7 @@ def find_suppressions(file_path: Path) -> list[SuppressionFinding]:
 def _find_python_suppressions(file_path: Path) -> list[SuppressionFinding]:
     """Find Python suppression comments using tokenization so strings are ignored."""
     suppressions: list[SuppressionFinding] = []
-    source_text: str = file_path.read_text(encoding="utf-8")
+    source_text: str = read_text_no_follow(file_path)
     lines: list[str] = source_text.splitlines()
 
     for token in tokenize.generate_tokens(io.StringIO(source_text).readline):
@@ -200,7 +205,7 @@ def _remove_suppression_from_line(line: str, kind: SuppressionKind) -> str:
 
 def _write_temp_variant(file_path: Path, line_num: int, kind: SuppressionKind) -> Path:
     """Write a temporary copy of a file with one suppression removed."""
-    lines: list[str] = file_path.read_text(encoding="utf-8").splitlines(keepends=True)
+    lines: list[str] = read_text_no_follow(file_path).splitlines(keepends=True)
     original_line: str = lines[line_num - 1]
     modified_line: str = _remove_suppression_from_line(original_line, kind)
     if modified_line == original_line:

@@ -7361,7 +7361,9 @@ def _distribution_text_file(distribution_name: str, filename: str) -> str | None
     except PackageNotFoundError:
         return None
     try:
-        return package_distribution.read_text(filename)
+        return package_distribution.read_text(  # skylos: ignore[SKY-D325] fixed importlib metadata filename, not a user path.
+            filename,
+        )
     except (FileNotFoundError, OSError, ValueError):
         return None
 

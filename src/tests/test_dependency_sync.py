@@ -27,6 +27,7 @@ from tools import (
     check_suppressions,
     generate_stubs,
     install_precommit_hook,
+    safe_io,
     update_readme_deps,
 )
 
@@ -151,6 +152,26 @@ def _write_stub_manifest(
         + "\n",
         encoding="utf-8",
     )
+
+
+def test_safe_io_read_text_no_follow_rejects_symlinked_file(tmp_path: Path) -> None:
+    """Maintenance-tool text reads should not follow attacker-swapped symlinks."""
+    target_path = tmp_path / "target.txt"
+    target_path.write_text("safe text", encoding="utf-8")
+    symlink_path = tmp_path / "link.txt"
+    symlink_path.symlink_to(target_path)
+
+    with pytest.raises(OSError, match="Refusing to follow symlink"):
+        safe_io.read_text_no_follow(symlink_path)
+
+
+def test_safe_io_read_text_no_follow_enforces_byte_cap(tmp_path: Path) -> None:
+    """Maintenance-tool text reads should reject unexpectedly large files."""
+    text_path = tmp_path / "large.txt"
+    text_path.write_text("abcdef", encoding="utf-8")
+
+    with pytest.raises(OSError, match=r"exceeds 3 bytes"):
+        safe_io.read_text_no_follow(text_path, max_bytes=3)
 
 
 def test_readme_runtime_block_matches_pyproject() -> None:
