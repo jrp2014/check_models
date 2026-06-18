@@ -355,8 +355,10 @@ Your PR must:
 The project organizes dependencies into groups:
 
 - **Runtime**: Core dependencies needed to run `check_models.py` (mlx, mlx-lm, mlx-vlm, Pillow, etc.)
-- **Extras**: Optional enhancements (psutil, tokenizers, einops, num2words, sentencepiece)
-- **Torch**: PyTorch stack for models that require it (torch, torchvision, torchaudio)
+- **Extras**: Optional enhancements (psutil, tokenizers, einops, num2words, sentencepiece);
+  tokenizers and sentencepiece specs track the Transformers compatibility window
+- **Torch**: PyTorch stack for models that require it (torch, torchvision, torchaudio, timm);
+  torch and timm floors track Transformers optional-extra metadata
 - **Dev**: Development tools (ruff, mypy, pytest)
 
 Install specific groups as needed:

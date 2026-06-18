@@ -681,12 +681,13 @@ Optional (enable additional features):
 | Feature | Package | Source | Install Command |
 | ------- | ------- | ------ | --------------- |
 | Extended system metrics (RAM/CPU) | `psutil` | `extras` | `pip install -e "src/[extras]"` |
-| Fast tokenizer backends | `tokenizers` | `extras` | `pip install -e "src/[extras]"` |
+| Fast tokenizer backends | `tokenizers>=0.22.0,<=0.23.0` | `extras` | `pip install -e "src/[extras]"` |
 | Tensor operations (for some models) | `einops` | `extras` | `pip install -e "src/[extras]"` |
 | Number-to-words conversion (for some models) | `num2words` | `extras` | `pip install -e "src/[extras]"` |
+| SentencePiece tokenizers | `sentencepiece!=0.1.92,>=0.1.91` | `extras` | `pip install -e "src/[extras]"` |
 | Transformer model support | `transformers` | core runtime | Installed by `make install` / `pip install -e src/` |
-| PyTorch stack (needed for some models) | `torch`, `torchvision`, `torchaudio` | `torch` | `pip install -e "src/[torch]"` or `make -C src install-torch` |
-| Vision backbones for FastVLM-style models | `timm` | `torch` | `pip install -e "src/[torch]"` or `make -C src install-torch` |
+| PyTorch stack (needed for some models) | `torch>=2.4.0`, `torchvision>=0.17.0`, `torchaudio>=2.2.0` | `torch` | `pip install -e "src/[torch]"` or `make -C src install-torch` |
+| Vision backbones for FastVLM-style models | `timm>=1.0.23` | `torch` | `pip install -e "src/[torch]"` or `make -C src install-torch` |
 
 **Note**: Some models (e.g., Phi-3-vision, certain Florence2 variants) require PyTorch. If you encounter import errors for `torch`, `torchvision`, or `torchaudio`, install with:
 
@@ -722,7 +723,7 @@ pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.
 
 ### With Optional Extras
 
-The `extras` group in `pyproject.toml` pulls in `psutil`, `tokenizers`, `einops`, `num2words`, and `sentencepiece`:
+The `extras` group in `pyproject.toml` pulls in `psutil`, `tokenizers`, `einops`, `num2words`, and `sentencepiece`. The tokenizer specs follow the `transformers>=5.7.0` compatibility window:
 
 ```bash
 pip install -e ".[extras,torch]"  # recommended for the widest optional feature/model coverage
@@ -740,7 +741,7 @@ To include only the optional PyTorch stack when needed (macOS wheels include MPS
 pip install -e ".[torch]"
 ```
 
-That `torch` extra also installs `timm`, which is required by FastVLM remote-code model loaders.
+That `torch` extra also installs `timm`; the `torch` and `timm` floors follow Transformers optional-extra metadata and support FastVLM remote-code model loaders.
 
 ### Full Development Environment
 
@@ -755,7 +756,7 @@ pip install -e ".[dev,extras,torch]"  # dev tools + optional model/runtime deps
 > `psutil` is optional (installed with `extras`); if absent the extended Apple Silicon hardware section omits RAM/cores.
 
 > [!NOTE]
-> `mlx-lm` is part of the core runtime dependency set. The `extras` group adds psutil, tokenizers, einops, num2words, and sentencepiece. For the widest model coverage, pair extras with `.[torch]` or install `.[extras,torch]` directly.
+> `mlx-lm` is part of the core runtime dependency set. The `extras` group adds psutil, tokenizers, einops, num2words, and sentencepiece; tokenizers and sentencepiece follow the `transformers>=5.7.0` compatibility window. For the widest model coverage, pair extras with `.[torch]` or install `.[extras,torch]` directly.
 
 > [!NOTE]
 > Project policy requires `transformers>=5.7.0` and validates the live

@@ -26,6 +26,21 @@ UPSTREAM_MLX_LM_MINIMUMS: Final[dict[str, str]] = {
     "transformers": "5.7.0",
 }
 
+PROJECT_OPTIONAL_MODEL_SUPPORT_SPECS: Final[dict[str, str]] = {
+    "psutil": ">=5.9.0",
+    "tokenizers": "<=0.23.0,>=0.22.0",
+    "einops": ">=0.6.0",
+    "num2words": ">=0.5.0",
+    "sentencepiece": "!=0.1.92,>=0.1.91",
+}
+
+PROJECT_TORCH_EXTRA_COMPAT_SPECS: Final[dict[str, str]] = {
+    "torch": ">=2.4.0",
+    "torchvision": ">=0.17.0",
+    "torchaudio": ">=2.2.0",
+    "timm": ">=1.0.23",
+}
+
 VALIDATE_ENV_CORE_FALLBACK_SPECS: Final[dict[str, str]] = {
     "mlx": f">={PROJECT_RUNTIME_STACK_MINIMUMS['mlx']}",
     "mlx-lm": f">={PROJECT_RUNTIME_STACK_MINIMUMS['mlx-lm']}",
@@ -41,8 +56,6 @@ VALIDATE_ENV_CORE_FALLBACK_SPECS: Final[dict[str, str]] = {
 }
 
 VALIDATE_ENV_EXTRAS_FALLBACK_SPECS: Final[dict[str, str]] = {
-    "psutil": ">=5.9.0",
-    "tokenizers": ">=0.15.0",
-    "einops": ">=0.6.0",
-    "num2words": ">=0.5.0",
+    **PROJECT_OPTIONAL_MODEL_SUPPORT_SPECS,
+    **PROJECT_TORCH_EXTRA_COMPAT_SPECS,
 }

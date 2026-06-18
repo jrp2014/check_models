@@ -7508,7 +7508,7 @@ def _collect_upstream_requirements(
 
     if versions.get("mlx-lm"):
         # mlx-lm setup.py currently specifies:
-        #   mlx>=0.31.2, transformers>=5.0.0
+        #   mlx>=0.31.2, transformers>=5.7.0
         for package_name, minimum_version in UPSTREAM_MLX_LM_MINIMUMS.items():
             _record_requirement(package_name, minimum_version, "mlx-lm")
 

@@ -110,3 +110,19 @@ def test_load_pyproject_deps_tracks_shared_runtime_policy() -> None:
     )
     assert core_deps["packaging"] == ">=26.0"
     assert "mlx-lm" not in extras_deps
+
+
+def test_load_pyproject_deps_tracks_transformers_optional_compatibility() -> None:
+    """Optional model-support floors should match the shared Transformers policy."""
+    _core_deps, extras_deps, _dev_deps = validate_env.load_pyproject_deps()
+
+    assert (
+        extras_deps["tokenizers"]
+        == dependency_policy.PROJECT_OPTIONAL_MODEL_SUPPORT_SPECS["tokenizers"]
+    )
+    assert (
+        extras_deps["sentencepiece"]
+        == dependency_policy.PROJECT_OPTIONAL_MODEL_SUPPORT_SPECS["sentencepiece"]
+    )
+    assert extras_deps["torch"] == dependency_policy.PROJECT_TORCH_EXTRA_COMPAT_SPECS["torch"]
+    assert extras_deps["timm"] == dependency_policy.PROJECT_TORCH_EXTRA_COMPAT_SPECS["timm"]

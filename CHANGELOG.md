@@ -12,6 +12,9 @@ Notable changes to this project will be documented in this file.
 - Align the project Transformers floor with the current `mlx-lm>=0.31.3`
   requirement (`transformers>=5.7.0`) and keep the shared dependency policy,
   install snippets, and environment validation in sync.
+- Tighten optional model-support floors around the `transformers>=5.7.0`
+  compatibility window: `tokenizers`, `sentencepiece`, `torch`, and `timm`
+  now match the relevant upstream Transformers metadata.
 - Keep upstream passthrough bounded to `--processor-kwargs` and named
   generation-control flags, while preserving the effective generation kwargs in
   diagnostics, JSONL prompt metadata, repro bundles, and native `mlx-vlm`

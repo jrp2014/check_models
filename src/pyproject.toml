@@ -66,15 +66,15 @@ packages = ["check_models_data"]
 extras = [
     # Hardware metrics (optional system block)
     "psutil>=5.9.0",
-    # Fast tokenizer backends
-    "tokenizers>=0.15.0",
+    # Fast tokenizer backends; keep aligned with the Transformers runtime cap.
+    "tokenizers>=0.22.0,<=0.23.0",
     # Tensor operations (required by some model architectures)
     "einops>=0.6.0",
     # Number-to-words conversion (required by some model processors)
     "num2words>=0.5.0",
-    "sentencepiece",
+    "sentencepiece!=0.1.92,>=0.1.91",
 ]
-torch = ["torch>=2.2.0", "torchvision>=0.17.0", "torchaudio>=2.2.0", "timm"]
+torch = ["torch>=2.4.0", "torchvision>=0.17.0", "torchaudio>=2.2.0", "timm>=1.0.23"]
 dev = [
     "ruff>=0.1.0",
     "mypy>=1.8.0",
