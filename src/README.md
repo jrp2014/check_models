@@ -1213,9 +1213,9 @@ Key commands:
 
 - `make install` — install runtime package (`pip install -e src/`)
 - `make dev` — install dev setup (`pip install -e "src/[dev,extras,torch]"`)
-- `make test` — run pytest (`pytest src/tests/ -v`)
+- `make test` — run pytest only; useful for a faster test loop before the full gate
 - `make vulture` — run the configured dead-code scan for `src/check_models.py` and `src/tools/`
-- `make quality` — full gate (ruff format+lint, mypy, ty, pyrefly, vulture, pytest, shellcheck, markdownlint)
+- `make quality` — full gate (ruff format+lint, mypy, ty, pyrefly, vulture, full pytest, shellcheck, markdownlint)
 - `make ci` — strict CI-style pipeline
 - `make deps-sync` — sync dependency blocks in docs from `pyproject.toml`
 - `python -m tools.update_readme_deps --check` — verify dependency blocks are already synced (no writes)
@@ -1275,7 +1275,8 @@ npm install
 ### Contribution Guidelines
 
 - Keep patches focused; separate mechanical formatting changes from functional changes.
-- Run `make quality` before opening a PR (or at minimum `make test` and `make typecheck`).
+- Run `make quality` before opening a PR. It already includes the full pytest
+  suite; use `make test` separately only for a pytest-only local loop.
 - Add or update tests when changing output formatting or public CLI flags.
 - Prefer small helper functions over adding more branching to large blocks in `check_models.py`.
 - Document new flags or output changes in this README (search for an existing section to extend rather than creating duplicates).

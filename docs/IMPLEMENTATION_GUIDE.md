@@ -70,12 +70,14 @@ A single medium-sized, well-commented function is often clearer than a web of on
 1. **Context First**: Before making changes, read `src/README.md` for CLI usage and `src/check_models_data/quality_config.yaml` for configuration logic.
 2. **Use Existing Tools**:
     - Run `python -m tools.validate_env` to diagnose environment issues.
-    - Run `make quality` to verify your changes (formatting, linting, typing).
+    - Run `make quality` to verify your changes (formatting, linting, typing,
+      tests, shellcheck, and markdownlint).
     - **Do not** create new "test" scripts; use `python -m mlx_vlm.generate` or the official `test_smoke.py` for verification. Narrow diagnostic tools under `src/tools/` must be documented as diagnostics, kept out of CI, and include risk notes when they can trigger native runtime failures.
 3. **Environment Discipline**:
     - **ALWAYS** run python commands in the `mlx-vlm` conda environment.
     - Use `conda run -n mlx-vlm python ...` for single commands.
-    - Or prefer `make` targets (e.g., `make run`, `make test`) which handle the environment automatically.
+    - Or prefer `make` targets (e.g., `make run`, `make test`, `make quality`)
+      which handle the environment automatically.
     - **NEVER** run `python` directly without ensuring the environment is active.
 4. **Configuration over Hardcoding**:
     - **Never** hardcode magic numbers for thresholds (e.g., repetition limits, formatting precision).
@@ -1041,7 +1043,7 @@ The `pyproject.toml` MUST conform to the official packaging guide: <https://pack
 ### Running Tests
 
 ```bash
-make test           # Run all tests
+make test           # Run pytest only
 pytest src/tests/   # Direct pytest invocation
 ```
 
@@ -1162,7 +1164,6 @@ make check-outdated
 # 2. Update pyproject.toml as needed
 # 3. Test thoroughly
 make quality
-make test
 
 # 4. Commit if tests pass
 git add src/pyproject.toml
@@ -1183,7 +1184,7 @@ make deps-sync
 
 # 3. Install and test
 make update
-make test
+make quality
 
 # 4. Commit all changes
 git add src/pyproject.toml README.md src/README.md

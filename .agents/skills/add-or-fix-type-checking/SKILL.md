@@ -232,7 +232,7 @@ If stub gaps cause errors:
 
 ```bash
 make stubs          # Regenerate all stubs
-make clean-stubs    # Remove stubs, then regenerate
+make stubs-clear    # Remove generated stubs
 ```
 
 ### 8. Verify and close the loop
@@ -253,8 +253,6 @@ make clean-stubs    # Remove stubs, then regenerate
   make quality
   ```
 
-- Ensure runtime behavior did not change and run relevant tests:
-
-  ```bash
-  make test
-  ```
+- `make quality` already runs the full pytest suite. Run targeted pytest
+  commands before the full gate when you need a faster feedback loop, but do
+  not run `make test` again after a successful `make quality`.

@@ -62,9 +62,9 @@ The file is organized in this order — search for these exact landmark headers 
 
 | Target | What it does |
 | -------- | ------------- |
-| `make quality` | **Primary gate**: checks Ruff formatting + lint, mypy, ty, pyrefly, vulture, pytest, shellcheck, markdownlint |
+| `make quality` | **Primary gate**: checks Ruff formatting + lint, mypy, ty, pyrefly, vulture, full pytest, shellcheck, markdownlint |
 | `make vulture` | Run Vulture dead-code scan for `src/check_models.py` and `src/tools/`. *Note: Vulture commonly flags `TypedDict` keys and `Protocol` signatures as "unused" because they are evaluated statically and not tracked natively in runtime logic flows. Treat these as false positives.* |
-| `make test` | `pytest src/tests/ -v` |
+| `make test` | Pytest-only shortcut for faster local test loops. Do not run it again after a successful `make quality`; `make quality` already runs the full pytest suite. |
 | `make dev` | Install editable with `[dev,extras,torch]` |
 | `make install` | Install editable (runtime only) |
 | `make format` | Apply `ruff format src/` before running the full quality gate |
@@ -117,11 +117,10 @@ The file is organized in this order — search for these exact landmark headers 
 8. `make -C src lint-fix` — apply safe Ruff fixes when lint reports fixable issues
 9. `make lint` — clear Ruff lint errors before running the full gate
 10. `bash src/tools/run_commit_hygiene.sh` — verify local commit hygiene
-11. `make quality` — run the full quality gate check
-12. `make test` — execute unit tests
-13. If report formats changed → update `src/output/` fixtures
-14. Update `CHANGELOG.md` under `[Unreleased]` for any maintainer-relevant change (features, fixes, refactors, tooling/docs workflow updates)
-15. `git commit -m "feat: description"` and push
+11. `make quality` — run the full quality gate check, including the full pytest suite
+12. If report formats changed → update `src/output/` fixtures
+13. Update `CHANGELOG.md` under `[Unreleased]` for any maintainer-relevant change (features, fixes, refactors, tooling/docs workflow updates)
+14. `git commit -m "feat: description"` and push
 
 ### 10. Agentic skills (`.agents/skills/`)
 

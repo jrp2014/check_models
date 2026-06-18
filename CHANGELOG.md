@@ -35,7 +35,9 @@ Notable changes to this project will be documented in this file.
   images with extracted metadata and the shorter `triage` lane for metadata-free
   images while preserving explicit mode choices.
 - Clarify agent workflow guidance so Ruff formatting and safe lint fixes run
-  before the full `make quality` gate.
+  before the full `make quality` gate, and so `make test` is treated as a
+  pytest-only development loop rather than a redundant step after successful
+  `make quality`.
 - Harden maintenance tooling by avoiding dynamic `conda.sh` sourcing, adding
   symlink-resistant text writes for generated stubs and hooks, and narrowing
   cleanup-script delete/help paths.

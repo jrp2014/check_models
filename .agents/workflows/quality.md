@@ -2,6 +2,8 @@
 description: Format, lint-fix, then run the project's full quality suite
 ---
 Always run this workflow after editing code in the `check_models` project, or when asked to validate the codebase.
+`make quality` already runs the full pytest suite, so do not run `make test`
+again after this workflow unless specifically investigating a test-only failure.
 
 1. Ensure we are using the correct conda environment
 // turbo

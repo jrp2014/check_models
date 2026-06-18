@@ -112,17 +112,15 @@ python -m tools.validate_env --fix
    - Add tests for new functionality
    - Update documentation as needed
 
-3. **Run quality checks locally**:
+3. **Run the full local gate**:
 
    ```bash
    make quality
    ```
 
-4. **Run tests**:
-
-   ```bash
-   make test
-   ```
+   `make quality` includes the full pytest suite. Use `make test` as a
+   faster pytest-only loop while developing, not as an extra step after a
+   successful quality run.
 
 ### Code Style
 
@@ -178,18 +176,19 @@ The project uses several automated quality checks:
 5. **Tests**:
 
    ```bash
-   make test        # Run all tests
+   make test        # Run pytest only; useful before the full gate
    ```
 
 6. **Combined quality check**:
 
    ```bash
-   make quality     # Runs ruff + mypy + ty + pyrefly + vulture + pytest + shellcheck + markdownlint
+   make quality     # Runs ruff + mypy + ty + pyrefly + vulture + full pytest + shellcheck + markdownlint
    ```
 
    The Ty and Vulture steps inside `make quality` use the same checked-in repo
    wrappers and config as their standalone targets, so local runs and CI use
-   the same behavior.
+   the same behavior. A successful `make quality` run supersedes `make test`;
+   run `make test` separately only when you want a pytest-only feedback loop.
 
 7. **Markdown linting**:
 
@@ -485,7 +484,9 @@ SKIP_TORCH=1 bash tools/update.sh
    - Dev dependencies: `[project.optional-dependencies.dev]`
    - Optional extras: `[project.optional-dependencies.extras]`
 2. Run `make deps-sync` to update README blocks
-3. Test thoroughly with `make test`
+3. Test thoroughly with `make quality` before committing. During local
+   iteration, use targeted pytest commands or `make test` for a faster
+   pytest-only loop.
 4. Commit the changes
 
 ### Keeping Your Environment Up-to-Date

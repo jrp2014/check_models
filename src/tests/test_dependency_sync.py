@@ -53,6 +53,8 @@ README = _first_existing(
 PACKAGED_QUALITY_CONFIG = PKG_ROOT / "check_models_data" / "quality_config.yaml"
 LEGACY_ROOT_QUALITY_CONFIG = PKG_ROOT / "quality_config.yaml"
 ROOT_SKYLOS_CONFIG = REPO_ROOT / ".skylos" / "config.yaml"
+COPILOT_INSTRUCTIONS = REPO_ROOT / ".github" / "copilot-instructions.md"
+AGENT_QUALITY_WORKFLOW = REPO_ROOT / ".agents" / "workflows" / "quality.md"
 
 SKYLOS_ADVISORY_QUALITY_IGNORES = {
     "SKY-C303",
@@ -476,6 +478,17 @@ def test_generated_markdown_lint_guards_use_named_rule_sets() -> None:
     assert "<!-- markdownlint-enable MD033 MD034 MD037 MD049 -->" not in source
     assert "<!-- markdownlint-disable MD034 -->" not in source
     assert "<!-- markdownlint-enable MD034 -->" not in source
+
+
+def test_agent_quality_guidance_avoids_redundant_pytest_after_quality() -> None:
+    """Agent-facing workflow docs should treat make quality as the full pytest gate."""
+    copilot_text = COPILOT_INSTRUCTIONS.read_text(encoding="utf-8")
+    quality_workflow = AGENT_QUALITY_WORKFLOW.read_text(encoding="utf-8")
+
+    assert "full pytest" in copilot_text
+    assert "Do not run it again after a successful `make quality`" in copilot_text
+    assert "`make quality` already runs the full pytest suite" in quality_workflow
+    assert "`make test` — execute unit tests" not in copilot_text
 
 
 def test_output_artifact_policy_is_documented_and_gitignored() -> None:
