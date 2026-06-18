@@ -188,9 +188,6 @@ __all__ = [
 
 LOGGER_NAME: Final[str] = "mlx-vlm-check"
 NOT_AVAILABLE: Final[str] = "N/A"
-MARKDOWNLINT_MAIN_TABLE_RULES: Final[str] = "MD033 MD034 MD037 MD049"
-MARKDOWNLINT_GALLERY_SUMMARY_RULES: Final[str] = "MD034"
-MARKDOWNLINT_TABLE_PIPE_RULES: Final[str] = "MD060"
 
 MISSING_DEPENDENCIES: dict[str, str] = {}
 
@@ -2039,16 +2036,6 @@ def _wrap_markdown_text(
     return wrapped or [initial_indent.rstrip()]
 
 
-def _guard_markdownlint_block(lines: Sequence[str], *, rules: str) -> list[str]:
-    """Wrap Markdown lines with markdownlint disable/enable comments."""
-    return [
-        f"<!-- markdownlint-disable {rules} -->",
-        "",
-        *lines,
-        f"<!-- markdownlint-enable {rules} -->",
-    ]
-
-
 def _escape_markdown_underscore_runs(text: str) -> str:
     """Escape multi-underscore runs without altering single-word identifiers."""
     return re.sub(r"_{2,}", lambda match: r"\_" * len(match.group(0)), text)
@@ -2780,7 +2767,6 @@ class ProcessImageParams:
     eos_tokens: tuple[str, ...] | None = None
     skip_special_tokens: bool = False
     processor_kwargs: dict[str, JsonLike] | None = None
-    gen_kwargs: dict[str, JsonLike] | None = None
     enable_thinking: bool = False
     thinking_budget: int | None = None
     thinking_start_token: str | None = None
@@ -11931,7 +11917,10 @@ def _build_gallery_quality_summary_section(
             "when it did not produce usable output."
         ),
         "",
-        *_guard_markdownlint_block(table_lines, rules=MARKDOWNLINT_GALLERY_SUMMARY_RULES),
+        "<!-- markdownlint-disable MD034 -->",
+        "",
+        *table_lines,
+        "<!-- markdownlint-enable MD034 -->",
         "",
     ]
 
@@ -13188,7 +13177,7 @@ def _diagnostics_environment_section(
                 ),
             )
         ),
-        rules=MARKDOWNLINT_TABLE_PIPE_RULES,
+        rules="MD060",
     )
     parts.append("")
     return parts
@@ -13802,7 +13791,7 @@ def _diagnostics_failure_clusters(
                         ),
                     )
                 ),
-                rules=MARKDOWNLINT_TABLE_PIPE_RULES,
+                rules="MD060",
             )
         )
         parts.append("")
@@ -13943,7 +13932,7 @@ def _diagnostics_stack_signal_section(
                     ),
                 ),
             ),
-            rules=MARKDOWNLINT_TABLE_PIPE_RULES,
+            rules="MD060",
         )
     )
     parts.append("")
@@ -14335,7 +14324,7 @@ def _diagnostics_issue_queue_section(
                     repro_bundles,
                 ),
             ),
-            rules=MARKDOWNLINT_TABLE_PIPE_RULES,
+            rules="MD060",
         )
     )
     parts.append("")
@@ -14443,7 +14432,7 @@ def _diagnostics_history_section(
                     ),
                 ),
             ),
-            rules=MARKDOWNLINT_TABLE_PIPE_RULES,
+            rules="MD060",
         )
     )
     parts.append("")
@@ -14755,10 +14744,6 @@ def _append_repro_extended_generate_args(
     processor_kwargs = getattr(run_args, "processor_kwargs", None)
     if processor_kwargs:
         tokens.extend(["--processor-kwargs", json.dumps(processor_kwargs, sort_keys=True)])
-
-    gen_kwargs = getattr(run_args, "gen_kwargs", None)
-    if gen_kwargs:
-        tokens.extend(["--gen-kwargs", json.dumps(gen_kwargs, sort_keys=True)])
 
     logit_bias = getattr(run_args, "logit_bias", None)
     if logit_bias:
@@ -15855,15 +15840,16 @@ def _generate_markdown_table_section(report_context: ReportRenderContext) -> lis
 
     markdown_table = normalize_markdown_trailing_spaces(markdown_table)
 
+    md: list[str] = []
     # Surround the table with markdownlint rule guards; the table can be wide and may
     # contain HTML breaks and model-generated emphasis styles
-    return [
-        *_guard_markdownlint_block(
-            [markdown_table, ""],
-            rules=MARKDOWNLINT_MAIN_TABLE_RULES,
-        ),
-        "",
-    ]
+    md.append("<!-- markdownlint-disable MD033 MD034 MD037 MD049 -->")
+    md.append("")
+    md.append(markdown_table)
+    md.append("")
+    md.append("<!-- markdownlint-enable MD033 MD034 MD037 MD049 -->")
+    md.append("")
+    return md
 
 
 def _append_markdown_gallery_note(
@@ -16259,7 +16245,7 @@ def _append_review_issue_queue(
                 issue_link_for_cluster=_review_issue_link,
                 evidence_link_for_cluster=lambda _cluster: "-",
             ),
-            rules=MARKDOWNLINT_TABLE_PIPE_RULES,
+            rules="MD060",
         )
     )
     md.append("")
@@ -16821,31 +16807,21 @@ _RESERVED_PROCESSOR_KWARG_KEYS: Final[frozenset[str]] = frozenset(
 )
 
 
-def _parse_json_object_arg(value: str, *, argument_name: str) -> dict[str, JsonLike]:
-    """Parse a CLI JSON object argument with stable error wording."""
+def _parse_processor_kwargs_arg(value: str) -> dict[str, JsonLike]:
+    """Parse ``--processor-kwargs`` as a JSON object."""
     try:
         parsed = json.loads(value)
     except json.JSONDecodeError as exc:
-        msg = f"{argument_name} must be valid JSON: {exc.msg}"
+        msg = f"processor_kwargs must be valid JSON: {exc.msg}"
         raise argparse.ArgumentTypeError(msg) from exc
 
     if not isinstance(parsed, dict):
-        msg = f"{argument_name} must be a JSON object"
+        msg = "processor_kwargs must be a JSON object"
         raise argparse.ArgumentTypeError(msg)
     if not all(isinstance(key, str) for key in parsed):
-        msg = f"{argument_name} keys must all be strings"
+        msg = "processor_kwargs keys must all be strings"
         raise argparse.ArgumentTypeError(msg)
     return cast("dict[str, JsonLike]", parsed)
-
-
-def _parse_processor_kwargs_arg(value: str) -> dict[str, JsonLike]:
-    """Parse ``--processor-kwargs`` as a JSON object."""
-    return _parse_json_object_arg(value, argument_name="processor_kwargs")
-
-
-def _parse_gen_kwargs_arg(value: str) -> dict[str, JsonLike]:
-    """Parse ``--gen-kwargs`` as a JSON object."""
-    return _parse_json_object_arg(value, argument_name="gen_kwargs")
 
 
 def _parse_logit_bias_arg(value: str) -> LogitBiasDict:
@@ -16916,20 +16892,6 @@ def _validate_processor_kwargs(
         msg = f"processor_kwargs cannot override dedicated CLI arguments: {overlap_str}"
         raise ValueError(msg)
     return dict(processor_kwargs)
-
-
-def _copy_json_object_kwargs(
-    kwargs: Mapping[str, JsonLike] | None,
-    *,
-    argument_name: str,
-) -> dict[str, JsonLike] | None:
-    """Return a defensive copy of a parsed passthrough kwargs mapping."""
-    if kwargs is None:
-        return None
-    if not all(isinstance(key, str) for key in kwargs):
-        msg = f"{argument_name} keys must all be strings"
-        raise ValueError(msg)
-    return dict(kwargs)
 
 
 def _validate_server_shared_request_params(args: argparse.Namespace) -> None:
@@ -17008,10 +16970,6 @@ def validate_cli_arguments(args: argparse.Namespace) -> None:
     args.eos_tokens = _decode_cli_eos_tokens(getattr(args, "eos_tokens", None))
     args.processor_kwargs = _validate_processor_kwargs(
         getattr(args, "processor_kwargs", None),
-    )
-    args.gen_kwargs = _copy_json_object_kwargs(
-        getattr(args, "gen_kwargs", None),
-        argument_name="gen_kwargs",
     )
     _validate_server_shared_request_params(args)
     _validate_thinking_params(args)
@@ -17108,7 +17066,6 @@ def _generation_kwargs_for_prompt_diagnostics(
     params: ProcessImageParams,
     extra_kwargs: Mapping[str, object],
     processor_passthrough_kwargs: Mapping[str, object],
-    generation_passthrough_kwargs: Mapping[str, object],
 ) -> dict[str, JsonLike]:
     """Return the generation kwargs forwarded to mlx-vlm in JSON-safe form."""
     kwargs: dict[str, object] = {
@@ -17128,9 +17085,6 @@ def _generation_kwargs_for_prompt_diagnostics(
     if params.quantize_activations:
         kwargs["quantize_activations"] = True
     kwargs.update(extra_kwargs)
-    if generation_passthrough_kwargs:
-        kwargs.update(generation_passthrough_kwargs)
-        kwargs["gen_kwargs"] = dict(generation_passthrough_kwargs)
     if processor_passthrough_kwargs:
         kwargs["processor_kwargs"] = dict(processor_passthrough_kwargs)
     return {key: _prompt_diag_json_value(value) for key, value in sorted(kwargs.items())}
@@ -17144,7 +17098,6 @@ def _build_prompt_diagnostics(
     formatted_prompt: str,
     extra_kwargs: Mapping[str, object],
     processor_passthrough_kwargs: Mapping[str, object],
-    generation_passthrough_kwargs: Mapping[str, object],
 ) -> PromptDiagnostics:
     """Collect bounded prompt/template diagnostics for JSONL and repro bundles."""
     tokenizer = _extract_processor_tokenizer(processor)
@@ -17170,7 +17123,6 @@ def _build_prompt_diagnostics(
             params=params,
             extra_kwargs=extra_kwargs,
             processor_passthrough_kwargs=processor_passthrough_kwargs,
-            generation_passthrough_kwargs=generation_passthrough_kwargs,
         ),
     )
 
@@ -17254,15 +17206,6 @@ class HFCacheScanState:
     attempted: bool = False
     info: HFCacheInfo | None = None
     error: OSError | ValueError | HFValidationError | None = None
-
-
-@dataclass(frozen=True)
-class CachedModelEligibility:
-    """Auto-discovery eligibility for one cached Hugging Face repository."""
-
-    repo_id: str
-    supported: bool
-    reasons: tuple[str, ...] = ()
 
 
 _HF_CACHE_SCAN_STATE = HFCacheScanState()
@@ -18271,7 +18214,7 @@ def _cleanup_runtime_resources(*, synchronize_first: bool = True) -> None:
     _run_cleanup_step("mx.reset_peak_memory", reset_peak_memory_fn)
 
 
-def _generate_with_passthrough_kwargs(
+def _generate_with_processor_passthrough(
     *,
     generate_fn: Callable[..., GenerationResult],
     model: nn.Module,
@@ -18282,40 +18225,36 @@ def _generate_with_passthrough_kwargs(
 ) -> GenerationResult:
     """Call upstream generate() with user-provided passthrough kwargs.
 
-    This branch is intentionally dynamic because ``processor_kwargs`` and
-    ``gen_kwargs`` are user-supplied JSON objects whose keys depend on the
-    active upstream model and installed mlx-vlm version.
+    This branch is intentionally dynamic because ``processor_kwargs`` is a
+    user-supplied JSON object whose keys depend on the active upstream model.
     """
     processor_kwargs = params.processor_kwargs or {}
-    generation_kwargs = params.gen_kwargs or {}
-    call_kwargs: dict[str, object] = {
-        "model": model,
-        "processor": processor,
-        "prompt": formatted_prompt,
-        "image": str(params.image_path),
-        "video": None,
-        "verbose": params.verbose,
-        "temperature": params.temperature,
-        "top_p": params.top_p,
-        "repetition_penalty": params.repetition_penalty,
-        "repetition_context_size": params.repetition_context_size,
-        "seed": params.seed,
-        "presence_penalty": params.presence_penalty,
-        "presence_context_size": params.presence_context_size,
-        "frequency_penalty": params.frequency_penalty,
-        "frequency_context_size": params.frequency_context_size,
-        "logit_bias": params.logit_bias,
-        "max_kv_size": params.max_kv_size,
-        "kv_bits": params.kv_bits,
-        "kv_quant_scheme": params.kv_quant_scheme,
-        "kv_group_size": params.kv_group_size,
-        "quantized_kv_start": params.quantized_kv_start,
-        "max_tokens": params.max_tokens,
-    }
-    call_kwargs.update(processor_kwargs)
-    call_kwargs.update(extra_kwargs)
-    call_kwargs.update(generation_kwargs)
-    return generate_fn(**call_kwargs)
+    return generate_fn(
+        model=model,
+        processor=processor,
+        prompt=formatted_prompt,
+        image=str(params.image_path),
+        video=None,
+        verbose=params.verbose,
+        temperature=params.temperature,
+        top_p=params.top_p,
+        repetition_penalty=params.repetition_penalty,
+        repetition_context_size=params.repetition_context_size,
+        seed=params.seed,
+        presence_penalty=params.presence_penalty,
+        presence_context_size=params.presence_context_size,
+        frequency_penalty=params.frequency_penalty,
+        frequency_context_size=params.frequency_context_size,
+        logit_bias=params.logit_bias,
+        max_kv_size=params.max_kv_size,
+        kv_bits=params.kv_bits,
+        kv_quant_scheme=params.kv_quant_scheme,
+        kv_group_size=params.kv_group_size,
+        quantized_kv_start=params.quantized_kv_start,
+        max_tokens=params.max_tokens,
+        **processor_kwargs,
+        **extra_kwargs,
+    )
 
 
 def _sample_active_memory_gb() -> float | None:
@@ -18468,7 +18407,6 @@ def _run_model_generation(
 
     extra_kwargs = _build_generate_extra_kwargs(params)
     processor_passthrough_kwargs = params.processor_kwargs or {}
-    generation_passthrough_kwargs = params.gen_kwargs or {}
     prompt_diagnostics = _build_prompt_diagnostics(
         params=params,
         processor=processor,
@@ -18476,13 +18414,12 @@ def _run_model_generation(
         formatted_prompt=formatted_prompt,
         extra_kwargs=extra_kwargs,
         processor_passthrough_kwargs=processor_passthrough_kwargs,
-        generation_passthrough_kwargs=generation_passthrough_kwargs,
     )
     strict_generate = cast("StrictGenerateCallable", generate)
 
     def _generate_once() -> GenerationResult | SupportsGenerationResult:
-        if processor_passthrough_kwargs or generation_passthrough_kwargs:
-            return _generate_with_passthrough_kwargs(
+        if processor_passthrough_kwargs:
+            return _generate_with_processor_passthrough(
                 generate_fn=generate,
                 model=model,
                 processor=processor,
@@ -20136,116 +20073,21 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
     return prompt
 
 
-def _hf_cache_file_name(cache_file: object) -> str:
-    """Return the display filename for a Hugging Face cached file object."""
-    file_name = getattr(cache_file, "file_name", None)
-    if isinstance(file_name, str) and file_name:
-        return PurePosixPath(file_name).name
-    file_path = getattr(cache_file, "file_path", None)
-    if file_path is not None:
-        return Path(str(file_path)).name
-    if isinstance(cache_file, str):
-        return PurePosixPath(cache_file).name
-    return ""
-
-
-def _hf_cache_revision_files(revision: object) -> frozenset[str]:
-    """Return basename set for the files attached to one cached revision."""
-    files = getattr(revision, "files", ())
-    return frozenset(
-        file_name for cache_file in files if (file_name := _hf_cache_file_name(cache_file))
-    )
-
-
-def _hf_cache_main_revision_files(repo: object) -> frozenset[str] | None:
-    """Return cached files for the repo's main revision, if present."""
-    refs = getattr(repo, "refs", None)
-    if isinstance(refs, Mapping) and "main" in refs:
-        return _hf_cache_revision_files(refs["main"])
-
-    for revision in getattr(repo, "revisions", ()):
-        revision_refs = getattr(revision, "refs", ())
-        if "main" in revision_refs:
-            return _hf_cache_revision_files(revision)
-    return None
-
-
-def _cached_repo_model_eligibility(repo: object) -> CachedModelEligibility:
-    """Classify whether a cached repo should be auto-run like mlx-vlm's server list."""
-    repo_id = str(getattr(repo, "repo_id", ""))
-    repo_type = str(getattr(repo, "repo_type", ""))
-    reasons: list[str] = []
-
-    if repo_type != "model":
-        reasons.append(f"repo type is {repo_type!r}, not 'model'")
-
-    main_files = _hf_cache_main_revision_files(repo)
-    if main_files is None:
-        reasons.append("missing main revision in cache")
-    else:
-        if "config.json" not in main_files:
-            reasons.append("missing config.json")
-        if "tokenizer_config.json" not in main_files:
-            reasons.append("missing tokenizer_config.json")
-        has_safetensors = "model.safetensors.index.json" in main_files or any(
-            file_name.endswith(".safetensors") for file_name in main_files
-        )
-        if not has_safetensors:
-            reasons.append("missing safetensors weights")
-
-    return CachedModelEligibility(
-        repo_id=repo_id,
-        supported=not reasons,
-        reasons=tuple(reasons),
-    )
-
-
-def get_cached_model_eligibility() -> tuple[CachedModelEligibility, ...]:
-    """Return supported/skipped classifications for Hugging Face cache repos."""
+def get_cached_model_ids() -> list[str]:
+    """Return a list of model IDs found in the Hugging Face cache."""
     try:
         cache_info = _get_hf_cache_info_cached()
     except HFValidationError:
         logger.warning("Hugging Face cache directory invalid.")
-        return ()
+        return []
     except FileNotFoundError:
         logger.warning("Hugging Face cache directory not found.")
-        return ()
+        return []
     except (OSError, ValueError) as e:
         logger.warning("Unexpected error scanning Hugging Face cache: %s", e)
-        return ()
-    return tuple(
-        sorted(
-            (_cached_repo_model_eligibility(repo) for repo in cache_info.repos),
-            key=lambda entry: entry.repo_id,
-        )
-    )
-
-
-def _all_cached_repo_ids() -> list[str]:
-    """Return all cached repo IDs, including repos that auto-discovery will skip."""
-    return sorted(entry.repo_id for entry in get_cached_model_eligibility())
-
-
-def _supported_cached_model_ids_with_skipped_logging(
-    eligibility: Iterable[CachedModelEligibility],
-) -> list[str]:
-    """Return supported cached model IDs and log skipped local repos with reasons."""
-    entries = tuple(eligibility)
-    skipped = [entry for entry in entries if not entry.supported]
-    if skipped:
-        logger.warning(
-            "Skipped %d cached repo(s) that mlx-vlm server-style discovery would not run:",
-            len(skipped),
-        )
-        for entry in skipped:
-            reason_text = "; ".join(entry.reasons) if entry.reasons else "unsupported cache layout"
-            logger.warning("   - %s: %s", entry.repo_id, reason_text)
-    return sorted(entry.repo_id for entry in entries if entry.supported)
-
-
-def get_cached_model_ids() -> list[str]:
-    """Return cached model IDs eligible for mlx-vlm server-style auto-discovery."""
-    return sorted(entry.repo_id for entry in get_cached_model_eligibility() if entry.supported)
+        return []
+    else:
+        return sorted([repo.repo_id for repo in cache_info.repos])
 
 
 def validate_model_identifier(model_id: str) -> None:
@@ -20289,9 +20131,9 @@ def validate_and_warn_model_selection(args: argparse.Namespace) -> None:
     if not args.exclude:
         return  # No exclusions to validate
 
-    cached_repos = set(_all_cached_repo_ids())
+    cached_models = set(get_cached_model_ids())
     excluded_models: set[str] = set(args.exclude)
-    ineffective_exclusions: set[str] = excluded_models - cached_repos
+    ineffective_exclusions: set[str] = excluded_models - cached_models
 
     if ineffective_exclusions:
         ineffective_list = sorted(ineffective_exclusions)
@@ -20312,7 +20154,7 @@ def validate_and_warn_model_selection(args: argparse.Namespace) -> None:
             )
         return
 
-    effective_exclusions = excluded_models & set(get_cached_model_ids())
+    effective_exclusions = excluded_models & cached_models
     if effective_exclusions:
         logger.info(
             "Effective exclusions (models that will be filtered out): %s",
@@ -20386,20 +20228,10 @@ def process_models(
     else:
         # Case 2: No explicit models - scan cache and apply exclusions
         logger.info("Scanning cache for models to process...")
-        cache_eligibility = get_cached_model_eligibility()
-        model_identifiers = _supported_cached_model_ids_with_skipped_logging(cache_eligibility)
+        model_identifiers = get_cached_model_ids()
         if not model_identifiers:
-            skipped_count = sum(1 for entry in cache_eligibility if not entry.supported)
-            skipped_hint = (
-                f" {skipped_count} cached repo(s) were present but skipped as unsupported; "
-                "see the skipped-repo warnings above."
-                if skipped_count
-                else ""
-            )
             exit_with_cli_error(
-                "No mlx-vlm server-supported models found in the local Hugging Face cache."
-                + skipped_hint
-                + " "
+                "No models found in the local Hugging Face cache. "
                 "Download a model (e.g., `huggingface-cli download mlx-community/<model>`) "
                 "or pass explicit IDs with --models.",
             )
@@ -20476,7 +20308,6 @@ def process_models(
             eos_tokens=args.eos_tokens,
             skip_special_tokens=args.skip_special_tokens,
             processor_kwargs=args.processor_kwargs,
-            gen_kwargs=args.gen_kwargs,
             enable_thinking=args.enable_thinking,
             thinking_budget=args.thinking_budget,
             thinking_start_token=args.thinking_start_token,
@@ -23309,116 +23140,6 @@ def _issue_summary_section(cluster: IssueCluster) -> list[str]:
     return parts
 
 
-def _issue_inline_value(value: object | None, *, fallback: str = "unknown") -> str:
-    """Return a compact backticked issue value."""
-    if value is None:
-        return f"`{fallback}`"
-    rendered = str(value).lower() if isinstance(value, bool) else str(value)
-    return f"`{MARKDOWN_ESCAPER.escape(rendered)}`"
-
-
-def _issue_model_section(
-    cluster: IssueCluster,
-    *,
-    run_args: argparse.Namespace | None,
-) -> list[str]:
-    """Build the Model section expected by upstream issue templates."""
-    model_names = _issue_cluster_model_names(cluster)
-    representative_model = model_names[0] if model_names else "owner/model"
-    parts = ["", "## Model", ""]
-    parts.append(f"- **Primary model:** `{MARKDOWN_ESCAPER.escape(representative_model)}`")
-    parts.append(f"- **Affected model count:** {_issue_cluster_model_count(cluster)}")
-    if run_args is not None:
-        parts.append(f"- **Revision:** {_issue_inline_value(getattr(run_args, 'revision', None))}")
-        parts.append(
-            "- **Trust remote code:** "
-            f"{_issue_inline_value(getattr(run_args, 'trust_remote_code', None))}"
-        )
-    else:
-        parts.append("- **Revision:** `unknown`")
-        parts.append("- **Trust remote code:** `unknown`")
-    parts.append("")
-    return parts
-
-
-def _issue_image_facts(image_ref: str) -> str:
-    """Return concise local-image facts when the referenced image is readable."""
-    image_path = Path(image_ref)
-    facts: list[str] = []
-    profile = _load_image_input_profile(image_path)
-    if profile is not None:
-        facts.append(f"{profile.width}x{profile.height} ({profile.megapixels:.2f} MP)")
-    if image_path.suffix:
-        facts.append(f"{image_path.suffix.lstrip('.').upper()} extension")
-    if image_path.is_file():
-        with suppress(OSError):
-            facts.append(f"{image_path.stat().st_size} bytes")
-        if digest := _sha256_file(image_path):
-            facts.append(f"sha256 `{digest}`")
-    return ", ".join(facts)
-
-
-def _issue_inputs_section(
-    *,
-    prompt: str | None,
-    image_path: Path | None,
-    run_args: argparse.Namespace | None,
-) -> list[str]:
-    """Build the Inputs section expected by upstream issue templates."""
-    prompt_text = _issue_repro_prompt(prompt=prompt, run_args=run_args)
-    prompt_preview = " ".join(prompt_text.split())
-    prompt_preview = _truncate_text_preview(prompt_preview, max_chars=240)
-    image_ref = _issue_repro_image_ref(image_path=image_path, run_args=run_args)
-
-    parts = ["", "## Inputs", ""]
-    parts.append(f"- **Prompt:** `{MARKDOWN_ESCAPER.escape(prompt_preview)}`")
-    parts.append(f"- **Image:** `{MARKDOWN_ESCAPER.escape(image_ref)}`")
-    if image_facts := _issue_image_facts(image_ref):
-        parts.append(f"- **Image facts:** {MARKDOWN_ESCAPER.escape(image_facts)}")
-    parts.append("- **Shareable:** unknown")
-    parts.append("")
-    return parts
-
-
-def _issue_expected_behavior_section(cluster: IssueCluster) -> list[str]:
-    """Build the expected behavior section for an upstream-facing issue draft."""
-    parts = ["", "## Expected Behavior", ""]
-    parts.append(
-        "- The native `mlx-vlm` CLI/Python repro should load the model, process the "
-        "prompt and image, and return a response without the observed failure or "
-        "quality regression."
-    )
-    if cluster.issue_kind == "runtime_failure":
-        parts.append(
-            "- If the model family is intentionally unsupported, `mlx-vlm` should fail "
-            "before generation with a clear model-specific message."
-        )
-    parts.append("")
-    return parts
-
-
-def _issue_actual_behavior_section(cluster: IssueCluster) -> list[str]:
-    """Build the actual behavior section for an upstream-facing issue draft."""
-    representative = _issue_cluster_representative(cluster)
-    parts = ["", "## Actual Behavior", ""]
-    parts.append(f"- {MARKDOWN_ESCAPER.escape(_issue_problem_summary(cluster))}")
-    if representative is None:
-        parts.append("- No representative model result was available for this cluster.")
-        parts.append("")
-        return parts
-    if not representative.success and representative.error_message:
-        parts.append("- Representative failure:")
-        _append_markdown_code_block(parts, representative.error_message, language="text")
-    else:
-        stack_symptoms = {
-            result.model_name: symptom for result, symptom, _owner in cluster.stack_signals
-        }
-        signal_text = _issue_model_signal(representative, stack_symptoms=stack_symptoms)
-        parts.append(f"- Representative signal: {MARKDOWN_ESCAPER.escape(signal_text)}")
-        parts.append("")
-    return parts
-
-
 def _issue_bundle_link(
     model_name: str,
     repro_bundles: Mapping[str, Path],
@@ -23452,6 +23173,16 @@ def _issue_model_signal(
         issue_subtype = triage.get("issue_subtype")
         return issue_subtype or triage["issue_kind"]
     return result.error_message or "clustered issue signal"
+
+
+def _guard_markdownlint_block(lines: Sequence[str], *, rules: str) -> list[str]:
+    """Wrap Markdown lines with markdownlint disable/enable comments."""
+    return [
+        f"<!-- markdownlint-disable {rules} -->",
+        "",
+        *lines,
+        f"<!-- markdownlint-enable {rules} -->",
+    ]
 
 
 def _issue_affected_models_section(
@@ -23488,7 +23219,7 @@ def _issue_affected_models_section(
                     ),
                 )
             ),
-            rules=MARKDOWNLINT_TABLE_PIPE_RULES,
+            rules="MD060",
         )
     )
     parts.append("")
@@ -23795,9 +23526,6 @@ def _native_mlx_vlm_generate_kwargs(run_args: argparse.Namespace | None) -> dict
     logit_bias = getattr(run_args, "logit_bias", None)
     if logit_bias:
         kwargs["logit_bias"] = dict(logit_bias)
-    gen_kwargs = getattr(run_args, "gen_kwargs", None)
-    if gen_kwargs:
-        kwargs.update(dict(gen_kwargs))
     return kwargs
 
 
@@ -23922,9 +23650,6 @@ def _build_native_mlx_vlm_cli_tokens(
     processor_kwargs = getattr(run_args, "processor_kwargs", None)
     if processor_kwargs:
         tokens.extend(["--processor-kwargs", json.dumps(processor_kwargs, sort_keys=True)])
-    gen_kwargs = getattr(run_args, "gen_kwargs", None)
-    if gen_kwargs:
-        tokens.extend(["--gen-kwargs", json.dumps(gen_kwargs, sort_keys=True)])
     _append_native_cli_optional_pair(
         tokens,
         "--prefill-step-size",
@@ -24303,10 +24028,6 @@ def _build_issue_markdown(
         f"# {_issue_title(cluster)}",
     ]
     parts.extend(_issue_summary_section(cluster))
-    parts.extend(_issue_model_section(cluster, run_args=run_args))
-    parts.extend(_issue_inputs_section(prompt=prompt, image_path=image_path, run_args=run_args))
-    parts.extend(_issue_expected_behavior_section(cluster))
-    parts.extend(_issue_actual_behavior_section(cluster))
     parts.extend(_issue_affected_models_section(cluster, repro_bundles=repro_bundles))
     parts.extend(_issue_minimal_evidence_section(cluster))
     parts.extend(
@@ -25207,10 +24928,8 @@ def _handle_dry_run(
         model_identifiers = args.models
         logger.info("📦 Models specified explicitly:")
     else:
-        model_identifiers = _supported_cached_model_ids_with_skipped_logging(
-            get_cached_model_eligibility()
-        )
-        logger.info("📦 Server-supported models discovered in cache:")
+        model_identifiers = get_cached_model_ids()
+        logger.info("📦 Models discovered in cache:")
 
     # Apply exclusions
     excluded = set(args.exclude or [])
@@ -25481,16 +25200,6 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
         help=(
             "Extra processor kwargs as a JSON object. "
             'Example: --processor-kwargs \'{"cropping": false, "max_patches": 3}\''
-        ),
-    )
-    prompt_group.add_argument(
-        "--gen-kwargs",
-        type=_parse_gen_kwargs_arg,
-        default=None,
-        help=(
-            "Extra mlx-vlm generation kwargs as a JSON object. "
-            "Use this for upstream/model-specific generation options; keep preprocessing "
-            "options in --processor-kwargs."
         ),
     )
     prompt_group.add_argument(
