@@ -1069,6 +1069,48 @@ class TestMarkdownGalleryReport:
         assert "### ✅ org/good" in content
         assert "### ❌ org/bad" in content
 
+    def test_gallery_is_evidence_only_without_scoreboard_duplication(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Gallery should keep output evidence without duplicating selection scoreboards."""
+        result = PerformanceResult(
+            model_name="org/evidence-model",
+            success=True,
+            generation=_MockGeneration(
+                text="Two cats resting on a pink couch.",
+                generation_tps=50.0,
+                prompt_tokens=12,
+                generation_tokens=8,
+                peak_memory=2.0,
+            ),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+        )
+        out = tmp_path / "model_gallery.md"
+        context = check_models._build_report_render_context(
+            results=[result],
+            prompt="Describe this image briefly.",
+            eval_mode="triage",
+        )
+
+        generate_markdown_gallery_report(
+            [result],
+            out,
+            prompt="Describe this image briefly.",
+            metadata={"description": ""},
+            report_context=context,
+            versions={},
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "# Model Output Gallery" in content
+        assert "Full generated output by model" in content
+        assert "Review Shortlist" not in content
+        assert "Failures by Package" not in content
+        assert "Best keywording" not in content
+
     def test_gallery_includes_issue_style_quality_summary_and_version_stamps(
         self,
         tmp_path: Path,
@@ -1190,11 +1232,11 @@ class TestMarkdownGalleryReport:
         assert "org/risky" in maintainer_queue
         assert "org/bad" in maintainer_queue
 
-    def test_gallery_includes_shared_triage_sections_and_review_status(
+    def test_gallery_includes_summary_pointer_and_per_model_review_status(
         self,
         tmp_path: Path,
     ) -> None:
-        """Gallery should surface shared triage sections and per-model review status."""
+        """Gallery should point to summaries while keeping per-model review status."""
         out = tmp_path / "triage_gallery.md"
         results = [
             _make_success("org/good"),
@@ -1212,8 +1254,8 @@ class TestMarkdownGalleryReport:
 
         content = out.read_text(encoding="utf-8")
         assert "Action Snapshot" in content  # cross-reference to results.md
-        assert "## 🧭 Review Shortlist" in content
-        assert "## 🚨 Failures by Package (Actionable)" in content
+        assert "## 🧭 Review Shortlist" not in content
+        assert "## 🚨 Failures by Package (Actionable)" not in content
         assert "_Review focus:_" in content
         assert "strong candidate for first-pass review" in content or "watchlist" in content
         assert "_Error summary:_" in content

@@ -11838,48 +11838,52 @@ def _build_markdown_quality_breakdown(
 
 
 def _build_markdown_gallery_navigation(report_context: ReportRenderContext) -> list[str]:
-    """Build a quick-navigation section for the standalone gallery artifact."""
-    recommended = _select_recommended_models(report_context)
-    failed_models = [
-        model_name
-        for model_name, _stage, _message in report_context.summary.get(
-            "failed_models",
-            [],
-        )
+    """Build evidence-oriented quick navigation for the standalone gallery artifact."""
+    successful_models = [result.model_name for result in report_context.result_set.successful]
+    flagged_models = [
+        result.model_name
+        for result in report_context.result_set.results
+        if result.quality_issues or not result.success
     ]
-    low_utility_models = [
-        model_name
-        for model_name, _score, _grade, _weakness in report_context.summary.get(
-            "low_utility_models",
-            [],
-        )
-    ]
-    if not recommended and not failed_models and not low_utility_models:
+    failed_models = [result.model_name for result in report_context.result_set.failed]
+    if not successful_models and not flagged_models and not failed_models:
         return []
 
     parts: list[str] = []
     _append_markdown_section(parts, title="## Quick Navigation")
-    for label, result, _score_data in recommended:
+    if successful_models:
         _append_markdown_labeled_value(
             parts,
-            label=label,
-            value=_format_gallery_model_link(result.model_name),
+            label="Successful outputs",
+            value=_preview_model_references(
+                successful_models,
+                gallery_link_target="",
+                max_items=8,
+            ),
+            bullet=True,
+        )
+    if flagged_models:
+        flagged_preview = _preview_model_references(
+            flagged_models,
+            gallery_link_target="",
+            max_items=8,
+        )
+        _append_markdown_labeled_value(
+            parts,
+            label="Flagged outputs",
+            value=flagged_preview,
             bullet=True,
         )
     if failed_models:
-        failed_preview = _preview_model_references(failed_models, max_items=6)
-        _append_markdown_labeled_value(
-            parts,
-            label="Failed models",
-            value=failed_preview,
-            bullet=True,
+        failed_preview = _preview_model_references(
+            failed_models,
+            gallery_link_target="",
+            max_items=8,
         )
-    if low_utility_models:
-        low_utility_preview = _preview_model_references(low_utility_models, max_items=6)
         _append_markdown_labeled_value(
             parts,
-            label="D/F utility models",
-            value=low_utility_preview,
+            label="Failed outputs",
+            value=failed_preview,
             bullet=True,
         )
     parts.append("")
@@ -16262,8 +16266,6 @@ def generate_markdown_gallery_report(
             system_info=report_context.system_info,
         )
     )
-    md.extend(_format_review_priorities_parts(report_context, html_output=False))
-    md.extend(_format_failures_by_package_parts(results, html_output=False))
     _append_markdown_image_metadata_section(md, metadata)
     md.append("## Prompt")
     _append_markdown_wrapped_blockquote(md, prompt)
