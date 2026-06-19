@@ -748,8 +748,10 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
         output_markdown=tmp_path / "report.md",
         output_gallery_markdown=tmp_path / "gallery.md",
         output_review=tmp_path / "review.md",
+        output_model_selection=tmp_path / "model_selection.md",
         output_tsv=tmp_path / "report.tsv",
         output_jsonl=tmp_path / "report.jsonl",
+        output_run_json=tmp_path / "run.json",
         output_diagnostics=tmp_path / "diagnostics.md",
         output_log=custom_log,
         output_env=custom_env,
@@ -778,6 +780,7 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
         patch("check_models.generate_review_report"),
         patch("check_models.generate_tsv_report"),
         patch("check_models.save_jsonl_report"),
+        patch("check_models.save_run_json_report"),
         patch("check_models.append_history_record", return_value=history_record),
         patch("check_models.generate_diagnostics_report", return_value=False),
         patch("check_models._log_history_comparison"),
@@ -804,6 +807,7 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
         next(i for i, msg in enumerate(messages) if "Review Report:" in msg),
         next(i for i, msg in enumerate(messages) if "TSV Report:" in msg),
         next(i for i, msg in enumerate(messages) if "JSONL Report:" in msg),
+        next(i for i, msg in enumerate(messages) if "Run JSON:" in msg),
     ]
     assert artifact_positions == sorted(artifact_positions)
 
@@ -815,8 +819,10 @@ def test_report_generation_uses_single_artifact_plan(tmp_path: Path) -> None:
         output_markdown=tmp_path / "report.md",
         output_gallery_markdown=tmp_path / "gallery.md",
         output_review=tmp_path / "review.md",
+        output_model_selection=tmp_path / "model_selection.md",
         output_tsv=tmp_path / "report.tsv",
         output_jsonl=tmp_path / "report.jsonl",
+        output_run_json=tmp_path / "run.json",
         output_diagnostics=tmp_path / "diagnostics.md",
         output_log=tmp_path / "check_models.log",
         output_env=tmp_path / "environment.log",
@@ -843,6 +849,7 @@ def test_report_generation_uses_single_artifact_plan(tmp_path: Path) -> None:
         "review",
         "tsv",
         "jsonl",
+        "run_json",
     ]
     assert [artifact.label.strip() for artifact in artifacts] == [
         "HTML Report:",
@@ -851,6 +858,7 @@ def test_report_generation_uses_single_artifact_plan(tmp_path: Path) -> None:
         "Review Report:",
         "TSV Report:",
         "JSONL Report:",
+        "Run JSON:",
     ]
     assert all(artifact.path.is_absolute() for artifact in artifacts)
     assert all(artifact.job is not None for artifact in artifacts)
@@ -865,8 +873,10 @@ def test_finalize_execution_prunes_canonical_repro_bundle_dir(tmp_path: Path) ->
         output_markdown=reports_dir / "report.md",
         output_gallery_markdown=reports_dir / "gallery.md",
         output_review=reports_dir / "review.md",
+        output_model_selection=reports_dir / "model_selection.md",
         output_tsv=reports_dir / "report.tsv",
         output_jsonl=tmp_path / "report.jsonl",
+        output_run_json=tmp_path / "run.json",
         output_diagnostics=reports_dir / "diagnostics.md",
         output_log=tmp_path / "check_models.log",
         output_env=tmp_path / "environment.log",
@@ -896,6 +906,7 @@ def test_finalize_execution_prunes_canonical_repro_bundle_dir(tmp_path: Path) ->
         patch("check_models.generate_review_report"),
         patch("check_models.generate_tsv_report"),
         patch("check_models.save_jsonl_report"),
+        patch("check_models.save_run_json_report"),
         patch("check_models.append_history_record", return_value=history_record),
         patch("check_models.generate_diagnostics_report", return_value=False),
         patch("check_models._log_history_comparison"),

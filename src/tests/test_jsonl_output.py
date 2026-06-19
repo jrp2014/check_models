@@ -124,6 +124,55 @@ def test_save_jsonl_report_includes_library_versions_in_metadata(tmp_path: Path)
     assert rows == []
 
 
+def test_save_run_json_report_captures_public_snapshot_contract(tmp_path: Path) -> None:
+    """Run JSON should capture stable public snapshot metadata."""
+    result = PerformanceResult(
+        model_name="org/caption-model",
+        generation=MockGeneration(
+            text="Two cats on a pink couch.",
+            generation_tps=12.0,
+            prompt_tokens=8,
+            generation_tokens=7,
+            peak_memory=1.5,
+        ),
+        success=True,
+        generation_time=1.0,
+        model_load_time=0.5,
+        total_time=1.5,
+    )
+    out = tmp_path / "run.json"
+    context = check_models._build_report_render_context(
+        results=[result],
+        prompt="Describe this image briefly.",
+        metadata={"description": ""},
+        eval_mode="triage",
+    )
+
+    check_models.save_run_json_report(
+        [result],
+        out,
+        versions={"mlx-vlm": "0.6.3"},
+        prompt="Describe this image briefly.",
+        total_runtime_seconds=3.0,
+        report_context=context,
+        output_paths={
+            "results_markdown": "reports/results.md",
+            "model_selection": "reports/model_selection.md",
+            "diagnostics": "reports/diagnostics.md",
+        },
+    )
+
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == "1.0"
+    assert payload["eval_mode"] == "triage"
+    assert payload["semantic_rankings_grounded"] is False
+    assert payload["selection_basis"] == "ungrounded"
+    assert payload["counts"]["models_total"] == 1
+    assert payload["counts"]["models_successful"] == 1
+    assert payload["artifacts"]["model_selection"] == "reports/model_selection.md"
+    assert payload["library_versions"]["mlx-vlm"] == "0.6.3"
+
+
 def test_jsonl_metrics_fall_back_to_generation_runtime_fields() -> None:
     """JSONL metrics should use performance fields attached to GenerationResult."""
     record = cast(

@@ -175,6 +175,7 @@ __all__ = [
     "print_model_result",
     "print_version_info",
     "process_image_with_model",
+    "save_run_json_report",
     "validate_cli_arguments",
     "validate_image_accessible",
     "validate_inputs",
@@ -23181,6 +23182,41 @@ def save_jsonl_report(
         logger.exception("Failed to write JSONL report to %s", filename)
 
 
+def save_run_json_report(
+    results: list[PerformanceResult],
+    filename: Path,
+    *,
+    versions: LibraryVersionDict,
+    prompt: str,
+    total_runtime_seconds: float,
+    report_context: ReportRenderContext,
+    output_paths: Mapping[str, str],
+) -> None:
+    """Write stable run-level metadata for public benchmark snapshots."""
+    failed = [result for result in results if not result.success]
+    successful = [result for result in results if result.success]
+    policy = report_context.mode_policy
+    payload: dict[str, JsonLike] = {
+        "schema_version": "1.0",
+        "generated_at": local_now_str(),
+        "eval_mode": policy.eval_mode,
+        "prompt": prompt,
+        "prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
+        "semantic_rankings_grounded": policy.semantic_rankings_grounded,
+        "selection_basis": policy.selection_basis,
+        "has_descriptive_metadata": policy.has_descriptive_metadata,
+        "total_runtime_seconds": round(total_runtime_seconds, 3),
+        "counts": {
+            "models_total": len(results),
+            "models_successful": len(successful),
+            "models_failed": len(failed),
+        },
+        "artifacts": dict(output_paths),
+        "library_versions": dict(versions),
+    }
+    _write_text_file(filename, json.dumps(payload, indent=2, sort_keys=True) + "\n")
+
+
 def _write_report_failure_jsonl(
     *,
     filename: Path,
@@ -24787,6 +24823,36 @@ def _resolve_report_output_paths(args: argparse.Namespace) -> ReportOutputPaths:
     )
 
 
+def _public_artifact_path(path: Path) -> str:
+    """Return a stable public artifact path for committed output snapshots."""
+    resolved = path.resolve()
+    output_root = (_SCRIPT_DIR / "output").resolve()
+    try:
+        return str(PurePosixPath(*resolved.relative_to(output_root).parts))
+    except ValueError:
+        try:
+            return str(PurePosixPath(*resolved.relative_to(_SCRIPT_DIR.resolve()).parts))
+        except ValueError:
+            return str(path)
+
+
+def _public_output_artifact_map(output_paths: ReportOutputPaths) -> dict[str, str]:
+    """Return stable artifact paths for run-level JSON metadata."""
+    return {
+        "results_html": _public_artifact_path(output_paths.html),
+        "results_markdown": _public_artifact_path(output_paths.markdown),
+        "model_selection": _public_artifact_path(output_paths.model_selection),
+        "model_gallery": _public_artifact_path(output_paths.gallery_markdown),
+        "review": _public_artifact_path(output_paths.review),
+        "diagnostics": _public_artifact_path(output_paths.diagnostics),
+        "results_tsv": _public_artifact_path(output_paths.tsv),
+        "results_jsonl": _public_artifact_path(output_paths.jsonl),
+        "run_json": _public_artifact_path(output_paths.run_json),
+        "log": _public_artifact_path(output_paths.log),
+        "environment": _public_artifact_path(output_paths.environment),
+    }
+
+
 def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtifact, ...]:
     """Build the ordered final report artifact plan."""
     output_paths = inputs.output_paths
@@ -24870,6 +24936,20 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
                 system_info=inputs.system_info,
                 library_versions=inputs.library_versions,
                 runtime_fingerprint=inputs.runtime_fingerprint,
+            ),
+        ),
+        ReportArtifact(
+            key="run_json",
+            label="   Run JSON:       ",
+            path=output_paths.run_json,
+            job=lambda: save_run_json_report(
+                inputs.results,
+                output_paths.run_json,
+                versions=inputs.library_versions,
+                prompt=inputs.prompt,
+                total_runtime_seconds=inputs.overall_time,
+                report_context=inputs.report_context,
+                output_paths=_public_output_artifact_map(output_paths),
             ),
         ),
     )
