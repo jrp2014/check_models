@@ -24916,6 +24916,20 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
             ),
         ),
         ReportArtifact(
+            key="model_selection",
+            label="   Model Selection: ",
+            path=output_paths.model_selection,
+            job=lambda: generate_model_selection_report(
+                inputs.results,
+                output_paths.model_selection,
+                prompt=inputs.prompt,
+                metadata=inputs.metadata,
+                report_context=inputs.report_context,
+                gallery_filename=output_paths.gallery_markdown,
+                diagnostics_filename=output_paths.diagnostics,
+            ),
+        ),
+        ReportArtifact(
             key="tsv",
             label="   TSV Report:      ",
             path=output_paths.tsv,
@@ -25249,10 +25263,12 @@ def _print_reports_dashboard(
         table.add_row(label, purpose, clickable_link)
 
     add_row("HTML Report", "Interactive dashboard with charts & filters", output_paths.html)
-    add_row("Markdown Report", "Clean results summary for docs & portals", output_paths.markdown)
-    add_row("Gallery Report", "Text output & quality review details", output_paths.gallery_markdown)
+    add_row("Markdown Report", "Mode-aware public run index", output_paths.markdown)
+    add_row("Model Selection", "Caption & metadata decision brief", output_paths.model_selection)
+    add_row("Gallery Report", "Evidence-only model outputs", output_paths.gallery_markdown)
     add_row("Review Report", "Insights summary & checklist", output_paths.review)
     add_row("TSV Metrics", "Tab-separated raw metrics for import", output_paths.tsv)
+    add_row("Run JSON", "Stable run metadata contract", output_paths.run_json)
 
     if diagnostics_artifacts and diagnostics_artifacts.diagnostics_written:
         add_row("Diagnostics", "Upstream bug triage & package failures", output_paths.diagnostics)

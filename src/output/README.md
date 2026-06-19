@@ -10,8 +10,9 @@ The script's default output location is now this directory, keeping the project 
 output/
 ├── reports/                  # Human-readable report files
 │   ├── results.html          # Styled HTML report (viewable in browser)
-│   ├── results.md            # GitHub-friendly Markdown summary report
-│   ├── model_gallery.md      # Standalone gallery for qualitative output review
+│   ├── results.md            # Mode-aware public run index
+│   ├── model_selection.md    # Caption and structured-metadata decision brief
+│   ├── model_gallery.md      # Evidence-only generated output gallery
 │   ├── review.md             # Review digest grouped by owner and user bucket
 │   ├── results.tsv           # Tab-separated values table (for spreadsheets)
 │   └── diagnostics.md        # Upstream issue report (conditional)
@@ -21,6 +22,7 @@ output/
 ├── repro_bundles/            # JSON reproduction bundles per failed model
 │   └── 20260417T...*.json    # Timestamped bundle with error + env details
 ├── results.jsonl             # JSON Lines report (machine-readable results)
+├── run.json                  # Stable run-level metadata contract
 ├── results.history.jsonl     # Append-only per-run history for regressions
 ├── check_models.log          # Detailed execution log
 └── environment.log           # Complete Python environment dump
@@ -33,8 +35,12 @@ output/
 **In `reports/`** (human-readable):
 
 - `reports/results.html` - Styled HTML report (viewable in browser)
-- `reports/results.md` - GitHub-friendly Markdown summary report
-- `reports/model_gallery.md` - Standalone Markdown gallery artifact for qualitative output review
+- `reports/results.md` - Mode-aware public run index. In triage mode it suppresses cataloging
+  and keyword scores and points to model-selection and diagnostics artifacts.
+- `reports/model_selection.md` - Brief-caption and structured title/description/keywords
+  decision brief. Semantic rankings are labelled ungrounded unless trusted descriptive image
+  metadata is present.
+- `reports/model_gallery.md` - Evidence-only generated outputs and diagnostics per model
 - `reports/review.md` - Review digest grouped by owner and user bucket
 - `reports/results.tsv` - Tab-separated values table (for spreadsheets/data analysis)
 - `reports/diagnostics.md` - Upstream issue report (only generated when failures/harness issues detected)
@@ -42,6 +48,8 @@ output/
 **In `output/`** (machine-readable and logs):
 
 - `results.jsonl` - JSON Lines report (machine-readable results)
+- `run.json` - Stable run-level machine contract with resolved mode, grounding policy, counts,
+  versions, and artifact paths
 - `results.history.jsonl` - Append-only per-run history for regressions/recoveries
 - `check_models.log` - Detailed execution log from production benchmark runs
 - `environment.log` - Complete Python environment dump (for reproducibility)
@@ -64,9 +72,11 @@ results:
 python -m check_models \
   --output-html output/test_results.html \
   --output-markdown output/test_results.md \
+  --output-model-selection output/test_model_selection.md \
   --output-gallery-markdown output/test_model_gallery.md \
   --output-tsv output/test_results.tsv \
   --output-jsonl output/test_results.jsonl \
+  --output-run-json output/test_run.json \
   --output-log output/test_check_models.log \
   [other options...]
 ```
@@ -187,11 +197,13 @@ Success rate: 2/3 (66.7%)
 
 ```console
 💾 Reports generated:
-   • HTML: src/output/results.html
-   • Markdown: src/output/results.md
-  • Gallery: src/output/model_gallery.md
-  • TSV: src/output/results.tsv
+   • HTML: src/output/reports/results.html
+   • Markdown: src/output/reports/results.md
+   • Model Selection: src/output/reports/model_selection.md
+   • Gallery: src/output/reports/model_gallery.md
+   • TSV: src/output/reports/results.tsv
   • JSONL: src/output/results.jsonl
+  • Run JSON: src/output/run.json
 
 ⏱️  Total runtime: 45.2 seconds
 ```

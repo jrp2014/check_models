@@ -72,8 +72,9 @@ python -m check_models --dry-run
 - **Multiple Output Formats**:
   - **CLI**: Colorized with compact or detailed metrics modes
   - **HTML**: Standalone report with inline CSS, failed row highlighting
-  - **Markdown**: GitHub-compatible summary plus standalone gallery Markdown artifact
+  - **Markdown**: Mode-aware run index, model-selection brief, and evidence gallery
   - **TSV/JSONL**: Machine-readable exports for downstream analysis
+  - **Run JSON**: Stable run-level metadata contract for public snapshots
 - **Error Handling**: Per-model isolation with detailed diagnostics; graceful timeout/failure handling
 - **Machine Parsable**: SUMMARY lines with `key=value` format for automation
 - **Visual Hierarchy**: Emoji prefixes, tree-structured metrics, wrapped text output
@@ -239,17 +240,24 @@ The tool generates multiple report formats in `output/` by default:
 
 - **CLI**: Real-time colorized progress and metrics.
 - **HTML** (`reports/results.html`): Interactive table with sortable columns and failed row highlighting.
-- **Markdown** (`reports/results.md`): GitHub-compatible summary for documentation, with links to the canonical log and review artifacts.
-- **Gallery Markdown** (`reports/model_gallery.md`): GitHub-compatible review artifact with image metadata, the full prompt, and one full-output section per model.
+- **Markdown** (`reports/results.md`): Mode-aware public run index with links to canonical
+  evidence, model-selection, and review artifacts.
+- **Model Selection** (`reports/model_selection.md`): Brief-caption and structured
+  title/description/keywords decision brief.
+- **Gallery Markdown** (`reports/model_gallery.md`): Evidence-only artifact with image metadata,
+  the full prompt, and one full-output section per model.
 - **Review Markdown** (`reports/review.md`): Short automated digest grouped by likely owner and user-facing utility bucket.
-- **TSV/JSONL** (`reports/results.tsv`, `results.jsonl`): Machine-readable formats for analysis.
+- **TSV/JSONL** (`reports/results.tsv`, `results.jsonl`): Machine-readable per-model formats for analysis.
+- **Run JSON** (`run.json`): Stable run-level machine contract with mode, grounding, counts, versions, and artifact paths.
 - **Diagnostics** (`reports/diagnostics.md`): Failure-focused and compatibility-focused issue report (generated when failures, harness issues, or preflight compatibility warnings are present).
 - **Log** (`check_models.log`): Canonical comprehensive run artifact, including the full per-model review block and full output/captured failure output.
 - **History** (`results.history.jsonl`): Append-only run history for regressions/recoveries.
 - **Issue templates** (`issues/`): Ready-to-file GitHub issue markdown for clustered crashes and harness problems, including Model, Inputs, Expected Behavior, and Actual Behavior sections (generated when failures are present).
 - **Repro bundles** (`repro_bundles/`): JSON reproduction bundles per failed model, containing error details, CLI args, and environment for reproducibility.
 
-The main Markdown report stays brief and points readers to `check_models.log`, `review.md`, and `model_gallery.md` for the full automated review and output evidence.
+The main Markdown report stays brief and points readers to `model_selection.md`,
+`model_gallery.md`, `review.md`, and `check_models.log` for decisions, evidence,
+automated review, and the canonical run trace.
 
 ### Metrics Explained
 
@@ -892,10 +900,12 @@ See module docstrings and `__all__` exports for complete API reference.
 | `-i`, `--image` | Path | omitted | Path to a specific image file to process directly. Requires a value when provided. |
 | `--output-html` | Path | `output/reports/results.html` | HTML report output filename. |
 | `--output-markdown` | Path | `output/reports/results.md` | Markdown report output filename. |
-| `--output-gallery-markdown` | Path | `output/reports/model_gallery.md` | Standalone Markdown gallery artifact for qualitative output review. |
+| `--output-gallery-markdown` | Path | `output/reports/model_gallery.md` | Evidence-only Markdown gallery report filename. |
 | `--output-review` | Path | `output/reports/review.md` | Markdown review digest grouped by owner and user bucket. |
+| `--output-model-selection` | Path | `output/reports/model_selection.md` | Markdown model-selection report filename. |
 | `--output-tsv` | Path | `output/reports/results.tsv` | TSV (tab-separated values) report output filename. |
 | `--output-jsonl` | Path | `output/results.jsonl` | JSONL report output filename. |
+| `--output-run-json` | Path | `output/run.json` | Run-level JSON metadata filename. |
 | `--output-log` | Path | `output/check_models.log` | Command line output log filename. |
 | `--output-env` | Path | `output/environment.log` | Environment log filename (pip freeze, conda list). |
 | `--output-diagnostics` | Path | `output/reports/diagnostics.md` | Diagnostics report filename (generated on failures/harness issues). |
@@ -1173,6 +1183,7 @@ check_models/
 │       ├── reports/
 │       │   ├── results.html
 │       │   ├── results.md
+│       │   ├── model_selection.md
 │       │   ├── model_gallery.md
 │       │   ├── review.md
 │       │   ├── results.tsv
@@ -1180,6 +1191,7 @@ check_models/
 │       ├── issues/           # Generated GitHub issue templates
 │       ├── repro_bundles/    # JSON reproduction bundles
 │       ├── results.jsonl
+│       ├── run.json
 │       ├── results.history.jsonl
 │       ├── check_models.log
 │       └── environment.log
@@ -1190,10 +1202,20 @@ check_models/
 
 **Output behaviour**: By default, outputs are written to `src/output/` (git-ignored).
 Override with `--output-html`, `--output-markdown`, `--output-gallery-markdown`,
-`--output-review`, `--output-tsv`, `--output-jsonl`, `--output-log`, `--output-env`,
-and `--output-diagnostics`. Human-readable reports (HTML, Markdown, TSV, diagnostics)
-default to `output/reports/`; machine-readable files (JSONL, history) and logs remain
-in `output/`.
+`--output-review`, `--output-model-selection`, `--output-tsv`, `--output-jsonl`,
+`--output-run-json`, `--output-log`, `--output-env`, and `--output-diagnostics`.
+Human-readable reports (HTML, Markdown, TSV, diagnostics) default to `output/reports/`;
+machine-readable files (JSONL, run JSON, history) and logs remain in `output/`.
+
+- **Run index** (`reports/results.md`): public snapshot entry point. In triage mode it
+  suppresses cataloging and keyword scores and points to model-selection and diagnostics artifacts.
+- **Model Selection** (`reports/model_selection.md`): brief-caption and structured metadata
+  decision brief. Semantic rankings are labelled ungrounded unless trusted descriptive image
+  metadata is present.
+- **Gallery Markdown** (`reports/model_gallery.md`): evidence-only generated outputs and
+  diagnostics per model.
+- **Run JSON** (`run.json`): stable run-level machine contract with resolved mode, grounding
+  policy, counts, versions, and artifact paths.
 
 ## Contributing
 

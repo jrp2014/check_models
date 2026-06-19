@@ -37,6 +37,9 @@ Notable changes to this project will be documented in this file.
 - Make `--eval-mode` default to metadata-aware `auto`, selecting `stress` for
   images with extracted metadata and the shorter `triage` lane for metadata-free
   images while preserving explicit mode choices.
+- Made public benchmark artifacts mode-aware: triage summaries now suppress
+  cataloging/keyword scores, add a dedicated model-selection brief, and expose
+  stable run-level JSON metadata.
 - Clarify agent workflow guidance so Ruff formatting and safe lint fixes run
   before the full `make quality` gate, and so `make test` is treated as a
   pytest-only development loop rather than a redundant step after successful
