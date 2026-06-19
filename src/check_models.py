@@ -149,6 +149,7 @@ __all__ = [
     "generate_diagnostics_report",
     "generate_html_report",
     "generate_markdown_report",
+    "generate_model_selection_report",
     "get_device_info",
     "get_exif_data",
     "get_library_versions",
@@ -3154,6 +3155,8 @@ OUTPUT_PREVIEW_MIN_TAIL_CHARS: Final[int] = 48  # Minimum chars reserved for pre
 OUTPUT_PREVIEW_MIN_BODY_CHARS: Final[int] = 24  # Smallest useful body budget after cue prefix
 MAX_CAPTURED_OUTPUT_LOG_CHARS: Final[int] = 1200  # Max chars of captured stdout/stderr in logs
 MAX_TRIAGE_MODELS: Final[int] = 5  # Max model rows shown in triage subsections
+MODEL_SELECTION_MIN_CAPTION_WORDS: Final[int] = 5  # Below this, captions are usually too sparse
+MODEL_SELECTION_MAX_CAPTION_WORDS: Final[int] = 80  # Above this, caption briefs become unwieldy
 SUMMARY_CHART_WIDTH: Final[int] = 24  # Character width for compact Rich summary bars
 SUMMARY_MODEL_LABEL_MAX: Final[int] = 32  # Max model label length in summary tables/charts
 SUMMARY_CHART_MAX_ROWS: Final[int] = 8  # Max rows shown in summary charts
@@ -12186,6 +12189,17 @@ class ReportTriageContext:
 
 
 @dataclass(frozen=True)
+class ModelSelectionRow:
+    """One ranked model-selection row for public reports."""
+
+    result: PerformanceResult
+    score: float
+    verdict: str
+    caption_preview: str
+    caveat: str
+
+
+@dataclass(frozen=True)
 class ReportModePolicy:
     """Mode-aware report rules for score visibility and selection grounding."""
 
@@ -16276,6 +16290,66 @@ def _group_review_results(
     return grouped
 
 
+def _model_selection_score(result: PerformanceResult) -> float:
+    """Score output hygiene and practical caption usefulness without image semantics."""
+    review = _build_jsonl_review_record(result)
+    if not result.success or result.generation is None or review is None:
+        return 0.0
+
+    text = str(getattr(result.generation, "text", "") or "").strip()
+    word_count = len(text.split())
+    labels = _extract_quality_issue_labels(result.quality_issues)
+    score = 100.0
+
+    if review["user_bucket"] == "avoid":
+        score -= 65.0
+    elif review["user_bucket"] == "caveat":
+        score -= 25.0
+
+    if labels & {"harness", "reasoning_leak", "generation_loop", "repetitive"}:
+        score -= 35.0
+    if labels & {"formatting", "cutoff", "text_sanity", "lang_mixing"}:
+        score -= 20.0
+
+    if word_count < MODEL_SELECTION_MIN_CAPTION_WORDS:
+        score -= 25.0
+    elif word_count > MODEL_SELECTION_MAX_CAPTION_WORDS:
+        score -= 15.0
+
+    return max(0.0, round(score, 1))
+
+
+def _build_model_selection_rows(
+    results: Sequence[PerformanceResult],
+) -> list[ModelSelectionRow]:
+    """Return ranked model-selection rows for caption and metadata users."""
+    rows: list[ModelSelectionRow] = []
+    for result in results:
+        review = _build_jsonl_review_record(result)
+        if review is None:
+            continue
+        caption_preview = _build_result_output_preview(result, max_chars=180)
+        caveat = _review_focus_text(review, _quality_analysis_for_result(result))
+        rows.append(
+            ModelSelectionRow(
+                result=result,
+                score=_model_selection_score(result),
+                verdict=review["verdict"],
+                caption_preview=caption_preview,
+                caveat=caveat,
+            )
+        )
+
+    rows.sort(
+        key=lambda row: (
+            -row.score,
+            -float(getattr(row.result.generation, "generation_tps", 0.0) or 0.0),
+            row.result.model_name,
+        )
+    )
+    return rows
+
+
 def _is_review_escalation(result: PerformanceResult) -> bool:
     """Return True for review rows that need maintainer attention."""
     review = _build_jsonl_review_record(result)
@@ -16412,6 +16486,155 @@ def _append_review_issue_queue(
         )
     )
     md.append("")
+
+
+def _build_grounded_metadata_selection_section(rows: Sequence[ModelSelectionRow]) -> list[str]:
+    """Render metadata-agreement candidates when trusted metadata is available."""
+    table_rows: list[tuple[str, ...]] = []
+    for row in rows[:10]:
+        agreement = row.result.metadata_agreement
+        agreement_score = 0.0 if agreement is None else agreement.overall_score
+        table_rows.append(
+            (
+                f"`{MARKDOWN_ESCAPER.escape(row.result.model_name)}`",
+                f"{agreement_score:.0f}",
+                f"`{MARKDOWN_ESCAPER.escape(row.verdict)}`",
+                MARKDOWN_ESCAPER.escape(row.caption_preview),
+            )
+        )
+
+    parts = ["## Structured Metadata Candidates", ""]
+    parts.extend(
+        render_report_markdown(
+            (
+                ReportTable(
+                    headers=("Model", "Metadata agreement", "Verdict", "Output Preview"),
+                    rows=tuple(table_rows),
+                    markdown_escaped=True,
+                ),
+            )
+        )
+    )
+    parts.append("")
+    return parts
+
+
+def _append_model_selection_evidence_links(
+    md: list[str],
+    *,
+    report_filename: Path,
+    gallery_filename: Path | None,
+    diagnostics_filename: Path | None,
+) -> None:
+    """Append companion links for the model-selection brief."""
+    if gallery_filename is None and diagnostics_filename is None:
+        return
+
+    md.extend(["## Evidence Links", ""])
+    if gallery_filename is not None:
+        target = _markdown_artifact_target(
+            report_filename=report_filename,
+            artifact_filename=gallery_filename,
+        )
+        _append_markdown_labeled_value(
+            md,
+            label="Output evidence",
+            value=f"[{gallery_filename.name}]({target})",
+            bullet=True,
+        )
+    if diagnostics_filename is not None:
+        target = _markdown_artifact_target(
+            report_filename=report_filename,
+            artifact_filename=diagnostics_filename,
+        )
+        _append_markdown_labeled_value(
+            md,
+            label="Maintainer diagnostics",
+            value=f"[{diagnostics_filename.name}]({target})",
+            bullet=True,
+        )
+    md.append("")
+
+
+def generate_model_selection_report(
+    results: list[PerformanceResult],
+    filename: Path,
+    *,
+    prompt: str,
+    metadata: MetadataDict | None = None,
+    report_context: ReportRenderContext | None = None,
+    gallery_filename: Path | None = None,
+    diagnostics_filename: Path | None = None,
+) -> None:
+    """Write a public model-selection brief for caption and metadata users."""
+    if not results:
+        log_warning_note("No results to generate model-selection report.")
+        return
+    if report_context is None:
+        report_context = _build_report_render_context(
+            results=results,
+            prompt=prompt,
+            metadata=metadata,
+        )
+
+    policy = report_context.mode_policy
+    grounding = "grounded" if policy.semantic_rankings_grounded else "ungrounded"
+    rows = _build_model_selection_rows(report_context.result_set.results)
+    md: list[str] = [
+        "# Model Selection Brief",
+        "",
+        f"_Generated on {local_now_str()}_",
+        "",
+        f"- Mode: {MARKDOWN_ESCAPER.escape(policy.eval_mode)}",
+        (f"- Semantic rankings: {grounding} ({MARKDOWN_ESCAPER.escape(policy.selection_basis)})"),
+        "- Primary use cases: brief captions; structured title/description/keywords",
+        "",
+    ]
+
+    _append_model_selection_evidence_links(
+        md,
+        report_filename=filename,
+        gallery_filename=gallery_filename,
+        diagnostics_filename=diagnostics_filename,
+    )
+
+    md.extend(["## Brief Caption Candidates", ""])
+    caption_rows = [
+        (
+            f"`{MARKDOWN_ESCAPER.escape(row.result.model_name)}`",
+            f"{row.score:.0f}",
+            f"`{MARKDOWN_ESCAPER.escape(row.verdict)}`",
+            MARKDOWN_ESCAPER.escape(row.caption_preview),
+            MARKDOWN_ESCAPER.escape(row.caveat),
+        )
+        for row in rows[:10]
+    ]
+    md.extend(
+        render_report_markdown(
+            (
+                ReportTable(
+                    headers=("Model", "Hygiene", "Verdict", "Caption Preview", "Caveat"),
+                    rows=tuple(caption_rows),
+                    markdown_escaped=True,
+                ),
+            )
+        )
+    )
+    md.append("")
+
+    if policy.suppress_cataloging_scores:
+        md.extend(
+            [
+                "## Structured Metadata Candidates",
+                "",
+                "Structured metadata scoring is suppressed in triage mode.",
+                "",
+            ]
+        )
+    else:
+        md.extend(_build_grounded_metadata_selection_section(rows))
+
+    _write_markdown_artifact(filename, md, artifact_name="Model-selection report")
 
 
 def generate_review_report(

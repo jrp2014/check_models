@@ -839,6 +839,114 @@ class TestMarkdownReportEdgeCases:
         assert "Semantic rankings: ungrounded" in content
         assert "Mode: triage" in content
 
+    def test_model_selection_report_labels_triage_rankings_ungrounded(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Model-selection triage rankings should be explicit ungrounded hygiene rankings."""
+        good = PerformanceResult(
+            model_name="org/good-caption",
+            success=True,
+            generation=_MockGeneration(
+                text="Two cats resting on a bright pink couch.",
+                generation_tps=80.0,
+                prompt_tokens=12,
+                generation_tokens=9,
+                peak_memory=3.0,
+            ),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+        )
+        bad = _make_harness_success(
+            "org/harness-caption",
+            text="Two cats.<|end|><|endoftext|>",
+            harness_type="stop_token",
+            harness_detail="token_leak:<|endoftext|>",
+            prompt_tokens=12,
+            generation_tokens=20,
+        )
+        out = tmp_path / "model_selection.md"
+        context = check_models._build_report_render_context(
+            results=[good, bad],
+            prompt="Describe this image briefly.",
+            metadata={"description": "", "keywords": ""},
+            eval_mode="triage",
+        )
+
+        check_models.generate_model_selection_report(
+            [good, bad],
+            out,
+            prompt="Describe this image briefly.",
+            report_context=context,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "# Model Selection Brief" in content
+        assert "Semantic rankings: ungrounded" in content
+        assert "Brief Caption Candidates" in content
+        assert "`org/good-caption`" in content
+        assert "`org/harness-caption`" in content
+        assert "Structured metadata scoring is suppressed in triage mode." in content
+        assert "Best keywording" not in content
+        assert "Keywords 0" not in content
+
+    def test_model_selection_report_uses_metadata_when_available(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Model-selection reports should surface metadata agreement when grounded."""
+        result = PerformanceResult(
+            model_name="org/metadata-model",
+            success=True,
+            generation=_MockGeneration(
+                text=(
+                    "Title: Two tabby cats resting\n"
+                    "Description: Two tabby cats rest on a bright pink couch with two remotes.\n"
+                    "Keywords: cats, tabby, pink couch, remote controls"
+                ),
+                generation_tps=55.0,
+                prompt_tokens=80,
+                generation_tokens=34,
+                peak_memory=4.0,
+            ),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+        )
+        out = tmp_path / "model_selection.md"
+        metadata = {
+            "title": "Two tabby cats resting",
+            "description": "Two tabby cats rest on a bright pink couch with two remotes.",
+            "keywords": "cats, tabby, pink couch, remote controls",
+        }
+        enriched = check_models._populate_result_quality_analysis(
+            result,
+            prompt="Create title, description, and keywords.",
+            metadata=metadata,
+            requested_max_tokens=200,
+        )
+        context = check_models._build_report_render_context(
+            results=[enriched],
+            prompt="Create title, description, and keywords.",
+            metadata=metadata,
+            eval_mode="quality",
+        )
+
+        check_models.generate_model_selection_report(
+            [enriched],
+            out,
+            prompt="Create title, description, and keywords.",
+            metadata=metadata,
+            report_context=context,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "Semantic rankings: grounded (trusted image metadata)" in content
+        assert "Structured Metadata Candidates" in content
+        assert "Metadata agreement" in content
+        assert "`org/metadata-model`" in content
+
     def test_markdown_report_uses_shared_output_preview_text(self) -> None:
         """Markdown compact views should rely on the shared preview builder semantics."""
         long_text = "Start of answer. " + ("filler text " * 40) + "TRAILING-SIGNAL"
