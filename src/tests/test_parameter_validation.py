@@ -352,6 +352,7 @@ class TestCliArgumentNormalization:
         assert args.eval_mode == "auto"
 
     def test_output_model_selection_and_run_json_defaults(self) -> None:
+        """Parser defaults should include model-selection and run JSON artifacts."""
         parser = check_models._build_cli_parser()
         args = parser.parse_args([])
 
@@ -361,6 +362,7 @@ class TestCliArgumentNormalization:
         assert args.output_run_json == check_models._SCRIPT_DIR / "output" / "run.json"
 
     def test_output_model_selection_and_run_json_can_be_overridden(self, tmp_path: Path) -> None:
+        """Parser should accept explicit model-selection and run JSON destinations."""
         parser = check_models._build_cli_parser()
         model_selection = tmp_path / "selection.md"
         run_json = tmp_path / "run.json"
