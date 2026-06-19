@@ -286,6 +286,36 @@ def test_build_report_render_context_refreshes_prompt_dependent_checks() -> None
     assert populated.quality_analysis.has_context_echo is True
 
 
+def test_report_mode_policy_triage_without_metadata_is_ungrounded() -> None:
+    policy = check_models._build_report_mode_policy(
+        eval_mode="triage",
+        metadata={"date": "2026-04-25", "description": "", "keywords": ""},
+    )
+
+    assert policy.eval_mode == "triage"
+    assert policy.has_descriptive_metadata is False
+    assert policy.semantic_rankings_grounded is False
+    assert policy.suppress_cataloging_scores is True
+    assert policy.selection_basis == "ungrounded"
+
+
+def test_report_mode_policy_quality_with_metadata_is_grounded() -> None:
+    policy = check_models._build_report_mode_policy(
+        eval_mode="quality",
+        metadata={
+            "title": "Two tabby cats resting",
+            "description": "Two tabby cats on a pink couch with remotes.",
+            "keywords": "cats, tabby, pink couch, remote controls",
+        },
+    )
+
+    assert policy.eval_mode == "quality"
+    assert policy.has_descriptive_metadata is True
+    assert policy.semantic_rankings_grounded is True
+    assert policy.suppress_cataloging_scores is False
+    assert policy.selection_basis == "trusted image metadata"
+
+
 def test_unflagged_models_section_marks_prompt_incomplete_analysis() -> None:
     """Diagnostics should avoid labeling prompt-less cached analysis as clean output."""
     stale_analysis = check_models.analyze_generation_text(

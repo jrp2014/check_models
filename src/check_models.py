@@ -1370,8 +1370,10 @@ class ReportOutputPaths:
     markdown: Path
     gallery_markdown: Path
     review: Path
+    model_selection: Path
     tsv: Path
     jsonl: Path
+    run_json: Path
     diagnostics: Path
     log: Path
     environment: Path
@@ -1749,9 +1751,13 @@ DEFAULT_HTML_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "results
 DEFAULT_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "results.md"
 DEFAULT_GALLERY_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "model_gallery.md"
 DEFAULT_REVIEW_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "review.md"
+DEFAULT_MODEL_SELECTION_OUTPUT: Final[Path] = (
+    _SCRIPT_DIR / "output" / "reports" / "model_selection.md"
+)
 DEFAULT_TSV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "results.tsv"
 DEFAULT_LOG_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "check_models.log"
 DEFAULT_JSONL_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.jsonl"
+DEFAULT_RUN_JSON_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "run.json"
 DEFAULT_ENV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "environment.log"
 DEFAULT_DIAGNOSTICS_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "diagnostics.md"
 _PREFLIGHT_ISSUES_ARG_ATTR: Final[str] = "_check_models_preflight_issues"
@@ -8981,11 +8987,43 @@ def _materialize_prepared_table_data(
     return headers, rows, field_names
 
 
+def _metadata_has_descriptive_reference(metadata: MetadataDict | None) -> bool:
+    """Return True when metadata contains visual title, description, or keywords."""
+    if not metadata:
+        return False
+    for field_name in ("title", "description", "keywords"):
+        value = metadata.get(field_name)
+        if isinstance(value, str) and value.strip():
+            return True
+    return False
+
+
+def _build_report_mode_policy(
+    *,
+    eval_mode: str,
+    metadata: MetadataDict | None = None,
+) -> ReportModePolicy:
+    """Return mode-aware report rules for human and machine artifacts."""
+    has_descriptive_metadata = _metadata_has_descriptive_reference(metadata)
+    semantic_rankings_grounded = has_descriptive_metadata
+    suppress_cataloging_scores = eval_mode == "triage"
+    selection_basis = "trusted image metadata" if semantic_rankings_grounded else "ungrounded"
+    return ReportModePolicy(
+        eval_mode=eval_mode,
+        has_descriptive_metadata=has_descriptive_metadata,
+        semantic_rankings_grounded=semantic_rankings_grounded,
+        suppress_cataloging_scores=suppress_cataloging_scores,
+        selection_basis=selection_basis,
+    )
+
+
 def _build_report_render_context(
     *,
     results: list[PerformanceResult],
     prompt: str,
     image_path: Path | None = None,
+    metadata: MetadataDict | None = None,
+    eval_mode: str = DEFAULT_EVAL_MODE,
     system_info: dict[str, str] | None = None,
     preflight_issues: Sequence[str] = (),
 ) -> ReportRenderContext:
@@ -9024,6 +9062,7 @@ def _build_report_render_context(
         triage=triage,
         image_profile=image_profile,
         preflight_issues=tuple(issue for issue in preflight_issues),
+        mode_policy=_build_report_mode_policy(eval_mode=eval_mode, metadata=metadata),
     )
 
 
@@ -12078,6 +12117,22 @@ class ReportTriageContext:
 
 
 @dataclass(frozen=True)
+class ReportModePolicy:
+    """Mode-aware report rules for score visibility and selection grounding."""
+
+    eval_mode: str
+    has_descriptive_metadata: bool
+    semantic_rankings_grounded: bool
+    suppress_cataloging_scores: bool
+    selection_basis: str
+
+
+def _default_report_mode_policy() -> ReportModePolicy:
+    """Return a conservative policy for contexts built without run metadata."""
+    return _build_report_mode_policy(eval_mode=DEFAULT_EVAL_MODE, metadata=None)
+
+
+@dataclass(frozen=True)
 class ReportRenderContext:
     """Shared cached context for HTML/Markdown/TSV report generation."""
 
@@ -12090,6 +12145,7 @@ class ReportRenderContext:
     triage: ReportTriageContext
     image_profile: ImageInputProfile | None = None
     preflight_issues: tuple[str, ...] = ()
+    mode_policy: ReportModePolicy = dataclass_field(default_factory=_default_report_mode_policy)
 
 
 def _append_markdown_code_block(
@@ -24357,8 +24413,10 @@ def _resolve_report_output_paths(args: argparse.Namespace) -> ReportOutputPaths:
         markdown=args.output_markdown.resolve(),
         gallery_markdown=args.output_gallery_markdown.resolve(),
         review=args.output_review.resolve(),
+        model_selection=args.output_model_selection.resolve(),
         tsv=args.output_tsv.resolve(),
         jsonl=args.output_jsonl.resolve(),
+        run_json=args.output_run_json.resolve(),
         diagnostics=args.output_diagnostics.resolve(),
         log=args.output_log.resolve(),
         environment=args.output_env.resolve(),
@@ -24808,6 +24866,8 @@ def finalize_execution(
             results=results,
             prompt=prompt,
             image_path=image_path,
+            metadata=metadata,
+            eval_mode=str(getattr(args, "eval_mode", DEFAULT_EVAL_MODE)),
             system_info=system_info,
             preflight_issues=_get_run_preflight_issues(args),
         )
@@ -24822,8 +24882,10 @@ def finalize_execution(
             output_paths.markdown,
             output_paths.gallery_markdown,
             output_paths.review,
+            output_paths.model_selection,
             output_paths.tsv,
             output_paths.jsonl,
+            output_paths.run_json,
         ):
             output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -25158,6 +25220,12 @@ def _add_output_path_arguments(parser: _ArgumentAdder) -> None:
         help="Output Markdown review digest filename.",
     )
     parser.add_argument(
+        "--output-model-selection",
+        type=Path,
+        default=DEFAULT_MODEL_SELECTION_OUTPUT,
+        help="Output model selection report filename.",
+    )
+    parser.add_argument(
         "--output-tsv",
         type=Path,
         default=DEFAULT_TSV_OUTPUT,
@@ -25168,6 +25236,12 @@ def _add_output_path_arguments(parser: _ArgumentAdder) -> None:
         type=Path,
         default=DEFAULT_JSONL_OUTPUT,
         help=_output_report_help("JSONL"),
+    )
+    parser.add_argument(
+        "--output-run-json",
+        type=Path,
+        default=DEFAULT_RUN_JSON_OUTPUT,
+        help="Output run summary JSON filename.",
     )
     parser.add_argument(
         "--output-log",

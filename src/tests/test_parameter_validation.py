@@ -1,6 +1,7 @@
 """Tests for parameter validation functions."""
 
 import argparse
+from pathlib import Path
 
 import pytest
 
@@ -349,6 +350,32 @@ class TestCliArgumentNormalization:
         args = parser.parse_args(["--folder", "test-folder"])
 
         assert args.eval_mode == "auto"
+
+    def test_output_model_selection_and_run_json_defaults(self) -> None:
+        parser = check_models._build_cli_parser()
+        args = parser.parse_args([])
+
+        assert args.output_model_selection == (
+            check_models._SCRIPT_DIR / "output" / "reports" / "model_selection.md"
+        )
+        assert args.output_run_json == check_models._SCRIPT_DIR / "output" / "run.json"
+
+    def test_output_model_selection_and_run_json_can_be_overridden(self, tmp_path: Path) -> None:
+        parser = check_models._build_cli_parser()
+        model_selection = tmp_path / "selection.md"
+        run_json = tmp_path / "run.json"
+
+        args = parser.parse_args(
+            [
+                "--output-model-selection",
+                str(model_selection),
+                "--output-run-json",
+                str(run_json),
+            ],
+        )
+
+        assert args.output_model_selection == model_selection
+        assert args.output_run_json == run_json
 
     def test_auto_eval_mode_uses_stress_defaults_when_metadata_exists(self) -> None:
         """Auto mode should keep the cataloguing stress lane for metadata-bearing images."""
