@@ -379,17 +379,45 @@ class TestCliArgumentNormalization:
         assert args.output_model_selection == model_selection
         assert args.output_run_json == run_json
 
-    def test_auto_eval_mode_uses_stress_defaults_when_metadata_exists(self) -> None:
-        """Auto mode should keep the cataloguing stress lane for metadata-bearing images."""
+    def test_auto_eval_mode_uses_stress_defaults_when_descriptive_metadata_exists(self) -> None:
+        """Auto mode should use the cataloguing stress lane for descriptive metadata."""
         args = self._build_args(
             eval_mode="auto",
             max_tokens=check_models.DEFAULT_MAX_TOKENS,
         )
 
-        check_models._apply_eval_mode_defaults(args, {"date": "2026-06-12", "exif": "{...}"})
+        check_models._apply_eval_mode_defaults(
+            args,
+            {
+                "date": "2026-06-12",
+                "description": "Two cats lounging on a couch.",
+                "keywords": "cats, couch, remote controls",
+                "exif": "{...}",
+            },
+        )
 
         assert args.eval_mode == "stress"
         assert args.max_tokens == check_models.DEFAULT_MAX_TOKENS
+
+    def test_auto_eval_mode_uses_triage_defaults_with_capture_metadata_only(self) -> None:
+        """Auto mode should ignore capture-only metadata for semantic ranking mode."""
+        args = self._build_args(
+            eval_mode="auto",
+            max_tokens=check_models.DEFAULT_MAX_TOKENS,
+        )
+
+        check_models._apply_eval_mode_defaults(
+            args,
+            {
+                "date": "2026-06-12",
+                "time": "12:34:56",
+                "gps": "51.5074,-0.1278",
+                "exif": "{...}",
+            },
+        )
+
+        assert args.eval_mode == "triage"
+        assert args.max_tokens == check_models.TRIAGE_MAX_TOKENS
 
     def test_auto_eval_mode_uses_triage_defaults_without_metadata(self) -> None:
         """Auto mode should avoid the metadata stress lane when no usable metadata exists."""

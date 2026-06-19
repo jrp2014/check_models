@@ -35,8 +35,9 @@ Notable changes to this project will be documented in this file.
 - Centralize generated-report markdownlint guard rule sets and document the
   tracked-output policy, including `test_` ignore patterns for local artifacts.
 - Make `--eval-mode` default to metadata-aware `auto`, selecting `stress` for
-  images with extracted metadata and the shorter `triage` lane for metadata-free
-  images while preserving explicit mode choices.
+  images with descriptive title/description/keyword metadata and the shorter
+  `triage` lane for metadata-free or capture-only images while preserving
+  explicit mode choices.
 - Made public benchmark artifacts mode-aware: triage summaries now suppress
   cataloging/keyword scores, add a dedicated model-selection brief, and expose
   stable run-level JSON metadata.

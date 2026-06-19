@@ -1737,14 +1737,6 @@ DEFAULT_MAX_TOKENS: Final[int] = 500
 DEFAULT_EVAL_MODE: Final[str] = "auto"
 TRIAGE_MAX_TOKENS: Final[int] = 200
 QUALITY_MAX_TOKENS: Final[int] = 1000
-_EVAL_MODE_METADATA_FIELDS: Final[tuple[str, ...]] = (
-    "date",
-    "time",
-    "gps",
-    "description",
-    "title",
-    "keywords",
-)
 DEFAULT_FOLDER: Final[Path] = Path.home() / "Pictures" / "Processed"
 # Output paths relative to script's directory (not CWD) for consistency
 _SCRIPT_DIR = Path(__file__).parent
@@ -8991,7 +8983,7 @@ def _materialize_prepared_table_data(
     return headers, rows, field_names
 
 
-def _metadata_has_descriptive_reference(metadata: MetadataDict | None) -> bool:
+def _metadata_has_descriptive_reference(metadata: Mapping[str, str | None] | None) -> bool:
     """Return True when metadata contains visual title, description, or keywords."""
     if not metadata:
         return False
@@ -20270,13 +20262,7 @@ def handle_metadata(image_path: Path, args: argparse.Namespace) -> MetadataDict:
 
 def _metadata_has_eval_context(metadata: Mapping[str, str | None] | None) -> bool:
     """Return whether extracted image metadata is useful for stress-mode evaluation."""
-    if not metadata:
-        return False
-    for field_name in _EVAL_MODE_METADATA_FIELDS:
-        value = metadata.get(field_name)
-        if isinstance(value, str) and value.strip():
-            return True
-    return False
+    return _metadata_has_descriptive_reference(metadata)
 
 
 def _resolve_eval_mode(eval_mode: str, metadata: Mapping[str, str | None] | None) -> str:
@@ -20294,7 +20280,11 @@ def _apply_eval_mode_defaults(
     requested_eval_mode = str(getattr(args, "eval_mode", DEFAULT_EVAL_MODE))
     resolved_eval_mode = _resolve_eval_mode(requested_eval_mode, metadata)
     if requested_eval_mode == DEFAULT_EVAL_MODE:
-        reason = "metadata found" if resolved_eval_mode == "stress" else "no image metadata found"
+        reason = (
+            "descriptive image metadata found"
+            if resolved_eval_mode == "stress"
+            else "no descriptive image metadata found"
+        )
         logger.info("Auto eval mode selected '%s' (%s).", resolved_eval_mode, reason)
     args.eval_mode = resolved_eval_mode
 
