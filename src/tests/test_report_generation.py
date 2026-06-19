@@ -1111,6 +1111,48 @@ class TestMarkdownGalleryReport:
         assert "Failures by Package" not in content
         assert "Best keywording" not in content
 
+    def test_gallery_suppresses_cataloging_score_rows_in_triage(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Triage gallery output should not leak cataloging or keyword score rows."""
+        result = PerformanceResult(
+            model_name="org/brief-caption",
+            success=True,
+            generation=_MockGeneration(
+                text=(
+                    "Title: Two cats on a couch\n"
+                    "Description: Two cats rest on a bright pink couch beside remote controls.\n"
+                    "Keywords: cats, cats, cats, cats"
+                ),
+                prompt_tokens=12,
+                generation_tokens=28,
+            ),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+        )
+        out = tmp_path / "model_gallery.md"
+        context = check_models._build_report_render_context(
+            results=[result],
+            prompt="Describe this image briefly.",
+            eval_mode="triage",
+        )
+
+        generate_markdown_gallery_report(
+            [result],
+            out,
+            prompt="Describe this image briefly.",
+            metadata={"description": ""},
+            report_context=context,
+            versions={},
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "_Score:_" not in content
+        assert "Keywords are not specific" not in content
+        assert "_Review focus:_" not in content
+
     def test_gallery_includes_issue_style_quality_summary_and_version_stamps(
         self,
         tmp_path: Path,

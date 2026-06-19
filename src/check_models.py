@@ -2533,9 +2533,13 @@ def _build_gallery_success_triage_rows(
     summary: ModelIssueSummary | None,
     useful_now: bool,
     watchlist_reason: str | None,
+    suppress_cataloging_scores: bool = False,
 ) -> list[tuple[str, str]]:
     """Build score and review-focus rows for one successful gallery entry."""
     rows: list[tuple[str, str]] = []
+    if suppress_cataloging_scores:
+        return rows
+
     if summary is not None:
         score_data = _cataloging_score_index(summary).get(res.model_name)
         if score_data is not None:
@@ -2633,6 +2637,7 @@ def _build_gallery_success_block_lines(
     summary: ModelIssueSummary | None = None,
     useful_now: bool = False,
     watchlist_reason: str | None = None,
+    suppress_cataloging_scores: bool = False,
 ) -> list[str]:
     """Build the success block used by the Markdown gallery."""
     generation: StoredGenerationResult | None = res.generation
@@ -2645,6 +2650,7 @@ def _build_gallery_success_block_lines(
             summary=summary,
             useful_now=useful_now,
             watchlist_reason=watchlist_reason,
+            suppress_cataloging_scores=suppress_cataloging_scores,
         )
     )
     summary_rows.extend(_build_gallery_success_performance_rows(res, generation))
@@ -15925,6 +15931,11 @@ def _generate_model_gallery_section(
         else ResultSet(report_context).results
     )
     summary = report_context.summary if isinstance(report_context, ReportRenderContext) else None
+    suppress_cataloging_scores = (
+        report_context.mode_policy.suppress_cataloging_scores
+        if isinstance(report_context, ReportRenderContext)
+        else False
+    )
     useful_model_names: set[str] = set()
     watchlist_by_model: dict[str, str] = {}
     if isinstance(report_context, ReportRenderContext):
@@ -15946,6 +15957,7 @@ def _generate_model_gallery_section(
                 summary=summary,
                 useful_now=res.model_name in useful_model_names,
                 watchlist_reason=watchlist_by_model.get(res.model_name),
+                suppress_cataloging_scores=suppress_cataloging_scores,
             )
         while block_lines and block_lines[-1] == "":
             block_lines.pop()
