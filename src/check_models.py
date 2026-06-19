@@ -10326,11 +10326,12 @@ def _format_issues_summary_parts(
     stats: PerformanceStats,
     *,
     html_output: bool,
+    include_cataloging_summary: bool = True,
 ) -> list[str]:
     parts: list[str] = []
     cataloging_data = _collect_cataloging_summary_data(summary)
     parts.extend(_format_top_performers(summary, html_output=html_output))
-    if cataloging_data is not None:
+    if include_cataloging_summary and cataloging_data is not None:
         parts.extend(_format_cataloging_summary(cataloging_data, html_output=html_output))
     parts.extend(_format_quality_issues(summary, html_output=html_output))
     parts.extend(
@@ -10342,9 +10343,77 @@ def _format_issues_summary_parts(
     return parts
 
 
-def format_issues_summary_html(summary: ModelIssueSummary, stats: PerformanceStats) -> str:
+def format_issues_summary_html(
+    summary: ModelIssueSummary,
+    stats: PerformanceStats,
+    *,
+    suppress_cataloging_scores: bool = False,
+) -> str:
     """Format the issues and statistics summary as an HTML string."""
-    return "".join(_format_issues_summary_parts(summary, stats, html_output=True))
+    return "".join(
+        _format_issues_summary_parts(
+            summary,
+            stats,
+            html_output=True,
+            include_cataloging_summary=not suppress_cataloging_scores,
+        )
+    )
+
+
+def _format_run_contract_parts(
+    report_context: ReportRenderContext,
+    *,
+    html_output: bool,
+) -> list[str]:
+    """Render the mode and grounding contract for a run summary."""
+    policy = report_context.mode_policy
+    semantic_rankings = "grounded" if policy.semantic_rankings_grounded else "ungrounded"
+    semantic_rankings = f"{semantic_rankings} ({policy.selection_basis})"
+    primary_selection_tasks = (
+        "brief captions; structured title/description/keywords when descriptive image metadata "
+        "is available"
+    )
+
+    if html_output:
+        return [
+            "<h3>Run Contract</h3>",
+            "<ul>",
+            f"<li><b>Mode:</b> {html.escape(policy.eval_mode)}</li>",
+            f"<li><b>Semantic rankings:</b> {html.escape(semantic_rankings)}</li>",
+            f"<li><b>Primary selection tasks:</b> {html.escape(primary_selection_tasks)}</li>",
+            "</ul>",
+        ]
+
+    parts: list[str] = []
+    _append_markdown_section(parts, title="## Run Contract")
+    parts.append(f"- Mode: {policy.eval_mode}")
+    parts.append(f"- Semantic rankings: {semantic_rankings}")
+    parts.append(f"- Primary selection tasks: {primary_selection_tasks}")
+    parts.append("")
+    return parts
+
+
+def _build_markdown_triage_model_selection_pointer(
+    report_context: ReportRenderContext,
+) -> list[str]:
+    """Point triage readers at caption-selection artifacts instead of scorecards."""
+    if not report_context.mode_policy.suppress_cataloging_scores:
+        return []
+
+    parts: list[str] = []
+    _append_markdown_section(
+        parts,
+        title="## Caption Selection",
+        body_lines=[
+            (
+                "Triage mode suppresses cataloging and keyword scores. Brief-caption "
+                "recommendations are ungrounded unless descriptive image metadata is present; "
+                "use `model_selection.md` for the caption shortlist and `model_gallery.md` "
+                "for full output evidence."
+            ),
+        ],
+    )
+    return parts
 
 
 def _relative_markdown_artifact_path(*, report_filename: Path, artifact_filename: Path) -> str:
@@ -15406,9 +15475,21 @@ def generate_diagnostics_report(
         return True
 
 
-def format_issues_summary_text(summary: ModelIssueSummary, stats: PerformanceStats) -> str:
+def format_issues_summary_text(
+    summary: ModelIssueSummary,
+    stats: PerformanceStats,
+    *,
+    suppress_cataloging_scores: bool = False,
+) -> str:
     """Format the issues and statistics summary as a Markdown string."""
-    return "\n".join(_format_issues_summary_parts(summary, stats, html_output=False))
+    return "\n".join(
+        _format_issues_summary_parts(
+            summary,
+            stats,
+            html_output=False,
+            include_cataloging_summary=not suppress_cataloging_scores,
+        )
+    )
 
 
 def _build_full_html_document(
@@ -15417,6 +15498,7 @@ def _build_full_html_document(
     versions: LibraryVersionDict,
     prompt: str,
     total_runtime_seconds: float,
+    run_contract_html: str,
     action_snapshot_html: str,
     issues_summary_html: str,
     review_priorities_html: str,
@@ -15639,6 +15721,7 @@ def _build_full_html_document(
         {image_html}
         <div class="summary">
             <h2>Summary</h2>
+            {run_contract_html}
             {action_snapshot_html}
             {issues_summary_html}
             {review_priorities_html}
@@ -15734,21 +15817,31 @@ def generate_html_report(
         sorted_results=report_context.result_set.results,
     )
 
+    suppress_cataloging_scores = report_context.mode_policy.suppress_cataloging_scores
+    run_contract_html = "".join(
+        _format_run_contract_parts(
+            report_context,
+            html_output=True,
+        ),
+    )
     issues_summary_html = format_issues_summary_html(
         report_context.summary,
         report_context.stats,
+        suppress_cataloging_scores=suppress_cataloging_scores,
     )
     action_snapshot_html = "".join(
         _format_action_snapshot_parts(
             results,
             report_context,
             html_output=True,
+            suppress_cataloging_claims=suppress_cataloging_scores,
         ),
     )
     review_priorities_html = "".join(
         _format_review_priorities_parts(
             report_context,
             html_output=True,
+            suppress_cataloging_scores=suppress_cataloging_scores,
         ),
     )
     failures_by_package_html = "".join(
@@ -15764,6 +15857,7 @@ def generate_html_report(
         versions=versions,
         prompt=prompt,
         total_runtime_seconds=total_runtime_seconds,
+        run_contract_html=run_contract_html,
         action_snapshot_html=action_snapshot_html,
         issues_summary_html=issues_summary_html,
         review_priorities_html=review_priorities_html,
@@ -16010,6 +16104,7 @@ def generate_markdown_report(
     issues_text: str = format_issues_summary_text(
         report_context.summary,
         report_context.stats,
+        suppress_cataloging_scores=report_context.mode_policy.suppress_cataloging_scores,
     )
 
     gallery_link_target = (
@@ -16028,27 +16123,37 @@ def generate_markdown_report(
     md.append(f"_Generated on {local_now_str()}_")
     md.append("")
     md.extend(
+        _format_run_contract_parts(
+            report_context,
+            html_output=False,
+        ),
+    )
+    md.extend(
         _format_action_snapshot_parts(
             results,
             report_context,
             html_output=False,
+            suppress_cataloging_claims=report_context.mode_policy.suppress_cataloging_scores,
         ),
     )
     # Add issues summary before prompt
     if issues_text:
         md.append(issues_text)
-    md.extend(
-        _build_markdown_recommended_models(
-            report_context,
-            gallery_link_target=gallery_link_target,
-        ),
-    )
-    md.extend(
-        _build_markdown_quality_breakdown(
-            report_context,
-            gallery_link_target=gallery_link_target,
-        ),
-    )
+    if report_context.mode_policy.suppress_cataloging_scores:
+        md.extend(_build_markdown_triage_model_selection_pointer(report_context))
+    else:
+        md.extend(
+            _build_markdown_recommended_models(
+                report_context,
+                gallery_link_target=gallery_link_target,
+            ),
+        )
+        md.extend(
+            _build_markdown_quality_breakdown(
+                report_context,
+                gallery_link_target=gallery_link_target,
+            ),
+        )
 
     # Add failures-by-package section for actionable reporting
     failures_by_pkg = _format_failures_by_package_parts(
@@ -21451,12 +21556,17 @@ def _format_review_shortlist_line(
     *,
     include_reason: str | None = None,
     html_output: bool = False,
+    include_cataloging_scores: bool = True,
 ) -> str:
     """Format one useful/watchlist row for shared report sections."""
-    details: list[str] = [_grade_display_parts(row.grade, row.score)]
-    details.append(f"Desc {row.description_score:.0f}")
-    details.append(f"Keywords {row.keyword_score:.0f}")
-    if row.delta_vs_metadata is not None:
+    details: list[str] = []
+    if include_cataloging_scores:
+        details.append(_grade_display_parts(row.grade, row.score))
+        details.append(f"Desc {row.description_score:.0f}")
+        details.append(f"Keywords {row.keyword_score:.0f}")
+    else:
+        details.append("caption-review candidate")
+    if include_cataloging_scores and row.delta_vs_metadata is not None:
         details.append(f"Δ{row.delta_vs_metadata:+.0f}")
     tps = getattr(row.result.generation, "generation_tps", None)
     if isinstance(tps, int | float) and float(tps) > 0.0:
@@ -21474,6 +21584,7 @@ def _format_review_priorities_parts(
     report_context: ReportRenderContext,
     *,
     html_output: bool,
+    suppress_cataloging_scores: bool | None = None,
 ) -> list[str]:
     """Render shared reviewer-oriented shortlists for HTML/Markdown reports."""
     triage = report_context.triage
@@ -21481,6 +21592,9 @@ def _format_review_priorities_parts(
     watchlist_rows = list(triage.watchlist_rows)
     if not useful_rows and not watchlist_rows:
         return []
+    if suppress_cataloging_scores is None:
+        suppress_cataloging_scores = report_context.mode_policy.suppress_cataloging_scores
+    include_cataloging_scores = not suppress_cataloging_scores
 
     parts: list[str] = []
     if html_output:
@@ -21492,7 +21606,9 @@ def _format_review_priorities_parts(
         if html_output:
             parts.append("<p><b>Strong candidates:</b></p><ul>")
             parts.extend(
-                f"<li>{_format_review_shortlist_line(row, html_output=True)}</li>"
+                "<li>"
+                f"{_format_review_shortlist_line(row, html_output=True, include_cataloging_scores=include_cataloging_scores)}"
+                "</li>"
                 for row in useful_rows[:MAX_TRIAGE_MODELS]
             )
             parts.append("</ul>")
@@ -21500,7 +21616,9 @@ def _format_review_priorities_parts(
             parts.append("### Strong Candidates")
             parts.append("")
             parts.extend(
-                f"- {_format_review_shortlist_line(row)}" for row in useful_rows[:MAX_TRIAGE_MODELS]
+                "- "
+                f"{_format_review_shortlist_line(row, include_cataloging_scores=include_cataloging_scores)}"
+                for row in useful_rows[:MAX_TRIAGE_MODELS]
             )
             parts.append("")
 
@@ -21509,7 +21627,7 @@ def _format_review_priorities_parts(
             parts.append("<p><b>Watchlist:</b></p><ul>")
             parts.extend(
                 "<li>"
-                f"{_format_review_shortlist_line(row, include_reason=reason, html_output=True)}"
+                f"{_format_review_shortlist_line(row, include_reason=reason, html_output=True, include_cataloging_scores=include_cataloging_scores)}"
                 "</li>"
                 for row, reason in watchlist_rows[:MAX_TRIAGE_MODELS]
             )
@@ -21518,7 +21636,8 @@ def _format_review_priorities_parts(
             parts.append("### Watchlist")
             parts.append("")
             parts.extend(
-                f"- {_format_review_shortlist_line(row, include_reason=reason)}"
+                "- "
+                f"{_format_review_shortlist_line(row, include_reason=reason, include_cataloging_scores=include_cataloging_scores)}"
                 for row, reason in watchlist_rows[:MAX_TRIAGE_MODELS]
             )
             parts.append("")
@@ -21529,6 +21648,8 @@ def _format_review_priorities_parts(
 def _build_action_snapshot_stanzas(
     results: list[PerformanceResult],
     report_context: ReportRenderContext,
+    *,
+    suppress_cataloging_claims: bool = False,
 ) -> list[ReportStanza]:
     """Build shared action-snapshot stanzas for Markdown and HTML reports."""
     summary = report_context.summary
@@ -21545,6 +21666,7 @@ def _build_action_snapshot_stanzas(
         triage=triage,
         harness_success_count=harness_success_count,
         successful_count=successful_count,
+        suppress_cataloging_claims=suppress_cataloging_claims,
     )
     if preflight_issues:
         failure_rows.extend(
@@ -21562,7 +21684,11 @@ def _build_action_snapshot_stanzas(
         )
 
     quality_rows: list[tuple[str, str | None]] = []
-    if triage.baseline_score is not None and triage.baseline_grade is not None:
+    if (
+        not suppress_cataloging_claims
+        and triage.baseline_score is not None
+        and triage.baseline_grade is not None
+    ):
         better = len(summary.get("cataloging_improves_metadata", []))
         neutral = len(summary.get("cataloging_neutral_vs_metadata", []))
         worse = len(summary.get("cataloging_worse_than_metadata", []))
@@ -21609,6 +21735,7 @@ def _format_action_snapshot_parts(
     report_context: ReportRenderContext,
     *,
     html_output: bool,
+    suppress_cataloging_claims: bool = False,
 ) -> list[str]:
     """Build a compact shared triage block for maintainers and reviewers.
 
@@ -21617,7 +21744,11 @@ def _format_action_snapshot_parts(
     **Quality & Metadata** — signal frequencies and baseline comparison.
     **Runtime** — phase timing and decode dominance.
     """
-    stanzas = _build_action_snapshot_stanzas(results, report_context)
+    stanzas = _build_action_snapshot_stanzas(
+        results,
+        report_context,
+        suppress_cataloging_claims=suppress_cataloging_claims,
+    )
 
     if html_output:
         parts: list[str] = ["<h3>🎯 Action Snapshot</h3>"]
@@ -21637,6 +21768,7 @@ def _action_snapshot_failure_items(
     triage: ReportTriageContext,
     harness_success_count: int,
     successful_count: int,
+    suppress_cataloging_claims: bool = False,
 ) -> list[tuple[str, str]]:
     """Build label/value pairs for the Failures & Triage snapshot group."""
     items: list[tuple[str, str]] = []
@@ -21662,11 +21794,18 @@ def _action_snapshot_failure_items(
             f"mechanically clean outputs={triage.clean_count}/{successful_count}.",
         )
     )
-    useful_text = (
-        f"{len(triage.useful_rows)} mechanically clean A/B model(s) with useful signals."
-        if triage.useful_rows
-        else "none (no mechanically clean A/B shortlist for this run)."
-    )
+    if suppress_cataloging_claims:
+        useful_text = (
+            f"{len(triage.useful_rows)} model(s) shortlisted for caption review."
+            if triage.useful_rows
+            else "none (caption shortlist not populated for this run)."
+        )
+    else:
+        useful_text = (
+            f"{len(triage.useful_rows)} mechanically clean A/B model(s) with useful signals."
+            if triage.useful_rows
+            else "none (no mechanically clean A/B shortlist for this run)."
+        )
     items.append(("Useful now", useful_text))
     watchlist_text = (
         f"{len(triage.watchlist_rows)} model(s) with breaking or lower-value output."

@@ -448,6 +448,36 @@ class TestHtmlReportEdgeCases:
         assert "org/risky" in content
         assert "transformers" in content
 
+    def test_triage_html_report_suppresses_cataloging_scores(self, tmp_path: Path) -> None:
+        """Triage HTML should publish run-index context instead of cataloging scorecards."""
+        out = tmp_path / "triage.html"
+        results = [_make_success("org/caption-model")]
+        report_context = _build_report_render_context(
+            results=results,
+            prompt="Describe this image briefly.",
+            metadata={"description": "", "keywords": ""},
+            eval_mode="triage",
+        )
+
+        generate_html_report(
+            results=results,
+            filename=out,
+            versions=_stub_versions(),
+            prompt="Describe this image briefly.",
+            total_runtime_seconds=1.0,
+            report_context=report_context,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "Run Contract" in content
+        assert "<b>Mode:</b> triage" in content
+        assert "<b>Semantic rankings:</b> ungrounded" in content
+        assert "Cataloging Utility Summary" not in content
+        assert "Best keywording" not in content
+        assert "Keywords 0" not in content
+        assert "Keywords 100" not in content
+        assert "caption-review candidate" in content
+
     def test_html_report_includes_preflight_guidance_in_action_snapshot(
         self, tmp_path: Path
     ) -> None:
@@ -762,6 +792,52 @@ class TestMarkdownReportEdgeCases:
         assert "_Best descriptions:_" in content
         assert "_Best keywording:_" in content
         assert "## 🔍 Quality Pattern Breakdown" in content
+
+    def test_triage_markdown_report_suppresses_cataloging_scores(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Triage reports should act as run indexes instead of cataloging scorecards."""
+        result = PerformanceResult(
+            model_name="org/caption-model",
+            success=True,
+            generation=_MockGeneration(
+                text="Two cats resting on a bright pink couch.",
+                generation_tps=42.0,
+                prompt_tokens=12,
+                generation_tokens=9,
+                peak_memory=2.5,
+            ),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+        )
+        out = tmp_path / "results.md"
+        context = check_models._build_report_render_context(
+            results=[result],
+            prompt="Describe this image briefly.",
+            metadata={"description": "", "keywords": ""},
+            eval_mode="triage",
+        )
+
+        check_models.generate_markdown_report(
+            [result],
+            out,
+            versions={},
+            prompt="Describe this image briefly.",
+            total_runtime_seconds=1.25,
+            report_context=context,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "Cataloging Utility Summary" not in content
+        assert "Best end-to-end cataloging" not in content
+        assert "Best keywording" not in content
+        assert "Keywords 0" not in content
+        assert "Quality Pattern Breakdown" not in content
+        assert "## Caption Selection" in content
+        assert "Semantic rankings: ungrounded" in content
+        assert "Mode: triage" in content
 
     def test_markdown_report_uses_shared_output_preview_text(self) -> None:
         """Markdown compact views should rely on the shared preview builder semantics."""
