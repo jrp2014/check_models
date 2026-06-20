@@ -1258,7 +1258,12 @@ class TestMarkdownGalleryReport:
         summary = _extract_markdown_subsection(
             content,
             "## Model Quality Summary",
-            end_headings=("## Image Metadata", "## Prompt", "## Quick Navigation"),
+            end_headings=(
+                "## Image Metadata",
+                "## Prompt",
+                "## All Model Output and Cost Summary",
+                "## Quick Navigation",
+            ),
         )
         assert "Response / diagnostic" in summary
         assert "[`org/good`](#model-org-good)" in summary
@@ -1272,6 +1277,60 @@ class TestMarkdownGalleryReport:
         assert "`avoid` / `runtime failure`" in summary
         assert "mlx-vlm; load" in summary
         assert "Error: load - boom" in summary
+
+    def test_gallery_includes_all_model_output_and_cost_summary(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Gallery should summarize every model's output beside runtime and memory cost."""
+        success = PerformanceResult(
+            model_name="org/full-caption",
+            success=True,
+            generation=_MockGeneration(
+                text=(
+                    "Title: Two cats on a sofa\n"
+                    "Description: Two cats sit together on a pink sofa beside remote controls.\n"
+                    "Keywords: cats, sofa, remote controls, indoor, pet portrait"
+                ),
+                prompt_tokens=18,
+                generation_tokens=24,
+                generation_tps=42.0,
+                peak_memory=2.5,
+            ),
+            total_time=1.25,
+            generation_time=0.75,
+            model_load_time=0.50,
+        )
+        failure = replace(
+            _make_failure("org/crashed", error_package="transformers"),
+            total_time=0.33,
+        )
+        out = tmp_path / "model_gallery.md"
+
+        generate_markdown_gallery_report(
+            results=[success, failure],
+            filename=out,
+            prompt="Describe this image briefly.",
+        )
+
+        content = out.read_text(encoding="utf-8")
+        summary = _extract_markdown_subsection(
+            content,
+            "## All Model Output and Cost Summary",
+            end_headings=("## Quick Navigation", "## Model Gallery"),
+        )
+        assert "Output / diagnostic" in summary
+        assert "Peak GB" in summary
+        assert "[`org/full-caption`](#model-org-full-caption)" in summary
+        assert "Two cats sit together on a pink sofa" in summary
+        assert "24" in summary
+        assert "1.25s" in summary
+        assert "42.0" in summary
+        assert "2.5" in summary
+        assert "[`org/crashed`](#model-org-crashed)" in summary
+        assert "Error: load - boom" in summary
+        assert "transformers; load" in summary
+        assert "0.33s" in summary
 
     def test_review_report_groups_owner_and_user_buckets(self, tmp_path: Path) -> None:
         """Review digest should group maintainer ownership and user-facing buckets."""

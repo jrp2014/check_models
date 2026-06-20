@@ -7,8 +7,8 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Bump the package version to `0.8.2` for the MLX stack dependency sync and
-  upstream passthrough-diagnostics refinement.
+- Bump the package version to `0.8.3` for the MLX stack dependency sync,
+  upstream passthrough-diagnostics refinement, and gallery output-cost summary.
 - Align the project Transformers floor with the current `mlx-lm>=0.31.3`
   requirement (`transformers>=5.7.0`) and keep the shared dependency policy,
   install snippets, and environment validation in sync.
@@ -30,6 +30,9 @@ Notable changes to this project will be documented in this file.
 - Add issue-style quality summaries and package/runtime stamps to the Markdown
   gallery report so full-run model output reviews are easier to paste into
   GitHub issues.
+- Add an all-model output-and-cost summary to the Markdown gallery report so
+  benchmark snapshots show every model's response or diagnostic beside total
+  runtime, generation throughput, token count, and peak-memory signals.
 - Stop generated Markdown reports from re-enabling `MD013`, which could make
   later generated traceback/output lines fail the pre-push markdownlint hook.
 - Centralize generated-report markdownlint guard rule sets and document the

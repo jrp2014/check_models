@@ -11967,6 +11967,7 @@ GALLERY_STAMP_SYSTEM_KEYS: Final[tuple[str, ...]] = (
     "GPU/Chip",
 )
 GALLERY_QUALITY_SUMMARY_PREVIEW_CHARS: Final[int] = 320
+GALLERY_OUTPUT_COST_PREVIEW_CHARS: Final[int] = 220
 
 
 def _markdown_inline_code(value: str) -> str:
@@ -12063,6 +12064,87 @@ def _gallery_summary_preview(result: PerformanceResult) -> str:
     if result.success:
         return "No generated text captured."
     return "No failure diagnostics captured."
+
+
+def _gallery_output_cost_metric(field_name: str, value: MetricValue) -> str:
+    """Return one compact table metric, using a dash when the value was not captured."""
+    formatted = format_field_value(field_name, value)
+    return formatted or "-"
+
+
+def _gallery_output_cost_preview(result: PerformanceResult) -> str:
+    """Return a compact all-model output or diagnostic preview."""
+    preview = _build_result_output_preview(
+        result,
+        max_chars=GALLERY_OUTPUT_COST_PREVIEW_CHARS,
+    )
+    if preview:
+        return _collapse_preview_whitespace(preview)
+    if result.success:
+        return "No generated text captured."
+    return "No failure diagnostics captured."
+
+
+def _build_gallery_output_cost_summary_section(
+    report_context: ReportRenderContext,
+) -> list[str]:
+    """Build a compact all-model output, runtime, and memory summary table."""
+    rows: list[tuple[str, str, str, str, str, str, str, str]] = []
+    for result in report_context.result_set.results:
+        generation = result.generation
+        rows.append(
+            (
+                _gallery_summary_model_link(result.model_name),
+                _gallery_summary_status(result),
+                MARKDOWN_ESCAPER.escape(_gallery_output_cost_preview(result)),
+                _gallery_output_cost_metric(
+                    "generation_tokens",
+                    _generation_int_metric(generation, "generation_tokens"),
+                ),
+                _gallery_output_cost_metric("total_time", result.total_time),
+                _gallery_output_cost_metric(
+                    "generation_tps",
+                    _generation_float_metric(generation, "generation_tps"),
+                ),
+                _gallery_output_cost_metric(
+                    "peak_memory",
+                    _generation_float_metric(generation, "peak_memory"),
+                ),
+                MARKDOWN_ESCAPER.escape(_gallery_summary_signal(result)),
+            ),
+        )
+    if not rows:
+        return []
+
+    table_lines = render_report_markdown(
+        (
+            ReportTable(
+                headers=(
+                    "Model",
+                    "Result",
+                    "Output / diagnostic",
+                    "Gen tok",
+                    "Total",
+                    "Gen TPS",
+                    "Peak GB",
+                    "Quality / diagnostic",
+                ),
+                rows=tuple(rows),
+                markdown_escaped=True,
+            ),
+        )
+    )
+    return [
+        "## All Model Output and Cost Summary",
+        "",
+        (
+            "Every model in this run, with its skim-first output or diagnostic beside "
+            "the main runtime and peak-memory signals."
+        ),
+        "",
+        *_guard_markdownlint_block(table_lines, rules=MARKDOWNLINT_GALLERY_SUMMARY_RULES),
+        "",
+    ]
 
 
 def _build_gallery_quality_summary_section(
@@ -16338,6 +16420,7 @@ def generate_markdown_gallery_report(
     md.append("## Prompt")
     _append_markdown_wrapped_blockquote(md, prompt)
     md.extend(_build_gallery_quality_summary_section(report_context))
+    md.extend(_build_gallery_output_cost_summary_section(report_context))
     md.extend(_build_markdown_gallery_navigation(report_context))
     md.extend(_generate_model_gallery_section(report_context))
 
