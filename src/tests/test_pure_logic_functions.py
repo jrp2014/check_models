@@ -1013,6 +1013,62 @@ class TestPreflightDependencyDiagnostics:
             "mlx_vlm.generate.generate is missing required keyword parameter(s): verbose, temperature.",
         ]
 
+    def test_import_probe_excerpt_preserves_actionable_import_error_tail(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """Import probe summaries should keep the terminal ImportError visible."""
+        probe_output = """
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import mlx_vlm
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/__init__.py", line 6, in <module>
+    from .convert import convert
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/convert.py", line 11, in <module>
+    from .utils import load
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 21, in <module>
+    from transformers import AutoProcessor
+  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/utils/versions.py", line 43, in _compare_versions
+    raise ImportError(
+ImportError: tokenizers>=0.22.0,<=0.23.0 is required for a normal functioning of this module, but found tokenizers==0.23.1.
+Try: `pip install transformers -U` or `pip install -e '.[dev]'` if you're working with git main
+"""
+
+        excerpt = mod._format_import_probe_output_excerpt(
+            probe_output,
+            max_output_excerpt_chars=220,
+        )
+
+        assert "Traceback (most recent call last)" in excerpt
+        assert "..." in excerpt
+        assert "ImportError: tokenizers>=0.22.0,<=0.23.0 is required" in excerpt
+        assert "found tokenizers==0.23.1" in excerpt
+
+    def test_runtime_api_drift_groups_missing_mlx_vlm_placeholders(
+        self,
+        mod: types.ModuleType,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """A failed mlx-vlm import should be one preflight issue, not four symbol warnings."""
+        dependency_message = (
+            "Core dependency initialization failed: mlx-vlm could not be imported safely. "
+            "Import probe exited with code 1. Probe output: Traceback (most recent call last): "
+            "ImportError: tokenizers>=0.22.0,<=0.23.0 is required, but found tokenizers==0.23.1."
+        )
+        monkeypatch.setitem(mod.MISSING_DEPENDENCIES, "mlx-vlm", dependency_message)
+        for symbol_name in ("load", "apply_chat_template", "generate", "load_image"):
+            monkeypatch.setattr(mod, symbol_name, mod._raise_mlx_vlm_missing)
+
+        issues = mod._detect_runtime_api_drift_issues()
+
+        assert issues == (
+            "mlx-vlm import unavailable; affected API surfaces: "
+            "mlx_vlm.utils.load, mlx_vlm.prompt_utils.apply_chat_template, "
+            "mlx_vlm.generate.generate, mlx_vlm.utils.load_image. "
+            f"Root cause: {dependency_message}",
+        )
+        assert "missing-dependency placeholder" not in issues[0]
+
     def test_get_generation_result_contract_issues_reports_missing_fields(
         self,
         mod: types.ModuleType,

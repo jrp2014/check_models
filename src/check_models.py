@@ -215,6 +215,8 @@ ERROR_MLX_VLM_RUNTIME_INIT: Final[str] = (
     "Core dependency initialization failed: mlx-vlm could not be imported safely."
 )
 MLX_IMPORT_PROBE_TIMEOUT_SECONDS: Final[float] = 8.0
+IMPORT_PROBE_OUTPUT_EXCERPT_CHARS: Final[int] = 220
+IMPORT_PROBE_MIN_TAIL_CHARS: Final[int] = 10
 DEFAULT_KV_QUANT_SCHEME: Final = "uniform"
 DEFAULT_KV_GROUP_SIZE: Final[int] = 64
 DEFAULT_QUANTIZED_KV_START: Final[int] = 5000
@@ -722,6 +724,39 @@ def load_quality_config(config_path: Path | None = None) -> None:
 _temp_logger = logging.getLogger(LOGGER_NAME)
 
 
+def _format_import_probe_output_excerpt(
+    output: str,
+    *,
+    max_output_excerpt_chars: int = IMPORT_PROBE_OUTPUT_EXCERPT_CHARS,
+) -> str:
+    """Return a compact import-probe excerpt that preserves the terminal exception."""
+    lines = [line.strip() for line in output.splitlines() if line.strip()]
+    if not lines:
+        return "no output"
+
+    normalized = " ".join(output.split())
+    if len(normalized) <= max_output_excerpt_chars:
+        return normalized
+
+    exception_line: str | None = None
+    for line in reversed(lines):
+        if re.match(r"^[A-Za-z_][\w.]*(?:Error|Exception):\s", line):
+            exception_line = line
+            break
+
+    if exception_line is None:
+        return f"{normalized[: max_output_excerpt_chars - 3]}..."
+
+    candidate = f"{lines[0]} ... {exception_line}"
+    if len(candidate) <= max_output_excerpt_chars:
+        return candidate
+
+    tail_budget = max_output_excerpt_chars - len(f"{lines[0]} ... ")
+    if tail_budget <= IMPORT_PROBE_MIN_TAIL_CHARS:
+        return f"{exception_line[: max_output_excerpt_chars - 3]}..."
+    return f"{lines[0]} ... {exception_line[: tail_budget - 3]}..."
+
+
 def _probe_import_runtime(
     *,
     import_target: str,
@@ -729,7 +764,6 @@ def _probe_import_runtime(
     detect_metal_nsrange: bool = False,
 ) -> str | None:
     """Run a subprocess import probe and return an actionable error message when it fails."""
-    max_output_excerpt_chars = 220
     try:
         probe_result = subprocess.run(  # noqa: S603 - fixed interpreter + fixed probe command
             [sys.executable, "-c", f"import {import_target}"],
@@ -759,12 +793,7 @@ def _probe_import_runtime(
                 "headless or virtualized sessions without visible Apple GPU access."
             )
 
-    if combined_output:
-        output_excerpt = " ".join(combined_output.split())
-        if len(output_excerpt) > max_output_excerpt_chars:
-            output_excerpt = f"{output_excerpt[: max_output_excerpt_chars - 3]}..."
-    else:
-        output_excerpt = "no output"
+    output_excerpt = _format_import_probe_output_excerpt(combined_output)
     return (
         f"{error_prefix} Import probe exited with code "
         f"{probe_result.returncode}. Probe output: {output_excerpt}"
@@ -7802,16 +7831,29 @@ def _get_generation_result_contract_issues(result_type: type[object] | None) -> 
 def _detect_runtime_api_drift_issues() -> tuple[str, ...]:
     """Return issues when installed MLX runtime call surfaces drift from our contract."""
     issues: list[str] = []
+    missing_mlx_vlm_surfaces: list[str] = []
     for symbol_name, (
         qualified_name,
         required_keyword_params,
     ) in _RUNTIME_API_CALL_CONTRACTS.items():
+        symbol_value = globals()[symbol_name]
+        if symbol_value is _raise_mlx_vlm_missing:
+            missing_mlx_vlm_surfaces.append(qualified_name)
+            continue
         issues.extend(
             _get_callable_contract_issues(
                 qualified_name=qualified_name,
-                symbol_value=globals()[symbol_name],
+                symbol_value=symbol_value,
                 required_keyword_params=required_keyword_params,
             ),
+        )
+
+    if missing_mlx_vlm_surfaces:
+        dependency_message = MISSING_DEPENDENCIES.get("mlx-vlm", ERROR_MLX_VLM_MISSING)
+        issues.insert(
+            0,
+            "mlx-vlm import unavailable; affected API surfaces: "
+            f"{', '.join(missing_mlx_vlm_surfaces)}. Root cause: {dependency_message}",
         )
 
     issues.extend(_get_generation_result_contract_issues(_resolve_generation_result_type()))

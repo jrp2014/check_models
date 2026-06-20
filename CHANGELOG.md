@@ -44,6 +44,9 @@ Notable changes to this project will be documented in this file.
 - Rank triage model-selection candidates by ungrounded caption usefulness after
   output hygiene, so sparse successful labels remain visible without outranking
   fuller brief descriptions.
+- Keep import-probe preflight warnings actionable by preserving terminal
+  exception lines and grouping repeated `mlx-vlm` placeholder warnings under a
+  single root-cause message.
 - Clarify agent workflow guidance so Ruff formatting and safe lint fixes run
   before the full `make quality` gate, and so `make test` is treated as a
   pytest-only development loop rather than a redundant step after successful
