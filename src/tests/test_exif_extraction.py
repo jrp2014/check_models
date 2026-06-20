@@ -9,6 +9,7 @@ from PIL import Image
 
 import check_models
 from check_models import (
+    EXIF_NOT_EXTRACTED,
     _build_cataloguing_prompt,
     _extract_xp_keywords,
     _merge_keywords,
@@ -276,6 +277,30 @@ def test_extract_metadata_description_prefers_iptc_caption(tmp_path: Path) -> No
     meta = extract_image_metadata(img_path, exif_data=exif_with_desc)
     # On a plain JPEG with no IPTC/XMP, EXIF description is used
     assert meta["description"] == "EXIF description"
+
+
+def test_extract_image_metadata_respects_known_absent_exif_sentinel(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """Known-missing EXIF should not trigger a second image probe."""
+    img_path = tmp_path / "plain.jpg"
+    Image.new("RGB", (10, 10), color="white").save(img_path)
+
+    probe_count = 0
+
+    def fake_get_exif_data(_image_path: Path) -> dict[str, str]:
+        nonlocal probe_count
+        probe_count += 1
+        return {"ImageDescription": "unexpected"}
+
+    monkeypatch.setattr(check_models, "get_exif_data", fake_get_exif_data)
+
+    metadata = extract_image_metadata(img_path, exif_data=EXIF_NOT_EXTRACTED)
+
+    assert probe_count == 0
+    assert metadata["description"] is None
+    assert metadata["exif"] == "{}"
 
 
 # ---------------------------------------------------------------------------

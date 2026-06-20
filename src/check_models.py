@@ -132,6 +132,7 @@ if TYPE_CHECKING:
 
 # Public API (PEP 8 / PEP 561 best practice)
 __all__ = [
+    "EXIF_NOT_EXTRACTED",
     "GenerationQualityAnalysis",
     "PerformanceResult",
     "ProcessImageParams",
@@ -973,6 +974,14 @@ type SystemProfilerDict = dict[
 ]  # macOS system_profiler JSON structure
 type LibraryVersionDict = dict[str, str | None]  # Library name to version mapping (optional values)
 type MetricValue = int | float | str | bool | None  # Common scalar metric variants for metrics
+
+
+class _ExifNotExtracted:
+    """Sentinel for callers that already checked EXIF and found nothing."""
+
+
+EXIF_NOT_EXTRACTED: Final[_ExifNotExtracted] = _ExifNotExtracted()
+type ExifExtractionInput = ExifDict | _ExifNotExtracted | None
 
 
 class IPTCMetadata(TypedDict, total=False):
@@ -3182,6 +3191,9 @@ OUTPUT_PREVIEW_MIN_HEAD_CHARS: Final[int] = 96  # Minimum chars reserved for pre
 OUTPUT_PREVIEW_MIN_TAIL_CHARS: Final[int] = 48  # Minimum chars reserved for preview tail
 OUTPUT_PREVIEW_MIN_BODY_CHARS: Final[int] = 24  # Smallest useful body budget after cue prefix
 MAX_CAPTURED_OUTPUT_LOG_CHARS: Final[int] = 1200  # Max chars of captured stdout/stderr in logs
+SELF_LOGGED_FAILURE_PREFIX_RE: Final[re.Pattern[str]] = re.compile(
+    r"^\[\d{2}:\d{2}:\d{2}\]\s+ERROR\s+Failed to load model\b"
+)
 MAX_TRIAGE_MODELS: Final[int] = 5  # Max model rows shown in triage subsections
 MODEL_SELECTION_MIN_CAPTION_WORDS: Final[int] = 5  # Below this, captions are usually too sparse
 MODEL_SELECTION_IDEAL_CAPTION_MIN_WORDS: Final[int] = 9  # Lower bound for useful brief captions
@@ -8801,7 +8813,7 @@ def _merge_keywords(*sources: list[str]) -> str | None:
 def extract_image_metadata(
     image_path: PathLike,
     *,
-    exif_data: ExifDict | None = None,
+    exif_data: ExifExtractionInput = None,
 ) -> MetadataDict:
     """Derive high-level metadata (date, description, GPS, keywords, title, raw EXIF).
 
@@ -8817,7 +8829,11 @@ def extract_image_metadata(
     metadata: MetadataDict = {}
     img_path = Path(image_path)
     if exif_data is None:
-        exif_data = get_exif_data(img_path) or {}
+        resolved_exif_data: ExifDict = get_exif_data(img_path) or {}
+    elif exif_data is EXIF_NOT_EXTRACTED:
+        resolved_exif_data = {}
+    else:
+        resolved_exif_data = cast("ExifDict", exif_data)
 
     # IPTC + XMP extraction (separate image opens for header-only access)
     iptc = _extract_iptc_metadata(img_path)
@@ -8829,12 +8845,12 @@ def extract_image_metadata(
     xmp_keywords = _metadata_keyword_list(xmp, "xmp_keywords")
 
     # Date, Time, GPS
-    metadata["date"] = _extract_exif_date(img_path, exif_data)
-    metadata["time"] = _extract_exif_time(img_path, exif_data)
-    metadata["gps"] = _extract_gps_str(exif_data.get("GPSInfo"))
+    metadata["date"] = _extract_exif_date(img_path, resolved_exif_data)
+    metadata["time"] = _extract_exif_time(img_path, resolved_exif_data)
+    metadata["gps"] = _extract_gps_str(resolved_exif_data.get("GPSInfo"))
 
     # Description: prefer IPTC caption → XMP description → EXIF ImageDescription
-    description = iptc_caption or xmp_description or _extract_description(exif_data)
+    description = iptc_caption or xmp_description or _extract_description(resolved_exif_data)
     metadata["description"] = description
 
     # Title: from XMP dc:title (falls back to None)
@@ -8844,11 +8860,11 @@ def extract_image_metadata(
     metadata["keywords"] = _merge_keywords(
         iptc_keywords,
         xmp_keywords,
-        _extract_xp_keywords(exif_data),
+        _extract_xp_keywords(resolved_exif_data),
     )
 
     # Raw EXIF for reference
-    metadata["exif"] = str(exif_data)
+    metadata["exif"] = str(resolved_exif_data)
     return metadata
 
 
@@ -18887,7 +18903,12 @@ def _run_model_generation(
         # Capture model loading errors and run cache diagnostics to distinguish
         # code bugs from environment issues (corrupted cache, incomplete download)
         error_details = f"Model loading failed: {load_err}"
-        logger.exception("Failed to load model %s", params.model_identifier)
+        logger.debug(
+            "Model load failure captured for %s: %s",
+            params.model_identifier,
+            load_err,
+            extra={"log_destination": "file"},
+        )
         _check_hf_cache_integrity(params.model_identifier)
 
         raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
@@ -19050,6 +19071,33 @@ def _build_failure_result(
     )
 
 
+def _is_self_logged_rich_traceback_line(line: str) -> bool:
+    """Return whether a captured stderr line came from our own Rich traceback log."""
+    stripped = _strip_ansi(line).strip()
+    if not stripped:
+        return False
+    if SELF_LOGGED_FAILURE_PREFIX_RE.search(stripped):
+        return True
+    if "Traceback (most recent call last)" in stripped:
+        return True
+    if "check_models.py:" in stripped:
+        return True
+    if "_run_model_generation" in stripped:
+        return True
+    return stripped.startswith(("╭", "╰", "│", "❱", "─"))
+
+
+def _sanitize_failure_stderr_capture(stderr_text: str) -> str:
+    """Drop self-logged Rich traceback noise while preserving external stderr."""
+    normalized = stderr_text.replace("\r", "\n")
+    kept = [
+        _strip_ansi(line).rstrip()
+        for line in normalized.splitlines()
+        if not _is_self_logged_rich_traceback_line(line)
+    ]
+    return "\n".join(line for line in kept if line.strip()).strip()
+
+
 def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     """Process an image with a Vision Language Model, managing stats and errors."""
     arch, gpu_info = get_system_info()
@@ -19144,7 +19192,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     except (TimeoutError, OSError, ValueError, RuntimeError) as e:
         captured_sections: list[str] = []
         stdout_clean = stdout_capture.getvalue().strip()
-        stderr_clean = stderr_capture.getvalue().strip()
+        stderr_clean = _sanitize_failure_stderr_capture(stderr_capture.getvalue())
         failure_quality_analysis: GenerationQualityAnalysis | None = None
         failure_quality_issues: str | None = None
         if stdout_clean:
@@ -20355,7 +20403,10 @@ def handle_metadata(image_path: Path, args: argparse.Namespace) -> MetadataDict:
 
     # Single EXIF extraction shared by metadata and verbose pretty-print
     exif_data: ExifDict | None = get_exif_data(image_path)
-    metadata: MetadataDict = extract_image_metadata(image_path, exif_data=exif_data)
+    metadata: MetadataDict = extract_image_metadata(
+        image_path,
+        exif_data=exif_data if exif_data is not None else EXIF_NOT_EXTRACTED,
+    )
 
     # Display key metadata (fallback to empty at presentation time)
     logger.info("Date: %s", metadata.get("date") or "")
@@ -20371,7 +20422,7 @@ def handle_metadata(image_path: Path, args: argparse.Namespace) -> MetadataDict:
         if exif_data:
             pretty_print_exif(exif_data, show_all=True)
         else:
-            logger.warning("No detailed EXIF data could be extracted.")
+            logger.info("No detailed EXIF data available.")
     return metadata
 
 
@@ -22526,6 +22577,8 @@ def log_summary(
     *,
     prompt: str | None = None,
     image_path: Path | None = None,
+    eval_mode: str = DEFAULT_EVAL_MODE,
+    metadata: MetadataDict | None = None,
 ) -> None:
     """Log run summary focused on diagnostics, quality, and model triage."""
     if not results:
@@ -22560,11 +22613,18 @@ def log_summary(
             clean_count=clean_count,
             successful_count=len(successful),
         )
-        _log_utility_triage(
-            utility_rows,
-            baseline_score=baseline_score,
-            baseline_grade=baseline_grade,
-        )
+        mode_policy = _build_report_mode_policy(eval_mode=eval_mode, metadata=metadata)
+        if mode_policy.suppress_cataloging_scores:
+            log_blank()
+            logger.info("📌 Caption Selection Snapshot:")
+            logger.info("   Structured metadata scoring is suppressed in triage mode.")
+            logger.info("   Review generated captions directly; semantic rankings are ungrounded.")
+        else:
+            _log_utility_triage(
+                utility_rows,
+                baseline_score=baseline_score,
+                baseline_grade=baseline_grade,
+            )
         log_blank()
 
     if failed:
@@ -23504,9 +23564,9 @@ def _history_summary_rows(
         ["Quality recoveries", "-", str(len(quality_recoveries)), "-"],
         ["Harness regressions", "-", str(len(harness_regressions)), "-"],
         ["Harness recoveries", "-", str(len(harness_recoveries)), "-"],
-        ["Window quality regressions", "-", str(len(window_quality_regressions)), "-"],
-        ["Window harness regressions", "-", str(len(window_harness_regressions)), "-"],
-        ["Window generation regressions", "-", str(len(window_generation_regressions)), "-"],
+        ["Window quality signals", "-", str(len(window_quality_regressions)), "-"],
+        ["Window harness signals", "-", str(len(window_harness_regressions)), "-"],
+        ["Window generation signals", "-", str(len(window_generation_regressions)), "-"],
         ["Owner changes", "-", str(len(owner_changes)), "-"],
         ["New models", "-", str(len(new_models)), "-"],
         ["Missing models", "-", str(len(missing_models)), "-"],
@@ -23567,9 +23627,9 @@ def _log_history_transition_chart(
         ("quality recoveries", float(len(quality_recoveries))),
         ("harness regressions", float(len(harness_regressions))),
         ("harness recoveries", float(len(harness_recoveries))),
-        ("window quality", float(len(window_quality_regressions))),
-        ("window harness", float(len(window_harness_regressions))),
-        ("window generation", float(len(window_generation_regressions))),
+        ("window quality signals", float(len(window_quality_regressions))),
+        ("window harness signals", float(len(window_harness_regressions))),
+        ("window generation signals", float(len(window_generation_regressions))),
         ("owner changes", float(len(owner_changes))),
         ("new", float(len(new_models))),
         ("missing", float(len(missing_models))),
@@ -23716,11 +23776,11 @@ def _history_transition_rows(
         elif model_name in quality_recoveries:
             transition = "Quality recovery"
         elif model_name in window_generation_regressions:
-            transition = "Window generation regression"
+            transition = "Window generation signal"
         elif model_name in window_harness_regressions:
-            transition = "Window harness regression"
+            transition = "Window harness signal"
         elif model_name in window_quality_regressions:
-            transition = "Window quality regression"
+            transition = "Window quality signal"
         elif model_name in owner_changes:
             transition = "Owner changed"
         elif model_name in new_models:
@@ -25425,7 +25485,13 @@ def finalize_execution(
         print_model_stats(results)
 
         # Log summary with failure bucketing for diagnostics
-        log_summary(results, prompt=prompt, image_path=image_path)
+        log_summary(
+            results,
+            prompt=prompt,
+            image_path=image_path,
+            eval_mode=str(getattr(args, "eval_mode", DEFAULT_EVAL_MODE)),
+            metadata=metadata,
+        )
 
         # Gather system characteristics for reports
         system_info = get_system_characteristics()

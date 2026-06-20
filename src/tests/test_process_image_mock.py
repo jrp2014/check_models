@@ -283,6 +283,39 @@ class TestProcessImageWithModelMock:
         assert "stdout marker" in result.captured_output_on_fail
         assert "stderr marker" in result.captured_output_on_fail
 
+    def test_failure_capture_omits_self_logged_rich_traceback(
+        self,
+        test_image: Path,
+    ) -> None:
+        """Captured stderr should keep tool output but drop our own Rich traceback block."""
+        params = _build_params(test_image)
+
+        def _raise_after_rich_log_output(
+            *_args: object, **_kwargs: object
+        ) -> _FakeGenerationResult:
+            sys.stderr.write("Downloading (incomplete total...): 0.00B [00:00, ?B/s]\n")
+            sys.stderr.write("[19:36:43] ERROR    Failed to load model org/broken\n")
+            sys.stderr.write("╭──────── Traceback (most recent call last) ────────╮\n")
+            sys.stderr.write("│ /repo/src/check_models.py:18883 in _run_model_generation │\n")
+            sys.stderr.write("╰──────────────────────────────────────────────────╯\n")
+            sys.stderr.write("ValueError: Missing 2 parameters\n")
+            error_message = "bad config"
+            raise ValueError(error_message)
+
+        with patch.object(
+            check_models,
+            "_run_model_generation",
+            side_effect=_raise_after_rich_log_output,
+        ):
+            result = check_models.process_image_with_model(params)
+
+        assert result.success is False
+        captured_output = result.captured_output_on_fail or ""
+        assert "Downloading (incomplete total" in captured_output
+        assert "Failed to load model org/broken" not in captured_output
+        assert "Traceback (most recent call last)" not in captured_output
+        assert "_run_model_generation" not in captured_output
+
     def test_failure_stdout_quality_is_analyzed(self, test_image: Path) -> None:
         """Captured stdout with model-like output should retain quality flags on failures."""
         params = _build_params(test_image)

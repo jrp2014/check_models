@@ -542,6 +542,37 @@ def test_log_summary_reports_metadata_baseline_delta_when_context_present(
     assert "Vs metadata:" in messages
 
 
+def test_log_summary_suppresses_cataloging_scores_in_triage_mode(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Triage console summaries should not emit cataloging or keyword scorecards."""
+    caplog.set_level(logging.INFO)
+    result = PerformanceResult(
+        model_name="org/caption-model",
+        generation=_StubGeneration(
+            generation_tps=42.0,
+            peak_memory=1.2,
+            text="Two cats resting on a bright pink couch.",
+        ),
+        success=True,
+        generation_time=1.0,
+        model_load_time=0.4,
+        total_time=1.4,
+    )
+
+    log_summary(
+        [result],
+        prompt="Describe this image briefly.",
+        eval_mode="triage",
+    )
+
+    messages = "\n".join(record.message for record in caplog.records)
+    assert "Quality Signal Frequency:" in messages
+    assert "Cataloging Utility Snapshot:" not in messages
+    assert "Best description:" not in messages
+    assert "Best keywording:" not in messages
+
+
 def test_log_history_comparison_emits_tables_and_transition_chart(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -572,6 +603,43 @@ def test_log_history_comparison_emits_tables_and_transition_chart(
     assert "Image path differs from previous run" in messages
     assert "Regression" in messages
     assert "Recovery" in messages
+
+
+def test_log_history_comparison_labels_window_signals_without_regression_wording(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Window lookbacks should not call unchanged bad states true regressions."""
+    caplog.set_level(logging.INFO)
+    baseline = _history_run_record({"org/model-a": True})
+    noisy_previous = _history_run_record({"org/model-a": True})
+    current = _history_run_record({"org/model-a": True})
+
+    baseline_results = baseline["model_results"]
+    noisy_results = noisy_previous["model_results"]
+    current_results = current["model_results"]
+    assert isinstance(baseline_results, dict)
+    assert isinstance(noisy_results, dict)
+    assert isinstance(current_results, dict)
+    baseline_results["org/model-a"]["review_verdict"] = "clean"
+    baseline_results["org/model-a"]["review_user_bucket"] = "recommended"
+    noisy_results["org/model-a"]["review_verdict"] = "cutoff_degraded"
+    noisy_results["org/model-a"]["review_user_bucket"] = "avoid"
+    noisy_results["org/model-a"]["stop_reason"] = "max_tokens"
+    current_results["org/model-a"]["review_verdict"] = "cutoff_degraded"
+    current_results["org/model-a"]["review_user_bucket"] = "avoid"
+    current_results["org/model-a"]["stop_reason"] = "max_tokens"
+
+    _log_history_comparison(
+        noisy_previous,
+        current,
+        history_records=[baseline, noisy_previous],
+    )
+
+    messages = "\n".join(record.message for record in caplog.records)
+    assert "Window quality signals" in messages
+    assert "Window generation signals" in messages
+    assert "Window quality regression" not in messages
+    assert "Window generation regression" not in messages
 
 
 def test_log_history_comparison_baseline_emits_current_status_chart(

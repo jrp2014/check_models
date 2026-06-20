@@ -66,6 +66,14 @@ Notable changes to this project will be documented in this file.
 - Remove the matching macOS CI deployment-target workaround from quality and
   runtime-smoke workflows so upstream MLX owns target selection consistently.
 
+### Fixed
+
+- Make benchmark logs less repetitive and more actionable by avoiding duplicate
+  EXIF absence probes, suppressing cataloging/keyword scorecards in triage-mode
+  console summaries, filtering self-captured Rich tracebacks from failure
+  stderr snippets, and labelling history-window lookbacks as signals rather
+  than true regressions.
+
 
 ## [0.8.0] - 2026-06-06
 
