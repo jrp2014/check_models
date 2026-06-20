@@ -3155,7 +3155,11 @@ OUTPUT_PREVIEW_MIN_BODY_CHARS: Final[int] = 24  # Smallest useful body budget af
 MAX_CAPTURED_OUTPUT_LOG_CHARS: Final[int] = 1200  # Max chars of captured stdout/stderr in logs
 MAX_TRIAGE_MODELS: Final[int] = 5  # Max model rows shown in triage subsections
 MODEL_SELECTION_MIN_CAPTION_WORDS: Final[int] = 5  # Below this, captions are usually too sparse
+MODEL_SELECTION_IDEAL_CAPTION_MIN_WORDS: Final[int] = 9  # Lower bound for useful brief captions
+MODEL_SELECTION_IDEAL_CAPTION_MAX_WORDS: Final[int] = 36  # Upper bound for useful brief captions
 MODEL_SELECTION_MAX_CAPTION_WORDS: Final[int] = 80  # Above this, caption briefs become unwieldy
+MODEL_SELECTION_RICHNESS_TARGET_TERMS: Final[int] = 16  # Terms needed for full richness credit
+MODEL_SELECTION_CONTENT_TERM_MIN_CHARS: Final[int] = 3  # Minimum token length for richness
 SUMMARY_CHART_WIDTH: Final[int] = 24  # Character width for compact Rich summary bars
 SUMMARY_MODEL_LABEL_MAX: Final[int] = 32  # Max model label length in summary tables/charts
 SUMMARY_CHART_MAX_ROWS: Final[int] = 8  # Max rows shown in summary charts
@@ -12197,6 +12201,7 @@ class ModelSelectionRow:
 
     result: PerformanceResult
     score: float
+    caption_score: float
     verdict: str
     caption_preview: str
     caveat: str
@@ -16326,6 +16331,51 @@ def _model_selection_score(result: PerformanceResult) -> float:
     return max(0.0, round(score, 1))
 
 
+def _caption_usefulness_score(text: str) -> float:
+    """Score ungrounded caption usefulness from output shape and descriptive richness."""
+    words = re.findall(r"[A-Za-z0-9']+", text)
+    word_count = len(words)
+    if word_count == 0:
+        return 0.0
+
+    if word_count < MODEL_SELECTION_MIN_CAPTION_WORDS:
+        length_score = 22.0 + (word_count * 6.0)
+    elif word_count < MODEL_SELECTION_IDEAL_CAPTION_MIN_WORDS:
+        length_score = 64.0
+    elif word_count <= MODEL_SELECTION_IDEAL_CAPTION_MAX_WORDS:
+        length_score = 82.0
+    elif word_count <= MODEL_SELECTION_MAX_CAPTION_WORDS:
+        length_score = 78.0 - min(
+            (word_count - MODEL_SELECTION_IDEAL_CAPTION_MAX_WORDS) * 0.45,
+            18.0,
+        )
+    else:
+        length_score = 48.0
+
+    normalized_words = {
+        word.casefold() for word in words if len(word) >= MODEL_SELECTION_CONTENT_TERM_MIN_CHARS
+    }
+    richness_score = (
+        min(
+            len(normalized_words) / MODEL_SELECTION_RICHNESS_TARGET_TERMS,
+            1.0,
+        )
+        * 14.0
+    )
+    boilerplate_penalty = (
+        8.0 if re.search(r"\b(?:here(?:'s| is)|brief description)\b", text, re.IGNORECASE) else 0.0
+    )
+    repetition_penalty = 12.0 if _detect_repetitive_output(text, threshold=0.25)[0] else 0.0
+
+    return max(
+        0.0,
+        min(
+            100.0,
+            round(length_score + richness_score - boilerplate_penalty - repetition_penalty, 1),
+        ),
+    )
+
+
 def _build_model_selection_rows(
     results: Sequence[PerformanceResult],
 ) -> list[ModelSelectionRow]:
@@ -16336,11 +16386,13 @@ def _build_model_selection_rows(
         if review is None:
             continue
         caption_preview = _build_result_output_preview(result, max_chars=180)
+        caption_text = str(getattr(result.generation, "text", "") or "")
         caveat = _review_focus_text(review, _quality_analysis_for_result(result))
         rows.append(
             ModelSelectionRow(
                 result=result,
                 score=_model_selection_score(result),
+                caption_score=_caption_usefulness_score(caption_text),
                 verdict=review["verdict"],
                 caption_preview=caption_preview,
                 caveat=caveat,
@@ -16350,6 +16402,7 @@ def _build_model_selection_rows(
     rows.sort(
         key=lambda row: (
             -row.score,
+            -row.caption_score,
             -float(getattr(row.result.generation, "generation_tps", 0.0) or 0.0),
             row.result.model_name,
         )
@@ -16610,6 +16663,7 @@ def generate_model_selection_report(
         (
             f"`{MARKDOWN_ESCAPER.escape(row.result.model_name)}`",
             f"{row.score:.0f}",
+            f"{row.caption_score:.0f}",
             f"`{MARKDOWN_ESCAPER.escape(row.verdict)}`",
             MARKDOWN_ESCAPER.escape(row.caption_preview),
             MARKDOWN_ESCAPER.escape(row.caveat),
@@ -16620,7 +16674,14 @@ def generate_model_selection_report(
         render_report_markdown(
             (
                 ReportTable(
-                    headers=("Model", "Hygiene", "Verdict", "Caption Preview", "Caveat"),
+                    headers=(
+                        "Model",
+                        "Hygiene",
+                        "Usefulness",
+                        "Verdict",
+                        "Caption Preview",
+                        "Caveat",
+                    ),
                     rows=tuple(caption_rows),
                     markdown_escaped=True,
                 ),
@@ -23198,6 +23259,13 @@ def save_run_json_report(
     failed = [result for result in results if not result.success]
     successful = [result for result in results if result.success]
     policy = report_context.mode_policy
+    counts: dict[str, JsonLike] = {
+        "models_total": len(results),
+        "models_successful": len(successful),
+        "models_failed": len(failed),
+    }
+    artifacts: dict[str, JsonLike] = dict(output_paths)
+    library_versions: dict[str, JsonLike] = dict(versions)
     payload: dict[str, JsonLike] = {
         "schema_version": "1.0",
         "generated_at": local_now_str(),
@@ -23208,13 +23276,9 @@ def save_run_json_report(
         "selection_basis": policy.selection_basis,
         "has_descriptive_metadata": policy.has_descriptive_metadata,
         "total_runtime_seconds": round(total_runtime_seconds, 3),
-        "counts": {
-            "models_total": len(results),
-            "models_successful": len(successful),
-            "models_failed": len(failed),
-        },
-        "artifacts": dict(output_paths),
-        "library_versions": dict(versions),
+        "counts": counts,
+        "artifacts": artifacts,
+        "library_versions": library_versions,
     }
     _write_text_file(filename, json.dumps(payload, indent=2, sort_keys=True) + "\n")
 

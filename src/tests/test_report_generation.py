@@ -891,6 +891,76 @@ class TestMarkdownReportEdgeCases:
         assert "Best keywording" not in content
         assert "Keywords 0" not in content
 
+    def test_model_selection_report_ranks_fuller_clean_captions_above_terse_ones(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Brief-caption ranking should keep terse outputs but prefer useful detail."""
+        terse = PerformanceResult(
+            model_name="org/terse-caption",
+            success=True,
+            generation=_MockGeneration(
+                text="Two cats are sleeping on a pink blanket.",
+                generation_tps=200.0,
+                prompt_tokens=12,
+                generation_tokens=8,
+                peak_memory=2.0,
+            ),
+            total_time=0.5,
+            generation_time=0.2,
+            model_load_time=0.3,
+        )
+        fuller = PerformanceResult(
+            model_name="org/full-caption",
+            success=True,
+            generation=_MockGeneration(
+                text=(
+                    "Two tabby cats are sleeping on a bright pink couch beside two remote controls."
+                ),
+                generation_tps=20.0,
+                prompt_tokens=12,
+                generation_tokens=15,
+                peak_memory=6.0,
+            ),
+            total_time=1.5,
+            generation_time=1.0,
+            model_load_time=0.5,
+        )
+        label_only = PerformanceResult(
+            model_name="org/label-caption",
+            success=True,
+            generation=_MockGeneration(
+                text="Cats.",
+                generation_tps=300.0,
+                prompt_tokens=12,
+                generation_tokens=1,
+                peak_memory=1.0,
+            ),
+            total_time=0.4,
+            generation_time=0.1,
+            model_load_time=0.3,
+        )
+        out = tmp_path / "model_selection.md"
+        context = check_models._build_report_render_context(
+            results=[terse, fuller, label_only],
+            prompt="Describe this image briefly.",
+            eval_mode="triage",
+        )
+
+        check_models.generate_model_selection_report(
+            [terse, fuller, label_only],
+            out,
+            prompt="Describe this image briefly.",
+            report_context=context,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "`org/label-caption`" in content
+        assert "`org/terse-caption`" in content
+        assert "`org/full-caption`" in content
+        assert content.index("`org/full-caption`") < content.index("`org/terse-caption`")
+        assert content.index("`org/terse-caption`") < content.index("`org/label-caption`")
+
     def test_model_selection_report_uses_metadata_when_available(
         self,
         tmp_path: Path,
@@ -915,7 +985,7 @@ class TestMarkdownReportEdgeCases:
             model_load_time=0.5,
         )
         out = tmp_path / "model_selection.md"
-        metadata = {
+        metadata: dict[str, str | None] = {
             "title": "Two tabby cats resting",
             "description": "Two tabby cats rest on a bright pink couch with two remotes.",
             "keywords": "cats, tabby, pink couch, remote controls",

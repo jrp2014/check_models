@@ -41,6 +41,9 @@ Notable changes to this project will be documented in this file.
 - Made public benchmark artifacts mode-aware: triage summaries now suppress
   cataloging/keyword scores, add a dedicated model-selection brief, and expose
   stable run-level JSON metadata.
+- Rank triage model-selection candidates by ungrounded caption usefulness after
+  output hygiene, so sparse successful labels remain visible without outranking
+  fuller brief descriptions.
 - Clarify agent workflow guidance so Ruff formatting and safe lint fixes run
   before the full `make quality` gate, and so `make test` is treated as a
   pytest-only development loop rather than a redundant step after successful
