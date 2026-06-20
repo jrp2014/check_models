@@ -12053,16 +12053,30 @@ def _gallery_summary_signal(result: PerformanceResult) -> str:
     return signal
 
 
+def _gallery_success_output_preview(result: PerformanceResult, *, max_chars: int) -> str:
+    """Return compact successful model text without adding diagnostic cue prefixes."""
+    preview = _build_output_preview_text(
+        _generation_text_value(result.generation),
+        max_chars=max_chars,
+    )
+    return _collapse_preview_whitespace(preview) if preview else ""
+
+
 def _gallery_summary_preview(result: PerformanceResult) -> str:
     """Return the response or failure-diagnostic preview for one summary row."""
+    if result.success:
+        preview = _gallery_success_output_preview(
+            result,
+            max_chars=GALLERY_QUALITY_SUMMARY_PREVIEW_CHARS,
+        )
+        return preview or "No generated text captured."
+
     preview = _build_result_output_preview(
         result,
         max_chars=GALLERY_QUALITY_SUMMARY_PREVIEW_CHARS,
     )
     if preview:
         return _collapse_preview_whitespace(preview)
-    if result.success:
-        return "No generated text captured."
     return "No failure diagnostics captured."
 
 
@@ -12074,15 +12088,25 @@ def _gallery_output_cost_metric(field_name: str, value: MetricValue) -> str:
 
 def _gallery_output_cost_preview(result: PerformanceResult) -> str:
     """Return a compact all-model output or diagnostic preview."""
+    if result.success:
+        preview = _gallery_success_output_preview(
+            result,
+            max_chars=GALLERY_OUTPUT_COST_PREVIEW_CHARS,
+        )
+        return preview or "No generated text captured."
+
     preview = _build_result_output_preview(
         result,
         max_chars=GALLERY_OUTPUT_COST_PREVIEW_CHARS,
     )
     if preview:
         return _collapse_preview_whitespace(preview)
-    if result.success:
-        return "No generated text captured."
     return "No failure diagnostics captured."
+
+
+def _gallery_output_cost_signal_cell(result: PerformanceResult) -> str:
+    """Return the escaped quality or diagnostic signal for the compact table."""
+    return MARKDOWN_ESCAPER.escape(_gallery_summary_signal(result))
 
 
 def _build_gallery_output_cost_summary_section(
@@ -12110,7 +12134,7 @@ def _build_gallery_output_cost_summary_section(
                     "peak_memory",
                     _generation_float_metric(generation, "peak_memory"),
                 ),
-                MARKDOWN_ESCAPER.escape(_gallery_summary_signal(result)),
+                _gallery_output_cost_signal_cell(result),
             ),
         )
     if not rows:
@@ -12127,7 +12151,7 @@ def _build_gallery_output_cost_summary_section(
                     "Total",
                     "Gen TPS",
                     "Peak GB",
-                    "Quality / diagnostic",
+                    "Quality signal",
                 ),
                 rows=tuple(rows),
                 markdown_escaped=True,

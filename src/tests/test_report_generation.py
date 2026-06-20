@@ -1272,6 +1272,7 @@ class TestMarkdownGalleryReport:
         assert "`avoid` / `harness`" in summary
         assert "harness:stop-token" in summary
         assert r"answer with \| pipe" in summary
+        assert "[harness:stop-token] answer" not in summary
         assert "&lt;think&gt;leaked marker&lt;/think&gt;" in summary
         assert "[`org/bad`](#model-org-bad)" in summary
         assert "`avoid` / `runtime failure`" in summary
@@ -1305,10 +1306,16 @@ class TestMarkdownGalleryReport:
             _make_failure("org/crashed", error_package="transformers"),
             total_time=0.33,
         )
+        harness = _make_harness_success(
+            "org/risky-output",
+            text="cats",
+            generation_tokens=3,
+            harness_type="prompt_template",
+        )
         out = tmp_path / "model_gallery.md"
 
         generate_markdown_gallery_report(
-            results=[success, failure],
+            results=[success, failure, harness],
             filename=out,
             prompt="Describe this image briefly.",
         )
@@ -1321,12 +1328,18 @@ class TestMarkdownGalleryReport:
         )
         assert "Output / diagnostic" in summary
         assert "Peak GB" in summary
+        assert "Quality signal" in summary
         assert "[`org/full-caption`](#model-org-full-caption)" in summary
         assert "Two cats sit together on a pink sofa" in summary
         assert "24" in summary
         assert "1.25s" in summary
         assert "42.0" in summary
         assert "2.5" in summary
+        assert "clean" in summary
+        risky_row = next(line for line in summary.splitlines() if "org/risky-output" in line)
+        assert "| cats " in risky_row
+        assert "[harness" not in risky_row
+        assert "harness:prompt-template" in risky_row
         assert "[`org/crashed`](#model-org-crashed)" in summary
         assert "Error: load - boom" in summary
         assert "transformers; load" in summary
