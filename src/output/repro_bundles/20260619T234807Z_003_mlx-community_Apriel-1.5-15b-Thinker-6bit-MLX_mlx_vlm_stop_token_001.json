@@ -2,17 +2,17 @@
   "environment": {
     "library_versions": {
       "Pillow": "12.2.0",
-      "huggingface-hub": "1.17.0",
-      "mlx": "0.31.2",
-      "mlx-audio": "0.4.3",
+      "huggingface-hub": "1.20.1",
+      "mlx": "0.32.0.dev20260620+c9e8ee6b",
+      "mlx-audio": "0.4.4",
       "mlx-lm": "0.31.3",
-      "mlx-metal": "0.31.2",
-      "mlx-vlm": "0.5.0",
+      "mlx-metal": null,
+      "mlx-vlm": "0.6.3",
       "numpy": "2.4.6",
       "tokenizers": "0.22.2",
-      "transformers": "5.9.0"
+      "transformers": "5.12.1"
     },
-    "platform": "macOS-26.5-arm64-arm-64bit-Mach-O",
+    "platform": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
     "preflight_issues": [],
     "system_info": {
       "Active Developer Directory": "/Applications/Xcode.app/Contents/Developer",
@@ -22,11 +22,11 @@
       "CPU Cores (Physical)": "18",
       "GPU Cores": "40",
       "GPU/Chip": "Apple M5 Max",
-      "MLX Core Extension": "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/mlx/core.cpython-313-darwin.so",
+      "MLX Core Extension": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so",
       "MLX Distribution Root": "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
-      "MLX Install Type": "wheel/site-packages",
-      "MLX Metallib": "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/mlx/lib/mlx.metallib (157,748,008 bytes, sha256=8c8bfcece8c0610745b68879771e5aa1b92b29fa5e17172e5508e4f5153d8d15)",
-      "MLX libmlx.dylib": "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/mlx/lib/libmlx.dylib (21,653,808 bytes, sha256=2ee6fbd32ff22e22e1301ebe3c3bece95584104ff9cbc900513d41a095211bbd)",
+      "MLX Install Type": "editable local source",
+      "MLX Metallib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (157,739,544 bytes, sha256=79cffa58fb03a5b79bd95708adfc3f36d96a5930cbd6bb011d33be8240d12089)",
+      "MLX libmlx.dylib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,691,776 bytes, sha256=efe539c4f4b73598aba1dc2f04da6bfdeed9bb2170db2da6af7757f8083c0fb3)",
       "Metal Compiler Version": "Apple metal version 32023.883 (metalfe-32023.883)",
       "Metal SDK": "MacOSX26.5.sdk",
       "Metal Support": "Metal 4",
@@ -38,8 +38,8 @@
       "SDK Version": "26.5",
       "Xcode Build": "17F42",
       "Xcode Version": "26.5",
-      "macOS Version": "26.5",
-      "mlx-metal Distribution Root": "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages"
+      "macOS Version": "26.5.1",
+      "mlx-metal Distribution": "not installed; local editable mlx supplies backend"
     }
   },
   "failure": {
@@ -53,9 +53,9 @@
     "traceback": null,
     "type": null
   },
-  "generated_at_utc": "2026-05-29T20:59:41+00:00",
+  "generated_at_utc": "2026-06-19T23:48:07+00:00",
   "issue_cluster_id": "mlx-vlm_stop-token_001",
-  "model": "mlx-community/GLM-4.6V-nvfp4",
+  "model": "mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX",
   "repro": {
     "args": {
       "_check_models_preflight_issues": [],
@@ -66,19 +66,19 @@
       "enable_thinking": false,
       "eos_tokens": null,
       "eval_mode": "triage",
-      "exclude": [
-        "mlx-community/Qwen3-VL-2B-Thinking-bf16",
-        "Qwen/Qwen3-VL-2B-Instruct"
-      ],
-      "folder": "/Users/jrp/Pictures/Processed",
+      "exclude": null,
+      "folder": null,
       "force_color": false,
       "force_download": false,
-      "image": null,
+      "frequency_context_size": 20,
+      "frequency_penalty": null,
+      "image": "/Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg",
       "kv_bits": null,
       "kv_group_size": 64,
       "kv_quant_scheme": "uniform",
       "lazy_load": false,
       "link_style": "github",
+      "logit_bias": null,
       "max_kv_size": null,
       "max_tokens": 200,
       "min_p": 0.0,
@@ -92,9 +92,13 @@
       "output_jsonl": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.jsonl",
       "output_log": "/Users/jrp/Documents/AI/mlx/check_models/src/output/check_models.log",
       "output_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.md",
+      "output_model_selection": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/model_selection.md",
       "output_review": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/review.md",
+      "output_run_json": "/Users/jrp/Documents/AI/mlx/check_models/src/output/run.json",
       "output_tsv": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.tsv",
       "prefill_step_size": 4096,
+      "presence_context_size": 20,
+      "presence_penalty": null,
       "processor_kwargs": null,
       "prompt": null,
       "prune_repro_days": 90,
@@ -106,6 +110,7 @@
       "rerun_triage": false,
       "resize_shape": null,
       "revision": null,
+      "seed": null,
       "skip_special_tokens": false,
       "temperature": 0.0,
       "thinking_budget": null,
@@ -118,16 +123,16 @@
       "verbose": true,
       "width": null
     },
-    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260525-164635_DSC00024.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models microsoft/Phi-3.5-vision-instruct mlx-community/GLM-4.6V-Flash-6bit mlx-community/GLM-4.6V-Flash-mxfp4 mlx-community/GLM-4.6V-nvfp4",
+    "cluster_repro_command": "python -m check_models --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models microsoft/Phi-3.5-vision-instruct mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX mlx-community/Qwen3-VL-2B-Thinking-bf16",
     "env_vars": {
       "TOKENIZERS_PARALLELISM": "false"
     },
-    "image_path": "/Users/jrp/Pictures/Processed/20260525-164635_DSC00024.jpg",
-    "image_ref_sha256": "4b820385c467500a73237172e63ef4c00aa3c057fb287c78f88dd6205cb296c6",
-    "image_sha256": "458d7668c048f9e41ae06272ae1251faa40b7ecafe85b50b00d501bf2b0bdde9",
+    "image_path": "/Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg",
+    "image_ref_sha256": "9bc422400088c31c0accf7fb023ee29945d47640042565218c1c33f78694f204",
+    "image_sha256": "dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e",
     "prompt_diagnostics": {
-      "eos_token": "<|endoftext|>",
-      "eos_token_id": 151329,
+      "eos_token": "</s>",
+      "eos_token_id": 2,
       "generate_kwargs": {
         "kv_bits": null,
         "kv_group_size": 64,
@@ -141,60 +146,61 @@
         "temperature": 0.0,
         "top_p": 1.0
       },
-      "image_placeholder_count": 1,
-      "model_type": "glm4v_moe",
-      "processor_class": "mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor",
-      "rendered_prompt_chars": 106,
-      "rendered_prompt_hash_sha256": "fa2fbc451bdabbc414af5c93d3b44f06a16030f54d4441abb2af90d3322ede04",
-      "rendered_prompt_preview": "[gMASK]<sop><|user|>\n<|begin_of_image|><|image|><|end_of_image|>Describe this image briefly.<|assistant|>\n",
+      "image_placeholder_count": 0,
+      "model_type": "pixtral",
+      "processor_class": "mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor",
+      "rendered_prompt_chars": 423,
+      "rendered_prompt_hash_sha256": "cd2117604e10712180fd861d63f168284b28f5193279b6d89637cca292d91cc5",
+      "rendered_prompt_preview": "<s><|system|>\nYou are a thoughtful and systematic AI assistant built by ServiceNow Language Models (SLAM) lab. Before providing an answer, analyze the problem carefully and present your reasoning step by step. After explaining your thought process, provide the final solution in the following format: [BEGIN FINAL RESPONSE] ... [END FINAL RESPONSE].\n<|end|>\n<|user|>\n[IMG]Describe this image briefly.\n<|end|>\n<|assistant|>\n",
       "special_token_ids": [
-        151329
+        1,
+        2,
+        0,
+        11
       ],
       "special_tokens": [
-        "<|endoftext|>"
+        "<s>",
+        "</s>",
+        "<unk>",
+        "<pad>"
       ],
       "tokenizer_class": "transformers.tokenization_utils_tokenizers.TokenizersBackend"
     },
     "prompt_hash_sha256": "d760336d0fd143932f194573dd63f6b531e0ffbc2c4f1595e015392a3471c318",
     "prompt_preview": "Describe this image briefly.",
-    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260525-164635_DSC00024.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/GLM-4.6V-nvfp4",
+    "rerun_command": "python -m check_models --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX",
     "seed": null
   },
   "result": {
-    "generated_text_preview": "<think>Okay, let's see. The image shows a young man riding a Sea-Doo jet ski on the, probably, a body of water like the ocean or a lake. The jet ski is black and green with some yellow accents, and it has the number AG-8933 on it. The water around him is a bit choppy with white foam from the jet ski's movement. He's wearing a black life vest and black gloves, and he's smiling, maybe waving or rais...",
+    "generated_text_preview": "Here are my reasoning steps:\nThe user asks: \"Describe this image briefly.\" The image is of two cats sleeping on a pink couch, with a remote control. The user wants a brief description. This is a straightforward request. There's no disallowed content. So we can comply. Provide a concise description. Possibly mention the cats' colors, positions, the couch, the remote. The user wants a brief descript...",
     "maintainer_triage": {
       "confidence": "high",
       "evidence": [
         "harness:stop_token",
-        "abrupt_tail",
         "reasoning_leak",
-        "degeneration",
-        "text_sanity",
-        "generation_loop"
+        "text_sanity"
       ],
       "harness_details": [
-        "token_leak:</think>"
+        "token_leak:<|end|>"
       ],
-      "hit_max_tokens": true,
+      "hit_max_tokens": false,
       "issue_kind": "harness",
       "issue_subtype": "stop_token",
       "next_action": "Inspect EOS/stop-token stripping; control tokens are leaking into user-facing text.",
-      "nontext_prompt_ratio": 0.9990254994315413,
-      "prompt_output_ratio": 0.0324833522819555,
-      "prompt_tokens_total": 6157,
+      "nontext_prompt_ratio": 0.9954887218045113,
+      "prompt_output_ratio": 0.13082706766917293,
+      "prompt_tokens_total": 1330,
       "requested_max_tokens": 200,
-      "stop_reason": "max_tokens",
-      "summary": "Special control token &lt;/think&gt; appeared in generated text. | hit token cap (200) | nontext prompt burden=100% | reasoning leak",
+      "stop_reason": "completed",
+      "summary": "Special control token &lt;|end|&gt; appeared in generated text. | nontext prompt burden=100% | reasoning leak",
       "suspected_owner": "mlx-vlm",
       "user_bucket": "avoid"
     },
     "quality_issues": [
       "\u26a0\ufe0fharness(stop_token)",
-      "generation_loop(token_noise)",
       "gibberish(token_noise)",
-      "degeneration",
-      "reasoning-leak",
-      "formatting"
+      "lang_mixing",
+      "reasoning-leak"
     ],
     "success": true
   },

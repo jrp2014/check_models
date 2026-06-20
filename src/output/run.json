@@ -1,0 +1,41 @@
+{
+  "artifacts": {
+    "diagnostics": "reports/diagnostics.md",
+    "environment": "environment.log",
+    "log": "check_models.log",
+    "model_gallery": "reports/model_gallery.md",
+    "model_selection": "reports/model_selection.md",
+    "results_html": "reports/results.html",
+    "results_jsonl": "results.jsonl",
+    "results_markdown": "reports/results.md",
+    "results_tsv": "reports/results.tsv",
+    "review": "reports/review.md",
+    "run_json": "run.json"
+  },
+  "counts": {
+    "models_failed": 2,
+    "models_successful": 58,
+    "models_total": 60
+  },
+  "eval_mode": "triage",
+  "generated_at": "2026-06-20 00:48:07 BST",
+  "has_descriptive_metadata": false,
+  "library_versions": {
+    "Pillow": "12.2.0",
+    "huggingface-hub": "1.20.1",
+    "mlx": "0.32.0.dev20260620+c9e8ee6b",
+    "mlx-audio": "0.4.4",
+    "mlx-lm": "0.31.3",
+    "mlx-metal": null,
+    "mlx-vlm": "0.6.3",
+    "numpy": "2.4.6",
+    "tokenizers": "0.22.2",
+    "transformers": "5.12.1"
+  },
+  "prompt": "Describe this image briefly.",
+  "prompt_sha256": "d760336d0fd143932f194573dd63f6b531e0ffbc2c4f1595e015392a3471c318",
+  "schema_version": "1.0",
+  "selection_basis": "ungrounded",
+  "semantic_rankings_grounded": false,
+  "total_runtime_seconds": 417.31
+}

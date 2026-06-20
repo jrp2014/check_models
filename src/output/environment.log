@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-06-18 23:01:37 BST
+FULL ENVIRONMENT DUMP - 2026-06-20 00:41:08 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -52,7 +52,7 @@ hf-xet==1.5.1
 httpcore==1.0.9
 httpx==0.28.1
 httpx-sse==0.4.3
-huggingface_hub==1.20.0
+huggingface_hub==1.20.1
 identify==2.6.19
 idna==3.18
 iniconfig==2.3.0
@@ -81,8 +81,8 @@ mdit-py-plugins==0.6.1
 mdurl==0.1.2
 miniaudio==1.71
 ml_dtypes==0.5.4
-mlx==0.32.0.dev20260618+350f2cf8
-mlx==0.32.0.dev20260618+350f2cf8
+mlx==0.32.0.dev20260620+c9e8ee6b
+mlx==0.32.0.dev20260620+c9e8ee6b
 mlx-audio==0.4.4
 mlx-lm==0.31.3
 mlx-vlm==0.6.3
@@ -118,15 +118,15 @@ psutil==7.2.2
 pyarrow==24.0.0
 pycparser==3.0
 pydantic==2.13.4
-pydantic-settings==2.14.1
+pydantic-settings==2.14.2
 pydantic_core==2.46.4
 Pygments==2.20.0
 PyJWT==2.13.0
 pylint==4.0.6
 pyperclip==1.11.0
 pyproject_hooks==1.2.0
-pyrefly==1.1.0
-pytest==9.1.0
+pyrefly==1.1.1
+pytest==9.1.1
 pytest-cov==7.1.0
 pytest-xdist==3.8.0
 python-dateutil==2.9.0.post0
@@ -144,13 +144,13 @@ rpds-py==2026.5.1
 ruff==0.15.18
 runs==1.3.0
 safetensors==0.8.0
-scipy==1.17.1
+scipy==1.18.0
 sentencepiece==0.2.1
 setuptools==81.0.0
 setuptools==82.0.1
 shellingham==1.5.4
 six==1.17.0
-skylos==4.24.2
+skylos==4.25.0
 sounddevice==0.5.5
 soundfile==0.14.0
 sse-starlette==3.4.4
@@ -175,8 +175,8 @@ tree-sitter-java==0.23.5
 tree-sitter-php==0.24.1
 tree-sitter-rust==0.24.2
 tree-sitter-typescript==0.23.2
-ty==0.0.50
-typer==0.26.7
+ty==0.0.51
+typer==0.25.1
 types-defusedxml==0.7.0.20260504
 types-psutil==7.2.2.20260518
 types-PyYAML==6.0.12.20260518
@@ -202,7 +202,7 @@ xmod==1.10.0
 xxhash==3.7.0
 yarl==1.24.2
 
-Conda Environment: mlx-vlm
+Conda Environment: base
 ================================================================================
-Environment dump completed at 2026-06-18 23:01:37 BST
+Environment dump completed at 2026-06-20 00:41:08 BST
 ================================================================================
