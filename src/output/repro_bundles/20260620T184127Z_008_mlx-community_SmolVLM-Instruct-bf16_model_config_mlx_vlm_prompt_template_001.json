@@ -2,15 +2,15 @@
   "environment": {
     "library_versions": {
       "Pillow": "12.2.0",
-      "huggingface-hub": "1.18.0",
-      "mlx": "0.32.0.dev20260605+6ea7a00d",
-      "mlx-audio": "0.4.3",
+      "huggingface-hub": "1.20.1",
+      "mlx": "0.32.0.dev20260620+5abdd04b",
+      "mlx-audio": "0.4.4",
       "mlx-lm": "0.31.3",
       "mlx-metal": null,
-      "mlx-vlm": "0.6.1",
+      "mlx-vlm": "0.6.3",
       "numpy": "2.4.6",
       "tokenizers": "0.22.2",
-      "transformers": "5.10.2"
+      "transformers": "5.12.1"
     },
     "platform": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
     "preflight_issues": [],
@@ -25,8 +25,8 @@
       "MLX Core Extension": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so",
       "MLX Distribution Root": "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
       "MLX Install Type": "editable local source",
-      "MLX Metallib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (157,751,704 bytes, sha256=e50cd0c2d2ae16781f644476459cbc2ca23b0d428a897140740f86678b5e2bf5)",
-      "MLX libmlx.dylib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,675,136 bytes, sha256=7c19dc6a8bf6b56db0155bed7a1d2b0a54182b42eba2fcf0f42b97d3d4c57eff)",
+      "MLX Metallib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (157,739,544 bytes, sha256=d7cb97dee8940843711ef5df4ff68b80a6e02f98bbd9e085c6794183655c94d1)",
+      "MLX libmlx.dylib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,692,160 bytes, sha256=fdbe3aaa7ce26dcbcd3873b4005c74c1f8d78970533bedf9f05f30dec6631f75)",
       "Metal Compiler Version": "Apple metal version 32023.883 (metalfe-32023.883)",
       "Metal SDK": "MacOSX26.5.sdk",
       "Metal Support": "Metal 4",
@@ -53,9 +53,9 @@
     "traceback": null,
     "type": null
   },
-  "generated_at_utc": "2026-06-05T12:31:25+00:00",
-  "issue_cluster_id": "mlx-vlm_stop-token_001",
-  "model": "mlx-community/GLM-4.6V-Flash-6bit",
+  "generated_at_utc": "2026-06-20T18:41:27+00:00",
+  "issue_cluster_id": "model-config-mlx-vlm_prompt-template_001",
+  "model": "mlx-community/SmolVLM-Instruct-bf16",
   "repro": {
     "args": {
       "_check_models_preflight_issues": [],
@@ -66,19 +66,19 @@
       "enable_thinking": false,
       "eos_tokens": null,
       "eval_mode": "triage",
-      "exclude": [
-        "mlx-community/Qwen3-VL-2B-Thinking-bf16",
-        "Qwen/Qwen3-VL-2B-Instruct"
-      ],
-      "folder": "/Users/jrp/Pictures/Processed",
+      "exclude": null,
+      "folder": null,
       "force_color": false,
       "force_download": false,
-      "image": null,
+      "frequency_context_size": 20,
+      "frequency_penalty": null,
+      "image": "../../mlx-vlm/examples/images/cats.jpg",
       "kv_bits": null,
       "kv_group_size": 64,
       "kv_quant_scheme": "uniform",
       "lazy_load": false,
       "link_style": "github",
+      "logit_bias": null,
       "max_kv_size": null,
       "max_tokens": 200,
       "min_p": 0.0,
@@ -92,9 +92,13 @@
       "output_jsonl": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.jsonl",
       "output_log": "/Users/jrp/Documents/AI/mlx/check_models/src/output/check_models.log",
       "output_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.md",
+      "output_model_selection": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/model_selection.md",
       "output_review": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/review.md",
+      "output_run_json": "/Users/jrp/Documents/AI/mlx/check_models/src/output/run.json",
       "output_tsv": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.tsv",
       "prefill_step_size": 4096,
+      "presence_context_size": 20,
+      "presence_penalty": null,
       "processor_kwargs": null,
       "prompt": null,
       "prune_repro_days": 90,
@@ -106,6 +110,7 @@
       "rerun_triage": false,
       "resize_shape": null,
       "revision": null,
+      "seed": null,
       "skip_special_tokens": false,
       "temperature": 0.0,
       "thinking_budget": null,
@@ -118,16 +123,16 @@
       "verbose": true,
       "width": null
     },
-    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260525-164635_DSC00024.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models microsoft/Phi-3.5-vision-instruct mlx-community/GLM-4.6V-Flash-6bit mlx-community/GLM-4.6V-Flash-mxfp4 mlx-community/GLM-4.6V-nvfp4",
+    "cluster_repro_command": "python -m check_models --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models HuggingFaceTB/SmolVLM-Instruct mlx-community/SmolVLM-Instruct-bf16",
     "env_vars": {
       "TOKENIZERS_PARALLELISM": "false"
     },
-    "image_path": "/Users/jrp/Pictures/Processed/20260525-164635_DSC00024.jpg",
-    "image_ref_sha256": "4b820385c467500a73237172e63ef4c00aa3c057fb287c78f88dd6205cb296c6",
-    "image_sha256": "458d7668c048f9e41ae06272ae1251faa40b7ecafe85b50b00d501bf2b0bdde9",
+    "image_path": "/Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg",
+    "image_ref_sha256": "9bc422400088c31c0accf7fb023ee29945d47640042565218c1c33f78694f204",
+    "image_sha256": "dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e",
     "prompt_diagnostics": {
-      "eos_token": "<|endoftext|>",
-      "eos_token_id": 151329,
+      "eos_token": "<end_of_utterance>",
+      "eos_token_id": 49154,
       "generate_kwargs": {
         "kv_bits": null,
         "kv_group_size": 64,
@@ -142,54 +147,59 @@
         "top_p": 1.0
       },
       "image_placeholder_count": 1,
-      "model_type": "glm4v",
-      "processor_class": "mlx_vlm.models.glm4v.processing.Glm46VProcessor",
-      "rendered_prompt_chars": 106,
-      "rendered_prompt_hash_sha256": "fa2fbc451bdabbc414af5c93d3b44f06a16030f54d4441abb2af90d3322ede04",
-      "rendered_prompt_preview": "[gMASK]<sop><|user|>\n<|begin_of_image|><|image|><|end_of_image|>Describe this image briefly.<|assistant|>\n",
+      "model_type": "idefics3",
+      "processor_class": "mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor",
+      "rendered_prompt_chars": 81,
+      "rendered_prompt_hash_sha256": "9ee10dd28003c3bc52a85acfb2e19df9e55ac4182fdc07df17101192bd45f3ad",
+      "rendered_prompt_preview": "<|im_start|>User:<image>Describe this image briefly.<end_of_utterance>\nAssistant:",
       "special_token_ids": [
-        151329
+        1,
+        49154,
+        0,
+        2,
+        49152,
+        49153
       ],
       "special_tokens": [
-        "<|endoftext|>"
+        "<|im_start|>",
+        "<end_of_utterance>",
+        "<|endoftext|>",
+        "<|im_end|>",
+        "<fake_token_around_image>",
+        "<image>"
       ],
-      "tokenizer_class": "transformers.tokenization_utils_tokenizers.TokenizersBackend"
+      "tokenizer_class": "transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer"
     },
     "prompt_hash_sha256": "d760336d0fd143932f194573dd63f6b531e0ffbc2c4f1595e015392a3471c318",
     "prompt_preview": "Describe this image briefly.",
-    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260525-164635_DSC00024.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/GLM-4.6V-Flash-6bit",
+    "rerun_command": "python -m check_models --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/SmolVLM-Instruct-bf16",
     "seed": null
   },
   "result": {
-    "generated_text_preview": "<think>Got it, let's see. The image shows a person riding a Sea-Doo jet ski in the ocean. The jet ski is green and yellow with the registration AG-8933. The rider is wearing a life vest, black shirt, and gloves, and is smiling with one arm raised. The water around the jet ski is splashing, indicating movement. So I need to describe this briefly. Let's structure it: A person rides a green and yello...",
+    "generated_text_preview": " Two cats are sleeping on a pink blanket on a couch.",
     "maintainer_triage": {
       "confidence": "high",
       "evidence": [
-        "harness:stop_token",
-        "reasoning_leak",
-        "text_sanity"
+        "harness:prompt_template"
       ],
       "harness_details": [
-        "token_leak:</think>"
+        "output:output_ratio(1.1%)"
       ],
       "hit_max_tokens": false,
       "issue_kind": "harness",
-      "issue_subtype": "stop_token",
-      "next_action": "Inspect EOS/stop-token stripping; control tokens are leaking into user-facing text.",
-      "nontext_prompt_ratio": 0.9990254994315413,
-      "prompt_output_ratio": 0.0295598505765795,
-      "prompt_tokens_total": 6157,
+      "issue_subtype": "prompt_template",
+      "next_action": "Inspect model repo config, chat template, and EOS settings.",
+      "nontext_prompt_ratio": 0.9949832775919732,
+      "prompt_output_ratio": 0.010869565217391304,
+      "prompt_tokens_total": 1196,
       "requested_max_tokens": 200,
       "stop_reason": "completed",
-      "summary": "Special control token &lt;/think&gt; appeared in generated text. | nontext prompt burden=100% | reasoning leak | formatting=Unknown tags: &lt;think&gt;",
-      "suspected_owner": "mlx-vlm",
+      "summary": "Output is very short relative to prompt size (1.1%), suggesting possible early-stop or prompt-handling issues. | nontext prompt burden=99%",
+      "suspected_owner": "model-config",
       "user_bucket": "avoid"
     },
     "quality_issues": [
-      "\u26a0\ufe0fharness(stop_token)",
-      "gibberish(token_noise)",
-      "reasoning-leak",
-      "formatting"
+      "\u26a0\ufe0fharness(prompt_template)"
     ],
     "success": true
   },

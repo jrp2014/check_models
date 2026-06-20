@@ -18,12 +18,12 @@
     "models_total": 60
   },
   "eval_mode": "triage",
-  "generated_at": "2026-06-20 00:48:07 BST",
+  "generated_at": "2026-06-20 19:41:27 BST",
   "has_descriptive_metadata": false,
   "library_versions": {
     "Pillow": "12.2.0",
     "huggingface-hub": "1.20.1",
-    "mlx": "0.32.0.dev20260620+c9e8ee6b",
+    "mlx": "0.32.0.dev20260620+5abdd04b",
     "mlx-audio": "0.4.4",
     "mlx-lm": "0.31.3",
     "mlx-metal": null,
@@ -37,5 +37,5 @@
   "schema_version": "1.0",
   "selection_basis": "ungrounded",
   "semantic_rankings_grounded": false,
-  "total_runtime_seconds": 417.31
+  "total_runtime_seconds": 468.538
 }
