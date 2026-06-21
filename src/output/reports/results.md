@@ -317,8 +317,9 @@ _Overall runtime:_ 1554.92s
 
 <!-- markdownlint-enable MD033 MD034 MD037 MD049 -->
 
-_Review artifacts:_
+_Companion artifacts:_
 
+- _Model-selection shortlist:_ [model_selection.md](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_selection.md)
 - _Standalone output gallery:_ [model_gallery.md](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md)
 - _Automated review digest:_ [review.md](https://github.com/jrp2014/check_models/blob/main/src/output/reports/review.md)
 - _Canonical run log:_ [check_models.log](https://github.com/jrp2014/check_models/blob/main/src/output/check_models.log)

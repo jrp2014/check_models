@@ -735,8 +735,9 @@ class TestMarkdownReportEdgeCases:
         assert "> _Prompt used:_" not in content
 
     def test_report_links_to_dedicated_gallery_artifact(self, tmp_path: Path) -> None:
-        """Main markdown report should point readers at the standalone gallery artifact."""
+        """Main markdown report should point readers at companion artifacts."""
         out = tmp_path / "results.md"
+        model_selection = tmp_path / "model_selection.md"
         gallery = tmp_path / "model_gallery.md"
         review = tmp_path / "review.md"
         log_file = tmp_path / "check_models.log"
@@ -746,16 +747,21 @@ class TestMarkdownReportEdgeCases:
             versions=_stub_versions(),
             prompt="describe",
             total_runtime_seconds=1.0,
+            model_selection_filename=model_selection,
             gallery_filename=gallery,
             review_filename=review,
             log_filename=log_file,
         )
         content = out.read_text(encoding="utf-8")
-        assert "Review artifacts:" in content
-        assert "_Review artifacts:_\n\n- _Standalone output gallery:_" in content
+        assert "Companion artifacts:" in content
+        assert "_Companion artifacts:_\n\n- _Model-selection shortlist:_" in content
+        assert "Model-selection shortlist" in content
         assert "Standalone output gallery" in content
         assert "Automated review digest" in content
         assert "Canonical run log" in content
+        assert (
+            "[model_selection.md](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_selection.md)"
+        ) in content
         assert (
             "[model_gallery.md](https://github.com/jrp2014/check_models/blob/main/src/output/reports/model_gallery.md)"
         ) in content
@@ -777,11 +783,13 @@ class TestMarkdownReportEdgeCases:
                 versions=_stub_versions(),
                 prompt="describe",
                 total_runtime_seconds=1.0,
+                model_selection_filename=model_selection,
                 gallery_filename=gallery,
                 review_filename=review,
                 log_filename=log_file,
             )
             content_relative = out.read_text(encoding="utf-8")
+            assert "[model_selection.md](model_selection.md)" in content_relative
             assert "[model_gallery.md](model_gallery.md)" in content_relative
             assert "[review.md](review.md)" in content_relative
             assert "[check_models.log](check_models.log)" in content_relative
@@ -884,7 +892,10 @@ class TestMarkdownReportEdgeCases:
         content = out.read_text(encoding="utf-8")
         assert "# Model Selection Brief" in content
         assert "Semantic rankings: ungrounded" in content
+        assert "Scope: ranked shortlist, not the complete run" in content
+        assert "complete per-model outputs and diagnostics are in" in content
         assert "Brief Caption Candidates" in content
+        assert "Top 10 ranked candidates for brief captions" in content
         assert "`org/good-caption`" in content
         assert "`org/harness-caption`" in content
         assert "Structured metadata scoring is suppressed in triage mode." in content
@@ -1014,6 +1025,7 @@ class TestMarkdownReportEdgeCases:
         content = out.read_text(encoding="utf-8")
         assert "Semantic rankings: grounded (trusted image metadata)" in content
         assert "Structured Metadata Candidates" in content
+        assert "Top 10 ranked candidates for structured title/description/keywords" in content
         assert "Metadata agreement" in content
         assert "`org/metadata-model`" in content
 
@@ -3610,9 +3622,12 @@ class TestCleanStaleToplevelReports:
         reports_dir.mkdir()
         (tmp_path / "results.md").write_text("old")
         (reports_dir / "results.md").write_text("canonical")
+        (tmp_path / "model_selection.md").write_text("old selection")
+        (reports_dir / "model_selection.md").write_text("canonical selection")
         removed = _clean_stale_toplevel_reports(tmp_path, reports_dir)
-        assert removed == 1
+        assert removed == 2
         assert not (tmp_path / "results.md").exists()
+        assert not (tmp_path / "model_selection.md").exists()
 
     def test_keeps_file_when_no_canonical(self, tmp_path: Path) -> None:
         """Top-level file kept when reports/ copy does not exist."""

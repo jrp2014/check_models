@@ -11,8 +11,8 @@ output/
 ├── reports/                  # Human-readable report files
 │   ├── results.html          # Styled HTML report (viewable in browser)
 │   ├── results.md            # Mode-aware public run index
-│   ├── model_selection.md    # Caption and structured-metadata decision brief
-│   ├── model_gallery.md      # Evidence-only generated output gallery
+│   ├── model_selection.md    # Ranked caption/metadata shortlist
+│   ├── model_gallery.md      # Complete per-model evidence gallery
 │   ├── review.md             # Review digest grouped by owner and user bucket
 │   ├── results.tsv           # Tab-separated values table (for spreadsheets)
 │   └── diagnostics.md        # Upstream issue report (conditional)
@@ -37,10 +37,12 @@ output/
 - `reports/results.html` - Styled HTML report (viewable in browser)
 - `reports/results.md` - Mode-aware public run index. In triage mode it suppresses cataloging
   and keyword scores and points to model-selection and diagnostics artifacts.
-- `reports/model_selection.md` - Brief-caption and structured title/description/keywords
-  decision brief. Semantic rankings are labelled ungrounded unless trusted descriptive image
-  metadata is present.
-- `reports/model_gallery.md` - Evidence-only generated outputs and diagnostics per model
+- `reports/model_selection.md` - Ranked shortlist for brief-caption and structured
+  title/description/keywords decisions. This is not the complete run; it is a
+  selection aid that points to the complete gallery.
+- `reports/model_gallery.md` - Complete evidence-only record for every attempted
+  model, including generated outputs, diagnostics, timing/memory summaries, and
+  full per-model sections.
 - `reports/review.md` - Review digest grouped by owner and user bucket
 - `reports/results.tsv` - Tab-separated values table (for spreadsheets/data analysis)
 - `reports/diagnostics.md` - Upstream issue report (only generated when failures/harness issues detected)

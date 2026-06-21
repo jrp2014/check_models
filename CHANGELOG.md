@@ -35,6 +35,9 @@ Notable changes to this project will be documented in this file.
   runtime, generation throughput, token count, and peak-memory signals.
 - Keep model-generated text unprefixed in gallery summary tables while carrying
   quality and diagnostic cues in separate signal columns.
+- Clarify generated reports and user docs so `model_selection.md` is described
+  as a ranked shortlist and `model_gallery.md` as the complete per-model
+  evidence artifact.
 - Stop generated Markdown reports from re-enabling `MD013`, which could make
   later generated traceback/output lines fail the pre-push markdownlint hook.
 - Centralize generated-report markdownlint guard rule sets and document the

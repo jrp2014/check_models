@@ -2,8 +2,9 @@
 
 _Generated on 2026-06-21 01:13:25 BST_
 
-A review-friendly artifact with image metadata, the source prompt, and full
-generated output for each model.
+Complete per-model evidence artifact with image metadata, the source prompt,
+summary tables, diagnostics, and full generated output for every attempted
+model.
 
 _Action Snapshot: see [results.md](results.md) for the full summary._
 

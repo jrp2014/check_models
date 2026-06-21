@@ -1801,6 +1801,7 @@ _PUBLISHED_REPORT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
         DEFAULT_HTML_OUTPUT.name,
         DEFAULT_MD_OUTPUT.name,
         DEFAULT_GALLERY_MD_OUTPUT.name,
+        DEFAULT_MODEL_SELECTION_OUTPUT.name,
         DEFAULT_REVIEW_MD_OUTPUT.name,
         DEFAULT_TSV_OUTPUT.name,
         DEFAULT_DIAGNOSTICS_OUTPUT.name,
@@ -16200,12 +16201,24 @@ def _append_markdown_gallery_note(
     md: list[str],
     *,
     report_filename: Path,
-    gallery_filename: Path | None,
+    model_selection_filename: Path | None = None,
+    gallery_filename: Path | None = None,
     review_filename: Path | None = None,
     log_filename: Path | None = None,
 ) -> None:
     """Append companion artifact links, preferring published GitHub URLs."""
     artifact_lines: list[tuple[str, str]] = []
+    if model_selection_filename is not None:
+        model_selection_target = _markdown_artifact_target(
+            report_filename=report_filename,
+            artifact_filename=model_selection_filename,
+        )
+        artifact_lines.append(
+            (
+                "Model-selection shortlist",
+                f"[{model_selection_filename.name}]({model_selection_target})",
+            ),
+        )
     if gallery_filename is not None:
         gallery_target = _markdown_artifact_target(
             report_filename=report_filename,
@@ -16243,7 +16256,7 @@ def _append_markdown_gallery_note(
     if not artifact_lines:
         return
 
-    md.append(_markdown_emphasis("Review artifacts:"))
+    md.append(_markdown_emphasis("Companion artifacts:"))
     md.append("")
     for label, link in artifact_lines:
         _append_markdown_labeled_value(md, label=label, value=link, bullet=True)
@@ -16258,6 +16271,7 @@ def generate_markdown_report(
     total_runtime_seconds: float,
     image_path: Path | None = None,
     report_context: ReportRenderContext | None = None,
+    model_selection_filename: Path | None = None,
     gallery_filename: Path | None = None,
     review_filename: Path | None = None,
     log_filename: Path | None = None,
@@ -16272,6 +16286,7 @@ def generate_markdown_report(
         total_runtime_seconds: Total wall-clock runtime for the full run.
         image_path: Optional input image path for input-normalized resource metrics.
         report_context: Optional cached shared report context built in finalization.
+        model_selection_filename: Optional selection-brief artifact path to link from results.md.
         gallery_filename: Optional standalone gallery artifact path to link from results.md.
         review_filename: Optional automated review digest path to link from results.md.
         log_filename: Optional canonical log path to link from results.md.
@@ -16375,6 +16390,7 @@ def generate_markdown_report(
     _append_markdown_gallery_note(
         md,
         report_filename=filename,
+        model_selection_filename=model_selection_filename,
         gallery_filename=gallery_filename,
         review_filename=review_filename,
         log_filename=log_filename,
@@ -16427,8 +16443,8 @@ def generate_markdown_gallery_report(
     md.append("")
     md.extend(
         _wrap_markdown_text(
-            "A review-friendly artifact with image metadata, the source prompt, and full "
-            "generated output for each model.",
+            "Complete per-model evidence artifact with image metadata, the source prompt, "
+            "summary tables, diagnostics, and full generated output for every attempted model.",
         ),
     )
     md.append("")
@@ -16728,7 +16744,15 @@ def _build_grounded_metadata_selection_section(rows: Sequence[ModelSelectionRow]
             )
         )
 
-    parts = ["## Structured Metadata Candidates", ""]
+    parts = [
+        "## Structured Metadata Candidates",
+        "",
+        (
+            "Top 10 ranked candidates for structured title/description/keywords. "
+            "Use the gallery for complete per-model evidence."
+        ),
+        "",
+    ]
     parts.extend(
         render_report_markdown(
             (
@@ -16813,6 +16837,10 @@ def generate_model_selection_report(
         f"- Mode: {MARKDOWN_ESCAPER.escape(policy.eval_mode)}",
         (f"- Semantic rankings: {grounding} ({MARKDOWN_ESCAPER.escape(policy.selection_basis)})"),
         "- Primary use cases: brief captions; structured title/description/keywords",
+        (
+            "- Scope: ranked shortlist, not the complete run; complete per-model "
+            "outputs and diagnostics are in `model_gallery.md`."
+        ),
         "",
     ]
 
@@ -16823,7 +16851,17 @@ def generate_model_selection_report(
         diagnostics_filename=diagnostics_filename,
     )
 
-    md.extend(["## Brief Caption Candidates", ""])
+    md.extend(
+        [
+            "## Brief Caption Candidates",
+            "",
+            (
+                "Top 10 ranked candidates for brief captions. This is a selection aid, "
+                "not the complete result set."
+            ),
+            "",
+        ]
+    )
     caption_rows = [
         (
             f"`{MARKDOWN_ESCAPER.escape(row.result.model_name)}`",
@@ -25159,6 +25197,7 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
                 total_runtime_seconds=inputs.overall_time,
                 image_path=inputs.image_path,
                 report_context=inputs.report_context,
+                model_selection_filename=output_paths.model_selection,
                 gallery_filename=output_paths.gallery_markdown,
                 review_filename=output_paths.review,
                 log_filename=output_paths.log,
@@ -25352,6 +25391,7 @@ def _clean_stale_toplevel_reports(output_dir: Path, reports_dir: Path) -> int:
         "results.tsv",
         "diagnostics.md",
         "model_gallery.md",
+        "model_selection.md",
         "review.md",
     )
     removed = 0
@@ -25539,8 +25579,8 @@ def _print_reports_dashboard(
 
     add_row("HTML Report", "Interactive dashboard with charts & filters", output_paths.html)
     add_row("Markdown Report", "Mode-aware public run index", output_paths.markdown)
-    add_row("Model Selection", "Caption & metadata decision brief", output_paths.model_selection)
-    add_row("Gallery Report", "Evidence-only model outputs", output_paths.gallery_markdown)
+    add_row("Model Selection", "Ranked caption/metadata shortlist", output_paths.model_selection)
+    add_row("Gallery Report", "Complete per-model evidence", output_paths.gallery_markdown)
     add_row("Review Report", "Insights summary & checklist", output_paths.review)
     add_row("TSV Metrics", "Tab-separated raw metrics for import", output_paths.tsv)
     add_row("Run JSON", "Stable run metadata contract", output_paths.run_json)

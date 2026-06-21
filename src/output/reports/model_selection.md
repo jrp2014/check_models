@@ -5,6 +5,8 @@ _Generated on 2026-06-21 01:13:25 BST_
 - Mode: stress
 - Semantic rankings: grounded (trusted image metadata)
 - Primary use cases: brief captions; structured title/description/keywords
+- Scope: ranked shortlist, not the complete run; complete per-model outputs
+  and diagnostics are in `model_gallery.md`.
 
 ## Evidence Links
 
@@ -12,6 +14,9 @@ _Generated on 2026-06-21 01:13:25 BST_
 - _Maintainer diagnostics:_ [diagnostics.md](https://github.com/jrp2014/check_models/blob/main/src/output/reports/diagnostics.md)
 
 ## Brief Caption Candidates
+
+Top 10 ranked candidates for brief captions. This is a selection aid, not the
+complete result set.
 
 | Model                                     |   Hygiene |   Usefulness | Verdict          | Caption Preview                                                                                                                                                                      | Caveat                                                                                                                                          |
 |-------------------------------------------|-----------|--------------|------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -27,6 +32,9 @@ _Generated on 2026-06-21 01:13:25 BST_
 | `mlx-community/Qwen3-VL-2B-Instruct-bf16` |        75 |           74 | `context_budget` | [metadata-borrowing; context-budget] Title: St Peters Church Colchester ...                                                                                                          | output/prompt=0.67% \| nontext prompt burden=97% \| missing terms: exterior \| keywords=20                                                      |
 
 ## Structured Metadata Candidates
+
+Top 10 ranked candidates for structured title/description/keywords. Use the
+gallery for complete per-model evidence.
 
 | Model                                     |   Metadata agreement | Verdict          | Output Preview                                                                                                                                                                       |
 |-------------------------------------------|----------------------|------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

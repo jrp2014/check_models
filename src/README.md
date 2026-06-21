@@ -242,10 +242,11 @@ The tool generates multiple report formats in `output/` by default:
 - **HTML** (`reports/results.html`): Interactive table with sortable columns and failed row highlighting.
 - **Markdown** (`reports/results.md`): Mode-aware public run index with links to canonical
   evidence, model-selection, and review artifacts.
-- **Model Selection** (`reports/model_selection.md`): Brief-caption and structured
-  title/description/keywords decision brief.
-- **Gallery Markdown** (`reports/model_gallery.md`): Evidence-only artifact with image metadata,
-  the full prompt, and one full-output section per model.
+- **Model Selection** (`reports/model_selection.md`): Ranked shortlist for brief-caption
+  and structured title/description/keywords decisions. This is not the complete run.
+- **Gallery Markdown** (`reports/model_gallery.md`): Complete evidence-only artifact with
+  image metadata, the full prompt, summary tables, diagnostics, and one full-output
+  section for every attempted model.
 - **Review Markdown** (`reports/review.md`): Short automated digest grouped by likely owner and user-facing utility bucket.
 - **TSV/JSONL** (`reports/results.tsv`, `results.jsonl`): Machine-readable per-model formats for analysis.
 - **Run JSON** (`run.json`): Stable run-level machine contract with mode, grounding, counts, versions, and artifact paths.
@@ -1179,7 +1180,7 @@ check_models/
 │   ├── pyproject.toml       # Project configuration and dependencies
 │   ├── tools/               # Helper scripts
 │   ├── tests/               # PyTest test suite
-│   └── output/              # Generated outputs (git-ignored)
+│   └── output/              # Versioned benchmark snapshots
 │       ├── reports/
 │       │   ├── results.html
 │       │   ├── results.md
@@ -1200,7 +1201,9 @@ check_models/
 └── Makefile                 # Root orchestration
 ```
 
-**Output behaviour**: By default, outputs are written to `src/output/` (git-ignored).
+**Output behaviour**: By default, production outputs are written to `src/output/`
+and committed as public benchmark snapshots. Test and debug outputs use the
+`test_*` prefix and are git-ignored.
 Override with `--output-html`, `--output-markdown`, `--output-gallery-markdown`,
 `--output-review`, `--output-model-selection`, `--output-tsv`, `--output-jsonl`,
 `--output-run-json`, `--output-log`, `--output-env`, and `--output-diagnostics`.
@@ -1209,11 +1212,10 @@ machine-readable files (JSONL, run JSON, history) and logs remain in `output/`.
 
 - **Run index** (`reports/results.md`): public snapshot entry point. In triage mode it
   suppresses cataloging and keyword scores and points to model-selection and diagnostics artifacts.
-- **Model Selection** (`reports/model_selection.md`): brief-caption and structured metadata
-  decision brief. Semantic rankings are labelled ungrounded unless trusted descriptive image
-  metadata is present.
-- **Gallery Markdown** (`reports/model_gallery.md`): evidence-only generated outputs and
-  diagnostics per model.
+- **Model Selection** (`reports/model_selection.md`): ranked shortlist for brief-caption
+  and structured metadata decisions. It is not the complete result set.
+- **Gallery Markdown** (`reports/model_gallery.md`): complete evidence-only generated
+  outputs and diagnostics for every attempted model.
 - **Run JSON** (`run.json`): stable run-level machine contract with resolved mode, grounding
   policy, counts, versions, and artifact paths.
 
