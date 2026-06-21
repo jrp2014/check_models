@@ -1,12 +1,11 @@
 # Model Selection Brief
 
-_Generated on 2026-06-21 01:13:25 BST_
+_Generated on 2026-06-21 21:59:52 BST_
 
-- Mode: stress
-- Semantic rankings: grounded (trusted image metadata)
+- Mode: triage
+- Semantic rankings: ungrounded (ungrounded)
 - Primary use cases: brief captions; structured title/description/keywords
-- Scope: ranked shortlist, not the complete run; complete per-model outputs
-  and diagnostics are in `model_gallery.md`.
+- Scope: ranked shortlist, not the complete run; complete per-model outputs and diagnostics are in `model_gallery.md`.
 
 ## Evidence Links
 
@@ -15,36 +14,21 @@ _Generated on 2026-06-21 01:13:25 BST_
 
 ## Brief Caption Candidates
 
-Top 10 ranked candidates for brief captions. This is a selection aid, not the
-complete result set.
+Top 10 ranked candidates for brief captions. This is a selection aid, not the complete result set.
 
-| Model                                     |   Hygiene |   Usefulness | Verdict          | Caption Preview                                                                                                                                                                      | Caveat                                                                                                                                          |
-|-------------------------------------------|-----------|--------------|------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Qwen3.5-35B-A3B-bf16`      |       100 |           76 | `clean`          | Title: Stone church tower with clock and weather vane Description: A tall flint and stone church tower stands against ... [tail] a brick wall and metal fence in the foreground. ... | nontext prompt burden=97% \| missing terms: Colchester, Entrance, Essex, High Street, Path                                                      |
-| `mlx-community/GLM-4.6V-Flash-mxfp4`      |        85 |           62 | `token_cap`      | [metadata-borrowing] Title: St Peter's Church Tower ...                                                                                                                              | hit token cap (500) \| nontext prompt burden=94% \| missing terms: Colchester, Rural, exterior \| keyword duplication=85%                       |
-| `mlx-community/pixtral-12b-bf16`          |        75 |           86 | `context_budget` | [metadata-borrowing; context-budget] Title: - Church Tower with Clock ...                                                                                                            | output/prompt=2.60% \| nontext prompt burden=87% \| missing terms: Colchester, Essex, High Street, St, Peters \| keywords=19                    |
-| `mlx-community/pixtral-12b-8bit`          |        75 |           85 | `context_budget` | [metadata-borrowing; context-budget] Title: - Church Tower with Clock ...                                                                                                            | output/prompt=2.69% \| nontext prompt burden=87% \| missing terms: Colchester, Essex, High Street, St, Peters \| keywords=20                    |
-| `mlx-community/Qwen3.5-27B-mxfp8`         |        75 |           80 | `context_budget` | [metadata-borrowing; context-budget] Title: Stone church tower with clock and weather vane ...                                                                                       | output/prompt=0.59% \| nontext prompt burden=97% \| missing terms: Entrance, Essex, High Street, Rural, Tranquil \| nonvisual metadata reused   |
-| `mlx-community/GLM-4.6V-nvfp4`            |        75 |           80 | `context_budget` | [context-budget; missing-sections] <\|begin_of_box\|>Title: - Stone church tower with clock and weather vane ...                                                                     | output/prompt=1.34% \| nontext prompt burden=94% \| missing sections: title \| missing terms: Colchester, Entrance, Essex, High Street, Path    |
-| `mlx-community/Qwen3.5-35B-A3B-6bit`      |        75 |           78 | `context_budget` | [metadata-borrowing; context-budget] Title: Stone church tower with clock and weather vane Description: A flint and stone church tower stands against a blue sky with scattered c... | output/prompt=0.59% \| nontext prompt burden=97% \| missing terms: Colchester, Essex, High Street, Rural, Tranquil \| nonvisual metadata reused |
-| `mlx-community/Qwen3.5-35B-A3B-4bit`      |        75 |           74 | `clean`          | Title: Stone church tower with clock and weather vane Description: A stone church tower stands against a blue sky wit ... [tail] nd the base, with greenery visible to the left. ... | nontext prompt burden=97% \| missing terms: Colchester, Entrance, Essex, High Street, Path \| keywords=19                                       |
-| `Qwen/Qwen3-VL-2B-Instruct`               |        75 |           74 | `context_budget` | [metadata-borrowing; context-budget] Title: St Peters Church Colchester ...                                                                                                          | output/prompt=0.67% \| nontext prompt burden=97% \| missing terms: exterior \| keywords=20                                                      |
-| `mlx-community/Qwen3-VL-2B-Instruct-bf16` |        75 |           74 | `context_budget` | [metadata-borrowing; context-budget] Title: St Peters Church Colchester ...                                                                                                          | output/prompt=0.67% \| nontext prompt burden=97% \| missing terms: exterior \| keywords=20                                                      |
+| Model                                              |   Hygiene |   Usefulness | Verdict   | Caption Preview                                                                                                                                                                     | Caveat                    |
+|----------------------------------------------------|-----------|--------------|-----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------|
+| `qnguyen3/nanoLLaVA`                               |       100 |           96 | `clean`   | This image features two cats lying on a couch. One cat is a light brown and the other is a dark brown. They both have green eyes and a black nose.                                  | nontext prompt burden=73% |
+| `mlx-community/GLM-4.6V-Flash-mxfp4`               |       100 |           96 | `clean`   | This image shows two tabby cats resting on a bright pink couch. One cat lies on its side, while the other is curled w ... [tail] Two remote controls are also visible on the couch. | nontext prompt burden=99% |
+| `mlx-community/gemma-4-31b-it-4bit`                |       100 |           96 | `clean`   | Two tabby cats are sleeping on a bright pink blanket on a red couch, with two remote controls lying next to them.                                                                   | nontext prompt burden=98% |
+| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit` |       100 |           96 | `clean`   | The image shows two tabby cats lying on a pink blanket, with two remote controls placed on the couch behind them.                                                                   | nontext prompt burden=62% |
+| `mlx-community/Qwen3.5-27B-mxfp8`                  |       100 |           96 | `clean`   | Two tabby cats are sleeping on a bright pink couch. One cat is stretched out on its side, while the other is curled up nearby. Two remote controls lie on the couch between them.   | nontext prompt burden=98% |
+| `mlx-community/gemma-4-31b-bf16`                   |       100 |           96 | `clean`   | Both cats are sleeping on a pink blanket. The difference between these images is that one cat is on the left side of the blanket and the other is on the right side.                | nontext prompt burden=98% |
+| `mlx-community/gemma-4-26b-a4b-it-4bit`            |       100 |           95 | `clean`   | Two tabby cats are lying on a pink blanket on a red couch, with a remote control next to each cat.                                                                                  | nontext prompt burden=98% |
+| `mlx-community/MiniCPM-V-4.6-8bit`                 |       100 |           93 | `clean`   | The image shows two cats lying on a pink blanket. There are remote controls on the blanket as well.                                                                                 | nontext prompt burden=97% |
+| `mlx-community/diffusiongemma-26B-A4B-it-mxfp8`    |       100 |           92 | `clean`   | Two high-angle tabby cats are sleeping on a pink blanket next to two remote controls.                                                                                               | nontext prompt burden=98% |
+| `mlx-community/Phi-3.5-vision-instruct-bf16`       |       100 |           92 | `clean`   | Two cats are sleeping on a pink couch with remote controls beside them.                                                                                                             | nontext prompt burden=99% |
 
 ## Structured Metadata Candidates
 
-Top 10 ranked candidates for structured title/description/keywords. Use the
-gallery for complete per-model evidence.
-
-| Model                                     |   Metadata agreement | Verdict          | Output Preview                                                                                                                                                                       |
-|-------------------------------------------|----------------------|------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Qwen3.5-35B-A3B-bf16`      |                   31 | `clean`          | Title: Stone church tower with clock and weather vane Description: A tall flint and stone church tower stands against ... [tail] a brick wall and metal fence in the foreground. ... |
-| `mlx-community/GLM-4.6V-Flash-mxfp4`      |                   23 | `token_cap`      | [metadata-borrowing] Title: St Peter's Church Tower ...                                                                                                                              |
-| `mlx-community/pixtral-12b-bf16`          |                   10 | `context_budget` | [metadata-borrowing; context-budget] Title: - Church Tower with Clock ...                                                                                                            |
-| `mlx-community/pixtral-12b-8bit`          |                   10 | `context_budget` | [metadata-borrowing; context-budget] Title: - Church Tower with Clock ...                                                                                                            |
-| `mlx-community/Qwen3.5-27B-mxfp8`         |                   20 | `context_budget` | [metadata-borrowing; context-budget] Title: Stone church tower with clock and weather vane ...                                                                                       |
-| `mlx-community/GLM-4.6V-nvfp4`            |                   21 | `context_budget` | [context-budget; missing-sections] <\|begin_of_box\|>Title: - Stone church tower with clock and weather vane ...                                                                     |
-| `mlx-community/Qwen3.5-35B-A3B-6bit`      |                   22 | `context_budget` | [metadata-borrowing; context-budget] Title: Stone church tower with clock and weather vane Description: A flint and stone church tower stands against a blue sky with scattered c... |
-| `mlx-community/Qwen3.5-35B-A3B-4bit`      |                   29 | `clean`          | Title: Stone church tower with clock and weather vane Description: A stone church tower stands against a blue sky wit ... [tail] nd the base, with greenery visible to the left. ... |
-| `Qwen/Qwen3-VL-2B-Instruct`               |                   14 | `context_budget` | [metadata-borrowing; context-budget] Title: St Peters Church Colchester ...                                                                                                          |
-| `mlx-community/Qwen3-VL-2B-Instruct-bf16` |                   14 | `context_budget` | [metadata-borrowing; context-budget] Title: St Peters Church Colchester ...                                                                                                          |
+Structured metadata scoring is suppressed in triage mode.

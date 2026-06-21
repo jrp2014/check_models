@@ -2,15 +2,15 @@
   "environment": {
     "library_versions": {
       "Pillow": "12.2.0",
-      "huggingface-hub": "1.18.0",
-      "mlx": "0.32.0.dev20260606+8f0e8b14",
+      "huggingface-hub": "1.20.1",
+      "mlx": "0.32.0.dev20260621+602b5359",
       "mlx-audio": "0.4.4",
       "mlx-lm": "0.31.3",
       "mlx-metal": null,
-      "mlx-vlm": "0.6.2",
+      "mlx-vlm": "0.6.3",
       "numpy": "2.4.6",
       "tokenizers": "0.22.2",
-      "transformers": "5.10.2"
+      "transformers": "5.12.1"
     },
     "platform": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
     "preflight_issues": [],
@@ -25,8 +25,8 @@
       "MLX Core Extension": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so",
       "MLX Distribution Root": "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
       "MLX Install Type": "editable local source",
-      "MLX Metallib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (157,751,704 bytes, sha256=e50cd0c2d2ae16781f644476459cbc2ca23b0d428a897140740f86678b5e2bf5)",
-      "MLX libmlx.dylib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,675,136 bytes, sha256=8084f4df1833f78e6598f28ff40818d3c7a73343ced3f3c416b192f2292ad933)",
+      "MLX Metallib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (157,739,544 bytes, sha256=d7cb97dee8940843711ef5df4ff68b80a6e02f98bbd9e085c6794183655c94d1)",
+      "MLX libmlx.dylib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,692,192 bytes, sha256=0ea19d7411248e6b2d303609a783557122605c277250a48a66479cc921548aac)",
       "Metal Compiler Version": "Apple metal version 32023.883 (metalfe-32023.883)",
       "Metal SDK": "MacOSX26.5.sdk",
       "Metal Support": "Metal 4",
@@ -53,7 +53,7 @@
     "traceback": null,
     "type": null
   },
-  "generated_at_utc": "2026-06-06T19:51:24+00:00",
+  "generated_at_utc": "2026-06-21T20:59:53+00:00",
   "issue_cluster_id": "mlx-vlm_encoding_001",
   "model": "mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
   "repro": {
@@ -65,23 +65,22 @@
       "dry_run": false,
       "enable_thinking": false,
       "eos_tokens": null,
-      "eval_mode": "stress",
-      "exclude": [
-        "mlx-community/Qwen3-VL-2B-Thinking-bf16",
-        "Qwen/Qwen3-VL-2B-Instruct",
-        "mlx-community/Qwen3-VL-2B-Instruct-bf16"
-      ],
-      "folder": "/Users/jrp/Pictures/Processed",
+      "eval_mode": "triage",
+      "exclude": null,
+      "folder": null,
       "force_color": false,
       "force_download": false,
-      "image": null,
+      "frequency_context_size": 20,
+      "frequency_penalty": null,
+      "image": "../../mlx-vlm/examples/images/cats.jpg",
       "kv_bits": null,
       "kv_group_size": 64,
       "kv_quant_scheme": "uniform",
       "lazy_load": false,
       "link_style": "github",
+      "logit_bias": null,
       "max_kv_size": null,
-      "max_tokens": 500,
+      "max_tokens": 200,
       "min_p": 0.0,
       "models": null,
       "no_color": false,
@@ -93,9 +92,13 @@
       "output_jsonl": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.jsonl",
       "output_log": "/Users/jrp/Documents/AI/mlx/check_models/src/output/check_models.log",
       "output_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.md",
+      "output_model_selection": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/model_selection.md",
       "output_review": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/review.md",
+      "output_run_json": "/Users/jrp/Documents/AI/mlx/check_models/src/output/run.json",
       "output_tsv": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.tsv",
       "prefill_step_size": 4096,
+      "presence_context_size": 20,
+      "presence_penalty": null,
       "processor_kwargs": null,
       "prompt": null,
       "prune_repro_days": 90,
@@ -107,6 +110,7 @@
       "rerun_triage": false,
       "resize_shape": null,
       "revision": null,
+      "seed": null,
       "skip_special_tokens": false,
       "temperature": 0.0,
       "thinking_budget": null,
@@ -119,13 +123,13 @@
       "verbose": true,
       "width": null
     },
-    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260525-164635_DSC00024.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
+    "cluster_repro_command": "python -m check_models --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
     "env_vars": {
       "TOKENIZERS_PARALLELISM": "false"
     },
-    "image_path": "/Users/jrp/Pictures/Processed/20260525-164635_DSC00024.jpg",
-    "image_ref_sha256": "4b820385c467500a73237172e63ef4c00aa3c057fb287c78f88dd6205cb296c6",
-    "image_sha256": "458d7668c048f9e41ae06272ae1251faa40b7ecafe85b50b00d501bf2b0bdde9",
+    "image_path": "/Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg",
+    "image_ref_sha256": "9bc422400088c31c0accf7fb023ee29945d47640042565218c1c33f78694f204",
+    "image_sha256": "dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e",
     "prompt_diagnostics": {
       "eos_token": "</s>",
       "eos_token_id": 2,
@@ -134,7 +138,7 @@
         "kv_group_size": 64,
         "kv_quant_scheme": "uniform",
         "max_kv_size": null,
-        "max_tokens": 500,
+        "max_tokens": 200,
         "prefill_step_size": 4096,
         "quantized_kv_start": 5000,
         "repetition_context_size": 20,
@@ -145,9 +149,9 @@
       "image_placeholder_count": 0,
       "model_type": "mistral3",
       "processor_class": "mlx_vlm.models.mistral3.processing_mistral3.Mistral3Processor",
-      "rendered_prompt_chars": 1778,
-      "rendered_prompt_hash_sha256": "5737c39b9a6ba926abaef516d4ee5d96d95b3151ad4b5c3764b801f31bed6d71",
-      "rendered_prompt_preview": "<s>[INST][IMG]Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences describ...",
+      "rendered_prompt_chars": 49,
+      "rendered_prompt_hash_sha256": "8d085e929cf99abed8b8058dc9ad06d6cd2f67a8c0e76e0a42d895a2f288750c",
+      "rendered_prompt_preview": "<s>[INST][IMG]Describe this image briefly.[/INST]",
       "special_token_ids": [
         1,
         2,
@@ -218,38 +222,36 @@
       ],
       "tokenizer_class": "transformers.tokenization_utils_tokenizers.TokenizersBackend"
     },
-    "prompt_hash_sha256": "0f2ddbf3e21a6c5498f72a4053f4901ed8c4fbe850fadaede50009e717784fb3",
-    "prompt_preview": "Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct any...",
-    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260525-164635_DSC00024.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
+    "prompt_hash_sha256": "d760336d0fd143932f194573dd63f6b531e0ffbc2c4f1595e015392a3471c318",
+    "prompt_preview": "Describe this image briefly.",
+    "rerun_command": "python -m check_models --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit",
     "seed": null
   },
   "result": {
-    "generated_text_preview": "Title:\u010aPerson\u0120riding\u0120a\u0120jet\u0120ski\u0120on\u0120water\u010a\u010aDescription:\u010aA\u0120person\u0120wearing\u0120a\u0120black\u0120wetsuit\u0120and\u0120gloves\u0120is\u0120riding\u0120a\u0120green\u0120and\u0120black\u0120jet\u0120ski\u0120on\u0120choppy\u0120water,\u0120with\u0120one\u0120arm\u0120raised\u0120in\u0120celebration.\u010a\u010aKeywords:\u010ajet\u0120ski,\u0120water,\u0120person,\u0120wetsuit,\u0120gloves,\u0120green,\u0120black,\u0120choppy\u0120water,\u0120outdoor,\u0120action,\u0120sports,\u0120watercraft,\u0120celebration,\u0120motion,\u0120waves",
+    "generated_text_preview": "The\u0120image\u0120features\u0120two\u0120cats\u0120lying\u0120on\u0120a\u0120pink\u0120surface,\u0120possibly\u0120a\u0120blanket\u0120or\u0120a\u0120couch.\u0120The\u0120cat\u0120on\u0120the\u0120left\u0120is\u0120a\u0120kitten,\u0120and\u0120the\u0120one\u0120on\u0120the\u0120right\u0120is\u0120an\u0120adult\u0120cat.\u0120Both\u0120cats\u0120are\u0120in\u0120relaxed\u0120postures,\u0120with\u0120the\u0120kitten\u0120lying\u0120on\u0120its\u0120side\u0120and\u0120the\u0120adult\u0120cat\u0120lying\u0120on\u0120its\u0120back.\u0120There\u0120are\u0120two\u0120remote\u0120controls\u0120placed\u0120near\u0120the\u0120cats,\u0120one\u0120closer\u0120to\u0120the\u0120kitten\u0120and\u0120the\u0120other\u0120closer\u0120to\u0120the\u0120adult\u0120cat.",
     "maintainer_triage": {
       "confidence": "high",
       "evidence": [
         "harness:encoding"
       ],
       "harness_details": [
-        "token_encoding:bpe_space_leak(46)"
+        "token_encoding:bpe_space_leak(76)"
       ],
       "hit_max_tokens": false,
       "issue_kind": "harness",
       "issue_subtype": "encoding",
       "next_action": "Inspect decode cleanup; tokenizer markers are leaking into user-facing text.",
-      "nontext_prompt_ratio": 0.8578313253012049,
-      "prompt_output_ratio": 0.0321285140562249,
-      "prompt_tokens_total": 2490,
-      "requested_max_tokens": 500,
+      "nontext_prompt_ratio": 0.9856115107913669,
+      "prompt_output_ratio": 0.2158273381294964,
+      "prompt_tokens_total": 417,
+      "requested_max_tokens": 200,
       "stop_reason": "completed",
-      "summary": "Tokenizer space-marker artifacts (for example \u0120) appeared in output (about 46 occurrences). | nontext prompt burden=86% | missing sections: description, keywords",
+      "summary": "Tokenizer space-marker artifacts (for example \u0120) appeared in output (about 76 occurrences). | nontext prompt burden=99%",
       "suspected_owner": "mlx-vlm",
       "user_bucket": "avoid"
     },
     "quality_issues": [
-      "\u26a0\ufe0fharness(encoding)",
-      "missing-sections(description+keywords)",
-      "title-length(51)"
+      "\u26a0\ufe0fharness(encoding)"
     ],
     "success": true
   },
