@@ -25,6 +25,9 @@ Notable changes to this project will be documented in this file.
 - Drop the redundant all-fields CLI performance table from final summaries so
   `check_models.log` keeps the readable highlights, compact comparison, charts,
   and diagnostics without the narrow wrapped table.
+- Limit the main Markdown `results.md` table to decision-facing performance and
+  diagnostic columns, leaving exhaustive upstream/debug fields in TSV and JSONL
+  artifacts.
 - Redirect E2E smoke-test model-selection and run-summary artifacts into the
   test temp directory so validation no longer dirties tracked benchmark output.
 - Document the validation artifact-hygiene rule across agent guidance, CI, and
@@ -38,6 +41,8 @@ Notable changes to this project will be documented in this file.
 - Trim generated GitHub issue drafts to compact upstream-facing sections focused
   on affected models, minimal evidence, native `mlx-vlm` repro commands,
   acceptance checks, environment details, and detailed evidence.
+- Keep diagnostics hard-failure sections and issue traceback tails focused on
+  upstream frames instead of local `check_models.py` wrapper traces.
 - Add issue-style quality summaries and package/runtime stamps to the Markdown
   gallery report so full-run model output reviews are easier to paste into
   GitHub issues.

@@ -35,61 +35,20 @@ Each row is intended to become one focused upstream GitHub issue.
 **Observed error:**
 
 ```text
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 19044, in _run_model_generation
-    model, processor, config = _load_model(params)
-                               ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 18433, in _load_model
-    model, processor = load(
-                       ~~~~^
-        path_or_hf_repo=params.model_identifier,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<5 lines>...
-        quantize_activations=params.quantize_activations,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 933, in _typed_mlx_vlm_load
-    loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
-                                               ~~~~~~~~~~~~~^
-        path_or_hf_repo=path_or_hf_repo,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<5 lines>...
-        **kwargs,
-        ^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 783, in load
-    model = load_model(model_path, lazy, strict=strict, **kwargs)
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 659, in load_model
-    model.load_weights(list(weights.items()), strict=strict)
+Model loading failed: Missing 2 parameters:
+multi_modal_projector.layer_norm.bias,
+multi_modal_projector.layer_norm.weight.
+```
+
+**Relevant upstream traceback:**
+
+```text
     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py", line 191, in load_weights
     raise ValueError(f"Missing {num_missing} parameters: \n{missing}.")
-ValueError: Missing 2 parameters: 
+ValueError: Missing 2 parameters:
 multi_modal_projector.layer_norm.bias,
 multi_modal_projector.layer_norm.weight.
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 19285, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        phase_timer=phase_timer,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 19059, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
-ValueError: Model loading failed: Missing 2 parameters: 
-multi_modal_projector.layer_norm.bias,
-multi_modal_projector.layer_norm.weight.
-
 ```
 
 <!-- markdownlint-disable MD060 -->
@@ -111,57 +70,18 @@ multi_modal_projector.layer_norm.weight.
 **Observed error:**
 
 ```text
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 19044, in _run_model_generation
-    model, processor, config = _load_model(params)
-                               ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 18433, in _load_model
-    model, processor = load(
-                       ~~~~^
-        path_or_hf_repo=params.model_identifier,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<5 lines>...
-        quantize_activations=params.quantize_activations,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 933, in _typed_mlx_vlm_load
-    loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
-                                               ~~~~~~~~~~~~~^
-        path_or_hf_repo=path_or_hf_repo,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<5 lines>...
-        **kwargs,
-        ^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 783, in load
-    model = load_model(model_path, lazy, strict=strict, **kwargs)
+Model loading failed: property 'eos_token_id' of 'ModelConfig' object has no setter
+```
+
+**Relevant upstream traceback:**
+
+```text
   File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 534, in load_model
     model_config = apply_generation_config_defaults(model_config, config)
   File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 69, in apply_generation_config_defaults
     setattr(model_config, key, config[key])
     ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 AttributeError: property 'eos_token_id' of 'ModelConfig' object has no setter
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 19285, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        phase_timer=phase_timer,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 19059, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
-ValueError: Model loading failed: property 'eos_token_id' of 'ModelConfig' object has no setter
-
 ```
 
 <!-- markdownlint-disable MD060 -->

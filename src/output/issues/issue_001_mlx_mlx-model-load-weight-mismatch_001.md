@@ -164,11 +164,10 @@ multi_modal_projector.layer_norm.weight.
 Traceback tail:
 
 ```text
-multi_modal_projector.layer_norm.weight.
-The above exception was the direct cause of the following exception:
-Traceback (most recent call last):
-ValueError: Model loading failed: Missing 2 parameters: 
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py", line 191, in load_weights
+    raise ValueError(f"Missing {num_missing} parameters: \n{missing}.")
+ValueError: Missing 2 parameters:
 multi_modal_projector.layer_norm.bias,
 multi_modal_projector.layer_norm.weight.
 ```
-

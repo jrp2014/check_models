@@ -160,11 +160,10 @@ builtins.AttributeError: property 'eos_token_id' of 'ModelConfig' object has no 
 Traceback tail:
 
 ```text
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 534, in load_model
+    model_config = apply_generation_config_defaults(model_config, config)
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 69, in apply_generation_config_defaults
     setattr(model_config, key, config[key])
     ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 AttributeError: property 'eos_token_id' of 'ModelConfig' object has no setter
-The above exception was the direct cause of the following exception:
-Traceback (most recent call last):
-ValueError: Model loading failed: property 'eos_token_id' of 'ModelConfig' object has no setter
 ```
-

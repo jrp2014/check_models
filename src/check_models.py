@@ -3226,6 +3226,20 @@ PERFORMANCE_TIMING_FIELDS: Final[list[str]] = [
     if field
     in {"generation_time", "model_load_time", "total_time", "quality_issues", "error_package"}
 ]
+MARKDOWN_SUMMARY_TABLE_FIELDS: Final[tuple[str, ...]] = (
+    "model_name",
+    "prompt_tokens",
+    "generation_tokens",
+    "total_tokens",
+    "generation_tps",
+    "peak_memory",
+    "finish_reason",
+    "generation_time",
+    "model_load_time",
+    "total_time",
+    "quality_issues",
+    "error_package",
+)
 
 
 # =============================================================================
@@ -12696,6 +12710,11 @@ def _begin_diagnostics_section(
 _LOCAL_RUNNER_TRACEBACK_FRAME_RE: Final[re.Pattern[str]] = re.compile(
     r'^\s*File ".*(?:^|/)check_models\.py", line \d+, in ',
 )
+_TRACEBACK_CHAIN_SEPARATOR_RE: Final[re.Pattern[str]] = re.compile(
+    r"^(?:The above exception was the direct cause of the following exception:"
+    r"|During handling of the above exception, another exception occurred:)$",
+)
+_TRACEBACK_FILE_FRAME_RE: Final[re.Pattern[str]] = re.compile(r'^\s*File "')
 
 
 def _normalize_traceback_for_report(traceback_str: str | None) -> str | None:
@@ -12732,7 +12751,34 @@ def _format_traceback_tail(traceback_str: str | None) -> str | None:
     normalized = _normalize_traceback_for_report(traceback_str)
     if normalized is None:
         return None
-    lines = [ln for ln in normalized.splitlines() if ln.strip()]
+
+    segments: list[list[str]] = []
+    current_segment: list[str] = []
+    for line in normalized.splitlines():
+        if _TRACEBACK_CHAIN_SEPARATOR_RE.match(line.strip()):
+            if current_segment:
+                segments.append(current_segment)
+            current_segment = []
+            continue
+        current_segment.append(line)
+    if current_segment:
+        segments.append(current_segment)
+
+    nonblank_segments = [
+        [ln for ln in segment if ln.strip()]
+        for segment in segments
+        if any(ln.strip() for ln in segment)
+    ]
+    upstream_segments = [
+        segment
+        for segment in nonblank_segments
+        if any(_TRACEBACK_FILE_FRAME_RE.match(ln) for ln in segment)
+    ]
+    lines = (
+        upstream_segments[0]
+        if upstream_segments
+        else [ln for ln in normalized.splitlines() if ln.strip()]
+    )
     if not lines:
         return None
     tail = lines[-DIAGNOSTICS.traceback_tail_lines :]
@@ -14048,6 +14094,26 @@ def _build_cluster_filing_guidance(
     ]
 
 
+def _append_diagnostics_failure_error_block(
+    parts: list[str],
+    result: PerformanceResult,
+) -> None:
+    """Append a concise failure summary and upstream traceback evidence."""
+    observed_error = result.error_message or result.root_error_message
+    traceback_tail = _format_traceback_tail(result.error_traceback)
+
+    parts.append("**Observed error:**")
+    _append_markdown_code_block(
+        parts,
+        observed_error or traceback_tail or "Unknown runtime failure.",
+        language="text",
+    )
+
+    if traceback_tail and observed_error:
+        parts.append("**Relevant upstream traceback:**")
+        _append_markdown_code_block(parts, traceback_tail, language="text")
+
+
 def _diagnostics_failure_clusters(
     failure_clusters: list[tuple[str, list[PerformanceResult]]],
     *,
@@ -14072,12 +14138,7 @@ def _diagnostics_failure_clusters(
             parts.append(f"**Affected models:** {models_text}")
             parts.append("")
 
-        parts.append("**Observed error:**")
-        _append_markdown_code_block(
-            parts,
-            rep.error_traceback or rep.error_message or "Unknown runtime failure.",
-            language="text",
-        )
+        _append_diagnostics_failure_error_block(parts, rep)
 
         # Maintainer-facing table (human-readable, no local diagnostic codes).
         table_rows: list[tuple[str, ...]] = []
@@ -16066,6 +16127,8 @@ def generate_html_report(
 def _process_markdown_rows(
     rows: list[list[str]],
     sorted_results: Sequence[PerformanceResult],
+    *,
+    field_names: Sequence[str],
 ) -> None:
     """Process table rows for Markdown: escape content and format model names."""
     for i in range(len(rows)):
@@ -16073,17 +16136,30 @@ def _process_markdown_rows(
         if rows[i][0]:
             rows[i][0] = f"`{rows[i][0]}`"
 
-        last_col_idx = len(rows[i]) - 1
-        if last_col_idx < 0:
-            continue
-        # If corresponding result failed, treat as diagnostics and escape more aggressively
         is_failure = i < len(sorted_results) and not sorted_results[i].success
-        if is_failure:
-            rows[i][last_col_idx] = DIAGNOSTICS_ESCAPER.escape(rows[i][last_col_idx])
-        else:
-            # Minimal structural escaping only (protect pipes/HTML-like tags, preserve output
-            # as-is otherwise)
-            rows[i][last_col_idx] = MARKDOWN_ESCAPER.escape(rows[i][last_col_idx])
+        for column_index, field_name in enumerate(field_names[1:], start=1):
+            if column_index >= len(rows[i]) or is_numeric_field(field_name):
+                continue
+            escaper = DIAGNOSTICS_ESCAPER if is_failure else MARKDOWN_ESCAPER
+            rows[i][column_index] = escaper.escape(rows[i][column_index])
+
+
+def _filter_table_columns(
+    *,
+    headers: list[str],
+    rows: list[list[str]],
+    field_names: list[str],
+    allowed_fields: Sequence[str],
+) -> None:
+    """Mutate table data to retain only the requested field names."""
+    index_by_field = {field_name: index for index, field_name in enumerate(field_names)}
+    keep_indexes = [
+        index_by_field[field_name] for field_name in allowed_fields if field_name in index_by_field
+    ]
+    headers[:] = [headers[index] for index in keep_indexes]
+    field_names[:] = [field_names[index] for index in keep_indexes]
+    for row_index, row in enumerate(rows):
+        rows[row_index] = [row[index] for index in keep_indexes if index < len(row)]
 
 
 def _generate_model_gallery_section(
@@ -16147,33 +16223,27 @@ def _generate_model_gallery_section(
 def _generate_markdown_table_section(report_context: ReportRenderContext) -> list[str]:
     """Generate the metrics table section for the Markdown report."""
     headers, rows, field_names = _materialize_prepared_table_data(report_context.table_data)
+    _filter_table_columns(
+        headers=headers,
+        rows=rows,
+        field_names=field_names,
+        allowed_fields=MARKDOWN_SUMMARY_TABLE_FIELDS,
+    )
 
     # For Markdown, we need to process headers to remove HTML breaks and use simpler formatting
     markdown_headers: list[str] = []
-
-    # Remove "Output" column from table data for Markdown report
-    # We will show it in a separate "Model Gallery" section instead
-    output_col_idx = -1
-    if "output" in field_names:
-        output_col_idx = field_names.index("output")
-        headers.pop(output_col_idx)
-        # We don't pop from field_names yet as we might need it for alignment,
-        # but we must remove it from rows
-        for row in rows:
-            if len(row) > output_col_idx:
-                row.pop(output_col_idx)
-        # Now remove from field_names
-        field_names.pop(output_col_idx)
 
     for header in headers:
         # Replace <br> with space for Markdown compatibility
         clean_header = header.replace("<br>", " ")
         markdown_headers.append(clean_header)
 
-    # Escape Markdown only for diagnostics (failed rows). Keep successful model output
-    # unchanged. This preserves model formatting (including *, _, `, etc.) while
-    # avoiding table breakage from diagnostics.
-    _process_markdown_rows(rows, report_context.result_set.results)
+    # Escape textual cells after filtering so summary values cannot break pipe tables.
+    _process_markdown_rows(
+        rows,
+        report_context.result_set.results,
+        field_names=field_names,
+    )
 
     colalign = ["left"] + [
         "right" if is_numeric_field(field_name) else "left" for field_name in field_names[1:]
@@ -16189,6 +16259,14 @@ def _generate_markdown_table_section(report_context: ReportRenderContext) -> lis
     markdown_table = normalize_markdown_trailing_spaces(markdown_table)
 
     md: list[str] = []
+    md.extend(
+        _wrap_markdown_text(
+            "_Detailed machine-readable metrics remain in `results.tsv` and "
+            "`results.jsonl`; this Markdown table keeps the high-signal columns "
+            "for human review._",
+        ),
+    )
+    md.append("")
     # Surround the table with markdownlint rule guards; the table can be wide and may
     # contain HTML breaks and model-generated emphasis styles
     md.append(f"<!-- markdownlint-disable {MARKDOWNLINT_MAIN_TABLE_RULES} -->")

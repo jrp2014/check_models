@@ -73,6 +73,35 @@ class _MockGeneration:
     cache_memory: float | None = None
 
 
+@dataclass
+class _VerboseGeneration:
+    """GenerationResult-like stand-in with upstream debug fields."""
+
+    text: str | None = "output"
+    token: object | None = None
+    logprobs: object | None = None
+    prompt_tokens: int | None = 10
+    generation_tokens: int | None = 5
+    total_tokens: int | None = 15
+    prompt_tps: float | None = 1200.0
+    generation_tps: float | None = 80.0
+    peak_memory: float | None = 4.5
+    cached_tokens: int | None = 0
+    finish_reason: str | None = "stop"
+    diffusion_canvas_tokens: int | None = 0
+    diffusion_denoising_steps: int | None = 0
+    diffusion_work_tokens: int | None = 0
+    diffusion_canvas_tps: float | None = 0.0
+    diffusion_work_tps: float | None = 0.0
+    is_draft: bool = False
+    draft_text: str | None = None
+    text_already_printed: bool = False
+    diffusion_step: int | None = 0
+    diffusion_total_steps: int | None = 0
+    diffusion_canvas_index: int | None = 0
+    diffusion_block_complete: bool = False
+
+
 def _stub_versions() -> LibraryVersionDict:
     return {
         "numpy": "1.0",
@@ -648,6 +677,74 @@ class TestMarkdownReportEdgeCases:
         assert "<!-- markdownlint-disable MD033 MD034 MD037 MD049 -->" in content
         assert "<!-- markdownlint-enable MD033 MD034 MD037 MD049 -->" in content
         assert "<!-- markdownlint-enable MD013" not in content
+
+    def test_markdown_results_table_uses_human_summary_columns(self, tmp_path: Path) -> None:
+        """Main Markdown table should omit low-signal upstream debug columns."""
+        out = tmp_path / "compact.md"
+        result = PerformanceResult(
+            model_name="org/verbose",
+            success=True,
+            generation=_VerboseGeneration(),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+        )
+
+        generate_markdown_report(
+            results=[result],
+            filename=out,
+            versions=_stub_versions(),
+            prompt="describe",
+            total_runtime_seconds=1.0,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        table = content.split("<!-- markdownlint-disable MD033 MD034 MD037 MD049 -->", 1)[1].split(
+            "<!-- markdownlint-enable MD033 MD034 MD037 MD049 -->", 1
+        )[0]
+        expected_headers = (
+            "Model Name",
+            "Prompt (tokens)",
+            "Generation (tokens)",
+            "Total Tokens",
+            "Gen TPS",
+            "Peak (GB)",
+            "Finish Reason",
+            "Generation (s)",
+            "Load (s)",
+            "Total (s)",
+            "Quality Issues",
+            "Error Package",
+        )
+        header_line = next(line for line in table.splitlines() if line.startswith("| Model Name"))
+        header_cells = [cell.strip() for cell in header_line.strip().strip("|").split("|")]
+
+        assert header_cells == list(expected_headers)
+
+        for expected in expected_headers:
+            assert expected in table
+
+        for omitted in (
+            "Prompt Tps",
+            "Cached Tokens",
+            "Diffusion Canvas Tokens",
+            "Diffusion Denoising Steps",
+            "Diffusion Work Tokens",
+            "Diffusion Canvas Tps",
+            "Diffusion Work Tps",
+            "Is Draft",
+            "Draft Text",
+            "Text Already Printed",
+            "Diffusion Step",
+            "Diffusion Total Steps",
+            "Diffusion Canvas Index",
+            "Diffusion Block Complete",
+        ):
+            assert omitted not in table
+
+        assert "Detailed machine-readable metrics remain" in content
+        assert "`results.tsv`" in content
+        assert "`results.jsonl`" in content
 
     def test_markdown_report_includes_peak_delta_per_megapixel(
         self,
@@ -1975,6 +2072,56 @@ class TestDiagnosticsReport:
         assert "\x1b[" not in content
         assert "\r" not in content
         assert "`org/m`" in content
+
+    def test_failure_section_uses_upstream_traceback_not_local_wrappers(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Failure sections should surface upstream stack frames before harness wrappers."""
+        traceback_text = (
+            "Traceback (most recent call last):\n"
+            '  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", '
+            "line 19044, in _run_model_generation\n"
+            "    model, processor, config = _load_model(params)\n"
+            '  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", '
+            "line 534, in load_model\n"
+            "    model_config = apply_generation_config_defaults(model_config, config)\n"
+            '  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", '
+            "line 69, in apply_generation_config_defaults\n"
+            "    setattr(model_config, key, config[key])\n"
+            "AttributeError: property 'eos_token_id' of 'ModelConfig' object has no setter\n"
+        )
+        out = tmp_path / "diag.md"
+
+        generate_diagnostics_report(
+            results=[
+                _make_failure_with_details(
+                    "org/upstream-fail",
+                    error_msg=(
+                        "Model loading failed: property 'eos_token_id' of "
+                        "'ModelConfig' object has no setter"
+                    ),
+                    traceback_str=traceback_text,
+                ),
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+
+        content = out.read_text(encoding="utf-8")
+        failure_section = _extract_markdown_subsection(
+            content,
+            "## 1. Failure affecting 1 model",
+            end_headings=["<!-- markdownlint-disable MD060 -->"],
+        )
+        assert "**Observed error:**" in failure_section
+        assert "**Relevant upstream traceback:**" in failure_section
+        assert "mlx_vlm/utils.py" in failure_section
+        assert "AttributeError: property 'eos_token_id'" in failure_section
+        assert "check_models/src/check_models.py" not in failure_section
+        assert "_run_model_generation" not in failure_section
 
     def test_history_context_includes_regressions_recoveries_and_repro(
         self,
@@ -3518,6 +3665,42 @@ class TestFormatTracebackTail:
         result = _format_traceback_tail(tb)
         assert result is not None
         assert "ValueError: bad" in result
+
+    def test_chained_exception_prefers_upstream_traceback_segment(self) -> None:
+        """Wrapped local failures should not hide the upstream root traceback."""
+        tb = (
+            "Traceback (most recent call last):\n"
+            '  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", '
+            "line 19044, in _run_model_generation\n"
+            "    model, processor, config = _load_model(params)\n"
+            '  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", '
+            "line 534, in load_model\n"
+            "    model_config = apply_generation_config_defaults(model_config, config)\n"
+            '  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", '
+            "line 69, in apply_generation_config_defaults\n"
+            "    setattr(model_config, key, config[key])\n"
+            "AttributeError: property 'eos_token_id' of 'ModelConfig' object has no setter\n"
+            "\n"
+            "The above exception was the direct cause of the following exception:\n"
+            "\n"
+            "Traceback (most recent call last):\n"
+            '  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", '
+            "line 19285, in process_image_with_model\n"
+            "    output = _run_model_generation(params=params)\n"
+            '  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", '
+            "line 19059, in _run_model_generation\n"
+            "    raise ValueError(error_details) from load_err\n"
+            "ValueError: Model loading failed: property 'eos_token_id' of "
+            "'ModelConfig' object has no setter\n"
+        )
+
+        result = _format_traceback_tail(tb)
+
+        assert result is not None
+        assert "mlx_vlm/utils.py" in result
+        assert "AttributeError: property 'eos_token_id'" in result
+        assert "Model loading failed" not in result
+        assert "check_models/src/check_models.py" not in result
 
 
 class TestDiagnosticsContextBuilder:
