@@ -2,19 +2,19 @@ name: Dependency Sync Guard
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [main]
     paths:
-      - 'src/pyproject.toml'
-      - 'src/README.md'
-      - 'src/tools/update_readme_deps.py'
-      - '.github/workflows/dependency-sync.yml'
+      - "src/pyproject.toml"
+      - "src/README.md"
+      - "src/tools/update_readme_deps.py"
+      - ".github/workflows/dependency-sync.yml"
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
-      - 'src/pyproject.toml'
-      - 'src/README.md'
-      - 'src/tools/update_readme_deps.py'
-      - '.github/workflows/dependency-sync.yml'
+      - "src/pyproject.toml"
+      - "src/README.md"
+      - "src/tools/update_readme_deps.py"
+      - ".github/workflows/dependency-sync.yml"
   workflow_dispatch: {}
 
 permissions: {}
@@ -39,8 +39,8 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
-          python-version: '3.13'
-          cache: 'pip'
+          python-version: "3.13"
+          cache: "pip"
 
       - name: Prepare Python
         run: |

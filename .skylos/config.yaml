@@ -8,7 +8,7 @@ exclude:
   - node_modules
   - build
   - dist
-  - '*.egg-info'
+  - "*.egg-info"
   - src/check_models.suppression-audit*.py
 
 # Mirror the package-local quality policy so repo-root scans and `src` scans
