@@ -78,9 +78,23 @@ Notable changes to this project will be documented in this file.
 - Extend the Skylos quality-gate invocation to include secrets and SCA checks,
   while documenting `--danger` as an advisory follow-up until its current
   filesystem findings are triaged.
+- Add a dedicated `make skylos-danger` advisory path, plus an LLM-oriented
+  `make skylos-danger-llm` variant, so workflow-security findings are surfaced
+  separately from the blocking quality gate with GitHub annotations and step
+  summaries.
+- Add a dedicated `make skylos-verify` / `src/tools/run_skylos_verify.sh`
+  wrapper so narrow `skylos verify` post-edit checks use the repo's conda
+  environment and project context consistently.
 - Triage the non-test Skylos `SKY-D325` read warnings by routing maintenance
   tools through bounded no-follow text reads and documenting the fixed
   `importlib.metadata` distribution read as a false positive.
+- Route the remaining test-only Skylos `SKY-D324`/`SKY-D325` fixture reads and
+  writes through `tools.safe_io`, clearing the advisory `make skylos-danger`
+  queue back to a clean `A+` repo-root scan.
+- Harden GitHub Actions workflow files by pinning third-party actions to full
+  SHAs, minimizing token permissions, disabling persisted checkout
+  credentials, failing artifact uploads when files are missing, and installing
+  npm dev tooling with `--ignore-scripts`.
 - Harden maintenance tooling by avoiding dynamic `conda.sh` sourcing, adding
   symlink-resistant text writes for generated stubs and hooks, and narrowing
   cleanup-script delete/help paths.

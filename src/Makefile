@@ -222,6 +222,18 @@ check: format lint typecheck test ## Core quality pipeline
 quality: ## Run full quality checks (ruff+typing+vulture+Skylos+pytest+shellcheck+markdownlint)
 	bash tools/run_quality_checks.sh
 
+.PHONY: skylos-danger
+skylos-danger: ## Run advisory Skylos danger scan for workflow/security findings
+	bash tools/run_skylos_danger_advisory.sh
+
+.PHONY: skylos-danger-llm
+skylos-danger-llm: ## Write advisory Skylos danger findings in LLM-friendly format
+	bash tools/run_skylos_danger_advisory.sh --llm
+
+.PHONY: skylos-verify
+skylos-verify: ## Run the Skylos verifier on a file/range (pass ARGS='--file ... --range ...')
+	bash tools/run_skylos_verify.sh $(ARGS)
+
 .PHONY: quality-strict
 quality-strict: ## Run quality checks and require markdownlint availability
 	@echo "[quality-strict] verifying markdownlint availability..."

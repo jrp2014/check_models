@@ -56,6 +56,8 @@ LEGACY_ROOT_QUALITY_CONFIG = PKG_ROOT / "quality_config.yaml"
 ROOT_SKYLOS_CONFIG = REPO_ROOT / ".skylos" / "config.yaml"
 COPILOT_INSTRUCTIONS = REPO_ROOT / ".github" / "copilot-instructions.md"
 AGENT_QUALITY_WORKFLOW = REPO_ROOT / ".agents" / "workflows" / "quality.md"
+SKYLOS_DANGER_ADVISORY_SCRIPT = PKG_ROOT / "tools" / "run_skylos_danger_advisory.sh"
+SKYLOS_VERIFY_SCRIPT = PKG_ROOT / "tools" / "run_skylos_verify.sh"
 
 SKYLOS_ADVISORY_QUALITY_IGNORES = {
     "SKY-C303",
@@ -133,7 +135,8 @@ def _write_stub_manifest(
     stubgen_version: str,
 ) -> None:
     manifest_path = typings_dir / generate_stubs.STUB_MANIFEST
-    manifest_path.write_text(
+    safe_io.write_text_no_follow(
+        manifest_path,
         json.dumps(
             {
                 "packages": {
@@ -150,7 +153,6 @@ def _write_stub_manifest(
             sort_keys=True,
         )
         + "\n",
-        encoding="utf-8",
     )
 
 
@@ -310,6 +312,16 @@ def test_root_skylos_config_mirrors_package_quality_policy() -> None:
     root_config = yaml.safe_load(ROOT_SKYLOS_CONFIG.read_text(encoding="utf-8"))
 
     assert isinstance(root_config, dict)
+    assert {
+        "output",
+        "src/output",
+        "package-lock.json",
+        "node_modules",
+        "build",
+        "dist",
+        "*.egg-info",
+        "src/check_models.suppression-audit*.py",
+    } <= set(root_config["exclude"])
     assert set(root_config["ignore"]) == set(package_config["ignore"])
     for key in SKYLOS_MONOLITH_QUALITY_LIMITS:
         assert root_config[key] == package_config[key]
@@ -508,7 +520,13 @@ def test_agent_quality_guidance_avoids_redundant_pytest_after_quality() -> None:
 
     assert "full pytest" in copilot_text
     assert "Do not run it again after a successful `make quality`" in copilot_text
+    assert "make skylos-danger" in copilot_text
+    assert "make skylos-danger-llm" in copilot_text
+    assert "make skylos-verify" in copilot_text
+    assert "could be promoted later" in copilot_text
     assert "`make quality` already runs the full pytest suite" in quality_workflow
+    assert "make skylos-danger-llm" in quality_workflow
+    assert "make skylos-verify" in quality_workflow
     assert "`make test` — execute unit tests" not in copilot_text
 
 
@@ -989,6 +1007,29 @@ def test_quality_script_runs_skylos_quality_gate() -> None:
     )
 
 
+def test_skylos_danger_advisory_script_is_separate_and_agent_friendly() -> None:
+    """Advisory Skylos danger scans should stay separate from the blocking quality gate."""
+    script = SKYLOS_DANGER_ADVISORY_SCRIPT.read_text(encoding="utf-8")
+
+    assert "--danger --json" in script
+    assert "skylos cicd annotate" in script
+    assert "--severity medium" in script
+    assert "cicd gate" in script
+    assert "--advisory" in script
+    assert "--llm" in script
+    assert ".skylos/skylos-danger-advisory.llm.txt" in script
+
+
+def test_skylos_verify_script_wraps_repo_context_verifier() -> None:
+    """The Skylos verify helper should keep agent checks repo-scoped and deterministic."""
+    script = SKYLOS_VERIFY_SCRIPT.read_text(encoding="utf-8")
+
+    assert "Usage: bash tools/run_skylos_verify.sh" in script
+    assert 'cd "$(quality_repo_root)"' in script
+    assert "quality_require_python_tool skylos" in script
+    assert 'quality_run_python_tool skylos verify . --project-context "$@"' in script
+
+
 @pytest.mark.subprocess
 def test_pyrefly_quality_gate_fails_on_warnings(tmp_path: Path) -> None:
     """The quality helper should treat Pyrefly warnings as gate failures."""
@@ -1099,6 +1140,48 @@ def test_quality_ci_defers_macos_deployment_target_to_upstream_mlx() -> None:
 
         assert "Target host macOS for native builds" not in step_names
         assert "MACOSX_DEPLOYMENT_TARGET" not in install_command
+
+
+def test_workflows_pin_actions_and_keep_skylos_danger_advisory_nonblocking() -> None:
+    """Workflow security hardening and advisory Skylos danger wiring should stay in place."""
+    action_ref_pattern = re.compile(r"^[^@]+@[0-9a-f]{40}$")
+
+    for workflow_path in (
+        REPO_ROOT / ".github" / "workflows" / "dependency-sync.yml",
+        REPO_ROOT / ".github" / "workflows" / "quality.yml",
+    ):
+        workflow = yaml.safe_load(workflow_path.read_text(encoding="utf-8"))
+
+        assert workflow["permissions"] == {}
+        for job_name, job in workflow["jobs"].items():
+            assert job["permissions"] == {"contents": "read"}, job_name
+            for step in job.get("steps", []):
+                if "uses" in step:
+                    assert action_ref_pattern.match(step["uses"]), (
+                        workflow_path.name,
+                        step["uses"],
+                    )
+                if step.get("name") == "Checkout":
+                    assert step["with"]["persist-credentials"] is False
+                if step.get("uses", "").startswith("actions/upload-artifact@"):
+                    assert step["with"]["if-no-files-found"] == "error"
+
+    quality_workflow = yaml.safe_load(
+        (REPO_ROOT / ".github" / "workflows" / "quality.yml").read_text(encoding="utf-8")
+    )
+    advisory_job = quality_workflow["jobs"]["skylos-advisory"]
+    advisory_step_names = [step.get("name") for step in advisory_job["steps"]]
+
+    assert advisory_job["runs-on"] == "ubuntu-latest"
+    assert "Install Skylos" in advisory_step_names
+    assert "Run Skylos advisory danger scan" in advisory_step_names
+
+    static_quality_install = next(
+        step["run"]
+        for step in quality_workflow["jobs"]["static-quality"]["steps"]
+        if step.get("name") == "Install dependencies"
+    )
+    assert "npm install --ignore-scripts --prefix src" in static_quality_install
 
 
 def test_should_audit_path_excludes_generated_and_archived_paths(tmp_path: Path) -> None:

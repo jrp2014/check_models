@@ -639,6 +639,40 @@ The `src/tools/` directory contains scripts useful for development and verificat
   bash src/tools/run_quality_checks.sh
   ```
 
+- **`run_skylos_danger_advisory.sh`**: Advisory Skylos `--danger` scan for
+  workflow/security findings, with an optional LLM-friendly report for agent
+  triage.
+
+  > [!IMPORTANT]
+  > This path stays advisory for now, but the current repo-root `--danger` scan
+  > is clean. If the project wants stricter enforcement later, this is the most
+  > obvious candidate to promote into the blocking gate.
+
+  ```bash
+  # Run from repo root (recommended)
+  make skylos-danger
+
+  # Add an LLM-oriented report for agent review
+  make skylos-danger-llm
+
+  # Or run the script directly
+  bash src/tools/run_skylos_danger_advisory.sh --llm
+  ```
+
+- **`run_skylos_verify.sh`**: Narrow Skylos verifier wrapper for post-edit
+  agent checks, always with repo project context.
+
+  ```bash
+  # Run from repo root (recommended)
+  make skylos-verify ARGS='--file src/check_models.py --range 100:130'
+
+  # Allow findings without failing the command
+  make skylos-verify ARGS='--file src/check_models.py --range 100:130 --no-fail'
+
+  # Or run the script directly
+  bash src/tools/run_skylos_verify.sh --file src/check_models.py --range 100:130
+  ```
+
 - **`run_ty_check.sh`**: Dedicated Ty entrypoint with explicit interpreter
   resolution for this repo.
 
@@ -1244,6 +1278,9 @@ Key commands:
 - `make test` — run pytest only; useful for a faster test loop before the full gate
 - `make vulture` — run the configured dead-code scan for `src/check_models.py` and `src/tools/`
 - `make quality` — full gate (ruff format+lint, mypy, ty, pyrefly, vulture, Skylos quality/secrets/SCA, full pytest, shellcheck, markdownlint)
+- `make skylos-danger` — advisory Skylos `--danger` scan for workflow and security findings
+- `make skylos-danger-llm` — advisory Skylos `--danger` scan with LLM-oriented output for agent triage
+- `make skylos-verify` — narrow `skylos verify` wrapper for file/range agent checks
 - `make ci` — strict CI-style pipeline
 - `make deps-sync` — sync dependency blocks in docs from `pyproject.toml`
 - `python -m tools.update_readme_deps --check` — verify dependency blocks are already synced (no writes)
@@ -1305,6 +1342,12 @@ npm install
 - Keep patches focused; separate mechanical formatting changes from functional changes.
 - Run `make quality` before opening a PR. It already includes the full pytest
   suite; use `make test` separately only for a pytest-only local loop.
+- Run `make skylos-danger` when a change touches GitHub Actions, shell helpers,
+  or other repo-controlled security surfaces. Use `make skylos-danger-llm` when
+  an AI/code-review agent should consume the same findings with nearby code
+  context.
+- Run `make skylos-verify ARGS='--file ... --range ...'` for the cheapest
+  post-edit AI-defect verification pass before falling back to broader scans.
 - Add or update tests when changing output formatting or public CLI flags.
 - Prefer small helper functions over adding more branching to large blocks in `check_models.py`.
 - Document new flags or output changes in this README (search for an existing section to extend rather than creating duplicates).

@@ -22,6 +22,10 @@ help: ## Show this help message
 	@echo "  make test             Run tests"
 	@echo "  make check            Run format, lint, typecheck, and tests"
 	@echo "  make quality          Run full quality checks (ruff+typing+vulture+Skylos+pytest+shellcheck+markdownlint)"
+	@echo "  make skylos-danger    Run advisory Skylos danger scan for workflow/security findings"
+	@echo "                        Current repo-root danger scan is clean; this could be promoted later"
+	@echo "  make skylos-danger-llm  Write the advisory Skylos danger scan in LLM-friendly format"
+	@echo "  make skylos-verify    Run the Skylos verifier on a file/range (pass ARGS='--file ... --range ...')"
 	@echo "  make vulture          Run the configured dead-code scan"
 	@echo "  make ty               Run Ty type checking with the resolved mlx-vlm interpreter"
 	@echo "  make ci               Run full CI pipeline (strict)"
@@ -57,6 +61,18 @@ check: ## Run core quality pipeline (format, lint, typecheck, test)
 .PHONY: quality
 quality: ## Run full quality checks (ruff+typing+vulture+Skylos+pytest+shellcheck+markdownlint)
 	@$(MAKE) -C $(SRC) quality
+
+.PHONY: skylos-danger
+skylos-danger: ## Run advisory Skylos danger scan for workflow/security findings
+	@$(MAKE) -C $(SRC) skylos-danger
+
+.PHONY: skylos-danger-llm
+skylos-danger-llm: ## Write advisory Skylos danger findings in LLM-friendly format
+	@$(MAKE) -C $(SRC) skylos-danger-llm
+
+.PHONY: skylos-verify
+skylos-verify: ## Run the Skylos verifier on a file/range (pass ARGS='--file ... --range ...')
+	@$(MAKE) -C $(SRC) skylos-verify ARGS='$(ARGS)'
 
 .PHONY: vulture
 vulture: ## Run the configured dead-code scan

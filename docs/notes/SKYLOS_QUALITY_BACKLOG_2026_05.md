@@ -5,15 +5,20 @@ secret, and dependency findings first, then use these quality results as a
 focused refactoring queue.
 
 The blocking `make quality` gate runs Skylos quality, secrets, and SCA checks.
-Keep `--danger` out of the blocking gate until the current filesystem
-read/write findings in tests and helper scripts are triaged into real fixes,
-targeted ignores, or a separate advisory audit.
+Run `make skylos-danger` separately so `--danger` continues to review GitHub
+Actions workflow changes while the team decides independently whether a clean
+advisory queue should be promoted into the blocking gate.
+
+Current status: the advisory repo-root `--danger` queue is clean, so promotion
+is a policy choice now, not a cleanup blocker.
 
 June 2026 triage resolved the non-test `SKY-D325` read warnings: maintenance
 tools now use bounded no-follow text reads, and the remaining runtime metadata
-read is documented as fixed-name `importlib.metadata` access. The remaining
-`--danger` queue is test-only read/write fixture noise unless a future scan
-reports new production paths.
+read is documented as fixed-name `importlib.metadata` access. The new advisory
+workflow-security scan closed the live GitHub Actions findings, and the last
+test-only `SKY-D324`/`SKY-D325` fixtures now also route through `tools.safe_io`,
+so the current repo-root `--danger` queue is clean unless a future scan reports
+new production or workflow paths.
 
 Keep `src/check_models.py` as the intentional CLI monolith. Refactor only when a
 nearby behavior-preserving test path exists, and prefer small readability

@@ -7,28 +7,62 @@ on:
     branches: [main]
   workflow_dispatch: {}
 
+permissions: {}
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  skylos-advisory:
+    name: Skylos Danger Advisory
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      - name: Install Skylos
+        run: python -m pip install --upgrade pip skylos
+
+      - name: Run Skylos advisory danger scan
+        env:
+          CI: true
+        run: bash src/tools/run_skylos_danger_advisory.sh
+
   static-quality:
     name: Static Quality Checks
     runs-on: macos-15
     timeout-minutes: 20
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          persist-credentials: false
 
       - name: Set up Python 3.13
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.13'
           cache: 'pip'
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: '22'
 
@@ -39,7 +73,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e "src/.[dev]"
-          npm install --prefix src
+          npm install --ignore-scripts --prefix src
           
       - name: Generate MLX stubs for mypy
         run: |
@@ -79,8 +113,9 @@ jobs:
 
       - name: Upload static-quality artifacts on failure
         if: failure()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
+          if-no-files-found: error
           name: static-quality-artifacts
           path: |
             src/output/**
@@ -93,13 +128,17 @@ jobs:
     name: Runtime Smoke
     runs-on: macos-15
     timeout-minutes: 10
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          persist-credentials: false
 
       - name: Set up Python 3.13
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.13'
           cache: 'pip'
@@ -118,8 +157,9 @@ jobs:
 
       - name: Upload runtime-smoke artifacts on failure
         if: failure()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
+          if-no-files-found: error
           name: runtime-smoke-artifacts
           path: |
             src/output/**

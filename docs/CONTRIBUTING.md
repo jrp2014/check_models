@@ -197,9 +197,17 @@ The project uses several automated quality checks:
    run `make test` separately only when you want a pytest-only feedback loop.
    Validation tests must not rewrite tracked `src/output/` assets; use a temp
    directory or gitignored `test_*` path for generated reports and logs.
-   The Skylos step gates quality, secrets, and dependency-vulnerability scans;
-   `--danger` findings are tracked separately until the current test/helper
-   false-positive queue is triaged.
+   The blocking Skylos step gates quality, secrets, and dependency-vulnerability
+   scans. Run `make skylos-danger` separately for advisory `--danger` findings,
+   including GitHub Actions workflow hardening checks. Run
+   `make skylos-danger-llm` when you want the same advisory findings rendered in
+   the LLM-oriented format for agent triage. For a narrow agent/edit-loop check,
+   run `make skylos-verify ARGS='--file path/to/file --range L1:L2'`.
+
+   The advisory `make skylos-danger` path is intentionally non-blocking for now,
+   but note the current repo-root `--danger` scan is clean. If you want stricter
+   enforcement later, this path can be promoted into the blocking gate without
+   inheriting known findings.
 
 7. **Markdown linting**:
 

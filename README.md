@@ -56,7 +56,14 @@ make install   # install runtime dependencies
 make dev       # install dev dependencies (dev + extras + torch)
 make test      # run pytest only
 make quality   # run full gate (ruff + typing + vulture + Skylos + pytest + shellcheck + markdownlint)
+make skylos-danger      # advisory Skylos workflow/security scan
+make skylos-danger-llm  # same advisory scan with LLM-oriented output
+make skylos-verify      # narrow Skylos file/range verifier (pass ARGS='--file ... --range ...')
 ```
+
+`make skylos-danger` remains advisory for now, but the repo-root `--danger`
+scan is currently clean, so it is a credible candidate for promotion into the
+blocking gate later.
 
 > [!TIP]
 > **Platform**: macOS with Apple Silicon is required.

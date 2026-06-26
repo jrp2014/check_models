@@ -21,6 +21,7 @@ from check_models import (
     compare_history_window,
     save_jsonl_report,
 )
+from tools import safe_io
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -30,7 +31,7 @@ if TYPE_CHECKING:
 
 def _read_jsonl(path: Path) -> tuple[JsonlMetadataRecord, list[JsonlResultRecord]]:
     """Read JSONL file returning (metadata_header, result_rows)."""
-    lines = path.read_text().strip().split("\n")
+    lines = safe_io.read_text_no_follow(path).strip().split("\n")
     header = cast("JsonlMetadataRecord", json.loads(lines[0]))
     results = [cast("JsonlResultRecord", json.loads(line)) for line in lines[1:]]
     return header, results

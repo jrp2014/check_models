@@ -63,6 +63,9 @@ The file is organized in this order — search for these exact landmark headers 
 | Target | What it does |
 | -------- | ------------- |
 | `make quality` | **Primary gate**: checks Ruff formatting + lint, mypy, ty, pyrefly, vulture, Skylos quality/secrets/SCA, full pytest, shellcheck, markdownlint |
+| `make skylos-danger` | Advisory Skylos `--danger` scan for workflow and security findings; not merge-blocking yet, but the current repo-root scan is clean and could be promoted later |
+| `make skylos-danger-llm` | Advisory Skylos `--danger` scan with LLM-optimized output for agent triage |
+| `make skylos-verify` | Run `skylos verify` with repo project context for narrow post-edit agent checks |
 | `make vulture` | Run Vulture dead-code scan for `src/check_models.py` and `src/tools/`. *Note: Vulture commonly flags `TypedDict` keys and `Protocol` signatures as "unused" because they are evaluated statically and not tracked natively in runtime logic flows. Treat these as false positives.* |
 | `make test` | Pytest-only shortcut for faster local test loops. Do not run it again after a successful `make quality`; `make quality` already runs the full pytest suite. |
 | `make dev` | Install editable with `[dev,extras,torch]` |
@@ -87,13 +90,14 @@ The file is organized in this order — search for these exact landmark headers 
 
 ### 7. CI and hooks
 
-- **Static CI job**: GitHub Actions `static-quality` on `macos-15`, Python 3.13, Node.js 22. It installs `src/.[dev]`, runs `npm install --prefix src`, generates MLX stubs via nanobind into `typings/`, then runs `bash src/tools/run_quality_checks.sh`, including Skylos quality/secrets/SCA checks.
+- **Skylos advisory job**: GitHub Actions `skylos-advisory` on `ubuntu-latest` runs `bash src/tools/run_skylos_danger_advisory.sh` so workflow-security findings are surfaced separately from the blocking quality gate. The current repo-root advisory scan is clean, so this path is now a viable candidate for promotion if the team wants stricter enforcement.
+- **Static CI job**: GitHub Actions `static-quality` on `macos-15`, Python 3.13, Node.js 22. It installs `src/.[dev]`, runs `npm install --ignore-scripts --prefix src`, generates MLX stubs via nanobind into `typings/`, then runs `bash src/tools/run_quality_checks.sh`, including Skylos quality/secrets/SCA checks.
 - **Runtime CI job**: separate `runtime-smoke` job runs `bash src/tools/run_runtime_smoke.sh` so Metal/runtime failures do not mask static quality results.
 - **Dependency sync CI job**: `.github/workflows/dependency-sync.yml` runs on `ubuntu-latest` with path filters and verifies `python -m tools.update_readme_deps --check`.
 - **Pre-commit hooks**: either `pre-commit install` or `cd src && python -m tools.install_precommit_hook`. Both install the same two stages:
   - commit stage: `bash src/tools/run_commit_hygiene.sh`
   - push stage: `bash src/tools/check_quality_simple.sh`
-- **PRs must pass**: workflow YAML validation, dependency sync check, ruff format + lint, mypy, ty, pyrefly, vulture, Skylos quality/secrets/SCA, pytest, shellcheck, markdownlint, plus the isolated runtime smoke probe.
+- **PRs must pass**: workflow YAML validation, dependency sync check, ruff format + lint, mypy, ty, pyrefly, vulture, Skylos quality/secrets/SCA, pytest, shellcheck, markdownlint, plus the isolated runtime smoke probe. Skylos `--danger` runs separately in advisory mode with GitHub annotations and summaries, but the clean advisory queue means it can be promoted later without carrying known debt.
 
 ### 8. Coding conventions (quick reference)
 
@@ -133,6 +137,12 @@ relevant `SKILL.md` **before** starting work of that kind.
 | `add-or-fix-type-checking` | Typing errors from mypy, ty, pyrefly, or `make quality` | `.agents/skills/add-or-fix-type-checking/SKILL.md` |
 
 ### 11. Common edit recipes
+
+**Review workflow security or agent-generated changes:**
+
+1. Run `make skylos-danger` for the advisory JSON/annotation-style scan
+2. Run `make skylos-danger-llm` when you want the same findings with code context tuned for an AI/code-review agent
+3. Run `make skylos-verify ARGS='--file path/to/file --range L1:L2'` for narrow post-edit AI-defect verification
 
 **Add a CLI flag:**
 

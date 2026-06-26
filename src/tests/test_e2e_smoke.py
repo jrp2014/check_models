@@ -49,6 +49,7 @@ from huggingface_hub.errors import CacheNotFound  # noqa: E402
 from PIL import Image  # noqa: E402
 
 import check_models  # noqa: E402
+from tools import safe_io  # noqa: E402
 
 # Fixture model - small, fast, reliable
 # nanoLLaVA is ~600MB, fastest load, lowest memory (4.5GB peak)
@@ -239,8 +240,11 @@ class TestE2ESmoke:
         assert e2e_md.exists()
         assert e2e_jsonl.exists()
 
-        with e2e_jsonl.open() as f:
-            records = [json.loads(line) for line in f if line.strip()]
+        records = [
+            json.loads(line)
+            for line in safe_io.read_text_no_follow(e2e_jsonl).splitlines()
+            if line.strip()
+        ]
         assert len(records) >= 2  # metadata header + at least 1 result
         # First line is metadata header
         assert records[0]["_type"] == "metadata"
