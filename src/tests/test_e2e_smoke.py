@@ -90,10 +90,14 @@ def _get_e2e_output_args(output_dir: Path) -> list[str]:
         str(output_dir / "e2e_gallery.md"),
         "--output-review",
         str(output_dir / "e2e_review.md"),
+        "--output-model-selection",
+        str(output_dir / "e2e_model_selection.md"),
         "--output-tsv",
         str(output_dir / "e2e.tsv"),
         "--output-jsonl",
         str(output_dir / "e2e.jsonl"),
+        "--output-run-json",
+        str(output_dir / "e2e_run.json"),
         "--output-env",
         str(output_dir / "e2e_env.log"),
         "--output-diagnostics",
@@ -109,6 +113,8 @@ def test_get_e2e_output_args_redirects_gallery_and_review(tmp_path: Path) -> Non
 
     assert output_map["--output-gallery-markdown"] == str(output_dir / "e2e_gallery.md")
     assert output_map["--output-review"] == str(output_dir / "e2e_review.md")
+    assert output_map["--output-model-selection"] == str(output_dir / "e2e_model_selection.md")
+    assert output_map["--output-run-json"] == str(output_dir / "e2e_run.json")
 
 
 @pytest.fixture

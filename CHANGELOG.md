@@ -22,6 +22,14 @@ Notable changes to this project will be documented in this file.
 - Forward thinking budget and custom thinking delimiter flags to
   `mlx_vlm.apply_chat_template()` as well as `mlx_vlm.generate()`, matching
   the `mlx-vlm` server request path.
+- Drop the redundant all-fields CLI performance table from final summaries so
+  `check_models.log` keeps the readable highlights, compact comparison, charts,
+  and diagnostics without the narrow wrapped table.
+- Redirect E2E smoke-test model-selection and run-summary artifacts into the
+  test temp directory so validation no longer dirties tracked benchmark output.
+- Document the validation artifact-hygiene rule across agent guidance, CI, and
+  contributor docs so tests write to temp or `test_*` paths instead of tracked
+  `src/output/` benchmark snapshots.
 - Align automatic Hugging Face cache discovery with the pending `mlx-vlm`
   server-supported model filter: repo type `model`, cached `main` revision,
   `config.json`, `tokenizer_config.json`, and safetensors weights.

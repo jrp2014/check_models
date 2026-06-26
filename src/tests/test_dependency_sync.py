@@ -534,6 +534,28 @@ def test_output_artifact_policy_is_documented_and_gitignored() -> None:
     }.issubset(gitignore_lines)
 
 
+def test_validation_artifact_hygiene_policy_is_documented() -> None:
+    """Validation guidance should forbid dirtying tracked benchmark assets."""
+    required_phrase = "Validation tests must not rewrite tracked `src/output/` assets"
+
+    docs = {
+        "copilot instructions": COPILOT_INSTRUCTIONS.read_text(encoding="utf-8"),
+        "agent instructions": (REPO_ROOT / "AGENTS.md").read_text(encoding="utf-8"),
+        "claude instructions": (REPO_ROOT / "CLAUDE.md").read_text(encoding="utf-8"),
+        "quality workflow": (REPO_ROOT / ".github" / "workflows" / "quality.yml").read_text(
+            encoding="utf-8"
+        ),
+        "contributor guide": (REPO_ROOT / "docs" / "CONTRIBUTING.md").read_text(encoding="utf-8"),
+        "cli readme": (PKG_ROOT / "README.md").read_text(encoding="utf-8"),
+    }
+
+    for label, text in docs.items():
+        assert required_phrase in text, label
+
+    for label, text in docs.items():
+        assert "temp directory" in text or "`test_*`" in text, label
+
+
 def test_stub_refresh_reason_is_none_for_fresh_manifest(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

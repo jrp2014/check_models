@@ -853,6 +853,7 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
         patch("check_models.append_history_record", return_value=history_record),
         patch("check_models.generate_diagnostics_report", return_value=False),
         patch("check_models._log_history_comparison"),
+        patch("check_models.print_model_stats") as mock_print_model_stats,
     ):
         finalize_execution(
             args=args,
@@ -864,6 +865,7 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
             metadata=None,
         )
 
+    mock_print_model_stats.assert_not_called()
     messages = [record.message for record in caplog.records]
     assert any(str(custom_log.resolve()) in msg for msg in messages)
     assert any(str(custom_env.resolve()) in msg for msg in messages)

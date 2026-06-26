@@ -122,6 +122,12 @@ python -m tools.validate_env --fix
    faster pytest-only loop while developing, not as an extra step after a
    successful quality run.
 
+   Validation tests must not rewrite tracked `src/output/` assets. Any test or
+   validation command that exercises report generation should write to a temp
+   directory (for pytest, usually `tmp_path`) or a gitignored `test_*` output
+   path, so contributors and CI do not need to restore benchmark snapshots after
+   verification.
+
 ### Code Style
 
 - **Python**: Follow PEP 8, enforced by ruff
@@ -189,6 +195,8 @@ The project uses several automated quality checks:
    wrappers and config as their standalone targets, so local runs and CI use
    the same behavior. A successful `make quality` run supersedes `make test`;
    run `make test` separately only when you want a pytest-only feedback loop.
+   Validation tests must not rewrite tracked `src/output/` assets; use a temp
+   directory or gitignored `test_*` path for generated reports and logs.
    The Skylos step gates quality, secrets, and dependency-vulnerability scans;
    `--danger` findings are tracked separately until the current test/helper
    false-positive queue is triaged.

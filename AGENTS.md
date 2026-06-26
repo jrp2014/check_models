@@ -12,4 +12,6 @@ Key reminders:
   `make -C src lint-fix` / `make lint`, then run the full quality gate
 - `src/check_models.py` is an intentional single-file monolith — do not split it
 - Add tests to existing `src/tests/test_*.py` files, never create standalone scripts
+- Validation tests must not rewrite tracked `src/output/` assets; send generated
+  files to a temp directory or gitignored `test_*` output paths
 - Keep `CHANGELOG.md` (`[Unreleased]`) up to date for maintainer-relevant changes, including refactors and tooling updates

@@ -25645,10 +25645,6 @@ def finalize_execution(
     """Output summary statistics, generate reports, and display timing information."""
     overall_time: float = time.perf_counter() - overall_start_time
     if results:
-        print_cli_section("Performance Summary")
-        print_model_stats(results)
-
-        # Log summary with failure bucketing for diagnostics
         log_summary(
             results,
             prompt=prompt,

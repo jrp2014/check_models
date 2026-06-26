@@ -83,6 +83,7 @@ The file is organized in this order — search for these exact landmark headers 
 - **Fixtures** (from `conftest.py`): `test_image` (100×100), `minimal_test_image` (10×10), `realistic_test_image` (640×480 with shapes), `folder_with_images`, `empty_folder`, `mlx_vlm_available`, `fixture_model_cached`.
 - **Many tests assert exact strings** — if you change report formats or CLI output, update `src/output/` fixtures and check formatting tests.
 - **Add tests to existing files** (e.g., `test_parameter_validation.py` for new CLI flags, `test_html_formatting.py` for report changes). Do not create standalone test scripts.
+- **Validation artifact hygiene**: Validation tests must not rewrite tracked `src/output/` assets. Route generated outputs to `tmp_path`, another temp directory, or gitignored `src/output/test_*` paths so `make quality` never requires restoring benchmark snapshots after it runs.
 
 ### 7. CI and hooks
 
@@ -118,7 +119,7 @@ The file is organized in this order — search for these exact landmark headers 
 9. `make lint` — clear Ruff lint errors before running the full gate
 10. `bash src/tools/run_commit_hygiene.sh` — verify local commit hygiene
 11. `make quality` — run the full quality gate check, including the full pytest suite
-12. If report formats changed → update `src/output/` fixtures
+12. If report formats changed → update `src/output/` fixtures intentionally; validation tests must not rewrite tracked `src/output/` assets just to prove a change
 13. Update `CHANGELOG.md` under `[Unreleased]` for any maintainer-relevant change (features, fixes, refactors, tooling/docs workflow updates)
 14. `git commit -m "feat: description"` and push
 

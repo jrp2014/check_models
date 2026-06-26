@@ -1204,6 +1204,9 @@ check_models/
 **Output behaviour**: By default, production outputs are written to `src/output/`
 and committed as public benchmark snapshots. Test and debug outputs use the
 `test_*` prefix and are git-ignored.
+Validation tests must not rewrite tracked `src/output/` assets; override report
+and log paths to a temp directory or gitignored `test_*` paths so verification
+does not require restoring benchmark snapshots.
 Override with `--output-html`, `--output-markdown`, `--output-gallery-markdown`,
 `--output-review`, `--output-model-selection`, `--output-tsv`, `--output-jsonl`,
 `--output-run-json`, `--output-log`, `--output-env`, and `--output-diagnostics`.
