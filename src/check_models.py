@@ -1449,6 +1449,9 @@ class ChatTemplateKwargs(TypedDict, total=False):
     """Supported optional kwargs forwarded to ``mlx_vlm.apply_chat_template``."""
 
     enable_thinking: bool
+    thinking_budget: int
+    thinking_end_token: str
+    thinking_start_token: str
 
 
 class LoadExtraKwargs(TypedDict, total=False):
@@ -17663,6 +17666,22 @@ def _build_generate_extra_kwargs(params: ProcessImageParams) -> GenerateExtraKwa
     return extra_kwargs
 
 
+def _build_chat_template_kwargs(params: ProcessImageParams) -> ChatTemplateKwargs:
+    """Collect optional chat-template kwargs for benchmark runs."""
+    if not params.enable_thinking:
+        return {}
+
+    template_kwargs: ChatTemplateKwargs = {
+        "enable_thinking": True,
+        "thinking_end_token": params.thinking_end_token,
+    }
+    if params.thinking_budget is not None:
+        template_kwargs["thinking_budget"] = params.thinking_budget
+    if params.thinking_start_token is not None:
+        template_kwargs["thinking_start_token"] = params.thinking_start_token
+    return template_kwargs
+
+
 _IMAGE_PLACEHOLDER_PATTERNS: Final[tuple[re.Pattern[str], ...]] = (
     re.compile(r"<\|?image(?:_\d+)?\|?>", re.IGNORECASE),
     re.compile(r"<start_of_image>", re.IGNORECASE),
@@ -18787,9 +18806,7 @@ def _prepare_generation_prompt(
 ) -> str | list[object]:
     """Run preflight checks and build the prompt payload for generation."""
     try:
-        chat_template_kwargs: ChatTemplateKwargs = (
-            {"enable_thinking": True} if params.enable_thinking else {}
-        )
+        chat_template_kwargs = _build_chat_template_kwargs(params)
         if phase_timer is not None:
             with phase_timer.track("prompt_prep"):
                 _run_model_preflight_validators(

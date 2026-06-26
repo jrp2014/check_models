@@ -19,6 +19,9 @@ Notable changes to this project will be documented in this file.
   generation-control flags, while preserving the effective generation kwargs in
   diagnostics, JSONL prompt metadata, repro bundles, and native `mlx-vlm`
   repro commands.
+- Forward thinking budget and custom thinking delimiter flags to
+  `mlx_vlm.apply_chat_template()` as well as `mlx_vlm.generate()`, matching
+  the `mlx-vlm` server request path.
 - Align automatic Hugging Face cache discovery with the pending `mlx-vlm`
   server-supported model filter: repo type `model`, cached `main` revision,
   `config.json`, `tokenizer_config.json`, and safetensors weights.

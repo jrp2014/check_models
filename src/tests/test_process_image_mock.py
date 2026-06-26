@@ -552,6 +552,9 @@ class TestProcessImageWithModelMock:
 
         assert result is fake_generation
         assert mock_template.call_args.kwargs["enable_thinking"] is True
+        assert mock_template.call_args.kwargs["thinking_budget"] == 96
+        assert mock_template.call_args.kwargs["thinking_start_token"] == "<think>"
+        assert mock_template.call_args.kwargs["thinking_end_token"] == "</think>"
         generate_kwargs = mock_generate.call_args.kwargs
         assert generate_kwargs["enable_thinking"] is True
         assert generate_kwargs["thinking_budget"] == 96
