@@ -2,15 +2,15 @@
   "environment": {
     "library_versions": {
       "Pillow": "12.2.0",
-      "huggingface-hub": "1.19.0",
-      "mlx": "0.32.0.dev20260612+337f736a",
+      "huggingface-hub": "1.21.0",
+      "mlx": "0.32.0.dev20260627+548dd80e",
       "mlx-audio": "0.4.4",
       "mlx-lm": "0.31.3",
       "mlx-metal": null,
       "mlx-vlm": "0.6.3",
-      "numpy": "2.4.6",
+      "numpy": "2.5.0",
       "tokenizers": "0.22.2",
-      "transformers": "5.11.0"
+      "transformers": "5.12.1"
     },
     "platform": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
     "preflight_issues": [],
@@ -25,8 +25,8 @@
       "MLX Core Extension": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so",
       "MLX Distribution Root": "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
       "MLX Install Type": "editable local source",
-      "MLX Metallib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (157,751,704 bytes, sha256=ba9913d81d92bbbde42bbc6dda27e80ecb31db6031fa073e6c8aeb0666d47c33)",
-      "MLX libmlx.dylib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,676,160 bytes, sha256=811f9557132c55cc5b95a4dcbdb6e3757ed88cfa5bcfabf8b3561959383335a5)",
+      "MLX Metallib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (162,369,176 bytes, sha256=28369eb4da5ecc579c68497402a2b76dd8fa31df58c6ae2b42e7150dc3b90445)",
+      "MLX libmlx.dylib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,710,112 bytes, sha256=44c96c82bbc3808ee6aea73ee73bd83f2a13c00fbd99eca6828ce5359001c319)",
       "Metal Compiler Version": "Apple metal version 32023.883 (metalfe-32023.883)",
       "Metal SDK": "MacOSX26.5.sdk",
       "Metal Support": "Metal 4",
@@ -36,8 +36,8 @@
       "RAM": "128.0 GB",
       "SDK Path": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
       "SDK Version": "26.5",
-      "Xcode Build": "17F42",
-      "Xcode Version": "26.5",
+      "Xcode Build": "17F113",
+      "Xcode Version": "26.6",
       "macOS Version": "26.5.1",
       "mlx-metal Distribution": "not installed; local editable mlx supplies backend"
     }
@@ -53,9 +53,9 @@
     "traceback": null,
     "type": null
   },
-  "generated_at_utc": "2026-06-12T12:18:08+00:00",
-  "issue_cluster_id": "model-config-mlx-vlm_prompt-template_001",
-  "model": "HuggingFaceTB/SmolVLM-Instruct",
+  "generated_at_utc": "2026-06-27T22:58:03+00:00",
+  "issue_cluster_id": "mlx-vlm_stop-token_001",
+  "model": "mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX",
   "repro": {
     "args": {
       "_check_models_preflight_issues": [],
@@ -92,7 +92,9 @@
       "output_jsonl": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.jsonl",
       "output_log": "/Users/jrp/Documents/AI/mlx/check_models/src/output/check_models.log",
       "output_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.md",
+      "output_model_selection": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/model_selection.md",
       "output_review": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/review.md",
+      "output_run_json": "/Users/jrp/Documents/AI/mlx/check_models/src/output/run.json",
       "output_tsv": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.tsv",
       "prefill_step_size": 4096,
       "presence_context_size": 20,
@@ -121,7 +123,7 @@
       "verbose": true,
       "width": null
     },
-    "cluster_repro_command": "python -m check_models --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models HuggingFaceTB/SmolVLM-Instruct mlx-community/SmolVLM-Instruct-bf16",
+    "cluster_repro_command": "python -m check_models --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models microsoft/Phi-3.5-vision-instruct mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX mlx-community/Qwen3-VL-2B-Thinking-bf16",
     "env_vars": {
       "TOKENIZERS_PARALLELISM": "false"
     },
@@ -129,8 +131,8 @@
     "image_ref_sha256": "9bc422400088c31c0accf7fb023ee29945d47640042565218c1c33f78694f204",
     "image_sha256": "dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e",
     "prompt_diagnostics": {
-      "eos_token": "<end_of_utterance>",
-      "eos_token_id": 49154,
+      "eos_token": "</s>",
+      "eos_token_id": 2,
       "generate_kwargs": {
         "kv_bits": null,
         "kv_group_size": 64,
@@ -144,60 +146,61 @@
         "temperature": 0.0,
         "top_p": 1.0
       },
-      "image_placeholder_count": 1,
-      "model_type": "idefics3",
-      "processor_class": "mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor",
-      "rendered_prompt_chars": 81,
-      "rendered_prompt_hash_sha256": "9ee10dd28003c3bc52a85acfb2e19df9e55ac4182fdc07df17101192bd45f3ad",
-      "rendered_prompt_preview": "<|im_start|>User:<image>Describe this image briefly.<end_of_utterance>\nAssistant:",
+      "image_placeholder_count": 0,
+      "model_type": "pixtral",
+      "processor_class": "mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor",
+      "rendered_prompt_chars": 423,
+      "rendered_prompt_hash_sha256": "cd2117604e10712180fd861d63f168284b28f5193279b6d89637cca292d91cc5",
+      "rendered_prompt_preview": "<s><|system|>\nYou are a thoughtful and systematic AI assistant built by ServiceNow Language Models (SLAM) lab. Before providing an answer, analyze the problem carefully and present your reasoning step by step. After explaining your thought process, provide the final solution in the following format: [BEGIN FINAL RESPONSE] ... [END FINAL RESPONSE].\n<|end|>\n<|user|>\n[IMG]Describe this image briefly.\n<|end|>\n<|assistant|>\n",
       "special_token_ids": [
         1,
-        49154,
-        0,
         2,
-        49152,
-        49153
+        0,
+        11
       ],
       "special_tokens": [
-        "<|im_start|>",
-        "<end_of_utterance>",
-        "<|endoftext|>",
-        "<|im_end|>",
-        "<fake_token_around_image>",
-        "<image>"
+        "<s>",
+        "</s>",
+        "<unk>",
+        "<pad>"
       ],
-      "tokenizer_class": "transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer"
+      "tokenizer_class": "transformers.tokenization_utils_tokenizers.TokenizersBackend"
     },
     "prompt_hash_sha256": "d760336d0fd143932f194573dd63f6b531e0ffbc2c4f1595e015392a3471c318",
     "prompt_preview": "Describe this image briefly.",
-    "rerun_command": "python -m check_models --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models HuggingFaceTB/SmolVLM-Instruct",
+    "rerun_command": "python -m check_models --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX",
     "seed": null
   },
   "result": {
-    "generated_text_preview": " Two cats are sleeping on a pink blanket on a couch.",
+    "generated_text_preview": "Here are my reasoning steps:\nThe user asks: \"Describe this image briefly.\" The image is of two cats sleeping on a pink couch, with a remote control. The user wants a brief description. This is a straightforward request. There's no disallowed content. So we can comply. Provide a concise description. Possibly mention the cats' colors, positions, the couch, the remote. The user wants a brief descript...",
     "maintainer_triage": {
       "confidence": "high",
       "evidence": [
-        "harness:prompt_template"
+        "harness:stop_token",
+        "reasoning_leak",
+        "text_sanity"
       ],
       "harness_details": [
-        "output:output_ratio(1.1%)"
+        "token_leak:<|end|>"
       ],
       "hit_max_tokens": false,
       "issue_kind": "harness",
-      "issue_subtype": "prompt_template",
-      "next_action": "Inspect model repo config, chat template, and EOS settings.",
-      "nontext_prompt_ratio": 0.9949832775919732,
-      "prompt_output_ratio": 0.010869565217391304,
-      "prompt_tokens_total": 1196,
+      "issue_subtype": "stop_token",
+      "next_action": "Inspect EOS/stop-token stripping; control tokens are leaking into user-facing text.",
+      "nontext_prompt_ratio": 0.9954887218045113,
+      "prompt_output_ratio": 0.13082706766917293,
+      "prompt_tokens_total": 1330,
       "requested_max_tokens": 200,
       "stop_reason": "completed",
-      "summary": "Output is very short relative to prompt size (1.1%), suggesting possible early-stop or prompt-handling issues. | nontext prompt burden=99%",
-      "suspected_owner": "model-config",
+      "summary": "Special control token &lt;|end|&gt; appeared in generated text. | reasoning leak",
+      "suspected_owner": "mlx-vlm",
       "user_bucket": "avoid"
     },
     "quality_issues": [
-      "\u26a0\ufe0fharness(prompt_template)"
+      "\u26a0\ufe0fharness(stop_token)",
+      "gibberish(token_noise)",
+      "lang_mixing",
+      "reasoning-leak"
     ],
     "success": true
   },
