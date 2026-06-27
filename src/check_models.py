@@ -11243,12 +11243,7 @@ def _review_focus_text(
     """Return compact evidence text tuned for human review surfaces."""
     parts: list[str] = []
 
-    harness_descriptions = [
-        description
-        for detail in review["harness_details"][:2]
-        if (description := _describe_harness_detail(detail))
-    ]
-    parts.extend(harness_descriptions)
+    parts.extend(_describe_harness_details(review["harness_details"][:2]))
 
     if review["hit_max_tokens"] and review["requested_max_tokens"] is not None:
         parts.append(f"hit token cap ({review['requested_max_tokens']})")
@@ -11303,14 +11298,15 @@ def _review_owner_specific_next_action(review: JsonlReviewRecord) -> str | None:
     """Return owner-tuned action text when evidence allows a more specific hint."""
     owner = review["owner"]
     harness_details = tuple(review["harness_details"])
+    harness_kinds = {_split_harness_detail(detail)[0] for detail in harness_details}
     action: str | None = None
 
     if owner == "mlx-vlm":
-        if any(detail.startswith("token_leak:") for detail in harness_details):
+        if "token_leak" in harness_kinds:
             action = "Inspect EOS/stop-token stripping; control tokens are leaking into user-facing text."
-        elif any(detail.startswith("token_encoding:") for detail in harness_details):
+        elif "token_encoding" in harness_kinds:
             action = "Inspect decode cleanup; tokenizer markers are leaking into user-facing text."
-        elif any(detail.startswith("training_leak:") for detail in harness_details):
+        elif "training_leak" in harness_kinds:
             action = (
                 "Inspect continuation and stop handling; generation is drifting into template text."
             )
@@ -12972,14 +12968,10 @@ def _harness_symptom_family(
     if subtype in {"stop_token", "encoding", "prompt_template", "long_context"}:
         return subtype
     details = tuple(analysis.harness_issue_details if analysis is not None else ())
-    if any(detail.startswith("token_leak:") for detail in details):
-        return "stop_token"
-    if any(detail.startswith("token_encoding:") for detail in details):
-        return "encoding"
-    if any(detail.startswith("output:") for detail in details):
-        return "prompt_template"
-    if any(detail.startswith("long_context_") for detail in details):
-        return "long_context"
+    detail_kinds = {_split_harness_detail(detail)[0] for detail in details}
+    for kind, symptom_family in _HARNESS_DETAIL_SYMPTOM_FAMILY.items():
+        if kind in detail_kinds:
+            return symptom_family
     return subtype
 
 
@@ -13056,10 +13048,10 @@ def _issue_harness_symptom(
     analysis: GenerationQualityAnalysis | None,
 ) -> str:
     """Return the issue title/body symptom for a harness issue cluster."""
-    if analysis is not None:
-        for detail in analysis.harness_issue_details:
-            if description := _describe_harness_detail(detail):
-                return description
+    if analysis is not None and (
+        descriptions := _describe_harness_details(analysis.harness_issue_details)
+    ):
+        return descriptions[0]
     return _HARNESS_TYPE_DESCRIPTIONS.get(
         issue_subtype,
         "Output indicates a likely integration/runtime issue.",
@@ -13844,14 +13836,26 @@ _HARNESS_OWNER_BY_TYPE: Final[dict[str, str]] = {
 }
 
 
+_HARNESS_DETAIL_SYMPTOM_FAMILY: Final[dict[str, str]] = {
+    "token_leak": "stop_token",
+    "token_encoding": "encoding",
+    "output": "prompt_template",
+    "long_context": "long_context",
+}
+
+
+def _split_harness_detail(detail: str) -> tuple[str, str]:
+    """Return structured harness detail kind and payload."""
+    raw = detail or ""
+    for prefix in ("token_leak:", "token_encoding:", "output:", "training_leak:"):
+        if raw.startswith(prefix):
+            return prefix[:-1], raw.removeprefix(prefix)
+    return ("long_context", raw) if raw.startswith("long_context_") else ("unknown", raw)
+
+
 def _diagnostics_owner_label(owner_key: str) -> str:
     """Return readable owner label for diagnostics rows/sections."""
     return _DIAGNOSTICS_COMPONENT_LABELS.get(owner_key, owner_key)
-
-
-def _has_prefixed_detail(details: Sequence[str], prefix: str) -> bool:
-    """Return True when any detail entry starts with the requested prefix."""
-    return any(detail.startswith(prefix) for detail in details)
 
 
 def _diagnostics_next_action(owner_key: str) -> str:
@@ -13905,15 +13909,13 @@ def _infer_harness_issue_owner(result: PerformanceResult) -> str:
 
     harness_type = (qa.harness_issue_type or "").strip().lower()
     harness_details = tuple((detail or "").strip().lower() for detail in qa.harness_issue_details)
+    detail_kinds = {_split_harness_detail(detail)[0] for detail in harness_details}
 
     if inferred_owner := _HARNESS_OWNER_BY_TYPE.get(harness_type):
         return inferred_owner
-    if harness_type == "generation_loop" and _has_prefixed_detail(
-        harness_details,
-        "training_leak:",
-    ):
+    if harness_type == "generation_loop" and "training_leak" in detail_kinds:
         return "mlx-vlm / mlx-lm"
-    if _has_prefixed_detail(harness_details, "output:"):
+    if "output" in detail_kinds:
         return "model-config / mlx-vlm"
     return "mlx-vlm"
 
@@ -14022,23 +14024,25 @@ def _describe_long_context_detail(detail: str) -> str | None:
 
 def _describe_harness_detail(detail: str) -> str | None:
     """Translate internal harness detail tokens into maintainer-friendly prose."""
-    description: str | None = None
-    if detail.startswith("token_leak:"):
-        token = detail.removeprefix("token_leak:")
-        description = (
-            f"Special control token {html.escape(token, quote=False)} appeared in generated text."
-        )
-    elif detail.startswith("token_encoding:"):
-        description = _describe_token_encoding_detail(detail.removeprefix("token_encoding:"))
-    elif detail.startswith("output:"):
-        description = _describe_output_detail(detail.removeprefix("output:"))
-    elif detail.startswith("long_context_"):
-        description = _describe_long_context_detail(detail)
-    elif detail.startswith("training_leak:"):
-        leak_type = detail.removeprefix("training_leak:")
-        leak_label = _TRAINING_LEAK_LABELS.get(leak_type, "instruction/template text")
-        description = f"Generated text appears to continue into {leak_label}."
-    return description
+    kind, payload = _split_harness_detail(detail)
+    if kind == "token_leak":
+        token = html.escape(payload, quote=False)
+        return f"Special control token {token} appeared in generated text."
+    if kind == "token_encoding":
+        return _describe_token_encoding_detail(payload)
+    if kind == "output":
+        return _describe_output_detail(payload)
+    if kind == "long_context":
+        return _describe_long_context_detail(payload)
+    if kind == "training_leak":
+        leak_label = _TRAINING_LEAK_LABELS.get(payload, "instruction/template text")
+        return f"Generated text appears to continue into {leak_label}."
+    return None
+
+
+def _describe_harness_details(details: Sequence[str]) -> list[str]:
+    """Translate harness detail tokens into maintainer-friendly prose."""
+    return [desc for detail in details if (desc := _describe_harness_detail(detail))]
 
 
 def _evidence_token_encoding_detail(token_issue: str) -> str | None:
@@ -14090,18 +14094,18 @@ def _evidence_long_context_detail(detail: str) -> str | None:
 
 def _evidence_harness_detail(detail: str) -> str | None:
     """Translate harness detail tokens into concise supporting facts."""
-    if detail.startswith("token_leak:"):
-        token = html.escape(detail.removeprefix("token_leak:"), quote=False)
+    kind, payload = _split_harness_detail(detail)
+    if kind == "token_leak":
+        token = html.escape(payload, quote=False)
         return f"decoded text contains control token {token}"
-    if detail.startswith("token_encoding:"):
-        return _evidence_token_encoding_detail(detail.removeprefix("token_encoding:"))
-    if detail.startswith("output:"):
-        return _evidence_output_detail(detail.removeprefix("output:"))
-    if detail.startswith("long_context_"):
-        return _evidence_long_context_detail(detail)
-    if detail.startswith("training_leak:"):
-        leak_type = detail.removeprefix("training_leak:")
-        leak_label = _TRAINING_LEAK_LABELS.get(leak_type, "instruction/template text")
+    if kind == "token_encoding":
+        return _evidence_token_encoding_detail(payload)
+    if kind == "output":
+        return _evidence_output_detail(payload)
+    if kind == "long_context":
+        return _evidence_long_context_detail(payload)
+    if kind == "training_leak":
+        leak_label = _TRAINING_LEAK_LABELS.get(payload, "instruction/template text")
         return f"decoded text continues into {leak_label}"
     return None
 
@@ -14277,9 +14281,7 @@ def _diagnostics_harness_section(
         harness_details = getattr(qa, "harness_issue_details", []) if qa else []
 
         _append_markdown_section(parts, title=f"### `{res.model_name}`")
-        observations = [
-            desc for detail in harness_details if (desc := _describe_harness_detail(detail))
-        ]
+        observations = _describe_harness_details(harness_details)
         observations.extend(_summarize_quality_signals(qa))
         unique_observations = _dedupe_preserve_order(observations)
         if unique_observations:
@@ -24328,11 +24330,11 @@ def _issue_output_preview_needles(
     """Return exact output markers that issue excerpts should keep visible."""
     if analysis is None:
         return ()
-    needles = [
-        detail.removeprefix("token_leak:")
-        for detail in analysis.harness_issue_details
-        if detail.startswith("token_leak:")
-    ]
+    needles: list[str] = []
+    for detail in analysis.harness_issue_details:
+        kind, payload = _split_harness_detail(detail)
+        if kind == "token_leak":
+            needles.append(payload)
     return tuple(_dedupe_preserve_order(needles))
 
 
@@ -24361,11 +24363,9 @@ def _issue_harness_evidence(result: PerformanceResult) -> list[str]:
     """Build harness-specific evidence for one affected model."""
     parts = [f"### `{MARKDOWN_ESCAPER.escape(result.model_name)}`", ""]
     analysis = _quality_analysis_for_result(result)
-    observations = [
-        desc
-        for detail in (analysis.harness_issue_details if analysis is not None else [])
-        if (desc := _describe_harness_detail(detail))
-    ]
+    observations = _describe_harness_details(
+        analysis.harness_issue_details if analysis is not None else [],
+    )
     observations.extend(_summarize_quality_signals(analysis))
     unique_observations = _dedupe_preserve_order(observations)
     if unique_observations:
@@ -24455,11 +24455,9 @@ def _issue_minimal_evidence_for_result(
             )
     else:
         analysis = _quality_analysis_for_result(result)
-        observations = [
-            desc
-            for detail in (analysis.harness_issue_details if analysis is not None else [])
-            if (desc := _describe_harness_detail(detail))
-        ]
+        observations = _describe_harness_details(
+            analysis.harness_issue_details if analysis is not None else [],
+        )
         observations.extend(_summarize_quality_signals(analysis))
         bullets.extend(
             (
