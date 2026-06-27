@@ -1523,7 +1523,157 @@ class TestMarkdownGalleryReport:
         assert "<!-- markdownlint-enable MD060 -->" in maintainer_queue
         assert "org/good" not in maintainer_queue
         assert "org/risky" in maintainer_queue
-        assert "org/bad" in maintainer_queue
+
+    def test_review_report_marks_hint_handling_not_evaluated_without_metadata(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Plain triage prompts should not claim trusted metadata hints were preserved."""
+        prompt = "Describe this image briefly."
+        text = "Two cats are sleeping on a pink blanket on a couch."
+        analysis = check_models.analyze_generation_text(
+            text,
+            generated_tokens=13,
+            prompt_tokens=1196,
+            prompt=prompt,
+            requested_max_tokens=200,
+        )
+        result = PerformanceResult(
+            model_name="org/plain-caption",
+            success=True,
+            generation=_MockGeneration(
+                text=text,
+                prompt_tokens=1196,
+                generation_tokens=13,
+            ),
+            quality_analysis=analysis,
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+        )
+        out = tmp_path / "review.md"
+
+        generate_review_report(
+            results=[result],
+            filename=out,
+            prompt=prompt,
+            report_context=_build_report_render_context(
+                results=[result],
+                prompt=prompt,
+                eval_mode="triage",
+            ),
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "not evaluated" in content
+        assert "preserves trusted hints" not in content
+
+    def test_review_report_keeps_hint_handling_when_metadata_is_present(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Metadata-grounded prompts should still evaluate trusted visual hints."""
+        prompt = (
+            "Context:\n"
+            "Title: Two tabby cats resting\n"
+            "Description: Two tabby cats rest on a bright pink couch with two remotes.\n"
+            "Keywords: cats, tabby, pink couch, remote controls\n\n"
+            "Describe this image briefly."
+        )
+        text = "Two tabby cats rest on a bright pink couch with two remote controls."
+        analysis = check_models.analyze_generation_text(
+            text,
+            generated_tokens=16,
+            prompt_tokens=260,
+            prompt=prompt,
+            requested_max_tokens=200,
+        )
+        result = PerformanceResult(
+            model_name="org/metadata-caption",
+            success=True,
+            generation=_MockGeneration(
+                text=text,
+                prompt_tokens=260,
+                generation_tokens=16,
+            ),
+            quality_analysis=analysis,
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+        )
+        out = tmp_path / "review.md"
+
+        generate_review_report(
+            results=[result],
+            filename=out,
+            prompt=prompt,
+            report_context=_build_report_render_context(
+                results=[result],
+                prompt=prompt,
+                metadata={
+                    "title": "Two tabby cats resting",
+                    "description": "Two tabby cats rest on a bright pink couch with two remotes.",
+                    "keywords": "cats, tabby, pink couch, remote controls",
+                },
+                eval_mode="quality",
+            ),
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "preserves trusted hints" in content
+        assert "not evaluated" not in content
+
+    def test_clean_image_heavy_review_focus_omits_nontext_burden(self) -> None:
+        """Non-text prompt burden should be context, not key evidence, for clean captions."""
+        prompt = "Describe this image briefly."
+        text = "Two cats are sleeping on a pink blanket on a couch."
+        analysis = check_models.analyze_generation_text(
+            text,
+            generated_tokens=13,
+            prompt_tokens=1196,
+            prompt=prompt,
+            requested_max_tokens=200,
+        )
+        result = PerformanceResult(
+            model_name="org/plain-caption",
+            success=True,
+            generation=_MockGeneration(
+                text=text,
+                prompt_tokens=1196,
+                generation_tokens=13,
+            ),
+            quality_analysis=analysis,
+        )
+        review = check_models._build_jsonl_review_record(result)
+
+        assert review is not None
+        assert "nontext prompt burden" not in check_models._review_focus_text(review, analysis)
+
+    def test_context_budget_review_focus_keeps_nontext_burden(self) -> None:
+        """Real context-collapse cases should still expose image-token pressure."""
+        analysis = check_models.analyze_generation_text(
+            "Cat.",
+            generated_tokens=3,
+            prompt_tokens=4103,
+            prompt="Describe this image briefly.",
+            requested_max_tokens=200,
+        )
+        result = PerformanceResult(
+            model_name="org/context-collapse",
+            success=True,
+            generation=_MockGeneration(
+                text="Cat.",
+                prompt_tokens=4103,
+                generation_tokens=3,
+            ),
+            quality_analysis=analysis,
+        )
+        review = check_models._build_jsonl_review_record(result)
+
+        assert review is not None
+        focus = check_models._review_focus_text(review, analysis)
+        assert analysis.verdict == "context_budget"
+        assert "nontext prompt burden" in focus
 
     def test_gallery_includes_summary_pointer_and_per_model_review_status(
         self,
@@ -3340,6 +3490,39 @@ class TestDiagnosticsReport:
         assert "org/good" in content
         assert "error_type" in content
 
+    def test_generate_tsv_report_includes_full_generated_text_for_analysis(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Spreadsheet output should preserve exact generated text separately from previews."""
+        out = tmp_path / "results.tsv"
+        full_text = (
+            "Two cats are sleeping on a pink couch. "
+            + "context words " * 40
+            + "</think> exact leak marker after a long reasoning preface."
+        )
+        result = PerformanceResult(
+            model_name="org/full-output",
+            success=True,
+            generation=_MockGeneration(
+                text=full_text,
+                prompt_tokens=317,
+                generation_tokens=196,
+            ),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+        )
+
+        generate_tsv_report(
+            results=[result],
+            filename=out,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "Generated Text" in content
+        assert "</think> exact leak marker" in content
+
     def test_generate_tsv_report_standalone_uses_prepared_table_path(
         self,
         tmp_path: Path,
@@ -4441,6 +4624,37 @@ class TestGithubIssueReportContent:
         assert "mlx-vlm_stop-token_001" not in content
         assert "&lt;\\|end\\|&gt;" in content
         assert "&lt;/think&gt;" in content
+
+    def test_stop_token_issue_excerpt_keeps_late_leak_marker(self, tmp_path: Path) -> None:
+        """Issue excerpts should center on exact late leak markers instead of only the head."""
+        leaked_text = (
+            "A long answer starts with plausible visual details. "
+            + "background context " * 80
+            + "</think> leaked control token after the long preface."
+        )
+        result = _make_harness_success(
+            name="org/late-stop",
+            text=leaked_text,
+            generation_tokens=220,
+            harness_type="stop_token",
+            harness_detail="token_leak:</think>",
+        )
+        snapshot = DiagnosticsSnapshot(
+            harness_results=((result, leaked_text),),
+        )
+
+        generated = _generate_github_issue_reports(
+            diagnostics_snapshot=snapshot,
+            output_dir=tmp_path,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            repro_bundles={},
+            run_args=None,
+        )
+
+        content = next(iter(generated.values())).read_text(encoding="utf-8")
+        assert "</think> leaked control token" in content
+        assert "Output excerpt:" in content
 
     def test_unrelated_harness_subtypes_produce_separate_issues(self, tmp_path: Path) -> None:
         """Different harness subtypes should not be merged into one draft."""

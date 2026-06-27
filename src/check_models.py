@@ -4023,8 +4023,11 @@ def _parse_context_hint_lines(
     nonvisual_lines: list[str] = []
     prefix_targets: tuple[tuple[str, str], ...] = (
         ("title hint:", "title"),
+        ("title:", "title"),
         ("description hint:", "description"),
+        ("description:", "description"),
         ("keyword hints:", "keywords"),
+        ("keywords:", "keywords"),
         ("capture metadata:", "nonvisual"),
     )
 
@@ -4386,7 +4389,7 @@ def _classify_hint_relationship(
 ) -> tuple[str, list[str]]:
     """Classify how the answer relates to trusted prompt hints."""
     if not bundle.trusted_text:
-        return "preserves_trusted_hints", []
+        return "not_evaluated", []
 
     text_for_hint_eval = _strip_nonvisual_terms_from_text(text, bundle.nonvisual_terms) or text
     normalized_text = _normalize_phrase_for_matching(text_for_hint_eval)
@@ -4563,6 +4566,7 @@ def _classify_user_bucket(
         in {
             "improves_trusted_hints",
             "preserves_trusted_hints",
+            "not_evaluated",
         }
         and not has_contract_issue
     )
@@ -5088,6 +5092,36 @@ def _detect_special_token_leakage(text: str) -> tuple[bool, list[str]]:
     return bool(leaked_tokens), leaked_tokens
 
 
+def _minimal_output_weakness_reason(text: str, generated_tokens: int) -> str | None:
+    """Return a weak-output reason when short text is likely not useful content."""
+    text_stripped: str = text.strip()
+    if not text_stripped:
+        return f"empty({generated_tokens}tok)"
+
+    word_count: int = len(text_stripped.split())
+    text_lower: str = text_stripped.lower()
+
+    filler_responses: list[str] = [
+        "the image is a photograph",
+        "the image is in the public domain",
+        "i cannot",
+        "i can't",
+    ]
+    for filler in filler_responses:
+        if text_lower.startswith(filler) and word_count < QUALITY.min_words_for_filler_response:
+            return f"filler_response({generated_tokens}tok)"
+
+    if word_count < QUALITY.min_words_for_truncated:
+        return f"truncated({generated_tokens}tok)"
+
+    return None
+
+
+def _minimal_output_weakness_label(reason: str) -> str:
+    """Return a compact weak-output label safe to embed in structured detail strings."""
+    return reason.split("(", maxsplit=1)[0]
+
+
 def _detect_minimal_output(
     text: str,
     generated_tokens: int,
@@ -5115,27 +5149,11 @@ def _detect_minimal_output(
 
     # Less than threshold tokens when we have a substantial prompt
     if generated_tokens < QUALITY.min_tokens_for_substantial:
-        # Check if the output is actually meaningful or just filler
-        text_stripped: str = text.strip()
-        word_count: int = len(text_stripped.split())
+        weak_reason = _minimal_output_weakness_reason(text, generated_tokens)
+        if weak_reason is not None:
+            return True, weak_reason
 
-        # Single sentence filler responses
-        filler_responses: list[str] = [
-            "the image is a photograph",
-            "the image is in the public domain",
-            "i cannot",
-            "i can't",
-            "this image shows",
-        ]
-        text_lower: str = text_stripped.lower()
-        for filler in filler_responses:
-            if text_lower.startswith(filler) and word_count < QUALITY.min_words_for_filler_response:
-                return True, f"filler_response({generated_tokens}tok)"
-
-        if word_count < QUALITY.min_words_for_truncated:
-            return True, f"truncated({generated_tokens}tok)"
-
-    # Very low ratio of output to prompt (if prompt_tokens known)
+    # Very low output/prompt ratio is only suspicious when the text is also weak.
     if (
         prompt_tokens
         and prompt_tokens > QUALITY.min_prompt_tokens_for_ratio
@@ -5143,7 +5161,10 @@ def _detect_minimal_output(
     ):
         ratio: float = generated_tokens / prompt_tokens
         if ratio < QUALITY.min_output_ratio:
-            return True, f"output_ratio({ratio:.1%})"
+            weak_reason = _minimal_output_weakness_reason(text, generated_tokens)
+            if weak_reason is not None:
+                weak_label = _minimal_output_weakness_label(weak_reason)
+                return True, f"output_ratio({ratio:.1%};{weak_label})"
 
     return False, None
 
@@ -5174,7 +5195,13 @@ def _detect_long_context_breakdown(
         return True, f"long_context_empty({prompt_tokens}tok)"
 
     if generated_tokens < QUALITY.min_output_tokens_for_ratio and ratio < QUALITY.min_output_ratio:
-        return True, f"long_context_low_ratio({ratio:.1%};{prompt_tokens}->{generated_tokens})"
+        weak_reason = _minimal_output_weakness_reason(text, generated_tokens)
+        if weak_reason is not None:
+            weak_label = _minimal_output_weakness_label(weak_reason)
+            return True, (
+                f"long_context_low_ratio({ratio:.1%};{prompt_tokens}->{generated_tokens};"
+                f"{weak_label})"
+            )
 
     if prompt_tokens >= QUALITY.severe_prompt_tokens_threshold and is_repetitive:
         return True, f"long_context_repetition({prompt_tokens}tok)"
@@ -6557,7 +6584,7 @@ class GenerationQualityAnalysis:
     prompt_checks_ran: bool = False
     instruction_echo: bool = False
     metadata_borrowing: bool = False
-    hint_relationship: str = "preserves_trusted_hints"
+    hint_relationship: str = "not_evaluated"
     verdict: str = "clean"
     owner: str = "model"
     user_bucket: str = "recommended"
@@ -7040,7 +7067,7 @@ def analyze_generation_text(
     )
     utility_context = prompt_signals.prompt_bundle.trusted_text or None
     utility_grade = str(compute_cataloging_utility(text, utility_context)["utility_grade"])
-    hint_relationship = "preserves_trusted_hints"
+    hint_relationship = "not_evaluated"
     hint_evidence: list[str] = []
     if prompt_signals.prompt_bundle.trusted_text:
         hint_relationship, hint_evidence = _classify_hint_relationship(
@@ -10729,7 +10756,7 @@ def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord |
     evidence: list[str] = _failure_review_evidence(result)
     return {
         "verdict": "runtime_failure",
-        "hint_relationship": "preserves_trusted_hints",
+        "hint_relationship": "not_evaluated",
         "instruction_echo": False,
         "metadata_borrowing": False,
         "likely_capped": bool(
@@ -11235,6 +11262,7 @@ def _review_focus_text(
     if (
         review["nontext_prompt_ratio"] is not None
         and review["nontext_prompt_ratio"] >= HEAVY_NON_TEXT_PROMPT_RATIO_THRESHOLD
+        and review["verdict"] == "context_budget"
     ):
         parts.append(f"nontext prompt burden={review['nontext_prompt_ratio']:.0%}")
 
@@ -13956,11 +13984,13 @@ def _describe_output_detail(output_detail: str) -> str | None:
         return f"Output appears truncated to about {match.group(1)} tokens."
     if match := re.fullmatch(r"filler_response\((\d+)tok\)", output_detail):
         return f"Output was a short generic filler response (about {match.group(1)} tokens)."
-    if match := re.fullmatch(r"output_ratio\(([^)]+)\)", output_detail):
-        ratio_text = match.group(1)
+    if match := re.fullmatch(r"output_ratio\(([^;)]+)(?:;([^)]+))?\)", output_detail):
+        ratio_text, weak_label = match.groups()
+        weak_text = f" with weak text signal '{weak_label}'" if weak_label else ""
         return (
             "Output is very short relative to prompt size "
-            f"({ratio_text}), suggesting possible early-stop or prompt-handling issues."
+            f"({ratio_text}){weak_text}, suggesting possible early-stop or "
+            "prompt-handling issues."
         )
     return None
 
@@ -13969,12 +13999,16 @@ def _describe_long_context_detail(detail: str) -> str | None:
     """Describe long-context harness anomalies in plain language."""
     if match := re.fullmatch(r"long_context_empty\((\d+)tok\)", detail):
         return f"At long prompt length ({match.group(1)} tokens), generation returned empty output."
-    if match := re.fullmatch(r"long_context_low_ratio\(([^;]+);(\d+)->(\d+)\)", detail):
-        ratio_text, prompt_tok, output_tok = match.groups()
+    if match := re.fullmatch(
+        r"long_context_low_ratio\(([^;]+);(\d+)->(\d+)(?:;([^)]+))?\)",
+        detail,
+    ):
+        ratio_text, prompt_tok, output_tok, weak_label = match.groups()
+        weak_text = f"; weak text signal {weak_label}" if weak_label else ""
         return (
             "At long prompt length "
             f"({prompt_tok} tokens), output stayed unusually short "
-            f"({output_tok} tokens; ratio {ratio_text})."
+            f"({output_tok} tokens; ratio {ratio_text}{weak_text})."
         )
     if match := re.fullmatch(r"long_context_repetition\((\d+)tok\)", detail):
         return f"At long prompt length ({match.group(1)} tokens), output became repetitive."
@@ -14026,8 +14060,10 @@ def _evidence_output_detail(output_detail: str) -> str | None:
         return f"generated_tokens~{match.group(1)}"
     if match := re.fullmatch(r"filler_response\((\d+)tok\)", output_detail):
         return f"generic filler response, generated_tokens~{match.group(1)}"
-    if match := re.fullmatch(r"output_ratio\(([^)]+)\)", output_detail):
-        return f"output/prompt={match.group(1)}"
+    if match := re.fullmatch(r"output_ratio\(([^;)]+)(?:;([^)]+))?\)", output_detail):
+        ratio_text, weak_label = match.groups()
+        weak_text = f", weak text={weak_label}" if weak_label else ""
+        return f"output/prompt={ratio_text}{weak_text}"
     return None
 
 
@@ -14035,9 +14071,16 @@ def _evidence_long_context_detail(detail: str) -> str | None:
     """Return fact-style evidence for long-context harness detections."""
     if match := re.fullmatch(r"long_context_empty\((\d+)tok\)", detail):
         return f"prompt_tokens={match.group(1)}, output_tokens=0"
-    if match := re.fullmatch(r"long_context_low_ratio\(([^;]+);(\d+)->(\d+)\)", detail):
-        ratio_text, prompt_tok, output_tok = match.groups()
-        return f"prompt_tokens={prompt_tok}, output_tokens={output_tok}, output/prompt={ratio_text}"
+    if match := re.fullmatch(
+        r"long_context_low_ratio\(([^;]+);(\d+)->(\d+)(?:;([^)]+))?\)",
+        detail,
+    ):
+        ratio_text, prompt_tok, output_tok, weak_label = match.groups()
+        weak_text = f", weak text={weak_label}" if weak_label else ""
+        return (
+            f"prompt_tokens={prompt_tok}, output_tokens={output_tok}, "
+            f"output/prompt={ratio_text}{weak_text}"
+        )
     if match := re.fullmatch(r"long_context_repetition\((\d+)tok\)", detail):
         return f"prompt_tokens={match.group(1)}, repetitive output"
     if match := re.fullmatch(r"long_context_context_drop\((\d+)tok\)", detail):
@@ -17048,9 +17091,11 @@ def generate_tsv_report(
     """Write a TSV (tab-separated values) file of the core results table.
 
     A ``# generated_at: <timestamp>`` comment line is written first so
-    downstream consumers know when the data was produced.  For failed models
-    two extra columns (``error_type``, ``error_package``) are appended to
-    aid programmatic triage.
+    downstream consumers know when the data was produced.  A full
+    ``Generated Text`` column is appended alongside the compact preview so
+    diagnostic markers remain searchable in spreadsheets.  For failed models
+    ``error_type`` and ``error_package`` are also appended to aid programmatic
+    triage.
 
     Args:
         results: List of PerformanceResult objects.
@@ -17095,17 +17140,26 @@ def generate_tsv_report(
         clean_header = re.sub(r"<[^>]+>", "", clean_header)
         clean_headers.append(escape_tsv_value(clean_header))
 
-    clean_headers.extend(["error_type", "error_package"])
+    clean_headers.extend(["Generated Text", "error_type", "error_package"])
+    generated_text_index = clean_headers.index("Generated Text")
 
     clean_rows: list[list[str]] = []
     for row, res in zip(rows, sorted_results, strict=False):
         clean_row = [escape_tsv_value(cell) for cell in row]
+        generated_text = (
+            str(getattr(res.generation, "text", "") or "") if res.generation is not None else ""
+        )
+        clean_row.append(escape_tsv_value(generated_text))
         clean_row.append(escape_tsv_value(res.error_type or ""))
         clean_row.append(escape_tsv_value(res.error_package or ""))
         clean_rows.append(
             [
-                c if len(c) <= MAX_TSV_CELL_CHARS else c[: MAX_TSV_CELL_CHARS - 3].rstrip() + "..."
-                for c in clean_row
+                (
+                    c
+                    if index == generated_text_index or len(c) <= MAX_TSV_CELL_CHARS
+                    else c[: MAX_TSV_CELL_CHARS - 3].rstrip() + "..."
+                )
+                for index, c in enumerate(clean_row)
             ]
         )
 
@@ -21381,7 +21435,7 @@ def _format_quality_analysis_for_log(analysis: GenerationQualityAnalysis) -> str
         _format_quality_log_flag("metadata_borrowing", analysis.metadata_borrowing),
         (
             f"hint_relationship={analysis.hint_relationship}"
-            if analysis.hint_relationship != "preserves_trusted_hints"
+            if analysis.hint_relationship not in {"preserves_trusted_hints", "not_evaluated"}
             else None
         ),
         f"verdict={analysis.verdict}" if analysis.verdict != "clean" else None,
@@ -21551,6 +21605,47 @@ def _truncate_text_preview(text: str, *, max_chars: int) -> str:
     if len(text) <= max_chars:
         return text
     return text[: max_chars - 3].rstrip() + "..."
+
+
+def _center_text_preview_on_needles(
+    text: str,
+    *,
+    needles: Sequence[str],
+    max_chars: int,
+) -> str:
+    """Trim text around the first requested needle so evidence remains visible."""
+    if len(text) <= max_chars:
+        return text
+
+    matched_index: int | None = None
+    matched_needle = ""
+    for needle in needles:
+        if not needle:
+            continue
+        index = text.find(needle)
+        if index == -1:
+            index = text.casefold().find(needle.casefold())
+        if index != -1:
+            matched_index = index
+            matched_needle = needle
+            break
+
+    if matched_index is None:
+        return _truncate_text_preview(text, max_chars=max_chars)
+
+    ellipsis = "..."
+    available_chars = max(max_chars - (len(ellipsis) * 2), len(matched_needle))
+    start = max(matched_index - max((available_chars - len(matched_needle)) // 2, 0), 0)
+    end = min(start + available_chars, len(text))
+    if end - start < available_chars:
+        start = max(end - available_chars, 0)
+
+    preview = text[start:end].strip()
+    if start > 0:
+        preview = ellipsis + preview
+    if end < len(text):
+        preview = preview + ellipsis
+    return preview
 
 
 def _collapse_preview_whitespace(text: str) -> str:
@@ -24227,6 +24322,41 @@ def _issue_failure_evidence(result: PerformanceResult) -> list[str]:
     return parts
 
 
+def _issue_output_preview_needles(
+    analysis: GenerationQualityAnalysis | None,
+) -> tuple[str, ...]:
+    """Return exact output markers that issue excerpts should keep visible."""
+    if analysis is None:
+        return ()
+    needles = [
+        detail.removeprefix("token_leak:")
+        for detail in analysis.harness_issue_details
+        if detail.startswith("token_leak:")
+    ]
+    return tuple(_dedupe_preserve_order(needles))
+
+
+def _issue_output_excerpt(
+    result: PerformanceResult,
+    *,
+    max_chars: int,
+) -> str:
+    """Return issue evidence output excerpt, centered on explicit leak markers when present."""
+    generation_text = (
+        str(getattr(result.generation, "text", "") or "").strip()
+        if result.generation is not None
+        else ""
+    )
+    if not generation_text:
+        return ""
+    needles = _issue_output_preview_needles(_quality_analysis_for_result(result))
+    return _center_text_preview_on_needles(
+        generation_text,
+        needles=needles,
+        max_chars=max_chars,
+    )
+
+
 def _issue_harness_evidence(result: PerformanceResult) -> list[str]:
     """Build harness-specific evidence for one affected model."""
     parts = [f"### `{MARKDOWN_ESCAPER.escape(result.model_name)}`", ""]
@@ -24244,18 +24374,10 @@ def _issue_harness_evidence(result: PerformanceResult) -> list[str]:
         parts.extend(f"- {MARKDOWN_ESCAPER.escape(item)}" for item in unique_observations)
         parts.append("")
 
-    sample_output = (
-        str(getattr(result.generation, "text", "") or "").strip()
-        if result.generation is not None
-        else ""
-    )
+    sample_output = _issue_output_excerpt(result, max_chars=DIAGNOSTICS.output_snippet_len)
     if sample_output:
         parts.append("Sample output:")
-        _append_markdown_code_block(
-            parts,
-            _truncate_text_preview(sample_output, max_chars=DIAGNOSTICS.output_snippet_len),
-            language="text",
-        )
+        _append_markdown_code_block(parts, sample_output, language="text")
     return parts
 
 
@@ -24347,13 +24469,9 @@ def _issue_minimal_evidence_for_result(
             for observation in _dedupe_preserve_order(observations)[:2]
         )
 
-    generation_text = (
-        str(getattr(result.generation, "text", "") or "").strip()
-        if result.generation is not None
-        else ""
-    )
+    generation_text = _issue_output_excerpt(result, max_chars=320)
     if generation_text:
-        preview = " ".join(_truncate_text_preview(generation_text, max_chars=320).split())
+        preview = " ".join(generation_text.split())
         bullets.append(f"Output excerpt: `{MARKDOWN_ESCAPER.escape(preview)}`")
     return bullets
 

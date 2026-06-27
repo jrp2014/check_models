@@ -19,6 +19,15 @@ class MockGenerationResult:
     cache_memory: float | None = None
 
 
+def _read_tsv_record(path: Path) -> dict[str, str]:
+    """Return the first data row keyed by stripped TSV headers."""
+    content = path.read_text(encoding="utf-8")
+    data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
+    headers = [cell.strip() for cell in data_lines[0].split("\t")]
+    values = [cell.strip() for cell in data_lines[1].split("\t")]
+    return dict(zip(headers, values, strict=False))
+
+
 def test_generate_tsv_report_basic(tmp_path: Path) -> None:
     """Should generate basic TSV report with headers and data."""
     # Create a simple test result
@@ -70,16 +79,11 @@ def test_tsv_escapes_tabs_in_values() -> None:
 
     try:
         check_models.generate_tsv_report(results, output_file)
-        content = output_file.read_text(encoding="utf-8")
+        record = _read_tsv_record(output_file)
 
-        # The output text should not contain actual tabs within the field value
-        # (but will have tabs as column separators)
-        # Skip metadata comment line
-        data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
-        # Get the last column which contains the output
-        last_column = data_lines[1].split("\t")[-1]
         # Shared output previews normalize internal whitespace before TSV escaping
-        assert "Line with tab character" in last_column
+        assert "Line with tab character" in record["Output"]
+        assert "Line with    tab character" in record["Generated Text"]
     finally:
         output_file.unlink()
 
@@ -109,9 +113,10 @@ def test_tsv_escapes_newlines_in_values() -> None:
         assert len(data_lines) == 2
 
         # Shared output previews collapse multiline output into a readable one-line preview
-        last_column = data_lines[1].split("\t")[-1]
-        assert "Line 1 Line 2 Line 3" in last_column
-        assert "\\n" not in last_column
+        record = _read_tsv_record(output_file)
+        assert "Line 1 Line 2 Line 3" in record["Output"]
+        assert "\\n" not in record["Output"]
+        assert "Line 1\\nLine 2\\nLine 3" in record["Generated Text"]
     finally:
         output_file.unlink()
 
@@ -255,7 +260,7 @@ def test_tsv_full_model_name(tmp_path: Path) -> None:
 
 
 def test_tsv_caps_oversized_cells(tmp_path: Path) -> None:
-    """TSV cells longer than MAX_TSV_CELL_CHARS are truncated."""
+    """Compact TSV cells are capped while exact generated text is preserved."""
     long_text = "x" * 500
     results = [
         check_models.PerformanceResult(
@@ -269,8 +274,15 @@ def test_tsv_caps_oversized_cells(tmp_path: Path) -> None:
     check_models.generate_tsv_report(results, output_file)
     content = output_file.read_text(encoding="utf-8")
     data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
-    # No cell in any data row should exceed the cap
+    headers = [cell.strip() for cell in data_lines[0].split("\t")]
+    generated_text_index = headers.index("Generated Text")
+    record = _read_tsv_record(output_file)
+    assert record["Generated Text"] == long_text
+
+    # Compact/metadata cells stay capped; Generated Text is intentionally exact.
     max_cell = check_models.MAX_TSV_CELL_CHARS
     for line in data_lines[1:]:
-        for cell in line.split("\t"):
+        for index, cell in enumerate(line.split("\t")):
+            if index == generated_text_index:
+                continue
             assert len(cell) <= max_cell, f"Cell length {len(cell)} exceeds {max_cell}"

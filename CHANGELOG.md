@@ -7,7 +7,7 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Bump the package version to `0.8.3` for the MLX stack dependency sync,
+- Bump the package version to `0.8.4` for the MLX stack dependency sync,
   upstream passthrough-diagnostics refinement, and gallery output-cost summary.
 - Align the project Transformers floor with the current `mlx-lm>=0.31.3`
   requirement (`transformers>=5.7.0`) and keep the shared dependency policy,
@@ -106,6 +106,11 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Calibrate image-heavy prompt quality review so low output/prompt ratio is no
+  longer a hard harness failure without weak text, early-stop, or context-collapse
+  evidence; keep non-text prompt burden in run context except real context-budget
+  cases, mark ungrounded trusted-hint review as not evaluated, preserve full
+  generated text in TSV, and center issue excerpts on leaked control tokens.
 - Make benchmark logs less repetitive and more actionable by avoiding duplicate
   EXIF absence probes, suppressing cataloging/keyword scorecards in triage-mode
   console summaries, filtering self-captured Rich tracebacks from failure

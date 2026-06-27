@@ -397,7 +397,7 @@ def test_analyze_generation_text_uses_nontext_prompt_burden_for_context_budget()
         "- Keyword hints: brick storefront, outdoor seating, sidewalk, people\n"
     )
     analysis = check_models.analyze_generation_text(
-        "Title: Storefront scene\nDescription: A storefront.\nKeywords: storefront, street",
+        "The image is a photograph.",
         generated_tokens=14,
         prompt_tokens=5000,
         prompt=prompt,
@@ -755,6 +755,23 @@ def test_detect_minimal_output_normal() -> None:
     assert reason is None
 
 
+def test_image_heavy_short_caption_does_not_become_prompt_template_harness() -> None:
+    """Useful short captions should not fail only because image tokens dominate the prompt."""
+    analysis = check_models.analyze_generation_text(
+        text="Two cats are sleeping on a pink blanket on a couch.",
+        generated_tokens=13,
+        prompt_tokens=1196,
+        prompt="Describe this image briefly.",
+        requested_max_tokens=200,
+    )
+
+    assert analysis.has_harness_issue is False
+    assert analysis.harness_issue_type is None
+    assert analysis.verdict == "clean"
+    assert analysis.user_bucket == "recommended"
+    assert not any("output_ratio" in item for item in analysis.issues)
+
+
 def test_analyze_generation_text_detects_long_context_breakdown() -> None:
     """Very long prompt contexts with tiny outputs should be flagged."""
     analysis = check_models.analyze_generation_text(
@@ -765,6 +782,54 @@ def test_analyze_generation_text_detects_long_context_breakdown() -> None:
     assert analysis.has_harness_issue is True
     assert analysis.harness_issue_type == "long_context"
     assert any("long_context" in item for item in analysis.harness_issue_details)
+
+
+def test_long_context_with_useful_caption_does_not_fail_on_ratio_alone() -> None:
+    """Long image prompts need weak output evidence before becoming context-budget findings."""
+    analysis = check_models.analyze_generation_text(
+        text="Two cats are sleeping on a pink blanket on a couch.",
+        generated_tokens=13,
+        prompt_tokens=4103,
+        prompt="Describe this image briefly.",
+        requested_max_tokens=200,
+    )
+
+    assert analysis.has_harness_issue is False
+    assert analysis.harness_issue_type is None
+    assert analysis.verdict == "clean"
+
+
+def test_prompt_without_trusted_metadata_marks_hint_handling_not_evaluated() -> None:
+    """Plain prompts should not claim that output preserved trusted image hints."""
+    analysis = check_models.analyze_generation_text(
+        text="Two cats are sleeping on a pink blanket on a couch.",
+        generated_tokens=13,
+        prompt_tokens=1196,
+        prompt="Describe this image briefly.",
+        requested_max_tokens=200,
+    )
+
+    assert analysis.hint_relationship == "not_evaluated"
+
+
+def test_prompt_with_visual_metadata_still_evaluates_hint_handling() -> None:
+    """Metadata-grounded prompts should continue to score trusted visual hints."""
+    prompt = (
+        "Context:\n"
+        "Title: Two tabby cats resting\n"
+        "Description: Two tabby cats rest on a bright pink couch with two remotes.\n"
+        "Keywords: cats, tabby, pink couch, remote controls\n\n"
+        "Describe this image briefly."
+    )
+    analysis = check_models.analyze_generation_text(
+        text="Two tabby cats rest on a bright pink couch with two remote controls.",
+        generated_tokens=16,
+        prompt_tokens=260,
+        prompt=prompt,
+        requested_max_tokens=200,
+    )
+
+    assert analysis.hint_relationship == "preserves_trusted_hints"
 
 
 def test_detect_training_data_leak_instruction() -> None:
