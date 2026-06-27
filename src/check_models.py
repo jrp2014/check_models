@@ -14291,10 +14291,11 @@ def _diagnostics_harness_section(
                 f"- {HTML_ESCAPER.escape(observation)}" for observation in unique_observations
             )
             parts.append("")
-        snippet_source = text.strip() or "<empty output>"
-        snippet = snippet_source[: DIAGNOSTICS.output_snippet_len]
-        if len(snippet_source) > DIAGNOSTICS.output_snippet_len:
-            snippet += "..."
+        snippet = _center_text_preview_on_needles(
+            text.strip() or "<empty output>",
+            needles=_output_preview_needles(qa),
+            max_chars=DIAGNOSTICS.output_snippet_len,
+        )
         parts.append("**Sample output:**")
         _append_markdown_code_block(parts, snippet, language="text")
 
@@ -24324,7 +24325,7 @@ def _issue_failure_evidence(result: PerformanceResult) -> list[str]:
     return parts
 
 
-def _issue_output_preview_needles(
+def _output_preview_needles(
     analysis: GenerationQualityAnalysis | None,
 ) -> tuple[str, ...]:
     """Return exact output markers that issue excerpts should keep visible."""
@@ -24351,7 +24352,7 @@ def _issue_output_excerpt(
     )
     if not generation_text:
         return ""
-    needles = _issue_output_preview_needles(_quality_analysis_for_result(result))
+    needles = _output_preview_needles(_quality_analysis_for_result(result))
     return _center_text_preview_on_needles(
         generation_text,
         needles=needles,

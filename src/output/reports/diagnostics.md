@@ -130,8 +130,11 @@ Two cats are sleeping on a pink couch with remote controls beside them.<|end|><|
 **Sample output:**
 
 ```text
-Here are my reasoning steps:
-The user asks: "Describe this image briefly." The image is of two cats sleeping on a pink couch, with a remote control. The user wants a brief description. This is a strai...
+...t's it. No need for extra. We'll comply.
+[BEGIN FINAL RESPONSE]
+Two tabby cats are curled up sleeping side‑by‑side on a pink couch, with a TV remote resting nearby.
+[END FINAL RESPONSE]
+<|end|>
 ```
 
 ### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`

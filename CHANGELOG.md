@@ -109,6 +109,8 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Center diagnostics harness sample output on leaked control tokens when the
+  marker appears after a long preface, matching issue-draft evidence excerpts.
 - Calibrate image-heavy prompt quality review so low output/prompt ratio is no
   longer a hard harness failure without weak text, early-stop, or context-collapse
   evidence; keep non-text prompt burden in run context except real context-budget
