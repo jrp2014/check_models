@@ -12969,9 +12969,14 @@ def _harness_symptom_family(
         return subtype
     details = tuple(analysis.harness_issue_details if analysis is not None else ())
     detail_kinds = {_split_harness_detail(detail)[0] for detail in details}
-    for kind, symptom_family in _HARNESS_DETAIL_SYMPTOM_FAMILY.items():
-        if kind in detail_kinds:
-            return symptom_family
+    if "token_leak" in detail_kinds:
+        return "stop_token"
+    if "token_encoding" in detail_kinds:
+        return "encoding"
+    if "output" in detail_kinds:
+        return "prompt_template"
+    if "long_context" in detail_kinds:
+        return "long_context"
     return subtype
 
 
@@ -13836,14 +13841,6 @@ _HARNESS_OWNER_BY_TYPE: Final[dict[str, str]] = {
 }
 
 
-_HARNESS_DETAIL_SYMPTOM_FAMILY: Final[dict[str, str]] = {
-    "token_leak": "stop_token",
-    "token_encoding": "encoding",
-    "output": "prompt_template",
-    "long_context": "long_context",
-}
-
-
 def _split_harness_detail(detail: str) -> tuple[str, str]:
     """Return structured harness detail kind and payload."""
     raw = detail or ""
@@ -14130,6 +14127,13 @@ def _summarize_quality_signals(qa: GenerationQualityAnalysis | None) -> list[str
     return _dedupe_preserve_order(messages)
 
 
+def _harness_observations(qa: GenerationQualityAnalysis | None) -> list[str]:
+    """Return display observations for successful-run harness diagnostics."""
+    observations = _describe_harness_details(qa.harness_issue_details if qa is not None else [])
+    observations.extend(_summarize_quality_signals(qa))
+    return observations
+
+
 def _build_cluster_filing_guidance(
     *,
     representative: PerformanceResult,
@@ -14278,12 +14282,9 @@ def _diagnostics_harness_section(
     for res, text in harness_results:
         gen = res.generation
         qa = res.quality_analysis or (getattr(gen, "quality_analysis", None) if gen else None)
-        harness_details = getattr(qa, "harness_issue_details", []) if qa else []
 
         _append_markdown_section(parts, title=f"### `{res.model_name}`")
-        observations = _describe_harness_details(harness_details)
-        observations.extend(_summarize_quality_signals(qa))
-        unique_observations = _dedupe_preserve_order(observations)
+        unique_observations = _dedupe_preserve_order(_harness_observations(qa))
         if unique_observations:
             parts.append("**Why this appears to be an integration/runtime issue:**")
             parts.append("")
@@ -24331,11 +24332,11 @@ def _output_preview_needles(
     """Return exact output markers that issue excerpts should keep visible."""
     if analysis is None:
         return ()
-    needles: list[str] = []
-    for detail in analysis.harness_issue_details:
-        kind, payload = _split_harness_detail(detail)
-        if kind == "token_leak":
-            needles.append(payload)
+    needles = [
+        payload
+        for kind, payload in map(_split_harness_detail, analysis.harness_issue_details)
+        if kind == "token_leak"
+    ]
     return tuple(_dedupe_preserve_order(needles))
 
 
@@ -24352,10 +24353,9 @@ def _issue_output_excerpt(
     )
     if not generation_text:
         return ""
-    needles = _output_preview_needles(_quality_analysis_for_result(result))
     return _center_text_preview_on_needles(
         generation_text,
-        needles=needles,
+        needles=_output_preview_needles(_quality_analysis_for_result(result)),
         max_chars=max_chars,
     )
 
@@ -24364,11 +24364,7 @@ def _issue_harness_evidence(result: PerformanceResult) -> list[str]:
     """Build harness-specific evidence for one affected model."""
     parts = [f"### `{MARKDOWN_ESCAPER.escape(result.model_name)}`", ""]
     analysis = _quality_analysis_for_result(result)
-    observations = _describe_harness_details(
-        analysis.harness_issue_details if analysis is not None else [],
-    )
-    observations.extend(_summarize_quality_signals(analysis))
-    unique_observations = _dedupe_preserve_order(observations)
+    unique_observations = _dedupe_preserve_order(_harness_observations(analysis))
     if unique_observations:
         parts.append("Observed signals:")
         parts.append("")
@@ -24456,16 +24452,12 @@ def _issue_minimal_evidence_for_result(
             )
     else:
         analysis = _quality_analysis_for_result(result)
-        observations = _describe_harness_details(
-            analysis.harness_issue_details if analysis is not None else [],
-        )
-        observations.extend(_summarize_quality_signals(analysis))
         bullets.extend(
             (
                 f"`{MARKDOWN_ESCAPER.escape(result.model_name)}`: "
                 f"{MARKDOWN_ESCAPER.escape(observation)}"
             )
-            for observation in _dedupe_preserve_order(observations)[:2]
+            for observation in _dedupe_preserve_order(_harness_observations(analysis))[:2]
         )
 
     generation_text = _issue_output_excerpt(result, max_chars=320)

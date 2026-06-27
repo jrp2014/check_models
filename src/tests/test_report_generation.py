@@ -1902,39 +1902,16 @@ class TestDiagnosticsReport:
         assert check_models._infer_harness_issue_owner(training_leak) == "mlx-vlm / mlx-lm"
         assert check_models._infer_harness_issue_owner(output_shape) == "model-config / mlx-vlm"
 
-    def test_diagnostics_harness_sample_output_keeps_late_leak_marker(
-        self,
-        tmp_path: Path,
-    ) -> None:
+    def test_diagnostics_harness_sample_output_keeps_late_leak_marker(self) -> None:
         """Diagnostics samples should show the exact leaked marker, not only the output head."""
-        leaked_text = (
-            "Here are my reasoning steps:\n"
-            "The user asks for a brief image description. "
-            + "background context " * 80
-            + "leaked control token <|end|> after the long preface."
-        )
+        leaked_text = "background context " * 80 + "leaked control token <|end|> after."
         result = _make_harness_success(
-            "org/late-stop",
             text=leaked_text,
-            generation_tokens=220,
             harness_type="stop_token",
             harness_detail="token_leak:<|end|>",
         )
-        out = tmp_path / "diag.md"
 
-        generate_diagnostics_report(
-            results=[result],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            prompt="Describe this image briefly.",
-        )
-
-        section = _extract_markdown_subsection(
-            out.read_text(encoding="utf-8"),
-            "### `org/late-stop`",
-            end_headings=("### `", "## "),
-        )
+        section = "\n".join(check_models._diagnostics_harness_section([(result, leaked_text)]))
         assert "leaked control token <|end|> after" in section
 
     def test_no_report_when_all_succeed(self, tmp_path: Path) -> None:

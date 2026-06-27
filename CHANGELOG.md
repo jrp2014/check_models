@@ -78,9 +78,9 @@ Notable changes to this project will be documented in this file.
 - Extend the Skylos quality-gate invocation to include secrets and SCA checks,
   while documenting `--danger` as an advisory follow-up until its current
   filesystem findings are triaged.
-- Centralize harness-detail signal parsing for review, diagnostics, and issue
-  reports while preserving the single-file CLI structure and existing artifact
-  output.
+- Centralize and trim harness-detail signal plumbing for review, diagnostics,
+  and issue reports while preserving the single-file CLI structure and existing
+  artifact output.
 - Add a dedicated `make skylos-danger` advisory path, plus an LLM-oriented
   `make skylos-danger-llm` variant, so workflow-security findings are surfaced
   separately from the blocking quality gate with GitHub annotations and step
