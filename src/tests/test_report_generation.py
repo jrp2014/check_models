@@ -348,8 +348,79 @@ class TestModelCapabilityScorecard:
         assert (
             "Structured metadata and keyword capability: not evaluated in triage mode." in markdown
         )
+        assert "Clean" in markdown
+        assert "Hygiene" in markdown
+        assert "Metadata" not in next(line for line in markdown.splitlines() if "Caption" in line)
         assert model_payload["keyword_score_avg"] is None
         assert model_payload["cataloging_score_avg"] is None
+
+    def test_scorecard_keeps_clean_high_caption_triage_models_reviewable(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Caption-usable triage rows should not be hidden behind history-only avoid labels."""
+        result = PerformanceResult(
+            model_name="org/history-risk-current-caption",
+            success=True,
+            generation=_MockGeneration(
+                text="Two tabby cats are sleeping on a bright pink couch beside two remote controls.",
+                generation_tps=88.0,
+                prompt_tokens=24,
+                generation_tokens=14,
+                peak_memory=3.5,
+            ),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+        )
+        report_context = _build_report_render_context(
+            results=[result],
+            prompt="Describe this image briefly.",
+            eval_mode="triage",
+        )
+        history_record: check_models.HistoryRunRecord = {
+            "_type": "run",
+            "format_version": "1.0",
+            "timestamp": "2026-06-20 10:00:00 +0000",
+            "prompt_hash": "prior",
+            "prompt_preview": "Describe this image briefly.",
+            "image_path": "prior.jpg",
+            "model_results": {
+                result.model_name: {
+                    "success": True,
+                    "error_stage": None,
+                    "error_type": None,
+                    "error_package": None,
+                    "review_user_bucket": "avoid",
+                    "review_verdict": "clean",
+                    "capability_score": 0.0,
+                    "hygiene_score": 100.0,
+                    "caption_score": 96.0,
+                    "generation_tps": 42.0,
+                    "peak_memory_gb": 4.0,
+                },
+            },
+            "system": {},
+            "library_versions": {},
+        }
+        markdown_path = tmp_path / "model_capabilities.md"
+        json_path = tmp_path / "model_capabilities.json"
+
+        check_models.generate_model_capability_scorecard(
+            [result],
+            markdown_path,
+            json_path,
+            prompt="Describe this image briefly.",
+            report_context=report_context,
+            history_records=(history_record,),
+        )
+
+        markdown = markdown_path.read_text(encoding="utf-8")
+        payload = json.loads(json_path.read_text(encoding="utf-8"))
+
+        assert "`org/history-risk-current-caption`" in markdown
+        assert "caption" in payload["models"][0]["recommendation"]
+        assert payload["models"][0]["recommendation"] != "avoid"
 
 
 def _make_quality_success(
@@ -1132,10 +1203,16 @@ class TestMarkdownReportEdgeCases:
         content = out.read_text(encoding="utf-8")
         assert "# Model Selection Brief" in content
         assert "Semantic rankings: ungrounded" in content
+        assert "brief captions only" in content
         assert "Scope: ranked shortlist, not the complete run" in content
         assert "complete per-model outputs and diagnostics are in" in content
         assert "Brief Caption Candidates" in content
         assert "Top 10 ranked candidates for brief captions" in content
+        assert "Gen TPS" in content
+        assert "Peak GB" in content
+        good_row = next(line for line in content.splitlines() if "org/good-caption" in line)
+        assert "80" in good_row
+        assert "3" in good_row
         assert "`org/good-caption`" in content
         assert "`org/harness-caption`" in content
         assert "Structured metadata scoring is suppressed in triage mode." in content
@@ -1658,6 +1735,7 @@ class TestMarkdownGalleryReport:
         assert "Evidence Bundle" in content
         assert "Fixed When" in content
         assert "Canonical run log" in content
+        assert "Treat as a model-quality limitation" not in content
         maintainer_queue = content.split("## Maintainer Escalations", maxsplit=1)[1].split(
             "## Model Verdicts",
             maxsplit=1,
@@ -1666,6 +1744,34 @@ class TestMarkdownGalleryReport:
         assert "<!-- markdownlint-enable MD060 -->" in maintainer_queue
         assert "org/good" not in maintainer_queue
         assert "org/risky" in maintainer_queue
+
+    def test_review_report_links_issue_repro_bundles_when_available(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Review maintainer queue should carry repro bundle links, not placeholder dashes."""
+        out = tmp_path / "review.md"
+        risky = _make_harness_success(
+            "org/risky", harness_type="stop_token", harness_detail="token_leak:<s>"
+        )
+        report_context = _build_report_render_context(results=[risky], prompt="describe")
+        bundle_path = tmp_path / "repro_bundles" / "risky.json"
+
+        generate_review_report(
+            results=[risky],
+            filename=out,
+            prompt="describe",
+            report_context=report_context,
+            repro_bundles={risky.model_name: bundle_path},
+        )
+
+        content = out.read_text(encoding="utf-8")
+        maintainer_queue = content.split("## Maintainer Escalations", maxsplit=1)[1].split(
+            "## Model Verdicts",
+            maxsplit=1,
+        )[0]
+        assert "[repro JSON]" in maintainer_queue
+        assert "risky.json" in maintainer_queue
 
     def test_review_report_marks_hint_handling_not_evaluated_without_metadata(
         self,

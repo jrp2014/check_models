@@ -1445,6 +1445,7 @@ class ReportGenerationInputs:
     output_paths: ReportOutputPaths
     history_records: Sequence[HistoryRunRecord] = ()
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None
+    diagnostics_artifacts: DiagnosticsArtifacts | None = None
 
 
 @dataclass(frozen=True)
@@ -11502,7 +11503,7 @@ def _build_markdown_review_block_rows(result: PerformanceResult) -> list[tuple[s
 
     review = payload.review
     analysis = payload.analysis
-    return [
+    rows = [
         (
             "Recommendation",
             (
@@ -11515,6 +11516,13 @@ def _build_markdown_review_block_rows(result: PerformanceResult) -> list[tuple[s
         ("Key signals", _markdown_review_text(payload.key_signals)),
         ("Tokens", _markdown_review_token_accounting_text(result, review)),
     ]
+    if (
+        review["user_bucket"] == "recommended"
+        and review["verdict"] == "clean"
+        and payload.key_signals == "no flagged signals"
+    ):
+        rows = [row for row in rows if row[0] != "Next step"]
+    return rows
 
 
 def _summarize_context_ignored_signal(qa: GenerationQualityAnalysis) -> str | None:
@@ -16889,6 +16897,7 @@ def _append_review_issue_queue(
     md: list[str],
     *,
     report_context: ReportRenderContext,
+    repro_bundles: Mapping[str, Path] | None = None,
 ) -> None:
     """Append a compact issue-queue pointer to the review digest."""
     snapshot = _build_diagnostics_snapshot(
@@ -16912,13 +16921,17 @@ def _append_review_issue_queue(
     def _review_issue_link(cluster: IssueCluster) -> str:
         return f"[issue draft]({_github_published_output_url('issues', cluster.issue_filename)})"
 
+    resolved_repro_bundles = repro_bundles or {}
     md.extend(
         _guard_markdownlint_block(
             _render_issue_queue_table(
                 clusters,
                 escape_text=MARKDOWN_ESCAPER.escape,
                 issue_link_for_cluster=_review_issue_link,
-                evidence_link_for_cluster=lambda _cluster: "-",
+                evidence_link_for_cluster=lambda cluster: _issue_cluster_bundle_link(
+                    cluster,
+                    resolved_repro_bundles,
+                ),
             ),
             rules=MARKDOWNLINT_TABLE_PIPE_RULES,
         )
@@ -17033,7 +17046,12 @@ def generate_model_selection_report(
         "",
         f"- Mode: {MARKDOWN_ESCAPER.escape(policy.eval_mode)}",
         (f"- Semantic rankings: {grounding} ({MARKDOWN_ESCAPER.escape(policy.selection_basis)})"),
-        "- Primary use cases: brief captions; structured title/description/keywords",
+        (
+            "- Primary use cases: brief captions only in triage mode; structured "
+            "title/description/keywords require a grounded metadata or quality run"
+            if policy.suppress_cataloging_scores
+            else "- Primary use cases: brief captions; structured title/description/keywords"
+        ),
         (
             "- Scope: ranked shortlist, not the complete run; complete per-model "
             "outputs and diagnostics are in `model_gallery.md`."
@@ -17064,6 +17082,16 @@ def generate_model_selection_report(
             f"`{MARKDOWN_ESCAPER.escape(row.result.model_name)}`",
             f"{row.score:.0f}",
             f"{row.caption_score:.0f}",
+            format_field_value(
+                "generation_tps",
+                _generation_float_metric(row.result.generation, "generation_tps"),
+            )
+            or "-",
+            format_field_value(
+                "peak_memory",
+                _generation_float_metric(row.result.generation, "peak_memory"),
+            )
+            or "-",
             f"`{MARKDOWN_ESCAPER.escape(row.verdict)}`",
             MARKDOWN_ESCAPER.escape(row.caption_preview),
             MARKDOWN_ESCAPER.escape(row.caveat),
@@ -17078,6 +17106,8 @@ def generate_model_selection_report(
                         "Model",
                         "Hygiene",
                         "Usefulness",
+                        "Gen TPS",
+                        "Peak GB",
                         "Verdict",
                         "Caption Preview",
                         "Caveat",
@@ -17244,13 +17274,33 @@ def _model_capability_recommendation(
         recommendation = "integration-blocked"
     elif row.success_rate < CAPABILITY_UNSTABLE_SUCCESS_RATE:
         recommendation = "unstable"
-    elif row.capability_score is not None and row.capability_score < CAPABILITY_AVOID_SCORE:
-        recommendation = "avoid"
     else:
         caption_ok = _score_at_least(row.caption_score, CAPABILITY_GOOD_CAPTION_SCORE)
         keyword_ok = _score_at_least(row.keyword_score, CAPABILITY_GOOD_KEYWORD_SCORE)
         metadata_ok = _score_at_least(row.metadata_alignment_score, CAPABILITY_GOOD_METADATA_SCORE)
-        if not suppress_cataloging_scores and caption_ok and (keyword_ok or metadata_ok):
+        latest_signal = row.signal.casefold()
+        latest_risky = any(
+            marker in latest_signal
+            for marker in (
+                "harness",
+                "cutoff",
+                "context-budget",
+                "runtime",
+                "repetitive",
+                "reasoning-leak",
+                "weight-mismatch",
+            )
+        )
+        if suppress_cataloging_scores and caption_ok and not latest_risky:
+            recommendation = (
+                "caption-review"
+                if row.capability_score is not None
+                and row.capability_score < CAPABILITY_AVOID_SCORE
+                else "caption"
+            )
+        elif row.capability_score is not None and row.capability_score < CAPABILITY_AVOID_SCORE:
+            recommendation = "avoid"
+        elif not suppress_cataloging_scores and caption_ok and (keyword_ok or metadata_ok):
             recommendation = "caption+keywords"
         elif caption_ok:
             recommendation = "caption"
@@ -17393,15 +17443,35 @@ def _capability_score_cell(value: float | None) -> str:
 CAPABILITY_TABLE_HEADER_TEXT: Final[str] = (
     "Model|Use|Runs|Success|Capability|Caption|Keyword|Metadata|Gen TPS|Peak GB|Latest signal"
 )
+TRIAGE_CAPABILITY_TABLE_HEADER_TEXT: Final[str] = (
+    "Model|Use|Runs|Success|Clean|Hygiene|Caption|Gen TPS|Peak GB|Latest signal"
+)
 
 
-def _capability_table_row(row: ModelCapabilityRow) -> tuple[str, ...]:
+def _capability_table_row(
+    row: ModelCapabilityRow,
+    *,
+    suppress_cataloging_scores: bool,
+) -> tuple[str, ...]:
     """Return the Markdown table cells for one scorecard row."""
-    return (
+    common = (
         f"`{MARKDOWN_ESCAPER.escape(row.model)}`",
         MARKDOWN_ESCAPER.escape(row.recommendation),
         str(row.runs),
         f"{row.success_rate:.0f}%",
+    )
+    if suppress_cataloging_scores:
+        return (
+            *common,
+            f"{row.recommended_rate:.0f}%",
+            _capability_score_cell(row.hygiene_score),
+            _capability_score_cell(row.caption_score),
+            format_field_value("generation_tps", row.generation_tps) or "-",
+            format_field_value("peak_memory", row.peak_memory_gb) or "-",
+            MARKDOWN_ESCAPER.escape(row.signal),
+        )
+    return (
+        *common,
         _capability_score_cell(row.capability_score),
         _capability_score_cell(row.caption_score),
         _capability_score_cell(row.keyword_score),
@@ -17481,14 +17551,27 @@ def generate_model_capability_scorecard(
         md.extend(
             [
                 "Structured metadata and keyword capability: not evaluated in triage mode.",
+                "Use the Clean, Hygiene, Caption, speed, and memory columns as a caption-review "
+                "shortlist; visual correctness still requires grounded metadata or manual review.",
                 "",
             ]
         )
+    headers = (
+        TRIAGE_CAPABILITY_TABLE_HEADER_TEXT
+        if policy.suppress_cataloging_scores
+        else CAPABILITY_TABLE_HEADER_TEXT
+    )
     table_lines = render_report_markdown(
         (
             ReportTable(
-                headers=tuple(CAPABILITY_TABLE_HEADER_TEXT.split("|")),
-                rows=tuple(_capability_table_row(row) for row in rows),
+                headers=tuple(headers.split("|")),
+                rows=tuple(
+                    _capability_table_row(
+                        row,
+                        suppress_cataloging_scores=policy.suppress_cataloging_scores,
+                    )
+                    for row in rows
+                ),
                 markdown_escaped=True,
             ),
         )
@@ -17525,6 +17608,7 @@ def generate_review_report(
     report_context: ReportRenderContext | None = None,
     log_filename: Path | None = None,
     gallery_filename: Path | None = None,
+    repro_bundles: Mapping[str, Path] | None = None,
 ) -> None:
     """Write a short Markdown digest of automated verdicts and action buckets."""
     if not results:
@@ -17562,7 +17646,11 @@ def generate_review_report(
 
     md.extend(_format_review_priorities_parts(report_context, html_output=False))
     _append_review_user_buckets(md, bucket_groups)
-    _append_review_issue_queue(md, report_context=report_context)
+    _append_review_issue_queue(
+        md,
+        report_context=report_context,
+        repro_bundles=repro_bundles,
+    )
     _append_review_model_verdicts(md, sorted_results)
 
     _write_markdown_artifact(filename, md, artifact_name="Review report")
@@ -25970,6 +26058,11 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
                 report_context=inputs.report_context,
                 log_filename=output_paths.log,
                 gallery_filename=output_paths.gallery_markdown,
+                repro_bundles=(
+                    inputs.diagnostics_artifacts.repro_bundles
+                    if inputs.diagnostics_artifacts is not None
+                    else None
+                ),
             ),
         ),
         ReportArtifact(
@@ -26437,22 +26530,6 @@ def finalize_execution(
         ):
             output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        _generate_reports_and_log_outputs(
-            ReportGenerationInputs(
-                results=results,
-                library_versions=library_versions,
-                prompt=prompt,
-                metadata=metadata,
-                overall_time=overall_time,
-                image_path=image_path,
-                system_info=system_info,
-                report_context=report_context,
-                output_paths=output_paths,
-                history_records=tuple(history_records_before_current),
-                runtime_fingerprint=runtime_fingerprint,
-            ),
-        )
-
         # Append run history (append-only) and compare with previous run
         current_history = append_history_record(
             history_path=history_path,
@@ -26486,6 +26563,23 @@ def finalize_execution(
         _log_maintainer_summary(
             artifacts=diagnostics_artifacts,
             diagnostics_path=output_paths.diagnostics,
+        )
+
+        _generate_reports_and_log_outputs(
+            ReportGenerationInputs(
+                results=results,
+                library_versions=library_versions,
+                prompt=prompt,
+                metadata=metadata,
+                overall_time=overall_time,
+                image_path=image_path,
+                system_info=system_info,
+                report_context=report_context,
+                output_paths=output_paths,
+                history_records=tuple(history_records_before_current),
+                runtime_fingerprint=runtime_fingerprint,
+                diagnostics_artifacts=diagnostics_artifacts,
+            ),
         )
 
         # Prune old repro bundles

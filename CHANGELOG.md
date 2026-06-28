@@ -54,6 +54,9 @@ Notable changes to this project will be documented in this file.
 - Add a concise model capability scorecard plus JSON summary, aggregating
   caption, keyword, metadata, reliability, speed, and memory signals across the
   current run and capability-enriched history rows.
+- Recalibrate generated model-choice artifacts so triage scorecards separate
+  caption hygiene from grounded metadata capability, selection shortlists include
+  speed and memory, and review queues link to repro bundles when available.
 - Trim model capability scorecard signal and table-rendering plumbing without
   changing the generated Markdown or JSON artifact shape.
 - Keep model-generated text unprefixed in gallery summary tables while carrying
