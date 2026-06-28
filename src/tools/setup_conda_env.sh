@@ -68,6 +68,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR/.." || exit 1
 
 # Reuse the shared conda executable resolver used by local quality and hook scripts.
+# shellcheck source-path=SCRIPTDIR
+# shellcheck source=common_quality.sh
 source "$SCRIPT_DIR/common_quality.sh"
 
 ENV_NAME="${1:-$DEFAULT_ENV_NAME}"

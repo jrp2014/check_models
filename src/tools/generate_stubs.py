@@ -27,6 +27,7 @@ import re
 import shutil
 import subprocess
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -57,7 +58,34 @@ def _mlx_vlm_generate_contract_paths(typings_dir: Path) -> tuple[Path, Path]:
     )
 
 
-def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
+StubReplacement = tuple[re.Pattern[str], str]
+
+
+@dataclass(frozen=True)
+class StubPatchSpec:
+    """One auditable semantic patch, backed by one or more regex replacements."""
+
+    label: str
+    replacements: tuple[StubReplacement, ...]
+
+
+StubPatch = StubReplacement | StubPatchSpec
+
+
+def _stub_patch(label: str, pattern: re.Pattern[str], replacement: str) -> StubPatchSpec:
+    """Return a named stub patch for generation-time audit reporting."""
+    return StubPatchSpec(label=label, replacements=((pattern, replacement),))
+
+
+def _stub_patch_group(
+    label: str,
+    replacements: Iterable[StubReplacement],
+) -> StubPatchSpec:
+    """Return one named patch satisfied by any replacement in the group."""
+    return StubPatchSpec(label=label, replacements=tuple(replacements))
+
+
+def _patch_mlx_vlm_stubs(typings_dir: Path, *, audit: bool = False) -> list[str]:
     """Patch known Optional signatures in generated mlx_vlm stubs.
 
     stubgen often emits parameters typed as non-Optional while using ``= None``
@@ -81,79 +109,97 @@ def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
     """
     mlx_root = typings_dir / "mlx_vlm"
     if not mlx_root.exists():
-        return
+        return []
 
+    audit_issues: list[str] = []
     # models/base.pyi
-    _patch_stub_file_in_typings(
-        typings_dir,
-        mlx_root / "models/base.pyi",
-        patches=[
-            # crop_size: dict[str, int] = None -> dict[str, int] | None = None
-            (
-                re.compile(r"(crop_size:\s*dict\[str,\s*int\])\s*=\s*None"),
-                r"\1 | None = None",
-            ),
-        ],
+    audit_issues.extend(
+        _patch_stub_file_in_typings(
+            typings_dir,
+            mlx_root / "models/base.pyi",
+            patches=[
+                # crop_size: dict[str, int] = None -> dict[str, int] | None = None
+                _stub_patch(
+                    "BaseImageProcessor crop_size optional default",
+                    re.compile(r"(crop_size:\s*dict\[str,\s*int\])\s*=\s*None"),
+                    r"\1 | None = None",
+                ),
+            ],
+            audit=audit,
+        )
     )
 
     # utils.pyi
-    _patch_stub_file_in_typings(
-        typings_dir,
-        mlx_root / "utils.pyi",
-        patches=[
-            # load_processor(..., eos_token_ids=None, ...)
-            #   -> eos_token_ids: int | list[int] | None = None
-            (
-                re.compile(
-                    r"(def\s+load_processor\([^\)]*?eos_token_ids)\s*=\s*None",
-                    re.DOTALL,
+    audit_issues.extend(
+        _patch_stub_file_in_typings(
+            typings_dir,
+            mlx_root / "utils.pyi",
+            patches=[
+                # load_processor(..., eos_token_ids=None, ...)
+                #   -> eos_token_ids: int | list[int] | None = None
+                _stub_patch(
+                    "load_processor eos_token_ids optional default",
+                    re.compile(
+                        r"(def\s+load_processor\([^\)]*?eos_token_ids)\s*=\s*None",
+                        re.DOTALL,
+                    ),
+                    r"\1: int | list[int] | None = None",
                 ),
-                r"\1: int | list[int] | None = None",
-            ),
-            # add_eos_token_ids(self, new_eos_token_ids: int | list[int] = None) -> include None
-            (
-                re.compile(
-                    r"(add_eos_token_ids\(self,\s*new_eos_token_ids:\s*int\s*\|\s*list\[int\])\s*=\s*None",
+                # add_eos_token_ids(self, new_eos_token_ids: int | list[int] = None)
+                _stub_patch(
+                    "StoppingCriteria add_eos_token_ids optional default",
+                    re.compile(
+                        r"(add_eos_token_ids\(self,\s*new_eos_token_ids:\s*int\s*\|\s*list\[int\])\s*=\s*None",
+                    ),
+                    r"\1 | None = None",
                 ),
-                r"\1 | None = None",
-            ),
-            # reset(self, eos_token_ids: list[int] = None) -> list[int] | None
-            (
-                re.compile(r"(reset\(self,\s*eos_token_ids:\s*list\[int\])\s*=\s*None"),
-                r"\1 | None = None",
-            ),
-        ],
+                # reset(self, eos_token_ids: list[int] = None) -> list[int] | None
+                _stub_patch(
+                    "StoppingCriteria reset eos_token_ids optional default",
+                    re.compile(r"(reset\(self,\s*eos_token_ids:\s*list\[int\])\s*=\s*None"),
+                    r"\1 | None = None",
+                ),
+            ],
+            audit=audit,
+        )
     )
 
     # convert.pyi
-    _patch_stub_file_in_typings(
-        typings_dir,
-        mlx_root / "convert.pyi",
-        patches=[
-            # upload_repo: str = None -> str | None = None
-            (
-                re.compile(r"(upload_repo:\s*str)\s*=\s*None"),
-                r"\1 | None = None",
-            ),
-        ],
+    audit_issues.extend(
+        _patch_stub_file_in_typings(
+            typings_dir,
+            mlx_root / "convert.pyi",
+            patches=[
+                # upload_repo: str = None -> str | None = None
+                _stub_patch(
+                    "convert upload_repo optional default",
+                    re.compile(r"(upload_repo:\s*str)\s*=\s*None"),
+                    r"\1 | None = None",
+                ),
+            ],
+            audit=audit,
+        )
     )
 
-    generate_entry_patches = [
+    generate_entry_patches: list[StubPatch] = [
         # Import ProcessorMixin so generate()/stream_generate() can model
         # the multimodal processors returned by mlx_vlm.utils.load().
-        (
+        _stub_patch(
+            "generate imports ProcessorMixin",
             re.compile(
                 r"(from transformers import PreTrainedTokenizer as PreTrainedTokenizer\n)(?!from transformers\.processing_utils import ProcessorMixin as ProcessorMixin\n)",
             ),
             r"\1from transformers.processing_utils import ProcessorMixin as ProcessorMixin\n",
         ),
         # processor: PreTrainedTokenizer -> ProcessorMixin | PreTrainedTokenizer
-        (
+        _stub_patch(
+            "generate processor accepts ProcessorMixin",
             re.compile(r"(processor:\s*)PreTrainedTokenizer\b"),
             r"\1ProcessorMixin | PreTrainedTokenizer",
         ),
         # Expand generate(...) to the explicit kwargs check_models forwards.
-        (
+        _stub_patch(
+            "generate explicit forwarded kwargs contract",
             re.compile(
                 r"def generate\([^\n]*?verbose: bool = False, \*\*kwargs\) -> GenerationResult: \.\.\.",
             ),
@@ -192,58 +238,76 @@ def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
             ),
         ),
         # image/audio/video: str | list[str] = None -> include None
-        (
+        _stub_patch(
+            "generate image optional default",
             re.compile(r"(image:\s*str\s*\|\s*list\[str\])\s*=\s*None"),
             r"\1 | None = None",
         ),
-        (
+        _stub_patch(
+            "generate audio optional default",
             re.compile(r"(audio:\s*str\s*\|\s*list\[str\])\s*=\s*None"),
             r"\1 | None = None",
         ),
-        (
+        _stub_patch(
+            "generate video optional default",
             re.compile(r"(video:\s*str\s*\|\s*list\[str\])\s*=\s*None"),
             r"\1 | None = None",
         ),
         # stream_generate(...) -> str | Generator[str, None, None]
         #   -> Generator[GenerationResult, None, None]
-        (
+        _stub_patch(
+            "stream_generate returns GenerationResult generator",
             re.compile(
                 r"(def\s+stream_generate\([^\)]*\)\s*->\s*)str\s*\|\s*Generator\[str,\s*None,\s*None\]",
             ),
             r"\1Generator[GenerationResult, None, None]",
         ),
     ]
+    legacy_generate_path = mlx_root / "generate.pyi"
+    package_dispatch_path = mlx_root / "generate" / "dispatch.pyi"
+    has_package_dispatch = package_dispatch_path.exists()
     for generate_path in _mlx_vlm_generate_contract_paths(typings_dir):
-        _patch_stub_file_in_typings(
-            typings_dir,
-            generate_path,
-            patches=generate_entry_patches,
+        if has_package_dispatch and generate_path == legacy_generate_path:
+            continue
+        audit_issues.extend(
+            _patch_stub_file_in_typings(
+                typings_dir,
+                generate_path,
+                patches=generate_entry_patches,
+                audit=audit,
+            )
         )
 
-    batch_generate_patches = [
+    batch_generate_patches: list[StubPatch] = [
         # batch_generate(..., images: str | list[str] = None, ...)
-        (
+        _stub_patch(
+            "batch_generate images optional default",
             re.compile(r"(images:\s*str\s*\|\s*list\[str\])\s*=\s*None"),
             r"\1 | None = None",
         ),
-        (
+        _stub_patch(
+            "batch_generate audios optional default",
             re.compile(r"(audios:\s*str\s*\|\s*list\[str\])\s*=\s*None"),
             r"\1 | None = None",
         ),
-        (
+        _stub_patch(
+            "batch_generate prompts optional default",
             re.compile(r"(prompts:\s*list\[str\])\s*=\s*None"),
             r"\1 | None = None",
         ),
     ]
-    for batch_generate_path in (mlx_root / "generate" / "ar.pyi", mlx_root / "generate.pyi"):
-        _patch_stub_file_in_typings(
-            typings_dir,
-            batch_generate_path,
-            patches=batch_generate_patches,
+    for batch_generate_path in (mlx_root / "generate" / "ar.pyi", legacy_generate_path):
+        if has_package_dispatch and batch_generate_path == legacy_generate_path:
+            continue
+        audit_issues.extend(
+            _patch_stub_file_in_typings(
+                typings_dir,
+                batch_generate_path,
+                patches=batch_generate_patches,
+                audit=audit,
+            )
         )
 
-    legacy_generate_path = mlx_root / "generate.pyi"
-    package_dispatch_path = mlx_root / "generate" / "dispatch.pyi"
     if package_dispatch_path.exists() and legacy_generate_path.exists():
         try:
             legacy_generate_path.unlink()
@@ -251,61 +315,83 @@ def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
             logger.warning("[stubs] Failed to remove stale %s: %s", legacy_generate_path, err)
         else:
             logger.info("[stubs] Removed stale %s", legacy_generate_path.relative_to(typings_dir))
+    return audit_issues
 
 
-def _patch_transformers_stubs(typings_dir: Path) -> None:
+def _patch_transformers_stubs(typings_dir: Path, *, audit: bool = False) -> list[str]:
     """Patch known defects emitted in transformers stubs."""
     root = typings_dir / "transformers"
     if not root.exists():
-        return
+        return []
 
     # stubgen can emit "<ERROR>.join(...)" in dataclass field metadata for some
     # datasets modules. Replace with a stable placeholder join string.
-    join_placeholder_fix = (
+    audit_issues: list[str] = []
+    join_placeholder_fix = _stub_patch(
+        "dataset metadata join placeholder",
         re.compile(r"<ERROR>\.join\("),
         "', '.join(",
     )
-    _patch_stub_file_in_typings(
-        typings_dir, root / "data/datasets/glue.pyi", [join_placeholder_fix]
+    audit_issues.extend(
+        _patch_stub_file_in_typings(
+            typings_dir,
+            root / "data/datasets/glue.pyi",
+            [join_placeholder_fix],
+            audit=audit,
+        )
     )
-    _patch_stub_file_in_typings(
-        typings_dir, root / "data/datasets/squad.pyi", [join_placeholder_fix]
+    audit_issues.extend(
+        _patch_stub_file_in_typings(
+            typings_dir,
+            root / "data/datasets/squad.pyi",
+            [join_placeholder_fix],
+            audit=audit,
+        )
     )
-    _patch_stub_file_in_typings(
-        typings_dir,
-        root / "processing_utils.pyi",
-        [
-            # Current stubgen output preserves ProcessorMixin's broad runtime
-            # declarations. Narrow tokenizer and retain the real None cases.
-            (
-                re.compile(
-                    r"(^class ProcessorMixin\(PushToHubMixin\):\n"
-                    r"(?:    [^\n]*\n)*?    tokenizer:) Any$",
-                    re.MULTILINE,
+    audit_issues.extend(
+        _patch_stub_file_in_typings(
+            typings_dir,
+            root / "processing_utils.pyi",
+            [
+                _stub_patch_group(
+                    "ProcessorMixin runtime attrs",
+                    [
+                        # Current stubgen output preserves ProcessorMixin's broad runtime
+                        # declarations. Narrow tokenizer and retain the real None cases.
+                        (
+                            re.compile(
+                                r"(^class ProcessorMixin\(PushToHubMixin\):\n"
+                                r"(?:    [^\n]*\n)*?    tokenizer:) Any$",
+                                re.MULTILINE,
+                            ),
+                            r"\1 PreTrainedTokenizerBase | None",
+                        ),
+                        (
+                            re.compile(
+                                r"(^class ProcessorMixin\(PushToHubMixin\):\n"
+                                r"(?:    [^\n]*\n)*?    image_processor:) Any$",
+                                re.MULTILINE,
+                            ),
+                            r"\1 Any | None",
+                        ),
+                        # Older stubgen output omitted both runtime attributes.
+                        (
+                            re.compile(
+                                r"(    audio_ids: Incomplete\n)(?!    tokenizer: PreTrainedTokenizerBase \| None\n)",
+                            ),
+                            (
+                                r"\1"
+                                "    tokenizer: PreTrainedTokenizerBase | None\n"
+                                "    image_processor: Any | None\n"
+                            ),
+                        ),
+                    ],
                 ),
-                r"\1 PreTrainedTokenizerBase | None",
-            ),
-            (
-                re.compile(
-                    r"(^class ProcessorMixin\(PushToHubMixin\):\n"
-                    r"(?:    [^\n]*\n)*?    image_processor:) Any$",
-                    re.MULTILINE,
-                ),
-                r"\1 Any | None",
-            ),
-            # Older stubgen output omitted both runtime attributes.
-            (
-                re.compile(
-                    r"(    audio_ids: Incomplete\n)(?!    tokenizer: PreTrainedTokenizerBase \| None\n)",
-                ),
-                (
-                    r"\1"
-                    "    tokenizer: PreTrainedTokenizerBase | None\n"
-                    "    image_processor: Any | None\n"
-                ),
-            ),
-        ],
+            ],
+            audit=audit,
+        )
     )
+    return audit_issues
 
 
 def _find_invalid_stub_files(
@@ -371,7 +457,7 @@ logger = logging.getLogger("generate_stubs")
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TYPINGS_DIR = REPO_ROOT / "typings"
 STUB_MANIFEST = ".stub_manifest.json"
-STUB_TOOL_VERSION = "7"
+STUB_TOOL_VERSION = "8"
 
 DEFAULT_PACKAGES = ["mlx_lm", "mlx_vlm", "transformers", "tokenizers"]
 
@@ -390,28 +476,78 @@ _TRANSFORMERS_STUBGEN_NOISE_TOKENS = (
 _VERSION_METADATA_CHANGED_SUFFIX = "version metadata changed"
 
 
-def _patch_stub_file(path: Path, patches: list[tuple[re.Pattern[str], str]]) -> bool:
-    """Apply regex replacements to a stub file, returning whether it changed."""
+def _apply_stub_patches(text: str, patches: list[StubPatch]) -> tuple[str, set[str]]:
+    """Apply stub patch specs and return the labels that changed text."""
+    changed_labels: set[str] = set()
+    for index, patch in enumerate(patches):
+        if isinstance(patch, StubPatchSpec):
+            label = patch.label
+            replacements = patch.replacements
+        else:
+            label = f"patch[{index}]"
+            replacements = (patch,)
+
+        before = text
+        for pattern, repl in replacements:
+            text = pattern.sub(repl, text)
+        if text != before:
+            changed_labels.add(label)
+    return text, changed_labels
+
+
+def _stub_patch_audit_issues(
+    *,
+    typings_dir: Path,
+    path: Path,
+    patches: list[StubPatch],
+    changed_labels: set[str],
+) -> list[str]:
+    """Return named patch specs that did not change the raw generated stub."""
+    rel_path = path.relative_to(typings_dir)
+    return [
+        f"{rel_path}: patch '{patch.label}' did not change the raw stub"
+        for patch in patches
+        if isinstance(patch, StubPatchSpec) and patch.label not in changed_labels
+    ]
+
+
+def _patch_stub_file_with_labels(path: Path, patches: list[StubPatch]) -> tuple[bool, set[str]]:
+    """Apply regex replacements to a stub file and report changed patch labels."""
     if not path.exists():
-        return False
+        return False, set()
     text = read_text_no_follow(path)
-    original = text
-    for pattern, repl in patches:
-        text = pattern.sub(repl, text)
-    if text == original:
-        return False
-    write_text_no_follow(path, text)
-    return True
+    patched_text, changed_labels = _apply_stub_patches(text, patches)
+    if patched_text == text:
+        return False, changed_labels
+    write_text_no_follow(path, patched_text)
+    return True, changed_labels
+
+
+def _patch_stub_file(path: Path, patches: list[StubPatch]) -> bool:
+    """Apply regex replacements to a stub file, returning whether it changed."""
+    changed, _changed_labels = _patch_stub_file_with_labels(path, patches)
+    return changed
 
 
 def _patch_stub_file_in_typings(
     typings_dir: Path,
     path: Path,
-    patches: list[tuple[re.Pattern[str], str]],
-) -> None:
+    patches: list[StubPatch],
+    *,
+    audit: bool = False,
+) -> list[str]:
     """Apply stub patches and log changed files relative to ``typings_dir``."""
-    if _patch_stub_file(path, patches):
+    changed, changed_labels = _patch_stub_file_with_labels(path, patches)
+    if changed:
         logger.info("[stubs] Patched %s", path.relative_to(typings_dir))
+    if not audit or not path.exists():
+        return []
+    return _stub_patch_audit_issues(
+        typings_dir=typings_dir,
+        path=path,
+        patches=patches,
+        changed_labels=changed_labels,
+    )
 
 
 def _validate_packages(packages: Iterable[str]) -> list[str]:
@@ -912,10 +1048,15 @@ def main() -> int:
             # Don't fail - mypy has ignore_missing_imports=true and will work without stubs
             return 0
         # Apply post-processing patches for mlx_vlm stubs
+        patch_audit_issues: list[str] = []
         if any(pkg.split(".")[0] == "mlx_vlm" for pkg in packages):
-            _patch_mlx_vlm_stubs(TYPINGS_DIR)
+            patch_audit_issues.extend(_patch_mlx_vlm_stubs(TYPINGS_DIR, audit=True))
         if any(pkg.split(".")[0] == "transformers" for pkg in packages):
-            _patch_transformers_stubs(TYPINGS_DIR)
+            patch_audit_issues.extend(_patch_transformers_stubs(TYPINGS_DIR, audit=True))
+        if patch_audit_issues:
+            for issue in patch_audit_issues:
+                logger.error("[stubs] Stub patch audit failed: %s", issue)
+            return 1
 
         _validate_stub_syntax(TYPINGS_DIR, packages)
         _write_stub_manifest(packages)

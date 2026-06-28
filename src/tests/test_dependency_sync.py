@@ -887,6 +887,61 @@ def test_patch_stub_file_applies_replacements_and_reports_change(tmp_path: Path)
     assert generate_stubs._patch_stub_file(stub_path, []) is False
 
 
+def test_stub_patch_audit_reports_named_patch_that_no_longer_changes_raw_stub(
+    tmp_path: Path,
+) -> None:
+    """Patch audits should flag stale shims when raw stubs already have the fix."""
+    typings_dir = tmp_path / "typings"
+    package_dir = typings_dir / "pkg"
+    package_dir.mkdir(parents=True)
+    stub_path = package_dir / "sample.pyi"
+    stub_path.write_text("def f(value: str | None = None) -> None: ...\n", encoding="utf-8")
+
+    issues = generate_stubs._patch_stub_file_in_typings(
+        typings_dir,
+        stub_path,
+        [
+            generate_stubs._stub_patch(
+                "optional value default",
+                re.compile(r"(value:\s*str)\s*=\s*None"),
+                r"\1 | None = None",
+            ),
+        ],
+        audit=True,
+    )
+
+    assert issues == ["pkg/sample.pyi: patch 'optional value default' did not change the raw stub"]
+
+
+def test_stub_patch_audit_accepts_group_when_one_alternative_changes(
+    tmp_path: Path,
+) -> None:
+    """Alternative patch patterns should audit as one semantic shim."""
+    typings_dir = tmp_path / "typings"
+    package_dir = typings_dir / "pkg"
+    package_dir.mkdir(parents=True)
+    stub_path = package_dir / "sample.pyi"
+    stub_path.write_text("class Processor:\n    tokenizer: Any\n", encoding="utf-8")
+
+    issues = generate_stubs._patch_stub_file_in_typings(
+        typings_dir,
+        stub_path,
+        [
+            generate_stubs._stub_patch_group(
+                "processor runtime attrs",
+                [
+                    (re.compile(r"(    tokenizer:) Any$"), r"\1 object | None"),
+                    (re.compile(r"(    image_processor:) Any$"), r"\1 object | None"),
+                ],
+            ),
+        ],
+        audit=True,
+    )
+
+    assert issues == []
+    assert "tokenizer: object | None" in stub_path.read_text(encoding="utf-8")
+
+
 def test_patch_stub_file_rejects_symlink_target(tmp_path: Path) -> None:
     """Stub patching should not follow a symlink target."""
     target_path = tmp_path / "target.pyi"

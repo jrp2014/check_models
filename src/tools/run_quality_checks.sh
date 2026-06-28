@@ -25,6 +25,8 @@ fi
 set --
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source-path=SCRIPTDIR
+# shellcheck source=common_quality.sh
 source "$SCRIPT_DIR/common_quality.sh"
 
 cd "$(quality_src_root)"

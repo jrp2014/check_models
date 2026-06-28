@@ -33,6 +33,8 @@ Notable changes to this project will be documented in this file.
 - Document the validation artifact-hygiene rule across agent guidance, CI, and
   contributor docs so tests write to temp or `test_*` paths instead of tracked
   `src/output/` benchmark snapshots.
+- Add generation-time audits for local stub patches so stale `stubgen`
+  workarounds fail loudly when raw stubs no longer need them.
 - Align automatic Hugging Face cache discovery with the pending `mlx-vlm`
   server-supported model filter: repo type `model`, cached `main` revision,
   `config.json`, `tokenizer_config.json`, and safetensors weights.

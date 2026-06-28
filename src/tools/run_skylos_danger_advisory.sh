@@ -53,6 +53,8 @@ while [ "$#" -gt 0 ]; do
 done
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source-path=SCRIPTDIR
+# shellcheck source=common_quality.sh
 source "$SCRIPT_DIR/common_quality.sh"
 
 cd "$(quality_repo_root)"
