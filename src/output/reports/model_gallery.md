@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-_Generated on 2026-06-28 02:18:30 BST_
+_Generated on 2026-06-28 22:11:08 BST_
 
 Complete per-model evidence artifact with image metadata, the source prompt,
 summary tables, diagnostics, and full generated output for every attempted
@@ -11,7 +11,7 @@ _Action Snapshot: see [results.md](results.md) for the full summary._
 ## Run Stamps
 
 - `mlx-vlm`: `0.6.3`
-- `mlx`: `0.32.0.dev20260627+548dd80e`
+- `mlx`: `0.32.0.dev20260628+e94b4150`
 - `mlx-lm`: `0.31.3`
 - `transformers`: `5.12.1`
 - `tokenizers`: `0.22.2`
@@ -51,50 +51,50 @@ Skim-first view of what each model returned, or the strongest diagnostic when it
 | [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `recommended` / `clean`     | clean                                | The image shows two cats lying on a pink blanket. One cat is on the left side, while the other is on the right side. There are two remote controls placed on the blanket, one on the left side and the other on the right side.                                                                                                                                                    |
 | [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava)                                                                       | `recommended` / `clean`     | clean                                | This image features two cats lying on a couch. One cat is a light brown and the other is a dark brown. They both have green eyes and a black nose.                                                                                                                                                                                                                                 |
 | [`mlx-community/SmolVLM-Instruct-bf16`](#model-mlx-community-smolvlm-instruct-bf16)                                     | `recommended` / `clean`     | clean                                | Two cats are sleeping on a pink blanket on a couch.                                                                                                                                                                                                                                                                                                                                |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `recommended` / `clean`     | clean                                | Two cats are sleeping on a pink couch with remote controls beside them.                                                                                                                                                                                                                                                                                                            |
 | [`HuggingFaceTB/SmolVLM-Instruct`](#model-huggingfacetb-smolvlm-instruct)                                               | `recommended` / `clean`     | clean                                | Two cats are sleeping on a pink blanket on a couch.                                                                                                                                                                                                                                                                                                                                |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `recommended` / `clean`     | clean                                | Two cats are sleeping on a pink couch with remote controls beside them.                                                                                                                                                                                                                                                                                                            |
 | [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `recommended` / `clean`     | clean                                | Two tabby cats are lying on a pink blanket on a red couch, with a remote control next to each cat.                                                                                                                                                                                                                                                                                 |
 | [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `recommended` / `clean`     | clean                                | This image shows two tabby cats resting on a bright pink couch. One cat lies on its side, while the other is curled with its head down. Two remote controls are also visible on the couch.                                                                                                                                                                                         |
-| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `recommended` / `clean`     | clean                                | This is a close-up photograph of two cats sleeping on a bright pink couch. The cat on the left is a tabby with a black and brown striped pattern, lying on its back with its eyes closed. The cat on the right i ... [tail] eacefully. There are two remote controls on the couch, one white and one gray, placed near the cats.                                                   |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `recommended` / `clean`     | clean                                | In this image, there are two cats lying on a soft, pink cushion or blanket. - The cat on the left appears to be a kitten, with a smaller size, fluffy fur, and a relaxed posture. - The cat on the right is an a ... [tail] kitten. Both are positioned near what looks like a remote control, suggesting a cozy indoor setting.                                                   |
 | [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `recommended` / `clean`     | clean                                | This is a close-up photograph of two cats sleeping on a bright pink couch. The cat on the left is a tabby with a black and brown striped pattern, lying on its back with its eyes closed. The cat on the right i ... [tail] eacefully. There are two remote controls on the couch, one white and one gray, placed near the cats.                                                   |
+| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `recommended` / `clean`     | clean                                | This is a close-up photograph of two cats sleeping on a bright pink couch. The cat on the left is a tabby with a black and brown striped pattern, lying on its back with its eyes closed. The cat on the right i ... [tail] eacefully. There are two remote controls on the couch, one white and one gray, placed near the cats.                                                   |
 | [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `recommended` / `clean`     | clean                                | Two tabby cats are sprawled out on a bright pink couch, sleeping peacefully. One cat is curled near the left armrest with a remote beside it, while the other lies stretched across the center, next to another remote. The scene is cozy and relaxed, capturing a quiet moment of feline comfort.                                                                                 |
 | [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `recommended` / `clean`     | clean                                | This image shows two tabby cats sleeping on a bright pink blanket or couch cover. The cat on the left is a smaller kitten, lying on its side with its head resting near a white remote control. The cat on the r ... [tail] oned next to another remote control. Both cats appear relaxed and comfortable in their cozy setting.                                                   |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `recommended` / `clean`     | clean                                | In this image, there are two cats lying on a soft, pink cushion or blanket. - The cat on the left appears to be a kitten, with a smaller size, fluffy fur, and a relaxed posture. - The cat on the right is an a ... [tail] kitten. Both are positioned near what looks like a remote control, suggesting a cozy indoor setting.                                                   |
 | [`mlx-community/Qwen3.5-35B-A3B-6bit`](#model-mlx-community-qwen35-35b-a3b-6bit)                                        | `recommended` / `clean`     | clean                                | Two tabby cats are sprawled out asleep on a bright pink couch, nestled between two remote controls. The cat on the left is stretched out with its tail curled, while the one on the right is curled up facing downward. Both appear deeply relaxed in a cozy, domestic scene.                                                                                                      |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `recommended` / `clean`     | clean                                | Two high-angle tabby cats are sleeping on a pink blanket next to two remote controls.                                                                                                                                                                                                                                                                                              |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `recommended` / `clean`     | clean                                | The image shows two tabby cats lying on a pink couch. Both cats are stretched out, appearing relaxed. Between them are two remote controls. The couch has a vibrant pink cover, and the cats' fur has a mix of brown, black, and white stripes. The scene conveys a cozy and calm atmosphere.                                                                                      |
-| [`mlx-community/GLM-4.6V-Flash-6bit`](#model-mlx-community-glm-46v-flash-6bit)                                          | `recommended` / `clean`     | clean                                | The image shows two tabby cats resting on a bright pink couch. One cat lies on its side, eyes closed, with a remote control nearby. The other cat, larger and more robust, rests with its head down, also near a remote. The scene is cozy, with the vivid pink couch contrasting with the cats’ striped fur.                                                                      |
 | [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `caveat` / `context budget` | harness:long-context; context-budget | Cat.                                                                                                                                                                                                                                                                                                                                                                               |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `recommended` / `clean`     | clean                                | A high-angle shot shows two tabby cats sleeping on a pink blanket on a red couch next to two remote controls.                                                                                                                                                                                                                                                                      |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `avoid` / `harness`         | harness:stop-token                   | So, let's see. The image shows two cats lying on a pink couch. The couch is a bright pink color, and there are two remote controls next to the cats. One cat is on the left, with a striped pattern, and the oth ... [tail] remote control is positioned near the left cat. The scene is calm, with the cats appearing relaxed.                                                    |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `recommended` / `clean`     | clean                                | In the image, a cat is comfortably nestled on a red couch, its body relaxed and at ease. The cat's fur is a mix of black and white, with the black spots standing out against the vibrant red of the couch. The ... [tail] a peaceful moment of a cat resting on a red couch, surrounded by a minimalist and clean environment.                                                    |
-| [`mlx-community/gemma-3n-E2B-4bit`](#model-mlx-community-gemma-3n-e2b-4bit)                                             | `avoid` / `cutoff degraded` | repetitive; cutoff                   | have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this i...                                                   |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `recommended` / `clean`     | clean                                | This image shows two tabby cats lying down on a pink blanket on a couch next to two remote controls.                                                                                                                                                                                                                                                                               |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `recommended` / `clean`     | clean                                | The image shows two tabby cats lying on a pink couch. Both cats are stretched out, appearing relaxed. Between them are two remote controls. The couch has a vibrant pink cover, and the cats' fur has a mix of brown, black, and white stripes. The scene conveys a cozy and calm atmosphere.                                                                                      |
 | [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `recommended` / `clean`     | clean                                | This image shows two tabby cats lounging on a pink blanket. Both cats appear relaxed, lying on their sides with their legs stretched out. One cat faces left, while the other faces right, and there seem to be remote controls near them.                                                                                                                                         |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `recommended` / `clean`     | formatting                           | In this image we can see two cats on the sofa. There are two remotes on the sofa.<end_of_utterance>                                                                                                                                                                                                                                                                                |
+| [`mlx-community/GLM-4.6V-Flash-6bit`](#model-mlx-community-glm-46v-flash-6bit)                                          | `recommended` / `clean`     | clean                                | The image shows two tabby cats resting on a bright pink couch. One cat lies on its side, eyes closed, with a remote control nearby. The other cat, larger and more robust, rests with its head down, also near a remote. The scene is cozy, with the vivid pink couch contrasting with the cats’ striped fur.                                                                      |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `recommended` / `clean`     | clean                                | Two high-contrast tabby cats are sleeping on a pink blanket next to two remote controls.                                                                                                                                                                                                                                                                                           |
 | [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `recommended` / `clean`     | clean                                | This image shows two cats lying on their backs on a pink blanket or cushion. Both cats appear relaxed and playful, with their legs stretched out and paws in the air. One cat is smaller, possibly a kitten, while the other is larger, likely an adult. There are two remote controls placed near them on the blanket.                                                            |
 | [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `recommended` / `clean`     | clean                                | Two tabby cats are sleeping on a bright pink blanket on a red couch, with two remote controls lying next to them.                                                                                                                                                                                                                                                                  |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `avoid` / `harness`         | harness:stop-token                   | So, let's see. The image shows two cats lying on a pink couch. The couch is a bright pink color, and there are two remote controls next to the cats. One cat is on the left, with a striped pattern, and the oth ... [tail] remote control is positioned near the left cat. The scene is calm, with the cats appearing relaxed.                                                    |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `recommended` / `clean`     | formatting                           | In this image we can see two cats on the sofa. There are two remotes on the sofa.<end_of_utterance>                                                                                                                                                                                                                                                                                |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `recommended` / `clean`     | clean                                | In the image, a cat is comfortably nestled on a red couch, its body relaxed and at ease. The cat's fur is a mix of black and white, with the black spots standing out against the vibrant red of the couch. The ... [tail] a peaceful moment of a cat resting on a red couch, surrounded by a minimalist and clean environment.                                                    |
+| [`mlx-community/gemma-3n-E2B-4bit`](#model-mlx-community-gemma-3n-e2b-4bit)                                             | `avoid` / `cutoff degraded` | repetitive; cutoff                   | have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this i...                                                   |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `recommended` / `clean`     | clean                                | The image shows two tabby cats lying on a pink blanket, with two remote controls placed on the couch behind them.                                                                                                                                                                                                                                                                  |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `recommended` / `clean`     | clean                                | The image shows two cats sleeping on a pink blanket. One cat is a small kitten, and the other is a larger adult cat. Both are lying on their sides, and there are two remote controls placed near them on the couch.                                                                                                                                                               |
+| [`mlx-community/InternVL3-14B-8bit`](#model-mlx-community-internvl3-14b-8bit)                                           | `recommended` / `clean`     | clean                                | Two cats are sleeping on a pink blanket with two remote controls nearby.                                                                                                                                                                                                                                                                                                           |
+| [`mlx-community/Qwen3.5-27B-4bit`](#model-mlx-community-qwen35-27b-4bit)                                                | `recommended` / `clean`     | clean                                | Two tabby cats are lounging on a bright pink couch, each with a remote control nearby. The cat on the left is stretched out on its back, paws relaxed, while the one on the right lies curled up, head resting near its front paws. Both appear to be napping or resting comfortably in a cozy, playful setting.                                                                   |
+| [`mlx-community/Qwen3.5-27B-mxfp8`](#model-mlx-community-qwen35-27b-mxfp8)                                              | `recommended` / `clean`     | clean                                | Two tabby cats are sleeping on a bright pink couch. One cat is stretched out on its side, while the other is curled up nearby. Two remote controls lie on the couch between them.                                                                                                                                                                                                  |
+| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `recommended` / `clean`     | clean                                | The image shows two cats lying on a pink blanket. The cat on the left is a kitten with a black and white striped tail. The cat on the right is a tabby cat with a black and brown striped tail. Both cats are sleeping.                                                                                                                                                            |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `recommended` / `clean`     | clean                                | Two tabby cats are peacefully napping on a bright pink couch. The cat on the left is lying on its back with its paws curled up, its tail curled around its body. It has a green collar. The cat on the right is ... [tail] d warm, creating a cozy atmosphere. The cats appear relaxed and content, enjoying a comfortable nap.                                                    |
+| [`jqlive/Kimi-VL-A3B-Thinking-2506-6bit`](#model-jqlive-kimi-vl-a3b-thinking-2506-6bit)                                 | `recommended` / `token cap` | reasoning-leak                       | ◁think▷So, let's describe the image. First, there are two tabby cats on a pink fabric surface. The cat on the left is lying on its side, facing the other cat. The cat on the right is lying on its back, facing ... [tail] also facing the left cat. Both cats have striped fur with a mix of brown, black, and white patterns.                                                   |
+| [`mlx-community/Kimi-VL-A3B-Thinking-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-8bit)                             | `avoid` / `cutoff degraded` | cutoff; reasoning-leak               | ◁think▷Okay, let me try to figure out how to describe this image. First, I need to look at the image carefully. There are two cats on a pink surface, maybe a blanket or a bed. Both cats seem to be lying down. ... [tail] e siblings or just two cats that are comfortable with each other. The remotes suggest a home setting                                                   |
 | [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `recommended` / `clean`     | clean                                | Two tabby cats are sleeping peacefully on a bright pink couch. One cat lies on its side near a white remote control, while the other stretches out nearby, also next to a remote. Both appear relaxed and comfortable in their cozy spot.                                                                                                                                          |
 | [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `avoid` / `harness`         | harness:encoding                     | TheĠimageĠfeaturesĠtwoĠcatsĠlyingĠonĠaĠpinkĠsurface,ĠpossiblyĠaĠblanketĠorĠaĠcouch.ĠTheĠcatĠonĠtheĠleftĠisĠaĠkitten,ĠandĠtheĠoneĠonĠtheĠrightĠisĠanĠadultĠcat.ĠBothĠcatsĠareĠinĠrelaxedĠpostures,ĠwithĠtheĠkitte ... [tail] emoteĠcontrolsĠplacedĠnearĠtheĠcats,ĠoneĠcloserĠtoĠtheĠkittenĠandĠtheĠotherĠcloserĠtoĠtheĠadultĠcat.                                                   |
-| [`mlx-community/Qwen3.5-27B-mxfp8`](#model-mlx-community-qwen35-27b-mxfp8)                                              | `recommended` / `clean`     | clean                                | Two tabby cats are sleeping on a bright pink couch. One cat is stretched out on its side, while the other is curled up nearby. Two remote controls lie on the couch between them.                                                                                                                                                                                                  |
-| [`microsoft/Phi-3.5-vision-instruct`](#model-microsoft-phi-35-vision-instruct)                                          | `avoid` / `harness`         | harness:stop-token                   | Two cats are sleeping on a pink couch with remote controls beside them.<\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|... |
-| [`mlx-community/Qwen3.5-27B-4bit`](#model-mlx-community-qwen35-27b-4bit)                                                | `recommended` / `clean`     | clean                                | Two tabby cats are lounging on a bright pink couch, each with a remote control nearby. The cat on the left is stretched out on its back, paws relaxed, while the one on the right lies curled up, head resting near its front paws. Both appear to be napping or resting comfortably in a cozy, playful setting.                                                                   |
-| [`jqlive/Kimi-VL-A3B-Thinking-2506-6bit`](#model-jqlive-kimi-vl-a3b-thinking-2506-6bit)                                 | `recommended` / `token cap` | reasoning-leak                       | ◁think▷So, let's describe the image. First, there are two tabby cats on a pink fabric surface. The cat on the left is lying on its side, facing the other cat. The cat on the right is lying on its back, facing ... [tail] also facing the left cat. Both cats have striped fur with a mix of brown, black, and white patterns.                                                   |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `recommended` / `clean`     | clean                                | The image shows two cats sleeping on a pink blanket. One cat is a small kitten, and the other is a larger adult cat. Both are lying on their sides, and there are two remote controls placed near them on the couch.                                                                                                                                                               |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `recommended` / `clean`     | clean                                | Two tabby cats are peacefully napping on a bright pink couch. The cat on the left is lying on its back with its paws curled up, its tail curled around its body. It has a green collar. The cat on the right is ... [tail] d warm, creating a cozy atmosphere. The cats appear relaxed and content, enjoying a comfortable nap.                                                    |
-| [`mlx-community/Kimi-VL-A3B-Thinking-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-8bit)                             | `avoid` / `cutoff degraded` | cutoff; reasoning-leak               | ◁think▷Okay, let me try to figure out how to describe this image. First, I need to look at the image carefully. There are two cats on a pink surface, maybe a blanket or a bed. Both cats seem to be lying down. ... [tail] e siblings or just two cats that are comfortable with each other. The remotes suggest a home setting                                                   |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `avoid` / `harness`         | harness:stop-token; reasoning-leak   | Here are my reasoning steps: The user asks: "Describe this image briefly." The image is of two cats sleeping on a pink couch, with a remote control. The user wants a brief description. This is a straightforwa ... [tail] sleeping side‑by‑side on a pink couch, with a TV remote resting nearby. [END FINAL RESPONSE] <\|end\|>                                                 |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `recommended` / `clean`     | clean                                | The image shows two tabby cats lying on a pink blanket, with two remote controls placed on the couch behind them.                                                                                                                                                                                                                                                                  |
-| [`mlx-community/paligemma2-10b-ft-docci-448-6bit`](#model-mlx-community-paligemma2-10b-ft-docci-448-6bit)               | `recommended` / `clean`     | clean                                | A top-down view of two cats laying on a pink blanket. The cat on the left is a gray tabby cat with black stripes and is laying on its side with its head facing the right side of the image. The cat on the righ ... [tail] mote control on the left side of the image and a gray remote control on the right side of the image.                                                   |
-| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `recommended` / `clean`     | clean                                | Two cats are sleeping on a pink blanket on a red couch. One cat is thin with black stripes, while the other is thicker with brown and black stripes. Both cats are curled up with their tails tucked in. Two remote controls are visible on the couch behind them.                                                                                                                 |
 | [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `recommended` / `clean`     | clean                                | Here's a brief description of the image: The image shows two tabby cats lying side-by-side on a bright pink surface, likely a couch cushion or blanket. Both cats are relaxed and appear to be sleeping. Each ca ... [tail] ur patterns and are in a comfortable, stretched-out position. The overall scene is cute and playful.                                                   |
-| [`mlx-community/InternVL3-14B-8bit`](#model-mlx-community-internvl3-14b-8bit)                                           | `recommended` / `clean`     | clean                                | Two cats are sleeping on a pink blanket with two remote controls nearby.                                                                                                                                                                                                                                                                                                           |
-| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `recommended` / `clean`     | clean                                | The image shows two cats lying on a pink blanket. The cat on the left is a kitten with a black and white striped tail. The cat on the right is a tabby cat with a black and brown striped tail. Both cats are sleeping.                                                                                                                                                            |
-| [`mlx-community/Molmo-7B-D-0924-bf16`](#model-mlx-community-molmo-7b-d-0924-bf16)                                       | `recommended` / `clean`     | clean                                | Two cats are sleeping on a pink blanket on a red couch. One cat is thin with black stripes, while the other is thicker with brown and black stripes. Both cats are curled up with their tails tucked in. Two remote controls are visible on the couch.                                                                                                                             |
-| [`mlx-community/paligemma2-3b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-3b-ft-docci-448-bf16)                 | `recommended` / `clean`     | clean                                | A top-down view of two cats sleeping on a pink blanket. The cat on the left is a gray and black tabby cat, and it is lying on its side with its head facing the right and its front paws stretched out in front ... [tail] Its tail is sticking out to the left. There are two white and blue remote controls between the cats.                                                    |
-| [`mlx-community/Qwen3.5-35B-A3B-bf16`](#model-mlx-community-qwen35-35b-a3b-bf16)                                        | `recommended` / `clean`     | clean                                | Two tabby cats are sprawled out asleep on a bright pink couch, nestled between two remote controls — one white and one gray. The cat on the left is curled with its tail tucked, while the one on the right lies stretched out, both looking deeply relaxed.                                                                                                                       |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `avoid` / `cutoff degraded` | cutoff                               | In the tranquil setting of this image, two feline companions, one adult and one kitten, are enjoying a peaceful slumber on a vibrant red couch. The adult cat, with its coat of brown and black stripes, is curl ... [tail] ust left the room or is about to return. This image captures a moment of quiet companionship between                                                   |
+| [`microsoft/Phi-3.5-vision-instruct`](#model-microsoft-phi-35-vision-instruct)                                          | `avoid` / `harness`         | harness:stop-token                   | Two cats are sleeping on a pink couch with remote controls beside them.<\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|... |
+| [`mlx-community/paligemma2-10b-ft-docci-448-6bit`](#model-mlx-community-paligemma2-10b-ft-docci-448-6bit)               | `recommended` / `clean`     | clean                                | A top-down view of two cats laying on a pink blanket. The cat on the left is a gray tabby cat with black stripes and is laying on its side with its head facing the right side of the image. The cat on the righ ... [tail] mote control on the left side of the image and a gray remote control on the right side of the image.                                                   |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `avoid` / `harness`         | harness:stop-token; reasoning-leak   | Here are my reasoning steps: The user asks: "Describe this image briefly." The image is of two cats sleeping on a pink couch, with a remote control. The user wants a brief description. This is a straightforwa ... [tail] sleeping side‑by‑side on a pink couch, with a TV remote resting nearby. [END FINAL RESPONSE] <\|end\|>                                                 |
 | [`mlx-community/gemma-3-27b-it-qat-8bit`](#model-mlx-community-gemma-3-27b-it-qat-8bit)                                 | `recommended` / `clean`     | clean                                | Here's a brief description of the image: The image shows two tabby kittens lying on their backs on a bright pink surface (likely a couch or blanket). Both kittens are relaxed and appear to be sleeping. Each k ... [tail] ol resting on its belly. The kittens have striped fur patterns and are in a playful, endearing pose.                                                   |
+| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `recommended` / `clean`     | clean                                | Two cats are sleeping on a pink blanket on a red couch. One cat is thin with black stripes, while the other is thicker with brown and black stripes. Both cats are curled up with their tails tucked in. Two remote controls are visible on the couch behind them.                                                                                                                 |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `avoid` / `cutoff degraded` | cutoff                               | In the tranquil setting of this image, two feline companions, one adult and one kitten, are enjoying a peaceful slumber on a vibrant red couch. The adult cat, with its coat of brown and black stripes, is curl ... [tail] ust left the room or is about to return. This image captures a moment of quiet companionship between                                                   |
+| [`mlx-community/paligemma2-3b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-3b-ft-docci-448-bf16)                 | `recommended` / `clean`     | clean                                | A top-down view of two cats sleeping on a pink blanket. The cat on the left is a gray and black tabby cat, and it is lying on its side with its head facing the right and its front paws stretched out in front ... [tail] Its tail is sticking out to the left. There are two white and blue remote controls between the cats.                                                    |
+| [`mlx-community/Molmo-7B-D-0924-bf16`](#model-mlx-community-molmo-7b-d-0924-bf16)                                       | `recommended` / `clean`     | clean                                | Two cats are sleeping on a pink blanket on a red couch. One cat is thin with black stripes, while the other is thicker with brown and black stripes. Both cats are curled up with their tails tucked in. Two remote controls are visible on the couch behind them.                                                                                                                 |
 | [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `recommended` / `clean`     | clean                                | The image shows two tabby cats resting on a bright pink blanket spread over a red couch. The cat on the is stretched out, sleeping with its head down, while the cat on the left lies curled, also asleep. Two remote controls (one gray, one white) rest near the cats, adding a cozy, domestic feel to the scene.                                                                |
+| [`mlx-community/Qwen3.5-35B-A3B-bf16`](#model-mlx-community-qwen35-35b-a3b-bf16)                                        | `recommended` / `clean`     | clean                                | Two tabby cats are sprawled out asleep on a bright pink couch, nestled between two remote controls — one white and one gray. The cat on the left is curled with its tail tucked, while the one on the right lies stretched out, both looking deeply relaxed.                                                                                                                       |
 | [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `avoid` / `cutoff degraded` | cutoff; degeneration                 | Okay, let's break this down. The user wants a brief description of an image, and they've given me a pretty convoluted OCR output. My first step is always to understand the request. "Briefly describe" means I ... [tail] tiger-striped tabby. They're both sleeping. The setting is a red couch. Now, I need to synthesize a                                                     |
 | [`mlx-community/gemma-4-31b-bf16`](#model-mlx-community-gemma-4-31b-bf16)                                               | `recommended` / `clean`     | clean                                | Both cats are sleeping on a pink blanket. The difference between these images is that one cat is on the left side of the blanket and the other is on the right side.                                                                                                                                                                                                               |
 | [`mlx-community/pixtral-12b-bf16`](#model-mlx-community-pixtral-12b-bf16)                                               | `avoid` / `cutoff degraded` | cutoff                               | In the tranquil setting of this image, two feline companions, one a tabby and the other a Bengal, are enjoying a peaceful slumber on a vibrant red couch. The tabby, with its distinctive striped coat, is spraw ... [tail] on of these objects relative to each other and the cats adds depth to the image, creating a snapshot                                                   |
@@ -111,66 +111,66 @@ Every model in this run, with its skim-first output or diagnostic beside the mai
 
 | Model                                                                                                                   | Result                      | Output / diagnostic                                                                                                                                                                                                                                      | Gen tok   | Total   | Gen TPS   | Peak GB   | Quality signal                       |
 |-------------------------------------------------------------------------------------------------------------------------|-----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|---------|-----------|-----------|--------------------------------------|
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `avoid` / `runtime failure` | [mlx; weight-mismatch] Error: Weight Mismatch - Model loading failed: Missing 2 parameters: multi_modal_projector.layer_norm.bias, multi_modal_projector.layer_norm.weight.                                                                              | -         | 0.13s   | -         | -         | mlx; weight-mismatch                 |
-| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `avoid` / `runtime failure` | [mlx-vlm; model-error] Error: Model Error - Model loading failed: property 'eos_token_id' of 'ModelConfig' object has no setter                                                                                                                          | -         | 0.28s   | -         | -         | mlx-vlm; model-error                 |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `recommended` / `clean`     | Two cats are laying on a pink couch.                                                                                                                                                                                                                     | 10        | 0.42s   | 551       | 1.0       | clean                                |
-| [`mlx-community/LFM2-VL-1.6B-8bit`](#model-mlx-community-lfm2-vl-16b-8bit)                                              | `recommended` / `clean`     | Two cats are sleeping on a pink blanket.                                                                                                                                                                                                                 | 10        | 0.73s   | 293       | 3.0       | clean                                |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `recommended` / `clean`     | Two cats are sleeping on a pink couch next to two remote controls.                                                                                                                                                                                       | 15        | 0.81s   | 324       | 2.1       | clean                                |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `recommended` / `clean`     | The image shows two cats lying on a pink blanket. There are remote controls on the blanket as well.                                                                                                                                                      | 22        | 1.18s   | 239       | 3.0       | clean                                |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `recommended` / `clean`     | The image shows a close-up view of two cats lying down on a pink fabric surface. Both cats have striped coats, and they are positioned on a cou ... [tail] re of the cats. There are no texts or other objects in the image.                             | 81        | 0.79s   | 368       | 1.9       | clean                                |
-| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `recommended` / `clean`     | The image shows two cats lying on a pink blanket. One cat is on the left side, while the other is on the right side. There are two remote contr ... [tail] he blanket, one on the left side and the other on the right side.                             | 52        | 0.84s   | 300       | 2.5       | clean                                |
-| [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava)                                                                       | `recommended` / `clean`     | This image features two cats lying on a couch. One cat is a light brown and the other is a dark brown. They both have green eyes and a black nose.                                                                                                       | 35        | 1.21s   | 111       | 3.8       | clean                                |
-| [`mlx-community/SmolVLM-Instruct-bf16`](#model-mlx-community-smolvlm-instruct-bf16)                                     | `recommended` / `clean`     | Two cats are sleeping on a pink blanket on a couch.                                                                                                                                                                                                      | 13        | 1.11s   | 127       | 5.5       | clean                                |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `recommended` / `clean`     | Two cats are sleeping on a pink couch with remote controls beside them.                                                                                                                                                                                  | 19        | 1.53s   | 61.9      | 9.2       | clean                                |
-| [`HuggingFaceTB/SmolVLM-Instruct`](#model-huggingfacetb-smolvlm-instruct)                                               | `recommended` / `clean`     | Two cats are sleeping on a pink blanket on a couch.                                                                                                                                                                                                      | 13        | 1.29s   | 124       | 5.5       | clean                                |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `recommended` / `clean`     | Two tabby cats are lying on a pink blanket on a red couch, with a remote control next to each cat.                                                                                                                                                       | 24        | 3.37s   | 104       | 17        | clean                                |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `recommended` / `clean`     | This image shows two tabby cats resting on a bright pink couch. One cat lies on its side, while the other is curled with its head down. Two remote controls are also visible on the couch.                                                               | 42        | 2.12s   | 92.7      | 7.7       | clean                                |
-| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `recommended` / `clean`     | This is a close-up photograph of two cats sleeping on a bright pink couch. The cat on the left is a tabby with a black and brown striped patter ... [tail] trols on the couch, one white and one gray, placed near the cats.                             | 96        | 1.57s   | 126       | 5.2       | clean                                |
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `recommended` / `clean`     | This is a close-up photograph of two cats sleeping on a bright pink couch. The cat on the left is a tabby with a black and brown striped patter ... [tail] trols on the couch, one white and one gray, placed near the cats.                             | 96        | 1.88s   | 133       | 4.7       | clean                                |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `recommended` / `clean`     | Two tabby cats are sprawled out on a bright pink couch, sleeping peacefully. One cat is curled near the left armrest with a remote beside it, w ... [tail] is cozy and relaxed, capturing a quiet moment of feline comfort.                              | 63        | 3.39s   | 116       | 21        | clean                                |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `recommended` / `clean`     | This image shows two tabby cats sleeping on a bright pink blanket or couch cover. The cat on the left is a smaller kitten, lying on its side wi ... [tail] . Both cats appear relaxed and comfortable in their cozy setting.                             | 71        | 2.41s   | 96.7      | 7.0       | clean                                |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `recommended` / `clean`     | In this image, there are two cats lying on a soft, pink cushion or blanket. - The cat on the left appears to be a kitten, with a smaller size, ... [tail] at looks like a remote control, suggesting a cozy indoor setting.                              | 99        | 2.03s   | 157       | 4.4       | clean                                |
-| [`mlx-community/Qwen3.5-35B-A3B-6bit`](#model-mlx-community-qwen35-35b-a3b-6bit)                                        | `recommended` / `clean`     | Two tabby cats are sprawled out asleep on a bright pink couch, nestled between two remote controls. The cat on the left is stretched out with i ... [tail] g downward. Both appear deeply relaxed in a cozy, domestic scene.                             | 58        | 4.17s   | 98.1      | 30        | clean                                |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `recommended` / `clean`     | Two high-angle tabby cats are sleeping on a pink blanket next to two remote controls.                                                                                                                                                                    | 19        | 4.59s   | 23.8      | 28        | clean                                |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `recommended` / `clean`     | The image shows two tabby cats lying on a pink couch. Both cats are stretched out, appearing relaxed. Between them are two remote controls. The ... [tail] and white stripes. The scene conveys a cozy and calm atmosphere.                              | 65        | 2.47s   | 63.4      | 10        | clean                                |
-| [`mlx-community/GLM-4.6V-Flash-6bit`](#model-mlx-community-glm-46v-flash-6bit)                                          | `recommended` / `clean`     | The image shows two tabby cats resting on a bright pink couch. One cat lies on its side, eyes closed, with a remote control nearby. The other c ... [tail] with the vivid pink couch contrasting with the cats’ striped fur.                             | 69        | 2.89s   | 62.7      | 10        | clean                                |
-| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `caveat` / `context budget` | Cat.                                                                                                                                                                                                                                                     | 3         | 2.77s   | 69.6      | 4.6       | harness:long-context; context-budget |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `recommended` / `clean`     | A high-angle shot shows two tabby cats sleeping on a pink blanket on a red couch next to two remote controls.                                                                                                                                            | 25        | 5.17s   | 23.3      | 29        | clean                                |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `avoid` / `harness`         | So, let's see. The image shows two cats lying on a pink couch. The couch is a bright pink color, and there are two remote controls next to the ... [tail] the left cat. The scene is calm, with the cats appearing relaxed.                              | 196       | 2.37s   | 127       | 5.3       | harness:stop-token                   |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `recommended` / `clean`     | In the image, a cat is comfortably nestled on a red couch, its body relaxed and at ease. The cat's fur is a mix of black and white, with the bl ... [tail] on a red couch, surrounded by a minimalist and clean environment.                             | 187       | 2.39s   | 128       | 5.5       | clean                                |
-| [`mlx-community/gemma-3n-E2B-4bit`](#model-mlx-community-gemma-3n-e2b-4bit)                                             | `avoid` / `cutoff degraded` | have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this ima...                             | 200       | 3.98s   | 98.8      | 6.0       | repetitive; cutoff                   |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `recommended` / `clean`     | This image shows two tabby cats lounging on a pink blanket. Both cats appear relaxed, lying on their sides with their legs stretched out. One c ... [tail] ther faces right, and there seem to be remote controls near them.                             | 52        | 3.88s   | 46.5      | 10        | clean                                |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `recommended` / `clean`     | In this image we can see two cats on the sofa. There are two remotes on the sofa.<end_of_utterance>                                                                                                                                                      | 23        | 4.53s   | 35.0      | 19        | formatting                           |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `recommended` / `clean`     | This image shows two cats lying on their backs on a pink blanket or cushion. Both cats appear relaxed and playful, with their legs stretched ou ... [tail] t. There are two remote controls placed near them on the blanket.                             | 68        | 4.17s   | 40.0      | 9.7       | clean                                |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `recommended` / `clean`     | Two tabby cats are sleeping on a bright pink blanket on a red couch, with two remote controls lying next to them.                                                                                                                                        | 25        | 5.67s   | 15.1      | 19        | clean                                |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `recommended` / `clean`     | Two tabby cats are sleeping peacefully on a bright pink couch. One cat lies on its side near a white remote control, while the other stretches ... [tail] a remote. Both appear relaxed and comfortable in their cozy spot.                              | 49        | 6.42s   | 18.9      | 30        | clean                                |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `avoid` / `harness`         | TheĠimageĠfeaturesĠtwoĠcatsĠlyingĠonĠaĠpinkĠsurface,ĠpossiblyĠaĠblanketĠorĠaĠcouch.ĠTheĠcatĠonĠtheĠleftĠisĠaĠkitten,ĠandĠtheĠoneĠonĠtheĠrightĠi ... [tail] ,ĠoneĠcloserĠtoĠtheĠkittenĠandĠtheĠotherĠcloserĠtoĠtheĠadultĠcat.                             | 90        | 5.51s   | 33.0      | 19        | harness:encoding                     |
-| [`mlx-community/Qwen3.5-27B-mxfp8`](#model-mlx-community-qwen35-27b-mxfp8)                                              | `recommended` / `clean`     | Two tabby cats are sleeping on a bright pink couch. One cat is stretched out on its side, while the other is curled up nearby. Two remote controls lie on the couch between them.                                                                        | 40        | 6.66s   | 14.7      | 30        | clean                                |
-| [`microsoft/Phi-3.5-vision-instruct`](#model-microsoft-phi-35-vision-instruct)                                          | `avoid` / `harness`         | Two cats are sleeping on a pink couch with remote controls beside them.<\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|end ... [tail] ext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|> | 200       | 4.68s   | 57.5      | 9.2       | harness:stop-token                   |
-| [`mlx-community/Qwen3.5-27B-4bit`](#model-mlx-community-qwen35-27b-4bit)                                                | `recommended` / `clean`     | Two tabby cats are lounging on a bright pink couch, each with a remote control nearby. The cat on the left is stretched out on its back, paws r ... [tail] to be napping or resting comfortably in a cozy, playful setting.                              | 71        | 6.47s   | 22.4      | 19        | clean                                |
-| [`jqlive/Kimi-VL-A3B-Thinking-2506-6bit`](#model-jqlive-kimi-vl-a3b-thinking-2506-6bit)                                 | `recommended` / `token cap` | ◁think▷So, let's describe the image. First, there are two tabby cats on a pink fabric surface. The cat on the left is lying on its side, facing ... [tail] have striped fur with a mix of brown, black, and white patterns.                              | 200       | 7.94s   | 76.3      | 15        | reasoning-leak                       |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `recommended` / `clean`     | The image shows two cats sleeping on a pink blanket. One cat is a small kitten, and the other is a larger adult cat. Both are lying on their sides, and there are two remote controls placed near them on the couch.                                     | 48        | 6.20s   | 30.3      | 18        | clean                                |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `recommended` / `clean`     | Two tabby cats are peacefully napping on a bright pink couch. The cat on the left is lying on its back with its paws curled up, its tail curled ... [tail] The cats appear relaxed and content, enjoying a comfortable nap.                              | 124       | 7.12s   | 29.2      | 17        | clean                                |
-| [`mlx-community/Kimi-VL-A3B-Thinking-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-8bit)                             | `avoid` / `cutoff degraded` | ◁think▷Okay, let me try to figure out how to describe this image. First, I need to look at the image carefully. There are two cats on a pink su ... [tail] e comfortable with each other. The remotes suggest a home setting                             | 200       | 7.02s   | 46.3      | 20        | cutoff; reasoning-leak               |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `avoid` / `harness`         | Here are my reasoning steps: The user asks: "Describe this image briefly." The image is of two cats sleeping on a pink couch, with a remote con ... [tail] ch, with a TV remote resting nearby. [END FINAL RESPONSE] <\|end\|>                           | 174       | 6.47s   | 44.2      | 14        | harness:stop-token; reasoning-leak   |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `recommended` / `clean`     | The image shows two tabby cats lying on a pink blanket, with two remote controls placed on the couch behind them.                                                                                                                                        | 25        | 6.74s   | 9.43      | 15        | clean                                |
-| [`mlx-community/paligemma2-10b-ft-docci-448-6bit`](#model-mlx-community-paligemma2-10b-ft-docci-448-6bit)               | `recommended` / `clean`     | A top-down view of two cats laying on a pink blanket. The cat on the left is a gray tabby cat with black stripes and is laying on its side with ... [tail] e image and a gray remote control on the right side of the image.                             | 101       | 7.15s   | 23.1      | 11        | clean                                |
-| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `recommended` / `clean`     | Two cats are sleeping on a pink blanket on a red couch. One cat is thin with black stripes, while the other is thicker with brown and black str ... [tail] ked in. Two remote controls are visible on the couch behind them.                             | 55        | 6.90s   | 48.3      | 20        | clean                                |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `recommended` / `clean`     | Here's a brief description of the image: The image shows two tabby cats lying side-by-side on a bright pink surface, likely a couch cushion or ... [tail] e, stretched-out position. The overall scene is cute and playful.                              | 91        | 8.15s   | 18.4      | 19        | clean                                |
-| [`mlx-community/InternVL3-14B-8bit`](#model-mlx-community-internvl3-14b-8bit)                                           | `recommended` / `clean`     | Two cats are sleeping on a pink blanket with two remote controls nearby.                                                                                                                                                                                 | 15        | 7.95s   | 32.2      | 19        | clean                                |
-| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `recommended` / `clean`     | The image shows two cats lying on a pink blanket. The cat on the left is a kitten with a black and white striped tail. The cat on the right is a tabby cat with a black and brown striped tail. Both cats are sleeping.                                  | 55        | 7.31s   | 57.7      | 9.7       | clean                                |
-| [`mlx-community/Molmo-7B-D-0924-bf16`](#model-mlx-community-molmo-7b-d-0924-bf16)                                       | `recommended` / `clean`     | Two cats are sleeping on a pink blanket on a red couch. One cat is thin with black stripes, while the other is thicker with brown and black str ... [tail] ir tails tucked in. Two remote controls are visible on the couch.                             | 53        | 8.28s   | 29.9      | 27        | clean                                |
-| [`mlx-community/paligemma2-3b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-3b-ft-docci-448-bf16)                 | `recommended` / `clean`     | A top-down view of two cats sleeping on a pink blanket. The cat on the left is a gray and black tabby cat, and it is lying on its side with its ... [tail] t. There are two white and blue remote controls between the cats.                             | 119       | 8.89s   | 17.7      | 10        | clean                                |
-| [`mlx-community/Qwen3.5-35B-A3B-bf16`](#model-mlx-community-qwen35-35b-a3b-bf16)                                        | `recommended` / `clean`     | Two tabby cats are sprawled out asleep on a bright pink couch, nestled between two remote controls — one white and one gray. The cat on the lef ... [tail] one on the right lies stretched out, both looking deeply relaxed.                             | 55        | 17.74s  | 67.9      | 71        | clean                                |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `avoid` / `cutoff degraded` | In the tranquil setting of this image, two feline companions, one adult and one kitten, are enjoying a peaceful slumber on a vibrant red couch. ... [tail] turn. This image captures a moment of quiet companionship between                             | 200       | 9.04s   | 31.1      | 15        | cutoff                               |
-| [`mlx-community/gemma-3-27b-it-qat-8bit`](#model-mlx-community-gemma-3-27b-it-qat-8bit)                                 | `recommended` / `clean`     | Here's a brief description of the image: The image shows two tabby kittens lying on their backs on a bright pink surface (likely a couch or bla ... [tail] s have striped fur patterns and are in a playful, endearing pose.                             | 70        | 11.22s  | 10.5      | 33        | clean                                |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `recommended` / `clean`     | The image shows two tabby cats resting on a bright pink blanket spread over a red couch. The cat on the is stretched out, sleeping with its hea ... [tail] e) rest near the cats, adding a cozy, domestic feel to the scene.                             | 71        | 16.30s  | 33.3      | 63        | clean                                |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `avoid` / `cutoff degraded` | Okay, let's break this down. The user wants a brief description of an image, and they've given me a pretty convoluted OCR output. My first step ... [tail] sleeping. The setting is a red couch. Now, I need to synthesize a                             | 200       | 18.94s  | 63.8      | 60        | cutoff; degeneration                 |
-| [`mlx-community/gemma-4-31b-bf16`](#model-mlx-community-gemma-4-31b-bf16)                                               | `recommended` / `clean`     | Both cats are sleeping on a pink blanket. The difference between these images is that one cat is on the left side of the blanket and the other is on the right side.                                                                                     | 36        | 17.10s  | 6.29      | 64        | clean                                |
-| [`mlx-community/pixtral-12b-bf16`](#model-mlx-community-pixtral-12b-bf16)                                               | `avoid` / `cutoff degraded` | In the tranquil setting of this image, two feline companions, one a tabby and the other a Bengal, are enjoying a peaceful slumber on a vibrant ... [tail] h other and the cats adds depth to the image, creating a snapshot                              | 200       | 14.80s  | 17.6      | 27        | cutoff                               |
-| [`meta-llama/Llama-3.2-11B-Vision-Instruct`](#model-meta-llama-llama-32-11b-vision-instruct)                            | `recommended` / `clean`     | The image shows two tabby cats lying on a pink blanket, with two remote controls placed on the couch behind them. The cat on the left is a kitt ... [tail] ene, with the cats seemingly enjoying a relaxing moment together.                             | 77        | 21.64s  | 5.09      | 25        | clean                                |
-| [`mlx-community/paligemma2-10b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-10b-ft-docci-448-bf16)               | `recommended` / `clean`     | A top-down view of two cats laying on a pink blanket. The cat on the left is a gray tabby cat with black stripes and a black tail. It is laying ... [tail] e image and a gray remote control on the right side of the image.                             | 159       | 40.59s  | 4.33      | 26        | clean                                |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `avoid` / `cutoff degraded` | ◁think▷So, let's describe the image. First, there are two tabby cats on a pink fabric surface. The cat on the left is lying on its side, facing ... [tail] remote control near its head. The cat on the right is positioned                              | 200       | 60.99s  | 3.54      | 39        | cutoff; reasoning-leak               |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `avoid` / `runtime failure` | [mlx; weight-mismatch] Error: Weight Mismatch - Model loading failed: Missing 2 parameters: multi_modal_projector.layer_norm.bias, multi_modal_projector.layer_norm.weight.                                                                              | -         | 0.41s   | -         | -         | mlx; weight-mismatch                 |
+| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `avoid` / `runtime failure` | [mlx-vlm; model-error] Error: Model Error - Model loading failed: property 'eos_token_id' of 'ModelConfig' object has no setter                                                                                                                          | -         | 0.56s   | -         | -         | mlx-vlm; model-error                 |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `recommended` / `clean`     | Two cats are laying on a pink couch.                                                                                                                                                                                                                     | 10        | 0.49s   | 547       | 1.0       | clean                                |
+| [`mlx-community/LFM2-VL-1.6B-8bit`](#model-mlx-community-lfm2-vl-16b-8bit)                                              | `recommended` / `clean`     | Two cats are sleeping on a pink blanket.                                                                                                                                                                                                                 | 10        | 2.96s   | 322       | 3.0       | clean                                |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `recommended` / `clean`     | Two cats are sleeping on a pink couch next to two remote controls.                                                                                                                                                                                       | 15        | 0.87s   | 329       | 2.2       | clean                                |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `recommended` / `clean`     | The image shows two cats lying on a pink blanket. There are remote controls on the blanket as well.                                                                                                                                                      | 22        | 1.11s   | 277       | 3.0       | clean                                |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `recommended` / `clean`     | The image shows a close-up view of two cats lying down on a pink fabric surface. Both cats have striped coats, and they are positioned on a cou ... [tail] re of the cats. There are no texts or other objects in the image.                             | 81        | 0.85s   | 332       | 1.8       | clean                                |
+| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `recommended` / `clean`     | The image shows two cats lying on a pink blanket. One cat is on the left side, while the other is on the right side. There are two remote contr ... [tail] he blanket, one on the left side and the other on the right side.                             | 52        | 1.13s   | 313       | 2.5       | clean                                |
+| [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava)                                                                       | `recommended` / `clean`     | This image features two cats lying on a couch. One cat is a light brown and the other is a dark brown. They both have green eyes and a black nose.                                                                                                       | 35        | 1.23s   | 114       | 4.0       | clean                                |
+| [`mlx-community/SmolVLM-Instruct-bf16`](#model-mlx-community-smolvlm-instruct-bf16)                                     | `recommended` / `clean`     | Two cats are sleeping on a pink blanket on a couch.                                                                                                                                                                                                      | 13        | 1.30s   | 128       | 5.5       | clean                                |
+| [`HuggingFaceTB/SmolVLM-Instruct`](#model-huggingfacetb-smolvlm-instruct)                                               | `recommended` / `clean`     | Two cats are sleeping on a pink blanket on a couch.                                                                                                                                                                                                      | 13        | 2.74s   | 131       | 5.5       | clean                                |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `recommended` / `clean`     | Two cats are sleeping on a pink couch with remote controls beside them.                                                                                                                                                                                  | 19        | 1.79s   | 60.1      | 9.2       | clean                                |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `recommended` / `clean`     | Two tabby cats are lying on a pink blanket on a red couch, with a remote control next to each cat.                                                                                                                                                       | 24        | 3.82s   | 115       | 17        | clean                                |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `recommended` / `clean`     | This image shows two tabby cats resting on a bright pink couch. One cat lies on its side, while the other is curled with its head down. Two remote controls are also visible on the couch.                                                               | 42        | 2.06s   | 93.1      | 7.7       | clean                                |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `recommended` / `clean`     | In this image, there are two cats lying on a soft, pink cushion or blanket. - The cat on the left appears to be a kitten, with a smaller size, ... [tail] at looks like a remote control, suggesting a cozy indoor setting.                              | 99        | 3.33s   | 198       | 4.4       | clean                                |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `recommended` / `clean`     | This is a close-up photograph of two cats sleeping on a bright pink couch. The cat on the left is a tabby with a black and brown striped patter ... [tail] trols on the couch, one white and one gray, placed near the cats.                             | 96        | 1.59s   | 131       | 5.2       | clean                                |
+| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `recommended` / `clean`     | This is a close-up photograph of two cats sleeping on a bright pink couch. The cat on the left is a tabby with a black and brown striped patter ... [tail] trols on the couch, one white and one gray, placed near the cats.                             | 96        | 1.62s   | 129       | 5.3       | clean                                |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `recommended` / `clean`     | Two tabby cats are sprawled out on a bright pink couch, sleeping peacefully. One cat is curled near the left armrest with a remote beside it, w ... [tail] is cozy and relaxed, capturing a quiet moment of feline comfort.                              | 63        | 4.65s   | 110       | 21        | clean                                |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `recommended` / `clean`     | This image shows two tabby cats sleeping on a bright pink blanket or couch cover. The cat on the left is a smaller kitten, lying on its side wi ... [tail] . Both cats appear relaxed and comfortable in their cozy setting.                             | 71        | 16.98s  | 99.4      | 7.0       | clean                                |
+| [`mlx-community/Qwen3.5-35B-A3B-6bit`](#model-mlx-community-qwen35-35b-a3b-6bit)                                        | `recommended` / `clean`     | Two tabby cats are sprawled out asleep on a bright pink couch, nestled between two remote controls. The cat on the left is stretched out with i ... [tail] g downward. Both appear deeply relaxed in a cozy, domestic scene.                             | 58        | 5.10s   | 93.7      | 30        | clean                                |
+| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `caveat` / `context budget` | Cat.                                                                                                                                                                                                                                                     | 3         | 3.47s   | 77.0      | 4.6       | harness:long-context; context-budget |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `recommended` / `clean`     | This image shows two tabby cats lying down on a pink blanket on a couch next to two remote controls.                                                                                                                                                     | 22        | 6.28s   | 28.5      | 28        | clean                                |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `recommended` / `clean`     | The image shows two tabby cats lying on a pink couch. Both cats are stretched out, appearing relaxed. Between them are two remote controls. The ... [tail] and white stripes. The scene conveys a cozy and calm atmosphere.                              | 65        | 2.51s   | 65.7      | 10        | clean                                |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `recommended` / `clean`     | This image shows two tabby cats lounging on a pink blanket. Both cats appear relaxed, lying on their sides with their legs stretched out. One c ... [tail] ther faces right, and there seem to be remote controls near them.                             | 52        | 2.96s   | 65.6      | 10        | clean                                |
+| [`mlx-community/GLM-4.6V-Flash-6bit`](#model-mlx-community-glm-46v-flash-6bit)                                          | `recommended` / `clean`     | The image shows two tabby cats resting on a bright pink couch. One cat lies on its side, eyes closed, with a remote control nearby. The other c ... [tail] with the vivid pink couch contrasting with the cats’ striped fur.                             | 69        | 2.96s   | 63.7      | 10        | clean                                |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `recommended` / `clean`     | Two high-contrast tabby cats are sleeping on a pink blanket next to two remote controls.                                                                                                                                                                 | 19        | 4.94s   | 17.9      | 29        | clean                                |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `recommended` / `clean`     | This image shows two cats lying on their backs on a pink blanket or cushion. Both cats appear relaxed and playful, with their legs stretched ou ... [tail] t. There are two remote controls placed near them on the blanket.                             | 68        | 3.18s   | 69.4      | 9.7       | clean                                |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `recommended` / `clean`     | Two tabby cats are sleeping on a bright pink blanket on a red couch, with two remote controls lying next to them.                                                                                                                                        | 25        | 5.21s   | 28.5      | 19        | clean                                |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `avoid` / `harness`         | So, let's see. The image shows two cats lying on a pink couch. The couch is a bright pink color, and there are two remote controls next to the ... [tail] the left cat. The scene is calm, with the cats appearing relaxed.                              | 196       | 2.63s   | 128       | 5.3       | harness:stop-token                   |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `recommended` / `clean`     | In this image we can see two cats on the sofa. There are two remotes on the sofa.<end_of_utterance>                                                                                                                                                      | 23        | 15.51s  | 34.1      | 19        | formatting                           |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `recommended` / `clean`     | In the image, a cat is comfortably nestled on a red couch, its body relaxed and at ease. The cat's fur is a mix of black and white, with the bl ... [tail] on a red couch, surrounded by a minimalist and clean environment.                             | 187       | 2.40s   | 129       | 5.5       | clean                                |
+| [`mlx-community/gemma-3n-E2B-4bit`](#model-mlx-community-gemma-3n-e2b-4bit)                                             | `avoid` / `cutoff degraded` | have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this image. have this ima...                             | 200       | 4.17s   | 121       | 6.0       | repetitive; cutoff                   |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `recommended` / `clean`     | The image shows two tabby cats lying on a pink blanket, with two remote controls placed on the couch behind them.                                                                                                                                        | 25        | 4.07s   | 22.4      | 15        | clean                                |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `recommended` / `clean`     | The image shows two cats sleeping on a pink blanket. One cat is a small kitten, and the other is a larger adult cat. Both are lying on their sides, and there are two remote controls placed near them on the couch.                                     | 48        | 49.48s  | 35.0      | 18        | clean                                |
+| [`mlx-community/InternVL3-14B-8bit`](#model-mlx-community-internvl3-14b-8bit)                                           | `recommended` / `clean`     | Two cats are sleeping on a pink blanket with two remote controls nearby.                                                                                                                                                                                 | 15        | 4.63s   | 33.2      | 19        | clean                                |
+| [`mlx-community/Qwen3.5-27B-4bit`](#model-mlx-community-qwen35-27b-4bit)                                                | `recommended` / `clean`     | Two tabby cats are lounging on a bright pink couch, each with a remote control nearby. The cat on the left is stretched out on its back, paws r ... [tail] to be napping or resting comfortably in a cozy, playful setting.                              | 71        | 5.96s   | 32.2      | 19        | clean                                |
+| [`mlx-community/Qwen3.5-27B-mxfp8`](#model-mlx-community-qwen35-27b-mxfp8)                                              | `recommended` / `clean`     | Two tabby cats are sleeping on a bright pink couch. One cat is stretched out on its side, while the other is curled up nearby. Two remote controls lie on the couch between them.                                                                        | 40        | 6.25s   | 18.7      | 30        | clean                                |
+| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `recommended` / `clean`     | The image shows two cats lying on a pink blanket. The cat on the left is a kitten with a black and white striped tail. The cat on the right is a tabby cat with a black and brown striped tail. Both cats are sleeping.                                  | 55        | 3.81s   | 60.7      | 9.7       | clean                                |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `recommended` / `clean`     | Two tabby cats are peacefully napping on a bright pink couch. The cat on the left is lying on its back with its paws curled up, its tail curled ... [tail] The cats appear relaxed and content, enjoying a comfortable nap.                              | 124       | 6.27s   | 47.8      | 17        | clean                                |
+| [`jqlive/Kimi-VL-A3B-Thinking-2506-6bit`](#model-jqlive-kimi-vl-a3b-thinking-2506-6bit)                                 | `recommended` / `token cap` | ◁think▷So, let's describe the image. First, there are two tabby cats on a pink fabric surface. The cat on the left is lying on its side, facing ... [tail] have striped fur with a mix of brown, black, and white patterns.                              | 200       | 5.67s   | 79.1      | 16        | reasoning-leak                       |
+| [`mlx-community/Kimi-VL-A3B-Thinking-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-8bit)                             | `avoid` / `cutoff degraded` | ◁think▷Okay, let me try to figure out how to describe this image. First, I need to look at the image carefully. There are two cats on a pink su ... [tail] e comfortable with each other. The remotes suggest a home setting                             | 200       | 5.63s   | 72.3      | 20        | cutoff; reasoning-leak               |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `recommended` / `clean`     | Two tabby cats are sleeping peacefully on a bright pink couch. One cat lies on its side near a white remote control, while the other stretches ... [tail] a remote. Both appear relaxed and comfortable in their cozy spot.                              | 49        | 6.40s   | 19.2      | 30        | clean                                |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `avoid` / `harness`         | TheĠimageĠfeaturesĠtwoĠcatsĠlyingĠonĠaĠpinkĠsurface,ĠpossiblyĠaĠblanketĠorĠaĠcouch.ĠTheĠcatĠonĠtheĠleftĠisĠaĠkitten,ĠandĠtheĠoneĠonĠtheĠrightĠi ... [tail] ,ĠoneĠcloserĠtoĠtheĠkittenĠandĠtheĠotherĠcloserĠtoĠtheĠadultĠcat.                             | 90        | 6.61s   | 33.0      | 19        | harness:encoding                     |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `recommended` / `clean`     | Here's a brief description of the image: The image shows two tabby cats lying side-by-side on a bright pink surface, likely a couch cushion or ... [tail] e, stretched-out position. The overall scene is cute and playful.                              | 91        | 6.56s   | 31.5      | 19        | clean                                |
+| [`microsoft/Phi-3.5-vision-instruct`](#model-microsoft-phi-35-vision-instruct)                                          | `avoid` / `harness`         | Two cats are sleeping on a pink couch with remote controls beside them.<\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|end ... [tail] ext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|> | 200       | 5.09s   | 58.2      | 9.2       | harness:stop-token                   |
+| [`mlx-community/paligemma2-10b-ft-docci-448-6bit`](#model-mlx-community-paligemma2-10b-ft-docci-448-6bit)               | `recommended` / `clean`     | A top-down view of two cats laying on a pink blanket. The cat on the left is a gray tabby cat with black stripes and is laying on its side with ... [tail] e image and a gray remote control on the right side of the image.                             | 101       | 5.45s   | 34.3      | 11        | clean                                |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `avoid` / `harness`         | Here are my reasoning steps: The user asks: "Describe this image briefly." The image is of two cats sleeping on a pink couch, with a remote con ... [tail] ch, with a TV remote resting nearby. [END FINAL RESPONSE] <\|end\|>                           | 174       | 6.76s   | 44.2      | 14        | harness:stop-token; reasoning-leak   |
+| [`mlx-community/gemma-3-27b-it-qat-8bit`](#model-mlx-community-gemma-3-27b-it-qat-8bit)                                 | `recommended` / `clean`     | Here's a brief description of the image: The image shows two tabby kittens lying on their backs on a bright pink surface (likely a couch or bla ... [tail] s have striped fur patterns and are in a playful, endearing pose.                             | 70        | 8.82s   | 17.5      | 33        | clean                                |
+| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `recommended` / `clean`     | Two cats are sleeping on a pink blanket on a red couch. One cat is thin with black stripes, while the other is thicker with brown and black str ... [tail] ked in. Two remote controls are visible on the couch behind them.                             | 55        | 6.64s   | 51.4      | 20        | clean                                |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `avoid` / `cutoff degraded` | In the tranquil setting of this image, two feline companions, one adult and one kitten, are enjoying a peaceful slumber on a vibrant red couch. ... [tail] turn. This image captures a moment of quiet companionship between                             | 200       | 7.50s   | 39.9      | 15        | cutoff                               |
+| [`mlx-community/paligemma2-3b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-3b-ft-docci-448-bf16)                 | `recommended` / `clean`     | A top-down view of two cats sleeping on a pink blanket. The cat on the left is a gray and black tabby cat, and it is lying on its side with its ... [tail] t. There are two white and blue remote controls between the cats.                             | 119       | 10.68s  | 19.4      | 10        | clean                                |
+| [`mlx-community/Molmo-7B-D-0924-bf16`](#model-mlx-community-molmo-7b-d-0924-bf16)                                       | `recommended` / `clean`     | Two cats are sleeping on a pink blanket on a red couch. One cat is thin with black stripes, while the other is thicker with brown and black str ... [tail] ked in. Two remote controls are visible on the couch behind them.                             | 55        | 9.79s   | 30.0      | 27        | clean                                |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `recommended` / `clean`     | The image shows two tabby cats resting on a bright pink blanket spread over a red couch. The cat on the is stretched out, sleeping with its hea ... [tail] e) rest near the cats, adding a cozy, domestic feel to the scene.                             | 71        | 15.97s  | 51.2      | 63        | clean                                |
+| [`mlx-community/Qwen3.5-35B-A3B-bf16`](#model-mlx-community-qwen35-35b-a3b-bf16)                                        | `recommended` / `clean`     | Two tabby cats are sprawled out asleep on a bright pink couch, nestled between two remote controls — one white and one gray. The cat on the lef ... [tail] one on the right lies stretched out, both looking deeply relaxed.                             | 55        | 19.82s  | 67.8      | 71        | clean                                |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `avoid` / `cutoff degraded` | Okay, let's break this down. The user wants a brief description of an image, and they've given me a pretty convoluted OCR output. My first step ... [tail] sleeping. The setting is a red couch. Now, I need to synthesize a                             | 200       | 18.51s  | 65.0      | 60        | cutoff; degeneration                 |
+| [`mlx-community/gemma-4-31b-bf16`](#model-mlx-community-gemma-4-31b-bf16)                                               | `recommended` / `clean`     | Both cats are sleeping on a pink blanket. The difference between these images is that one cat is on the left side of the blanket and the other is on the right side.                                                                                     | 36        | 17.99s  | 7.53      | 64        | clean                                |
+| [`mlx-community/pixtral-12b-bf16`](#model-mlx-community-pixtral-12b-bf16)                                               | `avoid` / `cutoff degraded` | In the tranquil setting of this image, two feline companions, one a tabby and the other a Bengal, are enjoying a peaceful slumber on a vibrant ... [tail] h other and the cats adds depth to the image, creating a snapshot                              | 200       | 13.72s  | 20.4      | 27        | cutoff                               |
+| [`meta-llama/Llama-3.2-11B-Vision-Instruct`](#model-meta-llama-llama-32-11b-vision-instruct)                            | `recommended` / `clean`     | The image shows two tabby cats lying on a pink blanket, with two remote controls placed on the couch behind them. The cat on the left is a kitt ... [tail] ene, with the cats seemingly enjoying a relaxing moment together.                             | 77        | 19.51s  | 5.07      | 25        | clean                                |
+| [`mlx-community/paligemma2-10b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-10b-ft-docci-448-bf16)               | `recommended` / `clean`     | A top-down view of two cats laying on a pink blanket. The cat on the left is a gray tabby cat with black stripes and a black tail. It is laying ... [tail] e image and a gray remote control on the right side of the image.                             | 159       | 34.03s  | 5.28      | 26        | clean                                |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `avoid` / `cutoff degraded` | ◁think▷So, let's describe the image. First, there are two tabby cats on a pink fabric surface. The cat on the left is lying on its side, facing ... [tail] remote control near its head. The cat on the right is positioned                              | 200       | 47.76s  | 4.64      | 39        | cutoff; reasoning-leak               |
 <!-- markdownlint-enable MD034 -->
 
 ## Quick Navigation
@@ -188,10 +188,10 @@ Every model in this run, with its skim-first output or diagnostic beside the mai
   [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16),
   [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit),
   [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16),
-  [`mlx-community/gemma-3n-E2B-4bit`](#model-mlx-community-gemma-3n-e2b-4bit),
   [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16),
-  [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit),
-  [`microsoft/Phi-3.5-vision-instruct`](#model-microsoft-phi-35-vision-instruct),
+  [`mlx-community/gemma-3n-E2B-4bit`](#model-mlx-community-gemma-3n-e2b-4bit),
+  [`jqlive/Kimi-VL-A3B-Thinking-2506-6bit`](#model-jqlive-kimi-vl-a3b-thinking-2506-6bit),
+  [`mlx-community/Kimi-VL-A3B-Thinking-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-8bit),
   +7 more
 - _Failed outputs:_ [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16),
   [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)
@@ -231,10 +231,10 @@ _Error details:_
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 19694, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 19678, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 19085, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 19069, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -268,7 +268,7 @@ multi_modal_projector.layer_norm.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 19935, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 19919, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -279,7 +279,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 19709, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 19693, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Missing 2 parameters:
 multi_modal_projector.layer_norm.bias,
@@ -317,10 +317,10 @@ _Error details:_
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 19694, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 19678, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 19085, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 19069, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -352,7 +352,7 @@ AttributeError: property 'eos_token_id' of 'ModelConfig' object has no setter
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 19935, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 19919, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -363,7 +363,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 19709, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 19693, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: property 'eos_token_id' of 'ModelConfig' object has no setter
 ```
@@ -380,8 +380,8 @@ ValueError: Model loading failed: property 'eos_token_id' of 'ModelConfig' objec
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 0.34s; Gen 0.07s; Total 0.42s
-- _Throughput:_ Prompt 3,395 TPS (80 tok); Gen 551 TPS (10 tok)
+- _Timing:_ Load 0.41s; Gen 0.05s; Total 0.49s
+- _Throughput:_ Prompt 3,680 TPS (80 tok); Gen 547 TPS (10 tok)
 - _Tokens:_ prompt 80 tok; estimated text 6 tok; estimated non-text 74 tok;
   generated 10 tok; requested max 200 tok; stop reason completed
 
@@ -402,8 +402,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 0.58s; Gen 0.15s; Total 0.73s
-- _Throughput:_ Prompt 3,350 TPS (269 tok); Gen 293 TPS (10 tok)
+- _Timing:_ Load 2.83s; Gen 0.12s; Total 2.96s
+- _Throughput:_ Prompt 3,349 TPS (269 tok); Gen 322 TPS (10 tok)
 - _Tokens:_ prompt 269 tok; estimated text 6 tok; estimated non-text 263 tok;
   generated 10 tok; requested max 200 tok; stop reason completed
 
@@ -424,8 +424,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 0.65s; Gen 0.16s; Total 0.81s
-- _Throughput:_ Prompt 331 TPS (26 tok); Gen 324 TPS (15 tok)
+- _Timing:_ Load 0.71s; Gen 0.16s; Total 0.87s
+- _Throughput:_ Prompt 335 TPS (26 tok); Gen 329 TPS (15 tok)
 - _Tokens:_ prompt 26 tok; estimated text 6 tok; estimated non-text 20 tok;
   generated 15 tok; requested max 200 tok; stop reason completed
 
@@ -446,8 +446,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 0.91s; Gen 0.26s; Total 1.18s
-- _Throughput:_ Prompt 1,866 TPS (228 tok); Gen 239 TPS (22 tok)
+- _Timing:_ Load 0.88s; Gen 0.22s; Total 1.11s
+- _Throughput:_ Prompt 2,255 TPS (228 tok); Gen 277 TPS (22 tok)
 - _Tokens:_ prompt 228 tok; estimated text 6 tok; estimated non-text 222 tok;
   generated 22 tok; requested max 200 tok; stop reason completed
 
@@ -469,8 +469,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 0.46s; Gen 0.32s; Total 0.79s
-- _Throughput:_ Prompt 266 TPS (22 tok); Gen 368 TPS (81 tok)
+- _Timing:_ Load 0.52s; Gen 0.33s; Total 0.85s
+- _Throughput:_ Prompt 314 TPS (22 tok); Gen 332 TPS (81 tok)
 - _Tokens:_ prompt 22 tok; estimated text 6 tok; estimated non-text 16 tok;
   generated 81 tok; requested max 200 tok; stop reason completed
 
@@ -496,8 +496,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 0.48s; Gen 0.35s; Total 0.84s
-- _Throughput:_ Prompt 2,733 TPS (417 tok); Gen 300 TPS (52 tok)
+- _Timing:_ Load 0.79s; Gen 0.34s; Total 1.13s
+- _Throughput:_ Prompt 2,826 TPS (417 tok); Gen 313 TPS (52 tok)
 - _Tokens:_ prompt 417 tok; estimated text 6 tok; estimated non-text 411 tok;
   generated 52 tok; requested max 200 tok; stop reason completed
 
@@ -520,8 +520,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 0.72s; Gen 0.48s; Total 1.21s
-- _Throughput:_ Prompt 168 TPS (22 tok); Gen 111 TPS (35 tok)
+- _Timing:_ Load 0.78s; Gen 0.44s; Total 1.23s
+- _Throughput:_ Prompt 214 TPS (22 tok); Gen 114 TPS (35 tok)
 - _Tokens:_ prompt 22 tok; estimated text 6 tok; estimated non-text 16 tok;
   generated 35 tok; requested max 200 tok; stop reason completed
 
@@ -543,8 +543,30 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 0.56s; Gen 0.54s; Total 1.11s
-- _Throughput:_ Prompt 3,328 TPS (1,196 tok); Gen 127 TPS (13 tok)
+- _Timing:_ Load 0.76s; Gen 0.53s; Total 1.30s
+- _Throughput:_ Prompt 3,374 TPS (1,196 tok); Gen 128 TPS (13 tok)
+- _Tokens:_ prompt 1196 tok; estimated text 6 tok; estimated non-text 1190
+  tok; generated 13 tok; requested max 200 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> Two cats are sleeping on a pink blanket on a couch.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
+<a id="model-huggingfacetb-smolvlm-instruct"></a>
+
+### ✅ HuggingFaceTB/SmolVLM-Instruct
+
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ no flagged signals
+- _Timing:_ Load 2.20s; Gen 0.53s; Total 2.74s
+- _Throughput:_ Prompt 3,144 TPS (1,196 tok); Gen 131 TPS (13 tok)
 - _Tokens:_ prompt 1196 tok; estimated text 6 tok; estimated non-text 1190
   tok; generated 13 tok; requested max 200 tok; stop reason completed
 
@@ -565,36 +587,14 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 0.95s; Gen 0.58s; Total 1.53s
-- _Throughput:_ Prompt 2,970 TPS (770 tok); Gen 61.9 TPS (19 tok)
+- _Timing:_ Load 1.20s; Gen 0.59s; Total 1.79s
+- _Throughput:_ Prompt 3,036 TPS (770 tok); Gen 60.1 TPS (19 tok)
 - _Tokens:_ prompt 770 tok; estimated text 6 tok; estimated non-text 764 tok;
   generated 19 tok; requested max 200 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > Two cats are sleeping on a pink couch with remote controls beside them.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-huggingfacetb-smolvlm-instruct"></a>
-
-### ✅ HuggingFaceTB/SmolVLM-Instruct
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ no flagged signals
-- _Timing:_ Load 0.69s; Gen 0.59s; Total 1.29s
-- _Throughput:_ Prompt 2,874 TPS (1,196 tok); Gen 124 TPS (13 tok)
-- _Tokens:_ prompt 1196 tok; estimated text 6 tok; estimated non-text 1190
-  tok; generated 13 tok; requested max 200 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> Two cats are sleeping on a pink blanket on a couch.
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 _Quality Status:_ no quality issues detected in this run
@@ -609,8 +609,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 2.64s; Gen 0.71s; Total 3.37s
-- _Throughput:_ Prompt 632 TPS (286 tok); Gen 104 TPS (24 tok)
+- _Timing:_ Load 3.18s; Gen 0.62s; Total 3.82s
+- _Throughput:_ Prompt 710 TPS (286 tok); Gen 115 TPS (24 tok)
 - _Tokens:_ prompt 286 tok; estimated text 6 tok; estimated non-text 280 tok;
   generated 24 tok; requested max 200 tok; stop reason completed
 
@@ -632,8 +632,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 1.33s; Gen 0.78s; Total 2.12s
-- _Throughput:_ Prompt 1,313 TPS (408 tok); Gen 92.7 TPS (42 tok)
+- _Timing:_ Load 1.29s; Gen 0.76s; Total 2.06s
+- _Throughput:_ Prompt 1,354 TPS (408 tok); Gen 93.1 TPS (42 tok)
 - _Tokens:_ prompt 408 tok; estimated text 6 tok; estimated non-text 402 tok;
   generated 42 tok; requested max 200 tok; stop reason completed
 
@@ -648,16 +648,46 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-qwen3-vl-2b-instruct-bf16"></a>
+<a id="model-mlx-community-ministral-3-3b-instruct-2512-4bit"></a>
 
-### ✅ mlx-community/Qwen3-VL-2B-Instruct-bf16
+### ✅ mlx-community/Ministral-3-3B-Instruct-2512-4bit
 
 - _Recommendation:_ recommended; review verdict: clean
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 0.68s; Gen 0.88s; Total 1.57s
-- _Throughput:_ Prompt 3,693 TPS (315 tok); Gen 126 TPS (96 tok)
+- _Timing:_ Load 2.54s; Gen 0.77s; Total 3.33s
+- _Throughput:_ Prompt 3,641 TPS (949 tok); Gen 198 TPS (99 tok)
+- _Tokens:_ prompt 949 tok; estimated text 6 tok; estimated non-text 943 tok;
+  generated 99 tok; requested max 200 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> In this image, there are two cats lying on a soft, pink cushion or blanket.
+>
+> &#45; The cat on the left appears to be a kitten, with a smaller size, fluffy
+> fur, and a relaxed posture.
+> &#45; The cat on the right is an adult, with a more robust build, striped tabby
+> fur, and is stretched out comfortably, looking slightly at the kitten.
+>
+> Both are positioned near what looks like a remote control, suggesting a cozy
+> indoor setting.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
+<a id="model-qwen-qwen3-vl-2b-instruct"></a>
+
+### ✅ Qwen/Qwen3-VL-2B-Instruct
+
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ no flagged signals
+- _Timing:_ Load 0.73s; Gen 0.85s; Total 1.59s
+- _Throughput:_ Prompt 3,586 TPS (315 tok); Gen 131 TPS (96 tok)
 - _Tokens:_ prompt 315 tok; estimated text 6 tok; estimated non-text 309 tok;
   generated 96 tok; requested max 200 tok; stop reason completed
 
@@ -675,16 +705,16 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-qwen-qwen3-vl-2b-instruct"></a>
+<a id="model-mlx-community-qwen3-vl-2b-instruct-bf16"></a>
 
-### ✅ Qwen/Qwen3-VL-2B-Instruct
+### ✅ mlx-community/Qwen3-VL-2B-Instruct-bf16
 
 - _Recommendation:_ recommended; review verdict: clean
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 0.97s; Gen 0.89s; Total 1.88s
-- _Throughput:_ Prompt 2,934 TPS (315 tok); Gen 133 TPS (96 tok)
+- _Timing:_ Load 0.74s; Gen 0.87s; Total 1.62s
+- _Throughput:_ Prompt 3,634 TPS (315 tok); Gen 129 TPS (96 tok)
 - _Tokens:_ prompt 315 tok; estimated text 6 tok; estimated non-text 309 tok;
   generated 96 tok; requested max 200 tok; stop reason completed
 
@@ -710,8 +740,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 2.43s; Gen 0.95s; Total 3.39s
-- _Throughput:_ Prompt 809 TPS (319 tok); Gen 116 TPS (63 tok)
+- _Timing:_ Load 3.65s; Gen 0.98s; Total 4.65s
+- _Throughput:_ Prompt 805 TPS (319 tok); Gen 110 TPS (63 tok)
 - _Tokens:_ prompt 319 tok; estimated text 6 tok; estimated non-text 313 tok;
   generated 63 tok; requested max 200 tok; stop reason completed
 
@@ -735,8 +765,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 1.39s; Gen 1.01s; Total 2.41s
-- _Throughput:_ Prompt 1,219 TPS (319 tok); Gen 96.7 TPS (71 tok)
+- _Timing:_ Load 15.94s; Gen 1.01s; Total 16.98s
+- _Throughput:_ Prompt 1,417 TPS (319 tok); Gen 99.4 TPS (71 tok)
 - _Tokens:_ prompt 319 tok; estimated text 6 tok; estimated non-text 313 tok;
   generated 71 tok; requested max 200 tok; stop reason completed
 
@@ -753,36 +783,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-ministral-3-3b-instruct-2512-4bit"></a>
-
-### ✅ mlx-community/Ministral-3-3B-Instruct-2512-4bit
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ no flagged signals
-- _Timing:_ Load 1.00s; Gen 1.02s; Total 2.03s
-- _Throughput:_ Prompt 2,735 TPS (949 tok); Gen 157 TPS (99 tok)
-- _Tokens:_ prompt 949 tok; estimated text 6 tok; estimated non-text 943 tok;
-  generated 99 tok; requested max 200 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> In this image, there are two cats lying on a soft, pink cushion or blanket.
->
-> &#45; The cat on the left appears to be a kitten, with a smaller size, fluffy
-> fur, and a relaxed posture.
-> &#45; The cat on the right is an adult, with a more robust build, striped tabby
-> fur, and is stretched out comfortably, looking slightly at the kitten.
->
-> Both are positioned near what looks like a remote control, suggesting a cozy
-> indoor setting.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
 <a id="model-mlx-community-qwen35-35b-a3b-6bit"></a>
 
 ### ✅ mlx-community/Qwen3.5-35B-A3B-6bit
@@ -791,8 +791,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 3.08s; Gen 1.08s; Total 4.17s
-- _Throughput:_ Prompt 664 TPS (319 tok); Gen 98.1 TPS (58 tok)
+- _Timing:_ Load 3.97s; Gen 1.13s; Total 5.10s
+- _Throughput:_ Prompt 668 TPS (319 tok); Gen 93.7 TPS (58 tok)
 - _Tokens:_ prompt 319 tok; estimated text 6 tok; estimated non-text 313 tok;
   generated 58 tok; requested max 200 tok; stop reason completed
 
@@ -802,80 +802,6 @@ _Quality Status:_ no quality issues detected in this run
 > between two remote controls. The cat on the left is stretched out with its
 > tail curled, while the one on the right is curled up facing downward. Both
 > appear deeply relaxed in a cozy, domestic scene.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
-
-### ✅ mlx-community/diffusiongemma-26B-A4B-it-mxfp8
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ no flagged signals
-- _Timing:_ Load 3.25s; Gen 1.31s; Total 4.59s
-- _Throughput:_ Prompt 869 TPS (286 tok); Gen 23.8 TPS (19 tok)
-- _Tokens:_ prompt 286 tok; estimated text 6 tok; estimated non-text 280 tok;
-  generated 19 tok; requested max 200 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> Two high-angle tabby cats are sleeping on a pink blanket next to two remote
-> controls.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
-
-### ✅ mlx-community/X-Reasoner-7B-8bit
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ no flagged signals
-- _Timing:_ Load 1.12s; Gen 1.34s; Total 2.47s
-- _Throughput:_ Prompt 1,671 TPS (417 tok); Gen 63.4 TPS (65 tok)
-- _Tokens:_ prompt 417 tok; estimated text 6 tok; estimated non-text 411 tok;
-  generated 65 tok; requested max 200 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> The image shows two tabby cats lying on a pink couch. Both cats are
-> stretched out, appearing relaxed. Between them are two remote controls. The
-> couch has a vibrant pink cover, and the cats' fur has a mix of brown, black,
-> and white stripes. The scene conveys a cozy and calm atmosphere.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-glm-46v-flash-6bit"></a>
-
-### ✅ mlx-community/GLM-4.6V-Flash-6bit
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ no flagged signals
-- _Timing:_ Load 1.39s; Gen 1.48s; Total 2.89s
-- _Throughput:_ Prompt 1,126 TPS (408 tok); Gen 62.7 TPS (69 tok)
-- _Tokens:_ prompt 408 tok; estimated text 6 tok; estimated non-text 402 tok;
-  generated 69 tok; requested max 200 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> The image shows two tabby cats resting on a bright pink couch. One cat lies
-> on its side, eyes closed, with a remote control nearby. The other cat,
-> larger and more robust, rests with its head down, also near a remote. The
-> scene is cozy, with the vivid pink couch contrasting with the cats’ striped
-> fur.
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 _Quality Status:_ no quality issues detected in this run
@@ -894,8 +820,8 @@ _Quality Status:_ no quality issues detected in this run
   length (4103 tokens), output stayed unusually short (3 tokens; ratio 0.1%;
   weak text signal truncated).; output/prompt=0.07%; nontext prompt
   burden=100%
-- _Timing:_ Load 1.26s; Gen 1.50s; Total 2.77s
-- _Throughput:_ Prompt 2,857 TPS (4,103 tok); Gen 69.6 TPS (3 tok)
+- _Timing:_ Load 2.30s; Gen 1.16s; Total 3.47s
+- _Throughput:_ Prompt 3,730 TPS (4,103 tok); Gen 77.0 TPS (3 tok)
 - _Tokens:_ prompt 4103 tok; estimated text 6 tok; estimated non-text 4097
   tok; generated 3 tok; requested max 200 tok; stop reason completed
 
@@ -913,6 +839,105 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
+
+### ✅ mlx-community/diffusiongemma-26B-A4B-it-mxfp8
+
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ no flagged signals
+- _Timing:_ Load 5.02s; Gen 1.25s; Total 6.28s
+- _Throughput:_ Prompt 939 TPS (286 tok); Gen 28.5 TPS (22 tok)
+- _Tokens:_ prompt 286 tok; estimated text 6 tok; estimated non-text 280 tok;
+  generated 22 tok; requested max 200 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> This image shows two tabby cats lying down on a pink blanket on a couch next
+> to two remote controls.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
+<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
+
+### ✅ mlx-community/X-Reasoner-7B-8bit
+
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ no flagged signals
+- _Timing:_ Load 1.22s; Gen 1.29s; Total 2.51s
+- _Throughput:_ Prompt 1,773 TPS (417 tok); Gen 65.7 TPS (65 tok)
+- _Tokens:_ prompt 417 tok; estimated text 6 tok; estimated non-text 411 tok;
+  generated 65 tok; requested max 200 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> The image shows two tabby cats lying on a pink couch. Both cats are
+> stretched out, appearing relaxed. Between them are two remote controls. The
+> couch has a vibrant pink cover, and the cats' fur has a mix of brown, black,
+> and white stripes. The scene conveys a cozy and calm atmosphere.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
+<a id="model-mlx-community-ministral-3-14b-instruct-2512-nvfp4"></a>
+
+### ✅ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
+
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ no flagged signals
+- _Timing:_ Load 1.51s; Gen 1.44s; Total 2.96s
+- _Throughput:_ Prompt 1,495 TPS (950 tok); Gen 65.6 TPS (52 tok)
+- _Tokens:_ prompt 950 tok; estimated text 6 tok; estimated non-text 944 tok;
+  generated 52 tok; requested max 200 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> This image shows two tabby cats lounging on a pink blanket. Both cats appear
+> relaxed, lying on their sides with their legs stretched out. One cat faces
+> left, while the other faces right, and there seem to be remote controls near
+> them.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
+<a id="model-mlx-community-glm-46v-flash-6bit"></a>
+
+### ✅ mlx-community/GLM-4.6V-Flash-6bit
+
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ no flagged signals
+- _Timing:_ Load 1.49s; Gen 1.45s; Total 2.96s
+- _Throughput:_ Prompt 1,154 TPS (408 tok); Gen 63.7 TPS (69 tok)
+- _Tokens:_ prompt 408 tok; estimated text 6 tok; estimated non-text 402 tok;
+  generated 69 tok; requested max 200 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> The image shows two tabby cats resting on a bright pink couch. One cat lies
+> on its side, eyes closed, with a remote control nearby. The other cat,
+> larger and more robust, rests with its head down, also near a remote. The
+> scene is cozy, with the vivid pink couch contrasting with the cats’ striped
+> fur.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
 <a id="model-mlx-community-diffusiongemma-26b-a4b-it-8bit"></a>
 
 ### ✅ mlx-community/diffusiongemma-26B-A4B-it-8bit
@@ -921,15 +946,64 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 3.49s; Gen 1.66s; Total 5.17s
-- _Throughput:_ Prompt 844 TPS (286 tok); Gen 23.3 TPS (25 tok)
+- _Timing:_ Load 3.34s; Gen 1.57s; Total 4.94s
+- _Throughput:_ Prompt 925 TPS (286 tok); Gen 17.9 TPS (19 tok)
+- _Tokens:_ prompt 286 tok; estimated text 6 tok; estimated non-text 280 tok;
+  generated 19 tok; requested max 200 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> Two high-contrast tabby cats are sleeping on a pink blanket next to two
+> remote controls.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
+<a id="model-mlx-community-ministral-3-14b-instruct-2512-mxfp4"></a>
+
+### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
+
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ no flagged signals
+- _Timing:_ Load 1.53s; Gen 1.64s; Total 3.18s
+- _Throughput:_ Prompt 1,478 TPS (950 tok); Gen 69.4 TPS (68 tok)
+- _Tokens:_ prompt 950 tok; estimated text 6 tok; estimated non-text 944 tok;
+  generated 68 tok; requested max 200 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> This image shows two cats lying on their backs on a pink blanket or cushion.
+> Both cats appear relaxed and playful, with their legs stretched out and
+> paws in the air. One cat is smaller, possibly a kitten, while the other is
+> larger, likely an adult. There are two remote controls placed near them on
+> the blanket.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
+<a id="model-mlx-community-gemma-4-31b-it-4bit"></a>
+
+### ✅ mlx-community/gemma-4-31b-it-4bit
+
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ no flagged signals
+- _Timing:_ Load 3.56s; Gen 1.64s; Total 5.21s
+- _Throughput:_ Prompt 383 TPS (286 tok); Gen 28.5 TPS (25 tok)
 - _Tokens:_ prompt 286 tok; estimated text 6 tok; estimated non-text 280 tok;
   generated 25 tok; requested max 200 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
-> A high-angle shot shows two tabby cats sleeping on a pink blanket on a red
-> couch next to two remote controls.
+> Two tabby cats are sleeping on a bright pink blanket on a red couch, with
+> two remote controls lying next to them.
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 _Quality Status:_ no quality issues detected in this run
@@ -946,8 +1020,8 @@ _Quality Status:_ no quality issues detected in this run
   into user-facing text.
 - _Key signals:_ Special control token &lt;/think&gt; appeared in generated
   text.
-- _Timing:_ Load 0.68s; Gen 1.67s; Total 2.37s
-- _Throughput:_ Prompt 3,733 TPS (317 tok); Gen 127 TPS (196 tok)
+- _Timing:_ Load 0.97s; Gen 1.65s; Total 2.63s
+- _Throughput:_ Prompt 3,731 TPS (317 tok); Gen 128 TPS (196 tok)
 - _Tokens:_ prompt 317 tok; estimated text 6 tok; estimated non-text 311 tok;
   generated 196 tok; requested max 200 tok; stop reason completed
 
@@ -977,6 +1051,31 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
+
+### ✅ mlx-community/Idefics3-8B-Llama3-bf16
+
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ formatting=Unknown tags: &lt;end_of_utterance&gt;
+- _Timing:_ Load 13.73s; Gen 1.76s; Total 15.51s
+- _Throughput:_ Prompt 2,244 TPS (2,327 tok); Gen 34.1 TPS (23 tok)
+- _Tokens:_ prompt 2327 tok; estimated text 6 tok; estimated non-text 2321
+  tok; generated 23 tok; requested max 200 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> In this image we can see two cats on the sofa. There are two remotes on the
+> sofa.<end_of_utterance>
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Unknown tags: <end_of_utterance>
+
+---
+
 <a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
 
 ### ✅ mlx-community/SmolVLM2-2.2B-Instruct-mlx
@@ -985,8 +1084,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 0.56s; Gen 1.83s; Total 2.39s
-- _Throughput:_ Prompt 336 TPS (97 tok); Gen 128 TPS (187 tok)
+- _Timing:_ Load 0.58s; Gen 1.81s; Total 2.40s
+- _Throughput:_ Prompt 340 TPS (97 tok); Gen 129 TPS (187 tok)
 - _Tokens:_ prompt 97 tok; estimated text 6 tok; estimated non-text 91 tok;
   generated 187 tok; requested max 200 tok; stop reason completed
 
@@ -1023,8 +1122,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ hit token cap (200); repetitive token=phrase: "have this
   image. have..."
-- _Timing:_ Load 1.65s; Gen 2.30s; Total 3.98s
-- _Throughput:_ Prompt 1,056 TPS (266 tok); Gen 98.8 TPS (200 tok)
+- _Timing:_ Load 2.25s; Gen 1.91s; Total 4.17s
+- _Throughput:_ Prompt 1,103 TPS (266 tok); Gen 121 TPS (200 tok)
 - _Tokens:_ prompt 266 tok; estimated text 6 tok; estimated non-text 260 tok;
   generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1121,212 +1220,72 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-ministral-3-14b-instruct-2512-nvfp4"></a>
+<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
 
-### ✅ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ no flagged signals
-- _Timing:_ Load 1.48s; Gen 2.40s; Total 3.88s
-- _Throughput:_ Prompt 752 TPS (950 tok); Gen 46.5 TPS (52 tok)
-- _Tokens:_ prompt 950 tok; estimated text 6 tok; estimated non-text 944 tok;
-  generated 52 tok; requested max 200 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> This image shows two tabby cats lounging on a pink blanket. Both cats appear
-> relaxed, lying on their sides with their legs stretched out. One cat faces
-> left, while the other faces right, and there seem to be remote controls near
-> them.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
-
-### ✅ mlx-community/Idefics3-8B-Llama3-bf16
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ formatting=Unknown tags: &lt;end_of_utterance&gt;
-- _Timing:_ Load 1.90s; Gen 2.61s; Total 4.53s
-- _Throughput:_ Prompt 1,224 TPS (2,327 tok); Gen 35.0 TPS (23 tok)
-- _Tokens:_ prompt 2327 tok; estimated text 6 tok; estimated non-text 2321
-  tok; generated 23 tok; requested max 200 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> In this image we can see two cats on the sofa. There are two remotes on the
-> sofa.<end_of_utterance>
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Unknown tags: <end_of_utterance>
-
----
-
-<a id="model-mlx-community-ministral-3-14b-instruct-2512-mxfp4"></a>
-
-### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
+### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
 
 - _Recommendation:_ recommended; review verdict: clean
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 1.31s; Gen 2.85s; Total 4.17s
-- _Throughput:_ Prompt 842 TPS (950 tok); Gen 40.0 TPS (68 tok)
-- _Tokens:_ prompt 950 tok; estimated text 6 tok; estimated non-text 944 tok;
-  generated 68 tok; requested max 200 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> This image shows two cats lying on their backs on a pink blanket or cushion.
-> Both cats appear relaxed and playful, with their legs stretched out and
-> paws in the air. One cat is smaller, possibly a kitten, while the other is
-> larger, likely an adult. There are two remote controls placed near them on
-> the blanket.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-gemma-4-31b-it-4bit"></a>
-
-### ✅ mlx-community/gemma-4-31b-it-4bit
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ no flagged signals
-- _Timing:_ Load 2.81s; Gen 2.85s; Total 5.67s
-- _Throughput:_ Prompt 245 TPS (286 tok); Gen 15.1 TPS (25 tok)
-- _Tokens:_ prompt 286 tok; estimated text 6 tok; estimated non-text 280 tok;
+- _Timing:_ Load 1.55s; Gen 2.52s; Total 4.07s
+- _Throughput:_ Prompt 11.6 TPS (16 tok); Gen 22.4 TPS (25 tok)
+- _Tokens:_ prompt 16 tok; estimated text 6 tok; estimated non-text 10 tok;
   generated 25 tok; requested max 200 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
-> Two tabby cats are sleeping on a bright pink blanket on a red couch, with
-> two remote controls lying next to them.
+> The image shows two tabby cats lying on a pink blanket, with two remote
+> controls placed on the couch behind them.
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-qwen36-27b-mxfp8"></a>
+<a id="model-mlx-community-internvl3-8b-bf16"></a>
 
-### ✅ mlx-community/Qwen3.6-27B-mxfp8
+### ✅ mlx-community/InternVL3-8B-bf16
 
 - _Recommendation:_ recommended; review verdict: clean
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 3.08s; Gen 3.31s; Total 6.42s
-- _Throughput:_ Prompt 454 TPS (319 tok); Gen 18.9 TPS (49 tok)
-- _Tokens:_ prompt 319 tok; estimated text 6 tok; estimated non-text 313 tok;
-  generated 49 tok; requested max 200 tok; stop reason completed
+- _Timing:_ Load 46.81s; Gen 2.66s; Total 49.48s
+- _Throughput:_ Prompt 2,648 TPS (3,341 tok); Gen 35.0 TPS (48 tok)
+- _Tokens:_ prompt 3341 tok; estimated text 6 tok; estimated non-text 3335
+  tok; generated 48 tok; requested max 200 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
-> Two tabby cats are sleeping peacefully on a bright pink couch. One cat lies
-> on its side near a white remote control, while the other stretches out
-> nearby, also next to a remote. Both appear relaxed and comfortable in their
-> cozy spot.
+> The image shows two cats sleeping on a pink blanket. One cat is a small
+> kitten, and the other is a larger adult cat. Both are lying on their sides,
+> and there are two remote controls placed near them on the couch.
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
+<a id="model-mlx-community-internvl3-14b-8bit"></a>
 
-### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
-
-- _Recommendation:_ avoid for now; review verdict: harness
-- _Owner:_ likely owner `mlx-vlm`; harness signal `encoding`
-- _Next step:_ Inspect decode cleanup; tokenizer markers are leaking into
-  user-facing text.
-- _Key signals:_ Tokenizer space-marker artifacts (for example Ġ) appeared in
-  output (about 76 occurrences).
-- _Timing:_ Load 2.06s; Gen 3.44s; Total 5.51s
-- _Throughput:_ Prompt 592 TPS (417 tok); Gen 33.0 TPS (90 tok)
-- _Tokens:_ prompt 417 tok; estimated text 6 tok; estimated non-text 411 tok;
-  generated 90 tok; requested max 200 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> TheĠimageĠfeaturesĠtwoĠcatsĠlyingĠonĠaĠpinkĠsurface,ĠpossiblyĠaĠblanketĠorĠaĠcouch.ĠTheĠcatĠonĠtheĠleftĠisĠaĠkitten,ĠandĠtheĠoneĠonĠtheĠrightĠisĠanĠadultĠcat.ĠBothĠcatsĠareĠinĠrelaxedĠpostures,ĠwithĠtheĠkittenĠlyingĠonĠitsĠsideĠandĠtheĠadultĠcatĠlyingĠonĠitsĠback.ĠThereĠareĠtwoĠremoteĠcontrolsĠplacedĠnearĠtheĠcats,ĠoneĠcloserĠtoĠtheĠkittenĠandĠtheĠotherĠcloserĠtoĠtheĠadultĠcat.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️HARNESS:encoding
-- token_encoding:bpe_space_leak(76)
-
----
-
-<a id="model-mlx-community-qwen35-27b-mxfp8"></a>
-
-### ✅ mlx-community/Qwen3.5-27B-mxfp8
+### ✅ mlx-community/InternVL3-14B-8bit
 
 - _Recommendation:_ recommended; review verdict: clean
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 3.05s; Gen 3.59s; Total 6.66s
-- _Throughput:_ Prompt 376 TPS (319 tok); Gen 14.7 TPS (40 tok)
-- _Tokens:_ prompt 319 tok; estimated text 6 tok; estimated non-text 313 tok;
-  generated 40 tok; requested max 200 tok; stop reason completed
+- _Timing:_ Load 1.77s; Gen 2.85s; Total 4.63s
+- _Throughput:_ Prompt 1,410 TPS (3,341 tok); Gen 33.2 TPS (15 tok)
+- _Tokens:_ prompt 3341 tok; estimated text 6 tok; estimated non-text 3335
+  tok; generated 15 tok; requested max 200 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
-> Two tabby cats are sleeping on a bright pink couch. One cat is stretched out
-> on its side, while the other is curled up nearby. Two remote controls lie
-> on the couch between them.
+> Two cats are sleeping on a pink blanket with two remote controls nearby.
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 _Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-microsoft-phi-35-vision-instruct"></a>
-
-### ✅ microsoft/Phi-3.5-vision-instruct
-
-- _Recommendation:_ avoid for now; review verdict: harness
-- _Owner:_ likely owner `mlx-vlm`; harness signal `stop_token`
-- _Next step:_ Inspect EOS/stop-token stripping; control tokens are leaking
-  into user-facing text.
-- _Key signals:_ Special control token &lt;|end|&gt; appeared in generated
-  text.; Special control token &lt;|endoftext|&gt; appeared in generated
-  text.; hit token cap (200)
-- _Timing:_ Load 0.89s; Gen 3.77s; Total 4.68s
-- _Throughput:_ Prompt 3,632 TPS (770 tok); Gen 57.5 TPS (200 tok)
-- _Tokens:_ prompt 770 tok; estimated text 6 tok; estimated non-text 764 tok;
-  generated 200 tok; requested max 200 tok; stop reason max_tokens
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> Two cats are sleeping on a pink couch with remote controls beside
-> them.<|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|>
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️HARNESS:stop_token
-- Text sanity issue (gibberish(token_noise))
-- Generation loop (token_noise)
-- Likely capped by max token budget
-- tokenizer_artifact
-- token_leak:<\|end\|>
-- token_leak:<\|endoftext\|>
 
 ---
 
@@ -1338,8 +1297,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 2.37s; Gen 4.08s; Total 6.47s
-- _Throughput:_ Prompt 362 TPS (319 tok); Gen 22.4 TPS (71 tok)
+- _Timing:_ Load 3.05s; Gen 2.88s; Total 5.96s
+- _Throughput:_ Prompt 487 TPS (319 tok); Gen 32.2 TPS (71 tok)
 - _Tokens:_ prompt 319 tok; estimated text 6 tok; estimated non-text 313 tok;
   generated 71 tok; requested max 200 tok; stop reason completed
 
@@ -1356,6 +1315,84 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-qwen35-27b-mxfp8"></a>
+
+### ✅ mlx-community/Qwen3.5-27B-mxfp8
+
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ no flagged signals
+- _Timing:_ Load 3.33s; Gen 2.90s; Total 6.25s
+- _Throughput:_ Prompt 426 TPS (319 tok); Gen 18.7 TPS (40 tok)
+- _Tokens:_ prompt 319 tok; estimated text 6 tok; estimated non-text 313 tok;
+  generated 40 tok; requested max 200 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> Two tabby cats are sleeping on a bright pink couch. One cat is stretched out
+> on its side, while the other is curled up nearby. Two remote controls lie
+> on the couch between them.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
+<a id="model-mlx-community-llava-v16-mistral-7b-8bit"></a>
+
+### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
+
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ no flagged signals
+- _Timing:_ Load 0.89s; Gen 2.91s; Total 3.81s
+- _Throughput:_ Prompt 1,220 TPS (2,356 tok); Gen 60.7 TPS (55 tok)
+- _Tokens:_ prompt 2356 tok; estimated text 6 tok; estimated non-text 2350
+  tok; generated 55 tok; requested max 200 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> The image shows two cats lying on a pink blanket. The cat on the left is a
+> kitten with a black and white striped tail. The cat on the right is a tabby
+> cat with a black and brown striped tail. Both cats are sleeping.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
+<a id="model-mlx-community-gemma-3n-e4b-it-bf16"></a>
+
+### ✅ mlx-community/gemma-3n-E4B-it-bf16
+
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ no flagged signals
+- _Timing:_ Load 3.32s; Gen 2.94s; Total 6.27s
+- _Throughput:_ Prompt 819 TPS (274 tok); Gen 47.8 TPS (124 tok)
+- _Tokens:_ prompt 274 tok; estimated text 6 tok; estimated non-text 268 tok;
+  generated 124 tok; requested max 200 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> Two tabby cats are peacefully napping on a bright pink couch. The cat on the
+> left is lying on its back with its paws curled up, its tail curled around
+> its body. It has a green collar. The cat on the right is also lying on its
+> back, with its head resting on its paws and its tail stretched out.
+>
+> Between the two cats are two television remotes, one white and one blue. The
+> couch is made of a soft, plush material. The lighting in the room is soft
+> and warm, creating a cozy atmosphere. The cats appear relaxed and content,
+> enjoying a comfortable nap.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
 <a id="model-jqlive-kimi-vl-a3b-thinking-2506-6bit"></a>
 
 ### ✅ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
@@ -1364,8 +1401,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ hit token cap (200); reasoning leak
-- _Timing:_ Load 3.75s; Gen 4.17s; Total 7.94s
-- _Throughput:_ Prompt 842 TPS (399 tok); Gen 76.3 TPS (200 tok)
+- _Timing:_ Load 2.69s; Gen 2.97s; Total 5.67s
+- _Throughput:_ Prompt 1,203 TPS (399 tok); Gen 79.1 TPS (200 tok)
 - _Tokens:_ prompt 399 tok; estimated text 6 tok; estimated non-text 393 tok;
   generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1392,60 +1429,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-internvl3-8b-bf16"></a>
-
-### ✅ mlx-community/InternVL3-8B-bf16
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ no flagged signals
-- _Timing:_ Load 1.59s; Gen 4.60s; Total 6.20s
-- _Throughput:_ Prompt 1,125 TPS (3,341 tok); Gen 30.3 TPS (48 tok)
-- _Tokens:_ prompt 3341 tok; estimated text 6 tok; estimated non-text 3335
-  tok; generated 48 tok; requested max 200 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> The image shows two cats sleeping on a pink blanket. One cat is a small
-> kitten, and the other is a larger adult cat. Both are lying on their sides,
-> and there are two remote controls placed near them on the couch.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-gemma-3n-e4b-it-bf16"></a>
-
-### ✅ mlx-community/gemma-3n-E4B-it-bf16
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ no flagged signals
-- _Timing:_ Load 2.44s; Gen 4.65s; Total 7.12s
-- _Throughput:_ Prompt 740 TPS (274 tok); Gen 29.2 TPS (124 tok)
-- _Tokens:_ prompt 274 tok; estimated text 6 tok; estimated non-text 268 tok;
-  generated 124 tok; requested max 200 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> Two tabby cats are peacefully napping on a bright pink couch. The cat on the
-> left is lying on its back with its paws curled up, its tail curled around
-> its body. It has a green collar. The cat on the right is also lying on its
-> back, with its head resting on its paws and its tail stretched out.
->
-> Between the two cats are two television remotes, one white and one blue. The
-> couch is made of a soft, plush material. The lighting in the room is soft
-> and warm, creating a cozy atmosphere. The cats appear relaxed and content,
-> enjoying a comfortable nap.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
 <a id="model-mlx-community-kimi-vl-a3b-thinking-8bit"></a>
 
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-8bit
@@ -1454,8 +1437,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ hit token cap (200); reasoning leak
-- _Timing:_ Load 2.24s; Gen 4.76s; Total 7.02s
-- _Throughput:_ Prompt 1,358 TPS (399 tok); Gen 46.3 TPS (200 tok)
+- _Timing:_ Load 2.43s; Gen 3.19s; Total 5.63s
+- _Throughput:_ Prompt 1,389 TPS (399 tok); Gen 72.3 TPS (200 tok)
 - _Tokens:_ prompt 399 tok; estimated text 6 tok; estimated non-text 393 tok;
   generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1483,6 +1466,147 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-qwen36-27b-mxfp8"></a>
+
+### ✅ mlx-community/Qwen3.6-27B-mxfp8
+
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ no flagged signals
+- _Timing:_ Load 3.13s; Gen 3.25s; Total 6.40s
+- _Throughput:_ Prompt 465 TPS (319 tok); Gen 19.2 TPS (49 tok)
+- _Tokens:_ prompt 319 tok; estimated text 6 tok; estimated non-text 313 tok;
+  generated 49 tok; requested max 200 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> Two tabby cats are sleeping peacefully on a bright pink couch. One cat lies
+> on its side near a white remote control, while the other stretches out
+> nearby, also next to a remote. Both appear relaxed and comfortable in their
+> cozy spot.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
+<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
+
+### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+
+- _Recommendation:_ avoid for now; review verdict: harness
+- _Owner:_ likely owner `mlx-vlm`; harness signal `encoding`
+- _Next step:_ Inspect decode cleanup; tokenizer markers are leaking into
+  user-facing text.
+- _Key signals:_ Tokenizer space-marker artifacts (for example Ġ) appeared in
+  output (about 76 occurrences).
+- _Timing:_ Load 3.20s; Gen 3.40s; Total 6.61s
+- _Throughput:_ Prompt 637 TPS (417 tok); Gen 33.0 TPS (90 tok)
+- _Tokens:_ prompt 417 tok; estimated text 6 tok; estimated non-text 411 tok;
+  generated 90 tok; requested max 200 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> TheĠimageĠfeaturesĠtwoĠcatsĠlyingĠonĠaĠpinkĠsurface,ĠpossiblyĠaĠblanketĠorĠaĠcouch.ĠTheĠcatĠonĠtheĠleftĠisĠaĠkitten,ĠandĠtheĠoneĠonĠtheĠrightĠisĠanĠadultĠcat.ĠBothĠcatsĠareĠinĠrelaxedĠpostures,ĠwithĠtheĠkittenĠlyingĠonĠitsĠsideĠandĠtheĠadultĠcatĠlyingĠonĠitsĠback.ĠThereĠareĠtwoĠremoteĠcontrolsĠplacedĠnearĠtheĠcats,ĠoneĠcloserĠtoĠtheĠkittenĠandĠtheĠotherĠcloserĠtoĠtheĠadultĠcat.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️HARNESS:encoding
+- token_encoding:bpe_space_leak(76)
+
+---
+
+<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
+
+### ✅ mlx-community/gemma-3-27b-it-qat-4bit
+
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ no flagged signals
+- _Timing:_ Load 2.93s; Gen 3.62s; Total 6.56s
+- _Throughput:_ Prompt 387 TPS (275 tok); Gen 31.5 TPS (91 tok)
+- _Tokens:_ prompt 275 tok; estimated text 6 tok; estimated non-text 269 tok;
+  generated 91 tok; requested max 200 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> &#8203;Here's a brief description of the image:
+>
+> The image shows two tabby cats lying side-by-side on a bright pink surface,
+> likely a couch cushion or blanket. Both cats are relaxed and appear to be
+> sleeping. Each cat has a remote control resting on its body – one on its
+> chest and one nearby. The cats have striped fur patterns and are in a
+> comfortable, stretched-out position. The overall scene is cute and playful.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
+<a id="model-microsoft-phi-35-vision-instruct"></a>
+
+### ✅ microsoft/Phi-3.5-vision-instruct
+
+- _Recommendation:_ avoid for now; review verdict: harness
+- _Owner:_ likely owner `mlx-vlm`; harness signal `stop_token`
+- _Next step:_ Inspect EOS/stop-token stripping; control tokens are leaking
+  into user-facing text.
+- _Key signals:_ Special control token &lt;|end|&gt; appeared in generated
+  text.; Special control token &lt;|endoftext|&gt; appeared in generated
+  text.; hit token cap (200)
+- _Timing:_ Load 1.36s; Gen 3.71s; Total 5.09s
+- _Throughput:_ Prompt 3,007 TPS (770 tok); Gen 58.2 TPS (200 tok)
+- _Tokens:_ prompt 770 tok; estimated text 6 tok; estimated non-text 764 tok;
+  generated 200 tok; requested max 200 tok; stop reason max_tokens
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> Two cats are sleeping on a pink couch with remote controls beside
+> them.<|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|>
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️HARNESS:stop_token
+- Text sanity issue (gibberish(token_noise))
+- Generation loop (token_noise)
+- Likely capped by max token budget
+- tokenizer_artifact
+- token_leak:<\|end\|>
+- token_leak:<\|endoftext\|>
+
+---
+
+<a id="model-mlx-community-paligemma2-10b-ft-docci-448-6bit"></a>
+
+### ✅ mlx-community/paligemma2-10b-ft-docci-448-6bit
+
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ no flagged signals
+- _Timing:_ Load 1.62s; Gen 3.81s; Total 5.45s
+- _Throughput:_ Prompt 1,322 TPS (1,031 tok); Gen 34.3 TPS (101 tok)
+- _Tokens:_ prompt 1031 tok; estimated text 6 tok; estimated non-text 1025
+  tok; generated 101 tok; requested max 200 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> A top-down view of two cats laying on a pink blanket. The cat on the left is
+> a gray tabby cat with black stripes and is laying on its side with its head
+> facing the right side of the image. The cat on the right is a brown tabby
+> cat with black stripes and is laying on its side with its head facing the
+> left side of the image. There is a gray remote control on the left side of
+> the image and a gray remote control on the right side of the image.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
 <a id="model-mlx-community-apriel-15-15b-thinker-6bit-mlx"></a>
 
 ### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
@@ -1493,8 +1617,8 @@ _Quality Status:_ no quality issues detected in this run
   into user-facing text.
 - _Key signals:_ Special control token &lt;|end|&gt; appeared in generated
   text.; reasoning leak
-- _Timing:_ Load 1.56s; Gen 4.90s; Total 6.47s
-- _Throughput:_ Prompt 1,401 TPS (1,330 tok); Gen 44.2 TPS (174 tok)
+- _Timing:_ Load 1.88s; Gen 4.87s; Total 6.76s
+- _Throughput:_ Prompt 1,451 TPS (1,330 tok); Gen 44.2 TPS (174 tok)
 - _Tokens:_ prompt 1330 tok; estimated text 6 tok; estimated non-text 1324
   tok; generated 174 tok; requested max 200 tok; stop reason completed
 
@@ -1527,50 +1651,27 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
+<a id="model-mlx-community-gemma-3-27b-it-qat-8bit"></a>
 
-### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ no flagged signals
-- _Timing:_ Load 1.49s; Gen 5.25s; Total 6.74s
-- _Throughput:_ Prompt 6.22 TPS (16 tok); Gen 9.43 TPS (25 tok)
-- _Tokens:_ prompt 16 tok; estimated text 6 tok; estimated non-text 10 tok;
-  generated 25 tok; requested max 200 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> The image shows two tabby cats lying on a pink blanket, with two remote
-> controls placed on the couch behind them.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-paligemma2-10b-ft-docci-448-6bit"></a>
-
-### ✅ mlx-community/paligemma2-10b-ft-docci-448-6bit
+### ✅ mlx-community/gemma-3-27b-it-qat-8bit
 
 - _Recommendation:_ recommended; review verdict: clean
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 1.54s; Gen 5.59s; Total 7.15s
-- _Throughput:_ Prompt 956 TPS (1,031 tok); Gen 23.1 TPS (101 tok)
-- _Tokens:_ prompt 1031 tok; estimated text 6 tok; estimated non-text 1025
-  tok; generated 101 tok; requested max 200 tok; stop reason completed
+- _Timing:_ Load 3.92s; Gen 4.90s; Total 8.82s
+- _Throughput:_ Prompt 311 TPS (275 tok); Gen 17.5 TPS (70 tok)
+- _Tokens:_ prompt 275 tok; estimated text 6 tok; estimated non-text 269 tok;
+  generated 70 tok; requested max 200 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
-> A top-down view of two cats laying on a pink blanket. The cat on the left is
-> a gray tabby cat with black stripes and is laying on its side with its head
-> facing the right side of the image. The cat on the right is a brown tabby
-> cat with black stripes and is laying on its side with its head facing the
-> left side of the image. There is a gray remote control on the left side of
-> the image and a gray remote control on the right side of the image.
+> &#8203;Here's a brief description of the image:
+>
+> The image shows two tabby kittens lying on their backs on a bright pink
+> surface (likely a couch or blanket). Both kittens are relaxed and appear to
+> be sleeping. Each kitten has a remote control resting on its belly. The
+> kittens have striped fur patterns and are in a playful, endearing pose.
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 _Quality Status:_ no quality issues detected in this run
@@ -1585,8 +1686,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 1.23s; Gen 5.66s; Total 6.90s
-- _Throughput:_ Prompt 166 TPS (745 tok); Gen 48.3 TPS (55 tok)
+- _Timing:_ Load 1.32s; Gen 5.31s; Total 6.64s
+- _Throughput:_ Prompt 177 TPS (745 tok); Gen 51.4 TPS (55 tok)
 - _Tokens:_ prompt 745 tok; estimated text 6 tok; estimated non-text 739 tok;
   generated 55 tok; requested max 200 tok; stop reason completed
 
@@ -1602,158 +1703,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
-
-### ✅ mlx-community/gemma-3-27b-it-qat-4bit
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ no flagged signals
-- _Timing:_ Load 2.31s; Gen 5.83s; Total 8.15s
-- _Throughput:_ Prompt 324 TPS (275 tok); Gen 18.4 TPS (91 tok)
-- _Tokens:_ prompt 275 tok; estimated text 6 tok; estimated non-text 269 tok;
-  generated 91 tok; requested max 200 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> &#8203;Here's a brief description of the image:
->
-> The image shows two tabby cats lying side-by-side on a bright pink surface,
-> likely a couch cushion or blanket. Both cats are relaxed and appear to be
-> sleeping. Each cat has a remote control resting on its body – one on its
-> chest and one nearby. The cats have striped fur patterns and are in a
-> comfortable, stretched-out position. The overall scene is cute and playful.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-internvl3-14b-8bit"></a>
-
-### ✅ mlx-community/InternVL3-14B-8bit
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ no flagged signals
-- _Timing:_ Load 1.63s; Gen 6.31s; Total 7.95s
-- _Throughput:_ Prompt 575 TPS (3,341 tok); Gen 32.2 TPS (15 tok)
-- _Tokens:_ prompt 3341 tok; estimated text 6 tok; estimated non-text 3335
-  tok; generated 15 tok; requested max 200 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> Two cats are sleeping on a pink blanket with two remote controls nearby.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-llava-v16-mistral-7b-8bit"></a>
-
-### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ no flagged signals
-- _Timing:_ Load 0.94s; Gen 6.35s; Total 7.31s
-- _Throughput:_ Prompt 445 TPS (2,356 tok); Gen 57.7 TPS (55 tok)
-- _Tokens:_ prompt 2356 tok; estimated text 6 tok; estimated non-text 2350
-  tok; generated 55 tok; requested max 200 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> The image shows two cats lying on a pink blanket. The cat on the left is a
-> kitten with a black and white striped tail. The cat on the right is a tabby
-> cat with a black and brown striped tail. Both cats are sleeping.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-molmo-7b-d-0924-bf16"></a>
-
-### ✅ mlx-community/Molmo-7B-D-0924-bf16
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ no flagged signals
-- _Timing:_ Load 1.74s; Gen 6.53s; Total 8.28s
-- _Throughput:_ Prompt 157 TPS (745 tok); Gen 29.9 TPS (53 tok)
-- _Tokens:_ prompt 745 tok; estimated text 6 tok; estimated non-text 739 tok;
-  generated 53 tok; requested max 200 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> Two cats are sleeping on a pink blanket on a red couch. One cat is thin
-> with black stripes, while the other is thicker with brown and black stripes.
-> Both cats are curled up with their tails tucked in. Two remote controls are
-> visible on the couch.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-paligemma2-3b-ft-docci-448-bf16"></a>
-
-### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ no flagged signals
-- _Timing:_ Load 1.70s; Gen 7.17s; Total 8.89s
-- _Throughput:_ Prompt 2,520 TPS (1,031 tok); Gen 17.7 TPS (119 tok)
-- _Tokens:_ prompt 1031 tok; estimated text 6 tok; estimated non-text 1025
-  tok; generated 119 tok; requested max 200 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> A top-down view of two cats sleeping on a pink blanket. The cat on the left
-> is a gray and black tabby cat, and it is lying on its side with its head
-> facing the right and its front paws stretched out in front of it. Its tail
-> is sticking out to the left. The cat on the right is lying on its side, and
-> it is brown and black. Its head is facing the left, and its front paws are
-> stretched out in front of it. Its tail is sticking out to the left. There
-> are two white and blue remote controls between the cats.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-qwen35-35b-a3b-bf16"></a>
-
-### ✅ mlx-community/Qwen3.5-35B-A3B-bf16
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ no flagged signals
-- _Timing:_ Load 10.36s; Gen 7.36s; Total 17.74s
-- _Throughput:_ Prompt 48.8 TPS (319 tok); Gen 67.9 TPS (55 tok)
-- _Tokens:_ prompt 319 tok; estimated text 6 tok; estimated non-text 313 tok;
-  generated 55 tok; requested max 200 tok; stop reason completed
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> Two tabby cats are sprawled out asleep on a bright pink couch, nestled
-> between two remote controls — one white and one gray. The cat on the left is
-> curled with its tail tucked, while the one on the right lies stretched out,
-> both looking deeply relaxed.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
 <a id="model-mlx-community-pixtral-12b-8bit"></a>
 
 ### ✅ mlx-community/pixtral-12b-8bit
@@ -1762,8 +1711,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ hit token cap (200)
-- _Timing:_ Load 1.61s; Gen 7.42s; Total 9.04s
-- _Throughput:_ Prompt 1,285 TPS (1,239 tok); Gen 31.1 TPS (200 tok)
+- _Timing:_ Load 1.70s; Gen 5.79s; Total 7.50s
+- _Throughput:_ Prompt 1,609 TPS (1,239 tok); Gen 39.9 TPS (200 tok)
 - _Tokens:_ prompt 1239 tok; estimated text 6 tok; estimated non-text 1233
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1794,27 +1743,53 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-gemma-3-27b-it-qat-8bit"></a>
+<a id="model-mlx-community-paligemma2-3b-ft-docci-448-bf16"></a>
 
-### ✅ mlx-community/gemma-3-27b-it-qat-8bit
+### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
 
 - _Recommendation:_ recommended; review verdict: clean
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 3.41s; Gen 7.80s; Total 11.22s
-- _Throughput:_ Prompt 246 TPS (275 tok); Gen 10.5 TPS (70 tok)
-- _Tokens:_ prompt 275 tok; estimated text 6 tok; estimated non-text 269 tok;
-  generated 70 tok; requested max 200 tok; stop reason completed
+- _Timing:_ Load 4.14s; Gen 6.53s; Total 10.68s
+- _Throughput:_ Prompt 2,662 TPS (1,031 tok); Gen 19.4 TPS (119 tok)
+- _Tokens:_ prompt 1031 tok; estimated text 6 tok; estimated non-text 1025
+  tok; generated 119 tok; requested max 200 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
-> &#8203;Here's a brief description of the image:
+> A top-down view of two cats sleeping on a pink blanket. The cat on the left
+> is a gray and black tabby cat, and it is lying on its side with its head
+> facing the right and its front paws stretched out in front of it. Its tail
+> is sticking out to the left. The cat on the right is lying on its side, and
+> it is brown and black. Its head is facing the left, and its front paws are
+> stretched out in front of it. Its tail is sticking out to the left. There
+> are two white and blue remote controls between the cats.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
+<a id="model-mlx-community-molmo-7b-d-0924-bf16"></a>
+
+### ✅ mlx-community/Molmo-7B-D-0924-bf16
+
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ no flagged signals
+- _Timing:_ Load 3.02s; Gen 6.77s; Total 9.79s
+- _Throughput:_ Prompt 152 TPS (745 tok); Gen 30.0 TPS (55 tok)
+- _Tokens:_ prompt 745 tok; estimated text 6 tok; estimated non-text 739 tok;
+  generated 55 tok; requested max 200 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
-> The image shows two tabby kittens lying on their backs on a bright pink
-> surface (likely a couch or blanket). Both kittens are relaxed and appear to
-> be sleeping. Each kitten has a remote control resting on its belly. The
-> kittens have striped fur patterns and are in a playful, endearing pose.
+> Two cats are sleeping on a pink blanket on a red couch. One cat is thin
+> with black stripes, while the other is thicker with brown and black stripes.
+> Both cats are curled up with their tails tucked in. Two remote controls are
+> visible on the couch behind them.
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 _Quality Status:_ no quality issues detected in this run
@@ -1829,8 +1804,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 8.04s; Gen 8.25s; Total 16.30s
-- _Throughput:_ Prompt 66.8 TPS (408 tok); Gen 33.3 TPS (71 tok)
+- _Timing:_ Load 8.74s; Gen 7.21s; Total 15.97s
+- _Throughput:_ Prompt 70.2 TPS (408 tok); Gen 51.2 TPS (71 tok)
 - _Tokens:_ prompt 408 tok; estimated text 6 tok; estimated non-text 402 tok;
   generated 71 tok; requested max 200 tok; stop reason completed
 
@@ -1847,6 +1822,31 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-qwen35-35b-a3b-bf16"></a>
+
+### ✅ mlx-community/Qwen3.5-35B-A3B-bf16
+
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ no flagged signals
+- _Timing:_ Load 11.70s; Gen 8.10s; Total 19.82s
+- _Throughput:_ Prompt 44.0 TPS (319 tok); Gen 67.8 TPS (55 tok)
+- _Tokens:_ prompt 319 tok; estimated text 6 tok; estimated non-text 313 tok;
+  generated 55 tok; requested max 200 tok; stop reason completed
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> Two tabby cats are sprawled out asleep on a bright pink couch, nestled
+> between two remote controls — one white and one gray. The cat on the left is
+> curled with its tail tucked, while the one on the right lies stretched out,
+> both looking deeply relaxed.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
 <a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
 
 ### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
@@ -1856,8 +1856,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ hit token cap (200); degeneration=incomplete_sentence: ends
   with 'a'
-- _Timing:_ Load 9.37s; Gen 9.56s; Total 18.94s
-- _Throughput:_ Prompt 68.5 TPS (439 tok); Gen 63.8 TPS (200 tok)
+- _Timing:_ Load 9.43s; Gen 9.07s; Total 18.51s
+- _Throughput:_ Prompt 73.5 TPS (439 tok); Gen 65.0 TPS (200 tok)
 - _Tokens:_ prompt 439 tok; estimated text 6 tok; estimated non-text 433 tok;
   generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1896,8 +1896,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 7.49s; Gen 9.59s; Total 17.10s
-- _Throughput:_ Prompt 71.4 TPS (274 tok); Gen 6.29 TPS (36 tok)
+- _Timing:_ Load 8.41s; Gen 9.57s; Total 17.99s
+- _Throughput:_ Prompt 57.5 TPS (274 tok); Gen 7.53 TPS (36 tok)
 - _Tokens:_ prompt 274 tok; estimated text 6 tok; estimated non-text 268 tok;
   generated 36 tok; requested max 200 tok; stop reason completed
 
@@ -1920,8 +1920,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ hit token cap (200)
-- _Timing:_ Load 2.52s; Gen 12.26s; Total 14.80s
-- _Throughput:_ Prompt 1,380 TPS (1,239 tok); Gen 17.6 TPS (200 tok)
+- _Timing:_ Load 3.08s; Gen 10.63s; Total 13.72s
+- _Throughput:_ Prompt 1,529 TPS (1,239 tok); Gen 20.4 TPS (200 tok)
 - _Tokens:_ prompt 1239 tok; estimated text 6 tok; estimated non-text 1233
   tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
@@ -1958,8 +1958,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 3.23s; Gen 18.39s; Total 21.64s
-- _Throughput:_ Prompt 5.27 TPS (17 tok); Gen 5.09 TPS (77 tok)
+- _Timing:_ Load 2.53s; Gen 16.95s; Total 19.51s
+- _Throughput:_ Prompt 9.9 TPS (17 tok); Gen 5.07 TPS (77 tok)
 - _Tokens:_ prompt 17 tok; estimated text 6 tok; estimated non-text 11 tok;
   generated 77 tok; requested max 200 tok; stop reason completed
 
@@ -1984,8 +1984,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ no flagged signals
-- _Timing:_ Load 2.41s; Gen 38.15s; Total 40.59s
-- _Throughput:_ Prompt 784 TPS (1,031 tok); Gen 4.33 TPS (159 tok)
+- _Timing:_ Load 2.68s; Gen 31.33s; Total 34.03s
+- _Throughput:_ Prompt 900 TPS (1,031 tok); Gen 5.28 TPS (159 tok)
 - _Tokens:_ prompt 1031 tok; estimated text 6 tok; estimated non-text 1025
   tok; generated 159 tok; requested max 200 tok; stop reason completed
 
@@ -2015,8 +2015,8 @@ _Quality Status:_ no quality issues detected in this run
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model-quality limitation for this prompt and image.
 - _Key signals:_ hit token cap (200); reasoning leak
-- _Timing:_ Load 3.33s; Gen 57.64s; Total 60.99s
-- _Throughput:_ Prompt 485 TPS (399 tok); Gen 3.54 TPS (200 tok)
+- _Timing:_ Load 3.38s; Gen 44.37s; Total 47.76s
+- _Throughput:_ Prompt 407 TPS (399 tok); Gen 4.64 TPS (200 tok)
 - _Tokens:_ prompt 399 tok; estimated text 6 tok; estimated non-text 393 tok;
   generated 200 tok; requested max 200 tok; stop reason max_tokens
 
