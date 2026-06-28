@@ -12440,7 +12440,6 @@ class ModelCapabilityRunSignal:
     model: str
     success: bool
     review_bucket: str | None = None
-    review_verdict: str | None = None
     capability_score: float | None = None
     hygiene_score: float | None = None
     caption_score: float | None = None
@@ -17157,6 +17156,10 @@ def _capability_score_from_parts(
     return round(max(0.0, min(100.0, score)), 1)
 
 
+def _score_at_least(value: float | None, threshold: float) -> bool:
+    return value is not None and value >= threshold
+
+
 def _capability_signal_from_result(
     result: PerformanceResult,
     *,
@@ -17180,7 +17183,6 @@ def _capability_signal_from_result(
     )
     keyword_score = None if suppress_cataloging_scores or utility is None else utility.keyword_score
     review_bucket = review["user_bucket"] if review is not None else None
-    review_verdict = review["verdict"] if review is not None else None
     capability_score = _capability_score_from_parts(
         success=result.success,
         review_bucket=review_bucket,
@@ -17189,12 +17191,10 @@ def _capability_signal_from_result(
         cataloging_score=cataloging_score,
         metadata_alignment_score=metadata_score,
     )
-    signal = _gallery_summary_signal(result)
     return ModelCapabilityRunSignal(
         model=result.model_name,
         success=result.success,
         review_bucket=review_bucket,
-        review_verdict=review_verdict,
         capability_score=capability_score,
         hygiene_score=hygiene_score,
         caption_score=caption_score,
@@ -17204,7 +17204,7 @@ def _capability_signal_from_result(
         metadata_alignment_score=metadata_score,
         generation_tps=_generation_float_metric(result.generation, "generation_tps"),
         peak_memory_gb=_generation_float_metric(result.generation, "peak_memory"),
-        signal=signal,
+        signal=_gallery_summary_signal(result),
     )
 
 
@@ -17213,15 +17213,13 @@ def _capability_signal_from_history(
     info: HistoryModelResultRecord,
 ) -> ModelCapabilityRunSignal:
     """Build a capability observation from a run-history model row."""
-    success = info.get("success") is True
     signal = (
         info.get("review_verdict") or info.get("harness_issue_type") or info.get("error_code") or ""
     )
     return ModelCapabilityRunSignal(
         model=model,
-        success=success,
+        success=info.get("success") is True,
         review_bucket=info.get("review_user_bucket"),
-        review_verdict=info.get("review_verdict"),
         capability_score=_capability_float(info.get("capability_score")),
         hygiene_score=_capability_float(info.get("hygiene_score")),
         caption_score=_capability_float(info.get("caption_score")),
@@ -17249,16 +17247,9 @@ def _model_capability_recommendation(
     elif row.capability_score is not None and row.capability_score < CAPABILITY_AVOID_SCORE:
         recommendation = "avoid"
     else:
-        caption_ok = (
-            row.caption_score is not None and row.caption_score >= CAPABILITY_GOOD_CAPTION_SCORE
-        )
-        keyword_ok = (
-            row.keyword_score is not None and row.keyword_score >= CAPABILITY_GOOD_KEYWORD_SCORE
-        )
-        metadata_ok = (
-            row.metadata_alignment_score is not None
-            and row.metadata_alignment_score >= CAPABILITY_GOOD_METADATA_SCORE
-        )
+        caption_ok = _score_at_least(row.caption_score, CAPABILITY_GOOD_CAPTION_SCORE)
+        keyword_ok = _score_at_least(row.keyword_score, CAPABILITY_GOOD_KEYWORD_SCORE)
+        metadata_ok = _score_at_least(row.metadata_alignment_score, CAPABILITY_GOOD_METADATA_SCORE)
         if not suppress_cataloging_scores and caption_ok and (keyword_ok or metadata_ok):
             recommendation = "caption+keywords"
         elif caption_ok:
@@ -17317,7 +17308,6 @@ def _model_capability_row_from_signals(
     """Aggregate one model's capability observations into a scorecard row."""
     runs = len(signals)
     successes = sum(1 for signal in signals if signal.success)
-    latest_signal = signals[-1].signal or signals[-1].review_verdict or "no flagged signals"
     row = ModelCapabilityRow(
         model=model,
         runs=runs,
@@ -17354,7 +17344,7 @@ def _model_capability_row_from_signals(
         generation_tps=_capability_avg(signal.generation_tps for signal in signals),
         peak_memory_gb=_capability_avg(signal.peak_memory_gb for signal in signals),
         recommendation="",
-        signal=latest_signal,
+        signal=signals[-1].signal or "no flagged signals",
     )
     return replace(
         row,
@@ -17398,6 +17388,28 @@ def _build_model_capability_rows(
 def _capability_score_cell(value: float | None) -> str:
     """Format a scorecard score cell."""
     return "-" if value is None else f"{value:.0f}"
+
+
+CAPABILITY_TABLE_HEADER_TEXT: Final[str] = (
+    "Model|Use|Runs|Success|Capability|Caption|Keyword|Metadata|Gen TPS|Peak GB|Latest signal"
+)
+
+
+def _capability_table_row(row: ModelCapabilityRow) -> tuple[str, ...]:
+    """Return the Markdown table cells for one scorecard row."""
+    return (
+        f"`{MARKDOWN_ESCAPER.escape(row.model)}`",
+        MARKDOWN_ESCAPER.escape(row.recommendation),
+        str(row.runs),
+        f"{row.success_rate:.0f}%",
+        _capability_score_cell(row.capability_score),
+        _capability_score_cell(row.caption_score),
+        _capability_score_cell(row.keyword_score),
+        _capability_score_cell(row.metadata_alignment_score),
+        format_field_value("generation_tps", row.generation_tps) or "-",
+        format_field_value("peak_memory", row.peak_memory_gb) or "-",
+        MARKDOWN_ESCAPER.escape(row.signal),
+    )
 
 
 def _capability_json_row(row: ModelCapabilityRow) -> dict[str, JsonLike]:
@@ -17455,22 +17467,6 @@ def generate_model_capability_scorecard(
         else "not grounded; caption hygiene only"
     )
     prior_runs = len(history_records)
-    table_rows = [
-        (
-            f"`{MARKDOWN_ESCAPER.escape(row.model)}`",
-            MARKDOWN_ESCAPER.escape(row.recommendation),
-            str(row.runs),
-            f"{row.success_rate:.0f}%",
-            _capability_score_cell(row.capability_score),
-            _capability_score_cell(row.caption_score),
-            _capability_score_cell(row.keyword_score),
-            _capability_score_cell(row.metadata_alignment_score),
-            format_field_value("generation_tps", row.generation_tps) or "-",
-            format_field_value("peak_memory", row.peak_memory_gb) or "-",
-            MARKDOWN_ESCAPER.escape(row.signal),
-        )
-        for row in rows
-    ]
     md = [
         "# Model Capability Scorecard",
         "",
@@ -17491,20 +17487,8 @@ def generate_model_capability_scorecard(
     table_lines = render_report_markdown(
         (
             ReportTable(
-                headers=(
-                    "Model",
-                    "Use",
-                    "Runs",
-                    "Success",
-                    "Capability",
-                    "Caption",
-                    "Keyword",
-                    "Metadata",
-                    "Gen TPS",
-                    "Peak GB",
-                    "Latest signal",
-                ),
-                rows=tuple(table_rows),
+                headers=tuple(CAPABILITY_TABLE_HEADER_TEXT.split("|")),
+                rows=tuple(_capability_table_row(row) for row in rows),
                 markdown_escaped=True,
             ),
         )
