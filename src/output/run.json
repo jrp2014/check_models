@@ -3,6 +3,8 @@
     "diagnostics": "reports/diagnostics.md",
     "environment": "environment.log",
     "log": "check_models.log",
+    "model_capabilities": "reports/model_capabilities.md",
+    "model_capabilities_json": "model_capabilities.json",
     "model_gallery": "reports/model_gallery.md",
     "model_selection": "reports/model_selection.md",
     "results_html": "reports/results.html",
@@ -18,7 +20,7 @@
     "models_total": 60
   },
   "eval_mode": "triage",
-  "generated_at": "2026-06-27 23:58:03 BST",
+  "generated_at": "2026-06-28 02:18:30 BST",
   "has_descriptive_metadata": false,
   "library_versions": {
     "Pillow": "12.2.0",
@@ -37,5 +39,5 @@
   "schema_version": "1.0",
   "selection_basis": "ungrounded",
   "semantic_rankings_grounded": false,
-  "total_runtime_seconds": 445.905
+  "total_runtime_seconds": 439.201
 }

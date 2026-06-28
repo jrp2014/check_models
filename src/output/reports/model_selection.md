@@ -1,6 +1,6 @@
 # Model Selection Brief
 
-_Generated on 2026-06-27 23:58:03 BST_
+_Generated on 2026-06-28 02:18:30 BST_
 
 - Mode: triage
 - Semantic rankings: ungrounded (ungrounded)
@@ -25,9 +25,9 @@ Top 10 ranked candidates for brief captions. This is a selection aid, not the co
 | `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit` |       100 |           96 | `clean`   | The image shows two tabby cats lying on a pink blanket, with two remote controls placed on the couch behind them.                                                                   | no flagged signals |
 | `mlx-community/gemma-4-31b-bf16`                   |       100 |           96 | `clean`   | Both cats are sleeping on a pink blanket. The difference between these images is that one cat is on the left side of the blanket and the other is on the right side.                | no flagged signals |
 | `mlx-community/gemma-4-26b-a4b-it-4bit`            |       100 |           95 | `clean`   | Two tabby cats are lying on a pink blanket on a red couch, with a remote control next to each cat.                                                                                  | no flagged signals |
-| `mlx-community/diffusiongemma-26B-A4B-it-8bit`     |       100 |           95 | `clean`   | A high-angle shot shows two tabby cats sleeping on a pink blanket on a red couch, next to two remote controls.                                                                      | no flagged signals |
+| `mlx-community/diffusiongemma-26B-A4B-it-8bit`     |       100 |           95 | `clean`   | A high-angle shot shows two tabby cats sleeping on a pink blanket on a red couch next to two remote controls.                                                                       | no flagged signals |
 | `mlx-community/MiniCPM-V-4.6-8bit`                 |       100 |           93 | `clean`   | The image shows two cats lying on a pink blanket. There are remote controls on the blanket as well.                                                                                 | no flagged signals |
-| `mlx-community/Phi-3.5-vision-instruct-bf16`       |       100 |           92 | `clean`   | Two cats are sleeping on a pink couch with remote controls beside them.                                                                                                             | no flagged signals |
+| `mlx-community/diffusiongemma-26B-A4B-it-mxfp8`    |       100 |           92 | `clean`   | Two high-angle tabby cats are sleeping on a pink blanket next to two remote controls.                                                                                               | no flagged signals |
 
 ## Structured Metadata Candidates
 

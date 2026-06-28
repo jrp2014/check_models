@@ -18,11 +18,11 @@ Each row is intended to become one focused upstream GitHub issue.
 
 | Target                                         | Problem                                                                                          | Evidence Snapshot                                                                                                                                                                                                                         | Affected Models                                            | Issue Draft                                                                                                                            | Evidence Bundle                                                                                                                                                                               | Fixed When                                                |
 |------------------------------------------------|--------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
-| `mlx`                                          | Weight/config mismatch during model load                                                         | Weight Mismatch \| phase model_load \| ValueError                                                                                                                                                                                         | 1: `mlx-community/LFM2.5-VL-1.6B-bf16`                     | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_001_mlx_mlx-model-load-weight-mismatch_001.md) | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260627T225803Z_004_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_MODEL_LOAD_WEIGHT_MISMATCH_7574b1189.json) | Load/generation completes or fails with a narrower owner. |
-| `mlx-vlm`                                      | mlx-vlm: Model load / model error: property 'eos_token_id' of 'ModelConfig' object has no setter | Model Error \| phase model_load \| AttributeError                                                                                                                                                                                         | 1: `mlx-community/MolmoPoint-8B-fp16`                      | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_002_mlx-vlm_mlx-vlm-model-load-model_001.md)   | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260627T225803Z_005_mlx-community_MolmoPoint-8B-fp16_MLX_VLM_MODEL_LOAD_MODEL_7cbd53695717.json)     | Load/generation completes or fails with a narrower owner. |
-| `mlx-vlm`                                      | Tokenizer decode leaked BPE/byte markers                                                         | 76 BPE space markers found in decoded text \| prompt=417 \| output/prompt=21.58% \| nontext burden=99% \| stop=completed                                                                                                                  | 1: `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_003_mlx-vlm_encoding_001.md)                   | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260627T225803Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) | No BPE/byte markers in output.                            |
-| `mlx-vlm`                                      | Stop/control tokens leaked into generated text                                                   | decoded text contains control token &lt;\|end\|&gt; \| decoded text contains control token &lt;\|endoftext\|&gt; \| prompt=770 \| output/prompt=25.97% \| nontext burden=99% \| stop=max_tokens \| hit token cap (200) \| 3 model cluster | 3: `microsoft/Phi-3.5-vision-instruct` (+2)                | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_004_mlx-vlm_stop-token_001.md)                 | [3 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260627T225803Z_001_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json)                | No leaked stop/control tokens.                            |
-| mlx-vlm first; MLX if cache/runtime reproduces | Long-context generation collapsed or became too short                                            | generated_tokens~3 \| prompt_tokens=4103, output_tokens=3, output/prompt=0.1%, weak text=truncated \| prompt=4,103 \| output/prompt=0.07% \| nontext burden=100% \| stop=completed                                                        | 1: `mlx-community/paligemma2-3b-pt-896-4bit`               | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_005_mlx-vlm-mlx_long-context_001.md)           | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260627T225803Z_007_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json)       | Full and reduced reruns avoid context collapse.           |
+| `mlx`                                          | Weight/config mismatch during model load                                                         | Weight Mismatch \| phase model_load \| ValueError                                                                                                                                                                                         | 1: `mlx-community/LFM2.5-VL-1.6B-bf16`                     | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_001_mlx_mlx-model-load-weight-mismatch_001.md) | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260628T011830Z_004_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_MODEL_LOAD_WEIGHT_MISMATCH_7574b1189.json) | Load/generation completes or fails with a narrower owner. |
+| `mlx-vlm`                                      | mlx-vlm: Model load / model error: property 'eos_token_id' of 'ModelConfig' object has no setter | Model Error \| phase model_load \| AttributeError                                                                                                                                                                                         | 1: `mlx-community/MolmoPoint-8B-fp16`                      | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_002_mlx-vlm_mlx-vlm-model-load-model_001.md)   | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260628T011830Z_005_mlx-community_MolmoPoint-8B-fp16_MLX_VLM_MODEL_LOAD_MODEL_7cbd53695717.json)     | Load/generation completes or fails with a narrower owner. |
+| `mlx-vlm`                                      | Tokenizer decode leaked BPE/byte markers                                                         | 76 BPE space markers found in decoded text \| prompt=417 \| output/prompt=21.58% \| nontext burden=99% \| stop=completed                                                                                                                  | 1: `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_003_mlx-vlm_encoding_001.md)                   | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260628T011830Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) | No BPE/byte markers in output.                            |
+| `mlx-vlm`                                      | Stop/control tokens leaked into generated text                                                   | decoded text contains control token &lt;\|end\|&gt; \| decoded text contains control token &lt;\|endoftext\|&gt; \| prompt=770 \| output/prompt=25.97% \| nontext burden=99% \| stop=max_tokens \| hit token cap (200) \| 3 model cluster | 3: `microsoft/Phi-3.5-vision-instruct` (+2)                | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_004_mlx-vlm_stop-token_001.md)                 | [3 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260628T011830Z_001_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json)                | No leaked stop/control tokens.                            |
+| mlx-vlm first; MLX if cache/runtime reproduces | Long-context generation collapsed or became too short                                            | generated_tokens~3 \| prompt_tokens=4103, output_tokens=3, output/prompt=0.1%, weak text=truncated \| prompt=4,103 \| output/prompt=0.07% \| nontext burden=100% \| stop=completed                                                        | 1: `mlx-community/paligemma2-3b-pt-896-4bit`               | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_005_mlx-vlm-mlx_long-context_001.md)           | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260628T011830Z_007_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json)       | Full and reduced reruns avoid context collapse.           |
 <!-- markdownlint-enable MD060 -->
 
 ---
@@ -116,7 +116,7 @@ point to stack/runtime behavior rather than inherent model quality limits.
 **Sample output:**
 
 ```text
-Two cats are sleeping on a pink couch with remote controls beside them.<|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|...
+Two cats are sleeping on a pink couch with remote controls beside them.<|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|e...
 ```
 
 ### `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`
@@ -130,7 +130,7 @@ Two cats are sleeping on a pink couch with remote controls beside them.<|end|><|
 **Sample output:**
 
 ```text
-...t's it. No need for extra. We'll comply.
+...at's it. No need for extra. We'll comply.
 [BEGIN FINAL RESPONSE]
 Two tabby cats are curled up sleeping side‑by‑side on a pink couch, with a TV remote resting nearby.
 [END FINAL RESPONSE]
@@ -146,7 +146,7 @@ Two tabby cats are curled up sleeping side‑by‑side on a pink couch, with a T
 **Sample output:**
 
 ```text
-TheĠimageĠfeaturesĠtwoĠcatsĠlyingĠonĠaĠpinkĠsurface,ĠpossiblyĠaĠblanketĠorĠaĠcouch.ĠTheĠcatĠonĠtheĠleftĠisĠaĠkitten,ĠandĠtheĠoneĠonĠtheĠrightĠisĠanĠadultĠcat.ĠBothĠcatsĠareĠinĠrelaxedĠpostures,ĠwithĠt...
+TheĠimageĠfeaturesĠtwoĠcatsĠlyingĠonĠaĠpinkĠsurface,ĠpossiblyĠaĠblanketĠorĠaĠcouch.ĠTheĠcatĠonĠtheĠleftĠisĠaĠkitten,ĠandĠtheĠoneĠonĠtheĠrightĠisĠanĠadultĠcat.ĠBothĠcatsĠareĠinĠrelaxedĠpostures,Ġwit...
 ```
 
 ### `mlx-community/Qwen3-VL-2B-Thinking-bf16`
@@ -158,7 +158,10 @@ TheĠimageĠfeaturesĠtwoĠcatsĠlyingĠonĠaĠpinkĠsurface,ĠpossiblyĠaĠblan
 **Sample output:**
 
 ```text
-So, let's see. The image shows two cats lying on a pink couch. The couch is a bright pink color, and there are two remote controls next to the cats. One cat is on the left, with a striped pattern, and...
+...need to describe this briefly, so focus on the key elements: two cats, pink couch, remotes.
+</think>
+
+Two tabby cats are lying on a bright pink couch, each resting with their paws extended. A w...
 ```
 
 ### `mlx-community/paligemma2-3b-pt-896-4bit`
@@ -201,14 +204,14 @@ model appears).
 - **Detailed diagnostics models:** 7
 - **Summary diagnostics models:** 53
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 436.27s (436.27s)
-- **Average runtime per model:** 7.27s (7.27s)
-- **Dominant runtime phase:** post-prefill decode dominated 22/60 measured model runs (50% of tracked runtime).
-- **Phase totals:** model load=134.08s, local prompt prep=0.20s, upstream prefill / first-token=80.23s, post-prefill decode=221.12s, cleanup=8.74s
-- **Generation total:** 301.35s across 58 model(s); upstream prefill / first-token split available for 58/58 model(s).
+- **Total model runtime (sum):** 430.35s (430.35s)
+- **Average runtime per model:** 7.17s (7.17s)
+- **Dominant runtime phase:** post-prefill decode dominated 21/60 measured model runs (51% of tracked runtime).
+- **Phase totals:** model load=128.52s, local prompt prep=0.19s, upstream prefill / first-token=77.82s, post-prefill decode=223.19s, cleanup=8.13s
+- **Generation total:** 301.01s across 58 model(s); upstream prefill / first-token split available for 58/58 model(s).
 - **Observed stop reasons:** completed=50, exception=2, max_tokens=8
-- **Validation overhead:** 0.20s total (avg 0.00s across 60 model(s)).
-- **Upstream prefill / first-token latency:** Avg 1.38s | Min 0.02s | Max 7.89s across 58 model(s).
+- **Validation overhead:** 0.24s total (avg 0.00s across 60 model(s)).
+- **Upstream prefill / first-token latency:** Avg 1.34s | Min 0.02s | Max 6.54s across 58 model(s).
 - **What this likely means:** Most measured runtime is spent generating after the first token is available.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
@@ -245,7 +248,7 @@ Repro bundles with prompt traces and environment details are available in [repro
 - Input image: `/Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg`
 - Generation settings: max_tokens=200, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-06-27 23:58:03 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-06-28 02:18:30 BST by [check_models](https://github.com/jrp2014/check_models)._
 
 <!-- markdownlint-disable MD060 -->
 
