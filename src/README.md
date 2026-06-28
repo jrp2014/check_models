@@ -938,6 +938,8 @@ See module docstrings and `__all__` exports for complete API reference.
 | `--output-gallery-markdown` | Path | `output/reports/model_gallery.md` | Evidence-only Markdown gallery report filename. |
 | `--output-review` | Path | `output/reports/review.md` | Markdown review digest grouped by owner and user bucket. |
 | `--output-model-selection` | Path | `output/reports/model_selection.md` | Markdown model-selection report filename. |
+| `--output-model-capabilities` | Path | `output/reports/model_capabilities.md` | Markdown model capability scorecard filename. |
+| `--output-model-capabilities-json` | Path | `output/model_capabilities.json` | Machine-readable model capability scorecard filename. |
 | `--output-tsv` | Path | `output/reports/results.tsv` | TSV (tab-separated values) report output filename. |
 | `--output-jsonl` | Path | `output/results.jsonl` | JSONL report output filename. |
 | `--output-run-json` | Path | `output/run.json` | Run-level JSON metadata filename. |
@@ -1219,6 +1221,7 @@ check_models/
 │       │   ├── results.html
 │       │   ├── results.md
 │       │   ├── model_selection.md
+│       │   ├── model_capabilities.md
 │       │   ├── model_gallery.md
 │       │   ├── review.md
 │       │   ├── results.tsv
@@ -1226,6 +1229,7 @@ check_models/
 │       ├── issues/           # Generated GitHub issue templates
 │       ├── repro_bundles/    # JSON reproduction bundles
 │       ├── results.jsonl
+│       ├── model_capabilities.json
 │       ├── run.json
 │       ├── results.history.jsonl
 │       ├── check_models.log
@@ -1242,15 +1246,19 @@ Validation tests must not rewrite tracked `src/output/` assets; override report
 and log paths to a temp directory or gitignored `test_*` paths so verification
 does not require restoring benchmark snapshots.
 Override with `--output-html`, `--output-markdown`, `--output-gallery-markdown`,
-`--output-review`, `--output-model-selection`, `--output-tsv`, `--output-jsonl`,
+`--output-review`, `--output-model-selection`, `--output-model-capabilities`,
+`--output-model-capabilities-json`, `--output-tsv`, `--output-jsonl`,
 `--output-run-json`, `--output-log`, `--output-env`, and `--output-diagnostics`.
 Human-readable reports (HTML, Markdown, TSV, diagnostics) default to `output/reports/`;
-machine-readable files (JSONL, run JSON, history) and logs remain in `output/`.
+machine-readable files (JSONL, capability JSON, run JSON, history) and logs remain in `output/`.
 
 - **Run index** (`reports/results.md`): public snapshot entry point. In triage mode it
   suppresses cataloging and keyword scores and points to model-selection and diagnostics artifacts.
 - **Model Selection** (`reports/model_selection.md`): ranked shortlist for brief-caption
   and structured metadata decisions. It is not the complete result set.
+- **Model Capability Scorecard** (`reports/model_capabilities.md`): concise matrix
+  aggregating current-run and capability-enriched history signals for captions,
+  keywording, metadata agreement, reliability, speed, and memory.
 - **Gallery Markdown** (`reports/model_gallery.md`): complete evidence-only generated
   outputs and diagnostics for every attempted model.
 - **Run JSON** (`run.json`): stable run-level machine contract with resolved mode, grounding

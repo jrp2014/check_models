@@ -150,6 +150,7 @@ __all__ = [
     "generate_diagnostics_report",
     "generate_html_report",
     "generate_markdown_report",
+    "generate_model_capability_scorecard",
     "generate_model_selection_report",
     "get_device_info",
     "get_exif_data",
@@ -1055,6 +1056,14 @@ class HistoryModelResultRecord(TypedDict):
     hit_max_tokens: NotRequired[bool]
     metadata_alignment_score: NotRequired[float | None]
     metadata_alignment_issue: NotRequired[str | None]
+    capability_score: NotRequired[float | None]
+    hygiene_score: NotRequired[float | None]
+    caption_score: NotRequired[float | None]
+    cataloging_score: NotRequired[float | None]
+    description_score: NotRequired[float | None]
+    keyword_score: NotRequired[float | None]
+    generation_tps: NotRequired[float | None]
+    peak_memory_gb: NotRequired[float | None]
     text_sanity_issue_type: NotRequired[str | None]
     generation_loop_type: NotRequired[str | None]
 
@@ -1411,6 +1420,8 @@ class ReportOutputPaths:
     gallery_markdown: Path
     review: Path
     model_selection: Path
+    model_capabilities: Path
+    model_capabilities_json: Path
     tsv: Path
     jsonl: Path
     run_json: Path
@@ -1432,6 +1443,7 @@ class ReportGenerationInputs:
     system_info: dict[str, str]
     report_context: ReportRenderContext
     output_paths: ReportOutputPaths
+    history_records: Sequence[HistoryRunRecord] = ()
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None
 
 
@@ -1789,6 +1801,12 @@ DEFAULT_REVIEW_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "re
 DEFAULT_MODEL_SELECTION_OUTPUT: Final[Path] = (
     _SCRIPT_DIR / "output" / "reports" / "model_selection.md"
 )
+DEFAULT_MODEL_CAPABILITIES_OUTPUT: Final[Path] = (
+    _SCRIPT_DIR / "output" / "reports" / "model_capabilities.md"
+)
+DEFAULT_MODEL_CAPABILITIES_JSON_OUTPUT: Final[Path] = (
+    _SCRIPT_DIR / "output" / "model_capabilities.json"
+)
 DEFAULT_TSV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "results.tsv"
 DEFAULT_LOG_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "check_models.log"
 DEFAULT_JSONL_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.jsonl"
@@ -1805,6 +1823,7 @@ _PUBLISHED_REPORT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
         DEFAULT_MD_OUTPUT.name,
         DEFAULT_GALLERY_MD_OUTPUT.name,
         DEFAULT_MODEL_SELECTION_OUTPUT.name,
+        DEFAULT_MODEL_CAPABILITIES_OUTPUT.name,
         DEFAULT_REVIEW_MD_OUTPUT.name,
         DEFAULT_TSV_OUTPUT.name,
         DEFAULT_DIAGNOSTICS_OUTPUT.name,
@@ -1814,6 +1833,7 @@ _PUBLISHED_ROOT_OUTPUT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
     {
         DEFAULT_LOG_OUTPUT.name,
         DEFAULT_JSONL_OUTPUT.name,
+        DEFAULT_MODEL_CAPABILITIES_JSON_OUTPUT.name,
         DEFAULT_ENV_OUTPUT.name,
         "results.history.jsonl",
     }
@@ -12414,6 +12434,56 @@ class ModelSelectionRow:
 
 
 @dataclass(frozen=True)
+class ModelCapabilityRunSignal:
+    """One current or historical model capability observation."""
+
+    model: str
+    success: bool
+    review_bucket: str | None = None
+    review_verdict: str | None = None
+    capability_score: float | None = None
+    hygiene_score: float | None = None
+    caption_score: float | None = None
+    cataloging_score: float | None = None
+    description_score: float | None = None
+    keyword_score: float | None = None
+    metadata_alignment_score: float | None = None
+    generation_tps: float | None = None
+    peak_memory_gb: float | None = None
+    signal: str = ""
+
+
+@dataclass(frozen=True)
+class ModelCapabilityRow:
+    """Aggregated per-model capability row rendered in scorecard artifacts."""
+
+    model: str
+    runs: int
+    successes: int
+    failures: int
+    success_rate: float
+    recommended_rate: float
+    capability_score: float | None
+    hygiene_score: float | None
+    caption_score: float | None
+    cataloging_score: float | None
+    description_score: float | None
+    keyword_score: float | None
+    metadata_alignment_score: float | None
+    generation_tps: float | None
+    peak_memory_gb: float | None
+    recommendation: str
+    signal: str
+
+
+CAPABILITY_UNSTABLE_SUCCESS_RATE: Final[float] = 50.0
+CAPABILITY_AVOID_SCORE: Final[float] = 45.0
+CAPABILITY_GOOD_CAPTION_SCORE: Final[float] = 70.0
+CAPABILITY_GOOD_KEYWORD_SCORE: Final[float] = 65.0
+CAPABILITY_GOOD_METADATA_SCORE: Final[float] = 70.0
+
+
+@dataclass(frozen=True)
 class ReportModePolicy:
     """Mode-aware report rules for score visibility and selection grounding."""
 
@@ -17034,6 +17104,433 @@ def generate_model_selection_report(
         md.extend(_build_grounded_metadata_selection_section(rows))
 
     _write_markdown_artifact(filename, md, artifact_name="Model-selection report")
+
+
+def _capability_float(value: object) -> float | None:
+    """Return finite numeric score values from history/current records."""
+    if isinstance(value, int | float) and not isinstance(value, bool) and math.isfinite(value):
+        return float(value)
+    return None
+
+
+def _capability_avg(values: Iterable[float | None]) -> float | None:
+    """Average available capability values, ignoring missing history fields."""
+    present = [value for value in values if value is not None]
+    if not present:
+        return None
+    return round(sum(present) / len(present), 1)
+
+
+def _capability_score_from_parts(
+    *,
+    success: bool,
+    review_bucket: str | None,
+    hygiene_score: float | None,
+    caption_score: float | None,
+    cataloging_score: float | None,
+    metadata_alignment_score: float | None,
+) -> float | None:
+    """Return a compact capability roll-up from already-computed signals."""
+    if not success:
+        return 0.0
+
+    content_score = (
+        metadata_alignment_score if metadata_alignment_score is not None else cataloging_score
+    )
+    components = [
+        (hygiene_score, 0.35),
+        (caption_score, 0.30),
+        (content_score, 0.25),
+    ]
+    weighted_sum = sum(value * weight for value, weight in components if value is not None)
+    weight_total = sum(weight for value, weight in components if value is not None)
+    if weight_total <= 0:
+        return None
+
+    bucket_adjustments = {
+        "recommended": 5.0,
+        "caveat": -10.0,
+        "needs_triage": -20.0,
+        "avoid": -45.0,
+    }
+    score = weighted_sum / weight_total + bucket_adjustments.get(review_bucket or "", 0.0)
+    return round(max(0.0, min(100.0, score)), 1)
+
+
+def _capability_signal_from_result(
+    result: PerformanceResult,
+    *,
+    utility_by_model: Mapping[str, UtilityTriageRow],
+    suppress_cataloging_scores: bool,
+) -> ModelCapabilityRunSignal:
+    """Build a current-run capability observation from a performance result."""
+    review = _build_jsonl_review_record(result)
+    text = str(getattr(result.generation, "text", "") or "") if result.generation else ""
+    utility = utility_by_model.get(result.model_name)
+    metadata_score = (
+        result.metadata_agreement.overall_score
+        if result.metadata_agreement is not None
+        else _capability_float(getattr(result.quality_analysis, "metadata_alignment_score", None))
+    )
+    hygiene_score = _model_selection_score(result) if review is not None else None
+    caption_score = _caption_usefulness_score(text) if result.success and text else None
+    cataloging_score = None if suppress_cataloging_scores or utility is None else utility.score
+    description_score = (
+        None if suppress_cataloging_scores or utility is None else utility.description_score
+    )
+    keyword_score = None if suppress_cataloging_scores or utility is None else utility.keyword_score
+    review_bucket = review["user_bucket"] if review is not None else None
+    review_verdict = review["verdict"] if review is not None else None
+    capability_score = _capability_score_from_parts(
+        success=result.success,
+        review_bucket=review_bucket,
+        hygiene_score=hygiene_score,
+        caption_score=caption_score,
+        cataloging_score=cataloging_score,
+        metadata_alignment_score=metadata_score,
+    )
+    signal = _gallery_summary_signal(result)
+    return ModelCapabilityRunSignal(
+        model=result.model_name,
+        success=result.success,
+        review_bucket=review_bucket,
+        review_verdict=review_verdict,
+        capability_score=capability_score,
+        hygiene_score=hygiene_score,
+        caption_score=caption_score,
+        cataloging_score=cataloging_score,
+        description_score=description_score,
+        keyword_score=keyword_score,
+        metadata_alignment_score=metadata_score,
+        generation_tps=_generation_float_metric(result.generation, "generation_tps"),
+        peak_memory_gb=_generation_float_metric(result.generation, "peak_memory"),
+        signal=signal,
+    )
+
+
+def _capability_signal_from_history(
+    model: str,
+    info: HistoryModelResultRecord,
+) -> ModelCapabilityRunSignal:
+    """Build a capability observation from a run-history model row."""
+    success = info.get("success") is True
+    signal = (
+        info.get("review_verdict") or info.get("harness_issue_type") or info.get("error_code") or ""
+    )
+    return ModelCapabilityRunSignal(
+        model=model,
+        success=success,
+        review_bucket=info.get("review_user_bucket"),
+        review_verdict=info.get("review_verdict"),
+        capability_score=_capability_float(info.get("capability_score")),
+        hygiene_score=_capability_float(info.get("hygiene_score")),
+        caption_score=_capability_float(info.get("caption_score")),
+        cataloging_score=_capability_float(info.get("cataloging_score")),
+        description_score=_capability_float(info.get("description_score")),
+        keyword_score=_capability_float(info.get("keyword_score")),
+        metadata_alignment_score=_capability_float(info.get("metadata_alignment_score")),
+        generation_tps=_capability_float(info.get("generation_tps")),
+        peak_memory_gb=_capability_float(info.get("peak_memory_gb")),
+        signal=signal,
+    )
+
+
+def _model_capability_recommendation(
+    row: ModelCapabilityRow,
+    *,
+    suppress_cataloging_scores: bool,
+) -> str:
+    """Return a compact use-case recommendation for one aggregated model row."""
+    recommendation = "needs-review"
+    if row.runs <= 0 or row.successes <= 0:
+        recommendation = "integration-blocked"
+    elif row.success_rate < CAPABILITY_UNSTABLE_SUCCESS_RATE:
+        recommendation = "unstable"
+    elif row.capability_score is not None and row.capability_score < CAPABILITY_AVOID_SCORE:
+        recommendation = "avoid"
+    else:
+        caption_ok = (
+            row.caption_score is not None and row.caption_score >= CAPABILITY_GOOD_CAPTION_SCORE
+        )
+        keyword_ok = (
+            row.keyword_score is not None and row.keyword_score >= CAPABILITY_GOOD_KEYWORD_SCORE
+        )
+        metadata_ok = (
+            row.metadata_alignment_score is not None
+            and row.metadata_alignment_score >= CAPABILITY_GOOD_METADATA_SCORE
+        )
+        if not suppress_cataloging_scores and caption_ok and (keyword_ok or metadata_ok):
+            recommendation = "caption+keywords"
+        elif caption_ok:
+            recommendation = "caption"
+        elif not suppress_cataloging_scores and keyword_ok:
+            recommendation = "keywords"
+    return recommendation
+
+
+def _collect_model_capability_signals(
+    report_context: ReportRenderContext,
+    history_records: Sequence[HistoryRunRecord],
+) -> dict[str, list[ModelCapabilityRunSignal]]:
+    """Collect current and historical capability observations by model."""
+    utility_by_model = {row.result.model_name: row for row in report_context.triage.utility_rows}
+    signals_by_model: dict[str, list[ModelCapabilityRunSignal]] = {}
+    for record in history_records:
+        for model, info in _history_model_results(record).items():
+            signals_by_model.setdefault(model, []).append(
+                _capability_signal_from_history(model, info)
+            )
+    for result in report_context.result_set.results:
+        signal = _capability_signal_from_result(
+            result,
+            utility_by_model=utility_by_model,
+            suppress_cataloging_scores=report_context.mode_policy.suppress_cataloging_scores,
+        )
+        signals_by_model.setdefault(result.model_name, []).append(signal)
+    return signals_by_model
+
+
+def _capability_score_value(
+    signal: ModelCapabilityRunSignal,
+    *,
+    suppress_cataloging_scores: bool,
+) -> float | None:
+    """Return the aggregate-safe capability value for one signal."""
+    if not suppress_cataloging_scores:
+        return signal.capability_score
+    return _capability_score_from_parts(
+        success=signal.success,
+        review_bucket=signal.review_bucket,
+        hygiene_score=signal.hygiene_score,
+        caption_score=signal.caption_score,
+        cataloging_score=None,
+        metadata_alignment_score=None,
+    )
+
+
+def _model_capability_row_from_signals(
+    model: str,
+    signals: Sequence[ModelCapabilityRunSignal],
+    *,
+    suppress_cataloging_scores: bool,
+) -> ModelCapabilityRow:
+    """Aggregate one model's capability observations into a scorecard row."""
+    runs = len(signals)
+    successes = sum(1 for signal in signals if signal.success)
+    latest_signal = signals[-1].signal or signals[-1].review_verdict or "no flagged signals"
+    row = ModelCapabilityRow(
+        model=model,
+        runs=runs,
+        successes=successes,
+        failures=runs - successes,
+        success_rate=round(successes / runs * 100.0, 1) if runs else 0.0,
+        recommended_rate=round(
+            sum(1 for signal in signals if signal.review_bucket == "recommended") / runs * 100.0,
+            1,
+        )
+        if runs
+        else 0.0,
+        capability_score=_capability_avg(
+            _capability_score_value(
+                signal,
+                suppress_cataloging_scores=suppress_cataloging_scores,
+            )
+            for signal in signals
+        ),
+        hygiene_score=_capability_avg(signal.hygiene_score for signal in signals),
+        caption_score=_capability_avg(signal.caption_score for signal in signals),
+        cataloging_score=None
+        if suppress_cataloging_scores
+        else _capability_avg(signal.cataloging_score for signal in signals),
+        description_score=None
+        if suppress_cataloging_scores
+        else _capability_avg(signal.description_score for signal in signals),
+        keyword_score=None
+        if suppress_cataloging_scores
+        else _capability_avg(signal.keyword_score for signal in signals),
+        metadata_alignment_score=_capability_avg(
+            signal.metadata_alignment_score for signal in signals
+        ),
+        generation_tps=_capability_avg(signal.generation_tps for signal in signals),
+        peak_memory_gb=_capability_avg(signal.peak_memory_gb for signal in signals),
+        recommendation="",
+        signal=latest_signal,
+    )
+    return replace(
+        row,
+        recommendation=_model_capability_recommendation(
+            row,
+            suppress_cataloging_scores=suppress_cataloging_scores,
+        ),
+    )
+
+
+def _build_model_capability_rows(
+    *,
+    report_context: ReportRenderContext,
+    history_records: Sequence[HistoryRunRecord],
+) -> list[ModelCapabilityRow]:
+    """Aggregate current and historical capability observations by model."""
+    suppress_cataloging_scores = report_context.mode_policy.suppress_cataloging_scores
+    rows = [
+        _model_capability_row_from_signals(
+            model,
+            signals,
+            suppress_cataloging_scores=suppress_cataloging_scores,
+        )
+        for model, signals in _collect_model_capability_signals(
+            report_context,
+            history_records,
+        ).items()
+    ]
+    rows.sort(
+        key=lambda row: (
+            row.capability_score if row.capability_score is not None else -1.0,
+            row.success_rate,
+            row.caption_score if row.caption_score is not None else -1.0,
+            row.model,
+        ),
+        reverse=True,
+    )
+    return rows
+
+
+def _capability_score_cell(value: float | None) -> str:
+    """Format a scorecard score cell."""
+    return "-" if value is None else f"{value:.0f}"
+
+
+def _capability_json_row(row: ModelCapabilityRow) -> dict[str, JsonLike]:
+    """Return the stable JSON shape for one scorecard model row."""
+    return {
+        "model": row.model,
+        "runs": row.runs,
+        "successes": row.successes,
+        "failures": row.failures,
+        "success_rate": row.success_rate,
+        "recommended_rate": row.recommended_rate,
+        "capability_score": row.capability_score,
+        "hygiene_score_avg": row.hygiene_score,
+        "caption_score_avg": row.caption_score,
+        "cataloging_score_avg": row.cataloging_score,
+        "description_score_avg": row.description_score,
+        "keyword_score_avg": row.keyword_score,
+        "metadata_alignment_avg": row.metadata_alignment_score,
+        "generation_tps_avg": row.generation_tps,
+        "peak_memory_gb_avg": row.peak_memory_gb,
+        "recommendation": row.recommendation,
+        "latest_signal": row.signal,
+    }
+
+
+def generate_model_capability_scorecard(
+    results: list[PerformanceResult],
+    markdown_filename: Path,
+    json_filename: Path,
+    *,
+    prompt: str,
+    metadata: MetadataDict | None = None,
+    report_context: ReportRenderContext | None = None,
+    history_records: Sequence[HistoryRunRecord] = (),
+) -> None:
+    """Write concise Markdown and JSON capability scorecards for model selection."""
+    if not results:
+        log_warning_note("No results to generate model capability scorecard.")
+        return
+    if report_context is None:
+        report_context = _build_report_render_context(
+            results=results,
+            prompt=prompt,
+            metadata=metadata,
+        )
+
+    rows = _build_model_capability_rows(
+        report_context=report_context,
+        history_records=history_records,
+    )
+    policy = report_context.mode_policy
+    grounding = (
+        "trusted image metadata"
+        if policy.semantic_rankings_grounded
+        else "not grounded; caption hygiene only"
+    )
+    prior_runs = len(history_records)
+    table_rows = [
+        (
+            f"`{MARKDOWN_ESCAPER.escape(row.model)}`",
+            MARKDOWN_ESCAPER.escape(row.recommendation),
+            str(row.runs),
+            f"{row.success_rate:.0f}%",
+            _capability_score_cell(row.capability_score),
+            _capability_score_cell(row.caption_score),
+            _capability_score_cell(row.keyword_score),
+            _capability_score_cell(row.metadata_alignment_score),
+            format_field_value("generation_tps", row.generation_tps) or "-",
+            format_field_value("peak_memory", row.peak_memory_gb) or "-",
+            MARKDOWN_ESCAPER.escape(row.signal),
+        )
+        for row in rows
+    ]
+    md = [
+        "# Model Capability Scorecard",
+        "",
+        f"_Generated on {local_now_str()}_",
+        "",
+        f"- Mode: {MARKDOWN_ESCAPER.escape(policy.eval_mode)}",
+        f"- Grounding: {grounding}",
+        f"- Coverage: current run plus {prior_runs} prior history run(s).",
+        "",
+    ]
+    if policy.suppress_cataloging_scores:
+        md.extend(
+            [
+                "Structured metadata and keyword capability: not evaluated in triage mode.",
+                "",
+            ]
+        )
+    table_lines = render_report_markdown(
+        (
+            ReportTable(
+                headers=(
+                    "Model",
+                    "Use",
+                    "Runs",
+                    "Success",
+                    "Capability",
+                    "Caption",
+                    "Keyword",
+                    "Metadata",
+                    "Gen TPS",
+                    "Peak GB",
+                    "Latest signal",
+                ),
+                rows=tuple(table_rows),
+                markdown_escaped=True,
+            ),
+        )
+    )
+    md.extend(_guard_markdownlint_block(table_lines, rules=MARKDOWNLINT_GALLERY_SUMMARY_RULES))
+    md.append("")
+    md.extend(
+        _wrap_markdown_text(
+            "Scores aggregate available current/history signals. Older history rows that predate "
+            "capability fields still count toward reliability, but not caption, keyword, or "
+            "metadata averages."
+        )
+    )
+    _write_markdown_artifact(markdown_filename, md, artifact_name="Model capability scorecard")
+
+    payload: dict[str, JsonLike] = {
+        "schema_version": "1.0",
+        "generated_at": local_now_str(),
+        "eval_mode": policy.eval_mode,
+        "grounding": grounding,
+        "has_descriptive_metadata": policy.has_descriptive_metadata,
+        "current_models": len(report_context.result_set.results),
+        "history_runs_considered": prior_runs,
+        "models": [_capability_json_row(row) for row in rows],
+    }
+    _write_text_file(json_filename, json.dumps(payload, indent=2, sort_keys=True) + "\n")
 
 
 def generate_review_report(
@@ -23350,7 +23847,59 @@ def _build_prompt_preview(prompt: str, *, max_chars: int = 200) -> str:
     return prompt if len(prompt) <= max_chars else f"{prompt[:max_chars]}..."
 
 
-def _history_model_result_from_result(result: PerformanceResult) -> HistoryModelResultRecord:
+def _populate_history_capability_scores(
+    record: HistoryModelResultRecord,
+    result: PerformanceResult,
+    *,
+    prompt: str | None,
+) -> None:
+    """Attach forward-looking capability fields to a history row."""
+    if result.generation is None:
+        return
+
+    text = str(getattr(result.generation, "text", "") or "")
+    hygiene_score = _model_selection_score(result)
+    caption_score = _caption_usefulness_score(text) if text else None
+    record["hygiene_score"] = hygiene_score
+    if caption_score is not None:
+        record["caption_score"] = caption_score
+
+    context = _extract_trusted_hint_bundle(prompt).trusted_text or None if prompt else None
+    utility = compute_cataloging_utility(text, context)
+    cataloging_score = float(utility["utility_score"])
+    record["cataloging_score"] = cataloging_score
+    record["description_score"] = float(utility.get("description_score", 0.0))
+    record["keyword_score"] = float(utility.get("keyword_score", 0.0))
+
+    metadata_score = (
+        result.metadata_agreement.overall_score
+        if result.metadata_agreement is not None
+        else _capability_float(record.get("metadata_alignment_score"))
+    )
+    capability_score = _capability_score_from_parts(
+        success=result.success,
+        review_bucket=record.get("review_user_bucket"),
+        hygiene_score=hygiene_score,
+        caption_score=caption_score,
+        cataloging_score=cataloging_score,
+        metadata_alignment_score=metadata_score,
+    )
+    if capability_score is not None:
+        record["capability_score"] = capability_score
+
+    generation_tps = _generation_float_metric(result.generation, "generation_tps")
+    peak_memory_gb = _generation_float_metric(result.generation, "peak_memory")
+    if generation_tps is not None:
+        record["generation_tps"] = generation_tps
+    if peak_memory_gb is not None:
+        record["peak_memory_gb"] = peak_memory_gb
+
+
+def _history_model_result_from_result(
+    result: PerformanceResult,
+    *,
+    prompt: str | None = None,
+) -> HistoryModelResultRecord:
     """Build a typed per-model history row from runtime result."""
     record: HistoryModelResultRecord = {
         "success": result.success,
@@ -23386,6 +23935,7 @@ def _history_model_result_from_result(result: PerformanceResult) -> HistoryModel
             record["text_sanity_issue_type"] = analysis.text_sanity_issue_type
         if analysis.generation_loop_type is not None:
             record["generation_loop_type"] = analysis.generation_loop_type
+    _populate_history_capability_scores(record, result, prompt=prompt)
     stop_reason = result.runtime_diagnostics.stop_reason if result.runtime_diagnostics else None
     if stop_reason is not None:
         record["stop_reason"] = stop_reason
@@ -23404,7 +23954,8 @@ def _build_history_run_record(
     """Build typed run-history record payload prior to append."""
     prompt_hash = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
     model_results = {
-        result.model_name: _history_model_result_from_result(result) for result in results
+        result.model_name: _history_model_result_from_result(result, prompt=prompt)
+        for result in results
     }
     record: HistoryRunRecord = {
         "_type": "run",
@@ -25331,6 +25882,8 @@ def _resolve_report_output_paths(args: argparse.Namespace) -> ReportOutputPaths:
         gallery_markdown=args.output_gallery_markdown.resolve(),
         review=args.output_review.resolve(),
         model_selection=args.output_model_selection.resolve(),
+        model_capabilities=args.output_model_capabilities.resolve(),
+        model_capabilities_json=args.output_model_capabilities_json.resolve(),
         tsv=args.output_tsv.resolve(),
         jsonl=args.output_jsonl.resolve(),
         run_json=args.output_run_json.resolve(),
@@ -25359,6 +25912,8 @@ def _public_output_artifact_map(output_paths: ReportOutputPaths) -> dict[str, st
         "results_html": _public_artifact_path(output_paths.html),
         "results_markdown": _public_artifact_path(output_paths.markdown),
         "model_selection": _public_artifact_path(output_paths.model_selection),
+        "model_capabilities": _public_artifact_path(output_paths.model_capabilities),
+        "model_capabilities_json": _public_artifact_path(output_paths.model_capabilities_json),
         "model_gallery": _public_artifact_path(output_paths.gallery_markdown),
         "review": _public_artifact_path(output_paths.review),
         "diagnostics": _public_artifact_path(output_paths.diagnostics),
@@ -25445,6 +26000,20 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
                 report_context=inputs.report_context,
                 gallery_filename=output_paths.gallery_markdown,
                 diagnostics_filename=output_paths.diagnostics,
+            ),
+        ),
+        ReportArtifact(
+            key="model_capabilities",
+            label="   Capabilities:    ",
+            path=output_paths.model_capabilities,
+            job=lambda: generate_model_capability_scorecard(
+                inputs.results,
+                output_paths.model_capabilities,
+                output_paths.model_capabilities_json,
+                prompt=inputs.prompt,
+                metadata=inputs.metadata,
+                report_context=inputs.report_context,
+                history_records=inputs.history_records,
             ),
         ),
         ReportArtifact(
@@ -25596,6 +26165,7 @@ def _clean_stale_toplevel_reports(output_dir: Path, reports_dir: Path) -> int:
         "diagnostics.md",
         "model_gallery.md",
         "model_selection.md",
+        "model_capabilities.md",
         "review.md",
     )
     removed = 0
@@ -25784,6 +26354,16 @@ def _print_reports_dashboard(
     add_row("HTML Report", "Interactive dashboard with charts & filters", output_paths.html)
     add_row("Markdown Report", "Mode-aware public run index", output_paths.markdown)
     add_row("Model Selection", "Ranked caption/metadata shortlist", output_paths.model_selection)
+    add_row(
+        "Capability Scorecard",
+        "Aggregated model capability matrix",
+        output_paths.model_capabilities,
+    )
+    add_row(
+        "Capability JSON",
+        "Machine-readable capability summary",
+        output_paths.model_capabilities_json,
+    )
     add_row("Gallery Report", "Complete per-model evidence", output_paths.gallery_markdown)
     add_row("Review Report", "Insights summary & checklist", output_paths.review)
     add_row("TSV Metrics", "Tab-separated raw metrics for import", output_paths.tsv)
@@ -25857,6 +26437,7 @@ def finalize_execution(
         output_paths = _resolve_report_output_paths(args)
         history_path = _history_path_for_jsonl(output_paths.jsonl)
         previous_history = _load_latest_history_record(history_path)
+        history_records_before_current = _load_history_run_records(history_path)
 
         for output_path in (
             output_paths.html,
@@ -25864,6 +26445,8 @@ def finalize_execution(
             output_paths.gallery_markdown,
             output_paths.review,
             output_paths.model_selection,
+            output_paths.model_capabilities,
+            output_paths.model_capabilities_json,
             output_paths.tsv,
             output_paths.jsonl,
             output_paths.run_json,
@@ -25881,6 +26464,7 @@ def finalize_execution(
                 system_info=system_info,
                 report_context=report_context,
                 output_paths=output_paths,
+                history_records=tuple(history_records_before_current),
                 runtime_fingerprint=runtime_fingerprint,
             ),
         )
@@ -26205,6 +26789,18 @@ def _add_output_path_arguments(parser: _ArgumentAdder) -> None:
         type=Path,
         default=DEFAULT_MODEL_SELECTION_OUTPUT,
         help="Output model selection report filename.",
+    )
+    parser.add_argument(
+        "--output-model-capabilities",
+        type=Path,
+        default=DEFAULT_MODEL_CAPABILITIES_OUTPUT,
+        help="Output model capability scorecard Markdown filename.",
+    )
+    parser.add_argument(
+        "--output-model-capabilities-json",
+        type=Path,
+        default=DEFAULT_MODEL_CAPABILITIES_JSON_OUTPUT,
+        help="Output model capability scorecard JSON filename.",
     )
     parser.add_argument(
         "--output-tsv",

@@ -351,32 +351,49 @@ class TestCliArgumentNormalization:
 
         assert args.eval_mode == "auto"
 
-    def test_output_model_selection_and_run_json_defaults(self) -> None:
-        """Parser defaults should include model-selection and run JSON artifacts."""
+    def test_output_model_selection_capabilities_and_run_json_defaults(self) -> None:
+        """Parser defaults should include selection, capability, and run JSON artifacts."""
         parser = check_models._build_cli_parser()
         args = parser.parse_args([])
 
         assert args.output_model_selection == (
             check_models._SCRIPT_DIR / "output" / "reports" / "model_selection.md"
         )
+        assert args.output_model_capabilities == (
+            check_models._SCRIPT_DIR / "output" / "reports" / "model_capabilities.md"
+        )
+        assert args.output_model_capabilities_json == (
+            check_models._SCRIPT_DIR / "output" / "model_capabilities.json"
+        )
         assert args.output_run_json == check_models._SCRIPT_DIR / "output" / "run.json"
 
-    def test_output_model_selection_and_run_json_can_be_overridden(self, tmp_path: Path) -> None:
-        """Parser should accept explicit model-selection and run JSON destinations."""
+    def test_output_model_selection_capabilities_and_run_json_can_be_overridden(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Parser should accept explicit capability artifact destinations."""
         parser = check_models._build_cli_parser()
         model_selection = tmp_path / "selection.md"
+        model_capabilities = tmp_path / "capabilities.md"
+        model_capabilities_json = tmp_path / "capabilities.json"
         run_json = tmp_path / "run.json"
 
         args = parser.parse_args(
             [
                 "--output-model-selection",
                 str(model_selection),
+                "--output-model-capabilities",
+                str(model_capabilities),
+                "--output-model-capabilities-json",
+                str(model_capabilities_json),
                 "--output-run-json",
                 str(run_json),
             ],
         )
 
         assert args.output_model_selection == model_selection
+        assert args.output_model_capabilities == model_capabilities
+        assert args.output_model_capabilities_json == model_capabilities_json
         assert args.output_run_json == run_json
 
     def test_auto_eval_mode_uses_stress_defaults_when_descriptive_metadata_exists(self) -> None:

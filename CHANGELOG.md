@@ -49,6 +49,9 @@ Notable changes to this project will be documented in this file.
 - Add an all-model output-and-cost summary to the Markdown gallery report so
   benchmark snapshots show every model's response or diagnostic beside total
   runtime, generation throughput, token count, and peak-memory signals.
+- Add a concise model capability scorecard plus JSON summary, aggregating
+  caption, keyword, metadata, reliability, speed, and memory signals across the
+  current run and capability-enriched history rows.
 - Keep model-generated text unprefixed in gallery summary tables while carrying
   quality and diagnostic cues in separate signal columns.
 - Clarify generated reports and user docs so `model_selection.md` is described

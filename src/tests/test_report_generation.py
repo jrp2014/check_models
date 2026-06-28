@@ -153,6 +153,19 @@ def _make_success(name: str = "org/model-ok") -> PerformanceResult:
     )
 
 
+def _make_metadata_agreement_result(name: str = "org/model-grounded") -> PerformanceResult:
+    return replace(
+        _make_success(name),
+        metadata_agreement=check_models.MetadataAgreementMetrics(
+            overall_score=88.0,
+            title_score=80.0,
+            description_score=92.0,
+            keyword_score=85.0,
+            matched_terms=("brick storefront", "outdoor seating"),
+        ),
+    )
+
+
 def _make_harness_success(
     name: str = "org/model-harness",
     *,
@@ -207,6 +220,136 @@ def _make_harness_success(
         quality_issues=f"⚠️harness({harness_type})",
         quality_analysis=qa,
     )
+
+
+class TestModelCapabilityScorecard:
+    """Tests for the concise model capability scorecard artifact."""
+
+    def test_scorecard_aggregates_current_and_history_with_metadata_grounding(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Grounded runs should report caption, keyword, reliability, and metadata signals."""
+        result = _make_metadata_agreement_result()
+        history_record: check_models.HistoryRunRecord = {
+            "_type": "run",
+            "format_version": "1.0",
+            "timestamp": "2026-06-20 10:00:00 +0000",
+            "prompt_hash": "prior",
+            "prompt_preview": "catalogue this image",
+            "image_path": "prior.jpg",
+            "model_results": {
+                result.model_name: {
+                    "success": True,
+                    "error_stage": None,
+                    "error_type": None,
+                    "error_package": None,
+                    "review_user_bucket": "recommended",
+                    "review_verdict": "clean",
+                    "capability_score": 82.0,
+                    "caption_score": 78.0,
+                    "cataloging_score": 80.0,
+                    "description_score": 84.0,
+                    "keyword_score": 76.0,
+                    "metadata_alignment_score": 70.0,
+                    "generation_tps": 55.0,
+                    "peak_memory_gb": 5.0,
+                },
+            },
+            "system": {},
+            "library_versions": {},
+        }
+        report_context = _build_report_render_context(
+            results=[result],
+            prompt="Title: Brick storefront\nDescription: outdoor seating\nKeywords: storefront",
+            metadata={"title": "Brick storefront", "description": "Outdoor seating"},
+            eval_mode="stress",
+        )
+        markdown_path = tmp_path / "model_capabilities.md"
+        json_path = tmp_path / "model_capabilities.json"
+
+        check_models.generate_model_capability_scorecard(
+            [result],
+            markdown_path,
+            json_path,
+            prompt=report_context.prompt_context or "",
+            metadata={"title": "Brick storefront", "description": "Outdoor seating"},
+            report_context=report_context,
+            history_records=(history_record,),
+        )
+
+        markdown = markdown_path.read_text(encoding="utf-8")
+        payload = json.loads(json_path.read_text(encoding="utf-8"))
+        model_payload = payload["models"][0]
+
+        assert "# Model Capability Scorecard" in markdown
+        assert "Grounding: trusted image metadata" in markdown
+        assert "`org/model-grounded`" in markdown
+        assert "caption+keywords" in markdown
+        assert model_payload["model"] == "org/model-grounded"
+        assert model_payload["runs"] == 2
+        assert model_payload["success_rate"] == 100.0
+        assert model_payload["metadata_alignment_avg"] > 70.0
+        assert model_payload["recommendation"] == "caption+keywords"
+
+    def test_scorecard_marks_triage_keyword_capability_not_evaluated(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Triage-mode scorecards should avoid keyword/cataloging claims."""
+        result = _make_success()
+        report_context = _build_report_render_context(
+            results=[result],
+            prompt="Describe this image briefly.",
+            metadata=None,
+            eval_mode="triage",
+        )
+        history_record: check_models.HistoryRunRecord = {
+            "_type": "run",
+            "format_version": "1.0",
+            "timestamp": "2026-06-20 10:00:00 +0000",
+            "prompt_hash": "prior",
+            "prompt_preview": "Describe this image briefly.",
+            "image_path": "prior.jpg",
+            "model_results": {
+                result.model_name: {
+                    "success": True,
+                    "error_stage": None,
+                    "error_type": None,
+                    "error_package": None,
+                    "review_user_bucket": "recommended",
+                    "capability_score": 90.0,
+                    "caption_score": 80.0,
+                    "cataloging_score": 95.0,
+                    "description_score": 95.0,
+                    "keyword_score": 95.0,
+                },
+            },
+            "system": {},
+            "library_versions": {},
+        }
+        markdown_path = tmp_path / "model_capabilities.md"
+        json_path = tmp_path / "model_capabilities.json"
+
+        check_models.generate_model_capability_scorecard(
+            [result],
+            markdown_path,
+            json_path,
+            prompt="Describe this image briefly.",
+            metadata=None,
+            report_context=report_context,
+            history_records=(history_record,),
+        )
+
+        markdown = markdown_path.read_text(encoding="utf-8")
+        payload = json.loads(json_path.read_text(encoding="utf-8"))
+        model_payload = payload["models"][0]
+
+        assert (
+            "Structured metadata and keyword capability: not evaluated in triage mode." in markdown
+        )
+        assert model_payload["keyword_score_avg"] is None
+        assert model_payload["cataloging_score_avg"] is None
 
 
 def _make_quality_success(
