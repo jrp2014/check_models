@@ -6,8 +6,9 @@ import argparse
 import io
 import logging
 import time
+from contextlib import ExitStack
 from typing import TYPE_CHECKING
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from rich.console import Console
 
@@ -77,6 +78,84 @@ def _build_perf() -> PerformanceResult:
         model_load_time=0.5,
         total_time=1.5,
     )
+
+
+_FINALIZE_REPORT_PATCHES = (
+    "check_models.print_cli_section",
+    "check_models.print_version_info",
+    "check_models.generate_html_report",
+    "check_models.generate_markdown_report",
+    "check_models.generate_markdown_gallery_report",
+    "check_models.generate_review_report",
+    "check_models.generate_model_selection_report",
+    "check_models.generate_model_capability_scorecard",
+    "check_models.generate_tsv_report",
+    "check_models.save_jsonl_report",
+    "check_models.save_run_json_report",
+    "check_models._log_history_comparison",
+)
+
+_EXPECTED_REPORT_ARTIFACT_LOG_LABELS = (
+    "HTML Report:",
+    "Markdown Report:",
+    "Gallery Report:",
+    "Review Report:",
+    "Model Selection:",
+    "Capabilities:",
+    "TSV Report:",
+    "JSONL Report:",
+    "Run JSON:",
+)
+
+
+def _finalize_history_stub() -> dict[str, object]:
+    return {
+        "_type": "run",
+        "timestamp": "2026-02-13 00:00:00",
+        "model_results": {},
+    }
+
+
+def _run_finalize_with_report_patches(
+    *,
+    args: argparse.Namespace,
+    result: PerformanceResult,
+    overall_start_time: float,
+) -> MagicMock:
+    """Run finalization with report writers patched out for path/log assertions."""
+    with ExitStack() as stack:
+        for patch_target in _FINALIZE_REPORT_PATCHES:
+            stack.enter_context(patch(patch_target))
+        stack.enter_context(patch("check_models.get_system_characteristics", return_value={}))
+        stack.enter_context(
+            patch("check_models.append_history_record", return_value=_finalize_history_stub())
+        )
+        stack.enter_context(patch("check_models.generate_diagnostics_report", return_value=False))
+        mock_print_model_stats = stack.enter_context(patch("check_models.print_model_stats"))
+        finalize_execution(
+            args=args,
+            results=[result],
+            library_versions={"mlx": "0.0.0", "mlx-vlm": "0.0.0"},
+            overall_start_time=overall_start_time,
+            prompt="test prompt",
+            image_path=None,
+            metadata=None,
+        )
+    return mock_print_model_stats
+
+
+def _assert_logged_paths(messages: list[str], *paths: Path) -> None:
+    for path in paths:
+        assert any(str(path.resolve()) in message for message in messages)
+
+
+def _message_index(messages: list[str], label: str) -> int:
+    return next(index for index, message in enumerate(messages) if label in message)
+
+
+def _assert_report_artifact_log_order(messages: list[str]) -> None:
+    positions = [_message_index(messages, label) for label in _EXPECTED_REPORT_ARTIFACT_LOG_LABELS]
+    assert positions == sorted(positions)
 
 
 def test_console_handler_keeps_repeated_timestamps_visible() -> None:
@@ -834,59 +913,24 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
         model_load_time=0.5,
         total_time=1.5,
     )
-    history_record: dict[str, object] = {
-        "_type": "run",
-        "timestamp": "2026-02-13 00:00:00",
-        "model_results": {},
-    }
 
-    with (
-        patch("check_models.print_cli_section"),
-        patch("check_models.print_version_info"),
-        patch("check_models.get_system_characteristics", return_value={}),
-        patch("check_models.generate_html_report"),
-        patch("check_models.generate_markdown_report"),
-        patch("check_models.generate_markdown_gallery_report"),
-        patch("check_models.generate_review_report"),
-        patch("check_models.generate_model_selection_report"),
-        patch("check_models.generate_model_capability_scorecard"),
-        patch("check_models.generate_tsv_report"),
-        patch("check_models.save_jsonl_report"),
-        patch("check_models.save_run_json_report"),
-        patch("check_models.append_history_record", return_value=history_record),
-        patch("check_models.generate_diagnostics_report", return_value=False),
-        patch("check_models._log_history_comparison"),
-        patch("check_models.print_model_stats") as mock_print_model_stats,
-    ):
-        finalize_execution(
-            args=args,
-            results=[result],
-            library_versions={"mlx": "0.0.0", "mlx-vlm": "0.0.0"},
-            overall_start_time=time.perf_counter() - 0.5,
-            prompt="test prompt",
-            image_path=None,
-            metadata=None,
-        )
+    mock_print_model_stats = _run_finalize_with_report_patches(
+        args=args,
+        result=result,
+        overall_start_time=time.perf_counter() - 0.5,
+    )
 
     mock_print_model_stats.assert_not_called()
     messages = [record.message for record in caplog.records]
-    assert any(str(custom_log.resolve()) in msg for msg in messages)
-    assert any(str(custom_env.resolve()) in msg for msg in messages)
-    assert any(str(args.output_gallery_markdown.resolve()) in msg for msg in messages)
-    assert any(str(args.output_review.resolve()) in msg for msg in messages)
-    assert any(str(args.output_model_capabilities.resolve()) in msg for msg in messages)
-    artifact_positions = [
-        next(i for i, msg in enumerate(messages) if "HTML Report:" in msg),
-        next(i for i, msg in enumerate(messages) if "Markdown Report:" in msg),
-        next(i for i, msg in enumerate(messages) if "Gallery Report:" in msg),
-        next(i for i, msg in enumerate(messages) if "Review Report:" in msg),
-        next(i for i, msg in enumerate(messages) if "Model Selection:" in msg),
-        next(i for i, msg in enumerate(messages) if "Capabilities:" in msg),
-        next(i for i, msg in enumerate(messages) if "TSV Report:" in msg),
-        next(i for i, msg in enumerate(messages) if "JSONL Report:" in msg),
-        next(i for i, msg in enumerate(messages) if "Run JSON:" in msg),
-    ]
-    assert artifact_positions == sorted(artifact_positions)
+    _assert_logged_paths(
+        messages,
+        custom_log,
+        custom_env,
+        args.output_gallery_markdown,
+        args.output_review,
+        args.output_model_capabilities,
+    )
+    _assert_report_artifact_log_order(messages)
 
 
 def test_report_generation_uses_single_artifact_plan(tmp_path: Path) -> None:
