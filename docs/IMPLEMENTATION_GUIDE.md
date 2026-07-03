@@ -975,7 +975,7 @@ The `test_dependency_sync` test and CI will fail otherwise.
 **Optional groups**:
 
 - `extras`: `psutil`, `tokenizers`, `einops`, `num2words`, `sentencepiece`
-  (`tokenizers` / `sentencepiece` specs track the `transformers>=5.7.0`
+  (`tokenizers` / `sentencepiece` specs track the `transformers>=5.7.0,<5.13.0`
   compatibility window)
 - `torch`: `torch`, `torchvision`, `torchaudio`, `timm` (`torch` and `timm`
   floors track Transformers optional-extra metadata)

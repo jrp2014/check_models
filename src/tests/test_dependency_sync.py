@@ -250,10 +250,7 @@ def test_dependency_policy_module_tracks_pyproject_stack_floors() -> None:
     assert f"mlx>={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['mlx']}" in runtime_deps
     assert f"mlx-lm>={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['mlx-lm']}" in runtime_deps
     assert f"mlx-vlm>={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['mlx-vlm']}" in runtime_deps
-    assert (
-        f"transformers>={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['transformers']}"
-        in runtime_deps
-    )
+    assert f"transformers{dependency_policy.PROJECT_TRANSFORMERS_VERSION_SPEC}" in runtime_deps
     assert (
         f"huggingface-hub[torch,typing]>={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['huggingface-hub']}"
         in runtime_deps

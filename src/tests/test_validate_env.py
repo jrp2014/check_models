@@ -6,6 +6,8 @@ import logging
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from packaging.specifiers import SpecifierSet
+
 from check_models_data import dependency_policy
 from tools import qwen3_vl_sequential_repro, validate_env
 
@@ -100,9 +102,8 @@ def test_load_pyproject_deps_tracks_shared_runtime_policy() -> None:
     assert (
         core_deps["mlx-vlm"] == f">={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['mlx-vlm']}"
     )
-    assert (
-        core_deps["transformers"]
-        == f">={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['transformers']}"
+    assert SpecifierSet(core_deps["transformers"]) == SpecifierSet(
+        dependency_policy.PROJECT_TRANSFORMERS_VERSION_SPEC
     )
     assert core_deps["mlx-lm"] == f">={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['mlx-lm']}"
     assert core_deps["huggingface-hub"] == (

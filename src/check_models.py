@@ -80,6 +80,7 @@ import yaml
 from huggingface_hub import HFCacheInfo, scan_cache_dir
 from huggingface_hub import __version__ as hf_version
 from huggingface_hub.errors import HFValidationError
+from packaging.specifiers import InvalidSpecifier, SpecifierSet
 from packaging.version import InvalidVersion, Version
 from rich import box
 from rich.bar import Bar
@@ -92,8 +93,10 @@ from rich.tree import Tree
 from tabulate import tabulate
 
 from check_models_data.dependency_policy import (
+    PROJECT_MAX_TRANSFORMERS_VERSION_EXCLUSIVE,
     PROJECT_MIN_TRANSFORMERS_VERSION,
     PROJECT_RUNTIME_STACK_MINIMUMS,
+    PROJECT_TRANSFORMERS_VERSION_SPEC,
     UPSTREAM_MLX_LM_MINIMUMS,
     UPSTREAM_MLX_VLM_MINIMUMS,
 )
@@ -7608,6 +7611,21 @@ def _is_version_at_least(installed: str, minimum: str) -> bool:
         return is_at_least
 
 
+def _is_version_in_specifier(installed: str, specifier_text: str) -> bool:
+    """Return whether ``installed`` satisfies a PEP 440 specifier string."""
+    try:
+        return Version(installed) in SpecifierSet(specifier_text)
+    except (InvalidSpecifier, InvalidVersion):
+        if specifier_text == PROJECT_TRANSFORMERS_VERSION_SPEC:
+            return _is_version_at_least(
+                installed,
+                PROJECT_MIN_TRANSFORMERS_VERSION,
+            ) and _version_components(installed) < _version_components(
+                PROJECT_MAX_TRANSFORMERS_VERSION_EXCLUSIVE,
+            )
+        return True
+
+
 def _collect_upstream_requirements(
     versions: LibraryVersionDict,
 ) -> dict[str, tuple[str, set[str]]]:
@@ -7663,6 +7681,19 @@ def _detect_upstream_version_issues(versions: LibraryVersionDict) -> list[str]:
             issues.append(
                 f"{package}=={installed} is below minimum {minimum} required by {source_label}.",
             )
+
+    transformers_version = versions.get("transformers")
+    if (
+        transformers_version is not None
+        and _is_version_at_least(transformers_version, PROJECT_MIN_TRANSFORMERS_VERSION)
+        and not _is_version_in_specifier(transformers_version, PROJECT_TRANSFORMERS_VERSION_SPEC)
+    ):
+        issues.append(
+            f"transformers=={transformers_version} is outside supported range "
+            f"{PROJECT_TRANSFORMERS_VERSION_SPEC} required by check_models. "
+            "Current mlx-lm/mlx-vlm releases still use string AutoTokenizer/"
+            "AutoProcessor registration calls that Transformers 5.13.0 rejects.",
+        )
 
     return issues
 
@@ -21211,6 +21242,11 @@ def _raise_for_missing_runtime_dependencies() -> None:
         MISSING_DEPENDENCIES["transformers"] = (
             f"Core dependency too old: transformers=={transformers_version}. "
             f"Need transformers>={PROJECT_MIN_TRANSFORMERS_VERSION}."
+        )
+    elif not _is_version_in_specifier(transformers_version, PROJECT_TRANSFORMERS_VERSION_SPEC):
+        MISSING_DEPENDENCIES["transformers"] = (
+            f"Core dependency outside supported range: transformers=={transformers_version}. "
+            f"Need transformers{PROJECT_TRANSFORMERS_VERSION_SPEC}."
         )
 
     if not MISSING_DEPENDENCIES:

@@ -13,6 +13,18 @@ PROJECT_RUNTIME_STACK_MINIMUMS: Final[dict[str, str]] = {
 }
 
 PROJECT_MIN_TRANSFORMERS_VERSION: Final[str] = PROJECT_RUNTIME_STACK_MINIMUMS["transformers"]
+PROJECT_MAX_TRANSFORMERS_VERSION_EXCLUSIVE: Final[str] = "5.13.0"
+PROJECT_TRANSFORMERS_VERSION_SPEC: Final[str] = (
+    f">={PROJECT_MIN_TRANSFORMERS_VERSION},<{PROJECT_MAX_TRANSFORMERS_VERSION_EXCLUSIVE}"
+)
+
+PROJECT_RUNTIME_STACK_SPECS: Final[dict[str, str]] = {
+    "mlx": f">={PROJECT_RUNTIME_STACK_MINIMUMS['mlx']}",
+    "mlx-lm": f">={PROJECT_RUNTIME_STACK_MINIMUMS['mlx-lm']}",
+    "mlx-vlm": f">={PROJECT_RUNTIME_STACK_MINIMUMS['mlx-vlm']}",
+    "transformers": PROJECT_TRANSFORMERS_VERSION_SPEC,
+    "huggingface-hub": f">={PROJECT_RUNTIME_STACK_MINIMUMS['huggingface-hub']}",
+}
 
 UPSTREAM_MLX_VLM_MINIMUMS: Final[dict[str, str]] = {
     "mlx": "0.31.2",
@@ -42,11 +54,7 @@ PROJECT_TORCH_EXTRA_COMPAT_SPECS: Final[dict[str, str]] = {
 }
 
 VALIDATE_ENV_CORE_FALLBACK_SPECS: Final[dict[str, str]] = {
-    "mlx": f">={PROJECT_RUNTIME_STACK_MINIMUMS['mlx']}",
-    "mlx-lm": f">={PROJECT_RUNTIME_STACK_MINIMUMS['mlx-lm']}",
-    "mlx-vlm": f">={PROJECT_RUNTIME_STACK_MINIMUMS['mlx-vlm']}",
-    "transformers": f">={PROJECT_RUNTIME_STACK_MINIMUMS['transformers']}",
-    "huggingface-hub": f">={PROJECT_RUNTIME_STACK_MINIMUMS['huggingface-hub']}",
+    **PROJECT_RUNTIME_STACK_SPECS,
     "defusedxml": ">=0.7.1",
     "packaging": ">=26.0",
     "Pillow": ">=10.3.0",
