@@ -297,7 +297,7 @@ ignore_missing_imports = false
 # Exclude archived tools
 exclude = ["^src/tools/\\.archived/"]
 # Include local type stubs if generated (update.sh can generate stubs for local MLX builds)
-mypy_path = "typings"
+mypy_path = "../typings"
 
 # Core strictness - catch common errors in our own code
 warn_unused_ignores = true
@@ -332,10 +332,12 @@ ignore_missing_imports = true
 follow_imports = "skip"
 
 # Auto-generated stubs for MLX packages: use "normal" to type-check call sites
-# against stub signatures.  Missing stubs remain non-fatal.
+# against stub signatures.  Missing stubs remain non-fatal, and generated-stub
+# internals are not treated as this project's strictness debt.
 [[tool.mypy.overrides]]
 module = ["mlx_lm", "mlx_lm.*", "mlx_vlm", "mlx_vlm.*"]
 ignore_missing_imports = true
+ignore_errors = true
 follow_imports = "normal"
 
 # Auto-generated stubs for transformers/tokenizers.  Use "silent" to read type
@@ -343,6 +345,7 @@ follow_imports = "normal"
 [[tool.mypy.overrides]]
 module = ["tokenizers", "tokenizers.*", "transformers", "transformers.*"]
 ignore_missing_imports = true
+ignore_errors = true
 follow_imports = "silent"
 
 [tool.ty]

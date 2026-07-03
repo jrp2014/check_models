@@ -27,6 +27,8 @@ help: ## Show this help message
 	@echo "  make skylos-danger-llm  Write the advisory Skylos danger scan in LLM-friendly format"
 	@echo "  make skylos-verify    Run the Skylos verifier on a file/range (pass ARGS='--file ... --range ...')"
 	@echo "  make vulture          Run the configured dead-code scan"
+	@echo "  make check-outdated   Check for outdated managed dependencies"
+	@echo "  make audit            Run dependency vulnerability audit"
 	@echo "  make ty               Run Ty type checking with the resolved mlx-vlm interpreter"
 	@echo "  make ci               Run full CI pipeline (strict)"
 	@echo "  make format           Format code with ruff"
@@ -78,6 +80,14 @@ skylos-verify: ## Run the Skylos verifier on a file/range (pass ARGS='--file ...
 vulture: ## Run the configured dead-code scan
 	@$(MAKE) -C $(SRC) vulture
 
+.PHONY: check-outdated
+check-outdated: ## Check for outdated managed dependencies
+	@$(MAKE) -C $(SRC) check-outdated
+
+.PHONY: audit
+audit: ## Run dependency vulnerability audit
+	@$(MAKE) -C $(SRC) audit
+
 .PHONY: ci
 ci: ## Run full CI pipeline (strict mode)
 	@$(MAKE) -C $(SRC) ci
@@ -113,6 +123,14 @@ clean: ## Remove generated files and caches
 .PHONY: clean-all
 clean-all: clean ## Deep clean including build artifacts and stubs
 	@$(MAKE) -C $(SRC) clean-all
+
+.PHONY: clean-mlx
+clean-mlx: ## Clean build artifacts from local MLX development repos
+	@$(MAKE) -C $(SRC) clean-mlx
+
+.PHONY: clean-mlx-dry-run
+clean-mlx-dry-run: ## Show what clean-mlx would remove
+	@$(MAKE) -C $(SRC) clean-mlx-dry-run
 
 .PHONY: check_models
 check_models: ## Run VLM checker (pass args: make check_models ARGS='--model X --image Y')

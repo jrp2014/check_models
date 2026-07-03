@@ -1,7 +1,8 @@
 """Generate local .pyi stubs for packages lacking type information.
 
 This writes stubs into the repository-local ``typings/`` directory and relies on
-``mypy_path = ["typings"]`` in ``pyproject.toml`` to make mypy discover them.
+``mypy_path = ["../typings"]`` in ``pyproject.toml`` to make mypy discover them
+when the quality gate runs from ``src/``.
 Safe to run repeatedly; existing stubs for the target packages are overwritten.
 
 Usage examples

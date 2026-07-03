@@ -489,6 +489,8 @@ Several behaviors can be customized via environment variables (useful for CI/aut
 | `NO_COLOR` | Disable ANSI colors in output | Not set (colors enabled) | `NO_COLOR=1` |
 | `FORCE_COLOR` | Force ANSI colors even in non-TTY | Not set | `FORCE_COLOR=1` |
 | `TOKENIZERS_PARALLELISM` | Disable tokenizer parallelism warnings | `false` | `TOKENIZERS_PARALLELISM=true` |
+| `UPDATE_SYSTEM_PACKAGES` | Optional `tools/update.sh` conda base/env and Homebrew updates | `0` (skip system updates) | `UPDATE_SYSTEM_PACKAGES=1` |
+| `UPDATE_NODE_TOOLING` | Optional `tools/update.sh` npm latest upgrade for markdownlint tooling | `0` (install from lockfile) | `UPDATE_NODE_TOOLING=1` |
 | `MLX_METAL_JIT` | Optional `tools/update.sh` override (`MLX_METAL_JIT`) | Unset (uses MLX default `OFF`, pre-built kernels) | `MLX_METAL_JIT=ON` for runtime JIT |
 | `MLX_LOCAL_BUILD_SMOKE` | Optional `tools/update.sh` local-MLX smoke control | `auto` (cached model only) | `MLX_LOCAL_BUILD_SMOKE=1` to force |
 | `MLX_LOCAL_BUILD_SMOKE_MODEL` | Model used by the local-MLX smoke test | `mlx-community/MiniCPM-V-4.6-8bit` | Any cached HF model |

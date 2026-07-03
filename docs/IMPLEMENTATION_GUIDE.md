@@ -123,8 +123,13 @@ A single medium-sized, well-commented function is often clearer than a web of on
 
 - Third-party stubs are generated locally into `typings/` using `src/tools/generate_stubs.py`
 - `typings/` is git-ignored; do not commit generated stubs
-- `mypy_path = ["typings"]` is configured in `src/pyproject.toml` so mypy picks them up
-- mypy uses `follow_imports = "normal"` for `mlx_lm`/`mlx_vlm` (active type checking against stubs) and `follow_imports = "silent"` for `transformers`/`tokenizers` (type info used at call sites without reporting errors within generated stubs)
+- `mypy_path = ["../typings"]` is configured in `src/pyproject.toml` so mypy
+  picks up the repo-root stubs while running from `src/`
+- mypy uses `follow_imports = "normal"` for `mlx_lm`/`mlx_vlm` and
+  `follow_imports = "silent"` for `transformers`/`tokenizers`; generated
+  stubs are available to call sites, but their internals use `ignore_errors`
+  because stubgen output can contain upstream/noisy annotations this project
+  does not own
 
 **Generating stubs**:
 
@@ -984,8 +989,8 @@ The `test_dependency_sync` test and CI will fail otherwise.
 
 1. Edit versions only in `pyproject.toml` (authoritative source)
 2. Run the sync helper: `python -m tools.update_readme_deps` to regenerate the blocks between:
-   - `<!-- BEGIN MANUAL_INSTALL -->` / `<!-- END MANUAL_INSTALL -->`
-   - `<!-- BEGIN MINIMAL_INSTALL -->` / `<!-- END MINIMAL_INSTALL -->`
+   - `<!-- MANUAL_INSTALL_START -->` / `<!-- MANUAL_INSTALL_END -->`
+   - `<!-- MINIMAL_INSTALL_START -->` / `<!-- MINIMAL_INSTALL_END -->`
 3. Commit both changed files together
 
 **Guidelines**:
@@ -1125,26 +1130,28 @@ dev = [
 All dependencies are defined in `src/pyproject.toml` as the single source of truth:
 
 ```toml
-[project.dependencies]
-# Core runtime dependencies
-mlx>=0.31.2
-mlx-vlm>=0.5.0
-Pillow>=10.3.0
-# ...
+[project]
+dependencies = [
+    "mlx>=0.31.2",
+    "mlx-lm>=0.31.3",
+    "mlx-vlm>=0.6.2",
+    "transformers>=5.7.0,<5.13.0",
+    # ...
+]
 
-[project.optional-dependencies.dev]
-# Development dependencies
-ruff>=0.1.0
-mypy>=1.8.0
-pytest>=8.0.0
-# ...
+[project.optional-dependencies]
+dev = ["ruff>=0.1.0", "mypy>=1.8.0", "pytest>=8.0.0"]
+extras = ["tokenizers>=0.22.0,<=0.23.0", "sentencepiece!=0.1.92,>=0.1.91"]
+torch = ["torch>=2.4.0", "torchvision>=0.17.0"]
 ```
 
-**Why minimum versions (`>=`)?**
+**Why mostly lower-bound versions (`>=`) with explicit compatibility caps?**
 
-- Allows automatic security patches
-- Compatible with Dependabot updates
-- Pip resolves latest compatible versions
+- Lower bounds allow automatic security and compatibility updates.
+- Explicit caps document known upstream incompatibilities, such as the current
+  `transformers<5.13.0` window for `mlx-lm` / `mlx-vlm`.
+- Dependabot and the dependency-sync guard keep visible install snippets aligned
+  with `src/pyproject.toml`.
 
 **Installation:**
 
@@ -1208,7 +1215,7 @@ pip list --outdated
 
 ```bash
 # Check for known vulnerabilities
-make -C vlm audit
+make audit
 ```
 
 ## Automated Updates
@@ -1227,7 +1234,7 @@ make -C vlm audit
 1. Review changes in PR
 2. CI automatically tests
 3. Merge if green
-4. Pull and sync: `git pull && make sync-deps`
+4. Pull and refresh the local environment: `git pull && make update`
 
 ## Version Constraints Guide
 
@@ -1249,7 +1256,7 @@ package==1.2.3
 
 ### When to Pin Versions
 
-**Only pin in `.in` files if**:
+**Only add exact pins, upper bounds, or exclusions if**:
 
 1. **Breaking changes**: Package has history of breaking semver
 2. **Critical stability**: Core dependency must be tested explicitly
@@ -1272,14 +1279,15 @@ mlx>=0.31.2,<0.32.0
 
 ## CI/CD Integration
 
-### Lock File Enforcement
+### Dependency Installation
 
-CI uses lock files for reproducibility:
+CI installs the package from `src/pyproject.toml`, then the dependency-sync job
+verifies generated README install snippets match the same source:
 
 ```yaml
 # .github/workflows/quality.yml
 - name: Install dependencies
-  run: pip install -e src/.[dev]
+  run: pip install -e "src/.[dev]"
 ```
 
 ### Dependency Sync Check
@@ -1312,24 +1320,24 @@ Pre-commit hook automatically updates README dependency blocks when `pyproject.t
 # Check which packages have conflicts
 pip install -e src/.[dev] --dry-run
 
-# If a specific version is needed, update both files:
+# If a specific version is needed:
 # 1. Edit src/pyproject.toml
-# 2. Edit src/requirements.txt (or requirements-dev.txt)
+# 2. Run make deps-sync
 # 3. Try installing again
 ```
 
 ### "Environment out of sync"
 
 ```bash
-# Reinstall from requirements
-make sync-deps
+# Reinstall the managed project environment
+make update
 
 # Or nuclear option: recreate environment
 conda deactivate
 conda remove -n mlx-vlm --all
-conda create -n mlx-vlm python=3.13
+bash src/tools/setup_conda_env.sh
 conda activate mlx-vlm
-make bootstrap-dev
+make dev
 ```
 
 ### "Dependabot PR causes test failures"
@@ -1348,7 +1356,7 @@ make ci
 
 ## Summary
 
-✅ **Current State**: All dependencies use `>=` for flexibility  
+✅ **Current State**: Dependencies use lower bounds plus documented caps for compatibility  
 ✅ **Single Source**: pyproject.toml is the sole source of truth  
 ✅ **Modern Standard**: PEP 621 compliant dependency specification  
 ✅ **Automation**: Dependabot handles routine updates  

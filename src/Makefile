@@ -208,7 +208,7 @@ update: ## Update conda environment and reinstall project with all dependencies
 	@echo "[update] Reinstalling project with all dependencies (dev+extras+torch)..."
 	@$(RUN_PY) -m pip install -e .[dev,extras,torch] --upgrade
 	@echo "✓ Environment updated and project reinstalled"
-	@echo "  To also upgrade lock files, run: make upgrade-deps"
+	@echo "  To change dependency bounds, edit pyproject.toml and run: make deps-sync"
 
 .PHONY: update-env
 update-env: update ## Alias for 'update' target

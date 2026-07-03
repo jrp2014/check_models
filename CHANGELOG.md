@@ -117,6 +117,11 @@ Notable changes to this project will be documented in this file.
   unset.
 - Remove the matching macOS CI deployment-target workaround from quality and
   runtime-smoke workflows so upstream MLX owns target selection consistently.
+- Harden project setup and agent/CI documentation by aligning generated-stub
+  paths across all type checkers, exposing root maintenance targets, removing
+  stale lock-file workflow references, tightening local quality interpreter/tool
+  resolution, and making `update.sh` system/npm-latest upgrades opt-in while
+  preserving the unified script.
 
 ### Fixed
 

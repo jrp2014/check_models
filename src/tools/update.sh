@@ -3,8 +3,8 @@
 # Installs/updates the project and all dependencies from pyproject.toml.
 #
 # Execution Order:
-#   1. Update conda (if in conda environment)
-#   2. Update Homebrew (if available)
+#   1. Optionally update conda/Homebrew if UPDATE_SYSTEM_PACKAGES=1
+#   2. Install repo-local npm tooling from lockfile (or latest if UPDATE_NODE_TOOLING=1)
 #   3. Update pip/wheel/setuptools
 #   4. Install project in editable mode with all dependencies (dev + extras)
 #   5. Then update local MLX repos (if present) OR update from PyPI
@@ -15,6 +15,8 @@
 #   FORCE_REINSTALL=1 ./update.sh     # Force reinstall with --force-reinstall
 #   SKIP_MLX=1 ./update.sh            # Force skip mlx/mlx-vlm updates (override detection)
 #   CONDA_UPDATE_ALL=1 ./update.sh    # Force conda update --all even with pip conflicts
+#   UPDATE_SYSTEM_PACKAGES=1 ./update.sh # Also run conda base/env and Homebrew updates
+#   UPDATE_NODE_TOOLING=1 ./update.sh # Upgrade markdownlint-cli2 to latest npm release
 #   MLX_METAL_JIT=ON ./update.sh      # Build MLX with runtime Metal kernel compilation
 #   MACOSX_DEPLOYMENT_TARGET=26.2 ./update.sh # Override local mlx build target
 #   MLX_LOCAL_BUILD_SMOKE=1 ./update.sh # Force local MLX runtime smoke test
@@ -74,64 +76,72 @@ fi
 
 # Update conda itself (base) and environment packages with pip-conflict safety check.
 # NOTE: conda update --all can break pip-installed packages (mlx, mlx-vlm) by
-# reshuffling shared dependencies like numpy. We do a dry-run first and warn.
-if [[ -n "${CONDA_DEFAULT_ENV:-}" ]]; then
-	echo "[update.sh] Updating conda (base)..."
-	conda update -n base conda -y
+# reshuffling shared dependencies like numpy. Keep this opt-in for update.sh.
+if [[ "${UPDATE_SYSTEM_PACKAGES:-0}" == "1" ]]; then
+	if [[ -n "${CONDA_DEFAULT_ENV:-}" ]]; then
+		echo "[update.sh] Updating conda (base)..."
+		conda update -n base conda -y
 
-	# Now attempt to update the active environment's conda-managed packages.
-	# Dry-run first to detect conflicts with pip-installed packages.
-	echo ""
-	echo "[update.sh] Checking for safe conda environment updates (dry-run)..."
-	DRY_RUN_OUTPUT=$(conda update --all --dry-run 2>&1) || true
+		# Now attempt to update the active environment's conda-managed packages.
+		# Dry-run first to detect conflicts with pip-installed packages.
+		echo ""
+		echo "[update.sh] Checking for safe conda environment updates (dry-run)..."
+		DRY_RUN_OUTPUT=$(conda update --all --dry-run 2>&1) || true
 
-	# Extract package names conda wants to change
-	CONDA_CHANGES=$(echo "$DRY_RUN_OUTPUT" | grep -E '^\s+\S+\s+\S+\s+->\s+\S+' | awk '{print $1}' 2>/dev/null || true)
+		# Extract package names conda wants to change
+		CONDA_CHANGES=$(echo "$DRY_RUN_OUTPUT" | grep -E '^\s+\S+\s+\S+\s+->\s+\S+' | awk '{print $1}' 2>/dev/null || true)
 
-	if [[ -z "$CONDA_CHANGES" ]]; then
-		echo "[update.sh] Conda environment is already up to date"
-	else
-		# Get pip-installed packages (not installed by conda)
-		PIP_ONLY_PKGS=$(pip list --format=freeze 2>/dev/null | cut -d= -f1 | tr '[:upper:]' '[:lower:]' || true)
+		if [[ -z "$CONDA_CHANGES" ]]; then
+			echo "[update.sh] Conda environment is already up to date"
+		else
+			# Get pip-installed packages (not installed by conda)
+			PIP_ONLY_PKGS=$(pip list --format=freeze 2>/dev/null | cut -d= -f1 | tr '[:upper:]' '[:lower:]' || true)
 
-		# Check for overlaps between conda changes and pip packages
-		CONFLICTS=""
-		while IFS= read -r pkg; do
-			[[ -z "$pkg" ]] && continue
-			pkg_lower=$(echo "$pkg" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
-			if echo "$PIP_ONLY_PKGS" | tr '_' '-' | grep -qx "$pkg_lower"; then
-				CONFLICTS="${CONFLICTS}  - ${pkg}\n"
-			fi
-		done <<< "$CONDA_CHANGES"
+			# Check for overlaps between conda changes and pip packages
+			CONFLICTS=""
+			while IFS= read -r pkg; do
+				[[ -z "$pkg" ]] && continue
+				pkg_lower=$(echo "$pkg" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
+				if echo "$PIP_ONLY_PKGS" | tr '_' '-' | grep -qx "$pkg_lower"; then
+					CONFLICTS="${CONFLICTS}  - ${pkg}\n"
+				fi
+			done <<< "$CONDA_CHANGES"
 
-		if [[ -n "$CONFLICTS" ]]; then
-			echo ""
-			echo "⚠️  WARNING: conda wants to update packages also managed by pip:"
-			echo -e "$CONFLICTS"
-			echo "   This may break pip-installed packages (mlx, mlx-vlm, etc.)."
-			echo "   Skipping conda update --all to be safe."
-			echo "   To force: CONDA_UPDATE_ALL=1 ./update.sh"
-			echo ""
-			if [[ "${CONDA_UPDATE_ALL:-0}" == "1" ]]; then
-				echo "[update.sh] CONDA_UPDATE_ALL=1 set — proceeding with conda update --all..."
+			if [[ -n "$CONFLICTS" ]]; then
+				echo ""
+				echo "⚠️  WARNING: conda wants to update packages also managed by pip:"
+				echo -e "$CONFLICTS"
+				echo "   This may break pip-installed packages (mlx, mlx-vlm, etc.)."
+				echo "   Skipping conda update --all to be safe."
+				echo "   To force: CONDA_UPDATE_ALL=1 ./update.sh"
+				echo ""
+				if [[ "${CONDA_UPDATE_ALL:-0}" == "1" ]]; then
+					echo "[update.sh] CONDA_UPDATE_ALL=1 set — proceeding with conda update --all..."
+					conda update --all -y
+				fi
+			else
+				echo "[update.sh] No pip conflicts detected — updating conda environment packages..."
 				conda update --all -y
 			fi
-		else
-			echo "[update.sh] No pip conflicts detected — updating conda environment packages..."
-			conda update --all -y
 		fi
+	else
+		echo "[update.sh] Not in conda environment; skipping conda update"
 	fi
 else
-	echo "[update.sh] Not in conda environment; skipping conda update"
+	echo "[update.sh] Skipping conda base/environment package updates (set UPDATE_SYSTEM_PACKAGES=1 to run)"
 fi
 
-# Homebrew updates first (if available)
-if command -v brew >/dev/null 2>&1; then
-	echo "[update.sh] Updating Homebrew..."
-	brew update
-	brew upgrade
+# Homebrew updates are system-wide; keep them opt-in with the conda system path.
+if [[ "${UPDATE_SYSTEM_PACKAGES:-0}" == "1" ]]; then
+	if command -v brew >/dev/null 2>&1; then
+		echo "[update.sh] Updating Homebrew..."
+		brew update
+		brew upgrade
+	else
+		echo "[update.sh] Homebrew not found; skipping brew update/upgrade"
+	fi
 else
-	echo "[update.sh] Homebrew not found; skipping brew update/upgrade"
+	echo "[update.sh] Skipping Homebrew update/upgrade (set UPDATE_SYSTEM_PACKAGES=1 to run)"
 fi
 
 # Determine project root (assuming check_models/src/tools/update.sh)
@@ -140,9 +150,14 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # Repo-local markdownlint tools (if npm is available)
 if command -v npm >/dev/null 2>&1; then
-	echo "[update.sh] Updating repo-local markdownlint-cli2 to the latest npm release..."
-	npm install --prefix "$PROJECT_ROOT" --save-dev markdownlint-cli2@latest
-	echo "[update.sh] repo-local npm tooling is up to date"
+	if [[ "${UPDATE_NODE_TOOLING:-0}" == "1" ]]; then
+		echo "[update.sh] Updating repo-local markdownlint-cli2 to the latest npm release..."
+		npm install --prefix "$PROJECT_ROOT" --save-dev markdownlint-cli2@latest
+	else
+		echo "[update.sh] Installing repo-local markdownlint tooling from package-lock.json..."
+		npm install --ignore-scripts --prefix "$PROJECT_ROOT"
+	fi
+	echo "[update.sh] repo-local npm tooling is installed"
 else
 	echo "[update.sh] npm not found; skipping repo-local markdownlint install"
 	echo "   (Install Node.js/npm for markdown linting: brew install node)"
@@ -966,10 +981,29 @@ echo "[update.sh] Done."
 # Post-flight check: verify critical packages are still importable
 echo ""
 echo "[update.sh] Verifying critical packages..."
+IMPORT_TO_PIP_PACKAGE() {
+	case "$1" in
+		mlx_lm)
+			printf '%s\n' "mlx-lm"
+			;;
+		mlx_vlm)
+			printf '%s\n' "mlx-vlm"
+			;;
+		*)
+			printf '%s\n' "$1"
+			;;
+	esac
+}
 MISSING_PKGS=()
+REPAIR_PKGS=()
+IMPORT_CHECK_DIR="$(mktemp -d)"
 for pkg in mlx mlx_lm mlx_vlm; do
-	if ! python -c "import $pkg" 2>/dev/null; then
+	import_log="$IMPORT_CHECK_DIR/$pkg.log"
+	if ! python -c "import $pkg" > /dev/null 2>"$import_log"; then
 		MISSING_PKGS+=("$pkg")
+		REPAIR_PKGS+=("$(IMPORT_TO_PIP_PACKAGE "$pkg")")
+	else
+		rm -f "$import_log"
 	fi
 done
 
@@ -977,11 +1011,24 @@ if [[ ${#MISSING_PKGS[@]} -gt 0 ]]; then
 	echo "❌ WARNING: The following critical packages are NOT importable after update:"
 	printf '   - %s\n' "${MISSING_PKGS[@]}"
 	echo ""
-	echo "   This may cause 'Missing required runtime dependencies' errors."
-	echo "   Fix with: pip install ${MISSING_PKGS[*]}"
+	echo "   Import failure details:"
+	for pkg in "${MISSING_PKGS[@]}"; do
+		import_log="$IMPORT_CHECK_DIR/$pkg.log"
+		echo "   [$pkg]"
+		if [[ -s "$import_log" ]]; then
+			tail -n 20 "$import_log" | sed 's/^/     /'
+		else
+			echo "     <no stderr captured>"
+		fi
+	done
 	echo ""
+	echo "   This may cause 'Missing required runtime dependencies' errors."
+	echo "   Fix with: pip install ${REPAIR_PKGS[*]}"
+	echo ""
+	rm -rf "$IMPORT_CHECK_DIR"
 	exit 1
 else
+	rm -rf "$IMPORT_CHECK_DIR"
 	echo "✓ All critical packages verified (mlx, mlx_lm, mlx_vlm)"
 fi
 

@@ -224,9 +224,14 @@ These rules are **mandatory** for this codebase (see `docs/IMPLEMENTATION_GUIDE.
 Third-party stubs live in `typings/` at the repo root (git-ignored). All
 three checkers reference them:
 
-- mypy: `mypy_path = "typings"` in `[tool.mypy]`
+- mypy: `mypy_path = "../typings"` in `[tool.mypy]`
 - ty: `extra-paths = ["../typings"]` in `[tool.ty.environment]`
 - pyrefly: `search-path = ["../typings"]` in `[tool.pyrefly]`
+
+Mypy consumes the generated stubs at call sites but ignores errors inside the
+stub files themselves. Do not "fix" generated third-party stubs just to satisfy
+project strictness unless the contract audit in `tools.generate_stubs` requires
+it.
 
 If stub gaps cause errors:
 

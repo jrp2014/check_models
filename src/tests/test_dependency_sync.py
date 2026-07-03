@@ -271,6 +271,85 @@ def test_ty_uses_generated_typings_search_path() -> None:
     assert ty_env["extra-paths"] == ["../typings"]
 
 
+def test_type_checkers_use_repo_root_generated_typings() -> None:
+    """All type checkers should resolve stubs generated at repo-root typings/."""
+    pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
+
+    assert pyproject["tool"]["mypy"]["mypy_path"] == "../typings"
+    assert pyproject["tool"]["ty"]["environment"]["extra-paths"] == ["../typings"]
+    assert pyproject["tool"]["pyrefly"]["search-path"] == ["../typings"]
+
+    generate_stubs_source = (PKG_ROOT / "tools" / "generate_stubs.py").read_text(encoding="utf-8")
+    assert 'mypy_path = ["../typings"]' in generate_stubs_source
+
+
+def test_mypy_uses_generated_typings_without_gating_stub_internals() -> None:
+    """Generated third-party stubs should inform call sites, not fail strict checks."""
+    pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
+    overrides = pyproject["tool"]["mypy"]["overrides"]
+
+    generated_overrides = [
+        override
+        for override in overrides
+        if set(override.get("module", []))
+        & {
+            "mlx_lm",
+            "mlx_lm.*",
+            "mlx_vlm",
+            "mlx_vlm.*",
+            "tokenizers",
+            "tokenizers.*",
+            "transformers",
+            "transformers.*",
+        }
+    ]
+
+    assert generated_overrides
+    for override in generated_overrides:
+        assert override["ignore_errors"] is True
+
+
+def test_root_makefile_exposes_documented_maintenance_targets() -> None:
+    """Contributor docs should be able to use maintenance targets from repo root."""
+    root_makefile = (REPO_ROOT / "Makefile").read_text(encoding="utf-8")
+
+    for target in ("check-outdated", "audit", "clean-mlx", "clean-mlx-dry-run"):
+        assert f".PHONY: {target}" in root_makefile
+        assert f"{target}:" in root_makefile
+
+
+def test_dependency_docs_do_not_reference_removed_lockfile_workflows() -> None:
+    """Live docs should not point contributors at removed requirements/lock workflows."""
+    live_docs = {
+        "implementation": (REPO_ROOT / "docs" / "IMPLEMENTATION_GUIDE.md").read_text(
+            encoding="utf-8"
+        ),
+        "contributing": (REPO_ROOT / "docs" / "CONTRIBUTING.md").read_text(encoding="utf-8"),
+        "src_makefile": (PKG_ROOT / "Makefile").read_text(encoding="utf-8"),
+    }
+    removed_phrases = (
+        "CI uses lock files",
+        "compatible with lock files",
+        "make sync-deps",
+        "make upgrade-deps",
+        "src/requirements.txt",
+        "requirements-dev.txt",
+        "make -C vlm",
+    )
+
+    for doc_name, text in live_docs.items():
+        for phrase in removed_phrases:
+            assert phrase not in text, (doc_name, phrase)
+
+
+def test_root_readme_describes_supported_cache_filter() -> None:
+    """The quick README should match the detailed supported-cache discovery docs."""
+    root_readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+
+    assert "server-supported cache filter" in root_readme
+    assert "all models found in your local HF cache" not in root_readme
+
+
 def test_package_skylos_scan_excludes_generated_artifacts() -> None:
     """Package-local Skylos config should scan maintained source, not generated outputs."""
     pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
@@ -419,6 +498,87 @@ def test_common_quality_finds_conda_executable_without_sourcing_conda_sh(tmp_pat
     assert output_path.read_text(encoding="utf-8").strip() == str(fake_conda)
 
 
+@pytest.mark.subprocess
+def test_common_quality_rejects_local_python_fallback_without_override(tmp_path: Path) -> None:
+    """Local quality runs should fail instead of silently using PATH python."""
+    run_script = tmp_path / "reject_python_fallback.sh"
+    run_script.write_text(
+        dedent(
+            f"""\
+            #!/usr/bin/env bash
+            set -euo pipefail
+            unset CONDA_PREFIX
+            unset CONDA_DEFAULT_ENV
+            unset CI
+            export HOME="{tmp_path}"
+            export PATH=/usr/bin:/bin
+            source "{PKG_ROOT / "tools" / "common_quality.sh"}"
+            if quality_setup_python > "{tmp_path / "stdout.txt"}" 2> "{tmp_path / "stderr.txt"}"; then
+                exit 44
+            fi
+            grep -q "Unable to resolve required conda environment" "{tmp_path / "stderr.txt"}"
+            """
+        ),
+        encoding="utf-8",
+    )
+    run_script.chmod(0o755)
+
+    result = subprocess.run(  # noqa: S603
+        ["/bin/bash", str(run_script)],
+        capture_output=True,
+        text=True,
+        check=False,
+        cwd=PKG_ROOT,
+    )
+
+    assert result.returncode == 0, result.stderr or result.stdout
+
+
+@pytest.mark.subprocess
+def test_common_quality_python_tools_do_not_fall_back_to_path_by_default(tmp_path: Path) -> None:
+    """Python tools should resolve from the chosen interpreter's bin directory."""
+    env_bin = tmp_path / "env" / "bin"
+    path_bin = tmp_path / "path-bin"
+    env_bin.mkdir(parents=True)
+    path_bin.mkdir()
+    fake_python = env_bin / "python"
+    fake_python.symlink_to(Path(sys.executable).resolve())
+    fake_path_tool = path_bin / "ty"
+    fake_path_tool.write_text("#!/usr/bin/env bash\nexit 0\n", encoding="utf-8")
+    fake_path_tool.chmod(0o755)
+
+    run_script = tmp_path / "reject_path_tool_fallback.sh"
+    run_script.write_text(
+        dedent(
+            f"""\
+            #!/usr/bin/env bash
+            set -euo pipefail
+            cd "{PKG_ROOT}"
+            export PATH="{path_bin}:/usr/bin:/bin"
+            source tools/common_quality.sh
+            QUALITY_PYTHON="{fake_python}"
+            QUALITY_PYTHON_SOURCE="conda-env:mlx-vlm"
+            export QUALITY_PYTHON QUALITY_PYTHON_SOURCE
+            if quality_find_python_tool ty > "{tmp_path / "tool.txt"}"; then
+                exit 44
+            fi
+            """
+        ),
+        encoding="utf-8",
+    )
+    run_script.chmod(0o755)
+
+    result = subprocess.run(  # noqa: S603
+        ["/bin/bash", str(run_script)],
+        capture_output=True,
+        text=True,
+        check=False,
+        cwd=PKG_ROOT,
+    )
+
+    assert result.returncode == 0, result.stderr or result.stdout
+
+
 def test_conda_setup_uses_conda_executable_without_sourcing_conda_sh() -> None:
     """Setup should use conda directly and avoid dynamic conda.sh sourcing."""
     setup_script = (PKG_ROOT / "tools" / "setup_conda_env.sh").read_text(encoding="utf-8")
@@ -492,8 +652,12 @@ def test_markdownlint_cli2_is_pinned_repo_local_and_updateable() -> None:
     assert package_lock["packages"]["node_modules/smol-toml"]["version"] == "1.6.1"
 
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+    assert 'npm install --ignore-scripts --prefix "$PROJECT_ROOT"' in update_script
     assert (
         'npm install --prefix "$PROJECT_ROOT" --save-dev markdownlint-cli2@latest' in update_script
+    )
+    assert update_script.index("markdownlint-cli2@latest") > update_script.index(
+        "UPDATE_NODE_TOOLING"
     )
 
 
@@ -1159,6 +1323,36 @@ def test_update_script_uses_upstream_mlx_editable_dev_install() -> None:
     assert "SKIP_TORCH=1 bash tools/update.sh" in contributing
     assert "# Skip PyTorch support" in contributing
     assert "MLX_LOCAL_BUILD_SMOKE=0" in contributing
+
+
+def test_update_script_import_repair_hint_uses_distribution_names() -> None:
+    """Postflight repair output should use pip package names, not import module names."""
+    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+
+    assert "IMPORT_TO_PIP_PACKAGE" in update_script
+    assert "printf '%s\\n' \"mlx-lm\"" in update_script
+    assert "printf '%s\\n' \"mlx-vlm\"" in update_script
+    assert "REPAIR_PKGS" in update_script
+    assert 'REPAIR_PKGS+=("$(IMPORT_TO_PIP_PACKAGE "$pkg")")' in update_script
+    assert "Fix with: pip install ${REPAIR_PKGS[*]}" in update_script
+    assert "Fix with: pip install ${MISSING_PKGS[*]}" not in update_script
+
+
+def test_update_script_keeps_system_and_node_latest_updates_opt_in() -> None:
+    """The unified updater should not upgrade system tooling unless requested."""
+    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+
+    assert "UPDATE_SYSTEM_PACKAGES" in update_script
+    assert "UPDATE_NODE_TOOLING" in update_script
+    assert 'if [[ "${UPDATE_SYSTEM_PACKAGES:-0}" == "1" ]]; then' in update_script
+    assert 'if [[ "${UPDATE_NODE_TOOLING:-0}" == "1" ]]; then' in update_script
+    assert "Skipping conda base/environment package updates" in update_script
+    assert "Skipping Homebrew update/upgrade" in update_script
+    assert "Installing repo-local markdownlint tooling from package-lock.json" in update_script
+
+    package_latest = "markdownlint-cli2@latest"
+    assert package_latest in update_script
+    assert update_script.index(package_latest) > update_script.index("UPDATE_NODE_TOOLING")
 
 
 def test_update_script_defers_macos_deployment_target_to_upstream_mlx() -> None:

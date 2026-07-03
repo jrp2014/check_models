@@ -88,6 +88,32 @@ quality_find_conda_env_python() {
     return 1
 }
 
+quality_python_fallback_allowed() {
+    case "${QUALITY_ALLOW_PYTHON_FALLBACK:-}" in
+        1|true|TRUE|yes|YES|on|ON)
+            return 0
+            ;;
+    esac
+
+    case "${CI:-}" in
+        1|true|TRUE|yes|YES|on|ON)
+            return 0
+            ;;
+    esac
+
+    return 1
+}
+
+quality_path_tool_fallback_allowed() {
+    case "${QUALITY_ALLOW_PATH_TOOLS:-}" in
+        1|true|TRUE|yes|YES|on|ON)
+            return 0
+            ;;
+    esac
+
+    return 1
+}
+
 quality_setup_python() {
     local env_python=""
 
@@ -96,15 +122,25 @@ quality_setup_python() {
     if env_python="$(quality_find_conda_env_python)"; then
         QUALITY_PYTHON="$env_python"
         QUALITY_PYTHON_SOURCE="conda-env:$CONDA_ENV"
-    elif [ -n "${CONDA_PREFIX:-}" ] && [ -x "$CONDA_PREFIX/bin/python" ]; then
-        QUALITY_PYTHON="$CONDA_PREFIX/bin/python"
-        QUALITY_PYTHON_SOURCE="active-conda:$CONDA_PREFIX"
-    elif command -v python3 >/dev/null 2>&1; then
-        QUALITY_PYTHON="python3"
-        QUALITY_PYTHON_SOURCE="fallback:python3"
+    elif quality_python_fallback_allowed; then
+        if [ -n "${CONDA_PREFIX:-}" ] && [ -x "$CONDA_PREFIX/bin/python" ]; then
+            QUALITY_PYTHON="$CONDA_PREFIX/bin/python"
+            QUALITY_PYTHON_SOURCE="active-conda:$CONDA_PREFIX"
+        elif command -v python3 >/dev/null 2>&1; then
+            QUALITY_PYTHON="$(command -v python3)"
+            QUALITY_PYTHON_SOURCE="fallback:python3"
+        elif command -v python >/dev/null 2>&1; then
+            QUALITY_PYTHON="$(command -v python)"
+            QUALITY_PYTHON_SOURCE="fallback:python"
+        else
+            echo "❌ Unable to resolve required Python interpreter." >&2
+            return 1
+        fi
     else
-        QUALITY_PYTHON="python"
-        QUALITY_PYTHON_SOURCE="fallback:python"
+        echo "❌ Unable to resolve required conda environment '$CONDA_ENV'." >&2
+        echo "   Activate it first: conda activate $CONDA_ENV" >&2
+        echo "   CI may set CI=true; local overrides may set QUALITY_ALLOW_PYTHON_FALLBACK=1." >&2
+        return 1
     fi
 
     export QUALITY_PYTHON
@@ -136,7 +172,7 @@ quality_require_command() {
             return 0
         fi
 
-        if command -v "$tool_name" >/dev/null 2>&1; then
+        if quality_path_tool_fallback_allowed && command -v "$tool_name" >/dev/null 2>&1; then
             command -v "$tool_name"
             return 0
         fi

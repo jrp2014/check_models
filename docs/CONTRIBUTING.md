@@ -5,7 +5,9 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
 **Target audience**: New contributors, anyone submitting a pull request.
 
 > [!NOTE]
-> This project was restructured in October 2025. The old `vlm/` directory is now `src/`. All `make` commands now use the root `Makefile` instead of `make -C src` or `make -C vlm`.
+> This project was restructured in October 2025. The old package-local tree is
+> now `src/`, and contributor-facing `make` commands should be run from the repo
+> root unless a package-local target is explicitly documented.
 
 **Related documents**:
 
@@ -407,10 +409,10 @@ Dependencies are defined in `src/pyproject.toml` as the single source of truth.
 make update
 
 # Check for outdated packages:
-make -C src check-outdated
+make check-outdated
 
 # Security audit:
-make -C src audit
+make audit
 
 # Sync README dependency blocks:
 make deps-sync
@@ -450,7 +452,9 @@ bash tools/update.sh
   CMake >= 3.25, Xcode >= 15, macOS SDK >= 14, Apple Clang >= 15, Metal
   tools, and a native arm64 shell on macOS
 - Installs the project editable environment with dev and extras enabled by default
-- Uses repo-local Node tooling (`npm install --prefix src`) for markdownlint instead of relying on global packages
+- Uses repo-local Node tooling (`npm install --ignore-scripts --prefix src`) for
+  markdownlint instead of relying on global packages; latest npm upgrades are
+  opt-in
 - Verifies dependency sync across `pyproject.toml`, generated README install blocks, and updater assumptions
 - Logs MLX backend provenance, including the installed `mlx`, `mlx-metal`,
   `libmlx.dylib`, and `mlx.metallib` locations and hashes
@@ -461,6 +465,11 @@ bash tools/update.sh
 **Environment Variables**:
 
 - `SKIP_TORCH=1`: Skip PyTorch installation (torch is included by default)
+- `UPDATE_SYSTEM_PACKAGES=1`: Also run conda base/environment updates and
+  Homebrew update/upgrade. By default, `update.sh` leaves system package
+  managers alone.
+- `UPDATE_NODE_TOOLING=1`: Upgrade repo-local markdownlint tooling to the
+  latest npm release. By default, `update.sh` installs from `package-lock.json`.
 - `MLX_METAL_JIT=ON`: Build local `mlx` with runtime Metal compilation
   (mapped to `CMAKE_ARGS=-DMLX_METAL_JIT=ON`; if unset, MLX's default
   `MLX_METAL_JIT=OFF` uses pre-built kernels)
@@ -522,7 +531,7 @@ This command will:
 
 - Update pip in your conda/venv environment
 - Reinstall the project with all dependencies (dev, extras, torch)
-- Ensure you have the latest versions compatible with lock files
+- Apply the current dependency bounds from `src/pyproject.toml`
 
 ### Cleaning Build Artifacts
 
@@ -565,7 +574,9 @@ According to the [official MLX documentation](https://ml-explore.github.io/mlx/b
 - To free up disk space
 - After switching between different MLX versions or branches
 
-**Note**: This does NOT update the lock files themselves. To upgrade dependencies to newer versions, edit `src/pyproject.toml` and run `make update`.
+**Note**: This does not change dependency bounds. To allow newer or different
+versions, edit `src/pyproject.toml`, run `make deps-sync`, then run
+`make update`.
 
 ## Release Process
 

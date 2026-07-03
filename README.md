@@ -3,7 +3,7 @@
 Lightweight CLI to run and benchmark MLX-compatible Vision-Language Models (VLMs) on Apple Silicon. Produces HTML/Markdown/gallery Markdown/TSV/JSONL reports and captures performance metrics (tokens/sec, memory, timings).
 
 > [!NOTE]
-> This tool runs MLX-format Vision-Language Models hosted on the [Hugging Face Hub](https://huggingface.co). By default it runs all models found in your local HF cache (use `--models` to specify explicit model IDs).
+> This tool runs MLX-format Vision-Language Models hosted on the [Hugging Face Hub](https://huggingface.co). By default it runs cached models that pass the `mlx-vlm` server-supported cache filter; use `--models` to specify explicit model IDs.
 
 ## Quick Start (fast path)
 
