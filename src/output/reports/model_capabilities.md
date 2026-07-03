@@ -1,6 +1,6 @@
 # Model Capability Scorecard
 
-_Generated on 2026-06-28 22:11:08 BST_
+Generated on: 2026-06-28 22:11:08 BST
 
 - Mode: triage
 - Grounding: not grounded; caption hygiene only

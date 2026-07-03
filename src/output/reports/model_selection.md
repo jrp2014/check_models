@@ -1,6 +1,6 @@
 # Model Selection Brief
 
-_Generated on 2026-06-28 22:11:08 BST_
+Generated on: 2026-06-28 22:11:08 BST
 
 - Mode: triage
 - Semantic rankings: ungrounded (ungrounded)

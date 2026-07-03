@@ -132,6 +132,16 @@ def _extract_markdown_subsection(
     return content[start:end]
 
 
+_GENERATED_STAMP_EMPHASIS_HEADING_RE = re.compile(
+    r"(?m)^_(?:Generated on|Report generated on).+_$",
+)
+
+
+def _assert_no_generated_stamp_emphasis_headings(content: str) -> None:
+    """Generated timestamp metadata should not trip markdownlint MD036."""
+    assert _GENERATED_STAMP_EMPHASIS_HEADING_RE.search(content) is None
+
+
 def _make_success(name: str = "org/model-ok") -> PerformanceResult:
     return PerformanceResult(
         model_name=name,
@@ -891,6 +901,69 @@ class TestMarkdownReportEdgeCases:
         assert "<!-- markdownlint-disable MD033 MD034 MD037 MD049 -->" in content
         assert "<!-- markdownlint-enable MD033 MD034 MD037 MD049 -->" in content
         assert "<!-- markdownlint-enable MD013" not in content
+
+    def test_generated_report_stamps_do_not_use_emphasis_only_lines(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Generated Markdown timestamp stamps should not look like headings."""
+        success = _make_success("org/good")
+        failure = _make_failure("org/bad")
+        prompt = "Describe this image briefly."
+        context = _build_report_render_context(results=[success, failure], prompt=prompt)
+
+        generated_paths = [
+            tmp_path / "results.md",
+            tmp_path / "model_gallery.md",
+            tmp_path / "model_selection.md",
+            tmp_path / "model_capabilities.md",
+            tmp_path / "review.md",
+            tmp_path / "diagnostics.md",
+        ]
+
+        generate_markdown_report(
+            results=[success, failure],
+            filename=generated_paths[0],
+            versions=_stub_versions(),
+            prompt=prompt,
+            total_runtime_seconds=1.0,
+            report_context=context,
+        )
+        generate_markdown_gallery_report(
+            results=[success, failure],
+            filename=generated_paths[1],
+            prompt=prompt,
+            report_context=context,
+        )
+        check_models.generate_model_selection_report(
+            [success, failure],
+            generated_paths[2],
+            prompt=prompt,
+            report_context=context,
+        )
+        check_models.generate_model_capability_scorecard(
+            [success, failure],
+            generated_paths[3],
+            tmp_path / "model_capabilities.json",
+            prompt=prompt,
+            report_context=context,
+        )
+        generate_review_report(
+            results=[success, failure],
+            filename=generated_paths[4],
+            prompt=prompt,
+            report_context=context,
+        )
+        generate_diagnostics_report(
+            results=[_make_failure_with_details("org/broken")],
+            filename=generated_paths[5],
+            versions=_stub_versions(),
+            system_info={},
+            prompt=prompt,
+        )
+
+        for path in generated_paths:
+            _assert_no_generated_stamp_emphasis_headings(path.read_text(encoding="utf-8"))
 
     def test_markdown_results_table_uses_human_summary_columns(self, tmp_path: Path) -> None:
         """Main Markdown table should omit low-signal upstream debug columns."""
@@ -2682,9 +2755,10 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        report_tail = content.split("_Report generated on ", maxsplit=1)[1]
-        assert ")._\n\n<!-- markdownlint-disable MD060 -->\n\n---\n\n## Environment" in report_tail
-        assert ")._\n---\n\n## Environment" not in report_tail
+        report_tail = content.split("Report generated on: ", maxsplit=1)[1]
+        assert ").\n\n<!-- markdownlint-disable MD060 -->\n\n---\n\n## Environment" in report_tail
+        assert ").\n---\n\n## Environment" not in report_tail
+        assert "_Report generated on" not in content
 
     def test_action_summary_and_repro_pointers_present(self, tmp_path: Path) -> None:
         """Diagnostics should include compact action triage and repro pointers."""

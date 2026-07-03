@@ -2,7 +2,7 @@
 
 # Automated Review Digest
 
-_Generated on 2026-06-28 22:11:08 BST_
+Generated on: 2026-06-28 22:11:08 BST
 
 Trusted-hint review uses only prompt title/description/keyword hints for utility comparison. Capture metadata, GPS, timestamps, source labels, and location labels are treated as nonvisual metadata and are not required visual evidence.
 
@@ -747,4 +747,3 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
 - _Key signals:_ hit token cap (200); reasoning leak
 - _Tokens:_ prompt 399 tok; estimated text 6 tok; estimated non-text 393 tok;
   generated 200 tok; requested max 200 tok; stop reason max_tokens
-

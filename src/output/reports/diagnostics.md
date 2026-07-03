@@ -248,7 +248,7 @@ Repro bundles with prompt traces and environment details are available in [repro
 - Input image: `/Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg`
 - Generation settings: max_tokens=200, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-06-28 22:11:08 BST by [check_models](https://github.com/jrp2014/check_models)._
+Report generated on: 2026-06-28 22:11:08 BST by [check_models](https://github.com/jrp2014/check_models).
 
 <!-- markdownlint-disable MD060 -->
 

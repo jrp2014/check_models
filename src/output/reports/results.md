@@ -1,6 +1,6 @@
 # Model Performance Results
 
-_Generated on 2026-06-28 22:11:08 BST_
+Generated on: 2026-06-28 22:11:08 BST
 
 ## Run Contract
 
@@ -240,4 +240,4 @@ _Companion artifacts:_
 - `tokenizers`: `0.22.2`
 - `Pillow`: `12.2.0`
 
-_Report generated on: 2026-06-28 22:11:08 BST_
+Report generated on: 2026-06-28 22:11:08 BST

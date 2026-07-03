@@ -2112,6 +2112,15 @@ def _markdown_emphasis(text: str) -> str:
     return f"_{text}_"
 
 
+def _markdown_generated_stamp(
+    *,
+    label: str = "Generated on",
+    suffix: str = "",
+) -> str:
+    """Return generated-artifact timestamp metadata without heading-like emphasis."""
+    return f"{label}: {local_now_str()}{suffix}"
+
+
 def _append_markdown_labeled_value(
     parts: list[str],
     *,
@@ -15693,7 +15702,10 @@ def _diagnostics_footer(
         )
     parts.append("")
     parts.append(
-        f"_Report generated on {local_now_str()} by [check_models]({_GITHUB_REPO_URL})._",
+        _markdown_generated_stamp(
+            label="Report generated on",
+            suffix=f" by [check_models]({_GITHUB_REPO_URL}).",
+        ),
     )
     parts.append("")
 
@@ -16532,7 +16544,7 @@ def generate_markdown_report(
     md: list[str] = []
     md.append("# Model Performance Results")
     md.append("")
-    md.append(f"_Generated on {local_now_str()}_")
+    md.append(_markdown_generated_stamp())
     md.append("")
     md.extend(
         _format_run_contract_parts(
@@ -16620,7 +16632,7 @@ def generate_markdown_report(
     for name, value in _collect_report_component_rows(versions=versions, system_info={}):
         md.append(f"- `{name}`: `{value}`")
     md.append("")
-    md.append(f"_Report generated on: {local_now_str()}_")
+    md.append(_markdown_generated_stamp(label="Report generated on"))
 
     _write_markdown_artifact(filename, md, artifact_name="Markdown report")
 
@@ -16644,7 +16656,7 @@ def generate_markdown_gallery_report(
     md: list[str] = []
     md.append("# Model Output Gallery")
     md.append("")
-    md.append(f"_Generated on {local_now_str()}_")
+    md.append(_markdown_generated_stamp())
     md.append("")
     md.extend(
         _wrap_markdown_text(
@@ -17042,7 +17054,7 @@ def generate_model_selection_report(
     md: list[str] = [
         "# Model Selection Brief",
         "",
-        f"_Generated on {local_now_str()}_",
+        _markdown_generated_stamp(),
         "",
         f"- Mode: {MARKDOWN_ESCAPER.escape(policy.eval_mode)}",
         (f"- Semantic rankings: {grounding} ({MARKDOWN_ESCAPER.escape(policy.selection_basis)})"),
@@ -17540,7 +17552,7 @@ def generate_model_capability_scorecard(
     md = [
         "# Model Capability Scorecard",
         "",
-        f"_Generated on {local_now_str()}_",
+        _markdown_generated_stamp(),
         "",
         f"- Mode: {MARKDOWN_ESCAPER.escape(policy.eval_mode)}",
         f"- Grounding: {grounding}",
@@ -17626,7 +17638,7 @@ def generate_review_report(
         "",
         "# Automated Review Digest",
         "",
-        f"_Generated on {local_now_str()}_",
+        _markdown_generated_stamp(),
         "",
         (
             "Trusted-hint review uses only prompt title/description/keyword hints for utility "

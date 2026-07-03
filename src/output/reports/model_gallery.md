@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-_Generated on 2026-06-28 22:11:08 BST_
+Generated on: 2026-06-28 22:11:08 BST
 
 Complete per-model evidence artifact with image metadata, the source prompt,
 summary tables, diagnostics, and full generated output for every attempted
