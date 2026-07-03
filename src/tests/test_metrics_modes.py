@@ -975,6 +975,7 @@ def test_report_generation_uses_single_artifact_plan(tmp_path: Path) -> None:
         "tsv",
         "jsonl",
         "run_json",
+        "output_index",
     ]
     assert [artifact.label.strip() for artifact in artifacts] == [
         "HTML Report:",
@@ -986,6 +987,7 @@ def test_report_generation_uses_single_artifact_plan(tmp_path: Path) -> None:
         "TSV Report:",
         "JSONL Report:",
         "Run JSON:",
+        "Output Index:",
     ]
     assert all(artifact.path.is_absolute() for artifact in artifacts)
     assert all(artifact.job is not None for artifact in artifacts)

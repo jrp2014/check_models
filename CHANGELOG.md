@@ -58,6 +58,19 @@ Notable changes to this project will be documented in this file.
 - Recalibrate generated model-choice artifacts so triage scorecards separate
   caption hygiene from grounded metadata capability, selection shortlists include
   speed and memory, and review queues link to repro bundles when available.
+- Add a generated `output/index.md` landing page that routes model users to
+  selection/capability artifacts and maintainers to diagnostics, issue drafts,
+  and current repro bundles.
+- Add practical quick-chooser sections to `model_selection.md` for memory
+  budgets, fastest usable models, quality-with-memory candidates, and current
+  failures.
+- Label ungrounded clean triage outputs as `clean-triage-pass` in human-facing
+  review and gallery reports while preserving the existing JSONL bucket
+  contract.
+- Surface current-run status in the model capability scorecard so historical
+  success cannot make a currently failing model look caption-ready.
+- Write `repro_bundles/latest_by_cluster.json` and keep issue-draft image
+  repros portable by avoiding reporter-specific absolute image paths.
 - Trim model capability scorecard signal and table-rendering plumbing without
   changing the generated Markdown or JSON artifact shape.
 - Keep model-generated text unprefixed in gallery summary tables while carrying

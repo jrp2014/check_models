@@ -432,6 +432,68 @@ class TestModelCapabilityScorecard:
         assert "caption" in payload["models"][0]["recommendation"]
         assert payload["models"][0]["recommendation"] != "avoid"
 
+    def test_scorecard_surfaces_current_failure_over_historical_success(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Current-run failures should not look caption-ready because history was good."""
+        failure = _make_failure_with_details(
+            "org/currently-broken",
+            error_msg="Loaded processor has no image_processor.",
+            error_package="model-config",
+            error_stage="Processor Error",
+        )
+        report_context = _build_report_render_context(
+            results=[failure],
+            prompt="Describe this image briefly.",
+            eval_mode="triage",
+        )
+        history_record: check_models.HistoryRunRecord = {
+            "_type": "run",
+            "format_version": "1.0",
+            "timestamp": "2026-06-20 10:00:00 +0000",
+            "prompt_hash": "prior",
+            "prompt_preview": "Describe this image briefly.",
+            "image_path": "prior.jpg",
+            "model_results": {
+                failure.model_name: {
+                    "success": True,
+                    "error_stage": None,
+                    "error_type": None,
+                    "error_package": None,
+                    "review_user_bucket": "recommended",
+                    "review_verdict": "clean",
+                    "capability_score": 90.0,
+                    "hygiene_score": 100.0,
+                    "caption_score": 96.0,
+                    "generation_tps": 80.0,
+                    "peak_memory_gb": 4.0,
+                },
+            },
+            "system": {},
+            "library_versions": {},
+        }
+        markdown_path = tmp_path / "model_capabilities.md"
+        json_path = tmp_path / "model_capabilities.json"
+
+        check_models.generate_model_capability_scorecard(
+            [failure],
+            markdown_path,
+            json_path,
+            prompt="Describe this image briefly.",
+            report_context=report_context,
+            history_records=(history_record,),
+        )
+
+        markdown = markdown_path.read_text(encoding="utf-8")
+        payload = json.loads(json_path.read_text(encoding="utf-8"))
+        model_payload = payload["models"][0]
+
+        assert "Current" in markdown
+        assert "current-run-blocked" in markdown
+        assert model_payload["current_status"] == "failed"
+        assert model_payload["recommendation"] == "current-run-blocked"
+
 
 def _make_quality_success(
     name: str,
@@ -1292,6 +1354,89 @@ class TestMarkdownReportEdgeCases:
         assert "Best keywording" not in content
         assert "Keywords 0" not in content
 
+    def test_model_selection_report_includes_budgeted_quick_chooser(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Model-selection users should get practical current-run chooser buckets."""
+        tiny = PerformanceResult(
+            model_name="org/tiny-fast",
+            success=True,
+            generation=_MockGeneration(
+                text="Two tabby cats sleep on a pink couch beside two remote controls.",
+                generation_tps=250.0,
+                prompt_tokens=20,
+                generation_tokens=12,
+                peak_memory=3.0,
+            ),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+        )
+        mid = PerformanceResult(
+            model_name="org/mid-balanced",
+            success=True,
+            generation=_MockGeneration(
+                text="Two cats are resting on a pink couch with remotes nearby.",
+                generation_tps=90.0,
+                prompt_tokens=20,
+                generation_tokens=11,
+                peak_memory=7.0,
+            ),
+            total_time=1.2,
+            generation_time=0.6,
+            model_load_time=0.6,
+        )
+        large = PerformanceResult(
+            model_name="org/large-quality",
+            success=True,
+            generation=_MockGeneration(
+                text=(
+                    "Two tabby cats are sleeping on a vivid pink couch, with two remote "
+                    "controls placed near them."
+                ),
+                generation_tps=45.0,
+                prompt_tokens=20,
+                generation_tokens=18,
+                peak_memory=24.0,
+            ),
+            total_time=2.0,
+            generation_time=1.0,
+            model_load_time=1.0,
+        )
+        failure = _make_failure("org/broken", error_package="mlx-vlm")
+        out = tmp_path / "model_selection.md"
+        context = check_models._build_report_render_context(
+            results=[tiny, mid, large, failure],
+            prompt="Describe this image briefly.",
+            eval_mode="triage",
+        )
+
+        check_models.generate_model_selection_report(
+            [tiny, mid, large, failure],
+            out,
+            prompt="Describe this image briefly.",
+            report_context=context,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "## Quick Chooser" in content
+        assert "### Best under 4 GB" in content
+        assert "### Best under 8 GB" in content
+        assert "### Fastest usable" in content
+        assert "### Quality if memory allows" in content
+        assert "### Current failures / avoid" in content
+        assert "`org/tiny-fast`" in _extract_markdown_subsection(
+            content,
+            "### Best under 4 GB",
+            end_headings=("### Best under 8 GB",),
+        )
+        assert "`org/broken`" in _extract_markdown_subsection(
+            content,
+            "### Current failures / avoid",
+            end_headings=("## Brief Caption Candidates",),
+        )
+
     def test_model_selection_report_ranks_fuller_clean_captions_above_terse_ones(
         self,
         tmp_path: Path,
@@ -1359,8 +1504,13 @@ class TestMarkdownReportEdgeCases:
         assert "`org/label-caption`" in content
         assert "`org/terse-caption`" in content
         assert "`org/full-caption`" in content
-        assert content.index("`org/full-caption`") < content.index("`org/terse-caption`")
-        assert content.index("`org/terse-caption`") < content.index("`org/label-caption`")
+        shortlist = _extract_markdown_subsection(
+            content,
+            "## Brief Caption Candidates",
+            end_headings=("## Structured Metadata Candidates",),
+        )
+        assert shortlist.index("`org/full-caption`") < shortlist.index("`org/terse-caption`")
+        assert shortlist.index("`org/terse-caption`") < shortlist.index("`org/label-caption`")
 
     def test_model_selection_report_uses_metadata_when_available(
         self,
@@ -1798,7 +1948,7 @@ class TestMarkdownGalleryReport:
         assert "## Model Verdicts" in content
         assert "## Maintainer Queue" not in content
         assert "`mlx-vlm`" in content or "`transformers`" in content
-        assert "`recommended`" in content
+        assert "`clean-triage-pass`" in content
         assert "`avoid`" in content
         assert content.index("## User Buckets") < content.index("## Maintainer Escalations")
         assert content.index("## Maintainer Escalations") < content.index("## Model Verdicts")
@@ -3493,6 +3643,34 @@ class TestDiagnosticsReport:
         assert bundle_path.name in issue_content
         assert "Optional advanced context:" in issue_content
 
+    def test_repro_bundles_write_latest_cluster_index(self, tmp_path: Path) -> None:
+        """Current-run bundles should be indexed separately from the historical archive."""
+        failure = _make_failure_with_details(
+            "org/broken-model",
+            error_msg="bad shape",
+            error_stage="Model Error",
+            error_package="mlx-vlm",
+            traceback_str="Traceback\nValueError: bad shape",
+        )
+        output_dir = tmp_path / "repro_bundles"
+
+        bundles = export_failure_repro_bundles(
+            results=[failure],
+            output_dir=output_dir,
+            run_args=Namespace(),
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            prompt="Describe this image.",
+            image_path=None,
+        )
+
+        index_path = output_dir / "latest_by_cluster.json"
+        payload = json.loads(index_path.read_text(encoding="utf-8"))
+        assert "org/broken-model" in bundles
+        assert payload["schema_version"] == "1.0"
+        assert payload["models"]["org/broken-model"]["bundle"] == bundles["org/broken-model"].name
+        assert payload["models"]["org/broken-model"]["issue_cluster_id"]
+
     def test_repro_command_omits_upstream_quantized_kv_default(self) -> None:
         """Default KV quantization start should not be forwarded as a repro override."""
         tokens = check_models._build_repro_command_tokens(
@@ -4675,6 +4853,47 @@ class TestGithubIssueReportContent:
         assert "Why this classification is credible" not in content
         assert "MLX_VLM_DECODE_RUNTIME" not in content
 
+    def test_issue_draft_uses_portable_image_reference_with_hash(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Pasteable upstream repros should not require the reporter's absolute paths."""
+        image_path = tmp_path / "cats.jpg"
+        image_path.write_bytes(b"fake image bytes")
+        failed_result = PerformanceResult(
+            model_name="org/broken-model",
+            generation=None,
+            success=False,
+            error_message="RuntimeError: shape mismatch",
+            error_stage="Model Error",
+            error_code="MLX_VLM_DECODE_RUNTIME",
+            error_package="mlx-vlm",
+            error_signature="MLX_DECODE_ERROR:abc123",
+            error_traceback="Traceback (most recent call last):\nRuntimeError: shape mismatch",
+            total_time=0.5,
+        )
+        snapshot = DiagnosticsSnapshot(
+            failed=(failed_result,),
+            failure_clusters=(("MLX_DECODE_ERROR:abc123", (failed_result,)),),
+        )
+
+        generated = _generate_github_issue_reports(
+            diagnostics_snapshot=snapshot,
+            output_dir=tmp_path,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            repro_bundles={},
+            run_args=Namespace(image=image_path, max_tokens=123, temperature=0.0),
+            prompt="Analyze this image.",
+            image_path=image_path,
+        )
+
+        content = next(iter(generated.values())).read_text(encoding="utf-8")
+        assert str(image_path) not in content
+        assert "--image cats.jpg" in content
+        assert '"image": "cats.jpg"' in content
+        assert "Image SHA256:" in content
+
     def test_issue_index_includes_run_context_header(self, tmp_path: Path) -> None:
         """Issue queue index should explain the run context before the table."""
         failed_result = PerformanceResult(
@@ -5179,6 +5398,58 @@ class TestGithubIssueReportContent:
         assert "Stack Signals" in content
         assert "Long-context collapse" in content
         assert "Inspect cache allocation" in content
+
+
+def test_output_index_routes_maintainers_and_model_users(tmp_path: Path) -> None:
+    """Run-level output index should tell each audience where to start."""
+    good = _make_success("org/good")
+    failure = _make_failure("org/bad", error_package="mlx-vlm")
+    report_context = _build_report_render_context(
+        results=[good, failure],
+        prompt="Describe this image briefly.",
+        eval_mode="triage",
+    )
+    output_dir = tmp_path / "output"
+    reports_dir = output_dir / "reports"
+    issues_dir = output_dir / "issues"
+    paths = check_models.ReportOutputPaths(
+        index=output_dir / "index.md",
+        html=reports_dir / "results.html",
+        markdown=reports_dir / "results.md",
+        gallery_markdown=reports_dir / "model_gallery.md",
+        review=reports_dir / "review.md",
+        model_selection=reports_dir / "model_selection.md",
+        model_capabilities=reports_dir / "model_capabilities.md",
+        model_capabilities_json=output_dir / "model_capabilities.json",
+        tsv=reports_dir / "results.tsv",
+        jsonl=output_dir / "results.jsonl",
+        run_json=output_dir / "run.json",
+        diagnostics=reports_dir / "diagnostics.md",
+        log=output_dir / "check_models.log",
+        environment=output_dir / "environment.log",
+    )
+    artifacts = DiagnosticsArtifacts(
+        snapshot=_build_diagnostics_snapshot(results=[good, failure], prompt="describe"),
+        diagnostics_written=True,
+        repro_bundles={"org/bad": output_dir / "repro_bundles" / "bad.json"},
+        issue_reports={"cluster": issues_dir / "index.md"},
+    )
+
+    check_models.generate_output_index_report(
+        paths.index,
+        output_paths=paths,
+        report_context=report_context,
+        diagnostics_artifacts=artifacts,
+    )
+
+    content = paths.index.read_text(encoding="utf-8")
+    assert "# Check Models Output Index" in content
+    assert "## For Model Users" in content
+    assert "## For Maintainers" in content
+    assert "model_selection.md" in content
+    assert "model_capabilities.md" in content
+    assert "issues/index.md" in content
+    assert "latest_by_cluster.json" in content
 
 
 class TestIssueDirectoryInvariants:

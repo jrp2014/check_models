@@ -8,6 +8,7 @@ The script's default output location is now this directory, keeping the project 
 
 ```text
 output/
+├── index.md                  # Start-here guide for model users and maintainers
 ├── reports/                  # Human-readable report files
 │   ├── results.html          # Styled HTML report (viewable in browser)
 │   ├── results.md            # Mode-aware public run index
@@ -20,6 +21,7 @@ output/
 │   ├── issue_001_crash.md    # One per failure cluster
 │   └── issue_002_harness.md  # One per harness issue
 ├── repro_bundles/            # JSON reproduction bundles per failed model
+│   ├── latest_by_cluster.json # Current-run bundle index by model and issue cluster
 │   └── 20260417T...*.json    # Timestamped bundle with error + env details
 ├── results.jsonl             # JSON Lines report (machine-readable results)
 ├── run.json                  # Stable run-level metadata contract
@@ -38,8 +40,10 @@ output/
 - `reports/results.md` - Mode-aware public run index. In triage mode it suppresses cataloging
   and keyword scores and points to model-selection and diagnostics artifacts.
 - `reports/model_selection.md` - Ranked shortlist for brief-caption and structured
-  title/description/keywords decisions. This is not the complete run; it is a
-  selection aid that points to the complete gallery.
+  title/description/keywords decisions. In triage mode it includes practical
+  quick-chooser buckets by memory budget, speed, and current failures. This is
+  not the complete run; it is a selection aid that points to the complete
+  gallery.
 - `reports/model_gallery.md` - Complete evidence-only record for every attempted
   model, including generated outputs, diagnostics, timing/memory summaries, and
   full per-model sections.
@@ -49,6 +53,9 @@ output/
 
 **In `output/`** (machine-readable and logs):
 
+- `index.md` - Generated landing page that routes model users to selection
+  artifacts and maintainers to diagnostics, issue drafts, and current repro
+  bundles.
 - `results.jsonl` - JSON Lines report (machine-readable results)
 - `run.json` - Stable run-level machine contract with resolved mode, grounding policy, counts,
   versions, and artifact paths
@@ -59,7 +66,16 @@ output/
 **Conditional subdirectories** (generated when failures are present):
 
 - `issues/` - Ready-to-file GitHub issue markdown for clustered crashes and harness problems
-- `repro_bundles/` - JSON reproduction bundles per failed model, containing error details, CLI args, and environment for reproducibility. Automatically pruned after 90 days (configurable via `--prune-repro-days`).
+- `repro_bundles/` - JSON reproduction bundles per failed model, containing
+  error details, CLI args, and environment for reproducibility.
+  `latest_by_cluster.json` points to the current run's relevant bundles without
+  scanning the historical archive. Timestamped bundles are automatically pruned
+  after 90 days (configurable via `--prune-repro-days`).
+
+Triage-mode reports use `clean-triage-pass` for models with no flagged
+automated signals. That label is not a grounded visual-quality endorsement; use
+`model_gallery.md` or a metadata/quality run before treating a model as
+recommended for production use.
 
 These files are regenerated each time you run the tool (**history is append-only**) and **committed to version control** so results are visible in GitHub.
 

@@ -155,6 +155,7 @@ __all__ = [
     "generate_markdown_report",
     "generate_model_capability_scorecard",
     "generate_model_selection_report",
+    "generate_output_index_report",
     "get_device_info",
     "get_exif_data",
     "get_library_versions",
@@ -1421,6 +1422,7 @@ class DiagnosticsArtifacts:
 class ReportOutputPaths:
     """Resolved final report and log output paths."""
 
+    index: Path
     html: Path
     markdown: Path
     gallery_markdown: Path
@@ -1814,6 +1816,7 @@ DEFAULT_MODEL_CAPABILITIES_OUTPUT: Final[Path] = (
 DEFAULT_MODEL_CAPABILITIES_JSON_OUTPUT: Final[Path] = (
     _SCRIPT_DIR / "output" / "model_capabilities.json"
 )
+DEFAULT_OUTPUT_INDEX: Final[Path] = _SCRIPT_DIR / "output" / "index.md"
 DEFAULT_TSV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "results.tsv"
 DEFAULT_LOG_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "check_models.log"
 DEFAULT_JSONL_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.jsonl"
@@ -1824,6 +1827,7 @@ _PREFLIGHT_ISSUES_ARG_ATTR: Final[str] = "_check_models_preflight_issues"
 _GITHUB_REPO_URL: Final[str] = "https://github.com/jrp2014/check_models"
 _GITHUB_DEFAULT_BRANCH: Final[str] = "main"
 _PUBLISHED_OUTPUT_ROOT: Final[PurePosixPath] = PurePosixPath("src/output")
+_REPRO_BUNDLE_ARCHIVE_RE: Final[re.Pattern[str]] = re.compile(r"^\d{8}T\d{6}Z?_")
 _PUBLISHED_REPORT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
     {
         DEFAULT_HTML_OUTPUT.name,
@@ -3241,6 +3245,11 @@ MODEL_SELECTION_IDEAL_CAPTION_MAX_WORDS: Final[int] = 36  # Upper bound for usef
 MODEL_SELECTION_MAX_CAPTION_WORDS: Final[int] = 80  # Above this, caption briefs become unwieldy
 MODEL_SELECTION_RICHNESS_TARGET_TERMS: Final[int] = 16  # Terms needed for full richness credit
 MODEL_SELECTION_CONTENT_TERM_MIN_CHARS: Final[int] = 3  # Minimum token length for richness
+MODEL_SELECTION_CHOOSER_MIN_HYGIENE_SCORE: Final[float] = 60.0
+MODEL_SELECTION_CHOOSER_SMALL_MEMORY_GB: Final[float] = 4.0
+MODEL_SELECTION_CHOOSER_MEDIUM_MEMORY_GB: Final[float] = 8.0
+MODEL_SELECTION_CHOOSER_ROW_LIMIT: Final[int] = 3
+MODEL_SELECTION_CHOOSER_AVOID_ROW_LIMIT: Final[int] = 5
 SUMMARY_CHART_WIDTH: Final[int] = 24  # Character width for compact Rich summary bars
 SUMMARY_MODEL_LABEL_MAX: Final[int] = 32  # Max model label length in summary tables/charts
 SUMMARY_CHART_MAX_ROWS: Final[int] = 8  # Max rows shown in summary charts
@@ -11514,14 +11523,37 @@ def _markdown_review_text(text: str) -> str:
     return text.replace(" | ", "; ")
 
 
-def _humanize_review_bucket_text(bucket: str) -> str:
+def _review_display_bucket_label(
+    bucket: str,
+    *,
+    policy: ReportModePolicy | None = None,
+    review: JsonlReviewRecord | None = None,
+) -> str:
+    """Return a human-facing bucket label without changing JSONL contracts."""
+    is_ungrounded = False
+    if policy is not None:
+        is_ungrounded = not policy.semantic_rankings_grounded
+    if review is not None and review["hint_relationship"] == "not_evaluated":
+        is_ungrounded = True
+    if bucket == "recommended" and is_ungrounded:
+        return "clean-triage-pass"
+    return bucket
+
+
+def _humanize_review_bucket_text(
+    bucket: str,
+    *,
+    review: JsonlReviewRecord | None = None,
+) -> str:
     """Return user-facing phrasing for gallery recommendations."""
+    display_bucket = _review_display_bucket_label(bucket, review=review)
     bucket_labels = {
         "recommended": "recommended",
+        "clean-triage-pass": "clean triage pass",
         "caveat": "use with caveats",
         "avoid": "avoid for now",
     }
-    return bucket_labels.get(bucket, bucket.replace("_", " "))
+    return bucket_labels.get(display_bucket, display_bucket.replace("_", " "))
 
 
 def _humanize_review_verdict_text(verdict: str) -> str:
@@ -11586,7 +11618,7 @@ def _build_markdown_review_block_rows(result: PerformanceResult) -> list[tuple[s
         (
             "Recommendation",
             (
-                f"{_humanize_review_bucket_text(review['user_bucket'])}; "
+                f"{_humanize_review_bucket_text(review['user_bucket'], review=review)}; "
                 f"review verdict: {_humanize_review_verdict_text(review['verdict'])}"
             ),
         ),
@@ -12169,7 +12201,10 @@ def _gallery_summary_status(result: PerformanceResult) -> str:
         status = "recommended" if result.success else "avoid"
         verdict = "not evaluated" if result.success else "runtime failure"
     else:
-        status = review["user_bucket"].replace("_", " ")
+        status = _review_display_bucket_label(
+            review["user_bucket"],
+            review=review,
+        ).replace("_", " ")
         verdict = _humanize_review_verdict_text(review["verdict"])
     return f"{_markdown_inline_code(status)} / {_markdown_inline_code(verdict)}"
 
@@ -12526,6 +12561,7 @@ class ModelCapabilityRunSignal:
 
     model: str
     success: bool
+    is_current: bool = False
     review_bucket: str | None = None
     capability_score: float | None = None
     hygiene_score: float | None = None
@@ -12558,6 +12594,7 @@ class ModelCapabilityRow:
     metadata_alignment_score: float | None
     generation_tps: float | None
     peak_memory_gb: float | None
+    current_status: str
     recommendation: str
     signal: str
 
@@ -15585,6 +15622,8 @@ def export_failure_repro_bundles(
 ) -> dict[str, Path]:
     """Write reproducibility bundles for failed and issue-clustered results."""
     bundles: dict[str, Path] = {}
+    latest_index_models: dict[str, dict[str, str | None]] = {}
+    latest_index_clusters: dict[str, dict[str, list[str]]] = {}
     timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
 
     prompt_hash = _sha256_text(prompt)
@@ -15697,6 +15736,34 @@ def export_failure_repro_bundles(
             logger.exception("Failed to write repro bundle for %s", result.model_name)
             continue
         bundles[result.model_name] = bundle_path
+        issue_cluster_id = issue_cluster.cluster_id if issue_cluster is not None else None
+        latest_index_models[result.model_name] = {
+            "bundle": bundle_path.name,
+            "issue_cluster_id": issue_cluster_id,
+            "issue_kind": issue_cluster.issue_kind if issue_cluster is not None else None,
+        }
+        if issue_cluster_id is not None:
+            cluster_entry = latest_index_clusters.setdefault(
+                issue_cluster_id,
+                {"models": [], "bundles": []},
+            )
+            cluster_entry["models"].append(result.model_name)
+            cluster_entry["bundles"].append(bundle_path.name)
+
+    if bundles:
+        index_payload: dict[str, object] = {
+            "schema_version": "1.0",
+            "generated_at_utc": datetime.now(UTC).isoformat(timespec="seconds"),
+            "models": latest_index_models,
+            "clusters": latest_index_clusters,
+        }
+        try:
+            _write_text_file(
+                output_dir / "latest_by_cluster.json",
+                json.dumps(index_payload, indent=2, sort_keys=True) + "\n",
+            )
+        except OSError:
+            logger.exception("Failed to write latest repro-bundle index.")
 
     return bundles
 
@@ -16878,6 +16945,166 @@ def _build_model_selection_rows(
     return rows
 
 
+def _model_selection_peak_gb(row: ModelSelectionRow) -> float | None:
+    """Return the captured peak-memory value for one selection row."""
+    return _generation_float_metric(row.result.generation, "peak_memory")
+
+
+def _model_selection_generation_tps(row: ModelSelectionRow) -> float | None:
+    """Return the captured generation-throughput value for one selection row."""
+    return _generation_float_metric(row.result.generation, "generation_tps")
+
+
+def _model_selection_row_is_usable(row: ModelSelectionRow) -> bool:
+    """Return True for rows suitable for current-run chooser recommendations."""
+    review = _build_jsonl_review_record(row.result)
+    if review is None or not row.result.success:
+        return False
+    return (
+        review["user_bucket"] != "avoid" and row.score >= MODEL_SELECTION_CHOOSER_MIN_HYGIENE_SCORE
+    )
+
+
+def _model_selection_row_is_current_avoid(row: ModelSelectionRow) -> bool:
+    """Return True for current-run failures and avoid-bucket outputs."""
+    if not row.result.success:
+        return True
+    review = _build_jsonl_review_record(row.result)
+    return review is not None and review["user_bucket"] == "avoid"
+
+
+def _model_selection_row_status(row: ModelSelectionRow) -> str:
+    """Return a concise human-facing status for a chooser row."""
+    review = _build_jsonl_review_record(row.result)
+    if review is None:
+        return "not-evaluated" if row.result.success else "runtime-failure"
+    return _review_display_bucket_label(review["user_bucket"], review=review)
+
+
+def _model_selection_chooser_table_rows(
+    rows: Sequence[ModelSelectionRow],
+) -> tuple[tuple[str, ...], ...]:
+    """Return compact chooser table cells for model-selection sections."""
+    return tuple(
+        (
+            f"`{MARKDOWN_ESCAPER.escape(row.result.model_name)}`",
+            format_field_value("peak_memory", _model_selection_peak_gb(row)) or "-",
+            format_field_value("generation_tps", _model_selection_generation_tps(row)) or "-",
+            f"{row.caption_score:.0f}",
+            f"`{MARKDOWN_ESCAPER.escape(_model_selection_row_status(row))}`",
+            MARKDOWN_ESCAPER.escape(
+                _build_result_output_preview(row.result, max_chars=96) or row.caveat
+            ),
+        )
+        for row in rows
+    )
+
+
+def _append_model_selection_chooser_section(
+    md: list[str],
+    *,
+    title: str,
+    rows: Sequence[ModelSelectionRow],
+    empty_text: str,
+) -> None:
+    """Append one compact practical chooser bucket."""
+    md.extend([f"### {title}", ""])
+    if not rows:
+        md.extend([f"- {empty_text}", ""])
+        return
+    md.extend(
+        render_report_markdown(
+            (
+                ReportTable(
+                    headers=("Model", "Peak GB", "Gen TPS", "Usefulness", "Status", "Evidence"),
+                    rows=_model_selection_chooser_table_rows(rows),
+                    markdown_escaped=True,
+                ),
+            )
+        )
+    )
+    md.append("")
+
+
+def _append_model_selection_quick_chooser(
+    md: list[str],
+    rows: Sequence[ModelSelectionRow],
+) -> None:
+    """Append practical model-user chooser buckets before the full shortlist."""
+    usable_rows = [row for row in rows if _model_selection_row_is_usable(row)]
+    under_4gb = [
+        row
+        for row in usable_rows
+        if (peak := _model_selection_peak_gb(row)) is not None
+        and peak <= MODEL_SELECTION_CHOOSER_SMALL_MEMORY_GB
+    ][:MODEL_SELECTION_CHOOSER_ROW_LIMIT]
+    under_8gb = [
+        row
+        for row in usable_rows
+        if (peak := _model_selection_peak_gb(row)) is not None
+        and peak <= MODEL_SELECTION_CHOOSER_MEDIUM_MEMORY_GB
+    ][:MODEL_SELECTION_CHOOSER_ROW_LIMIT]
+    fastest = sorted(
+        usable_rows,
+        key=lambda row: (
+            _model_selection_generation_tps(row) or 0.0,
+            row.caption_score,
+            row.score,
+        ),
+        reverse=True,
+    )[:MODEL_SELECTION_CHOOSER_ROW_LIMIT]
+    quality_any_memory = sorted(
+        usable_rows,
+        key=lambda row: (row.caption_score, row.score, _model_selection_generation_tps(row) or 0.0),
+        reverse=True,
+    )[:MODEL_SELECTION_CHOOSER_ROW_LIMIT]
+    current_avoid = [row for row in rows if _model_selection_row_is_current_avoid(row)][
+        :MODEL_SELECTION_CHOOSER_AVOID_ROW_LIMIT
+    ]
+
+    md.extend(
+        [
+            "## Quick Chooser",
+            "",
+            (
+                "Practical current-run buckets for model users. These are triage signals, "
+                "not grounded visual-quality claims."
+            ),
+            "",
+        ]
+    )
+    _append_model_selection_chooser_section(
+        md,
+        title="Best under 4 GB",
+        rows=under_4gb,
+        empty_text="No clean current-run candidates fit under this memory budget.",
+    )
+    _append_model_selection_chooser_section(
+        md,
+        title="Best under 8 GB",
+        rows=under_8gb,
+        empty_text="No clean current-run candidates fit under this memory budget.",
+    )
+    _append_model_selection_chooser_section(
+        md,
+        title="Fastest usable",
+        rows=fastest,
+        empty_text="No clean current-run candidates produced usable caption text.",
+    )
+    _append_model_selection_chooser_section(
+        md,
+        title="Quality if memory allows",
+        rows=quality_any_memory,
+        empty_text="No clean current-run candidates produced usable caption text.",
+    )
+    _append_model_selection_chooser_section(
+        md,
+        title="Current failures / avoid",
+        rows=current_avoid,
+        empty_text="No current-run failures or avoid-bucket outputs.",
+    )
+
+
 def _is_review_escalation(result: PerformanceResult) -> bool:
     """Return True for review rows that need maintainer attention."""
     review = _build_jsonl_review_record(result)
@@ -16908,6 +17135,8 @@ def _is_review_escalation(result: PerformanceResult) -> bool:
 def _append_review_user_buckets(
     md: list[str],
     bucket_groups: Mapping[str, Sequence[PerformanceResult]],
+    *,
+    mode_policy: ReportModePolicy | None = None,
 ) -> None:
     """Append user-facing recommendation buckets for the review digest."""
     md.extend(
@@ -16919,13 +17148,24 @@ def _append_review_user_buckets(
         ]
     )
     for bucket in ("recommended", "caveat", "needs_triage", "avoid"):
-        md.extend([f"### `{bucket}`", ""])
+        display_bucket = _review_display_bucket_label(bucket, policy=mode_policy)
+        md.extend([f"### `{display_bucket}`", ""])
+        if display_bucket == "clean-triage-pass":
+            md.extend(
+                [
+                    (
+                        "Clean in the current ungrounded triage run; visual correctness still "
+                        "needs gallery review or grounded metadata."
+                    ),
+                    "",
+                ]
+            )
         bucket_results = bucket_groups.get(bucket, [])
         if not bucket_results:
             if bucket == "recommended":
                 md.extend(
                     [
-                        "- None — no models produced clean output meeting all quality thresholds for this prompt.",
+                        "- None — no models produced clean triage output meeting all quality thresholds for this prompt.",
                         "",
                     ]
                 )
@@ -17148,6 +17388,8 @@ def generate_model_selection_report(
         diagnostics_filename=diagnostics_filename,
     )
 
+    _append_model_selection_quick_chooser(md, rows)
+
     md.extend(
         [
             "## Brief Caption Candidates",
@@ -17306,6 +17548,7 @@ def _capability_signal_from_result(
     return ModelCapabilityRunSignal(
         model=result.model_name,
         success=result.success,
+        is_current=True,
         review_bucket=review_bucket,
         capability_score=capability_score,
         hygiene_score=hygiene_score,
@@ -17352,7 +17595,11 @@ def _model_capability_recommendation(
 ) -> str:
     """Return a compact use-case recommendation for one aggregated model row."""
     recommendation = "needs-review"
-    if row.runs <= 0 or row.successes <= 0:
+    if row.current_status == "failed":
+        recommendation = "current-run-blocked"
+    elif row.current_status == "avoid":
+        recommendation = "avoid"
+    elif row.runs <= 0 or row.successes <= 0:
         recommendation = "integration-blocked"
     elif row.success_rate < CAPABILITY_UNSTABLE_SUCCESS_RATE:
         recommendation = "unstable"
@@ -17371,6 +17618,9 @@ def _model_capability_recommendation(
                 "repetitive",
                 "reasoning-leak",
                 "weight-mismatch",
+                "processor-error",
+                "model-error",
+                "model-config",
             )
         )
         if suppress_cataloging_scores and caption_ok and not latest_risky:
@@ -17389,6 +17639,19 @@ def _model_capability_recommendation(
         elif not suppress_cataloging_scores and keyword_ok:
             recommendation = "keywords"
     return recommendation
+
+
+def _model_capability_current_status(
+    current_signal: ModelCapabilityRunSignal | None,
+) -> str:
+    """Return a compact current-run status label for scorecard rows."""
+    if current_signal is None:
+        return "not-tested"
+    if not current_signal.success:
+        return "failed"
+    if current_signal.review_bucket in {"avoid", "caveat", "needs_triage"}:
+        return current_signal.review_bucket.replace("_", "-")
+    return "passed"
 
 
 def _collect_model_capability_signals(
@@ -17440,6 +17703,8 @@ def _model_capability_row_from_signals(
     """Aggregate one model's capability observations into a scorecard row."""
     runs = len(signals)
     successes = sum(1 for signal in signals if signal.success)
+    current_signal = next((signal for signal in reversed(signals) if signal.is_current), None)
+    latest_signal = current_signal or signals[-1]
     row = ModelCapabilityRow(
         model=model,
         runs=runs,
@@ -17475,8 +17740,9 @@ def _model_capability_row_from_signals(
         ),
         generation_tps=_capability_avg(signal.generation_tps for signal in signals),
         peak_memory_gb=_capability_avg(signal.peak_memory_gb for signal in signals),
+        current_status=_model_capability_current_status(current_signal),
         recommendation="",
-        signal=signals[-1].signal or "no flagged signals",
+        signal=latest_signal.signal or "no flagged signals",
     )
     return replace(
         row,
@@ -17523,10 +17789,10 @@ def _capability_score_cell(value: float | None) -> str:
 
 
 CAPABILITY_TABLE_HEADER_TEXT: Final[str] = (
-    "Model|Use|Runs|Success|Capability|Caption|Keyword|Metadata|Gen TPS|Peak GB|Latest signal"
+    "Model|Use|Current|Runs|Success|Capability|Caption|Keyword|Metadata|Gen TPS|Peak GB|Latest signal"
 )
 TRIAGE_CAPABILITY_TABLE_HEADER_TEXT: Final[str] = (
-    "Model|Use|Runs|Success|Clean|Hygiene|Caption|Gen TPS|Peak GB|Latest signal"
+    "Model|Use|Current|Runs|Success|Clean|Hygiene|Caption|Gen TPS|Peak GB|Latest signal"
 )
 
 
@@ -17539,6 +17805,7 @@ def _capability_table_row(
     common = (
         f"`{MARKDOWN_ESCAPER.escape(row.model)}`",
         MARKDOWN_ESCAPER.escape(row.recommendation),
+        MARKDOWN_ESCAPER.escape(row.current_status),
         str(row.runs),
         f"{row.success_rate:.0f}%",
     )
@@ -17582,6 +17849,7 @@ def _capability_json_row(row: ModelCapabilityRow) -> dict[str, JsonLike]:
         "metadata_alignment_avg": row.metadata_alignment_score,
         "generation_tps_avg": row.generation_tps,
         "peak_memory_gb_avg": row.peak_memory_gb,
+        "current_status": row.current_status,
         "recommendation": row.recommendation,
         "latest_signal": row.signal,
     }
@@ -17727,7 +17995,11 @@ def generate_review_report(
         )
 
     md.extend(_format_review_priorities_parts(report_context, html_output=False))
-    _append_review_user_buckets(md, bucket_groups)
+    _append_review_user_buckets(
+        md,
+        bucket_groups,
+        mode_policy=report_context.mode_policy,
+    )
     _append_review_issue_queue(
         md,
         report_context=report_context,
@@ -24434,6 +24706,122 @@ def save_run_json_report(
     _write_text_file(filename, json.dumps(payload, indent=2, sort_keys=True) + "\n")
 
 
+def _output_index_link(index_filename: Path, artifact_path: Path, label: str) -> str:
+    """Return a Markdown link from the output index to one artifact."""
+    target = _markdown_artifact_target(
+        report_filename=index_filename,
+        artifact_filename=artifact_path,
+    )
+    return f"[{MARKDOWN_ESCAPER.escape(label)}]({target})"
+
+
+def generate_output_index_report(
+    filename: Path,
+    *,
+    output_paths: ReportOutputPaths,
+    report_context: ReportRenderContext,
+    diagnostics_artifacts: DiagnosticsArtifacts | None = None,
+) -> None:
+    """Write a generated landing page that routes readers to the right artifact."""
+    summary = report_context.summary
+    policy = report_context.mode_policy
+    diagnostics_written = (
+        diagnostics_artifacts is not None and diagnostics_artifacts.diagnostics_written
+    )
+    issue_index = output_paths.diagnostics.parent.parent / "issues" / "index.md"
+    repro_index = (
+        output_paths.diagnostics.parent.parent / "repro_bundles" / "latest_by_cluster.json"
+    )
+    md = [
+        "# Check Models Output Index",
+        "",
+        _markdown_generated_stamp(),
+        "",
+        "## Run Snapshot",
+        "",
+        f"- Mode: {MARKDOWN_ESCAPER.escape(policy.eval_mode)}",
+        (
+            "- Selection basis: "
+            f"{MARKDOWN_ESCAPER.escape(policy.selection_basis)}"
+            + (" (grounded)" if policy.semantic_rankings_grounded else " (ungrounded)")
+        ),
+        f"- Models tested: {summary.get('total_models', len(report_context.result_set.results))}",
+        f"- Successful: {summary.get('successful_count', 0)}",
+        f"- Failed: {summary.get('failed_count', 0)}",
+        "",
+        "## For Model Users",
+        "",
+        (
+            "- Start with "
+            + _output_index_link(filename, output_paths.model_selection, "model_selection.md")
+            + " for the practical shortlist and memory/speed buckets."
+        ),
+        (
+            "- Use "
+            + _output_index_link(
+                filename,
+                output_paths.model_capabilities,
+                "model_capabilities.md",
+            )
+            + " for current status plus historical reliability."
+        ),
+        (
+            "- Inspect "
+            + _output_index_link(filename, output_paths.gallery_markdown, "model_gallery.md")
+            + " before treating a triage-clean model as visually correct."
+        ),
+        "",
+        "## For Maintainers",
+        "",
+    ]
+    if diagnostics_written:
+        md.extend(
+            [
+                (
+                    "- Start with "
+                    + _output_index_link(filename, output_paths.diagnostics, "diagnostics.md")
+                    + " for owner grouping, traceback excerpts, and failure clusters."
+                ),
+                (
+                    "- Use "
+                    + _output_index_link(filename, issue_index, "issues/index.md")
+                    + " for paste-ready upstream issue drafts."
+                ),
+                (
+                    "- Use "
+                    + _output_index_link(filename, repro_index, "latest_by_cluster.json")
+                    + " to find the current-run repro bundles without scanning the archive."
+                ),
+            ]
+        )
+    else:
+        md.append("- No maintainer issue queue was generated for this run.")
+    md.extend(
+        [
+            "",
+            "## Machine-Readable Data",
+            "",
+            (
+                "- "
+                + _output_index_link(filename, output_paths.run_json, "run.json")
+                + " contains the stable run-level contract."
+            ),
+            (
+                "- "
+                + _output_index_link(filename, output_paths.jsonl, "results.jsonl")
+                + " contains per-model diagnostics, timings, and review payloads."
+            ),
+            (
+                "- "
+                + _output_index_link(filename, output_paths.tsv, "results.tsv")
+                + " is optimized for spreadsheet inspection."
+            ),
+            "",
+        ]
+    )
+    _write_markdown_artifact(filename, md, artifact_name="Output index report")
+
+
 def _write_report_failure_jsonl(
     *,
     filename: Path,
@@ -25235,19 +25623,41 @@ def _issue_repro_image_ref(
     run_args: argparse.Namespace | None,
 ) -> str:
     """Return an image reference suitable for native upstream repro commands."""
+    raw_ref: str | None = None
     if image_path is not None:
-        return str(image_path)
-    if run_args is not None:
+        raw_ref = str(image_path)
+    elif run_args is not None:
         arg_image = getattr(run_args, "image", None)
         if isinstance(arg_image, Path):
-            return str(arg_image)
-        if isinstance(arg_image, str) and arg_image:
-            return arg_image
-        if isinstance(arg_image, Sequence) and not isinstance(arg_image, str | bytes | bytearray):
+            raw_ref = str(arg_image)
+        elif isinstance(arg_image, str) and arg_image:
+            raw_ref = arg_image
+        elif isinstance(arg_image, Sequence) and not isinstance(arg_image, str | bytes | bytearray):
             for candidate in arg_image:
                 if candidate:
-                    return str(candidate)
-    return "path/to/repro-image.jpg"
+                    raw_ref = str(candidate)
+                    break
+
+    if not raw_ref:
+        return "path/to/repro-image.jpg"
+
+    candidate_path = Path(raw_ref)
+    if not candidate_path.is_absolute():
+        return raw_ref
+    try:
+        return str(PurePosixPath(*candidate_path.resolve().relative_to(_REPO_ROOT).parts))
+    except (OSError, ValueError):
+        return candidate_path.name or "path/to/repro-image.jpg"
+
+
+def _issue_image_hash_line(image_path: Path | None) -> str | None:
+    """Return a portable image hash note for issue repro sections."""
+    if image_path is None:
+        return None
+    image_hash = _sha256_file(image_path)
+    if image_hash is None:
+        return None
+    return f"Image SHA256: `{MARKDOWN_ESCAPER.escape(image_hash)}`"
 
 
 def _native_mlx_vlm_load_kwargs(run_args: argparse.Namespace | None) -> dict[str, object]:
@@ -25581,6 +25991,13 @@ def _issue_repro_section(
         "These commands use `mlx-vlm` directly so the issue can be reproduced without "
         "installing the `check_models` harness."
     )
+    if image_ref != "path/to/repro-image.jpg":
+        parts.append(
+            f"Use a local copy of `{MARKDOWN_ESCAPER.escape(image_ref)}` or replace it with an "
+            "equivalent test image."
+        )
+    if image_hash_line := _issue_image_hash_line(image_path):
+        parts.append(image_hash_line)
     parts.append("")
     parts.append("Native CLI:")
     _append_markdown_code_block(parts, cli_commands, language="bash")
@@ -26035,7 +26452,9 @@ def _write_environment_failure_diagnostics(
 
 def _resolve_report_output_paths(args: argparse.Namespace) -> ReportOutputPaths:
     """Resolve all final report/log output paths once for finalization."""
+    run_json_path = args.output_run_json.resolve()
     return ReportOutputPaths(
+        index=run_json_path.parent / DEFAULT_OUTPUT_INDEX.name,
         html=args.output_html.resolve(),
         markdown=args.output_markdown.resolve(),
         gallery_markdown=args.output_gallery_markdown.resolve(),
@@ -26045,7 +26464,7 @@ def _resolve_report_output_paths(args: argparse.Namespace) -> ReportOutputPaths:
         model_capabilities_json=args.output_model_capabilities_json.resolve(),
         tsv=args.output_tsv.resolve(),
         jsonl=args.output_jsonl.resolve(),
-        run_json=args.output_run_json.resolve(),
+        run_json=run_json_path,
         diagnostics=args.output_diagnostics.resolve(),
         log=args.output_log.resolve(),
         environment=args.output_env.resolve(),
@@ -26068,6 +26487,7 @@ def _public_artifact_path(path: Path) -> str:
 def _public_output_artifact_map(output_paths: ReportOutputPaths) -> dict[str, str]:
     """Return stable artifact paths for run-level JSON metadata."""
     return {
+        "output_index": _public_artifact_path(output_paths.index),
         "results_html": _public_artifact_path(output_paths.html),
         "results_markdown": _public_artifact_path(output_paths.markdown),
         "model_selection": _public_artifact_path(output_paths.model_selection),
@@ -26217,6 +26637,17 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
                 output_paths=_public_output_artifact_map(output_paths),
             ),
         ),
+        ReportArtifact(
+            key="output_index",
+            label="   Output Index:   ",
+            path=output_paths.index,
+            job=lambda: generate_output_index_report(
+                output_paths.index,
+                output_paths=output_paths,
+                report_context=inputs.report_context,
+                diagnostics_artifacts=inputs.diagnostics_artifacts,
+            ),
+        ),
     )
 
 
@@ -26279,7 +26710,11 @@ def _prune_repro_bundles(
     seen_runs: set[str] = set()
     run_order: list[str] = []
     for entry in entries:
-        if entry.is_dir() or not entry.name.endswith(".json"):
+        if (
+            entry.is_dir()
+            or not entry.name.endswith(".json")
+            or _REPRO_BUNDLE_ARCHIVE_RE.match(entry.name) is None
+        ):
             continue
         run_prefix = entry.name[:16]
         if run_prefix not in seen_runs:
@@ -26297,7 +26732,7 @@ def _prune_repro_bundles(
             except OSError:
                 pass
             continue
-        if not entry.name.endswith(".json"):
+        if not entry.name.endswith(".json") or _REPRO_BUNDLE_ARCHIVE_RE.match(entry.name) is None:
             continue
         run_prefix = entry.name[:16]
         prune = run_prefix not in keep_prefixes
@@ -26515,6 +26950,7 @@ def _print_reports_dashboard(
         clickable_link = f"[link={uri}]{uri}[/link]"
         table.add_row(label, purpose, clickable_link)
 
+    add_row("Output Index", "Start here for model users and maintainers", output_paths.index)
     add_row("HTML Report", "Interactive dashboard with charts & filters", output_paths.html)
     add_row("Markdown Report", "Mode-aware public run index", output_paths.markdown)
     add_row("Model Selection", "Ranked caption/metadata shortlist", output_paths.model_selection)
