@@ -7,6 +7,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Keep cross-artifact report links portable across both `github` and
+  `relative` link styles, including the Markdown gallery back-link to
+  `results.md`, and add a regression sweep covering the generated Markdown
+  reports plus core non-Markdown artifact presence and shape.
 - Bump the package version to `0.8.4` for the MLX stack dependency sync,
   upstream passthrough-diagnostics refinement, and gallery output-cost summary.
 - Align the project Transformers compatibility window with the current

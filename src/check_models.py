@@ -16802,7 +16802,11 @@ def generate_markdown_gallery_report(
         ),
     )
     md.append("")
-    md.append("_Action Snapshot: see [results.md](results.md) for the full summary._")
+    results_target = _markdown_artifact_target(
+        report_filename=filename,
+        artifact_filename=filename.with_name("results.md"),
+    )
+    md.append(f"_Action Snapshot: see [results.md]({results_target}) for the full summary._")
     md.append("")
     md.extend(
         _build_gallery_stamps_section(

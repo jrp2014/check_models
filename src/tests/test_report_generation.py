@@ -135,11 +135,201 @@ def _extract_markdown_subsection(
 _GENERATED_STAMP_EMPHASIS_HEADING_RE = re.compile(
     r"(?m)^_(?:Generated on|Report generated on).+_$",
 )
+_MARKDOWN_LINK_TARGET_RE = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
+_URL_SCHEME_RE = re.compile(r"^[a-z][a-z0-9+.-]*:", re.IGNORECASE)
+_PUBLISHED_OUTPUT_GITHUB_TARGET_RE = re.compile(
+    rf"^{re.escape(check_models._GITHUB_REPO_URL)}/(?:blob|tree)/"
+    rf"{re.escape(check_models._GITHUB_DEFAULT_BRANCH)}/src/output(?:/|$)"
+)
 
 
 def _assert_no_generated_stamp_emphasis_headings(content: str) -> None:
     """Generated timestamp metadata should not trip markdownlint MD036."""
     assert _GENERATED_STAMP_EMPHASIS_HEADING_RE.search(content) is None
+
+
+def _extract_markdown_link_targets(content: str) -> list[str]:
+    """Return Markdown link targets from one generated artifact."""
+    return [match.group(1) for match in _MARKDOWN_LINK_TARGET_RE.finditer(content)]
+
+
+def _is_relative_markdown_target(target: str) -> bool:
+    """Return True for non-anchor Markdown targets without a URL scheme."""
+    return not target.startswith("#") and _URL_SCHEME_RE.match(target) is None
+
+
+def _is_published_output_github_target(target: str) -> bool:
+    """Return True for canonical GitHub links into this repo's published output tree."""
+    return _PUBLISHED_OUTPUT_GITHUB_TARGET_RE.match(target.split("#", 1)[0]) is not None
+
+
+def _relative_output_artifact_map(
+    output_dir: Path,
+    output_paths: check_models.ReportOutputPaths,
+) -> dict[str, str]:
+    """Return a stable run-json artifact map rooted at one output directory."""
+    return {
+        "index": output_paths.index.relative_to(output_dir).as_posix(),
+        "results_html": output_paths.html.relative_to(output_dir).as_posix(),
+        "results_markdown": output_paths.markdown.relative_to(output_dir).as_posix(),
+        "model_gallery": output_paths.gallery_markdown.relative_to(output_dir).as_posix(),
+        "model_selection": output_paths.model_selection.relative_to(output_dir).as_posix(),
+        "model_capabilities": output_paths.model_capabilities.relative_to(output_dir).as_posix(),
+        "model_capabilities_json": output_paths.model_capabilities_json.relative_to(
+            output_dir
+        ).as_posix(),
+        "review": output_paths.review.relative_to(output_dir).as_posix(),
+        "diagnostics": output_paths.diagnostics.relative_to(output_dir).as_posix(),
+        "results_tsv": output_paths.tsv.relative_to(output_dir).as_posix(),
+        "results_jsonl": output_paths.jsonl.relative_to(output_dir).as_posix(),
+        "run_json": output_paths.run_json.relative_to(output_dir).as_posix(),
+    }
+
+
+def _generate_output_artifacts_for_link_style(
+    tmp_path: Path,
+    *,
+    link_style: str,
+) -> tuple[Path, check_models.ReportOutputPaths, list[Path]]:
+    """Generate the core report artifact set for one link style."""
+    output_dir = tmp_path / link_style / "output"
+    reports_dir = output_dir / "reports"
+    reports_dir.mkdir(parents=True, exist_ok=True)
+
+    prompt = "Describe this image briefly."
+    versions = _stub_versions()
+    system_info = {"Python Version": "3.13"}
+    failure = _make_failure_with_details(
+        "org/broken",
+        error_msg="Model loading failed: boom",
+        failure_phase="model_load",
+        traceback_str="Traceback (most recent call last):\nValueError: boom",
+    )
+    results = [_make_success("org/good"), failure]
+    report_context = _build_report_render_context(results=results, prompt=prompt)
+    output_paths = check_models.ReportOutputPaths(
+        index=output_dir / "index.md",
+        html=reports_dir / "results.html",
+        markdown=reports_dir / "results.md",
+        gallery_markdown=reports_dir / "model_gallery.md",
+        review=reports_dir / "review.md",
+        model_selection=reports_dir / "model_selection.md",
+        model_capabilities=reports_dir / "model_capabilities.md",
+        model_capabilities_json=output_dir / "model_capabilities.json",
+        tsv=reports_dir / "results.tsv",
+        jsonl=output_dir / "results.jsonl",
+        run_json=output_dir / "run.json",
+        diagnostics=reports_dir / "diagnostics.md",
+        log=output_dir / "check_models.log",
+        environment=output_dir / "environment.log",
+    )
+    bundle_path = output_dir / "repro_bundles" / "broken.json"
+    bundle_path.parent.mkdir(parents=True, exist_ok=True)
+    bundle_path.write_text("{}", encoding="utf-8")
+    repro_bundles = {failure.model_name: bundle_path}
+    diagnostics_snapshot = _build_diagnostics_snapshot(results=results, prompt=prompt)
+
+    with patch.object(check_models._LinkStyleState, "value", link_style):
+        generate_html_report(
+            results=results,
+            filename=output_paths.html,
+            versions=versions,
+            prompt=prompt,
+            total_runtime_seconds=1.0,
+            report_context=report_context,
+        )
+        generate_markdown_report(
+            results=results,
+            filename=output_paths.markdown,
+            versions=versions,
+            prompt=prompt,
+            total_runtime_seconds=1.0,
+            report_context=report_context,
+            model_selection_filename=output_paths.model_selection,
+            gallery_filename=output_paths.gallery_markdown,
+            review_filename=output_paths.review,
+            log_filename=output_paths.log,
+        )
+        generate_markdown_gallery_report(
+            results=results,
+            filename=output_paths.gallery_markdown,
+            prompt=prompt,
+            report_context=report_context,
+        )
+        check_models.generate_model_selection_report(
+            results,
+            output_paths.model_selection,
+            prompt=prompt,
+            report_context=report_context,
+        )
+        check_models.generate_model_capability_scorecard(
+            results,
+            output_paths.model_capabilities,
+            output_paths.model_capabilities_json,
+            prompt=prompt,
+            report_context=report_context,
+        )
+        generate_review_report(
+            results=results,
+            filename=output_paths.review,
+            prompt=prompt,
+            report_context=report_context,
+            log_filename=output_paths.log,
+            gallery_filename=output_paths.gallery_markdown,
+            repro_bundles=repro_bundles,
+        )
+        generate_diagnostics_report(
+            results=results,
+            filename=output_paths.diagnostics,
+            versions=versions,
+            system_info=system_info,
+            prompt=prompt,
+            repro_bundles=repro_bundles,
+            diagnostics_snapshot=diagnostics_snapshot,
+        )
+        generate_tsv_report(
+            results=results,
+            filename=output_paths.tsv,
+            report_context=report_context,
+        )
+        check_models.save_jsonl_report(
+            results=results,
+            filename=output_paths.jsonl,
+            prompt=prompt,
+            system_info=system_info,
+            library_versions=versions,
+        )
+        check_models.save_run_json_report(
+            results,
+            output_paths.run_json,
+            versions=versions,
+            prompt=prompt,
+            total_runtime_seconds=1.0,
+            report_context=report_context,
+            output_paths=_relative_output_artifact_map(output_dir, output_paths),
+        )
+        issue_reports = _generate_github_issue_reports(
+            diagnostics_snapshot=diagnostics_snapshot,
+            output_dir=output_dir,
+            versions=versions,
+            system_info=system_info,
+            repro_bundles=repro_bundles,
+            run_args=None,
+            prompt=prompt,
+        )
+        check_models.generate_output_index_report(
+            output_paths.index,
+            output_paths=output_paths,
+            report_context=report_context,
+            diagnostics_artifacts=DiagnosticsArtifacts(
+                snapshot=diagnostics_snapshot,
+                diagnostics_written=True,
+                repro_bundles=repro_bundles,
+                issue_reports=issue_reports,
+            ),
+        )
+
+    return output_dir, output_paths, sorted(output_dir.rglob("*.md"))
 
 
 def _make_success(name: str = "org/model-ok") -> PerformanceResult:
@@ -1026,6 +1216,104 @@ class TestMarkdownReportEdgeCases:
 
         for path in generated_paths:
             _assert_no_generated_stamp_emphasis_headings(path.read_text(encoding="utf-8"))
+
+    def test_generated_markdown_artifacts_keep_selected_output_link_style(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Generated artifacts should keep link-style rules while non-Markdown outputs stay stable."""
+        expected_markdown_artifacts = {
+            "index.md",
+            "issues/index.md",
+            "reports/diagnostics.md",
+            "reports/model_capabilities.md",
+            "reports/model_gallery.md",
+            "reports/model_selection.md",
+            "reports/results.md",
+            "reports/review.md",
+        }
+        expected_non_markdown_artifacts = {
+            "model_capabilities.json",
+            "reports/results.html",
+            "reports/results.tsv",
+            "results.jsonl",
+            "run.json",
+        }
+        mode_summaries: dict[str, dict[str, object]] = {}
+
+        for link_style in ("github", "relative"):
+            output_dir, output_paths, markdown_paths = _generate_output_artifacts_for_link_style(
+                tmp_path,
+                link_style=link_style,
+            )
+            file_paths = {
+                path.relative_to(output_dir).as_posix()
+                for path in output_dir.rglob("*")
+                if path.is_file()
+            }
+            relative_paths = {path.relative_to(output_dir).as_posix() for path in markdown_paths}
+            assert expected_markdown_artifacts.issubset(relative_paths)
+            assert expected_non_markdown_artifacts.issubset(file_paths)
+            assert any(path.startswith("issues/issue_") for path in relative_paths)
+
+            link_targets = [
+                target
+                for path in markdown_paths
+                for target in _extract_markdown_link_targets(path.read_text(encoding="utf-8"))
+            ]
+            relative_targets = [
+                target for target in link_targets if _is_relative_markdown_target(target)
+            ]
+            github_output_targets = [
+                target for target in link_targets if _is_published_output_github_target(target)
+            ]
+
+            if link_style == "github":
+                assert github_output_targets
+                assert relative_targets == []
+            else:
+                assert relative_targets
+                assert github_output_targets == []
+
+            html_content = output_paths.html.read_text(encoding="utf-8")
+            tsv_lines = output_paths.tsv.read_text(encoding="utf-8").splitlines()
+            jsonl_records = [
+                json.loads(line)
+                for line in output_paths.jsonl.read_text(encoding="utf-8").splitlines()
+            ]
+            run_payload = json.loads(output_paths.run_json.read_text(encoding="utf-8"))
+            capability_payload = json.loads(
+                output_paths.model_capabilities_json.read_text(encoding="utf-8")
+            )
+            mode_summaries[link_style] = {
+                "html_markers": (
+                    "Action Snapshot" in html_content,
+                    "org/good" in html_content,
+                    "org/broken" in html_content,
+                ),
+                "tsv_header": tsv_lines[1].split("\t"),
+                "jsonl_header": jsonl_records[0]["_type"],
+                "jsonl_models": [record["model"] for record in jsonl_records[1:]],
+                "run_json_counts": run_payload["counts"],
+                "run_json_artifacts": sorted(run_payload["artifacts"]),
+                "capability_models": [
+                    model_payload["model"] for model_payload in capability_payload["models"]
+                ],
+            }
+
+            assert tsv_lines[0].startswith("# generated_at:")
+            assert "Generated Text" in tsv_lines[1]
+            assert jsonl_records[0]["_type"] == "metadata"
+            assert len(jsonl_records[1:]) == 2
+            assert run_payload["schema_version"] == "1.0"
+            assert run_payload["counts"] == {
+                "models_total": 2,
+                "models_successful": 1,
+                "models_failed": 1,
+            }
+            assert len(capability_payload["models"]) == 2
+
+        assert mode_summaries["github"] == mode_summaries["relative"]
 
     def test_markdown_results_table_uses_human_summary_columns(self, tmp_path: Path) -> None:
         """Main Markdown table should omit low-signal upstream debug columns."""
