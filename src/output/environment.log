@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-07-03 13:52:57 BST
+FULL ENVIRONMENT DUMP - 2026-07-03 23:55:41 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -63,7 +63,7 @@ jaraco.classes==3.4.0
 jaraco.context==6.1.2
 jaraco.functools==4.5.0
 Jinja2==3.1.6
-jinxed==2.0.4
+jinxed==2.1.0
 jsonschema==4.26.0
 jsonschema-specifications==2025.9.1
 keras==3.15.0
@@ -130,7 +130,7 @@ pytest==9.1.1
 pytest-cov==7.1.0
 pytest-xdist==3.8.0
 python-dateutil==2.9.0.post0
-python-discovery==1.4.2
+python-discovery==1.4.3
 python-dotenv==1.2.2
 python-multipart==0.0.32
 PyYAML==6.0.3
@@ -204,5 +204,5 @@ yarl==1.24.2
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-07-03 13:52:57 BST
+Environment dump completed at 2026-07-03 23:55:41 BST
 ================================================================================
