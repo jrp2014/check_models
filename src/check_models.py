@@ -230,11 +230,16 @@ DEFAULT_PENALTY_CONTEXT_SIZE: Final[int] = 20
 DEFAULT_THINKING_END_MARKER: Final[str] = "</think>"
 MAX_SAFE_TEXT_FILE_BYTES: Final[int] = 16 * 1024 * 1024
 SAFE_TEXT_FILE_READ_CHUNK_BYTES: Final[int] = 64 * 1024
+MAX_DISTRIBUTION_TEXT_FILE_BYTES: Final[int] = 64 * 1024
 ROOT_PATH: Final[Path] = Path(os.sep)
 ALLOWED_SYSTEM_SYMLINK_PARENTS: Final[dict[Path, Path]] = {
     ROOT_PATH / "tmp": ROOT_PATH / "private" / "tmp",
     ROOT_PATH / "var": ROOT_PATH / "private" / "var",
 }
+DISTRIBUTION_DIRECT_URL_METADATA_FILE: Final[str] = "direct_url.json"
+ALLOWED_DISTRIBUTION_TEXT_FILES: Final[frozenset[str]] = frozenset(
+    {DISTRIBUTION_DIRECT_URL_METADATA_FILE},
+)
 
 
 def _is_allowed_system_symlink_parent(path: Path) -> bool:
@@ -876,13 +881,11 @@ else:
 # defusedxml is required by Pillow's Image.getxmp() for safe XMP/XML parsing.
 # Declared explicitly in pyproject.toml even though Pillow[xmp] may also pull it
 # transitively, so _extract_xmp_metadata() fails clearly if the environment drifts.
-_defusedxml_available: bool
 try:
-    import defusedxml.ElementTree  # noqa: F401 — imported for availability check
-
-    _defusedxml_available = True
-except ImportError:
+    _defusedxml_available = find_spec("defusedxml.ElementTree") is not None
+except (ImportError, AttributeError, ValueError):
     _defusedxml_available = False
+if not _defusedxml_available:
     _temp_logger.warning(
         "defusedxml not installed — XMP metadata extraction will be disabled. "
         "Install with: pip install defusedxml",
@@ -7485,23 +7488,59 @@ def get_library_versions() -> LibraryVersionDict:
     }
 
 
+def _distribution_metadata_file_path(
+    package_distribution: Distribution,
+    metadata_filename: str,
+) -> Path | None:
+    """Resolve an exact dist-info metadata file path from distribution records."""
+    try:
+        distribution_files = package_distribution.files
+    except (OSError, RuntimeError, ValueError):
+        return None
+    if distribution_files is None:
+        return None
+
+    for distribution_file in distribution_files:
+        if distribution_file.name != metadata_filename:
+            continue
+        if not distribution_file.parent.name.endswith(".dist-info"):
+            continue
+        try:
+            return Path(str(package_distribution.locate_file(distribution_file)))
+        except (OSError, RuntimeError, ValueError):
+            return None
+    return None
+
+
 def _distribution_text_file(distribution_name: str, filename: str) -> str | None:
-    """Read optional distribution metadata text without importing the package."""
+    """Read allowlisted distribution metadata text without importing the package."""
+    if filename not in ALLOWED_DISTRIBUTION_TEXT_FILES:
+        return None
+
     try:
         package_distribution = distribution(distribution_name)
     except PackageNotFoundError:
         return None
+    metadata_path = _distribution_metadata_file_path(
+        package_distribution,
+        DISTRIBUTION_DIRECT_URL_METADATA_FILE,
+    )
+    if metadata_path is None:
+        return None
     try:
-        return package_distribution.read_text(  # skylos: ignore[SKY-D325] fixed importlib metadata filename, not a user path.
-            filename,
+        return _read_text_file(
+            metadata_path,
+            max_bytes=MAX_DISTRIBUTION_TEXT_FILE_BYTES,
         )
-    except (FileNotFoundError, OSError, ValueError):
+    except (OSError, UnicodeDecodeError, ValueError):
         return None
 
 
 def _distribution_is_editable(distribution_name: str) -> bool:
     """Return True when package metadata marks a distribution as editable."""
-    direct_url_text = _distribution_text_file(distribution_name, "direct_url.json")
+    direct_url_text = _distribution_text_file(
+        distribution_name, DISTRIBUTION_DIRECT_URL_METADATA_FILE
+    )
     if not direct_url_text:
         return False
     try:

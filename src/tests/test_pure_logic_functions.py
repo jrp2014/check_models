@@ -141,6 +141,51 @@ class TestToolchainHelpers:
         assert "Skipping malformed history record in history" in caplog.text
 
 
+class TestDistributionMetadataHelpers:
+    """Tests for installed distribution metadata helpers."""
+
+    def test_distribution_text_file_rejects_unknown_metadata_filename_before_lookup(
+        self,
+        mod: types.ModuleType,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Unknown metadata filenames should not reach importlib.metadata."""
+
+        def fail_distribution(_distribution_name: str) -> object:
+            pytest.fail("distribution lookup should not run for disallowed filenames")
+
+        monkeypatch.setattr(mod, "distribution", fail_distribution)
+
+        assert mod._distribution_text_file("example-package", "METADATA") is None
+        assert mod._distribution_text_file("example-package", "../direct_url.json") is None
+
+    def test_distribution_text_file_allows_direct_url_metadata(
+        self,
+        mod: types.ModuleType,
+        monkeypatch: pytest.MonkeyPatch,
+        tmp_path: Path,
+    ) -> None:
+        """direct_url.json should remain readable for editable-install detection."""
+        metadata_file = tmp_path / "direct_url.json"
+        metadata_file.write_text('{"dir_info": {"editable": true}}', encoding="utf-8")
+
+        class FakeDistribution:
+            files = (Path("example-1.0.dist-info") / "direct_url.json",)
+
+            def locate_file(self, filename: Path) -> Path:
+                assert filename == Path("example-1.0.dist-info") / "direct_url.json"
+                return metadata_file
+
+            def read_text(self, _filename: str) -> str:
+                pytest.fail("direct_url.json should be read through bounded safe I/O")
+
+        monkeypatch.setattr(mod, "distribution", lambda _distribution_name: FakeDistribution())
+
+        assert mod._distribution_text_file("example-package", "direct_url.json") == (
+            '{"dir_info": {"editable": true}}'
+        )
+
+
 class TestSafeTextFileIO:
     """Tests for symlink-resistant text file helpers."""
 

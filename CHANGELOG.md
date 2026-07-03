@@ -126,6 +126,9 @@ Notable changes to this project will be documented in this file.
   the Skylos development floor to `4.27.0`, and route TSV test fixture reads
   through bounded no-follow I/O so the advisory `--llm` scan is cleared without
   adding suppressions.
+- Refactor the `defusedxml` availability probe to avoid an unused import
+  suppression, and restrict distribution metadata reads to an explicit
+  `direct_url.json` allowlist before touching `importlib.metadata`.
 
 ### Fixed
 

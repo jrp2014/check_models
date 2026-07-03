@@ -1259,6 +1259,20 @@ def test_tsv_output_tests_use_safe_text_reads_for_skylos_advisory_scan() -> None
     assert "path.read_text" not in test_source
 
 
+def test_defusedxml_probe_avoids_unused_import_suppression() -> None:
+    """The defusedxml availability probe should not require a dead import suppression."""
+    check_models_source = (PKG_ROOT / "check_models.py").read_text(encoding="utf-8")
+    defusedxml_probe = check_models_source[
+        check_models_source.index("defusedxml is required") : check_models_source.index(
+            "try:\n    import numpy as np",
+        )
+    ]
+
+    assert 'find_spec("defusedxml.ElementTree")' in defusedxml_probe
+    assert "import defusedxml.ElementTree" not in defusedxml_probe
+    assert "F401" not in defusedxml_probe
+
+
 @pytest.mark.subprocess
 def test_pyrefly_quality_gate_fails_on_warnings(tmp_path: Path) -> None:
     """The quality helper should treat Pyrefly warnings as gate failures."""
