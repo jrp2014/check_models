@@ -1,14 +1,14 @@
 <!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
 
-# \[mlx\]\[MLX: Model load / weight/config mismatch\] Weight/config mismatch during model load affecting 1 model(s)
+# \[model configuration/repository\]\[Model config: Processor load / processor error\] Processor config is missing image processor affecting 2 model(s)
 
 ## Summary
 
-1 model(s) show **MLX: Model load / weight/config mismatch** that should be filed against mlx.
+2 model(s) show **Model config: Processor load / processor error** that should be filed against model configuration / repository.
 
-- **Observed problem:** Weight/config mismatch during model load
-- **Target:** mlx
-- **Affected models:** 1
+- **Observed problem:** Processor config is missing image processor
+- **Target:** model configuration / repository
+- **Affected models:** 2
 - **Fixed when:** Load/generation completes or fails with a narrower owner.
 
 
@@ -16,16 +16,19 @@
 
 <!-- markdownlint-disable MD060 -->
 
-| Model                               | Observed Behavior                                                                                     | Token Counts   | Optional Context                                                                                                                                                                                 |
-|-------------------------------------|-------------------------------------------------------------------------------------------------------|----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/LFM2.5-VL-1.6B-bf16` | Missing 2 parameters: multi_modal_projector.layer_norm.bias, multi_modal_projector.layer_norm.weight. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260703T125909Z_004_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_MODEL_LOAD_WEIGHT_MISMATCH_7574b1189.json) |
+| Model                                           | Observed Behavior                                                       | Token Counts   | Optional Context                                                                                                                                                                                             |
+|-------------------------------------------------|-------------------------------------------------------------------------|----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/diffusiongemma-26B-A4B-it-8bit`  | Loaded processor has no image_processor; expected multimodal processor. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260703T125909Z_007_mlx-community_diffusiongemma-26B-A4B-it-8bit_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_49.json)  |
+| `mlx-community/diffusiongemma-26B-A4B-it-mxfp8` | Loaded processor has no image_processor; expected multimodal processor. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260703T125909Z_008_mlx-community_diffusiongemma-26B-A4B-it-mxfp8_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_0c.json) |
 <!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
 
-- `mlx-community/LFM2.5-VL-1.6B-bf16` fails with: Model loading failed: Missing 2 parameters: multi_modal_projector.layer_norm.bias, multi_modal_projector.layer_norm.weight.
-- Root exception: `builtins.ValueError`: Missing 2 parameters: <br>multi_modal_projector.layer_norm.bias,<br>multi_modal_projector.layer_norm.weight.
+- `mlx-community/diffusiongemma-26B-A4B-it-8bit` fails with: Loaded processor has no image_processor; expected multimodal processor.
+- Root exception: `builtins.ValueError`: Loaded processor has no image_processor; expected multimodal processor.
+- `mlx-community/diffusiongemma-26B-A4B-it-mxfp8` fails with: Loaded processor has no image_processor; expected multimodal processor.
+- Root exception: `builtins.ValueError`: Loaded processor has no image_processor; expected multimodal processor.
 
 
 ## Minimal Reproduction
@@ -35,7 +38,8 @@ These commands use `mlx-vlm` directly so the issue can be reproduced without ins
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/LFM2.5-VL-1.6B-bf16 --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/diffusiongemma-26B-A4B-it-8bit --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/diffusiongemma-26B-A4B-it-mxfp8 --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 Minimal Python repro (representative model):
@@ -45,7 +49,7 @@ from mlx_vlm.generate import generate
 from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load
 
-MODEL = 'mlx-community/LFM2.5-VL-1.6B-bf16'
+MODEL = 'mlx-community/diffusiongemma-26B-A4B-it-8bit'
 IMAGE = '/Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg'
 PROMPT = 'Describe this image briefly.'
 LOAD_KWARGS = {'trust_remote_code': True}
@@ -82,13 +86,14 @@ Generation/load config:
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "mlx-community/LFM2.5-VL-1.6B-bf16"
+  "model": "mlx-community/diffusiongemma-26B-A4B-it-8bit"
 }
 ```
 
 Optional advanced context:
 
-- `mlx-community/LFM2.5-VL-1.6B-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260703T125909Z_004_mlx-community_LFM2.5-VL-1.6B-bf16_MLX_MODEL_LOAD_WEIGHT_MISMATCH_7574b1189.json)
+- `mlx-community/diffusiongemma-26B-A4B-it-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260703T125909Z_007_mlx-community_diffusiongemma-26B-A4B-it-8bit_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_49.json)
+- `mlx-community/diffusiongemma-26B-A4B-it-mxfp8`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260703T125909Z_008_mlx-community_diffusiongemma-26B-A4B-it-mxfp8_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_0c.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -100,10 +105,10 @@ Optional advanced context:
 
 ## Fix Checklist
 
-- [ ] Compare checkpoint keys with the selected model class and model config.
-- [ ] Inspect missing/unexpected projector, scale, bias, and quantized-weight parameter names.
-- [ ] Verify the model repo revision matches the mlx-vlm/mlx loader expectations.
-- [ ] Reproduce after upgrading/downgrading mlx-vlm and mlx to isolate version compatibility.
+- [ ] Inspect `preprocessor_config.json`, `processor_config.json`, and AutoProcessor mapping.
+- [ ] Verify the loaded processor exposes the image processor expected by mlx-vlm.
+- [ ] Check whether the model repo needs processor files or mlx-vlm needs a fallback path.
+- [ ] Reproduce with the single affected model before judging output quality.
 
 
 ## Appendix: Environment
@@ -143,32 +148,51 @@ Optional advanced context:
 
 ## Appendix: Detailed Evidence
 
-### `mlx-community/LFM2.5-VL-1.6B-bf16`
+### `mlx-community/diffusiongemma-26B-A4B-it-8bit`
 
 Observed error:
 
 ```text
-Model loading failed: Missing 2 parameters: 
-multi_modal_projector.layer_norm.bias,
-multi_modal_projector.layer_norm.weight.
+Model preflight failed for mlx-community/diffusiongemma-26B-A4B-it-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
 
 Root exception:
 
 ```text
-builtins.ValueError: Missing 2 parameters: 
-multi_modal_projector.layer_norm.bias,
-multi_modal_projector.layer_norm.weight.
+builtins.ValueError: Loaded processor has no image_processor; expected multimodal processor.
 ```
 
 Traceback tail:
 
 ```text
-    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py", line 191, in load_weights
-    raise ValueError(f"Missing {num_missing} parameters: \n{missing}.")
-ValueError: Missing 2 parameters: 
-multi_modal_projector.layer_norm.bias,
-multi_modal_projector.layer_norm.weight.
+Traceback (most recent call last):
+ValueError: Loaded processor has no image_processor; expected multimodal processor.
+The above exception was the direct cause of the following exception:
+Traceback (most recent call last):
+ValueError: Model preflight failed for mlx-community/diffusiongemma-26B-A4B-it-8bit: Loaded processor has no image_processor; expected multimodal processor.
+```
+
+### `mlx-community/diffusiongemma-26B-A4B-it-mxfp8`
+
+Observed error:
+
+```text
+Model preflight failed for mlx-community/diffusiongemma-26B-A4B-it-mxfp8: Loaded processor has no image_processor; expected multimodal processor.
+```
+
+Root exception:
+
+```text
+builtins.ValueError: Loaded processor has no image_processor; expected multimodal processor.
+```
+
+Traceback tail:
+
+```text
+Traceback (most recent call last):
+ValueError: Loaded processor has no image_processor; expected multimodal processor.
+The above exception was the direct cause of the following exception:
+Traceback (most recent call last):
+ValueError: Model preflight failed for mlx-community/diffusiongemma-26B-A4B-it-mxfp8: Loaded processor has no image_processor; expected multimodal processor.
 ```
 
