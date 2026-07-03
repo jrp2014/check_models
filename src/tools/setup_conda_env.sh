@@ -221,7 +221,7 @@ install_dependencies() {
     log_success "Installed runtime, extras, and torch-backed model dependencies"
 
     # Development dependencies (optional)
-        read -p "Do you want to install development dependencies (ruff, mypy, ty, pyrefly, vulture, pytest, pydantic, pre-commit)? (y/N): " -n 1 -r
+    read -p "Do you want to install development dependencies (ruff, mypy, ty, pyrefly, vulture, Skylos, pytest, pydantic, pre-commit)? (y/N): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         log_info "Installing development dependencies..."
@@ -229,7 +229,7 @@ install_dependencies() {
         if grep -q "dev =" pyproject.toml; then
              python -m pip install -e ".[dev]"
         else
-             python -m pip install "ruff>=0.1.0" "mypy>=1.8.0" "ty" "pyrefly" "vulture>=2.16" "pytest>=8.0.0" "pytest-cov>=4.0.0" "pydantic>=2.0.0" "types-defusedxml" "pre-commit"
+             python -m pip install "ruff>=0.1.0" "mypy>=1.8.0" "ty" "pyrefly" "vulture>=2.16" "skylos>=4.27.0" "pytest>=8.0.0" "pytest-cov>=4.0.0" "pydantic>=2.0.0" "types-defusedxml" "pre-commit"
         fi
 
         if command -v npm &> /dev/null; then

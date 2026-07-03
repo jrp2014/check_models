@@ -1,10 +1,10 @@
 """Tests for TSV output generation."""
 
-import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
 import check_models
+from tools import safe_io
 
 
 @dataclass
@@ -21,7 +21,7 @@ class MockGenerationResult:
 
 def _read_tsv_record(path: Path) -> dict[str, str]:
     """Return the first data row keyed by stripped TSV headers."""
-    content = path.read_text(encoding="utf-8")
+    content = safe_io.read_text_no_follow(path)
     data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
     headers = [cell.strip() for cell in data_lines[0].split("\t")]
     values = [cell.strip() for cell in data_lines[1].split("\t")]
@@ -49,7 +49,7 @@ def test_generate_tsv_report_basic(tmp_path: Path) -> None:
     assert output_file.exists()
 
     # Read and verify content
-    content = output_file.read_text(encoding="utf-8")
+    content = safe_io.read_text_no_follow(output_file)
     # Skip metadata comment line (starts with #)
     data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
 
@@ -61,7 +61,7 @@ def test_generate_tsv_report_basic(tmp_path: Path) -> None:
     assert "\t" in data_lines[1]  # Data line
 
 
-def test_tsv_escapes_tabs_in_values() -> None:
+def test_tsv_escapes_tabs_in_values(tmp_path: Path) -> None:
     """Should normalize tabs into visible spaces in compact output previews."""
     results = [
         check_models.PerformanceResult(
@@ -74,21 +74,17 @@ def test_tsv_escapes_tabs_in_values() -> None:
         ),
     ]
 
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".tsv", delete=False) as f:
-        output_file = Path(f.name)
+    output_file = tmp_path / "tabs.tsv"
 
-    try:
-        check_models.generate_tsv_report(results, output_file)
-        record = _read_tsv_record(output_file)
+    check_models.generate_tsv_report(results, output_file)
+    record = _read_tsv_record(output_file)
 
-        # Shared output previews normalize internal whitespace before TSV escaping
-        assert "Line with tab character" in record["Output"]
-        assert "Line with    tab character" in record["Generated Text"]
-    finally:
-        output_file.unlink()
+    # Shared output previews normalize internal whitespace before TSV escaping
+    assert "Line with tab character" in record["Output"]
+    assert "Line with    tab character" in record["Generated Text"]
 
 
-def test_tsv_escapes_newlines_in_values() -> None:
+def test_tsv_escapes_newlines_in_values(tmp_path: Path) -> None:
     r"""Should normalize embedded newlines into a single-line preview."""
     results = [
         check_models.PerformanceResult(
@@ -101,27 +97,23 @@ def test_tsv_escapes_newlines_in_values() -> None:
         ),
     ]
 
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".tsv", delete=False) as f:
-        output_file = Path(f.name)
+    output_file = tmp_path / "newlines.tsv"
 
-    try:
-        check_models.generate_tsv_report(results, output_file)
-        content = output_file.read_text(encoding="utf-8")
+    check_models.generate_tsv_report(results, output_file)
+    content = safe_io.read_text_no_follow(output_file)
 
-        # Content should be 3 lines: metadata comment + header + 1 data row
-        data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
-        assert len(data_lines) == 2
+    # Content should be 3 lines: metadata comment + header + 1 data row
+    data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
+    assert len(data_lines) == 2
 
-        # Shared output previews collapse multiline output into a readable one-line preview
-        record = _read_tsv_record(output_file)
-        assert "Line 1 Line 2 Line 3" in record["Output"]
-        assert "\\n" not in record["Output"]
-        assert "Line 1\\nLine 2\\nLine 3" in record["Generated Text"]
-    finally:
-        output_file.unlink()
+    # Shared output previews collapse multiline output into a readable one-line preview
+    record = _read_tsv_record(output_file)
+    assert "Line 1 Line 2 Line 3" in record["Output"]
+    assert "\\n" not in record["Output"]
+    assert "Line 1\\nLine 2\\nLine 3" in record["Generated Text"]
 
 
-def test_tsv_removes_html_tags_from_headers() -> None:
+def test_tsv_removes_html_tags_from_headers(tmp_path: Path) -> None:
     """Should remove HTML tags like <br> from headers."""
     results = [
         check_models.PerformanceResult(
@@ -134,24 +126,20 @@ def test_tsv_removes_html_tags_from_headers() -> None:
         ),
     ]
 
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".tsv", delete=False) as f:
-        output_file = Path(f.name)
+    output_file = tmp_path / "headers.tsv"
 
-    try:
-        check_models.generate_tsv_report(results, output_file)
-        content = output_file.read_text(encoding="utf-8")
+    check_models.generate_tsv_report(results, output_file)
+    content = safe_io.read_text_no_follow(output_file)
 
-        # Header should not contain HTML tags (skip metadata comment line)
-        data_lines = [ln for ln in content.split("\n") if not ln.startswith("#")]
-        header_line = data_lines[0]
-        assert "<br>" not in header_line
-        assert "<" not in header_line
-        assert ">" not in header_line
-    finally:
-        output_file.unlink()
+    # Header should not contain HTML tags (skip metadata comment line)
+    data_lines = [ln for ln in content.split("\n") if not ln.startswith("#")]
+    header_line = data_lines[0]
+    assert "<br>" not in header_line
+    assert "<" not in header_line
+    assert ">" not in header_line
 
 
-def test_tsv_handles_failed_results() -> None:
+def test_tsv_handles_failed_results(tmp_path: Path) -> None:
     """Should handle failed results with error messages."""
     results = [
         check_models.PerformanceResult(
@@ -163,24 +151,20 @@ def test_tsv_handles_failed_results() -> None:
         ),
     ]
 
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".tsv", delete=False) as f:
-        output_file = Path(f.name)
+    output_file = tmp_path / "failed.tsv"
 
-    try:
-        check_models.generate_tsv_report(results, output_file)
-        content = output_file.read_text(encoding="utf-8")
+    check_models.generate_tsv_report(results, output_file)
+    content = safe_io.read_text_no_follow(output_file)
 
-        # Should have metadata comment + header + data row
-        data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
-        assert len(data_lines) == 2
+    # Should have metadata comment + header + data row
+    data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
+    assert len(data_lines) == 2
 
-        # Error message should be in the output
-        assert "Error" in content or "Failed to load model" in content
-    finally:
-        output_file.unlink()
+    # Error message should be in the output
+    assert "Error" in content or "Failed to load model" in content
 
 
-def test_tsv_uses_shared_output_preview_cues_and_tail_marker() -> None:
+def test_tsv_uses_shared_output_preview_cues_and_tail_marker(tmp_path: Path) -> None:
     """Compact TSV output should expose issue cues and the output tail."""
     long_text = "Start of answer. " + ("filler text " * 40) + "TRAILING-SIGNAL"
     results = [
@@ -195,37 +179,28 @@ def test_tsv_uses_shared_output_preview_cues_and_tail_marker() -> None:
         ),
     ]
 
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".tsv", delete=False) as f:
-        output_file = Path(f.name)
+    output_file = tmp_path / "preview.tsv"
 
-    try:
-        check_models.generate_tsv_report(results, output_file)
-        content = output_file.read_text(encoding="utf-8")
+    check_models.generate_tsv_report(results, output_file)
+    content = safe_io.read_text_no_follow(output_file)
 
-        data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
-        data_row = data_lines[1]
-        assert "[context-echo; reasoning-leak]" in data_row
-        assert "[tail]" in data_row
-        assert "TRAILING-SIGNAL" in data_row
-    finally:
-        output_file.unlink()
+    data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
+    data_row = data_lines[1]
+    assert "[context-echo; reasoning-leak]" in data_row
+    assert "[tail]" in data_row
+    assert "TRAILING-SIGNAL" in data_row
 
 
-def test_tsv_empty_results() -> None:
+def test_tsv_empty_results(tmp_path: Path) -> None:
     """Should handle empty results list gracefully."""
     results: list[check_models.PerformanceResult] = []
 
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".tsv", delete=False) as f:
-        output_file = Path(f.name)
+    output_file = tmp_path / "empty.tsv"
 
-    try:
-        check_models.generate_tsv_report(results, output_file)
-        # Should not create file or create empty file for empty results
-        # Based on the implementation, it returns early if no results
-        assert not output_file.exists() or output_file.stat().st_size == 0
-    finally:
-        if output_file.exists():
-            output_file.unlink()
+    check_models.generate_tsv_report(results, output_file)
+    # Should not create file or create empty file for empty results
+    # Based on the implementation, it returns early if no results
+    assert not output_file.exists() or output_file.stat().st_size == 0
 
 
 def test_tsv_full_model_name(tmp_path: Path) -> None:
@@ -245,7 +220,7 @@ def test_tsv_full_model_name(tmp_path: Path) -> None:
     output_file = tmp_path / "test_full_name.tsv"
     check_models.generate_tsv_report(results, output_file)
 
-    content = output_file.read_text(encoding="utf-8")
+    content = safe_io.read_text_no_follow(output_file)
     # Skip metadata comment line
     data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
 
@@ -272,7 +247,7 @@ def test_tsv_caps_oversized_cells(tmp_path: Path) -> None:
     ]
     output_file = tmp_path / "results.tsv"
     check_models.generate_tsv_report(results, output_file)
-    content = output_file.read_text(encoding="utf-8")
+    content = safe_io.read_text_no_follow(output_file)
     data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
     headers = [cell.strip() for cell in data_lines[0].split("\t")]
     generated_text_index = headers.index("Generated Text")

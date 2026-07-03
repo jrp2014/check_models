@@ -647,7 +647,9 @@ def test_markdownlint_cli2_is_pinned_repo_local_and_updateable() -> None:
     package_lock = json.loads((PKG_ROOT / "package-lock.json").read_text(encoding="utf-8"))
 
     markdownlint_spec = package_json["devDependencies"]["markdownlint-cli2"]
+    assert markdownlint_spec == "^0.23.0"
     assert markdownlint_spec == package_lock["packages"][""]["devDependencies"]["markdownlint-cli2"]
+    assert package_lock["packages"]["node_modules/markdownlint-cli2"]["version"] == "0.23.0"
     assert package_json["overrides"]["smol-toml"] == "1.6.1"
     assert package_lock["packages"]["node_modules/smol-toml"]["version"] == "1.6.1"
 
@@ -1206,8 +1208,10 @@ def test_quality_script_runs_skylos_quality_gate() -> None:
     pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
     dev_deps = pyproject["project"]["optional-dependencies"]["dev"]
     quality_script = (PKG_ROOT / "tools" / "run_quality_checks.sh").read_text(encoding="utf-8")
+    setup_script = (PKG_ROOT / "tools" / "setup_conda_env.sh").read_text(encoding="utf-8")
 
-    assert any(dep.startswith("skylos") for dep in dev_deps)
+    assert "skylos>=4.27.0" in dev_deps
+    assert '"skylos>=4.27.0"' in setup_script
     assert (
         'quality_require_python_tool skylos "Install dev dependencies with: pip install -e .[dev]"'
         in quality_script
@@ -1244,6 +1248,15 @@ def test_skylos_verify_script_wraps_repo_context_verifier() -> None:
     assert 'cd "$(quality_repo_root)"' in script
     assert "quality_require_python_tool skylos" in script
     assert 'quality_run_python_tool skylos verify . --project-context "$@"' in script
+
+
+def test_tsv_output_tests_use_safe_text_reads_for_skylos_advisory_scan() -> None:
+    """TSV fixtures should use bounded no-follow reads instead of suppressing Skylos."""
+    test_source = (PKG_ROOT / "tests" / "test_tsv_output.py").read_text(encoding="utf-8")
+
+    assert "from tools import safe_io" in test_source
+    assert "safe_io.read_text_no_follow(path)" in test_source
+    assert "path.read_text" not in test_source
 
 
 @pytest.mark.subprocess

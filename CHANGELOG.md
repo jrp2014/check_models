@@ -122,6 +122,10 @@ Notable changes to this project will be documented in this file.
   stale lock-file workflow references, tightening local quality interpreter/tool
   resolution, and making `update.sh` system/npm-latest upgrades opt-in while
   preserving the unified script.
+- Keep repo-local Markdown linting locked to `markdownlint-cli2==0.23.0`, raise
+  the Skylos development floor to `4.27.0`, and route TSV test fixture reads
+  through bounded no-follow I/O so the advisory `--llm` scan is cleared without
+  adding suppressions.
 
 ### Fixed
 
