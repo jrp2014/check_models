@@ -1,31 +1,34 @@
 <!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
 
-# \[mlx-vlm\]\[mlx-vlm: Model load / model error\] mlx-vlm: Model load / model error: property 'eos_token_id' of 'ModelConfig' object has no setter affecting 1 model(s)
+# \[mlx-vlm\]\[Stop-token leakage\] Stop/control tokens leaked into generated text affecting 2 model(s)
 
 ## Summary
 
-1 model(s) show **mlx-vlm: Model load / model error** that should be filed against mlx-vlm.
+2 model(s) show **Stop-token leakage** that should be filed against mlx-vlm.
 
-- **Observed problem:** mlx-vlm: Model load / model error: property 'eos_token_id' of 'ModelConfig' object has no setter
+- **Observed problem:** Stop/control tokens leaked into generated text
 - **Target:** mlx-vlm
-- **Affected models:** 1
-- **Fixed when:** Load/generation completes or fails with a narrower owner.
+- **Affected models:** 2
+- **Fixed when:** No leaked stop/control tokens.
 
 
 ## Affected Models
 
 <!-- markdownlint-disable MD060 -->
 
-| Model                              | Observed Behavior                                             | Token Counts   | Optional Context                                                                                                                                                                             |
-|------------------------------------|---------------------------------------------------------------|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/MolmoPoint-8B-fp16` | property 'eos_token_id' of 'ModelConfig' object has no setter | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260703T230155Z_005_mlx-community_MolmoPoint-8B-fp16_MLX_VLM_MODEL_LOAD_MODEL_7cbd53695717.json) |
+| Model                                           | Observed Behavior                                   | Token Counts                                                                  | Optional Context                                                                                                                                                                           |
+|-------------------------------------------------|-----------------------------------------------------|-------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX` | decoded text contains control token &lt;\|end\|&gt; | prompt=1,330 \| output/prompt=13.08% \| nontext burden=100% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260704T185505Z_002_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_mlx_vlm_stop_token_001.json) |
+| `mlx-community/Qwen3-VL-2B-Thinking-bf16`       | decoded text contains control token &lt;/think&gt;  | prompt=317 \| output/prompt=23.97% \| nontext burden=98% \| stop=completed    | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260704T185505Z_006_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json)       |
 <!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
 
-- `mlx-community/MolmoPoint-8B-fp16` fails with: Model loading failed: property 'eos_token_id' of 'ModelConfig' object has no setter
-- Root exception: `builtins.AttributeError`: property 'eos_token_id' of 'ModelConfig' object has no setter
+- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: Special control token &lt;\|end\|&gt; appeared in generated text.
+- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: Output switched language/script unexpectedly (tokenizer_artifact).
+- Output excerpt: `...we can say something like: "Two tabby cats are sleeping side by side on a pink couch, with a TV remote lying nearby." That's it. No need for extra. We'll comply. [BEGIN FINAL RESPONSE] Two tabby cats are curled up sleeping side‑by‑side on a pink couch, with a TV remote resting nearby. [END FINAL RESPONSE] <\|end\|>`
+- `mlx-community/Qwen3-VL-2B-Thinking-bf16`: Special control token &lt;/think&gt; appeared in generated text.
 
 
 ## Minimal Reproduction
@@ -37,7 +40,8 @@ Image SHA256: `dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e`
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/MolmoPoint-8B-fp16 --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/Qwen3-VL-2B-Thinking-bf16 --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 Minimal Python repro (representative model):
@@ -47,7 +51,7 @@ from mlx_vlm.generate import generate
 from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load
 
-MODEL = 'mlx-community/MolmoPoint-8B-fp16'
+MODEL = 'mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX'
 IMAGE = 'cats.jpg'
 PROMPT = 'Describe this image briefly.'
 LOAD_KWARGS = {'trust_remote_code': True}
@@ -84,36 +88,37 @@ Generation/load config:
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "mlx-community/MolmoPoint-8B-fp16"
+  "model": "mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX"
 }
 ```
 
 Optional advanced context:
 
-- `mlx-community/MolmoPoint-8B-fp16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260703T230155Z_005_mlx-community_MolmoPoint-8B-fp16_MLX_VLM_MODEL_LOAD_MODEL_7cbd53695717.json)
+- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260704T185505Z_002_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_mlx_vlm_stop_token_001.json)
+- `mlx-community/Qwen3-VL-2B-Thinking-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260704T185505Z_006_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
 ## Expected Fix Signal
 
-- [ ] Affected reruns complete model load and generation, or fail with a narrower configuration/compatibility error that points to the owning layer.
+- [ ] Affected reruns contain no leaked stop/control tokens and terminate cleanly before the configured max-token cap when the response is complete.
 - [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem.
 
 
 ## Fix Checklist
 
-- [ ] Inspect the exported error package, load phase, and traceback owner.
-- [ ] Check model config, tokenizer files, and weight shape compatibility.
-- [ ] Compare against installed mlx, mlx-vlm, mlx-lm, transformers, and tokenizers versions.
-- [ ] Reproduce with the single affected model before judging output quality.
+- [ ] Inspect model EOS token IDs and tokenizer special-token mappings.
+- [ ] Verify mlx-vlm stop criteria receive all configured EOS/stop tokens.
+- [ ] Check `skip_special_tokens` handling during decode.
+- [ ] Strip generated control tokens such as `<|end|>` and `</think>` only after confirming generation stopped at the right boundary.
 
 
 ## Appendix: Environment
 
 | Component                  | Version                                                                                                                                                  |
 |----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| mlx-vlm                    | 0.6.3                                                                                                                                                    |
-| mlx                        | 0.32.0.dev20260703+de7b4ed9                                                                                                                              |
+| mlx-vlm                    | 0.6.4                                                                                                                                                    |
+| mlx                        | 0.32.0.dev20260704+de7b4ed9                                                                                                                              |
 | mlx-lm                     | 0.31.3                                                                                                                                                   |
 | mlx-audio                  | 0.4.4                                                                                                                                                    |
 | transformers               | 5.12.1                                                                                                                                                   |
@@ -139,34 +144,42 @@ Optional advanced context:
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                                       |
 | MLX Core Extension         | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
 | MLX Metallib               | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (162,451,352 bytes, sha256=7e5c9a3a3225bf3b04a5fe67c50602975d3698a45e2113433465848af47fd70c) |
-| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,747,136 bytes, sha256=6ae55e0952bcc7c19fd80f6f62dd1d0158448e0a58ce92384445c8f333f352ee)  |
+| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,747,136 bytes, sha256=53b0e529da8969b02cd891b10e5c7b24413dc65c0ccc092343d438e39e13a7d0)  |
 | RAM                        | 128.0 GB                                                                                                                                                 |
 
 
 ## Appendix: Detailed Evidence
 
-### `mlx-community/MolmoPoint-8B-fp16`
+### `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`
 
-Observed error:
+Observed signals:
+
+- Special control token &lt;\|end\|&gt; appeared in generated text.
+- Output switched language/script unexpectedly (tokenizer_artifact).
+- Output leaked reasoning or prompt-template text (here are my reasoning steps, the user asks:).
+
+Sample output:
 
 ```text
-Model loading failed: property 'eos_token_id' of 'ModelConfig' object has no setter
+...at's it. No need for extra. We'll comply.
+[BEGIN FINAL RESPONSE]
+Two tabby cats are curled up sleeping side‑by‑side on a pink couch, with a TV remote resting nearby.
+[END FINAL RESPONSE]
+<|end|>
 ```
 
-Root exception:
+### `mlx-community/Qwen3-VL-2B-Thinking-bf16`
+
+Observed signals:
+
+- Special control token &lt;/think&gt; appeared in generated text.
+
+Sample output:
 
 ```text
-builtins.AttributeError: property 'eos_token_id' of 'ModelConfig' object has no setter
-```
+So,,
+</think>
 
-Traceback tail:
-
-```text
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 549, in load_model
-    model_config = apply_generation_config_defaults(model_config, config)
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 70, in apply_generation_config_defaults
-    setattr(model_config, key, config[key])
-    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-AttributeError: property 'eos_token_id' of 'ModelConfig' object has no setter
+Two cats are lying on a bright pink blanket. One cat is a tabby with darker stripes, and the other is a calico with a mix of orange, black, and white fur. Both cats are relaxed, w...
 ```
 

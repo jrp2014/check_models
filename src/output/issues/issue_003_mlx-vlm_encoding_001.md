@@ -1,34 +1,31 @@
 <!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
 
-# \[model configuration/repository\]\[Model config: Processor load / processor error\] Processor config is missing image processor affecting 2 model(s)
+# \[mlx-vlm\]\[Tokenizer / decoding artifact\] Tokenizer decode leaked BPE/byte markers affecting 1 model(s)
 
 ## Summary
 
-2 model(s) show **Model config: Processor load / processor error** that should be filed against model configuration / repository.
+1 model(s) show **Tokenizer / decoding artifact** that should be filed against mlx-vlm.
 
-- **Observed problem:** Processor config is missing image processor
-- **Target:** model configuration / repository
-- **Affected models:** 2
-- **Fixed when:** Load/generation completes or fails with a narrower owner.
+- **Observed problem:** Tokenizer decode leaked BPE/byte markers
+- **Target:** mlx-vlm
+- **Affected models:** 1
+- **Fixed when:** No BPE/byte markers in output.
 
 
 ## Affected Models
 
 <!-- markdownlint-disable MD060 -->
 
-| Model                                           | Observed Behavior                                                       | Token Counts   | Optional Context                                                                                                                                                                                             |
-|-------------------------------------------------|-------------------------------------------------------------------------|----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/diffusiongemma-26B-A4B-it-8bit`  | Loaded processor has no image_processor; expected multimodal processor. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260703T230155Z_007_mlx-community_diffusiongemma-26B-A4B-it-8bit_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_49.json)  |
-| `mlx-community/diffusiongemma-26B-A4B-it-mxfp8` | Loaded processor has no image_processor; expected multimodal processor. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260703T230155Z_008_mlx-community_diffusiongemma-26B-A4B-it-mxfp8_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_0c.json) |
+| Model                                                   | Observed Behavior                          | Token Counts                                                               | Optional Context                                                                                                                                                                                 |
+|---------------------------------------------------------|--------------------------------------------|----------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | 56 BPE space markers found in decoded text | prompt=441 \| output/prompt=14.74% \| nontext burden=99% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260704T185505Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json) |
 <!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
 
-- `mlx-community/diffusiongemma-26B-A4B-it-8bit` fails with: Loaded processor has no image_processor; expected multimodal processor.
-- Root exception: `builtins.ValueError`: Loaded processor has no image_processor; expected multimodal processor.
-- `mlx-community/diffusiongemma-26B-A4B-it-mxfp8` fails with: Loaded processor has no image_processor; expected multimodal processor.
-- Root exception: `builtins.ValueError`: Loaded processor has no image_processor; expected multimodal processor.
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 56 occurrences).
+- Output excerpt: `TheĠimageĠfeaturesĠtwoĠcatsĠlyingĠonĠaĠpinkĠsurface,ĠpossiblyĠaĠcouchĠorĠbed.ĠTheĠcatĠonĠtheĠleftĠisĠlyingĠonĠitsĠbackĠwithĠitsĠlegsĠstretchedĠout,ĠwhileĠtheĠcatĠonĠtheĠrightĠisĠlyingĠonĠitsĠsideĠwithĠitsĠheadĠrestingĠonĠitsĠpaws.ĠBothĠcatsĠhaveĠaĠtabbyĠpatternĠinĠtheirĠfur.`
 
 
 ## Minimal Reproduction
@@ -40,8 +37,7 @@ Image SHA256: `dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e`
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/diffusiongemma-26B-A4B-it-8bit --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
-python -m mlx_vlm.generate --model mlx-community/diffusiongemma-26B-A4B-it-mxfp8 --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 Minimal Python repro (representative model):
@@ -51,7 +47,7 @@ from mlx_vlm.generate import generate
 from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load
 
-MODEL = 'mlx-community/diffusiongemma-26B-A4B-it-8bit'
+MODEL = 'mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit'
 IMAGE = 'cats.jpg'
 PROMPT = 'Describe this image briefly.'
 LOAD_KWARGS = {'trust_remote_code': True}
@@ -88,37 +84,35 @@ Generation/load config:
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "mlx-community/diffusiongemma-26B-A4B-it-8bit"
+  "model": "mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit"
 }
 ```
 
 Optional advanced context:
 
-- `mlx-community/diffusiongemma-26B-A4B-it-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260703T230155Z_007_mlx-community_diffusiongemma-26B-A4B-it-8bit_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_49.json)
-- `mlx-community/diffusiongemma-26B-A4B-it-mxfp8`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260703T230155Z_008_mlx-community_diffusiongemma-26B-A4B-it-mxfp8_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_0c.json)
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260704T185505Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
 ## Expected Fix Signal
 
-- [ ] Affected reruns complete model load and generation, or fail with a narrower configuration/compatibility error that points to the owning layer.
+- [ ] Affected reruns contain no leaked BPE, byte-level, or tokenizer marker text.
 - [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem.
 
 
 ## Fix Checklist
 
-- [ ] Inspect `preprocessor_config.json`, `processor_config.json`, and AutoProcessor mapping.
-- [ ] Verify the loaded processor exposes the image processor expected by mlx-vlm.
-- [ ] Check whether the model repo needs processor files or mlx-vlm needs a fallback path.
-- [ ] Reproduce with the single affected model before judging output quality.
+- [ ] Inspect tokenizer decode cleanup for byte-level/BPE marker leakage.
+- [ ] Compare `decode` and `batch_decode` behavior with `skip_special_tokens=True`.
+- [ ] Verify processor/tokenizer config does not require model-specific cleanup flags.
 
 
 ## Appendix: Environment
 
 | Component                  | Version                                                                                                                                                  |
 |----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| mlx-vlm                    | 0.6.3                                                                                                                                                    |
-| mlx                        | 0.32.0.dev20260703+de7b4ed9                                                                                                                              |
+| mlx-vlm                    | 0.6.4                                                                                                                                                    |
+| mlx                        | 0.32.0.dev20260704+de7b4ed9                                                                                                                              |
 | mlx-lm                     | 0.31.3                                                                                                                                                   |
 | mlx-audio                  | 0.4.4                                                                                                                                                    |
 | transformers               | 5.12.1                                                                                                                                                   |
@@ -144,57 +138,21 @@ Optional advanced context:
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                                       |
 | MLX Core Extension         | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
 | MLX Metallib               | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (162,451,352 bytes, sha256=7e5c9a3a3225bf3b04a5fe67c50602975d3698a45e2113433465848af47fd70c) |
-| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,747,136 bytes, sha256=6ae55e0952bcc7c19fd80f6f62dd1d0158448e0a58ce92384445c8f333f352ee)  |
+| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,747,136 bytes, sha256=53b0e529da8969b02cd891b10e5c7b24413dc65c0ccc092343d438e39e13a7d0)  |
 | RAM                        | 128.0 GB                                                                                                                                                 |
 
 
 ## Appendix: Detailed Evidence
 
-### `mlx-community/diffusiongemma-26B-A4B-it-8bit`
+### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`
 
-Observed error:
+Observed signals:
 
-```text
-Model preflight failed for mlx-community/diffusiongemma-26B-A4B-it-8bit: Loaded processor has no image_processor; expected multimodal processor.
-```
+- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 56 occurrences).
 
-Root exception:
+Sample output:
 
 ```text
-builtins.ValueError: Loaded processor has no image_processor; expected multimodal processor.
-```
-
-Traceback tail:
-
-```text
-Traceback (most recent call last):
-ValueError: Loaded processor has no image_processor; expected multimodal processor.
-The above exception was the direct cause of the following exception:
-Traceback (most recent call last):
-ValueError: Model preflight failed for mlx-community/diffusiongemma-26B-A4B-it-8bit: Loaded processor has no image_processor; expected multimodal processor.
-```
-
-### `mlx-community/diffusiongemma-26B-A4B-it-mxfp8`
-
-Observed error:
-
-```text
-Model preflight failed for mlx-community/diffusiongemma-26B-A4B-it-mxfp8: Loaded processor has no image_processor; expected multimodal processor.
-```
-
-Root exception:
-
-```text
-builtins.ValueError: Loaded processor has no image_processor; expected multimodal processor.
-```
-
-Traceback tail:
-
-```text
-Traceback (most recent call last):
-ValueError: Loaded processor has no image_processor; expected multimodal processor.
-The above exception was the direct cause of the following exception:
-Traceback (most recent call last):
-ValueError: Model preflight failed for mlx-community/diffusiongemma-26B-A4B-it-mxfp8: Loaded processor has no image_processor; expected multimodal processor.
+TheĠimageĠfeaturesĠtwoĠcatsĠlyingĠonĠaĠpinkĠsurface,ĠpossiblyĠaĠcouchĠorĠbed.ĠTheĠcatĠonĠtheĠleftĠisĠlyingĠonĠitsĠbackĠwithĠitsĠlegsĠstretchedĠout,ĠwhileĠtheĠcatĠonĠtheĠrightĠisĠlyingĠonĠitsĠsideĠw...
 ```
 

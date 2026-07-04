@@ -16,22 +16,22 @@
     "run_json": "run.json"
   },
   "counts": {
-    "models_failed": 4,
-    "models_successful": 57,
+    "models_failed": 3,
+    "models_successful": 58,
     "models_total": 61
   },
   "eval_mode": "triage",
-  "generated_at": "2026-07-04 00:01:55 BST",
+  "generated_at": "2026-07-04 19:55:05 BST",
   "has_descriptive_metadata": false,
   "library_versions": {
     "Pillow": "12.3.0",
     "huggingface-hub": "1.22.0",
-    "mlx": "0.32.0.dev20260703+de7b4ed9",
+    "mlx": "0.32.0.dev20260704+de7b4ed9",
     "mlx-audio": "0.4.4",
     "mlx-lm": "0.31.3",
     "mlx-metal": null,
-    "mlx-vlm": "0.6.3",
-    "numpy": "2.5.0",
+    "mlx-vlm": "0.6.4",
+    "numpy": "2.5.1",
     "tokenizers": "0.22.2",
     "transformers": "5.12.1"
   },
@@ -40,5 +40,5 @@
   "schema_version": "1.0",
   "selection_basis": "ungrounded",
   "semantic_rankings_grounded": false,
-  "total_runtime_seconds": 372.307
+  "total_runtime_seconds": 415.227
 }

@@ -1,35 +1,34 @@
 <!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
 
-# \[mlx-vlm\]\[Stop-token leakage\] Stop/control tokens leaked into generated text affecting 3 model(s)
+# \[model configuration/repository\]\[Model config: Processor load / processor error\] Processor config is missing image processor affecting 2 model(s)
 
 ## Summary
 
-3 model(s) show **Stop-token leakage** that should be filed against mlx-vlm.
+2 model(s) show **Model config: Processor load / processor error** that should be filed against model configuration / repository.
 
-- **Observed problem:** Stop/control tokens leaked into generated text
-- **Target:** mlx-vlm
-- **Affected models:** 3
-- **Fixed when:** No leaked stop/control tokens.
+- **Observed problem:** Processor config is missing image processor
+- **Target:** model configuration / repository
+- **Affected models:** 2
+- **Fixed when:** Load/generation completes or fails with a narrower owner.
 
 
 ## Affected Models
 
 <!-- markdownlint-disable MD060 -->
 
-| Model                                           | Observed Behavior                                                                                                | Token Counts                                                                                       | Optional Context                                                                                                                                                                           |
-|-------------------------------------------------|------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `microsoft/Phi-3.5-vision-instruct`             | decoded text contains control token &lt;\|end\|&gt; \| decoded text contains control token &lt;\|endoftext\|&gt; | prompt=770 \| output/prompt=25.97% \| nontext burden=99% \| stop=max_tokens \| hit token cap (200) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260703T230155Z_001_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json)             |
-| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX` | decoded text contains control token &lt;\|end\|&gt;                                                              | prompt=1,330 \| output/prompt=13.08% \| nontext burden=100% \| stop=completed                      | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260703T230155Z_002_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_mlx_vlm_stop_token_001.json) |
-| `mlx-community/Qwen3-VL-2B-Thinking-bf16`       | decoded text contains control token &lt;/think&gt;                                                               | prompt=317 \| output/prompt=61.83% \| nontext burden=98% \| stop=completed                         | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260703T230155Z_006_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json)       |
+| Model                                           | Observed Behavior                                                       | Token Counts   | Optional Context                                                                                                                                                                                             |
+|-------------------------------------------------|-------------------------------------------------------------------------|----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/diffusiongemma-26B-A4B-it-8bit`  | Loaded processor has no image_processor; expected multimodal processor. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260704T185505Z_010_mlx-community_diffusiongemma-26B-A4B-it-8bit_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_49.json)  |
+| `mlx-community/diffusiongemma-26B-A4B-it-mxfp8` | Loaded processor has no image_processor; expected multimodal processor. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260704T185505Z_011_mlx-community_diffusiongemma-26B-A4B-it-mxfp8_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_0c.json) |
 <!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
 
-- `microsoft/Phi-3.5-vision-instruct`: Special control token &lt;\|end\|&gt; appeared in generated text.
-- `microsoft/Phi-3.5-vision-instruct`: Special control token &lt;\|endoftext\|&gt; appeared in generated text.
-- Output excerpt: `Two cats are sleeping on a pink couch with remote controls beside them.<\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|end\|><\|endoftext\|><\|e...`
-- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: Special control token &lt;\|end\|&gt; appeared in generated text.
+- `mlx-community/diffusiongemma-26B-A4B-it-8bit` fails with: Loaded processor has no image_processor; expected multimodal processor.
+- Root exception: `builtins.ValueError`: Loaded processor has no image_processor; expected multimodal processor.
+- `mlx-community/diffusiongemma-26B-A4B-it-mxfp8` fails with: Loaded processor has no image_processor; expected multimodal processor.
+- Root exception: `builtins.ValueError`: Loaded processor has no image_processor; expected multimodal processor.
 
 
 ## Minimal Reproduction
@@ -41,9 +40,8 @@ Image SHA256: `dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e`
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model microsoft/Phi-3.5-vision-instruct --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
-python -m mlx_vlm.generate --model mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
-python -m mlx_vlm.generate --model mlx-community/Qwen3-VL-2B-Thinking-bf16 --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/diffusiongemma-26B-A4B-it-8bit --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/diffusiongemma-26B-A4B-it-mxfp8 --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 Minimal Python repro (representative model):
@@ -53,7 +51,7 @@ from mlx_vlm.generate import generate
 from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load
 
-MODEL = 'microsoft/Phi-3.5-vision-instruct'
+MODEL = 'mlx-community/diffusiongemma-26B-A4B-it-8bit'
 IMAGE = 'cats.jpg'
 PROMPT = 'Describe this image briefly.'
 LOAD_KWARGS = {'trust_remote_code': True}
@@ -90,38 +88,37 @@ Generation/load config:
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "microsoft/Phi-3.5-vision-instruct"
+  "model": "mlx-community/diffusiongemma-26B-A4B-it-8bit"
 }
 ```
 
 Optional advanced context:
 
-- `microsoft/Phi-3.5-vision-instruct`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260703T230155Z_001_microsoft_Phi-3.5-vision-instruct_mlx_vlm_stop_token_001.json)
-- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260703T230155Z_002_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_mlx_vlm_stop_token_001.json)
-- `mlx-community/Qwen3-VL-2B-Thinking-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260703T230155Z_006_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json)
+- `mlx-community/diffusiongemma-26B-A4B-it-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260704T185505Z_010_mlx-community_diffusiongemma-26B-A4B-it-8bit_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_49.json)
+- `mlx-community/diffusiongemma-26B-A4B-it-mxfp8`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260704T185505Z_011_mlx-community_diffusiongemma-26B-A4B-it-mxfp8_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_0c.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
 ## Expected Fix Signal
 
-- [ ] Affected reruns contain no leaked stop/control tokens and terminate cleanly before the configured max-token cap when the response is complete.
+- [ ] Affected reruns complete model load and generation, or fail with a narrower configuration/compatibility error that points to the owning layer.
 - [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem.
 
 
 ## Fix Checklist
 
-- [ ] Inspect model EOS token IDs and tokenizer special-token mappings.
-- [ ] Verify mlx-vlm stop criteria receive all configured EOS/stop tokens.
-- [ ] Check `skip_special_tokens` handling during decode.
-- [ ] Strip generated control tokens such as `<|end|>` and `</think>` only after confirming generation stopped at the right boundary.
+- [ ] Inspect `preprocessor_config.json`, `processor_config.json`, and AutoProcessor mapping.
+- [ ] Verify the loaded processor exposes the image processor expected by mlx-vlm.
+- [ ] Check whether the model repo needs processor files or mlx-vlm needs a fallback path.
+- [ ] Reproduce with the single affected model before judging output quality.
 
 
 ## Appendix: Environment
 
 | Component                  | Version                                                                                                                                                  |
 |----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| mlx-vlm                    | 0.6.3                                                                                                                                                    |
-| mlx                        | 0.32.0.dev20260703+de7b4ed9                                                                                                                              |
+| mlx-vlm                    | 0.6.4                                                                                                                                                    |
+| mlx                        | 0.32.0.dev20260704+de7b4ed9                                                                                                                              |
 | mlx-lm                     | 0.31.3                                                                                                                                                   |
 | mlx-audio                  | 0.4.4                                                                                                                                                    |
 | transformers               | 5.12.1                                                                                                                                                   |
@@ -147,56 +144,57 @@ Optional advanced context:
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                                       |
 | MLX Core Extension         | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
 | MLX Metallib               | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (162,451,352 bytes, sha256=7e5c9a3a3225bf3b04a5fe67c50602975d3698a45e2113433465848af47fd70c) |
-| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,747,136 bytes, sha256=6ae55e0952bcc7c19fd80f6f62dd1d0158448e0a58ce92384445c8f333f352ee)  |
+| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,747,136 bytes, sha256=53b0e529da8969b02cd891b10e5c7b24413dc65c0ccc092343d438e39e13a7d0)  |
 | RAM                        | 128.0 GB                                                                                                                                                 |
 
 
 ## Appendix: Detailed Evidence
 
-### `microsoft/Phi-3.5-vision-instruct`
+### `mlx-community/diffusiongemma-26B-A4B-it-8bit`
 
-Observed signals:
-
-- Special control token &lt;\|end\|&gt; appeared in generated text.
-- Special control token &lt;\|endoftext\|&gt; appeared in generated text.
-- Output switched language/script unexpectedly (tokenizer_artifact).
-
-Sample output:
+Observed error:
 
 ```text
-Two cats are sleeping on a pink couch with remote controls beside them.<|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|end|><|endoftext|><|e...
+Model preflight failed for mlx-community/diffusiongemma-26B-A4B-it-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
 
-### `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`
-
-Observed signals:
-
-- Special control token &lt;\|end\|&gt; appeared in generated text.
-- Output switched language/script unexpectedly (tokenizer_artifact).
-- Output leaked reasoning or prompt-template text (here are my reasoning steps, the user asks:).
-
-Sample output:
+Root exception:
 
 ```text
-...at's it. No need for extra. We'll comply.
-[BEGIN FINAL RESPONSE]
-Two tabby cats are curled up sleeping side‑by‑side on a pink couch, with a TV remote resting nearby.
-[END FINAL RESPONSE]
-<|end|>
+builtins.ValueError: Loaded processor has no image_processor; expected multimodal processor.
 ```
 
-### `mlx-community/Qwen3-VL-2B-Thinking-bf16`
-
-Observed signals:
-
-- Special control token &lt;/think&gt; appeared in generated text.
-
-Sample output:
+Traceback tail:
 
 ```text
-...need to describe this briefly, so focus on the key elements: two cats, pink couch, remotes.
-</think>
+Traceback (most recent call last):
+ValueError: Loaded processor has no image_processor; expected multimodal processor.
+The above exception was the direct cause of the following exception:
+Traceback (most recent call last):
+ValueError: Model preflight failed for mlx-community/diffusiongemma-26B-A4B-it-8bit: Loaded processor has no image_processor; expected multimodal processor.
+```
 
-Two tabby cats are lying on a bright pink couch, each resting with their paws extended. A w...
+### `mlx-community/diffusiongemma-26B-A4B-it-mxfp8`
+
+Observed error:
+
+```text
+Model preflight failed for mlx-community/diffusiongemma-26B-A4B-it-mxfp8: Loaded processor has no image_processor; expected multimodal processor.
+```
+
+Root exception:
+
+```text
+builtins.ValueError: Loaded processor has no image_processor; expected multimodal processor.
+```
+
+Traceback tail:
+
+```text
+Traceback (most recent call last):
+ValueError: Loaded processor has no image_processor; expected multimodal processor.
+The above exception was the direct cause of the following exception:
+Traceback (most recent call last):
+ValueError: Model preflight failed for mlx-community/diffusiongemma-26B-A4B-it-mxfp8: Loaded processor has no image_processor; expected multimodal processor.
 ```
 
