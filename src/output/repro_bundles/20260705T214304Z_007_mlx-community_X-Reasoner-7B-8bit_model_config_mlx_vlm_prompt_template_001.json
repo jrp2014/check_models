@@ -1,18 +1,18 @@
 {
   "environment": {
     "library_versions": {
-      "Pillow": "12.2.0",
-      "huggingface-hub": "1.20.1",
-      "mlx": "0.32.0.dev20260621+5abdd04b",
+      "Pillow": "12.3.0",
+      "huggingface-hub": "1.22.0",
+      "mlx": "0.32.0.dev20260705+de7b4ed9",
       "mlx-audio": "0.4.4",
       "mlx-lm": "0.31.3",
       "mlx-metal": null,
-      "mlx-vlm": "0.6.3",
-      "numpy": "2.4.6",
+      "mlx-vlm": "0.6.4",
+      "numpy": "2.5.1",
       "tokenizers": "0.22.2",
       "transformers": "5.12.1"
     },
-    "platform": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
     "preflight_issues": [],
     "system_info": {
       "Active Developer Directory": "/Applications/Xcode.app/Contents/Developer",
@@ -25,8 +25,8 @@
       "MLX Core Extension": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so",
       "MLX Distribution Root": "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
       "MLX Install Type": "editable local source",
-      "MLX Metallib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (157,739,544 bytes, sha256=d7cb97dee8940843711ef5df4ff68b80a6e02f98bbd9e085c6794183655c94d1)",
-      "MLX libmlx.dylib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,692,160 bytes, sha256=82404f0ce166a876abbb18627634a6fd5361cab3d161c305a7bb36ab54ab086b)",
+      "MLX Metallib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (162,451,352 bytes, sha256=7e5c9a3a3225bf3b04a5fe67c50602975d3698a45e2113433465848af47fd70c)",
+      "MLX libmlx.dylib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,747,136 bytes, sha256=7f99f8ba35fabb3f26e8a3016e5bd6410c975b68147be239054e5fa74232541c)",
       "Metal Compiler Version": "Apple metal version 32023.883 (metalfe-32023.883)",
       "Metal SDK": "MacOSX26.5.sdk",
       "Metal Support": "Metal 4",
@@ -36,9 +36,9 @@
       "RAM": "128.0 GB",
       "SDK Path": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
       "SDK Version": "26.5",
-      "Xcode Build": "17F42",
-      "Xcode Version": "26.5",
-      "macOS Version": "26.5.1",
+      "Xcode Build": "17F113",
+      "Xcode Version": "26.6",
+      "macOS Version": "26.5.2",
       "mlx-metal Distribution": "not installed; local editable mlx supplies backend"
     }
   },
@@ -53,9 +53,9 @@
     "traceback": null,
     "type": null
   },
-  "generated_at_utc": "2026-06-21T00:13:25+00:00",
+  "generated_at_utc": "2026-07-05T21:43:04+00:00",
   "issue_cluster_id": "model-config-mlx-vlm_prompt-template_001",
-  "model": "mlx-community/SmolVLM-Instruct-bf16",
+  "model": "mlx-community/X-Reasoner-7B-8bit",
   "repro": {
     "args": {
       "_check_models_preflight_issues": [],
@@ -65,14 +65,14 @@
       "dry_run": false,
       "enable_thinking": false,
       "eos_tokens": null,
-      "eval_mode": "stress",
+      "eval_mode": "triage",
       "exclude": null,
-      "folder": "/Users/jrp/Pictures/Processed",
+      "folder": null,
       "force_color": false,
       "force_download": false,
       "frequency_context_size": 20,
       "frequency_penalty": null,
-      "image": null,
+      "image": "../../mlx-vlm/examples/images/cats.jpg",
       "kv_bits": null,
       "kv_group_size": 64,
       "kv_quant_scheme": "uniform",
@@ -80,7 +80,7 @@
       "link_style": "github",
       "logit_bias": null,
       "max_kv_size": null,
-      "max_tokens": 500,
+      "max_tokens": 200,
       "min_p": 0.0,
       "models": null,
       "no_color": false,
@@ -92,6 +92,8 @@
       "output_jsonl": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.jsonl",
       "output_log": "/Users/jrp/Documents/AI/mlx/check_models/src/output/check_models.log",
       "output_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.md",
+      "output_model_capabilities": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/model_capabilities.md",
+      "output_model_capabilities_json": "/Users/jrp/Documents/AI/mlx/check_models/src/output/model_capabilities.json",
       "output_model_selection": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/model_selection.md",
       "output_review": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/review.md",
       "output_run_json": "/Users/jrp/Documents/AI/mlx/check_models/src/output/run.json",
@@ -123,22 +125,22 @@
       "verbose": true,
       "width": null
     },
-    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260620-195128_DSC00512-Edit.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models HuggingFaceTB/SmolVLM-Instruct mlx-community/SmolVLM-Instruct-bf16 mlx-community/llava-v1.6-mistral-7b-8bit",
+    "cluster_repro_command": "python -m check_models --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models Qwen/Qwen3-VL-2B-Instruct mlx-community/Qwen3-VL-2B-Instruct-bf16 mlx-community/Qwen3.5-35B-A3B-bf16 mlx-community/Qwen3.6-27B-mxfp8 mlx-community/X-Reasoner-7B-8bit",
     "env_vars": {
       "TOKENIZERS_PARALLELISM": "false"
     },
-    "image_path": "/Users/jrp/Pictures/Processed/20260620-195128_DSC00512-Edit.jpg",
-    "image_ref_sha256": "631d9b2b2600f6ab58564877866b0880763882226a8687c905cb65ce510700ec",
-    "image_sha256": "17998b7b2e65b04078174bef84650e6fdf91c69cbb03f750edd689b6d811d761",
+    "image_path": "/Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg",
+    "image_ref_sha256": "9bc422400088c31c0accf7fb023ee29945d47640042565218c1c33f78694f204",
+    "image_sha256": "dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e",
     "prompt_diagnostics": {
-      "eos_token": "<end_of_utterance>",
-      "eos_token_id": 49154,
+      "eos_token": "<|im_end|>",
+      "eos_token_id": 151645,
       "generate_kwargs": {
         "kv_bits": null,
         "kv_group_size": 64,
         "kv_quant_scheme": "uniform",
         "max_kv_size": null,
-        "max_tokens": 500,
+        "max_tokens": 200,
         "prefill_step_size": 4096,
         "quantized_kv_start": 5000,
         "repetition_context_size": 20,
@@ -146,63 +148,52 @@
         "temperature": 0.0,
         "top_p": 1.0
       },
-      "image_placeholder_count": 1,
-      "model_type": "idefics3",
-      "processor_class": "mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor",
-      "rendered_prompt_chars": 2195,
-      "rendered_prompt_hash_sha256": "0dfd736f1307466a226df049981a042c56e4077c712c8445d104117b167aefc4",
-      "rendered_prompt_preview": "<|im_start|>User:<image>Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentenc...",
+      "image_placeholder_count": 0,
+      "model_type": "qwen2_5_vl",
+      "processor_class": "mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor",
+      "rendered_prompt_chars": 179,
+      "rendered_prompt_hash_sha256": "73a1922daa0f2941d41cb6adeb450c1b2ef268e3e9dc5a65bee6f9dea62ce191",
+      "rendered_prompt_preview": "<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\n<|vision_start|><|image_pad|><|vision_end|>Describe this image briefly.<|im_end|>\n<|im_start|>assistant\n",
       "special_token_ids": [
-        1,
-        49154,
-        0,
-        2,
-        49152,
-        49153
+        151645,
+        151643
       ],
       "special_tokens": [
-        "<|im_start|>",
-        "<end_of_utterance>",
-        "<|endoftext|>",
         "<|im_end|>",
-        "<fake_token_around_image>",
-        "<image>"
+        "<|endoftext|>"
       ],
-      "tokenizer_class": "transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer"
+      "tokenizer_class": "transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer"
     },
-    "prompt_hash_sha256": "daa4ae25e10480769ecb62e108e21faab6e7f92673f742a0fe5a0b0ed33974e6",
-    "prompt_preview": "Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct any...",
-    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260620-195128_DSC00512-Edit.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/SmolVLM-Instruct-bf16",
+    "prompt_hash_sha256": "d760336d0fd143932f194573dd63f6b531e0ffbc2c4f1595e015392a3471c318",
+    "prompt_preview": "Describe this image briefly.",
+    "rerun_command": "python -m check_models --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/X-Reasoner-7B-8bit",
     "seed": null
   },
   "result": {
-    "generated_text_preview": " A tall stone church tower with a clock on it.",
+    "generated_text_preview": "The image",
     "maintainer_triage": {
       "confidence": "high",
       "evidence": [
-        "harness:prompt_template",
-        "utility_delta_negative"
+        "harness:prompt_template"
       ],
       "harness_details": [
-        "output:output_ratio(0.7%)"
+        "output:truncated(3tok)"
       ],
       "hit_max_tokens": false,
       "issue_kind": "harness",
       "issue_subtype": "prompt_template",
-      "next_action": "Check chat-template and EOS defaults first; the output shape is not matching the requested contract.",
-      "nontext_prompt_ratio": 0.7524694944799535,
-      "prompt_output_ratio": 0.006972690296339338,
-      "prompt_tokens_total": 1721,
-      "requested_max_tokens": 500,
+      "next_action": "Inspect model repo config, chat template, and EOS settings.",
+      "nontext_prompt_ratio": 0.9856115107913669,
+      "prompt_output_ratio": 0.007194244604316547,
+      "prompt_tokens_total": 417,
+      "requested_max_tokens": 200,
       "stop_reason": "completed",
-      "summary": "Output is very short relative to prompt size (0.7%), suggesting possible early-stop or prompt-handling issues. | nontext prompt burden=75% | missing sections: title, description, keywords | missing terms: Clouds, Colchester, Entrance, Essex, Fence",
+      "summary": "Output appears truncated to about 3 tokens.",
       "suspected_owner": "model-config",
       "user_bucket": "avoid"
     },
     "quality_issues": [
-      "\u26a0\ufe0fharness(prompt_template)",
-      "missing-sections(title+description+keywords)",
-      "trusted-hints-degraded"
+      "\u26a0\ufe0fharness(prompt_template)"
     ],
     "success": true
   },

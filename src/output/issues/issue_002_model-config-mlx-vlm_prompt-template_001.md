@@ -18,11 +18,11 @@
 
 | Model                                     | Observed Behavior   | Token Counts                                                              | Optional Context                                                                                                                                                                                       |
 |-------------------------------------------|---------------------|---------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `Qwen/Qwen3-VL-2B-Instruct`               | generated_tokens~3  | prompt=315 \| output/prompt=0.95% \| nontext burden=98% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T003436Z_001_Qwen_Qwen3-VL-2B-Instruct_model_config_mlx_vlm_prompt_template_001.json)               |
-| `mlx-community/Qwen3-VL-2B-Instruct-bf16` | generated_tokens~3  | prompt=315 \| output/prompt=0.95% \| nontext burden=98% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T003436Z_004_mlx-community_Qwen3-VL-2B-Instruct-bf16_model_config_mlx_vlm_prompt_template_001.json) |
-| `mlx-community/Qwen3.5-35B-A3B-bf16`      | generated_tokens~3  | prompt=319 \| output/prompt=0.94% \| nontext burden=98% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T003436Z_006_mlx-community_Qwen3.5-35B-A3B-bf16_model_config_mlx_vlm_prompt_template_001.json)      |
-| `mlx-community/Qwen3.6-27B-mxfp8`         | generated_tokens~2  | prompt=319 \| output/prompt=0.63% \| nontext burden=98% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T003436Z_007_mlx-community_Qwen3.6-27B-mxfp8_model_config_mlx_vlm_prompt_template_001.json)         |
-| `mlx-community/X-Reasoner-7B-8bit`        | generated_tokens~3  | prompt=417 \| output/prompt=0.72% \| nontext burden=99% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T003436Z_008_mlx-community_X-Reasoner-7B-8bit_model_config_mlx_vlm_prompt_template_001.json)        |
+| `Qwen/Qwen3-VL-2B-Instruct`               | generated_tokens~3  | prompt=315 \| output/prompt=0.95% \| nontext burden=98% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T214304Z_001_Qwen_Qwen3-VL-2B-Instruct_model_config_mlx_vlm_prompt_template_001.json)               |
+| `mlx-community/Qwen3-VL-2B-Instruct-bf16` | generated_tokens~3  | prompt=315 \| output/prompt=0.95% \| nontext burden=98% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T214304Z_003_mlx-community_Qwen3-VL-2B-Instruct-bf16_model_config_mlx_vlm_prompt_template_001.json) |
+| `mlx-community/Qwen3.5-35B-A3B-bf16`      | generated_tokens~3  | prompt=319 \| output/prompt=0.94% \| nontext burden=98% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T214304Z_005_mlx-community_Qwen3.5-35B-A3B-bf16_model_config_mlx_vlm_prompt_template_001.json)      |
+| `mlx-community/Qwen3.6-27B-mxfp8`         | generated_tokens~2  | prompt=319 \| output/prompt=0.63% \| nontext burden=98% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T214304Z_006_mlx-community_Qwen3.6-27B-mxfp8_model_config_mlx_vlm_prompt_template_001.json)         |
+| `mlx-community/X-Reasoner-7B-8bit`        | generated_tokens~3  | prompt=417 \| output/prompt=0.72% \| nontext burden=99% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T214304Z_007_mlx-community_X-Reasoner-7B-8bit_model_config_mlx_vlm_prompt_template_001.json)        |
 <!-- markdownlint-enable MD060 -->
 
 
@@ -100,11 +100,11 @@ Generation/load config:
 
 Optional advanced context:
 
-- `Qwen/Qwen3-VL-2B-Instruct`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T003436Z_001_Qwen_Qwen3-VL-2B-Instruct_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/Qwen3-VL-2B-Instruct-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T003436Z_004_mlx-community_Qwen3-VL-2B-Instruct-bf16_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/Qwen3.5-35B-A3B-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T003436Z_006_mlx-community_Qwen3.5-35B-A3B-bf16_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/Qwen3.6-27B-mxfp8`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T003436Z_007_mlx-community_Qwen3.6-27B-mxfp8_model_config_mlx_vlm_prompt_template_001.json)
-- `mlx-community/X-Reasoner-7B-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T003436Z_008_mlx-community_X-Reasoner-7B-8bit_model_config_mlx_vlm_prompt_template_001.json)
+- `Qwen/Qwen3-VL-2B-Instruct`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T214304Z_001_Qwen_Qwen3-VL-2B-Instruct_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/Qwen3-VL-2B-Instruct-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T214304Z_003_mlx-community_Qwen3-VL-2B-Instruct-bf16_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/Qwen3.5-35B-A3B-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T214304Z_005_mlx-community_Qwen3.5-35B-A3B-bf16_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/Qwen3.6-27B-mxfp8`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T214304Z_006_mlx-community_Qwen3.6-27B-mxfp8_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/X-Reasoner-7B-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T214304Z_007_mlx-community_X-Reasoner-7B-8bit_model_config_mlx_vlm_prompt_template_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -126,7 +126,7 @@ Optional advanced context:
 | Component                  | Version                                                                                                                                                  |
 |----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
 | mlx-vlm                    | 0.6.4                                                                                                                                                    |
-| mlx                        | 0.32.0.dev20260704+de7b4ed9                                                                                                                              |
+| mlx                        | 0.32.0.dev20260705+de7b4ed9                                                                                                                              |
 | mlx-lm                     | 0.31.3                                                                                                                                                   |
 | mlx-audio                  | 0.4.4                                                                                                                                                    |
 | transformers               | 5.12.1                                                                                                                                                   |
@@ -152,7 +152,7 @@ Optional advanced context:
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                                       |
 | MLX Core Extension         | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
 | MLX Metallib               | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (162,451,352 bytes, sha256=7e5c9a3a3225bf3b04a5fe67c50602975d3698a45e2113433465848af47fd70c) |
-| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,747,136 bytes, sha256=9d942d98a9a9f3e42b3f22c6606bc1ee621d28a9fb512d0cdba6edbb9ef79df8)  |
+| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,747,136 bytes, sha256=7f99f8ba35fabb3f26e8a3016e5bd6410c975b68147be239054e5fa74232541c)  |
 | RAM                        | 128.0 GB                                                                                                                                                 |
 
 

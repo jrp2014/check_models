@@ -16,17 +16,17 @@
     "run_json": "run.json"
   },
   "counts": {
-    "models_failed": 1,
-    "models_successful": 60,
+    "models_failed": 0,
+    "models_successful": 61,
     "models_total": 61
   },
   "eval_mode": "triage",
-  "generated_at": "2026-07-05 01:34:36 BST",
+  "generated_at": "2026-07-05 22:43:04 BST",
   "has_descriptive_metadata": false,
   "library_versions": {
     "Pillow": "12.3.0",
     "huggingface-hub": "1.22.0",
-    "mlx": "0.32.0.dev20260704+de7b4ed9",
+    "mlx": "0.32.0.dev20260705+de7b4ed9",
     "mlx-audio": "0.4.4",
     "mlx-lm": "0.31.3",
     "mlx-metal": null,
@@ -40,5 +40,5 @@
   "schema_version": "1.0",
   "selection_basis": "ungrounded",
   "semantic_rankings_grounded": false,
-  "total_runtime_seconds": 894.004
+  "total_runtime_seconds": 420.838
 }
