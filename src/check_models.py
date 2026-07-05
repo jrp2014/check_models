@@ -15145,16 +15145,16 @@ def _issue_queue_evidence_cell(
 def _issue_queue_fixed_when(cluster: IssueCluster) -> str:
     """Return a compact acceptance signal for the queue table."""
     subtype = cluster.issue_subtype.casefold()
-    if subtype == "stop_token":
-        return "No leaked stop/control tokens."
-    if subtype == "encoding":
-        return "No BPE/byte markers in output."
-    if subtype == "prompt_template":
-        return "Requested sections render without template leakage."
+    fixed_when_by_subtype = {
+        "stop_token": "No leaked stop/control tokens.",
+        "encoding": "No BPE/byte markers in output.",
+        "prompt_template": "Requested sections render without template leakage.",
+        "text_sanity": "Generated text is readable natural language, not token soup.",
+    }
+    if subtype in fixed_when_by_subtype:
+        return fixed_when_by_subtype[subtype]
     if subtype in {"long_context", "context_budget", "token_cap"}:
         return "Full and reduced reruns avoid context collapse."
-    if subtype == "text_sanity":
-        return "Generated text is readable natural language, not token soup."
     if cluster.issue_kind == "runtime_failure":
         return "Load/generation completes or fails with a narrower owner."
     return _truncate_text_preview(cluster.acceptance_signal, max_chars=88)

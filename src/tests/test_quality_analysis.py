@@ -47,10 +47,10 @@ def test_analyze_generation_text_flags_short_token_noise() -> None:
 def test_analyze_generation_text_flags_cjk_latin_token_soup() -> None:
     """Mixed CJK/Latin token soup should not be classified as a clean caption."""
     text = (
-        'open对不同方面">black/ with小猫小猫kotPicture •0超高清比!y表面处理超经典的！'
-        "张图片’七- object Tno-go-head-or U0.C在其他 ** ,Not只！被i animal "
+        'open对不同方面">black/ with小猫小猫kotPicture •0超高清比!y表面处理超经典的!'
+        "张图片'七- object Tno-go-head-or U0.C在其他 ** ,Not只!被i animal "
         "...'s*: .# • 模型被 partially \" alsoDifferent一\n"
-        ',  Germanyc-under,"开Picture顶 noncolor_over宠关 feature PETwith对上 from！'
+        ',  Germanyc-under,"开Picture顶 noncolor_over宠关 feature PETwith对上 from!'
     )
 
     analysis = check_models.analyze_generation_text(text, 85)

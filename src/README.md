@@ -250,11 +250,16 @@ The tool generates multiple report formats in `output/` by default:
 - **Review Markdown** (`reports/review.md`): Short automated digest grouped by likely owner and user-facing utility bucket.
 - **TSV/JSONL** (`reports/results.tsv`, `results.jsonl`): Machine-readable per-model formats for analysis.
 - **Run JSON** (`run.json`): Stable run-level machine contract with mode, grounding, counts, versions, and artifact paths.
-- **Diagnostics** (`reports/diagnostics.md`): Failure-focused and compatibility-focused issue report (generated when failures, harness issues, or preflight compatibility warnings are present).
+- **Diagnostics** (`reports/diagnostics.md`): Failure-, text-sanity-, and
+  compatibility-focused issue report (generated when failures, harness issues,
+  semantic/text-sanity issues, or preflight compatibility warnings are present).
 - **Log** (`check_models.log`): Canonical comprehensive run artifact, including the full per-model review block and full output/captured failure output.
 - **History** (`results.history.jsonl`): Append-only run history for regressions/recoveries.
-- **Issue templates** (`issues/`): Ready-to-file GitHub issue markdown for clustered crashes and harness problems, including Model, Inputs, Expected Behavior, and Actual Behavior sections (generated when failures are present).
-- **Repro bundles** (`repro_bundles/`): JSON reproduction bundles per failed model, containing error details, CLI args, and environment for reproducibility.
+- **Issue templates** (`issues/`): Ready-to-file GitHub issue markdown for clustered
+  crashes, harness problems, and text-sanity failures, including Model, Inputs,
+  Expected Behavior, and Actual Behavior sections.
+- **Repro bundles** (`repro_bundles/`): JSON reproduction bundles per issue cluster,
+  containing error or output-quality details, CLI args, and environment for reproducibility.
 
 The main Markdown report stays brief and points readers to `model_selection.md`,
 `model_gallery.md`, `review.md`, and `check_models.log` for decisions, evidence,
@@ -948,7 +953,7 @@ See module docstrings and `__all__` exports for complete API reference.
 | `--output-run-json` | Path | `output/run.json` | Run-level JSON metadata filename. |
 | `--output-log` | Path | `output/check_models.log` | Command line output log filename. |
 | `--output-env` | Path | `output/environment.log` | Environment log filename (pip freeze, conda list). |
-| `--output-diagnostics` | Path | `output/reports/diagnostics.md` | Diagnostics report filename (generated on failures/harness issues). |
+| `--output-diagnostics` | Path | `output/reports/diagnostics.md` | Diagnostics report filename (generated on failures, harness issues, text-sanity issues, or preflight warnings). |
 | `-m`, `--models` | list[str] | (none) | Explicit model IDs/paths; disables cache discovery. May be repeated; model lists accumulate across occurrences. |
 | `-e`, `--exclude` | list[str] | (none) | Models to exclude (applies to cache scan or explicit list). May be repeated; exclusions accumulate across occurrences. |
 | `--trust-remote-code` / `--no-trust-remote-code` | flag | `True` | Allow/disallow custom code from Hub models. Use `--no-trust-remote-code` for security. |
@@ -1107,7 +1112,9 @@ Line-delimited JSON for streaming ingestion:
 
 A comprehensive Markdown report focused on upstream debugging and issue reporting:
 
-- **Generation**: Created automatically when failures, harness issues (e.g., garbled output), or preflight compatibility warnings are detected.
+- **Generation**: Created automatically when failures, harness issues (e.g.,
+  garbled output), text-sanity/semantic issues, or preflight compatibility
+  warnings are detected.
 - **Failures Clustered**: Groups similar errors together to identify systemic issues.
 - **Reproducibility**: Includes explicit commands to reproduce specific failures.
 - **Environment**: Captures full package versions and system specs.

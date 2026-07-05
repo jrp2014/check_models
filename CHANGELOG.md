@@ -166,6 +166,9 @@ Notable changes to this project will be documented in this file.
 - Refactor the `defusedxml` availability probe to avoid an unused import
   suppression, and restrict distribution metadata reads to an explicit
   `direct_url.json` allowlist before touching `importlib.metadata`.
+- Promote mixed CJK/Latin token-soup outputs into text-sanity diagnostics,
+  issue clustering, and repro bundles so successful-but-unusable model runs are
+  visible to maintainers and model users.
 
 ### Fixed
 

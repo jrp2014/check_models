@@ -34,7 +34,8 @@ Expected outputs (default location: src/output/):
 - results.tsv
 - results.jsonl
 - results.history.jsonl
-- diagnostics.md (only when failures/harness issues are detected)
+- diagnostics.md (only when failures, harness issues, text-sanity issues, or
+  preflight warnings are detected)
 - check_models.log
 - environment.log
 

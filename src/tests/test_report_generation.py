@@ -3638,8 +3638,8 @@ class TestDiagnosticsReport:
         """Successful token-soup generations should be detailed in diagnostics."""
         out = tmp_path / "diag.md"
         junk_text = (
-            'open对不同方面">black/ with小猫小猫kotPicture •0超高清比!y表面处理超经典的！'
-            "张图片’七- object Tno-go-head-or U0.C在其他 ** ,Not只！被i animal"
+            'open对不同方面">black/ with小猫小猫kotPicture •0超高清比!y表面处理超经典的!'
+            "张图片'七- object Tno-go-head-or U0.C在其他 ** ,Not只!被i animal"
         )
         success = PerformanceResult(
             model_name="org/token-soup",
