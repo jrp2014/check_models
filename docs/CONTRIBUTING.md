@@ -465,11 +465,12 @@ bash tools/update.sh
 **Environment Variables**:
 
 - `SKIP_TORCH=1`: Skip PyTorch installation (torch is included by default)
-- `UPDATE_SYSTEM_PACKAGES=1`: Also run conda base/environment updates and
-  Homebrew update/upgrade. By default, `update.sh` leaves system package
-  managers alone.
+- `UPDATE_SYSTEM_PACKAGES=0`: Skip conda base/environment updates and Homebrew
+  update/upgrade. By default, `update.sh` refreshes system package managers.
 - `UPDATE_NODE_TOOLING=1`: Upgrade repo-local markdownlint tooling to the
   latest npm release. By default, `update.sh` installs from `package-lock.json`.
+- `CLEAN_PIP_INVALID_DISTS=0`: Skip cleanup of stale pip `~package` backup
+  directories that can produce "Ignoring invalid distribution" warnings.
 - `MLX_METAL_JIT=ON`: Build local `mlx` with runtime Metal compilation
   (mapped to `CMAKE_ARGS=-DMLX_METAL_JIT=ON`; if unset, MLX's default
   `MLX_METAL_JIT=OFF` uses pre-built kernels)

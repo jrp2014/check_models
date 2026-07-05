@@ -15,6 +15,9 @@ Notable changes to this project will be documented in this file.
   tables while preserving the full evidence appendix.
 - Keep `QualityThresholds` fallback defaults aligned with packaged
   `quality_config.yaml` and refresh the agent monolith size note.
+- Make `update.sh` refresh conda/Homebrew system packages by default, add
+  `UPDATE_SYSTEM_PACKAGES=0` as the skip path, and clean stale pip
+  `~package` backup directories that cause invalid-distribution warnings.
 - Keep cross-artifact report links portable across both `github` and
   `relative` link styles, including the Markdown gallery back-link to
   `results.md`, and add a regression sweep covering the generated Markdown
@@ -145,7 +148,7 @@ Notable changes to this project will be documented in this file.
 - Harden project setup and agent/CI documentation by aligning generated-stub
   paths across all type checkers, exposing root maintenance targets, removing
   stale lock-file workflow references, tightening local quality interpreter/tool
-  resolution, and making `update.sh` system/npm-latest upgrades opt-in while
+  resolution, and keeping `update.sh` npm-latest upgrades opt-in while
   preserving the unified script.
 - Keep repo-local Markdown linting locked to `markdownlint-cli2==0.23.0`, raise
   the Skylos development floor to `4.27.0`, and route TSV test fixture reads

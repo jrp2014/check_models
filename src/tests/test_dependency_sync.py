@@ -1373,21 +1373,43 @@ def test_update_script_import_repair_hint_uses_distribution_names() -> None:
     assert "Fix with: pip install ${MISSING_PKGS[*]}" not in update_script
 
 
-def test_update_script_keeps_system_and_node_latest_updates_opt_in() -> None:
-    """The unified updater should not upgrade system tooling unless requested."""
+def test_update_script_updates_system_packages_by_default_and_node_latest_opt_in() -> None:
+    """The updater should refresh system packages by default but keep npm latest opt-in."""
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+    readme = (PKG_ROOT / "README.md").read_text(encoding="utf-8")
+    contributing = (REPO_ROOT / "docs" / "CONTRIBUTING.md").read_text(encoding="utf-8")
 
     assert "UPDATE_SYSTEM_PACKAGES" in update_script
     assert "UPDATE_NODE_TOOLING" in update_script
-    assert 'if [[ "${UPDATE_SYSTEM_PACKAGES:-0}" == "1" ]]; then' in update_script
+    assert 'if [[ "${UPDATE_SYSTEM_PACKAGES:-1}" == "1" ]]; then' in update_script
     assert 'if [[ "${UPDATE_NODE_TOOLING:-0}" == "1" ]]; then' in update_script
-    assert "Skipping conda base/environment package updates" in update_script
-    assert "Skipping Homebrew update/upgrade" in update_script
+    assert "Skipping conda base/environment package updates (UPDATE_SYSTEM_PACKAGES=0)" in (
+        update_script
+    )
+    assert "Skipping Homebrew update/upgrade (UPDATE_SYSTEM_PACKAGES=0)" in update_script
     assert "Installing repo-local markdownlint tooling from package-lock.json" in update_script
+    assert (
+        "`UPDATE_SYSTEM_PACKAGES` | `tools/update.sh` conda base/env and Homebrew updates | `1` (run system updates)"
+        in readme
+    )
+    assert "`UPDATE_SYSTEM_PACKAGES=0`: Skip conda base/environment updates and Homebrew" in (
+        contributing
+    )
 
     package_latest = "markdownlint-cli2@latest"
     assert package_latest in update_script
     assert update_script.index(package_latest) > update_script.index("UPDATE_NODE_TOOLING")
+
+
+def test_update_script_cleans_stale_pip_invalid_distribution_backups() -> None:
+    """update.sh should clean pip '~package' backups that cause invalid-distribution warnings."""
+    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+
+    assert "cleanup_pip_invalid_distribution_backups" in update_script
+    assert 'if not name.startswith("~"):' in update_script
+    assert "path.is_symlink()" in update_script
+    assert "Removed stale pip invalid-distribution backup" in update_script
+    assert "CLEAN_PIP_INVALID_DISTS=0" in update_script
 
 
 def test_update_script_defers_macos_deployment_target_to_upstream_mlx() -> None:

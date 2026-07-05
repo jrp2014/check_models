@@ -3,7 +3,7 @@
 # Installs/updates the project and all dependencies from pyproject.toml.
 #
 # Execution Order:
-#   1. Optionally update conda/Homebrew if UPDATE_SYSTEM_PACKAGES=1
+#   1. Update conda/Homebrew by default unless UPDATE_SYSTEM_PACKAGES=0
 #   2. Install repo-local npm tooling from lockfile (or latest if UPDATE_NODE_TOOLING=1)
 #   3. Update pip/wheel/setuptools
 #   4. Install project in editable mode with all dependencies (dev + extras)
@@ -15,7 +15,7 @@
 #   FORCE_REINSTALL=1 ./update.sh     # Force reinstall with --force-reinstall
 #   SKIP_MLX=1 ./update.sh            # Force skip mlx/mlx-vlm updates (override detection)
 #   CONDA_UPDATE_ALL=1 ./update.sh    # Force conda update --all even with pip conflicts
-#   UPDATE_SYSTEM_PACKAGES=1 ./update.sh # Also run conda base/env and Homebrew updates
+#   UPDATE_SYSTEM_PACKAGES=0 ./update.sh # Skip conda base/env and Homebrew updates
 #   UPDATE_NODE_TOOLING=1 ./update.sh # Upgrade markdownlint-cli2 to latest npm release
 #   MLX_METAL_JIT=ON ./update.sh      # Build MLX with runtime Metal kernel compilation
 #   MACOSX_DEPLOYMENT_TARGET=26.2 ./update.sh # Override local mlx build target
@@ -74,10 +74,61 @@ if [[ -z "${VIRTUAL_ENV:-}" ]] && [[ -z "${CONDA_DEFAULT_ENV:-}" ]] && [[ -z "${
 	echo "[update.sh] Proceeding with global installation (user confirmed)..."
 fi
 
+cleanup_pip_invalid_distribution_backups() {
+	if [[ "${CLEAN_PIP_INVALID_DISTS:-1}" != "1" ]]; then
+		echo "[update.sh] Skipping stale pip invalid-distribution cleanup (CLEAN_PIP_INVALID_DISTS=0)"
+		return 0
+	fi
+
+	if ! python - <<'PY'
+from __future__ import annotations
+
+import shutil
+import sys
+import sysconfig
+from pathlib import Path
+
+site_dirs = {
+    value
+    for key in ("purelib", "platlib")
+    if (value := sysconfig.get_path(key)) is not None
+}
+removed: list[Path] = []
+
+for site_dir_value in sorted(site_dirs):
+    site_dir = Path(site_dir_value)
+    if not site_dir.is_dir():
+        continue
+
+    for path in site_dir.iterdir():
+        name = path.name
+        if not name.startswith("~"):
+            continue
+        if path.is_symlink():
+            print(f"[update.sh] Skipping stale pip backup symlink: {path}", file=sys.stderr)
+            continue
+        if path.is_dir():
+            shutil.rmtree(path)
+        else:
+            path.unlink()
+        removed.append(path)
+
+if removed:
+    print("[update.sh] Removed stale pip invalid-distribution backup(s):")
+    for path in removed:
+        print(f"   - {path}")
+PY
+	then
+		echo "⚠️  Unable to clean stale pip invalid-distribution backups; continuing"
+	fi
+}
+
+cleanup_pip_invalid_distribution_backups
+
 # Update conda itself (base) and environment packages with pip-conflict safety check.
 # NOTE: conda update --all can break pip-installed packages (mlx, mlx-vlm) by
-# reshuffling shared dependencies like numpy. Keep this opt-in for update.sh.
-if [[ "${UPDATE_SYSTEM_PACKAGES:-0}" == "1" ]]; then
+# reshuffling shared dependencies like numpy. Keep conflict checks in place.
+if [[ "${UPDATE_SYSTEM_PACKAGES:-1}" == "1" ]]; then
 	if [[ -n "${CONDA_DEFAULT_ENV:-}" ]]; then
 		echo "[update.sh] Updating conda (base)..."
 		conda update -n base conda -y
@@ -128,11 +179,11 @@ if [[ "${UPDATE_SYSTEM_PACKAGES:-0}" == "1" ]]; then
 		echo "[update.sh] Not in conda environment; skipping conda update"
 	fi
 else
-	echo "[update.sh] Skipping conda base/environment package updates (set UPDATE_SYSTEM_PACKAGES=1 to run)"
+	echo "[update.sh] Skipping conda base/environment package updates (UPDATE_SYSTEM_PACKAGES=0)"
 fi
 
-# Homebrew updates are system-wide; keep them opt-in with the conda system path.
-if [[ "${UPDATE_SYSTEM_PACKAGES:-0}" == "1" ]]; then
+# Homebrew updates are system-wide; run them with the conda system path unless explicitly skipped.
+if [[ "${UPDATE_SYSTEM_PACKAGES:-1}" == "1" ]]; then
 	if command -v brew >/dev/null 2>&1; then
 		echo "[update.sh] Updating Homebrew..."
 		brew update
@@ -141,7 +192,7 @@ if [[ "${UPDATE_SYSTEM_PACKAGES:-0}" == "1" ]]; then
 		echo "[update.sh] Homebrew not found; skipping brew update/upgrade"
 	fi
 else
-	echo "[update.sh] Skipping Homebrew update/upgrade (set UPDATE_SYSTEM_PACKAGES=1 to run)"
+	echo "[update.sh] Skipping Homebrew update/upgrade (UPDATE_SYSTEM_PACKAGES=0)"
 fi
 
 # Determine project root (assuming check_models/src/tools/update.sh)
