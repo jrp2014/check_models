@@ -455,6 +455,8 @@ bash tools/update.sh
 - Uses repo-local Node tooling (`npm install --ignore-scripts --prefix src`) for
   markdownlint instead of relying on global packages; latest npm upgrades are
   opt-in
+- Reinstalls `check_models` from `src/pyproject.toml` after local/PyPI MLX
+  updates so the project dependency policy performs the final reconciliation
 - Verifies dependency sync across `pyproject.toml`, generated README install blocks, and updater assumptions
 - Logs MLX backend provenance, including the installed `mlx`, `mlx-metal`,
   `libmlx.dylib`, and `mlx.metallib` locations and hashes

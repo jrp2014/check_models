@@ -6,8 +6,8 @@
 #   1. Update conda/Homebrew by default unless UPDATE_SYSTEM_PACKAGES=0
 #   2. Install repo-local npm tooling from lockfile (or latest if UPDATE_NODE_TOOLING=1)
 #   3. Update pip/wheel/setuptools
-#   4. Install project in editable mode with all dependencies (dev + extras)
-#   5. Then update local MLX repos (if present) OR update from PyPI
+#   4. Update local MLX repos (if present) OR update from PyPI
+#   5. Reinstall project in editable mode from pyproject.toml to reconcile deps
 #
 # Usage examples:
 #   ./update.sh                       # Install project + dev + extras + torch (MLX_METAL_JIT=OFF by default)
@@ -24,14 +24,16 @@
 #
 # Local MLX Development:
 #   If mlx, mlx-lm, and mlx-vlm directories exist at ../../ (sibling to check_models/),
-#   the script will automatically (AFTER installing all library dependencies):
+#   the script will automatically:
 #   1. Run git pull in each repository
 #   2. Install requirements.txt (if present) for additional dependencies
 #      (Note: mlx requires setuptools>=80 and typing_extensions for builds)
 #   3. Install packages in dependency order: mlx → mlx-lm → mlx-vlm
-#   5. Verify editable install origins for mlx, mlx-lm, and mlx-vlm
-#   6. Generate stubs for this project (mlx_lm, mlx_vlm, transformers, tokenizers)
-#   7. Skip PyPI updates for these packages
+#   4. Verify editable install origins for mlx, mlx-lm, and mlx-vlm
+#   5. Skip PyPI MLX updates for these packages
+#   6. Reinstall check_models from pyproject.toml to reconcile shared deps
+#   7. Generate stubs for this project (mlx_lm, mlx_vlm, transformers, tokenizers)
+#   8. Run the local MLX runtime smoke if a local mlx build was installed
 #
 # Requirements for local MLX builds:
 #   - CMake >= 3.25 (MLX minimum requirement as of 2025)
@@ -541,9 +543,10 @@ run_generate_stubs_command() {
 # Ensure global Python packaging tools are current
 # Use pip_install_tool (non-eager) to avoid cascading upgrades of shared deps
 echo "[update.sh] Updating core Python packaging tools (pip, wheel, setuptools, build, pyrefly)..."
-pip_install_tool pip wheel setuptools build pyrefly
+pip_install_tool pip wheel "setuptools>=80,<82" build pyrefly
 
-# Install project with all dependencies from pyproject.toml
+# Resolve project extras once; the install itself runs after MLX updates so
+# pyproject.toml performs the final dependency reconciliation.
 INSTALL_GROUPS=".[dev,extras,torch]"
 if [[ "${SKIP_TORCH:-0}" == "1" ]]; then
 	INSTALL_GROUPS=".[dev,extras]"
@@ -552,8 +555,41 @@ else
 	echo "[update.sh] Including torch group (default, set SKIP_TORCH=1 to skip)"
 fi
 
-echo "[update.sh] Installing project with all dependencies from pyproject.toml..."
-pip_install -e "$PROJECT_ROOT/$INSTALL_GROUPS"
+reconcile_project_environment_from_pyproject() {
+	echo ""
+	echo "[update.sh] Reinstalling project from pyproject.toml after MLX updates..."
+	pip_install -e "$PROJECT_ROOT/$INSTALL_GROUPS"
+
+	echo ""
+	echo "[update.sh] Running post-install dependency validation..."
+	python -m pip check
+	(
+		cd "$PROJECT_ROOT"
+		python -m tools.validate_env --expected-conda-env "${CONDA_DEFAULT_ENV:-mlx-vlm}"
+	)
+}
+
+generate_project_stubs() {
+	local ORIGINAL_DIR
+	ORIGINAL_DIR="$(pwd)"
+	cd "$SCRIPT_DIR"
+	if [[ -f "$SCRIPT_DIR/generate_stubs.py" ]]; then
+		echo "[update.sh] Generating type stubs for mlx_lm, mlx_vlm, transformers, and tokenizers..."
+		if run_generate_stubs_command "$SCRIPT_DIR" mlx_lm mlx_vlm transformers tokenizers; then
+			echo "✓ Project stubs generated successfully"
+		else
+			echo "⚠️  Failed to generate project stubs; verifying existing local stubs"
+		fi
+
+		if ! run_generate_stubs_command "$SCRIPT_DIR" --check --refresh-manifest-on-check mlx_lm mlx_vlm transformers tokenizers; then
+			echo "❌ Project stub integrity verification failed"
+			cd "$ORIGINAL_DIR"
+			return 1
+		fi
+		echo "✓ Project stubs verified"
+	fi
+	cd "$ORIGINAL_DIR"
+}
 
 # Function to clean build artifacts from local MLX repositories
 clean_local_mlx_builds() {
@@ -844,7 +880,7 @@ update_local_mlx_repos() {
 			# Use pip_install_tool to avoid eager transitive upgrades.
 			echo "[update.sh] Installing MLX build dependencies..."
 			pip_install_tool cmake
-			pip_install_tool setuptools
+			pip_install_tool "setuptools>=80,<82"
 			pip_install_tool typing_extensions
 
 			local JIT_SETTING_RAW="${MLX_METAL_JIT:-}"
@@ -934,39 +970,12 @@ update_local_mlx_repos() {
 		esac
 	done
 
-	# Stage 5: Generate project stubs if applicable
-	cd "$SCRIPT_DIR"
-	if [[ -f "$SCRIPT_DIR/generate_stubs.py" ]]; then
-		echo "[update.sh] Generating type stubs for mlx_lm, mlx_vlm, transformers, and tokenizers..."
-		if run_generate_stubs_command "$SCRIPT_DIR" mlx_lm mlx_vlm transformers tokenizers; then
-			echo "✓ Project stubs generated successfully"
-		else
-			echo "⚠️  Failed to generate project stubs; verifying existing local stubs"
-		fi
-
-		if ! run_generate_stubs_command "$SCRIPT_DIR" --check --refresh-manifest-on-check mlx_lm mlx_vlm transformers tokenizers; then
-			echo "❌ Project stub integrity verification failed"
-			cd "$ORIGINAL_DIR"
-			return 1
-		fi
-		echo "✓ Project stubs verified"
-	fi
-
-	local LOCAL_MLX_READY=0
 	for idx in "${!REPO_NAMES[@]}"; do
 		if [[ "${REPO_NAMES[idx]}" == "mlx" && ${REPO_SKIP[idx]} -eq 0 ]]; then
 			LOCAL_MLX_READY=1
 			break
 		fi
 	done
-
-	if [[ $LOCAL_MLX_READY -eq 1 ]]; then
-		log_mlx_runtime_provenance
-		if ! run_local_mlx_backend_smoke; then
-			cd "$ORIGINAL_DIR"
-			return 1
-		fi
-	fi
 
 	cd "$ORIGINAL_DIR"
 	echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -983,6 +992,7 @@ fi
 
 # Determine if we should skip PyPI MLX updates
 SKIP_MLX_PYPI=0
+LOCAL_MLX_READY=0
 
 # Check for local MLX repos
 if update_local_mlx_repos; then
@@ -1025,6 +1035,16 @@ else
 	# Explicitly upgrade MLX ecosystem from PyPI, triggering eager transitive upgrades
 	# mlx-metal is the Metal GPU backend - must be explicitly installed
 	pip_install mlx mlx-metal mlx-lm mlx-vlm
+fi
+
+reconcile_project_environment_from_pyproject
+generate_project_stubs
+
+if [[ $LOCAL_MLX_READY -eq 1 ]]; then
+	log_mlx_runtime_provenance
+	if ! run_local_mlx_backend_smoke; then
+		exit 1
+	fi
 fi
 
 echo "[update.sh] Done."

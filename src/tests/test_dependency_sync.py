@@ -1412,6 +1412,35 @@ def test_update_script_cleans_stale_pip_invalid_distribution_backups() -> None:
     assert "CLEAN_PIP_INVALID_DISTS=0" in update_script
 
 
+def test_update_script_reconciles_project_after_mlx_dependency_churn() -> None:
+    """update.sh should let pyproject.toml reconcile deps after MLX updates."""
+    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+    policy_source = (PKG_ROOT / "check_models_data" / "dependency_policy.py").read_text(
+        encoding="utf-8",
+    )
+    main_flow = update_script[update_script.index("# Clean build artifacts if requested") :]
+
+    assert "UPDATE_PIP_CONSTRAINT" not in update_script
+    assert "UPDATE_PIP_CONSTRAINT_SPECS" not in policy_source
+    assert 'pip install "${args[@]}" "$@"' in update_script
+    assert 'pip_install_tool "setuptools>=80,<82"' in update_script
+
+    local_update_pos = main_flow.index("if update_local_mlx_repos; then")
+    pypi_update_pos = main_flow.index("pip_install mlx mlx-metal mlx-lm mlx-vlm")
+    reconcile_pos = main_flow.index("reconcile_project_environment_from_pyproject")
+    stubs_pos = main_flow.index("generate_project_stubs")
+    local_smoke_pos = main_flow.index("run_local_mlx_backend_smoke")
+    critical_check_pos = main_flow.index("[update.sh] Verifying critical packages")
+
+    assert local_update_pos < reconcile_pos
+    assert pypi_update_pos < reconcile_pos
+    assert reconcile_pos < stubs_pos
+    assert reconcile_pos < local_smoke_pos
+    assert stubs_pos < critical_check_pos
+    assert "python -m pip check" in update_script
+    assert "python -m tools.validate_env" in update_script
+
+
 def test_update_script_defers_macos_deployment_target_to_upstream_mlx() -> None:
     """Local mlx builds should let upstream MLX choose the deployment target."""
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")

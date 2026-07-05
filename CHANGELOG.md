@@ -18,6 +18,10 @@ Notable changes to this project will be documented in this file.
 - Make `update.sh` refresh conda/Homebrew system packages by default, add
   `UPDATE_SYSTEM_PACKAGES=0` as the skip path, and clean stale pip
   `~package` backup directories that cause invalid-distribution warnings.
+- Reorder `update.sh` so local/PyPI MLX updates happen before the final project
+  reinstall from `pyproject.toml`, then run dependency validation, stub checks,
+  and the local backend smoke against the reconciled environment instead of
+  carrying updater-wide pip constraints.
 - Keep cross-artifact report links portable across both `github` and
   `relative` link styles, including the Markdown gallery back-link to
   `results.md`, and add a regression sweep covering the generated Markdown
