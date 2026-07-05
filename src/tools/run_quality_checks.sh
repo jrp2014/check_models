@@ -99,6 +99,10 @@ echo "=== Skylos Quality Gate ==="
 TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
     quality_run_python_tool skylos . --quality --secrets --sca --gate --no-upload --format concise
 
+echo "=== Skylos Audit Gate ==="
+TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0 \
+    quality_run_python_tool skylos . -a
+
 if [ "$QUALITY_MODE" = "fast" ]; then
     echo "=== Pytest (fast set) ==="
     "$QUALITY_PYTHON" -m pytest -q -m "not slow and not e2e"

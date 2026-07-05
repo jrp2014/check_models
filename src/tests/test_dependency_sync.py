@@ -1225,12 +1225,18 @@ def test_quality_script_runs_skylos_quality_gate() -> None:
         in quality_script
     )
     assert 'echo "=== Skylos Quality Gate ==="' in quality_script
+    assert 'echo "=== Skylos Audit Gate ==="' in quality_script
     assert "SKYLOS_JOBS" not in quality_script
     assert "--danger" not in quality_script
     assert re.search(
         r"TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0\s+\\?\s*"
         r"quality_run_python_tool skylos \. --quality --secrets --sca --gate --no-upload "
         r"--format concise",
+        quality_script,
+    )
+    assert re.search(
+        r"TERM=dumb NO_COLOR=1 CLICOLOR=0 FORCE_COLOR=0 PY_COLORS=0\s+\\?\s*"
+        r"quality_run_python_tool skylos \. -a",
         quality_script,
     )
 
@@ -1265,6 +1271,21 @@ def test_tsv_output_tests_use_safe_text_reads_for_skylos_advisory_scan() -> None
     assert "from tools import safe_io" in test_source
     assert "safe_io.read_text_no_follow(path)" in test_source
     assert "path.read_text" not in test_source
+
+
+def test_report_generation_link_style_helper_uses_safe_bundle_write() -> None:
+    """Report fixture bundle writes should not follow symlinks."""
+    test_source = (PKG_ROOT / "tests" / "test_report_generation.py").read_text(
+        encoding="utf-8",
+    )
+    helper_source = test_source[
+        test_source.index("def _generate_output_artifacts_for_link_style") : test_source.index(
+            "def _make_success",
+        )
+    ]
+
+    assert 'check_models._write_text_file(bundle_path, "{}")' in helper_source
+    assert "bundle_path.write_text" not in helper_source
 
 
 def test_defusedxml_probe_avoids_unused_import_suppression() -> None:

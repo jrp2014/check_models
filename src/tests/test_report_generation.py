@@ -225,7 +225,7 @@ def _generate_output_artifacts_for_link_style(
     )
     bundle_path = output_dir / "repro_bundles" / "broken.json"
     bundle_path.parent.mkdir(parents=True, exist_ok=True)
-    bundle_path.write_text("{}", encoding="utf-8")
+    check_models._write_text_file(bundle_path, "{}")
     repro_bundles = {failure.model_name: bundle_path}
     diagnostics_snapshot = _build_diagnostics_snapshot(results=results, prompt=prompt)
 

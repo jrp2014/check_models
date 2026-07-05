@@ -55,7 +55,7 @@ Expected outputs (default location: src/output/):
 make install   # install runtime dependencies
 make dev       # install dev dependencies (dev + extras + torch)
 make test      # run pytest only
-make quality   # run full gate (ruff + typing + vulture + Skylos + pytest + shellcheck + markdownlint)
+make quality   # run full gate (ruff + typing + vulture + Skylos quality/audit + pytest + shellcheck + markdownlint)
 make skylos-danger      # advisory Skylos workflow/security scan
 make skylos-danger-llm  # same advisory scan with LLM-oriented output
 make skylos-verify      # narrow Skylos file/range verifier (pass ARGS='--file ... --range ...')

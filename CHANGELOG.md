@@ -22,6 +22,11 @@ Notable changes to this project will be documented in this file.
   reinstall from `pyproject.toml`, then run dependency validation, stub checks,
   and the local backend smoke against the reconciled environment instead of
   carrying updater-wide pip constraints.
+- Harden the report-generation link-style fixture to use the symlink-resistant
+  report writer for repro bundle JSON, clearing the Skylos `SKY-D324` advisory
+  without suppressing it.
+- Promote `skylos . -a` into the blocking `make quality` gate as a separate
+  audit profile, with docs and tests documenting the expected coverage.
 - Keep cross-artifact report links portable across both `github` and
   `relative` link styles, including the Markdown gallery back-link to
   `results.md`, and add a regression sweep covering the generated Markdown

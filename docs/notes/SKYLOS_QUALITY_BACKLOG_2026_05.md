@@ -4,10 +4,10 @@ Skylos quality diagnostics are advisory for now. Gate project cleanup on securit
 secret, and dependency findings first, then use these quality results as a
 focused refactoring queue.
 
-The blocking `make quality` gate runs Skylos quality, secrets, and SCA checks.
-Run `make skylos-danger` separately so `--danger` continues to review GitHub
-Actions workflow changes while the team decides independently whether a clean
-advisory queue should be promoted into the blocking gate.
+The blocking `make quality` gate runs Skylos quality, secrets, SCA, and `-a`
+audit checks. Run `make skylos-danger` separately so `--danger` continues to
+review GitHub Actions workflow changes while the team decides independently
+whether a clean advisory queue should be promoted into the blocking gate.
 
 Current status: the advisory repo-root `--danger` queue is clean, so promotion
 is a policy choice now, not a cleanup blocker.

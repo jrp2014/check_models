@@ -62,7 +62,7 @@ The file is organized in this order — search for these exact landmark headers 
 
 | Target | What it does |
 | -------- | ------------- |
-| `make quality` | **Primary gate**: checks Ruff formatting + lint, mypy, ty, pyrefly, vulture, Skylos quality/secrets/SCA, full pytest, shellcheck, markdownlint |
+| `make quality` | **Primary gate**: checks Ruff formatting + lint, mypy, ty, pyrefly, vulture, Skylos quality/secrets/SCA plus `-a` audit, full pytest, shellcheck, markdownlint |
 | `make skylos-danger` | Advisory Skylos `--danger` scan for workflow and security findings; not merge-blocking yet, but the current repo-root scan is clean and could be promoted later |
 | `make skylos-danger-llm` | Advisory Skylos `--danger` scan with LLM-optimized output for agent triage |
 | `make skylos-verify` | Run `skylos verify` with repo project context for narrow post-edit agent checks |
@@ -91,13 +91,13 @@ The file is organized in this order — search for these exact landmark headers 
 ### 7. CI and hooks
 
 - **Skylos advisory job**: GitHub Actions `skylos-advisory` on `ubuntu-latest` runs `bash src/tools/run_skylos_danger_advisory.sh` so workflow-security findings are surfaced separately from the blocking quality gate. The current repo-root advisory scan is clean, so this path is now a viable candidate for promotion if the team wants stricter enforcement.
-- **Static CI job**: GitHub Actions `static-quality` on `macos-15`, Python 3.13, Node.js 22. It installs `src/.[dev]`, runs `npm install --ignore-scripts --prefix src`, generates MLX stubs via nanobind into `typings/`, then runs `bash src/tools/run_quality_checks.sh`, including Skylos quality/secrets/SCA checks.
+- **Static CI job**: GitHub Actions `static-quality` on `macos-15`, Python 3.13, Node.js 22. It installs `src/.[dev]`, runs `npm install --ignore-scripts --prefix src`, generates MLX stubs via nanobind into `typings/`, then runs `bash src/tools/run_quality_checks.sh`, including Skylos quality/secrets/SCA and `-a` audit checks.
 - **Runtime CI job**: separate `runtime-smoke` job runs `bash src/tools/run_runtime_smoke.sh` so Metal/runtime failures do not mask static quality results.
 - **Dependency sync CI job**: `.github/workflows/dependency-sync.yml` runs on `ubuntu-latest` with path filters and verifies `python -m tools.update_readme_deps --check`.
 - **Pre-commit hooks**: either `pre-commit install` or `cd src && python -m tools.install_precommit_hook`. Both install the same two stages:
   - commit stage: `bash src/tools/run_commit_hygiene.sh`
   - push stage: `bash src/tools/check_quality_simple.sh`
-- **PRs must pass**: workflow YAML validation, dependency sync check, ruff format + lint, mypy, ty, pyrefly, vulture, Skylos quality/secrets/SCA, pytest, shellcheck, markdownlint, plus the isolated runtime smoke probe. Skylos `--danger` runs separately in advisory mode with GitHub annotations and summaries, but the clean advisory queue means it can be promoted later without carrying known debt.
+- **PRs must pass**: workflow YAML validation, dependency sync check, ruff format + lint, mypy, ty, pyrefly, vulture, Skylos quality/secrets/SCA and `-a` audit, pytest, shellcheck, markdownlint, plus the isolated runtime smoke probe. Skylos `--danger` runs separately in advisory mode with GitHub annotations and summaries, but the clean advisory queue means it can be promoted later without carrying known debt.
 
 ### 8. Coding conventions (quick reference)
 

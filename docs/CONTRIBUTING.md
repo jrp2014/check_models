@@ -190,7 +190,7 @@ The project uses several automated quality checks:
 6. **Combined quality check**:
 
    ```bash
-   make quality     # Runs ruff + mypy + ty + pyrefly + vulture + Skylos + full pytest + shellcheck + markdownlint
+   make quality     # Runs ruff + mypy + ty + pyrefly + vulture + Skylos quality/audit + full pytest + shellcheck + markdownlint
    ```
 
    The Ty and Vulture steps inside `make quality` use the same checked-in repo
@@ -199,9 +199,9 @@ The project uses several automated quality checks:
    run `make test` separately only when you want a pytest-only feedback loop.
    Validation tests must not rewrite tracked `src/output/` assets; use a temp
    directory or gitignored `test_*` path for generated reports and logs.
-   The blocking Skylos step gates quality, secrets, and dependency-vulnerability
-   scans. Run `make skylos-danger` separately for advisory `--danger` findings,
-   including GitHub Actions workflow hardening checks. Run
+   The blocking Skylos steps gate quality, secrets, dependency-vulnerability,
+   and `-a` audit findings. Run `make skylos-danger` separately for advisory
+   `--danger` findings, including GitHub Actions workflow hardening checks. Run
    `make skylos-danger-llm` when you want the same advisory findings rendered in
    the LLM-oriented format for agent triage. For a narrow agent/edit-loop check,
    run `make skylos-verify ARGS='--file path/to/file --range L1:L2'`.
@@ -268,7 +268,7 @@ git push --no-verify
 
 All pull requests must pass:
 
-- Quality workflow (`.github/workflows/quality.yml`) `static-quality` job: workflow YAML validation, dependency sync check, ruff format check + lint, mypy + ty + pyrefly + Vulture, Skylos quality/secrets/SCA, pytest, shellcheck, markdownlint
+- Quality workflow (`.github/workflows/quality.yml`) `static-quality` job: workflow YAML validation, dependency sync check, ruff format check + lint, mypy + ty + pyrefly + Vulture, Skylos quality/secrets/SCA plus `-a` audit, pytest, shellcheck, markdownlint
 - Quality workflow (`.github/workflows/quality.yml`) `runtime-smoke` job: isolated runtime smoke probe via `src/tools/run_runtime_smoke.sh`
 - Dependency sync guard (`.github/workflows/dependency-sync.yml`)
 
