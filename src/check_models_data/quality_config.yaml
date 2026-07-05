@@ -112,6 +112,9 @@ thresholds:
   text_sanity_mixed_script_min_symbol_ratio: 0.05 # Symbol ratio needed before mixed scripts look like token soup
   text_sanity_mixed_script_min_families: 4 # Script-family count before mixed-script output is suspicious
   text_sanity_mixed_script_max_tokens: 25 # Keep mixed-script suspicion to short, noisy outputs
+  text_sanity_cjk_latin_min_cjk_chars: 3 # CJK chars needed before CJK+Latin short output can be token soup
+  text_sanity_cjk_latin_min_latin_chars: 8 # Latin chars needed before CJK+Latin short output can be token soup
+  text_sanity_cjk_latin_min_cjk_tokens: 2 # CJK-bearing tokens needed when no token glues CJK+Latin together
   text_sanity_min_tokens: 5 # Minimum tokens for token-noise checks
   text_sanity_numeric_loop_min_count: 6 # Repeated numeric/year tokens before numeric-loop flag
 

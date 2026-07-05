@@ -44,6 +44,23 @@ def test_analyze_generation_text_flags_short_token_noise() -> None:
     assert "text_sanity" in analysis.evidence
 
 
+def test_analyze_generation_text_flags_cjk_latin_token_soup() -> None:
+    """Mixed CJK/Latin token soup should not be classified as a clean caption."""
+    text = (
+        'open对不同方面">black/ with小猫小猫kotPicture •0超高清比!y表面处理超经典的！'
+        "张图片’七- object Tno-go-head-or U0.C在其他 ** ,Not只！被i animal "
+        "...'s*: .# • 模型被 partially \" alsoDifferent一\n"
+        ',  Germanyc-under,"开Picture顶 noncolor_over宠关 feature PETwith对上 from！'
+    )
+
+    analysis = check_models.analyze_generation_text(text, 85)
+
+    assert analysis.text_sanity_issue_type == "gibberish(mixed_script_noise)"
+    assert analysis.verdict == "semantic_mismatch"
+    assert analysis.user_bucket == "avoid"
+    assert "text_sanity" in analysis.evidence
+
+
 def test_repetitive_token_cap_is_generation_loop_diagnostic() -> None:
     """Max-token repetition should carry an explicit generation-loop signal."""
     analysis, issues = check_models._analyze_text_quality(

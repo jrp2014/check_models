@@ -3634,6 +3634,42 @@ class TestDiagnosticsReport:
         assert "### Long-Context Degradation / Potential Stack Issues" in content
         assert "org/suspicious-success" in content
 
+    def test_report_written_for_text_sanity_success_without_failures(self, tmp_path: Path) -> None:
+        """Successful token-soup generations should be detailed in diagnostics."""
+        out = tmp_path / "diag.md"
+        junk_text = (
+            'open对不同方面">black/ with小猫小猫kotPicture •0超高清比!y表面处理超经典的！'
+            "张图片’七- object Tno-go-head-or U0.C在其他 ** ,Not只！被i animal"
+        )
+        success = PerformanceResult(
+            model_name="org/token-soup",
+            success=True,
+            generation=_MockGeneration(
+                text=junk_text,
+                prompt_tokens=319,
+                generation_tokens=85,
+            ),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+        )
+
+        result = generate_diagnostics_report(
+            results=[success],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="Describe this image briefly.",
+        )
+
+        assert result is True
+        content = out.read_text(encoding="utf-8")
+        assert "## Text-Sanity / Semantic Mismatch Issues (1 model(s))" in content
+        assert "org/token-soup" in content
+        assert "gibberish(mixed_script_noise)" in content
+        assert "open对不同方面" in content
+        assert "## Models Not Flagged" not in content
+
     def test_report_written_for_context_echo_stack_signal(self, tmp_path: Path) -> None:
         """Extreme prompt-length context echo should be surfaced as a stack-signal candidate."""
         out = tmp_path / "diag.md"
@@ -4451,7 +4487,9 @@ class TestDiagnosticsReport:
                 diagnostics_path=diagnostics_path,
             )
 
-        assert "Diagnostics signals: failures=1, harness=1, stack=0, preflight=1" in caplog.text
+        assert (
+            "Diagnostics signals: failures=1, harness=1, stack=0, text_sanity=0, preflight=1"
+        ) in caplog.text
         assert "Likely owners:" in caplog.text
         assert "Repro bundles available for 1 issue-linked model(s)." in caplog.text
 

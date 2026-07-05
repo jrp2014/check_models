@@ -490,6 +490,9 @@ class QualityThresholds:
     text_sanity_mixed_script_min_symbol_ratio: float = 0.05
     text_sanity_mixed_script_min_families: int = 4
     text_sanity_mixed_script_max_tokens: int = 25
+    text_sanity_cjk_latin_min_cjk_chars: int = 3
+    text_sanity_cjk_latin_min_latin_chars: int = 8
+    text_sanity_cjk_latin_min_cjk_tokens: int = 2
     text_sanity_min_tokens: int = 5
     text_sanity_numeric_loop_min_count: int = 6
 
@@ -649,6 +652,24 @@ class QualityThresholds:
             msg = (
                 "quality_config.yaml thresholds.text_sanity_mixed_script_max_tokens must be > 0; "
                 f"got {self.text_sanity_mixed_script_max_tokens}"
+            )
+            raise ValueError(msg)
+        if self.text_sanity_cjk_latin_min_cjk_chars <= 0:
+            msg = (
+                "quality_config.yaml thresholds.text_sanity_cjk_latin_min_cjk_chars must be "
+                f"> 0; got {self.text_sanity_cjk_latin_min_cjk_chars}"
+            )
+            raise ValueError(msg)
+        if self.text_sanity_cjk_latin_min_latin_chars <= 0:
+            msg = (
+                "quality_config.yaml thresholds.text_sanity_cjk_latin_min_latin_chars must be "
+                f"> 0; got {self.text_sanity_cjk_latin_min_latin_chars}"
+            )
+            raise ValueError(msg)
+        if self.text_sanity_cjk_latin_min_cjk_tokens <= 0:
+            msg = (
+                "quality_config.yaml thresholds.text_sanity_cjk_latin_min_cjk_tokens must be "
+                f"> 0; got {self.text_sanity_cjk_latin_min_cjk_tokens}"
             )
             raise ValueError(msg)
         if self.text_sanity_min_tokens <= 0:
@@ -3595,6 +3616,8 @@ _TEXT_SANITY_LEADING_NOISE_RE: Final[re.Pattern[str]] = re.compile(r"^[^\w\s]{2,
 _TEXT_SANITY_NUMERIC_TOKEN_RE: Final[re.Pattern[str]] = re.compile(r"\b(?:19|20)\d{2}\b|\b\d+\b")
 _TEXT_SANITY_WORDLIKE_TOKEN_RE: Final[re.Pattern[str]] = re.compile(r"[A-Za-z][A-Za-z'-]{1,}")
 _TEXT_SANITY_STRUCTURAL_MARKER_RE: Final[re.Pattern[str]] = re.compile(r"[{}\[\]<>/\\|_=]{2,}")
+_TEXT_SANITY_CJK_CHAR_RE: Final[re.Pattern[str]] = re.compile(r"[\u3400-\u9fff]")
+_TEXT_SANITY_LATIN_CHAR_RE: Final[re.Pattern[str]] = re.compile(r"[A-Za-z]")
 _TEXT_SANITY_MIN_REPEATED_NUMERIC_TOKEN_COUNT: Final[int] = 3
 
 
@@ -3667,6 +3690,33 @@ def _has_mixed_script_token_noise(
     )
 
 
+def _has_cjk_latin_token_soup(
+    cleaned: str,
+    tokens: Sequence[str],
+    *,
+    token_count: int,
+    symbol_ratio: float,
+) -> bool:
+    """Return True for short CJK/Latin fragments that look tokenized, not bilingual."""
+    if (
+        token_count > QUALITY.text_sanity_mixed_script_max_tokens
+        or symbol_ratio < QUALITY.text_sanity_mixed_script_min_symbol_ratio
+    ):
+        return False
+
+    cjk_chars = _TEXT_SANITY_CJK_CHAR_RE.findall(cleaned)
+    latin_chars = _TEXT_SANITY_LATIN_CHAR_RE.findall(cleaned)
+    if (
+        len(cjk_chars) < QUALITY.text_sanity_cjk_latin_min_cjk_chars
+        or len(latin_chars) < QUALITY.text_sanity_cjk_latin_min_latin_chars
+    ):
+        return False
+
+    cjk_tokens = [token for token in tokens if _TEXT_SANITY_CJK_CHAR_RE.search(token)]
+    mixed_tokens = [token for token in cjk_tokens if _TEXT_SANITY_LATIN_CHAR_RE.search(token)]
+    return bool(mixed_tokens) or (len(cjk_tokens) >= QUALITY.text_sanity_cjk_latin_min_cjk_tokens)
+
+
 def _has_general_token_noise(
     *,
     token_count: int,
@@ -3708,6 +3758,11 @@ def _detect_text_sanity_issue(text: str) -> tuple[bool, str | None]:
                 token_count = len(tokens)
                 if _has_mixed_script_token_noise(
                     cleaned,
+                    token_count=token_count,
+                    symbol_ratio=symbol_ratio,
+                ) or _has_cjk_latin_token_soup(
+                    cleaned,
+                    tokens,
                     token_count=token_count,
                     symbol_ratio=symbol_ratio,
                 ):
@@ -12608,6 +12663,7 @@ class DiagnosticsSnapshot:
     failed: tuple[PerformanceResult, ...] = ()
     harness_results: tuple[tuple[PerformanceResult, str], ...] = ()
     stack_signals: tuple[tuple[PerformanceResult, str, str], ...] = ()
+    text_sanity_results: tuple[tuple[PerformanceResult, str], ...] = ()
     unflagged_successful: tuple[PerformanceResult, ...] = ()
     preflight_issues: tuple[str, ...] = ()
     failure_clusters: tuple[tuple[str, tuple[PerformanceResult, ...]], ...] = ()
@@ -13221,10 +13277,17 @@ def _build_diagnostics_snapshot(
         successful,
         preflight_issues=preflight_issues,
     )
-    harness_results, stack_signals, unflagged_successful = _partition_success_diagnostics(
+    text_sanity_detected = _collect_text_sanity_results(successful)
+    (
+        harness_results,
+        stack_signals,
+        text_sanity_results,
+        unflagged_successful,
+    ) = _partition_success_diagnostics(
         successful=successful,
         harness_results=harness_detected,
         stack_signals=stack_detected,
+        text_sanity_results=text_sanity_detected,
     )
     failure_clusters: tuple[tuple[str, tuple[PerformanceResult, ...]], ...] = ()
     if failed:
@@ -13239,6 +13302,7 @@ def _build_diagnostics_snapshot(
         failed=failed,
         harness_results=tuple(harness_results),
         stack_signals=tuple(stack_signals),
+        text_sanity_results=tuple(text_sanity_results),
         unflagged_successful=tuple(unflagged_successful),
         preflight_issues=tuple(preflight_issues),
         failure_clusters=failure_clusters,
@@ -13251,6 +13315,7 @@ def _snapshot_has_maintainer_signals(snapshot: DiagnosticsSnapshot) -> bool:
         snapshot.failed
         or snapshot.harness_results
         or snapshot.stack_signals
+        or snapshot.text_sanity_results
         or snapshot.preflight_issues,
     )
 
@@ -13323,6 +13388,10 @@ def _issue_acceptance_signal(issue_subtype: str, issue_kind: str) -> str:
         ),
         "empty_output": (
             "Affected reruns return non-empty generated text for the same prompt and image."
+        ),
+        "text_sanity": (
+            "Affected reruns produce readable natural-language output without mixed-script "
+            "token soup or decode artifacts."
         ),
     }
     if subtype in subtype_signals:
@@ -13467,6 +13536,26 @@ def _build_issue_clusters(snapshot: DiagnosticsSnapshot) -> tuple[IssueCluster, 
         )
         state.results.append(result)
 
+    for result, _sample_output in snapshot.text_sanity_results:
+        analysis = _quality_analysis_for_result(result)
+        review = _build_jsonl_review_record(result)
+        issue_type = (
+            analysis.text_sanity_issue_type
+            if analysis is not None and analysis.text_sanity_issue_type
+            else "text_sanity"
+        )
+        state = _issue_state_for_key(
+            states,
+            owner="model",
+            issue_kind=review["verdict"] if review is not None else "semantic_mismatch",
+            issue_subtype="text_sanity",
+            symptom_family=_normalize_issue_symptom_family(issue_type),
+            symptom=f"text-sanity={issue_type}",
+            source="text_sanity",
+            sort_rank=4,
+        )
+        state.results.append(result)
+
     for result, symptom, package_hint in snapshot.stack_signals:
         subtype = _stack_signal_subtype(symptom)
         state = _issue_state_for_key(
@@ -13560,6 +13649,9 @@ def _maintainer_owner_counts(snapshot: DiagnosticsSnapshot) -> list[tuple[str, i
     for _res, _symptom, package_hint in snapshot.stack_signals:
         owner_counts[_diagnostics_owner_label(package_hint)] += 1
 
+    for _res, _sample in snapshot.text_sanity_results:
+        owner_counts[_diagnostics_owner_label("model")] += 1
+
     for issue in snapshot.preflight_issues:
         owner_key = _guess_preflight_issue_package(issue)
         owner_counts[_diagnostics_owner_label(owner_key)] += 1
@@ -13582,10 +13674,11 @@ def _log_maintainer_summary(
         return
 
     logger.info(
-        "Diagnostics signals: failures=%d, harness=%d, stack=%d, preflight=%d",
+        "Diagnostics signals: failures=%d, harness=%d, stack=%d, text_sanity=%d, preflight=%d",
         len(snapshot.failed),
         len(snapshot.harness_results),
         len(snapshot.stack_signals),
+        len(snapshot.text_sanity_results),
         len(snapshot.preflight_issues),
     )
 
@@ -13630,6 +13723,13 @@ def _log_maintainer_summary(
             len(owner_signals),
             owner,
             _diagnostics_next_action(owner_key),
+        )
+    if snapshot.text_sanity_results:
+        logger.info(
+            "Text-sanity semantic mismatches: %d model(s) likely owned by %s. Next: %s",
+            len(snapshot.text_sanity_results),
+            _diagnostics_owner_label("model"),
+            _diagnostics_next_action("model"),
         )
     for owner_key, owner_issues in _group_preflight_issues_by_owner(snapshot.preflight_issues):
         owner = _diagnostics_owner_label(owner_key)
@@ -13738,6 +13838,21 @@ def _collect_harness_results(
     return harness_results
 
 
+def _collect_text_sanity_results(
+    successful: list[PerformanceResult],
+) -> list[tuple[PerformanceResult, str]]:
+    """Collect successful models whose generated text is lexical token soup."""
+    text_sanity_results: list[tuple[PerformanceResult, str]] = []
+    for res in successful:
+        qa = res.quality_analysis
+        if qa is None and res.generation is not None:
+            qa = getattr(res.generation, "quality_analysis", None)
+        if qa and getattr(qa, "text_sanity_issue_type", None) is not None:
+            text = getattr(res.generation, "text", "") if res.generation else ""
+            text_sanity_results.append((res, text))
+    return text_sanity_results
+
+
 def _collect_stack_issue_signals(
     successful: list[PerformanceResult],
     *,
@@ -13818,6 +13933,7 @@ def _diagnostics_header(
     total: int,
     n_failed: int,
     n_harness: int,
+    n_text_sanity: int,
     n_preflight: int,
     n_success: int,
     versions: LibraryVersionDict,
@@ -13828,12 +13944,14 @@ def _diagnostics_header(
     version = versions.get("mlx-vlm") or "unknown"
     parts.append(
         f"# Diagnostics Report — {n_failed} failure(s), "
-        f"{n_harness} harness issue(s) (mlx-vlm {version})",
+        f"{n_harness} harness issue(s), {n_text_sanity} text-sanity issue(s) "
+        f"(mlx-vlm {version})",
     )
     parts.append("")
     parts.append(
         f"**Run summary:** {total} locally-cached VLM model(s) checked; "
         f"{n_failed} hard failure(s), {n_harness} harness/integration issue(s), "
+        f"{n_text_sanity} text-sanity/semantic issue(s), "
         f"{n_preflight} preflight warning(s), {n_success} successful run(s)."
     )
     parts.append("")
@@ -14077,6 +14195,7 @@ _DIAGNOSTICS_COMPONENT_LABELS: Final[dict[str, str]] = {
     "mlx-lm": "mlx-lm",
     "transformers": "transformers",
     "huggingface-hub": "huggingface_hub",
+    "model": "model repository",
     "model-config": "model configuration/repository",
     "unknown": "unknown component",
 }
@@ -14090,6 +14209,7 @@ _DIAGNOSTICS_OWNER_ACTIONS: Final[dict[str, str]] = {
         "check cache/revision availability and network/auth state; Hub disconnects may be "
         "transient outages rather than model defects."
     ),
+    "model": "reproduce against the model repo and inspect tokenizer/config output quality.",
     "model-config": "verify model config, tokenizer files, and revision alignment.",
     "unknown": "capture traceback + env fingerprint, then triage manually.",
 }
@@ -14682,6 +14802,55 @@ def _diagnostics_stack_signal_section(
     return parts
 
 
+def _text_sanity_observations(qa: GenerationQualityAnalysis | None) -> list[str]:
+    """Return display observations for text-sanity semantic mismatches."""
+    if qa is None or qa.text_sanity_issue_type is None:
+        return []
+    return [f"Text sanity issue ({qa.text_sanity_issue_type})"]
+
+
+def _diagnostics_text_sanity_section(
+    text_sanity_results: list[tuple[PerformanceResult, str]],
+) -> list[str]:
+    """Build a diagnostics section for successful runs with token-soup output."""
+    if not text_sanity_results:
+        return []
+
+    parts = _begin_diagnostics_section(
+        title=(f"## Text-Sanity / Semantic Mismatch Issues ({len(text_sanity_results)} model(s))"),
+        body_lines=[
+            f"{len(text_sanity_results)} model(s) completed successfully but emitted "
+            "lexically invalid or mixed-script token-soup output.",
+            "These are not hard runtime failures, but they should be visible to "
+            "maintainers and model users because the generated caption is not usable.",
+        ],
+    )
+
+    for res, text in text_sanity_results:
+        gen = res.generation
+        qa = res.quality_analysis or (getattr(gen, "quality_analysis", None) if gen else None)
+
+        _append_markdown_section(parts, title=f"### `{res.model_name}`")
+        observations = _text_sanity_observations(qa)
+        if observations:
+            parts.append("**Why this output is flagged:**")
+            parts.append("")
+            parts.extend(f"- {HTML_ESCAPER.escape(observation)}" for observation in observations)
+            parts.append("")
+
+        parts.append("**Sample output:**")
+        _append_markdown_code_block(
+            parts,
+            _truncate_text_preview(
+                text.strip() or "<empty output>",
+                max_chars=DIAGNOSTICS.output_snippet_len,
+            ),
+            language="text",
+        )
+
+    return parts
+
+
 _ISSUE_QUEUE_HEADERS: Final[tuple[str, ...]] = (
     "Target",
     "Problem",
@@ -14703,6 +14872,7 @@ _ISSUE_SUBTYPE_DISPLAY_LABELS: Final[dict[str, str]] = {
     "runtime_failure": "Runtime failure",
     "stack_signal": "Stack anomaly",
     "stop_token": "Stop-token leakage",
+    "text_sanity": "Text-sanity / token-soup output",
     "token_cap": "Token cap / cutoff",
 }
 
@@ -14749,6 +14919,7 @@ _ISSUE_SUBTYPE_TOKEN_LABELS: Final[dict[str, str]] = {
 }
 
 _ISSUE_FILING_TARGET_LABELS: Final[dict[str, str]] = {
+    "model": "model repository",
     "model-config / mlx-vlm": "model repo first; mlx-vlm if template handling disagrees",
     "model configuration/repository": "model repository",
     "mlx-vlm / mlx": "mlx-vlm first; MLX if cache/runtime reproduces",
@@ -14872,6 +15043,7 @@ def _issue_problem_summary(cluster: IssueCluster) -> str:
             "stop_token": "Stop/control tokens leaked into generated text",
             "prompt_template": "Prompt/template output shape mismatch",
             "empty_output": "Generation returned empty output",
+            "text_sanity": "Generated text is mixed-script token-soup",
         }
         summary = subtype_summaries.get(subtype)
     if summary is None and subtype in {"long_context", "context_budget", "token_cap"}:
@@ -14981,6 +15153,8 @@ def _issue_queue_fixed_when(cluster: IssueCluster) -> str:
         return "Requested sections render without template leakage."
     if subtype in {"long_context", "context_budget", "token_cap"}:
         return "Full and reduced reruns avoid context collapse."
+    if subtype == "text_sanity":
+        return "Generated text is readable natural language, not token soup."
     if cluster.issue_kind == "runtime_failure":
         return "Load/generation completes or fails with a narrower owner."
     return _truncate_text_preview(cluster.acceptance_signal, max_chars=88)
@@ -15188,14 +15362,16 @@ def _partition_success_diagnostics(
     successful: list[PerformanceResult],
     harness_results: list[tuple[PerformanceResult, str]],
     stack_signals: list[tuple[PerformanceResult, str, str]],
+    text_sanity_results: list[tuple[PerformanceResult, str]],
 ) -> tuple[
     list[tuple[PerformanceResult, str]],
     list[tuple[PerformanceResult, str, str]],
+    list[tuple[PerformanceResult, str]],
     list[PerformanceResult],
 ]:
     """Partition successful runs into exclusive diagnostics buckets.
 
-    Precedence is stable and explicit: harness -> stack -> unflagged summary.
+    Precedence is stable and explicit: harness -> stack -> text_sanity -> unflagged.
     """
     harness_unique: list[tuple[PerformanceResult, str]] = []
     harness_seen: set[str] = set()
@@ -15213,13 +15389,27 @@ def _partition_success_diagnostics(
         stack_seen.add(res.model_name)
         stack_unique.append((res, symptom, owner))
 
+    text_sanity_unique: list[tuple[PerformanceResult, str]] = []
+    text_sanity_seen: set[str] = set()
+    for res, text in text_sanity_results:
+        if (
+            res.model_name in harness_seen
+            or res.model_name in stack_seen
+            or res.model_name in text_sanity_seen
+        ):
+            continue
+        text_sanity_seen.add(res.model_name)
+        text_sanity_unique.append((res, text))
+
     unflagged_successful = [
         res
         for res in successful
-        if res.model_name not in harness_seen and res.model_name not in stack_seen
+        if res.model_name not in harness_seen
+        and res.model_name not in stack_seen
+        and res.model_name not in text_sanity_seen
     ]
 
-    return harness_unique, stack_unique, unflagged_successful
+    return harness_unique, stack_unique, text_sanity_unique, unflagged_successful
 
 
 def _runtime_seconds_per_model(results: Sequence[PerformanceResult]) -> tuple[list[float], int]:
@@ -15292,6 +15482,7 @@ def _diagnostics_coverage_and_runtime_section(
     failed: list[PerformanceResult],
     harness_results: list[tuple[PerformanceResult, str]],
     stack_signals: list[tuple[PerformanceResult, str, str]],
+    text_sanity_results: list[tuple[PerformanceResult, str]],
     unflagged_successful: list[PerformanceResult],
 ) -> list[str]:
     """Build coverage verification and aggregate runtime metrics section."""
@@ -15302,6 +15493,7 @@ def _diagnostics_coverage_and_runtime_section(
         *[res.model_name for res in failed],
         *[res.model_name for res, _ in harness_results],
         *[res.model_name for res, _symptom, _owner in stack_signals],
+        *[res.model_name for res, _ in text_sanity_results],
     ]
     summary_names = [res.model_name for res in unflagged_successful]
     listed_names = [*detailed_names, *summary_names]
@@ -15921,6 +16113,7 @@ def _diagnostics_footer(
             *[result.model_name for result in diagnostics_snapshot.failed],
             *[result.model_name for result, _sample in diagnostics_snapshot.harness_results],
             *[result.model_name for result, _symptom, _owner in diagnostics_snapshot.stack_signals],
+            *[result.model_name for result, _sample in diagnostics_snapshot.text_sanity_results],
         ]
     )
     parts: list[str] = []
@@ -16020,12 +16213,19 @@ def generate_diagnostics_report(
     failed = list(diagnostics_snapshot.failed)
     harness_results = list(diagnostics_snapshot.harness_results)
     stack_signals = list(diagnostics_snapshot.stack_signals)
+    text_sanity_results = list(diagnostics_snapshot.text_sanity_results)
     unflagged_successful = list(diagnostics_snapshot.unflagged_successful)
     preflight_issues = list(diagnostics_snapshot.preflight_issues)
     successful_count = len(results) - len(failed)
     resolved_repro_bundles = repro_bundles or {}
 
-    if not failed and not harness_results and not stack_signals and not preflight_issues:
+    if (
+        not failed
+        and not harness_results
+        and not stack_signals
+        and not text_sanity_results
+        and not preflight_issues
+    ):
         return False
 
     failure_clusters = [
@@ -16053,6 +16253,7 @@ def generate_diagnostics_report(
         total=len(results),
         n_failed=len(failed),
         n_harness=len(harness_results),
+        n_text_sanity=len(text_sanity_results),
         n_preflight=len(preflight_issues),
         n_success=successful_count,
         versions=versions,
@@ -16075,6 +16276,7 @@ def generate_diagnostics_report(
 
     # Render stack signals merged into the harness/integration section
     parts.extend(_diagnostics_stack_signal_section(stack_signals))
+    parts.extend(_diagnostics_text_sanity_section(text_sanity_results))
 
     parts.extend(
         _diagnostics_history_section(
@@ -16089,6 +16291,7 @@ def generate_diagnostics_report(
             failed=failed,
             harness_results=harness_results,
             stack_signals=stack_signals,
+            text_sanity_results=text_sanity_results,
             unflagged_successful=unflagged_successful,
         ),
     )
@@ -26208,6 +26411,15 @@ def _issue_fix_checklist_items(cluster: IssueCluster) -> list[str]:
             "Compare prompt-token accounting with text-only and image+text prompts.",
             "Inspect cache allocation, prefill step size, and long-context generation behavior.",
         ]
+    elif subtype == "text_sanity":
+        checklist = [
+            "Reproduce with the native command and confirm whether token soup appears without "
+            "the check_models harness.",
+            "Inspect tokenizer config, chat template, and decode cleanup for the model revision.",
+            "Compare against a nearby quantization or base model to isolate model weights from "
+            "tokenizer/runtime behavior.",
+            "Add a focused regression check for mixed-script token-soup output if fixed.",
+        ]
     elif cluster.issue_kind == "runtime_failure":
         representative = _issue_cluster_representative(cluster)
         runtime_kind = _runtime_failure_diagnostic_kind(representative)
@@ -26356,6 +26568,7 @@ def _issue_index_header(
         len(snapshot.failed)
         + len(snapshot.harness_results)
         + len(snapshot.stack_signals)
+        + len(snapshot.text_sanity_results)
         + len(snapshot.unflagged_successful)
     )
     summary_parts = [
@@ -26363,6 +26576,7 @@ def _issue_index_header(
         _issue_index_count_phrase(len(snapshot.failed), "hard failure"),
         _issue_index_count_phrase(len(snapshot.harness_results), "harness issue"),
         _issue_index_count_phrase(len(snapshot.stack_signals), "stack signal"),
+        _issue_index_count_phrase(len(snapshot.text_sanity_results), "text-sanity issue"),
         _issue_index_count_phrase(len(clusters), "issue draft"),
     ]
     return [
