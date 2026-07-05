@@ -1,14 +1,14 @@
 # Check Models Output Index
 
-Generated on: 2026-07-04 19:55:05 BST
+Generated on: 2026-07-05 01:34:36 BST
 
 ## Run Snapshot
 
 - Mode: triage
 - Selection basis: ungrounded (ungrounded)
 - Models tested: 61
-- Successful: 58
-- Failed: 0
+- Successful: 60
+- Failed: 1
 
 ## For Model Users
 

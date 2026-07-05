@@ -1,32 +1,31 @@
 <!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
 
-# \[mlx-vlm / mlx\]\[Long-context collapse\] Long-context generation collapsed or became too short affecting 1 model(s)
+# \[huggingface_hub\]\[Hugging Face Hub: Model load / model error\] Hugging Face Hub: Model load / model error: Operation timed out after 300.0 seconds affecting 1 model(s)
 
 ## Summary
 
-1 model(s) show **Long-context collapse** that should be filed against mlx-vlm first; MLX if cache/runtime reproduces.
+1 model(s) show **Hugging Face Hub: Model load / model error** that should be filed against huggingface_hub.
 
-- **Observed problem:** Long-context generation collapsed or became too short
-- **Target:** mlx-vlm first; MLX if cache/runtime reproduces
+- **Observed problem:** Hugging Face Hub: Model load / model error: Operation timed out after 300.0 seconds
+- **Target:** huggingface_hub
 - **Affected models:** 1
-- **Fixed when:** Full and reduced reruns avoid context collapse.
+- **Fixed when:** Load/generation completes or fails with a narrower owner.
 
 
 ## Affected Models
 
 <!-- markdownlint-disable MD060 -->
 
-| Model                                     | Observed Behavior                                                                                  | Token Counts                                                                 | Optional Context                                                                                                                                                                           |
-|-------------------------------------------|----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/paligemma2-3b-pt-896-4bit` | generated_tokens~3 \| prompt_tokens=4103, output_tokens=3, output/prompt=0.1%, weak text=truncated | prompt=4,103 \| output/prompt=0.07% \| nontext burden=100% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260704T185505Z_012_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json) |
+| Model                                                   | Observed Behavior                       | Token Counts   | Optional Context                                                                                                                                                                                                     |
+|---------------------------------------------------------|-----------------------------------------|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | Operation timed out after 300.0 seconds | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T003436Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_HUGGINGFACE_HUB_MODEL_LOAD_MODEL_6c3197f.json) |
 <!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
 
-- `mlx-community/paligemma2-3b-pt-896-4bit`: Output appears truncated to about 3 tokens.
-- `mlx-community/paligemma2-3b-pt-896-4bit`: At long prompt length (4103 tokens), output stayed unusually short (3 tokens; ratio 0.1%; weak text signal truncated).
-- Output excerpt: `Cat.`
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` fails with: Model loading failed: Operation timed out after 300.0 seconds
+- Root exception: `builtins.TimeoutError`: Operation timed out after 300.0 seconds
 
 
 ## Minimal Reproduction
@@ -38,7 +37,7 @@ Image SHA256: `dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e`
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/paligemma2-3b-pt-896-4bit --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 Minimal Python repro (representative model):
@@ -48,7 +47,7 @@ from mlx_vlm.generate import generate
 from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load
 
-MODEL = 'mlx-community/paligemma2-3b-pt-896-4bit'
+MODEL = 'mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit'
 IMAGE = 'cats.jpg'
 PROMPT = 'Describe this image briefly.'
 LOAD_KWARGS = {'trust_remote_code': True}
@@ -85,27 +84,28 @@ Generation/load config:
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "mlx-community/paligemma2-3b-pt-896-4bit"
+  "model": "mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit"
 }
 ```
 
 Optional advanced context:
 
-- `mlx-community/paligemma2-3b-pt-896-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260704T185505Z_012_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json)
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T003436Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_HUGGINGFACE_HUB_MODEL_LOAD_MODEL_6c3197f.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
 ## Expected Fix Signal
 
-- [ ] A same-command rerun and a reduced image/text burden rerun show consistent prompt-token accounting and no long-context collapse.
+- [ ] Affected reruns complete model load and generation, or fail with a narrower configuration/compatibility error that points to the owning layer.
 - [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem.
 
 
 ## Fix Checklist
 
-- [ ] Rerun with reduced image/text burden and compare output recovery.
-- [ ] Compare prompt-token accounting with text-only and image+text prompts.
-- [ ] Inspect cache allocation, prefill step size, and long-context generation behavior.
+- [ ] Inspect the exported error package, load phase, and traceback owner.
+- [ ] Check model config, tokenizer files, and weight shape compatibility.
+- [ ] Compare against installed mlx, mlx-vlm, mlx-lm, transformers, and tokenizers versions.
+- [ ] Reproduce with the single affected model before judging output quality.
 
 
 ## Appendix: Environment
@@ -139,22 +139,34 @@ Optional advanced context:
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                                       |
 | MLX Core Extension         | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
 | MLX Metallib               | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (162,451,352 bytes, sha256=7e5c9a3a3225bf3b04a5fe67c50602975d3698a45e2113433465848af47fd70c) |
-| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,747,136 bytes, sha256=53b0e529da8969b02cd891b10e5c7b24413dc65c0ccc092343d438e39e13a7d0)  |
+| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,747,136 bytes, sha256=9d942d98a9a9f3e42b3f22c6606bc1ee621d28a9fb512d0cdba6edbb9ef79df8)  |
 | RAM                        | 128.0 GB                                                                                                                                                 |
 
 
 ## Appendix: Detailed Evidence
 
-### `mlx-community/paligemma2-3b-pt-896-4bit`
+### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`
 
-Observed signals:
-
-- Output appears truncated to about 3 tokens.
-- At long prompt length (4103 tokens), output stayed unusually short (3 tokens; ratio 0.1%; weak text signal truncated).
-
-Sample output:
+Observed error:
 
 ```text
-Cat.
+Model loading failed: Operation timed out after 300.0 seconds
+```
+
+Root exception:
+
+```text
+builtins.TimeoutError: Operation timed out after 300.0 seconds
+```
+
+Traceback tail:
+
+```text
+    self._condition.wait(timeout)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/threading.py", line 359, in wait
+    waiter.acquire()
+    ~~~~~~~~~~~~~~^^
+TimeoutError: Operation timed out after 300.0 seconds
 ```
 

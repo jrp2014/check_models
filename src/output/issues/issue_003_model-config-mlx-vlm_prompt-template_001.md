@@ -1,34 +1,37 @@
 <!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
 
-# \[model configuration/repository\]\[Model config: Processor load / processor error\] Processor config is missing image processor affecting 2 model(s)
+# \[model-config / mlx-vlm\]\[Prompt-template / image-placeholder mismatch\] Prompt/template output shape mismatch affecting 5 model(s)
 
 ## Summary
 
-2 model(s) show **Model config: Processor load / processor error** that should be filed against model configuration / repository.
+5 model(s) show **Prompt-template / image-placeholder mismatch** that should be filed against model repo first; mlx-vlm if template handling disagrees.
 
-- **Observed problem:** Processor config is missing image processor
-- **Target:** model configuration / repository
-- **Affected models:** 2
-- **Fixed when:** Load/generation completes or fails with a narrower owner.
+- **Observed problem:** Prompt/template output shape mismatch
+- **Target:** model repo first; mlx-vlm if template handling disagrees
+- **Affected models:** 5
+- **Fixed when:** Requested sections render without template leakage.
 
 
 ## Affected Models
 
 <!-- markdownlint-disable MD060 -->
 
-| Model                                           | Observed Behavior                                                       | Token Counts   | Optional Context                                                                                                                                                                                             |
-|-------------------------------------------------|-------------------------------------------------------------------------|----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/diffusiongemma-26B-A4B-it-8bit`  | Loaded processor has no image_processor; expected multimodal processor. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260704T185505Z_010_mlx-community_diffusiongemma-26B-A4B-it-8bit_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_49.json)  |
-| `mlx-community/diffusiongemma-26B-A4B-it-mxfp8` | Loaded processor has no image_processor; expected multimodal processor. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260704T185505Z_011_mlx-community_diffusiongemma-26B-A4B-it-mxfp8_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_0c.json) |
+| Model                                     | Observed Behavior   | Token Counts                                                              | Optional Context                                                                                                                                                                                       |
+|-------------------------------------------|---------------------|---------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Qwen/Qwen3-VL-2B-Instruct`               | generated_tokens~3  | prompt=315 \| output/prompt=0.95% \| nontext burden=98% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T003436Z_001_Qwen_Qwen3-VL-2B-Instruct_model_config_mlx_vlm_prompt_template_001.json)               |
+| `mlx-community/Qwen3-VL-2B-Instruct-bf16` | generated_tokens~3  | prompt=315 \| output/prompt=0.95% \| nontext burden=98% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T003436Z_004_mlx-community_Qwen3-VL-2B-Instruct-bf16_model_config_mlx_vlm_prompt_template_001.json) |
+| `mlx-community/Qwen3.5-35B-A3B-bf16`      | generated_tokens~3  | prompt=319 \| output/prompt=0.94% \| nontext burden=98% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T003436Z_006_mlx-community_Qwen3.5-35B-A3B-bf16_model_config_mlx_vlm_prompt_template_001.json)      |
+| `mlx-community/Qwen3.6-27B-mxfp8`         | generated_tokens~2  | prompt=319 \| output/prompt=0.63% \| nontext burden=98% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T003436Z_007_mlx-community_Qwen3.6-27B-mxfp8_model_config_mlx_vlm_prompt_template_001.json)         |
+| `mlx-community/X-Reasoner-7B-8bit`        | generated_tokens~3  | prompt=417 \| output/prompt=0.72% \| nontext burden=99% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T003436Z_008_mlx-community_X-Reasoner-7B-8bit_model_config_mlx_vlm_prompt_template_001.json)        |
 <!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
 
-- `mlx-community/diffusiongemma-26B-A4B-it-8bit` fails with: Loaded processor has no image_processor; expected multimodal processor.
-- Root exception: `builtins.ValueError`: Loaded processor has no image_processor; expected multimodal processor.
-- `mlx-community/diffusiongemma-26B-A4B-it-mxfp8` fails with: Loaded processor has no image_processor; expected multimodal processor.
-- Root exception: `builtins.ValueError`: Loaded processor has no image_processor; expected multimodal processor.
+- `Qwen/Qwen3-VL-2B-Instruct`: Output appears truncated to about 3 tokens.
+- Output excerpt: `This image`
+- `mlx-community/Qwen3-VL-2B-Instruct-bf16`: Output appears truncated to about 3 tokens.
+- Output excerpt: `This image`
 
 
 ## Minimal Reproduction
@@ -40,8 +43,11 @@ Image SHA256: `dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e`
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/diffusiongemma-26B-A4B-it-8bit --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
-python -m mlx_vlm.generate --model mlx-community/diffusiongemma-26B-A4B-it-mxfp8 --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model Qwen/Qwen3-VL-2B-Instruct --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/Qwen3-VL-2B-Instruct-bf16 --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/Qwen3.5-35B-A3B-bf16 --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/Qwen3.6-27B-mxfp8 --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/X-Reasoner-7B-8bit --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 Minimal Python repro (representative model):
@@ -51,7 +57,7 @@ from mlx_vlm.generate import generate
 from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load
 
-MODEL = 'mlx-community/diffusiongemma-26B-A4B-it-8bit'
+MODEL = 'Qwen/Qwen3-VL-2B-Instruct'
 IMAGE = 'cats.jpg'
 PROMPT = 'Describe this image briefly.'
 LOAD_KWARGS = {'trust_remote_code': True}
@@ -88,29 +94,31 @@ Generation/load config:
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "mlx-community/diffusiongemma-26B-A4B-it-8bit"
+  "model": "Qwen/Qwen3-VL-2B-Instruct"
 }
 ```
 
 Optional advanced context:
 
-- `mlx-community/diffusiongemma-26B-A4B-it-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260704T185505Z_010_mlx-community_diffusiongemma-26B-A4B-it-8bit_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_49.json)
-- `mlx-community/diffusiongemma-26B-A4B-it-mxfp8`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260704T185505Z_011_mlx-community_diffusiongemma-26B-A4B-it-mxfp8_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_0c.json)
+- `Qwen/Qwen3-VL-2B-Instruct`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T003436Z_001_Qwen_Qwen3-VL-2B-Instruct_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/Qwen3-VL-2B-Instruct-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T003436Z_004_mlx-community_Qwen3-VL-2B-Instruct-bf16_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/Qwen3.5-35B-A3B-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T003436Z_006_mlx-community_Qwen3.5-35B-A3B-bf16_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/Qwen3.6-27B-mxfp8`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T003436Z_007_mlx-community_Qwen3.6-27B-mxfp8_model_config_mlx_vlm_prompt_template_001.json)
+- `mlx-community/X-Reasoner-7B-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T003436Z_008_mlx-community_X-Reasoner-7B-8bit_model_config_mlx_vlm_prompt_template_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
 ## Expected Fix Signal
 
-- [ ] Affected reruns complete model load and generation, or fail with a narrower configuration/compatibility error that points to the owning layer.
+- [ ] Affected reruns produce the requested sections without empty/filler output, template leakage, or image-placeholder mismatch symptoms.
 - [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem.
 
 
 ## Fix Checklist
 
-- [ ] Inspect `preprocessor_config.json`, `processor_config.json`, and AutoProcessor mapping.
-- [ ] Verify the loaded processor exposes the image processor expected by mlx-vlm.
-- [ ] Check whether the model repo needs processor files or mlx-vlm needs a fallback path.
-- [ ] Reproduce with the single affected model before judging output quality.
+- [ ] Inspect chat template selection and rendered message roles.
+- [ ] Verify image placeholder count and order match the processor config.
+- [ ] Check EOS defaults and whether the template expects explicit assistant prefixes.
 
 
 ## Appendix: Environment
@@ -144,57 +152,47 @@ Optional advanced context:
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                                       |
 | MLX Core Extension         | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
 | MLX Metallib               | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (162,451,352 bytes, sha256=7e5c9a3a3225bf3b04a5fe67c50602975d3698a45e2113433465848af47fd70c) |
-| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,747,136 bytes, sha256=53b0e529da8969b02cd891b10e5c7b24413dc65c0ccc092343d438e39e13a7d0)  |
+| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,747,136 bytes, sha256=9d942d98a9a9f3e42b3f22c6606bc1ee621d28a9fb512d0cdba6edbb9ef79df8)  |
 | RAM                        | 128.0 GB                                                                                                                                                 |
 
 
 ## Appendix: Detailed Evidence
 
-### `mlx-community/diffusiongemma-26B-A4B-it-8bit`
+### `Qwen/Qwen3-VL-2B-Instruct`
 
-Observed error:
+Observed signals:
 
-```text
-Model preflight failed for mlx-community/diffusiongemma-26B-A4B-it-8bit: Loaded processor has no image_processor; expected multimodal processor.
-```
+- Output appears truncated to about 3 tokens.
 
-Root exception:
+Sample output:
 
 ```text
-builtins.ValueError: Loaded processor has no image_processor; expected multimodal processor.
+This image
 ```
 
-Traceback tail:
+### `mlx-community/Qwen3-VL-2B-Instruct-bf16`
+
+Observed signals:
+
+- Output appears truncated to about 3 tokens.
+
+Sample output:
 
 ```text
-Traceback (most recent call last):
-ValueError: Loaded processor has no image_processor; expected multimodal processor.
-The above exception was the direct cause of the following exception:
-Traceback (most recent call last):
-ValueError: Model preflight failed for mlx-community/diffusiongemma-26B-A4B-it-8bit: Loaded processor has no image_processor; expected multimodal processor.
+This image
 ```
 
-### `mlx-community/diffusiongemma-26B-A4B-it-mxfp8`
+### `mlx-community/Qwen3.5-35B-A3B-bf16`
 
-Observed error:
+Observed signals:
+
+- Output appears truncated to about 3 tokens.
+
+Sample output:
 
 ```text
-Model preflight failed for mlx-community/diffusiongemma-26B-A4B-it-mxfp8: Loaded processor has no image_processor; expected multimodal processor.
+os,
 ```
 
-Root exception:
-
-```text
-builtins.ValueError: Loaded processor has no image_processor; expected multimodal processor.
-```
-
-Traceback tail:
-
-```text
-Traceback (most recent call last):
-ValueError: Loaded processor has no image_processor; expected multimodal processor.
-The above exception was the direct cause of the following exception:
-Traceback (most recent call last):
-ValueError: Model preflight failed for mlx-community/diffusiongemma-26B-A4B-it-mxfp8: Loaded processor has no image_processor; expected multimodal processor.
-```
+_Additional affected models are listed in the Affected Models table above._
 

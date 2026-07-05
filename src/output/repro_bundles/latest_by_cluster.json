@@ -1,46 +1,38 @@
 {
   "clusters": {
-    "mlx-vlm-mlx_long-context_001": {
+    "huggingface-hub_huggingface-hub-model-load-model_001": {
       "bundles": [
-        "20260704T185505Z_012_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json"
-      ],
-      "models": [
-        "mlx-community/paligemma2-3b-pt-896-4bit"
-      ]
-    },
-    "mlx-vlm_encoding_001": {
-      "bundles": [
-        "20260704T185505Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json"
+        "20260705T003436Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_HUGGINGFACE_HUB_MODEL_LOAD_MODEL_6c3197f.json"
       ],
       "models": [
         "mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit"
       ]
     },
+    "mlx-vlm-mlx_long-context_001": {
+      "bundles": [
+        "20260705T003436Z_009_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json"
+      ],
+      "models": [
+        "mlx-community/paligemma2-3b-pt-896-4bit"
+      ]
+    },
     "mlx-vlm_stop-token_001": {
       "bundles": [
-        "20260704T185505Z_002_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_mlx_vlm_stop_token_001.json",
-        "20260704T185505Z_006_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json"
+        "20260705T003436Z_002_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_mlx_vlm_stop_token_001.json",
+        "20260705T003436Z_005_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json"
       ],
       "models": [
         "mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX",
         "mlx-community/Qwen3-VL-2B-Thinking-bf16"
       ]
     },
-    "mlx_mlx-model-load-model_001": {
-      "bundles": [
-        "20260704T185505Z_004_mlx-community_MiniCPM-V-4.6-8bit_MLX_MODEL_LOAD_MODEL_b4b095ff6a33.json"
-      ],
-      "models": [
-        "mlx-community/MiniCPM-V-4.6-8bit"
-      ]
-    },
     "model-config-mlx-vlm_prompt-template_001": {
       "bundles": [
-        "20260704T185505Z_001_Qwen_Qwen3-VL-2B-Instruct_model_config_mlx_vlm_prompt_template_001.json",
-        "20260704T185505Z_005_mlx-community_Qwen3-VL-2B-Instruct-bf16_model_config_mlx_vlm_prompt_template_001.json",
-        "20260704T185505Z_007_mlx-community_Qwen3.5-35B-A3B-bf16_model_config_mlx_vlm_prompt_template_001.json",
-        "20260704T185505Z_008_mlx-community_Qwen3.6-27B-mxfp8_model_config_mlx_vlm_prompt_template_001.json",
-        "20260704T185505Z_009_mlx-community_X-Reasoner-7B-8bit_model_config_mlx_vlm_prompt_template_001.json"
+        "20260705T003436Z_001_Qwen_Qwen3-VL-2B-Instruct_model_config_mlx_vlm_prompt_template_001.json",
+        "20260705T003436Z_004_mlx-community_Qwen3-VL-2B-Instruct-bf16_model_config_mlx_vlm_prompt_template_001.json",
+        "20260705T003436Z_006_mlx-community_Qwen3.5-35B-A3B-bf16_model_config_mlx_vlm_prompt_template_001.json",
+        "20260705T003436Z_007_mlx-community_Qwen3.6-27B-mxfp8_model_config_mlx_vlm_prompt_template_001.json",
+        "20260705T003436Z_008_mlx-community_X-Reasoner-7B-8bit_model_config_mlx_vlm_prompt_template_001.json"
       ],
       "models": [
         "Qwen/Qwen3-VL-2B-Instruct",
@@ -49,77 +41,52 @@
         "mlx-community/Qwen3.6-27B-mxfp8",
         "mlx-community/X-Reasoner-7B-8bit"
       ]
-    },
-    "model-configuration-repository_model-config-processor-load-processor_001": {
-      "bundles": [
-        "20260704T185505Z_010_mlx-community_diffusiongemma-26B-A4B-it-8bit_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_49.json",
-        "20260704T185505Z_011_mlx-community_diffusiongemma-26B-A4B-it-mxfp8_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_0c.json"
-      ],
-      "models": [
-        "mlx-community/diffusiongemma-26B-A4B-it-8bit",
-        "mlx-community/diffusiongemma-26B-A4B-it-mxfp8"
-      ]
     }
   },
-  "generated_at_utc": "2026-07-04T18:55:05+00:00",
+  "generated_at_utc": "2026-07-05T00:34:36+00:00",
   "models": {
     "Qwen/Qwen3-VL-2B-Instruct": {
-      "bundle": "20260704T185505Z_001_Qwen_Qwen3-VL-2B-Instruct_model_config_mlx_vlm_prompt_template_001.json",
+      "bundle": "20260705T003436Z_001_Qwen_Qwen3-VL-2B-Instruct_model_config_mlx_vlm_prompt_template_001.json",
       "issue_cluster_id": "model-config-mlx-vlm_prompt-template_001",
       "issue_kind": "harness"
     },
     "mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX": {
-      "bundle": "20260704T185505Z_002_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_mlx_vlm_stop_token_001.json",
+      "bundle": "20260705T003436Z_002_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_mlx_vlm_stop_token_001.json",
       "issue_cluster_id": "mlx-vlm_stop-token_001",
       "issue_kind": "harness"
     },
     "mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit": {
-      "bundle": "20260704T185505Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_mlx_vlm_encoding_001.json",
-      "issue_cluster_id": "mlx-vlm_encoding_001",
-      "issue_kind": "harness"
-    },
-    "mlx-community/MiniCPM-V-4.6-8bit": {
-      "bundle": "20260704T185505Z_004_mlx-community_MiniCPM-V-4.6-8bit_MLX_MODEL_LOAD_MODEL_b4b095ff6a33.json",
-      "issue_cluster_id": "mlx_mlx-model-load-model_001",
+      "bundle": "20260705T003436Z_003_mlx-community_Devstral-Small-2-24B-Instruct-2512-5bit_HUGGINGFACE_HUB_MODEL_LOAD_MODEL_6c3197f.json",
+      "issue_cluster_id": "huggingface-hub_huggingface-hub-model-load-model_001",
       "issue_kind": "runtime_failure"
     },
     "mlx-community/Qwen3-VL-2B-Instruct-bf16": {
-      "bundle": "20260704T185505Z_005_mlx-community_Qwen3-VL-2B-Instruct-bf16_model_config_mlx_vlm_prompt_template_001.json",
+      "bundle": "20260705T003436Z_004_mlx-community_Qwen3-VL-2B-Instruct-bf16_model_config_mlx_vlm_prompt_template_001.json",
       "issue_cluster_id": "model-config-mlx-vlm_prompt-template_001",
       "issue_kind": "harness"
     },
     "mlx-community/Qwen3-VL-2B-Thinking-bf16": {
-      "bundle": "20260704T185505Z_006_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json",
+      "bundle": "20260705T003436Z_005_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json",
       "issue_cluster_id": "mlx-vlm_stop-token_001",
       "issue_kind": "harness"
     },
     "mlx-community/Qwen3.5-35B-A3B-bf16": {
-      "bundle": "20260704T185505Z_007_mlx-community_Qwen3.5-35B-A3B-bf16_model_config_mlx_vlm_prompt_template_001.json",
+      "bundle": "20260705T003436Z_006_mlx-community_Qwen3.5-35B-A3B-bf16_model_config_mlx_vlm_prompt_template_001.json",
       "issue_cluster_id": "model-config-mlx-vlm_prompt-template_001",
       "issue_kind": "harness"
     },
     "mlx-community/Qwen3.6-27B-mxfp8": {
-      "bundle": "20260704T185505Z_008_mlx-community_Qwen3.6-27B-mxfp8_model_config_mlx_vlm_prompt_template_001.json",
+      "bundle": "20260705T003436Z_007_mlx-community_Qwen3.6-27B-mxfp8_model_config_mlx_vlm_prompt_template_001.json",
       "issue_cluster_id": "model-config-mlx-vlm_prompt-template_001",
       "issue_kind": "harness"
     },
     "mlx-community/X-Reasoner-7B-8bit": {
-      "bundle": "20260704T185505Z_009_mlx-community_X-Reasoner-7B-8bit_model_config_mlx_vlm_prompt_template_001.json",
+      "bundle": "20260705T003436Z_008_mlx-community_X-Reasoner-7B-8bit_model_config_mlx_vlm_prompt_template_001.json",
       "issue_cluster_id": "model-config-mlx-vlm_prompt-template_001",
       "issue_kind": "harness"
     },
-    "mlx-community/diffusiongemma-26B-A4B-it-8bit": {
-      "bundle": "20260704T185505Z_010_mlx-community_diffusiongemma-26B-A4B-it-8bit_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_49.json",
-      "issue_cluster_id": "model-configuration-repository_model-config-processor-load-processor_001",
-      "issue_kind": "runtime_failure"
-    },
-    "mlx-community/diffusiongemma-26B-A4B-it-mxfp8": {
-      "bundle": "20260704T185505Z_011_mlx-community_diffusiongemma-26B-A4B-it-mxfp8_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_0c.json",
-      "issue_cluster_id": "model-configuration-repository_model-config-processor-load-processor_001",
-      "issue_kind": "runtime_failure"
-    },
     "mlx-community/paligemma2-3b-pt-896-4bit": {
-      "bundle": "20260704T185505Z_012_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json",
+      "bundle": "20260705T003436Z_009_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json",
       "issue_cluster_id": "mlx-vlm-mlx_long-context_001",
       "issue_kind": "context_budget"
     }
