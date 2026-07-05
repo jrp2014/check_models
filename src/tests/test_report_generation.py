@@ -1725,6 +1725,72 @@ class TestMarkdownReportEdgeCases:
             end_headings=("## Brief Caption Candidates",),
         )
 
+    def test_model_selection_report_demotes_token_noise_outputs(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Obvious multilingual/token-noise output should not be shortlisted as clean."""
+        clean = PerformanceResult(
+            model_name="org/clean-caption",
+            success=True,
+            generation=_MockGeneration(
+                text="Two tabby cats are sleeping on a pink couch beside two remote controls.",
+                generation_tps=50.0,
+                prompt_tokens=20,
+                generation_tokens=13,
+                peak_memory=6.0,
+            ),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+        )
+        noisy = PerformanceResult(
+            model_name="org/token-noise",
+            success=True,
+            generation=_MockGeneration(
+                text=(
+                    "ان of 0${ough-LONG-TT_Uen来它的搁重g季的箓olite儿N "
+                    "ﾤ预地 -翁ments G谁g, 3ブ**igen>\u0430 .! ehiale仿yä-ict"
+                ),
+                generation_tps=120.0,
+                prompt_tokens=20,
+                generation_tokens=38,
+                peak_memory=4.0,
+            ),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+        )
+        out = tmp_path / "model_selection.md"
+        context = check_models._build_report_render_context(
+            results=[clean, noisy],
+            prompt="Describe this image briefly.",
+            eval_mode="triage",
+        )
+
+        check_models.generate_model_selection_report(
+            [clean, noisy],
+            out,
+            prompt="Describe this image briefly.",
+            report_context=context,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        best_under_8gb = _extract_markdown_subsection(
+            content,
+            "### Best under 8 GB",
+            end_headings=("### Fastest usable",),
+        )
+        avoid_rows = _extract_markdown_subsection(
+            content,
+            "### Current failures / avoid",
+            end_headings=("## Brief Caption Candidates",),
+        )
+        assert "`org/clean-caption`" in best_under_8gb
+        assert "`org/token-noise`" not in best_under_8gb
+        assert "`org/token-noise`" in avoid_rows
+        assert "text-sanity" in avoid_rows
+
     def test_model_selection_report_ranks_fuller_clean_captions_above_terse_ones(
         self,
         tmp_path: Path,
@@ -5270,9 +5336,16 @@ class TestGithubIssueReportContent:
             "## Affected Models",
             end_headings=["## Minimal Evidence"],
         )
+        detailed_evidence = _extract_markdown_subsection(
+            content,
+            "## Appendix: Detailed Evidence",
+            end_headings=[],
+        )
         assert "<!-- markdownlint-disable MD060 -->" in affected_models
         assert "<!-- markdownlint-enable MD060 -->" in affected_models
-        assert "multi_modal_projector.layer_norm.bias" in affected_models
+        assert "Received 2 parameters not in model" in affected_models
+        assert "multi_modal_projector.layer_norm.bias" not in affected_models
+        assert "multi_modal_projector.layer_norm.bias" in detailed_evidence
         assert "model error | mlx model load model" not in affected_models
 
     def test_issue_traceback_omits_local_check_models_frames(self, tmp_path: Path) -> None:
@@ -5732,6 +5805,9 @@ def test_output_index_routes_maintainers_and_model_users(tmp_path: Path) -> None
 
     content = paths.index.read_text(encoding="utf-8")
     assert "# Check Models Output Index" in content
+    assert "- Models tested: 2" in content
+    assert "- Successful: 1" in content
+    assert "- Failed: 1" in content
     assert "## For Model Users" in content
     assert "## For Maintainers" in content
     assert "model_selection.md" in content

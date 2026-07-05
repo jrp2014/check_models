@@ -7,6 +7,14 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Centralize final report artifact metadata for path logging, public artifact
+  maps, and the generated dashboard; fix the output index to report current-run
+  success/failure counts from the `ResultSet`.
+- Demote short mixed-script token-noise outputs from model-selection shortlists
+  and keep verbose model-load parameter lists out of GitHub issue affected-model
+  tables while preserving the full evidence appendix.
+- Keep `QualityThresholds` fallback defaults aligned with packaged
+  `quality_config.yaml` and refresh the agent monolith size note.
 - Keep cross-artifact report links portable across both `github` and
   `relative` link styles, including the Markdown gallery back-link to
   `results.md`, and add a regression sweep covering the generated Markdown

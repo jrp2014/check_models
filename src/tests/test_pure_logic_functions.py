@@ -14,7 +14,7 @@ import importlib
 import json
 import logging
 import subprocess
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, fields, replace
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 from unittest.mock import patch
@@ -23,6 +23,7 @@ if TYPE_CHECKING:  # pragma: no cover
     import types
 
 import pytest
+import yaml
 
 
 @pytest.fixture(scope="module")
@@ -777,8 +778,27 @@ class TestQualityThresholdsFromConfig:
         config: dict[str, object] = {}
         qt = mod.QualityThresholds.from_config(config)
         # Should use all defaults
-        default_ratio = 0.8
+        default_ratio = 0.9
         assert qt.repetition_ratio == default_ratio
+
+    def test_python_defaults_match_packaged_yaml_thresholds(self, mod: types.ModuleType) -> None:
+        """Fallback dataclass thresholds should not drift from packaged YAML defaults."""
+        config_path = (
+            Path(__file__).resolve().parents[1] / "check_models_data" / "quality_config.yaml"
+        )
+        config = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+        configured = mod.QualityThresholds.from_config(
+            {
+                "thresholds": config["thresholds"],
+                "patterns": {},
+            }
+        )
+        fallback = mod.QualityThresholds()
+
+        for field in fields(fallback):
+            if field.name == "patterns":
+                continue
+            assert getattr(fallback, field.name) == getattr(configured, field.name), field.name
 
     def test_non_mapping_threshold_section_raises(self, mod: types.ModuleType) -> None:
         """Non-mapping threshold sections should fail with a clear schema error."""

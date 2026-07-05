@@ -693,6 +693,14 @@ def test_agent_quality_guidance_avoids_redundant_pytest_after_quality() -> None:
     assert "`make test` — execute unit tests" not in copilot_text
 
 
+def test_agent_monolith_size_note_matches_current_file() -> None:
+    """Agent-facing file map should not drift badly from the monolith size."""
+    copilot_text = COPILOT_INSTRUCTIONS.read_text(encoding="utf-8")
+
+    assert "`src/check_models.py` | **Single-file CLI monolith** (~27,900 lines)" in copilot_text
+    assert "~23,900 lines" not in copilot_text
+
+
 def test_output_artifact_policy_is_documented_and_gitignored() -> None:
     """Generated output docs should match the repo ignore policy."""
     output_readme = (PKG_ROOT / "output" / "README.md").read_text(encoding="utf-8")

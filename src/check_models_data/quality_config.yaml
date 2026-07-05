@@ -109,6 +109,9 @@ thresholds:
   # Text sanity diagnostics
   text_sanity_min_wordlike_ratio: 0.45 # Minimum word-like token ratio before token-noise flag
   text_sanity_max_symbol_ratio: 0.35 # Maximum symbol/punctuation ratio before char-noise flag
+  text_sanity_mixed_script_min_symbol_ratio: 0.05 # Symbol ratio needed before mixed scripts look like token soup
+  text_sanity_mixed_script_min_families: 4 # Script-family count before mixed-script output is suspicious
+  text_sanity_mixed_script_max_tokens: 25 # Keep mixed-script suspicion to short, noisy outputs
   text_sanity_min_tokens: 5 # Minimum tokens for token-noise checks
   text_sanity_numeric_loop_min_count: 6 # Repeated numeric/year tokens before numeric-loop flag
 

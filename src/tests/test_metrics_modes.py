@@ -993,6 +993,45 @@ def test_report_generation_uses_single_artifact_plan(tmp_path: Path) -> None:
     assert all(artifact.job is not None for artifact in artifacts)
 
 
+def test_report_artifact_specs_are_the_metadata_source(tmp_path: Path) -> None:
+    """Generated report path, run-json, and dashboard metadata should share specs."""
+    args = argparse.Namespace(
+        output_html=tmp_path / "report.html",
+        output_markdown=tmp_path / "report.md",
+        output_gallery_markdown=tmp_path / "gallery.md",
+        output_review=tmp_path / "review.md",
+        output_model_selection=tmp_path / "model_selection.md",
+        output_model_capabilities=tmp_path / "model_capabilities.md",
+        output_model_capabilities_json=tmp_path / "model_capabilities.json",
+        output_tsv=tmp_path / "report.tsv",
+        output_jsonl=tmp_path / "report.jsonl",
+        output_run_json=tmp_path / "run.json",
+        output_diagnostics=tmp_path / "diagnostics.md",
+        output_log=tmp_path / "check_models.log",
+        output_env=tmp_path / "environment.log",
+    )
+    paths = check_models._resolve_report_output_paths(args)
+
+    specs = check_models._build_report_artifact_specs(paths)
+
+    assert [
+        (spec.key, spec.public_key, spec.label.strip(), spec.dashboard_label) for spec in specs
+    ] == [
+        ("output_index", "output_index", "Output Index:", "Output Index"),
+        ("html", "results_html", "HTML Report:", "HTML Report"),
+        ("markdown", "results_markdown", "Markdown Report:", "Markdown Report"),
+        ("markdown_gallery", "model_gallery", "Gallery Report:", "Gallery Report"),
+        ("review", "review", "Review Report:", "Review Report"),
+        ("model_selection", "model_selection", "Model Selection:", "Model Selection"),
+        ("model_capabilities", "model_capabilities", "Capabilities:", "Capability Scorecard"),
+        ("tsv", "results_tsv", "TSV Report:", "TSV Metrics"),
+        ("jsonl", "results_jsonl", "JSONL Report:", "JSONL Data"),
+        ("run_json", "run_json", "Run JSON:", "Run JSON"),
+    ]
+    public_map = check_models._public_output_artifact_map(paths)
+    assert {spec.public_key for spec in specs} <= set(public_map)
+
+
 def test_finalize_execution_prunes_canonical_repro_bundle_dir(tmp_path: Path) -> None:
     """Finalization should prune output/repro_bundles, not output/reports/repro_bundles."""
     reports_dir = tmp_path / "reports"

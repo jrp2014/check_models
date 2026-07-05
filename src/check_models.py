@@ -28,6 +28,7 @@ import sys
 import textwrap
 import time
 import traceback
+import unicodedata
 import webbrowser
 from collections import Counter
 from collections.abc import Callable, Generator, Iterable, Iterator, Mapping, Sequence
@@ -386,7 +387,7 @@ class QualityThresholds:
     """
 
     # Repetition detection
-    repetition_ratio: float = 0.8
+    repetition_ratio: float = 0.9
     min_text_length: int = 10
     min_token_count: int = 5
 
@@ -410,7 +411,7 @@ class QualityThresholds:
     min_context_term_length: int = 2
 
     # Verbosity detection
-    max_verbosity_tokens: int = 300
+    max_verbosity_tokens: int = 400
     min_meta_patterns: int = 2
     min_section_headers: int = 3
 
@@ -419,12 +420,12 @@ class QualityThresholds:
 
     # Generic output detection
     min_text_length_for_generic: int = 20
-    generic_filler_threshold: float = 0.15
+    generic_filler_threshold: float = 0.20
     min_specificity_indicators: int = 2
 
     # Context ignorance detection
-    min_key_terms_threshold: int = 3
-    min_missing_ratio: float = 0.75
+    min_key_terms_threshold: int = 5
+    min_missing_ratio: float = 0.85
 
     # Confidence thresholds for output analysis
     high_confidence_threshold: float = 0.7
@@ -456,11 +457,11 @@ class QualityThresholds:
     min_useful_chars: int = 10  # Minimum chars for useful output
     severe_echo_threshold: float = 0.8  # Echo ratio triggering severe penalty
     moderate_echo_threshold: float = 0.5  # Echo ratio triggering moderate penalty
-    context_echo_min_words: int = 30  # Minimum output words before context-echo scoring
-    context_echo_vocab_ratio_threshold: float = 0.9  # Vocab overlap threshold for context echo
+    context_echo_min_words: int = 50  # Minimum output words before context-echo scoring
+    context_echo_vocab_ratio_threshold: float = 0.95  # Vocab overlap threshold for context echo
     context_echo_ngram_size: int = 8  # N-gram size for verbatim context copy detection
     context_echo_min_shared_ngrams: int = 3  # Minimum shared n-grams for context echo
-    context_echo_ngram_ratio_threshold: float = 0.25  # Shared n-gram ratio threshold
+    context_echo_ngram_ratio_threshold: float = 0.40  # Shared n-gram ratio threshold
     low_grounding_threshold: float = 0.3  # Visual grounding considered low
     low_compliance_threshold: float = 0.5  # Task compliance considered low
     low_info_gain_threshold: float = 0.3  # Information gain considered low
@@ -486,6 +487,9 @@ class QualityThresholds:
     metadata_alignment_partial_match_cap: int = 8
     text_sanity_min_wordlike_ratio: float = 0.45
     text_sanity_max_symbol_ratio: float = 0.35
+    text_sanity_mixed_script_min_symbol_ratio: float = 0.05
+    text_sanity_mixed_script_min_families: int = 4
+    text_sanity_mixed_script_max_tokens: int = 25
     text_sanity_min_tokens: int = 5
     text_sanity_numeric_loop_min_count: int = 6
 
@@ -538,6 +542,9 @@ class QualityThresholds:
             "metadata_agreement_weight_keywords": self.metadata_agreement_weight_keywords,
             "text_sanity_min_wordlike_ratio": self.text_sanity_min_wordlike_ratio,
             "text_sanity_max_symbol_ratio": self.text_sanity_max_symbol_ratio,
+            "text_sanity_mixed_script_min_symbol_ratio": (
+                self.text_sanity_mixed_script_min_symbol_ratio
+            ),
         }
         for field_name, value in unit_interval_fields.items():
             if not 0.0 <= value <= 1.0:
@@ -630,6 +637,18 @@ class QualityThresholds:
             msg = (
                 "quality_config.yaml thresholds.metadata_alignment_partial_match_cap must be "
                 f"> 0; got {self.metadata_alignment_partial_match_cap}"
+            )
+            raise ValueError(msg)
+        if self.text_sanity_mixed_script_min_families <= 1:
+            msg = (
+                "quality_config.yaml thresholds.text_sanity_mixed_script_min_families must be "
+                f"> 1; got {self.text_sanity_mixed_script_min_families}"
+            )
+            raise ValueError(msg)
+        if self.text_sanity_mixed_script_max_tokens <= 0:
+            msg = (
+                "quality_config.yaml thresholds.text_sanity_mixed_script_max_tokens must be > 0; "
+                f"got {self.text_sanity_mixed_script_max_tokens}"
             )
             raise ValueError(msg)
         if self.text_sanity_min_tokens <= 0:
@@ -1464,6 +1483,18 @@ class ReportArtifact:
     label: str
     path: Path
     job: Callable[[], None] | None = None
+
+
+@dataclass(frozen=True)
+class ReportArtifactSpec:
+    """Shared metadata for final generated report artifacts."""
+
+    key: str
+    public_key: str
+    label: str
+    path: Path
+    dashboard_label: str
+    dashboard_purpose: str
 
 
 class ChatTemplateKwargs(TypedDict, total=False):
@@ -3551,6 +3582,106 @@ def _detect_repetitive_output(text: str, threshold: float | None = None) -> tupl
     return False, None
 
 
+_TEXT_SANITY_SCRIPT_NAME_PREFIXES: Final[tuple[tuple[str, tuple[str, ...]], ...]] = (
+    ("latin", ("LATIN",)),
+    ("cyrillic", ("CYRILLIC",)),
+    ("arabic", ("ARABIC",)),
+    ("kana", ("HIRAGANA", "KATAKANA")),
+    ("cjk", ("CJK",)),
+    ("hangul", ("HANGUL",)),
+)
+_TEXT_SANITY_CHAR_NOISE_RE: Final[re.Pattern[str]] = re.compile(r"([#&_=(){}\[\]<>/\\|])\1{5,}")
+_TEXT_SANITY_LEADING_NOISE_RE: Final[re.Pattern[str]] = re.compile(r"^[^\w\s]{2,}")
+_TEXT_SANITY_NUMERIC_TOKEN_RE: Final[re.Pattern[str]] = re.compile(r"\b(?:19|20)\d{2}\b|\b\d+\b")
+_TEXT_SANITY_WORDLIKE_TOKEN_RE: Final[re.Pattern[str]] = re.compile(r"[A-Za-z][A-Za-z'-]{1,}")
+_TEXT_SANITY_STRUCTURAL_MARKER_RE: Final[re.Pattern[str]] = re.compile(r"[{}\[\]<>/\\|_=]{2,}")
+_TEXT_SANITY_MIN_REPEATED_NUMERIC_TOKEN_COUNT: Final[int] = 3
+
+
+def _text_sanity_script_family(char: str) -> str | None:
+    """Return broad script families used to spot tokenizer-style script soup."""
+    if not char.isalpha():
+        return None
+    unicode_name = unicodedata.name(char, "")
+    return next(
+        (
+            family
+            for family, prefixes in _TEXT_SANITY_SCRIPT_NAME_PREFIXES
+            if unicode_name.startswith(prefixes)
+        ),
+        "other",
+    )
+
+
+def _text_sanity_numeric_loop_issue(cleaned: str) -> str | None:
+    """Return a numeric-loop issue label when one number dominates the output."""
+    numeric_tokens = _TEXT_SANITY_NUMERIC_TOKEN_RE.findall(cleaned)
+    if len(numeric_tokens) < QUALITY.text_sanity_numeric_loop_min_count:
+        return None
+    _number, count = Counter(numeric_tokens).most_common(1)[0]
+    repeated_token_threshold = max(
+        _TEXT_SANITY_MIN_REPEATED_NUMERIC_TOKEN_COUNT,
+        QUALITY.text_sanity_numeric_loop_min_count // 2,
+    )
+    return "numeric_loop" if count >= repeated_token_threshold else None
+
+
+def _text_sanity_token_marker_issue(cleaned: str) -> str | None:
+    """Return a token-noise issue label for control/BPE/special-token leakage."""
+    control_or_bpe_issue, _encoding_type = _detect_token_encoding_issues(cleaned)
+    special_token_leak, _leaked_tokens = _detect_special_token_leakage(cleaned)
+    return "gibberish(token_noise)" if control_or_bpe_issue or special_token_leak else None
+
+
+def _text_sanity_wordlike_ratio(tokens: Sequence[str]) -> float:
+    """Return ratio of tokens that resemble ordinary Latin words."""
+    wordlike_tokens = [
+        token
+        for token in tokens
+        if _TEXT_SANITY_WORDLIKE_TOKEN_RE.search(token)
+        and not _TEXT_SANITY_STRUCTURAL_MARKER_RE.search(token)
+    ]
+    return len(wordlike_tokens) / len(tokens)
+
+
+def _text_sanity_symbol_ratio(cleaned: str) -> float:
+    """Return punctuation/symbol density for lexical noise checks."""
+    symbol_chars = sum(1 for char in cleaned if not (char.isalnum() or char.isspace()))
+    return symbol_chars / max(len(cleaned), 1)
+
+
+def _has_mixed_script_token_noise(
+    cleaned: str,
+    *,
+    token_count: int,
+    symbol_ratio: float,
+) -> bool:
+    """Return True when short output mixes many unrelated scripts with symbol noise."""
+    script_families = {
+        family for char in cleaned if (family := _text_sanity_script_family(char)) is not None
+    }
+    return (
+        len(script_families) >= QUALITY.text_sanity_mixed_script_min_families
+        and token_count <= QUALITY.text_sanity_mixed_script_max_tokens
+        and symbol_ratio >= QUALITY.text_sanity_mixed_script_min_symbol_ratio
+    )
+
+
+def _has_general_token_noise(
+    *,
+    token_count: int,
+    wordlike_ratio: float,
+    symbol_ratio: float,
+    leading_token_noise: bool,
+) -> bool:
+    """Return True for lexical token noise independent of visual correctness."""
+    return (
+        wordlike_ratio < QUALITY.text_sanity_min_wordlike_ratio
+        or symbol_ratio > QUALITY.text_sanity_max_symbol_ratio
+        or (leading_token_noise and token_count <= QUALITY.short_output_words)
+    )
+
+
 def _detect_text_sanity_issue(text: str) -> tuple[bool, str | None]:
     """Detect prompt-independent token noise that is not valid prose.
 
@@ -3563,43 +3694,35 @@ def _detect_text_sanity_issue(text: str) -> tuple[bool, str | None]:
         return False, None
 
     issue_type: str | None = None
-    if re.search(r"([#&_=(){}\[\]<>/\\|])\1{5,}", cleaned):
+    if _TEXT_SANITY_CHAR_NOISE_RE.search(cleaned):
         issue_type = "gibberish(char_noise)"
+    else:
+        tokens = re.findall(r"\S+", cleaned)
+        if len(tokens) >= QUALITY.text_sanity_min_tokens:
+            issue_type = _text_sanity_numeric_loop_issue(
+                cleaned
+            ) or _text_sanity_token_marker_issue(cleaned)
+            if issue_type is None:
+                wordlike_ratio = _text_sanity_wordlike_ratio(tokens)
+                symbol_ratio = _text_sanity_symbol_ratio(cleaned)
+                token_count = len(tokens)
+                if _has_mixed_script_token_noise(
+                    cleaned,
+                    token_count=token_count,
+                    symbol_ratio=symbol_ratio,
+                ):
+                    issue_type = "gibberish(mixed_script_noise)"
+                else:
+                    leading_token_noise = bool(_TEXT_SANITY_LEADING_NOISE_RE.match(cleaned))
+                    if _has_general_token_noise(
+                        token_count=token_count,
+                        wordlike_ratio=wordlike_ratio,
+                        symbol_ratio=symbol_ratio,
+                        leading_token_noise=leading_token_noise,
+                    ):
+                        issue_type = "gibberish(token_noise)"
 
-    tokens = re.findall(r"\S+", cleaned)
-    if issue_type is None and len(tokens) < QUALITY.text_sanity_min_tokens:
-        return False, None
-
-    numeric_tokens = re.findall(r"\b(?:19|20)\d{2}\b|\b\d+\b", cleaned)
-    if issue_type is None and len(numeric_tokens) >= QUALITY.text_sanity_numeric_loop_min_count:
-        _number, count = Counter(numeric_tokens).most_common(1)[0]
-        if count >= max(3, QUALITY.text_sanity_numeric_loop_min_count // 2):
-            issue_type = "numeric_loop"
-
-    control_or_bpe_issue, _encoding_type = _detect_token_encoding_issues(cleaned)
-    special_token_leak, _leaked_tokens = _detect_special_token_leakage(cleaned)
-    if issue_type is None and (control_or_bpe_issue or special_token_leak):
-        issue_type = "gibberish(token_noise)"
-
-    wordlike_tokens = [
-        token
-        for token in tokens
-        if re.search(r"[A-Za-z][A-Za-z'-]{1,}", token)
-        and not re.search(r"[{}\[\]<>/\\|_=]{2,}", token)
-    ]
-    wordlike_ratio = len(wordlike_tokens) / len(tokens)
-    symbol_chars = sum(1 for char in cleaned if not (char.isalnum() or char.isspace()))
-    symbol_ratio = symbol_chars / max(len(cleaned), 1)
-    leading_token_noise = bool(re.match(r"^[^\w\s]{2,}", cleaned))
-
-    if issue_type is None and (
-        wordlike_ratio < QUALITY.text_sanity_min_wordlike_ratio
-        or symbol_ratio > QUALITY.text_sanity_max_symbol_ratio
-        or (leading_token_noise and len(tokens) <= QUALITY.short_output_words)
-    ):
-        issue_type = "gibberish(token_noise)"
-
-    return (issue_type is not None), issue_type
+    return issue_type is not None, issue_type
 
 
 def _detect_hallucination_patterns(text: str) -> list[str]:
@@ -11329,6 +11452,8 @@ def _review_analysis_focus_parts(analysis: GenerationQualityAnalysis) -> list[st
         parts.append("nonvisual metadata reused")
     if analysis.has_reasoning_leak:
         parts.append("reasoning leak")
+    if analysis.text_sanity_issue_type is not None:
+        parts.append(f"text-sanity={analysis.text_sanity_issue_type}")
     if analysis.formatting_issues:
         formatting_preview = html.escape(
             _collapse_preview_whitespace(analysis.formatting_issues[0]),
@@ -16985,6 +17110,14 @@ def _model_selection_row_status(row: ModelSelectionRow) -> str:
     return _review_display_bucket_label(review["user_bucket"], review=review)
 
 
+def _model_selection_chooser_evidence(row: ModelSelectionRow) -> str:
+    """Return chooser evidence, preferring diagnostics for avoid-bucket rows."""
+    preview = _build_result_output_preview(row.result, max_chars=96)
+    if _model_selection_row_is_current_avoid(row) and row.caveat != "no flagged signals":
+        return row.caveat
+    return preview or row.caveat
+
+
 def _model_selection_chooser_table_rows(
     rows: Sequence[ModelSelectionRow],
 ) -> tuple[tuple[str, ...], ...]:
@@ -16996,9 +17129,7 @@ def _model_selection_chooser_table_rows(
             format_field_value("generation_tps", _model_selection_generation_tps(row)) or "-",
             f"{row.caption_score:.0f}",
             f"`{MARKDOWN_ESCAPER.escape(_model_selection_row_status(row))}`",
-            MARKDOWN_ESCAPER.escape(
-                _build_result_output_preview(row.result, max_chars=96) or row.caveat
-            ),
+            MARKDOWN_ESCAPER.escape(_model_selection_chooser_evidence(row)),
         )
         for row in rows
     )
@@ -24727,8 +24858,8 @@ def generate_output_index_report(
     diagnostics_artifacts: DiagnosticsArtifacts | None = None,
 ) -> None:
     """Write a generated landing page that routes readers to the right artifact."""
-    summary = report_context.summary
     policy = report_context.mode_policy
+    result_set = report_context.result_set
     diagnostics_written = (
         diagnostics_artifacts is not None and diagnostics_artifacts.diagnostics_written
     )
@@ -24749,9 +24880,9 @@ def generate_output_index_report(
             f"{MARKDOWN_ESCAPER.escape(policy.selection_basis)}"
             + (" (grounded)" if policy.semantic_rankings_grounded else " (ungrounded)")
         ),
-        f"- Models tested: {summary.get('total_models', len(report_context.result_set.results))}",
-        f"- Successful: {summary.get('successful_count', 0)}",
-        f"- Failed: {summary.get('failed_count', 0)}",
+        f"- Models tested: {len(result_set.results)}",
+        f"- Successful: {len(result_set.successful)}",
+        f"- Failed: {len(result_set.failed)}",
         "",
         "## For Model Users",
         "",
@@ -25354,6 +25485,20 @@ def _issue_model_signal(
     return result.error_message or "clustered issue signal"
 
 
+_PARAMETERS_NOT_IN_MODEL_ROW_RE: Final[re.Pattern[str]] = re.compile(
+    r"\b(Received\s+\d+\s+parameters?\s+not\s+in\s+model)\b",
+    re.IGNORECASE,
+)
+
+
+def _compact_issue_table_signal(signal: str) -> str:
+    """Trim verbose raw error text for compact issue-draft table rows."""
+    normalized = re.sub(r"\s+", " ", signal).strip()
+    if match := _PARAMETERS_NOT_IN_MODEL_ROW_RE.search(normalized):
+        return match.group(1)
+    return normalized
+
+
 def _guard_markdownlint_block(lines: Sequence[str], *, rules: str) -> list[str]:
     """Wrap Markdown lines with markdownlint disable/enable comments."""
     return [
@@ -25380,7 +25525,11 @@ def _issue_affected_models_section(
         rows.append(
             (
                 f"`{MARKDOWN_ESCAPER.escape(result.model_name)}`",
-                MARKDOWN_ESCAPER.escape(_issue_model_signal(result, stack_symptoms=stack_symptoms)),
+                MARKDOWN_ESCAPER.escape(
+                    _compact_issue_table_signal(
+                        _issue_model_signal(result, stack_symptoms=stack_symptoms)
+                    )
+                ),
                 MARKDOWN_ESCAPER.escape(context or ""),
                 _issue_bundle_link(result.model_name, repro_bundles),
             )
@@ -26488,35 +26637,119 @@ def _public_artifact_path(path: Path) -> str:
             return str(path)
 
 
+def _build_report_artifact_specs(output_paths: ReportOutputPaths) -> tuple[ReportArtifactSpec, ...]:
+    """Return one ordered metadata source for generated report artifacts."""
+    return (
+        ReportArtifactSpec(
+            key="output_index",
+            public_key="output_index",
+            label="   Output Index:   ",
+            path=output_paths.index,
+            dashboard_label="Output Index",
+            dashboard_purpose="Start here for model users and maintainers",
+        ),
+        ReportArtifactSpec(
+            key="html",
+            public_key="results_html",
+            label="   HTML Report:     ",
+            path=output_paths.html,
+            dashboard_label="HTML Report",
+            dashboard_purpose="Interactive dashboard with charts & filters",
+        ),
+        ReportArtifactSpec(
+            key="markdown",
+            public_key="results_markdown",
+            label="   Markdown Report: ",
+            path=output_paths.markdown,
+            dashboard_label="Markdown Report",
+            dashboard_purpose="Mode-aware public run index",
+        ),
+        ReportArtifactSpec(
+            key="markdown_gallery",
+            public_key="model_gallery",
+            label="   Gallery Report:  ",
+            path=output_paths.gallery_markdown,
+            dashboard_label="Gallery Report",
+            dashboard_purpose="Complete per-model evidence",
+        ),
+        ReportArtifactSpec(
+            key="review",
+            public_key="review",
+            label="   Review Report:   ",
+            path=output_paths.review,
+            dashboard_label="Review Report",
+            dashboard_purpose="Insights summary & checklist",
+        ),
+        ReportArtifactSpec(
+            key="model_selection",
+            public_key="model_selection",
+            label="   Model Selection: ",
+            path=output_paths.model_selection,
+            dashboard_label="Model Selection",
+            dashboard_purpose="Ranked caption/metadata shortlist",
+        ),
+        ReportArtifactSpec(
+            key="model_capabilities",
+            public_key="model_capabilities",
+            label="   Capabilities:    ",
+            path=output_paths.model_capabilities,
+            dashboard_label="Capability Scorecard",
+            dashboard_purpose="Aggregated model capability matrix",
+        ),
+        ReportArtifactSpec(
+            key="tsv",
+            public_key="results_tsv",
+            label="   TSV Report:      ",
+            path=output_paths.tsv,
+            dashboard_label="TSV Metrics",
+            dashboard_purpose="Tab-separated raw metrics for import",
+        ),
+        ReportArtifactSpec(
+            key="jsonl",
+            public_key="results_jsonl",
+            label="   JSONL Report:    ",
+            path=output_paths.jsonl,
+            dashboard_label="JSONL Data",
+            dashboard_purpose="Machine-readable per-model diagnostics",
+        ),
+        ReportArtifactSpec(
+            key="run_json",
+            public_key="run_json",
+            label="   Run JSON:       ",
+            path=output_paths.run_json,
+            dashboard_label="Run JSON",
+            dashboard_purpose="Stable run metadata contract",
+        ),
+    )
+
+
 def _public_output_artifact_map(output_paths: ReportOutputPaths) -> dict[str, str]:
     """Return stable artifact paths for run-level JSON metadata."""
-    return {
-        "output_index": _public_artifact_path(output_paths.index),
-        "results_html": _public_artifact_path(output_paths.html),
-        "results_markdown": _public_artifact_path(output_paths.markdown),
-        "model_selection": _public_artifact_path(output_paths.model_selection),
-        "model_capabilities": _public_artifact_path(output_paths.model_capabilities),
-        "model_capabilities_json": _public_artifact_path(output_paths.model_capabilities_json),
-        "model_gallery": _public_artifact_path(output_paths.gallery_markdown),
-        "review": _public_artifact_path(output_paths.review),
-        "diagnostics": _public_artifact_path(output_paths.diagnostics),
-        "results_tsv": _public_artifact_path(output_paths.tsv),
-        "results_jsonl": _public_artifact_path(output_paths.jsonl),
-        "run_json": _public_artifact_path(output_paths.run_json),
-        "log": _public_artifact_path(output_paths.log),
-        "environment": _public_artifact_path(output_paths.environment),
+    artifacts = {
+        spec.public_key: _public_artifact_path(spec.path)
+        for spec in _build_report_artifact_specs(output_paths)
     }
+    artifacts.update(
+        {
+            "model_capabilities_json": _public_artifact_path(output_paths.model_capabilities_json),
+            "diagnostics": _public_artifact_path(output_paths.diagnostics),
+            "log": _public_artifact_path(output_paths.log),
+            "environment": _public_artifact_path(output_paths.environment),
+        }
+    )
+    return artifacts
 
 
 def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtifact, ...]:
     """Build the ordered final report artifact plan."""
     output_paths = inputs.output_paths
+    specs = {spec.key: spec for spec in _build_report_artifact_specs(output_paths)}
 
     return (
         ReportArtifact(
-            key="html",
-            label="   HTML Report:     ",
-            path=output_paths.html,
+            key=specs["html"].key,
+            label=specs["html"].label,
+            path=specs["html"].path,
             job=lambda: generate_html_report(
                 results=inputs.results,
                 filename=output_paths.html,
@@ -26528,9 +26761,9 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
             ),
         ),
         ReportArtifact(
-            key="markdown",
-            label="   Markdown Report: ",
-            path=output_paths.markdown,
+            key=specs["markdown"].key,
+            label=specs["markdown"].label,
+            path=specs["markdown"].path,
             job=lambda: generate_markdown_report(
                 results=inputs.results,
                 filename=output_paths.markdown,
@@ -26546,9 +26779,9 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
             ),
         ),
         ReportArtifact(
-            key="markdown_gallery",
-            label="   Gallery Report:  ",
-            path=output_paths.gallery_markdown,
+            key=specs["markdown_gallery"].key,
+            label=specs["markdown_gallery"].label,
+            path=specs["markdown_gallery"].path,
             job=lambda: generate_markdown_gallery_report(
                 results=inputs.results,
                 filename=output_paths.gallery_markdown,
@@ -26559,9 +26792,9 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
             ),
         ),
         ReportArtifact(
-            key="review",
-            label="   Review Report:   ",
-            path=output_paths.review,
+            key=specs["review"].key,
+            label=specs["review"].label,
+            path=specs["review"].path,
             job=lambda: generate_review_report(
                 results=inputs.results,
                 filename=output_paths.review,
@@ -26577,9 +26810,9 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
             ),
         ),
         ReportArtifact(
-            key="model_selection",
-            label="   Model Selection: ",
-            path=output_paths.model_selection,
+            key=specs["model_selection"].key,
+            label=specs["model_selection"].label,
+            path=specs["model_selection"].path,
             job=lambda: generate_model_selection_report(
                 inputs.results,
                 output_paths.model_selection,
@@ -26591,9 +26824,9 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
             ),
         ),
         ReportArtifact(
-            key="model_capabilities",
-            label="   Capabilities:    ",
-            path=output_paths.model_capabilities,
+            key=specs["model_capabilities"].key,
+            label=specs["model_capabilities"].label,
+            path=specs["model_capabilities"].path,
             job=lambda: generate_model_capability_scorecard(
                 inputs.results,
                 output_paths.model_capabilities,
@@ -26605,9 +26838,9 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
             ),
         ),
         ReportArtifact(
-            key="tsv",
-            label="   TSV Report:      ",
-            path=output_paths.tsv,
+            key=specs["tsv"].key,
+            label=specs["tsv"].label,
+            path=specs["tsv"].path,
             job=lambda: generate_tsv_report(
                 results=inputs.results,
                 filename=output_paths.tsv,
@@ -26615,9 +26848,9 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
             ),
         ),
         ReportArtifact(
-            key="jsonl",
-            label="   JSONL Report:    ",
-            path=output_paths.jsonl,
+            key=specs["jsonl"].key,
+            label=specs["jsonl"].label,
+            path=specs["jsonl"].path,
             job=lambda: save_jsonl_report(
                 inputs.results,
                 output_paths.jsonl,
@@ -26628,9 +26861,9 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
             ),
         ),
         ReportArtifact(
-            key="run_json",
-            label="   Run JSON:       ",
-            path=output_paths.run_json,
+            key=specs["run_json"].key,
+            label=specs["run_json"].label,
+            path=specs["run_json"].path,
             job=lambda: save_run_json_report(
                 inputs.results,
                 output_paths.run_json,
@@ -26642,9 +26875,9 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
             ),
         ),
         ReportArtifact(
-            key="output_index",
-            label="   Output Index:   ",
-            path=output_paths.index,
+            key=specs["output_index"].key,
+            label=specs["output_index"].label,
+            path=specs["output_index"].path,
             job=lambda: generate_output_index_report(
                 output_paths.index,
                 output_paths=output_paths,
@@ -26954,24 +27187,14 @@ def _print_reports_dashboard(
         clickable_link = f"[link={uri}]{uri}[/link]"
         table.add_row(label, purpose, clickable_link)
 
-    add_row("Output Index", "Start here for model users and maintainers", output_paths.index)
-    add_row("HTML Report", "Interactive dashboard with charts & filters", output_paths.html)
-    add_row("Markdown Report", "Mode-aware public run index", output_paths.markdown)
-    add_row("Model Selection", "Ranked caption/metadata shortlist", output_paths.model_selection)
-    add_row(
-        "Capability Scorecard",
-        "Aggregated model capability matrix",
-        output_paths.model_capabilities,
-    )
+    for spec in _build_report_artifact_specs(output_paths):
+        add_row(spec.dashboard_label, spec.dashboard_purpose, spec.path)
+
     add_row(
         "Capability JSON",
         "Machine-readable capability summary",
         output_paths.model_capabilities_json,
     )
-    add_row("Gallery Report", "Complete per-model evidence", output_paths.gallery_markdown)
-    add_row("Review Report", "Insights summary & checklist", output_paths.review)
-    add_row("TSV Metrics", "Tab-separated raw metrics for import", output_paths.tsv)
-    add_row("Run JSON", "Stable run metadata contract", output_paths.run_json)
 
     if diagnostics_artifacts and diagnostics_artifacts.diagnostics_written:
         add_row("Diagnostics", "Upstream bug triage & package failures", output_paths.diagnostics)
