@@ -171,9 +171,8 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- Preserve Nanobind's recursive `mlx.core` stub layout in static CI so
-  `ty>=0.0.58` resolves the native module without relying on a local conda
-  environment.
+- Dynamically load the probed `mlx.core` native module so `ty>=0.0.58` does not
+  require incomplete Nanobind stubs that fail strict `mypy` checks in static CI.
 - Center diagnostics harness sample output on leaked control tokens when the
   marker appears after a long preface, matching issue-draft evidence excerpts.
 - Render generated Markdown report timestamps as plain metadata instead of

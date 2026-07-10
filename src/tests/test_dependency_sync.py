@@ -1500,18 +1500,29 @@ def test_quality_ci_defers_macos_deployment_target_to_upstream_mlx() -> None:
         assert "MACOSX_DEPLOYMENT_TARGET" not in install_command
 
 
-def test_quality_ci_preserves_recursive_mlx_stubgen_layout() -> None:
-    """CI should publish Nanobind's recursive mlx.core layout for type checkers."""
-    workflow = yaml.safe_load(
-        (REPO_ROOT / ".github" / "workflows" / "quality.yml").read_text(encoding="utf-8")
-    )
-    static_steps = workflow["jobs"]["static-quality"]["steps"]
-    stub_command = next(
-        step["run"] for step in static_steps if step.get("name") == "Generate MLX stubs for mypy"
-    )
+def test_mlx_runtime_import_avoids_static_native_module_resolution() -> None:
+    """Static checkers should not need importable stubs for the native MLX module."""
+    source = (PKG_ROOT / "check_models.py").read_text(encoding="utf-8")
+    tree = ast.parse(source)
 
-    assert '"$STUB_ROOT/core/__init__.pyi"' in stub_command
-    assert 'cp -R "$STUB_ROOT/core/." typings/mlx/core/' in stub_command
+    direct_mlx_imports = [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Import) and any(alias.name == "mlx.core" for alias in node.names)
+    ]
+    dynamic_mlx_imports = [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "import_module"
+        and node.args
+        and isinstance(node.args[0], ast.Constant)
+        and node.args[0].value == "mlx.core"
+    ]
+
+    assert not direct_mlx_imports
+    assert dynamic_mlx_imports
 
 
 def test_workflows_pin_actions_and_keep_skylos_danger_advisory_nonblocking() -> None:

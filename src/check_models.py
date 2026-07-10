@@ -44,6 +44,7 @@ from dataclasses import dataclass, fields, is_dataclass, replace
 from dataclasses import field as dataclass_field
 from datetime import UTC, datetime, timedelta
 from functools import lru_cache
+from importlib import import_module
 from importlib.metadata import (
     Distribution,
     PackageNotFoundError,
@@ -856,7 +857,7 @@ mlx_probe_error = _probe_import_runtime(
 )
 if mlx_probe_error is None:
     try:
-        import mlx.core as _mx_runtime
+        _mx_runtime = import_module("mlx.core")
     except ImportError:
         MISSING_DEPENDENCIES["mlx"] = ERROR_MLX_MISSING
     except (OSError, RuntimeError, ValueError) as mlx_init_err:
