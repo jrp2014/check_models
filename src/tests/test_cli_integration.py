@@ -144,6 +144,15 @@ def test_cli_parser_accumulates_repeated_eos_token_flags() -> None:
     assert args.eos_tokens == ["</think>", r"\n", "<END>"]
 
 
+def test_cli_output_path_defaults_match_typed_specs() -> None:
+    """Output artifact defaults should remain aligned with their CLI specifications."""
+    args = check_models._build_cli_parser().parse_args(["--folder", "test-folder"])
+
+    for spec in check_models.OUTPUT_PATH_ARGUMENT_SPECS:
+        destination = spec.flag.removeprefix("--").replace("-", "_")
+        assert getattr(args, destination) == spec.default
+
+
 def test_cli_exits_on_nonexistent_folder(capsys: pytest.CaptureFixture[str]) -> None:
     """Should exit with error when folder does not exist."""
     result = _run_cli([*_get_test_output_args(), "--folder", "/nonexistent/path"], capsys)

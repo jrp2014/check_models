@@ -7,6 +7,8 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Consolidate generated-output CLI path definitions and configuration-driven
+  quality detector regex matching while preserving their existing contracts.
 - Consolidate the regular and diagnostic Markdown table escaping pipeline while
   preserving their distinct whitespace policies.
 - Bump the package version to `0.8.5` to establish the release baseline for

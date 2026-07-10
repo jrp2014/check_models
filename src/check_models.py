@@ -3796,6 +3796,28 @@ def _detect_text_sanity_issue(text: str) -> tuple[bool, str | None]:
     return issue_type is not None, issue_type
 
 
+def _configured_regex_issues(
+    text: str,
+    rules: Sequence[tuple[str, tuple[str, ...], str, int]],
+    *,
+    debug_context: str,
+    quality_thresholds: QualityThresholds | None = None,
+) -> Iterator[str]:
+    """Yield issue labels whose configured regex lists match text."""
+    for pattern_key, fallback_patterns, issue_label, flags in rules:
+        if _matches_any_pattern(
+            text,
+            _get_quality_pattern_list(
+                pattern_key,
+                list(fallback_patterns),
+                quality_thresholds=quality_thresholds,
+            ),
+            debug_context=f"{debug_context} {issue_label}",
+            flags=flags,
+        ):
+            yield issue_label
+
+
 def _detect_hallucination_patterns(text: str) -> list[str]:
     """Detect quiz/table artifacts that indicate task drift or hallucination.
 
@@ -4984,50 +5006,47 @@ def _detect_language_mixing(
     if quality_thresholds is None:
         quality_thresholds = QUALITY
 
-    issues: list[str] = []
-
-    # Check for common tokenizer artifacts
-    tokenizer_artifacts: list[str] = _get_quality_pattern_list(
-        "tokenizer_artifacts",
-        [
-            r"<\|endoftext\|>",
-            r"<\|end\|>",
-            r"<s>",
-            r"</s>",
-            r"\[SEP\]",
-            r"\[CLS\]",
-            r"\[PAD\]",
-            r"\[UNK\]",
-            r"\[MASK\]",
-            r"<pad>",
-            r"<unk>",
-            r"<mask>",
-        ],
-        quality_thresholds=quality_thresholds,
+    rules = (
+        (
+            "tokenizer_artifacts",
+            (
+                r"<\|endoftext\|>",
+                r"<\|end\|>",
+                r"<s>",
+                r"</s>",
+                r"\[SEP\]",
+                r"\[CLS\]",
+                r"\[PAD\]",
+                r"\[UNK\]",
+                r"\[MASK\]",
+                r"<pad>",
+                r"<unk>",
+                r"<mask>",
+            ),
+            "tokenizer_artifact",
+            re.IGNORECASE,
+        ),
+        (
+            "code_patterns",
+            (
+                r"\bdef\s+\w+\(",
+                r"\bfunction\s+\w+\(",
+                r"\bclass\s+\w+",
+                r"\bimport\s+\w+",
+                r"\breturn\s+",
+            ),
+            "code_snippet",
+            0,
+        ),
     )
-
-    for artifact in tokenizer_artifacts:
-        if re.search(artifact, text, re.IGNORECASE):
-            issues.append("tokenizer_artifact")
-            break
-
-    # Check for code snippets (function calls, variable assignments)
-    code_patterns: list[str] = _get_quality_pattern_list(
-        "code_patterns",
-        [
-            r"\bdef\s+\w+\(",  # Python function def
-            r"\bfunction\s+\w+\(",  # JavaScript function
-            r"\bclass\s+\w+",  # Class definition
-            r"\bimport\s+\w+",  # Import statement
-            r"\breturn\s+",  # Return statement
-        ],
-        quality_thresholds=quality_thresholds,
+    issues = list(
+        _configured_regex_issues(
+            text,
+            rules,
+            debug_context="language mixing",
+            quality_thresholds=quality_thresholds,
+        )
     )
-
-    for pattern in code_patterns:
-        if re.search(pattern, text):
-            issues.append("code_snippet")
-            break
 
     return bool(issues), issues
 
@@ -5470,64 +5489,50 @@ def _detect_training_data_leak(text: str) -> tuple[bool, str | None]:
     if not text or len(text) < QUALITY.min_text_for_leak_detection:
         return False, None
 
-    # Look for instruction-like patterns appearing mid-output
-    training_leak_pattern_groups: list[tuple[list[str], str]] = [
-        (
-            _get_quality_pattern_list(
-                "training_leak_instruction_header_patterns",
-                [r"\n# INSTRUCTION\b"],
-            ),
-            "instruction_header",
-        ),
-        (
-            _get_quality_pattern_list(
-                "training_leak_task_header_patterns",
-                [r"\n## (Task|Question|Instructions?):"],
-            ),
-            "task_header",
-        ),
-        (
-            _get_quality_pattern_list(
-                "training_leak_write_prompt_patterns",
-                [r"\nWrite a (?:short )?(?:story|essay|poem|code)"],
-            ),
-            "write_prompt",
-        ),
-        (
-            _get_quality_pattern_list(
-                "training_leak_user_turn_patterns",
-                [r"\n(?:User|Human|Question):\s*\n"],
-            ),
-            "user_turn",
-        ),
-        (
-            _get_quality_pattern_list(
-                "training_leak_code_example_patterns",
-                [r"\n```\w+\n.*?def \w+\("],
-            ),
-            "code_example",
-        ),
-        (
-            _get_quality_pattern_list(
-                "training_leak_qa_pair_patterns",
-                [r"\nQ:\s*\n.*?\nA:\s*\n"],
-            ),
-            "qa_pair",
-        ),
-    ]
-
     # Only check the latter portion of output (leaks happen after good output)
     check_portion: str = text[len(text) // 3 :]
-
-    for patterns, leak_type in training_leak_pattern_groups:
-        for pattern in patterns:
-            try:
-                if re.search(pattern, check_portion, re.DOTALL):
-                    return True, leak_type
-            except re.error:
-                logger.debug("Ignoring invalid training leak regex: %s", pattern)
-
-    return False, None
+    rules = (
+        (
+            "training_leak_instruction_header_patterns",
+            (r"\n# INSTRUCTION\b",),
+            "instruction_header",
+            re.DOTALL,
+        ),
+        (
+            "training_leak_task_header_patterns",
+            (r"\n## (Task|Question|Instructions?):",),
+            "task_header",
+            re.DOTALL,
+        ),
+        (
+            "training_leak_write_prompt_patterns",
+            (r"\nWrite a (?:short )?(?:story|essay|poem|code)",),
+            "write_prompt",
+            re.DOTALL,
+        ),
+        (
+            "training_leak_user_turn_patterns",
+            (r"\n(?:User|Human|Question):\s*\n",),
+            "user_turn",
+            re.DOTALL,
+        ),
+        (
+            "training_leak_code_example_patterns",
+            (r"\n```\w+\n.*?def \w+\(",),
+            "code_example",
+            re.DOTALL,
+        ),
+        ("training_leak_qa_pair_patterns", (r"\nQ:\s*\n.*?\nA:\s*\n",), "qa_pair", re.DOTALL),
+    )
+    leak_type = next(
+        _configured_regex_issues(
+            check_portion,
+            rules,
+            debug_context="training leak",
+        ),
+        None,
+    )
+    return leak_type is not None, leak_type
 
 
 def compute_vocabulary_diversity(text: str) -> tuple[float, int, int]:
@@ -5714,10 +5719,20 @@ def _extract_pattern_matches(
     return matches
 
 
-def _matches_any_pattern(text: str, patterns: list[str], *, debug_context: str) -> bool:
+def _matches_any_pattern(
+    text: str,
+    patterns: list[str],
+    *,
+    debug_context: str,
+    flags: int = 0,
+) -> bool:
     """Return True if text matches at least one configured regex pattern."""
     for pattern in patterns:
-        compiled = _compile_regex_for_detection(pattern, debug_context=debug_context)
+        compiled = _compile_regex_for_detection(
+            pattern,
+            debug_context=debug_context,
+            flags=flags,
+        )
         if compiled and compiled.search(text):
             return True
     return False
@@ -27921,98 +27936,87 @@ class _ArgumentAdder(Protocol):
         ...
 
 
-def _output_report_help(label: str) -> str:
-    """Return help text for output artifact path arguments."""
-    return f"Output {label} report filename."
+@dataclass(frozen=True)
+class OutputPathArgumentSpec:
+    """Declarative definition for a generated output artifact path option."""
+
+    flag: str
+    default: Path
+    help_text: str
+
+
+OUTPUT_PATH_ARGUMENT_SPECS: Final[tuple[OutputPathArgumentSpec, ...]] = (
+    OutputPathArgumentSpec("--output-html", DEFAULT_HTML_OUTPUT, "Output HTML report filename."),
+    OutputPathArgumentSpec(
+        "--output-markdown",
+        DEFAULT_MD_OUTPUT,
+        "Output GitHub Markdown report filename.",
+    ),
+    OutputPathArgumentSpec(
+        "--output-gallery-markdown",
+        DEFAULT_GALLERY_MD_OUTPUT,
+        "Output GitHub Markdown gallery filename for the standalone review artifact.",
+    ),
+    OutputPathArgumentSpec(
+        "--output-review",
+        DEFAULT_REVIEW_MD_OUTPUT,
+        "Output Markdown review digest filename.",
+    ),
+    OutputPathArgumentSpec(
+        "--output-model-selection",
+        DEFAULT_MODEL_SELECTION_OUTPUT,
+        "Output model selection report filename.",
+    ),
+    OutputPathArgumentSpec(
+        "--output-model-capabilities",
+        DEFAULT_MODEL_CAPABILITIES_OUTPUT,
+        "Output model capability scorecard Markdown filename.",
+    ),
+    OutputPathArgumentSpec(
+        "--output-model-capabilities-json",
+        DEFAULT_MODEL_CAPABILITIES_JSON_OUTPUT,
+        "Output model capability scorecard JSON filename.",
+    ),
+    OutputPathArgumentSpec(
+        "--output-tsv",
+        DEFAULT_TSV_OUTPUT,
+        "Output TSV (tab-separated values) report filename.",
+    ),
+    OutputPathArgumentSpec("--output-jsonl", DEFAULT_JSONL_OUTPUT, "Output JSONL report filename."),
+    OutputPathArgumentSpec(
+        "--output-run-json",
+        DEFAULT_RUN_JSON_OUTPUT,
+        "Output run summary JSON filename.",
+    ),
+    OutputPathArgumentSpec(
+        "--output-log",
+        DEFAULT_LOG_OUTPUT,
+        "Command line output log filename (overwritten each run). "
+        "Use different path for tests/debug runs.",
+    ),
+    OutputPathArgumentSpec(
+        "--output-env",
+        DEFAULT_ENV_OUTPUT,
+        "Environment log filename (pip freeze, conda list for reproducibility).",
+    ),
+    OutputPathArgumentSpec(
+        "--output-diagnostics",
+        DEFAULT_DIAGNOSTICS_OUTPUT,
+        "Diagnostics report filename (Markdown). Generated when failures or harness issues are "
+        "detected. Structured for filing upstream issues against mlx-vlm / mlx / transformers.",
+    ),
+)
 
 
 def _add_output_path_arguments(parser: _ArgumentAdder) -> None:
     """Register output artifact path arguments on the CLI parser."""
-    parser.add_argument(
-        "--output-html",
-        type=Path,
-        default=DEFAULT_HTML_OUTPUT,
-        help=_output_report_help("HTML"),
-    )
-    parser.add_argument(
-        "--output-markdown",
-        type=Path,
-        default=DEFAULT_MD_OUTPUT,
-        help=_output_report_help("GitHub Markdown"),
-    )
-    parser.add_argument(
-        "--output-gallery-markdown",
-        type=Path,
-        default=DEFAULT_GALLERY_MD_OUTPUT,
-        help=("Output GitHub Markdown gallery filename for the standalone review artifact."),
-    )
-    parser.add_argument(
-        "--output-review",
-        type=Path,
-        default=DEFAULT_REVIEW_MD_OUTPUT,
-        help="Output Markdown review digest filename.",
-    )
-    parser.add_argument(
-        "--output-model-selection",
-        type=Path,
-        default=DEFAULT_MODEL_SELECTION_OUTPUT,
-        help="Output model selection report filename.",
-    )
-    parser.add_argument(
-        "--output-model-capabilities",
-        type=Path,
-        default=DEFAULT_MODEL_CAPABILITIES_OUTPUT,
-        help="Output model capability scorecard Markdown filename.",
-    )
-    parser.add_argument(
-        "--output-model-capabilities-json",
-        type=Path,
-        default=DEFAULT_MODEL_CAPABILITIES_JSON_OUTPUT,
-        help="Output model capability scorecard JSON filename.",
-    )
-    parser.add_argument(
-        "--output-tsv",
-        type=Path,
-        default=DEFAULT_TSV_OUTPUT,
-        help=_output_report_help("TSV (tab-separated values)"),
-    )
-    parser.add_argument(
-        "--output-jsonl",
-        type=Path,
-        default=DEFAULT_JSONL_OUTPUT,
-        help=_output_report_help("JSONL"),
-    )
-    parser.add_argument(
-        "--output-run-json",
-        type=Path,
-        default=DEFAULT_RUN_JSON_OUTPUT,
-        help="Output run summary JSON filename.",
-    )
-    parser.add_argument(
-        "--output-log",
-        type=Path,
-        default=DEFAULT_LOG_OUTPUT,
-        help=(
-            "Command line output log filename (overwritten each run). "
-            "Use different path for tests/debug runs."
-        ),
-    )
-    parser.add_argument(
-        "--output-env",
-        type=Path,
-        default=DEFAULT_ENV_OUTPUT,
-        help="Environment log filename (pip freeze, conda list for reproducibility).",
-    )
-    parser.add_argument(
-        "--output-diagnostics",
-        type=Path,
-        default=DEFAULT_DIAGNOSTICS_OUTPUT,
-        help=(
-            "Diagnostics report filename (Markdown). "
-            "Generated when failures or harness issues are detected. "
-            "Structured for filing upstream issues against mlx-vlm / mlx / transformers."
-        ),
-    )
+    for spec in OUTPUT_PATH_ARGUMENT_SPECS:
+        parser.add_argument(
+            spec.flag,
+            type=Path,
+            default=spec.default,
+            help=spec.help_text,
+        )
 
 
 def _add_input_arguments(parser: argparse.ArgumentParser) -> None:
