@@ -38,6 +38,19 @@ class _FakeCacheInfo:
     repos: tuple[_FakeCacheRepo, ...]
 
 
+@dataclass(frozen=True)
+class _FakeIntegrityRepo:
+    repo_id: str
+    size_on_disk: int = 2_000_000
+    nb_files: int = 3
+
+
+@dataclass(frozen=True)
+class _FakeIntegrityCacheInfo:
+    repos: tuple[_FakeIntegrityRepo, ...]
+    warnings: tuple[Exception, ...] = ()
+
+
 def _fake_cache_repo(
     repo_id: str,
     files: tuple[str, ...],
@@ -162,6 +175,43 @@ def test_auto_cache_discovery_logs_skipped_models(caplog: pytest.LogCaptureFixtu
         "Skipped 1 cached repo(s) that mlx-vlm server-style discovery would not run" in caplog.text
     )
     assert "org/no-tokenizer: missing tokenizer_config.json" in caplog.text
+
+
+def test_cache_integrity_uses_exact_repo_id_matching(
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """A similarly named cache entry must not be treated as the requested model."""
+    cache_info = _FakeIntegrityCacheInfo(
+        repos=(_FakeIntegrityRepo("org/model-extra"),),
+    )
+    monkeypatch.setattr(check_models, "_get_hf_cache_info_cached", lambda **_: cache_info)
+
+    with caplog.at_level(logging.DEBUG, logger=check_models.logger.name):
+        check_models._check_hf_cache_integrity("org/model")
+
+    assert "Model org/model not found in HF cache" in caplog.text
+    assert "HF Cache Info for org/model-extra" not in caplog.text
+
+
+def test_cache_integrity_reports_matching_scan_warning(
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """A corrupt repo omitted from repos should still produce an actionable warning."""
+    cache_info = _FakeIntegrityCacheInfo(
+        repos=(),
+        warnings=(
+            RuntimeError("Snapshots dir doesn't exist in cached repo: /cache/models--org--model"),
+        ),
+    )
+    monkeypatch.setattr(check_models, "_get_hf_cache_info_cached", lambda **_: cache_info)
+
+    with caplog.at_level(logging.WARNING, logger=check_models.logger.name):
+        check_models._check_hf_cache_integrity("org/model")
+
+    assert "Cache Warning: Hugging Face reported corruption for org/model" in caplog.text
+    assert "Snapshots dir doesn't exist" in caplog.text
 
 
 def test_validate_model_identifier_accepts_valid_huggingface_format() -> None:

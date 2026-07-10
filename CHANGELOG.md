@@ -7,6 +7,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Correct Pillow XMP parsing and EXIF-oriented report previews; clarify runtime
+  timing boundaries, prefer upstream generation finish reasons, standardize MLX
+  allocator metrics on decimal GB, and surface model-specific Hugging Face cache
+  corruption warnings with exact repository matching.
 - Centralize final report artifact metadata for path logging, public artifact
   maps, and the generated dashboard; fix the output index to report current-run
   success/failure counts from the `ResultSet`.

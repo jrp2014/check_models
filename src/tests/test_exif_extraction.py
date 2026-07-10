@@ -279,6 +279,33 @@ def test_extract_metadata_description_prefers_iptc_caption(tmp_path: Path) -> No
     assert meta["description"] == "EXIF description"
 
 
+def test_extract_xmp_metadata_reads_pillow_normalized_keys(tmp_path: Path) -> None:
+    """Pillow's namespace-stripped getxmp() shape should retain catalog metadata."""
+    img_path = tmp_path / "xmp.jpg"
+    xmp = b"""<?xpacket begin="\xef\xbb\xbf"?>
+<x:xmpmeta xmlns:x="adobe:ns:meta/">
+  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+           xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <rdf:Description>
+      <dc:title><rdf:Alt><rdf:li xml:lang="x-default">Probe title</rdf:li></rdf:Alt></dc:title>
+      <dc:description><rdf:Alt><rdf:li xml:lang="x-default">Probe description</rdf:li></rdf:Alt></dc:description>
+      <dc:subject><rdf:Bag><rdf:li>probe-keyword</rdf:li><rdf:li>second</rdf:li></rdf:Bag></dc:subject>
+    </rdf:Description>
+  </rdf:RDF>
+</x:xmpmeta>
+<?xpacket end="w"?>"""
+    Image.new("RGB", (10, 10), color="green").save(img_path, xmp=xmp)
+
+    with Image.open(img_path) as image:
+        assert "RDF" in image.getxmp()["xmpmeta"]
+
+    assert check_models._extract_xmp_metadata(img_path) == {
+        "xmp_keywords": ["probe-keyword", "second"],
+        "xmp_description": "Probe description",
+        "xmp_title": "Probe title",
+    }
+
+
 def test_extract_image_metadata_respects_known_absent_exif_sentinel(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,

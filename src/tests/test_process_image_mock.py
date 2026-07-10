@@ -36,6 +36,8 @@ class _FakeGenerationResult:
     time: float = 0.0
     active_memory: float = 0.5
     cache_memory: float = 0.3
+    model_load_active_memory: float | None = None
+    finish_reason: str | None = None
 
 
 class _FakeModel:
@@ -102,9 +104,10 @@ class _RecordingMxRuntime:
 class _SequencedMxRuntime(_RecordingMxRuntime):
     """MLX runtime stand-in with deterministic active-memory samples."""
 
-    def __init__(self, active_values: Sequence[float]) -> None:
+    def __init__(self, active_values: Sequence[float], *, cache_value: float = 0.0) -> None:
         super().__init__()
         self._active_values = tuple(active_values)
+        self._cache_value = cache_value
 
     def get_active_memory(self) -> float:
         self.active_calls += 1
@@ -112,6 +115,10 @@ class _SequencedMxRuntime(_RecordingMxRuntime):
             return 0.0
         value_index = min(self.active_calls - 1, len(self._active_values) - 1)
         return self._active_values[value_index]
+
+    def get_cache_memory(self) -> float:
+        self.cache_calls += 1
+        return self._cache_value
 
 
 def _build_params(image_path: Path) -> check_models.ProcessImageParams:
@@ -811,9 +818,10 @@ class TestProcessImageWithModelMock:
         fake_generation = _FakeGenerationResult()
         runtime = _SequencedMxRuntime(
             active_values=(
-                2.0 * 1024**3,
-                4.0 * 1024**3,
-            )
+                2.0 * check_models.DECIMAL_GB,
+                4.0 * check_models.DECIMAL_GB,
+            ),
+            cache_value=3.0 * check_models.DECIMAL_GB,
         )
 
         with (
@@ -833,7 +841,36 @@ class TestProcessImageWithModelMock:
         assert result is fake_generation
         assert getattr(result, "model_load_active_memory", None) == 2.0
         assert result.active_memory == 4.0
+        assert result.cache_memory == 3.0
         assert runtime.active_calls == 2
+
+    @pytest.mark.parametrize(
+        ("finish_reason", "generation_tokens", "expected"),
+        [
+            ("stop", 50, "completed"),
+            ("length", 20, "max_tokens"),
+            (None, 50, "max_tokens"),
+        ],
+    )
+    def test_process_image_with_model_prefers_upstream_finish_reason(
+        self,
+        test_image: Path,
+        finish_reason: str | None,
+        generation_tokens: int,
+        expected: str,
+    ) -> None:
+        """Explicit upstream termination should win over the token-count fallback."""
+        params = _build_params(test_image)
+        fake_result = _FakeGenerationResult(
+            generation_tokens=generation_tokens,
+            finish_reason=finish_reason,
+        )
+
+        with patch.object(check_models, "_run_model_generation", return_value=fake_result):
+            result = check_models.process_image_with_model(params)
+
+        assert result.runtime_diagnostics is not None
+        assert result.runtime_diagnostics.stop_reason == expected
 
     def test_process_image_with_model_skips_cleanup_sync_after_success(
         self,

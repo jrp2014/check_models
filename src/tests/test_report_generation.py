@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import base64
+import io
 import json
 import os
 import re
@@ -10,6 +12,8 @@ from argparse import Namespace
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, cast
 from unittest.mock import patch
+
+from PIL import Image
 
 import check_models
 from check_models import (
@@ -926,6 +930,29 @@ class TestHtmlReportEdgeCases:
         content = out.read_text(encoding="utf-8")
         assert "org/good" in content
         assert "org/bad" in content
+
+    def test_html_report_preview_applies_exif_orientation(self, tmp_path: Path) -> None:
+        """The embedded preview should match mlx-vlm's orientation-corrected input."""
+        image_path = tmp_path / "rotated.jpg"
+        exif = Image.Exif()
+        exif[274] = 6
+        Image.new("RGB", (40, 20), color="purple").save(image_path, exif=exif)
+        out = tmp_path / "oriented.html"
+
+        generate_html_report(
+            results=[_make_success("org/model")],
+            filename=out,
+            versions=_stub_versions(),
+            prompt="describe",
+            total_runtime_seconds=1.0,
+            image_path=image_path,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        encoded_match = re.search(r"data:image/jpeg;base64,([^\"]+)", content)
+        assert encoded_match is not None
+        with Image.open(io.BytesIO(base64.b64decode(encoded_match.group(1)))) as preview:
+            assert preview.size == (20, 40)
 
     def test_html_report_includes_shared_triage_sections(self, tmp_path: Path) -> None:
         """HTML report should reuse shared action, review, and failure sections."""
@@ -3484,15 +3511,15 @@ class TestDiagnosticsReport:
         assert "**Runtime note:**" in content
         assert "**Dominant runtime phase:**" in content
         assert "local prompt prep=" in content
-        assert "upstream prefill / first-token=" in content
-        assert "post-prefill decode=" in content
+        assert "upstream model prefill / first-token=" in content
+        assert "input preparation + decode=" in content
         assert "**Generation total:**" in content
         assert "**Validation overhead:**" in content
-        assert "**Upstream prefill / first-token latency:**" in content
+        assert "**Upstream model prefill / first-token time:**" in content
         assert "**What this likely means:**" in content
         assert "**Suggested next action:**" in content
 
-    def test_runtime_metrics_split_prefill_from_post_prefill_decode(
+    def test_runtime_metrics_split_prefill_from_generation_residual(
         self,
         tmp_path: Path,
     ) -> None:
@@ -3538,11 +3565,13 @@ class TestDiagnosticsReport:
         )
 
         content = out.read_text(encoding="utf-8")
-        assert "**Dominant runtime phase:** upstream prefill / first-token dominated" in content
-        assert "upstream prefill / first-token=9.00s" in content
-        assert "post-prefill decode=7.00s" in content
         assert (
-            "**Generation total:** 16.00s across 2 model(s); upstream prefill / "
+            "**Dominant runtime phase:** upstream model prefill / first-token dominated" in content
+        )
+        assert "upstream model prefill / first-token=9.00s" in content
+        assert "input preparation + decode=7.00s" in content
+        assert (
+            "**Generation total:** 16.00s across 2 model(s); upstream model prefill / "
             "first-token split available for 2/2 model(s)."
         ) in content
 
@@ -3578,7 +3607,7 @@ class TestDiagnosticsReport:
         )
 
         content = out.read_text(encoding="utf-8")
-        assert "generation total (unsplit)=3.00s" in content
+        assert "generation call total (unsplit)=3.00s" in content
         assert "post-prefill decode=" not in content
         assert "upstream prefill / first-token=" not in content
 

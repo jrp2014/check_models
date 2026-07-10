@@ -373,7 +373,7 @@ def test_metrics_mode_detailed_logs_runtime_phase_details(
     assert "Validation:" in messages
     assert "Prompt prep:" in messages
     assert "Cleanup:" in messages
-    assert "First token:" in messages
+    assert "Upstream model prefill / first token:" in messages
     assert "Stop reason:" in messages
 
 

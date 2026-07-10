@@ -874,7 +874,7 @@ UnidentifiedImageError: type[Exception]
 GPS: SupportsGPSEnum | None
 
 try:
-    from PIL import Image
+    from PIL import Image, ImageOps
     from PIL import UnidentifiedImageError as _PILUnidentifiedImageError
 
     UnidentifiedImageError = _PILUnidentifiedImageError
@@ -899,6 +899,7 @@ except ImportError:
 
     ExifTags = cast("SupportsExifTagsModule", _ExifTagsUnavailable())
     Image = cast("Any", _ImageUnavailable())
+    ImageOps = cast("Any", _ImageUnavailable())
     UnidentifiedImageError = _PILUnavailableError
     GPS = None
     GPSTAGS = cast("Mapping[int, str]", {})
@@ -1341,7 +1342,7 @@ type RuntimePhaseName = Literal[
     "model_load",
     "prompt_prep",
     "upstream_prefill_first_token",
-    "post_prefill_decode",
+    "input_preparation_and_decode",
     "decode",
     "cleanup",
 ]
@@ -1732,6 +1733,7 @@ class SupportsGenerationResult(SupportsGenerationText, Protocol):
     cache_memory: float | None  # Dynamically added cache memory (GB)
     model_load_active_memory: float | None  # Dynamically added post-load active memory (GB)
     peak_memory: float | None  # Upstream peak memory (GB)
+    finish_reason: str | None  # Upstream stop/length termination classification
 
 
 @dataclass(frozen=True)
@@ -1747,7 +1749,9 @@ class GenerationPerformanceData:
     active_memory_gb: float = 0.0
     cache_memory_gb: float = 0.0
     generation_time_s: float | None = None
+    # Upstream model-loop time until the first token; excludes prepare_inputs().
     first_token_latency_s: float | None = None
+    finish_reason: str | None = None
 
 
 class SupportsExifIfd(Protocol):
@@ -1822,9 +1826,14 @@ def _extract_generation_performance_data(
     total_tokens = _generation_nonnegative_int_metric(generation, "total_tokens")
     prompt_tps = _generation_nonnegative_float_metric(generation, "prompt_tps")
 
+    # mlx-vlm derives prompt_tps from its timed model loop through the first
+    # token. This is not end-to-end TTFT because prepare_inputs() runs earlier.
     first_token_latency_s = None
     if prompt_tokens > 0 and prompt_tps > 0.0:
         first_token_latency_s = float(prompt_tokens) / prompt_tps
+
+    raw_finish_reason = getattr(generation, "finish_reason", None)
+    finish_reason = raw_finish_reason.strip() if isinstance(raw_finish_reason, str) else None
 
     return GenerationPerformanceData(
         prompt_tokens=prompt_tokens,
@@ -1837,7 +1846,25 @@ def _extract_generation_performance_data(
         cache_memory_gb=_generation_nonnegative_float_metric(generation, "cache_memory"),
         generation_time_s=_generation_optional_nonnegative_float_metric(generation, "time"),
         first_token_latency_s=first_token_latency_s,
+        finish_reason=finish_reason or None,
     )
+
+
+def _resolve_generation_stop_reason(
+    performance_data: GenerationPerformanceData,
+    *,
+    requested_max_tokens: int,
+) -> str:
+    """Prefer upstream termination metadata, with a count-based legacy fallback."""
+    if performance_data.finish_reason == "length":
+        return "max_tokens"
+    if performance_data.finish_reason == "stop":
+        return "completed"
+    if performance_data.finish_reason is not None:
+        return performance_data.finish_reason
+    if requested_max_tokens > 0 and performance_data.generation_tokens >= requested_max_tokens:
+        return "max_tokens"
+    return "completed"
 
 
 # =============================================================================
@@ -2061,8 +2088,11 @@ class RuntimeDiagnostics:
     model_load_time_s: float | None = None
     model_load_active_memory_gb: float | None = None
     prompt_prep_time_s: float | None = None
+    # Legacy output key: this times the complete mlx_vlm.generate() call,
+    # including prepare_inputs(), model prefill, and token decoding.
     decode_time_s: float | None = None
     cleanup_time_s: float | None = None
+    # Upstream model-loop time through first token; excludes prepare_inputs().
     first_token_latency_s: float | None = None
     stop_reason: str | None = None
 
@@ -8973,6 +9003,29 @@ def _nested_mapping_value(
     return _as_str_object_mapping(container.get(key, {}))
 
 
+def _xmp_value(container: Mapping[str, object], qualified_key: str) -> object | None:
+    """Return an XMP value across namespace-qualified and Pillow-normalized keys."""
+    if qualified_key in container:
+        return container[qualified_key]
+
+    local_name = qualified_key.rsplit("}", maxsplit=1)[-1].rsplit(":", maxsplit=1)[-1]
+    for existing_key, value in container.items():
+        existing_local_name = existing_key.rsplit("}", maxsplit=1)[-1].rsplit(":", maxsplit=1)[-1]
+        if existing_local_name == local_name:
+            return value
+    return None
+
+
+def _xmp_mapping_value(
+    container: Mapping[str, object] | None,
+    qualified_key: str,
+) -> Mapping[str, object] | None:
+    """Return a nested XMP mapping while tolerating Pillow's stripped namespaces."""
+    if container is None:
+        return None
+    return _as_str_object_mapping(_xmp_value(container, qualified_key))
+
+
 def _metadata_text_value(metadata: Mapping[str, object], key: str) -> str | None:
     """Return a string metadata value when present and correctly typed."""
     value = metadata.get(key)
@@ -8994,13 +9047,15 @@ def _xmp_alt_text(container: Mapping[str, object] | object, rdf_ns: str) -> str 
     container_mapping = _as_str_object_mapping(container)
     if container_mapping is None:
         return None
-    alt = _nested_mapping_value(container_mapping, f"{rdf_ns}Alt")
+    alt = _xmp_mapping_value(container_mapping, f"{rdf_ns}Alt")
     if alt is None:
         return None
-    text = alt.get(f"{rdf_ns}li", "")
+    text = _xmp_value(alt, f"{rdf_ns}li")
+    if isinstance(text, list):
+        text = next((item for item in text if isinstance(item, str | Mapping)), "")
     text_mapping = _as_str_object_mapping(text)
     if text_mapping is not None:
-        text = text_mapping.get("#text", "")
+        text = text_mapping.get("text", text_mapping.get("#text", ""))
     return text.strip() if isinstance(text, str) and text.strip() else None
 
 
@@ -9022,21 +9077,21 @@ def _xmp_description_block(
     rdf_ns: str,
 ) -> Mapping[str, object] | None:
     """Return the XMP RDF description block when present."""
-    return _nested_mapping_value(
-        _nested_mapping_value(_nested_mapping_value(xmp, "xmpmeta"), f"{rdf_ns}RDF"),
+    return _xmp_mapping_value(
+        _xmp_mapping_value(_xmp_mapping_value(xmp, "xmpmeta"), f"{rdf_ns}RDF"),
         f"{rdf_ns}Description",
     )
 
 
 def _xmp_keywords(desc_block: Mapping[str, object], *, rdf_ns: str, dc_ns: str) -> list[str]:
     """Extract XMP dc:subject keywords from an RDF description block."""
-    subject_mapping = _as_str_object_mapping(desc_block.get(f"{dc_ns}subject", {}))
+    subject_mapping = _as_str_object_mapping(_xmp_value(desc_block, f"{dc_ns}subject"))
     if subject_mapping is None:
         return []
-    bag = _nested_mapping_value(subject_mapping, f"{rdf_ns}Bag")
+    bag = _xmp_mapping_value(subject_mapping, f"{rdf_ns}Bag")
     if bag is None:
         return []
-    items = bag.get(f"{rdf_ns}li", [])
+    items = _xmp_value(bag, f"{rdf_ns}li") or []
     if isinstance(items, str):
         items = [items]
     if not isinstance(items, list):
@@ -9047,8 +9102,9 @@ def _xmp_keywords(desc_block: Mapping[str, object], *, rdf_ns: str, dc_ns: str) 
 def _extract_xmp_metadata(image_path: PathLike) -> XMPMetadata:
     """Extract XMP metadata (dc:subject keywords, dc:title, dc:description).
 
-    Uses Pillow's ``Image.getxmp()`` (8.2+).  The returned dict is deeply
-    nested with XML namespace prefixes; this function navigates defensively.
+    Uses Pillow's ``Image.getxmp()`` (8.2+). The returned dict is deeply
+    nested and Pillow strips namespace prefixes from current releases; this
+    function also accepts older namespace-qualified shapes.
     Requires the ``defusedxml`` package; returns empty if unavailable.
     """
     if not _defusedxml_available:
@@ -9070,12 +9126,12 @@ def _extract_xmp_metadata(image_path: PathLike) -> XMPMetadata:
     if keywords:
         result["xmp_keywords"] = keywords
 
-    description = desc_block.get(f"{dc_ns}description", {})
+    description = _xmp_value(desc_block, f"{dc_ns}description") or {}
     desc_text = _xmp_alt_text(description, rdf_ns)
     if desc_text:
         result["xmp_description"] = desc_text
 
-    title = desc_block.get(f"{dc_ns}title", {})
+    title = _xmp_value(desc_block, f"{dc_ns}title") or {}
     title_text = _xmp_alt_text(title, rdf_ns)
     if title_text:
         result["xmp_title"] = title_text
@@ -9892,7 +9948,7 @@ _RUNTIME_PHASE_KEYS: Final[tuple[RuntimePhaseName, ...]] = (
     "model_load",
     "prompt_prep",
     "upstream_prefill_first_token",
-    "post_prefill_decode",
+    "input_preparation_and_decode",
     "decode",
     "cleanup",
 )
@@ -9900,9 +9956,9 @@ _RUNTIME_PHASE_KEYS: Final[tuple[RuntimePhaseName, ...]] = (
 _RUNTIME_PHASE_LABELS: Final[dict[RuntimePhaseName, str]] = {
     "model_load": "model load",
     "prompt_prep": "local prompt prep",
-    "upstream_prefill_first_token": "upstream prefill / first-token",
-    "post_prefill_decode": "post-prefill decode",
-    "decode": "generation total (unsplit)",
+    "upstream_prefill_first_token": "upstream model prefill / first-token",
+    "input_preparation_and_decode": "input preparation + decode",
+    "decode": "generation call total (unsplit)",
     "cleanup": "cleanup",
 }
 
@@ -9917,29 +9973,32 @@ _RUNTIME_PHASE_ACTIONS: Final[dict[RuntimePhaseName, tuple[str, str]]] = {
             "prefill step sizing, and cache/prefill behavior."
         ),
     ),
-    "post_prefill_decode": (
-        "Most measured runtime is spent generating after the first token is available.",
+    "input_preparation_and_decode": (
         (
-            "Prioritize early-stop policies, lower long-tail token budgets, "
-            "or upstream decode-path work."
+            "Most residual generation-call time falls outside the upstream model-loop "
+            "first-token window, combining input preparation with token decoding."
+        ),
+        (
+            "Profile prepare_inputs() and image preprocessing, then use generation TPS "
+            "and token counts to assess the decode contribution."
         ),
     ),
     "decode": (
         (
-            "Most measured runtime is spent inside generation, but first-token timing "
-            "was not available to split prefill from decode."
+            "Most measured runtime is spent inside the full generation call, but upstream "
+            "model first-token timing was unavailable to split that call further."
         ),
         (
-            "Prioritize early-stop policies, lower long-tail token budgets, "
-            "or rerun with prompt throughput metrics available to isolate prefill."
+            "Use generation TPS and token counts to assess decode, then profile input "
+            "preparation separately if the remaining call time is high."
         ),
     ),
     "prompt_prep": (
         (
             "Local prompt preparation is consuming a large share of runtime, which often "
-            "means expensive chat-template, preflight, or multimodal preprocessing work."
+            "means expensive chat-template or preflight validation work."
         ),
-        "Inspect chat-template rendering, context blocks, image preprocessing, and validators.",
+        "Inspect chat-template rendering, context blocks, and validators.",
     ),
     "model_load": (
         "Cold model load time is a major share of runtime for this cohort.",
@@ -9971,16 +10030,16 @@ def _runtime_upstream_prefill_first_token_time_s(
     return _positive_runtime_duration(runtime.first_token_latency_s)
 
 
-def _runtime_post_prefill_decode_time_s(runtime: RuntimeDiagnostics | None) -> float | None:
-    """Return generation time after first token when a split signal is available."""
+def _runtime_generation_residual_time_s(runtime: RuntimeDiagnostics | None) -> float | None:
+    """Return input-preparation plus decode time outside upstream model TTFT."""
     if runtime is None:
         return None
     decode_time = _positive_runtime_duration(runtime.decode_time_s)
     upstream_prefill_time = _runtime_upstream_prefill_first_token_time_s(runtime)
     if decode_time is None or upstream_prefill_time is None:
         return None
-    post_prefill_decode_time = max(decode_time - upstream_prefill_time, 0.0)
-    return post_prefill_decode_time if post_prefill_decode_time > 0.0 else None
+    residual_time = max(decode_time - upstream_prefill_time, 0.0)
+    return residual_time if residual_time > 0.0 else None
 
 
 def _runtime_phase_durations(runtime: RuntimeDiagnostics | None) -> dict[RuntimePhaseName, float]:
@@ -9999,12 +10058,12 @@ def _runtime_phase_durations(runtime: RuntimeDiagnostics | None) -> dict[Runtime
             phase_durations[phase] = duration
 
     upstream_prefill_time = _runtime_upstream_prefill_first_token_time_s(runtime)
-    post_prefill_decode_time = _runtime_post_prefill_decode_time_s(runtime)
+    generation_residual_time = _runtime_generation_residual_time_s(runtime)
     decode_time = _positive_runtime_duration(runtime.decode_time_s)
     if upstream_prefill_time is not None:
         phase_durations["upstream_prefill_first_token"] = upstream_prefill_time
-        if post_prefill_decode_time is not None:
-            phase_durations["post_prefill_decode"] = post_prefill_decode_time
+        if generation_residual_time is not None:
+            phase_durations["input_preparation_and_decode"] = generation_residual_time
     elif decode_time is not None:
         phase_durations["decode"] = decode_time
 
@@ -10125,11 +10184,11 @@ def _format_runtime_generation_total_line(
     prefill_split_models: int = runtime_analysis["prefill_split_models"]
     if prefill_split_models > 0:
         split_note = (
-            f"; upstream prefill / first-token split available for "
+            f"; upstream model prefill / first-token split available for "
             f"{prefill_split_models}/{generation_models} model(s)"
         )
     else:
-        split_note = "; upstream prefill / first-token split unavailable"
+        split_note = "; upstream model prefill / first-token split unavailable"
     return (
         "- **Generation total:** "
         f"{format_overall_runtime(generation_total)} across {generation_models} model(s)"
@@ -10181,7 +10240,7 @@ def _format_runtime_timing_snapshot_lines(runtime_analysis: RuntimeAnalysisSumma
         and first_token_max is not None
     ):
         lines.append(
-            "- **Upstream prefill / first-token latency:** "
+            "- **Upstream model prefill / first-token time:** "
             f"Avg {format_overall_runtime(first_token_avg)} | "
             f"Min {format_overall_runtime(first_token_min)} | "
             f"Max {format_overall_runtime(first_token_max)} "
@@ -16479,17 +16538,20 @@ def _build_full_html_document(
     if image_path and image_path.exists():
         try:
             # Open and resize image if needed
-            with Image.open(image_path) as img_original:
+            with (
+                Image.open(image_path) as img_original,
+                ImageOps.exif_transpose(img_original) as img_oriented,
+            ):
                 # Resize if larger than 1024px in either dimension
                 max_size = 1024
                 # Explicitly type as generic Image to handle both ImageFile and resized Image
-                img_to_save: PILImage = img_original
-                if img_original.width > max_size or img_original.height > max_size:
+                img_to_save: PILImage = img_oriented
+                if img_oriented.width > max_size or img_oriented.height > max_size:
                     # Calculate new dimensions maintaining aspect ratio
-                    ratio = min(max_size / img_original.width, max_size / img_original.height)
-                    new_width = int(img_original.width * ratio)
-                    new_height = int(img_original.height * ratio)
-                    img_to_save = img_original.resize(
+                    ratio = min(max_size / img_oriented.width, max_size / img_oriented.height)
+                    new_width = int(img_oriented.width * ratio)
+                    new_height = int(img_oriented.height * ratio)
+                    img_to_save = img_oriented.resize(
                         (new_width, new_height),
                         Image.Resampling.LANCZOS,
                     )
@@ -18690,7 +18752,7 @@ def collect_runtime_fingerprint() -> dict[str, RuntimeProbeResult]:
         if mx is not None and hasattr(mx, "get_active_memory"):
             active = mx.get_active_memory()
             probes["gpu_memory"] = RuntimeProbeResult(
-                status="ok", detail=f"active={active / (1024**3):.2f}GB"
+                status="ok", detail=f"active={active / DECIMAL_GB:.2f}GB"
             )
         else:
             probes["gpu_memory"] = RuntimeProbeResult(status="unavailable")
@@ -19309,10 +19371,27 @@ def _check_hf_cache_integrity(model_identifier: str) -> None:
     min_cache_size_mb = 1  # Less than 1MB is suspicious for any model
     try:
         cache_info = _get_hf_cache_info_cached()
+        encoded_repo_name = "models--" + model_identifier.replace("/", "--")
+        matching_warnings = [
+            warning
+            for warning in cache_info.warnings
+            if encoded_repo_name
+            in {
+                component.strip("'\"()[]{}:,. ")
+                for component in str(warning).replace("\\", "/").split("/")
+            }
+        ]
+        for cache_warning in matching_warnings:
+            logger.warning(
+                "⚠️  Cache Warning: Hugging Face reported corruption for %s: %s",
+                model_identifier,
+                cache_warning,
+            )
+
         # Find the specific repo in cache
         repo_found = False
         for repo in cache_info.repos:
-            if model_identifier in repo.repo_id:
+            if model_identifier == repo.repo_id:
                 repo_found = True
                 logger.debug(
                     "HF Cache Info for %s: size=%s MB, files=%d",
@@ -19335,7 +19414,7 @@ def _check_hf_cache_integrity(model_identifier: str) -> None:
                     )
                 break
 
-        if not repo_found:
+        if not repo_found and not matching_warnings:
             logger.debug(
                 "Model %s not found in HF cache (may need to download)",
                 model_identifier,
@@ -20315,7 +20394,7 @@ def _sample_active_memory_gb() -> float | None:
     active_mem_raw = get_active_memory_fn()
     if not isinstance(active_mem_raw, int | float) or active_mem_raw < 0:
         return None
-    return float(active_mem_raw) / (1024**3)
+    return float(active_mem_raw) / DECIMAL_GB
 
 
 def _attach_model_load_memory_baseline(
@@ -20344,7 +20423,7 @@ def _attach_generation_runtime_metrics(
     result = cast("SupportsGenerationResult", output)
     result.time = duration
     result.active_memory = _sample_active_memory_gb() or 0.0
-    result.cache_memory = cache_mem_bytes / (1024**3)  # Convert to GB
+    result.cache_memory = cache_mem_bytes / DECIMAL_GB
     return result
 
 
@@ -20688,10 +20767,9 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         active_mem_gb = performance_data.active_memory_gb
         cache_mem_gb = performance_data.cache_memory_gb
 
-        stop_reason = (
-            "max_tokens"
-            if params.max_tokens > 0 and performance_data.generation_tokens >= params.max_tokens
-            else "completed"
+        stop_reason = _resolve_generation_stop_reason(
+            performance_data,
+            requested_max_tokens=params.max_tokens,
         )
 
         result_payload = PerformanceResult(
@@ -21301,7 +21379,7 @@ def _log_detailed_timings(res: PerformanceResult) -> None:
             field_name="total_time",
         )
         _append_phase_entry(
-            label="First token:",
+            label="Upstream model prefill / first token:",
             value=runtime.first_token_latency_s,
             field_name="total_time",
             include_pct=False,

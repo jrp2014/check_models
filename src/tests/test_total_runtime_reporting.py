@@ -137,7 +137,7 @@ def test_markdown_report_includes_timing_snapshot(tmp_path: Path) -> None:
     content = md_file.read_text(encoding="utf-8")
     assert "### Runtime" in content
     assert "_Validation overhead:_" in content
-    assert "_Upstream prefill / first-token latency:_" in content
+    assert "_Upstream model prefill / first-token time:_" in content
     assert "_Generation total:_" in content
 
 
@@ -155,7 +155,7 @@ def test_html_report_includes_timing_snapshot(tmp_path: Path) -> None:
     content = html_file.read_text(encoding="utf-8")
     assert "<p><b>Runtime</b></p>" in content
     assert "Validation overhead:" in content
-    assert "Upstream prefill / first-token latency:" in content
+    assert "Upstream model prefill / first-token time:" in content
     assert "Generation total:" in content
 
 

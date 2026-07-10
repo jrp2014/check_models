@@ -1099,7 +1099,7 @@ class TestRuntimeFingerprint:
         class _FakeMxRuntime:
             @staticmethod
             def get_active_memory() -> float:
-                return float(2 * 1024**3)
+                return 2 * check_models.DECIMAL_GB
 
         with patch.object(check_models, "mx", _FakeMxRuntime()):
             fingerprint = check_models.collect_runtime_fingerprint()
