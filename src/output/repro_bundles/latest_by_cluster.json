@@ -1,16 +1,8 @@
 {
   "clusters": {
-    "huggingface-hub_huggingface-hub-model-load-model_001": {
-      "bundles": [
-        "20260710T140722Z_003_mlx-community_gemma-4-31b-it-4bit_HUGGINGFACE_HUB_MODEL_LOAD_MODEL_bd9f4ea.json"
-      ],
-      "models": [
-        "mlx-community/gemma-4-31b-it-4bit"
-      ]
-    },
     "mlx-vlm-mlx_long-context_001": {
       "bundles": [
-        "20260710T140722Z_004_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json"
+        "20260710T203149Z_003_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json"
       ],
       "models": [
         "mlx-community/paligemma2-3b-pt-896-4bit"
@@ -18,7 +10,7 @@
     },
     "mlx-vlm_mlx-vlm-decode-model_001": {
       "bundles": [
-        "20260710T140722Z_002_mlx-community_gemma-4-31b-bf16_MLX_VLM_DECODE_MODEL_0375357f22c1.json"
+        "20260710T203149Z_002_mlx-community_gemma-4-31b-bf16_MLX_VLM_DECODE_MODEL_0375357f22c1.json"
       ],
       "models": [
         "mlx-community/gemma-4-31b-bf16"
@@ -26,32 +18,27 @@
     },
     "mlx-vlm_stop-token_001": {
       "bundles": [
-        "20260710T140722Z_001_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json"
+        "20260710T203149Z_001_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json"
       ],
       "models": [
         "mlx-community/Qwen3-VL-2B-Thinking-bf16"
       ]
     }
   },
-  "generated_at_utc": "2026-07-10T14:07:22+00:00",
+  "generated_at_utc": "2026-07-10T20:31:49+00:00",
   "models": {
     "mlx-community/Qwen3-VL-2B-Thinking-bf16": {
-      "bundle": "20260710T140722Z_001_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json",
+      "bundle": "20260710T203149Z_001_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json",
       "issue_cluster_id": "mlx-vlm_stop-token_001",
       "issue_kind": "harness"
     },
     "mlx-community/gemma-4-31b-bf16": {
-      "bundle": "20260710T140722Z_002_mlx-community_gemma-4-31b-bf16_MLX_VLM_DECODE_MODEL_0375357f22c1.json",
+      "bundle": "20260710T203149Z_002_mlx-community_gemma-4-31b-bf16_MLX_VLM_DECODE_MODEL_0375357f22c1.json",
       "issue_cluster_id": "mlx-vlm_mlx-vlm-decode-model_001",
       "issue_kind": "runtime_failure"
     },
-    "mlx-community/gemma-4-31b-it-4bit": {
-      "bundle": "20260710T140722Z_003_mlx-community_gemma-4-31b-it-4bit_HUGGINGFACE_HUB_MODEL_LOAD_MODEL_bd9f4ea.json",
-      "issue_cluster_id": "huggingface-hub_huggingface-hub-model-load-model_001",
-      "issue_kind": "runtime_failure"
-    },
     "mlx-community/paligemma2-3b-pt-896-4bit": {
-      "bundle": "20260710T140722Z_004_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json",
+      "bundle": "20260710T203149Z_003_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json",
       "issue_cluster_id": "mlx-vlm-mlx_long-context_001",
       "issue_kind": "context_budget"
     }

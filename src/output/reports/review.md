@@ -2,7 +2,7 @@
 
 # Automated Review Digest
 
-Generated on: 2026-07-10 15:07:22 BST
+Generated on: 2026-07-10 21:31:49 BST
 
 Trusted-hint review uses only prompt title/description/keyword hints for utility comparison. Capture metadata, GPS, timestamps, source labels, and location labels are treated as nonvisual metadata and are not required visual evidence.
 
@@ -15,19 +15,19 @@ _Companion artifacts:_
 
 ### Strong Candidates
 
-- `Qwen/Qwen3-VL-2B-Instruct`: caption-review candidate | 137.5 tps
-- `mlx-community/Qwen3-VL-2B-Instruct-bf16`: caption-review candidate | 133.5 tps
-- `mlx-community/Qwen3.5-9B-MLX-4bit`: caption-review candidate | 100.9 tps
-- `mlx-community/Qwen3.5-35B-A3B-6bit`: caption-review candidate | 98.1 tps
-- `mlx-community/GLM-4.6V-nvfp4`: caption-review candidate | 51.6 tps
+- `mlx-community/Qwen3-VL-2B-Instruct-bf16`: caption-review candidate | 133.3 tps
+- `Qwen/Qwen3-VL-2B-Instruct`: caption-review candidate | 132.8 tps
+- `mlx-community/Qwen3.5-35B-A3B-6bit`: caption-review candidate | 99.5 tps
+- `mlx-community/Qwen3.5-9B-MLX-4bit`: caption-review candidate | 95.4 tps
+- `mlx-community/GLM-4.6V-nvfp4`: caption-review candidate | 42.9 tps
 
 ### Watchlist
 
-- `mlx-community/paligemma2-3b-pt-896-4bit`: caption-review candidate | 85.8 tps | harness, long context
-- `mlx-community/Qwen3-VL-2B-Thinking-bf16`: caption-review candidate | 133.9 tps | harness, text sanity
-- `mlx-community/MiniCPM-V-4.6-8bit`: caption-review candidate | 264.7 tps | Output lacks detail
-- `mlx-community/diffusiongemma-26B-A4B-it-mxfp8`: caption-review candidate | 21.1 tps | Output lacks detail
-- `mlx-community/Idefics3-8B-Llama3-bf16`: caption-review candidate | 33.1 tps | Keywords are not specific or diverse enough
+- `mlx-community/paligemma2-3b-pt-896-4bit`: caption-review candidate | 84.5 tps | harness, long context
+- `mlx-community/Qwen3-VL-2B-Thinking-bf16`: caption-review candidate | 134.4 tps | harness, text sanity
+- `mlx-community/MiniCPM-V-4.6-8bit`: caption-review candidate | 266.9 tps | Output lacks detail
+- `mlx-community/Idefics3-8B-Llama3-bf16`: caption-review candidate | 33.7 tps | Keywords are not specific or diverse enough
+- `mlx-community/FastVLM-0.5B-bf16`: caption-review candidate | 303.9 tps | Output lacks detail
 
 ## User Buckets
 
@@ -47,40 +47,41 @@ Clean in the current ungrounded triage run; visual correctness still needs galle
 | `mlx-community/nanoLLaVA-1.5-4bit`                      | `clean`     | not evaluated   | no flagged signals                                |
 | `mlx-community/Qwen2-VL-2B-Instruct-4bit`               | `clean`     | not evaluated   | no flagged signals                                |
 | `qnguyen3/nanoLLaVA`                                    | `clean`     | not evaluated   | no flagged signals                                |
-| `HuggingFaceTB/SmolVLM-Instruct`                        | `clean`     | not evaluated   | no flagged signals                                |
-| `microsoft/Phi-3.5-vision-instruct`                     | `clean`     | not evaluated   | no flagged signals                                |
-| `mlx-community/Phi-3.5-vision-instruct-bf16`            | `clean`     | not evaluated   | no flagged signals                                |
 | `mlx-community/SmolVLM-Instruct-bf16`                   | `clean`     | not evaluated   | no flagged signals                                |
+| `HuggingFaceTB/SmolVLM-Instruct`                        | `clean`     | not evaluated   | no flagged signals                                |
+| `mlx-community/Phi-3.5-vision-instruct-bf16`            | `clean`     | not evaluated   | no flagged signals                                |
+| `microsoft/Phi-3.5-vision-instruct`                     | `clean`     | not evaluated   | no flagged signals                                |
 | `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       | `clean`     | not evaluated   | no flagged signals                                |
-| `Qwen/Qwen3-VL-2B-Instruct`                             | `clean`     | not evaluated   | no flagged signals                                |
-| `mlx-community/GLM-4.6V-Flash-mxfp4`                    | `clean`     | not evaluated   | no flagged signals                                |
+| `mlx-community/gemma-4-26b-a4b-it-4bit`                 | `clean`     | not evaluated   | no flagged signals                                |
 | `mlx-community/Qwen3-VL-2B-Instruct-bf16`               | `clean`     | not evaluated   | no flagged signals                                |
+| `Qwen/Qwen3-VL-2B-Instruct`                             | `clean`     | not evaluated   | no flagged signals                                |
 | `mlx-community/Qwen3.5-35B-A3B-4bit`                    | `clean`     | not evaluated   | no flagged signals                                |
-| `mlx-community/Qwen3.5-9B-MLX-4bit`                     | `clean`     | not evaluated   | no flagged signals                                |
+| `mlx-community/GLM-4.6V-Flash-mxfp4`                    | `clean`     | not evaluated   | no flagged signals                                |
 | `mlx-community/Qwen3.5-35B-A3B-6bit`                    | `clean`     | not evaluated   | no flagged signals                                |
+| `mlx-community/Qwen3.5-9B-MLX-4bit`                     | `clean`     | not evaluated   | no flagged signals                                |
 | `mlx-community/diffusiongemma-26B-A4B-it-mxfp8`         | `clean`     | not evaluated   | no flagged signals                                |
 | `mlx-community/diffusiongemma-26B-A4B-it-8bit`          | `clean`     | not evaluated   | no flagged signals                                |
-| `mlx-community/GLM-4.6V-Flash-6bit`                     | `clean`     | not evaluated   | no flagged signals                                |
 | `mlx-community/X-Reasoner-7B-8bit`                      | `clean`     | not evaluated   | no flagged signals                                |
+| `mlx-community/GLM-4.6V-Flash-6bit`                     | `clean`     | not evaluated   | no flagged signals                                |
 | `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`     | `clean`     | not evaluated   | no flagged signals                                |
 | `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`     | `clean`     | not evaluated   | no flagged signals                                |
-| `mlx-community/gemma-4-26b-a4b-it-4bit`                 | `clean`     | not evaluated   | no flagged signals                                |
 | `mlx-community/Idefics3-8B-Llama3-bf16`                 | `clean`     | not evaluated   | formatting=Unknown tags: &lt;end_of_utterance&gt; |
 | `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              | `token_cap` | not evaluated   | hit token cap (200)                               |
+| `mlx-community/gemma-4-31b-it-4bit`                     | `clean`     | not evaluated   | no flagged signals                                |
 | `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      | `clean`     | not evaluated   | no flagged signals                                |
-| `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 | `clean`     | not evaluated   | reasoning leak                                    |
 | `mlx-community/Qwen3.5-27B-4bit`                        | `clean`     | not evaluated   | no flagged signals                                |
+| `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 | `clean`     | not evaluated   | reasoning leak                                    |
+| `mlx-community/Ornith-1.0-35B-bf16`                     | `clean`     | not evaluated   | no flagged signals                                |
 | `mlx-community/InternVL3-8B-bf16`                       | `clean`     | not evaluated   | no flagged signals                                |
 | `mlx-community/llava-v1.6-mistral-7b-8bit`              | `clean`     | not evaluated   | no flagged signals                                |
+| `mlx-community/Qwen3.5-35B-A3B-bf16`                    | `clean`     | not evaluated   | no flagged signals                                |
 | `mlx-community/Qwen3.5-27B-mxfp8`                       | `clean`     | not evaluated   | no flagged signals                                |
 | `mlx-community/gemma-3n-E4B-it-bf16`                    | `clean`     | not evaluated   | no flagged signals                                |
+| `mlx-community/Qwen3.6-27B-mxfp8`                       | `clean`     | not evaluated   | no flagged signals                                |
 | `mlx-community/InternVL3-14B-8bit`                      | `clean`     | not evaluated   | no flagged signals                                |
 | `mlx-community/gemma-3-27b-it-qat-4bit`                 | `clean`     | not evaluated   | no flagged signals                                |
-| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | `clean`     | not evaluated   | no flagged signals                                |
 | `mlx-community/paligemma2-10b-ft-docci-448-6bit`        | `clean`     | not evaluated   | no flagged signals                                |
-| `mlx-community/Qwen3.6-27B-mxfp8`                       | `clean`     | not evaluated   | no flagged signals                                |
-| `mlx-community/Ornith-1.0-35B-bf16`                     | `clean`     | not evaluated   | no flagged signals                                |
-| `mlx-community/Qwen3.5-35B-A3B-bf16`                    | `clean`     | not evaluated   | no flagged signals                                |
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` | `clean`     | not evaluated   | no flagged signals                                |
 | `mlx-community/GLM-4.6V-nvfp4`                          | `clean`     | not evaluated   | no flagged signals                                |
 | `mlx-community/gemma-3-27b-it-qat-8bit`                 | `clean`     | not evaluated   | no flagged signals                                |
 | `mlx-community/Molmo-7B-D-0924-8bit`                    | `clean`     | not evaluated   | no flagged signals                                |
@@ -105,13 +106,12 @@ Clean in the current ungrounded triage run; visual correctness still needs galle
 | Model                                              | Verdict             | Hint Handling   | Key Evidence                                                                                           |
 |----------------------------------------------------|---------------------|-----------------|--------------------------------------------------------------------------------------------------------|
 | `mlx-community/gemma-4-31b-bf16`                   | `semantic_mismatch` | not evaluated   | text-sanity=gibberish(char_noise)                                                                      |
-| `mlx-community/gemma-4-31b-it-4bit`                | `runtime_failure`   | not evaluated   | model error \| huggingface hub model load model \| hub connectivity                                    |
 | `mlx-community/Qwen3-VL-2B-Thinking-bf16`          | `harness`           | not evaluated   | Special control token &lt;/think&gt; appeared in generated text. \| text-sanity=gibberish(token_noise) |
 | `mlx-community/gemma-3n-E2B-4bit`                  | `cutoff_degraded`   | not evaluated   | hit token cap (200) \| repetitive token=phrase: "have this image. have..."                             |
 | `mlx-community/Kimi-VL-A3B-Thinking-8bit`          | `cutoff_degraded`   | not evaluated   | hit token cap (200) \| reasoning leak                                                                  |
 | `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16` | `cutoff_degraded`   | not evaluated   | hit token cap (200) \| degeneration=incomplete_sentence: ends with 'on'                                |
-| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`    | `cutoff_degraded`   | not evaluated   | hit token cap (200) \| reasoning leak                                                                  |
 | `mlx-community/pixtral-12b-8bit`                   | `cutoff_degraded`   | not evaluated   | hit token cap (200)                                                                                    |
+| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`    | `cutoff_degraded`   | not evaluated   | hit token cap (200) \| reasoning leak                                                                  |
 | `mlx-community/pixtral-12b-bf16`                   | `cutoff_degraded`   | not evaluated   | hit token cap (200)                                                                                    |
 | `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`     | `cutoff_degraded`   | not evaluated   | hit token cap (200) \| reasoning leak                                                                  |
 
@@ -121,12 +121,11 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
 
 <!-- markdownlint-disable MD060 -->
 
-| Target                                         | Problem                                                                             | Evidence Snapshot                                                                                                                                                                  | Affected Models                              | Issue Draft                                                                                                                                          | Evidence Bundle                                                                                                                                                                               | Fixed When                                                |
-|------------------------------------------------|-------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
-| `huggingface_hub`                              | Hugging Face Hub: Model load / model error: Operation timed out after 300.0 seconds | Model Error \| phase model_load \| TimeoutError                                                                                                                                    | 1: `mlx-community/gemma-4-31b-it-4bit`       | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_001_huggingface-hub_huggingface-hub-model-load-model_001.md) | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260710T140722Z_003_mlx-community_gemma-4-31b-it-4bit_HUGGINGFACE_HUB_MODEL_LOAD_MODEL_bd9f4ea.json) | Load/generation completes or fails with a narrower owner. |
-| `mlx-vlm`                                      | mlx-vlm: Decode / model error: list index out of range                              | Model Error \| phase decode \| IndexError                                                                                                                                          | 1: `mlx-community/gemma-4-31b-bf16`          | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_002_mlx-vlm_mlx-vlm-decode-model_001.md)                     | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260710T140722Z_002_mlx-community_gemma-4-31b-bf16_MLX_VLM_DECODE_MODEL_0375357f22c1.json)           | Load/generation completes or fails with a narrower owner. |
-| `mlx-vlm`                                      | Stop/control tokens leaked into generated text                                      | decoded text contains control token &lt;/think&gt; \| prompt=317 \| output/prompt=59.31% \| nontext burden=98% \| stop=completed                                                   | 1: `mlx-community/Qwen3-VL-2B-Thinking-bf16` | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_003_mlx-vlm_stop-token_001.md)                               | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260710T140722Z_001_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json)             | No leaked stop/control tokens.                            |
-| mlx-vlm first; MLX if cache/runtime reproduces | Long-context generation collapsed or became too short                               | generated_tokens~3 \| prompt_tokens=4103, output_tokens=3, output/prompt=0.1%, weak text=truncated \| prompt=4,103 \| output/prompt=0.07% \| nontext burden=100% \| stop=completed | 1: `mlx-community/paligemma2-3b-pt-896-4bit` | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_004_mlx-vlm-mlx_long-context_001.md)                         | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260710T140722Z_004_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json)       | Full and reduced reruns avoid context collapse.           |
+| Target                                         | Problem                                                | Evidence Snapshot                                                                                                                                                                  | Affected Models                              | Issue Draft                                                                                                                      | Evidence Bundle                                                                                                                                                                         | Fixed When                                                |
+|------------------------------------------------|--------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
+| `mlx-vlm`                                      | mlx-vlm: Decode / model error: list index out of range | Model Error \| phase decode \| IndexError                                                                                                                                          | 1: `mlx-community/gemma-4-31b-bf16`          | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_001_mlx-vlm_mlx-vlm-decode-model_001.md) | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260710T203149Z_002_mlx-community_gemma-4-31b-bf16_MLX_VLM_DECODE_MODEL_0375357f22c1.json)     | Load/generation completes or fails with a narrower owner. |
+| `mlx-vlm`                                      | Stop/control tokens leaked into generated text         | decoded text contains control token &lt;/think&gt; \| prompt=317 \| output/prompt=59.31% \| nontext burden=98% \| stop=completed                                                   | 1: `mlx-community/Qwen3-VL-2B-Thinking-bf16` | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_002_mlx-vlm_stop-token_001.md)           | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260710T203149Z_001_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json)       | No leaked stop/control tokens.                            |
+| mlx-vlm first; MLX if cache/runtime reproduces | Long-context generation collapsed or became too short  | generated_tokens~3 \| prompt_tokens=4103, output_tokens=3, output/prompt=0.1%, weak text=truncated \| prompt=4,103 \| output/prompt=0.07% \| nontext burden=100% \| stop=completed | 1: `mlx-community/paligemma2-3b-pt-896-4bit` | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_003_mlx-vlm-mlx_long-context_001.md)     | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260710T203149Z_003_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json) | Full and reduced reruns avoid context collapse.           |
 <!-- markdownlint-enable MD060 -->
 
 ## Model Verdicts
@@ -140,20 +139,6 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
 - _Key signals:_ text-sanity=gibberish(char_noise)
 - _Tokens:_ prompt n/a; estimated text 6 tok; estimated non-text n/a;
   generated n/a; requested max 200 tok; stop reason exception
-
-
-### `mlx-community/gemma-4-31b-it-4bit`
-
-- _Recommendation:_ avoid for now; review verdict: runtime failure
-- _Owner:_ likely owner `huggingface-hub`; reported package `huggingface-hub`;
-  failure stage `Model Error`; diagnostic code
-  `HUGGINGFACE_HUB_MODEL_LOAD_MODEL`
-- _Next step:_ Check whether Hugging Face was reachable; this may be a
-  transient Hub/network outage or disconnect rather than a model defect.
-- _Key signals:_ model error; huggingface hub model load model; hub
-  connectivity
-- _Tokens:_ prompt n/a; estimated text n/a; estimated non-text n/a; generated
-  n/a; requested max 200 tok; stop reason exception
 
 
 ### `LiquidAI/LFM2.5-VL-450M-MLX-bf16`
@@ -228,7 +213,7 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   generated 35 tok; requested max 200 tok; stop reason completed
 
 
-### `HuggingFaceTB/SmolVLM-Instruct`
+### `mlx-community/SmolVLM-Instruct-bf16`
 
 - _Recommendation:_ clean triage pass; review verdict: clean
 - _Owner:_ likely owner `model`
@@ -237,13 +222,13 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   tok; generated 13 tok; requested max 200 tok; stop reason completed
 
 
-### `microsoft/Phi-3.5-vision-instruct`
+### `HuggingFaceTB/SmolVLM-Instruct`
 
 - _Recommendation:_ clean triage pass; review verdict: clean
 - _Owner:_ likely owner `model`
 - _Key signals:_ no flagged signals
-- _Tokens:_ prompt 770 tok; estimated text 6 tok; estimated non-text 764 tok;
-  generated 19 tok; requested max 200 tok; stop reason completed
+- _Tokens:_ prompt 1196 tok; estimated text 6 tok; estimated non-text 1190
+  tok; generated 13 tok; requested max 200 tok; stop reason completed
 
 
 ### `mlx-community/Phi-3.5-vision-instruct-bf16`
@@ -255,13 +240,13 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   generated 19 tok; requested max 200 tok; stop reason completed
 
 
-### `mlx-community/SmolVLM-Instruct-bf16`
+### `microsoft/Phi-3.5-vision-instruct`
 
 - _Recommendation:_ clean triage pass; review verdict: clean
 - _Owner:_ likely owner `model`
 - _Key signals:_ no flagged signals
-- _Tokens:_ prompt 1196 tok; estimated text 6 tok; estimated non-text 1190
-  tok; generated 13 tok; requested max 200 tok; stop reason completed
+- _Tokens:_ prompt 770 tok; estimated text 6 tok; estimated non-text 764 tok;
+  generated 19 tok; requested max 200 tok; stop reason completed
 
 
 ### `mlx-community/Ministral-3-3B-Instruct-2512-4bit`
@@ -273,7 +258,16 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   generated 97 tok; requested max 200 tok; stop reason completed
 
 
-### `Qwen/Qwen3-VL-2B-Instruct`
+### `mlx-community/gemma-4-26b-a4b-it-4bit`
+
+- _Recommendation:_ clean triage pass; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Key signals:_ no flagged signals
+- _Tokens:_ prompt 286 tok; estimated text 6 tok; estimated non-text 280 tok;
+  generated 21 tok; requested max 200 tok; stop reason completed
+
+
+### `mlx-community/Qwen3-VL-2B-Instruct-bf16`
 
 - _Recommendation:_ clean triage pass; review verdict: clean
 - _Owner:_ likely owner `model`
@@ -282,16 +276,7 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   generated 89 tok; requested max 200 tok; stop reason completed
 
 
-### `mlx-community/GLM-4.6V-Flash-mxfp4`
-
-- _Recommendation:_ clean triage pass; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Key signals:_ no flagged signals
-- _Tokens:_ prompt 408 tok; estimated text 6 tok; estimated non-text 402 tok;
-  generated 42 tok; requested max 200 tok; stop reason completed
-
-
-### `mlx-community/Qwen3-VL-2B-Instruct-bf16`
+### `Qwen/Qwen3-VL-2B-Instruct`
 
 - _Recommendation:_ clean triage pass; review verdict: clean
 - _Owner:_ likely owner `model`
@@ -309,13 +294,13 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   generated 51 tok; requested max 200 tok; stop reason completed
 
 
-### `mlx-community/Qwen3.5-9B-MLX-4bit`
+### `mlx-community/GLM-4.6V-Flash-mxfp4`
 
 - _Recommendation:_ clean triage pass; review verdict: clean
 - _Owner:_ likely owner `model`
 - _Key signals:_ no flagged signals
-- _Tokens:_ prompt 319 tok; estimated text 6 tok; estimated non-text 313 tok;
-  generated 75 tok; requested max 200 tok; stop reason completed
+- _Tokens:_ prompt 408 tok; estimated text 6 tok; estimated non-text 402 tok;
+  generated 42 tok; requested max 200 tok; stop reason completed
 
 
 ### `mlx-community/Qwen3.5-35B-A3B-6bit`
@@ -325,6 +310,15 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
 - _Key signals:_ no flagged signals
 - _Tokens:_ prompt 319 tok; estimated text 6 tok; estimated non-text 313 tok;
   generated 61 tok; requested max 200 tok; stop reason completed
+
+
+### `mlx-community/Qwen3.5-9B-MLX-4bit`
+
+- _Recommendation:_ clean triage pass; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Key signals:_ no flagged signals
+- _Tokens:_ prompt 319 tok; estimated text 6 tok; estimated non-text 313 tok;
+  generated 75 tok; requested max 200 tok; stop reason completed
 
 
 ### `mlx-community/paligemma2-3b-pt-896-4bit`
@@ -347,7 +341,7 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
 - _Owner:_ likely owner `model`
 - _Key signals:_ no flagged signals
 - _Tokens:_ prompt 286 tok; estimated text 6 tok; estimated non-text 280 tok;
-  generated 16 tok; requested max 200 tok; stop reason completed
+  generated 19 tok; requested max 200 tok; stop reason completed
 
 
 ### `mlx-community/diffusiongemma-26B-A4B-it-8bit`
@@ -356,16 +350,7 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
 - _Owner:_ likely owner `model`
 - _Key signals:_ no flagged signals
 - _Tokens:_ prompt 286 tok; estimated text 6 tok; estimated non-text 280 tok;
-  generated 25 tok; requested max 200 tok; stop reason completed
-
-
-### `mlx-community/GLM-4.6V-Flash-6bit`
-
-- _Recommendation:_ clean triage pass; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Key signals:_ no flagged signals
-- _Tokens:_ prompt 408 tok; estimated text 6 tok; estimated non-text 402 tok;
-  generated 58 tok; requested max 200 tok; stop reason completed
+  generated 21 tok; requested max 200 tok; stop reason completed
 
 
 ### `mlx-community/X-Reasoner-7B-8bit`
@@ -375,6 +360,15 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
 - _Key signals:_ no flagged signals
 - _Tokens:_ prompt 417 tok; estimated text 6 tok; estimated non-text 411 tok;
   generated 65 tok; requested max 200 tok; stop reason completed
+
+
+### `mlx-community/GLM-4.6V-Flash-6bit`
+
+- _Recommendation:_ clean triage pass; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Key signals:_ no flagged signals
+- _Tokens:_ prompt 408 tok; estimated text 6 tok; estimated non-text 402 tok;
+  generated 58 tok; requested max 200 tok; stop reason completed
 
 
 ### `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`
@@ -405,15 +399,6 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   text.; text-sanity=gibberish(token_noise)
 - _Tokens:_ prompt 317 tok; estimated text 6 tok; estimated non-text 311 tok;
   generated 188 tok; requested max 200 tok; stop reason completed
-
-
-### `mlx-community/gemma-4-26b-a4b-it-4bit`
-
-- _Recommendation:_ clean triage pass; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Key signals:_ no flagged signals
-- _Tokens:_ prompt 286 tok; estimated text 6 tok; estimated non-text 280 tok;
-  generated 21 tok; requested max 200 tok; stop reason completed
 
 
 ### `mlx-community/Idefics3-8B-Llama3-bf16`
@@ -447,6 +432,15 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   generated 200 tok; requested max 200 tok; stop reason max_tokens
 
 
+### `mlx-community/gemma-4-31b-it-4bit`
+
+- _Recommendation:_ clean triage pass; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Key signals:_ no flagged signals
+- _Tokens:_ prompt 286 tok; estimated text 6 tok; estimated non-text 280 tok;
+  generated 25 tok; requested max 200 tok; stop reason completed
+
+
 ### `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`
 
 - _Recommendation:_ clean triage pass; review verdict: clean
@@ -454,6 +448,15 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
 - _Key signals:_ no flagged signals
 - _Tokens:_ prompt 16 tok; estimated text 6 tok; estimated non-text 10 tok;
   generated 25 tok; requested max 200 tok; stop reason completed
+
+
+### `mlx-community/Qwen3.5-27B-4bit`
+
+- _Recommendation:_ clean triage pass; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Key signals:_ no flagged signals
+- _Tokens:_ prompt 319 tok; estimated text 6 tok; estimated non-text 313 tok;
+  generated 64 tok; requested max 200 tok; stop reason completed
 
 
 ### `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`
@@ -466,13 +469,13 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   generated 167 tok; requested max 200 tok; stop reason completed
 
 
-### `mlx-community/Qwen3.5-27B-4bit`
+### `mlx-community/Ornith-1.0-35B-bf16`
 
 - _Recommendation:_ clean triage pass; review verdict: clean
 - _Owner:_ likely owner `model`
 - _Key signals:_ no flagged signals
 - _Tokens:_ prompt 319 tok; estimated text 6 tok; estimated non-text 313 tok;
-  generated 64 tok; requested max 200 tok; stop reason completed
+  generated 41 tok; requested max 200 tok; stop reason completed
 
 
 ### `mlx-community/InternVL3-8B-bf16`
@@ -493,6 +496,15 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   tok; generated 55 tok; requested max 200 tok; stop reason completed
 
 
+### `mlx-community/Qwen3.5-35B-A3B-bf16`
+
+- _Recommendation:_ clean triage pass; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Key signals:_ no flagged signals
+- _Tokens:_ prompt 319 tok; estimated text 6 tok; estimated non-text 313 tok;
+  generated 35 tok; requested max 200 tok; stop reason completed
+
+
 ### `mlx-community/Qwen3.5-27B-mxfp8`
 
 - _Recommendation:_ clean triage pass; review verdict: clean
@@ -511,15 +523,6 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   generated 124 tok; requested max 200 tok; stop reason completed
 
 
-### `mlx-community/InternVL3-14B-8bit`
-
-- _Recommendation:_ clean triage pass; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Key signals:_ no flagged signals
-- _Tokens:_ prompt 3341 tok; estimated text 6 tok; estimated non-text 3335
-  tok; generated 20 tok; requested max 200 tok; stop reason completed
-
-
 ### `mlx-community/Kimi-VL-A3B-Thinking-8bit`
 
 - _Recommendation:_ avoid for now; review verdict: cutoff degraded
@@ -528,33 +531,6 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
 - _Key signals:_ hit token cap (200); reasoning leak
 - _Tokens:_ prompt 399 tok; estimated text 6 tok; estimated non-text 393 tok;
   generated 200 tok; requested max 200 tok; stop reason max_tokens
-
-
-### `mlx-community/gemma-3-27b-it-qat-4bit`
-
-- _Recommendation:_ clean triage pass; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Key signals:_ no flagged signals
-- _Tokens:_ prompt 275 tok; estimated text 6 tok; estimated non-text 269 tok;
-  generated 91 tok; requested max 200 tok; stop reason completed
-
-
-### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`
-
-- _Recommendation:_ clean triage pass; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Key signals:_ no flagged signals
-- _Tokens:_ prompt 441 tok; estimated text 6 tok; estimated non-text 435 tok;
-  generated 92 tok; requested max 200 tok; stop reason completed
-
-
-### `mlx-community/paligemma2-10b-ft-docci-448-6bit`
-
-- _Recommendation:_ clean triage pass; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Key signals:_ no flagged signals
-- _Tokens:_ prompt 1031 tok; estimated text 6 tok; estimated non-text 1025
-  tok; generated 101 tok; requested max 200 tok; stop reason completed
 
 
 ### `mlx-community/Qwen3.6-27B-mxfp8`
@@ -566,22 +542,40 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
   generated 49 tok; requested max 200 tok; stop reason completed
 
 
-### `mlx-community/Ornith-1.0-35B-bf16`
+### `mlx-community/InternVL3-14B-8bit`
 
 - _Recommendation:_ clean triage pass; review verdict: clean
 - _Owner:_ likely owner `model`
 - _Key signals:_ no flagged signals
-- _Tokens:_ prompt 319 tok; estimated text 6 tok; estimated non-text 313 tok;
-  generated 41 tok; requested max 200 tok; stop reason completed
+- _Tokens:_ prompt 3341 tok; estimated text 6 tok; estimated non-text 3335
+  tok; generated 20 tok; requested max 200 tok; stop reason completed
 
 
-### `mlx-community/Qwen3.5-35B-A3B-bf16`
+### `mlx-community/gemma-3-27b-it-qat-4bit`
 
 - _Recommendation:_ clean triage pass; review verdict: clean
 - _Owner:_ likely owner `model`
 - _Key signals:_ no flagged signals
-- _Tokens:_ prompt 319 tok; estimated text 6 tok; estimated non-text 313 tok;
-  generated 35 tok; requested max 200 tok; stop reason completed
+- _Tokens:_ prompt 275 tok; estimated text 6 tok; estimated non-text 269 tok;
+  generated 91 tok; requested max 200 tok; stop reason completed
+
+
+### `mlx-community/paligemma2-10b-ft-docci-448-6bit`
+
+- _Recommendation:_ clean triage pass; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Key signals:_ no flagged signals
+- _Tokens:_ prompt 1031 tok; estimated text 6 tok; estimated non-text 1025
+  tok; generated 101 tok; requested max 200 tok; stop reason completed
+
+
+### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`
+
+- _Recommendation:_ clean triage pass; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Key signals:_ no flagged signals
+- _Tokens:_ prompt 441 tok; estimated text 6 tok; estimated non-text 435 tok;
+  generated 92 tok; requested max 200 tok; stop reason completed
 
 
 ### `mlx-community/GLM-4.6V-nvfp4`
@@ -611,16 +605,6 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
 - _Key signals:_ no flagged signals
 - _Tokens:_ prompt 275 tok; estimated text 6 tok; estimated non-text 269 tok;
   generated 70 tok; requested max 200 tok; stop reason completed
-
-
-### `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ hit token cap (200); reasoning leak
-- _Tokens:_ prompt 1330 tok; estimated text 6 tok; estimated non-text 1324
-  tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
 
 ### `mlx-community/pixtral-12b-8bit`
@@ -657,7 +641,17 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
 - _Owner:_ likely owner `model`
 - _Key signals:_ no flagged signals
 - _Tokens:_ prompt 745 tok; estimated text 6 tok; estimated non-text 739 tok;
-  generated 53 tok; requested max 200 tok; stop reason completed
+  generated 55 tok; requested max 200 tok; stop reason completed
+
+
+### `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`
+
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ hit token cap (200); reasoning leak
+- _Tokens:_ prompt 1330 tok; estimated text 6 tok; estimated non-text 1324
+  tok; generated 200 tok; requested max 200 tok; stop reason max_tokens
 
 
 ### `mlx-community/pixtral-12b-bf16`

@@ -16,12 +16,12 @@
     "run_json": "run.json"
   },
   "counts": {
-    "models_failed": 2,
-    "models_successful": 59,
+    "models_failed": 1,
+    "models_successful": 60,
     "models_total": 61
   },
   "eval_mode": "triage",
-  "generated_at": "2026-07-10 15:07:22 BST",
+  "generated_at": "2026-07-10 21:31:49 BST",
   "has_descriptive_metadata": false,
   "library_versions": {
     "Pillow": "12.3.0",
@@ -40,5 +40,5 @@
   "schema_version": "1.0",
   "selection_basis": "ungrounded",
   "semantic_rankings_grounded": false,
-  "total_runtime_seconds": 1305.18
+  "total_runtime_seconds": 544.014
 }

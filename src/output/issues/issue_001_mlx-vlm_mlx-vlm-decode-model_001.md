@@ -1,13 +1,13 @@
 <!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
 
-# \[huggingface_hub\]\[Hugging Face Hub: Model load / model error\] Hugging Face Hub: Model load / model error: Operation timed out after 300.0 seconds affecting 1 model(s)
+# \[mlx-vlm\]\[mlx-vlm: Decode / model error\] mlx-vlm: Decode / model error: list index out of range affecting 1 model(s)
 
 ## Summary
 
-1 model(s) show **Hugging Face Hub: Model load / model error** that should be filed against huggingface_hub.
+1 model(s) show **mlx-vlm: Decode / model error** that should be filed against mlx-vlm.
 
-- **Observed problem:** Hugging Face Hub: Model load / model error: Operation timed out after 300.0 seconds
-- **Target:** huggingface_hub
+- **Observed problem:** mlx-vlm: Decode / model error: list index out of range
+- **Target:** mlx-vlm
 - **Affected models:** 1
 - **Fixed when:** Load/generation completes or fails with a narrower owner.
 
@@ -16,16 +16,16 @@
 
 <!-- markdownlint-disable MD060 -->
 
-| Model                               | Observed Behavior                       | Token Counts   | Optional Context                                                                                                                                                                                 |
-|-------------------------------------|-----------------------------------------|----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/gemma-4-31b-it-4bit` | Operation timed out after 300.0 seconds | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260710T140722Z_003_mlx-community_gemma-4-31b-it-4bit_HUGGINGFACE_HUB_MODEL_LOAD_MODEL_bd9f4ea.json) |
+| Model                            | Observed Behavior       | Token Counts   | Optional Context                                                                                                                                                                       |
+|----------------------------------|-------------------------|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/gemma-4-31b-bf16` | list index out of range | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260710T203149Z_002_mlx-community_gemma-4-31b-bf16_MLX_VLM_DECODE_MODEL_0375357f22c1.json) |
 <!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
 
-- `mlx-community/gemma-4-31b-it-4bit` fails with: Model loading failed: Operation timed out after 300.0 seconds
-- Root exception: `builtins.TimeoutError`: Operation timed out after 300.0 seconds
+- `mlx-community/gemma-4-31b-bf16` fails with: Model runtime error during generation for mlx-community/gemma-4-31b-bf16: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+- Root exception: `builtins.IndexError`: list index out of range
 
 
 ## Minimal Reproduction
@@ -37,7 +37,7 @@ Image SHA256: `dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e`
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/gemma-4-31b-it-4bit --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/gemma-4-31b-bf16 --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 Minimal Python repro (representative model):
@@ -47,7 +47,7 @@ from mlx_vlm.generate import generate
 from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load
 
-MODEL = 'mlx-community/gemma-4-31b-it-4bit'
+MODEL = 'mlx-community/gemma-4-31b-bf16'
 IMAGE = 'cats.jpg'
 PROMPT = 'Describe this image briefly.'
 LOAD_KWARGS = {'trust_remote_code': True}
@@ -84,13 +84,13 @@ Generation/load config:
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "mlx-community/gemma-4-31b-it-4bit"
+  "model": "mlx-community/gemma-4-31b-bf16"
 }
 ```
 
 Optional advanced context:
 
-- `mlx-community/gemma-4-31b-it-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260710T140722Z_003_mlx-community_gemma-4-31b-it-4bit_HUGGINGFACE_HUB_MODEL_LOAD_MODEL_bd9f4ea.json)
+- `mlx-community/gemma-4-31b-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260710T203149Z_002_mlx-community_gemma-4-31b-bf16_MLX_VLM_DECODE_MODEL_0375357f22c1.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -139,34 +139,34 @@ Optional advanced context:
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                                       |
 | MLX Core Extension         | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
 | MLX Metallib               | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (162,449,848 bytes, sha256=1078bd042297dbbf704a414617a7988c55b0001ea69d7cb478bcafa2fdfdeecb) |
-| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,697,568 bytes, sha256=a96d8dc798ee2a07ecd2a03f916dd5568d35fbd50cf296876dd893230fdf2391)  |
+| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,697,568 bytes, sha256=e61c827cd79f978aa5eacc136f65d6dea065005787f3a1457dc9d4512d6ee9cf)  |
 | RAM                        | 128.0 GB                                                                                                                                                 |
 
 
 ## Appendix: Detailed Evidence
 
-### `mlx-community/gemma-4-31b-it-4bit`
+### `mlx-community/gemma-4-31b-bf16`
 
 Observed error:
 
 ```text
-Model loading failed: Operation timed out after 300.0 seconds
+Model runtime error during generation for mlx-community/gemma-4-31b-bf16: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
 ```
 
 Root exception:
 
 ```text
-builtins.TimeoutError: Operation timed out after 300.0 seconds
+builtins.IndexError: list index out of range
 ```
 
 Traceback tail:
 
 ```text
-    self._condition.wait(timeout)
-    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/threading.py", line 359, in wait
-    waiter.acquire()
-    ~~~~~~~~~~~~~~^^
-TimeoutError: Operation timed out after 300.0 seconds
+    detokenizer.add_token(token, skip_special_token_ids=skip_special_token_ids)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/tokenizer_utils.py", line 171, in add_token
+    if self.is_byte_token[token]:
+       ~~~~~~~~~~~~~~~~~~^^^^^^^
+IndexError: list index out of range
 ```
 
