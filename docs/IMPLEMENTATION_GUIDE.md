@@ -980,8 +980,8 @@ The `test_dependency_sync` test and CI will fail otherwise.
 **Optional groups**:
 
 - `extras`: `psutil`, `tokenizers`, `einops`, `num2words`, `sentencepiece`
-  (`tokenizers` / `sentencepiece` specs track the `transformers>=5.7.0,<5.13.0`
-  compatibility window)
+  (`tokenizers` / `sentencepiece` specs track the `transformers>=5.7.0`
+  compatibility floor)
 - `torch`: `torch`, `torchvision`, `torchaudio`, `timm` (`torch` and `timm`
   floors track Transformers optional-extra metadata)
 
@@ -1135,7 +1135,7 @@ dependencies = [
     "mlx>=0.31.2",
     "mlx-lm>=0.31.3",
     "mlx-vlm>=0.6.2",
-    "transformers>=5.7.0,<5.13.0",
+    "transformers>=5.7.0",
     # ...
 ]
 
@@ -1145,11 +1145,11 @@ extras = ["tokenizers>=0.22.0,<=0.23.0", "sentencepiece!=0.1.92,>=0.1.91"]
 torch = ["torch>=2.4.0", "torchvision>=0.17.0"]
 ```
 
-**Why mostly lower-bound versions (`>=`) with explicit compatibility caps?**
+**Why mostly lower-bound versions (`>=`)?**
 
-- Lower bounds allow automatic security and compatibility updates.
-- Explicit caps document known upstream incompatibilities, such as the current
-  `transformers<5.13.0` window for `mlx-lm` / `mlx-vlm`.
+- Lower bounds allow automatic security and compatibility updates; temporary
+  upper bounds are removed once the supported upstream stack resolves the
+  incompatibility.
 - Dependabot and the dependency-sync guard keep visible install snippets aligned
   with `src/pyproject.toml`.
 

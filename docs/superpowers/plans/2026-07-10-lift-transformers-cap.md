@@ -83,6 +83,7 @@ def test_detect_upstream_version_issues_accepts_transformers_without_upper_cap(
             "mlx-vlm": "0.6.3",
             "mlx-lm": "0.31.3",
             "mlx": "0.31.2",
+            "mlx-audio": "0.4.3",
             "transformers": "5.13.0",
             "huggingface-hub": "1.10.1",
         },

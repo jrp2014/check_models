@@ -716,7 +716,7 @@ Runtime (installed automatically via `pip install -e .` when executed inside `sr
 | ------- | ------- | ------- |
 | Core tensor/runtime | `mlx` | `>=0.31.2` |
 | Vision‑language utilities | `mlx-vlm` | `>=0.6.2` |
-| Transformer compatibility surface | `transformers` | `>=5.7.0,<5.13.0` |
+| Transformer compatibility surface | `transformers` | `>=5.7.0` |
 | Image processing & loading | `Pillow[xmp]` | `>=12.2.0` |
 | Safe XMP/XML parsing | `defusedxml` | `>=0.7.1` |
 | Model cache / discovery | `huggingface-hub` | `>=1.10.1` |
@@ -773,7 +773,7 @@ pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.
 
 ### With Optional Extras
 
-The `extras` group in `pyproject.toml` pulls in `psutil`, `tokenizers`, `einops`, `num2words`, and `sentencepiece`. The tokenizer specs follow the `transformers>=5.7.0,<5.13.0` compatibility window:
+The `extras` group in `pyproject.toml` pulls in `psutil`, `tokenizers`, `einops`, `num2words`, and `sentencepiece`. The tokenizer specs follow the `transformers>=5.7.0` compatibility floor:
 
 ```bash
 pip install -e ".[extras,torch]"  # recommended for the widest optional feature/model coverage
@@ -806,10 +806,10 @@ pip install -e ".[dev,extras,torch]"  # dev tools + optional model/runtime deps
 > `psutil` is optional (installed with `extras`); if absent the extended Apple Silicon hardware section omits RAM/cores.
 
 > [!NOTE]
-> `mlx-lm` is part of the core runtime dependency set. The `extras` group adds psutil, tokenizers, einops, num2words, and sentencepiece; tokenizers and sentencepiece follow the `transformers>=5.7.0,<5.13.0` compatibility window. For the widest model coverage, pair extras with `.[torch]` or install `.[extras,torch]` directly.
+> `mlx-lm` is part of the core runtime dependency set. The `extras` group adds psutil, tokenizers, einops, num2words, and sentencepiece; tokenizers and sentencepiece follow the `transformers>=5.7.0` compatibility floor. For the widest model coverage, pair extras with `.[torch]` or install `.[extras,torch]` directly.
 
 > [!NOTE]
-> Project policy requires `transformers>=5.7.0,<5.13.0` and validates the live
+> Project policy requires `transformers>=5.7.0` and validates the live
 > `mlx_vlm` runtime contract during preflight so upstream API drift is surfaced
 > before generation starts.
 

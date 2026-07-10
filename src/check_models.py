@@ -95,7 +95,6 @@ from tabulate import tabulate
 from check_models_data.dependency_policy import (
     PROJECT_MIN_TRANSFORMERS_VERSION,
     PROJECT_RUNTIME_STACK_MINIMUMS,
-    PROJECT_TRANSFORMERS_VERSION_SPEC,
     UPSTREAM_MLX_LM_MINIMUMS,
     UPSTREAM_MLX_VLM_MINIMUMS,
 )

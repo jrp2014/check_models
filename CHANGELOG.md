@@ -33,13 +33,12 @@ Notable changes to this project will be documented in this file.
   reports plus core non-Markdown artifact presence and shape.
 - Bump the package version to `0.8.4` for the MLX stack dependency sync,
   upstream passthrough-diagnostics refinement, and gallery output-cost summary.
-- Align the project Transformers compatibility window with the current
-  `mlx-lm>=0.31.3` floor while capping before the `5.13.0` auto-registration
-  break (`transformers>=5.7.0,<5.13.0`), keeping the shared dependency policy,
-  install snippets, and environment validation in sync.
-- Tighten optional model-support floors around the `transformers>=5.7.0,<5.13.0`
-  compatibility window: `tokenizers`, `sentencepiece`, `torch`, and `timm`
-  now match the relevant upstream Transformers metadata.
+- Align the project Transformers floor with `mlx-lm>=0.31.3`
+  (`transformers>=5.7.0`) and keep the shared dependency policy, install
+  snippets, environment validation, and optional model-support floors in sync.
+- Lift the temporary Transformers 5.13 upper bound after `mlx-lm` GitHub main
+  replaced its string tokenizer registration with the tokenizer class, allowing
+  the editable upstream stack to consume current Transformers releases.
 - Keep upstream passthrough bounded to `--processor-kwargs` and named
   generation-control flags, while preserving the effective generation kwargs in
   diagnostics, JSONL prompt metadata, repro bundles, and native `mlx-vlm`
@@ -174,10 +173,6 @@ Notable changes to this project will be documented in this file.
 
 - Center diagnostics harness sample output on leaked control tokens when the
   marker appears after a long preface, matching issue-draft evidence excerpts.
-- Prevent `update.sh` dependency refreshes from selecting `transformers==5.13.0`,
-  whose auto-registration API rejects current `mlx-lm`/`mlx-vlm` string
-  registrations, and surface too-new Transformers versions in preflight
-  diagnostics.
 - Render generated Markdown report timestamps as plain metadata instead of
   emphasis-only paragraphs so markdownlint `MD036` stays clean.
 - Calibrate image-heavy prompt quality review so low output/prompt ratio is no
