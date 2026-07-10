@@ -171,8 +171,10 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- Dynamically load the probed `mlx.core` native module so `ty>=0.0.58` does not
-  require incomplete Nanobind stubs that fail strict `mypy` checks in static CI.
+- Synchronize the optional `tokenizers` compatibility cap at `0.23.1` between
+  packaging metadata and the shared dependency policy.
+- Dynamically load probed `mlx.core` native modules in the main CLI and Qwen3-VL
+  repro tool so static CI does not require incomplete Nanobind stubs.
 - Center diagnostics harness sample output on leaked control tokens when the
   marker appears after a long preface, matching issue-draft evidence excerpts.
 - Render generated Markdown report timestamps as plain metadata instead of

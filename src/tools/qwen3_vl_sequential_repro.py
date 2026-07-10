@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import gc
+import importlib
 import shlex
 from collections.abc import Callable
 from pathlib import Path
@@ -160,7 +161,7 @@ def build_probe_plan(image_path: Path) -> str:
 
 def _load_runtime_symbols() -> tuple[Any, GenerateCallable, PromptTemplateCallable, LoadCallable]:
     """Import MLX and mlx-vlm only when a probe is actually going to run."""
-    import mlx.core as mx  # noqa: PLC0415
+    mx = cast("Any", importlib.import_module("mlx.core"))
     from mlx_vlm.generate import generate  # noqa: PLC0415
     from mlx_vlm.prompt_utils import apply_chat_template  # noqa: PLC0415
     from mlx_vlm.utils import load  # noqa: PLC0415

@@ -1500,29 +1500,41 @@ def test_quality_ci_defers_macos_deployment_target_to_upstream_mlx() -> None:
         assert "MACOSX_DEPLOYMENT_TARGET" not in install_command
 
 
-def test_mlx_runtime_import_avoids_static_native_module_resolution() -> None:
+def test_mlx_runtime_imports_avoid_static_native_module_resolution() -> None:
     """Static checkers should not need importable stubs for the native MLX module."""
-    source = (PKG_ROOT / "check_models.py").read_text(encoding="utf-8")
-    tree = ast.parse(source)
+    runtime_import_sources = (
+        PKG_ROOT / "check_models.py",
+        PKG_ROOT / "tools" / "qwen3_vl_sequential_repro.py",
+    )
 
-    direct_mlx_imports = [
-        node
-        for node in ast.walk(tree)
-        if isinstance(node, ast.Import) and any(alias.name == "mlx.core" for alias in node.names)
-    ]
-    dynamic_mlx_imports = [
-        node
-        for node in ast.walk(tree)
-        if isinstance(node, ast.Call)
-        and isinstance(node.func, ast.Name)
-        and node.func.id == "import_module"
-        and node.args
-        and isinstance(node.args[0], ast.Constant)
-        and node.args[0].value == "mlx.core"
-    ]
+    for source_path in runtime_import_sources:
+        tree = ast.parse(source_path.read_text(encoding="utf-8"))
+        direct_mlx_imports = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Import)
+            and any(alias.name == "mlx.core" for alias in node.names)
+        ]
+        dynamic_mlx_imports = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and node.args
+            and isinstance(node.args[0], ast.Constant)
+            and node.args[0].value == "mlx.core"
+            and (
+                (isinstance(node.func, ast.Name) and node.func.id == "import_module")
+                or (
+                    isinstance(node.func, ast.Attribute)
+                    and isinstance(node.func.value, ast.Name)
+                    and node.func.value.id == "importlib"
+                    and node.func.attr == "import_module"
+                )
+            )
+        ]
 
-    assert not direct_mlx_imports
-    assert dynamic_mlx_imports
+        assert not direct_mlx_imports, source_path
+        assert dynamic_mlx_imports, source_path
 
 
 def test_workflows_pin_actions_and_keep_skylos_danger_advisory_nonblocking() -> None:
