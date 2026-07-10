@@ -1500,6 +1500,20 @@ def test_quality_ci_defers_macos_deployment_target_to_upstream_mlx() -> None:
         assert "MACOSX_DEPLOYMENT_TARGET" not in install_command
 
 
+def test_quality_ci_preserves_recursive_mlx_stubgen_layout() -> None:
+    """CI should publish Nanobind's recursive mlx.core layout for type checkers."""
+    workflow = yaml.safe_load(
+        (REPO_ROOT / ".github" / "workflows" / "quality.yml").read_text(encoding="utf-8")
+    )
+    static_steps = workflow["jobs"]["static-quality"]["steps"]
+    stub_command = next(
+        step["run"] for step in static_steps if step.get("name") == "Generate MLX stubs for mypy"
+    )
+
+    assert '"$STUB_ROOT/core/__init__.pyi"' in stub_command
+    assert 'cp -R "$STUB_ROOT/core/." typings/mlx/core/' in stub_command
+
+
 def test_workflows_pin_actions_and_keep_skylos_danger_advisory_nonblocking() -> None:
     """Workflow security hardening and advisory Skylos danger wiring should stay in place."""
     action_ref_pattern = re.compile(r"^[^@]+@[0-9a-f]{40}$")

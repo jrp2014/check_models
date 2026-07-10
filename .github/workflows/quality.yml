@@ -88,11 +88,16 @@ jobs:
               GENERATED_STUB="$STUB_ROOT/mlx/core.pyi"
             elif [ -f "$STUB_ROOT/core.pyi" ]; then
               GENERATED_STUB="$STUB_ROOT/core.pyi"
+            elif [ -f "$STUB_ROOT/core/__init__.pyi" ]; then
+              GENERATED_STUB="$STUB_ROOT/core/__init__.pyi"
             fi
 
             if [ -n "$GENERATED_STUB" ] && [ -f "$GENERATED_STUB" ]; then
-              # Keep stubs in repo-local typings/ so mypy/pyrefly consume one source of truth.
+              # Keep stubs in repo-local typings/ so all type checkers consume one source of truth.
               mkdir -p typings/mlx/core
+              if [ -d "$STUB_ROOT/core" ]; then
+                cp -R "$STUB_ROOT/core/." typings/mlx/core/
+              fi
               cp "$GENERATED_STUB" typings/mlx/core.pyi
               cp "$GENERATED_STUB" typings/mlx/core/__init__.pyi
             else
