@@ -18,7 +18,7 @@
 
 | Model                            | Observed Behavior       | Token Counts   | Optional Context                                                                                                                                                                       |
 |----------------------------------|-------------------------|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/gemma-4-31b-bf16` | list index out of range | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260710T203149Z_002_mlx-community_gemma-4-31b-bf16_MLX_VLM_DECODE_MODEL_0375357f22c1.json) |
+| `mlx-community/gemma-4-31b-bf16` | list index out of range | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260710T223701Z_007_mlx-community_gemma-4-31b-bf16_MLX_VLM_DECODE_MODEL_eddb255ac4b7.json) |
 <!-- markdownlint-enable MD060 -->
 
 
@@ -31,13 +31,47 @@
 ## Minimal Reproduction
 
 These commands use `mlx-vlm` directly so the issue can be reproduced without installing the `check_models` harness.
-Use a local copy of `cats.jpg` or replace it with an equivalent test image.
-Image SHA256: `dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e`
+Use a local copy of `20260704-181004_DSC00862_DxO.jpg` or replace it with an equivalent test image.
+Image SHA256: `ca8d7f4e290d2f17ff550dd856e3cad8903013e2e0b5044bc926ee086199c806`
 
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/gemma-4-31b-bf16 --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/gemma-4-31b-bf16 --image 20260704-181004_DSC00862_DxO.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
+
+Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.
+
+Treat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.
+
+Return exactly these three sections, and nothing else:
+
+Title:
+- 5-10 words, concrete and factual, limited to clearly visible content.
+- Output only the title text after the label.
+- Do not repeat or paraphrase these instructions in the title.
+
+Description:
+- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.
+- Output only the description text after the label.
+
+Keywords:
+- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.
+- Output only the keyword list after the label.
+
+Rules:
+- Include only details that are definitely visible in the image.
+- Reuse metadata terms only when they are clearly supported by the image.
+- If metadata and image disagree, follow the image.
+- Prefer omission to speculation.
+- Do not copy prompt instructions into the Title, Description, or Keywords fields.
+- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.
+- Do not output reasoning, notes, hedging, or extra sections.
+
+Context: Existing metadata hints (high confidence; use only when visually confirmed):
+- Title hint: , Deben Estuary, Woodbridge, England, UK, GBR, Europe
+- Description hint: Two sailing boats moored on a river with trees behind on the bank
+- Keyword hints: Bird, Boat, Boating, Buoy, Bushes, Coast, Deben Estuary, England, Estuary, Europe, Foliage, Forest, Landscape, Mast, Moored, Mudflat, Nature, Outdoors, Peaceful, Rigging
+- Capture metadata: Taken on 2026-07-04 19:10:04 BST (at 19:10:04 local time).' --max-tokens 500 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 Minimal Python repro (representative model):
@@ -48,10 +82,10 @@ from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load
 
 MODEL = 'mlx-community/gemma-4-31b-bf16'
-IMAGE = 'cats.jpg'
-PROMPT = 'Describe this image briefly.'
+IMAGE = '20260704-181004_DSC00862_DxO.jpg'
+PROMPT = 'Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.\n- Output only the description text after the label.\n\nKeywords:\n- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.\n- Output only the keyword list after the label.\n\nRules:\n- Include only details that are definitely visible in the image.\n- Reuse metadata terms only when they are clearly supported by the image.\n- If metadata and image disagree, follow the image.\n- Prefer omission to speculation.\n- Do not copy prompt instructions into the Title, Description, or Keywords fields.\n- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.\n- Do not output reasoning, notes, hedging, or extra sections.\n\nContext: Existing metadata hints (high confidence; use only when visually confirmed):\n- Title hint: , Deben Estuary, Woodbridge, England, UK, GBR, Europe\n- Description hint: Two sailing boats moored on a river with trees behind on the bank\n- Keyword hints: Bird, Boat, Boating, Buoy, Bushes, Coast, Deben Estuary, England, Estuary, Europe, Foliage, Forest, Landscape, Mast, Moored, Mudflat, Nature, Outdoors, Peaceful, Rigging\n- Capture metadata: Taken on 2026-07-04 19:10:04 BST (at 19:10:04 local time).'
 LOAD_KWARGS = {'trust_remote_code': True}
-GENERATE_KWARGS = {'max_tokens': 200, 'temperature': 0.0, 'prefill_step_size': 4096}
+GENERATE_KWARGS = {'max_tokens': 500, 'temperature': 0.0, 'prefill_step_size': 4096}
 model, processor = load(MODEL, **LOAD_KWARGS)
 formatted_prompt = apply_chat_template(
     processor,
@@ -68,7 +102,41 @@ print(result.text)
 Prompt:
 
 ```text
-Describe this image briefly.
+Analyze this image for cataloguing metadata, using British English.
+
+Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.
+
+Treat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.
+
+Return exactly these three sections, and nothing else:
+
+Title:
+- 5-10 words, concrete and factual, limited to clearly visible content.
+- Output only the title text after the label.
+- Do not repeat or paraphrase these instructions in the title.
+
+Description:
+- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.
+- Output only the description text after the label.
+
+Keywords:
+- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.
+- Output only the keyword list after the label.
+
+Rules:
+- Include only details that are definitely visible in the image.
+- Reuse metadata terms only when they are clearly supported by the image.
+- If metadata and image disagree, follow the image.
+- Prefer omission to speculation.
+- Do not copy prompt instructions into the Title, Description, or Keywords fields.
+- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.
+- Do not output reasoning, notes, hedging, or extra sections.
+
+Context: Existing metadata hints (high confidence; use only when visually confirmed):
+- Title hint: , Deben Estuary, Woodbridge, England, UK, GBR, Europe
+- Description hint: Two sailing boats moored on a river with trees behind on the bank
+- Keyword hints: Bird, Boat, Boating, Buoy, Bushes, Coast, Deben Estuary, England, Estuary, Europe, Foliage, Forest, Landscape, Mast, Moored, Mudflat, Nature, Outdoors, Peaceful, Rigging
+- Capture metadata: Taken on 2026-07-04 19:10:04 BST (at 19:10:04 local time).
 ```
 
 Generation/load config:
@@ -76,11 +144,11 @@ Generation/load config:
 ```json
 {
   "generate_kwargs": {
-    "max_tokens": 200,
+    "max_tokens": 500,
     "prefill_step_size": 4096,
     "temperature": 0.0
   },
-  "image": "cats.jpg",
+  "image": "20260704-181004_DSC00862_DxO.jpg",
   "load_kwargs": {
     "trust_remote_code": true
   },
@@ -90,7 +158,7 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/gemma-4-31b-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260710T203149Z_002_mlx-community_gemma-4-31b-bf16_MLX_VLM_DECODE_MODEL_0375357f22c1.json)
+- `mlx-community/gemma-4-31b-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260710T223701Z_007_mlx-community_gemma-4-31b-bf16_MLX_VLM_DECODE_MODEL_eddb255ac4b7.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 

@@ -74,7 +74,12 @@ extras = [
     "num2words>=0.5.0",
     "sentencepiece!=0.1.92,>=0.1.91",
 ]
-torch = ["torch>=2.4.0", "torchvision>=0.17.0", "torchaudio>=2.2.0", "timm>=1.0.23"]
+torch = [
+    "torch>=2.4.0",
+    "torchvision>=0.17.0",
+    "torchaudio>=2.2.0",
+    "timm>=1.0.23",
+]
 dev = [
     "ruff>=0.1.0",
     "mypy>=1.8.0",

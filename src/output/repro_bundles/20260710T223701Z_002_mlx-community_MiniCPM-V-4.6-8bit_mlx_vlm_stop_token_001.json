@@ -1,18 +1,18 @@
 {
   "environment": {
     "library_versions": {
-      "Pillow": "12.2.0",
-      "huggingface-hub": "1.21.0",
-      "mlx": "0.32.0.dev20260627+548dd80e",
-      "mlx-audio": "0.4.4",
+      "Pillow": "12.3.0",
+      "huggingface-hub": "1.23.0",
+      "mlx": "0.32.1.dev20260710+4367c73b",
+      "mlx-audio": "0.4.5",
       "mlx-lm": "0.31.3",
       "mlx-metal": null,
-      "mlx-vlm": "0.6.3",
-      "numpy": "2.5.0",
+      "mlx-vlm": "0.6.5",
+      "numpy": "2.5.1",
       "tokenizers": "0.22.2",
-      "transformers": "5.12.1"
+      "transformers": "5.13.0"
     },
-    "platform": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
     "preflight_issues": [],
     "system_info": {
       "Active Developer Directory": "/Applications/Xcode.app/Contents/Developer",
@@ -25,8 +25,8 @@
       "MLX Core Extension": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so",
       "MLX Distribution Root": "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
       "MLX Install Type": "editable local source",
-      "MLX Metallib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (162,369,176 bytes, sha256=28369eb4da5ecc579c68497402a2b76dd8fa31df58c6ae2b42e7150dc3b90445)",
-      "MLX libmlx.dylib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,710,112 bytes, sha256=44c96c82bbc3808ee6aea73ee73bd83f2a13c00fbd99eca6828ce5359001c319)",
+      "MLX Metallib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (162,449,848 bytes, sha256=1078bd042297dbbf704a414617a7988c55b0001ea69d7cb478bcafa2fdfdeecb)",
+      "MLX libmlx.dylib": "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,697,568 bytes, sha256=e61c827cd79f978aa5eacc136f65d6dea065005787f3a1457dc9d4512d6ee9cf)",
       "Metal Compiler Version": "Apple metal version 32023.883 (metalfe-32023.883)",
       "Metal SDK": "MacOSX26.5.sdk",
       "Metal Support": "Metal 4",
@@ -38,7 +38,7 @@
       "SDK Version": "26.5",
       "Xcode Build": "17F113",
       "Xcode Version": "26.6",
-      "macOS Version": "26.5.1",
+      "macOS Version": "26.5.2",
       "mlx-metal Distribution": "not installed; local editable mlx supplies backend"
     }
   },
@@ -53,9 +53,9 @@
     "traceback": null,
     "type": null
   },
-  "generated_at_utc": "2026-06-27T22:58:03+00:00",
+  "generated_at_utc": "2026-07-10T22:37:01+00:00",
   "issue_cluster_id": "mlx-vlm_stop-token_001",
-  "model": "mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX",
+  "model": "mlx-community/MiniCPM-V-4.6-8bit",
   "repro": {
     "args": {
       "_check_models_preflight_issues": [],
@@ -65,14 +65,14 @@
       "dry_run": false,
       "enable_thinking": false,
       "eos_tokens": null,
-      "eval_mode": "triage",
+      "eval_mode": "assisted",
       "exclude": null,
-      "folder": null,
+      "folder": "/Users/jrp/Pictures/Processed",
       "force_color": false,
       "force_download": false,
       "frequency_context_size": 20,
       "frequency_penalty": null,
-      "image": "../../mlx-vlm/examples/images/cats.jpg",
+      "image": null,
       "kv_bits": null,
       "kv_group_size": 64,
       "kv_quant_scheme": "uniform",
@@ -80,7 +80,7 @@
       "link_style": "github",
       "logit_bias": null,
       "max_kv_size": null,
-      "max_tokens": 200,
+      "max_tokens": 500,
       "min_p": 0.0,
       "models": null,
       "no_color": false,
@@ -92,6 +92,8 @@
       "output_jsonl": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.jsonl",
       "output_log": "/Users/jrp/Documents/AI/mlx/check_models/src/output/check_models.log",
       "output_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.md",
+      "output_model_capabilities": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/model_capabilities.md",
+      "output_model_capabilities_json": "/Users/jrp/Documents/AI/mlx/check_models/src/output/model_capabilities.json",
       "output_model_selection": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/model_selection.md",
       "output_review": "/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/review.md",
       "output_run_json": "/Users/jrp/Documents/AI/mlx/check_models/src/output/run.json",
@@ -123,22 +125,23 @@
       "verbose": true,
       "width": null
     },
-    "cluster_repro_command": "python -m check_models --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models microsoft/Phi-3.5-vision-instruct mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX mlx-community/Qwen3-VL-2B-Thinking-bf16",
+    "cluster_repro_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260704-181004_DSC00862_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/MiniCPM-V-4.6-8bit",
     "env_vars": {
       "TOKENIZERS_PARALLELISM": "false"
     },
-    "image_path": "/Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg",
-    "image_ref_sha256": "9bc422400088c31c0accf7fb023ee29945d47640042565218c1c33f78694f204",
-    "image_sha256": "dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e",
+    "eval_mode": "assisted",
+    "image_path": "/Users/jrp/Pictures/Processed/20260704-181004_DSC00862_DxO.jpg",
+    "image_ref_sha256": "f76bef4d8f52be5e31e848b7d74a1f47940b5289ea37387e4842d5ce7846ad04",
+    "image_sha256": "ca8d7f4e290d2f17ff550dd856e3cad8903013e2e0b5044bc926ee086199c806",
     "prompt_diagnostics": {
-      "eos_token": "</s>",
-      "eos_token_id": 2,
+      "eos_token": "<|im_end|>",
+      "eos_token_id": 248046,
       "generate_kwargs": {
         "kv_bits": null,
         "kv_group_size": 64,
         "kv_quant_scheme": "uniform",
         "max_kv_size": null,
-        "max_tokens": 200,
+        "max_tokens": 500,
         "prefill_step_size": 4096,
         "quantized_kv_start": 5000,
         "repetition_context_size": 20,
@@ -146,61 +149,77 @@
         "temperature": 0.0,
         "top_p": 1.0
       },
-      "image_placeholder_count": 0,
-      "model_type": "pixtral",
-      "processor_class": "mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor",
-      "rendered_prompt_chars": 423,
-      "rendered_prompt_hash_sha256": "cd2117604e10712180fd861d63f168284b28f5193279b6d89637cca292d91cc5",
-      "rendered_prompt_preview": "<s><|system|>\nYou are a thoughtful and systematic AI assistant built by ServiceNow Language Models (SLAM) lab. Before providing an answer, analyze the problem carefully and present your reasoning step by step. After explaining your thought process, provide the final solution in the following format: [BEGIN FINAL RESPONSE] ... [END FINAL RESPONSE].\n<|end|>\n<|user|>\n[IMG]Describe this image briefly.\n<|end|>\n<|assistant|>\n",
+      "image_placeholder_count": 1,
+      "model_type": "minicpmv4_6",
+      "processor_class": "mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor",
+      "rendered_prompt_chars": 2269,
+      "rendered_prompt_hash_sha256": "e74415f178ca29292ff4ce3a49757089b2a4a32a80560718490633d0366cec4d",
+      "rendered_prompt_preview": "<|im_start|>user\n(<image>./</image>)\nAnalyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 fa...",
       "special_token_ids": [
-        1,
-        2,
-        0,
-        11
+        248045,
+        248046,
+        248077,
+        248044,
+        248070,
+        248071,
+        248076,
+        248056,
+        248057,
+        248053,
+        248054
       ],
       "special_tokens": [
-        "<s>",
-        "</s>",
+        "<|im_start|>",
+        "<|im_end|>",
         "<unk>",
-        "<pad>"
+        "<|endoftext|>",
+        "<|audio_start|>",
+        "<|audio_end|>",
+        "<|audio_pad|>",
+        "<|image_pad|>",
+        "<|video_pad|>",
+        "<|vision_start|>",
+        "<|vision_end|>"
       ],
-      "tokenizer_class": "transformers.tokenization_utils_tokenizers.TokenizersBackend"
+      "tokenizer_class": "transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer"
     },
-    "prompt_hash_sha256": "d760336d0fd143932f194573dd63f6b531e0ffbc2c4f1595e015392a3471c318",
-    "prompt_preview": "Describe this image briefly.",
-    "rerun_command": "python -m check_models --image /Users/jrp/Documents/AI/mlx/mlx-vlm/examples/images/cats.jpg --trust-remote-code --max-tokens 200 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX",
+    "prompt_hash_sha256": "97d77740086c43fcd1200f0f2dade06bb7e508cf1a71d7e9fc460b5b70b6d594",
+    "prompt_preview": "Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct any...",
+    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260704-181004_DSC00862_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/MiniCPM-V-4.6-8bit",
     "seed": null
   },
   "result": {
-    "generated_text_preview": "Here are my reasoning steps:\nThe user asks: \"Describe this image briefly.\" The image is of two cats sleeping on a pink couch, with a remote control. The user wants a brief description. This is a straightforward request. There's no disallowed content. So we can comply. Provide a concise description. Possibly mention the cats' colors, positions, the couch, the remote. The user wants a brief descript...",
+    "generated_text_preview": "<think>\n\n</think>\n\nTitle:\nSailing boats moored near dense green foliage on water\n\nDescription:\nThe image shows two sailing boats floating on water with lush trees in the background. The scene appears calm with natural lighting.\n\nKeywords:\nsailing boats, water, trees, moored, calm, green, nature, river, boats, foliage, peace, outdoors",
     "maintainer_triage": {
       "confidence": "high",
       "evidence": [
         "harness:stop_token",
+        "utility_delta_negative",
         "reasoning_leak",
         "text_sanity"
       ],
       "harness_details": [
-        "token_leak:<|end|>"
+        "token_leak:</think>"
       ],
       "hit_max_tokens": false,
       "issue_kind": "harness",
       "issue_subtype": "stop_token",
       "next_action": "Inspect EOS/stop-token stripping; control tokens are leaking into user-facing text.",
-      "nontext_prompt_ratio": 0.9954887218045113,
-      "prompt_output_ratio": 0.13082706766917293,
-      "prompt_tokens_total": 1330,
-      "requested_max_tokens": 200,
+      "nontext_prompt_ratio": 0.614019520851819,
+      "prompt_output_ratio": 0.06832298136645963,
+      "prompt_tokens_total": 1127,
+      "requested_max_tokens": 500,
       "stop_reason": "completed",
-      "summary": "Special control token &lt;|end|&gt; appeared in generated text. | reasoning leak",
+      "summary": "Special control token &lt;/think&gt; appeared in generated text. | missing terms: Bird, Boating, Buoy, Bushes, Coast | reasoning leak | text-sanity=gibberish(token_noise)",
       "suspected_owner": "mlx-vlm",
       "user_bucket": "avoid"
     },
     "quality_issues": [
       "\u26a0\ufe0fharness(stop_token)",
       "gibberish(token_noise)",
-      "lang_mixing",
-      "reasoning-leak"
+      "reasoning-leak",
+      "trusted-hints-degraded",
+      "formatting"
     ],
     "success": true
   },

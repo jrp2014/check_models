@@ -1,10 +1,11 @@
 # Model Selection Brief
 
-Generated on: 2026-07-10 21:31:49 BST
+Generated on: 2026-07-10 23:37:01 BST
 
-- Mode: triage
-- Semantic rankings: ungrounded (ungrounded)
-- Primary use cases: brief captions only in triage mode; structured title/description/keywords require a grounded metadata or quality run
+- Evaluation lane: assisted
+- Metadata exposed to prompt: yes
+- Semantic rankings: grounded (metadata-assisted visual verification)
+- Primary use cases: brief captions; structured title/description/keywords
 - Scope: ranked shortlist, not the complete run; complete per-model outputs and diagnostics are in `model_gallery.md`.
 
 ## Evidence Links
@@ -18,63 +19,70 @@ Practical current-run buckets for model users. These are triage signals, not gro
 
 ### Best under 4 GB
 
-| Model                                     |   Peak GB |   Gen TPS |   Usefulness | Status              | Evidence                                                                                         |
-|-------------------------------------------|-----------|-----------|--------------|---------------------|--------------------------------------------------------------------------------------------------|
-| `mlx-community/MiniCPM-V-4.6-8bit`        |       3   |       267 |           92 | `clean-triage-pass` | The image shows two cats lying on a pink blanket, with remote controls nearby.                   |
-| `mlx-community/FastVLM-0.5B-bf16`         |       2.1 |       304 |           90 | `clean-triage-pass` | Two cats are sleeping on a pink couch next to two remote controls.                               |
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit` |       2.5 |       329 |           88 | `clean-triage-pass` | The image shows two cats lying on a pink blanket. One cat is on the left side, while the othe... |
+- No clean current-run candidates fit under this memory budget.
 
 ### Best under 8 GB
 
-| Model                                |   Peak GB |   Gen TPS |   Usefulness | Status              | Evidence                                                                                         |
-|--------------------------------------|-----------|-----------|--------------|---------------------|--------------------------------------------------------------------------------------------------|
-| `qnguyen3/nanoLLaVA`                 |       4.2 |     116   |           96 | `clean-triage-pass` | This image features two cats lying on a couch. One cat is a light brown and the other is a da... |
-| `mlx-community/GLM-4.6V-Flash-mxfp4` |       7.7 |      83.9 |           96 | `clean-triage-pass` | This image shows two tabby cats resting on a bright pink couch. One cat lies on its side, whi... |
-| `mlx-community/MiniCPM-V-4.6-8bit`   |       3   |     267   |           92 | `clean-triage-pass` | The image shows two cats lying on a pink blanket, with remote controls nearby.                   |
+| Model                                     |   Peak GB |   Gen TPS |   Usefulness | Status   | Evidence                                                                                         |
+|-------------------------------------------|-----------|-----------|--------------|----------|--------------------------------------------------------------------------------------------------|
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit` |       5.1 |       221 |           96 | `caveat` | [metadata-borrowing; context-budget; missing-sections] -001.jpg - Title: Deben Estuary, Woodb... |
 
 ### Fastest usable
 
-| Model                                     |   Peak GB |   Gen TPS |   Usefulness | Status              | Evidence                                                                                         |
-|-------------------------------------------|-----------|-----------|--------------|---------------------|--------------------------------------------------------------------------------------------------|
-| `LiquidAI/LFM2.5-VL-450M-MLX-bf16`        |       1   |       532 |           69 | `clean-triage-pass` | Two cats are laying on a pink couch.                                                             |
-| `mlx-community/nanoLLaVA-1.5-4bit`        |       1.9 |       374 |           77 | `clean-triage-pass` | The image shows a close-up view of two cats lying down on a pink fabric surface. Both cats ha... |
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit` |       2.5 |       329 |           88 | `clean-triage-pass` | The image shows two cats lying on a pink blanket. One cat is on the left side, while the othe... |
+| Model                                     |   Peak GB |   Gen TPS |   Usefulness | Status   | Evidence                                                                                         |
+|-------------------------------------------|-----------|-----------|--------------|----------|--------------------------------------------------------------------------------------------------|
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit` |       5.1 |     221   |           96 | `caveat` | [metadata-borrowing; context-budget; missing-sections] -001.jpg - Title: Deben Estuary, Woodb... |
+| `mlx-community/Qwen3.5-9B-MLX-4bit`       |      11   |      92.4 |           76 | `caveat` | [metadata-borrowing; context-budget] Title: Two moored sailboats in a river estuary ...          |
+| `mlx-community/Qwen3.5-35B-A3B-6bit`      |      35   |      92.2 |           82 | `caveat` | [metadata-borrowing; context-budget] Title: Two sailing boats moored on a river with trees be... |
 
 ### Quality if memory allows
 
-| Model                                |   Peak GB |   Gen TPS |   Usefulness | Status              | Evidence                                                                                         |
-|--------------------------------------|-----------|-----------|--------------|---------------------|--------------------------------------------------------------------------------------------------|
-| `qnguyen3/nanoLLaVA`                 |       4.2 |     116   |           96 | `clean-triage-pass` | This image features two cats lying on a couch. One cat is a light brown and the other is a da... |
-| `mlx-community/GLM-4.6V-Flash-mxfp4` |       7.7 |      83.9 |           96 | `clean-triage-pass` | This image shows two tabby cats resting on a bright pink couch. One cat lies on its side, whi... |
-| `mlx-community/Qwen3.5-35B-A3B-bf16` |      71   |      70.5 |           96 | `clean-triage-pass` | Two tabby cats are sprawled out asleep on a bright pink couch, nestled between two remote con... |
+| Model                                     |   Peak GB |   Gen TPS |   Usefulness | Status        | Evidence                                                                                         |
+|-------------------------------------------|-----------|-----------|--------------|---------------|--------------------------------------------------------------------------------------------------|
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit` |       5.1 |     221   |           96 | `caveat`      | [metadata-borrowing; context-budget; missing-sections] -001.jpg - Title: Deben Estuary, Woodb... |
+| `mlx-community/pixtral-12b-8bit`          |      16   |      39   |           89 | `caveat`      | [metadata-borrowing; context-budget] Title: Two Boats Moored on River ...                        |
+| `microsoft/Phi-3.5-vision-instruct`       |       9.5 |      57.7 |           86 | `recommended` | Title: Sailing Boats at Deben Estuary Description: Two sailing boats are moored on a river, s... |
 
 ### Current failures / avoid
 
-| Model                                          |   Peak GB |   Gen TPS |   Usefulness | Status   | Evidence                                                                                               |
-|------------------------------------------------|-----------|-----------|--------------|----------|--------------------------------------------------------------------------------------------------------|
-| `mlx-community/Qwen3-VL-2B-Thinking-bf16`      |       5.3 |    134    |           62 | `avoid`  | Special control token &lt;/think&gt; appeared in generated text. \| text-sanity=gibberish(token_noise) |
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit`      |      20   |     73.9  |           62 | `avoid`  | hit token cap (200) \| reasoning leak                                                                  |
-| `mlx-community/pixtral-12b-8bit`               |      15   |     39.5  |           62 | `avoid`  | hit token cap (200)                                                                                    |
-| `mlx-community/pixtral-12b-bf16`               |      27   |     20    |           62 | `avoid`  | hit token cap (200)                                                                                    |
-| `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16` |      39   |      4.64 |           62 | `avoid`  | hit token cap (200) \| reasoning leak                                                                  |
+| Model                                |   Peak GB |   Gen TPS |   Usefulness | Status   | Evidence                                                                                                                           |
+|--------------------------------------|-----------|-----------|--------------|----------|------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/LFM2-VL-1.6B-8bit`    |       3   |     325   |           96 | `avoid`  | missing terms: Bird, Boating, Buoy, Bushes, Coast \| nonvisual metadata reused                                                     |
+| `mlx-community/Molmo-7B-D-0924-bf16` |      48   |      27   |           96 | `avoid`  | missing sections: title, description, keywords \| missing terms: Bird, Boating, Buoy, Bushes, Foliage \| nonvisual metadata reused |
+| `mlx-community/Molmo-7B-D-0924-8bit` |      41   |      46.7 |           94 | `avoid`  | missing sections: title, description, keywords \| missing terms: Bird, Boating, Buoy, Bushes, Coast \| nonvisual metadata reused   |
+| `qnguyen3/nanoLLaVA`                 |       4.6 |     112   |           92 | `avoid`  | missing sections: keywords \| missing terms: Bird, Boating, Buoy, Bushes, Coast \| nonvisual metadata reused                       |
+| `mlx-community/InternVL3-14B-8bit`   |      18   |      31.4 |           90 | `avoid`  | missing terms: Bird, Bushes, Coast, Deben Estuary, Estuary                                                                         |
 
 ## Brief Caption Candidates
 
 Top 10 ranked candidates for brief captions. This is a selection aid, not the complete result set.
 
-| Model                                              |   Hygiene |   Usefulness |   Gen TPS |   Peak GB | Verdict   | Caption Preview                                                                                                                                                                     | Caveat             |
-|----------------------------------------------------|-----------|--------------|-----------|-----------|-----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|
-| `qnguyen3/nanoLLaVA`                               |       100 |           96 |     116   |       4.2 | `clean`   | This image features two cats lying on a couch. One cat is a light brown and the other is a dark brown. They both have green eyes and a black nose.                                  | no flagged signals |
-| `mlx-community/GLM-4.6V-Flash-mxfp4`               |       100 |           96 |      83.9 |       7.7 | `clean`   | This image shows two tabby cats resting on a bright pink couch. One cat lies on its side, while the other is curled w ... [tail] Two remote controls are also visible on the couch. | no flagged signals |
-| `mlx-community/Qwen3.5-35B-A3B-bf16`               |       100 |           96 |      70.5 |      71   | `clean`   | Two tabby cats are sprawled out asleep on a bright pink couch, nestled between two remote controls — one white and one gray — creating a cozy, domestic scene.                      | no flagged signals |
-| `mlx-community/Ornith-1.0-35B-bf16`                |       100 |           96 |      61.8 |      71   | `clean`   | Two tabby cats are sleeping peacefully on a bright pink couch, each nestled beside a remote control — one white, one ... [tail] cozy and slightly humorous scene of feline comfort. | no flagged signals |
-| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit` |       100 |           96 |      22.7 |      15   | `clean`   | The image shows two tabby cats lying on a pink blanket, with two remote controls placed on the couch behind them.                                                                   | no flagged signals |
-| `mlx-community/gemma-4-31b-it-4bit`                |       100 |           96 |      21   |      20   | `clean`   | Two tabby cats are sleeping on a bright pink blanket on a red couch, with two remote controls lying next to them.                                                                   | no flagged signals |
-| `mlx-community/Qwen3.5-27B-mxfp8`                  |       100 |           96 |      19.5 |      30   | `clean`   | Two tabby cats are sleeping peacefully on a bright pink couch. One cat is stretched out on its side, while the other ... [tail] Two remote controls lie on the couch between them.  | no flagged signals |
-| `mlx-community/gemma-4-26b-a4b-it-4bit`            |       100 |           93 |      62.6 |      17   | `clean`   | Two tabby cats are lying on a pink blanket on a red couch, with two remote controls nearby.                                                                                         | no flagged signals |
-| `mlx-community/diffusiongemma-26B-A4B-it-8bit`     |       100 |           93 |      27.5 |      29   | `clean`   | A high-angle shot shows two tabby cats sleeping on a pink blanket next to two remote controls.                                                                                      | no flagged signals |
-| `mlx-community/MiniCPM-V-4.6-8bit`                 |       100 |           92 |     267   |       3   | `clean`   | The image shows two cats lying on a pink blanket, with remote controls nearby.                                                                                                      | no flagged signals |
+| Model                                               |   Hygiene |   Usefulness |   Gen TPS |   Peak GB | Verdict          | Caption Preview                                                                                                                                                                      | Caveat                                                                                                                                    |
+|-----------------------------------------------------|-----------|--------------|-----------|-----------|------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
+| `microsoft/Phi-3.5-vision-instruct`                 |       100 |           86 |      57.7 |       9.5 | `clean`          | Title: Sailing Boats at Deben Estuary Description: Two sailing boats are moored on a river, surrounded by lush greene ... [tail] h one boat having a prominent mast and rigging. ... | missing terms: Bird, Boating, Buoy, Bushes, Coast                                                                                         |
+| `mlx-community/Phi-3.5-vision-instruct-bf16`        |       100 |           86 |      55.5 |       9.5 | `clean`          | Title: Sailing Boats at Deben Estuary Description: Two sailing boats are moored on a river, surrounded by lush greene ... [tail] h one boat having a prominent mast and rigging. ... | missing terms: Bird, Boating, Buoy, Bushes, Coast                                                                                         |
+| `mlx-community/Ornith-1.0-35B-bf16`                 |       100 |           79 |      60.9 |      76   | `clean`          | Title: Two sailboats moored on a river with a wooded bank Description: Two sailing boats with orange masts are moored ... [tail] oreground near the stern of the nearest vessel. ... | missing terms: Bird, Boating, Bushes, Coast, Deben Estuary                                                                                |
+| `mlx-community/Qwen3.6-27B-mxfp8`                   |       100 |           78 |      17.6 |      38   | `clean`          | Title: Two sailing boats moored on a river ...                                                                                                                                       | missing terms: Bird, Boating, Bushes, Coast, Deben Estuary                                                                                |
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit`           |        75 |           96 |     221   |       5.1 | `context_budget` | [metadata-borrowing; context-budget; missing-sections] -001.jpg - Title: Deben Estuary, Woodbridge, England, UK, GBR, Europe - Description: Two sailing boats moored on a river w... | output/prompt=0.26% \| nontext prompt burden=97% \| missing sections: keywords \| missing terms: Bird, Boating, Buoy, Bushes, Coast       |
+| `mlx-community/pixtral-12b-8bit`                    |        75 |           89 |      39   |      16   | `context_budget` | [metadata-borrowing; context-budget] Title: Two Boats Moored on River ...                                                                                                            | output/prompt=2.35% \| nontext prompt burden=87% \| missing terms: Bird, Buoy, Bushes, Coast, Deben Estuary \| nonvisual metadata reused  |
+| `mlx-community/Qwen3.5-35B-A3B-6bit`                |        75 |           82 |      92.2 |      35   | `context_budget` | [metadata-borrowing; context-budget] Title: Two sailing boats moored on a river with trees behind Description: Two sailing boats with tall masts are moored on a river, backed by... | output/prompt=0.59% \| nontext prompt burden=97% \| missing terms: Bird, Bushes, Coast, Peaceful, Woodbridge \| nonvisual metadata reused |
+| `mlx-community/Qwen3.5-35B-A3B-bf16`                |        75 |           81 |      64.6 |      76   | `context_budget` | [metadata-borrowing; context-budget] Title: Two sailing boats moored on a river with trees behind Description: Two sailing boats with tall masts are moored on a calm river, back... | output/prompt=0.61% \| nontext prompt burden=97% \| missing terms: Bird, Bushes, Coast, Peaceful, Woodbridge \| nonvisual metadata reused |
+| `mlx-community/GLM-4.6V-Flash-6bit`                 |        75 |           80 |      58.4 |      11   | `context_budget` | [context-budget; missing-sections] <\|begin_of_box\|>Title: Two sailing boats moored on water with trees behind ...                                                                  | output/prompt=1.41% \| nontext prompt burden=93% \| missing sections: title \| missing terms: Bird, Boating, Bushes, Coast, Deben Estuary |
+| `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4` |        75 |           78 |      61.8 |      13   | `context_budget` | [metadata-borrowing; context-budget] **Title:** Sailing Boat Moored on Deben Estuary ...                                                                                             | output/prompt=3.84% \| nontext prompt burden=86% \| missing terms: Bird, Boating, Bushes, Coast, Forest \| nonvisual metadata reused      |
 
 ## Structured Metadata Candidates
 
-Structured metadata scoring is suppressed in triage mode.
+Top 10 ranked candidates for structured title/description/keywords. Use the gallery for complete per-model evidence.
+
+| Model                                               |   Metadata agreement | Verdict          | Output Preview                                                                                                                                                                       |
+|-----------------------------------------------------|----------------------|------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `microsoft/Phi-3.5-vision-instruct`                 |                   26 | `clean`          | Title: Sailing Boats at Deben Estuary Description: Two sailing boats are moored on a river, surrounded by lush greene ... [tail] h one boat having a prominent mast and rigging. ... |
+| `mlx-community/Phi-3.5-vision-instruct-bf16`        |                   26 | `clean`          | Title: Sailing Boats at Deben Estuary Description: Two sailing boats are moored on a river, surrounded by lush greene ... [tail] h one boat having a prominent mast and rigging. ... |
+| `mlx-community/Ornith-1.0-35B-bf16`                 |                   25 | `clean`          | Title: Two sailboats moored on a river with a wooded bank Description: Two sailing boats with orange masts are moored ... [tail] oreground near the stern of the nearest vessel. ... |
+| `mlx-community/Qwen3.6-27B-mxfp8`                   |                   26 | `clean`          | Title: Two sailing boats moored on a river ...                                                                                                                                       |
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit`           |                    6 | `context_budget` | [metadata-borrowing; context-budget; missing-sections] -001.jpg - Title: Deben Estuary, Woodbridge, England, UK, GBR, Europe - Description: Two sailing boats moored on a river w... |
+| `mlx-community/pixtral-12b-8bit`                    |                   17 | `context_budget` | [metadata-borrowing; context-budget] Title: Two Boats Moored on River ...                                                                                                            |
+| `mlx-community/Qwen3.5-35B-A3B-6bit`                |                   12 | `context_budget` | [metadata-borrowing; context-budget] Title: Two sailing boats moored on a river with trees behind Description: Two sailing boats with tall masts are moored on a river, backed by... |
+| `mlx-community/Qwen3.5-35B-A3B-bf16`                |                   13 | `context_budget` | [metadata-borrowing; context-budget] Title: Two sailing boats moored on a river with trees behind Description: Two sailing boats with tall masts are moored on a calm river, back... |
+| `mlx-community/GLM-4.6V-Flash-6bit`                 |                   22 | `context_budget` | [context-budget; missing-sections] <\|begin_of_box\|>Title: Two sailing boats moored on water with trees behind ...                                                                  |
+| `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4` |                   18 | `context_budget` | [metadata-borrowing; context-budget] **Title:** Sailing Boat Moored on Deben Estuary ...                                                                                             |
