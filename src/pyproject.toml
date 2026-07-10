@@ -34,10 +34,9 @@ dependencies = [
     "mlx>=0.31.2",
     "mlx-lm>=0.31.3",
     "mlx-vlm>=0.6.2",
-    # Project-level compatibility window for the MLX ecosystem; transformers
-    # 5.13.0 rejects string auto-registration calls still used by local
-    # mlx-lm/mlx-vlm builds.
-    "transformers>=5.7.0,<5.13.0",
+    # Project-level compatibility floor for the MLX ecosystem; current
+    # mlx-lm GitHub main supports Transformers 5.13.0 and later.
+    "transformers>=5.7.0",
     "defusedxml>=0.7.1",
     "Pillow[xmp]>=12.2.0",
     "huggingface-hub[torch,typing]>=1.10.1",

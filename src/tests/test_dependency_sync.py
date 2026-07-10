@@ -264,6 +264,11 @@ def test_dependency_policy_tracks_current_upstream_transformers_floor() -> None:
     assert dependency_policy.UPSTREAM_MLX_LM_MINIMUMS["transformers"] == "5.7.0"
 
 
+def test_dependency_policy_does_not_cap_transformers() -> None:
+    """Transformers should retain its floor without an upper version bound."""
+    assert dependency_policy.PROJECT_TRANSFORMERS_VERSION_SPEC == ">=5.7.0"
+
+
 def test_ty_uses_generated_typings_search_path() -> None:
     """Ensure ty resolves repo-local generated stubs like mlx_vlm.*."""
     pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))

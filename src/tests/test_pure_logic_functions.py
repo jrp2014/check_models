@@ -1059,25 +1059,23 @@ class TestPreflightDependencyDiagnostics:
         assert any("transformers==5.3.9" in issue and "5.7.0" in issue for issue in issues)
         assert any("huggingface-hub==1.9.9" in issue and "1.10.1" in issue for issue in issues)
 
-    def test_detect_upstream_version_issues_reports_transformers_above_supported_cap(
+    def test_detect_upstream_version_issues_accepts_transformers_without_upper_cap(
         self,
         mod: types.ModuleType,
     ) -> None:
-        """Transformers releases beyond the MLX auto-registration contract should be surfaced."""
+        """Transformers releases above 5.12 should be accepted after the MLX fix."""
         issues = mod._detect_upstream_version_issues(
             {
                 "mlx-vlm": "0.6.3",
                 "mlx-lm": "0.31.3",
                 "mlx": "0.31.2",
+                "mlx-audio": "0.4.3",
                 "transformers": "5.13.0",
                 "huggingface-hub": "1.10.1",
             },
         )
 
-        assert any(
-            "transformers==5.13.0" in issue and mod.PROJECT_TRANSFORMERS_VERSION_SPEC in issue
-            for issue in issues
-        )
+        assert issues == []
 
     def test_get_callable_contract_issues_reports_keyword_drift(
         self,
