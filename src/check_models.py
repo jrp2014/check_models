@@ -3435,6 +3435,24 @@ class HTMLSelectiveEscaper:
         return self.tag_pattern.sub(_escape_html_like, text)
 
 
+def _escape_markdown_table_text(
+    text: str,
+    *,
+    collapse_breaks_at: int,
+    normalize_whitespace: bool,
+) -> str:
+    """Escape text for a Markdown table with a caller-selected whitespace policy."""
+    result = text.replace("\r\n", "<br>").replace("\r", "<br>").replace("\n", "<br>")
+    result = re.sub(rf"(<br>\s*){{{collapse_breaks_at},}}", "<br><br>", result)
+    if normalize_whitespace:
+        result = re.sub(r"\s+", " ", result).strip()
+    result = _wrap_bare_urls(result)
+    result = result.replace("|", "\\|")
+    result = HTML_ESCAPER.escape(result)
+    result = _escape_markdown_underscore_runs(result)
+    return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", result)
+
+
 class MarkdownPipeEscaper:
     """Markdown escaping for table pipe characters and formatting.
 
@@ -3449,35 +3467,17 @@ class MarkdownPipeEscaper:
         Converts newlines to <br> tags, wraps bare URLs, escapes pipes,
         and neutralizes HTML-like tags while preserving markdown formatting.
         """
-        # First, convert newlines to HTML <br> tags to preserve line structure
-        # Handle different newline formats consistently
-        result = text.replace("\r\n", "<br>").replace("\r", "<br>").replace("\n", "<br>")
-
-        # Clean up multiple consecutive <br> tags and normalize spacing
-        result = re.sub(r"(<br>\s*){2,}", "<br><br>", result)  # Max 2 consecutive breaks
-        result = re.sub(r"\s+", " ", result).strip()  # Normalize other whitespace
-
-        # Wrap bare URLs in angle brackets (MD034 compliance)
-        result = _wrap_bare_urls(result)
-
-        # Escape pipe characters (CRITICAL: breaks table structure)
-        result = result.replace("|", "\\|")
-
-        # Neutralize HTML-like tags using selective escaper
-        result = HTML_ESCAPER.escape(result)
-
-        # Escape underscore runs that would otherwise render as Markdown emphasis.
-        result = _escape_markdown_underscore_runs(result)
-
-        # Escape bare ampersands that could start entities
-        return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", result)
+        return _escape_markdown_table_text(
+            text,
+            collapse_breaks_at=2,
+            normalize_whitespace=True,
+        )
 
 
 class DiagnosticsEscaper:
     """Markdown escaping optimized for error/diagnostic messages.
 
-    Similar to MarkdownPipeEscaper but allows more consecutive line breaks
-    to preserve traceback formatting while still preventing table breakage.
+    Preserves diagnostic spacing while still preventing table breakage.
     """
 
     def escape(self, text: str) -> str:
@@ -3485,26 +3485,11 @@ class DiagnosticsEscaper:
 
         More lenient than standard escaping to preserve error message formatting.
         """
-        # Convert newlines to <br> but preserve more spacing for tracebacks
-        result = text.replace("\r\n", "<br>").replace("\r", "<br>").replace("\n", "<br>")
-
-        # Limit excessive consecutive <br> (allow 3 for traceback readability)
-        result = re.sub(r"(<br>\s*){3,}", "<br><br>", result)
-
-        # Wrap bare URLs in angle brackets
-        result = _wrap_bare_urls(result)
-
-        # Escape pipes (critical for table structure)
-        result = result.replace("|", "\\|")
-
-        # Neutralize HTML-like tags
-        result = HTML_ESCAPER.escape(result)
-
-        # Escape underscore runs that would otherwise render as Markdown emphasis.
-        result = _escape_markdown_underscore_runs(result)
-
-        # Escape bare ampersands
-        return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", result)
+        return _escape_markdown_table_text(
+            text,
+            collapse_breaks_at=3,
+            normalize_whitespace=False,
+        )
 
 
 # Instantiate default escapers for runtime use

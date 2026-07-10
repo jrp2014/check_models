@@ -7,6 +7,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Consolidate the regular and diagnostic Markdown table escaping pipeline while
+  preserving their distinct whitespace policies.
+- Bump the package version to `0.8.5` to establish the release baseline for
+  explicit triage, blind-cataloguing, and metadata-assisted evaluation lanes.
 - Correct Pillow XMP parsing and EXIF-oriented report previews; clarify runtime
   timing boundaries, prefer upstream generation finish reasons, standardize MLX
   allocator metrics on decimal GB, and surface model-specific Hugging Face cache

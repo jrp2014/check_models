@@ -50,6 +50,14 @@ def test_escape_markdown_in_text_whitespace() -> None:
     assert result == "a \\| b \\| c"
 
 
+def test_table_escapers_preserve_their_whitespace_policies() -> None:
+    """Regular tables normalize whitespace while diagnostics retain it."""
+    text = "alpha  \n\n beta|gamma"
+
+    assert check_models.MARKDOWN_ESCAPER.escape(text) == "alpha <br><br>beta\\|gamma"
+    assert check_models.DIAGNOSTICS_ESCAPER.escape(text) == "alpha  <br><br> beta\\|gamma"
+
+
 def test_format_failures_by_package_empty() -> None:
     """Should return empty list when no failures."""
     results = [
