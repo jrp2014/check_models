@@ -462,12 +462,13 @@ class TestModelCapabilityScorecard:
             },
             "system": {},
             "library_versions": {},
+            "eval_mode": "assisted",
         }
         report_context = _build_report_render_context(
             results=[result],
             prompt="Title: Brick storefront\nDescription: outdoor seating\nKeywords: storefront",
             metadata={"title": "Brick storefront", "description": "Outdoor seating"},
-            eval_mode="stress",
+            eval_mode="assisted",
         )
         markdown_path = tmp_path / "model_capabilities.md"
         json_path = tmp_path / "model_capabilities.json"
@@ -479,7 +480,13 @@ class TestModelCapabilityScorecard:
             prompt=report_context.prompt_context or "",
             metadata={"title": "Brick storefront", "description": "Outdoor seating"},
             report_context=report_context,
-            history_records=(history_record,),
+            history_records=(
+                history_record,
+                cast(
+                    "check_models.HistoryRunRecord",
+                    {**history_record, "eval_mode": "blind", "prompt_hash": "blind"},
+                ),
+            ),
         )
 
         markdown = markdown_path.read_text(encoding="utf-8")
@@ -492,6 +499,7 @@ class TestModelCapabilityScorecard:
         assert "caption+keywords" in markdown
         assert model_payload["model"] == "org/model-grounded"
         assert model_payload["runs"] == 2
+        assert payload["history_runs_considered"] == 1
         assert model_payload["success_rate"] == 100.0
         assert model_payload["metadata_alignment_avg"] > 70.0
         assert model_payload["recommendation"] == "caption+keywords"
@@ -805,12 +813,13 @@ def test_report_mode_policy_triage_without_metadata_is_ungrounded() -> None:
     assert policy.has_descriptive_metadata is False
     assert policy.semantic_rankings_grounded is False
     assert policy.suppress_cataloging_scores is True
-    assert policy.selection_basis == "ungrounded"
+    assert policy.selection_basis == "caption hygiene only"
+    assert policy.metadata_exposed_to_prompt is False
 
 
-def test_report_mode_policy_quality_with_metadata_is_grounded() -> None:
+def test_report_mode_policy_assisted_with_metadata_is_grounded() -> None:
     policy = check_models._build_report_mode_policy(
-        eval_mode="quality",
+        eval_mode="assisted",
         metadata={
             "title": "Two tabby cats resting",
             "description": "Two tabby cats on a pink couch with remotes.",
@@ -818,11 +827,24 @@ def test_report_mode_policy_quality_with_metadata_is_grounded() -> None:
         },
     )
 
-    assert policy.eval_mode == "quality"
+    assert policy.eval_mode == "assisted"
     assert policy.has_descriptive_metadata is True
     assert policy.semantic_rankings_grounded is True
     assert policy.suppress_cataloging_scores is False
-    assert policy.selection_basis == "trusted image metadata"
+    assert policy.selection_basis == "metadata-assisted visual verification"
+    assert policy.metadata_exposed_to_prompt is True
+
+
+def test_report_mode_policy_blind_keeps_metadata_held_out() -> None:
+    policy = check_models._build_report_mode_policy(
+        eval_mode="blind",
+        metadata={"description": "Held-out reference caption"},
+    )
+
+    assert policy.semantic_rankings_grounded is True
+    assert policy.suppress_cataloging_scores is False
+    assert policy.selection_basis == "held-out trusted image metadata"
+    assert policy.metadata_exposed_to_prompt is False
 
 
 def test_unflagged_models_section_marks_prompt_incomplete_analysis() -> None:
@@ -1002,7 +1024,8 @@ class TestHtmlReportEdgeCases:
 
         content = out.read_text(encoding="utf-8")
         assert "Run Contract" in content
-        assert "<b>Mode:</b> triage" in content
+        assert "<b>Evaluation lane:</b> triage" in content
+        assert "<b>Metadata exposed to prompt:</b> no" in content
         assert "<b>Semantic rankings:</b> ungrounded" in content
         assert "Cataloging Utility Summary" not in content
         assert "Best keywording" not in content
@@ -1606,7 +1629,8 @@ class TestMarkdownReportEdgeCases:
         assert "Quality Pattern Breakdown" not in content
         assert "## Caption Selection" in content
         assert "Semantic rankings: ungrounded" in content
-        assert "Mode: triage" in content
+        assert "Evaluation lane: triage" in content
+        assert "Metadata exposed to prompt: no" in content
 
     def test_model_selection_report_labels_triage_rankings_ungrounded(
         self,
@@ -1944,7 +1968,8 @@ class TestMarkdownReportEdgeCases:
         )
 
         content = out.read_text(encoding="utf-8")
-        assert "Semantic rankings: grounded (trusted image metadata)" in content
+        assert "Semantic rankings: grounded (metadata-assisted visual verification)" in content
+        assert "Metadata exposed to prompt: yes" in content
         assert "Structured Metadata Candidates" in content
         assert "Top 10 ranked candidates for structured title/description/keywords" in content
         assert "Metadata agreement" in content
@@ -3986,7 +4011,7 @@ class TestDiagnosticsReport:
         bundles = export_failure_repro_bundles(
             results=[failure],
             output_dir=tmp_path / "repro_bundles",
-            run_args=Namespace(),
+            run_args=Namespace(eval_mode="blind"),
             versions=_stub_versions(),
             system_info={"Python Version": "3.13"},
             prompt="Describe this image.",
@@ -3999,6 +4024,7 @@ class TestDiagnosticsReport:
         assert payload["model"] == "org/broken-model"
         assert payload["failure"]["stage"] == "Model Error"
         assert payload["repro"]["prompt_hash_sha256"]
+        assert payload["repro"]["eval_mode"] == "blind"
 
     def test_harness_repro_bundles_written_and_linked(self, tmp_path: Path) -> None:
         """Successful issue-clustered harness anomalies should get repro bundles."""

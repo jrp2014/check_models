@@ -1127,6 +1127,7 @@ class HistoryRunRecord(TypedDict, total=False):
     system: dict[str, str]
     library_versions: LibraryVersionDict
     runtime_fingerprint: dict[str, RuntimeProbeResult]
+    eval_mode: str
 
 
 class HistoryComparisonSummary(TypedDict):
@@ -1271,6 +1272,8 @@ class JsonlMetadataRecord(TypedDict, total=False):
     timestamp: Required[str]
     library_versions: LibraryVersionDict
     runtime_fingerprint: dict[str, RuntimeProbeResult]
+    eval_mode: str
+    metadata_exposed_to_prompt: bool
 
 
 class JsonlRerunSummary(TypedDict, total=False):
@@ -9412,15 +9415,25 @@ def _build_report_mode_policy(
 ) -> ReportModePolicy:
     """Return mode-aware report rules for human and machine artifacts."""
     has_descriptive_metadata = _metadata_has_descriptive_reference(metadata)
-    semantic_rankings_grounded = has_descriptive_metadata
-    suppress_cataloging_scores = eval_mode == "triage"
-    selection_basis = "trusted image metadata" if semantic_rankings_grounded else "ungrounded"
+    resolved_eval_mode = _resolve_eval_mode(eval_mode, metadata)
+    metadata_exposed_to_prompt = resolved_eval_mode == "assisted"
+    suppress_cataloging_scores = resolved_eval_mode == "triage"
+    semantic_rankings_grounded = has_descriptive_metadata and not suppress_cataloging_scores
+    if suppress_cataloging_scores:
+        selection_basis = "caption hygiene only"
+    elif resolved_eval_mode == "assisted":
+        selection_basis = "metadata-assisted visual verification"
+    elif semantic_rankings_grounded:
+        selection_basis = "held-out trusted image metadata"
+    else:
+        selection_basis = "ungrounded visual/cataloguing heuristics"
     return ReportModePolicy(
-        eval_mode=eval_mode,
+        eval_mode=resolved_eval_mode,
         has_descriptive_metadata=has_descriptive_metadata,
         semantic_rankings_grounded=semantic_rankings_grounded,
         suppress_cataloging_scores=suppress_cataloging_scores,
         selection_basis=selection_basis,
+        metadata_exposed_to_prompt=metadata_exposed_to_prompt,
     )
 
 
@@ -10788,7 +10801,9 @@ def _format_run_contract_parts(
         return [
             "<h3>Run Contract</h3>",
             "<ul>",
-            f"<li><b>Mode:</b> {html.escape(policy.eval_mode)}</li>",
+            f"<li><b>Evaluation lane:</b> {html.escape(policy.eval_mode)}</li>",
+            "<li><b>Metadata exposed to prompt:</b> "
+            f"{'yes' if policy.metadata_exposed_to_prompt else 'no'}</li>",
             f"<li><b>Semantic rankings:</b> {html.escape(semantic_rankings)}</li>",
             f"<li><b>Primary selection tasks:</b> {html.escape(primary_selection_tasks)}</li>",
             "</ul>",
@@ -10796,7 +10811,10 @@ def _format_run_contract_parts(
 
     parts: list[str] = []
     _append_markdown_section(parts, title="## Run Contract")
-    parts.append(f"- Mode: {policy.eval_mode}")
+    parts.append(f"- Evaluation lane: {policy.eval_mode}")
+    parts.append(
+        f"- Metadata exposed to prompt: {'yes' if policy.metadata_exposed_to_prompt else 'no'}"
+    )
     parts.append(f"- Semantic rankings: {semantic_rankings}")
     parts.append(f"- Primary selection tasks: {primary_selection_tasks}")
     parts.append("")
@@ -12810,6 +12828,7 @@ class ReportModePolicy:
     semantic_rankings_grounded: bool
     suppress_cataloging_scores: bool
     selection_basis: str
+    metadata_exposed_to_prompt: bool
 
 
 def _default_report_mode_policy() -> ReportModePolicy:
@@ -16006,6 +16025,10 @@ def export_failure_repro_bundles(
         )
         repro_payload: dict[str, object] = {
             "rerun_command": rerun_command,
+            "eval_mode": _resolve_eval_mode(
+                str(serialized_args.get("eval_mode", DEFAULT_EVAL_MODE)),
+                None,
+            ),
             "seed": serialized_args.get("seed"),
             "prompt_hash_sha256": prompt_hash,
             "prompt_preview": _build_prompt_preview(prompt, max_chars=400),
@@ -16252,6 +16275,9 @@ def generate_diagnostics_report(
     current_history = history.current_history if history is not None else None
 
     history_records = _load_history_run_records(history_path)
+    current_eval_mode = current_history.get("eval_mode") if current_history is not None else None
+    if isinstance(current_eval_mode, str):
+        history_records = _history_records_for_eval_mode(history_records, current_eval_mode)
     failed_models = {r.model_name for r in failed}
     comparison: HistoryComparisonSummary | None = None
     if current_history is not None:
@@ -17721,7 +17747,8 @@ def generate_model_selection_report(
         "",
         _markdown_generated_stamp(),
         "",
-        f"- Mode: {MARKDOWN_ESCAPER.escape(policy.eval_mode)}",
+        f"- Evaluation lane: {MARKDOWN_ESCAPER.escape(policy.eval_mode)}",
+        f"- Metadata exposed to prompt: {'yes' if policy.metadata_exposed_to_prompt else 'no'}",
         (f"- Semantic rankings: {grounding} ({MARKDOWN_ESCAPER.escape(policy.selection_basis)})"),
         (
             "- Primary use cases: brief captions only in triage mode; structured "
@@ -18016,7 +18043,11 @@ def _collect_model_capability_signals(
     """Collect current and historical capability observations by model."""
     utility_by_model = {row.result.model_name: row for row in report_context.triage.utility_rows}
     signals_by_model: dict[str, list[ModelCapabilityRunSignal]] = {}
-    for record in history_records:
+    lane_history_records = _history_records_for_eval_mode(
+        history_records,
+        report_context.mode_policy.eval_mode,
+    )
+    for record in lane_history_records:
         for model, info in _history_model_results(record).items():
             signals_by_model.setdefault(model, []).append(
                 _capability_signal_from_history(model, info)
@@ -18231,9 +18262,13 @@ def generate_model_capability_scorecard(
             metadata=metadata,
         )
 
+    lane_history_records = _history_records_for_eval_mode(
+        history_records,
+        report_context.mode_policy.eval_mode,
+    )
     rows = _build_model_capability_rows(
         report_context=report_context,
-        history_records=history_records,
+        history_records=lane_history_records,
     )
     policy = report_context.mode_policy
     grounding = (
@@ -18241,13 +18276,14 @@ def generate_model_capability_scorecard(
         if policy.semantic_rankings_grounded
         else "not grounded; caption hygiene only"
     )
-    prior_runs = len(history_records)
+    prior_runs = len(lane_history_records)
     md = [
         "# Model Capability Scorecard",
         "",
         _markdown_generated_stamp(),
         "",
-        f"- Mode: {MARKDOWN_ESCAPER.escape(policy.eval_mode)}",
+        f"- Evaluation lane: {MARKDOWN_ESCAPER.escape(policy.eval_mode)}",
+        f"- Metadata exposed to prompt: {'yes' if policy.metadata_exposed_to_prompt else 'no'}",
         f"- Grounding: {grounding}",
         f"- Coverage: current run plus {prior_runs} prior history run(s).",
         "",
@@ -18296,6 +18332,7 @@ def generate_model_capability_scorecard(
         "schema_version": "1.0",
         "generated_at": local_now_str(),
         "eval_mode": policy.eval_mode,
+        "metadata_exposed_to_prompt": policy.metadata_exposed_to_prompt,
         "grounding": grounding,
         "has_descriptive_metadata": policy.has_descriptive_metadata,
         "current_models": len(report_context.result_set.results),
@@ -22017,16 +22054,11 @@ def handle_metadata(image_path: Path, args: argparse.Namespace) -> MetadataDict:
     return metadata
 
 
-def _metadata_has_eval_context(metadata: Mapping[str, str | None] | None) -> bool:
-    """Return whether extracted image metadata is useful for stress-mode evaluation."""
-    return _metadata_has_descriptive_reference(metadata)
-
-
 def _resolve_eval_mode(eval_mode: str, metadata: Mapping[str, str | None] | None) -> str:
-    """Resolve the metadata-aware automatic eval mode to a concrete lane."""
-    if eval_mode != DEFAULT_EVAL_MODE:
+    """Resolve automatic and legacy aliases to one concrete evaluation lane."""
+    if eval_mode not in {DEFAULT_EVAL_MODE, "stress", "quality"}:
         return eval_mode
-    return "stress" if _metadata_has_eval_context(metadata) else "triage"
+    return "assisted" if _metadata_has_descriptive_reference(metadata) else "blind"
 
 
 def _apply_eval_mode_defaults(
@@ -22035,14 +22067,23 @@ def _apply_eval_mode_defaults(
 ) -> None:
     """Apply metadata-aware eval-mode and token-cap defaults to parsed CLI args."""
     requested_eval_mode = str(getattr(args, "eval_mode", DEFAULT_EVAL_MODE))
+    if requested_eval_mode == "assisted" and not _metadata_has_descriptive_reference(metadata):
+        msg = "The assisted evaluation lane requires descriptive metadata."
+        raise ValueError(msg)
     resolved_eval_mode = _resolve_eval_mode(requested_eval_mode, metadata)
     if requested_eval_mode == DEFAULT_EVAL_MODE:
         reason = (
             "descriptive image metadata found"
-            if resolved_eval_mode == "stress"
+            if resolved_eval_mode == "assisted"
             else "no descriptive image metadata found"
         )
         logger.info("Auto eval mode selected '%s' (%s).", resolved_eval_mode, reason)
+    elif requested_eval_mode in {"stress", "quality"}:
+        logger.warning(
+            "Evaluation mode '%s' is a deprecated alias; using the '%s' lane.",
+            requested_eval_mode,
+            resolved_eval_mode,
+        )
     args.eval_mode = resolved_eval_mode
 
     max_tokens = getattr(args, "max_tokens", DEFAULT_MAX_TOKENS)
@@ -22050,7 +22091,7 @@ def _apply_eval_mode_defaults(
         return
     if resolved_eval_mode == "triage":
         args.max_tokens = TRIAGE_MAX_TOKENS
-    elif resolved_eval_mode == "quality":
+    elif requested_eval_mode == "quality":
         args.max_tokens = QUALITY_MAX_TOKENS
 
 
@@ -22083,7 +22124,11 @@ def _summarize_prompt_keywords(raw_keywords: str) -> str:
     return ", ".join(deduped_items)
 
 
-def _build_cataloguing_prompt(metadata: MetadataDict) -> str:
+def _build_cataloguing_prompt(
+    metadata: MetadataDict,
+    *,
+    include_metadata_hints: bool = True,
+) -> str:
     """Build a structured prompt optimised for stock-photo cataloguing.
 
     Keeps instructions concise while preserving metadata grounding from
@@ -22103,6 +22148,9 @@ def _build_cataloguing_prompt(metadata: MetadataDict) -> str:
             "Treat the metadata hints below as a draft catalog record. Keep only details "
             "that are clearly confirmed by the image, correct anything contradicted by "
             "the image, and add important visible details that are definitely present."
+            if include_metadata_hints
+            else "No existing catalog metadata is supplied. Base every field only on visual "
+            "evidence in the image."
         ),
         "",
         "Return exactly these three sections, and nothing else:",
@@ -22130,8 +22178,16 @@ def _build_cataloguing_prompt(metadata: MetadataDict) -> str:
         "",
         "Rules:",
         "- Include only details that are definitely visible in the image.",
-        "- Reuse metadata terms only when they are clearly supported by the image.",
-        "- If metadata and image disagree, follow the image.",
+        (
+            "- Reuse metadata terms only when they are clearly supported by the image."
+            if include_metadata_hints
+            else "- Do not infer or import metadata that is not visible in the image."
+        ),
+        *(
+            ["- If metadata and image disagree, follow the image."]
+            if include_metadata_hints
+            else []
+        ),
         "- Prefer omission to speculation.",
         "- Do not copy prompt instructions into the Title, Description, or Keywords fields.",
         (
@@ -22142,9 +22198,9 @@ def _build_cataloguing_prompt(metadata: MetadataDict) -> str:
     ]
 
     # --- Context block (uses the "Context:" marker for quality analysis) ---
-    desc = metadata.get("description")
-    title = metadata.get("title")
-    existing_kw = metadata.get("keywords")
+    desc = metadata.get("description") if include_metadata_hints else None
+    title = metadata.get("title") if include_metadata_hints else None
+    existing_kw = metadata.get("keywords") if include_metadata_hints else None
     has_context = desc or title or existing_kw
     if has_context:
         parts.append("")
@@ -22166,9 +22222,9 @@ def _build_cataloguing_prompt(metadata: MetadataDict) -> str:
                 parts.append(f"- Keyword hints: {keyword_hint}")
 
     # Date / time / GPS metadata
-    date_val = metadata.get("date")
-    time_val = metadata.get("time")
-    gps_val = metadata.get("gps")
+    date_val = metadata.get("date") if include_metadata_hints else None
+    time_val = metadata.get("time") if include_metadata_hints else None
+    gps_val = metadata.get("gps") if include_metadata_hints else None
     if date_val or gps_val:
         meta_fragments: list[str] = []
         if date_val:
@@ -22206,9 +22262,13 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
         prompt = "Describe this image briefly."
         logger.info("Using triage-mode prompt (minimal context).")
     else:
-        logger.info("Generating default prompt based on image metadata.")
-        prompt = _build_cataloguing_prompt(metadata)
-        logger.debug("Using generated prompt based on metadata.")
+        include_metadata_hints = eval_mode == "assisted"
+        logger.info("Generating default prompt for the '%s' evaluation lane.", eval_mode)
+        prompt = _build_cataloguing_prompt(
+            metadata if include_metadata_hints else {},
+            include_metadata_hints=include_metadata_hints,
+        )
+        logger.debug("Using generated %s-lane prompt.", eval_mode)
         logger.info(
             "Final prompt: %s",
             _build_prompt_preview(prompt, max_chars=max_display_len),
@@ -24332,6 +24392,14 @@ def _load_history_run_records(
     return records
 
 
+def _history_records_for_eval_mode(
+    records: Sequence[HistoryRunRecord],
+    eval_mode: str,
+) -> list[HistoryRunRecord]:
+    """Return records for one resolved lane, excluding unlabelled legacy rows."""
+    return [record for record in records if record.get("eval_mode") == eval_mode]
+
+
 def _history_bucket_rank(bucket: object) -> int:
     """Return severity rank for history user-bucket comparisons."""
     if not isinstance(bucket, str):
@@ -24746,6 +24814,7 @@ def _build_history_run_record(
     library_versions: LibraryVersionDict,
     image_path: Path | None,
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
+    eval_mode: str = DEFAULT_EVAL_MODE,
 ) -> HistoryRunRecord:
     """Build typed run-history record payload prior to append."""
     prompt_hash = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
@@ -24763,6 +24832,7 @@ def _build_history_run_record(
         "model_results": model_results,
         "system": system_info,
         "library_versions": library_versions,
+        "eval_mode": _resolve_eval_mode(eval_mode, None),
     }
     if runtime_fingerprint is not None:
         record["runtime_fingerprint"] = runtime_fingerprint
@@ -24778,6 +24848,7 @@ def append_history_record(
     library_versions: LibraryVersionDict,
     image_path: Path | None = None,
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
+    eval_mode: str = DEFAULT_EVAL_MODE,
 ) -> HistoryRunRecord:
     """Append a per-run history record for tracking regressions/recoveries."""
     record = _build_history_run_record(
@@ -24787,6 +24858,7 @@ def append_history_record(
         library_versions=library_versions,
         image_path=image_path,
         runtime_fingerprint=runtime_fingerprint,
+        eval_mode=eval_mode,
     )
 
     try:
@@ -24803,14 +24875,21 @@ def _build_jsonl_metadata_record(
     system_info: dict[str, str],
     library_versions: LibraryVersionDict | None = None,
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
+    eval_mode: str = DEFAULT_EVAL_MODE,
+    metadata_exposed_to_prompt: bool = False,
 ) -> JsonlMetadataRecord:
     """Build shared metadata header row for JSONL results."""
+    resolved_eval_mode = _resolve_eval_mode(eval_mode, None)
     record: JsonlMetadataRecord = {
         "_type": "metadata",
         "format_version": "2.0",
         "prompt": prompt,
         "system": system_info,
         "timestamp": local_now_str(),
+        "eval_mode": resolved_eval_mode,
+        "metadata_exposed_to_prompt": (
+            metadata_exposed_to_prompt and resolved_eval_mode == "assisted"
+        ),
     }
     if library_versions is not None:
         record["library_versions"] = library_versions
@@ -24988,6 +25067,8 @@ def save_jsonl_report(
     *,
     library_versions: LibraryVersionDict | None = None,
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
+    eval_mode: str = DEFAULT_EVAL_MODE,
+    metadata_exposed_to_prompt: bool = False,
 ) -> None:
     """Save results to a JSONL file for programmatic analysis and AI issue generation.
 
@@ -25012,6 +25093,8 @@ def save_jsonl_report(
             system_info=system_info,
             library_versions=library_versions,
             runtime_fingerprint=runtime_fingerprint,
+            eval_mode=eval_mode,
+            metadata_exposed_to_prompt=metadata_exposed_to_prompt,
         )
         lines = [json.dumps(header)]
 
@@ -25063,6 +25146,7 @@ def save_run_json_report(
         "semantic_rankings_grounded": policy.semantic_rankings_grounded,
         "selection_basis": policy.selection_basis,
         "has_descriptive_metadata": policy.has_descriptive_metadata,
+        "metadata_exposed_to_prompt": policy.metadata_exposed_to_prompt,
         "total_runtime_seconds": round(total_runtime_seconds, 3),
         "counts": counts,
         "artifacts": artifacts,
@@ -25104,7 +25188,8 @@ def generate_output_index_report(
         "",
         "## Run Snapshot",
         "",
-        f"- Mode: {MARKDOWN_ESCAPER.escape(policy.eval_mode)}",
+        f"- Evaluation lane: {MARKDOWN_ESCAPER.escape(policy.eval_mode)}",
+        f"- Metadata exposed to prompt: {'yes' if policy.metadata_exposed_to_prompt else 'no'}",
         (
             "- Selection basis: "
             f"{MARKDOWN_ESCAPER.escape(policy.selection_basis)}"
@@ -27099,6 +27184,10 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
                 system_info=inputs.system_info,
                 library_versions=inputs.library_versions,
                 runtime_fingerprint=inputs.runtime_fingerprint,
+                eval_mode=inputs.report_context.mode_policy.eval_mode,
+                metadata_exposed_to_prompt=(
+                    inputs.report_context.mode_policy.metadata_exposed_to_prompt
+                ),
             ),
         ),
         ReportArtifact(
@@ -27504,8 +27593,14 @@ def finalize_execution(
         # Prepare output paths
         output_paths = _resolve_report_output_paths(args)
         history_path = _history_path_for_jsonl(output_paths.jsonl)
-        previous_history = _load_latest_history_record(history_path)
-        history_records_before_current = _load_history_run_records(history_path)
+        eval_mode = report_context.mode_policy.eval_mode
+        history_records_before_current = _history_records_for_eval_mode(
+            _load_history_run_records(history_path),
+            eval_mode,
+        )
+        previous_history = (
+            history_records_before_current[-1] if history_records_before_current else None
+        )
 
         for output_path in (
             output_paths.html,
@@ -27530,11 +27625,15 @@ def finalize_execution(
             library_versions=library_versions,
             image_path=image_path,
             runtime_fingerprint=runtime_fingerprint,
+            eval_mode=eval_mode,
         )
 
         log_file_path(history_path, label="   History:     ")
 
-        history_records = _load_history_run_records(history_path)
+        history_records = _history_records_for_eval_mode(
+            _load_history_run_records(history_path),
+            eval_mode,
+        )
         _log_history_comparison(previous_history, current_history, history_records[:-1])
 
         # Generate diagnostics report after history append so regression/retry
@@ -28066,14 +28165,22 @@ def _add_model_prompt_generation_arguments(parser: argparse.ArgumentParser) -> N
     generation_group = parser.add_argument_group("Generation Controls")
     generation_group.add_argument(
         "--eval-mode",
-        choices=[DEFAULT_EVAL_MODE, "stress", "triage", "quality"],
+        choices=[
+            DEFAULT_EVAL_MODE,
+            "triage",
+            "blind",
+            "assisted",
+            "stress",
+            "quality",
+        ],
         default=DEFAULT_EVAL_MODE,
         help=(
-            "Evaluation lane: 'auto' (default) uses 'stress' when extracted image metadata "
-            "is available and 'triage' otherwise; 'stress' = full cataloguing prompt with "
-            "metadata, 500 token cap; 'triage' = short prompt, minimal context, 200 token cap, "
-            "pass/fail only; 'quality' = cataloguing prompt with generous 1000 token cap, "
-            "scored on output quality."
+            "Evaluation lane: 'auto' (default) selects 'assisted' when descriptive metadata "
+            "is available and 'blind' otherwise; 'triage' = brief compatibility caption, "
+            "200 tokens; 'blind' = structured cataloguing without metadata hints, 500 tokens; "
+            "'assisted' = structured cataloguing with metadata hints, 500 tokens. Deprecated "
+            "'stress' and 'quality' inputs are aliases, not separate lanes; 'quality' retains "
+            "its 1000-token default."
         ),
     )
     generation_group.add_argument(

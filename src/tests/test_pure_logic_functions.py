@@ -340,8 +340,12 @@ class TestPreparePrompt:
     """Tests for prepare_prompt()."""
 
     @staticmethod
-    def _make_args(prompt: str | None = None) -> argparse.Namespace:
-        return argparse.Namespace(prompt=prompt)
+    def _make_args(
+        prompt: str | None = None,
+        *,
+        eval_mode: str = "auto",
+    ) -> argparse.Namespace:
+        return argparse.Namespace(prompt=prompt, eval_mode=eval_mode)
 
     def test_user_provided_prompt(self, mod: types.ModuleType) -> None:
         """User-provided prompt should be returned verbatim."""
@@ -377,14 +381,53 @@ class TestPreparePrompt:
         assert "18:30" in result
         assert "51.0N, 0.9W" in result
 
-    def test_generated_prompt_empty_metadata_uses_triage_prompt(
+    def test_generated_prompt_empty_metadata_uses_blind_cataloguing_prompt(
         self,
         mod: types.ModuleType,
     ) -> None:
-        """Auto eval mode should use the brief triage prompt when metadata is empty."""
+        """Auto mode should benchmark structured cataloguing without metadata leakage."""
         args = self._make_args()
         result = mod.prepare_prompt(args, {})
-        assert result == "Describe this image briefly."
+        assert "Return exactly these three sections" in result
+        assert "Title:" in result
+        assert "Keywords:" in result
+        assert "metadata hints" not in result.casefold()
+        assert "Context:" not in result
+
+    def test_blind_prompt_withholds_available_metadata(self, mod: types.ModuleType) -> None:
+        """Blind lane should not expose descriptive or capture metadata to the model."""
+        args = self._make_args(eval_mode="blind")
+        result = mod.prepare_prompt(
+            args,
+            {
+                "title": "Private reference title",
+                "description": "Private reference description",
+                "keywords": "private, reference",
+                "date": "2026-07-10",
+                "gps": "51.5,-0.1",
+            },
+        )
+
+        assert "Private reference" not in result
+        assert "2026-07-10" not in result
+        assert "51.5,-0.1" not in result
+        assert "Context:" not in result
+
+    def test_assisted_prompt_exposes_descriptive_metadata(self, mod: types.ModuleType) -> None:
+        """Assisted lane should expose reference metadata for visual verification."""
+        args = self._make_args(eval_mode="assisted")
+        result = mod.prepare_prompt(
+            args,
+            {
+                "title": "Brick storefront",
+                "description": "Outdoor seating beside a pavement.",
+                "keywords": "brick, storefront, seating",
+            },
+        )
+
+        assert "Context: Existing metadata hints" in result
+        assert "Brick storefront" in result
+        assert "Outdoor seating" in result
 
 
 class TestQualityIssueTruncation:

@@ -396,8 +396,8 @@ class TestCliArgumentNormalization:
         assert args.output_model_capabilities_json == model_capabilities_json
         assert args.output_run_json == run_json
 
-    def test_auto_eval_mode_uses_stress_defaults_when_descriptive_metadata_exists(self) -> None:
-        """Auto mode should use the cataloguing stress lane for descriptive metadata."""
+    def test_auto_eval_mode_uses_assisted_lane_when_descriptive_metadata_exists(self) -> None:
+        """Auto mode should use metadata-assisted cataloguing when references exist."""
         args = self._build_args(
             eval_mode="auto",
             max_tokens=check_models.DEFAULT_MAX_TOKENS,
@@ -413,11 +413,11 @@ class TestCliArgumentNormalization:
             },
         )
 
-        assert args.eval_mode == "stress"
+        assert args.eval_mode == "assisted"
         assert args.max_tokens == check_models.DEFAULT_MAX_TOKENS
 
-    def test_auto_eval_mode_uses_triage_defaults_with_capture_metadata_only(self) -> None:
-        """Auto mode should ignore capture-only metadata for semantic ranking mode."""
+    def test_auto_eval_mode_uses_blind_lane_with_capture_metadata_only(self) -> None:
+        """Auto mode should withhold capture-only metadata in the blind lane."""
         args = self._build_args(
             eval_mode="auto",
             max_tokens=check_models.DEFAULT_MAX_TOKENS,
@@ -433,11 +433,11 @@ class TestCliArgumentNormalization:
             },
         )
 
-        assert args.eval_mode == "triage"
-        assert args.max_tokens == check_models.TRIAGE_MAX_TOKENS
+        assert args.eval_mode == "blind"
+        assert args.max_tokens == check_models.DEFAULT_MAX_TOKENS
 
-    def test_auto_eval_mode_uses_triage_defaults_without_metadata(self) -> None:
-        """Auto mode should avoid the metadata stress lane when no usable metadata exists."""
+    def test_auto_eval_mode_uses_blind_lane_without_metadata(self) -> None:
+        """Auto mode should run the structured blind benchmark without references."""
         args = self._build_args(
             eval_mode="auto",
             max_tokens=check_models.DEFAULT_MAX_TOKENS,
@@ -456,8 +456,8 @@ class TestCliArgumentNormalization:
             },
         )
 
-        assert args.eval_mode == "triage"
-        assert args.max_tokens == check_models.TRIAGE_MAX_TOKENS
+        assert args.eval_mode == "blind"
+        assert args.max_tokens == check_models.DEFAULT_MAX_TOKENS
 
     def test_auto_eval_mode_preserves_custom_token_cap_without_metadata(self) -> None:
         """Metadata-aware defaults should not overwrite an already-custom token cap."""
@@ -465,5 +465,42 @@ class TestCliArgumentNormalization:
 
         check_models._apply_eval_mode_defaults(args, {})
 
-        assert args.eval_mode == "triage"
+        assert args.eval_mode == "blind"
         assert args.max_tokens == 321
+
+    def test_explicit_assisted_lane_requires_descriptive_metadata(self) -> None:
+        """Assisted selection should fail instead of silently becoming a blind run."""
+        args = self._build_args(
+            eval_mode="assisted",
+            max_tokens=check_models.DEFAULT_MAX_TOKENS,
+        )
+
+        with pytest.raises(ValueError, match=r"assisted.*descriptive metadata"):
+            check_models._apply_eval_mode_defaults(args, {})
+
+    def test_legacy_quality_mode_maps_to_assisted_with_quality_budget(self) -> None:
+        """The quality alias should retain its token budget while recording the new lane."""
+        args = self._build_args(
+            eval_mode="quality",
+            max_tokens=check_models.DEFAULT_MAX_TOKENS,
+        )
+
+        check_models._apply_eval_mode_defaults(args, {"description": "Reference caption"})
+
+        assert args.eval_mode == "assisted"
+        assert args.max_tokens == check_models.QUALITY_MAX_TOKENS
+
+    @pytest.mark.parametrize("legacy_mode", ["stress", "quality"])
+    def test_legacy_modes_map_to_blind_without_descriptive_metadata(
+        self,
+        legacy_mode: str,
+    ) -> None:
+        """Legacy inputs should remain aliases and never become persisted lanes."""
+        args = self._build_args(
+            eval_mode=legacy_mode,
+            max_tokens=check_models.DEFAULT_MAX_TOKENS,
+        )
+
+        check_models._apply_eval_mode_defaults(args, {"date": "2026-07-10"})
+
+        assert args.eval_mode == "blind"

@@ -936,6 +936,31 @@ from check_models import (
 See module docstrings and `__all__` exports for complete API reference.
 
 
+## Evaluation lanes
+
+Each invocation runs exactly one resolved evaluation lane. Reports, JSONL headers,
+run metadata, repro bundles, and history rows record that resolved lane, and
+historical comparisons never combine observations from different lanes.
+
+| Lane | Prompt input | Default token cap | Intended use |
+| ---- | ------------ | ----------------- | ------------ |
+| `triage` | Image only; brief caption request | 200 | Fast MLX-VLM compatibility and output-hygiene check. Structured cataloguing scores are suppressed. |
+| `blind` | Image only; structured title, description, and keywords request | 500 | Measures unaided visual cataloguing. Existing metadata, including EXIF capture date and GPS, is withheld from the model; descriptive metadata may still be used after generation as held-out scoring evidence. |
+| `assisted` | Image plus descriptive title, description, or keyword hints | 500 | Measures metadata-assisted visual verification and correction. Explicit selection requires descriptive metadata. |
+
+`--eval-mode auto` selects `assisted` when descriptive title, description, or
+keywords are available and `blind` otherwise. `stress` and `quality` remain
+deprecated input aliases for compatibility, not additional lanes: both resolve
+to `assisted` or `blind`; `quality` retains its 1000-token default.
+
+```bash
+# Compare models without exposing any existing metadata to them
+python -m check_models --image photo.jpg --eval-mode blind
+
+# Verify and improve existing descriptive metadata
+python -m check_models --image photo.jpg --eval-mode assisted
+```
+
 ## Command Line Reference
 
 | Flag | Type | Default | Description |
@@ -970,7 +995,7 @@ See module docstrings and `__all__` exports for complete API reference.
 | `--thinking-start-token` | str | (none) | Token marking the start of a thinking block, such as `<think>`. |
 | `--thinking-end-token` | str | `</think>` | Token marking the end of a thinking block when thinking mode is enabled. |
 | `-d`, `--detailed-metrics` | flag | `False` | Show expanded multi-line metrics block, including phase timings and stop reason when available; ignored unless `--verbose` is also set. |
-| `--eval-mode` | str | `auto` | Evaluation lane: `auto` (default) selects `stress` when extracted image metadata is available and `triage` otherwise; `stress` = full cataloguing prompt, 500 token cap; `triage` = short prompt, 200 token cap, pass/fail only; `quality` = cataloguing prompt with generous 1000 token cap. |
+| `--eval-mode` | str | `auto` | One resolved lane per run: `auto` selects `assisted` when descriptive metadata exists and `blind` otherwise; `triage` requests a brief compatibility caption; `blind` requests structured cataloguing without metadata hints; `assisted` supplies descriptive metadata for visual verification. Deprecated `stress`/`quality` inputs resolve as aliases, not separate lanes. |
 | `-x`, `--max-tokens` | int | 500 | Max new tokens to generate. |
 | `-t`, `--temperature` | float | 0.0 | Sampling temperature. |
 | `--top-p` | float | 1.0 | Nucleus sampling parameter (0.0-1.0); lower = more focused. |

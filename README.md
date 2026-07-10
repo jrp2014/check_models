@@ -44,6 +44,8 @@ Expected outputs (default location: src/output/):
 - Batch run multiple models against an image.
 - Standardized metrics + rich reports for easy comparison and qualitative review.
 - Robust error handling and metadata-aware prompts.
+- Explicit `triage`, metadata-blind, and metadata-assisted evaluation lanes,
+  with lane-isolated history and capability comparisons.
 
 ## Documentation (full details)
 

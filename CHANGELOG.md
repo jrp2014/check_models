@@ -11,6 +11,10 @@ Notable changes to this project will be documented in this file.
   preserving their distinct whitespace policies.
 - Bump the package version to `0.8.5` to establish the release baseline for
   explicit triage, blind-cataloguing, and metadata-assisted evaluation lanes.
+- Resolve each run to one explicit `triage`, `blind`, or `assisted` lane; keep
+  `stress` and `quality` as deprecated aliases rather than separate lanes,
+  withhold all metadata from blind prompts, and isolate reports, history,
+  capability aggregation, JSONL, and repro provenance by resolved lane.
 - Correct Pillow XMP parsing and EXIF-oriented report previews; clarify runtime
   timing boundaries, prefer upstream generation finish reasons, standardize MLX
   allocator metrics on decimal GB, and surface model-specific Hugging Face cache
@@ -113,10 +117,9 @@ Notable changes to this project will be documented in this file.
   later generated traceback/output lines fail the pre-push markdownlint hook.
 - Centralize generated-report markdownlint guard rule sets and document the
   tracked-output policy, including `test_` ignore patterns for local artifacts.
-- Make `--eval-mode` default to metadata-aware `auto`, selecting `stress` for
-  images with descriptive title/description/keyword metadata and the shorter
-  `triage` lane for metadata-free or capture-only images while preserving
-  explicit mode choices.
+- Make `--eval-mode` default to metadata-aware `auto`, selecting `assisted` for
+  images with descriptive title/description/keyword metadata and `blind` for
+  metadata-free or capture-only images while preserving explicit lane choices.
 - Made public benchmark artifacts mode-aware: triage summaries now suppress
   cataloging/keyword scores, add a dedicated model-selection brief, and expose
   stable run-level JSON metadata.

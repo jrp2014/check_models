@@ -119,6 +119,20 @@ A single medium-sized, well-commented function is often clearer than a web of on
 - Regenerate via `make stubs` (from repo root) or `python -m tools.generate_stubs mlx_lm mlx_vlm transformers tokenizers` (from `src/`)
 - See `.gitignore` for complete list of excluded files
 
+### Evaluation Lane Isolation
+
+The CLI resolves every run to exactly one of `triage`, `blind`, or `assisted`
+before prompt construction. `auto`, plus the deprecated `stress` and `quality`
+compatibility inputs, are selection aliases and must never be persisted as lane
+identities.
+
+The resolved lane and whether metadata was exposed to the prompt must be carried
+through reports, JSONL metadata, run JSON, history, and repro bundles. History
+comparisons and capability aggregation must filter on the resolved lane;
+unlabelled legacy rows are retained on disk but excluded from lane rankings.
+This prevents assisted outputs from inflating blind results and keeps triage
+compatibility checks separate from structured cataloguing benchmarks.
+
 ### Typings Policy
 
 - Third-party stubs are generated locally into `typings/` using `src/tools/generate_stubs.py`

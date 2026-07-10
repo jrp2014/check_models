@@ -94,13 +94,22 @@ def test_save_jsonl_report_creates_file(tmp_path: Path) -> None:
     """Test that save_jsonl_report creates a file with metadata header."""
     output_file = tmp_path / "results.jsonl"
     results: list[PerformanceResult] = []
-    save_jsonl_report(results, output_file, prompt="test", system_info={})
+    save_jsonl_report(
+        results,
+        output_file,
+        prompt="test",
+        system_info={},
+        eval_mode="blind",
+        metadata_exposed_to_prompt=False,
+    )
 
     assert output_file.exists()
     header, rows = _read_jsonl(output_file)
     assert header["_type"] == "metadata"
     assert header["format_version"] == "2.0"
     assert header["prompt"] == "test"
+    assert header["eval_mode"] == "blind"
+    assert header["metadata_exposed_to_prompt"] is False
     assert rows == []
 
 
@@ -167,7 +176,8 @@ def test_save_run_json_report_captures_public_snapshot_contract(tmp_path: Path) 
     assert payload["schema_version"] == "1.0"
     assert payload["eval_mode"] == "triage"
     assert payload["semantic_rankings_grounded"] is False
-    assert payload["selection_basis"] == "ungrounded"
+    assert payload["selection_basis"] == "caption hygiene only"
+    assert payload["metadata_exposed_to_prompt"] is False
     assert payload["counts"]["models_total"] == 1
     assert payload["counts"]["models_successful"] == 1
     assert payload["artifacts"]["model_selection"] == "reports/model_selection.md"
@@ -1324,9 +1334,46 @@ class TestSchemaVersioning:
             system_info={},
             library_versions={},
             history_path=hist,
+            eval_mode="blind",
         )
         data = json.loads(hist.read_text().strip())
         assert data["format_version"] == "1.0"
+        assert data["eval_mode"] == "blind"
+
+    def test_history_lane_filter_excludes_legacy_and_other_lane_records(self) -> None:
+        """Capability/history comparisons should consume only the selected lane."""
+        records: list[HistoryRunRecord] = [
+            _history_run({"org/legacy": True}),
+            cast(
+                "HistoryRunRecord",
+                {**_history_run({"org/blind": True}), "eval_mode": "blind"},
+            ),
+            cast(
+                "HistoryRunRecord",
+                {**_history_run({"org/assisted": True}), "eval_mode": "assisted"},
+            ),
+        ]
+
+        selected = check_models._history_records_for_eval_mode(records, "blind")
+
+        assert [record["eval_mode"] for record in selected] == ["blind"]
+
+    def test_legacy_mode_is_resolved_before_history_persistence(self, tmp_path: Path) -> None:
+        """Compatibility aliases should never appear as stored lane identities."""
+        hist = tmp_path / "results.history.jsonl"
+
+        check_models.append_history_record(
+            results=[],
+            prompt="t",
+            image_path=None,
+            system_info={},
+            library_versions={},
+            history_path=hist,
+            eval_mode="stress",
+        )
+
+        data = json.loads(hist.read_text().strip())
+        assert data["eval_mode"] == "blind"
 
 
 class TestRerunEvidence:

@@ -319,6 +319,9 @@ pytest src/tests/ -v
 - Use descriptive test names: `test_<function>_<scenario>_<expected_result>`
 - Include both positive and negative test cases
 - Aim for high coverage of critical paths
+- When testing evaluation history or capability aggregation, label fixtures with
+  the resolved `triage`, `blind`, or `assisted` lane and verify that records
+  from other lanes and unlabelled legacy history are excluded.
 
 ## Submitting Changes
 
