@@ -1,14 +1,14 @@
 <!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
 
-# \[mlx-vlm\]\[Stop-token leakage\] Stop/control tokens leaked into generated text affecting 2 model(s)
+# \[mlx-vlm\]\[Stop-token leakage\] Stop/control tokens leaked into generated text affecting 1 model(s)
 
 ## Summary
 
-2 model(s) show **Stop-token leakage** that should be filed against mlx-vlm.
+1 model(s) show **Stop-token leakage** that should be filed against mlx-vlm.
 
 - **Observed problem:** Stop/control tokens leaked into generated text
 - **Target:** mlx-vlm
-- **Affected models:** 2
+- **Affected models:** 1
 - **Fixed when:** No leaked stop/control tokens.
 
 
@@ -16,19 +16,16 @@
 
 <!-- markdownlint-disable MD060 -->
 
-| Model                                           | Observed Behavior                                   | Token Counts                                                                  | Optional Context                                                                                                                                                                           |
-|-------------------------------------------------|-----------------------------------------------------|-------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX` | decoded text contains control token &lt;\|end\|&gt; | prompt=1,330 \| output/prompt=13.08% \| nontext burden=100% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T214304Z_002_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_mlx_vlm_stop_token_001.json) |
-| `mlx-community/Qwen3-VL-2B-Thinking-bf16`       | decoded text contains control token &lt;/think&gt;  | prompt=317 \| output/prompt=23.97% \| nontext burden=98% \| stop=completed    | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T214304Z_004_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json)       |
+| Model                                     | Observed Behavior                                  | Token Counts                                                               | Optional Context                                                                                                                                                                     |
+|-------------------------------------------|----------------------------------------------------|----------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/Qwen3-VL-2B-Thinking-bf16` | decoded text contains control token &lt;/think&gt; | prompt=317 \| output/prompt=59.31% \| nontext burden=98% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260710T140722Z_001_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json) |
 <!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
 
-- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: Special control token &lt;\|end\|&gt; appeared in generated text.
-- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: Output switched language/script unexpectedly (tokenizer_artifact).
-- Output excerpt: `...we can say something like: "Two tabby cats are sleeping side by side on a pink couch, with a TV remote lying nearby." That's it. No need for extra. We'll comply. [BEGIN FINAL RESPONSE] Two tabby cats are curled up sleeping side‑by‑side on a pink couch, with a TV remote resting nearby. [END FINAL RESPONSE] <\|end\|>`
 - `mlx-community/Qwen3-VL-2B-Thinking-bf16`: Special control token &lt;/think&gt; appeared in generated text.
+- Output excerpt: `...blue button. The background is the pink couch, so the main elements are the two cats, the remotes, and the pink fabric. I need to describe this briefly. &lt;/think&gt; Two tabby cats are lying on a bright pink couch, relaxed and asleep. A white remote control with a blue button sits between them, and another remote co...`
 
 
 ## Minimal Reproduction
@@ -40,7 +37,6 @@ Image SHA256: `dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e`
 Native CLI:
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 python -m mlx_vlm.generate --model mlx-community/Qwen3-VL-2B-Thinking-bf16 --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
@@ -51,7 +47,7 @@ from mlx_vlm.generate import generate
 from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load
 
-MODEL = 'mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX'
+MODEL = 'mlx-community/Qwen3-VL-2B-Thinking-bf16'
 IMAGE = 'cats.jpg'
 PROMPT = 'Describe this image briefly.'
 LOAD_KWARGS = {'trust_remote_code': True}
@@ -88,14 +84,13 @@ Generation/load config:
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX"
+  "model": "mlx-community/Qwen3-VL-2B-Thinking-bf16"
 }
 ```
 
 Optional advanced context:
 
-- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T214304Z_002_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_mlx_vlm_stop_token_001.json)
-- `mlx-community/Qwen3-VL-2B-Thinking-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260705T214304Z_004_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json)
+- `mlx-community/Qwen3-VL-2B-Thinking-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260710T140722Z_001_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -117,13 +112,13 @@ Optional advanced context:
 
 | Component                  | Version                                                                                                                                                  |
 |----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| mlx-vlm                    | 0.6.4                                                                                                                                                    |
-| mlx                        | 0.32.0.dev20260705+de7b4ed9                                                                                                                              |
+| mlx-vlm                    | 0.6.5                                                                                                                                                    |
+| mlx                        | 0.32.1.dev20260710+4367c73b                                                                                                                              |
 | mlx-lm                     | 0.31.3                                                                                                                                                   |
-| mlx-audio                  | 0.4.4                                                                                                                                                    |
-| transformers               | 5.12.1                                                                                                                                                   |
+| mlx-audio                  | 0.4.5                                                                                                                                                    |
+| transformers               | 5.13.0                                                                                                                                                   |
 | tokenizers                 | 0.22.2                                                                                                                                                   |
-| huggingface-hub            | 1.22.0                                                                                                                                                   |
+| huggingface-hub            | 1.23.0                                                                                                                                                   |
 | Python Version             | 3.13.13                                                                                                                                                  |
 | OS                         | Darwin 25.5.0                                                                                                                                            |
 | macOS Version              | 26.5.2                                                                                                                                                   |
@@ -143,30 +138,12 @@ Optional advanced context:
 | MLX Distribution Root      | /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages                                                                                          |
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                                       |
 | MLX Core Extension         | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
-| MLX Metallib               | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (162,451,352 bytes, sha256=7e5c9a3a3225bf3b04a5fe67c50602975d3698a45e2113433465848af47fd70c) |
-| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,747,136 bytes, sha256=7f99f8ba35fabb3f26e8a3016e5bd6410c975b68147be239054e5fa74232541c)  |
+| MLX Metallib               | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (162,449,848 bytes, sha256=1078bd042297dbbf704a414617a7988c55b0001ea69d7cb478bcafa2fdfdeecb) |
+| MLX libmlx.dylib           | /Users/jrp/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,697,568 bytes, sha256=a96d8dc798ee2a07ecd2a03f916dd5568d35fbd50cf296876dd893230fdf2391)  |
 | RAM                        | 128.0 GB                                                                                                                                                 |
 
 
 ## Appendix: Detailed Evidence
-
-### `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`
-
-Observed signals:
-
-- Special control token &lt;\|end\|&gt; appeared in generated text.
-- Output switched language/script unexpectedly (tokenizer_artifact).
-- Output leaked reasoning or prompt-template text (here are my reasoning steps, the user asks:).
-
-Sample output:
-
-```text
-...at's it. No need for extra. We'll comply.
-[BEGIN FINAL RESPONSE]
-Two tabby cats are curled up sleeping side‑by‑side on a pink couch, with a TV remote resting nearby.
-[END FINAL RESPONSE]
-<|end|>
-```
 
 ### `mlx-community/Qwen3-VL-2B-Thinking-bf16`
 
@@ -177,9 +154,9 @@ Observed signals:
 Sample output:
 
 ```text
-So,,
+...lements are the two cats, the remotes, and the pink fabric. I need to describe this briefly.
 </think>
 
-Two cats are lying on a bright pink blanket. One cat is a tabby with darker stripes, and the other is a calico with a mix of orange, black, and white fur. Both cats are relaxed, w...
+Two tabby cats are lying on a bright pink couch, relaxed and asleep. A white remote control...
 ```
 

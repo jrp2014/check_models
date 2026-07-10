@@ -16,29 +16,29 @@
     "run_json": "run.json"
   },
   "counts": {
-    "models_failed": 0,
-    "models_successful": 61,
+    "models_failed": 2,
+    "models_successful": 59,
     "models_total": 61
   },
   "eval_mode": "triage",
-  "generated_at": "2026-07-05 22:43:04 BST",
+  "generated_at": "2026-07-10 15:07:22 BST",
   "has_descriptive_metadata": false,
   "library_versions": {
     "Pillow": "12.3.0",
-    "huggingface-hub": "1.22.0",
-    "mlx": "0.32.0.dev20260705+de7b4ed9",
-    "mlx-audio": "0.4.4",
+    "huggingface-hub": "1.23.0",
+    "mlx": "0.32.1.dev20260710+4367c73b",
+    "mlx-audio": "0.4.5",
     "mlx-lm": "0.31.3",
     "mlx-metal": null,
-    "mlx-vlm": "0.6.4",
+    "mlx-vlm": "0.6.5",
     "numpy": "2.5.1",
     "tokenizers": "0.22.2",
-    "transformers": "5.12.1"
+    "transformers": "5.13.0"
   },
   "prompt": "Describe this image briefly.",
   "prompt_sha256": "d760336d0fd143932f194573dd63f6b531e0ffbc2c4f1595e015392a3471c318",
   "schema_version": "1.0",
   "selection_basis": "ungrounded",
   "semantic_rankings_grounded": false,
-  "total_runtime_seconds": 420.838
+  "total_runtime_seconds": 1305.18
 }
