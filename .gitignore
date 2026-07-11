@@ -61,6 +61,9 @@ typings/
 # Agent-managed isolated development worktrees
 .worktrees/
 
+# Ephemeral subagent task briefs, reports, and progress ledgers
+.superpowers/
+
 # Test/debug generated output; production defaults under src/output are tracked.
 src/output/test_*
 src/output/reports/test_*
