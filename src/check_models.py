@@ -4147,6 +4147,68 @@ class TrustedHintBundle:
     nonvisual_terms: tuple[str, ...] = ()
 
 
+@dataclass(frozen=True)
+class MetadataProvenance:
+    """Authoritative structured context plus fallible descriptive draft fields."""
+
+    authoritative_terms: tuple[str, ...] = ()
+    capture_date: str | None = None
+    capture_time: str | None = None
+    gps: str | None = None
+    draft_title: str | None = None
+    draft_description: str | None = None
+    draft_keywords: tuple[str, ...] = ()
+    draft_terms: tuple[str, ...] = ()
+
+    @property
+    def has_authoritative_context(self) -> bool:
+        return bool(self.authoritative_terms or self.capture_date or self.capture_time or self.gps)
+
+    @property
+    def has_draft(self) -> bool:
+        return bool(self.draft_title or self.draft_description or self.draft_keywords)
+
+
+def _clean_metadata_text(value: str | None) -> str | None:
+    if not isinstance(value, str):
+        return None
+    cleaned = re.sub(r"\s+", " ", value).strip(" ,")
+    return cleaned or None
+
+
+def _build_metadata_provenance(metadata: MetadataDict | None) -> MetadataProvenance:
+    if not metadata:
+        return MetadataProvenance()
+    if QUALITY.patterns is None:
+        load_quality_config()
+
+    title = _clean_metadata_text(metadata.get("title"))
+    description = _clean_metadata_text(metadata.get("description"))
+    keyword_text = _clean_metadata_text(metadata.get("keywords")) or ""
+    keyword_terms = _split_catalog_keywords(keyword_text)
+    draft_keywords, authoritative_keywords = _partition_hint_terms(keyword_terms)
+
+    authoritative_terms = list(authoritative_keywords)
+    draft_terms = list(draft_keywords)
+    for free_text in (title, description):
+        if free_text is None:
+            continue
+        descriptive, contextual = _partition_hint_terms(_extract_hint_signal_terms(free_text))
+        draft_terms.extend(descriptive)
+        authoritative_terms.extend(contextual)
+
+    return MetadataProvenance(
+        authoritative_terms=tuple(_dedupe_preserve_order(authoritative_terms)),
+        capture_date=_clean_metadata_text(metadata.get("date")),
+        capture_time=_clean_metadata_text(metadata.get("time")),
+        gps=_clean_metadata_text(metadata.get("gps")),
+        draft_title=title,
+        draft_description=description,
+        draft_keywords=tuple(draft_keywords),
+        draft_terms=tuple(_dedupe_preserve_order(draft_terms)),
+    )
+
+
 def _normalize_phrase_for_matching(text: str) -> str:
     """Normalize free-form text for alias and overlap matching."""
     return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9]+", " ", text.casefold())).strip()
@@ -6481,55 +6543,33 @@ def _build_metadata_scoring_inputs(
     metadata: MetadataDict | None,
 ) -> tuple[str | None, str | None, tuple[str, ...], tuple[str, ...]]:
     """Extract trusted reference fields and nonvisual metadata terms for scoring."""
-    if not metadata:
+    provenance = _build_metadata_provenance(metadata)
+    if not provenance.has_authoritative_context and not provenance.has_draft:
         return None, None, (), ()
 
-    raw_title = metadata.get("title")
-    reference_title = (
-        raw_title.strip() if isinstance(raw_title, str) and raw_title.strip() else None
-    )
-
-    raw_description = metadata.get("description")
-    reference_description = (
-        raw_description.strip()
-        if isinstance(raw_description, str) and raw_description.strip()
-        else None
-    )
-
-    raw_keywords = metadata.get("keywords") or ""
-    keyword_terms = _split_catalog_keywords(raw_keywords) if isinstance(raw_keywords, str) else []
-    trusted_keywords, keyword_nonvisual_terms = _partition_hint_terms(keyword_terms)
-
-    nonvisual_terms: list[str] = list(keyword_nonvisual_terms)
-    for free_text in filter(None, (reference_title, reference_description)):
-        _trusted_terms, nonvisual_hint_terms = _partition_hint_terms(
-            _extract_hint_signal_terms(free_text),
-        )
-        nonvisual_terms.extend(nonvisual_hint_terms)
-
-    for field_name in ("date", "time", "gps"):
-        raw_value = metadata.get(field_name)
-        if not isinstance(raw_value, str):
-            continue
-        cleaned_value = raw_value.strip()
-        if not cleaned_value:
-            continue
-        nonvisual_terms.append(cleaned_value)
-        nonvisual_terms.extend(_extract_hint_signal_terms(cleaned_value))
+    nonvisual_terms: list[str] = list(provenance.authoritative_terms)
+    for capture_value in (
+        provenance.capture_date,
+        provenance.capture_time,
+        provenance.gps,
+    ):
+        if capture_value:
+            nonvisual_terms.append(capture_value)
+            nonvisual_terms.extend(_extract_hint_signal_terms(capture_value))
 
     deduped_nonvisual_terms = _dedupe_preserve_order(nonvisual_terms)
     filtered_title = _strip_nonvisual_terms_from_text(
-        reference_title or "", deduped_nonvisual_terms
+        provenance.draft_title or "", deduped_nonvisual_terms
     )
     filtered_description = _strip_nonvisual_terms_from_text(
-        reference_description or "",
+        provenance.draft_description or "",
         deduped_nonvisual_terms,
     )
 
     return (
         filtered_title or None,
         filtered_description or None,
-        tuple(_dedupe_preserve_order(trusted_keywords)),
+        provenance.draft_keywords,
         tuple(deduped_nonvisual_terms),
     )
 
@@ -22212,48 +22252,50 @@ def _build_cataloguing_prompt(
         "- Do not output reasoning, notes, hedging, or extra sections.",
     ]
 
-    # --- Context block (uses the "Context:" marker for quality analysis) ---
-    desc = metadata.get("description") if include_metadata_hints else None
-    title = metadata.get("title") if include_metadata_hints else None
-    existing_kw = metadata.get("keywords") if include_metadata_hints else None
-    has_context = desc or title or existing_kw
-    if has_context:
-        parts.append("")
-        parts.append(
-            "Context: Existing metadata hints (high confidence; use only when visually confirmed):",
+    provenance = _build_metadata_provenance(metadata if include_metadata_hints else None)
+    if provenance.has_authoritative_context:
+        parts.extend(["", "Context: Authoritative context:"])
+        if provenance.authoritative_terms:
+            parts.append("- Location terms: " + ", ".join(provenance.authoritative_terms))
+        capture_value = " ".join(
+            value for value in (provenance.capture_date, provenance.capture_time) if value
         )
-        if title:
-            title_hint = _compact_prompt_text(title, max_chars=QUALITY.prompt_title_max_chars)
-            parts.append(f"- Title hint: {title_hint}")
-        if desc:
-            desc_hint = _compact_prompt_text(
-                desc,
+        if capture_value:
+            parts.append(f"- Capture date/time: {capture_value}")
+        if provenance.gps:
+            parts.append(f"- GPS: {provenance.gps}")
+        parts.append(
+            "- Use this factual context where it improves the catalogue record; do not "
+            "claim that contextual facts are visually observable."
+        )
+
+    if provenance.has_draft:
+        draft_heading = (
+            "Draft descriptive metadata:"
+            if provenance.has_authoritative_context
+            else "Context: Draft descriptive metadata:"
+        )
+        parts.extend(["", draft_heading])
+        if provenance.draft_title:
+            title_hint = _compact_prompt_text(
+                provenance.draft_title,
+                max_chars=QUALITY.prompt_title_max_chars,
+            )
+            parts.append(f"- Existing title: {title_hint}")
+        if provenance.draft_description:
+            description_hint = _compact_prompt_text(
+                provenance.draft_description,
                 max_chars=QUALITY.prompt_description_max_chars,
             )
-            parts.append(f"- Description hint: {desc_hint}")
-        if existing_kw:
-            keyword_hint = _summarize_prompt_keywords(existing_kw)
+            parts.append(f"- Existing description: {description_hint}")
+        if provenance.draft_keywords:
+            keyword_hint = _summarize_prompt_keywords(", ".join(provenance.draft_keywords))
             if keyword_hint:
-                parts.append(f"- Keyword hints: {keyword_hint}")
-
-    # Date / time / GPS metadata
-    date_val = metadata.get("date") if include_metadata_hints else None
-    time_val = metadata.get("time") if include_metadata_hints else None
-    gps_val = metadata.get("gps") if include_metadata_hints else None
-    if date_val or gps_val:
-        meta_fragments: list[str] = []
-        if date_val:
-            s = f"Taken on {date_val}"
-            if time_val:
-                s += f" (at {time_val} local time)"
-            meta_fragments.append(s)
-        if gps_val:
-            meta_fragments.append(f"GPS: {gps_val}")
-        if has_context:
-            parts.append("- Capture metadata: " + ". ".join(meta_fragments) + ".")
-        else:
-            parts.append("")
-            parts.append("Capture metadata hints: " + ". ".join(meta_fragments) + ".")
+                parts.append(f"- Existing keywords: {keyword_hint}")
+        parts.append(
+            "- Treat this draft as fallible. Retain supported details, correct errors, "
+            "and add important visible information."
+        )
 
     return "\n".join(parts)
 

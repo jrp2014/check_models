@@ -7,6 +7,8 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Separate authoritative capture/location context from fallible descriptive
+  metadata in assisted prompts and reuse that provenance split for scoring.
 - Consolidate generated-output CLI path definitions and configuration-driven
   quality detector regex matching while preserving their existing contracts.
 - Consolidate the regular and diagnostic Markdown table escaping pipeline while

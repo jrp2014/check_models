@@ -448,6 +448,22 @@ def test_analyze_generation_text_ignores_nonvisual_location_and_time_metadata() 
     assert "Welwyn" not in " ".join(analysis.missing_context_terms)
 
 
+def test_metadata_provenance_keeps_location_out_of_draft_terms() -> None:
+    """Location hints should be authoritative rather than draft descriptive terms."""
+    provenance = check_models._build_metadata_provenance(
+        {
+            "title": "Deben Estuary at Woodbridge",
+            "description": "Two sailing boats with trees behind.",
+            "keywords": "Deben Estuary, Woodbridge, England, boats, trees",
+        }
+    )
+
+    assert "Deben Estuary" in provenance.authoritative_terms
+    assert "Woodbridge" in provenance.authoritative_terms
+    assert "boats" in {term.casefold() for term in provenance.draft_terms}
+    assert "woodbridge" not in {term.casefold() for term in provenance.draft_terms}
+
+
 def test_repetitive_phrase_detection_uses_quality_thresholds() -> None:
     """Test that phrase repetition detection uses QUALITY config thresholds."""
     # Verify the QUALITY constants exist and have expected types

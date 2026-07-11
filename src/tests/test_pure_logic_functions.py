@@ -425,9 +425,34 @@ class TestPreparePrompt:
             },
         )
 
-        assert "Context: Existing metadata hints" in result
+        assert "Draft descriptive metadata:" in result
         assert "Brick storefront" in result
         assert "Outdoor seating" in result
+
+    def test_assisted_prompt_separates_authoritative_context_from_draft(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """Assisted prompts should label factual context separately from draft text."""
+        args = argparse.Namespace(prompt=None, eval_mode="assisted")
+        prompt = mod.prepare_prompt(
+            args,
+            {
+                "title": "Deben Estuary at Woodbridge",
+                "description": "Two boats on a river.",
+                "keywords": "Deben Estuary, Woodbridge, boats, river",
+                "date": "2026-07-04",
+                "time": "19:10:04",
+                "gps": "52.0,-1.0",
+            },
+        )
+
+        assert "Authoritative context:" in prompt
+        assert "Location terms: Deben Estuary, Woodbridge" in prompt
+        assert "Capture date/time: 2026-07-04 19:10:04" in prompt
+        assert "Draft descriptive metadata:" in prompt
+        assert "Existing description: Two boats on a river." in prompt
+        assert "Treat this draft as fallible" in prompt
 
 
 class TestQualityIssueTruncation:

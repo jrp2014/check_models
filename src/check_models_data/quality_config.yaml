@@ -225,6 +225,8 @@ patterns:
   # in IPTC/EXIF metadata but are not visually verifiable. Models should not
   # be penalised for omitting these from image descriptions.
   nonvisual_location_terms:
+    - "deben estuary"
+    - "woodbridge"
     - "town"
     - "centre"
     - "center"
