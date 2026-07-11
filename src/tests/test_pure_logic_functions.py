@@ -454,6 +454,43 @@ class TestPreparePrompt:
         assert "Existing description: Two boats on a river." in prompt
         assert "Treat this draft as fallible" in prompt
 
+    def test_assisted_prompt_bounds_authoritative_context_terms(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """Authoritative context should retain key terms within a deterministic bound."""
+        extra_locations = [f"Location {index:02d}" for index in range(60)]
+        configured_quality = replace(
+            mod.QUALITY,
+            patterns={
+                **(mod.QUALITY.patterns or {}),
+                "nonvisual_location_terms": [
+                    "deben estuary",
+                    "woodbridge",
+                    *(term.casefold() for term in extra_locations),
+                ],
+            },
+        )
+        metadata = {
+            "keywords": ", ".join(["Deben Estuary", "Woodbridge", *extra_locations, "boats"]),
+        }
+
+        with patch.object(mod, "QUALITY", configured_quality):
+            prompt = mod.prepare_prompt(
+                argparse.Namespace(prompt=None, eval_mode="assisted"),
+                metadata,
+            )
+
+        location_line = next(
+            line for line in prompt.splitlines() if line.startswith("- Location terms:")
+        )
+        rendered_terms = location_line.removeprefix("- Location terms:").split(",")
+        assert "Authoritative context:" in prompt
+        assert "Deben Estuary" in location_line
+        assert "Woodbridge" in location_line
+        assert len(rendered_terms) <= configured_quality.prompt_keyword_max_items
+        assert "Location 59" not in location_line
+
 
 class TestQualityIssueTruncation:
     """Tests for quality issue parsing and truncation helpers."""

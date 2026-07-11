@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import dataclasses
 from unittest.mock import patch
 
@@ -462,6 +463,34 @@ def test_metadata_provenance_keeps_location_out_of_draft_terms() -> None:
     assert "Woodbridge" in provenance.authoritative_terms
     assert "boats" in {term.casefold() for term in provenance.draft_terms}
     assert "woodbridge" not in {term.casefold() for term in provenance.draft_terms}
+
+
+def test_metadata_provenance_prompt_round_trips_through_trusted_hint_bundle() -> None:
+    """New assisted prompt labels should remain readable by compatibility checks."""
+    prompt = check_models.prepare_prompt(
+        argparse.Namespace(prompt=None, eval_mode="assisted"),
+        {
+            "title": "Deben Estuary at Woodbridge",
+            "description": "Two boats on a river.",
+            "keywords": "Deben Estuary, Woodbridge, boats, river",
+            "date": "2026-07-04",
+            "time": "19:10:04",
+            "gps": "52.0,-1.0",
+        },
+    )
+
+    bundle = check_models._extract_trusted_hint_bundle(prompt)
+
+    assert bundle.trusted_text
+    assert "Description: Two boats on a river" in bundle.trusted_text
+    assert "Keywords: boats, river" in bundle.trusted_text
+    assert not any(line.startswith("Title:") for line in bundle.trusted_text.splitlines())
+    assert {"boats", "river"}.issubset({term.casefold() for term in bundle.trusted_terms})
+    nonvisual_text = " ".join(bundle.nonvisual_terms)
+    assert "Deben Estuary" in nonvisual_text
+    assert "Woodbridge" in nonvisual_text
+    assert "2026-07-04 19:10:04" in nonvisual_text
+    assert "52.0,-1.0" in nonvisual_text
 
 
 def test_repetitive_phrase_detection_uses_quality_thresholds() -> None:

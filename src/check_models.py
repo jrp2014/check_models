@@ -4218,7 +4218,8 @@ def _extract_prompt_context_text(prompt: str, context_marker: str = "Context:") 
     """Extract prompt context text anchored at ``context_marker``.
 
     Supports inline-marker context (``Context: ...``) and multi-line bullet
-    context blocks. Stops on the first blank line after context content starts.
+    context blocks. Stops on the first blank line after context content starts,
+    except for the adjacent authoritative/draft sections emitted by assisted prompts.
     """
     if not prompt:
         return ""
@@ -4238,10 +4239,23 @@ def _extract_prompt_context_text(prompt: str, context_marker: str = "Context:") 
         if inline_remainder:
             extracted.append(inline_remainder.lstrip("-").strip())
 
-        for follow in lines[idx + 1 :]:
+        follow_lines = lines[idx + 1 :]
+        allow_draft_section = inline_remainder.casefold() == "authoritative context:"
+        for follow_idx, follow in enumerate(follow_lines):
             stripped: str = follow.strip()
             if not stripped:
                 if extracted:
+                    remaining_lines = follow_lines[follow_idx + 1 :]
+                    next_content = next(
+                        (candidate.strip() for candidate in remaining_lines if candidate.strip()),
+                        "",
+                    )
+                    if (
+                        allow_draft_section
+                        and next_content.casefold() == "draft descriptive metadata:"
+                    ):
+                        allow_draft_section = False
+                        continue
                     break
                 continue
             # Context bullets are expected; strip bullet prefix but retain content.
@@ -4345,12 +4359,18 @@ def _parse_context_hint_lines(
     keyword_hint_text = ""
     nonvisual_lines: list[str] = []
     prefix_targets: tuple[tuple[str, str], ...] = (
+        ("existing title:", "title"),
         ("title hint:", "title"),
         ("title:", "title"),
+        ("existing description:", "description"),
         ("description hint:", "description"),
         ("description:", "description"),
+        ("existing keywords:", "keywords"),
         ("keyword hints:", "keywords"),
         ("keywords:", "keywords"),
+        ("location terms:", "nonvisual"),
+        ("capture date/time:", "nonvisual"),
+        ("gps:", "nonvisual"),
         ("capture metadata:", "nonvisual"),
     )
 
@@ -4416,6 +4436,10 @@ def _extract_trusted_hint_bundle(
 
     filtered_title = _strip_nonvisual_terms_from_text(title_hint, nonvisual_terms)
     filtered_description = _strip_nonvisual_terms_from_text(description_hint, nonvisual_terms)
+    if not _extract_hint_signal_terms(filtered_title):
+        filtered_title = ""
+    if not _extract_hint_signal_terms(filtered_description):
+        filtered_description = ""
     filtered_keywords = [
         term for term in trusted_keyword_terms if not _is_nonvisual_context_term(term)
     ]
@@ -22256,7 +22280,11 @@ def _build_cataloguing_prompt(
     if provenance.has_authoritative_context:
         parts.extend(["", "Context: Authoritative context:"])
         if provenance.authoritative_terms:
-            parts.append("- Location terms: " + ", ".join(provenance.authoritative_terms))
+            authoritative_hint = _summarize_prompt_keywords(
+                ", ".join(provenance.authoritative_terms)
+            )
+            if authoritative_hint:
+                parts.append(f"- Location terms: {authoritative_hint}")
         capture_value = " ".join(
             value for value in (provenance.capture_date, provenance.capture_time) if value
         )
