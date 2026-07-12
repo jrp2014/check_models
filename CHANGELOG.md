@@ -7,6 +7,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Align standalone HTML, Markdown selection, JSONL, TSV, and history on one
+  cached recommendation/diagnostics context; add compatible machine fields for
+  enrichment, burden, compatibility, and owner confidence, and label primary
+  versus supporting output roles without changing JSONL/history versions.
 - Consolidate current-run model recommendations into one reliability-gated view
   shared by selection, gallery, and capability surfaces, with lane-specific
   quality evidence, named policies, memory/Pareto selectors, and conservative

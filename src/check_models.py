@@ -1152,6 +1152,14 @@ class HistoryModelResultRecord(TypedDict):
     peak_memory_gb: NotRequired[float | None]
     text_sanity_issue_type: NotRequired[str | None]
     generation_loop_type: NotRequired[str | None]
+    compatibility_status: NotRequired[str]
+    context_integration_score: NotRequired[float | None]
+    draft_improvement_score: NotRequired[float | None]
+    visual_description_score: NotRequired[float | None]
+    assisted_enrichment_score: NotRequired[float | None]
+    prompt_burden_kind: NotRequired[str]
+    prompt_burden_source: NotRequired[str]
+    owner_confidence: NotRequired[str]
 
 
 class HistoryRunRecord(TypedDict, total=False):
@@ -1378,6 +1386,14 @@ class JsonlResultRecord(TypedDict):
     prompt_diagnostics: NotRequired[dict[str, JsonLike]]
     signature_components: NotRequired[JsonlSignatureComponents]
     rerun_summary: NotRequired[JsonlRerunSummary]
+    compatibility_status: NotRequired[str]
+    context_integration_score: NotRequired[float | None]
+    draft_improvement_score: NotRequired[float | None]
+    visual_description_score: NotRequired[float | None]
+    assisted_enrichment_score: NotRequired[float | None]
+    prompt_burden_kind: NotRequired[str]
+    prompt_burden_source: NotRequired[str]
+    owner_confidence: NotRequired[str]
 
 
 type FailedModelIssue = tuple[str, str | None, str | None]
@@ -9835,6 +9851,7 @@ def _build_report_render_context(
     preflight_issues: Sequence[str] = (),
 ) -> ReportRenderContext:
     """Build shared derived report data once for all renderers."""
+    resolved_preflight_issues = tuple(preflight_issues)
     resolved_results = [
         _populate_result_quality_analysis(
             result,
@@ -9859,7 +9876,12 @@ def _build_report_render_context(
         [result for result in result_set.results if result.success],
         prompt=prompt,
     )
-    return ReportRenderContext(
+    diagnostics_snapshot = _build_diagnostics_snapshot(
+        results=resolved_results,
+        prompt=prompt,
+        preflight_issues=resolved_preflight_issues,
+    )
+    context = ReportRenderContext(
         result_set=result_set,
         table_data=table_data,
         prompt_context=prompt_context,
@@ -9868,9 +9890,12 @@ def _build_report_render_context(
         system_info=resolved_system_info,
         triage=triage,
         image_profile=image_profile,
-        preflight_issues=tuple(issue for issue in preflight_issues),
+        preflight_issues=resolved_preflight_issues,
         mode_policy=_build_report_mode_policy(eval_mode=eval_mode, metadata=metadata),
+        diagnostics_snapshot=diagnostics_snapshot,
+        issue_clusters=_build_issue_clusters(diagnostics_snapshot),
     )
+    return replace(context, recommendations=_build_model_recommendation_views(context))
 
 
 def _html_attr(name: str, value: str) -> str:
@@ -12933,7 +12958,7 @@ def _build_gallery_output_cost_summary_section(
 ) -> list[str]:
     """Build a compact all-model output, runtime, and memory summary table."""
     rows: list[tuple[str, str, str, str, str, str, str, str]] = []
-    for view in _build_model_recommendation_views(report_context):
+    for view in report_context.recommendations:
         result = view.result
         generation = result.generation
         rows.append(
@@ -13002,7 +13027,7 @@ def _build_gallery_quality_summary_section(
             MARKDOWN_ESCAPER.escape(_gallery_summary_signal(view.result)),
             MARKDOWN_ESCAPER.escape(_gallery_summary_preview(view.result)),
         )
-        for view in _build_model_recommendation_views(report_context)
+        for view in report_context.recommendations
     ]
     if not rows:
         return []
@@ -13205,6 +13230,20 @@ class ModelRecommendationView:
 
 
 @dataclass(frozen=True)
+class MachineArtifactFacts:
+    """Additive machine-readable facts shared by JSONL, TSV, and history."""
+
+    compatibility_status: CompatibilityStatus
+    context_integration_score: float | None
+    draft_improvement_score: float | None
+    visual_description_score: float | None
+    assisted_enrichment_score: float | None
+    prompt_burden_kind: str
+    prompt_burden_source: str
+    owner_confidence: MaintainerConfidence | None
+
+
+@dataclass(frozen=True)
 class ModelCapabilityRunSignal:
     """One current or historical model capability observation."""
 
@@ -13288,6 +13327,9 @@ class ReportRenderContext:
     image_profile: ImageInputProfile | None = None
     preflight_issues: tuple[str, ...] = ()
     mode_policy: ReportModePolicy = dataclass_field(default_factory=_default_report_mode_policy)
+    recommendations: tuple[ModelRecommendationView, ...] = ()
+    diagnostics_snapshot: DiagnosticsSnapshot = dataclass_field(default_factory=DiagnosticsSnapshot)
+    issue_clusters: tuple[IssueCluster, ...] = ()
 
 
 def _append_markdown_code_block(
@@ -14107,21 +14149,28 @@ def _build_issue_clusters(snapshot: DiagnosticsSnapshot) -> tuple[IssueCluster, 
     return tuple(clusters)
 
 
-def _issue_cluster_map_for_results(
-    results: Sequence[PerformanceResult],
-    *,
-    prompt: str | None,
+def _issue_clusters_by_model(
+    clusters: Sequence[IssueCluster],
 ) -> dict[str, IssueCluster]:
-    """Return model-name to issue-cluster mapping for JSONL/repro metadata."""
-    snapshot = _build_diagnostics_snapshot(
-        results=list(results),
-        prompt=prompt,
-    )
-    cluster_by_model: dict[str, IssueCluster] = {}
-    for cluster in _build_issue_clusters(snapshot):
-        for result in _issue_cluster_results(cluster):
-            cluster_by_model.setdefault(result.model_name, cluster)
-    return cluster_by_model
+    """Index cached issue clusters by every affected model identifier."""
+    return {
+        result.model_name: cluster
+        for cluster in clusters
+        for result in _issue_cluster_results(cluster)
+    }
+
+
+def _resolve_issue_clusters_for_results(
+    *,
+    results: list[PerformanceResult],
+    prompt: str,
+    issue_clusters: Sequence[IssueCluster] | None,
+) -> tuple[IssueCluster, ...]:
+    """Return cached issue clusters or build them for a standalone caller."""
+    if issue_clusters is not None:
+        return tuple(issue_clusters)
+    snapshot = _build_diagnostics_snapshot(results=results, prompt=prompt)
+    return _build_issue_clusters(snapshot)
 
 
 def _maintainer_owner_counts(snapshot: DiagnosticsSnapshot) -> list[tuple[str, int]]:
@@ -16123,6 +16172,7 @@ def export_failure_repro_bundles(
     system_info: dict[str, str],
     prompt: str,
     image_path: Path | None,
+    issue_clusters: Sequence[IssueCluster] | None = None,
 ) -> dict[str, Path]:
     """Write reproducibility bundles for failed and issue-clustered results."""
     bundles: dict[str, Path] = {}
@@ -16138,7 +16188,12 @@ def export_failure_repro_bundles(
         key: _jsonify_cli_value(value) for key, value in sorted(vars(run_args).items())
     }
     preflight_issues = list(_get_run_preflight_issues(run_args))
-    issue_cluster_by_model = _issue_cluster_map_for_results(results, prompt=prompt)
+    resolved_issue_clusters = _resolve_issue_clusters_for_results(
+        results=results,
+        prompt=prompt,
+        issue_clusters=issue_clusters,
+    )
+    issue_cluster_by_model = _issue_clusters_by_model(resolved_issue_clusters)
     bundled_results = [
         result
         for result in results
@@ -16290,6 +16345,7 @@ def generate_diagnostics_report(
     history: DiagnosticsHistoryInputs | None = None,
     repro_bundles: Mapping[str, Path] | None = None,
     diagnostics_snapshot: DiagnosticsSnapshot | None = None,
+    issue_clusters: Sequence[IssueCluster] | None = None,
 ) -> bool:
     """Generate a Markdown diagnostics report structured for upstream issue filing.
 
@@ -16309,6 +16365,7 @@ def generate_diagnostics_report(
         history: Optional history inputs for first-seen/repro/regression context.
         repro_bundles: Optional model->bundle path mapping from repro export.
         diagnostics_snapshot: Optional cached diagnostics classification for this run.
+        issue_clusters: Optional cached root-cause clusters derived from the snapshot.
 
     Returns:
         True if the report was written (i.e. there was something to report),
@@ -16339,7 +16396,11 @@ def generate_diagnostics_report(
     ):
         return False
 
-    clusters = _build_issue_clusters(diagnostics_snapshot)
+    clusters = tuple(
+        issue_clusters
+        if issue_clusters is not None
+        else _build_issue_clusters(diagnostics_snapshot)
+    )
     mlx_vlm_clusters = tuple(
         cluster for cluster in clusters if _issue_cluster_is_mlx_vlm_scope(cluster)
     )
@@ -16425,6 +16486,7 @@ def _build_full_html_document(
     total_runtime_seconds: float,
     run_contract_html: str,
     action_snapshot_html: str,
+    recommendations_html: str,
     issues_summary_html: str,
     review_priorities_html: str,
     failures_by_package_html: str,
@@ -16651,6 +16713,7 @@ def _build_full_html_document(
             <h2>Summary</h2>
             {run_contract_html}
             {action_snapshot_html}
+            {recommendations_html}
             {issues_summary_html}
             {review_priorities_html}
             {failures_by_package_html}
@@ -16699,6 +16762,56 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
 # =============================================================================
 # SECTION: REPORT GENERATORS & RUNTIME FINGERPRINTS
 # =============================================================================
+
+
+def _build_recommendation_summary_block(
+    report_context: ReportRenderContext,
+) -> ReportSection:
+    """Build the shared current-run compatibility and recommendation summary."""
+    rows: list[tuple[str, ...]] = []
+    for view in report_context.recommendations:
+        if view.result.success:
+            task_outcome = "Task outcome: completed"
+        else:
+            task_outcome = f"Task outcome: {_build_failure_narrative(view.result).task_outcome}"
+        rows.append(
+            (
+                view.result.model_name,
+                task_outcome,
+                view.compatibility,
+                "eligible" if view.eligible else f"excluded: {view.eligibility_reason}",
+                view.burden.kind,
+                format_field_value("generation_tps", view.generation_tps) or "-",
+                format_field_value("peak_memory", view.peak_memory_gb) or "-",
+            )
+        )
+    return ReportSection(
+        title="Reliability-gated Current-run View",
+        level=3,
+        blocks=(
+            ReportParagraph(
+                "Policy: reliability-gated; crashes and integration warnings remain visible "
+                "but cannot be named as usable winners."
+            ),
+            ReportTable(
+                headers=(
+                    "Model",
+                    "Task outcome",
+                    "Compatibility",
+                    "Recommendation eligibility",
+                    "Prompt burden",
+                    "Gen TPS",
+                    "Peak GB",
+                ),
+                rows=tuple(rows),
+            ),
+        ),
+    )
+
+
+def _build_html_recommendation_summary(report_context: ReportRenderContext) -> str:
+    """Render the shared recommendation block for standalone HTML."""
+    return "".join(render_report_html((_build_recommendation_summary_block(report_context),)))
 
 
 def generate_html_report(
@@ -16765,6 +16878,7 @@ def generate_html_report(
             suppress_cataloging_claims=suppress_cataloging_scores,
         ),
     )
+    recommendations_html = _build_html_recommendation_summary(report_context)
     review_priorities_html = "".join(
         _format_review_priorities_parts(
             report_context,
@@ -16787,6 +16901,7 @@ def generate_html_report(
         total_runtime_seconds=total_runtime_seconds,
         run_contract_html=run_contract_html,
         action_snapshot_html=action_snapshot_html,
+        recommendations_html=recommendations_html,
         issues_summary_html=issues_summary_html,
         review_priorities_html=review_priorities_html,
         failures_by_package_html=failures_by_package_html,
@@ -17443,6 +17558,48 @@ def _build_model_recommendation_views(
     return tuple(views)
 
 
+def _machine_artifact_facts(view: ModelRecommendationView) -> MachineArtifactFacts:
+    """Return one canonical additive machine payload from cached report views."""
+    triage = _maintainer_triage_for_result(view.result)
+    agreement = view.result.metadata_agreement
+    return MachineArtifactFacts(
+        compatibility_status=view.compatibility,
+        context_integration_score=view.context_score,
+        draft_improvement_score=view.draft_improvement_score,
+        visual_description_score=(agreement.visual_description_score if agreement else None),
+        assisted_enrichment_score=view.assisted_enrichment_score,
+        prompt_burden_kind=view.burden.kind,
+        prompt_burden_source=view.burden.source,
+        owner_confidence=triage["confidence"] if triage is not None else None,
+    )
+
+
+def _recommendations_by_model(
+    report_context: ReportRenderContext,
+) -> dict[str, ModelRecommendationView]:
+    """Index cached current-run recommendations by model identifier."""
+    return {view.result.model_name: view for view in report_context.recommendations}
+
+
+def _machine_artifact_tsv_cells(view: ModelRecommendationView) -> tuple[str, ...]:
+    """Format canonical additive facts as TSV cells, leaving unavailable scores blank."""
+    facts = _machine_artifact_facts(view)
+
+    def optional_score(value: float | None) -> str:
+        return str(value) if value is not None else ""
+
+    return (
+        facts.compatibility_status,
+        optional_score(facts.context_integration_score),
+        optional_score(facts.draft_improvement_score),
+        optional_score(facts.visual_description_score),
+        optional_score(facts.assisted_enrichment_score),
+        facts.prompt_burden_kind,
+        facts.prompt_burden_source,
+        facts.owner_confidence or "",
+    )
+
+
 def _eligible_recommendations(
     views: Sequence[ModelRecommendationView],
 ) -> list[ModelRecommendationView]:
@@ -18059,7 +18216,7 @@ def generate_model_selection_report(
 
     policy = report_context.mode_policy
     grounding = "grounded" if policy.semantic_rankings_grounded else "ungrounded"
-    views = _build_model_recommendation_views(report_context)
+    views = report_context.recommendations
     ranked_views = _rank_quality_first(views)
     ranking_policy_name = _model_selection_policy_name(policy)
     quality_policy_name = f"quality-first ({ranking_policy_name})"
@@ -18092,6 +18249,9 @@ def generate_model_selection_report(
         gallery_filename=gallery_filename,
         diagnostics_filename=diagnostics_filename,
     )
+
+    md.extend(render_report_markdown((_build_recommendation_summary_block(report_context),)))
+    md.append("")
 
     _append_model_selection_quick_chooser(
         md,
@@ -18402,7 +18562,7 @@ def _collect_model_capability_signals(
             signals_by_model.setdefault(model, []).append(
                 _capability_signal_from_history(model, info)
             )
-    for view in _build_model_recommendation_views(report_context):
+    for view in report_context.recommendations:
         signal = _capability_signal_from_result(
             view,
             utility_by_model=utility_by_model,
@@ -18784,6 +18944,11 @@ def generate_tsv_report(
         table_data = _build_prepared_table_data(result_set=result_set)
         headers, rows, _ = _materialize_prepared_table_data(table_data)
         sorted_results = list(result_set.results)
+        report_context = _build_report_render_context(
+            results=results,
+            prompt="",
+            system_info={},
+        )
     else:
         headers, rows, _ = _materialize_prepared_table_data(report_context.table_data)
         sorted_results = list(report_context.result_set.results)
@@ -18813,26 +18978,32 @@ def generate_tsv_report(
         clean_header = re.sub(r"<[^>]+>", "", clean_header)
         clean_headers.append(escape_tsv_value(clean_header))
 
-    burden_headers = [
+    canonical_headers = [
+        "compatibility_status",
+        "context_integration_score",
+        "draft_improvement_score",
+        "visual_description_score",
+        "assisted_enrichment_score",
         "prompt_burden_kind",
         "prompt_burden_source",
+        "owner_confidence",
         "prompt_burden_reason",
         "processed_image_width",
         "processed_image_height",
         "image_patch_count",
     ]
-    clean_headers.extend([*burden_headers, "Generated Text", "error_type", "error_package"])
+    clean_headers.extend([*canonical_headers, "Generated Text", "error_type", "error_package"])
     generated_text_index = clean_headers.index("Generated Text")
+    recommendations = _recommendations_by_model(report_context)
 
     clean_rows: list[list[str]] = []
     for row, res in zip(rows, sorted_results, strict=False):
         clean_row = [escape_tsv_value(cell) for cell in row]
-        image_profile = report_context.image_profile if report_context is not None else None
-        burden = _prompt_burden_for_result(res, image_profile)
+        recommendation = recommendations[res.model_name]
+        burden = recommendation.burden
         clean_row.extend(
             [
-                burden.kind,
-                burden.source,
+                *_machine_artifact_tsv_cells(recommendation),
                 burden.reason or "",
                 str(burden.processed_width) if burden.processed_width is not None else "",
                 str(burden.processed_height) if burden.processed_height is not None else "",
@@ -24459,14 +24630,16 @@ def _format_failures_by_package_parts(
         for package, failures in sorted_packages:
             parts.append(f"<h4>{html.escape(package)}</h4><ul>")
             for result in failures:
-                error_message = result.error_message or ""
+                narrative = _build_failure_narrative(result)
+                error_message = narrative.primary_exception
                 if len(error_message) > ERROR_MESSAGE_TRUNCATE_LEN:
                     error_message = error_message[: ERROR_MESSAGE_TRUNCATE_LEN - 3] + "..."
                 issue_parts = [html.escape(result.model_name)]
                 if result.error_stage:
                     issue_parts.append(html.escape(result.error_stage))
-                if result.error_type:
-                    issue_parts.append(html.escape(result.error_type))
+                issue_parts.append(
+                    html.escape(f"{narrative.suspected_owner} ({narrative.owner_confidence})")
+                )
                 if error_message:
                     issue_parts.append(html.escape(error_message))
                 parts.append(f"<li>{' | '.join(issue_parts)}</li>")
@@ -24502,6 +24675,7 @@ def _format_failures_by_package_parts(
         parts.append(f"#### {package}")
         parts.append("")
         for result in failures:
+            narrative = _build_failure_narrative(result)
             parts.extend(
                 _wrap_markdown_text(
                     f"{result.model_name} ({result.error_stage})",
@@ -24509,13 +24683,14 @@ def _format_failures_by_package_parts(
                     subsequent_indent="  ",
                 )
             )
-            error_message = result.error_message or ""
+            error_message = narrative.primary_exception
             if len(error_message) > ERROR_MESSAGE_TRUNCATE_LEN:
                 error_message = error_message[: ERROR_MESSAGE_TRUNCATE_LEN - 3] + "..."
             escaped_message = DIAGNOSTICS_ESCAPER.escape(error_message)
             parts.append(f"  - Error: `{escaped_message}`")
-            if result.error_type:
-                parts.append(f"  - Type: `{result.error_type}`")
+            parts.append(
+                f"  - Suspected owner: `{narrative.suspected_owner}` ({narrative.owner_confidence})"
+            )
         parts.append("")
 
     return parts
@@ -25278,10 +25453,32 @@ def _populate_history_capability_scores(
         record["peak_memory_gb"] = peak_memory_gb
 
 
+def _populate_history_machine_facts(
+    record: HistoryModelResultRecord,
+    recommendation: ModelRecommendationView,
+) -> None:
+    """Attach available canonical machine facts to one history model row."""
+    facts = _machine_artifact_facts(recommendation)
+    record["compatibility_status"] = facts.compatibility_status
+    record["prompt_burden_kind"] = facts.prompt_burden_kind
+    record["prompt_burden_source"] = facts.prompt_burden_source
+    if facts.context_integration_score is not None:
+        record["context_integration_score"] = facts.context_integration_score
+    if facts.draft_improvement_score is not None:
+        record["draft_improvement_score"] = facts.draft_improvement_score
+    if facts.visual_description_score is not None:
+        record["visual_description_score"] = facts.visual_description_score
+    if facts.assisted_enrichment_score is not None:
+        record["assisted_enrichment_score"] = facts.assisted_enrichment_score
+    if facts.owner_confidence is not None:
+        record["owner_confidence"] = facts.owner_confidence
+
+
 def _history_model_result_from_result(
     result: PerformanceResult,
     *,
     prompt: str | None = None,
+    recommendation: ModelRecommendationView | None = None,
 ) -> HistoryModelResultRecord:
     """Build a typed per-model history row from runtime result."""
     record: HistoryModelResultRecord = {
@@ -25322,6 +25519,8 @@ def _history_model_result_from_result(
     stop_reason = result.runtime_diagnostics.stop_reason if result.runtime_diagnostics else None
     if stop_reason is not None:
         record["stop_reason"] = stop_reason
+    if recommendation is not None:
+        _populate_history_machine_facts(record, recommendation)
     return record
 
 
@@ -25334,11 +25533,25 @@ def _build_history_run_record(
     image_path: Path | None,
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
     eval_mode: str = DEFAULT_EVAL_MODE,
+    report_context: ReportRenderContext | None = None,
 ) -> HistoryRunRecord:
     """Build typed run-history record payload prior to append."""
     prompt_hash = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
+    if report_context is None:
+        report_context = _build_report_render_context(
+            results=results,
+            prompt=prompt,
+            image_path=image_path,
+            eval_mode=eval_mode,
+            system_info=system_info,
+        )
+    recommendations = _recommendations_by_model(report_context)
     model_results = {
-        result.model_name: _history_model_result_from_result(result, prompt=prompt)
+        result.model_name: _history_model_result_from_result(
+            result,
+            prompt=prompt,
+            recommendation=recommendations.get(result.model_name),
+        )
         for result in results
     }
     record: HistoryRunRecord = {
@@ -25368,6 +25581,7 @@ def append_history_record(
     image_path: Path | None = None,
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
     eval_mode: str = DEFAULT_EVAL_MODE,
+    report_context: ReportRenderContext | None = None,
 ) -> HistoryRunRecord:
     """Append a per-run history record for tracking regressions/recoveries."""
     record = _build_history_run_record(
@@ -25378,6 +25592,7 @@ def append_history_record(
         image_path=image_path,
         runtime_fingerprint=runtime_fingerprint,
         eval_mode=eval_mode,
+        report_context=report_context,
     )
 
     try:
@@ -25600,6 +25815,7 @@ def save_jsonl_report(
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
     eval_mode: str = DEFAULT_EVAL_MODE,
     metadata_exposed_to_prompt: bool = False,
+    report_context: ReportRenderContext | None = None,
 ) -> None:
     """Save results to a JSONL file for programmatic analysis and AI issue generation.
 
@@ -25616,7 +25832,15 @@ def save_jsonl_report(
     Format (v2.0): First line is a metadata header containing prompt,
     system_info, and shared runtime context. Per-model result lines follow.
     """
-    issue_cluster_by_model = _issue_cluster_map_for_results(results, prompt=prompt)
+    if report_context is None:
+        report_context = _build_report_render_context(
+            results=results,
+            prompt=prompt,
+            eval_mode=eval_mode,
+            system_info=system_info,
+        )
+    issue_cluster_by_model = _issue_clusters_by_model(report_context.issue_clusters)
+    recommendations = _recommendations_by_model(report_context)
     try:
         # Write shared metadata header (avoids repeating prompt/system per row)
         header = _build_jsonl_metadata_record(
@@ -25635,11 +25859,27 @@ def save_jsonl_report(
             review_payload = _build_jsonl_review_record(result)
             if review_payload:
                 record["review"] = review_payload
-                record["maintainer_triage"] = _build_jsonl_maintainer_triage_record(
+                triage = _build_jsonl_maintainer_triage_record(
                     result,
                     review_payload,
                     issue_cluster=issue_cluster_by_model.get(result.model_name),
                 )
+                record["maintainer_triage"] = triage
+            if recommendation := recommendations.get(result.model_name):
+                facts = _machine_artifact_facts(recommendation)
+                record["compatibility_status"] = facts.compatibility_status
+                record["prompt_burden_kind"] = facts.prompt_burden_kind
+                record["prompt_burden_source"] = facts.prompt_burden_source
+                if facts.context_integration_score is not None:
+                    record["context_integration_score"] = facts.context_integration_score
+                if facts.draft_improvement_score is not None:
+                    record["draft_improvement_score"] = facts.draft_improvement_score
+                if facts.visual_description_score is not None:
+                    record["visual_description_score"] = facts.visual_description_score
+                if facts.assisted_enrichment_score is not None:
+                    record["assisted_enrichment_score"] = facts.assisted_enrichment_score
+                if facts.owner_confidence is not None:
+                    record["owner_confidence"] = facts.owner_confidence
             lines.append(json.dumps(record))
         _write_text_file(filename, "\n".join(lines) + "\n")
         # Logging handled in finalize_execution
@@ -25730,31 +25970,119 @@ def generate_output_index_report(
         f"- Successful: {len(result_set.successful)}",
         f"- Failed: {len(result_set.failed)}",
         "",
-        "## For Model Users",
+        "## Primary Artifacts",
         "",
         (
-            "- Start with "
-            + _output_index_link(filename, output_paths.model_selection, "model_selection.md")
-            + " for the practical shortlist and memory/speed buckets."
+            "- "
+            + _output_index_link(filename, output_paths.diagnostics, "diagnostics.md")
+            + " is the maintainer-first failure and integration route."
         ),
         (
-            "- Use "
+            "- "
+            + _output_index_link(filename, output_paths.html, "results.html")
+            + " is the complete standalone interactive run report."
+        ),
+        (
+            "- "
+            + _output_index_link(filename, output_paths.model_selection, "model_selection.md")
+            + " is the reliability-gated current-run chooser."
+        ),
+        (
+            "- "
+            + _output_index_link(filename, output_paths.gallery_markdown, "model_gallery.md")
+            + " preserves complete per-model output evidence."
+        ),
+        (
+            "- "
+            + _output_index_link(filename, output_paths.jsonl, "results.jsonl")
+            + " is the primary per-model machine-readable stream."
+        ),
+        "",
+        "## Supporting Artifacts",
+        "",
+        (
+            "- "
+            + _output_index_link(filename, output_paths.markdown, "results.md")
+            + " is the compatibility Markdown summary."
+        ),
+        (
+            "- "
+            + _output_index_link(filename, output_paths.review, "review.md")
+            + " is the supporting automated-review digest."
+        ),
+        (
+            "- "
             + _output_index_link(
                 filename,
                 output_paths.model_capabilities,
                 "model_capabilities.md",
             )
-            + " for current status plus historical reliability."
+            + " aggregates lane-matched current and historical capability signals."
         ),
         (
-            "- Inspect "
-            + _output_index_link(filename, output_paths.gallery_markdown, "model_gallery.md")
-            + " before treating a triage-clean model as visually correct."
+            "- "
+            + _output_index_link(filename, output_paths.tsv, "results.tsv")
+            + " supports spreadsheet inspection."
         ),
-        "",
-        "## For Maintainers",
-        "",
+        (
+            "- "
+            + _output_index_link(
+                filename,
+                _history_path_for_jsonl(output_paths.jsonl),
+                "results.history.jsonl",
+            )
+            + " is the append-only supporting history stream."
+        ),
+        (
+            "- "
+            + _output_index_link(filename, output_paths.run_json, "run.json")
+            + " contains the stable run-level contract."
+        ),
     ]
+    if diagnostics_written:
+        md.extend(
+            [
+                (
+                    "- "
+                    + _output_index_link(filename, issue_index, "issues/index.md")
+                    + " indexes supporting issue drafts."
+                ),
+                (
+                    "- "
+                    + _output_index_link(filename, repro_index, "latest_by_cluster.json")
+                    + " indexes supporting reproduction bundles."
+                ),
+            ]
+        )
+    md.extend(
+        [
+            "",
+            "## For Model Users",
+            "",
+            (
+                "- Start with "
+                + _output_index_link(filename, output_paths.model_selection, "model_selection.md")
+                + " for the practical shortlist and memory/speed buckets."
+            ),
+            (
+                "- Use "
+                + _output_index_link(
+                    filename,
+                    output_paths.model_capabilities,
+                    "model_capabilities.md",
+                )
+                + " for current status plus historical reliability."
+            ),
+            (
+                "- Inspect "
+                + _output_index_link(filename, output_paths.gallery_markdown, "model_gallery.md")
+                + " before treating a triage-clean model as visually correct."
+            ),
+            "",
+            "## For Maintainers",
+            "",
+        ]
+    )
     if diagnostics_written:
         md.extend(
             [
@@ -27355,6 +27683,7 @@ def _generate_github_issue_reports(
     run_args: argparse.Namespace | None,
     prompt: str | None = None,
     image_path: Path | None = None,
+    issue_clusters: Sequence[IssueCluster] | None = None,
 ) -> Mapping[str, Path]:
     """Generate clustered GitHub issue drafts and the issue queue index."""
     issues_dir = output_dir / "issues"
@@ -27367,7 +27696,11 @@ def _generate_github_issue_reports(
     if stale_index.exists():
         stale_index.unlink()
 
-    clusters = _build_issue_clusters(diagnostics_snapshot)
+    clusters = tuple(
+        issue_clusters
+        if issue_clusters is not None
+        else _build_issue_clusters(diagnostics_snapshot)
+    )
     generated_reports: dict[str, Path] = {}
     for cluster in clusters:
         issue_path = issues_dir / cluster.issue_filename
@@ -27412,14 +27745,12 @@ def _write_diagnostics_and_repro_artifacts(
     history_path: Path,
     previous_history: HistoryRunRecord | None,
     current_history: HistoryRunRecord | None,
+    report_context: ReportRenderContext,
 ) -> DiagnosticsArtifacts:
     """Export repro bundles and diagnostics markdown after history append."""
     preflight_issues = _get_run_preflight_issues(args)
-    diagnostics_snapshot = _build_diagnostics_snapshot(
-        results=results,
-        prompt=prompt,
-        preflight_issues=preflight_issues,
-    )
+    diagnostics_snapshot = report_context.diagnostics_snapshot
+    issue_clusters = report_context.issue_clusters
     repro_bundles = export_failure_repro_bundles(
         results=results,
         output_dir=diagnostics_path.parent.parent / "repro_bundles",
@@ -27428,6 +27759,7 @@ def _write_diagnostics_and_repro_artifacts(
         system_info=system_info,
         prompt=prompt,
         image_path=image_path,
+        issue_clusters=issue_clusters,
     )
     if repro_bundles:
         logger.info("Repro bundles written for %d issue-linked model(s).", len(repro_bundles))
@@ -27450,6 +27782,7 @@ def _write_diagnostics_and_repro_artifacts(
         ),
         repro_bundles=repro_bundles,
         diagnostics_snapshot=diagnostics_snapshot,
+        issue_clusters=issue_clusters,
     )
     issue_reports = _generate_github_issue_reports(
         diagnostics_snapshot=diagnostics_snapshot,
@@ -27460,6 +27793,7 @@ def _write_diagnostics_and_repro_artifacts(
         run_args=args,
         prompt=prompt,
         image_path=image_path,
+        issue_clusters=issue_clusters,
     )
     if issue_reports:
         logger.info("GitHub Issue reports generated for %d issue(s).", len(issue_reports))
@@ -27756,6 +28090,7 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
                 metadata_exposed_to_prompt=(
                     inputs.report_context.mode_policy.metadata_exposed_to_prompt
                 ),
+                report_context=inputs.report_context,
             ),
         ),
         ReportArtifact(
@@ -28194,6 +28529,7 @@ def finalize_execution(
             image_path=image_path,
             runtime_fingerprint=runtime_fingerprint,
             eval_mode=eval_mode,
+            report_context=report_context,
         )
 
         log_file_path(history_path, label="   History:     ")
@@ -28217,6 +28553,7 @@ def finalize_execution(
             history_path=history_path,
             previous_history=previous_history,
             current_history=current_history,
+            report_context=report_context,
         )
         _log_maintainer_summary(
             artifacts=diagnostics_artifacts,

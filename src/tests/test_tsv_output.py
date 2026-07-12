@@ -228,6 +228,53 @@ def test_tsv_includes_canonical_prompt_burden_scalars(tmp_path: Path) -> None:
     assert record["image_patch_count"] == "4"
 
 
+def test_tsv_includes_canonical_enrichment_compatibility_and_owner(tmp_path: Path) -> None:
+    """TSV should expose the same additive facts as JSONL and history."""
+    prompt = "Create title, description, and keywords."
+    result = check_models.PerformanceResult(
+        model_name="test/enriched",
+        success=True,
+        generation=MockGenerationResult(
+            text="Title: Cat. Description: A cat on a chair. Keywords: cat, chair.",
+            prompt_tokens=4100,
+            generation_tokens=18,
+        ),
+        quality_analysis=check_models.analyze_generation_text(
+            "Title: Cat. Description: A cat on a chair. Keywords: cat, chair.",
+            generated_tokens=18,
+            prompt_tokens=4100,
+            prompt=prompt,
+        ),
+        prompt_diagnostics=check_models.PromptDiagnostics(image_placeholder_count=1),
+        metadata_agreement=check_models.MetadataAgreementMetrics(
+            overall_score=88.0,
+            context_integration_score=81.0,
+            draft_improvement_score=72.0,
+            visual_description_score=91.0,
+            assisted_enrichment_score=84.0,
+        ),
+    )
+    context = check_models._build_report_render_context(
+        results=[result],
+        prompt=prompt,
+        metadata={"description": "A cat on a chair."},
+        eval_mode="assisted",
+    )
+    output_file = tmp_path / "aligned.tsv"
+
+    check_models.generate_tsv_report([result], output_file, report_context=context)
+    record = _read_tsv_record(output_file)
+
+    assert record["compatibility_status"] == "clean"
+    assert record["context_integration_score"] == "81"
+    assert record["draft_improvement_score"] == "72"
+    assert record["visual_description_score"] == "91"
+    assert record["assisted_enrichment_score"] == "84"
+    assert record["prompt_burden_kind"] == "visual_input"
+    assert record["prompt_burden_source"] == "estimated_nontext"
+    assert record["owner_confidence"] in {"high", "medium", "low"}
+
+
 def test_tsv_empty_results(tmp_path: Path) -> None:
     """Should handle empty results list gracefully."""
     results: list[check_models.PerformanceResult] = []

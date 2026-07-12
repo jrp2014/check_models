@@ -725,6 +725,77 @@ def test_save_jsonl_report_includes_canonical_prompt_burden(tmp_path: Path) -> N
     assert review["prompt_burden_source"] == "estimated_nontext"
 
 
+def test_jsonl_and_history_include_canonical_cross_artifact_facts(tmp_path: Path) -> None:
+    """Additive machine fields should mirror recommendation, burden, and owner facts."""
+    output_file = tmp_path / "results.jsonl"
+    history_file = tmp_path / "results.history.jsonl"
+    prompt = "Create title, description, and keywords."
+    analysis = check_models.analyze_generation_text(
+        "Title: Cat\nDescription: A cat rests on a chair.\nKeywords: cat, chair",
+        generated_tokens=18,
+        prompt_tokens=4100,
+        prompt=prompt,
+    )
+    result = PerformanceResult(
+        model_name="org/enriched",
+        generation=MockGeneration(
+            text="Title: Cat\nDescription: A cat rests on a chair.\nKeywords: cat, chair",
+            prompt_tokens=4100,
+            generation_tokens=18,
+        ),
+        success=True,
+        quality_analysis=analysis,
+        prompt_diagnostics=check_models.PromptDiagnostics(image_placeholder_count=1),
+        metadata_agreement=MetadataAgreementMetrics(
+            overall_score=88.0,
+            context_integration_score=81.0,
+            draft_improvement_score=72.0,
+            visual_description_score=91.0,
+            assisted_enrichment_score=84.0,
+        ),
+    )
+    context = check_models._build_report_render_context(
+        results=[result],
+        prompt=prompt,
+        metadata={"description": "A cat rests on a chair."},
+        eval_mode="assisted",
+    )
+
+    save_jsonl_report(
+        [result],
+        output_file,
+        prompt=prompt,
+        system_info={},
+        eval_mode="assisted",
+        metadata_exposed_to_prompt=True,
+        report_context=context,
+    )
+    history = append_history_record(
+        history_path=history_file,
+        results=[result],
+        prompt=prompt,
+        system_info={},
+        library_versions={},
+        eval_mode="assisted",
+        report_context=context,
+    )
+    header, rows = _read_jsonl(output_file)
+    row = rows[0]
+    history_row = history["model_results"]["org/enriched"]
+
+    assert header["format_version"] == "2.0"
+    assert history["format_version"] == "1.0"
+    for machine_row in (row, history_row):
+        assert machine_row["compatibility_status"] == "clean"
+        assert machine_row["context_integration_score"] == 81.0
+        assert machine_row["draft_improvement_score"] == 72.0
+        assert machine_row["visual_description_score"] == 91.0
+        assert machine_row["assisted_enrichment_score"] == 84.0
+        assert machine_row["prompt_burden_kind"] == "visual_input"
+        assert machine_row["prompt_burden_source"] == "estimated_nontext"
+        assert machine_row["owner_confidence"] == row["maintainer_triage"]["confidence"]
+
+
 def test_jsonl_prompt_burden_reuses_generation_level_quality_analysis(tmp_path: Path) -> None:
     output_file = tmp_path / "results.jsonl"
     prompt = "Describe this image briefly."

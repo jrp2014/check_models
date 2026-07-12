@@ -387,6 +387,61 @@ def test_recommendation_view_excludes_crash_from_usable_policies() -> None:
     assert by_model["org/passed"].eligible is True
 
 
+def test_report_context_caches_cross_artifact_views() -> None:
+    """One context should own recommendations, diagnostics, and issue clusters."""
+    failed = _make_failure("org/crashed")
+    passed = _make_success("org/passed")
+
+    context = _build_report_render_context(
+        results=[failed, passed],
+        prompt="Describe the image.",
+        eval_mode="blind",
+    )
+
+    assert [view.result.model_name for view in context.recommendations] == [
+        "org/crashed",
+        "org/passed",
+    ]
+    assert context.diagnostics_snapshot.failed == (failed,)
+    assert context.issue_clusters == check_models._build_issue_clusters(
+        context.diagnostics_snapshot
+    )
+
+
+def test_html_and_markdown_share_task_outcome_and_policy(tmp_path: Path) -> None:
+    """HTML and the selection brief should expose the same reliability policy."""
+    results = [_make_failure("org/crashed"), _make_success("org/passed")]
+    context = _build_report_render_context(
+        results=results,
+        prompt="Describe the image.",
+        eval_mode="blind",
+    )
+    html_path = tmp_path / "results.html"
+    selection_path = tmp_path / "model_selection.md"
+
+    generate_html_report(
+        results,
+        html_path,
+        versions={},
+        prompt="Describe the image.",
+        total_runtime_seconds=1.0,
+        report_context=context,
+    )
+    check_models.generate_model_selection_report(
+        results,
+        selection_path,
+        prompt="Describe the image.",
+        report_context=context,
+    )
+
+    html_text = html_path.read_text(encoding="utf-8")
+    selection_text = selection_path.read_text(encoding="utf-8")
+    assert "org/crashed" in html_text
+    assert "Task outcome: crashed" in html_text
+    assert "reliability-gated" in html_text
+    assert "reliability-gated" in selection_text
+
+
 def test_recommendation_policies_gate_reliability_memory_and_dominance() -> None:
     def _result(name: str, *, score: float, total: float, peak: float) -> PerformanceResult:
         base = _make_success(name)
@@ -5625,6 +5680,36 @@ def test_output_index_routes_maintainers_and_model_users(tmp_path: Path) -> None
     assert "model_capabilities.md" in content
     assert "issues/index.md" in content
     assert "latest_by_cluster.json" in content
+    assert "## Primary Artifacts" in content
+    assert "## Supporting Artifacts" in content
+    primary = _extract_markdown_subsection(
+        content,
+        "## Primary Artifacts",
+        end_headings=("## Supporting Artifacts",),
+    )
+    supporting = _extract_markdown_subsection(
+        content,
+        "## Supporting Artifacts",
+        end_headings=("## For Model Users",),
+    )
+    for artifact in (
+        "diagnostics.md",
+        "results.html",
+        "model_selection.md",
+        "model_gallery.md",
+        "results.jsonl",
+    ):
+        assert artifact in primary
+    for artifact in (
+        "results.md",
+        "review.md",
+        "model_capabilities.md",
+        "results.tsv",
+        "results.history.jsonl",
+        "issues/index.md",
+        "latest_by_cluster.json",
+    ):
+        assert artifact in supporting
 
 
 class TestIssueDirectoryInvariants:
