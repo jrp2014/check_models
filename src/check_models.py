@@ -13211,6 +13211,8 @@ class ModelCapabilityRunSignal:
     model: str
     success: bool
     is_current: bool = False
+    eligible: bool | None = None
+    eligibility_reason: str | None = None
     review_bucket: str | None = None
     capability_score: float | None = None
     hygiene_score: float | None = None
@@ -17467,10 +17469,10 @@ def _rank_under_memory_budget(
     views: Sequence[ModelRecommendationView],
     budget_gb: float,
 ) -> list[ModelRecommendationView]:
-    """Return reliability-gated enrichment results within a peak-memory budget."""
+    """Return reliability-gated, quality-first results within a memory budget."""
     return [
         view
-        for view in _rank_reliability_gated_enrichment(views)
+        for view in _rank_quality_first(views)
         if view.peak_memory_gb is not None and view.peak_memory_gb <= budget_gb
     ]
 
@@ -17478,29 +17480,32 @@ def _rank_under_memory_budget(
 def _pareto_recommendations(
     views: Sequence[ModelRecommendationView],
 ) -> list[ModelRecommendationView]:
-    """Return eligible views not dominated on enrichment, total time, and memory."""
-    ranked = _rank_reliability_gated_enrichment(views)
+    """Return eligible views not dominated on lane quality, total time, and memory."""
+    ranked = _rank_quality_first(views)
 
     def _dominates(left: ModelRecommendationView, right: ModelRecommendationView) -> bool:
-        if any(
-            value is None
-            for value in (
-                left.assisted_enrichment_score,
-                left.total_time_s,
-                left.peak_memory_gb,
-                right.assisted_enrichment_score,
-                right.total_time_s,
-                right.peak_memory_gb,
+        left_quality = _recommendation_quality_score(left)
+        right_quality = _recommendation_quality_score(right)
+        if (
+            any(
+                value is None
+                for value in (
+                    left.total_time_s,
+                    left.peak_memory_gb,
+                    right.total_time_s,
+                    right.peak_memory_gb,
+                )
             )
+            or min(left_quality, right_quality) < 0.0
         ):
             return False
         left_values = (
-            cast("float", left.assisted_enrichment_score),
+            left_quality,
             -cast("float", left.total_time_s),
             -cast("float", left.peak_memory_gb),
         )
         right_values = (
-            cast("float", right.assisted_enrichment_score),
+            right_quality,
             -cast("float", right.total_time_s),
             -cast("float", right.peak_memory_gb),
         )
@@ -17538,6 +17543,42 @@ def _recommendation_quality_score(view: ModelRecommendationView) -> float:
         if score is not None:
             return score
     return -1.0
+
+
+def _rank_quality_first(
+    views: Sequence[ModelRecommendationView],
+) -> list[ModelRecommendationView]:
+    """Rank reliability-gated views by lane quality, then output and throughput."""
+    eligible = _eligible_recommendations(views)
+    if any(view.assisted_enrichment_score is not None for view in eligible):
+        return _rank_reliability_gated_enrichment(views)
+    return sorted(
+        eligible,
+        key=lambda view: (
+            _recommendation_quality_score(view),
+            view.output_score if view.output_score is not None else -1.0,
+            view.generation_tps if view.generation_tps is not None else -1.0,
+            view.result.model_name,
+        ),
+        reverse=True,
+    )
+
+
+def _rank_efficiency_aware(
+    views: Sequence[ModelRecommendationView],
+) -> list[ModelRecommendationView]:
+    """Rank the reliability-gated quality/time/memory Pareto frontier by efficiency."""
+    return sorted(
+        _pareto_recommendations(views),
+        key=lambda view: (
+            -(view.total_time_s if view.total_time_s is not None else math.inf),
+            -(view.peak_memory_gb if view.peak_memory_gb is not None else math.inf),
+            view.generation_tps if view.generation_tps is not None else -1.0,
+            _recommendation_quality_score(view),
+            view.result.model_name,
+        ),
+        reverse=True,
+    )
 
 
 def _rank_current_recommendations(
@@ -17631,41 +17672,16 @@ def _append_model_selection_quick_chooser(
     policy_name: str,
 ) -> None:
     """Append practical model-user chooser buckets before the full shortlist."""
-    usable_views = _eligible_recommendations(views)
-    if any(view.assisted_enrichment_score is not None for view in usable_views):
-        budget_ranked = _rank_reliability_gated_enrichment(views)
-    else:
-        budget_ranked = _rank_current_recommendations(usable_views)
-    under_4gb = [
-        view
-        for view in budget_ranked
-        if view.peak_memory_gb is not None
-        and view.peak_memory_gb <= MODEL_SELECTION_CHOOSER_SMALL_MEMORY_GB
-    ][:MODEL_SELECTION_CHOOSER_ROW_LIMIT]
-    under_8gb = [
-        view
-        for view in budget_ranked
-        if view.peak_memory_gb is not None
-        and view.peak_memory_gb <= MODEL_SELECTION_CHOOSER_MEDIUM_MEMORY_GB
-    ][:MODEL_SELECTION_CHOOSER_ROW_LIMIT]
-    fastest = sorted(
-        usable_views,
-        key=lambda view: (
-            view.generation_tps or 0.0,
-            _recommendation_quality_score(view),
-            view.output_score or 0.0,
-        ),
-        reverse=True,
+    under_4gb = _rank_under_memory_budget(
+        views,
+        MODEL_SELECTION_CHOOSER_SMALL_MEMORY_GB,
     )[:MODEL_SELECTION_CHOOSER_ROW_LIMIT]
-    quality_any_memory = sorted(
-        usable_views,
-        key=lambda view: (
-            _recommendation_quality_score(view),
-            view.output_score or 0.0,
-            view.generation_tps or 0.0,
-        ),
-        reverse=True,
+    under_8gb = _rank_under_memory_budget(
+        views,
+        MODEL_SELECTION_CHOOSER_MEDIUM_MEMORY_GB,
     )[:MODEL_SELECTION_CHOOSER_ROW_LIMIT]
+    fastest = _rank_efficiency_aware(views)[:MODEL_SELECTION_CHOOSER_ROW_LIMIT]
+    quality_any_memory = _rank_quality_first(views)[:MODEL_SELECTION_CHOOSER_ROW_LIMIT]
     current_avoid = [view for view in views if not view.eligible][
         :MODEL_SELECTION_CHOOSER_AVOID_ROW_LIMIT
     ]
@@ -17685,35 +17701,35 @@ def _append_model_selection_quick_chooser(
         md,
         title="Best under 4 GB",
         views=under_4gb,
-        policy_name=policy_name,
+        policy_name=f"memory-aware ({policy_name}; budget 4 GB)",
         empty_text="No clean current-run candidates fit under this memory budget.",
     )
     _append_model_selection_chooser_section(
         md,
         title="Best under 8 GB",
         views=under_8gb,
-        policy_name=policy_name,
+        policy_name=f"memory-aware ({policy_name}; budget 8 GB)",
         empty_text="No clean current-run candidates fit under this memory budget.",
     )
     _append_model_selection_chooser_section(
         md,
         title="Fastest usable",
         views=fastest,
-        policy_name="reliability-gated generation throughput",
+        policy_name="efficiency-aware Pareto frontier (reliability-gated)",
         empty_text="No clean current-run candidates produced usable caption text.",
     )
     _append_model_selection_chooser_section(
         md,
         title="Quality if memory allows",
         views=quality_any_memory,
-        policy_name=policy_name,
+        policy_name=f"quality-first ({policy_name})",
         empty_text="No clean current-run candidates produced usable caption text.",
     )
     _append_model_selection_chooser_section(
         md,
         title="Current failures / avoid",
         views=current_avoid,
-        policy_name="current-run reliability exclusion",
+        policy_name="reliability-gated exclusion evidence",
         empty_text="No current-run failures or avoid-bucket outputs.",
     )
 
@@ -18044,8 +18060,9 @@ def generate_model_selection_report(
     policy = report_context.mode_policy
     grounding = "grounded" if policy.semantic_rankings_grounded else "ungrounded"
     views = _build_model_recommendation_views(report_context)
-    ranked_views = _rank_current_recommendations(_eligible_recommendations(views))
+    ranked_views = _rank_quality_first(views)
     ranking_policy_name = _model_selection_policy_name(policy)
+    quality_policy_name = f"quality-first ({ranking_policy_name})"
     md: list[str] = [
         "# Model Selection Brief",
         "",
@@ -18090,7 +18107,7 @@ def generate_model_selection_report(
                 "Top 10 ranked candidates for brief captions. This is a selection aid, "
                 "not the complete result set."
             ),
-            f"Policy: {ranking_policy_name}.",
+            f"Policy: {quality_policy_name}.",
             "Evidence scope: 1 image, 1 current run.",
             "",
         ]
@@ -18136,7 +18153,7 @@ def generate_model_selection_report(
                 "## Structured Metadata Candidates",
                 "",
                 "Structured metadata scoring is suppressed in triage mode.",
-                f"Policy: {ranking_policy_name}.",
+                f"Policy: {quality_policy_name}.",
                 "Evidence scope: 1 image, 1 current run.",
                 "",
             ]
@@ -18145,14 +18162,14 @@ def generate_model_selection_report(
         md.extend(
             _build_grounded_metadata_selection_section(
                 ranked_views,
-                policy_name=ranking_policy_name,
+                policy_name=quality_policy_name,
             )
         )
 
     md.extend(
         _build_model_family_comparison_section(
             views,
-            policy_name=ranking_policy_name,
+            policy_name=quality_policy_name,
         )
     )
 
@@ -18254,6 +18271,8 @@ def _capability_signal_from_result(
         model=result.model_name,
         success=result.success,
         is_current=True,
+        eligible=view.eligible,
+        eligibility_reason=view.eligibility_reason,
         review_bucket=review_bucket,
         capability_score=capability_score,
         hygiene_score=hygiene_score,
@@ -18264,7 +18283,11 @@ def _capability_signal_from_result(
         metadata_alignment_score=metadata_score,
         generation_tps=view.generation_tps,
         peak_memory_gb=view.peak_memory_gb,
-        signal=_gallery_summary_signal(result),
+        signal=(
+            _gallery_summary_signal(result)
+            if view.eligible
+            else f"{view.eligibility_reason}; {_gallery_summary_signal(result)}"
+        ),
     )
 
 
@@ -18302,6 +18325,8 @@ def _model_capability_recommendation(
     recommendation = "needs-review"
     if row.current_status == "failed":
         recommendation = "current-run-blocked"
+    elif row.current_status == "ineligible":
+        recommendation = "current-run-ineligible"
     elif row.current_status == "avoid":
         recommendation = "avoid"
     elif row.runs <= 0 or row.successes <= 0:
@@ -18354,6 +18379,8 @@ def _model_capability_current_status(
         return "not-tested"
     if not current_signal.success:
         return "failed"
+    if current_signal.eligible is False:
+        return "ineligible"
     if current_signal.review_bucket in {"avoid", "caveat", "needs_triage"}:
         return current_signal.review_bucket.replace("_", "-")
     return "passed"

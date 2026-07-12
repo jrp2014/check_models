@@ -599,7 +599,7 @@ def test_capability_and_structured_sections_name_policy_and_scope(tmp_path: Path
         end_headings=("## Repository Variant Comparisons",),
     )
     capability_content = capability.read_text(encoding="utf-8")
-    assert "Policy: reliability-gated assisted enrichment" in structured
+    assert "Policy: quality-first (reliability-gated assisted enrichment)" in structured
     assert "Evidence scope: 1 image, 1 current run" in structured
     assert (
         "Policy: lane-filtered current and historical capability aggregation" in capability_content
@@ -608,6 +608,123 @@ def test_capability_and_structured_sections_name_policy_and_scope(tmp_path: Path
         "Evidence scope: 1 image, 1 current run plus 0 prior lane-matched runs"
         in capability_content
     )
+
+
+def test_ineligible_current_view_cannot_receive_positive_capability_recommendation(
+    tmp_path: Path,
+) -> None:
+    result = _make_success("org/ineligible-caption")
+    analysis = replace(
+        check_models.analyze_generation_text(
+            str(getattr(result.generation, "text", "") or ""),
+            generated_tokens=48,
+            prompt_tokens=120,
+            prompt="Describe this image briefly.",
+        ),
+        verdict="clean",
+        user_bucket="recommended",
+    )
+    result = replace(
+        result,
+        quality_analysis=analysis,
+        quality_issues="repetitive, formatting",
+    )
+    context = _build_report_render_context(
+        results=[result],
+        prompt="Describe this image briefly.",
+        eval_mode="triage",
+    )
+    (view,) = check_models._build_model_recommendation_views(context)
+    markdown = tmp_path / "capability.md"
+    payload_path = tmp_path / "capability.json"
+
+    check_models.generate_model_capability_scorecard(
+        [result],
+        markdown,
+        payload_path,
+        prompt="Describe this image briefly.",
+        report_context=context,
+    )
+
+    payload = json.loads(payload_path.read_text(encoding="utf-8"))
+    model = payload["models"][0]
+    assert view.eligible is False
+    assert "configured chooser threshold" in view.eligibility_reason
+    assert model["current_status"] == "ineligible"
+    assert model["recommendation"] == "current-run-ineligible"
+    assert model["recommendation"] not in {"caption", "caption+keywords", "keywords"}
+    assert "configured chooser threshold" in model["latest_signal"]
+
+
+def test_model_selection_renders_canonical_policy_taxonomy(tmp_path: Path) -> None:
+    results = [
+        replace(
+            _make_metadata_agreement_result("org/quality"),
+            generation=_MockGeneration(
+                text="Two boats rest on a calm river beside a wooded bank.",
+                generation_tps=40.0,
+                peak_memory=3.0,
+            ),
+            total_time=1.0,
+            metadata_agreement=check_models.MetadataAgreementMetrics(
+                overall_score=90.0,
+                visual_description_score=90.0,
+                assisted_enrichment_score=90.0,
+            ),
+        ),
+        replace(
+            _make_metadata_agreement_result("org/efficient"),
+            generation=_MockGeneration(
+                text="Two boats sit on calm water near trees along the river bank.",
+                generation_tps=100.0,
+                peak_memory=2.0,
+            ),
+            total_time=0.5,
+            metadata_agreement=check_models.MetadataAgreementMetrics(
+                overall_score=80.0,
+                visual_description_score=80.0,
+                assisted_enrichment_score=80.0,
+            ),
+        ),
+        _make_failure("org/crashed"),
+    ]
+    context = _build_report_render_context(
+        results=results,
+        prompt="Create title, description, and keywords.",
+        metadata={"description": "Two boats on a river", "keywords": "boats, river"},
+        eval_mode="assisted",
+    )
+    output = tmp_path / "selection.md"
+
+    check_models.generate_model_selection_report(
+        results,
+        output,
+        prompt="Create title, description, and keywords.",
+        report_context=context,
+    )
+
+    content = output.read_text(encoding="utf-8")
+    for policy_name in (
+        "Policy: reliability-gated",
+        "Policy: quality-first",
+        "Policy: efficiency-aware",
+        "Policy: memory-aware",
+    ):
+        assert policy_name in content
+    assert content.count("Evidence scope: 1 image, 1 current run") >= 5
+    for heading, next_heading in (
+        ("### Best under 4 GB", "### Best under 8 GB"),
+        ("### Best under 8 GB", "### Fastest usable"),
+        ("### Fastest usable", "### Quality if memory allows"),
+        ("### Quality if memory allows", "### Current failures / avoid"),
+        ("## Brief Caption Candidates", "## Structured Metadata Candidates"),
+    ):
+        section = _extract_markdown_subsection(
+            content,
+            heading,
+            end_headings=(next_heading,),
+        )
+        assert "org/crashed" not in section
 
 
 def _make_harness_success(
