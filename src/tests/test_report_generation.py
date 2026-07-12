@@ -847,35 +847,6 @@ def test_report_mode_policy_blind_keeps_metadata_held_out() -> None:
     assert policy.metadata_exposed_to_prompt is False
 
 
-def test_unflagged_models_section_marks_prompt_incomplete_analysis() -> None:
-    """Diagnostics should avoid labeling prompt-less cached analysis as clean output."""
-    stale_analysis = check_models.analyze_generation_text(
-        "Title: Brick storefront with outdoor seating",
-        generated_tokens=18,
-    )
-    result = PerformanceResult(
-        model_name="org/promptless",
-        success=True,
-        generation=_MockGeneration(
-            text="Title: Brick storefront with outdoor seating",
-            generation_tokens=18,
-        ),
-        total_time=1.0,
-        generation_time=0.5,
-        model_load_time=0.5,
-        quality_analysis=stale_analysis,
-    )
-
-    section = check_models._diagnostics_unflagged_success_section(
-        unflagged_successful=[result],
-    )
-    content = "\n".join(section)
-
-    assert "Passed (prompt-dependent quality checks unavailable)" in content
-    assert "1 model(s)" in content
-    assert "`org/promptless`" not in content
-
-
 def _history_run(
     model_success: dict[str, bool],
     *,
@@ -2790,6 +2761,160 @@ def _make_failure_with_details(
 class TestDiagnosticsReport:
     """Tests for generate_diagnostics_report and its helpers."""
 
+    def test_diagnostics_is_self_contained_mlx_vlm_issue(self, tmp_path: Path) -> None:
+        """Diagnostics should be directly pasteable as an mlx-vlm issue."""
+        failure = _make_failure_with_details(
+            "org/crashing-model",
+            error_msg="generation failed",
+            error_stage="Model Error",
+            error_package="mlx-vlm",
+            traceback_str="Traceback\nIndexError: token id out of range",
+        )
+        output = tmp_path / "diagnostics.md"
+
+        written = generate_diagnostics_report(
+            results=[failure],
+            filename=output,
+            versions={"mlx-vlm": "0.6.5", "mlx": "0.32.1"},
+            system_info={"GPU/Chip": "Apple M5 Max", "RAM": "128 GB"},
+            prompt="Describe the image.",
+            image_path=tmp_path / "fixture.jpg",
+            run_args=Namespace(max_tokens=500, temperature=0.0, top_p=1.0),
+        )
+
+        content = output.read_text(encoding="utf-8")
+        assert written is True
+        assert "## Crash / Failure Matrix" in content
+        assert "Task outcome: crashed" in content
+        assert "python -m mlx_vlm.generate" in content
+        assert "## Expected and Actual Behaviour" in content
+        assert "## Models Not Flagged" not in content
+        assert "Total model runtime (sum)" not in content
+
+    def test_model_only_text_quality_is_not_confirmed_mlx_vlm_issue(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Model-owned text quality should remain an observation."""
+        result = _make_quality_success("org/model-only", with_quality_issue=False)
+        analysis = cast("GenerationQualityAnalysis", result.quality_analysis)
+        result = replace(
+            result,
+            quality_analysis=replace(
+                analysis,
+                text_sanity_issue_type="numeric_loop",
+                owner="model",
+                user_bucket="avoid",
+            ),
+        )
+        output = tmp_path / "diagnostics.md"
+
+        generate_diagnostics_report(
+            results=[result],
+            filename=output,
+            versions={"mlx-vlm": "0.6.5"},
+            system_info={},
+            prompt="Describe the image.",
+        )
+
+        content = output.read_text(encoding="utf-8")
+        assert "mlx-vlm / MLX Issue Matrix" not in content
+        assert "Model/config observations" in content
+
+    def test_non_scope_crash_stays_in_crash_matrix_and_observations(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Every crash remains visible even when its owner is out of filing scope."""
+        output = tmp_path / "diagnostics.md"
+        failure = _make_failure_with_details(
+            "org/transformers-crash",
+            error_msg="processor API mismatch",
+            error_package="transformers",
+            error_stage="API Mismatch",
+        )
+
+        generate_diagnostics_report(
+            results=[failure],
+            filename=output,
+            versions={"mlx-vlm": "0.6.5", "transformers": "5.12.0"},
+            system_info={},
+            prompt="Describe the image.",
+        )
+
+        content = output.read_text(encoding="utf-8")
+        assert "## Crash / Failure Matrix" in content
+        assert "Task outcome: crashed" in content
+        assert "## mlx-vlm / MLX Issue Matrix" not in content
+        assert "## Model/config observations" in content
+        assert "org/transformers-crash" in content
+
+    def test_preflight_warnings_are_model_config_observations(self, tmp_path: Path) -> None:
+        """Preflight-only signals should stay outside confirmed upstream issues."""
+        output = tmp_path / "diagnostics.md"
+
+        written = generate_diagnostics_report(
+            results=[_make_success()],
+            filename=output,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="Describe the image.",
+            history=DiagnosticsHistoryInputs(
+                preflight_issues=(
+                    "transformers compatibility warning",
+                    "mlx runtime cache warning",
+                ),
+            ),
+        )
+
+        content = output.read_text(encoding="utf-8")
+        assert written is True
+        assert "## Model/config observations" in content
+        assert "transformers compatibility warning" in content
+        assert "mlx runtime cache warning" in content
+        assert "## mlx-vlm / MLX Issue Matrix" not in content
+
+    def test_scoped_harness_cluster_is_inline_issue(self, tmp_path: Path) -> None:
+        """An mlx-vlm-owned harness cluster should include its complete issue body."""
+        output = tmp_path / "diagnostics.md"
+        result = _make_harness_success(
+            "org/stop-token",
+            text="caption <|end|>",
+            harness_type="stop_token",
+            harness_detail="token_leak:<|end|>",
+        )
+
+        generate_diagnostics_report(
+            results=[result],
+            filename=output,
+            versions={"mlx-vlm": "0.6.5"},
+            system_info={},
+            prompt="Describe the image.",
+        )
+
+        content = output.read_text(encoding="utf-8")
+        assert "## mlx-vlm / MLX Issue Matrix" in content
+        assert "## Expected and Actual Behaviour" in content
+        assert "python -m mlx_vlm.generate" in content
+        assert "issues/index.md" not in content
+
+    def test_text_sanity_cluster_requires_output_excerpt(self) -> None:
+        """A detector label without generated evidence should not form a text issue."""
+        result = _make_quality_success("org/no-excerpt", with_quality_issue=False)
+        analysis = cast("GenerationQualityAnalysis", result.quality_analysis)
+        result = replace(
+            result,
+            generation=replace(cast("_MockGeneration", result.generation), text=""),
+            quality_analysis=replace(analysis, text_sanity_issue_type="numeric_loop"),
+        )
+
+        snapshot = _build_diagnostics_snapshot(
+            results=[result],
+            prompt="Describe the image.",
+        )
+
+        assert snapshot.text_sanity_results == ()
+
     def test_classify_review_owner_prefers_failure_owner_then_harness(self) -> None:
         """Review ownership should keep failure-owner precedence and harness fallbacks."""
         assert (
@@ -2881,8 +3006,8 @@ class TestDiagnosticsReport:
             harness_detail="token_leak:<|end|>",
         )
 
-        section = "\n".join(check_models._diagnostics_harness_section([(result, leaked_text)]))
-        assert "leaked control token <|end|> after" in section
+        excerpt = check_models._issue_output_excerpt(result, max_chars=240)
+        assert "leaked control token <|end|> after" in excerpt
 
     def test_no_report_when_all_succeed(self, tmp_path: Path) -> None:
         """No diagnostics file when every model succeeds without harness issues."""
@@ -2896,122 +3021,6 @@ class TestDiagnosticsReport:
         )
         assert result is False
         assert not out.exists()
-
-    def test_report_written_for_preflight_warnings_only(self, tmp_path: Path) -> None:
-        """Preflight compatibility warnings should be captured in diagnostics output."""
-        out = tmp_path / "diag.md"
-        result = generate_diagnostics_report(
-            results=[_make_success()],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            prompt="test",
-            history=DiagnosticsHistoryInputs(
-                preflight_issues=(
-                    "transformers==5.4.0 is below minimum 5.7.0 required by check_models.",
-                ),
-            ),
-        )
-        assert result is True
-        content = out.read_text(encoding="utf-8")
-        assert "## Preflight Compatibility Warnings" in content
-        assert "transformers==5.4.0 is below minimum 5.7.0 required by check_models." in content
-        assert "They are informational by" in content
-        assert "default and do not invalidate successful runs on their own." in content
-        assert "transformers/issues/new" in content
-        assert "These warnings were detected before inference." in content
-
-    def test_preflight_section_splits_mixed_owner_groups(self, tmp_path: Path) -> None:
-        """Mixed preflight owners should render as separate detailed owner buckets."""
-        out = tmp_path / "diag.md"
-        result = generate_diagnostics_report(
-            results=[_make_success()],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            prompt="test",
-            history=DiagnosticsHistoryInputs(
-                preflight_issues=(
-                    "transformers==5.4.0 is below minimum 5.7.0 required by check_models.",
-                    "mlx runtime probe reported a suspicious cache incompatibility",
-                ),
-            ),
-        )
-        assert result is True
-        content = out.read_text(encoding="utf-8")
-        assert "### `transformers`" in content
-        assert "### `mlx`" in content
-        assert "verify API compatibility and pinned version floor." in content
-        assert "mlx runtime probe reported a suspicious cache incompatibility" in content
-        assert "transformers/issues/new" in content
-
-    def test_report_written_for_stack_signal_uses_preflight_owner_hint(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Stack-signal rows should reuse matching preflight ownership hints when available."""
-        out = tmp_path / "diag.md"
-        success = PerformanceResult(
-            model_name="org/stack-transformers",
-            success=True,
-            generation=_MockGeneration(
-                text="echoed context",
-                prompt_tokens=15000,
-                generation_tokens=80,
-            ),
-            total_time=1.0,
-            generation_time=0.5,
-            model_load_time=0.5,
-            quality_analysis=GenerationQualityAnalysis(
-                is_repetitive=False,
-                repeated_token=None,
-                hallucination_issues=[],
-                is_verbose=False,
-                formatting_issues=[],
-                has_excessive_bullets=False,
-                bullet_count=0,
-                is_context_ignored=False,
-                missing_context_terms=[],
-                is_refusal=False,
-                refusal_type=None,
-                is_generic=False,
-                specificity_score=0.0,
-                has_language_mixing=False,
-                language_mixing_issues=[],
-                has_degeneration=False,
-                degeneration_type=None,
-                has_fabrication=False,
-                fabrication_issues=[],
-                has_reasoning_leak=False,
-                reasoning_leak_markers=[],
-                has_context_echo=True,
-                context_echo_ratio=0.9,
-                has_harness_issue=False,
-                harness_issue_type=None,
-                harness_issue_details=[],
-                word_count=80,
-                unique_ratio=0.3,
-                prompt_checks_ran=True,
-            ),
-        )
-
-        result = generate_diagnostics_report(
-            results=[success],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            prompt="test",
-            history=DiagnosticsHistoryInputs(
-                preflight_issues=(
-                    "transformers==5.4.0 is below minimum 5.7.0 required by check_models.",
-                ),
-            ),
-        )
-
-        assert result is True
-        content = out.read_text(encoding="utf-8")
-        assert "`transformers / mlx-vlm`" in content
-        assert "Long-Context Degradation / Potential Stack Issues" in content
 
     def test_report_written_on_failure(self, tmp_path: Path) -> None:
         """Diagnostics file created when a model fails."""
@@ -3142,13 +3151,8 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        # Both should be in the same cluster section, not separate sections
-        # Count the number of "##" headings that mention grouped failure heading
-        error_sections = [
-            ln for ln in content.splitlines() if ln.startswith("## ") and "Failure affecting" in ln
-        ]
-        assert len(error_sections) == 1
-        # Both models mentioned in that section
+        assert content.count("## Expected and Actual Behaviour") == 1
+        assert "Affected models:_ org/model-a, org/model-b" in content
         assert "org/model-a" in content
         assert "org/model-b" in content
 
@@ -3245,11 +3249,10 @@ class TestDiagnosticsReport:
         content = out.read_text(encoding="utf-8")
         failure_section = _extract_markdown_subsection(
             content,
-            "## 1. Failure affecting 1 model",
-            end_headings=["<!-- markdownlint-disable MD060 -->"],
+            "## Crash / Failure Matrix",
+            end_headings=["## mlx-vlm / MLX Issue Matrix"],
         )
-        assert "**Observed error:**" in failure_section
-        assert "**Relevant upstream traceback:**" in failure_section
+        assert "Crash evidence: org/upstream-fail" in failure_section
         assert "mlx_vlm/utils.py" in failure_section
         assert "AttributeError: property 'eos_token_id'" in failure_section
         assert "check_models/src/check_models.py" not in failure_section
@@ -3298,61 +3301,8 @@ class TestDiagnosticsReport:
         assert "RuntimeError: METAL command buffer out of memory" in content
         assert "ValueError: generation failed" in content
 
-    def test_history_context_includes_regressions_recoveries_and_repro(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Diagnostics should show history-based regression/recovery and retry context."""
-        out = tmp_path / "diag.md"
-        history_path = tmp_path / "results.history.jsonl"
-
-        old_record = _history_run(
-            {"org/a": False, "org/b": False},
-            timestamp="2026-02-10 10:00:00 GMT",
-        )
-        previous_record = _history_run(
-            {"org/a": True, "org/b": False},
-            timestamp="2026-02-11 10:00:00 GMT",
-        )
-        current_record = _history_run(
-            {"org/a": False, "org/b": True},
-            timestamp="2026-02-12 10:00:00 GMT",
-        )
-        history_path.write_text(
-            "\n".join(
-                [
-                    json.dumps(old_record),
-                    json.dumps(previous_record),
-                    json.dumps(current_record),
-                ],
-            )
-            + "\n",
-            encoding="utf-8",
-        )
-
-        generate_diagnostics_report(
-            results=[_make_failure_with_details("org/a", error_msg="boom")],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-            history=DiagnosticsHistoryInputs(
-                history_path=history_path,
-                previous_history=previous_record,
-                current_history=current_record,
-            ),
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "## History Context" in content
-        assert "`org/a`" in content
-        assert "new regression" in content
-        assert "Recoveries since previous run" in content
-        assert "`org/b`" in content
-        assert "2/3 recent runs failed" in content
-        assert "2026-02-10 10:00:00 GMT" in content
-
     def test_issue_queue_present(self, tmp_path: Path) -> None:
-        """Issue Queue table should include links plus inline evidence context."""
+        """Issue matrix should contain inline evidence without draft dependencies."""
         out = tmp_path / "diag.md"
         generate_diagnostics_report(
             results=[
@@ -3370,40 +3320,22 @@ class TestDiagnosticsReport:
         assert content.startswith("<!-- markdownlint-disable MD013 -->\n\n# Diagnostics Report")
         assert "<!-- markdownlint-disable MD060 -->" in content
         assert "<!-- markdownlint-enable MD060 -->" in content
-        assert "## Issue Queue" in content
-        assert "Issue Draft" in content
+        assert "## mlx-vlm / MLX Issue Matrix" in content
         assert "Target" in content
         assert "Evidence Snapshot" in content
         assert "Model Error" in content
         assert "phase model_load" in content
         assert "ValueError" in content
-        assert "Evidence Bundle" in content
+        assert "Confidence" in content
+        assert "Evidence Type" in content
         assert "Fixed When" in content
-        assert "issues/index.md" in content
-        assert (
-            "https://github.com/jrp2014/check_models/blob/main/src/output/issues/index.md"
-        ) in content
-
-        # Now test relative local links when the link-style state is "relative"
-        with patch.object(check_models._LinkStyleState, "value", "relative"):
-            generate_diagnostics_report(
-                results=[
-                    _make_failure_with_details(
-                        failure_phase="model_load",
-                        error_type="ValueError",
-                    )
-                ],
-                filename=out,
-                versions=_stub_versions(),
-                system_info={},
-                prompt="test",
-            )
-            content_relative = out.read_text(encoding="utf-8")
-            assert "../issues/index.md" in content_relative
+        assert "issues/index.md" not in content
+        assert "issue draft" not in content.casefold()
         assert "Priority" not in content
-        assert content.index("## Issue Queue") < content.index("## 1. Failure")
-        assert content.index("## Issue Queue") < content.index("## Environment")
-        assert content.index("## Reproducibility") < content.index("## Environment")
+        assert content.index("## Crash / Failure Matrix") < content.index(
+            "## mlx-vlm / MLX Issue Matrix"
+        )
+        assert content.index("## Native mlx-vlm reproduction") < content.index("## Environment")
 
     def test_failure_observed_behavior_keeps_multiline_error_details(
         self,
@@ -3435,155 +3367,6 @@ class TestDiagnosticsReport:
         ) in content
         assert "multi_modal_projector.layer_norm.weight." in content
 
-    def test_report_stamp_is_not_setext_heading(self, tmp_path: Path) -> None:
-        """Report stamp must be separated from the next horizontal rule."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[_make_failure_with_details()],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        report_tail = content.split("Report generated on: ", maxsplit=1)[1]
-        assert ").\n\n<!-- markdownlint-disable MD060 -->\n\n---\n\n## Environment" in report_tail
-        assert ").\n---\n\n## Environment" not in report_tail
-        assert "_Report generated on" not in content
-
-    def test_action_summary_and_repro_pointers_present(self, tmp_path: Path) -> None:
-        """Diagnostics should include compact action triage and repro pointers."""
-        out = tmp_path / "diag.md"
-        image_path = tmp_path / "sample image.jpg"
-        image_path.write_text("placeholder", encoding="utf-8")
-        adapter_path = tmp_path / "portable-adapter"
-        run_args = Namespace(
-            image=image_path,
-            folder=None,
-            models=None,
-            exclude=None,
-            trust_remote_code=False,
-            revision="main",
-            adapter_path=adapter_path,
-            prompt=None,
-            detailed_metrics=False,
-            resize_shape=None,
-            eos_tokens=None,
-            skip_special_tokens=False,
-            processor_kwargs=None,
-            enable_thinking=False,
-            thinking_budget=None,
-            thinking_start_token=None,
-            thinking_end_token=None,
-            max_tokens=123,
-            temperature=0.7,
-            top_p=0.92,
-            min_p=0.08,
-            top_k=24,
-            repetition_penalty=1.1,
-            repetition_context_size=50,
-            lazy_load=False,
-            max_kv_size=None,
-            kv_bits=None,
-            kv_quant_scheme=check_models.DEFAULT_KV_QUANT_SCHEME,
-            prefill_step_size=16,
-            kv_group_size=64,
-            quantized_kv_start=2048,
-            timeout=42.0,
-            verbose=True,
-            no_color=False,
-            force_color=False,
-            width=None,
-            quality_config=None,
-            context_marker="Context:",
-        )
-        stack_signal = PerformanceResult(
-            model_name="org/stack-probe",
-            success=True,
-            generation=_MockGeneration(
-                text="echoed context",
-                prompt_tokens=15000,
-                generation_tokens=80,
-            ),
-            total_time=1.0,
-            generation_time=0.5,
-            model_load_time=0.5,
-            quality_analysis=GenerationQualityAnalysis(
-                is_repetitive=False,
-                repeated_token=None,
-                hallucination_issues=[],
-                is_verbose=False,
-                formatting_issues=[],
-                has_excessive_bullets=False,
-                bullet_count=0,
-                is_context_ignored=False,
-                missing_context_terms=[],
-                is_refusal=False,
-                refusal_type=None,
-                is_generic=False,
-                specificity_score=0.0,
-                has_language_mixing=False,
-                language_mixing_issues=[],
-                has_degeneration=False,
-                degeneration_type=None,
-                has_fabrication=False,
-                fabrication_issues=[],
-                has_reasoning_leak=False,
-                reasoning_leak_markers=[],
-                has_context_echo=True,
-                context_echo_ratio=0.94,
-                has_harness_issue=False,
-                harness_issue_type=None,
-                harness_issue_details=[],
-                word_count=80,
-                unique_ratio=0.3,
-                prompt_checks_ran=True,
-            ),
-        )
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details("org/broken-model"),
-                _make_harness_success("org/harness-probe"),
-                stack_signal,
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-            image_path=image_path,
-            run_args=run_args,
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "## Appendix" not in content
-        assert "### Portable upstream probes (no local image required)" not in content
-        assert "Issue-specific native repro commands are in the linked issue drafts." in content
-        assert "Queued issue models:" in content
-        assert "org/broken-model" in content
-        assert "org/harness-probe" in content
-        assert "org/stack-probe" in content
-        assert "check_models_portable_probe.png" not in content
-        assert str(image_path) in content
-
-    def test_unflagged_models_section_lists_successes(self, tmp_path: Path) -> None:
-        """Diagnostics should summarize unflagged successes without listing every model."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details("org/fail"),
-                _make_success("org/pass-a"),
-                _make_success("org/pass-b"),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "## Models Not Flagged (2 model(s))" in content
-        assert "- **Clean output:** 2 model(s)." in content
-        assert "`org/pass-a`" not in content
-        assert "`org/pass-b`" not in content
-
     def test_build_diagnostics_snapshot_classifies_prompt_backfilled_harness_run(self) -> None:
         """Prompt-aware snapshot building should classify harness issues without cached analysis."""
         failure = _make_failure_with_details("org/fail")
@@ -3604,224 +3387,6 @@ class TestDiagnosticsReport:
         assert len(snapshot.harness_results) == 1
         assert snapshot.harness_results[0][0].model_name == "org/harness-implicit"
         assert not snapshot.unflagged_successful
-
-    def test_unflagged_models_section_categorizes_by_quality(self, tmp_path: Path) -> None:
-        """Unflagged successful models should be summarized by quality bucket."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details("org/fail"),
-                _make_quality_success("org/clean", with_quality_issue=False),
-                _make_quality_success("org/warn", with_quality_issue=True),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "## Models Not Flagged (2 model(s))" in content
-        assert "- **Clean output:** 1 model(s)." in content
-        assert "- **Ran, but with quality warnings:** 1 model(s)." in content
-        assert "`org/clean`" not in content
-        assert "`org/warn`" not in content
-        assert "Output formatting deviated from the requested structure." not in content
-
-    def test_coverage_and_runtime_metrics_section(self, tmp_path: Path) -> None:
-        """Diagnostics should verify exclusive model coverage and report aggregate runtime."""
-        out = tmp_path / "diag.md"
-        stack_only_success = PerformanceResult(
-            model_name="org/stack",
-            success=True,
-            generation=_MockGeneration(text="", prompt_tokens=5000, generation_tokens=0),
-            total_time=2.0,
-            generation_time=1.0,
-            model_load_time=1.0,
-            runtime_diagnostics=RuntimeDiagnostics(
-                input_validation_time_s=0.05,
-                model_load_time_s=1.0,
-                prompt_prep_time_s=0.15,
-                decode_time_s=0.8,
-                cleanup_time_s=0.1,
-                first_token_latency_s=0.25,
-                stop_reason="completed",
-            ),
-        )
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details("org/fail"),
-                _make_harness_success("org/harness"),
-                stack_only_success,
-                _make_success("org/clean"),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-
-        content = out.read_text(encoding="utf-8")
-        assert "## Coverage & Runtime Metrics" in content
-        assert "**Detailed diagnostics models:** 3" in content
-        assert "**Summary diagnostics models:** 1" in content
-        assert "**Coverage check:** ✅ Complete (each model appears exactly once)." in content
-        assert "**Total model runtime (sum):**" in content
-        assert "**Average runtime per model:**" in content
-        assert "Runtime aggregates: unavailable" not in content
-        assert "**Runtime note:**" in content
-        assert "**Dominant runtime phase:**" in content
-        assert "local prompt prep=" in content
-        assert "upstream model prefill / first-token=" in content
-        assert "input preparation + decode=" in content
-        assert "**Generation total:**" in content
-        assert "**Validation overhead:**" in content
-        assert "**Upstream model prefill / first-token time:**" in content
-        assert "**What this likely means:**" in content
-        assert "**Suggested next action:**" in content
-
-    def test_runtime_metrics_split_prefill_from_generation_residual(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Diagnostics should expose upstream prefill as a distinct derived phase."""
-        out = tmp_path / "diag.md"
-        prefill_heavy = PerformanceResult(
-            model_name="org/prefill-heavy",
-            success=True,
-            generation=_MockGeneration(text="ok", prompt_tokens=1000, generation_tokens=10),
-            total_time=10.4,
-            generation_time=10.0,
-            model_load_time=0.2,
-            runtime_diagnostics=RuntimeDiagnostics(
-                model_load_time_s=0.2,
-                prompt_prep_time_s=0.1,
-                decode_time_s=10.0,
-                cleanup_time_s=0.1,
-                first_token_latency_s=8.0,
-                stop_reason="completed",
-            ),
-        )
-        decode_heavy = replace(
-            prefill_heavy,
-            model_name="org/decode-heavy",
-            total_time=6.4,
-            generation_time=6.0,
-            runtime_diagnostics=RuntimeDiagnostics(
-                model_load_time_s=0.2,
-                prompt_prep_time_s=0.1,
-                decode_time_s=6.0,
-                cleanup_time_s=0.1,
-                first_token_latency_s=1.0,
-                stop_reason="completed",
-            ),
-        )
-
-        generate_diagnostics_report(
-            results=[prefill_heavy, decode_heavy],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-
-        content = out.read_text(encoding="utf-8")
-        assert (
-            "**Dominant runtime phase:** upstream model prefill / first-token dominated" in content
-        )
-        assert "upstream model prefill / first-token=9.00s" in content
-        assert "input preparation + decode=7.00s" in content
-        assert (
-            "**Generation total:** 16.00s across 2 model(s); upstream model prefill / "
-            "first-token split available for 2/2 model(s)."
-        ) in content
-
-    def test_runtime_metrics_keep_unsplit_generation_when_first_token_missing(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Missing first-token latency should preserve the old generation total fallback."""
-        out = tmp_path / "diag.md"
-        result = PerformanceResult(
-            model_name="org/no-first-token",
-            success=True,
-            generation=_MockGeneration(text="ok", prompt_tokens=100, generation_tokens=10),
-            total_time=3.3,
-            generation_time=3.0,
-            model_load_time=0.2,
-            runtime_diagnostics=RuntimeDiagnostics(
-                model_load_time_s=0.2,
-                prompt_prep_time_s=0.1,
-                decode_time_s=3.0,
-                cleanup_time_s=0.0,
-                first_token_latency_s=None,
-                stop_reason="completed",
-            ),
-        )
-
-        generate_diagnostics_report(
-            results=[_make_failure_with_details("org/fail"), result],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-
-        content = out.read_text(encoding="utf-8")
-        assert "generation call total (unsplit)=3.00s" in content
-        assert "post-prefill decode=" not in content
-        assert "upstream prefill / first-token=" not in content
-
-    def test_report_written_for_stack_signal_without_failures(self, tmp_path: Path) -> None:
-        """Suspicious successful runs should still produce diagnostics for stack triage."""
-        out = tmp_path / "diag.md"
-        repeated_phrase = "loop"
-        analysis = GenerationQualityAnalysis(
-            is_repetitive=True,
-            repeated_token=repeated_phrase,
-            hallucination_issues=[],
-            is_verbose=False,
-            formatting_issues=[],
-            has_excessive_bullets=False,
-            bullet_count=0,
-            is_context_ignored=False,
-            missing_context_terms=[],
-            is_refusal=False,
-            refusal_type=None,
-            is_generic=False,
-            specificity_score=0.0,
-            has_language_mixing=False,
-            language_mixing_issues=[],
-            has_degeneration=False,
-            degeneration_type=None,
-            has_fabrication=False,
-            fabrication_issues=[],
-            has_harness_issue=False,
-            harness_issue_type=None,
-            harness_issue_details=[],
-            word_count=40,
-            unique_ratio=0.05,
-            prompt_checks_ran=True,
-        )
-        success = PerformanceResult(
-            model_name="org/suspicious-success",
-            success=True,
-            generation=_MockGeneration(text=("loop " * 40).strip(), prompt_tokens=15000),
-            total_time=1.0,
-            generation_time=0.5,
-            model_load_time=0.5,
-            quality_analysis=analysis,
-        )
-        result = generate_diagnostics_report(
-            results=[success],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-        assert result is True
-        content = out.read_text(encoding="utf-8")
-        assert "### Long-Context Degradation / Potential Stack Issues" in content
-        assert "org/suspicious-success" in content
 
     def test_report_written_for_text_sanity_success_without_failures(self, tmp_path: Path) -> None:
         """Successful token-soup generations should be detailed in diagnostics."""
@@ -3853,266 +3418,12 @@ class TestDiagnosticsReport:
 
         assert result is True
         content = out.read_text(encoding="utf-8")
-        assert "## Text-Sanity / Semantic Mismatch Issues (1 model(s))" in content
+        assert "## Model/config observations" in content
         assert "org/token-soup" in content
-        assert "gibberish(mixed_script_noise)" in content
+        assert "Generated text is mixed-script token-soup" in content
         assert "open对不同方面" in content
+        assert "## mlx-vlm / MLX Issue Matrix" not in content
         assert "## Models Not Flagged" not in content
-
-    def test_report_written_for_context_echo_stack_signal(self, tmp_path: Path) -> None:
-        """Extreme prompt-length context echo should be surfaced as a stack-signal candidate."""
-        out = tmp_path / "diag.md"
-        analysis = GenerationQualityAnalysis(
-            is_repetitive=False,
-            repeated_token=None,
-            hallucination_issues=[],
-            is_verbose=False,
-            formatting_issues=[],
-            has_excessive_bullets=False,
-            bullet_count=0,
-            is_context_ignored=False,
-            missing_context_terms=[],
-            is_refusal=False,
-            refusal_type=None,
-            is_generic=False,
-            specificity_score=0.0,
-            has_language_mixing=False,
-            language_mixing_issues=[],
-            has_degeneration=False,
-            degeneration_type=None,
-            has_fabrication=False,
-            fabrication_issues=[],
-            has_reasoning_leak=False,
-            reasoning_leak_markers=[],
-            has_context_echo=True,
-            context_echo_ratio=0.94,
-            has_harness_issue=False,
-            harness_issue_type=None,
-            harness_issue_details=[],
-            word_count=80,
-            unique_ratio=0.3,
-            prompt_checks_ran=True,
-        )
-        success = PerformanceResult(
-            model_name="org/context-echo",
-            success=True,
-            generation=_MockGeneration(
-                text="echoed context",
-                prompt_tokens=15000,
-                generation_tokens=80,
-            ),
-            total_time=1.0,
-            generation_time=0.5,
-            model_load_time=0.5,
-            quality_analysis=analysis,
-        )
-
-        result = generate_diagnostics_report(
-            results=[success],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-
-        assert result is True
-        content = out.read_text(encoding="utf-8")
-        assert "### Long-Context Degradation / Potential Stack Issues" in content
-        assert "`mlx-vlm / mlx`" in content
-        assert "org/context-echo" in content
-
-    def test_action_summary_splits_mixed_stack_signal_owners(self, tmp_path: Path) -> None:
-        """Mixed stack-signal owner classes should render separate maintainer triage rows."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[
-                PerformanceResult(
-                    model_name="org/stack-empty",
-                    success=True,
-                    generation=_MockGeneration(text="", prompt_tokens=5000, generation_tokens=0),
-                    total_time=1.0,
-                    generation_time=0.5,
-                    model_load_time=0.5,
-                    quality_analysis=GenerationQualityAnalysis(
-                        is_repetitive=False,
-                        repeated_token=None,
-                        hallucination_issues=[],
-                        is_verbose=False,
-                        formatting_issues=[],
-                        has_excessive_bullets=False,
-                        bullet_count=0,
-                        is_context_ignored=False,
-                        missing_context_terms=[],
-                        is_refusal=False,
-                        refusal_type=None,
-                        is_generic=False,
-                        specificity_score=0.0,
-                        has_language_mixing=False,
-                        language_mixing_issues=[],
-                        has_degeneration=False,
-                        degeneration_type=None,
-                        has_fabrication=False,
-                        fabrication_issues=[],
-                        has_reasoning_leak=False,
-                        reasoning_leak_markers=[],
-                        has_context_echo=False,
-                        context_echo_ratio=0.0,
-                        has_harness_issue=False,
-                        harness_issue_type=None,
-                        harness_issue_details=[],
-                        word_count=0,
-                        unique_ratio=0.0,
-                        prompt_checks_ran=True,
-                    ),
-                ),
-                PerformanceResult(
-                    model_name="org/stack-context",
-                    success=True,
-                    generation=_MockGeneration(
-                        text="echoed context",
-                        prompt_tokens=15000,
-                        generation_tokens=80,
-                    ),
-                    total_time=1.0,
-                    generation_time=0.5,
-                    model_load_time=0.5,
-                    quality_analysis=GenerationQualityAnalysis(
-                        is_repetitive=False,
-                        repeated_token=None,
-                        hallucination_issues=[],
-                        is_verbose=False,
-                        formatting_issues=[],
-                        has_excessive_bullets=False,
-                        bullet_count=0,
-                        is_context_ignored=False,
-                        missing_context_terms=[],
-                        is_refusal=False,
-                        refusal_type=None,
-                        is_generic=False,
-                        specificity_score=0.0,
-                        has_language_mixing=False,
-                        language_mixing_issues=[],
-                        has_degeneration=False,
-                        degeneration_type=None,
-                        has_fabrication=False,
-                        fabrication_issues=[],
-                        has_reasoning_leak=False,
-                        reasoning_leak_markers=[],
-                        has_context_echo=True,
-                        context_echo_ratio=0.9,
-                        has_harness_issue=False,
-                        harness_issue_type=None,
-                        harness_issue_details=[],
-                        word_count=80,
-                        unique_ratio=0.3,
-                        prompt_checks_ran=True,
-                    ),
-                ),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "`mlx-vlm`" in content
-        assert "`mlx-vlm / mlx`" in content
-        assert "org/stack-empty" in content
-        assert "org/stack-context" in content
-
-    def test_action_summary_splits_mixed_preflight_owners(self, tmp_path: Path) -> None:
-        """Mixed preflight owner classes should render separate maintainer triage rows."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[_make_success()],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-            history=DiagnosticsHistoryInputs(
-                preflight_issues=(
-                    "transformers==5.4.0 is below minimum 5.7.0 required by check_models.",
-                    "mlx runtime probe reported a suspicious cache incompatibility",
-                ),
-            ),
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "`transformers`" in content
-        assert "`mlx`" in content
-        assert "verify API compatibility and pinned version floor." in content
-        assert "mlx runtime probe reported a suspicious cache incompatibility" in content
-
-    def test_harness_token_leak_details_are_escaped(self, tmp_path: Path) -> None:
-        """Token leak details should be escaped so markdown does not treat them as HTML."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[
-                _make_harness_success(
-                    name="org/harness-token",
-                    text="safe output",
-                    harness_type="stop_token",
-                    harness_detail="token_leak:<|end|>",
-                ),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "Special control token &lt;|end|&gt; appeared in generated text." in content
-        assert "Special control token <|end|> appeared in generated text." not in content
-
-    def test_reproducibility_section(self, tmp_path: Path) -> None:
-        """Reproducibility section should point to issue-specific native repros."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[_make_failure_with_details("org/broken-model")],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "## Reproducibility" in content
-        assert "Issue-specific native repro commands are in the linked issue drafts." in content
-        assert "Queued issue models:" in content
-        assert "`org/broken-model`" in content
-        assert "### Target specific failing models" not in content
-        assert "python -m check_models" in content
-
-    def test_filing_guidance_points_to_footer_repro_section(self, tmp_path: Path) -> None:
-        """Failure clusters should point readers to the footer repro appendix."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details(
-                    "org/broken-model",
-                    error_msg="got an unexpected keyword argument 'images'",
-                    error_package="transformers",
-                    error_stage="API Mismatch",
-                    traceback_str='Traceback\nFile "x.py", line 12, in y\nTypeError: bad',
-                ),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13", "Platform": "macOS", "GPU/Chip": "Apple M4"},
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "### To reproduce" in content
-        assert "### Filing Guidance" not in content
-        assert "Copy/paste GitHub issue template" not in content
-        assert "Observed" in content
-        assert "Failure phase" not in content
-        assert "Canonical code" not in content
-        assert "Signature" not in content
-        assert "Environment fingerprint" not in content
-        assert "Use the linked issue draft for the native upstream repro command." in content
-        assert "Representative failing model: `org/broken-model`" in content
-        assert "Repro command (exact run)" not in content
-        assert "issues/new" not in content
-        assert "repro_bundles" in content
 
     def test_failure_cluster_shows_generated_output_inline(self, tmp_path: Path) -> None:
         """Failure clusters should show generated output inline when present."""
@@ -4131,7 +3442,7 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        assert "**Observed model output (`org/partial`):**" in content
+        assert "Crash evidence: org/partial" in content
         assert "Partial decoded answer before crash." in content
 
     def test_failure_repro_bundles_written(self, tmp_path: Path) -> None:
@@ -4333,7 +3644,8 @@ class TestDiagnosticsReport:
             image_path=image_path,
         )
         content = out.read_text(encoding="utf-8")
-        assert f"--image '{image_path}'" in content
+        assert "--image 'sample image.jpg'" in content
+        assert str(image_path) not in content
 
     def test_reproducibility_section_includes_sampling_and_runtime_flags(
         self,
@@ -4393,9 +3705,9 @@ class TestDiagnosticsReport:
         content = out.read_text(encoding="utf-8")
         assert "--max-tokens 123" in content
         assert "--temperature 0.7" in content
-        assert "--top-p 0.92" in content
-        assert "--min-p 0.08" in content
-        assert "--top-k 24" in content
+        assert "--top-p" not in content
+        assert "--min-p" not in content
+        assert "--top-k" not in content
         assert "--resize-shape 768 512" in content
         assert "--eos-tokens '</think>'" in content
         assert "--skip-special-tokens" in content
@@ -4405,144 +3717,12 @@ class TestDiagnosticsReport:
         assert "--enable-thinking" in content
         assert "--thinking-budget 96" in content
         assert "--thinking-start-token '<think>'" in content
-        assert "--repetition-penalty 1.1" in content
-        assert "--repetition-context-size 50" in content
+        assert "--repetition-penalty" not in content
+        assert "--repetition-context-size" not in content
         assert "--quantized-kv-start 2048" in content
-        assert "--timeout 42.0" in content
-        assert "--no-trust-remote-code" in content
-        assert "--verbose" in content
-
-    def test_reproducibility_lists_each_failing_model(self, tmp_path: Path) -> None:
-        """Queued issue-model summary should include every failed model (no truncation)."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details("org/a"),
-                _make_failure_with_details("org/b"),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "Queued issue models:" in content
-        assert "`org/a`" in content
-        assert "`org/b`" in content
-        assert "python -m check_models --models org/a" not in content
-        assert "python -m check_models --models org/b" not in content
-
-    def test_portable_upstream_probes_include_harness_and_stack_models_only(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Harness and stack-only reports should still get portable generation probes."""
-        out = tmp_path / "diag.md"
-        image_path = tmp_path / "portable original image.jpg"
-        image_path.write_text("placeholder", encoding="utf-8")
-        stack_signal = PerformanceResult(
-            model_name="org/stack-only",
-            success=True,
-            generation=_MockGeneration(
-                text="echoed context",
-                prompt_tokens=15000,
-                generation_tokens=80,
-            ),
-            total_time=1.0,
-            generation_time=0.5,
-            model_load_time=0.5,
-            quality_analysis=GenerationQualityAnalysis(
-                is_repetitive=False,
-                repeated_token=None,
-                hallucination_issues=[],
-                is_verbose=False,
-                formatting_issues=[],
-                has_excessive_bullets=False,
-                bullet_count=0,
-                is_context_ignored=False,
-                missing_context_terms=[],
-                is_refusal=False,
-                refusal_type=None,
-                is_generic=False,
-                specificity_score=0.0,
-                has_language_mixing=False,
-                language_mixing_issues=[],
-                has_degeneration=False,
-                degeneration_type=None,
-                has_fabrication=False,
-                fabrication_issues=[],
-                has_reasoning_leak=False,
-                reasoning_leak_markers=[],
-                has_context_echo=True,
-                context_echo_ratio=0.94,
-                has_harness_issue=False,
-                harness_issue_type=None,
-                harness_issue_details=[],
-                word_count=80,
-                unique_ratio=0.3,
-                prompt_checks_ran=True,
-            ),
-        )
-        run_args = Namespace(
-            image=image_path,
-            folder=None,
-            models=None,
-            exclude=None,
-            trust_remote_code=True,
-            revision=None,
-            adapter_path=None,
-            prompt=None,
-            max_tokens=check_models.DEFAULT_MAX_TOKENS,
-            temperature=check_models.DEFAULT_TEMPERATURE,
-            top_p=1.0,
-            repetition_penalty=None,
-            repetition_context_size=None,
-            min_p=0.0,
-            top_k=0,
-            max_kv_size=None,
-            kv_bits=None,
-            kv_quant_scheme=check_models.DEFAULT_KV_QUANT_SCHEME,
-            prefill_step_size=None,
-            thinking_budget=None,
-            thinking_start_token=None,
-            thinking_end_token=None,
-            kv_group_size=64,
-            quantized_kv_start=check_models.DEFAULT_QUANTIZED_KV_START,
-            timeout=check_models.DEFAULT_TIMEOUT,
-            detailed_metrics=False,
-            lazy_load=False,
-            skip_special_tokens=False,
-            enable_thinking=False,
-            resize_shape=None,
-            eos_tokens=None,
-            processor_kwargs=None,
-            verbose=False,
-            no_color=False,
-            force_color=False,
-            width=None,
-            quality_config=None,
-            context_marker="Context:",
-        )
-        generate_diagnostics_report(
-            results=[
-                _make_harness_success("org/harness-only"),
-                stack_signal,
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="Describe this image.",
-            image_path=image_path,
-            run_args=run_args,
-        )
-
-        content = out.read_text(encoding="utf-8")
-        assert "Queued issue models:" in content
-        assert "`org/harness-only`" in content
-        assert "`org/stack-only`" in content
-        assert "check_models_portable_probe.png" not in content
-        assert "### Portable upstream probes (no local image required)" not in content
-        assert str(image_path) in content
+        assert "--timeout" not in content
+        assert "--no-trust-remote-code" not in content
+        assert "--verbose" not in content
 
     def test_prompt_in_section(self, tmp_path: Path) -> None:
         """Prompt text should be referenced instead of pasted into diagnostics."""
@@ -4556,10 +3736,8 @@ class TestDiagnosticsReport:
         )
         content = out.read_text(encoding="utf-8")
         assert "### Prompt Used" not in content
-        assert "### Run details" in content
-        assert "### Run details\n\n- Input image:" in content
-        assert "Analyze this image carefully." not in content
-        assert "Prompt text is in the linked issue drafts and repro bundles." in content
+        assert "## Impact and Run Conditions" in content
+        assert "Analyze this image carefully." in content
 
     def test_multi_model_cluster_has_no_priority_label(self, tmp_path: Path) -> None:
         """Clusters with multiple models should not emit priority labels."""
@@ -4575,7 +3753,8 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        assert "Failure affecting 2 models" in content
+        assert "Affected models:_ org/a, org/b" in content
+        assert content.count("## Expected and Actual Behaviour") == 1
         assert "Priority" not in content
 
     def test_generate_markdown_report_uses_provided_report_context(self, tmp_path: Path) -> None:

@@ -7,6 +7,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Rebuild `diagnostics.md` as a self-contained mlx-vlm issue report with an
+  all-crash failure matrix, scoped inline native repros, confidence routing,
+  prompt-burden evidence, and a separate model/config observation appendix;
+  remove its superseded runtime coverage and unflagged-success inventory.
 - Preserve failed-run exception chains in root-to-wrapper chronology across
   canonical failure narratives, JSONL, repro bundles, diagnostics, and issue
   reports; separate the conclusive crash outcome from cautious owner attribution.
