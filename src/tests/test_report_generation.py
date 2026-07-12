@@ -466,6 +466,150 @@ def test_model_selection_names_each_ranking_policy(tmp_path: Path) -> None:
     assert "Evidence scope: 1 image, 1 current run" in content
 
 
+def test_reliability_gated_candidate_sections_exclude_crashes(tmp_path: Path) -> None:
+    passed = _make_metadata_agreement_result("org/passed")
+    failed = _make_failure("org/crashed")
+    context = _build_report_render_context(
+        results=[failed, passed],
+        prompt="Create title, description, and keywords.",
+        metadata={"description": "Brick storefront", "keywords": "storefront"},
+        eval_mode="blind",
+    )
+    output = tmp_path / "model_selection.md"
+
+    check_models.generate_model_selection_report(
+        [failed, passed],
+        output,
+        prompt="Create title, description, and keywords.",
+        report_context=context,
+    )
+
+    content = output.read_text(encoding="utf-8")
+    caption_candidates = _extract_markdown_subsection(
+        content,
+        "## Brief Caption Candidates",
+        end_headings=("## Structured Metadata Candidates",),
+    )
+    structured_candidates = _extract_markdown_subsection(
+        content,
+        "## Structured Metadata Candidates",
+        end_headings=("## Repository Variant Comparisons",),
+    )
+    assert "org/passed" in caption_candidates
+    assert "org/crashed" not in caption_candidates
+    assert "org/crashed" not in structured_candidates
+
+
+def test_blind_recommendation_view_does_not_rank_assisted_enrichment() -> None:
+    result = replace(
+        _make_success("org/blind"),
+        metadata_agreement=check_models.MetadataAgreementMetrics(
+            overall_score=42.0,
+            visual_description_score=91.0,
+            assisted_enrichment_score=99.0,
+        ),
+    )
+    context = _build_report_render_context(
+        results=[result],
+        prompt="Create title, description, and keywords.",
+        metadata={"description": "Held-out reference"},
+        eval_mode="blind",
+    )
+
+    (view,) = check_models._build_model_recommendation_views(context)
+
+    assert view.visual_score == 42.0
+    assert view.assisted_enrichment_score is None
+    assert check_models._recommendation_quality_score(view) == 42.0
+
+
+def test_triage_capability_suppresses_metadata_for_current_and_history(tmp_path: Path) -> None:
+    result = _make_metadata_agreement_result("org/triage")
+    context = _build_report_render_context(
+        results=[result],
+        prompt="Describe this image briefly.",
+        metadata={"description": "Not a triage capability target"},
+        eval_mode="triage",
+    )
+    history: check_models.HistoryRunRecord = {
+        "_type": "run",
+        "format_version": "1.0",
+        "timestamp": "2026-07-01 10:00:00 +0000",
+        "prompt_hash": "triage",
+        "prompt_preview": "Describe this image briefly.",
+        "image_path": "image.jpg",
+        "model_results": {
+            result.model_name: {
+                "success": True,
+                "error_stage": None,
+                "error_type": None,
+                "error_package": None,
+                "review_user_bucket": "recommended",
+                "metadata_alignment_score": 95.0,
+            }
+        },
+        "system": {},
+        "library_versions": {},
+        "eval_mode": "triage",
+    }
+    markdown = tmp_path / "capabilities.md"
+    payload_path = tmp_path / "capabilities.json"
+
+    check_models.generate_model_capability_scorecard(
+        [result],
+        markdown,
+        payload_path,
+        prompt="Describe this image briefly.",
+        report_context=context,
+        history_records=(history,),
+    )
+
+    payload = json.loads(payload_path.read_text(encoding="utf-8"))
+    assert payload["models"][0]["metadata_alignment_avg"] is None
+
+
+def test_capability_and_structured_sections_name_policy_and_scope(tmp_path: Path) -> None:
+    result = _make_metadata_agreement_result()
+    context = _build_report_render_context(
+        results=[result],
+        prompt="Create title, description, and keywords.",
+        metadata={"description": "Brick storefront"},
+        eval_mode="assisted",
+    )
+    selection = tmp_path / "selection.md"
+    capability = tmp_path / "capability.md"
+
+    check_models.generate_model_selection_report(
+        [result],
+        selection,
+        prompt="Create title, description, and keywords.",
+        report_context=context,
+    )
+    check_models.generate_model_capability_scorecard(
+        [result],
+        capability,
+        tmp_path / "capability.json",
+        prompt="Create title, description, and keywords.",
+        report_context=context,
+    )
+
+    structured = _extract_markdown_subsection(
+        selection.read_text(encoding="utf-8"),
+        "## Structured Metadata Candidates",
+        end_headings=("## Repository Variant Comparisons",),
+    )
+    capability_content = capability.read_text(encoding="utf-8")
+    assert "Policy: reliability-gated assisted enrichment" in structured
+    assert "Evidence scope: 1 image, 1 current run" in structured
+    assert (
+        "Policy: lane-filtered current and historical capability aggregation" in capability_content
+    )
+    assert (
+        "Evidence scope: 1 image, 1 current run plus 0 prior lane-matched runs"
+        in capability_content
+    )
+
+
 def _make_harness_success(
     name: str = "org/model-harness",
     *,
@@ -1913,7 +2057,7 @@ class TestMarkdownReportEdgeCases:
         self,
         tmp_path: Path,
     ) -> None:
-        """Brief-caption ranking should keep terse outputs but prefer useful detail."""
+        """Brief-caption ranking should prefer detail and gate avoid-bucket labels."""
         terse = PerformanceResult(
             model_name="org/terse-caption",
             success=True,
@@ -1982,7 +2126,13 @@ class TestMarkdownReportEdgeCases:
             end_headings=("## Structured Metadata Candidates",),
         )
         assert shortlist.index("`org/full-caption`") < shortlist.index("`org/terse-caption`")
-        assert shortlist.index("`org/terse-caption`") < shortlist.index("`org/label-caption`")
+        assert "`org/label-caption`" not in shortlist
+        avoid = _extract_markdown_subsection(
+            content,
+            "### Current failures / avoid",
+            end_headings=("## Brief Caption Candidates",),
+        )
+        assert "`org/label-caption`" in avoid
 
     def test_model_selection_report_uses_metadata_when_available(
         self,

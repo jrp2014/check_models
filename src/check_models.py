@@ -17421,7 +17421,9 @@ def _build_model_recommendation_views(
                 draft_improvement_score=(agreement.draft_improvement_score if agreement else None),
                 output_score=hygiene_score,
                 assisted_enrichment_score=(
-                    agreement.assisted_enrichment_score if agreement else None
+                    agreement.assisted_enrichment_score
+                    if agreement is not None and context.mode_policy.eval_mode == "assisted"
+                    else None
                 ),
                 first_token_latency_s=(runtime.first_token_latency_s if runtime else None),
                 total_time_s=result.total_time,
@@ -17874,6 +17876,8 @@ def _append_review_issue_queue(
 
 def _build_grounded_metadata_selection_section(
     views: Sequence[ModelRecommendationView],
+    *,
+    policy_name: str,
 ) -> list[str]:
     """Render metadata-agreement candidates when trusted metadata is available."""
     table_rows: list[tuple[str, ...]] = []
@@ -17898,6 +17902,8 @@ def _build_grounded_metadata_selection_section(
             "Top 10 ranked candidates for structured title/description/keywords. "
             "Use the gallery for complete per-model evidence."
         ),
+        f"Policy: {policy_name}.",
+        "Evidence scope: 1 image, 1 current run.",
         "",
     ]
     parts.extend(
@@ -18038,7 +18044,7 @@ def generate_model_selection_report(
     policy = report_context.mode_policy
     grounding = "grounded" if policy.semantic_rankings_grounded else "ungrounded"
     views = _build_model_recommendation_views(report_context)
-    ranked_views = _rank_current_recommendations(views)
+    ranked_views = _rank_current_recommendations(_eligible_recommendations(views))
     ranking_policy_name = _model_selection_policy_name(policy)
     md: list[str] = [
         "# Model Selection Brief",
@@ -18130,11 +18136,18 @@ def generate_model_selection_report(
                 "## Structured Metadata Candidates",
                 "",
                 "Structured metadata scoring is suppressed in triage mode.",
+                f"Policy: {ranking_policy_name}.",
+                "Evidence scope: 1 image, 1 current run.",
                 "",
             ]
         )
     else:
-        md.extend(_build_grounded_metadata_selection_section(ranked_views))
+        md.extend(
+            _build_grounded_metadata_selection_section(
+                ranked_views,
+                policy_name=ranking_policy_name,
+            )
+        )
 
     md.extend(
         _build_model_family_comparison_section(
@@ -18212,11 +18225,15 @@ def _capability_signal_from_result(
     review = _build_jsonl_review_record(result)
     text = str(getattr(result.generation, "text", "") or "") if result.generation else ""
     utility = utility_by_model.get(result.model_name)
-    metadata_score = (
-        result.metadata_agreement.overall_score
-        if result.metadata_agreement is not None
-        else _capability_float(getattr(result.quality_analysis, "metadata_alignment_score", None))
-    )
+    metadata_score = None
+    if not suppress_cataloging_scores:
+        metadata_score = (
+            result.metadata_agreement.overall_score
+            if result.metadata_agreement is not None
+            else _capability_float(
+                getattr(result.quality_analysis, "metadata_alignment_score", None)
+            )
+        )
     hygiene_score = view.output_score
     caption_score = _caption_usefulness_score(text) if result.success and text else None
     cataloging_score = None if suppress_cataloging_scores or utility is None else utility.score
@@ -18427,8 +18444,10 @@ def _model_capability_row_from_signals(
         keyword_score=None
         if suppress_cataloging_scores
         else _capability_avg(signal.keyword_score for signal in signals),
-        metadata_alignment_score=_capability_avg(
-            signal.metadata_alignment_score for signal in signals
+        metadata_alignment_score=(
+            None
+            if suppress_cataloging_scores
+            else _capability_avg(signal.metadata_alignment_score for signal in signals)
         ),
         generation_tps=_capability_avg(signal.generation_tps for signal in signals),
         peak_memory_gb=_capability_avg(signal.peak_memory_gb for signal in signals),
@@ -18592,6 +18611,8 @@ def generate_model_capability_scorecard(
         f"- Metadata exposed to prompt: {'yes' if policy.metadata_exposed_to_prompt else 'no'}",
         f"- Grounding: {grounding}",
         f"- Coverage: current run plus {prior_runs} prior history run(s).",
+        "- Policy: lane-filtered current and historical capability aggregation",
+        (f"- Evidence scope: 1 image, 1 current run plus {prior_runs} prior lane-matched runs"),
         "",
     ]
     if policy.suppress_cataloging_scores:
