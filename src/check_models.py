@@ -4736,9 +4736,11 @@ def _detect_metadata_borrowing(
     """Detect unverified output claims copied from structured capture metadata."""
     if not text or not bundle.nonvisual_terms:
         return False, []
-    structured_terms = [
-        term for term in bundle.nonvisual_terms if _STRUCTURED_NUMERIC_METADATA_RE.search(term)
-    ]
+    structured_terms = _dedupe_preserve_order(
+        match.group(0)
+        for term in bundle.nonvisual_terms
+        for match in _STRUCTURED_NUMERIC_METADATA_RE.finditer(term)
+    )
     if not structured_terms:
         return False, []
     normalized_text = _normalize_phrase_for_matching(text)
@@ -6858,7 +6860,11 @@ def _score_assisted_enrichment(
     context_integration_score, _matched_context = _score_authoritative_context(text, provenance)
     draft_improvement_score = _score_draft_improvement(text, provenance)
     utility = compute_cataloging_utility(text, None)
-    visual_description_score = float(utility["description_score"]) if provenance.has_draft else None
+    visual_description_score = (
+        float(utility["description_score"])
+        if provenance.has_authoritative_context or provenance.has_draft
+        else None
+    )
     output_quality_score = (
         float(compute_task_compliance(text)["compliance_score"]) * 100.0
         if provenance.has_authoritative_context or provenance.has_draft

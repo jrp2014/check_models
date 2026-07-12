@@ -557,6 +557,50 @@ def test_assisted_capture_metadata_copy_uses_unverified_context_label() -> None:
     assert "unverified-context-copy" in (check_models._build_quality_issues_string(analysis) or "")
 
 
+def test_assisted_date_only_copy_uses_unverified_context_label() -> None:
+    prompt = check_models.prepare_prompt(
+        argparse.Namespace(prompt=None, eval_mode="assisted"),
+        {
+            "description": "Two boats on a river.",
+            "keywords": "boats, river",
+            "date": "2026-07-04",
+            "time": "19:10:04",
+        },
+    )
+    text = (
+        "Title: Two boats on a river\n"
+        "Description: Two boats photographed on 2026-07-04 beside calm water.\n"
+        "Keywords: boats, river"
+    )
+
+    analysis = check_models.analyze_generation_text(text, generated_tokens=28, prompt=prompt)
+
+    assert analysis.metadata_borrowing is True
+    assert "unverified-context-copy" in analysis.evidence
+
+
+def test_assisted_time_only_copy_uses_unverified_context_label() -> None:
+    prompt = check_models.prepare_prompt(
+        argparse.Namespace(prompt=None, eval_mode="assisted"),
+        {
+            "description": "Two boats on a river.",
+            "keywords": "boats, river",
+            "date": "2026-07-04",
+            "time": "19:10:04",
+        },
+    )
+    text = (
+        "Title: Two boats on a river\n"
+        "Description: Two boats photographed at 19:10:04 beside calm water.\n"
+        "Keywords: boats, river"
+    )
+
+    analysis = check_models.analyze_generation_text(text, generated_tokens=28, prompt=prompt)
+
+    assert analysis.metadata_borrowing is True
+    assert "unverified-context-copy" in analysis.evidence
+
+
 def test_verbatim_draft_is_low_improvement_not_hallucination() -> None:
     metadata: check_models.MetadataDict = {
         "description": "Two boats on a river.",

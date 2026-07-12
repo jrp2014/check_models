@@ -2061,6 +2061,26 @@ class TestMarkdownReportEdgeCases:
         assert payload["visual_description_score"] == 90.0
         assert payload["assisted_enrichment_score"] == 76.5
 
+    def test_authoritative_only_assisted_record_keeps_visual_description_component(self) -> None:
+        """Authoritative-only assisted records should retain visual-description scoring."""
+        metrics = check_models.compute_metadata_agreement(
+            (
+                "Title: Sailboats on Deben Estuary at Woodbridge\n"
+                "Description: Two white sailboats rest on calm water before a wooded bank.\n"
+                "Keywords: sailboats, estuary, Woodbridge, calm water, wooded bank"
+            ),
+            {"keywords": "Deben Estuary, Woodbridge"},
+        )
+
+        payload = check_models._build_jsonl_metadata_agreement_record(metrics)
+
+        assert metrics.context_integration_score is not None
+        assert metrics.draft_improvement_score is None
+        assert metrics.visual_description_score is not None
+        assert metrics.assisted_enrichment_score is not None
+        assert payload is not None
+        assert payload["visual_description_score"] == metrics.visual_description_score
+
     def test_review_surfaces_use_canonical_assisted_enrichment_evidence(self) -> None:
         """Review surfaces should reuse canonical assisted enrichment evidence."""
         analysis = replace(
