@@ -7,6 +7,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Consolidate current-run model recommendations into one reliability-gated view
+  shared by selection, gallery, and capability surfaces, with lane-specific
+  quality evidence, named policies, memory/Pareto selectors, and conservative
+  repository-variant comparisons.
 - Rebuild `diagnostics.md` as a self-contained mlx-vlm issue report with an
   all-crash failure matrix, scoped inline native repros, confidence routing,
   prompt-burden evidence, and a separate model/config observation appendix;

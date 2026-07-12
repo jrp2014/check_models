@@ -370,6 +370,102 @@ def _make_metadata_agreement_result(name: str = "org/model-grounded") -> Perform
     )
 
 
+def test_recommendation_view_excludes_crash_from_usable_policies() -> None:
+    failed = _make_failure("org/crashed")
+    passed = _make_success("org/passed")
+    context = _build_report_render_context(
+        results=[failed, passed],
+        prompt="Describe the image.",
+        eval_mode="blind",
+    )
+
+    views = check_models._build_model_recommendation_views(context)
+    by_model = {view.result.model_name: view for view in views}
+
+    assert by_model["org/crashed"].compatibility == "crashed"
+    assert by_model["org/crashed"].eligible is False
+    assert by_model["org/passed"].eligible is True
+
+
+def test_recommendation_policies_gate_reliability_memory_and_dominance() -> None:
+    def _result(name: str, *, score: float, total: float, peak: float) -> PerformanceResult:
+        base = _make_success(name)
+        return replace(
+            base,
+            total_time=total,
+            generation=_MockGeneration(
+                text=getattr(base.generation, "text", None),
+                prompt_tokens=120,
+                generation_tokens=48,
+                peak_memory=peak,
+            ),
+            metadata_agreement=check_models.MetadataAgreementMetrics(
+                assisted_enrichment_score=score,
+            ),
+        )
+
+    context = _build_report_render_context(
+        results=[
+            _result("org/dominant", score=90.0, total=1.0, peak=3.0),
+            _result("org/dominated", score=80.0, total=2.0, peak=4.0),
+            _result("org/large", score=95.0, total=0.8, peak=12.0),
+            _make_failure("org/crashed"),
+        ],
+        prompt="Create title, description, and keywords.",
+        metadata={"description": "Two boats", "keywords": "boats, river"},
+        eval_mode="assisted",
+    )
+    views = check_models._build_model_recommendation_views(context)
+
+    assert [
+        view.result.model_name for view in check_models._rank_reliability_gated_enrichment(views)
+    ] == ["org/large", "org/dominant", "org/dominated"]
+    assert [
+        view.result.model_name for view in check_models._rank_under_memory_budget(views, 4.0)
+    ] == ["org/dominant", "org/dominated"]
+    assert [view.result.model_name for view in check_models._pareto_recommendations(views)] == [
+        "org/large",
+        "org/dominant",
+    ]
+
+
+def test_model_variant_family_key_is_conservative() -> None:
+    assert check_models._model_family_key("org/model-4bit") == "org/model"
+    assert check_models._model_family_key("org/model-bf16") == "org/model"
+    assert check_models._model_family_key("org/model-instruct") == "org/model-instruct"
+
+
+def test_model_selection_names_each_ranking_policy(tmp_path: Path) -> None:
+    result = replace(
+        _make_metadata_agreement_result(),
+        metadata_agreement=check_models.MetadataAgreementMetrics(
+            overall_score=88.0,
+            visual_description_score=90.0,
+            context_integration_score=80.0,
+            draft_improvement_score=70.0,
+            assisted_enrichment_score=84.0,
+        ),
+    )
+    context = _build_report_render_context(
+        results=[result],
+        prompt="Create title, description, and keywords.",
+        metadata={"description": "Two boats", "keywords": "boats, river"},
+        eval_mode="assisted",
+    )
+    output = tmp_path / "model_selection.md"
+
+    check_models.generate_model_selection_report(
+        [result],
+        output,
+        prompt="Create title, description, and keywords.",
+        report_context=context,
+    )
+
+    content = output.read_text(encoding="utf-8")
+    assert "Policy: reliability-gated assisted enrichment" in content
+    assert "Evidence scope: 1 image, 1 current run" in content
+
+
 def _make_harness_success(
     name: str = "org/model-harness",
     *,

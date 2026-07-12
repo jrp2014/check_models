@@ -12933,7 +12933,8 @@ def _build_gallery_output_cost_summary_section(
 ) -> list[str]:
     """Build a compact all-model output, runtime, and memory summary table."""
     rows: list[tuple[str, str, str, str, str, str, str, str]] = []
-    for result in report_context.result_set.results:
+    for view in _build_model_recommendation_views(report_context):
+        result = view.result
         generation = result.generation
         rows.append(
             (
@@ -12944,14 +12945,14 @@ def _build_gallery_output_cost_summary_section(
                     "generation_tokens",
                     _generation_int_metric(generation, "generation_tokens"),
                 ),
-                _gallery_output_cost_metric("total_time", result.total_time),
+                _gallery_output_cost_metric("total_time", view.total_time_s),
                 _gallery_output_cost_metric(
                     "generation_tps",
-                    _generation_float_metric(generation, "generation_tps"),
+                    view.generation_tps,
                 ),
                 _gallery_output_cost_metric(
                     "peak_memory",
-                    _generation_float_metric(generation, "peak_memory"),
+                    view.peak_memory_gb,
                 ),
                 _gallery_output_cost_signal_cell(result),
             ),
@@ -12996,12 +12997,12 @@ def _build_gallery_quality_summary_section(
     """Build an issue-style per-model quality table for the gallery artifact."""
     rows = [
         (
-            _gallery_summary_model_link(result.model_name),
-            _gallery_summary_status(result),
-            MARKDOWN_ESCAPER.escape(_gallery_summary_signal(result)),
-            MARKDOWN_ESCAPER.escape(_gallery_summary_preview(result)),
+            _gallery_summary_model_link(view.result.model_name),
+            _gallery_summary_status(view.result),
+            MARKDOWN_ESCAPER.escape(_gallery_summary_signal(view.result)),
+            MARKDOWN_ESCAPER.escape(_gallery_summary_preview(view.result)),
         )
-        for result in report_context.result_set.results
+        for view in _build_model_recommendation_views(report_context)
     ]
     if not rows:
         return []
@@ -13179,16 +13180,28 @@ class ReportTriageContext:
     baseline_grade: str | None = None
 
 
+type CompatibilityStatus = Literal["crashed", "integration-warning", "clean"]
+
+
 @dataclass(frozen=True)
-class ModelSelectionRow:
-    """One ranked model-selection row for public reports."""
+class ModelRecommendationView:
+    """Canonical current-run facts used by model recommendation surfaces."""
 
     result: PerformanceResult
-    score: float
-    caption_score: float
-    verdict: str
-    caption_preview: str
-    caveat: str
+    compatibility: CompatibilityStatus
+    eligible: bool
+    eligibility_reason: str
+    visual_score: float | None
+    context_score: float | None
+    draft_improvement_score: float | None
+    output_score: float | None
+    assisted_enrichment_score: float | None
+    first_token_latency_s: float | None
+    total_time_s: float | None
+    generation_tps: float | None
+    peak_memory_gb: float | None
+    burden: PromptBurden
+    caveats: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -17304,98 +17317,273 @@ def _caption_usefulness_score(text: str) -> float:
     )
 
 
-def _build_model_selection_rows(
-    results: Sequence[PerformanceResult],
-) -> list[ModelSelectionRow]:
-    """Return ranked model-selection rows for caption and metadata users."""
-    rows: list[ModelSelectionRow] = []
-    for result in results:
+def _recommendation_eligibility(
+    result: PerformanceResult,
+    review: JsonlReviewRecord | None,
+    analysis: GenerationQualityAnalysis | None,
+    *,
+    has_output: bool,
+    hygiene_score: float | None,
+) -> tuple[CompatibilityStatus, str]:
+    """Return compatibility and the first current-run eligibility gate."""
+    if not result.success:
+        return "crashed", "current run crashed"
+    if analysis is not None and analysis.has_harness_issue:
+        return "integration-warning", "integration warning requires review"
+    compatibility: CompatibilityStatus = "clean"
+    eligibility_reason = "eligible"
+    if review is None:
+        eligibility_reason = "quality review unavailable"
+    elif review["user_bucket"] == "avoid":
+        eligibility_reason = "current review says avoid"
+    elif not has_output:
+        eligibility_reason = "no usable output text"
+    elif hygiene_score is None or hygiene_score < MODEL_SELECTION_CHOOSER_MIN_HYGIENE_SCORE:
+        eligibility_reason = "output is below the configured chooser threshold"
+    return compatibility, eligibility_reason
+
+
+def _recommendation_visual_score(
+    *,
+    eval_mode: str,
+    caption_score: float | None,
+    agreement: MetadataAgreementMetrics | None,
+    utility: UtilityTriageRow | None,
+) -> float | None:
+    """Return the visual-quality fact appropriate to the current evaluation lane."""
+    if eval_mode == "assisted":
+        if agreement is not None and agreement.visual_description_score is not None:
+            return agreement.visual_description_score
+        return utility.description_score if utility is not None else None
+    if eval_mode == "blind" and agreement is not None:
+        return agreement.overall_score
+    return caption_score
+
+
+def _recommendation_caveats(
+    result: PerformanceResult,
+    review: JsonlReviewRecord | None,
+    analysis: GenerationQualityAnalysis | None,
+    *,
+    eligibility_reason: str,
+) -> tuple[str, ...]:
+    """Return deduplicated review and failure evidence for one recommendation."""
+    caveats: list[str] = []
+    if review is not None:
+        focus = _review_focus_text(review, analysis)
+        if focus != "no flagged signals":
+            caveats.append(focus)
+    if not result.success:
+        narrative = _build_failure_narrative(result)
+        caveats.extend((f"Task outcome: {narrative.task_outcome}", narrative.primary_exception))
+    if eligibility_reason != "eligible":
+        caveats.append(eligibility_reason)
+    return tuple(_dedupe_preserve_order(caveats))
+
+
+def _build_model_recommendation_views(
+    context: ReportRenderContext,
+) -> tuple[ModelRecommendationView, ...]:
+    """Build one canonical recommendation view per current-run model."""
+    utility_by_model = {row.result.model_name: row for row in context.triage.utility_rows}
+    views: list[ModelRecommendationView] = []
+    for result in context.result_set.results:
         review = _build_jsonl_review_record(result)
-        if review is None:
-            continue
-        caption_preview = _build_result_output_preview(result, max_chars=180)
-        caption_text = str(getattr(result.generation, "text", "") or "")
-        caveat = _review_focus_text(review, _quality_analysis_for_result(result))
-        rows.append(
-            ModelSelectionRow(
+        analysis = _quality_analysis_for_result(result)
+        agreement = result.metadata_agreement
+        utility = utility_by_model.get(result.model_name)
+        text = _generation_text_value(result.generation).strip()
+        hygiene_score = _model_selection_score(result) if review is not None else None
+        compatibility, eligibility_reason = _recommendation_eligibility(
+            result,
+            review,
+            analysis,
+            has_output=bool(text),
+            hygiene_score=hygiene_score,
+        )
+        caption_score = _caption_usefulness_score(text) if text else None
+        visual_score = _recommendation_visual_score(
+            eval_mode=context.mode_policy.eval_mode,
+            caption_score=caption_score,
+            agreement=agreement,
+            utility=utility,
+        )
+
+        runtime = result.runtime_diagnostics
+        views.append(
+            ModelRecommendationView(
                 result=result,
-                score=_model_selection_score(result),
-                caption_score=_caption_usefulness_score(caption_text),
-                verdict=review["verdict"],
-                caption_preview=caption_preview,
-                caveat=caveat,
+                compatibility=compatibility,
+                eligible=eligibility_reason == "eligible",
+                eligibility_reason=eligibility_reason,
+                visual_score=visual_score,
+                context_score=(agreement.context_integration_score if agreement else None),
+                draft_improvement_score=(agreement.draft_improvement_score if agreement else None),
+                output_score=hygiene_score,
+                assisted_enrichment_score=(
+                    agreement.assisted_enrichment_score if agreement else None
+                ),
+                first_token_latency_s=(runtime.first_token_latency_s if runtime else None),
+                total_time_s=result.total_time,
+                generation_tps=_generation_float_metric(result.generation, "generation_tps"),
+                peak_memory_gb=_generation_float_metric(result.generation, "peak_memory"),
+                burden=_prompt_burden_for_result(result, context.image_profile),
+                caveats=_recommendation_caveats(
+                    result,
+                    review,
+                    analysis,
+                    eligibility_reason=eligibility_reason,
+                ),
             )
         )
+    return tuple(views)
 
-    rows.sort(
-        key=lambda row: (
-            -row.score,
-            -row.caption_score,
-            -float(getattr(row.result.generation, "generation_tps", 0.0) or 0.0),
-            row.result.model_name,
+
+def _eligible_recommendations(
+    views: Sequence[ModelRecommendationView],
+) -> list[ModelRecommendationView]:
+    """Return recommendation views that pass current-run reliability gates."""
+    return [view for view in views if view.eligible]
+
+
+def _rank_reliability_gated_enrichment(
+    views: Sequence[ModelRecommendationView],
+) -> list[ModelRecommendationView]:
+    """Rank eligible assisted-enrichment results with runtime as a tie-breaker."""
+    return sorted(
+        _eligible_recommendations(views),
+        key=lambda view: (
+            view.assisted_enrichment_score if view.assisted_enrichment_score is not None else -1.0,
+            -(view.total_time_s if view.total_time_s is not None else math.inf),
+            view.result.model_name,
+        ),
+        reverse=True,
+    )
+
+
+def _rank_under_memory_budget(
+    views: Sequence[ModelRecommendationView],
+    budget_gb: float,
+) -> list[ModelRecommendationView]:
+    """Return reliability-gated enrichment results within a peak-memory budget."""
+    return [
+        view
+        for view in _rank_reliability_gated_enrichment(views)
+        if view.peak_memory_gb is not None and view.peak_memory_gb <= budget_gb
+    ]
+
+
+def _pareto_recommendations(
+    views: Sequence[ModelRecommendationView],
+) -> list[ModelRecommendationView]:
+    """Return eligible views not dominated on enrichment, total time, and memory."""
+    ranked = _rank_reliability_gated_enrichment(views)
+
+    def _dominates(left: ModelRecommendationView, right: ModelRecommendationView) -> bool:
+        if any(
+            value is None
+            for value in (
+                left.assisted_enrichment_score,
+                left.total_time_s,
+                left.peak_memory_gb,
+                right.assisted_enrichment_score,
+                right.total_time_s,
+                right.peak_memory_gb,
+            )
+        ):
+            return False
+        left_values = (
+            cast("float", left.assisted_enrichment_score),
+            -cast("float", left.total_time_s),
+            -cast("float", left.peak_memory_gb),
         )
+        right_values = (
+            cast("float", right.assisted_enrichment_score),
+            -cast("float", right.total_time_s),
+            -cast("float", right.peak_memory_gb),
+        )
+        return all(
+            left_value >= right_value
+            for left_value, right_value in zip(left_values, right_values, strict=True)
+        ) and any(
+            left_value > right_value
+            for left_value, right_value in zip(left_values, right_values, strict=True)
+        )
+
+    return [
+        view
+        for view in ranked
+        if not any(_dominates(other, view) for other in ranked if other is not view)
+    ]
+
+
+_MODEL_VARIANT_SUFFIX_RE: Final[re.Pattern[str]] = re.compile(
+    r"-(?:bf16|fp16|[348]-?bit|6bit|8bit|mxfp4|mxfp8|nvfp4|qat-4bit|qat-8bit)$",
+    re.IGNORECASE,
+)
+
+
+def _model_family_key(model_name: str) -> str:
+    """Return a conservative repository-variant grouping key."""
+    owner, separator, model = model_name.partition("/")
+    normalized = _MODEL_VARIANT_SUFFIX_RE.sub("", model)
+    return f"{owner}/{normalized}" if separator else normalized
+
+
+def _recommendation_quality_score(view: ModelRecommendationView) -> float:
+    """Return the strongest lane-populated quality fact for presentation ordering."""
+    for score in (view.assisted_enrichment_score, view.visual_score, view.output_score):
+        if score is not None:
+            return score
+    return -1.0
+
+
+def _rank_current_recommendations(
+    views: Sequence[ModelRecommendationView],
+) -> list[ModelRecommendationView]:
+    """Rank all current views while keeping ineligible evidence visible at the end."""
+    return sorted(
+        views,
+        key=lambda view: (
+            view.eligible,
+            _recommendation_quality_score(view),
+            view.output_score if view.output_score is not None else -1.0,
+            view.generation_tps if view.generation_tps is not None else -1.0,
+            view.result.model_name,
+        ),
+        reverse=True,
     )
-    return rows
 
 
-def _model_selection_peak_gb(row: ModelSelectionRow) -> float | None:
-    """Return the captured peak-memory value for one selection row."""
-    return _generation_float_metric(row.result.generation, "peak_memory")
-
-
-def _model_selection_generation_tps(row: ModelSelectionRow) -> float | None:
-    """Return the captured generation-throughput value for one selection row."""
-    return _generation_float_metric(row.result.generation, "generation_tps")
-
-
-def _model_selection_row_is_usable(row: ModelSelectionRow) -> bool:
-    """Return True for rows suitable for current-run chooser recommendations."""
-    review = _build_jsonl_review_record(row.result)
-    if review is None or not row.result.success:
-        return False
-    return (
-        review["user_bucket"] != "avoid" and row.score >= MODEL_SELECTION_CHOOSER_MIN_HYGIENE_SCORE
-    )
-
-
-def _model_selection_row_is_current_avoid(row: ModelSelectionRow) -> bool:
-    """Return True for current-run failures and avoid-bucket outputs."""
-    if not row.result.success:
-        return True
-    review = _build_jsonl_review_record(row.result)
-    return review is not None and review["user_bucket"] == "avoid"
-
-
-def _model_selection_row_status(row: ModelSelectionRow) -> str:
-    """Return a concise human-facing status for a chooser row."""
-    review = _build_jsonl_review_record(row.result)
+def _model_recommendation_status(view: ModelRecommendationView) -> str:
+    """Return a concise human-facing status for a recommendation view."""
+    review = _build_jsonl_review_record(view.result)
     if review is None:
-        return "not-evaluated" if row.result.success else "runtime-failure"
+        return "not-evaluated" if view.result.success else "runtime-failure"
     return _review_display_bucket_label(review["user_bucket"], review=review)
 
 
-def _model_selection_chooser_evidence(row: ModelSelectionRow) -> str:
-    """Return chooser evidence, preferring diagnostics for avoid-bucket rows."""
-    preview = _build_result_output_preview(row.result, max_chars=96)
-    if _model_selection_row_is_current_avoid(row) and row.caveat != "no flagged signals":
-        return row.caveat
-    return preview or row.caveat
+def _model_recommendation_evidence(view: ModelRecommendationView) -> str:
+    """Return compact chooser evidence, preferring diagnostics for gated rows."""
+    preview = _build_result_output_preview(view.result, max_chars=96)
+    caveat = " | ".join(view.caveats) or "no flagged signals"
+    return caveat if not view.eligible and caveat != "no flagged signals" else preview or caveat
 
 
 def _model_selection_chooser_table_rows(
-    rows: Sequence[ModelSelectionRow],
+    views: Sequence[ModelRecommendationView],
 ) -> tuple[tuple[str, ...], ...]:
-    """Return compact chooser table cells for model-selection sections."""
+    """Return compact chooser table cells from canonical recommendation views."""
     return tuple(
         (
-            f"`{MARKDOWN_ESCAPER.escape(row.result.model_name)}`",
-            format_field_value("peak_memory", _model_selection_peak_gb(row)) or "-",
-            format_field_value("generation_tps", _model_selection_generation_tps(row)) or "-",
-            f"{row.caption_score:.0f}",
-            f"`{MARKDOWN_ESCAPER.escape(_model_selection_row_status(row))}`",
-            MARKDOWN_ESCAPER.escape(_model_selection_chooser_evidence(row)),
+            f"`{MARKDOWN_ESCAPER.escape(view.result.model_name)}`",
+            format_field_value("peak_memory", view.peak_memory_gb) or "-",
+            format_field_value("generation_tps", view.generation_tps) or "-",
+            (f"{view.visual_score:.0f}" if view.visual_score is not None else "-"),
+            f"`{MARKDOWN_ESCAPER.escape(_model_recommendation_status(view))}`",
+            MARKDOWN_ESCAPER.escape(_model_recommendation_evidence(view)),
         )
-        for row in rows
+        for view in views
     )
 
 
@@ -17403,12 +17591,21 @@ def _append_model_selection_chooser_section(
     md: list[str],
     *,
     title: str,
-    rows: Sequence[ModelSelectionRow],
+    views: Sequence[ModelRecommendationView],
+    policy_name: str,
     empty_text: str,
 ) -> None:
     """Append one compact practical chooser bucket."""
-    md.extend([f"### {title}", ""])
-    if not rows:
+    md.extend(
+        [
+            f"### {title}",
+            "",
+            f"Policy: {policy_name}.",
+            "Evidence scope: 1 image, 1 current run.",
+            "",
+        ]
+    )
+    if not views:
         md.extend([f"- {empty_text}", ""])
         return
     md.extend(
@@ -17416,7 +17613,7 @@ def _append_model_selection_chooser_section(
             (
                 ReportTable(
                     headers=("Model", "Peak GB", "Gen TPS", "Usefulness", "Status", "Evidence"),
-                    rows=_model_selection_chooser_table_rows(rows),
+                    rows=_model_selection_chooser_table_rows(views),
                     markdown_escaped=True,
                 ),
             )
@@ -17427,37 +17624,47 @@ def _append_model_selection_chooser_section(
 
 def _append_model_selection_quick_chooser(
     md: list[str],
-    rows: Sequence[ModelSelectionRow],
+    views: Sequence[ModelRecommendationView],
+    *,
+    policy_name: str,
 ) -> None:
     """Append practical model-user chooser buckets before the full shortlist."""
-    usable_rows = [row for row in rows if _model_selection_row_is_usable(row)]
+    usable_views = _eligible_recommendations(views)
+    if any(view.assisted_enrichment_score is not None for view in usable_views):
+        budget_ranked = _rank_reliability_gated_enrichment(views)
+    else:
+        budget_ranked = _rank_current_recommendations(usable_views)
     under_4gb = [
-        row
-        for row in usable_rows
-        if (peak := _model_selection_peak_gb(row)) is not None
-        and peak <= MODEL_SELECTION_CHOOSER_SMALL_MEMORY_GB
+        view
+        for view in budget_ranked
+        if view.peak_memory_gb is not None
+        and view.peak_memory_gb <= MODEL_SELECTION_CHOOSER_SMALL_MEMORY_GB
     ][:MODEL_SELECTION_CHOOSER_ROW_LIMIT]
     under_8gb = [
-        row
-        for row in usable_rows
-        if (peak := _model_selection_peak_gb(row)) is not None
-        and peak <= MODEL_SELECTION_CHOOSER_MEDIUM_MEMORY_GB
+        view
+        for view in budget_ranked
+        if view.peak_memory_gb is not None
+        and view.peak_memory_gb <= MODEL_SELECTION_CHOOSER_MEDIUM_MEMORY_GB
     ][:MODEL_SELECTION_CHOOSER_ROW_LIMIT]
     fastest = sorted(
-        usable_rows,
-        key=lambda row: (
-            _model_selection_generation_tps(row) or 0.0,
-            row.caption_score,
-            row.score,
+        usable_views,
+        key=lambda view: (
+            view.generation_tps or 0.0,
+            _recommendation_quality_score(view),
+            view.output_score or 0.0,
         ),
         reverse=True,
     )[:MODEL_SELECTION_CHOOSER_ROW_LIMIT]
     quality_any_memory = sorted(
-        usable_rows,
-        key=lambda row: (row.caption_score, row.score, _model_selection_generation_tps(row) or 0.0),
+        usable_views,
+        key=lambda view: (
+            _recommendation_quality_score(view),
+            view.output_score or 0.0,
+            view.generation_tps or 0.0,
+        ),
         reverse=True,
     )[:MODEL_SELECTION_CHOOSER_ROW_LIMIT]
-    current_avoid = [row for row in rows if _model_selection_row_is_current_avoid(row)][
+    current_avoid = [view for view in views if not view.eligible][
         :MODEL_SELECTION_CHOOSER_AVOID_ROW_LIMIT
     ]
 
@@ -17475,31 +17682,36 @@ def _append_model_selection_quick_chooser(
     _append_model_selection_chooser_section(
         md,
         title="Best under 4 GB",
-        rows=under_4gb,
+        views=under_4gb,
+        policy_name=policy_name,
         empty_text="No clean current-run candidates fit under this memory budget.",
     )
     _append_model_selection_chooser_section(
         md,
         title="Best under 8 GB",
-        rows=under_8gb,
+        views=under_8gb,
+        policy_name=policy_name,
         empty_text="No clean current-run candidates fit under this memory budget.",
     )
     _append_model_selection_chooser_section(
         md,
         title="Fastest usable",
-        rows=fastest,
+        views=fastest,
+        policy_name="reliability-gated generation throughput",
         empty_text="No clean current-run candidates produced usable caption text.",
     )
     _append_model_selection_chooser_section(
         md,
         title="Quality if memory allows",
-        rows=quality_any_memory,
+        views=quality_any_memory,
+        policy_name=policy_name,
         empty_text="No clean current-run candidates produced usable caption text.",
     )
     _append_model_selection_chooser_section(
         md,
         title="Current failures / avoid",
-        rows=current_avoid,
+        views=current_avoid,
+        policy_name="current-run reliability exclusion",
         empty_text="No current-run failures or avoid-bucket outputs.",
     )
 
@@ -17660,18 +17872,22 @@ def _append_review_issue_queue(
     md.append("")
 
 
-def _build_grounded_metadata_selection_section(rows: Sequence[ModelSelectionRow]) -> list[str]:
+def _build_grounded_metadata_selection_section(
+    views: Sequence[ModelRecommendationView],
+) -> list[str]:
     """Render metadata-agreement candidates when trusted metadata is available."""
     table_rows: list[tuple[str, ...]] = []
-    for row in rows[:10]:
-        agreement = row.result.metadata_agreement
+    for view in views[:10]:
+        agreement = view.result.metadata_agreement
         agreement_score = 0.0 if agreement is None else agreement.overall_score
+        review = _build_jsonl_review_record(view.result)
+        verdict = review["verdict"] if review is not None else "not_evaluated"
         table_rows.append(
             (
-                f"`{MARKDOWN_ESCAPER.escape(row.result.model_name)}`",
+                f"`{MARKDOWN_ESCAPER.escape(view.result.model_name)}`",
                 f"{agreement_score:.0f}",
-                f"`{MARKDOWN_ESCAPER.escape(row.verdict)}`",
-                MARKDOWN_ESCAPER.escape(row.caption_preview),
+                f"`{MARKDOWN_ESCAPER.escape(verdict)}`",
+                MARKDOWN_ESCAPER.escape(_build_result_output_preview(view.result, max_chars=180)),
             )
         )
 
@@ -17697,6 +17913,68 @@ def _build_grounded_metadata_selection_section(rows: Sequence[ModelSelectionRow]
     )
     parts.append("")
     return parts
+
+
+def _build_model_family_comparison_section(
+    views: Sequence[ModelRecommendationView],
+    *,
+    policy_name: str,
+) -> list[str]:
+    """Render current-run variant comparisons without merging variant evidence."""
+    grouped: dict[str, list[ModelRecommendationView]] = {}
+    for view in views:
+        grouped.setdefault(_model_family_key(view.result.model_name), []).append(view)
+    families = {
+        key: members
+        for key, members in grouped.items()
+        if len(members) >= MIN_MODELS_FOR_EFFICIENCY_CHART
+    }
+    if not families:
+        return []
+
+    rows = tuple(
+        (
+            MARKDOWN_ESCAPER.escape(family),
+            f"`{MARKDOWN_ESCAPER.escape(view.result.model_name)}`",
+            "yes" if view.eligible else "no",
+            (
+                f"{_recommendation_quality_score(view):.0f}"
+                if _recommendation_quality_score(view) >= 0.0
+                else "-"
+            ),
+            format_field_value("total_time", view.total_time_s) or "-",
+            format_field_value("peak_memory", view.peak_memory_gb) or "-",
+        )
+        for family in sorted(families)
+        for view in _rank_current_recommendations(families[family])
+    )
+    table = render_report_markdown(
+        (
+            ReportTable(
+                headers=("Family", "Variant", "Eligible", "Quality", "Total", "Peak GB"),
+                rows=rows,
+                markdown_escaped=True,
+            ),
+        )
+    )
+    return [
+        "## Repository Variant Comparisons",
+        "",
+        f"Policy: {policy_name} within matching repository families.",
+        "Evidence scope: 1 image, 1 current run per variant; scores and histories are not merged.",
+        "",
+        *table,
+        "",
+    ]
+
+
+def _model_selection_policy_name(policy: ReportModePolicy) -> str:
+    """Return the explicit current-run ranking policy for an evaluation lane."""
+    if policy.eval_mode == "assisted":
+        return "reliability-gated assisted enrichment"
+    if policy.eval_mode == "blind":
+        return "reliability-gated held-out visual quality"
+    return "reliability-gated caption usefulness"
 
 
 def _append_model_selection_evidence_links(
@@ -17759,7 +18037,9 @@ def generate_model_selection_report(
 
     policy = report_context.mode_policy
     grounding = "grounded" if policy.semantic_rankings_grounded else "ungrounded"
-    rows = _build_model_selection_rows(report_context.result_set.results)
+    views = _build_model_recommendation_views(report_context)
+    ranked_views = _rank_current_recommendations(views)
+    ranking_policy_name = _model_selection_policy_name(policy)
     md: list[str] = [
         "# Model Selection Brief",
         "",
@@ -17768,6 +18048,8 @@ def generate_model_selection_report(
         f"- Evaluation lane: {MARKDOWN_ESCAPER.escape(policy.eval_mode)}",
         f"- Metadata exposed to prompt: {'yes' if policy.metadata_exposed_to_prompt else 'no'}",
         (f"- Semantic rankings: {grounding} ({MARKDOWN_ESCAPER.escape(policy.selection_basis)})"),
+        f"- Policy: {ranking_policy_name}",
+        "- Evidence scope: 1 image, 1 current run",
         (
             "- Primary use cases: brief captions only in triage mode; structured "
             "title/description/keywords require a grounded metadata or quality run"
@@ -17788,7 +18070,11 @@ def generate_model_selection_report(
         diagnostics_filename=diagnostics_filename,
     )
 
-    _append_model_selection_quick_chooser(md, rows)
+    _append_model_selection_quick_chooser(
+        md,
+        views,
+        policy_name=ranking_policy_name,
+    )
 
     md.extend(
         [
@@ -17798,29 +18084,23 @@ def generate_model_selection_report(
                 "Top 10 ranked candidates for brief captions. This is a selection aid, "
                 "not the complete result set."
             ),
+            f"Policy: {ranking_policy_name}.",
+            "Evidence scope: 1 image, 1 current run.",
             "",
         ]
     )
     caption_rows = [
         (
-            f"`{MARKDOWN_ESCAPER.escape(row.result.model_name)}`",
-            f"{row.score:.0f}",
-            f"{row.caption_score:.0f}",
-            format_field_value(
-                "generation_tps",
-                _generation_float_metric(row.result.generation, "generation_tps"),
-            )
-            or "-",
-            format_field_value(
-                "peak_memory",
-                _generation_float_metric(row.result.generation, "peak_memory"),
-            )
-            or "-",
-            f"`{MARKDOWN_ESCAPER.escape(row.verdict)}`",
-            MARKDOWN_ESCAPER.escape(row.caption_preview),
-            MARKDOWN_ESCAPER.escape(row.caveat),
+            f"`{MARKDOWN_ESCAPER.escape(view.result.model_name)}`",
+            f"{view.output_score:.0f}" if view.output_score is not None else "-",
+            f"{view.visual_score:.0f}" if view.visual_score is not None else "-",
+            format_field_value("generation_tps", view.generation_tps) or "-",
+            format_field_value("peak_memory", view.peak_memory_gb) or "-",
+            f"`{MARKDOWN_ESCAPER.escape(_model_recommendation_status(view))}`",
+            MARKDOWN_ESCAPER.escape(_build_result_output_preview(view.result, max_chars=180)),
+            MARKDOWN_ESCAPER.escape(" | ".join(view.caveats) or "no flagged signals"),
         )
-        for row in rows[:10]
+        for view in ranked_views[:10]
     ]
     md.extend(
         render_report_markdown(
@@ -17854,7 +18134,14 @@ def generate_model_selection_report(
             ]
         )
     else:
-        md.extend(_build_grounded_metadata_selection_section(rows))
+        md.extend(_build_grounded_metadata_selection_section(ranked_views))
+
+    md.extend(
+        _build_model_family_comparison_section(
+            views,
+            policy_name=ranking_policy_name,
+        )
+    )
 
     _write_markdown_artifact(filename, md, artifact_name="Model-selection report")
 
@@ -17915,12 +18202,13 @@ def _score_at_least(value: float | None, threshold: float) -> bool:
 
 
 def _capability_signal_from_result(
-    result: PerformanceResult,
+    view: ModelRecommendationView,
     *,
     utility_by_model: Mapping[str, UtilityTriageRow],
     suppress_cataloging_scores: bool,
 ) -> ModelCapabilityRunSignal:
-    """Build a current-run capability observation from a performance result."""
+    """Build a current capability signal from the canonical recommendation view."""
+    result = view.result
     review = _build_jsonl_review_record(result)
     text = str(getattr(result.generation, "text", "") or "") if result.generation else ""
     utility = utility_by_model.get(result.model_name)
@@ -17929,7 +18217,7 @@ def _capability_signal_from_result(
         if result.metadata_agreement is not None
         else _capability_float(getattr(result.quality_analysis, "metadata_alignment_score", None))
     )
-    hygiene_score = _model_selection_score(result) if review is not None else None
+    hygiene_score = view.output_score
     caption_score = _caption_usefulness_score(text) if result.success and text else None
     cataloging_score = None if suppress_cataloging_scores or utility is None else utility.score
     description_score = (
@@ -17957,8 +18245,8 @@ def _capability_signal_from_result(
         description_score=description_score,
         keyword_score=keyword_score,
         metadata_alignment_score=metadata_score,
-        generation_tps=_generation_float_metric(result.generation, "generation_tps"),
-        peak_memory_gb=_generation_float_metric(result.generation, "peak_memory"),
+        generation_tps=view.generation_tps,
+        peak_memory_gb=view.peak_memory_gb,
         signal=_gallery_summary_signal(result),
     )
 
@@ -18070,13 +18358,13 @@ def _collect_model_capability_signals(
             signals_by_model.setdefault(model, []).append(
                 _capability_signal_from_history(model, info)
             )
-    for result in report_context.result_set.results:
+    for view in _build_model_recommendation_views(report_context):
         signal = _capability_signal_from_result(
-            result,
+            view,
             utility_by_model=utility_by_model,
             suppress_cataloging_scores=report_context.mode_policy.suppress_cataloging_scores,
         )
-        signals_by_model.setdefault(result.model_name, []).append(signal)
+        signals_by_model.setdefault(view.result.model_name, []).append(signal)
     return signals_by_model
 
 
