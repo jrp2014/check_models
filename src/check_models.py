@@ -16522,6 +16522,7 @@ def export_failure_repro_bundles(
                 "traceback": result.error_traceback,
                 "captured_output": result.captured_output_on_fail,
                 **_exception_chain_json_field(result.exception_chain),
+                **_failure_narrative_json_fields(result),
             },
             "result": {
                 "success": result.success,
@@ -20064,10 +20065,14 @@ def _exception_chain(error: BaseException) -> Iterator[BaseException]:
             cur = None
 
 
-def _root_cause_exception(error: BaseException) -> BaseException:
-    """Return the deepest available exception in a cause/context chain."""
+def _root_cause_exception(
+    error: BaseException,
+    *,
+    chain: Iterable[BaseException] | None = None,
+) -> BaseException:
+    """Return the deepest exception, reusing a materialized chain when supplied."""
     root = error
-    for candidate in _exception_chain(error):
+    for candidate in chain if chain is not None else _exception_chain(error):
         root = candidate
     return root
 
@@ -20102,6 +20107,20 @@ def _exception_chain_json_field(
     if not chain:
         return {}
     return {"exception_chain": _serialize_exception_chain(chain)}
+
+
+def _failure_narrative_json_fields(result: PerformanceResult) -> dict[str, object]:
+    """Serialize canonical crash facts for failed repro payloads."""
+    if result.success:
+        return {}
+    narrative = _build_failure_narrative(result)
+    return {
+        "task_outcome": narrative.task_outcome,
+        "primary_exception": narrative.primary_exception,
+        "secondary_exceptions": list(narrative.secondary_exceptions),
+        "suspected_owner": narrative.suspected_owner,
+        "owner_confidence": narrative.owner_confidence,
+    }
 
 
 def _format_failure_exception(entry: FailureException) -> str:
@@ -20147,9 +20166,13 @@ def _build_failure_narrative(result: PerformanceResult) -> FailureNarrative:
     )
 
 
-def _extract_exception_prompt_diagnostics(error: BaseException) -> PromptDiagnostics | None:
-    """Return prompt diagnostics attached anywhere in an exception chain."""
-    for item in _exception_chain(error):
+def _extract_exception_prompt_diagnostics(
+    error: BaseException,
+    *,
+    chain: Iterable[BaseException] | None = None,
+) -> PromptDiagnostics | None:
+    """Return prompt diagnostics from a new or already-materialized exception chain."""
+    for item in chain if chain is not None else _exception_chain(error):
         if diagnostics := _object_prompt_diagnostics(item):
             return diagnostics
     return None
@@ -21228,9 +21251,10 @@ def _build_failure_result(
     """Build a standardized failure result payload for a model run."""
     error_msg = str(error)
     tb_str = traceback.format_exc()
-    exception_chain = tuple(
-        _failure_exception_record(item) for item in reversed(tuple(_exception_chain(error)))
-    )
+    traversed_chain = tuple(_exception_chain(error))
+    root_exception = _root_cause_exception(error, chain=traversed_chain)
+    chronological_errors = (root_exception, *reversed(traversed_chain[:-1]))
+    exception_chain = tuple(_failure_exception_record(item) for item in chronological_errors)
     root_error = exception_chain[0]
     root_error_msg = root_error.message
     classification_text = " ".join(part for part in (root_error_msg, error_msg) if part)
@@ -21247,7 +21271,10 @@ def _build_failure_result(
         error_message=root_error_msg or error_msg,
         error_traceback=tb_str,
     )
-    resolved_prompt_diagnostics = prompt_diagnostics or _extract_exception_prompt_diagnostics(error)
+    resolved_prompt_diagnostics = prompt_diagnostics or _extract_exception_prompt_diagnostics(
+        error,
+        chain=traversed_chain,
+    )
     return PerformanceResult(
         model_name=model_name,
         generation=None,

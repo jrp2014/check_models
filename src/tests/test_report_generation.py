@@ -4135,18 +4135,27 @@ class TestDiagnosticsReport:
         assert "Partial decoded answer before crash." in content
 
     def test_failure_repro_bundles_written(self, tmp_path: Path) -> None:
-        """Each failed model should produce a machine-readable repro bundle."""
+        """Failure repros should add one narrative while preserving legacy fields."""
         failure = replace(
             _make_failure_with_details(
                 "org/broken-model",
-                error_msg="bad shape",
+                error_msg="generation failed",
+                error_type="ValueError",
                 error_stage="Model Error",
                 error_package="mlx-vlm",
-                traceback_str="Traceback\nValueError: bad shape",
+                traceback_str="Traceback\nValueError: generation failed",
             ),
             exception_chain=(
-                check_models.FailureException("RuntimeError", "mlx.core", "bad shape"),
-                check_models.FailureException("ValueError", "builtins", "generation failed"),
+                check_models.FailureException(
+                    "RuntimeError",
+                    "mlx.core",
+                    "kIOGPUCommandBufferCallbackErrorOutOfMemory",
+                ),
+                check_models.FailureException(
+                    "ValueError",
+                    "builtins",
+                    "mlx_vlm/generate.py generation failed",
+                ),
             ),
         )
         bundles = export_failure_repro_bundles(
@@ -4163,11 +4172,33 @@ class TestDiagnosticsReport:
         assert bundle_path.exists()
         payload = json.loads(bundle_path.read_text(encoding="utf-8"))
         assert payload["model"] == "org/broken-model"
+        assert payload["failure"]["type"] == "ValueError"
+        assert payload["failure"]["package"] == "mlx-vlm"
+        assert payload["failure"]["message"] == "generation failed"
         assert payload["failure"]["stage"] == "Model Error"
         assert payload["failure"]["exception_chain"] == [
-            {"type": "RuntimeError", "module": "mlx.core", "message": "bad shape"},
-            {"type": "ValueError", "module": "builtins", "message": "generation failed"},
+            {
+                "type": "RuntimeError",
+                "module": "mlx.core",
+                "message": "kIOGPUCommandBufferCallbackErrorOutOfMemory",
+            },
+            {
+                "type": "ValueError",
+                "module": "builtins",
+                "message": "mlx_vlm/generate.py generation failed",
+            },
         ]
+        assert payload["failure"]["task_outcome"] == "crashed"
+        assert (
+            payload["failure"]["primary_exception"]
+            == "RuntimeError: kIOGPUCommandBufferCallbackErrorOutOfMemory"
+        )
+        assert payload["failure"]["secondary_exceptions"] == [
+            "ValueError: mlx_vlm/generate.py generation failed"
+        ]
+        assert payload["failure"]["suspected_owner"] == "unresolved: mlx/mlx-vlm"
+        assert payload["failure"]["owner_confidence"] == "low"
+        assert payload["result"]["maintainer_triage"]["suspected_owner"] == "mlx-vlm"
         assert payload["repro"]["prompt_hash_sha256"]
         assert payload["repro"]["eval_mode"] == "blind"
 

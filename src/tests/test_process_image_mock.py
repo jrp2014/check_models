@@ -434,6 +434,38 @@ class TestProcessImageWithModelMock:
             "ValueError: generation failed",
         )
 
+    def test_build_failure_result_reuses_one_root_selection_traversal(self) -> None:
+        """Failure building should reuse the canonical root selector over one chain walk."""
+        root_error = IndexError("bad token")
+        wrapper_error = ValueError("generation failed")
+        wrapper_error.__cause__ = root_error
+
+        with (
+            patch.object(
+                check_models,
+                "_exception_chain",
+                wraps=check_models._exception_chain,
+            ) as chain_walk,
+            patch.object(
+                check_models,
+                "_root_cause_exception",
+                wraps=check_models._root_cause_exception,
+            ) as root_selector,
+        ):
+            try:
+                raise wrapper_error
+            except ValueError as error:
+                result = check_models._build_failure_result(
+                    model_name="org/model",
+                    error=error,
+                    captured_output=None,
+                )
+
+        root_selector.assert_called_once()
+        assert chain_walk.call_count == 1
+        assert result.root_error_type == "IndexError"
+        assert result.root_error_message == "bad token"
+
     def test_failure_narrative_marks_mixed_runtime_owners_unresolved(self) -> None:
         """A mixed mlx-vlm/MLX chain should not be assigned confidently to one owner."""
         runtime_error = RuntimeError("kIOGPUCommandBufferCallbackErrorOutOfMemory")
