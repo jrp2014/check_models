@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 import json
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, cast
@@ -60,6 +61,7 @@ class MockGeneration:
     time: float | None = None
     active_memory: float | None = None
     cache_memory: float | None = None
+    quality_analysis: object | None = None
 
 
 def _history_run(
@@ -696,6 +698,67 @@ def test_save_jsonl_report_includes_canonical_prompt_burden(tmp_path: Path) -> N
     review = _require_present(rows[0].get("review"), field_name="review")
     assert review["prompt_burden_kind"] == "visual_input"
     assert review["prompt_burden_source"] == "estimated_nontext"
+
+
+def test_jsonl_prompt_burden_reuses_generation_level_quality_analysis(tmp_path: Path) -> None:
+    output_file = tmp_path / "results.jsonl"
+    prompt = "Describe this image briefly."
+    analysis = check_models.analyze_generation_text(
+        "Cat.",
+        generated_tokens=3,
+        prompt_tokens=4103,
+        prompt=prompt,
+    )
+    generation = MockGeneration(
+        text="Cat.",
+        prompt_tokens=4103,
+        generation_tokens=3,
+        quality_analysis=analysis,
+    )
+    result = PerformanceResult(
+        model_name="org/legacy-analysis",
+        generation=generation,
+        success=True,
+        prompt_diagnostics=check_models.PromptDiagnostics(image_placeholder_count=1),
+    )
+
+    save_jsonl_report([result], output_file, prompt=prompt, system_info={})
+    _header, rows = _read_jsonl(output_file)
+
+    review = _require_present(rows[0].get("review"), field_name="review")
+    assert review["prompt_tokens_total"] == analysis.prompt_tokens_total
+    assert review["prompt_tokens_text_est"] == analysis.prompt_tokens_text_est
+    assert review["prompt_tokens_nontext_est"] == analysis.prompt_tokens_nontext_est
+    assert review["prompt_burden_kind"] == "visual_input"
+    assert review["prompt_burden_source"] == "estimated_nontext"
+
+
+def test_jsonl_prompt_burden_serializes_unavailable_reason(tmp_path: Path) -> None:
+    output_file = tmp_path / "results.jsonl"
+    analysis = dataclasses.replace(
+        check_models.analyze_generation_text(
+            "A concise image description.",
+            generated_tokens=6,
+            prompt_tokens=4200,
+            prompt="Describe this image.",
+        ),
+        prompt_tokens_text_est=None,
+        prompt_tokens_nontext_est=None,
+    )
+    result = PerformanceResult(
+        model_name="org/unavailable-components",
+        generation=MockGeneration(prompt_tokens=4200, generation_tokens=6),
+        success=True,
+        quality_analysis=analysis,
+    )
+
+    save_jsonl_report([result], output_file, prompt="Describe this image.", system_info={})
+    _header, rows = _read_jsonl(output_file)
+
+    review = _require_present(rows[0].get("review"), field_name="review")
+    assert review["prompt_burden_kind"] == "unavailable"
+    assert review["prompt_burden_source"] == "unavailable"
+    assert review["prompt_burden_reason"] == "component_estimates_unavailable"
 
 
 def test_save_jsonl_report_includes_captured_output(tmp_path: Path) -> None:

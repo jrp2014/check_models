@@ -1268,6 +1268,7 @@ class JsonlReviewRecord(TypedDict):
     nontext_prompt_ratio: float | None
     prompt_burden_kind: NotRequired[str]
     prompt_burden_source: NotRequired[str]
+    prompt_burden_reason: NotRequired[str | None]
     processed_image_width: NotRequired[int | None]
     processed_image_height: NotRequired[int | None]
     image_patch_count: NotRequired[int | None]
@@ -2169,7 +2170,14 @@ class ImageInputProfile:
     processed_height: int | None = None
 
 
-type PromptBurdenKind = Literal["normal", "visual_input", "text", "mixed", "unknown"]
+type PromptBurdenKind = Literal[
+    "normal",
+    "visual_input",
+    "text",
+    "mixed",
+    "unknown",
+    "unavailable",
+]
 
 
 @dataclass(frozen=True)
@@ -2184,6 +2192,7 @@ class PromptBurden:
     template_tokens_est: int | None = None
     nontext_ratio: float | None = None
     source: str = "unavailable"
+    reason: str | None = None
     original_width: int | None = None
     original_height: int | None = None
     processed_width: int | None = None
@@ -2196,7 +2205,7 @@ def _prompt_burden_for_result(
     image_profile: ImageInputProfile | None,
 ) -> PromptBurden:
     """Return the shared prompt/input burden view without re-tokenizing input."""
-    analysis = result.quality_analysis
+    analysis = _quality_analysis_for_result(result)
     total = analysis.prompt_tokens_total if analysis is not None else None
     text_est = analysis.prompt_tokens_text_est if analysis is not None else None
     nontext_est = analysis.prompt_tokens_nontext_est if analysis is not None else None
@@ -2215,8 +2224,15 @@ def _prompt_burden_for_result(
         None,
     )
 
-    kind: PromptBurdenKind = "unknown" if total is None else "normal"
-    if substantial and ratio is not None:
+    reason: str | None = None
+    kind: PromptBurdenKind = "normal"
+    if total is None:
+        kind = "unknown"
+        reason = "prompt_token_total_unavailable"
+    elif text_est is None or nontext_est is None:
+        kind = "unavailable"
+        reason = "component_estimates_unavailable"
+    elif substantial and ratio is not None:
         if placeholders and ratio >= QUALITY.heavy_nontext_prompt_ratio:
             kind = "visual_input"
         elif text_est is not None and text_est >= QUALITY.long_prompt_tokens_threshold:
@@ -2231,6 +2247,7 @@ def _prompt_burden_for_result(
         nontext_tokens_est=nontext_est,
         nontext_ratio=ratio,
         source="estimated_nontext" if nontext_est is not None else "unavailable",
+        reason=reason,
         original_width=image_profile.width if image_profile is not None else None,
         original_height=image_profile.height if image_profile is not None else None,
         processed_width=processed_width,
@@ -11411,6 +11428,7 @@ def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord |
             "nontext_prompt_ratio": nontext_prompt_ratio,
             "prompt_burden_kind": prompt_burden.kind,
             "prompt_burden_source": prompt_burden.source,
+            "prompt_burden_reason": prompt_burden.reason,
             "processed_image_width": prompt_burden.processed_width,
             "processed_image_height": prompt_burden.processed_height,
             "image_patch_count": prompt_burden.patch_count,
@@ -11449,6 +11467,7 @@ def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord |
         "nontext_prompt_ratio": None,
         "prompt_burden_kind": prompt_burden.kind,
         "prompt_burden_source": prompt_burden.source,
+        "prompt_burden_reason": prompt_burden.reason,
         "processed_image_width": prompt_burden.processed_width,
         "processed_image_height": prompt_burden.processed_height,
         "image_patch_count": prompt_burden.patch_count,
@@ -11756,7 +11775,9 @@ def _maintainer_triage_context_text(triage: JsonlMaintainerTriageRecord) -> str 
         context_parts.append(f"output/prompt={prompt_output_ratio:.2%}")
     nontext_prompt_ratio = triage.get("nontext_prompt_ratio")
     prompt_burden_kind = triage.get("prompt_burden_kind")
-    if prompt_burden_kind and prompt_burden_kind not in {"normal", "unknown"}:
+    if prompt_burden_kind == "unavailable":
+        context_parts.append("prompt/input composition unavailable")
+    elif prompt_burden_kind and prompt_burden_kind not in {"normal", "unknown"}:
         burden_label = prompt_burden_kind.replace("_", " ")
         ratio_suffix = f"={nontext_prompt_ratio:.0%}" if nontext_prompt_ratio is not None else ""
         context_parts.append(f"{burden_label} burden{ratio_suffix}")
@@ -11944,7 +11965,9 @@ def _review_focus_text(
         parts.append(f"output/prompt={review['prompt_output_ratio']:.2%}")
 
     burden_kind = review.get("prompt_burden_kind", "unknown")
-    if burden_kind not in {"normal", "unknown"} and review["verdict"] == "context_budget":
+    if burden_kind == "unavailable" and review["verdict"] == "context_budget":
+        parts.append("prompt/input composition unavailable")
+    elif burden_kind not in {"normal", "unknown"} and review["verdict"] == "context_budget":
         burden_label = burden_kind.replace("_", " ")
         ratio_suffix = (
             f"={review['nontext_prompt_ratio']:.0%}"
@@ -12031,11 +12054,18 @@ def _review_next_action_text(review: JsonlReviewRecord) -> str:
     if review["verdict"] == "cutoff":
         action = _review_cutoff_next_action(review)
     elif review["verdict"] == "context_budget":
-        burden_label = review.get("prompt_burden_kind", "prompt/input").replace("_", " ")
-        action = (
-            f"Treat this as a {burden_label} burden issue first; reduce that input load or inspect "
-            "long-context handling before judging output quality."
-        )
+        burden_kind = review.get("prompt_burden_kind", "unknown")
+        if burden_kind in {"unknown", "unavailable"}:
+            action = (
+                "Prompt/input composition is unavailable; inspect token accounting or reduce the "
+                "input load before judging output quality."
+            )
+        else:
+            burden_label = burden_kind.replace("_", " ")
+            action = (
+                f"Treat this as a {burden_label} burden issue first; reduce that input load or "
+                "inspect long-context handling before judging output quality."
+            )
     elif review["owner"] == "huggingface-hub":
         action = (
             "Check whether Hugging Face was reachable; this may be a transient Hub/network "
@@ -18860,6 +18890,7 @@ def generate_tsv_report(
     burden_headers = [
         "prompt_burden_kind",
         "prompt_burden_source",
+        "prompt_burden_reason",
         "processed_image_width",
         "processed_image_height",
         "image_patch_count",
@@ -18876,6 +18907,7 @@ def generate_tsv_report(
             [
                 burden.kind,
                 burden.source,
+                burden.reason or "",
                 str(burden.processed_width) if burden.processed_width is not None else "",
                 str(burden.processed_height) if burden.processed_height is not None else "",
                 str(burden.patch_count) if burden.patch_count is not None else "",

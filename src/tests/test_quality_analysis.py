@@ -520,6 +520,32 @@ def test_small_image_long_text_is_text_burden() -> None:
     assert burden.nontext_ratio < 0.5
 
 
+def test_known_total_without_component_estimates_is_unavailable_burden() -> None:
+    analysis = dataclasses.replace(
+        check_models.analyze_generation_text(
+            "A concise image description.",
+            generated_tokens=6,
+            prompt_tokens=4200,
+            prompt="Describe this image.",
+        ),
+        prompt_tokens_text_est=None,
+        prompt_tokens_nontext_est=None,
+    )
+    result = check_models.PerformanceResult(
+        model_name="org/unavailable-components",
+        generation=None,
+        success=True,
+        quality_analysis=analysis,
+    )
+
+    burden = check_models._prompt_burden_for_result(result, None)
+
+    assert burden.total_tokens == 4200
+    assert burden.kind == "unavailable"
+    assert burden.source == "unavailable"
+    assert burden.reason == "component_estimates_unavailable"
+
+
 def test_analyze_generation_text_ignores_nonvisual_location_and_time_metadata() -> None:
     """Location, GPS, and timestamps should not drive trusted-hint penalties."""
     prompt = (

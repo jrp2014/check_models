@@ -2614,6 +2614,37 @@ class TestMarkdownGalleryReport:
         assert "visual input burden" in focus
         assert "nontext prompt burden" not in focus
 
+    def test_unavailable_prompt_components_do_not_claim_normal_burden(self) -> None:
+        """Unavailable component estimates should produce uncertainty-aware guidance."""
+        analysis = replace(
+            check_models.analyze_generation_text(
+                "Cat.",
+                generated_tokens=3,
+                prompt_tokens=4103,
+                prompt="Describe this image briefly.",
+            ),
+            prompt_tokens_text_est=None,
+            prompt_tokens_nontext_est=None,
+            verdict="context_budget",
+        )
+        result = PerformanceResult(
+            model_name="org/unavailable-components",
+            success=True,
+            generation=_MockGeneration(
+                text="Cat.",
+                prompt_tokens=4103,
+                generation_tokens=3,
+            ),
+            quality_analysis=analysis,
+        )
+        review = check_models._build_jsonl_review_record(result)
+
+        assert review is not None
+        guidance = check_models._review_next_action_text(review)
+        assert review["prompt_burden_kind"] == "unavailable"
+        assert "normal burden issue" not in guidance
+        assert "input composition is unavailable" in guidance
+
     def test_gallery_includes_summary_pointer_and_per_model_review_status(
         self,
         tmp_path: Path,
