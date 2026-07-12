@@ -7,6 +7,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Preserve failed-run exception chains in root-to-wrapper chronology across
+  canonical failure narratives, JSONL, repro bundles, diagnostics, and issue
+  reports; separate the conclusive crash outcome from cautious owner attribution.
 - Add one configuration-driven prompt burden view that distinguishes visual,
   textual, mixed, normal, and unavailable input load across review, diagnostics,
   JSONL, and TSV output while preserving existing token-estimate fields.

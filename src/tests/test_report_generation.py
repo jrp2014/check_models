@@ -3255,6 +3255,49 @@ class TestDiagnosticsReport:
         assert "check_models/src/check_models.py" not in failure_section
         assert "_run_model_generation" not in failure_section
 
+    def test_failure_section_uses_one_chronological_failure_narrative(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Failure reports should lead with the root and retain later wrappers."""
+        out = tmp_path / "diag.md"
+        failure = replace(
+            _make_failure_with_details(
+                "org/chained-fail",
+                error_msg="generation failed",
+            ),
+            exception_chain=(
+                check_models.FailureException(
+                    "IndexError",
+                    "builtins",
+                    "token id 999 outside detokenizer table",
+                ),
+                check_models.FailureException(
+                    "RuntimeError",
+                    "builtins",
+                    "METAL command buffer out of memory",
+                ),
+                check_models.FailureException(
+                    "ValueError",
+                    "builtins",
+                    "generation failed",
+                ),
+            ),
+        )
+
+        generate_diagnostics_report(
+            results=[failure],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "IndexError: token id 999 outside detokenizer table" in content
+        assert "RuntimeError: METAL command buffer out of memory" in content
+        assert "ValueError: generation failed" in content
+
     def test_history_context_includes_regressions_recoveries_and_repro(
         self,
         tmp_path: Path,
@@ -4093,12 +4136,18 @@ class TestDiagnosticsReport:
 
     def test_failure_repro_bundles_written(self, tmp_path: Path) -> None:
         """Each failed model should produce a machine-readable repro bundle."""
-        failure = _make_failure_with_details(
-            "org/broken-model",
-            error_msg="bad shape",
-            error_stage="Model Error",
-            error_package="mlx-vlm",
-            traceback_str="Traceback\nValueError: bad shape",
+        failure = replace(
+            _make_failure_with_details(
+                "org/broken-model",
+                error_msg="bad shape",
+                error_stage="Model Error",
+                error_package="mlx-vlm",
+                traceback_str="Traceback\nValueError: bad shape",
+            ),
+            exception_chain=(
+                check_models.FailureException("RuntimeError", "mlx.core", "bad shape"),
+                check_models.FailureException("ValueError", "builtins", "generation failed"),
+            ),
         )
         bundles = export_failure_repro_bundles(
             results=[failure],
@@ -4115,6 +4164,10 @@ class TestDiagnosticsReport:
         payload = json.loads(bundle_path.read_text(encoding="utf-8"))
         assert payload["model"] == "org/broken-model"
         assert payload["failure"]["stage"] == "Model Error"
+        assert payload["failure"]["exception_chain"] == [
+            {"type": "RuntimeError", "module": "mlx.core", "message": "bad shape"},
+            {"type": "ValueError", "module": "builtins", "message": "generation failed"},
+        ]
         assert payload["repro"]["prompt_hash_sha256"]
         assert payload["repro"]["eval_mode"] == "blind"
 

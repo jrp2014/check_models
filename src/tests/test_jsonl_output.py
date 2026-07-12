@@ -624,6 +624,31 @@ def test_save_jsonl_report_includes_root_exception_fields(tmp_path: Path) -> Non
     assert data.get("root_error_message") == "upstream shape mismatch"
 
 
+def test_save_jsonl_report_includes_exception_chain_in_chronological_order(
+    tmp_path: Path,
+) -> None:
+    """Exception chains serialize additively from root cause to outer wrapper."""
+    output_file = tmp_path / "results.jsonl"
+    result = PerformanceResult(
+        model_name="failed-model",
+        generation=None,
+        success=False,
+        error_message="generation failed",
+        exception_chain=(
+            check_models.FailureException("IndexError", "builtins", "bad token"),
+            check_models.FailureException("ValueError", "builtins", "generation failed"),
+        ),
+    )
+
+    save_jsonl_report([result], output_file, prompt="test", system_info={})
+    _header, rows = _read_jsonl(output_file)
+
+    assert rows[0].get("exception_chain") == [
+        {"type": "IndexError", "module": "builtins", "message": "bad token"},
+        {"type": "ValueError", "module": "builtins", "message": "generation failed"},
+    ]
+
+
 def test_save_jsonl_report_includes_prompt_diagnostics(tmp_path: Path) -> None:
     """Rendered prompt diagnostics should be optional JSONL metadata."""
     output_file = tmp_path / "results.jsonl"

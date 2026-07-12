@@ -1363,6 +1363,7 @@ class JsonlResultRecord(TypedDict):
     root_error_type: NotRequired[str]
     root_error_module: NotRequired[str]
     root_error_message: NotRequired[str]
+    exception_chain: NotRequired[list[dict[str, str]]]
     error_package: str | None
     error_traceback: str | None
     quality_issues: list[str]
@@ -1929,6 +1930,7 @@ def _resolve_generation_stop_reason(
 # These constants define default values for various parameters used in the script.
 DEFAULT_MAX_TOKENS: Final[int] = 500
 DEFAULT_EVAL_MODE: Final[str] = "auto"
+_UNKNOWN_OWNER: Final[str] = "unknown"
 TRIAGE_MAX_TOKENS: Final[int] = 200
 QUALITY_MAX_TOKENS: Final[int] = 1000
 DEFAULT_FOLDER: Final[Path] = Path.home() / "Pictures" / "Processed"
@@ -2055,6 +2057,28 @@ class PromptDiagnostics:
 
 
 @dataclass(frozen=True)
+class FailureException:
+    """One exception in a failed run, stored in root-to-wrapper order."""
+
+    exception_type: str
+    module: str
+    message: str
+
+
+@dataclass(frozen=True)
+class FailureNarrative:
+    """Canonical task outcome and suspected ownership for a failed run."""
+
+    task_outcome: Literal["crashed"]
+    phase: str | None
+    stage: str | None
+    primary_exception: str
+    secondary_exceptions: tuple[str, ...]
+    suspected_owner: str
+    owner_confidence: MaintainerConfidence
+
+
+@dataclass(frozen=True)
 class PerformanceResult:
     """Encapsulates a GenerationResult and execution metadata for a model run.
 
@@ -2099,6 +2123,7 @@ class PerformanceResult:
     root_error_type: str | None = None
     root_error_module: str | None = None
     root_error_message: str | None = None
+    exception_chain: tuple[FailureException, ...] = ()
     quality_issues: str | None = None
     quality_analysis: GenerationQualityAnalysis | None = None
     metadata_agreement: MetadataAgreementMetrics | None = None
@@ -15049,17 +15074,25 @@ def _append_diagnostics_failure_error_block(
     result: PerformanceResult,
 ) -> None:
     """Append a concise failure summary and upstream traceback evidence."""
-    observed_error = result.error_message or result.root_error_message
+    narrative = _build_failure_narrative(result)
     traceback_tail = _format_traceback_tail(result.error_traceback)
 
     parts.append("**Observed error:**")
     _append_markdown_code_block(
         parts,
-        observed_error or traceback_tail or "Unknown runtime failure.",
+        narrative.primary_exception,
         language="text",
     )
 
-    if traceback_tail and observed_error:
+    if narrative.secondary_exceptions:
+        parts.append("**Exception chain:**")
+        _append_markdown_code_block(
+            parts,
+            "\n".join(narrative.secondary_exceptions),
+            language="text",
+        )
+
+    if traceback_tail:
         parts.append("**Relevant upstream traceback:**")
         _append_markdown_code_block(parts, traceback_tail, language="text")
 
@@ -15556,8 +15589,12 @@ def _issue_queue_failure_evidence(result: PerformanceResult) -> list[str]:
     if result.failure_phase:
         parts.append(f"phase {result.failure_phase}")
 
-    observed = _simplify_failure_message(result.error_message, model_name=result.model_name)
-    exc_type = result.root_error_type or result.error_type
+    narrative = _build_failure_narrative(result)
+    observed = _simplify_failure_message(
+        narrative.primary_exception,
+        model_name=result.model_name,
+    )
+    exc_type = narrative.primary_exception.partition(":")[0] or None
     if exc_type:
         parts.append(exc_type)
     elif observed and not parts:
@@ -16484,6 +16521,7 @@ def export_failure_repro_bundles(
                 "message": result.error_message,
                 "traceback": result.error_traceback,
                 "captured_output": result.captured_output_on_fail,
+                **_exception_chain_json_field(result.exception_chain),
             },
             "result": {
                 "success": result.success,
@@ -20034,6 +20072,81 @@ def _root_cause_exception(error: BaseException) -> BaseException:
     return root
 
 
+def _failure_exception_record(error: BaseException) -> FailureException:
+    """Materialize stable exception identity for failure artifacts."""
+    return FailureException(
+        exception_type=type(error).__name__,
+        module=type(error).__module__,
+        message=str(error),
+    )
+
+
+def _serialize_exception_chain(
+    chain: tuple[FailureException, ...],
+) -> list[dict[str, str]]:
+    """Serialize a stored exception chain without changing its chronology."""
+    return [
+        {
+            "type": entry.exception_type,
+            "module": entry.module,
+            "message": entry.message,
+        }
+        for entry in chain
+    ]
+
+
+def _exception_chain_json_field(
+    chain: tuple[FailureException, ...],
+) -> dict[str, object]:
+    """Return the additive exception-chain field only when evidence exists."""
+    if not chain:
+        return {}
+    return {"exception_chain": _serialize_exception_chain(chain)}
+
+
+def _format_failure_exception(entry: FailureException) -> str:
+    """Format one exception consistently across failure surfaces."""
+    return f"{entry.exception_type}: {entry.message}"
+
+
+def _build_failure_narrative(result: PerformanceResult) -> FailureNarrative:
+    """Derive one conclusive crash narrative and cautious owner attribution."""
+    chain = result.exception_chain
+    if chain:
+        primary = _format_failure_exception(chain[0])
+        secondary = tuple(_format_failure_exception(entry) for entry in chain[1:])
+    else:
+        primary = (
+            f"{result.root_error_type or result.error_type or 'Error'}: "
+            f"{result.root_error_message or result.error_message or 'Unknown failure'}"
+        )
+        secondary = ()
+
+    triage = _maintainer_triage_for_result(result)
+    chain_owners = {
+        owner
+        for entry in chain
+        if (owner := _attribute_error_to_package(entry.message)) != _UNKNOWN_OWNER
+    }
+    suspected_owner = triage["suspected_owner"] if triage is not None else _UNKNOWN_OWNER
+    owner_confidence = triage["confidence"] if triage is not None else "low"
+    if len(chain_owners) > 1:
+        suspected_owner = "unresolved: " + "/".join(sorted(chain_owners))
+        owner_confidence = "low"
+    elif len(chain) > 1 and owner_confidence == "high":
+        owner_confidence = "medium"
+
+    return FailureNarrative(
+        task_outcome="crashed",
+        phase=result.failure_phase,
+        stage=result.error_stage,
+        primary_exception=primary,
+        secondary_exceptions=secondary,
+        suspected_owner=suspected_owner,
+        owner_confidence=owner_confidence,
+    )
+
+
 def _extract_exception_prompt_diagnostics(error: BaseException) -> PromptDiagnostics | None:
     """Return prompt diagnostics attached anywhere in an exception chain."""
     for item in _exception_chain(error):
@@ -20258,6 +20371,9 @@ def _attribute_error_to_package(error_msg: str, traceback_str: str | None = None
             [
                 "metal::malloc",
                 "maximum allowed buffer size",
+                "insufficient memory",
+                "out of memory",
+                "kiogpucommandbuffercallbackerroroutofmemory",
                 "std::bad_cast",
                 "mlx/core/",
                 "mlx/nn/",
@@ -21112,8 +21228,11 @@ def _build_failure_result(
     """Build a standardized failure result payload for a model run."""
     error_msg = str(error)
     tb_str = traceback.format_exc()
-    root_error = _root_cause_exception(error)
-    root_error_msg = str(root_error)
+    exception_chain = tuple(
+        _failure_exception_record(item) for item in reversed(tuple(_exception_chain(error)))
+    )
+    root_error = exception_chain[0]
+    root_error_msg = root_error.message
     classification_text = " ".join(part for part in (root_error_msg, error_msg) if part)
     resolved_phase = _extract_failure_phase(error, fallback=failure_phase)
     classified_stage = _classify_error(classification_text or error_msg)
@@ -21140,9 +21259,10 @@ def _build_failure_result(
         error_message=error_msg,
         captured_output_on_fail=captured_output,
         error_type=type(error).__name__,
-        root_error_type=type(root_error).__name__,
-        root_error_module=type(root_error).__module__,
+        root_error_type=root_error.exception_type,
+        root_error_module=root_error.module,
         root_error_message=root_error_msg,
+        exception_chain=exception_chain,
         quality_issues=quality_issues,
         quality_analysis=quality_analysis,
         error_package=error_package,
@@ -25452,6 +25572,8 @@ def _build_jsonl_result_record_base(result: PerformanceResult) -> JsonlResultRec
         record["root_error_module"] = result.root_error_module
     if result.root_error_message is not None:
         record["root_error_message"] = result.root_error_message
+    if result.exception_chain:
+        record["exception_chain"] = _serialize_exception_chain(result.exception_chain)
     prompt_diagnostics = _prompt_diagnostics_to_json(result.prompt_diagnostics)
     if prompt_diagnostics:
         record["prompt_diagnostics"] = prompt_diagnostics
@@ -26282,8 +26404,11 @@ def _issue_model_signal(
     if result.model_name in stack_symptoms:
         return stack_symptoms[result.model_name]
     if not result.success:
-        source_message = result.root_error_message or result.error_message
-        return _simplify_failure_message(source_message, model_name=result.model_name)
+        narrative = _build_failure_narrative(result)
+        return _simplify_failure_message(
+            narrative.primary_exception,
+            model_name=result.model_name,
+        )
     triage = _maintainer_triage_for_result(result)
     if triage is not None:
         if evidence_text := _maintainer_triage_evidence_text(triage):
@@ -26367,20 +26492,16 @@ def _issue_affected_models_section(
 def _issue_failure_evidence(result: PerformanceResult) -> list[str]:
     """Build failure-specific evidence for one affected model."""
     parts = [f"### `{MARKDOWN_ESCAPER.escape(result.model_name)}`", ""]
-    if result.error_message:
-        parts.append("Observed error:")
-        _append_markdown_code_block(parts, result.error_message, language="text")
-    if result.root_error_type and result.root_error_message:
-        root_label = result.root_error_type
-        if result.root_error_module:
-            root_label = f"{result.root_error_module}.{root_label}"
-        root_text = f"{root_label}: {result.root_error_message}"
-        if (
-            result.root_error_type != result.error_type
-            or result.root_error_message != result.error_message
-        ):
-            parts.append("Root exception:")
-            _append_markdown_code_block(parts, root_text, language="text")
+    narrative = _build_failure_narrative(result)
+    parts.append("Observed error:")
+    _append_markdown_code_block(parts, narrative.primary_exception, language="text")
+    if narrative.secondary_exceptions:
+        parts.append("Exception chain:")
+        _append_markdown_code_block(
+            parts,
+            "\n".join(narrative.secondary_exceptions),
+            language="text",
+        )
     if trace_tail := _format_traceback_tail(result.error_traceback):
         parts.append("Traceback tail:")
         _append_markdown_code_block(parts, trace_tail, language="text")
@@ -26497,20 +26618,21 @@ def _issue_minimal_evidence_for_result(
             f"{MARKDOWN_ESCAPER.escape(stack_symptoms[result.model_name])}"
         )
     elif not result.success:
-        observed = _simplify_failure_message(result.error_message, model_name=result.model_name)
+        narrative = _build_failure_narrative(result)
+        observed = _simplify_failure_message(
+            narrative.primary_exception,
+            model_name=result.model_name,
+        )
         bullets.append(
             f"`{MARKDOWN_ESCAPER.escape(result.model_name)}` fails with: "
             f"{MARKDOWN_ESCAPER.escape(observed)}"
         )
-        if result.root_error_type and result.root_error_message:
-            root_label = result.root_error_type
-            if result.root_error_module:
-                root_label = f"{result.root_error_module}.{root_label}"
-            root_text = _truncate_text_preview(result.root_error_message, max_chars=180)
-            bullets.append(
-                f"Root exception: `{MARKDOWN_ESCAPER.escape(root_label)}`: "
-                f"{MARKDOWN_ESCAPER.escape(root_text)}"
+        if narrative.secondary_exceptions:
+            secondary_text = _truncate_text_preview(
+                " -> ".join(narrative.secondary_exceptions),
+                max_chars=180,
             )
+            bullets.append(f"Later exceptions: {MARKDOWN_ESCAPER.escape(secondary_text)}")
     else:
         analysis = _quality_analysis_for_result(result)
         bullets.extend(

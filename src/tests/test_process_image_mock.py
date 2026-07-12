@@ -404,6 +404,56 @@ class TestProcessImageWithModelMock:
         assert result.root_error_module == "builtins"
         assert result.root_error_message == upstream_message
 
+    def test_build_failure_result_preserves_exception_chain_order(self) -> None:
+        """Failure narratives should preserve root-to-wrapper exception chronology."""
+        index_error = IndexError("token id 999 outside detokenizer table")
+        runtime_error = RuntimeError("METAL command buffer out of memory")
+        runtime_error.__cause__ = index_error
+        wrapped = ValueError("generation failed")
+        wrapped.__cause__ = runtime_error
+
+        try:
+            raise wrapped
+        except ValueError as error:
+            result = check_models._build_failure_result(
+                model_name="org/model",
+                error=error,
+                captured_output=None,
+            )
+
+        assert [entry.exception_type for entry in result.exception_chain] == [
+            "IndexError",
+            "RuntimeError",
+            "ValueError",
+        ]
+        narrative = check_models._build_failure_narrative(result)
+        assert narrative.task_outcome == "crashed"
+        assert narrative.primary_exception == "IndexError: token id 999 outside detokenizer table"
+        assert narrative.secondary_exceptions == (
+            "RuntimeError: METAL command buffer out of memory",
+            "ValueError: generation failed",
+        )
+
+    def test_failure_narrative_marks_mixed_runtime_owners_unresolved(self) -> None:
+        """A mixed mlx-vlm/MLX chain should not be assigned confidently to one owner."""
+        runtime_error = RuntimeError("kIOGPUCommandBufferCallbackErrorOutOfMemory")
+        wrapper_error = ValueError("mlx_vlm/generate.py generation failed")
+        wrapper_error.__cause__ = runtime_error
+
+        try:
+            raise wrapper_error
+        except ValueError as error:
+            result = check_models._build_failure_result(
+                model_name="org/model",
+                error=error,
+                captured_output=None,
+            )
+
+        narrative = check_models._build_failure_narrative(result)
+        assert narrative.task_outcome == "crashed"
+        assert narrative.suspected_owner == "unresolved: mlx/mlx-vlm"
+        assert narrative.owner_confidence == "low"
+
     def test_build_failure_result_preserves_quality_fields(self) -> None:
         """Failure builder should carry precomputed quality diagnostics when provided."""
         repeated_phrase = "loop"
