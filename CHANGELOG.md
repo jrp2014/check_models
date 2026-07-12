@@ -7,6 +7,20 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Redesign benchmark reporting around provenance-aware assisted enrichment,
+  blind-versus-assisted scoring, visual/text/mixed/normal/unavailable burden
+  attribution, root-to-wrapper exception chronology, and separate crash outcome
+  versus suspected-owner confidence. Consolidate recommendation views, make
+  `diagnostics.md` an issue-ready mlx-vlm artifact, and retain `results.html` as
+  the complete HTML report while preserving existing output paths and compatible
+  JSONL/history schemas.
+- **Code-size audit:** `src/check_models.py` adds 2,371 lines and deletes 1,262
+  versus `origin/main`. Net growth records genuinely new upstream facts for
+  metadata provenance, component-aware prompt burden, exception chains and owner
+  confidence, cached machine/report facts, and lane-specific recommendation
+  policy. The redesign removes or consolidates duplicate diagnostics preflight,
+  failure/harness/stack/text-sanity, runtime/coverage, unflagged-inventory,
+  footer, model-selection-row, winner, issue-map, and recommendation helpers.
 - Cache canonical review classification and maintainer triage once per report
   context so recommendation, history, JSONL, TSV, and finalization paths cannot
   independently reclassify the same model result.

@@ -14060,7 +14060,8 @@ def _issue_cluster_confidence(cluster: IssueCluster) -> MaintainerConfidence:
 
 def _issue_cluster_is_mlx_vlm_scope(cluster: IssueCluster) -> bool:
     """Return whether a cluster belongs in an mlx-vlm/MLX upstream issue."""
-    return cluster.owner in {"mlx-vlm", "mlx"}
+    owner_packages = {part.strip() for part in cluster.owner.split("/")}
+    return not owner_packages.isdisjoint({"mlx-vlm", "mlx"})
 
 
 def _issue_harness_symptom(
@@ -16458,10 +16459,11 @@ def generate_diagnostics_report(
 ) -> bool:
     """Generate a Markdown diagnostics report structured for upstream issue filing.
 
-    The report clusters failures by root-cause pattern, highlights
-    harness/encoding issues from successful models, and keeps verbose trace
-    and prompt evidence in linked issue drafts/repro bundles so the run-level
-    report stays pasteable.
+    The report is a self-contained, issue-ready mlx-vlm artifact: it clusters
+    failures by root-cause pattern, highlights integration/runtime signals from
+    successful models, and embeds the bounded trace, prompt, and native-repro
+    evidence needed for filing. Separate model/config observations remain in an
+    appendix instead of being presented as upstream mlx-vlm issues.
 
     Args:
         results: All PerformanceResult objects from the run.

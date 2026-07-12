@@ -3635,6 +3635,27 @@ class TestDiagnosticsReport:
             == "validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime."
         )
 
+    def test_diagnostics_stack_routing_matches_exact_package_components(self) -> None:
+        """Composite MLX owners route upstream without substring false positives."""
+
+        def cluster(owner: str) -> check_models.IssueCluster:
+            return check_models.IssueCluster(
+                cluster_id="stack",
+                issue_filename="issue_stack.md",
+                owner=owner,
+                issue_kind="stack_signal",
+                issue_subtype="long_context",
+                symptom_family="context",
+                symptom="context collapse",
+                acceptance_signal="generation completes",
+                source="stack_signal",
+                sort_rank=1,
+            )
+
+        assert check_models._issue_cluster_is_mlx_vlm_scope(cluster("mlx-vlm / mlx"))
+        assert check_models._issue_cluster_is_mlx_vlm_scope(cluster("transformers / mlx-vlm"))
+        assert not check_models._issue_cluster_is_mlx_vlm_scope(cluster("not-mlx-vlm"))
+
     def test_infer_harness_issue_owner_uses_detail_prefix_fallbacks(self) -> None:
         """Harness owner inference should still honor detail-prefix fallbacks."""
         training_leak = _make_harness_success(

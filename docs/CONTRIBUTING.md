@@ -322,6 +322,16 @@ pytest src/tests/ -v
 - When testing evaluation history or capability aggregation, label fixtures with
   the resolved `triage`, `blind`, or `assisted` lane and verify that records
   from other lanes and unlabelled legacy history are excluded.
+- Report tests must write to `tmp_path` or a gitignored `test_*` output path.
+  Never refresh tracked `src/output/` fixtures as a side effect of pytest.
+- Refresh tracked benchmark snapshots only with the documented representative
+  production command and only when its exact source image is available. Review
+  every generated artifact, retain the complete `results.html`, avoid private
+  absolute paths in copy/paste repro commands, and stage only the intended
+  public snapshot files.
+- Assert semantics at the canonical fact/view boundary where possible, then add
+  compact renderer assertions for primary/supporting artifact roles and for the
+  current-run versus lane-matched historical capability distinction.
 
 ## Submitting Changes
 

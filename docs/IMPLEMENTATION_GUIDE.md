@@ -85,8 +85,11 @@ A single medium-sized, well-commented function is often clearer than a web of on
 5. **Dependency Management**:
     - If you add an import, you **must** add it to `pyproject.toml` and run `python -m tools.update_readme_deps`.
 6. **Linting**:
-    - Do not suppress lints (e.g., `# noqa`, `# type: ignore`) without a specific, valid reason documented in a comment.
-    - Fix the underlying issue whenever possible.
+    - Fix the code first. A suppression is permitted only for an unavoidable
+      upstream/tool false positive, must name the exact rule, and must have a
+      nearby comment documenting why the tool is wrong.
+    - Never add broad `noqa`, bare `type: ignore`, or configuration exclusions
+      to make project-owned code pass.
 7. **Documentation & Alignment**:
     - **Update All Docs**: Ensure changes are reflected in `src/README.md`, `docs/CONTRIBUTING.md`, and `docs/IMPLEMENTATION_GUIDE.md`.
     - **Avoid Fragmentation**: Try to avoid changes that require aligning multiple scripts or documents.
@@ -464,11 +467,11 @@ Current config (see `pyproject.toml`):
 
 **Handling complexity warnings**:
 
-- Do not refactor purely to silence them if it reduces clarity
-- Instead:
-  - Add a top-of-function comment summarizing the flow; OR
-  - If truly egregious and conceptually separable, refactor
-  - Suppression (`# noqa: C901`) is allowed with an explanatory comment above it
+- Fix repeated or unclear project-owned code first; do not refactor purely to
+  silence a metric when doing so reduces cohesion.
+- A narrow suppression is a last resort only when the warning is an unavoidable
+  tool false positive. It must name the exact code and have an explanatory
+  comment. Function size or inconvenience alone is not a false positive.
 
 **Usage**:
 
@@ -477,14 +480,15 @@ Current config (see `pyproject.toml`):
 
 ### Suppressions
 
-When suppressing a rule:
+When an upstream/tool false positive makes suppression unavoidable:
 
 ```python
 # Reason: Brief justification (why alternative is worse here)
 # noqa: C901
 ```
 
-Avoid drive-by suppressions without explanation.
+Do not add broad `noqa`, bare `type: ignore`, or repository-wide exclusions.
+The suppression audit must confirm that every retained directive is still needed.
 
 ## Function Design
 
@@ -594,6 +598,17 @@ Before deleting or merging logic:
 
 This project prefers explicit behavior-preserving cleanup over stylistic
 rewrites. When in doubt, keep the simpler control flow with fewer moving parts.
+
+### Canonical report views and code size
+
+Compute run facts once in the canonical report/diagnostics context, then render
+all human and machine artifacts from that context. New report surfaces must not
+reimplement scoring, ownership, issue classification, failure narration, or
+recommendation policy. Prefer deleting or consolidating an older view when a
+canonical view supersedes it. Any report redesign must audit
+`git diff --numstat origin/main...HEAD -- src/check_models.py`; net production
+growth requires a changelog rationale naming the genuinely new upstream facts
+and the duplicate helper families removed or consolidated.
 
 ## Comments & Documentation
 
