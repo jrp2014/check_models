@@ -493,6 +493,152 @@ def test_metadata_provenance_prompt_round_trips_through_trusted_hint_bundle() ->
     assert "52.0,-1.0" in nonvisual_text
 
 
+def test_assisted_location_use_is_context_integration_not_borrowing() -> None:
+    metadata: check_models.MetadataDict = {
+        "title": "Deben Estuary at Woodbridge",
+        "description": "Two boats on a river.",
+        "keywords": "Deben Estuary, Woodbridge, boats, river",
+    }
+    text = (
+        "Title: Sailboats on Deben Estuary at Woodbridge\n"
+        "Description: Two moored sailboats stand before a wooded bank.\n"
+        "Keywords: sailboats, Deben Estuary, Woodbridge, river, wooded bank"
+    )
+
+    metrics = check_models.compute_metadata_agreement(text, metadata)
+
+    assert metrics.context_integration_score is not None
+    assert metrics.context_integration_score > 0
+    assert metrics.nonvisual_penalty == 0
+
+
+def test_assisted_location_prompt_use_does_not_set_legacy_borrowing_flag() -> None:
+    prompt = check_models.prepare_prompt(
+        argparse.Namespace(prompt=None, eval_mode="assisted"),
+        {
+            "title": "Deben Estuary at Woodbridge",
+            "description": "Two boats on a river.",
+            "keywords": "Deben Estuary, Woodbridge, boats, river",
+        },
+    )
+    text = (
+        "Title: Sailboats on Deben Estuary at Woodbridge\n"
+        "Description: Two sailboats rest on calm water.\n"
+        "Keywords: sailboats, Deben Estuary, Woodbridge, river"
+    )
+
+    analysis = check_models.analyze_generation_text(text, generated_tokens=30, prompt=prompt)
+
+    assert analysis.metadata_borrowing is False
+    assert "unverified-context-copy" not in analysis.evidence
+
+
+def test_assisted_capture_metadata_copy_uses_unverified_context_label() -> None:
+    prompt = check_models.prepare_prompt(
+        argparse.Namespace(prompt=None, eval_mode="assisted"),
+        {
+            "description": "Two boats on a river.",
+            "keywords": "boats, river",
+            "date": "2026-07-04",
+            "time": "19:10:04",
+            "gps": "52.0,-1.0",
+        },
+    )
+    text = (
+        "Title: Two boats on a river\n"
+        "Description: Two boats captured on 2026-07-04 at 19:10:04 near 52.0,-1.0.\n"
+        "Keywords: boats, river"
+    )
+
+    analysis = check_models.analyze_generation_text(text, generated_tokens=30, prompt=prompt)
+
+    assert analysis.metadata_borrowing is True
+    assert "unverified-context-copy" in analysis.evidence
+    assert "unverified-context-copy" in (check_models._build_quality_issues_string(analysis) or "")
+
+
+def test_verbatim_draft_is_low_improvement_not_hallucination() -> None:
+    metadata: check_models.MetadataDict = {
+        "description": "Two boats on a river.",
+        "keywords": "boats, river",
+    }
+    text = "Title: Two boats on a river\nDescription: Two boats on a river.\nKeywords: boats, river"
+    metrics = check_models.compute_metadata_agreement(text, metadata)
+    analysis = check_models.analyze_generation_text(
+        text,
+        generated_tokens=20,
+        prompt_tokens=120,
+        prompt="Return Title, Description, and Keywords.",
+    )
+
+    assert analysis.metadata_borrowing is False
+    assert metrics.draft_improvement_score is not None
+    assert metrics.draft_improvement_score < 50
+    assert not analysis.hallucination_issues
+
+
+def test_draft_improvement_rewards_corrected_enriched_description() -> None:
+    provenance = check_models._build_metadata_provenance(
+        {
+            "description": "Two boats on a river.",
+            "keywords": "boats, river",
+        }
+    )
+    copied = check_models._score_draft_improvement(
+        "Description: Two boats on a river.\nKeywords: boats, river",
+        provenance,
+    )
+    enriched = check_models._score_draft_improvement(
+        (
+            "Title: Moored sailboats beside a wooded estuary\n"
+            "Description: Two white sailboats rest on calm water before a dense wooded bank.\n"
+            "Keywords: sailboats, estuary, moored, calm water, wooded bank, reflections"
+        ),
+        provenance,
+    )
+
+    assert copied is not None
+    assert enriched is not None
+    assert enriched > copied
+    assert enriched >= 50
+
+
+def test_draft_improvement_allows_concise_legitimate_overlap() -> None:
+    provenance = check_models._build_metadata_provenance(
+        {
+            "description": "A boat on a river.",
+            "keywords": "boat, river",
+        }
+    )
+
+    score = check_models._score_draft_improvement(
+        "A blue boat crosses the broad river at sunset.",
+        provenance,
+    )
+
+    assert score is not None
+    assert 20 <= score < 100
+
+
+@pytest.mark.parametrize(
+    "structured_text",
+    [
+        "GPS 51.5014, -0.1419; GPS 51.5014, -0.1419; GPS 51.5014, -0.1419",
+        "51°30'05\"N 0°08'31\"W; 51°30'05\"N 0°08'31\"W",
+        "Captured 12:34:56, processed 12:34:56, exported 12:34:56",
+        "Image dimensions 1920x1080; preview 1920x1080; export 1920x1080",
+        "Exposure 1/125 sec; alternate 1/125 sec; selected 1/125 sec",
+    ],
+    ids=["decimal_coordinates", "dms_coordinates", "timestamps", "dimensions", "exposure"],
+)
+def test_structured_numeric_metadata_is_not_a_numeric_loop(structured_text: str) -> None:
+    assert check_models._text_sanity_numeric_loop_issue(structured_text) is None
+
+
+def test_true_repeated_number_still_triggers_numeric_loop() -> None:
+    assert check_models._text_sanity_numeric_loop_issue("42 42 42 42 42 42") == "numeric_loop"
+
+
 def test_repetitive_phrase_detection_uses_quality_thresholds() -> None:
     """Test that phrase repetition detection uses QUALITY config thresholds."""
     # Verify the QUALITY constants exist and have expected types
@@ -1282,6 +1428,26 @@ class TestClassifyUserBucket:
         assert refreshed.verdict == "token_cap"
         assert refreshed.metadata_alignment_issue is None
         assert refreshed.user_bucket == "recommended"
+
+    def test_low_draft_improvement_is_canonical_review_evidence(self) -> None:
+        """Low draft scores should flow into canonical review evidence."""
+        analysis = check_models.analyze_generation_text(
+            "Title: Two boats\nDescription: Two boats on a river.\nKeywords: boats, river",
+            20,
+        )
+        metadata_agreement = check_models.MetadataAgreementMetrics(
+            overall_score=90.0,
+            matched_terms=("boats",),
+            draft_improvement_score=20.0,
+        )
+
+        refreshed = check_models._apply_metadata_alignment_to_analysis(
+            analysis,
+            metadata_agreement,
+        )
+
+        assert refreshed.draft_improvement_score == 20.0
+        assert "low-draft-improvement" in refreshed.evidence
 
     def test_cutoff_degraded_avoid(self) -> None:
         """cutoff_degraded models should be avoid."""

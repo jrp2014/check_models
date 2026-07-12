@@ -7,6 +7,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Replace blanket assisted metadata-borrowing penalties with provenance-aware
+  context integration, draft improvement, visual-description, and enrichment
+  scores; keep structured capture-data copy detection as canonical review
+  evidence and ignore legitimate numeric metadata in loop diagnostics.
 - Separate authoritative capture/location context from fallible descriptive
   metadata in assisted prompts and reuse that provenance split for scoring.
 - Consolidate generated-output CLI path definitions and configuration-driven

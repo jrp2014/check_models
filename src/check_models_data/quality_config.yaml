@@ -105,6 +105,11 @@ thresholds:
   metadata_agreement_nonvisual_penalty: 20.0 # Max penalty for date/time/GPS leakage
   metadata_alignment_min_score: 25.0 # Minimum trusted-metadata alignment before clean output is usable
   metadata_alignment_partial_match_cap: 8 # Number of visual terms that counts as full caption alignment
+  assisted_weight_visual_description: 0.35
+  assisted_weight_context_integration: 0.25
+  assisted_weight_draft_improvement: 0.20
+  assisted_weight_output_quality: 0.20
+  low_draft_improvement_score: 40.0
 
   # Text sanity diagnostics
   text_sanity_min_wordlike_ratio: 0.45 # Minimum word-like token ratio before token-noise flag

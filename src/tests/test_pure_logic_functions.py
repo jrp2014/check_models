@@ -575,10 +575,18 @@ class TestMetadataAgreementIntegration:
         normalized_second_analysis = replace(
             second_pass.quality_analysis,
             metadata_alignment_score=None,
+            draft_improvement_score=None,
+            evidence=[
+                label
+                for label in second_pass.quality_analysis.evidence
+                if label != "low-draft-improvement"
+            ],
         )
         assert normalized_second_analysis == first_pass.quality_analysis
         assert second_pass.quality_analysis.metadata_alignment_score is not None
         assert second_pass.quality_analysis.metadata_alignment_score > 0.0
+        assert second_pass.quality_analysis.draft_improvement_score is not None
+        assert "low-draft-improvement" in second_pass.quality_analysis.evidence
         assert second_pass.metadata_agreement is not None
         assert second_pass.metadata_agreement.overall_score > 0.0
 

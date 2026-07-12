@@ -2043,6 +2043,45 @@ class TestMarkdownReportEdgeCases:
             == expected_order[: check_models.OUTPUT_PREVIEW_CUE_LIMIT]
         )
 
+    def test_jsonl_metadata_agreement_includes_assisted_enrichment_components(self) -> None:
+        """JSONL should expose available assisted enrichment component scores."""
+        metrics = check_models.MetadataAgreementMetrics(
+            overall_score=84.0,
+            context_integration_score=75.0,
+            draft_improvement_score=45.0,
+            visual_description_score=90.0,
+            assisted_enrichment_score=76.5,
+        )
+
+        payload = check_models._build_jsonl_metadata_agreement_record(metrics)
+
+        assert payload is not None
+        assert payload["context_integration_score"] == 75.0
+        assert payload["draft_improvement_score"] == 45.0
+        assert payload["visual_description_score"] == 90.0
+        assert payload["assisted_enrichment_score"] == 76.5
+
+    def test_review_surfaces_use_canonical_assisted_enrichment_evidence(self) -> None:
+        """Review surfaces should reuse canonical assisted enrichment evidence."""
+        analysis = replace(
+            check_models.analyze_generation_text("A concise river caption.", 6),
+            metadata_borrowing=True,
+            evidence=["unverified-context-copy", "low-draft-improvement"],
+        )
+        review = check_models._build_jsonl_review_record(
+            replace(_make_success("org/enrichment"), quality_analysis=analysis)
+        )
+
+        assert review is not None
+        hint_text = check_models._review_hint_text(review, analysis)
+        utility_text = check_models._review_utility_text(review, analysis)
+        focus_text = check_models._review_focus_text(review, analysis)
+        combined = f"{hint_text} | {utility_text} | {focus_text}"
+        assert "unverified-context-copy" in combined
+        assert "low-draft-improvement" in combined
+        assert "nonvisual metadata reused" not in combined
+        assert "metadata borrowing" not in combined
+
 
 class TestMarkdownGalleryReport:
     """Coverage for the standalone markdown gallery artifact."""

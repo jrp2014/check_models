@@ -100,6 +100,9 @@ from check_models_data.dependency_policy import (
     UPSTREAM_MLX_VLM_MINIMUMS,
 )
 
+FLOAT_ZERO_EPSILON: Final[float] = 1e-9
+QUALITY_SCORE_MAX: Final[float] = 100.0
+
 # Optional dependency: psutil for system info; degrade gracefully if missing.
 # Keep a nullable module binding so downstream checks can stay simple.
 psutil: Any | None
@@ -483,6 +486,11 @@ class QualityThresholds:
     metadata_agreement_nonvisual_penalty: float = 20.0
     metadata_alignment_min_score: float = 25.0
     metadata_alignment_partial_match_cap: int = 8
+    assisted_weight_visual_description: float = 0.35
+    assisted_weight_context_integration: float = 0.25
+    assisted_weight_draft_improvement: float = 0.20
+    assisted_weight_output_quality: float = 0.20
+    low_draft_improvement_score: float = 40.0
     text_sanity_min_wordlike_ratio: float = 0.45
     text_sanity_max_symbol_ratio: float = 0.35
     text_sanity_mixed_script_min_symbol_ratio: float = 0.05
@@ -541,6 +549,10 @@ class QualityThresholds:
             "metadata_agreement_weight_title": self.metadata_agreement_weight_title,
             "metadata_agreement_weight_description": self.metadata_agreement_weight_description,
             "metadata_agreement_weight_keywords": self.metadata_agreement_weight_keywords,
+            "assisted_weight_visual_description": self.assisted_weight_visual_description,
+            "assisted_weight_context_integration": self.assisted_weight_context_integration,
+            "assisted_weight_draft_improvement": self.assisted_weight_draft_improvement,
+            "assisted_weight_output_quality": self.assisted_weight_output_quality,
             "text_sanity_min_wordlike_ratio": self.text_sanity_min_wordlike_ratio,
             "text_sanity_max_symbol_ratio": self.text_sanity_max_symbol_ratio,
             "text_sanity_mixed_script_min_symbol_ratio": (
@@ -619,6 +631,30 @@ class QualityThresholds:
             msg = (
                 "quality_config.yaml metadata agreement weights must sum to 1.0; "
                 f"got {metadata_weight_total:.3f}"
+            )
+            raise ValueError(msg)
+
+        assisted_weight_total = (
+            self.assisted_weight_visual_description
+            + self.assisted_weight_context_integration
+            + self.assisted_weight_draft_improvement
+            + self.assisted_weight_output_quality
+        )
+        if not math.isclose(
+            assisted_weight_total,
+            1.0,
+            rel_tol=0.0,
+            abs_tol=FLOAT_ZERO_EPSILON,
+        ):
+            msg = (
+                "quality_config.yaml assisted enrichment weights must sum to 1.0; "
+                f"got {assisted_weight_total:.3f}"
+            )
+            raise ValueError(msg)
+        if not 0.0 <= self.low_draft_improvement_score <= QUALITY_SCORE_MAX:
+            msg = (
+                "quality_config.yaml thresholds.low_draft_improvement_score must be between "
+                f"0 and 100; got {self.low_draft_improvement_score}"
             )
             raise ValueError(msg)
 
@@ -1202,6 +1238,10 @@ class JsonlMetadataAgreementRecord(TypedDict):
     matched_terms: list[str]
     missed_terms: list[str]
     nonvisual_hits: list[str]
+    context_integration_score: NotRequired[float | None]
+    draft_improvement_score: NotRequired[float | None]
+    visual_description_score: NotRequired[float | None]
+    assisted_enrichment_score: NotRequired[float | None]
 
 
 class JsonlReviewRecord(TypedDict):
@@ -2081,6 +2121,10 @@ class MetadataAgreementMetrics:
     matched_terms: tuple[str, ...] = ()
     missed_terms: tuple[str, ...] = ()
     nonvisual_hits: tuple[str, ...] = ()
+    context_integration_score: float | None = None
+    draft_improvement_score: float | None = None
+    visual_description_score: float | None = None
+    assisted_enrichment_score: float | None = None
 
 
 @dataclass(frozen=True)
@@ -3337,7 +3381,6 @@ SUMMARY_CHART_WIDTH: Final[int] = 24  # Character width for compact Rich summary
 SUMMARY_MODEL_LABEL_MAX: Final[int] = 32  # Max model label length in summary tables/charts
 SUMMARY_CHART_MAX_ROWS: Final[int] = 8  # Max rows shown in summary charts
 MIN_MODELS_FOR_EFFICIENCY_CHART: Final[int] = 2  # Min successful rows for cross-model efficiency
-FLOAT_ZERO_EPSILON: Final[float] = 1e-9  # Tolerance when rendering signed deltas as zero
 UTILITY_DELTA_NEUTRAL_BAND: Final[float] = 2.0  # Within ±band, model is neutral vs metadata
 
 # Numeric fields are automatically derived from FIELD_ABBREVIATIONS for consistency
@@ -3635,6 +3678,19 @@ _TEXT_SANITY_STRUCTURAL_MARKER_RE: Final[re.Pattern[str]] = re.compile(r"[{}\[\]
 _TEXT_SANITY_CJK_CHAR_RE: Final[re.Pattern[str]] = re.compile(r"[\u3400-\u9fff]")
 _TEXT_SANITY_LATIN_CHAR_RE: Final[re.Pattern[str]] = re.compile(r"[A-Za-z]")
 _TEXT_SANITY_MIN_REPEATED_NUMERIC_TOKEN_COUNT: Final[int] = 3
+_STRUCTURED_NUMERIC_METADATA_RE: Final[re.Pattern[str]] = re.compile(
+    r"(?:\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}:\d{2}(?::\d{2})?\b|"
+    r"[-+]?\d{1,3}(?:\.\d+)?\s*,\s*[-+]?\d{1,3}(?:\.\d+)?|"
+    r"\b\d{1,3}°\s*\d{1,2}['\u2032]\s*\d{1,2}(?:\.\d+)?[\"\u2033]\s*[NSEW]\b|"
+    r"\b\d{1,3}(?:\.\d+)?°\s*[NSEW]\b|\b\d+\s*[x\u00d7]\s*\d+\b|"
+    r"\b\d+\s*/\s*\d+\b)",
+    re.IGNORECASE,
+)
+
+
+def _remove_structured_numeric_metadata(text: str) -> str:
+    """Remove legitimate structured numeric fields before loop detection."""
+    return _STRUCTURED_NUMERIC_METADATA_RE.sub(" ", text)
 
 
 def _text_sanity_script_family(char: str) -> str | None:
@@ -3654,7 +3710,9 @@ def _text_sanity_script_family(char: str) -> str | None:
 
 def _text_sanity_numeric_loop_issue(cleaned: str) -> str | None:
     """Return a numeric-loop issue label when one number dominates the output."""
-    numeric_tokens = _TEXT_SANITY_NUMERIC_TOKEN_RE.findall(cleaned)
+    numeric_tokens = _TEXT_SANITY_NUMERIC_TOKEN_RE.findall(
+        _remove_structured_numeric_metadata(cleaned)
+    )
     if len(numeric_tokens) < QUALITY.text_sanity_numeric_loop_min_count:
         return None
     _number, count = Counter(numeric_tokens).most_common(1)[0]
@@ -4675,13 +4733,16 @@ def _detect_metadata_borrowing(
     text: str,
     bundle: TrustedHintBundle,
 ) -> tuple[bool, list[str]]:
-    """Detect output reuse of explicitly nonvisual metadata from the prompt."""
+    """Detect unverified output claims copied from structured capture metadata."""
     if not text or not bundle.nonvisual_terms:
         return False, []
-    normalized_text = _normalize_phrase_for_matching(text)
-    matches = [
-        term for term in bundle.nonvisual_terms if _context_term_present(term, normalized_text)
+    structured_terms = [
+        term for term in bundle.nonvisual_terms if _STRUCTURED_NUMERIC_METADATA_RE.search(term)
     ]
+    if not structured_terms:
+        return False, []
+    normalized_text = _normalize_phrase_for_matching(text)
+    matches = [term for term in structured_terms if _context_term_present(term, normalized_text)]
     deduped = _dedupe_preserve_order(matches)
     return bool(deduped), deduped[: QUALITY.max_reported_missing_terms]
 
@@ -4832,7 +4893,7 @@ def _classify_review_verdict(
 
     weak_signals = (
         ("instruction_echo", instruction_echo),
-        ("metadata_borrowing", metadata_borrowing),
+        ("unverified-context-copy", metadata_borrowing),
         ("hallucination", has_hallucination),
     )
     weak_output = bool(missing_sections) or any(flag for _label, flag in weak_signals)
@@ -6564,10 +6625,9 @@ def _compute_metadata_baseline_utility(context: str | None) -> tuple[float, str]
 
 
 def _build_metadata_scoring_inputs(
-    metadata: MetadataDict | None,
+    provenance: MetadataProvenance,
 ) -> tuple[str | None, str | None, tuple[str, ...], tuple[str, ...]]:
     """Extract trusted reference fields and nonvisual metadata terms for scoring."""
-    provenance = _build_metadata_provenance(metadata)
     if not provenance.has_authoritative_context and not provenance.has_draft:
         return None, None, (), ()
 
@@ -6701,15 +6761,18 @@ def _score_metadata_keywords(
 
 def _score_nonvisual_metadata_leakage(
     text: str,
-    metadata: MetadataDict | None,
+    provenance: MetadataProvenance,
 ) -> tuple[float, tuple[str, ...]]:
-    """Penalize reuse of nonvisual metadata such as date/time/GPS strings."""
-    if not text or not metadata:
+    """Penalize claims that copy capture date/time/GPS as visible image content."""
+    if not text:
         return 0.0, ()
 
-    _reference_title, _reference_description, _reference_keywords, nonvisual_terms = (
-        _build_metadata_scoring_inputs(metadata)
-    )
+    nonvisual_terms: list[str] = []
+    for capture_value in (provenance.capture_date, provenance.capture_time, provenance.gps):
+        if capture_value:
+            nonvisual_terms.append(capture_value)
+            nonvisual_terms.extend(_extract_hint_signal_terms(capture_value))
+    nonvisual_terms = _dedupe_preserve_order(nonvisual_terms)
     if not nonvisual_terms:
         return 0.0, ()
 
@@ -6727,6 +6790,94 @@ def _score_nonvisual_metadata_leakage(
 
     scaled_penalty = (min(len(hits), 3) / 3) * QUALITY.metadata_agreement_nonvisual_penalty
     return round(scaled_penalty, 1), tuple(hits)
+
+
+def _score_authoritative_context(
+    text: str,
+    provenance: MetadataProvenance,
+) -> tuple[float | None, tuple[str, ...]]:
+    """Score correct integration of authoritative location/context terms."""
+    terms = tuple(_dedupe_preserve_order(provenance.authoritative_terms))
+    if not terms:
+        return None, ()
+    normalized = _normalize_phrase_for_matching(text)
+    matched = tuple(term for term in terms if _context_term_present(term, normalized))
+    target = min(len(terms), QUALITY.metadata_alignment_partial_match_cap)
+    return round(min(len(matched) / max(target, 1), 1.0) * 100.0, 1), matched
+
+
+def _score_draft_improvement(
+    text: str,
+    provenance: MetadataProvenance,
+) -> float | None:
+    """Score utility gain and descriptive novelty relative to fallible draft metadata."""
+    draft_parts = [
+        value for value in (provenance.draft_title, provenance.draft_description) if value
+    ]
+    if provenance.draft_keywords:
+        draft_parts.append(", ".join(provenance.draft_keywords))
+    if not draft_parts:
+        return None
+
+    baseline = compute_cataloging_utility("\n".join(draft_parts), None)
+    generated = compute_cataloging_utility(text, None)
+    delta = float(generated["utility_score"]) - float(baseline["utility_score"])
+    utility_improvement = max(0.0, min(100.0, 50.0 + delta))
+
+    normalized_draft_terms = {
+        _normalize_phrase_for_matching(term) for term in provenance.draft_terms if term
+    }
+    generated_terms = {
+        _normalize_phrase_for_matching(term) for term in _extract_hint_signal_terms(text)
+    }
+    generated_terms.discard("")
+    if not generated_terms:
+        return 0.0
+    novel_terms = generated_terms - normalized_draft_terms
+    novelty_ratio = len(novel_terms) / len(generated_terms)
+    novelty_factor = 0.25 + (0.75 * novelty_ratio)
+    return round(utility_improvement * novelty_factor, 1)
+
+
+def _weighted_available_score(
+    components: Sequence[tuple[float | None, float]],
+) -> float | None:
+    """Combine available components after normalizing their configured weights."""
+    available = [(value, weight) for value, weight in components if value is not None]
+    if not available:
+        return None
+    weight_total = sum(weight for _value, weight in available)
+    return round(sum(value * weight for value, weight in available) / weight_total, 1)
+
+
+def _score_assisted_enrichment(
+    text: str,
+    provenance: MetadataProvenance,
+) -> tuple[float | None, float | None, float | None, float | None]:
+    """Return provenance-aware assisted enrichment component scores."""
+    context_integration_score, _matched_context = _score_authoritative_context(text, provenance)
+    draft_improvement_score = _score_draft_improvement(text, provenance)
+    utility = compute_cataloging_utility(text, None)
+    visual_description_score = float(utility["description_score"]) if provenance.has_draft else None
+    output_quality_score = (
+        float(compute_task_compliance(text)["compliance_score"]) * 100.0
+        if provenance.has_authoritative_context or provenance.has_draft
+        else None
+    )
+    assisted_enrichment_score = _weighted_available_score(
+        (
+            (visual_description_score, QUALITY.assisted_weight_visual_description),
+            (context_integration_score, QUALITY.assisted_weight_context_integration),
+            (draft_improvement_score, QUALITY.assisted_weight_draft_improvement),
+            (output_quality_score, QUALITY.assisted_weight_output_quality),
+        ),
+    )
+    return (
+        context_integration_score,
+        draft_improvement_score,
+        visual_description_score,
+        assisted_enrichment_score,
+    )
 
 
 def _score_unstructured_metadata_caption(
@@ -6756,9 +6907,16 @@ def compute_metadata_agreement(
     if not text.strip() or not metadata:
         return MetadataAgreementMetrics()
 
+    provenance = _build_metadata_provenance(metadata)
     reference_title, reference_description, reference_keywords, _nonvisual_terms = (
-        _build_metadata_scoring_inputs(metadata)
+        _build_metadata_scoring_inputs(provenance)
     )
+    (
+        context_integration_score,
+        draft_improvement_score,
+        visual_description_score,
+        assisted_enrichment_score,
+    ) = _score_assisted_enrichment(text, provenance)
     generated_sections = _extract_catalog_sections(text)
 
     reference_terms_display: list[str] = []
@@ -6771,7 +6929,7 @@ def compute_metadata_agreement(
     reference_terms_display = _dedupe_preserve_order(reference_terms_display)
 
     if not generated_sections:
-        nonvisual_penalty, nonvisual_hits = _score_nonvisual_metadata_leakage(text, metadata)
+        nonvisual_penalty, nonvisual_hits = _score_nonvisual_metadata_leakage(text, provenance)
         caption_score, matched_terms, missed_terms = _score_unstructured_metadata_caption(
             text,
             reference_terms_display,
@@ -6785,6 +6943,10 @@ def compute_metadata_agreement(
             matched_terms=matched_terms,
             missed_terms=missed_terms,
             nonvisual_hits=nonvisual_hits,
+            context_integration_score=context_integration_score,
+            draft_improvement_score=draft_improvement_score,
+            visual_description_score=visual_description_score,
+            assisted_enrichment_score=assisted_enrichment_score,
         )
 
     title_score, title_matched, _title_missed = _score_metadata_title(
@@ -6799,7 +6961,7 @@ def compute_metadata_agreement(
         generated_sections,
         reference_keywords,
     )
-    nonvisual_penalty, nonvisual_hits = _score_nonvisual_metadata_leakage(text, metadata)
+    nonvisual_penalty, nonvisual_hits = _score_nonvisual_metadata_leakage(text, provenance)
 
     weighted_components: list[tuple[float, float]] = []
     if reference_title:
@@ -6837,6 +6999,10 @@ def compute_metadata_agreement(
         matched_terms=matched_terms,
         missed_terms=missed_terms,
         nonvisual_hits=nonvisual_hits,
+        context_integration_score=context_integration_score,
+        draft_improvement_score=draft_improvement_score,
+        visual_description_score=visual_description_score,
+        assisted_enrichment_score=assisted_enrichment_score,
     )
 
 
@@ -6883,6 +7049,7 @@ class GenerationQualityAnalysis:
     generation_loop_type: str | None = None
     metadata_alignment_score: float | None = None
     metadata_alignment_issue: str | None = None
+    draft_improvement_score: float | None = None
     missing_sections: list[str] = dataclass_field(default_factory=list)
     title_word_count: int | None = None
     description_sentence_count: int | None = None
@@ -7047,7 +7214,12 @@ class GenerationQualityAnalysis:
             ),
             (self.has_context_echo, f"Context echo ({self.context_echo_ratio:.0%} overlap)"),
             (self.instruction_echo, "Instruction echo"),
-            (self.metadata_borrowing, "Nonvisual metadata borrowing"),
+            (self.metadata_borrowing, "Unverified context copy"),
+            (
+                self.draft_improvement_score is not None
+                and self.draft_improvement_score < QUALITY.low_draft_improvement_score,
+                "Low draft improvement",
+            ),
             (self.likely_capped, "Likely capped by max token budget"),
             (
                 self.hint_relationship == "ignores_trusted_hints",
@@ -11497,6 +11669,14 @@ def _triage_text_fingerprint(text: str) -> str:
     return re.sub(r"\W+", " ", html.unescape(text).casefold()).strip()
 
 
+def _review_assisted_enrichment_evidence(review: JsonlReviewRecord) -> list[str]:
+    """Return canonical assisted-enrichment labels for human review surfaces."""
+    labels = {"unverified-context-copy", "low-draft-improvement"}
+    return [
+        _humanize_review_evidence_label(label) for label in review["evidence"] if label in labels
+    ]
+
+
 def _review_hint_text(
     review: JsonlReviewRecord,
     analysis: GenerationQualityAnalysis | None,
@@ -11507,8 +11687,7 @@ def _review_hint_text(
     parts = [review["hint_relationship"].replace("_", " ")]
     if analysis.is_context_ignored and analysis.missing_context_terms:
         parts.append("missing terms: " + ", ".join(analysis.missing_context_terms))
-    if analysis.metadata_borrowing:
-        parts.append("nonvisual metadata reused")
+    parts.extend(_review_assisted_enrichment_evidence(review))
     return " | ".join(parts)
 
 
@@ -11541,12 +11720,11 @@ def _review_utility_text(
         parts.append(review["hint_relationship"].replace("_", " "))
         if analysis.instruction_echo:
             parts.append("instruction echo")
-        if analysis.metadata_borrowing:
-            parts.append("metadata borrowing")
         if analysis.is_generic:
             parts.append("generic")
         if analysis.has_context_echo:
             parts.append("context echo")
+    parts.extend(_review_assisted_enrichment_evidence(review))
     return " | ".join(parts)
 
 
@@ -11614,8 +11792,6 @@ def _review_analysis_focus_parts(analysis: GenerationQualityAnalysis) -> list[st
 
     if analysis.has_context_echo and analysis.context_echo_ratio > 0:
         parts.append(f"context echo={analysis.context_echo_ratio:.0%}")
-    if analysis.metadata_borrowing:
-        parts.append("nonvisual metadata reused")
     if analysis.has_reasoning_leak:
         parts.append("reasoning leak")
     if analysis.text_sanity_issue_type is not None:
@@ -11669,6 +11845,8 @@ def _review_focus_text(
 
     if analysis is not None:
         parts.extend(_review_analysis_focus_parts(analysis))
+
+    parts.extend(_review_assisted_enrichment_evidence(review))
 
     if not parts and review["evidence"]:
         parts.extend(_humanize_review_evidence_label(label) for label in review["evidence"][:3])
@@ -22961,7 +23139,12 @@ def _build_quality_issues_string(analysis: GenerationQualityAnalysis) -> str | N
         (analysis.has_reasoning_leak, "reasoning-leak"),
         (analysis.has_context_echo, f"context-echo({analysis.context_echo_ratio:.2f})"),
         (analysis.instruction_echo, "instruction-echo"),
-        (analysis.metadata_borrowing, "metadata-borrowing"),
+        (analysis.metadata_borrowing, "unverified-context-copy"),
+        (
+            analysis.draft_improvement_score is not None
+            and analysis.draft_improvement_score < QUALITY.low_draft_improvement_score,
+            "low-draft-improvement",
+        ),
         (
             analysis.hint_relationship == "ignores_trusted_hints",
             "trusted-hints-ignored",
@@ -23005,6 +23188,8 @@ QUALITY_ISSUE_PATTERNS: Final[dict[str, re.Pattern[str]]] = {
     "context_echo": re.compile(r"\bcontext-echo\b", re.IGNORECASE),
     "instruction_echo": re.compile(r"\binstruction-echo\b", re.IGNORECASE),
     "metadata_borrowing": re.compile(r"\bmetadata-borrowing\b", re.IGNORECASE),
+    "unverified_context_copy": re.compile(r"\bunverified-context-copy\b", re.IGNORECASE),
+    "low_draft_improvement": re.compile(r"\blow-draft-improvement\b", re.IGNORECASE),
     "trusted_hint_ignored": re.compile(r"\btrusted-hints-ignored\b", re.IGNORECASE),
     "trusted_hint_degraded": re.compile(r"\btrusted-hints-degraded\b", re.IGNORECASE),
     "cutoff": re.compile(r"\bcutoff\b", re.IGNORECASE),
@@ -23034,6 +23219,7 @@ QUALITY_BREAKING_LABELS: Final[frozenset[str]] = frozenset(
         "context_echo",
         "instruction_echo",
         "metadata_borrowing",
+        "unverified_context_copy",
         "cutoff",
         "trusted_hint_degraded",
         "runtime_failure",
@@ -23109,19 +23295,25 @@ def _apply_metadata_alignment_to_analysis(
     metadata_agreement: MetadataAgreementMetrics | None,
 ) -> GenerationQualityAnalysis:
     """Fold trusted-metadata agreement into clean-output diagnostics."""
-    if not _metadata_agreement_has_visual_reference(metadata_agreement):
+    if metadata_agreement is None:
         return analysis
 
-    metadata_agreement = cast("MetadataAgreementMetrics", metadata_agreement)
+    has_visual_reference = _metadata_agreement_has_visual_reference(metadata_agreement)
     score = metadata_agreement.overall_score
     metadata_issue: str | None = None
     verdict = analysis.verdict
     evidence = list(analysis.evidence)
 
-    if verdict == "clean" and score < QUALITY.metadata_alignment_min_score:
+    if has_visual_reference and verdict == "clean" and score < QUALITY.metadata_alignment_min_score:
         metadata_issue = "low_metadata_alignment"
         verdict = "semantic_mismatch"
         evidence.append(metadata_issue)
+    draft_improvement_score = metadata_agreement.draft_improvement_score
+    if (
+        draft_improvement_score is not None
+        and draft_improvement_score < QUALITY.low_draft_improvement_score
+    ):
+        evidence.append("low-draft-improvement")
 
     user_bucket = analysis.user_bucket
     if metadata_issue is not None:
@@ -23136,8 +23328,11 @@ def _apply_metadata_alignment_to_analysis(
         verdict=verdict,
         user_bucket=user_bucket,
         evidence=_dedupe_preserve_order(evidence),
-        metadata_alignment_score=score,
+        metadata_alignment_score=score
+        if has_visual_reference
+        else analysis.metadata_alignment_score,
         metadata_alignment_issue=metadata_issue,
+        draft_improvement_score=draft_improvement_score,
     )
 
 
@@ -23245,6 +23440,13 @@ def _build_result_output_cues(result: PerformanceResult) -> list[str]:
         ("repetitive", "repetitive", "is_repetitive", None),
         ("context_echo", "context-echo", "has_context_echo", None),
         ("instruction_echo", "instruction-echo", "instruction_echo", None),
+        (
+            "unverified_context_copy",
+            "unverified-context-copy",
+            None,
+            None,
+        ),
+        ("low_draft_improvement", "low-draft-improvement", None, None),
         ("metadata_borrowing", "metadata-borrowing", "metadata_borrowing", None),
         ("cutoff", "cutoff", None, "cutoff"),
         ("context_budget", "context-budget", None, "context_budget"),
@@ -25080,7 +25282,7 @@ def _build_jsonl_metadata_agreement_record(
     """Build JSONL metadata-agreement payload from result-level benchmark data."""
     if metadata_agreement is None:
         return None
-    return {
+    record: JsonlMetadataAgreementRecord = {
         "overall_score": metadata_agreement.overall_score,
         "title_score": metadata_agreement.title_score,
         "description_score": metadata_agreement.description_score,
@@ -25090,6 +25292,16 @@ def _build_jsonl_metadata_agreement_record(
         "missed_terms": list(metadata_agreement.missed_terms),
         "nonvisual_hits": list(metadata_agreement.nonvisual_hits),
     }
+    for field_name in (
+        "context_integration_score",
+        "draft_improvement_score",
+        "visual_description_score",
+        "assisted_enrichment_score",
+    ):
+        value = getattr(metadata_agreement, field_name)
+        if value is not None:
+            record[field_name] = value
+    return record
 
 
 def _populate_jsonl_result_generation_data(
