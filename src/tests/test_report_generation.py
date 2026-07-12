@@ -442,6 +442,195 @@ def test_html_and_markdown_share_task_outcome_and_policy(tmp_path: Path) -> None
     assert "reliability-gated" in selection_text
 
 
+def test_html_and_supporting_markdown_do_not_name_ineligible_legacy_winners(
+    tmp_path: Path,
+) -> None:
+    """Legacy summary highlights must obey the canonical reliability gate."""
+    eligible = replace(
+        _make_success("org/eligible"),
+        generation=_MockGeneration(
+            text=getattr(_make_success().generation, "text", None),
+            generation_tps=10.0,
+            peak_memory=5.0,
+        ),
+        model_load_time=1.0,
+    )
+    warning = replace(
+        _make_harness_success(
+            "org/fast-warning",
+            text=getattr(_make_success().generation, "text", "") or "",
+            prompt_tokens=120,
+            generation_tokens=48,
+            harness_type="stop_token",
+            harness_detail="token_leak:<|endoftext|>",
+        ),
+        generation=_MockGeneration(
+            text=getattr(_make_success().generation, "text", None),
+            generation_tps=999.0,
+            peak_memory=0.5,
+        ),
+        model_load_time=0.01,
+    )
+    results = [warning, eligible]
+    context = _build_report_render_context(
+        results=results,
+        prompt="Create title, description, and keywords.",
+        metadata={"description": "Brick storefront", "keywords": "storefront, seating"},
+        eval_mode="blind",
+    )
+    html_path = tmp_path / "results.html"
+    markdown_path = tmp_path / "results.md"
+
+    generate_html_report(
+        results,
+        html_path,
+        versions={},
+        prompt="Create title, description, and keywords.",
+        total_runtime_seconds=2.0,
+        report_context=context,
+    )
+    generate_markdown_report(
+        results,
+        markdown_path,
+        versions={},
+        prompt="Create title, description, and keywords.",
+        total_runtime_seconds=2.0,
+        report_context=context,
+    )
+
+    assert context.summary["fastest_model"][0] == "org/eligible"
+    assert context.summary["most_efficient_model"][0] == "org/eligible"
+    assert context.summary["fastest_load_model"][0] == "org/eligible"
+    cataloging_best = context.summary["cataloging_best"]
+    if cataloging_best is None:
+        message = "cataloging_best"
+        raise AssertionError(message)
+    assert cataloging_best[0] == "org/eligible"
+    html_text = html_path.read_text(encoding="utf-8")
+    markdown_text = markdown_path.read_text(encoding="utf-8")
+    assert "org/fast-warning" in html_text
+    assert "org/fast-warning" in markdown_text
+    assert "<b>Fastest:</b> <code>org/eligible</code>" in html_text
+    assert "- **Fastest:** `org/eligible`" in markdown_text
+    assert "<b>Best for cataloging:</b> <code>org/eligible</code>" in html_text
+    assert "- **Best for cataloging:** `org/eligible`" in markdown_text
+
+
+def test_all_ineligible_html_keeps_cataloging_aggregates_without_winner(
+    tmp_path: Path,
+) -> None:
+    """An all-warning run should retain aggregate evidence without naming a winner."""
+    warning = _make_harness_success(
+        "org/warning-only",
+        text=getattr(_make_success().generation, "text", "") or "",
+        prompt_tokens=120,
+        generation_tokens=48,
+        harness_type="stop_token",
+        harness_detail="token_leak:<|endoftext|>",
+    )
+    context = _build_report_render_context(
+        results=[warning],
+        prompt="Create title, description, and keywords.",
+        metadata={"description": "Brick storefront", "keywords": "storefront"},
+        eval_mode="blind",
+    )
+    html_path = tmp_path / "results.html"
+
+    generate_html_report(
+        [warning],
+        html_path,
+        versions={},
+        prompt="Create title, description, and keywords.",
+        total_runtime_seconds=1.0,
+        report_context=context,
+    )
+
+    html_text = html_path.read_text(encoding="utf-8")
+    assert context.summary["cataloging_best"] is None
+    assert "Cataloging Utility Summary" in html_text
+    assert "Best for cataloging" not in html_text
+
+
+def test_report_context_builds_machine_and_failure_facts_once_for_serializers(
+    tmp_path: Path,
+) -> None:
+    """Serializers should reuse context facts instead of rerunning classifiers."""
+    failure = replace(
+        _make_failure("org/wrapped", error_package="mlx-vlm"),
+        exception_chain=(
+            check_models.FailureException(
+                "RuntimeError",
+                "mlx.core",
+                "kIOGPUCommandBufferCallbackErrorOutOfMemory",
+            ),
+            check_models.FailureException(
+                "ValueError",
+                "builtins",
+                "mlx_vlm/generate.py wrapped generation failure",
+            ),
+        ),
+    )
+    results = [failure, _make_success("org/passed")]
+
+    with (
+        patch.object(
+            check_models,
+            "_machine_artifact_facts",
+            wraps=check_models._machine_artifact_facts,
+        ) as facts_builder,
+        patch.object(
+            check_models,
+            "_build_failure_narrative",
+            wraps=check_models._build_failure_narrative,
+        ) as narrative_builder,
+    ):
+        context = _build_report_render_context(
+            results=results,
+            prompt="Describe the image.",
+            eval_mode="blind",
+        )
+        assert facts_builder.call_count == len(results)
+        assert narrative_builder.call_count == 1
+        initial_facts_calls = facts_builder.call_count
+        initial_narrative_calls = narrative_builder.call_count
+
+        generate_html_report(
+            results,
+            tmp_path / "results.html",
+            versions={},
+            prompt="Describe the image.",
+            total_runtime_seconds=1.0,
+            report_context=context,
+        )
+        generate_markdown_report(
+            results,
+            tmp_path / "results.md",
+            versions={},
+            prompt="Describe the image.",
+            total_runtime_seconds=1.0,
+            report_context=context,
+        )
+        generate_tsv_report(results, tmp_path / "results.tsv", report_context=context)
+        check_models.save_jsonl_report(
+            results,
+            tmp_path / "results.jsonl",
+            prompt="Describe the image.",
+            system_info={},
+            report_context=context,
+        )
+        check_models.append_history_record(
+            history_path=tmp_path / "results.history.jsonl",
+            results=results,
+            prompt="Describe the image.",
+            system_info={},
+            library_versions={},
+            report_context=context,
+        )
+
+        assert facts_builder.call_count == initial_facts_calls
+        assert narrative_builder.call_count == initial_narrative_calls
+
+
 def test_recommendation_policies_gate_reliability_memory_and_dominance() -> None:
     def _result(name: str, *, score: float, total: float, peak: float) -> PerformanceResult:
         base = _make_success(name)

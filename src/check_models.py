@@ -9881,6 +9881,11 @@ def _build_report_render_context(
         prompt=prompt,
         preflight_issues=resolved_preflight_issues,
     )
+    failure_narratives = tuple(
+        (result.model_name, _build_failure_narrative(result))
+        for result in result_set.results
+        if not result.success
+    )
     context = ReportRenderContext(
         result_set=result_set,
         table_data=table_data,
@@ -9894,8 +9899,30 @@ def _build_report_render_context(
         mode_policy=_build_report_mode_policy(eval_mode=eval_mode, metadata=metadata),
         diagnostics_snapshot=diagnostics_snapshot,
         issue_clusters=_build_issue_clusters(diagnostics_snapshot),
+        failure_narratives=failure_narratives,
     )
-    return replace(context, recommendations=_build_model_recommendation_views(context))
+    recommendations = _build_model_recommendation_views(context)
+    aligned_summary = _align_summary_recommendation_highlights(
+        summary,
+        triage=triage,
+        recommendations=recommendations,
+    )
+    context = replace(
+        context,
+        summary=aligned_summary,
+        recommendations=recommendations,
+    )
+    narrative_by_model = _failure_narratives_by_model(context)
+    return replace(
+        context,
+        machine_facts=tuple(
+            _machine_artifact_facts(
+                view,
+                failure_narrative=narrative_by_model.get(view.result.model_name),
+            )
+            for view in recommendations
+        ),
+    )
 
 
 def _html_attr(name: str, value: str) -> str:
@@ -10269,26 +10296,7 @@ def _populate_summary_performance_highlights(
     if not successful:
         return
 
-    fastest: PerformanceResult = max(
-        successful,
-        key=lambda r: getattr(r.generation, "generation_tps", 0) or 0,
-    )
-    fastest_tps: float = getattr(fastest.generation, "generation_tps", 0) or 0
-    summary["fastest_model"] = (fastest.model_name, fastest_tps)
-
-    most_efficient: PerformanceResult = min(
-        successful,
-        key=lambda r: getattr(r.generation, "peak_memory", float("inf")) or float("inf"),
-    )
-    efficient_mem: float = getattr(most_efficient.generation, "peak_memory", 0) or 0
-    summary["most_efficient_model"] = (most_efficient.model_name, efficient_mem)
-
-    fastest_load: PerformanceResult = min(
-        successful,
-        key=lambda r: getattr(r, "model_load_time", float("inf")) or float("inf"),
-    )
-    load_time: float = getattr(fastest_load, "model_load_time", 0) or 0
-    summary["fastest_load_model"] = (fastest_load.model_name, load_time)
+    _populate_summary_winner_highlights(summary, successful)
 
     total_tps: float = sum(getattr(r.generation, "generation_tps", 0) or 0 for r in successful)
     summary["average_tps"] = total_tps / len(successful)
@@ -10304,6 +10312,39 @@ def _populate_summary_performance_highlights(
         for r in successful
     )
     summary["memory_efficiency"] = total_tokens / total_mem if total_mem > 0 else 0
+
+
+def _populate_summary_winner_highlights(
+    summary: ModelIssueSummary,
+    candidates: Sequence[PerformanceResult],
+) -> None:
+    """Populate winner labels from an explicitly policy-filtered candidate set."""
+    summary.pop("fastest_model", None)
+    summary.pop("most_efficient_model", None)
+    summary.pop("fastest_load_model", None)
+    if not candidates:
+        return
+
+    fastest: PerformanceResult = max(
+        candidates,
+        key=lambda r: getattr(r.generation, "generation_tps", 0) or 0,
+    )
+    fastest_tps: float = getattr(fastest.generation, "generation_tps", 0) or 0
+    summary["fastest_model"] = (fastest.model_name, fastest_tps)
+
+    most_efficient: PerformanceResult = min(
+        candidates,
+        key=lambda r: getattr(r.generation, "peak_memory", float("inf")) or float("inf"),
+    )
+    efficient_mem: float = getattr(most_efficient.generation, "peak_memory", 0) or 0
+    summary["most_efficient_model"] = (most_efficient.model_name, efficient_mem)
+
+    fastest_load: PerformanceResult = min(
+        candidates,
+        key=lambda r: getattr(r, "model_load_time", float("inf")) or float("inf"),
+    )
+    load_time: float = getattr(fastest_load, "model_load_time", 0) or 0
+    summary["fastest_load_model"] = (fastest_load.model_name, load_time)
 
 
 def _append_quality_issue_entries(
@@ -10985,7 +11026,7 @@ def _cataloging_vs_metadata_breakdown(
 def _collect_cataloging_summary_data(summary: ModelIssueSummary) -> CatalogingSummaryData | None:
     """Collect shared cataloging summary data for HTML and Markdown renderers."""
     best_entry = summary.get("cataloging_best")
-    if best_entry is None:
+    if best_entry is None and not summary.get("cataloging_scores"):
         return None
 
     average_score = summary.get("cataloging_avg_score", 0.0)
@@ -13240,6 +13281,7 @@ class MachineArtifactFacts:
     assisted_enrichment_score: float | None
     prompt_burden_kind: str
     prompt_burden_source: str
+    suspected_owner: str | None
     owner_confidence: MaintainerConfidence | None
 
 
@@ -13330,6 +13372,8 @@ class ReportRenderContext:
     recommendations: tuple[ModelRecommendationView, ...] = ()
     diagnostics_snapshot: DiagnosticsSnapshot = dataclass_field(default_factory=DiagnosticsSnapshot)
     issue_clusters: tuple[IssueCluster, ...] = ()
+    failure_narratives: tuple[tuple[str, FailureNarrative], ...] = ()
+    machine_facts: tuple[MachineArtifactFacts, ...] = ()
 
 
 def _append_markdown_code_block(
@@ -16769,11 +16813,13 @@ def _build_recommendation_summary_block(
 ) -> ReportSection:
     """Build the shared current-run compatibility and recommendation summary."""
     rows: list[tuple[str, ...]] = []
+    narrative_by_model = _failure_narratives_by_model(report_context)
     for view in report_context.recommendations:
         if view.result.success:
             task_outcome = "Task outcome: completed"
         else:
-            task_outcome = f"Task outcome: {_build_failure_narrative(view.result).task_outcome}"
+            narrative = narrative_by_model[view.result.model_name]
+            task_outcome = f"Task outcome: {narrative.task_outcome}"
         rows.append(
             (
                 view.result.model_name,
@@ -16890,6 +16936,7 @@ def generate_html_report(
         _format_failures_by_package_parts(
             results,
             html_output=True,
+            failure_narratives=_failure_narratives_by_model(report_context),
         ),
     )
 
@@ -17239,6 +17286,7 @@ def generate_markdown_report(
     failures_by_pkg = _format_failures_by_package_parts(
         results,
         html_output=False,
+        failure_narratives=_failure_narratives_by_model(report_context),
     )
     if failures_by_pkg:
         md.extend(failures_by_pkg)
@@ -17477,12 +17525,20 @@ def _recommendation_visual_score(
     return caption_score
 
 
+def _failure_narratives_by_model(
+    context: ReportRenderContext,
+) -> dict[str, FailureNarrative]:
+    """Index cached unescaped failure narratives by model identifier."""
+    return dict(context.failure_narratives)
+
+
 def _recommendation_caveats(
     result: PerformanceResult,
     review: JsonlReviewRecord | None,
     analysis: GenerationQualityAnalysis | None,
     *,
     eligibility_reason: str,
+    failure_narrative: FailureNarrative | None = None,
 ) -> tuple[str, ...]:
     """Return deduplicated review and failure evidence for one recommendation."""
     caveats: list[str] = []
@@ -17491,7 +17547,7 @@ def _recommendation_caveats(
         if focus != "no flagged signals":
             caveats.append(focus)
     if not result.success:
-        narrative = _build_failure_narrative(result)
+        narrative = failure_narrative or _build_failure_narrative(result)
         caveats.extend((f"Task outcome: {narrative.task_outcome}", narrative.primary_exception))
     if eligibility_reason != "eligible":
         caveats.append(eligibility_reason)
@@ -17503,6 +17559,7 @@ def _build_model_recommendation_views(
 ) -> tuple[ModelRecommendationView, ...]:
     """Build one canonical recommendation view per current-run model."""
     utility_by_model = {row.result.model_name: row for row in context.triage.utility_rows}
+    narrative_by_model = _failure_narratives_by_model(context)
     views: list[ModelRecommendationView] = []
     for result in context.result_set.results:
         review = _build_jsonl_review_record(result)
@@ -17552,15 +17609,27 @@ def _build_model_recommendation_views(
                     review,
                     analysis,
                     eligibility_reason=eligibility_reason,
+                    failure_narrative=narrative_by_model.get(result.model_name),
                 ),
             )
         )
     return tuple(views)
 
 
-def _machine_artifact_facts(view: ModelRecommendationView) -> MachineArtifactFacts:
+def _machine_artifact_facts(
+    view: ModelRecommendationView,
+    *,
+    failure_narrative: FailureNarrative | None = None,
+) -> MachineArtifactFacts:
     """Return one canonical additive machine payload from cached report views."""
-    triage = _maintainer_triage_for_result(view.result)
+    if view.result.success:
+        triage = _maintainer_triage_for_result(view.result)
+        suspected_owner = triage["suspected_owner"] if triage is not None else None
+        owner_confidence = triage["confidence"] if triage is not None else None
+    else:
+        narrative = failure_narrative or _build_failure_narrative(view.result)
+        suspected_owner = narrative.suspected_owner
+        owner_confidence = narrative.owner_confidence
     agreement = view.result.metadata_agreement
     return MachineArtifactFacts(
         compatibility_status=view.compatibility,
@@ -17570,7 +17639,8 @@ def _machine_artifact_facts(view: ModelRecommendationView) -> MachineArtifactFac
         assisted_enrichment_score=view.assisted_enrichment_score,
         prompt_burden_kind=view.burden.kind,
         prompt_burden_source=view.burden.source,
-        owner_confidence=triage["confidence"] if triage is not None else None,
+        suspected_owner=suspected_owner,
+        owner_confidence=owner_confidence,
     )
 
 
@@ -17581,9 +17651,22 @@ def _recommendations_by_model(
     return {view.result.model_name: view for view in report_context.recommendations}
 
 
-def _machine_artifact_tsv_cells(view: ModelRecommendationView) -> tuple[str, ...]:
+def _machine_facts_by_model(
+    report_context: ReportRenderContext,
+) -> dict[str, MachineArtifactFacts]:
+    """Index cached additive machine facts by current-run model identifier."""
+    return {
+        view.result.model_name: facts
+        for view, facts in zip(
+            report_context.recommendations,
+            report_context.machine_facts,
+            strict=True,
+        )
+    }
+
+
+def _machine_artifact_tsv_cells(facts: MachineArtifactFacts) -> tuple[str, ...]:
     """Format canonical additive facts as TSV cells, leaving unavailable scores blank."""
-    facts = _machine_artifact_facts(view)
 
     def optional_score(value: float | None) -> str:
         return str(value) if value is not None else ""
@@ -17598,6 +17681,43 @@ def _machine_artifact_tsv_cells(view: ModelRecommendationView) -> tuple[str, ...
         facts.prompt_burden_source,
         facts.owner_confidence or "",
     )
+
+
+def _align_summary_recommendation_highlights(
+    summary: ModelIssueSummary,
+    *,
+    triage: ReportTriageContext,
+    recommendations: Sequence[ModelRecommendationView],
+) -> ModelIssueSummary:
+    """Align legacy summary winner labels with canonical recommendation eligibility."""
+    aligned: ModelIssueSummary = summary.copy()
+    eligible = _eligible_recommendations(recommendations)
+    eligible_names = {view.result.model_name for view in eligible}
+    _populate_summary_winner_highlights(
+        aligned,
+        [view.result for view in eligible],
+    )
+
+    eligible_scores = [
+        row for row in aligned.get("cataloging_scores", []) if row[0] in eligible_names
+    ]
+    if eligible_scores:
+        best = max(eligible_scores, key=lambda row: (row[1], row[0]))
+        aligned["cataloging_best"] = (best[0], best[1], best[2])
+    else:
+        aligned["cataloging_best"] = None
+
+    eligible_utility = [
+        row for row in triage.utility_rows if row.result.model_name in eligible_names
+    ]
+    _populate_cataloging_recommendation_highlights(
+        aligned,
+        description_scores=[
+            (row.result.model_name, row.description_score) for row in eligible_utility
+        ],
+        keyword_scores=[(row.result.model_name, row.keyword_score) for row in eligible_utility],
+    )
+    return aligned
 
 
 def _eligible_recommendations(
@@ -18995,6 +19115,7 @@ def generate_tsv_report(
     clean_headers.extend([*canonical_headers, "Generated Text", "error_type", "error_package"])
     generated_text_index = clean_headers.index("Generated Text")
     recommendations = _recommendations_by_model(report_context)
+    machine_facts = _machine_facts_by_model(report_context)
 
     clean_rows: list[list[str]] = []
     for row, res in zip(rows, sorted_results, strict=False):
@@ -19003,7 +19124,7 @@ def generate_tsv_report(
         burden = recommendation.burden
         clean_row.extend(
             [
-                *_machine_artifact_tsv_cells(recommendation),
+                *_machine_artifact_tsv_cells(machine_facts[res.model_name]),
                 burden.reason or "",
                 str(burden.processed_width) if burden.processed_width is not None else "",
                 str(burden.processed_height) if burden.processed_height is not None else "",
@@ -24592,10 +24713,21 @@ def _group_failures_by_package(
     return sorted(by_package.items(), key=lambda item: -len(item[1]))
 
 
+def _failure_narrative_for_result(
+    result: PerformanceResult,
+    narratives: Mapping[str, FailureNarrative] | None,
+) -> FailureNarrative:
+    """Return a cached failure narrative, with a standalone-call fallback."""
+    if narratives is not None and (narrative := narratives.get(result.model_name)) is not None:
+        return narrative
+    return _build_failure_narrative(result)
+
+
 def _format_failures_by_package_parts(
     results: list[PerformanceResult],
     *,
     html_output: bool,
+    failure_narratives: Mapping[str, FailureNarrative] | None = None,
 ) -> list[str]:
     """Render shared failure-ownership sections for HTML/Markdown reports."""
     sorted_packages = _group_failures_by_package(results)
@@ -24630,7 +24762,7 @@ def _format_failures_by_package_parts(
         for package, failures in sorted_packages:
             parts.append(f"<h4>{html.escape(package)}</h4><ul>")
             for result in failures:
-                narrative = _build_failure_narrative(result)
+                narrative = _failure_narrative_for_result(result, failure_narratives)
                 error_message = narrative.primary_exception
                 if len(error_message) > ERROR_MESSAGE_TRUNCATE_LEN:
                     error_message = error_message[: ERROR_MESSAGE_TRUNCATE_LEN - 3] + "..."
@@ -24675,7 +24807,7 @@ def _format_failures_by_package_parts(
         parts.append(f"#### {package}")
         parts.append("")
         for result in failures:
-            narrative = _build_failure_narrative(result)
+            narrative = _failure_narrative_for_result(result, failure_narratives)
             parts.extend(
                 _wrap_markdown_text(
                     f"{result.model_name} ({result.error_stage})",
@@ -25455,13 +25587,14 @@ def _populate_history_capability_scores(
 
 def _populate_history_machine_facts(
     record: HistoryModelResultRecord,
-    recommendation: ModelRecommendationView,
+    facts: MachineArtifactFacts,
 ) -> None:
     """Attach available canonical machine facts to one history model row."""
-    facts = _machine_artifact_facts(recommendation)
     record["compatibility_status"] = facts.compatibility_status
     record["prompt_burden_kind"] = facts.prompt_burden_kind
     record["prompt_burden_source"] = facts.prompt_burden_source
+    if facts.suspected_owner is not None:
+        record["review_owner"] = facts.suspected_owner
     if facts.context_integration_score is not None:
         record["context_integration_score"] = facts.context_integration_score
     if facts.draft_improvement_score is not None:
@@ -25478,7 +25611,7 @@ def _history_model_result_from_result(
     result: PerformanceResult,
     *,
     prompt: str | None = None,
-    recommendation: ModelRecommendationView | None = None,
+    machine_facts: MachineArtifactFacts | None = None,
 ) -> HistoryModelResultRecord:
     """Build a typed per-model history row from runtime result."""
     record: HistoryModelResultRecord = {
@@ -25519,8 +25652,8 @@ def _history_model_result_from_result(
     stop_reason = result.runtime_diagnostics.stop_reason if result.runtime_diagnostics else None
     if stop_reason is not None:
         record["stop_reason"] = stop_reason
-    if recommendation is not None:
-        _populate_history_machine_facts(record, recommendation)
+    if machine_facts is not None:
+        _populate_history_machine_facts(record, machine_facts)
     return record
 
 
@@ -25545,12 +25678,12 @@ def _build_history_run_record(
             eval_mode=eval_mode,
             system_info=system_info,
         )
-    recommendations = _recommendations_by_model(report_context)
+    machine_facts = _machine_facts_by_model(report_context)
     model_results = {
         result.model_name: _history_model_result_from_result(
             result,
             prompt=prompt,
-            recommendation=recommendations.get(result.model_name),
+            machine_facts=machine_facts.get(result.model_name),
         )
         for result in results
     }
@@ -25840,7 +25973,7 @@ def save_jsonl_report(
             system_info=system_info,
         )
     issue_cluster_by_model = _issue_clusters_by_model(report_context.issue_clusters)
-    recommendations = _recommendations_by_model(report_context)
+    machine_facts = _machine_facts_by_model(report_context)
     try:
         # Write shared metadata header (avoids repeating prompt/system per row)
         header = _build_jsonl_metadata_record(
@@ -25856,6 +25989,7 @@ def save_jsonl_report(
         for result in results:
             record = _build_jsonl_result_record_base(result)
             _populate_jsonl_result_generation_data(record, result)
+            facts = machine_facts.get(result.model_name)
             review_payload = _build_jsonl_review_record(result)
             if review_payload:
                 record["review"] = review_payload
@@ -25864,9 +25998,12 @@ def save_jsonl_report(
                     review_payload,
                     issue_cluster=issue_cluster_by_model.get(result.model_name),
                 )
+                if facts is not None and facts.suspected_owner is not None:
+                    triage["suspected_owner"] = facts.suspected_owner
+                if facts is not None and facts.owner_confidence is not None:
+                    triage["confidence"] = facts.owner_confidence
                 record["maintainer_triage"] = triage
-            if recommendation := recommendations.get(result.model_name):
-                facts = _machine_artifact_facts(recommendation)
+            if facts is not None:
                 record["compatibility_status"] = facts.compatibility_status
                 record["prompt_burden_kind"] = facts.prompt_burden_kind
                 record["prompt_burden_source"] = facts.prompt_burden_source

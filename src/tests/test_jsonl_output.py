@@ -796,6 +796,67 @@ def test_jsonl_and_history_include_canonical_cross_artifact_facts(tmp_path: Path
         assert machine_row["owner_confidence"] == row["maintainer_triage"]["confidence"]
 
 
+def test_jsonl_and_history_use_canonical_mixed_owner_failure_confidence(
+    tmp_path: Path,
+) -> None:
+    """Machine failure confidence should match the downgraded human narrative."""
+    result = PerformanceResult(
+        model_name="org/mixed-owner",
+        generation=None,
+        success=False,
+        error_message="wrapped generation failure",
+        error_package="mlx-vlm",
+        exception_chain=(
+            check_models.FailureException(
+                "RuntimeError",
+                "mlx.core",
+                "kIOGPUCommandBufferCallbackErrorOutOfMemory",
+            ),
+            check_models.FailureException(
+                "ValueError",
+                "builtins",
+                "mlx_vlm/generate.py wrapped generation failure",
+            ),
+        ),
+    )
+    prompt = "Describe the image."
+    context = check_models._build_report_render_context(
+        results=[result],
+        prompt=prompt,
+        eval_mode="blind",
+    )
+    output_file = tmp_path / "results.jsonl"
+    history_file = tmp_path / "results.history.jsonl"
+
+    save_jsonl_report(
+        [result],
+        output_file,
+        prompt=prompt,
+        system_info={},
+        report_context=context,
+    )
+    history = append_history_record(
+        history_path=history_file,
+        results=[result],
+        prompt=prompt,
+        system_info={},
+        library_versions={},
+        report_context=context,
+    )
+    _header, rows = _read_jsonl(output_file)
+    narrative = check_models._build_failure_narrative(result)
+
+    assert narrative.owner_confidence == "low"
+    assert rows[0]["owner_confidence"] == narrative.owner_confidence
+    assert rows[0]["maintainer_triage"]["confidence"] == narrative.owner_confidence
+    assert rows[0]["maintainer_triage"]["suspected_owner"] == narrative.suspected_owner
+    assert (
+        history["model_results"][result.model_name]["owner_confidence"]
+        == narrative.owner_confidence
+    )
+    assert history["model_results"][result.model_name]["review_owner"] == narrative.suspected_owner
+
+
 def test_jsonl_prompt_burden_reuses_generation_level_quality_analysis(tmp_path: Path) -> None:
     output_file = tmp_path / "results.jsonl"
     prompt = "Describe this image briefly."

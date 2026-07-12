@@ -7,6 +7,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Gate legacy HTML/Markdown performance and cataloging winners through the
+  canonical recommendation policy, and cache failure narratives plus machine
+  facts so human, JSONL, TSV, and history ownership cannot diverge.
 - Align standalone HTML, Markdown selection, JSONL, TSV, and history on one
   cached recommendation/diagnostics context; add compatible machine fields for
   enrichment, burden, compatibility, and owner confidence, and label primary

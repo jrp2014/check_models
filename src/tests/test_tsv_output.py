@@ -275,6 +275,42 @@ def test_tsv_includes_canonical_enrichment_compatibility_and_owner(tmp_path: Pat
     assert record["owner_confidence"] in {"high", "medium", "low"}
 
 
+def test_tsv_uses_canonical_mixed_owner_failure_confidence(tmp_path: Path) -> None:
+    """TSV confidence should match the canonical wrapped-failure narrative."""
+    result = check_models.PerformanceResult(
+        model_name="org/mixed-owner",
+        generation=None,
+        success=False,
+        error_message="wrapped generation failure",
+        error_package="mlx-vlm",
+        exception_chain=(
+            check_models.FailureException(
+                "RuntimeError",
+                "mlx.core",
+                "kIOGPUCommandBufferCallbackErrorOutOfMemory",
+            ),
+            check_models.FailureException(
+                "ValueError",
+                "builtins",
+                "mlx_vlm/generate.py wrapped generation failure",
+            ),
+        ),
+    )
+    context = check_models._build_report_render_context(
+        results=[result],
+        prompt="Describe the image.",
+        eval_mode="blind",
+    )
+    output_file = tmp_path / "failure.tsv"
+
+    check_models.generate_tsv_report([result], output_file, report_context=context)
+    record = _read_tsv_record(output_file)
+    narrative = check_models._build_failure_narrative(result)
+
+    assert narrative.owner_confidence == "low"
+    assert record["owner_confidence"] == narrative.owner_confidence
+
+
 def test_tsv_empty_results(tmp_path: Path) -> None:
     """Should handle empty results list gracefully."""
     results: list[check_models.PerformanceResult] = []
