@@ -7,6 +7,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Add one configuration-driven prompt burden view that distinguishes visual,
+  textual, mixed, normal, and unavailable input load across review, diagnostics,
+  JSONL, and TSV output while preserving existing token-estimate fields.
 - Replace blanket assisted metadata-borrowing penalties with provenance-aware
   context integration, draft improvement, visual-description, and enrichment
   scores; keep structured capture-data copy detection as canonical review

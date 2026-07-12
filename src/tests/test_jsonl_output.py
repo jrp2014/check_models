@@ -637,6 +637,9 @@ def test_save_jsonl_report_includes_prompt_diagnostics(tmp_path: Path) -> None:
             rendered_prompt_preview="<image> Describe this.",
             rendered_prompt_chars=22,
             image_placeholder_count=1,
+            processed_image_width=512,
+            processed_image_height=384,
+            image_patch_count=4,
             eos_token_id=151645,
             special_token_ids=(151645,),
             special_tokens=("<|end|>",),
@@ -656,11 +659,43 @@ def test_save_jsonl_report_includes_prompt_diagnostics(tmp_path: Path) -> None:
     )
     assert prompt_diagnostics["rendered_prompt_hash_sha256"] == "abc123"
     assert prompt_diagnostics["image_placeholder_count"] == 1
+    assert prompt_diagnostics["processed_image_width"] == 512
+    assert prompt_diagnostics["processed_image_height"] == 384
+    assert prompt_diagnostics["image_patch_count"] == 4
     assert prompt_diagnostics["special_tokens"] == ["<|end|>"]
     assert prompt_diagnostics["generate_kwargs"] == {
         "max_tokens": 500,
         "quantized_kv_start": check_models.DEFAULT_QUANTIZED_KV_START,
     }
+
+
+def test_save_jsonl_report_includes_canonical_prompt_burden(tmp_path: Path) -> None:
+    output_file = tmp_path / "results.jsonl"
+    prompt = "Describe this image briefly."
+    analysis = check_models.analyze_generation_text(
+        "Cat.",
+        generated_tokens=3,
+        prompt_tokens=4103,
+        prompt=prompt,
+    )
+    result = PerformanceResult(
+        model_name="org/visual-heavy",
+        generation=MockGeneration(
+            text="Cat.",
+            prompt_tokens=4103,
+            generation_tokens=3,
+        ),
+        success=True,
+        quality_analysis=analysis,
+        prompt_diagnostics=check_models.PromptDiagnostics(image_placeholder_count=1),
+    )
+
+    save_jsonl_report([result], output_file, prompt=prompt, system_info={})
+    _header, rows = _read_jsonl(output_file)
+
+    review = _require_present(rows[0].get("review"), field_name="review")
+    assert review["prompt_burden_kind"] == "visual_input"
+    assert review["prompt_burden_source"] == "estimated_nontext"
 
 
 def test_save_jsonl_report_includes_captured_output(tmp_path: Path) -> None:

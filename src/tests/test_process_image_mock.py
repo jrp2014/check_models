@@ -524,6 +524,10 @@ class TestProcessImageWithModelMock:
         assert generate_kwargs["skip_special_tokens"] is True
         assert generate_kwargs["cropping"] is False
         assert generate_kwargs["max_patches"] == 3
+        prompt_diagnostics = result._check_models_prompt_diagnostics
+        assert prompt_diagnostics.processed_image_width == 384
+        assert prompt_diagnostics.processed_image_height == 512
+        assert prompt_diagnostics.image_patch_count is None
 
     def test_run_model_generation_passes_thinking_kwargs(self, test_image: Path) -> None:
         """Thinking-mode flags should reach both chat templating and generation."""

@@ -191,6 +191,43 @@ def test_tsv_uses_shared_output_preview_cues_and_tail_marker(tmp_path: Path) -> 
     assert "TRAILING-SIGNAL" in data_row
 
 
+def test_tsv_includes_canonical_prompt_burden_scalars(tmp_path: Path) -> None:
+    """TSV should expose the same burden classification and measured dimensions."""
+    prompt = "Describe this image briefly."
+    analysis = check_models.analyze_generation_text(
+        "Cat.",
+        generated_tokens=3,
+        prompt_tokens=4103,
+        prompt=prompt,
+    )
+    result = check_models.PerformanceResult(
+        model_name="test/visual-heavy",
+        success=True,
+        generation=MockGenerationResult(
+            text="Cat.",
+            prompt_tokens=4103,
+            generation_tokens=3,
+        ),
+        quality_analysis=analysis,
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            image_placeholder_count=1,
+            processed_image_width=512,
+            processed_image_height=384,
+            image_patch_count=4,
+        ),
+    )
+    output_file = tmp_path / "burden.tsv"
+
+    check_models.generate_tsv_report([result], output_file)
+    record = _read_tsv_record(output_file)
+
+    assert record["prompt_burden_kind"] == "visual_input"
+    assert record["prompt_burden_source"] == "estimated_nontext"
+    assert record["processed_image_width"] == "512"
+    assert record["processed_image_height"] == "384"
+    assert record["image_patch_count"] == "4"
+
+
 def test_tsv_empty_results(tmp_path: Path) -> None:
     """Should handle empty results list gracefully."""
     results: list[check_models.PerformanceResult] = []

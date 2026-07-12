@@ -428,6 +428,98 @@ def test_analyze_generation_text_uses_nontext_prompt_burden_for_context_budget()
     assert analysis.verdict == "context_budget"
 
 
+def test_large_image_short_text_is_visual_input_burden() -> None:
+    analysis = check_models.GenerationQualityAnalysis(
+        is_repetitive=False,
+        repeated_token=None,
+        hallucination_issues=[],
+        is_verbose=False,
+        formatting_issues=[],
+        has_excessive_bullets=False,
+        bullet_count=0,
+        is_context_ignored=False,
+        missing_context_terms=[],
+        is_refusal=False,
+        refusal_type=None,
+        is_generic=False,
+        specificity_score=1.0,
+        has_language_mixing=False,
+        language_mixing_issues=[],
+        has_degeneration=False,
+        degeneration_type=None,
+        has_fabrication=False,
+        fabrication_issues=[],
+        prompt_tokens_total=16700,
+        prompt_tokens_text_est=430,
+        prompt_tokens_nontext_est=16270,
+    )
+    result = check_models.PerformanceResult(
+        model_name="org/visual-heavy",
+        generation=None,
+        success=True,
+        quality_analysis=analysis,
+        prompt_diagnostics=check_models.PromptDiagnostics(image_placeholder_count=1),
+    )
+    profile = check_models.ImageInputProfile(
+        width=9504,
+        height=6336,
+        megapixels=60.2,
+        processed_width=1344,
+        processed_height=896,
+    )
+
+    burden = check_models._prompt_burden_for_result(result, profile)
+
+    assert burden.kind == "visual_input"
+    assert burden.text_tokens_est == 430
+    assert burden.nontext_tokens_est == 16270
+    assert burden.visual_tokens_est is None
+    assert burden.source == "estimated_nontext"
+    assert burden.processed_width == 1344
+    assert burden.processed_height == 896
+
+
+def test_small_image_long_text_is_text_burden() -> None:
+    analysis = check_models.GenerationQualityAnalysis(
+        is_repetitive=False,
+        repeated_token=None,
+        hallucination_issues=[],
+        is_verbose=False,
+        formatting_issues=[],
+        has_excessive_bullets=False,
+        bullet_count=0,
+        is_context_ignored=False,
+        missing_context_terms=[],
+        is_refusal=False,
+        refusal_type=None,
+        is_generic=False,
+        specificity_score=1.0,
+        has_language_mixing=False,
+        language_mixing_issues=[],
+        has_degeneration=False,
+        degeneration_type=None,
+        has_fabrication=False,
+        fabrication_issues=[],
+        prompt_tokens_total=4200,
+        prompt_tokens_text_est=3900,
+        prompt_tokens_nontext_est=300,
+    )
+    result = check_models.PerformanceResult(
+        model_name="org/text-heavy",
+        generation=None,
+        success=True,
+        quality_analysis=analysis,
+        prompt_diagnostics=check_models.PromptDiagnostics(image_placeholder_count=1),
+    )
+    profile = check_models.ImageInputProfile(width=640, height=480, megapixels=0.3)
+
+    burden = check_models._prompt_burden_for_result(result, profile)
+
+    assert burden.kind == "text"
+    assert burden.nontext_ratio is not None
+    assert burden.nontext_ratio < 0.5
+
+
 def test_analyze_generation_text_ignores_nonvisual_location_and_time_metadata() -> None:
     """Location, GPS, and timestamps should not drive trusted-hint penalties."""
     prompt = (

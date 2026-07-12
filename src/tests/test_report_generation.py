@@ -2587,7 +2587,7 @@ class TestMarkdownGalleryReport:
         assert "nontext prompt burden" not in check_models._review_focus_text(review, analysis)
 
     def test_context_budget_review_focus_keeps_nontext_burden(self) -> None:
-        """Real context-collapse cases should still expose image-token pressure."""
+        """Real context-collapse cases should expose canonical image-token pressure."""
         analysis = check_models.analyze_generation_text(
             "Cat.",
             generated_tokens=3,
@@ -2604,13 +2604,15 @@ class TestMarkdownGalleryReport:
                 generation_tokens=3,
             ),
             quality_analysis=analysis,
+            prompt_diagnostics=check_models.PromptDiagnostics(image_placeholder_count=1),
         )
         review = check_models._build_jsonl_review_record(result)
 
         assert review is not None
         focus = check_models._review_focus_text(review, analysis)
         assert analysis.verdict == "context_budget"
-        assert "nontext prompt burden" in focus
+        assert "visual input burden" in focus
+        assert "nontext prompt burden" not in focus
 
     def test_gallery_includes_summary_pointer_and_per_model_review_status(
         self,

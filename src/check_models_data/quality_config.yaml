@@ -133,6 +133,8 @@ thresholds:
   min_output_tokens_for_ratio: 15 # Generated-token counts below this are suspicious
   min_output_ratio: 0.02 # Minimum output/prompt ratio (2%)
   long_prompt_tokens_threshold: 3000 # Prompt size where context-related failures become likely
+  heavy_nontext_prompt_ratio: 0.50 # Non-text share where image input dominates prompt burden
+  mixed_prompt_burden_ratio_floor: 0.25 # Non-text share where long text becomes mixed burden
   severe_prompt_tokens_threshold: 12000 # Extreme prompt size risk threshold
   prompt_title_max_chars: 120 # Max chars for metadata title hints in generated prompt
   prompt_description_max_chars: 420 # Max chars for metadata description hints

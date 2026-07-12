@@ -511,6 +511,8 @@ class QualityThresholds:
     min_output_tokens_for_ratio: int = 15  # Generated-token counts below this are suspicious
     min_output_ratio: float = 0.02  # Minimum output/prompt ratio (2%)
     long_prompt_tokens_threshold: int = 3000  # Prompt tokens above this can degrade outputs
+    heavy_nontext_prompt_ratio: float = 0.5
+    mixed_prompt_burden_ratio_floor: float = 0.25
     severe_prompt_tokens_threshold: int = 12000  # Extreme prompt token count risk threshold
     prompt_title_max_chars: int = 120  # Max chars for metadata title hints in default prompt
     prompt_description_max_chars: int = 420  # Max chars for metadata description hints
@@ -546,6 +548,8 @@ class QualityThresholds:
             "low_compliance_threshold": self.low_compliance_threshold,
             "low_info_gain_threshold": self.low_info_gain_threshold,
             "min_output_ratio": self.min_output_ratio,
+            "heavy_nontext_prompt_ratio": self.heavy_nontext_prompt_ratio,
+            "mixed_prompt_burden_ratio_floor": self.mixed_prompt_burden_ratio_floor,
             "metadata_agreement_weight_title": self.metadata_agreement_weight_title,
             "metadata_agreement_weight_description": self.metadata_agreement_weight_description,
             "metadata_agreement_weight_keywords": self.metadata_agreement_weight_keywords,
@@ -1262,6 +1266,11 @@ class JsonlReviewRecord(TypedDict):
     prompt_tokens_nontext_est: int | None
     prompt_output_ratio: float | None
     nontext_prompt_ratio: float | None
+    prompt_burden_kind: NotRequired[str]
+    prompt_burden_source: NotRequired[str]
+    processed_image_width: NotRequired[int | None]
+    processed_image_height: NotRequired[int | None]
+    image_patch_count: NotRequired[int | None]
     missing_terms: list[str]
     missing_sections: list[str]
     harness_details: list[str]
@@ -1290,6 +1299,8 @@ class JsonlMaintainerTriageRecord(TypedDict, total=False):
     prompt_tokens_total: int | None
     prompt_output_ratio: float | None
     nontext_prompt_ratio: float | None
+    prompt_burden_kind: str
+    prompt_burden_source: str
     issue_cluster_id: str
     issue_cluster_path: str
     acceptance_signal: str
@@ -2032,6 +2043,9 @@ class PromptDiagnostics:
     rendered_prompt_preview: str | None = None
     rendered_prompt_chars: int | None = None
     image_placeholder_count: int | None = None
+    processed_image_width: int | None = None
+    processed_image_height: int | None = None
+    image_patch_count: int | None = None
     eos_token_id: JsonLike = None
     eos_token: str | None = None
     special_token_ids: tuple[JsonLike, ...] = ()
@@ -2151,6 +2165,78 @@ class ImageInputProfile:
     width: int
     height: int
     megapixels: float
+    processed_width: int | None = None
+    processed_height: int | None = None
+
+
+type PromptBurdenKind = Literal["normal", "visual_input", "text", "mixed", "unknown"]
+
+
+@dataclass(frozen=True)
+class PromptBurden:
+    """Canonical classification of textual and visual prompt/input burden."""
+
+    kind: PromptBurdenKind
+    total_tokens: int | None = None
+    text_tokens_est: int | None = None
+    nontext_tokens_est: int | None = None
+    visual_tokens_est: int | None = None
+    template_tokens_est: int | None = None
+    nontext_ratio: float | None = None
+    source: str = "unavailable"
+    original_width: int | None = None
+    original_height: int | None = None
+    processed_width: int | None = None
+    processed_height: int | None = None
+    patch_count: int | None = None
+
+
+def _prompt_burden_for_result(
+    result: PerformanceResult,
+    image_profile: ImageInputProfile | None,
+) -> PromptBurden:
+    """Return the shared prompt/input burden view without re-tokenizing input."""
+    analysis = result.quality_analysis
+    total = analysis.prompt_tokens_total if analysis is not None else None
+    text_est = analysis.prompt_tokens_text_est if analysis is not None else None
+    nontext_est = analysis.prompt_tokens_nontext_est if analysis is not None else None
+    ratio = nontext_est / total if total and nontext_est is not None else None
+    diagnostics = result.prompt_diagnostics
+    placeholders = diagnostics.image_placeholder_count if diagnostics is not None else 0
+    substantial = total is not None and total >= QUALITY.long_prompt_tokens_threshold
+    processed_width = getattr(diagnostics, "processed_image_width", None) or getattr(
+        image_profile,
+        "processed_width",
+        None,
+    )
+    processed_height = getattr(diagnostics, "processed_image_height", None) or getattr(
+        image_profile,
+        "processed_height",
+        None,
+    )
+
+    kind: PromptBurdenKind = "unknown" if total is None else "normal"
+    if substantial and ratio is not None:
+        if placeholders and ratio >= QUALITY.heavy_nontext_prompt_ratio:
+            kind = "visual_input"
+        elif text_est is not None and text_est >= QUALITY.long_prompt_tokens_threshold:
+            kind = "text" if ratio < QUALITY.mixed_prompt_burden_ratio_floor else "mixed"
+        else:
+            kind = "mixed"
+
+    return PromptBurden(
+        kind=kind,
+        total_tokens=total,
+        text_tokens_est=text_est,
+        nontext_tokens_est=nontext_est,
+        nontext_ratio=ratio,
+        source="estimated_nontext" if nontext_est is not None else "unavailable",
+        original_width=image_profile.width if image_profile is not None else None,
+        original_height=image_profile.height if image_profile is not None else None,
+        processed_width=processed_width,
+        processed_height=processed_height,
+        patch_count=diagnostics.image_patch_count if diagnostics is not None else None,
+    )
 
 
 class PhaseTimer:
@@ -4737,9 +4823,11 @@ def _detect_metadata_borrowing(
     if not text or not bundle.nonvisual_terms:
         return False, []
     structured_terms = _dedupe_preserve_order(
-        match.group(0)
-        for term in bundle.nonvisual_terms
-        for match in _STRUCTURED_NUMERIC_METADATA_RE.finditer(term)
+        [
+            match.group(0)
+            for term in bundle.nonvisual_terms
+            for match in _STRUCTURED_NUMERIC_METADATA_RE.finditer(term)
+        ]
     )
     if not structured_terms:
         return False, []
@@ -4908,10 +4996,10 @@ def _classify_review_verdict(
     )
     if None not in prompt_token_values:
         total_tokens = cast("int", prompt_tokens_total)
-        text_tokens = cast("int", prompt_tokens_text_est)
         nontext_tokens = cast("int", prompt_tokens_nontext_est)
         heavy_nontext_burden = (
-            total_tokens >= QUALITY.long_prompt_tokens_threshold and nontext_tokens > text_tokens
+            total_tokens >= QUALITY.long_prompt_tokens_threshold
+            and nontext_tokens / total_tokens >= QUALITY.heavy_nontext_prompt_ratio
         )
 
     context_budget_evidence: list[str] = []
@@ -11292,6 +11380,7 @@ def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord |
         if prompt_tokens_total is not None and prompt_tokens_total > 0
         else None
     )
+    prompt_burden = _prompt_burden_for_result(result, None)
 
     if analysis is not None:
         requested_max_tokens = analysis.requested_max_tokens or result.requested_max_tokens
@@ -11320,6 +11409,11 @@ def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord |
             "prompt_tokens_nontext_est": analysis.prompt_tokens_nontext_est,
             "prompt_output_ratio": prompt_output_ratio,
             "nontext_prompt_ratio": nontext_prompt_ratio,
+            "prompt_burden_kind": prompt_burden.kind,
+            "prompt_burden_source": prompt_burden.source,
+            "processed_image_width": prompt_burden.processed_width,
+            "processed_image_height": prompt_burden.processed_height,
+            "image_patch_count": prompt_burden.patch_count,
             "missing_terms": list(analysis.missing_context_terms),
             "missing_sections": list(analysis.missing_sections),
             "harness_details": list(analysis.harness_issue_details),
@@ -11353,6 +11447,11 @@ def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord |
         "prompt_tokens_nontext_est": None,
         "prompt_output_ratio": prompt_output_ratio,
         "nontext_prompt_ratio": None,
+        "prompt_burden_kind": prompt_burden.kind,
+        "prompt_burden_source": prompt_burden.source,
+        "processed_image_width": prompt_burden.processed_width,
+        "processed_image_height": prompt_burden.processed_height,
+        "image_patch_count": prompt_burden.patch_count,
         "missing_terms": [],
         "missing_sections": [],
         "harness_details": [],
@@ -11377,8 +11476,6 @@ _HUGGINGFACE_HUB_CONNECTIVITY_NEEDLES: Final[tuple[str, ...]] = (
     "502 bad gateway",
     "504 gateway timeout",
 )
-
-HEAVY_NON_TEXT_PROMPT_RATIO_THRESHOLD: Final[float] = 0.5
 
 
 def _is_huggingface_hub_connectivity_failure(result: PerformanceResult) -> bool:
@@ -11616,6 +11713,8 @@ def _build_jsonl_maintainer_triage_record(
         triage["prompt_output_ratio"] = review["prompt_output_ratio"]
     if review["nontext_prompt_ratio"] is not None:
         triage["nontext_prompt_ratio"] = review["nontext_prompt_ratio"]
+    triage["prompt_burden_kind"] = review.get("prompt_burden_kind", "unknown")
+    triage["prompt_burden_source"] = review.get("prompt_burden_source", "unavailable")
     if issue_cluster is not None:
         triage["issue_cluster_id"] = issue_cluster.cluster_id
         triage["issue_cluster_path"] = _issue_cluster_path(issue_cluster)
@@ -11656,8 +11755,11 @@ def _maintainer_triage_context_text(triage: JsonlMaintainerTriageRecord) -> str 
     if prompt_output_ratio is not None:
         context_parts.append(f"output/prompt={prompt_output_ratio:.2%}")
     nontext_prompt_ratio = triage.get("nontext_prompt_ratio")
-    if nontext_prompt_ratio is not None:
-        context_parts.append(f"nontext burden={nontext_prompt_ratio:.0%}")
+    prompt_burden_kind = triage.get("prompt_burden_kind")
+    if prompt_burden_kind and prompt_burden_kind not in {"normal", "unknown"}:
+        burden_label = prompt_burden_kind.replace("_", " ")
+        ratio_suffix = f"={nontext_prompt_ratio:.0%}" if nontext_prompt_ratio is not None else ""
+        context_parts.append(f"{burden_label} burden{ratio_suffix}")
     stop_reason = triage.get("stop_reason")
     if stop_reason is not None:
         context_parts.append(f"stop={stop_reason}")
@@ -11825,7 +11927,12 @@ def _review_focus_text(
     """Return compact evidence text tuned for human review surfaces."""
     parts: list[str] = []
 
-    parts.extend(_describe_harness_details(review["harness_details"][:2]))
+    parts.extend(
+        _describe_harness_details(
+            review["harness_details"][:2],
+            prompt_burden_kind=review.get("prompt_burden_kind", "unknown"),
+        )
+    )
 
     if review["hit_max_tokens"] and review["requested_max_tokens"] is not None:
         parts.append(f"hit token cap ({review['requested_max_tokens']})")
@@ -11836,12 +11943,15 @@ def _review_focus_text(
     }:
         parts.append(f"output/prompt={review['prompt_output_ratio']:.2%}")
 
-    if (
-        review["nontext_prompt_ratio"] is not None
-        and review["nontext_prompt_ratio"] >= HEAVY_NON_TEXT_PROMPT_RATIO_THRESHOLD
-        and review["verdict"] == "context_budget"
-    ):
-        parts.append(f"nontext prompt burden={review['nontext_prompt_ratio']:.0%}")
+    burden_kind = review.get("prompt_burden_kind", "unknown")
+    if burden_kind not in {"normal", "unknown"} and review["verdict"] == "context_budget":
+        burden_label = burden_kind.replace("_", " ")
+        ratio_suffix = (
+            f"={review['nontext_prompt_ratio']:.0%}"
+            if review["nontext_prompt_ratio"] is not None
+            else ""
+        )
+        parts.append(f"{burden_label} burden{ratio_suffix}")
 
     if review["missing_sections"]:
         parts.append("missing sections: " + ", ".join(review["missing_sections"]))
@@ -11894,11 +12004,7 @@ def _review_owner_specific_next_action(review: JsonlReviewRecord) -> str | None:
             action = (
                 "Inspect continuation and stop handling; generation is drifting into template text."
             )
-    elif (
-        owner == "mlx"
-        and review["nontext_prompt_ratio"] is not None
-        and review["nontext_prompt_ratio"] >= HEAVY_NON_TEXT_PROMPT_RATIO_THRESHOLD
-    ):
+    elif owner == "mlx" and review.get("prompt_burden_kind") == "visual_input":
         action = "Inspect long-context cache behavior under heavy image-token burden."
     elif owner == "model-config" and review["missing_sections"]:
         action = (
@@ -11925,11 +12031,10 @@ def _review_next_action_text(review: JsonlReviewRecord) -> str:
     if review["verdict"] == "cutoff":
         action = _review_cutoff_next_action(review)
     elif review["verdict"] == "context_budget":
+        burden_label = review.get("prompt_burden_kind", "prompt/input").replace("_", " ")
         action = (
-            "Treat this as a prompt-budget issue first; nontext prompt burden is "
-            f"{review['nontext_prompt_ratio']:.0%} and the output stays weak under that load."
-            if review["nontext_prompt_ratio"] is not None
-            else "Reduce prompt/image burden or inspect long-context handling before judging quality."
+            f"Treat this as a {burden_label} burden issue first; reduce that input load or inspect "
+            "long-context handling before judging output quality."
         )
     elif review["owner"] == "huggingface-hub":
         action = (
@@ -14167,6 +14272,7 @@ def _collect_stack_issue_signals(
         prompt_tokens = int(getattr(gen, "prompt_tokens", 0) or 0)
         generated_tokens = int(getattr(gen, "generation_tokens", 0) or 0)
         ratio = (generated_tokens / prompt_tokens) if prompt_tokens > 0 else 0.0
+        burden_label = _prompt_burden_for_result(res, None).kind.replace("_", " ")
 
         if not text.strip() or generated_tokens == 0:
             symptom = "Empty output despite successful run"
@@ -14184,7 +14290,7 @@ def _collect_stack_issue_signals(
             and generated_tokens < QUALITY.min_output_tokens_for_ratio
             and ratio < QUALITY.min_output_ratio
         ):
-            symptom = f"Long-context low output ratio ({ratio:.1%})"
+            symptom = f"{burden_label.title()} burden low output ratio ({ratio:.1%})"
             signals.append(
                 (
                     res,
@@ -14205,14 +14311,14 @@ def _collect_stack_issue_signals(
             )
         ):
             if qa.is_repetitive:
-                symptom = "Repetition under long prompt length"
+                symptom = f"Repetition under {burden_label} burden"
             elif qa.is_context_ignored:
-                symptom = "Context dropped under long prompt length"
+                symptom = f"Context dropped under {burden_label} burden"
             elif qa.has_context_echo:
-                symptom = "Context echo under long prompt length"
+                symptom = f"Context echo under {burden_label} burden"
             else:
                 degeneration_type = qa.degeneration_type or "degradation"
-                symptom = f"Output degeneration under long prompt length ({degeneration_type})"
+                symptom = f"Output degeneration under {burden_label} burden ({degeneration_type})"
             signals.append(
                 (
                     res,
@@ -14728,10 +14834,19 @@ def _describe_output_detail(output_detail: str) -> str | None:
     return None
 
 
-def _describe_long_context_detail(detail: str) -> str | None:
+def _describe_long_context_detail(
+    detail: str,
+    *,
+    prompt_burden_kind: str | None = None,
+) -> str | None:
     """Describe long-context harness anomalies in plain language."""
+    burden_label = (
+        f"{prompt_burden_kind.replace('_', ' ')} burden"
+        if prompt_burden_kind and prompt_burden_kind not in {"normal", "unknown"}
+        else "long prompt length"
+    )
     if match := re.fullmatch(r"long_context_empty\((\d+)tok\)", detail):
-        return f"At long prompt length ({match.group(1)} tokens), generation returned empty output."
+        return f"At {burden_label} ({match.group(1)} tokens), generation returned empty output."
     if match := re.fullmatch(
         r"long_context_low_ratio\(([^;]+);(\d+)->(\d+)(?:;([^)]+))?\)",
         detail,
@@ -14739,21 +14854,25 @@ def _describe_long_context_detail(detail: str) -> str | None:
         ratio_text, prompt_tok, output_tok, weak_label = match.groups()
         weak_text = f"; weak text signal {weak_label}" if weak_label else ""
         return (
-            "At long prompt length "
+            f"At {burden_label} "
             f"({prompt_tok} tokens), output stayed unusually short "
             f"({output_tok} tokens; ratio {ratio_text}{weak_text})."
         )
     if match := re.fullmatch(r"long_context_repetition\((\d+)tok\)", detail):
-        return f"At long prompt length ({match.group(1)} tokens), output became repetitive."
+        return f"At {burden_label} ({match.group(1)} tokens), output became repetitive."
     if match := re.fullmatch(r"long_context_context_drop\((\d+)tok\)", detail):
         return (
-            "At long prompt length "
+            f"At {burden_label} "
             f"({match.group(1)} tokens), output may stop following prompt/image context."
         )
     return None
 
 
-def _describe_harness_detail(detail: str) -> str | None:
+def _describe_harness_detail(
+    detail: str,
+    *,
+    prompt_burden_kind: str | None = None,
+) -> str | None:
     """Translate internal harness detail tokens into maintainer-friendly prose."""
     kind, payload = _split_harness_detail(detail)
     if kind == "token_leak":
@@ -14764,16 +14883,32 @@ def _describe_harness_detail(detail: str) -> str | None:
     if kind == "output":
         return _describe_output_detail(payload)
     if kind == "long_context":
-        return _describe_long_context_detail(payload)
+        return _describe_long_context_detail(
+            payload,
+            prompt_burden_kind=prompt_burden_kind,
+        )
     if kind == "training_leak":
         leak_label = _TRAINING_LEAK_LABELS.get(payload, "instruction/template text")
         return f"Generated text appears to continue into {leak_label}."
     return None
 
 
-def _describe_harness_details(details: Sequence[str]) -> list[str]:
+def _describe_harness_details(
+    details: Sequence[str],
+    *,
+    prompt_burden_kind: str | None = None,
+) -> list[str]:
     """Translate harness detail tokens into maintainer-friendly prose."""
-    return [desc for detail in details if (desc := _describe_harness_detail(detail))]
+    return [
+        desc
+        for detail in details
+        if (
+            desc := _describe_harness_detail(
+                detail,
+                prompt_burden_kind=prompt_burden_kind,
+            )
+        )
+    ]
 
 
 def _evidence_token_encoding_detail(token_issue: str) -> str | None:
@@ -18722,12 +18857,30 @@ def generate_tsv_report(
         clean_header = re.sub(r"<[^>]+>", "", clean_header)
         clean_headers.append(escape_tsv_value(clean_header))
 
-    clean_headers.extend(["Generated Text", "error_type", "error_package"])
+    burden_headers = [
+        "prompt_burden_kind",
+        "prompt_burden_source",
+        "processed_image_width",
+        "processed_image_height",
+        "image_patch_count",
+    ]
+    clean_headers.extend([*burden_headers, "Generated Text", "error_type", "error_package"])
     generated_text_index = clean_headers.index("Generated Text")
 
     clean_rows: list[list[str]] = []
     for row, res in zip(rows, sorted_results, strict=False):
         clean_row = [escape_tsv_value(cell) for cell in row]
+        image_profile = report_context.image_profile if report_context is not None else None
+        burden = _prompt_burden_for_result(res, image_profile)
+        clean_row.extend(
+            [
+                burden.kind,
+                burden.source,
+                str(burden.processed_width) if burden.processed_width is not None else "",
+                str(burden.processed_height) if burden.processed_height is not None else "",
+                str(burden.patch_count) if burden.patch_count is not None else "",
+            ]
+        )
         generated_text = (
             str(getattr(res.generation, "text", "") or "") if res.generation is not None else ""
         )
@@ -19494,6 +19647,8 @@ def _build_prompt_diagnostics(
     model_type_raw = _get_config_value(config, "model_type")
     model_type = str(model_type_raw) if model_type_raw is not None else None
     eos_token = getattr(tokenizer, "eos_token", None)
+    processed_height = params.resize_shape[0] if params.resize_shape is not None else None
+    processed_width = params.resize_shape[1] if params.resize_shape is not None else None
     return PromptDiagnostics(
         model_type=model_type,
         processor_class=_qualified_class_name(processor),
@@ -19505,6 +19660,8 @@ def _build_prompt_diagnostics(
         ),
         rendered_prompt_chars=len(formatted_prompt),
         image_placeholder_count=_count_image_placeholders(formatted_prompt),
+        processed_image_width=processed_width,
+        processed_image_height=processed_height,
         eos_token_id=_prompt_diag_json_value(getattr(tokenizer, "eos_token_id", None)),
         eos_token=str(eos_token) if eos_token is not None else None,
         special_token_ids=_bounded_json_sequence(getattr(tokenizer, "all_special_ids", None)),
@@ -19530,6 +19687,9 @@ def _prompt_diagnostics_to_json(diagnostics: PromptDiagnostics | None) -> dict[s
         "rendered_prompt_preview",
         "rendered_prompt_chars",
         "image_placeholder_count",
+        "processed_image_width",
+        "processed_image_height",
+        "image_patch_count",
         "eos_token_id",
         "eos_token",
     ):
