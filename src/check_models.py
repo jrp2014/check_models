@@ -2151,6 +2151,22 @@ class PerformanceResult:
     requested_max_tokens: int | None = None
     prompt_diagnostics: PromptDiagnostics | None = None
     rerun_evidence: RerunEvidence | None = None
+    review_payload: JsonlReviewRecord | None = dataclass_field(
+        default=None,
+        repr=False,
+        compare=False,
+    )
+    review_payload_ready: bool = dataclass_field(default=False, repr=False, compare=False)
+    maintainer_triage_payload: JsonlMaintainerTriageRecord | None = dataclass_field(
+        default=None,
+        repr=False,
+        compare=False,
+    )
+    maintainer_triage_payload_ready: bool = dataclass_field(
+        default=False,
+        repr=False,
+        compare=False,
+    )
 
 
 @dataclass(frozen=True)
@@ -9852,13 +9868,36 @@ def _build_report_render_context(
 ) -> ReportRenderContext:
     """Build shared derived report data once for all renderers."""
     resolved_preflight_issues = tuple(preflight_issues)
-    resolved_results = [
+    analyzed_results = [
         _populate_result_quality_analysis(
             result,
             prompt=prompt,
         )
         for result in results
     ]
+    resolved_results: list[PerformanceResult] = []
+    review_payloads: list[tuple[str, JsonlReviewRecord | None]] = []
+    maintainer_triage_payloads: list[tuple[str, JsonlMaintainerTriageRecord | None]] = []
+    for result in analyzed_results:
+        review = _build_jsonl_review_record(result)
+        result_with_review = replace(
+            result,
+            review_payload=review,
+            review_payload_ready=True,
+        )
+        maintainer_triage = (
+            _build_jsonl_maintainer_triage_record(result_with_review, review)
+            if review is not None
+            else None
+        )
+        resolved_result = replace(
+            result_with_review,
+            maintainer_triage_payload=maintainer_triage,
+            maintainer_triage_payload_ready=True,
+        )
+        resolved_results.append(resolved_result)
+        review_payloads.append((resolved_result.model_name, review))
+        maintainer_triage_payloads.append((resolved_result.model_name, maintainer_triage))
     result_set: ResultSet = ResultSet(resolved_results)
     prompt_context = _extract_trusted_hint_bundle(prompt).trusted_text or None
     image_profile = _load_image_input_profile(image_path)
@@ -9900,6 +9939,8 @@ def _build_report_render_context(
         diagnostics_snapshot=diagnostics_snapshot,
         issue_clusters=_build_issue_clusters(diagnostics_snapshot),
         failure_narratives=failure_narratives,
+        reviews=tuple(review_payloads),
+        maintainer_triage=tuple(maintainer_triage_payloads),
     )
     recommendations = _build_model_recommendation_views(context)
     aligned_summary = _align_summary_recommendation_highlights(
@@ -11568,6 +11609,13 @@ def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord |
     }
 
 
+def _review_for_result(result: PerformanceResult) -> JsonlReviewRecord | None:
+    """Return a context-cached review payload, classifying only for direct fallbacks."""
+    if result.review_payload_ready:
+        return result.review_payload
+    return _build_jsonl_review_record(result)
+
+
 _HUGGINGFACE_HUB_CONNECTIVITY_NEEDLES: Final[tuple[str, ...]] = (
     "server disconnected without sending a response",
     "remoteprotocolerror",
@@ -11836,7 +11884,9 @@ def _maintainer_triage_for_result(
     result: PerformanceResult,
 ) -> JsonlMaintainerTriageRecord | None:
     """Return cached maintainer triage payload for a result when available."""
-    review = _build_jsonl_review_record(result)
+    if result.maintainer_triage_payload_ready:
+        return result.maintainer_triage_payload
+    review = _review_for_result(result)
     if review is None:
         return None
     return _build_jsonl_maintainer_triage_record(result, review)
@@ -12186,7 +12236,7 @@ def _review_next_action_text(review: JsonlReviewRecord) -> str:
 
 def _build_review_payload(result: PerformanceResult) -> ReviewPayload | None:
     """Build the shared review payload once for downstream report renderers."""
-    review = _build_jsonl_review_record(result)
+    review = _review_for_result(result)
     if review is None:
         return None
 
@@ -12475,7 +12525,7 @@ def _log_canonical_run_review_summary(results: Sequence[PerformanceResult]) -> N
     evidence_counts: Counter[str] = Counter()
 
     for result in results:
-        review = _build_jsonl_review_record(result)
+        review = _review_for_result(result)
         if review is None:
             continue
         owner_map.setdefault(review["owner"], []).append(
@@ -12707,7 +12757,7 @@ def _build_markdown_recommended_models(
         )
         if peak_memory:
             rationale.append(f"Memory {peak_memory}")
-        review = _build_jsonl_review_record(result)
+        review = _review_for_result(result)
         analysis = _quality_analysis_for_result(result)
         if review is not None:
             focus = _review_focus_text(review, analysis)
@@ -12897,7 +12947,7 @@ def _gallery_summary_model_link(model_name: str) -> str:
 
 def _gallery_summary_status(result: PerformanceResult) -> str:
     """Return a compact user-facing status for the gallery summary table."""
-    review = _build_jsonl_review_record(result)
+    review = _review_for_result(result)
     if review is None:
         status = "recommended" if result.success else "avoid"
         verdict = "not evaluated" if result.success else "runtime failure"
@@ -12927,7 +12977,7 @@ def _gallery_summary_signal(result: PerformanceResult) -> str:
                 signal = "clean"
 
         if signal == "no flagged signals":
-            review = _build_jsonl_review_record(result)
+            review = _review_for_result(result)
             if review is not None:
                 focus = _review_focus_text(review, analysis)
                 if focus != "no flagged signals":
@@ -13374,6 +13424,8 @@ class ReportRenderContext:
     issue_clusters: tuple[IssueCluster, ...] = ()
     failure_narratives: tuple[tuple[str, FailureNarrative], ...] = ()
     machine_facts: tuple[MachineArtifactFacts, ...] = ()
+    reviews: tuple[tuple[str, JsonlReviewRecord | None], ...] = ()
+    maintainer_triage: tuple[tuple[str, JsonlMaintainerTriageRecord | None], ...] = ()
 
 
 def _append_markdown_code_block(
@@ -14087,7 +14139,7 @@ def _build_issue_clusters(snapshot: DiagnosticsSnapshot) -> tuple[IssueCluster, 
 
     for result, _sample_output in snapshot.harness_results:
         analysis = _quality_analysis_for_result(result)
-        review = _build_jsonl_review_record(result)
+        review = _review_for_result(result)
         subtype = (
             analysis.harness_issue_type
             if analysis is not None and analysis.harness_issue_type
@@ -14114,7 +14166,7 @@ def _build_issue_clusters(snapshot: DiagnosticsSnapshot) -> tuple[IssueCluster, 
 
     for result, _sample_output in snapshot.text_sanity_results:
         analysis = _quality_analysis_for_result(result)
-        review = _build_jsonl_review_record(result)
+        review = _review_for_result(result)
         issue_type = (
             analysis.text_sanity_issue_type
             if analysis is not None and analysis.text_sanity_issue_type
@@ -15421,7 +15473,11 @@ def _issue_queue_affected_cell(
     return f"{count}: {model} (+{count - 1})"
 
 
-def _issue_queue_failure_evidence(result: PerformanceResult) -> list[str]:
+def _issue_queue_failure_evidence(
+    result: PerformanceResult,
+    *,
+    failure_narratives: Mapping[str, FailureNarrative] | None = None,
+) -> list[str]:
     """Return compact failure evidence for issue-queue rows."""
     parts: list[str] = []
     if result.error_stage:
@@ -15429,7 +15485,7 @@ def _issue_queue_failure_evidence(result: PerformanceResult) -> list[str]:
     if result.failure_phase:
         parts.append(f"phase {result.failure_phase}")
 
-    narrative = _build_failure_narrative(result)
+    narrative = _failure_narrative_for_result(result, failure_narratives)
     observed = _simplify_failure_message(
         narrative.primary_exception,
         model_name=result.model_name,
@@ -15459,6 +15515,7 @@ def _issue_queue_evidence_cell(
     cluster: IssueCluster,
     *,
     escape_text: Callable[[str], str],
+    failure_narratives: Mapping[str, FailureNarrative] | None = None,
 ) -> str:
     """Render a self-contained evidence snapshot for queue-only readers."""
     representative = _issue_cluster_representative(cluster)
@@ -15468,7 +15525,10 @@ def _issue_queue_evidence_cell(
     evidence_parts = (
         _issue_queue_success_evidence(representative)
         if representative.success
-        else _issue_queue_failure_evidence(representative)
+        else _issue_queue_failure_evidence(
+            representative,
+            failure_narratives=failure_narratives,
+        )
     )
     if not evidence_parts and cluster.stack_signals:
         _result, symptom, owner = cluster.stack_signals[0]
@@ -15520,6 +15580,7 @@ def _render_issue_queue_table(
     escape_text: Callable[[str], str],
     issue_link_for_cluster: Callable[[IssueCluster], str],
     evidence_link_for_cluster: Callable[[IssueCluster], str],
+    failure_narratives: Mapping[str, FailureNarrative] | None = None,
     headers: tuple[str, ...] = _ISSUE_QUEUE_HEADERS,
 ) -> list[str]:
     """Render the shared issue-queue table used across Markdown artifacts."""
@@ -15527,7 +15588,11 @@ def _render_issue_queue_table(
         (
             _issue_queue_target_cell(cluster, escape_text=escape_text),
             _issue_queue_problem_cell(cluster, escape_text=escape_text),
-            _issue_queue_evidence_cell(cluster, escape_text=escape_text),
+            _issue_queue_evidence_cell(
+                cluster,
+                escape_text=escape_text,
+                failure_narratives=failure_narratives,
+            ),
             _issue_queue_affected_cell(cluster, escape_text=escape_text),
             issue_link_for_cluster(cluster),
             evidence_link_for_cluster(cluster),
@@ -17400,7 +17465,7 @@ def _group_review_results(
     """Group results by one field from the canonical review payload."""
     grouped: dict[str, list[PerformanceResult]] = {}
     for result in results:
-        review = _build_jsonl_review_record(result)
+        review = _review_for_result(result)
         if review is None:
             continue
         key = review["owner"] if key_name == "owner" else review["user_bucket"]
@@ -17410,7 +17475,7 @@ def _group_review_results(
 
 def _model_selection_score(result: PerformanceResult) -> float:
     """Score output hygiene and practical caption usefulness without image semantics."""
-    review = _build_jsonl_review_record(result)
+    review = _review_for_result(result)
     if not result.success or result.generation is None or review is None:
         return 0.0
 
@@ -17562,7 +17627,7 @@ def _build_model_recommendation_views(
     narrative_by_model = _failure_narratives_by_model(context)
     views: list[ModelRecommendationView] = []
     for result in context.result_set.results:
-        review = _build_jsonl_review_record(result)
+        review = _review_for_result(result)
         analysis = _quality_analysis_for_result(result)
         agreement = result.metadata_agreement
         utility = utility_by_model.get(result.model_name)
@@ -17877,7 +17942,7 @@ def _rank_current_recommendations(
 
 def _model_recommendation_status(view: ModelRecommendationView) -> str:
     """Return a concise human-facing status for a recommendation view."""
-    review = _build_jsonl_review_record(view.result)
+    review = _review_for_result(view.result)
     if review is None:
         return "not-evaluated" if view.result.success else "runtime-failure"
     return _review_display_bucket_label(review["user_bucket"], review=review)
@@ -18013,7 +18078,7 @@ def _append_model_selection_quick_chooser(
 
 def _is_review_escalation(result: PerformanceResult) -> bool:
     """Return True for review rows that need maintainer attention."""
-    review = _build_jsonl_review_record(result)
+    review = _review_for_result(result)
     if review is None:
         return False
     if review["verdict"] in {
@@ -18080,7 +18145,7 @@ def _append_review_user_buckets(
             continue
         rows: list[tuple[str, ...]] = []
         for result in bucket_results:
-            review = _build_jsonl_review_record(result)
+            review = _review_for_result(result)
             if review is None:
                 continue
             analysis = _quality_analysis_for_result(result)
@@ -18113,7 +18178,7 @@ def _append_review_model_verdicts(
     """Append detailed per-model canonical review rows for the digest."""
     md.extend(["## Model Verdicts", ""])
     for result in results:
-        review = _build_jsonl_review_record(result)
+        review = _review_for_result(result)
         if review is None:
             continue
         md.extend([f"### `{result.model_name}`", ""])
@@ -18160,6 +18225,7 @@ def _append_review_issue_queue(
                     cluster,
                     resolved_repro_bundles,
                 ),
+                failure_narratives=_failure_narratives_by_model(report_context),
             ),
             rules=MARKDOWNLINT_TABLE_PIPE_RULES,
         )
@@ -18177,7 +18243,7 @@ def _build_grounded_metadata_selection_section(
     for view in views[:10]:
         agreement = view.result.metadata_agreement
         agreement_score = 0.0 if agreement is None else agreement.overall_score
-        review = _build_jsonl_review_record(view.result)
+        review = _review_for_result(view.result)
         verdict = review["verdict"] if review is not None else "not_evaluated"
         table_rows.append(
             (
@@ -18519,7 +18585,7 @@ def _capability_signal_from_result(
 ) -> ModelCapabilityRunSignal:
     """Build a current capability signal from the canonical recommendation view."""
     result = view.result
-    review = _build_jsonl_review_record(result)
+    review = _review_for_result(result)
     text = str(getattr(result.generation, "text", "") or "") if result.generation else ""
     utility = utility_by_model.get(result.model_name)
     metadata_score = None
@@ -25623,7 +25689,7 @@ def _history_model_result_from_result(
         "error_code": result.error_code,
         "error_signature": result.error_signature,
     }
-    review = _build_jsonl_review_record(result)
+    review = _review_for_result(result)
     analysis = _quality_analysis_for_result(result)
     if review is not None:
         record["review_verdict"] = review["verdict"]
@@ -25679,9 +25745,10 @@ def _build_history_run_record(
             system_info=system_info,
         )
     machine_facts = _machine_facts_by_model(report_context)
+    cached_results = {result.model_name: result for result in report_context.result_set.results}
     model_results = {
         result.model_name: _history_model_result_from_result(
-            result,
+            cached_results.get(result.model_name, result),
             prompt=prompt,
             machine_facts=machine_facts.get(result.model_name),
         )
@@ -25974,6 +26041,7 @@ def save_jsonl_report(
         )
     issue_cluster_by_model = _issue_clusters_by_model(report_context.issue_clusters)
     machine_facts = _machine_facts_by_model(report_context)
+    cached_results = {result.model_name: result for result in report_context.result_set.results}
     try:
         # Write shared metadata header (avoids repeating prompt/system per row)
         header = _build_jsonl_metadata_record(
@@ -25986,23 +26054,27 @@ def save_jsonl_report(
         )
         lines = [json.dumps(header)]
 
-        for result in results:
+        for original_result in results:
+            result = cached_results.get(original_result.model_name, original_result)
             record = _build_jsonl_result_record_base(result)
             _populate_jsonl_result_generation_data(record, result)
             facts = machine_facts.get(result.model_name)
-            review_payload = _build_jsonl_review_record(result)
+            review_payload = _review_for_result(result)
             if review_payload:
                 record["review"] = review_payload
-                triage = _build_jsonl_maintainer_triage_record(
-                    result,
-                    review_payload,
-                    issue_cluster=issue_cluster_by_model.get(result.model_name),
-                )
-                if facts is not None and facts.suspected_owner is not None:
-                    triage["suspected_owner"] = facts.suspected_owner
-                if facts is not None and facts.owner_confidence is not None:
-                    triage["confidence"] = facts.owner_confidence
-                record["maintainer_triage"] = triage
+                base_triage = _maintainer_triage_for_result(result)
+                if base_triage is not None:
+                    triage = cast("JsonlMaintainerTriageRecord", dict(base_triage))
+                    issue_cluster = issue_cluster_by_model.get(result.model_name)
+                    if issue_cluster is not None:
+                        triage["issue_cluster_id"] = issue_cluster.cluster_id
+                        triage["issue_cluster_path"] = _issue_cluster_path(issue_cluster)
+                        triage["acceptance_signal"] = issue_cluster.acceptance_signal
+                    if facts is not None and facts.suspected_owner is not None:
+                        triage["suspected_owner"] = facts.suspected_owner
+                    if facts is not None and facts.owner_confidence is not None:
+                        triage["confidence"] = facts.owner_confidence
+                    record["maintainer_triage"] = triage
             if facts is not None:
                 record["compatibility_status"] = facts.compatibility_status
                 record["prompt_burden_kind"] = facts.prompt_burden_kind
@@ -28262,6 +28334,13 @@ def _generate_reports_and_log_outputs(
     inputs: ReportGenerationInputs,
 ) -> None:
     """Generate reports and log the emitted artifact paths."""
+    cached_results = {
+        result.model_name: result for result in inputs.report_context.result_set.results
+    }
+    inputs = replace(
+        inputs,
+        results=[cached_results.get(result.model_name, result) for result in inputs.results],
+    )
     artifacts = _build_report_artifacts(inputs)
 
     try:
@@ -28629,6 +28708,7 @@ def finalize_execution(
             system_info=system_info,
             preflight_issues=_get_run_preflight_issues(args),
         )
+        results = list(report_context.result_set.results)
 
         # Prepare output paths
         output_paths = _resolve_report_output_paths(args)

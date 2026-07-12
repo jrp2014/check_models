@@ -7,6 +7,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Cache canonical review classification and maintainer triage once per report
+  context so recommendation, history, JSONL, TSV, and finalization paths cannot
+  independently reclassify the same model result.
 - Gate legacy HTML/Markdown performance and cataloging winners through the
   canonical recommendation policy, and cache failure narratives plus machine
   facts so human, JSONL, TSV, and history ownership cannot diverge.

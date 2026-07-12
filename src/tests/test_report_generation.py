@@ -575,6 +575,16 @@ def test_report_context_builds_machine_and_failure_facts_once_for_serializers(
     with (
         patch.object(
             check_models,
+            "_build_jsonl_review_record",
+            wraps=check_models._build_jsonl_review_record,
+        ) as review_builder,
+        patch.object(
+            check_models,
+            "_build_jsonl_maintainer_triage_record",
+            wraps=check_models._build_jsonl_maintainer_triage_record,
+        ) as triage_builder,
+        patch.object(
+            check_models,
             "_machine_artifact_facts",
             wraps=check_models._machine_artifact_facts,
         ) as facts_builder,
@@ -589,34 +599,30 @@ def test_report_context_builds_machine_and_failure_facts_once_for_serializers(
             prompt="Describe the image.",
             eval_mode="blind",
         )
+        assert review_builder.call_count == len(results)
+        assert triage_builder.call_count == len(results)
         assert facts_builder.call_count == len(results)
         assert narrative_builder.call_count == 1
+        initial_review_calls = review_builder.call_count
+        initial_triage_calls = triage_builder.call_count
         initial_facts_calls = facts_builder.call_count
         initial_narrative_calls = narrative_builder.call_count
 
-        generate_html_report(
-            results,
-            tmp_path / "results.html",
-            versions={},
-            prompt="Describe the image.",
-            total_runtime_seconds=1.0,
-            report_context=context,
-        )
-        generate_markdown_report(
-            results,
-            tmp_path / "results.md",
-            versions={},
-            prompt="Describe the image.",
-            total_runtime_seconds=1.0,
-            report_context=context,
-        )
-        generate_tsv_report(results, tmp_path / "results.tsv", report_context=context)
-        check_models.save_jsonl_report(
-            results,
-            tmp_path / "results.jsonl",
-            prompt="Describe the image.",
-            system_info={},
-            report_context=context,
+        output_paths = check_models.ReportOutputPaths(
+            index=tmp_path / "index.md",
+            html=tmp_path / "results.html",
+            markdown=tmp_path / "results.md",
+            gallery_markdown=tmp_path / "model_gallery.md",
+            review=tmp_path / "review.md",
+            model_selection=tmp_path / "model_selection.md",
+            model_capabilities=tmp_path / "model_capabilities.md",
+            model_capabilities_json=tmp_path / "model_capabilities.json",
+            tsv=tmp_path / "results.tsv",
+            jsonl=tmp_path / "results.jsonl",
+            run_json=tmp_path / "run.json",
+            diagnostics=tmp_path / "diagnostics.md",
+            log=tmp_path / "check_models.log",
+            environment=tmp_path / "environment.log",
         )
         check_models.append_history_record(
             history_path=tmp_path / "results.history.jsonl",
@@ -626,9 +632,50 @@ def test_report_context_builds_machine_and_failure_facts_once_for_serializers(
             library_versions={},
             report_context=context,
         )
+        check_models._generate_reports_and_log_outputs(
+            check_models.ReportGenerationInputs(
+                results=results,
+                library_versions={},
+                prompt="Describe the image.",
+                metadata=None,
+                overall_time=1.0,
+                image_path=None,
+                system_info={},
+                report_context=context,
+                output_paths=output_paths,
+            )
+        )
 
+        assert review_builder.call_count == initial_review_calls
+        assert triage_builder.call_count == initial_triage_calls
         assert facts_builder.call_count == initial_facts_calls
         assert narrative_builder.call_count == initial_narrative_calls
+
+
+def test_direct_serializers_build_one_local_review_cache(tmp_path: Path) -> None:
+    """Legacy direct serializers should classify once through their fallback context."""
+    result = _make_success("org/direct")
+
+    with patch.object(
+        check_models,
+        "_build_jsonl_review_record",
+        wraps=check_models._build_jsonl_review_record,
+    ) as review_builder:
+        check_models.save_jsonl_report(
+            [result],
+            tmp_path / "direct.jsonl",
+            prompt="Describe the image.",
+            system_info={},
+        )
+        check_models.append_history_record(
+            history_path=tmp_path / "direct.history.jsonl",
+            results=[result],
+            prompt="Describe the image.",
+            system_info={},
+            library_versions={},
+        )
+
+    assert review_builder.call_count == 2
 
 
 def test_recommendation_policies_gate_reliability_memory_and_dominance() -> None:
