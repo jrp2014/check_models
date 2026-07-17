@@ -297,11 +297,14 @@ def check_if_needed(
         return False, "No audit runner available for suppression"
 
     output: str = f"{result.stdout}\n{result.stderr}"
-    for code in finding.codes:
-        code_marker: str = f"[{code}]" if finding.kind == "type-ignore" else code
-        if code_marker in output:
-            return True, f"Suppression needed: {code} violation found"
-    return False, "No violations found - suppression appears stale"
+    missing_codes = tuple(
+        code
+        for code in finding.codes
+        if (f"[{code}]" if finding.kind == "type-ignore" else code) not in output
+    )
+    if missing_codes:
+        return False, f"No violation found for: {', '.join(missing_codes)}"
+    return True, f"Suppression needed: {', '.join(finding.codes)} violations found"
 
 
 def main() -> int:

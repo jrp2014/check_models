@@ -1358,6 +1358,27 @@ class TestRuntimeFingerprint:
                 f"Probe '{probe_name}' has invalid status: {result['status']}"
             )
 
+    def test_collect_runtime_fingerprint_reports_mlx_vlm_available(self) -> None:
+        """An imported mlx-vlm runtime should be recorded as available."""
+        with patch.dict(check_models.MISSING_DEPENDENCIES, {}, clear=True):
+            fingerprint = check_models.collect_runtime_fingerprint()
+
+        assert fingerprint["mlx_vlm"] == {"status": "ok"}
+
+    def test_collect_runtime_fingerprint_reports_mlx_vlm_unavailable(self) -> None:
+        """A captured mlx-vlm import failure should remain actionable."""
+        with patch.dict(
+            check_models.MISSING_DEPENDENCIES,
+            {"mlx-vlm": "not imported"},
+            clear=True,
+        ):
+            fingerprint = check_models.collect_runtime_fingerprint()
+
+        assert fingerprint["mlx_vlm"] == {
+            "status": "unavailable",
+            "detail": "not imported",
+        }
+
     def test_collect_runtime_fingerprint_uses_top_level_mlx_memory_probe(self) -> None:
         """GPU memory probe should use the current top-level MLX memory API."""
 

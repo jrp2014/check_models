@@ -1676,6 +1676,66 @@ def test_check_if_needed_fails_bare_suppressions(tmp_path: Path) -> None:
     assert "not allowed" in reason
 
 
+@pytest.mark.parametrize(
+    ("checker_output", "expected_needed", "expected_reason"),
+    [
+        (
+            "PLR0912 Too many branches",
+            False,
+            "No violation found for: PLR0915",
+        ),
+        (
+            "PLR0912 Too many branches\nPLR0915 Too many statements",
+            True,
+            "Suppression needed: PLR0912, PLR0915 violations found",
+        ),
+    ],
+)
+def test_check_if_needed_requires_evidence_for_every_suppressed_code(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    checker_output: str,
+    expected_needed: bool,
+    expected_reason: str,
+) -> None:
+    """Every code on a combined suppression must have checker evidence."""
+    repo_root = tmp_path / "repo"
+    src_root = repo_root / "src"
+    src_root.mkdir(parents=True)
+    file_path = src_root / "sample.py"
+    file_path.write_text(
+        "def sample():  # noqa: PLR0912, PLR0915\n    pass\n",
+        encoding="utf-8",
+    )
+    finding = check_suppressions.SuppressionFinding(
+        file_path=file_path,
+        line_num=1,
+        kind="noqa",
+        codes=("PLR0912", "PLR0915"),
+        line_text="def sample():  # noqa: PLR0912, PLR0915",
+    )
+    result = subprocess.CompletedProcess(
+        args=["ruff"],
+        returncode=1,
+        stdout=checker_output,
+        stderr="",
+    )
+
+    def fake_run(*_args: object, **_kwargs: object) -> subprocess.CompletedProcess[str]:
+        return result
+
+    monkeypatch.setattr(check_suppressions, "_run_for_finding", fake_run)
+
+    needed, reason = check_suppressions.check_if_needed(
+        finding,
+        repo_root=repo_root,
+        src_root=src_root,
+    )
+
+    assert needed is expected_needed
+    assert reason == expected_reason
+
+
 def test_run_for_finding_uses_active_python_for_ruff(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

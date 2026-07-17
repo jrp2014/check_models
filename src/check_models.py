@@ -19685,16 +19685,14 @@ def collect_runtime_fingerprint() -> dict[str, RuntimeProbeResult]:
     except Exception as exc:  # noqa: BLE001
         probes["mlx_framework"] = RuntimeProbeResult(status="errored", detail=str(exc)[:120])
 
-    # mlx-vlm importability
-    try:
-        if "mlx-vlm" not in MISSING_DEPENDENCIES:
-            probes["mlx_vlm"] = RuntimeProbeResult(status="ok")
-        else:
-            probes["mlx_vlm"] = RuntimeProbeResult(
-                status="unavailable", detail=MISSING_DEPENDENCIES.get("mlx-vlm", "not imported")
-            )
-    except Exception as exc:  # noqa: BLE001
-        probes["mlx_vlm"] = RuntimeProbeResult(status="errored", detail=str(exc)[:120])
+    # mlx-vlm importability was captured during module initialization.
+    if "mlx-vlm" not in MISSING_DEPENDENCIES:
+        probes["mlx_vlm"] = RuntimeProbeResult(status="ok")
+    else:
+        probes["mlx_vlm"] = RuntimeProbeResult(
+            status="unavailable",
+            detail=MISSING_DEPENDENCIES.get("mlx-vlm", "not imported"),
+        )
 
     # GPU memory query
     try:
