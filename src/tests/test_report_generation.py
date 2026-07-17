@@ -3759,6 +3759,65 @@ class TestDiagnosticsReport:
         assert "python -m mlx_vlm.generate" in content
         assert "issues/index.md" not in content
 
+    def test_scoped_harness_cluster_includes_complete_expandable_output(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Diagnostics should retain complete model output behind a clickable summary."""
+        complete_text = (
+            "BEGIN-EVIDENCE " + ("model reasoning context " * 20) + "<|end|> END-EVIDENCE"
+        )
+        output = tmp_path / "diagnostics.md"
+        result = _make_harness_success(
+            "org/stop-token",
+            text=complete_text,
+            harness_type="stop_token",
+            harness_detail="token_leak:<|end|>",
+        )
+
+        generate_diagnostics_report(
+            results=[result],
+            filename=output,
+            versions={"mlx-vlm": "0.6.5"},
+            system_info={},
+            prompt="Describe the image.",
+        )
+
+        content = output.read_text(encoding="utf-8")
+        assert "### Generated Output Evidence" in content
+        assert "<details>" in content
+        assert "<summary>Complete generated output: org/stop-token</summary>" in content
+        assert "```text" in content
+        assert "BEGIN-EVIDENCE" in content
+        assert "END-EVIDENCE" in content
+        assert "[tail]" not in content
+
+    def test_failure_only_diagnostics_omit_generated_output_section(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """A conclusive crash should not require an empty generated-output section."""
+        output = tmp_path / "diagnostics.md"
+
+        generate_diagnostics_report(
+            results=[
+                _make_failure_with_details(
+                    "org/crashing-model",
+                    error_msg="generation failed",
+                    error_stage="Model Error",
+                    error_package="mlx-vlm",
+                )
+            ],
+            filename=output,
+            versions={"mlx-vlm": "0.6.5"},
+            system_info={},
+            prompt="Describe the image.",
+        )
+
+        content = output.read_text(encoding="utf-8")
+        assert "Task outcome: crashed" in content
+        assert "### Generated Output Evidence" not in content
+
     def test_text_sanity_cluster_requires_output_excerpt(self) -> None:
         """A detector label without generated evidence should not form a text issue."""
         result = _make_quality_success("org/no-excerpt", with_quality_issue=False)

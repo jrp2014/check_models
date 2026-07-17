@@ -200,6 +200,7 @@ LOGGER_NAME: Final[str] = "mlx-vlm-check"
 NOT_AVAILABLE: Final[str] = "N/A"
 MARKDOWNLINT_MAIN_TABLE_RULES: Final[str] = "MD033 MD034 MD037 MD049"
 MARKDOWNLINT_GALLERY_SUMMARY_RULES: Final[str] = "MD034"
+MARKDOWNLINT_DETAILS_RULES: Final[str] = "MD033"
 MARKDOWNLINT_TABLE_PIPE_RULES: Final[str] = "MD060"
 
 MISSING_DEPENDENCIES: dict[str, str] = {}
@@ -15841,6 +15842,35 @@ def _diagnostics_issue_matrix(clusters: Sequence[IssueCluster]) -> list[str]:
     return lines
 
 
+def _diagnostics_generated_output_section(cluster: IssueCluster) -> list[str]:
+    """Render complete captured model output as per-model expandable evidence."""
+    details: list[ReportDetails] = []
+    for result in _issue_cluster_results(cluster):
+        output = _generation_text_value(result.generation)
+        if not output.strip():
+            continue
+        details.append(
+            ReportDetails(
+                summary=f"Complete generated output: {result.model_name}",
+                blocks=(ReportCodeBlock(output, language="text"),),
+            )
+        )
+    if not details:
+        return []
+    return _guard_markdownlint_block(
+        render_report_markdown(
+            (
+                ReportSection(
+                    title="Generated Output Evidence",
+                    level=3,
+                    blocks=tuple(details),
+                ),
+            )
+        ),
+        rules=MARKDOWNLINT_DETAILS_RULES,
+    )
+
+
 def _diagnostics_cluster_issue_sections(
     clusters: Sequence[IssueCluster],
     *,
@@ -15867,6 +15897,8 @@ def _diagnostics_cluster_issue_sections(
                 )
             )
         )
+        parts.append("")
+        parts.extend(_diagnostics_generated_output_section(cluster))
         parts.append("")
         parts.extend(
             render_report_markdown(
