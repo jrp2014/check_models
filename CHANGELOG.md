@@ -7,6 +7,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Make suppression auditing require evidence for every listed checker code and
+  remove a redundant broad-exception suppression from deterministic runtime
+  fingerprinting.
 - Classify documented delimiters from known thinking models as informational
   thinking traces rather than reasoning faults; report an unclosed trace as
   ownership-neutral incomplete thinking while preserving existing cutoff and
