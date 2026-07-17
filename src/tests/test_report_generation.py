@@ -2743,6 +2743,7 @@ class TestMarkdownReportEdgeCases:
             results=[enriched],
             prompt="Create title, description, and keywords.",
             metadata=metadata,
+            metadata_exposed_to_prompt=True,
             eval_mode="quality",
         )
 
@@ -4413,7 +4414,9 @@ class TestDiagnosticsReport:
         ]
         assert payload["failure"]["suspected_owner"] == "unresolved: mlx/mlx-vlm"
         assert payload["failure"]["owner_confidence"] == "low"
-        assert payload["result"]["maintainer_triage"]["suspected_owner"] == "mlx-vlm"
+        assert (
+            payload["result"]["maintainer_triage"]["suspected_owner"] == "unresolved: mlx/mlx-vlm"
+        )
         assert payload["repro"]["prompt_hash_sha256"]
         assert payload["repro"]["eval_mode"] == "blind"
 
