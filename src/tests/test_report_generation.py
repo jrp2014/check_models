@@ -2743,6 +2743,7 @@ class TestMarkdownReportEdgeCases:
             results=[enriched],
             prompt="Create title, description, and keywords.",
             metadata=metadata,
+            metadata_exposed_to_prompt=True,
             eval_mode="quality",
         )
 
@@ -4413,7 +4414,9 @@ class TestDiagnosticsReport:
         ]
         assert payload["failure"]["suspected_owner"] == "unresolved: mlx/mlx-vlm"
         assert payload["failure"]["owner_confidence"] == "low"
-        assert payload["result"]["maintainer_triage"]["suspected_owner"] == "mlx-vlm"
+        assert (
+            payload["result"]["maintainer_triage"]["suspected_owner"] == "unresolved: mlx/mlx-vlm"
+        )
         assert payload["repro"]["prompt_hash_sha256"]
         assert payload["repro"]["eval_mode"] == "blind"
 
@@ -6259,3 +6262,19 @@ class TestIssueDirectoryInvariants:
         issue_files = list(issues_dir.glob("issue_*.md"))
         assert issue_files == [], f"Expected no issue files, found {issue_files}"
         assert (issues_dir / "index.md").exists()
+
+
+def test_quality_signal_summary_reports_incomplete_thinking_without_fault_language() -> None:
+    """Developer prose should describe an unfinished expected thinking protocol."""
+    analysis = check_models.analyze_generation_text(
+        "◁think▷Inspecting the image step by step.",
+        generated_tokens=500,
+        requested_max_tokens=500,
+        model_name="mlx-community/Kimi-VL-A3B-Thinking-8bit",
+    )
+
+    summary = " ".join(check_models._summarize_quality_signals(analysis))
+
+    assert "Thinking trace incomplete" in summary
+    assert "expected model protocol" in summary
+    assert "leaked reasoning" not in summary

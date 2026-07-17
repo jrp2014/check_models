@@ -7,6 +7,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Classify documented delimiters from known thinking models as informational
+  thinking traces rather than reasoning faults; report an unclosed trace as
+  ownership-neutral incomplete thinking while preserving existing cutoff and
+  output-contract verdicts.
+- Pin the repo-local Markdownlint version exactly so fresh CI and worktree npm
+  installs cannot drift beyond the version required by the static-quality test;
+  keep opt-in tooling updates exact as they advance that pin.
 - Track whether metadata was actually injected into the prompt, keep triage
   quality classification independent of metadata agreement, and preserve
   exception traceback origins so root mlx-vlm failures followed by MLX cleanup
