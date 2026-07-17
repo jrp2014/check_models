@@ -3057,8 +3057,8 @@ class TestMarkdownGalleryReport:
         assert "## Model Output and Cost Summary" in content
         assert "## Model Quality Summary" not in content
         assert "## All Model Output and Cost Summary" not in content
-        assert "<!-- markdownlint-disable MD034 -->" in content
-        assert "<!-- markdownlint-enable MD034 -->" in content
+        assert "<!-- markdownlint-disable MD034 MD049 -->" in content
+        assert "<!-- markdownlint-enable MD034 MD049 -->" in content
         assert "<!-- markdownlint-disable MD013 MD034 -->" not in content
         assert "<!-- markdownlint-enable MD013" not in content
 
@@ -3090,7 +3090,9 @@ class TestMarkdownGalleryReport:
         tmp_path: Path,
     ) -> None:
         """The gallery summary should let the generation token limit bound output."""
-        complete_text = "BEGIN " + ("distinct middle evidence " * 30) + "END-SENTINEL"
+        complete_text = (
+            "**BEGIN:** *model emphasis* " + ("distinct middle evidence " * 30) + "END-SENTINEL"
+        )
         result = PerformanceResult(
             model_name="org/complete-output",
             success=True,
@@ -3124,6 +3126,7 @@ class TestMarkdownGalleryReport:
         assert "BEGIN" in summary
         assert "END-SENTINEL" in summary
         assert "[tail]" not in summary
+        assert "<!-- markdownlint-disable MD034 MD049 -->" in summary
         assert "Gen tok" in summary
         assert "Peak GB" in summary
         assert "Quality signal" in summary
