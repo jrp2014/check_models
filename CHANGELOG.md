@@ -7,6 +7,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Classify documented delimiters from known thinking models as informational
+  thinking traces rather than reasoning faults; report an unclosed trace as
+  ownership-neutral incomplete thinking while preserving existing cutoff and
+  output-contract verdicts.
 - Track whether metadata was actually injected into the prompt, keep triage
   quality classification independent of metadata agreement, and preserve
   exception traceback origins so root mlx-vlm failures followed by MLX cleanup

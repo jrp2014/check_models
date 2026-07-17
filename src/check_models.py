@@ -7366,6 +7366,14 @@ class GenerationQualityAnalysis:
             if self.keyword_duplication_ratio is not None
             else "Keyword duplication"
         )
+        thinking_marker = (
+            self.thinking_trace_markers[0] if self.thinking_trace_markers else "marker"
+        )
+        thinking_trace_label = (
+            f"Thinking trace incomplete (expected model protocol; opened with {thinking_marker})"
+            if self.thinking_trace_incomplete
+            else f"Thinking trace present (expected model protocol; {thinking_marker})"
+        )
 
         scalar_issues = [
             (
@@ -7427,6 +7435,7 @@ class GenerationQualityAnalysis:
                     else "Reasoning leak"
                 ),
             ),
+            (self.has_thinking_trace, thinking_trace_label),
             (self.has_context_echo, f"Context echo ({self.context_echo_ratio:.0%} overlap)"),
             (self.instruction_echo, "Instruction echo"),
             (self.metadata_borrowing, "Unverified context copy"),
@@ -12183,6 +12192,10 @@ def _review_analysis_focus_parts(analysis: GenerationQualityAnalysis) -> list[st
         parts.append(f"context echo={analysis.context_echo_ratio:.0%}")
     if analysis.has_reasoning_leak:
         parts.append("reasoning leak")
+    if analysis.thinking_trace_incomplete:
+        parts.append("thinking trace incomplete")
+    elif analysis.has_thinking_trace:
+        parts.append("thinking trace present")
     if analysis.text_sanity_issue_type is not None:
         parts.append(f"text-sanity={analysis.text_sanity_issue_type}")
     if analysis.formatting_issues:
@@ -12590,6 +12603,19 @@ def _summarize_reasoning_leak_signal(qa: GenerationQualityAnalysis) -> str | Non
             f"({', '.join(qa.reasoning_leak_markers[:2])})."
         )
     return "Output leaked reasoning or prompt-template text."
+
+
+def _summarize_thinking_trace_signal(qa: GenerationQualityAnalysis) -> str | None:
+    """Describe an expected thinking protocol without assigning fault."""
+    if not qa.has_thinking_trace:
+        return None
+    marker = qa.thinking_trace_markers[0] if qa.thinking_trace_markers else "start marker"
+    if qa.thinking_trace_incomplete:
+        return (
+            "Thinking trace incomplete: the expected model protocol opened with "
+            f"{marker} but did not close, so no separable final answer was produced."
+        )
+    return f"Thinking trace present as expected for this model protocol ({marker})."
 
 
 def _summarize_context_echo_signal(qa: GenerationQualityAnalysis) -> str | None:
@@ -15309,6 +15335,7 @@ def _summarize_quality_signals(qa: GenerationQualityAnalysis | None) -> list[str
         _summarize_formatting_signal,
         _summarize_missing_sections_signal,
         _summarize_reasoning_leak_signal,
+        _summarize_thinking_trace_signal,
         _summarize_context_echo_signal,
     )
     messages = [message for builder in signal_builders if (message := builder(qa)) is not None]
@@ -17644,7 +17671,13 @@ def _model_selection_score(result: PerformanceResult) -> float:
     elif review["user_bucket"] == "caveat":
         score -= 25.0
 
-    if labels & {"harness", "reasoning_leak", "generation_loop", "repetitive"}:
+    if labels & {
+        "harness",
+        "reasoning_leak",
+        "thinking_incomplete",
+        "generation_loop",
+        "repetitive",
+    }:
         score -= 35.0
     if labels & {"formatting", "cutoff", "text_sanity", "lang_mixing"}:
         score -= 20.0
@@ -18248,12 +18281,18 @@ def _is_review_escalation(result: PerformanceResult) -> bool:
     analysis = _quality_analysis_for_result(result)
     if analysis is None:
         return result.error_package is not None
-    if analysis.has_harness_issue or analysis.has_reasoning_leak or analysis.has_degeneration:
+    if (
+        analysis.has_harness_issue
+        or analysis.has_reasoning_leak
+        or analysis.thinking_trace_incomplete
+        or analysis.has_degeneration
+    ):
         return True
     if analysis.formatting_issues or analysis.has_excessive_bullets or analysis.has_context_echo:
         return True
     return any(
-        "long_context" in evidence or evidence in {"reasoning_leak", "formatting"}
+        "long_context" in evidence
+        or evidence in {"reasoning_leak", "thinking_incomplete", "formatting"}
         for evidence in review["evidence"]
     )
 
@@ -18848,6 +18887,7 @@ def _model_capability_recommendation(
                 "runtime",
                 "repetitive",
                 "reasoning-leak",
+                "thinking-incomplete",
                 "weight-mismatch",
                 "processor-error",
                 "model-error",
@@ -22257,6 +22297,8 @@ def _preview_generation(
         log_warning_note(f"Missing sections: {missing}")
     if analysis.has_reasoning_leak:
         log_warning_note("Reasoning/prompt text leaked into output")
+    if analysis.thinking_trace_incomplete:
+        log_warning_note("Expected thinking trace did not reach a final answer")
     if analysis.has_context_echo:
         log_warning_note(f"Context echo ({analysis.context_echo_ratio:.0%} overlap)")
     if analysis.has_harness_issue:
@@ -23775,6 +23817,9 @@ def _format_quality_analysis_for_log(analysis: GenerationQualityAnalysis) -> str
     reasoning_marker = (
         analysis.reasoning_leak_markers[0] if analysis.reasoning_leak_markers else "marker"
     )
+    thinking_marker = (
+        analysis.thinking_trace_markers[0] if analysis.thinking_trace_markers else "marker"
+    )
     parts_raw: tuple[str | None, ...] = (
         _format_repetitive_quality_log_part(analysis),
         _format_refusal_quality_log_part(analysis),
@@ -23819,6 +23864,15 @@ def _format_quality_analysis_for_log(analysis: GenerationQualityAnalysis) -> str
             "reasoning_leak",
             analysis.has_reasoning_leak,
             detail=reasoning_marker,
+        ),
+        _format_quality_log_flag(
+            "thinking_trace",
+            analysis.has_thinking_trace,
+            detail=thinking_marker,
+        ),
+        _format_quality_log_flag(
+            "thinking_incomplete",
+            analysis.thinking_trace_incomplete,
         ),
         _format_quality_log_flag(
             "context_echo",
@@ -23911,6 +23965,14 @@ def _build_quality_issues_string(analysis: GenerationQualityAnalysis) -> str | N
             keyword_duplication_label,
         ),
         (analysis.has_reasoning_leak, "reasoning-leak"),
+        (
+            analysis.thinking_trace_incomplete,
+            "thinking-incomplete",
+        ),
+        (
+            analysis.has_thinking_trace and not analysis.thinking_trace_incomplete,
+            "thinking-trace",
+        ),
         (analysis.has_context_echo, f"context-echo({analysis.context_echo_ratio:.2f})"),
         (analysis.instruction_echo, "instruction-echo"),
         (analysis.metadata_borrowing, "unverified-context-copy"),
@@ -23959,6 +24021,8 @@ QUALITY_ISSUE_PATTERNS: Final[dict[str, re.Pattern[str]]] = {
     "keyword_count": re.compile(r"\bkeyword-count\b", re.IGNORECASE),
     "keyword_duplication": re.compile(r"\bkeyword-duplication\b", re.IGNORECASE),
     "reasoning_leak": re.compile(r"\breasoning-leak\b", re.IGNORECASE),
+    "thinking_incomplete": re.compile(r"\bthinking-incomplete\b", re.IGNORECASE),
+    "thinking_trace": re.compile(r"\bthinking-trace\b", re.IGNORECASE),
     "context_echo": re.compile(r"\bcontext-echo\b", re.IGNORECASE),
     "instruction_echo": re.compile(r"\binstruction-echo\b", re.IGNORECASE),
     "metadata_borrowing": re.compile(r"\bmetadata-borrowing\b", re.IGNORECASE),
@@ -23990,6 +24054,7 @@ QUALITY_BREAKING_LABELS: Final[frozenset[str]] = frozenset(
         "context_ignored",
         "missing_sections",
         "reasoning_leak",
+        "thinking_incomplete",
         "context_echo",
         "instruction_echo",
         "metadata_borrowing",
@@ -24124,11 +24189,18 @@ def _populate_result_quality_analysis(
 
     text = str(getattr(result.generation, "text", ""))
     needs_metadata_refresh = bool(metadata) and result.metadata_agreement is None
+    needs_thinking_refresh = False
 
     cached_analysis = _quality_analysis_for_result(result)
     if cached_analysis is not None:
         needs_prompt_refresh = bool(prompt) and not cached_analysis.prompt_checks_ran
-        if not needs_prompt_refresh:
+        refreshed_reasoning = _detect_reasoning_output(text, model_name=result.model_name)
+        needs_thinking_refresh = (
+            cached_analysis.has_reasoning_leak
+            and not cached_analysis.has_thinking_trace
+            and refreshed_reasoning.has_thinking_trace
+        )
+        if not needs_prompt_refresh and not needs_thinking_refresh:
             metadata_agreement = result.metadata_agreement
             if needs_metadata_refresh:
                 metadata_agreement = compute_metadata_agreement(text, metadata)
@@ -24166,7 +24238,7 @@ def _populate_result_quality_analysis(
         context_marker=context_marker,
         model_name=result.model_name,
     )
-    if cached_analysis is not None:
+    if cached_analysis is not None and not needs_thinking_refresh:
         cached_quality_issues = result.quality_issues or _build_quality_issues_string(
             cached_analysis,
         )
@@ -24178,7 +24250,7 @@ def _populate_result_quality_analysis(
         metadata_agreement = compute_metadata_agreement(text, metadata)
     analysis = _apply_metadata_alignment_to_analysis(analysis, metadata_agreement)
     quality_issues = _build_quality_issues_string(analysis)
-    if result.quality_issues and metadata_agreement is None:
+    if result.quality_issues and metadata_agreement is None and not needs_thinking_refresh:
         quality_issues = result.quality_issues
 
     return replace(
@@ -24226,6 +24298,13 @@ def _build_result_output_cues(result: PerformanceResult) -> list[str]:
         ("cutoff", "cutoff", None, "cutoff"),
         ("context_budget", "context-budget", None, "context_budget"),
         ("reasoning_leak", "reasoning-leak", "has_reasoning_leak", None),
+        (
+            "thinking_incomplete",
+            "thinking-incomplete",
+            "thinking_trace_incomplete",
+            None,
+        ),
+        ("thinking_trace", "thinking-trace", None, None),
         ("degeneration", "degeneration", "has_degeneration", None),
         ("context_ignored", "context-ignored", "is_context_ignored", None),
         ("refusal", "refusal", "is_refusal", None),

@@ -301,6 +301,7 @@ def test_analyze_generation_text_treats_expected_thinking_trace_as_information()
     assert analysis.thinking_trace_markers == ["◁think▷", "◁/think▷"]
     assert analysis.has_reasoning_leak is False
     assert analysis.verdict == "clean"
+    assert check_models._build_quality_issues_string(analysis) == "thinking-trace"
 
 
 def test_analyze_generation_text_flags_unclosed_expected_thinking_trace() -> None:
@@ -327,6 +328,24 @@ def test_analyze_generation_text_flags_unclosed_expected_thinking_trace() -> Non
     assert "thinking_incomplete" in analysis.evidence
     assert analysis.verdict == "cutoff_degraded"
     assert analysis.user_bucket == "avoid"
+    quality_issues = check_models._build_quality_issues_string(analysis) or ""
+    assert "thinking-incomplete" in quality_issues
+    assert "reasoning-leak" not in quality_issues
+
+
+def test_format_quality_analysis_for_log_distinguishes_incomplete_thinking() -> None:
+    """Compact logs should preserve informational and incomplete trace states."""
+    analysis = check_models.analyze_generation_text(
+        "◁think▷Inspecting the image step by step.",
+        generated_tokens=20,
+        model_name="org/Kimi-VL-Thinking",
+    )
+
+    quality_log = check_models._format_quality_analysis_for_log(analysis)
+
+    assert "thinking_trace=True (◁think▷)" in quality_log
+    assert "thinking_incomplete=True" in quality_log
+    assert "reasoning_leak" not in quality_log
 
 
 def test_analyze_generation_text_detects_context_echo() -> None:

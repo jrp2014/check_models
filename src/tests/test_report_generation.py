@@ -6259,3 +6259,42 @@ class TestIssueDirectoryInvariants:
         issue_files = list(issues_dir.glob("issue_*.md"))
         assert issue_files == [], f"Expected no issue files, found {issue_files}"
         assert (issues_dir / "index.md").exists()
+
+
+def test_quality_signal_summary_reports_incomplete_thinking_without_fault_language() -> None:
+    """Developer prose should describe an unfinished expected thinking protocol."""
+    analysis = check_models.analyze_generation_text(
+        "◁think▷Inspecting the image step by step.",
+        generated_tokens=500,
+        requested_max_tokens=500,
+        model_name="mlx-community/Kimi-VL-A3B-Thinking-8bit",
+    )
+
+    summary = " ".join(check_models._summarize_quality_signals(analysis))
+
+    assert "Thinking trace incomplete" in summary
+    assert "expected model protocol" in summary
+    assert "leaked reasoning" not in summary
+
+
+def test_cached_thinking_model_analysis_is_refreshed_with_model_protocol() -> None:
+    """Legacy cached reasoning labels should be reclassified for thinking models."""
+    text = "◁think▷Inspecting the image step by step."
+    legacy_analysis = check_models.analyze_generation_text(text, generated_tokens=500)
+    result = PerformanceResult(
+        model_name="mlx-community/Kimi-VL-A3B-Thinking-8bit",
+        success=True,
+        generation=_MockGeneration(text=text, generation_tokens=500),
+        quality_analysis=legacy_analysis,
+        quality_issues="reasoning-leak",
+        requested_max_tokens=500,
+    )
+
+    refreshed = check_models._populate_result_quality_analysis(result)
+
+    assert refreshed.quality_analysis is not None
+    assert refreshed.quality_analysis.has_thinking_trace is True
+    assert refreshed.quality_analysis.thinking_trace_incomplete is True
+    assert refreshed.quality_analysis.has_reasoning_leak is False
+    assert "thinking-incomplete" in (refreshed.quality_issues or "")
+    assert "reasoning-leak" not in (refreshed.quality_issues or "")

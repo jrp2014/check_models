@@ -68,7 +68,7 @@ def test_analyze_generation_text_treats_expected_thinking_trace_as_information()
 
 def test_analyze_generation_text_flags_unclosed_expected_thinking_trace() -> None:
     prompt = (
-        "Return exactly these sections:\n"
+        "Return exactly these three sections:\n"
         "Title: 5-10 words.\nDescription: 1-2 sentences.\nKeywords: 10-18 terms."
     )
     analysis = check_models.analyze_generation_text(
