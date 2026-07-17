@@ -247,15 +247,18 @@ The tool generates multiple report formats in `output/` by default:
 - **Model Selection** (`reports/model_selection.md`): Ranked shortlist for brief-caption
   and structured title/description/keywords decisions. This is not the complete run.
 - **Gallery Markdown** (`reports/model_gallery.md`): Complete evidence-only artifact with
-  image metadata, the full prompt, summary tables, diagnostics, and one full-output
-  section for every attempted model.
+  image metadata, the full prompt, one consolidated output/cost/quality summary
+  that retains complete successful output, diagnostics, and one structured
+  full-output section for every attempted model.
 - **Review Markdown** (`reports/review.md`): Short automated digest grouped by likely owner and user-facing utility bucket.
 - **TSV/JSONL** (`reports/results.tsv`, `results.jsonl`): Machine-readable per-model formats for analysis.
 - **Run JSON** (`run.json`): Stable run-level machine contract with mode, grounding, counts, versions, and artifact paths.
 - **Diagnostics** (`reports/diagnostics.md`): Self-contained, issue-ready mlx-vlm
-  report with bounded evidence and native reproduction commands. Definite crashes
-  are reported as outcomes; package ownership and confidence remain cautious
-  triage. Model/config observations are separated from the mlx-vlm issue matrix.
+  report with native reproduction commands and complete affected-model output in
+  per-model expandable evidence blocks. Definite crashes are reported as outcomes;
+  traceback evidence remains bounded, package ownership and confidence remain
+  cautious triage, and model/config observations stay separate from the mlx-vlm
+  issue matrix.
 - **Log** (`check_models.log`): Canonical comprehensive run artifact, including the full per-model review block and full output/captured failure output.
 - **History** (`results.history.jsonl`): Append-only run history for regressions/recoveries.
 - **Issue templates** (`issues/`): Ready-to-file GitHub issue markdown for clustered
@@ -1135,6 +1138,7 @@ GitHub-compatible qualitative review artifact with:
 
 - Populated image metadata fields when present (title, description, keywords, date, time, GPS)
 - The full prompt in a fenced `text` block
+- One consolidated output/cost/quality summary with complete successful model output
 - One easy-to-scan section per model with full generated output
 - Existing success/failure gallery formatting reused from the main report path
 

@@ -737,7 +737,7 @@ def test_published_failure_artifacts_match_canonical_runtime_triage() -> None:
         record for record in records if record.get("_type") == "result" and not record["success"]
     ]
 
-    assert failures
+    assert any(record.get("_type") == "result" for record in records)
     diagnostics = (output_dir / "reports/diagnostics.md").read_text(encoding="utf-8")
     review_report = (output_dir / "reports/review.md").read_text(encoding="utf-8")
     gallery = (output_dir / "reports/model_gallery.md").read_text(encoding="utf-8")
@@ -3755,6 +3755,7 @@ class TestDiagnosticsReport:
 
         content = output.read_text(encoding="utf-8")
         assert "## mlx-vlm / MLX Issue Matrix" in content
+        assert "- _Image:_ path/to/repro-image.jpg\n\n## mlx-vlm / MLX Issue Matrix" in content
         assert "## Expected and Actual Behaviour" in content
         assert "python -m mlx_vlm.generate" in content
         assert "issues/index.md" not in content

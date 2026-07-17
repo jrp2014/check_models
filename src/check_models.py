@@ -16683,6 +16683,7 @@ def generate_diagnostics_report(
             image_path=image_path,
         )
     )
+    parts.append("")
     parts.extend(_diagnostics_crash_matrix(failed))
     parts.extend(_diagnostics_issue_matrix(mlx_vlm_clusters))
     parts.extend(

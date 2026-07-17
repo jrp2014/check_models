@@ -9,6 +9,11 @@ Notable changes to this project will be documented in this file.
 
 - Bump the package version to `0.8.6` to establish the release baseline before
   refining complete model-output evidence in gallery and diagnostics reports.
+- Consolidate duplicate gallery summaries without shortening successful model
+  output, and retain complete affected-model output in expandable diagnostics
+  evidence blocks.
+- Allow the published-artifact audit to validate successful benchmark snapshots
+  that contain no model failures.
 - Make suppression auditing require evidence for every listed checker code and
   remove a redundant broad-exception suppression from deterministic runtime
   fingerprinting.

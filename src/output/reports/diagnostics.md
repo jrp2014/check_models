@@ -13,6 +13,7 @@ Test image: `cats.jpg` (0.2 MB).
 - _Completed:_ 61
 - _Prompt:_ Describe this image briefly.
 - _Image:_ cats.jpg
+
 ## mlx-vlm / MLX Issue Matrix
 
 Routing labels reflect evidence confidence only; a crash remains a conclusive
