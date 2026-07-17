@@ -191,6 +191,126 @@ def test_tsv_uses_shared_output_preview_cues_and_tail_marker(tmp_path: Path) -> 
     assert "TRAILING-SIGNAL" in data_row
 
 
+def test_tsv_includes_canonical_prompt_burden_scalars(tmp_path: Path) -> None:
+    """TSV should expose the same burden classification and measured dimensions."""
+    prompt = "Describe this image briefly."
+    analysis = check_models.analyze_generation_text(
+        "Cat.",
+        generated_tokens=3,
+        prompt_tokens=4103,
+        prompt=prompt,
+    )
+    result = check_models.PerformanceResult(
+        model_name="test/visual-heavy",
+        success=True,
+        generation=MockGenerationResult(
+            text="Cat.",
+            prompt_tokens=4103,
+            generation_tokens=3,
+        ),
+        quality_analysis=analysis,
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            image_placeholder_count=1,
+            processed_image_width=512,
+            processed_image_height=384,
+            image_patch_count=4,
+        ),
+    )
+    output_file = tmp_path / "burden.tsv"
+
+    check_models.generate_tsv_report([result], output_file)
+    record = _read_tsv_record(output_file)
+
+    assert record["prompt_burden_kind"] == "visual_input"
+    assert record["prompt_burden_source"] == "estimated_nontext"
+    assert record["processed_image_width"] == "512"
+    assert record["processed_image_height"] == "384"
+    assert record["image_patch_count"] == "4"
+
+
+def test_tsv_includes_canonical_enrichment_compatibility_and_owner(tmp_path: Path) -> None:
+    """TSV should expose the same additive facts as JSONL and history."""
+    prompt = "Create title, description, and keywords."
+    result = check_models.PerformanceResult(
+        model_name="test/enriched",
+        success=True,
+        generation=MockGenerationResult(
+            text="Title: Cat. Description: A cat on a chair. Keywords: cat, chair.",
+            prompt_tokens=4100,
+            generation_tokens=18,
+        ),
+        quality_analysis=check_models.analyze_generation_text(
+            "Title: Cat. Description: A cat on a chair. Keywords: cat, chair.",
+            generated_tokens=18,
+            prompt_tokens=4100,
+            prompt=prompt,
+        ),
+        prompt_diagnostics=check_models.PromptDiagnostics(image_placeholder_count=1),
+        metadata_agreement=check_models.MetadataAgreementMetrics(
+            overall_score=88.0,
+            context_integration_score=81.0,
+            draft_improvement_score=72.0,
+            visual_description_score=91.0,
+            assisted_enrichment_score=84.0,
+        ),
+    )
+    context = check_models._build_report_render_context(
+        results=[result],
+        prompt=prompt,
+        metadata={"description": "A cat on a chair."},
+        eval_mode="assisted",
+    )
+    output_file = tmp_path / "aligned.tsv"
+
+    check_models.generate_tsv_report([result], output_file, report_context=context)
+    record = _read_tsv_record(output_file)
+
+    assert record["compatibility_status"] == "clean"
+    assert record["context_integration_score"] == "81"
+    assert record["draft_improvement_score"] == "72"
+    assert record["visual_description_score"] == "91"
+    assert record["assisted_enrichment_score"] == "84"
+    assert record["prompt_burden_kind"] == "visual_input"
+    assert record["prompt_burden_source"] == "estimated_nontext"
+    assert record["owner_confidence"] in {"high", "medium", "low"}
+
+
+def test_tsv_uses_canonical_mixed_owner_failure_confidence(tmp_path: Path) -> None:
+    """TSV confidence should match the canonical wrapped-failure narrative."""
+    result = check_models.PerformanceResult(
+        model_name="org/mixed-owner",
+        generation=None,
+        success=False,
+        error_message="wrapped generation failure",
+        error_package="mlx-vlm",
+        exception_chain=(
+            check_models.FailureException(
+                "RuntimeError",
+                "mlx.core",
+                "kIOGPUCommandBufferCallbackErrorOutOfMemory",
+            ),
+            check_models.FailureException(
+                "ValueError",
+                "builtins",
+                "mlx_vlm/generate.py wrapped generation failure",
+            ),
+        ),
+    )
+    context = check_models._build_report_render_context(
+        results=[result],
+        prompt="Describe the image.",
+        eval_mode="blind",
+    )
+    output_file = tmp_path / "failure.tsv"
+
+    check_models.generate_tsv_report([result], output_file, report_context=context)
+    record = _read_tsv_record(output_file)
+    narrative = check_models._build_failure_narrative(result)
+
+    assert narrative.owner_confidence == "low"
+    assert record["owner_confidence"] == narrative.owner_confidence
+
+
 def test_tsv_empty_results(tmp_path: Path) -> None:
     """Should handle empty results list gracefully."""
     results: list[check_models.PerformanceResult] = []

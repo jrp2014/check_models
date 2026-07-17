@@ -369,8 +369,8 @@ def test_build_prompt_includes_metadata_fields() -> None:
     assert "2025-10-01" in prompt
     assert "18:30" in prompt
     assert "51.0N, 0.9W" in prompt
-    assert "high confidence" in prompt
-    assert "use only when visually confirmed" in prompt
+    assert "Draft descriptive metadata:" in prompt
+    assert "Treat this draft as fallible" in prompt
     assert "Do not copy context hints verbatim." not in prompt
 
 
@@ -396,11 +396,11 @@ def test_build_prompt_truncates_long_metadata_fields() -> None:
     assert long_desc not in prompt
     assert long_keywords not in prompt
     assert "..." in prompt
-    assert "Keyword hints:" in prompt
+    assert "Existing keywords:" in prompt
 
 
-def test_build_prompt_no_context_when_no_description() -> None:
-    """Prompt without description/title/keywords should omit 'Context:' block."""
+def test_build_prompt_date_only_uses_authoritative_context() -> None:
+    """Capture dates should be presented as authoritative context."""
     meta: dict[str, str | None] = {"date": "2025-01-01"}
     prompt = _build_cataloguing_prompt(meta)
-    assert "Context:" not in prompt
+    assert "Context: Authoritative context:" in prompt

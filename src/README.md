@@ -240,7 +240,8 @@ python -m check_models \
 The tool generates multiple report formats in `output/` by default:
 
 - **CLI**: Real-time colorized progress and metrics.
-- **HTML** (`reports/results.html`): Interactive table with sortable columns and failed row highlighting.
+- **HTML** (`reports/results.html`): Retained complete, self-contained report with
+  sortable rows, failed-row highlighting, recommendations, and full run context.
 - **Markdown** (`reports/results.md`): Mode-aware public run index with links to canonical
   evidence, model-selection, and review artifacts.
 - **Model Selection** (`reports/model_selection.md`): Ranked shortlist for brief-caption
@@ -251,9 +252,10 @@ The tool generates multiple report formats in `output/` by default:
 - **Review Markdown** (`reports/review.md`): Short automated digest grouped by likely owner and user-facing utility bucket.
 - **TSV/JSONL** (`reports/results.tsv`, `results.jsonl`): Machine-readable per-model formats for analysis.
 - **Run JSON** (`run.json`): Stable run-level machine contract with mode, grounding, counts, versions, and artifact paths.
-- **Diagnostics** (`reports/diagnostics.md`): Failure-, text-sanity-, and
-  compatibility-focused issue report (generated when failures, harness issues,
-  semantic/text-sanity issues, or preflight compatibility warnings are present).
+- **Diagnostics** (`reports/diagnostics.md`): Self-contained, issue-ready mlx-vlm
+  report with bounded evidence and native reproduction commands. Definite crashes
+  are reported as outcomes; package ownership and confidence remain cautious
+  triage. Model/config observations are separated from the mlx-vlm issue matrix.
 - **Log** (`check_models.log`): Canonical comprehensive run artifact, including the full per-model review block and full output/captured failure output.
 - **History** (`results.history.jsonl`): Append-only run history for regressions/recoveries.
 - **Issue templates** (`issues/`): Ready-to-file GitHub issue markdown for clustered
@@ -265,6 +267,15 @@ The tool generates multiple report formats in `output/` by default:
 The main Markdown report stays brief and points readers to `model_selection.md`,
 `model_gallery.md`, `review.md`, and `check_models.log` for decisions, evidence,
 automated review, and the canonical run trace.
+
+The output index labels the primary artifacts for the current run:
+`diagnostics.md`, the retained `results.html`, `model_selection.md`,
+`model_gallery.md`, and `results.jsonl`. Supporting artifacts provide alternate
+views, compact tables, capability/history summaries, and generated issue or repro
+indexes; they do not replace the primary evidence. `model_selection.md` is a
+single-image shortlist. Capability wording in `model_capabilities.md` combines
+the current run with compatible, lane-matched history and must not be read as a
+claim based on the current image alone.
 
 ### Metrics Explained
 
@@ -560,7 +571,7 @@ If you prefer to install dependencies manually (ensure these match `pyproject.to
 
 <!-- MANUAL_INSTALL_START -->
 ```bash
-pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.2" "mlx-lm>=0.31.3" "mlx-vlm>=0.6.2" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=12.2.0" "PyYAML>=6.0" "rich>=14.1.0" "tabulate>=0.9.0" "transformers>=5.7.0" "wcwidth>=0.2.13"
+pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.2" "mlx-lm>=0.31.3" "mlx-vlm>=0.6.2" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=12.3.0" "PyYAML>=6.0" "rich>=14.1.0" "tabulate>=0.9.0" "transformers>=5.7.0" "wcwidth>=0.2.13"
 ```
 <!-- MANUAL_INSTALL_END -->
 
@@ -718,7 +729,7 @@ Runtime (installed automatically via `pip install -e .` when executed inside `sr
 | Core tensor/runtime | `mlx` | `>=0.31.2` |
 | Vision‑language utilities | `mlx-vlm` | `>=0.6.2` |
 | Transformer compatibility surface | `transformers` | `>=5.7.0` |
-| Image processing & loading | `Pillow[xmp]` | `>=12.2.0` |
+| Image processing & loading | `Pillow[xmp]` | `>=12.3.0` |
 | Safe XMP/XML parsing | `defusedxml` | `>=0.7.1` |
 | Model cache / discovery | `huggingface-hub` | `>=1.10.1` |
 | PEP 440 version parsing | `packaging` | `>=26.0` |
@@ -768,7 +779,7 @@ Development / QA:
 
 <!-- MINIMAL_INSTALL_START -->
 ```bash
-pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.2" "mlx-lm>=0.31.3" "mlx-vlm>=0.6.2" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=12.2.0" "PyYAML>=6.0" "rich>=14.1.0" "tabulate>=0.9.0" "transformers>=5.7.0" "wcwidth>=0.2.13"
+pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.2" "mlx-lm>=0.31.3" "mlx-vlm>=0.6.2" "numpy>=2.1.0" "packaging>=26.0" "Pillow[xmp]>=12.3.0" "PyYAML>=6.0" "rich>=14.1.0" "tabulate>=0.9.0" "transformers>=5.7.0" "wcwidth>=0.2.13"
 ```
 <!-- MINIMAL_INSTALL_END -->
 
@@ -952,6 +963,19 @@ historical comparisons never combine observations from different lanes.
 keywords are available and `blind` otherwise. `stress` and `quality` remain
 deprecated input aliases for compatibility, not additional lanes: both resolve
 to `assisted` or `blind`; `quality` retains its 1000-token default.
+
+Blind and assisted scores answer different questions and are never pooled.
+Blind scoring measures unaided cataloguing against held-out evidence. Assisted
+scoring measures whether a model integrates authoritative context and improves
+fallible draft metadata while remaining visually grounded. Location and capture
+context are authoritative inputs when available; existing title, description,
+and keywords are LLM-editable draft metadata, not ground truth.
+
+Prompt burden is reported independently from quality as `visual input` (image or
+estimated non-text tokens dominate), `text` (text tokens dominate), `mixed`
+(both materially contribute), `normal`, or `unavailable` when the upstream stack
+does not expose enough component measurements. Estimates stay labelled as
+estimates; missing components remain `null` rather than being inferred as normal.
 
 ```bash
 # Compare models without exposing any existing metadata to them

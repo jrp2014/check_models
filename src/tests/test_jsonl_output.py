@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 import json
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, cast
@@ -60,6 +61,7 @@ class MockGeneration:
     time: float | None = None
     active_memory: float | None = None
     cache_memory: float | None = None
+    quality_analysis: object | None = None
 
 
 def _history_run(
@@ -622,6 +624,31 @@ def test_save_jsonl_report_includes_root_exception_fields(tmp_path: Path) -> Non
     assert data.get("root_error_message") == "upstream shape mismatch"
 
 
+def test_save_jsonl_report_includes_exception_chain_in_chronological_order(
+    tmp_path: Path,
+) -> None:
+    """Exception chains serialize additively from root cause to outer wrapper."""
+    output_file = tmp_path / "results.jsonl"
+    result = PerformanceResult(
+        model_name="failed-model",
+        generation=None,
+        success=False,
+        error_message="generation failed",
+        exception_chain=(
+            check_models.FailureException("IndexError", "builtins", "bad token"),
+            check_models.FailureException("ValueError", "builtins", "generation failed"),
+        ),
+    )
+
+    save_jsonl_report([result], output_file, prompt="test", system_info={})
+    _header, rows = _read_jsonl(output_file)
+
+    assert rows[0].get("exception_chain") == [
+        {"type": "IndexError", "module": "builtins", "message": "bad token"},
+        {"type": "ValueError", "module": "builtins", "message": "generation failed"},
+    ]
+
+
 def test_save_jsonl_report_includes_prompt_diagnostics(tmp_path: Path) -> None:
     """Rendered prompt diagnostics should be optional JSONL metadata."""
     output_file = tmp_path / "results.jsonl"
@@ -637,6 +664,9 @@ def test_save_jsonl_report_includes_prompt_diagnostics(tmp_path: Path) -> None:
             rendered_prompt_preview="<image> Describe this.",
             rendered_prompt_chars=22,
             image_placeholder_count=1,
+            processed_image_width=512,
+            processed_image_height=384,
+            image_patch_count=4,
             eos_token_id=151645,
             special_token_ids=(151645,),
             special_tokens=("<|end|>",),
@@ -656,11 +686,236 @@ def test_save_jsonl_report_includes_prompt_diagnostics(tmp_path: Path) -> None:
     )
     assert prompt_diagnostics["rendered_prompt_hash_sha256"] == "abc123"
     assert prompt_diagnostics["image_placeholder_count"] == 1
+    assert prompt_diagnostics["processed_image_width"] == 512
+    assert prompt_diagnostics["processed_image_height"] == 384
+    assert prompt_diagnostics["image_patch_count"] == 4
     assert prompt_diagnostics["special_tokens"] == ["<|end|>"]
     assert prompt_diagnostics["generate_kwargs"] == {
         "max_tokens": 500,
         "quantized_kv_start": check_models.DEFAULT_QUANTIZED_KV_START,
     }
+
+
+def test_save_jsonl_report_includes_canonical_prompt_burden(tmp_path: Path) -> None:
+    output_file = tmp_path / "results.jsonl"
+    prompt = "Describe this image briefly."
+    analysis = check_models.analyze_generation_text(
+        "Cat.",
+        generated_tokens=3,
+        prompt_tokens=4103,
+        prompt=prompt,
+    )
+    result = PerformanceResult(
+        model_name="org/visual-heavy",
+        generation=MockGeneration(
+            text="Cat.",
+            prompt_tokens=4103,
+            generation_tokens=3,
+        ),
+        success=True,
+        quality_analysis=analysis,
+        prompt_diagnostics=check_models.PromptDiagnostics(image_placeholder_count=1),
+    )
+
+    save_jsonl_report([result], output_file, prompt=prompt, system_info={})
+    _header, rows = _read_jsonl(output_file)
+
+    review = _require_present(rows[0].get("review"), field_name="review")
+    assert review["prompt_burden_kind"] == "visual_input"
+    assert review["prompt_burden_source"] == "estimated_nontext"
+
+
+def test_jsonl_and_history_include_canonical_cross_artifact_facts(tmp_path: Path) -> None:
+    """Additive machine fields should mirror recommendation, burden, and owner facts."""
+    output_file = tmp_path / "results.jsonl"
+    history_file = tmp_path / "results.history.jsonl"
+    prompt = "Create title, description, and keywords."
+    analysis = check_models.analyze_generation_text(
+        "Title: Cat\nDescription: A cat rests on a chair.\nKeywords: cat, chair",
+        generated_tokens=18,
+        prompt_tokens=4100,
+        prompt=prompt,
+    )
+    result = PerformanceResult(
+        model_name="org/enriched",
+        generation=MockGeneration(
+            text="Title: Cat\nDescription: A cat rests on a chair.\nKeywords: cat, chair",
+            prompt_tokens=4100,
+            generation_tokens=18,
+        ),
+        success=True,
+        quality_analysis=analysis,
+        prompt_diagnostics=check_models.PromptDiagnostics(image_placeholder_count=1),
+        metadata_agreement=MetadataAgreementMetrics(
+            overall_score=88.0,
+            context_integration_score=81.0,
+            draft_improvement_score=72.0,
+            visual_description_score=91.0,
+            assisted_enrichment_score=84.0,
+        ),
+    )
+    context = check_models._build_report_render_context(
+        results=[result],
+        prompt=prompt,
+        metadata={"description": "A cat rests on a chair."},
+        eval_mode="assisted",
+    )
+
+    save_jsonl_report(
+        [result],
+        output_file,
+        prompt=prompt,
+        system_info={},
+        eval_mode="assisted",
+        metadata_exposed_to_prompt=True,
+        report_context=context,
+    )
+    history = append_history_record(
+        history_path=history_file,
+        results=[result],
+        prompt=prompt,
+        system_info={},
+        library_versions={},
+        eval_mode="assisted",
+        report_context=context,
+    )
+    header, rows = _read_jsonl(output_file)
+    row = rows[0]
+    history_row = history["model_results"]["org/enriched"]
+
+    assert header["format_version"] == "2.0"
+    assert history["format_version"] == "1.0"
+    for machine_row in (row, history_row):
+        assert machine_row["compatibility_status"] == "clean"
+        assert machine_row["context_integration_score"] == 81.0
+        assert machine_row["draft_improvement_score"] == 72.0
+        assert machine_row["visual_description_score"] == 91.0
+        assert machine_row["assisted_enrichment_score"] == 84.0
+        assert machine_row["prompt_burden_kind"] == "visual_input"
+        assert machine_row["prompt_burden_source"] == "estimated_nontext"
+        assert machine_row["owner_confidence"] == row["maintainer_triage"]["confidence"]
+
+
+def test_jsonl_and_history_use_canonical_mixed_owner_failure_confidence(
+    tmp_path: Path,
+) -> None:
+    """Machine failure confidence should match the downgraded human narrative."""
+    result = PerformanceResult(
+        model_name="org/mixed-owner",
+        generation=None,
+        success=False,
+        error_message="wrapped generation failure",
+        error_package="mlx-vlm",
+        exception_chain=(
+            check_models.FailureException(
+                "RuntimeError",
+                "mlx.core",
+                "kIOGPUCommandBufferCallbackErrorOutOfMemory",
+            ),
+            check_models.FailureException(
+                "ValueError",
+                "builtins",
+                "mlx_vlm/generate.py wrapped generation failure",
+            ),
+        ),
+    )
+    prompt = "Describe the image."
+    context = check_models._build_report_render_context(
+        results=[result],
+        prompt=prompt,
+        eval_mode="blind",
+    )
+    output_file = tmp_path / "results.jsonl"
+    history_file = tmp_path / "results.history.jsonl"
+
+    save_jsonl_report(
+        [result],
+        output_file,
+        prompt=prompt,
+        system_info={},
+        report_context=context,
+    )
+    history = append_history_record(
+        history_path=history_file,
+        results=[result],
+        prompt=prompt,
+        system_info={},
+        library_versions={},
+        report_context=context,
+    )
+    _header, rows = _read_jsonl(output_file)
+    narrative = check_models._build_failure_narrative(result)
+
+    assert narrative.owner_confidence == "low"
+    assert rows[0]["owner_confidence"] == narrative.owner_confidence
+    assert rows[0]["maintainer_triage"]["confidence"] == narrative.owner_confidence
+    assert rows[0]["maintainer_triage"]["suspected_owner"] == narrative.suspected_owner
+    assert (
+        history["model_results"][result.model_name]["owner_confidence"]
+        == narrative.owner_confidence
+    )
+    assert history["model_results"][result.model_name]["review_owner"] == narrative.suspected_owner
+
+
+def test_jsonl_prompt_burden_reuses_generation_level_quality_analysis(tmp_path: Path) -> None:
+    output_file = tmp_path / "results.jsonl"
+    prompt = "Describe this image briefly."
+    analysis = check_models.analyze_generation_text(
+        "Cat.",
+        generated_tokens=3,
+        prompt_tokens=4103,
+        prompt=prompt,
+    )
+    generation = MockGeneration(
+        text="Cat.",
+        prompt_tokens=4103,
+        generation_tokens=3,
+        quality_analysis=analysis,
+    )
+    result = PerformanceResult(
+        model_name="org/legacy-analysis",
+        generation=generation,
+        success=True,
+        prompt_diagnostics=check_models.PromptDiagnostics(image_placeholder_count=1),
+    )
+
+    save_jsonl_report([result], output_file, prompt=prompt, system_info={})
+    _header, rows = _read_jsonl(output_file)
+
+    review = _require_present(rows[0].get("review"), field_name="review")
+    assert review["prompt_tokens_total"] == analysis.prompt_tokens_total
+    assert review["prompt_tokens_text_est"] == analysis.prompt_tokens_text_est
+    assert review["prompt_tokens_nontext_est"] == analysis.prompt_tokens_nontext_est
+    assert review["prompt_burden_kind"] == "visual_input"
+    assert review["prompt_burden_source"] == "estimated_nontext"
+
+
+def test_jsonl_prompt_burden_serializes_unavailable_reason(tmp_path: Path) -> None:
+    output_file = tmp_path / "results.jsonl"
+    analysis = dataclasses.replace(
+        check_models.analyze_generation_text(
+            "A concise image description.",
+            generated_tokens=6,
+            prompt_tokens=4200,
+            prompt="Describe this image.",
+        ),
+        prompt_tokens_text_est=None,
+        prompt_tokens_nontext_est=None,
+    )
+    result = PerformanceResult(
+        model_name="org/unavailable-components",
+        generation=MockGeneration(prompt_tokens=4200, generation_tokens=6),
+        success=True,
+        quality_analysis=analysis,
+    )
+
+    save_jsonl_report([result], output_file, prompt="Describe this image.", system_info={})
+    _header, rows = _read_jsonl(output_file)
+
+    review = _require_present(rows[0].get("review"), field_name="review")
+    assert review["prompt_burden_kind"] == "unavailable"
+    assert review["prompt_burden_source"] == "unavailable"
+    assert review["prompt_burden_reason"] == "component_estimates_unavailable"
 
 
 def test_save_jsonl_report_includes_captured_output(tmp_path: Path) -> None:

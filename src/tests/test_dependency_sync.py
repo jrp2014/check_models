@@ -269,6 +269,21 @@ def test_dependency_policy_does_not_cap_transformers() -> None:
     assert dependency_policy.PROJECT_TRANSFORMERS_VERSION_SPEC == ">=5.7.0"
 
 
+def test_pillow_floor_uses_security_fixed_release() -> None:
+    """Pillow's declared floor should exclude vulnerabilities fixed in 12.3.0."""
+    pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
+
+    assert dependency_policy.PROJECT_PILLOW_MINIMUM_VERSION == "12.3.0"
+    assert (
+        f"Pillow[xmp]>={dependency_policy.PROJECT_PILLOW_MINIMUM_VERSION}"
+        in pyproject["project"]["dependencies"]
+    )
+    assert (
+        dependency_policy.VALIDATE_ENV_CORE_FALLBACK_SPECS["Pillow"]
+        == f">={dependency_policy.PROJECT_PILLOW_MINIMUM_VERSION}"
+    )
+
+
 def test_ty_uses_generated_typings_search_path() -> None:
     """Ensure ty resolves repo-local generated stubs like mlx_vlm.*."""
     pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))

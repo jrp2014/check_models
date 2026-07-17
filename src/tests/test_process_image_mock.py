@@ -404,6 +404,88 @@ class TestProcessImageWithModelMock:
         assert result.root_error_module == "builtins"
         assert result.root_error_message == upstream_message
 
+    def test_build_failure_result_preserves_exception_chain_order(self) -> None:
+        """Failure narratives should preserve root-to-wrapper exception chronology."""
+        index_error = IndexError("token id 999 outside detokenizer table")
+        runtime_error = RuntimeError("METAL command buffer out of memory")
+        runtime_error.__cause__ = index_error
+        wrapped = ValueError("generation failed")
+        wrapped.__cause__ = runtime_error
+
+        try:
+            raise wrapped
+        except ValueError as error:
+            result = check_models._build_failure_result(
+                model_name="org/model",
+                error=error,
+                captured_output=None,
+            )
+
+        assert [entry.exception_type for entry in result.exception_chain] == [
+            "IndexError",
+            "RuntimeError",
+            "ValueError",
+        ]
+        narrative = check_models._build_failure_narrative(result)
+        assert narrative.task_outcome == "crashed"
+        assert narrative.primary_exception == "IndexError: token id 999 outside detokenizer table"
+        assert narrative.secondary_exceptions == (
+            "RuntimeError: METAL command buffer out of memory",
+            "ValueError: generation failed",
+        )
+
+    def test_build_failure_result_reuses_one_root_selection_traversal(self) -> None:
+        """Failure building should reuse the canonical root selector over one chain walk."""
+        root_error = IndexError("bad token")
+        wrapper_error = ValueError("generation failed")
+        wrapper_error.__cause__ = root_error
+
+        with (
+            patch.object(
+                check_models,
+                "_exception_chain",
+                wraps=check_models._exception_chain,
+            ) as chain_walk,
+            patch.object(
+                check_models,
+                "_root_cause_exception",
+                wraps=check_models._root_cause_exception,
+            ) as root_selector,
+        ):
+            try:
+                raise wrapper_error
+            except ValueError as error:
+                result = check_models._build_failure_result(
+                    model_name="org/model",
+                    error=error,
+                    captured_output=None,
+                )
+
+        root_selector.assert_called_once()
+        assert chain_walk.call_count == 1
+        assert result.root_error_type == "IndexError"
+        assert result.root_error_message == "bad token"
+
+    def test_failure_narrative_marks_mixed_runtime_owners_unresolved(self) -> None:
+        """A mixed mlx-vlm/MLX chain should not be assigned confidently to one owner."""
+        runtime_error = RuntimeError("kIOGPUCommandBufferCallbackErrorOutOfMemory")
+        wrapper_error = ValueError("mlx_vlm/generate.py generation failed")
+        wrapper_error.__cause__ = runtime_error
+
+        try:
+            raise wrapper_error
+        except ValueError as error:
+            result = check_models._build_failure_result(
+                model_name="org/model",
+                error=error,
+                captured_output=None,
+            )
+
+        narrative = check_models._build_failure_narrative(result)
+        assert narrative.task_outcome == "crashed"
+        assert narrative.suspected_owner == "unresolved: mlx/mlx-vlm"
+        assert narrative.owner_confidence == "low"
+
     def test_build_failure_result_preserves_quality_fields(self) -> None:
         """Failure builder should carry precomputed quality diagnostics when provided."""
         repeated_phrase = "loop"
@@ -524,6 +606,10 @@ class TestProcessImageWithModelMock:
         assert generate_kwargs["skip_special_tokens"] is True
         assert generate_kwargs["cropping"] is False
         assert generate_kwargs["max_patches"] == 3
+        prompt_diagnostics = result._check_models_prompt_diagnostics
+        assert prompt_diagnostics.processed_image_width == 384
+        assert prompt_diagnostics.processed_image_height == 512
+        assert prompt_diagnostics.image_patch_count is None
 
     def test_run_model_generation_passes_thinking_kwargs(self, test_image: Path) -> None:
         """Thinking-mode flags should reach both chat templating and generation."""

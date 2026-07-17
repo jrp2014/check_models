@@ -7,6 +7,61 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Track whether metadata was actually injected into the prompt, keep triage
+  quality classification independent of metadata agreement, and preserve
+  exception traceback origins so root mlx-vlm failures followed by MLX cleanup
+  failures are reported as mixed ownership rather than misclassified.
+- Keep partial output-quality observations from overriding or decorating a
+  conclusive runtime failure, and verify that committed issue-ready artifacts
+  retain the canonical crash verdict, owner, and issue-cluster routing.
+- Raise the Pillow runtime floor to 12.3.0, excluding the image/font parsing
+  vulnerabilities fixed by that upstream security release.
+- Keep committed human-facing report paths home-relative so issue-ready
+  diagnostics and benchmark artifacts do not expose the local account path.
+- Redesign benchmark reporting around provenance-aware assisted enrichment,
+  blind-versus-assisted scoring, visual/text/mixed/normal/unavailable burden
+  attribution, root-to-wrapper exception chronology, and separate crash outcome
+  versus suspected-owner confidence. Consolidate recommendation views, make
+  `diagnostics.md` an issue-ready mlx-vlm artifact, and retain `results.html` as
+  the complete HTML report while preserving existing output paths and compatible
+  JSONL/history schemas.
+- **Code-size audit:** `src/check_models.py` adds 2,391 lines and deletes 1,241
+  versus `origin/main`. Net growth records genuinely new upstream facts for
+  metadata provenance, component-aware prompt burden, exception chains and owner
+  confidence, cached machine/report facts, and lane-specific recommendation
+  policy. The redesign removes or consolidates duplicate diagnostics preflight,
+  failure/harness/stack/text-sanity, runtime/coverage, unflagged-inventory,
+  footer, model-selection-row, winner, issue-map, and recommendation helpers.
+- Cache canonical review classification and maintainer triage once per report
+  context so recommendation, history, JSONL, TSV, and finalization paths cannot
+  independently reclassify the same model result.
+- Gate legacy HTML/Markdown performance and cataloging winners through the
+  canonical recommendation policy, and cache failure narratives plus machine
+  facts so human, JSONL, TSV, and history ownership cannot diverge.
+- Align standalone HTML, Markdown selection, JSONL, TSV, and history on one
+  cached recommendation/diagnostics context; add compatible machine fields for
+  enrichment, burden, compatibility, and owner confidence, and label primary
+  versus supporting output roles without changing JSONL/history versions.
+- Consolidate current-run model recommendations into one reliability-gated view
+  shared by selection, gallery, and capability surfaces, with lane-specific
+  quality evidence, named policies, memory/Pareto selectors, and conservative
+  repository-variant comparisons.
+- Rebuild `diagnostics.md` as a self-contained mlx-vlm issue report with an
+  all-crash failure matrix, scoped inline native repros, confidence routing,
+  prompt-burden evidence, and a separate model/config observation appendix;
+  remove its superseded runtime coverage and unflagged-success inventory.
+- Preserve failed-run exception chains in root-to-wrapper chronology across
+  canonical failure narratives, JSONL, repro bundles, diagnostics, and issue
+  reports; separate the conclusive crash outcome from cautious owner attribution.
+- Add one configuration-driven prompt burden view that distinguishes visual,
+  textual, mixed, normal, and unavailable input load across review, diagnostics,
+  JSONL, and TSV output while preserving existing token-estimate fields.
+- Replace blanket assisted metadata-borrowing penalties with provenance-aware
+  context integration, draft improvement, visual-description, and enrichment
+  scores; keep structured capture-data copy detection as canonical review
+  evidence and ignore legitimate numeric metadata in loop diagnostics.
+- Separate authoritative capture/location context from fallible descriptive
+  metadata in assisted prompts and reuse that provenance split for scoring.
 - Consolidate generated-output CLI path definitions and configuration-driven
   quality detector regex matching while preserving their existing contracts.
 - Consolidate the regular and diagnostic Markdown table escaping pipeline while

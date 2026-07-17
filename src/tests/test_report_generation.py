@@ -10,6 +10,7 @@ import re
 import time
 from argparse import Namespace
 from dataclasses import dataclass, replace
+from pathlib import Path
 from typing import TYPE_CHECKING, cast
 from unittest.mock import patch
 
@@ -45,7 +46,6 @@ from check_models import (
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
-    from pathlib import Path
 
     import pytest
 
@@ -368,6 +368,762 @@ def _make_metadata_agreement_result(name: str = "org/model-grounded") -> Perform
             matched_terms=("brick storefront", "outdoor seating"),
         ),
     )
+
+
+def test_recommendation_view_excludes_crash_from_usable_policies() -> None:
+    failed = _make_failure("org/crashed")
+    passed = _make_success("org/passed")
+    context = _build_report_render_context(
+        results=[failed, passed],
+        prompt="Describe the image.",
+        eval_mode="blind",
+    )
+
+    views = check_models._build_model_recommendation_views(context)
+    by_model = {view.result.model_name: view for view in views}
+
+    assert by_model["org/crashed"].compatibility == "crashed"
+    assert by_model["org/crashed"].eligible is False
+    assert by_model["org/passed"].eligible is True
+
+
+def test_report_context_caches_cross_artifact_views() -> None:
+    """One context should own recommendations, diagnostics, and issue clusters."""
+    failed = _make_failure("org/crashed")
+    passed = _make_success("org/passed")
+
+    context = _build_report_render_context(
+        results=[failed, passed],
+        prompt="Describe the image.",
+        eval_mode="blind",
+    )
+
+    assert [view.result.model_name for view in context.recommendations] == [
+        "org/crashed",
+        "org/passed",
+    ]
+    assert context.diagnostics_snapshot.failed == (failed,)
+    assert context.issue_clusters == check_models._build_issue_clusters(
+        context.diagnostics_snapshot
+    )
+
+
+def test_html_and_markdown_share_task_outcome_and_policy(tmp_path: Path) -> None:
+    """HTML and the selection brief should expose the same reliability policy."""
+    results = [_make_failure("org/crashed"), _make_success("org/passed")]
+    context = _build_report_render_context(
+        results=results,
+        prompt="Describe the image.",
+        eval_mode="blind",
+    )
+    html_path = tmp_path / "results.html"
+    selection_path = tmp_path / "model_selection.md"
+
+    generate_html_report(
+        results,
+        html_path,
+        versions={},
+        prompt="Describe the image.",
+        total_runtime_seconds=1.0,
+        report_context=context,
+    )
+    check_models.generate_model_selection_report(
+        results,
+        selection_path,
+        prompt="Describe the image.",
+        report_context=context,
+    )
+
+    html_text = html_path.read_text(encoding="utf-8")
+    selection_text = selection_path.read_text(encoding="utf-8")
+    assert "org/crashed" in html_text
+    assert "Task outcome: crashed" in html_text
+    assert "reliability-gated" in html_text
+    assert "reliability-gated" in selection_text
+
+
+def test_html_and_supporting_markdown_do_not_name_ineligible_legacy_winners(
+    tmp_path: Path,
+) -> None:
+    """Legacy summary highlights must obey the canonical reliability gate."""
+    eligible = replace(
+        _make_success("org/eligible"),
+        generation=_MockGeneration(
+            text=getattr(_make_success().generation, "text", None),
+            generation_tps=10.0,
+            peak_memory=5.0,
+        ),
+        model_load_time=1.0,
+    )
+    warning = replace(
+        _make_harness_success(
+            "org/fast-warning",
+            text=getattr(_make_success().generation, "text", "") or "",
+            prompt_tokens=120,
+            generation_tokens=48,
+            harness_type="stop_token",
+            harness_detail="token_leak:<|endoftext|>",
+        ),
+        generation=_MockGeneration(
+            text=getattr(_make_success().generation, "text", None),
+            generation_tps=999.0,
+            peak_memory=0.5,
+        ),
+        model_load_time=0.01,
+    )
+    results = [warning, eligible]
+    context = _build_report_render_context(
+        results=results,
+        prompt="Create title, description, and keywords.",
+        metadata={"description": "Brick storefront", "keywords": "storefront, seating"},
+        eval_mode="blind",
+    )
+    html_path = tmp_path / "results.html"
+    markdown_path = tmp_path / "results.md"
+
+    generate_html_report(
+        results,
+        html_path,
+        versions={},
+        prompt="Create title, description, and keywords.",
+        total_runtime_seconds=2.0,
+        report_context=context,
+    )
+    generate_markdown_report(
+        results,
+        markdown_path,
+        versions={},
+        prompt="Create title, description, and keywords.",
+        total_runtime_seconds=2.0,
+        report_context=context,
+    )
+
+    assert context.summary["fastest_model"][0] == "org/eligible"
+    assert context.summary["most_efficient_model"][0] == "org/eligible"
+    assert context.summary["fastest_load_model"][0] == "org/eligible"
+    cataloging_best = context.summary["cataloging_best"]
+    if cataloging_best is None:
+        message = "cataloging_best"
+        raise AssertionError(message)
+    assert cataloging_best[0] == "org/eligible"
+    html_text = html_path.read_text(encoding="utf-8")
+    markdown_text = markdown_path.read_text(encoding="utf-8")
+    assert "org/fast-warning" in html_text
+    assert "org/fast-warning" in markdown_text
+    assert "<b>Fastest:</b> <code>org/eligible</code>" in html_text
+    assert "- **Fastest:** `org/eligible`" in markdown_text
+    assert "<b>Best for cataloging:</b> <code>org/eligible</code>" in html_text
+    assert "- **Best for cataloging:** `org/eligible`" in markdown_text
+
+
+def test_all_ineligible_html_keeps_cataloging_aggregates_without_winner(
+    tmp_path: Path,
+) -> None:
+    """An all-warning run should retain aggregate evidence without naming a winner."""
+    warning = _make_harness_success(
+        "org/warning-only",
+        text=getattr(_make_success().generation, "text", "") or "",
+        prompt_tokens=120,
+        generation_tokens=48,
+        harness_type="stop_token",
+        harness_detail="token_leak:<|endoftext|>",
+    )
+    context = _build_report_render_context(
+        results=[warning],
+        prompt="Create title, description, and keywords.",
+        metadata={"description": "Brick storefront", "keywords": "storefront"},
+        eval_mode="blind",
+    )
+    html_path = tmp_path / "results.html"
+
+    generate_html_report(
+        [warning],
+        html_path,
+        versions={},
+        prompt="Create title, description, and keywords.",
+        total_runtime_seconds=1.0,
+        report_context=context,
+    )
+
+    html_text = html_path.read_text(encoding="utf-8")
+    assert context.summary["cataloging_best"] is None
+    assert "Cataloging Utility Summary" in html_text
+    assert "Best for cataloging" not in html_text
+
+
+def test_report_context_builds_machine_and_failure_facts_once_for_serializers(
+    tmp_path: Path,
+) -> None:
+    """Serializers should reuse context facts instead of rerunning classifiers."""
+    failure = replace(
+        _make_failure("org/wrapped", error_package="mlx-vlm"),
+        exception_chain=(
+            check_models.FailureException(
+                "RuntimeError",
+                "mlx.core",
+                "kIOGPUCommandBufferCallbackErrorOutOfMemory",
+            ),
+            check_models.FailureException(
+                "ValueError",
+                "builtins",
+                "mlx_vlm/generate.py wrapped generation failure",
+            ),
+        ),
+    )
+    results = [failure, _make_success("org/passed")]
+
+    with (
+        patch.object(
+            check_models,
+            "_build_jsonl_review_record",
+            wraps=check_models._build_jsonl_review_record,
+        ) as review_builder,
+        patch.object(
+            check_models,
+            "_build_jsonl_maintainer_triage_record",
+            wraps=check_models._build_jsonl_maintainer_triage_record,
+        ) as triage_builder,
+        patch.object(
+            check_models,
+            "_machine_artifact_facts",
+            wraps=check_models._machine_artifact_facts,
+        ) as facts_builder,
+        patch.object(
+            check_models,
+            "_build_failure_narrative",
+            wraps=check_models._build_failure_narrative,
+        ) as narrative_builder,
+    ):
+        context = _build_report_render_context(
+            results=results,
+            prompt="Describe the image.",
+            eval_mode="blind",
+        )
+        assert review_builder.call_count == len(results)
+        assert triage_builder.call_count == len(results)
+        assert facts_builder.call_count == len(results)
+        assert narrative_builder.call_count == 1
+        initial_review_calls = review_builder.call_count
+        initial_triage_calls = triage_builder.call_count
+        initial_facts_calls = facts_builder.call_count
+        initial_narrative_calls = narrative_builder.call_count
+
+        output_paths = check_models.ReportOutputPaths(
+            index=tmp_path / "index.md",
+            html=tmp_path / "results.html",
+            markdown=tmp_path / "results.md",
+            gallery_markdown=tmp_path / "model_gallery.md",
+            review=tmp_path / "review.md",
+            model_selection=tmp_path / "model_selection.md",
+            model_capabilities=tmp_path / "model_capabilities.md",
+            model_capabilities_json=tmp_path / "model_capabilities.json",
+            tsv=tmp_path / "results.tsv",
+            jsonl=tmp_path / "results.jsonl",
+            run_json=tmp_path / "run.json",
+            diagnostics=tmp_path / "diagnostics.md",
+            log=tmp_path / "check_models.log",
+            environment=tmp_path / "environment.log",
+        )
+        check_models.append_history_record(
+            history_path=tmp_path / "results.history.jsonl",
+            results=results,
+            prompt="Describe the image.",
+            system_info={},
+            library_versions={},
+            report_context=context,
+        )
+        check_models._generate_reports_and_log_outputs(
+            check_models.ReportGenerationInputs(
+                results=results,
+                library_versions={},
+                prompt="Describe the image.",
+                metadata=None,
+                overall_time=1.0,
+                image_path=None,
+                system_info={},
+                report_context=context,
+                output_paths=output_paths,
+            )
+        )
+
+        assert review_builder.call_count == initial_review_calls
+        assert triage_builder.call_count == initial_triage_calls
+        assert facts_builder.call_count == initial_facts_calls
+        assert narrative_builder.call_count == initial_narrative_calls
+
+
+def test_failed_partial_output_keeps_runtime_failure_owner() -> None:
+    """Partial generated text must not replace conclusive crash triage."""
+    quality_result = _make_quality_success("org/partial", with_quality_issue=True)
+    failure = replace(
+        _make_failure("org/partial", error_package="mlx"),
+        generation=quality_result.generation,
+        quality_analysis=quality_result.quality_analysis,
+        quality_issues=quality_result.quality_issues,
+    )
+
+    context = _build_report_render_context(
+        results=[failure],
+        prompt="Describe the image.",
+        eval_mode="assisted",
+    )
+    cached = context.result_set.results[0]
+
+    assert cached.review_payload is not None
+    assert cached.review_payload["verdict"] == "runtime_failure"
+    assert cached.review_payload["owner"] == "mlx"
+    assert cached.maintainer_triage_payload is not None
+    assert cached.maintainer_triage_payload["issue_kind"] == "runtime_failure"
+    assert cached.maintainer_triage_payload["suspected_owner"] == "mlx"
+    assert "load" in cached.maintainer_triage_payload["summary"].casefold()
+    assert "formatting" not in cached.maintainer_triage_payload["summary"].casefold()
+    assert "text-sanity" not in cached.maintainer_triage_payload["summary"].casefold()
+
+    review_rows = dict(check_models._build_review_block_rows(cached))
+    assert "load" in review_rows["Why"].casefold()
+    assert "formatting" not in review_rows["Why"].casefold()
+    assert "text-sanity" not in review_rows["Why"].casefold()
+
+    assert len(context.recommendations) == 1
+    recommendation_caveats = " | ".join(context.recommendations[0].caveats).casefold()
+    assert "formatting" not in recommendation_caveats
+    assert "text-sanity" not in recommendation_caveats
+    assert check_models._format_table_field_value("quality_issues", cached) == ""
+    assert check_models._build_jsonl_result_record_base(cached)["quality_issues"] == []
+
+
+def test_chained_failure_uses_primary_origin_and_reports_mixed_ownership() -> None:
+    failure = replace(
+        _make_failure("org/chained", error_package="mlx"),
+        exception_chain=(
+            check_models.FailureException(
+                "IndexError",
+                "builtins",
+                "token index outside detokenizer table",
+                origin="mlx_vlm/tokenizer_utils.py",
+            ),
+            check_models.FailureException(
+                "RuntimeError",
+                "mlx.core",
+                "kIOGPUCommandBufferCallbackErrorOutOfMemory",
+                origin="mlx/core/metal.cpp",
+            ),
+        ),
+    )
+
+    context = _build_report_render_context(
+        results=[failure],
+        prompt="Describe the image.",
+    )
+    cached = context.result_set.results[0]
+    narrative = dict(context.failure_narratives)[failure.model_name]
+
+    assert narrative.primary_exception.startswith("IndexError:")
+    assert narrative.suspected_owner == "unresolved: mlx/mlx-vlm"
+    assert narrative.owner_confidence == "low"
+    assert cached.review_payload is not None
+    assert cached.review_payload["owner"] == narrative.suspected_owner
+    assert context.issue_clusters[0].owner == narrative.suspected_owner
+
+
+def test_published_failure_artifacts_match_canonical_runtime_triage() -> None:
+    """Checked-in issue-ready reports must not retain pre-fix quality classifications."""
+    output_dir = Path(__file__).parents[1] / "output"
+    records = [
+        json.loads(line)
+        for line in (output_dir / "results.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    failures = [
+        record for record in records if record.get("_type") == "result" and not record["success"]
+    ]
+
+    assert failures
+    diagnostics = (output_dir / "reports/diagnostics.md").read_text(encoding="utf-8")
+    review_report = (output_dir / "reports/review.md").read_text(encoding="utf-8")
+    gallery = (output_dir / "reports/model_gallery.md").read_text(encoding="utf-8")
+    html_report = (output_dir / "reports/results.html").read_text(encoding="utf-8")
+    assert str(Path.home()) not in diagnostics
+    assert str(Path.home()) not in review_report
+    assert str(Path.home()) not in gallery
+    assert str(Path.home()) not in html_report
+    for failure in failures:
+        review = failure["review"]
+        triage = failure["maintainer_triage"]
+        assert review["verdict"] == "runtime_failure"
+        assert triage["issue_kind"] == "runtime_failure"
+        assert failure["compatibility_status"] == "crashed"
+        assert failure["quality_issues"] == []
+        assert review["owner"] == triage["suspected_owner"]
+        assert review["owner"] in diagnostics
+        assert f"`{failure['model']}`" in review_report
+        assert "`runtime_failure`" in review_report
+        assert (output_dir / triage["issue_cluster_path"]).is_file()
+
+
+def test_direct_serializers_build_one_local_review_cache(tmp_path: Path) -> None:
+    """Legacy direct serializers should classify once through their fallback context."""
+    result = _make_success("org/direct")
+
+    with patch.object(
+        check_models,
+        "_build_jsonl_review_record",
+        wraps=check_models._build_jsonl_review_record,
+    ) as review_builder:
+        check_models.save_jsonl_report(
+            [result],
+            tmp_path / "direct.jsonl",
+            prompt="Describe the image.",
+            system_info={},
+        )
+        check_models.append_history_record(
+            history_path=tmp_path / "direct.history.jsonl",
+            results=[result],
+            prompt="Describe the image.",
+            system_info={},
+            library_versions={},
+        )
+
+    assert review_builder.call_count == 2
+
+
+def test_recommendation_policies_gate_reliability_memory_and_dominance() -> None:
+    def _result(name: str, *, score: float, total: float, peak: float) -> PerformanceResult:
+        base = _make_success(name)
+        return replace(
+            base,
+            total_time=total,
+            generation=_MockGeneration(
+                text=getattr(base.generation, "text", None),
+                prompt_tokens=120,
+                generation_tokens=48,
+                peak_memory=peak,
+            ),
+            metadata_agreement=check_models.MetadataAgreementMetrics(
+                assisted_enrichment_score=score,
+            ),
+        )
+
+    context = _build_report_render_context(
+        results=[
+            _result("org/dominant", score=90.0, total=1.0, peak=3.0),
+            _result("org/dominated", score=80.0, total=2.0, peak=4.0),
+            _result("org/large", score=95.0, total=0.8, peak=12.0),
+            _make_failure("org/crashed"),
+        ],
+        prompt="Create title, description, and keywords.",
+        metadata={"description": "Two boats", "keywords": "boats, river"},
+        eval_mode="assisted",
+    )
+    views = check_models._build_model_recommendation_views(context)
+
+    assert [
+        view.result.model_name for view in check_models._rank_reliability_gated_enrichment(views)
+    ] == ["org/large", "org/dominant", "org/dominated"]
+    assert [
+        view.result.model_name for view in check_models._rank_under_memory_budget(views, 4.0)
+    ] == ["org/dominant", "org/dominated"]
+    assert [view.result.model_name for view in check_models._pareto_recommendations(views)] == [
+        "org/large",
+        "org/dominant",
+    ]
+
+
+def test_model_variant_family_key_is_conservative() -> None:
+    assert check_models._model_family_key("org/model-4bit") == "org/model"
+    assert check_models._model_family_key("org/model-bf16") == "org/model"
+    assert check_models._model_family_key("org/model-instruct") == "org/model-instruct"
+
+
+def test_model_selection_names_each_ranking_policy(tmp_path: Path) -> None:
+    result = replace(
+        _make_metadata_agreement_result(),
+        metadata_agreement=check_models.MetadataAgreementMetrics(
+            overall_score=88.0,
+            visual_description_score=90.0,
+            context_integration_score=80.0,
+            draft_improvement_score=70.0,
+            assisted_enrichment_score=84.0,
+        ),
+    )
+    context = _build_report_render_context(
+        results=[result],
+        prompt="Create title, description, and keywords.",
+        metadata={"description": "Two boats", "keywords": "boats, river"},
+        eval_mode="assisted",
+    )
+    output = tmp_path / "model_selection.md"
+
+    check_models.generate_model_selection_report(
+        [result],
+        output,
+        prompt="Create title, description, and keywords.",
+        report_context=context,
+    )
+
+    content = output.read_text(encoding="utf-8")
+    assert "Policy: reliability-gated assisted enrichment" in content
+    assert "Evidence scope: 1 image, 1 current run" in content
+
+
+def test_reliability_gated_candidate_sections_exclude_crashes(tmp_path: Path) -> None:
+    passed = _make_metadata_agreement_result("org/passed")
+    failed = _make_failure("org/crashed")
+    context = _build_report_render_context(
+        results=[failed, passed],
+        prompt="Create title, description, and keywords.",
+        metadata={"description": "Brick storefront", "keywords": "storefront"},
+        eval_mode="blind",
+    )
+    output = tmp_path / "model_selection.md"
+
+    check_models.generate_model_selection_report(
+        [failed, passed],
+        output,
+        prompt="Create title, description, and keywords.",
+        report_context=context,
+    )
+
+    content = output.read_text(encoding="utf-8")
+    caption_candidates = _extract_markdown_subsection(
+        content,
+        "## Brief Caption Candidates",
+        end_headings=("## Structured Metadata Candidates",),
+    )
+    structured_candidates = _extract_markdown_subsection(
+        content,
+        "## Structured Metadata Candidates",
+        end_headings=("## Repository Variant Comparisons",),
+    )
+    assert "org/passed" in caption_candidates
+    assert "org/crashed" not in caption_candidates
+    assert "org/crashed" not in structured_candidates
+
+
+def test_blind_recommendation_view_does_not_rank_assisted_enrichment() -> None:
+    result = replace(
+        _make_success("org/blind"),
+        metadata_agreement=check_models.MetadataAgreementMetrics(
+            overall_score=42.0,
+            visual_description_score=91.0,
+            assisted_enrichment_score=99.0,
+        ),
+    )
+    context = _build_report_render_context(
+        results=[result],
+        prompt="Create title, description, and keywords.",
+        metadata={"description": "Held-out reference"},
+        eval_mode="blind",
+    )
+
+    (view,) = check_models._build_model_recommendation_views(context)
+
+    assert view.visual_score == 42.0
+    assert view.assisted_enrichment_score is None
+    assert check_models._recommendation_quality_score(view) == 42.0
+
+
+def test_triage_capability_suppresses_metadata_for_current_and_history(tmp_path: Path) -> None:
+    result = _make_metadata_agreement_result("org/triage")
+    context = _build_report_render_context(
+        results=[result],
+        prompt="Describe this image briefly.",
+        metadata={"description": "Not a triage capability target"},
+        eval_mode="triage",
+    )
+    history: check_models.HistoryRunRecord = {
+        "_type": "run",
+        "format_version": "1.0",
+        "timestamp": "2026-07-01 10:00:00 +0000",
+        "prompt_hash": "triage",
+        "prompt_preview": "Describe this image briefly.",
+        "image_path": "image.jpg",
+        "model_results": {
+            result.model_name: {
+                "success": True,
+                "error_stage": None,
+                "error_type": None,
+                "error_package": None,
+                "review_user_bucket": "recommended",
+                "metadata_alignment_score": 95.0,
+            }
+        },
+        "system": {},
+        "library_versions": {},
+        "eval_mode": "triage",
+    }
+    markdown = tmp_path / "capabilities.md"
+    payload_path = tmp_path / "capabilities.json"
+
+    check_models.generate_model_capability_scorecard(
+        [result],
+        markdown,
+        payload_path,
+        prompt="Describe this image briefly.",
+        report_context=context,
+        history_records=(history,),
+    )
+
+    payload = json.loads(payload_path.read_text(encoding="utf-8"))
+    assert payload["models"][0]["metadata_alignment_avg"] is None
+
+
+def test_capability_and_structured_sections_name_policy_and_scope(tmp_path: Path) -> None:
+    result = _make_metadata_agreement_result()
+    context = _build_report_render_context(
+        results=[result],
+        prompt="Create title, description, and keywords.",
+        metadata={"description": "Brick storefront"},
+        eval_mode="assisted",
+    )
+    selection = tmp_path / "selection.md"
+    capability = tmp_path / "capability.md"
+
+    check_models.generate_model_selection_report(
+        [result],
+        selection,
+        prompt="Create title, description, and keywords.",
+        report_context=context,
+    )
+    check_models.generate_model_capability_scorecard(
+        [result],
+        capability,
+        tmp_path / "capability.json",
+        prompt="Create title, description, and keywords.",
+        report_context=context,
+    )
+
+    structured = _extract_markdown_subsection(
+        selection.read_text(encoding="utf-8"),
+        "## Structured Metadata Candidates",
+        end_headings=("## Repository Variant Comparisons",),
+    )
+    capability_content = capability.read_text(encoding="utf-8")
+    assert "Policy: quality-first (reliability-gated assisted enrichment)" in structured
+    assert "Evidence scope: 1 image, 1 current run" in structured
+    assert (
+        "Policy: lane-filtered current and historical capability aggregation" in capability_content
+    )
+    assert (
+        "Evidence scope: 1 image, 1 current run plus 0 prior lane-matched runs"
+        in capability_content
+    )
+
+
+def test_ineligible_current_view_cannot_receive_positive_capability_recommendation(
+    tmp_path: Path,
+) -> None:
+    result = _make_success("org/ineligible-caption")
+    analysis = replace(
+        check_models.analyze_generation_text(
+            str(getattr(result.generation, "text", "") or ""),
+            generated_tokens=48,
+            prompt_tokens=120,
+            prompt="Describe this image briefly.",
+        ),
+        verdict="clean",
+        user_bucket="recommended",
+    )
+    result = replace(
+        result,
+        quality_analysis=analysis,
+        quality_issues="repetitive, formatting",
+    )
+    context = _build_report_render_context(
+        results=[result],
+        prompt="Describe this image briefly.",
+        eval_mode="triage",
+    )
+    (view,) = check_models._build_model_recommendation_views(context)
+    markdown = tmp_path / "capability.md"
+    payload_path = tmp_path / "capability.json"
+
+    check_models.generate_model_capability_scorecard(
+        [result],
+        markdown,
+        payload_path,
+        prompt="Describe this image briefly.",
+        report_context=context,
+    )
+
+    payload = json.loads(payload_path.read_text(encoding="utf-8"))
+    model = payload["models"][0]
+    assert view.eligible is False
+    assert "configured chooser threshold" in view.eligibility_reason
+    assert model["current_status"] == "ineligible"
+    assert model["recommendation"] == "current-run-ineligible"
+    assert model["recommendation"] not in {"caption", "caption+keywords", "keywords"}
+    assert "configured chooser threshold" in model["latest_signal"]
+
+
+def test_model_selection_renders_canonical_policy_taxonomy(tmp_path: Path) -> None:
+    results = [
+        replace(
+            _make_metadata_agreement_result("org/quality"),
+            generation=_MockGeneration(
+                text="Two boats rest on a calm river beside a wooded bank.",
+                generation_tps=40.0,
+                peak_memory=3.0,
+            ),
+            total_time=1.0,
+            metadata_agreement=check_models.MetadataAgreementMetrics(
+                overall_score=90.0,
+                visual_description_score=90.0,
+                assisted_enrichment_score=90.0,
+            ),
+        ),
+        replace(
+            _make_metadata_agreement_result("org/efficient"),
+            generation=_MockGeneration(
+                text="Two boats sit on calm water near trees along the river bank.",
+                generation_tps=100.0,
+                peak_memory=2.0,
+            ),
+            total_time=0.5,
+            metadata_agreement=check_models.MetadataAgreementMetrics(
+                overall_score=80.0,
+                visual_description_score=80.0,
+                assisted_enrichment_score=80.0,
+            ),
+        ),
+        _make_failure("org/crashed"),
+    ]
+    context = _build_report_render_context(
+        results=results,
+        prompt="Create title, description, and keywords.",
+        metadata={"description": "Two boats on a river", "keywords": "boats, river"},
+        eval_mode="assisted",
+    )
+    output = tmp_path / "selection.md"
+
+    check_models.generate_model_selection_report(
+        results,
+        output,
+        prompt="Create title, description, and keywords.",
+        report_context=context,
+    )
+
+    content = output.read_text(encoding="utf-8")
+    for policy_name in (
+        "Policy: reliability-gated",
+        "Policy: quality-first",
+        "Policy: efficiency-aware",
+        "Policy: memory-aware",
+    ):
+        assert policy_name in content
+    assert content.count("Evidence scope: 1 image, 1 current run") >= 5
+    for heading, next_heading in (
+        ("### Best under 4 GB", "### Best under 8 GB"),
+        ("### Best under 8 GB", "### Fastest usable"),
+        ("### Fastest usable", "### Quality if memory allows"),
+        ("### Quality if memory allows", "### Current failures / avoid"),
+        ("## Brief Caption Candidates", "## Structured Metadata Candidates"),
+    ):
+        section = _extract_markdown_subsection(
+            content,
+            heading,
+            end_headings=(next_heading,),
+        )
+        assert "org/crashed" not in section
 
 
 def _make_harness_success(
@@ -825,6 +1581,7 @@ def test_report_mode_policy_assisted_with_metadata_is_grounded() -> None:
             "description": "Two tabby cats on a pink couch with remotes.",
             "keywords": "cats, tabby, pink couch, remote controls",
         },
+        metadata_exposed_to_prompt=True,
     )
 
     assert policy.eval_mode == "assisted"
@@ -833,6 +1590,29 @@ def test_report_mode_policy_assisted_with_metadata_is_grounded() -> None:
     assert policy.suppress_cataloging_scores is False
     assert policy.selection_basis == "metadata-assisted visual verification"
     assert policy.metadata_exposed_to_prompt is True
+
+
+def test_assisted_custom_prompt_reports_metadata_as_held_out() -> None:
+    policy = check_models._build_report_mode_policy(
+        eval_mode="assisted",
+        metadata={"description": "Held-out reference caption"},
+        metadata_exposed_to_prompt=False,
+    )
+
+    assert policy.eval_mode == "assisted"
+    assert policy.semantic_rankings_grounded is True
+    assert policy.selection_basis == "held-out trusted image metadata"
+    assert policy.metadata_exposed_to_prompt is False
+
+    fallback_context = _build_report_render_context(
+        results=[_make_success("org/custom-prompt")],
+        prompt="Describe the image without injected metadata.",
+        metadata={"description": "Held-out reference caption"},
+        eval_mode="auto",
+    )
+    assert fallback_context.mode_policy.eval_mode == "assisted"
+    assert fallback_context.mode_policy.selection_basis == "held-out trusted image metadata"
+    assert fallback_context.mode_policy.metadata_exposed_to_prompt is False
 
 
 def test_report_mode_policy_blind_keeps_metadata_held_out() -> None:
@@ -847,33 +1627,34 @@ def test_report_mode_policy_blind_keeps_metadata_held_out() -> None:
     assert policy.metadata_exposed_to_prompt is False
 
 
-def test_unflagged_models_section_marks_prompt_incomplete_analysis() -> None:
-    """Diagnostics should avoid labeling prompt-less cached analysis as clean output."""
-    stale_analysis = check_models.analyze_generation_text(
-        "Title: Brick storefront with outdoor seating",
-        generated_tokens=18,
-    )
-    result = PerformanceResult(
-        model_name="org/promptless",
-        success=True,
-        generation=_MockGeneration(
-            text="Title: Brick storefront with outdoor seating",
-            generation_tokens=18,
+def test_triage_quality_analysis_ignores_descriptive_metadata() -> None:
+    metadata: dict[str, str | None] = {
+        "description": "A red suspension bridge over a crowded harbour.",
+        "keywords": "bridge, harbour, boats",
+    }
+    result = _make_success("org/triage-clean")
+
+    analyzed = check_models._populate_result_quality_analysis(
+        result,
+        prompt="Describe this image briefly.",
+        metadata=check_models._quality_reference_metadata(
+            eval_mode="triage",
+            metadata=metadata,
         ),
-        total_time=1.0,
-        generation_time=0.5,
-        model_load_time=0.5,
-        quality_analysis=stale_analysis,
+    )
+    context = _build_report_render_context(
+        results=[analyzed],
+        prompt="Describe this image briefly.",
+        metadata=metadata,
+        eval_mode="triage",
     )
 
-    section = check_models._diagnostics_unflagged_success_section(
-        unflagged_successful=[result],
-    )
-    content = "\n".join(section)
-
-    assert "Passed (prompt-dependent quality checks unavailable)" in content
-    assert "1 model(s)" in content
-    assert "`org/promptless`" not in content
+    cached = context.result_set.results[0]
+    assert cached.metadata_agreement is None
+    assert cached.review_payload is not None
+    assert cached.review_payload["verdict"] == "clean"
+    assert cached.review_payload["user_bucket"] != "avoid"
+    assert context.recommendations[0].eligible is True
 
 
 def _history_run(
@@ -1846,7 +2627,7 @@ class TestMarkdownReportEdgeCases:
         self,
         tmp_path: Path,
     ) -> None:
-        """Brief-caption ranking should keep terse outputs but prefer useful detail."""
+        """Brief-caption ranking should prefer detail and gate avoid-bucket labels."""
         terse = PerformanceResult(
             model_name="org/terse-caption",
             success=True,
@@ -1915,7 +2696,13 @@ class TestMarkdownReportEdgeCases:
             end_headings=("## Structured Metadata Candidates",),
         )
         assert shortlist.index("`org/full-caption`") < shortlist.index("`org/terse-caption`")
-        assert shortlist.index("`org/terse-caption`") < shortlist.index("`org/label-caption`")
+        assert "`org/label-caption`" not in shortlist
+        avoid = _extract_markdown_subsection(
+            content,
+            "### Current failures / avoid",
+            end_headings=("## Brief Caption Candidates",),
+        )
+        assert "`org/label-caption`" in avoid
 
     def test_model_selection_report_uses_metadata_when_available(
         self,
@@ -2042,6 +2829,65 @@ class TestMarkdownReportEdgeCases:
             check_models._build_result_output_cues(result)
             == expected_order[: check_models.OUTPUT_PREVIEW_CUE_LIMIT]
         )
+
+    def test_jsonl_metadata_agreement_includes_assisted_enrichment_components(self) -> None:
+        """JSONL should expose available assisted enrichment component scores."""
+        metrics = check_models.MetadataAgreementMetrics(
+            overall_score=84.0,
+            context_integration_score=75.0,
+            draft_improvement_score=45.0,
+            visual_description_score=90.0,
+            assisted_enrichment_score=76.5,
+        )
+
+        payload = check_models._build_jsonl_metadata_agreement_record(metrics)
+
+        assert payload is not None
+        assert payload["context_integration_score"] == 75.0
+        assert payload["draft_improvement_score"] == 45.0
+        assert payload["visual_description_score"] == 90.0
+        assert payload["assisted_enrichment_score"] == 76.5
+
+    def test_authoritative_only_assisted_record_keeps_visual_description_component(self) -> None:
+        """Authoritative-only assisted records should retain visual-description scoring."""
+        metrics = check_models.compute_metadata_agreement(
+            (
+                "Title: Sailboats on Deben Estuary at Woodbridge\n"
+                "Description: Two white sailboats rest on calm water before a wooded bank.\n"
+                "Keywords: sailboats, estuary, Woodbridge, calm water, wooded bank"
+            ),
+            {"keywords": "Deben Estuary, Woodbridge"},
+        )
+
+        payload = check_models._build_jsonl_metadata_agreement_record(metrics)
+
+        assert metrics.context_integration_score is not None
+        assert metrics.draft_improvement_score is None
+        assert metrics.visual_description_score is not None
+        assert metrics.assisted_enrichment_score is not None
+        assert payload is not None
+        assert payload["visual_description_score"] == metrics.visual_description_score
+
+    def test_review_surfaces_use_canonical_assisted_enrichment_evidence(self) -> None:
+        """Review surfaces should reuse canonical assisted enrichment evidence."""
+        analysis = replace(
+            check_models.analyze_generation_text("A concise river caption.", 6),
+            metadata_borrowing=True,
+            evidence=["unverified-context-copy", "low-draft-improvement"],
+        )
+        review = check_models._build_jsonl_review_record(
+            replace(_make_success("org/enrichment"), quality_analysis=analysis)
+        )
+
+        assert review is not None
+        hint_text = check_models._review_hint_text(review, analysis)
+        utility_text = check_models._review_utility_text(review, analysis)
+        focus_text = check_models._review_focus_text(review, analysis)
+        combined = f"{hint_text} | {utility_text} | {focus_text}"
+        assert "unverified-context-copy" in combined
+        assert "low-draft-improvement" in combined
+        assert "nonvisual metadata reused" not in combined
+        assert "metadata borrowing" not in combined
 
 
 class TestMarkdownGalleryReport:
@@ -2528,7 +3374,7 @@ class TestMarkdownGalleryReport:
         assert "nontext prompt burden" not in check_models._review_focus_text(review, analysis)
 
     def test_context_budget_review_focus_keeps_nontext_burden(self) -> None:
-        """Real context-collapse cases should still expose image-token pressure."""
+        """Real context-collapse cases should expose canonical image-token pressure."""
         analysis = check_models.analyze_generation_text(
             "Cat.",
             generated_tokens=3,
@@ -2545,13 +3391,46 @@ class TestMarkdownGalleryReport:
                 generation_tokens=3,
             ),
             quality_analysis=analysis,
+            prompt_diagnostics=check_models.PromptDiagnostics(image_placeholder_count=1),
         )
         review = check_models._build_jsonl_review_record(result)
 
         assert review is not None
         focus = check_models._review_focus_text(review, analysis)
         assert analysis.verdict == "context_budget"
-        assert "nontext prompt burden" in focus
+        assert "visual input burden" in focus
+        assert "nontext prompt burden" not in focus
+
+    def test_unavailable_prompt_components_do_not_claim_normal_burden(self) -> None:
+        """Unavailable component estimates should produce uncertainty-aware guidance."""
+        analysis = replace(
+            check_models.analyze_generation_text(
+                "Cat.",
+                generated_tokens=3,
+                prompt_tokens=4103,
+                prompt="Describe this image briefly.",
+            ),
+            prompt_tokens_text_est=None,
+            prompt_tokens_nontext_est=None,
+            verdict="context_budget",
+        )
+        result = PerformanceResult(
+            model_name="org/unavailable-components",
+            success=True,
+            generation=_MockGeneration(
+                text="Cat.",
+                prompt_tokens=4103,
+                generation_tokens=3,
+            ),
+            quality_analysis=analysis,
+        )
+        review = check_models._build_jsonl_review_record(result)
+
+        assert review is not None
+        guidance = check_models._review_next_action_text(review)
+        assert review["prompt_burden_kind"] == "unavailable"
+        assert "normal burden issue" not in guidance
+        assert "input composition is unavailable" in guidance
 
     def test_gallery_includes_summary_pointer_and_per_model_review_status(
         self,
@@ -2698,6 +3577,160 @@ def _make_failure_with_details(
 class TestDiagnosticsReport:
     """Tests for generate_diagnostics_report and its helpers."""
 
+    def test_diagnostics_is_self_contained_mlx_vlm_issue(self, tmp_path: Path) -> None:
+        """Diagnostics should be directly pasteable as an mlx-vlm issue."""
+        failure = _make_failure_with_details(
+            "org/crashing-model",
+            error_msg="generation failed",
+            error_stage="Model Error",
+            error_package="mlx-vlm",
+            traceback_str="Traceback\nIndexError: token id out of range",
+        )
+        output = tmp_path / "diagnostics.md"
+
+        written = generate_diagnostics_report(
+            results=[failure],
+            filename=output,
+            versions={"mlx-vlm": "0.6.5", "mlx": "0.32.1"},
+            system_info={"GPU/Chip": "Apple M5 Max", "RAM": "128 GB"},
+            prompt="Describe the image.",
+            image_path=tmp_path / "fixture.jpg",
+            run_args=Namespace(max_tokens=500, temperature=0.0, top_p=1.0),
+        )
+
+        content = output.read_text(encoding="utf-8")
+        assert written is True
+        assert "## Crash / Failure Matrix" in content
+        assert "Task outcome: crashed" in content
+        assert "python -m mlx_vlm.generate" in content
+        assert "## Expected and Actual Behaviour" in content
+        assert "## Models Not Flagged" not in content
+        assert "Total model runtime (sum)" not in content
+
+    def test_model_only_text_quality_is_not_confirmed_mlx_vlm_issue(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Model-owned text quality should remain an observation."""
+        result = _make_quality_success("org/model-only", with_quality_issue=False)
+        analysis = cast("GenerationQualityAnalysis", result.quality_analysis)
+        result = replace(
+            result,
+            quality_analysis=replace(
+                analysis,
+                text_sanity_issue_type="numeric_loop",
+                owner="model",
+                user_bucket="avoid",
+            ),
+        )
+        output = tmp_path / "diagnostics.md"
+
+        generate_diagnostics_report(
+            results=[result],
+            filename=output,
+            versions={"mlx-vlm": "0.6.5"},
+            system_info={},
+            prompt="Describe the image.",
+        )
+
+        content = output.read_text(encoding="utf-8")
+        assert "mlx-vlm / MLX Issue Matrix" not in content
+        assert "Model/config observations" in content
+
+    def test_non_scope_crash_stays_in_crash_matrix_and_observations(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Every crash remains visible even when its owner is out of filing scope."""
+        output = tmp_path / "diagnostics.md"
+        failure = _make_failure_with_details(
+            "org/transformers-crash",
+            error_msg="processor API mismatch",
+            error_package="transformers",
+            error_stage="API Mismatch",
+        )
+
+        generate_diagnostics_report(
+            results=[failure],
+            filename=output,
+            versions={"mlx-vlm": "0.6.5", "transformers": "5.12.0"},
+            system_info={},
+            prompt="Describe the image.",
+        )
+
+        content = output.read_text(encoding="utf-8")
+        assert "## Crash / Failure Matrix" in content
+        assert "Task outcome: crashed" in content
+        assert "## mlx-vlm / MLX Issue Matrix" not in content
+        assert "## Model/config observations" in content
+        assert "org/transformers-crash" in content
+
+    def test_preflight_warnings_are_model_config_observations(self, tmp_path: Path) -> None:
+        """Preflight-only signals should stay outside confirmed upstream issues."""
+        output = tmp_path / "diagnostics.md"
+
+        written = generate_diagnostics_report(
+            results=[_make_success()],
+            filename=output,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="Describe the image.",
+            history=DiagnosticsHistoryInputs(
+                preflight_issues=(
+                    "transformers compatibility warning",
+                    "mlx runtime cache warning",
+                ),
+            ),
+        )
+
+        content = output.read_text(encoding="utf-8")
+        assert written is True
+        assert "## Model/config observations" in content
+        assert "transformers compatibility warning" in content
+        assert "mlx runtime cache warning" in content
+        assert "## mlx-vlm / MLX Issue Matrix" not in content
+
+    def test_scoped_harness_cluster_is_inline_issue(self, tmp_path: Path) -> None:
+        """An mlx-vlm-owned harness cluster should include its complete issue body."""
+        output = tmp_path / "diagnostics.md"
+        result = _make_harness_success(
+            "org/stop-token",
+            text="caption <|end|>",
+            harness_type="stop_token",
+            harness_detail="token_leak:<|end|>",
+        )
+
+        generate_diagnostics_report(
+            results=[result],
+            filename=output,
+            versions={"mlx-vlm": "0.6.5"},
+            system_info={},
+            prompt="Describe the image.",
+        )
+
+        content = output.read_text(encoding="utf-8")
+        assert "## mlx-vlm / MLX Issue Matrix" in content
+        assert "## Expected and Actual Behaviour" in content
+        assert "python -m mlx_vlm.generate" in content
+        assert "issues/index.md" not in content
+
+    def test_text_sanity_cluster_requires_output_excerpt(self) -> None:
+        """A detector label without generated evidence should not form a text issue."""
+        result = _make_quality_success("org/no-excerpt", with_quality_issue=False)
+        analysis = cast("GenerationQualityAnalysis", result.quality_analysis)
+        result = replace(
+            result,
+            generation=replace(cast("_MockGeneration", result.generation), text=""),
+            quality_analysis=replace(analysis, text_sanity_issue_type="numeric_loop"),
+        )
+
+        snapshot = _build_diagnostics_snapshot(
+            results=[result],
+            prompt="Describe the image.",
+        )
+
+        assert snapshot.text_sanity_results == ()
+
     def test_classify_review_owner_prefers_failure_owner_then_harness(self) -> None:
         """Review ownership should keep failure-owner precedence and harness fallbacks."""
         assert (
@@ -2764,6 +3797,27 @@ class TestDiagnosticsReport:
             == "validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime."
         )
 
+    def test_diagnostics_stack_routing_matches_exact_package_components(self) -> None:
+        """Composite MLX owners route upstream without substring false positives."""
+
+        def cluster(owner: str) -> check_models.IssueCluster:
+            return check_models.IssueCluster(
+                cluster_id="stack",
+                issue_filename="issue_stack.md",
+                owner=owner,
+                issue_kind="stack_signal",
+                issue_subtype="long_context",
+                symptom_family="context",
+                symptom="context collapse",
+                acceptance_signal="generation completes",
+                source="stack_signal",
+                sort_rank=1,
+            )
+
+        assert check_models._issue_cluster_is_mlx_vlm_scope(cluster("mlx-vlm / mlx"))
+        assert check_models._issue_cluster_is_mlx_vlm_scope(cluster("transformers / mlx-vlm"))
+        assert not check_models._issue_cluster_is_mlx_vlm_scope(cluster("not-mlx-vlm"))
+
     def test_infer_harness_issue_owner_uses_detail_prefix_fallbacks(self) -> None:
         """Harness owner inference should still honor detail-prefix fallbacks."""
         training_leak = _make_harness_success(
@@ -2789,8 +3843,8 @@ class TestDiagnosticsReport:
             harness_detail="token_leak:<|end|>",
         )
 
-        section = "\n".join(check_models._diagnostics_harness_section([(result, leaked_text)]))
-        assert "leaked control token <|end|> after" in section
+        excerpt = check_models._issue_output_excerpt(result, max_chars=240)
+        assert "leaked control token <|end|> after" in excerpt
 
     def test_no_report_when_all_succeed(self, tmp_path: Path) -> None:
         """No diagnostics file when every model succeeds without harness issues."""
@@ -2804,122 +3858,6 @@ class TestDiagnosticsReport:
         )
         assert result is False
         assert not out.exists()
-
-    def test_report_written_for_preflight_warnings_only(self, tmp_path: Path) -> None:
-        """Preflight compatibility warnings should be captured in diagnostics output."""
-        out = tmp_path / "diag.md"
-        result = generate_diagnostics_report(
-            results=[_make_success()],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            prompt="test",
-            history=DiagnosticsHistoryInputs(
-                preflight_issues=(
-                    "transformers==5.4.0 is below minimum 5.7.0 required by check_models.",
-                ),
-            ),
-        )
-        assert result is True
-        content = out.read_text(encoding="utf-8")
-        assert "## Preflight Compatibility Warnings" in content
-        assert "transformers==5.4.0 is below minimum 5.7.0 required by check_models." in content
-        assert "They are informational by" in content
-        assert "default and do not invalidate successful runs on their own." in content
-        assert "transformers/issues/new" in content
-        assert "These warnings were detected before inference." in content
-
-    def test_preflight_section_splits_mixed_owner_groups(self, tmp_path: Path) -> None:
-        """Mixed preflight owners should render as separate detailed owner buckets."""
-        out = tmp_path / "diag.md"
-        result = generate_diagnostics_report(
-            results=[_make_success()],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            prompt="test",
-            history=DiagnosticsHistoryInputs(
-                preflight_issues=(
-                    "transformers==5.4.0 is below minimum 5.7.0 required by check_models.",
-                    "mlx runtime probe reported a suspicious cache incompatibility",
-                ),
-            ),
-        )
-        assert result is True
-        content = out.read_text(encoding="utf-8")
-        assert "### `transformers`" in content
-        assert "### `mlx`" in content
-        assert "verify API compatibility and pinned version floor." in content
-        assert "mlx runtime probe reported a suspicious cache incompatibility" in content
-        assert "transformers/issues/new" in content
-
-    def test_report_written_for_stack_signal_uses_preflight_owner_hint(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Stack-signal rows should reuse matching preflight ownership hints when available."""
-        out = tmp_path / "diag.md"
-        success = PerformanceResult(
-            model_name="org/stack-transformers",
-            success=True,
-            generation=_MockGeneration(
-                text="echoed context",
-                prompt_tokens=15000,
-                generation_tokens=80,
-            ),
-            total_time=1.0,
-            generation_time=0.5,
-            model_load_time=0.5,
-            quality_analysis=GenerationQualityAnalysis(
-                is_repetitive=False,
-                repeated_token=None,
-                hallucination_issues=[],
-                is_verbose=False,
-                formatting_issues=[],
-                has_excessive_bullets=False,
-                bullet_count=0,
-                is_context_ignored=False,
-                missing_context_terms=[],
-                is_refusal=False,
-                refusal_type=None,
-                is_generic=False,
-                specificity_score=0.0,
-                has_language_mixing=False,
-                language_mixing_issues=[],
-                has_degeneration=False,
-                degeneration_type=None,
-                has_fabrication=False,
-                fabrication_issues=[],
-                has_reasoning_leak=False,
-                reasoning_leak_markers=[],
-                has_context_echo=True,
-                context_echo_ratio=0.9,
-                has_harness_issue=False,
-                harness_issue_type=None,
-                harness_issue_details=[],
-                word_count=80,
-                unique_ratio=0.3,
-                prompt_checks_ran=True,
-            ),
-        )
-
-        result = generate_diagnostics_report(
-            results=[success],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            prompt="test",
-            history=DiagnosticsHistoryInputs(
-                preflight_issues=(
-                    "transformers==5.4.0 is below minimum 5.7.0 required by check_models.",
-                ),
-            ),
-        )
-
-        assert result is True
-        content = out.read_text(encoding="utf-8")
-        assert "`transformers / mlx-vlm`" in content
-        assert "Long-Context Degradation / Potential Stack Issues" in content
 
     def test_report_written_on_failure(self, tmp_path: Path) -> None:
         """Diagnostics file created when a model fails."""
@@ -3050,13 +3988,8 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        # Both should be in the same cluster section, not separate sections
-        # Count the number of "##" headings that mention grouped failure heading
-        error_sections = [
-            ln for ln in content.splitlines() if ln.startswith("## ") and "Failure affecting" in ln
-        ]
-        assert len(error_sections) == 1
-        # Both models mentioned in that section
+        assert content.count("## Expected and Actual Behaviour") == 1
+        assert "Affected models:_ org/model-a, org/model-b" in content
         assert "org/model-a" in content
         assert "org/model-b" in content
 
@@ -3085,6 +4018,40 @@ class TestDiagnosticsReport:
         content = out.read_text(encoding="utf-8")
         assert "chat_template is not set" in content
         assert "Missing 1 parameters: lm_head.weight" in content
+
+    def test_multiple_diagnostic_clusters_use_lint_safe_heading_hierarchy(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Inline issue bodies should be distinct and Markdown-lint clean."""
+        out = tmp_path / "diag.md"
+        generate_diagnostics_report(
+            results=[
+                _make_failure_with_details(
+                    "org/model-a",
+                    error_msg="chat_template is not set",
+                    error_stage="No Chat Template",
+                ),
+                _make_failure_with_details(
+                    "org/model-b",
+                    error_msg="Missing 1 parameters: lm_head.weight",
+                    error_stage="Weight Mismatch",
+                    error_package="mlx",
+                ),
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert content.count("\n## Issue ") == 2
+        assert content.count("\n### Expected and Actual Behaviour\n") == 2
+        assert content.count("\n### Native mlx-vlm reproduction\n") == 2
+        assert content.count("\n### Expected Fix Signal\n") == 2
+        assert "\n- _Filing target:_ mlx-vlm\n\n### Native mlx-vlm reproduction\n" in content
+        assert "\n- _Filing target:_ mlx\n\n### Native mlx-vlm reproduction\n" in content
 
     def test_captured_output_omitted_from_compact_diagnostics(self, tmp_path: Path) -> None:
         """Captured stdout/stderr belongs in issue drafts and bundles, not diagnostics."""
@@ -3153,71 +4120,93 @@ class TestDiagnosticsReport:
         content = out.read_text(encoding="utf-8")
         failure_section = _extract_markdown_subsection(
             content,
-            "## 1. Failure affecting 1 model",
-            end_headings=["<!-- markdownlint-disable MD060 -->"],
+            "## Crash / Failure Matrix",
+            end_headings=["## mlx-vlm / MLX Issue Matrix"],
         )
-        assert "**Observed error:**" in failure_section
-        assert "**Relevant upstream traceback:**" in failure_section
+        assert "Crash evidence: org/upstream-fail" in failure_section
         assert "mlx_vlm/utils.py" in failure_section
         assert "AttributeError: property 'eos_token_id'" in failure_section
         assert "check_models/src/check_models.py" not in failure_section
         assert "_run_model_generation" not in failure_section
 
-    def test_history_context_includes_regressions_recoveries_and_repro(
+    def test_diagnostics_make_local_paths_home_relative(self, tmp_path: Path) -> None:
+        """Public issue artifacts should not expose the local account path."""
+        home = str(Path.home())
+        traceback_text = (
+            "Traceback (most recent call last):\n"
+            f'  File "{home}/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", '
+            "line 69, in load\n"
+            "    raise ValueError('bad config')\n"
+            "ValueError: bad config\n"
+        )
+        out = tmp_path / "diag.md"
+
+        generate_diagnostics_report(
+            results=[
+                _make_failure_with_details(
+                    "org/upstream-fail",
+                    error_msg="bad config",
+                    traceback_str=traceback_text,
+                ),
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={
+                "MLX Distribution Root": f"{home}/miniconda3/envs/mlx-vlm/site-packages",
+            },
+            prompt="test",
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert home not in content
+        assert 'File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py"' in content
+        assert "~/miniconda3/envs/mlx-vlm/site-packages" in content
+
+    def test_failure_section_uses_one_chronological_failure_narrative(
         self,
         tmp_path: Path,
     ) -> None:
-        """Diagnostics should show history-based regression/recovery and retry context."""
+        """Failure reports should lead with the root and retain later wrappers."""
         out = tmp_path / "diag.md"
-        history_path = tmp_path / "results.history.jsonl"
-
-        old_record = _history_run(
-            {"org/a": False, "org/b": False},
-            timestamp="2026-02-10 10:00:00 GMT",
-        )
-        previous_record = _history_run(
-            {"org/a": True, "org/b": False},
-            timestamp="2026-02-11 10:00:00 GMT",
-        )
-        current_record = _history_run(
-            {"org/a": False, "org/b": True},
-            timestamp="2026-02-12 10:00:00 GMT",
-        )
-        history_path.write_text(
-            "\n".join(
-                [
-                    json.dumps(old_record),
-                    json.dumps(previous_record),
-                    json.dumps(current_record),
-                ],
-            )
-            + "\n",
-            encoding="utf-8",
+        failure = replace(
+            _make_failure_with_details(
+                "org/chained-fail",
+                error_msg="generation failed",
+            ),
+            exception_chain=(
+                check_models.FailureException(
+                    "IndexError",
+                    "builtins",
+                    "token id 999 outside detokenizer table",
+                ),
+                check_models.FailureException(
+                    "RuntimeError",
+                    "builtins",
+                    "METAL command buffer out of memory",
+                ),
+                check_models.FailureException(
+                    "ValueError",
+                    "builtins",
+                    "generation failed",
+                ),
+            ),
         )
 
         generate_diagnostics_report(
-            results=[_make_failure_with_details("org/a", error_msg="boom")],
+            results=[failure],
             filename=out,
             versions=_stub_versions(),
             system_info={},
             prompt="test",
-            history=DiagnosticsHistoryInputs(
-                history_path=history_path,
-                previous_history=previous_record,
-                current_history=current_record,
-            ),
         )
+
         content = out.read_text(encoding="utf-8")
-        assert "## History Context" in content
-        assert "`org/a`" in content
-        assert "new regression" in content
-        assert "Recoveries since previous run" in content
-        assert "`org/b`" in content
-        assert "2/3 recent runs failed" in content
-        assert "2026-02-10 10:00:00 GMT" in content
+        assert "IndexError: token id 999 outside detokenizer table" in content
+        assert "RuntimeError: METAL command buffer out of memory" in content
+        assert "ValueError: generation failed" in content
 
     def test_issue_queue_present(self, tmp_path: Path) -> None:
-        """Issue Queue table should include links plus inline evidence context."""
+        """Issue matrix should contain inline evidence without draft dependencies."""
         out = tmp_path / "diag.md"
         generate_diagnostics_report(
             results=[
@@ -3235,40 +4224,22 @@ class TestDiagnosticsReport:
         assert content.startswith("<!-- markdownlint-disable MD013 -->\n\n# Diagnostics Report")
         assert "<!-- markdownlint-disable MD060 -->" in content
         assert "<!-- markdownlint-enable MD060 -->" in content
-        assert "## Issue Queue" in content
-        assert "Issue Draft" in content
+        assert "## mlx-vlm / MLX Issue Matrix" in content
         assert "Target" in content
         assert "Evidence Snapshot" in content
         assert "Model Error" in content
         assert "phase model_load" in content
         assert "ValueError" in content
-        assert "Evidence Bundle" in content
+        assert "Confidence" in content
+        assert "Evidence Type" in content
         assert "Fixed When" in content
-        assert "issues/index.md" in content
-        assert (
-            "https://github.com/jrp2014/check_models/blob/main/src/output/issues/index.md"
-        ) in content
-
-        # Now test relative local links when the link-style state is "relative"
-        with patch.object(check_models._LinkStyleState, "value", "relative"):
-            generate_diagnostics_report(
-                results=[
-                    _make_failure_with_details(
-                        failure_phase="model_load",
-                        error_type="ValueError",
-                    )
-                ],
-                filename=out,
-                versions=_stub_versions(),
-                system_info={},
-                prompt="test",
-            )
-            content_relative = out.read_text(encoding="utf-8")
-            assert "../issues/index.md" in content_relative
+        assert "issues/index.md" not in content
+        assert "issue draft" not in content.casefold()
         assert "Priority" not in content
-        assert content.index("## Issue Queue") < content.index("## 1. Failure")
-        assert content.index("## Issue Queue") < content.index("## Environment")
-        assert content.index("## Reproducibility") < content.index("## Environment")
+        assert content.index("## Crash / Failure Matrix") < content.index(
+            "## mlx-vlm / MLX Issue Matrix"
+        )
+        assert content.index("## Native mlx-vlm reproduction") < content.index("## Environment")
 
     def test_failure_observed_behavior_keeps_multiline_error_details(
         self,
@@ -3300,155 +4271,6 @@ class TestDiagnosticsReport:
         ) in content
         assert "multi_modal_projector.layer_norm.weight." in content
 
-    def test_report_stamp_is_not_setext_heading(self, tmp_path: Path) -> None:
-        """Report stamp must be separated from the next horizontal rule."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[_make_failure_with_details()],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        report_tail = content.split("Report generated on: ", maxsplit=1)[1]
-        assert ").\n\n<!-- markdownlint-disable MD060 -->\n\n---\n\n## Environment" in report_tail
-        assert ").\n---\n\n## Environment" not in report_tail
-        assert "_Report generated on" not in content
-
-    def test_action_summary_and_repro_pointers_present(self, tmp_path: Path) -> None:
-        """Diagnostics should include compact action triage and repro pointers."""
-        out = tmp_path / "diag.md"
-        image_path = tmp_path / "sample image.jpg"
-        image_path.write_text("placeholder", encoding="utf-8")
-        adapter_path = tmp_path / "portable-adapter"
-        run_args = Namespace(
-            image=image_path,
-            folder=None,
-            models=None,
-            exclude=None,
-            trust_remote_code=False,
-            revision="main",
-            adapter_path=adapter_path,
-            prompt=None,
-            detailed_metrics=False,
-            resize_shape=None,
-            eos_tokens=None,
-            skip_special_tokens=False,
-            processor_kwargs=None,
-            enable_thinking=False,
-            thinking_budget=None,
-            thinking_start_token=None,
-            thinking_end_token=None,
-            max_tokens=123,
-            temperature=0.7,
-            top_p=0.92,
-            min_p=0.08,
-            top_k=24,
-            repetition_penalty=1.1,
-            repetition_context_size=50,
-            lazy_load=False,
-            max_kv_size=None,
-            kv_bits=None,
-            kv_quant_scheme=check_models.DEFAULT_KV_QUANT_SCHEME,
-            prefill_step_size=16,
-            kv_group_size=64,
-            quantized_kv_start=2048,
-            timeout=42.0,
-            verbose=True,
-            no_color=False,
-            force_color=False,
-            width=None,
-            quality_config=None,
-            context_marker="Context:",
-        )
-        stack_signal = PerformanceResult(
-            model_name="org/stack-probe",
-            success=True,
-            generation=_MockGeneration(
-                text="echoed context",
-                prompt_tokens=15000,
-                generation_tokens=80,
-            ),
-            total_time=1.0,
-            generation_time=0.5,
-            model_load_time=0.5,
-            quality_analysis=GenerationQualityAnalysis(
-                is_repetitive=False,
-                repeated_token=None,
-                hallucination_issues=[],
-                is_verbose=False,
-                formatting_issues=[],
-                has_excessive_bullets=False,
-                bullet_count=0,
-                is_context_ignored=False,
-                missing_context_terms=[],
-                is_refusal=False,
-                refusal_type=None,
-                is_generic=False,
-                specificity_score=0.0,
-                has_language_mixing=False,
-                language_mixing_issues=[],
-                has_degeneration=False,
-                degeneration_type=None,
-                has_fabrication=False,
-                fabrication_issues=[],
-                has_reasoning_leak=False,
-                reasoning_leak_markers=[],
-                has_context_echo=True,
-                context_echo_ratio=0.94,
-                has_harness_issue=False,
-                harness_issue_type=None,
-                harness_issue_details=[],
-                word_count=80,
-                unique_ratio=0.3,
-                prompt_checks_ran=True,
-            ),
-        )
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details("org/broken-model"),
-                _make_harness_success("org/harness-probe"),
-                stack_signal,
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-            image_path=image_path,
-            run_args=run_args,
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "## Appendix" not in content
-        assert "### Portable upstream probes (no local image required)" not in content
-        assert "Issue-specific native repro commands are in the linked issue drafts." in content
-        assert "Queued issue models:" in content
-        assert "org/broken-model" in content
-        assert "org/harness-probe" in content
-        assert "org/stack-probe" in content
-        assert "check_models_portable_probe.png" not in content
-        assert str(image_path) in content
-
-    def test_unflagged_models_section_lists_successes(self, tmp_path: Path) -> None:
-        """Diagnostics should summarize unflagged successes without listing every model."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details("org/fail"),
-                _make_success("org/pass-a"),
-                _make_success("org/pass-b"),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "## Models Not Flagged (2 model(s))" in content
-        assert "- **Clean output:** 2 model(s)." in content
-        assert "`org/pass-a`" not in content
-        assert "`org/pass-b`" not in content
-
     def test_build_diagnostics_snapshot_classifies_prompt_backfilled_harness_run(self) -> None:
         """Prompt-aware snapshot building should classify harness issues without cached analysis."""
         failure = _make_failure_with_details("org/fail")
@@ -3469,224 +4291,6 @@ class TestDiagnosticsReport:
         assert len(snapshot.harness_results) == 1
         assert snapshot.harness_results[0][0].model_name == "org/harness-implicit"
         assert not snapshot.unflagged_successful
-
-    def test_unflagged_models_section_categorizes_by_quality(self, tmp_path: Path) -> None:
-        """Unflagged successful models should be summarized by quality bucket."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details("org/fail"),
-                _make_quality_success("org/clean", with_quality_issue=False),
-                _make_quality_success("org/warn", with_quality_issue=True),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "## Models Not Flagged (2 model(s))" in content
-        assert "- **Clean output:** 1 model(s)." in content
-        assert "- **Ran, but with quality warnings:** 1 model(s)." in content
-        assert "`org/clean`" not in content
-        assert "`org/warn`" not in content
-        assert "Output formatting deviated from the requested structure." not in content
-
-    def test_coverage_and_runtime_metrics_section(self, tmp_path: Path) -> None:
-        """Diagnostics should verify exclusive model coverage and report aggregate runtime."""
-        out = tmp_path / "diag.md"
-        stack_only_success = PerformanceResult(
-            model_name="org/stack",
-            success=True,
-            generation=_MockGeneration(text="", prompt_tokens=5000, generation_tokens=0),
-            total_time=2.0,
-            generation_time=1.0,
-            model_load_time=1.0,
-            runtime_diagnostics=RuntimeDiagnostics(
-                input_validation_time_s=0.05,
-                model_load_time_s=1.0,
-                prompt_prep_time_s=0.15,
-                decode_time_s=0.8,
-                cleanup_time_s=0.1,
-                first_token_latency_s=0.25,
-                stop_reason="completed",
-            ),
-        )
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details("org/fail"),
-                _make_harness_success("org/harness"),
-                stack_only_success,
-                _make_success("org/clean"),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-
-        content = out.read_text(encoding="utf-8")
-        assert "## Coverage & Runtime Metrics" in content
-        assert "**Detailed diagnostics models:** 3" in content
-        assert "**Summary diagnostics models:** 1" in content
-        assert "**Coverage check:** ✅ Complete (each model appears exactly once)." in content
-        assert "**Total model runtime (sum):**" in content
-        assert "**Average runtime per model:**" in content
-        assert "Runtime aggregates: unavailable" not in content
-        assert "**Runtime note:**" in content
-        assert "**Dominant runtime phase:**" in content
-        assert "local prompt prep=" in content
-        assert "upstream model prefill / first-token=" in content
-        assert "input preparation + decode=" in content
-        assert "**Generation total:**" in content
-        assert "**Validation overhead:**" in content
-        assert "**Upstream model prefill / first-token time:**" in content
-        assert "**What this likely means:**" in content
-        assert "**Suggested next action:**" in content
-
-    def test_runtime_metrics_split_prefill_from_generation_residual(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Diagnostics should expose upstream prefill as a distinct derived phase."""
-        out = tmp_path / "diag.md"
-        prefill_heavy = PerformanceResult(
-            model_name="org/prefill-heavy",
-            success=True,
-            generation=_MockGeneration(text="ok", prompt_tokens=1000, generation_tokens=10),
-            total_time=10.4,
-            generation_time=10.0,
-            model_load_time=0.2,
-            runtime_diagnostics=RuntimeDiagnostics(
-                model_load_time_s=0.2,
-                prompt_prep_time_s=0.1,
-                decode_time_s=10.0,
-                cleanup_time_s=0.1,
-                first_token_latency_s=8.0,
-                stop_reason="completed",
-            ),
-        )
-        decode_heavy = replace(
-            prefill_heavy,
-            model_name="org/decode-heavy",
-            total_time=6.4,
-            generation_time=6.0,
-            runtime_diagnostics=RuntimeDiagnostics(
-                model_load_time_s=0.2,
-                prompt_prep_time_s=0.1,
-                decode_time_s=6.0,
-                cleanup_time_s=0.1,
-                first_token_latency_s=1.0,
-                stop_reason="completed",
-            ),
-        )
-
-        generate_diagnostics_report(
-            results=[prefill_heavy, decode_heavy],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-
-        content = out.read_text(encoding="utf-8")
-        assert (
-            "**Dominant runtime phase:** upstream model prefill / first-token dominated" in content
-        )
-        assert "upstream model prefill / first-token=9.00s" in content
-        assert "input preparation + decode=7.00s" in content
-        assert (
-            "**Generation total:** 16.00s across 2 model(s); upstream model prefill / "
-            "first-token split available for 2/2 model(s)."
-        ) in content
-
-    def test_runtime_metrics_keep_unsplit_generation_when_first_token_missing(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Missing first-token latency should preserve the old generation total fallback."""
-        out = tmp_path / "diag.md"
-        result = PerformanceResult(
-            model_name="org/no-first-token",
-            success=True,
-            generation=_MockGeneration(text="ok", prompt_tokens=100, generation_tokens=10),
-            total_time=3.3,
-            generation_time=3.0,
-            model_load_time=0.2,
-            runtime_diagnostics=RuntimeDiagnostics(
-                model_load_time_s=0.2,
-                prompt_prep_time_s=0.1,
-                decode_time_s=3.0,
-                cleanup_time_s=0.0,
-                first_token_latency_s=None,
-                stop_reason="completed",
-            ),
-        )
-
-        generate_diagnostics_report(
-            results=[_make_failure_with_details("org/fail"), result],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-
-        content = out.read_text(encoding="utf-8")
-        assert "generation call total (unsplit)=3.00s" in content
-        assert "post-prefill decode=" not in content
-        assert "upstream prefill / first-token=" not in content
-
-    def test_report_written_for_stack_signal_without_failures(self, tmp_path: Path) -> None:
-        """Suspicious successful runs should still produce diagnostics for stack triage."""
-        out = tmp_path / "diag.md"
-        repeated_phrase = "loop"
-        analysis = GenerationQualityAnalysis(
-            is_repetitive=True,
-            repeated_token=repeated_phrase,
-            hallucination_issues=[],
-            is_verbose=False,
-            formatting_issues=[],
-            has_excessive_bullets=False,
-            bullet_count=0,
-            is_context_ignored=False,
-            missing_context_terms=[],
-            is_refusal=False,
-            refusal_type=None,
-            is_generic=False,
-            specificity_score=0.0,
-            has_language_mixing=False,
-            language_mixing_issues=[],
-            has_degeneration=False,
-            degeneration_type=None,
-            has_fabrication=False,
-            fabrication_issues=[],
-            has_harness_issue=False,
-            harness_issue_type=None,
-            harness_issue_details=[],
-            word_count=40,
-            unique_ratio=0.05,
-            prompt_checks_ran=True,
-        )
-        success = PerformanceResult(
-            model_name="org/suspicious-success",
-            success=True,
-            generation=_MockGeneration(text=("loop " * 40).strip(), prompt_tokens=15000),
-            total_time=1.0,
-            generation_time=0.5,
-            model_load_time=0.5,
-            quality_analysis=analysis,
-        )
-        result = generate_diagnostics_report(
-            results=[success],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-        assert result is True
-        content = out.read_text(encoding="utf-8")
-        assert "### Long-Context Degradation / Potential Stack Issues" in content
-        assert "org/suspicious-success" in content
 
     def test_report_written_for_text_sanity_success_without_failures(self, tmp_path: Path) -> None:
         """Successful token-soup generations should be detailed in diagnostics."""
@@ -3718,266 +4322,12 @@ class TestDiagnosticsReport:
 
         assert result is True
         content = out.read_text(encoding="utf-8")
-        assert "## Text-Sanity / Semantic Mismatch Issues (1 model(s))" in content
+        assert "## Model/config observations" in content
         assert "org/token-soup" in content
-        assert "gibberish(mixed_script_noise)" in content
+        assert "Generated text is mixed-script token-soup" in content
         assert "open对不同方面" in content
+        assert "## mlx-vlm / MLX Issue Matrix" not in content
         assert "## Models Not Flagged" not in content
-
-    def test_report_written_for_context_echo_stack_signal(self, tmp_path: Path) -> None:
-        """Extreme prompt-length context echo should be surfaced as a stack-signal candidate."""
-        out = tmp_path / "diag.md"
-        analysis = GenerationQualityAnalysis(
-            is_repetitive=False,
-            repeated_token=None,
-            hallucination_issues=[],
-            is_verbose=False,
-            formatting_issues=[],
-            has_excessive_bullets=False,
-            bullet_count=0,
-            is_context_ignored=False,
-            missing_context_terms=[],
-            is_refusal=False,
-            refusal_type=None,
-            is_generic=False,
-            specificity_score=0.0,
-            has_language_mixing=False,
-            language_mixing_issues=[],
-            has_degeneration=False,
-            degeneration_type=None,
-            has_fabrication=False,
-            fabrication_issues=[],
-            has_reasoning_leak=False,
-            reasoning_leak_markers=[],
-            has_context_echo=True,
-            context_echo_ratio=0.94,
-            has_harness_issue=False,
-            harness_issue_type=None,
-            harness_issue_details=[],
-            word_count=80,
-            unique_ratio=0.3,
-            prompt_checks_ran=True,
-        )
-        success = PerformanceResult(
-            model_name="org/context-echo",
-            success=True,
-            generation=_MockGeneration(
-                text="echoed context",
-                prompt_tokens=15000,
-                generation_tokens=80,
-            ),
-            total_time=1.0,
-            generation_time=0.5,
-            model_load_time=0.5,
-            quality_analysis=analysis,
-        )
-
-        result = generate_diagnostics_report(
-            results=[success],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-
-        assert result is True
-        content = out.read_text(encoding="utf-8")
-        assert "### Long-Context Degradation / Potential Stack Issues" in content
-        assert "`mlx-vlm / mlx`" in content
-        assert "org/context-echo" in content
-
-    def test_action_summary_splits_mixed_stack_signal_owners(self, tmp_path: Path) -> None:
-        """Mixed stack-signal owner classes should render separate maintainer triage rows."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[
-                PerformanceResult(
-                    model_name="org/stack-empty",
-                    success=True,
-                    generation=_MockGeneration(text="", prompt_tokens=5000, generation_tokens=0),
-                    total_time=1.0,
-                    generation_time=0.5,
-                    model_load_time=0.5,
-                    quality_analysis=GenerationQualityAnalysis(
-                        is_repetitive=False,
-                        repeated_token=None,
-                        hallucination_issues=[],
-                        is_verbose=False,
-                        formatting_issues=[],
-                        has_excessive_bullets=False,
-                        bullet_count=0,
-                        is_context_ignored=False,
-                        missing_context_terms=[],
-                        is_refusal=False,
-                        refusal_type=None,
-                        is_generic=False,
-                        specificity_score=0.0,
-                        has_language_mixing=False,
-                        language_mixing_issues=[],
-                        has_degeneration=False,
-                        degeneration_type=None,
-                        has_fabrication=False,
-                        fabrication_issues=[],
-                        has_reasoning_leak=False,
-                        reasoning_leak_markers=[],
-                        has_context_echo=False,
-                        context_echo_ratio=0.0,
-                        has_harness_issue=False,
-                        harness_issue_type=None,
-                        harness_issue_details=[],
-                        word_count=0,
-                        unique_ratio=0.0,
-                        prompt_checks_ran=True,
-                    ),
-                ),
-                PerformanceResult(
-                    model_name="org/stack-context",
-                    success=True,
-                    generation=_MockGeneration(
-                        text="echoed context",
-                        prompt_tokens=15000,
-                        generation_tokens=80,
-                    ),
-                    total_time=1.0,
-                    generation_time=0.5,
-                    model_load_time=0.5,
-                    quality_analysis=GenerationQualityAnalysis(
-                        is_repetitive=False,
-                        repeated_token=None,
-                        hallucination_issues=[],
-                        is_verbose=False,
-                        formatting_issues=[],
-                        has_excessive_bullets=False,
-                        bullet_count=0,
-                        is_context_ignored=False,
-                        missing_context_terms=[],
-                        is_refusal=False,
-                        refusal_type=None,
-                        is_generic=False,
-                        specificity_score=0.0,
-                        has_language_mixing=False,
-                        language_mixing_issues=[],
-                        has_degeneration=False,
-                        degeneration_type=None,
-                        has_fabrication=False,
-                        fabrication_issues=[],
-                        has_reasoning_leak=False,
-                        reasoning_leak_markers=[],
-                        has_context_echo=True,
-                        context_echo_ratio=0.9,
-                        has_harness_issue=False,
-                        harness_issue_type=None,
-                        harness_issue_details=[],
-                        word_count=80,
-                        unique_ratio=0.3,
-                        prompt_checks_ran=True,
-                    ),
-                ),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "`mlx-vlm`" in content
-        assert "`mlx-vlm / mlx`" in content
-        assert "org/stack-empty" in content
-        assert "org/stack-context" in content
-
-    def test_action_summary_splits_mixed_preflight_owners(self, tmp_path: Path) -> None:
-        """Mixed preflight owner classes should render separate maintainer triage rows."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[_make_success()],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-            history=DiagnosticsHistoryInputs(
-                preflight_issues=(
-                    "transformers==5.4.0 is below minimum 5.7.0 required by check_models.",
-                    "mlx runtime probe reported a suspicious cache incompatibility",
-                ),
-            ),
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "`transformers`" in content
-        assert "`mlx`" in content
-        assert "verify API compatibility and pinned version floor." in content
-        assert "mlx runtime probe reported a suspicious cache incompatibility" in content
-
-    def test_harness_token_leak_details_are_escaped(self, tmp_path: Path) -> None:
-        """Token leak details should be escaped so markdown does not treat them as HTML."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[
-                _make_harness_success(
-                    name="org/harness-token",
-                    text="safe output",
-                    harness_type="stop_token",
-                    harness_detail="token_leak:<|end|>",
-                ),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "Special control token &lt;|end|&gt; appeared in generated text." in content
-        assert "Special control token <|end|> appeared in generated text." not in content
-
-    def test_reproducibility_section(self, tmp_path: Path) -> None:
-        """Reproducibility section should point to issue-specific native repros."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[_make_failure_with_details("org/broken-model")],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "## Reproducibility" in content
-        assert "Issue-specific native repro commands are in the linked issue drafts." in content
-        assert "Queued issue models:" in content
-        assert "`org/broken-model`" in content
-        assert "### Target specific failing models" not in content
-        assert "python -m check_models" in content
-
-    def test_filing_guidance_points_to_footer_repro_section(self, tmp_path: Path) -> None:
-        """Failure clusters should point readers to the footer repro appendix."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details(
-                    "org/broken-model",
-                    error_msg="got an unexpected keyword argument 'images'",
-                    error_package="transformers",
-                    error_stage="API Mismatch",
-                    traceback_str='Traceback\nFile "x.py", line 12, in y\nTypeError: bad',
-                ),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13", "Platform": "macOS", "GPU/Chip": "Apple M4"},
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "### To reproduce" in content
-        assert "### Filing Guidance" not in content
-        assert "Copy/paste GitHub issue template" not in content
-        assert "Observed" in content
-        assert "Failure phase" not in content
-        assert "Canonical code" not in content
-        assert "Signature" not in content
-        assert "Environment fingerprint" not in content
-        assert "Use the linked issue draft for the native upstream repro command." in content
-        assert "Representative failing model: `org/broken-model`" in content
-        assert "Repro command (exact run)" not in content
-        assert "issues/new" not in content
-        assert "repro_bundles" in content
 
     def test_failure_cluster_shows_generated_output_inline(self, tmp_path: Path) -> None:
         """Failure clusters should show generated output inline when present."""
@@ -3996,17 +4346,32 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        assert "**Observed model output (`org/partial`):**" in content
+        assert "Crash evidence: org/partial" in content
         assert "Partial decoded answer before crash." in content
 
     def test_failure_repro_bundles_written(self, tmp_path: Path) -> None:
-        """Each failed model should produce a machine-readable repro bundle."""
-        failure = _make_failure_with_details(
-            "org/broken-model",
-            error_msg="bad shape",
-            error_stage="Model Error",
-            error_package="mlx-vlm",
-            traceback_str="Traceback\nValueError: bad shape",
+        """Failure repros should add one narrative while preserving legacy fields."""
+        failure = replace(
+            _make_failure_with_details(
+                "org/broken-model",
+                error_msg="generation failed",
+                error_type="ValueError",
+                error_stage="Model Error",
+                error_package="mlx-vlm",
+                traceback_str="Traceback\nValueError: generation failed",
+            ),
+            exception_chain=(
+                check_models.FailureException(
+                    "RuntimeError",
+                    "mlx.core",
+                    "kIOGPUCommandBufferCallbackErrorOutOfMemory",
+                ),
+                check_models.FailureException(
+                    "ValueError",
+                    "builtins",
+                    "mlx_vlm/generate.py generation failed",
+                ),
+            ),
         )
         bundles = export_failure_repro_bundles(
             results=[failure],
@@ -4022,7 +4387,33 @@ class TestDiagnosticsReport:
         assert bundle_path.exists()
         payload = json.loads(bundle_path.read_text(encoding="utf-8"))
         assert payload["model"] == "org/broken-model"
+        assert payload["failure"]["type"] == "ValueError"
+        assert payload["failure"]["package"] == "mlx-vlm"
+        assert payload["failure"]["message"] == "generation failed"
         assert payload["failure"]["stage"] == "Model Error"
+        assert payload["failure"]["exception_chain"] == [
+            {
+                "type": "RuntimeError",
+                "module": "mlx.core",
+                "message": "kIOGPUCommandBufferCallbackErrorOutOfMemory",
+            },
+            {
+                "type": "ValueError",
+                "module": "builtins",
+                "message": "mlx_vlm/generate.py generation failed",
+            },
+        ]
+        assert payload["failure"]["task_outcome"] == "crashed"
+        assert (
+            payload["failure"]["primary_exception"]
+            == "RuntimeError: kIOGPUCommandBufferCallbackErrorOutOfMemory"
+        )
+        assert payload["failure"]["secondary_exceptions"] == [
+            "ValueError: mlx_vlm/generate.py generation failed"
+        ]
+        assert payload["failure"]["suspected_owner"] == "unresolved: mlx/mlx-vlm"
+        assert payload["failure"]["owner_confidence"] == "low"
+        assert payload["result"]["maintainer_triage"]["suspected_owner"] == "mlx-vlm"
         assert payload["repro"]["prompt_hash_sha256"]
         assert payload["repro"]["eval_mode"] == "blind"
 
@@ -4157,7 +4548,8 @@ class TestDiagnosticsReport:
             image_path=image_path,
         )
         content = out.read_text(encoding="utf-8")
-        assert f"--image '{image_path}'" in content
+        assert "--image 'sample image.jpg'" in content
+        assert str(image_path) not in content
 
     def test_reproducibility_section_includes_sampling_and_runtime_flags(
         self,
@@ -4217,9 +4609,9 @@ class TestDiagnosticsReport:
         content = out.read_text(encoding="utf-8")
         assert "--max-tokens 123" in content
         assert "--temperature 0.7" in content
-        assert "--top-p 0.92" in content
-        assert "--min-p 0.08" in content
-        assert "--top-k 24" in content
+        assert "--top-p" not in content
+        assert "--min-p" not in content
+        assert "--top-k" not in content
         assert "--resize-shape 768 512" in content
         assert "--eos-tokens '</think>'" in content
         assert "--skip-special-tokens" in content
@@ -4229,144 +4621,12 @@ class TestDiagnosticsReport:
         assert "--enable-thinking" in content
         assert "--thinking-budget 96" in content
         assert "--thinking-start-token '<think>'" in content
-        assert "--repetition-penalty 1.1" in content
-        assert "--repetition-context-size 50" in content
+        assert "--repetition-penalty" not in content
+        assert "--repetition-context-size" not in content
         assert "--quantized-kv-start 2048" in content
-        assert "--timeout 42.0" in content
-        assert "--no-trust-remote-code" in content
-        assert "--verbose" in content
-
-    def test_reproducibility_lists_each_failing_model(self, tmp_path: Path) -> None:
-        """Queued issue-model summary should include every failed model (no truncation)."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details("org/a"),
-                _make_failure_with_details("org/b"),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "Queued issue models:" in content
-        assert "`org/a`" in content
-        assert "`org/b`" in content
-        assert "python -m check_models --models org/a" not in content
-        assert "python -m check_models --models org/b" not in content
-
-    def test_portable_upstream_probes_include_harness_and_stack_models_only(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Harness and stack-only reports should still get portable generation probes."""
-        out = tmp_path / "diag.md"
-        image_path = tmp_path / "portable original image.jpg"
-        image_path.write_text("placeholder", encoding="utf-8")
-        stack_signal = PerformanceResult(
-            model_name="org/stack-only",
-            success=True,
-            generation=_MockGeneration(
-                text="echoed context",
-                prompt_tokens=15000,
-                generation_tokens=80,
-            ),
-            total_time=1.0,
-            generation_time=0.5,
-            model_load_time=0.5,
-            quality_analysis=GenerationQualityAnalysis(
-                is_repetitive=False,
-                repeated_token=None,
-                hallucination_issues=[],
-                is_verbose=False,
-                formatting_issues=[],
-                has_excessive_bullets=False,
-                bullet_count=0,
-                is_context_ignored=False,
-                missing_context_terms=[],
-                is_refusal=False,
-                refusal_type=None,
-                is_generic=False,
-                specificity_score=0.0,
-                has_language_mixing=False,
-                language_mixing_issues=[],
-                has_degeneration=False,
-                degeneration_type=None,
-                has_fabrication=False,
-                fabrication_issues=[],
-                has_reasoning_leak=False,
-                reasoning_leak_markers=[],
-                has_context_echo=True,
-                context_echo_ratio=0.94,
-                has_harness_issue=False,
-                harness_issue_type=None,
-                harness_issue_details=[],
-                word_count=80,
-                unique_ratio=0.3,
-                prompt_checks_ran=True,
-            ),
-        )
-        run_args = Namespace(
-            image=image_path,
-            folder=None,
-            models=None,
-            exclude=None,
-            trust_remote_code=True,
-            revision=None,
-            adapter_path=None,
-            prompt=None,
-            max_tokens=check_models.DEFAULT_MAX_TOKENS,
-            temperature=check_models.DEFAULT_TEMPERATURE,
-            top_p=1.0,
-            repetition_penalty=None,
-            repetition_context_size=None,
-            min_p=0.0,
-            top_k=0,
-            max_kv_size=None,
-            kv_bits=None,
-            kv_quant_scheme=check_models.DEFAULT_KV_QUANT_SCHEME,
-            prefill_step_size=None,
-            thinking_budget=None,
-            thinking_start_token=None,
-            thinking_end_token=None,
-            kv_group_size=64,
-            quantized_kv_start=check_models.DEFAULT_QUANTIZED_KV_START,
-            timeout=check_models.DEFAULT_TIMEOUT,
-            detailed_metrics=False,
-            lazy_load=False,
-            skip_special_tokens=False,
-            enable_thinking=False,
-            resize_shape=None,
-            eos_tokens=None,
-            processor_kwargs=None,
-            verbose=False,
-            no_color=False,
-            force_color=False,
-            width=None,
-            quality_config=None,
-            context_marker="Context:",
-        )
-        generate_diagnostics_report(
-            results=[
-                _make_harness_success("org/harness-only"),
-                stack_signal,
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="Describe this image.",
-            image_path=image_path,
-            run_args=run_args,
-        )
-
-        content = out.read_text(encoding="utf-8")
-        assert "Queued issue models:" in content
-        assert "`org/harness-only`" in content
-        assert "`org/stack-only`" in content
-        assert "check_models_portable_probe.png" not in content
-        assert "### Portable upstream probes (no local image required)" not in content
-        assert str(image_path) in content
+        assert "--timeout" not in content
+        assert "--no-trust-remote-code" not in content
+        assert "--verbose" not in content
 
     def test_prompt_in_section(self, tmp_path: Path) -> None:
         """Prompt text should be referenced instead of pasted into diagnostics."""
@@ -4380,10 +4640,8 @@ class TestDiagnosticsReport:
         )
         content = out.read_text(encoding="utf-8")
         assert "### Prompt Used" not in content
-        assert "### Run details" in content
-        assert "### Run details\n\n- Input image:" in content
-        assert "Analyze this image carefully." not in content
-        assert "Prompt text is in the linked issue drafts and repro bundles." in content
+        assert "## Impact and Run Conditions" in content
+        assert "Analyze this image carefully." in content
 
     def test_multi_model_cluster_has_no_priority_label(self, tmp_path: Path) -> None:
         """Clusters with multiple models should not emit priority labels."""
@@ -4399,7 +4657,8 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        assert "Failure affecting 2 models" in content
+        assert "Affected models:_ org/a, org/b" in content
+        assert content.count("## Expected and Actual Behaviour") == 1
         assert "Priority" not in content
 
     def test_generate_markdown_report_uses_provided_report_context(self, tmp_path: Path) -> None:
@@ -5907,6 +6166,36 @@ def test_output_index_routes_maintainers_and_model_users(tmp_path: Path) -> None
     assert "model_capabilities.md" in content
     assert "issues/index.md" in content
     assert "latest_by_cluster.json" in content
+    assert "## Primary Artifacts" in content
+    assert "## Supporting Artifacts" in content
+    primary = _extract_markdown_subsection(
+        content,
+        "## Primary Artifacts",
+        end_headings=("## Supporting Artifacts",),
+    )
+    supporting = _extract_markdown_subsection(
+        content,
+        "## Supporting Artifacts",
+        end_headings=("## For Model Users",),
+    )
+    for artifact in (
+        "diagnostics.md",
+        "results.html",
+        "model_selection.md",
+        "model_gallery.md",
+        "results.jsonl",
+    ):
+        assert artifact in primary
+    for artifact in (
+        "results.md",
+        "review.md",
+        "model_capabilities.md",
+        "results.tsv",
+        "results.history.jsonl",
+        "issues/index.md",
+        "latest_by_cluster.json",
+    ):
+        assert artifact in supporting
 
 
 class TestIssueDirectoryInvariants:
