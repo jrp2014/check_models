@@ -1,99 +1,115 @@
-<!-- markdownlint-disable MD013 -->
+<!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
 
-# Diagnostics Report — 0 failure(s), 2 harness issue(s), 0 text-sanity issue(s) (mlx-vlm 0.6.5)
+# \[mlx-vlm / mlx\]\[Long-context collapse\] Long-context generation collapsed or became too short affecting 1 model(s)
 
-**Run summary:** 61 locally-cached VLM model(s) checked; 0 hard failure(s), 2 harness/integration issue(s), 0 text-sanity/semantic issue(s), 0 preflight warning(s), 61 successful run(s).
+## Summary
 
-Test image: `cats.jpg` (0.2 MB).
+1 model(s) show **Long-context collapse** that should be filed against mlx-vlm first; MLX if cache/runtime reproduces.
 
-## Impact and Run Conditions
+- **Observed problem:** Long-context generation collapsed or became too short
+- **Target:** mlx-vlm first; MLX if cache/runtime reproduces
+- **Affected models:** 1
+- **Fixed when:** Full and reduced reruns avoid context collapse.
 
-- _Models tested:_ 61
-- _Crashed:_ 0
-- _Completed:_ 61
-- _Prompt:_ Describe this image briefly.
-- _Image:_ cats.jpg
-## mlx-vlm / MLX Issue Matrix
 
-Routing labels reflect evidence confidence only; a crash remains a conclusive
-failed task at every confidence level.
+## Affected Models
+
 <!-- markdownlint-disable MD060 -->
 
-| Target                                         | Problem                                               | Evidence Snapshot                                                                                                                                                                       | Affected Models                              | Confidence   | Evidence Type   | Fixed When                                      |
-|------------------------------------------------|-------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------|--------------|-----------------|-------------------------------------------------|
-| `mlx-vlm`                                      | Stop/control tokens leaked into generated text        | decoded text contains control token &lt;/think&gt; \| prompt=317 \| output/prompt=59.31% \| stop=completed                                                                              | 1: `mlx-community/Qwen3-VL-2B-Thinking-bf16` | confirmed    | harness         | No leaked stop/control tokens.                  |
-| mlx-vlm first; MLX if cache/runtime reproduces | Long-context generation collapsed or became too short | generated_tokens~3 \| prompt_tokens=4103, output_tokens=3, output/prompt=0.1%, weak text=truncated \| prompt=4,103 \| output/prompt=0.07% \| visual input burden=100% \| stop=completed | 1: `mlx-community/paligemma2-3b-pt-896-4bit` | confirmed    | context_budget  | Full and reduced reruns avoid context collapse. |
+| Model                                     | Observed Behavior                                                                                  | Token Counts                                                                      | Optional Context                                                                                                                                                                           |
+|-------------------------------------------|----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/paligemma2-3b-pt-896-4bit` | generated_tokens~3 \| prompt_tokens=4103, output_tokens=3, output/prompt=0.1%, weak text=truncated | prompt=4,103 \| output/prompt=0.07% \| visual input burden=100% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260717T212852Z_001_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json) |
 <!-- markdownlint-enable MD060 -->
----
-
-## Issue 1: mlx-vlm — Stop-token leakage
-
-### Expected and Actual Behaviour
-
-- _Affected models:_ mlx-community/Qwen3-VL-2B-Thinking-bf16
-- _Expected:_ Affected reruns contain no leaked stop/control tokens and
-  terminate cleanly before the configured max-token cap when the response is
-  complete.
-- _Actual:_ Stop/control tokens leaked into generated text
-- _Filing target:_ mlx-vlm
-
-### Native mlx-vlm reproduction
 
 
-```bash
-python -m mlx_vlm.generate --model mlx-community/Qwen3-VL-2B-Thinking-bf16 --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
-```
+## Minimal Evidence
+
+- `mlx-community/paligemma2-3b-pt-896-4bit`: Output appears truncated to about 3 tokens.
+- `mlx-community/paligemma2-3b-pt-896-4bit`: At long prompt length (4103 tokens), output stayed unusually short (3 tokens; ratio 0.1%; weak text signal truncated).
+- Output excerpt: `Cat.`
 
 
+## Minimal Reproduction
+
+These commands use `mlx-vlm` directly so the issue can be reproduced without installing the `check_models` harness.
+Use a local copy of `cats.jpg` or replace it with an equivalent test image.
 Image SHA256: `dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e`
 
-
-### Expected Fix Signal
-
-- [ ] Affected reruns contain no leaked stop/control tokens and terminate cleanly before the configured max-token cap when the response is complete.
-- [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem.
-
----
-
-## Issue 2: mlx-vlm first; MLX if cache/runtime reproduces — Long-context collapse
-
-### Expected and Actual Behaviour
-
-- _Affected models:_ mlx-community/paligemma2-3b-pt-896-4bit
-- _Expected:_ A same-command rerun and a reduced image/text burden rerun show
-  consistent prompt-token accounting and no long-context collapse.
-- _Actual:_ Long-context generation collapsed or became too short
-- _Filing target:_ mlx-vlm first; MLX if cache/runtime reproduces
-
-### Native mlx-vlm reproduction
+## Native mlx-vlm reproduction
 
 
 ```bash
 python -m mlx_vlm.generate --model mlx-community/paligemma2-3b-pt-896-4bit --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
+Minimal Python repro (representative model):
 
-Image SHA256: `dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e`
+```python
+from mlx_vlm.generate import generate
+from mlx_vlm.prompt_utils import apply_chat_template
+from mlx_vlm.utils import load
+
+MODEL = 'mlx-community/paligemma2-3b-pt-896-4bit'
+IMAGE = 'cats.jpg'
+PROMPT = 'Describe this image briefly.'
+LOAD_KWARGS = {'trust_remote_code': True}
+GENERATE_KWARGS = {'max_tokens': 200, 'temperature': 0.0, 'prefill_step_size': 4096}
+model, processor = load(MODEL, **LOAD_KWARGS)
+formatted_prompt = apply_chat_template(
+    processor,
+    model.config,
+    PROMPT,
+    num_images=1,
+)
+if isinstance(formatted_prompt, list):
+    formatted_prompt = "\n".join(str(message) for message in formatted_prompt)
+result = generate(model, processor, formatted_prompt, image=IMAGE, **GENERATE_KWARGS)
+print(result.text)
+```
+
+Prompt:
+
+```text
+Describe this image briefly.
+```
+
+Generation/load config:
+
+```json
+{
+  "generate_kwargs": {
+    "max_tokens": 200,
+    "prefill_step_size": 4096,
+    "temperature": 0.0
+  },
+  "image": "cats.jpg",
+  "load_kwargs": {
+    "trust_remote_code": true
+  },
+  "model": "mlx-community/paligemma2-3b-pt-896-4bit"
+}
+```
+
+Optional advanced context:
+
+- `mlx-community/paligemma2-3b-pt-896-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260717T212852Z_001_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json)
+- JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
-### Expected Fix Signal
+## Expected Fix Signal
 
 - [ ] A same-command rerun and a reduced image/text burden rerun show consistent prompt-token accounting and no long-context collapse.
 - [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem.
 
-<!-- markdownlint-disable MD060 -->
 
-## Prompt / Input Burden Evidence
+## Fix Checklist
 
-| Model                                   | Burden       |   Total tokens |   Text estimate |   Non-text estimate | Source            |
-|-----------------------------------------|--------------|----------------|-----------------|---------------------|-------------------|
-| mlx-community/paligemma2-3b-pt-896-4bit | visual_input |           4103 |               6 |                4097 | estimated_nontext |
-<!-- markdownlint-enable MD060 -->
-<!-- markdownlint-disable MD060 -->
+- [ ] Rerun with reduced image/text burden and compare output recovery.
+- [ ] Compare prompt-token accounting with text-only and image+text prompts.
+- [ ] Inspect cache allocation, prefill step size, and long-context generation behavior.
 
----
 
-## Environment
+## Appendix: Environment
 
 | Component                  | Version                                                                                                                                         |
 |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -126,4 +142,20 @@ Image SHA256: `dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e`
 | MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (162,449,848 bytes, sha256=1078bd042297dbbf704a414617a7988c55b0001ea69d7cb478bcafa2fdfdeecb) |
 | MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,697,568 bytes, sha256=98e311dc5a6588305bef55d6f231605e3591120df70183b6cec2cf2d424d8362)  |
 | RAM                        | 128.0 GB                                                                                                                                        |
-<!-- markdownlint-enable MD060 -->
+
+
+## Appendix: Detailed Evidence
+
+### `mlx-community/paligemma2-3b-pt-896-4bit`
+
+Observed signals:
+
+- Output appears truncated to about 3 tokens.
+- At long prompt length (4103 tokens), output stayed unusually short (3 tokens; ratio 0.1%; weak text signal truncated).
+
+Sample output:
+
+```text
+Cat.
+```
+
