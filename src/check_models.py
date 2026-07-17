@@ -11488,9 +11488,17 @@ def _collect_report_component_rows(
     for system_key in selected_system_keys:
         system_value = system_info.get(system_key)
         if system_value:
-            rows.append((system_key, system_value))
+            rows.append((system_key, _home_relative_report_text(system_value)))
 
     return rows
+
+
+def _home_relative_report_text(value: str) -> str:
+    """Replace the local home prefix in public report text with ``~``."""
+    home = str(Path.home())
+    if home == "/":
+        return value
+    return value.replace(home, "~")
 
 
 def _cataloging_score_index(
@@ -11531,7 +11539,7 @@ def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord |
     )
     prompt_burden = _prompt_burden_for_result(result, None)
 
-    if analysis is not None:
+    if analysis is not None and result.success:
         requested_max_tokens = analysis.requested_max_tokens or result.requested_max_tokens
         nontext_prompt_ratio = (
             analysis.prompt_tokens_nontext_est / analysis.prompt_tokens_total
@@ -13745,7 +13753,7 @@ def _normalize_traceback_for_report(traceback_str: str | None) -> str | None:
         kept.append(line)
         idx += 1
 
-    sanitized = "\n".join(kept).strip()
+    sanitized = _home_relative_report_text("\n".join(kept).strip())
     return sanitized or None
 
 
@@ -15763,12 +15771,30 @@ def _diagnostics_cluster_issue_sections(
 ) -> list[str]:
     """Build pasteable expected/actual/repro/acceptance blocks per scoped cluster."""
     parts: list[str] = []
-    for cluster in clusters:
+    for issue_number, cluster in enumerate(clusters, start=1):
+        if parts and parts[-1] != "":
+            parts.append("")
+        parts.extend(
+            render_report_markdown(
+                (
+                    ReportSection(
+                        title=(
+                            f"Issue {issue_number}: "
+                            f"{_issue_filing_target_label(cluster.owner)} — "
+                            f"{_issue_subtype_display_label(cluster.issue_subtype)}"
+                        ),
+                        divider=True,
+                    ),
+                )
+            )
+        )
+        parts.append("")
         parts.extend(
             render_report_markdown(
                 (
                     ReportSection(
                         title="Expected and Actual Behaviour",
+                        level=3,
                         blocks=(
                             ReportKeyValues(
                                 rows=(
@@ -15783,18 +15809,27 @@ def _diagnostics_cluster_issue_sections(
                             ),
                         ),
                     ),
+                )
+            )
+        )
+        parts.append("")
+        parts.extend(
+            render_report_markdown(
+                (
                     _native_repro_block(
                         cluster,
                         prompt=prompt,
                         image_path=image_path,
                         run_args=run_args,
+                        heading_level=3,
                     ),
                 )
             )
         )
+        parts.append("")
         if image_hash_line := _issue_image_hash_line(image_path):
             parts.extend(("", image_hash_line, ""))
-        parts.extend(_issue_acceptance_section(cluster))
+        parts.extend(_issue_acceptance_section(cluster, heading_level=3))
     return parts
 
 
@@ -27508,6 +27543,7 @@ def _native_repro_block(
     prompt: str,
     image_path: Path | None,
     run_args: argparse.Namespace | None,
+    heading_level: int = 2,
 ) -> ReportSection:
     """Build one portable native mlx-vlm command for a clustered issue."""
     representative = _issue_cluster_representative(cluster)
@@ -27521,6 +27557,7 @@ def _native_repro_block(
     )
     return ReportSection(
         title="Native mlx-vlm reproduction",
+        level=heading_level,
         blocks=(ReportCodeBlock(command.shell_command(), language="bash"),),
     )
 
@@ -27687,9 +27724,13 @@ def _issue_fix_checklist_section(cluster: IssueCluster) -> list[str]:
     return parts
 
 
-def _issue_acceptance_section(cluster: IssueCluster) -> list[str]:
+def _issue_acceptance_section(
+    cluster: IssueCluster,
+    *,
+    heading_level: int = 2,
+) -> list[str]:
     """Build the expected fixed-state section for one issue cluster."""
-    parts = ["", "## Expected Fix Signal", ""]
+    parts = ["", f"{'#' * heading_level} Expected Fix Signal", ""]
     parts.append(f"- [ ] {MARKDOWN_ESCAPER.escape(cluster.acceptance_signal)}")
     parts.append(
         "- [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem."

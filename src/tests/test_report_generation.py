@@ -10,6 +10,7 @@ import re
 import time
 from argparse import Namespace
 from dataclasses import dataclass, replace
+from pathlib import Path
 from typing import TYPE_CHECKING, cast
 from unittest.mock import patch
 
@@ -45,7 +46,6 @@ from check_models import (
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
-    from pathlib import Path
 
     import pytest
 
@@ -650,6 +650,30 @@ def test_report_context_builds_machine_and_failure_facts_once_for_serializers(
         assert triage_builder.call_count == initial_triage_calls
         assert facts_builder.call_count == initial_facts_calls
         assert narrative_builder.call_count == initial_narrative_calls
+
+
+def test_failed_partial_output_keeps_runtime_failure_owner() -> None:
+    """Partial generated text must not replace conclusive crash triage."""
+    quality_result = _make_quality_success("org/partial", with_quality_issue=True)
+    failure = replace(
+        _make_failure("org/partial", error_package="mlx"),
+        generation=quality_result.generation,
+        quality_analysis=quality_result.quality_analysis,
+    )
+
+    context = _build_report_render_context(
+        results=[failure],
+        prompt="Describe the image.",
+        eval_mode="assisted",
+    )
+    cached = context.result_set.results[0]
+
+    assert cached.review_payload is not None
+    assert cached.review_payload["verdict"] == "runtime_failure"
+    assert cached.review_payload["owner"] == "mlx"
+    assert cached.maintainer_triage_payload is not None
+    assert cached.maintainer_triage_payload["issue_kind"] == "runtime_failure"
+    assert cached.maintainer_triage_payload["suspected_owner"] == "mlx"
 
 
 def test_direct_serializers_build_one_local_review_cache(tmp_path: Path) -> None:
@@ -3857,6 +3881,40 @@ class TestDiagnosticsReport:
         assert "chat_template is not set" in content
         assert "Missing 1 parameters: lm_head.weight" in content
 
+    def test_multiple_diagnostic_clusters_use_lint_safe_heading_hierarchy(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Inline issue bodies should be distinct and Markdown-lint clean."""
+        out = tmp_path / "diag.md"
+        generate_diagnostics_report(
+            results=[
+                _make_failure_with_details(
+                    "org/model-a",
+                    error_msg="chat_template is not set",
+                    error_stage="No Chat Template",
+                ),
+                _make_failure_with_details(
+                    "org/model-b",
+                    error_msg="Missing 1 parameters: lm_head.weight",
+                    error_stage="Weight Mismatch",
+                    error_package="mlx",
+                ),
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert content.count("\n## Issue ") == 2
+        assert content.count("\n### Expected and Actual Behaviour\n") == 2
+        assert content.count("\n### Native mlx-vlm reproduction\n") == 2
+        assert content.count("\n### Expected Fix Signal\n") == 2
+        assert "\n- _Filing target:_ mlx-vlm\n\n### Native mlx-vlm reproduction\n" in content
+        assert "\n- _Filing target:_ mlx\n\n### Native mlx-vlm reproduction\n" in content
+
     def test_captured_output_omitted_from_compact_diagnostics(self, tmp_path: Path) -> None:
         """Captured stdout/stderr belongs in issue drafts and bundles, not diagnostics."""
         out = tmp_path / "diag.md"
@@ -3932,6 +3990,39 @@ class TestDiagnosticsReport:
         assert "AttributeError: property 'eos_token_id'" in failure_section
         assert "check_models/src/check_models.py" not in failure_section
         assert "_run_model_generation" not in failure_section
+
+    def test_diagnostics_make_local_paths_home_relative(self, tmp_path: Path) -> None:
+        """Public issue artifacts should not expose the local account path."""
+        home = str(Path.home())
+        traceback_text = (
+            "Traceback (most recent call last):\n"
+            f'  File "{home}/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", '
+            "line 69, in load\n"
+            "    raise ValueError('bad config')\n"
+            "ValueError: bad config\n"
+        )
+        out = tmp_path / "diag.md"
+
+        generate_diagnostics_report(
+            results=[
+                _make_failure_with_details(
+                    "org/upstream-fail",
+                    error_msg="bad config",
+                    traceback_str=traceback_text,
+                ),
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={
+                "MLX Distribution Root": f"{home}/miniconda3/envs/mlx-vlm/site-packages",
+            },
+            prompt="test",
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert home not in content
+        assert 'File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py"' in content
+        assert "~/miniconda3/envs/mlx-vlm/site-packages" in content
 
     def test_failure_section_uses_one_chronological_failure_narrative(
         self,

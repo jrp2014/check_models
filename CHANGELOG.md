@@ -7,6 +7,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Raise the Pillow runtime floor to 12.3.0, excluding the image/font parsing
+  vulnerabilities fixed by that upstream security release.
+- Keep committed human-facing report paths home-relative so issue-ready
+  diagnostics and benchmark artifacts do not expose the local account path.
 - Redesign benchmark reporting around provenance-aware assisted enrichment,
   blind-versus-assisted scoring, visual/text/mixed/normal/unavailable burden
   attribution, root-to-wrapper exception chronology, and separate crash outcome
@@ -14,7 +18,7 @@ Notable changes to this project will be documented in this file.
   `diagnostics.md` an issue-ready mlx-vlm artifact, and retain `results.html` as
   the complete HTML report while preserving existing output paths and compatible
   JSONL/history schemas.
-- **Code-size audit:** `src/check_models.py` adds 2,371 lines and deletes 1,262
+- **Code-size audit:** `src/check_models.py` adds 2,391 lines and deletes 1,241
   versus `origin/main`. Net growth records genuinely new upstream facts for
   metadata provenance, component-aware prompt burden, exception chains and owner
   confidence, cached machine/report facts, and lane-specific recommendation

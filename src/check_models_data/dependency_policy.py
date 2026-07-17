@@ -14,6 +14,7 @@ PROJECT_RUNTIME_STACK_MINIMUMS: Final[dict[str, str]] = {
 
 PROJECT_MIN_TRANSFORMERS_VERSION: Final[str] = PROJECT_RUNTIME_STACK_MINIMUMS["transformers"]
 PROJECT_TRANSFORMERS_VERSION_SPEC: Final[str] = f">={PROJECT_MIN_TRANSFORMERS_VERSION}"
+PROJECT_PILLOW_MINIMUM_VERSION: Final[str] = "12.3.0"
 
 PROJECT_RUNTIME_STACK_SPECS: Final[dict[str, str]] = {
     "mlx": f">={PROJECT_RUNTIME_STACK_MINIMUMS['mlx']}",
@@ -54,7 +55,7 @@ VALIDATE_ENV_CORE_FALLBACK_SPECS: Final[dict[str, str]] = {
     **PROJECT_RUNTIME_STACK_SPECS,
     "defusedxml": ">=0.7.1",
     "packaging": ">=26.0",
-    "Pillow": ">=10.3.0",
+    "Pillow": f">={PROJECT_PILLOW_MINIMUM_VERSION}",
     "tabulate": ">=0.9.0",
     "wcwidth": ">=0.2.13",
     "PyYAML": ">=6.0",
