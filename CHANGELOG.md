@@ -7,6 +7,8 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Bump the package version to `0.8.6` to establish the release baseline before
+  refining complete model-output evidence in gallery and diagnostics reports.
 - Make suppression auditing require evidence for every listed checker code and
   remove a redundant broad-exception suppression from deterministic runtime
   fingerprinting.
