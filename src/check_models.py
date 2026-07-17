@@ -231,6 +231,10 @@ DEFAULT_QUANTIZED_KV_START: Final[int] = 5000
 UNIFORM_KV_BITS: Final[frozenset[int]] = frozenset({2, 3, 4, 5, 6, 8})
 DEFAULT_PENALTY_CONTEXT_SIZE: Final[int] = 20
 DEFAULT_THINKING_END_MARKER: Final[str] = "</think>"
+THINKING_TRACE_DELIMITER_PAIRS: Final[tuple[tuple[str, str], ...]] = (
+    ("<think>", "</think>"),
+    ("◁think▷", "◁/think▷"),
+)
 MAX_SAFE_TEXT_FILE_BYTES: Final[int] = 16 * 1024 * 1024
 SAFE_TEXT_FILE_READ_CHUNK_BYTES: Final[int] = 64 * 1024
 MAX_DISTRIBUTION_TEXT_FILE_BYTES: Final[int] = 64 * 1024
@@ -4772,12 +4776,47 @@ def _analyze_catalog_contract(
     )
 
 
-def _detect_reasoning_leakage(text: str) -> tuple[bool, list[str]]:
-    """Detect chain-of-thought or prompt-echo leakage in generated output."""
+@dataclass(frozen=True)
+class ReasoningOutputSignals:
+    """Classify unexpected reasoning separately from expected thinking traces."""
+
+    has_reasoning_leak: bool = False
+    reasoning_leak_markers: tuple[str, ...] = ()
+    has_thinking_trace: bool = False
+    thinking_trace_incomplete: bool = False
+    thinking_trace_markers: tuple[str, ...] = ()
+
+
+def _detect_reasoning_output(
+    text: str,
+    *,
+    model_name: str | None = None,
+) -> ReasoningOutputSignals:
+    """Detect unexpected reasoning or a documented thinking-model trace."""
     if not text:
-        return False, []
+        return ReasoningOutputSignals()
 
     text_lower: str = text.casefold()
+    expected_thinking_model = "thinking" in (model_name or "").casefold()
+    thinking_trace_markers: list[str] = []
+    thinking_trace_incomplete = False
+    if expected_thinking_model:
+        for start_marker, end_marker in THINKING_TRACE_DELIMITER_PAIRS:
+            if start_marker.casefold() not in text_lower:
+                continue
+            thinking_trace_markers.append(start_marker)
+            if end_marker.casefold() in text_lower:
+                thinking_trace_markers.append(end_marker)
+            else:
+                thinking_trace_incomplete = True
+
+    if thinking_trace_markers:
+        return ReasoningOutputSignals(
+            has_thinking_trace=True,
+            thinking_trace_incomplete=thinking_trace_incomplete,
+            thinking_trace_markers=tuple(thinking_trace_markers),
+        )
+
     markers: list[str] = _get_quality_pattern_list(
         "reasoning_leak_markers",
         [
@@ -4795,7 +4834,10 @@ def _detect_reasoning_leakage(text: str) -> tuple[bool, list[str]]:
     ]
     findings.extend(marker for marker in PROMPT_ECHO_MARKERS if marker in text_lower)
     deduped: list[str] = _dedupe_preserve_order(findings)
-    return bool(deduped), deduped[:4]
+    return ReasoningOutputSignals(
+        has_reasoning_leak=bool(deduped),
+        reasoning_leak_markers=tuple(deduped[:4]),
+    )
 
 
 def _detect_instruction_echo(text: str) -> tuple[bool, list[str]]:
@@ -7226,6 +7268,9 @@ class GenerationQualityAnalysis:
     keyword_duplication_ratio: float | None = None
     has_reasoning_leak: bool = False
     reasoning_leak_markers: list[str] = dataclass_field(default_factory=list)
+    has_thinking_trace: bool = False
+    thinking_trace_incomplete: bool = False
+    thinking_trace_markers: list[str] = dataclass_field(default_factory=list)
     has_context_echo: bool = False
     context_echo_ratio: float = 0.0
     # Harness issues indicate mlx-vlm integration bugs, not model quality problems
@@ -7303,6 +7348,7 @@ class GenerationQualityAnalysis:
             self.has_keyword_count_violation,
             self.has_keyword_duplication_violation,
             self.has_reasoning_leak,
+            self.thinking_trace_incomplete,
             self.has_context_echo,
             self.has_harness_issue,
             self.instruction_echo,
@@ -7426,6 +7472,9 @@ class PromptQualitySignals:
     missing_context_terms: tuple[str, ...] = ()
     has_reasoning_leak: bool = False
     reasoning_leak_markers: tuple[str, ...] = ()
+    has_thinking_trace: bool = False
+    thinking_trace_incomplete: bool = False
+    thinking_trace_markers: tuple[str, ...] = ()
     has_context_echo: bool = False
     context_echo_ratio: float = 0.0
     instruction_echo: bool = False
@@ -7454,15 +7503,19 @@ def _collect_prompt_quality_signals(
     generated_tokens: int,
     prompt: str | None,
     context_marker: str,
+    model_name: str | None,
 ) -> PromptQualitySignals:
     """Collect prompt-aware trusted-hint and contract signals."""
-    has_reasoning_leak, reasoning_leak_markers = _detect_reasoning_leakage(text)
+    reasoning_signals = _detect_reasoning_output(text, model_name=model_name)
     instruction_echo, instruction_markers = _detect_instruction_echo(text)
     if not prompt:
         return PromptQualitySignals(
             prompt_bundle=TrustedHintBundle(),
-            has_reasoning_leak=has_reasoning_leak,
-            reasoning_leak_markers=tuple(reasoning_leak_markers),
+            has_reasoning_leak=reasoning_signals.has_reasoning_leak,
+            reasoning_leak_markers=reasoning_signals.reasoning_leak_markers,
+            has_thinking_trace=reasoning_signals.has_thinking_trace,
+            thinking_trace_incomplete=reasoning_signals.thinking_trace_incomplete,
+            thinking_trace_markers=reasoning_signals.thinking_trace_markers,
             instruction_echo=instruction_echo,
             instruction_markers=tuple(instruction_markers),
         )
@@ -7502,8 +7555,11 @@ def _collect_prompt_quality_signals(
         prompt_bundle=prompt_bundle,
         is_context_ignored=is_context_ignored,
         missing_context_terms=tuple(missing_context_terms),
-        has_reasoning_leak=has_reasoning_leak,
-        reasoning_leak_markers=tuple(reasoning_leak_markers),
+        has_reasoning_leak=reasoning_signals.has_reasoning_leak,
+        reasoning_leak_markers=reasoning_signals.reasoning_leak_markers,
+        has_thinking_trace=reasoning_signals.has_thinking_trace,
+        thinking_trace_incomplete=reasoning_signals.thinking_trace_incomplete,
+        thinking_trace_markers=reasoning_signals.thinking_trace_markers,
         has_context_echo=has_context_echo,
         context_echo_ratio=context_echo_ratio,
         instruction_echo=instruction_echo,
@@ -7645,6 +7701,7 @@ def analyze_generation_text(
     prompt: str | None = None,
     requested_max_tokens: int | None = None,
     context_marker: str = "Context:",
+    model_name: str | None = None,
 ) -> GenerationQualityAnalysis:
     """Analyze generated text for quality issues.
 
@@ -7658,6 +7715,7 @@ def analyze_generation_text(
         prompt: Optional prompt text for context ignorance detection
         requested_max_tokens: Requested max generation tokens for cutoff detection
         context_marker: Marker for context section in prompt
+        model_name: Model identifier used to recognise expected thinking protocols
 
     Returns:
         GenerationQualityAnalysis with all detected issues
@@ -7672,6 +7730,7 @@ def analyze_generation_text(
         generated_tokens=generated_tokens,
         prompt=prompt,
         context_marker=context_marker,
+        model_name=model_name,
     )
 
     # Refusal detection: model declines to answer
@@ -7776,6 +7835,7 @@ def analyze_generation_text(
             *(["instruction_markers"] if prompt_signals.instruction_markers else []),
             *(["metadata_terms"] if prompt_signals.borrowed_metadata_terms else []),
             *(["reasoning_leak"] if prompt_signals.has_reasoning_leak else []),
+            *(["thinking_incomplete"] if prompt_signals.thinking_trace_incomplete else []),
             *(["context_echo"] if prompt_signals.has_context_echo else []),
             *(["refusal"] if is_refusal else []),
             *(["generic"] if is_generic else []),
@@ -7815,6 +7875,9 @@ def analyze_generation_text(
         keyword_duplication_ratio=prompt_signals.keyword_duplication_ratio,
         has_reasoning_leak=prompt_signals.has_reasoning_leak,
         reasoning_leak_markers=list(prompt_signals.reasoning_leak_markers),
+        has_thinking_trace=prompt_signals.has_thinking_trace,
+        thinking_trace_incomplete=prompt_signals.thinking_trace_incomplete,
+        thinking_trace_markers=list(prompt_signals.thinking_trace_markers),
         has_context_echo=prompt_signals.has_context_echo,
         context_echo_ratio=prompt_signals.context_echo_ratio,
         has_harness_issue=harness_signals.has_harness_issue,
@@ -7846,6 +7909,7 @@ def _analyze_text_quality(
     prompt: str | None = None,
     requested_max_tokens: int | None = None,
     context_marker: str = "Context:",
+    model_name: str | None = None,
 ) -> tuple[GenerationQualityAnalysis, str | None]:
     """Return structured quality analysis plus the normalized issue label string."""
     analysis = analyze_generation_text(
@@ -7855,6 +7919,7 @@ def _analyze_text_quality(
         prompt=prompt,
         requested_max_tokens=requested_max_tokens,
         context_marker=context_marker,
+        model_name=model_name,
     )
     return analysis, _build_quality_issues_string(analysis)
 
@@ -21798,6 +21863,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
                     prompt=params.prompt,
                     requested_max_tokens=params.max_tokens,
                     context_marker=params.context_marker,
+                    model_name=params.model_identifier,
                 )
         if stderr_clean:
             captured_sections.append("=== STDERR ===\n" + stderr_clean)
@@ -24098,6 +24164,7 @@ def _populate_result_quality_analysis(
         prompt=prompt,
         requested_max_tokens=resolved_requested_max_tokens,
         context_marker=context_marker,
+        model_name=result.model_name,
     )
     if cached_analysis is not None:
         cached_quality_issues = result.quality_issues or _build_quality_issues_string(

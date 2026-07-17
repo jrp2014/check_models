@@ -283,6 +283,50 @@ def test_analyze_generation_text_detects_reasoning_leak() -> None:
 
     assert analysis.has_reasoning_leak is True
     assert analysis.reasoning_leak_markers
+    assert analysis.has_thinking_trace is False
+
+
+def test_analyze_generation_text_treats_expected_thinking_trace_as_information() -> None:
+    """Documented delimiters from thinking models should be informational."""
+    text = "◁think▷Inspect the scene.◁/think▷ Title: Two boats on a river"
+
+    analysis = check_models.analyze_generation_text(
+        text,
+        generated_tokens=24,
+        model_name="mlx-community/Kimi-VL-A3B-Thinking-2506-bf16",
+    )
+
+    assert analysis.has_thinking_trace is True
+    assert analysis.thinking_trace_incomplete is False
+    assert analysis.thinking_trace_markers == ["◁think▷", "◁/think▷"]
+    assert analysis.has_reasoning_leak is False
+    assert analysis.verdict == "clean"
+
+
+def test_analyze_generation_text_flags_unclosed_expected_thinking_trace() -> None:
+    """An unclosed thinking trace should explain a degraded capped result."""
+    prompt = (
+        "Return exactly these three sections:\n"
+        "Title: 5-10 words.\n"
+        "Description: 1-2 sentences.\n"
+        "Keywords: 10-18 terms."
+    )
+
+    analysis = check_models.analyze_generation_text(
+        "◁think▷Inspecting the image step by step.",
+        generated_tokens=500,
+        prompt=prompt,
+        requested_max_tokens=500,
+        model_name="mlx-community/Kimi-VL-A3B-Thinking-8bit",
+    )
+
+    assert analysis.has_thinking_trace is True
+    assert analysis.thinking_trace_incomplete is True
+    assert analysis.thinking_trace_markers == ["◁think▷"]
+    assert analysis.has_reasoning_leak is False
+    assert "thinking_incomplete" in analysis.evidence
+    assert analysis.verdict == "cutoff_degraded"
+    assert analysis.user_bucket == "avoid"
 
 
 def test_analyze_generation_text_detects_context_echo() -> None:
