@@ -667,7 +667,7 @@ def test_markdownlint_cli2_is_pinned_repo_local_and_updateable() -> None:
     package_lock = json.loads((PKG_ROOT / "package-lock.json").read_text(encoding="utf-8"))
 
     markdownlint_spec = package_json["devDependencies"]["markdownlint-cli2"]
-    assert markdownlint_spec == "^0.23.0"
+    assert markdownlint_spec == "0.23.0"
     assert markdownlint_spec == package_lock["packages"][""]["devDependencies"]["markdownlint-cli2"]
     assert package_lock["packages"]["node_modules/markdownlint-cli2"]["version"] == "0.23.0"
     assert package_json["overrides"]["smol-toml"] == "1.6.1"
@@ -676,7 +676,8 @@ def test_markdownlint_cli2_is_pinned_repo_local_and_updateable() -> None:
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
     assert 'npm install --ignore-scripts --prefix "$PROJECT_ROOT"' in update_script
     assert (
-        'npm install --prefix "$PROJECT_ROOT" --save-dev markdownlint-cli2@latest' in update_script
+        'npm install --prefix "$PROJECT_ROOT" --save-dev --save-exact '
+        "markdownlint-cli2@latest" in update_script
     )
     assert update_script.index("markdownlint-cli2@latest") > update_script.index(
         "UPDATE_NODE_TOOLING"
