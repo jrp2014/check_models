@@ -13043,8 +13043,7 @@ GALLERY_STAMP_SYSTEM_KEYS: Final[tuple[str, ...]] = (
     "macOS Version",
     "GPU/Chip",
 )
-GALLERY_QUALITY_SUMMARY_PREVIEW_CHARS: Final[int] = 320
-GALLERY_OUTPUT_COST_PREVIEW_CHARS: Final[int] = 220
+GALLERY_FAILURE_DIAGNOSTIC_PREVIEW_CHARS: Final[int] = 220
 
 
 def _markdown_inline_code(value: str) -> str:
@@ -13133,31 +13132,10 @@ def _gallery_summary_signal(result: PerformanceResult) -> str:
     return signal
 
 
-def _gallery_success_output_preview(result: PerformanceResult, *, max_chars: int) -> str:
-    """Return compact successful model text without adding diagnostic cue prefixes."""
-    preview = _build_output_preview_text(
-        _generation_text_value(result.generation),
-        max_chars=max_chars,
-    )
-    return _collapse_preview_whitespace(preview) if preview else ""
-
-
-def _gallery_summary_preview(result: PerformanceResult) -> str:
-    """Return the response or failure-diagnostic preview for one summary row."""
-    if result.success:
-        preview = _gallery_success_output_preview(
-            result,
-            max_chars=GALLERY_QUALITY_SUMMARY_PREVIEW_CHARS,
-        )
-        return preview or "No generated text captured."
-
-    preview = _build_result_output_preview(
-        result,
-        max_chars=GALLERY_QUALITY_SUMMARY_PREVIEW_CHARS,
-    )
-    if preview:
-        return _collapse_preview_whitespace(preview)
-    return "No failure diagnostics captured."
+def _gallery_success_output(result: PerformanceResult) -> str:
+    """Return complete successful model text flattened for a Markdown table cell."""
+    output = _generation_text_value(result.generation)
+    return _collapse_preview_whitespace(output) if output else ""
 
 
 def _gallery_output_cost_metric(field_name: str, value: MetricValue) -> str:
@@ -13167,17 +13145,13 @@ def _gallery_output_cost_metric(field_name: str, value: MetricValue) -> str:
 
 
 def _gallery_output_cost_preview(result: PerformanceResult) -> str:
-    """Return a compact all-model output or diagnostic preview."""
+    """Return complete model output or a compact failure diagnostic."""
     if result.success:
-        preview = _gallery_success_output_preview(
-            result,
-            max_chars=GALLERY_OUTPUT_COST_PREVIEW_CHARS,
-        )
-        return preview or "No generated text captured."
+        return _gallery_success_output(result) or "No generated text captured."
 
     preview = _build_result_output_preview(
         result,
-        max_chars=GALLERY_OUTPUT_COST_PREVIEW_CHARS,
+        max_chars=GALLERY_FAILURE_DIAGNOSTIC_PREVIEW_CHARS,
     )
     if preview:
         return _collapse_preview_whitespace(preview)
@@ -13192,7 +13166,7 @@ def _gallery_output_cost_signal_cell(result: PerformanceResult) -> str:
 def _build_gallery_output_cost_summary_section(
     report_context: ReportRenderContext,
 ) -> list[str]:
-    """Build a compact all-model output, runtime, and memory summary table."""
+    """Build the all-model output, runtime, memory, and quality summary table."""
     rows: list[tuple[str, str, str, str, str, str, str, str]] = []
     for view in report_context.recommendations:
         result = view.result
@@ -13240,49 +13214,11 @@ def _build_gallery_output_cost_summary_section(
         )
     )
     return [
-        "## All Model Output and Cost Summary",
+        "## Model Output and Cost Summary",
         "",
         (
-            "Every model in this run, with its skim-first output or diagnostic beside "
-            "the main runtime and peak-memory signals."
-        ),
-        "",
-        *_guard_markdownlint_block(table_lines, rules=MARKDOWNLINT_GALLERY_SUMMARY_RULES),
-        "",
-    ]
-
-
-def _build_gallery_quality_summary_section(
-    report_context: ReportRenderContext,
-) -> list[str]:
-    """Build an issue-style per-model quality table for the gallery artifact."""
-    rows = [
-        (
-            _gallery_summary_model_link(view.result.model_name),
-            _gallery_summary_status(view.result),
-            MARKDOWN_ESCAPER.escape(_gallery_summary_signal(view.result)),
-            MARKDOWN_ESCAPER.escape(_gallery_summary_preview(view.result)),
-        )
-        for view in report_context.recommendations
-    ]
-    if not rows:
-        return []
-
-    table_lines = render_report_markdown(
-        (
-            ReportTable(
-                headers=("Model", "Result", "Quality / diagnostic", "Response / diagnostic"),
-                rows=tuple(rows),
-                markdown_escaped=True,
-            ),
-        )
-    )
-    return [
-        "## Model Quality Summary",
-        "",
-        (
-            "Skim-first view of what each model returned, or the strongest diagnostic "
-            "when it did not produce usable output."
+            "Every model in this run, with complete successful output or a concise "
+            "failure diagnostic beside runtime, memory, and quality signals."
         ),
         "",
         *_guard_markdownlint_block(table_lines, rules=MARKDOWNLINT_GALLERY_SUMMARY_RULES),
@@ -17631,7 +17567,6 @@ def generate_markdown_gallery_report(
     _append_markdown_image_metadata_section(md, metadata)
     md.append("## Prompt")
     _append_markdown_wrapped_blockquote(md, prompt)
-    md.extend(_build_gallery_quality_summary_section(report_context))
     md.extend(_build_gallery_output_cost_summary_section(report_context))
     md.extend(_build_markdown_gallery_navigation(report_context))
     md.extend(_generate_model_gallery_section(report_context))

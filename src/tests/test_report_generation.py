@@ -3028,7 +3028,7 @@ class TestMarkdownGalleryReport:
         assert "Keywords are not specific" not in content
         assert "_Review focus:_" not in content
 
-    def test_gallery_includes_issue_style_quality_summary_and_version_stamps(
+    def test_gallery_includes_consolidated_summary_and_version_stamps(
         self,
         tmp_path: Path,
     ) -> None:
@@ -3054,7 +3054,9 @@ class TestMarkdownGalleryReport:
         assert "## Run Stamps" in content
         assert "- `mlx-vlm`: `0.1`" in content
         assert "- `mlx`: `0.1`" in content
-        assert "## Model Quality Summary" in content
+        assert "## Model Output and Cost Summary" in content
+        assert "## Model Quality Summary" not in content
+        assert "## All Model Output and Cost Summary" not in content
         assert "<!-- markdownlint-disable MD034 -->" in content
         assert "<!-- markdownlint-enable MD034 -->" in content
         assert "<!-- markdownlint-disable MD013 MD034 -->" not in content
@@ -3062,15 +3064,14 @@ class TestMarkdownGalleryReport:
 
         summary = _extract_markdown_subsection(
             content,
-            "## Model Quality Summary",
+            "## Model Output and Cost Summary",
             end_headings=(
                 "## Image Metadata",
                 "## Prompt",
-                "## All Model Output and Cost Summary",
                 "## Quick Navigation",
             ),
         )
-        assert "Response / diagnostic" in summary
+        assert "Output / diagnostic" in summary
         assert "[`org/good`](#model-org-good)" in summary
         assert "quality output" in summary
         assert "[`org/risky`](#model-org-risky)" in summary
@@ -3083,6 +3084,49 @@ class TestMarkdownGalleryReport:
         assert "`avoid` / `runtime failure`" in summary
         assert "mlx-vlm; load" in summary
         assert "Error: load - boom" in summary
+
+    def test_gallery_consolidated_summary_keeps_complete_model_output(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """The gallery summary should let the generation token limit bound output."""
+        complete_text = "BEGIN " + ("distinct middle evidence " * 30) + "END-SENTINEL"
+        result = PerformanceResult(
+            model_name="org/complete-output",
+            success=True,
+            generation=_MockGeneration(
+                text=complete_text,
+                prompt_tokens=18,
+                generation_tokens=200,
+                generation_tps=42.0,
+                peak_memory=2.5,
+            ),
+            total_time=1.25,
+            generation_time=0.75,
+            model_load_time=0.50,
+        )
+        out = tmp_path / "model_gallery.md"
+
+        generate_markdown_gallery_report(
+            results=[result],
+            filename=out,
+            prompt="Describe this image briefly.",
+        )
+
+        content = out.read_text(encoding="utf-8")
+        summary = _extract_markdown_subsection(
+            content,
+            "## Model Output and Cost Summary",
+            end_headings=("## Quick Navigation", "## Model Gallery"),
+        )
+        assert "## Model Quality Summary" not in content
+        assert "## All Model Output and Cost Summary" not in content
+        assert "BEGIN" in summary
+        assert "END-SENTINEL" in summary
+        assert "[tail]" not in summary
+        assert "Gen tok" in summary
+        assert "Peak GB" in summary
+        assert "Quality signal" in summary
 
     def test_gallery_includes_all_model_output_and_cost_summary(
         self,
@@ -3128,7 +3172,7 @@ class TestMarkdownGalleryReport:
         content = out.read_text(encoding="utf-8")
         summary = _extract_markdown_subsection(
             content,
-            "## All Model Output and Cost Summary",
+            "## Model Output and Cost Summary",
             end_headings=("## Quick Navigation", "## Model Gallery"),
         )
         assert "Output / diagnostic" in summary
