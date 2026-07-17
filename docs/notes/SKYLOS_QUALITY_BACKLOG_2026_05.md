@@ -37,8 +37,12 @@ changing user-facing behavior:
 
 1. `_build_result_output_cues`
 2. `_format_quality_analysis_for_log`
-3. `_diagnostics_coverage_and_runtime_section`
-4. `_history_transition_detail_text`
+3. `_history_transition_detail_text` - a 2026-07 review found this reduced to a
+   small, clean loop over four tracked fields; no further extraction needed.
+
+`_diagnostics_coverage_and_runtime_section` was removed from this queue: the
+function no longer exists after the diagnostics report redesign (see
+`CHANGELOG.md`), so the entry was stale.
 
 Then evaluate the remaining critical hotspots from the first full Skylos scan:
 
