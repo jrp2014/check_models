@@ -24189,18 +24189,11 @@ def _populate_result_quality_analysis(
 
     text = str(getattr(result.generation, "text", ""))
     needs_metadata_refresh = bool(metadata) and result.metadata_agreement is None
-    needs_thinking_refresh = False
 
     cached_analysis = _quality_analysis_for_result(result)
     if cached_analysis is not None:
         needs_prompt_refresh = bool(prompt) and not cached_analysis.prompt_checks_ran
-        refreshed_reasoning = _detect_reasoning_output(text, model_name=result.model_name)
-        needs_thinking_refresh = (
-            cached_analysis.has_reasoning_leak
-            and not cached_analysis.has_thinking_trace
-            and refreshed_reasoning.has_thinking_trace
-        )
-        if not needs_prompt_refresh and not needs_thinking_refresh:
+        if not needs_prompt_refresh:
             metadata_agreement = result.metadata_agreement
             if needs_metadata_refresh:
                 metadata_agreement = compute_metadata_agreement(text, metadata)
@@ -24238,7 +24231,7 @@ def _populate_result_quality_analysis(
         context_marker=context_marker,
         model_name=result.model_name,
     )
-    if cached_analysis is not None and not needs_thinking_refresh:
+    if cached_analysis is not None:
         cached_quality_issues = result.quality_issues or _build_quality_issues_string(
             cached_analysis,
         )
@@ -24250,7 +24243,7 @@ def _populate_result_quality_analysis(
         metadata_agreement = compute_metadata_agreement(text, metadata)
     analysis = _apply_metadata_alignment_to_analysis(analysis, metadata_agreement)
     quality_issues = _build_quality_issues_string(analysis)
-    if result.quality_issues and metadata_agreement is None and not needs_thinking_refresh:
+    if result.quality_issues and metadata_agreement is None:
         quality_issues = result.quality_issues
 
     return replace(
