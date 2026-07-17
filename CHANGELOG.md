@@ -7,6 +7,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Track whether metadata was actually injected into the prompt, keep triage
+  quality classification independent of metadata agreement, and preserve
+  exception traceback origins so root mlx-vlm failures followed by MLX cleanup
+  failures are reported as mixed ownership rather than misclassified.
+- Keep partial output-quality observations from overriding or decorating a
+  conclusive runtime failure, and verify that committed issue-ready artifacts
+  retain the canonical crash verdict, owner, and issue-cluster routing.
 - Raise the Pillow runtime floor to 12.3.0, excluding the image/font parsing
   vulnerabilities fixed by that upstream security release.
 - Keep committed human-facing report paths home-relative so issue-ready

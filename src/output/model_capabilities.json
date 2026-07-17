@@ -1,7 +1,7 @@
 {
   "current_models": 61,
   "eval_mode": "assisted",
-  "generated_at": "2026-07-13 05:57:30 BST",
+  "generated_at": "2026-07-17 13:44:06 BST",
   "grounding": "trusted image metadata",
   "has_descriptive_metadata": true,
   "history_runs_considered": 1,
@@ -1217,7 +1217,7 @@
       "generation_tps_avg": null,
       "hygiene_score_avg": 0.0,
       "keyword_score_avg": null,
-      "latest_signal": "current run crashed; mlx; model-error",
+      "latest_signal": "current run crashed; mlx-vlm; model-error",
       "metadata_alignment_avg": null,
       "model": "mlx-community/gemma-4-31b-bf16",
       "peak_memory_gb_avg": null,

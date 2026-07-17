@@ -659,6 +659,7 @@ def test_failed_partial_output_keeps_runtime_failure_owner() -> None:
         _make_failure("org/partial", error_package="mlx"),
         generation=quality_result.generation,
         quality_analysis=quality_result.quality_analysis,
+        quality_issues=quality_result.quality_issues,
     )
 
     context = _build_report_render_context(
@@ -674,6 +675,89 @@ def test_failed_partial_output_keeps_runtime_failure_owner() -> None:
     assert cached.maintainer_triage_payload is not None
     assert cached.maintainer_triage_payload["issue_kind"] == "runtime_failure"
     assert cached.maintainer_triage_payload["suspected_owner"] == "mlx"
+    assert "load" in cached.maintainer_triage_payload["summary"].casefold()
+    assert "formatting" not in cached.maintainer_triage_payload["summary"].casefold()
+    assert "text-sanity" not in cached.maintainer_triage_payload["summary"].casefold()
+
+    review_rows = dict(check_models._build_review_block_rows(cached))
+    assert "load" in review_rows["Why"].casefold()
+    assert "formatting" not in review_rows["Why"].casefold()
+    assert "text-sanity" not in review_rows["Why"].casefold()
+
+    assert len(context.recommendations) == 1
+    recommendation_caveats = " | ".join(context.recommendations[0].caveats).casefold()
+    assert "formatting" not in recommendation_caveats
+    assert "text-sanity" not in recommendation_caveats
+    assert check_models._format_table_field_value("quality_issues", cached) == ""
+    assert check_models._build_jsonl_result_record_base(cached)["quality_issues"] == []
+
+
+def test_chained_failure_uses_primary_origin_and_reports_mixed_ownership() -> None:
+    failure = replace(
+        _make_failure("org/chained", error_package="mlx"),
+        exception_chain=(
+            check_models.FailureException(
+                "IndexError",
+                "builtins",
+                "token index outside detokenizer table",
+                origin="mlx_vlm/tokenizer_utils.py",
+            ),
+            check_models.FailureException(
+                "RuntimeError",
+                "mlx.core",
+                "kIOGPUCommandBufferCallbackErrorOutOfMemory",
+                origin="mlx/core/metal.cpp",
+            ),
+        ),
+    )
+
+    context = _build_report_render_context(
+        results=[failure],
+        prompt="Describe the image.",
+    )
+    cached = context.result_set.results[0]
+    narrative = dict(context.failure_narratives)[failure.model_name]
+
+    assert narrative.primary_exception.startswith("IndexError:")
+    assert narrative.suspected_owner == "unresolved: mlx/mlx-vlm"
+    assert narrative.owner_confidence == "low"
+    assert cached.review_payload is not None
+    assert cached.review_payload["owner"] == narrative.suspected_owner
+    assert context.issue_clusters[0].owner == narrative.suspected_owner
+
+
+def test_published_failure_artifacts_match_canonical_runtime_triage() -> None:
+    """Checked-in issue-ready reports must not retain pre-fix quality classifications."""
+    output_dir = Path(__file__).parents[1] / "output"
+    records = [
+        json.loads(line)
+        for line in (output_dir / "results.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    failures = [
+        record for record in records if record.get("_type") == "result" and not record["success"]
+    ]
+
+    assert failures
+    diagnostics = (output_dir / "reports/diagnostics.md").read_text(encoding="utf-8")
+    review_report = (output_dir / "reports/review.md").read_text(encoding="utf-8")
+    gallery = (output_dir / "reports/model_gallery.md").read_text(encoding="utf-8")
+    html_report = (output_dir / "reports/results.html").read_text(encoding="utf-8")
+    assert str(Path.home()) not in diagnostics
+    assert str(Path.home()) not in review_report
+    assert str(Path.home()) not in gallery
+    assert str(Path.home()) not in html_report
+    for failure in failures:
+        review = failure["review"]
+        triage = failure["maintainer_triage"]
+        assert review["verdict"] == "runtime_failure"
+        assert triage["issue_kind"] == "runtime_failure"
+        assert failure["compatibility_status"] == "crashed"
+        assert failure["quality_issues"] == []
+        assert review["owner"] == triage["suspected_owner"]
+        assert review["owner"] in diagnostics
+        assert f"`{failure['model']}`" in review_report
+        assert "`runtime_failure`" in review_report
+        assert (output_dir / triage["issue_cluster_path"]).is_file()
 
 
 def test_direct_serializers_build_one_local_review_cache(tmp_path: Path) -> None:
@@ -1497,6 +1581,7 @@ def test_report_mode_policy_assisted_with_metadata_is_grounded() -> None:
             "description": "Two tabby cats on a pink couch with remotes.",
             "keywords": "cats, tabby, pink couch, remote controls",
         },
+        metadata_exposed_to_prompt=True,
     )
 
     assert policy.eval_mode == "assisted"
@@ -1505,6 +1590,29 @@ def test_report_mode_policy_assisted_with_metadata_is_grounded() -> None:
     assert policy.suppress_cataloging_scores is False
     assert policy.selection_basis == "metadata-assisted visual verification"
     assert policy.metadata_exposed_to_prompt is True
+
+
+def test_assisted_custom_prompt_reports_metadata_as_held_out() -> None:
+    policy = check_models._build_report_mode_policy(
+        eval_mode="assisted",
+        metadata={"description": "Held-out reference caption"},
+        metadata_exposed_to_prompt=False,
+    )
+
+    assert policy.eval_mode == "assisted"
+    assert policy.semantic_rankings_grounded is True
+    assert policy.selection_basis == "held-out trusted image metadata"
+    assert policy.metadata_exposed_to_prompt is False
+
+    fallback_context = _build_report_render_context(
+        results=[_make_success("org/custom-prompt")],
+        prompt="Describe the image without injected metadata.",
+        metadata={"description": "Held-out reference caption"},
+        eval_mode="auto",
+    )
+    assert fallback_context.mode_policy.eval_mode == "assisted"
+    assert fallback_context.mode_policy.selection_basis == "held-out trusted image metadata"
+    assert fallback_context.mode_policy.metadata_exposed_to_prompt is False
 
 
 def test_report_mode_policy_blind_keeps_metadata_held_out() -> None:
@@ -1517,6 +1625,36 @@ def test_report_mode_policy_blind_keeps_metadata_held_out() -> None:
     assert policy.suppress_cataloging_scores is False
     assert policy.selection_basis == "held-out trusted image metadata"
     assert policy.metadata_exposed_to_prompt is False
+
+
+def test_triage_quality_analysis_ignores_descriptive_metadata() -> None:
+    metadata: dict[str, str | None] = {
+        "description": "A red suspension bridge over a crowded harbour.",
+        "keywords": "bridge, harbour, boats",
+    }
+    result = _make_success("org/triage-clean")
+
+    analyzed = check_models._populate_result_quality_analysis(
+        result,
+        prompt="Describe this image briefly.",
+        metadata=check_models._quality_reference_metadata(
+            eval_mode="triage",
+            metadata=metadata,
+        ),
+    )
+    context = _build_report_render_context(
+        results=[analyzed],
+        prompt="Describe this image briefly.",
+        metadata=metadata,
+        eval_mode="triage",
+    )
+
+    cached = context.result_set.results[0]
+    assert cached.metadata_agreement is None
+    assert cached.review_payload is not None
+    assert cached.review_payload["verdict"] == "clean"
+    assert cached.review_payload["user_bucket"] != "avoid"
+    assert context.recommendations[0].eligible is True
 
 
 def _history_run(

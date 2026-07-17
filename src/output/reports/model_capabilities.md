@@ -1,6 +1,6 @@
 # Model Capability Scorecard
 
-Generated on: 2026-07-13 05:57:30 BST
+Generated on: 2026-07-17 13:44:06 BST
 
 - Evaluation lane: assisted
 - Metadata exposed to prompt: yes
@@ -73,7 +73,7 @@ Generated on: 2026-07-13 05:57:30 BST
 | `mlx-community/Qwen3-VL-2B-Thinking-bf16`               | current-run-ineligible | ineligible |      2 | 100%      |            0 | 0         | 0         | 0          | 58.1      | 8.6       | integration warning requires review; harness:long-context; repetitive; low-draft-improvement     |
 | `mlx-community/Qwen3-VL-2B-Instruct-bf16`               | current-run-ineligible | ineligible |      2 | 100%      |            0 | 0         | 0         | 0          | 136       | 8.6       | integration warning requires review; harness:long-context; repetitive; low-draft-improvement     |
 | `Qwen/Qwen3-VL-2B-Instruct`                             | current-run-ineligible | ineligible |      2 | 100%      |            0 | 0         | 0         | 0          | 137       | 8.6       | integration warning requires review; harness:long-context; repetitive; low-draft-improvement     |
-| `mlx-community/gemma-4-31b-bf16`                        | current-run-blocked    | failed     |      2 | 0%        |            0 | -         | -         | -          | -         | -         | current run crashed; mlx; model-error                                                            |
+| `mlx-community/gemma-4-31b-bf16`                        | current-run-blocked    | failed     |      2 | 0%        |            0 | -         | -         | -          | -         | -         | current run crashed; mlx-vlm; model-error                                                        |
 <!-- markdownlint-enable MD034 -->
 
 Scores aggregate available current/history signals. Older history rows that

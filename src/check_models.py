@@ -2079,6 +2079,7 @@ class FailureException:
     exception_type: str
     module: str
     message: str
+    origin: str | None = None
 
 
 @dataclass(frozen=True)
@@ -2854,12 +2855,12 @@ def _build_gallery_error_block_lines(res: PerformanceResult) -> list[str]:
         out.append("")
         out.extend(f"> {line}" for line in wrapped_lines)
 
-    if res.error_traceback:
+    if traceback_text := _normalize_traceback_for_report(res.error_traceback):
         out.append("")
         traceback_lines: list[str] = []
         _append_markdown_code_block(
             traceback_lines,
-            res.error_traceback.rstrip(),
+            traceback_text,
             language="python",
         )
         _append_markdown_details_block(
@@ -9758,6 +9759,8 @@ def _format_table_field_value(
 
     value = _get_field_value(res, field_name)
     if field_name == "quality_issues":
+        if not res.success:
+            return ""
         return _truncate_quality_issues(
             format_field_value(field_name, value),
         )
@@ -9827,20 +9830,48 @@ def _metadata_has_descriptive_reference(metadata: Mapping[str, str | None] | Non
     return False
 
 
+def _quality_reference_metadata(
+    *,
+    eval_mode: str,
+    metadata: MetadataDict | None,
+) -> MetadataDict | None:
+    """Exclude metadata agreement from the caption-hygiene-only triage lane."""
+    return None if _resolve_eval_mode(eval_mode, metadata) == "triage" else metadata
+
+
+def _prompt_builder_exposes_metadata(
+    args: argparse.Namespace,
+    metadata: MetadataDict | None,
+) -> bool:
+    """Return whether the generated prompt actually includes metadata context."""
+    if getattr(args, "prompt", None):
+        return False
+    if (
+        _resolve_eval_mode(str(getattr(args, "eval_mode", DEFAULT_EVAL_MODE)), metadata)
+        != "assisted"
+    ):
+        return False
+    provenance = _build_metadata_provenance(metadata)
+    return provenance.has_authoritative_context or provenance.has_draft
+
+
 def _build_report_mode_policy(
     *,
     eval_mode: str,
     metadata: MetadataDict | None = None,
+    metadata_exposed_to_prompt: bool | None = None,
 ) -> ReportModePolicy:
     """Return mode-aware report rules for human and machine artifacts."""
     has_descriptive_metadata = _metadata_has_descriptive_reference(metadata)
     resolved_eval_mode = _resolve_eval_mode(eval_mode, metadata)
-    metadata_exposed_to_prompt = resolved_eval_mode == "assisted"
+    resolved_metadata_exposure = (
+        bool(metadata_exposed_to_prompt) and resolved_eval_mode == "assisted"
+    )
     suppress_cataloging_scores = resolved_eval_mode == "triage"
     semantic_rankings_grounded = has_descriptive_metadata and not suppress_cataloging_scores
     if suppress_cataloging_scores:
         selection_basis = "caption hygiene only"
-    elif resolved_eval_mode == "assisted":
+    elif resolved_metadata_exposure:
         selection_basis = "metadata-assisted visual verification"
     elif semantic_rankings_grounded:
         selection_basis = "held-out trusted image metadata"
@@ -9852,7 +9883,7 @@ def _build_report_mode_policy(
         semantic_rankings_grounded=semantic_rankings_grounded,
         suppress_cataloging_scores=suppress_cataloging_scores,
         selection_basis=selection_basis,
-        metadata_exposed_to_prompt=metadata_exposed_to_prompt,
+        metadata_exposed_to_prompt=resolved_metadata_exposure,
     )
 
 
@@ -9862,6 +9893,7 @@ def _build_report_render_context(
     prompt: str,
     image_path: Path | None = None,
     metadata: MetadataDict | None = None,
+    metadata_exposed_to_prompt: bool | None = None,
     eval_mode: str = DEFAULT_EVAL_MODE,
     system_info: dict[str, str] | None = None,
     preflight_issues: Sequence[str] = (),
@@ -9935,7 +9967,11 @@ def _build_report_render_context(
         triage=triage,
         image_profile=image_profile,
         preflight_issues=resolved_preflight_issues,
-        mode_policy=_build_report_mode_policy(eval_mode=eval_mode, metadata=metadata),
+        mode_policy=_build_report_mode_policy(
+            eval_mode=eval_mode,
+            metadata=metadata,
+            metadata_exposed_to_prompt=metadata_exposed_to_prompt,
+        ),
         diagnostics_snapshot=diagnostics_snapshot,
         issue_clusters=_build_issue_clusters(diagnostics_snapshot),
         failure_narratives=failure_narratives,
@@ -11524,9 +11560,14 @@ def _quality_analysis_for_result(res: PerformanceResult) -> GenerationQualityAna
     )
 
 
+def _review_analysis_for_result(res: PerformanceResult) -> GenerationQualityAnalysis | None:
+    """Return output-quality evidence only for completed generations."""
+    return _quality_analysis_for_result(res) if res.success else None
+
+
 def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord | None:
     """Build the canonical automated review payload for one result."""
-    analysis = _quality_analysis_for_result(result)
+    analysis = _review_analysis_for_result(result)
     generation = result.generation
     generation_tokens = 0
     if generation is not None:
@@ -11539,7 +11580,7 @@ def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord |
     )
     prompt_burden = _prompt_burden_for_result(result, None)
 
-    if analysis is not None and result.success:
+    if analysis is not None:
         requested_max_tokens = analysis.requested_max_tokens or result.requested_max_tokens
         nontext_prompt_ratio = (
             analysis.prompt_tokens_nontext_est / analysis.prompt_tokens_total
@@ -11582,6 +11623,7 @@ def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord |
 
     requested_max_tokens = result.requested_max_tokens
     evidence: list[str] = _failure_review_evidence(result)
+    failure_owner = _failure_owner_for_result(result)
     return {
         "verdict": "runtime_failure",
         "hint_relationship": "not_evaluated",
@@ -11590,9 +11632,13 @@ def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord |
         "likely_capped": bool(
             requested_max_tokens is not None and generation_tokens >= requested_max_tokens
         ),
-        "owner": _classify_review_owner(
-            harness_type=None,
-            failure_owner=result.error_package,
+        "owner": (
+            failure_owner
+            if failure_owner.startswith("unresolved: ")
+            else _classify_review_owner(
+                harness_type=None,
+                failure_owner=failure_owner,
+            )
         ),
         "user_bucket": "avoid",
         "evidence": _dedupe_preserve_order(evidence) or ["runtime_failure"],
@@ -11848,7 +11894,7 @@ def _build_jsonl_maintainer_triage_record(
     issue_cluster: IssueCluster | None = None,
 ) -> JsonlMaintainerTriageRecord:
     """Build an action-oriented maintainer triage payload for one result."""
-    analysis = _quality_analysis_for_result(result)
+    analysis = _review_analysis_for_result(result)
     triage: JsonlMaintainerTriageRecord = {
         "suspected_owner": review["owner"],
         "confidence": _review_confidence(result, review, analysis),
@@ -12248,7 +12294,7 @@ def _build_review_payload(result: PerformanceResult) -> ReviewPayload | None:
     if review is None:
         return None
 
-    analysis = _quality_analysis_for_result(result)
+    analysis = _review_analysis_for_result(result)
     return ReviewPayload(
         review=review,
         analysis=analysis,
@@ -14068,7 +14114,9 @@ def _issue_cluster_confidence(cluster: IssueCluster) -> MaintainerConfidence:
 
 def _issue_cluster_is_mlx_vlm_scope(cluster: IssueCluster) -> bool:
     """Return whether a cluster belongs in an mlx-vlm/MLX upstream issue."""
-    owner_packages = {part.strip() for part in cluster.owner.split("/")}
+    owner_packages = {
+        part.strip().removeprefix("unresolved: ") for part in cluster.owner.split("/")
+    }
     return not owner_packages.isdisjoint({"mlx-vlm", "mlx"})
 
 
@@ -14122,7 +14170,7 @@ def _build_issue_clusters(snapshot: DiagnosticsSnapshot) -> tuple[IssueCluster, 
             continue
         sorted_results = sorted(cluster_results, key=lambda result: result.model_name)
         representative = sorted_results[0]
-        owner = _diagnostics_owner_label(representative.error_package or "unknown")
+        owner = _diagnostics_owner_label(_failure_owner_for_result(representative))
         subtype = representative.error_code or "runtime_failure"
         representative_error = representative.root_error_message or representative.error_message
         symptom = _truncate_text_preview(
@@ -14904,7 +14952,9 @@ def _diagnostics_next_action(owner_key: str) -> str:
     if action := _DIAGNOSTICS_OWNER_ACTIONS.get(owner_key):
         return action
 
-    owner_parts = {part.strip() for part in owner_key.split("/") if part.strip()}
+    owner_parts = {
+        part.strip().removeprefix("unresolved: ") for part in owner_key.split("/") if part.strip()
+    }
     for required_parts, action in _DIAGNOSTICS_OWNER_PART_ACTIONS:
         if required_parts.issubset(owner_parts):
             return action
@@ -15318,6 +15368,7 @@ _ISSUE_FILING_TARGET_LABELS: Final[dict[str, str]] = {
     "model-config / mlx-vlm": "model repo first; mlx-vlm if template handling disagrees",
     "model configuration/repository": "model repository",
     "mlx-vlm / mlx": "mlx-vlm first; MLX if cache/runtime reproduces",
+    "unresolved: mlx / mlx-vlm": "mlx-vlm first; MLX if cache/runtime reproduces",
     "mlx-vlm / mlx-lm": "mlx-vlm first; mlx-lm if shared generation reproduces",
     "transformers / mlx-vlm": "transformers first; mlx-vlm integration check",
 }
@@ -16710,7 +16761,9 @@ def _build_full_html_document(
     """
     sys_info_html = "<ul>"
     for k, v in system_info.items():
-        sys_info_html += f"<li><b>{html.escape(k)}:</b> {html.escape(v)}</li>"
+        sys_info_html += (
+            f"<li><b>{html.escape(k)}:</b> {html.escape(_home_relative_report_text(v))}</li>"
+        )
     sys_info_html += "</ul>"
 
     # Build filter controls with JavaScript
@@ -17665,7 +17718,7 @@ def _build_model_recommendation_views(
     views: list[ModelRecommendationView] = []
     for result in context.result_set.results:
         review = _review_for_result(result)
-        analysis = _quality_analysis_for_result(result)
+        analysis = _review_analysis_for_result(result)
         agreement = result.metadata_agreement
         utility = utility_by_model.get(result.model_name)
         text = _generation_text_value(result.generation).strip()
@@ -20361,10 +20414,13 @@ def _root_cause_exception(
 
 def _failure_exception_record(error: BaseException) -> FailureException:
     """Materialize stable exception identity for failure artifacts."""
+    frames = traceback.extract_tb(error.__traceback__)
+    origin = frames[-1].filename if frames else None
     return FailureException(
         exception_type=type(error).__name__,
         module=type(error).__module__,
         message=str(error),
+        origin=origin,
     )
 
 
@@ -20372,14 +20428,17 @@ def _serialize_exception_chain(
     chain: tuple[FailureException, ...],
 ) -> list[dict[str, str]]:
     """Serialize a stored exception chain without changing its chronology."""
-    return [
-        {
+    serialized: list[dict[str, str]] = []
+    for entry in chain:
+        item = {
             "type": entry.exception_type,
             "module": entry.module,
             "message": entry.message,
         }
-        for entry in chain
-    ]
+        if entry.origin is not None:
+            item["origin"] = _home_relative_report_text(entry.origin)
+        serialized.append(item)
+    return serialized
 
 
 def _exception_chain_json_field(
@@ -20410,6 +20469,26 @@ def _format_failure_exception(entry: FailureException) -> str:
     return f"{entry.exception_type}: {entry.message}"
 
 
+def _failure_exception_owner(entry: FailureException) -> str:
+    """Attribute one exception using its message, module, and traceback origin."""
+    origin = " ".join(part for part in (entry.module, entry.origin) if part)
+    return _attribute_error_to_package(entry.message, origin)
+
+
+def _failure_owner_for_result(result: PerformanceResult) -> str:
+    """Return a primary owner or an explicit mixed-owner failure label."""
+    chain_owners = {
+        owner
+        for entry in result.exception_chain
+        if (owner := _failure_exception_owner(entry)) != _UNKNOWN_OWNER
+    }
+    if len(chain_owners) > 1:
+        return "unresolved: " + "/".join(sorted(chain_owners))
+    if chain_owners:
+        return next(iter(chain_owners))
+    return result.error_package or _UNKNOWN_OWNER
+
+
 def _build_failure_narrative(result: PerformanceResult) -> FailureNarrative:
     """Derive one conclusive crash narrative and cautious owner attribution."""
     chain = result.exception_chain
@@ -20424,15 +20503,9 @@ def _build_failure_narrative(result: PerformanceResult) -> FailureNarrative:
         secondary = ()
 
     triage = _maintainer_triage_for_result(result)
-    chain_owners = {
-        owner
-        for entry in chain
-        if (owner := _attribute_error_to_package(entry.message)) != _UNKNOWN_OWNER
-    }
-    suspected_owner = triage["suspected_owner"] if triage is not None else _UNKNOWN_OWNER
+    suspected_owner = _failure_owner_for_result(result)
     owner_confidence = triage["confidence"] if triage is not None else "low"
-    if len(chain_owners) > 1:
-        suspected_owner = "unresolved: " + "/".join(sorted(chain_owners))
+    if suspected_owner.startswith("unresolved: "):
         owner_confidence = "low"
     elif len(chain) > 1 and owner_confidence == "high":
         owner_confidence = "medium"
@@ -21542,7 +21615,12 @@ def _build_failure_result(
     classification_text = " ".join(part for part in (root_error_msg, error_msg) if part)
     resolved_phase = _extract_failure_phase(error, fallback=failure_phase)
     classified_stage = _classify_error(classification_text or error_msg)
-    error_package = _attribute_error_to_package(classification_text or error_msg, tb_str)
+    primary_owner = _failure_exception_owner(root_error)
+    error_package = (
+        primary_owner
+        if primary_owner != _UNKNOWN_OWNER
+        else _attribute_error_to_package(classification_text or error_msg, tb_str)
+    )
     error_code = _build_canonical_error_code(
         error_stage=classified_stage,
         error_package=error_package,
@@ -23519,7 +23597,10 @@ def process_models(
             result = _populate_result_quality_analysis(
                 result,
                 prompt=prompt,
-                metadata=metadata,
+                metadata=_quality_reference_metadata(
+                    eval_mode=str(getattr(args, "eval_mode", DEFAULT_EVAL_MODE)),
+                    metadata=metadata,
+                ),
                 requested_max_tokens=args.max_tokens,
                 context_marker=args.context_marker,
             )
@@ -25200,6 +25281,7 @@ def log_summary(
     image_path: Path | None = None,
     eval_mode: str = DEFAULT_EVAL_MODE,
     metadata: MetadataDict | None = None,
+    metadata_exposed_to_prompt: bool | None = None,
 ) -> None:
     """Log run summary focused on diagnostics, quality, and model triage."""
     if not results:
@@ -25234,7 +25316,11 @@ def log_summary(
             clean_count=clean_count,
             successful_count=len(successful),
         )
-        mode_policy = _build_report_mode_policy(eval_mode=eval_mode, metadata=metadata)
+        mode_policy = _build_report_mode_policy(
+            eval_mode=eval_mode,
+            metadata=metadata,
+            metadata_exposed_to_prompt=metadata_exposed_to_prompt,
+        )
         if mode_policy.suppress_cataloging_scores:
             log_blank()
             logger.info("📌 Caption Selection Snapshot:")
@@ -25885,7 +25971,9 @@ def _build_jsonl_result_record_base(result: PerformanceResult) -> JsonlResultRec
         "error_type": result.error_type,
         "error_package": result.error_package,
         "error_traceback": result.error_traceback,
-        "quality_issues": _parse_quality_issues_to_list(result.quality_issues),
+        "quality_issues": (
+            _parse_quality_issues_to_list(result.quality_issues) if result.success else []
+        ),
         "timestamp": local_now_str(),
         "metrics": {},
         "timing": {
@@ -28731,12 +28819,14 @@ def finalize_execution(
     """Output summary statistics, generate reports, and display timing information."""
     overall_time: float = time.perf_counter() - overall_start_time
     if results:
+        metadata_exposed_to_prompt = _prompt_builder_exposes_metadata(args, metadata)
         log_summary(
             results,
             prompt=prompt,
             image_path=image_path,
             eval_mode=str(getattr(args, "eval_mode", DEFAULT_EVAL_MODE)),
             metadata=metadata,
+            metadata_exposed_to_prompt=metadata_exposed_to_prompt,
         )
 
         # Gather system characteristics for reports
@@ -28747,6 +28837,7 @@ def finalize_execution(
             prompt=prompt,
             image_path=image_path,
             metadata=metadata,
+            metadata_exposed_to_prompt=metadata_exposed_to_prompt,
             eval_mode=str(getattr(args, "eval_mode", DEFAULT_EVAL_MODE)),
             system_info=system_info,
             preflight_issues=_get_run_preflight_issues(args),

@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-07-13 05:57:30 BST
+Generated on: 2026-07-17 13:44:05 BST
 
 Complete per-model evidence artifact with image metadata, the source prompt,
 summary tables, diagnostics, and full generated output for every attempted
@@ -23,17 +23,12 @@ _Action Snapshot: see [results.md](https://github.com/jrp2014/check_models/blob/
 
 ## Image Metadata
 
-- _Title:_ , Deben Estuary, Woodbridge, England, UK, GBR, Europe
+- _Title:_ Deben Estuary, Woodbridge, England, UK, GBR, Europe
 - _Description:_ Two sailing boats moored on a river with trees behind on the
   bank
-- _Keywords:_ Bird, Boat, Boating, Buoy, Bushes, Coast, Deben Estuary,
-  England, Estuary, Europe, Foliage, Forest, Landscape, Mast, Moored, Mudflat,
-  Nature, Outdoors, Peaceful, Rigging, River, Riverbank, Sailboat, Sailing,
-  Suffolk, Trees, UK, Water, Watercraft, Woodbridge, Woodland, anchored, bank,
-  calm, classic boat, flora, getaway, green, holiday, lake, leisure, low tide,
-  marine, mooring, mudbank, nautical, recreation, reflection, sail, sailing
-  boat, scenic, serene, shore, summer, tide, tranquil, travel, vacation,
-  vessel, vintage boat, wooden boat, yacht
+- _Keywords:_ Bird, Boat, Boating, Buoy, Bushes, Coast, Estuary, Foliage,
+  Forest, Landscape, Mast, Moored, Mudflat, Nature, Outdoors, Peaceful,
+  Rigging, River, Riverbank, Sailboat
 - _Date:_ 2026-07-04 19:10:04 BST
 - _Time:_ 19:10:04
 
@@ -106,7 +101,7 @@ Skim-first view of what each model returned, or the strongest diagnostic when it
 
 | Model                                                                                                                   | Result                        | Quality / diagnostic                                               | Response / diagnostic                                                                                                                                                                                                                                                                                                                        |
 |-------------------------------------------------------------------------------------------------------------------------|-------------------------------|--------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`mlx-community/gemma-4-31b-bf16`](#model-mlx-community-gemma-4-31b-bf16)                                               | `avoid` / `semantic mismatch` | mlx; model-error                                                   | [mlx; model-error] Error: Model Error - Model runtime error during generation for mlx-community/gemma-4-31b-bf16: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).                                                                                                       |
+| [`mlx-community/gemma-4-31b-bf16`](#model-mlx-community-gemma-4-31b-bf16)                                               | `avoid` / `runtime failure`   | mlx-vlm; model-error                                               | [mlx-vlm; model-error] Error: Model Error - Model runtime error during generation for mlx-community/gemma-4-31b-bf16: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).                                                                                                   |
 | [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `caveat` / `clean`            | missing terms: Bird, Buoy, Mudflat, behind, bank                   | Title: Deben Estuary, Woodbridge, England, UK, GBR, Europe, Boating, Sailboat, River, Riverbank, Nature, Outdoors, Peaceful, Rigging, Boats, Muddy, Coast, Estuary, Foliage, Forest, Landscape, Mast, Moored, Sa ... [tail] ary, Sailing, Muddy, Coast, Nature, Outdoors, Peaceful, Rigging, Boats, Mushrooms, Trees, Water, Sky             |
 | [`mlx-community/LFM2-VL-1.6B-8bit`](#model-mlx-community-lfm2-vl-16b-8bit)                                              | `avoid` / `model shortcoming` | unverified-context-copy; low-draft-improvement; metadata-borrowing | Title: Deben Estuary, Woodbridge, England, UK, GBR, Europe, 2026-07-04 19:10:04 BST 19:10:04 Description: Two sailing boats moored on a river with trees behind on the bank. The boats are white with orange mas ... [tail] t, Landscape, Mast, Moored, Mudflat, Nature, Outdoors, Peaceful, Rigging, River, Riverbank, Sailboat             |
 | [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava)                                                                       | `avoid` / `model shortcoming` | low-draft-improvement; missing-sections                            | Title: Deben Estuary, Woodbridge, England, UK, GBR, Europe Description: Two sailing boats moored on a river with trees behind on the bank.                                                                                                                                                                                                   |
@@ -177,7 +172,7 @@ Every model in this run, with its skim-first output or diagnostic beside the mai
 
 | Model                                                                                                                   | Result                        | Output / diagnostic                                                                                                                                                                                                                     | Gen tok   | Total   | Gen TPS   | Peak GB   | Quality signal                                                     |
 |-------------------------------------------------------------------------------------------------------------------------|-------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|---------|-----------|-----------|--------------------------------------------------------------------|
-| [`mlx-community/gemma-4-31b-bf16`](#model-mlx-community-gemma-4-31b-bf16)                                               | `avoid` / `semantic mismatch` | [mlx; model-error] Error: Model Error - Model runtime error during generation for mlx-community/gemma-4-31b-bf16: [METAL] Command buffer execution fa ... [tail] ory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).            | -         | 135.96s | -         | -         | mlx; model-error                                                   |
+| [`mlx-community/gemma-4-31b-bf16`](#model-mlx-community-gemma-4-31b-bf16)                                               | `avoid` / `runtime failure`   | [mlx-vlm; model-error] Error: Model Error - Model runtime error during generation for mlx-community/gemma-4-31b-bf16: [METAL] Command buffer execution ... [tail] y (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).             | -         | 135.96s | -         | -         | mlx-vlm; model-error                                               |
 | [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `caveat` / `clean`            | Title: Deben Estuary, Woodbridge, England, UK, GBR, Europe, Boating, Sailboat, River, Riverbank, Nature, Outdoors, Peaceful, Rigging, Boats, Mu ... [tail] Outdoors, Peaceful, Rigging, Boats, Mushrooms, Trees, Water, Sky             | 181       | 1.55s   | 504       | 1.4       | missing terms: Bird, Buoy, Mudflat, behind, bank                   |
 | [`mlx-community/LFM2-VL-1.6B-8bit`](#model-mlx-community-lfm2-vl-16b-8bit)                                              | `avoid` / `model shortcoming` | Title: Deben Estuary, Woodbridge, England, UK, GBR, Europe, 2026-07-04 19:10:04 BST 19:10:04 Description: Two sailing boats moored on a river w ... [tail] , Nature, Outdoors, Peaceful, Rigging, River, Riverbank, Sailboat            | 144       | 1.91s   | 331       | 3.0       | unverified-context-copy; low-draft-improvement; metadata-borrowing |
 | [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava)                                                                       | `avoid` / `model shortcoming` | Title: Deben Estuary, Woodbridge, England, UK, GBR, Europe Description: Two sailing boats moored on a river with trees behind on the bank.                                                                                              | 37        | 2.06s   | 113       | 5.1       | low-draft-improvement; missing-sections                            |
@@ -259,7 +254,7 @@ Every model in this run, with its skim-first output or diagnostic beside the mai
   [`HuggingFaceTB/SmolVLM-Instruct`](#model-huggingfacetb-smolvlm-instruct),
   [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit),
   [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16),
-  +44 more
+  +52 more
 - _Failed outputs:_ [`mlx-community/gemma-4-31b-bf16`](#model-mlx-community-gemma-4-31b-bf16)
 
 ## Model Gallery
@@ -272,18 +267,17 @@ Full generated output by model:
 
 ### ❌ mlx-community/gemma-4-31b-bf16
 
-- _Recommendation:_ avoid for now; review verdict: semantic mismatch
+- _Recommendation:_ avoid for now; review verdict: runtime failure
 - _Status:_ Failed (Model Error)
-- _Owner:_ likely owner `model`; reported package `mlx`; failure stage `Model
-  Error`; diagnostic code `MLX_DECODE_MODEL`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Owner:_ likely owner `unresolved: mlx/mlx-vlm`; reported package `mlx-vlm`;
+  failure stage `Model Error`; diagnostic code `MLX_VLM_DECODE_MODEL`
+- _Next step:_ Inspect the canonical log and diagnostics output.
 - _Error summary:_ see error details below
-- _Key signals:_ keywords=66; reasoning leak;
-  text-sanity=gibberish(char_noise)
+- _Key signals:_ model error; mlx vlm decode model
 - _Failure context:_ type `ValueError`; phase `decode`; code
-  `MLX_DECODE_MODEL`; package `mlx`
-- _Tokens:_ prompt n/a; estimated text 478 tok; estimated non-text n/a;
-  generated n/a; requested max 500 tok; stop reason exception
+  `MLX_VLM_DECODE_MODEL`; package `mlx-vlm`
+- _Tokens:_ prompt n/a; estimated text n/a; estimated non-text n/a; generated
+  n/a; requested max 500 tok; stop reason exception
 
 _Error details:_
 
@@ -309,14 +303,6 @@ IndexError: list index out of range
 During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/.worktrees/report-output-redesign/src/check_models.py", line 21051, in _run_generation_with_retry_workaround
-    return generate_once()
-  File "~/Documents/AI/mlx/check_models/.worktrees/report-output-redesign/src/check_models.py", line 21427, in _generate_once
-    return strict_generate(
-        model=model,
-    ...<21 lines>...
-        **extra_kwargs,
-    )
   File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate/dispatch.py", line 1240, in generate
     for response in stream_generate(
                     ~~~~~~~~~~~~~~~^
@@ -338,24 +324,6 @@ RuntimeError: [METAL] Command buffer execution failed: Insufficient Memory (0000
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/.worktrees/report-output-redesign/src/check_models.py", line 21619, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        phase_timer=phase_timer,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/Documents/AI/mlx/check_models/.worktrees/report-output-redesign/src/check_models.py", line 21458, in _run_model_generation
-    output = _run_generation_with_retry_workaround(
-        params=params,
-        generate_once=_generate_once,
-    )
-  File "~/Documents/AI/mlx/check_models/.worktrees/report-output-redesign/src/check_models.py", line 21085, in _run_generation_with_retry_workaround
-    raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
 ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-bf16: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
 ```
 
@@ -452,7 +420,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 - _Key signals:_ missing sections: keywords; missing terms: Bird, Boating,
   Buoy, Bushes, Coast; low-draft-improvement
 - _Score:_ 🟠 D (46/100); Δ-3; Keywords are not specific or diverse enough
-- _Review focus:_ watchlist (missing sections)
+- _Review focus:_ watchlist (missing sections, trusted hint degraded)
 - _Timing:_ Load 0.70s; Gen 1.00s; Total 2.06s
 - _Throughput:_ Prompt 5,194 TPS (562 tok); Gen 113 TPS (37 tok)
 - _Tokens:_ prompt 562 tok; estimated text 478 tok; estimated non-text 84 tok;
@@ -469,6 +437,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 
 - Missing sections (keywords)
 - Low draft improvement
+- Degrades trusted hints
 
 ---
 
@@ -663,7 +632,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
   coverage is still weak.
 - _Key signals:_ missing terms: Bird, Boating, Buoy, Bushes, Coast
 - _Score:_ ✅ B (79/100); Δ+30; None identified
-- _Review focus:_ strong candidate for first-pass review
+- _Review focus:_ watchlist (low metadata alignment)
 - _Timing:_ Load 2.51s; Gen 2.69s; Total 5.57s
 - _Throughput:_ Prompt 1,367 TPS (835 tok); Gen 56.7 TPS (86 tok)
 - _Tokens:_ prompt 835 tok; estimated text 478 tok; estimated non-text 357
@@ -684,6 +653,10 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 > greenery, nature, outdoors, landscape, mooring, estuary, vertical, daylight
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
+⚠️ _Quality Warnings:_
+
+- Metadata alignment issue (low_metadata_alignment)
+
 ---
 
 <a id="model-microsoft-phi-35-vision-instruct"></a>
@@ -697,6 +670,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 - _Key signals:_ missing terms: Boating, Buoy, Bushes, Coast, Foliage;
   keywords=21; low-draft-improvement
 - _Score:_ 🟡 C (58/100); Δ+9; Lacks visual description of image
+- _Review focus:_ watchlist (low metadata alignment)
 - _Timing:_ Load 1.21s; Gen 3.08s; Total 4.65s
 - _Throughput:_ Prompt 3,981 TPS (1,394 tok); Gen 57.6 TPS (130 tok)
 - _Tokens:_ prompt 1394 tok; estimated text 478 tok; estimated non-text 916
@@ -717,6 +691,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 
 ⚠️ _Quality Warnings:_
 
+- Metadata alignment issue (low_metadata_alignment)
 - Keyword count violation (21; expected 10-18)
 - Low draft improvement
 
@@ -790,6 +765,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 - _Key signals:_ missing terms: Bird, Landscape, Mudflat, Peaceful, Rigging;
   low-draft-improvement
 - _Score:_ 🟡 C (64/100); Δ+15; Limited novel information
+- _Review focus:_ watchlist (low metadata alignment)
 - _Timing:_ Load 1.66s; Gen 3.79s; Total 5.82s
 - _Throughput:_ Prompt 2,720 TPS (2,345 tok); Gen 35.3 TPS (81 tok)
 - _Tokens:_ prompt 2345 tok; estimated text 478 tok; estimated non-text 1867
@@ -811,6 +787,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 
 ⚠️ _Quality Warnings:_
 
+- Metadata alignment issue (low_metadata_alignment)
 - Low draft improvement
 
 ---
@@ -825,7 +802,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
   coverage is still weak.
 - _Key signals:_ missing terms: Bird, Boating, Bushes, Coast, Estuary
 - _Score:_ 🏆 A (83/100); Δ+34; None identified
-- _Review focus:_ strong candidate for first-pass review
+- _Review focus:_ watchlist (low metadata alignment)
 - _Timing:_ Load 1.51s; Gen 4.38s; Total 6.26s
 - _Throughput:_ Prompt 1,414 TPS (3,173 tok); Gen 66.1 TPS (105 tok)
 - _Tokens:_ prompt 3173 tok; estimated text 478 tok; estimated non-text 2695
@@ -847,6 +824,10 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 > trees, calm water, moored, buoy, riverbank
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
+⚠️ _Quality Warnings:_
+
+- Metadata alignment issue (low_metadata_alignment)
+
 ---
 
 <a id="model-mlx-community-pixtral-12b-8bit"></a>
@@ -860,7 +841,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 - _Key signals:_ missing terms: Bird, Boating, Bushes, Coast, Forest;
   low-draft-improvement
 - _Score:_ ✅ B (72/100); Δ+23; None identified
-- _Review focus:_ strong candidate for first-pass review
+- _Review focus:_ watchlist (low metadata alignment)
 - _Timing:_ Load 1.99s; Gen 4.67s; Total 7.02s
 - _Throughput:_ Prompt 1,822 TPS (3,366 tok); Gen 39.4 TPS (92 tok)
 - _Tokens:_ prompt 3366 tok; estimated text 478 tok; estimated non-text 2888
@@ -883,6 +864,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 
 ⚠️ _Quality Warnings:_
 
+- Metadata alignment issue (low_metadata_alignment)
 - Low draft improvement
 
 ---
@@ -967,7 +949,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model limitation for this prompt; trusted hint
   coverage is still weak.
-- _Key signals:_ missing terms: Bird, Coast, Mudflat, Peaceful, GBR;
+- _Key signals:_ missing terms: Bird, Coast, Mudflat, Peaceful, Woodbridge;
   low-draft-improvement
 - _Score:_ ✅ B (65/100); Δ+16; None identified
 - _Review focus:_ strong candidate for first-pass review
@@ -1007,7 +989,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
   coverage is still weak.
 - _Key signals:_ missing terms: Bird, Boating, Bushes, Coast, Landscape
 - _Score:_ 🏆 A (86/100); Δ+37; None identified
-- _Review focus:_ strong candidate for first-pass review
+- _Review focus:_ watchlist (low metadata alignment)
 - _Timing:_ Load 1.36s; Gen 5.74s; Total 7.66s
 - _Throughput:_ Prompt 984 TPS (3,172 tok); Gen 64.9 TPS (125 tok)
 - _Tokens:_ prompt 3172 tok; estimated text 478 tok; estimated non-text 2694
@@ -1032,6 +1014,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 
 ⚠️ _Quality Warnings:_
 
+- Metadata alignment issue (low_metadata_alignment)
 - Description sentence violation (3; expected 1-2)
 
 ---
@@ -1127,7 +1110,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 - _Key signals:_ missing terms: Bird, Boating, Bushes, Coast, Foliage;
   low-draft-improvement
 - _Score:_ ✅ B (73/100); Δ+24; None identified
-- _Review focus:_ strong candidate for first-pass review
+- _Review focus:_ watchlist (low metadata alignment)
 - _Timing:_ Load 2.79s; Gen 6.52s; Total 9.67s
 - _Throughput:_ Prompt 1,903 TPS (3,366 tok); Gen 20.7 TPS (88 tok)
 - _Tokens:_ prompt 3366 tok; estimated text 478 tok; estimated non-text 2888
@@ -1149,6 +1132,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 
 ⚠️ _Quality Warnings:_
 
+- Metadata alignment issue (low_metadata_alignment)
 - Low draft improvement
 
 ---
@@ -1163,7 +1147,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
   coverage is still weak.
 - _Key signals:_ missing terms: Bird, Boating, Bushes, Coast, Forest
 - _Score:_ 🏆 A (85/100); Δ+36; None identified
-- _Review focus:_ strong candidate for first-pass review
+- _Review focus:_ watchlist (low metadata alignment)
 - _Timing:_ Load 1.58s; Gen 6.90s; Total 8.86s
 - _Throughput:_ Prompt 1,392 TPS (3,173 tok); Gen 26.5 TPS (108 tok)
 - _Tokens:_ prompt 3173 tok; estimated text 478 tok; estimated non-text 2695
@@ -1184,6 +1168,10 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 > Floating buoy, Classic boat, Deben Estuary, Moored vessel, Green landscape,
 > Woodbridge, Rigging lines
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Metadata alignment issue (low_metadata_alignment)
 
 ---
 
@@ -1234,7 +1222,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 - _Key signals:_ missing terms: Bird, Boating, Bushes, Coast, Mudflat;
   low-draft-improvement
 - _Score:_ ✅ B (71/100); Δ+22; None identified
-- _Review focus:_ strong candidate for first-pass review
+- _Review focus:_ watchlist (low metadata alignment)
 - _Timing:_ Load 1.76s; Gen 6.91s; Total 9.05s
 - _Throughput:_ Prompt 1,410 TPS (2,345 tok); Gen 23.6 TPS (109 tok)
 - _Tokens:_ prompt 2345 tok; estimated text 478 tok; estimated non-text 1867
@@ -1257,6 +1245,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 
 ⚠️ _Quality Warnings:_
 
+- Metadata alignment issue (low_metadata_alignment)
 - Low draft improvement
 
 ---
@@ -1272,7 +1261,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 - _Key signals:_ missing terms: Bird, Boating, Buoy, Bushes, Coast;
   low-draft-improvement
 - _Score:_ ✅ B (72/100); Δ+23; None identified
-- _Review focus:_ strong candidate for first-pass review
+- _Review focus:_ watchlist (low metadata alignment)
 - _Timing:_ Load 2.31s; Gen 7.00s; Total 9.70s
 - _Throughput:_ Prompt 798 TPS (2,640 tok); Gen 30.4 TPS (96 tok)
 - _Tokens:_ prompt 2640 tok; estimated text 478 tok; estimated non-text 2162
@@ -1296,6 +1285,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 
 ⚠️ _Quality Warnings:_
 
+- Metadata alignment issue (low_metadata_alignment)
 - Title length violation (3 words; expected 5-10)
 - Low draft improvement
 
@@ -1398,7 +1388,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 - _Key signals:_ missing terms: Bird, Bushes, Coast, Landscape, Mudflat;
   low-draft-improvement
 - _Score:_ ✅ B (71/100); Δ+22; None identified
-- _Review focus:_ strong candidate for first-pass review
+- _Review focus:_ watchlist (low metadata alignment)
 - _Timing:_ Load 3.41s; Gen 7.55s; Total 11.37s
 - _Throughput:_ Prompt 1,851 TPS (835 tok); Gen 15.0 TPS (96 tok)
 - _Tokens:_ prompt 835 tok; estimated text 478 tok; estimated non-text 357
@@ -1421,6 +1411,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 
 ⚠️ _Quality Warnings:_
 
+- Metadata alignment issue (low_metadata_alignment)
 - Low draft improvement
 
 ---
@@ -1436,6 +1427,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 - _Key signals:_ missing terms: Boating, Buoy, Bushes, Coast, Foliage;
   keywords=21; low-draft-improvement
 - _Score:_ 🟡 C (58/100); Δ+9; Lacks visual description of image
+- _Review focus:_ watchlist (low metadata alignment)
 - _Timing:_ Load 0.98s; Gen 7.84s; Total 9.22s
 - _Throughput:_ Prompt 3,290 TPS (1,394 tok); Gen 19.1 TPS (130 tok)
 - _Tokens:_ prompt 1394 tok; estimated text 478 tok; estimated non-text 916
@@ -1456,6 +1448,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 
 ⚠️ _Quality Warnings:_
 
+- Metadata alignment issue (low_metadata_alignment)
 - Keyword count violation (21; expected 10-18)
 - Low draft improvement
 
@@ -1702,8 +1695,8 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model limitation for this prompt; trusted hint
   coverage is still weak.
-- _Key signals:_ missing terms: Bird, Deben, GBR, bank; keywords=19;
-  low-draft-improvement
+- _Key signals:_ missing terms: Bird, Deben, Woodbridge, GBR, bank;
+  keywords=19; low-draft-improvement
 - _Score:_ 🟡 C (60/100); Δ+11; None identified
 - _Timing:_ Load 1.74s; Gen 9.93s; Total 12.03s
 - _Throughput:_ Prompt 332 TPS (543 tok); Gen 19.0 TPS (148 tok)
@@ -2157,7 +2150,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 - _Next step:_ Treat this as a visual input burden issue first; reduce that
   input load or inspect long-context handling before judging output quality.
 - _Key signals:_ output/prompt=1.70%; visual input burden=93%; missing
-  sections: title; missing terms: Bird, Coast, Deben, GBR, bank
+  sections: title; missing terms: Bird, Coast, Deben, Woodbridge, GBR
 - _Score:_ 🟡 C (56/100); Δ+7; Limited novel information
 - _Review focus:_ watchlist (hallucination, missing sections)
 - _Timing:_ Load 5.85s; Gen 15.63s; Total 21.86s
@@ -2289,8 +2282,8 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model limitation for this prompt; trusted hint
   coverage is still weak.
-- _Key signals:_ missing terms: Bird, Deben, GBR, sailing, trees; keywords=19;
-  low-draft-improvement
+- _Key signals:_ missing terms: Bird, Deben, Woodbridge, GBR, sailing;
+  keywords=19; low-draft-improvement
 - _Score:_ 🟠 D (48/100); Δ-1; Lacks visual description of image
 - _Review focus:_ watchlist (Lacks visual description of image)
 - _Timing:_ Load 2.36s; Gen 21.20s; Total 23.94s
@@ -2580,7 +2573,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
   coverage is still weak.
 - _Key signals:_ missing terms: Bird, Boating, Bushes, Coast, Mudflat
 - _Score:_ 🏆 A (82/100); Δ+33; None identified
-- _Review focus:_ strong candidate for first-pass review
+- _Review focus:_ watchlist (low metadata alignment)
 - _Timing:_ Load 6.07s; Gen 58.21s; Total 64.68s
 - _Throughput:_ Prompt 307 TPS (16,808 tok); Gen 56.1 TPS (137 tok)
 - _Tokens:_ prompt 16808 tok; estimated text 478 tok; estimated non-text 16330
@@ -2605,6 +2598,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 
 ⚠️ _Quality Warnings:_
 
+- Metadata alignment issue (low_metadata_alignment)
 - Title length violation (11 words; expected 5-10)
 
 ---
@@ -2619,7 +2613,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
   coverage is still weak.
 - _Key signals:_ missing terms: Bird, Boat, Boating, Bushes, Coast
 - _Score:_ 🏆 A (92/100); Δ+42; None identified
-- _Review focus:_ strong candidate for first-pass review
+- _Review focus:_ watchlist (low metadata alignment)
 - _Timing:_ Load 3.35s; Gen 59.23s; Total 62.95s
 - _Throughput:_ Prompt 296 TPS (16,808 tok); Gen 68.7 TPS (113 tok)
 - _Tokens:_ prompt 16808 tok; estimated text 478 tok; estimated non-text 16330
@@ -2637,6 +2631,10 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 > riverbank, trees, foliage, water, buoys, rigging, estuary, nature, outdoors,
 > calm, green, UK, Woodbridge
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Metadata alignment issue (low_metadata_alignment)
 
 ---
 
@@ -2703,7 +2701,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
   coverage is still weak.
 - _Key signals:_ missing terms: Bird, Boating, Bushes, Coast, Estuary
 - _Score:_ ✅ B (78/100); Δ+30; None identified
-- _Review focus:_ strong candidate for first-pass review
+- _Review focus:_ watchlist (low metadata alignment)
 - _Timing:_ Load 1.56s; Gen 67.05s; Total 69.00s
 - _Throughput:_ Prompt 258 TPS (16,808 tok); Gen 91.4 TPS (99 tok)
 - _Tokens:_ prompt 16808 tok; estimated text 478 tok; estimated non-text 16330
@@ -2724,6 +2722,10 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 > Outdoors, Mast, Rigging, Buoy, Water, Landscape
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
+⚠️ _Quality Warnings:_
+
+- Metadata alignment issue (low_metadata_alignment)
+
 ---
 
 <a id="model-mlx-community-qwen35-35b-a3b-bf16"></a>
@@ -2737,7 +2739,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 - _Key signals:_ missing terms: Bird, Boating, Bushes, Coast, Forest;
   low-draft-improvement
 - _Score:_ ✅ B (67/100); Δ+18; None identified
-- _Review focus:_ strong candidate for first-pass review
+- _Review focus:_ watchlist (low metadata alignment)
 - _Timing:_ Load 6.62s; Gen 68.07s; Total 75.08s
 - _Throughput:_ Prompt 256 TPS (16,808 tok); Gen 59.7 TPS (93 tok)
 - _Tokens:_ prompt 16808 tok; estimated text 478 tok; estimated non-text 16330
@@ -2755,6 +2757,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 
 ⚠️ _Quality Warnings:_
 
+- Metadata alignment issue (low_metadata_alignment)
 - Low draft improvement
 
 ---
@@ -2769,7 +2772,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
   coverage is still weak.
 - _Key signals:_ missing terms: Bird, Boating, Bushes, Coast, Landscape
 - _Score:_ ✅ B (72/100); Δ+23; None identified
-- _Review focus:_ strong candidate for first-pass review
+- _Review focus:_ watchlist (low metadata alignment)
 - _Timing:_ Load 2.75s; Gen 73.62s; Total 76.73s
 - _Throughput:_ Prompt 236 TPS (16,808 tok); Gen 68.2 TPS (105 tok)
 - _Tokens:_ prompt 16808 tok; estimated text 478 tok; estimated non-text 16330
@@ -2787,6 +2790,10 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 > Moored, River, Water, Trees, Foliage, Forest, Green, Wooden, Mast, Rigging,
 > Buoy
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Metadata alignment issue (low_metadata_alignment)
 
 ---
 
@@ -2858,7 +2865,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
   coverage is still weak.
 - _Key signals:_ missing terms: Bird, Boating, Bushes, Coast, Foliage
 - _Score:_ 🏆 A (90/100); Δ+41; None identified
-- _Review focus:_ strong candidate for first-pass review
+- _Review focus:_ watchlist (low metadata alignment)
 - _Timing:_ Load 3.38s; Gen 99.24s; Total 103.01s
 - _Throughput:_ Prompt 184 TPS (16,808 tok); Gen 18.3 TPS (131 tok)
 - _Tokens:_ prompt 16808 tok; estimated text 478 tok; estimated non-text 16330
@@ -2880,6 +2887,10 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 > Landscape, Vegetation, Buoy, Deck, Estuary, Wood, Greenery, Outdoors
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
+⚠️ _Quality Warnings:_
+
+- Metadata alignment issue (low_metadata_alignment)
+
 ---
 
 <a id="model-mlx-community-qwen35-27b-4bit"></a>
@@ -2892,7 +2903,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
   coverage is still weak.
 - _Key signals:_ missing terms: Bird, Boating, Bushes, Coast, Mudflat
 - _Score:_ 🏆 A (87/100); Δ+38; None identified
-- _Review focus:_ strong candidate for first-pass review
+- _Review focus:_ watchlist (low metadata alignment)
 - _Timing:_ Load 2.85s; Gen 100.84s; Total 106.12s
 - _Throughput:_ Prompt 177 TPS (16,808 tok); Gen 23.9 TPS (121 tok)
 - _Tokens:_ prompt 16808 tok; estimated text 478 tok; estimated non-text 16330
@@ -2914,6 +2925,10 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 > Vegetation, Trees, Nature, Landscape, Sailing, Boat, Estuary, Foliage
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
+⚠️ _Quality Warnings:_
+
+- Metadata alignment issue (low_metadata_alignment)
+
 ---
 
 <a id="model-mlx-community-kimi-vl-a3b-thinking-2506-bf16"></a>
@@ -2925,7 +2940,7 @@ ValueError: Model runtime error during generation for mlx-community/gemma-4-31b-
 - _Next step:_ Treat as a model limitation for this prompt; the requested
   output contract is not being met.
 - _Key signals:_ hit token cap (500); missing sections: title; missing terms:
-  Mudflat, Peaceful, Riverbank, GBR, sailing; keyword duplication=50%
+  Mudflat, Peaceful, Riverbank, Woodbridge, GBR; keyword duplication=50%
 - _Score:_ 🟡 C (57/100); Δ+8; Lacks visual description of image
 - _Review focus:_ watchlist (cutoff, missing sections, reasoning leak)
 - _Timing:_ Load 3.57s; Gen 118.17s; Total 122.12s

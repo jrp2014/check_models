@@ -21,7 +21,7 @@
     "models_total": 61
   },
   "eval_mode": "assisted",
-  "generated_at": "2026-07-13 05:57:30 BST",
+  "generated_at": "2026-07-17 13:44:06 BST",
   "has_descriptive_metadata": true,
   "library_versions": {
     "Pillow": "12.3.0",

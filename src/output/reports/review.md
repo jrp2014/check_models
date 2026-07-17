@@ -2,7 +2,7 @@
 
 # Automated Review Digest
 
-Generated on: 2026-07-13 05:57:30 BST
+Generated on: 2026-07-17 13:44:05 BST
 
 Trusted-hint review uses only prompt title/description/keyword hints for utility comparison. Capture metadata, GPS, timestamps, source labels, and location labels are treated as nonvisual metadata and are not required visual evidence.
 
@@ -15,11 +15,11 @@ _Companion artifacts:_
 
 ### Strong Candidates
 
-- `mlx-community/Qwen3.5-35B-A3B-6bit`: 🏆 A (92/100) | Desc 100 | Keywords 77 | Δ+42 | 68.7 tps
-- `mlx-community/Qwen3.5-27B-mxfp8`: 🏆 A (90/100) | Desc 100 | Keywords 50 | Δ+41 | 18.3 tps
-- `mlx-community/Qwen3.5-27B-4bit`: 🏆 A (87/100) | Desc 100 | Keywords 50 | Δ+38 | 23.9 tps
-- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: 🏆 A (86/100) | Desc 93 | Keywords 70 | Δ+37 | 64.9 tps
 - `mlx-community/Qwen3.6-27B-mxfp8`: 🏆 A (85/100) | Desc 93 | Keywords 68 | Δ+36 | 6.3 tps
+- `mlx-community/gemma-3-27b-it-qat-4bit`: ✅ B (79/100) | Desc 92 | Keywords 80 | Δ+30 | 18.9 tps
+- `LiquidAI/LFM2.5-VL-450M-MLX-bf16`: ✅ B (76/100) | Desc 90 | Keywords 77 | Δ+27 | 503.6 tps
+- `mlx-community/gemma-4-31b-it-4bit`: ✅ B (74/100) | Desc 93 | Keywords 68 | Δ+25 | 19.6 tps
+- `mlx-community/gemma-3-27b-it-qat-8bit`: ✅ B (72/100) | Desc 93 | Keywords 66 | Δ+23 | 17.7 tps
 
 ### Watchlist
 
@@ -35,11 +35,11 @@ User-first summary grouped by recommendation bucket.
 
 ### `recommended`
 
-| Model                                          | Verdict   | Hint Handling                                    | Key Evidence                                                                  |
-|------------------------------------------------|-----------|--------------------------------------------------|-------------------------------------------------------------------------------|
-| `mlx-community/diffusiongemma-26B-A4B-it-8bit` | `clean`   | preserves trusted hints \| low-draft-improvement | missing terms: Bird, Coast, Mudflat, Peaceful, GBR \| low-draft-improvement   |
-| `mlx-community/gemma-4-31b-it-4bit`            | `clean`   | preserves trusted hints \| low-draft-improvement | missing terms: Bird, Boating, Bushes, Coast, Mudflat \| low-draft-improvement |
-| `mlx-community/Qwen3.6-27B-mxfp8`              | `clean`   | improves trusted hints                           | missing terms: Bird, Boating, Bushes, Coast, Forest                           |
+| Model                                          | Verdict   | Hint Handling                                    | Key Evidence                                                                       |
+|------------------------------------------------|-----------|--------------------------------------------------|------------------------------------------------------------------------------------|
+| `mlx-community/diffusiongemma-26B-A4B-it-8bit` | `clean`   | preserves trusted hints \| low-draft-improvement | missing terms: Bird, Coast, Mudflat, Peaceful, Woodbridge \| low-draft-improvement |
+| `mlx-community/gemma-4-31b-it-4bit`            | `clean`   | preserves trusted hints \| low-draft-improvement | missing terms: Bird, Boating, Bushes, Coast, Mudflat \| low-draft-improvement      |
+| `mlx-community/Qwen3.6-27B-mxfp8`              | `clean`   | improves trusted hints                           | missing terms: Bird, Boating, Bushes, Coast, Forest                                |
 
 ### `caveat`
 
@@ -49,13 +49,13 @@ User-first summary grouped by recommendation bucket.
 | `mlx-community/nanoLLaVA-1.5-4bit`                 | `clean`          | preserves trusted hints \| low-draft-improvement                                                   | keywords=21 \| low-draft-improvement                                                                                                                                                                                                                                                                              |
 | `mlx-community/Idefics3-8B-Llama3-bf16`            | `clean`          | preserves trusted hints \| low-draft-improvement                                                   | missing terms: Bird, Boating, Buoy, Bushes, Coast \| formatting=Unknown tags: &lt;end_of_utterance&gt; \| low-draft-improvement                                                                                                                                                                                   |
 | `mlx-community/gemma-3-27b-it-qat-8bit`            | `clean`          | preserves trusted hints \| low-draft-improvement                                                   | missing terms: Bird, Bushes, Coast, Mudflat, Peaceful \| keywords=19 \| low-draft-improvement                                                                                                                                                                                                                     |
-| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit` | `clean`          | preserves trusted hints \| low-draft-improvement                                                   | missing terms: Bird, Deben, GBR, bank \| keywords=19 \| low-draft-improvement                                                                                                                                                                                                                                     |
+| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit` | `clean`          | preserves trusted hints \| low-draft-improvement                                                   | missing terms: Bird, Deben, Woodbridge, GBR, bank \| keywords=19 \| low-draft-improvement                                                                                                                                                                                                                         |
 | `mlx-community/gemma-3-27b-it-qat-4bit`            | `clean`          | improves trusted hints \| low-draft-improvement                                                    | missing terms: Bird, Bushes, Forest, Peaceful, Rigging \| keywords=21 \| low-draft-improvement                                                                                                                                                                                                                    |
 | `mlx-community/llava-v1.6-mistral-7b-8bit`         | `token_cap`      | preserves trusted hints \| low-draft-improvement                                                   | hit token cap (500) \| keywords=27 \| low-draft-improvement                                                                                                                                                                                                                                                       |
 | `mlx-community/GLM-4.6V-Flash-6bit`                | `context_budget` | improves trusted hints                                                                             | output/prompt=1.46% \| visual input burden=93% \| missing sections: title \| missing terms: Bird, Boating, Buoy, Bushes, Coast                                                                                                                                                                                    |
-| `mlx-community/GLM-4.6V-nvfp4`                     | `context_budget` | preserves trusted hints \| low-draft-improvement                                                   | output/prompt=1.70% \| visual input burden=93% \| missing sections: title \| missing terms: Bird, Coast, Deben, GBR, bank                                                                                                                                                                                         |
+| `mlx-community/GLM-4.6V-nvfp4`                     | `context_budget` | preserves trusted hints \| low-draft-improvement                                                   | output/prompt=1.70% \| visual input burden=93% \| missing sections: title \| missing terms: Bird, Coast, Deben, Woodbridge, GBR                                                                                                                                                                                   |
 | `mlx-community/Molmo-7B-D-0924-bf16`               | `clean`          | preserves trusted hints \| low-draft-improvement                                                   | missing terms: GBR, bank \| keywords=20 \| low-draft-improvement                                                                                                                                                                                                                                                  |
-| `mlx-community/MolmoPoint-8B-fp16`                 | `clean`          | preserves trusted hints \| low-draft-improvement                                                   | missing terms: Bird, Deben, GBR, sailing, trees \| keywords=19 \| low-draft-improvement                                                                                                                                                                                                                           |
+| `mlx-community/MolmoPoint-8B-fp16`                 | `clean`          | preserves trusted hints \| low-draft-improvement                                                   | missing terms: Bird, Deben, Woodbridge, GBR, sailing \| keywords=19 \| low-draft-improvement                                                                                                                                                                                                                      |
 | `mlx-community/Molmo-7B-D-0924-8bit`               | `clean`          | preserves trusted hints \| low-draft-improvement                                                   | missing terms: GBR, bank \| keywords=20 \| low-draft-improvement                                                                                                                                                                                                                                                  |
 | `mlx-community/X-Reasoner-7B-8bit`                 | `context_budget` | ignores trusted hints \| missing terms: Bird, Boat, Boating, Buoy, Bushes \| low-draft-improvement | Output is very short relative to prompt size (0.1%) with weak text signal 'truncated', suggesting possible early-stop or prompt-handling issues. \| At mixed burden (16790 tokens), output stayed unusually short (14 tokens; ratio 0.1%; weak text signal truncated). \| output/prompt=0.08% \| mixed burden=97% |
 
@@ -67,9 +67,9 @@ User-first summary grouped by recommendation bucket.
 
 | Model                                                   | Verdict             | Hint Handling                                                                                      | Key Evidence                                                                                                                                                                           |
 |---------------------------------------------------------|---------------------|----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/gemma-4-31b-bf16`                        | `semantic_mismatch` | preserves trusted hints                                                                            | keywords=66 \| reasoning leak \| text-sanity=gibberish(char_noise)                                                                                                                     |
+| `mlx-community/gemma-4-31b-bf16`                        | `runtime_failure`   | not evaluated                                                                                      | model error \| mlx vlm decode model                                                                                                                                                    |
 | `mlx-community/LFM2-VL-1.6B-8bit`                       | `model_shortcoming` | preserves trusted hints \| unverified-context-copy \| low-draft-improvement                        | keywords=20 \| unverified-context-copy \| low-draft-improvement                                                                                                                        |
-| `qnguyen3/nanoLLaVA`                                    | `model_shortcoming` | preserves trusted hints \| low-draft-improvement                                                   | missing sections: keywords \| missing terms: Bird, Boating, Buoy, Bushes, Coast \| low-draft-improvement                                                                               |
+| `qnguyen3/nanoLLaVA`                                    | `model_shortcoming` | degrades trusted hints \| low-draft-improvement                                                    | missing sections: keywords \| missing terms: Bird, Boating, Buoy, Bushes, Coast \| low-draft-improvement                                                                               |
 | `HuggingFaceTB/SmolVLM-Instruct`                        | `model_shortcoming` | ignores trusted hints \| missing terms: Bird, Boat, Boating, Buoy, Bushes \| low-draft-improvement | missing sections: title, description, keywords \| missing terms: Bird, Boat, Boating, Buoy, Bushes \| low-draft-improvement                                                            |
 | `mlx-community/MiniCPM-V-4.6-8bit`                      | `harness`           | preserves trusted hints                                                                            | Special control token &lt;/think&gt; appeared in generated text. \| missing terms: Bird, Boating, Bushes, Coast, Estuary \| reasoning leak \| text-sanity=gibberish(token_noise)       |
 | `mlx-community/FastVLM-0.5B-bf16`                       | `model_shortcoming` | preserves trusted hints \| unverified-context-copy \| low-draft-improvement                        | keywords=28 \| unverified-context-copy \| low-draft-improvement                                                                                                                        |
@@ -111,7 +111,7 @@ User-first summary grouped by recommendation bucket.
 | `mlx-community/Qwen2-VL-2B-Instruct-4bit`               | `cutoff_degraded`   | degrades trusted hints \| low-draft-improvement                                                    | At mixed burden (16790 tokens), output became repetitive. \| hit token cap (500) \| missing sections: description, keywords \| missing terms: Bird, Buoy, Bushes, Coast, Estuary       |
 | `mlx-community/Qwen3.5-27B-mxfp8`                       | `semantic_mismatch` | improves trusted hints                                                                             | missing terms: Bird, Boating, Bushes, Coast, Foliage                                                                                                                                   |
 | `mlx-community/Qwen3.5-27B-4bit`                        | `semantic_mismatch` | improves trusted hints                                                                             | missing terms: Bird, Boating, Bushes, Coast, Mudflat                                                                                                                                   |
-| `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`          | `cutoff_degraded`   | preserves trusted hints \| low-draft-improvement                                                   | hit token cap (500) \| missing sections: title \| missing terms: Mudflat, Peaceful, Riverbank, GBR, sailing \| keyword duplication=50%                                                 |
+| `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`          | `cutoff_degraded`   | preserves trusted hints \| low-draft-improvement                                                   | hit token cap (500) \| missing sections: title \| missing terms: Mudflat, Peaceful, Riverbank, Woodbridge, GBR \| keyword duplication=50%                                              |
 
 ## Maintainer Escalations
 
@@ -119,27 +119,26 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
 
 <!-- markdownlint-disable MD060 -->
 
-| Target                                         | Problem                                               | Evidence Snapshot                                                                                                                                                                                       | Affected Models                                    | Issue Draft                                                                                                                  | Evidence Bundle                                                                                                                                                                        | Fixed When                                                   |
-|------------------------------------------------|-------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|
-| `mlx`                                          | MLX: Decode / model error: list index out of range    | Model Error \| phase decode \| IndexError                                                                                                                                                               | 1: `mlx-community/gemma-4-31b-bf16`                | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_001_mlx_mlx-decode-model_001.md)     | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260713T045729Z_001_mlx-community_gemma-4-31b-bf16_MLX_DECODE_MODEL_6b8c1b82382e.json)        | Load/generation completes or fails with a narrower owner.    |
-| `mlx-vlm`                                      | Stop/control tokens leaked into generated text        | decoded text contains control token &lt;/think&gt; \| prompt=1,179 \| output/prompt=6.87% \| stop=completed                                                                                             | 1: `mlx-community/MiniCPM-V-4.6-8bit`              | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_002_mlx-vlm_stop-token_001.md)       | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260713T045729Z_002_mlx-community_MiniCPM-V-4.6-8bit_mlx_vlm_stop_token_001.json)             | No leaked stop/control tokens.                               |
-| mlx-vlm first; MLX if cache/runtime reproduces | Long-context generation collapsed or became too short | prompt_tokens=16779, repetitive output \| prompt=16,779 \| output/prompt=2.98% \| mixed burden=97% \| stop=max_tokens \| hit token cap (500) \| 4 model cluster                                         | 4: `Qwen/Qwen3-VL-2B-Instruct` (+3)                | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_003_mlx-vlm-mlx_long-context_001.md) | [4 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260713T045729Z_005_Qwen_Qwen3-VL-2B-Instruct_mlx_vlm_mlx_long_context_001.json)           | Full and reduced reruns avoid context collapse.              |
-| mlx-vlm first; MLX if cache/runtime reproduces | Long-context generation collapsed or became too short | output/prompt=0.1%, weak text=truncated \| prompt_tokens=16790, output_tokens=14, output/prompt=0.1%, weak text=truncated \| prompt=16,790 \| output/prompt=0.08% \| mixed burden=97% \| stop=completed | 1: `mlx-community/X-Reasoner-7B-8bit`              | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_004_mlx-vlm-mlx_long-context_002.md) | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260713T045729Z_006_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_mlx_long_context_002.json)       | Full and reduced reruns avoid context collapse.              |
-| model repository                               | Generated text is mixed-script token-soup             | token cap \| missing sections \| abrupt tail \| prompt=3,457 \| output/prompt=14.46% \| mixed burden=86% \| stop=max_tokens \| hit token cap (500)                                                      | 1: `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX` | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_005_model_text-sanity_001.md)        | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260713T045729Z_003_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_model_text_sanity_001.json) | Generated text is readable natural language, not token soup. |
+| Target                                         | Problem                                                | Evidence Snapshot                                                                                                                                                                                       | Affected Models                                    | Issue Draft                                                                                                                                     | Evidence Bundle                                                                                                                                                                        | Fixed When                                                   |
+|------------------------------------------------|--------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|
+| mlx-vlm first; MLX if cache/runtime reproduces | mlx-vlm: Decode / model error: list index out of range | Model Error \| phase decode \| IndexError                                                                                                                                                               | 1: `mlx-community/gemma-4-31b-bf16`                | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_001_unresolved-mlx-mlx-vlm_mlx-vlm-decode-model_001.md) | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260717T122048Z_001_mlx-community_gemma-4-31b-bf16_MLX_VLM_DECODE_MODEL_0375357f22c1.json)    | Load/generation completes or fails with a narrower owner.    |
+| `mlx-vlm`                                      | Stop/control tokens leaked into generated text         | decoded text contains control token &lt;/think&gt; \| prompt=1,179 \| output/prompt=6.87% \| stop=completed                                                                                             | 1: `mlx-community/MiniCPM-V-4.6-8bit`              | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_002_mlx-vlm_stop-token_001.md)                          | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260717T122048Z_002_mlx-community_MiniCPM-V-4.6-8bit_mlx_vlm_stop_token_001.json)             | No leaked stop/control tokens.                               |
+| mlx-vlm first; MLX if cache/runtime reproduces | Long-context generation collapsed or became too short  | prompt_tokens=16779, repetitive output \| prompt=16,779 \| output/prompt=2.98% \| mixed burden=97% \| stop=max_tokens \| hit token cap (500) \| 4 model cluster                                         | 4: `Qwen/Qwen3-VL-2B-Instruct` (+3)                | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_003_mlx-vlm-mlx_long-context_001.md)                    | [4 repro JSONs](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260717T122048Z_005_Qwen_Qwen3-VL-2B-Instruct_mlx_vlm_mlx_long_context_001.json)           | Full and reduced reruns avoid context collapse.              |
+| mlx-vlm first; MLX if cache/runtime reproduces | Long-context generation collapsed or became too short  | output/prompt=0.1%, weak text=truncated \| prompt_tokens=16790, output_tokens=14, output/prompt=0.1%, weak text=truncated \| prompt=16,790 \| output/prompt=0.08% \| mixed burden=97% \| stop=completed | 1: `mlx-community/X-Reasoner-7B-8bit`              | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_004_mlx-vlm-mlx_long-context_002.md)                    | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260717T122048Z_006_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_mlx_long_context_002.json)       | Full and reduced reruns avoid context collapse.              |
+| model repository                               | Generated text is mixed-script token-soup              | token cap \| missing sections \| abrupt tail \| prompt=3,457 \| output/prompt=14.46% \| mixed burden=86% \| stop=max_tokens \| hit token cap (500)                                                      | 1: `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX` | [issue draft](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_005_model_text-sanity_001.md)                           | [repro JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260717T122048Z_003_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_model_text_sanity_001.json) | Generated text is readable natural language, not token soup. |
 <!-- markdownlint-enable MD060 -->
 
 ## Model Verdicts
 
 ### `mlx-community/gemma-4-31b-bf16`
 
-- _Recommendation:_ avoid for now; review verdict: semantic mismatch
-- _Owner:_ likely owner `model`; reported package `mlx`; failure stage `Model
-  Error`; diagnostic code `MLX_DECODE_MODEL`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ keywords=66; reasoning leak;
-  text-sanity=gibberish(char_noise)
-- _Tokens:_ prompt n/a; estimated text 478 tok; estimated non-text n/a;
-  generated n/a; requested max 500 tok; stop reason exception
+- _Recommendation:_ avoid for now; review verdict: runtime failure
+- _Owner:_ likely owner `unresolved: mlx/mlx-vlm`; reported package `mlx-vlm`;
+  failure stage `Model Error`; diagnostic code `MLX_VLM_DECODE_MODEL`
+- _Next step:_ Inspect the canonical log and diagnostics output.
+- _Key signals:_ model error; mlx vlm decode model
+- _Tokens:_ prompt n/a; estimated text n/a; estimated non-text n/a; generated
+  n/a; requested max 500 tok; stop reason exception
 
 
 ### `LiquidAI/LFM2.5-VL-450M-MLX-bf16`
@@ -333,7 +332,7 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model limitation for this prompt; trusted hint
   coverage is still weak.
-- _Key signals:_ missing terms: Bird, Coast, Mudflat, Peaceful, GBR;
+- _Key signals:_ missing terms: Bird, Coast, Mudflat, Peaceful, Woodbridge;
   low-draft-improvement
 - _Tokens:_ prompt 835 tok; estimated text 478 tok; estimated non-text 357
   tok; generated 89 tok; requested max 500 tok; stop reason completed
@@ -524,8 +523,8 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model limitation for this prompt; trusted hint
   coverage is still weak.
-- _Key signals:_ missing terms: Bird, Deben, GBR, bank; keywords=19;
-  low-draft-improvement
+- _Key signals:_ missing terms: Bird, Deben, Woodbridge, GBR, bank;
+  keywords=19; low-draft-improvement
 - _Tokens:_ prompt 543 tok; estimated text 478 tok; estimated non-text 65 tok;
   generated 148 tok; requested max 500 tok; stop reason completed
 
@@ -622,7 +621,7 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
 - _Next step:_ Treat this as a visual input burden issue first; reduce that
   input load or inspect long-context handling before judging output quality.
 - _Key signals:_ output/prompt=1.70%; visual input burden=93%; missing
-  sections: title; missing terms: Bird, Coast, Deben, GBR, bank
+  sections: title; missing terms: Bird, Coast, Deben, Woodbridge, GBR
 - _Tokens:_ prompt 6592 tok; estimated text 478 tok; estimated non-text 6114
   tok; generated 112 tok; requested max 500 tok; stop reason completed
 
@@ -657,8 +656,8 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
 - _Owner:_ likely owner `model`
 - _Next step:_ Treat as a model limitation for this prompt; trusted hint
   coverage is still weak.
-- _Key signals:_ missing terms: Bird, Deben, GBR, sailing, trees; keywords=19;
-  low-draft-improvement
+- _Key signals:_ missing terms: Bird, Deben, Woodbridge, GBR, sailing;
+  keywords=19; low-draft-improvement
 - _Tokens:_ prompt 3377 tok; estimated text 478 tok; estimated non-text 2899
   tok; generated 106 tok; requested max 500 tok; stop reason completed
 
@@ -838,7 +837,7 @@ Focused upstream issue drafts are queued in [issues/index.md](https://github.com
 - _Next step:_ Treat as a model limitation for this prompt; the requested
   output contract is not being met.
 - _Key signals:_ hit token cap (500); missing sections: title; missing terms:
-  Mudflat, Peaceful, Riverbank, GBR, sailing; keyword duplication=50%
+  Mudflat, Peaceful, Riverbank, Woodbridge, GBR; keyword duplication=50%
 - _Tokens:_ prompt 1564 tok; estimated text 478 tok; estimated non-text 1086
   tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
 

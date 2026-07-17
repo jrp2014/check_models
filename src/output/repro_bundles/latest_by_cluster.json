@@ -2,10 +2,10 @@
   "clusters": {
     "mlx-vlm-mlx_long-context_001": {
       "bundles": [
-        "20260713T045729Z_004_mlx-community_Qwen3-VL-2B-Instruct-bf16_mlx_vlm_mlx_long_context_001.json",
-        "20260713T045729Z_005_Qwen_Qwen3-VL-2B-Instruct_mlx_vlm_mlx_long_context_001.json",
-        "20260713T045729Z_007_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_mlx_long_context_001.json",
-        "20260713T045729Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json"
+        "20260717T122048Z_004_mlx-community_Qwen3-VL-2B-Instruct-bf16_mlx_vlm_mlx_long_context_001.json",
+        "20260717T122048Z_005_Qwen_Qwen3-VL-2B-Instruct_mlx_vlm_mlx_long_context_001.json",
+        "20260717T122048Z_007_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_mlx_long_context_001.json",
+        "20260717T122048Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json"
       ],
       "models": [
         "mlx-community/Qwen3-VL-2B-Instruct-bf16",
@@ -16,7 +16,7 @@
     },
     "mlx-vlm-mlx_long-context_002": {
       "bundles": [
-        "20260713T045729Z_006_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_mlx_long_context_002.json"
+        "20260717T122048Z_006_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_mlx_long_context_002.json"
       ],
       "models": [
         "mlx-community/X-Reasoner-7B-8bit"
@@ -24,69 +24,69 @@
     },
     "mlx-vlm_stop-token_001": {
       "bundles": [
-        "20260713T045729Z_002_mlx-community_MiniCPM-V-4.6-8bit_mlx_vlm_stop_token_001.json"
+        "20260717T122048Z_002_mlx-community_MiniCPM-V-4.6-8bit_mlx_vlm_stop_token_001.json"
       ],
       "models": [
         "mlx-community/MiniCPM-V-4.6-8bit"
       ]
     },
-    "mlx_mlx-decode-model_001": {
-      "bundles": [
-        "20260713T045729Z_001_mlx-community_gemma-4-31b-bf16_MLX_DECODE_MODEL_6b8c1b82382e.json"
-      ],
-      "models": [
-        "mlx-community/gemma-4-31b-bf16"
-      ]
-    },
     "model_text-sanity_001": {
       "bundles": [
-        "20260713T045729Z_003_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_model_text_sanity_001.json"
+        "20260717T122048Z_003_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_model_text_sanity_001.json"
       ],
       "models": [
         "mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX"
       ]
+    },
+    "unresolved-mlx-mlx-vlm_mlx-vlm-decode-model_001": {
+      "bundles": [
+        "20260717T122048Z_001_mlx-community_gemma-4-31b-bf16_MLX_VLM_DECODE_MODEL_0375357f22c1.json"
+      ],
+      "models": [
+        "mlx-community/gemma-4-31b-bf16"
+      ]
     }
   },
-  "generated_at_utc": "2026-07-13T04:57:29+00:00",
+  "generated_at_utc": "2026-07-17T12:20:48+00:00",
   "models": {
     "Qwen/Qwen3-VL-2B-Instruct": {
-      "bundle": "20260713T045729Z_005_Qwen_Qwen3-VL-2B-Instruct_mlx_vlm_mlx_long_context_001.json",
+      "bundle": "20260717T122048Z_005_Qwen_Qwen3-VL-2B-Instruct_mlx_vlm_mlx_long_context_001.json",
       "issue_cluster_id": "mlx-vlm-mlx_long-context_001",
       "issue_kind": "cutoff_degraded"
     },
     "mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX": {
-      "bundle": "20260713T045729Z_003_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_model_text_sanity_001.json",
+      "bundle": "20260717T122048Z_003_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_model_text_sanity_001.json",
       "issue_cluster_id": "model_text-sanity_001",
       "issue_kind": "cutoff_degraded"
     },
     "mlx-community/MiniCPM-V-4.6-8bit": {
-      "bundle": "20260713T045729Z_002_mlx-community_MiniCPM-V-4.6-8bit_mlx_vlm_stop_token_001.json",
+      "bundle": "20260717T122048Z_002_mlx-community_MiniCPM-V-4.6-8bit_mlx_vlm_stop_token_001.json",
       "issue_cluster_id": "mlx-vlm_stop-token_001",
       "issue_kind": "harness"
     },
     "mlx-community/Qwen2-VL-2B-Instruct-4bit": {
-      "bundle": "20260713T045729Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json",
+      "bundle": "20260717T122048Z_008_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json",
       "issue_cluster_id": "mlx-vlm-mlx_long-context_001",
       "issue_kind": "cutoff_degraded"
     },
     "mlx-community/Qwen3-VL-2B-Instruct-bf16": {
-      "bundle": "20260713T045729Z_004_mlx-community_Qwen3-VL-2B-Instruct-bf16_mlx_vlm_mlx_long_context_001.json",
+      "bundle": "20260717T122048Z_004_mlx-community_Qwen3-VL-2B-Instruct-bf16_mlx_vlm_mlx_long_context_001.json",
       "issue_cluster_id": "mlx-vlm-mlx_long-context_001",
       "issue_kind": "cutoff_degraded"
     },
     "mlx-community/Qwen3-VL-2B-Thinking-bf16": {
-      "bundle": "20260713T045729Z_007_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_mlx_long_context_001.json",
+      "bundle": "20260717T122048Z_007_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_mlx_long_context_001.json",
       "issue_cluster_id": "mlx-vlm-mlx_long-context_001",
       "issue_kind": "cutoff_degraded"
     },
     "mlx-community/X-Reasoner-7B-8bit": {
-      "bundle": "20260713T045729Z_006_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_mlx_long_context_002.json",
+      "bundle": "20260717T122048Z_006_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_mlx_long_context_002.json",
       "issue_cluster_id": "mlx-vlm-mlx_long-context_002",
       "issue_kind": "context_budget"
     },
     "mlx-community/gemma-4-31b-bf16": {
-      "bundle": "20260713T045729Z_001_mlx-community_gemma-4-31b-bf16_MLX_DECODE_MODEL_6b8c1b82382e.json",
-      "issue_cluster_id": "mlx_mlx-decode-model_001",
+      "bundle": "20260717T122048Z_001_mlx-community_gemma-4-31b-bf16_MLX_VLM_DECODE_MODEL_0375357f22c1.json",
+      "issue_cluster_id": "unresolved-mlx-mlx-vlm_mlx-vlm-decode-model_001",
       "issue_kind": "runtime_failure"
     }
   },
