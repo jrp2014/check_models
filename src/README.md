@@ -746,7 +746,7 @@ Optional (enable additional features):
 | Feature | Package | Source | Install Command |
 | ------- | ------- | ------ | --------------- |
 | Extended system metrics (RAM/CPU) | `psutil` | `extras` | `pip install -e "src/[extras]"` |
-| Fast tokenizer backends | `tokenizers>=0.22.0,<=0.23.0` | `extras` | `pip install -e "src/[extras]"` |
+| Fast tokenizer backends | `tokenizers>=0.22.0,<0.23.0` | `extras` | `pip install -e "src/[extras]"` |
 | Tensor operations (for some models) | `einops` | `extras` | `pip install -e "src/[extras]"` |
 | Number-to-words conversion (for some models) | `num2words` | `extras` | `pip install -e "src/[extras]"` |
 | SentencePiece tokenizers | `sentencepiece!=0.1.92,>=0.1.91` | `extras` | `pip install -e "src/[extras]"` |

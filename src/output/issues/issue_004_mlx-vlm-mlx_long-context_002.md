@@ -1,32 +1,34 @@
 <!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
 
-# \[mlx-vlm\]\[Stop-token leakage\] Stop/control tokens leaked into generated text affecting 1 model(s)
+# \[mlx-vlm / mlx\]\[Long-context collapse\] Long-context generation collapsed or became too short affecting 2 model(s)
 
 ## Summary
 
-1 model(s) show **Stop-token leakage** that should be filed against mlx-vlm.
+2 model(s) show **Long-context collapse** that should be filed against mlx-vlm first; MLX if cache/runtime reproduces.
 
-- **Observed problem:** Stop/control tokens leaked into generated text
-- **Target:** mlx-vlm
-- **Affected models:** 1
-- **Fixed when:** No leaked stop/control tokens.
+- **Observed problem:** Long-context generation collapsed or became too short
+- **Target:** mlx-vlm first; MLX if cache/runtime reproduces
+- **Affected models:** 2
+- **Fixed when:** Full and reduced reruns avoid context collapse.
 
 
 ## Affected Models
 
 <!-- markdownlint-disable MD060 -->
 
-| Model                              | Observed Behavior                                  | Token Counts                                          | Optional Context                                                                                                                                                              |
-|------------------------------------|----------------------------------------------------|-------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/MiniCPM-V-4.6-8bit` | decoded text contains control token &lt;/think&gt; | prompt=1,205 \| output/prompt=6.56% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260717T221600Z_001_mlx-community_MiniCPM-V-4.6-8bit_mlx_vlm_stop_token_001.json) |
+| Model                                     | Observed Behavior                      | Token Counts                                                                                       | Optional Context                                                                                                                                                                           |
+|-------------------------------------------|----------------------------------------|----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | prompt_tokens=16909, repetitive output | prompt=16,909 \| output/prompt=2.96% \| mixed burden=97% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260717T221600Z_007_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_002.json) |
+| `mlx-community/Qwen3-VL-2B-Thinking-bf16` | prompt_tokens=16900, repetitive output | prompt=16,900 \| output/prompt=2.96% \| mixed burden=97% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260717T221600Z_006_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_mlx_long_context_002.json) |
 <!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
 
-- `mlx-community/MiniCPM-V-4.6-8bit`: Special control token &lt;/think&gt; appeared in generated text.
-- `mlx-community/MiniCPM-V-4.6-8bit`: Output formatting deviated from the requested structure. Details: Unknown tags: &lt;think&gt;.
-- Output excerpt: `&lt;think&gt; &lt;/think&gt; Title: Beachfront with buildings and sea Description: The image shows a coastal beach with sandy areas and seaside buildings under a partly cloudy sky. Waves are visible near the shore, and people are present near the shoreline. Keywords: Beach, Buildings, Sea, Sand, Coastal, Buildings, Water...`
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: At long prompt length (16909 tokens), output became repetitive.
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: Model output may not follow prompt or image contents (missing: Beach, Buildings, Cars, Coastline, Horizon).
+- Output excerpt: `-001.jpg - 19:04:26 BST - 51.226814°N, 1.401142°E - 2026-07-11 19:04:26 BST Title: Deal, Kent, UK, 2026-07-11 19:04:26 BST Keywords: - 19:04:26 BST - Deal, Kent, UK, 2026-07-11 19:04:26 BST - 51.226814°N, 1.401142°E - 2026-07-11 19:04:26 BST - Deal, Kent, UK, 2026-07-11 19:04:26 BST - Deal, Kent, UK, 2026-07-11 19...`
+- `mlx-community/Qwen3-VL-2B-Thinking-bf16`: At long prompt length (16900 tokens), output became repetitive.
 
 
 ## Minimal Reproduction
@@ -39,7 +41,7 @@ Image SHA256: `b33a875fdf0b264dbfb24adaa03ac330ecede0f05832bd2bd6b0151e32d505c6`
 
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/MiniCPM-V-4.6-8bit --image 20260711-180426_DSC00975_DxO.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
+python -m mlx_vlm.generate --model mlx-community/Qwen2-VL-2B-Instruct-4bit --image 20260711-180426_DSC00975_DxO.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
 
 Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.
 
@@ -89,7 +91,7 @@ from mlx_vlm.generate import generate
 from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load
 
-MODEL = 'mlx-community/MiniCPM-V-4.6-8bit'
+MODEL = 'mlx-community/Qwen2-VL-2B-Instruct-4bit'
 IMAGE = '20260711-180426_DSC00975_DxO.jpg'
 PROMPT = 'Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.\n- Output only the description text after the label.\n\nKeywords:\n- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.\n- Output only the keyword list after the label.\n\nRules:\n- Include only details that are definitely visible in the image.\n- Reuse metadata terms only when they are clearly supported by the image.\n- If metadata and image disagree, follow the image.\n- Prefer omission to speculation.\n- Do not copy prompt instructions into the Title, Description, or Keywords fields.\n- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.\n- Do not output reasoning, notes, hedging, or extra sections.\n\nContext: Authoritative context:\n- Location terms: England, Europe, Town, UK\n- Capture date/time: 2026-07-11 19:04:26 BST 19:04:26\n- GPS: 51.226814°N, 1.401142°E\n- Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.\n\nDraft descriptive metadata:\n- Existing title: Seafront, Deal, England, UK, GBR, Europe\n- Existing description: A coastal view of Deal, Kent, UK, showing the shingle beach, sea, and seafront buildings on a partly cloudy day.\n- Existing keywords: Beach, Buildings, Cars, Coastline, Deal, Horizon, Kent, Landscape, People, Promenade, Seaside, Shore, Sitting, Sky, Swimming, Walking, Water, Waterfront, Waves, architecture\n- Treat this draft as fallible. Retain supported details, correct errors, and add important visible information.'
 LOAD_KWARGS = {'trust_remote_code': True}
@@ -166,28 +168,28 @@ Generation/load config:
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "mlx-community/MiniCPM-V-4.6-8bit"
+  "model": "mlx-community/Qwen2-VL-2B-Instruct-4bit"
 }
 ```
 
 Optional advanced context:
 
-- `mlx-community/MiniCPM-V-4.6-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260717T221600Z_001_mlx-community_MiniCPM-V-4.6-8bit_mlx_vlm_stop_token_001.json)
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260717T221600Z_007_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_002.json)
+- `mlx-community/Qwen3-VL-2B-Thinking-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260717T221600Z_006_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_mlx_long_context_002.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
 ## Expected Fix Signal
 
-- [ ] Affected reruns contain no leaked stop/control tokens and terminate cleanly before the configured max-token cap when the response is complete.
+- [ ] A same-command rerun and a reduced image/text burden rerun show consistent prompt-token accounting and no long-context collapse.
 - [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem.
 
 
 ## Fix Checklist
 
-- [ ] Inspect model EOS token IDs and tokenizer special-token mappings.
-- [ ] Verify mlx-vlm stop criteria receive all configured EOS/stop tokens.
-- [ ] Check `skip_special_tokens` handling during decode.
-- [ ] Strip generated control tokens such as `<|end|>` and `</think>` only after confirming generation stopped at the right boundary.
+- [ ] Rerun with reduced image/text burden and compare output recovery.
+- [ ] Compare prompt-token accounting with text-only and image+text prompts.
+- [ ] Inspect cache allocation, prefill step size, and long-context generation behavior.
 
 
 ## Appendix: Environment
@@ -227,25 +229,44 @@ Optional advanced context:
 
 ## Appendix: Detailed Evidence
 
-### `mlx-community/MiniCPM-V-4.6-8bit`
+### `mlx-community/Qwen2-VL-2B-Instruct-4bit`
 
 Observed signals:
 
-- Special control token &lt;/think&gt; appeared in generated text.
-- Output formatting deviated from the requested structure. Details: Unknown tags: &lt;think&gt;.
-- Output leaked reasoning or prompt-template text (&lt;think&gt;).
+- At long prompt length (16909 tokens), output became repetitive.
+- Model output may not follow prompt or image contents (missing: Beach, Buildings, Cars, Coastline, Horizon).
+- Output became repetitive, indicating possible generation instability (token: phrase: "deal, kent, uk, 2026-07-11...").
+- Output omitted required Title/Description/Keywords sections (description).
 
 Sample output:
 
 ```text
-<think>
+-001.jpg
+- 19:04:26 BST
+- 51.226814°N, 1.401142°E
+- 2026-07-11 19:04:26 BST
 
-</think>
+Title: Deal, Kent, UK, 2026-07-11 19:04:26 BST
 
-Title:
-Beachfront with buildings and sea
+Keywords:
+- 19:04:26 BST
+- Deal, Kent, UK, 2026-07-11 19:04:26 BST
+- 51....
+```
 
-Description:
-The image shows a coastal beach with sandy areas and seaside buildings under a partly cloudy sky. Waves are visible near...
+### `mlx-community/Qwen3-VL-2B-Thinking-bf16`
+
+Observed signals:
+
+- At long prompt length (16900 tokens), output became repetitive.
+- Model output may not follow prompt or image contents (missing: Beach, Buildings, Cars, Coastline, Deal).
+- Output became repetitive, indicating possible generation instability (token: -).
+- Output contains corrupted or malformed text segments (character_loop: ' -' repeated).
+- Output omitted required Title/Description/Keywords sections (title, description, keywords).
+
+Sample output:
+
+```text
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -...
 ```
 

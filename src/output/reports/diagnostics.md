@@ -1,18 +1,51 @@
 <!-- markdownlint-disable MD013 -->
 
-# Diagnostics Report — 0 failure(s), 2 harness issue(s), 0 text-sanity issue(s) (mlx-vlm 0.6.5)
+# Diagnostics Report — 0 failure(s), 7 harness issue(s), 0 text-sanity issue(s) (mlx-vlm 0.6.5)
 
-**Run summary:** 61 locally-cached VLM model(s) checked; 0 hard failure(s), 2 harness/integration issue(s), 0 text-sanity/semantic issue(s), 0 preflight warning(s), 61 successful run(s).
+**Run summary:** 61 locally-cached VLM model(s) checked; 0 hard failure(s), 7 harness/integration issue(s), 0 text-sanity/semantic issue(s), 0 preflight warning(s), 61 successful run(s).
 
-Test image: `cats.jpg` (0.2 MB).
+Test image: `20260711-180426_DSC00975_DxO.jpg` (43.2 MB).
 
 ## Impact and Run Conditions
 
 - _Models tested:_ 61
 - _Crashed:_ 0
 - _Completed:_ 61
-- _Prompt:_ Describe this image briefly.
-- _Image:_ cats.jpg
+- _Prompt:_ Analyze this image for cataloguing metadata, using British
+  English.  Use only details that are clearly and definitely visible in the
+  image. If a detail is uncertain, ambiguous, partially obscured, too small to
+  verify, or not directly visible, leave it out. Do not guess.  Treat the
+  metadata hints below as a draft catalog record. Keep only details that are
+  clearly confirmed by the image, correct anything contradicted by the image,
+  and add important visible details that are definitely present.  Return
+  exactly these three sections, and nothing else:  Title: - 5-10 words,
+  concrete and factual, limited to clearly visible content. - Output only the
+  title text after the label. - Do not repeat or paraphrase these instructions
+  in the title.  Description: - 1-2 factual sentences describing the main
+  visible subject, setting, lighting, action, and other distinctive visible
+  details. Omit anything uncertain or inferred. - Output only the description
+  text after the label.  Keywords: - 10-18 unique comma-separated terms based
+  only on clearly visible subjects, setting, colors, composition, and style.
+  Omit uncertain tags rather than guessing. - Output only the keyword list
+  after the label.  Rules: - Include only details that are definitely visible
+  in the image. - Reuse metadata terms only when they are clearly supported by
+  the image. - If metadata and image disagree, follow the image. - Prefer
+  omission to speculation. - Do not copy prompt instructions into the Title,
+  Description, or Keywords fields. - Do not infer identity, location, event,
+  brand, species, time period, or intent unless visually obvious. - Do not
+  output reasoning, notes, hedging, or extra sections.  Context: Authoritative
+  context: - Location terms: England, Europe, Town, UK - Capture date/time:
+  2026-07-11 19:04:26 BST 19:04:26 - GPS: 51.226814°N, 1.401142°E - Use this
+  factual context where it improves the catalogue record; do not claim that
+  contextual facts are visually observable.  Draft descriptive metadata: -
+  Existing title: Seafront, Deal, England, UK, GBR, Europe - Existing
+  description: A coastal view of Deal, Kent, UK, showing the shingle beach,
+  sea, and seafront buildings on a partly cloudy day. - Existing keywords:
+  Beach, Buildings, Cars, Coastline, Deal, Horizon, Kent, Landscape, People,
+  Promenade, Seaside, Shore, Sitting, Sky, Swimming, Walking, Water,
+  Waterfront, Waves, architecture - Treat this draft as fallible. Retain
+  supported details, correct errors, and add important visible information.
+- _Image:_ 20260711-180426_DSC00975_DxO.jpg
 
 ## mlx-vlm / MLX Issue Matrix
 
@@ -20,10 +53,12 @@ Routing labels reflect evidence confidence only; a crash remains a conclusive
 failed task at every confidence level.
 <!-- markdownlint-disable MD060 -->
 
-| Target                                         | Problem                                               | Evidence Snapshot                                                                                                                                                                       | Affected Models                              | Confidence   | Evidence Type   | Fixed When                                      |
-|------------------------------------------------|-------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------|--------------|-----------------|-------------------------------------------------|
-| `mlx-vlm`                                      | Stop/control tokens leaked into generated text        | decoded text contains control token &lt;/think&gt; \| prompt=317 \| output/prompt=59.31% \| stop=completed                                                                              | 1: `mlx-community/Qwen3-VL-2B-Thinking-bf16` | confirmed    | harness         | No leaked stop/control tokens.                  |
-| mlx-vlm first; MLX if cache/runtime reproduces | Long-context generation collapsed or became too short | generated_tokens~3 \| prompt_tokens=4103, output_tokens=3, output/prompt=0.1%, weak text=truncated \| prompt=4,103 \| output/prompt=0.07% \| visual input burden=100% \| stop=completed | 1: `mlx-community/paligemma2-3b-pt-896-4bit` | confirmed    | context_budget  | Full and reduced reruns avoid context collapse. |
+| Target                                                   | Problem                                               | Evidence Snapshot                                                                                                                                                                                    | Affected Models                                   | Confidence   | Evidence Type   | Fixed When                                          |
+|----------------------------------------------------------|-------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------|--------------|-----------------|-----------------------------------------------------|
+| `mlx-vlm`                                                | Stop/control tokens leaked into generated text        | decoded text contains control token &lt;/think&gt; \| prompt=1,205 \| output/prompt=6.56% \| stop=completed                                                                                          | 1: `mlx-community/MiniCPM-V-4.6-8bit`             | confirmed    | harness         | No leaked stop/control tokens.                      |
+| model repo first; mlx-vlm if template handling disagrees | Prompt/template output shape mismatch                 | generated_tokens~4 \| prompt=853 \| output/prompt=0.47% \| stop=completed                                                                                                                            | 1: `mlx-community/gemma-4-31b-bf16`               | confirmed    | harness         | Requested sections render without template leakage. |
+| mlx-vlm first; MLX if cache/runtime reproduces           | Long-context generation collapsed or became too short | generated_tokens~2 \| prompt_tokens=16898, output_tokens=2, output/prompt=0.0%, weak text=truncated \| prompt=16,898 \| output/prompt=0.01% \| mixed burden=97% \| stop=completed \| 3 model cluster | 3: `Qwen/Qwen3-VL-2B-Instruct` (+2)               | confirmed    | context_budget  | Full and reduced reruns avoid context collapse.     |
+| mlx-vlm first; MLX if cache/runtime reproduces           | Long-context generation collapsed or became too short | prompt_tokens=16909, repetitive output \| prompt=16,909 \| output/prompt=2.96% \| mixed burden=97% \| stop=max_tokens \| hit token cap (500) \| 2 model cluster                                      | 2: `mlx-community/Qwen2-VL-2B-Instruct-4bit` (+1) | confirmed    | context_budget  | Full and reduced reruns avoid context collapse.     |
 <!-- markdownlint-enable MD060 -->
 ---
 
@@ -31,7 +66,7 @@ failed task at every confidence level.
 
 ### Expected and Actual Behaviour
 
-- _Affected models:_ mlx-community/Qwen3-VL-2B-Thinking-bf16
+- _Affected models:_ mlx-community/MiniCPM-V-4.6-8bit
 - _Expected:_ Affected reruns contain no leaked stop/control tokens and
   terminate cleanly before the configured max-token cap when the response is
   complete.
@@ -42,11 +77,51 @@ failed task at every confidence level.
 
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/Qwen3-VL-2B-Thinking-bf16 --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/MiniCPM-V-4.6-8bit --image 20260711-180426_DSC00975_DxO.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
+
+Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.
+
+Treat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.
+
+Return exactly these three sections, and nothing else:
+
+Title:
+- 5-10 words, concrete and factual, limited to clearly visible content.
+- Output only the title text after the label.
+- Do not repeat or paraphrase these instructions in the title.
+
+Description:
+- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.
+- Output only the description text after the label.
+
+Keywords:
+- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.
+- Output only the keyword list after the label.
+
+Rules:
+- Include only details that are definitely visible in the image.
+- Reuse metadata terms only when they are clearly supported by the image.
+- If metadata and image disagree, follow the image.
+- Prefer omission to speculation.
+- Do not copy prompt instructions into the Title, Description, or Keywords fields.
+- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.
+- Do not output reasoning, notes, hedging, or extra sections.
+
+Context: Authoritative context:
+- Location terms: England, Europe, Town, UK
+- Capture date/time: 2026-07-11 19:04:26 BST 19:04:26
+- GPS: 51.226814°N, 1.401142°E
+- Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.
+
+Draft descriptive metadata:
+- Existing title: Seafront, Deal, England, UK, GBR, Europe
+- Existing description: A coastal view of Deal, Kent, UK, showing the shingle beach, sea, and seafront buildings on a partly cloudy day.
+- Existing keywords: Beach, Buildings, Cars, Coastline, Deal, Horizon, Kent, Landscape, People, Promenade, Seaside, Shore, Sitting, Sky, Swimming, Walking, Water, Waterfront, Waves, architecture
+- Treat this draft as fallible. Retain supported details, correct errors, and add important visible information.' --max-tokens 500 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 
-Image SHA256: `dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e`
+Image SHA256: `b33a875fdf0b264dbfb24adaa03ac330ecede0f05832bd2bd6b0151e32d505c6`
 
 
 ### Expected Fix Signal
@@ -56,11 +131,81 @@ Image SHA256: `dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e`
 
 ---
 
-## Issue 2: mlx-vlm first; MLX if cache/runtime reproduces — Long-context collapse
+## Issue 2: model repo first; mlx-vlm if template handling disagrees — Prompt-template / image-placeholder mismatch
 
 ### Expected and Actual Behaviour
 
-- _Affected models:_ mlx-community/paligemma2-3b-pt-896-4bit
+- _Affected models:_ mlx-community/gemma-4-31b-bf16
+- _Expected:_ Affected reruns produce the requested sections without
+  empty/filler output, template leakage, or image-placeholder mismatch
+  symptoms.
+- _Actual:_ Prompt/template output shape mismatch
+- _Filing target:_ model repo first; mlx-vlm if template handling disagrees
+
+### Native mlx-vlm reproduction
+
+
+```bash
+python -m mlx_vlm.generate --model mlx-community/gemma-4-31b-bf16 --image 20260711-180426_DSC00975_DxO.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
+
+Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.
+
+Treat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.
+
+Return exactly these three sections, and nothing else:
+
+Title:
+- 5-10 words, concrete and factual, limited to clearly visible content.
+- Output only the title text after the label.
+- Do not repeat or paraphrase these instructions in the title.
+
+Description:
+- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.
+- Output only the description text after the label.
+
+Keywords:
+- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.
+- Output only the keyword list after the label.
+
+Rules:
+- Include only details that are definitely visible in the image.
+- Reuse metadata terms only when they are clearly supported by the image.
+- If metadata and image disagree, follow the image.
+- Prefer omission to speculation.
+- Do not copy prompt instructions into the Title, Description, or Keywords fields.
+- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.
+- Do not output reasoning, notes, hedging, or extra sections.
+
+Context: Authoritative context:
+- Location terms: England, Europe, Town, UK
+- Capture date/time: 2026-07-11 19:04:26 BST 19:04:26
+- GPS: 51.226814°N, 1.401142°E
+- Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.
+
+Draft descriptive metadata:
+- Existing title: Seafront, Deal, England, UK, GBR, Europe
+- Existing description: A coastal view of Deal, Kent, UK, showing the shingle beach, sea, and seafront buildings on a partly cloudy day.
+- Existing keywords: Beach, Buildings, Cars, Coastline, Deal, Horizon, Kent, Landscape, People, Promenade, Seaside, Shore, Sitting, Sky, Swimming, Walking, Water, Waterfront, Waves, architecture
+- Treat this draft as fallible. Retain supported details, correct errors, and add important visible information.' --max-tokens 500 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+```
+
+
+Image SHA256: `b33a875fdf0b264dbfb24adaa03ac330ecede0f05832bd2bd6b0151e32d505c6`
+
+
+### Expected Fix Signal
+
+- [ ] Affected reruns produce the requested sections without empty/filler output, template leakage, or image-placeholder mismatch symptoms.
+- [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem.
+
+---
+
+## Issue 3: mlx-vlm first; MLX if cache/runtime reproduces — Long-context collapse
+
+### Expected and Actual Behaviour
+
+- _Affected models:_ Qwen/Qwen3-VL-2B-Instruct,
+  mlx-community/Qwen3-VL-2B-Instruct-bf16, mlx-community/X-Reasoner-7B-8bit
 - _Expected:_ A same-command rerun and a reduced image/text burden rerun show
   consistent prompt-token accounting and no long-context collapse.
 - _Actual:_ Long-context generation collapsed or became too short
@@ -70,11 +215,120 @@ Image SHA256: `dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e`
 
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/paligemma2-3b-pt-896-4bit --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model Qwen/Qwen3-VL-2B-Instruct --image 20260711-180426_DSC00975_DxO.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
+
+Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.
+
+Treat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.
+
+Return exactly these three sections, and nothing else:
+
+Title:
+- 5-10 words, concrete and factual, limited to clearly visible content.
+- Output only the title text after the label.
+- Do not repeat or paraphrase these instructions in the title.
+
+Description:
+- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.
+- Output only the description text after the label.
+
+Keywords:
+- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.
+- Output only the keyword list after the label.
+
+Rules:
+- Include only details that are definitely visible in the image.
+- Reuse metadata terms only when they are clearly supported by the image.
+- If metadata and image disagree, follow the image.
+- Prefer omission to speculation.
+- Do not copy prompt instructions into the Title, Description, or Keywords fields.
+- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.
+- Do not output reasoning, notes, hedging, or extra sections.
+
+Context: Authoritative context:
+- Location terms: England, Europe, Town, UK
+- Capture date/time: 2026-07-11 19:04:26 BST 19:04:26
+- GPS: 51.226814°N, 1.401142°E
+- Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.
+
+Draft descriptive metadata:
+- Existing title: Seafront, Deal, England, UK, GBR, Europe
+- Existing description: A coastal view of Deal, Kent, UK, showing the shingle beach, sea, and seafront buildings on a partly cloudy day.
+- Existing keywords: Beach, Buildings, Cars, Coastline, Deal, Horizon, Kent, Landscape, People, Promenade, Seaside, Shore, Sitting, Sky, Swimming, Walking, Water, Waterfront, Waves, architecture
+- Treat this draft as fallible. Retain supported details, correct errors, and add important visible information.' --max-tokens 500 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 
-Image SHA256: `dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e`
+Image SHA256: `b33a875fdf0b264dbfb24adaa03ac330ecede0f05832bd2bd6b0151e32d505c6`
+
+
+### Expected Fix Signal
+
+- [ ] A same-command rerun and a reduced image/text burden rerun show consistent prompt-token accounting and no long-context collapse.
+- [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem.
+
+---
+
+## Issue 4: mlx-vlm first; MLX if cache/runtime reproduces — Long-context collapse
+
+### Expected and Actual Behaviour
+
+- _Affected models:_ mlx-community/Qwen2-VL-2B-Instruct-4bit,
+  mlx-community/Qwen3-VL-2B-Thinking-bf16
+- _Expected:_ A same-command rerun and a reduced image/text burden rerun show
+  consistent prompt-token accounting and no long-context collapse.
+- _Actual:_ Long-context generation collapsed or became too short
+- _Filing target:_ mlx-vlm first; MLX if cache/runtime reproduces
+
+### Native mlx-vlm reproduction
+
+
+```bash
+python -m mlx_vlm.generate --model mlx-community/Qwen2-VL-2B-Instruct-4bit --image 20260711-180426_DSC00975_DxO.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
+
+Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.
+
+Treat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.
+
+Return exactly these three sections, and nothing else:
+
+Title:
+- 5-10 words, concrete and factual, limited to clearly visible content.
+- Output only the title text after the label.
+- Do not repeat or paraphrase these instructions in the title.
+
+Description:
+- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.
+- Output only the description text after the label.
+
+Keywords:
+- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.
+- Output only the keyword list after the label.
+
+Rules:
+- Include only details that are definitely visible in the image.
+- Reuse metadata terms only when they are clearly supported by the image.
+- If metadata and image disagree, follow the image.
+- Prefer omission to speculation.
+- Do not copy prompt instructions into the Title, Description, or Keywords fields.
+- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.
+- Do not output reasoning, notes, hedging, or extra sections.
+
+Context: Authoritative context:
+- Location terms: England, Europe, Town, UK
+- Capture date/time: 2026-07-11 19:04:26 BST 19:04:26
+- GPS: 51.226814°N, 1.401142°E
+- Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.
+
+Draft descriptive metadata:
+- Existing title: Seafront, Deal, England, UK, GBR, Europe
+- Existing description: A coastal view of Deal, Kent, UK, showing the shingle beach, sea, and seafront buildings on a partly cloudy day.
+- Existing keywords: Beach, Buildings, Cars, Coastline, Deal, Horizon, Kent, Landscape, People, Promenade, Seaside, Shore, Sitting, Sky, Swimming, Walking, Water, Waterfront, Waves, architecture
+- Treat this draft as fallible. Retain supported details, correct errors, and add important visible information.' --max-tokens 500 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+```
+
+
+Image SHA256: `b33a875fdf0b264dbfb24adaa03ac330ecede0f05832bd2bd6b0151e32d505c6`
 
 
 ### Expected Fix Signal
@@ -86,9 +340,13 @@ Image SHA256: `dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e`
 
 ## Prompt / Input Burden Evidence
 
-| Model                                   | Burden       |   Total tokens |   Text estimate |   Non-text estimate | Source            |
-|-----------------------------------------|--------------|----------------|-----------------|---------------------|-------------------|
-| mlx-community/paligemma2-3b-pt-896-4bit | visual_input |           4103 |               6 |                4097 | estimated_nontext |
+| Model                                   | Burden   |   Total tokens |   Text estimate |   Non-text estimate | Source            |
+|-----------------------------------------|----------|----------------|-----------------|---------------------|-------------------|
+| Qwen/Qwen3-VL-2B-Instruct               | mixed    |          16898 |             488 |               16410 | estimated_nontext |
+| mlx-community/Qwen3-VL-2B-Instruct-bf16 | mixed    |          16898 |             488 |               16410 | estimated_nontext |
+| mlx-community/X-Reasoner-7B-8bit        | mixed    |          16909 |             488 |               16421 | estimated_nontext |
+| mlx-community/Qwen2-VL-2B-Instruct-4bit | mixed    |          16909 |             488 |               16421 | estimated_nontext |
+| mlx-community/Qwen3-VL-2B-Thinking-bf16 | mixed    |          16900 |             488 |               16412 | estimated_nontext |
 <!-- markdownlint-enable MD060 -->
 <!-- markdownlint-disable MD060 -->
 

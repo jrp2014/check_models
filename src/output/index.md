@@ -1,12 +1,12 @@
 # Check Models Output Index
 
-Generated on: 2026-07-17 22:28:52 BST
+Generated on: 2026-07-17 23:16:01 BST
 
 ## Run Snapshot
 
-- Evaluation lane: triage
-- Metadata exposed to prompt: no
-- Selection basis: caption hygiene only (ungrounded)
+- Evaluation lane: assisted
+- Metadata exposed to prompt: yes
+- Selection basis: metadata-assisted visual verification (grounded)
 - Models tested: 61
 - Successful: 61
 - Failed: 0

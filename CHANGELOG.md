@@ -7,6 +7,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Cap the optional `tokenizers` extra to the `0.22.x` line
+  (`>=0.22.0,<0.23.0`) in the shared dependency policy, packaging metadata,
+  and README until the `0.23.x` line has been validated against this
+  project's supported Transformers releases.
 - Bump the package version to `0.8.6` to establish the release baseline before
   refining complete model-output evidence in gallery and diagnostics reports.
 - Consolidate duplicate gallery summaries without shortening successful model
