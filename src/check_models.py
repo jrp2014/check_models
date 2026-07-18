@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import base64
 import codecs
+import csv
 import gc
 import hashlib
 import html
@@ -18402,7 +18403,7 @@ def _machine_artifact_tsv_cells(facts: MachineArtifactFacts) -> tuple[str, ...]:
     """Format canonical additive facts as TSV cells, leaving unavailable scores blank."""
 
     def optional_score(value: float | None) -> str:
-        return str(value) if value is not None else ""
+        return fmt_num(value) if value is not None else ""
 
     return (
         facts.compatibility_status,
@@ -19847,6 +19848,7 @@ def generate_tsv_report(
             prompt="",
             system_info={},
         )
+        sorted_results = list(report_context.result_set.results)
     else:
         headers, rows, field_names = _materialize_prepared_table_data(report_context.table_data)
         sorted_results = list(report_context.result_set.results)
@@ -19875,15 +19877,35 @@ def generate_tsv_report(
         # Remove carriage returns
         return value.replace("\r", "")
 
-    # Clean headers: remove HTML tags and escape for TSV
-    clean_headers: list[str] = []
-    for header in headers:
-        # Remove <br> tags and other HTML
-        clean_header = header.replace("<br>", " ").strip()
-        clean_header = re.sub(r"<[^>]+>", "", clean_header)
-        clean_headers.append(escape_tsv_value(clean_header))
-
-    canonical_headers = [
+    header_by_field = {
+        field_name: escape_tsv_value(re.sub(r"<[^>]+>", "", header.replace("<br>", " ")).strip())
+        for field_name, header in zip(field_names, headers, strict=True)
+    }
+    header_by_field.update(
+        {
+            "execution_status": "execution_status",
+            "recommendation_status": "recommendation_status",
+            "compatibility_status": "compatibility_status",
+            "context_integration_score": "context_integration_score",
+            "draft_improvement_score": "draft_improvement_score",
+            "visual_description_score": "visual_description_score",
+            "assisted_enrichment_score": "assisted_enrichment_score",
+            "peak_memory_working_set_pct": "peak_memory_working_set_pct",
+            "prompt_burden_kind": "prompt_burden_kind",
+            "prompt_burden_source": "prompt_burden_source",
+            "owner_confidence": "owner_confidence",
+            "prompt_burden_reason": "prompt_burden_reason",
+            "processed_image_width": "processed_image_width",
+            "processed_image_height": "processed_image_height",
+            "image_patch_count": "image_patch_count",
+            "generated_text": "Generated Text",
+            "error_stage": "error_stage",
+            "error_type": "error_type",
+            "error_package": "error_package",
+            "error_message": "error_message",
+        }
+    )
+    optional_fields = (
         "compatibility_status",
         "context_integration_score",
         "draft_improvement_score",
@@ -19897,65 +19919,90 @@ def generate_tsv_report(
         "processed_image_width",
         "processed_image_height",
         "image_patch_count",
-    ]
-    clean_headers.extend(
-        [
-            *canonical_headers,
-            "Generated Text",
-            "error_stage",
-            "error_type",
-            "error_package",
-            "error_message",
-        ]
+        "error_stage",
+        "error_type",
+        "error_package",
+        "error_message",
     )
-    generated_text_index = clean_headers.index("Generated Text")
     recommendations = _recommendations_by_model(report_context)
     machine_facts = _machine_facts_by_model(report_context)
 
-    clean_rows: list[list[str]] = []
+    row_records: list[dict[str, str]] = []
     for row, res in zip(rows, sorted_results, strict=False):
-        clean_row = [escape_tsv_value(cell) for cell in row]
+        record = {
+            field_name: escape_tsv_value(cell)
+            for field_name, cell in zip(field_names, row, strict=False)
+        }
         recommendation = recommendations[res.model_name]
         burden = recommendation.burden
-        clean_row.extend(
-            [
-                *_machine_artifact_tsv_cells(machine_facts[res.model_name]),
-                burden.reason or "",
-                str(burden.processed_width) if burden.processed_width is not None else "",
-                str(burden.processed_height) if burden.processed_height is not None else "",
-                str(burden.patch_count) if burden.patch_count is not None else "",
-            ]
+        facts = machine_facts[res.model_name]
+        machine_cells = _machine_artifact_tsv_cells(facts)
+        machine_fields = optional_fields[:9]
+        record.update(zip(machine_fields, machine_cells, strict=True))
+        record.update(
+            {
+                "execution_status": _execution_outcome(res),
+                "recommendation_status": _recommendation_status_for_result(res),
+                "prompt_burden_reason": burden.reason or "",
+                "processed_image_width": (
+                    str(burden.processed_width) if burden.processed_width is not None else ""
+                ),
+                "processed_image_height": (
+                    str(burden.processed_height) if burden.processed_height is not None else ""
+                ),
+                "image_patch_count": (
+                    str(burden.patch_count) if burden.patch_count is not None else ""
+                ),
+                "generated_text": escape_tsv_value(
+                    str(getattr(res.generation, "text", "") or "")
+                    if res.generation is not None
+                    else ""
+                ),
+                "error_stage": escape_tsv_value(res.error_stage or ""),
+                "error_type": escape_tsv_value(res.error_type or ""),
+                "error_package": escape_tsv_value(res.error_package or ""),
+                "error_message": escape_tsv_value(res.error_message or ""),
+            }
         )
-        generated_text = (
-            str(getattr(res.generation, "text", "") or "") if res.generation is not None else ""
-        )
-        clean_row.append(escape_tsv_value(generated_text))
-        clean_row.append(escape_tsv_value(res.error_stage or ""))
-        clean_row.append(escape_tsv_value(res.error_type or ""))
-        clean_row.append(escape_tsv_value(res.error_package or ""))
-        clean_row.append(escape_tsv_value(res.error_message or ""))
-        clean_rows.append(
-            [
-                (
-                    c
-                    if index == generated_text_index or len(c) <= MAX_TSV_CELL_CHARS
-                    else c[: MAX_TSV_CELL_CHARS - 3].rstrip() + "..."
+        row_records.append(
+            {
+                field_name: (
+                    value
+                    if field_name == "generated_text" or len(value) <= MAX_TSV_CELL_CHARS
+                    else value[: MAX_TSV_CELL_CHARS - 3].rstrip() + "..."
                 )
-                for index, c in enumerate(clean_row)
-            ]
+                for field_name, value in record.items()
+            }
         )
 
-    tsv_content = tabulate(
-        clean_rows,
-        headers=clean_headers,
-        tablefmt="tsv",
+    active_optional_fields = tuple(
+        field_name
+        for field_name in optional_fields
+        if any(record.get(field_name, "") for record in row_records)
     )
+    core_fields = (
+        field_names[0],
+        "execution_status",
+        "recommendation_status",
+        *(field_name for field_name in field_names[1:]),
+        "prompt_burden_kind",
+        "prompt_burden_source",
+        "generated_text",
+    )
+    output_fields = tuple(dict.fromkeys((*core_fields, *active_optional_fields)))
 
     try:
-        output_content = f"# generated_at: {local_now_str()}\n{tsv_content}"
-        if not output_content.endswith("\n"):
-            output_content += "\n"
-        _write_text_file(filename, output_content)
+        buffer = io.StringIO(newline="")
+        buffer.write(
+            f"# generated_at: {local_now_str()}; format=compact-adaptive; "
+            "exhaustive=results.jsonl\n"
+        )
+        writer = csv.writer(buffer, delimiter="\t", lineterminator="\n")
+        writer.writerow([header_by_field[field_name] for field_name in output_fields])
+        writer.writerows(
+            [record.get(field_name, "") for field_name in output_fields] for record in row_records
+        )
+        _write_text_file(filename, buffer.getvalue())
         # Logging handled in finalize_execution
     except OSError:
         logger.exception("Failed to write TSV report to %s", filename)

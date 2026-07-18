@@ -1,6 +1,8 @@
 """Tests for TSV output generation."""
 
+import csv
 from dataclasses import dataclass
+from io import StringIO
 from pathlib import Path
 
 import check_models
@@ -21,12 +23,11 @@ class MockGenerationResult:
 
 
 def _read_tsv_record(path: Path) -> dict[str, str]:
-    """Return the first data row keyed by stripped TSV headers."""
+    """Return the first data row from the literal TSV artifact."""
     content = safe_io.read_text_no_follow(path)
-    data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
-    headers = [cell.strip() for cell in data_lines[0].split("\t")]
-    values = [cell.strip() for cell in data_lines[1].split("\t")]
-    return dict(zip(headers, values, strict=False))
+    data = "\n".join(line for line in content.splitlines() if not line.startswith("#"))
+    rows = list(csv.reader(StringIO(data), delimiter="\t"))
+    return dict(zip(rows[0], rows[1], strict=True))
 
 
 def test_generate_tsv_report_basic(tmp_path: Path) -> None:
@@ -83,10 +84,10 @@ def test_tsv_includes_working_set_percentage(tmp_path: Path) -> None:
     assert float(record["peak_memory_working_set_pct"]) == 50.0
 
 
-def test_tsv_leaves_working_set_percentage_blank_without_denominator(
+def test_tsv_omits_working_set_percentage_without_denominator(
     tmp_path: Path,
 ) -> None:
-    """The additive TSV column should remain blank when capacity is unknown."""
+    """An all-empty optional TSV column should not widen the spreadsheet."""
     result = check_models.PerformanceResult(
         model_name="test/model",
         success=True,
@@ -103,7 +104,7 @@ def test_tsv_leaves_working_set_percentage_blank_without_denominator(
     check_models.generate_tsv_report([result], output_file, report_context=context)
 
     record = _read_tsv_record(output_file)
-    assert record["peak_memory_working_set_pct"] == ""
+    assert "peak_memory_working_set_pct" not in record
 
 
 def test_tsv_escapes_tabs_in_values(tmp_path: Path) -> None:
@@ -247,13 +248,34 @@ def test_tsv_uses_compact_caption_schema_without_diffusion_or_duplicate_owner(
     header = next(line for line in content.splitlines() if not line.startswith("#"))
     fields = [field.strip() for field in header.split("\t")]
 
-    assert fields.count("error_package") == 1
+    assert "error_package" not in fields
     assert "Error Package" not in fields
     assert "Output" not in fields
     assert "Generated Text" in fields
     assert "Diffusion Canvas Tokens" not in fields
     assert "Diffusion Denoising Steps" not in fields
     assert "Text Already Printed" not in fields
+
+
+def test_tsv_is_unpadded_and_includes_canonical_statuses(tmp_path: Path) -> None:
+    """Headers and values should be literal TSV cells with shared status semantics."""
+    result = check_models.PerformanceResult(
+        model_name="test/caption-model",
+        success=True,
+        generation=MockGenerationResult(text="A cat on a pink sofa."),
+    )
+    output_file = tmp_path / "literal.tsv"
+
+    check_models.generate_tsv_report([result], output_file)
+
+    lines = safe_io.read_text_no_follow(output_file).splitlines()
+    header = lines[1]
+    assert header == header.rstrip()
+    assert "  \t" not in header
+    record = _read_tsv_record(output_file)
+    assert record["execution_status"] == "completed"
+    assert record["recommendation_status"] == "recommended"
+    assert record["compatibility_status"] == "clean"
 
 
 def test_tsv_includes_canonical_prompt_burden_scalars(tmp_path: Path) -> None:

@@ -3907,26 +3907,17 @@ class TestTsvReportEdgeCases:
         assert "RuntimeError" in data_line
         assert "transformers" in data_line
 
-    def test_tsv_error_columns_empty_for_success(self, tmp_path: Path) -> None:
-        """Successful models should have empty error columns in the header."""
+    def test_tsv_omits_empty_error_columns_for_success(self, tmp_path: Path) -> None:
+        """Successful-only runs should omit wholly empty error columns."""
         out = tmp_path / "ok.tsv"
         generate_tsv_report(
             results=[_make_success()],
             filename=out,
         )
         content = out.read_text(encoding="utf-8")
-        # The header must advertise error_type / error_package columns
         header_line = content.splitlines()[1]
-        assert "error_type" in header_line
-        assert "error_package" in header_line
-        # For a success row, those columns are empty strings; tabulate may
-        # trim trailing whitespace-only fields, so just verify the data row
-        # does NOT contain a populated error value.
-        data_line = content.splitlines()[2]
-        stripped_fields = [f.strip() for f in data_line.split("\t")]
-        # error_type and error_package should not contain real values
-        assert "RuntimeError" not in stripped_fields
-        assert "transformers" not in stripped_fields
+        assert "error_type" not in header_line
+        assert "error_package" not in header_line
 
 
 # ===================================================================
