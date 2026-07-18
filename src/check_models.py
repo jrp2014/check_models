@@ -8030,6 +8030,29 @@ def format_field_value(field_name: str, value: MetricValue) -> str:
     return formatted_value
 
 
+def _format_peak_memory_context(
+    peak_memory_gb: float | None,
+    recommended_working_set_bytes: int | None,
+) -> str:
+    """Format peak memory with optional Metal working-set context."""
+    if peak_memory_gb is None:
+        return ""
+    peak = format_field_value("peak_memory", peak_memory_gb)
+    if not peak:
+        return ""
+    percentage = _peak_memory_working_set_pct(
+        peak_memory_gb,
+        recommended_working_set_bytes,
+    )
+    if percentage is None or recommended_working_set_bytes is None:
+        return peak
+    working_set_gb = recommended_working_set_bytes / (1024**3)
+    return (
+        f"{peak} GB ({fmt_num(percentage)}% of {fmt_num(working_set_gb)} GB "
+        "recommended working set)"
+    )
+
+
 def is_numeric_value(val: object) -> bool:
     """Return True if val can be interpreted as a number."""
     return _coerce_numeric_value(val) is not None
@@ -9834,6 +9857,8 @@ def pretty_print_exif(
 def _format_table_field_value(
     field_name: str,
     res: PerformanceResult,
+    *,
+    recommended_working_set_bytes: int | None = None,
 ) -> str:
     """Format one report-table field, including the field-specific shortcuts.
 
@@ -9855,6 +9880,12 @@ def _format_table_field_value(
             max_chars=MAX_OUTPUT_PREVIEW_CHARS,
         )
 
+    if field_name == "peak_memory":
+        return _format_peak_memory_context(
+            _generation_float_metric(res.generation, "peak_memory"),
+            recommended_working_set_bytes,
+        )
+
     value = _get_field_value(res, field_name)
     if field_name == "quality_issues":
         if not res.success:
@@ -9871,6 +9902,7 @@ def _build_prepared_table_data(
     result_set: ResultSet,
     header_separator: str = "<br>",
     include_output: bool = True,
+    recommended_working_set_bytes: int | None = None,
 ) -> PreparedTableData:
     """Build immutable cached table data from a sorted result set."""
     field_names = ["model_name", *result_set.get_fields()]
@@ -9897,7 +9929,14 @@ def _build_prepared_table_data(
 
     rows: list[tuple[str, ...]] = []
     for res in result_set.results:
-        row = tuple(_format_table_field_value(field_name, res) for field_name in field_names)
+        row = tuple(
+            _format_table_field_value(
+                field_name,
+                res,
+                recommended_working_set_bytes=recommended_working_set_bytes,
+            )
+            for field_name in field_names
+        )
         rows.append(row)
 
     return PreparedTableData(
@@ -10041,7 +10080,10 @@ def _build_report_render_context(
     resolved_system_info: dict[str, str] = (
         system_info if system_info is not None else get_system_characteristics()
     )
-    table_data: PreparedTableData = _build_prepared_table_data(result_set=result_set)
+    table_data: PreparedTableData = _build_prepared_table_data(
+        result_set=result_set,
+        recommended_working_set_bytes=recommended_working_set_bytes,
+    )
     triage: ReportTriageContext = _build_report_triage_context(
         [result for result in result_set.results if result.success],
         prompt=prompt,
@@ -13215,6 +13257,11 @@ def _build_gallery_output_cost_summary_section(
                 _gallery_output_cost_metric(
                     "peak_memory",
                     view.peak_memory_gb,
+                )
+                if report_context.recommended_working_set_bytes is None
+                else _format_peak_memory_context(
+                    view.peak_memory_gb,
+                    report_context.recommended_working_set_bytes,
                 ),
                 _gallery_output_cost_signal_cell(result),
             ),
@@ -17072,7 +17119,11 @@ def _build_recommendation_summary_block(
                 "eligible" if view.eligible else f"excluded: {view.eligibility_reason}",
                 view.burden.kind,
                 format_field_value("generation_tps", view.generation_tps) or "-",
-                format_field_value("peak_memory", view.peak_memory_gb) or "-",
+                _format_peak_memory_context(
+                    view.peak_memory_gb,
+                    report_context.recommended_working_set_bytes,
+                )
+                or "-",
             )
         )
     return ReportSection(
@@ -18147,12 +18198,18 @@ def _model_recommendation_evidence(view: ModelRecommendationView) -> str:
 
 def _model_selection_chooser_table_rows(
     views: Sequence[ModelRecommendationView],
+    *,
+    recommended_working_set_bytes: int | None = None,
 ) -> tuple[tuple[str, ...], ...]:
     """Return compact chooser table cells from canonical recommendation views."""
     return tuple(
         (
             f"`{MARKDOWN_ESCAPER.escape(view.result.model_name)}`",
-            format_field_value("peak_memory", view.peak_memory_gb) or "-",
+            _format_peak_memory_context(
+                view.peak_memory_gb,
+                recommended_working_set_bytes,
+            )
+            or "-",
             format_field_value("generation_tps", view.generation_tps) or "-",
             (f"{view.visual_score:.0f}" if view.visual_score is not None else "-"),
             f"`{MARKDOWN_ESCAPER.escape(_model_recommendation_status(view))}`",
@@ -18169,6 +18226,7 @@ def _append_model_selection_chooser_section(
     views: Sequence[ModelRecommendationView],
     policy_name: str,
     empty_text: str,
+    recommended_working_set_bytes: int | None = None,
 ) -> None:
     """Append one compact practical chooser bucket."""
     md.extend(
@@ -18188,7 +18246,10 @@ def _append_model_selection_chooser_section(
             (
                 ReportTable(
                     headers=("Model", "Peak GB", "Gen TPS", "Usefulness", "Status", "Evidence"),
-                    rows=_model_selection_chooser_table_rows(views),
+                    rows=_model_selection_chooser_table_rows(
+                        views,
+                        recommended_working_set_bytes=recommended_working_set_bytes,
+                    ),
                     markdown_escaped=True,
                 ),
             )
@@ -18202,6 +18263,7 @@ def _append_model_selection_quick_chooser(
     views: Sequence[ModelRecommendationView],
     *,
     policy_name: str,
+    recommended_working_set_bytes: int | None = None,
 ) -> None:
     """Append practical model-user chooser buckets before the full shortlist."""
     under_4gb = _rank_under_memory_budget(
@@ -18235,6 +18297,7 @@ def _append_model_selection_quick_chooser(
         views=under_4gb,
         policy_name=f"memory-aware ({policy_name}; budget 4 GB)",
         empty_text="No clean current-run candidates fit under this memory budget.",
+        recommended_working_set_bytes=recommended_working_set_bytes,
     )
     _append_model_selection_chooser_section(
         md,
@@ -18242,6 +18305,7 @@ def _append_model_selection_quick_chooser(
         views=under_8gb,
         policy_name=f"memory-aware ({policy_name}; budget 8 GB)",
         empty_text="No clean current-run candidates fit under this memory budget.",
+        recommended_working_set_bytes=recommended_working_set_bytes,
     )
     _append_model_selection_chooser_section(
         md,
@@ -18249,6 +18313,7 @@ def _append_model_selection_quick_chooser(
         views=fastest,
         policy_name="efficiency-aware Pareto frontier (reliability-gated)",
         empty_text="No clean current-run candidates produced usable caption text.",
+        recommended_working_set_bytes=recommended_working_set_bytes,
     )
     _append_model_selection_chooser_section(
         md,
@@ -18256,6 +18321,7 @@ def _append_model_selection_quick_chooser(
         views=quality_any_memory,
         policy_name=f"quality-first ({policy_name})",
         empty_text="No clean current-run candidates produced usable caption text.",
+        recommended_working_set_bytes=recommended_working_set_bytes,
     )
     _append_model_selection_chooser_section(
         md,
@@ -18263,6 +18329,7 @@ def _append_model_selection_quick_chooser(
         views=current_avoid,
         policy_name="reliability-gated exclusion evidence",
         empty_text="No current-run failures or avoid-bucket outputs.",
+        recommended_working_set_bytes=recommended_working_set_bytes,
     )
 
 
@@ -18480,6 +18547,7 @@ def _build_model_family_comparison_section(
     views: Sequence[ModelRecommendationView],
     *,
     policy_name: str,
+    recommended_working_set_bytes: int | None = None,
 ) -> list[str]:
     """Render current-run variant comparisons without merging variant evidence."""
     grouped: dict[str, list[ModelRecommendationView]] = {}
@@ -18504,7 +18572,11 @@ def _build_model_family_comparison_section(
                 else "-"
             ),
             format_field_value("total_time", view.total_time_s) or "-",
-            format_field_value("peak_memory", view.peak_memory_gb) or "-",
+            _format_peak_memory_context(
+                view.peak_memory_gb,
+                recommended_working_set_bytes,
+            )
+            or "-",
         )
         for family in sorted(families)
         for view in _rank_current_recommendations(families[family])
@@ -18639,6 +18711,7 @@ def generate_model_selection_report(
         md,
         views,
         policy_name=ranking_policy_name,
+        recommended_working_set_bytes=report_context.recommended_working_set_bytes,
     )
 
     md.extend(
@@ -18660,7 +18733,11 @@ def generate_model_selection_report(
             f"{view.output_score:.0f}" if view.output_score is not None else "-",
             f"{view.visual_score:.0f}" if view.visual_score is not None else "-",
             format_field_value("generation_tps", view.generation_tps) or "-",
-            format_field_value("peak_memory", view.peak_memory_gb) or "-",
+            _format_peak_memory_context(
+                view.peak_memory_gb,
+                report_context.recommended_working_set_bytes,
+            )
+            or "-",
             f"`{MARKDOWN_ESCAPER.escape(_model_recommendation_status(view))}`",
             MARKDOWN_ESCAPER.escape(_build_result_output_preview(view.result, max_chars=180)),
             MARKDOWN_ESCAPER.escape(" | ".join(view.caveats) or "no flagged signals"),
@@ -18712,6 +18789,7 @@ def generate_model_selection_report(
         _build_model_family_comparison_section(
             views,
             policy_name=quality_policy_name,
+            recommended_working_set_bytes=report_context.recommended_working_set_bytes,
         )
     )
 
@@ -19728,7 +19806,8 @@ def get_system_characteristics() -> dict[str, str]:
 
         recommended_working_set_bytes = device_info.get("max_recommended_working_set_size")
         if recommended_working_set_bytes is not None:
-            info["Recommended Working Set"] = f"{recommended_working_set_bytes / (1024**3):.1f} GB"
+            working_set_gb = recommended_working_set_bytes / (1024**3)
+            info["Recommended Working Set"] = f"{fmt_num(working_set_gb)} GB"
 
         fused_attention = _probe_fused_attention()
         fused_attention_labels = {
@@ -22613,13 +22692,22 @@ def _log_perf_block(res: PerformanceResult) -> None:
         return
 
     entries: list[MetricTreeRow] = []
+    recommended_working_set_bytes = _get_recommended_working_set_bytes()
 
     def _append_mem(label: str, field: str, raw_val: float) -> None:
         if raw_val <= 0:
             return
-        formatted = format_field_value(field, raw_val)
+        formatted = (
+            _format_peak_memory_context(raw_val, recommended_working_set_bytes)
+            if field == "peak_memory"
+            else format_field_value(field, raw_val)
+        )
         unit = "GB"
-        text = formatted if formatted.endswith(unit) else f"{formatted} GB"
+        text = (
+            formatted
+            if "recommended working set" in formatted or formatted.endswith(unit)
+            else f"{formatted} GB"
+        )
         entries.append((label, f"{text:>8}"))
 
     _append_mem("Active Δ:", "active_memory", active_mem)
@@ -22843,8 +22931,15 @@ def _log_compact_metrics(res: PerformanceResult) -> None:
 
     mem_part = ""
     if peak_mem > 0:
-        mem_fmt = format_field_value("peak_memory", peak_mem)
-        mem_str = f"{mem_fmt}GB" if not mem_fmt.endswith("GB") else mem_fmt
+        mem_fmt = _format_peak_memory_context(
+            peak_mem,
+            _get_recommended_working_set_bytes(),
+        )
+        mem_str = (
+            mem_fmt
+            if "recommended working set" in mem_fmt or mem_fmt.endswith("GB")
+            else f"{mem_fmt}GB"
+        )
         mem_part = f" | Memory: {mem_str} peak"
 
     line1 = f"📊 Timing: {timing_display}{mem_part}"
@@ -24640,7 +24735,11 @@ def _log_rich_metric_chart(
     _log_rich_renderable(chart, indent="   ")
 
 
-def _log_model_comparison_table_and_charts(results: list[PerformanceResult]) -> None:
+def _log_model_comparison_table_and_charts(
+    results: list[PerformanceResult],
+    *,
+    recommended_working_set_bytes: int | None = None,
+) -> None:
     """Log per-model comparison table and compact Rich charts for this run."""
     if not results:
         return
@@ -24669,7 +24768,11 @@ def _log_model_comparison_table_and_charts(results: list[PerformanceResult]) -> 
                     _format_float_or_dash(tps, digits=1),
                     _format_float_or_dash(res.total_time, digits=2),
                     _format_float_or_dash(res.model_load_time, digits=2),
-                    _format_float_or_dash(peak_mem if peak_mem > 0 else None, digits=2),
+                    _format_peak_memory_context(
+                        peak_mem if peak_mem > 0 else None,
+                        recommended_working_set_bytes,
+                    )
+                    or "-",
                     notes,
                 ],
             )
@@ -24729,6 +24832,7 @@ def _log_performance_highlights(
     successful: list[PerformanceResult],
     *,
     image_profile: ImageInputProfile | None = None,
+    recommended_working_set_bytes: int | None = None,
 ) -> None:
     """Log speed and memory highlights for successful runs."""
     if not successful:
@@ -24771,7 +24875,13 @@ def _log_performance_highlights(
         logger.info("   Average peak delta from post-load: %.2f GB", average_peak_delta)
     if memory_delta_per_mp is not None:
         logger.info("   Peak memory delta / MP: %.0f MB/MP", memory_delta_per_mp)
-    logger.info("   Average peak memory: %.1f GB", average_peak_memory)
+    logger.info(
+        "   Average peak memory: %s",
+        _format_peak_memory_context(
+            float(average_peak_memory),
+            recommended_working_set_bytes,
+        ),
+    )
     logger.info("   Memory efficiency: %.0f tokens/GB", memory_efficiency)
 
 
@@ -25550,11 +25660,13 @@ def log_summary(
 
     successful = [r for r in results if r.success]
     failed = [r for r in results if not r.success]
+    recommended_working_set_bytes = _get_recommended_working_set_bytes()
 
     if successful:
         _log_performance_highlights(
             successful,
             image_profile=_load_image_input_profile(image_path),
+            recommended_working_set_bytes=recommended_working_set_bytes,
         )
         log_blank()
         (
@@ -25594,7 +25706,10 @@ def log_summary(
         _log_failed_models_summary(failed)
         log_blank()
 
-    _log_model_comparison_table_and_charts(results)
+    _log_model_comparison_table_and_charts(
+        results,
+        recommended_working_set_bytes=recommended_working_set_bytes,
+    )
     log_blank()
 
     if successful:

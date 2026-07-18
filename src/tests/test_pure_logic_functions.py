@@ -1296,7 +1296,7 @@ class TestHardwareFacts:
         assert info["MLX Device"] == "Apple M5 Max"
         assert info["GPU Architecture"] == "applegpu_g17s"
         assert info["RAM"] == "128.0 GB"
-        assert info["Recommended Working Set"] == "96.0 GB"
+        assert info["Recommended Working Set"] == "96 GB"
         assert info["Fused Attention"] == "Available"
 
     @pytest.mark.parametrize(

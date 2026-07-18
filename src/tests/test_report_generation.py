@@ -120,6 +120,69 @@ def _stub_versions() -> LibraryVersionDict:
     }
 
 
+def test_format_peak_memory_context_uses_significant_figures() -> None:
+    """Human working-set context should follow project-wide significant figures."""
+    assert check_models._format_peak_memory_context(18.2, 96 * 1024**3) == (
+        "18 GB (17.7% of 96 GB recommended working set)"
+    )
+    assert check_models._format_peak_memory_context(120.0, 96 * 1024**3) == (
+        "120 GB (116% of 96 GB recommended working set)"
+    )
+
+
+def test_format_peak_memory_context_preserves_bare_peak_without_denominator() -> None:
+    """Missing capacity must preserve the established bare table value."""
+    assert check_models._format_peak_memory_context(18.2, None) == "18"
+    assert check_models._format_peak_memory_context(None, 96 * 1024**3) == ""
+
+
+def test_html_and_markdown_render_working_set_context(tmp_path: Path) -> None:
+    """Primary human reports should contextualize per-model peak memory."""
+    result = PerformanceResult(
+        model_name="test/model",
+        generation=_MockGeneration(peak_memory=1.0),
+        success=True,
+    )
+    context = _build_report_render_context(
+        results=[result],
+        prompt="Describe the image.",
+        system_info={},
+        recommended_working_set_bytes=2_000_000_000,
+    )
+    html_path = tmp_path / "results.html"
+    markdown_path = tmp_path / "results.md"
+    gallery_path = tmp_path / "gallery.md"
+
+    generate_html_report(
+        [result],
+        html_path,
+        _stub_versions(),
+        "Describe the image.",
+        1.0,
+        report_context=context,
+    )
+    generate_markdown_report(
+        [result],
+        markdown_path,
+        _stub_versions(),
+        "Describe the image.",
+        1.0,
+        report_context=context,
+    )
+    generate_markdown_gallery_report(
+        [result],
+        gallery_path,
+        "Describe the image.",
+        report_context=context,
+        versions=_stub_versions(),
+    )
+
+    expected = "1.0 GB (50% of 1.86 GB recommended working set)"
+    assert html_path.read_text(encoding="utf-8").count(expected) >= 2
+    assert expected in markdown_path.read_text(encoding="utf-8")
+    assert expected in gallery_path.read_text(encoding="utf-8")
+
+
 def _extract_markdown_subsection(
     content: str,
     heading: str,
@@ -2530,6 +2593,7 @@ class TestMarkdownReportEdgeCases:
             results=[tiny, mid, large, failure],
             prompt="Describe this image briefly.",
             eval_mode="triage",
+            recommended_working_set_bytes=2_000_000_000,
         )
 
         check_models.generate_model_selection_report(
@@ -2546,6 +2610,13 @@ class TestMarkdownReportEdgeCases:
         assert "### Fastest usable" in content
         assert "### Quality if memory allows" in content
         assert "### Current failures / avoid" in content
+        assert "3.0 GB (150% of 1.86 GB recommended working set)" in (
+            _extract_markdown_subsection(
+                content,
+                "### Best under 4 GB",
+                end_headings=("### Best under 8 GB",),
+            )
+        )
         assert "`org/tiny-fast`" in _extract_markdown_subsection(
             content,
             "### Best under 4 GB",

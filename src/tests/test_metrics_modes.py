@@ -279,6 +279,27 @@ def test_metrics_mode_compact_smoke(caplog: pytest.LogCaptureFixture) -> None:
     assert timing_lines, "Expected Timing line in compact mode logs"
 
 
+def test_metrics_mode_compact_shows_working_set_context(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Compact memory output should include the detected Metal denominator."""
+    caplog.set_level(logging.INFO)
+    res = PerformanceResult(
+        model_name="dummy/model",
+        generation=_StubGeneration(peak_memory=1.0),
+        success=True,
+        generation_time=1.0,
+        model_load_time=0.5,
+        total_time=1.5,
+    )
+
+    with patch("check_models._get_recommended_working_set_bytes", return_value=2_000_000_000):
+        print_model_result(res, verbose=True, detailed_metrics=False)
+
+    messages = "\n".join(record.message for record in caplog.records)
+    assert "1.0 GB (50% of 1.86 GB recommended working set)" in messages
+
+
 def test_metrics_mode_verbose_does_not_repeat_generated_text(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -342,6 +363,27 @@ def test_metrics_mode_detailed_smoke(caplog: pytest.LogCaptureFixture) -> None:
     token_lines = [r.message for r in caplog.records if "Tokens:" in r.message]
     assert token_lines, "Expected token summary lines in detailed mode"
     assert perf_lines, "Expected Performance Metrics header in detailed mode"
+
+
+def test_metrics_mode_detailed_shows_working_set_context(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Detailed peak-memory rows should include the same Metal context."""
+    caplog.set_level(logging.INFO)
+    res = PerformanceResult(
+        model_name="dummy/model",
+        generation=_StubGeneration(peak_memory=1.0),
+        success=True,
+        generation_time=1.0,
+        model_load_time=0.5,
+        total_time=1.5,
+    )
+
+    with patch("check_models._get_recommended_working_set_bytes", return_value=2_000_000_000):
+        print_model_result(res, verbose=True, detailed_metrics=True)
+
+    messages = "\n".join(record.message for record in caplog.records)
+    assert "1.0 GB (50% of 1.86 GB recommended working set)" in messages
 
 
 def test_metrics_mode_detailed_logs_runtime_phase_details(
@@ -505,6 +547,38 @@ def test_log_summary_emits_comparison_table_and_ascii_charts(
     assert "TPS comparison chart:" in messages
     assert "Efficiency chart (higher is faster overall):" in messages
     assert "Failure stage frequency:" in messages
+
+
+def test_log_summary_contextualizes_comparison_and_average_peak_memory(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Summary memory values should use the same detected Metal denominator."""
+    caplog.set_level(logging.INFO)
+    results = [
+        PerformanceResult(
+            model_name="org/model-a",
+            generation=_StubGeneration(generation_tps=35.0, peak_memory=1.2, text="clean"),
+            success=True,
+            generation_time=1.0,
+            model_load_time=0.4,
+            total_time=1.4,
+        ),
+        PerformanceResult(
+            model_name="org/model-b",
+            generation=_StubGeneration(generation_tps=20.0, peak_memory=1.5, text="clean"),
+            success=True,
+            generation_time=1.3,
+            model_load_time=0.7,
+            total_time=2.0,
+        ),
+    ]
+
+    with patch("check_models._get_recommended_working_set_bytes", return_value=2_000_000_000):
+        log_summary(results, prompt="Describe this image.")
+
+    messages = "\n".join(record.message for record in caplog.records)
+    assert "1.2 GB (60% of" in messages
+    assert "67.5% of 1.86 GB recommended working set" in messages
 
 
 def test_log_summary_single_model_omits_efficiency_chart(
