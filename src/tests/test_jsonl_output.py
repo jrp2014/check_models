@@ -28,6 +28,8 @@ from tools import safe_io
 if TYPE_CHECKING:
     from pathlib import Path
 
+    import pytest
+
     from check_models import HistoryModelResultRecord, HistoryRunRecord
 
 
@@ -173,18 +175,94 @@ def test_save_run_json_report_captures_public_snapshot_contract(tmp_path: Path) 
             "model_selection": "reports/model_selection.md",
             "diagnostics": "reports/diagnostics.md",
         },
+        producer={
+            "name": "check_models",
+            "version": "0.8.6",
+            "git_revision": "abc123",
+            "install_type": "editable",
+        },
     )
 
     payload = json.loads(out.read_text(encoding="utf-8"))
-    assert payload["schema_version"] == "1.0"
+    assert payload["schema_version"] == "1.1"
     assert payload["eval_mode"] == "triage"
     assert payload["semantic_rankings_grounded"] is False
     assert payload["selection_basis"] == "caption hygiene only"
     assert payload["metadata_exposed_to_prompt"] is False
     assert payload["counts"]["models_total"] == 1
+    assert payload["counts"]["models_attempted"] == 1
+    assert payload["counts"]["models_evaluated"] == 1
+    assert payload["counts"]["models_indeterminate"] == 0
     assert payload["counts"]["models_successful"] == 1
+    assert payload["counts"]["models_failed"] == 0
     assert payload["artifacts"]["model_selection"] == "reports/model_selection.md"
     assert payload["library_versions"]["mlx-vlm"] == "0.6.3"
+    assert payload["producer"] == {
+        "name": "check_models",
+        "version": "0.8.6",
+        "git_revision": "abc123",
+        "install_type": "editable",
+    }
+
+
+def test_run_json_excludes_connectivity_disconnects_from_evaluated_and_failed_counts(
+    tmp_path: Path,
+) -> None:
+    """Unavailable external input should be counted as indeterminate, not a model failure."""
+    completed = PerformanceResult(model_name="org/completed", generation=None, success=True)
+    disconnected = PerformanceResult(
+        model_name="org/not-reached",
+        generation=None,
+        success=False,
+        error_stage="Network Error",
+        error_message="Model loading failed: Server disconnected without sending a response.",
+        error_package="unknown",
+    )
+    results = [completed, disconnected]
+    context = check_models._build_report_render_context(results=results, prompt="Describe it.")
+    out = tmp_path / "run.json"
+
+    check_models.save_run_json_report(
+        results,
+        out,
+        versions={},
+        prompt="Describe it.",
+        total_runtime_seconds=2.0,
+        report_context=context,
+        output_paths={},
+        producer={"name": "check_models"},
+    )
+
+    counts = json.loads(out.read_text(encoding="utf-8"))["counts"]
+    assert counts == {
+        "models_attempted": 2,
+        "models_evaluated": 1,
+        "models_failed": 0,
+        "models_indeterminate": 1,
+        "models_successful": 1,
+        "models_total": 2,
+    }
+
+
+def test_check_models_provenance_degrades_without_install_or_git_metadata(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Run metadata collection should remain usable outside an installed Git checkout."""
+
+    def missing_version(_distribution_name: str) -> str:
+        raise check_models.PackageNotFoundError
+
+    monkeypatch.delenv("GITHUB_SHA", raising=False)
+    monkeypatch.setattr(check_models, "version", missing_version)
+    monkeypatch.setattr(check_models, "_distribution_is_editable", lambda _name: False)
+    monkeypatch.setattr(check_models, "_run_macos_toolchain_command", lambda _cmd: None)
+
+    assert check_models._collect_check_models_provenance() == {
+        "name": "check_models",
+        "version": "unknown",
+        "git_revision": None,
+        "install_type": "unknown",
+    }
 
 
 def test_jsonl_metrics_fall_back_to_generation_runtime_fields() -> None:
@@ -473,8 +551,8 @@ def test_save_jsonl_report_includes_metadata_agreement_payload(tmp_path: Path) -
     assert payload["nonvisual_hits"] == ["51.5000,-0.1200"]
 
 
-def test_save_jsonl_report_flags_huggingface_hub_connectivity_failures(tmp_path: Path) -> None:
-    """Hub transport failures should carry a connectivity-oriented review hint."""
+def test_save_jsonl_report_marks_external_connectivity_as_indeterminate(tmp_path: Path) -> None:
+    """Transport failures should remain ownerless because the cause is unknowable."""
     output_file = tmp_path / "results.jsonl"
     result = PerformanceResult(
         model_name="failed-model",
@@ -494,9 +572,10 @@ def test_save_jsonl_report_flags_huggingface_hub_connectivity_failures(tmp_path:
 
     _header, rows = _read_jsonl(output_file)
     review = _require_present(rows[0].get("review"), field_name="review")
-    assert review["verdict"] == "runtime_failure"
-    assert review["owner"] == "huggingface-hub"
-    assert "hub_connectivity" in review["evidence"]
+    assert review["verdict"] == "indeterminate"
+    assert review["owner"] == "unknown"
+    assert review["user_bucket"] == "not_evaluated"
+    assert "external_connectivity" in review["evidence"]
 
 
 def test_save_jsonl_report_no_generation(tmp_path: Path) -> None:

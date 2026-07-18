@@ -241,7 +241,9 @@ The tool generates multiple report formats in `output/` by default:
 
 - **CLI**: Real-time colorized progress and metrics.
 - **HTML** (`reports/results.html`): Retained complete, self-contained report with
-  sortable rows, failed-row highlighting, recommendations, and full run context.
+  a compact caption-comparison table, sortable columns, model search,
+  status/compatibility/prompt-burden/recommendation filters, an optional peak-memory
+  ceiling, expandable full output, recommendations, and full run context.
 - **Markdown** (`reports/results.md`): Mode-aware public run index with links to canonical
   evidence, model-selection, and review artifacts.
 - **Model Selection** (`reports/model_selection.md`): Ranked shortlist for brief-caption
@@ -251,11 +253,18 @@ The tool generates multiple report formats in `output/` by default:
   that retains complete successful output, diagnostics, and one structured
   full-output section for every attempted model.
 - **Review Markdown** (`reports/review.md`): Short automated digest grouped by likely owner and user-facing utility bucket.
-- **TSV/JSONL** (`reports/results.tsv`, `results.jsonl`): Machine-readable per-model formats for analysis.
-- **Run JSON** (`run.json`): Stable run-level machine contract with mode, grounding, counts, versions, and artifact paths.
+- **TSV** (`reports/results.tsv`): Compact spreadsheet contract with caption/runtime
+  comparison fields, exact generated text once, and concise failure evidence.
+- **JSONL** (`results.jsonl`): Exhaustive machine-readable per-model diagnostics,
+  including fields intentionally omitted from the compact TSV.
+- **Run JSON** (`run.json`): Stable run-level machine contract with mode, grounding,
+  attempted/evaluated/indeterminate counts, library versions, check_models producer
+  version/revision, and artifact paths.
 - **Diagnostics** (`reports/diagnostics.md`): Self-contained, issue-ready mlx-vlm
   report with native reproduction commands and complete affected-model output in
   per-model expandable evidence blocks. Definite crashes are reported as outcomes;
+  external-connectivity interruptions are retained as indeterminate attempts and
+  excluded from upstream issue drafts and evaluated/failure totals;
   traceback evidence remains bounded, package ownership and confidence remain
   cautious triage, and model/config observations stay separate from the mlx-vlm
   issue matrix.
@@ -265,7 +274,9 @@ The tool generates multiple report formats in `output/` by default:
   crashes, harness problems, and text-sanity failures, including Model, Inputs,
   Expected Behavior, and Actual Behavior sections.
 - **Repro bundles** (`repro_bundles/`): JSON reproduction bundles per issue cluster,
-  containing error or output-quality details, CLI args, and environment for reproducibility.
+  containing error or output-quality details, CLI args, and environment for
+  reproducibility. Local home paths are normalized and repro commands use portable
+  image references.
 
 The main Markdown report stays brief and points readers to `model_selection.md`,
 `model_gallery.md`, `review.md`, and `check_models.log` for decisions, evidence,
@@ -318,7 +329,9 @@ While MLX-VLM doesn't explicitly document these in all examples, the underlying 
 
 ```bash
 # Moderate penalty to reduce repetition
-python -m check_models --image photo.jpg --repetition-penalty 1.1
+python -m check_models --image photo.jpg \
+  --repetition-penalty 1.1 \
+  --repetition-context-size 64
 
 # Strong penalty with larger context window
 python -m check_models --image photo.jpg --repetition-penalty 1.15 --repetition-context-size 50
@@ -333,6 +346,12 @@ python -m check_models --image photo.jpg --repetition-penalty 1.15 --repetition-
 - 💡 **Tip**: Start with 1.05-1.1 and increase gradually while monitoring quality flags in the output
 
 The `check_models` tool's quality analysis detects repetition post-generation and flags it in reports. Using these parameters proactively can prevent repetitive output before it occurs, saving generation time and improving results.
+
+Keep the neutral defaults for comparable baseline runs. When one model loops, first
+rerun only that model with `--repetition-penalty 1.1 --repetition-context-size 64`.
+If the loop disappears, report both attempts; do not silently mix penalized and
+unpenalized results in one ranking. Repetition penalties do not correct irrelevant
+reasoning traces or a chat template that inserts thinking tokens.
 
 #### Server-Shared Request Controls
 
@@ -1114,7 +1133,9 @@ Width and color controls:
 Report featuring:
 
 - Executive summary with test parameters
-- Interactive performance table with sortable columns
+- Compact performance table with sortable columns and expandable complete output
+- Model search plus status, compatibility, prompt-burden, recommendation, and
+  peak-memory filters
 - Model outputs and diagnostics
 - System information and library versions
 - Failed rows are highlighted in red for quick identification
@@ -1148,17 +1169,18 @@ Tab-separated values for programmatic analysis (spreadsheets, `awk`, pandas, etc
 
 - **Metadata comment**: The first line is a `# generated_at: <ISO timestamp>` comment
   indicating when the report was produced. Parsers should skip lines starting with `#`.
-- **Header row**: Column names matching the CLI summary table.
-- **Error diagnostics**: Two additional columns, `error_type` and `error_package`,
-  are populated for failed models to support automated triage (e.g. filtering by
-  `TimeoutError` or `mlx` package failures). These columns are empty for successful runs.
+- **Compact fixed-purpose columns**: Caption/runtime comparison fields, canonical
+  compatibility and prompt-burden facts, and exact `Generated Text`. The redundant
+  output preview and diffusion-only fields are omitted; use JSONL for exhaustive data.
+- **Error diagnostics**: One each of `error_stage`, `error_type`, `error_package`,
+  and `error_message` support automated triage and remain empty for completed runs.
 
 ### JSONL Report
 
 Line-delimited JSON for streaming ingestion:
 
 - **Metadata header**: The first record (line 1) contains shared metadata
-  (prompt, system info, timestamp) — JSONL v1.1 format.
+  (prompt, system info, timestamp) — JSONL v2.0 format.
 - **Per-model records**: One JSON object per model with all metrics and error details.
 
 
@@ -1326,7 +1348,8 @@ machine-readable files (JSONL, capability JSON, run JSON, history) and logs rema
 - **Gallery Markdown** (`reports/model_gallery.md`): complete evidence-only generated
   outputs and diagnostics for every attempted model.
 - **Run JSON** (`run.json`): stable run-level machine contract with resolved mode, grounding
-  policy, counts, versions, and artifact paths.
+  policy, attempted/evaluated/indeterminate counts, versions, producer revision,
+  and artifact paths.
 
 ## Contributing
 

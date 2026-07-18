@@ -18,6 +18,10 @@ from check_models import (
         ("[metal::malloc] Attempting to allocate...", "OOM"),
         ("maximum allowed buffer size exceeded", "OOM"),
         ("Operation timeout", "Timeout"),
+        (
+            "Model loading failed: Server disconnected without sending a response.",
+            "Network Error",
+        ),
         # Dependency/Version errors
         ("ImportError: cannot import name 'foo'", "Lib Version"),
         ("requires packages X. pip install X", "Missing Dep"),
@@ -61,6 +65,11 @@ def test_classify_error(message: str, expected_type: str) -> None:
         ("chat_template is not set", None, "model-config"),
         # HuggingFace
         ("does not appear to have a file", "huggingface_hub/utils.py", "huggingface-hub"),
+        (
+            "Model loading failed: Server disconnected without sending a response.",
+            "mlx_vlm/utils.py caused by httpcore.RemoteProtocolError",
+            "unknown",
+        ),
         # Wrapped upstream failures should prefer the deeper traceback owner
         (
             "Model generation failed: Failed to process inputs with error: can only concatenate str",

@@ -1929,6 +1929,143 @@ class TestHtmlReportEdgeCases:
         assert re.search(r'class="numeric"', content) is not None
         assert 'class="text failed"' in content
 
+    def test_html_report_uses_compact_caption_columns_and_interactive_controls(
+        self, tmp_path: Path
+    ) -> None:
+        """HTML should be a compact, searchable comparison rather than a raw field dump."""
+        out = tmp_path / "interactive.html"
+        result = _make_success("org/caption-model")
+
+        generate_html_report(
+            results=[result],
+            filename=out,
+            versions=_stub_versions(),
+            prompt="describe",
+            total_runtime_seconds=1.0,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert 'id="model-search"' in content
+        assert 'id="compatibility-filter"' in content
+        assert 'id="prompt-burden-filter"' in content
+        assert 'id="eligibility-filter"' in content
+        assert 'id="max-memory-filter"' in content
+        assert 'data-model="org/caption-model"' in content
+        assert 'data-compatibility="clean"' in content
+        assert "data-prompt-burden=" in content
+        assert 'data-eligible="true"' in content
+        assert 'class="sort-btn"' in content
+        assert "data-sort-value=" in content
+        assert "Diffusion Canvas Tokens" not in content
+        assert "Diffusion Denoising Steps" not in content
+        assert "Text Already Printed" not in content
+
+    def test_html_report_escapes_filter_metadata(self, tmp_path: Path) -> None:
+        """Model-controlled row metadata must remain safe in HTML attributes."""
+        out = tmp_path / "metadata-escaped.html"
+        model_name = 'org/model" onmouseover="alert(1)'
+
+        generate_html_report(
+            results=[_make_success(model_name)],
+            filename=out,
+            versions=_stub_versions(),
+            prompt="describe",
+            total_runtime_seconds=1.0,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert f'data-model="{model_name}"' not in content
+        assert 'data-model="org/model&quot; onmouseover=&quot;alert(1)"' in content
+
+    def test_html_report_marks_connectivity_disconnect_as_indeterminate(
+        self, tmp_path: Path
+    ) -> None:
+        """Unreachable model files should not appear as conclusive crashes."""
+        out = tmp_path / "indeterminate.html"
+        result = replace(
+            _make_failure("org/not-reached", error_package="unknown"),
+            error_stage="Network Error",
+            error_message="Model loading failed: Server disconnected without sending a response.",
+        )
+
+        generate_html_report(
+            results=[result],
+            filename=out,
+            versions=_stub_versions(),
+            prompt="describe",
+            total_runtime_seconds=1.0,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert 'data-status="indeterminate"' in content
+        assert 'data-compatibility="indeterminate"' in content
+
+    def test_connectivity_disconnect_is_retained_but_not_filed_as_upstream_issue(
+        self, tmp_path: Path
+    ) -> None:
+        """Diagnostics should show the attempt without producing an upstream issue draft."""
+        result = _make_failure_with_details(
+            "org/not-reached",
+            error_msg="Model loading failed: Server disconnected without sending a response.",
+            error_stage="Network Error",
+            error_package="unknown",
+            traceback_str="httpcore.RemoteProtocolError: Server disconnected without a response",
+        )
+        snapshot = _build_diagnostics_snapshot(results=[result], prompt="Describe it.")
+
+        assert snapshot.failed == ()
+        assert snapshot.indeterminate == (result,)
+        generated = _generate_github_issue_reports(
+            diagnostics_snapshot=snapshot,
+            output_dir=tmp_path,
+            versions=_stub_versions(),
+            system_info={},
+            repro_bundles={},
+            run_args=Namespace(),
+        )
+        assert generated == {}
+        assert not list((tmp_path / "issues").glob("issue_*.md"))
+
+    def test_reports_separate_attempted_evaluated_and_indeterminate_counts(
+        self, tmp_path: Path
+    ) -> None:
+        """Human summaries should not inflate tested or hard-failure totals."""
+        completed = _make_success("org/completed")
+        disconnected = _make_failure_with_details(
+            "org/not-reached",
+            error_msg="Model loading failed: Server disconnected without sending a response.",
+            error_stage="Network Error",
+            error_package="unknown",
+            traceback_str="httpcore.RemoteProtocolError: Server disconnected without a response",
+        )
+        results = [completed, disconnected]
+        diagnostics = tmp_path / "diagnostics.md"
+        markdown = tmp_path / "results.md"
+
+        assert generate_diagnostics_report(
+            results=results,
+            filename=diagnostics,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="Describe it.",
+        )
+        generate_markdown_report(
+            results=results,
+            filename=markdown,
+            versions=_stub_versions(),
+            prompt="Describe it.",
+            total_runtime_seconds=2.0,
+        )
+
+        diagnostics_text = diagnostics.read_text(encoding="utf-8")
+        report_text = markdown.read_text(encoding="utf-8")
+        assert "2 attempted" in diagnostics_text
+        assert "1 evaluated" in diagnostics_text
+        assert "1 indeterminate" in diagnostics_text
+        assert "0 hard failure(s)" in diagnostics_text
+        assert "Indeterminate attempts" in report_text
+        assert "Framework/runtime failures:_ none" in report_text
+
     def test_html_report_preserves_full_output_in_details(self, tmp_path: Path) -> None:
         """HTML table should reuse the shared preview while keeping full text expandable."""
         out = tmp_path / "details.html"
@@ -2199,11 +2336,15 @@ class TestMarkdownReportEdgeCases:
             assert "Generated Text" in tsv_lines[1]
             assert jsonl_records[0]["_type"] == "metadata"
             assert len(jsonl_records[1:]) == 2
-            assert run_payload["schema_version"] == "1.0"
+            assert run_payload["schema_version"] == "1.1"
+            assert run_payload["producer"]["name"] == "check_models"
             assert run_payload["counts"] == {
+                "models_attempted": 2,
+                "models_evaluated": 2,
                 "models_total": 2,
                 "models_successful": 1,
                 "models_failed": 1,
+                "models_indeterminate": 0,
             }
             assert len(capability_payload["models"]) == 2
 
@@ -3948,8 +4089,8 @@ class TestDiagnosticsReport:
             == "huggingface-hub"
         )
 
-    def test_review_next_action_calls_out_hub_connectivity_failures(self) -> None:
-        """Canonical review text should flag transient Hub disconnects explicitly."""
+    def test_review_next_action_calls_out_indeterminate_connectivity(self) -> None:
+        """Canonical review text should avoid assigning an unreachable server to a package."""
         action = check_models._review_next_action_text(
             {
                 "verdict": "harness",
@@ -3957,12 +4098,12 @@ class TestDiagnosticsReport:
                 "instruction_echo": False,
                 "metadata_borrowing": False,
                 "likely_capped": False,
-                "owner": "huggingface-hub",
-                "user_bucket": "avoid",
+                "owner": "unknown",
+                "user_bucket": "not_evaluated",
                 "evidence": [
                     "model_error",
                     "huggingface_hub_model_load_model",
-                    "hub_connectivity",
+                    "external_connectivity",
                 ],
                 "requested_max_tokens": 100,
                 "hit_max_tokens": False,
@@ -3976,8 +4117,8 @@ class TestDiagnosticsReport:
                 "harness_details": [],
             },
         )
-        assert "Hugging Face was reachable" in action
-        assert "transient Hub/network outage" in action
+        assert "model was not evaluated" in action
+        assert "does not identify a faulty package" in action
 
     def test_diagnostics_next_action_uses_composite_owner_rules(self) -> None:
         """Composite owner keys should keep their specialized next-step guidance."""
@@ -4622,6 +4763,39 @@ class TestDiagnosticsReport:
         )
         assert payload["repro"]["prompt_hash_sha256"]
         assert payload["repro"]["eval_mode"] == "blind"
+
+    def test_repro_bundle_does_not_expose_local_home_paths(self, tmp_path: Path) -> None:
+        """Published repro JSON and commands should be portable across user accounts."""
+        home = Path.home()
+        image_path = home / "Pictures" / "benchmark-cat.jpg"
+        failure = _make_failure_with_details(
+            "org/broken-model",
+            error_msg=f"could not read {home}/Library/Caches/model.bin",
+            traceback_str=f'Traceback\n  File "{home}/src/runner.py", line 1\nValueError',
+        )
+        output_dir = tmp_path / "repro_bundles"
+
+        bundles = export_failure_repro_bundles(
+            results=[failure],
+            output_dir=output_dir,
+            run_args=Namespace(
+                eval_mode="blind",
+                output_html=home / "project" / "output" / "results.html",
+                image=image_path,
+            ),
+            versions=_stub_versions(),
+            system_info={"MLX Core Extension": f"{home}/mlx/core.so"},
+            prompt="Describe this image.",
+            image_path=image_path,
+        )
+
+        bundle_text = next(iter(bundles.values())).read_text(encoding="utf-8")
+        payload = json.loads(bundle_text)
+        assert str(home) not in bundle_text
+        assert payload["repro"]["image_path"] == "benchmark-cat.jpg"
+        assert "--image benchmark-cat.jpg" in payload["repro"]["rerun_command"]
+        assert payload["repro"]["args"]["output_html"].startswith("~")
+        assert payload["environment"]["system_info"]["MLX Core Extension"].startswith("~")
 
     def test_harness_repro_bundles_written_and_linked(self, tmp_path: Path) -> None:
         """Successful issue-clustered harness anomalies should get repro bundles."""
@@ -6363,9 +6537,11 @@ def test_output_index_routes_maintainers_and_model_users(tmp_path: Path) -> None
 
     content = paths.index.read_text(encoding="utf-8")
     assert "# Check Models Output Index" in content
-    assert "- Models tested: 2" in content
+    assert "- Models attempted: 2" in content
+    assert "- Models evaluated: 2" in content
     assert "- Successful: 1" in content
     assert "- Failed: 1" in content
+    assert "- Indeterminate: 0" in content
     assert "## For Model Users" in content
     assert "## For Maintainers" in content
     assert "model_selection.md" in content
