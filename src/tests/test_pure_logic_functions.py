@@ -1287,6 +1287,7 @@ class TestHardwareFacts:
                 },
             ),
             patch.object(mod, "_get_mlx_backend_artifact_info", return_value={}),
+            patch.object(mod, "_probe_fused_attention", return_value={"status": "ok"}),
             patch.object(mod, "psutil", None),
         ):
             info = mod.get_system_characteristics()
@@ -1296,6 +1297,7 @@ class TestHardwareFacts:
         assert info["GPU Architecture"] == "applegpu_g17s"
         assert info["RAM"] == "128.0 GB"
         assert info["Recommended Working Set"] == "96.0 GB"
+        assert info["Fused Attention"] == "Available"
 
     @pytest.mark.parametrize(
         ("profiler_name", "sysctl_name", "mlx_name", "expected"),
@@ -1327,11 +1329,46 @@ class TestHardwareFacts:
                 return_value={"device_name": mlx_name},
             ),
             patch.object(mod, "_get_mlx_backend_artifact_info", return_value={}),
+            patch.object(
+                mod,
+                "_probe_fused_attention",
+                return_value={"status": "unavailable"},
+            ),
             patch.object(mod, "psutil", None),
         ):
             info = mod.get_system_characteristics()
 
         assert info["GPU/Chip"] == expected
+
+    @pytest.mark.parametrize(
+        ("status", "expected"),
+        [
+            ("ok", "Available"),
+            ("unavailable", "Unavailable"),
+            ("errored", "Error"),
+            ("timed_out", "Timed out"),
+        ],
+    )
+    def test_get_system_characteristics_maps_fused_attention_state(
+        self,
+        mod: types.ModuleType,
+        status: str,
+        expected: str,
+    ) -> None:
+        """Human capability state should map from the shared structured probe."""
+        with (
+            patch.object(mod.platform, "system", return_value="Other"),
+            patch.object(mod, "get_system_info", return_value=("arm64", None)),
+            patch.object(mod, "_get_apple_silicon_info", return_value={}),
+            patch.object(mod, "_get_total_memory_bytes", return_value=None),
+            patch.object(mod, "_get_mlx_device_info", return_value={}),
+            patch.object(mod, "_get_mlx_backend_artifact_info", return_value={}),
+            patch.object(mod, "_probe_fused_attention", return_value={"status": status}),
+            patch.object(mod, "psutil", None),
+        ):
+            info = mod.get_system_characteristics()
+
+        assert info["Fused Attention"] == expected
 
 
 class TestPreflightDependencyDiagnostics:

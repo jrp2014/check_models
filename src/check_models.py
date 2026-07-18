@@ -19704,6 +19704,15 @@ def get_system_characteristics() -> dict[str, str]:
         if recommended_working_set_bytes is not None:
             info["Recommended Working Set"] = f"{recommended_working_set_bytes / (1024**3):.1f} GB"
 
+        fused_attention = _probe_fused_attention()
+        fused_attention_labels = {
+            "ok": "Available",
+            "unavailable": "Unavailable",
+            "errored": "Error",
+            "timed_out": "Timed out",
+        }
+        info["Fused Attention"] = fused_attention_labels[fused_attention["status"]]
+
         # Get CPU info if psutil available
         if psutil is not None:
             physical_cores = psutil.cpu_count(logical=False)
@@ -19720,6 +19729,20 @@ def get_system_characteristics() -> dict[str, str]:
         logger.debug("Error gathering system characteristics: %s", err)
 
     return info
+
+
+def _probe_fused_attention() -> RuntimeProbeResult:
+    """Report whether MLX exposes callable fused scaled-dot-product attention."""
+    if mx is None:
+        return RuntimeProbeResult(status="unavailable", detail="mlx not imported")
+    try:
+        fast = getattr(mx, "fast", None)
+        attention = getattr(fast, "scaled_dot_product_attention", None)
+    except (AttributeError, OSError, RuntimeError, TypeError, ValueError) as exc:
+        return RuntimeProbeResult(status="errored", detail=str(exc)[:120])
+    if callable(attention):
+        return RuntimeProbeResult(status="ok")
+    return RuntimeProbeResult(status="unavailable")
 
 
 def collect_runtime_fingerprint() -> dict[str, RuntimeProbeResult]:
@@ -19773,6 +19796,8 @@ def collect_runtime_fingerprint() -> dict[str, RuntimeProbeResult]:
             probes["gpu_memory"] = RuntimeProbeResult(status="unavailable")
     except Exception as exc:  # noqa: BLE001
         probes["gpu_memory"] = RuntimeProbeResult(status="errored", detail=str(exc)[:120])
+
+    probes["fused_attention"] = _probe_fused_attention()
 
     return probes
 

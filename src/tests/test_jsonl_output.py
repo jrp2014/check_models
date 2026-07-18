@@ -5,6 +5,7 @@ from __future__ import annotations
 import dataclasses
 import json
 from dataclasses import dataclass
+from types import SimpleNamespace
 from typing import TYPE_CHECKING, cast
 from unittest.mock import MagicMock, patch
 
@@ -1344,9 +1345,15 @@ class TestRuntimeFingerprint:
     """Mock canary tests for runtime capability fingerprint collection."""
 
     def test_collect_runtime_fingerprint_returns_all_probes(self) -> None:
-        """Fingerprint must include all four probe keys (G2: never silently omit)."""
+        """Fingerprint must include every probe key (G2: never silently omit)."""
         fingerprint = check_models.collect_runtime_fingerprint()
-        expected_probes = {"metal_gpu", "mlx_framework", "mlx_vlm", "gpu_memory"}
+        expected_probes = {
+            "metal_gpu",
+            "mlx_framework",
+            "mlx_vlm",
+            "gpu_memory",
+            "fused_attention",
+        }
         assert set(fingerprint.keys()) == expected_probes
 
     def test_each_probe_has_valid_status(self) -> None:
@@ -1392,6 +1399,36 @@ class TestRuntimeFingerprint:
 
         assert fingerprint["gpu_memory"]["status"] == "ok"
         assert fingerprint["gpu_memory"].get("detail") == "active=2.00GB"
+
+    def test_collect_runtime_fingerprint_reports_fused_attention_available(self) -> None:
+        """Callable MLX fused attention should be recorded as available."""
+        runtime = SimpleNamespace(
+            fast=SimpleNamespace(scaled_dot_product_attention=lambda: None),
+        )
+        with patch.object(check_models, "mx", runtime):
+            fingerprint = check_models.collect_runtime_fingerprint()
+
+        assert fingerprint["fused_attention"] == {"status": "ok"}
+
+    def test_collect_runtime_fingerprint_reports_fused_attention_unavailable(self) -> None:
+        """A missing fused-attention surface should remain explicit."""
+        with patch.object(check_models, "mx", SimpleNamespace()):
+            fingerprint = check_models.collect_runtime_fingerprint()
+
+        assert fingerprint["fused_attention"]["status"] == "unavailable"
+
+    def test_probe_fused_attention_reports_attribute_error(self) -> None:
+        """Runtime attribute errors should become bounded probe state."""
+
+        class RaisingRuntime:
+            @property
+            def fast(self) -> object:
+                raise RuntimeError("runtime unavailable")
+
+        with patch.object(check_models, "mx", RaisingRuntime()):
+            result = check_models._probe_fused_attention()
+
+        assert result == {"status": "errored", "detail": "runtime unavailable"}
 
     def test_jsonl_metadata_includes_fingerprint(self) -> None:
         """JSONL metadata record includes runtime_fingerprint when provided."""
