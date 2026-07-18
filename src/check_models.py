@@ -9867,6 +9867,8 @@ def _format_table_field_value(
             formatting, ``output`` uses the shared preview builder, and
             ``quality_issues`` is truncated after field-aware formatting.
         res: Performance result supplying timing, generation, and issue data
+        recommended_working_set_bytes: Optional Metal recommended-working-set
+            ceiling used to contextualize peak-memory values.
 
     Returns:
         Formatted string value for the field
@@ -13111,6 +13113,11 @@ GALLERY_STAMP_SYSTEM_KEYS: Final[tuple[str, ...]] = (
     "OS",
     "macOS Version",
     "GPU/Chip",
+    "MLX Device",
+    "GPU Architecture",
+    "RAM",
+    "Recommended Working Set",
+    "Fused Attention",
 )
 GALLERY_FAILURE_DIAGNOSTIC_PREVIEW_CHARS: Final[int] = 220
 
@@ -13333,6 +13340,10 @@ _DIAGNOSTICS_SYSTEM_KEYS: Final[tuple[str, ...]] = (
     "Apple Clang Version",
     "GPU/Chip",
     "GPU Cores",
+    "MLX Device",
+    "GPU Architecture",
+    "Recommended Working Set",
+    "Fused Attention",
     "Metal Support",
     "MLX Install Type",
     "MLX Distribution Root",
@@ -24768,11 +24779,7 @@ def _log_model_comparison_table_and_charts(
                     _format_float_or_dash(tps, digits=1),
                     _format_float_or_dash(res.total_time, digits=2),
                     _format_float_or_dash(res.model_load_time, digits=2),
-                    _format_peak_memory_context(
-                        peak_mem if peak_mem > 0 else None,
-                        recommended_working_set_bytes,
-                    )
-                    or "-",
+                    _format_float_or_dash(peak_mem if peak_mem > 0 else None, digits=2),
                     notes,
                 ],
             )
@@ -24798,6 +24805,11 @@ def _log_model_comparison_table_and_charts(
             failed.append(res)
 
     logger.info("📋 Model Comparison (current run):")
+    if recommended_working_set_bytes is not None:
+        logger.info(
+            "   Recommended working set: %s GB",
+            fmt_num(recommended_working_set_bytes / (1024**3)),
+        )
     headers = ["#", "Model", "Status", "TPS", "Total(s)", "Load(s)", "PeakGB", "Notes"]
     _log_rich_table(
         headers=headers,

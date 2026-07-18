@@ -1495,7 +1495,8 @@ class TestRuntimeFingerprint:
         class RaisingRuntime:
             @property
             def fast(self) -> object:
-                raise RuntimeError("runtime unavailable")
+                message = "runtime unavailable"
+                raise RuntimeError(message)
 
         with patch.object(check_models, "mx", RaisingRuntime()):
             result = check_models._probe_fused_attention()

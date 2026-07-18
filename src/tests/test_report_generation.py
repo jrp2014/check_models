@@ -3105,26 +3105,40 @@ class TestMarkdownGalleryReport:
     ) -> None:
         """Gallery should provide a pasteable run summary with package version stamps."""
         out = tmp_path / "model_gallery.md"
+        results = [
+            _make_quality_success("org/good", with_quality_issue=False),
+            _make_harness_success(
+                "org/risky",
+                text="answer with | pipe and <think>leaked marker</think>",
+                harness_type="stop_token",
+                harness_detail="token_leak:<|end|>",
+            ),
+            _make_failure("org/bad", error_package="mlx-vlm"),
+        ]
+        context = _build_report_render_context(
+            results=results,
+            prompt="Describe this image briefly.",
+            system_info={
+                "GPU Architecture": "applegpu_g17s",
+                "Recommended Working Set": "96 GB",
+                "Fused Attention": "available",
+            },
+        )
         generate_markdown_gallery_report(
-            results=[
-                _make_quality_success("org/good", with_quality_issue=False),
-                _make_harness_success(
-                    "org/risky",
-                    text="answer with | pipe and <think>leaked marker</think>",
-                    harness_type="stop_token",
-                    harness_detail="token_leak:<|end|>",
-                ),
-                _make_failure("org/bad", error_package="mlx-vlm"),
-            ],
+            results=results,
             filename=out,
             prompt="Describe this image briefly.",
             versions=_stub_versions(),
+            report_context=context,
         )
 
         content = out.read_text(encoding="utf-8")
         assert "## Run Stamps" in content
         assert "- `mlx-vlm`: `0.1`" in content
         assert "- `mlx`: `0.1`" in content
+        assert "- _GPU Architecture:_ applegpu_g17s" in content
+        assert "- _Recommended Working Set:_ 96 GB" in content
+        assert "- _Fused Attention:_ available" in content
         assert "## Model Output and Cost Summary" in content
         assert "## Model Quality Summary" not in content
         assert "## All Model Output and Cost Summary" not in content
@@ -4117,6 +4131,10 @@ class TestDiagnosticsReport:
             system_info={
                 "Python Version": "3.13.9",
                 "GPU/Chip": "Apple M4 Max",
+                "MLX Device": "Apple M4 Max",
+                "GPU Architecture": "applegpu_g16g",
+                "Recommended Working Set": "96 GB",
+                "Fused Attention": "available",
                 "SDK Version": "26.5",
                 "Xcode Version": "26.5",
                 "Xcode Build": "17F42",
@@ -4135,6 +4153,13 @@ class TestDiagnosticsReport:
         assert "3.13.9" in content
         assert "GPU/Chip" in content
         assert "Apple M4 Max" in content
+        assert "MLX Device" in content
+        assert "GPU Architecture" in content
+        assert "applegpu_g16g" in content
+        assert "Recommended Working Set" in content
+        assert "96 GB" in content
+        assert "Fused Attention" in content
+        assert "available" in content
         assert "SDK Version" in content
         assert "26.5" in content
         assert "Xcode Version" in content

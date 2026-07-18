@@ -577,7 +577,7 @@ def test_log_summary_contextualizes_comparison_and_average_peak_memory(
         log_summary(results, prompt="Describe this image.")
 
     messages = "\n".join(record.message for record in caplog.records)
-    assert "1.2 GB (60% of" in messages
+    assert "Recommended working set: 1.86 GB" in messages
     assert "67.5% of 1.86 GB recommended working set" in messages
 
 

@@ -7,6 +7,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Bump the package version to `0.8.7` and enrich benchmark hardware/runtime
+  provenance with MLX device identity, GPU architecture, fused-attention
+  availability, resilient RAM/chip discovery, and Metal recommended-working-set
+  context in structured artifacts, human reports, and console summaries.
 - Cap the optional `tokenizers` extra to the `0.22.x` line
   (`>=0.22.0,<0.23.0`) in the shared dependency policy, packaging metadata,
   and README until the `0.23.x` line has been validated against this
