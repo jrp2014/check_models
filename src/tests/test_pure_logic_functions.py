@@ -1371,6 +1371,29 @@ class TestHardwareFacts:
         assert info["Fused Attention"] == expected
 
 
+@pytest.mark.parametrize(
+    ("peak_gb", "working_set_bytes", "expected"),
+    [
+        (18.2, 96 * 1024**3, pytest.approx(17.6563238104)),
+        (120.0, 96 * 1024**3, pytest.approx(116.4153218269)),
+        (0.0, 96 * 1024**3, 0.0),
+        (None, 96 * 1024**3, None),
+        (float("nan"), 96 * 1024**3, None),
+        (1.0, None, None),
+        (1.0, 0, None),
+        (-1.0, 96 * 1024**3, None),
+    ],
+)
+def test_peak_memory_working_set_pct(
+    mod: types.ModuleType,
+    peak_gb: float | None,
+    working_set_bytes: int | None,
+    expected: object,
+) -> None:
+    """Working-set context should use MLX's decimal-GB allocator convention."""
+    assert mod._peak_memory_working_set_pct(peak_gb, working_set_bytes) == expected
+
+
 class TestPreflightDependencyDiagnostics:
     """Tests for upstream version-floor and source-pattern diagnostics."""
 

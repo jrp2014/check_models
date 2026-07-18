@@ -17,6 +17,7 @@ class MockGenerationResult:
     time: float | None = None
     active_memory: float | None = None
     cache_memory: float | None = None
+    peak_memory: float | None = 1.0
 
 
 def _read_tsv_record(path: Path) -> dict[str, str]:
@@ -59,6 +60,50 @@ def test_generate_tsv_report_basic(tmp_path: Path) -> None:
     # Verify it's tab-separated
     assert "\t" in data_lines[0]  # Header line
     assert "\t" in data_lines[1]  # Data line
+
+
+def test_tsv_includes_working_set_percentage(tmp_path: Path) -> None:
+    """TSV should expose the canonical peak-memory working-set percentage."""
+    result = check_models.PerformanceResult(
+        model_name="test/model",
+        success=True,
+        generation=MockGenerationResult(peak_memory=1.0),
+    )
+    context = check_models._build_report_render_context(
+        results=[result],
+        prompt="test",
+        system_info={},
+        recommended_working_set_bytes=2_000_000_000,
+    )
+    output_file = tmp_path / "working-set.tsv"
+
+    check_models.generate_tsv_report([result], output_file, report_context=context)
+
+    record = _read_tsv_record(output_file)
+    assert float(record["peak_memory_working_set_pct"]) == 50.0
+
+
+def test_tsv_leaves_working_set_percentage_blank_without_denominator(
+    tmp_path: Path,
+) -> None:
+    """The additive TSV column should remain blank when capacity is unknown."""
+    result = check_models.PerformanceResult(
+        model_name="test/model",
+        success=True,
+        generation=MockGenerationResult(peak_memory=1.0),
+    )
+    context = check_models._build_report_render_context(
+        results=[result],
+        prompt="test",
+        system_info={},
+        recommended_working_set_bytes=None,
+    )
+    output_file = tmp_path / "no-working-set.tsv"
+
+    check_models.generate_tsv_report([result], output_file, report_context=context)
+
+    record = _read_tsv_record(output_file)
+    assert record["peak_memory_working_set_pct"] == ""
 
 
 def test_tsv_escapes_tabs_in_values(tmp_path: Path) -> None:

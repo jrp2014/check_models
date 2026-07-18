@@ -1164,6 +1164,7 @@ class HistoryModelResultRecord(TypedDict):
     keyword_score: NotRequired[float | None]
     generation_tps: NotRequired[float | None]
     peak_memory_gb: NotRequired[float | None]
+    peak_memory_working_set_pct: NotRequired[float | None]
     text_sanity_issue_type: NotRequired[str | None]
     generation_loop_type: NotRequired[str | None]
     compatibility_status: NotRequired[str]
@@ -1232,6 +1233,7 @@ class JsonlMetricsRecord(TypedDict, total=False):
     prompt_tps: float
     generation_tps: float
     peak_memory_gb: float
+    peak_memory_working_set_pct: float
     active_memory_gb: float
     cache_memory_gb: float
     model_load_active_memory_gb: float
@@ -3732,6 +3734,18 @@ def _format_memory_value_gb(num: float) -> str:
     if gb >= 1:
         return f"{gb:,.1f}"
     return f"{gb:.2f}"
+
+
+def _peak_memory_working_set_pct(
+    peak_memory_gb: float | None,
+    recommended_working_set_bytes: int | None,
+) -> float | None:
+    """Return peak allocator bytes as a percentage of Metal's recommendation."""
+    if peak_memory_gb is None or not math.isfinite(peak_memory_gb) or peak_memory_gb < 0:
+        return None
+    if type(recommended_working_set_bytes) is not int or recommended_working_set_bytes <= 0:
+        return None
+    return peak_memory_gb * DECIMAL_GB / recommended_working_set_bytes * 100.0
 
 
 def _format_time_seconds(num: float) -> str:
@@ -9980,6 +9994,7 @@ def _build_report_render_context(
     metadata_exposed_to_prompt: bool | None = None,
     eval_mode: str = DEFAULT_EVAL_MODE,
     system_info: dict[str, str] | None = None,
+    recommended_working_set_bytes: int | None = None,
     preflight_issues: Sequence[str] = (),
 ) -> ReportRenderContext:
     """Build shared derived report data once for all renderers."""
@@ -10049,6 +10064,7 @@ def _build_report_render_context(
         stats=stats,
         system_info=resolved_system_info,
         triage=triage,
+        recommended_working_set_bytes=recommended_working_set_bytes,
         image_profile=image_profile,
         preflight_issues=resolved_preflight_issues,
         mode_policy=_build_report_mode_policy(
@@ -10079,6 +10095,7 @@ def _build_report_render_context(
         machine_facts=tuple(
             _machine_artifact_facts(
                 view,
+                recommended_working_set_bytes=context.recommended_working_set_bytes,
                 failure_narrative=narrative_by_model.get(view.result.model_name),
             )
             for view in recommendations
@@ -13420,6 +13437,7 @@ class MachineArtifactFacts:
     draft_improvement_score: float | None
     visual_description_score: float | None
     assisted_enrichment_score: float | None
+    peak_memory_working_set_pct: float | None
     prompt_burden_kind: str
     prompt_burden_source: str
     suspected_owner: str | None
@@ -13507,6 +13525,7 @@ class ReportRenderContext:
     stats: PerformanceStats
     system_info: dict[str, str]
     triage: ReportTriageContext
+    recommended_working_set_bytes: int | None = None
     image_profile: ImageInputProfile | None = None
     preflight_issues: tuple[str, ...] = ()
     mode_policy: ReportModePolicy = dataclass_field(default_factory=_default_report_mode_policy)
@@ -17849,6 +17868,7 @@ def _build_model_recommendation_views(
 def _machine_artifact_facts(
     view: ModelRecommendationView,
     *,
+    recommended_working_set_bytes: int | None,
     failure_narrative: FailureNarrative | None = None,
 ) -> MachineArtifactFacts:
     """Return one canonical additive machine payload from cached report views."""
@@ -17867,6 +17887,10 @@ def _machine_artifact_facts(
         draft_improvement_score=view.draft_improvement_score,
         visual_description_score=(agreement.visual_description_score if agreement else None),
         assisted_enrichment_score=view.assisted_enrichment_score,
+        peak_memory_working_set_pct=_peak_memory_working_set_pct(
+            view.peak_memory_gb,
+            recommended_working_set_bytes,
+        ),
         prompt_burden_kind=view.burden.kind,
         prompt_burden_source=view.burden.source,
         suspected_owner=suspected_owner,
@@ -17907,6 +17931,7 @@ def _machine_artifact_tsv_cells(facts: MachineArtifactFacts) -> tuple[str, ...]:
         optional_score(facts.draft_improvement_score),
         optional_score(facts.visual_description_score),
         optional_score(facts.assisted_enrichment_score),
+        optional_score(facts.peak_memory_working_set_pct),
         facts.prompt_burden_kind,
         facts.prompt_burden_source,
         facts.owner_confidence or "",
@@ -19342,6 +19367,7 @@ def generate_tsv_report(
         "draft_improvement_score",
         "visual_description_score",
         "assisted_enrichment_score",
+        "peak_memory_working_set_pct",
         "prompt_burden_kind",
         "prompt_burden_source",
         "owner_confidence",
@@ -26022,6 +26048,8 @@ def _populate_history_machine_facts(
         record["visual_description_score"] = facts.visual_description_score
     if facts.assisted_enrichment_score is not None:
         record["assisted_enrichment_score"] = facts.assisted_enrichment_score
+    if facts.peak_memory_working_set_pct is not None:
+        record["peak_memory_working_set_pct"] = facts.peak_memory_working_set_pct
     if facts.owner_confidence is not None:
         record["owner_confidence"] = facts.owner_confidence
 
@@ -26431,6 +26459,10 @@ def save_jsonl_report(
                         triage["confidence"] = facts.owner_confidence
                     record["maintainer_triage"] = triage
             if facts is not None:
+                if facts.peak_memory_working_set_pct is not None:
+                    record["metrics"]["peak_memory_working_set_pct"] = (
+                        facts.peak_memory_working_set_pct
+                    )
                 record["compatibility_status"] = facts.compatibility_status
                 record["prompt_burden_kind"] = facts.prompt_burden_kind
                 record["prompt_burden_source"] = facts.prompt_burden_source
@@ -29061,6 +29093,7 @@ def finalize_execution(
 
         # Gather system characteristics for reports
         system_info = get_system_characteristics()
+        recommended_working_set_bytes = _get_recommended_working_set_bytes()
         runtime_fingerprint = collect_runtime_fingerprint()
         report_context = _build_report_render_context(
             results=results,
@@ -29070,6 +29103,7 @@ def finalize_execution(
             metadata_exposed_to_prompt=metadata_exposed_to_prompt,
             eval_mode=str(getattr(args, "eval_mode", DEFAULT_EVAL_MODE)),
             system_info=system_info,
+            recommended_working_set_bytes=recommended_working_set_bytes,
             preflight_issues=_get_run_preflight_issues(args),
         )
         results = list(report_context.result_set.results)

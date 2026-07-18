@@ -218,6 +218,78 @@ def test_jsonl_metrics_fall_back_to_generation_runtime_fields() -> None:
     assert metrics["peak_memory_delta_gb"] == 0.5
 
 
+def test_working_set_percentage_reaches_jsonl_and_history(tmp_path: Path) -> None:
+    """JSONL and history should share one canonical working-set percentage."""
+    result = PerformanceResult(
+        model_name="test-model",
+        generation=MockGeneration(peak_memory=1.0),
+        success=True,
+    )
+    context = check_models._build_report_render_context(
+        results=[result],
+        prompt="test",
+        system_info={},
+        recommended_working_set_bytes=2_000_000_000,
+    )
+
+    output_file = tmp_path / "working-set.jsonl"
+    save_jsonl_report(
+        [result],
+        output_file,
+        prompt="test",
+        system_info={},
+        report_context=context,
+    )
+    _header, rows = _read_jsonl(output_file)
+    assert rows[0]["metrics"]["peak_memory_working_set_pct"] == 50.0
+
+    history = append_history_record(
+        history_path=tmp_path / "working-set.history.jsonl",
+        results=[result],
+        prompt="test",
+        system_info={},
+        library_versions={},
+        report_context=context,
+    )
+    assert history["model_results"]["test-model"]["peak_memory_working_set_pct"] == 50.0
+
+
+def test_missing_working_set_omits_jsonl_and_history_percentage(tmp_path: Path) -> None:
+    """An unavailable denominator should not create a guessed structured fact."""
+    result = PerformanceResult(
+        model_name="test-model",
+        generation=MockGeneration(peak_memory=1.0),
+        success=True,
+    )
+    context = check_models._build_report_render_context(
+        results=[result],
+        prompt="test",
+        system_info={},
+        recommended_working_set_bytes=None,
+    )
+
+    output_file = tmp_path / "no-working-set.jsonl"
+    save_jsonl_report(
+        [result],
+        output_file,
+        prompt="test",
+        system_info={},
+        report_context=context,
+    )
+    _header, rows = _read_jsonl(output_file)
+    assert "peak_memory_working_set_pct" not in rows[0]["metrics"]
+
+    history = append_history_record(
+        history_path=tmp_path / "no-working-set.history.jsonl",
+        results=[result],
+        prompt="test",
+        system_info={},
+        library_versions={},
+        report_context=context,
+    )
+    assert "peak_memory_working_set_pct" not in history["model_results"]["test-model"]
+
+
 def test_save_jsonl_report_content(tmp_path: Path) -> None:
     """Test that save_jsonl_report writes correct content with generation."""
     output_file = tmp_path / "results.jsonl"
