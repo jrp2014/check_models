@@ -2,78 +2,30 @@
   "clusters": {
     "mlx-vlm-mlx_long-context_001": {
       "bundles": [
-        "20260718T182321Z_007_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json"
+        "20260718T215647Z_001_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json"
       ],
       "models": [
         "mlx-community/paligemma2-3b-pt-896-4bit"
       ]
     },
-    "mlx-vlm_mlx-vlm-model-load-model_001": {
-      "bundles": [
-        "20260718T182321Z_001_mlx-community_FastVLM-0.5B-bf16_MLX_VLM_MODEL_LOAD_MODEL_baf9616f8913.json",
-        "20260718T182321Z_002_mlx-community_GLM-4.6V-Flash-6bit_MLX_VLM_MODEL_LOAD_MODEL_baf9616f8913.json",
-        "20260718T182321Z_003_mlx-community_Qwen3.5-9B-MLX-4bit_MLX_VLM_MODEL_LOAD_MODEL_baf9616f8913.json",
-        "20260718T182321Z_004_mlx-community_Qwen3.6-27B-mxfp8_MLX_VLM_MODEL_LOAD_MODEL_baf9616f8913.json",
-        "20260718T182321Z_005_mlx-community_SmolVLM-Instruct-bf16_MLX_VLM_MODEL_LOAD_MODEL_baf9616f8913.json",
-        "20260718T182321Z_006_mlx-community_SmolVLM2-2.2B-Instruct-mlx_MLX_VLM_MODEL_LOAD_MODEL_baf9616f8913.json"
-      ],
-      "models": [
-        "mlx-community/FastVLM-0.5B-bf16",
-        "mlx-community/GLM-4.6V-Flash-6bit",
-        "mlx-community/Qwen3.5-9B-MLX-4bit",
-        "mlx-community/Qwen3.6-27B-mxfp8",
-        "mlx-community/SmolVLM-Instruct-bf16",
-        "mlx-community/SmolVLM2-2.2B-Instruct-mlx"
-      ]
-    },
     "mlx-vlm_stop-token_001": {
       "bundles": [
-        "20260718T182321Z_008_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json"
+        "20260718T215647Z_002_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json"
       ],
       "models": [
         "mlx-community/Qwen3-VL-2B-Thinking-bf16"
       ]
     }
   },
-  "generated_at_utc": "2026-07-18T18:23:21+00:00",
+  "generated_at_utc": "2026-07-18T21:56:47+00:00",
   "models": {
-    "mlx-community/FastVLM-0.5B-bf16": {
-      "bundle": "20260718T182321Z_001_mlx-community_FastVLM-0.5B-bf16_MLX_VLM_MODEL_LOAD_MODEL_baf9616f8913.json",
-      "issue_cluster_id": "mlx-vlm_mlx-vlm-model-load-model_001",
-      "issue_kind": "runtime_failure"
-    },
-    "mlx-community/GLM-4.6V-Flash-6bit": {
-      "bundle": "20260718T182321Z_002_mlx-community_GLM-4.6V-Flash-6bit_MLX_VLM_MODEL_LOAD_MODEL_baf9616f8913.json",
-      "issue_cluster_id": "mlx-vlm_mlx-vlm-model-load-model_001",
-      "issue_kind": "runtime_failure"
-    },
     "mlx-community/Qwen3-VL-2B-Thinking-bf16": {
-      "bundle": "20260718T182321Z_008_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json",
+      "bundle": "20260718T215647Z_002_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json",
       "issue_cluster_id": "mlx-vlm_stop-token_001",
       "issue_kind": "harness"
     },
-    "mlx-community/Qwen3.5-9B-MLX-4bit": {
-      "bundle": "20260718T182321Z_003_mlx-community_Qwen3.5-9B-MLX-4bit_MLX_VLM_MODEL_LOAD_MODEL_baf9616f8913.json",
-      "issue_cluster_id": "mlx-vlm_mlx-vlm-model-load-model_001",
-      "issue_kind": "runtime_failure"
-    },
-    "mlx-community/Qwen3.6-27B-mxfp8": {
-      "bundle": "20260718T182321Z_004_mlx-community_Qwen3.6-27B-mxfp8_MLX_VLM_MODEL_LOAD_MODEL_baf9616f8913.json",
-      "issue_cluster_id": "mlx-vlm_mlx-vlm-model-load-model_001",
-      "issue_kind": "runtime_failure"
-    },
-    "mlx-community/SmolVLM-Instruct-bf16": {
-      "bundle": "20260718T182321Z_005_mlx-community_SmolVLM-Instruct-bf16_MLX_VLM_MODEL_LOAD_MODEL_baf9616f8913.json",
-      "issue_cluster_id": "mlx-vlm_mlx-vlm-model-load-model_001",
-      "issue_kind": "runtime_failure"
-    },
-    "mlx-community/SmolVLM2-2.2B-Instruct-mlx": {
-      "bundle": "20260718T182321Z_006_mlx-community_SmolVLM2-2.2B-Instruct-mlx_MLX_VLM_MODEL_LOAD_MODEL_baf9616f8913.json",
-      "issue_cluster_id": "mlx-vlm_mlx-vlm-model-load-model_001",
-      "issue_kind": "runtime_failure"
-    },
     "mlx-community/paligemma2-3b-pt-896-4bit": {
-      "bundle": "20260718T182321Z_007_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json",
+      "bundle": "20260718T215647Z_001_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json",
       "issue_cluster_id": "mlx-vlm-mlx_long-context_001",
       "issue_kind": "context_budget"
     }

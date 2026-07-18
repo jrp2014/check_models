@@ -16,18 +16,21 @@
     "run_json": "run.json"
   },
   "counts": {
-    "models_failed": 6,
-    "models_successful": 55,
+    "models_attempted": 61,
+    "models_evaluated": 61,
+    "models_failed": 0,
+    "models_indeterminate": 0,
+    "models_successful": 61,
     "models_total": 61
   },
   "eval_mode": "triage",
-  "generated_at": "2026-07-18 19:23:21 BST",
+  "generated_at": "2026-07-18 22:56:47 BST",
   "has_descriptive_metadata": false,
   "library_versions": {
     "Pillow": "12.3.0",
     "huggingface-hub": "1.24.0",
     "mlx": "0.32.1.dev20260718+b7c3dd6d",
-    "mlx-audio": "0.4.5",
+    "mlx-audio": "0.4.4",
     "mlx-lm": "0.31.3",
     "mlx-metal": null,
     "mlx-vlm": "0.6.5",
@@ -36,10 +39,16 @@
     "transformers": "5.14.1"
   },
   "metadata_exposed_to_prompt": false,
+  "producer": {
+    "git_revision": "56c7ef4ab9c9883a7d311e8d8c131d1587137ce5",
+    "install_type": "installed",
+    "name": "check_models",
+    "version": "0.8.8"
+  },
   "prompt": "Describe this image briefly.",
   "prompt_sha256": "d760336d0fd143932f194573dd63f6b531e0ffbc2c4f1595e015392a3471c318",
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "selection_basis": "caption hygiene only",
   "semantic_rankings_grounded": false,
-  "total_runtime_seconds": 1041.425
+  "total_runtime_seconds": 483.598
 }

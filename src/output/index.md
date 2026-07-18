@@ -1,15 +1,17 @@
 # Check Models Output Index
 
-Generated on: 2026-07-18 19:23:21 BST
+Generated on: 2026-07-18 22:56:47 BST
 
 ## Run Snapshot
 
 - Evaluation lane: triage
 - Metadata exposed to prompt: no
 - Selection basis: caption hygiene only (ungrounded)
-- Models tested: 61
-- Successful: 55
-- Failed: 6
+- Models attempted: 61
+- Models evaluated: 61
+- Successful: 61
+- Failed: 0
+- Indeterminate: 0
 
 ## Primary Artifacts
 

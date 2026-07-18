@@ -18,7 +18,7 @@
 
 | Model                                     | Observed Behavior                                                                                  | Token Counts                                                                      | Optional Context                                                                                                                                                                           |
 |-------------------------------------------|----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/paligemma2-3b-pt-896-4bit` | generated_tokens~3 \| prompt_tokens=4103, output_tokens=3, output/prompt=0.1%, weak text=truncated | prompt=4,103 \| output/prompt=0.07% \| visual input burden=100% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260718T182321Z_007_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json) |
+| `mlx-community/paligemma2-3b-pt-896-4bit` | generated_tokens~3 \| prompt_tokens=4103, output_tokens=3, output/prompt=0.1%, weak text=truncated | prompt=4,103 \| output/prompt=0.07% \| visual input burden=100% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260718T215647Z_001_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json) |
 <!-- markdownlint-enable MD060 -->
 
 
@@ -92,7 +92,7 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/paligemma2-3b-pt-896-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260718T182321Z_007_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json)
+- `mlx-community/paligemma2-3b-pt-896-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260718T215647Z_001_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -116,7 +116,7 @@ Optional advanced context:
 | mlx-vlm                    | 0.6.5                                                                                                                                           |
 | mlx                        | 0.32.1.dev20260718+b7c3dd6d                                                                                                                     |
 | mlx-lm                     | 0.31.3                                                                                                                                          |
-| mlx-audio                  | 0.4.5                                                                                                                                           |
+| mlx-audio                  | 0.4.4                                                                                                                                           |
 | transformers               | 5.14.1                                                                                                                                          |
 | tokenizers                 | 0.22.2                                                                                                                                          |
 | huggingface-hub            | 1.24.0                                                                                                                                          |
@@ -134,13 +134,17 @@ Optional advanced context:
 | Apple Clang Version        | Apple clang version 21.0.0 (clang-2100.1.1.101)                                                                                                 |
 | GPU/Chip                   | Apple M5 Max                                                                                                                                    |
 | GPU Cores                  | 40                                                                                                                                              |
+| MLX Device                 | Apple M5 Max                                                                                                                                    |
+| GPU Architecture           | applegpu_g17s                                                                                                                                   |
+| Recommended Working Set    | 108 GB                                                                                                                                          |
+| Fused Attention            | Available                                                                                                                                       |
 | Metal Support              | Metal 4                                                                                                                                         |
 | MLX Install Type           | editable local source                                                                                                                           |
 | MLX Distribution Root      | ~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages                                                                                          |
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                              |
 | MLX Core Extension         | ~/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
 | MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (162,449,848 bytes, sha256=1078bd042297dbbf704a414617a7988c55b0001ea69d7cb478bcafa2fdfdeecb) |
-| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,697,568 bytes, sha256=c03f8b1be065c164ed6c9380cc87b205f1c11c0e5b0cda028984159c57c79a3b)  |
+| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,697,568 bytes, sha256=bef52521877d51c72e90bb0a5dc2823d77e222799855fc5f7bbb21ac8bcd129f)  |
 | RAM                        | 128.0 GB                                                                                                                                        |
 
 
