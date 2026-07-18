@@ -1255,6 +1255,10 @@ class JsonlQualityAnalysisRecord(TypedDict):
     metrics: JsonlQualityAnalysisMetrics
 
 
+type ExecutionOutcome = Literal["completed", "failed", "indeterminate"]
+type RecommendationStatus = Literal["recommended", "caveat", "avoid", "not-evaluated"]
+
+
 class JsonlMetadataAgreementRecord(TypedDict):
     """Metadata-agreement payload attached to successful rows when available."""
 
@@ -5185,30 +5189,28 @@ def _classify_user_bucket(
     hint_relationship: str,
     has_contract_issue: bool,
     utility_grade: str = "",
-) -> str:
+    has_presentation_warning: bool = False,
+) -> RecommendationStatus:
     """Bucket outputs for end users based on verdict and utility signals.
 
     Verdict-to-bucket mapping:
 
     * ``harness`` / ``cutoff_degraded`` → ``"avoid"``
-    * ``token_cap`` with A/B grade → ``"recommended"`` (model is good, just
-      needs more budget)
-    * ``token_cap`` with C or below → ``"caveat"``
+    * ``token_cap`` → ``"caveat"`` because output is not presentation-ready
     * ``context_budget`` → ``"caveat"``
     * ``model_shortcoming`` or degraded hints → ``"avoid"``
     * ``runtime_failure`` → ``"avoid"``
-    * ``unknown_runtime_anomaly`` → ``"needs_triage"``
+    * ``unknown_runtime_anomaly`` → ``"caveat"``
     * ``clean`` with positive hints and no contract issues → ``"recommended"``
     * everything else → ``"caveat"``
     """
+    del utility_grade  # Kept for caller compatibility; readiness is grade-independent.
     if verdict in {"harness", "cutoff_degraded", "runtime_failure"}:
         return "avoid"
-    if verdict == "token_cap":
-        if utility_grade in {"A", "B"} and hint_relationship != "degrades_trusted_hints":
-            return "recommended"
+    if verdict == "token_cap" or has_presentation_warning:
         return "caveat"
     if verdict in {"context_budget", "unknown_runtime_anomaly"}:
-        return "needs_triage" if verdict == "unknown_runtime_anomaly" else "caveat"
+        return "caveat"
     if (
         verdict in {"model_shortcoming", "semantic_mismatch"}
         or hint_relationship == "degrades_trusted_hints"
@@ -7873,7 +7875,11 @@ def analyze_generation_text(
         verdict=verdict,
         hint_relationship=hint_relationship,
         has_contract_issue=has_contract_issue,
-        utility_grade=utility_grade,
+        has_presentation_warning=bool(
+            prompt_signals.has_thinking_trace
+            or prompt_signals.has_reasoning_leak
+            or formatting_issues
+        ),
     )
     evidence = _dedupe_preserve_order(
         [
@@ -11924,6 +11930,25 @@ def _is_indeterminate_connectivity_failure(result: PerformanceResult) -> bool:
         if part
     )
     return _has_external_connectivity_signal(combined)
+
+
+def _execution_outcome(result: PerformanceResult) -> ExecutionOutcome:
+    """Return whether generation completed, failed conclusively, or was indeterminate."""
+    if _is_indeterminate_connectivity_failure(result):
+        return "indeterminate"
+    return "completed" if result.success else "failed"
+
+
+def _recommendation_status_for_result(result: PerformanceResult) -> RecommendationStatus:
+    """Return the canonical user recommendation independently of execution outcome."""
+    review = _review_for_result(result)
+    if review is not None:
+        bucket = review["user_bucket"]
+        if bucket in {"recommended", "caveat", "avoid", "not-evaluated"}:
+            return cast("RecommendationStatus", bucket)
+    if _is_indeterminate_connectivity_failure(result):
+        return "not-evaluated"
+    return "caveat" if result.success else "avoid"
 
 
 def _run_outcome_counts(results: Sequence[PerformanceResult]) -> dict[str, JsonLike]:
@@ -17561,7 +17586,7 @@ def _generate_model_gallery_section(
             row.result.model_name: reason for row, reason in report_context.triage.watchlist_rows
         }
     for res in sorted_results:
-        icon = "✅" if res.success else "❌"
+        icon = _recommendation_icon(_recommendation_status_for_result(res))
         md.append(f'<a id="{_gallery_model_anchor(res.model_name)}"></a>')
         md.append("")
         md.append(f"### {icon} {res.model_name}")
@@ -18035,8 +18060,8 @@ def _recommendation_eligibility(
     eligibility_reason = "eligible"
     if review is None:
         eligibility_reason = "quality review unavailable"
-    elif review["user_bucket"] == "avoid":
-        eligibility_reason = "current review says avoid"
+    elif review["user_bucket"] != "recommended":
+        eligibility_reason = f"current review says {review['user_bucket']}"
     elif not has_output:
         eligibility_reason = "no usable output text"
     elif hygiene_score is None or hygiene_score < MODEL_SELECTION_CHOOSER_MIN_HYGIENE_SCORE:
@@ -18421,8 +18446,18 @@ def _model_recommendation_status(view: ModelRecommendationView) -> str:
     """Return a concise human-facing status for a recommendation view."""
     review = _review_for_result(view.result)
     if review is None:
-        return "not-evaluated" if view.result.success else "runtime-failure"
+        return _recommendation_status_for_result(view.result)
     return _review_display_bucket_label(review["user_bucket"], review=review)
+
+
+def _recommendation_icon(status: RecommendationStatus) -> str:
+    """Return a gallery icon for one canonical recommendation status."""
+    return {
+        "recommended": "✅",
+        "caveat": "⚠️",
+        "avoid": "❌",
+        "not-evaluated": "❔",
+    }[status]
 
 
 def _model_recommendation_evidence(view: ModelRecommendationView) -> str:
@@ -24646,14 +24681,14 @@ def _apply_metadata_alignment_to_analysis(
     ):
         evidence.append("low-draft-improvement")
 
-    user_bucket = analysis.user_bucket
-    if metadata_issue is not None:
-        user_bucket = _classify_user_bucket(
-            verdict=verdict,
-            hint_relationship=analysis.hint_relationship,
-            has_contract_issue=_analysis_has_contract_issue(analysis),
-            utility_grade="F",
-        )
+    user_bucket = _classify_user_bucket(
+        verdict=verdict,
+        hint_relationship=analysis.hint_relationship,
+        has_contract_issue=_analysis_has_contract_issue(analysis),
+        has_presentation_warning=bool(
+            analysis.has_thinking_trace or analysis.has_reasoning_leak or analysis.formatting_issues
+        ),
+    )
     return replace(
         analysis,
         verdict=verdict,

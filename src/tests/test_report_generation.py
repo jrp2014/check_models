@@ -3156,6 +3156,38 @@ class TestMarkdownGalleryReport:
         assert "### ✅ org/good" in content
         assert "### ❌ org/bad" in content
 
+    def test_gallery_icon_uses_recommendation_not_execution_success(self, tmp_path: Path) -> None:
+        """Completed output with a presentation warning should use the caveat icon."""
+        text = "<think>Inspect.</think> A useful final caption."
+        result = _make_success("org/thinking")
+        analysis = replace(
+            check_models.analyze_generation_text(
+                text,
+                generated_tokens=12,
+                model_name="org/thinking",
+                prompt="Describe this image.",
+            ),
+            has_reasoning_leak=False,
+            has_thinking_trace=True,
+            user_bucket="caveat",
+        )
+        result = replace(
+            result,
+            generation=_MockGeneration(text=text, generation_tokens=12),
+            quality_analysis=analysis,
+        )
+        out = tmp_path / "model_gallery.md"
+
+        generate_markdown_gallery_report(
+            results=[result],
+            filename=out,
+            prompt="Describe this image.",
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "### ⚠️ org/thinking" in content
+        assert "### ✅ org/thinking" not in content
+
     def test_gallery_is_evidence_only_without_scoreboard_duplication(
         self,
         tmp_path: Path,

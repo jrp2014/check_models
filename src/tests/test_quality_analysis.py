@@ -194,7 +194,7 @@ def test_near_empty_output_promotes_to_unknown_anomaly() -> None:
     # to avoid the harness detector's "too few tokens" check.
     analysis = check_models.analyze_generation_text("A nice photo.", 13)
     assert analysis.verdict == "unknown_runtime_anomaly"
-    assert analysis.user_bucket == "needs_triage"
+    assert analysis.user_bucket == "caveat"
 
 
 def test_analyze_generation_text_context_ignorance_custom_marker() -> None:
@@ -299,6 +299,7 @@ def test_analyze_generation_text_treats_expected_thinking_trace_as_information()
     assert analysis.thinking_trace_markers == ["◁think▷", "◁/think▷"]
     assert analysis.has_reasoning_leak is False
     assert analysis.verdict == "clean"
+    assert analysis.user_bucket == "caveat"
     assert check_models._build_quality_issues_string(analysis) == "thinking-trace"
 
 
@@ -463,6 +464,7 @@ def test_analyze_generation_text_detects_cutoff_when_cap_is_hit() -> None:
 
     assert analysis.likely_capped is True
     assert analysis.verdict in {"cutoff_degraded", "token_cap"}
+    assert analysis.user_bucket in {"avoid", "caveat"}
     assert "token_cap" in analysis.evidence
 
 
@@ -1614,18 +1616,18 @@ class TestClassifyReviewVerdict:
 class TestClassifyUserBucket:
     """Tests for _classify_user_bucket with new verdict types."""
 
-    def test_token_cap_grade_a_recommended(self) -> None:
-        """A-grade token_cap models should be recommended."""
+    def test_token_cap_grade_a_is_caveat(self) -> None:
+        """Even A-grade token-capped output is not presentation-ready."""
         bucket = check_models._classify_user_bucket(
             verdict="token_cap",
             hint_relationship="preserves_trusted_hints",
             has_contract_issue=False,
             utility_grade="A",
         )
-        assert bucket == "recommended"
+        assert bucket == "caveat"
 
-    def test_metadata_alignment_preserves_passing_token_cap_bucket(self) -> None:
-        """Passing metadata alignment must not downgrade benign token caps."""
+    def test_metadata_alignment_normalizes_stale_token_cap_bucket(self) -> None:
+        """Passing metadata alignment should retain canonical token-cap semantics."""
         base = check_models.analyze_generation_text(
             "A normal caption with varied image details and a complete sentence.",
             12,
@@ -1650,7 +1652,7 @@ class TestClassifyUserBucket:
 
         assert refreshed.verdict == "token_cap"
         assert refreshed.metadata_alignment_issue is None
-        assert refreshed.user_bucket == "recommended"
+        assert refreshed.user_bucket == "caveat"
 
     def test_low_draft_improvement_is_canonical_review_evidence(self) -> None:
         """Low draft scores should flow into canonical review evidence."""
@@ -1682,15 +1684,15 @@ class TestClassifyUserBucket:
         )
         assert bucket == "avoid"
 
-    def test_unknown_runtime_anomaly_needs_triage(self) -> None:
-        """unknown_runtime_anomaly models should be needs_triage."""
+    def test_unknown_runtime_anomaly_is_caveat(self) -> None:
+        """Unknown runtime anomalies use the canonical caveat status."""
         bucket = check_models._classify_user_bucket(
             verdict="unknown_runtime_anomaly",
             hint_relationship="preserves_trusted_hints",
             has_contract_issue=False,
             utility_grade="F",
         )
-        assert bucket == "needs_triage"
+        assert bucket == "caveat"
 
     def test_runtime_failure_avoid(self) -> None:
         """runtime_failure models should be avoid."""
@@ -1818,19 +1820,19 @@ class TestClassificationInvariants:
             "ignores_trusted_hints",
         ],
     )
-    def test_unknown_anomaly_always_needs_triage(
+    def test_unknown_anomaly_always_caveat(
         self, utility_grade: str, hint_relationship: str
     ) -> None:
-        """unknown_runtime_anomaly must always map to needs_triage."""
+        """unknown_runtime_anomaly must always map to canonical caveat."""
         bucket = check_models._classify_user_bucket(
             verdict="unknown_runtime_anomaly",
             hint_relationship=hint_relationship,
             has_contract_issue=False,
             utility_grade=utility_grade,
         )
-        assert bucket == "needs_triage", (
+        assert bucket == "caveat", (
             f"unknown_runtime_anomaly + grade={utility_grade} + hints={hint_relationship} "
-            f"must map to 'needs_triage', got '{bucket}'"
+            f"must map to 'caveat', got '{bucket}'"
         )
 
     # -- Clean verdict implies no breaking evidence --
