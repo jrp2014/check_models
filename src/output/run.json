@@ -16,18 +16,18 @@
     "run_json": "run.json"
   },
   "counts": {
-    "models_failed": 0,
-    "models_successful": 61,
+    "models_failed": 6,
+    "models_successful": 55,
     "models_total": 61
   },
-  "eval_mode": "assisted",
-  "generated_at": "2026-07-17 23:16:01 BST",
-  "has_descriptive_metadata": true,
+  "eval_mode": "triage",
+  "generated_at": "2026-07-18 19:23:21 BST",
+  "has_descriptive_metadata": false,
   "library_versions": {
     "Pillow": "12.3.0",
     "huggingface-hub": "1.24.0",
-    "mlx": "0.32.1.dev20260717+b7c3dd6d",
-    "mlx-audio": "0.4.4",
+    "mlx": "0.32.1.dev20260718+b7c3dd6d",
+    "mlx-audio": "0.4.5",
     "mlx-lm": "0.31.3",
     "mlx-metal": null,
     "mlx-vlm": "0.6.5",
@@ -35,11 +35,11 @@
     "tokenizers": "0.22.2",
     "transformers": "5.14.1"
   },
-  "metadata_exposed_to_prompt": true,
-  "prompt": "Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.\n- Output only the description text after the label.\n\nKeywords:\n- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.\n- Output only the keyword list after the label.\n\nRules:\n- Include only details that are definitely visible in the image.\n- Reuse metadata terms only when they are clearly supported by the image.\n- If metadata and image disagree, follow the image.\n- Prefer omission to speculation.\n- Do not copy prompt instructions into the Title, Description, or Keywords fields.\n- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.\n- Do not output reasoning, notes, hedging, or extra sections.\n\nContext: Authoritative context:\n- Location terms: England, Europe, Town, UK\n- Capture date/time: 2026-07-11 19:04:26 BST 19:04:26\n- GPS: 51.226814\u00b0N, 1.401142\u00b0E\n- Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.\n\nDraft descriptive metadata:\n- Existing title: Seafront, Deal, England, UK, GBR, Europe\n- Existing description: A coastal view of Deal, Kent, UK, showing the shingle beach, sea, and seafront buildings on a partly cloudy day.\n- Existing keywords: Beach, Buildings, Cars, Coastline, Deal, Horizon, Kent, Landscape, People, Promenade, Seaside, Shore, Sitting, Sky, Swimming, Walking, Water, Waterfront, Waves, architecture\n- Treat this draft as fallible. Retain supported details, correct errors, and add important visible information.",
-  "prompt_sha256": "92f9306b902ccd03614c23bad427362174e2cf812272dec306f3fb65aef39ca4",
+  "metadata_exposed_to_prompt": false,
+  "prompt": "Describe this image briefly.",
+  "prompt_sha256": "d760336d0fd143932f194573dd63f6b531e0ffbc2c4f1595e015392a3471c318",
   "schema_version": "1.0",
-  "selection_basis": "metadata-assisted visual verification",
-  "semantic_rankings_grounded": true,
-  "total_runtime_seconds": 1414.698
+  "selection_basis": "caption hygiene only",
+  "semantic_rankings_grounded": false,
+  "total_runtime_seconds": 1041.425
 }

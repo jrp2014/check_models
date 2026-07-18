@@ -1,32 +1,31 @@
 <!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
 
-# \[mlx-vlm / mlx\]\[Long-context collapse\] Long-context generation collapsed or became too short affecting 1 model(s)
+# \[mlx-vlm\]\[Stop-token leakage\] Stop/control tokens leaked into generated text affecting 1 model(s)
 
 ## Summary
 
-1 model(s) show **Long-context collapse** that should be filed against mlx-vlm first; MLX if cache/runtime reproduces.
+1 model(s) show **Stop-token leakage** that should be filed against mlx-vlm.
 
-- **Observed problem:** Long-context generation collapsed or became too short
-- **Target:** mlx-vlm first; MLX if cache/runtime reproduces
+- **Observed problem:** Stop/control tokens leaked into generated text
+- **Target:** mlx-vlm
 - **Affected models:** 1
-- **Fixed when:** Full and reduced reruns avoid context collapse.
+- **Fixed when:** No leaked stop/control tokens.
 
 
 ## Affected Models
 
 <!-- markdownlint-disable MD060 -->
 
-| Model                                     | Observed Behavior                                                                                  | Token Counts                                                                      | Optional Context                                                                                                                                                                           |
-|-------------------------------------------|----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/paligemma2-3b-pt-896-4bit` | generated_tokens~3 \| prompt_tokens=4103, output_tokens=3, output/prompt=0.1%, weak text=truncated | prompt=4,103 \| output/prompt=0.07% \| visual input burden=100% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260718T182321Z_007_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json) |
+| Model                                     | Observed Behavior                                  | Token Counts                                         | Optional Context                                                                                                                                                                     |
+|-------------------------------------------|----------------------------------------------------|------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/Qwen3-VL-2B-Thinking-bf16` | decoded text contains control token &lt;/think&gt; | prompt=317 \| output/prompt=59.31% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260718T182321Z_008_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json) |
 <!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
 
-- `mlx-community/paligemma2-3b-pt-896-4bit`: Output appears truncated to about 3 tokens.
-- `mlx-community/paligemma2-3b-pt-896-4bit`: At long prompt length (4103 tokens), output stayed unusually short (3 tokens; ratio 0.1%; weak text signal truncated).
-- Output excerpt: `Cat.`
+- `mlx-community/Qwen3-VL-2B-Thinking-bf16`: Special control token &lt;/think&gt; appeared in generated text.
+- Output excerpt: `...blue button. The background is the pink couch, so the main elements are the two cats, the remotes, and the pink fabric. I need to describe this briefly. &lt;/think&gt; Two tabby cats are lying on a bright pink couch, relaxed and asleep. A white remote control with a blue button sits between them, and another remote co...`
 
 
 ## Minimal Reproduction
@@ -39,7 +38,7 @@ Image SHA256: `dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e`
 
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/paligemma2-3b-pt-896-4bit --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model mlx-community/Qwen3-VL-2B-Thinking-bf16 --image cats.jpg --prompt 'Describe this image briefly.' --max-tokens 200 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
 Minimal Python repro (representative model):
@@ -49,7 +48,7 @@ from mlx_vlm.generate import generate
 from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load
 
-MODEL = 'mlx-community/paligemma2-3b-pt-896-4bit'
+MODEL = 'mlx-community/Qwen3-VL-2B-Thinking-bf16'
 IMAGE = 'cats.jpg'
 PROMPT = 'Describe this image briefly.'
 LOAD_KWARGS = {'trust_remote_code': True}
@@ -86,27 +85,28 @@ Generation/load config:
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "mlx-community/paligemma2-3b-pt-896-4bit"
+  "model": "mlx-community/Qwen3-VL-2B-Thinking-bf16"
 }
 ```
 
 Optional advanced context:
 
-- `mlx-community/paligemma2-3b-pt-896-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260718T182321Z_007_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json)
+- `mlx-community/Qwen3-VL-2B-Thinking-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260718T182321Z_008_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
 ## Expected Fix Signal
 
-- [ ] A same-command rerun and a reduced image/text burden rerun show consistent prompt-token accounting and no long-context collapse.
+- [ ] Affected reruns contain no leaked stop/control tokens and terminate cleanly before the configured max-token cap when the response is complete.
 - [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem.
 
 
 ## Fix Checklist
 
-- [ ] Rerun with reduced image/text burden and compare output recovery.
-- [ ] Compare prompt-token accounting with text-only and image+text prompts.
-- [ ] Inspect cache allocation, prefill step size, and long-context generation behavior.
+- [ ] Inspect model EOS token IDs and tokenizer special-token mappings.
+- [ ] Verify mlx-vlm stop criteria receive all configured EOS/stop tokens.
+- [ ] Check `skip_special_tokens` handling during decode.
+- [ ] Strip generated control tokens such as `<|end|>` and `</think>` only after confirming generation stopped at the right boundary.
 
 
 ## Appendix: Environment
@@ -146,16 +146,18 @@ Optional advanced context:
 
 ## Appendix: Detailed Evidence
 
-### `mlx-community/paligemma2-3b-pt-896-4bit`
+### `mlx-community/Qwen3-VL-2B-Thinking-bf16`
 
 Observed signals:
 
-- Output appears truncated to about 3 tokens.
-- At long prompt length (4103 tokens), output stayed unusually short (3 tokens; ratio 0.1%; weak text signal truncated).
+- Special control token &lt;/think&gt; appeared in generated text.
 
 Sample output:
 
 ```text
-Cat.
+...lements are the two cats, the remotes, and the pink fabric. I need to describe this briefly.
+</think>
+
+Two tabby cats are lying on a bright pink couch, relaxed and asleep. A white remote control...
 ```
 

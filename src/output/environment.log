@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-07-17 22:49:11 BST
+FULL ENVIRONMENT DUMP - 2026-07-18 19:05:58 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -24,8 +24,8 @@ certifi==2026.6.17
 cffi==2.1.0
 cfgv==3.5.0
 charset-normalizer==3.4.9
-check_models==0.8.5
-check_models==0.8.5
+check_models==0.8.6
+check_models==0.8.6
 click==8.4.2
 cmake==4.4.0
 coverage==7.15.2
@@ -39,7 +39,7 @@ editor==1.8.0
 einops==0.8.2
 execnet==2.1.2
 fastapi==0.139.2
-filelock==3.30.3
+filelock==3.31.0
 flatbuffers==25.12.19
 frozenlist==1.8.0
 fsspec==2026.4.0
@@ -81,9 +81,9 @@ mdit-py-plugins==0.6.1
 mdurl==0.1.2
 miniaudio==1.71
 ml_dtypes==0.5.4
-mlx==0.32.1.dev20260717+b7c3dd6d
-mlx==0.32.1.dev20260717+b7c3dd6d
-mlx-audio==0.4.4
+mlx==0.32.1.dev20260718+b7c3dd6d
+mlx==0.32.1.dev20260718+b7c3dd6d
+mlx-audio==0.4.5
 mlx-lm==0.31.3
 mlx-vlm==0.6.5
 more-itertools==11.1.0
@@ -108,7 +108,7 @@ pathspec==1.1.1
 pfzy==0.3.4
 pillow==12.3.0
 pip==26.1.2
-platformdirs==4.10.0
+platformdirs==4.10.1
 pluggy==1.6.0
 pre_commit==4.6.0
 prompt_toolkit==3.0.52
@@ -174,7 +174,7 @@ tree-sitter-java==0.23.5
 tree-sitter-php==0.24.1
 tree-sitter-rust==0.24.2
 tree-sitter-typescript==0.23.2
-ty==0.0.60
+ty==0.0.61
 typer==0.27.0
 types-defusedxml==0.7.0.20260504
 types-psutil==7.2.2.20260518
@@ -203,5 +203,5 @@ yarl==1.24.2
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-07-17 22:49:12 BST
+Environment dump completed at 2026-07-18 19:05:58 BST
 ================================================================================
