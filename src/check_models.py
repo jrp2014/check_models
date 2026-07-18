@@ -1306,6 +1306,7 @@ class JsonlReviewRecord(TypedDict):
 
 
 type MaintainerConfidence = Literal["high", "medium", "low"]
+type IssueReadiness = Literal["confirmed", "needs-reproduction", "not-evaluated"]
 
 
 class JsonlMaintainerTriageRecord(TypedDict, total=False):
@@ -1313,6 +1314,7 @@ class JsonlMaintainerTriageRecord(TypedDict, total=False):
 
     suspected_owner: Required[str]
     confidence: Required[MaintainerConfidence]
+    issue_readiness: Required[IssueReadiness]
     issue_kind: Required[str]
     summary: Required[str]
     next_action: Required[str]
@@ -11978,6 +11980,37 @@ def _failure_review_evidence(result: PerformanceResult) -> list[str]:
     return _dedupe_preserve_order(evidence) or ["runtime_failure"]
 
 
+def _has_template_opened_thinking(result: PerformanceResult) -> bool:
+    """Return whether a disabled-thinking run received a template-opened trace."""
+    diagnostics = result.prompt_diagnostics
+    analysis = _review_analysis_for_result(result)
+    if diagnostics is None or analysis is None or not analysis.has_thinking_trace:
+        return False
+    if diagnostics.generate_kwargs.get("enable_thinking") is True:
+        return False
+    preview = (diagnostics.rendered_prompt_preview or "").rstrip()
+    return any(preview.endswith(start) for start, _end in THINKING_TRACE_DELIMITER_PAIRS)
+
+
+def _issue_readiness_for_result(
+    result: PerformanceResult,
+    review: JsonlReviewRecord,
+    analysis: GenerationQualityAnalysis | None,
+) -> IssueReadiness:
+    """Return whether maintainer evidence is issue-ready or needs a control run."""
+    if _is_indeterminate_connectivity_failure(result):
+        return "not-evaluated"
+    if not result.success:
+        return "confirmed"
+    if _has_template_opened_thinking(result):
+        return "needs-reproduction"
+    if review["verdict"] == "context_budget" and result.rerun_evidence is None:
+        return "needs-reproduction"
+    if analysis is not None and analysis.has_harness_issue:
+        return "confirmed"
+    return "needs-reproduction"
+
+
 def _review_issue_subtype(
     result: PerformanceResult,
     review: JsonlReviewRecord,
@@ -11985,7 +12018,11 @@ def _review_issue_subtype(
 ) -> str | None:
     """Return the most actionable subtype label for maintainer triage surfaces."""
     subtype: str | None = None
-    if analysis is not None and analysis.harness_issue_type:
+    if _has_template_opened_thinking(result):
+        subtype = "thinking_configuration"
+    elif review["verdict"] == "context_budget" and result.success:
+        subtype = "context_boundary"
+    elif analysis is not None and analysis.harness_issue_type:
         subtype = analysis.harness_issue_type
     elif result.error_code:
         subtype = result.error_code
@@ -12006,24 +12043,28 @@ def _review_confidence(
     analysis: GenerationQualityAnalysis | None,
 ) -> MaintainerConfidence:
     """Return confidence level for maintainer-oriented triage routing."""
-    if not result.success and (
+    confidence: MaintainerConfidence = "low"
+    if _has_template_opened_thinking(result):
+        confidence = "medium"
+    elif result.success and review["verdict"] == "context_budget":
+        confidence = "medium" if review["prompt_tokens_nontext_est"] is not None else "low"
+    elif not result.success and (
         result.error_code is not None
         or result.error_traceback is not None
         or result.error_package is not None
     ):
-        return "low" if _is_indeterminate_connectivity_failure(result) else "high"
-    if analysis is not None:
-        if analysis.has_harness_issue and analysis.harness_issue_type is not None:
-            return "high"
-        if review["verdict"] in {"cutoff", "context_budget"} and (
-            review["hit_max_tokens"] or review["nontext_prompt_ratio"] is not None
+        confidence = "low" if _is_indeterminate_connectivity_failure(result) else "high"
+    elif analysis is not None:
+        if (analysis.has_harness_issue and analysis.harness_issue_type is not None) or (
+            review["verdict"] in {"cutoff", "context_budget"}
+            and (review["hit_max_tokens"] or review["nontext_prompt_ratio"] is not None)
         ):
-            return "high"
-        if analysis.evidence or analysis.missing_sections or analysis.missing_context_terms:
-            return "medium"
-    if review["evidence"] or review["missing_sections"] or review["missing_terms"]:
-        return "medium"
-    return "low"
+            confidence = "high"
+        elif analysis.evidence or analysis.missing_sections or analysis.missing_context_terms:
+            confidence = "medium"
+    elif review["evidence"] or review["missing_sections"] or review["missing_terms"]:
+        confidence = "medium"
+    return confidence
 
 
 def _failure_context_text(result: PerformanceResult) -> str:
@@ -12129,6 +12170,16 @@ def _review_next_action_for_result(
     review: JsonlReviewRecord,
 ) -> str:
     """Return one actionable next-step line, using result details when available."""
+    if _has_template_opened_thinking(result):
+        return (
+            "Re-run with the rendered template and effective thinking kwargs captured; compare "
+            "an explicitly thinking-disabled template before filing a stop-token issue."
+        )
+    if result.success and review["verdict"] == "context_budget":
+        return (
+            "Run a controlled reduced-image or lower-visual-token comparison before assigning "
+            "the context-boundary behaviour to mlx, mlx-vlm, or the model."
+        )
     if review["verdict"] == "runtime_failure" and (
         action := _review_runtime_failure_next_action(result)
     ):
@@ -12154,9 +12205,16 @@ def _build_jsonl_maintainer_triage_record(
 ) -> JsonlMaintainerTriageRecord:
     """Build an action-oriented maintainer triage payload for one result."""
     analysis = _review_analysis_for_result(result)
+    issue_readiness = _issue_readiness_for_result(result, review, analysis)
+    suspected_owner = review["owner"]
+    if _has_template_opened_thinking(result):
+        suspected_owner = "model-config / mlx-vlm"
+    elif result.success and review["verdict"] == "context_budget":
+        suspected_owner = "model-config / mlx-vlm / mlx"
     triage: JsonlMaintainerTriageRecord = {
-        "suspected_owner": review["owner"],
+        "suspected_owner": suspected_owner,
         "confidence": _review_confidence(result, review, analysis),
+        "issue_readiness": issue_readiness,
         "issue_kind": review["verdict"],
         "summary": _review_focus_text(review, analysis),
         "next_action": _review_maintainer_next_action(result, review),
@@ -12186,7 +12244,7 @@ def _build_jsonl_maintainer_triage_record(
         triage["nontext_prompt_ratio"] = review["nontext_prompt_ratio"]
     triage["prompt_burden_kind"] = review.get("prompt_burden_kind", "unknown")
     triage["prompt_burden_source"] = review.get("prompt_burden_source", "unavailable")
-    if issue_cluster is not None:
+    if issue_cluster is not None and issue_readiness == "confirmed":
         triage["issue_cluster_id"] = issue_cluster.cluster_id
         triage["issue_cluster_path"] = _issue_cluster_path(issue_cluster)
         triage["acceptance_signal"] = issue_cluster.acceptance_signal
@@ -14438,6 +14496,9 @@ def _build_issue_clusters(snapshot: DiagnosticsSnapshot) -> tuple[IssueCluster, 
     for result, _sample_output in snapshot.harness_results:
         analysis = _quality_analysis_for_result(result)
         review = _review_for_result(result)
+        triage = _maintainer_triage_for_result(result)
+        if triage is not None and triage["issue_readiness"] != "confirmed":
+            continue
         subtype = (
             analysis.harness_issue_type
             if analysis is not None and analysis.harness_issue_type
@@ -16059,6 +16120,80 @@ def _diagnostics_indeterminate_matrix(
     )
 
 
+def _diagnostics_reproduction_observations(snapshot: DiagnosticsSnapshot) -> list[str]:
+    """Render successful signals that need a controlled run before issue filing."""
+    observations: list[tuple[PerformanceResult, JsonlMaintainerTriageRecord]] = []
+    for result, _sample in snapshot.harness_results:
+        triage = _maintainer_triage_for_result(result)
+        if triage is not None and triage["issue_readiness"] == "needs-reproduction":
+            observations.append((result, triage))
+    if not observations:
+        return []
+
+    rows: list[tuple[str, ...]] = []
+    details: list[ReportDetails] = []
+    for result, triage in sorted(observations, key=lambda item: item[0].model_name):
+        rows.append(
+            (
+                result.model_name,
+                triage.get("issue_subtype", triage["issue_kind"]),
+                triage["suspected_owner"],
+                triage["confidence"],
+                triage["summary"],
+                triage["next_action"],
+            )
+        )
+        evidence_blocks: list[object] = []
+        prompt_diagnostics = _prompt_diagnostics_to_json(result.prompt_diagnostics)
+        if prompt_diagnostics:
+            evidence_blocks.append(
+                ReportCodeBlock(
+                    json.dumps(prompt_diagnostics, indent=2, sort_keys=True),
+                    language="json",
+                )
+            )
+        output = _generation_text_value(result.generation)
+        if output.strip():
+            evidence_blocks.append(ReportCodeBlock(output, language="text"))
+        if evidence_blocks:
+            details.append(
+                ReportDetails(
+                    summary=f"Complete generated output: {result.model_name}",
+                    blocks=tuple(evidence_blocks),
+                )
+            )
+
+    return _guard_markdownlint_block(
+        render_report_markdown(
+            (
+                ReportSection(
+                    title="Observations Requiring Controlled Reproduction",
+                    blocks=(
+                        ReportParagraph(
+                            "These completed runs are useful diagnostic observations, but they "
+                            "do not yet isolate an upstream library fault and generate no issue "
+                            "draft."
+                        ),
+                        ReportTable(
+                            headers=(
+                                "Model",
+                                "Observation",
+                                "Routing",
+                                "Confidence",
+                                "Evidence",
+                                "Controlled next action",
+                            ),
+                            rows=tuple(rows),
+                        ),
+                        *details,
+                    ),
+                ),
+            )
+        ),
+        rules=f"{MARKDOWNLINT_TABLE_PIPE_RULES} {MARKDOWNLINT_DETAILS_RULES}",
+    )
+
+
 def _diagnostics_issue_matrix(clusters: Sequence[IssueCluster]) -> list[str]:
     """Render only mlx-vlm/MLX filing-scope clusters as a compact issue matrix."""
     if not clusters:
@@ -16974,6 +17109,7 @@ def generate_diagnostics_report(
     parts.append("")
     parts.extend(_diagnostics_indeterminate_matrix(indeterminate))
     parts.extend(_diagnostics_crash_matrix(failed))
+    parts.extend(_diagnostics_reproduction_observations(diagnostics_snapshot))
     parts.extend(_diagnostics_issue_matrix(mlx_vlm_clusters))
     parts.extend(
         _diagnostics_cluster_issue_sections(

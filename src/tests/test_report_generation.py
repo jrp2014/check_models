@@ -1245,6 +1245,86 @@ def _make_harness_success(
     )
 
 
+def test_thinking_template_mismatch_requires_reproduction_not_issue_draft() -> None:
+    """A template-opened complete trace is configuration evidence, not a stop-token fault."""
+    text = "<think>Inspecting the image.</think> A cat rests on a blanket."
+    result = replace(
+        _make_harness_success(
+            "org/thinking-model",
+            text=text,
+            prompt_tokens=120,
+            generation_tokens=20,
+            harness_type="stop_token",
+            harness_detail="token_leak:</think>",
+        ),
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            rendered_prompt_preview="<|im_start|>assistant\n<think>\n",
+            special_tokens=("<|im_end|>", "</think>"),
+            generate_kwargs={"skip_special_tokens": False},
+        ),
+    )
+    assert result.quality_analysis is not None
+    result = replace(
+        result,
+        quality_analysis=replace(
+            result.quality_analysis,
+            has_thinking_trace=True,
+            thinking_trace_markers=["<think>", "</think>"],
+        ),
+    )
+
+    triage = check_models._maintainer_triage_for_result(result)
+    assert triage is not None
+    assert triage["issue_readiness"] == "needs-reproduction"
+    assert triage["issue_subtype"] == "thinking_configuration"
+    assert triage["confidence"] == "medium"
+    assert triage["suspected_owner"] == "model-config / mlx-vlm"
+    snapshot = DiagnosticsSnapshot(harness_results=((result, text),))
+    assert check_models._build_issue_clusters(snapshot) == ()
+    observation = "\n".join(check_models._diagnostics_reproduction_observations(snapshot))
+    assert "Observations Requiring Controlled Reproduction" in observation
+    assert "thinking_configuration" in observation
+    assert "Complete generated output: org/thinking-model" in observation
+    assert text in observation
+    assert "rendered_prompt_preview" in observation
+
+
+def test_single_visual_context_boundary_requires_controlled_rerun() -> None:
+    """One weak visual-heavy result cannot establish an MLX long-context fault."""
+    result = _make_harness_success(
+        "org/pretrained-model",
+        text="Cat.",
+        prompt_tokens=4103,
+        generation_tokens=2,
+        harness_type="long_context",
+        harness_detail="long_context_low_ratio(0.0%;4103->2)",
+    )
+    analysis = result.quality_analysis
+    assert analysis is not None
+    result = replace(
+        result,
+        quality_analysis=replace(
+            analysis,
+            prompt_tokens_total=4103,
+            prompt_tokens_text_est=6,
+            prompt_tokens_nontext_est=4097,
+        ),
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            processed_image_width=896,
+            processed_image_height=896,
+            generate_kwargs={"prefill_step_size": 4096},
+        ),
+    )
+
+    triage = check_models._maintainer_triage_for_result(result)
+    assert triage is not None
+    assert triage["issue_readiness"] == "needs-reproduction"
+    assert triage["issue_subtype"] == "context_boundary"
+    assert "reduced-image" in triage["next_action"]
+    snapshot = DiagnosticsSnapshot(harness_results=((result, "Cat."),))
+    assert check_models._build_issue_clusters(snapshot) == ()
+
+
 class TestModelCapabilityScorecard:
     """Tests for the concise model capability scorecard artifact."""
 
@@ -6228,8 +6308,10 @@ class TestGithubIssueReportContent:
         assert "Python Version" in content
         assert "Priority" not in content
 
-    def test_harness_issue_humanizes_details_and_includes_checklist(self, tmp_path: Path) -> None:
-        """Harness issue templates should show humanized details and fix guidance."""
+    def test_single_long_context_signal_stays_a_reproduction_observation(
+        self, tmp_path: Path
+    ) -> None:
+        """An unpaired long-context signal should not create an upstream issue draft."""
         harness_result = _make_harness_success(
             name="org/harness-empty",
             harness_type="long_context",
@@ -6248,19 +6330,11 @@ class TestGithubIssueReportContent:
             run_args=None,
         )
 
-        content = next(iter(generated.values())).read_text(encoding="utf-8")
-        assert content.startswith(
-            "<!-- markdownlint-disable MD012 MD013 MD033 MD060 -->\n\n"
-            "# \\[mlx-vlm / mlx\\]\\[Long-context collapse\\]"
-        )
-        assert "## Minimal Reproduction" in content
-        assert "mlx-vlm first; MLX if cache/runtime reproduces" in content
-        assert "At long prompt length (5000 tokens), generation returned empty output." in content
-        assert "context_budget" not in content
-        assert "long_context" not in content
-        assert "Rerun with reduced image/text burden" in content
-        assert "Expected Fix Signal" in content
-        assert "Priority" not in content
+        assert generated == {}
+        content = "\n".join(check_models._diagnostics_reproduction_observations(snapshot))
+        assert "Observations Requiring Controlled Reproduction" in content
+        assert "context_boundary" in content
+        assert "controlled reduced-image" in content
 
     def test_multiple_stop_token_models_produce_one_issue(self, tmp_path: Path) -> None:
         """Multiple stop-token harness models should cluster into one issue draft."""
