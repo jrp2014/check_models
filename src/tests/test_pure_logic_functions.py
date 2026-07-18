@@ -17,7 +17,7 @@ import subprocess
 from dataclasses import dataclass, fields, replace
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 if TYPE_CHECKING:  # pragma: no cover
     import types
@@ -1115,6 +1115,223 @@ class TestSystemProfilerParsing:
 
         assert arch == "arm64"
         assert gpu_info == "Apple M4 Max"
+
+
+class TestHardwareFacts:
+    """Tests for dependency-free MLX and macOS hardware fact collection."""
+
+    def test_get_mlx_device_info_normalizes_and_caches(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """The report-facing MLX subset should be validated and cached."""
+        runtime = MagicMock()
+        runtime.device_info.return_value = {
+            "device_name": " Apple M5 Max ",
+            "architecture": " applegpu_g17s ",
+            "memory_size": 128 * 1024**3,
+            "max_recommended_working_set_size": 96 * 1024**3,
+            "ignored": "value",
+        }
+        mod._get_mlx_device_info.cache_clear()
+        with patch.object(mod, "mx", runtime):
+            first = mod._get_mlx_device_info()
+            second = mod._get_mlx_device_info()
+        mod._get_mlx_device_info.cache_clear()
+
+        assert (
+            first
+            == second
+            == {
+                "device_name": "Apple M5 Max",
+                "architecture": "applegpu_g17s",
+                "memory_size": 128 * 1024**3,
+                "max_recommended_working_set_size": 96 * 1024**3,
+            }
+        )
+        runtime.device_info.assert_called_once_with()
+
+    @pytest.mark.parametrize(
+        "payload",
+        [
+            {"memory_size": True},
+            {"memory_size": 0},
+            {"memory_size": -1},
+            {"memory_size": "128 GB"},
+            {"device_name": "  ", "architecture": 17},
+        ],
+    )
+    def test_get_mlx_device_info_rejects_invalid_values(
+        self,
+        mod: types.ModuleType,
+        payload: dict[str, object],
+    ) -> None:
+        """Invalid MLX values should never become report facts."""
+        runtime = MagicMock()
+        runtime.device_info.return_value = payload
+        mod._get_mlx_device_info.cache_clear()
+        with patch.object(mod, "mx", runtime):
+            assert mod._get_mlx_device_info() == {}
+        mod._get_mlx_device_info.cache_clear()
+
+    def test_get_mlx_device_info_handles_missing_and_errored_runtime(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """Missing or errored MLX probes should return an empty fact set."""
+        mod._get_mlx_device_info.cache_clear()
+        with patch.object(mod, "mx", None):
+            assert mod._get_mlx_device_info() == {}
+        mod._get_mlx_device_info.cache_clear()
+
+        runtime = MagicMock()
+        runtime.device_info.side_effect = RuntimeError("Metal unavailable")
+        with patch.object(mod, "mx", runtime):
+            assert mod._get_mlx_device_info() == {}
+        mod._get_mlx_device_info.cache_clear()
+
+    def test_get_total_memory_bytes_prefers_psutil(self, mod: types.ModuleType) -> None:
+        """The established psutil total remains the primary memory source."""
+        fake_psutil = MagicMock()
+        fake_psutil.virtual_memory.return_value.total = 64 * 1024**3
+        with (
+            patch.object(mod, "psutil", fake_psutil),
+            patch.object(mod, "_get_macos_sysctl_value") as sysctl_value,
+            patch.object(mod, "_get_mlx_device_info") as mlx_info,
+        ):
+            assert mod._get_total_memory_bytes() == 64 * 1024**3
+        sysctl_value.assert_not_called()
+        mlx_info.assert_not_called()
+
+    def test_get_total_memory_bytes_uses_sysctl_without_psutil(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """A valid macOS hw.memsize value should fill the optional-dependency gap."""
+        with (
+            patch.object(mod, "psutil", None),
+            patch.object(mod, "_get_macos_sysctl_value", return_value=str(48 * 1024**3)),
+            patch.object(mod, "_get_mlx_device_info") as mlx_info,
+        ):
+            assert mod._get_total_memory_bytes() == 48 * 1024**3
+        mlx_info.assert_not_called()
+
+    def test_get_total_memory_bytes_falls_back_from_sysctl_to_mlx(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """MLX memory should be used after unavailable sysctl data."""
+        with (
+            patch.object(mod, "psutil", None),
+            patch.object(mod, "_get_macos_sysctl_value", return_value=None),
+            patch.object(
+                mod,
+                "_get_mlx_device_info",
+                return_value={"memory_size": 32 * 1024**3},
+            ),
+        ):
+            assert mod._get_total_memory_bytes() == 32 * 1024**3
+
+    def test_get_total_memory_bytes_returns_none_without_valid_source(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """Failed probes must not turn into a guessed memory amount."""
+        with (
+            patch.object(mod, "psutil", None),
+            patch.object(mod, "_get_macos_sysctl_value", return_value="not-an-int"),
+            patch.object(mod, "_get_mlx_device_info", return_value={}),
+        ):
+            assert mod._get_total_memory_bytes() is None
+
+    def test_get_recommended_working_set_bytes_requires_positive_mlx_value(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """The working-set ceiling should come only from normalized MLX facts."""
+        with patch.object(
+            mod,
+            "_get_mlx_device_info",
+            return_value={"max_recommended_working_set_size": 24 * 1024**3},
+        ):
+            assert mod._get_recommended_working_set_bytes() == 24 * 1024**3
+        with patch.object(mod, "_get_mlx_device_info", return_value={}):
+            assert mod._get_recommended_working_set_bytes() is None
+
+    def test_get_system_characteristics_surfaces_mlx_hardware_facts(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """Human system information should include every normalized MLX fact."""
+        with (
+            patch.object(mod.platform, "system", return_value="Darwin"),
+            patch.object(mod.platform, "machine", return_value="arm64"),
+            patch.object(mod, "_get_macos_toolchain_info", return_value={}),
+            patch.object(mod, "get_system_info", return_value=("arm64", None)),
+            patch.object(mod, "_get_apple_silicon_info", return_value={}),
+            patch.object(
+                mod,
+                "_get_macos_sysctl_value",
+                side_effect=lambda name: (
+                    "Apple M5 Max" if name == "machdep.cpu.brand_string" else None
+                ),
+            ),
+            patch.object(mod, "_get_total_memory_bytes", return_value=128 * 1024**3),
+            patch.object(
+                mod,
+                "_get_mlx_device_info",
+                return_value={
+                    "device_name": "Apple M5 Max",
+                    "architecture": "applegpu_g17s",
+                    "max_recommended_working_set_size": 96 * 1024**3,
+                },
+            ),
+            patch.object(mod, "_get_mlx_backend_artifact_info", return_value={}),
+            patch.object(mod, "psutil", None),
+        ):
+            info = mod.get_system_characteristics()
+
+        assert info["GPU/Chip"] == "Apple M5 Max"
+        assert info["MLX Device"] == "Apple M5 Max"
+        assert info["GPU Architecture"] == "applegpu_g17s"
+        assert info["RAM"] == "128.0 GB"
+        assert info["Recommended Working Set"] == "96.0 GB"
+
+    @pytest.mark.parametrize(
+        ("profiler_name", "sysctl_name", "mlx_name", "expected"),
+        [
+            ("Apple M4 Max", "Apple M5 Max", "MLX Device", "Apple M4 Max"),
+            (None, "Apple M5 Max", "MLX Device", "Apple M5 Max"),
+            (None, None, "MLX Device", "MLX Device"),
+        ],
+    )
+    def test_get_system_characteristics_chip_fallback_order(
+        self,
+        mod: types.ModuleType,
+        profiler_name: str | None,
+        sysctl_name: str | None,
+        mlx_name: str,
+        expected: str,
+    ) -> None:
+        """Chip identity should retain profiler priority and degrade gracefully."""
+        with (
+            patch.object(mod.platform, "system", return_value="Darwin"),
+            patch.object(mod, "_get_macos_toolchain_info", return_value={}),
+            patch.object(mod, "get_system_info", return_value=("arm64", profiler_name)),
+            patch.object(mod, "_get_apple_silicon_info", return_value={}),
+            patch.object(mod, "_get_macos_sysctl_value", return_value=sysctl_name),
+            patch.object(mod, "_get_total_memory_bytes", return_value=None),
+            patch.object(
+                mod,
+                "_get_mlx_device_info",
+                return_value={"device_name": mlx_name},
+            ),
+            patch.object(mod, "_get_mlx_backend_artifact_info", return_value={}),
+            patch.object(mod, "psutil", None),
+        ):
+            info = mod.get_system_characteristics()
+
+        assert info["GPU/Chip"] == expected
 
 
 class TestPreflightDependencyDiagnostics:

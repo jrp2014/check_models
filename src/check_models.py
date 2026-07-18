@@ -1068,6 +1068,15 @@ type LibraryVersionDict = dict[str, str | None]  # Library name to version mappi
 type MetricValue = int | float | str | bool | None  # Common scalar metric variants for metrics
 
 
+class MlxDeviceInfo(TypedDict, total=False):
+    """Validated subset of ``mx.device_info()`` used by reports."""
+
+    device_name: str
+    architecture: str
+    memory_size: int
+    max_recommended_working_set_size: int
+
+
 class _ExifNotExtracted:
     """Sentinel for callers that already checked EXIF and found nothing."""
 
@@ -19468,6 +19477,78 @@ def _run_macos_toolchain_command(command: Sequence[str], *, timeout: int = 2) ->
     return output or None
 
 
+@lru_cache(maxsize=1)
+def _get_mlx_device_info() -> MlxDeviceInfo:
+    """Return the validated report-facing subset of ``mx.device_info()``."""
+    if mx is None:
+        return {}
+    device_info_fn = getattr(mx, "device_info", None)
+    if not callable(device_info_fn):
+        return {}
+    try:
+        payload = _as_str_object_mapping(device_info_fn())
+    except (AttributeError, OSError, RuntimeError, TypeError, ValueError) as err:
+        logger.debug("Could not retrieve MLX device information: %s", err)
+        return {}
+    if payload is None:
+        return {}
+
+    info: MlxDeviceInfo = {}
+    device_name = payload.get("device_name")
+    if isinstance(device_name, str) and device_name.strip():
+        info["device_name"] = device_name.strip()
+    architecture = payload.get("architecture")
+    if isinstance(architecture, str) and architecture.strip():
+        info["architecture"] = architecture.strip()
+    memory_size = payload.get("memory_size")
+    if type(memory_size) is int and memory_size > 0:
+        info["memory_size"] = memory_size
+    recommended_size = payload.get("max_recommended_working_set_size")
+    if type(recommended_size) is int and recommended_size > 0:
+        info["max_recommended_working_set_size"] = recommended_size
+    return info
+
+
+def _get_macos_sysctl_value(name: str) -> str | None:
+    """Read one allowlisted macOS hardware sysctl through the bounded runner."""
+    if platform.system() != "Darwin":
+        return None
+    if name not in {"hw.memsize", "machdep.cpu.brand_string"}:
+        return None
+    return _run_macos_toolchain_command(["/usr/sbin/sysctl", "-n", name])
+
+
+def _positive_int_text(value: str | None) -> int | None:
+    """Parse a strictly positive integer or return no value."""
+    if value is None:
+        return None
+    try:
+        parsed = int(value)
+    except ValueError:
+        return None
+    return parsed if parsed > 0 else None
+
+
+def _get_total_memory_bytes() -> int | None:
+    """Return detected unified memory without inventing a fallback amount."""
+    if psutil is not None:
+        try:
+            total = psutil.virtual_memory().total
+        except (AttributeError, OSError, RuntimeError, TypeError, ValueError):
+            total = None
+        if type(total) is int and total > 0:
+            return total
+    sysctl_total = _positive_int_text(_get_macos_sysctl_value("hw.memsize"))
+    if sysctl_total is not None:
+        return sysctl_total
+    return _get_mlx_device_info().get("memory_size")
+
+
+def _get_recommended_working_set_bytes() -> int | None:
+    """Return Metal's positive recommended working-set ceiling when available."""
+    return _get_mlx_device_info().get("max_recommended_working_set_size")
+
+
 def _first_toolchain_output_line(output: str | None) -> str | None:
     """Return the first non-empty line from a toolchain command output."""
     if output is None:
@@ -19593,19 +19674,38 @@ def get_system_characteristics() -> dict[str, str]:
         info["Python Version"] = sys.version.split()[0]
         info["Architecture"] = platform.machine()
 
-        # Get GPU info
-        _, gpu_name = get_system_info()
-        if gpu_name:
-            info["GPU/Chip"] = gpu_name
+        device_info = _get_mlx_device_info()
+
+        # Get GPU/chip info with graceful fallbacks.
+        _, profiler_gpu_name = get_system_info()
+        chip_name = profiler_gpu_name
+        if chip_name is None:
+            chip_name = _get_macos_sysctl_value("machdep.cpu.brand_string")
+        if chip_name is None:
+            chip_name = device_info.get("device_name")
+        if chip_name:
+            info["GPU/Chip"] = chip_name
+
+        device_name = device_info.get("device_name")
+        if device_name:
+            info["MLX Device"] = device_name
+        gpu_architecture = device_info.get("architecture")
+        if gpu_architecture:
+            info["GPU Architecture"] = gpu_architecture
 
         # Get detailed Apple Silicon info
         info.update(_get_apple_silicon_info())
 
-        # Get memory and CPU info if psutil available
-        if psutil is not None:
-            ram_gb = psutil.virtual_memory().total / (1024**3)
-            info["RAM"] = f"{ram_gb:.1f} GB"
+        total_memory_bytes = _get_total_memory_bytes()
+        if total_memory_bytes is not None:
+            info["RAM"] = f"{total_memory_bytes / (1024**3):.1f} GB"
 
+        recommended_working_set_bytes = device_info.get("max_recommended_working_set_size")
+        if recommended_working_set_bytes is not None:
+            info["Recommended Working Set"] = f"{recommended_working_set_bytes / (1024**3):.1f} GB"
+
+        # Get CPU info if psutil available
+        if psutil is not None:
             physical_cores = psutil.cpu_count(logical=False)
             if physical_cores:
                 info["CPU Cores (Physical)"] = str(physical_cores)
