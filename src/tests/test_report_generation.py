@@ -2422,7 +2422,7 @@ class TestMarkdownReportEdgeCases:
             assert "Generated Text" in tsv_lines[1]
             assert jsonl_records[0]["_type"] == "metadata"
             assert len(jsonl_records[1:]) == 2
-            assert run_payload["schema_version"] == "1.1"
+            assert run_payload["schema_version"] == "1.2"
             assert run_payload["producer"]["name"] == "check_models"
             assert run_payload["counts"] == {
                 "models_attempted": 2,

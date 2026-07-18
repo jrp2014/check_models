@@ -76,7 +76,7 @@ from typing import (
     runtime_checkable,
 )
 from urllib.error import URLError
-from urllib.parse import quote, urlparse
+from urllib.parse import quote, unquote, urlparse
 from urllib.request import urlopen
 
 import yaml
@@ -1357,6 +1357,27 @@ class JsonlMetadataRecord(TypedDict, total=False):
     runtime_fingerprint: dict[str, RuntimeProbeResult]
     eval_mode: str
     metadata_exposed_to_prompt: bool
+    component_provenance: dict[str, ComponentProvenanceRecord]
+
+
+class ComponentProvenanceRecord(TypedDict):
+    """Local installation identity for one runtime component."""
+
+    version: str | None
+    install_type: Literal["editable", "wheel", "source-tree", "unknown"]
+    source_location: str | None
+    source_revision: str | None
+    direct_url: str | None
+    vcs_revision: str | None
+
+
+class ModelProvenanceRecord(TypedDict):
+    """Requested and locally resolved identity for one model snapshot."""
+
+    model: str
+    requested_revision: str | None
+    resolved_revision: str | None
+    snapshot_path: str | None
 
 
 class JsonlRerunSummary(TypedDict, total=False):
@@ -1399,6 +1420,7 @@ class JsonlResultRecord(TypedDict):
     error_traceback: str | None
     quality_issues: list[str]
     timestamp: str
+    model_provenance: NotRequired[ModelProvenanceRecord]
     metrics: JsonlMetricsRecord
     timing: JsonlTimingRecord
     generated_text: NotRequired[str]
@@ -8321,6 +8343,113 @@ def _distribution_is_editable(distribution_name: str) -> bool:
     return isinstance(dir_info, dict) and bool(dir_info.get("editable"))
 
 
+def _distribution_direct_url(distribution_name: str) -> dict[str, JsonLike] | None:
+    """Return parsed PEP 610 direct-URL metadata for an installed distribution."""
+    text = _distribution_text_file(distribution_name, DISTRIBUTION_DIRECT_URL_METADATA_FILE)
+    if not text:
+        return None
+    try:
+        payload = json.loads(text)
+    except json.JSONDecodeError:
+        return None
+    return cast("dict[str, JsonLike]", payload) if isinstance(payload, dict) else None
+
+
+def _direct_url_source_path(payload: Mapping[str, JsonLike] | None) -> Path | None:
+    """Resolve a local file URL from installed metadata without network access."""
+    raw_url = payload.get("url") if payload is not None else None
+    if not isinstance(raw_url, str):
+        return None
+    parsed = urlparse(raw_url)
+    if parsed.scheme != "file":
+        return None
+    return Path(unquote(parsed.path))
+
+
+def _local_source_revision(path: Path) -> str | None:
+    """Return the Git revision for an existing local source directory."""
+    if not path.is_dir():
+        return None
+    return _run_macos_toolchain_command(("git", "-C", str(path), "rev-parse", "HEAD"))
+
+
+def _collect_component_provenance(
+    versions: Mapping[str, str | None] | None = None,
+) -> dict[str, ComponentProvenanceRecord]:
+    """Collect publication-safe local install provenance without network access."""
+    resolved_versions = dict(versions or get_library_versions())
+    check_models_version = _collect_check_models_provenance().get("version")
+    resolved_versions.setdefault(
+        "check_models",
+        check_models_version if isinstance(check_models_version, str) else None,
+    )
+    provenance: dict[str, ComponentProvenanceRecord] = {}
+    for name, component_version in resolved_versions.items():
+        direct = _distribution_direct_url(name)
+        source_path = _direct_url_source_path(direct)
+        editable = bool(
+            isinstance(direct, Mapping)
+            and isinstance(direct.get("dir_info"), Mapping)
+            and cast("Mapping[str, JsonLike]", direct["dir_info"]).get("editable") is True
+        )
+        install_type: Literal["editable", "wheel", "source-tree", "unknown"]
+        if editable:
+            install_type = "editable"
+        elif name == "check_models" and source_path is None:
+            install_type = "source-tree"
+            source_path = _REPO_ROOT
+        elif _distribution_location(name) is not None:
+            install_type = "wheel"
+        else:
+            install_type = "unknown"
+        if source_path is None:
+            location = _distribution_location(name)
+            source_path = Path(location) if location else None
+        vcs_info = direct.get("vcs_info") if direct is not None else None
+        vcs_revision = (
+            cast("Mapping[str, JsonLike]", vcs_info).get("commit_id")
+            if isinstance(vcs_info, Mapping)
+            else None
+        )
+        raw_direct_url = direct.get("url") if direct is not None else None
+        provenance[name] = {
+            "version": component_version,
+            "install_type": install_type,
+            "source_location": (
+                _home_relative_report_text(str(source_path)) if source_path is not None else None
+            ),
+            "source_revision": (
+                _local_source_revision(source_path)
+                if source_path is not None and install_type in {"editable", "source-tree"}
+                else None
+            ),
+            "direct_url": (
+                _home_relative_report_text(raw_direct_url)
+                if isinstance(raw_direct_url, str)
+                else None
+            ),
+            "vcs_revision": str(vcs_revision) if vcs_revision is not None else None,
+        }
+    return provenance
+
+
+def _component_provenance_json(
+    provenance: Mapping[str, ComponentProvenanceRecord],
+) -> dict[str, JsonLike]:
+    """Convert typed provenance records to the recursive JSON value contract."""
+    payload: dict[str, JsonLike] = {}
+    for component, record in provenance.items():
+        payload[component] = {
+            "version": record["version"],
+            "install_type": record["install_type"],
+            "source_location": record["source_location"],
+            "source_revision": record["source_revision"],
+            "direct_url": record["direct_url"],
+            "vcs_revision": record["vcs_revision"],
+        }
+    return payload
+
+
 def _distribution_location(distribution_name: str) -> str | None:
     """Return the installed distribution root path when metadata is available."""
     try:
@@ -15007,6 +15136,20 @@ def _diagnostics_environment_section(
             system_keys=_DIAGNOSTICS_SYSTEM_KEYS,
         )
     ]
+    for component, provenance in _collect_component_provenance(versions).items():
+        if component not in _DIAGNOSTICS_LIB_NAMES and component != "check_models":
+            continue
+        details: list[str] = [provenance["install_type"]]
+        if provenance["source_revision"]:
+            details.append(f"revision {provenance['source_revision'][:12]}")
+        if provenance["source_location"]:
+            details.append(provenance["source_location"])
+        table_rows.append(
+            (
+                f"{component} provenance",
+                DIAGNOSTICS_ESCAPER.escape("; ".join(details)),
+            )
+        )
     parts = _guard_markdownlint_block(
         render_report_markdown(
             (
@@ -16952,6 +17095,14 @@ def export_failure_repro_bundles(
             "schema_version": "1.0",
             "generated_at_utc": datetime.now(UTC).isoformat(timespec="seconds"),
             "model": result.model_name,
+            "model_provenance": _collect_model_provenance(
+                result.model_name,
+                requested_revision=(
+                    str(serialized_args["revision"])
+                    if serialized_args.get("revision") is not None
+                    else None
+                ),
+            ),
             "failure": {
                 "phase": result.failure_phase,
                 "stage": result.error_stage,
@@ -16981,6 +17132,7 @@ def export_failure_repro_bundles(
                 "platform": platform.platform(),
                 "system_info": _public_repro_value(system_info),
                 "library_versions": versions,
+                "component_provenance": _collect_component_provenance(versions),
                 "preflight_issues": preflight_issues,
             },
         }
@@ -21747,6 +21899,28 @@ def _resolve_model_snapshot_path(model_identifier: str) -> Path | None:
         snapshot_path = getattr(revisions[0], "snapshot_path", None)
         return Path(snapshot_path) if snapshot_path else None
     return None
+
+
+def _collect_model_provenance(
+    model_identifier: str,
+    *,
+    requested_revision: str | None = None,
+) -> ModelProvenanceRecord:
+    """Return requested and locally selected model snapshot identity."""
+    snapshot_path = _resolve_model_snapshot_path(model_identifier)
+    resolved_revision = (
+        snapshot_path.name
+        if snapshot_path is not None and snapshot_path.parent.name == "snapshots"
+        else None
+    )
+    return {
+        "model": model_identifier,
+        "requested_revision": requested_revision,
+        "resolved_revision": resolved_revision,
+        "snapshot_path": (
+            _home_relative_report_text(str(snapshot_path)) if snapshot_path is not None else None
+        ),
+    }
 
 
 def _get_config_value(config: object | None, key: str) -> object | None:
@@ -26881,6 +27055,7 @@ def _build_jsonl_metadata_record(
     }
     if library_versions is not None:
         record["library_versions"] = library_versions
+        record["component_provenance"] = _collect_component_provenance(library_versions)
     if runtime_fingerprint is not None:
         record["runtime_fingerprint"] = runtime_fingerprint
     return record
@@ -27113,6 +27288,7 @@ def save_jsonl_report(
         for original_result in results:
             result = cached_results.get(original_result.model_name, original_result)
             record = _build_jsonl_result_record_base(result)
+            record["model_provenance"] = _collect_model_provenance(result.model_name)
             _populate_jsonl_result_generation_data(record, result)
             facts = machine_facts.get(result.model_name)
             review_payload = _review_for_result(result)
@@ -27200,7 +27376,7 @@ def save_run_json_report(
     artifacts: dict[str, JsonLike] = dict(output_paths)
     library_versions: dict[str, JsonLike] = dict(versions)
     payload: dict[str, JsonLike] = {
-        "schema_version": "1.1",
+        "schema_version": "1.2",
         "generated_at": local_now_str(),
         "eval_mode": policy.eval_mode,
         "prompt": prompt,
@@ -27213,6 +27389,7 @@ def save_run_json_report(
         "counts": counts,
         "artifacts": artifacts,
         "library_versions": library_versions,
+        "component_provenance": _component_provenance_json(_collect_component_provenance(versions)),
         "producer": dict(producer or _collect_check_models_provenance()),
     }
     _write_text_file(filename, json.dumps(payload, indent=2, sort_keys=True) + "\n")

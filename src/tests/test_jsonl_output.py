@@ -184,7 +184,7 @@ def test_save_run_json_report_captures_public_snapshot_contract(tmp_path: Path) 
     )
 
     payload = json.loads(out.read_text(encoding="utf-8"))
-    assert payload["schema_version"] == "1.1"
+    assert payload["schema_version"] == "1.2"
     assert payload["eval_mode"] == "triage"
     assert payload["semantic_rankings_grounded"] is False
     assert payload["selection_basis"] == "caption hygiene only"
@@ -263,6 +263,128 @@ def test_check_models_provenance_degrades_without_install_or_git_metadata(
         "git_revision": None,
         "install_type": "unknown",
     }
+
+
+def test_component_provenance_captures_editable_source_without_home_disclosure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Editable component metadata should retain source and revision safely."""
+    monkeypatch.setattr(
+        check_models,
+        "_distribution_direct_url",
+        lambda _name: {
+            "url": "file:///Users/example/src/mlx-vlm",
+            "dir_info": {"editable": True},
+        },
+    )
+    monkeypatch.setattr(
+        check_models,
+        "_distribution_location",
+        lambda _name: "/Users/example/miniconda/envs/mlx-vlm/lib/python3.13/site-packages",
+    )
+    monkeypatch.setattr(
+        check_models,
+        "_local_source_revision",
+        lambda _path: "abc123",
+    )
+    monkeypatch.setattr(
+        check_models.Path, "home", classmethod(lambda _cls: check_models.Path("/Users/example"))
+    )
+
+    provenance = check_models._collect_component_provenance({"mlx-vlm": "0.6.4"})
+
+    assert provenance["mlx-vlm"] == {
+        "version": "0.6.4",
+        "install_type": "editable",
+        "source_location": "~/src/mlx-vlm",
+        "source_revision": "abc123",
+        "direct_url": "file://~/src/mlx-vlm",
+        "vcs_revision": None,
+    }
+
+
+def test_model_provenance_distinguishes_requested_and_resolved_revision(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Local snapshot identity should not be confused with the requested ref."""
+    snapshot_sha = "0123456789abcdef"
+    snapshot = check_models.Path(
+        f"/Users/example/.cache/huggingface/hub/models--org--model/snapshots/{snapshot_sha}"
+    )
+    monkeypatch.setattr(check_models, "_resolve_model_snapshot_path", lambda _model: snapshot)
+    monkeypatch.setattr(
+        check_models.Path, "home", classmethod(lambda _cls: check_models.Path("/Users/example"))
+    )
+
+    provenance = check_models._collect_model_provenance(
+        "org/model",
+        requested_revision="main",
+    )
+
+    assert provenance == {
+        "model": "org/model",
+        "requested_revision": "main",
+        "resolved_revision": snapshot_sha,
+        "snapshot_path": ("~/.cache/huggingface/hub/models--org--model/snapshots/" + snapshot_sha),
+    }
+
+
+def test_jsonl_and_run_json_include_shared_component_provenance(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Primary machine artifacts should expose the same component identity payload."""
+    components = {
+        "mlx-vlm": {
+            "version": "0.6.4",
+            "install_type": "wheel",
+            "source_location": "~/env/site-packages",
+            "source_revision": None,
+            "direct_url": None,
+            "vcs_revision": None,
+        }
+    }
+    monkeypatch.setattr(
+        check_models, "_collect_component_provenance", lambda _versions=None: components
+    )
+    monkeypatch.setattr(
+        check_models,
+        "_collect_model_provenance",
+        lambda model, requested_revision=None: {
+            "model": model,
+            "requested_revision": requested_revision,
+            "resolved_revision": "snapshot123",
+            "snapshot_path": "~/.cache/snapshots/snapshot123",
+        },
+    )
+    result = PerformanceResult(model_name="org/model", generation=MockGeneration(), success=True)
+    context = check_models._build_report_render_context(results=[result], prompt="describe")
+    jsonl_path = tmp_path / "results.jsonl"
+    run_path = tmp_path / "run.json"
+
+    save_jsonl_report(
+        [result],
+        jsonl_path,
+        prompt="describe",
+        system_info={},
+        library_versions={"mlx-vlm": "0.6.4"},
+        report_context=context,
+    )
+    check_models.save_run_json_report(
+        [result],
+        run_path,
+        versions={"mlx-vlm": "0.6.4"},
+        prompt="describe",
+        total_runtime_seconds=1.0,
+        report_context=context,
+        output_paths={},
+    )
+
+    header, rows = _read_jsonl(jsonl_path)
+    run_payload = json.loads(run_path.read_text(encoding="utf-8"))
+    assert header["component_provenance"] == components
+    assert run_payload["component_provenance"] == components
+    assert rows[0]["model_provenance"]["resolved_revision"] == "snapshot123"
 
 
 def test_jsonl_metrics_fall_back_to_generation_runtime_fields() -> None:
