@@ -38,6 +38,7 @@ class _FakeGenerationResult:
     cache_memory: float = 0.3
     model_load_active_memory: float | None = None
     finish_reason: str | None = None
+    _check_models_prompt_diagnostics: check_models.PromptDiagnostics | None = None
 
 
 class _FakeModel:
@@ -607,6 +608,7 @@ class TestProcessImageWithModelMock:
         assert generate_kwargs["cropping"] is False
         assert generate_kwargs["max_patches"] == 3
         prompt_diagnostics = result._check_models_prompt_diagnostics
+        assert prompt_diagnostics is not None
         assert prompt_diagnostics.processed_image_width == 384
         assert prompt_diagnostics.processed_image_height == 512
         assert prompt_diagnostics.image_patch_count is None

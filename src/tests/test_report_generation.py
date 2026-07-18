@@ -3996,7 +3996,8 @@ class TestDiagnosticsReport:
     ) -> None:
         """Model-owned text quality should remain an observation."""
         result = _make_quality_success("org/model-only", with_quality_issue=False)
-        analysis = cast("GenerationQualityAnalysis", result.quality_analysis)
+        analysis = result.quality_analysis
+        assert analysis is not None
         result = replace(
             result,
             quality_analysis=replace(
@@ -4160,7 +4161,8 @@ class TestDiagnosticsReport:
     def test_text_sanity_cluster_requires_output_excerpt(self) -> None:
         """A detector label without generated evidence should not form a text issue."""
         result = _make_quality_success("org/no-excerpt", with_quality_issue=False)
-        analysis = cast("GenerationQualityAnalysis", result.quality_analysis)
+        analysis = result.quality_analysis
+        assert analysis is not None
         result = replace(
             result,
             generation=replace(cast("_MockGeneration", result.generation), text=""),

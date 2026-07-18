@@ -254,20 +254,23 @@ The tool generates multiple report formats in `output/` by default:
   full-output section for every attempted model.
 - **Review Markdown** (`reports/review.md`): Short automated digest grouped by likely owner and user-facing utility bucket.
 - **TSV** (`reports/results.tsv`): Compact spreadsheet contract with caption/runtime
-  comparison fields, exact generated text once, and concise failure evidence.
+  comparison fields, canonical execution/recommendation status, exact generated
+  text once, and optional columns only when the run contains relevant evidence.
 - **JSONL** (`results.jsonl`): Exhaustive machine-readable per-model diagnostics,
-  including fields intentionally omitted from the compact TSV.
+  including fields intentionally omitted from the compact TSV, local component
+  installation identity, and each model's requested versus resolved cache revision.
 - **Run JSON** (`run.json`): Stable run-level machine contract with mode, grounding,
-  attempted/evaluated/indeterminate counts, library versions, check_models producer
-  version/revision, and artifact paths.
+  attempted/evaluated/indeterminate counts, component source/install provenance,
+  check_models producer version/revision, and artifact paths.
 - **Diagnostics** (`reports/diagnostics.md`): Self-contained, issue-ready mlx-vlm
   report with native reproduction commands and complete affected-model output in
   per-model expandable evidence blocks. Definite crashes are reported as outcomes;
   external-connectivity interruptions are retained as indeterminate attempts and
   excluded from upstream issue drafts and evaluated/failure totals;
   traceback evidence remains bounded, package ownership and confidence remain
-  cautious triage, and model/config observations stay separate from the mlx-vlm
-  issue matrix.
+  cautious triage, and successful configuration/context observations that still
+  need a controlled reproduction stay separate from the confirmed mlx-vlm issue
+  matrix.
 - **Log** (`check_models.log`): Canonical comprehensive run artifact, including the full per-model review block and full output/captured failure output.
 - **History** (`results.history.jsonl`): Append-only run history for regressions/recoveries.
 - **Issue templates** (`issues/`): Ready-to-file GitHub issue markdown for clustered
@@ -1139,6 +1142,9 @@ Report featuring:
 - Model outputs and diagnostics
 - System information and library versions
 - Failed rows are highlighted in red for quick identification
+- Recommendation values use the same `recommended`, `caveat`, `avoid`, and
+  `not-evaluated` contract as the other report formats. Presentation warnings and
+  token-limit truncation are caveats rather than clean recommendations.
 - Responsive design for mobile viewing
 
 ### Markdown Report
@@ -1168,20 +1174,25 @@ GitHub-compatible qualitative review artifact with:
 Tab-separated values for programmatic analysis (spreadsheets, `awk`, pandas, etc.):
 
 - **Metadata comment**: The first line is a `# generated_at: <ISO timestamp>` comment
-  indicating when the report was produced. Parsers should skip lines starting with `#`.
-- **Compact fixed-purpose columns**: Caption/runtime comparison fields, canonical
-  compatibility and prompt-burden facts, and exact `Generated Text`. The redundant
-  output preview and diffusion-only fields are omitted; use JSONL for exhaustive data.
-- **Error diagnostics**: One each of `error_stage`, `error_type`, `error_package`,
-  and `error_message` support automated triage and remain empty for completed runs.
+  indicating when the report was produced and that JSONL is exhaustive. Parsers
+  should skip lines starting with `#`.
+- **Compact adaptive columns**: Stable caption/runtime and canonical
+  execution/recommendation fields are always present. Compatibility, scoring,
+  prompt-detail, memory, owner-confidence, and error columns appear only when at
+  least one row has evidence. Output-preview and diffusion-only fields are omitted.
+- **Literal TSV**: Fields are written with real tab delimiters and CSV-compatible
+  quoting. Embedded generated-output newlines are represented as literal `\n`, and
+  the exact generated text is not shortened. Use JSONL for exhaustive diagnostics.
 
 ### JSONL Report
 
 Line-delimited JSON for streaming ingestion:
 
 - **Metadata header**: The first record (line 1) contains shared metadata
-  (prompt, system info, timestamp) — JSONL v2.0 format.
-- **Per-model records**: One JSON object per model with all metrics and error details.
+  (prompt, system info, timestamp, versions, and component install/source
+  provenance) — JSONL v2.0 format.
+- **Per-model records**: One JSON object per model with all metrics, error details,
+  and requested/resolved model snapshot provenance when locally available.
 
 
 ### Diagnostics Report
@@ -1194,7 +1205,11 @@ A comprehensive Markdown report focused on upstream debugging and issue reportin
 - **Failures Clustered**: Groups similar errors together to identify systemic issues.
 - **Reproducibility**: Includes explicit commands to reproduce specific failures.
 - **Environment**: Captures full package versions and system specs.
-- **Ready-to-File**: Formatted to be copy-pasted directly into GitHub issues.
+- **Issue readiness**: Definite failures are ready to file; successful thinking-token
+  or context-boundary observations remain visible with complete evidence but require
+  the stated controlled reproduction before they become issue drafts.
+- **Ready-to-File**: Confirmed issue clusters are formatted to be copy-pasted directly
+  into GitHub issues.
 
 ### Preflight Compatibility Warnings
 
@@ -1348,8 +1363,8 @@ machine-readable files (JSONL, capability JSON, run JSON, history) and logs rema
 - **Gallery Markdown** (`reports/model_gallery.md`): complete evidence-only generated
   outputs and diagnostics for every attempted model.
 - **Run JSON** (`run.json`): stable run-level machine contract with resolved mode, grounding
-  policy, attempted/evaluated/indeterminate counts, versions, producer revision,
-  and artifact paths.
+  policy, attempted/evaluated/indeterminate counts, component source/install
+  provenance, producer revision, and artifact paths (schema 1.2).
 
 ## Contributing
 

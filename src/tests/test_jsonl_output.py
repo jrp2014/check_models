@@ -230,7 +230,12 @@ def test_run_json_excludes_connectivity_disconnects_from_evaluated_and_failed_co
         total_runtime_seconds=2.0,
         report_context=context,
         output_paths={},
-        producer={"name": "check_models"},
+        producer={
+            "name": "check_models",
+            "version": "test",
+            "git_revision": None,
+            "install_type": "unknown",
+        },
     )
 
     counts = json.loads(out.read_text(encoding="utf-8"))["counts"]
@@ -368,6 +373,7 @@ def test_jsonl_and_run_json_include_shared_component_provenance(
         prompt="describe",
         system_info={},
         library_versions={"mlx-vlm": "0.6.4"},
+        requested_revision="release-branch",
         report_context=context,
     )
     check_models.save_run_json_report(
@@ -385,6 +391,7 @@ def test_jsonl_and_run_json_include_shared_component_provenance(
     assert header["component_provenance"] == components
     assert run_payload["component_provenance"] == components
     assert rows[0]["model_provenance"]["resolved_revision"] == "snapshot123"
+    assert rows[0]["model_provenance"]["requested_revision"] == "release-branch"
 
 
 def test_jsonl_metrics_fall_back_to_generation_runtime_fields() -> None:

@@ -1061,6 +1061,14 @@ type PathLike = str | Path
 type JsonLike = None | bool | int | float | str | list[JsonLike] | dict[str, JsonLike]
 type LogitBiasDict = dict[int, float]
 type GPSDict = dict[str, ExifValue]  # GPS EXIF data structure
+type EvaluationLane = Literal["triage", "blind", "assisted"]
+type RequestedEvaluationMode = EvaluationLane | Literal["auto", "stress", "quality"]
+type ReportSelectionBasis = Literal[
+    "caption hygiene only",
+    "metadata-assisted visual verification",
+    "held-out trusted image metadata",
+    "ungrounded visual/cataloguing heuristics",
+]
 type SystemProfilerEntry = dict[str, object]
 type SystemProfilerDict = dict[
     str, list[SystemProfilerEntry]
@@ -1191,7 +1199,7 @@ class HistoryRunRecord(TypedDict, total=False):
     system: dict[str, str]
     library_versions: LibraryVersionDict
     runtime_fingerprint: dict[str, RuntimeProbeResult]
-    eval_mode: str
+    eval_mode: EvaluationLane
 
 
 class HistoryComparisonSummary(TypedDict):
@@ -1345,6 +1353,52 @@ class RuntimeProbeResult(TypedDict, total=False):
     detail: str
 
 
+type ComponentInstallType = Literal["editable", "wheel", "source-tree", "unknown"]
+
+
+class DirectUrlDirInfo(TypedDict, total=False):
+    """PEP 610 directory-source details used by provenance collection."""
+
+    editable: bool
+
+
+class DirectUrlVcsInfo(TypedDict, total=False):
+    """PEP 610 version-control details used by provenance collection."""
+
+    vcs: str
+    requested_revision: str
+    commit_id: str
+
+
+class DistributionDirectUrlRecord(TypedDict, total=False):
+    """Relevant fields from an installed distribution's PEP 610 metadata."""
+
+    url: str
+    dir_info: DirectUrlDirInfo
+    vcs_info: DirectUrlVcsInfo
+    subdirectory: str
+
+
+class ComponentProvenanceRecord(TypedDict):
+    """Local installation identity for one runtime component."""
+
+    version: str | None
+    install_type: ComponentInstallType
+    source_location: str | None
+    source_revision: str | None
+    direct_url: str | None
+    vcs_revision: str | None
+
+
+class CheckModelsProvenanceRecord(TypedDict):
+    """Producer identity recorded in run-level artifacts."""
+
+    name: Literal["check_models"]
+    version: str
+    git_revision: str | None
+    install_type: Literal["editable", "installed", "unknown"]
+
+
 class JsonlMetadataRecord(TypedDict, total=False):
     """Shared header row for ``results.jsonl`` format."""
 
@@ -1355,20 +1409,9 @@ class JsonlMetadataRecord(TypedDict, total=False):
     timestamp: Required[str]
     library_versions: LibraryVersionDict
     runtime_fingerprint: dict[str, RuntimeProbeResult]
-    eval_mode: str
+    eval_mode: EvaluationLane
     metadata_exposed_to_prompt: bool
     component_provenance: dict[str, ComponentProvenanceRecord]
-
-
-class ComponentProvenanceRecord(TypedDict):
-    """Local installation identity for one runtime component."""
-
-    version: str | None
-    install_type: Literal["editable", "wheel", "source-tree", "unknown"]
-    source_location: str | None
-    source_revision: str | None
-    direct_url: str | None
-    vcs_revision: str | None
 
 
 class ModelProvenanceRecord(TypedDict):
@@ -1378,6 +1421,37 @@ class ModelProvenanceRecord(TypedDict):
     requested_revision: str | None
     resolved_revision: str | None
     snapshot_path: str | None
+
+
+class RunOutcomeCounts(TypedDict):
+    """Mutually consistent execution totals shared by run-level reports."""
+
+    models_attempted: int
+    models_evaluated: int
+    models_failed: int
+    models_indeterminate: int
+    models_successful: int
+    models_total: int
+
+
+class RunJsonReportRecord(TypedDict):
+    """Stable run-level machine artifact schema."""
+
+    schema_version: Literal["1.2"]
+    generated_at: str
+    eval_mode: EvaluationLane
+    prompt: str
+    prompt_sha256: str
+    semantic_rankings_grounded: bool
+    selection_basis: ReportSelectionBasis
+    has_descriptive_metadata: bool
+    metadata_exposed_to_prompt: bool
+    total_runtime_seconds: float
+    counts: RunOutcomeCounts
+    artifacts: dict[str, str]
+    library_versions: LibraryVersionDict
+    component_provenance: dict[str, ComponentProvenanceRecord]
+    producer: CheckModelsProvenanceRecord
 
 
 class JsonlRerunSummary(TypedDict, total=False):
@@ -1608,6 +1682,7 @@ class ReportGenerationInputs:
     system_info: dict[str, str]
     report_context: ReportRenderContext
     output_paths: ReportOutputPaths
+    model_revision: str | None = None
     history_records: Sequence[HistoryRunRecord] = ()
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None
     diagnostics_artifacts: DiagnosticsArtifacts | None = None
@@ -1991,7 +2066,7 @@ def _resolve_generation_stop_reason(
 
 # These constants define default values for various parameters used in the script.
 DEFAULT_MAX_TOKENS: Final[int] = 500
-DEFAULT_EVAL_MODE: Final[str] = "auto"
+DEFAULT_EVAL_MODE: Final[RequestedEvaluationMode] = "auto"
 _UNKNOWN_OWNER: Final[str] = "unknown"
 TRIAGE_MAX_TOKENS: Final[int] = 200
 QUALITY_MAX_TOKENS: Final[int] = 1000
@@ -8343,7 +8418,7 @@ def _distribution_is_editable(distribution_name: str) -> bool:
     return isinstance(dir_info, dict) and bool(dir_info.get("editable"))
 
 
-def _distribution_direct_url(distribution_name: str) -> dict[str, JsonLike] | None:
+def _distribution_direct_url(distribution_name: str) -> DistributionDirectUrlRecord | None:
     """Return parsed PEP 610 direct-URL metadata for an installed distribution."""
     text = _distribution_text_file(distribution_name, DISTRIBUTION_DIRECT_URL_METADATA_FILE)
     if not text:
@@ -8352,10 +8427,39 @@ def _distribution_direct_url(distribution_name: str) -> dict[str, JsonLike] | No
         payload = json.loads(text)
     except json.JSONDecodeError:
         return None
-    return cast("dict[str, JsonLike]", payload) if isinstance(payload, dict) else None
+    if not isinstance(payload, dict):
+        return None
+    record: DistributionDirectUrlRecord = {}
+    raw_url = payload.get("url")
+    if isinstance(raw_url, str):
+        record["url"] = raw_url
+    raw_dir_info = payload.get("dir_info")
+    if isinstance(raw_dir_info, dict):
+        dir_info: DirectUrlDirInfo = {}
+        editable = raw_dir_info.get("editable")
+        if isinstance(editable, bool):
+            dir_info["editable"] = editable
+        record["dir_info"] = dir_info
+    raw_vcs_info = payload.get("vcs_info")
+    if isinstance(raw_vcs_info, dict):
+        vcs_info: DirectUrlVcsInfo = {}
+        vcs = raw_vcs_info.get("vcs")
+        if isinstance(vcs, str):
+            vcs_info["vcs"] = vcs
+        requested_revision = raw_vcs_info.get("requested_revision")
+        if isinstance(requested_revision, str):
+            vcs_info["requested_revision"] = requested_revision
+        commit_id = raw_vcs_info.get("commit_id")
+        if isinstance(commit_id, str):
+            vcs_info["commit_id"] = commit_id
+        record["vcs_info"] = vcs_info
+    subdirectory = payload.get("subdirectory")
+    if isinstance(subdirectory, str):
+        record["subdirectory"] = subdirectory
+    return record
 
 
-def _direct_url_source_path(payload: Mapping[str, JsonLike] | None) -> Path | None:
+def _direct_url_source_path(payload: DistributionDirectUrlRecord | None) -> Path | None:
     """Resolve a local file URL from installed metadata without network access."""
     raw_url = payload.get("url") if payload is not None else None
     if not isinstance(raw_url, str):
@@ -8387,12 +8491,9 @@ def _collect_component_provenance(
     for name, component_version in resolved_versions.items():
         direct = _distribution_direct_url(name)
         source_path = _direct_url_source_path(direct)
-        editable = bool(
-            isinstance(direct, Mapping)
-            and isinstance(direct.get("dir_info"), Mapping)
-            and cast("Mapping[str, JsonLike]", direct["dir_info"]).get("editable") is True
-        )
-        install_type: Literal["editable", "wheel", "source-tree", "unknown"]
+        dir_info = direct.get("dir_info") if direct is not None else None
+        editable = dir_info is not None and dir_info.get("editable") is True
+        install_type: ComponentInstallType
         if editable:
             install_type = "editable"
         elif name == "check_models" and source_path is None:
@@ -8406,11 +8507,7 @@ def _collect_component_provenance(
             location = _distribution_location(name)
             source_path = Path(location) if location else None
         vcs_info = direct.get("vcs_info") if direct is not None else None
-        vcs_revision = (
-            cast("Mapping[str, JsonLike]", vcs_info).get("commit_id")
-            if isinstance(vcs_info, Mapping)
-            else None
-        )
+        vcs_revision = vcs_info.get("commit_id") if vcs_info is not None else None
         raw_direct_url = direct.get("url") if direct is not None else None
         provenance[name] = {
             "version": component_version,
@@ -8428,26 +8525,9 @@ def _collect_component_provenance(
                 if isinstance(raw_direct_url, str)
                 else None
             ),
-            "vcs_revision": str(vcs_revision) if vcs_revision is not None else None,
+            "vcs_revision": vcs_revision,
         }
     return provenance
-
-
-def _component_provenance_json(
-    provenance: Mapping[str, ComponentProvenanceRecord],
-) -> dict[str, JsonLike]:
-    """Convert typed provenance records to the recursive JSON value contract."""
-    payload: dict[str, JsonLike] = {}
-    for component, record in provenance.items():
-        payload[component] = {
-            "version": record["version"],
-            "install_type": record["install_type"],
-            "source_location": record["source_location"],
-            "source_revision": record["source_revision"],
-            "direct_url": record["direct_url"],
-            "vcs_revision": record["vcs_revision"],
-        }
-    return payload
 
 
 def _distribution_location(distribution_name: str) -> str | None:
@@ -10161,6 +10241,7 @@ def _build_report_mode_policy(
     )
     suppress_cataloging_scores = resolved_eval_mode == "triage"
     semantic_rankings_grounded = has_descriptive_metadata and not suppress_cataloging_scores
+    selection_basis: ReportSelectionBasis
     if suppress_cataloging_scores:
         selection_basis = "caption hygiene only"
     elif resolved_metadata_exposure:
@@ -12096,14 +12177,15 @@ def _recommendation_status_for_result(result: PerformanceResult) -> Recommendati
     review = _review_for_result(result)
     if review is not None:
         bucket = review["user_bucket"]
-        if bucket in {"recommended", "caveat", "avoid", "not-evaluated"}:
-            return cast("RecommendationStatus", bucket)
+        match bucket:
+            case "recommended" | "caveat" | "avoid" | "not-evaluated":
+                return bucket
     if _is_indeterminate_connectivity_failure(result):
         return "not-evaluated"
     return "caveat" if result.success else "avoid"
 
 
-def _run_outcome_counts(results: Sequence[PerformanceResult]) -> dict[str, JsonLike]:
+def _run_outcome_counts(results: Sequence[PerformanceResult]) -> RunOutcomeCounts:
     """Return counts without treating unreachable inputs as evaluated failures."""
     indeterminate = sum(_is_indeterminate_connectivity_failure(result) for result in results)
     successful = sum(result.success for result in results)
@@ -13885,11 +13967,11 @@ CAPABILITY_GOOD_METADATA_SCORE: Final[float] = 70.0
 class ReportModePolicy:
     """Mode-aware report rules for score visibility and selection grounding."""
 
-    eval_mode: str
+    eval_mode: EvaluationLane
     has_descriptive_metadata: bool
     semantic_rankings_grounded: bool
     suppress_cataloging_scores: bool
-    selection_basis: str
+    selection_basis: ReportSelectionBasis
     metadata_exposed_to_prompt: bool
 
 
@@ -24039,11 +24121,19 @@ def handle_metadata(image_path: Path, args: argparse.Namespace) -> MetadataDict:
     return metadata
 
 
-def _resolve_eval_mode(eval_mode: str, metadata: Mapping[str, str | None] | None) -> str:
+def _resolve_eval_mode(
+    eval_mode: str,
+    metadata: Mapping[str, str | None] | None,
+) -> EvaluationLane:
     """Resolve automatic and legacy aliases to one concrete evaluation lane."""
-    if eval_mode not in {DEFAULT_EVAL_MODE, "stress", "quality"}:
-        return eval_mode
-    return "assisted" if _metadata_has_descriptive_reference(metadata) else "blind"
+    match eval_mode:
+        case "triage" | "blind" | "assisted":
+            return eval_mode
+        case "auto" | "stress" | "quality":
+            return "assisted" if _metadata_has_descriptive_reference(metadata) else "blind"
+        case _:
+            msg = f"Unsupported evaluation mode: {eval_mode}"
+            raise ValueError(msg)
 
 
 def _apply_eval_mode_defaults(
@@ -27246,6 +27336,7 @@ def save_jsonl_report(
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
     eval_mode: str = DEFAULT_EVAL_MODE,
     metadata_exposed_to_prompt: bool = False,
+    requested_revision: str | None = None,
     report_context: ReportRenderContext | None = None,
 ) -> None:
     """Save results to a JSONL file for programmatic analysis and AI issue generation.
@@ -27288,7 +27379,10 @@ def save_jsonl_report(
         for original_result in results:
             result = cached_results.get(original_result.model_name, original_result)
             record = _build_jsonl_result_record_base(result)
-            record["model_provenance"] = _collect_model_provenance(result.model_name)
+            record["model_provenance"] = _collect_model_provenance(
+                result.model_name,
+                requested_revision=requested_revision,
+            )
             _populate_jsonl_result_generation_data(record, result)
             facts = machine_facts.get(result.model_name)
             review_payload = _review_for_result(result)
@@ -27332,7 +27426,7 @@ def save_jsonl_report(
         logger.exception("Failed to write JSONL report to %s", filename)
 
 
-def _collect_check_models_provenance() -> dict[str, JsonLike]:
+def _collect_check_models_provenance() -> CheckModelsProvenanceRecord:
     """Collect best-effort producer identity for reproducible run snapshots."""
     installed = True
     try:
@@ -27344,13 +27438,13 @@ def _collect_check_models_provenance() -> dict[str, JsonLike]:
     revision = os.environ.get("GITHUB_SHA") or _run_macos_toolchain_command(
         ("git", "-C", str(_REPO_ROOT), "rev-parse", "HEAD")
     )
-    install_type = (
-        "editable"
-        if installed and _distribution_is_editable("check_models")
-        else "installed"
-        if installed
-        else "unknown"
-    )
+    install_type: Literal["editable", "installed", "unknown"]
+    if installed and _distribution_is_editable("check_models"):
+        install_type = "editable"
+    elif installed:
+        install_type = "installed"
+    else:
+        install_type = "unknown"
     return {
         "name": "check_models",
         "version": package_version,
@@ -27368,14 +27462,12 @@ def save_run_json_report(
     total_runtime_seconds: float,
     report_context: ReportRenderContext,
     output_paths: Mapping[str, str],
-    producer: Mapping[str, JsonLike] | None = None,
+    producer: CheckModelsProvenanceRecord | None = None,
 ) -> None:
     """Write stable run-level metadata for public benchmark snapshots."""
     policy = report_context.mode_policy
     counts = _run_outcome_counts(results)
-    artifacts: dict[str, JsonLike] = dict(output_paths)
-    library_versions: dict[str, JsonLike] = dict(versions)
-    payload: dict[str, JsonLike] = {
+    payload: RunJsonReportRecord = {
         "schema_version": "1.2",
         "generated_at": local_now_str(),
         "eval_mode": policy.eval_mode,
@@ -27387,10 +27479,10 @@ def save_run_json_report(
         "metadata_exposed_to_prompt": policy.metadata_exposed_to_prompt,
         "total_runtime_seconds": round(total_runtime_seconds, 3),
         "counts": counts,
-        "artifacts": artifacts,
-        "library_versions": library_versions,
-        "component_provenance": _component_provenance_json(_collect_component_provenance(versions)),
-        "producer": dict(producer or _collect_check_models_provenance()),
+        "artifacts": dict(output_paths),
+        "library_versions": dict(versions),
+        "component_provenance": _collect_component_provenance(versions),
+        "producer": producer or _collect_check_models_provenance(),
     }
     _write_text_file(filename, json.dumps(payload, indent=2, sort_keys=True) + "\n")
 
@@ -29571,6 +29663,7 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
                 metadata_exposed_to_prompt=(
                     inputs.report_context.mode_policy.metadata_exposed_to_prompt
                 ),
+                requested_revision=inputs.model_revision,
                 report_context=inputs.report_context,
             ),
         ),
@@ -30065,6 +30158,9 @@ def finalize_execution(
                 system_info=system_info,
                 report_context=report_context,
                 output_paths=output_paths,
+                model_revision=(
+                    str(args.revision) if getattr(args, "revision", None) is not None else None
+                ),
                 history_records=tuple(history_records_before_current),
                 runtime_fingerprint=runtime_fingerprint,
                 diagnostics_artifacts=diagnostics_artifacts,

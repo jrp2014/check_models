@@ -16,7 +16,7 @@ import logging
 import subprocess
 from dataclasses import dataclass, fields, replace
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, Never, cast
 from unittest.mock import MagicMock, patch
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -152,8 +152,8 @@ class TestDistributionMetadataHelpers:
     ) -> None:
         """Unknown metadata filenames should not reach importlib.metadata."""
 
-        def fail_distribution(_distribution_name: str) -> object:
-            pytest.fail("distribution lookup should not run for disallowed filenames")
+        def fail_distribution(_distribution_name: str) -> Never:
+            raise AssertionError
 
         monkeypatch.setattr(mod, "distribution", fail_distribution)
 
@@ -177,14 +177,39 @@ class TestDistributionMetadataHelpers:
                 assert filename == Path("example-1.0.dist-info") / "direct_url.json"
                 return metadata_file
 
-            def read_text(self, _filename: str) -> str:
-                pytest.fail("direct_url.json should be read through bounded safe I/O")
+            def read_text(self, _filename: str) -> Never:
+                raise AssertionError
 
         monkeypatch.setattr(mod, "distribution", lambda _distribution_name: FakeDistribution())
 
         assert mod._distribution_text_file("example-package", "direct_url.json") == (
             '{"dir_info": {"editable": true}}'
         )
+
+    def test_distribution_direct_url_validates_narrow_pep610_fields(
+        self,
+        mod: types.ModuleType,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Untrusted direct-URL JSON should be narrowed before internal use."""
+        payload = {
+            "url": "file:///tmp/mlx-vlm",
+            "dir_info": {"editable": "yes", "unexpected": True},
+            "vcs_info": {"vcs": "git", "commit_id": "abc123", "requested_revision": 7},
+            "subdirectory": "python",
+        }
+        monkeypatch.setattr(
+            mod,
+            "_distribution_text_file",
+            lambda _name, _filename: json.dumps(payload),
+        )
+
+        assert mod._distribution_direct_url("mlx-vlm") == {
+            "url": "file:///tmp/mlx-vlm",
+            "dir_info": {},
+            "vcs_info": {"vcs": "git", "commit_id": "abc123"},
+            "subdirectory": "python",
+        }
 
 
 class TestSafeTextFileIO:
@@ -412,6 +437,11 @@ class TestPreparePrompt:
         assert "2026-07-10" not in result
         assert "51.5,-0.1" not in result
         assert "Context:" not in result
+
+    def test_resolve_eval_mode_rejects_unsupported_values(self, mod: types.ModuleType) -> None:
+        """Resolved report lanes should remain a closed, precisely typed set."""
+        with pytest.raises(ValueError, match="Unsupported evaluation mode"):
+            mod._resolve_eval_mode("experimental", None)
 
     def test_assisted_prompt_exposes_descriptive_metadata(self, mod: types.ModuleType) -> None:
         """Assisted lane should expose reference metadata for visual verification."""

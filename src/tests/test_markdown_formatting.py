@@ -244,7 +244,7 @@ def test_gallery_anchor_and_heading_are_separated_by_blank_line() -> None:
 
     md = _gallery_lines_for(result)
 
-    assert '<a id="model-test-model"></a>\n\n### ✅ test/model' in md
+    assert '<a id="model-test-model"></a>\n\n### ⚠️ test/model' in md
 
 
 def test_gallery_quality_warnings_have_blank_line_before_list() -> None:

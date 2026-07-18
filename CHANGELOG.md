@@ -7,6 +7,21 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Unify execution and recommendation semantics across HTML, Markdown, TSV, JSONL,
+  history, and selection reports. A model is now `recommended` only when its output
+  is presentation-ready; token caps and thinking/control-token presentation issues
+  are retained as `caveat` evidence.
+- Keep successful thinking-template and context-boundary observations out of
+  ready-to-file maintainer issue clusters until a controlled reproduction confirms
+  them, while preserving their full generated output and prompt diagnostics.
+- Repair the standalone HTML report's numeric sorting, recommendation filtering,
+  filter counts, and table accessibility, and replace padded TSV output with a
+  compact adaptive literal-tab contract that retains complete generated text.
+- Add publication-safe component installation/source revisions and requested versus
+  resolved local model-snapshot provenance to JSONL, run JSON schema 1.2,
+  diagnostics, and failure reproduction bundles.
+- Tighten provenance and test-double annotations so the type checker can validate
+  dynamic generation diagnostics without new suppressions.
 - Bump the package version to `0.8.8` for the report-utility and indeterminate
   external-connectivity reporting release.
 - Bump the package version to `0.8.7` and enrich benchmark hardware/runtime
