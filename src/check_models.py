@@ -24890,7 +24890,7 @@ def _log_performance_highlights(
     logger.info(
         "   Average peak memory: %s",
         _format_peak_memory_context(
-            float(average_peak_memory),
+            average_peak_memory,
             recommended_working_set_bytes,
         ),
     )
