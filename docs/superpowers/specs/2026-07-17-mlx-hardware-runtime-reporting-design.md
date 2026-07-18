@@ -91,9 +91,9 @@ GPU core count and Metal family will continue to come from `system_profiler`.
 
 The recommended working-set size must not be recovered by parsing a formatted
 system-information string. Add an optional `recommended_working_set_bytes` field
-to both `FinalizationInputs` and `ReportRenderContext`, and populate it from the
-normalized MLX device probe. Finalization passes the same value to every report
-and persistence builder that needs it.
+to `ReportRenderContext`, populate it from the normalized MLX device probe in
+`finalize_execution()`, and pass the same context to every report and persistence
+builder that needs it.
 
 The raw value is run-level context, not a model result. Report builders use it to
 derive a model-level percentage:
