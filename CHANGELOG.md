@@ -7,6 +7,22 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Make standalone HTML results genuinely interactive and caption-focused: omit
+  irrelevant diffusion columns, add safe model/status/compatibility/burden/
+  recommendation/memory filters, and support numeric or textual column sorting.
+- Treat externally disconnected model-load attempts as indeterminate rather than
+  model or framework failures: retain their evidence, exclude them from upstream
+  issue drafts and quality comparisons, and report attempted/evaluated/failed/
+  indeterminate counts consistently.
+- Replace the wide TSV field dump with a compact caption-comparison contract that
+  keeps exact generated text once, one error-owner field, and concise failure facts;
+  JSONL 2.0 remains the exhaustive machine-readable artifact.
+- Normalize local home paths in reproduction bundles and commands, and add
+  check_models version, Git revision, and install type to run JSON schema 1.1.
+- Lower the configured verbosity threshold from 400 to 160 generated tokens so
+  the 200-token triage lane can identify overlong meta-commentary, while retaining
+  neutral sampling defaults for comparable baseline runs.
+
 - Cap the optional `tokenizers` extra to the `0.22.x` line
   (`>=0.22.0,<0.23.0`) in the shared dependency policy, packaging metadata,
   and README until the `0.23.x` line has been validated against this

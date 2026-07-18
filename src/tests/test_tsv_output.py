@@ -62,7 +62,7 @@ def test_generate_tsv_report_basic(tmp_path: Path) -> None:
 
 
 def test_tsv_escapes_tabs_in_values(tmp_path: Path) -> None:
-    """Should normalize tabs into visible spaces in compact output previews."""
+    """Should normalize tabs into visible spaces in exact generated text."""
     results = [
         check_models.PerformanceResult(
             model_name="test/model",
@@ -79,9 +79,8 @@ def test_tsv_escapes_tabs_in_values(tmp_path: Path) -> None:
     check_models.generate_tsv_report(results, output_file)
     record = _read_tsv_record(output_file)
 
-    # Shared output previews normalize internal whitespace before TSV escaping
-    assert "Line with tab character" in record["Output"]
     assert "Line with    tab character" in record["Generated Text"]
+    assert "Output" not in record
 
 
 def test_tsv_escapes_newlines_in_values(tmp_path: Path) -> None:
@@ -106,11 +105,9 @@ def test_tsv_escapes_newlines_in_values(tmp_path: Path) -> None:
     data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
     assert len(data_lines) == 2
 
-    # Shared output previews collapse multiline output into a readable one-line preview
     record = _read_tsv_record(output_file)
-    assert "Line 1 Line 2 Line 3" in record["Output"]
-    assert "\\n" not in record["Output"]
     assert "Line 1\\nLine 2\\nLine 3" in record["Generated Text"]
+    assert "Output" not in record
 
 
 def test_tsv_removes_html_tags_from_headers(tmp_path: Path) -> None:
@@ -164,8 +161,8 @@ def test_tsv_handles_failed_results(tmp_path: Path) -> None:
     assert "Error" in content or "Failed to load model" in content
 
 
-def test_tsv_uses_shared_output_preview_cues_and_tail_marker(tmp_path: Path) -> None:
-    """Compact TSV output should expose issue cues and the output tail."""
+def test_tsv_keeps_full_output_without_a_duplicate_preview(tmp_path: Path) -> None:
+    """Compact TSV should retain exact evidence without a redundant preview column."""
     long_text = "Start of answer. " + ("filler text " * 40) + "TRAILING-SIGNAL"
     results = [
         check_models.PerformanceResult(
@@ -182,13 +179,36 @@ def test_tsv_uses_shared_output_preview_cues_and_tail_marker(tmp_path: Path) -> 
     output_file = tmp_path / "preview.tsv"
 
     check_models.generate_tsv_report(results, output_file)
-    content = safe_io.read_text_no_follow(output_file)
 
-    data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
-    data_row = data_lines[1]
-    assert "[context-echo; reasoning-leak]" in data_row
-    assert "[tail]" in data_row
-    assert "TRAILING-SIGNAL" in data_row
+    record = _read_tsv_record(output_file)
+    assert record["Generated Text"] == long_text
+    assert "Output" not in record
+
+
+def test_tsv_uses_compact_caption_schema_without_diffusion_or_duplicate_owner(
+    tmp_path: Path,
+) -> None:
+    """The spreadsheet contract should not expose irrelevant or duplicate columns."""
+    result = check_models.PerformanceResult(
+        model_name="test/caption-model",
+        success=True,
+        generation=MockGenerationResult(text="A cat on a pink sofa."),
+        total_time=1.0,
+    )
+    output_file = tmp_path / "compact.tsv"
+
+    check_models.generate_tsv_report([result], output_file)
+    content = safe_io.read_text_no_follow(output_file)
+    header = next(line for line in content.splitlines() if not line.startswith("#"))
+    fields = [field.strip() for field in header.split("\t")]
+
+    assert fields.count("error_package") == 1
+    assert "Error Package" not in fields
+    assert "Output" not in fields
+    assert "Generated Text" in fields
+    assert "Diffusion Canvas Tokens" not in fields
+    assert "Diffusion Denoising Steps" not in fields
+    assert "Text Already Printed" not in fields
 
 
 def test_tsv_includes_canonical_prompt_burden_scalars(tmp_path: Path) -> None:

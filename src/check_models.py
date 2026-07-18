@@ -417,7 +417,7 @@ class QualityThresholds:
     min_context_term_length: int = 2
 
     # Verbosity detection
-    max_verbosity_tokens: int = 400
+    max_verbosity_tokens: int = 160
     min_meta_patterns: int = 2
     min_section_headers: int = 3
 
@@ -1453,6 +1453,7 @@ class ModelIssueSummary(TypedDict, total=False):
 
     total_models: int
     failed_models: list[FailedModelIssue]
+    indeterminate_models: list[FailedModelIssue]
     repetitive_models: list[RepetitiveModelIssue]
     hallucination_models: list[HallucinationModelIssue]
     verbose_models: list[VerboseModelIssue]
@@ -3577,6 +3578,20 @@ MARKDOWN_SUMMARY_TABLE_FIELDS: Final[tuple[str, ...]] = (
     "quality_issues",
     "error_package",
 )
+TSV_COMPACT_TABLE_FIELDS: Final[tuple[str, ...]] = (
+    "model_name",
+    "prompt_tokens",
+    "generation_tokens",
+    "total_tokens",
+    "prompt_tps",
+    "generation_tps",
+    "peak_memory",
+    "finish_reason",
+    "generation_time",
+    "model_load_time",
+    "total_time",
+    "quality_issues",
+)
 
 
 # =============================================================================
@@ -4092,7 +4107,7 @@ def _detect_excessive_verbosity(text: str, generated_tokens: int) -> bool:
     """Detect if model output is excessively verbose.
 
     Considers output verbose if:
-    - Generated tokens > 300 (substantial length)
+    - Generated tokens reach the configured substantial-length threshold
     - Contains meta-commentary about the image/analysis
     - Has multiple sections (###, ##) suggesting over-structure
 
@@ -10099,11 +10114,32 @@ def _escape_html_header_text(header: str) -> str:
     return "<br>".join(_escape_html_table_text(part) for part in header.split("<br>"))
 
 
-def _html_result_row_attrs(result: PerformanceResult) -> str:
+def _html_result_row_attrs(
+    result: PerformanceResult,
+    recommendation: ModelRecommendationView | None = None,
+) -> str:
     """Return filter metadata attributes for one result row."""
+    attrs = _html_attr("data-model", result.model_name.casefold())
+    if recommendation is not None:
+        attrs += _html_attr("data-compatibility", recommendation.compatibility)
+        attrs += _html_attr("data-prompt-burden", recommendation.burden.kind)
+        attrs += _html_attr("data-eligible", str(recommendation.eligible).lower())
+        attrs += _html_attr(
+            "data-peak-memory",
+            str(recommendation.peak_memory_gb) if recommendation.peak_memory_gb is not None else "",
+        )
     if result.success:
-        return _html_class_attr(["success"]) + _html_attr("data-status", "success")
-    return (
+        return attrs + _html_class_attr(["success"]) + _html_attr("data-status", "success")
+    if _is_indeterminate_connectivity_failure(result):
+        return (
+            attrs
+            + _html_class_attr(["indeterminate"])
+            + _html_attr("data-status", "indeterminate")
+            + _html_attr("data-error-stage", result.error_stage or "Network Error")
+            + _html_attr("data-error-type", result.error_type or "error")
+            + _html_attr("data-error-package", _UNKNOWN_OWNER)
+        )
+    return attrs + (
         _html_class_attr(["failed"])
         + _html_attr("data-status", "failed")
         + _html_attr("data-error-stage", result.error_stage or "unknown")
@@ -10128,6 +10164,7 @@ def _build_html_results_table(
     rows: Sequence[Sequence[str]],
     field_names: Sequence[str],
     sorted_results: Sequence[PerformanceResult],
+    recommendations: Mapping[str, ModelRecommendationView] | None = None,
 ) -> str:
     """Build the escaped HTML results table without regex post-processing."""
     numeric_columns: frozenset[int] = frozenset(
@@ -10139,13 +10176,23 @@ def _build_html_results_table(
     for index, header in enumerate(headers):
         alignment_class = "numeric" if index in numeric_columns else "text"
         parts.append(
-            f"<th{_html_class_attr([alignment_class])}>{_escape_html_header_text(header)}</th>"
+            f"<th{_html_class_attr([alignment_class])}>"
+            f'<button class="sort-btn" type="button" data-column="{index}" '
+            f'data-numeric="{str(index in numeric_columns).lower()}">'
+            f"{_escape_html_header_text(header)}</button></th>"
         )
     parts.extend(["</tr>", "</thead>", "<tbody>"])
 
     for row_index, row in enumerate(rows):
         result = sorted_results[row_index] if row_index < len(sorted_results) else None
-        parts.append(f"<tr{_html_result_row_attrs(result) if result is not None else ''}>")
+        recommendation = (
+            recommendations.get(result.model_name)
+            if recommendations is not None and result is not None
+            else None
+        )
+        parts.append(
+            f"<tr{_html_result_row_attrs(result, recommendation) if result is not None else ''}>"
+        )
         for column_index, value in enumerate(row):
             field_name = field_names[column_index] if column_index < len(field_names) else ""
             cell_classes = ["numeric" if column_index in numeric_columns else "text"]
@@ -10160,7 +10207,15 @@ def _build_html_results_table(
                 cell_content = _build_html_output_details(value, value)
             else:
                 cell_content = _escape_html_table_text(value)
-            parts.append(f"<td{_html_class_attr(cell_classes)}>{cell_content}</td>")
+            sort_value = (
+                re.sub(r"[^0-9eE+.-]", "", value.replace(",", ""))
+                if column_index in numeric_columns
+                else value.casefold()
+            )
+            parts.append(
+                f"<td{_html_class_attr(cell_classes)}{_html_attr('data-sort-value', sort_value)}>"
+                f"{cell_content}</td>"
+            )
         parts.append("</tr>")
 
     parts.extend(["</tbody>", "</table>"])
@@ -10271,6 +10326,7 @@ def analyze_model_issues(
     baseline_grade: str | None = baseline[1] if baseline is not None else None
 
     failed_models: list[FailedModelIssue] = []
+    indeterminate_models: list[FailedModelIssue] = []
     repetitive_models: list[RepetitiveModelIssue] = []
     hallucination_models: list[HallucinationModelIssue] = []
     verbose_models: list[VerboseModelIssue] = []
@@ -10285,6 +10341,7 @@ def analyze_model_issues(
     summary: ModelIssueSummary = {
         "total_models": len(results),
         "failed_models": failed_models,
+        "indeterminate_models": indeterminate_models,
         "repetitive_models": repetitive_models,
         "hallucination_models": hallucination_models,
         "verbose_models": verbose_models,
@@ -10324,7 +10381,12 @@ def analyze_model_issues(
 
     for res in results:
         if not res.success:
-            failed_models.append((res.model_name, res.error_stage, res.error_message))
+            destination = (
+                indeterminate_models
+                if _is_indeterminate_connectivity_failure(res)
+                else failed_models
+            )
+            destination.append((res.model_name, res.error_stage, res.error_message))
             continue
         if not res.generation:
             continue
@@ -11058,6 +11120,16 @@ def _collect_quality_issue_sections(summary: ModelIssueSummary) -> list[QualityI
             ),
         )
 
+    indeterminate_models = summary.get("indeterminate_models", [])
+    if indeterminate_models:
+        sections.append(
+            (
+                "⚠️ Indeterminate Attempts",
+                "metric-neutral",
+                [(model, stage or "Network Error") for model, stage, _ in indeterminate_models],
+            ),
+        )
+
     repetitive_models = summary.get("repetitive_models", [])
     if repetitive_models:
         sections.append(
@@ -11699,8 +11771,9 @@ def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord |
     requested_max_tokens = result.requested_max_tokens
     evidence: list[str] = _failure_review_evidence(result)
     failure_owner = _failure_owner_for_result(result)
+    indeterminate = _is_indeterminate_connectivity_failure(result)
     return {
-        "verdict": "runtime_failure",
+        "verdict": "indeterminate" if indeterminate else "runtime_failure",
         "hint_relationship": "not_evaluated",
         "instruction_echo": False,
         "metadata_borrowing": False,
@@ -11708,14 +11781,13 @@ def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord |
             requested_max_tokens is not None and generation_tokens >= requested_max_tokens
         ),
         "owner": (
-            failure_owner
+            "unknown"
+            if indeterminate
+            else failure_owner
             if failure_owner.startswith("unresolved: ")
-            else _classify_review_owner(
-                harness_type=None,
-                failure_owner=failure_owner,
-            )
+            else _classify_review_owner(harness_type=None, failure_owner=failure_owner)
         ),
-        "user_bucket": "avoid",
+        "user_bucket": "not_evaluated" if indeterminate else "avoid",
         "evidence": _dedupe_preserve_order(evidence) or ["runtime_failure"],
         "requested_max_tokens": requested_max_tokens,
         "hit_max_tokens": bool(
@@ -11745,7 +11817,7 @@ def _review_for_result(result: PerformanceResult) -> JsonlReviewRecord | None:
     return _build_jsonl_review_record(result)
 
 
-_HUGGINGFACE_HUB_CONNECTIVITY_NEEDLES: Final[tuple[str, ...]] = (
+_EXTERNAL_CONNECTIVITY_NEEDLES: Final[tuple[str, ...]] = (
     "server disconnected without sending a response",
     "remoteprotocolerror",
     "connection refused",
@@ -11756,20 +11828,22 @@ _HUGGINGFACE_HUB_CONNECTIVITY_NEEDLES: Final[tuple[str, ...]] = (
     "temporary failure in name resolution",
     "nodename nor servname provided",
     "failed to establish a new connection",
-    "read timeout",
-    "connect timeout",
-    "timed out",
     "503 service unavailable",
     "502 bad gateway",
     "504 gateway timeout",
 )
 
 
-def _is_huggingface_hub_connectivity_failure(result: PerformanceResult) -> bool:
-    """Return whether a failed result likely reflects a transient Hub connectivity issue."""
-    if (result.error_package or "").casefold() != "huggingface-hub":
-        return False
+def _has_external_connectivity_signal(text: str) -> bool:
+    """Return whether text contains a narrow external-connectivity signature."""
+    normalized = text.casefold()
+    return any(needle in normalized for needle in _EXTERNAL_CONNECTIVITY_NEEDLES)
 
+
+def _is_indeterminate_connectivity_failure(result: PerformanceResult) -> bool:
+    """Return whether connectivity prevented a conclusive model attempt."""
+    if result.success:
+        return False
     combined = " ".join(
         part.casefold()
         for part in (
@@ -11779,7 +11853,22 @@ def _is_huggingface_hub_connectivity_failure(result: PerformanceResult) -> bool:
         )
         if part
     )
-    return any(needle in combined for needle in _HUGGINGFACE_HUB_CONNECTIVITY_NEEDLES)
+    return _has_external_connectivity_signal(combined)
+
+
+def _run_outcome_counts(results: Sequence[PerformanceResult]) -> dict[str, JsonLike]:
+    """Return counts without treating unreachable inputs as evaluated failures."""
+    indeterminate = sum(_is_indeterminate_connectivity_failure(result) for result in results)
+    successful = sum(result.success for result in results)
+    failed = len(results) - successful - indeterminate
+    return {
+        "models_attempted": len(results),
+        "models_evaluated": successful + failed,
+        "models_failed": failed,
+        "models_indeterminate": indeterminate,
+        "models_successful": successful,
+        "models_total": len(results),
+    }
 
 
 def _failure_review_evidence(result: PerformanceResult) -> list[str]:
@@ -11789,8 +11878,8 @@ def _failure_review_evidence(result: PerformanceResult) -> list[str]:
         evidence.append(re.sub(r"[^a-z0-9]+", "_", result.error_stage.casefold()).strip("_"))
     if result.error_code:
         evidence.append(result.error_code.casefold())
-    if _is_huggingface_hub_connectivity_failure(result):
-        evidence.append("hub_connectivity")
+    if _is_indeterminate_connectivity_failure(result):
+        evidence.append("external_connectivity")
     return _dedupe_preserve_order(evidence) or ["runtime_failure"]
 
 
@@ -11827,7 +11916,7 @@ def _review_confidence(
         or result.error_traceback is not None
         or result.error_package is not None
     ):
-        return "high"
+        return "low" if _is_indeterminate_connectivity_failure(result) else "high"
     if analysis is not None:
         if analysis.has_harness_issue and analysis.harness_issue_type is not None:
             return "high"
@@ -12340,12 +12429,10 @@ def _review_next_action_text(review: JsonlReviewRecord) -> str:
                 f"Treat this as a {burden_label} burden issue first; reduce that input load or "
                 "inspect long-context handling before judging output quality."
             )
-    elif review["owner"] == "huggingface-hub":
+    elif "external_connectivity" in review["evidence"]:
         action = (
-            "Check whether Hugging Face was reachable; this may be a transient Hub/network "
-            "outage or disconnect rather than a model defect."
-            if "hub_connectivity" in review["evidence"]
-            else "Check cache/revision availability and network/auth state before blaming the model."
+            "Retry when external connectivity is stable; the model was not evaluated and the "
+            "disconnect does not identify a faulty package."
         )
     else:
         action = _review_owner_specific_next_action(review)
@@ -13315,6 +13402,7 @@ class DiagnosticsSnapshot:
     """Cached diagnostics classification derived from a completed run."""
 
     failed: tuple[PerformanceResult, ...] = ()
+    indeterminate: tuple[PerformanceResult, ...] = ()
     harness_results: tuple[tuple[PerformanceResult, str], ...] = ()
     stack_signals: tuple[tuple[PerformanceResult, str, str], ...] = ()
     text_sanity_results: tuple[tuple[PerformanceResult, str], ...] = ()
@@ -13378,7 +13466,12 @@ class ReportTriageContext:
     baseline_grade: str | None = None
 
 
-type CompatibilityStatus = Literal["crashed", "integration-warning", "clean"]
+type CompatibilityStatus = Literal[
+    "crashed",
+    "indeterminate",
+    "integration-warning",
+    "clean",
+]
 
 
 @dataclass(frozen=True)
@@ -13961,7 +14054,14 @@ def _build_diagnostics_snapshot(
     resolved_results = [
         _populate_result_quality_analysis(result, prompt=prompt) for result in results
     ]
-    failed = tuple(r for r in resolved_results if not r.success)
+    indeterminate = tuple(
+        result for result in resolved_results if _is_indeterminate_connectivity_failure(result)
+    )
+    failed = tuple(
+        result
+        for result in resolved_results
+        if not result.success and not _is_indeterminate_connectivity_failure(result)
+    )
     successful = [r for r in resolved_results if r.success]
     harness_detected = _collect_harness_results(successful)
     stack_detected = _collect_stack_issue_signals(
@@ -13985,12 +14085,13 @@ def _build_diagnostics_snapshot(
         failure_clusters = tuple(
             (signature, tuple(cluster_results))
             for signature, cluster_results in sorted(
-                _cluster_failures_by_pattern(resolved_results).items(),
+                _cluster_failures_by_pattern(list(failed)).items(),
                 key=lambda kv: -len(kv[1]),
             )
         )
     return DiagnosticsSnapshot(
         failed=failed,
+        indeterminate=indeterminate,
         harness_results=tuple(harness_results),
         stack_signals=tuple(stack_signals),
         text_sanity_results=tuple(text_sanity_results),
@@ -14004,6 +14105,7 @@ def _snapshot_has_maintainer_signals(snapshot: DiagnosticsSnapshot) -> bool:
     """Return True when a run produced maintainer-facing diagnostics."""
     return bool(
         snapshot.failed
+        or snapshot.indeterminate
         or snapshot.harness_results
         or snapshot.stack_signals
         or snapshot.text_sanity_results
@@ -14658,6 +14760,7 @@ def _diagnostics_header(
     *,
     total: int,
     n_failed: int,
+    n_indeterminate: int,
     n_harness: int,
     n_text_sanity: int,
     n_preflight: int,
@@ -14669,16 +14772,17 @@ def _diagnostics_header(
     parts: list[str] = ["<!-- markdownlint-disable MD013 -->", ""]
     version = versions.get("mlx-vlm") or "unknown"
     parts.append(
-        f"# Diagnostics Report — {n_failed} failure(s), "
+        f"# Diagnostics Report — {n_failed} failure(s), {n_indeterminate} indeterminate, "
         f"{n_harness} harness issue(s), {n_text_sanity} text-sanity issue(s) "
         f"(mlx-vlm {version})",
     )
     parts.append("")
     parts.append(
-        f"**Run summary:** {total} locally-cached VLM model(s) checked; "
+        f"**Run summary:** {total} attempted, {total - n_indeterminate} evaluated; "
         f"{n_failed} hard failure(s), {n_harness} harness/integration issue(s), "
         f"{n_text_sanity} text-sanity/semantic issue(s), "
-        f"{n_preflight} preflight warning(s), {n_success} successful run(s)."
+        f"{n_indeterminate} indeterminate, {n_preflight} preflight warning(s), "
+        f"{n_success} successful run(s)."
     )
     parts.append("")
 
@@ -15717,7 +15821,7 @@ def _diagnostics_impact_section(
     image_path: Path | None,
 ) -> list[str]:
     """Build issue-ready impact and run-condition context."""
-    successful_count = len(results) - len(snapshot.failed)
+    counts = _run_outcome_counts(results)
     image_ref = _issue_repro_image_ref(image_path=image_path, run_args=None)
     return render_report_markdown(
         (
@@ -15726,9 +15830,11 @@ def _diagnostics_impact_section(
                 blocks=(
                     ReportKeyValues(
                         rows=(
-                            ("Models tested", str(len(results))),
+                            ("Models attempted", str(counts["models_attempted"])),
+                            ("Models evaluated", str(counts["models_evaluated"])),
+                            ("Indeterminate", str(counts["models_indeterminate"])),
                             ("Crashed", str(len(snapshot.failed))),
-                            ("Completed", str(successful_count)),
+                            ("Completed", str(counts["models_successful"])),
                             ("Prompt", prompt),
                             ("Image", image_ref),
                         )
@@ -15794,6 +15900,46 @@ def _diagnostics_crash_matrix(failed: Sequence[PerformanceResult]) -> list[str]:
                             rows=tuple(rows),
                         ),
                         *details,
+                    ),
+                ),
+            )
+        ),
+        rules=MARKDOWNLINT_TABLE_PIPE_RULES,
+    )
+
+
+def _diagnostics_indeterminate_matrix(
+    results: Sequence[PerformanceResult],
+) -> list[str]:
+    """Render attempts that could not evaluate a model because input was unreachable."""
+    if not results:
+        return []
+    rows = tuple(
+        (
+            result.model_name,
+            result.failure_phase or "model_load",
+            result.error_stage or "Network Error",
+            _collapse_preview_whitespace(
+                result.root_error_message or result.error_message or "Connectivity unavailable"
+            ),
+            "Retry; no package owner or model-quality conclusion.",
+        )
+        for result in sorted(results, key=lambda item: item.model_name)
+    )
+    return _guard_markdownlint_block(
+        render_report_markdown(
+            (
+                ReportSection(
+                    title="Indeterminate Attempts",
+                    blocks=(
+                        ReportParagraph(
+                            "External connectivity prevented evaluation. These attempts remain "
+                            "visible as evidence but are excluded from failures and issue drafts."
+                        ),
+                        ReportTable(
+                            headers=("Model", "Phase", "Status", "Evidence", "Action"),
+                            rows=rows,
+                        ),
                     ),
                 ),
             )
@@ -16387,6 +16533,33 @@ def _jsonify_cli_value(value: object) -> object:
     return str(value)
 
 
+def _public_repro_value(value: object) -> object:
+    """Return a JSON-safe repro value without local home-directory disclosure."""
+    if isinstance(value, Path):
+        return _home_relative_report_text(str(value))
+    if isinstance(value, str):
+        return _home_relative_report_text(value)
+    if isinstance(value, (int, float, bool)) or value is None:
+        return value
+    if isinstance(value, list | tuple):
+        return [_public_repro_value(item) for item in value]
+    if isinstance(value, dict):
+        return {str(key): _public_repro_value(item) for key, item in value.items()}
+    return _home_relative_report_text(str(value))
+
+
+def _portable_repro_image_path(image_path: Path | None) -> Path | None:
+    """Return a shareable image reference while preserving ``None``."""
+    if image_path is None:
+        return None
+    return Path(
+        _issue_repro_portable_path_ref(
+            str(image_path),
+            fallback="path/to/repro-image.jpg",
+        )
+    )
+
+
 def _sha256_text(value: str) -> str:
     """Return SHA256 hash of UTF-8 text."""
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
@@ -16439,10 +16612,11 @@ def export_failure_repro_bundles(
     prompt_hash = _sha256_text(prompt)
     image_hash = _sha256_file(image_path) if image_path is not None else None
     image_ref_hash = _sha256_text(str(image_path)) if image_path is not None else None
-    env_vars = _collect_repro_env()
+    env_vars = cast("dict[str, str]", _public_repro_value(_collect_repro_env()))
     serialized_args = {
-        key: _jsonify_cli_value(value) for key, value in sorted(vars(run_args).items())
+        key: _public_repro_value(value) for key, value in sorted(vars(run_args).items())
     }
+    portable_image_path = _portable_repro_image_path(image_path)
     preflight_issues = list(_get_run_preflight_issues(run_args))
     resolved_issue_clusters = _resolve_issue_clusters_for_results(
         results=results,
@@ -16472,7 +16646,7 @@ def export_failure_repro_bundles(
         bundle_path = output_dir / bundle_name
 
         rerun_tokens = _build_repro_command_tokens(
-            image_path=image_path,
+            image_path=portable_image_path,
             run_args=run_args,
             include_selection=False,
         )
@@ -16497,7 +16671,7 @@ def export_failure_repro_bundles(
             "seed": serialized_args.get("seed"),
             "prompt_hash_sha256": prompt_hash,
             "prompt_preview": _build_prompt_preview(prompt, max_chars=400),
-            "image_path": str(image_path) if image_path is not None else None,
+            "image_path": str(portable_image_path) if portable_image_path is not None else None,
             "image_sha256": image_hash,
             "image_ref_sha256": image_ref_hash,
             "args": serialized_args,
@@ -16538,7 +16712,7 @@ def export_failure_repro_bundles(
             "repro": repro_payload,
             "environment": {
                 "platform": platform.platform(),
-                "system_info": system_info,
+                "system_info": _public_repro_value(system_info),
                 "library_versions": versions,
                 "preflight_issues": preflight_issues,
             },
@@ -16551,7 +16725,7 @@ def export_failure_repro_bundles(
         try:
             _write_text_file(
                 bundle_path,
-                json.dumps(bundle_payload, indent=2, sort_keys=True) + "\n",
+                json.dumps(_public_repro_value(bundle_payload), indent=2, sort_keys=True) + "\n",
             )
         except OSError:
             logger.exception("Failed to write repro bundle for %s", result.model_name)
@@ -16638,14 +16812,16 @@ def generate_diagnostics_report(
         )
 
     failed = list(diagnostics_snapshot.failed)
+    indeterminate = list(diagnostics_snapshot.indeterminate)
     harness_results = list(diagnostics_snapshot.harness_results)
     stack_signals = list(diagnostics_snapshot.stack_signals)
     text_sanity_results = list(diagnostics_snapshot.text_sanity_results)
     preflight_issues = list(diagnostics_snapshot.preflight_issues)
-    successful_count = len(results) - len(failed)
+    successful_count = sum(result.success for result in results)
 
     if (
         not failed
+        and not indeterminate
         and not harness_results
         and not stack_signals
         and not text_sanity_results
@@ -16668,6 +16844,7 @@ def generate_diagnostics_report(
     parts: list[str] = _diagnostics_header(
         total=len(results),
         n_failed=len(failed),
+        n_indeterminate=len(indeterminate),
         n_harness=len(harness_results),
         n_text_sanity=len(text_sanity_results),
         n_preflight=len(preflight_issues),
@@ -16684,6 +16861,7 @@ def generate_diagnostics_report(
         )
     )
     parts.append("")
+    parts.extend(_diagnostics_indeterminate_matrix(indeterminate))
     parts.extend(_diagnostics_crash_matrix(failed))
     parts.extend(_diagnostics_issue_matrix(mlx_vlm_clusters))
     parts.extend(
@@ -16760,6 +16938,7 @@ def _build_full_html_document(
         th { background-color: #f2f2f2; font-weight: bold; }
         .numeric { text-align: right; }
         .failed { background-color: #ffdddd; }
+        .indeterminate { background-color: #fff4cc; }
         tr.hidden { display: none; }
         .summary {
             margin-top: 2em; padding: 1em; border: 1px solid #eee;
@@ -16818,6 +16997,15 @@ def _build_full_html_document(
             font-size: 0.9em;
             color: #666;
         }
+        .filter-controls label { display: inline-block; margin: 0.3em 0.8em 0.3em 0; }
+        .filter-controls input, .filter-controls select { margin-left: 0.3em; }
+        .sort-btn {
+            width: 100%; border: 0; background: transparent; color: inherit;
+            cursor: pointer; font: inherit; font-weight: bold; text-align: inherit;
+        }
+        .sort-btn::after { content: " ↕"; color: #777; }
+        .sort-btn[data-direction="asc"]::after { content: " ↑"; }
+        .sort-btn[data-direction="desc"]::after { content: " ↓"; }
     </style>
     """
     sys_info_html = "<ul>"
@@ -16827,50 +17015,58 @@ def _build_full_html_document(
         )
     sys_info_html += "</ul>"
 
-    # Build filter controls with JavaScript
+    # Build dependency-free table controls with JavaScript.
     filter_controls = """
     <div class="filter-controls">
+        <strong>Filter and compare results:</strong>
         <div>
-            <strong>Filter Results:</strong>
-            <button class="filter-btn active" onclick="filterTable('all')">All</button>
-            <button class="filter-btn" onclick="filterTable('success')">Success Only</button>
-            <button class="filter-btn" onclick="filterTable('failed')">Failed Only</button>
-            <button class="filter-btn" onclick="filterTable('load')">Load Errors</button>
-            <button class="filter-btn" onclick="filterTable('generation')">
-                Generation Errors
-            </button>
-            <button class="filter-btn" onclick="filterTable('timeout')">Timeouts</button>
+            <label>Model <input id="model-search" type="search" placeholder="Search models"></label>
+            <label>Status <select id="status-filter">
+                <option value="all">All</option><option value="success">Completed</option>
+                <option value="failed">Failed</option>
+                <option value="indeterminate">Indeterminate</option>
+            </select></label>
+            <label>Compatibility <select id="compatibility-filter">
+                <option value="all">All</option><option value="clean">Clean</option>
+                <option value="integration-warning">Integration warning</option>
+                <option value="crashed">Crashed</option>
+                <option value="indeterminate">Indeterminate</option>
+            </select></label>
+            <label>Prompt burden <select id="prompt-burden-filter">
+                <option value="all">All</option><option value="normal">Normal</option>
+                <option value="visual_input">Visual input</option><option value="text">Text</option>
+                <option value="mixed">Mixed</option><option value="unknown">Unknown</option>
+                <option value="unavailable">Unavailable</option>
+            </select></label>
+            <label>Recommendation <select id="eligibility-filter">
+                <option value="all">All</option><option value="true">Eligible</option>
+                <option value="false">Excluded</option>
+            </select></label>
+            <label>Max peak GB <input id="max-memory-filter" type="number" min="0" step="0.5"></label>
         </div>
         <div class="filter-info" id="filter-info">Showing all rows</div>
     </div>
 
     <script>
-    function filterTable(filterType) {
+    function applyFilters() {
         const table = document.querySelector('table');
         const rows = table.querySelectorAll('tr[data-status]');
+        const modelQuery = document.getElementById('model-search').value.toLowerCase();
+        const status = document.getElementById('status-filter').value;
+        const compatibility = document.getElementById('compatibility-filter').value;
+        const burden = document.getElementById('prompt-burden-filter').value;
+        const eligibility = document.getElementById('eligibility-filter').value;
+        const maxMemoryText = document.getElementById('max-memory-filter').value;
+        const maxMemory = maxMemoryText === '' ? null : Number(maxMemoryText);
         let visibleCount = 0;
-
-        // Update button states
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        event.target.classList.add('active');
-
-        // Apply filter
         rows.forEach(row => {
-            let show = false;
-
-            if (filterType === 'all') {
-                show = true;
-            } else if (filterType === 'success') {
-                show = row.dataset.status === 'success';
-            } else if (filterType === 'failed') {
-                show = row.dataset.status === 'failed';
-            } else {
-                // Filter by error stage
-                show = row.dataset.errorStage === filterType;
-            }
-
+            const memory = row.dataset.peakMemory === '' ? null : Number(row.dataset.peakMemory);
+            const show = row.dataset.model.includes(modelQuery)
+                && (status === 'all' || row.dataset.status === status)
+                && (compatibility === 'all' || row.dataset.compatibility === compatibility)
+                && (burden === 'all' || row.dataset.promptBurden === burden)
+                && (eligibility === 'all' || row.dataset.eligible === eligibility)
+                && (maxMemory === null || memory === null || memory <= maxMemory);
             if (show) {
                 row.classList.remove('hidden');
                 visibleCount++;
@@ -16878,16 +17074,36 @@ def _build_full_html_document(
                 row.classList.add('hidden');
             }
         });
-
-        // Update info text
         const totalRows = rows.length;
-        const filterInfo = document.getElementById('filter-info');
-        if (filterType === 'all') {
-            filterInfo.textContent = `Showing all ${totalRows} rows`;
-        } else {
-            filterInfo.textContent = `Showing ${visibleCount} of ${totalRows} rows`;
-        }
+        document.getElementById('filter-info').textContent =
+            `Showing ${visibleCount} of ${totalRows} rows`;
     }
+
+    function sortResults(button) {
+        const table = document.querySelector('table');
+        const tbody = table.tBodies[0];
+        const column = Number(button.dataset.column);
+        const numeric = button.dataset.numeric === 'true';
+        const direction = button.dataset.direction === 'asc' ? 'desc' : 'asc';
+        document.querySelectorAll('.sort-btn').forEach(item => item.removeAttribute('data-direction'));
+        button.dataset.direction = direction;
+        const rows = Array.from(tbody.querySelectorAll('tr[data-status]'));
+        rows.sort((left, right) => {
+            const leftValue = left.cells[column].dataset.sortValue || '';
+            const rightValue = right.cells[column].dataset.sortValue || '';
+            const comparison = numeric
+                ? ((Number(leftValue) || 0) - (Number(rightValue) || 0))
+                : leftValue.localeCompare(rightValue);
+            return direction === 'asc' ? comparison : -comparison;
+        });
+        rows.forEach(row => tbody.appendChild(row));
+    }
+
+    document.querySelectorAll('.filter-controls input, .filter-controls select')
+        .forEach(control => control.addEventListener('input', applyFilters));
+    document.querySelectorAll('.sort-btn')
+        .forEach(button => button.addEventListener('click', () => sortResults(button)));
+    applyFilters();
     </script>
     """
 
@@ -17108,6 +17324,12 @@ def generate_html_report(
         )
 
     headers, rows, field_names = _materialize_prepared_table_data(report_context.table_data)
+    _filter_table_columns(
+        headers=headers,
+        rows=rows,
+        field_names=field_names,
+        allowed_fields=(*MARKDOWN_SUMMARY_TABLE_FIELDS, "output"),
+    )
 
     if not headers or not rows:
         log_warning_note("No table data to generate HTML report.")
@@ -17118,6 +17340,7 @@ def generate_html_report(
         rows=rows,
         field_names=field_names,
         sorted_results=report_context.result_set.results,
+        recommendations=_recommendations_by_model(report_context),
     )
 
     suppress_cataloging_scores = report_context.mode_policy.suppress_cataloging_scores
@@ -17712,6 +17935,8 @@ def _recommendation_eligibility(
     hygiene_score: float | None,
 ) -> tuple[CompatibilityStatus, str]:
     """Return compatibility and the first current-run eligibility gate."""
+    if _is_indeterminate_connectivity_failure(result):
+        return "indeterminate", "model input was unreachable; outcome indeterminate"
     if not result.success:
         return "crashed", "current run crashed"
     if analysis is not None and analysis.has_harness_issue:
@@ -19270,14 +19495,13 @@ def generate_tsv_report(
     filename: Path,
     report_context: ReportRenderContext | None = None,
 ) -> None:
-    """Write a TSV (tab-separated values) file of the core results table.
+    """Write a compact TSV (tab-separated values) caption-comparison table.
 
     A ``# generated_at: <timestamp>`` comment line is written first so
-    downstream consumers know when the data was produced.  A full
-    ``Generated Text`` column is appended alongside the compact preview so
-    diagnostic markers remain searchable in spreadsheets.  For failed models
-    ``error_type`` and ``error_package`` are also appended to aid programmatic
-    triage.
+    downstream consumers know when the data was produced.  Exact model output
+    appears once in ``Generated Text``; exhaustive and diffusion-specific fields
+    remain available in JSONL.  Failed rows retain compact ``error_stage``,
+    ``error_type``, ``error_package``, and ``error_message`` evidence.
 
     Args:
         results: List of PerformanceResult objects.
@@ -19291,7 +19515,7 @@ def generate_tsv_report(
     if report_context is None:
         result_set = ResultSet(results)
         table_data = _build_prepared_table_data(result_set=result_set)
-        headers, rows, _ = _materialize_prepared_table_data(table_data)
+        headers, rows, field_names = _materialize_prepared_table_data(table_data)
         sorted_results = list(result_set.results)
         report_context = _build_report_render_context(
             results=results,
@@ -19299,12 +19523,19 @@ def generate_tsv_report(
             system_info={},
         )
     else:
-        headers, rows, _ = _materialize_prepared_table_data(report_context.table_data)
+        headers, rows, field_names = _materialize_prepared_table_data(report_context.table_data)
         sorted_results = list(report_context.result_set.results)
 
     if not headers or not rows:
         log_warning_note("No table data to generate TSV report.")
         return
+
+    _filter_table_columns(
+        headers=headers,
+        rows=rows,
+        field_names=field_names,
+        allowed_fields=TSV_COMPACT_TABLE_FIELDS,
+    )
 
     def escape_tsv_value(value: str) -> str:
         r"""Escape a value for TSV format.
@@ -19341,7 +19572,16 @@ def generate_tsv_report(
         "processed_image_height",
         "image_patch_count",
     ]
-    clean_headers.extend([*canonical_headers, "Generated Text", "error_type", "error_package"])
+    clean_headers.extend(
+        [
+            *canonical_headers,
+            "Generated Text",
+            "error_stage",
+            "error_type",
+            "error_package",
+            "error_message",
+        ]
+    )
     generated_text_index = clean_headers.index("Generated Text")
     recommendations = _recommendations_by_model(report_context)
     machine_facts = _machine_facts_by_model(report_context)
@@ -19364,8 +19604,10 @@ def generate_tsv_report(
             str(getattr(res.generation, "text", "") or "") if res.generation is not None else ""
         )
         clean_row.append(escape_tsv_value(generated_text))
+        clean_row.append(escape_tsv_value(res.error_stage or ""))
         clean_row.append(escape_tsv_value(res.error_type or ""))
         clean_row.append(escape_tsv_value(res.error_package or ""))
+        clean_row.append(escape_tsv_value(res.error_message or ""))
         clean_rows.append(
             [
                 (
@@ -20351,6 +20593,7 @@ _PROMPT_DIAGNOSTICS_ATTR: Final[str] = "_check_models_prompt_diagnostics"
 _STAGE_CODE_MAP: Final[dict[str, str]] = {
     "OOM": "OOM",
     "Timeout": "TIMEOUT",
+    "Network Error": "NETWORK_ERROR",
     "Missing Dep": "MISSING_DEP",
     "Lib Version": "LIB_VERSION",
     "API Drift": "API_DRIFT",
@@ -20395,6 +20638,7 @@ _FAILURE_PHASE_HINTS: Final[dict[str, str]] = {
 _ERROR_STAGE_HINTS: Final[dict[str, str]] = {
     "OOM": "out-of-memory pressure in backend runtime",
     "Timeout": "operation exceeded configured timeout",
+    "Network Error": "external connectivity prevented a conclusive model attempt",
     "Missing Dep": "missing required package(s) or extras",
     "Lib Version": "incompatible library versions/import surface changed",
     "API Drift": "required upstream runtime contract changed (missing symbol/signature/result fields)",
@@ -20548,6 +20792,8 @@ def _failure_exception_owner(entry: FailureException) -> str:
 
 def _failure_owner_for_result(result: PerformanceResult) -> str:
     """Return a primary owner or an explicit mixed-owner failure label."""
+    if _is_indeterminate_connectivity_failure(result):
+        return _UNKNOWN_OWNER
     chain_owners = {
         owner
         for entry in result.exception_chain
@@ -20732,6 +20978,7 @@ def _classify_error(error_msg: str) -> str:
     # Order matters: first match wins
     error_definitions = [
         # Critical infrastructure errors
+        ("Network Error", list(_EXTERNAL_CONNECTIVITY_NEEDLES)),
         ("OOM", ["metal::malloc", "maximum allowed buffer size"]),
         ("Timeout", ["timeout"]),
         # Dependency/version errors
@@ -20811,6 +21058,8 @@ def _attribute_error_to_package(error_msg: str, traceback_str: str | None = None
     msg_lower = error_msg.lower()
     tb_lower = (traceback_str or "").lower()
     combined = msg_lower + " " + tb_lower
+    if _has_external_connectivity_signal(combined):
+        return _UNKNOWN_OWNER
 
     # (Package Name, List of unique identification patterns)
     # Order matters: matches earlier in list take precedence
@@ -24829,7 +25078,12 @@ def _build_action_snapshot_stanzas(
     summary = report_context.summary
     triage = report_context.triage
     preflight_issues = report_context.preflight_issues
-    failed: list[PerformanceResult] = [res for res in results if not res.success]
+    indeterminate = [result for result in results if _is_indeterminate_connectivity_failure(result)]
+    failed = [
+        result
+        for result in results
+        if not result.success and not _is_indeterminate_connectivity_failure(result)
+    ]
     quality_counts = Counter(dict(triage.quality_counts))
     harness_success_count = sum("harness" in row.labels for row in triage.utility_rows)
     successful_count = len(triage.utility_rows)
@@ -24837,6 +25091,7 @@ def _build_action_snapshot_stanzas(
 
     failure_rows = _action_snapshot_failure_items(
         failed,
+        indeterminate=indeterminate,
         triage=triage,
         harness_success_count=harness_success_count,
         successful_count=successful_count,
@@ -24877,7 +25132,14 @@ def _build_action_snapshot_stanzas(
     termination_summary = ", ".join(
         f"{reason}={count}"
         for reason, count in sorted(
-            Counter("completed" if res.success else "exception" for res in results).items(),
+            Counter(
+                "completed"
+                if result.success
+                else "indeterminate"
+                if _is_indeterminate_connectivity_failure(result)
+                else "exception"
+                for result in results
+            ).items(),
         )
     )
     if runtime_analysis is None:
@@ -24939,6 +25201,7 @@ def _format_action_snapshot_parts(
 def _action_snapshot_failure_items(
     failed: list[PerformanceResult],
     *,
+    indeterminate: Sequence[PerformanceResult] = (),
     triage: ReportTriageContext,
     harness_success_count: int,
     successful_count: int,
@@ -24960,6 +25223,14 @@ def _action_snapshot_failure_items(
         )
     else:
         items.append(("Framework/runtime failures", "none."))
+
+    if indeterminate:
+        items.append(
+            (
+                "Indeterminate attempts",
+                f"{len(indeterminate)} (external connectivity prevented evaluation; retry).",
+            )
+        )
 
     items.append(
         (
@@ -24994,7 +25265,11 @@ def _group_failures_by_package(
     results: Sequence[PerformanceResult],
 ) -> list[tuple[str, list[PerformanceResult]]]:
     """Group failures by originating package ordered by highest count first."""
-    failed = [result for result in results if not result.success]
+    failed = [
+        result
+        for result in results
+        if not result.success and not _is_indeterminate_connectivity_failure(result)
+    ]
     by_package: dict[str, list[PerformanceResult]] = {}
     for result in failed:
         package = result.error_package or "unknown"
@@ -25542,6 +25817,8 @@ def _history_success_failure_sets(
     failed: set[str] = set()
 
     for model, info in models.items():
+        if info.get("compatibility_status") == "indeterminate":
+            continue
         success_value: object = info.get("success")
         if success_value is True:
             successful.add(model)
@@ -26326,6 +26603,33 @@ def save_jsonl_report(
         logger.exception("Failed to write JSONL report to %s", filename)
 
 
+def _collect_check_models_provenance() -> dict[str, JsonLike]:
+    """Collect best-effort producer identity for reproducible run snapshots."""
+    installed = True
+    try:
+        package_version = version("check_models")
+    except PackageNotFoundError:
+        package_version = "unknown"
+        installed = False
+
+    revision = os.environ.get("GITHUB_SHA") or _run_macos_toolchain_command(
+        ("git", "-C", str(_REPO_ROOT), "rev-parse", "HEAD")
+    )
+    install_type = (
+        "editable"
+        if installed and _distribution_is_editable("check_models")
+        else "installed"
+        if installed
+        else "unknown"
+    )
+    return {
+        "name": "check_models",
+        "version": package_version,
+        "git_revision": revision,
+        "install_type": install_type,
+    }
+
+
 def save_run_json_report(
     results: list[PerformanceResult],
     filename: Path,
@@ -26335,20 +26639,15 @@ def save_run_json_report(
     total_runtime_seconds: float,
     report_context: ReportRenderContext,
     output_paths: Mapping[str, str],
+    producer: Mapping[str, JsonLike] | None = None,
 ) -> None:
     """Write stable run-level metadata for public benchmark snapshots."""
-    failed = [result for result in results if not result.success]
-    successful = [result for result in results if result.success]
     policy = report_context.mode_policy
-    counts: dict[str, JsonLike] = {
-        "models_total": len(results),
-        "models_successful": len(successful),
-        "models_failed": len(failed),
-    }
+    counts = _run_outcome_counts(results)
     artifacts: dict[str, JsonLike] = dict(output_paths)
     library_versions: dict[str, JsonLike] = dict(versions)
     payload: dict[str, JsonLike] = {
-        "schema_version": "1.0",
+        "schema_version": "1.1",
         "generated_at": local_now_str(),
         "eval_mode": policy.eval_mode,
         "prompt": prompt,
@@ -26361,6 +26660,7 @@ def save_run_json_report(
         "counts": counts,
         "artifacts": artifacts,
         "library_versions": library_versions,
+        "producer": dict(producer or _collect_check_models_provenance()),
     }
     _write_text_file(filename, json.dumps(payload, indent=2, sort_keys=True) + "\n")
 
@@ -26384,6 +26684,7 @@ def generate_output_index_report(
     """Write a generated landing page that routes readers to the right artifact."""
     policy = report_context.mode_policy
     result_set = report_context.result_set
+    counts = _run_outcome_counts(result_set.results)
     diagnostics_written = (
         diagnostics_artifacts is not None and diagnostics_artifacts.diagnostics_written
     )
@@ -26405,9 +26706,11 @@ def generate_output_index_report(
             f"{MARKDOWN_ESCAPER.escape(policy.selection_basis)}"
             + (" (grounded)" if policy.semantic_rankings_grounded else " (ungrounded)")
         ),
-        f"- Models tested: {len(result_set.results)}",
-        f"- Successful: {len(result_set.successful)}",
-        f"- Failed: {len(result_set.failed)}",
+        f"- Models attempted: {counts['models_attempted']}",
+        f"- Models evaluated: {counts['models_evaluated']}",
+        f"- Successful: {counts['models_successful']}",
+        f"- Failed: {counts['models_failed']}",
+        f"- Indeterminate: {counts['models_indeterminate']}",
         "",
         "## Primary Artifacts",
         "",
@@ -26601,11 +26904,14 @@ def _history_model_results(record: HistoryRunRecord | None) -> dict[str, History
 
 
 def _history_counts(record: HistoryRunRecord | None) -> tuple[int, int, int, float]:
-    """Return (total, success, failed, success_rate_pct) for a history record."""
+    """Return evaluated total, successes, failures, and rate for a history record."""
     models = _history_model_results(record)
-    total = len(models)
-    success = sum(1 for info in models.values() if info.get("success") is True)
-    failed = sum(1 for info in models.values() if info.get("success") is False)
+    evaluated = [
+        info for info in models.values() if info.get("compatibility_status") != "indeterminate"
+    ]
+    total = len(evaluated)
+    success = sum(1 for info in evaluated if info.get("success") is True)
+    failed = sum(1 for info in evaluated if info.get("success") is False)
     success_rate = (success / total * 100.0) if total else 0.0
     return total, success, failed, success_rate
 
@@ -26720,7 +27026,7 @@ def _history_summary_rows(
 
     return [
         [
-            "Models tested",
+            "Models evaluated",
             previous_values[0],
             str(curr_total),
             _fmt_delta_int(curr_total, prev_total if previous is not None else None),

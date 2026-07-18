@@ -114,11 +114,9 @@ def test_detect_hallucination_patterns_uses_configured_keyword_lists() -> None:
 
 
 def test_analyze_generation_text_excessive_verbosity() -> None:
-    """Test detection of overly verbose output."""
-    # Verbosity requires 400+ tokens AND meta-commentary or section headers
+    """Triage-length output should be flaggable before its 200-token cap."""
     text = "The image shows " * 50 + "\n### Analysis\n" + "content " * 50
-    # Must have 400+ generated tokens
-    analysis = check_models.analyze_generation_text(text, 450)
+    analysis = check_models.analyze_generation_text(text, 180)
 
     assert analysis.is_verbose
 

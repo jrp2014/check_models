@@ -27,7 +27,7 @@ thresholds:
   min_context_term_length: 2 # Minimum length for context term extraction
 
   # Verbosity detection
-  max_verbosity_tokens: 400 # Substantial length threshold
+  max_verbosity_tokens: 160 # Allows triage's 200-token lane to flag overlong meta-output
   min_meta_patterns: 2 # Minimum meta-commentary patterns
 
   # Unknown anomaly detection
