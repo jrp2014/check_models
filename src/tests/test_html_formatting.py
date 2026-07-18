@@ -64,3 +64,15 @@ def test_escape_html_tags_selective_entity_chain() -> None:
     assert "&gt;" in result
     assert "&amp;" in result
     assert "&quot;" in result
+
+
+def test_html_numeric_sort_value_uses_only_leading_number() -> None:
+    """Units and label letters must not corrupt numeric sort keys."""
+    assert check_models._html_sort_value("1.00 GB", numeric=True) == "1.00"
+    assert check_models._html_sort_value("1.25e-3 s", numeric=True) == "1.25e-3"
+    assert check_models._html_sort_value("N/A", numeric=True) == ""
+
+
+def test_error_package_is_a_text_field() -> None:
+    """Package-owner labels should never be right-aligned or numerically sorted."""
+    assert not check_models.is_numeric_field("error_package")

@@ -3570,7 +3570,7 @@ UTILITY_DELTA_NEUTRAL_BAND: Final[float] = 2.0  # Within ±band, model is neutra
 # Numeric fields are automatically derived from FIELD_ABBREVIATIONS for consistency
 # Exclude non-numeric fields explicitly
 NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(
-    k for k in FIELD_ABBREVIATIONS if k not in {"model_name", "quality_issues"}
+    k for k in FIELD_ABBREVIATIONS if k not in {"model_name", "quality_issues", "error_package"}
 )
 
 # Performance timing fields: those from PerformanceResult (not GenerationResult)
@@ -10201,7 +10201,10 @@ def _html_result_row_attrs(
     if recommendation is not None:
         attrs += _html_attr("data-compatibility", recommendation.compatibility)
         attrs += _html_attr("data-prompt-burden", recommendation.burden.kind)
-        attrs += _html_attr("data-eligible", str(recommendation.eligible).lower())
+        attrs += _html_attr(
+            "data-recommendation",
+            _recommendation_status_for_result(result),
+        )
         attrs += _html_attr(
             "data-peak-memory",
             str(recommendation.peak_memory_gb) if recommendation.peak_memory_gb is not None else "",
@@ -10236,6 +10239,19 @@ def _build_html_output_details(preview_text: str, full_text: str) -> str:
     )
 
 
+_HTML_LEADING_NUMBER_RE: Final[re.Pattern[str]] = re.compile(
+    r"^\s*([-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)"
+)
+
+
+def _html_sort_value(value: str, *, numeric: bool) -> str:
+    """Return a stable HTML sort key without mixing unit text into numbers."""
+    if not numeric:
+        return value.casefold()
+    match = _HTML_LEADING_NUMBER_RE.match(value.replace(",", ""))
+    return match.group(1) if match is not None else ""
+
+
 def _build_html_results_table(
     *,
     headers: Sequence[str],
@@ -10250,11 +10266,16 @@ def _build_html_results_table(
     )
     output_column: int | None = field_names.index("output") if "output" in field_names else None
 
-    parts: list[str] = ["<table>", "<thead>", "<tr>"]
+    parts: list[str] = [
+        "<table>",
+        "<caption>Per-model execution, quality, and performance results</caption>",
+        "<thead>",
+        "<tr>",
+    ]
     for index, header in enumerate(headers):
         alignment_class = "numeric" if index in numeric_columns else "text"
         parts.append(
-            f"<th{_html_class_attr([alignment_class])}>"
+            f'<th scope="col" aria-sort="none"{_html_class_attr([alignment_class])}>'
             f'<button class="sort-btn" type="button" data-column="{index}" '
             f'data-numeric="{str(index in numeric_columns).lower()}">'
             f"{_escape_html_header_text(header)}</button></th>"
@@ -10285,10 +10306,9 @@ def _build_html_results_table(
                 cell_content = _build_html_output_details(value, value)
             else:
                 cell_content = _escape_html_table_text(value)
-            sort_value = (
-                re.sub(r"[^0-9eE+.-]", "", value.replace(",", ""))
-                if column_index in numeric_columns
-                else value.casefold()
+            sort_value = _html_sort_value(
+                value,
+                numeric=column_index in numeric_columns,
             )
             parts.append(
                 f"<td{_html_class_attr(cell_classes)}{_html_attr('data-sort-value', sort_value)}>"
@@ -17285,13 +17305,18 @@ def _build_full_html_document(
                 <option value="mixed">Mixed</option><option value="unknown">Unknown</option>
                 <option value="unavailable">Unavailable</option>
             </select></label>
-            <label>Recommendation <select id="eligibility-filter">
-                <option value="all">All</option><option value="true">Eligible</option>
-                <option value="false">Excluded</option>
+            <label>Recommendation <select id="recommendation-filter">
+                <option value="all">All</option>
+                <option value="recommended">Recommended</option>
+                <option value="caveat">Caveat</option>
+                <option value="avoid">Avoid</option>
+                <option value="not-evaluated">Not evaluated</option>
             </select></label>
             <label>Max peak GB <input id="max-memory-filter" type="number" min="0" step="0.5"></label>
         </div>
-        <div class="filter-info" id="filter-info">Showing all rows</div>
+        <div class="filter-info" id="filter-info" role="status" aria-live="polite">
+            Showing all rows
+        </div>
     </div>
 
     <script>
@@ -17302,7 +17327,7 @@ def _build_full_html_document(
         const status = document.getElementById('status-filter').value;
         const compatibility = document.getElementById('compatibility-filter').value;
         const burden = document.getElementById('prompt-burden-filter').value;
-        const eligibility = document.getElementById('eligibility-filter').value;
+        const recommendation = document.getElementById('recommendation-filter').value;
         const maxMemoryText = document.getElementById('max-memory-filter').value;
         const maxMemory = maxMemoryText === '' ? null : Number(maxMemoryText);
         let visibleCount = 0;
@@ -17312,7 +17337,7 @@ def _build_full_html_document(
                 && (status === 'all' || row.dataset.status === status)
                 && (compatibility === 'all' || row.dataset.compatibility === compatibility)
                 && (burden === 'all' || row.dataset.promptBurden === burden)
-                && (eligibility === 'all' || row.dataset.eligible === eligibility)
+                && (recommendation === 'all' || row.dataset.recommendation === recommendation)
                 && (maxMemory === null || memory === null || memory <= maxMemory);
             if (show) {
                 row.classList.remove('hidden');
@@ -17332,8 +17357,14 @@ def _build_full_html_document(
         const column = Number(button.dataset.column);
         const numeric = button.dataset.numeric === 'true';
         const direction = button.dataset.direction === 'asc' ? 'desc' : 'asc';
-        document.querySelectorAll('.sort-btn').forEach(item => item.removeAttribute('data-direction'));
+        document.querySelectorAll('.sort-btn').forEach(item => {
+            item.removeAttribute('data-direction');
+            item.closest('th').setAttribute('aria-sort', 'none');
+        });
         button.dataset.direction = direction;
+        button.closest('th').setAttribute(
+            'aria-sort', direction === 'asc' ? 'ascending' : 'descending'
+        );
         const rows = Array.from(tbody.querySelectorAll('tr[data-status]'));
         rows.sort((left, right) => {
             const leftValue = left.cells[column].dataset.sortValue || '';

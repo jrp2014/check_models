@@ -2006,8 +2006,13 @@ class TestHtmlReportEdgeCases:
         assert 'data-error-stage="load"' in content
         assert 'data-error-type="ValueError"' in content
         assert 'data-error-package="mlx-vlm"' in content
+        assert "<caption>Per-model execution, quality, and performance results</caption>" in content
+        assert 'scope="col"' in content
+        assert 'aria-sort="none"' in content
+        assert 'role="status" aria-live="polite"' in content
         assert re.search(r'class="numeric"', content) is not None
         assert 'class="text failed"' in content
+        assert 'data-sort-value="4.5"' in content
 
     def test_html_report_uses_compact_caption_columns_and_interactive_controls(
         self, tmp_path: Path
@@ -2028,12 +2033,13 @@ class TestHtmlReportEdgeCases:
         assert 'id="model-search"' in content
         assert 'id="compatibility-filter"' in content
         assert 'id="prompt-burden-filter"' in content
-        assert 'id="eligibility-filter"' in content
+        assert 'id="recommendation-filter"' in content
         assert 'id="max-memory-filter"' in content
         assert 'data-model="org/caption-model"' in content
         assert 'data-compatibility="clean"' in content
         assert "data-prompt-burden=" in content
-        assert 'data-eligible="true"' in content
+        assert 'data-recommendation="recommended"' in content
+        assert '<option value="caveat">Caveat</option>' in content
         assert 'class="sort-btn"' in content
         assert "data-sort-value=" in content
         assert "Diffusion Canvas Tokens" not in content
