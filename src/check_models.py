@@ -4586,6 +4586,7 @@ class TrustedHintBundle:
 
     trusted_text: str = ""
     trusted_terms: tuple[str, ...] = ()
+    trusted_keywords: tuple[str, ...] = ()
     nonvisual_terms: tuple[str, ...] = ()
 
 
@@ -4746,6 +4747,35 @@ def _split_catalog_keywords(raw_keywords: str) -> list[str]:
     return keywords
 
 
+def _keyword_overlap_state(
+    reference: Sequence[str],
+    generated: Sequence[str],
+) -> KeywordOverlapState:
+    """Return an elementary keyword-overlap smell, never a recall score."""
+    reference_terms = tuple(filter(None, map(_normalize_phrase_for_matching, reference)))
+    generated_terms = tuple(filter(None, map(_normalize_phrase_for_matching, generated)))
+    if not reference_terms or not generated_terms:
+        return "not_assessable"
+
+    def _variants(term: str) -> tuple[str, ...]:
+        words = term.split()
+        final = words[-1]
+        alternate = (
+            final[:-1]
+            if final.endswith("s") and len(final) > QUALITY.min_context_term_length
+            else f"{final}s"
+        )
+        return term, " ".join((*words[:-1], alternate))
+
+    generated_text = " ".join(generated_terms)
+    has_overlap = any(
+        re.search(rf"\b{re.escape(variant)}\b", generated_text)
+        for term in reference_terms
+        for variant in _variants(term)
+    )
+    return "some_overlap" if has_overlap else "no_overlap"
+
+
 def _is_nonvisual_context_term(term: str) -> bool:
     """Return True for metadata/source/location terms we should not require visually."""
     normalized = _normalize_phrase_for_matching(term)
@@ -4897,6 +4927,7 @@ def _extract_trusted_hint_bundle(
     return TrustedHintBundle(
         trusted_text="\n".join(trusted_parts).strip(),
         trusted_terms=tuple(_dedupe_preserve_order(trusted_terms)),
+        trusted_keywords=tuple(_dedupe_preserve_order(filtered_keywords)),
         nonvisual_terms=tuple(_dedupe_preserve_order(nonvisual_terms)),
     )
 
@@ -5143,13 +5174,11 @@ def _detect_context_ignorance(
     missing_terms: list[str] = [
         term for term in bundle.trusted_terms if not _context_term_present(term, normalized_text)
     ]
-    is_ignored: bool = (
-        len(missing_terms) > 0
-        and len(bundle.trusted_terms) >= QUALITY.min_key_terms_threshold
-        and len(missing_terms) >= len(bundle.trusted_terms) * QUALITY.min_missing_ratio
+    overlap = _keyword_overlap_state(
+        bundle.trusted_keywords or bundle.trusted_terms,
+        _extract_hint_signal_terms(text),
     )
-
-    return is_ignored, missing_terms[: QUALITY.max_reported_missing_terms]
+    return overlap == "no_overlap", missing_terms[: QUALITY.max_reported_missing_terms]
 
 
 def _detect_metadata_borrowing(
@@ -5227,25 +5256,21 @@ def _classify_hint_relationship(
         return "not_evaluated", []
 
     text_for_hint_eval = _strip_nonvisual_terms_from_text(text, bundle.nonvisual_terms) or text
-    normalized_text = _normalize_phrase_for_matching(text_for_hint_eval)
     visual_terms = [t for t in bundle.trusted_terms if not _is_nonvisual_context_term(t)]
-    visual_matched = [t for t in visual_terms if _context_term_present(t, normalized_text)]
-    overlap_ratio = len(visual_matched) / max(len(visual_terms), 1) if visual_terms else 0.0
+    overlap = _keyword_overlap_state(visual_terms, _extract_hint_signal_terms(text_for_hint_eval))
+    if overlap == "no_overlap":
+        return "no_overlap", ["no_overlap"]
+    if overlap == "not_assessable":
+        return "not_evaluated", []
     baseline = compute_cataloging_utility(bundle.trusted_text, None)
     baseline_score = float(baseline["utility_score"])
     utility = compute_cataloging_utility(text_for_hint_eval, bundle.trusted_text)
     score = float(utility["utility_score"])
     delta = score - baseline_score
 
-    if visual_terms and overlap_ratio < (1.0 - QUALITY.min_missing_ratio):
-        return "ignores_trusted_hints", ["low_hint_overlap"]
     if delta > UTILITY_DELTA_NEUTRAL_BAND:
         return "improves_trusted_hints", ["utility_delta_positive"]
-    if overlap_ratio >= QUALITY.medium_confidence_threshold:
-        return "preserves_trusted_hints", ["trusted_overlap"]
-    if delta < -UTILITY_DELTA_NEUTRAL_BAND:
-        return "degrades_trusted_hints", ["utility_delta_negative"]
-    return "preserves_trusted_hints", ["utility_delta_neutral"]
+    return "preserves_trusted_hints", ["some_overlap"]
 
 
 def _classify_review_owner(
@@ -7512,6 +7537,7 @@ class GenerationQualityAnalysis:
     prompt_tokens_text_est: int | None = None
     prompt_tokens_nontext_est: int | None = None
     special_token_wrappers: list[str] = dataclass_field(default_factory=list)
+    keyword_overlap: KeywordOverlapState = "not_assessable"
 
     @property
     def has_title_length_violation(self) -> bool:
@@ -7603,7 +7629,7 @@ class GenerationQualityAnalysis:
             (self.has_excessive_bullets, f"Excessive bullet points ({self.bullet_count})"),
             (
                 self.is_context_ignored,
-                f"Context ignored (missing: {', '.join(self.missing_context_terms)})",
+                "No overlap with supplied context indicators",
             ),
             (self.is_refusal, f"Refusal detected ({self.refusal_type})"),
             (
@@ -7714,6 +7740,7 @@ class PromptQualitySignals:
     description_sentence_count: int | None = None
     keyword_count: int | None = None
     keyword_duplication_ratio: float | None = None
+    keyword_overlap: KeywordOverlapState = "not_assessable"
 
 
 @dataclass(frozen=True)
@@ -7779,6 +7806,13 @@ def _collect_prompt_quality_signals(
             keyword_count,
             keyword_duplication_ratio,
         ) = _analyze_catalog_contract(text)
+    generated_keywords = _split_catalog_keywords(
+        _extract_catalog_sections(text).get("keywords", "")
+    )
+    keyword_overlap = _keyword_overlap_state(
+        prompt_bundle.trusted_keywords,
+        generated_keywords,
+    )
 
     return PromptQualitySignals(
         prompt_bundle=prompt_bundle,
@@ -7800,6 +7834,7 @@ def _collect_prompt_quality_signals(
         description_sentence_count=description_sentence_count,
         keyword_count=keyword_count,
         keyword_duplication_ratio=keyword_duplication_ratio,
+        keyword_overlap=keyword_overlap,
     )
 
 
@@ -8153,6 +8188,7 @@ def analyze_generation_text(
         prompt_tokens_text_est=prompt_tokens_text_est,
         prompt_tokens_nontext_est=prompt_tokens_nontext_est,
         special_token_wrappers=list(normalized.removed_wrappers),
+        keyword_overlap=prompt_signals.keyword_overlap,
     )
 
 
@@ -12416,8 +12452,6 @@ def _review_issue_subtype(
         subtype = "token_cap"
     elif review["missing_sections"]:
         subtype = "contract_mismatch"
-    elif review["missing_terms"]:
-        subtype = "context_gap"
     elif review["evidence"]:
         subtype = review["evidence"][0]
     return subtype
@@ -12446,9 +12480,9 @@ def _review_confidence(
             and (review["hit_max_tokens"] or review["nontext_prompt_ratio"] is not None)
         ):
             confidence = "high"
-        elif analysis.evidence or analysis.missing_sections or analysis.missing_context_terms:
+        elif analysis.evidence or analysis.missing_sections:
             confidence = "medium"
-    elif review["evidence"] or review["missing_sections"] or review["missing_terms"]:
+    elif review["evidence"] or review["missing_sections"]:
         confidence = "medium"
     return confidence
 
@@ -12712,8 +12746,6 @@ def _review_hint_text(
     if analysis is None:
         return "not evaluated"
     parts = [review["hint_relationship"].replace("_", " ")]
-    if analysis.is_context_ignored and analysis.missing_context_terms:
-        parts.append("missing terms: " + ", ".join(analysis.missing_context_terms))
     parts.extend(_review_assisted_enrichment_evidence(review))
     return " | ".join(parts)
 
@@ -12880,9 +12912,6 @@ def _review_focus_text(
 
     if review["missing_sections"]:
         parts.append("missing sections: " + ", ".join(review["missing_sections"]))
-
-    if review["missing_terms"]:
-        parts.append("missing terms: " + ", ".join(review["missing_terms"]))
 
     if analysis is not None:
         parts.extend(_review_analysis_focus_parts(analysis))
@@ -13150,12 +13179,7 @@ def _summarize_context_ignored_signal(qa: GenerationQualityAnalysis) -> str | No
     """Return contextual-miss signal text when available."""
     if not qa.is_context_ignored:
         return None
-    if qa.missing_context_terms:
-        return (
-            "Model output may not follow prompt or image contents "
-            f"(missing: {', '.join(qa.missing_context_terms)})."
-        )
-    return "Model output may not follow prompt or image contents."
+    return "Model output has no overlap with the supplied context indicators."
 
 
 def _summarize_repetition_signal(qa: GenerationQualityAnalysis) -> str | None:
@@ -14140,7 +14164,11 @@ def _collect_observed_evidence(result: PerformanceResult) -> ObservedEvidence:
         generated_tokens=_generation_int_metric(result.generation, "generation_tokens"),
         anomalies=_output_anomalies(result),
         reproduction_status=_controlled_reproduction_status(result.rerun_evidence),
-        keyword_overlap="not_assessable",
+        keyword_overlap=(
+            result.quality_analysis.keyword_overlap
+            if result.quality_analysis is not None
+            else "not_assessable"
+        ),
     )
 
 
@@ -23544,9 +23572,8 @@ def _preview_generation(
         log_warning_note(f"Verbose ({gen_tokens} tokens)")
     if analysis.formatting_issues:
         log_warning_note(analysis.formatting_issues[0])
-    if analysis.is_context_ignored and analysis.missing_context_terms:
-        missing = ", ".join(analysis.missing_context_terms[:3])
-        log_warning_note(f"Context ignored (missing: {missing})")
+    if analysis.is_context_ignored:
+        log_warning_note("No overlap with supplied context indicators")
     if analysis.missing_sections:
         missing = ", ".join(analysis.missing_sections)
         log_warning_note(f"Missing sections: {missing}")
@@ -23614,12 +23641,8 @@ def _log_verbose_success_details_mode(
         for issue in analysis.formatting_issues[:2]:  # Show first 2 issues
             log_warning_note(issue, prefix="⚠️  Note:")
 
-    if analysis.is_context_ignored and analysis.missing_context_terms:
-        missing = ", ".join(analysis.missing_context_terms)
-        log_warning_note(
-            f"Note: Output ignored key context (missing: {missing})",
-            prefix="⚠️",
-        )
+    if analysis.is_context_ignored:
+        log_warning_note("No overlap with supplied context indicators", prefix="⚠️")
     if analysis.has_harness_issue:
         details = ", ".join(analysis.harness_issue_details[:3])
         log_warning_note(

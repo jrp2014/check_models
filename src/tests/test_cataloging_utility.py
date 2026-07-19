@@ -10,12 +10,14 @@ from check_models import (
     GRADE_EMOJIS,
     QUALITY,
     GenerationQualityAnalysis,
+    KeywordOverlapState,
     MetadataDict,
     ModelIssueSummary,
     PerformanceResult,
     _collect_cataloging_summary_data,
     _format_cataloging_summary,
     _get_grade_display,
+    _keyword_overlap_state,
     analyze_model_issues,
     compute_cataloging_utility,
     compute_description_quality,
@@ -30,6 +32,24 @@ from check_models import (
 GROUNDING_MIDPOINT = 0.5  # Threshold for "high" vs "low" grounding in tests
 MIN_COLOR_TERMS_IN_LIST = 4  # Expected colors in "red, blue, green, yellow..."
 MIN_SPATIAL_TERMS_IN_SENTENCE = 3  # "above", "below", "behind"
+
+
+@pytest.mark.parametrize(
+    ("reference", "generated", "expected"),
+    [
+        ((), ("harbour",), "not_assessable"),
+        (("red boats",), (), "not_assessable"),
+        (("wooden benches",), ("city lights",), "no_overlap"),
+        (("garden paths", "flowers"), ("flower", "trees"), "some_overlap"),
+    ],
+)
+def test_keyword_overlap_state_is_an_elementary_weak_signal(
+    reference: tuple[str, ...],
+    generated: tuple[str, ...],
+    expected: KeywordOverlapState,
+) -> None:
+    """Keyword comparison should expose only assessability and any overlap."""
+    assert _keyword_overlap_state(reference, generated) == expected
 
 
 def _get_utility_score(result: dict[str, float | str]) -> float:

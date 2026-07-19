@@ -1574,16 +1574,77 @@ class TestClassifyHintRelationship:
             "Metadata-only hints should not trigger ignores_trusted_hints"
         )
 
-    def test_visual_hints_still_detected_as_ignores(self) -> None:
-        """When visual terms are present and not reflected, still flag as ignores."""
+    def test_visual_hints_with_no_overlap_are_a_weak_smell(self) -> None:
+        """No overlap is evidence, but does not itself prove the output is unusable."""
         bundle = check_models.TrustedHintBundle(
             trusted_text="Brick storefront with outdoor seating beside sidewalk",
             trusted_terms=("Brick", "storefront", "outdoor", "seating", "sidewalk"),
             nonvisual_terms=(),
         )
         text = "Title: Abstract painting\nDescription: Colorful abstract art.\nKeywords: art"
-        relationship, _ = check_models._classify_hint_relationship(text, bundle)
-        assert relationship == "ignores_trusted_hints"
+        relationship, evidence = check_models._classify_hint_relationship(text, bundle)
+        assert relationship == "no_overlap"
+        assert evidence == ["no_overlap"]
+        assert (
+            check_models._classify_user_bucket(
+                verdict="clean",
+                hint_relationship=relationship,
+                has_contract_issue=False,
+            )
+            != "avoid"
+        )
+
+    def test_omitting_individual_hint_terms_does_not_demote_clean_output(self) -> None:
+        """One matching indicator is enough; absent reference terms are not recall failures."""
+        bundle = check_models.TrustedHintBundle(
+            trusted_text="Garden paths with flowers, hedges, benches, and trees",
+            trusted_terms=("garden paths", "flowers", "hedges", "benches", "trees"),
+        )
+        text = (
+            "Title: Curving garden path\n"
+            "Description: A curved path passes flowering borders in a public garden.\n"
+            "Keywords: garden path, flower border, public garden"
+        )
+
+        relationship, _evidence = check_models._classify_hint_relationship(text, bundle)
+
+        assert relationship in {"preserves_trusted_hints", "improves_trusted_hints"}
+        assert (
+            check_models._classify_user_bucket(
+                verdict="clean",
+                hint_relationship=relationship,
+                has_contract_issue=False,
+            )
+            == "recommended"
+        )
+
+    def test_no_overlap_plus_independent_failures_can_still_avoid(self) -> None:
+        """The weak smell may support, but never replace, independent failure evidence."""
+        assert (
+            check_models._classify_user_bucket(
+                verdict="model_shortcoming",
+                hint_relationship="no_overlap",
+                has_contract_issue=True,
+            )
+            == "avoid"
+        )
+
+    def test_primary_quality_prose_does_not_enumerate_absent_hint_terms(self) -> None:
+        """Human diagnostics should describe the smell without implying keyword recall."""
+        prompt = (
+            "Context:\nKeyword hints: wooden benches, garden paths, flower borders\n\n"
+            "Describe this image."
+        )
+        analysis = check_models.analyze_generation_text(
+            "A night market glows beneath strings of lanterns.",
+            generated_tokens=12,
+            prompt=prompt,
+        )
+
+        prose = " ".join(analysis.issues)
+        assert analysis.keyword_overlap == "not_assessable"
+        assert "wooden benches" not in prose
+        assert "garden paths" not in prose
 
 
 class TestClassifyReviewVerdict:
