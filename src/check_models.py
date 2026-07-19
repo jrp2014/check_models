@@ -1265,6 +1265,7 @@ class JsonlQualityAnalysisRecord(TypedDict):
 
 type ExecutionOutcome = Literal["completed", "failed", "indeterminate"]
 type RecommendationStatus = Literal["recommended", "caveat", "avoid", "not-evaluated"]
+type UpstreamBoundary = Literal["not_started", "load_started", "generation_started"]
 type FailureOrigin = Literal[
     "harness_preflight",
     "upstream_load",
@@ -2299,6 +2300,7 @@ class PerformanceResult:
     model_name: str
     generation: StoredGenerationResult | None
     success: bool
+    upstream_boundary: UpstreamBoundary = "not_started"
     failure_phase: str | None = None
     error_stage: str | None = None
     error_code: str | None = None
@@ -12206,6 +12208,31 @@ def _execution_outcome(result: PerformanceResult) -> ExecutionOutcome:
     return "completed" if result.success else "failed"
 
 
+def _failure_origin(result: PerformanceResult) -> FailureOrigin:
+    """Classify the failure from explicit upstream-entry and connectivity facts."""
+    if _is_indeterminate_connectivity_failure(result):
+        return "external_service"
+    if result.upstream_boundary == "generation_started":
+        return "upstream_generation"
+    if result.upstream_boundary == "load_started":
+        return "upstream_load"
+    if result.failure_phase in {"input_validation", "model_preflight"}:
+        return "harness_preflight"
+    return "unknown"
+
+
+def _advance_upstream_boundary(
+    boundary: UpstreamBoundary,
+    phase: str,
+) -> UpstreamBoundary:
+    """Advance, but never regress, the deepest entered upstream boundary."""
+    if phase == "decode":
+        return "generation_started"
+    if phase == "model_load" and boundary == "not_started":
+        return "load_started"
+    return boundary
+
+
 def _maintainer_readiness(
     *,
     failure_origin: FailureOrigin,
@@ -13943,7 +13970,7 @@ type CompatibilityStatus = Literal[
 class ObservedEvidence:
     """Immutable runtime, output, and proxy facts without policy decisions."""
 
-    upstream_boundary: Literal["not_started", "load_started", "generation_started"]
+    upstream_boundary: UpstreamBoundary
     failure_phase: str | None
     exception_origin: str | None
     exception_chain: tuple[FailureException, ...]
@@ -13987,6 +14014,65 @@ class CanonicalAssessment:
 
     model_user: ModelUserAssessment
     maintainer: MaintainerAssessment
+
+
+def _controlled_reproduction_status(
+    rerun: RerunEvidence | None,
+) -> ControlledReproductionStatus:
+    """Map optional differential-rerun facts to a narrow reproduction status."""
+    if rerun is None:
+        return "not_run"
+    if rerun.rerun_verdict == "indeterminate":
+        return "indeterminate"
+    return "not_reproduced" if rerun.rerun_success else "confirmed"
+
+
+def _output_anomalies(result: PerformanceResult) -> tuple[OutputAnomaly, ...]:
+    """Project existing mechanical quality facts into canonical anomaly codes."""
+    analysis = result.quality_analysis
+    if analysis is None:
+        return ()
+    anomalies: list[OutputAnomaly] = []
+    harness_details = " ".join(analysis.harness_issue_details)
+    if "token_leak:" in harness_details:
+        anomalies.append("special_token_leak")
+    if analysis.has_thinking_trace:
+        anomalies.append("thinking_trace")
+    if analysis.thinking_trace_incomplete and analysis.likely_capped:
+        anomalies.append("reasoning_budget_exhausted")
+    if analysis.is_repetitive:
+        anomalies.append("text_repetition")
+    if analysis.text_sanity_issue_type == "numeric_loop":
+        anomalies.append("numeric_repetition")
+    if analysis.degeneration_type and "encoding" in analysis.degeneration_type:
+        anomalies.append("encoding_corruption")
+    if analysis.missing_sections:
+        anomalies.append("missing_required_sections")
+    if analysis.likely_capped:
+        anomalies.append("token_cap_truncation")
+    return tuple(dict.fromkeys(anomalies))
+
+
+def _collect_observed_evidence(result: PerformanceResult) -> ObservedEvidence:
+    """Collect immutable runtime and output facts without audience policy."""
+    runtime = result.runtime_diagnostics
+    return ObservedEvidence(
+        upstream_boundary=result.upstream_boundary,
+        failure_phase=result.failure_phase,
+        exception_origin=(result.exception_chain[0].origin if result.exception_chain else None),
+        exception_chain=result.exception_chain,
+        raw_output=(
+            _generation_text_value(result.generation)
+            if result.generation is not None
+            else result.captured_output_on_fail or ""
+        ),
+        stop_reason=runtime.stop_reason if runtime is not None else None,
+        requested_tokens=result.requested_max_tokens,
+        generated_tokens=_generation_int_metric(result.generation, "generation_tokens"),
+        anomalies=_output_anomalies(result),
+        reproduction_status=_controlled_reproduction_status(result.rerun_evidence),
+        keyword_overlap="not_assessable",
+    )
 
 
 @dataclass(frozen=True)
@@ -22602,6 +22688,7 @@ def _finalize_process_result(
     stop_reason: str | None,
     current_phase: str,
     total_start_time: float,
+    upstream_boundary: UpstreamBoundary = "not_started",
 ) -> PerformanceResult:
     """Attach final runtime diagnostics after cleanup has completed."""
     runtime_diagnostics = _build_runtime_diagnostics(
@@ -22636,6 +22723,7 @@ def _finalize_process_result(
             total_time=time.perf_counter() - total_start_time,
             runtime_diagnostics=runtime_diagnostics,
             requested_max_tokens=params.max_tokens,
+            upstream_boundary=upstream_boundary,
         )
     return replace(result_payload, runtime_diagnostics=runtime_diagnostics)
 
@@ -22798,6 +22886,7 @@ def _build_failure_result(
     runtime_diagnostics: RuntimeDiagnostics | None = None,
     requested_max_tokens: int | None = None,
     prompt_diagnostics: PromptDiagnostics | None = None,
+    upstream_boundary: UpstreamBoundary = "not_started",
 ) -> PerformanceResult:
     """Build a standardized failure result payload for a model run."""
     error_msg = str(error)
@@ -22835,6 +22924,7 @@ def _build_failure_result(
         model_name=model_name,
         generation=None,
         success=False,
+        upstream_boundary=upstream_boundary,
         failure_phase=resolved_phase,
         error_stage=classified_stage,
         error_code=error_code,
@@ -22899,10 +22989,12 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     result_payload: PerformanceResult | None = None
     stop_reason: str | None = None
     cleanup_requires_sync = True
+    upstream_boundary: UpstreamBoundary = "not_started"
 
     def _update_phase(phase: str) -> None:
-        nonlocal current_phase
+        nonlocal current_phase, upstream_boundary
         current_phase = _normalise_failure_phase(phase) or phase
+        upstream_boundary = _advance_upstream_boundary(upstream_boundary, current_phase)
 
     try:
         _update_phase("input_validation")
@@ -22956,6 +23048,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             model_name=params.model_identifier,
             generation=output,
             success=True,
+            upstream_boundary=upstream_boundary,
             generation_time=generation_time,
             model_load_time=model_load_time,
             total_time=total_time,
@@ -23015,6 +23108,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
                 stop_reason=stop_reason,
             ),
             requested_max_tokens=params.max_tokens,
+            upstream_boundary=upstream_boundary,
         )
     finally:
         _update_phase("cleanup")
@@ -23029,6 +23123,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         stop_reason=stop_reason or "exception",
         current_phase=current_phase,
         total_start_time=total_start_time,
+        upstream_boundary=upstream_boundary,
     )
 
 
@@ -30066,7 +30161,7 @@ def _build_rerun_evidence(
             gen_chars = len(text)
     return RerunEvidence(
         rerun_success=rerun_result.success,
-        rerun_verdict=None,  # Not classified — secondary evidence only
+        rerun_verdict=_execution_outcome(rerun_result),
         rerun_error_code=rerun_result.error_code,
         rerun_generated_chars=gen_chars,
         rerun_generation_time=rerun_result.generation_time,

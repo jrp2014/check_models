@@ -11,7 +11,7 @@ from unittest.mock import patch
 import pytest
 
 if TYPE_CHECKING:
-    from collections.abc import Generator, Sequence
+    from collections.abc import Callable, Generator, Sequence
     from pathlib import Path
 
 import check_models
@@ -170,6 +170,78 @@ class TestProcessImageWithModelMock:
         assert result.runtime_diagnostics is not None
         assert result.runtime_diagnostics.first_token_latency_s == 0.5
 
+    def test_process_records_upstream_generation_entry(self, test_image: Path) -> None:
+        """A successful upstream call should retain the deepest entered boundary."""
+        params = _build_params(test_image)
+
+        def _run_with_boundaries(
+            *_args: object,
+            phase_callback: Callable[[str], None],
+            **_kwargs: object,
+        ) -> _FakeGenerationResult:
+            phase_callback("model_load")
+            phase_callback("decode")
+            return _FakeGenerationResult()
+
+        with patch.object(
+            check_models,
+            "_run_model_generation",
+            side_effect=_run_with_boundaries,
+        ):
+            result = check_models.process_image_with_model(params)
+
+        assert result.upstream_boundary == "generation_started"
+        evidence = check_models._collect_observed_evidence(result)
+        assert evidence.raw_output == "Hello world"
+        assert evidence.upstream_boundary == "generation_started"
+
+    def test_process_records_upstream_load_failure(self, test_image: Path) -> None:
+        """A load exception should retain that upstream loading was entered."""
+        params = _build_params(test_image)
+        load_error = "loader raised"
+
+        def _fail_during_load(
+            *_args: object,
+            phase_callback: Callable[[str], None],
+            **_kwargs: object,
+        ) -> _FakeGenerationResult:
+            phase_callback("model_load")
+            raise ValueError(load_error)
+
+        with patch.object(
+            check_models,
+            "_run_model_generation",
+            side_effect=_fail_during_load,
+        ):
+            result = check_models.process_image_with_model(params)
+
+        assert result.upstream_boundary == "load_started"
+        assert check_models._failure_origin(result) == "upstream_load"
+
+    def test_process_records_upstream_generation_failure(self, test_image: Path) -> None:
+        """A decode exception should retain that upstream generation was entered."""
+        params = _build_params(test_image)
+        generation_error = "generator raised"
+
+        def _fail_during_generation(
+            *_args: object,
+            phase_callback: Callable[[str], None],
+            **_kwargs: object,
+        ) -> _FakeGenerationResult:
+            phase_callback("model_load")
+            phase_callback("decode")
+            raise ValueError(generation_error)
+
+        with patch.object(
+            check_models,
+            "_run_model_generation",
+            side_effect=_fail_during_generation,
+        ):
+            result = check_models.process_image_with_model(params)
+
+        assert result.upstream_boundary == "generation_started"
+        assert check_models._failure_origin(result) == "upstream_generation"
+
     def test_extract_generation_performance_data_uses_generation_result(self) -> None:
         """Performance snapshots should prefer upstream GenerationResult metrics."""
         fake_result = _FakeGenerationResult(
@@ -290,6 +362,10 @@ class TestProcessImageWithModelMock:
         assert result.captured_output_on_fail is not None
         assert "stdout marker" in result.captured_output_on_fail
         assert "stderr marker" in result.captured_output_on_fail
+        assert (
+            check_models._collect_observed_evidence(result).raw_output
+            == result.captured_output_on_fail
+        )
 
     def test_failure_capture_omits_self_logged_rich_traceback(
         self,

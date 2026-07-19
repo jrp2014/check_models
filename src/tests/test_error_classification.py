@@ -6,11 +6,14 @@ from check_models import (
     ControlledReproductionStatus,
     FailureOrigin,
     MaintainerReadiness,
+    PerformanceResult,
+    UpstreamBoundary,
     _attribute_error_to_package,
     _build_canonical_error_code,
     _build_error_signature,
     _build_failure_action_hint,
     _classify_error,
+    _failure_origin,
     _maintainer_readiness,
 )
 
@@ -194,3 +197,49 @@ def test_maintainer_readiness_uses_origin_and_reproduction_evidence(
         )
         == expected
     )
+
+
+@pytest.mark.parametrize(
+    ("boundary", "phase", "message", "expected"),
+    [
+        ("not_started", "model_preflight", "invalid local image input", "harness_preflight"),
+        ("load_started", "model_load", "loader raised", "upstream_load"),
+        ("generation_started", "decode", "generator raised", "upstream_generation"),
+        (
+            "load_started",
+            "model_load",
+            "server disconnected without sending a response",
+            "external_service",
+        ),
+    ],
+)
+def test_failure_origin_follows_execution_boundary(
+    boundary: UpstreamBoundary,
+    phase: str,
+    message: str,
+    expected: FailureOrigin,
+) -> None:
+    """Failure ownership begins with the recorded upstream entry boundary."""
+    result = PerformanceResult(
+        model_name="example/model",
+        generation=None,
+        success=False,
+        failure_phase=phase,
+        error_message=message,
+        upstream_boundary=boundary,
+    )
+
+    assert _failure_origin(result) == expected
+
+
+def test_unknown_failure_origin_requires_trustworthy_boundary_evidence() -> None:
+    """An untagged failure must remain unknown rather than being blamed upstream."""
+    result = PerformanceResult(
+        model_name="example/model",
+        generation=None,
+        success=False,
+        failure_phase="unexpected_phase",
+        error_message="unclassified failure",
+    )
+
+    assert _failure_origin(result) == "unknown"

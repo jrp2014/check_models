@@ -7,6 +7,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Add narrow, immutable evidence and audience-specific assessment types, and
+  retain explicit upstream load/generation entry boundaries so maintainer issue
+  readiness distinguishes upstream failures, harness observations, and external
+  connectivity interruptions without changing the model-user recommendation.
 - Restore the static-quality baseline by separating indeterminate published
   artifacts from conclusive runtime failures, reducing repro/TSV complexity,
   and ensuring ty resolves generated gitignored stubs without suppressions.
