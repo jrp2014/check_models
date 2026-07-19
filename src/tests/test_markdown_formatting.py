@@ -211,8 +211,8 @@ def test_gallery_metrics_omit_missing_segments_cleanly() -> None:
     assert "Prompt" not in md
 
 
-def test_gallery_output_uses_wrapped_blockquote_instead_of_fence() -> None:
-    """Gallery output should render model text in a wrapped blockquote."""
+def test_gallery_output_uses_expandable_fenced_evidence() -> None:
+    """Gallery output should retain complete model text in an expandable code block."""
     result = check_models.PerformanceResult(
         model_name="test/model",
         generation=_GalleryGeneration(text="alpha\n\nbeta"),
@@ -224,11 +224,10 @@ def test_gallery_output_uses_wrapped_blockquote_instead_of_fence() -> None:
 
     md = _gallery_lines_for(result)
 
-    assert "```text" not in md
-    assert "<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->" in md
-    assert "> [!NOTE]" not in md
-    assert "> alpha" in md
-    assert "\n>\n> beta" in md
+    assert "<summary>Complete generated output: test/model</summary>" in md
+    assert "```text\nalpha\n\nbeta\n```" in md
+    assert md.count("alpha") == 1
+    assert md.count("beta") == 1
 
 
 def test_gallery_anchor_and_heading_are_separated_by_blank_line() -> None:

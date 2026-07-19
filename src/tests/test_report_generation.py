@@ -1325,6 +1325,86 @@ def test_single_visual_context_boundary_requires_controlled_rerun() -> None:
     assert check_models._build_issue_clusters(snapshot) == ()
 
 
+def test_capped_long_context_signal_still_requires_controlled_rerun() -> None:
+    """A token-capped collapse must not bypass the reduced-image evidence gate."""
+    result = _make_harness_success(
+        "org/capped-context",
+        text="- " * 500,
+        prompt_tokens=16822,
+        generation_tokens=500,
+        harness_type="long_context",
+        harness_detail="long_context_repetition(16822tok)",
+    )
+    analysis = result.quality_analysis
+    assert analysis is not None
+    result = replace(
+        result,
+        quality_analysis=replace(
+            analysis,
+            verdict="cutoff_degraded",
+            user_bucket="avoid",
+            prompt_tokens_total=16822,
+            prompt_tokens_text_est=493,
+            prompt_tokens_nontext_est=16329,
+        ),
+    )
+
+    triage = check_models._maintainer_triage_for_result(result)
+    assert triage is not None
+    assert triage["issue_readiness"] == "needs-reproduction"
+    assert (
+        check_models._build_issue_clusters(
+            DiagnosticsSnapshot(harness_results=((result, "- " * 500),)),
+        )
+        == ()
+    )
+
+
+def test_review_shortlist_obeys_canonical_user_recommendation() -> None:
+    """A legacy high utility score must not promote a canonically avoided model."""
+    base = PerformanceResult(
+        model_name="org/high-score-avoid",
+        success=True,
+        generation=_MockGeneration(
+            text="A detailed and useful image caption with specific visual evidence.",
+            prompt_tokens=20,
+            generation_tokens=12,
+        ),
+    )
+    base = check_models._populate_result_quality_analysis(base, prompt="Describe it.")
+    review = check_models._build_jsonl_review_record(base)
+    assert review is not None
+    result = replace(
+        base,
+        review_payload={**review, "user_bucket": "avoid"},
+        review_payload_ready=True,
+    )
+    row = check_models.UtilityTriageRow(
+        result=result,
+        score=95.0,
+        description_score=95.0,
+        keyword_score=90.0,
+        grade="A",
+        weakness="None identified",
+        delta_vs_metadata=20.0,
+        labels=frozenset(),
+    )
+    context = _build_report_render_context(results=[result], prompt="Describe it.")
+    context = replace(
+        context,
+        triage=check_models.ReportTriageContext(useful_rows=(row,)),
+    )
+
+    content = "\n".join(
+        check_models._format_review_priorities_parts(context, html_output=False),
+    )
+
+    assert "### Strong Candidates" not in content
+    assert "### Watchlist" in content
+    assert "org/high-score-avoid" in content
+    assert "current review says avoid" in content
+
+
 class TestModelCapabilityScorecard:
     """Tests for the concise model capability scorecard artifact."""
 
@@ -2408,7 +2488,7 @@ class TestMarkdownReportEdgeCases:
                     "org/good" in html_content,
                     "org/broken" in html_content,
                 ),
-                "tsv_header": tsv_lines[1].split("\t"),
+                "tsv_header": tsv_lines[0].split("\t"),
                 "jsonl_header": jsonl_records[0]["_type"],
                 "jsonl_models": [record["model"] for record in jsonl_records[1:]],
                 "run_json_counts": run_payload["counts"],
@@ -2418,11 +2498,11 @@ class TestMarkdownReportEdgeCases:
                 ],
             }
 
-            assert tsv_lines[0].startswith("# generated_at:")
-            assert "Generated Text" in tsv_lines[1]
+            assert not tsv_lines[0].startswith("#")
+            assert "Generated Text" in tsv_lines[0]
             assert jsonl_records[0]["_type"] == "metadata"
             assert len(jsonl_records[1:]) == 2
-            assert run_payload["schema_version"] == "1.2"
+            assert run_payload["schema_version"] == "1.3"
             assert run_payload["producer"]["name"] == "check_models"
             assert run_payload["counts"] == {
                 "models_attempted": 2,
@@ -2832,6 +2912,8 @@ class TestMarkdownReportEdgeCases:
 
         content = out.read_text(encoding="utf-8")
         assert "## Quick Chooser" in content
+        assert "Ungrounded triage rankings compare output hygiene" in content
+        assert "not claims about visual accuracy" in content
         assert "### Best under 4 GB" in content
         assert "### Best under 8 GB" in content
         assert "### Fastest usable" in content
@@ -3234,7 +3316,9 @@ class TestMarkdownGalleryReport:
         assert "<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->" in content
         assert "> [!NOTE]" not in content
         assert "Describe this image fully." in content
-        assert "```text" not in content
+        assert "```text\nDescribe this image fully." not in content
+        assert "<summary>Complete generated output: org/good</summary>" in content
+        assert "```text" in content
         assert '<a id="model-org-good"></a>' in content
         assert "_Recommendation:_" in content
         assert "_Owner:_" in content
@@ -3415,7 +3499,7 @@ class TestMarkdownGalleryReport:
                 "## Quick Navigation",
             ),
         )
-        assert "Output / diagnostic" in summary
+        assert "Output preview / diagnostic" in summary
         assert "[`org/good`](#model-org-good)" in summary
         assert "quality output" in summary
         assert "[`org/risky`](#model-org-risky)" in summary
@@ -3429,11 +3513,11 @@ class TestMarkdownGalleryReport:
         assert "mlx-vlm; load" in summary
         assert "Error: load - boom" in summary
 
-    def test_gallery_consolidated_summary_keeps_complete_model_output(
+    def test_gallery_keeps_complete_output_once_in_expandable_code_block(
         self,
         tmp_path: Path,
     ) -> None:
-        """The gallery summary should let the generation token limit bound output."""
+        """The gallery should keep full evidence once without making the summary unwieldy."""
         complete_text = (
             "**BEGIN:** *model emphasis* " + ("distinct middle evidence " * 30) + "END-SENTINEL"
         )
@@ -3468,12 +3552,14 @@ class TestMarkdownGalleryReport:
         assert "## Model Quality Summary" not in content
         assert "## All Model Output and Cost Summary" not in content
         assert "BEGIN" in summary
-        assert "END-SENTINEL" in summary
-        assert "[tail]" not in summary
+        assert "END-SENTINEL" not in summary
         assert "<!-- markdownlint-disable MD034 MD049 -->" in summary
         assert "Gen tok" in summary
         assert "Peak GB" in summary
         assert "Quality signal" in summary
+        assert "<summary>Complete generated output: org/complete-output</summary>" in content
+        assert "```text" in content
+        assert content.count("END-SENTINEL") == 1
 
     def test_gallery_includes_all_model_output_and_cost_summary(
         self,
@@ -3522,7 +3608,7 @@ class TestMarkdownGalleryReport:
             "## Model Output and Cost Summary",
             end_headings=("## Quick Navigation", "## Model Gallery"),
         )
-        assert "Output / diagnostic" in summary
+        assert "Output preview / diagnostic" in summary
         assert "Peak GB" in summary
         assert "Quality signal" in summary
         assert "[`org/full-caption`](#model-org-full-caption)" in summary
@@ -3848,8 +3934,8 @@ class TestMarkdownGalleryReport:
         assert "Action Snapshot" in content  # cross-reference to results.md
         assert "## 🧭 Review Shortlist" not in content
         assert "## 🚨 Failures by Package (Actionable)" not in content
-        assert "_Review focus:_" in content
-        assert "strong candidate for first-pass review" in content or "watchlist" in content
+        assert "_Review focus:_" not in content
+        assert "_Score:_" not in content
         assert "_Error summary:_" in content
         assert "_Next step:_" in content
 
@@ -3880,15 +3966,16 @@ class TestTsvReportEdgeCases:
         assert "org/e" in content
         assert "org/f" in content
 
-    def test_tsv_has_metadata_comment(self, tmp_path: Path) -> None:
-        """TSV output should start with a generated_at metadata comment."""
+    def test_tsv_starts_with_standard_header(self, tmp_path: Path) -> None:
+        """TSV output should import without a non-standard comment preamble."""
         out = tmp_path / "meta.tsv"
         generate_tsv_report(
             results=[_make_success()],
             filename=out,
         )
         first_line = out.read_text(encoding="utf-8").splitlines()[0]
-        assert first_line.startswith("# generated_at:")
+        assert not first_line.startswith("#")
+        assert "Model" in first_line
 
     def test_tsv_has_error_columns(self, tmp_path: Path) -> None:
         """TSV should include error_type and error_package columns."""
@@ -3898,12 +3985,10 @@ class TestTsvReportEdgeCases:
             filename=out,
         )
         content = out.read_text(encoding="utf-8")
-        # Header row (skip the comment line)
-        header_line = content.splitlines()[1]
+        header_line = content.splitlines()[0]
         assert "error_type" in header_line
         assert "error_package" in header_line
-        # Data row
-        data_line = content.splitlines()[2]
+        data_line = content.splitlines()[1]
         assert "RuntimeError" in data_line
         assert "transformers" in data_line
 
@@ -4784,6 +4869,41 @@ class TestDiagnosticsReport:
         assert "open对不同方面" in content
         assert "## mlx-vlm / MLX Issue Matrix" not in content
         assert "## Models Not Flagged" not in content
+
+    def test_text_sanity_issue_clusters_are_split_by_model_repository(self) -> None:
+        """Unrelated model repositories must not share a single issue draft."""
+        junk_text = (
+            'open对不同方面">black/ with小猫小猫kotPicture •0超高清比!y表面处理超经典的!'
+            "张图片'七- object Tno-go-head-or U0.C在其他 ** ,Not只!"
+        )
+        results = [
+            PerformanceResult(
+                model_name=name,
+                success=True,
+                generation=_MockGeneration(
+                    text=junk_text,
+                    prompt_tokens=319,
+                    generation_tokens=85,
+                ),
+            )
+            for name in ("org-a/token-soup", "org-b/token-soup")
+        ]
+        snapshot = _build_diagnostics_snapshot(
+            results=results,
+            prompt="Describe this image briefly.",
+        )
+
+        clusters = [
+            cluster
+            for cluster in check_models._build_issue_clusters(snapshot)
+            if cluster.source == "text_sanity"
+        ]
+
+        assert len(clusters) == 2
+        assert {cluster.results[0].model_name for cluster in clusters} == {
+            "org-a/token-soup",
+            "org-b/token-soup",
+        }
 
     def test_failure_cluster_shows_generated_output_inline(self, tmp_path: Path) -> None:
         """Failure clusters should show generated output inline when present."""

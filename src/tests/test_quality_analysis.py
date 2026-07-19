@@ -1674,6 +1674,32 @@ class TestClassifyUserBucket:
         assert refreshed.draft_improvement_score == 20.0
         assert "low-draft-improvement" in refreshed.evidence
 
+    def test_low_literal_metadata_overlap_does_not_override_clean_verdict(self) -> None:
+        """Omitting optional draft terms must not turn a useful caption into a failure."""
+        analysis = check_models.analyze_generation_text(
+            (
+                "Title: Curved glass skyscraper at night\n"
+                "Description: A curved glass tower rises above a wet city street.\n"
+                "Keywords: skyscraper, glass, night, street, bicycles, architecture"
+            ),
+            42,
+        )
+        metadata_agreement = check_models.MetadataAgreementMetrics(
+            overall_score=12.0,
+            matched_terms=("Skyscraper", "Night"),
+            missed_terms=("Commuting", "Fenchurch Street", "Nightscape"),
+            visual_description_score=95.0,
+        )
+
+        refreshed = check_models._apply_metadata_alignment_to_analysis(
+            analysis,
+            metadata_agreement,
+        )
+
+        assert refreshed.verdict == "clean"
+        assert refreshed.user_bucket == "recommended"
+        assert refreshed.metadata_alignment_issue == "low_metadata_alignment"
+
     def test_cutoff_degraded_avoid(self) -> None:
         """cutoff_degraded models should be avoid."""
         bucket = check_models._classify_user_bucket(
@@ -1713,6 +1739,49 @@ class TestClassifyUserBucket:
             utility_grade="A",
         )
         assert bucket == "recommended"
+
+
+def test_assisted_prompt_keeps_complete_keyword_and_authoritative_context_policy() -> None:
+    """Assisted prompts must not corrupt long metadata terms or forbid supplied facts."""
+    complete_name = "The Fenchurch Building (The Walkie-Talkie)"
+    prompt = check_models._build_cataloguing_prompt(
+        {
+            "title": f"{complete_name}, London",
+            "description": "Walkie Talkie building known formally as 20 Fenchurch Street.",
+            "keywords": f"Architecture, {complete_name}, London",
+        },
+    )
+
+    assert complete_name in prompt
+    assert "The Fenchurch Building (The Walki..." not in prompt
+    assert "Authoritative context may supply identity and location" in prompt
+    assert "unless supplied as authoritative context or visually obvious" in prompt
+
+
+def test_empty_thinking_wrapper_is_presentation_warning_not_harness_failure() -> None:
+    """An empty protocol wrapper should remain visible without becoming leaked reasoning."""
+    text = (
+        "<think>\n\n</think>\n\n"
+        "Title: Curved glass tower at night\n"
+        "Description: A curved glass tower rises above a city street.\n"
+        "Keywords: tower, glass, night, street, architecture, city"
+    )
+
+    analysis = check_models.analyze_generation_text(
+        text,
+        45,
+        prompt=(
+            "Return exactly these three sections, and nothing else:\n"
+            "Title:\nDescription:\nKeywords:"
+        ),
+    )
+
+    assert analysis.verdict == "clean"
+    assert analysis.user_bucket == "caveat"
+    assert analysis.has_harness_issue is False
+    assert analysis.has_reasoning_leak is False
+    assert analysis.text_sanity_issue_type is None
+    assert analysis.formatting_issues == ["Empty thinking wrapper present"]
 
 
 class TestClassificationInvariants:

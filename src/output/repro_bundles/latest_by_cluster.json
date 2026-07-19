@@ -1,20 +1,87 @@
 {
   "clusters": {
-    "mlx-vlm_stop-token_001": {
+    "mlx-vlm-mlx_long-context_001": {
       "bundles": [
-        "20260719T001617Z_001_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json"
+        "20260719T014155Z_005_Qwen_Qwen3-VL-2B-Instruct_mlx_vlm_mlx_long_context_001.json",
+        "20260719T014155Z_006_mlx-community_Qwen3-VL-2B-Instruct-bf16_mlx_vlm_mlx_long_context_001.json",
+        "20260719T014155Z_007_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_mlx_long_context_001.json",
+        "20260719T014155Z_008_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_mlx_long_context_001.json"
       ],
       "models": [
-        "mlx-community/Qwen3-VL-2B-Thinking-bf16"
+        "Qwen/Qwen3-VL-2B-Instruct",
+        "mlx-community/Qwen3-VL-2B-Instruct-bf16",
+        "mlx-community/Qwen3-VL-2B-Thinking-bf16",
+        "mlx-community/X-Reasoner-7B-8bit"
+      ]
+    },
+    "mlx-vlm_stop-token_001": {
+      "bundles": [
+        "20260719T014155Z_002_mlx-community_MiniCPM-V-4.6-8bit_mlx_vlm_stop_token_001.json"
+      ],
+      "models": [
+        "mlx-community/MiniCPM-V-4.6-8bit"
+      ]
+    },
+    "model-configuration-repository_model-config-processor-load-processor_001": {
+      "bundles": [
+        "20260719T014155Z_001_mlx-community_Step-3.7-Flash-oQ2e_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_3c.json"
+      ],
+      "models": [
+        "mlx-community/Step-3.7-Flash-oQ2e"
+      ]
+    },
+    "model_text-sanity_001": {
+      "bundles": [
+        "20260719T014155Z_003_mlx-community_Kimi-VL-A3B-Thinking-8bit_model_text_sanity_001.json",
+        "20260719T014155Z_004_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_model_text_sanity_001.json"
+      ],
+      "models": [
+        "mlx-community/Kimi-VL-A3B-Thinking-8bit",
+        "mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX"
       ]
     }
   },
-  "generated_at_utc": "2026-07-19T00:16:17+00:00",
+  "generated_at_utc": "2026-07-19T01:41:56+00:00",
   "models": {
-    "mlx-community/Qwen3-VL-2B-Thinking-bf16": {
-      "bundle": "20260719T001617Z_001_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json",
+    "Qwen/Qwen3-VL-2B-Instruct": {
+      "bundle": "20260719T014155Z_005_Qwen_Qwen3-VL-2B-Instruct_mlx_vlm_mlx_long_context_001.json",
+      "issue_cluster_id": "mlx-vlm-mlx_long-context_001",
+      "issue_kind": "cutoff_degraded"
+    },
+    "mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX": {
+      "bundle": "20260719T014155Z_004_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_model_text_sanity_001.json",
+      "issue_cluster_id": "model_text-sanity_001",
+      "issue_kind": "cutoff_degraded"
+    },
+    "mlx-community/Kimi-VL-A3B-Thinking-8bit": {
+      "bundle": "20260719T014155Z_003_mlx-community_Kimi-VL-A3B-Thinking-8bit_model_text_sanity_001.json",
+      "issue_cluster_id": "model_text-sanity_001",
+      "issue_kind": "cutoff_degraded"
+    },
+    "mlx-community/MiniCPM-V-4.6-8bit": {
+      "bundle": "20260719T014155Z_002_mlx-community_MiniCPM-V-4.6-8bit_mlx_vlm_stop_token_001.json",
       "issue_cluster_id": "mlx-vlm_stop-token_001",
       "issue_kind": "harness"
+    },
+    "mlx-community/Qwen3-VL-2B-Instruct-bf16": {
+      "bundle": "20260719T014155Z_006_mlx-community_Qwen3-VL-2B-Instruct-bf16_mlx_vlm_mlx_long_context_001.json",
+      "issue_cluster_id": "mlx-vlm-mlx_long-context_001",
+      "issue_kind": "cutoff_degraded"
+    },
+    "mlx-community/Qwen3-VL-2B-Thinking-bf16": {
+      "bundle": "20260719T014155Z_007_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_mlx_long_context_001.json",
+      "issue_cluster_id": "mlx-vlm-mlx_long-context_001",
+      "issue_kind": "cutoff_degraded"
+    },
+    "mlx-community/Step-3.7-Flash-oQ2e": {
+      "bundle": "20260719T014155Z_001_mlx-community_Step-3.7-Flash-oQ2e_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_3c.json",
+      "issue_cluster_id": "model-configuration-repository_model-config-processor-load-processor_001",
+      "issue_kind": "runtime_failure"
+    },
+    "mlx-community/X-Reasoner-7B-8bit": {
+      "bundle": "20260719T014155Z_008_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_mlx_long_context_001.json",
+      "issue_cluster_id": "mlx-vlm-mlx_long-context_001",
+      "issue_kind": "cutoff_degraded"
     }
   },
   "schema_version": "1.0"

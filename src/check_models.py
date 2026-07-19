@@ -523,7 +523,6 @@ class QualityThresholds:
     prompt_title_max_chars: int = 120  # Max chars for metadata title hints in default prompt
     prompt_description_max_chars: int = 420  # Max chars for metadata description hints
     prompt_keyword_max_items: int = 20  # Max number of metadata keyword hints
-    prompt_keyword_item_max_chars: int = 36  # Max chars per metadata keyword hint
     min_text_for_leak_detection: int = 100  # Min text length for training leak detection
     prompt_word_to_token_ratio: float = 1.3  # Lightweight prompt-token estimate multiplier
     max_reported_missing_terms: int = 5  # Cap human-facing missing-term lists
@@ -1396,7 +1395,7 @@ class CheckModelsProvenanceRecord(TypedDict):
     name: Literal["check_models"]
     version: str
     git_revision: str | None
-    install_type: Literal["editable", "installed", "unknown"]
+    install_type: Literal["editable", "installed", "source-tree", "unknown"]
 
 
 class JsonlMetadataRecord(TypedDict, total=False):
@@ -1434,10 +1433,21 @@ class RunOutcomeCounts(TypedDict):
     models_total: int
 
 
+class RunImageRecord(TypedDict):
+    """Publication-safe source-image identity for a benchmark run."""
+
+    name: str
+    sha256: str | None
+    size_bytes: int | None
+    width: int | None
+    height: int | None
+    megapixels: float | None
+
+
 class RunJsonReportRecord(TypedDict):
     """Stable run-level machine artifact schema."""
 
-    schema_version: Literal["1.2"]
+    schema_version: Literal["1.3"]
     generated_at: str
     eval_mode: EvaluationLane
     prompt: str
@@ -1452,6 +1462,8 @@ class RunJsonReportRecord(TypedDict):
     library_versions: LibraryVersionDict
     component_provenance: dict[str, ComponentProvenanceRecord]
     producer: CheckModelsProvenanceRecord
+    image: RunImageRecord | None
+    generation_settings: dict[str, JsonLike]
 
 
 class JsonlRerunSummary(TypedDict, total=False):
@@ -3018,37 +3030,6 @@ def _gallery_throughput_segment(
     return f"{label} {tokens_formatted} tok"
 
 
-def _build_gallery_success_triage_rows(
-    res: PerformanceResult,
-    *,
-    summary: ModelIssueSummary | None,
-    useful_now: bool,
-    watchlist_reason: str | None,
-    suppress_cataloging_scores: bool = False,
-) -> list[tuple[str, str]]:
-    """Build score and review-focus rows for one successful gallery entry."""
-    rows: list[tuple[str, str]] = []
-    if suppress_cataloging_scores:
-        return rows
-
-    if summary is not None:
-        score_data = _cataloging_score_index(summary).get(res.model_name)
-        if score_data is not None:
-            score, grade, weakness, delta = score_data
-            assessment_parts = [_grade_display_parts(grade, score)]
-            if delta is not None:
-                assessment_parts.append(f"Δ{delta:+.0f}")
-            if weakness:
-                assessment_parts.append(weakness)
-            rows.append(("Score", _markdown_review_text(" | ".join(assessment_parts))))
-
-    if useful_now:
-        rows.append(("Review focus", "strong candidate for first-pass review"))
-    elif watchlist_reason is not None:
-        rows.append(("Review focus", f"watchlist ({_humanize_watchlist_reason(watchlist_reason)})"))
-    return rows
-
-
 def _build_gallery_success_performance_rows(
     res: PerformanceResult,
     generation: StoredGenerationResult | None,
@@ -3124,26 +3105,12 @@ def _append_gallery_quality_lines(
 
 def _build_gallery_success_block_lines(
     res: PerformanceResult,
-    *,
-    summary: ModelIssueSummary | None = None,
-    useful_now: bool = False,
-    watchlist_reason: str | None = None,
-    suppress_cataloging_scores: bool = False,
 ) -> list[str]:
     """Build the success block used by the Markdown gallery."""
     generation: StoredGenerationResult | None = res.generation
     rows = _build_markdown_review_block_rows(res)
     token_rows = [(label, value) for label, value in rows if label == "Tokens"]
     summary_rows = [(label, value) for label, value in rows if label != "Tokens"]
-    summary_rows.extend(
-        _build_gallery_success_triage_rows(
-            res,
-            summary=summary,
-            useful_now=useful_now,
-            watchlist_reason=watchlist_reason,
-            suppress_cataloging_scores=suppress_cataloging_scores,
-        )
-    )
     summary_rows.extend(_build_gallery_success_performance_rows(res, generation))
     summary_rows.extend(token_rows)
 
@@ -3151,7 +3118,13 @@ def _build_gallery_success_block_lines(
     _append_markdown_row_block(out, rows=summary_rows)
 
     text = _generation_text_value(generation)
-    _append_markdown_wrapped_blockquote(out, text)
+    output_lines: list[str] = []
+    _append_markdown_code_block(output_lines, text)
+    _append_markdown_details_block(
+        out,
+        summary=f"Complete generated output: {res.model_name}",
+        body_lines=output_lines,
+    )
 
     _append_gallery_quality_lines(out, res=res, generation=generation)
 
@@ -3985,6 +3958,10 @@ _TEXT_SANITY_WORDLIKE_TOKEN_RE: Final[re.Pattern[str]] = re.compile(r"[A-Za-z][A
 _TEXT_SANITY_STRUCTURAL_MARKER_RE: Final[re.Pattern[str]] = re.compile(r"[{}\[\]<>/\\|_=]{2,}")
 _TEXT_SANITY_CJK_CHAR_RE: Final[re.Pattern[str]] = re.compile(r"[\u3400-\u9fff]")
 _TEXT_SANITY_LATIN_CHAR_RE: Final[re.Pattern[str]] = re.compile(r"[A-Za-z]")
+_EMPTY_THINKING_WRAPPER_RE: Final[re.Pattern[str]] = re.compile(
+    r"<think>\s*</think>",
+    re.IGNORECASE,
+)
 _TEXT_SANITY_MIN_REPEATED_NUMERIC_TOKEN_COUNT: Final[int] = 3
 _STRUCTURED_NUMERIC_METADATA_RE: Final[re.Pattern[str]] = re.compile(
     r"(?:\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}:\d{2}(?::\d{2})?\b|"
@@ -3999,6 +3976,11 @@ _STRUCTURED_NUMERIC_METADATA_RE: Final[re.Pattern[str]] = re.compile(
 def _remove_structured_numeric_metadata(text: str) -> str:
     """Remove legitimate structured numeric fields before loop detection."""
     return _STRUCTURED_NUMERIC_METADATA_RE.sub(" ", text)
+
+
+def _strip_empty_thinking_wrappers(text: str) -> str:
+    """Remove empty protocol wrappers before semantic and token-leak checks."""
+    return _EMPTY_THINKING_WRAPPER_RE.sub(" ", text)
 
 
 def _text_sanity_script_family(char: str) -> str | None:
@@ -4033,8 +4015,9 @@ def _text_sanity_numeric_loop_issue(cleaned: str) -> str | None:
 
 def _text_sanity_token_marker_issue(cleaned: str) -> str | None:
     """Return a token-noise issue label for control/BPE/special-token leakage."""
-    control_or_bpe_issue, _encoding_type = _detect_token_encoding_issues(cleaned)
-    special_token_leak, _leaked_tokens = _detect_special_token_leakage(cleaned)
+    semantic_text = _strip_empty_thinking_wrappers(cleaned)
+    control_or_bpe_issue, _encoding_type = _detect_token_encoding_issues(semantic_text)
+    special_token_leak, _leaked_tokens = _detect_special_token_leakage(semantic_text)
     return "gibberish(token_noise)" if control_or_bpe_issue or special_token_leak else None
 
 
@@ -4292,8 +4275,17 @@ def _detect_formatting_violations(text: str) -> list[str]:
     if not text:
         return issues
 
+    semantic_text = text
+    if _EMPTY_THINKING_WRAPPER_RE.search(text):
+        issues.append("Empty thinking wrapper present")
+        semantic_text = _strip_empty_thinking_wrappers(text)
+
     # Check for tags (beyond simple breaks) that may interfere with rendering
-    html_tags: list[str] = re.findall(r"<(?!br>|/br>)[a-z]+[^>]*>", text, re.IGNORECASE)
+    html_tags: list[str] = re.findall(
+        r"<(?!br>|/br>)[a-z]+[^>]*>",
+        semantic_text,
+        re.IGNORECASE,
+    )
     if html_tags:
         # Keep raw tags in analysis output; renderers escape them as needed for Markdown/HTML.
         tags_preview: str = ", ".join(dict.fromkeys(html_tags[: FORMATTING.max_preview_tags]))
@@ -4939,7 +4931,8 @@ def _detect_reasoning_output(
     if not text:
         return ReasoningOutputSignals()
 
-    text_lower: str = text.casefold()
+    semantic_text = _strip_empty_thinking_wrappers(text)
+    text_lower: str = semantic_text.casefold()
     expected_thinking_model = "thinking" in (model_name or "").casefold()
     thinking_trace_markers: list[str] = []
     thinking_trace_incomplete = False
@@ -7742,7 +7735,9 @@ def _collect_harness_quality_signals(
         harness_type = harness_type or "encoding"
         harness_issues.append(f"token_encoding:{encoding_type}")
 
-    has_token_leak, leaked_tokens = _detect_special_token_leakage(text)
+    has_token_leak, leaked_tokens = _detect_special_token_leakage(
+        _strip_empty_thinking_wrappers(text),
+    )
     if has_token_leak:
         harness_type = harness_type or "stop_token"
         harness_issues.extend([f"token_leak:{tok}" for tok in leaked_tokens[:3]])
@@ -12234,9 +12229,14 @@ def _issue_readiness_for_result(
         return "not-evaluated"
     if not result.success:
         return "confirmed"
-    if _has_template_opened_thinking(result):
-        return "needs-reproduction"
-    if review["verdict"] == "context_budget" and result.rerun_evidence is None:
+    needs_controlled_reproduction = _has_template_opened_thinking(result) or (
+        result.rerun_evidence is None
+        and (
+            review["verdict"] == "context_budget"
+            or (analysis is not None and analysis.harness_issue_type == "long_context")
+        )
+    )
+    if needs_controlled_reproduction:
         return "needs-reproduction"
     if analysis is not None and analysis.has_harness_issue:
         return "confirmed"
@@ -13611,9 +13611,14 @@ def _gallery_summary_signal(result: PerformanceResult) -> str:
 
 
 def _gallery_success_output(result: PerformanceResult) -> str:
-    """Return complete successful model text flattened for a Markdown table cell."""
+    """Return a concise successful-output preview for a Markdown table cell."""
     output = _generation_text_value(result.generation)
-    return _collapse_preview_whitespace(output) if output else ""
+    if not output:
+        return ""
+    return _truncate_text_preview(
+        _collapse_preview_whitespace(output),
+        max_chars=MAX_OUTPUT_PREVIEW_CHARS,
+    )
 
 
 def _gallery_output_cost_metric(field_name: str, value: MetricValue) -> str:
@@ -13623,7 +13628,7 @@ def _gallery_output_cost_metric(field_name: str, value: MetricValue) -> str:
 
 
 def _gallery_output_cost_preview(result: PerformanceResult) -> str:
-    """Return complete model output or a compact failure diagnostic."""
+    """Return a compact model-output preview or failure diagnostic."""
     if result.success:
         return _gallery_success_output(result) or "No generated text captured."
 
@@ -13684,7 +13689,7 @@ def _build_gallery_output_cost_summary_section(
                 headers=(
                     "Model",
                     "Result",
-                    "Output / diagnostic",
+                    "Output preview / diagnostic",
                     "Gen tok",
                     "Total",
                     "Gen TPS",
@@ -13700,8 +13705,9 @@ def _build_gallery_output_cost_summary_section(
         "## Model Output and Cost Summary",
         "",
         (
-            "Every model in this run, with complete successful output or a concise "
-            "failure diagnostic beside runtime, memory, and quality signals."
+            "Every model in this run, with a concise output preview or failure diagnostic "
+            "beside runtime, memory, and quality signals. Complete output appears once in "
+            "the expandable per-model evidence below."
         ),
         "",
         *_guard_markdownlint_block(table_lines, rules=MARKDOWNLINT_GALLERY_SUMMARY_RULES),
@@ -14768,7 +14774,9 @@ def _build_issue_clusters(snapshot: DiagnosticsSnapshot) -> tuple[IssueCluster, 
             owner="model",
             issue_kind=review["verdict"] if review is not None else "semantic_mismatch",
             issue_subtype="text_sanity",
-            symptom_family=_normalize_issue_symptom_family(issue_type),
+            symptom_family=_normalize_issue_symptom_family(
+                f"{result.model_name}:{issue_type}",
+            ),
             symptom=f"text-sanity={issue_type}",
             source="text_sanity",
             sort_rank=4,
@@ -17974,19 +17982,6 @@ def _generate_model_gallery_section(
         if isinstance(report_context, ReportRenderContext)
         else ResultSet(report_context).results
     )
-    summary = report_context.summary if isinstance(report_context, ReportRenderContext) else None
-    suppress_cataloging_scores = (
-        report_context.mode_policy.suppress_cataloging_scores
-        if isinstance(report_context, ReportRenderContext)
-        else False
-    )
-    useful_model_names: set[str] = set()
-    watchlist_by_model: dict[str, str] = {}
-    if isinstance(report_context, ReportRenderContext):
-        useful_model_names = {row.result.model_name for row in report_context.triage.useful_rows}
-        watchlist_by_model = {
-            row.result.model_name: reason for row, reason in report_context.triage.watchlist_rows
-        }
     for res in sorted_results:
         icon = _recommendation_icon(_recommendation_status_for_result(res))
         md.append(f'<a id="{_gallery_model_anchor(res.model_name)}"></a>')
@@ -17996,13 +17991,7 @@ def _generate_model_gallery_section(
         if not res.success:
             block_lines = _build_gallery_error_block_lines(res)
         else:
-            block_lines = _build_gallery_success_block_lines(
-                res,
-                summary=summary,
-                useful_now=res.model_name in useful_model_names,
-                watchlist_reason=watchlist_by_model.get(res.model_name),
-                suppress_cataloging_scores=suppress_cataloging_scores,
-            )
+            block_lines = _build_gallery_success_block_lines(res)
         while block_lines and block_lines[-1] == "":
             block_lines.pop()
         md.extend(block_lines)
@@ -18936,6 +18925,7 @@ def _append_model_selection_quick_chooser(
     views: Sequence[ModelRecommendationView],
     *,
     policy_name: str,
+    semantic_rankings_grounded: bool,
     recommended_working_set_bytes: int | None = None,
 ) -> None:
     """Append practical model-user chooser buckets before the full shortlist."""
@@ -18952,15 +18942,22 @@ def _append_model_selection_quick_chooser(
     current_avoid = [view for view in views if not view.eligible][
         :MODEL_SELECTION_CHOOSER_AVOID_ROW_LIMIT
     ]
+    chooser_scope = (
+        "In assisted mode, quality rankings combine visual usefulness with correct use "
+        "of authoritative metadata; runtime and contract findings remain diagnostic "
+        "triage signals."
+        if semantic_rankings_grounded
+        else (
+            "Ungrounded triage rankings compare output hygiene and runtime behaviour; "
+            "they are not claims about visual accuracy."
+        )
+    )
 
     md.extend(
         [
             "## Quick Chooser",
             "",
-            (
-                "Practical current-run buckets for model users. These are triage signals, "
-                "not grounded visual-quality claims."
-            ),
+            f"Practical current-run buckets for model users. {chooser_scope}",
             "",
         ]
     )
@@ -19384,6 +19381,7 @@ def generate_model_selection_report(
         md,
         views,
         policy_name=ranking_policy_name,
+        semantic_rankings_grounded=policy.semantic_rankings_grounded,
         recommended_working_set_bytes=report_context.recommended_working_set_bytes,
     )
 
@@ -20057,10 +20055,10 @@ def generate_tsv_report(
 ) -> None:
     """Write a compact TSV (tab-separated values) caption-comparison table.
 
-    A ``# generated_at: <timestamp>`` comment line is written first so
-    downstream consumers know when the data was produced.  Exact model output
-    appears once in ``Generated Text``; exhaustive and diffusion-specific fields
-    remain available in JSONL.  Failed rows retain compact ``error_stage``,
+    The first line is the standard TSV header so spreadsheet and dataframe
+    readers need no custom comment handling. Exact model output appears once in
+    ``Generated Text``; run metadata and exhaustive fields remain available in
+    ``run.json`` and JSONL. Failed rows retain compact ``error_stage``,
     ``error_type``, ``error_package``, and ``error_message`` evidence.
 
     Args:
@@ -20227,10 +20225,6 @@ def generate_tsv_report(
 
     try:
         buffer = io.StringIO(newline="")
-        buffer.write(
-            f"# generated_at: {local_now_str()}; format=compact-adaptive; "
-            "exhaustive=results.jsonl\n"
-        )
         writer = csv.writer(buffer, delimiter="\t", lineterminator="\n")
         writer.writerow([header_by_field[field_name] for field_name in output_fields])
         writer.writerows(
@@ -24179,14 +24173,11 @@ def _compact_prompt_text(value: str, *, max_chars: int) -> str:
 
 
 def _summarize_prompt_keywords(raw_keywords: str) -> str:
-    """Return a deduplicated, size-limited keyword hint string for the prompt."""
+    """Return complete deduplicated keyword hints, bounded only by item count."""
     deduped_items: list[str] = []
     seen: set[str] = set()
     for item in raw_keywords.split(","):
-        compact_item = _compact_prompt_text(
-            item,
-            max_chars=QUALITY.prompt_keyword_item_max_chars,
-        )
+        compact_item = _clean_metadata_text(item)
         if not compact_item:
             continue
         key = compact_item.casefold()
@@ -24214,15 +24205,15 @@ def _build_cataloguing_prompt(
         "Analyze this image for cataloguing metadata, using British English.",
         "",
         (
-            "Use only details that are clearly and definitely visible in the image. "
-            "If a detail is uncertain, ambiguous, partially obscured, too small to "
-            "verify, or not directly visible, leave it out. Do not guess."
+            "Describe visible details faithfully. If a visual detail is uncertain, ambiguous, "
+            "partially obscured, or too small to verify, leave it out rather than guessing."
         ),
         "",
         (
-            "Treat the metadata hints below as a draft catalog record. Keep only details "
-            "that are clearly confirmed by the image, correct anything contradicted by "
-            "the image, and add important visible details that are definitely present."
+            "Use authoritative context as supplied fact, and treat the descriptive metadata "
+            "as a draft catalog record. Retain draft details that are consistent with the "
+            "image, correct contradictions, and add important visible details. Authoritative "
+            "context may supply identity and location even when they are not visually readable."
             if include_metadata_hints
             else "No existing catalog metadata is supplied. Base every field only on visual "
             "evidence in the image."
@@ -24231,30 +24222,34 @@ def _build_cataloguing_prompt(
         "Return exactly these three sections, and nothing else:",
         "",
         "Title:",
-        "- 5-10 words, concrete and factual, limited to clearly visible content.",
+        "- 5-10 words, concrete and factual; authoritative context may supply identity and location.",
         "- Output only the title text after the label.",
         "- Do not repeat or paraphrase these instructions in the title.",
         "",
         "Description:",
         (
-            "- 1-2 factual sentences describing the main visible subject, "
-            "setting, lighting, action, and other distinctive visible details. Omit "
-            "anything uncertain or inferred."
+            "- 1-2 factual sentences combining supplied authoritative context with the main "
+            "visible subject, setting, lighting, action, and distinctive visible details."
         ),
         "- Output only the description text after the label.",
         "",
         "Keywords:",
         (
-            "- 10-18 unique comma-separated terms based only on clearly visible "
-            "subjects, setting, colors, composition, and style. Omit uncertain tags "
-            "rather than guessing."
+            "- 10-18 unique comma-separated terms covering supplied authoritative context and "
+            "clearly visible subjects, setting, colors, composition, and style."
         ),
         "- Output only the keyword list after the label.",
         "",
         "Rules:",
-        "- Include only details that are definitely visible in the image.",
         (
-            "- Reuse metadata terms only when they are clearly supported by the image."
+            "- Distinguish supplied authoritative facts from visible details; do not present "
+            "contextual facts as though they were read from the image."
+            if include_metadata_hints
+            else "- Include only details that are definitely visible in the image."
+        ),
+        (
+            "- Reuse draft metadata when it is consistent with the image; authoritative context "
+            "does not require separate visual proof."
             if include_metadata_hints
             else "- Do not infer or import metadata that is not visible in the image."
         ),
@@ -24266,7 +24261,10 @@ def _build_cataloguing_prompt(
         "- Prefer omission to speculation.",
         "- Do not copy prompt instructions into the Title, Description, or Keywords fields.",
         (
-            "- Do not infer identity, location, event, brand, species, time period, "
+            "- Do not infer identity, location, event, brand, species, time period, or intent "
+            "unless supplied as authoritative context or visually obvious."
+            if include_metadata_hints
+            else "- Do not infer identity, location, event, brand, species, time period, "
             "or intent unless visually obvious."
         ),
         "- Do not output reasoning, notes, hedging, or extra sections.",
@@ -25148,9 +25146,8 @@ def _apply_metadata_alignment_to_analysis(
     verdict = analysis.verdict
     evidence = list(analysis.evidence)
 
-    if has_visual_reference and verdict == "clean" and score < QUALITY.metadata_alignment_min_score:
+    if has_visual_reference and score < QUALITY.metadata_alignment_min_score:
         metadata_issue = "low_metadata_alignment"
-        verdict = "semantic_mismatch"
         evidence.append(metadata_issue)
     draft_improvement_score = metadata_agreement.draft_improvement_score
     if (
@@ -25817,8 +25814,22 @@ def _format_review_priorities_parts(
 ) -> list[str]:
     """Render shared reviewer-oriented shortlists for HTML/Markdown reports."""
     triage = report_context.triage
-    useful_rows = list(triage.useful_rows)
+    useful_rows = [
+        row
+        for row in triage.useful_rows
+        if _recommendation_status_for_result(row.result) == "recommended"
+    ]
     watchlist_rows = list(triage.watchlist_rows)
+    watchlist_models = {row.result.model_name for row, _reason in watchlist_rows}
+    watchlist_rows.extend(
+        (
+            row,
+            f"current-review-says-{_recommendation_status_for_result(row.result)}",
+        )
+        for row in triage.useful_rows
+        if row.result.model_name not in watchlist_models
+        and _recommendation_status_for_result(row.result) != "recommended"
+    )
     if not useful_rows and not watchlist_rows:
         return []
     if suppress_cataloging_scores is None:
@@ -27438,9 +27449,11 @@ def _collect_check_models_provenance() -> CheckModelsProvenanceRecord:
     revision = os.environ.get("GITHUB_SHA") or _run_macos_toolchain_command(
         ("git", "-C", str(_REPO_ROOT), "rev-parse", "HEAD")
     )
-    install_type: Literal["editable", "installed", "unknown"]
+    install_type: Literal["editable", "installed", "source-tree", "unknown"]
     if installed and _distribution_is_editable("check_models"):
         install_type = "editable"
+    elif revision is not None and (_REPO_ROOT / ".git").exists():
+        install_type = "source-tree"
     elif installed:
         install_type = "installed"
     else:
@@ -27453,6 +27466,42 @@ def _collect_check_models_provenance() -> CheckModelsProvenanceRecord:
     }
 
 
+def _common_generation_settings(results: Sequence[PerformanceResult]) -> dict[str, JsonLike]:
+    """Return generation settings shared by every result that captured them."""
+    captured = [
+        diagnostics.generate_kwargs
+        for result in results
+        if (diagnostics := result.prompt_diagnostics) is not None and diagnostics.generate_kwargs
+    ]
+    if not captured:
+        return {}
+    common = dict(captured[0])
+    for settings in captured[1:]:
+        common = {key: value for key, value in common.items() if settings.get(key) == value}
+    return common
+
+
+def _run_image_record(
+    image_path: Path | None,
+    image_profile: ImageInputProfile | None,
+) -> RunImageRecord | None:
+    """Return a publication-safe source-image manifest without exposing local paths."""
+    if image_path is None:
+        return None
+    try:
+        size_bytes = image_path.stat().st_size
+    except OSError:
+        size_bytes = None
+    return {
+        "name": image_path.name,
+        "sha256": _sha256_file(image_path),
+        "size_bytes": size_bytes,
+        "width": image_profile.width if image_profile is not None else None,
+        "height": image_profile.height if image_profile is not None else None,
+        "megapixels": image_profile.megapixels if image_profile is not None else None,
+    }
+
+
 def save_run_json_report(
     results: list[PerformanceResult],
     filename: Path,
@@ -27462,13 +27511,14 @@ def save_run_json_report(
     total_runtime_seconds: float,
     report_context: ReportRenderContext,
     output_paths: Mapping[str, str],
+    image_path: Path | None = None,
     producer: CheckModelsProvenanceRecord | None = None,
 ) -> None:
     """Write stable run-level metadata for public benchmark snapshots."""
     policy = report_context.mode_policy
     counts = _run_outcome_counts(results)
     payload: RunJsonReportRecord = {
-        "schema_version": "1.2",
+        "schema_version": "1.3",
         "generated_at": local_now_str(),
         "eval_mode": policy.eval_mode,
         "prompt": prompt,
@@ -27483,6 +27533,8 @@ def save_run_json_report(
         "library_versions": dict(versions),
         "component_provenance": _collect_component_provenance(versions),
         "producer": producer or _collect_check_models_provenance(),
+        "image": _run_image_record(image_path, report_context.image_profile),
+        "generation_settings": _common_generation_settings(results),
     }
     _write_text_file(filename, json.dumps(payload, indent=2, sort_keys=True) + "\n")
 
@@ -29679,6 +29731,7 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
                 total_runtime_seconds=inputs.overall_time,
                 report_context=inputs.report_context,
                 output_paths=_public_output_artifact_map(output_paths),
+                image_path=inputs.image_path,
             ),
         ),
         ReportArtifact(

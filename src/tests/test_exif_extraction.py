@@ -343,7 +343,7 @@ def test_build_prompt_empty_metadata() -> None:
     assert "Description:" in prompt
     assert "Keywords:" in prompt
     assert "Do not output reasoning" in prompt
-    assert "Do not guess." in prompt
+    assert "unless supplied as authoritative context or visually obvious" in prompt
     assert "- 5-10 words, concrete and factual" in prompt
     assert "- 10-18 unique comma-separated terms" in prompt
     assert "Do not repeat or paraphrase these instructions in the title." in prompt

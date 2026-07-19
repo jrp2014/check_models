@@ -9,6 +9,8 @@ from types import SimpleNamespace
 from typing import TYPE_CHECKING, cast
 from unittest.mock import MagicMock, patch
 
+from PIL import Image
+
 import check_models
 from check_models import (
     JsonlMetadataRecord,
@@ -154,11 +156,21 @@ def test_save_run_json_report_captures_public_snapshot_contract(tmp_path: Path) 
         generation_time=1.0,
         model_load_time=0.5,
         total_time=1.5,
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            generate_kwargs={
+                "max_tokens": 500,
+                "temperature": 0.0,
+                "prefill_step_size": 4096,
+            },
+        ),
     )
     out = tmp_path / "run.json"
+    image_path = tmp_path / "catalogue.jpg"
+    Image.new("RGB", (12, 8), "blue").save(image_path)
     context = check_models._build_report_render_context(
         results=[result],
         prompt="Describe this image briefly.",
+        image_path=image_path,
         metadata={"description": ""},
         eval_mode="triage",
     )
@@ -170,6 +182,7 @@ def test_save_run_json_report_captures_public_snapshot_contract(tmp_path: Path) 
         prompt="Describe this image briefly.",
         total_runtime_seconds=3.0,
         report_context=context,
+        image_path=image_path,
         output_paths={
             "results_markdown": "reports/results.md",
             "model_selection": "reports/model_selection.md",
@@ -184,7 +197,7 @@ def test_save_run_json_report_captures_public_snapshot_contract(tmp_path: Path) 
     )
 
     payload = json.loads(out.read_text(encoding="utf-8"))
-    assert payload["schema_version"] == "1.2"
+    assert payload["schema_version"] == "1.3"
     assert payload["eval_mode"] == "triage"
     assert payload["semantic_rankings_grounded"] is False
     assert payload["selection_basis"] == "caption hygiene only"
@@ -197,6 +210,16 @@ def test_save_run_json_report_captures_public_snapshot_contract(tmp_path: Path) 
     assert payload["counts"]["models_failed"] == 0
     assert payload["artifacts"]["model_selection"] == "reports/model_selection.md"
     assert payload["library_versions"]["mlx-vlm"] == "0.6.3"
+    assert payload["image"]["name"] == "catalogue.jpg"
+    assert payload["image"]["width"] == 12
+    assert payload["image"]["height"] == 8
+    assert payload["image"]["sha256"]
+    assert payload["image"]["size_bytes"] > 0
+    assert payload["generation_settings"] == {
+        "max_tokens": 500,
+        "prefill_step_size": 4096,
+        "temperature": 0.0,
+    }
     assert payload["producer"] == {
         "name": "check_models",
         "version": "0.8.6",

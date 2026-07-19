@@ -52,8 +52,7 @@ def test_generate_tsv_report_basic(tmp_path: Path) -> None:
 
     # Read and verify content
     content = safe_io.read_text_no_follow(output_file)
-    # Skip metadata comment line (starts with #)
-    data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
+    data_lines = content.strip().split("\n")
 
     # Should have at least header + 1 data row
     assert len(data_lines) >= 2
@@ -147,8 +146,8 @@ def test_tsv_escapes_newlines_in_values(tmp_path: Path) -> None:
     check_models.generate_tsv_report(results, output_file)
     content = safe_io.read_text_no_follow(output_file)
 
-    # Content should be 3 lines: metadata comment + header + 1 data row
-    data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
+    # Content should be a standard header followed by one data row.
+    data_lines = content.strip().split("\n")
     assert len(data_lines) == 2
 
     record = _read_tsv_record(output_file)
@@ -174,8 +173,8 @@ def test_tsv_removes_html_tags_from_headers(tmp_path: Path) -> None:
     check_models.generate_tsv_report(results, output_file)
     content = safe_io.read_text_no_follow(output_file)
 
-    # Header should not contain HTML tags (skip metadata comment line)
-    data_lines = [ln for ln in content.split("\n") if not ln.startswith("#")]
+    # Header should not contain HTML tags.
+    data_lines = content.split("\n")
     header_line = data_lines[0]
     assert "<br>" not in header_line
     assert "<" not in header_line
@@ -199,8 +198,8 @@ def test_tsv_handles_failed_results(tmp_path: Path) -> None:
     check_models.generate_tsv_report(results, output_file)
     content = safe_io.read_text_no_follow(output_file)
 
-    # Should have metadata comment + header + data row
-    data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
+    # Should have a standard header and data row.
+    data_lines = content.strip().split("\n")
     assert len(data_lines) == 2
 
     # Error message should be in the output

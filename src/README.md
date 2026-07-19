@@ -249,9 +249,9 @@ The tool generates multiple report formats in `output/` by default:
 - **Model Selection** (`reports/model_selection.md`): Ranked shortlist for brief-caption
   and structured title/description/keywords decisions. This is not the complete run.
 - **Gallery Markdown** (`reports/model_gallery.md`): Complete evidence-only artifact with
-  image metadata, the full prompt, one consolidated output/cost/quality summary
-  that retains complete successful output, diagnostics, and one structured
-  full-output section for every attempted model.
+  image metadata, the full prompt, a concise output/cost/quality summary,
+  diagnostics, and one expandable fenced full-output section for every attempted
+  model.
 - **Review Markdown** (`reports/review.md`): Short automated digest grouped by likely owner and user-facing utility bucket.
 - **TSV** (`reports/results.tsv`): Compact spreadsheet contract with caption/runtime
   comparison fields, canonical execution/recommendation status, exact generated
@@ -261,7 +261,8 @@ The tool generates multiple report formats in `output/` by default:
   installation identity, and each model's requested versus resolved cache revision.
 - **Run JSON** (`run.json`): Stable run-level machine contract with mode, grounding,
   attempted/evaluated/indeterminate counts, component source/install provenance,
-  check_models producer version/revision, and artifact paths.
+  check_models producer version/revision, source-image identity and dimensions,
+  common generation settings, and artifact paths.
 - **Diagnostics** (`reports/diagnostics.md`): Self-contained, issue-ready mlx-vlm
   report with native reproduction commands and complete affected-model output in
   per-model expandable evidence blocks. Definite crashes are reported as outcomes;
@@ -994,7 +995,10 @@ Blind scoring measures unaided cataloguing against held-out evidence. Assisted
 scoring measures whether a model integrates authoritative context and improves
 fallible draft metadata while remaining visually grounded. Location and capture
 context are authoritative inputs when available; existing title, description,
-and keywords are LLM-editable draft metadata, not ground truth.
+and keywords are LLM-editable draft metadata, not ground truth. Authoritative
+identity and location may enrich an assisted result without being independently
+readable in the pixels; literal omission of optional draft terms is evidence, not
+by itself a semantic failure.
 
 Prompt burden is reported independently from quality as `visual input` (image or
 estimated non-text tokens dominate), `text` (text tokens dominate), `mixed`
@@ -1165,17 +1169,18 @@ GitHub-compatible qualitative review artifact with:
 
 - Populated image metadata fields when present (title, description, keywords, date, time, GPS)
 - The full prompt in a fenced `text` block
-- One consolidated output/cost/quality summary with complete successful model output
-- One easy-to-scan section per model with full generated output
+- One consolidated output/cost/quality summary with concise output previews
+- One easy-to-scan section per model with complete generated output in an
+  expandable fenced code block
 - Existing success/failure gallery formatting reused from the main report path
 
 ### TSV Report
 
 Tab-separated values for programmatic analysis (spreadsheets, `awk`, pandas, etc.):
 
-- **Metadata comment**: The first line is a `# generated_at: <ISO timestamp>` comment
-  indicating when the report was produced and that JSONL is exhaustive. Parsers
-  should skip lines starting with `#`.
+- **Standard header first**: The first line contains TSV column names, so ordinary
+  spreadsheet, `csv`, and dataframe readers require no comment-skipping option.
+  Run-level timestamps and provenance live in `run.json`.
 - **Compact adaptive columns**: Stable caption/runtime and canonical
   execution/recommendation fields are always present. Compatibility, scoring,
   prompt-detail, memory, owner-confidence, and error columns appear only when at
@@ -1364,7 +1369,8 @@ machine-readable files (JSONL, capability JSON, run JSON, history) and logs rema
   outputs and diagnostics for every attempted model.
 - **Run JSON** (`run.json`): stable run-level machine contract with resolved mode, grounding
   policy, attempted/evaluated/indeterminate counts, component source/install
-  provenance, producer revision, and artifact paths (schema 1.2).
+  provenance, producer revision, source-image manifest, common generation settings,
+  and artifact paths (schema 1.3).
 
 ## Contributing
 

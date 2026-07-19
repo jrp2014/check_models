@@ -7,6 +7,19 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Make assisted-lane recommendations evidence-led rather than literal-overlap-led:
+  authoritative identity/location is explicitly permitted, complete metadata terms
+  reach the prompt without ellipsis corruption, and low draft-term overlap no longer
+  overrides an otherwise clean model verdict.
+- Treat empty `<think></think>` protocol wrappers as presentation caveats rather
+  than reasoning, gibberish, or confirmed stop-token failures; require controlled
+  reruns for long-context collapses even when they also hit the output-token cap,
+  and split unrelated text-sanity observations by model repository.
+- Remove contradictory legacy score/review-focus rows from the evidence gallery,
+  constrain review shortlists to canonical recommendations, keep complete output
+  once in expandable fenced blocks, and use concise output previews in its summary.
+- Make TSV directly importable with the header on the first line, and extend run
+  JSON schema 1.3 with a hashed source-image manifest and shared generation settings.
 - Unify execution and recommendation semantics across HTML, Markdown, TSV, JSONL,
   history, and selection reports. A model is now `recommended` only when its output
   is presentation-ready; token caps and thinking/control-token presentation issues
