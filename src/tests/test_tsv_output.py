@@ -363,7 +363,7 @@ def test_tsv_includes_canonical_enrichment_compatibility_and_owner(tmp_path: Pat
     assert record["assisted_enrichment_score"] == "84"
     assert record["prompt_burden_kind"] == "visual_input"
     assert record["prompt_burden_source"] == "estimated_nontext"
-    assert record["owner_confidence"] in {"high", "medium", "low"}
+    assert "owner_confidence" not in record
 
 
 def test_tsv_uses_canonical_mixed_owner_failure_confidence(tmp_path: Path) -> None:

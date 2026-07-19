@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, cast
 from unittest.mock import patch
 
+import pytest
 from PIL import Image
 
 import check_models
@@ -46,8 +47,6 @@ from check_models import (
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
-
-    import pytest
 
     from check_models import HistoryModelResultRecord, HistoryRunRecord
 
@@ -1756,6 +1755,166 @@ def test_build_report_render_context_backfills_quality_analysis() -> None:
 
     populated = context.result_set.results[0]
     assert populated.quality_analysis is not None
+
+
+def test_report_context_caches_one_canonical_assessment_per_model(tmp_path: Path) -> None:
+    """All renderers should reuse one dual-purpose assessment per resolved model."""
+    results = [_make_success("org/model-clean"), _make_failure("org/model-failed")]
+
+    with patch.object(
+        check_models,
+        "_build_canonical_assessment",
+        wraps=check_models._build_canonical_assessment,
+    ) as build_assessment:
+        context = _build_report_render_context(results=results, prompt="Describe this image.")
+        assert build_assessment.call_count == len(results)
+        assert len(context.assessments) == len(results)
+        assert all(
+            isinstance(assessment, check_models.CanonicalAssessment)
+            for _model, assessment in context.assessments
+        )
+        assert set(check_models._assessments_by_model(context)) == {
+            result.model_name for result in results
+        }
+        assert set(check_models._user_presentations_by_model(context)) == {
+            result.model_name for result in results
+        }
+        assert set(check_models._maintainer_presentations_by_model(context)) == {
+            result.model_name for result in results
+        }
+
+        generate_markdown_report(
+            results,
+            tmp_path / "results.md",
+            _stub_versions(),
+            "Describe this image.",
+            1.0,
+            report_context=context,
+        )
+        generate_html_report(
+            results,
+            tmp_path / "results.html",
+            _stub_versions(),
+            "Describe this image.",
+            1.0,
+            report_context=context,
+        )
+        generate_tsv_report(results, tmp_path / "results.tsv", report_context=context)
+        check_models.save_jsonl_report(
+            results,
+            tmp_path / "results.jsonl",
+            "Describe this image.",
+            {},
+            report_context=context,
+        )
+
+        assert build_assessment.call_count == len(results)
+
+
+@pytest.mark.parametrize(
+    ("success", "outcome", "anomalies", "overlap", "expected"),
+    [
+        (False, "failed", (), "not_assessable", "not-evaluated"),
+        (False, "indeterminate", (), "not_assessable", "not-evaluated"),
+        (True, "completed", ("missing_required_sections",), "some_overlap", "avoid"),
+        (True, "completed", ("encoding_corruption",), "some_overlap", "avoid"),
+        (True, "completed", ("token_cap_truncation",), "some_overlap", "caveat"),
+        (True, "completed", (), "no_overlap", "caveat"),
+        (True, "completed", ("irrelevant_output_smell",), "no_overlap", "avoid"),
+        (True, "completed", (), "some_overlap", "recommended"),
+    ],
+)
+def test_canonical_recommendation_matrix(
+    success: bool,
+    outcome: check_models.ExecutionOutcome,
+    anomalies: tuple[check_models.OutputAnomaly, ...],
+    overlap: check_models.KeywordOverlapState,
+    expected: check_models.RecommendationStatus,
+) -> None:
+    """User recommendation uses a small evidence matrix, not proxy score thresholds."""
+    result = PerformanceResult(
+        model_name="example/model",
+        generation=_MockGeneration() if success else None,
+        success=success,
+    )
+    evidence = check_models.ObservedEvidence(
+        upstream_boundary="not_started",
+        failure_phase=None,
+        exception_origin=None,
+        exception_chain=(),
+        raw_output="A coherent catalog response." if success else "",
+        stop_reason=None,
+        requested_tokens=None,
+        generated_tokens=12 if success else None,
+        anomalies=anomalies,
+        reproduction_status="not_run",
+        keyword_overlap=overlap,
+    )
+
+    assessment = check_models._classify_model_user_assessment(
+        evidence=evidence,
+        result=result,
+        execution_outcome=outcome,
+    )
+
+    assert assessment.current_recommendation == expected
+
+
+def test_canonical_assessments_keep_user_and_maintainer_decisions_independent() -> None:
+    """A crash may be issue-ready without pretending caption quality was evaluated."""
+    crash = PerformanceResult(
+        model_name="example/crash",
+        generation=None,
+        success=False,
+        upstream_boundary="generation_started",
+        failure_phase="decode",
+        error_message="generator raised",
+        error_package="mlx-vlm",
+    )
+    crash_assessment = check_models._build_canonical_assessment(
+        check_models._collect_observed_evidence(crash),
+        crash,
+    )
+
+    assert crash_assessment.model_user.current_recommendation == "not-evaluated"
+    assert crash_assessment.maintainer.maintainer_readiness == "issue_ready"
+
+    poor_output = PerformanceResult(
+        model_name="example/poor-output",
+        generation=_MockGeneration(text="irrelevant boilerplate"),
+        success=True,
+    )
+    poor_evidence = replace(
+        check_models._collect_observed_evidence(poor_output),
+        anomalies=("irrelevant_output_smell",),
+        keyword_overlap="no_overlap",
+    )
+    poor_assessment = check_models._build_canonical_assessment(poor_evidence, poor_output)
+
+    assert poor_assessment.model_user.current_recommendation == "avoid"
+    assert poor_assessment.maintainer.maintainer_readiness == "not_applicable"
+
+    leak_evidence = replace(
+        check_models._collect_observed_evidence(poor_output),
+        anomalies=("special_token_leak",),
+    )
+    unconfirmed = check_models._build_canonical_assessment(leak_evidence, poor_output)
+    confirmed = check_models._build_canonical_assessment(
+        replace(leak_evidence, reproduction_status="confirmed"),
+        poor_output,
+    )
+    assert (
+        unconfirmed.model_user.current_recommendation == confirmed.model_user.current_recommendation
+    )
+    assert unconfirmed.maintainer.maintainer_readiness == "needs_reproduction"
+    assert confirmed.maintainer.maintainer_readiness == "issue_ready"
+
+    overlap_only = check_models._build_canonical_assessment(
+        replace(leak_evidence, anomalies=(), keyword_overlap="no_overlap"),
+        poor_output,
+    )
+    assert overlap_only.model_user.current_recommendation == "caveat"
+    assert overlap_only.maintainer.maintainer_readiness == "not_applicable"
 
 
 def test_build_report_render_context_refreshes_prompt_dependent_checks() -> None:

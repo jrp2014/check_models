@@ -637,6 +637,7 @@ def test_save_jsonl_report_includes_review_payload_for_failures(tmp_path: Path) 
         model_name="failed-model",
         generation=None,
         success=False,
+        upstream_boundary="generation_started",
         error_message="runtime error",
         error_stage="Model Error",
         error_code="MLX_VLM_DECODE_RUNTIME",
@@ -1097,7 +1098,7 @@ def test_jsonl_and_history_include_canonical_cross_artifact_facts(tmp_path: Path
         assert machine_row["assisted_enrichment_score"] == 84.0
         assert machine_row["prompt_burden_kind"] == "visual_input"
         assert machine_row["prompt_burden_source"] == "estimated_nontext"
-        assert machine_row["owner_confidence"] == row["maintainer_triage"]["confidence"]
+        assert "owner_confidence" not in machine_row
 
 
 def test_jsonl_and_history_use_canonical_mixed_owner_failure_confidence(

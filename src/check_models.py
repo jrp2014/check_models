@@ -10421,9 +10421,13 @@ def _build_report_render_context(
         for result in results
     ]
     resolved_results: list[PerformanceResult] = []
+    assessments: list[tuple[str, CanonicalAssessment]] = []
+    user_presentations: list[tuple[str, ModelUserPresentation]] = []
+    maintainer_presentations: list[tuple[str, MaintainerPresentation]] = []
     review_payloads: list[tuple[str, JsonlReviewRecord | None]] = []
     maintainer_triage_payloads: list[tuple[str, JsonlMaintainerTriageRecord | None]] = []
     for result in analyzed_results:
+        assessment = _build_canonical_assessment(_collect_observed_evidence(result), result)
         review = _build_jsonl_review_record(result)
         result_with_review = replace(
             result,
@@ -10441,6 +10445,13 @@ def _build_report_render_context(
             maintainer_triage_payload_ready=True,
         )
         resolved_results.append(resolved_result)
+        assessments.append((resolved_result.model_name, assessment))
+        user_presentations.append(
+            (resolved_result.model_name, _model_user_presentation(assessment.model_user))
+        )
+        maintainer_presentations.append(
+            (resolved_result.model_name, _maintainer_presentation(assessment.maintainer))
+        )
         review_payloads.append((resolved_result.model_name, review))
         maintainer_triage_payloads.append((resolved_result.model_name, maintainer_triage))
     result_set: ResultSet = ResultSet(resolved_results)
@@ -10492,6 +10503,9 @@ def _build_report_render_context(
         diagnostics_snapshot=diagnostics_snapshot,
         issue_clusters=_build_issue_clusters(diagnostics_snapshot),
         failure_narratives=failure_narratives,
+        assessments=tuple(assessments),
+        user_presentations=tuple(user_presentations),
+        maintainer_presentations=tuple(maintainer_presentations),
         reviews=tuple(review_payloads),
         maintainer_triage=tuple(maintainer_triage_payloads),
     )
@@ -10506,14 +10520,14 @@ def _build_report_render_context(
         summary=aligned_summary,
         recommendations=recommendations,
     )
-    narrative_by_model = _failure_narratives_by_model(context)
+    assessment_by_model = _assessments_by_model(context)
     return replace(
         context,
         machine_facts=tuple(
             _machine_artifact_facts(
                 view,
+                assessment_by_model[view.result.model_name],
                 recommended_working_set_bytes=context.recommended_working_set_bytes,
-                failure_narrative=narrative_by_model.get(view.result.model_name),
             )
             for view in recommendations
         ),
@@ -14107,6 +14121,26 @@ class CanonicalAssessment:
     maintainer: MaintainerAssessment
 
 
+@dataclass(frozen=True)
+class ModelUserPresentation:
+    """Human-facing projection of the model-user assessment."""
+
+    recommendation: RecommendationStatus
+    label: str
+    icon: str
+    reason: str
+
+
+@dataclass(frozen=True)
+class MaintainerPresentation:
+    """Human-facing projection of the maintainer assessment."""
+
+    suspected_owner: str | None
+    readiness: MaintainerReadiness
+    evidence: tuple[str, ...]
+    next_action: str
+
+
 def _controlled_reproduction_status(
     rerun: RerunEvidence | None,
 ) -> ControlledReproductionStatus:
@@ -14137,12 +14171,16 @@ def _output_anomalies(result: PerformanceResult) -> tuple[OutputAnomaly, ...]:
         anomalies.append("text_repetition")
     if analysis.text_sanity_issue_type == "numeric_loop":
         anomalies.append("numeric_repetition")
+    elif analysis.text_sanity_issue_type == "gibberish(mixed_script_noise)":
+        anomalies.append("mixed_script_corruption")
     if analysis.degeneration_type and "encoding" in analysis.degeneration_type:
         anomalies.append("encoding_corruption")
     if analysis.missing_sections:
         anomalies.append("missing_required_sections")
     if analysis.likely_capped:
         anomalies.append("token_cap_truncation")
+    if analysis.verdict == "model_shortcoming":
+        anomalies.append("irrelevant_output_smell")
     return tuple(dict.fromkeys(anomalies))
 
 
@@ -14172,6 +14210,153 @@ def _collect_observed_evidence(result: PerformanceResult) -> ObservedEvidence:
     )
 
 
+_SEVERE_MODEL_OUTPUT_ANOMALIES: Final[frozenset[OutputAnomaly]] = frozenset(
+    {
+        "missing_required_sections",
+        "text_repetition",
+        "numeric_repetition",
+        "mixed_script_corruption",
+        "encoding_corruption",
+    }
+)
+_UPSTREAM_DIAGNOSTIC_ANOMALIES: Final[frozenset[OutputAnomaly]] = frozenset(
+    {"special_token_leak", "mixed_script_corruption", "encoding_corruption"}
+)
+
+
+def _classify_model_user_assessment(
+    *,
+    evidence: ObservedEvidence,
+    result: PerformanceResult,
+    execution_outcome: ExecutionOutcome,
+) -> ModelUserAssessment:
+    """Classify current-run usefulness without making maintainer decisions."""
+    del result
+    anomaly_set = frozenset(evidence.anomalies)
+    if execution_outcome != "completed":
+        recommendation: RecommendationStatus = "not-evaluated"
+    elif anomaly_set & _SEVERE_MODEL_OUTPUT_ANOMALIES or (
+        evidence.keyword_overlap == "no_overlap" and "irrelevant_output_smell" in anomaly_set
+    ):
+        recommendation = "avoid"
+    elif evidence.keyword_overlap == "no_overlap" or anomaly_set:
+        recommendation = "caveat"
+    else:
+        recommendation = "recommended"
+
+    if execution_outcome == "indeterminate":
+        compatibility: CompatibilityStatus = "indeterminate"
+    elif execution_outcome == "failed":
+        compatibility = "crashed"
+    elif anomaly_set & _UPSTREAM_DIAGNOSTIC_ANOMALIES:
+        compatibility = "integration-warning"
+    else:
+        compatibility = "clean"
+
+    evidence_codes: tuple[str, ...] = evidence.anomalies
+    if evidence.keyword_overlap == "no_overlap":
+        evidence_codes += ("keyword_no_overlap",)
+    return ModelUserAssessment(
+        execution_outcome=execution_outcome,
+        compatibility_status=compatibility,
+        current_recommendation=recommendation,
+        output_anomalies=evidence.anomalies,
+        keyword_overlap=evidence.keyword_overlap,
+        evidence_codes=evidence_codes,
+    )
+
+
+def _classify_maintainer_assessment(
+    *,
+    evidence: ObservedEvidence,
+    result: PerformanceResult,
+) -> MaintainerAssessment:
+    """Classify issue actionability independently of model-user usefulness."""
+    failure_origin = _failure_origin(result)
+    diagnostic_anomalies = tuple(
+        anomaly for anomaly in evidence.anomalies if anomaly in _UPSTREAM_DIAGNOSTIC_ANOMALIES
+    )
+    if result.success and not diagnostic_anomalies:
+        readiness: MaintainerReadiness = "not_applicable"
+    else:
+        readiness = _maintainer_readiness(
+            failure_origin=failure_origin,
+            reproduction_status=evidence.reproduction_status,
+            has_output_anomaly=bool(diagnostic_anomalies),
+        )
+
+    suspected_owner: str | None = None
+    if not result.success:
+        owner = _failure_owner_for_result(result)
+        suspected_owner = owner if owner != _UNKNOWN_OWNER else None
+    elif diagnostic_anomalies and result.quality_analysis is not None:
+        suspected_owner = result.quality_analysis.owner
+
+    owner_confidence: MaintainerConfidence | None = None
+    if suspected_owner is not None:
+        owner_confidence = "high" if failure_origin.startswith("upstream_") else "medium"
+        if suspected_owner.startswith("unresolved: "):
+            owner_confidence = "low"
+        elif len(result.exception_chain) > 1 and owner_confidence == "high":
+            owner_confidence = "medium"
+    if readiness == "issue_ready":
+        next_action = "File the retained reproduction evidence with the suspected owner."
+    elif readiness == "needs_reproduction":
+        next_action = "Run a controlled reproduction before assigning an upstream defect."
+    elif readiness == "harness_observation":
+        next_action = "Correct or verify the local harness preflight before upstream filing."
+    else:
+        next_action = "No maintainer issue action is indicated by this run."
+    return MaintainerAssessment(
+        failure_origin=failure_origin,
+        maintainer_readiness=readiness,
+        suspected_owner=suspected_owner,
+        owner_confidence=owner_confidence,
+        reproduction_status=evidence.reproduction_status,
+        evidence_codes=tuple(diagnostic_anomalies),
+        next_action=next_action,
+    )
+
+
+def _build_canonical_assessment(
+    evidence: ObservedEvidence,
+    result: PerformanceResult,
+) -> CanonicalAssessment:
+    """Build both audience decisions from one immutable evidence record."""
+    outcome = _execution_outcome(result)
+    return CanonicalAssessment(
+        model_user=_classify_model_user_assessment(
+            evidence=evidence,
+            result=result,
+            execution_outcome=outcome,
+        ),
+        maintainer=_classify_maintainer_assessment(evidence=evidence, result=result),
+    )
+
+
+def _model_user_presentation(assessment: ModelUserAssessment) -> ModelUserPresentation:
+    """Return the compact human label for a model-user assessment."""
+    labels: Final[dict[RecommendationStatus, tuple[str, str]]] = {
+        "recommended": ("Recommended", "✓"),
+        "caveat": ("Caveat", "△"),
+        "avoid": ("Avoid", "✗"),
+        "not-evaluated": ("Not evaluated", "—"),
+    }
+    label, icon = labels[assessment.current_recommendation]
+    reason = ", ".join(assessment.evidence_codes) or "no flagged evidence"
+    return ModelUserPresentation(assessment.current_recommendation, label, icon, reason)
+
+
+def _maintainer_presentation(assessment: MaintainerAssessment) -> MaintainerPresentation:
+    """Return the compact human projection of maintainer readiness."""
+    return MaintainerPresentation(
+        suspected_owner=assessment.suspected_owner,
+        readiness=assessment.maintainer_readiness,
+        evidence=assessment.evidence_codes,
+        next_action=assessment.next_action,
+    )
+
+
 @dataclass(frozen=True)
 class ModelRecommendationView:
     """Canonical current-run facts used by model recommendation surfaces."""
@@ -14198,6 +14383,11 @@ class MachineArtifactFacts:
     """Additive machine-readable facts shared by JSONL, TSV, and history."""
 
     compatibility_status: CompatibilityStatus
+    current_recommendation: RecommendationStatus
+    failure_origin: FailureOrigin
+    maintainer_readiness: MaintainerReadiness
+    reproduction_status: ControlledReproductionStatus
+    keyword_overlap: KeywordOverlapState
     context_integration_score: float | None
     draft_improvement_score: float | None
     visual_description_score: float | None
@@ -14299,6 +14489,9 @@ class ReportRenderContext:
     issue_clusters: tuple[IssueCluster, ...] = ()
     failure_narratives: tuple[tuple[str, FailureNarrative], ...] = ()
     machine_facts: tuple[MachineArtifactFacts, ...] = ()
+    assessments: tuple[tuple[str, CanonicalAssessment], ...] = ()
+    user_presentations: tuple[tuple[str, ModelUserPresentation], ...] = ()
+    maintainer_presentations: tuple[tuple[str, MaintainerPresentation], ...] = ()
     reviews: tuple[tuple[str, JsonlReviewRecord | None], ...] = ()
     maintainer_triage: tuple[tuple[str, JsonlMaintainerTriageRecord | None], ...] = ()
 
@@ -18880,22 +19073,19 @@ def _build_model_recommendation_views(
 
 def _machine_artifact_facts(
     view: ModelRecommendationView,
+    assessment: CanonicalAssessment,
     *,
     recommended_working_set_bytes: int | None,
-    failure_narrative: FailureNarrative | None = None,
 ) -> MachineArtifactFacts:
     """Return one canonical additive machine payload from cached report views."""
-    if view.result.success:
-        triage = _maintainer_triage_for_result(view.result)
-        suspected_owner = triage["suspected_owner"] if triage is not None else None
-        owner_confidence = triage["confidence"] if triage is not None else None
-    else:
-        narrative = failure_narrative or _build_failure_narrative(view.result)
-        suspected_owner = narrative.suspected_owner
-        owner_confidence = narrative.owner_confidence
     agreement = view.result.metadata_agreement
     return MachineArtifactFacts(
-        compatibility_status=view.compatibility,
+        compatibility_status=assessment.model_user.compatibility_status,
+        current_recommendation=assessment.model_user.current_recommendation,
+        failure_origin=assessment.maintainer.failure_origin,
+        maintainer_readiness=assessment.maintainer.maintainer_readiness,
+        reproduction_status=assessment.maintainer.reproduction_status,
+        keyword_overlap=assessment.model_user.keyword_overlap,
         context_integration_score=view.context_score,
         draft_improvement_score=view.draft_improvement_score,
         visual_description_score=(agreement.visual_description_score if agreement else None),
@@ -18906,8 +19096,8 @@ def _machine_artifact_facts(
         ),
         prompt_burden_kind=view.burden.kind,
         prompt_burden_source=view.burden.source,
-        suspected_owner=suspected_owner,
-        owner_confidence=owner_confidence,
+        suspected_owner=assessment.maintainer.suspected_owner,
+        owner_confidence=assessment.maintainer.owner_confidence,
     )
 
 
@@ -18916,6 +19106,27 @@ def _recommendations_by_model(
 ) -> dict[str, ModelRecommendationView]:
     """Index cached current-run recommendations by model identifier."""
     return {view.result.model_name: view for view in report_context.recommendations}
+
+
+def _assessments_by_model(
+    report_context: ReportRenderContext,
+) -> dict[str, CanonicalAssessment]:
+    """Index the cached dual-purpose assessment by model identifier."""
+    return dict(report_context.assessments)
+
+
+def _user_presentations_by_model(
+    report_context: ReportRenderContext,
+) -> dict[str, ModelUserPresentation]:
+    """Index cached model-user presentation records by model identifier."""
+    return dict(report_context.user_presentations)
+
+
+def _maintainer_presentations_by_model(
+    report_context: ReportRenderContext,
+) -> dict[str, MaintainerPresentation]:
+    """Index cached maintainer presentation records by model identifier."""
+    return dict(report_context.maintainer_presentations)
 
 
 def _machine_facts_by_model(
