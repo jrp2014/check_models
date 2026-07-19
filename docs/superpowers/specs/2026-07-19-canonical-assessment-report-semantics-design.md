@@ -5,9 +5,21 @@ Status: Approved design
 
 ## Purpose
 
-Make classifications, recommendations, maintainer routing, and confidence
-language consistent across every generated artifact while reducing the size and
-complexity of `src/check_models.py`.
+Make the two purpose-specific classifications, their evidence, and confidence
+language consistent across every relevant generated artifact while reducing the
+size and complexity of `src/check_models.py`.
+
+The two classifications reflect the outputs' two main audiences:
+
+- a model-user assessment answers whether the model is useful for local image
+  captioning and keywording in the current run;
+- a maintainer assessment answers whether the observation is actionable for
+  mlx-vlm, mlx, transformers, a model configuration, or another owning layer.
+
+They share canonical observed evidence but remain independent decisions. A
+model can be unsuitable for users without presenting an issue-ready upstream
+defect, and an issue-ready integration failure can say nothing about the
+model's caption quality.
 
 The design treats issue publication as a strict boundary: only confirmed
 upstream findings may generate issue drafts. Uncertain observations must remain
@@ -106,33 +118,42 @@ should include, where available:
 Evidence collection must not assign an owner, recommendation, readiness state,
 or issue title.
 
-### Canonical assessment
+### Canonical assessments
 
-Introduce one fully typed immutable `CanonicalAssessment` per result. It should
-contain:
+Introduce one fully typed immutable assessment bundle per result containing two
+narrow, purpose-specific assessments.
+
+The model-user assessment should contain:
 
 - execution outcome;
-- failure origin;
 - compatibility status;
 - output-anomaly tuple;
 - current recommendation;
+- concise user-facing evidence codes;
+- raw proxy measurements and their declared scope.
+
+The maintainer assessment should contain:
+
+- failure origin;
 - maintainer readiness;
 - suspected owner and confidence;
 - controlled-reproduction status;
-- concise evidence codes;
-- next action;
-- raw proxy measurements and their declared scope.
+- concise maintainer-facing evidence codes;
+- next action.
 
-Assessments are computed once and stored by model in `ReportRenderContext`.
-Renderers and machine serializers must consume this cached assessment rather
-than invoke classification functions independently.
+Both assessments are computed from the same immutable evidence and stored by
+model in `ReportRenderContext`. Renderers and machine serializers must consume
+the relevant cached assessment rather than invoke classification functions
+independently. Shared evidence collection should be consolidated; distinct
+audience policy must not be collapsed merely to reduce code.
 
 ### Data flow
 
 1. Execute the model and retain raw runtime data.
 2. Collect observed evidence.
-3. Classify one canonical assessment from the evidence and run policy.
-4. Build a shared presentation record from the assessment.
+3. Classify canonical model-user and maintainer assessments from the evidence
+   and their separate policies.
+4. Build audience-specific presentation records from those assessments.
 5. Render every artifact from the result, assessment, and presentation record.
 6. Filter `issue_ready` assessments before issue clustering and issue-draft
    generation.
@@ -342,11 +363,12 @@ prompt hash, image identity, and common generation settings.
 
 Implementation is deletion-oriented:
 
-1. Compute and cache the canonical assessment once per result.
+1. Compute and cache the two canonical, purpose-specific assessments once per
+   result from one evidence record.
 2. Retain JSON/TSV record types as serialised views, not competing internal
    models.
-3. Use one shared presentation record for labels, concise evidence, owner,
-   readiness, recommendation, and next action.
+3. Use narrow model-user and maintainer presentation records; share factual
+   formatting helpers without merging the two audience decisions.
 4. Delete duplicate review and maintainer-triage builders after migration.
 5. Delete report-specific recommendation and readiness decisions.
 6. Filter issue-ready results before clustering, removing repeated readiness
@@ -414,8 +436,8 @@ unless an existing documented policy proves it necessary.
 
 ## Suggested Implementation Sequence
 
-1. Add the evidence and canonical-assessment types and table-driven decision
-   tests.
+1. Add the evidence and two canonical-assessment types and table-driven
+   decision tests.
 2. Compute assessments in the shared report context while preserving existing
    serialized fields.
 3. Migrate diagnostics and confirmed-only issue generation.
