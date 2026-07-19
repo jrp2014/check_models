@@ -4003,7 +4003,6 @@ _EMPTY_THINKING_WRAPPER_RE: Final[re.Pattern[str]] = re.compile(
     r"<think>\s*</think>",
     re.IGNORECASE,
 )
-_TEXT_SANITY_MIN_REPEATED_NUMERIC_TOKEN_COUNT: Final[int] = 3
 _STRUCTURED_NUMERIC_METADATA_RE: Final[re.Pattern[str]] = re.compile(
     r"(?:\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}:\d{2}(?::\d{2})?\b|"
     r"[-+]?\d{1,3}(?:\.\d+)?\s*,\s*[-+]?\d{1,3}(?:\.\d+)?|"
@@ -4024,6 +4023,46 @@ def _strip_empty_thinking_wrappers(text: str) -> str:
     return _EMPTY_THINKING_WRAPPER_RE.sub(" ", text)
 
 
+@dataclass(frozen=True)
+class NormalizedOutput:
+    """Scoring-only output copy plus every removed literal wrapper token."""
+
+    text: str
+    removed_wrappers: tuple[str, ...] = ()
+
+
+_GENERIC_SPECIAL_WRAPPER_RE: Final[re.Pattern[str]] = re.compile(
+    r"<\|/?[A-Za-z][\w.-]*\|>|</?[A-Za-z][\w.-]*(?:_token|_turn)>",
+)
+
+
+def _normalize_output_for_analysis(
+    text: str,
+    *,
+    known_special_tokens: Sequence[str] = (),
+) -> NormalizedOutput:
+    """Return a semantic-scoring copy while retaining removed wrappers as evidence."""
+    candidates = {token for token in known_special_tokens if token and token.startswith(("<", "["))}
+    candidates.update(_GENERIC_SPECIAL_WRAPPER_RE.findall(text))
+    if not candidates:
+        return NormalizedOutput(text=text.strip())
+
+    pattern = re.compile(
+        "|".join(re.escape(token) for token in sorted(candidates, key=len, reverse=True))
+    )
+    removed: list[str] = []
+
+    def _remove_wrapper(match: re.Match[str]) -> str:
+        removed.append(match.group(0))
+        return " "
+
+    normalized = pattern.sub(_remove_wrapper, text)
+    normalized = re.sub(r"[ \t]+", " ", normalized)
+    normalized = re.sub(r" *\n *", "\n", normalized)
+    normalized = re.sub(r"\n{3,}", "\n\n", normalized).strip()
+    return NormalizedOutput(text=normalized, removed_wrappers=tuple(removed))
+
+
 def _text_sanity_script_family(char: str) -> str | None:
     """Return broad script families used to spot tokenizer-style script soup."""
     if not char.isalpha():
@@ -4040,18 +4079,22 @@ def _text_sanity_script_family(char: str) -> str | None:
 
 
 def _text_sanity_numeric_loop_issue(cleaned: str) -> str | None:
-    """Return a numeric-loop issue label when one number dominates the output."""
-    numeric_tokens = _TEXT_SANITY_NUMERIC_TOKEN_RE.findall(
-        _remove_structured_numeric_metadata(cleaned)
-    )
-    if len(numeric_tokens) < QUALITY.text_sanity_numeric_loop_min_count:
-        return None
-    _number, count = Counter(numeric_tokens).most_common(1)[0]
-    repeated_token_threshold = max(
-        _TEXT_SANITY_MIN_REPEATED_NUMERIC_TOKEN_COUNT,
-        QUALITY.text_sanity_numeric_loop_min_count // 2,
-    )
-    return "numeric_loop" if count >= repeated_token_threshold else None
+    """Return a numeric-loop label only for a contiguous run of one number."""
+    numeric_text = _remove_structured_numeric_metadata(cleaned)
+    matches = list(_TEXT_SANITY_NUMERIC_TOKEN_RE.finditer(numeric_text))
+    run_token: str | None = None
+    run_length = 0
+    previous_end = 0
+    for match in matches:
+        separator = numeric_text[previous_end : match.start()]
+        token = match.group(0)
+        contiguous = not separator.strip(" \t\r\n,;:|/-")
+        run_length = run_length + 1 if contiguous and token == run_token else 1
+        run_token = token
+        previous_end = match.end()
+        if run_length >= QUALITY.text_sanity_numeric_loop_min_count:
+            return "numeric_loop"
+    return None
 
 
 def _text_sanity_token_marker_issue(cleaned: str) -> str | None:
@@ -7468,6 +7511,7 @@ class GenerationQualityAnalysis:
     prompt_tokens_total: int | None = None
     prompt_tokens_text_est: int | None = None
     prompt_tokens_nontext_est: int | None = None
+    special_token_wrappers: list[str] = dataclass_field(default_factory=list)
 
     @property
     def has_title_length_violation(self) -> bool:
@@ -7684,13 +7728,14 @@ class HarnessQualitySignals:
 def _collect_prompt_quality_signals(
     text: str,
     *,
+    raw_text: str | None = None,
     generated_tokens: int,
     prompt: str | None,
     context_marker: str,
     model_name: str | None,
 ) -> PromptQualitySignals:
     """Collect prompt-aware trusted-hint and contract signals."""
-    reasoning_signals = _detect_reasoning_output(text, model_name=model_name)
+    reasoning_signals = _detect_reasoning_output(raw_text or text, model_name=model_name)
     instruction_echo, instruction_markers = _detect_instruction_echo(text)
     if not prompt:
         return PromptQualitySignals(
@@ -7761,6 +7806,7 @@ def _collect_prompt_quality_signals(
 def _collect_harness_quality_signals(
     text: str,
     *,
+    ignored_special_tokens: Sequence[str] = (),
     generated_tokens: int,
     prompt_tokens: int | None,
     is_repetitive: bool,
@@ -7776,8 +7822,11 @@ def _collect_harness_quality_signals(
         harness_type = harness_type or "encoding"
         harness_issues.append(f"token_encoding:{encoding_type}")
 
+    leakage_text = text
+    for token in ignored_special_tokens:
+        leakage_text = leakage_text.replace(token, " ")
     has_token_leak, leaked_tokens = _detect_special_token_leakage(
-        _strip_empty_thinking_wrappers(text),
+        _strip_empty_thinking_wrappers(leakage_text),
     )
     if has_token_leak:
         harness_type = harness_type or "stop_token"
@@ -7888,6 +7937,7 @@ def analyze_generation_text(
     requested_max_tokens: int | None = None,
     context_marker: str = "Context:",
     model_name: str | None = None,
+    known_special_tokens: Sequence[str] = (),
 ) -> GenerationQualityAnalysis:
     """Analyze generated text for quality issues.
 
@@ -7902,17 +7952,24 @@ def analyze_generation_text(
         requested_max_tokens: Requested max generation tokens for cutoff detection
         context_marker: Marker for context section in prompt
         model_name: Model identifier used to recognise expected thinking protocols
+        known_special_tokens: Tokenizer-reported wrappers excluded from semantic scoring
 
     Returns:
         GenerationQualityAnalysis with all detected issues
     """
-    is_repetitive, repeated_token = _detect_repetitive_output(text)
-    hallucination_issues = _detect_hallucination_patterns(text)
-    is_verbose = _detect_excessive_verbosity(text, generated_tokens)
-    formatting_issues = _detect_formatting_violations(text)
-    has_excessive_bullets, bullet_count = _detect_excessive_bullets(text)
-    prompt_signals = _collect_prompt_quality_signals(
+    normalized = _normalize_output_for_analysis(
         text,
+        known_special_tokens=known_special_tokens,
+    )
+    scoring_text = normalized.text
+    is_repetitive, repeated_token = _detect_repetitive_output(scoring_text)
+    hallucination_issues = _detect_hallucination_patterns(scoring_text)
+    is_verbose = _detect_excessive_verbosity(scoring_text, generated_tokens)
+    formatting_issues = _detect_formatting_violations(text)
+    has_excessive_bullets, bullet_count = _detect_excessive_bullets(scoring_text)
+    prompt_signals = _collect_prompt_quality_signals(
+        scoring_text,
+        raw_text=text,
         generated_tokens=generated_tokens,
         prompt=prompt,
         context_marker=context_marker,
@@ -7920,26 +7977,27 @@ def analyze_generation_text(
     )
 
     # Refusal detection: model declines to answer
-    is_refusal, refusal_type = _detect_refusal_patterns(text)
+    is_refusal, refusal_type = _detect_refusal_patterns(scoring_text)
 
     # Generic output: boilerplate without image-specific content
-    is_generic, specificity_score = _detect_generic_output(text)
+    is_generic, specificity_score = _detect_generic_output(scoring_text)
 
     # Language mixing: unexpected language/script switches
-    has_language_mixing, language_mixing_issues = _detect_language_mixing(text)
+    has_language_mixing, language_mixing_issues = _detect_language_mixing(scoring_text)
 
     # Output degeneration: rubbish characters, encoding corruption
-    has_degeneration, degeneration_type = _detect_output_degeneration(text)
+    has_degeneration, degeneration_type = _detect_output_degeneration(scoring_text)
 
     # Fabrication: hallucinated specific details
-    has_fabrication, fabrication_issues = _detect_fabricated_details(text)
+    has_fabrication, fabrication_issues = _detect_fabricated_details(scoring_text)
 
-    has_text_sanity_issue, text_sanity_issue_type = _detect_text_sanity_issue(text)
+    has_text_sanity_issue, text_sanity_issue_type = _detect_text_sanity_issue(scoring_text)
     if not has_text_sanity_issue:
         text_sanity_issue_type = None
 
     harness_signals = _collect_harness_quality_signals(
         text,
+        ignored_special_tokens=normalized.removed_wrappers,
         generated_tokens=generated_tokens,
         prompt_tokens=prompt_tokens,
         is_repetitive=is_repetitive,
@@ -7947,7 +8005,7 @@ def analyze_generation_text(
         is_refusal=is_refusal,
     )
 
-    _ttr, unique_words, total_words = compute_vocabulary_diversity(text)
+    _ttr, unique_words, total_words = compute_vocabulary_diversity(scoring_text)
     unique_ratio = unique_words / total_words if total_words else 0.0
     prompt_tokens_text_est = _estimate_prompt_tokens_from_text(prompt)
     prompt_tokens_nontext_est = (
@@ -7956,7 +8014,7 @@ def analyze_generation_text(
         else None
     )
     likely_capped, cutoff_reasons = _detect_likely_cutoff(
-        text,
+        scoring_text,
         generated_tokens=generated_tokens,
         requested_max_tokens=requested_max_tokens,
         is_repetitive=is_repetitive,
@@ -7970,12 +8028,12 @@ def analyze_generation_text(
         text_sanity_issue_type=text_sanity_issue_type,
     )
     utility_context = prompt_signals.prompt_bundle.trusted_text or None
-    utility_grade = str(compute_cataloging_utility(text, utility_context)["utility_grade"])
+    utility_grade = str(compute_cataloging_utility(scoring_text, utility_context)["utility_grade"])
     hint_relationship = "not_evaluated"
     hint_evidence: list[str] = []
     if prompt_signals.prompt_bundle.trusted_text:
         hint_relationship, hint_evidence = _classify_hint_relationship(
-            text,
+            scoring_text,
             prompt_signals.prompt_bundle,
         )
     verdict, review_evidence = _classify_review_verdict(
@@ -7998,7 +8056,7 @@ def analyze_generation_text(
     if (
         verdict == "clean"
         and utility_grade == "F"
-        and len(text.strip()) < QUALITY.anomaly_min_output_chars
+        and len(scoring_text) < QUALITY.anomaly_min_output_chars
     ):
         verdict = "unknown_runtime_anomaly"
         review_evidence.append("utility:F")
@@ -8033,6 +8091,12 @@ def analyze_generation_text(
             *(["fabrication"] if has_fabrication else []),
             *(["text_sanity"] if text_sanity_issue_type is not None else []),
             *(["generation_loop"] if generation_loop_type is not None else []),
+            *(["special_token_wrapper"] if normalized.removed_wrappers else []),
+            *(
+                ["reasoning_budget_exhausted"]
+                if prompt_signals.thinking_trace_incomplete and likely_capped
+                else []
+            ),
         ],
     )
 
@@ -8088,6 +8152,7 @@ def analyze_generation_text(
         prompt_tokens_total=prompt_tokens,
         prompt_tokens_text_est=prompt_tokens_text_est,
         prompt_tokens_nontext_est=prompt_tokens_nontext_est,
+        special_token_wrappers=list(normalized.removed_wrappers),
     )
 
 
@@ -8100,6 +8165,7 @@ def _analyze_text_quality(
     requested_max_tokens: int | None = None,
     context_marker: str = "Context:",
     model_name: str | None = None,
+    known_special_tokens: Sequence[str] = (),
 ) -> tuple[GenerationQualityAnalysis, str | None]:
     """Return structured quality analysis plus the normalized issue label string."""
     analysis = analyze_generation_text(
@@ -8110,6 +8176,7 @@ def _analyze_text_quality(
         requested_max_tokens=requested_max_tokens,
         context_marker=context_marker,
         model_name=model_name,
+        known_special_tokens=known_special_tokens,
     )
     return analysis, _build_quality_issues_string(analysis)
 
@@ -14034,6 +14101,8 @@ def _output_anomalies(result: PerformanceResult) -> tuple[OutputAnomaly, ...]:
         return ()
     anomalies: list[OutputAnomaly] = []
     harness_details = " ".join(analysis.harness_issue_details)
+    if analysis.special_token_wrappers:
+        anomalies.append("special_token_wrapper")
     if "token_leak:" in harness_details:
         anomalies.append("special_token_leak")
     if analysis.has_thinking_trace:
@@ -25463,6 +25532,9 @@ def _populate_result_quality_analysis(
         requested_max_tokens=resolved_requested_max_tokens,
         context_marker=context_marker,
         model_name=result.model_name,
+        known_special_tokens=(
+            result.prompt_diagnostics.special_tokens if result.prompt_diagnostics else ()
+        ),
     )
     if cached_analysis is not None:
         cached_quality_issues = result.quality_issues or _build_quality_issues_string(

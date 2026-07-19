@@ -332,6 +332,64 @@ def test_analyze_generation_text_flags_unclosed_expected_thinking_trace() -> Non
     assert "reasoning-leak" not in quality_issues
 
 
+def test_wrapped_valid_output_uses_normalized_scoring_copy() -> None:
+    """Known wrappers should not hide valid sections or mutate retained raw output."""
+    raw = (
+        "<|assistant|>\n"
+        "Title: Craftspeople restoring a wooden workbench\n"
+        "Description: Two craftspeople repair a worn bench in a bright workshop.\n"
+        "Keywords: workshop, craftspeople, workbench, repair, tools, timber, restoration, "
+        "indoors, craft, furniture\n"
+        "<|end|>"
+    )
+    known_tokens = ("<|assistant|>", "<|end|>")
+
+    normalized = check_models._normalize_output_for_analysis(
+        raw,
+        known_special_tokens=known_tokens,
+    )
+    analysis = check_models.analyze_generation_text(
+        raw,
+        generated_tokens=64,
+        prompt=(
+            "Analyze this image for cataloguing metadata.\n"
+            "Return exactly these three sections, and nothing else:\n"
+            "Title: 5-10 words.\nDescription: 1-2 factual sentences.\n"
+            "Keywords: 10-18 terms."
+        ),
+        known_special_tokens=known_tokens,
+    )
+
+    assert raw.startswith("<|assistant|>")
+    assert normalized.text.startswith("Title:")
+    assert normalized.removed_wrappers == known_tokens
+    assert analysis.missing_sections == []
+    assert analysis.special_token_wrappers == list(known_tokens)
+    assert "special_token_wrapper" in analysis.evidence
+
+
+def test_coherent_capped_reasoning_is_not_mechanical_corruption() -> None:
+    """A coherent unfinished trace should be a budget issue, not token soup."""
+    text = (
+        "◁think▷The shoreline contains several small boats beside a timber jetty. "
+        "The calm water reflects the hulls, while low buildings and trees form "
+        "the background. I should now compose the requested catalog description"
+    )
+
+    analysis = check_models.analyze_generation_text(
+        text,
+        generated_tokens=80,
+        requested_max_tokens=80,
+        model_name="example/Thinking-Vision-Model",
+    )
+
+    assert analysis.thinking_trace_incomplete is True
+    assert analysis.text_sanity_issue_type is None
+    assert analysis.is_repetitive is False
+    assert analysis.has_degeneration is False
+    assert "reasoning_budget_exhausted" in analysis.evidence
+
+
 def test_format_quality_analysis_for_log_distinguishes_incomplete_thinking() -> None:
     """Compact logs should preserve informational and incomplete trace states."""
     analysis = check_models.analyze_generation_text(
@@ -862,6 +920,16 @@ def test_structured_numeric_metadata_is_not_a_numeric_loop(structured_text: str)
 
 def test_true_repeated_number_still_triggers_numeric_loop() -> None:
     assert check_models._text_sanity_numeric_loop_issue("42 42 42 42 42 42") == "numeric_loop"
+
+
+def test_repeated_factual_values_in_prose_are_not_a_numeric_loop() -> None:
+    """Separated factual reuse should not look like contiguous degeneration."""
+    text = (
+        "The market opened in 2024 with 42 stalls. By noon, 42 vendors had served "
+        "visitors, and the 2024 programme still listed 42 independent makers."
+    )
+
+    assert check_models._text_sanity_numeric_loop_issue(text) is None
 
 
 def test_repetitive_phrase_detection_uses_quality_thresholds() -> None:
