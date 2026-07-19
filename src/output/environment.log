@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-07-18 22:48:42 BST
+FULL ENVIRONMENT DUMP - 2026-07-19 01:08:10 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -81,8 +81,8 @@ mdit-py-plugins==0.6.1
 mdurl==0.1.2
 miniaudio==1.71
 ml_dtypes==0.5.4
-mlx==0.32.1.dev20260718+b7c3dd6d
-mlx==0.32.1.dev20260718+b7c3dd6d
+mlx==0.32.1.dev20260719+b7c3dd6d
+mlx==0.32.1.dev20260719+b7c3dd6d
 mlx-audio==0.4.4
 mlx-lm==0.31.3
 mlx-vlm==0.6.5
@@ -203,5 +203,5 @@ yarl==1.24.2
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-07-18 22:48:42 BST
+Environment dump completed at 2026-07-19 01:08:10 BST
 ================================================================================

@@ -1,10 +1,10 @@
 {
-  "current_models": 61,
+  "current_models": 60,
   "eval_mode": "triage",
-  "generated_at": "2026-07-18 22:56:47 BST",
+  "generated_at": "2026-07-19 01:16:18 BST",
   "grounding": "not grounded; caption hygiene only",
   "has_descriptive_metadata": false,
-  "history_runs_considered": 2,
+  "history_runs_considered": 3,
   "metadata_exposed_to_prompt": false,
   "models": [
     {
@@ -14,7 +14,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 115.0,
+      "generation_tps_avg": 114.9,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -23,9 +23,9 @@
       "peak_memory_gb_avg": 4.0,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 100.0,
@@ -43,9 +43,9 @@
       "peak_memory_gb_avg": 19.3,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 100.0,
@@ -54,7 +54,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 7.6,
+      "generation_tps_avg": 7.7,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -63,9 +63,9 @@
       "peak_memory_gb_avg": 63.5,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 100.0,
@@ -74,7 +74,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 68.1,
+      "generation_tps_avg": 68.4,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -83,9 +83,9 @@
       "peak_memory_gb_avg": 71.3,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 100.0,
@@ -103,15 +103,15 @@
       "peak_memory_gb_avg": 29.7,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 100.0,
       "caption_score_avg": 96.0,
       "cataloging_score_avg": null,
-      "current_status": "passed",
+      "current_status": "not-tested",
       "description_score_avg": null,
       "failures": 0,
       "generation_tps_avg": 54.7,
@@ -134,7 +134,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 21.5,
+      "generation_tps_avg": 21.4,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -143,9 +143,9 @@
       "peak_memory_gb_avg": 15.0,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 100.0,
@@ -154,7 +154,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 86.0,
+      "generation_tps_avg": 87.5,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -163,9 +163,9 @@
       "peak_memory_gb_avg": 7.7,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 100.0,
@@ -174,7 +174,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 127.7,
+      "generation_tps_avg": 127.2,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -183,9 +183,9 @@
       "peak_memory_gb_avg": 16.3,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 100.0,
@@ -194,7 +194,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 259.1,
+      "generation_tps_avg": 254.0,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -203,9 +203,9 @@
       "peak_memory_gb_avg": 3.0,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 100.0,
@@ -214,7 +214,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 32.3,
+      "generation_tps_avg": 32.4,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -223,9 +223,9 @@
       "peak_memory_gb_avg": 18.8,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 100.0,
@@ -234,7 +234,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 60.6,
+      "generation_tps_avg": 60.5,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -243,9 +243,9 @@
       "peak_memory_gb_avg": 9.2,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 100.0,
@@ -254,7 +254,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 59.7,
+      "generation_tps_avg": 59.4,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -263,9 +263,9 @@
       "peak_memory_gb_avg": 9.2,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 100.0,
@@ -274,7 +274,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 64.7,
+      "generation_tps_avg": 65.2,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -283,9 +283,9 @@
       "peak_memory_gb_avg": 10.2,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 100.0,
@@ -294,7 +294,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 33.8,
+      "generation_tps_avg": 34.0,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -303,9 +303,9 @@
       "peak_memory_gb_avg": 18.4,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 99.8,
@@ -314,7 +314,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 113.1,
+      "generation_tps_avg": 112.8,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -323,9 +323,9 @@
       "peak_memory_gb_avg": 21.5,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 99.5,
@@ -334,7 +334,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 191.8,
+      "generation_tps_avg": 188.8,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -343,9 +343,9 @@
       "peak_memory_gb_avg": 4.1,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 99.5,
@@ -354,7 +354,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 124.2,
+      "generation_tps_avg": 125.0,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -363,9 +363,9 @@
       "peak_memory_gb_avg": 5.5,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 99.5,
@@ -383,9 +383,9 @@
       "peak_memory_gb_avg": 9.7,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 99.2,
@@ -394,7 +394,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 322.3,
+      "generation_tps_avg": 321.9,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -403,18 +403,18 @@
       "peak_memory_gb_avg": 2.5,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
-      "capability_score": 98.9,
-      "caption_score_avg": 86.7,
+      "capability_score": 98.8,
+      "caption_score_avg": 86.6,
       "cataloging_score_avg": null,
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 30.2,
+      "generation_tps_avg": 30.3,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -423,18 +423,18 @@
       "peak_memory_gb_avg": 27.1,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 98.7,
-      "caption_score_avg": 86.5,
+      "caption_score_avg": 86.4,
       "cataloging_score_avg": null,
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 51.9,
+      "generation_tps_avg": 51.6,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -443,9 +443,9 @@
       "peak_memory_gb_avg": 19.8,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 98.2,
@@ -454,7 +454,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 99.0,
+      "generation_tps_avg": 97.8,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -463,9 +463,9 @@
       "peak_memory_gb_avg": 30.1,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 98.2,
@@ -474,7 +474,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 65.3,
+      "generation_tps_avg": 66.4,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -483,9 +483,9 @@
       "peak_memory_gb_avg": 9.8,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 98.0,
@@ -494,7 +494,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 63.8,
+      "generation_tps_avg": 64.3,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -503,9 +503,9 @@
       "peak_memory_gb_avg": 10.2,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 98.0,
@@ -523,9 +523,9 @@
       "peak_memory_gb_avg": 19.0,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 94.5,
@@ -534,7 +534,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 359.8,
+      "generation_tps_avg": 358.4,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -543,9 +543,9 @@
       "peak_memory_gb_avg": 1.9,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 94.5,
@@ -563,9 +563,9 @@
       "peak_memory_gb_avg": 25.0,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 93.2,
@@ -574,7 +574,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 194.0,
+      "generation_tps_avg": 196.2,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -583,9 +583,9 @@
       "peak_memory_gb_avg": 4.5,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 93.0,
@@ -594,7 +594,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 133.7,
+      "generation_tps_avg": 133.9,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -603,9 +603,9 @@
       "peak_memory_gb_avg": 5.3,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 93.0,
@@ -614,7 +614,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 42.6,
+      "generation_tps_avg": 44.8,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -623,9 +623,9 @@
       "peak_memory_gb_avg": 63.0,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 93.0,
@@ -634,7 +634,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 29.8,
+      "generation_tps_avg": 30.0,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -643,9 +643,9 @@
       "peak_memory_gb_avg": 19.7,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 93.0,
@@ -654,7 +654,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 131.7,
+      "generation_tps_avg": 132.6,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -663,9 +663,9 @@
       "peak_memory_gb_avg": 5.1,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 92.9,
@@ -674,7 +674,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 17.4,
+      "generation_tps_avg": 17.5,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -683,49 +683,9 @@
       "peak_memory_gb_avg": 31.6,
       "recommendation": "caption",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
-    },
-    {
-      "capability_score": 91.3,
-      "caption_score_avg": 93.6,
-      "cataloging_score_avg": null,
-      "current_status": "passed",
-      "description_score_avg": null,
-      "failures": 0,
-      "generation_tps_avg": 29.0,
-      "hygiene_score_avg": 80.0,
-      "keyword_score_avg": null,
-      "latest_signal": "formatting",
-      "metadata_alignment_avg": null,
-      "model": "mlx-community/diffusiongemma-26B-A4B-it-mxfp8",
-      "peak_memory_gb_avg": 28.1,
-      "recommendation": "caption",
-      "recommended_rate": 100.0,
-      "runs": 3,
-      "success_rate": 100.0,
-      "successes": 3
-    },
-    {
-      "capability_score": 91.2,
-      "caption_score_avg": 93.4,
-      "cataloging_score_avg": null,
-      "current_status": "passed",
-      "description_score_avg": null,
-      "failures": 0,
-      "generation_tps_avg": 33.4,
-      "hygiene_score_avg": 80.0,
-      "keyword_score_avg": null,
-      "latest_signal": "formatting",
-      "metadata_alignment_avg": null,
-      "model": "mlx-community/Idefics3-8B-Llama3-bf16",
-      "peak_memory_gb_avg": 18.7,
-      "recommendation": "caption",
-      "recommended_rate": 100.0,
-      "runs": 3,
-      "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 90.8,
@@ -734,7 +694,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 303.6,
+      "generation_tps_avg": 302.2,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -743,9 +703,9 @@
       "peak_memory_gb_avg": 3.0,
       "recommendation": "needs-review",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 90.8,
@@ -754,7 +714,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 521.8,
+      "generation_tps_avg": 525.7,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -763,9 +723,9 @@
       "peak_memory_gb_avg": 1.0,
       "recommendation": "needs-review",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 89.5,
@@ -774,7 +734,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 31.6,
+      "generation_tps_avg": 31.5,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -783,29 +743,69 @@
       "peak_memory_gb_avg": 18.1,
       "recommendation": "needs-review",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
-      "capability_score": 89.4,
-      "caption_score_avg": 89.4,
+      "capability_score": 84.3,
+      "caption_score_avg": 93.8,
       "cataloging_score_avg": null,
-      "current_status": "passed",
+      "current_status": "ineligible",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 42.9,
-      "hygiene_score_avg": 80.0,
+      "generation_tps_avg": 27.8,
+      "hygiene_score_avg": 73.8,
       "keyword_score_avg": null,
-      "latest_signal": "formatting",
+      "latest_signal": "current review says caveat; formatting",
+      "metadata_alignment_avg": null,
+      "model": "mlx-community/diffusiongemma-26B-A4B-it-mxfp8",
+      "peak_memory_gb_avg": 28.1,
+      "recommendation": "current-run-ineligible",
+      "recommended_rate": 75.0,
+      "runs": 4,
+      "success_rate": 100.0,
+      "successes": 4
+    },
+    {
+      "capability_score": 84.1,
+      "caption_score_avg": 93.4,
+      "cataloging_score_avg": null,
+      "current_status": "ineligible",
+      "description_score_avg": null,
+      "failures": 0,
+      "generation_tps_avg": 33.4,
+      "hygiene_score_avg": 73.8,
+      "keyword_score_avg": null,
+      "latest_signal": "current review says caveat; formatting",
+      "metadata_alignment_avg": null,
+      "model": "mlx-community/Idefics3-8B-Llama3-bf16",
+      "peak_memory_gb_avg": 18.7,
+      "recommendation": "current-run-ineligible",
+      "recommended_rate": 75.0,
+      "runs": 4,
+      "success_rate": 100.0,
+      "successes": 4
+    },
+    {
+      "capability_score": 83.0,
+      "caption_score_avg": 91.0,
+      "cataloging_score_avg": null,
+      "current_status": "ineligible",
+      "description_score_avg": null,
+      "failures": 0,
+      "generation_tps_avg": 40.2,
+      "hygiene_score_avg": 73.8,
+      "keyword_score_avg": null,
+      "latest_signal": "current review says caveat; formatting",
       "metadata_alignment_avg": null,
       "model": "mlx-community/diffusiongemma-26B-A4B-it-8bit",
       "peak_memory_gb_avg": 28.9,
-      "recommendation": "caption",
-      "recommended_rate": 100.0,
-      "runs": 3,
+      "recommendation": "current-run-ineligible",
+      "recommended_rate": 75.0,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 79.4,
@@ -823,9 +823,9 @@
       "peak_memory_gb_avg": 10.4,
       "recommendation": "needs-review",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 79.4,
@@ -843,9 +843,9 @@
       "peak_memory_gb_avg": 25.8,
       "recommendation": "needs-review",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 79.4,
@@ -854,7 +854,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 34.3,
+      "generation_tps_avg": 34.2,
       "hygiene_score_avg": 85.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -863,9 +863,9 @@
       "peak_memory_gb_avg": 11.1,
       "recommendation": "needs-review",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 79.4,
@@ -874,7 +874,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 48.2,
+      "generation_tps_avg": 48.3,
       "hygiene_score_avg": 85.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -883,9 +883,9 @@
       "peak_memory_gb_avg": 17.2,
       "recommendation": "needs-review",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 79.4,
@@ -894,7 +894,7 @@
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 5.8,
+      "generation_tps_avg": 5.9,
       "hygiene_score_avg": 85.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -903,38 +903,18 @@
       "peak_memory_gb_avg": 23.2,
       "recommendation": "needs-review",
       "recommended_rate": 100.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
-      "capability_score": 79.4,
-      "caption_score_avg": 62.0,
-      "cataloging_score_avg": null,
-      "current_status": "passed",
-      "description_score_avg": null,
-      "failures": 0,
-      "generation_tps_avg": 76.3,
-      "hygiene_score_avg": 85.0,
-      "keyword_score_avg": null,
-      "latest_signal": "thinking-trace",
-      "metadata_alignment_avg": null,
-      "model": "jqlive/Kimi-VL-A3B-Thinking-2506-6bit",
-      "peak_memory_gb_avg": 15.6,
-      "recommendation": "needs-review",
-      "recommended_rate": 100.0,
-      "runs": 3,
-      "success_rate": 100.0,
-      "successes": 3
-    },
-    {
-      "capability_score": 66.7,
+      "capability_score": 75.0,
       "caption_score_avg": 89.9,
       "cataloging_score_avg": null,
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 1,
-      "generation_tps_avg": 310.0,
+      "generation_tps_avg": 316.5,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -942,19 +922,19 @@
       "model": "mlx-community/FastVLM-0.5B-bf16",
       "peak_memory_gb_avg": 2.1,
       "recommendation": "caption",
-      "recommended_rate": 66.7,
-      "runs": 3,
-      "success_rate": 66.7,
-      "successes": 2
+      "recommended_rate": 75.0,
+      "runs": 4,
+      "success_rate": 75.0,
+      "successes": 3
     },
     {
-      "capability_score": 66.7,
+      "capability_score": 75.0,
       "caption_score_avg": 89.3,
       "cataloging_score_avg": null,
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 1,
-      "generation_tps_avg": 18.7,
+      "generation_tps_avg": 18.9,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -962,19 +942,19 @@
       "model": "mlx-community/Qwen3.6-27B-mxfp8",
       "peak_memory_gb_avg": 29.7,
       "recommendation": "caption",
-      "recommended_rate": 66.7,
-      "runs": 3,
-      "success_rate": 66.7,
-      "successes": 2
+      "recommended_rate": 75.0,
+      "runs": 4,
+      "success_rate": 75.0,
+      "successes": 3
     },
     {
-      "capability_score": 66.3,
+      "capability_score": 74.6,
       "caption_score_avg": 88.1,
       "cataloging_score_avg": null,
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 1,
-      "generation_tps_avg": 123.0,
+      "generation_tps_avg": 123.5,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -982,19 +962,19 @@
       "model": "mlx-community/SmolVLM-Instruct-bf16",
       "peak_memory_gb_avg": 5.5,
       "recommendation": "caption",
-      "recommended_rate": 66.7,
-      "runs": 3,
-      "success_rate": 66.7,
-      "successes": 2
+      "recommended_rate": 75.0,
+      "runs": 4,
+      "success_rate": 75.0,
+      "successes": 3
     },
     {
-      "capability_score": 66.3,
+      "capability_score": 74.6,
       "caption_score_avg": 88.0,
       "cataloging_score_avg": null,
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 1,
-      "generation_tps_avg": 53.2,
+      "generation_tps_avg": 56.7,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -1002,19 +982,39 @@
       "model": "mlx-community/GLM-4.6V-Flash-6bit",
       "peak_memory_gb_avg": 10.3,
       "recommendation": "caption",
-      "recommended_rate": 66.7,
-      "runs": 3,
-      "success_rate": 66.7,
-      "successes": 2
+      "recommended_rate": 75.0,
+      "runs": 4,
+      "success_rate": 75.0,
+      "successes": 3
     },
     {
-      "capability_score": 63.4,
+      "capability_score": 72.3,
+      "caption_score_avg": 62.0,
+      "cataloging_score_avg": null,
+      "current_status": "ineligible",
+      "description_score_avg": null,
+      "failures": 0,
+      "generation_tps_avg": 77.2,
+      "hygiene_score_avg": 78.8,
+      "keyword_score_avg": null,
+      "latest_signal": "current review says caveat; thinking-trace",
+      "metadata_alignment_avg": null,
+      "model": "jqlive/Kimi-VL-A3B-Thinking-2506-6bit",
+      "peak_memory_gb_avg": 15.6,
+      "recommendation": "current-run-ineligible",
+      "recommended_rate": 75.0,
+      "runs": 4,
+      "success_rate": 100.0,
+      "successes": 4
+    },
+    {
+      "capability_score": 71.3,
       "caption_score_avg": 78.5,
       "cataloging_score_avg": null,
       "current_status": "passed",
       "description_score_avg": null,
       "failures": 1,
-      "generation_tps_avg": 98.2,
+      "generation_tps_avg": 99.0,
       "hygiene_score_avg": 100.0,
       "keyword_score_avg": null,
       "latest_signal": "clean",
@@ -1022,30 +1022,30 @@
       "model": "mlx-community/Qwen3.5-9B-MLX-4bit",
       "peak_memory_gb_avg": 7.0,
       "recommendation": "caption",
-      "recommended_rate": 66.7,
-      "runs": 3,
-      "success_rate": 66.7,
-      "successes": 2
+      "recommended_rate": 75.0,
+      "runs": 4,
+      "success_rate": 75.0,
+      "successes": 3
     },
     {
-      "capability_score": 52.9,
+      "capability_score": 52.4,
       "caption_score_avg": 62.0,
       "cataloging_score_avg": null,
-      "current_status": "passed",
+      "current_status": "ineligible",
       "description_score_avg": null,
       "failures": 1,
-      "generation_tps_avg": 125.4,
-      "hygiene_score_avg": 85.0,
+      "generation_tps_avg": 127.1,
+      "hygiene_score_avg": 76.7,
       "keyword_score_avg": null,
-      "latest_signal": "hit token cap (200)",
+      "latest_signal": "current review says caveat; hit token cap (200)",
       "metadata_alignment_avg": null,
       "model": "mlx-community/SmolVLM2-2.2B-Instruct-mlx",
       "peak_memory_gb_avg": 5.5,
-      "recommendation": "needs-review",
-      "recommended_rate": 66.7,
-      "runs": 3,
-      "success_rate": 66.7,
-      "successes": 2
+      "recommendation": "current-run-ineligible",
+      "recommended_rate": 50.0,
+      "runs": 4,
+      "success_rate": 75.0,
+      "successes": 3
     },
     {
       "capability_score": 11.4,
@@ -1054,7 +1054,7 @@
       "current_status": "ineligible",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 80.2,
+      "generation_tps_avg": 78.9,
       "hygiene_score_avg": 15.0,
       "keyword_score_avg": null,
       "latest_signal": "integration warning requires review; harness:long-context; context-budget",
@@ -1063,9 +1063,9 @@
       "peak_memory_gb_avg": 4.6,
       "recommendation": "current-run-ineligible",
       "recommended_rate": 0.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 0.0,
@@ -1074,7 +1074,7 @@
       "current_status": "ineligible",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 20.1,
+      "generation_tps_avg": 19.5,
       "hygiene_score_avg": 0.0,
       "keyword_score_avg": null,
       "latest_signal": "current review says avoid; cutoff",
@@ -1083,9 +1083,9 @@
       "peak_memory_gb_avg": 26.6,
       "recommendation": "current-run-ineligible",
       "recommended_rate": 0.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 0.0,
@@ -1094,7 +1094,7 @@
       "current_status": "ineligible",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 40.1,
+      "generation_tps_avg": 40.0,
       "hygiene_score_avg": 0.0,
       "keyword_score_avg": null,
       "latest_signal": "current review says avoid; cutoff",
@@ -1103,9 +1103,9 @@
       "peak_memory_gb_avg": 14.6,
       "recommendation": "current-run-ineligible",
       "recommended_rate": 0.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 0.0,
@@ -1114,7 +1114,7 @@
       "current_status": "ineligible",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 133.5,
+      "generation_tps_avg": 134.1,
       "hygiene_score_avg": 0.0,
       "keyword_score_avg": null,
       "latest_signal": "integration warning requires review; harness:stop-token",
@@ -1123,9 +1123,9 @@
       "peak_memory_gb_avg": 5.3,
       "recommendation": "current-run-ineligible",
       "recommended_rate": 0.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 0.0,
@@ -1134,7 +1134,7 @@
       "current_status": "ineligible",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 69.4,
+      "generation_tps_avg": 69.1,
       "hygiene_score_avg": 0.0,
       "keyword_score_avg": null,
       "latest_signal": "current review says avoid; cutoff; thinking-incomplete",
@@ -1143,9 +1143,9 @@
       "peak_memory_gb_avg": 19.9,
       "recommendation": "current-run-ineligible",
       "recommended_rate": 0.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 0.0,
@@ -1154,7 +1154,7 @@
       "current_status": "ineligible",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 4.5,
+      "generation_tps_avg": 4.6,
       "hygiene_score_avg": 0.0,
       "keyword_score_avg": null,
       "latest_signal": "current review says avoid; cutoff; thinking-trace",
@@ -1163,9 +1163,9 @@
       "peak_memory_gb_avg": 39.2,
       "recommendation": "current-run-ineligible",
       "recommended_rate": 0.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 0.0,
@@ -1174,7 +1174,7 @@
       "current_status": "ineligible",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 60.3,
+      "generation_tps_avg": 61.1,
       "hygiene_score_avg": 0.0,
       "keyword_score_avg": null,
       "latest_signal": "current review says avoid; cutoff; degeneration",
@@ -1183,9 +1183,9 @@
       "peak_memory_gb_avg": 59.7,
       "recommendation": "current-run-ineligible",
       "recommended_rate": 0.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 0.0,
@@ -1194,7 +1194,7 @@
       "current_status": "ineligible",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 41.0,
+      "generation_tps_avg": 41.8,
       "hygiene_score_avg": 0.0,
       "keyword_score_avg": null,
       "latest_signal": "current review says avoid; cutoff; reasoning-leak",
@@ -1203,9 +1203,9 @@
       "peak_memory_gb_avg": 13.8,
       "recommendation": "current-run-ineligible",
       "recommended_rate": 0.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     },
     {
       "capability_score": 0.0,
@@ -1214,7 +1214,7 @@
       "current_status": "ineligible",
       "description_score_avg": null,
       "failures": 0,
-      "generation_tps_avg": 120.0,
+      "generation_tps_avg": 119.8,
       "hygiene_score_avg": 0.0,
       "keyword_score_avg": null,
       "latest_signal": "current review says avoid; repetitive; cutoff",
@@ -1223,9 +1223,9 @@
       "peak_memory_gb_avg": 6.0,
       "recommendation": "current-run-ineligible",
       "recommended_rate": 0.0,
-      "runs": 3,
+      "runs": 4,
       "success_rate": 100.0,
-      "successes": 3
+      "successes": 4
     }
   ],
   "schema_version": "1.0"

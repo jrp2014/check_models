@@ -18,7 +18,7 @@
 
 | Model                                     | Observed Behavior                                  | Token Counts                                         | Optional Context                                                                                                                                                                     |
 |-------------------------------------------|----------------------------------------------------|------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Qwen3-VL-2B-Thinking-bf16` | decoded text contains control token &lt;/think&gt; | prompt=317 \| output/prompt=59.31% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260718T215647Z_002_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json) |
+| `mlx-community/Qwen3-VL-2B-Thinking-bf16` | decoded text contains control token &lt;/think&gt; | prompt=317 \| output/prompt=59.31% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260719T001617Z_001_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json) |
 <!-- markdownlint-enable MD060 -->
 
 
@@ -91,7 +91,7 @@ Generation/load config:
 
 Optional advanced context:
 
-- `mlx-community/Qwen3-VL-2B-Thinking-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260718T215647Z_002_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json)
+- `mlx-community/Qwen3-VL-2B-Thinking-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260719T001617Z_001_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -114,7 +114,7 @@ Optional advanced context:
 | Component                  | Version                                                                                                                                         |
 |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | mlx-vlm                    | 0.6.5                                                                                                                                           |
-| mlx                        | 0.32.1.dev20260718+b7c3dd6d                                                                                                                     |
+| mlx                        | 0.32.1.dev20260719+b7c3dd6d                                                                                                                     |
 | mlx-lm                     | 0.31.3                                                                                                                                          |
 | mlx-audio                  | 0.4.4                                                                                                                                           |
 | transformers               | 5.14.1                                                                                                                                          |
@@ -144,7 +144,7 @@ Optional advanced context:
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                              |
 | MLX Core Extension         | ~/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
 | MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (162,449,848 bytes, sha256=1078bd042297dbbf704a414617a7988c55b0001ea69d7cb478bcafa2fdfdeecb) |
-| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,697,568 bytes, sha256=bef52521877d51c72e90bb0a5dc2823d77e222799855fc5f7bbb21ac8bcd129f)  |
+| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,697,568 bytes, sha256=107989d6cb7f822e366d22e8259ea8eb2e68c15271ab6dc981da277ecf282cb0)  |
 | RAM                        | 128.0 GB                                                                                                                                        |
 
 

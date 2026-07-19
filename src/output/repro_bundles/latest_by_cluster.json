@@ -1,33 +1,20 @@
 {
   "clusters": {
-    "mlx-vlm-mlx_long-context_001": {
-      "bundles": [
-        "20260718T215647Z_001_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json"
-      ],
-      "models": [
-        "mlx-community/paligemma2-3b-pt-896-4bit"
-      ]
-    },
     "mlx-vlm_stop-token_001": {
       "bundles": [
-        "20260718T215647Z_002_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json"
+        "20260719T001617Z_001_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json"
       ],
       "models": [
         "mlx-community/Qwen3-VL-2B-Thinking-bf16"
       ]
     }
   },
-  "generated_at_utc": "2026-07-18T21:56:47+00:00",
+  "generated_at_utc": "2026-07-19T00:16:17+00:00",
   "models": {
     "mlx-community/Qwen3-VL-2B-Thinking-bf16": {
-      "bundle": "20260718T215647Z_002_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json",
+      "bundle": "20260719T001617Z_001_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_stop_token_001.json",
       "issue_cluster_id": "mlx-vlm_stop-token_001",
       "issue_kind": "harness"
-    },
-    "mlx-community/paligemma2-3b-pt-896-4bit": {
-      "bundle": "20260718T215647Z_001_mlx-community_paligemma2-3b-pt-896-4bit_mlx_vlm_mlx_long_context_001.json",
-      "issue_cluster_id": "mlx-vlm-mlx_long-context_001",
-      "issue_kind": "context_budget"
     }
   },
   "schema_version": "1.0"

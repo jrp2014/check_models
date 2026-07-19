@@ -15,21 +15,111 @@
     "review": "reports/review.md",
     "run_json": "run.json"
   },
+  "component_provenance": {
+    "Pillow": {
+      "direct_url": null,
+      "install_type": "wheel",
+      "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
+      "source_revision": null,
+      "vcs_revision": null,
+      "version": "12.3.0"
+    },
+    "check_models": {
+      "direct_url": null,
+      "install_type": "source-tree",
+      "source_location": "~/Documents/AI/mlx/check_models",
+      "source_revision": "fc050882d88c234021ce4aa3c111a2901c513ff6",
+      "vcs_revision": null,
+      "version": "0.8.8"
+    },
+    "huggingface-hub": {
+      "direct_url": null,
+      "install_type": "wheel",
+      "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
+      "source_revision": null,
+      "vcs_revision": null,
+      "version": "1.24.0"
+    },
+    "mlx": {
+      "direct_url": "file://~/Documents/AI/mlx/mlx",
+      "install_type": "editable",
+      "source_location": "~/Documents/AI/mlx/mlx",
+      "source_revision": "b7c3dd6d27f45b5365b08a840310187dc503f1db",
+      "vcs_revision": null,
+      "version": "0.32.1.dev20260719+b7c3dd6d"
+    },
+    "mlx-audio": {
+      "direct_url": null,
+      "install_type": "wheel",
+      "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
+      "source_revision": null,
+      "vcs_revision": null,
+      "version": "0.4.4"
+    },
+    "mlx-lm": {
+      "direct_url": "file://~/Documents/AI/mlx/mlx-lm",
+      "install_type": "editable",
+      "source_location": "~/Documents/AI/mlx/mlx-lm",
+      "source_revision": "15b522f593b7ca5fbc0cac6f7572d40859d2d8fe",
+      "vcs_revision": null,
+      "version": "0.31.3"
+    },
+    "mlx-metal": {
+      "direct_url": null,
+      "install_type": "unknown",
+      "source_location": null,
+      "source_revision": null,
+      "vcs_revision": null,
+      "version": null
+    },
+    "mlx-vlm": {
+      "direct_url": "file://~/Documents/AI/mlx/mlx-vlm",
+      "install_type": "editable",
+      "source_location": "~/Documents/AI/mlx/mlx-vlm",
+      "source_revision": "6d5603b36902e0742a8273f0b0e6fa4a60d2a201",
+      "vcs_revision": null,
+      "version": "0.6.5"
+    },
+    "numpy": {
+      "direct_url": null,
+      "install_type": "wheel",
+      "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
+      "source_revision": null,
+      "vcs_revision": null,
+      "version": "2.5.1"
+    },
+    "tokenizers": {
+      "direct_url": null,
+      "install_type": "wheel",
+      "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
+      "source_revision": null,
+      "vcs_revision": null,
+      "version": "0.22.2"
+    },
+    "transformers": {
+      "direct_url": null,
+      "install_type": "wheel",
+      "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
+      "source_revision": null,
+      "vcs_revision": null,
+      "version": "5.14.1"
+    }
+  },
   "counts": {
-    "models_attempted": 61,
-    "models_evaluated": 61,
+    "models_attempted": 60,
+    "models_evaluated": 60,
     "models_failed": 0,
     "models_indeterminate": 0,
-    "models_successful": 61,
-    "models_total": 61
+    "models_successful": 60,
+    "models_total": 60
   },
   "eval_mode": "triage",
-  "generated_at": "2026-07-18 22:56:47 BST",
+  "generated_at": "2026-07-19 01:16:18 BST",
   "has_descriptive_metadata": false,
   "library_versions": {
     "Pillow": "12.3.0",
     "huggingface-hub": "1.24.0",
-    "mlx": "0.32.1.dev20260718+b7c3dd6d",
+    "mlx": "0.32.1.dev20260719+b7c3dd6d",
     "mlx-audio": "0.4.4",
     "mlx-lm": "0.31.3",
     "mlx-metal": null,
@@ -40,15 +130,15 @@
   },
   "metadata_exposed_to_prompt": false,
   "producer": {
-    "git_revision": "56c7ef4ab9c9883a7d311e8d8c131d1587137ce5",
+    "git_revision": "fc050882d88c234021ce4aa3c111a2901c513ff6",
     "install_type": "installed",
     "name": "check_models",
     "version": "0.8.8"
   },
   "prompt": "Describe this image briefly.",
   "prompt_sha256": "d760336d0fd143932f194573dd63f6b531e0ffbc2c4f1595e015392a3471c318",
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "selection_basis": "caption hygiene only",
   "semantic_rankings_grounded": false,
-  "total_runtime_seconds": 483.598
+  "total_runtime_seconds": 486.641
 }
