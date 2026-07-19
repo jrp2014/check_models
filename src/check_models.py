@@ -1265,6 +1265,45 @@ class JsonlQualityAnalysisRecord(TypedDict):
 
 type ExecutionOutcome = Literal["completed", "failed", "indeterminate"]
 type RecommendationStatus = Literal["recommended", "caveat", "avoid", "not-evaluated"]
+type FailureOrigin = Literal[
+    "harness_preflight",
+    "upstream_load",
+    "upstream_generation",
+    "external_service",
+    "unknown",
+]
+type MaintainerReadiness = Literal[
+    "issue_ready",
+    "needs_reproduction",
+    "harness_observation",
+    "not_applicable",
+]
+type ControlledReproductionStatus = Literal[
+    "not_run",
+    "confirmed",
+    "not_reproduced",
+    "indeterminate",
+]
+type KeywordOverlapState = Literal["not_assessable", "no_overlap", "some_overlap"]
+type HistoricalReliability = Literal[
+    "stable",
+    "variable",
+    "insufficient_evidence",
+    "consistently_unsuitable",
+]
+type OutputAnomaly = Literal[
+    "special_token_wrapper",
+    "special_token_leak",
+    "thinking_trace",
+    "reasoning_budget_exhausted",
+    "text_repetition",
+    "numeric_repetition",
+    "mixed_script_corruption",
+    "encoding_corruption",
+    "missing_required_sections",
+    "token_cap_truncation",
+    "irrelevant_output_smell",
+]
 
 
 class JsonlMetadataAgreementRecord(TypedDict):
@@ -12167,6 +12206,27 @@ def _execution_outcome(result: PerformanceResult) -> ExecutionOutcome:
     return "completed" if result.success else "failed"
 
 
+def _maintainer_readiness(
+    *,
+    failure_origin: FailureOrigin,
+    reproduction_status: ControlledReproductionStatus,
+    has_output_anomaly: bool,
+) -> MaintainerReadiness:
+    """Classify issue readiness from origin and controlled-reproduction evidence."""
+    if failure_origin == "harness_preflight":
+        return "harness_observation"
+    if failure_origin == "external_service" or reproduction_status == "not_reproduced":
+        return "not_applicable"
+    if (
+        failure_origin in {"upstream_load", "upstream_generation"}
+        or reproduction_status == "confirmed"
+    ):
+        return "issue_ready"
+    if failure_origin == "unknown" or reproduction_status == "indeterminate":
+        return "needs_reproduction"
+    return "needs_reproduction" if has_output_anomaly else "not_applicable"
+
+
 def _recommendation_status_for_result(result: PerformanceResult) -> RecommendationStatus:
     """Return the canonical user recommendation independently of execution outcome."""
     review = _review_for_result(result)
@@ -13877,6 +13937,56 @@ type CompatibilityStatus = Literal[
     "integration-warning",
     "clean",
 ]
+
+
+@dataclass(frozen=True)
+class ObservedEvidence:
+    """Immutable runtime, output, and proxy facts without policy decisions."""
+
+    upstream_boundary: Literal["not_started", "load_started", "generation_started"]
+    failure_phase: str | None
+    exception_origin: str | None
+    exception_chain: tuple[FailureException, ...]
+    raw_output: str
+    stop_reason: str | None
+    requested_tokens: int | None
+    generated_tokens: int | None
+    anomalies: tuple[OutputAnomaly, ...]
+    reproduction_status: ControlledReproductionStatus
+    keyword_overlap: KeywordOverlapState
+
+
+@dataclass(frozen=True)
+class ModelUserAssessment:
+    """Current-run usefulness decision for local model users."""
+
+    execution_outcome: ExecutionOutcome
+    compatibility_status: CompatibilityStatus
+    current_recommendation: RecommendationStatus
+    output_anomalies: tuple[OutputAnomaly, ...]
+    keyword_overlap: KeywordOverlapState
+    evidence_codes: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class MaintainerAssessment:
+    """Ownership and publication decision for library/model maintainers."""
+
+    failure_origin: FailureOrigin
+    maintainer_readiness: MaintainerReadiness
+    suspected_owner: str | None
+    owner_confidence: MaintainerConfidence | None
+    reproduction_status: ControlledReproductionStatus
+    evidence_codes: tuple[str, ...]
+    next_action: str
+
+
+@dataclass(frozen=True)
+class CanonicalAssessment:
+    """The two purpose-specific decisions derived from one evidence record."""
+
+    model_user: ModelUserAssessment
+    maintainer: MaintainerAssessment
 
 
 @dataclass(frozen=True)

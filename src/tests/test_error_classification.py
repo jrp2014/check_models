@@ -3,11 +3,15 @@
 import pytest
 
 from check_models import (
+    ControlledReproductionStatus,
+    FailureOrigin,
+    MaintainerReadiness,
     _attribute_error_to_package,
     _build_canonical_error_code,
     _build_error_signature,
     _build_failure_action_hint,
     _classify_error,
+    _maintainer_readiness,
 )
 
 
@@ -159,3 +163,34 @@ def test_build_failure_action_hint_is_maintainer_actionable(
     hint_lower = hint.lower()
     for phrase in expected_phrases:
         assert phrase.lower() in hint_lower
+
+
+@pytest.mark.parametrize(
+    ("origin", "reproduction", "has_output_anomaly", "expected"),
+    [
+        ("harness_preflight", "not_run", False, "harness_observation"),
+        ("external_service", "not_run", False, "not_applicable"),
+        ("unknown", "not_run", False, "needs_reproduction"),
+        ("upstream_load", "not_run", False, "issue_ready"),
+        ("upstream_generation", "not_run", False, "issue_ready"),
+        ("unknown", "confirmed", True, "issue_ready"),
+        ("unknown", "not_reproduced", True, "not_applicable"),
+        ("unknown", "indeterminate", True, "needs_reproduction"),
+        ("unknown", "not_run", True, "needs_reproduction"),
+    ],
+)
+def test_maintainer_readiness_uses_origin_and_reproduction_evidence(
+    origin: FailureOrigin,
+    reproduction: ControlledReproductionStatus,
+    has_output_anomaly: bool,
+    expected: MaintainerReadiness,
+) -> None:
+    """Maintainer readiness must not collapse model-user and issue-fileability views."""
+    assert (
+        _maintainer_readiness(
+            failure_origin=origin,
+            reproduction_status=reproduction,
+            has_output_anomaly=has_output_anomaly,
+        )
+        == expected
+    )
