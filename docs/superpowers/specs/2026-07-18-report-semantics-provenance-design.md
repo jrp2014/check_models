@@ -322,7 +322,7 @@ normal benchmark run.
   and the table has the specified accessibility semantics.
 - TSV has no alignment padding or wholly empty optional columns and retains
   complete generated evidence.
-- Component and model provenance is locally discoverable, publication-safe,
+- Component and model provenance is locally discoverable, publication-safe,batton
   and shared across machine and maintainer artifacts.
 - No multi-image behaviour changes.
 - `CHANGELOG.md` and `src/README.md` document the contract.
