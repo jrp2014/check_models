@@ -241,7 +241,7 @@ quality_require_command() {
         python_path="$(quality_resolve_python_path)" || return 1
         ty_path="$(quality_find_python_tool ty)" || return 1
         quality_print_ty_diagnostics "$python_path" "$ty_path" "$@"
-        "$ty_path" check --python "$python_path" "$@"
+        "$ty_path" check --no-respect-ignore-files --python "$python_path" "$@"
     }
 
     quality_write_pyrefly_config() {

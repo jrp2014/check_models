@@ -10431,7 +10431,7 @@ def _html_result_row_attrs(
         + _html_attr("data-status", "failed")
         + _html_attr("data-error-stage", result.error_stage or "unknown")
         + _html_attr("data-error-type", result.error_type or "error")
-        + _html_attr("data-error-package", result.error_package or "unknown")
+        + _html_attr("data-error-package", result.error_package or _UNKNOWN_OWNER)
     )
 
 
@@ -14874,7 +14874,7 @@ def _maintainer_owner_counts(snapshot: DiagnosticsSnapshot) -> list[tuple[str, i
 
     for _signature, cluster_results in snapshot.failure_clusters:
         representative = cluster_results[0]
-        owner = _diagnostics_owner_label(representative.error_package or "unknown")
+        owner = _diagnostics_owner_label(representative.error_package or _UNKNOWN_OWNER)
         owner_counts[owner] += len(cluster_results)
 
     for res, _text in snapshot.harness_results:
@@ -14925,7 +14925,7 @@ def _log_maintainer_summary(
 
     for index, (_signature, cluster_results) in enumerate(snapshot.failure_clusters[:3], start=1):
         representative = cluster_results[0]
-        owner_key = representative.error_package or "unknown"
+        owner_key = representative.error_package or _UNKNOWN_OWNER
         owner = _diagnostics_owner_label(owner_key)
         issue = _truncate_text_preview(
             _simplify_failure_message(
@@ -17092,6 +17092,31 @@ def _collect_repro_env() -> dict[str, str]:
     return env
 
 
+def _write_latest_repro_bundle_index(
+    *,
+    output_dir: Path,
+    bundles: Mapping[str, Path],
+    models: Mapping[str, Mapping[str, str | None]],
+    clusters: Mapping[str, Mapping[str, list[str]]],
+) -> None:
+    """Write the current-run repro index when at least one bundle exists."""
+    if not bundles:
+        return
+    index_payload: dict[str, object] = {
+        "schema_version": "1.0",
+        "generated_at_utc": datetime.now(UTC).isoformat(timespec="seconds"),
+        "models": models,
+        "clusters": clusters,
+    }
+    try:
+        _write_text_file(
+            output_dir / "latest_by_cluster.json",
+            json.dumps(index_payload, indent=2, sort_keys=True) + "\n",
+        )
+    except OSError:
+        logger.exception("Failed to write latest repro-bundle index.")
+
+
 def export_failure_repro_bundles(
     *,
     results: list[PerformanceResult],
@@ -17254,20 +17279,12 @@ def export_failure_repro_bundles(
             cluster_entry["models"].append(result.model_name)
             cluster_entry["bundles"].append(bundle_path.name)
 
-    if bundles:
-        index_payload: dict[str, object] = {
-            "schema_version": "1.0",
-            "generated_at_utc": datetime.now(UTC).isoformat(timespec="seconds"),
-            "models": latest_index_models,
-            "clusters": latest_index_clusters,
-        }
-        try:
-            _write_text_file(
-                output_dir / "latest_by_cluster.json",
-                json.dumps(index_payload, indent=2, sort_keys=True) + "\n",
-            )
-        except OSError:
-            logger.exception("Failed to write latest repro-bundle index.")
+    _write_latest_repro_bundle_index(
+        output_dir=output_dir,
+        bundles=bundles,
+        models=latest_index_models,
+        clusters=latest_index_clusters,
+    )
 
     return bundles
 
@@ -18875,7 +18892,7 @@ def _model_selection_chooser_table_rows(
             format_field_value("generation_tps", view.generation_tps) or "-",
             (f"{view.visual_score:.0f}" if view.visual_score is not None else "-"),
             f"`{MARKDOWN_ESCAPER.escape(_model_recommendation_status(view))}`",
-            MARKDOWN_ESCAPER.escape(_model_recommendation_evidence(view)),
+            _markdown_inline_code(_model_recommendation_evidence(view)),
         )
         for view in views
     )
@@ -19183,7 +19200,7 @@ def _build_grounded_metadata_selection_section(
                 f"`{MARKDOWN_ESCAPER.escape(view.result.model_name)}`",
                 f"{agreement_score:.0f}",
                 f"`{MARKDOWN_ESCAPER.escape(verdict)}`",
-                MARKDOWN_ESCAPER.escape(_build_result_output_preview(view.result, max_chars=180)),
+                _markdown_inline_code(_build_result_output_preview(view.result, max_chars=180)),
             )
         )
 
@@ -19410,7 +19427,7 @@ def generate_model_selection_report(
             )
             or "-",
             f"`{MARKDOWN_ESCAPER.escape(_model_recommendation_status(view))}`",
-            MARKDOWN_ESCAPER.escape(_build_result_output_preview(view.result, max_chars=180)),
+            _markdown_inline_code(_build_result_output_preview(view.result, max_chars=180)),
             MARKDOWN_ESCAPER.escape(" | ".join(view.caveats) or "no flagged signals"),
         )
         for view in ranked_views[:10]
@@ -20048,6 +20065,91 @@ def generate_review_report(
     _write_markdown_artifact(filename, md, artifact_name="Review report")
 
 
+def _escape_tsv_value(value: str) -> str:
+    r"""Escape record-breaking characters while preserving literal ``\n``."""
+    return value.replace("\t", "    ").replace("\n", "\\n").replace("\r", "")
+
+
+_TSV_OPTIONAL_FIELDS: Final[tuple[str, ...]] = (
+    "compatibility_status",
+    "context_integration_score",
+    "draft_improvement_score",
+    "visual_description_score",
+    "assisted_enrichment_score",
+    "peak_memory_working_set_pct",
+    "prompt_burden_kind",
+    "prompt_burden_source",
+    "owner_confidence",
+    "prompt_burden_reason",
+    "processed_image_width",
+    "processed_image_height",
+    "image_patch_count",
+    "error_stage",
+    "error_type",
+    "error_package",
+    "error_message",
+)
+
+
+def _build_tsv_row_records(
+    *,
+    rows: Sequence[Sequence[str]],
+    results: Sequence[PerformanceResult],
+    field_names: Sequence[str],
+    report_context: ReportRenderContext,
+) -> list[dict[str, str]]:
+    """Return compact literal TSV records from shared report facts."""
+    recommendations = _recommendations_by_model(report_context)
+    machine_facts = _machine_facts_by_model(report_context)
+    machine_fields = _TSV_OPTIONAL_FIELDS[:9]
+    records: list[dict[str, str]] = []
+    for row, result in zip(rows, results, strict=False):
+        record = {
+            field_name: _escape_tsv_value(cell)
+            for field_name, cell in zip(field_names, row, strict=False)
+        }
+        recommendation = recommendations[result.model_name]
+        burden = recommendation.burden
+        machine_cells = _machine_artifact_tsv_cells(machine_facts[result.model_name])
+        record.update(zip(machine_fields, machine_cells, strict=True))
+        record.update(
+            {
+                "execution_status": _execution_outcome(result),
+                "recommendation_status": _recommendation_status_for_result(result),
+                "prompt_burden_reason": burden.reason or "",
+                "processed_image_width": (
+                    str(burden.processed_width) if burden.processed_width is not None else ""
+                ),
+                "processed_image_height": (
+                    str(burden.processed_height) if burden.processed_height is not None else ""
+                ),
+                "image_patch_count": (
+                    str(burden.patch_count) if burden.patch_count is not None else ""
+                ),
+                "generated_text": _escape_tsv_value(
+                    str(getattr(result.generation, "text", "") or "")
+                    if result.generation is not None
+                    else ""
+                ),
+                "error_stage": _escape_tsv_value(result.error_stage or ""),
+                "error_type": _escape_tsv_value(result.error_type or ""),
+                "error_package": _escape_tsv_value(result.error_package or ""),
+                "error_message": _escape_tsv_value(result.error_message or ""),
+            }
+        )
+        records.append(
+            {
+                field_name: (
+                    value
+                    if field_name == "generated_text" or len(value) <= MAX_TSV_CELL_CHARS
+                    else value[: MAX_TSV_CELL_CHARS - 3].rstrip() + "..."
+                )
+                for field_name, value in record.items()
+            }
+        )
+    return records
+
+
 def generate_tsv_report(
     results: list[PerformanceResult],
     filename: Path,
@@ -20096,21 +20198,8 @@ def generate_tsv_report(
         allowed_fields=TSV_COMPACT_TABLE_FIELDS,
     )
 
-    def escape_tsv_value(value: str) -> str:
-        r"""Escape a value for TSV format.
-
-        Replaces tabs with spaces and newlines with literal \n to preserve
-        the tabular structure. This ensures each record stays on one line.
-        """
-        # Replace actual tabs with spaces
-        value = value.replace("\t", "    ")
-        # Replace newlines with escaped newline sequence
-        value = value.replace("\n", "\\n")
-        # Remove carriage returns
-        return value.replace("\r", "")
-
     header_by_field = {
-        field_name: escape_tsv_value(re.sub(r"<[^>]+>", "", header.replace("<br>", " ")).strip())
+        field_name: _escape_tsv_value(re.sub(r"<[^>]+>", "", header.replace("<br>", " ")).strip())
         for field_name, header in zip(field_names, headers, strict=True)
     }
     header_by_field.update(
@@ -20137,79 +20226,16 @@ def generate_tsv_report(
             "error_message": "error_message",
         }
     )
-    optional_fields = (
-        "compatibility_status",
-        "context_integration_score",
-        "draft_improvement_score",
-        "visual_description_score",
-        "assisted_enrichment_score",
-        "peak_memory_working_set_pct",
-        "prompt_burden_kind",
-        "prompt_burden_source",
-        "owner_confidence",
-        "prompt_burden_reason",
-        "processed_image_width",
-        "processed_image_height",
-        "image_patch_count",
-        "error_stage",
-        "error_type",
-        "error_package",
-        "error_message",
+    row_records = _build_tsv_row_records(
+        rows=rows,
+        results=sorted_results,
+        field_names=field_names,
+        report_context=report_context,
     )
-    recommendations = _recommendations_by_model(report_context)
-    machine_facts = _machine_facts_by_model(report_context)
-
-    row_records: list[dict[str, str]] = []
-    for row, res in zip(rows, sorted_results, strict=False):
-        record = {
-            field_name: escape_tsv_value(cell)
-            for field_name, cell in zip(field_names, row, strict=False)
-        }
-        recommendation = recommendations[res.model_name]
-        burden = recommendation.burden
-        facts = machine_facts[res.model_name]
-        machine_cells = _machine_artifact_tsv_cells(facts)
-        machine_fields = optional_fields[:9]
-        record.update(zip(machine_fields, machine_cells, strict=True))
-        record.update(
-            {
-                "execution_status": _execution_outcome(res),
-                "recommendation_status": _recommendation_status_for_result(res),
-                "prompt_burden_reason": burden.reason or "",
-                "processed_image_width": (
-                    str(burden.processed_width) if burden.processed_width is not None else ""
-                ),
-                "processed_image_height": (
-                    str(burden.processed_height) if burden.processed_height is not None else ""
-                ),
-                "image_patch_count": (
-                    str(burden.patch_count) if burden.patch_count is not None else ""
-                ),
-                "generated_text": escape_tsv_value(
-                    str(getattr(res.generation, "text", "") or "")
-                    if res.generation is not None
-                    else ""
-                ),
-                "error_stage": escape_tsv_value(res.error_stage or ""),
-                "error_type": escape_tsv_value(res.error_type or ""),
-                "error_package": escape_tsv_value(res.error_package or ""),
-                "error_message": escape_tsv_value(res.error_message or ""),
-            }
-        )
-        row_records.append(
-            {
-                field_name: (
-                    value
-                    if field_name == "generated_text" or len(value) <= MAX_TSV_CELL_CHARS
-                    else value[: MAX_TSV_CELL_CHARS - 3].rstrip() + "..."
-                )
-                for field_name, value in record.items()
-            }
-        )
 
     active_optional_fields = tuple(
         field_name
-        for field_name in optional_fields
+        for field_name in _TSV_OPTIONAL_FIELDS
         if any(record.get(field_name, "") for record in row_records)
     )
     core_fields = (
@@ -21583,7 +21609,7 @@ def _build_failure_action_hint(
     error_stage: str | None,
 ) -> str:
     """Build an owner/component/cause hint for failed-model summary lines."""
-    package_key = (error_package or "unknown").strip().lower() or "unknown"
+    package_key = (error_package or _UNKNOWN_OWNER).strip().lower() or _UNKNOWN_OWNER
     owner_hint = _PACKAGE_OWNER_HINTS.get(
         package_key,
         f"{package_key} (upstream owner not in built-in hint map)",
@@ -21646,7 +21672,7 @@ def _build_canonical_error_code(
 ) -> str:
     """Build stable machine-readable error code for cross-run clustering."""
     package_token = _PACKAGE_CODE_MAP.get(
-        (error_package or "unknown").lower(),
+        (error_package or _UNKNOWN_OWNER).lower(),
         _sanitize_error_token(error_package, default="UNKNOWN"),
     )
     phase_token = _sanitize_error_token(_normalise_failure_phase(failure_phase), default="UNKNOWN")
@@ -26027,7 +26053,7 @@ def _action_snapshot_failure_items(
     """Build label/value pairs for the Failures & Triage snapshot group."""
     items: list[tuple[str, str]] = []
     if failed:
-        owners = Counter(res.error_package or "unknown" for res in failed)
+        owners = Counter(res.error_package or _UNKNOWN_OWNER for res in failed)
         owner_summary = ", ".join(f"{owner}={count}" for owner, count in owners.most_common(3))
         items.append(
             ("Framework/runtime failures", f"{len(failed)} (top owners: {owner_summary}).")
@@ -26089,7 +26115,7 @@ def _group_failures_by_package(
     ]
     by_package: dict[str, list[PerformanceResult]] = {}
     for result in failed:
-        package = result.error_package or "unknown"
+        package = result.error_package or _UNKNOWN_OWNER
         by_package.setdefault(package, []).append(result)
     return sorted(by_package.items(), key=lambda item: -len(item[1]))
 
@@ -26439,7 +26465,7 @@ def _log_failed_models_summary(failed: list[PerformanceResult]) -> None:
                 extra={"style_hint": LogStyles.WARNING},
             )
 
-    package_names: list[str] = [res.error_package or "unknown" for res in failed]
+    package_names: list[str] = [res.error_package or _UNKNOWN_OWNER for res in failed]
     stage_names: list[str] = [res.error_stage or "Unknown" for res in failed]
     pkg_counts: Counter[str] = Counter(package_names)
     stage_counts: Counter[str] = Counter(stage_names)

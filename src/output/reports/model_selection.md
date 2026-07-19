@@ -111,7 +111,7 @@ Evidence scope: 1 image, 1 current run.
 | Model                                               | Peak GB                                          |   Gen TPS |   Usefulness | Status        | Evidence                                                                   |
 |-----------------------------------------------------|--------------------------------------------------|-----------|--------------|---------------|----------------------------------------------------------------------------|
 | `mlx-community/gemma-4-26b-a4b-it-4bit`             | 17 GB (14.3% of 108 GB recommended working set)  |     123   |           93 | `recommended` | Title: The Fenchurch Building in London at night ...                       |
-| `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4` | 13 GB (11.7% of 108 GB recommended working set)  |      62.9 |          100 | `recommended` | **Title:** *20 Fenchurch Street at Night, London, England, UK* ...         |
+| `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4` | 13 GB (11.7% of 108 GB recommended working set)  |      62.9 |          100 | `recommended` | `**Title:** *20 Fenchurch Street at Night, London, England, UK* ...`       |
 | `mlx-community/GLM-4.6V-Flash-mxfp4`                | 8.6 GB (7.42% of 108 GB recommended working set) |      80   |           87 | `recommended` | Title: The Fenchurch Building (The Walkie-Talkie), London, England, UK ... |
 
 ### Quality if memory allows
@@ -119,11 +119,11 @@ Evidence scope: 1 image, 1 current run.
 Policy: quality-first (reliability-gated assisted enrichment).
 Evidence scope: 1 image, 1 current run.
 
-| Model                                               | Peak GB                                         |   Gen TPS |   Usefulness | Status        | Evidence                                                           |
-|-----------------------------------------------------|-------------------------------------------------|-----------|--------------|---------------|--------------------------------------------------------------------|
-| `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4` | 13 GB (11.7% of 108 GB recommended working set) |      62.9 |          100 | `recommended` | **Title:** *20 Fenchurch Street at Night, London, England, UK* ... |
-| `mlx-community/Qwen3.5-27B-4bit`                    | 26 GB (22.4% of 108 GB recommended working set) |      30.7 |          100 | `recommended` | Title: 20 Fenchurch Street, London, England, UK, Europe ...        |
-| `mlx-community/Qwen3.5-27B-mxfp8`                   | 38 GB (33.3% of 108 GB recommended working set) |      18.3 |          100 | `recommended` | Title: The Walkie-Talkie Building, London, England, UK ...         |
+| Model                                               | Peak GB                                         |   Gen TPS |   Usefulness | Status        | Evidence                                                             |
+|-----------------------------------------------------|-------------------------------------------------|-----------|--------------|---------------|----------------------------------------------------------------------|
+| `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4` | 13 GB (11.7% of 108 GB recommended working set) |      62.9 |          100 | `recommended` | `**Title:** *20 Fenchurch Street at Night, London, England, UK* ...` |
+| `mlx-community/Qwen3.5-27B-4bit`                    | 26 GB (22.4% of 108 GB recommended working set) |      30.7 |          100 | `recommended` | Title: 20 Fenchurch Street, London, England, UK, Europe ...          |
+| `mlx-community/Qwen3.5-27B-mxfp8`                   | 38 GB (33.3% of 108 GB recommended working set) |      18.3 |          100 | `recommended` | Title: The Walkie-Talkie Building, London, England, UK ...           |
 
 ### Current failures / avoid
 
@@ -144,18 +144,18 @@ Top 10 ranked candidates for brief captions. This is a selection aid, not the co
 Policy: quality-first (reliability-gated assisted enrichment).
 Evidence scope: 1 image, 1 current run.
 
-| Model                                               |   Hygiene |   Usefulness |   Gen TPS | Peak GB                                         | Verdict       | Caption Preview                                                    | Caveat                                                                                         |
-|-----------------------------------------------------|-----------|--------------|-----------|-------------------------------------------------|---------------|--------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
-| `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4` |        85 |          100 |      62.9 | 13 GB (11.7% of 108 GB recommended working set) | `recommended` | **Title:** *20 Fenchurch Street at Night, London, England, UK* ... | missing terms: Cars, City, Commuting, Nightscape, Street signs                                 |
-| `mlx-community/Qwen3.5-27B-4bit`                    |       100 |          100 |      30.7 | 26 GB (22.4% of 108 GB recommended working set) | `recommended` | Title: 20 Fenchurch Street, London, England, UK, Europe ...        | missing terms: Building, Buildings, Cars, City, Commuting                                      |
-| `mlx-community/Qwen3.5-27B-mxfp8`                   |        85 |          100 |      18.3 | 38 GB (33.3% of 108 GB recommended working set) | `recommended` | Title: The Walkie-Talkie Building, London, England, UK ...         | missing terms: Cars, City, Commuting, Street signs, The Fenchurch Building (The Walkie-Talkie) |
-| `mlx-community/Qwen3.6-27B-mxfp8`                   |       100 |          100 |      17.7 | 38 GB (33.3% of 108 GB recommended working set) | `recommended` | Title: 20 Fenchurch Street, London, England, UK, Europe ...        | missing terms: Cars, City, Commuting, Street signs, The Fenchurch Building (The Walkie-Talkie) |
-| `mlx-community/Qwen3.5-35B-A3B-bf16`                |       100 |           93 |      65.8 | 76 GB (65.8% of 108 GB recommended working set) | `recommended` | Title: The Fenchurch Building at night in London ...               | missing terms: Cars, City, Commuting, Modern, The Fenchurch Building (The Walkie-Talkie)       |
-| `mlx-community/Ornith-1.0-35B-bf16`                 |       100 |           93 |      57.3 | 76 GB (65.8% of 108 GB recommended working set) | `recommended` | Title: - The Fenchurch Street skyscraper at night ...              | missing terms: Building, Buildings, Commuting, Modern, Nightscape                              |
-| `mlx-community/Qwen3.5-35B-A3B-6bit`                |       100 |           93 |      91.2 | 35 GB (30.1% of 108 GB recommended working set) | `recommended` | Title: The Fenchurch Building at night in London ...               | missing terms: Cars, Cityscape, Commuting, Modern, The Fenchurch Building (The Walkie-Talkie)  |
-| `mlx-community/Qwen3.5-35B-A3B-4bit`                |        85 |           93 |     107   | 26 GB (22.6% of 108 GB recommended working set) | `recommended` | Title: The Fenchurch Building at night in London ...               | missing terms: Cars, City, Commuting, Fenchurch Street, Nightscape                             |
-| `mlx-community/gemma-4-26b-a4b-it-4bit`             |       100 |           93 |     123   | 17 GB (14.3% of 108 GB recommended working set) | `recommended` | Title: The Fenchurch Building in London at night ...               | missing terms: Cars, City, Commuting, Street signs, The Fenchurch Building (The Walkie-Talkie) |
-| `mlx-community/Qwen3.5-9B-MLX-4bit`                 |       100 |           93 |      92.1 | 11 GB (9.94% of 108 GB recommended working set) | `recommended` | Title: The Fenchurch Building, London, UK, Night ...               | missing terms: Cars, Commuting, The Fenchurch Building (The Walkie-Talkie), GBR, formally      |
+| Model                                               |   Hygiene |   Usefulness |   Gen TPS | Peak GB                                         | Verdict       | Caption Preview                                                      | Caveat                                                                                         |
+|-----------------------------------------------------|-----------|--------------|-----------|-------------------------------------------------|---------------|----------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
+| `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4` |        85 |          100 |      62.9 | 13 GB (11.7% of 108 GB recommended working set) | `recommended` | `**Title:** *20 Fenchurch Street at Night, London, England, UK* ...` | missing terms: Cars, City, Commuting, Nightscape, Street signs                                 |
+| `mlx-community/Qwen3.5-27B-4bit`                    |       100 |          100 |      30.7 | 26 GB (22.4% of 108 GB recommended working set) | `recommended` | Title: 20 Fenchurch Street, London, England, UK, Europe ...          | missing terms: Building, Buildings, Cars, City, Commuting                                      |
+| `mlx-community/Qwen3.5-27B-mxfp8`                   |        85 |          100 |      18.3 | 38 GB (33.3% of 108 GB recommended working set) | `recommended` | Title: The Walkie-Talkie Building, London, England, UK ...           | missing terms: Cars, City, Commuting, Street signs, The Fenchurch Building (The Walkie-Talkie) |
+| `mlx-community/Qwen3.6-27B-mxfp8`                   |       100 |          100 |      17.7 | 38 GB (33.3% of 108 GB recommended working set) | `recommended` | Title: 20 Fenchurch Street, London, England, UK, Europe ...          | missing terms: Cars, City, Commuting, Street signs, The Fenchurch Building (The Walkie-Talkie) |
+| `mlx-community/Qwen3.5-35B-A3B-bf16`                |       100 |           93 |      65.8 | 76 GB (65.8% of 108 GB recommended working set) | `recommended` | Title: The Fenchurch Building at night in London ...                 | missing terms: Cars, City, Commuting, Modern, The Fenchurch Building (The Walkie-Talkie)       |
+| `mlx-community/Ornith-1.0-35B-bf16`                 |       100 |           93 |      57.3 | 76 GB (65.8% of 108 GB recommended working set) | `recommended` | Title: - The Fenchurch Street skyscraper at night ...                | missing terms: Building, Buildings, Commuting, Modern, Nightscape                              |
+| `mlx-community/Qwen3.5-35B-A3B-6bit`                |       100 |           93 |      91.2 | 35 GB (30.1% of 108 GB recommended working set) | `recommended` | Title: The Fenchurch Building at night in London ...                 | missing terms: Cars, Cityscape, Commuting, Modern, The Fenchurch Building (The Walkie-Talkie)  |
+| `mlx-community/Qwen3.5-35B-A3B-4bit`                |        85 |           93 |     107   | 26 GB (22.6% of 108 GB recommended working set) | `recommended` | Title: The Fenchurch Building at night in London ...                 | missing terms: Cars, City, Commuting, Fenchurch Street, Nightscape                             |
+| `mlx-community/gemma-4-26b-a4b-it-4bit`             |       100 |           93 |     123   | 17 GB (14.3% of 108 GB recommended working set) | `recommended` | Title: The Fenchurch Building in London at night ...                 | missing terms: Cars, City, Commuting, Street signs, The Fenchurch Building (The Walkie-Talkie) |
+| `mlx-community/Qwen3.5-9B-MLX-4bit`                 |       100 |           93 |      92.1 | 11 GB (9.94% of 108 GB recommended working set) | `recommended` | Title: The Fenchurch Building, London, UK, Night ...                 | missing terms: Cars, Commuting, The Fenchurch Building (The Walkie-Talkie), GBR, formally      |
 
 ## Structured Metadata Candidates
 
@@ -163,18 +163,18 @@ Top 10 ranked candidates for structured title/description/keywords. Use the gall
 Policy: quality-first (reliability-gated assisted enrichment).
 Evidence scope: 1 image, 1 current run.
 
-| Model                                               |   Metadata agreement | Verdict   | Output Preview                                                     |
-|-----------------------------------------------------|----------------------|-----------|--------------------------------------------------------------------|
-| `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4` |                   21 | `clean`   | **Title:** *20 Fenchurch Street at Night, London, England, UK* ... |
-| `mlx-community/Qwen3.5-27B-4bit`                    |                   30 | `clean`   | Title: 20 Fenchurch Street, London, England, UK, Europe ...        |
-| `mlx-community/Qwen3.5-27B-mxfp8`                   |                   39 | `clean`   | Title: The Walkie-Talkie Building, London, England, UK ...         |
-| `mlx-community/Qwen3.6-27B-mxfp8`                   |                   31 | `clean`   | Title: 20 Fenchurch Street, London, England, UK, Europe ...        |
-| `mlx-community/Qwen3.5-35B-A3B-bf16`                |                   28 | `clean`   | Title: The Fenchurch Building at night in London ...               |
-| `mlx-community/Ornith-1.0-35B-bf16`                 |                   25 | `clean`   | Title: - The Fenchurch Street skyscraper at night ...              |
-| `mlx-community/Qwen3.5-35B-A3B-6bit`                |                   30 | `clean`   | Title: The Fenchurch Building at night in London ...               |
-| `mlx-community/Qwen3.5-35B-A3B-4bit`                |                   29 | `clean`   | Title: The Fenchurch Building at night in London ...               |
-| `mlx-community/gemma-4-26b-a4b-it-4bit`             |                   31 | `clean`   | Title: The Fenchurch Building in London at night ...               |
-| `mlx-community/Qwen3.5-9B-MLX-4bit`                 |                   41 | `clean`   | Title: The Fenchurch Building, London, UK, Night ...               |
+| Model                                               |   Metadata agreement | Verdict   | Output Preview                                                       |
+|-----------------------------------------------------|----------------------|-----------|----------------------------------------------------------------------|
+| `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4` |                   21 | `clean`   | `**Title:** *20 Fenchurch Street at Night, London, England, UK* ...` |
+| `mlx-community/Qwen3.5-27B-4bit`                    |                   30 | `clean`   | Title: 20 Fenchurch Street, London, England, UK, Europe ...          |
+| `mlx-community/Qwen3.5-27B-mxfp8`                   |                   39 | `clean`   | Title: The Walkie-Talkie Building, London, England, UK ...           |
+| `mlx-community/Qwen3.6-27B-mxfp8`                   |                   31 | `clean`   | Title: 20 Fenchurch Street, London, England, UK, Europe ...          |
+| `mlx-community/Qwen3.5-35B-A3B-bf16`                |                   28 | `clean`   | Title: The Fenchurch Building at night in London ...                 |
+| `mlx-community/Ornith-1.0-35B-bf16`                 |                   25 | `clean`   | Title: - The Fenchurch Street skyscraper at night ...                |
+| `mlx-community/Qwen3.5-35B-A3B-6bit`                |                   30 | `clean`   | Title: The Fenchurch Building at night in London ...                 |
+| `mlx-community/Qwen3.5-35B-A3B-4bit`                |                   29 | `clean`   | Title: The Fenchurch Building at night in London ...                 |
+| `mlx-community/gemma-4-26b-a4b-it-4bit`             |                   31 | `clean`   | Title: The Fenchurch Building in London at night ...                 |
+| `mlx-community/Qwen3.5-9B-MLX-4bit`                 |                   41 | `clean`   | Title: The Fenchurch Building, London, UK, Night ...                 |
 
 ## Repository Variant Comparisons
 

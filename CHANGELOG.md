@@ -7,6 +7,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Restore the static-quality baseline by separating indeterminate published
+  artifacts from conclusive runtime failures, reducing repro/TSV complexity,
+  and ensuring ty resolves generated gitignored stubs without suppressions.
 - Make assisted-lane recommendations evidence-led rather than literal-overlap-led:
   authoritative identity/location is explicitly permitted, complete metadata terms
   reach the prompt without ellipsis corruption, and low draft-term overlap no longer

@@ -30,6 +30,11 @@ def _read_tsv_record(path: Path) -> dict[str, str]:
     return dict(zip(rows[0], rows[1], strict=True))
 
 
+def test_escape_tsv_value_normalizes_record_breaking_characters() -> None:
+    """The shared TSV escaper should keep one logical value on one row."""
+    assert check_models._escape_tsv_value("one\ttwo\nthree\rfour") == ("one    two\\nthreefour")
+
+
 def test_generate_tsv_report_basic(tmp_path: Path) -> None:
     """Should generate basic TSV report with headers and data."""
     # Create a simple test result

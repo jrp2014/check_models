@@ -291,6 +291,13 @@ def test_ty_uses_generated_typings_search_path() -> None:
     assert ty_env["extra-paths"] == ["../typings"]
 
 
+def test_ty_quality_check_resolves_gitignored_generated_stubs() -> None:
+    """Ty must not exclude the configured typings path merely because Git ignores it."""
+    common_quality = (PKG_ROOT / "tools" / "common_quality.sh").read_text(encoding="utf-8")
+
+    assert 'check --no-respect-ignore-files --python "$python_path"' in common_quality
+
+
 def test_type_checkers_use_repo_root_generated_typings() -> None:
     """All type checkers should resolve stubs generated at repo-root typings/."""
     pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))

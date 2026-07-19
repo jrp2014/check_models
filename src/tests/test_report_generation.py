@@ -796,8 +796,17 @@ def test_published_failure_artifacts_match_canonical_runtime_triage() -> None:
         json.loads(line)
         for line in (output_dir / "results.jsonl").read_text(encoding="utf-8").splitlines()
     ]
-    failures = [
-        record for record in records if record.get("_type") == "result" and not record["success"]
+    conclusive_failures = [
+        record
+        for record in records
+        if record.get("_type") == "result"
+        and not record["success"]
+        and record["review"]["verdict"] != "indeterminate"
+    ]
+    indeterminate = [
+        record
+        for record in records
+        if record.get("_type") == "result" and record["review"]["verdict"] == "indeterminate"
     ]
 
     assert any(record.get("_type") == "result" for record in records)
@@ -809,7 +818,9 @@ def test_published_failure_artifacts_match_canonical_runtime_triage() -> None:
     assert str(Path.home()) not in review_report
     assert str(Path.home()) not in gallery
     assert str(Path.home()) not in html_report
-    for failure in failures:
+    assert all(record["compatibility_status"] == "indeterminate" for record in indeterminate)
+    assert all("issue_cluster_path" not in record["maintainer_triage"] for record in indeterminate)
+    for failure in conclusive_failures:
         review = failure["review"]
         triage = failure["maintainer_triage"]
         assert review["verdict"] == "runtime_failure"
@@ -2936,6 +2947,50 @@ class TestMarkdownReportEdgeCases:
             "### Current failures / avoid",
             end_headings=("## Brief Caption Candidates",),
         )
+
+    def test_model_selection_table_quotes_model_markdown_emphasis(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Model-authored emphasis should remain literal evidence in table previews."""
+        result = PerformanceResult(
+            model_name="org/emphasized-caption",
+            success=True,
+            generation=_MockGeneration(
+                text=(
+                    "**Title:** *A workshop at dusk*\n\n"
+                    "**Description:** A spacious workshop contains orderly hand tools, "
+                    "wooden benches, task lighting, storage cabinets, and an open doorway "
+                    "showing the fading evening light.\n\n"
+                    "**Keywords:** workshop, tools, benches, cabinets, evening, doorway"
+                ),
+                generation_tps=40.0,
+                prompt_tokens=20,
+                generation_tokens=15,
+                peak_memory=4.0,
+            ),
+        )
+        context = check_models._build_report_render_context(
+            results=[result],
+            prompt="Describe this image briefly.",
+            eval_mode="triage",
+        )
+        output_path = tmp_path / "model_selection.md"
+
+        check_models.generate_model_selection_report(
+            [result],
+            output_path,
+            prompt="Describe this image briefly.",
+            report_context=context,
+        )
+
+        model_rows = [
+            line
+            for line in output_path.read_text(encoding="utf-8").splitlines()
+            if "org/emphasized-caption" in line and "Title:" in line
+        ]
+        assert model_rows
+        assert all("`**Title:** *A workshop at dusk*" in row for row in model_rows)
 
     def test_model_selection_report_demotes_token_noise_outputs(
         self,
@@ -5117,6 +5172,17 @@ class TestDiagnosticsReport:
         assert payload["schema_version"] == "1.0"
         assert payload["models"]["org/broken-model"]["bundle"] == bundles["org/broken-model"].name
         assert payload["models"]["org/broken-model"]["issue_cluster_id"]
+
+    def test_repro_bundle_index_writer_skips_empty_runs(self, tmp_path: Path) -> None:
+        """A run without bundles should not publish an empty latest-run index."""
+        check_models._write_latest_repro_bundle_index(
+            output_dir=tmp_path,
+            bundles={},
+            models={},
+            clusters={},
+        )
+
+        assert not (tmp_path / "latest_by_cluster.json").exists()
 
     def test_repro_command_omits_upstream_quantized_kv_default(self) -> None:
         """Default KV quantization start should not be forwarded as a repro override."""
