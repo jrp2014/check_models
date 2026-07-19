@@ -1,6 +1,6 @@
 # Check Models Output Index
 
-Generated on: 2026-07-19 02:41:58 BST
+Generated on: 2026-07-19 20:37:24 BST
 
 ## Run Snapshot
 
@@ -8,10 +8,10 @@ Generated on: 2026-07-19 02:41:58 BST
 - Metadata exposed to prompt: yes
 - Selection basis: metadata-assisted visual verification (grounded)
 - Models attempted: 62
-- Models evaluated: 62
-- Successful: 61
+- Models evaluated: 61
+- Successful: 60
 - Failed: 1
-- Indeterminate: 0
+- Indeterminate: 1
 
 ## Primary Artifacts
 

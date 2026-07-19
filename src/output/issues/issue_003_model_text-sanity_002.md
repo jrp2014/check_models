@@ -1,14 +1,14 @@
 <!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
 
-# \[model\]\[Text-sanity / token-soup output\] Generated text is mixed-script token-soup affecting 2 model(s)
+# \[model\]\[Text-sanity / token-soup output\] Generated text is mixed-script token-soup affecting 1 model(s)
 
 ## Summary
 
-2 model(s) show **Text-sanity / token-soup output** that should be filed against model repository.
+1 model(s) show **Text-sanity / token-soup output** that should be filed against model repository.
 
 - **Observed problem:** Generated text is mixed-script token-soup
 - **Target:** model repository
-- **Affected models:** 2
+- **Affected models:** 1
 - **Fixed when:** Generated text is readable natural language, not token soup.
 
 
@@ -16,19 +16,16 @@
 
 <!-- markdownlint-disable MD060 -->
 
-| Model                                           | Observed Behavior                                | Token Counts                                                                                       | Optional Context                                                                                                                                                                          |
-|-------------------------------------------------|--------------------------------------------------|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX` | token cap \| missing sections \| trusted overlap | prompt=3,502 \| output/prompt=14.28% \| mixed burden=86% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260719T014155Z_004_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_model_text_sanity_001.json) |
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit`       | token cap \| missing sections \| trusted overlap | prompt=1,598 \| output/prompt=31.29% \| stop=max_tokens \| hit token cap (500)                     | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260719T014155Z_003_mlx-community_Kimi-VL-A3B-Thinking-8bit_model_text_sanity_001.json)       |
+| Model                                              | Observed Behavior                            | Token Counts                                                                   | Optional Context                                                                                                                                                                             |
+|----------------------------------------------------|----------------------------------------------|--------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16` | token cap \| missing sections \| abrupt tail | prompt=1,956 \| output/prompt=25.56% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260719T193722Z_003_mlx-community_ERNIE-4.5-VL-28B-A3B-Thinking-bf16_model_text_sanity_002.json) |
 <!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
 
-- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: Output omitted required Title/Description/Keywords sections (title).
-- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: Output leaked reasoning or prompt-template text (here are my reasoning steps).
-- Output excerpt: `Here are my reasoning steps: We need to produce a catalog entry with Title, Description, Keywords sections. The image is a nighttime city street scene with a tall glass skyscraper that is the Walkie-Talkie (20 Fenchurch Street) in London. The image shows the building illuminated, street lights, a few cars, a bike, a...`
-- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: Output omitted required Title/Description/Keywords sections (title).
+- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
+- Output excerpt: `Let's tackle this step by step. First, the title needs to be 5-10 words, concrete and factual. The authoritative context gives location as London, England, UK, and the building is The Fenchurch Building (The Walkie-Talkie). So the title should be something like "The Fenchurch Building (The Walkie-Talkie), London, UK...`
 
 
 ## Minimal Reproduction
@@ -41,34 +38,34 @@ Image SHA256: `210a59774a1ca56ab647a9a6d360c9ae355df72584935141e21feb228ab77bc6`
 
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX --image 20260718-215539_DSC01101_DxO.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
+python -m mlx_vlm.generate --model mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 --image 20260718-215539_DSC01101_DxO.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
 
-Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.
+Describe visible details faithfully. If a visual detail is uncertain, ambiguous, partially obscured, or too small to verify, leave it out rather than guessing.
 
-Treat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.
+Use authoritative context as supplied fact, and treat the descriptive metadata as a draft catalog record. Retain draft details that are consistent with the image, correct contradictions, and add important visible details. Authoritative context may supply identity and location even when they are not visually readable.
 
 Return exactly these three sections, and nothing else:
 
 Title:
-- 5-10 words, concrete and factual, limited to clearly visible content.
+- 5-10 words, concrete and factual; authoritative context may supply identity and location.
 - Output only the title text after the label.
 - Do not repeat or paraphrase these instructions in the title.
 
 Description:
-- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.
+- 1-2 factual sentences combining supplied authoritative context with the main visible subject, setting, lighting, action, and distinctive visible details.
 - Output only the description text after the label.
 
 Keywords:
-- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.
+- 10-18 unique comma-separated terms covering supplied authoritative context and clearly visible subjects, setting, colors, composition, and style.
 - Output only the keyword list after the label.
 
 Rules:
-- Include only details that are definitely visible in the image.
-- Reuse metadata terms only when they are clearly supported by the image.
+- Distinguish supplied authoritative facts from visible details; do not present contextual facts as though they were read from the image.
+- Reuse draft metadata when it is consistent with the image; authoritative context does not require separate visual proof.
 - If metadata and image disagree, follow the image.
 - Prefer omission to speculation.
 - Do not copy prompt instructions into the Title, Description, or Keywords fields.
-- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.
+- Do not infer identity, location, event, brand, species, time period, or intent unless supplied as authoritative context or visually obvious.
 - Do not output reasoning, notes, hedging, or extra sections.
 
 Context: Authoritative context:
@@ -80,7 +77,7 @@ Context: Authoritative context:
 Draft descriptive metadata:
 - Existing title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe
 - Existing description: Walkie Talkie building known formally as 20 Fenchurch Street.
-- Existing keywords: Architecture, Building, Buildings, Cars, City, Cityscape, Commuting, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walki..., Urban, Urban landscape, Walkie Talkie building
+- Existing keywords: Architecture, Building, Buildings, Cars, City, Cityscape, Commuting, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walkie-Talkie), Urban, Urban landscape, Walkie Talkie building
 - Treat this draft as fallible. Retain supported details, correct errors, and add important visible information.' --max-tokens 500 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
@@ -91,9 +88,9 @@ from mlx_vlm.generate import generate
 from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load
 
-MODEL = 'mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX'
+MODEL = 'mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16'
 IMAGE = '20260718-215539_DSC01101_DxO.jpg'
-PROMPT = 'Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.\n- Output only the description text after the label.\n\nKeywords:\n- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.\n- Output only the keyword list after the label.\n\nRules:\n- Include only details that are definitely visible in the image.\n- Reuse metadata terms only when they are clearly supported by the image.\n- If metadata and image disagree, follow the image.\n- Prefer omission to speculation.\n- Do not copy prompt instructions into the Title, Description, or Keywords fields.\n- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.\n- Do not output reasoning, notes, hedging, or extra sections.\n\nContext: Authoritative context:\n- Location terms: England, Europe, UK, district, united kingdom\n- Capture date/time: 2026-07-18 22:55:39 BST 22:55:39\n- GPS: 51.511300°N, 0.083400°W\n- Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.\n\nDraft descriptive metadata:\n- Existing title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe\n- Existing description: Walkie Talkie building known formally as 20 Fenchurch Street.\n- Existing keywords: Architecture, Building, Buildings, Cars, City, Cityscape, Commuting, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walki..., Urban, Urban landscape, Walkie Talkie building\n- Treat this draft as fallible. Retain supported details, correct errors, and add important visible information.'
+PROMPT = 'Analyze this image for cataloguing metadata, using British English.\n\nDescribe visible details faithfully. If a visual detail is uncertain, ambiguous, partially obscured, or too small to verify, leave it out rather than guessing.\n\nUse authoritative context as supplied fact, and treat the descriptive metadata as a draft catalog record. Retain draft details that are consistent with the image, correct contradictions, and add important visible details. Authoritative context may supply identity and location even when they are not visually readable.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual; authoritative context may supply identity and location.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences combining supplied authoritative context with the main visible subject, setting, lighting, action, and distinctive visible details.\n- Output only the description text after the label.\n\nKeywords:\n- 10-18 unique comma-separated terms covering supplied authoritative context and clearly visible subjects, setting, colors, composition, and style.\n- Output only the keyword list after the label.\n\nRules:\n- Distinguish supplied authoritative facts from visible details; do not present contextual facts as though they were read from the image.\n- Reuse draft metadata when it is consistent with the image; authoritative context does not require separate visual proof.\n- If metadata and image disagree, follow the image.\n- Prefer omission to speculation.\n- Do not copy prompt instructions into the Title, Description, or Keywords fields.\n- Do not infer identity, location, event, brand, species, time period, or intent unless supplied as authoritative context or visually obvious.\n- Do not output reasoning, notes, hedging, or extra sections.\n\nContext: Authoritative context:\n- Location terms: England, Europe, UK, district, united kingdom\n- Capture date/time: 2026-07-18 22:55:39 BST 22:55:39\n- GPS: 51.511300°N, 0.083400°W\n- Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.\n\nDraft descriptive metadata:\n- Existing title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe\n- Existing description: Walkie Talkie building known formally as 20 Fenchurch Street.\n- Existing keywords: Architecture, Building, Buildings, Cars, City, Cityscape, Commuting, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walkie-Talkie), Urban, Urban landscape, Walkie Talkie building\n- Treat this draft as fallible. Retain supported details, correct errors, and add important visible information.'
 LOAD_KWARGS = {'trust_remote_code': True}
 GENERATE_KWARGS = {'max_tokens': 500, 'temperature': 0.0, 'prefill_step_size': 4096}
 model, processor = load(MODEL, **LOAD_KWARGS)
@@ -114,32 +111,32 @@ Prompt:
 ```text
 Analyze this image for cataloguing metadata, using British English.
 
-Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.
+Describe visible details faithfully. If a visual detail is uncertain, ambiguous, partially obscured, or too small to verify, leave it out rather than guessing.
 
-Treat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.
+Use authoritative context as supplied fact, and treat the descriptive metadata as a draft catalog record. Retain draft details that are consistent with the image, correct contradictions, and add important visible details. Authoritative context may supply identity and location even when they are not visually readable.
 
 Return exactly these three sections, and nothing else:
 
 Title:
-- 5-10 words, concrete and factual, limited to clearly visible content.
+- 5-10 words, concrete and factual; authoritative context may supply identity and location.
 - Output only the title text after the label.
 - Do not repeat or paraphrase these instructions in the title.
 
 Description:
-- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.
+- 1-2 factual sentences combining supplied authoritative context with the main visible subject, setting, lighting, action, and distinctive visible details.
 - Output only the description text after the label.
 
 Keywords:
-- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.
+- 10-18 unique comma-separated terms covering supplied authoritative context and clearly visible subjects, setting, colors, composition, and style.
 - Output only the keyword list after the label.
 
 Rules:
-- Include only details that are definitely visible in the image.
-- Reuse metadata terms only when they are clearly supported by the image.
+- Distinguish supplied authoritative facts from visible details; do not present contextual facts as though they were read from the image.
+- Reuse draft metadata when it is consistent with the image; authoritative context does not require separate visual proof.
 - If metadata and image disagree, follow the image.
 - Prefer omission to speculation.
 - Do not copy prompt instructions into the Title, Description, or Keywords fields.
-- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.
+- Do not infer identity, location, event, brand, species, time period, or intent unless supplied as authoritative context or visually obvious.
 - Do not output reasoning, notes, hedging, or extra sections.
 
 Context: Authoritative context:
@@ -151,7 +148,7 @@ Context: Authoritative context:
 Draft descriptive metadata:
 - Existing title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe
 - Existing description: Walkie Talkie building known formally as 20 Fenchurch Street.
-- Existing keywords: Architecture, Building, Buildings, Cars, City, Cityscape, Commuting, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walki..., Urban, Urban landscape, Walkie Talkie building
+- Existing keywords: Architecture, Building, Buildings, Cars, City, Cityscape, Commuting, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walkie-Talkie), Urban, Urban landscape, Walkie Talkie building
 - Treat this draft as fallible. Retain supported details, correct errors, and add important visible information.
 ```
 
@@ -168,14 +165,13 @@ Generation/load config:
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX"
+  "model": "mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16"
 }
 ```
 
 Optional advanced context:
 
-- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260719T014155Z_004_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_model_text_sanity_001.json)
-- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260719T014155Z_003_mlx-community_Kimi-VL-A3B-Thinking-8bit_model_text_sanity_001.json)
+- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260719T193722Z_003_mlx-community_ERNIE-4.5-VL-28B-A3B-Thinking-bf16_model_text_sanity_002.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
@@ -234,30 +230,15 @@ Optional advanced context:
 
 ## Appendix: Detailed Evidence
 
-### `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`
+### `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`
 
 Observed signals:
 
-- Output omitted required Title/Description/Keywords sections (title).
-- Output leaked reasoning or prompt-template text (here are my reasoning steps).
+- Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 Sample output:
 
 ```text
-Here are my reasoning steps:
-We need to produce a catalog entry with Title, Description, Keywords sections. The image is a nighttime city street scene with a tall glass skyscraper that is the Walki...
-```
-
-### `mlx-community/Kimi-VL-A3B-Thinking-8bit`
-
-Observed signals:
-
-- Output omitted required Title/Description/Keywords sections (title).
-- Thinking trace present as expected for this model protocol (◁think▷).
-
-Sample output:
-
-```text
-◁think▷Okay, let's analyze this image for metadata cataloging based on the user's instructions. First, I need to focus only on what's clearly visible and avoid any assumptions or inferences. The im...
+Let's tackle this step by step. First, the title needs to be 5-10 words, concrete and factual. The authoritative context gives location as London, England, UK, and the building is The Fenchurch Bui...
 ```
 

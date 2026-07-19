@@ -1,56 +1,70 @@
 <!-- markdownlint-disable MD013 -->
 
-# Diagnostics Report — 1 failure(s), 0 indeterminate, 6 harness issue(s), 2 text-sanity issue(s) (mlx-vlm 0.6.5)
+# Diagnostics Report — 1 failure(s), 1 indeterminate, 5 harness issue(s), 2 text-sanity issue(s) (mlx-vlm 0.6.5)
 
-**Run summary:** 62 attempted, 62 evaluated; 1 hard failure(s), 6 harness/integration issue(s), 2 text-sanity/semantic issue(s), 0 indeterminate, 0 preflight warning(s), 61 successful run(s).
+**Run summary:** 62 attempted, 61 evaluated; 1 hard failure(s), 5 harness/integration issue(s), 2 text-sanity/semantic issue(s), 1 indeterminate, 0 preflight warning(s), 60 successful run(s).
 
 Test image: `20260718-215539_DSC01101_DxO.jpg` (35.1 MB).
 
 ## Impact and Run Conditions
 
 - _Models attempted:_ 62
-- _Models evaluated:_ 62
-- _Indeterminate:_ 0
+- _Models evaluated:_ 61
+- _Indeterminate:_ 1
 - _Crashed:_ 1
-- _Completed:_ 61
+- _Completed:_ 60
 - _Prompt:_ Analyze this image for cataloguing metadata, using British
-  English.  Use only details that are clearly and definitely visible in the
-  image. If a detail is uncertain, ambiguous, partially obscured, too small to
-  verify, or not directly visible, leave it out. Do not guess.  Treat the
-  metadata hints below as a draft catalog record. Keep only details that are
-  clearly confirmed by the image, correct anything contradicted by the image,
-  and add important visible details that are definitely present.  Return
-  exactly these three sections, and nothing else:  Title: - 5-10 words,
-  concrete and factual, limited to clearly visible content. - Output only the
-  title text after the label. - Do not repeat or paraphrase these instructions
-  in the title.  Description: - 1-2 factual sentences describing the main
-  visible subject, setting, lighting, action, and other distinctive visible
-  details. Omit anything uncertain or inferred. - Output only the description
-  text after the label.  Keywords: - 10-18 unique comma-separated terms based
-  only on clearly visible subjects, setting, colors, composition, and style.
-  Omit uncertain tags rather than guessing. - Output only the keyword list
-  after the label.  Rules: - Include only details that are definitely visible
-  in the image. - Reuse metadata terms only when they are clearly supported by
-  the image. - If metadata and image disagree, follow the image. - Prefer
-  omission to speculation. - Do not copy prompt instructions into the Title,
-  Description, or Keywords fields. - Do not infer identity, location, event,
-  brand, species, time period, or intent unless visually obvious. - Do not
-  output reasoning, notes, hedging, or extra sections.  Context: Authoritative
-  context: - Location terms: England, Europe, UK, district, united kingdom -
-  Capture date/time: 2026-07-18 22:55:39 BST 22:55:39 - GPS: 51.511300°N,
-  0.083400°W - Use this factual context where it improves the catalogue
-  record; do not claim that contextual facts are visually observable.  Draft
-  descriptive metadata: - Existing title: The Fenchurch Building (The
-  Walkie-Talkie), London, England, UK, GBR, Europe - Existing description:
-  Walkie Talkie building known formally as 20 Fenchurch Street. - Existing
-  keywords: Architecture, Building, Buildings, Cars, City, Cityscape,
-  Commuting, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape,
-  Skyscraper, Street, Street signs, The Fenchurch Building (The Walki...,
-  Urban, Urban landscape, Walkie Talkie building - Treat this draft as
-  fallible. Retain supported details, correct errors, and add important
-  visible information.
+  English.  Describe visible details faithfully. If a visual detail is
+  uncertain, ambiguous, partially obscured, or too small to verify, leave it
+  out rather than guessing.  Use authoritative context as supplied fact, and
+  treat the descriptive metadata as a draft catalog record. Retain draft
+  details that are consistent with the image, correct contradictions, and add
+  important visible details. Authoritative context may supply identity and
+  location even when they are not visually readable.  Return exactly these
+  three sections, and nothing else:  Title: - 5-10 words, concrete and
+  factual; authoritative context may supply identity and location. - Output
+  only the title text after the label. - Do not repeat or paraphrase these
+  instructions in the title.  Description: - 1-2 factual sentences combining
+  supplied authoritative context with the main visible subject, setting,
+  lighting, action, and distinctive visible details. - Output only the
+  description text after the label.  Keywords: - 10-18 unique comma-separated
+  terms covering supplied authoritative context and clearly visible subjects,
+  setting, colors, composition, and style. - Output only the keyword list
+  after the label.  Rules: - Distinguish supplied authoritative facts from
+  visible details; do not present contextual facts as though they were read
+  from the image. - Reuse draft metadata when it is consistent with the image;
+  authoritative context does not require separate visual proof. - If metadata
+  and image disagree, follow the image. - Prefer omission to speculation. - Do
+  not copy prompt instructions into the Title, Description, or Keywords
+  fields. - Do not infer identity, location, event, brand, species, time
+  period, or intent unless supplied as authoritative context or visually
+  obvious. - Do not output reasoning, notes, hedging, or extra sections.
+  Context: Authoritative context: - Location terms: England, Europe, UK,
+  district, united kingdom - Capture date/time: 2026-07-18 22:55:39 BST
+  22:55:39 - GPS: 51.511300°N, 0.083400°W - Use this factual context where it
+  improves the catalogue record; do not claim that contextual facts are
+  visually observable.  Draft descriptive metadata: - Existing title: The
+  Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe -
+  Existing description: Walkie Talkie building known formally as 20 Fenchurch
+  Street. - Existing keywords: Architecture, Building, Buildings, Cars, City,
+  Cityscape, Commuting, Fenchurch Street, Illuminated, London, Modern, Night,
+  Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The
+  Walkie-Talkie), Urban, Urban landscape, Walkie Talkie building - Treat this
+  draft as fallible. Retain supported details, correct errors, and add
+  important visible information.
 - _Image:_ 20260718-215539_DSC01101_DxO.jpg
 
+<!-- markdownlint-disable MD060 -->
+
+## Indeterminate Attempts
+
+External connectivity prevented evaluation. These attempts remain visible as
+evidence but are excluded from failures and issue drafts.
+
+| Model                              | Phase      | Status        | Evidence                            | Action                                               |
+|------------------------------------|------------|---------------|-------------------------------------|------------------------------------------------------|
+| mlx-community/Molmo-7B-D-0924-8bit | model_load | Network Error | [Errno 54] Connection reset by peer | Retry; no package owner or model-quality conclusion. |
+<!-- markdownlint-enable MD060 -->
 <!-- markdownlint-disable MD060 -->
 
 ## Crash / Failure Matrix
@@ -87,12 +101,16 @@ ValueError: Model preflight failed for mlx-community/Step-3.7-Flash-oQ2e: Loaded
 These completed runs are useful diagnostic observations, but they do not yet
 isolate an upstream library fault and generate no issue draft.
 
-| Model                                   | Observation      | Routing                      | Confidence   | Evidence                                                                                                                                                 | Controlled next action                                                                                                                         |
-|-----------------------------------------|------------------|------------------------------|--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
-| mlx-community/Qwen2-VL-2B-Instruct-4bit | context_boundary | model-config / mlx-vlm / mlx | medium       | At mixed burden (16833 tokens), output stayed unusually short (1 tokens; ratio 0.0%; weak text signal empty). \| output/prompt=0.01% \| mixed burden=97% | Run a controlled reduced-image or lower-visual-token comparison before assigning the context-boundary behaviour to mlx, mlx-vlm, or the model. |
+| Model                                   | Observation      | Routing                      | Confidence   | Evidence                                                                                                                                                                                                    | Controlled next action                                                                                                                         |
+|-----------------------------------------|------------------|------------------------------|--------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| Qwen/Qwen3-VL-2B-Instruct               | long_context     | mlx                          | high         | At mixed burden (16842 tokens), output became repetitive. \| hit token cap (500) \| missing sections: title, description, keywords \| missing terms: Architecture, Building, Buildings, Cars, City          | Inspect KV/cache behavior, memory pressure, and long-context execution.                                                                        |
+| mlx-community/Qwen2-VL-2B-Instruct-4bit | long_context     | mlx                          | high         | At mixed burden (16853 tokens), output became repetitive. \| hit token cap (500) \| missing sections: title, description, keywords \| missing terms: Architecture, Building, Buildings, Cars, City          | Inspect KV/cache behavior, memory pressure, and long-context execution.                                                                        |
+| mlx-community/Qwen3-VL-2B-Instruct-bf16 | long_context     | mlx                          | high         | At mixed burden (16842 tokens), output became repetitive. \| hit token cap (500) \| missing sections: title, description, keywords \| missing terms: Architecture, Building, Buildings, Cars, City          | Inspect KV/cache behavior, memory pressure, and long-context execution.                                                                        |
+| mlx-community/Qwen3-VL-2B-Thinking-bf16 | context_boundary | model-config / mlx-vlm / mlx | medium       | Output appears truncated to about 9 tokens. \| At mixed burden (16844 tokens), output stayed unusually short (9 tokens; ratio 0.1%; weak text signal truncated). \| output/prompt=0.05% \| mixed burden=97% | Run a controlled reduced-image or lower-visual-token comparison before assigning the context-boundary behaviour to mlx, mlx-vlm, or the model. |
+| mlx-community/X-Reasoner-7B-8bit        | context_boundary | model-config / mlx-vlm / mlx | medium       | Output appears truncated to about 9 tokens. \| At mixed burden (16853 tokens), output stayed unusually short (9 tokens; ratio 0.1%; weak text signal truncated). \| output/prompt=0.05% \| mixed burden=97% | Run a controlled reduced-image or lower-visual-token comparison before assigning the context-boundary behaviour to mlx, mlx-vlm, or the model. |
 
 <details>
-<summary>Complete generated output: mlx-community/Qwen2-VL-2B-Instruct-4bit</summary>
+<summary>Complete generated output: Qwen/Qwen3-VL-2B-Instruct</summary>
 
 ```json
 {
@@ -112,11 +130,11 @@ isolate an upstream library fault and generate no issue draft.
     "top_p": 1.0
   },
   "image_placeholder_count": 0,
-  "model_type": "qwen2_vl",
-  "processor_class": "mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor",
-  "rendered_prompt_chars": 2731,
-  "rendered_prompt_hash_sha256": "1eb7c168b1a0af25c36b0f721e42f68d02698600998ee0cd8242a0057149d24b",
-  "rendered_prompt_preview": "<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\nAnalyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instruction...",
+  "model_type": "qwen3_vl",
+  "processor_class": "mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor",
+  "rendered_prompt_chars": 2891,
+  "rendered_prompt_hash_sha256": "e4333dee0329365f7f63bf8f4d1cd27d6cdfd58e1ac00ca4043991685c9add65",
+  "rendered_prompt_preview": "<|im_start|>user\n<|vision_start|><|image_pad|><|vision_end|>Analyze this image for cataloguing metadata, using British English.\n\nDescribe visible details faithfully. If a visual detail is uncertain, ambiguous, partially obscured, or too small to verify, leave it out rather than guessing.\n\nUse authoritative context as supplied fact, and treat the descriptive metadata as a draft catalog record. Retain draft details that are consistent with the image, correct contradictions, and add important visible details. Authoritative context may supply identity and location even when they are not visually readable.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual; authoritative context may supply identity and location.\n- Output only the title text after ...",
   "special_token_ids": [
     151645,
     151643,
@@ -153,124 +171,6 @@ isolate an upstream library fault and generate no issue draft.
 }
 ```
 
-</details>
-<!-- markdownlint-enable MD060 MD033 -->
-## mlx-vlm / MLX Issue Matrix
-
-Routing labels reflect evidence confidence only; a crash remains a conclusive
-failed task at every confidence level.
-<!-- markdownlint-disable MD060 -->
-
-| Target                                         | Problem                                               | Evidence Snapshot                                                                                                                                               | Affected Models                       | Confidence   | Evidence Type   | Fixed When                                      |
-|------------------------------------------------|-------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------|--------------|-----------------|-------------------------------------------------|
-| `mlx-vlm`                                      | Stop/control tokens leaked into generated text        | decoded text contains control token &lt;/think&gt; \| prompt=1,223 \| output/prompt=7.11% \| stop=completed                                                     | 1: `mlx-community/MiniCPM-V-4.6-8bit` | confirmed    | harness         | No leaked stop/control tokens.                  |
-| mlx-vlm first; MLX if cache/runtime reproduces | Long-context generation collapsed or became too short | prompt_tokens=16822, repetitive output \| prompt=16,822 \| output/prompt=2.97% \| mixed burden=97% \| stop=max_tokens \| hit token cap (500) \| 4 model cluster | 4: `Qwen/Qwen3-VL-2B-Instruct` (+3)   | confirmed    | context_budget  | Full and reduced reruns avoid context collapse. |
-<!-- markdownlint-enable MD060 -->
----
-
-## Issue 1: mlx-vlm — Stop-token leakage
-
-<!-- markdownlint-disable MD033 -->
-
-### Generated Output Evidence
-
-<details>
-<summary>Complete generated output: mlx-community/MiniCPM-V-4.6-8bit</summary>
-
-```text
-<think>
-
-</think>
-
-Title:
-- Tall modern building at night in urban area
-
-Description:
-The image shows a tall modern building illuminated at night in a city setting, with street lights and surrounding structures visible. The scene is urban with illuminated windows and paved roads.
-
-Keywords:
-Architecture, Building, Buildings, City, Cityscape, Illuminated, Night, Modern, Skyscraper, Street, Urban, Urban landscape
-```
-
-</details>
-<!-- markdownlint-enable MD033 -->
-
-### Expected and Actual Behaviour
-
-- _Affected models:_ mlx-community/MiniCPM-V-4.6-8bit
-- _Expected:_ Affected reruns contain no leaked stop/control tokens and
-  terminate cleanly before the configured max-token cap when the response is
-  complete.
-- _Actual:_ Stop/control tokens leaked into generated text
-- _Filing target:_ mlx-vlm
-
-### Native mlx-vlm reproduction
-
-
-```bash
-python -m mlx_vlm.generate --model mlx-community/MiniCPM-V-4.6-8bit --image 20260718-215539_DSC01101_DxO.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
-
-Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.
-
-Treat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.
-
-Return exactly these three sections, and nothing else:
-
-Title:
-- 5-10 words, concrete and factual, limited to clearly visible content.
-- Output only the title text after the label.
-- Do not repeat or paraphrase these instructions in the title.
-
-Description:
-- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.
-- Output only the description text after the label.
-
-Keywords:
-- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.
-- Output only the keyword list after the label.
-
-Rules:
-- Include only details that are definitely visible in the image.
-- Reuse metadata terms only when they are clearly supported by the image.
-- If metadata and image disagree, follow the image.
-- Prefer omission to speculation.
-- Do not copy prompt instructions into the Title, Description, or Keywords fields.
-- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.
-- Do not output reasoning, notes, hedging, or extra sections.
-
-Context: Authoritative context:
-- Location terms: England, Europe, UK, district, united kingdom
-- Capture date/time: 2026-07-18 22:55:39 BST 22:55:39
-- GPS: 51.511300°N, 0.083400°W
-- Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.
-
-Draft descriptive metadata:
-- Existing title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe
-- Existing description: Walkie Talkie building known formally as 20 Fenchurch Street.
-- Existing keywords: Architecture, Building, Buildings, Cars, City, Cityscape, Commuting, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walki..., Urban, Urban landscape, Walkie Talkie building
-- Treat this draft as fallible. Retain supported details, correct errors, and add important visible information.' --max-tokens 500 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
-```
-
-
-Image SHA256: `210a59774a1ca56ab647a9a6d360c9ae355df72584935141e21feb228ab77bc6`
-
-
-### Expected Fix Signal
-
-- [ ] Affected reruns contain no leaked stop/control tokens and terminate cleanly before the configured max-token cap when the response is complete.
-- [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem.
-
----
-
-## Issue 2: mlx-vlm first; MLX if cache/runtime reproduces — Long-context collapse
-
-<!-- markdownlint-disable MD033 -->
-
-### Generated Output Evidence
-
-<details>
-<summary>Complete generated output: Qwen/Qwen3-VL-2B-Instruct</summary>
-
 ```text
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ```
@@ -278,7 +178,110 @@ Image SHA256: `210a59774a1ca56ab647a9a6d360c9ae355df72584935141e21feb228ab77bc6`
 </details>
 
 <details>
+<summary>Complete generated output: mlx-community/Qwen2-VL-2B-Instruct-4bit</summary>
+
+```json
+{
+  "eos_token": "<|im_end|>",
+  "eos_token_id": 151645,
+  "generate_kwargs": {
+    "kv_bits": null,
+    "kv_group_size": 64,
+    "kv_quant_scheme": "uniform",
+    "max_kv_size": null,
+    "max_tokens": 500,
+    "prefill_step_size": 4096,
+    "quantized_kv_start": 5000,
+    "repetition_context_size": 20,
+    "repetition_penalty": null,
+    "temperature": 0.0,
+    "top_p": 1.0
+  },
+  "image_placeholder_count": 0,
+  "model_type": "qwen2_vl",
+  "processor_class": "mlx_vlm.models.qwen2_vl.processing_qwen2_vl.Qwen2VLProcessor",
+  "rendered_prompt_chars": 2949,
+  "rendered_prompt_hash_sha256": "93271e531b6d4a0f203fe3ff496980ff6c9904c102c5c62a70027c7e9ab399f7",
+  "rendered_prompt_preview": "<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\nAnalyze this image for cataloguing metadata, using British English.\n\nDescribe visible details faithfully. If a visual detail is uncertain, ambiguous, partially obscured, or too small to verify, leave it out rather than guessing.\n\nUse authoritative context as supplied fact, and treat the descriptive metadata as a draft catalog record. Retain draft details that are consistent with the image, correct contradictions, and add important visible details. Authoritative context may supply identity and location even when they are not visually readable.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual; authoritative context may supply identity and location.\n- Output only the ti...",
+  "special_token_ids": [
+    151645,
+    151643,
+    151644,
+    151646,
+    151647,
+    151648,
+    151649,
+    151650,
+    151651,
+    151652,
+    151653,
+    151654,
+    151655,
+    151656
+  ],
+  "special_tokens": [
+    "<|im_end|>",
+    "<|endoftext|>",
+    "<|im_start|>",
+    "<|object_ref_start|>",
+    "<|object_ref_end|>",
+    "<|box_start|>",
+    "<|box_end|>",
+    "<|quad_start|>",
+    "<|quad_end|>",
+    "<|vision_start|>",
+    "<|vision_end|>",
+    "<|vision_pad|>",
+    "<|image_pad|>",
+    "<|video_pad|>"
+  ],
+  "tokenizer_class": "transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer"
+}
+```
+
+```text
+-2026-07-18 22:55:39 BST 51.511300°N 0.083400°W 51.511300°N 0.083400°W 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22
+```
+
+</details>
+
+<details>
 <summary>Complete generated output: mlx-community/Qwen3-VL-2B-Instruct-bf16</summary>
+
+```json
+{
+  "eos_token": "<|im_end|>",
+  "eos_token_id": 151645,
+  "generate_kwargs": {
+    "kv_bits": null,
+    "kv_group_size": 64,
+    "kv_quant_scheme": "uniform",
+    "max_kv_size": null,
+    "max_tokens": 500,
+    "prefill_step_size": 4096,
+    "quantized_kv_start": 5000,
+    "repetition_context_size": 20,
+    "repetition_penalty": null,
+    "temperature": 0.0,
+    "top_p": 1.0
+  },
+  "image_placeholder_count": 0,
+  "model_type": "qwen3_vl",
+  "processor_class": "mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor",
+  "rendered_prompt_chars": 2891,
+  "rendered_prompt_hash_sha256": "e4333dee0329365f7f63bf8f4d1cd27d6cdfd58e1ac00ca4043991685c9add65",
+  "rendered_prompt_preview": "<|im_start|>user\n<|vision_start|><|image_pad|><|vision_end|>Analyze this image for cataloguing metadata, using British English.\n\nDescribe visible details faithfully. If a visual detail is uncertain, ambiguous, partially obscured, or too small to verify, leave it out rather than guessing.\n\nUse authoritative context as supplied fact, and treat the descriptive metadata as a draft catalog record. Retain draft details that are consistent with the image, correct contradictions, and add important visible details. Authoritative context may supply identity and location even when they are not visually readable.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual; authoritative context may supply identity and location.\n- Output only the title text after ...",
+  "special_token_ids": [
+    151645,
+    151643
+  ],
+  "special_tokens": [
+    "<|im_end|>",
+    "<|endoftext|>"
+  ],
+  "tokenizer_class": "transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer"
+}
+```
 
 ```text
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -289,8 +292,43 @@ Image SHA256: `210a59774a1ca56ab647a9a6d360c9ae355df72584935141e21feb228ab77bc6`
 <details>
 <summary>Complete generated output: mlx-community/Qwen3-VL-2B-Thinking-bf16</summary>
 
+```json
+{
+  "eos_token": "<|im_end|>",
+  "eos_token_id": 151645,
+  "generate_kwargs": {
+    "kv_bits": null,
+    "kv_group_size": 64,
+    "kv_quant_scheme": "uniform",
+    "max_kv_size": null,
+    "max_tokens": 500,
+    "prefill_step_size": 4096,
+    "quantized_kv_start": 5000,
+    "repetition_context_size": 20,
+    "repetition_penalty": null,
+    "temperature": 0.0,
+    "top_p": 1.0
+  },
+  "image_placeholder_count": 0,
+  "model_type": "qwen3_vl",
+  "processor_class": "mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor",
+  "rendered_prompt_chars": 2899,
+  "rendered_prompt_hash_sha256": "83b37b51a91c9763fd079721022c7abbd1e6cbd119b83ba71fce9e2bfbbb9b3b",
+  "rendered_prompt_preview": "<|im_start|>user\n<|vision_start|><|image_pad|><|vision_end|>Analyze this image for cataloguing metadata, using British English.\n\nDescribe visible details faithfully. If a visual detail is uncertain, ambiguous, partially obscured, or too small to verify, leave it out rather than guessing.\n\nUse authoritative context as supplied fact, and treat the descriptive metadata as a draft catalog record. Retain draft details that are consistent with the image, correct contradictions, and add important visible details. Authoritative context may supply identity and location even when they are not visually readable.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual; authoritative context may supply identity and location.\n- Output only the title text after ...",
+  "special_token_ids": [
+    151645,
+    151643
+  ],
+  "special_tokens": [
+    "<|im_end|>",
+    "<|endoftext|>"
+  ],
+  "tokenizer_class": "transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer"
+}
+```
+
 ```text
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ 1000000
 ```
 
 </details>
@@ -298,339 +336,48 @@ Image SHA256: `210a59774a1ca56ab647a9a6d360c9ae355df72584935141e21feb228ab77bc6`
 <details>
 <summary>Complete generated output: mlx-community/X-Reasoner-7B-8bit</summary>
 
+```json
+{
+  "eos_token": "<|im_end|>",
+  "eos_token_id": 151645,
+  "generate_kwargs": {
+    "kv_bits": null,
+    "kv_group_size": 64,
+    "kv_quant_scheme": "uniform",
+    "max_kv_size": null,
+    "max_tokens": 500,
+    "prefill_step_size": 4096,
+    "quantized_kv_start": 5000,
+    "repetition_context_size": 20,
+    "repetition_penalty": null,
+    "temperature": 0.0,
+    "top_p": 1.0
+  },
+  "image_placeholder_count": 0,
+  "model_type": "qwen2_5_vl",
+  "processor_class": "mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor",
+  "rendered_prompt_chars": 2949,
+  "rendered_prompt_hash_sha256": "1a7723e6a7d2f57441f0726b8b2c4a1aed0f4708cc5fa164fb5d64ea7d38e6f5",
+  "rendered_prompt_preview": "<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\n<|vision_start|><|image_pad|><|vision_end|>Analyze this image for cataloguing metadata, using British English.\n\nDescribe visible details faithfully. If a visual detail is uncertain, ambiguous, partially obscured, or too small to verify, leave it out rather than guessing.\n\nUse authoritative context as supplied fact, and treat the descriptive metadata as a draft catalog record. Retain draft details that are consistent with the image, correct contradictions, and add important visible details. Authoritative context may supply identity and location even when they are not visually readable.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual; authoritative context may supply ...",
+  "special_token_ids": [
+    151645,
+    151643
+  ],
+  "special_tokens": [
+    "<|im_end|>",
+    "<|endoftext|>"
+  ],
+  "tokenizer_class": "transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer"
+}
+```
+
 ```text
- addCriterion
-<|im_start|>MMdd
 <|im_start|>
- addCriterion
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
-<|im_start|>
+ addCriterion("image:caption")
 ```
 
 </details>
-<!-- markdownlint-enable MD033 -->
-
-### Expected and Actual Behaviour
-
-- _Affected models:_ Qwen/Qwen3-VL-2B-Instruct,
-  mlx-community/Qwen3-VL-2B-Instruct-bf16,
-  mlx-community/Qwen3-VL-2B-Thinking-bf16, mlx-community/X-Reasoner-7B-8bit
-- _Expected:_ A same-command rerun and a reduced image/text burden rerun show
-  consistent prompt-token accounting and no long-context collapse.
-- _Actual:_ Long-context generation collapsed or became too short
-- _Filing target:_ mlx-vlm first; MLX if cache/runtime reproduces
-
-### Native mlx-vlm reproduction
-
-
-```bash
-python -m mlx_vlm.generate --model Qwen/Qwen3-VL-2B-Instruct --image 20260718-215539_DSC01101_DxO.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
-
-Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.
-
-Treat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.
-
-Return exactly these three sections, and nothing else:
-
-Title:
-- 5-10 words, concrete and factual, limited to clearly visible content.
-- Output only the title text after the label.
-- Do not repeat or paraphrase these instructions in the title.
-
-Description:
-- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.
-- Output only the description text after the label.
-
-Keywords:
-- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.
-- Output only the keyword list after the label.
-
-Rules:
-- Include only details that are definitely visible in the image.
-- Reuse metadata terms only when they are clearly supported by the image.
-- If metadata and image disagree, follow the image.
-- Prefer omission to speculation.
-- Do not copy prompt instructions into the Title, Description, or Keywords fields.
-- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.
-- Do not output reasoning, notes, hedging, or extra sections.
-
-Context: Authoritative context:
-- Location terms: England, Europe, UK, district, united kingdom
-- Capture date/time: 2026-07-18 22:55:39 BST 22:55:39
-- GPS: 51.511300°N, 0.083400°W
-- Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.
-
-Draft descriptive metadata:
-- Existing title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe
-- Existing description: Walkie Talkie building known formally as 20 Fenchurch Street.
-- Existing keywords: Architecture, Building, Buildings, Cars, City, Cityscape, Commuting, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walki..., Urban, Urban landscape, Walkie Talkie building
-- Treat this draft as fallible. Retain supported details, correct errors, and add important visible information.' --max-tokens 500 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
-```
-
-
-Image SHA256: `210a59774a1ca56ab647a9a6d360c9ae355df72584935141e21feb228ab77bc6`
-
-
-### Expected Fix Signal
-
-- [ ] A same-command rerun and a reduced image/text burden rerun show consistent prompt-token accounting and no long-context collapse.
-- [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem.
-
-<!-- markdownlint-disable MD060 -->
-
-## Prompt / Input Burden Evidence
-
-| Model                                   | Burden   |   Total tokens |   Text estimate |   Non-text estimate | Source            |
-|-----------------------------------------|----------|----------------|-----------------|---------------------|-------------------|
-| Qwen/Qwen3-VL-2B-Instruct               | mixed    |          16822 |             493 |               16329 | estimated_nontext |
-| mlx-community/Qwen3-VL-2B-Instruct-bf16 | mixed    |          16822 |             493 |               16329 | estimated_nontext |
-| mlx-community/Qwen3-VL-2B-Thinking-bf16 | mixed    |          16824 |             493 |               16331 | estimated_nontext |
-| mlx-community/X-Reasoner-7B-8bit        | mixed    |          16833 |             493 |               16340 | estimated_nontext |
-<!-- markdownlint-enable MD060 -->
+<!-- markdownlint-enable MD060 MD033 -->
 <!-- markdownlint-disable MD060 -->
 
 ## Model/config observations
@@ -638,10 +385,11 @@ Image SHA256: `210a59774a1ca56ab647a9a6d360c9ae355df72584935141e21feb228ab77bc6`
 These signals are retained for model/configuration follow-up and are not
 presented as confirmed mlx-vlm issues.
 
-| Owner                          | Models                                                                                 | Observation                                 | Evidence                                                                                                                                                                                | Routing   |
-|--------------------------------|----------------------------------------------------------------------------------------|---------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
-| model configuration/repository | mlx-community/Step-3.7-Flash-oQ2e                                                      | Processor config is missing image processor |                                                                                                                                                                                         | confirmed |
-| model                          | mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX, mlx-community/Kimi-VL-A3B-Thinking-8bit | Generated text is mixed-script token-soup   | Here are my reasoning steps:<br>We need to produce a catalog entry with Title, Description, Keywords sections. The image is a nighttime city street scene with a tall glass skyscrap... | probable  |
+| Owner                          | Models                                           | Observation                                 | Evidence                                                                                                                                                                                | Routing   |
+|--------------------------------|--------------------------------------------------|---------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| model configuration/repository | mlx-community/Step-3.7-Flash-oQ2e                | Processor config is missing image processor |                                                                                                                                                                                         | confirmed |
+| model                          | mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX    | Generated text is mixed-script token-soup   | Here are my reasoning steps:<br>We need to produce a catalog record with three sections: Title, Description, Keywords. The image is a nighttime cityscape of a tall skyscraper, like... | probable  |
+| model                          | mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 | Generated text is mixed-script token-soup   | Let's tackle this step by step. First, the title needs to be 5-10 words, concrete and factual. The authoritative context gives location as London, England, UK, and the building...     | probable  |
 <!-- markdownlint-enable MD060 -->
 <!-- markdownlint-disable MD060 -->
 
@@ -692,5 +440,5 @@ presented as confirmed mlx-vlm issues.
 | huggingface-hub provenance | wheel; ~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages                                                                                   |
 | transformers provenance    | wheel; ~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages                                                                                   |
 | tokenizers provenance      | wheel; ~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages                                                                                   |
-| check_models provenance    | source-tree; revision 2a7352f1e8b6; ~/Documents/AI/mlx/check_models                                                                             |
+| check_models provenance    | source-tree; revision 88b6a8195c11; ~/Documents/AI/mlx/check_models                                                                             |
 <!-- markdownlint-enable MD060 -->

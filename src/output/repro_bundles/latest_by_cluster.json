@@ -1,30 +1,8 @@
 {
   "clusters": {
-    "mlx-vlm-mlx_long-context_001": {
-      "bundles": [
-        "20260719T014155Z_005_Qwen_Qwen3-VL-2B-Instruct_mlx_vlm_mlx_long_context_001.json",
-        "20260719T014155Z_006_mlx-community_Qwen3-VL-2B-Instruct-bf16_mlx_vlm_mlx_long_context_001.json",
-        "20260719T014155Z_007_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_mlx_long_context_001.json",
-        "20260719T014155Z_008_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_mlx_long_context_001.json"
-      ],
-      "models": [
-        "Qwen/Qwen3-VL-2B-Instruct",
-        "mlx-community/Qwen3-VL-2B-Instruct-bf16",
-        "mlx-community/Qwen3-VL-2B-Thinking-bf16",
-        "mlx-community/X-Reasoner-7B-8bit"
-      ]
-    },
-    "mlx-vlm_stop-token_001": {
-      "bundles": [
-        "20260719T014155Z_002_mlx-community_MiniCPM-V-4.6-8bit_mlx_vlm_stop_token_001.json"
-      ],
-      "models": [
-        "mlx-community/MiniCPM-V-4.6-8bit"
-      ]
-    },
     "model-configuration-repository_model-config-processor-load-processor_001": {
       "bundles": [
-        "20260719T014155Z_001_mlx-community_Step-3.7-Flash-oQ2e_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_3c.json"
+        "20260719T193722Z_002_mlx-community_Step-3.7-Flash-oQ2e_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_3c.json"
       ],
       "models": [
         "mlx-community/Step-3.7-Flash-oQ2e"
@@ -32,56 +10,42 @@
     },
     "model_text-sanity_001": {
       "bundles": [
-        "20260719T014155Z_003_mlx-community_Kimi-VL-A3B-Thinking-8bit_model_text_sanity_001.json",
-        "20260719T014155Z_004_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_model_text_sanity_001.json"
+        "20260719T193722Z_004_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_model_text_sanity_001.json"
       ],
       "models": [
-        "mlx-community/Kimi-VL-A3B-Thinking-8bit",
         "mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX"
+      ]
+    },
+    "model_text-sanity_002": {
+      "bundles": [
+        "20260719T193722Z_003_mlx-community_ERNIE-4.5-VL-28B-A3B-Thinking-bf16_model_text_sanity_002.json"
+      ],
+      "models": [
+        "mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16"
       ]
     }
   },
-  "generated_at_utc": "2026-07-19T01:41:56+00:00",
+  "generated_at_utc": "2026-07-19T19:37:23+00:00",
   "models": {
-    "Qwen/Qwen3-VL-2B-Instruct": {
-      "bundle": "20260719T014155Z_005_Qwen_Qwen3-VL-2B-Instruct_mlx_vlm_mlx_long_context_001.json",
-      "issue_cluster_id": "mlx-vlm-mlx_long-context_001",
-      "issue_kind": "cutoff_degraded"
-    },
     "mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX": {
-      "bundle": "20260719T014155Z_004_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_model_text_sanity_001.json",
+      "bundle": "20260719T193722Z_004_mlx-community_Apriel-1.5-15b-Thinker-6bit-MLX_model_text_sanity_001.json",
       "issue_cluster_id": "model_text-sanity_001",
       "issue_kind": "cutoff_degraded"
     },
-    "mlx-community/Kimi-VL-A3B-Thinking-8bit": {
-      "bundle": "20260719T014155Z_003_mlx-community_Kimi-VL-A3B-Thinking-8bit_model_text_sanity_001.json",
-      "issue_cluster_id": "model_text-sanity_001",
+    "mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16": {
+      "bundle": "20260719T193722Z_003_mlx-community_ERNIE-4.5-VL-28B-A3B-Thinking-bf16_model_text_sanity_002.json",
+      "issue_cluster_id": "model_text-sanity_002",
       "issue_kind": "cutoff_degraded"
     },
-    "mlx-community/MiniCPM-V-4.6-8bit": {
-      "bundle": "20260719T014155Z_002_mlx-community_MiniCPM-V-4.6-8bit_mlx_vlm_stop_token_001.json",
-      "issue_cluster_id": "mlx-vlm_stop-token_001",
-      "issue_kind": "harness"
-    },
-    "mlx-community/Qwen3-VL-2B-Instruct-bf16": {
-      "bundle": "20260719T014155Z_006_mlx-community_Qwen3-VL-2B-Instruct-bf16_mlx_vlm_mlx_long_context_001.json",
-      "issue_cluster_id": "mlx-vlm-mlx_long-context_001",
-      "issue_kind": "cutoff_degraded"
-    },
-    "mlx-community/Qwen3-VL-2B-Thinking-bf16": {
-      "bundle": "20260719T014155Z_007_mlx-community_Qwen3-VL-2B-Thinking-bf16_mlx_vlm_mlx_long_context_001.json",
-      "issue_cluster_id": "mlx-vlm-mlx_long-context_001",
-      "issue_kind": "cutoff_degraded"
+    "mlx-community/Molmo-7B-D-0924-8bit": {
+      "bundle": "20260719T193722Z_001_mlx-community_Molmo-7B-D-0924-8bit_UNKNOWN_MODEL_LOAD_NETWORK_ERROR_3bddb6c.json",
+      "issue_cluster_id": null,
+      "issue_kind": null
     },
     "mlx-community/Step-3.7-Flash-oQ2e": {
-      "bundle": "20260719T014155Z_001_mlx-community_Step-3.7-Flash-oQ2e_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_3c.json",
+      "bundle": "20260719T193722Z_002_mlx-community_Step-3.7-Flash-oQ2e_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_3c.json",
       "issue_cluster_id": "model-configuration-repository_model-config-processor-load-processor_001",
       "issue_kind": "runtime_failure"
-    },
-    "mlx-community/X-Reasoner-7B-8bit": {
-      "bundle": "20260719T014155Z_008_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_mlx_long_context_001.json",
-      "issue_cluster_id": "mlx-vlm-mlx_long-context_001",
-      "issue_kind": "cutoff_degraded"
     }
   },
   "schema_version": "1.0"
