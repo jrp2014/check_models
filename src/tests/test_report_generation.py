@@ -737,12 +737,12 @@ def test_failed_partial_output_keeps_runtime_failure_owner() -> None:
     assert cached.maintainer_triage_payload is not None
     assert cached.maintainer_triage_payload["issue_kind"] == "runtime_failure"
     assert cached.maintainer_triage_payload["suspected_owner"] == "mlx"
-    assert "load" in cached.maintainer_triage_payload["summary"].casefold()
+    assert "boom" in cached.maintainer_triage_payload["summary"].casefold()
     assert "formatting" not in cached.maintainer_triage_payload["summary"].casefold()
     assert "text-sanity" not in cached.maintainer_triage_payload["summary"].casefold()
 
     review_rows = dict(check_models._build_review_block_rows(cached))
-    assert "load" in review_rows["Why"].casefold()
+    assert review_rows["Why"] == "execution failure"
     assert "formatting" not in review_rows["Why"].casefold()
     assert "text-sanity" not in review_rows["Why"].casefold()
 
@@ -965,7 +965,7 @@ def test_reliability_gated_candidate_sections_exclude_crashes(tmp_path: Path) ->
     structured_candidates = _extract_markdown_subsection(
         content,
         "## Structured Metadata Candidates",
-        end_headings=("## Repository Variant Comparisons",),
+        end_headings=("## Complete Current-Run Matrix",),
     )
     assert "org/passed" in caption_candidates
     assert "org/crashed" not in caption_candidates
@@ -1082,7 +1082,7 @@ def test_capability_and_structured_sections_name_policy_and_scope(tmp_path: Path
     )
 
 
-def test_ineligible_current_view_cannot_receive_positive_capability_recommendation(
+def test_quality_score_indicators_do_not_override_canonical_recommendation(
     tmp_path: Path,
 ) -> None:
     result = _make_success("org/ineligible-caption")
@@ -1120,12 +1120,11 @@ def test_ineligible_current_view_cannot_receive_positive_capability_recommendati
 
     payload = json.loads(payload_path.read_text(encoding="utf-8"))
     model = payload["models"][0]
-    assert view.eligible is False
-    assert "configured chooser threshold" in view.eligibility_reason
-    assert model["current_status"] == "ineligible"
-    assert model["recommendation"] == "current-run-ineligible"
-    assert model["recommendation"] not in {"caption", "caption+keywords", "keywords"}
-    assert "configured chooser threshold" in model["latest_signal"]
+    assert view.eligible is True
+    assert view.eligibility_reason == "eligible"
+    assert model["current_status"] == "passed"
+    assert model["recommendation"] != "current-run-ineligible"
+    assert "configured chooser threshold" not in model["latest_signal"]
 
 
 def test_model_selection_renders_canonical_policy_taxonomy(tmp_path: Path) -> None:
@@ -1197,6 +1196,39 @@ def test_model_selection_renders_canonical_policy_taxonomy(tmp_path: Path) -> No
             end_headings=(next_heading,),
         )
         assert "org/crashed" not in section
+
+
+def test_quick_chooser_labels_caveated_rows_as_fallbacks(tmp_path: Path) -> None:
+    """A tier without a recommended model may show, but not promote, a caveat."""
+    caveated = _make_harness_success(
+        "org/caveated",
+        text="A usable caption with an unconfirmed leaked wrapper <|end|>.",
+        harness_type="stop_token",
+        harness_detail="token_leak:<|end|>",
+    )
+    context = _build_report_render_context(
+        results=[caveated],
+        prompt="Describe the image.",
+        eval_mode="triage",
+    )
+    output = tmp_path / "selection.md"
+
+    check_models.generate_model_selection_report(
+        [caveated],
+        output,
+        prompt="Describe the image.",
+        report_context=context,
+    )
+
+    content = output.read_text(encoding="utf-8")
+    section = _extract_markdown_subsection(
+        content,
+        "### Quality if memory allows",
+        end_headings=("### Current failures / avoid",),
+    )
+    assert "Fallback only" in section
+    assert "`org/caveated`" in section
+    assert "`caveat`" in section
 
 
 def _make_harness_success(
@@ -1296,7 +1328,7 @@ def test_thinking_template_mismatch_requires_reproduction_not_issue_draft() -> N
 
     triage = check_models._maintainer_triage_for_result(result)
     assert triage is not None
-    assert triage["issue_readiness"] == "needs-reproduction"
+    assert triage["issue_readiness"] == "needs_reproduction"
     assert triage["issue_subtype"] == "thinking_configuration"
     assert triage["confidence"] == "medium"
     assert triage["suspected_owner"] == "model-config / mlx-vlm"
@@ -1340,7 +1372,7 @@ def test_single_visual_context_boundary_requires_controlled_rerun() -> None:
 
     triage = check_models._maintainer_triage_for_result(result)
     assert triage is not None
-    assert triage["issue_readiness"] == "needs-reproduction"
+    assert triage["issue_readiness"] == "needs_reproduction"
     assert triage["issue_subtype"] == "context_boundary"
     assert "reduced-image" in triage["next_action"]
     snapshot = DiagnosticsSnapshot(harness_results=((result, "Cat."),))
@@ -1373,7 +1405,7 @@ def test_capped_long_context_signal_still_requires_controlled_rerun() -> None:
 
     triage = check_models._maintainer_triage_for_result(result)
     assert triage is not None
-    assert triage["issue_readiness"] == "needs-reproduction"
+    assert triage["issue_readiness"] == "needs_reproduction"
     assert (
         check_models._build_issue_clusters(
             DiagnosticsSnapshot(harness_results=((result, "- " * 500),)),
@@ -1885,7 +1917,7 @@ def test_report_context_caches_one_canonical_assessment_per_model(tmp_path: Path
         wraps=check_models._build_canonical_assessment,
     ) as build_assessment:
         context = _build_report_render_context(results=results, prompt="Describe this image.")
-        assert build_assessment.call_count == len(results)
+        assert build_assessment.call_count == len(results), build_assessment.call_args_list
         assert len(context.assessments) == len(results)
         assert all(
             isinstance(assessment, check_models.CanonicalAssessment)
@@ -1932,8 +1964,8 @@ def test_report_context_caches_one_canonical_assessment_per_model(tmp_path: Path
 @pytest.mark.parametrize(
     ("success", "outcome", "anomalies", "overlap", "expected"),
     [
-        (False, "failed", (), "not_assessable", "not-evaluated"),
-        (False, "indeterminate", (), "not_assessable", "not-evaluated"),
+        (False, "failed", (), "not_assessable", "not_evaluated"),
+        (False, "indeterminate", (), "not_assessable", "not_evaluated"),
         (True, "completed", ("missing_required_sections",), "some_overlap", "avoid"),
         (True, "completed", ("encoding_corruption",), "some_overlap", "avoid"),
         (True, "completed", ("token_cap_truncation",), "some_overlap", "caveat"),
@@ -1994,7 +2026,7 @@ def test_canonical_assessments_keep_user_and_maintainer_decisions_independent() 
         crash,
     )
 
-    assert crash_assessment.model_user.current_recommendation == "not-evaluated"
+    assert crash_assessment.model_user.current_recommendation == "not_evaluated"
     assert crash_assessment.maintainer.maintainer_readiness == "issue_ready"
 
     poor_output = PerformanceResult(
@@ -2369,8 +2401,9 @@ class TestHtmlReportEdgeCases:
         )
 
         content = out.read_text(encoding="utf-8")
-        assert content.count('data-status="success"') == 1
+        assert content.count('data-status="completed"') == 1
         assert content.count('data-status="failed"') == 1
+        assert 'data-recommendation="not_evaluated"' in content
         assert 'data-error-stage="load"' in content
         assert 'data-error-type="ValueError"' in content
         assert 'data-error-package="mlx-vlm"' in content
@@ -2407,7 +2440,12 @@ class TestHtmlReportEdgeCases:
         assert 'data-compatibility="clean"' in content
         assert "data-prompt-burden=" in content
         assert 'data-recommendation="recommended"' in content
+        assert 'data-failure-origin="unknown"' in content
+        assert 'data-maintainer-readiness="not_applicable"' in content
+        assert 'data-reproduction-status="not_run"' in content
+        assert 'data-keyword-overlap="not_assessable"' in content
         assert '<option value="caveat">Caveat</option>' in content
+        assert '<option value="not_evaluated">Not evaluated</option>' in content
         assert 'class="sort-btn"' in content
         assert "data-sort-value=" in content
         assert "Diffusion Canvas Tokens" not in content
@@ -3117,8 +3155,8 @@ class TestMarkdownReportEdgeCases:
         assert "# Model Selection Brief" in content
         assert "Semantic rankings: ungrounded" in content
         assert "brief captions only" in content
-        assert "Scope: ranked shortlist, not the complete run" in content
-        assert "complete per-model outputs and diagnostics are in" in content
+        assert "Scope: ranked shortlists plus an expandable complete current-run matrix" in content
+        assert "complete outputs and diagnostics are in" in content
         assert "Brief Caption Candidates" in content
         assert "Top 10 ranked candidates for brief captions" in content
         assert "Gen TPS" in content
@@ -3414,7 +3452,8 @@ class TestMarkdownReportEdgeCases:
             "### Current failures / avoid",
             end_headings=("## Brief Caption Candidates",),
         )
-        assert "`org/label-caption`" in avoid
+        assert "`org/label-caption`" not in avoid
+        assert "`caveat`" in content
 
     def test_model_selection_report_uses_metadata_when_available(
         self,
@@ -3656,7 +3695,7 @@ class TestMarkdownGalleryReport:
         assert "_Owner:_" in content
         assert "_Next step:_" in content
         assert "### ✅ org/good" in content
-        assert "### ❌ org/bad" in content
+        assert "### ❔ org/bad" in content
 
     def test_gallery_icon_uses_recommendation_not_execution_success(self, tmp_path: Path) -> None:
         """Completed output with a presentation warning should use the caveat icon."""
@@ -3835,13 +3874,13 @@ class TestMarkdownGalleryReport:
         assert "[`org/good`](#model-org-good)" in summary
         assert "quality output" in summary
         assert "[`org/risky`](#model-org-risky)" in summary
-        assert "`avoid` / `harness`" in summary
+        assert "`caveat` / `harness`" in summary
         assert "harness:stop-token" in summary
         assert r"answer with \| pipe" in summary
         assert "[harness:stop-token] answer" not in summary
         assert "&lt;think&gt;leaked marker&lt;/think&gt;" in summary
         assert "[`org/bad`](#model-org-bad)" in summary
-        assert "`avoid` / `runtime failure`" in summary
+        assert "`not evaluated` / `runtime failure`" in summary
         assert "mlx-vlm; load" in summary
         assert "Error: load - boom" in summary
 

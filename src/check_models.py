@@ -1176,6 +1176,28 @@ class HistoryModelResultRecord(TypedDict):
     text_sanity_issue_type: NotRequired[str | None]
     generation_loop_type: NotRequired[str | None]
     compatibility_status: NotRequired[str]
+    current_recommendation: NotRequired[Literal["recommended", "caveat", "avoid", "not_evaluated"]]
+    failure_origin: NotRequired[
+        Literal[
+            "harness_preflight",
+            "upstream_load",
+            "upstream_generation",
+            "external_service",
+            "unknown",
+        ]
+    ]
+    maintainer_readiness: NotRequired[
+        Literal[
+            "issue_ready",
+            "needs_reproduction",
+            "harness_observation",
+            "not_applicable",
+        ]
+    ]
+    reproduction_status: NotRequired[
+        Literal["not_run", "confirmed", "not_reproduced", "indeterminate"]
+    ]
+    keyword_overlap: NotRequired[Literal["not_assessable", "no_overlap", "some_overlap"]]
     context_integration_score: NotRequired[float | None]
     draft_improvement_score: NotRequired[float | None]
     visual_description_score: NotRequired[float | None]
@@ -1264,7 +1286,7 @@ class JsonlQualityAnalysisRecord(TypedDict):
 
 
 type ExecutionOutcome = Literal["completed", "failed", "indeterminate"]
-type RecommendationStatus = Literal["recommended", "caveat", "avoid", "not-evaluated"]
+type RecommendationStatus = Literal["recommended", "caveat", "avoid", "not_evaluated"]
 type UpstreamBoundary = Literal["not_started", "load_started", "generation_started"]
 type FailureOrigin = Literal[
     "harness_preflight",
@@ -1295,6 +1317,7 @@ type HistoricalReliability = Literal[
 type OutputAnomaly = Literal[
     "special_token_wrapper",
     "special_token_leak",
+    "harness_contract",
     "thinking_trace",
     "reasoning_budget_exhausted",
     "text_repetition",
@@ -1354,7 +1377,7 @@ class JsonlReviewRecord(TypedDict):
 
 
 type MaintainerConfidence = Literal["high", "medium", "low"]
-type IssueReadiness = Literal["confirmed", "needs-reproduction", "not-evaluated"]
+type IssueReadiness = MaintainerReadiness
 
 
 class JsonlMaintainerTriageRecord(TypedDict, total=False):
@@ -1558,6 +1581,11 @@ class JsonlResultRecord(TypedDict):
     signature_components: NotRequired[JsonlSignatureComponents]
     rerun_summary: NotRequired[JsonlRerunSummary]
     compatibility_status: NotRequired[str]
+    current_recommendation: NotRequired[RecommendationStatus]
+    failure_origin: NotRequired[FailureOrigin]
+    maintainer_readiness: NotRequired[MaintainerReadiness]
+    reproduction_status: NotRequired[ControlledReproductionStatus]
+    keyword_overlap: NotRequired[KeywordOverlapState]
     context_integration_score: NotRequired[float | None]
     draft_improvement_score: NotRequired[float | None]
     visual_description_score: NotRequired[float | None]
@@ -10426,19 +10454,46 @@ def _build_report_render_context(
     maintainer_presentations: list[tuple[str, MaintainerPresentation]] = []
     review_payloads: list[tuple[str, JsonlReviewRecord | None]] = []
     maintainer_triage_payloads: list[tuple[str, JsonlMaintainerTriageRecord | None]] = []
+    failure_narratives: list[tuple[str, FailureNarrative]] = []
     for result in analyzed_results:
         assessment = _build_canonical_assessment(_collect_observed_evidence(result), result)
         review = _build_jsonl_review_record(result)
+        if review is not None:
+            review["user_bucket"] = assessment.model_user.current_recommendation
+            review["owner"] = assessment.maintainer.suspected_owner or _UNKNOWN_OWNER
+            review["evidence"] = list(assessment.model_user.evidence_codes)
         result_with_review = replace(
             result,
             review_payload=review,
             review_payload_ready=True,
         )
         maintainer_triage = (
-            _build_jsonl_maintainer_triage_record(result_with_review, review)
+            _build_jsonl_maintainer_triage_record(
+                result_with_review,
+                review,
+                assessment=assessment.maintainer,
+            )
             if review is not None
             else None
         )
+        if maintainer_triage is not None:
+            maintainer_triage["issue_readiness"] = assessment.maintainer.maintainer_readiness
+            maintainer_triage["suspected_owner"] = (
+                assessment.maintainer.suspected_owner or _UNKNOWN_OWNER
+            )
+            maintainer_triage["confidence"] = assessment.maintainer.owner_confidence or "low"
+            maintainer_triage["next_action"] = assessment.maintainer.next_action
+            maintainer_triage["user_bucket"] = assessment.model_user.current_recommendation
+            maintainer_triage["evidence"] = list(assessment.maintainer.evidence_codes)
+            if result.success:
+                maintainer_triage["summary"] = (
+                    ", ".join(assessment.maintainer.evidence_codes)
+                    or "No maintainer finding in this run."
+                )
+            else:
+                narrative = _build_failure_narrative(result, triage=maintainer_triage)
+                maintainer_triage["summary"] = narrative.primary_exception
+                failure_narratives.append((result.model_name, narrative))
         resolved_result = replace(
             result_with_review,
             maintainer_triage_payload=maintainer_triage,
@@ -10479,11 +10534,6 @@ def _build_report_render_context(
         prompt=prompt,
         preflight_issues=resolved_preflight_issues,
     )
-    failure_narratives = tuple(
-        (result.model_name, _build_failure_narrative(result))
-        for result in result_set.results
-        if not result.success
-    )
     context = ReportRenderContext(
         result_set=result_set,
         table_data=table_data,
@@ -10505,7 +10555,7 @@ def _build_report_render_context(
             diagnostics_snapshot,
             assessments=dict(assessments),
         ),
-        failure_narratives=failure_narratives,
+        failure_narratives=tuple(failure_narratives),
         assessments=tuple(assessments),
         user_presentations=tuple(user_presentations),
         maintainer_presentations=tuple(maintainer_presentations),
@@ -10562,23 +10612,42 @@ def _escape_html_header_text(header: str) -> str:
 def _html_result_row_attrs(
     result: PerformanceResult,
     recommendation: ModelRecommendationView | None = None,
+    assessment: CanonicalAssessment | None = None,
 ) -> str:
     """Return filter metadata attributes for one result row."""
     attrs = _html_attr("data-model", result.model_name.casefold())
-    if recommendation is not None:
-        attrs += _html_attr("data-compatibility", recommendation.compatibility)
+    if recommendation is not None and assessment is not None:
+        attrs += _html_attr(
+            "data-compatibility",
+            assessment.model_user.compatibility_status,
+        )
         attrs += _html_attr("data-prompt-burden", recommendation.burden.kind)
         attrs += _html_attr(
             "data-recommendation",
-            _recommendation_status_for_result(result),
+            assessment.model_user.current_recommendation,
         )
+        attrs += _html_attr("data-failure-origin", assessment.maintainer.failure_origin)
+        attrs += _html_attr(
+            "data-maintainer-readiness",
+            assessment.maintainer.maintainer_readiness,
+        )
+        attrs += _html_attr(
+            "data-reproduction-status",
+            assessment.maintainer.reproduction_status,
+        )
+        attrs += _html_attr("data-keyword-overlap", assessment.model_user.keyword_overlap)
         attrs += _html_attr(
             "data-peak-memory",
             str(recommendation.peak_memory_gb) if recommendation.peak_memory_gb is not None else "",
         )
-    if result.success:
-        return attrs + _html_class_attr(["success"]) + _html_attr("data-status", "success")
-    if _is_indeterminate_connectivity_failure(result):
+    execution_outcome = (
+        assessment.model_user.execution_outcome
+        if assessment is not None
+        else _execution_outcome(result)
+    )
+    if execution_outcome == "completed":
+        return attrs + _html_class_attr(["success"]) + _html_attr("data-status", "completed")
+    if execution_outcome == "indeterminate":
         return (
             attrs
             + _html_class_attr(["indeterminate"])
@@ -10626,6 +10695,7 @@ def _build_html_results_table(
     field_names: Sequence[str],
     sorted_results: Sequence[PerformanceResult],
     recommendations: Mapping[str, ModelRecommendationView] | None = None,
+    assessments: Mapping[str, CanonicalAssessment] | None = None,
 ) -> str:
     """Build the escaped HTML results table without regex post-processing."""
     numeric_columns: frozenset[int] = frozenset(
@@ -10656,8 +10726,13 @@ def _build_html_results_table(
             if recommendations is not None and result is not None
             else None
         )
+        assessment = (
+            assessments.get(result.model_name)
+            if assessments is not None and result is not None
+            else None
+        )
         parts.append(
-            f"<tr{_html_result_row_attrs(result, recommendation) if result is not None else ''}>"
+            f"<tr{_html_result_row_attrs(result, recommendation, assessment) if result is not None else ''}>"
         )
         for column_index, value in enumerate(row):
             field_name = field_names[column_index] if column_index < len(field_names) else ""
@@ -11938,6 +12013,7 @@ def _format_run_contract_parts(
         "brief captions; structured title/description/keywords when descriptive image metadata "
         "is available"
     )
+    proxy_scope = "Automated metadata-assisted proxy; one image; no human visual ground truth."
 
     if html_output:
         return [
@@ -11948,6 +12024,7 @@ def _format_run_contract_parts(
             f"{'yes' if policy.metadata_exposed_to_prompt else 'no'}</li>",
             f"<li><b>Semantic rankings:</b> {html.escape(semantic_rankings)}</li>",
             f"<li><b>Primary selection tasks:</b> {html.escape(primary_selection_tasks)}</li>",
+            f"<li><b>Evidence scope:</b> {html.escape(proxy_scope)}</li>",
             "</ul>",
         ]
 
@@ -11959,6 +12036,7 @@ def _format_run_contract_parts(
     )
     parts.append(f"- Semantic rankings: {semantic_rankings}")
     parts.append(f"- Primary selection tasks: {primary_selection_tasks}")
+    parts.append(f"- Evidence scope: {proxy_scope}")
     parts.append("")
     return parts
 
@@ -12380,10 +12458,10 @@ def _recommendation_status_for_result(result: PerformanceResult) -> Recommendati
     if review is not None:
         bucket = review["user_bucket"]
         match bucket:
-            case "recommended" | "caveat" | "avoid" | "not-evaluated":
+            case "recommended" | "caveat" | "avoid" | "not_evaluated":
                 return bucket
     if _is_indeterminate_connectivity_failure(result):
-        return "not-evaluated"
+        return "not_evaluated"
     return "caveat" if result.success else "avoid"
 
 
@@ -12431,23 +12509,11 @@ def _issue_readiness_for_result(
     review: JsonlReviewRecord,
     analysis: GenerationQualityAnalysis | None,
 ) -> IssueReadiness:
-    """Return whether maintainer evidence is issue-ready or needs a control run."""
-    if _is_indeterminate_connectivity_failure(result):
-        return "not-evaluated"
-    if not result.success:
-        return "confirmed"
-    needs_controlled_reproduction = _has_template_opened_thinking(result) or (
-        result.rerun_evidence is None
-        and (
-            review["verdict"] == "context_budget"
-            or (analysis is not None and analysis.harness_issue_type == "long_context")
-        )
-    )
-    if needs_controlled_reproduction:
-        return "needs-reproduction"
-    if analysis is not None and analysis.has_harness_issue:
-        return "confirmed"
-    return "needs-reproduction"
+    """Project canonical maintainer readiness into the legacy triage view."""
+    del review, analysis
+    return _classify_maintainer_assessment(
+        evidence=_collect_observed_evidence(result), result=result
+    ).maintainer_readiness
 
 
 def _review_issue_subtype(
@@ -12639,10 +12705,15 @@ def _build_jsonl_maintainer_triage_record(
     review: JsonlReviewRecord,
     *,
     issue_cluster: IssueCluster | None = None,
+    assessment: MaintainerAssessment | None = None,
 ) -> JsonlMaintainerTriageRecord:
     """Build an action-oriented maintainer triage payload for one result."""
     analysis = _review_analysis_for_result(result)
-    issue_readiness = _issue_readiness_for_result(result, review, analysis)
+    issue_readiness = (
+        assessment.maintainer_readiness
+        if assessment is not None
+        else _issue_readiness_for_result(result, review, analysis)
+    )
     suspected_owner = review["owner"]
     if _has_template_opened_thinking(result):
         suspected_owner = "model-config / mlx-vlm"
@@ -12681,7 +12752,7 @@ def _build_jsonl_maintainer_triage_record(
         triage["nontext_prompt_ratio"] = review["nontext_prompt_ratio"]
     triage["prompt_burden_kind"] = review.get("prompt_burden_kind", "unknown")
     triage["prompt_burden_source"] = review.get("prompt_burden_source", "unavailable")
-    if issue_cluster is not None and issue_readiness == "confirmed":
+    if issue_cluster is not None and issue_readiness == "issue_ready":
         triage["issue_cluster_id"] = issue_cluster.cluster_id
         triage["issue_cluster_path"] = _issue_cluster_path(issue_cluster)
         triage["acceptance_signal"] = issue_cluster.acceptance_signal
@@ -14166,6 +14237,8 @@ def _output_anomalies(result: PerformanceResult) -> tuple[OutputAnomaly, ...]:
         anomalies.append("special_token_wrapper")
     if "token_leak:" in harness_details:
         anomalies.append("special_token_leak")
+    if analysis.has_harness_issue:
+        anomalies.append("harness_contract")
     if analysis.has_thinking_trace:
         anomalies.append("thinking_trace")
     if analysis.thinking_trace_incomplete and analysis.likely_capped:
@@ -14237,7 +14310,7 @@ def _classify_model_user_assessment(
     del result
     anomaly_set = frozenset(evidence.anomalies)
     if execution_outcome != "completed":
-        recommendation: RecommendationStatus = "not-evaluated"
+        recommendation: RecommendationStatus = "not_evaluated"
     elif anomaly_set & _SEVERE_MODEL_OUTPUT_ANOMALIES or (
         evidence.keyword_overlap == "no_overlap" and "irrelevant_output_smell" in anomaly_set
     ):
@@ -14257,6 +14330,10 @@ def _classify_model_user_assessment(
         compatibility = "clean"
 
     evidence_codes: tuple[str, ...] = evidence.anomalies
+    if execution_outcome == "indeterminate":
+        evidence_codes += ("external_connectivity",)
+    elif execution_outcome == "failed":
+        evidence_codes += ("execution_failure",)
     if evidence.keyword_overlap == "no_overlap":
         evidence_codes += ("keyword_no_overlap",)
     return ModelUserAssessment(
@@ -14353,7 +14430,7 @@ def _model_user_presentation(assessment: ModelUserAssessment) -> ModelUserPresen
         "recommended": ("Recommended", "✓"),
         "caveat": ("Caveat", "△"),
         "avoid": ("Avoid", "✗"),
-        "not-evaluated": ("Not evaluated", "—"),
+        "not_evaluated": ("Not evaluated", "—"),
     }
     label, icon = labels[assessment.current_recommendation]
     reason = ", ".join(assessment.evidence_codes) or "no flagged evidence"
@@ -14376,6 +14453,7 @@ class ModelRecommendationView:
 
     result: PerformanceResult
     compatibility: CompatibilityStatus
+    current_recommendation: RecommendationStatus
     eligible: bool
     eligibility_reason: str
     visual_score: float | None
@@ -18169,7 +18247,7 @@ def _build_full_html_document(
         <div>
             <label>Model <input id="model-search" type="search" placeholder="Search models"></label>
             <label>Status <select id="status-filter">
-                <option value="all">All</option><option value="success">Completed</option>
+                <option value="all">All</option><option value="completed">Completed</option>
                 <option value="failed">Failed</option>
                 <option value="indeterminate">Indeterminate</option>
             </select></label>
@@ -18190,7 +18268,7 @@ def _build_full_html_document(
                 <option value="recommended">Recommended</option>
                 <option value="caveat">Caveat</option>
                 <option value="avoid">Avoid</option>
-                <option value="not-evaluated">Not evaluated</option>
+                <option value="not_evaluated">Not evaluated</option>
             </select></label>
             <label>Max peak GB <input id="max-memory-filter" type="number" min="0" step="0.5"></label>
         </div>
@@ -18503,6 +18581,7 @@ def generate_html_report(
         field_names=field_names,
         sorted_results=report_context.result_set.results,
         recommendations=_recommendations_by_model(report_context),
+        assessments=_assessments_by_model(report_context),
     )
 
     suppress_cataloging_scores = report_context.mode_policy.suppress_cataloging_scores
@@ -19070,31 +19149,20 @@ def _caption_usefulness_score(text: str) -> float:
 
 
 def _recommendation_eligibility(
-    result: PerformanceResult,
-    review: JsonlReviewRecord | None,
-    analysis: GenerationQualityAnalysis | None,
+    assessment: ModelUserAssessment,
     *,
     has_output: bool,
-    hygiene_score: float | None,
 ) -> tuple[CompatibilityStatus, str]:
     """Return compatibility and the first current-run eligibility gate."""
-    if _is_indeterminate_connectivity_failure(result):
-        return "indeterminate", "model input was unreachable; outcome indeterminate"
-    if not result.success:
-        return "crashed", "current run crashed"
-    if analysis is not None and analysis.has_harness_issue:
-        return "integration-warning", "integration warning requires review"
-    compatibility: CompatibilityStatus = "clean"
-    eligibility_reason = "eligible"
-    if review is None:
-        eligibility_reason = "quality review unavailable"
-    elif review["user_bucket"] != "recommended":
-        eligibility_reason = f"current review says {review['user_bucket']}"
-    elif not has_output:
-        eligibility_reason = "no usable output text"
-    elif hygiene_score is None or hygiene_score < MODEL_SELECTION_CHOOSER_MIN_HYGIENE_SCORE:
-        eligibility_reason = "output is below the configured chooser threshold"
-    return compatibility, eligibility_reason
+    if assessment.current_recommendation != "recommended":
+        return (
+            assessment.compatibility_status,
+            f"current recommendation is {assessment.current_recommendation}",
+        )
+    return (
+        assessment.compatibility_status,
+        "eligible" if has_output else "no usable output text",
+    )
 
 
 def _recommendation_visual_score(
@@ -19149,6 +19217,7 @@ def _build_model_recommendation_views(
     """Build one canonical recommendation view per current-run model."""
     utility_by_model = {row.result.model_name: row for row in context.triage.utility_rows}
     narrative_by_model = _failure_narratives_by_model(context)
+    assessments = _assessments_by_model(context)
     views: list[ModelRecommendationView] = []
     for result in context.result_set.results:
         review = _review_for_result(result)
@@ -19157,12 +19226,10 @@ def _build_model_recommendation_views(
         utility = utility_by_model.get(result.model_name)
         text = _generation_text_value(result.generation).strip()
         hygiene_score = _model_selection_score(result) if review is not None else None
+        model_user_assessment = assessments[result.model_name].model_user
         compatibility, eligibility_reason = _recommendation_eligibility(
-            result,
-            review,
-            analysis,
+            model_user_assessment,
             has_output=bool(text),
-            hygiene_score=hygiene_score,
         )
         caption_score = _caption_usefulness_score(text) if text else None
         visual_score = _recommendation_visual_score(
@@ -19177,6 +19244,7 @@ def _build_model_recommendation_views(
             ModelRecommendationView(
                 result=result,
                 compatibility=compatibility,
+                current_recommendation=model_user_assessment.current_recommendation,
                 eligible=eligibility_reason == "eligible",
                 eligibility_reason=eligibility_reason,
                 visual_score=visual_score,
@@ -19285,6 +19353,11 @@ def _machine_artifact_tsv_cells(facts: MachineArtifactFacts) -> tuple[str, ...]:
 
     return (
         facts.compatibility_status,
+        facts.current_recommendation,
+        facts.failure_origin,
+        facts.maintainer_readiness,
+        facts.reproduction_status,
+        facts.keyword_overlap,
         optional_score(facts.context_integration_score),
         optional_score(facts.draft_improvement_score),
         optional_score(facts.visual_description_score),
@@ -19490,10 +19563,7 @@ def _rank_current_recommendations(
 
 def _model_recommendation_status(view: ModelRecommendationView) -> str:
     """Return a concise human-facing status for a recommendation view."""
-    review = _review_for_result(view.result)
-    if review is None:
-        return _recommendation_status_for_result(view.result)
-    return _review_display_bucket_label(review["user_bucket"], review=review)
+    return view.current_recommendation.replace("_", " ")
 
 
 def _recommendation_icon(status: RecommendationStatus) -> str:
@@ -19502,7 +19572,7 @@ def _recommendation_icon(status: RecommendationStatus) -> str:
         "recommended": "✅",
         "caveat": "⚠️",
         "avoid": "❌",
-        "not-evaluated": "❔",
+        "not_evaluated": "❔",
     }[status]
 
 
@@ -19543,6 +19613,7 @@ def _append_model_selection_chooser_section(
     views: Sequence[ModelRecommendationView],
     policy_name: str,
     empty_text: str,
+    fallback: bool = False,
     recommended_working_set_bytes: int | None = None,
 ) -> None:
     """Append one compact practical chooser bucket."""
@@ -19558,6 +19629,14 @@ def _append_model_selection_chooser_section(
     if not views:
         md.extend([f"- {empty_text}", ""])
         return
+    if fallback:
+        md.extend(
+            [
+                "Fallback only: no recommended row met this tier; the rows below retain "
+                "their current-run caveat status.",
+                "",
+            ]
+        )
     md.extend(
         render_report_markdown(
             (
@@ -19584,6 +19663,14 @@ def _append_model_selection_quick_chooser(
     recommended_working_set_bytes: int | None = None,
 ) -> None:
     """Append practical model-user chooser buckets before the full shortlist."""
+    caveated = [view for view in views if view.current_recommendation == "caveat"]
+
+    def with_fallback(
+        recommended: Sequence[ModelRecommendationView],
+        fallbacks: Sequence[ModelRecommendationView],
+    ) -> tuple[Sequence[ModelRecommendationView], bool]:
+        return (recommended, False) if recommended else (fallbacks[:1], bool(fallbacks))
+
     under_4gb = _rank_under_memory_budget(
         views,
         MODEL_SELECTION_CHOOSER_SMALL_MEMORY_GB,
@@ -19594,9 +19681,40 @@ def _append_model_selection_quick_chooser(
     )[:MODEL_SELECTION_CHOOSER_ROW_LIMIT]
     fastest = _rank_efficiency_aware(views)[:MODEL_SELECTION_CHOOSER_ROW_LIMIT]
     quality_any_memory = _rank_quality_first(views)[:MODEL_SELECTION_CHOOSER_ROW_LIMIT]
-    current_avoid = [view for view in views if not view.eligible][
-        :MODEL_SELECTION_CHOOSER_AVOID_ROW_LIMIT
-    ]
+    caveated_by_quality = _rank_current_recommendations(caveated)
+    under_4gb, under_4gb_fallback = with_fallback(
+        under_4gb,
+        [
+            view
+            for view in caveated_by_quality
+            if view.peak_memory_gb is not None
+            and view.peak_memory_gb <= MODEL_SELECTION_CHOOSER_SMALL_MEMORY_GB
+        ],
+    )
+    under_8gb, under_8gb_fallback = with_fallback(
+        under_8gb,
+        [
+            view
+            for view in caveated_by_quality
+            if view.peak_memory_gb is not None
+            and view.peak_memory_gb <= MODEL_SELECTION_CHOOSER_MEDIUM_MEMORY_GB
+        ],
+    )
+    fastest, fastest_fallback = with_fallback(
+        fastest,
+        sorted(
+            caveated,
+            key=lambda view: view.generation_tps or -1.0,
+            reverse=True,
+        ),
+    )
+    quality_any_memory, quality_fallback = with_fallback(
+        quality_any_memory,
+        caveated_by_quality,
+    )
+    current_avoid = [
+        view for view in views if view.current_recommendation in {"avoid", "not_evaluated"}
+    ][:MODEL_SELECTION_CHOOSER_AVOID_ROW_LIMIT]
     chooser_scope = (
         "In assisted mode, quality rankings combine visual usefulness with correct use "
         "of authoritative metadata; runtime and contract findings remain diagnostic "
@@ -19622,6 +19740,7 @@ def _append_model_selection_quick_chooser(
         views=under_4gb,
         policy_name=f"memory-aware ({policy_name}; budget 4 GB)",
         empty_text="No clean current-run candidates fit under this memory budget.",
+        fallback=under_4gb_fallback,
         recommended_working_set_bytes=recommended_working_set_bytes,
     )
     _append_model_selection_chooser_section(
@@ -19630,6 +19749,7 @@ def _append_model_selection_quick_chooser(
         views=under_8gb,
         policy_name=f"memory-aware ({policy_name}; budget 8 GB)",
         empty_text="No clean current-run candidates fit under this memory budget.",
+        fallback=under_8gb_fallback,
         recommended_working_set_bytes=recommended_working_set_bytes,
     )
     _append_model_selection_chooser_section(
@@ -19638,6 +19758,7 @@ def _append_model_selection_quick_chooser(
         views=fastest,
         policy_name="efficiency-aware Pareto frontier (reliability-gated)",
         empty_text="No clean current-run candidates produced usable caption text.",
+        fallback=fastest_fallback,
         recommended_working_set_bytes=recommended_working_set_bytes,
     )
     _append_model_selection_chooser_section(
@@ -19646,6 +19767,7 @@ def _append_model_selection_quick_chooser(
         views=quality_any_memory,
         policy_name=f"quality-first ({policy_name})",
         empty_text="No clean current-run candidates produced usable caption text.",
+        fallback=quality_fallback,
         recommended_working_set_bytes=recommended_working_set_bytes,
     )
     _append_model_selection_chooser_section(
@@ -20016,8 +20138,8 @@ def generate_model_selection_report(
             else "- Primary use cases: brief captions; structured title/description/keywords"
         ),
         (
-            "- Scope: ranked shortlist, not the complete run; complete per-model "
-            "outputs and diagnostics are in `model_gallery.md`."
+            "- Scope: ranked shortlists plus an expandable complete current-run matrix; "
+            "complete outputs and diagnostics are in `model_gallery.md`."
         ),
         "",
     ]
@@ -20116,6 +20238,38 @@ def generate_model_selection_report(
             views,
             policy_name=quality_policy_name,
             recommended_working_set_bytes=report_context.recommended_working_set_bytes,
+        )
+    )
+    md.extend(["## Complete Current-Run Matrix", "", "All attempted models; expand to skim.", ""])
+    md.extend(
+        _guard_markdownlint_block(
+            render_report_markdown(
+                (
+                    ReportDetails(
+                        summary="Expand complete current-run matrix",
+                        blocks=(
+                            ReportTable(
+                                headers=(
+                                    "Model",
+                                    "Peak GB",
+                                    "Gen TPS",
+                                    "Usefulness",
+                                    "Status",
+                                    "Evidence",
+                                ),
+                                rows=_model_selection_chooser_table_rows(
+                                    _rank_current_recommendations(views),
+                                    recommended_working_set_bytes=(
+                                        report_context.recommended_working_set_bytes
+                                    ),
+                                ),
+                                markdown_escaped=True,
+                            ),
+                        ),
+                    ),
+                )
+            ),
+            rules=f"{MARKDOWNLINT_TABLE_PIPE_RULES} {MARKDOWNLINT_DETAILS_RULES}",
         )
     )
 
@@ -20710,6 +20864,11 @@ def _escape_tsv_value(value: str) -> str:
 
 _TSV_OPTIONAL_FIELDS: Final[tuple[str, ...]] = (
     "compatibility_status",
+    "current_recommendation",
+    "failure_origin",
+    "maintainer_readiness",
+    "reproduction_status",
+    "keyword_overlap",
     "context_integration_score",
     "draft_improvement_score",
     "visual_description_score",
@@ -20739,7 +20898,7 @@ def _build_tsv_row_records(
     """Return compact literal TSV records from shared report facts."""
     recommendations = _recommendations_by_model(report_context)
     machine_facts = _machine_facts_by_model(report_context)
-    machine_fields = _TSV_OPTIONAL_FIELDS[:9]
+    machine_fields = _TSV_OPTIONAL_FIELDS[:14]
     records: list[dict[str, str]] = []
     for row, result in zip(rows, results, strict=False):
         record = {
@@ -20753,7 +20912,7 @@ def _build_tsv_row_records(
         record.update(
             {
                 "execution_status": _execution_outcome(result),
-                "recommendation_status": _recommendation_status_for_result(result),
+                "recommendation_status": machine_facts[result.model_name].current_recommendation,
                 "prompt_burden_reason": burden.reason or "",
                 "processed_image_width": (
                     str(burden.processed_width) if burden.processed_width is not None else ""
@@ -20845,6 +21004,11 @@ def generate_tsv_report(
             "execution_status": "execution_status",
             "recommendation_status": "recommendation_status",
             "compatibility_status": "compatibility_status",
+            "current_recommendation": "current_recommendation",
+            "failure_origin": "failure_origin",
+            "maintainer_readiness": "maintainer_readiness",
+            "reproduction_status": "reproduction_status",
+            "keyword_overlap": "keyword_overlap",
             "context_integration_score": "context_integration_score",
             "draft_improvement_score": "draft_improvement_score",
             "visual_description_score": "visual_description_score",
@@ -22188,7 +22352,11 @@ def _failure_owner_for_result(result: PerformanceResult) -> str:
     return result.error_package or _UNKNOWN_OWNER
 
 
-def _build_failure_narrative(result: PerformanceResult) -> FailureNarrative:
+def _build_failure_narrative(
+    result: PerformanceResult,
+    *,
+    triage: JsonlMaintainerTriageRecord | None = None,
+) -> FailureNarrative:
     """Derive one conclusive crash narrative and cautious owner attribution."""
     chain = result.exception_chain
     if chain:
@@ -22201,9 +22369,9 @@ def _build_failure_narrative(result: PerformanceResult) -> FailureNarrative:
         )
         secondary = ()
 
-    triage = _maintainer_triage_for_result(result)
+    resolved_triage = triage if triage is not None else _maintainer_triage_for_result(result)
     suspected_owner = _failure_owner_for_result(result)
-    owner_confidence = triage["confidence"] if triage is not None else "low"
+    owner_confidence = resolved_triage["confidence"] if resolved_triage is not None else "low"
     if suspected_owner.startswith("unresolved: "):
         owner_confidence = "low"
     elif len(chain) > 1 and owner_confidence == "high":
@@ -27655,6 +27823,11 @@ def _populate_history_machine_facts(
 ) -> None:
     """Attach available canonical machine facts to one history model row."""
     record["compatibility_status"] = facts.compatibility_status
+    record["current_recommendation"] = facts.current_recommendation
+    record["failure_origin"] = facts.failure_origin
+    record["maintainer_readiness"] = facts.maintainer_readiness
+    record["reproduction_status"] = facts.reproduction_status
+    record["keyword_overlap"] = facts.keyword_overlap
     record["prompt_burden_kind"] = facts.prompt_burden_kind
     record["prompt_burden_source"] = facts.prompt_burden_source
     if facts.suspected_owner is not None:
@@ -27816,7 +27989,7 @@ def _build_jsonl_metadata_record(
     resolved_eval_mode = _resolve_eval_mode(eval_mode, None)
     record: JsonlMetadataRecord = {
         "_type": "metadata",
-        "format_version": "2.0",
+        "format_version": "2.1",
         "prompt": prompt,
         "system": system_info,
         "timestamp": local_now_str(),
@@ -28033,7 +28206,7 @@ def save_jsonl_report(
     - Shared library/runtime metadata for reproducible maintainer triage
     - Per-result maintainer triage hints for actionable follow-up
 
-    Format (v2.0): First line is a metadata header containing prompt,
+    Format (v2.1): First line is a metadata header containing prompt,
     system_info, and shared runtime context. Per-model result lines follow.
     """
     if report_context is None:
@@ -28089,6 +28262,11 @@ def save_jsonl_report(
                         facts.peak_memory_working_set_pct
                     )
                 record["compatibility_status"] = facts.compatibility_status
+                record["current_recommendation"] = facts.current_recommendation
+                record["failure_origin"] = facts.failure_origin
+                record["maintainer_readiness"] = facts.maintainer_readiness
+                record["reproduction_status"] = facts.reproduction_status
+                record["keyword_overlap"] = facts.keyword_overlap
                 record["prompt_burden_kind"] = facts.prompt_burden_kind
                 record["prompt_burden_source"] = facts.prompt_burden_source
                 if facts.context_integration_score is not None:

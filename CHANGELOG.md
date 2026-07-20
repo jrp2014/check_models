@@ -7,6 +7,11 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Publish the same canonical execution, recommendation, failure-origin,
+  maintainer-readiness, reproduction, and keyword-overlap fields across HTML,
+  TSV, history, and JSONL 2.1; limit chooser rankings to recommended models,
+  retain one clearly caveated fallback when needed, expose an expandable complete
+  run matrix, and label scoring as a one-image metadata-assisted proxy.
 - Gate every issue cluster, queue entry, and draft on canonical `issue_ready`
   evidence; keep needs-reproduction, harness, connectivity, and model-quality
   observations in separate diagnostics sections with complete expandable output

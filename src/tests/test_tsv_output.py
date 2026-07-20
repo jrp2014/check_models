@@ -280,6 +280,11 @@ def test_tsv_is_unpadded_and_includes_canonical_statuses(tmp_path: Path) -> None
     assert record["execution_status"] == "completed"
     assert record["recommendation_status"] == "recommended"
     assert record["compatibility_status"] == "clean"
+    assert record["current_recommendation"] == "recommended"
+    assert record["failure_origin"] == "unknown"
+    assert record["maintainer_readiness"] == "not_applicable"
+    assert record["reproduction_status"] == "not_run"
+    assert record["keyword_overlap"] == "not_assessable"
 
 
 def test_tsv_includes_canonical_prompt_burden_scalars(tmp_path: Path) -> None:

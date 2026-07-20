@@ -113,7 +113,7 @@ def test_save_jsonl_report_creates_file(tmp_path: Path) -> None:
     assert output_file.exists()
     header, rows = _read_jsonl(output_file)
     assert header["_type"] == "metadata"
-    assert header["format_version"] == "2.0"
+    assert header["format_version"] == "2.1"
     assert header["prompt"] == "test"
     assert header["eval_mode"] == "blind"
     assert header["metadata_exposed_to_prompt"] is False
@@ -627,7 +627,7 @@ def test_save_jsonl_report_includes_review_payload_for_success(tmp_path: Path) -
     assert "issue_cluster_id" not in triage
     assert "priority" not in json.dumps(triage).casefold()
     if review["verdict"] == "clean":
-        assert triage["next_action"] == "No immediate maintainer action."
+        assert triage["next_action"] == ("No maintainer issue action is indicated by this run.")
 
 
 def test_save_jsonl_report_includes_review_payload_for_failures(tmp_path: Path) -> None:
@@ -651,7 +651,7 @@ def test_save_jsonl_report_includes_review_payload_for_failures(tmp_path: Path) 
     triage = _require_present(rows[0].get("maintainer_triage"), field_name="maintainer_triage")
     assert review["verdict"] == "runtime_failure"
     assert review["owner"] == "mlx-vlm"
-    assert review["user_bucket"] == "avoid"
+    assert review["user_bucket"] == "not_evaluated"
     assert review["evidence"]
     assert triage["issue_kind"] == "runtime_failure"
     assert triage.get("issue_subtype") == "MLX_VLM_DECODE_RUNTIME"
@@ -664,7 +664,9 @@ def test_save_jsonl_report_includes_review_payload_for_failures(tmp_path: Path) 
     assert triage.get("acceptance_signal")
     assert triage["confidence"] == "high"
     assert triage["suspected_owner"] == "mlx-vlm"
-    assert "Inspect prompt-template" in triage["next_action"]
+    assert triage["next_action"] == (
+        "File the retained reproduction evidence with the suspected owner."
+    )
     assert "priority" not in json.dumps(triage).casefold()
 
 
@@ -1088,10 +1090,15 @@ def test_jsonl_and_history_include_canonical_cross_artifact_facts(tmp_path: Path
     row = rows[0]
     history_row = history["model_results"]["org/enriched"]
 
-    assert header["format_version"] == "2.0"
+    assert header["format_version"] == "2.1"
     assert history["format_version"] == "1.0"
     for machine_row in (row, history_row):
         assert machine_row["compatibility_status"] == "clean"
+        assert machine_row["current_recommendation"] == "recommended"
+        assert machine_row["failure_origin"] == "unknown"
+        assert machine_row["maintainer_readiness"] == "not_applicable"
+        assert machine_row["reproduction_status"] == "not_run"
+        assert machine_row["keyword_overlap"] == "not_assessable"
         assert machine_row["context_integration_score"] == 81.0
         assert machine_row["draft_improvement_score"] == 72.0
         assert machine_row["visual_description_score"] == 91.0
@@ -1389,7 +1396,7 @@ def test_append_history_record_captures_review_fields_for_quality_tracking(
     model_results = _require_present(record.get("model_results"), field_name="model_results")
     model_record = model_results["test-model"]
     assert model_record.get("review_verdict") == analysis.verdict
-    assert model_record.get("review_owner") == analysis.owner
+    assert model_record.get("review_owner") == "unknown"
     assert model_record.get("review_user_bucket") == analysis.user_bucket
     assert model_record.get("prompt_output_ratio") == 64 / 320
 
@@ -1858,11 +1865,11 @@ class TestSchemaVersioning:
     """Tests for JSONL schema versioning and round-trip integrity."""
 
     def test_metadata_format_version_is_2_0(self, tmp_path: Path) -> None:
-        """Current JSONL output uses format_version 2.0."""
+        """Current JSONL output uses format_version 2.1."""
         out = tmp_path / "results.jsonl"
         check_models.save_jsonl_report([], out, prompt="test", system_info={})
         header, _ = _read_jsonl(out)
-        assert header["format_version"] == "2.0"
+        assert header["format_version"] == "2.1"
 
     def test_round_trip_metadata_keys(self, tmp_path: Path) -> None:
         """Metadata record round-trips through JSON with expected keys."""
