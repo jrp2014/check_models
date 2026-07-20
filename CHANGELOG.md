@@ -12,6 +12,10 @@ Notable changes to this project will be documented in this file.
   TSV, history, and JSONL 2.1; limit chooser rankings to recommended models,
   retain one clearly caveated fallback when needed, expose an expandable complete
   run matrix, and label scoring as a one-image metadata-assisted proxy.
+- Replace the capability scorecard's score-derived `Use` label with independent,
+  narrow current-recommendation and historical-reliability fields; summarize only
+  prior lane-matched categorical outcomes, with run count, recommended rate, and a
+  concise variability reason in Markdown and capability JSON 1.1.
 - Gate every issue cluster, queue entry, and draft on canonical `issue_ready`
   evidence; keep needs-reproduction, harness, connectivity, and model-quality
   observations in separate diagnostics sections with complete expandable output

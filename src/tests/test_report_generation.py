@@ -1082,6 +1082,141 @@ def test_capability_and_structured_sections_name_policy_and_scope(tmp_path: Path
     )
 
 
+@pytest.mark.parametrize(
+    ("recommendations", "expected"),
+    [
+        (("recommended", "recommended"), "stable"),
+        (("recommended", "caveat", "not_evaluated"), "variable"),
+        (("recommended",), "insufficient_evidence"),
+        (("avoid", "not_evaluated"), "consistently_unsuitable"),
+    ],
+)
+def test_historical_reliability_uses_lane_matched_outcomes_not_scores(
+    recommendations: tuple[check_models.RecommendationStatus, ...],
+    expected: check_models.HistoricalReliability,
+) -> None:
+    """Reliability is a cautious history summary, not another quality score."""
+    signals = tuple(
+        check_models.ModelCapabilityRunSignal(
+            model="org/history-model",
+            success=recommendation != "not_evaluated",
+            current_recommendation=recommendation,
+            capability_score=100.0 if recommendation == "avoid" else 0.0,
+        )
+        for recommendation in recommendations
+    )
+
+    row = check_models._model_capability_row_from_signals(
+        "org/history-model",
+        signals,
+        suppress_cataloging_scores=False,
+    )
+
+    assert row.historical_reliability == expected
+
+
+@pytest.mark.parametrize(
+    ("history", "current", "expected_reliability"),
+    [
+        (("recommended", "recommended"), "caveat", "stable"),
+        (("recommended", "avoid"), "recommended", "variable"),
+    ],
+)
+def test_capability_current_recommendation_is_independent_of_history(
+    history: tuple[check_models.RecommendationStatus, ...],
+    current: check_models.RecommendationStatus,
+    expected_reliability: check_models.HistoricalReliability,
+) -> None:
+    """Historical aggregation must never rewrite the current-run decision."""
+    signals = [
+        check_models.ModelCapabilityRunSignal(
+            model="org/separate-status",
+            success=recommendation != "not_evaluated",
+            current_recommendation=recommendation,
+        )
+        for recommendation in history
+    ]
+    signals.append(
+        check_models.ModelCapabilityRunSignal(
+            model="org/separate-status",
+            success=current != "not_evaluated",
+            is_current=True,
+            current_recommendation=current,
+        )
+    )
+
+    row = check_models._model_capability_row_from_signals(
+        "org/separate-status",
+        signals,
+        suppress_cataloging_scores=False,
+    )
+
+    assert row.current_recommendation == current
+    assert row.historical_reliability == expected_reliability
+    assert row.runs == len(history)
+
+
+def test_capability_artifacts_expose_current_and_historical_status_separately(
+    tmp_path: Path,
+) -> None:
+    """Markdown and JSON should name the two independent status dimensions."""
+    result = _make_success("org/separate-artifacts")
+    context = _build_report_render_context(
+        results=[result],
+        prompt="Describe this image briefly.",
+        eval_mode="triage",
+    )
+    current_view = replace(context.recommendations[0], current_recommendation="caveat")
+    context = replace(context, recommendations=(current_view,))
+    history_records = tuple(
+        cast(
+            "check_models.HistoryRunRecord",
+            {
+                "_type": "run",
+                "format_version": "1.1",
+                "timestamp": f"2026-07-{day:02d} 10:00:00 +0000",
+                "prompt_hash": f"history-{day}",
+                "prompt_preview": "Describe this image briefly.",
+                "image_path": "prior.jpg",
+                "model_results": {
+                    result.model_name: {
+                        "success": True,
+                        "error_stage": None,
+                        "error_type": None,
+                        "error_package": None,
+                        "current_recommendation": "recommended",
+                    }
+                },
+                "system": {},
+                "library_versions": {},
+                "eval_mode": "triage",
+            },
+        )
+        for day in (17, 18)
+    )
+    markdown_path = tmp_path / "model_capabilities.md"
+    json_path = tmp_path / "model_capabilities.json"
+
+    check_models.generate_model_capability_scorecard(
+        [result],
+        markdown_path,
+        json_path,
+        prompt="Describe this image briefly.",
+        report_context=context,
+        history_records=history_records,
+    )
+
+    markdown = markdown_path.read_text(encoding="utf-8")
+    model = json.loads(json_path.read_text(encoding="utf-8"))["models"][0]
+    assert "Historical reliability" in markdown
+    assert "Current recommendation" in markdown
+    assert model["historical_reliability"] == "stable"
+    assert model["current_recommendation"] == "caveat"
+    assert model["runs"] == 2
+    assert model["recommended_rate"] == 100.0
+    assert model["variability_reason"]
+
+
 def test_quality_score_indicators_do_not_override_canonical_recommendation(
     tmp_path: Path,
 ) -> None:
@@ -1122,8 +1257,8 @@ def test_quality_score_indicators_do_not_override_canonical_recommendation(
     model = payload["models"][0]
     assert view.eligible is True
     assert view.eligibility_reason == "eligible"
-    assert model["current_status"] == "passed"
-    assert model["recommendation"] != "current-run-ineligible"
+    assert model["current_recommendation"] == "recommended"
+    assert model["historical_reliability"] == "insufficient_evidence"
     assert "configured chooser threshold" not in model["latest_signal"]
 
 
@@ -1634,13 +1769,15 @@ class TestModelCapabilityScorecard:
         assert "# Model Capability Scorecard" in markdown
         assert "Grounding: trusted image metadata" in markdown
         assert "`org/model-grounded`" in markdown
-        assert "caption+keywords" in markdown
+        assert "Historical reliability" in markdown
+        assert "Current recommendation" in markdown
         assert model_payload["model"] == "org/model-grounded"
-        assert model_payload["runs"] == 2
+        assert model_payload["runs"] == 1
         assert payload["history_runs_considered"] == 1
         assert model_payload["success_rate"] == 100.0
         assert model_payload["metadata_alignment_avg"] > 70.0
-        assert model_payload["recommendation"] == "caption+keywords"
+        assert model_payload["current_recommendation"] == "recommended"
+        assert model_payload["historical_reliability"] == "insufficient_evidence"
 
     def test_scorecard_marks_triage_keyword_capability_not_evaluated(
         self,
@@ -1769,8 +1906,8 @@ class TestModelCapabilityScorecard:
         payload = json.loads(json_path.read_text(encoding="utf-8"))
 
         assert "`org/history-risk-current-caption`" in markdown
-        assert "caption" in payload["models"][0]["recommendation"]
-        assert payload["models"][0]["recommendation"] != "avoid"
+        assert payload["models"][0]["current_recommendation"] == "recommended"
+        assert payload["models"][0]["historical_reliability"] == "insufficient_evidence"
 
     def test_scorecard_surfaces_current_failure_over_historical_success(
         self,
@@ -1830,9 +1967,9 @@ class TestModelCapabilityScorecard:
         model_payload = payload["models"][0]
 
         assert "Current" in markdown
-        assert "current-run-blocked" in markdown
-        assert model_payload["current_status"] == "failed"
-        assert model_payload["recommendation"] == "current-run-blocked"
+        assert "not_evaluated" in markdown
+        assert model_payload["current_recommendation"] == "not_evaluated"
+        assert model_payload["historical_reliability"] == "insufficient_evidence"
 
 
 def _make_quality_success(

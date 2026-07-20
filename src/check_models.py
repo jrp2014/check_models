@@ -14496,6 +14496,7 @@ class ModelCapabilityRunSignal:
 
     model: str
     success: bool
+    current_recommendation: RecommendationStatus
     is_current: bool = False
     eligible: bool | None = None
     eligibility_reason: str | None = None
@@ -14531,16 +14532,13 @@ class ModelCapabilityRow:
     metadata_alignment_score: float | None
     generation_tps: float | None
     peak_memory_gb: float | None
-    current_status: str
-    recommendation: str
+    current_recommendation: RecommendationStatus
+    historical_reliability: HistoricalReliability
+    variability_reason: str
     signal: str
 
 
-CAPABILITY_UNSTABLE_SUCCESS_RATE: Final[float] = 50.0
-CAPABILITY_AVOID_SCORE: Final[float] = 45.0
-CAPABILITY_GOOD_CAPTION_SCORE: Final[float] = 70.0
-CAPABILITY_GOOD_KEYWORD_SCORE: Final[float] = 65.0
-CAPABILITY_GOOD_METADATA_SCORE: Final[float] = 70.0
+MIN_HISTORICAL_RELIABILITY_RUNS: Final[int] = 2
 
 
 @dataclass(frozen=True)
@@ -19668,8 +19666,8 @@ def _append_model_selection_quick_chooser(
     def with_fallback(
         recommended: Sequence[ModelRecommendationView],
         fallbacks: Sequence[ModelRecommendationView],
-    ) -> tuple[Sequence[ModelRecommendationView], bool]:
-        return (recommended, False) if recommended else (fallbacks[:1], bool(fallbacks))
+    ) -> tuple[list[ModelRecommendationView], bool]:
+        return (list(recommended), False) if recommended else (list(fallbacks[:1]), bool(fallbacks))
 
     under_4gb = _rank_under_memory_budget(
         views,
@@ -20327,10 +20325,6 @@ def _capability_score_from_parts(
     return round(max(0.0, min(100.0, score)), 1)
 
 
-def _score_at_least(value: float | None, threshold: float) -> bool:
-    return value is not None and value >= threshold
-
-
 def _capability_signal_from_result(
     view: ModelRecommendationView,
     *,
@@ -20339,7 +20333,6 @@ def _capability_signal_from_result(
 ) -> ModelCapabilityRunSignal:
     """Build a current capability signal from the canonical recommendation view."""
     result = view.result
-    review = _review_for_result(result)
     text = str(getattr(result.generation, "text", "") or "") if result.generation else ""
     utility = utility_by_model.get(result.model_name)
     metadata_score = None
@@ -20358,7 +20351,7 @@ def _capability_signal_from_result(
         None if suppress_cataloging_scores or utility is None else utility.description_score
     )
     keyword_score = None if suppress_cataloging_scores or utility is None else utility.keyword_score
-    review_bucket = review["user_bucket"] if review is not None else None
+    review_bucket = view.current_recommendation
     capability_score = _capability_score_from_parts(
         success=result.success,
         review_bucket=review_bucket,
@@ -20370,6 +20363,7 @@ def _capability_signal_from_result(
     return ModelCapabilityRunSignal(
         model=result.model_name,
         success=result.success,
+        current_recommendation=view.current_recommendation,
         is_current=True,
         eligible=view.eligible,
         eligibility_reason=view.eligibility_reason,
@@ -20402,7 +20396,8 @@ def _capability_signal_from_history(
     return ModelCapabilityRunSignal(
         model=model,
         success=info.get("success") is True,
-        review_bucket=info.get("review_user_bucket"),
+        current_recommendation=_history_recommendation_status(info),
+        review_bucket=_history_recommendation_status(info),
         capability_score=_capability_float(info.get("capability_score")),
         hygiene_score=_capability_float(info.get("hygiene_score")),
         caption_score=_capability_float(info.get("caption_score")),
@@ -20416,75 +20411,45 @@ def _capability_signal_from_history(
     )
 
 
-def _model_capability_recommendation(
-    row: ModelCapabilityRow,
-    *,
-    suppress_cataloging_scores: bool,
-) -> str:
-    """Return a compact use-case recommendation for one aggregated model row."""
-    recommendation = "needs-review"
-    if row.current_status == "failed":
-        recommendation = "current-run-blocked"
-    elif row.current_status == "ineligible":
-        recommendation = "current-run-ineligible"
-    elif row.current_status == "avoid":
-        recommendation = "avoid"
-    elif row.runs <= 0 or row.successes <= 0:
-        recommendation = "integration-blocked"
-    elif row.success_rate < CAPABILITY_UNSTABLE_SUCCESS_RATE:
-        recommendation = "unstable"
-    else:
-        caption_ok = _score_at_least(row.caption_score, CAPABILITY_GOOD_CAPTION_SCORE)
-        keyword_ok = _score_at_least(row.keyword_score, CAPABILITY_GOOD_KEYWORD_SCORE)
-        metadata_ok = _score_at_least(row.metadata_alignment_score, CAPABILITY_GOOD_METADATA_SCORE)
-        latest_signal = row.signal.casefold()
-        latest_risky = any(
-            marker in latest_signal
-            for marker in (
-                "harness",
-                "cutoff",
-                "context-budget",
-                "runtime",
-                "repetitive",
-                "reasoning-leak",
-                "thinking-incomplete",
-                "weight-mismatch",
-                "processor-error",
-                "model-error",
-                "model-config",
-            )
+def _history_recommendation_status(
+    info: HistoryModelResultRecord,
+) -> RecommendationStatus:
+    """Return a canonical recommendation from new or legacy history rows."""
+    if recommendation := info.get("current_recommendation"):
+        return recommendation
+    legacy = info.get("review_user_bucket")
+    if legacy == "recommended":
+        return "recommended"
+    if legacy == "caveat":
+        return "caveat"
+    if legacy == "avoid":
+        return "avoid"
+    return "not_evaluated"
+
+
+def _historical_reliability(
+    signals: Sequence[ModelCapabilityRunSignal],
+) -> tuple[HistoricalReliability, str]:
+    """Summarize lane-matched prior outcomes without using aggregate scores."""
+    runs = len(signals)
+    if runs < MIN_HISTORICAL_RELIABILITY_RUNS:
+        return (
+            "insufficient_evidence",
+            "no prior lane-matched runs" if runs == 0 else "only one prior lane-matched run",
         )
-        if suppress_cataloging_scores and caption_ok and not latest_risky:
-            recommendation = (
-                "caption-review"
-                if row.capability_score is not None
-                and row.capability_score < CAPABILITY_AVOID_SCORE
-                else "caption"
-            )
-        elif row.capability_score is not None and row.capability_score < CAPABILITY_AVOID_SCORE:
-            recommendation = "avoid"
-        elif not suppress_cataloging_scores and caption_ok and (keyword_ok or metadata_ok):
-            recommendation = "caption+keywords"
-        elif caption_ok:
-            recommendation = "caption"
-        elif not suppress_cataloging_scores and keyword_ok:
-            recommendation = "keywords"
-    return recommendation
-
-
-def _model_capability_current_status(
-    current_signal: ModelCapabilityRunSignal | None,
-) -> str:
-    """Return a compact current-run status label for scorecard rows."""
-    if current_signal is None:
-        return "not-tested"
-    if not current_signal.success:
-        return "failed"
-    if current_signal.eligible is False:
-        return "ineligible"
-    if current_signal.review_bucket in {"avoid", "caveat", "needs_triage"}:
-        return current_signal.review_bucket.replace("_", "-")
-    return "passed"
+    counts = {
+        status: sum(1 for signal in signals if signal.current_recommendation == status)
+        for status in ("recommended", "caveat", "avoid", "not_evaluated")
+    }
+    if counts["recommended"] == runs:
+        return "stable", f"all {runs} prior lane-matched runs were recommended"
+    if counts["avoid"] + counts["not_evaluated"] == runs:
+        return (
+            "consistently_unsuitable",
+            f"all {runs} prior lane-matched runs were avoid or not evaluated",
+        )
+    summary = ", ".join(f"{count} {status}" for status, count in counts.items() if count)
+    return "variable", f"mixed prior outcomes: {summary}"
 
 
 def _collect_model_capability_signals(
@@ -20538,18 +20503,24 @@ def _model_capability_row_from_signals(
     suppress_cataloging_scores: bool,
 ) -> ModelCapabilityRow:
     """Aggregate one model's capability observations into a scorecard row."""
-    runs = len(signals)
-    successes = sum(1 for signal in signals if signal.success)
+    historical_signals = tuple(signal for signal in signals if not signal.is_current)
+    runs = len(historical_signals)
+    successes = sum(1 for signal in historical_signals if signal.success)
     current_signal = next((signal for signal in reversed(signals) if signal.is_current), None)
     latest_signal = current_signal or signals[-1]
-    row = ModelCapabilityRow(
+    reliability, variability_reason = _historical_reliability(historical_signals)
+    return ModelCapabilityRow(
         model=model,
         runs=runs,
         successes=successes,
         failures=runs - successes,
         success_rate=round(successes / runs * 100.0, 1) if runs else 0.0,
         recommended_rate=round(
-            sum(1 for signal in signals if signal.review_bucket == "recommended") / runs * 100.0,
+            sum(
+                1 for signal in historical_signals if signal.current_recommendation == "recommended"
+            )
+            / runs
+            * 100.0,
             1,
         )
         if runs
@@ -20579,16 +20550,12 @@ def _model_capability_row_from_signals(
         ),
         generation_tps=_capability_avg(signal.generation_tps for signal in signals),
         peak_memory_gb=_capability_avg(signal.peak_memory_gb for signal in signals),
-        current_status=_model_capability_current_status(current_signal),
-        recommendation="",
-        signal=latest_signal.signal or "no flagged signals",
-    )
-    return replace(
-        row,
-        recommendation=_model_capability_recommendation(
-            row,
-            suppress_cataloging_scores=suppress_cataloging_scores,
+        current_recommendation=(
+            current_signal.current_recommendation if current_signal else "not_evaluated"
         ),
+        historical_reliability=reliability,
+        variability_reason=variability_reason,
+        signal=latest_signal.signal or "no flagged signals",
     )
 
 
@@ -20628,10 +20595,12 @@ def _capability_score_cell(value: float | None) -> str:
 
 
 CAPABILITY_TABLE_HEADER_TEXT: Final[str] = (
-    "Model|Use|Current|Runs|Success|Capability|Caption|Keyword|Metadata|Gen TPS|Peak GB|Latest signal"
+    "Model|Historical reliability|Current recommendation|History runs|Recommended|Capability|"
+    "Caption|Keyword|Metadata|Gen TPS|Peak GB|Variability reason|Latest signal"
 )
 TRIAGE_CAPABILITY_TABLE_HEADER_TEXT: Final[str] = (
-    "Model|Use|Current|Runs|Success|Clean|Hygiene|Caption|Gen TPS|Peak GB|Latest signal"
+    "Model|Historical reliability|Current recommendation|History runs|Recommended|Clean|Hygiene|"
+    "Caption|Gen TPS|Peak GB|Variability reason|Latest signal"
 )
 
 
@@ -20643,10 +20612,10 @@ def _capability_table_row(
     """Return the Markdown table cells for one scorecard row."""
     common = (
         f"`{MARKDOWN_ESCAPER.escape(row.model)}`",
-        MARKDOWN_ESCAPER.escape(row.recommendation),
-        MARKDOWN_ESCAPER.escape(row.current_status),
+        MARKDOWN_ESCAPER.escape(row.historical_reliability),
+        MARKDOWN_ESCAPER.escape(row.current_recommendation),
         str(row.runs),
-        f"{row.success_rate:.0f}%",
+        f"{row.recommended_rate:.0f}%",
     )
     if suppress_cataloging_scores:
         return (
@@ -20656,6 +20625,7 @@ def _capability_table_row(
             _capability_score_cell(row.caption_score),
             format_field_value("generation_tps", row.generation_tps) or "-",
             format_field_value("peak_memory", row.peak_memory_gb) or "-",
+            MARKDOWN_ESCAPER.escape(row.variability_reason),
             MARKDOWN_ESCAPER.escape(row.signal),
         )
     return (
@@ -20666,6 +20636,7 @@ def _capability_table_row(
         _capability_score_cell(row.metadata_alignment_score),
         format_field_value("generation_tps", row.generation_tps) or "-",
         format_field_value("peak_memory", row.peak_memory_gb) or "-",
+        MARKDOWN_ESCAPER.escape(row.variability_reason),
         MARKDOWN_ESCAPER.escape(row.signal),
     )
 
@@ -20688,8 +20659,9 @@ def _capability_json_row(row: ModelCapabilityRow) -> dict[str, JsonLike]:
         "metadata_alignment_avg": row.metadata_alignment_score,
         "generation_tps_avg": row.generation_tps,
         "peak_memory_gb_avg": row.peak_memory_gb,
-        "current_status": row.current_status,
-        "recommendation": row.recommendation,
+        "current_recommendation": row.current_recommendation,
+        "historical_reliability": row.historical_reliability,
+        "variability_reason": row.variability_reason,
         "latest_signal": row.signal,
     }
 
@@ -20784,7 +20756,7 @@ def generate_model_capability_scorecard(
     _write_markdown_artifact(markdown_filename, md, artifact_name="Model capability scorecard")
 
     payload: dict[str, JsonLike] = {
-        "schema_version": "1.0",
+        "schema_version": "1.1",
         "generated_at": local_now_str(),
         "eval_mode": policy.eval_mode,
         "metadata_exposed_to_prompt": policy.metadata_exposed_to_prompt,
