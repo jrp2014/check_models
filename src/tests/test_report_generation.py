@@ -1255,6 +1255,17 @@ def _make_harness_success(
     )
 
 
+def _with_confirmed_reproduction(result: PerformanceResult) -> PerformanceResult:
+    """Return a diagnostic anomaly confirmed by a same-path controlled rerun."""
+    return replace(
+        result,
+        rerun_evidence=check_models.RerunEvidence(
+            rerun_success=False,
+            rerun_verdict="harness",
+        ),
+    )
+
+
 def test_thinking_template_mismatch_requires_reproduction_not_issue_draft() -> None:
     """A template-opened complete trace is configuration evidence, not a stop-token fault."""
     text = "<think>Inspecting the image.</think> A cat rests on a blanket."
@@ -1293,8 +1304,9 @@ def test_thinking_template_mismatch_requires_reproduction_not_issue_draft() -> N
     assert check_models._build_issue_clusters(snapshot) == ()
     observation = "\n".join(check_models._diagnostics_reproduction_observations(snapshot))
     assert "Observations Requiring Controlled Reproduction" in observation
-    assert "thinking_configuration" in observation
-    assert "Complete generated output: org/thinking-model" in observation
+    assert "special_token_leak" in observation
+    assert "thinking_trace" in observation
+    assert "Complete generated output and evidence: org/thinking-model" in observation
     assert text in observation
     assert "rendered_prompt_preview" in observation
 
@@ -1368,6 +1380,111 @@ def test_capped_long_context_signal_still_requires_controlled_rerun() -> None:
         )
         == ()
     )
+
+
+@pytest.mark.parametrize(
+    ("readiness", "expected_drafts"),
+    [
+        ("issue_ready", 1),
+        ("needs_reproduction", 0),
+        ("harness_observation", 0),
+        ("not_applicable", 0),
+    ],
+)
+def test_issue_artifacts_publish_only_issue_ready_assessments(
+    tmp_path: Path,
+    readiness: check_models.MaintainerReadiness,
+    expected_drafts: int,
+) -> None:
+    """The canonical readiness gate should control every issue artifact."""
+    result = _make_harness_success(
+        f"org/{readiness}",
+        text="Complete diagnostic output <|end|>",
+        harness_type="stop_token",
+        harness_detail="token_leak:<|end|>",
+    )
+    assessment = check_models._build_canonical_assessment(
+        check_models._collect_observed_evidence(result),
+        result,
+    )
+    assessment = replace(
+        assessment,
+        maintainer=replace(
+            assessment.maintainer,
+            maintainer_readiness=readiness,
+        ),
+    )
+    snapshot = DiagnosticsSnapshot(
+        harness_results=((result, "Complete diagnostic output <|end|>"),)
+    )
+
+    clusters = check_models._build_issue_clusters(
+        snapshot,
+        assessments={result.model_name: assessment},
+    )
+    generated = _generate_github_issue_reports(
+        diagnostics_snapshot=snapshot,
+        output_dir=tmp_path,
+        versions=_stub_versions(),
+        system_info={},
+        repro_bundles={},
+        run_args=None,
+        issue_clusters=clusters,
+    )
+
+    assert len(clusters) == expected_drafts
+    assert len(generated) == expected_drafts
+    assert len(list((tmp_path / "issues").glob("issue_*.md"))) == expected_drafts
+    index = (tmp_path / "issues" / "index.md").read_text(encoding="utf-8")
+    assert ("No issue drafts were generated" in index) is (expected_drafts == 0)
+
+
+def test_upstream_crash_is_issue_ready_and_retains_complete_evidence(tmp_path: Path) -> None:
+    """An entered upstream crash needs no rerun and must retain unabridged evidence."""
+    traceback_text = "\n".join(
+        [
+            "Traceback (most recent call last):",
+            "EARLY-TRACE-EVIDENCE",
+            *(f'  File "frame_{index}.py", line {index}' for index in range(10)),
+            "RuntimeError: decoder failed",
+        ]
+    )
+    captured_output = "BEGIN-CAPTURE " + ("partial generation " * 30) + "END-CAPTURE"
+    result = replace(
+        _make_failure_with_details(
+            "org/upstream-crash",
+            error_msg="decoder failed",
+            error_package="mlx-vlm",
+            failure_phase="decode",
+            traceback_str=traceback_text,
+            captured_output=captured_output,
+        ),
+        upstream_boundary="generation_started",
+    )
+    context = _build_report_render_context(
+        results=[result],
+        prompt="Describe the image.",
+        system_info={},
+    )
+    assessment = dict(context.assessments)[result.model_name]
+    output = tmp_path / "diagnostics.md"
+
+    assert assessment.maintainer.maintainer_readiness == "issue_ready"
+    assert len(context.issue_clusters) == 1
+    assert generate_diagnostics_report(
+        results=list(context.result_set.results),
+        filename=output,
+        versions=_stub_versions(),
+        system_info={},
+        prompt="Describe the image.",
+        diagnostics_snapshot=context.diagnostics_snapshot,
+        issue_clusters=context.issue_clusters,
+    )
+
+    content = output.read_text(encoding="utf-8")
+    assert "<details>" in content
+    assert traceback_text in content
+    assert captured_output in content
 
 
 def test_review_shortlist_obeys_canonical_user_recommendation() -> None:
@@ -1743,6 +1860,7 @@ def _make_failure(
         error_message="boom",
         error_type=error_type,
         error_package=error_package,
+        upstream_boundary="generation_started",
     )
 
 
@@ -3910,7 +4028,7 @@ class TestMarkdownGalleryReport:
         assert "<!-- markdownlint-disable MD060 -->" in maintainer_queue
         assert "<!-- markdownlint-enable MD060 -->" in maintainer_queue
         assert "org/good" not in maintainer_queue
-        assert "org/risky" in maintainer_queue
+        assert "org/risky" not in maintainer_queue
 
     def test_review_report_links_issue_repro_bundles_when_available(
         self,
@@ -3918,8 +4036,10 @@ class TestMarkdownGalleryReport:
     ) -> None:
         """Review maintainer queue should carry repro bundle links, not placeholder dashes."""
         out = tmp_path / "review.md"
-        risky = _make_harness_success(
-            "org/risky", harness_type="stop_token", harness_detail="token_leak:<s>"
+        risky = _with_confirmed_reproduction(
+            _make_harness_success(
+                "org/risky", harness_type="stop_token", harness_detail="token_leak:<s>"
+            )
         )
         report_context = _build_report_render_context(results=[risky], prompt="describe")
         bundle_path = tmp_path / "repro_bundles" / "risky.json"
@@ -4235,6 +4355,7 @@ def _make_failure_with_details(
     traceback_str: str | None = None,
     captured_output: str | None = None,
     generated_text: str | None = None,
+    upstream_boundary: check_models.UpstreamBoundary = "generation_started",
 ) -> PerformanceResult:
     """Create a failure result with full error details for diagnostics tests."""
     generation = (
@@ -4253,6 +4374,7 @@ def _make_failure_with_details(
         error_package=error_package,
         captured_output_on_fail=captured_output,
         error_traceback=traceback_str,
+        upstream_boundary=upstream_boundary,
     )
 
 
@@ -4345,7 +4467,7 @@ class TestDiagnosticsReport:
         assert "## Crash / Failure Matrix" in content
         assert "Task outcome: crashed" in content
         assert "## mlx-vlm / MLX Issue Matrix" not in content
-        assert "## Model/config observations" in content
+        assert "## Other confirmed maintainer findings" in content
         assert "org/transformers-crash" in content
 
     def test_preflight_warnings_are_model_config_observations(self, tmp_path: Path) -> None:
@@ -4368,7 +4490,7 @@ class TestDiagnosticsReport:
 
         content = output.read_text(encoding="utf-8")
         assert written is True
-        assert "## Model/config observations" in content
+        assert "## Preflight warnings" in content
         assert "transformers compatibility warning" in content
         assert "mlx runtime cache warning" in content
         assert "## mlx-vlm / MLX Issue Matrix" not in content
@@ -4376,11 +4498,13 @@ class TestDiagnosticsReport:
     def test_scoped_harness_cluster_is_inline_issue(self, tmp_path: Path) -> None:
         """An mlx-vlm-owned harness cluster should include its complete issue body."""
         output = tmp_path / "diagnostics.md"
-        result = _make_harness_success(
-            "org/stop-token",
-            text="caption <|end|>",
-            harness_type="stop_token",
-            harness_detail="token_leak:<|end|>",
+        result = _with_confirmed_reproduction(
+            _make_harness_success(
+                "org/stop-token",
+                text="caption <|end|>",
+                harness_type="stop_token",
+                harness_detail="token_leak:<|end|>",
+            )
         )
 
         generate_diagnostics_report(
@@ -4407,11 +4531,13 @@ class TestDiagnosticsReport:
             "BEGIN-EVIDENCE " + ("model reasoning context " * 20) + "<|end|> END-EVIDENCE"
         )
         output = tmp_path / "diagnostics.md"
-        result = _make_harness_success(
-            "org/stop-token",
-            text=complete_text,
-            harness_type="stop_token",
-            harness_detail="token_leak:<|end|>",
+        result = _with_confirmed_reproduction(
+            _make_harness_success(
+                "org/stop-token",
+                text=complete_text,
+                harness_type="stop_token",
+                harness_detail="token_leak:<|end|>",
+            )
         )
 
         generate_diagnostics_report(
@@ -4808,8 +4934,8 @@ class TestDiagnosticsReport:
         assert "\n- _Filing target:_ mlx-vlm\n\n### Native mlx-vlm reproduction\n" in content
         assert "\n- _Filing target:_ mlx\n\n### Native mlx-vlm reproduction\n" in content
 
-    def test_captured_output_omitted_from_compact_diagnostics(self, tmp_path: Path) -> None:
-        """Captured stdout/stderr belongs in issue drafts and bundles, not diagnostics."""
+    def test_captured_output_is_retained_in_expandable_diagnostics(self, tmp_path: Path) -> None:
+        """Captured stdout/stderr should remain available as complete crash evidence."""
         out = tmp_path / "diag.md"
         generate_diagnostics_report(
             results=[
@@ -4828,11 +4954,9 @@ class TestDiagnosticsReport:
         )
         content = out.read_text(encoding="utf-8")
         assert "Detailed trace logs" not in content
-        assert "Tokenizer warning here" not in content
-        assert "Captured stdout/stderr" not in content
-        assert "Downloading: 100%" not in content
-        assert "\x1b[" not in content
-        assert "\r" not in content
+        assert "<details>" in content
+        assert "Tokenizer warning here" in content
+        assert "Downloading: 100%" in content
         assert "`org/m`" in content
 
     def test_failure_section_uses_upstream_traceback_not_local_wrappers(
@@ -5077,15 +5201,15 @@ class TestDiagnosticsReport:
 
         assert result is True
         content = out.read_text(encoding="utf-8")
-        assert "## Model/config observations" in content
+        assert "## Observations Requiring Controlled Reproduction" in content
         assert "org/token-soup" in content
-        assert "Generated text is mixed-script token-soup" in content
+        assert "mixed_script_corruption" in content
         assert "open对不同方面" in content
         assert "## mlx-vlm / MLX Issue Matrix" not in content
         assert "## Models Not Flagged" not in content
 
-    def test_text_sanity_issue_clusters_are_split_by_model_repository(self) -> None:
-        """Unrelated model repositories must not share a single issue draft."""
+    def test_unconfirmed_text_sanity_observations_do_not_create_issue_clusters(self) -> None:
+        """Serious output smells should remain observations until reproduced."""
         junk_text = (
             'open对不同方面">black/ with小猫小猫kotPicture •0超高清比!y表面处理超经典的!'
             "张图片'七- object Tno-go-head-or U0.C在其他 ** ,Not只!"
@@ -5107,17 +5231,10 @@ class TestDiagnosticsReport:
             prompt="Describe this image briefly.",
         )
 
-        clusters = [
-            cluster
-            for cluster in check_models._build_issue_clusters(snapshot)
-            if cluster.source == "text_sanity"
-        ]
-
-        assert len(clusters) == 2
-        assert {cluster.results[0].model_name for cluster in clusters} == {
-            "org-a/token-soup",
-            "org-b/token-soup",
-        }
+        assert check_models._build_issue_clusters(snapshot) == ()
+        observations = "\n".join(check_models._diagnostics_reproduction_observations(snapshot))
+        assert "org-a/token-soup" in observations
+        assert "org-b/token-soup" in observations
 
     def test_failure_cluster_shows_generated_output_inline(self, tmp_path: Path) -> None:
         """Failure clusters should show generated output inline when present."""
@@ -5245,28 +5362,30 @@ class TestDiagnosticsReport:
     def test_harness_repro_bundles_written_and_linked(self, tmp_path: Path) -> None:
         """Successful issue-clustered harness anomalies should get repro bundles."""
         prompt = "Describe this image."
-        harness = replace(
-            _make_harness_success(
-                "org/model-harness",
-                text="<|end|> leaked control token",
-                harness_type="prompt_template",
-                harness_detail="output:zero_tokens",
-            ),
-            prompt_diagnostics=check_models.PromptDiagnostics(
-                model_type="qwen2_vl",
-                processor_class="transformers.AutoProcessor",
-                tokenizer_class="transformers.PreTrainedTokenizerFast",
-                rendered_prompt_hash_sha256="rendered-hash",
-                rendered_prompt_preview="<|im_start|>user <image> Describe this image.",
-                rendered_prompt_chars=44,
-                image_placeholder_count=1,
-                eos_token_id=151645,
-                special_token_ids=(151645,),
-                special_tokens=("<|end|>", "</think>"),
-                generate_kwargs={
-                    "max_tokens": 500,
-                    "quantized_kv_start": check_models.DEFAULT_QUANTIZED_KV_START,
-                },
+        harness = _with_confirmed_reproduction(
+            replace(
+                _make_harness_success(
+                    "org/model-harness",
+                    text="<|end|> leaked control token",
+                    harness_type="prompt_template",
+                    harness_detail="output:zero_tokens",
+                ),
+                prompt_diagnostics=check_models.PromptDiagnostics(
+                    model_type="qwen2_vl",
+                    processor_class="transformers.AutoProcessor",
+                    tokenizer_class="transformers.PreTrainedTokenizerFast",
+                    rendered_prompt_hash_sha256="rendered-hash",
+                    rendered_prompt_preview="<|im_start|>user <image> Describe this image.",
+                    rendered_prompt_chars=44,
+                    image_placeholder_count=1,
+                    eos_token_id=151645,
+                    special_token_ids=(151645,),
+                    special_tokens=("<|end|>", "</think>"),
+                    generate_kwargs={
+                        "max_tokens": 500,
+                        "quantized_kv_start": check_models.DEFAULT_QUANTIZED_KV_START,
+                    },
+                ),
             ),
         )
         bundles = export_failure_repro_bundles(
@@ -6356,6 +6475,7 @@ class TestGithubIssueReportContent:
             error_code="MLX_VLM_DECODE_RUNTIME",
             error_package="mlx-vlm",
             error_signature="MLX_DECODE_ERROR:abc123",
+            upstream_boundary="generation_started",
             error_traceback="Traceback (most recent call last):\nRuntimeError: shape mismatch",
             total_time=0.5,
         )
@@ -6411,6 +6531,7 @@ class TestGithubIssueReportContent:
             error_code="MLX_VLM_DECODE_RUNTIME",
             error_package="mlx-vlm",
             error_signature="MLX_DECODE_ERROR:abc123",
+            upstream_boundary="generation_started",
             error_traceback="Traceback (most recent call last):\nRuntimeError: shape mismatch",
             total_time=0.5,
         )
@@ -6447,6 +6568,7 @@ class TestGithubIssueReportContent:
             error_code="MLX_VLM_DECODE_RUNTIME",
             error_package="mlx-vlm",
             error_signature="MLX_DECODE_ERROR:abc123",
+            upstream_boundary="generation_started",
             error_traceback="Traceback (most recent call last):\nRuntimeError: shape mismatch",
             total_time=0.5,
         )
@@ -6501,6 +6623,7 @@ class TestGithubIssueReportContent:
             error_code="MLX_MODEL_LOAD_MODEL",
             error_package="mlx",
             error_signature="MLX_MODEL_LOAD_MODEL:abc123",
+            upstream_boundary="load_started",
             error_traceback="Traceback (most recent call last):\nValueError: shape mismatch",
             total_time=0.5,
         )
@@ -6557,6 +6680,7 @@ class TestGithubIssueReportContent:
             error_code="MLX_VLM_DECODE_RUNTIME",
             error_package="mlx-vlm",
             error_signature="MLX_DECODE_ERROR:abc123",
+            upstream_boundary="generation_started",
             error_traceback=traceback_text,
             total_time=0.5,
         )
@@ -6592,6 +6716,7 @@ class TestGithubIssueReportContent:
             error_code="MLX_VLM_DECODE_RUNTIME",
             error_package="mlx-vlm",
             error_signature="MLX_DECODE_ERROR:abc123",
+            upstream_boundary="generation_started",
             error_traceback="Traceback (most recent call last):\nRuntimeError: shape mismatch",
             total_time=0.5,
         )
@@ -6677,24 +6802,28 @@ class TestGithubIssueReportContent:
         assert generated == {}
         content = "\n".join(check_models._diagnostics_reproduction_observations(snapshot))
         assert "Observations Requiring Controlled Reproduction" in content
-        assert "context_boundary" in content
-        assert "controlled reduced-image" in content
+        assert "harness:long_context" in content
+        assert "controlled reproduction" in content
 
     def test_multiple_stop_token_models_produce_one_issue(self, tmp_path: Path) -> None:
         """Multiple stop-token harness models should cluster into one issue draft."""
-        first = _make_harness_success(
-            name="org/stop-a",
-            text="caption <|end|>",
-            generation_tokens=32,
-            harness_type="stop_token",
-            harness_detail="token_leak:<|end|>",
+        first = _with_confirmed_reproduction(
+            _make_harness_success(
+                name="org/stop-a",
+                text="caption <|end|>",
+                generation_tokens=32,
+                harness_type="stop_token",
+                harness_detail="token_leak:<|end|>",
+            )
         )
-        second = _make_harness_success(
-            name="org/stop-b",
-            text="caption </think>",
-            generation_tokens=32,
-            harness_type="stop_token",
-            harness_detail="token_leak:</think>",
+        second = _with_confirmed_reproduction(
+            _make_harness_success(
+                name="org/stop-b",
+                text="caption </think>",
+                generation_tokens=32,
+                harness_type="stop_token",
+                harness_detail="token_leak:</think>",
+            )
         )
         snapshot = DiagnosticsSnapshot(
             harness_results=(
@@ -6729,12 +6858,14 @@ class TestGithubIssueReportContent:
             + "background context " * 80
             + "</think> leaked control token after the long preface."
         )
-        result = _make_harness_success(
-            name="org/late-stop",
-            text=leaked_text,
-            generation_tokens=220,
-            harness_type="stop_token",
-            harness_detail="token_leak:</think>",
+        result = _with_confirmed_reproduction(
+            _make_harness_success(
+                name="org/late-stop",
+                text=leaked_text,
+                generation_tokens=220,
+                harness_type="stop_token",
+                harness_detail="token_leak:</think>",
+            )
         )
         snapshot = DiagnosticsSnapshot(
             harness_results=((result, leaked_text),),
@@ -6755,19 +6886,23 @@ class TestGithubIssueReportContent:
 
     def test_unrelated_harness_subtypes_produce_separate_issues(self, tmp_path: Path) -> None:
         """Different harness subtypes should not be merged into one draft."""
-        stop = _make_harness_success(
-            name="org/stop",
-            text="caption <|end|>",
-            generation_tokens=32,
-            harness_type="stop_token",
-            harness_detail="token_leak:<|end|>",
+        stop = _with_confirmed_reproduction(
+            _make_harness_success(
+                name="org/stop",
+                text="caption <|end|>",
+                generation_tokens=32,
+                harness_type="stop_token",
+                harness_detail="token_leak:<|end|>",
+            )
         )
-        encoding = _make_harness_success(
-            name="org/encoding",
-            text="A Ġcaption",
-            generation_tokens=32,
-            harness_type="encoding",
-            harness_detail="token_encoding:bpe_space_leak(1)",
+        encoding = _with_confirmed_reproduction(
+            _make_harness_success(
+                name="org/encoding",
+                text="A Ġcaption",
+                generation_tokens=32,
+                harness_type="encoding",
+                harness_detail="token_encoding:bpe_space_leak(1)",
+            )
         )
         snapshot = DiagnosticsSnapshot(
             harness_results=(
@@ -6804,6 +6939,7 @@ class TestGithubIssueReportContent:
             error_code="MLX_MODEL_LOAD_MODEL",
             error_package="mlx",
             error_signature="MLX_MODEL_LOAD_MODEL:abc123",
+            upstream_boundary="load_started",
             error_traceback="Traceback (most recent call last):\nRuntimeError: shape mismatch",
             total_time=0.5,
         )
@@ -6843,6 +6979,7 @@ class TestGithubIssueReportContent:
             error_code="MLX_VLM_MODEL_LOAD_MODEL",
             error_package="mlx-vlm",
             error_signature="MLX_VLM_MODEL_LOAD_MODEL:abc123",
+            upstream_boundary="load_started",
             error_traceback="Traceback (most recent call last):\nModuleNotFoundError: no module",
             total_time=0.5,
         )
@@ -6884,6 +7021,7 @@ class TestGithubIssueReportContent:
             error_code="MLX_MODEL_LOAD_WEIGHT_MISMATCH",
             error_package="mlx",
             error_signature="MLX_MODEL_LOAD_WEIGHT_MISMATCH:abc123",
+            upstream_boundary="load_started",
             error_traceback="Traceback (most recent call last):\nValueError: missing parameters",
             total_time=0.5,
         )
@@ -6908,8 +7046,8 @@ class TestGithubIssueReportContent:
         assert "scale, bias" in content
         assert "KV/cache behavior" not in content
 
-    def test_stack_signal_anomaly_produces_issue_draft(self, tmp_path: Path) -> None:
-        """Successful-run stack anomalies should also produce clustered issue drafts."""
+    def test_unconfirmed_stack_signal_does_not_produce_issue_draft(self, tmp_path: Path) -> None:
+        """A one-run stack symptom should not bypass canonical readiness."""
         result = PerformanceResult(
             model_name="org/stack-context",
             success=True,
@@ -6935,12 +7073,7 @@ class TestGithubIssueReportContent:
             run_args=None,
         )
 
-        assert len(generated) == 1
-        content = next(iter(generated.values())).read_text(encoding="utf-8")
-        assert "## Appendix: Detailed Evidence" in content
-        assert "Stack Signals" in content
-        assert "Long-context collapse" in content
-        assert "Inspect cache allocation" in content
+        assert generated == {}
 
 
 def test_output_index_routes_maintainers_and_model_users(tmp_path: Path) -> None:
@@ -7048,6 +7181,7 @@ class TestIssueDirectoryInvariants:
             success=False,
             error_message="RuntimeError: shape mismatch",
             error_signature="MLX_DECODE_ERROR:abc123",
+            upstream_boundary="generation_started",
             total_time=0.5,
         )
         snapshot = DiagnosticsSnapshot(

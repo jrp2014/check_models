@@ -7,6 +7,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Gate every issue cluster, queue entry, and draft on canonical `issue_ready`
+  evidence; keep needs-reproduction, harness, connectivity, and model-quality
+  observations in separate diagnostics sections with complete expandable output
+  and normalized full tracebacks.
 - Add narrow, immutable evidence and audience-specific assessment types, and
   retain explicit upstream load/generation entry boundaries so maintainer issue
   readiness distinguishes upstream failures, harness observations, and external
