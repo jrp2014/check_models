@@ -109,6 +109,24 @@ def _estimate_tokens(text: str) -> int:
     return estimated_tokens
 
 
+def _print_diagnostic_observations(analysis: GenerationQualityAnalysis) -> None:
+    """Print retained non-fault output observations when present."""
+    if analysis.special_token_wrappers:
+        _print_field("Special Token Wrappers", analysis.special_token_wrappers)
+
+
+def _analysis_status_text(
+    analysis: GenerationQualityAnalysis,
+    issue_string: str | None,
+) -> str:
+    """Return a fault, observation, or clean status without conflating them."""
+    if issue_string:
+        return issue_string
+    if analysis.special_token_wrappers:
+        return "🟡 OBSERVATION (special-token wrapper retained)"
+    return "🟢 CLEAN (No issues detected)"
+
+
 def _print_analysis_report(
     analysis: GenerationQualityAnalysis,
     *,
@@ -128,6 +146,7 @@ def _print_analysis_report(
     if analysis.has_harness_issue:
         _print_field("Harness Issue Type", analysis.harness_issue_type)
         _print_field("Harness Issue Details", analysis.harness_issue_details)
+    _print_diagnostic_observations(analysis)
 
     print("\nQuality & Integrity Rule Violations:")
     _print_field("Is Repetitive", analysis.is_repetitive)
@@ -172,7 +191,7 @@ def _print_analysis_report(
     print("\n" + "-" * 60)
     issue_string = _build_quality_issues_string(analysis)
     print("Final Tag Output string:")
-    print(f"  {issue_string or '🟢 CLEAN (No issues detected)'}")
+    print(f"  {_analysis_status_text(analysis, issue_string)}")
     print("-" * 60 + "\n")
 
 
@@ -187,7 +206,9 @@ def _build_json_payload(
     issue_string = _build_quality_issues_string(analysis) or ""
     exit_code = 1 if analysis.has_any_issues() else 0
     return {
-        "status": "issues" if exit_code else "clean",
+        "status": (
+            "issues" if exit_code else "observation" if analysis.special_token_wrappers else "clean"
+        ),
         "exit_code": exit_code,
         "summary": {
             "word_count": word_count,

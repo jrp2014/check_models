@@ -773,6 +773,25 @@ def test_validation_artifact_hygiene_policy_is_documented() -> None:
         assert "temp directory" in text or "`test_*`" in text, label
 
 
+def test_production_assessment_policy_has_no_fixture_specific_exceptions() -> None:
+    """Canonical classifiers must not special-case synthetic models or image subjects."""
+    source = (PKG_ROOT / "check_models.py").read_text(encoding="utf-8")
+    classifier_source = source[
+        source.index("def _output_anomalies(") : source.index("def _model_user_presentation(")
+    ].casefold()
+
+    assert re.search(r"\borg/[a-z0-9_-]+", classifier_source) is None
+    for fixture_term in (
+        "granite",
+        "pink couch",
+        "tabby",
+        "brick storefront",
+        "harbor sunset",
+        "remote controls",
+    ):
+        assert fixture_term not in classifier_source
+
+
 def test_stub_refresh_reason_is_none_for_fresh_manifest(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

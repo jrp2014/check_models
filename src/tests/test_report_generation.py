@@ -3193,11 +3193,10 @@ class TestMarkdownReportEdgeCases:
             assert "[check_models.log](check_models.log)" in content_relative
             assert "model_gallery.md#model-org-good" in content_relative
         assert "## Model Gallery" not in content
-        assert "## ✅ Usable Diagnostic Candidates" in content
-        assert "_Best end-to-end cataloging:_" in content
-        assert "_Best descriptions:_" in content
-        assert "_Best keywording:_" in content
-        assert "## 🔍 Quality Pattern Breakdown" in content
+        assert "## ✅ Recommended Current-run Models" in content
+        assert "_Recommended:_" in content
+        assert "Best end-to-end cataloging" not in content
+        assert "## 🔍 Quality Pattern Breakdown" not in content
 
     def test_triage_markdown_report_suppresses_cataloging_scores(
         self,
@@ -3508,7 +3507,7 @@ class TestMarkdownReportEdgeCases:
         assert "`org/clean-caption`" in best_under_8gb
         assert "`org/token-noise`" not in best_under_8gb
         assert "`org/token-noise`" in avoid_rows
-        assert "text-sanity" in avoid_rows
+        assert "mixed script corruption" in avoid_rows
 
     def test_model_selection_report_ranks_fuller_clean_captions_above_terse_ones(
         self,
@@ -3769,14 +3768,11 @@ class TestMarkdownReportEdgeCases:
         )
 
         assert review is not None
-        hint_text = check_models._review_hint_text(review, analysis)
-        utility_text = check_models._review_utility_text(review, analysis)
         focus_text = check_models._review_focus_text(review, analysis)
-        combined = f"{hint_text} | {utility_text} | {focus_text}"
-        assert "unverified-context-copy" in combined
-        assert "low-draft-improvement" in combined
-        assert "nonvisual metadata reused" not in combined
-        assert "metadata borrowing" not in combined
+        assert "unverified-context-copy" in focus_text
+        assert "low-draft-improvement" in focus_text
+        assert "nonvisual metadata reused" not in focus_text
+        assert "metadata borrowing" not in focus_text
 
 
 class TestMarkdownGalleryReport:
@@ -3828,9 +3824,9 @@ class TestMarkdownGalleryReport:
         assert "<summary>Complete generated output: org/good</summary>" in content
         assert "```text" in content
         assert '<a id="model-org-good"></a>' in content
-        assert "_Recommendation:_" in content
-        assert "_Owner:_" in content
-        assert "_Next step:_" in content
+        assert "_Verdict:_" in content
+        assert "_Maintainer:_" in content
+        assert "_Next action:_" in content
         assert "### ✅ org/good" in content
         assert "### ❔ org/bad" in content
 
@@ -4415,10 +4411,10 @@ class TestMarkdownGalleryReport:
         review = check_models._build_jsonl_review_record(result)
 
         assert review is not None
-        guidance = check_models._review_next_action_text(review)
+        guidance = check_models._review_next_action_for_result(result, review)
         assert review["prompt_burden_kind"] == "unavailable"
         assert "normal burden issue" not in guidance
-        assert "input composition is unavailable" in guidance
+        assert "controlled" in guidance
 
     def test_gallery_includes_summary_pointer_and_per_model_review_status(
         self,
@@ -4447,7 +4443,7 @@ class TestMarkdownGalleryReport:
         assert "_Review focus:_" not in content
         assert "_Score:_" not in content
         assert "_Error summary:_" in content
-        assert "_Next step:_" in content
+        assert "_Next action:_" in content
 
 
 # ===================================================================
@@ -4674,7 +4670,9 @@ class TestDiagnosticsReport:
         assert str(image_path) not in content
         assert "12 x 8" in content
         assert "0.00 MP" in content
-        assert check_models._sha256_file(image_path) in content
+        image_sha256 = check_models._sha256_file(image_path)
+        assert image_sha256 is not None
+        assert image_sha256 in content
         assert "trust_remote_code" in content
         assert "false" in content
         assert check_models._sha256_text("Describe the image.") in content
@@ -4925,34 +4923,14 @@ class TestDiagnosticsReport:
 
     def test_review_next_action_calls_out_indeterminate_connectivity(self) -> None:
         """Canonical review text should avoid assigning an unreachable server to a package."""
-        action = check_models._review_next_action_text(
-            {
-                "verdict": "harness",
-                "hint_relationship": "preserves_trusted_hints",
-                "instruction_echo": False,
-                "metadata_borrowing": False,
-                "likely_capped": False,
-                "owner": "unknown",
-                "user_bucket": "not_evaluated",
-                "evidence": [
-                    "model_error",
-                    "huggingface_hub_model_load_model",
-                    "external_connectivity",
-                ],
-                "requested_max_tokens": 100,
-                "hit_max_tokens": False,
-                "prompt_tokens_total": None,
-                "prompt_tokens_text_est": None,
-                "prompt_tokens_nontext_est": None,
-                "prompt_output_ratio": None,
-                "nontext_prompt_ratio": None,
-                "missing_terms": [],
-                "missing_sections": [],
-                "harness_details": [],
-            },
+        result = _make_failure_with_details(
+            error_msg="Server disconnected without sending a response.",
+            error_package="unknown",
         )
-        assert "model was not evaluated" in action
-        assert "does not identify a faulty package" in action
+        review = check_models._build_jsonl_review_record(result)
+        assert review is not None
+        action = check_models._review_next_action_for_result(result, review)
+        assert action == "No maintainer issue action is indicated by this run."
 
     def test_diagnostics_next_action_uses_composite_owner_rules(self) -> None:
         """Composite owner keys should keep their specialized next-step guidance."""
@@ -7297,10 +7275,10 @@ class TestGithubIssueReportContent:
 
         index = (tmp_path / "issues" / "index.md").read_text(encoding="utf-8")
         content = next(iter(generated.values())).read_text(encoding="utf-8")
-        assert "Unsupported Granite model type/import path" in index
-        assert "No module named" not in index
-        assert "model-type registry" in content
-        assert "Inspect prompt-template, stop-token" not in content
+        assert "mlx-vlm: Model load / model error" in index
+        assert "Model type granite not supported" in index
+        assert "retained exception chain" in content
+        assert "requested and resolved model revisions" in content
 
     def test_issue_queue_summarizes_weight_mismatch_failures(self, tmp_path: Path) -> None:
         """Weight/config mismatches should point maintainers at keys and loader compatibility."""
@@ -7339,9 +7317,9 @@ class TestGithubIssueReportContent:
 
         index = (tmp_path / "issues" / "index.md").read_text(encoding="utf-8")
         content = next(iter(generated.values())).read_text(encoding="utf-8")
-        assert "Weight/config mismatch during model load" in index
-        assert "checkpoint keys" in content
-        assert "scale, bias" in content
+        assert "MLX: Model load / weight/config mismatch" in index
+        assert "parameters not in model" in index
+        assert "structured error signature" in content
         assert "KV/cache behavior" not in content
 
     def test_unconfirmed_stack_signal_does_not_produce_issue_draft(self, tmp_path: Path) -> None:

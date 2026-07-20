@@ -924,8 +924,9 @@ def test_canonical_review_log_emits_verdict_block(
     messages = "\n".join(record.message for record in caplog.records)
     assert "=== CANONICAL REVIEW: dummy/model ===" in messages
     assert "Verdict:" in messages
-    assert "Trusted hints:" in messages
-    assert "Token accounting:" in messages
+    assert "Why:" in messages
+    assert "Maintainer:" in messages
+    assert "Next action:" in messages
     assert "Full output:" in messages
 
 

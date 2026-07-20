@@ -51,8 +51,10 @@ def test_analyze_output_quality_clean_text(capsys: pytest.CaptureFixture[str]) -
     assert "Has Harness Issue         : ❌ No" in captured.out
 
 
-def test_analyze_output_quality_harness_issue(capsys: pytest.CaptureFixture[str]) -> None:
-    """Test that a stop token leak triggers a harness issue and returns exit code 1."""
+def test_analyze_output_quality_special_token_observation(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """A special-token wrapper should remain evidence without becoming a fault."""
     original_argv = sys.argv
     sys.argv = [
         "analyze_output_quality.py",
@@ -62,14 +64,14 @@ def test_analyze_output_quality_harness_issue(capsys: pytest.CaptureFixture[str]
 
     try:
         exit_code = main()
-        assert exit_code == 1
+        assert exit_code == 0
     finally:
         sys.argv = original_argv
 
     captured = capsys.readouterr()
-    assert "Has Harness Issue         : ✅ Yes" in captured.out
-    assert "Harness Issue Type        : stop_token" in captured.out
-    assert "⚠️harness" in captured.out
+    assert "Has Harness Issue         : ❌ No" in captured.out
+    assert "Special Token Wrappers    : [<|endoftext|>]" in captured.out
+    assert "OBSERVATION (special-token wrapper retained)" in captured.out
 
 
 def test_analyze_output_quality_with_file(
@@ -193,10 +195,10 @@ def test_analyze_output_quality_json_clean_output(
     assert payload["analysis"]["has_harness_issue"] is False
 
 
-def test_analyze_output_quality_json_issue_output(
+def test_analyze_output_quality_json_special_token_observation(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    """JSON mode should emit machine-readable issue details."""
+    """JSON mode should retain a wrapper as non-fault evidence."""
     original_argv = sys.argv
     sys.argv = [
         "analyze_output_quality.py",
@@ -207,14 +209,15 @@ def test_analyze_output_quality_json_issue_output(
 
     try:
         exit_code = main()
-        assert exit_code == 1
+        assert exit_code == 0
     finally:
         sys.argv = original_argv
 
     captured = capsys.readouterr()
     payload = json.loads(captured.out)
-    assert payload["status"] == "issues"
-    assert payload["exit_code"] == 1
-    assert payload["analysis"]["has_harness_issue"] is True
-    assert payload["analysis"]["harness_issue_type"] == "stop_token"
-    assert payload["summary"]["issue_string"]
+    assert payload["status"] == "observation"
+    assert payload["exit_code"] == 0
+    assert payload["analysis"]["has_harness_issue"] is False
+    assert payload["analysis"]["special_token_wrappers"] == ["<|endoftext|>"]
+    assert payload["analysis"]["evidence"] == ["special_token_wrapper"]
+    assert payload["summary"]["issue_string"] == ""

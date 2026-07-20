@@ -166,8 +166,8 @@ def _gallery_lines_for(result: check_models.PerformanceResult) -> str:
     return "\n".join(check_models._generate_model_gallery_section([result]))
 
 
-def test_gallery_metrics_include_time_and_throughput_details() -> None:
-    """Gallery success blocks should show timing and prompt/gen throughput."""
+def test_gallery_evidence_block_does_not_duplicate_summary_metrics() -> None:
+    """Per-model evidence should leave timing and throughput in the summary table."""
     result = check_models.PerformanceResult(
         model_name="test/model",
         generation=_GalleryGeneration(
@@ -184,12 +184,13 @@ def test_gallery_metrics_include_time_and_throughput_details() -> None:
 
     md = _gallery_lines_for(result)
 
-    assert "_Timing:_ Load 3.29s; Gen 1.60s; Total 5.14s" in md
-    assert "_Throughput:_ Prompt 1,551 TPS (1,624 tok); Gen 5.51 TPS (9 tok)" in md
+    assert "_Timing:_" not in md
+    assert "_Throughput:_" not in md
+    assert "<summary>Complete generated output: test/model</summary>" in md
 
 
-def test_gallery_metrics_omit_missing_segments_cleanly() -> None:
-    """Gallery metrics should omit unavailable prompt throughput without empty separators."""
+def test_gallery_evidence_block_omits_all_duplicate_metric_segments() -> None:
+    """Missing metrics should not reintroduce a partial per-model cost block."""
     result = check_models.PerformanceResult(
         model_name="test/model",
         generation=_GalleryGeneration(
@@ -206,9 +207,9 @@ def test_gallery_metrics_omit_missing_segments_cleanly() -> None:
 
     md = _gallery_lines_for(result)
 
-    assert "_Timing:_ Gen 10.90s; Total 14.51s" in md
-    assert "_Throughput:_ Gen 29.7 TPS (80 tok)" in md
-    assert "Prompt" not in md
+    assert "_Timing:_" not in md
+    assert "_Throughput:_" not in md
+    assert "<summary>Complete generated output: test/model</summary>" in md
 
 
 def test_gallery_output_uses_expandable_fenced_evidence() -> None:
@@ -286,7 +287,7 @@ def test_gallery_quality_warnings_have_blank_line_before_list() -> None:
 
     md = _gallery_lines_for(result)
 
-    assert "⚠️ _Quality Warnings:_\n\n- Context ignored" in md
+    assert "⚠️ _Quality Warnings:_\n\n- No overlap with supplied context indicators" in md
     assert "\n\n\n⚠️ _Quality Warnings:_" not in md
 
 
@@ -551,9 +552,9 @@ def test_gallery_review_summary_uses_review_focus_evidence(tmp_path: Path) -> No
     )
     md = out.read_text(encoding="utf-8")
 
-    assert "_Key signals:_" in md
+    assert "_Why:_" in md
     assert "hit token cap (60)" in md
-    assert "keywords=1" in md
+    assert "Keyword count violation" in md
 
 
 def test_wrapped_blockquote_strips_trailing_nonbreaking_spaces() -> None:

@@ -259,7 +259,7 @@ The tool generates multiple report formats in `output/` by default:
 - **JSONL** (`results.jsonl`): Exhaustive machine-readable per-model diagnostics,
   including fields intentionally omitted from the compact TSV, local component
   installation identity, and each model's requested versus resolved cache revision.
-- **Run JSON** (`run.json`): Stable run-level machine contract with mode, grounding,
+- **Run JSON** (`run.json`): Stable v1.4 run-level machine contract with mode, grounding,
   attempted/evaluated/indeterminate counts, component source/install provenance,
   check_models producer version/revision, source-image identity and dimensions,
   common generation settings, and artifact paths.
@@ -275,8 +275,9 @@ The tool generates multiple report formats in `output/` by default:
 - **Log** (`check_models.log`): Canonical comprehensive run artifact, including the full per-model review block and full output/captured failure output.
 - **History** (`results.history.jsonl`): Append-only run history for regressions/recoveries.
 - **Issue templates** (`issues/`): Ready-to-file GitHub issue markdown for clustered
-  crashes, harness problems, and text-sanity failures, including Model, Inputs,
-  Expected Behavior, and Actual Behavior sections.
+  `issue_ready` failures or controlled reproductions, including Model, Inputs,
+  Expected Behavior, and Actual Behavior sections. Harness observations and
+  unconfirmed output anomalies remain in diagnostics and do not create drafts.
 - **Repro bundles** (`repro_bundles/`): JSON reproduction bundles per issue cluster,
   containing error or output-quality details, CLI args, and environment for
   reproducibility. Local home paths are normalized and repro commands use portable
@@ -294,6 +295,36 @@ indexes; they do not replace the primary evidence. `model_selection.md` is a
 single-image shortlist. Capability wording in `model_capabilities.md` combines
 the current run with compatible, lane-matched history and must not be read as a
 claim based on the current image alone.
+
+#### Decision semantics and evidence scope
+
+Reports keep four decisions separate: current recommendation (`recommended`,
+`caveat`, `avoid`, or `not_evaluated`), historical reliability (`stable`,
+`variable`, `insufficient_evidence`, or `consistently_unsuitable`), runtime
+compatibility, and maintainer readiness. A useful current output can coexist with
+an unconfirmed maintainer observation; history never rewrites the current-run
+recommendation. Only canonical `issue_ready` evidence creates an issue draft.
+An upstream-entry crash is sufficient evidence of a crash, while successful
+thinking, stop-token, or context observations require a controlled reproduction.
+
+Keyword overlap is deliberately weak evidence. Zero overlap with known-good
+indicators is a smell worth surfacing, but missing one or more individual keywords
+does not establish poor caption quality and cannot by itself demote a model.
+All quality scores are an automated, metadata-assisted proxy over one image with
+no human visual ground truth; they are shortlist indicators, not benchmark-grade
+confidence estimates.
+
+The Model Selection Quick Chooser ranks only current `recommended` rows. When a
+memory/speed tier has no such row, it may show one explicitly caveated fallback;
+quality-first, efficiency, and memory-tier tables state their sort policy. The
+expandable complete current-run matrix prevents exclusions from disappearing.
+Use `model_gallery.md` for complete generated output, `diagnostics.md` for
+maintainer evidence and reproduction state, `check_models.log` for maximalist
+capture, and run JSON/JSONL for image, prompt, generation, component, and model
+revision provenance.
+
+Avoid lint/type suppressions wherever possible. Any unavoidable suppression must
+have a documented purpose and pass the repository suppression audit.
 
 ### Metrics Explained
 
@@ -1147,7 +1178,7 @@ Report featuring:
 - System information and library versions
 - Failed rows are highlighted in red for quick identification
 - Recommendation values use the same `recommended`, `caveat`, `avoid`, and
-  `not-evaluated` contract as the other report formats. Presentation warnings and
+  `not_evaluated` contract as the other report formats. Presentation warnings and
   token-limit truncation are caveats rather than clean recommendations.
 - Responsive design for mobile viewing
 
@@ -1195,7 +1226,7 @@ Line-delimited JSON for streaming ingestion:
 
 - **Metadata header**: The first record (line 1) contains shared metadata
   (prompt, system info, timestamp, versions, and component install/source
-  provenance) — JSONL v2.0 format.
+  provenance) — JSONL v2.1 format.
 - **Per-model records**: One JSON object per model with all metrics, error details,
   and requested/resolved model snapshot provenance when locally available.
 

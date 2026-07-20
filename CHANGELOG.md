@@ -20,6 +20,10 @@ Notable changes to this project will be documented in this file.
   source-image identity, prompt hash and burden, processed dimensions/patch count,
   common generation settings, `trust_remote_code`, producer/component revisions,
   and requested versus resolved model revisions; render missing evidence explicitly.
+- Remove superseded score-derived winner labels, model/fixture-specific runtime
+  keyword branches, and duplicate review/triage advice; project human and machine
+  reports from the canonical two-audience assessment while making
+  `src/check_models.py` shorter than its pre-change baseline without suppressions.
 - Gate every issue cluster, queue entry, and draft on canonical `issue_ready`
   evidence; keep needs-reproduction, harness, connectivity, and model-quality
   observations in separate diagnostics sections with complete expandable output
@@ -38,7 +42,8 @@ Notable changes to this project will be documented in this file.
 - Treat empty `<think></think>` protocol wrappers as presentation caveats rather
   than reasoning, gibberish, or confirmed stop-token failures; require controlled
   reruns for long-context collapses even when they also hit the output-token cap,
-  and split unrelated text-sanity observations by model repository.
+  split unrelated text-sanity observations by model repository, and make the
+  standalone analyzer retain special-token wrappers as non-fault observations.
 - Remove contradictory legacy score/review-focus rows from the evidence gallery,
   constrain review shortlists to canonical recommendations, keep complete output
   once in expandable fenced blocks, and use concise output previews in its summary.

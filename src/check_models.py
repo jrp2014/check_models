@@ -3009,23 +3009,13 @@ def _render_html_stanza(stanza: ReportStanza) -> list[str]:
     return parts
 
 
-@dataclass(frozen=True)
-class ReviewPayload:
-    """Canonical review inputs reused across human-facing report renderers."""
-
-    review: JsonlReviewRecord
-    analysis: GenerationQualityAnalysis | None
-    key_signals: str
-    next_action: str
-
-
 def _append_markdown_review_block(
     out: list[str],
     *,
     res: PerformanceResult,
 ) -> None:
     """Append the shared canonical review block to a Markdown artifact."""
-    rows = _build_markdown_review_block_rows(res)
+    rows = _build_review_block_rows(res)
     _append_markdown_row_block(out, rows=rows)
 
 
@@ -3035,7 +3025,7 @@ def _build_gallery_error_block_lines(res: PerformanceResult) -> list[str]:
     max_inline_error_length = 80
 
     error_msg = _escape_markdown_blockquote_line(str(res.error_message))
-    review_rows = dict(_build_markdown_review_block_rows(res))
+    review_rows = dict(_build_review_block_rows(res))
     failure_context = "; ".join(
         f"{label.lower()} `{value}`"
         for label, value in (
@@ -3047,17 +3037,16 @@ def _build_gallery_error_block_lines(res: PerformanceResult) -> list[str]:
         if value
     )
     rows = [
-        ("Recommendation", review_rows.get("Recommendation")),
+        ("Verdict", review_rows.get("Verdict")),
         ("Status", f"Failed ({res.error_stage})"),
-        ("Owner", review_rows.get("Owner")),
-        ("Next step", review_rows.get("Next step")),
+        ("Maintainer", review_rows.get("Maintainer")),
+        ("Next action", review_rows.get("Next action")),
         (
             "Error summary",
             error_msg if len(error_msg) <= max_inline_error_length else "see error details below",
         ),
-        ("Key signals", review_rows.get("Key signals")),
+        ("Why", review_rows.get("Why")),
         ("Failure context", failure_context),
-        ("Tokens", review_rows.get("Tokens")),
     ]
     _append_markdown_row_block(out, rows=_build_report_stanza(None, rows).rows)
 
@@ -3086,73 +3075,6 @@ def _build_gallery_error_block_lines(res: PerformanceResult) -> list[str]:
             body_lines=traceback_lines,
         )
     return out
-
-
-def _gallery_metric_segment(label: str, field_name: str, value: MetricValue) -> str | None:
-    """Return one compact timing segment for gallery rows."""
-    formatted = format_field_value(field_name, value)
-    if not formatted:
-        return None
-    return f"{label} {formatted}"
-
-
-def _gallery_throughput_segment(
-    label: str,
-    tps_value: float | None,
-    token_field_name: str,
-    token_value: int | None,
-) -> str | None:
-    """Return one compact throughput segment for gallery rows."""
-    tps_formatted = format_field_value("generation_tps", tps_value)
-    tokens_formatted = format_field_value(token_field_name, token_value)
-    if not tps_formatted and not tokens_formatted:
-        return None
-    if tps_formatted and tokens_formatted:
-        return f"{label} {tps_formatted} TPS ({tokens_formatted} tok)"
-    if tps_formatted:
-        return f"{label} {tps_formatted} TPS"
-    return f"{label} {tokens_formatted} tok"
-
-
-def _build_gallery_success_performance_rows(
-    res: PerformanceResult,
-    generation: StoredGenerationResult | None,
-) -> list[tuple[str, str]]:
-    """Build timing and throughput rows for one successful gallery entry."""
-    time_segments = [
-        segment
-        for segment in (
-            _gallery_metric_segment("Load", "model_load_time", res.model_load_time),
-            _gallery_metric_segment("Gen", "generation_time", res.generation_time),
-            _gallery_metric_segment("Total", "total_time", res.total_time),
-        )
-        if segment is not None
-    ]
-    rows = [("Timing", _markdown_review_text(" | ".join(time_segments)))] if time_segments else []
-    if not time_segments or generation is None:
-        return rows
-
-    throughput_segments = [
-        segment
-        for segment in (
-            _gallery_throughput_segment(
-                "Prompt",
-                _generation_float_metric(generation, "prompt_tps"),
-                "prompt_tokens",
-                _generation_int_metric(generation, "prompt_tokens"),
-            ),
-            _gallery_throughput_segment(
-                "Gen",
-                _generation_float_metric(generation, "generation_tps"),
-                "generation_tokens",
-                _generation_int_metric(generation, "generation_tokens"),
-            ),
-        )
-        if segment is not None
-    ]
-    if throughput_segments:
-        rows.append(("Throughput", _markdown_review_text(" | ".join(throughput_segments))))
-    return rows
 
 
 def _append_gallery_quality_lines(
@@ -3192,11 +3114,7 @@ def _build_gallery_success_block_lines(
 ) -> list[str]:
     """Build the success block used by the Markdown gallery."""
     generation: StoredGenerationResult | None = res.generation
-    rows = _build_markdown_review_block_rows(res)
-    token_rows = [(label, value) for label, value in rows if label == "Tokens"]
-    summary_rows = [(label, value) for label, value in rows if label != "Tokens"]
-    summary_rows.extend(_build_gallery_success_performance_rows(res, generation))
-    summary_rows.extend(token_rows)
+    summary_rows = _build_review_block_rows(res)
 
     out: list[str] = []
     _append_markdown_row_block(out, rows=summary_rows)
@@ -8153,28 +8071,30 @@ def analyze_generation_text(
             or formatting_issues
         ),
     )
+    conditional_evidence = (
+        ("instruction_markers", bool(prompt_signals.instruction_markers)),
+        ("metadata_terms", bool(prompt_signals.borrowed_metadata_terms)),
+        ("reasoning_leak", prompt_signals.has_reasoning_leak),
+        ("thinking_incomplete", prompt_signals.thinking_trace_incomplete),
+        ("context_echo", prompt_signals.has_context_echo),
+        ("refusal", is_refusal),
+        ("generic", is_generic),
+        ("degeneration", has_degeneration),
+        ("fabrication", has_fabrication),
+        ("text_sanity", text_sanity_issue_type is not None),
+        ("generation_loop", generation_loop_type is not None),
+        ("special_token_wrapper", bool(normalized.removed_wrappers)),
+        (
+            "reasoning_budget_exhausted",
+            prompt_signals.thinking_trace_incomplete and likely_capped,
+        ),
+    )
     evidence = _dedupe_preserve_order(
         [
             *review_evidence,
             *cutoff_reasons,
             *hint_evidence,
-            *(["instruction_markers"] if prompt_signals.instruction_markers else []),
-            *(["metadata_terms"] if prompt_signals.borrowed_metadata_terms else []),
-            *(["reasoning_leak"] if prompt_signals.has_reasoning_leak else []),
-            *(["thinking_incomplete"] if prompt_signals.thinking_trace_incomplete else []),
-            *(["context_echo"] if prompt_signals.has_context_echo else []),
-            *(["refusal"] if is_refusal else []),
-            *(["generic"] if is_generic else []),
-            *(["degeneration"] if has_degeneration else []),
-            *(["fabrication"] if has_fabrication else []),
-            *(["text_sanity"] if text_sanity_issue_type is not None else []),
-            *(["generation_loop"] if generation_loop_type is not None else []),
-            *(["special_token_wrapper"] if normalized.removed_wrappers else []),
-            *(
-                ["reasoning_budget_exhausted"]
-                if prompt_signals.thinking_trace_incomplete and likely_capped
-                else []
-            ),
+            *(label for label, present in conditional_evidence if present),
         ],
     )
 
@@ -12242,16 +12162,6 @@ def _home_relative_report_text(value: str) -> str:
     return value.replace(home, "~")
 
 
-def _cataloging_score_index(
-    summary: ModelIssueSummary,
-) -> dict[str, tuple[float, str, str, float | None]]:
-    """Index cached cataloging scores by model for shared report helpers."""
-    return {
-        model_name: (score, grade, weakness, delta)
-        for model_name, score, grade, weakness, delta in summary.get("cataloging_scores", [])
-    }
-
-
 def _quality_analysis_for_result(res: PerformanceResult) -> GenerationQualityAnalysis | None:
     """Return cached quality analysis for a result when present."""
     if res.quality_analysis is not None:
@@ -12519,18 +12429,6 @@ def _has_template_opened_thinking(result: PerformanceResult) -> bool:
     return any(preview.endswith(start) for start, _end in THINKING_TRACE_DELIMITER_PAIRS)
 
 
-def _issue_readiness_for_result(
-    result: PerformanceResult,
-    review: JsonlReviewRecord,
-    analysis: GenerationQualityAnalysis | None,
-) -> IssueReadiness:
-    """Project canonical maintainer readiness into the legacy triage view."""
-    del review, analysis
-    return _classify_maintainer_assessment(
-        evidence=_collect_observed_evidence(result), result=result
-    ).maintainer_readiness
-
-
 def _review_issue_subtype(
     result: PerformanceResult,
     review: JsonlReviewRecord,
@@ -12555,164 +12453,15 @@ def _review_issue_subtype(
     return subtype
 
 
-def _review_confidence(
-    result: PerformanceResult,
-    review: JsonlReviewRecord,
-    analysis: GenerationQualityAnalysis | None,
-) -> MaintainerConfidence:
-    """Return confidence level for maintainer-oriented triage routing."""
-    confidence: MaintainerConfidence = "low"
-    if _has_template_opened_thinking(result):
-        confidence = "medium"
-    elif result.success and review["verdict"] == "context_budget":
-        confidence = "medium" if review["prompt_tokens_nontext_est"] is not None else "low"
-    elif not result.success and (
-        result.error_code is not None
-        or result.error_traceback is not None
-        or result.error_package is not None
-    ):
-        confidence = "low" if _is_indeterminate_connectivity_failure(result) else "high"
-    elif analysis is not None:
-        if (analysis.has_harness_issue and analysis.harness_issue_type is not None) or (
-            review["verdict"] in {"cutoff", "context_budget"}
-            and (review["hit_max_tokens"] or review["nontext_prompt_ratio"] is not None)
-        ):
-            confidence = "high"
-        elif analysis.evidence or analysis.missing_sections:
-            confidence = "medium"
-    elif review["evidence"] or review["missing_sections"]:
-        confidence = "medium"
-    return confidence
-
-
-def _failure_context_text(result: PerformanceResult) -> str:
-    """Return combined failure text for issue/routing heuristics."""
-    return " ".join(
-        part
-        for part in (
-            result.root_error_message,
-            result.error_message,
-            result.error_stage,
-            result.error_code,
-            result.error_traceback,
-            result.captured_output_on_fail,
-        )
-        if part
-    )
-
-
-_RUNTIME_FAILURE_PROBLEM_LABELS: Final[dict[str, str]] = {
-    "unsupported_granite": "Unsupported Granite model type/import path",
-    "weight_config_mismatch": "Weight/config mismatch during model load",
-    "missing_image_processor": "Processor config is missing image processor",
-    "missing_chat_template": "Missing chat template in model/tokenizer config",
-    "api_mismatch": "Upstream API mismatch in processor/generation call",
-    "missing_module": "Missing module/import during model load",
-}
-
-_RUNTIME_FAILURE_NEXT_ACTIONS: Final[dict[str, str]] = {
-    "unsupported_granite": (
-        "Check mlx-vlm model-type registration/import handling for Granite; confirm the "
-        "loader either supports this architecture or fails before generation with a clear "
-        "unsupported-model message."
-    ),
-    "weight_config_mismatch": (
-        "Compare checkpoint keys with the selected model class/config, especially projector "
-        "scale/bias parameters and quantized weight naming, before judging model quality."
-    ),
-    "missing_image_processor": (
-        "Inspect the model repo processor/preprocessor config and AutoProcessor mapping; "
-        "the multimodal processor is missing or not exposing the image processor expected "
-        "by mlx-vlm."
-    ),
-    "missing_chat_template": (
-        "Inspect tokenizer chat_template and EOS defaults in the model repo before changing "
-        "generation logic."
-    ),
-    "api_mismatch": (
-        "Check installed transformers/mlx-vlm API compatibility and forwarded processor or "
-        "generation kwargs."
-    ),
-    "missing_module": (
-        "Inspect the import path and installed package version that owns the missing module "
-        "before treating this as a model failure."
-    ),
-}
-
-
-def _runtime_failure_diagnostic_kind(result: PerformanceResult | None) -> str | None:
-    """Return a compact runtime-failure kind from structured root-cause fields."""
-    kind: str | None = None
-    if result is None:
-        return kind
-
-    failure_text = _failure_context_text(result)
-    normalized = failure_text.casefold()
-    error_code = (result.error_code or "").upper()
-    error_stage = (result.error_stage or "").casefold()
-
-    if "granite" in normalized and "not supported" in normalized:
-        kind = "unsupported_granite"
-    elif (
-        "WEIGHT_MISMATCH" in error_code
-        or "weight mismatch" in error_stage
-        or "parameters not in model" in normalized
-        or ("missing" in normalized and "parameters" in normalized)
-        or ("received" in normalized and "parameters" in normalized)
-    ):
-        kind = "weight_config_mismatch"
-    elif (
-        "image_processor" in normalized
-        or "image processor" in normalized
-        or "PROCESSOR" in error_code
-        or "processor" in error_stage
-    ):
-        kind = "missing_image_processor"
-    elif "chat_template is not set" in normalized or "no template argument" in normalized:
-        kind = "missing_chat_template"
-    elif "unexpected keyword argument" in normalized or "got an unexpected keyword" in normalized:
-        kind = "api_mismatch"
-    elif "no module named" in normalized:
-        kind = "missing_module"
-    return kind
-
-
-def _review_runtime_failure_next_action(result: PerformanceResult) -> str | None:
-    """Return failure-specific maintainer guidance from structured root-cause fields."""
-    kind = _runtime_failure_diagnostic_kind(result)
-    return _RUNTIME_FAILURE_NEXT_ACTIONS.get(kind or "")
-
-
 def _review_next_action_for_result(
     result: PerformanceResult,
     review: JsonlReviewRecord,
 ) -> str:
-    """Return one actionable next-step line, using result details when available."""
-    if _has_template_opened_thinking(result):
-        return (
-            "Re-run with the rendered template and effective thinking kwargs captured; compare "
-            "an explicitly thinking-disabled template before filing a stop-token issue."
-        )
-    if result.success and review["verdict"] == "context_budget":
-        return (
-            "Run a controlled reduced-image or lower-visual-token comparison before assigning "
-            "the context-boundary behaviour to mlx, mlx-vlm, or the model."
-        )
-    if review["verdict"] == "runtime_failure" and (
-        action := _review_runtime_failure_next_action(result)
-    ):
-        return action
-    return _review_next_action_text(review)
-
-
-def _review_maintainer_next_action(
-    result: PerformanceResult,
-    review: JsonlReviewRecord,
-) -> str:
-    """Return a maintainer-facing next action, avoiding noisy advice for clean rows."""
-    if review["verdict"] == "clean" and review["user_bucket"] == "recommended":
-        return "No immediate maintainer action."
-    return _review_next_action_for_result(result, review)
+    """Project the canonical maintainer action into legacy review surfaces."""
+    del review
+    return _classify_maintainer_assessment(
+        evidence=_collect_observed_evidence(result), result=result
+    ).next_action
 
 
 def _build_jsonl_maintainer_triage_record(
@@ -12724,23 +12473,17 @@ def _build_jsonl_maintainer_triage_record(
 ) -> JsonlMaintainerTriageRecord:
     """Build an action-oriented maintainer triage payload for one result."""
     analysis = _review_analysis_for_result(result)
-    issue_readiness = (
-        assessment.maintainer_readiness
-        if assessment is not None
-        else _issue_readiness_for_result(result, review, analysis)
+    resolved_assessment = assessment or _classify_maintainer_assessment(
+        evidence=_collect_observed_evidence(result), result=result
     )
-    suspected_owner = review["owner"]
-    if _has_template_opened_thinking(result):
-        suspected_owner = "model-config / mlx-vlm"
-    elif result.success and review["verdict"] == "context_budget":
-        suspected_owner = "model-config / mlx-vlm / mlx"
+    issue_readiness = resolved_assessment.maintainer_readiness
     triage: JsonlMaintainerTriageRecord = {
-        "suspected_owner": suspected_owner,
-        "confidence": _review_confidence(result, review, analysis),
+        "suspected_owner": resolved_assessment.suspected_owner or _UNKNOWN_OWNER,
+        "confidence": resolved_assessment.owner_confidence or "low",
         "issue_readiness": issue_readiness,
         "issue_kind": review["verdict"],
         "summary": _review_focus_text(review, analysis),
-        "next_action": _review_maintainer_next_action(result, review),
+        "next_action": resolved_assessment.next_action,
         "user_bucket": review["user_bucket"],
         "evidence": list(review["evidence"]),
         "harness_details": list(review["harness_details"]),
@@ -12833,330 +12576,52 @@ def _triage_text_fingerprint(text: str) -> str:
     return re.sub(r"\W+", " ", html.unescape(text).casefold()).strip()
 
 
-def _review_assisted_enrichment_evidence(review: JsonlReviewRecord) -> list[str]:
-    """Return canonical assisted-enrichment labels for human review surfaces."""
-    labels = {"unverified-context-copy", "low-draft-improvement"}
-    return [
-        _humanize_review_evidence_label(label) for label in review["evidence"] if label in labels
-    ]
-
-
-def _review_hint_text(
-    review: JsonlReviewRecord,
-    analysis: GenerationQualityAnalysis | None,
-) -> str:
-    """Return a concise trusted-hint summary for review surfaces."""
-    if analysis is None:
-        return "not evaluated"
-    parts = [review["hint_relationship"].replace("_", " ")]
-    parts.extend(_review_assisted_enrichment_evidence(review))
-    return " | ".join(parts)
-
-
-def _review_contract_text(analysis: GenerationQualityAnalysis | None) -> str:
-    """Return a compact contract-compliance summary."""
-    if analysis is None:
-        return "not evaluated"
-
-    issues: list[str] = []
-    if analysis.missing_sections:
-        issues.append("missing: " + ", ".join(analysis.missing_sections))
-    if analysis.has_title_length_violation:
-        issues.append(f"title words={analysis.title_word_count}")
-    if analysis.has_description_sentence_violation:
-        issues.append(f"description sentences={analysis.description_sentence_count}")
-    if analysis.has_keyword_count_violation:
-        issues.append(f"keywords={analysis.keyword_count}")
-    if analysis.has_keyword_duplication_violation:
-        issues.append(f"keyword duplication={analysis.keyword_duplication_ratio:.2f}")
-    return "ok" if not issues else " | ".join(issues)
-
-
-def _review_utility_text(
-    review: JsonlReviewRecord,
-    analysis: GenerationQualityAnalysis | None,
-) -> str:
-    """Return a concise informational-utility summary."""
-    parts = [f"user={review['user_bucket']}"]
-    if analysis is not None:
-        parts.append(review["hint_relationship"].replace("_", " "))
-        if analysis.instruction_echo:
-            parts.append("instruction echo")
-        if analysis.is_generic:
-            parts.append("generic")
-        if analysis.has_context_echo:
-            parts.append("context echo")
-    parts.extend(_review_assisted_enrichment_evidence(review))
-    return " | ".join(parts)
-
-
-def _review_stack_owner_text(
-    result: PerformanceResult,
-    review: JsonlReviewRecord,
-    analysis: GenerationQualityAnalysis | None,
-) -> str:
-    """Return a compact stack-integrity and ownership summary."""
-    parts = [f"owner={review['owner']}"]
-    if analysis is not None and analysis.has_harness_issue:
-        parts.append(f"harness={analysis.harness_issue_type or 'yes'}")
-    if result.error_package:
-        parts.append(f"package={result.error_package}")
-    if result.error_stage:
-        parts.append(f"stage={result.error_stage}")
-    if result.error_code:
-        parts.append(f"code={result.error_code}")
-    return " | ".join(parts)
-
-
-def _review_token_accounting_text(result: PerformanceResult, review: JsonlReviewRecord) -> str:
-    """Assemble token-count context for review surfaces."""
-    generation_tokens = (
-        getattr(result.generation, "generation_tokens", None)
-        if result.generation is not None
-        else None
-    )
-    stop_reason = result.runtime_diagnostics.stop_reason if result.runtime_diagnostics else None
-    parts = [
-        f"prompt={review['prompt_tokens_total'] if review['prompt_tokens_total'] is not None else 'n/a'}",
-        (
-            f"text_est={review['prompt_tokens_text_est']}"
-            if review["prompt_tokens_text_est"] is not None
-            else "text_est=n/a"
-        ),
-        (
-            f"nontext_est={review['prompt_tokens_nontext_est']}"
-            if review["prompt_tokens_nontext_est"] is not None
-            else "nontext_est=n/a"
-        ),
-        f"gen={generation_tokens if generation_tokens is not None else 'n/a'}",
-        f"max={review['requested_max_tokens'] if review['requested_max_tokens'] is not None else 'n/a'}",
-    ]
-    if stop_reason:
-        parts.append(f"stop={stop_reason}")
-    return " | ".join(parts)
-
-
 def _humanize_review_evidence_label(label: str) -> str:
     """Return a human-readable fallback label for compact review evidence."""
     return label.replace("_", " ")
-
-
-def _review_analysis_focus_parts(analysis: GenerationQualityAnalysis) -> list[str]:
-    """Return compact focus fragments sourced directly from quality analysis."""
-    parts: list[str] = []
-    if (
-        analysis.has_keyword_duplication_violation
-        and analysis.keyword_duplication_ratio is not None
-    ):
-        parts.append(f"keyword duplication={analysis.keyword_duplication_ratio:.0%}")
-    elif analysis.has_keyword_count_violation and analysis.keyword_count is not None:
-        parts.append(f"keywords={analysis.keyword_count}")
-
-    if analysis.has_context_echo and analysis.context_echo_ratio > 0:
-        parts.append(f"context echo={analysis.context_echo_ratio:.0%}")
-    if analysis.has_reasoning_leak:
-        parts.append("reasoning leak")
-    if analysis.thinking_trace_incomplete:
-        parts.append("thinking trace incomplete")
-    elif analysis.has_thinking_trace:
-        parts.append("thinking trace present")
-    if analysis.text_sanity_issue_type is not None:
-        parts.append(f"text-sanity={analysis.text_sanity_issue_type}")
-    if analysis.formatting_issues:
-        formatting_preview = html.escape(
-            _collapse_preview_whitespace(analysis.formatting_issues[0]),
-            quote=False,
-        )
-        parts.append(f"formatting={formatting_preview}")
-    if analysis.has_excessive_bullets:
-        parts.append(f"excessive bullets={analysis.bullet_count}")
-    if analysis.has_degeneration and analysis.degeneration_type is not None:
-        parts.append(f"degeneration={analysis.degeneration_type}")
-    if analysis.is_repetitive and analysis.repeated_token is not None:
-        safe_token = analysis.repeated_token.replace("*", r"\*")
-        parts.append(f"repetitive token={safe_token}")
-    return parts
 
 
 def _review_focus_text(
     review: JsonlReviewRecord,
     analysis: GenerationQualityAnalysis | None,
 ) -> str:
-    """Return compact evidence text tuned for human review surfaces."""
-    parts: list[str] = []
-
-    parts.extend(
-        _describe_harness_details(
-            review["harness_details"][:2],
-            prompt_burden_kind=review.get("prompt_burden_kind", "unknown"),
-        )
+    """Return a compact projection of retained review evidence."""
+    parts = _describe_harness_details(
+        review["harness_details"][:2],
+        prompt_burden_kind=review.get("prompt_burden_kind", "unknown"),
     )
-
-    if review["hit_max_tokens"] and review["requested_max_tokens"] is not None:
-        parts.append(f"hit token cap ({review['requested_max_tokens']})")
-
-    if review["prompt_output_ratio"] is not None and review["verdict"] in {
-        "cutoff",
-        "context_budget",
-    }:
-        parts.append(f"output/prompt={review['prompt_output_ratio']:.2%}")
-
-    burden_kind = review.get("prompt_burden_kind", "unknown")
-    if burden_kind == "unavailable" and review["verdict"] == "context_budget":
-        parts.append("prompt/input composition unavailable")
-    elif burden_kind not in {"normal", "unknown"} and review["verdict"] == "context_budget":
-        burden_label = burden_kind.replace("_", " ")
-        ratio_suffix = (
-            f"={review['nontext_prompt_ratio']:.0%}"
-            if review["nontext_prompt_ratio"] is not None
-            else ""
-        )
-        parts.append(f"{burden_label} burden{ratio_suffix}")
-
+    parts.extend(_humanize_review_evidence_label(label) for label in review["evidence"][:3])
+    if review["hit_max_tokens"]:
+        cap = review["requested_max_tokens"]
+        parts.append(f"hit token cap ({cap})" if cap is not None else "hit token cap")
     if review["missing_sections"]:
         parts.append("missing sections: " + ", ".join(review["missing_sections"]))
-
-    if analysis is not None:
-        parts.extend(_review_analysis_focus_parts(analysis))
-
-    parts.extend(_review_assisted_enrichment_evidence(review))
-
-    if not parts and review["evidence"]:
-        parts.extend(_humanize_review_evidence_label(label) for label in review["evidence"][:3])
-
+    if analysis is not None and analysis.formatting_issues:
+        parts.append(_collapse_preview_whitespace(analysis.formatting_issues[0]))
     return " | ".join(_dedupe_preserve_order(parts[:4])) or "no flagged signals"
 
 
-def _review_cutoff_next_action(review: JsonlReviewRecord) -> str:
-    """Return evidence-specific next action for cutoff verdicts."""
-    action = (
-        "Inspect stop behavior and tail quality before treating this as a model-quality failure."
-    )
-    if review["hit_max_tokens"] and review["missing_sections"]:
-        action = (
-            "Raise the token cap or trim prompt burden first; generation hit the limit "
-            f"while {', '.join(review['missing_sections'])} remained incomplete."
-        )
-    elif review["hit_max_tokens"] and review["prompt_output_ratio"] is not None:
-        action = (
-            "Treat this as cap-limited output first; generation exhausted the token budget "
-            f"with output/prompt={review['prompt_output_ratio']:.2%}."
-        )
-    return action
-
-
-def _review_owner_specific_next_action(review: JsonlReviewRecord) -> str | None:
-    """Return owner-tuned action text when evidence allows a more specific hint."""
-    owner = review["owner"]
-    harness_details = tuple(review["harness_details"])
-    harness_kinds = {_split_harness_detail(detail)[0] for detail in harness_details}
-    action: str | None = None
-
-    if owner == "mlx-vlm":
-        if "token_leak" in harness_kinds:
-            action = "Inspect EOS/stop-token stripping; control tokens are leaking into user-facing text."
-        elif "token_encoding" in harness_kinds:
-            action = "Inspect decode cleanup; tokenizer markers are leaking into user-facing text."
-        elif "training_leak" in harness_kinds:
-            action = (
-                "Inspect continuation and stop handling; generation is drifting into template text."
-            )
-    elif owner == "mlx" and review.get("prompt_burden_kind") == "visual_input":
-        action = "Inspect long-context cache behavior under heavy image-token burden."
-    elif owner == "model-config" and review["missing_sections"]:
-        action = (
-            "Check chat-template and EOS defaults first; the output shape is not matching the "
-            "requested contract."
-        )
-    elif owner == "model":
-        if review["missing_sections"]:
-            action = (
-                "Treat as a model limitation for this prompt; the requested output contract is "
-                "not being met."
-            )
-        elif review["missing_terms"]:
-            action = (
-                "Treat as a model limitation for this prompt; trusted hint coverage is still weak."
-            )
-
-    return action
-
-
-def _review_next_action_text(review: JsonlReviewRecord) -> str:
-    """Return one actionable next-step line for developers or users."""
-    action: str | None = None
-    if review["verdict"] == "cutoff":
-        action = _review_cutoff_next_action(review)
-    elif review["verdict"] == "context_budget":
-        burden_kind = review.get("prompt_burden_kind", "unknown")
-        if burden_kind in {"unknown", "unavailable"}:
-            action = (
-                "Prompt/input composition is unavailable; inspect token accounting or reduce the "
-                "input load before judging output quality."
-            )
-        else:
-            burden_label = burden_kind.replace("_", " ")
-            action = (
-                f"Treat this as a {burden_label} burden issue first; reduce that input load or "
-                "inspect long-context handling before judging output quality."
-            )
-    elif "external_connectivity" in review["evidence"]:
-        action = (
-            "Retry when external connectivity is stable; the model was not evaluated and the "
-            "disconnect does not identify a faulty package."
-        )
-    else:
-        action = _review_owner_specific_next_action(review)
-
-    if action is not None:
-        return action
-
-    owner_actions: dict[str, str] = {
-        "mlx-vlm": "Inspect prompt-template, stop-token, and decode post-processing behavior.",
-        "mlx": "Inspect KV/cache behavior, memory pressure, and long-context execution.",
-        "mlx-lm": "Inspect tokenizer/generation stack shared with mlx-lm.",
-        "transformers": "Inspect upstream template/tokenizer/config compatibility.",
-        "huggingface-hub": (
-            "Check cache/revision availability and network/auth state before blaming the model."
-        ),
-        "model-config": "Inspect model repo config, chat template, and EOS settings.",
-        "model": "Treat as a model-quality limitation for this prompt and image.",
-    }
-    return owner_actions.get(review["owner"], "Inspect the canonical log and diagnostics output.")
-
-
-def _build_review_payload(result: PerformanceResult) -> ReviewPayload | None:
-    """Build the shared review payload once for downstream report renderers."""
+def _build_review_block_rows(result: PerformanceResult) -> list[tuple[str, str]]:
+    """Build a compact canonical-decision audit for the maximalist log."""
     review = _review_for_result(result)
     if review is None:
-        return None
-
-    analysis = _review_analysis_for_result(result)
-    return ReviewPayload(
-        review=review,
-        analysis=analysis,
-        key_signals=_review_focus_text(review, analysis),
-        next_action=_review_next_action_for_result(result, review),
-    )
-
-
-def _build_review_block_rows(result: PerformanceResult) -> list[tuple[str, str]]:
-    """Build ordered canonical review rows shared by log and Markdown outputs."""
-    payload = _build_review_payload(result)
-    if payload is None:
         return []
 
-    review = payload.review
-    analysis = payload.analysis
+    signals = _review_focus_text(review, _review_analysis_for_result(result))
+    triage = _maintainer_triage_for_result(result)
     return [
         ("Verdict", f"{review['verdict']} | user={review['user_bucket']}"),
-        ("Why", payload.key_signals),
-        ("Trusted hints", _review_hint_text(review, analysis)),
-        ("Contract", _review_contract_text(analysis)),
-        ("Utility", _review_utility_text(review, analysis)),
-        ("Stack / owner", _review_stack_owner_text(result, review, analysis)),
-        ("Token accounting", _review_token_accounting_text(result, review)),
-        ("Next action", payload.next_action),
+        ("Why", signals),
+        (
+            "Maintainer",
+            (
+                f"{triage['issue_readiness']} | owner={triage['suspected_owner']} | "
+                f"confidence={triage['confidence']}"
+                if triage is not None
+                else "not applicable"
+            ),
+        ),
+        ("Next action", _review_next_action_for_result(result, review)),
     ]
 
 
@@ -13180,203 +12645,6 @@ def _review_display_bucket_label(
     if bucket == "recommended" and is_ungrounded:
         return "clean-triage-pass"
     return bucket
-
-
-def _humanize_review_bucket_text(
-    bucket: str,
-    *,
-    review: JsonlReviewRecord | None = None,
-) -> str:
-    """Return user-facing phrasing for gallery recommendations."""
-    display_bucket = _review_display_bucket_label(bucket, review=review)
-    bucket_labels = {
-        "recommended": "recommended",
-        "clean-triage-pass": "clean triage pass",
-        "caveat": "use with caveats",
-        "avoid": "avoid for now",
-    }
-    return bucket_labels.get(display_bucket, display_bucket.replace("_", " "))
-
-
-def _humanize_review_verdict_text(verdict: str) -> str:
-    """Return human-readable verdict text for gallery surfaces."""
-    return verdict.replace("_", " ")
-
-
-def _markdown_review_stack_owner_text(
-    result: PerformanceResult,
-    review: JsonlReviewRecord,
-    analysis: GenerationQualityAnalysis | None,
-) -> str:
-    """Return gallery-friendly maintainer-routing text."""
-    parts = [f"likely owner `{review['owner']}`"]
-    if analysis is not None and analysis.has_harness_issue:
-        parts.append(f"harness signal `{analysis.harness_issue_type or 'present'}`")
-    if result.error_package:
-        parts.append(f"reported package `{result.error_package}`")
-    if result.error_stage:
-        parts.append(f"failure stage `{result.error_stage}`")
-    if result.error_code:
-        parts.append(f"diagnostic code `{result.error_code}`")
-    return "; ".join(parts)
-
-
-def _markdown_review_token_accounting_text(
-    result: PerformanceResult,
-    review: JsonlReviewRecord,
-) -> str:
-    """Return gallery-friendly token summary text."""
-
-    def _format_token_count(value: int | None) -> str:
-        return f"{value} tok" if value is not None else "n/a"
-
-    generation_tokens = (
-        getattr(result.generation, "generation_tokens", None)
-        if result.generation is not None
-        else None
-    )
-    stop_reason = result.runtime_diagnostics.stop_reason if result.runtime_diagnostics else None
-    parts = [
-        f"prompt {_format_token_count(review['prompt_tokens_total'])}",
-        f"estimated text {_format_token_count(review['prompt_tokens_text_est'])}",
-        f"estimated non-text {_format_token_count(review['prompt_tokens_nontext_est'])}",
-        f"generated {_format_token_count(generation_tokens)}",
-        f"requested max {_format_token_count(review['requested_max_tokens'])}",
-    ]
-    if stop_reason:
-        parts.append(f"stop reason {stop_reason}")
-    return "; ".join(parts)
-
-
-def _build_markdown_review_block_rows(result: PerformanceResult) -> list[tuple[str, str]]:
-    """Build clearer review rows for gallery-style Markdown artifacts."""
-    payload = _build_review_payload(result)
-    if payload is None:
-        return []
-
-    review = payload.review
-    analysis = payload.analysis
-    rows = [
-        (
-            "Recommendation",
-            (
-                f"{_humanize_review_bucket_text(review['user_bucket'], review=review)}; "
-                f"review verdict: {_humanize_review_verdict_text(review['verdict'])}"
-            ),
-        ),
-        ("Owner", _markdown_review_stack_owner_text(result, review, analysis)),
-        ("Next step", payload.next_action),
-        ("Key signals", _markdown_review_text(payload.key_signals)),
-        ("Tokens", _markdown_review_token_accounting_text(result, review)),
-    ]
-    if (
-        review["user_bucket"] == "recommended"
-        and review["verdict"] == "clean"
-        and payload.key_signals == "no flagged signals"
-    ):
-        rows = [row for row in rows if row[0] != "Next step"]
-    return rows
-
-
-def _summarize_context_ignored_signal(qa: GenerationQualityAnalysis) -> str | None:
-    """Return contextual-miss signal text when available."""
-    if not qa.is_context_ignored:
-        return None
-    return "Model output has no overlap with the supplied context indicators."
-
-
-def _summarize_repetition_signal(qa: GenerationQualityAnalysis) -> str | None:
-    """Return repetition signal text when available."""
-    if not qa.is_repetitive:
-        return None
-    if qa.repeated_token is not None:
-        return (
-            "Output became repetitive, indicating possible generation instability "
-            f"(token: {qa.repeated_token})."
-        )
-    return "Output became repetitive, indicating possible generation instability."
-
-
-def _summarize_degeneration_signal(qa: GenerationQualityAnalysis) -> str | None:
-    """Return degeneration signal text when available."""
-    if not qa.has_degeneration:
-        return None
-    if qa.degeneration_type is not None:
-        return f"Output contains corrupted or malformed text segments ({qa.degeneration_type})."
-    return "Output contains corrupted or malformed text segments."
-
-
-def _summarize_language_signal(qa: GenerationQualityAnalysis) -> str | None:
-    """Return language-mixing signal text when available."""
-    if not qa.has_language_mixing:
-        return None
-    if qa.language_mixing_issues:
-        return (
-            "Output switched language/script unexpectedly "
-            f"({', '.join(qa.language_mixing_issues)})."
-        )
-    return "Output switched language/script unexpectedly."
-
-
-def _summarize_refusal_signal(qa: GenerationQualityAnalysis) -> str | None:
-    """Return refusal signal text when available."""
-    if not qa.is_refusal:
-        return None
-    if qa.refusal_type is not None:
-        return f"Model refused or deflected the requested task ({qa.refusal_type})."
-    return "Model refused or deflected the requested task."
-
-
-def _summarize_formatting_signal(qa: GenerationQualityAnalysis) -> str | None:
-    """Return formatting signal text when available."""
-    if not qa.formatting_issues:
-        return None
-    return (
-        "Output formatting deviated from the requested structure. "
-        f"Details: {'; '.join(qa.formatting_issues[:2])}."
-    )
-
-
-def _summarize_missing_sections_signal(qa: GenerationQualityAnalysis) -> str | None:
-    """Return missing-section signal text when available."""
-    if not qa.missing_sections:
-        return None
-    return (
-        "Output omitted required Title/Description/Keywords sections "
-        f"({', '.join(qa.missing_sections)})."
-    )
-
-
-def _summarize_reasoning_leak_signal(qa: GenerationQualityAnalysis) -> str | None:
-    """Return reasoning-leak signal text when available."""
-    if not qa.has_reasoning_leak:
-        return None
-    if qa.reasoning_leak_markers:
-        return (
-            "Output leaked reasoning or prompt-template text "
-            f"({', '.join(qa.reasoning_leak_markers[:2])})."
-        )
-    return "Output leaked reasoning or prompt-template text."
-
-
-def _summarize_thinking_trace_signal(qa: GenerationQualityAnalysis) -> str | None:
-    """Describe an expected thinking protocol without assigning fault."""
-    if not qa.has_thinking_trace:
-        return None
-    marker = qa.thinking_trace_markers[0] if qa.thinking_trace_markers else "start marker"
-    if qa.thinking_trace_incomplete:
-        return (
-            "Thinking trace incomplete: the expected model protocol opened with "
-            f"{marker} but did not close, so no separable final answer was produced."
-        )
-    return f"Thinking trace present as expected for this model protocol ({marker})."
-
-
-def _summarize_context_echo_signal(qa: GenerationQualityAnalysis) -> str | None:
-    """Return context-echo signal text when available."""
-    if not qa.has_context_echo:
-        return None
-    return f"Output appears to copy prompt context verbatim ({qa.context_echo_ratio:.0%} overlap)."
 
 
 def _failure_review_text(result: PerformanceResult) -> str:
@@ -13417,172 +12685,6 @@ def _log_canonical_model_review(result: PerformanceResult) -> None:
     )
 
 
-def _log_canonical_run_review_summary(results: Sequence[PerformanceResult]) -> None:
-    """Emit a grouped run-level review summary for the canonical log."""
-    owner_map: dict[str, list[str]] = {}
-    bucket_map: dict[str, list[str]] = {}
-    evidence_counts: Counter[str] = Counter()
-
-    for result in results:
-        review = _review_for_result(result)
-        if review is None:
-            continue
-        owner_map.setdefault(review["owner"], []).append(
-            f"{result.model_name} ({review['verdict']})",
-        )
-        bucket_map.setdefault(review["user_bucket"], []).append(result.model_name)
-        evidence_counts.update(review["evidence"])
-
-    if not owner_map and not bucket_map:
-        return
-
-    logger.debug("")
-    logger.debug("=== RUN REVIEW SUMMARY ===")
-    logger.debug("Maintainer queue by owner:")
-    for owner in sorted(owner_map):
-        logger.debug("  %s: %s", owner, ", ".join(owner_map[owner]))
-    logger.debug("User buckets:")
-    for bucket in sorted(bucket_map):
-        logger.debug("  %s: %s", bucket, ", ".join(bucket_map[bucket]))
-    if evidence_counts:
-        logger.debug(
-            "Top recurring verdict causes: %s",
-            ", ".join(f"{label}={count}" for label, count in evidence_counts.most_common(8)),
-        )
-    logger.debug("=== END RUN REVIEW SUMMARY ===")
-
-
-def _recommendation_candidate_rows(
-    report_context: ReportRenderContext,
-) -> list[UtilityTriageRow]:
-    """Return rows safe enough to use for user-facing model picks."""
-    rows = [
-        row
-        for row in report_context.triage.utility_rows
-        if _is_cataloging_pick_eligible(row.result, _quality_analysis_for_result(row.result))
-    ]
-    actionable_rows = [
-        row
-        for row in rows
-        if row.grade in {"A", "B", "C"} and not (row.labels & QUALITY_BREAKING_LABELS)
-    ]
-    return actionable_rows or rows
-
-
-def _select_recommended_models(
-    report_context: ReportRenderContext,
-) -> list[tuple[str, PerformanceResult, tuple[float, str, str, float | None] | None]]:
-    """Select compact recommendation targets for summary and gallery navigation."""
-    successful_results = list(report_context.result_set.successful)
-    if not successful_results:
-        return []
-
-    results_by_name = {result.model_name: result for result in successful_results}
-    score_index = _cataloging_score_index(report_context.summary)
-    candidate_rows = _recommendation_candidate_rows(report_context)
-    recommendations: list[
-        tuple[str, PerformanceResult, tuple[float, str, str, float | None] | None]
-    ] = []
-
-    def _append_ranked_row(
-        label: str,
-        key: Callable[[UtilityTriageRow], tuple[float, float, float, str]],
-    ) -> None:
-        if not candidate_rows:
-            return
-        row = max(candidate_rows, key=key)
-        recommendations.append(
-            (
-                label,
-                row.result,
-                score_index.get(row.result.model_name),
-            ),
-        )
-
-    _append_ranked_row(
-        "Best end-to-end cataloging",
-        lambda row: (
-            row.score,
-            row.description_score + row.keyword_score,
-            getattr(row.result.generation, "generation_tps", 0.0) or 0.0,
-            row.result.model_name,
-        ),
-    )
-    _append_ranked_row(
-        "Best descriptions",
-        lambda row: (
-            row.description_score,
-            row.score,
-            getattr(row.result.generation, "generation_tps", 0.0) or 0.0,
-            row.result.model_name,
-        ),
-    )
-    _append_ranked_row(
-        "Best keywording",
-        lambda row: (
-            row.keyword_score,
-            row.score,
-            getattr(row.result.generation, "generation_tps", 0.0) or 0.0,
-            row.result.model_name,
-        ),
-    )
-
-    fastest_model = report_context.summary.get("fastest_model")
-    if fastest_model is not None:
-        model_name = fastest_model[0]
-        if model_name in results_by_name:
-            recommendations.append(
-                ("Fastest generation", results_by_name[model_name], score_index.get(model_name)),
-            )
-
-    efficient_model = report_context.summary.get("most_efficient_model")
-    if efficient_model is not None:
-        model_name = efficient_model[0]
-        if model_name in results_by_name:
-            recommendations.append(
-                (
-                    "Lowest memory footprint",
-                    results_by_name[model_name],
-                    score_index.get(model_name),
-                ),
-            )
-
-    balance_candidates: list[
-        tuple[float, float, float, PerformanceResult, tuple[float, str, str, float | None] | None]
-    ] = []
-    for row in candidate_rows:
-        result = row.result
-        score_data = score_index.get(result.model_name)
-        generation_tps = getattr(result.generation, "generation_tps", 0.0) or 0.0
-        peak_memory = getattr(result.generation, "peak_memory", float("inf")) or float("inf")
-        if not row.labels:
-            balance_candidates.append((row.score, generation_tps, -peak_memory, result, score_data))
-
-    if not balance_candidates:
-        for row in candidate_rows:
-            result = row.result
-            score_data = score_index.get(result.model_name)
-            generation_tps = getattr(result.generation, "generation_tps", 0.0) or 0.0
-            peak_memory = getattr(result.generation, "peak_memory", float("inf")) or float("inf")
-            balance_candidates.append((row.score, generation_tps, -peak_memory, result, score_data))
-
-    if balance_candidates:
-        _score, _tps, _neg_peak, result, score_data = max(
-            balance_candidates,
-            key=lambda item: (item[0], item[1], item[2], item[3].model_name),
-        )
-        recommendations.append(("Best balance", result, score_data))
-
-    deduped: list[tuple[str, PerformanceResult, tuple[float, str, str, float | None] | None]] = []
-    seen_labels: set[str] = set()
-    for label, result, score_data in recommendations:
-        if label in seen_labels:
-            continue
-        seen_labels.add(label)
-        deduped.append((label, result, score_data))
-    return deduped
-
-
 def _preview_model_references(
     model_names: Sequence[str],
     *,
@@ -13610,24 +12712,25 @@ def _build_markdown_recommended_models(
     *,
     gallery_link_target: str | None = None,
 ) -> list[str]:
-    """Build a recommendation section for the Markdown summary report."""
-    recommendations = _select_recommended_models(report_context)
+    """Build a canonical current-run recommendation section."""
+    recommendations = [
+        view
+        for view in report_context.recommendations
+        if view.current_recommendation == "recommended"
+    ]
     if not recommendations:
         return []
 
-    triage_by_name = {row.result.model_name: row for row in report_context.triage.utility_rows}
     parts: list[str] = []
     _append_markdown_section(
         parts,
-        title="## ✅ Usable Diagnostic Candidates",
+        title="## ✅ Recommended Current-run Models",
         body_lines=[
-            (
-                "Models that passed mechanical diagnostics and retained useful cataloguing "
-                "or metadata-alignment signals."
-            ),
+            "Only canonical `recommended` results are listed; see model_selection.md for ranking.",
         ],
     )
-    for label, result, score_data in recommendations:
+    for view in recommendations:
+        result = view.result
         model_ref = (
             _format_gallery_model_link(
                 result.model_name,
@@ -13636,95 +12739,17 @@ def _build_markdown_recommended_models(
             if gallery_link_target is not None
             else f"`{result.model_name}`"
         )
-        rationale: list[str] = []
-        if score_data is not None:
-            score, grade, _weakness, _delta = score_data
-            rationale.append(f"Utility {grade} {score:.0f}/100")
-        triage_row = triage_by_name.get(result.model_name)
-        if triage_row is not None:
-            rationale.append(f"Description {triage_row.description_score:.0f}")
-            rationale.append(f"Keywords {triage_row.keyword_score:.0f}")
-        generation_tps = format_field_value(
-            "generation_tps",
-            cast("MetricValue", getattr(result.generation, "generation_tps", None)),
-        )
-        if generation_tps:
-            rationale.append(f"Speed {generation_tps} TPS")
-        peak_memory = format_field_value(
-            "peak_memory",
-            cast("MetricValue", getattr(result.generation, "peak_memory", None)),
-        )
-        if peak_memory:
-            rationale.append(f"Memory {peak_memory}")
-        review = _review_for_result(result)
-        analysis = _quality_analysis_for_result(result)
-        if review is not None:
-            focus = _review_focus_text(review, analysis)
-            if focus != "no flagged signals":
-                rationale.append(f"Caveat {_markdown_review_text(focus)}")
+        rationale = [f"compatibility {view.compatibility}"]
+        if view.generation_tps is not None:
+            rationale.append(f"speed {view.generation_tps:.2f} TPS")
+        if view.peak_memory_gb is not None:
+            rationale.append(f"memory {view.peak_memory_gb:.2f} GB")
         _append_markdown_labeled_value(
             parts,
-            label=label,
+            label="Recommended",
             value=f"{model_ref} ({' | '.join(rationale)})",
             bullet=True,
         )
-    parts.append("")
-    return parts
-
-
-def _build_markdown_quality_breakdown(
-    report_context: ReportRenderContext,
-    *,
-    gallery_link_target: str | None = None,
-) -> list[str]:
-    """Build a compact quality-pattern breakdown for the Markdown summary report."""
-    summary = report_context.summary
-    sections = _collect_quality_issue_sections(summary)
-    low_utility_models = summary.get("low_utility_models", [])
-    if not sections and not low_utility_models:
-        return []
-
-    parts: list[str] = []
-    _append_markdown_section(
-        parts,
-        title="## 🔍 Quality Pattern Breakdown",
-        body_lines=[
-            (
-                "Common weaknesses and failure patterns from this run, linked to the "
-                "gallery when available."
-            ),
-        ],
-    )
-    for title, _css_class, entries in sections:
-        models = [model for model, _detail in entries]
-        preview = _preview_model_references(models, gallery_link_target=gallery_link_target)
-        details = [detail for _model, detail in entries if detail]
-        detail_text = (
-            f" Example: {_format_quality_detail(details[0], html_output=False)}." if details else ""
-        )
-        _append_markdown_labeled_value(
-            parts,
-            label=f"{title} ({len(entries)})",
-            value=f"{preview}.{detail_text}",
-            bullet=True,
-        )
-
-    if low_utility_models:
-        model_names = [model_name for model_name, _score, _grade, _weakness in low_utility_models]
-        weakest_model = low_utility_models[0]
-        model_preview = _preview_model_references(
-            model_names,
-            gallery_link_target=gallery_link_target,
-        )
-        _append_markdown_labeled_value(
-            parts,
-            label=f"Low-utility outputs ({len(low_utility_models)})",
-            value=(
-                f"{model_preview}. Common weakness: {html.escape(weakest_model[3], quote=False)}."
-            ),
-            bullet=True,
-        )
-
     parts.append("")
     return parts
 
@@ -13859,7 +12884,7 @@ def _gallery_summary_status(result: PerformanceResult) -> str:
             review["user_bucket"],
             review=review,
         ).replace("_", " ")
-        verdict = _humanize_review_verdict_text(review["verdict"])
+        verdict = review["verdict"].replace("_", " ")
     return f"{_markdown_inline_code(status)} / {_markdown_inline_code(verdict)}"
 
 
@@ -14313,6 +13338,28 @@ _SEVERE_MODEL_OUTPUT_ANOMALIES: Final[frozenset[OutputAnomaly]] = frozenset(
 _UPSTREAM_DIAGNOSTIC_ANOMALIES: Final[frozenset[OutputAnomaly]] = frozenset(
     {"special_token_leak", "mixed_script_corruption", "encoding_corruption"}
 )
+_MAINTAINER_NEXT_ACTIONS: Final[Mapping[MaintainerReadiness, str]] = {
+    "issue_ready": "File the retained reproduction evidence with the suspected owner.",
+    "needs_reproduction": "Run a controlled reproduction before assigning an upstream defect.",
+    "harness_observation": "Correct or verify the local harness preflight before upstream filing.",
+    "not_applicable": "No maintainer issue action is indicated by this run.",
+}
+
+
+def _maintainer_owner_confidence(
+    suspected_owner: str | None,
+    *,
+    failure_origin: FailureOrigin,
+    exception_count: int,
+) -> MaintainerConfidence | None:
+    """Rate an ownership inference from its retained execution evidence."""
+    if suspected_owner is None:
+        return None
+    if suspected_owner.startswith("unresolved: "):
+        return "low"
+    if failure_origin.startswith("upstream_") and exception_count <= 1:
+        return "high"
+    return "medium"
 
 
 def _classify_model_user_assessment(
@@ -14371,7 +13418,7 @@ def _classify_maintainer_assessment(
     diagnostic_anomalies = tuple(
         anomaly for anomaly in evidence.anomalies if anomaly in _UPSTREAM_DIAGNOSTIC_ANOMALIES
     )
-    harness_signal = bool(
+    harness_signal = (
         result.success
         and result.quality_analysis is not None
         and result.quality_analysis.has_harness_issue
@@ -14389,24 +13436,23 @@ def _classify_maintainer_assessment(
     if not result.success:
         owner = _failure_owner_for_result(result)
         suspected_owner = owner if owner != _UNKNOWN_OWNER else None
+    elif _has_template_opened_thinking(result):
+        suspected_owner = "model-config / mlx-vlm"
     elif (diagnostic_anomalies or harness_signal) and result.quality_analysis is not None:
         suspected_owner = result.quality_analysis.owner
 
-    owner_confidence: MaintainerConfidence | None = None
-    if suspected_owner is not None:
-        owner_confidence = "high" if failure_origin.startswith("upstream_") else "medium"
-        if suspected_owner.startswith("unresolved: "):
-            owner_confidence = "low"
-        elif len(result.exception_chain) > 1 and owner_confidence == "high":
-            owner_confidence = "medium"
-    if readiness == "issue_ready":
-        next_action = "File the retained reproduction evidence with the suspected owner."
-    elif readiness == "needs_reproduction":
-        next_action = "Run a controlled reproduction before assigning an upstream defect."
-    elif readiness == "harness_observation":
-        next_action = "Correct or verify the local harness preflight before upstream filing."
-    else:
-        next_action = "No maintainer issue action is indicated by this run."
+    owner_confidence = _maintainer_owner_confidence(
+        suspected_owner,
+        failure_origin=failure_origin,
+        exception_count=len(result.exception_chain),
+    )
+    next_action = _MAINTAINER_NEXT_ACTIONS[readiness]
+    if (
+        readiness == "needs_reproduction"
+        and result.quality_analysis is not None
+        and (result.quality_analysis.harness_issue_type == "long_context")
+    ):
+        next_action = "Run a controlled reproduction with a reduced-image comparison before assigning a defect."
     return MaintainerAssessment(
         failure_origin=failure_origin,
         maintainer_readiness=readiness,
@@ -16559,23 +15605,16 @@ def _evidence_harness_detail(detail: str) -> str | None:
 
 
 def _summarize_quality_signals(qa: GenerationQualityAnalysis | None) -> list[str]:
-    """Convert additional quality flags into self-explanatory prose."""
+    """Convert retained quality evidence into concise diagnostic prose."""
     if qa is None:
         return []
-
-    signal_builders = (
-        _summarize_context_ignored_signal,
-        _summarize_repetition_signal,
-        _summarize_degeneration_signal,
-        _summarize_language_signal,
-        _summarize_refusal_signal,
-        _summarize_formatting_signal,
-        _summarize_missing_sections_signal,
-        _summarize_reasoning_leak_signal,
-        _summarize_thinking_trace_signal,
-        _summarize_context_echo_signal,
-    )
-    messages = [message for builder in signal_builders if (message := builder(qa)) is not None]
+    messages = [label.replace("_", " ") for label in qa.evidence]
+    messages.extend(qa.formatting_issues[:2])
+    if qa.missing_sections:
+        messages.append("missing sections: " + ", ".join(qa.missing_sections))
+    if qa.has_thinking_trace:
+        qualifier = "incomplete" if qa.thinking_trace_incomplete else "present"
+        messages.append(f"Thinking trace {qualifier} in expected model protocol")
     return _dedupe_preserve_order(messages)
 
 
@@ -16796,20 +15835,14 @@ def _issue_queue_target_cell(
     return escape_text(target)
 
 
-def _runtime_failure_problem_summary(result: PerformanceResult | None) -> str | None:
-    """Return a concise problem label for a hard failure when evidence is specific."""
-    kind = _runtime_failure_diagnostic_kind(result)
-    return _RUNTIME_FAILURE_PROBLEM_LABELS.get(kind or "")
-
-
 def _issue_problem_summary(cluster: IssueCluster) -> str:
     """Return the filing-facing problem summary for an issue cluster."""
     representative = _issue_cluster_representative(cluster)
     summary: str | None = None
-    if cluster.issue_kind == "runtime_failure" and (
-        runtime_summary := _runtime_failure_problem_summary(representative)
-    ):
-        summary = runtime_summary
+    if cluster.issue_kind == "runtime_failure":
+        label = _issue_subtype_display_label(cluster.issue_subtype)
+        message = representative.error_message if representative is not None else None
+        summary = f"{label}: {message}" if message else label
 
     subtype = cluster.issue_subtype.casefold()
     if summary is None:
@@ -19078,12 +18111,6 @@ def generate_markdown_report(
                 gallery_link_target=gallery_link_target,
             ),
         )
-        md.extend(
-            _build_markdown_quality_breakdown(
-                report_context,
-                gallery_link_target=gallery_link_target,
-            ),
-        )
 
     # Add failures-by-package section for actionable reporting
     failures_by_pkg = _format_failures_by_package_parts(
@@ -20005,7 +19032,7 @@ def _append_review_user_buckets(
                 (
                     f"`{MARKDOWN_ESCAPER.escape(result.model_name)}`",
                     f"`{MARKDOWN_ESCAPER.escape(review['verdict'])}`",
-                    MARKDOWN_ESCAPER.escape(_review_hint_text(review, analysis)),
+                    MARKDOWN_ESCAPER.escape(review["hint_relationship"].replace("_", " ")),
                     MARKDOWN_ESCAPER.escape(_review_focus_text(review, analysis)),
                 )
             )
@@ -20653,6 +19680,9 @@ def _model_capability_row_from_signals(
     current_signal = next((signal for signal in reversed(signals) if signal.is_current), None)
     latest_signal = current_signal or signals[-1]
     reliability, variability_reason = _historical_reliability(historical_signals)
+    scored_signals: Sequence[ModelCapabilityRunSignal] = (
+        () if suppress_cataloging_scores else signals
+    )
     return ModelCapabilityRow(
         model=model,
         runs=runs,
@@ -20678,19 +19708,11 @@ def _model_capability_row_from_signals(
         ),
         hygiene_score=_capability_avg(signal.hygiene_score for signal in signals),
         caption_score=_capability_avg(signal.caption_score for signal in signals),
-        cataloging_score=None
-        if suppress_cataloging_scores
-        else _capability_avg(signal.cataloging_score for signal in signals),
-        description_score=None
-        if suppress_cataloging_scores
-        else _capability_avg(signal.description_score for signal in signals),
-        keyword_score=None
-        if suppress_cataloging_scores
-        else _capability_avg(signal.keyword_score for signal in signals),
-        metadata_alignment_score=(
-            None
-            if suppress_cataloging_scores
-            else _capability_avg(signal.metadata_alignment_score for signal in signals)
+        cataloging_score=_capability_avg(signal.cataloging_score for signal in scored_signals),
+        description_score=_capability_avg(signal.description_score for signal in scored_signals),
+        keyword_score=_capability_avg(signal.keyword_score for signal in scored_signals),
+        metadata_alignment_score=_capability_avg(
+            signal.metadata_alignment_score for signal in scored_signals
         ),
         generation_tps=_capability_avg(signal.generation_tps for signal in signals),
         peak_memory_gb=_capability_avg(signal.peak_memory_gb for signal in signals),
@@ -27500,7 +26522,6 @@ def log_summary(
 
     if successful:
         _log_successful_models_list(successful)
-    _log_canonical_run_review_summary(results)
 
 
 def _history_path_for_jsonl(jsonl_path: Path) -> Path:
@@ -30045,36 +29066,12 @@ def _issue_fix_checklist_items(cluster: IssueCluster) -> list[str]:
             "Add a focused regression check for mixed-script token-soup output if fixed.",
         ]
     elif cluster.issue_kind == "runtime_failure":
-        representative = _issue_cluster_representative(cluster)
-        runtime_kind = _runtime_failure_diagnostic_kind(representative)
-        if runtime_kind == "unsupported_granite":
-            checklist = [
-                "Inspect mlx-vlm model-type registry and architecture import path for Granite.",
-                "Confirm whether this model type should be supported by the installed mlx-vlm version.",
-                "If unsupported, fail before generation with a clear architecture-specific message.",
-                "If supported, add a focused load/regression check for this model family.",
-            ]
-        elif runtime_kind == "weight_config_mismatch":
-            checklist = [
-                "Compare checkpoint keys with the selected model class and model config.",
-                "Inspect missing/unexpected projector, scale, bias, and quantized-weight parameter names.",
-                "Verify the model repo revision matches the mlx-vlm/mlx loader expectations.",
-                "Reproduce after upgrading/downgrading mlx-vlm and mlx to isolate version compatibility.",
-            ]
-        elif runtime_kind == "missing_image_processor":
-            checklist = [
-                "Inspect `preprocessor_config.json`, `processor_config.json`, and AutoProcessor mapping.",
-                "Verify the loaded processor exposes the image processor expected by mlx-vlm.",
-                "Check whether the model repo needs processor files or mlx-vlm needs a fallback path.",
-                "Reproduce with the single affected model before judging output quality.",
-            ]
-        else:
-            checklist = [
-                "Inspect the exported error package, load phase, and traceback owner.",
-                "Check model config, tokenizer files, and weight shape compatibility.",
-                "Compare against installed mlx, mlx-vlm, mlx-lm, transformers, and tokenizers versions.",
-                "Reproduce with the single affected model before judging output quality.",
-            ]
+        checklist = [
+            "Inspect the retained exception chain, upstream boundary, and attributed package.",
+            "Verify the requested and resolved model revisions against the captured environment.",
+            "Reproduce with the single affected model before changing compatibility logic.",
+            "Add a focused regression for the structured error signature when fixed.",
+        ]
     if checklist is None:
         checklist = [
             "Reproduce with the cluster command.",
