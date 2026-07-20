@@ -141,8 +141,22 @@ def test_save_jsonl_report_includes_library_versions_in_metadata(tmp_path: Path)
     assert rows == []
 
 
-def test_save_run_json_report_captures_public_snapshot_contract(tmp_path: Path) -> None:
+def test_save_run_json_report_captures_public_snapshot_contract(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Run JSON should capture stable public snapshot metadata."""
+    analysis = dataclasses.replace(
+        check_models.analyze_generation_text(
+            "Two cats on a pink couch.",
+            generated_tokens=7,
+            prompt_tokens=80,
+            prompt="Describe this image briefly.",
+        ),
+        prompt_tokens_total=80,
+        prompt_tokens_text_est=12,
+        prompt_tokens_nontext_est=68,
+    )
     result = PerformanceResult(
         model_name="org/caption-model",
         generation=MockGeneration(
@@ -156,7 +170,11 @@ def test_save_run_json_report_captures_public_snapshot_contract(tmp_path: Path) 
         generation_time=1.0,
         model_load_time=0.5,
         total_time=1.5,
+        quality_analysis=analysis,
         prompt_diagnostics=check_models.PromptDiagnostics(
+            processed_image_width=640,
+            processed_image_height=480,
+            image_patch_count=120,
             generate_kwargs={
                 "max_tokens": 500,
                 "temperature": 0.0,
@@ -174,6 +192,16 @@ def test_save_run_json_report_captures_public_snapshot_contract(tmp_path: Path) 
         metadata={"description": ""},
         eval_mode="triage",
     )
+    monkeypatch.setattr(
+        check_models,
+        "_collect_model_provenance",
+        lambda model, requested_revision=None: {
+            "model": model,
+            "requested_revision": requested_revision,
+            "resolved_revision": "snapshot123",
+            "snapshot_path": "~/.cache/snapshots/snapshot123",
+        },
+    )
 
     check_models.save_run_json_report(
         [result],
@@ -183,6 +211,8 @@ def test_save_run_json_report_captures_public_snapshot_contract(tmp_path: Path) 
         total_runtime_seconds=3.0,
         report_context=context,
         image_path=image_path,
+        trust_remote_code=False,
+        requested_revision="release-branch",
         output_paths={
             "results_markdown": "reports/results.md",
             "model_selection": "reports/model_selection.md",
@@ -197,7 +227,7 @@ def test_save_run_json_report_captures_public_snapshot_contract(tmp_path: Path) 
     )
 
     payload = json.loads(out.read_text(encoding="utf-8"))
-    assert payload["schema_version"] == "1.3"
+    assert payload["schema_version"] == "1.4"
     assert payload["eval_mode"] == "triage"
     assert payload["semantic_rankings_grounded"] is False
     assert payload["selection_basis"] == "caption hygiene only"
@@ -219,6 +249,22 @@ def test_save_run_json_report_captures_public_snapshot_contract(tmp_path: Path) 
         "max_tokens": 500,
         "prefill_step_size": 4096,
         "temperature": 0.0,
+    }
+    assert payload["trust_remote_code"] is False
+    assert payload["prompt_sha256"] == check_models._sha256_text("Describe this image briefly.")
+    assert payload["model_provenance"][result.model_name] == {
+        "model": result.model_name,
+        "requested_revision": "release-branch",
+        "resolved_revision": "snapshot123",
+        "snapshot_path": "~/.cache/snapshots/snapshot123",
+    }
+    assert payload["prompt_burden"][result.model_name] == {
+        "total_tokens": 80,
+        "text_tokens_est": 12,
+        "nontext_tokens_est": 68,
+        "processed_image_width": 640,
+        "processed_image_height": 480,
+        "image_patch_count": 120,
     }
     assert payload["producer"] == {
         "name": "check_models",

@@ -1507,10 +1507,21 @@ class RunImageRecord(TypedDict):
     megapixels: float | None
 
 
+class RunPromptBurdenRecord(TypedDict):
+    """Per-model prompt and processed-image facts retained by run JSON."""
+
+    total_tokens: int | None
+    text_tokens_est: int | None
+    nontext_tokens_est: int | None
+    processed_image_width: int | None
+    processed_image_height: int | None
+    image_patch_count: int | None
+
+
 class RunJsonReportRecord(TypedDict):
     """Stable run-level machine artifact schema."""
 
-    schema_version: Literal["1.3"]
+    schema_version: Literal["1.4"]
     generated_at: str
     eval_mode: EvaluationLane
     prompt: str
@@ -1527,6 +1538,9 @@ class RunJsonReportRecord(TypedDict):
     producer: CheckModelsProvenanceRecord
     image: RunImageRecord | None
     generation_settings: dict[str, JsonLike]
+    trust_remote_code: bool
+    model_provenance: dict[str, ModelProvenanceRecord]
+    prompt_burden: dict[str, RunPromptBurdenRecord]
 
 
 class JsonlRerunSummary(TypedDict, total=False):
@@ -1763,6 +1777,7 @@ class ReportGenerationInputs:
     report_context: ReportRenderContext
     output_paths: ReportOutputPaths
     model_revision: str | None = None
+    trust_remote_code: bool = True
     history_records: Sequence[HistoryRunRecord] = ()
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None
     diagnostics_artifacts: DiagnosticsArtifacts | None = None
@@ -15899,6 +15914,125 @@ def _diagnostics_environment_section(
     return parts
 
 
+def _diagnostics_run_conditions_section(
+    *,
+    results: Sequence[PerformanceResult],
+    versions: LibraryVersionDict,
+    prompt: str,
+    image_path: Path | None,
+    run_args: argparse.Namespace | None,
+) -> list[str]:
+    """Render the public input, prompt, generation, and revision contract."""
+    image_profile = _load_image_input_profile(image_path)
+    image = _run_image_record(image_path, image_profile)
+    if image is None:
+        image_summary = "unavailable"
+    else:
+        dimensions = (
+            f"{image['width']} x {image['height']}"
+            if image["width"] is not None and image["height"] is not None
+            else "unavailable"
+        )
+        megapixels = (
+            f"{image['megapixels']:.2f} MP" if image["megapixels"] is not None else "unavailable"
+        )
+        size = f"{image['size_bytes']} bytes" if image["size_bytes"] is not None else "unavailable"
+        image_summary = (
+            f"{image['name']}; {dimensions}; {megapixels}; {size}; "
+            f"SHA-256 {image['sha256'] or 'unavailable'}"
+        )
+
+    trust_remote_code = bool(getattr(run_args, "trust_remote_code", True))
+    requested_revision = getattr(run_args, "revision", None)
+    requested_revision = str(requested_revision) if requested_revision is not None else None
+    contract_rows = (
+        ("Source image", image_summary),
+        ("Prompt SHA-256", _sha256_text(prompt)),
+        ("trust_remote_code", str(trust_remote_code).lower()),
+    )
+    model_rows: list[tuple[str, ...]] = []
+    for result in results:
+        burden = _prompt_burden_for_result(result, image_profile)
+        provenance = _collect_model_provenance(
+            result.model_name,
+            requested_revision=requested_revision,
+        )
+        processed = (
+            f"{burden.processed_width} x {burden.processed_height}"
+            if burden.processed_width is not None and burden.processed_height is not None
+            else "unavailable"
+        )
+        prompt_tokens = (
+            f"{burden.total_tokens} / {burden.text_tokens_est} / {burden.nontext_tokens_est}"
+            if burden.total_tokens is not None
+            and burden.text_tokens_est is not None
+            and burden.nontext_tokens_est is not None
+            else "unavailable"
+        )
+        model_rows.append(
+            (
+                result.model_name,
+                provenance["requested_revision"] or "unavailable",
+                provenance["resolved_revision"] or "unavailable",
+                processed,
+                str(burden.patch_count) if burden.patch_count is not None else "unavailable",
+                prompt_tokens,
+            )
+        )
+
+    producer = _collect_check_models_provenance()
+    provenance_rows: list[tuple[str, ...]] = [
+        (
+            producer["name"],
+            producer["version"],
+            producer["install_type"],
+            producer["git_revision"] or "unavailable",
+        )
+    ]
+    provenance_rows.extend(
+        (
+            component,
+            provenance["version"] or "unavailable",
+            provenance["install_type"],
+            provenance["source_revision"] or provenance["vcs_revision"] or "unavailable",
+        )
+        for component, provenance in _collect_component_provenance(versions).items()
+        if component != "check_models"
+    )
+    generation_settings = _common_generation_settings(results)
+    settings_block: ReportParagraph | ReportCodeBlock = (
+        ReportCodeBlock(json.dumps(generation_settings, indent=2, sort_keys=True), language="json")
+        if generation_settings
+        else ReportParagraph("Common generation settings: unavailable.")
+    )
+    blocks: tuple[object, ...] = (
+        ReportTable(headers=("Condition", "Value"), rows=contract_rows),
+        ReportParagraph("Common generation settings:"),
+        settings_block,
+        ReportTable(
+            headers=(
+                "Model",
+                "Requested revision",
+                "Resolved revision",
+                "Processed image",
+                "Patches",
+                "Prompt tokens total / text / non-text",
+            ),
+            rows=tuple(model_rows),
+        ),
+        ReportTable(
+            headers=("Component", "Version", "Install type", "Source revision"),
+            rows=tuple(provenance_rows),
+        ),
+    )
+    return _guard_markdownlint_block(
+        render_report_markdown(
+            (ReportSection(title="Run Conditions and Provenance", blocks=blocks),)
+        ),
+        rules=MARKDOWNLINT_TABLE_PIPE_RULES,
+    )
+
+
 def _build_environment_failure_diagnostics(
     *,
     error_message: str,
@@ -18058,6 +18192,16 @@ def generate_diagnostics_report(
             snapshot=diagnostics_snapshot,
             prompt=prompt,
             image_path=image_path,
+        )
+    )
+    parts.append("")
+    parts.extend(
+        _diagnostics_run_conditions_section(
+            results=results,
+            versions=versions,
+            prompt=prompt,
+            image_path=image_path,
+            run_args=run_args,
         )
     )
     parts.append("")
@@ -28323,6 +28467,25 @@ def _run_image_record(
     }
 
 
+def _run_prompt_burden_records(
+    results: Sequence[PerformanceResult],
+    image_profile: ImageInputProfile | None,
+) -> dict[str, RunPromptBurdenRecord]:
+    """Return publication-safe prompt and processed-image facts by model."""
+    records: dict[str, RunPromptBurdenRecord] = {}
+    for result in results:
+        burden = _prompt_burden_for_result(result, image_profile)
+        records[result.model_name] = {
+            "total_tokens": burden.total_tokens,
+            "text_tokens_est": burden.text_tokens_est,
+            "nontext_tokens_est": burden.nontext_tokens_est,
+            "processed_image_width": burden.processed_width,
+            "processed_image_height": burden.processed_height,
+            "image_patch_count": burden.patch_count,
+        }
+    return records
+
+
 def save_run_json_report(
     results: list[PerformanceResult],
     filename: Path,
@@ -28334,12 +28497,14 @@ def save_run_json_report(
     output_paths: Mapping[str, str],
     image_path: Path | None = None,
     producer: CheckModelsProvenanceRecord | None = None,
+    trust_remote_code: bool = True,
+    requested_revision: str | None = None,
 ) -> None:
     """Write stable run-level metadata for public benchmark snapshots."""
     policy = report_context.mode_policy
     counts = _run_outcome_counts(results)
     payload: RunJsonReportRecord = {
-        "schema_version": "1.3",
+        "schema_version": "1.4",
         "generated_at": local_now_str(),
         "eval_mode": policy.eval_mode,
         "prompt": prompt,
@@ -28356,6 +28521,15 @@ def save_run_json_report(
         "producer": producer or _collect_check_models_provenance(),
         "image": _run_image_record(image_path, report_context.image_profile),
         "generation_settings": _common_generation_settings(results),
+        "trust_remote_code": trust_remote_code,
+        "model_provenance": {
+            result.model_name: _collect_model_provenance(
+                result.model_name,
+                requested_revision=requested_revision,
+            )
+            for result in results
+        },
+        "prompt_burden": _run_prompt_burden_records(results, report_context.image_profile),
     }
     _write_text_file(filename, json.dumps(payload, indent=2, sort_keys=True) + "\n")
 
@@ -30554,6 +30728,8 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
                 report_context=inputs.report_context,
                 output_paths=_public_output_artifact_map(output_paths),
                 image_path=inputs.image_path,
+                trust_remote_code=inputs.trust_remote_code,
+                requested_revision=inputs.model_revision,
             ),
         ),
         ReportArtifact(
@@ -31036,6 +31212,7 @@ def finalize_execution(
                 model_revision=(
                     str(args.revision) if getattr(args, "revision", None) is not None else None
                 ),
+                trust_remote_code=bool(getattr(args, "trust_remote_code", True)),
                 history_records=tuple(history_records_before_current),
                 runtime_fingerprint=runtime_fingerprint,
                 diagnostics_artifacts=diagnostics_artifacts,

@@ -2965,7 +2965,7 @@ class TestMarkdownReportEdgeCases:
             assert "Generated Text" in tsv_lines[0]
             assert jsonl_records[0]["_type"] == "metadata"
             assert len(jsonl_records[1:]) == 2
-            assert run_payload["schema_version"] == "1.3"
+            assert run_payload["schema_version"] == "1.4"
             assert run_payload["producer"]["name"] == "check_models"
             assert run_payload["counts"] == {
                 "models_attempted": 2,
@@ -4587,6 +4587,127 @@ class TestDiagnosticsReport:
         assert "## Models Not Flagged" not in content
         assert "Total model runtime (sum)" not in content
 
+    def test_diagnostics_run_contract_exposes_complete_public_provenance(
+        self,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Issue evidence should state image, prompt, runtime, and revision conditions."""
+        image_path = tmp_path / "private input.jpg"
+        Image.new("RGB", (12, 8), "blue").save(image_path)
+        quality_result = _make_quality_success("org/provenance", with_quality_issue=False)
+        analysis = quality_result.quality_analysis
+        assert analysis is not None
+        result = replace(
+            quality_result,
+            success=False,
+            upstream_boundary="generation_started",
+            error_stage="Model Error",
+            error_message="generation failed",
+            error_type="RuntimeError",
+            error_package="mlx-vlm",
+            quality_analysis=replace(
+                analysis,
+                prompt_tokens_total=100,
+                prompt_tokens_text_est=20,
+                prompt_tokens_nontext_est=80,
+            ),
+            prompt_diagnostics=check_models.PromptDiagnostics(
+                processed_image_width=640,
+                processed_image_height=480,
+                image_patch_count=120,
+                generate_kwargs={"max_tokens": 500, "temperature": 0.0},
+            ),
+        )
+        monkeypatch.setattr(
+            check_models,
+            "_collect_component_provenance",
+            lambda _versions=None: {
+                "mlx-vlm": {
+                    "version": "0.6.5",
+                    "install_type": "editable",
+                    "source_location": "~/src/mlx-vlm",
+                    "source_revision": "component123",
+                    "direct_url": None,
+                    "vcs_revision": None,
+                }
+            },
+        )
+        monkeypatch.setattr(
+            check_models,
+            "_collect_check_models_provenance",
+            lambda: {
+                "name": "check_models",
+                "version": "0.8.8",
+                "git_revision": "producer123",
+                "install_type": "source-tree",
+            },
+        )
+        monkeypatch.setattr(
+            check_models,
+            "_collect_model_provenance",
+            lambda model, requested_revision=None: {
+                "model": model,
+                "requested_revision": requested_revision,
+                "resolved_revision": "snapshot123",
+                "snapshot_path": "~/.cache/snapshots/snapshot123",
+            },
+        )
+        output = tmp_path / "diagnostics.md"
+
+        generate_diagnostics_report(
+            results=[result],
+            filename=output,
+            versions={"mlx-vlm": "0.6.5"},
+            system_info={},
+            prompt="Describe the image.",
+            image_path=image_path,
+            run_args=Namespace(
+                trust_remote_code=False,
+                revision="release-branch",
+            ),
+        )
+
+        content = output.read_text(encoding="utf-8")
+        assert "## Run Conditions and Provenance" in content
+        assert "private input.jpg" in content
+        assert str(image_path) not in content
+        assert "12 x 8" in content
+        assert "0.00 MP" in content
+        assert check_models._sha256_file(image_path) in content
+        assert "trust_remote_code" in content
+        assert "false" in content
+        assert check_models._sha256_text("Describe the image.") in content
+        assert '"max_tokens": 500' in content
+        assert "640 x 480" in content
+        assert "100 / 20 / 80" in content
+        assert "120" in content
+        assert "release-branch" in content
+        assert "snapshot123" in content
+        assert "producer123" in content
+        assert "component123" in content
+
+    def test_diagnostics_processed_dimensions_unavailable_is_explicit(
+        self,
+    ) -> None:
+        """Missing processor evidence should be visible rather than omitted."""
+        result = _make_failure_with_details("org/no-processor-evidence")
+
+        content = "\n".join(
+            check_models._diagnostics_run_conditions_section(
+                results=[result],
+                versions={},
+                prompt="Describe the image.",
+                image_path=None,
+                run_args=Namespace(trust_remote_code=True),
+            )
+        )
+
+        model_row = next(
+            line for line in content.splitlines() if "org/no-processor-evidence" in line
+        )
+        assert "unavailable" in model_row
+
     def test_model_only_text_quality_is_not_confirmed_mlx_vlm_issue(
         self,
         tmp_path: Path,
@@ -4693,7 +4814,8 @@ class TestDiagnosticsReport:
 
         content = output.read_text(encoding="utf-8")
         assert "## mlx-vlm / MLX Issue Matrix" in content
-        assert "- _Image:_ path/to/repro-image.jpg\n\n## mlx-vlm / MLX Issue Matrix" in content
+        assert "- _Image:_ path/to/repro-image.jpg" in content
+        assert "## Run Conditions and Provenance" in content
         assert "## Expected and Actual Behaviour" in content
         assert "python -m mlx_vlm.generate" in content
         assert "issues/index.md" not in content

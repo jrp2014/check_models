@@ -16,6 +16,10 @@ Notable changes to this project will be documented in this file.
   narrow current-recommendation and historical-reliability fields; summarize only
   prior lane-matched categorical outcomes, with run count, recommended rate, and a
   concise variability reason in Markdown and capability JSON 1.1.
+- Complete the diagnostics run contract and run JSON 1.4 with publication-safe
+  source-image identity, prompt hash and burden, processed dimensions/patch count,
+  common generation settings, `trust_remote_code`, producer/component revisions,
+  and requested versus resolved model revisions; render missing evidence explicitly.
 - Gate every issue cluster, queue entry, and draft on canonical `issue_ready`
   evidence; keep needs-reproduction, harness, connectivity, and model-quality
   observations in separate diagnostics sections with complete expandable output
