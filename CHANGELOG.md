@@ -9,7 +9,8 @@ Notable changes to this project will be documented in this file.
 
 - Rebuild maintainer diagnostics from cached current-run assessments with complete
   traceback/output evidence and factual provenance, restrict issue drafts to one
-  per hard crash, and remove issue-queue and reproduction-bundle indexes.
+  per hard crash, remove inferred issue queues, link direct crash drafts, and
+  reproduce actual run settings without guessing resolved model revisions.
 - Rebuild the Markdown model gallery around the cached current-run assessment,
   deterministic avoid/memory/speed chooser policies, mechanically valid
   throughput samples, and complete expandable generated or crash evidence.

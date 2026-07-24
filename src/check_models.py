@@ -1683,7 +1683,7 @@ class CatalogingSummaryData:
 class DiagnosticsArtifacts:
     """Diagnostics artifacts emitted at the end of a run."""
 
-    snapshot: DiagnosticsSnapshot
+    outcome_counts: RunOutcomeCounts | None = None
     diagnostics_written: bool = False
     repro_bundles: Mapping[str, Path] = dataclass_field(default_factory=dict)
     issue_reports: Mapping[str, Path] = dataclass_field(default_factory=dict)
@@ -14576,114 +14576,32 @@ def _resolve_issue_clusters_for_results(
     return _build_issue_clusters(snapshot)
 
 
-def _maintainer_owner_counts(snapshot: DiagnosticsSnapshot) -> list[tuple[str, int]]:
-    """Summarize likely owner buckets for the diagnostics snapshot."""
-    owner_counts: Counter[str] = Counter()
-
-    for _signature, cluster_results in snapshot.failure_clusters:
-        representative = cluster_results[0]
-        owner = _diagnostics_owner_label(representative.error_package or _UNKNOWN_OWNER)
-        owner_counts[owner] += len(cluster_results)
-
-    for res, _text in snapshot.harness_results:
-        owner_counts[_diagnostics_owner_label(_infer_harness_issue_owner(res))] += 1
-
-    for _res, _symptom, package_hint in snapshot.stack_signals:
-        owner_counts[_diagnostics_owner_label(package_hint)] += 1
-
-    for _res, _sample in snapshot.text_sanity_results:
-        owner_counts[_diagnostics_owner_label("model")] += 1
-
-    for issue in snapshot.preflight_issues:
-        owner_key = _guess_preflight_issue_package(issue)
-        owner_counts[_diagnostics_owner_label(owner_key)] += 1
-
-    return sorted(owner_counts.items(), key=lambda item: (-item[1], item[0]))
-
-
 def _log_maintainer_summary(
     *,
     artifacts: DiagnosticsArtifacts,
     diagnostics_path: Path,
 ) -> None:
-    """Emit a concise maintainer-facing summary sourced from diagnostics data."""
-    snapshot = artifacts.snapshot
+    """Emit factual cached outcome counts and direct diagnostics artifact paths."""
     log_blank()
     print_cli_section("Maintainer Summary")
 
-    if not _snapshot_has_maintainer_signals(snapshot):
-        logger.info("No maintainer-facing diagnostics signals detected.")
-        return
-
-    logger.info(
-        "Diagnostics signals: failures=%d, harness=%d, stack=%d, text_sanity=%d, preflight=%d",
-        len(snapshot.failed),
-        len(snapshot.harness_results),
-        len(snapshot.stack_signals),
-        len(snapshot.text_sanity_results),
-        len(snapshot.preflight_issues),
-    )
-
-    owner_counts = _maintainer_owner_counts(snapshot)
-    if owner_counts:
+    counts = artifacts.outcome_counts
+    if counts is not None:
         logger.info(
-            "Likely owners: %s",
-            "; ".join(f"{owner}={count}" for owner, count in owner_counts[:3]),
+            "Run outcomes: attempted=%d, evaluated=%d, completed=%d, crashed=%d, indeterminate=%d",
+            counts["models_attempted"],
+            counts["models_evaluated"],
+            counts["models_completed"],
+            counts["models_crashed"],
+            counts["models_indeterminate"],
         )
-
-    for index, (_signature, cluster_results) in enumerate(snapshot.failure_clusters[:3], start=1):
-        representative = cluster_results[0]
-        owner_key = representative.error_package or _UNKNOWN_OWNER
-        owner = _diagnostics_owner_label(owner_key)
-        issue = _truncate_text_preview(
-            _simplify_failure_message(
-                representative.error_message,
-                model_name=representative.model_name,
-            ),
-            max_chars=96,
-        )
-        logger.info(
-            "Issue cluster %d: %d model(s) | owner=%s | issue=%s",
-            index,
-            len(cluster_results),
-            owner,
-            issue,
-        )
-
-    for owner_key, owner_results in _group_harness_results_by_owner(snapshot.harness_results):
-        owner = _diagnostics_owner_label(owner_key)
-        logger.info(
-            "Harness/runtime anomalies: %d model(s) likely owned by %s. Next: %s",
-            len(owner_results),
-            owner,
-            _diagnostics_next_action(owner_key),
-        )
-    for owner_key, owner_signals in _group_stack_signals_by_owner(snapshot.stack_signals):
-        owner = _diagnostics_owner_label(owner_key)
-        logger.info(
-            "Long-context or stack-signal anomalies: %d model(s) likely owned by %s. Next: %s",
-            len(owner_signals),
-            owner,
-            _diagnostics_next_action(owner_key),
-        )
-    if snapshot.text_sanity_results:
-        logger.info(
-            "Text-sanity semantic mismatches: %d model(s) likely owned by %s. Next: %s",
-            len(snapshot.text_sanity_results),
-            _diagnostics_owner_label("model"),
-            _diagnostics_next_action("model"),
-        )
-    for owner_key, owner_issues in _group_preflight_issues_by_owner(snapshot.preflight_issues):
-        owner = _diagnostics_owner_label(owner_key)
-        logger.info(
-            "Preflight compatibility warnings: %d issue(s) likely owned by %s. Next: %s",
-            len(owner_issues),
-            owner,
-            _diagnostics_next_action(owner_key),
-        )
+    else:
+        logger.info("Run outcome counts unavailable.")
 
     if artifacts.diagnostics_written:
         log_file_path(diagnostics_path, label="   Diagnostics:  ")
+    for model_name, issue_path in sorted(artifacts.issue_reports.items()):
+        log_file_path(issue_path, label=f"   Crash Draft ({model_name}):")
     if artifacts.repro_bundles:
         logger.info(
             "Repro bundles available for %d issue-linked model(s).",
@@ -16454,25 +16372,10 @@ def _diagnostics_repro_command(
     *,
     prompt: str,
     image_path: Path | None,
+    run_args: argparse.Namespace | None,
 ) -> str:
     """Build a direct native repro command from recorded current-run facts."""
-    generation_kwargs = (
-        result.prompt_diagnostics.generate_kwargs if result.prompt_diagnostics is not None else {}
-    )
-    run_args = argparse.Namespace(
-        max_tokens=result.requested_max_tokens or DEFAULT_MAX_TOKENS,
-        temperature=generation_kwargs.get("temperature", DEFAULT_TEMPERATURE),
-        revision=generation_kwargs.get("revision"),
-        eos_tokens=generation_kwargs.get("eos_tokens"),
-        enable_thinking=generation_kwargs.get("enable_thinking", False),
-        thinking_budget=generation_kwargs.get("thinking_budget"),
-        thinking_start_token=generation_kwargs.get("thinking_start_token"),
-        thinking_end_token=generation_kwargs.get(
-            "thinking_end_token",
-            DEFAULT_THINKING_END_MARKER,
-        ),
-    )
-    image_ref = _issue_repro_image_ref(image_path=image_path, run_args=None)
+    image_ref = _issue_repro_image_ref(image_path=image_path, run_args=run_args)
     return build_native_mlx_vlm_repro_command_spec(
         model_name=result.model_name,
         prompt=prompt,
@@ -16484,11 +16387,12 @@ def _diagnostics_repro_command(
 def _diagnostics_result_facts(
     result: PerformanceResult,
     assessment: ResultAssessment,
+    *,
+    run_args: argparse.Namespace | None,
 ) -> tuple[tuple[str, str], ...]:
     """Return exact per-model runtime and provenance fields for maintainers."""
     prompt_diagnostics = result.prompt_diagnostics
     runtime = result.runtime_diagnostics
-    provenance = _collect_model_provenance(result.model_name)
     generation_kwargs = prompt_diagnostics.generate_kwargs if prompt_diagnostics is not None else {}
     return (
         ("Execution", assessment.execution),
@@ -16497,7 +16401,11 @@ def _diagnostics_result_facts(
         ("Phase", _diagnostics_fact(result.failure_phase)),
         ("Stage", _diagnostics_fact(result.error_stage)),
         ("Package", _diagnostics_fact(result.error_package)),
-        ("Model revision", _diagnostics_fact(provenance["resolved_revision"])),
+        ("Model revision", "unavailable"),
+        (
+            "Requested model revision",
+            _diagnostics_fact(getattr(run_args, "revision", None)),
+        ),
         (
             "Processor class",
             _diagnostics_fact(
@@ -16535,6 +16443,10 @@ def _diagnostics_result_facts(
             ),
         ),
         (
+            "Configured EOS token override",
+            _diagnostics_fact(generation_kwargs.get("eos_tokens")),
+        ),
+        (
             "Configured thinking start token",
             _diagnostics_fact(generation_kwargs.get("thinking_start_token")),
         ),
@@ -16551,6 +16463,7 @@ def _diagnostics_model_entry(
     *,
     prompt: str,
     image_path: Path | None,
+    run_args: argparse.Namespace | None,
     heading_level: int,
 ) -> list[str]:
     """Render one model's complete maintainer evidence in priority order."""
@@ -16571,28 +16484,61 @@ def _diagnostics_model_entry(
 
     parts.extend([f"{'#' * (heading_level + 1)} Execution and provenance", ""])
     parts.extend(
-        render_report_markdown((ReportKeyValues(_diagnostics_result_facts(result, assessment)),))
+        render_report_markdown(
+            (ReportKeyValues(_diagnostics_result_facts(result, assessment, run_args=run_args)),)
+        )
     )
 
-    generated_output = _generation_text_value(result.generation)
+    generated_output = (
+        "unavailable"
+        if result.generation is None
+        else _generation_text_value(result.generation) or "(empty)"
+    )
     output_label = (
         "Complete partial output" if assessment.execution == "crashed" else "Complete output"
     )
     parts.extend([f"{'#' * (heading_level + 1)} {output_label}", ""])
     _append_markdown_code_block(
         parts,
-        generated_output or "(empty)",
+        generated_output,
         language="text",
     )
-    if result.captured_output_on_fail is not None:
-        parts.extend([f"{'#' * (heading_level + 1)} Captured stdout/stderr", ""])
-        _append_markdown_code_block(parts, result.captured_output_on_fail, language="text")
-
-    parts.extend([f"{'#' * (heading_level + 1)} Reproduction command", ""])
+    parts.extend([f"{'#' * (heading_level + 1)} Captured stdout/stderr", ""])
     _append_markdown_code_block(
         parts,
-        _diagnostics_repro_command(result, prompt=prompt, image_path=image_path),
+        result.captured_output_on_fail or "unavailable",
+        language="text",
+    )
+
+    parts.extend(
+        [
+            f"{'#' * (heading_level + 1)} Supplemental CLI reproduction",
+            "",
+            "This form includes only settings supported by the native mlx-vlm CLI.",
+            "",
+        ]
+    )
+    _append_markdown_code_block(
+        parts,
+        _diagnostics_repro_command(
+            result,
+            prompt=prompt,
+            image_path=image_path,
+            run_args=run_args,
+        ),
         language="bash",
+    )
+    image_ref = _issue_repro_image_ref(image_path=image_path, run_args=run_args)
+    parts.extend([f"{'#' * (heading_level + 1)} Canonical Python reproduction script", ""])
+    _append_markdown_code_block(
+        parts,
+        _build_native_mlx_vlm_python_script(
+            model_name=result.model_name,
+            prompt=prompt,
+            image_ref=image_ref,
+            run_args=run_args,
+        ),
+        language="python",
     )
     return parts
 
@@ -16604,6 +16550,7 @@ def _diagnostics_partition_section(
     assessments: Mapping[str, ResultAssessment],
     prompt: str,
     image_path: Path | None,
+    run_args: argparse.Namespace | None,
 ) -> list[str]:
     """Render one direct current-run diagnostics partition."""
     parts = [f"## {title}", ""]
@@ -16616,6 +16563,7 @@ def _diagnostics_partition_section(
                 assessments[result.model_name],
                 prompt=prompt,
                 image_path=image_path,
+                run_args=run_args,
                 heading_level=3,
             )
         )
@@ -16662,6 +16610,7 @@ def generate_diagnostics_report(
     system_info: Mapping[str, str],
     report_context: ReportRenderContext,
     image_path: Path | None = None,
+    run_args: argparse.Namespace | None = None,
 ) -> None:
     """Write current-run maintainer evidence without reclassifying results."""
     del results  # The cached context is the sole classification and result source.
@@ -16699,6 +16648,7 @@ def generate_diagnostics_report(
             assessments=assessments,
             prompt=prompt,
             image_path=image_path,
+            run_args=run_args,
         )
     )
     parts.extend(
@@ -16708,6 +16658,7 @@ def generate_diagnostics_report(
             assessments=assessments,
             prompt=prompt,
             image_path=image_path,
+            run_args=run_args,
         )
     )
     parts.extend(
@@ -16717,6 +16668,7 @@ def generate_diagnostics_report(
             assessments=assessments,
             prompt=prompt,
             image_path=image_path,
+            run_args=run_args,
         )
     )
     parts.extend(
@@ -18499,53 +18451,6 @@ def _append_review_model_verdicts(
         md.append("")
 
 
-def _append_review_issue_queue(
-    md: list[str],
-    *,
-    report_context: ReportRenderContext,
-    repro_bundles: Mapping[str, Path] | None = None,
-) -> None:
-    """Append a compact issue-queue pointer to the review digest."""
-    snapshot = _build_diagnostics_snapshot(
-        results=list(report_context.result_set.results),
-        prompt=report_context.prompt_context,
-        preflight_issues=report_context.preflight_issues,
-    )
-    clusters = _build_issue_clusters(snapshot)
-    if not clusters:
-        return
-
-    md.extend(
-        [
-            "## Maintainer Escalations",
-            "",
-            f"Focused upstream issue drafts are queued in [issues/index.md]({_github_published_output_url('issues', 'index.md')}).",
-            "",
-        ]
-    )
-
-    def _review_issue_link(cluster: IssueCluster) -> str:
-        return f"[issue draft]({_github_published_output_url('issues', cluster.issue_filename)})"
-
-    resolved_repro_bundles = repro_bundles or {}
-    md.extend(
-        _guard_markdownlint_block(
-            _render_issue_queue_table(
-                clusters,
-                escape_text=MARKDOWN_ESCAPER.escape,
-                issue_link_for_cluster=_review_issue_link,
-                evidence_link_for_cluster=lambda cluster: _issue_cluster_bundle_link(
-                    cluster,
-                    resolved_repro_bundles,
-                ),
-                failure_narratives=_failure_narratives_by_model(report_context),
-            ),
-            rules=MARKDOWNLINT_TABLE_PIPE_RULES,
-        )
-    )
-    md.append("")
-
-
 def _build_grounded_metadata_selection_section(
     views: Sequence[ModelRecommendationView],
     *,
@@ -19407,6 +19312,7 @@ def generate_review_report(
     repro_bundles: Mapping[str, Path] | None = None,
 ) -> None:
     """Write a short Markdown digest of automated verdicts and action buckets."""
+    del repro_bundles  # Retained for caller compatibility; review no longer owns issue routing.
     if not results:
         log_warning_note("No results to generate review report.")
         return
@@ -19445,11 +19351,6 @@ def generate_review_report(
         md,
         bucket_groups,
         mode_policy=report_context.mode_policy,
-    )
-    _append_review_issue_queue(
-        md,
-        report_context=report_context,
-        repro_bundles=repro_bundles,
     )
     _append_review_model_verdicts(md, sorted_results)
 
@@ -27688,6 +27589,9 @@ def _native_mlx_vlm_generate_kwargs(run_args: argparse.Namespace | None) -> dict
     logit_bias = getattr(run_args, "logit_bias", None)
     if logit_bias:
         kwargs["logit_bias"] = dict(logit_bias)
+    processor_kwargs = getattr(run_args, "processor_kwargs", None)
+    if processor_kwargs:
+        kwargs.update(processor_kwargs)
     return kwargs
 
 
@@ -27932,6 +27836,7 @@ def _generate_github_issue_reports(
     system_info: Mapping[str, str],
     prompt: str,
     image_path: Path | None = None,
+    run_args: argparse.Namespace | None = None,
 ) -> Mapping[str, Path]:
     """Write one factual issue draft per crashed actionable result."""
     issues_dir = output_dir / "issues"
@@ -27970,6 +27875,7 @@ def _generate_github_issue_reports(
                 assessments[result.model_name],
                 prompt=prompt,
                 image_path=image_path,
+                run_args=run_args,
                 heading_level=2,
             )
         )
@@ -27999,7 +27905,6 @@ def _write_diagnostics_and_repro_artifacts(
     report_context: ReportRenderContext,
 ) -> DiagnosticsArtifacts:
     """Export repro bundles and diagnostics markdown after history append."""
-    diagnostics_snapshot = report_context.diagnostics_snapshot
     issue_clusters = report_context.issue_clusters
     repro_bundles = export_failure_repro_bundles(
         results=results,
@@ -28024,6 +27929,7 @@ def _write_diagnostics_and_repro_artifacts(
         system_info=system_info,
         report_context=report_context,
         image_path=image_path,
+        run_args=args,
     )
     issue_reports = _generate_github_issue_reports(
         report_context=report_context,
@@ -28032,6 +27938,7 @@ def _write_diagnostics_and_repro_artifacts(
         system_info=system_info,
         prompt=prompt,
         image_path=image_path,
+        run_args=args,
     )
     if issue_reports:
         logger.info("GitHub Issue reports generated for %d issue(s).", len(issue_reports))
@@ -28039,7 +27946,7 @@ def _write_diagnostics_and_repro_artifacts(
             log_file_path(issue_path, label=f"   Issue Report ({issue_key}):")
 
     return DiagnosticsArtifacts(
-        snapshot=diagnostics_snapshot,
+        outcome_counts=_run_outcome_counts(report_context.assessments),
         diagnostics_written=True,
         repro_bundles=repro_bundles,
         issue_reports=issue_reports,
@@ -28688,9 +28595,12 @@ def _print_reports_dashboard(
     add_row("Environment Log", "Pip freeze & conda env config log", output_paths.environment)
 
     if diagnostics_artifacts and diagnostics_artifacts.issue_reports:
-        issues_dir = output_paths.diagnostics.parent.parent / "issues"
-        if issues_dir.exists():
-            add_row("GitHub Issue Drafts", "Upstream issue template index", issues_dir / "index.md")
+        for model_name, issue_path in sorted(diagnostics_artifacts.issue_reports.items()):
+            add_row(
+                issue_path.name,
+                f"Factual crash draft for {model_name}",
+                issue_path,
+            )
 
     if diagnostics_artifacts and diagnostics_artifacts.repro_bundles:
         repro_dir = output_paths.diagnostics.parent.parent / "repro_bundles"

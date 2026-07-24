@@ -5,7 +5,9 @@ from __future__ import annotations
 import base64
 import io
 import json
+import os
 import re
+import time
 from argparse import Namespace
 from dataclasses import dataclass, replace
 from pathlib import Path
@@ -22,9 +24,10 @@ from check_models import (
     LibraryVersionDict,
     PerformanceResult,
     RuntimeDiagnostics,
-    _build_diagnostics_snapshot,
     _build_report_render_context,
+    _clean_stale_toplevel_reports,
     _generate_github_issue_reports,
+    _prune_repro_bundles,
     generate_diagnostics_report,
     generate_html_report,
     generate_markdown_gallery_report,
@@ -41,6 +44,8 @@ if TYPE_CHECKING:
 THINKING_START_TOKEN = "<think>"
 THINKING_END_TOKEN = "</think>"
 EOS_END_TOKEN = "</s>"
+EOS_OVERRIDE_TOKEN = "<override-eos>"
+CUSTOM_THINKING_END_TOKEN = "</done>"
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -282,7 +287,6 @@ def _generate_output_artifacts_for_link_style(
     bundle_path.parent.mkdir(parents=True, exist_ok=True)
     check_models._write_text_file(bundle_path, "{}")
     repro_bundles = {failure.model_name: bundle_path}
-    diagnostics_snapshot = _build_diagnostics_snapshot(results=results, prompt=prompt)
 
     with patch.object(check_models._LinkStyleState, "value", link_style):
         generate_html_report(
@@ -374,7 +378,7 @@ def _generate_output_artifacts_for_link_style(
             output_paths=output_paths,
             report_context=report_context,
             diagnostics_artifacts=DiagnosticsArtifacts(
-                snapshot=diagnostics_snapshot,
+                outcome_counts=check_models._run_outcome_counts(report_context.assessments),
                 diagnostics_written=True,
                 repro_bundles=repro_bundles,
                 issue_reports=issue_reports,
@@ -1588,6 +1592,215 @@ def test_successful_anomaly_and_indeterminate_attempt_create_no_issue_draft(
     assert "owner confidence" not in content.casefold()
     assert generated == {}
     assert not list((tmp_path / "issues").glob("issue_*.md"))
+
+
+def test_issue_generation_writes_exactly_one_draft_per_crash(tmp_path: Path) -> None:
+    """Only crashed actionable attempts should become individual issue drafts."""
+    crashes = [
+        _make_failure_with_details("org/crash-one", error_msg="decoder one failed"),
+        _make_failure_with_details("org/crash-two", error_msg="decoder two failed"),
+    ]
+    completed = _make_success("org/completed")
+    indeterminate = PerformanceResult(
+        model_name="org/network",
+        success=False,
+        generation=None,
+        error_message="503 Service Unavailable",
+    )
+    results = [*crashes, completed, indeterminate]
+    context = _build_report_render_context(results=results, prompt="Describe the image.")
+
+    generated = _generate_github_issue_reports(
+        report_context=context,
+        output_dir=tmp_path,
+        library_versions=_stub_versions(),
+        system_info={},
+        prompt="Describe the image.",
+    )
+
+    assert set(generated) == {"org/crash-one", "org/crash-two"}
+    assert len(list((tmp_path / "issues").glob("issue_*.md"))) == 2
+
+
+def test_diagnostics_distinguish_empty_output_from_unavailable_evidence(tmp_path: Path) -> None:
+    """Recorded empty output and evidence that was never captured are different facts."""
+    empty_output = _make_failure_with_details(
+        "org/empty-output",
+        error_msg="generation stopped",
+        generated_text="",
+    )
+    unavailable = _make_failure_with_details(
+        "org/no-evidence",
+        error_msg="generation failed before output",
+        traceback_str=None,
+        captured_output=None,
+        generated_text=None,
+    )
+    results = [empty_output, unavailable]
+    context = _build_report_render_context(results=results, prompt="Describe the image.")
+    output = tmp_path / "diagnostics.md"
+
+    generate_diagnostics_report(
+        results,
+        output,
+        prompt="Describe the image.",
+        library_versions=_stub_versions(),
+        system_info={},
+        report_context=context,
+    )
+
+    content = output.read_text(encoding="utf-8")
+    empty_entry = _extract_markdown_subsection(
+        content,
+        "### org/empty-output",
+        end_headings=("### org/no-evidence",),
+    )
+    missing_entry = _extract_markdown_subsection(
+        content,
+        "### org/no-evidence",
+        end_headings=("## Successful Observations Requiring Reproduction",),
+    )
+    assert "Complete partial output\n\n```text\n(empty)" in empty_entry
+    assert "Complete traceback\n\n```text\nunavailable" in missing_entry
+    assert "Complete partial output\n\n```text\nunavailable" in missing_entry
+    assert "Captured stdout/stderr\n\n```text\nunavailable" in missing_entry
+
+
+def test_diagnostics_use_run_args_for_complete_native_reproduction(tmp_path: Path) -> None:
+    """Diagnostics should preserve the actual run's CLI and Python reproduction settings."""
+    result = replace(
+        _make_failure_with_details("org/repro", error_msg="decode failed"),
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            eos_token_id=2,
+            eos_token=EOS_END_TOKEN,
+            generate_kwargs={"eos_tokens": [EOS_OVERRIDE_TOKEN]},
+        ),
+    )
+    context = _build_report_render_context(results=[result], prompt="Describe the image.")
+    output = tmp_path / "diagnostics.md"
+    image_path = tmp_path / "sample image.jpg"
+    run_args = Namespace(
+        max_tokens=321,
+        temperature=0.25,
+        top_p=0.81,
+        min_p=0.12,
+        top_k=7,
+        seed=73,
+        repetition_penalty=1.15,
+        repetition_context_size=48,
+        presence_penalty=0.3,
+        presence_context_size=96,
+        frequency_penalty=0.2,
+        frequency_context_size=80,
+        max_kv_size=4096,
+        kv_bits=4,
+        kv_quant_scheme="turboquant",
+        kv_group_size=32,
+        quantized_kv_start=128,
+        prefill_step_size=512,
+        resize_shape=(64, 32),
+        eos_tokens=[EOS_OVERRIDE_TOKEN],
+        skip_special_tokens=True,
+        revision="run-revision",
+        trust_remote_code=True,
+        force_download=True,
+        quantize_activations=True,
+        processor_kwargs={"cropping": False},
+        enable_thinking=True,
+        thinking_budget=24,
+        thinking_start_token=THINKING_START_TOKEN,
+        thinking_end_token=CUSTOM_THINKING_END_TOKEN,
+        logit_bias={42: -1.5},
+        adapter_path=None,
+        lazy_load=False,
+    )
+
+    with patch.object(check_models, "_collect_model_provenance", side_effect=AssertionError):
+        generate_diagnostics_report(
+            [result],
+            output,
+            prompt="Describe the image.",
+            library_versions=_stub_versions(),
+            system_info={},
+            report_context=context,
+            image_path=image_path,
+            run_args=run_args,
+        )
+        issue_reports = _generate_github_issue_reports(
+            report_context=context,
+            output_dir=tmp_path,
+            library_versions=_stub_versions(),
+            system_info={},
+            prompt="Describe the image.",
+            image_path=image_path,
+            run_args=run_args,
+        )
+
+    contents = [
+        output.read_text(encoding="utf-8"),
+        next(iter(issue_reports.values())).read_text(encoding="utf-8"),
+    ]
+    for content in contents:
+        assert "- _Model revision:_ unavailable" in content
+        assert "- _Requested model revision:_ run-revision" in content
+        assert '- _Configured EOS token override:_ ["&lt;override-eos&gt;"]' in content
+        assert "Supplemental CLI reproduction" in content
+        assert "Canonical Python reproduction script" in content
+        assert "--revision run-revision" in content
+        assert "--processor-kwargs" in content
+        assert "--resize-shape 64 32" in content
+        assert "--skip-special-tokens" in content
+        assert "'top_p': 0.81" in content
+        assert "'min_p': 0.12" in content
+        assert "'top_k': 7" in content
+        assert "'seed': 73" in content
+        assert "'repetition_penalty': 1.15" in content
+        assert "'presence_penalty': 0.3" in content
+        assert "'frequency_penalty': 0.2" in content
+        assert "'eos_tokens': ['<override-eos>']" in content
+        assert "'enable_thinking': True" in content
+        assert "'cropping': False" in content
+
+
+def test_maintainer_summary_logs_only_counts_and_direct_draft_paths(
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Console diagnostics should report cached facts without inferred ownership."""
+    diagnostics_path = tmp_path / "diagnostics.md"
+    diagnostics_path.write_text("diagnostics\n", encoding="utf-8")
+    issue_one = tmp_path / "issues" / "issue_one.md"
+    issue_two = tmp_path / "issues" / "issue_two.md"
+    issue_one.parent.mkdir()
+    issue_one.write_text("one\n", encoding="utf-8")
+    issue_two.write_text("two\n", encoding="utf-8")
+    artifacts = DiagnosticsArtifacts(
+        outcome_counts={
+            "models_attempted": 4,
+            "models_evaluated": 3,
+            "models_completed": 1,
+            "models_crashed": 2,
+            "models_indeterminate": 1,
+        },
+        diagnostics_written=True,
+        issue_reports={"org/one": issue_one, "org/two": issue_two},
+    )
+
+    caplog.set_level("INFO")
+    check_models._log_maintainer_summary(
+        artifacts=artifacts,
+        diagnostics_path=diagnostics_path,
+    )
+
+    messages = caplog.text
+    assert "attempted=4" in messages
+    assert "completed=1" in messages
+    assert "crashed=2" in messages
+    assert "indeterminate=1" in messages
+    assert str(issue_one) in messages
+    assert str(issue_two) in messages
+    assert "owner" not in messages.casefold()
+    assert "cluster" not in messages.casefold()
 
 
 def test_review_shortlist_obeys_canonical_user_recommendation() -> None:
@@ -4349,8 +4562,11 @@ class TestMarkdownGalleryReport:
         assert "_Processor:_ not captured" in evidence
         assert "_Tokenizer:_ not captured" in evidence
 
-    def test_review_report_groups_owner_and_user_buckets(self, tmp_path: Path) -> None:
-        """Review digest should group maintainer ownership and user-facing buckets."""
+    def test_review_report_keeps_user_buckets_without_legacy_issue_queue(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Review digest should not advertise inferred owners or retired issue indexes."""
         out = tmp_path / "review.md"
         log_file = tmp_path / "check_models.log"
         gallery = tmp_path / "model_gallery.md"
@@ -4377,13 +4593,10 @@ class TestMarkdownGalleryReport:
             "<!-- markdownlint-disable MD012 MD013 -->\n\n# Automated Review Digest"
         )
         assert "# Automated Review Digest" in content
-        assert "## Maintainer Escalations" in content
-        assert "issues/index.md" in content
-        assert (
-            "https://github.com/jrp2014/check_models/blob/main/src/output/issues/index.md"
-        ) in content
+        assert "## Maintainer Escalations" not in content
+        assert "issues/index.md" not in content
 
-        # Now test relative local links when the link-style state is "relative"
+        # Relative link rendering must not revive the retired issue queue.
         with patch.object(check_models._LinkStyleState, "value", "relative"):
             generate_review_report(
                 results=results,
@@ -4394,37 +4607,25 @@ class TestMarkdownGalleryReport:
                 gallery_filename=gallery,
             )
             content_relative = out.read_text(encoding="utf-8")
-            assert "../issues/index.md" in content_relative
+            assert "issues/index.md" not in content_relative
         assert "## 🧭 Review Shortlist" in content
         assert "## User Buckets" in content
         assert "## Model Verdicts" in content
         assert "## Maintainer Queue" not in content
-        assert "`mlx-vlm`" in content or "`transformers`" in content
         assert "`clean-triage-pass`" in content
         assert "`avoid`" in content
-        assert content.index("## User Buckets") < content.index("## Maintainer Escalations")
-        assert content.index("## Maintainer Escalations") < content.index("## Model Verdicts")
+        assert content.index("## User Buckets") < content.index("## Model Verdicts")
         assert "Model" in content
         assert "Hint Handling" in content
         assert "Key Evidence" in content
-        assert "Evidence Bundle" in content
-        assert "Fixed When" in content
         assert "Canonical run log" in content
         assert "Treat as a model-quality limitation" not in content
-        maintainer_queue = content.split("## Maintainer Escalations", maxsplit=1)[1].split(
-            "## Model Verdicts",
-            maxsplit=1,
-        )[0]
-        assert "<!-- markdownlint-disable MD060 -->" in maintainer_queue
-        assert "<!-- markdownlint-enable MD060 -->" in maintainer_queue
-        assert "org/good" not in maintainer_queue
-        assert "org/risky" not in maintainer_queue
 
-    def test_review_report_links_issue_repro_bundles_when_available(
+    def test_review_report_ignores_repro_bundles_without_legacy_issue_queue(
         self,
         tmp_path: Path,
     ) -> None:
-        """Review maintainer queue should carry repro bundle links, not placeholder dashes."""
+        """A repro bundle must not recreate the removed inferred issue queue."""
         out = tmp_path / "review.md"
         risky = _with_confirmed_reproduction(
             _make_harness_success(
@@ -4443,12 +4644,9 @@ class TestMarkdownGalleryReport:
         )
 
         content = out.read_text(encoding="utf-8")
-        maintainer_queue = content.split("## Maintainer Escalations", maxsplit=1)[1].split(
-            "## Model Verdicts",
-            maxsplit=1,
-        )[0]
-        assert "[repro JSON]" in maintainer_queue
-        assert "risky.json" in maintainer_queue
+        assert "## Maintainer Escalations" not in content
+        assert "issues/index.md" not in content
+        assert "risky.json" not in content
 
     def test_review_report_marks_hint_handling_not_evaluated_without_metadata(
         self,
@@ -4990,6 +5188,7 @@ class TestReproCommandNormalization:
         assert "'top_k': 4" in script
         assert "'repetition_penalty': 1.1" in script
         assert "'repetition_context_size': 64" in script
+        assert "'cropping': False" in script
         assert "from mlx_vlm.prompt_utils import apply_chat_template" in script
         assert "formatted_prompt = apply_chat_template(" in script
         assert "processor," in script
@@ -5032,7 +5231,7 @@ def test_output_index_routes_maintainers_and_model_users(tmp_path: Path) -> None
         environment=output_dir / "environment.log",
     )
     artifacts = DiagnosticsArtifacts(
-        snapshot=_build_diagnostics_snapshot(results=[good, failure], prompt="describe"),
+        outcome_counts=check_models._run_outcome_counts(report_context.assessments),
         diagnostics_written=True,
         repro_bundles={"org/bad": output_dir / "repro_bundles" / "bad.json"},
         issue_reports={"org/bad": issues_dir / "issue_org_bad.md"},
@@ -5088,6 +5287,213 @@ def test_output_index_routes_maintainers_and_model_users(tmp_path: Path) -> None
         "issue_org_bad.md",
     ):
         assert artifact in supporting
+
+
+def test_reports_dashboard_lists_each_real_issue_draft(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """The console dashboard should link actual drafts, never a deleted index."""
+    output_dir = tmp_path / "output"
+    reports_dir = output_dir / "reports"
+    issues_dir = output_dir / "issues"
+    reports_dir.mkdir(parents=True)
+    issues_dir.mkdir()
+    diagnostics = reports_dir / "diagnostics.md"
+    diagnostics.write_text("diagnostics\n", encoding="utf-8")
+    issue_one = issues_dir / "issue_org_one.md"
+    issue_two = issues_dir / "issue_org_two.md"
+    issue_one.write_text("one\n", encoding="utf-8")
+    issue_two.write_text("two\n", encoding="utf-8")
+    paths = check_models.ReportOutputPaths(
+        index=output_dir / "index.md",
+        html=reports_dir / "results.html",
+        markdown=reports_dir / "results.md",
+        gallery_markdown=reports_dir / "model_gallery.md",
+        review=reports_dir / "review.md",
+        model_selection=reports_dir / "model_selection.md",
+        model_capabilities=reports_dir / "model_capabilities.md",
+        model_capabilities_json=output_dir / "model_capabilities.json",
+        tsv=reports_dir / "results.tsv",
+        jsonl=output_dir / "results.jsonl",
+        run_json=output_dir / "run.json",
+        diagnostics=diagnostics,
+        log=output_dir / "check_models.log",
+        environment=output_dir / "environment.log",
+    )
+    artifacts = DiagnosticsArtifacts(
+        diagnostics_written=True,
+        issue_reports={"org/one": issue_one, "org/two": issue_two},
+    )
+
+    check_models._print_reports_dashboard(paths, diagnostics_artifacts=artifacts)
+
+    captured = capsys.readouterr().err
+    assert "issue_org_one.md" in captured
+    assert "issue_org_two.md" in captured
+    assert "issues/index.md" not in captured
+
+
+def test_generate_markdown_report_uses_provided_report_context(tmp_path: Path) -> None:
+    """Markdown generation should reuse a supplied cached report context."""
+    out = tmp_path / "results.md"
+    results = [_make_success("org/good"), _make_failure("org/bad")]
+    report_context = _build_report_render_context(results=results, prompt="test prompt")
+
+    with (
+        patch.object(check_models, "_build_report_render_context", side_effect=AssertionError),
+        patch.object(check_models, "analyze_model_issues", side_effect=AssertionError),
+        patch.object(check_models, "compute_performance_statistics", side_effect=AssertionError),
+        patch.object(check_models, "get_system_characteristics", side_effect=AssertionError),
+    ):
+        generate_markdown_report(
+            results=results,
+            filename=out,
+            versions=_stub_versions(),
+            prompt="test prompt",
+            total_runtime_seconds=1.0,
+            report_context=report_context,
+        )
+
+    content = out.read_text(encoding="utf-8")
+    assert "# Model Performance Results" in content
+    assert "org/good" in content
+
+
+def test_generate_tsv_report_uses_provided_report_context(tmp_path: Path) -> None:
+    """TSV generation should reuse a supplied cached report context."""
+    out = tmp_path / "results.tsv"
+    results = [_make_success("org/good"), _make_failure("org/bad")]
+    report_context = _build_report_render_context(results=results, prompt="test prompt")
+
+    with patch.object(check_models, "_build_report_render_context", side_effect=AssertionError):
+        generate_tsv_report(results=results, filename=out, report_context=report_context)
+
+    content = out.read_text(encoding="utf-8")
+    assert "org/good" in content
+    assert "error_type" in content
+
+
+def test_generate_tsv_report_includes_full_generated_text_for_analysis(tmp_path: Path) -> None:
+    """Spreadsheet output should preserve exact generated text separately from previews."""
+    out = tmp_path / "results.tsv"
+    full_text = (
+        "Two cats are sleeping on a pink couch. "
+        + "context words " * 40
+        + "</think> exact leak marker after a long reasoning preface."
+    )
+    result = PerformanceResult(
+        model_name="org/full-output",
+        success=True,
+        generation=_MockGeneration(
+            text=full_text,
+            prompt_tokens=317,
+            generation_tokens=196,
+        ),
+        total_time=1.0,
+        generation_time=0.5,
+        model_load_time=0.5,
+    )
+
+    generate_tsv_report(results=[result], filename=out)
+
+    content = out.read_text(encoding="utf-8")
+    assert "Generated Text" in content
+    assert "</think> exact leak marker" in content
+
+
+def test_generate_tsv_report_standalone_uses_prepared_table_path(tmp_path: Path) -> None:
+    """Standalone TSV generation should still render results without cached context."""
+    out = tmp_path / "standalone.tsv"
+    results = [_make_success("org/good"), _make_failure("org/bad")]
+
+    generate_tsv_report(results=results, filename=out)
+
+    content = out.read_text(encoding="utf-8")
+    assert "org/good" in content
+    assert "org/bad" in content
+
+
+class TestPruneReproBundles:
+    """Regression coverage for repro bundle retention."""
+
+    def test_removes_old_bundles(self, tmp_path: Path) -> None:
+        """JSON bundles older than max_age_days are removed."""
+        old_file = tmp_path / "20240101T000000_001_model_sig.json"
+        old_file.write_text("{}", encoding="utf-8")
+        old_time = time.time() - 200 * 86400
+        os.utime(old_file, (old_time, old_time))
+        new_file = tmp_path / "20260401T000000_001_model_sig.json"
+        new_file.write_text("{}", encoding="utf-8")
+
+        removed = _prune_repro_bundles(tmp_path, 90, max_runs=100)
+
+        assert removed == 1
+        assert not old_file.exists()
+        assert new_file.exists()
+
+    def test_zero_days_disables_pruning(self, tmp_path: Path) -> None:
+        """max_age_days=0 disables pruning."""
+        (tmp_path / "20260401T000000_001_model_sig.json").write_text("{}", encoding="utf-8")
+        assert _prune_repro_bundles(tmp_path, 0) == 0
+
+    def test_nonexistent_dir(self, tmp_path: Path) -> None:
+        """A non-existent directory returns zero."""
+        assert _prune_repro_bundles(tmp_path / "nonexistent", 90) == 0
+
+    def test_prunes_json_files_by_run_count(self, tmp_path: Path) -> None:
+        """JSON bundle files beyond max_runs are pruned."""
+        for index, prefix in enumerate(("20260401T000000", "20260402T000000", "20260403T000000")):
+            (tmp_path / f"{prefix}_{index:03d}_model_sig.json").write_text(
+                "{}",
+                encoding="utf-8",
+            )
+
+        removed = _prune_repro_bundles(tmp_path, max_age_days=9999, max_runs=2)
+
+        assert removed == 1
+        assert not (tmp_path / "20260401T000000_000_model_sig.json").exists()
+        assert (tmp_path / "20260402T000000_001_model_sig.json").exists()
+        assert (tmp_path / "20260403T000000_002_model_sig.json").exists()
+
+    def test_removes_empty_directories(self, tmp_path: Path) -> None:
+        """Empty subdirectories are cleaned up."""
+        empty = tmp_path / "empty_dir"
+        empty.mkdir()
+        _prune_repro_bundles(tmp_path, max_age_days=9999, max_runs=100)
+        assert not empty.exists()
+
+
+class TestCleanStaleToplevelReports:
+    """Regression coverage for stale top-level report cleanup."""
+
+    def test_removes_stale_files_when_canonical_exists(self, tmp_path: Path) -> None:
+        """A stale top-level file is removed when the reports copy exists."""
+        reports_dir = tmp_path / "reports"
+        reports_dir.mkdir()
+        (tmp_path / "results.md").write_text("old", encoding="utf-8")
+        (reports_dir / "results.md").write_text("canonical", encoding="utf-8")
+        (tmp_path / "model_selection.md").write_text("old selection", encoding="utf-8")
+        (reports_dir / "model_selection.md").write_text(
+            "canonical selection",
+            encoding="utf-8",
+        )
+
+        removed = _clean_stale_toplevel_reports(tmp_path, reports_dir)
+
+        assert removed == 2
+        assert not (tmp_path / "results.md").exists()
+        assert not (tmp_path / "model_selection.md").exists()
+
+    def test_keeps_file_when_no_canonical(self, tmp_path: Path) -> None:
+        """A top-level file is kept when no reports copy exists."""
+        reports_dir = tmp_path / "reports"
+        reports_dir.mkdir()
+        only_copy = tmp_path / "results.md"
+        only_copy.write_text("only copy", encoding="utf-8")
+
+        assert _clean_stale_toplevel_reports(tmp_path, reports_dir) == 0
+        assert only_copy.exists()
 
 
 def test_quality_signal_summary_reports_incomplete_thinking_without_fault_language() -> None:
