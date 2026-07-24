@@ -67,7 +67,7 @@ extras = [
     # Hardware metrics (optional system block)
     "psutil>=5.9.0",
     # Fast tokenizer backends; stay on the 0.22.x line until 0.23.x is validated.
-    "tokenizers>=0.22.0,<0.23.0",
+    "tokenizers>=0.22.0,<0.24.0",
     # Tensor operations (required by some model architectures)
     "einops>=0.6.0",
     # Number-to-words conversion (required by some model processors)
