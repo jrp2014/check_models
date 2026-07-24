@@ -22,6 +22,9 @@
   artifact must use `tmp_path` or a gitignored `test_*` location.
 - Do not add compatibility aliases for retired statuses, fields, reports, or
   command-line options.
+- Legacy assessment structures may coexist temporarily while their consumers
+  migrate to `ResultAssessment`; delete each structure after its final caller
+  moves. Do not adapt old callers through aliases or back-projections.
 - Do not add bare `noqa`, blanket `type: ignore`, lint-file exclusions, or broad
   exception handling.
 - Preserve complete generated output. A preview may aid navigation but never
@@ -133,11 +136,11 @@ pytest src/tests/test_report_generation.py src/tests/test_quality_analysis.py -q
 Expected: the first new contract test fails during collection or execution on
 the missing minimal assessment API.
 
-- [ ] Replace `ExecutionOutcome`, `RecommendationStatus`,
-  `MaintainerReadiness`, `CompatibilityStatus`, `OutputAnomaly`,
-  `ModelUserAssessment`, `MaintainerAssessment`, `CanonicalAssessment`, and
-  their presentation dataclasses with the four narrow aliases and
-  `ResultAssessment` above.
+- [ ] Add the four narrow aliases and `ResultAssessment` above. Keep existing
+  assessment structures only while later tasks still have unmigrated callers;
+  do not add an adapter, alias, or back-projection between the old and new
+  contracts. Delete the old structures immediately after the last consumer is
+  migrated in Tasks 2-7.
 
 - [ ] Implement `_execution_status`, `_assessment_observations`, and
   `_assess_result`. Reuse existing factual detectors, but project only the
@@ -149,7 +152,6 @@ _UNUSABLE_OBSERVATIONS: Final[frozenset[ObservationCode]] = frozenset(
         "empty_output",
         "repeated_output",
         "missing_requested_sections",
-        "token_cap_truncation",
     }
 )
 
@@ -177,10 +179,13 @@ def _assess_result(result: PerformanceResult) -> ResultAssessment:
 ```
 
   Keep `no_keyword_overlap`, `thinking_trace_present`,
-  `unexpected_special_token`, `prompt_instruction_echo`, and `minimal_output`
-  non-fatal by themselves. Require recorded stop/token-cap evidence before
-  emitting `token_cap_truncation`. Preserve the existing direct connectivity
-  signature logic for `indeterminate`.
+  `unexpected_special_token`, `prompt_instruction_echo`, `minimal_output`, and
+  a token-cap stop non-fatal by themselves. Emit `token_cap_truncation` only
+  when recorded cap evidence coincides with a mechanical sign that the output
+  is incomplete or degenerate, such as contiguous repetition, missing
+  requested sections, or an incomplete thinking trace. Reaching the cap with
+  otherwise usable output emits no issue observation. Preserve the existing
+  direct connectivity signature logic for `indeterminate`.
 
 - [ ] Change `ReportRenderContext.assessments` to
   `tuple[tuple[str, ResultAssessment], ...]`. Delete the cached user and
