@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import html
 import inspect
 import io
 import json
@@ -127,8 +128,8 @@ def test_format_peak_memory_context_preserves_bare_peak_without_denominator() ->
     assert check_models._format_peak_memory_context(None, 96 * 1024**3) == ""
 
 
-def test_html_and_markdown_render_working_set_context(tmp_path: Path) -> None:
-    """Primary human reports should contextualize per-model peak memory."""
+def test_html_and_gallery_render_same_captured_peak_memory(tmp_path: Path) -> None:
+    """HTML should mirror the GalleryRow peak-memory fact without another projection."""
     result = PerformanceResult(
         model_name="test/model",
         generation=_MockGeneration(peak_memory=1.0),
@@ -168,9 +169,12 @@ def test_html_and_markdown_render_working_set_context(tmp_path: Path) -> None:
         versions=_stub_versions(),
     )
 
-    expected = "1.0 GB (50% of 1.86 GB recommended working set)"
-    assert html_path.read_text(encoding="utf-8").count(expected) >= 2
-    assert expected in markdown_path.read_text(encoding="utf-8")
+    html_text = html_path.read_text(encoding="utf-8")
+    assert "<td>Peak memory</td>\n<td>1.0</td>" in html_text
+    assert "recommended working set" not in html_text
+    assert "1.0 GB (50% of 1.86 GB recommended working set)" in markdown_path.read_text(
+        encoding="utf-8"
+    )
     assert "_Peak memory:_ 1.0" in gallery_path.read_text(encoding="utf-8")
 
 
@@ -470,8 +474,8 @@ def test_retired_cluster_and_repro_bundle_api_is_absent() -> None:
     )
 
 
-def test_html_and_markdown_share_task_outcome_and_policy(tmp_path: Path) -> None:
-    """HTML and the selection brief should expose the same reliability policy."""
+def test_html_uses_cached_execution_while_selection_keeps_legacy_policy(tmp_path: Path) -> None:
+    """HTML should expose cached execution without importing selection policy."""
     results = [_make_failure("org/crashed"), _make_success("org/passed")]
     context = _build_report_render_context(
         results=results,
@@ -499,15 +503,16 @@ def test_html_and_markdown_share_task_outcome_and_policy(tmp_path: Path) -> None
     html_text = html_path.read_text(encoding="utf-8")
     selection_text = selection_path.read_text(encoding="utf-8")
     assert "org/crashed" in html_text
-    assert "Task outcome: crashed" in html_text
-    assert "reliability-gated" in html_text
+    assert 'data-execution="crashed"' in html_text
+    assert "Task outcome:" not in html_text
+    assert "reliability-gated" not in html_text
     assert "reliability-gated" in selection_text
 
 
-def test_html_and_supporting_markdown_do_not_name_ineligible_legacy_winners(
+def test_html_ignores_legacy_semantic_winners(
     tmp_path: Path,
 ) -> None:
-    """Legacy summary highlights must obey the canonical reliability gate."""
+    """Legacy summary highlights must not leak into the facts-only HTML mirror."""
     eligible = replace(
         _make_success("org/eligible"),
         generation=_MockGeneration(
@@ -541,8 +546,6 @@ def test_html_and_supporting_markdown_do_not_name_ineligible_legacy_winners(
         eval_mode="blind",
     )
     html_path = tmp_path / "results.html"
-    markdown_path = tmp_path / "results.md"
-
     generate_html_report(
         results,
         html_path,
@@ -551,37 +554,18 @@ def test_html_and_supporting_markdown_do_not_name_ineligible_legacy_winners(
         total_runtime_seconds=2.0,
         report_context=context,
     )
-    generate_markdown_report(
-        results,
-        markdown_path,
-        versions={},
-        prompt="Create title, description, and keywords.",
-        total_runtime_seconds=2.0,
-        report_context=context,
-    )
-
-    assert context.summary["fastest_model"][0] == "org/eligible"
-    assert context.summary["most_efficient_model"][0] == "org/eligible"
-    assert context.summary["fastest_load_model"][0] == "org/eligible"
-    cataloging_best = context.summary["cataloging_best"]
-    if cataloging_best is None:
-        message = "cataloging_best"
-        raise AssertionError(message)
-    assert cataloging_best[0] == "org/eligible"
     html_text = html_path.read_text(encoding="utf-8")
-    markdown_text = markdown_path.read_text(encoding="utf-8")
     assert "org/fast-warning" in html_text
-    assert "org/fast-warning" in markdown_text
-    assert "<b>Fastest:</b> <code>org/eligible</code>" in html_text
-    assert "- **Fastest:** `org/eligible`" in markdown_text
-    assert "<b>Best for cataloging:</b> <code>org/eligible</code>" in html_text
-    assert "- **Best for cataloging:** `org/eligible`" in markdown_text
+    assert "org/eligible" in html_text
+    assert "Best for cataloging" not in html_text
+    assert "Cataloging Utility" not in html_text
+    assert "reliability-gated" not in html_text
 
 
-def test_all_ineligible_html_keeps_cataloging_aggregates_without_winner(
+def test_all_caveated_html_omits_cataloging_aggregates_and_winner(
     tmp_path: Path,
 ) -> None:
-    """An all-warning run should retain aggregate evidence without naming a winner."""
+    """An all-caveat run should retain evidence without semantic aggregates."""
     warning = _make_harness_success(
         "org/warning-only",
         text=getattr(_make_success().generation, "text", "") or "",
@@ -608,8 +592,8 @@ def test_all_ineligible_html_keeps_cataloging_aggregates_without_winner(
     )
 
     html_text = html_path.read_text(encoding="utf-8")
-    assert context.summary["cataloging_best"] is None
-    assert "Cataloging Utility Summary" in html_text
+    assert "org/warning-only" in html_text
+    assert "Cataloging Utility Summary" not in html_text
     assert "Best for cataloging" not in html_text
 
 
@@ -2553,6 +2537,217 @@ class TestHtmlReportEdgeCases:
         assert "org/good" in content
         assert "org/bad" in content
 
+    def test_html_mirrors_cached_assessments_across_retained_artifacts(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """JSONL and human reports should expose one exact cached status vocabulary."""
+        prompt = "Describe the image."
+        results = [
+            _make_success("org/usable"),
+            _make_success("org/caveat"),
+            replace(
+                _make_success("org/unusable"),
+                generation=_MockGeneration(text="", generation_tokens=0),
+            ),
+            _make_failure_with_details(
+                "org/crashed",
+                traceback_str="Traceback:\nRuntimeError: crashed",
+            ),
+            _make_failure_with_details(
+                "org/indeterminate",
+                error_msg="Server disconnected without sending a response.",
+                error_stage="Network Error",
+                error_package="unknown",
+            ),
+        ]
+        context = _build_report_render_context(results=results, prompt=prompt, system_info={})
+        expected = {
+            "org/usable": check_models.ResultAssessment("completed", "usable", "none", ()),
+            "org/caveat": check_models.ResultAssessment(
+                "completed",
+                "usable_with_caveats",
+                "observation_needs_reproduction",
+                ("minimal_output",),
+            ),
+            "org/unusable": check_models.ResultAssessment(
+                "completed",
+                "unusable",
+                "observation_needs_reproduction",
+                ("empty_output",),
+            ),
+            "org/crashed": check_models.ResultAssessment(
+                "crashed",
+                "not_evaluated",
+                "actionable_failure",
+                (),
+            ),
+            "org/indeterminate": check_models.ResultAssessment(
+                "indeterminate",
+                "not_evaluated",
+                "none",
+                (),
+            ),
+        }
+        context = replace(context, assessments=tuple(expected.items()))
+        jsonl_path = tmp_path / "results.jsonl"
+        diagnostics_path = tmp_path / "diagnostics.md"
+        gallery_path = tmp_path / "model_gallery.md"
+        html_path = tmp_path / "results.html"
+
+        with patch.object(check_models, "_assess_result", side_effect=AssertionError):
+            check_models.save_jsonl_report(
+                results,
+                jsonl_path,
+                prompt,
+                {},
+                report_context=context,
+            )
+            generate_diagnostics_report(
+                results,
+                diagnostics_path,
+                prompt=prompt,
+                library_versions=_stub_versions(),
+                system_info={},
+                report_context=context,
+            )
+            generate_markdown_gallery_report(
+                results,
+                gallery_path,
+                prompt,
+                report_context=context,
+            )
+            generate_html_report(
+                results,
+                html_path,
+                _stub_versions(),
+                prompt,
+                5.0,
+                report_context=context,
+            )
+
+        records = {
+            record["model"]: record
+            for line in jsonl_path.read_text(encoding="utf-8").splitlines()
+            if (record := json.loads(line)).get("_type") == "result"
+        }
+        diagnostics = diagnostics_path.read_text(encoding="utf-8")
+        gallery = gallery_path.read_text(encoding="utf-8")
+        html_report = html_path.read_text(encoding="utf-8")
+        for model, assessment in expected.items():
+            serialized = records[model]["assessment"]
+            assert serialized["execution"] == assessment.execution
+            assert serialized["usability"] == assessment.usability
+            assert serialized["maintainer_status"] == assessment.maintainer_status
+            gallery_entry = _extract_markdown_subsection(
+                gallery,
+                f"### {model}",
+                end_headings=("### org/", "<!-- markdownlint-enable"),
+            )
+            assert f"_Execution:_ {assessment.execution}" in gallery_entry
+            assert f"_Usability:_ {assessment.usability}" in gallery_entry
+            assert f"_Maintainer status:_ {assessment.maintainer_status}" in gallery_entry
+            escaped_model = html.escape(model, quote=True)
+            row_pattern = (
+                rf'data-model="{re.escape(escaped_model)}"[^>]*'
+                rf'data-execution="{assessment.execution}"[^>]*'
+                rf'data-usability="{assessment.usability}"[^>]*'
+                rf'data-maintainer-status="{assessment.maintainer_status}"'
+            )
+            assert re.search(row_pattern, html_report) is not None
+            if assessment.maintainer_status != "none" or assessment.execution == "indeterminate":
+                assert model in diagnostics
+                assert f"_Execution:_ {assessment.execution}" in diagnostics
+                assert f"_Usability:_ {assessment.usability}" in diagnostics
+                assert f"_Maintainer status:_ {assessment.maintainer_status}" in diagnostics
+
+    def test_html_preserves_complete_escaped_output_in_expandable_evidence(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Complete generated text should survive HTML escaping and round-trip exactly."""
+        output = (
+            'literal <thinking> & "quotes" — café 雪\n'
+            + ("complete evidence segment " * 40)
+            + "END"
+        )
+        result = replace(
+            _make_success("org/evidence"),
+            generation=_MockGeneration(text=output, generation_tokens=80),
+        )
+        context = _build_report_render_context(results=[result], prompt="Describe.")
+        context = replace(
+            context,
+            assessments=(
+                (
+                    result.model_name,
+                    check_models.ResultAssessment("completed", "usable", "none", ()),
+                ),
+            ),
+        )
+        out = tmp_path / "evidence.html"
+
+        generate_html_report(
+            [result],
+            out,
+            _stub_versions(),
+            "Describe.",
+            1.0,
+            report_context=context,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        escaped = html.escape(output, quote=True)
+        assert content.count(escaped) == 1
+        match = re.search(
+            r"<details><summary>Complete evidence: org/evidence</summary>.*?"
+            r"Complete generated output.*?<pre><code[^>]*>(.*?)</code></pre>",
+            content,
+            flags=re.DOTALL,
+        )
+        assert match is not None
+        assert html.unescape(match.group(1)) == output
+
+    def test_html_contains_gallery_and_diagnostics_without_semantic_scores(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """HTML should mirror the two human reports without legacy semantic judgements."""
+        results = [
+            _make_success("org/usable"),
+            _make_failure_with_details(
+                "org/crashed",
+                traceback_str="Traceback:\nRuntimeError: complete crash",
+            ),
+        ]
+        context = _build_report_render_context(results=results, prompt="Describe.")
+        out = tmp_path / "canonical.html"
+
+        generate_html_report(
+            results,
+            out,
+            _stub_versions(),
+            "Describe.",
+            2.0,
+            report_context=context,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "Current-run Chooser" in content
+        assert "Complete Per-model Evidence" in content
+        assert "Maintainer Diagnostics" in content
+        assert "Actionable Failures" in content
+        lowered = content.casefold()
+        for retired_phrase in (
+            "quality score",
+            "cataloging utility summary",
+            "owner confidence",
+            "best for cataloging",
+            "semantic winner",
+            "grade:",
+        ):
+            assert retired_phrase not in lowered
+
     def test_html_report_preview_applies_exif_orientation(self, tmp_path: Path) -> None:
         """The embedded preview should match mlx-vlm's orientation-corrected input."""
         image_path = tmp_path / "rotated.jpg"
@@ -2576,8 +2771,8 @@ class TestHtmlReportEdgeCases:
         with Image.open(io.BytesIO(base64.b64decode(encoded_match.group(1)))) as preview:
             assert preview.size == (20, 40)
 
-    def test_html_report_includes_shared_triage_sections(self, tmp_path: Path) -> None:
-        """HTML report should reuse shared action, review, and failure sections."""
+    def test_html_report_includes_gallery_and_diagnostic_sections(self, tmp_path: Path) -> None:
+        """HTML should mirror the current Gallery and Diagnostics structure."""
         out = tmp_path / "triage.html"
         results = [
             _make_success("org/good"),
@@ -2596,14 +2791,16 @@ class TestHtmlReportEdgeCases:
         )
 
         content = out.read_text(encoding="utf-8")
-        assert "Action Snapshot" in content
-        assert "Review Shortlist" in content
-        assert "Failures by Package" in content
+        assert "Current-run Chooser" in content
+        assert "Complete Per-model Evidence" in content
+        assert "Maintainer Diagnostics" in content
+        assert "Actionable Failures" in content
+        assert "Successful Observations Requiring Reproduction" in content
         assert "org/risky" in content
         assert "transformers" in content
 
     def test_triage_html_report_suppresses_cataloging_scores(self, tmp_path: Path) -> None:
-        """Triage HTML should publish run-index context instead of cataloging scorecards."""
+        """HTML should never publish legacy lane or semantic score projections."""
         out = tmp_path / "triage.html"
         results = [_make_success("org/caption-model")]
         report_context = _build_report_render_context(
@@ -2623,48 +2820,19 @@ class TestHtmlReportEdgeCases:
         )
 
         content = out.read_text(encoding="utf-8")
-        assert "Run Contract" in content
-        assert "<b>Evaluation lane:</b> triage" in content
-        assert "<b>Metadata exposed to prompt:</b> no" in content
-        assert "<b>Semantic rankings:</b> ungrounded" in content
+        assert "Current-run Chooser" in content
+        assert 'data-execution="completed"' in content
+        assert 'data-usability="usable"' in content
+        assert 'data-maintainer-status="none"' in content
+        assert "Run Contract" not in content
+        assert "Semantic rankings" not in content
         assert "Cataloging Utility Summary" not in content
         assert "Best keywording" not in content
         assert "Keywords 0" not in content
         assert "Keywords 100" not in content
-        assert "caption-review candidate" in content
 
-    def test_html_report_includes_preflight_guidance_in_action_snapshot(
-        self, tmp_path: Path
-    ) -> None:
-        """HTML report should explain how to interpret preflight compatibility warnings."""
-        out = tmp_path / "preflight-triage.html"
-        results = [_make_success("org/good")]
-        report_context = _build_report_render_context(
-            results=results,
-            prompt="describe",
-            preflight_issues=(
-                "transformers==5.4.0 is below minimum 5.7.0 required by check_models.",
-            ),
-        )
-
-        generate_html_report(
-            results=results,
-            filename=out,
-            versions=_stub_versions(),
-            prompt="describe",
-            total_runtime_seconds=1.0,
-            report_context=report_context,
-        )
-
-        content = out.read_text(encoding="utf-8")
-        assert "Preflight compatibility" in content
-        assert "informational warning(s); do not treat these alone as run failures" in content
-        assert "API mismatches, startup hangs, or backend/runtime crashes" in content
-
-    def test_html_report_adds_filterable_row_attributes_and_numeric_classes(
-        self, tmp_path: Path
-    ) -> None:
-        """HTML results table should expose row metadata and numeric alignment classes."""
+    def test_html_report_adds_exact_filterable_assessment_attributes(self, tmp_path: Path) -> None:
+        """HTML chooser rows should filter only on the three canonical status strings."""
         out = tmp_path / "filterable.html"
         results = [_make_success("org/good"), _make_failure("org/bad", error_package="mlx-vlm")]
 
@@ -2677,24 +2845,22 @@ class TestHtmlReportEdgeCases:
         )
 
         content = out.read_text(encoding="utf-8")
-        assert content.count('data-status="completed"') == 1
-        assert content.count('data-status="failed"') == 1
-        assert 'data-recommendation="not_evaluated"' in content
-        assert 'data-error-stage="load"' in content
-        assert 'data-error-type="ValueError"' in content
-        assert 'data-error-package="mlx-vlm"' in content
-        assert "<caption>Per-model execution, quality, and performance results</caption>" in content
+        assert content.count('data-execution="completed"') == 1
+        assert content.count('data-execution="crashed"') == 1
+        assert 'data-usability="usable"' in content
+        assert 'data-usability="not_evaluated"' in content
+        assert 'data-maintainer-status="none"' in content
+        assert 'data-maintainer-status="actionable_failure"' in content
+        assert "<caption>Current-run model chooser</caption>" in content
         assert 'scope="col"' in content
-        assert 'aria-sort="none"' in content
         assert 'role="status" aria-live="polite"' in content
-        assert re.search(r'class="numeric"', content) is not None
-        assert 'class="text failed"' in content
-        assert 'data-sort-value="4.5"' in content
+        assert "data-recommendation=" not in content
+        assert "data-failure-origin=" not in content
 
     def test_html_report_uses_compact_caption_columns_and_interactive_controls(
         self, tmp_path: Path
     ) -> None:
-        """HTML should be a compact, searchable comparison rather than a raw field dump."""
+        """HTML filtering should remain presentation-only over canonical statuses."""
         out = tmp_path / "interactive.html"
         result = _make_success("org/caption-model")
 
@@ -2708,22 +2874,16 @@ class TestHtmlReportEdgeCases:
 
         content = out.read_text(encoding="utf-8")
         assert 'id="model-search"' in content
-        assert 'id="compatibility-filter"' in content
-        assert 'id="prompt-burden-filter"' in content
-        assert 'id="recommendation-filter"' in content
-        assert 'id="max-memory-filter"' in content
+        assert 'id="execution-filter"' in content
+        assert 'id="usability-filter"' in content
+        assert 'id="maintainer-status-filter"' in content
         assert 'data-model="org/caption-model"' in content
-        assert 'data-compatibility="clean"' in content
-        assert "data-prompt-burden=" in content
-        assert 'data-recommendation="recommended"' in content
-        assert 'data-failure-origin="unknown"' in content
-        assert 'data-maintainer-readiness="not_applicable"' in content
-        assert 'data-reproduction-status="not_run"' in content
-        assert 'data-keyword-overlap="not_assessable"' in content
-        assert '<option value="caveat">Caveat</option>' in content
-        assert '<option value="not_evaluated">Not evaluated</option>' in content
-        assert 'class="sort-btn"' in content
-        assert "data-sort-value=" in content
+        assert '<option value="completed">completed</option>' in content
+        assert '<option value="usable_with_caveats">usable_with_caveats</option>' in content
+        assert '<option value="not_evaluated">not_evaluated</option>' in content
+        assert '<option value="observation_needs_reproduction">' in content
+        assert "compatibility-filter" not in content
+        assert "recommendation-filter" not in content
         assert "Diffusion Canvas Tokens" not in content
         assert "Diffusion Denoising Steps" not in content
         assert "Text Already Printed" not in content
@@ -2765,8 +2925,9 @@ class TestHtmlReportEdgeCases:
         )
 
         content = out.read_text(encoding="utf-8")
-        assert 'data-status="indeterminate"' in content
-        assert 'data-compatibility="indeterminate"' in content
+        assert 'data-execution="indeterminate"' in content
+        assert 'data-usability="not_evaluated"' in content
+        assert 'data-maintainer-status="none"' in content
 
     def test_connectivity_disconnect_is_retained_but_not_filed_as_upstream_issue(
         self, tmp_path: Path
@@ -2842,38 +3003,6 @@ class TestHtmlReportEdgeCases:
         assert "Indeterminate attempts" in report_text
         assert "Framework/runtime failures:_ none" in report_text
 
-    def test_html_report_preserves_full_output_in_details(self, tmp_path: Path) -> None:
-        """HTML table should reuse the shared preview while keeping full text expandable."""
-        out = tmp_path / "details.html"
-        long_text = (
-            "START " + ("filler " * 70) + "MIDDLE-MARKER " + ("more filler " * 70) + "END-MARKER"
-        )
-        results = [
-            PerformanceResult(
-                model_name="org/preview-model",
-                success=True,
-                generation=_MockGeneration(text=long_text),
-                total_time=1.0,
-                generation_time=0.5,
-                model_load_time=0.5,
-                quality_issues="context-echo",
-            ),
-        ]
-
-        generate_html_report(
-            results=results,
-            filename=out,
-            versions=_stub_versions(),
-            prompt="describe",
-            total_runtime_seconds=1.0,
-        )
-
-        content = out.read_text(encoding="utf-8")
-        assert "context-echo" in content
-        assert "[tail]" in content
-        assert "MIDDLE-MARKER" in content
-        assert "END-MARKER" in content
-
     def test_html_report_escapes_untrusted_table_values(self, tmp_path: Path) -> None:
         """HTML reports should render model-controlled text as escaped table content."""
         out = tmp_path / "escaped.html"
@@ -2905,7 +3034,10 @@ class TestHtmlReportEdgeCases:
         assert "&lt;script&gt;alert(&quot;model&quot;)&lt;/script&gt;" in content
         assert "&lt;script&gt;alert(&quot;output&quot;)&lt;/script&gt;" in content
         assert "&lt;img src=x onerror=&quot;alert(1)&quot;&gt;" in content
-        assert "<pre>&lt;script&gt;alert(&quot;prompt&quot;)&lt;/script&gt;</pre>" in content
+        assert (
+            '<pre><code class="language-text">'
+            "&lt;script&gt;alert(&quot;prompt&quot;)&lt;/script&gt;</code></pre>"
+        ) in content
 
 
 # ===================================================================
@@ -3978,7 +4110,7 @@ class TestMarkdownGalleryReport:
 
         content = out.read_text(encoding="utf-8")
         chooser_row = next(line for line in content.splitlines() if "org/thinking" in line)
-        assert "usable with caveats" in chooser_row
+        assert "usable_with_caveats" in chooser_row
         assert "### org/thinking" in content
         assert "### ⚠️ org/thinking" not in content
 
@@ -4127,7 +4259,7 @@ class TestMarkdownGalleryReport:
         assert r"answer with \| pipe" in chooser
         assert "&lt;think&gt;leaked marker&lt;/think&gt;" in chooser
         assert "[`org/bad`](#model-org-bad)" in chooser
-        assert "not evaluated" in chooser
+        assert "not_evaluated" in chooser
         assert "boom" in chooser
 
     def test_gallery_keeps_complete_output_once_in_expandable_code_block(

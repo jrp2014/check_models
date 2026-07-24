@@ -2961,31 +2961,17 @@ def _append_markdown_review_block(
     _append_markdown_row_block(out, rows=rows)
 
 
-def _render_gallery_model(
+def _gallery_runtime_facts(
     result: PerformanceResult,
     row: GalleryRow,
-    assessment: ResultAssessment,
-) -> list[str]:
-    """Render complete captured evidence for one model without reclassification."""
+) -> tuple[tuple[str, str | None], ...]:
+    """Return captured timing, token, and memory facts for gallery renderers."""
     generation = result.generation
     runtime = result.runtime_diagnostics
-    prompt = result.prompt_diagnostics
     generation_tps = _generation_float_metric(generation, "generation_tps")
     prompt_tps = _generation_float_metric(generation, "prompt_tps")
     peak_memory = _generation_float_metric(generation, "peak_memory")
-    facts: list[tuple[str, str | None]] = [
-        ("Usability", row.usability.replace("_", " ")),
-        ("Observations", _gallery_observation_labels(row.observations)),
-        ("Execution", assessment.execution),
-        ("Failure phase", result.failure_phase),
-        ("Error stage", result.error_stage),
-        ("Error code", result.error_code),
-        ("Error type", result.error_type),
-        ("Error package", result.error_package),
-        ("Error message", result.error_message),
-        ("Root exception type", result.root_error_type),
-        ("Root exception module", result.root_error_module),
-        ("Root exception message", result.root_error_message),
+    return (
         ("Model load time", _gallery_metric("model_load_time", result.model_load_time)),
         ("Generation time", _gallery_metric("generation_time", result.generation_time)),
         ("Total time", _gallery_metric("total_time", result.total_time)),
@@ -3019,21 +3005,12 @@ def _render_gallery_model(
         ),
         (
             "Prompt tokens",
-            _gallery_metric(
-                "prompt_tokens",
-                _generation_int_metric(generation, "prompt_tokens"),
-            ),
+            _gallery_metric("prompt_tokens", _generation_int_metric(generation, "prompt_tokens")),
         ),
-        (
-            "Generation tokens",
-            _gallery_metric("generation_tokens", row.generation_tokens),
-        ),
+        ("Generation tokens", _gallery_metric("generation_tokens", row.generation_tokens)),
         (
             "Total tokens",
-            _gallery_metric(
-                "total_tokens",
-                _generation_int_metric(generation, "total_tokens"),
-            ),
+            _gallery_metric("total_tokens", _generation_int_metric(generation, "total_tokens")),
         ),
         (
             "Prompt throughput (raw)",
@@ -3059,6 +3036,20 @@ def _render_gallery_model(
             "Stop reason",
             runtime.stop_reason if runtime is not None and runtime.stop_reason else "not captured",
         ),
+    )
+
+
+def _gallery_prompt_facts(result: PerformanceResult) -> tuple[tuple[str, str], ...]:
+    """Return captured prompt, processor, and generation-setting facts."""
+    prompt = result.prompt_diagnostics
+    processed_image = "not captured"
+    if (
+        prompt is not None
+        and prompt.processed_image_width is not None
+        and prompt.processed_image_height is not None
+    ):
+        processed_image = f"{prompt.processed_image_width} x {prompt.processed_image_height} px"
+    return (
         ("Requested maximum tokens", str(result.requested_max_tokens or "not captured")),
         (
             "Rendered prompt characters",
@@ -3072,16 +3063,7 @@ def _render_gallery_model(
             if prompt is not None and prompt.image_placeholder_count is not None
             else "not captured",
         ),
-        (
-            "Processed image",
-            (
-                f"{prompt.processed_image_width} x {prompt.processed_image_height} px"
-                if prompt is not None
-                and prompt.processed_image_width is not None
-                and prompt.processed_image_height is not None
-                else "not captured"
-            ),
-        ),
+        ("Processed image", processed_image),
         (
             "Image patch count",
             str(prompt.image_patch_count)
@@ -3090,19 +3072,15 @@ def _render_gallery_model(
         ),
         (
             "Processor",
-            (
-                prompt.processor_class
-                if prompt is not None and prompt.processor_class
-                else "not captured"
-            ),
+            prompt.processor_class
+            if prompt is not None and prompt.processor_class
+            else "not captured",
         ),
         (
             "Tokenizer",
-            (
-                prompt.tokenizer_class
-                if prompt is not None and prompt.tokenizer_class
-                else "not captured"
-            ),
+            prompt.tokenizer_class
+            if prompt is not None and prompt.tokenizer_class
+            else "not captured",
         ),
         ("Model revision", "not captured by this result"),
         (
@@ -3117,10 +3095,44 @@ def _render_gallery_model(
             if prompt is not None and prompt.eos_token is not None
             else "not captured",
         ),
-    ]
+    )
+
+
+def _gallery_model_facts(
+    result: PerformanceResult,
+    row: GalleryRow,
+    assessment: ResultAssessment,
+) -> tuple[tuple[str, str | None], ...]:
+    """Return factual per-model evidence shared by gallery renderers."""
+    return (
+        ("Execution", assessment.execution),
+        ("Usability", row.usability),
+        ("Maintainer status", assessment.maintainer_status),
+        ("Observations", _gallery_observation_labels(row.observations)),
+        ("Failure phase", result.failure_phase),
+        ("Error stage", result.error_stage),
+        ("Error code", result.error_code),
+        ("Error type", result.error_type),
+        ("Error package", result.error_package),
+        ("Error message", result.error_message),
+        ("Root exception type", result.root_error_type),
+        ("Root exception module", result.root_error_module),
+        ("Root exception message", result.root_error_message),
+        *_gallery_runtime_facts(result, row),
+        *_gallery_prompt_facts(result),
+    )
+
+
+def _render_gallery_model(
+    result: PerformanceResult,
+    row: GalleryRow,
+    assessment: ResultAssessment,
+) -> list[str]:
+    """Render complete captured evidence for one model without reclassification."""
+    generation = result.generation
     escaped_facts = [
         (MARKDOWN_ESCAPER.escape(label), MARKDOWN_ESCAPER.escape(value))
-        for label, value in facts
+        for label, value in _gallery_model_facts(result, row, assessment)
         if value is not None
     ]
 
@@ -10556,165 +10568,47 @@ def _html_class_attr(classes: Sequence[str]) -> str:
     return _html_attr("class", " ".join(classes))
 
 
-def _escape_html_table_text(value: str) -> str:
-    """Escape plain text for HTML table cells while preserving line breaks."""
-    return html.escape(value, quote=True).replace("\n", "<br>")
-
-
-def _escape_html_header_text(header: str) -> str:
-    """Escape a prepared HTML table header while preserving intentional breaks."""
-    return "<br>".join(_escape_html_table_text(part) for part in header.split("<br>"))
-
-
-def _html_result_row_attrs(
+def _html_status_attrs(
     result: PerformanceResult,
-    recommendation: ModelRecommendationView | None = None,
-    assessment: CanonicalAssessment | None = None,
+    assessment: ResultAssessment,
 ) -> str:
-    """Return filter metadata attributes for one result row."""
-    attrs = _html_attr("data-model", result.model_name.casefold())
-    if recommendation is not None and assessment is not None:
-        attrs += _html_attr(
-            "data-compatibility",
-            assessment.model_user.compatibility_status,
+    """Return presentation-only filter attributes from one cached assessment."""
+    return "".join(
+        (
+            _html_attr("data-model", result.model_name.casefold()),
+            _html_attr("data-execution", assessment.execution),
+            _html_attr("data-usability", assessment.usability),
+            _html_attr("data-maintainer-status", assessment.maintainer_status),
+            _html_class_attr((assessment.execution, assessment.usability)),
         )
-        attrs += _html_attr("data-prompt-burden", recommendation.burden.kind)
-        attrs += _html_attr(
-            "data-recommendation",
-            assessment.model_user.current_recommendation,
-        )
-        attrs += _html_attr("data-failure-origin", assessment.maintainer.failure_origin)
-        attrs += _html_attr(
-            "data-maintainer-readiness",
-            assessment.maintainer.maintainer_readiness,
-        )
-        attrs += _html_attr(
-            "data-reproduction-status",
-            assessment.maintainer.reproduction_status,
-        )
-        attrs += _html_attr("data-keyword-overlap", assessment.model_user.keyword_overlap)
-        attrs += _html_attr(
-            "data-peak-memory",
-            str(recommendation.peak_memory_gb) if recommendation.peak_memory_gb is not None else "",
-        )
-    execution_outcome = (
-        assessment.model_user.execution_outcome
-        if assessment is not None
-        else _execution_outcome(result)
-    )
-    if execution_outcome == "completed":
-        return attrs + _html_class_attr(["success"]) + _html_attr("data-status", "completed")
-    if execution_outcome == "indeterminate":
-        return (
-            attrs
-            + _html_class_attr(["indeterminate"])
-            + _html_attr("data-status", "indeterminate")
-            + _html_attr("data-error-stage", result.error_stage or "Network Error")
-            + _html_attr("data-error-type", result.error_type or "error")
-            + _html_attr("data-error-package", _UNKNOWN_OWNER)
-        )
-    return attrs + (
-        _html_class_attr(["failed"])
-        + _html_attr("data-status", "failed")
-        + _html_attr("data-error-stage", result.error_stage or "unknown")
-        + _html_attr("data-error-type", result.error_type or "error")
-        + _html_attr("data-error-package", result.error_package or _UNKNOWN_OWNER)
     )
 
 
-def _build_html_output_details(preview_text: str, full_text: str) -> str:
-    """Return escaped expandable output HTML for one result row."""
-    preview_html = html.escape(preview_text, quote=True).replace("\n", "<br>")
-    full_html = html.escape(full_text, quote=True).replace("\n", "<br>")
-    return (
-        f"<details><summary>{preview_html}</summary>"
-        f'<div style="margin-top: 0.5em;">{full_html}</div></details>'
-    )
+def _html_code_block(content: str, *, language: str = "text") -> str:
+    """Render complete escaped evidence without normalising captured text."""
+    class_attr = _html_attr("class", f"language-{language}") if language else ""
+    return f"<pre><code{class_attr}>{html.escape(content, quote=True)}</code></pre>"
 
 
-_HTML_LEADING_NUMBER_RE: Final[re.Pattern[str]] = re.compile(
-    r"^\s*([-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)"
-)
-
-
-def _html_sort_value(value: str, *, numeric: bool) -> str:
-    """Return a stable HTML sort key without mixing unit text into numbers."""
-    if not numeric:
-        return value.casefold()
-    match = _HTML_LEADING_NUMBER_RE.match(value.replace(",", ""))
-    return match.group(1) if match is not None else ""
-
-
-def _build_html_results_table(
+def _html_table(
     *,
+    caption: str,
     headers: Sequence[str],
     rows: Sequence[Sequence[str]],
-    field_names: Sequence[str],
-    sorted_results: Sequence[PerformanceResult],
-    recommendations: Mapping[str, ModelRecommendationView] | None = None,
-    assessments: Mapping[str, CanonicalAssessment] | None = None,
+    row_attrs: Sequence[str] = (),
+    raw_columns: frozenset[int] = frozenset(),
 ) -> str:
-    """Build the escaped HTML results table without regex post-processing."""
-    numeric_columns: frozenset[int] = frozenset(
-        index for index, field_name in enumerate(field_names) if is_numeric_field(field_name)
-    )
-    output_column: int | None = field_names.index("output") if "output" in field_names else None
-
-    parts: list[str] = [
-        "<table>",
-        "<caption>Per-model execution, quality, and performance results</caption>",
-        "<thead>",
-        "<tr>",
-    ]
-    for index, header in enumerate(headers):
-        alignment_class = "numeric" if index in numeric_columns else "text"
-        parts.append(
-            f'<th scope="col" aria-sort="none"{_html_class_attr([alignment_class])}>'
-            f'<button class="sort-btn" type="button" data-column="{index}" '
-            f'data-numeric="{str(index in numeric_columns).lower()}">'
-            f"{_escape_html_header_text(header)}</button></th>"
-        )
-    parts.extend(["</tr>", "</thead>", "<tbody>"])
-
+    """Render a compact escaped table, allowing explicitly built internal-link cells."""
+    parts = ["<table>", f"<caption>{html.escape(caption, quote=True)}</caption>", "<thead><tr>"]
+    parts.extend(f'<th scope="col">{html.escape(header, quote=True)}</th>' for header in headers)
+    parts.extend(["</tr></thead>", "<tbody>"])
     for row_index, row in enumerate(rows):
-        result = sorted_results[row_index] if row_index < len(sorted_results) else None
-        recommendation = (
-            recommendations.get(result.model_name)
-            if recommendations is not None and result is not None
-            else None
-        )
-        assessment = (
-            assessments.get(result.model_name)
-            if assessments is not None and result is not None
-            else None
-        )
-        parts.append(
-            f"<tr{_html_result_row_attrs(result, recommendation, assessment) if result is not None else ''}>"
-        )
+        attrs = row_attrs[row_index] if row_index < len(row_attrs) else ""
+        parts.append(f"<tr{attrs}>")
         for column_index, value in enumerate(row):
-            field_name = field_names[column_index] if column_index < len(field_names) else ""
-            cell_classes = ["numeric" if column_index in numeric_columns else "text"]
-            if column_index == 0 and result is not None and not result.success:
-                cell_classes.append("failed")
-            if output_column is not None and column_index == output_column and result is not None:
-                cell_content = _build_html_output_details(
-                    value,
-                    _full_output_report_text(result),
-                )
-            elif field_name == "output":
-                cell_content = _build_html_output_details(value, value)
-            else:
-                cell_content = _escape_html_table_text(value)
-            sort_value = _html_sort_value(
-                value,
-                numeric=column_index in numeric_columns,
-            )
-            parts.append(
-                f"<td{_html_class_attr(cell_classes)}{_html_attr('data-sort-value', sort_value)}>"
-                f"{cell_content}</td>"
-            )
+            cell = value if column_index in raw_columns else html.escape(value, quote=True)
+            parts.append(f"<td>{cell}</td>")
         parts.append("</tr>")
-
     parts.extend(["</tbody>", "</table>"])
     return "\n".join(parts)
 
@@ -12899,7 +12793,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
     chooser_rows = [
         (
             _gallery_summary_model_link(row.model),
-            _markdown_inline_code(row.usability.replace("_", " ")),
+            _markdown_inline_code(row.usability),
             _gallery_throughput_cell(row),
             _gallery_metric("peak_memory", row.peak_memory_gb),
             _gallery_metric("generation_tokens", row.generation_tokens),
@@ -12941,7 +12835,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
                 rows=[
                     (
                         _gallery_summary_model_link(row.model),
-                        _markdown_inline_code(row.usability.replace("_", " ")),
+                        _markdown_inline_code(row.usability),
                         MARKDOWN_ESCAPER.escape(_gallery_observation_labels(row.observations)),
                         MARKDOWN_ESCAPER.escape(row.output_preview),
                     )
@@ -12969,7 +12863,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
                 rows=[
                     (
                         _gallery_summary_model_link(row.model),
-                        _markdown_inline_code(row.usability.replace("_", " ")),
+                        _markdown_inline_code(row.usability),
                         _gallery_metric("peak_memory", row.peak_memory_gb),
                         _gallery_metric("generation_tokens", row.generation_tokens),
                     )
@@ -13016,7 +12910,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
                 rows=[
                     (
                         _gallery_summary_model_link(row.model),
-                        _markdown_inline_code(row.usability.replace("_", " ")),
+                        _markdown_inline_code(row.usability),
                         _gallery_throughput_cell(row),
                         _gallery_metric("generation_tokens", row.generation_tokens),
                     )
@@ -14533,6 +14427,7 @@ def _diagnostics_result_facts(
     generation_kwargs = prompt_diagnostics.generate_kwargs if prompt_diagnostics is not None else {}
     return (
         ("Execution", assessment.execution),
+        ("Usability", assessment.usability),
         ("Maintainer status", assessment.maintainer_status),
         ("Observations", ", ".join(assessment.observations) or "none"),
         ("Phase", _diagnostics_fact(result.failure_phase)),
@@ -14837,311 +14732,634 @@ def format_issues_summary_text(
     )
 
 
+def _html_model_link(model_name: str) -> str:
+    """Return a safe internal link to one complete-evidence entry."""
+    anchor = _gallery_model_anchor(model_name)
+    return (
+        f'<a href="#{html.escape(anchor, quote=True)}">'
+        f"<code>{html.escape(model_name, quote=True)}</code></a>"
+    )
+
+
+def _html_filter_controls() -> str:
+    """Return dependency-free filters over exact cached assessment strings."""
+    return """
+<div class="filter-controls">
+<strong>Filter current-run chooser:</strong>
+<label>Model <input id="model-search" type="search" placeholder="Search models"></label>
+<label>Execution <select id="execution-filter">
+<option value="all">all</option><option value="completed">completed</option>
+<option value="crashed">crashed</option><option value="indeterminate">indeterminate</option>
+</select></label>
+<label>Usability <select id="usability-filter">
+<option value="all">all</option><option value="usable">usable</option>
+<option value="usable_with_caveats">usable_with_caveats</option>
+<option value="unusable">unusable</option><option value="not_evaluated">not_evaluated</option>
+</select></label>
+<label>Maintainer status <select id="maintainer-status-filter">
+<option value="all">all</option><option value="actionable_failure">actionable_failure</option>
+<option value="observation_needs_reproduction">observation_needs_reproduction</option>
+<option value="none">none</option>
+</select></label>
+<span id="filter-info" role="status" aria-live="polite">Showing all rows</span>
+</div>
+<script>
+function applyAssessmentFilters() {
+    const query = document.getElementById('model-search').value.toLowerCase();
+    const execution = document.getElementById('execution-filter').value;
+    const usability = document.getElementById('usability-filter').value;
+    const maintainer = document.getElementById('maintainer-status-filter').value;
+    const rows = document.querySelectorAll('#chooser-table tr[data-model]');
+    let visible = 0;
+    rows.forEach(row => {
+        const show = row.dataset.model.includes(query)
+            && (execution === 'all' || row.dataset.execution === execution)
+            && (usability === 'all' || row.dataset.usability === usability)
+            && (maintainer === 'all' || row.dataset.maintainerStatus === maintainer);
+        row.classList.toggle('hidden', !show);
+        if (show) visible += 1;
+    });
+    document.getElementById('filter-info').textContent =
+        `Showing ${visible} of ${rows.length} rows`;
+}
+document.querySelectorAll('.filter-controls input, .filter-controls select')
+    .forEach(control => control.addEventListener('input', applyAssessmentFilters));
+applyAssessmentFilters();
+</script>
+"""
+
+
+def _html_embedded_image(image_path: Path | None) -> str:
+    """Return an orientation-corrected embedded preview when an image is available."""
+    if image_path is None or not image_path.exists():
+        return ""
+    try:
+        with (
+            Image.open(image_path) as img_original,
+            ImageOps.exif_transpose(img_original) as img_oriented,
+        ):
+            max_size = 1024
+            img_to_save: PILImage = img_oriented
+            if img_oriented.width > max_size or img_oriented.height > max_size:
+                ratio = min(max_size / img_oriented.width, max_size / img_oriented.height)
+                img_to_save = img_oriented.resize(
+                    (int(img_oriented.width * ratio), int(img_oriented.height * ratio)),
+                    Image.Resampling.LANCZOS,
+                )
+            img_buffer = io.BytesIO()
+            extension = image_path.suffix.lower()
+            image_format = {
+                ".jpg": "JPEG",
+                ".jpeg": "JPEG",
+                ".png": "PNG",
+                ".gif": "GIF",
+                ".webp": "WEBP",
+            }.get(extension, "JPEG")
+            img_to_save.save(img_buffer, format=image_format)
+            image_data = base64.b64encode(img_buffer.getvalue()).decode("utf-8")
+            mime_type = {
+                ".jpg": "image/jpeg",
+                ".jpeg": "image/jpeg",
+                ".png": "image/png",
+                ".gif": "image/gif",
+                ".webp": "image/webp",
+            }.get(extension, "image/jpeg")
+            return (
+                '<section id="test-image"><h2>Test Image</h2>'
+                f'<img src="data:{html.escape(mime_type, quote=True)};base64,'
+                f'{html.escape(image_data, quote=True)}" class="embedded-image" '
+                'alt="Test image used for model evaluation"></section>'
+            )
+    except (OSError, ValueError):
+        logger.warning("Failed to embed image: %s", image_path)
+        return ""
+
+
+def _html_gallery_chooser(report_context: ReportRenderContext) -> str:
+    """Render the same facts-only chooser and resource policies as Markdown."""
+    assessments = _assessments_by_model(report_context)
+    rows = [
+        _gallery_row(result, assessments[result.model_name])
+        for result in report_context.result_set.results
+    ]
+    result_by_model = {result.model_name: result for result in report_context.result_set.results}
+    usability_order: Mapping[ModelUsability, int] = {
+        "unusable": 0,
+        "not_evaluated": 1,
+        "usable": 2,
+        "usable_with_caveats": 2,
+    }
+    ordered = sorted(rows, key=lambda row: (usability_order[row.usability], row.model))
+    chooser_rows = [
+        (
+            _html_model_link(row.model),
+            assessments[row.model].execution,
+            row.usability,
+            assessments[row.model].maintainer_status,
+            _gallery_throughput_cell(row),
+            _gallery_metric("peak_memory", row.peak_memory_gb),
+            _gallery_metric("generation_tokens", row.generation_tokens),
+            _gallery_observation_labels(row.observations),
+            row.output_preview,
+        )
+        for row in ordered
+    ]
+    chooser_attrs = [
+        _html_status_attrs(result_by_model[row.model], assessments[row.model]) for row in ordered
+    ]
+    parts = [
+        '<section id="current-run-chooser">',
+        "<h2>Current-run Chooser</h2>",
+        (
+            "<p>Current-run usability and captured resource facts only. Throughput requires "
+            f"at least {MIN_THROUGHPUT_SAMPLE_TOKENS} generated tokens.</p>"
+        ),
+        _html_filter_controls(),
+        '<div id="chooser-table">',
+        _html_table(
+            caption="Current-run model chooser",
+            headers=(
+                "Model",
+                "Execution",
+                "Usability",
+                "Maintainer status",
+                "Gen TPS",
+                "Peak GB",
+                "Gen tok",
+                "Observations",
+                "Output preview",
+            ),
+            rows=chooser_rows,
+            row_attrs=chooser_attrs,
+            raw_columns=frozenset({0}),
+        ),
+        "</div>",
+        "<h3>Avoid for This Run</h3>",
+    ]
+    avoided = [row for row in ordered if row.usability in {"unusable", "not_evaluated"}]
+    if avoided:
+        parts.append(
+            _html_table(
+                caption="Unusable and not-evaluated models",
+                headers=("Model", "Usability", "Observations", "Output preview"),
+                rows=[
+                    (
+                        _html_model_link(row.model),
+                        row.usability,
+                        _gallery_observation_labels(row.observations),
+                        row.output_preview,
+                    )
+                    for row in avoided
+                ],
+                raw_columns=frozenset({0}),
+            )
+        )
+    else:
+        parts.append("<p>No unusable or not-evaluated models in this run.</p>")
+
+    usable = [row for row in rows if row.usability in {"usable", "usable_with_caveats"}]
+    by_memory = sorted(
+        usable,
+        key=lambda row: (
+            row.peak_memory_gb is None,
+            row.peak_memory_gb if row.peak_memory_gb is not None else 0.0,
+            row.model,
+        ),
+    )
+    parts.append("<h3>Lowest-memory Usable Models</h3>")
+    if by_memory:
+        parts.append(
+            _html_table(
+                caption="Usable models ordered by lowest captured peak memory",
+                headers=("Model", "Usability", "Peak GB", "Gen tok"),
+                rows=[
+                    (
+                        _html_model_link(row.model),
+                        row.usability,
+                        _gallery_metric("peak_memory", row.peak_memory_gb),
+                        _gallery_metric("generation_tokens", row.generation_tokens),
+                    )
+                    for row in by_memory
+                ],
+                raw_columns=frozenset({0}),
+            )
+        )
+    else:
+        parts.append("<p>No usable models in this run.</p>")
+
+    by_speed = sorted(
+        usable,
+        key=lambda row: (
+            row.generation_tps is None,
+            -(row.generation_tps if row.generation_tps is not None else 0.0),
+            row.model,
+        ),
+    )
+    valid_rows = [row for row in by_speed if row.generation_tps is not None]
+    parts.append("<h3>Fastest Valid Generation</h3>")
+    if valid_rows:
+        fastest = valid_rows[0]
+        average = sum(cast("float", row.generation_tps) for row in valid_rows) / len(valid_rows)
+        parts.extend(
+            (
+                (
+                    f"<p>Fastest valid generation: {_html_model_link(fastest.model)} at "
+                    f"{html.escape(_gallery_metric('generation_tps', fastest.generation_tps))} "
+                    "tok/s.</p>"
+                ),
+                (
+                    "<p>Average valid generation throughput: "
+                    f"{html.escape(_gallery_metric('generation_tps', average))} tok/s.</p>"
+                ),
+            )
+        )
+    else:
+        parts.append("<p>No valid throughput samples in this run.</p>")
+    if by_speed:
+        parts.append(
+            _html_table(
+                caption="Usable models ordered by valid generation throughput",
+                headers=("Model", "Usability", "Gen TPS", "Gen tok"),
+                rows=[
+                    (
+                        _html_model_link(row.model),
+                        row.usability,
+                        _gallery_throughput_cell(row),
+                        _gallery_metric("generation_tokens", row.generation_tokens),
+                    )
+                    for row in by_speed
+                ],
+                raw_columns=frozenset({0}),
+            )
+        )
+    else:
+        parts.append("<p>No usable models in this run.</p>")
+    parts.append("</section>")
+    return "\n".join(parts)
+
+
+def _html_gallery_model(
+    result: PerformanceResult,
+    row: GalleryRow,
+    assessment: ResultAssessment,
+) -> str:
+    """Render one complete, escaped model-evidence entry from shared gallery facts."""
+    facts = tuple(
+        (label, value)
+        for label, value in _gallery_model_facts(result, row, assessment)
+        if value is not None
+    )
+    parts = [
+        f'<article id="{html.escape(_gallery_model_anchor(result.model_name), quote=True)}">',
+        f"<h3>{html.escape(result.model_name, quote=True)}</h3>",
+        f"<details><summary>Complete evidence: {html.escape(result.model_name, quote=True)}</summary>",
+        _html_table(
+            caption=f"Captured facts for {result.model_name}",
+            headers=("Fact", "Value"),
+            rows=facts,
+        ),
+    ]
+    if assessment.execution == "completed":
+        output = _generation_text_value(result.generation)
+        parts.append("<h4>Complete generated output</h4>")
+        if not output:
+            parts.append("<p>empty output</p>")
+        parts.append(_html_code_block(output))
+    else:
+        parts.extend(
+            (
+                "<h4>Complete traceback</h4>",
+                _html_code_block(result.error_traceback or "unavailable"),
+            )
+        )
+        partial_output = _generation_text_value(result.generation)
+        if partial_output:
+            parts.extend(("<h4>Partial generated output</h4>", _html_code_block(partial_output)))
+        if result.captured_output_on_fail:
+            parts.extend(
+                (
+                    "<h4>Captured upstream output</h4>",
+                    _html_code_block(result.captured_output_on_fail),
+                )
+            )
+        if not partial_output and not result.captured_output_on_fail:
+            parts.append("<p>No partial or captured output.</p>")
+    parts.extend(("</details>", "</article>"))
+    return "\n".join(parts)
+
+
+def _html_complete_gallery(report_context: ReportRenderContext) -> str:
+    """Render complete evidence in the same stable order as the Markdown gallery."""
+    assessments = _assessments_by_model(report_context)
+    rows_by_model = {
+        result.model_name: _gallery_row(result, assessments[result.model_name])
+        for result in report_context.result_set.results
+    }
+    usability_order: Mapping[ModelUsability, int] = {
+        "unusable": 0,
+        "not_evaluated": 1,
+        "usable": 2,
+        "usable_with_caveats": 2,
+    }
+    ordered_results = sorted(
+        report_context.result_set.results,
+        key=lambda result: (
+            usability_order[rows_by_model[result.model_name].usability],
+            result.model_name,
+        ),
+    )
+    parts = [
+        '<section id="complete-model-evidence">',
+        "<h2>Complete Per-model Evidence</h2>",
+        "<p>Complete generated or crash evidence for every attempted model.</p>",
+    ]
+    parts.extend(
+        _html_gallery_model(
+            result,
+            rows_by_model[result.model_name],
+            assessments[result.model_name],
+        )
+        for result in ordered_results
+    )
+    parts.append("</section>")
+    return "\n".join(parts)
+
+
+def _html_diagnostics_entry(
+    result: PerformanceResult,
+    assessment: ResultAssessment,
+    *,
+    prompt: str,
+    image_path: Path | None,
+) -> str:
+    """Render one maintainer entry from shared factual diagnostic helpers."""
+    parts = [
+        f"<article><h4>{html.escape(result.model_name, quote=True)}</h4>",
+        f"<details><summary>Maintainer evidence: {html.escape(result.model_name, quote=True)}</summary>",
+    ]
+    if assessment.execution == "crashed":
+        parts.extend(
+            (
+                "<h5>Root exception and chain</h5>",
+                _html_code_block("\n".join(_diagnostics_exception_lines(result))),
+                "<h5>Complete traceback</h5>",
+                _html_code_block(
+                    _home_relative_report_text(result.error_traceback or "unavailable")
+                ),
+            )
+        )
+    parts.extend(
+        (
+            "<h5>Execution and provenance</h5>",
+            _html_table(
+                caption=f"Maintainer facts for {result.model_name}",
+                headers=("Fact", "Value"),
+                rows=_diagnostics_result_facts(result, assessment, run_args=None),
+            ),
+        )
+    )
+    generated_output = (
+        "unavailable"
+        if result.generation is None
+        else _generation_text_value(result.generation) or "(empty)"
+    )
+    output_label = (
+        "Complete partial output" if assessment.execution == "crashed" else "Complete output"
+    )
+    parts.extend(
+        (
+            f"<h5>{output_label}</h5>",
+            _html_code_block(generated_output),
+            "<h5>Captured stdout/stderr</h5>",
+            _html_code_block(result.captured_output_on_fail or "unavailable"),
+            "<h5>Supplemental CLI reproduction</h5>",
+            _html_code_block(
+                _diagnostics_repro_command(
+                    result,
+                    prompt=prompt,
+                    image_path=image_path,
+                    run_args=None,
+                ),
+                language="bash",
+            ),
+            "<h5>Canonical Python reproduction script</h5>",
+            _html_code_block(
+                _build_native_mlx_vlm_python_script(
+                    model_name=result.model_name,
+                    prompt=prompt,
+                    image_ref=_issue_repro_image_ref(image_path=image_path, run_args=None),
+                    run_args=None,
+                ),
+                language="python",
+            ),
+            "</details></article>",
+        )
+    )
+    return "\n".join(parts)
+
+
+def _html_diagnostics_partition(
+    *,
+    title: str,
+    results: Sequence[PerformanceResult],
+    assessments: Mapping[str, ResultAssessment],
+    prompt: str,
+    image_path: Path | None,
+) -> str:
+    """Render one direct partition of maintainer evidence."""
+    parts = [f"<h3>{html.escape(title, quote=True)}</h3>"]
+    if results:
+        parts.extend(
+            _html_diagnostics_entry(
+                result,
+                assessments[result.model_name],
+                prompt=prompt,
+                image_path=image_path,
+            )
+            for result in results
+        )
+    else:
+        parts.append("<p>None.</p>")
+    return "\n".join(parts)
+
+
+def _html_maintainer_diagnostics(
+    report_context: ReportRenderContext,
+    *,
+    prompt: str,
+    image_path: Path | None,
+) -> str:
+    """Render diagnostics from the same cached assessment partitions as Markdown."""
+    assessments = _assessments_by_model(report_context)
+    actionable, observations, indeterminate = _partition_diagnostics(report_context)
+    counts = _run_outcome_counts(report_context.assessments)
+    parts = [
+        '<section id="maintainer-diagnostics">',
+        "<h2>Maintainer Diagnostics</h2>",
+        _html_table(
+            caption="Run outcome counts",
+            headers=("Outcome", "Count"),
+            rows=(
+                ("Attempted", str(counts["models_attempted"])),
+                ("Evaluated", str(counts["models_evaluated"])),
+                ("Completed", str(counts["models_completed"])),
+                ("Crashed", str(counts["models_crashed"])),
+                ("Indeterminate", str(counts["models_indeterminate"])),
+            ),
+        ),
+        _html_diagnostics_partition(
+            title="Actionable Failures",
+            results=actionable,
+            assessments=assessments,
+            prompt=prompt,
+            image_path=image_path,
+        ),
+        _html_diagnostics_partition(
+            title="Successful Observations Requiring Reproduction",
+            results=observations,
+            assessments=assessments,
+            prompt=prompt,
+            image_path=image_path,
+        ),
+        _html_diagnostics_partition(
+            title="Indeterminate Attempts",
+            results=indeterminate,
+            assessments=assessments,
+            prompt=prompt,
+            image_path=image_path,
+        ),
+        "</section>",
+    ]
+    return "\n".join(parts)
+
+
+def _html_runtime_facts(
+    results: Sequence[PerformanceResult],
+    total_runtime_seconds: float,
+) -> str:
+    """Render factual total and aggregate timing evidence without semantic projections."""
+    rows = [("Overall runtime", format_overall_runtime(total_runtime_seconds))]
+    runtime_analysis = _build_runtime_analysis_summary(results)
+    if runtime_analysis is not None:
+        lines = [
+            _format_runtime_generation_total_line(runtime_analysis),
+            _format_runtime_phase_totals_line(runtime_analysis),
+            *_format_runtime_timing_snapshot_lines(runtime_analysis),
+        ]
+        for line in lines:
+            if line is None:
+                continue
+            label, value = line.removeprefix("- **").split(":** ", maxsplit=1)
+            rows.append((label, value))
+    return "\n".join(
+        (
+            '<section id="runtime">',
+            "<h2>Runtime</h2>",
+            "<p><b>Runtime</b></p>",
+            "".join(render_report_html((ReportKeyValues(tuple(rows)),))),
+            "</section>",
+        )
+    )
+
+
+def _html_provenance(
+    *,
+    versions: LibraryVersionDict,
+    system_info: Mapping[str, str],
+    prompt: str,
+) -> str:
+    """Render prompt, component versions, and system facts in deterministic order."""
+    version_rows = tuple((name, value or "unavailable") for name, value in sorted(versions.items()))
+    system_rows = tuple(
+        (name, _home_relative_report_text(value)) for name, value in sorted(system_info.items())
+    )
+    return "\n".join(
+        (
+            '<section id="provenance">',
+            "<h2>Provenance and Environment</h2>",
+            "<h3>Prompt</h3>",
+            _html_code_block(prompt),
+            "<h3>Library Versions</h3>",
+            _html_table(
+                caption="Library versions",
+                headers=("Library", "Version"),
+                rows=version_rows,
+            ),
+            "<h3>System Information</h3>",
+            _html_table(
+                caption="System information",
+                headers=("Fact", "Value"),
+                rows=system_rows,
+            ),
+            "</section>",
+        )
+    )
+
+
 def _build_full_html_document(
     *,
-    html_table: str,
+    report_context: ReportRenderContext,
     versions: LibraryVersionDict,
     prompt: str,
     total_runtime_seconds: float,
-    run_contract_html: str,
-    action_snapshot_html: str,
-    recommendations_html: str,
-    issues_summary_html: str,
-    review_priorities_html: str,
-    failures_by_package_html: str,
-    system_info: dict[str, str],
-    image_path: Path | None = None,
+    image_path: Path | None,
 ) -> str:
-    """Build the full self-contained HTML document from components with optional embedded image."""
+    """Build standalone HTML from cached gallery and diagnostic facts only."""
     css = """
-    <style>
-        body { font-family: sans-serif; margin: 2em; }
-        table { border-collapse: collapse; margin-top: 1em; width: 100%; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; font-weight: bold; }
-        .numeric { text-align: right; }
-        .failed { background-color: #ffdddd; }
-        .indeterminate { background-color: #fff4cc; }
-        tr.hidden { display: none; }
-        .summary {
-            margin-top: 2em; padding: 1em; border: 1px solid #eee;
-            background-color: #f9f9f9;
-        }
-        .summary h3 { margin-top: 1.2em; }
-        .summary h3:first-child { margin-top: 0; }
-        .summary ul { margin-top: 0.4em; }
-        .embedded-image {
-            max-width: 600px; margin: 1em 0; border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        details { cursor: pointer; max-width: 800px; }
-        details summary {
-            font-weight: normal;
-            color: #0066cc;
-            padding: 0.25em;
-            user-select: none;
-        }
-        details summary:hover { background-color: #f0f0f0; }
-        details[open] summary { color: #004499; font-weight: bold; }
-        details > div {
-            margin-top: 0.5em;
-            padding: 0.5em;
-            border-left: 3px solid #0066cc;
-            background-color: #f8f8f8;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-        .filter-controls {
-            margin: 1em 0;
-            padding: 1em;
-            background-color: #f5f5f5;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-        }
-        .filter-btn {
-            padding: 0.5em 1em;
-            margin: 0.25em;
-            border: 1px solid #999;
-            background-color: #fff;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 0.9em;
-        }
-        .filter-btn:hover {
-            background-color: #e8e8e8;
-        }
-        .filter-btn.active {
-            background-color: #0066cc;
-            color: white;
-            border-color: #0055aa;
-        }
-        .filter-info {
-            margin-top: 0.5em;
-            font-size: 0.9em;
-            color: #666;
-        }
-        .filter-controls label { display: inline-block; margin: 0.3em 0.8em 0.3em 0; }
-        .filter-controls input, .filter-controls select { margin-left: 0.3em; }
-        .sort-btn {
-            width: 100%; border: 0; background: transparent; color: inherit;
-            cursor: pointer; font: inherit; font-weight: bold; text-align: inherit;
-        }
-        .sort-btn::after { content: " ↕"; color: #777; }
-        .sort-btn[data-direction="asc"]::after { content: " ↑"; }
-        .sort-btn[data-direction="desc"]::after { content: " ↓"; }
-    </style>
-    """
-    sys_info_html = "<ul>"
-    for k, v in system_info.items():
-        sys_info_html += (
-            f"<li><b>{html.escape(k)}:</b> {html.escape(_home_relative_report_text(v))}</li>"
+<style>
+body { font-family: system-ui, sans-serif; line-height: 1.45; margin: 2rem auto; max-width: 1200px; padding: 0 1rem; }
+nav a { margin-right: 1rem; }
+table { border-collapse: collapse; margin: 1rem 0 2rem; width: 100%; }
+caption { font-weight: 600; text-align: left; }
+th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; vertical-align: top; }
+th { background: #f2f2f2; }
+pre { background: #f7f7f7; border-left: 3px solid #666; overflow-x: auto; padding: 0.75rem; white-space: pre-wrap; }
+details { margin: 0.75rem 0 1.5rem; }
+summary { color: #0645ad; cursor: pointer; font-weight: 600; }
+.crashed { background: #fff0f0; }
+.indeterminate { background: #fff8dc; }
+.filter-controls { background: #f5f5f5; border: 1px solid #ddd; margin: 1rem 0; padding: 0.75rem; }
+.filter-controls label { display: inline-block; margin: 0.25rem 0.75rem 0.25rem 0; }
+.hidden { display: none; }
+.embedded-image { border: 1px solid #ccc; max-width: min(100%, 600px); }
+</style>
+"""
+    return "\n".join(
+        (
+            "<!DOCTYPE html>",
+            '<html lang="en">',
+            "<head>",
+            '<meta charset="UTF-8">',
+            '<meta name="viewport" content="width=device-width, initial-scale=1">',
+            "<title>Model Results: Gallery and Diagnostics</title>",
+            css,
+            "</head>",
+            "<body>",
+            "<h1>Model Results: Gallery and Diagnostics</h1>",
+            (
+                '<nav aria-label="Report sections"><a href="#current-run-chooser">Chooser</a>'
+                '<a href="#complete-model-evidence">Complete evidence</a>'
+                '<a href="#maintainer-diagnostics">Maintainer diagnostics</a>'
+                '<a href="#provenance">Provenance</a></nav>'
+            ),
+            _html_embedded_image(image_path),
+            _html_runtime_facts(report_context.result_set.results, total_runtime_seconds),
+            _html_gallery_chooser(report_context),
+            _html_complete_gallery(report_context),
+            _html_maintainer_diagnostics(
+                report_context,
+                prompt=prompt,
+                image_path=image_path,
+            ),
+            _html_provenance(
+                versions=versions,
+                system_info=report_context.system_info,
+                prompt=prompt,
+            ),
+            "</body>",
+            "</html>",
         )
-    sys_info_html += "</ul>"
-
-    # Build dependency-free table controls with JavaScript.
-    filter_controls = """
-    <div class="filter-controls">
-        <strong>Filter and compare results:</strong>
-        <div>
-            <label>Model <input id="model-search" type="search" placeholder="Search models"></label>
-            <label>Status <select id="status-filter">
-                <option value="all">All</option><option value="completed">Completed</option>
-                <option value="failed">Failed</option>
-                <option value="indeterminate">Indeterminate</option>
-            </select></label>
-            <label>Compatibility <select id="compatibility-filter">
-                <option value="all">All</option><option value="clean">Clean</option>
-                <option value="integration-warning">Integration warning</option>
-                <option value="crashed">Crashed</option>
-                <option value="indeterminate">Indeterminate</option>
-            </select></label>
-            <label>Prompt burden <select id="prompt-burden-filter">
-                <option value="all">All</option><option value="normal">Normal</option>
-                <option value="visual_input">Visual input</option><option value="text">Text</option>
-                <option value="mixed">Mixed</option><option value="unknown">Unknown</option>
-                <option value="unavailable">Unavailable</option>
-            </select></label>
-            <label>Recommendation <select id="recommendation-filter">
-                <option value="all">All</option>
-                <option value="recommended">Recommended</option>
-                <option value="caveat">Caveat</option>
-                <option value="avoid">Avoid</option>
-                <option value="not_evaluated">Not evaluated</option>
-            </select></label>
-            <label>Max peak GB <input id="max-memory-filter" type="number" min="0" step="0.5"></label>
-        </div>
-        <div class="filter-info" id="filter-info" role="status" aria-live="polite">
-            Showing all rows
-        </div>
-    </div>
-
-    <script>
-    function applyFilters() {
-        const table = document.querySelector('table');
-        const rows = table.querySelectorAll('tr[data-status]');
-        const modelQuery = document.getElementById('model-search').value.toLowerCase();
-        const status = document.getElementById('status-filter').value;
-        const compatibility = document.getElementById('compatibility-filter').value;
-        const burden = document.getElementById('prompt-burden-filter').value;
-        const recommendation = document.getElementById('recommendation-filter').value;
-        const maxMemoryText = document.getElementById('max-memory-filter').value;
-        const maxMemory = maxMemoryText === '' ? null : Number(maxMemoryText);
-        let visibleCount = 0;
-        rows.forEach(row => {
-            const memory = row.dataset.peakMemory === '' ? null : Number(row.dataset.peakMemory);
-            const show = row.dataset.model.includes(modelQuery)
-                && (status === 'all' || row.dataset.status === status)
-                && (compatibility === 'all' || row.dataset.compatibility === compatibility)
-                && (burden === 'all' || row.dataset.promptBurden === burden)
-                && (recommendation === 'all' || row.dataset.recommendation === recommendation)
-                && (maxMemory === null || memory === null || memory <= maxMemory);
-            if (show) {
-                row.classList.remove('hidden');
-                visibleCount++;
-            } else {
-                row.classList.add('hidden');
-            }
-        });
-        const totalRows = rows.length;
-        document.getElementById('filter-info').textContent =
-            `Showing ${visibleCount} of ${totalRows} rows`;
-    }
-
-    function sortResults(button) {
-        const table = document.querySelector('table');
-        const tbody = table.tBodies[0];
-        const column = Number(button.dataset.column);
-        const numeric = button.dataset.numeric === 'true';
-        const direction = button.dataset.direction === 'asc' ? 'desc' : 'asc';
-        document.querySelectorAll('.sort-btn').forEach(item => {
-            item.removeAttribute('data-direction');
-            item.closest('th').setAttribute('aria-sort', 'none');
-        });
-        button.dataset.direction = direction;
-        button.closest('th').setAttribute(
-            'aria-sort', direction === 'asc' ? 'ascending' : 'descending'
-        );
-        const rows = Array.from(tbody.querySelectorAll('tr[data-status]'));
-        rows.sort((left, right) => {
-            const leftValue = left.cells[column].dataset.sortValue || '';
-            const rightValue = right.cells[column].dataset.sortValue || '';
-            const comparison = numeric
-                ? ((Number(leftValue) || 0) - (Number(rightValue) || 0))
-                : leftValue.localeCompare(rightValue);
-            return direction === 'asc' ? comparison : -comparison;
-        });
-        rows.forEach(row => tbody.appendChild(row));
-    }
-
-    document.querySelectorAll('.filter-controls input, .filter-controls select')
-        .forEach(control => control.addEventListener('input', applyFilters));
-    document.querySelectorAll('.sort-btn')
-        .forEach(button => button.addEventListener('click', () => sortResults(button)));
-    applyFilters();
-    </script>
-    """
-
-    versions_html = "<ul>"
-    for name, ver in sorted(versions.items()):
-        ver_str = "" if ver is None else ver
-        versions_html += (
-            f"<li><code>{html.escape(name)}</code>: <code>{html.escape(ver_str)}</code></li>"
-        )
-    versions_html += "</ul>"
-
-    # Embed image if provided
-    image_html = ""
-    if image_path and image_path.exists():
-        try:
-            # Open and resize image if needed
-            with (
-                Image.open(image_path) as img_original,
-                ImageOps.exif_transpose(img_original) as img_oriented,
-            ):
-                # Resize if larger than 1024px in either dimension
-                max_size = 1024
-                # Explicitly type as generic Image to handle both ImageFile and resized Image
-                img_to_save: PILImage = img_oriented
-                if img_oriented.width > max_size or img_oriented.height > max_size:
-                    # Calculate new dimensions maintaining aspect ratio
-                    ratio = min(max_size / img_oriented.width, max_size / img_oriented.height)
-                    new_width = int(img_oriented.width * ratio)
-                    new_height = int(img_oriented.height * ratio)
-                    img_to_save = img_oriented.resize(
-                        (new_width, new_height),
-                        Image.Resampling.LANCZOS,
-                    )
-
-                # Convert to bytes
-                img_buffer = io.BytesIO()
-                # Determine format from extension
-                ext = image_path.suffix.lower()
-                img_format = {
-                    ".jpg": "JPEG",
-                    ".jpeg": "JPEG",
-                    ".png": "PNG",
-                    ".gif": "GIF",
-                    ".webp": "WEBP",
-                }.get(ext, "JPEG")
-                img_to_save.save(img_buffer, format=img_format)
-                img_data = base64.b64encode(img_buffer.getvalue()).decode("utf-8")
-
-                # Determine MIME type
-                mime_type = {
-                    ".jpg": "image/jpeg",
-                    ".jpeg": "image/jpeg",
-                    ".png": "image/png",
-                    ".gif": "image/gif",
-                    ".webp": "image/webp",
-                }.get(ext, "image/jpeg")
-                image_html = (
-                    f"<h2>Test Image</h2>"
-                    f'<img src="data:{mime_type};base64,{img_data}" '
-                    f'class="embedded-image" '
-                    f'alt="Test image used for model evaluation" />'
-                )
-        except (OSError, ValueError):
-            logger.warning("Failed to embed image: %s", image_path)
-
-    # The template below combines fixed report chrome with HTML fragments created by
-    # internal renderers that escape user/model text at their boundaries; see
-    # test_html_report_escapes_untrusted_table_values for the regression contract.
-    # skylos: ignore-start  # noqa: ERA001 - false-positive marker, not commented code
-    return f"""
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Model Performance Report</title>
-        {css}
-    </head>
-    <body>
-        <h1>Model Performance Report</h1>
-        <p><em>Generated on {local_now_str()}</em></p>
-        {image_html}
-        <div class="summary">
-            <h2>Summary</h2>
-            {run_contract_html}
-            {action_snapshot_html}
-            {recommendations_html}
-            {issues_summary_html}
-            {review_priorities_html}
-            {failures_by_package_html}
-        </div>
-        <h2>Prompt</h2>
-        <pre>{html.escape(prompt)}</pre>
-        <h2>Results</h2>
-        <p><strong>Overall runtime:</strong> {format_overall_runtime(total_runtime_seconds)}</p>
-        {filter_controls}
-        {html_table}
-        <h2>System Information</h2>
-        {sys_info_html}
-        <h2>Library Versions</h2>
-        {versions_html}
-    </body>
-    </html>
-    """
-    # skylos: ignore-end  # noqa: ERA001 - closes the false-positive marker block
+    )
 
 
 def print_model_stats(results: list[PerformanceResult]) -> None:
@@ -15225,11 +15443,6 @@ def _build_recommendation_summary_block(
     )
 
 
-def _build_html_recommendation_summary(report_context: ReportRenderContext) -> str:
-    """Render the shared recommendation block for standalone HTML."""
-    return "".join(render_report_html((_build_recommendation_summary_block(report_context),)))
-
-
 def generate_html_report(
     results: list[PerformanceResult],
     filename: Path,
@@ -15239,7 +15452,7 @@ def generate_html_report(
     image_path: Path | None = None,
     report_context: ReportRenderContext | None = None,
 ) -> None:
-    """Write a self-contained HTML summary with aligned table and embedded image.
+    """Write a standalone HTML mirror of the facts-only gallery and diagnostics.
 
     Args:
         results: Run results to render.
@@ -15261,76 +15474,11 @@ def generate_html_report(
             image_path=image_path,
         )
 
-    headers, rows, field_names = _materialize_prepared_table_data(report_context.table_data)
-    _filter_table_columns(
-        headers=headers,
-        rows=rows,
-        field_names=field_names,
-        allowed_fields=(*MARKDOWN_SUMMARY_TABLE_FIELDS, "output"),
-    )
-
-    if not headers or not rows:
-        log_warning_note("No table data to generate HTML report.")
-        return
-
-    html_table = _build_html_results_table(
-        headers=headers,
-        rows=rows,
-        field_names=field_names,
-        sorted_results=report_context.result_set.results,
-        recommendations=_recommendations_by_model(report_context),
-        assessments=_legacy_assessments_by_model(report_context),
-    )
-
-    suppress_cataloging_scores = report_context.mode_policy.suppress_cataloging_scores
-    run_contract_html = "".join(
-        _format_run_contract_parts(
-            report_context,
-            html_output=True,
-        ),
-    )
-    issues_summary_html = format_issues_summary_html(
-        report_context.summary,
-        report_context.stats,
-        suppress_cataloging_scores=suppress_cataloging_scores,
-    )
-    action_snapshot_html = "".join(
-        _format_action_snapshot_parts(
-            results,
-            report_context,
-            html_output=True,
-            suppress_cataloging_claims=suppress_cataloging_scores,
-        ),
-    )
-    recommendations_html = _build_html_recommendation_summary(report_context)
-    review_priorities_html = "".join(
-        _format_review_priorities_parts(
-            report_context,
-            html_output=True,
-            suppress_cataloging_scores=suppress_cataloging_scores,
-        ),
-    )
-    failures_by_package_html = "".join(
-        _format_failures_by_package_parts(
-            results,
-            html_output=True,
-            failure_narratives=_failure_narratives_by_model(report_context),
-        ),
-    )
-
-    # Build the full HTML document
     html_content = _build_full_html_document(
-        html_table=html_table,
+        report_context=report_context,
         versions=versions,
         prompt=prompt,
         total_runtime_seconds=total_runtime_seconds,
-        run_contract_html=run_contract_html,
-        action_snapshot_html=action_snapshot_html,
-        recommendations_html=recommendations_html,
-        issues_summary_html=issues_summary_html,
-        review_priorities_html=review_priorities_html,
-        failures_by_package_html=failures_by_package_html,
-        system_info=report_context.system_info,
         image_path=image_path,
     )
 
