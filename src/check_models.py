@@ -3073,7 +3073,10 @@ def _render_gallery_model(
                 runtime.model_load_active_memory_gb if runtime is not None else None,
             ),
         ),
-        ("Stop reason", runtime.stop_reason if runtime is not None else "not captured"),
+        (
+            "Stop reason",
+            runtime.stop_reason if runtime is not None and runtime.stop_reason else "not captured",
+        ),
         ("Requested maximum tokens", str(result.requested_max_tokens or "not captured")),
         (
             "Rendered prompt characters",
@@ -3105,11 +3108,19 @@ def _render_gallery_model(
         ),
         (
             "Processor",
-            prompt.processor_class if prompt is not None else "not captured",
+            (
+                prompt.processor_class
+                if prompt is not None and prompt.processor_class
+                else "not captured"
+            ),
         ),
         (
             "Tokenizer",
-            prompt.tokenizer_class if prompt is not None else "not captured",
+            (
+                prompt.tokenizer_class
+                if prompt is not None and prompt.tokenizer_class
+                else "not captured"
+            ),
         ),
         ("Model revision", "not captured by this result"),
         (

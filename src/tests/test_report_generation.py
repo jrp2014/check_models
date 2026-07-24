@@ -4340,6 +4340,39 @@ class TestMarkdownGalleryReport:
         assert "_Execution:_ indeterminate" in content
         assert "_Execution:_ crashed" not in content
 
+    def test_gallery_marks_missing_nested_diagnostic_fields_not_captured(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Present diagnostic objects should not make absent nested facts disappear."""
+        result = replace(
+            _make_success("org/missing-nested"),
+            runtime_diagnostics=RuntimeDiagnostics(stop_reason=None),
+            prompt_diagnostics=check_models.PromptDiagnostics(
+                processor_class=None,
+                tokenizer_class=None,
+            ),
+        )
+        context = _build_report_render_context(results=[result], prompt="Describe the image.")
+        out = tmp_path / "model_gallery.md"
+
+        generate_markdown_gallery_report(
+            results=[result],
+            filename=out,
+            prompt="Describe the image.",
+            report_context=context,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        evidence = _extract_markdown_subsection(
+            content,
+            "### org/missing-nested",
+            end_headings=("<!-- markdownlint-enable",),
+        )
+        assert "_Stop reason:_ not captured" in evidence
+        assert "_Processor:_ not captured" in evidence
+        assert "_Tokenizer:_ not captured" in evidence
+
     def test_review_report_groups_owner_and_user_buckets(self, tmp_path: Path) -> None:
         """Review digest should group maintainer ownership and user-facing buckets."""
         out = tmp_path / "review.md"
