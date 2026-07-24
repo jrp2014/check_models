@@ -216,6 +216,11 @@ ignore = [
     "TD003",  # Missing TODO link - not critical for small team
     "FIX002", # TODO/FIXME comments - we want these visible
 
+    # === Repository metadata policy ===
+    # Licensing is declared once at project level; source files do not carry
+    # individual copyright notices.
+    "CPY001",
+
     # === Complexity thresholds (configured separately via pylint section) ===
     "PLR0913", # Too many arguments - configured via max-args=10
 
@@ -274,6 +279,8 @@ max-complexity = 75
 [tool.ruff.lint.pylint]
 # Pylint-specific settings
 max-args = 10
+# Preserve the positional compatibility of the established report API.
+max-positional-args = 11
 max-branches = 15
 max-statements = 60
 

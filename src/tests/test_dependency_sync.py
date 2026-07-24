@@ -721,9 +721,9 @@ def test_markdownlint_cli2_is_pinned_repo_local_and_updateable() -> None:
     package_lock = json.loads((PKG_ROOT / "package-lock.json").read_text(encoding="utf-8"))
 
     markdownlint_spec = package_json["devDependencies"]["markdownlint-cli2"]
-    assert markdownlint_spec == "0.23.0"
+    assert markdownlint_spec == "0.23.1"
     assert markdownlint_spec == package_lock["packages"][""]["devDependencies"]["markdownlint-cli2"]
-    assert package_lock["packages"]["node_modules/markdownlint-cli2"]["version"] == "0.23.0"
+    assert package_lock["packages"]["node_modules/markdownlint-cli2"]["version"] == "0.23.1"
     assert package_json["overrides"]["smol-toml"] == "1.6.1"
     assert package_lock["packages"]["node_modules/smol-toml"]["version"] == "1.6.1"
 

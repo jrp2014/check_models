@@ -992,12 +992,12 @@ prompt_keyword_item_max_chars: 36
 
 ```python
 from check_models import (
-    process_image_with_model,    # Process single image with a model
-    generate_markdown_report,     # Create Markdown report
-    generate_html_report,         # Create HTML report
-    get_system_info,              # Get system information dict
-    format_field_value,           # Format metric values consistently
-    format_overall_runtime,       # Format duration strings
+    process_image_with_model,  # Process single image with a model
+    generate_markdown_report,  # Create Markdown report
+    generate_html_report,  # Create HTML report
+    get_system_info,  # Get system information dict
+    format_field_value,  # Format metric values consistently
+    format_overall_runtime,  # Format duration strings
 )
 ```
 

@@ -284,5 +284,6 @@ All attempted models; expand to skim.
 | `mlx-community/Qwen3-VL-2B-Instruct-bf16`               | 8.6 GB (7.47% of 108 GB recommended working set) | 91.4      | 40           | `avoid`         | `At mixed burden (16922 tokens), output became repetitive. \| harness contract \| text repetition \| missing required sections \| current recommendation is avoid`                                                                                  |
 | `mlx-community/Molmo-7B-D-0924-bf16`                    | 48 GB (41.4% of 108 GB recommended working set)  | 45,282    | 0            | `caveat`        | `harness contract \| current recommendation is caveat`                                                                                                                                                                                              |
 | `mlx-community/Step-3.7-Flash-oQ2e`                     | -                                                | -         | -            | `not evaluated` | `execution failure \| Task outcome: crashed \| ValueError: Loaded processor has no image_processor; expected multimodal processor. \| current recommendation is not_evaluated`                                                                      |
+
 </details>
 <!-- markdownlint-enable MD060 MD033 -->

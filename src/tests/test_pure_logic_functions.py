@@ -1565,10 +1565,12 @@ Try: `pip install transformers -U` or `pip install -e '.[dev]'` if you're workin
         issues = mod._detect_runtime_api_drift_issues()
 
         assert issues == (
-            "mlx-vlm import unavailable; affected API surfaces: "
-            "mlx_vlm.utils.load, mlx_vlm.prompt_utils.apply_chat_template, "
-            "mlx_vlm.generate.generate, mlx_vlm.utils.load_image. "
-            f"Root cause: {dependency_message}",
+            (
+                "mlx-vlm import unavailable; affected API surfaces: "
+                "mlx_vlm.utils.load, mlx_vlm.prompt_utils.apply_chat_template, "
+                "mlx_vlm.generate.generate, mlx_vlm.utils.load_image. "
+                f"Root cause: {dependency_message}"
+            ),
         )
         assert "missing-dependency placeholder" not in issues[0]
 

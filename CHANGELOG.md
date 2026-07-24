@@ -7,6 +7,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Keep the static-quality gate compatible with current Ruff releases by
+  documenting the project-level copyright policy, calibrating the established
+  report API's positional-argument threshold, and normalizing multiline string
+  concatenation and Markdown details-table spacing.
 - Accept `mlx-vlm`'s upstream `ProcessorLike` and `GenerateKwargs` type helpers
   during stub generation and integrity checks, while retaining legacy signature
   patches for older releases.

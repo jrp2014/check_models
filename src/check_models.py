@@ -1057,7 +1057,7 @@ type ExifValue = Any  # Pillow yields varied scalar / tuple EXIF types; keep per
 type ExifDict = dict[str | int, ExifValue]
 type MetadataDict = dict[str, str | None]
 type PathLike = str | Path
-type JsonLike = None | bool | int | float | str | list[JsonLike] | dict[str, JsonLike]
+type JsonLike = bool | int | float | str | list[JsonLike] | dict[str, JsonLike] | None
 type LogitBiasDict = dict[int, float]
 type GPSDict = dict[str, ExifValue]  # GPS EXIF data structure
 type EvaluationLane = Literal["triage", "blind", "assisted"]
@@ -7613,21 +7613,27 @@ class GenerationQualityAnalysis:
             (bool(self.missing_sections), f"Missing sections ({', '.join(self.missing_sections)})"),
             (
                 self.has_title_length_violation,
-                "Title length violation "
-                f"({self.title_word_count} words; expected "
-                f"{QUALITY.min_title_words}-{QUALITY.max_title_words})",
+                (
+                    "Title length violation "
+                    f"({self.title_word_count} words; expected "
+                    f"{QUALITY.min_title_words}-{QUALITY.max_title_words})"
+                ),
             ),
             (
                 self.has_description_sentence_violation,
-                "Description sentence violation "
-                f"({self.description_sentence_count}; expected "
-                f"{QUALITY.min_description_sentences}-{QUALITY.max_description_sentences})",
+                (
+                    "Description sentence violation "
+                    f"({self.description_sentence_count}; expected "
+                    f"{QUALITY.min_description_sentences}-{QUALITY.max_description_sentences})"
+                ),
             ),
             (
                 self.has_keyword_count_violation,
-                "Keyword count violation "
-                f"({self.keyword_count}; expected "
-                f"{QUALITY.min_keywords_count}-{QUALITY.max_keywords_count})",
+                (
+                    "Keyword count violation "
+                    f"({self.keyword_count}; expected "
+                    f"{QUALITY.min_keywords_count}-{QUALITY.max_keywords_count})"
+                ),
             ),
             (
                 self.has_keyword_duplication_violation,
@@ -8945,8 +8951,10 @@ def _get_callable_contract_issues(
     if symbol_value is _raise_mlx_vlm_missing:
         dependency_message = MISSING_DEPENDENCIES.get("mlx-vlm", ERROR_MLX_VLM_MISSING)
         return [
-            f"{qualified_name} is still bound to the missing-dependency placeholder "
-            f"({dependency_message}).",
+            (
+                f"{qualified_name} is still bound to the missing-dependency placeholder "
+                f"({dependency_message})."
+            ),
         ]
 
     if not callable(symbol_value):
@@ -11955,8 +11963,10 @@ def _format_run_contract_parts(
             "<h3>Run Contract</h3>",
             "<ul>",
             f"<li><b>Evaluation lane:</b> {html.escape(policy.eval_mode)}</li>",
-            "<li><b>Metadata exposed to prompt:</b> "
-            f"{'yes' if policy.metadata_exposed_to_prompt else 'no'}</li>",
+            (
+                "<li><b>Metadata exposed to prompt:</b> "
+                f"{'yes' if policy.metadata_exposed_to_prompt else 'no'}</li>"
+            ),
             f"<li><b>Semantic rankings:</b> {html.escape(semantic_rankings)}</li>",
             f"<li><b>Primary selection tasks:</b> {html.escape(primary_selection_tasks)}</li>",
             f"<li><b>Evidence scope:</b> {html.escape(proxy_scope)}</li>",
@@ -13914,7 +13924,7 @@ def _append_markdown_details_block(
     parts.append(f"<summary>{html.escape(summary, quote=False)}</summary>")
     parts.append("")
     parts.extend(normalized_body_lines)
-    if normalized_body_lines and re.fullmatch(r"`{3,}", normalized_body_lines[-1]):
+    if normalized_body_lines:
         parts.append("")
     parts.append("</details>")
     parts.append("")
@@ -18801,8 +18811,10 @@ def _append_model_selection_chooser_section(
     if fallback:
         md.extend(
             [
-                "Fallback only: no recommended row met this tier; the rows below retain "
-                "their current-run caveat status.",
+                (
+                    "Fallback only: no recommended row met this tier; the rows below retain "
+                    "their current-run caveat status."
+                ),
                 "",
             ]
         )
@@ -19885,8 +19897,10 @@ def generate_model_capability_scorecard(
         md.extend(
             [
                 "Structured metadata and keyword capability: not evaluated in triage mode.",
-                "Use the Clean, Hygiene, Caption, speed, and memory columns as a caption-review "
-                "shortlist; visual correctness still requires grounded metadata or manual review.",
+                (
+                    "Use the Clean, Hygiene, Caption, speed, and memory columns as a caption-review "
+                    "shortlist; visual correctness still requires grounded metadata or manual review."
+                ),
                 "",
             ]
         )
@@ -23521,8 +23535,10 @@ def _log_cataloging_utility(gen_text: str, context: str | None) -> None:
     entries.append(
         (
             "Info Gain:",
-            f"{info_gain['information_gain']:.0%} novel "
-            f"({info_gain['novel_words']}/{info_gain['output_words']} words)",
+            (
+                f"{info_gain['information_gain']:.0%} novel "
+                f"({info_gain['novel_words']}/{info_gain['output_words']} words)"
+            ),
         )
     )
     if echo_ratio > QUALITY.moderate_echo_threshold:
@@ -23546,10 +23562,12 @@ def _log_cataloging_utility(gen_text: str, context: str | None) -> None:
     entries.append(
         (
             "Description:",
-            f"{description['description_score']:.0f}/100 "
-            f"({description['description_word_count']} words, "
-            f"{description['description_sentence_count']} sentences, "
-            f"grounding={description['description_grounding_score']:.0%})",
+            (
+                f"{description['description_score']:.0f}/100 "
+                f"({description['description_word_count']} words, "
+                f"{description['description_sentence_count']} sentences, "
+                f"grounding={description['description_grounding_score']:.0%})"
+            ),
         )
     )
 
@@ -23557,10 +23575,12 @@ def _log_cataloging_utility(gen_text: str, context: str | None) -> None:
     entries.append(
         (
             "Keywords:",
-            f"{keywords['keyword_score']:.0f}/100 "
-            f"({keywords['keyword_term_count']} terms, "
-            f"{keywords['keyword_unique_terms']} unique, "
-            f"coverage={keywords['keyword_category_coverage']:.0%})",
+            (
+                f"{keywords['keyword_score']:.0f}/100 "
+                f"({keywords['keyword_term_count']} terms, "
+                f"{keywords['keyword_unique_terms']} unique, "
+                f"coverage={keywords['keyword_category_coverage']:.0%})"
+            ),
         )
     )
 
@@ -25896,8 +25916,10 @@ def _build_action_snapshot_stanzas(
             [
                 (
                     "Preflight compatibility",
-                    f"{len(preflight_issues)} informational warning(s); "
-                    "do not treat these alone as run failures.",
+                    (
+                        f"{len(preflight_issues)} informational warning(s); "
+                        "do not treat these alone as run failures."
+                    ),
                 ),
                 (
                     "Escalate only if",
@@ -25918,8 +25940,10 @@ def _build_action_snapshot_stanzas(
         quality_rows.append(
             (
                 "Vs existing metadata",
-                f"better={better}, neutral={neutral}, worse={worse} "
-                f"(baseline {triage.baseline_grade} {triage.baseline_score:.0f}/100).",
+                (
+                    f"better={better}, neutral={neutral}, worse={worse} "
+                    f"(baseline {triage.baseline_grade} {triage.baseline_score:.0f}/100)."
+                ),
             )
         )
     quality_rows.append(("Quality signal frequency", f"{_format_counter_items(quality_counts)}."))
@@ -26029,8 +26053,10 @@ def _action_snapshot_failure_items(
     items.append(
         (
             "Maintainer signals",
-            f"harness-risk successes={harness_success_count}, "
-            f"mechanically clean outputs={triage.clean_count}/{successful_count}.",
+            (
+                f"harness-risk successes={harness_success_count}, "
+                f"mechanically clean outputs={triage.clean_count}/{successful_count}."
+            ),
         )
     )
     if suppress_cataloging_claims:
@@ -29035,8 +29061,10 @@ def _issue_fix_checklist_items(cluster: IssueCluster) -> list[str]:
             "Inspect model EOS token IDs and tokenizer special-token mappings.",
             "Verify mlx-vlm stop criteria receive all configured EOS/stop tokens.",
             "Check `skip_special_tokens` handling during decode.",
-            "Strip generated control tokens such as `<|end|>` and `</think>` only after "
-            "confirming generation stopped at the right boundary.",
+            (
+                "Strip generated control tokens such as `<|end|>` and `</think>` only after "
+                "confirming generation stopped at the right boundary."
+            ),
         ]
     elif subtype == "encoding":
         checklist = [
@@ -29058,11 +29086,15 @@ def _issue_fix_checklist_items(cluster: IssueCluster) -> list[str]:
         ]
     elif subtype == "text_sanity":
         checklist = [
-            "Reproduce with the native command and confirm whether token soup appears without "
-            "the check_models harness.",
+            (
+                "Reproduce with the native command and confirm whether token soup appears without "
+                "the check_models harness."
+            ),
             "Inspect tokenizer config, chat template, and decode cleanup for the model revision.",
-            "Compare against a nearby quantization or base model to isolate model weights from "
-            "tokenizer/runtime behavior.",
+            (
+                "Compare against a nearby quantization or base model to isolate model weights from "
+                "tokenizer/runtime behavior."
+            ),
             "Add a focused regression check for mixed-script token-soup output if fixed.",
         ]
     elif cluster.issue_kind == "runtime_failure":

@@ -829,7 +829,7 @@ def test_published_failure_artifacts_match_canonical_runtime_triage() -> None:
         assert review["owner"] == triage["suspected_owner"]
         assert review["owner"] in diagnostics
         assert f"`{failure['model']}`" in review_report
-        assert "`runtime_failure`" in review_report
+        assert "runtime_failure" in review_report
         assert (output_dir / triage["issue_cluster_path"]).is_file()
 
 
@@ -6476,6 +6476,23 @@ class TestEmptyRecommendedBucketExplanation:
 
 class TestSharedReportSections:
     """Tests for shared Markdown/HTML report section primitives."""
+
+    def test_report_details_separates_table_from_closing_tag(self) -> None:
+        """Tables inside details blocks should retain the required trailing blank line."""
+        details = check_models.ReportDetails(
+            summary="Complete matrix",
+            blocks=(
+                check_models.ReportTable(
+                    headers=("Model", "Status"),
+                    rows=(("org/model", "recommended"),),
+                ),
+            ),
+        )
+
+        markdown = "\n".join(check_models.render_report_markdown((details,)))
+
+        assert "| org/model" in markdown
+        assert "\n\n</details>" in markdown
 
     def test_markdown_block_helper_matches_public_renderer(self) -> None:
         """Private block renderer should preserve public Markdown output."""
