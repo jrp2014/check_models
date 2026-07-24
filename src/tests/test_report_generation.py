@@ -179,7 +179,7 @@ def test_html_and_markdown_render_working_set_context(tmp_path: Path) -> None:
     expected = "1.0 GB (50% of 1.86 GB recommended working set)"
     assert html_path.read_text(encoding="utf-8").count(expected) >= 2
     assert expected in markdown_path.read_text(encoding="utf-8")
-    assert expected in gallery_path.read_text(encoding="utf-8")
+    assert "_Peak memory:_ 1.0" in gallery_path.read_text(encoding="utf-8")
 
 
 def _extract_markdown_subsection(
@@ -3648,8 +3648,10 @@ class TestMarkdownGalleryReport:
     def test_gallery_includes_metadata_prompt_and_models(self, tmp_path: Path) -> None:
         """Gallery artifact should include selected metadata, prompt, and model sections."""
         out = tmp_path / "model_gallery.md"
+        results = [_make_success("org/good"), _make_failure("org/bad")]
+        context = _build_report_render_context(results=results, prompt="Describe this image fully.")
         generate_markdown_gallery_report(
-            results=[_make_success("org/good"), _make_failure("org/bad")],
+            results=results,
             filename=out,
             prompt="Describe this image fully.",
             metadata={
@@ -3661,6 +3663,7 @@ class TestMarkdownGalleryReport:
                 "gps": "51.5000, -0.1200",
                 "exif": "ignored raw blob",
             },
+            report_context=context,
         )
         content = out.read_text(encoding="utf-8")
         assert "# Model Output Gallery" in content
@@ -3673,22 +3676,26 @@ class TestMarkdownGalleryReport:
         assert "_GPS:_ 51.5000, -0.1200" in content
         assert "ignored raw blob" not in content
         assert "## Prompt" in content
-        assert "## Quick Navigation" in content
-        assert "<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->" in content
+        assert "## Current-run Chooser" in content
+        assert "## Avoid for This Run" in content
+        assert "## Lowest-memory Usable Models" in content
+        assert "## Fastest Valid Generation" in content
         assert "> [!NOTE]" not in content
         assert "Describe this image fully." in content
         assert "```text\nDescribe this image fully." not in content
-        assert "<summary>Complete generated output: org/good</summary>" in content
+        assert "<summary>Complete evidence: org/good</summary>" in content
         assert "```text" in content
         assert '<a id="model-org-good"></a>' in content
-        assert "_Verdict:_" in content
-        assert "_Maintainer:_" in content
-        assert "_Next action:_" in content
-        assert "### ✅ org/good" in content
-        assert "### ❔ org/bad" in content
+        assert "_Usability:_" in content
+        assert "_Observations:_" in content
+        assert "_Verdict:_" not in content
+        assert "_Maintainer:_" not in content
+        assert "_Next action:_" not in content
+        assert "### org/good" in content
+        assert "### org/bad" in content
 
-    def test_gallery_icon_uses_recommendation_not_execution_success(self, tmp_path: Path) -> None:
-        """Completed output with a presentation warning should use the caveat icon."""
+    def test_gallery_uses_cached_usability_not_recommendation_icons(self, tmp_path: Path) -> None:
+        """Completed output should expose cached usability without recommendation policy."""
         text = "<think>Inspect.</think> A useful final caption."
         result = _make_success("org/thinking")
         analysis = replace(
@@ -3708,16 +3715,20 @@ class TestMarkdownGalleryReport:
             quality_analysis=analysis,
         )
         out = tmp_path / "model_gallery.md"
+        context = _build_report_render_context(results=[result], prompt="Describe this image.")
 
         generate_markdown_gallery_report(
             results=[result],
             filename=out,
             prompt="Describe this image.",
+            report_context=context,
         )
 
         content = out.read_text(encoding="utf-8")
-        assert "### ⚠️ org/thinking" in content
-        assert "### ✅ org/thinking" not in content
+        chooser_row = next(line for line in content.splitlines() if "org/thinking" in line)
+        assert "usable with caveats" in chooser_row
+        assert "### org/thinking" in content
+        assert "### ⚠️ org/thinking" not in content
 
     def test_gallery_is_evidence_only_without_scoreboard_duplication(
         self,
@@ -3756,7 +3767,7 @@ class TestMarkdownGalleryReport:
 
         content = out.read_text(encoding="utf-8")
         assert "# Model Output Gallery" in content
-        assert "Full generated output by model" in content
+        assert "Complete generated or crash evidence for every attempted model" in content
         assert "Review Shortlist" not in content
         assert "Failures by Package" not in content
         assert "Best keywording" not in content
@@ -3843,7 +3854,7 @@ class TestMarkdownGalleryReport:
         assert "- _GPU Architecture:_ applegpu_g17s" in content
         assert "- _Recommended Working Set:_ 96 GB" in content
         assert "- _Fused Attention:_ available" in content
-        assert "## Model Output and Cost Summary" in content
+        assert "## Current-run Chooser" in content
         assert "## Model Quality Summary" not in content
         assert "## All Model Output and Cost Summary" not in content
         assert "<!-- markdownlint-disable MD034 MD049 -->" in content
@@ -3851,28 +3862,21 @@ class TestMarkdownGalleryReport:
         assert "<!-- markdownlint-disable MD013 MD034 -->" not in content
         assert "<!-- markdownlint-enable MD013" not in content
 
-        summary = _extract_markdown_subsection(
+        chooser = _extract_markdown_subsection(
             content,
-            "## Model Output and Cost Summary",
-            end_headings=(
-                "## Image Metadata",
-                "## Prompt",
-                "## Quick Navigation",
-            ),
+            "## Current-run Chooser",
+            end_headings=("## Avoid for This Run",),
         )
-        assert "Output preview / diagnostic" in summary
-        assert "[`org/good`](#model-org-good)" in summary
-        assert "quality output" in summary
-        assert "[`org/risky`](#model-org-risky)" in summary
-        assert "`caveat` / `harness`" in summary
-        assert "harness:stop-token" in summary
-        assert r"answer with \| pipe" in summary
-        assert "[harness:stop-token] answer" not in summary
-        assert "&lt;think&gt;leaked marker&lt;/think&gt;" in summary
-        assert "[`org/bad`](#model-org-bad)" in summary
-        assert "`not evaluated` / `runtime failure`" in summary
-        assert "mlx-vlm; load" in summary
-        assert "Error: load - boom" in summary
+        assert "Output preview" in chooser
+        assert "[`org/good`](#model-org-good)" in chooser
+        assert "quality output" in chooser
+        assert "[`org/risky`](#model-org-risky)" in chooser
+        assert "unexpected special token" in chooser
+        assert r"answer with \| pipe" in chooser
+        assert "&lt;think&gt;leaked marker&lt;/think&gt;" in chooser
+        assert "[`org/bad`](#model-org-bad)" in chooser
+        assert "not evaluated" in chooser
+        assert "boom" in chooser
 
     def test_gallery_keeps_complete_output_once_in_expandable_code_block(
         self,
@@ -3897,28 +3901,33 @@ class TestMarkdownGalleryReport:
             model_load_time=0.50,
         )
         out = tmp_path / "model_gallery.md"
+        context = _build_report_render_context(
+            results=[result],
+            prompt="Describe this image briefly.",
+        )
 
         generate_markdown_gallery_report(
             results=[result],
             filename=out,
             prompt="Describe this image briefly.",
+            report_context=context,
         )
 
         content = out.read_text(encoding="utf-8")
-        summary = _extract_markdown_subsection(
+        chooser = _extract_markdown_subsection(
             content,
-            "## Model Output and Cost Summary",
-            end_headings=("## Quick Navigation", "## Model Gallery"),
+            "## Current-run Chooser",
+            end_headings=("## Avoid for This Run",),
         )
         assert "## Model Quality Summary" not in content
         assert "## All Model Output and Cost Summary" not in content
-        assert "BEGIN" in summary
-        assert "END-SENTINEL" not in summary
-        assert "<!-- markdownlint-disable MD034 MD049 -->" in summary
-        assert "Gen tok" in summary
-        assert "Peak GB" in summary
-        assert "Quality signal" in summary
-        assert "<summary>Complete generated output: org/complete-output</summary>" in content
+        assert "BEGIN" in chooser
+        assert "END-SENTINEL" not in chooser
+        assert "<!-- markdownlint-disable MD034 MD049 -->" in chooser
+        assert "Gen tok" in chooser
+        assert "Peak GB" in chooser
+        assert "Observations" in chooser
+        assert "<summary>Complete evidence: org/complete-output</summary>" in content
         assert "```text" in content
         assert content.count("END-SENTINEL") == 1
 
@@ -3956,37 +3965,380 @@ class TestMarkdownGalleryReport:
             harness_type="prompt_template",
         )
         out = tmp_path / "model_gallery.md"
+        context = _build_report_render_context(
+            results=[success, failure, harness],
+            prompt="Describe this image briefly.",
+        )
 
         generate_markdown_gallery_report(
             results=[success, failure, harness],
             filename=out,
             prompt="Describe this image briefly.",
+            report_context=context,
         )
 
         content = out.read_text(encoding="utf-8")
-        summary = _extract_markdown_subsection(
+        chooser = _extract_markdown_subsection(
             content,
-            "## Model Output and Cost Summary",
-            end_headings=("## Quick Navigation", "## Model Gallery"),
+            "## Current-run Chooser",
+            end_headings=("## Avoid for This Run",),
         )
-        assert "Output preview / diagnostic" in summary
-        assert "Peak GB" in summary
-        assert "Quality signal" in summary
-        assert "[`org/full-caption`](#model-org-full-caption)" in summary
-        assert "Two cats sit together on a pink sofa" in summary
-        assert "24" in summary
-        assert "1.25s" in summary
-        assert "42.0" in summary
-        assert "2.5" in summary
-        assert "clean" in summary
-        risky_row = next(line for line in summary.splitlines() if "org/risky-output" in line)
+        assert "Output preview" in chooser
+        assert "Peak GB" in chooser
+        assert "Observations" in chooser
+        assert "[`org/full-caption`](#model-org-full-caption)" in chooser
+        assert "Two cats sit together on a pink sofa" in chooser
+        assert "24" in chooser
+        assert "42.0" in chooser
+        assert "2.5" in chooser
+        risky_row = next(line for line in chooser.splitlines() if "org/risky-output" in line)
         assert "| cats " in risky_row
-        assert "[harness" not in risky_row
-        assert "harness:prompt-template" in risky_row
-        assert "[`org/crashed`](#model-org-crashed)" in summary
-        assert "Error: load - boom" in summary
-        assert "transformers; load" in summary
-        assert "0.33s" in summary
+        assert "insufficient sample" in risky_row
+        assert "[`org/crashed`](#model-org-crashed)" in chooser
+        assert "boom" in chooser
+        crashed_evidence = _extract_markdown_subsection(
+            content,
+            "### org/crashed",
+            end_headings=("### org/full-caption", "### org/risky-output"),
+        )
+        assert "_Total time:_ 0.33s" in crashed_evidence
+
+    def test_gallery_uses_skim_first_chooser_order_and_cached_assessments(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Gallery order should move from chooser policy to complete evidence."""
+        results = [
+            _make_success("org/usable"),
+            _make_success("org/unusable"),
+            _make_failure("org/not-evaluated"),
+        ]
+        context = _build_report_render_context(results=results, prompt="Describe the image.")
+        context = replace(
+            context,
+            assessments=(
+                (
+                    "org/usable",
+                    check_models.ResultAssessment("completed", "usable", "none", ()),
+                ),
+                (
+                    "org/unusable",
+                    check_models.ResultAssessment(
+                        "completed",
+                        "unusable",
+                        "observation_needs_reproduction",
+                        ("repeated_output",),
+                    ),
+                ),
+                (
+                    "org/not-evaluated",
+                    check_models.ResultAssessment(
+                        "crashed",
+                        "not_evaluated",
+                        "actionable_failure",
+                        (),
+                    ),
+                ),
+            ),
+        )
+        out = tmp_path / "model_gallery.md"
+
+        with (
+            patch.object(check_models, "_review_for_result", side_effect=AssertionError),
+            patch.object(check_models, "_model_selection_score", side_effect=AssertionError),
+            patch.object(
+                check_models,
+                "_recommendation_status_for_result",
+                side_effect=AssertionError,
+            ),
+        ):
+            generate_markdown_gallery_report(
+                results=results,
+                filename=out,
+                prompt="Describe the image.",
+                report_context=context,
+            )
+
+        content = out.read_text(encoding="utf-8")
+        headings = [
+            "## Current-run Chooser",
+            "## Avoid for This Run",
+            "## Lowest-memory Usable Models",
+            "## Fastest Valid Generation",
+            "## Complete Per-model Evidence",
+        ]
+        assert [content.index(heading) for heading in headings] == sorted(
+            content.index(heading) for heading in headings
+        )
+        assert "_Verdict:_" not in content
+        assert "_Maintainer:_" not in content
+        assert "_Next action:_" not in content
+        assert "_Score:_" not in content
+
+    def test_gallery_complete_output_uses_safe_fence_without_shortening(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Complete output should survive prior limits and nested Markdown fences."""
+        complete_text = (
+            "BEGIN-COMPLETE\n```python\nprint('nested')\n```\n"
+            + ("evidence-line-0123456789\n" * 600)
+            + "END-COMPLETE"
+        )
+        result = replace(
+            _make_success("org/complete"),
+            generation=_MockGeneration(
+                text=complete_text,
+                prompt_tokens=32,
+                generation_tokens=500,
+                generation_tps=25.0,
+            ),
+        )
+        context = _build_report_render_context(results=[result], prompt="Describe the image.")
+        out = tmp_path / "model_gallery.md"
+
+        generate_markdown_gallery_report(
+            results=[result],
+            filename=out,
+            prompt="Describe the image.",
+            report_context=context,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        evidence = _extract_markdown_subsection(
+            content,
+            "### org/complete",
+            end_headings=("<!-- markdownlint-enable",),
+        )
+        assert "<details>" in evidence
+        assert "````text\n" in evidence
+        assert complete_text in evidence
+        assert content.count(complete_text) == 1
+
+    def test_short_generation_is_not_valid_throughput_but_keeps_raw_metrics(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """A short sample should affect throughput validity, not model usability."""
+        short = replace(
+            _make_success("org/short"),
+            generation=_MockGeneration(
+                text="A usable short response.",
+                prompt_tokens=20,
+                generation_tokens=8,
+                generation_tps=999.0,
+                peak_memory=1.0,
+            ),
+            generation_time=0.25,
+        )
+        valid = replace(
+            _make_success("org/valid"),
+            generation=_MockGeneration(
+                text="A sufficiently measured response.",
+                prompt_tokens=20,
+                generation_tokens=20,
+                generation_tps=40.0,
+                peak_memory=2.0,
+            ),
+        )
+        context = _build_report_render_context(results=[short, valid], prompt="Describe the image.")
+        context = replace(
+            context,
+            assessments=tuple(
+                (
+                    result.model_name,
+                    check_models.ResultAssessment("completed", "usable", "none", ()),
+                )
+                for result in (short, valid)
+            ),
+        )
+        out = tmp_path / "model_gallery.md"
+
+        generate_markdown_gallery_report(
+            results=[short, valid],
+            filename=out,
+            prompt="Describe the image.",
+            report_context=context,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        chooser = _extract_markdown_subsection(
+            content,
+            "## Current-run Chooser",
+            end_headings=("## Avoid for This Run",),
+        )
+        short_row = next(line for line in chooser.splitlines() if "org/short" in line)
+        assert "usable" in short_row
+        assert "insufficient sample" in short_row
+        assert "999" not in short_row
+        assert "Fastest valid generation: `org/valid` at 40.0 tok/s" in content
+        assert "Average valid generation throughput: 40.0 tok/s" in content
+        evidence = _extract_markdown_subsection(
+            content,
+            "### org/short",
+            end_headings=("### org/valid", "<!-- markdownlint-enable"),
+        )
+        assert "_Generation time:_ 0.25s" in evidence
+        assert "_Generation throughput (raw):_ 999 tok/s" in evidence
+        assert "_Generation tokens:_ 8" in evidence
+
+    def test_gallery_resource_policies_are_deterministic(self, tmp_path: Path) -> None:
+        """Avoid, memory, and speed policies should have explicit stable ordering."""
+
+        def result(
+            name: str,
+            *,
+            memory: float | None,
+            tokens: int,
+            throughput: float | None,
+        ) -> PerformanceResult:
+            return PerformanceResult(
+                model_name=name,
+                success=True,
+                generation=_MockGeneration(
+                    text=f"output for {name}",
+                    prompt_tokens=20,
+                    generation_tokens=tokens,
+                    generation_tps=throughput,
+                    peak_memory=memory,
+                ),
+            )
+
+        usable_results = [
+            result("org/zeta", memory=None, tokens=8, throughput=900.0),
+            result("org/beta", memory=2.0, tokens=20, throughput=30.0),
+            result("org/alpha", memory=2.0, tokens=20, throughput=30.0),
+            result("org/gamma", memory=1.0, tokens=20, throughput=10.0),
+        ]
+        avoided_results = [
+            _make_success("org/z-unusable"),
+            _make_success("org/a-unusable"),
+            _make_failure("org/a-not-evaluated"),
+        ]
+        results = [*usable_results, *avoided_results]
+        context = _build_report_render_context(results=results, prompt="Describe the image.")
+        assessments = {
+            result.model_name: check_models.ResultAssessment(
+                "completed",
+                "usable_with_caveats" if result.model_name == "org/beta" else "usable",
+                "none",
+                (),
+            )
+            for result in usable_results
+        }
+        assessments.update(
+            {
+                "org/z-unusable": check_models.ResultAssessment(
+                    "completed", "unusable", "observation_needs_reproduction", ("empty_output",)
+                ),
+                "org/a-unusable": check_models.ResultAssessment(
+                    "completed", "unusable", "observation_needs_reproduction", ("empty_output",)
+                ),
+                "org/a-not-evaluated": check_models.ResultAssessment(
+                    "crashed", "not_evaluated", "actionable_failure", ()
+                ),
+            }
+        )
+        context = replace(context, assessments=tuple(assessments.items()))
+        out = tmp_path / "model_gallery.md"
+
+        generate_markdown_gallery_report(
+            results=results,
+            filename=out,
+            prompt="Describe the image.",
+            report_context=context,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        avoid = _extract_markdown_subsection(
+            content,
+            "## Avoid for This Run",
+            end_headings=("## Lowest-memory Usable Models",),
+        )
+        memory = _extract_markdown_subsection(
+            content,
+            "## Lowest-memory Usable Models",
+            end_headings=("## Fastest Valid Generation",),
+        )
+        speed = _extract_markdown_subsection(
+            content,
+            "## Fastest Valid Generation",
+            end_headings=("## Complete Per-model Evidence",),
+        )
+        assert avoid.index("org/a-unusable") < avoid.index("org/z-unusable")
+        assert avoid.index("org/z-unusable") < avoid.index("org/a-not-evaluated")
+        assert memory.index("org/gamma") < memory.index("org/alpha")
+        assert memory.index("org/alpha") < memory.index("org/beta")
+        assert memory.index("org/beta") < memory.index("org/zeta")
+        assert speed.index("org/alpha") < speed.index("org/beta")
+        assert speed.index("org/beta") < speed.index("org/gamma")
+        assert speed.index("org/gamma") < speed.index("org/zeta")
+
+    def test_gallery_crash_evidence_keeps_traceback_before_captured_output(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Crash evidence should retain factual context and complete evidence priority."""
+        result = replace(
+            _make_failure("org/crashed", error_package="mlx-vlm"),
+            failure_phase="decode",
+            error_code="generation-failed",
+            error_traceback="Traceback (most recent call last):\nRuntimeError: complete trace",
+            captured_output_on_fail="complete captured stderr",
+        )
+        context = _build_report_render_context(results=[result], prompt="Describe the image.")
+        out = tmp_path / "model_gallery.md"
+
+        generate_markdown_gallery_report(
+            results=[result],
+            filename=out,
+            prompt="Describe the image.",
+            report_context=context,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        evidence = _extract_markdown_subsection(
+            content,
+            "### org/crashed",
+            end_headings=("<!-- markdownlint-enable",),
+        )
+        assert "_Failure phase:_ decode" in evidence
+        assert "_Error code:_ generation-failed" in evidence
+        assert "_Error package:_ mlx-vlm" in evidence
+        assert evidence.index("RuntimeError: complete trace") < evidence.index(
+            "complete captured stderr"
+        )
+
+    def test_gallery_uses_cached_indeterminate_execution(self, tmp_path: Path) -> None:
+        """Per-model evidence should not turn indeterminate attempts into crashes."""
+        result = _make_failure("org/indeterminate", error_package="huggingface-hub")
+        context = _build_report_render_context(results=[result], prompt="Describe the image.")
+        context = replace(
+            context,
+            assessments=(
+                (
+                    result.model_name,
+                    check_models.ResultAssessment(
+                        "indeterminate",
+                        "not_evaluated",
+                        "observation_needs_reproduction",
+                        (),
+                    ),
+                ),
+            ),
+        )
+        out = tmp_path / "model_gallery.md"
+
+        generate_markdown_gallery_report(
+            results=[result],
+            filename=out,
+            prompt="Describe the image.",
+            report_context=context,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "_Execution:_ indeterminate" in content
+        assert "_Execution:_ crashed" not in content
 
     def test_review_report_groups_owner_and_user_buckets(self, tmp_path: Path) -> None:
         """Review digest should group maintainer ownership and user-facing buckets."""
@@ -4273,11 +4625,11 @@ class TestMarkdownGalleryReport:
         assert "normal burden issue" not in guidance
         assert "controlled" in guidance
 
-    def test_gallery_includes_summary_pointer_and_per_model_review_status(
+    def test_gallery_keeps_chooser_and_per_model_factual_status(
         self,
         tmp_path: Path,
     ) -> None:
-        """Gallery should point to summaries while keeping per-model review status."""
+        """Gallery should keep cached status without legacy review projections."""
         out = tmp_path / "triage_gallery.md"
         results = [
             _make_success("org/good"),
@@ -4294,13 +4646,15 @@ class TestMarkdownGalleryReport:
         )
 
         content = out.read_text(encoding="utf-8")
-        assert "Action Snapshot" in content  # cross-reference to results.md
+        assert "## Current-run Chooser" in content
+        assert "Action Snapshot" not in content
         assert "## 🧭 Review Shortlist" not in content
         assert "## 🚨 Failures by Package (Actionable)" not in content
         assert "_Review focus:_" not in content
         assert "_Score:_" not in content
-        assert "_Error summary:_" in content
-        assert "_Next action:_" in content
+        assert "_Usability:_" in content
+        assert "_Execution:_" in content
+        assert "_Next action:_" not in content
 
 
 # ===================================================================

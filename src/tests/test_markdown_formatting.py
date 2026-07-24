@@ -163,11 +163,16 @@ class _GalleryGeneration:
 
 def _gallery_lines_for(result: check_models.PerformanceResult) -> str:
     """Return joined gallery markdown for a single result."""
-    return "\n".join(check_models._generate_model_gallery_section([result]))
+    context = check_models._build_report_render_context(
+        results=[result],
+        prompt="Describe the image.",
+        system_info={},
+    )
+    return "\n".join(check_models._generate_model_gallery_section(context))
 
 
-def test_gallery_evidence_block_does_not_duplicate_summary_metrics() -> None:
-    """Per-model evidence should leave timing and throughput in the summary table."""
+def test_gallery_evidence_block_keeps_raw_timing_metrics() -> None:
+    """Per-model evidence should retain raw timing even for short samples."""
     result = check_models.PerformanceResult(
         model_name="test/model",
         generation=_GalleryGeneration(
@@ -184,13 +189,13 @@ def test_gallery_evidence_block_does_not_duplicate_summary_metrics() -> None:
 
     md = _gallery_lines_for(result)
 
-    assert "_Timing:_" not in md
-    assert "_Throughput:_" not in md
-    assert "<summary>Complete generated output: test/model</summary>" in md
+    assert "_Generation time:_ 1.60s" in md
+    assert "_Generation throughput (raw):_ 5.51 tok/s" in md
+    assert "<summary>Complete evidence: test/model</summary>" in md
 
 
-def test_gallery_evidence_block_omits_all_duplicate_metric_segments() -> None:
-    """Missing metrics should not reintroduce a partial per-model cost block."""
+def test_gallery_evidence_block_marks_missing_metrics() -> None:
+    """Missing facts should remain explicit in the complete evidence block."""
     result = check_models.PerformanceResult(
         model_name="test/model",
         generation=_GalleryGeneration(
@@ -207,9 +212,9 @@ def test_gallery_evidence_block_omits_all_duplicate_metric_segments() -> None:
 
     md = _gallery_lines_for(result)
 
-    assert "_Timing:_" not in md
-    assert "_Throughput:_" not in md
-    assert "<summary>Complete generated output: test/model</summary>" in md
+    assert "_Model load time:_ -" in md
+    assert "_Generation throughput (raw):_ 29.7 tok/s" in md
+    assert "<summary>Complete evidence: test/model</summary>" in md
 
 
 def test_gallery_output_uses_expandable_fenced_evidence() -> None:
@@ -225,7 +230,7 @@ def test_gallery_output_uses_expandable_fenced_evidence() -> None:
 
     md = _gallery_lines_for(result)
 
-    assert "<summary>Complete generated output: test/model</summary>" in md
+    assert "<summary>Complete evidence: test/model</summary>" in md
     assert "```text\nalpha\n\nbeta\n```" in md
     assert md.count("alpha") == 1
     assert md.count("beta") == 1
@@ -244,11 +249,11 @@ def test_gallery_anchor_and_heading_are_separated_by_blank_line() -> None:
 
     md = _gallery_lines_for(result)
 
-    assert '<a id="model-test-model"></a>\n\n### ⚠️ test/model' in md
+    assert '<a id="model-test-model"></a>\n\n### test/model' in md
 
 
-def test_gallery_quality_warnings_have_blank_line_before_list() -> None:
-    """Quality warning bullets should be separated from the label for MD032 compliance."""
+def test_gallery_does_not_expand_observations_into_quality_warning_prose() -> None:
+    """Gallery should use assessment labels instead of report-local warning prose."""
     analysis = check_models.GenerationQualityAnalysis(
         is_repetitive=False,
         repeated_token=None,
@@ -287,12 +292,12 @@ def test_gallery_quality_warnings_have_blank_line_before_list() -> None:
 
     md = _gallery_lines_for(result)
 
-    assert "⚠️ _Quality Warnings:_\n\n- No overlap with supplied context indicators" in md
-    assert "\n\n\n⚠️ _Quality Warnings:_" not in md
+    assert "Quality Warnings" not in md
+    assert "<summary>Complete evidence: test/model</summary>" in md
 
 
-def test_gallery_quality_warnings_preserve_underscores_but_escape_asterisks() -> None:
-    """Quality warning bullets should keep identifiers readable while escaping emphasis."""
+def test_gallery_preserves_complete_output_instead_of_warning_projection() -> None:
+    """Quality analysis prose should not replace the complete generated string."""
     analysis = check_models.GenerationQualityAnalysis(
         is_repetitive=False,
         repeated_token=None,
@@ -331,7 +336,8 @@ def test_gallery_quality_warnings_preserve_underscores_but_escape_asterisks() ->
 
     md = _gallery_lines_for(result)
 
-    assert "- Unknown tags: <fake_token_around_image>, small \\*/ alpha\\*/ beta \\*/" in md
+    assert "Unknown tags: <fake_token_around_image>" not in md
+    assert "```text\nalpha\n```" in md
 
 
 def test_gallery_blockquote_escapes_full_multi_underscore_runs() -> None:
@@ -356,8 +362,8 @@ def test_markdown_code_block_expands_tabs_to_spaces() -> None:
     assert "left    right" in md
 
 
-def test_gallery_quality_warnings_escape_html_like_thinking_tags() -> None:
-    """Markdown gallery warnings should escape real HTML-like tags such as <think>."""
+def test_gallery_omits_report_local_html_warning_projection() -> None:
+    """HTML-like warning prose should not be synthesized by the gallery."""
     analysis = check_models.GenerationQualityAnalysis(
         is_repetitive=False,
         repeated_token=None,
@@ -396,8 +402,8 @@ def test_gallery_quality_warnings_escape_html_like_thinking_tags() -> None:
 
     md = _gallery_lines_for(result)
 
-    assert "- Unknown tags: &lt;think&gt;" in md
-    assert "- Unknown tags: <think>" not in md
+    assert "Unknown tags: &lt;think&gt;" not in md
+    assert "Unknown tags: <think>" not in md
 
 
 def test_gallery_error_block_does_not_emit_extra_blank_lines_before_separator() -> None:
@@ -511,8 +517,8 @@ def test_wrapped_blockquote_neutralizes_label_only_lines_and_lone_markers() -> N
     assert "> -" not in md
 
 
-def test_gallery_review_summary_uses_review_focus_evidence(tmp_path: Path) -> None:
-    """Gallery compact review line should use the canonical evidence-focused summary."""
+def test_gallery_uses_short_observation_labels_without_review_prose(tmp_path: Path) -> None:
+    """Gallery chooser should project cached observation codes as short labels."""
     prompt = (
         "Analyze this image for cataloguing metadata.\n"
         "Return exactly these three sections, and nothing else:\n"
@@ -545,16 +551,23 @@ def test_gallery_review_summary_uses_review_focus_evidence(tmp_path: Path) -> No
     )
 
     out = tmp_path / "gallery.md"
+    context = check_models._build_report_render_context(
+        results=[result],
+        prompt=prompt,
+        system_info={},
+    )
     check_models.generate_markdown_gallery_report(
         results=[result],
         filename=out,
         prompt=prompt,
+        report_context=context,
     )
     md = out.read_text(encoding="utf-8")
 
-    assert "_Why:_" in md
-    assert "hit token cap (60)" in md
-    assert "Keyword count violation" in md
+    assert "_Why:_" not in md
+    assert "_Next action:_" not in md
+    assert "_Observations:_ none" in md
+    assert "Keyword count violation" not in md
 
 
 def test_wrapped_blockquote_strips_trailing_nonbreaking_spaces() -> None:

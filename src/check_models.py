@@ -2700,6 +2700,10 @@ class UnsupportedReportBlockError(TypeError):
         super().__init__(f"Unsupported report block: {block_name}")
 
 
+class MissingGalleryAssessmentError(RuntimeError):
+    """Raised when gallery rendering lacks the cached current-run assessments."""
+
+
 def _render_report_section_markdown(block: ReportSection) -> list[str]:
     """Render a report section as Markdown lines."""
     rendered: list[str] = ["---", ""] if block.divider else []
@@ -2975,117 +2979,195 @@ def _append_markdown_review_block(
     _append_markdown_row_block(out, rows=rows)
 
 
-def _build_gallery_error_block_lines(res: PerformanceResult) -> list[str]:
-    """Build the failure block used by the Markdown gallery."""
-    out: list[str] = []
-    max_inline_error_length = 80
-
-    error_msg = _escape_markdown_blockquote_line(str(res.error_message))
-    review_rows = dict(_build_review_block_rows(res))
-    failure_context = "; ".join(
-        f"{label.lower()} `{value}`"
-        for label, value in (
-            ("Type", res.error_type),
-            ("Phase", res.failure_phase),
-            ("Code", res.error_code),
-            ("Package", res.error_package),
-        )
-        if value
-    )
-    rows = [
-        ("Verdict", review_rows.get("Verdict")),
-        ("Status", f"Failed ({res.error_stage})"),
-        ("Maintainer", review_rows.get("Maintainer")),
-        ("Next action", review_rows.get("Next action")),
-        (
-            "Error summary",
-            error_msg if len(error_msg) <= max_inline_error_length else "see error details below",
-        ),
-        ("Why", review_rows.get("Why")),
-        ("Failure context", failure_context),
-    ]
-    _append_markdown_row_block(out, rows=_build_report_stanza(None, rows).rows)
-
-    if len(error_msg) > max_inline_error_length:
-        wrapped_lines = textwrap.wrap(
-            error_msg,
-            width=76,
-            break_long_words=False,
-            break_on_hyphens=False,
-        )
-        out.append(_markdown_emphasis("Error details:"))
-        out.append("")
-        out.extend(f"> {line}" for line in wrapped_lines)
-
-    if traceback_text := _normalize_traceback_for_report(res.error_traceback):
-        out.append("")
-        traceback_lines: list[str] = []
-        _append_markdown_code_block(
-            traceback_lines,
-            traceback_text,
-            language="python",
-        )
-        _append_markdown_details_block(
-            out,
-            summary="Full Traceback (click to expand)",
-            body_lines=traceback_lines,
-        )
-    return out
-
-
-def _append_gallery_quality_lines(
-    out: list[str],
-    *,
-    res: PerformanceResult,
-    generation: StoredGenerationResult | None,
-) -> None:
-    """Append quality warnings or clean status after a generated-output block."""
-    if generation is None:
-        return
-
-    analysis = _quality_analysis_for_result(res)
-    if analysis and analysis.issues:
-        if not out or out[-1] != "":
-            out.append("")
-        out.append(f"⚠️ {_markdown_emphasis('Quality Warnings:')}")
-        out.append("")
-        for issue in analysis.issues:
-            escaped = DIAGNOSTICS_ESCAPER.escape(_collapse_preview_whitespace(issue))
-            sanitized = re.sub(r"(?<!\\)([*`])", r"\\\1", escaped)
-            out.append(f"- {sanitized}")
-        return
-
-    if analysis is not None and not analysis.has_any_issues():
-        if not out or out[-1] != "":
-            out.append("")
-        _append_markdown_labeled_value(
-            out,
-            label="Quality Status",
-            value="no quality issues detected in this run",
-        )
-
-
-def _build_gallery_success_block_lines(
-    res: PerformanceResult,
+def _render_gallery_model(
+    result: PerformanceResult,
+    row: GalleryRow,
+    assessment: ResultAssessment,
 ) -> list[str]:
-    """Build the success block used by the Markdown gallery."""
-    generation: StoredGenerationResult | None = res.generation
-    summary_rows = _build_review_block_rows(res)
+    """Render complete captured evidence for one model without reclassification."""
+    generation = result.generation
+    runtime = result.runtime_diagnostics
+    prompt = result.prompt_diagnostics
+    generation_tps = _generation_float_metric(generation, "generation_tps")
+    prompt_tps = _generation_float_metric(generation, "prompt_tps")
+    peak_memory = _generation_float_metric(generation, "peak_memory")
+    facts: list[tuple[str, str | None]] = [
+        ("Usability", row.usability.replace("_", " ")),
+        ("Observations", _gallery_observation_labels(row.observations)),
+        ("Execution", assessment.execution),
+        ("Failure phase", result.failure_phase),
+        ("Error stage", result.error_stage),
+        ("Error code", result.error_code),
+        ("Error type", result.error_type),
+        ("Error package", result.error_package),
+        ("Error message", result.error_message),
+        ("Root exception type", result.root_error_type),
+        ("Root exception module", result.root_error_module),
+        ("Root exception message", result.root_error_message),
+        ("Model load time", _gallery_metric("model_load_time", result.model_load_time)),
+        ("Generation time", _gallery_metric("generation_time", result.generation_time)),
+        ("Total time", _gallery_metric("total_time", result.total_time)),
+        (
+            "Input validation time",
+            _gallery_metric(
+                "input_validation_time_s",
+                runtime.input_validation_time_s if runtime is not None else None,
+            ),
+        ),
+        (
+            "Prompt preparation time",
+            _gallery_metric(
+                "prompt_prep_time_s",
+                runtime.prompt_prep_time_s if runtime is not None else None,
+            ),
+        ),
+        (
+            "First-token latency",
+            _gallery_metric(
+                "first_token_latency_s",
+                runtime.first_token_latency_s if runtime is not None else None,
+            ),
+        ),
+        (
+            "Cleanup time",
+            _gallery_metric(
+                "cleanup_time_s",
+                runtime.cleanup_time_s if runtime is not None else None,
+            ),
+        ),
+        (
+            "Prompt tokens",
+            _gallery_metric(
+                "prompt_tokens",
+                _generation_int_metric(generation, "prompt_tokens"),
+            ),
+        ),
+        (
+            "Generation tokens",
+            _gallery_metric("generation_tokens", row.generation_tokens),
+        ),
+        (
+            "Total tokens",
+            _gallery_metric(
+                "total_tokens",
+                _generation_int_metric(generation, "total_tokens"),
+            ),
+        ),
+        (
+            "Prompt throughput (raw)",
+            f"{_gallery_metric('prompt_tps', prompt_tps)} tok/s" if prompt_tps is not None else "-",
+        ),
+        (
+            "Generation throughput (raw)",
+            f"{_gallery_metric('generation_tps', generation_tps)} tok/s"
+            if generation_tps is not None
+            else "-",
+        ),
+        ("Peak memory", _gallery_metric("peak_memory", peak_memory)),
+        ("Active memory", _gallery_metric("active_memory", result.active_memory)),
+        ("Cache memory", _gallery_metric("cache_memory", result.cache_memory)),
+        (
+            "Model-load active memory",
+            _gallery_metric(
+                "model_load_active_memory_gb",
+                runtime.model_load_active_memory_gb if runtime is not None else None,
+            ),
+        ),
+        ("Stop reason", runtime.stop_reason if runtime is not None else "not captured"),
+        ("Requested maximum tokens", str(result.requested_max_tokens or "not captured")),
+        (
+            "Rendered prompt characters",
+            str(prompt.rendered_prompt_chars)
+            if prompt is not None and prompt.rendered_prompt_chars is not None
+            else "not captured",
+        ),
+        (
+            "Image placeholders",
+            str(prompt.image_placeholder_count)
+            if prompt is not None and prompt.image_placeholder_count is not None
+            else "not captured",
+        ),
+        (
+            "Processed image",
+            (
+                f"{prompt.processed_image_width} x {prompt.processed_image_height} px"
+                if prompt is not None
+                and prompt.processed_image_width is not None
+                and prompt.processed_image_height is not None
+                else "not captured"
+            ),
+        ),
+        (
+            "Image patch count",
+            str(prompt.image_patch_count)
+            if prompt is not None and prompt.image_patch_count is not None
+            else "not captured",
+        ),
+        (
+            "Processor",
+            prompt.processor_class if prompt is not None else "not captured",
+        ),
+        (
+            "Tokenizer",
+            prompt.tokenizer_class if prompt is not None else "not captured",
+        ),
+        ("Model revision", "not captured by this result"),
+        (
+            "Generation settings",
+            json.dumps(prompt.generate_kwargs, sort_keys=True)
+            if prompt is not None and prompt.generate_kwargs
+            else "not captured",
+        ),
+        (
+            "EOS token",
+            str(prompt.eos_token)
+            if prompt is not None and prompt.eos_token is not None
+            else "not captured",
+        ),
+    ]
+    escaped_facts = [
+        (MARKDOWN_ESCAPER.escape(label), MARKDOWN_ESCAPER.escape(value))
+        for label, value in facts
+        if value is not None
+    ]
 
-    out: list[str] = []
-    _append_markdown_row_block(out, rows=summary_rows)
+    out = [
+        f'<a id="{_gallery_model_anchor(result.model_name)}"></a>',
+        "",
+        f"### {result.model_name}",
+        "",
+        "<details>",
+        f"<summary>Complete evidence: {html.escape(result.model_name)}</summary>",
+        "",
+    ]
+    _append_markdown_row_block(out, rows=escaped_facts)
 
-    text = _generation_text_value(generation)
-    output_lines: list[str] = []
-    _append_markdown_code_block(output_lines, text)
-    _append_markdown_details_block(
-        out,
-        summary=f"Complete generated output: {res.model_name}",
-        body_lines=output_lines,
-    )
+    if result.success:
+        output = _generation_text_value(generation)
+        out.extend([_markdown_emphasis("Complete generated output:"), ""])
+        if not output:
+            out.extend(["empty output", ""])
+        _append_markdown_code_block(out, output)
+    else:
+        out.extend([_markdown_emphasis("Complete traceback:"), ""])
+        if result.error_traceback:
+            _append_markdown_code_block(out, result.error_traceback, language="python")
+        else:
+            out.extend(["traceback not captured", ""])
 
-    _append_gallery_quality_lines(out, res=res, generation=generation)
+        partial_output = _generation_text_value(generation)
+        if partial_output:
+            out.extend([_markdown_emphasis("Partial generated output:"), ""])
+            _append_markdown_code_block(out, partial_output)
+        if result.captured_output_on_fail:
+            out.extend([_markdown_emphasis("Captured upstream output:"), ""])
+            _append_markdown_code_block(out, result.captured_output_on_fail)
+        if not partial_output and not result.captured_output_on_fail:
+            out.extend(["No partial or captured output.", ""])
 
+    while out and out[-1] == "":
+        out.pop()
+    out.extend(["", "</details>", ""])
     return out
 
 
@@ -3569,6 +3651,7 @@ ERROR_MESSAGE_TRUNCATE_LEN: Final[int] = 120  # Max chars for error messages in 
 MAX_QUALITY_ISSUES_LEN: Final[int] = 30  # Max chars for quality issues in Markdown tables
 MAX_OUTPUT_LINES: Final[int] = 3  # Max lines to show in summary table cells
 MAX_OUTPUT_PREVIEW_CHARS: Final[int] = 280  # Max chars for output previews in summary tables
+MIN_THROUGHPUT_SAMPLE_TOKENS: Final[int] = 16
 MAX_TSV_CELL_CHARS: Final[int] = 300  # Hard cap for any single TSV cell value
 OUTPUT_PREVIEW_CUE_LIMIT: Final[int] = 3  # Max issue cues shown before compact output text
 OUTPUT_PREVIEW_MIN_HEAD_CHARS: Final[int] = 96  # Minimum chars reserved for preview head
@@ -12715,59 +12798,6 @@ def _build_markdown_recommended_models(
     return parts
 
 
-def _build_markdown_gallery_navigation(report_context: ReportRenderContext) -> list[str]:
-    """Build evidence-oriented quick navigation for the standalone gallery artifact."""
-    successful_models = [result.model_name for result in report_context.result_set.successful]
-    flagged_models = [
-        result.model_name
-        for result in report_context.result_set.results
-        if result.quality_issues or not result.success
-    ]
-    failed_models = [result.model_name for result in report_context.result_set.failed]
-    if not successful_models and not flagged_models and not failed_models:
-        return []
-
-    parts: list[str] = []
-    _append_markdown_section(parts, title="## Quick Navigation")
-    if successful_models:
-        _append_markdown_labeled_value(
-            parts,
-            label="Successful outputs",
-            value=_preview_model_references(
-                successful_models,
-                gallery_link_target="",
-                max_items=8,
-            ),
-            bullet=True,
-        )
-    if flagged_models:
-        flagged_preview = _preview_model_references(
-            flagged_models,
-            gallery_link_target="",
-            max_items=8,
-        )
-        _append_markdown_labeled_value(
-            parts,
-            label="Flagged outputs",
-            value=flagged_preview,
-            bullet=True,
-        )
-    if failed_models:
-        failed_preview = _preview_model_references(
-            failed_models,
-            gallery_link_target="",
-            max_items=8,
-        )
-        _append_markdown_labeled_value(
-            parts,
-            label="Failed outputs",
-            value=failed_preview,
-            bullet=True,
-        )
-    parts.append("")
-    return parts
-
-
 GALLERY_STAMP_LIBRARY_NAMES: Final[tuple[str, ...]] = (
     "mlx-vlm",
     "mlx",
@@ -12788,7 +12818,6 @@ GALLERY_STAMP_SYSTEM_KEYS: Final[tuple[str, ...]] = (
     "Recommended Working Set",
     "Fused Attention",
 )
-GALLERY_FAILURE_DIAGNOSTIC_PREVIEW_CHARS: Final[int] = 220
 
 
 def _markdown_inline_code(value: str) -> str:
@@ -12834,152 +12863,220 @@ def _gallery_summary_model_link(model_name: str) -> str:
     return f"[`{escaped_name}`](#{_gallery_model_anchor(model_name)})"
 
 
-def _gallery_summary_status(result: PerformanceResult) -> str:
-    """Return a compact user-facing status for the gallery summary table."""
-    review = _review_for_result(result)
-    if review is None:
-        status = "recommended" if result.success else "avoid"
-        verdict = "not evaluated" if result.success else "runtime failure"
+def _valid_generation_tps(result: PerformanceResult) -> float | None:
+    """Return mechanically valid throughput for a sufficiently large sample."""
+    tokens = _generation_int_metric(result.generation, "generation_tokens")
+    rate = _generation_float_metric(result.generation, "generation_tps")
+    if tokens is None or tokens < MIN_THROUGHPUT_SAMPLE_TOKENS:
+        return None
+    return rate if rate is not None and rate >= 0 else None
+
+
+def _gallery_row(result: PerformanceResult, assessment: ResultAssessment) -> GalleryRow:
+    """Build one chooser row from cached assessment and captured facts only."""
+    generation = result.generation
+    output = _generation_text_value(generation)
+    if assessment.execution == "completed":
+        preview_source = output or "empty output"
     else:
-        status = _review_display_bucket_label(
-            review["user_bucket"],
-            review=review,
-        ).replace("_", " ")
-        verdict = review["verdict"].replace("_", " ")
-    return f"{_markdown_inline_code(status)} / {_markdown_inline_code(verdict)}"
-
-
-def _gallery_summary_signal(result: PerformanceResult) -> str:
-    """Return the highest-level quality or diagnostic cue for one table row."""
-    cues = _build_result_output_cues(result)
-    if cues:
-        signal = "; ".join(cues)
-    else:
-        signal = "no flagged signals"
-        analysis = _quality_analysis_for_result(result)
-        if result.success:
-            if analysis is None:
-                signal = "quality not evaluated"
-            elif not analysis.prompt_checks_ran:
-                signal = "prompt checks unavailable"
-            elif not analysis.has_any_issues():
-                signal = "clean"
-
-        if signal == "no flagged signals":
-            review = _review_for_result(result)
-            if review is not None:
-                focus = _review_focus_text(review, analysis)
-                if focus != "no flagged signals":
-                    signal = _markdown_review_text(focus)
-
-        if signal == "no flagged signals":
-            signal = result.error_stage or result.error_package or signal
-    return signal
-
-
-def _gallery_success_output(result: PerformanceResult) -> str:
-    """Return a concise successful-output preview for a Markdown table cell."""
-    output = _generation_text_value(result.generation)
-    if not output:
-        return ""
-    return _truncate_text_preview(
-        _collapse_preview_whitespace(output),
+        preview_source = (
+            result.error_message
+            or result.error_traceback
+            or output
+            or result.captured_output_on_fail
+            or "no failure evidence captured"
+        )
+    output_preview = _truncate_text_preview(
+        _collapse_preview_whitespace(preview_source),
         max_chars=MAX_OUTPUT_PREVIEW_CHARS,
     )
-
-
-def _gallery_output_cost_metric(field_name: str, value: MetricValue) -> str:
-    """Return one compact table metric, using a dash when the value was not captured."""
-    formatted = format_field_value(field_name, value)
-    return formatted or "-"
-
-
-def _gallery_output_cost_preview(result: PerformanceResult) -> str:
-    """Return a compact model-output preview or failure diagnostic."""
-    if result.success:
-        return _gallery_success_output(result) or "No generated text captured."
-
-    preview = _build_result_output_preview(
-        result,
-        max_chars=GALLERY_FAILURE_DIAGNOSTIC_PREVIEW_CHARS,
+    peak_memory = _generation_float_metric(generation, "peak_memory")
+    return GalleryRow(
+        model=result.model_name,
+        usability=assessment.usability,
+        observations=assessment.observations,
+        generation_tps=_valid_generation_tps(result),
+        peak_memory_gb=(peak_memory if peak_memory is not None and peak_memory >= 0 else None),
+        generation_tokens=_generation_int_metric(generation, "generation_tokens"),
+        output_preview=output_preview,
     )
-    if preview:
-        return _collapse_preview_whitespace(preview)
-    return "No failure diagnostics captured."
 
 
-def _gallery_output_cost_signal_cell(result: PerformanceResult) -> str:
-    """Return the escaped quality or diagnostic signal for the compact table."""
-    return MARKDOWN_ESCAPER.escape(_gallery_summary_signal(result))
+def _gallery_observation_labels(observations: Sequence[ObservationCode]) -> str:
+    """Render stable observation codes as compact mechanical labels."""
+    return ", ".join(code.replace("_", " ") for code in observations) or "none"
 
 
-def _build_gallery_output_cost_summary_section(
-    report_context: ReportRenderContext,
+def _gallery_metric(field_name: str, value: MetricValue) -> str:
+    """Format one captured metric, using a dash when unavailable."""
+    return format_field_value(field_name, value) or "-"
+
+
+def _gallery_throughput_cell(row: GalleryRow) -> str:
+    """Render valid throughput or the explicit short-sample label."""
+    if row.generation_tps is not None:
+        return f"{_gallery_metric('generation_tps', row.generation_tps)} tok/s"
+    if row.generation_tokens is not None and row.generation_tokens < MIN_THROUGHPUT_SAMPLE_TOKENS:
+        return "insufficient sample"
+    return "-"
+
+
+def _render_gallery_table(
+    *,
+    headers: tuple[str, ...],
+    rows: Sequence[tuple[str, ...]],
 ) -> list[str]:
-    """Build the all-model output, runtime, memory, and quality summary table."""
-    rows: list[tuple[str, str, str, str, str, str, str, str]] = []
-    for view in report_context.recommendations:
-        result = view.result
-        generation = result.generation
-        rows.append(
-            (
-                _gallery_summary_model_link(result.model_name),
-                _gallery_summary_status(result),
-                MARKDOWN_ESCAPER.escape(_gallery_output_cost_preview(result)),
-                _gallery_output_cost_metric(
-                    "generation_tokens",
-                    _generation_int_metric(generation, "generation_tokens"),
-                ),
-                _gallery_output_cost_metric("total_time", view.total_time_s),
-                _gallery_output_cost_metric(
-                    "generation_tps",
-                    view.generation_tps,
-                ),
-                _gallery_output_cost_metric(
-                    "peak_memory",
-                    view.peak_memory_gb,
-                )
-                if report_context.recommended_working_set_bytes is None
-                else _format_peak_memory_context(
-                    view.peak_memory_gb,
-                    report_context.recommended_working_set_bytes,
-                ),
-                _gallery_output_cost_signal_cell(result),
-            ),
-        )
-    if not rows:
-        return []
-
+    """Render one compact gallery table with the established lint guard."""
     table_lines = render_report_markdown(
-        (
-            ReportTable(
-                headers=(
-                    "Model",
-                    "Result",
-                    "Output preview / diagnostic",
-                    "Gen tok",
-                    "Total",
-                    "Gen TPS",
-                    "Peak GB",
-                    "Quality signal",
-                ),
-                rows=tuple(rows),
-                markdown_escaped=True,
-            ),
-        )
+        (ReportTable(headers=headers, rows=tuple(rows), markdown_escaped=True),)
     )
-    return [
-        "## Model Output and Cost Summary",
+    return _guard_markdownlint_block(
+        table_lines,
+        rules=MARKDOWNLINT_GALLERY_SUMMARY_RULES,
+    )
+
+
+def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
+    """Render the skim-first chooser, avoid list, and explicit resource policies."""
+    usability_order: Mapping[ModelUsability, int] = {
+        "unusable": 0,
+        "not_evaluated": 1,
+        "usable": 2,
+        "usable_with_caveats": 2,
+    }
+    ordered = sorted(rows, key=lambda row: (usability_order[row.usability], row.model))
+    chooser_rows = [
+        (
+            _gallery_summary_model_link(row.model),
+            _markdown_inline_code(row.usability.replace("_", " ")),
+            _gallery_throughput_cell(row),
+            _gallery_metric("peak_memory", row.peak_memory_gb),
+            _gallery_metric("generation_tokens", row.generation_tokens),
+            MARKDOWN_ESCAPER.escape(_gallery_observation_labels(row.observations)),
+            MARKDOWN_ESCAPER.escape(row.output_preview),
+        )
+        for row in ordered
+    ]
+    parts = [
+        "## Current-run Chooser",
         "",
         (
-            "Every model in this run, with a concise output preview or failure diagnostic "
-            "beside runtime, memory, and quality signals. Complete output appears once in "
-            "the expandable per-model evidence below."
+            "Current-run usability and captured resource facts only. Throughput requires "
+            f"at least {MIN_THROUGHPUT_SAMPLE_TOKENS} generated tokens."
         ),
         "",
-        *_guard_markdownlint_block(table_lines, rules=MARKDOWNLINT_GALLERY_SUMMARY_RULES),
+        *_render_gallery_table(
+            headers=(
+                "Model",
+                "Usability",
+                "Gen TPS",
+                "Peak GB",
+                "Gen tok",
+                "Observations",
+                "Output preview",
+            ),
+            rows=chooser_rows,
+        ),
+        "",
+        "## Avoid for This Run",
         "",
     ]
+
+    avoided = [row for row in ordered if row.usability in {"unusable", "not_evaluated"}]
+    if avoided:
+        parts.extend(
+            _render_gallery_table(
+                headers=("Model", "Usability", "Observations", "Output preview"),
+                rows=[
+                    (
+                        _gallery_summary_model_link(row.model),
+                        _markdown_inline_code(row.usability.replace("_", " ")),
+                        MARKDOWN_ESCAPER.escape(_gallery_observation_labels(row.observations)),
+                        MARKDOWN_ESCAPER.escape(row.output_preview),
+                    )
+                    for row in avoided
+                ],
+            )
+        )
+    else:
+        parts.append("No unusable or not-evaluated models in this run.")
+    parts.extend(["", "## Lowest-memory Usable Models", ""])
+
+    usable = [row for row in rows if row.usability in {"usable", "usable_with_caveats"}]
+    by_memory = sorted(
+        usable,
+        key=lambda row: (
+            row.peak_memory_gb is None,
+            row.peak_memory_gb if row.peak_memory_gb is not None else 0.0,
+            row.model,
+        ),
+    )
+    if by_memory:
+        parts.extend(
+            _render_gallery_table(
+                headers=("Model", "Usability", "Peak GB", "Gen tok"),
+                rows=[
+                    (
+                        _gallery_summary_model_link(row.model),
+                        _markdown_inline_code(row.usability.replace("_", " ")),
+                        _gallery_metric("peak_memory", row.peak_memory_gb),
+                        _gallery_metric("generation_tokens", row.generation_tokens),
+                    )
+                    for row in by_memory
+                ],
+            )
+        )
+    else:
+        parts.append("No usable models in this run.")
+    parts.extend(["", "## Fastest Valid Generation", ""])
+
+    by_speed = sorted(
+        usable,
+        key=lambda row: (
+            row.generation_tps is None,
+            -(row.generation_tps if row.generation_tps is not None else 0.0),
+            row.model,
+        ),
+    )
+    valid_rows = [row for row in by_speed if row.generation_tps is not None]
+    if valid_rows:
+        fastest = valid_rows[0]
+        average = sum(cast("float", row.generation_tps) for row in valid_rows) / len(valid_rows)
+        parts.extend(
+            [
+                (
+                    f"Fastest valid generation: `{fastest.model}` at "
+                    f"{_gallery_metric('generation_tps', fastest.generation_tps)} tok/s"
+                ),
+                "",
+                (
+                    "Average valid generation throughput: "
+                    f"{_gallery_metric('generation_tps', average)} tok/s"
+                ),
+                "",
+            ]
+        )
+    else:
+        parts.extend(["No valid throughput samples in this run.", ""])
+    if by_speed:
+        parts.extend(
+            _render_gallery_table(
+                headers=("Model", "Usability", "Gen TPS", "Gen tok"),
+                rows=[
+                    (
+                        _gallery_summary_model_link(row.model),
+                        _markdown_inline_code(row.usability.replace("_", " ")),
+                        _gallery_throughput_cell(row),
+                        _gallery_metric("generation_tokens", row.generation_tokens),
+                    )
+                    for row in by_speed
+                ],
+            )
+        )
+    else:
+        parts.append("No usable models in this run.")
+    parts.append("")
+    return parts
 
 
 # =============================================================================
@@ -13154,6 +13251,19 @@ class ResultAssessment:
     usability: ModelUsability
     maintainer_status: MaintainerStatus
     observations: tuple[ObservationCode, ...]
+
+
+@dataclass(frozen=True)
+class GalleryRow:
+    """One facts-only chooser row derived from cached assessment and run metrics."""
+
+    model: str
+    usability: ModelUsability
+    observations: tuple[ObservationCode, ...]
+    generation_tps: float | None
+    peak_memory_gb: float | None
+    generation_tokens: int | None
+    output_preview: str
 
 
 _UNUSABLE_OBSERVATIONS: Final[frozenset[ObservationCode]] = frozenset(
@@ -17917,42 +18027,45 @@ def _filter_table_columns(
         rows[row_index] = [row[index] for index in keep_indexes if index < len(row)]
 
 
-def _generate_model_gallery_section(
-    report_context: ReportRenderContext | list[PerformanceResult],
-) -> list[str]:
-    """Generate the Model Gallery section for the Markdown report."""
-    md: list[str] = []
-    md.append("## Model Gallery")
-    md.append("")
-    md.append("Full generated output by model:")
-    md.append("")
-    md.append("<!-- markdownlint-disable MD033 MD034 -->")
-    md.append("")
-
-    sorted_results = (
-        report_context.result_set.results
-        if isinstance(report_context, ReportRenderContext)
-        else ResultSet(report_context).results
+def _generate_model_gallery_section(report_context: ReportRenderContext) -> list[str]:
+    """Render complete evidence in stable avoid-first, then usable order."""
+    assessments = _assessments_by_model(report_context)
+    results = report_context.result_set.results
+    rows_by_model = {
+        result.model_name: _gallery_row(result, assessments[result.model_name])
+        for result in results
+    }
+    usability_order: Mapping[ModelUsability, int] = {
+        "unusable": 0,
+        "not_evaluated": 1,
+        "usable": 2,
+        "usable_with_caveats": 2,
+    }
+    ordered_results = sorted(
+        results,
+        key=lambda result: (
+            usability_order[rows_by_model[result.model_name].usability],
+            result.model_name,
+        ),
     )
-    for res in sorted_results:
-        icon = _recommendation_icon(_recommendation_status_for_result(res))
-        md.append(f'<a id="{_gallery_model_anchor(res.model_name)}"></a>')
-        md.append("")
-        md.append(f"### {icon} {res.model_name}")
-        md.append("")
-        if not res.success:
-            block_lines = _build_gallery_error_block_lines(res)
-        else:
-            block_lines = _build_gallery_success_block_lines(res)
-        while block_lines and block_lines[-1] == "":
-            block_lines.pop()
-        md.extend(block_lines)
-        md.append("")
-        md.append("---")
-        md.append("")
-
-    md.append("<!-- markdownlint-enable MD033 MD034 -->")
-    md.append("")
+    md = [
+        "## Complete Per-model Evidence",
+        "",
+        "Complete generated or crash evidence for every attempted model.",
+        "",
+        "<!-- markdownlint-disable MD033 MD034 -->",
+        "",
+    ]
+    for result in ordered_results:
+        md.extend(
+            _render_gallery_model(
+                result,
+                rows_by_model[result.model_name],
+                assessments[result.model_name],
+            )
+        )
+        md.extend(["---", ""])
+    md.extend(["<!-- markdownlint-enable MD033 MD034 -->", ""])
     return md
 
 
@@ -18240,13 +18353,19 @@ def generate_markdown_gallery_report(
     report_context: ReportRenderContext | None = None,
     versions: LibraryVersionDict | None = None,
 ) -> None:
-    """Write a review-focused markdown artifact with metadata, prompt, summaries, and outputs."""
+    """Write the facts-only current-run chooser and complete model evidence."""
     if not results:
         log_warning_note("No results to generate Markdown gallery report.")
         return
 
     if report_context is None:
-        report_context = _build_report_render_context(results=results, prompt=prompt)
+        raise MissingGalleryAssessmentError
+
+    assessments = _assessments_by_model(report_context)
+    gallery_rows = [
+        _gallery_row(result, assessments[result.model_name])
+        for result in report_context.result_set.results
+    ]
 
     md: list[str] = []
     md.append("# Model Output Gallery")
@@ -18256,16 +18375,11 @@ def generate_markdown_gallery_report(
     md.extend(
         _wrap_markdown_text(
             "Complete per-model evidence artifact with image metadata, the source prompt, "
-            "summary tables, diagnostics, and full generated output for every attempted model.",
+            "a facts-only chooser, and full generated or crash output for every attempted model.",
         ),
     )
     md.append("")
-    results_target = _markdown_artifact_target(
-        report_filename=filename,
-        artifact_filename=filename.with_name("results.md"),
-    )
-    md.append(f"_Action Snapshot: see [results.md]({results_target}) for the full summary._")
-    md.append("")
+    md.extend(_render_gallery_chooser(gallery_rows))
     md.extend(
         _build_gallery_stamps_section(
             versions=versions,
@@ -18275,8 +18389,6 @@ def generate_markdown_gallery_report(
     _append_markdown_image_metadata_section(md, metadata)
     md.append("## Prompt")
     _append_markdown_wrapped_blockquote(md, prompt)
-    md.extend(_build_gallery_output_cost_summary_section(report_context))
-    md.extend(_build_markdown_gallery_navigation(report_context))
     md.extend(_generate_model_gallery_section(report_context))
 
     _write_markdown_artifact(filename, md, artifact_name="Markdown gallery report")
@@ -19555,6 +19667,32 @@ def _capability_score_from_parts(
     return round(max(0.0, min(100.0, score)), 1)
 
 
+def _capability_summary_signal(result: PerformanceResult) -> str:
+    """Return the legacy capability-scorecard signal outside gallery rendering."""
+    cues = _build_result_output_cues(result)
+    if cues:
+        return "; ".join(cues)
+
+    signal = "no flagged signals"
+    analysis = _quality_analysis_for_result(result)
+    if result.success:
+        if analysis is None:
+            signal = "quality not evaluated"
+        elif not analysis.prompt_checks_ran:
+            signal = "prompt checks unavailable"
+        elif not analysis.has_any_issues():
+            signal = "clean"
+    if signal == "no flagged signals":
+        review = _review_for_result(result)
+        if review is not None:
+            focus = _review_focus_text(review, analysis)
+            if focus != "no flagged signals":
+                signal = _markdown_review_text(focus)
+    if signal == "no flagged signals":
+        signal = result.error_stage or result.error_package or signal
+    return signal
+
+
 def _capability_signal_from_result(
     view: ModelRecommendationView,
     *,
@@ -19590,6 +19728,7 @@ def _capability_signal_from_result(
         cataloging_score=cataloging_score,
         metadata_alignment_score=metadata_score,
     )
+    summary_signal = _capability_summary_signal(result)
     return ModelCapabilityRunSignal(
         model=result.model_name,
         success=result.success,
@@ -19608,9 +19747,7 @@ def _capability_signal_from_result(
         generation_tps=view.generation_tps,
         peak_memory_gb=view.peak_memory_gb,
         signal=(
-            _gallery_summary_signal(result)
-            if view.eligible
-            else f"{view.eligibility_reason}; {_gallery_summary_signal(result)}"
+            summary_signal if view.eligible else f"{view.eligibility_reason}; {summary_signal}"
         ),
     )
 

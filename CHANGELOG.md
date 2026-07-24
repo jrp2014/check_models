@@ -7,6 +7,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Rebuild the Markdown model gallery around the cached current-run assessment,
+  deterministic avoid/memory/speed chooser policies, mechanically valid
+  throughput samples, and complete expandable generated or crash evidence.
 - Establish the minimal immutable current-run result-assessment contract with
   ordered factual observations while legacy report projections remain available
   during the staged migration.
