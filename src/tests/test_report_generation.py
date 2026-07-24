@@ -194,6 +194,16 @@ def _extract_markdown_subsection(
     return content[start:end]
 
 
+def _extract_markdown_model_section(content: str, model_name: str) -> str:
+    """Return one model's heading-scoped section without crossing into another model."""
+    match = re.search(
+        rf"(?ms)^### {re.escape(model_name)}\n.*?(?=^### |^## |\Z)",
+        content,
+    )
+    assert match is not None, f"Missing Markdown section for {model_name}"
+    return match.group(0)
+
+
 _GENERATED_STAMP_EMPHASIS_HEADING_RE = re.compile(
     r"(?m)^_(?:Generated on|Report generated on).+_$",
 )
@@ -689,9 +699,17 @@ def test_report_context_builds_machine_and_failure_facts_once_for_serializers(
                 system_info={},
                 report_context=context,
                 output_paths=output_paths,
+                run_args=Namespace(
+                    revision="cached-revision",
+                    max_tokens=17,
+                    temperature=0.17,
+                ),
             )
         )
 
+        html_report = html.unescape(output_paths.html.read_text(encoding="utf-8"))
+        assert "<td>Requested model revision</td>\n<td>cached-revision</td>" in html_report
+        assert "--max-tokens 17" in html_report
         assert review_builder.call_count == initial_review_calls
         assert triage_builder.call_count == initial_triage_calls
         assert facts_builder.call_count == initial_facts_calls
@@ -2639,11 +2657,7 @@ class TestHtmlReportEdgeCases:
             assert serialized["execution"] == assessment.execution
             assert serialized["usability"] == assessment.usability
             assert serialized["maintainer_status"] == assessment.maintainer_status
-            gallery_entry = _extract_markdown_subsection(
-                gallery,
-                f"### {model}",
-                end_headings=("### org/", "<!-- markdownlint-enable"),
-            )
+            gallery_entry = _extract_markdown_model_section(gallery, model)
             assert f"_Execution:_ {assessment.execution}" in gallery_entry
             assert f"_Usability:_ {assessment.usability}" in gallery_entry
             assert f"_Maintainer status:_ {assessment.maintainer_status}" in gallery_entry
@@ -2656,10 +2670,97 @@ class TestHtmlReportEdgeCases:
             )
             assert re.search(row_pattern, html_report) is not None
             if assessment.maintainer_status != "none" or assessment.execution == "indeterminate":
-                assert model in diagnostics
-                assert f"_Execution:_ {assessment.execution}" in diagnostics
-                assert f"_Usability:_ {assessment.usability}" in diagnostics
-                assert f"_Maintainer status:_ {assessment.maintainer_status}" in diagnostics
+                diagnostics_entry = _extract_markdown_model_section(diagnostics, model)
+                assert f"_Execution:_ {assessment.execution}" in diagnostics_entry
+                assert f"_Usability:_ {assessment.usability}" in diagnostics_entry
+                assert f"_Maintainer status:_ {assessment.maintainer_status}" in diagnostics_entry
+
+    def test_standalone_html_does_not_build_legacy_semantic_context(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Standalone HTML should build only its canonical gallery/diagnostic context."""
+        result = _make_success("org/standalone")
+        out = tmp_path / "standalone.html"
+
+        with (
+            patch.object(check_models, "_build_report_render_context", side_effect=AssertionError),
+            patch.object(check_models, "_build_canonical_assessment", side_effect=AssertionError),
+            patch.object(
+                check_models,
+                "_build_model_recommendation_views",
+                side_effect=AssertionError,
+            ),
+            patch.object(check_models, "analyze_model_issues", side_effect=AssertionError),
+            patch.object(
+                check_models,
+                "compute_performance_statistics",
+                side_effect=AssertionError,
+            ),
+            patch.object(
+                check_models,
+                "_build_report_triage_context",
+                side_effect=AssertionError,
+            ),
+            patch.object(check_models, "_machine_artifact_facts", side_effect=AssertionError),
+        ):
+            generate_html_report(
+                [result],
+                out,
+                _stub_versions(),
+                "Describe.",
+                1.0,
+            )
+
+        content = out.read_text(encoding="utf-8")
+        assert 'data-execution="completed"' in content
+        assert 'data-usability="usable"' in content
+        assert 'data-maintainer-status="none"' in content
+
+    def test_html_diagnostics_preserve_nondefault_run_arguments(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """HTML maintainer facts and repros should retain the actual run configuration."""
+        result = _make_failure_with_details("org/repro", error_msg="decode failed")
+        context = _build_report_render_context(results=[result], prompt="Describe the image.")
+        output = tmp_path / "results.html"
+        image_path = tmp_path / "sample image.jpg"
+        run_args = Namespace(
+            adapter_path=tmp_path / "adapter",
+            revision="refs/pr/42",
+            trust_remote_code=False,
+            enable_thinking=True,
+            thinking_budget=19,
+            thinking_start_token=THINKING_START_TOKEN,
+            thinking_end_token=CUSTOM_THINKING_END_TOKEN,
+            max_tokens=321,
+            temperature=0.42,
+            processor_kwargs={"cropping": False},
+        )
+
+        generate_html_report(
+            [result],
+            output,
+            _stub_versions(),
+            "Describe the image.",
+            1.0,
+            image_path=image_path,
+            report_context=context,
+            run_args=run_args,
+        )
+
+        content = html.unescape(output.read_text(encoding="utf-8"))
+        assert "<td>Requested model revision</td>\n<td>refs/pr/42</td>" in content
+        assert "--revision refs/pr/42" in content
+        assert "--max-tokens 321" in content
+        assert "--temperature 0.42" in content
+        assert "--adapter-path adapter" in content
+        assert "LOAD_KWARGS = {'trust_remote_code': False" in content
+        assert "'revision': 'refs/pr/42'" in content
+        assert "TEMPLATE_KWARGS = {'enable_thinking': True" in content
+        assert "'thinking_budget': 19" in content
+        assert "'cropping': False" in content
 
     def test_html_preserves_complete_escaped_output_in_expandable_evidence(
         self,

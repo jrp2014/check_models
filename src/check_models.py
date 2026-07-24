@@ -1715,6 +1715,7 @@ class ReportGenerationInputs:
     system_info: dict[str, str]
     report_context: ReportRenderContext
     output_paths: ReportOutputPaths
+    run_args: argparse.Namespace | None = None
     model_revision: str | None = None
     trust_remote_code: bool = True
     history_records: Sequence[HistoryRunRecord] = ()
@@ -13552,6 +13553,41 @@ class ReportRenderContext:
     maintainer_triage: tuple[tuple[str, JsonlMaintainerTriageRecord | None], ...] = ()
 
 
+@dataclass(frozen=True)
+class CanonicalHtmlReportContext:
+    """Minimal cached facts required by the standalone HTML report."""
+
+    result_set: ResultSet
+    system_info: dict[str, str]
+    assessments: tuple[tuple[str, ResultAssessment], ...]
+
+
+type HtmlReportContext = ReportRenderContext | CanonicalHtmlReportContext
+
+
+def _build_html_report_context(
+    *,
+    results: Sequence[PerformanceResult],
+    prompt: str,
+    system_info: dict[str, str] | None = None,
+) -> CanonicalHtmlReportContext:
+    """Build only the canonical gallery and diagnostics facts consumed by HTML."""
+    analyzed_results = [
+        _populate_result_quality_analysis(
+            result,
+            prompt=prompt,
+        )
+        for result in results
+    ]
+    return CanonicalHtmlReportContext(
+        result_set=ResultSet(analyzed_results),
+        system_info=system_info if system_info is not None else get_system_characteristics(),
+        assessments=tuple(
+            (result.model_name, _assess_result(result)) for result in analyzed_results
+        ),
+    )
+
+
 def _append_markdown_code_block(
     parts: list[str],
     content: str,
@@ -14339,7 +14375,7 @@ def _sanitize_issue_filename_component(model_name: str) -> str:
 
 
 def _partition_diagnostics(
-    context: ReportRenderContext,
+    context: HtmlReportContext,
 ) -> tuple[
     tuple[PerformanceResult, ...],
     tuple[PerformanceResult, ...],
@@ -14835,7 +14871,7 @@ def _html_embedded_image(image_path: Path | None) -> str:
         return ""
 
 
-def _html_gallery_chooser(report_context: ReportRenderContext) -> str:
+def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
     """Render the same facts-only chooser and resource policies as Markdown."""
     assessments = _assessments_by_model(report_context)
     rows = [
@@ -15048,7 +15084,7 @@ def _html_gallery_model(
     return "\n".join(parts)
 
 
-def _html_complete_gallery(report_context: ReportRenderContext) -> str:
+def _html_complete_gallery(report_context: HtmlReportContext) -> str:
     """Render complete evidence in the same stable order as the Markdown gallery."""
     assessments = _assessments_by_model(report_context)
     rows_by_model = {
@@ -15091,6 +15127,7 @@ def _html_diagnostics_entry(
     *,
     prompt: str,
     image_path: Path | None,
+    run_args: argparse.Namespace | None,
 ) -> str:
     """Render one maintainer entry from shared factual diagnostic helpers."""
     parts = [
@@ -15114,7 +15151,7 @@ def _html_diagnostics_entry(
             _html_table(
                 caption=f"Maintainer facts for {result.model_name}",
                 headers=("Fact", "Value"),
-                rows=_diagnostics_result_facts(result, assessment, run_args=None),
+                rows=_diagnostics_result_facts(result, assessment, run_args=run_args),
             ),
         )
     )
@@ -15138,7 +15175,7 @@ def _html_diagnostics_entry(
                     result,
                     prompt=prompt,
                     image_path=image_path,
-                    run_args=None,
+                    run_args=run_args,
                 ),
                 language="bash",
             ),
@@ -15147,8 +15184,8 @@ def _html_diagnostics_entry(
                 _build_native_mlx_vlm_python_script(
                     model_name=result.model_name,
                     prompt=prompt,
-                    image_ref=_issue_repro_image_ref(image_path=image_path, run_args=None),
-                    run_args=None,
+                    image_ref=_issue_repro_image_ref(image_path=image_path, run_args=run_args),
+                    run_args=run_args,
                 ),
                 language="python",
             ),
@@ -15165,6 +15202,7 @@ def _html_diagnostics_partition(
     assessments: Mapping[str, ResultAssessment],
     prompt: str,
     image_path: Path | None,
+    run_args: argparse.Namespace | None,
 ) -> str:
     """Render one direct partition of maintainer evidence."""
     parts = [f"<h3>{html.escape(title, quote=True)}</h3>"]
@@ -15175,6 +15213,7 @@ def _html_diagnostics_partition(
                 assessments[result.model_name],
                 prompt=prompt,
                 image_path=image_path,
+                run_args=run_args,
             )
             for result in results
         )
@@ -15184,10 +15223,11 @@ def _html_diagnostics_partition(
 
 
 def _html_maintainer_diagnostics(
-    report_context: ReportRenderContext,
+    report_context: HtmlReportContext,
     *,
     prompt: str,
     image_path: Path | None,
+    run_args: argparse.Namespace | None,
 ) -> str:
     """Render diagnostics from the same cached assessment partitions as Markdown."""
     assessments = _assessments_by_model(report_context)
@@ -15213,6 +15253,7 @@ def _html_maintainer_diagnostics(
             assessments=assessments,
             prompt=prompt,
             image_path=image_path,
+            run_args=run_args,
         ),
         _html_diagnostics_partition(
             title="Successful Observations Requiring Reproduction",
@@ -15220,6 +15261,7 @@ def _html_maintainer_diagnostics(
             assessments=assessments,
             prompt=prompt,
             image_path=image_path,
+            run_args=run_args,
         ),
         _html_diagnostics_partition(
             title="Indeterminate Attempts",
@@ -15227,6 +15269,7 @@ def _html_maintainer_diagnostics(
             assessments=assessments,
             prompt=prompt,
             image_path=image_path,
+            run_args=run_args,
         ),
         "</section>",
     ]
@@ -15298,11 +15341,12 @@ def _html_provenance(
 
 def _build_full_html_document(
     *,
-    report_context: ReportRenderContext,
+    report_context: HtmlReportContext,
     versions: LibraryVersionDict,
     prompt: str,
     total_runtime_seconds: float,
     image_path: Path | None,
+    run_args: argparse.Namespace | None,
 ) -> str:
     """Build standalone HTML from cached gallery and diagnostic facts only."""
     css = """
@@ -15350,6 +15394,7 @@ summary { color: #0645ad; cursor: pointer; font-weight: 600; }
                 report_context,
                 prompt=prompt,
                 image_path=image_path,
+                run_args=run_args,
             ),
             _html_provenance(
                 versions=versions,
@@ -15450,7 +15495,8 @@ def generate_html_report(
     prompt: str,
     total_runtime_seconds: float,
     image_path: Path | None = None,
-    report_context: ReportRenderContext | None = None,
+    report_context: HtmlReportContext | None = None,
+    run_args: argparse.Namespace | None = None,
 ) -> None:
     """Write a standalone HTML mirror of the facts-only gallery and diagnostics.
 
@@ -15462,16 +15508,16 @@ def generate_html_report(
         total_runtime_seconds: Total wall-clock runtime for the full run.
         image_path: Optional input image path for the report header.
         report_context: Optional cached shared report context built in finalization.
+        run_args: Original CLI arguments used to preserve diagnostic reproduction settings.
     """
     if not results:
         log_warning_note("No results to generate HTML report.")
         return
 
     if report_context is None:
-        report_context = _build_report_render_context(
+        report_context = _build_html_report_context(
             results=results,
             prompt=prompt,
-            image_path=image_path,
         )
 
     html_content = _build_full_html_document(
@@ -15480,6 +15526,7 @@ def generate_html_report(
         prompt=prompt,
         total_runtime_seconds=total_runtime_seconds,
         image_path=image_path,
+        run_args=run_args,
     )
 
     try:
@@ -16152,7 +16199,7 @@ def _recommendations_by_model(
 
 
 def _assessments_by_model(
-    report_context: ReportRenderContext,
+    report_context: HtmlReportContext,
 ) -> dict[str, ResultAssessment]:
     """Index the cached minimal current-run assessment by model identifier."""
     return dict(report_context.assessments)
@@ -26378,6 +26425,7 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
                 total_runtime_seconds=inputs.overall_time,
                 image_path=inputs.image_path,
                 report_context=inputs.report_context,
+                run_args=inputs.run_args,
             ),
         ),
         ReportArtifact(
@@ -26901,6 +26949,7 @@ def finalize_execution(
                 system_info=system_info,
                 report_context=report_context,
                 output_paths=output_paths,
+                run_args=args,
                 model_revision=(
                     str(args.revision) if getattr(args, "revision", None) is not None else None
                 ),
