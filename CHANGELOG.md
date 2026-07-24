@@ -7,6 +7,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Establish the minimal immutable current-run result-assessment contract with
+  ordered factual observations while legacy report projections remain available
+  during the staged migration.
 - Keep the static-quality gate compatible with current Ruff releases by
   documenting the project-level copyright policy, calibrating the established
   report API's positional-argument threshold, and normalizing multiline string

@@ -1286,6 +1286,25 @@ class JsonlQualityAnalysisRecord(TypedDict):
 
 
 type ExecutionOutcome = Literal["completed", "failed", "indeterminate"]
+type ExecutionStatus = Literal["completed", "crashed", "indeterminate"]
+type ModelUsability = Literal["usable", "usable_with_caveats", "unusable", "not_evaluated"]
+type MaintainerStatus = Literal[
+    "actionable_failure",
+    "observation_needs_reproduction",
+    "none",
+]
+type ObservationCode = Literal[
+    "empty_output",
+    "minimal_output",
+    "repeated_output",
+    "missing_requested_sections",
+    "token_cap_truncation",
+    "prompt_instruction_echo",
+    "unexpected_special_token",
+    "thinking_trace_present",
+    "thinking_trace_incomplete",
+    "no_keyword_overlap",
+]
 type RecommendationStatus = Literal["recommended", "caveat", "avoid", "not_evaluated"]
 type UpstreamBoundary = Literal["not_started", "load_started", "generation_started"]
 type FailureOrigin = Literal[
@@ -10392,19 +10411,19 @@ def _build_report_render_context(
         for result in results
     ]
     resolved_results: list[PerformanceResult] = []
-    assessments: list[tuple[str, CanonicalAssessment]] = []
-    user_presentations: list[tuple[str, ModelUserPresentation]] = []
-    maintainer_presentations: list[tuple[str, MaintainerPresentation]] = []
+    assessments: list[tuple[str, ResultAssessment]] = []
+    legacy_assessments: list[tuple[str, CanonicalAssessment]] = []
     review_payloads: list[tuple[str, JsonlReviewRecord | None]] = []
     maintainer_triage_payloads: list[tuple[str, JsonlMaintainerTriageRecord | None]] = []
     failure_narratives: list[tuple[str, FailureNarrative]] = []
     for result in analyzed_results:
-        assessment = _build_canonical_assessment(_collect_observed_evidence(result), result)
+        legacy_assessment = _build_canonical_assessment(_collect_observed_evidence(result), result)
+        assessment = _assess_result(result)
         review = _build_jsonl_review_record(result)
         if review is not None:
-            review["user_bucket"] = assessment.model_user.current_recommendation
-            review["owner"] = assessment.maintainer.suspected_owner or _UNKNOWN_OWNER
-            review["evidence"] = list(assessment.model_user.evidence_codes)
+            review["user_bucket"] = legacy_assessment.model_user.current_recommendation
+            review["owner"] = legacy_assessment.maintainer.suspected_owner or _UNKNOWN_OWNER
+            review["evidence"] = list(legacy_assessment.model_user.evidence_codes)
         result_with_review = replace(
             result,
             review_payload=review,
@@ -10414,23 +10433,23 @@ def _build_report_render_context(
             _build_jsonl_maintainer_triage_record(
                 result_with_review,
                 review,
-                assessment=assessment.maintainer,
+                assessment=legacy_assessment.maintainer,
             )
             if review is not None
             else None
         )
         if maintainer_triage is not None:
-            maintainer_triage["issue_readiness"] = assessment.maintainer.maintainer_readiness
+            maintainer_triage["issue_readiness"] = legacy_assessment.maintainer.maintainer_readiness
             maintainer_triage["suspected_owner"] = (
-                assessment.maintainer.suspected_owner or _UNKNOWN_OWNER
+                legacy_assessment.maintainer.suspected_owner or _UNKNOWN_OWNER
             )
-            maintainer_triage["confidence"] = assessment.maintainer.owner_confidence or "low"
-            maintainer_triage["next_action"] = assessment.maintainer.next_action
-            maintainer_triage["user_bucket"] = assessment.model_user.current_recommendation
-            maintainer_triage["evidence"] = list(assessment.maintainer.evidence_codes)
+            maintainer_triage["confidence"] = legacy_assessment.maintainer.owner_confidence or "low"
+            maintainer_triage["next_action"] = legacy_assessment.maintainer.next_action
+            maintainer_triage["user_bucket"] = legacy_assessment.model_user.current_recommendation
+            maintainer_triage["evidence"] = list(legacy_assessment.maintainer.evidence_codes)
             if result.success:
                 maintainer_triage["summary"] = (
-                    ", ".join(assessment.maintainer.evidence_codes)
+                    ", ".join(legacy_assessment.maintainer.evidence_codes)
                     or "No maintainer finding in this run."
                 )
             else:
@@ -10444,12 +10463,7 @@ def _build_report_render_context(
         )
         resolved_results.append(resolved_result)
         assessments.append((resolved_result.model_name, assessment))
-        user_presentations.append(
-            (resolved_result.model_name, _model_user_presentation(assessment.model_user))
-        )
-        maintainer_presentations.append(
-            (resolved_result.model_name, _maintainer_presentation(assessment.maintainer))
-        )
+        legacy_assessments.append((resolved_result.model_name, legacy_assessment))
         review_payloads.append((resolved_result.model_name, review))
         maintainer_triage_payloads.append((resolved_result.model_name, maintainer_triage))
     result_set: ResultSet = ResultSet(resolved_results)
@@ -10496,12 +10510,10 @@ def _build_report_render_context(
         diagnostics_snapshot=diagnostics_snapshot,
         issue_clusters=_build_issue_clusters(
             diagnostics_snapshot,
-            assessments=dict(assessments),
+            assessments=dict(legacy_assessments),
         ),
         failure_narratives=tuple(failure_narratives),
         assessments=tuple(assessments),
-        user_presentations=tuple(user_presentations),
-        maintainer_presentations=tuple(maintainer_presentations),
         reviews=tuple(review_payloads),
         maintainer_triage=tuple(maintainer_triage_payloads),
     )
@@ -10516,13 +10528,13 @@ def _build_report_render_context(
         summary=aligned_summary,
         recommendations=recommendations,
     )
-    assessment_by_model = _assessments_by_model(context)
+    legacy_assessment_by_model = dict(legacy_assessments)
     return replace(
         context,
         machine_facts=tuple(
             _machine_artifact_facts(
                 view,
-                assessment_by_model[view.result.model_name],
+                legacy_assessment_by_model[view.result.model_name],
                 recommended_working_set_bytes=context.recommended_working_set_bytes,
             )
             for view in recommendations
@@ -13196,6 +13208,96 @@ type CompatibilityStatus = Literal[
 
 
 @dataclass(frozen=True)
+class ResultAssessment:
+    """Minimal current-run assessment shared by all report consumers."""
+
+    execution: ExecutionStatus
+    usability: ModelUsability
+    maintainer_status: MaintainerStatus
+    observations: tuple[ObservationCode, ...]
+
+
+_UNUSABLE_OBSERVATIONS: Final[frozenset[ObservationCode]] = frozenset(
+    {
+        "empty_output",
+        "repeated_output",
+        "missing_requested_sections",
+    }
+)
+
+
+def _execution_status(result: PerformanceResult) -> ExecutionStatus:
+    """Classify the conclusive execution state for one model attempt."""
+    if _is_indeterminate_connectivity_failure(result):
+        return "indeterminate"
+    return "completed" if result.success else "crashed"
+
+
+def _assessment_observations(result: PerformanceResult) -> tuple[ObservationCode, ...]:
+    """Project approved current-run facts into stable ordered observation codes."""
+    text = _generation_text_value(result.generation)
+    analysis = result.quality_analysis
+    observations: list[ObservationCode] = []
+    if not text.strip():
+        observations.append("empty_output")
+    else:
+        generated_tokens = _generation_int_metric(result.generation, "generation_tokens") or 0
+        is_minimal, _minimal_reason = _detect_minimal_output(text, generated_tokens)
+        if is_minimal:
+            observations.append("minimal_output")
+
+    is_repetitive = (
+        analysis.is_repetitive if analysis is not None else _detect_repetitive_output(text)[0]
+    )
+    if is_repetitive:
+        observations.append("repeated_output")
+    if analysis is None:
+        return tuple(observations)
+    if analysis.missing_sections:
+        observations.append("missing_requested_sections")
+    if analysis.likely_capped and (
+        is_repetitive or analysis.missing_sections or analysis.thinking_trace_incomplete
+    ):
+        observations.append("token_cap_truncation")
+    if analysis.instruction_echo:
+        observations.append("prompt_instruction_echo")
+    _, leaked_tokens = _detect_special_token_leakage(_strip_empty_thinking_wrappers(text))
+    expected_thinking_tokens = {"</think>"} if analysis.has_thinking_trace else set()
+    if any(token not in expected_thinking_tokens for token in leaked_tokens):
+        observations.append("unexpected_special_token")
+    if analysis.has_thinking_trace:
+        observations.append("thinking_trace_present")
+    if analysis.thinking_trace_incomplete:
+        observations.append("thinking_trace_incomplete")
+    if analysis.keyword_overlap == "no_overlap":
+        observations.append("no_keyword_overlap")
+    return tuple(observations)
+
+
+def _assess_result(result: PerformanceResult) -> ResultAssessment:
+    """Return the minimal current-run outcome without legacy presentation policy."""
+    execution = _execution_status(result)
+    observations = _assessment_observations(result) if execution == "completed" else ()
+    if execution != "completed":
+        usability: ModelUsability = "not_evaluated"
+    elif set(observations) & _UNUSABLE_OBSERVATIONS:
+        usability = "unusable"
+    elif observations:
+        usability = "usable_with_caveats"
+    else:
+        usability = "usable"
+
+    if execution == "crashed":
+        maintainer_status: MaintainerStatus = "actionable_failure"
+    elif observations:
+        maintainer_status = "observation_needs_reproduction"
+    else:
+        maintainer_status = "none"
+
+    return ResultAssessment(execution, usability, maintainer_status, observations)
+
+
+@dataclass(frozen=True)
 class ObservedEvidence:
     """Immutable runtime, output, and proxy facts without policy decisions."""
 
@@ -13649,9 +13751,7 @@ class ReportRenderContext:
     issue_clusters: tuple[IssueCluster, ...] = ()
     failure_narratives: tuple[tuple[str, FailureNarrative], ...] = ()
     machine_facts: tuple[MachineArtifactFacts, ...] = ()
-    assessments: tuple[tuple[str, CanonicalAssessment], ...] = ()
-    user_presentations: tuple[tuple[str, ModelUserPresentation], ...] = ()
-    maintainer_presentations: tuple[tuple[str, MaintainerPresentation], ...] = ()
+    assessments: tuple[tuple[str, ResultAssessment], ...] = ()
     reviews: tuple[tuple[str, JsonlReviewRecord | None], ...] = ()
     maintainer_triage: tuple[tuple[str, JsonlMaintainerTriageRecord | None], ...] = ()
 
@@ -17766,7 +17866,7 @@ def generate_html_report(
         field_names=field_names,
         sorted_results=report_context.result_set.results,
         recommendations=_recommendations_by_model(report_context),
-        assessments=_assessments_by_model(report_context),
+        assessments=_legacy_assessments_by_model(report_context),
     )
 
     suppress_cataloging_scores = report_context.mode_policy.suppress_cataloging_scores
@@ -18396,7 +18496,7 @@ def _build_model_recommendation_views(
     """Build one canonical recommendation view per current-run model."""
     utility_by_model = {row.result.model_name: row for row in context.triage.utility_rows}
     narrative_by_model = _failure_narratives_by_model(context)
-    assessments = _assessments_by_model(context)
+    assessments = _legacy_assessments_by_model(context)
     views: list[ModelRecommendationView] = []
     for result in context.result_set.results:
         review = _review_for_result(result)
@@ -18491,23 +18591,19 @@ def _recommendations_by_model(
 
 def _assessments_by_model(
     report_context: ReportRenderContext,
-) -> dict[str, CanonicalAssessment]:
-    """Index the cached dual-purpose assessment by model identifier."""
+) -> dict[str, ResultAssessment]:
+    """Index the cached minimal current-run assessment by model identifier."""
     return dict(report_context.assessments)
 
 
-def _user_presentations_by_model(
+def _legacy_assessments_by_model(
     report_context: ReportRenderContext,
-) -> dict[str, ModelUserPresentation]:
-    """Index cached model-user presentation records by model identifier."""
-    return dict(report_context.user_presentations)
-
-
-def _maintainer_presentations_by_model(
-    report_context: ReportRenderContext,
-) -> dict[str, MaintainerPresentation]:
-    """Index cached maintainer presentation records by model identifier."""
-    return dict(report_context.maintainer_presentations)
+) -> dict[str, CanonicalAssessment]:
+    """Build legacy assessments until their report consumers are migrated."""
+    return {
+        result.model_name: _build_canonical_assessment(_collect_observed_evidence(result), result)
+        for result in report_context.result_set.results
+    }
 
 
 def _machine_facts_by_model(
@@ -29432,7 +29528,7 @@ def _write_diagnostics_and_repro_artifacts(
         repro_bundles=repro_bundles,
         diagnostics_snapshot=diagnostics_snapshot,
         issue_clusters=issue_clusters,
-        assessments=_assessments_by_model(report_context),
+        assessments=_legacy_assessments_by_model(report_context),
     )
     issue_reports = _generate_github_issue_reports(
         diagnostics_snapshot=diagnostics_snapshot,

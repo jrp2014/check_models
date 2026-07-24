@@ -11,6 +11,187 @@ import pytest
 import check_models
 
 
+@dataclasses.dataclass
+class _AssessmentGeneration:
+    """Minimal generation fixture for current-run assessment tests."""
+
+    text: str
+    generation_tokens: int = 24
+
+
+def _assessment_result(
+    text: str,
+    *,
+    generated_tokens: int = 24,
+    prompt: str | None = None,
+    requested_max_tokens: int | None = None,
+    model_name: str = "example/model",
+) -> check_models.PerformanceResult:
+    """Build a successful result with prompt-aware factual quality signals."""
+    return check_models.PerformanceResult(
+        model_name=model_name,
+        success=True,
+        generation=_AssessmentGeneration(text, generated_tokens),
+        requested_max_tokens=requested_max_tokens,
+        quality_analysis=check_models.analyze_generation_text(
+            text,
+            generated_tokens=generated_tokens,
+            prompt=prompt,
+            requested_max_tokens=requested_max_tokens,
+            model_name=model_name,
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    ("result", "expected"),
+    [
+        pytest.param(
+            _assessment_result(""),
+            check_models.ResultAssessment(
+                "completed", "unusable", "observation_needs_reproduction", ("empty_output",)
+            ),
+            id="empty-output",
+        ),
+        pytest.param(
+            _assessment_result("Brief reply", generated_tokens=2),
+            check_models.ResultAssessment(
+                "completed",
+                "usable_with_caveats",
+                "observation_needs_reproduction",
+                ("minimal_output",),
+            ),
+            id="minimal-output",
+        ),
+        pytest.param(
+            _assessment_result("word " * 100, generated_tokens=100),
+            check_models.ResultAssessment(
+                "completed", "unusable", "observation_needs_reproduction", ("repeated_output",)
+            ),
+            id="contiguous-repetition",
+        ),
+        pytest.param(
+            _assessment_result(
+                "A misty lakeshore with trees and power lines.",
+                prompt=(
+                    "Return exactly these three sections, and nothing else:\n"
+                    "Title: 5-10 words.\nDescription: 1-2 factual sentences.\n"
+                    "Keywords: 10-18 terms."
+                ),
+            ),
+            check_models.ResultAssessment(
+                "completed",
+                "unusable",
+                "observation_needs_reproduction",
+                ("missing_requested_sections",),
+            ),
+            id="missing-requested-sections",
+        ),
+        pytest.param(
+            _assessment_result(
+                "word " * 100,
+                generated_tokens=100,
+                requested_max_tokens=100,
+            ),
+            check_models.ResultAssessment(
+                "completed",
+                "unusable",
+                "observation_needs_reproduction",
+                ("repeated_output", "token_cap_truncation"),
+            ),
+            id="degraded-token-cap",
+        ),
+        pytest.param(
+            _assessment_result(
+                "Return exactly these three sections, and nothing else: Title, Description, Keywords.",
+            ),
+            check_models.ResultAssessment(
+                "completed",
+                "usable_with_caveats",
+                "observation_needs_reproduction",
+                ("prompt_instruction_echo",),
+            ),
+            id="instruction-echo",
+        ),
+        pytest.param(
+            _assessment_result("A caption.<|end|>"),
+            check_models.ResultAssessment(
+                "completed",
+                "usable_with_caveats",
+                "observation_needs_reproduction",
+                ("unexpected_special_token",),
+            ),
+            id="unexpected-special-token",
+        ),
+        pytest.param(
+            _assessment_result(
+                "<think>Inspect the scene.</think> A blue boat rests on calm water.",
+                model_name="example/thinking-model",
+            ),
+            check_models.ResultAssessment(
+                "completed",
+                "usable_with_caveats",
+                "observation_needs_reproduction",
+                ("thinking_trace_present",),
+            ),
+            id="thinking-trace",
+        ),
+        pytest.param(
+            _assessment_result(
+                "<think>Inspect the scene carefully",
+                model_name="example/thinking-model",
+            ),
+            check_models.ResultAssessment(
+                "completed",
+                "usable_with_caveats",
+                "observation_needs_reproduction",
+                ("thinking_trace_present", "thinking_trace_incomplete"),
+            ),
+            id="incomplete-thinking-trace",
+        ),
+        pytest.param(
+            _assessment_result(
+                "Title: A blue boat\nDescription: A blue boat rests on calm water.\n"
+                "Keywords: boat, water, blue, calm, lake, reflection, sky, shore, travel, vessel",
+                prompt=(
+                    "Context: Existing metadata hints:\n- Keyword hints: mountain, forest, snow\n"
+                ),
+            ),
+            check_models.ResultAssessment(
+                "completed",
+                "usable_with_caveats",
+                "observation_needs_reproduction",
+                ("no_keyword_overlap",),
+            ),
+            id="no-keyword-overlap",
+        ),
+    ],
+)
+def test_result_assessment_projects_ordered_observations(
+    result: check_models.PerformanceResult,
+    expected: check_models.ResultAssessment,
+) -> None:
+    """Only approved factual observations feed the minimal assessment contract."""
+    assert check_models._assess_result(result) == expected
+
+
+def test_result_assessment_ignores_benign_cap_empty_thinking_wrapper_and_partial_overlap() -> None:
+    """Neutral facts remain absent without an accompanying mechanical failure sign."""
+    result = _assessment_result(
+        "<think></think> Title: A blue boat at dawn\n"
+        "Description: A blue boat rests on calm water at dawn.\n"
+        "Keywords: boat, water, blue, calm, dawn, lake, reflection, sky, shore, vessel",
+        generated_tokens=80,
+        requested_max_tokens=80,
+        model_name="example/thinking-model",
+        prompt=("Context: Existing metadata hints:\n- Keyword hints: boat, mountain, forest\n"),
+    )
+
+    assert check_models._assess_result(result) == check_models.ResultAssessment(
+        "completed", "usable", "none", ()
+    )
+
+
 def test_analyze_generation_text_clean_output() -> None:
     """Test that clean text has no issues detected."""
     text = "This is a normal, varied caption describing an image."
