@@ -16,13 +16,10 @@ import check_models
 from check_models import (
     FileSafeFormatter,
     GenerationQualityAnalysis,
-    HistoryModelResultRecord,
-    HistoryRunRecord,
     PerformanceResult,
     RuntimeDiagnostics,
     StyleAwareRichHandler,
     _log_canonical_model_review,
-    _log_history_comparison,
     finalize_execution,
     log_summary,
     print_model_result,
@@ -84,25 +81,16 @@ _FINALIZE_REPORT_PATCHES = (
     "check_models.print_cli_section",
     "check_models.print_version_info",
     "check_models.generate_html_report",
-    "check_models.generate_markdown_report",
     "check_models.generate_markdown_gallery_report",
-    "check_models.generate_review_report",
-    "check_models.generate_model_selection_report",
-    "check_models.generate_model_capability_scorecard",
-    "check_models.generate_tsv_report",
     "check_models.save_jsonl_report",
     "check_models.save_run_json_report",
-    "check_models._log_history_comparison",
 )
 
 _EXPECTED_REPORT_ARTIFACT_LOG_LABELS = (
+    "Output Index:",
     "HTML Report:",
-    "Markdown Report:",
     "Gallery Report:",
-    "Review Report:",
-    "Model Selection:",
-    "Capabilities:",
-    "TSV Report:",
+    "Diagnostics:",
     "JSONL Report:",
     "Run JSON:",
 )
@@ -154,7 +142,11 @@ def _message_index(messages: list[str], label: str) -> int:
 
 
 def _assert_report_artifact_log_order(messages: list[str]) -> None:
-    positions = [_message_index(messages, label) for label in _EXPECTED_REPORT_ARTIFACT_LOG_LABELS]
+    report_start = _message_index(messages, "Reports successfully generated:")
+    report_messages = messages[report_start:]
+    positions = [
+        _message_index(report_messages, label) for label in _EXPECTED_REPORT_ARTIFACT_LOG_LABELS
+    ]
     assert positions == sorted(positions)
 
 
@@ -237,36 +229,6 @@ def test_console_handler_hides_file_only_records() -> None:
     output = stream.getvalue()
     assert "file-only message" not in output
     assert "console message" in output
-
-
-def _history_run_record(
-    outcomes: dict[str, bool],
-    *,
-    prompt_hash: str = "abc123456789",
-    image_path: str | None = "/Users/test/images/test.jpg",
-    library_versions: dict[str, str | None] | None = None,
-) -> HistoryRunRecord:
-    """Create typed history run records for _log_history_comparison tests."""
-    model_results: dict[str, HistoryModelResultRecord] = {}
-    for model_name, success in outcomes.items():
-        model_results[model_name] = {
-            "success": success,
-            "error_stage": None if success else "Model Error",
-            "error_type": None if success else "RuntimeError",
-            "error_package": None if success else "mlx-vlm",
-        }
-
-    return {
-        "_type": "run",
-        "format_version": "1.0",
-        "timestamp": "2026-02-15 00:00:00 GMT",
-        "prompt_hash": prompt_hash,
-        "prompt_preview": "Describe this image.",
-        "image_path": image_path,
-        "model_results": model_results,
-        "system": {"OS": "macOS"},
-        "library_versions": library_versions or {"mlx": "0.27.0", "mlx-vlm": "0.4.0"},
-    }
 
 
 def test_metrics_mode_compact_smoke(caplog: pytest.LogCaptureFixture) -> None:
@@ -726,92 +688,6 @@ def test_log_summary_suppresses_cataloging_scores_in_triage_mode(
     assert "Best keywording:" not in messages
 
 
-def test_log_history_comparison_emits_tables_and_transition_chart(
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    """History comparison should show run-over-run tables plus transition chart/details."""
-    caplog.set_level(logging.INFO)
-    previous = _history_run_record(
-        {"org/model-a": True, "org/model-b": False, "org/model-old": True},
-        prompt_hash="1111222233334444",
-        image_path="/Users/test/images/previous.jpg",
-        library_versions={"mlx": "0.26.0", "mlx-vlm": "0.3.0"},
-    )
-    current = _history_run_record(
-        {"org/model-a": False, "org/model-b": True, "org/model-new": False},
-        prompt_hash="aaaa222233334444",
-        image_path="/Users/test/images/current.jpg",
-        library_versions={"mlx": "0.27.0", "mlx-vlm": "0.4.0"},
-    )
-
-    _log_history_comparison(previous, current)
-
-    messages = "\n".join(record.message for record in caplog.records)
-    assert "Run-over-run comparison:" in messages
-    assert "│ Metric" in messages
-    assert "Comparison context:" in messages
-    assert "Status transition counts:" in messages
-    assert "Detailed model transitions:" in messages
-    assert "Prompt differs from previous run" in messages
-    assert "Image path differs from previous run" in messages
-    assert "Regression" in messages
-    assert "Recovery" in messages
-
-
-def test_log_history_comparison_labels_window_signals_without_regression_wording(
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    """Window lookbacks should not call unchanged bad states true regressions."""
-    caplog.set_level(logging.INFO)
-    baseline = _history_run_record({"org/model-a": True})
-    noisy_previous = _history_run_record({"org/model-a": True})
-    current = _history_run_record({"org/model-a": True})
-
-    baseline_results = baseline["model_results"]
-    noisy_results = noisy_previous["model_results"]
-    current_results = current["model_results"]
-    assert isinstance(baseline_results, dict)
-    assert isinstance(noisy_results, dict)
-    assert isinstance(current_results, dict)
-    baseline_results["org/model-a"]["review_verdict"] = "clean"
-    baseline_results["org/model-a"]["review_user_bucket"] = "recommended"
-    noisy_results["org/model-a"]["review_verdict"] = "cutoff_degraded"
-    noisy_results["org/model-a"]["review_user_bucket"] = "avoid"
-    noisy_results["org/model-a"]["stop_reason"] = "max_tokens"
-    current_results["org/model-a"]["review_verdict"] = "cutoff_degraded"
-    current_results["org/model-a"]["review_user_bucket"] = "avoid"
-    current_results["org/model-a"]["stop_reason"] = "max_tokens"
-
-    _log_history_comparison(
-        noisy_previous,
-        current,
-        history_records=[baseline, noisy_previous],
-    )
-
-    messages = "\n".join(record.message for record in caplog.records)
-    assert "Window quality signals" in messages
-    assert "Window generation signals" in messages
-    assert "Window quality regression" not in messages
-    assert "Window generation regression" not in messages
-
-
-def test_log_history_comparison_baseline_emits_current_status_chart(
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    """Baseline history should render table/context and current status chart without transitions."""
-    caplog.set_level(logging.INFO)
-    current = _history_run_record({"org/single": True})
-
-    _log_history_comparison(None, current)
-
-    messages = "\n".join(record.message for record in caplog.records)
-    assert "No prior history run available. Baseline created." in messages
-    assert "Run-over-run comparison:" in messages
-    assert "Comparison context:" in messages
-    assert "Current run status counts:" in messages
-    assert "Detailed model transitions:" not in messages
-
-
 def test_print_model_stats_excludes_output_column(caplog: pytest.LogCaptureFixture) -> None:
     """CLI performance table should avoid huge output-preview column."""
     caplog.set_level(logging.INFO)
@@ -967,13 +843,7 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
 
     args = argparse.Namespace(
         output_html=tmp_path / "report.html",
-        output_markdown=tmp_path / "report.md",
         output_gallery_markdown=tmp_path / "gallery.md",
-        output_review=tmp_path / "review.md",
-        output_model_selection=tmp_path / "model_selection.md",
-        output_model_capabilities=tmp_path / "model_capabilities.md",
-        output_model_capabilities_json=tmp_path / "model_capabilities.json",
-        output_tsv=tmp_path / "report.tsv",
         output_jsonl=tmp_path / "report.jsonl",
         output_run_json=tmp_path / "run.json",
         output_diagnostics=tmp_path / "diagnostics.md",
@@ -1002,8 +872,7 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
         custom_log,
         custom_env,
         args.output_gallery_markdown,
-        args.output_review,
-        args.output_model_capabilities,
+        args.output_diagnostics,
     )
     _assert_report_artifact_log_order(messages)
 
@@ -1012,13 +881,7 @@ def test_report_generation_uses_single_artifact_plan(tmp_path: Path) -> None:
     """Report generation should expose one ordered artifact plan for jobs and logs."""
     args = argparse.Namespace(
         output_html=tmp_path / "report.html",
-        output_markdown=tmp_path / "report.md",
         output_gallery_markdown=tmp_path / "gallery.md",
-        output_review=tmp_path / "review.md",
-        output_model_selection=tmp_path / "model_selection.md",
-        output_model_capabilities=tmp_path / "model_capabilities.md",
-        output_model_capabilities_json=tmp_path / "model_capabilities.json",
-        output_tsv=tmp_path / "report.tsv",
         output_jsonl=tmp_path / "report.jsonl",
         output_run_json=tmp_path / "run.json",
         output_diagnostics=tmp_path / "diagnostics.md",
@@ -1041,44 +904,30 @@ def test_report_generation_uses_single_artifact_plan(tmp_path: Path) -> None:
     artifacts = check_models._build_report_artifacts(inputs)
 
     assert [artifact.key for artifact in artifacts] == [
+        "output_index",
         "html",
-        "markdown",
         "markdown_gallery",
-        "review",
-        "model_selection",
-        "model_capabilities",
-        "tsv",
+        "diagnostics",
         "jsonl",
         "run_json",
-        "output_index",
     ]
     assert [artifact.label.strip() for artifact in artifacts] == [
+        "Output Index:",
         "HTML Report:",
-        "Markdown Report:",
         "Gallery Report:",
-        "Review Report:",
-        "Model Selection:",
-        "Capabilities:",
-        "TSV Report:",
+        "Diagnostics:",
         "JSONL Report:",
         "Run JSON:",
-        "Output Index:",
     ]
     assert all(artifact.path.is_absolute() for artifact in artifacts)
-    assert all(artifact.job is not None for artifact in artifacts)
+    assert all(artifact.job is not None for artifact in artifacts if artifact.key != "diagnostics")
 
 
 def test_report_artifact_specs_are_the_metadata_source(tmp_path: Path) -> None:
     """Generated report path, run-json, and dashboard metadata should share specs."""
     args = argparse.Namespace(
         output_html=tmp_path / "report.html",
-        output_markdown=tmp_path / "report.md",
         output_gallery_markdown=tmp_path / "gallery.md",
-        output_review=tmp_path / "review.md",
-        output_model_selection=tmp_path / "model_selection.md",
-        output_model_capabilities=tmp_path / "model_capabilities.md",
-        output_model_capabilities_json=tmp_path / "model_capabilities.json",
-        output_tsv=tmp_path / "report.tsv",
         output_jsonl=tmp_path / "report.jsonl",
         output_run_json=tmp_path / "run.json",
         output_diagnostics=tmp_path / "diagnostics.md",
@@ -1089,19 +938,85 @@ def test_report_artifact_specs_are_the_metadata_source(tmp_path: Path) -> None:
 
     specs = check_models._build_report_artifact_specs(paths)
 
-    assert [
-        (spec.key, spec.public_key, spec.label.strip(), spec.dashboard_label) for spec in specs
-    ] == [
-        ("output_index", "output_index", "Output Index:", "Output Index"),
-        ("html", "results_html", "HTML Report:", "HTML Report"),
-        ("markdown", "results_markdown", "Markdown Report:", "Markdown Report"),
-        ("markdown_gallery", "model_gallery", "Gallery Report:", "Gallery Report"),
-        ("review", "review", "Review Report:", "Review Report"),
-        ("model_selection", "model_selection", "Model Selection:", "Model Selection"),
-        ("model_capabilities", "model_capabilities", "Capabilities:", "Capability Scorecard"),
-        ("tsv", "results_tsv", "TSV Report:", "TSV Metrics"),
-        ("jsonl", "results_jsonl", "JSONL Report:", "JSONL Data"),
-        ("run_json", "run_json", "Run JSON:", "Run JSON"),
-    ]
+    assert tuple(spec.key for spec in specs) == (
+        "output_index",
+        "html",
+        "markdown_gallery",
+        "diagnostics",
+        "jsonl",
+        "run_json",
+    )
     public_map = check_models._public_output_artifact_map(paths)
-    assert {spec.public_key for spec in specs} <= set(public_map)
+    assert set(public_map) == {
+        "output_index",
+        "results_html",
+        "model_gallery",
+        "diagnostics",
+        "results_jsonl",
+        "run_json",
+        "log",
+        "environment",
+    }
+
+
+def test_output_index_links_only_retained_artifacts(tmp_path: Path) -> None:
+    """The navigation index must not reintroduce retired or conditional artifacts."""
+    reports_dir = tmp_path / "reports"
+    paths = check_models.ReportOutputPaths(
+        index=tmp_path / "index.md",
+        html=reports_dir / "results.html",
+        gallery_markdown=reports_dir / "model_gallery.md",
+        diagnostics=reports_dir / "diagnostics.md",
+        jsonl=tmp_path / "results.jsonl",
+        run_json=tmp_path / "run.json",
+        log=tmp_path / "check_models.log",
+        environment=tmp_path / "environment.log",
+    )
+
+    with patch.object(check_models._LinkStyleState, "value", "relative"):
+        check_models.generate_output_index_report(paths.index, output_paths=paths)
+
+    assert paths.index.read_text(encoding="utf-8").splitlines() == [
+        "# Check Models Output Index",
+        "",
+        "- [results.html](reports/results.html)",
+        "- [model_gallery.md](reports/model_gallery.md)",
+        "- [diagnostics.md](reports/diagnostics.md)",
+        "- [results.jsonl](results.jsonl)",
+        "- [run.json](run.json)",
+        "- [check_models.log](check_models.log)",
+        "- [environment.log](environment.log)",
+    ]
+
+
+def test_finalize_execution_does_not_read_history_for_current_reports(tmp_path: Path) -> None:
+    """Current report statuses must not depend on append-only history."""
+    args = argparse.Namespace(
+        output_html=tmp_path / "report.html",
+        output_gallery_markdown=tmp_path / "gallery.md",
+        output_jsonl=tmp_path / "report.jsonl",
+        output_run_json=tmp_path / "run.json",
+        output_diagnostics=tmp_path / "diagnostics.md",
+        output_log=tmp_path / "check_models.log",
+        output_env=tmp_path / "environment.log",
+    )
+    result = PerformanceResult(
+        model_name="dummy/model",
+        generation=_StubGeneration(text="A complete response."),
+        success=True,
+    )
+    expected = check_models._assess_result(result)
+
+    with patch.object(
+        check_models,
+        "_load_history_run_records",
+        side_effect=AssertionError("current reports must not read history"),
+        create=True,
+    ):
+        _run_finalize_with_report_patches(
+            args=args,
+            result=result,
+            overall_start_time=time.perf_counter() - 0.5,
+        )
+
+    assert check_models._assess_result(result) == expected

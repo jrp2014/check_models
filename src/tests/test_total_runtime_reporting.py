@@ -1,7 +1,7 @@
 """Tests for overall runtime inclusion in generated reports.
 
 This focuses on ensuring that the recently added overall runtime metric
-appears in CLI-related report outputs (Markdown & HTML builders) without
+appears in the retained HTML report without
 executing full model runs.
 """
 
@@ -13,7 +13,6 @@ from check_models import (
     PerformanceResult,
     RuntimeDiagnostics,
     generate_html_report,
-    generate_markdown_report,
 )
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -81,27 +80,6 @@ def _build_result_with_runtime() -> PerformanceResult:
     )
 
 
-def test_markdown_report_includes_runtime(tmp_path: Path) -> None:
-    """Markdown report should contain an overall runtime line with seconds."""
-    results = [_build_single_result()]
-    md_file = tmp_path / "report.md"
-    generate_markdown_report(
-        results=results,
-        filename=md_file,
-        versions={"mlx": "0.0.0", "mlx-vlm": "0.0.0"},
-        prompt="Test prompt",
-        total_runtime_seconds=12.34,
-    )
-    content = md_file.read_text(encoding="utf-8")
-    msg: str
-    if "Overall runtime:" not in content:
-        msg = "Missing overall runtime label in markdown report"
-        raise AssertionError(msg)
-    if "12.34" not in content:
-        msg = "Expected formatted runtime '12.34' not found in markdown report"
-        raise AssertionError(msg)
-
-
 def test_html_report_includes_runtime(tmp_path: Path) -> None:
     """HTML report should include the formatted overall runtime string with 's' suffix."""
     results = [_build_single_result()]
@@ -123,24 +101,6 @@ def test_html_report_includes_runtime(tmp_path: Path) -> None:
         raise AssertionError(msg)
 
 
-def test_markdown_report_includes_timing_snapshot(tmp_path: Path) -> None:
-    """Markdown report should surface aggregate timing inside the Runtime stanza."""
-    results = [_build_result_with_runtime()]
-    md_file = tmp_path / "report.md"
-    generate_markdown_report(
-        results=results,
-        filename=md_file,
-        versions={"mlx": "0.0.0", "mlx-vlm": "0.0.0"},
-        prompt="Test prompt",
-        total_runtime_seconds=12.34,
-    )
-    content = md_file.read_text(encoding="utf-8")
-    assert "### Runtime" in content
-    assert "_Validation overhead:_" in content
-    assert "_Upstream model prefill / first-token time:_" in content
-    assert "_Generation total:_" in content
-
-
 def test_html_report_includes_timing_snapshot(tmp_path: Path) -> None:
     """HTML report should surface aggregate timing inside the Runtime stanza."""
     results = [_build_result_with_runtime()]
@@ -157,27 +117,6 @@ def test_html_report_includes_timing_snapshot(tmp_path: Path) -> None:
     assert "Validation overhead:" in content
     assert "Upstream model prefill / first-token time:" in content
     assert "Generation total:" in content
-
-
-def test_markdown_long_runtime_hms(tmp_path: Path) -> None:
-    """Markdown should show HH:MM:SS plus seconds for long runtimes (>= 1 hour)."""
-    results = [_build_single_result()]
-    md_file = tmp_path / "long.md"
-    long_seconds = 3_726.4  # 1h 2m 6.4s
-    generate_markdown_report(
-        results=results,
-        filename=md_file,
-        versions={"mlx": "0.0.0", "mlx-vlm": "0.0.0"},
-        prompt="Test prompt",
-        total_runtime_seconds=long_seconds,
-    )
-    content = md_file.read_text(encoding="utf-8")
-    if "01:02:06" not in content:
-        msg = "Missing HH:MM:SS component in long runtime markdown report"
-        raise AssertionError(msg)
-    if "3726.40" not in content:
-        msg = "Missing precise seconds component in long runtime markdown report"
-        raise AssertionError(msg)
 
 
 def test_html_long_runtime_hms(tmp_path: Path) -> None:

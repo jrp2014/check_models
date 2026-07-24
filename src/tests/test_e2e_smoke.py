@@ -85,20 +85,8 @@ def _get_e2e_output_args(output_dir: Path) -> list[str]:
         str(output_dir / "e2e.log"),
         "--output-html",
         str(output_dir / "e2e.html"),
-        "--output-markdown",
-        str(output_dir / "e2e.md"),
         "--output-gallery-markdown",
         str(output_dir / "e2e_gallery.md"),
-        "--output-review",
-        str(output_dir / "e2e_review.md"),
-        "--output-model-selection",
-        str(output_dir / "e2e_model_selection.md"),
-        "--output-model-capabilities",
-        str(output_dir / "e2e_model_capabilities.md"),
-        "--output-model-capabilities-json",
-        str(output_dir / "e2e_model_capabilities.json"),
-        "--output-tsv",
-        str(output_dir / "e2e.tsv"),
         "--output-jsonl",
         str(output_dir / "e2e.jsonl"),
         "--output-run-json",
@@ -110,21 +98,22 @@ def _get_e2e_output_args(output_dir: Path) -> list[str]:
     ]
 
 
-def test_get_e2e_output_args_redirects_gallery_and_review(tmp_path: Path) -> None:
-    """E2E output helper should redirect all report artifacts into the temp directory."""
+def test_get_e2e_output_args_redirects_retained_artifacts(tmp_path: Path) -> None:
+    """E2E output helper should redirect every retained configurable artifact."""
     output_dir = tmp_path / "output"
     output_args = _get_e2e_output_args(output_dir)
     output_map = dict(zip(output_args[::2], output_args[1::2], strict=True))
 
+    assert set(output_map) == {
+        "--output-log",
+        "--output-html",
+        "--output-gallery-markdown",
+        "--output-jsonl",
+        "--output-run-json",
+        "--output-env",
+        "--output-diagnostics",
+    }
     assert output_map["--output-gallery-markdown"] == str(output_dir / "e2e_gallery.md")
-    assert output_map["--output-review"] == str(output_dir / "e2e_review.md")
-    assert output_map["--output-model-selection"] == str(output_dir / "e2e_model_selection.md")
-    assert output_map["--output-model-capabilities"] == str(
-        output_dir / "e2e_model_capabilities.md"
-    )
-    assert output_map["--output-model-capabilities-json"] == str(
-        output_dir / "e2e_model_capabilities.json"
-    )
     assert output_map["--output-run-json"] == str(output_dir / "e2e_run.json")
 
 
@@ -244,11 +233,15 @@ class TestE2ESmoke:
 
         # Verify output files were created
         e2e_html = e2e_output_dir / "e2e.html"
-        e2e_md = e2e_output_dir / "e2e.md"
+        e2e_gallery = e2e_output_dir / "e2e_gallery.md"
+        e2e_diagnostics = e2e_output_dir / "e2e_diagnostics.md"
         e2e_jsonl = e2e_output_dir / "e2e.jsonl"
+        e2e_run_json = e2e_output_dir / "e2e_run.json"
         assert e2e_html.exists()
-        assert e2e_md.exists()
+        assert e2e_gallery.exists()
+        assert e2e_diagnostics.exists()
         assert e2e_jsonl.exists()
+        assert e2e_run_json.exists()
 
         records = [
             json.loads(line)

@@ -9,7 +9,6 @@ from __future__ import annotations
 import argparse
 import base64
 import codecs
-import csv
 import gc
 import hashlib
 import html
@@ -43,7 +42,7 @@ from contextlib import (
 )
 from dataclasses import dataclass, fields, is_dataclass, replace
 from dataclasses import field as dataclass_field
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from functools import lru_cache
 from importlib import import_module
 from importlib.metadata import (
@@ -145,8 +144,6 @@ __all__ = [
     "ResultSet",
     "analyze_generation_text",
     "append_history_record",
-    "compare_history_records",
-    "compare_history_window",
     "exit_with_cli_error",
     "extract_image_metadata",
     "find_most_recent_file",
@@ -155,9 +152,6 @@ __all__ = [
     "format_overall_runtime",
     "generate_diagnostics_report",
     "generate_html_report",
-    "generate_markdown_report",
-    "generate_model_capability_scorecard",
-    "generate_model_selection_report",
     "generate_output_index_report",
     "get_device_info",
     "get_exif_data",
@@ -1144,66 +1138,26 @@ class SupportsGPSEnum(Protocol):
 
 
 class HistoryModelResultRecord(TypedDict):
-    """Per-model success/failure status stored in run history."""
+    """Per-model factual execution, timing, and resource data in raw history."""
 
     success: bool
-    error_stage: str | None
-    error_type: str | None
-    error_package: str | None
     failure_phase: NotRequired[str | None]
+    error_stage: NotRequired[str | None]
+    error_type: NotRequired[str | None]
+    error_package: NotRequired[str | None]
     error_code: NotRequired[str | None]
     error_signature: NotRequired[str | None]
-    review_verdict: NotRequired[str | None]
-    review_owner: NotRequired[str | None]
-    review_user_bucket: NotRequired[str | None]
-    review_issue_subtype: NotRequired[str | None]
-    harness_issue_type: NotRequired[str | None]
-    prompt_output_ratio: NotRequired[float | None]
-    nontext_prompt_ratio: NotRequired[float | None]
     stop_reason: NotRequired[str | None]
-    hit_max_tokens: NotRequired[bool]
-    metadata_alignment_score: NotRequired[float | None]
-    metadata_alignment_issue: NotRequired[str | None]
-    capability_score: NotRequired[float | None]
-    hygiene_score: NotRequired[float | None]
-    caption_score: NotRequired[float | None]
-    cataloging_score: NotRequired[float | None]
-    description_score: NotRequired[float | None]
-    keyword_score: NotRequired[float | None]
+    prompt_tokens: NotRequired[int | None]
+    generation_tokens: NotRequired[int | None]
+    total_tokens: NotRequired[int | None]
     generation_tps: NotRequired[float | None]
     peak_memory_gb: NotRequired[float | None]
-    peak_memory_working_set_pct: NotRequired[float | None]
-    text_sanity_issue_type: NotRequired[str | None]
-    generation_loop_type: NotRequired[str | None]
-    compatibility_status: NotRequired[str]
-    current_recommendation: NotRequired[Literal["recommended", "caveat", "avoid", "not_evaluated"]]
-    failure_origin: NotRequired[
-        Literal[
-            "harness_preflight",
-            "upstream_load",
-            "upstream_generation",
-            "external_service",
-            "unknown",
-        ]
-    ]
-    maintainer_readiness: NotRequired[
-        Literal[
-            "issue_ready",
-            "needs_reproduction",
-            "harness_observation",
-            "not_applicable",
-        ]
-    ]
-    reproduction_status: NotRequired[
-        Literal["not_run", "confirmed", "not_reproduced", "indeterminate"]
-    ]
-    keyword_overlap: NotRequired[Literal["not_assessable", "no_overlap", "some_overlap"]]
-    context_integration_score: NotRequired[float | None]
-    draft_improvement_score: NotRequired[float | None]
-    visual_description_score: NotRequired[float | None]
-    assisted_enrichment_score: NotRequired[float | None]
-    prompt_burden_kind: NotRequired[str]
-    prompt_burden_source: NotRequired[str]
+    active_memory_gb: NotRequired[float | None]
+    cache_memory_gb: NotRequired[float | None]
+    generation_time_s: NotRequired[float | None]
+    model_load_time_s: NotRequired[float | None]
+    total_time_s: NotRequired[float | None]
 
 
 class HistoryRunRecord(TypedDict, total=False):
@@ -1220,24 +1174,6 @@ class HistoryRunRecord(TypedDict, total=False):
     library_versions: LibraryVersionDict
     runtime_fingerprint: dict[str, RuntimeProbeResult]
     eval_mode: EvaluationLane
-
-
-class HistoryComparisonSummary(TypedDict):
-    """Run-over-run transition summary for history comparisons."""
-
-    regressions: list[str]
-    recoveries: list[str]
-    new_models: list[str]
-    missing_models: list[str]
-    quality_regressions: list[str]
-    quality_recoveries: list[str]
-    harness_regressions: list[str]
-    harness_recoveries: list[str]
-    owner_changes: list[str]
-    window_quality_regressions: list[str]
-    window_harness_regressions: list[str]
-    window_generation_regressions: list[str]
-    window_version_deltas: list[str]
 
 
 class JsonlTimingRecord(TypedDict):
@@ -1311,12 +1247,6 @@ type ControlledReproductionStatus = Literal[
     "indeterminate",
 ]
 type KeywordOverlapState = Literal["not_assessable", "no_overlap", "some_overlap"]
-type HistoricalReliability = Literal[
-    "stable",
-    "variable",
-    "insufficient_evidence",
-    "consistently_unsuitable",
-]
 type OutputAnomaly = Literal[
     "special_token_wrapper",
     "special_token_leak",
@@ -1688,13 +1618,7 @@ class ReportOutputPaths:
 
     index: Path
     html: Path
-    markdown: Path
     gallery_markdown: Path
-    review: Path
-    model_selection: Path
-    model_capabilities: Path
-    model_capabilities_json: Path
-    tsv: Path
     jsonl: Path
     run_json: Path
     diagnostics: Path
@@ -1718,9 +1642,7 @@ class ReportGenerationInputs:
     run_args: argparse.Namespace | None = None
     model_revision: str | None = None
     trust_remote_code: bool = True
-    history_records: Sequence[HistoryRunRecord] = ()
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None
-    diagnostics_artifacts: DiagnosticsArtifacts | None = None
 
 
 @dataclass(frozen=True)
@@ -2110,20 +2032,8 @@ DEFAULT_FOLDER: Final[Path] = Path.home() / "Pictures" / "Processed"
 _SCRIPT_DIR = Path(__file__).parent
 _REPO_ROOT = _SCRIPT_DIR.parent.resolve()
 DEFAULT_HTML_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "results.html"
-DEFAULT_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "results.md"
 DEFAULT_GALLERY_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "model_gallery.md"
-DEFAULT_REVIEW_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "review.md"
-DEFAULT_MODEL_SELECTION_OUTPUT: Final[Path] = (
-    _SCRIPT_DIR / "output" / "reports" / "model_selection.md"
-)
-DEFAULT_MODEL_CAPABILITIES_OUTPUT: Final[Path] = (
-    _SCRIPT_DIR / "output" / "reports" / "model_capabilities.md"
-)
-DEFAULT_MODEL_CAPABILITIES_JSON_OUTPUT: Final[Path] = (
-    _SCRIPT_DIR / "output" / "model_capabilities.json"
-)
 DEFAULT_OUTPUT_INDEX: Final[Path] = _SCRIPT_DIR / "output" / "index.md"
-DEFAULT_TSV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "results.tsv"
 DEFAULT_LOG_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "check_models.log"
 DEFAULT_JSONL_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.jsonl"
 DEFAULT_RUN_JSON_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "run.json"
@@ -2136,12 +2046,7 @@ _PUBLISHED_OUTPUT_ROOT: Final[PurePosixPath] = PurePosixPath("src/output")
 _PUBLISHED_REPORT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
     {
         DEFAULT_HTML_OUTPUT.name,
-        DEFAULT_MD_OUTPUT.name,
         DEFAULT_GALLERY_MD_OUTPUT.name,
-        DEFAULT_MODEL_SELECTION_OUTPUT.name,
-        DEFAULT_MODEL_CAPABILITIES_OUTPUT.name,
-        DEFAULT_REVIEW_MD_OUTPUT.name,
-        DEFAULT_TSV_OUTPUT.name,
         DEFAULT_DIAGNOSTICS_OUTPUT.name,
     }
 )
@@ -2150,7 +2055,6 @@ _PUBLISHED_ROOT_OUTPUT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
         DEFAULT_LOG_OUTPUT.name,
         DEFAULT_JSONL_OUTPUT.name,
         DEFAULT_RUN_JSON_OUTPUT.name,
-        DEFAULT_MODEL_CAPABILITIES_JSON_OUTPUT.name,
         DEFAULT_ENV_OUTPUT.name,
         "results.history.jsonl",
     }
@@ -3658,7 +3562,6 @@ MAX_QUALITY_ISSUES_LEN: Final[int] = 30  # Max chars for quality issues in Markd
 MAX_OUTPUT_LINES: Final[int] = 3  # Max lines to show in summary table cells
 MAX_OUTPUT_PREVIEW_CHARS: Final[int] = 280  # Max chars for output previews in summary tables
 MIN_THROUGHPUT_SAMPLE_TOKENS: Final[int] = 16
-MAX_TSV_CELL_CHARS: Final[int] = 300  # Hard cap for any single TSV cell value
 OUTPUT_PREVIEW_CUE_LIMIT: Final[int] = 3  # Max issue cues shown before compact output text
 OUTPUT_PREVIEW_MIN_HEAD_CHARS: Final[int] = 96  # Minimum chars reserved for preview head
 OUTPUT_PREVIEW_MIN_TAIL_CHARS: Final[int] = 48  # Minimum chars reserved for preview tail
@@ -3674,11 +3577,6 @@ MODEL_SELECTION_IDEAL_CAPTION_MAX_WORDS: Final[int] = 36  # Upper bound for usef
 MODEL_SELECTION_MAX_CAPTION_WORDS: Final[int] = 80  # Above this, caption briefs become unwieldy
 MODEL_SELECTION_RICHNESS_TARGET_TERMS: Final[int] = 16  # Terms needed for full richness credit
 MODEL_SELECTION_CONTENT_TERM_MIN_CHARS: Final[int] = 3  # Minimum token length for richness
-MODEL_SELECTION_CHOOSER_MIN_HYGIENE_SCORE: Final[float] = 60.0
-MODEL_SELECTION_CHOOSER_SMALL_MEMORY_GB: Final[float] = 4.0
-MODEL_SELECTION_CHOOSER_MEDIUM_MEMORY_GB: Final[float] = 8.0
-MODEL_SELECTION_CHOOSER_ROW_LIMIT: Final[int] = 3
-MODEL_SELECTION_CHOOSER_AVOID_ROW_LIMIT: Final[int] = 5
 SUMMARY_CHART_WIDTH: Final[int] = 24  # Character width for compact Rich summary bars
 SUMMARY_MODEL_LABEL_MAX: Final[int] = 32  # Max model label length in summary tables/charts
 SUMMARY_CHART_MAX_ROWS: Final[int] = 8  # Max rows shown in summary charts
@@ -3699,36 +3597,6 @@ PERFORMANCE_TIMING_FIELDS: Final[list[str]] = [
     if field
     in {"generation_time", "model_load_time", "total_time", "quality_issues", "error_package"}
 ]
-MARKDOWN_SUMMARY_TABLE_FIELDS: Final[tuple[str, ...]] = (
-    "model_name",
-    "prompt_tokens",
-    "generation_tokens",
-    "total_tokens",
-    "generation_tps",
-    "peak_memory",
-    "finish_reason",
-    "generation_time",
-    "model_load_time",
-    "total_time",
-    "quality_issues",
-    "error_package",
-)
-TSV_COMPACT_TABLE_FIELDS: Final[tuple[str, ...]] = (
-    "model_name",
-    "prompt_tokens",
-    "generation_tokens",
-    "total_tokens",
-    "prompt_tps",
-    "generation_tps",
-    "peak_memory",
-    "finish_reason",
-    "generation_time",
-    "model_load_time",
-    "total_time",
-    "quality_issues",
-)
-
-
 # =============================================================================
 # FORMATTING UTILITIES (Numbers, Memory, Time, Tokens/sec, Field Values)
 # =============================================================================
@@ -11895,29 +11763,6 @@ def _format_run_contract_parts(
     return parts
 
 
-def _build_markdown_triage_model_selection_pointer(
-    report_context: ReportRenderContext,
-) -> list[str]:
-    """Point triage readers at caption-selection artifacts instead of scorecards."""
-    if not report_context.mode_policy.suppress_cataloging_scores:
-        return []
-
-    parts: list[str] = []
-    _append_markdown_section(
-        parts,
-        title="## Caption Selection",
-        body_lines=[
-            (
-                "Triage mode suppresses cataloging and keyword scores. Brief-caption "
-                "recommendations are ungrounded unless descriptive image metadata is present; "
-                "use `model_selection.md` for the caption shortlist and `model_gallery.md` "
-                "for full output evidence."
-            ),
-        ],
-    )
-    return parts
-
-
 def _relative_markdown_artifact_path(*, report_filename: Path, artifact_filename: Path) -> str:
     """Return a relative path for links between Markdown artifacts."""
     try:
@@ -12597,53 +12442,6 @@ def _preview_model_references(
     return ", ".join(rendered_names)
 
 
-def _build_markdown_recommended_models(
-    report_context: ReportRenderContext,
-    *,
-    gallery_link_target: str | None = None,
-) -> list[str]:
-    """Build a canonical current-run recommendation section."""
-    recommendations = [
-        view
-        for view in report_context.recommendations
-        if view.current_recommendation == "recommended"
-    ]
-    if not recommendations:
-        return []
-
-    parts: list[str] = []
-    _append_markdown_section(
-        parts,
-        title="## ✅ Recommended Current-run Models",
-        body_lines=[
-            "Only canonical `recommended` results are listed; see model_selection.md for ranking.",
-        ],
-    )
-    for view in recommendations:
-        result = view.result
-        model_ref = (
-            _format_gallery_model_link(
-                result.model_name,
-                gallery_link_target=gallery_link_target,
-            )
-            if gallery_link_target is not None
-            else f"`{result.model_name}`"
-        )
-        rationale = [f"compatibility {view.compatibility}"]
-        if view.generation_tps is not None:
-            rationale.append(f"speed {view.generation_tps:.2f} TPS")
-        if view.peak_memory_gb is not None:
-            rationale.append(f"memory {view.peak_memory_gb:.2f} GB")
-        _append_markdown_labeled_value(
-            parts,
-            label="Recommended",
-            value=f"{model_ref} ({' | '.join(rationale)})",
-            bullet=True,
-        )
-    parts.append("")
-    return parts
-
-
 GALLERY_STAMP_LIBRARY_NAMES: Final[tuple[str, ...]] = (
     "mlx-vlm",
     "mlx",
@@ -12931,8 +12729,6 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
 
 
 _TRACEBACK_TAIL_LINES: Final[int] = 6
-_HISTORY_MAX_RECORDS: Final[int] = 100
-
 # System info keys to include in the environment table (order matters)
 _DIAGNOSTICS_SYSTEM_KEYS: Final[tuple[str, ...]] = (
     "Python Version",
@@ -13444,7 +13240,7 @@ class ModelRecommendationView:
 
 @dataclass(frozen=True)
 class MachineArtifactFacts:
-    """Additive machine-readable facts shared by JSONL, TSV, and history."""
+    """Additive machine-readable facts shared by current-run artifacts."""
 
     compatibility_status: CompatibilityStatus
     current_recommendation: RecommendationStatus
@@ -13460,57 +13256,6 @@ class MachineArtifactFacts:
     prompt_burden_kind: str
     prompt_burden_source: str
     suspected_owner: str | None
-
-
-@dataclass(frozen=True)
-class ModelCapabilityRunSignal:
-    """One current or historical model capability observation."""
-
-    model: str
-    success: bool
-    current_recommendation: RecommendationStatus
-    is_current: bool = False
-    eligible: bool | None = None
-    eligibility_reason: str | None = None
-    review_bucket: str | None = None
-    capability_score: float | None = None
-    hygiene_score: float | None = None
-    caption_score: float | None = None
-    cataloging_score: float | None = None
-    description_score: float | None = None
-    keyword_score: float | None = None
-    metadata_alignment_score: float | None = None
-    generation_tps: float | None = None
-    peak_memory_gb: float | None = None
-    signal: str = ""
-
-
-@dataclass(frozen=True)
-class ModelCapabilityRow:
-    """Aggregated per-model capability row rendered in scorecard artifacts."""
-
-    model: str
-    runs: int
-    successes: int
-    failures: int
-    success_rate: float
-    recommended_rate: float
-    capability_score: float | None
-    hygiene_score: float | None
-    caption_score: float | None
-    cataloging_score: float | None
-    description_score: float | None
-    keyword_score: float | None
-    metadata_alignment_score: float | None
-    generation_tps: float | None
-    peak_memory_gb: float | None
-    current_recommendation: RecommendationStatus
-    historical_reliability: HistoricalReliability
-    variability_reason: str
-    signal: str
-
-
-MIN_HISTORICAL_RELIABILITY_RUNS: Final[int] = 2
 
 
 @dataclass(frozen=True)
@@ -13532,7 +13277,7 @@ def _default_report_mode_policy() -> ReportModePolicy:
 
 @dataclass(frozen=True)
 class ReportRenderContext:
-    """Shared cached context for HTML/Markdown/TSV report generation."""
+    """Shared cached context for retained current-run report generation."""
 
     result_set: ResultSet
     table_data: PreparedTableData
@@ -15437,57 +15182,6 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
 # =============================================================================
 
 
-def _build_recommendation_summary_block(
-    report_context: ReportRenderContext,
-) -> ReportSection:
-    """Build the shared current-run compatibility and recommendation summary."""
-    rows: list[tuple[str, ...]] = []
-    narrative_by_model = _failure_narratives_by_model(report_context)
-    for view in report_context.recommendations:
-        if view.result.success:
-            task_outcome = "Task outcome: completed"
-        else:
-            narrative = narrative_by_model[view.result.model_name]
-            task_outcome = f"Task outcome: {narrative.task_outcome}"
-        rows.append(
-            (
-                view.result.model_name,
-                task_outcome,
-                view.compatibility,
-                "eligible" if view.eligible else f"excluded: {view.eligibility_reason}",
-                view.burden.kind,
-                format_field_value("generation_tps", view.generation_tps) or "-",
-                _format_peak_memory_context(
-                    view.peak_memory_gb,
-                    report_context.recommended_working_set_bytes,
-                )
-                or "-",
-            )
-        )
-    return ReportSection(
-        title="Reliability-gated Current-run View",
-        level=3,
-        blocks=(
-            ReportParagraph(
-                "Policy: reliability-gated; crashes and integration warnings remain visible "
-                "but cannot be named as usable winners."
-            ),
-            ReportTable(
-                headers=(
-                    "Model",
-                    "Task outcome",
-                    "Compatibility",
-                    "Recommendation eligibility",
-                    "Prompt burden",
-                    "Gen TPS",
-                    "Peak GB",
-                ),
-                rows=tuple(rows),
-            ),
-        ),
-    )
-
-
 def generate_html_report(
     results: list[PerformanceResult],
     filename: Path,
@@ -15536,44 +15230,6 @@ def generate_html_report(
         logger.exception("Failed to write HTML report to %s", filename)
 
 
-def _process_markdown_rows(
-    rows: list[list[str]],
-    sorted_results: Sequence[PerformanceResult],
-    *,
-    field_names: Sequence[str],
-) -> None:
-    """Process table rows for Markdown: escape content and format model names."""
-    for i in range(len(rows)):
-        # Wrap model name in backticks to preserve underscores and special chars
-        if rows[i][0]:
-            rows[i][0] = f"`{rows[i][0]}`"
-
-        is_failure = i < len(sorted_results) and not sorted_results[i].success
-        for column_index, field_name in enumerate(field_names[1:], start=1):
-            if column_index >= len(rows[i]) or is_numeric_field(field_name):
-                continue
-            escaper = DIAGNOSTICS_ESCAPER if is_failure else MARKDOWN_ESCAPER
-            rows[i][column_index] = escaper.escape(rows[i][column_index])
-
-
-def _filter_table_columns(
-    *,
-    headers: list[str],
-    rows: list[list[str]],
-    field_names: list[str],
-    allowed_fields: Sequence[str],
-) -> None:
-    """Mutate table data to retain only the requested field names."""
-    index_by_field = {field_name: index for index, field_name in enumerate(field_names)}
-    keep_indexes = [
-        index_by_field[field_name] for field_name in allowed_fields if field_name in index_by_field
-    ]
-    headers[:] = [headers[index] for index in keep_indexes]
-    field_names[:] = [field_names[index] for index in keep_indexes]
-    for row_index, row in enumerate(rows):
-        rows[row_index] = [row[index] for index in keep_indexes if index < len(row)]
-
-
 def _generate_model_gallery_section(report_context: ReportRenderContext) -> list[str]:
     """Render complete evidence in stable avoid-first, then usable order."""
     assessments = _assessments_by_model(report_context)
@@ -15614,282 +15270,6 @@ def _generate_model_gallery_section(report_context: ReportRenderContext) -> list
         md.extend(["---", ""])
     md.extend(["<!-- markdownlint-enable MD033 MD034 -->", ""])
     return md
-
-
-def _generate_markdown_table_section(report_context: ReportRenderContext) -> list[str]:
-    """Generate the metrics table section for the Markdown report."""
-    headers, rows, field_names = _materialize_prepared_table_data(report_context.table_data)
-    _filter_table_columns(
-        headers=headers,
-        rows=rows,
-        field_names=field_names,
-        allowed_fields=MARKDOWN_SUMMARY_TABLE_FIELDS,
-    )
-
-    # For Markdown, we need to process headers to remove HTML breaks and use simpler formatting
-    markdown_headers: list[str] = []
-
-    for header in headers:
-        # Replace <br> with space for Markdown compatibility
-        clean_header = header.replace("<br>", " ")
-        markdown_headers.append(clean_header)
-
-    # Escape textual cells after filtering so summary values cannot break pipe tables.
-    _process_markdown_rows(
-        rows,
-        report_context.result_set.results,
-        field_names=field_names,
-    )
-
-    colalign = ["left"] + [
-        "right" if is_numeric_field(field_name) else "left" for field_name in field_names[1:]
-    ]
-
-    markdown_table = tabulate(
-        rows,
-        headers=markdown_headers,
-        tablefmt="pipe",  # Use 'pipe' format for proper GitHub alignment with colons
-        colalign=colalign,
-    )
-
-    markdown_table = normalize_markdown_trailing_spaces(markdown_table)
-
-    md: list[str] = []
-    md.extend(
-        _wrap_markdown_text(
-            "_Detailed machine-readable metrics remain in `results.tsv` and "
-            "`results.jsonl`; this Markdown table keeps the high-signal columns "
-            "for human review._",
-        ),
-    )
-    md.append("")
-    # Surround the table with markdownlint rule guards; the table can be wide and may
-    # contain HTML breaks and model-generated emphasis styles
-    md.append(f"<!-- markdownlint-disable {MARKDOWNLINT_MAIN_TABLE_RULES} -->")
-    md.append("")
-    md.append(markdown_table)
-    md.append("")
-    md.append(f"<!-- markdownlint-enable {MARKDOWNLINT_MAIN_TABLE_RULES} -->")
-    md.append("")
-    return md
-
-
-def _append_markdown_gallery_note(
-    md: list[str],
-    *,
-    report_filename: Path,
-    model_selection_filename: Path | None = None,
-    gallery_filename: Path | None = None,
-    review_filename: Path | None = None,
-    log_filename: Path | None = None,
-) -> None:
-    """Append companion artifact links, preferring published GitHub URLs."""
-    artifact_lines: list[tuple[str, str]] = []
-    if model_selection_filename is not None:
-        model_selection_target = _markdown_artifact_target(
-            report_filename=report_filename,
-            artifact_filename=model_selection_filename,
-        )
-        artifact_lines.append(
-            (
-                "Model-selection shortlist",
-                f"[{model_selection_filename.name}]({model_selection_target})",
-            ),
-        )
-    if gallery_filename is not None:
-        gallery_target = _markdown_artifact_target(
-            report_filename=report_filename,
-            artifact_filename=gallery_filename,
-        )
-        artifact_lines.append(
-            (
-                "Standalone output gallery",
-                f"[{gallery_filename.name}]({gallery_target})",
-            ),
-        )
-    if review_filename is not None:
-        review_target = _markdown_artifact_target(
-            report_filename=report_filename,
-            artifact_filename=review_filename,
-        )
-        artifact_lines.append(
-            (
-                "Automated review digest",
-                f"[{review_filename.name}]({review_target})",
-            ),
-        )
-    if log_filename is not None:
-        log_target = _markdown_artifact_target(
-            report_filename=report_filename,
-            artifact_filename=log_filename,
-        )
-        artifact_lines.append(
-            (
-                "Canonical run log",
-                f"[{log_filename.name}]({log_target})",
-            ),
-        )
-
-    if not artifact_lines:
-        return
-
-    md.append(_markdown_emphasis("Companion artifacts:"))
-    md.append("")
-    for label, link in artifact_lines:
-        _append_markdown_labeled_value(md, label=label, value=link, bullet=True)
-    md.append("")
-
-
-def generate_markdown_report(
-    results: list[PerformanceResult],
-    filename: Path,
-    versions: LibraryVersionDict,
-    prompt: str,
-    total_runtime_seconds: float,
-    image_path: Path | None = None,
-    report_context: ReportRenderContext | None = None,
-    model_selection_filename: Path | None = None,
-    gallery_filename: Path | None = None,
-    review_filename: Path | None = None,
-    log_filename: Path | None = None,
-) -> None:
-    """Write a GitHub-friendly Markdown summary with aligned pipe table.
-
-    Args:
-        results: Run results to render.
-        filename: Output Markdown file path.
-        versions: Installed library versions shown in the report.
-        prompt: Prompt used for the run.
-        total_runtime_seconds: Total wall-clock runtime for the full run.
-        image_path: Optional input image path for input-normalized resource metrics.
-        report_context: Optional cached shared report context built in finalization.
-        model_selection_filename: Optional selection-brief artifact path to link from results.md.
-        gallery_filename: Optional standalone gallery artifact path to link from results.md.
-        review_filename: Optional automated review digest path to link from results.md.
-        log_filename: Optional canonical log path to link from results.md.
-    """
-    if not results:
-        log_warning_note("No results to generate Markdown report.")
-        return
-
-    if report_context is None:
-        report_context = _build_report_render_context(
-            results=results,
-            prompt=prompt,
-            image_path=image_path,
-        )
-
-    headers, rows, _ = _materialize_prepared_table_data(report_context.table_data)
-
-    if not headers or not rows:
-        log_warning_note("No table data to generate Markdown report.")
-        return
-
-    issues_text: str = format_issues_summary_text(
-        report_context.summary,
-        report_context.stats,
-        suppress_cataloging_scores=report_context.mode_policy.suppress_cataloging_scores,
-    )
-
-    gallery_link_target = (
-        _markdown_artifact_target(
-            report_filename=filename,
-            artifact_filename=gallery_filename,
-        )
-        if gallery_filename is not None
-        else None
-    )
-
-    # Build the complete markdown content
-    md: list[str] = []
-    md.append("# Model Performance Results")
-    md.append("")
-    md.append(_markdown_generated_stamp())
-    md.append("")
-    md.extend(
-        _format_run_contract_parts(
-            report_context,
-            html_output=False,
-        ),
-    )
-    md.extend(
-        _format_action_snapshot_parts(
-            results,
-            report_context,
-            html_output=False,
-            suppress_cataloging_claims=report_context.mode_policy.suppress_cataloging_scores,
-        ),
-    )
-    # Add issues summary before prompt
-    if issues_text:
-        md.append(issues_text)
-    if report_context.mode_policy.suppress_cataloging_scores:
-        md.extend(_build_markdown_triage_model_selection_pointer(report_context))
-    else:
-        md.extend(
-            _build_markdown_recommended_models(
-                report_context,
-                gallery_link_target=gallery_link_target,
-            ),
-        )
-
-    # Add failures-by-package section for actionable reporting
-    failures_by_pkg = _format_failures_by_package_parts(
-        results,
-        html_output=False,
-        failure_narratives=_failure_narratives_by_model(report_context),
-    )
-    if failures_by_pkg:
-        md.extend(failures_by_pkg)
-
-    md.append(_markdown_emphasis("Prompt used:"))
-    _append_markdown_wrapped_blockquote(md, prompt)
-    md.extend(
-        _wrap_markdown_text(
-            "_Note:_ Results sorted: errors first, then by generation time (fastest to slowest).",
-        ),
-    )
-    md.append("")
-    md.append(
-        _markdown_emphasis("Overall runtime:") + f" {format_overall_runtime(total_runtime_seconds)}"
-    )
-    md.append("")
-
-    # Generate table section
-    table_md: list[str] = _generate_markdown_table_section(report_context)
-    md.extend(table_md)
-
-    _append_markdown_gallery_note(
-        md,
-        report_filename=filename,
-        model_selection_filename=model_selection_filename,
-        gallery_filename=gallery_filename,
-        review_filename=review_filename,
-        log_filename=log_filename,
-    )
-
-    md.append("---")
-
-    # Add system/hardware information if available
-    if report_context.system_info:
-        md.append("")
-        md.append("## System/Hardware Information")
-        md.append("")
-        for name, value in _collect_report_component_rows(
-            versions={},
-            system_info=report_context.system_info,
-        ):
-            _append_markdown_labeled_value(md, label=name, value=value, bullet=True)
-        md.append("")
-
-    md.append("## Library Versions")
-    md.append("")
-    for name, value in _collect_report_component_rows(versions=versions, system_info={}):
-        md.append(f"- `{name}`: `{value}`")
-    md.append("")
-    md.append(_markdown_generated_stamp(label="Report generated on"))
-
-    _write_markdown_artifact(filename, md, artifact_name="Markdown report")
 
 
 def generate_markdown_gallery_report(
@@ -15939,22 +15319,6 @@ def generate_markdown_gallery_report(
     md.extend(_generate_model_gallery_section(report_context))
 
     _write_markdown_artifact(filename, md, artifact_name="Markdown gallery report")
-
-
-def _group_review_results(
-    results: Sequence[PerformanceResult],
-    *,
-    key_name: Literal["owner", "user_bucket"],
-) -> dict[str, list[PerformanceResult]]:
-    """Group results by one field from the canonical review payload."""
-    grouped: dict[str, list[PerformanceResult]] = {}
-    for result in results:
-        review = _review_for_result(result)
-        if review is None:
-            continue
-        key = review["owner"] if key_name == "owner" else review["user_bucket"]
-        grouped.setdefault(key, []).append(result)
-    return grouped
 
 
 def _model_selection_score(result: PerformanceResult) -> float:
@@ -16191,13 +15555,6 @@ def _machine_artifact_facts(
     )
 
 
-def _recommendations_by_model(
-    report_context: ReportRenderContext,
-) -> dict[str, ModelRecommendationView]:
-    """Index cached current-run recommendations by model identifier."""
-    return {view.result.model_name: view for view in report_context.recommendations}
-
-
 def _assessments_by_model(
     report_context: HtmlReportContext,
 ) -> dict[str, ResultAssessment]:
@@ -16215,58 +15572,17 @@ def _legacy_assessments_by_model(
     }
 
 
-def _machine_facts_by_model(
-    report_context: ReportRenderContext,
-) -> dict[str, MachineArtifactFacts]:
-    """Index cached additive machine facts by current-run model identifier."""
-    return {
-        view.result.model_name: facts
-        for view, facts in zip(
-            report_context.recommendations,
-            report_context.machine_facts,
-            strict=True,
-        )
-    }
-
-
-def _machine_artifact_tsv_cells(facts: MachineArtifactFacts) -> tuple[str, ...]:
-    """Format canonical additive facts as TSV cells, leaving unavailable scores blank."""
-
-    def optional_score(value: float | None) -> str:
-        return fmt_num(value) if value is not None else ""
-
-    return (
-        facts.compatibility_status,
-        facts.current_recommendation,
-        facts.failure_origin,
-        facts.maintainer_readiness,
-        facts.reproduction_status,
-        facts.keyword_overlap,
-        optional_score(facts.context_integration_score),
-        optional_score(facts.draft_improvement_score),
-        optional_score(facts.visual_description_score),
-        optional_score(facts.assisted_enrichment_score),
-        optional_score(facts.peak_memory_working_set_pct),
-        facts.prompt_burden_kind,
-        facts.prompt_burden_source,
-    )
-
-
 def _align_summary_recommendation_highlights(
     summary: ModelIssueSummary,
     *,
     triage: ReportTriageContext,
     recommendations: Sequence[ModelRecommendationView],
 ) -> ModelIssueSummary:
-    """Align legacy summary winner labels with canonical recommendation eligibility."""
+    """Align legacy summary labels until Task 7 removes their final callers."""
     aligned: ModelIssueSummary = summary.copy()
     eligible = _eligible_recommendations(recommendations)
     eligible_names = {view.result.model_name for view in eligible}
-    _populate_summary_winner_highlights(
-        aligned,
-        [view.result for view in eligible],
-    )
-
+    _populate_summary_winner_highlights(aligned, [view.result for view in eligible])
     eligible_scores = [
         row for row in aligned.get("cataloging_scores", []) if row[0] in eligible_names
     ]
@@ -16275,7 +15591,6 @@ def _align_summary_recommendation_highlights(
         aligned["cataloging_best"] = (best[0], best[1], best[2])
     else:
         aligned["cataloging_best"] = None
-
     eligible_utility = [
         row for row in triage.utility_rows if row.result.model_name in eligible_names
     ]
@@ -16294,1600 +15609,6 @@ def _eligible_recommendations(
 ) -> list[ModelRecommendationView]:
     """Return recommendation views that pass current-run reliability gates."""
     return [view for view in views if view.eligible]
-
-
-def _rank_reliability_gated_enrichment(
-    views: Sequence[ModelRecommendationView],
-) -> list[ModelRecommendationView]:
-    """Rank eligible assisted-enrichment results with runtime as a tie-breaker."""
-    return sorted(
-        _eligible_recommendations(views),
-        key=lambda view: (
-            view.assisted_enrichment_score if view.assisted_enrichment_score is not None else -1.0,
-            -(view.total_time_s if view.total_time_s is not None else math.inf),
-            view.result.model_name,
-        ),
-        reverse=True,
-    )
-
-
-def _rank_under_memory_budget(
-    views: Sequence[ModelRecommendationView],
-    budget_gb: float,
-) -> list[ModelRecommendationView]:
-    """Return reliability-gated, quality-first results within a memory budget."""
-    return [
-        view
-        for view in _rank_quality_first(views)
-        if view.peak_memory_gb is not None and view.peak_memory_gb <= budget_gb
-    ]
-
-
-def _pareto_recommendations(
-    views: Sequence[ModelRecommendationView],
-) -> list[ModelRecommendationView]:
-    """Return eligible views not dominated on lane quality, total time, and memory."""
-    ranked = _rank_quality_first(views)
-
-    def _dominates(left: ModelRecommendationView, right: ModelRecommendationView) -> bool:
-        left_quality = _recommendation_quality_score(left)
-        right_quality = _recommendation_quality_score(right)
-        if (
-            any(
-                value is None
-                for value in (
-                    left.total_time_s,
-                    left.peak_memory_gb,
-                    right.total_time_s,
-                    right.peak_memory_gb,
-                )
-            )
-            or min(left_quality, right_quality) < 0.0
-        ):
-            return False
-        left_values = (
-            left_quality,
-            -cast("float", left.total_time_s),
-            -cast("float", left.peak_memory_gb),
-        )
-        right_values = (
-            right_quality,
-            -cast("float", right.total_time_s),
-            -cast("float", right.peak_memory_gb),
-        )
-        return all(
-            left_value >= right_value
-            for left_value, right_value in zip(left_values, right_values, strict=True)
-        ) and any(
-            left_value > right_value
-            for left_value, right_value in zip(left_values, right_values, strict=True)
-        )
-
-    return [
-        view
-        for view in ranked
-        if not any(_dominates(other, view) for other in ranked if other is not view)
-    ]
-
-
-_MODEL_VARIANT_SUFFIX_RE: Final[re.Pattern[str]] = re.compile(
-    r"-(?:bf16|fp16|[348]-?bit|6bit|8bit|mxfp4|mxfp8|nvfp4|qat-4bit|qat-8bit)$",
-    re.IGNORECASE,
-)
-
-
-def _model_family_key(model_name: str) -> str:
-    """Return a conservative repository-variant grouping key."""
-    owner, separator, model = model_name.partition("/")
-    normalized = _MODEL_VARIANT_SUFFIX_RE.sub("", model)
-    return f"{owner}/{normalized}" if separator else normalized
-
-
-def _recommendation_quality_score(view: ModelRecommendationView) -> float:
-    """Return the strongest lane-populated quality fact for presentation ordering."""
-    for score in (view.assisted_enrichment_score, view.visual_score, view.output_score):
-        if score is not None:
-            return score
-    return -1.0
-
-
-def _rank_quality_first(
-    views: Sequence[ModelRecommendationView],
-) -> list[ModelRecommendationView]:
-    """Rank reliability-gated views by lane quality, then output and throughput."""
-    eligible = _eligible_recommendations(views)
-    if any(view.assisted_enrichment_score is not None for view in eligible):
-        return _rank_reliability_gated_enrichment(views)
-    return sorted(
-        eligible,
-        key=lambda view: (
-            _recommendation_quality_score(view),
-            view.output_score if view.output_score is not None else -1.0,
-            view.generation_tps if view.generation_tps is not None else -1.0,
-            view.result.model_name,
-        ),
-        reverse=True,
-    )
-
-
-def _rank_efficiency_aware(
-    views: Sequence[ModelRecommendationView],
-) -> list[ModelRecommendationView]:
-    """Rank the reliability-gated quality/time/memory Pareto frontier by efficiency."""
-    return sorted(
-        _pareto_recommendations(views),
-        key=lambda view: (
-            -(view.total_time_s if view.total_time_s is not None else math.inf),
-            -(view.peak_memory_gb if view.peak_memory_gb is not None else math.inf),
-            view.generation_tps if view.generation_tps is not None else -1.0,
-            _recommendation_quality_score(view),
-            view.result.model_name,
-        ),
-        reverse=True,
-    )
-
-
-def _rank_current_recommendations(
-    views: Sequence[ModelRecommendationView],
-) -> list[ModelRecommendationView]:
-    """Rank all current views while keeping ineligible evidence visible at the end."""
-    return sorted(
-        views,
-        key=lambda view: (
-            view.eligible,
-            _recommendation_quality_score(view),
-            view.output_score if view.output_score is not None else -1.0,
-            view.generation_tps if view.generation_tps is not None else -1.0,
-            view.result.model_name,
-        ),
-        reverse=True,
-    )
-
-
-def _model_recommendation_status(view: ModelRecommendationView) -> str:
-    """Return a concise human-facing status for a recommendation view."""
-    return view.current_recommendation.replace("_", " ")
-
-
-def _recommendation_icon(status: RecommendationStatus) -> str:
-    """Return a gallery icon for one canonical recommendation status."""
-    return {
-        "recommended": "✅",
-        "caveat": "⚠️",
-        "avoid": "❌",
-        "not_evaluated": "❔",
-    }[status]
-
-
-def _model_recommendation_evidence(view: ModelRecommendationView) -> str:
-    """Return compact chooser evidence, preferring diagnostics for gated rows."""
-    preview = _build_result_output_preview(view.result, max_chars=96)
-    caveat = " | ".join(view.caveats) or "no flagged signals"
-    return caveat if not view.eligible and caveat != "no flagged signals" else preview or caveat
-
-
-def _model_selection_chooser_table_rows(
-    views: Sequence[ModelRecommendationView],
-    *,
-    recommended_working_set_bytes: int | None = None,
-) -> tuple[tuple[str, ...], ...]:
-    """Return compact chooser table cells from canonical recommendation views."""
-    return tuple(
-        (
-            f"`{MARKDOWN_ESCAPER.escape(view.result.model_name)}`",
-            _format_peak_memory_context(
-                view.peak_memory_gb,
-                recommended_working_set_bytes,
-            )
-            or "-",
-            format_field_value("generation_tps", view.generation_tps) or "-",
-            (f"{view.visual_score:.0f}" if view.visual_score is not None else "-"),
-            f"`{MARKDOWN_ESCAPER.escape(_model_recommendation_status(view))}`",
-            _markdown_inline_code(_model_recommendation_evidence(view)),
-        )
-        for view in views
-    )
-
-
-def _append_model_selection_chooser_section(
-    md: list[str],
-    *,
-    title: str,
-    views: Sequence[ModelRecommendationView],
-    policy_name: str,
-    empty_text: str,
-    fallback: bool = False,
-    recommended_working_set_bytes: int | None = None,
-) -> None:
-    """Append one compact practical chooser bucket."""
-    md.extend(
-        [
-            f"### {title}",
-            "",
-            f"Policy: {policy_name}.",
-            "Evidence scope: 1 image, 1 current run.",
-            "",
-        ]
-    )
-    if not views:
-        md.extend([f"- {empty_text}", ""])
-        return
-    if fallback:
-        md.extend(
-            [
-                (
-                    "Fallback only: no recommended row met this tier; the rows below retain "
-                    "their current-run caveat status."
-                ),
-                "",
-            ]
-        )
-    md.extend(
-        render_report_markdown(
-            (
-                ReportTable(
-                    headers=("Model", "Peak GB", "Gen TPS", "Usefulness", "Status", "Evidence"),
-                    rows=_model_selection_chooser_table_rows(
-                        views,
-                        recommended_working_set_bytes=recommended_working_set_bytes,
-                    ),
-                    markdown_escaped=True,
-                ),
-            )
-        )
-    )
-    md.append("")
-
-
-def _append_model_selection_quick_chooser(
-    md: list[str],
-    views: Sequence[ModelRecommendationView],
-    *,
-    policy_name: str,
-    semantic_rankings_grounded: bool,
-    recommended_working_set_bytes: int | None = None,
-) -> None:
-    """Append practical model-user chooser buckets before the full shortlist."""
-    caveated = [view for view in views if view.current_recommendation == "caveat"]
-
-    def with_fallback(
-        recommended: Sequence[ModelRecommendationView],
-        fallbacks: Sequence[ModelRecommendationView],
-    ) -> tuple[list[ModelRecommendationView], bool]:
-        return (list(recommended), False) if recommended else (list(fallbacks[:1]), bool(fallbacks))
-
-    under_4gb = _rank_under_memory_budget(
-        views,
-        MODEL_SELECTION_CHOOSER_SMALL_MEMORY_GB,
-    )[:MODEL_SELECTION_CHOOSER_ROW_LIMIT]
-    under_8gb = _rank_under_memory_budget(
-        views,
-        MODEL_SELECTION_CHOOSER_MEDIUM_MEMORY_GB,
-    )[:MODEL_SELECTION_CHOOSER_ROW_LIMIT]
-    fastest = _rank_efficiency_aware(views)[:MODEL_SELECTION_CHOOSER_ROW_LIMIT]
-    quality_any_memory = _rank_quality_first(views)[:MODEL_SELECTION_CHOOSER_ROW_LIMIT]
-    caveated_by_quality = _rank_current_recommendations(caveated)
-    under_4gb, under_4gb_fallback = with_fallback(
-        under_4gb,
-        [
-            view
-            for view in caveated_by_quality
-            if view.peak_memory_gb is not None
-            and view.peak_memory_gb <= MODEL_SELECTION_CHOOSER_SMALL_MEMORY_GB
-        ],
-    )
-    under_8gb, under_8gb_fallback = with_fallback(
-        under_8gb,
-        [
-            view
-            for view in caveated_by_quality
-            if view.peak_memory_gb is not None
-            and view.peak_memory_gb <= MODEL_SELECTION_CHOOSER_MEDIUM_MEMORY_GB
-        ],
-    )
-    fastest, fastest_fallback = with_fallback(
-        fastest,
-        sorted(
-            caveated,
-            key=lambda view: view.generation_tps or -1.0,
-            reverse=True,
-        ),
-    )
-    quality_any_memory, quality_fallback = with_fallback(
-        quality_any_memory,
-        caveated_by_quality,
-    )
-    current_avoid = [
-        view for view in views if view.current_recommendation in {"avoid", "not_evaluated"}
-    ][:MODEL_SELECTION_CHOOSER_AVOID_ROW_LIMIT]
-    chooser_scope = (
-        "In assisted mode, quality rankings combine visual usefulness with correct use "
-        "of authoritative metadata; runtime and contract findings remain diagnostic "
-        "triage signals."
-        if semantic_rankings_grounded
-        else (
-            "Ungrounded triage rankings compare output hygiene and runtime behaviour; "
-            "they are not claims about visual accuracy."
-        )
-    )
-
-    md.extend(
-        [
-            "## Quick Chooser",
-            "",
-            f"Practical current-run buckets for model users. {chooser_scope}",
-            "",
-        ]
-    )
-    _append_model_selection_chooser_section(
-        md,
-        title="Best under 4 GB",
-        views=under_4gb,
-        policy_name=f"memory-aware ({policy_name}; budget 4 GB)",
-        empty_text="No clean current-run candidates fit under this memory budget.",
-        fallback=under_4gb_fallback,
-        recommended_working_set_bytes=recommended_working_set_bytes,
-    )
-    _append_model_selection_chooser_section(
-        md,
-        title="Best under 8 GB",
-        views=under_8gb,
-        policy_name=f"memory-aware ({policy_name}; budget 8 GB)",
-        empty_text="No clean current-run candidates fit under this memory budget.",
-        fallback=under_8gb_fallback,
-        recommended_working_set_bytes=recommended_working_set_bytes,
-    )
-    _append_model_selection_chooser_section(
-        md,
-        title="Fastest usable",
-        views=fastest,
-        policy_name="efficiency-aware Pareto frontier (reliability-gated)",
-        empty_text="No clean current-run candidates produced usable caption text.",
-        fallback=fastest_fallback,
-        recommended_working_set_bytes=recommended_working_set_bytes,
-    )
-    _append_model_selection_chooser_section(
-        md,
-        title="Quality if memory allows",
-        views=quality_any_memory,
-        policy_name=f"quality-first ({policy_name})",
-        empty_text="No clean current-run candidates produced usable caption text.",
-        fallback=quality_fallback,
-        recommended_working_set_bytes=recommended_working_set_bytes,
-    )
-    _append_model_selection_chooser_section(
-        md,
-        title="Current failures / avoid",
-        views=current_avoid,
-        policy_name="reliability-gated exclusion evidence",
-        empty_text="No current-run failures or avoid-bucket outputs.",
-        recommended_working_set_bytes=recommended_working_set_bytes,
-    )
-
-
-def _is_review_escalation(result: PerformanceResult) -> bool:
-    """Return True for review rows that need maintainer attention."""
-    review = _review_for_result(result)
-    if review is None:
-        return False
-    if review["verdict"] in {
-        "runtime_failure",
-        "harness",
-        "cutoff",
-        "cutoff_degraded",
-        "context_budget",
-    }:
-        return True
-
-    analysis = _quality_analysis_for_result(result)
-    if analysis is None:
-        return result.error_package is not None
-    if (
-        analysis.has_harness_issue
-        or analysis.has_reasoning_leak
-        or analysis.thinking_trace_incomplete
-        or analysis.has_degeneration
-    ):
-        return True
-    if analysis.formatting_issues or analysis.has_excessive_bullets or analysis.has_context_echo:
-        return True
-    return any(
-        "long_context" in evidence
-        or evidence in {"reasoning_leak", "thinking_incomplete", "formatting"}
-        for evidence in review["evidence"]
-    )
-
-
-def _append_review_user_buckets(
-    md: list[str],
-    bucket_groups: Mapping[str, Sequence[PerformanceResult]],
-    *,
-    mode_policy: ReportModePolicy | None = None,
-) -> None:
-    """Append user-facing recommendation buckets for the review digest."""
-    md.extend(
-        [
-            "## User Buckets",
-            "",
-            "User-first summary grouped by recommendation bucket.",
-            "",
-        ]
-    )
-    for bucket in ("recommended", "caveat", "needs_triage", "avoid"):
-        display_bucket = _review_display_bucket_label(bucket, policy=mode_policy)
-        md.extend([f"### `{display_bucket}`", ""])
-        if display_bucket == "clean-triage-pass":
-            md.extend(
-                [
-                    (
-                        "Clean in the current ungrounded triage run; visual correctness still "
-                        "needs gallery review or grounded metadata."
-                    ),
-                    "",
-                ]
-            )
-        bucket_results = bucket_groups.get(bucket, [])
-        if not bucket_results:
-            if bucket == "recommended":
-                md.extend(
-                    [
-                        "- None — no models produced clean triage output meeting all quality thresholds for this prompt.",
-                        "",
-                    ]
-                )
-            else:
-                md.extend(["- None.", ""])
-            continue
-        rows: list[tuple[str, ...]] = []
-        for result in bucket_results:
-            review = _review_for_result(result)
-            if review is None:
-                continue
-            analysis = _quality_analysis_for_result(result)
-            rows.append(
-                (
-                    f"`{MARKDOWN_ESCAPER.escape(result.model_name)}`",
-                    f"`{MARKDOWN_ESCAPER.escape(review['verdict'])}`",
-                    MARKDOWN_ESCAPER.escape(review["hint_relationship"].replace("_", " ")),
-                    MARKDOWN_ESCAPER.escape(_review_focus_text(review, analysis)),
-                )
-            )
-        md.extend(
-            render_report_markdown(
-                (
-                    ReportTable(
-                        headers=("Model", "Verdict", "Hint Handling", "Key Evidence"),
-                        rows=tuple(rows),
-                        markdown_escaped=True,
-                    ),
-                )
-            )
-        )
-        md.append("")
-
-
-def _append_review_model_verdicts(
-    md: list[str],
-    results: Sequence[PerformanceResult],
-) -> None:
-    """Append detailed per-model canonical review rows for the digest."""
-    md.extend(["## Model Verdicts", ""])
-    for result in results:
-        review = _review_for_result(result)
-        if review is None:
-            continue
-        md.extend([f"### `{result.model_name}`", ""])
-        _append_markdown_review_block(md, res=result)
-        md.append("")
-
-
-def _build_grounded_metadata_selection_section(
-    views: Sequence[ModelRecommendationView],
-    *,
-    policy_name: str,
-) -> list[str]:
-    """Render metadata-agreement candidates when trusted metadata is available."""
-    table_rows: list[tuple[str, ...]] = []
-    for view in views[:10]:
-        agreement = view.result.metadata_agreement
-        agreement_score = 0.0 if agreement is None else agreement.overall_score
-        review = _review_for_result(view.result)
-        verdict = review["verdict"] if review is not None else "not_evaluated"
-        table_rows.append(
-            (
-                f"`{MARKDOWN_ESCAPER.escape(view.result.model_name)}`",
-                f"{agreement_score:.0f}",
-                f"`{MARKDOWN_ESCAPER.escape(verdict)}`",
-                _markdown_inline_code(_build_result_output_preview(view.result, max_chars=180)),
-            )
-        )
-
-    parts = [
-        "## Structured Metadata Candidates",
-        "",
-        (
-            "Top 10 ranked candidates for structured title/description/keywords. "
-            "Use the gallery for complete per-model evidence."
-        ),
-        f"Policy: {policy_name}.",
-        "Evidence scope: 1 image, 1 current run.",
-        "",
-    ]
-    parts.extend(
-        render_report_markdown(
-            (
-                ReportTable(
-                    headers=("Model", "Metadata agreement", "Verdict", "Output Preview"),
-                    rows=tuple(table_rows),
-                    markdown_escaped=True,
-                ),
-            )
-        )
-    )
-    parts.append("")
-    return parts
-
-
-def _build_model_family_comparison_section(
-    views: Sequence[ModelRecommendationView],
-    *,
-    policy_name: str,
-    recommended_working_set_bytes: int | None = None,
-) -> list[str]:
-    """Render current-run variant comparisons without merging variant evidence."""
-    grouped: dict[str, list[ModelRecommendationView]] = {}
-    for view in views:
-        grouped.setdefault(_model_family_key(view.result.model_name), []).append(view)
-    families = {
-        key: members
-        for key, members in grouped.items()
-        if len(members) >= MIN_MODELS_FOR_EFFICIENCY_CHART
-    }
-    if not families:
-        return []
-
-    rows = tuple(
-        (
-            MARKDOWN_ESCAPER.escape(family),
-            f"`{MARKDOWN_ESCAPER.escape(view.result.model_name)}`",
-            "yes" if view.eligible else "no",
-            (
-                f"{_recommendation_quality_score(view):.0f}"
-                if _recommendation_quality_score(view) >= 0.0
-                else "-"
-            ),
-            format_field_value("total_time", view.total_time_s) or "-",
-            _format_peak_memory_context(
-                view.peak_memory_gb,
-                recommended_working_set_bytes,
-            )
-            or "-",
-        )
-        for family in sorted(families)
-        for view in _rank_current_recommendations(families[family])
-    )
-    table = render_report_markdown(
-        (
-            ReportTable(
-                headers=("Family", "Variant", "Eligible", "Quality", "Total", "Peak GB"),
-                rows=rows,
-                markdown_escaped=True,
-            ),
-        )
-    )
-    return [
-        "## Repository Variant Comparisons",
-        "",
-        f"Policy: {policy_name} within matching repository families.",
-        "Evidence scope: 1 image, 1 current run per variant; scores and histories are not merged.",
-        "",
-        *table,
-        "",
-    ]
-
-
-def _model_selection_policy_name(policy: ReportModePolicy) -> str:
-    """Return the explicit current-run ranking policy for an evaluation lane."""
-    if policy.eval_mode == "assisted":
-        return "reliability-gated assisted enrichment"
-    if policy.eval_mode == "blind":
-        return "reliability-gated held-out visual quality"
-    return "reliability-gated caption usefulness"
-
-
-def _append_model_selection_evidence_links(
-    md: list[str],
-    *,
-    report_filename: Path,
-    gallery_filename: Path | None,
-    diagnostics_filename: Path | None,
-) -> None:
-    """Append companion links for the model-selection brief."""
-    if gallery_filename is None and diagnostics_filename is None:
-        return
-
-    md.extend(["## Evidence Links", ""])
-    if gallery_filename is not None:
-        target = _markdown_artifact_target(
-            report_filename=report_filename,
-            artifact_filename=gallery_filename,
-        )
-        _append_markdown_labeled_value(
-            md,
-            label="Output evidence",
-            value=f"[{gallery_filename.name}]({target})",
-            bullet=True,
-        )
-    if diagnostics_filename is not None:
-        target = _markdown_artifact_target(
-            report_filename=report_filename,
-            artifact_filename=diagnostics_filename,
-        )
-        _append_markdown_labeled_value(
-            md,
-            label="Maintainer diagnostics",
-            value=f"[{diagnostics_filename.name}]({target})",
-            bullet=True,
-        )
-    md.append("")
-
-
-def generate_model_selection_report(
-    results: list[PerformanceResult],
-    filename: Path,
-    *,
-    prompt: str,
-    metadata: MetadataDict | None = None,
-    report_context: ReportRenderContext | None = None,
-    gallery_filename: Path | None = None,
-    diagnostics_filename: Path | None = None,
-) -> None:
-    """Write a public model-selection brief for caption and metadata users."""
-    if not results:
-        log_warning_note("No results to generate model-selection report.")
-        return
-    if report_context is None:
-        report_context = _build_report_render_context(
-            results=results,
-            prompt=prompt,
-            metadata=metadata,
-        )
-
-    policy = report_context.mode_policy
-    grounding = "grounded" if policy.semantic_rankings_grounded else "ungrounded"
-    views = report_context.recommendations
-    ranked_views = _rank_quality_first(views)
-    ranking_policy_name = _model_selection_policy_name(policy)
-    quality_policy_name = f"quality-first ({ranking_policy_name})"
-    md: list[str] = [
-        "# Model Selection Brief",
-        "",
-        _markdown_generated_stamp(),
-        "",
-        f"- Evaluation lane: {MARKDOWN_ESCAPER.escape(policy.eval_mode)}",
-        f"- Metadata exposed to prompt: {'yes' if policy.metadata_exposed_to_prompt else 'no'}",
-        (f"- Semantic rankings: {grounding} ({MARKDOWN_ESCAPER.escape(policy.selection_basis)})"),
-        f"- Policy: {ranking_policy_name}",
-        "- Evidence scope: 1 image, 1 current run",
-        (
-            "- Primary use cases: brief captions only in triage mode; structured "
-            "title/description/keywords require a grounded metadata or quality run"
-            if policy.suppress_cataloging_scores
-            else "- Primary use cases: brief captions; structured title/description/keywords"
-        ),
-        (
-            "- Scope: ranked shortlists plus an expandable complete current-run matrix; "
-            "complete outputs and diagnostics are in `model_gallery.md`."
-        ),
-        "",
-    ]
-
-    _append_model_selection_evidence_links(
-        md,
-        report_filename=filename,
-        gallery_filename=gallery_filename,
-        diagnostics_filename=diagnostics_filename,
-    )
-
-    md.extend(render_report_markdown((_build_recommendation_summary_block(report_context),)))
-    md.append("")
-
-    _append_model_selection_quick_chooser(
-        md,
-        views,
-        policy_name=ranking_policy_name,
-        semantic_rankings_grounded=policy.semantic_rankings_grounded,
-        recommended_working_set_bytes=report_context.recommended_working_set_bytes,
-    )
-
-    md.extend(
-        [
-            "## Brief Caption Candidates",
-            "",
-            (
-                "Top 10 ranked candidates for brief captions. This is a selection aid, "
-                "not the complete result set."
-            ),
-            f"Policy: {quality_policy_name}.",
-            "Evidence scope: 1 image, 1 current run.",
-            "",
-        ]
-    )
-    caption_rows = [
-        (
-            f"`{MARKDOWN_ESCAPER.escape(view.result.model_name)}`",
-            f"{view.output_score:.0f}" if view.output_score is not None else "-",
-            f"{view.visual_score:.0f}" if view.visual_score is not None else "-",
-            format_field_value("generation_tps", view.generation_tps) or "-",
-            _format_peak_memory_context(
-                view.peak_memory_gb,
-                report_context.recommended_working_set_bytes,
-            )
-            or "-",
-            f"`{MARKDOWN_ESCAPER.escape(_model_recommendation_status(view))}`",
-            _markdown_inline_code(_build_result_output_preview(view.result, max_chars=180)),
-            MARKDOWN_ESCAPER.escape(" | ".join(view.caveats) or "no flagged signals"),
-        )
-        for view in ranked_views[:10]
-    ]
-    md.extend(
-        render_report_markdown(
-            (
-                ReportTable(
-                    headers=(
-                        "Model",
-                        "Hygiene",
-                        "Usefulness",
-                        "Gen TPS",
-                        "Peak GB",
-                        "Verdict",
-                        "Caption Preview",
-                        "Caveat",
-                    ),
-                    rows=tuple(caption_rows),
-                    markdown_escaped=True,
-                ),
-            )
-        )
-    )
-    md.append("")
-
-    if policy.suppress_cataloging_scores:
-        md.extend(
-            [
-                "## Structured Metadata Candidates",
-                "",
-                "Structured metadata scoring is suppressed in triage mode.",
-                f"Policy: {quality_policy_name}.",
-                "Evidence scope: 1 image, 1 current run.",
-                "",
-            ]
-        )
-    else:
-        md.extend(
-            _build_grounded_metadata_selection_section(
-                ranked_views,
-                policy_name=quality_policy_name,
-            )
-        )
-
-    md.extend(
-        _build_model_family_comparison_section(
-            views,
-            policy_name=quality_policy_name,
-            recommended_working_set_bytes=report_context.recommended_working_set_bytes,
-        )
-    )
-    md.extend(["## Complete Current-Run Matrix", "", "All attempted models; expand to skim.", ""])
-    md.extend(
-        _guard_markdownlint_block(
-            render_report_markdown(
-                (
-                    ReportDetails(
-                        summary="Expand complete current-run matrix",
-                        blocks=(
-                            ReportTable(
-                                headers=(
-                                    "Model",
-                                    "Peak GB",
-                                    "Gen TPS",
-                                    "Usefulness",
-                                    "Status",
-                                    "Evidence",
-                                ),
-                                rows=_model_selection_chooser_table_rows(
-                                    _rank_current_recommendations(views),
-                                    recommended_working_set_bytes=(
-                                        report_context.recommended_working_set_bytes
-                                    ),
-                                ),
-                                markdown_escaped=True,
-                            ),
-                        ),
-                    ),
-                )
-            ),
-            rules=f"{MARKDOWNLINT_TABLE_PIPE_RULES} {MARKDOWNLINT_DETAILS_RULES}",
-        )
-    )
-
-    _write_markdown_artifact(filename, md, artifact_name="Model-selection report")
-
-
-def _capability_float(value: object) -> float | None:
-    """Return finite numeric score values from history/current records."""
-    if isinstance(value, int | float) and not isinstance(value, bool) and math.isfinite(value):
-        return float(value)
-    return None
-
-
-def _capability_avg(values: Iterable[float | None]) -> float | None:
-    """Average available capability values, ignoring missing history fields."""
-    present = [value for value in values if value is not None]
-    if not present:
-        return None
-    return round(sum(present) / len(present), 1)
-
-
-def _capability_score_from_parts(
-    *,
-    success: bool,
-    review_bucket: str | None,
-    hygiene_score: float | None,
-    caption_score: float | None,
-    cataloging_score: float | None,
-    metadata_alignment_score: float | None,
-) -> float | None:
-    """Return a compact capability roll-up from already-computed signals."""
-    if not success:
-        return 0.0
-
-    content_score = (
-        metadata_alignment_score if metadata_alignment_score is not None else cataloging_score
-    )
-    components = [
-        (hygiene_score, 0.35),
-        (caption_score, 0.30),
-        (content_score, 0.25),
-    ]
-    weighted_sum = sum(value * weight for value, weight in components if value is not None)
-    weight_total = sum(weight for value, weight in components if value is not None)
-    if weight_total <= 0:
-        return None
-
-    bucket_adjustments = {
-        "recommended": 5.0,
-        "caveat": -10.0,
-        "needs_triage": -20.0,
-        "avoid": -45.0,
-    }
-    score = weighted_sum / weight_total + bucket_adjustments.get(review_bucket or "", 0.0)
-    return round(max(0.0, min(100.0, score)), 1)
-
-
-def _capability_summary_signal(result: PerformanceResult) -> str:
-    """Return the legacy capability-scorecard signal outside gallery rendering."""
-    cues = _build_result_output_cues(result)
-    if cues:
-        return "; ".join(cues)
-
-    signal = "no flagged signals"
-    analysis = _quality_analysis_for_result(result)
-    if result.success:
-        if analysis is None:
-            signal = "quality not evaluated"
-        elif not analysis.prompt_checks_ran:
-            signal = "prompt checks unavailable"
-        elif not analysis.has_any_issues():
-            signal = "clean"
-    if signal == "no flagged signals":
-        review = _review_for_result(result)
-        if review is not None:
-            focus = _review_focus_text(review, analysis)
-            if focus != "no flagged signals":
-                signal = _markdown_review_text(focus)
-    if signal == "no flagged signals":
-        signal = result.error_stage or result.error_package or signal
-    return signal
-
-
-def _capability_signal_from_result(
-    view: ModelRecommendationView,
-    *,
-    utility_by_model: Mapping[str, UtilityTriageRow],
-    suppress_cataloging_scores: bool,
-) -> ModelCapabilityRunSignal:
-    """Build a current capability signal from the canonical recommendation view."""
-    result = view.result
-    text = str(getattr(result.generation, "text", "") or "") if result.generation else ""
-    utility = utility_by_model.get(result.model_name)
-    metadata_score = None
-    if not suppress_cataloging_scores:
-        metadata_score = (
-            result.metadata_agreement.overall_score
-            if result.metadata_agreement is not None
-            else _capability_float(
-                getattr(result.quality_analysis, "metadata_alignment_score", None)
-            )
-        )
-    hygiene_score = view.output_score
-    caption_score = _caption_usefulness_score(text) if result.success and text else None
-    cataloging_score = None if suppress_cataloging_scores or utility is None else utility.score
-    description_score = (
-        None if suppress_cataloging_scores or utility is None else utility.description_score
-    )
-    keyword_score = None if suppress_cataloging_scores or utility is None else utility.keyword_score
-    review_bucket = view.current_recommendation
-    capability_score = _capability_score_from_parts(
-        success=result.success,
-        review_bucket=review_bucket,
-        hygiene_score=hygiene_score,
-        caption_score=caption_score,
-        cataloging_score=cataloging_score,
-        metadata_alignment_score=metadata_score,
-    )
-    summary_signal = _capability_summary_signal(result)
-    return ModelCapabilityRunSignal(
-        model=result.model_name,
-        success=result.success,
-        current_recommendation=view.current_recommendation,
-        is_current=True,
-        eligible=view.eligible,
-        eligibility_reason=view.eligibility_reason,
-        review_bucket=review_bucket,
-        capability_score=capability_score,
-        hygiene_score=hygiene_score,
-        caption_score=caption_score,
-        cataloging_score=cataloging_score,
-        description_score=description_score,
-        keyword_score=keyword_score,
-        metadata_alignment_score=metadata_score,
-        generation_tps=view.generation_tps,
-        peak_memory_gb=view.peak_memory_gb,
-        signal=(
-            summary_signal if view.eligible else f"{view.eligibility_reason}; {summary_signal}"
-        ),
-    )
-
-
-def _capability_signal_from_history(
-    model: str,
-    info: HistoryModelResultRecord,
-) -> ModelCapabilityRunSignal:
-    """Build a capability observation from a run-history model row."""
-    signal = (
-        info.get("review_verdict") or info.get("harness_issue_type") or info.get("error_code") or ""
-    )
-    return ModelCapabilityRunSignal(
-        model=model,
-        success=info.get("success") is True,
-        current_recommendation=_history_recommendation_status(info),
-        review_bucket=_history_recommendation_status(info),
-        capability_score=_capability_float(info.get("capability_score")),
-        hygiene_score=_capability_float(info.get("hygiene_score")),
-        caption_score=_capability_float(info.get("caption_score")),
-        cataloging_score=_capability_float(info.get("cataloging_score")),
-        description_score=_capability_float(info.get("description_score")),
-        keyword_score=_capability_float(info.get("keyword_score")),
-        metadata_alignment_score=_capability_float(info.get("metadata_alignment_score")),
-        generation_tps=_capability_float(info.get("generation_tps")),
-        peak_memory_gb=_capability_float(info.get("peak_memory_gb")),
-        signal=signal,
-    )
-
-
-def _history_recommendation_status(
-    info: HistoryModelResultRecord,
-) -> RecommendationStatus:
-    """Return a canonical recommendation from new or legacy history rows."""
-    if recommendation := info.get("current_recommendation"):
-        return recommendation
-    legacy = info.get("review_user_bucket")
-    if legacy == "recommended":
-        return "recommended"
-    if legacy == "caveat":
-        return "caveat"
-    if legacy == "avoid":
-        return "avoid"
-    return "not_evaluated"
-
-
-def _historical_reliability(
-    signals: Sequence[ModelCapabilityRunSignal],
-) -> tuple[HistoricalReliability, str]:
-    """Summarize lane-matched prior outcomes without using aggregate scores."""
-    runs = len(signals)
-    if runs < MIN_HISTORICAL_RELIABILITY_RUNS:
-        return (
-            "insufficient_evidence",
-            "no prior lane-matched runs" if runs == 0 else "only one prior lane-matched run",
-        )
-    counts = {
-        status: sum(1 for signal in signals if signal.current_recommendation == status)
-        for status in ("recommended", "caveat", "avoid", "not_evaluated")
-    }
-    if counts["recommended"] == runs:
-        return "stable", f"all {runs} prior lane-matched runs were recommended"
-    if counts["avoid"] + counts["not_evaluated"] == runs:
-        return (
-            "consistently_unsuitable",
-            f"all {runs} prior lane-matched runs were avoid or not evaluated",
-        )
-    summary = ", ".join(f"{count} {status}" for status, count in counts.items() if count)
-    return "variable", f"mixed prior outcomes: {summary}"
-
-
-def _collect_model_capability_signals(
-    report_context: ReportRenderContext,
-    history_records: Sequence[HistoryRunRecord],
-) -> dict[str, list[ModelCapabilityRunSignal]]:
-    """Collect current and historical capability observations by model."""
-    utility_by_model = {row.result.model_name: row for row in report_context.triage.utility_rows}
-    signals_by_model: dict[str, list[ModelCapabilityRunSignal]] = {}
-    lane_history_records = _history_records_for_eval_mode(
-        history_records,
-        report_context.mode_policy.eval_mode,
-    )
-    for record in lane_history_records:
-        for model, info in _history_model_results(record).items():
-            signals_by_model.setdefault(model, []).append(
-                _capability_signal_from_history(model, info)
-            )
-    for view in report_context.recommendations:
-        signal = _capability_signal_from_result(
-            view,
-            utility_by_model=utility_by_model,
-            suppress_cataloging_scores=report_context.mode_policy.suppress_cataloging_scores,
-        )
-        signals_by_model.setdefault(view.result.model_name, []).append(signal)
-    return signals_by_model
-
-
-def _capability_score_value(
-    signal: ModelCapabilityRunSignal,
-    *,
-    suppress_cataloging_scores: bool,
-) -> float | None:
-    """Return the aggregate-safe capability value for one signal."""
-    if not suppress_cataloging_scores:
-        return signal.capability_score
-    return _capability_score_from_parts(
-        success=signal.success,
-        review_bucket=signal.review_bucket,
-        hygiene_score=signal.hygiene_score,
-        caption_score=signal.caption_score,
-        cataloging_score=None,
-        metadata_alignment_score=None,
-    )
-
-
-def _model_capability_row_from_signals(
-    model: str,
-    signals: Sequence[ModelCapabilityRunSignal],
-    *,
-    suppress_cataloging_scores: bool,
-) -> ModelCapabilityRow:
-    """Aggregate one model's capability observations into a scorecard row."""
-    historical_signals = tuple(signal for signal in signals if not signal.is_current)
-    runs = len(historical_signals)
-    successes = sum(1 for signal in historical_signals if signal.success)
-    current_signal = next((signal for signal in reversed(signals) if signal.is_current), None)
-    latest_signal = current_signal or signals[-1]
-    reliability, variability_reason = _historical_reliability(historical_signals)
-    scored_signals: Sequence[ModelCapabilityRunSignal] = (
-        () if suppress_cataloging_scores else signals
-    )
-    return ModelCapabilityRow(
-        model=model,
-        runs=runs,
-        successes=successes,
-        failures=runs - successes,
-        success_rate=round(successes / runs * 100.0, 1) if runs else 0.0,
-        recommended_rate=round(
-            sum(
-                1 for signal in historical_signals if signal.current_recommendation == "recommended"
-            )
-            / runs
-            * 100.0,
-            1,
-        )
-        if runs
-        else 0.0,
-        capability_score=_capability_avg(
-            _capability_score_value(
-                signal,
-                suppress_cataloging_scores=suppress_cataloging_scores,
-            )
-            for signal in signals
-        ),
-        hygiene_score=_capability_avg(signal.hygiene_score for signal in signals),
-        caption_score=_capability_avg(signal.caption_score for signal in signals),
-        cataloging_score=_capability_avg(signal.cataloging_score for signal in scored_signals),
-        description_score=_capability_avg(signal.description_score for signal in scored_signals),
-        keyword_score=_capability_avg(signal.keyword_score for signal in scored_signals),
-        metadata_alignment_score=_capability_avg(
-            signal.metadata_alignment_score for signal in scored_signals
-        ),
-        generation_tps=_capability_avg(signal.generation_tps for signal in signals),
-        peak_memory_gb=_capability_avg(signal.peak_memory_gb for signal in signals),
-        current_recommendation=(
-            current_signal.current_recommendation if current_signal else "not_evaluated"
-        ),
-        historical_reliability=reliability,
-        variability_reason=variability_reason,
-        signal=latest_signal.signal or "no flagged signals",
-    )
-
-
-def _build_model_capability_rows(
-    *,
-    report_context: ReportRenderContext,
-    history_records: Sequence[HistoryRunRecord],
-) -> list[ModelCapabilityRow]:
-    """Aggregate current and historical capability observations by model."""
-    suppress_cataloging_scores = report_context.mode_policy.suppress_cataloging_scores
-    rows = [
-        _model_capability_row_from_signals(
-            model,
-            signals,
-            suppress_cataloging_scores=suppress_cataloging_scores,
-        )
-        for model, signals in _collect_model_capability_signals(
-            report_context,
-            history_records,
-        ).items()
-    ]
-    rows.sort(
-        key=lambda row: (
-            row.capability_score if row.capability_score is not None else -1.0,
-            row.success_rate,
-            row.caption_score if row.caption_score is not None else -1.0,
-            row.model,
-        ),
-        reverse=True,
-    )
-    return rows
-
-
-def _capability_score_cell(value: float | None) -> str:
-    """Format a scorecard score cell."""
-    return "-" if value is None else f"{value:.0f}"
-
-
-CAPABILITY_TABLE_HEADER_TEXT: Final[str] = (
-    "Model|Historical reliability|Current recommendation|History runs|Recommended|Capability|"
-    "Caption|Keyword|Metadata|Gen TPS|Peak GB|Variability reason|Latest signal"
-)
-TRIAGE_CAPABILITY_TABLE_HEADER_TEXT: Final[str] = (
-    "Model|Historical reliability|Current recommendation|History runs|Recommended|Clean|Hygiene|"
-    "Caption|Gen TPS|Peak GB|Variability reason|Latest signal"
-)
-
-
-def _capability_table_row(
-    row: ModelCapabilityRow,
-    *,
-    suppress_cataloging_scores: bool,
-) -> tuple[str, ...]:
-    """Return the Markdown table cells for one scorecard row."""
-    common = (
-        f"`{MARKDOWN_ESCAPER.escape(row.model)}`",
-        MARKDOWN_ESCAPER.escape(row.historical_reliability),
-        MARKDOWN_ESCAPER.escape(row.current_recommendation),
-        str(row.runs),
-        f"{row.recommended_rate:.0f}%",
-    )
-    if suppress_cataloging_scores:
-        return (
-            *common,
-            f"{row.recommended_rate:.0f}%",
-            _capability_score_cell(row.hygiene_score),
-            _capability_score_cell(row.caption_score),
-            format_field_value("generation_tps", row.generation_tps) or "-",
-            format_field_value("peak_memory", row.peak_memory_gb) or "-",
-            MARKDOWN_ESCAPER.escape(row.variability_reason),
-            MARKDOWN_ESCAPER.escape(row.signal),
-        )
-    return (
-        *common,
-        _capability_score_cell(row.capability_score),
-        _capability_score_cell(row.caption_score),
-        _capability_score_cell(row.keyword_score),
-        _capability_score_cell(row.metadata_alignment_score),
-        format_field_value("generation_tps", row.generation_tps) or "-",
-        format_field_value("peak_memory", row.peak_memory_gb) or "-",
-        MARKDOWN_ESCAPER.escape(row.variability_reason),
-        MARKDOWN_ESCAPER.escape(row.signal),
-    )
-
-
-def _capability_json_row(row: ModelCapabilityRow) -> dict[str, JsonLike]:
-    """Return the stable JSON shape for one scorecard model row."""
-    return {
-        "model": row.model,
-        "runs": row.runs,
-        "successes": row.successes,
-        "failures": row.failures,
-        "success_rate": row.success_rate,
-        "recommended_rate": row.recommended_rate,
-        "capability_score": row.capability_score,
-        "hygiene_score_avg": row.hygiene_score,
-        "caption_score_avg": row.caption_score,
-        "cataloging_score_avg": row.cataloging_score,
-        "description_score_avg": row.description_score,
-        "keyword_score_avg": row.keyword_score,
-        "metadata_alignment_avg": row.metadata_alignment_score,
-        "generation_tps_avg": row.generation_tps,
-        "peak_memory_gb_avg": row.peak_memory_gb,
-        "current_recommendation": row.current_recommendation,
-        "historical_reliability": row.historical_reliability,
-        "variability_reason": row.variability_reason,
-        "latest_signal": row.signal,
-    }
-
-
-def generate_model_capability_scorecard(
-    results: list[PerformanceResult],
-    markdown_filename: Path,
-    json_filename: Path,
-    *,
-    prompt: str,
-    metadata: MetadataDict | None = None,
-    report_context: ReportRenderContext | None = None,
-    history_records: Sequence[HistoryRunRecord] = (),
-) -> None:
-    """Write concise Markdown and JSON capability scorecards for model selection."""
-    if not results:
-        log_warning_note("No results to generate model capability scorecard.")
-        return
-    if report_context is None:
-        report_context = _build_report_render_context(
-            results=results,
-            prompt=prompt,
-            metadata=metadata,
-        )
-
-    lane_history_records = _history_records_for_eval_mode(
-        history_records,
-        report_context.mode_policy.eval_mode,
-    )
-    rows = _build_model_capability_rows(
-        report_context=report_context,
-        history_records=lane_history_records,
-    )
-    policy = report_context.mode_policy
-    grounding = (
-        "trusted image metadata"
-        if policy.semantic_rankings_grounded
-        else "not grounded; caption hygiene only"
-    )
-    prior_runs = len(lane_history_records)
-    md = [
-        "# Model Capability Scorecard",
-        "",
-        _markdown_generated_stamp(),
-        "",
-        f"- Evaluation lane: {MARKDOWN_ESCAPER.escape(policy.eval_mode)}",
-        f"- Metadata exposed to prompt: {'yes' if policy.metadata_exposed_to_prompt else 'no'}",
-        f"- Grounding: {grounding}",
-        f"- Coverage: current run plus {prior_runs} prior history run(s).",
-        "- Policy: lane-filtered current and historical capability aggregation",
-        (f"- Evidence scope: 1 image, 1 current run plus {prior_runs} prior lane-matched runs"),
-        "",
-    ]
-    if policy.suppress_cataloging_scores:
-        md.extend(
-            [
-                "Structured metadata and keyword capability: not evaluated in triage mode.",
-                (
-                    "Use the Clean, Hygiene, Caption, speed, and memory columns as a caption-review "
-                    "shortlist; visual correctness still requires grounded metadata or manual review."
-                ),
-                "",
-            ]
-        )
-    headers = (
-        TRIAGE_CAPABILITY_TABLE_HEADER_TEXT
-        if policy.suppress_cataloging_scores
-        else CAPABILITY_TABLE_HEADER_TEXT
-    )
-    table_lines = render_report_markdown(
-        (
-            ReportTable(
-                headers=tuple(headers.split("|")),
-                rows=tuple(
-                    _capability_table_row(
-                        row,
-                        suppress_cataloging_scores=policy.suppress_cataloging_scores,
-                    )
-                    for row in rows
-                ),
-                markdown_escaped=True,
-            ),
-        )
-    )
-    md.extend(_guard_markdownlint_block(table_lines, rules=MARKDOWNLINT_GALLERY_SUMMARY_RULES))
-    md.append("")
-    md.extend(
-        _wrap_markdown_text(
-            "Scores aggregate available current/history signals. Older history rows that predate "
-            "capability fields still count toward reliability, but not caption, keyword, or "
-            "metadata averages."
-        )
-    )
-    _write_markdown_artifact(markdown_filename, md, artifact_name="Model capability scorecard")
-
-    payload: dict[str, JsonLike] = {
-        "schema_version": "1.1",
-        "generated_at": local_now_str(),
-        "eval_mode": policy.eval_mode,
-        "metadata_exposed_to_prompt": policy.metadata_exposed_to_prompt,
-        "grounding": grounding,
-        "has_descriptive_metadata": policy.has_descriptive_metadata,
-        "current_models": len(report_context.result_set.results),
-        "history_runs_considered": prior_runs,
-        "models": [_capability_json_row(row) for row in rows],
-    }
-    _write_text_file(json_filename, json.dumps(payload, indent=2, sort_keys=True) + "\n")
-
-
-def generate_review_report(
-    results: list[PerformanceResult],
-    filename: Path,
-    *,
-    prompt: str,
-    report_context: ReportRenderContext | None = None,
-    log_filename: Path | None = None,
-    gallery_filename: Path | None = None,
-) -> None:
-    """Write a short Markdown digest of automated verdicts and action buckets."""
-    if not results:
-        log_warning_note("No results to generate review report.")
-        return
-
-    if report_context is None:
-        report_context = _build_report_render_context(results=results, prompt=prompt)
-
-    sorted_results = list(report_context.result_set.results)
-    bucket_groups = _group_review_results(sorted_results, key_name="user_bucket")
-
-    md: list[str] = [
-        "<!-- markdownlint-disable MD012 MD013 -->",
-        "",
-        "# Automated Review Digest",
-        "",
-        _markdown_generated_stamp(),
-        "",
-        (
-            "Trusted-hint review uses only prompt title/description/keyword hints for utility "
-            "comparison. Capture metadata, GPS, timestamps, source labels, and location labels "
-            "are treated as nonvisual metadata and are not required visual evidence."
-        ),
-        "",
-    ]
-
-    if log_filename is not None or gallery_filename is not None:
-        _append_markdown_gallery_note(
-            md,
-            report_filename=filename,
-            gallery_filename=gallery_filename,
-            log_filename=log_filename,
-        )
-
-    md.extend(_format_review_priorities_parts(report_context, html_output=False))
-    _append_review_user_buckets(
-        md,
-        bucket_groups,
-        mode_policy=report_context.mode_policy,
-    )
-    _append_review_model_verdicts(md, sorted_results)
-
-    _write_markdown_artifact(filename, md, artifact_name="Review report")
-
-
-def _escape_tsv_value(value: str) -> str:
-    r"""Escape record-breaking characters while preserving literal ``\n``."""
-    return value.replace("\t", "    ").replace("\n", "\\n").replace("\r", "")
-
-
-_TSV_OPTIONAL_FIELDS: Final[tuple[str, ...]] = (
-    "compatibility_status",
-    "current_recommendation",
-    "failure_origin",
-    "maintainer_readiness",
-    "reproduction_status",
-    "keyword_overlap",
-    "context_integration_score",
-    "draft_improvement_score",
-    "visual_description_score",
-    "assisted_enrichment_score",
-    "peak_memory_working_set_pct",
-    "prompt_burden_kind",
-    "prompt_burden_source",
-    "prompt_burden_reason",
-    "processed_image_width",
-    "processed_image_height",
-    "image_patch_count",
-    "error_stage",
-    "error_type",
-    "error_package",
-    "error_message",
-)
-
-
-def _build_tsv_row_records(
-    *,
-    rows: Sequence[Sequence[str]],
-    results: Sequence[PerformanceResult],
-    field_names: Sequence[str],
-    report_context: ReportRenderContext,
-) -> list[dict[str, str]]:
-    """Return compact literal TSV records from shared report facts."""
-    recommendations = _recommendations_by_model(report_context)
-    machine_facts = _machine_facts_by_model(report_context)
-    machine_fields = _TSV_OPTIONAL_FIELDS[:13]
-    records: list[dict[str, str]] = []
-    for row, result in zip(rows, results, strict=False):
-        record = {
-            field_name: _escape_tsv_value(cell)
-            for field_name, cell in zip(field_names, row, strict=False)
-        }
-        recommendation = recommendations[result.model_name]
-        burden = recommendation.burden
-        machine_cells = _machine_artifact_tsv_cells(machine_facts[result.model_name])
-        record.update(zip(machine_fields, machine_cells, strict=True))
-        record.update(
-            {
-                "execution_status": _execution_outcome(result),
-                "recommendation_status": machine_facts[result.model_name].current_recommendation,
-                "prompt_burden_reason": burden.reason or "",
-                "processed_image_width": (
-                    str(burden.processed_width) if burden.processed_width is not None else ""
-                ),
-                "processed_image_height": (
-                    str(burden.processed_height) if burden.processed_height is not None else ""
-                ),
-                "image_patch_count": (
-                    str(burden.patch_count) if burden.patch_count is not None else ""
-                ),
-                "generated_text": _escape_tsv_value(
-                    str(getattr(result.generation, "text", "") or "")
-                    if result.generation is not None
-                    else ""
-                ),
-                "error_stage": _escape_tsv_value(result.error_stage or ""),
-                "error_type": _escape_tsv_value(result.error_type or ""),
-                "error_package": _escape_tsv_value(result.error_package or ""),
-                "error_message": _escape_tsv_value(result.error_message or ""),
-            }
-        )
-        records.append(
-            {
-                field_name: (
-                    value
-                    if field_name == "generated_text" or len(value) <= MAX_TSV_CELL_CHARS
-                    else value[: MAX_TSV_CELL_CHARS - 3].rstrip() + "..."
-                )
-                for field_name, value in record.items()
-            }
-        )
-    return records
-
-
-def generate_tsv_report(
-    results: list[PerformanceResult],
-    filename: Path,
-    report_context: ReportRenderContext | None = None,
-) -> None:
-    """Write a compact TSV (tab-separated values) caption-comparison table.
-
-    The first line is the standard TSV header so spreadsheet and dataframe
-    readers need no custom comment handling. Exact model output appears once in
-    ``Generated Text``; run metadata and exhaustive fields remain available in
-    ``run.json`` and JSONL. Failed rows retain compact ``error_stage``,
-    ``error_type``, ``error_package``, and ``error_message`` evidence.
-
-    Args:
-        results: List of PerformanceResult objects.
-        filename: Path where the TSV file will be written.
-        report_context: Optional cached shared report context built in finalization.
-    """
-    if not results:
-        log_warning_note("No results to generate TSV report.")
-        return
-
-    if report_context is None:
-        result_set = ResultSet(results)
-        table_data = _build_prepared_table_data(result_set=result_set)
-        headers, rows, field_names = _materialize_prepared_table_data(table_data)
-        sorted_results = list(result_set.results)
-        report_context = _build_report_render_context(
-            results=results,
-            prompt="",
-            system_info={},
-        )
-        sorted_results = list(report_context.result_set.results)
-    else:
-        headers, rows, field_names = _materialize_prepared_table_data(report_context.table_data)
-        sorted_results = list(report_context.result_set.results)
-
-    if not headers or not rows:
-        log_warning_note("No table data to generate TSV report.")
-        return
-
-    _filter_table_columns(
-        headers=headers,
-        rows=rows,
-        field_names=field_names,
-        allowed_fields=TSV_COMPACT_TABLE_FIELDS,
-    )
-
-    header_by_field = {
-        field_name: _escape_tsv_value(re.sub(r"<[^>]+>", "", header.replace("<br>", " ")).strip())
-        for field_name, header in zip(field_names, headers, strict=True)
-    }
-    header_by_field.update(
-        {
-            "execution_status": "execution_status",
-            "recommendation_status": "recommendation_status",
-            "compatibility_status": "compatibility_status",
-            "current_recommendation": "current_recommendation",
-            "failure_origin": "failure_origin",
-            "maintainer_readiness": "maintainer_readiness",
-            "reproduction_status": "reproduction_status",
-            "keyword_overlap": "keyword_overlap",
-            "context_integration_score": "context_integration_score",
-            "draft_improvement_score": "draft_improvement_score",
-            "visual_description_score": "visual_description_score",
-            "assisted_enrichment_score": "assisted_enrichment_score",
-            "peak_memory_working_set_pct": "peak_memory_working_set_pct",
-            "prompt_burden_kind": "prompt_burden_kind",
-            "prompt_burden_source": "prompt_burden_source",
-            "prompt_burden_reason": "prompt_burden_reason",
-            "processed_image_width": "processed_image_width",
-            "processed_image_height": "processed_image_height",
-            "image_patch_count": "image_patch_count",
-            "generated_text": "Generated Text",
-            "error_stage": "error_stage",
-            "error_type": "error_type",
-            "error_package": "error_package",
-            "error_message": "error_message",
-        }
-    )
-    row_records = _build_tsv_row_records(
-        rows=rows,
-        results=sorted_results,
-        field_names=field_names,
-        report_context=report_context,
-    )
-
-    active_optional_fields = tuple(
-        field_name
-        for field_name in _TSV_OPTIONAL_FIELDS
-        if any(record.get(field_name, "") for record in row_records)
-    )
-    core_fields = (
-        field_names[0],
-        "execution_status",
-        "recommendation_status",
-        *(field_name for field_name in field_names[1:]),
-        "prompt_burden_kind",
-        "prompt_burden_source",
-        "generated_text",
-    )
-    output_fields = tuple(dict.fromkeys((*core_fields, *active_optional_fields)))
-
-    try:
-        buffer = io.StringIO(newline="")
-        writer = csv.writer(buffer, delimiter="\t", lineterminator="\n")
-        writer.writerow([header_by_field[field_name] for field_name in output_fields])
-        writer.writerows(
-            [record.get(field_name, "") for field_name in output_fields] for record in row_records
-        )
-        _write_text_file(filename, buffer.getvalue())
-        # Logging handled in finalize_execution
-    except OSError:
-        logger.exception("Failed to write TSV report to %s", filename)
 
 
 def _wrap_bare_urls(text: str) -> str:
@@ -23016,7 +20737,7 @@ def _build_output_preview_text(
     cues: Sequence[str] = (),
     max_chars: int,
 ) -> str:
-    """Build a deterministic compact preview for Markdown/HTML/TSV tables."""
+    """Build a deterministic compact preview for current-run report tables."""
     normalized_text = _collapse_preview_whitespace(text)
     if not normalized_text:
         return ""
@@ -24215,465 +21936,13 @@ def _history_path_for_jsonl(jsonl_path: Path) -> Path:
     return jsonl_path.with_name(f"{jsonl_path.stem}.history.jsonl")
 
 
-def _decode_history_run_record_line(line: str, *, source: str) -> HistoryRunRecord | None:
-    """Decode one append-only history JSONL line, skipping non-run entries."""
-    text = line.strip()
-    if not text:
-        return None
-    try:
-        record = json.loads(text)
-    except json.JSONDecodeError as err:
-        logger.debug("Skipping malformed history record in %s: %s", source, err)
-        return None
-    if isinstance(record, dict) and record.get("_type") == "run":
-        return cast("HistoryRunRecord", record)
-    return None
-
-
-def _load_latest_history_record(history_path: Path) -> HistoryRunRecord | None:
-    """Load the most recent history record from an append-only JSONL file."""
-    if not history_path.exists():
-        return None
-
-    try:
-        lines = _read_text_file(history_path).splitlines()
-    except OSError:
-        logger.warning("Failed to read history file %s", history_path)
-        return None
-
-    for line in reversed(lines):
-        record = _decode_history_run_record_line(line, source=str(history_path))
-        if record is not None:
-            return record
-    return None
-
-
-def _load_history_run_records(
-    history_path: Path | None,
-    *,
-    max_records: int = _HISTORY_MAX_RECORDS,
-) -> list[HistoryRunRecord]:
-    """Load up to ``max_records`` run entries from append-only history JSONL."""
-    if history_path is None or not history_path.exists():
-        return []
-
-    try:
-        lines = _read_text_file(history_path).splitlines()
-    except OSError:
-        logger.warning("Failed to read history file %s", history_path)
-        return []
-
-    records: list[HistoryRunRecord] = []
-    for line in lines[-max_records:]:
-        record = _decode_history_run_record_line(line, source=str(history_path))
-        if record is not None:
-            records.append(record)
-    return records
-
-
-def _history_records_for_eval_mode(
-    records: Sequence[HistoryRunRecord],
-    eval_mode: str,
-) -> list[HistoryRunRecord]:
-    """Return records for one resolved lane, excluding unlabelled legacy rows."""
-    return [record for record in records if record.get("eval_mode") == eval_mode]
-
-
-def _history_bucket_rank(bucket: object) -> int:
-    """Return severity rank for history user-bucket comparisons."""
-    if not isinstance(bucket, str):
-        return 0
-    ranks = {
-        "recommended": 0,
-        "caveat": 1,
-        "caution": 1,
-        "needs_triage": 2,
-        "avoid": 3,
-    }
-    return ranks.get(bucket, 0)
-
-
-def _history_success_failure_sets(
-    models: Mapping[str, HistoryModelResultRecord],
-) -> tuple[set[str], set[str]]:
-    """Return model names with explicit success and explicit failure states."""
-    successful: set[str] = set()
-    failed: set[str] = set()
-
-    for model, info in models.items():
-        if info.get("compatibility_status") == "indeterminate":
-            continue
-        success_value: object = info.get("success")
-        if success_value is True:
-            successful.add(model)
-        elif success_value is False:
-            failed.add(model)
-
-    return successful, failed
-
-
-def _is_history_model_result_record(value: object) -> TypeGuard[HistoryModelResultRecord]:
-    """Return whether a legacy history value is shaped like a model-result row."""
-    if not isinstance(value, Mapping):
-        return False
-    mapping = cast("Mapping[str, object]", value)
-    return isinstance(mapping.get("success"), bool)
-
-
-def _empty_history_comparison_summary() -> HistoryComparisonSummary:
-    """Return a fully shaped empty history-comparison payload."""
-    return {
-        "regressions": [],
-        "recoveries": [],
-        "new_models": [],
-        "missing_models": [],
-        "quality_regressions": [],
-        "quality_recoveries": [],
-        "harness_regressions": [],
-        "harness_recoveries": [],
-        "owner_changes": [],
-        "window_quality_regressions": [],
-        "window_harness_regressions": [],
-        "window_generation_regressions": [],
-        "window_version_deltas": [],
-    }
-
-
-def compare_history_records(
-    previous: HistoryRunRecord | None,
-    current: HistoryRunRecord,
-) -> HistoryComparisonSummary:
-    """Compare two history records and return status plus quality transitions."""
-    prev_models: dict[str, HistoryModelResultRecord] = (
-        previous.get("model_results", {}) if previous else {}
-    )
-    curr_models: dict[str, HistoryModelResultRecord] = (
-        current.get("model_results", {}) if current else {}
-    )
-    if not isinstance(prev_models, dict):
-        prev_models = {}
-    if not isinstance(curr_models, dict):
-        curr_models = {}
-
-    prev_success, prev_failed = _history_success_failure_sets(prev_models)
-    curr_success, curr_failed = _history_success_failure_sets(curr_models)
-
-    regressions = sorted(prev_success & curr_failed)
-    recoveries = sorted(prev_failed & curr_success)
-    new_models = sorted(set(curr_models) - set(prev_models))
-    missing_models = sorted(set(prev_models) - set(curr_models))
-
-    quality_regressions: list[str] = []
-    quality_recoveries: list[str] = []
-    harness_regressions: list[str] = []
-    harness_recoveries: list[str] = []
-    owner_changes: list[str] = []
-
-    stable_models = sorted(
-        (set(prev_models) & set(curr_models))
-        - set(regressions)
-        - set(recoveries)
-        - set(new_models)
-        - set(missing_models)
-    )
-    for model_name in stable_models:
-        prev_info = prev_models[model_name]
-        curr_info = curr_models[model_name]
-        if prev_info.get("success") is True and curr_info.get("success") is True:
-            prev_bucket = _history_bucket_rank(prev_info.get("review_user_bucket"))
-            curr_bucket = _history_bucket_rank(curr_info.get("review_user_bucket"))
-            if curr_bucket > prev_bucket:
-                quality_regressions.append(model_name)
-            elif curr_bucket < prev_bucket:
-                quality_recoveries.append(model_name)
-
-            prev_harness = bool(prev_info.get("harness_issue_type"))
-            curr_harness = bool(curr_info.get("harness_issue_type"))
-            if not prev_harness and curr_harness:
-                harness_regressions.append(model_name)
-            elif prev_harness and not curr_harness:
-                harness_recoveries.append(model_name)
-
-        prev_owner = prev_info.get("review_owner")
-        curr_owner = curr_info.get("review_owner")
-        if prev_owner and curr_owner and prev_owner != curr_owner:
-            owner_changes.append(model_name)
-
-    summary = _empty_history_comparison_summary()
-    summary.update(
-        {
-            "regressions": regressions,
-            "recoveries": recoveries,
-            "new_models": new_models,
-            "missing_models": missing_models,
-            "quality_regressions": quality_regressions,
-            "quality_recoveries": quality_recoveries,
-            "harness_regressions": harness_regressions,
-            "harness_recoveries": harness_recoveries,
-            "owner_changes": owner_changes,
-        },
-    )
-    return summary
-
-
-def _parse_history_timestamp(record: HistoryRunRecord | None) -> datetime | None:
-    """Parse a history timestamp while tolerating legacy timezone spellings."""
-    if record is None:
-        return None
-    timestamp = record.get("timestamp")
-    if not isinstance(timestamp, str) or not timestamp.strip():
-        return None
-    normalized = timestamp.strip()
-    tz_aliases = {
-        " GMT": "+0000",
-        " UTC": "+0000",
-        " BST": "+0100",
-    }
-    for suffix, replacement in tz_aliases.items():
-        if normalized.endswith(suffix):
-            normalized = normalized[: -len(suffix)] + replacement
-            break
-    normalized_iso = normalized.replace(" ", "T", 1)
-    if re.search(r"[+-]\d{4}$", normalized_iso):
-        normalized_iso = f"{normalized_iso[:-5]}{normalized_iso[-5:-2]}:{normalized_iso[-2:]}"
-    with suppress(ValueError):
-        parsed = datetime.fromisoformat(normalized_iso)
-        return parsed if parsed.tzinfo else parsed.replace(tzinfo=UTC)
-    return None
-
-
-def _history_prompt_class(record: HistoryRunRecord | None) -> str:
-    """Return a coarse prompt class for fairer history-window comparison."""
-    if record is None:
-        return "unknown"
-    preview = (record.get("prompt_preview") or "").casefold()
-    if "describe this image briefly" in preview or "describe this picture" in preview:
-        return "triage"
-    if "catalog" in preview or all(label in preview for label in ("title:", "description:")):
-        return "cataloguing"
-    return "custom"
-
-
-def _history_records_in_window(
-    history_records: Sequence[HistoryRunRecord],
-    current: HistoryRunRecord,
-    *,
-    window_days: int,
-) -> list[HistoryRunRecord]:
-    """Return prior history records inside the requested lookback window."""
-    current_timestamp = _parse_history_timestamp(current)
-    if current_timestamp is None:
-        return list(history_records)
-    earliest = current_timestamp - timedelta(days=window_days)
-    records: list[HistoryRunRecord] = []
-    current_timestamp_text = current.get("timestamp")
-    for record in history_records:
-        if record.get("timestamp") == current_timestamp_text:
-            continue
-        parsed = _parse_history_timestamp(record)
-        if parsed is None or earliest <= parsed <= current_timestamp:
-            records.append(record)
-    return records
-
-
-def _history_version_deltas(
-    previous: HistoryRunRecord | None,
-    current: HistoryRunRecord,
-) -> list[str]:
-    """Return compact version deltas for core MLX/VLM dependencies."""
-    if previous is None:
-        return []
-    previous_versions = previous.get("library_versions", {})
-    current_versions = current.get("library_versions", {})
-    if not isinstance(previous_versions, dict) or not isinstance(current_versions, dict):
-        return []
-    deltas: list[str] = []
-    for package_name in ("mlx", "mlx-vlm", "transformers"):
-        previous_version = previous_versions.get(package_name)
-        current_version = current_versions.get(package_name)
-        if previous_version and current_version and previous_version != current_version:
-            deltas.append(f"{package_name}={previous_version}->{current_version}")
-    return deltas
-
-
-def _history_window_baseline_for_model(
-    model_name: str,
-    records: Sequence[HistoryRunRecord],
-    *,
-    prompt_class: str,
-) -> tuple[HistoryRunRecord, HistoryModelResultRecord] | None:
-    """Return the best in-window baseline row for one model."""
-    candidates: list[tuple[int, int, HistoryRunRecord, HistoryModelResultRecord]] = []
-    for record in records:
-        if _history_prompt_class(record) != prompt_class:
-            continue
-        model_results = record.get("model_results", {})
-        if not isinstance(model_results, dict):
-            continue
-        info = model_results.get(model_name)
-        if not _is_history_model_result_record(info):
-            continue
-        rank = _history_bucket_rank(info.get("review_user_bucket"))
-        stop_bonus: int = 0 if info.get("stop_reason") == "completed" else 1
-        candidates.append((rank, stop_bonus, record, info))
-    if not candidates:
-        return None
-    _rank, _stop_bonus, record, info = min(candidates, key=lambda item: (item[0], item[1]))
-    return record, info
-
-
-def compare_history_window(
-    history_records: Sequence[HistoryRunRecord],
-    current: HistoryRunRecord,
-    *,
-    window_days: int = 21,
-) -> HistoryComparisonSummary:
-    """Compare current run against the best matching baseline in a recent window."""
-    window_records = _history_records_in_window(
-        history_records,
-        current,
-        window_days=window_days,
-    )
-    previous = window_records[-1] if window_records else None
-    summary = compare_history_records(previous, current)
-    current_models = current.get("model_results", {})
-    if not isinstance(current_models, dict):
-        return summary
-
-    prompt_class = _history_prompt_class(current)
-    window_quality_regressions: list[str] = []
-    window_harness_regressions: list[str] = []
-    window_generation_regressions: list[str] = []
-    version_baselines: list[HistoryRunRecord] = []
-
-    for model_name, current_info in current_models.items():
-        if not isinstance(current_info, dict):
-            continue
-        baseline = _history_window_baseline_for_model(
-            model_name,
-            window_records,
-            prompt_class=prompt_class,
-        )
-        if baseline is None:
-            continue
-        baseline_record, baseline_info = baseline
-        version_baselines.append(baseline_record)
-
-        if _history_bucket_rank(current_info.get("review_user_bucket")) > _history_bucket_rank(
-            baseline_info.get("review_user_bucket"),
-        ):
-            window_quality_regressions.append(model_name)
-
-        if not baseline_info.get("harness_issue_type") and current_info.get("harness_issue_type"):
-            window_harness_regressions.append(model_name)
-
-        baseline_completed = baseline_info.get("stop_reason") == "completed"
-        current_capped = (
-            current_info.get("stop_reason") == "max_tokens"
-            or current_info.get("hit_max_tokens") is True
-        )
-        if baseline_completed and current_capped:
-            window_generation_regressions.append(model_name)
-
-    version_baseline = min(
-        version_baselines,
-        key=lambda record: _parse_history_timestamp(record) or datetime.max.replace(tzinfo=UTC),
-        default=previous,
-    )
-    summary["window_quality_regressions"] = sorted(set(window_quality_regressions))
-    summary["window_harness_regressions"] = sorted(set(window_harness_regressions))
-    summary["window_generation_regressions"] = sorted(set(window_generation_regressions))
-    summary["window_version_deltas"] = _history_version_deltas(version_baseline, current)
-    return summary
-
-
 def _build_prompt_preview(prompt: str, *, max_chars: int = 200) -> str:
     """Return prompt preview truncated to ``max_chars``."""
     return prompt if len(prompt) <= max_chars else f"{prompt[:max_chars]}..."
 
 
-def _populate_history_capability_scores(
-    record: HistoryModelResultRecord,
-    result: PerformanceResult,
-    *,
-    prompt: str | None,
-) -> None:
-    """Attach forward-looking capability fields to a history row."""
-    if result.generation is None:
-        return
-
-    text = str(getattr(result.generation, "text", "") or "")
-    hygiene_score = _model_selection_score(result)
-    caption_score = _caption_usefulness_score(text) if text else None
-    record["hygiene_score"] = hygiene_score
-    if caption_score is not None:
-        record["caption_score"] = caption_score
-
-    context = _extract_trusted_hint_bundle(prompt).trusted_text or None if prompt else None
-    utility = compute_cataloging_utility(text, context)
-    cataloging_score = float(utility["utility_score"])
-    record["cataloging_score"] = cataloging_score
-    record["description_score"] = float(utility.get("description_score", 0.0))
-    record["keyword_score"] = float(utility.get("keyword_score", 0.0))
-
-    metadata_score = (
-        result.metadata_agreement.overall_score
-        if result.metadata_agreement is not None
-        else _capability_float(record.get("metadata_alignment_score"))
-    )
-    capability_score = _capability_score_from_parts(
-        success=result.success,
-        review_bucket=record.get("review_user_bucket"),
-        hygiene_score=hygiene_score,
-        caption_score=caption_score,
-        cataloging_score=cataloging_score,
-        metadata_alignment_score=metadata_score,
-    )
-    if capability_score is not None:
-        record["capability_score"] = capability_score
-
-    generation_tps = _generation_float_metric(result.generation, "generation_tps")
-    peak_memory_gb = _generation_float_metric(result.generation, "peak_memory")
-    if generation_tps is not None:
-        record["generation_tps"] = generation_tps
-    if peak_memory_gb is not None:
-        record["peak_memory_gb"] = peak_memory_gb
-
-
-def _populate_history_machine_facts(
-    record: HistoryModelResultRecord,
-    facts: MachineArtifactFacts,
-) -> None:
-    """Attach available canonical machine facts to one history model row."""
-    record["compatibility_status"] = facts.compatibility_status
-    record["current_recommendation"] = facts.current_recommendation
-    record["failure_origin"] = facts.failure_origin
-    record["maintainer_readiness"] = facts.maintainer_readiness
-    record["reproduction_status"] = facts.reproduction_status
-    record["keyword_overlap"] = facts.keyword_overlap
-    record["prompt_burden_kind"] = facts.prompt_burden_kind
-    record["prompt_burden_source"] = facts.prompt_burden_source
-    if facts.suspected_owner is not None:
-        record["review_owner"] = facts.suspected_owner
-    if facts.context_integration_score is not None:
-        record["context_integration_score"] = facts.context_integration_score
-    if facts.draft_improvement_score is not None:
-        record["draft_improvement_score"] = facts.draft_improvement_score
-    if facts.visual_description_score is not None:
-        record["visual_description_score"] = facts.visual_description_score
-    if facts.assisted_enrichment_score is not None:
-        record["assisted_enrichment_score"] = facts.assisted_enrichment_score
-    if facts.peak_memory_working_set_pct is not None:
-        record["peak_memory_working_set_pct"] = facts.peak_memory_working_set_pct
-
-
-def _history_model_result_from_result(
-    result: PerformanceResult,
-    *,
-    prompt: str | None = None,
-    machine_facts: MachineArtifactFacts | None = None,
-) -> HistoryModelResultRecord:
-    """Build a typed per-model history row from runtime result."""
+def _history_model_result_from_result(result: PerformanceResult) -> HistoryModelResultRecord:
+    """Return raw execution, timing, token, and resource facts for one model."""
     record: HistoryModelResultRecord = {
         "success": result.success,
         "failure_phase": result.failure_phase,
@@ -24682,38 +21951,33 @@ def _history_model_result_from_result(
         "error_package": result.error_package,
         "error_code": result.error_code,
         "error_signature": result.error_signature,
+        "generation_time_s": result.generation_time,
+        "model_load_time_s": result.model_load_time,
+        "total_time_s": result.total_time,
     }
-    review = _review_for_result(result)
-    analysis = _quality_analysis_for_result(result)
-    if review is not None:
-        record["review_verdict"] = review["verdict"]
-        record["review_owner"] = review["owner"]
-        record["review_user_bucket"] = review["user_bucket"]
-        record["hit_max_tokens"] = review["hit_max_tokens"]
-        issue_subtype = _review_issue_subtype(result, review, analysis)
-        if issue_subtype is not None:
-            record["review_issue_subtype"] = issue_subtype
-        if review["prompt_output_ratio"] is not None:
-            record["prompt_output_ratio"] = review["prompt_output_ratio"]
-        if review["nontext_prompt_ratio"] is not None:
-            record["nontext_prompt_ratio"] = review["nontext_prompt_ratio"]
-    if analysis is not None and analysis.harness_issue_type is not None:
-        record["harness_issue_type"] = analysis.harness_issue_type
-    if analysis is not None:
-        if analysis.metadata_alignment_score is not None:
-            record["metadata_alignment_score"] = analysis.metadata_alignment_score
-        if analysis.metadata_alignment_issue is not None:
-            record["metadata_alignment_issue"] = analysis.metadata_alignment_issue
-        if analysis.text_sanity_issue_type is not None:
-            record["text_sanity_issue_type"] = analysis.text_sanity_issue_type
-        if analysis.generation_loop_type is not None:
-            record["generation_loop_type"] = analysis.generation_loop_type
-    _populate_history_capability_scores(record, result, prompt=prompt)
-    stop_reason = result.runtime_diagnostics.stop_reason if result.runtime_diagnostics else None
-    if stop_reason is not None:
-        record["stop_reason"] = stop_reason
-    if machine_facts is not None:
-        _populate_history_machine_facts(record, machine_facts)
+    if result.generation is not None:
+        performance = _extract_generation_performance_data(result.generation)
+        record.update(
+            {
+                "prompt_tokens": performance.prompt_tokens,
+                "generation_tokens": performance.generation_tokens,
+                "total_tokens": performance.total_tokens,
+                "generation_tps": performance.generation_tps,
+                "peak_memory_gb": performance.peak_memory_gb,
+                "active_memory_gb": (
+                    result.active_memory
+                    if result.active_memory is not None
+                    else performance.active_memory_gb
+                ),
+                "cache_memory_gb": (
+                    result.cache_memory
+                    if result.cache_memory is not None
+                    else performance.cache_memory_gb
+                ),
+            }
+        )
+    if result.runtime_diagnostics is not None:
+        record["stop_reason"] = result.runtime_diagnostics.stop_reason
     return record
 
 
@@ -24726,36 +21990,18 @@ def _build_history_run_record(
     image_path: Path | None,
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
     eval_mode: str = DEFAULT_EVAL_MODE,
-    report_context: ReportRenderContext | None = None,
 ) -> HistoryRunRecord:
-    """Build typed run-history record payload prior to append."""
-    prompt_hash = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
-    if report_context is None:
-        report_context = _build_report_render_context(
-            results=results,
-            prompt=prompt,
-            image_path=image_path,
-            eval_mode=eval_mode,
-            system_info=system_info,
-        )
-    machine_facts = _machine_facts_by_model(report_context)
-    cached_results = {result.model_name: result for result in report_context.result_set.results}
-    model_results = {
-        result.model_name: _history_model_result_from_result(
-            cached_results.get(result.model_name, result),
-            prompt=prompt,
-            machine_facts=machine_facts.get(result.model_name),
-        )
-        for result in results
-    }
+    """Build one append-only run record without current-report semantics."""
     record: HistoryRunRecord = {
         "_type": "run",
         "format_version": "1.0",
         "timestamp": local_now_str(),
-        "prompt_hash": prompt_hash,
+        "prompt_hash": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
         "prompt_preview": _build_prompt_preview(prompt),
         "image_path": str(image_path) if image_path is not None else None,
-        "model_results": model_results,
+        "model_results": {
+            result.model_name: _history_model_result_from_result(result) for result in results
+        },
         "system": system_info,
         "library_versions": library_versions,
         "eval_mode": _resolve_eval_mode(eval_mode, None),
@@ -24775,9 +22021,8 @@ def append_history_record(
     image_path: Path | None = None,
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
     eval_mode: str = DEFAULT_EVAL_MODE,
-    report_context: ReportRenderContext | None = None,
 ) -> HistoryRunRecord:
-    """Append a per-run history record for tracking regressions/recoveries."""
+    """Append raw factual run data for optional out-of-band history analysis."""
     record = _build_history_run_record(
         results=results,
         prompt=prompt,
@@ -24786,7 +22031,6 @@ def append_history_record(
         image_path=image_path,
         runtime_fingerprint=runtime_fingerprint,
         eval_mode=eval_mode,
-        report_context=report_context,
     )
 
     try:
@@ -25091,7 +22335,7 @@ def save_run_json_report(
         "metadata_exposed_to_prompt": policy.metadata_exposed_to_prompt,
         "total_runtime_seconds": round(total_runtime_seconds, 3),
         "counts": counts,
-        "artifacts": {name: path for name, path in output_paths.items() if "capabilit" not in name},
+        "artifacts": dict(output_paths),
         "library_versions": dict(versions),
         "component_provenance": _collect_component_provenance(versions),
         "producer": producer or _collect_check_models_provenance(),
@@ -25123,186 +22367,20 @@ def generate_output_index_report(
     filename: Path,
     *,
     output_paths: ReportOutputPaths,
-    report_context: ReportRenderContext,
-    diagnostics_artifacts: DiagnosticsArtifacts | None = None,
 ) -> None:
-    """Write a generated landing page that routes readers to the right artifact."""
-    policy = report_context.mode_policy
-    counts = _run_outcome_counts(report_context.assessments)
-    diagnostics_written = (
-        diagnostics_artifacts is not None and diagnostics_artifacts.diagnostics_written
+    """Write a minimal navigation list for the retained artifacts."""
+    links = (
+        (output_paths.html, "results.html"),
+        (output_paths.gallery_markdown, "model_gallery.md"),
+        (output_paths.diagnostics, "diagnostics.md"),
+        (output_paths.jsonl, "results.jsonl"),
+        (output_paths.run_json, "run.json"),
+        (output_paths.log, output_paths.log.name),
+        (output_paths.environment, output_paths.environment.name),
     )
-    issue_reports = (
-        tuple(sorted(diagnostics_artifacts.issue_reports.values()))
-        if diagnostics_artifacts is not None
-        else ()
-    )
-    md = [
-        "# Check Models Output Index",
-        "",
-        _markdown_generated_stamp(),
-        "",
-        "## Run Snapshot",
-        "",
-        f"- Evaluation lane: {MARKDOWN_ESCAPER.escape(policy.eval_mode)}",
-        f"- Metadata exposed to prompt: {'yes' if policy.metadata_exposed_to_prompt else 'no'}",
-        (
-            "- Selection basis: "
-            f"{MARKDOWN_ESCAPER.escape(policy.selection_basis)}"
-            + (" (grounded)" if policy.semantic_rankings_grounded else " (ungrounded)")
-        ),
-        f"- Models attempted: {counts['models_attempted']}",
-        f"- Models evaluated: {counts['models_evaluated']}",
-        f"- Successful: {counts['models_completed']}",
-        f"- Failed: {counts['models_crashed']}",
-        f"- Indeterminate: {counts['models_indeterminate']}",
-        "",
-        "## Primary Artifacts",
-        "",
-        (
-            "- "
-            + _output_index_link(filename, output_paths.diagnostics, "diagnostics.md")
-            + " is the maintainer-first failure and integration route."
-        ),
-        (
-            "- "
-            + _output_index_link(filename, output_paths.html, "results.html")
-            + " is the complete standalone interactive run report."
-        ),
-        (
-            "- "
-            + _output_index_link(filename, output_paths.model_selection, "model_selection.md")
-            + " is the reliability-gated current-run chooser."
-        ),
-        (
-            "- "
-            + _output_index_link(filename, output_paths.gallery_markdown, "model_gallery.md")
-            + " preserves complete per-model output evidence."
-        ),
-        (
-            "- "
-            + _output_index_link(filename, output_paths.jsonl, "results.jsonl")
-            + " is the primary per-model machine-readable stream."
-        ),
-        "",
-        "## Supporting Artifacts",
-        "",
-        (
-            "- "
-            + _output_index_link(filename, output_paths.markdown, "results.md")
-            + " is the compatibility Markdown summary."
-        ),
-        (
-            "- "
-            + _output_index_link(filename, output_paths.review, "review.md")
-            + " is the supporting automated-review digest."
-        ),
-        (
-            "- "
-            + _output_index_link(
-                filename,
-                output_paths.model_capabilities,
-                "model_capabilities.md",
-            )
-            + " aggregates lane-matched current and historical capability signals."
-        ),
-        (
-            "- "
-            + _output_index_link(filename, output_paths.tsv, "results.tsv")
-            + " supports spreadsheet inspection."
-        ),
-        (
-            "- "
-            + _output_index_link(
-                filename,
-                _history_path_for_jsonl(output_paths.jsonl),
-                "results.history.jsonl",
-            )
-            + " is the append-only supporting history stream."
-        ),
-        (
-            "- "
-            + _output_index_link(filename, output_paths.run_json, "run.json")
-            + " contains the stable run-level contract."
-        ),
-    ]
-    md.extend(
-        (
-            "- "
-            + _output_index_link(filename, issue_path, issue_path.name)
-            + " is a factual crash issue draft."
-        )
-        for issue_path in issue_reports
-    )
-    md.extend(
-        [
-            "",
-            "## For Model Users",
-            "",
-            (
-                "- Start with "
-                + _output_index_link(filename, output_paths.model_selection, "model_selection.md")
-                + " for the practical shortlist and memory/speed buckets."
-            ),
-            (
-                "- Use "
-                + _output_index_link(
-                    filename,
-                    output_paths.model_capabilities,
-                    "model_capabilities.md",
-                )
-                + " for current status plus historical reliability."
-            ),
-            (
-                "- Inspect "
-                + _output_index_link(filename, output_paths.gallery_markdown, "model_gallery.md")
-                + " before treating a triage-clean model as visually correct."
-            ),
-            "",
-            "## For Maintainers",
-            "",
-        ]
-    )
-    if diagnostics_written:
-        md.append(
-            "- Start with "
-            + _output_index_link(filename, output_paths.diagnostics, "diagnostics.md")
-            + " for complete current-run maintainer evidence."
-        )
-        md.extend(
-            (
-                "- Use "
-                + _output_index_link(filename, issue_path, issue_path.name)
-                + " for the corresponding actionable crash."
-            )
-            for issue_path in issue_reports
-        )
-    else:
-        md.append("- No maintainer issue queue was generated for this run.")
-    md.extend(
-        [
-            "",
-            "## Machine-Readable Data",
-            "",
-            (
-                "- "
-                + _output_index_link(filename, output_paths.run_json, "run.json")
-                + " contains the stable run-level contract."
-            ),
-            (
-                "- "
-                + _output_index_link(filename, output_paths.jsonl, "results.jsonl")
-                + " contains per-model diagnostics, timings, and review payloads."
-            ),
-            (
-                "- "
-                + _output_index_link(filename, output_paths.tsv, "results.tsv")
-                + " is optimized for spreadsheet inspection."
-            ),
-            "",
-        ]
-    )
-    _write_markdown_artifact(filename, md, artifact_name="Output index report")
+    md = ["# Check Models Output Index", ""]
+    md.extend(f"- {_output_index_link(filename, path, label)}" for path, label in links)
+    _write_text_file(filename, "\n".join(md) + "\n")
 
 
 def _write_report_failure_jsonl(
@@ -25323,446 +22401,6 @@ def _write_report_failure_jsonl(
         _write_text_file(filename, json.dumps(record) + "\n", append=True)
     except OSError:
         logger.exception("Failed to write report failure JSONL to %s", filename)
-
-
-def _history_model_results(record: HistoryRunRecord | None) -> dict[str, HistoryModelResultRecord]:
-    """Return normalized model-results map from a history record."""
-    if record is None:
-        return {}
-    raw = record.get("model_results", {})
-    if not isinstance(raw, dict):
-        return {}
-    return raw
-
-
-def _history_counts(record: HistoryRunRecord | None) -> tuple[int, int, int, float]:
-    """Return evaluated total, successes, failures, and rate for a history record."""
-    models = _history_model_results(record)
-    evaluated = [
-        info for info in models.values() if info.get("compatibility_status") != "indeterminate"
-    ]
-    total = len(evaluated)
-    success = sum(1 for info in evaluated if info.get("success") is True)
-    failed = sum(1 for info in evaluated if info.get("success") is False)
-    success_rate = (success / total * 100.0) if total else 0.0
-    return total, success, failed, success_rate
-
-
-def _fmt_delta_int(current: int, previous: int | None) -> str:
-    """Format signed integer delta for run-over-run summary tables."""
-    if previous is None:
-        return "-"
-    delta = current - previous
-    return "0" if delta == 0 else f"{delta:+d}"
-
-
-def _fmt_delta_pct(current: float, previous: float | None) -> str:
-    """Format signed percentage-point delta for run-over-run summary tables."""
-    if previous is None:
-        return "-"
-    delta = current - previous
-    return "0.0pp" if abs(delta) < FLOAT_ZERO_EPSILON else f"{delta:+.1f}pp"
-
-
-def _short_hash(value: str | None, *, size: int = 10) -> str:
-    """Return short hash preview for compact context tables."""
-    if not value:
-        return "-"
-    return value[:size]
-
-
-def _format_library_versions_for_history(record: HistoryRunRecord | None) -> str:
-    """Return compact comma-separated library version snapshot for history rows."""
-    if record is None:
-        return "-"
-    versions = record.get("library_versions", {})
-    if not isinstance(versions, dict) or not versions:
-        return "-"
-
-    parts: list[str] = []
-    for name in sorted(versions):
-        version = versions.get(name)
-        if version:
-            parts.append(f"{name}={version}")
-    if not parts:
-        return "-"
-
-    combined = ", ".join(parts)
-    return _truncate_text_preview(combined, max_chars=80)
-
-
-def _model_status_from_history(info: HistoryModelResultRecord | None) -> str:
-    """Render ``OK``/``FAIL``/``-`` for per-model history transition tables."""
-    if info is None:
-        return "-"
-    return "OK" if info.get("success") is True else "FAIL"
-
-
-def _history_summary_for_comparison(
-    previous: HistoryRunRecord | None,
-    current: HistoryRunRecord,
-) -> HistoryComparisonSummary:
-    """Return transition summary and log context-change warnings when needed."""
-    if previous is None:
-        return _empty_history_comparison_summary()
-
-    prev_prompt_hash = previous.get("prompt_hash")
-    curr_prompt_hash = current.get("prompt_hash")
-    if prev_prompt_hash and curr_prompt_hash and prev_prompt_hash != curr_prompt_hash:
-        log_warning_note(
-            "Prompt differs from previous run; regressions/recoveries may be noisy.",
-        )
-    prev_image = previous.get("image_path")
-    curr_image = current.get("image_path")
-    if prev_image and curr_image and prev_image != curr_image:
-        log_warning_note(
-            "Image path differs from previous run; regressions/recoveries may be noisy.",
-        )
-
-    return compare_history_records(previous, current)
-
-
-def _history_summary_rows(
-    *,
-    previous: HistoryRunRecord | None,
-    current: HistoryRunRecord,
-    summary: HistoryComparisonSummary,
-) -> list[list[str]]:
-    """Build run-over-run summary rows for history comparison output."""
-    regressions = summary["regressions"]
-    recoveries = summary["recoveries"]
-    new_models = summary["new_models"]
-    missing_models = summary["missing_models"]
-    quality_regressions = summary["quality_regressions"]
-    quality_recoveries = summary["quality_recoveries"]
-    harness_regressions = summary["harness_regressions"]
-    harness_recoveries = summary["harness_recoveries"]
-    owner_changes = summary["owner_changes"]
-    window_quality_regressions = summary["window_quality_regressions"]
-    window_harness_regressions = summary["window_harness_regressions"]
-    window_generation_regressions = summary["window_generation_regressions"]
-
-    prev_total, prev_success, prev_failed, prev_success_rate = _history_counts(previous)
-    curr_total, curr_success, curr_failed, curr_success_rate = _history_counts(current)
-
-    previous_values: tuple[str, str, str, str]
-    if previous is None:
-        previous_values = ("-", "-", "-", "-")
-    else:
-        previous_values = (
-            str(prev_total),
-            str(prev_success),
-            str(prev_failed),
-            f"{prev_success_rate:.1f}%",
-        )
-
-    return [
-        [
-            "Models evaluated",
-            previous_values[0],
-            str(curr_total),
-            _fmt_delta_int(curr_total, prev_total if previous is not None else None),
-        ],
-        [
-            "Successful",
-            previous_values[1],
-            str(curr_success),
-            _fmt_delta_int(curr_success, prev_success if previous is not None else None),
-        ],
-        [
-            "Failed",
-            previous_values[2],
-            str(curr_failed),
-            _fmt_delta_int(curr_failed, prev_failed if previous is not None else None),
-        ],
-        [
-            "Success rate",
-            previous_values[3],
-            f"{curr_success_rate:.1f}%",
-            _fmt_delta_pct(curr_success_rate, prev_success_rate if previous is not None else None),
-        ],
-        ["Regressions", "-", str(len(regressions)), "-"],
-        ["Recoveries", "-", str(len(recoveries)), "-"],
-        ["Quality regressions", "-", str(len(quality_regressions)), "-"],
-        ["Quality recoveries", "-", str(len(quality_recoveries)), "-"],
-        ["Harness regressions", "-", str(len(harness_regressions)), "-"],
-        ["Harness recoveries", "-", str(len(harness_recoveries)), "-"],
-        ["Window quality signals", "-", str(len(window_quality_regressions)), "-"],
-        ["Window harness signals", "-", str(len(window_harness_regressions)), "-"],
-        ["Window generation signals", "-", str(len(window_generation_regressions)), "-"],
-        ["Owner changes", "-", str(len(owner_changes)), "-"],
-        ["New models", "-", str(len(new_models)), "-"],
-        ["Missing models", "-", str(len(missing_models)), "-"],
-    ]
-
-
-def _history_context_rows(
-    previous: HistoryRunRecord | None,
-    current: HistoryRunRecord,
-) -> list[list[str]]:
-    """Build compact context rows (prompt/image/version) for history comparisons."""
-    previous_image = (
-        _truncate_text_preview(previous.get("image_path") or "-", max_chars=40)
-        if previous is not None
-        else "-"
-    )
-    return [
-        [
-            "Prompt hash",
-            _short_hash(previous.get("prompt_hash") if previous else None),
-            _short_hash(current.get("prompt_hash")),
-        ],
-        [
-            "Image path",
-            previous_image,
-            _truncate_text_preview(current.get("image_path") or "-", max_chars=40),
-        ],
-        [
-            "Library versions",
-            _format_library_versions_for_history(previous),
-            _format_library_versions_for_history(current),
-        ],
-    ]
-
-
-def _log_history_transition_chart(
-    *,
-    summary: HistoryComparisonSummary,
-    current: HistoryRunRecord,
-) -> None:
-    """Log transition chart (or current status chart when no transitions)."""
-    regressions = summary["regressions"]
-    recoveries = summary["recoveries"]
-    new_models = summary["new_models"]
-    missing_models = summary["missing_models"]
-    quality_regressions = summary["quality_regressions"]
-    quality_recoveries = summary["quality_recoveries"]
-    harness_regressions = summary["harness_regressions"]
-    harness_recoveries = summary["harness_recoveries"]
-    owner_changes = summary["owner_changes"]
-    window_quality_regressions = summary["window_quality_regressions"]
-    window_harness_regressions = summary["window_harness_regressions"]
-    window_generation_regressions = summary["window_generation_regressions"]
-    transition_entries = [
-        ("regressions", float(len(regressions))),
-        ("recoveries", float(len(recoveries))),
-        ("quality regressions", float(len(quality_regressions))),
-        ("quality recoveries", float(len(quality_recoveries))),
-        ("harness regressions", float(len(harness_regressions))),
-        ("harness recoveries", float(len(harness_recoveries))),
-        ("window quality signals", float(len(window_quality_regressions))),
-        ("window harness signals", float(len(window_harness_regressions))),
-        ("window generation signals", float(len(window_generation_regressions))),
-        ("owner changes", float(len(owner_changes))),
-        ("new", float(len(new_models))),
-        ("missing", float(len(missing_models))),
-    ]
-    if any(value > 0 for _label, value in transition_entries):
-        _log_rich_metric_chart(
-            "🔁 Status transition counts:",
-            transition_entries,
-            unit=" x",
-            digits=0,
-            max_rows=len(transition_entries),
-        )
-        return
-
-    _total, curr_success, curr_failed, _success_rate = _history_counts(current)
-    _log_rich_metric_chart(
-        "✅ Current run status counts:",
-        [("success", float(curr_success)), ("failed", float(curr_failed))],
-        unit=" x",
-        digits=0,
-        max_rows=2,
-    )
-
-
-def _history_transition_change_part(
-    prev_info: HistoryModelResultRecord,
-    curr_info: HistoryModelResultRecord,
-    *,
-    key: str,
-    label: str,
-) -> str | None:
-    """Return one transition detail part when a tracked history field changes."""
-    prev_value = prev_info.get(key)
-    curr_value = curr_info.get(key)
-    if prev_value == curr_value or not (prev_value or curr_value):
-        return None
-    return f"{label}={prev_value or '-'}->{curr_value or '-'}"
-
-
-def _history_transition_fallback_part(source: HistoryModelResultRecord) -> str | None:
-    """Return the fallback history detail when no field transitions are shown."""
-    harness_issue = source.get("harness_issue_type")
-    if harness_issue:
-        return f"harness={harness_issue}"
-
-    review_verdict = source.get("review_verdict")
-    if review_verdict:
-        return f"verdict={review_verdict}"
-
-    error_stage = source.get("error_stage")
-    if error_stage:
-        return error_stage
-
-    return None
-
-
-def _history_transition_detail_text(
-    prev_info: HistoryModelResultRecord | None,
-    curr_info: HistoryModelResultRecord | None,
-) -> str:
-    """Return compact detail text for history transition rows."""
-    source = curr_info if curr_info is not None else prev_info
-    if source is None:
-        return "-"
-
-    parts: list[str] = []
-    if prev_info is not None and curr_info is not None:
-        tracked_fields: tuple[tuple[str, str], ...] = (
-            ("review_user_bucket", "bucket"),
-            ("review_verdict", "verdict"),
-            ("harness_issue_type", "harness"),
-            ("review_owner", "owner"),
-        )
-        for key, label in tracked_fields:
-            part = _history_transition_change_part(
-                prev_info,
-                curr_info,
-                key=key,
-                label=label,
-            )
-            if part is not None:
-                parts.append(part)
-
-    if not parts:
-        fallback_part = _history_transition_fallback_part(source)
-        if fallback_part is not None:
-            parts.append(fallback_part)
-
-    return " | ".join(parts[:2]) or "-"
-
-
-def _history_transition_rows(
-    *,
-    previous: HistoryRunRecord | None,
-    current: HistoryRunRecord,
-    summary: HistoryComparisonSummary,
-) -> list[list[str]]:
-    """Build per-model transition rows for regressions/recoveries/new/missing models."""
-    regressions = summary["regressions"]
-    recoveries = summary["recoveries"]
-    new_models = summary["new_models"]
-    missing_models = summary["missing_models"]
-    quality_regressions = summary["quality_regressions"]
-    quality_recoveries = summary["quality_recoveries"]
-    harness_regressions = summary["harness_regressions"]
-    harness_recoveries = summary["harness_recoveries"]
-    owner_changes = summary["owner_changes"]
-    window_quality_regressions = summary["window_quality_regressions"]
-    window_harness_regressions = summary["window_harness_regressions"]
-    window_generation_regressions = summary["window_generation_regressions"]
-    changed_models = sorted(
-        {
-            *regressions,
-            *recoveries,
-            *new_models,
-            *missing_models,
-            *quality_regressions,
-            *quality_recoveries,
-            *harness_regressions,
-            *harness_recoveries,
-            *window_quality_regressions,
-            *window_harness_regressions,
-            *window_generation_regressions,
-            *owner_changes,
-        }
-    )
-    if not changed_models:
-        return []
-
-    prev_models = _history_model_results(previous)
-    curr_models = _history_model_results(current)
-    transition_rows: list[list[str]] = []
-    for model_name in changed_models:
-        if model_name in regressions:
-            transition = "Regression"
-        elif model_name in recoveries:
-            transition = "Recovery"
-        elif model_name in harness_regressions:
-            transition = "Harness regression"
-        elif model_name in harness_recoveries:
-            transition = "Harness recovery"
-        elif model_name in quality_regressions:
-            transition = "Quality regression"
-        elif model_name in quality_recoveries:
-            transition = "Quality recovery"
-        elif model_name in window_generation_regressions:
-            transition = "Window generation signal"
-        elif model_name in window_harness_regressions:
-            transition = "Window harness signal"
-        elif model_name in window_quality_regressions:
-            transition = "Window quality signal"
-        elif model_name in owner_changes:
-            transition = "Owner changed"
-        elif model_name in new_models:
-            transition = "New"
-        elif model_name in missing_models:
-            transition = "Missing"
-        else:
-            transition = "Changed"
-
-        prev_info = prev_models.get(model_name)
-        curr_info = curr_models.get(model_name)
-        transition_rows.append(
-            [
-                _short_model_label(model_name),
-                transition,
-                _model_status_from_history(prev_info),
-                _model_status_from_history(curr_info),
-                _history_transition_detail_text(prev_info, curr_info),
-            ],
-        )
-    return transition_rows
-
-
-def _log_history_comparison(
-    previous: HistoryRunRecord | None,
-    current: HistoryRunRecord,
-    history_records: Sequence[HistoryRunRecord] | None = None,
-) -> None:
-    """Print the History Comparison CLI section (regressions/recoveries)."""
-    print_cli_section("History Comparison")
-    if previous is None:
-        logger.info("No prior history run available. Baseline created.")
-    summary = (
-        compare_history_window(history_records, current)
-        if history_records is not None
-        else _history_summary_for_comparison(previous, current)
-    )
-    rows = _history_summary_rows(previous=previous, current=current, summary=summary)
-    logger.info("📚 Run-over-run comparison:")
-    _log_rich_table(headers=["Metric", "Previous", "Current", "Delta"], rows=rows)
-
-    context_rows = _history_context_rows(previous, current)
-    logger.info("🔎 Comparison context:")
-    _log_rich_table(headers=["Context", "Previous", "Current"], rows=context_rows)
-    if summary["window_version_deltas"]:
-        logger.info(
-            "🧬 Window library deltas: %s",
-            ", ".join(summary["window_version_deltas"]),
-        )
-
-    _log_history_transition_chart(summary=summary, current=current)
-    transition_rows = _history_transition_rows(previous=previous, current=current, summary=summary)
-    if transition_rows:
-        logger.info("🧾 Detailed model transitions:")
-        _log_rich_table(
-            headers=["Model", "Transition", "Prev", "Current", "Signal"],
-            rows=transition_rows,
-            no_wrap_headers=frozenset({"Prev", "Current"}),
-        )
 
 
 def _guard_markdownlint_block(lines: Sequence[str], *, rules: str) -> list[str]:
@@ -26276,13 +22914,7 @@ def _resolve_report_output_paths(args: argparse.Namespace) -> ReportOutputPaths:
     return ReportOutputPaths(
         index=run_json_path.parent / DEFAULT_OUTPUT_INDEX.name,
         html=args.output_html.resolve(),
-        markdown=args.output_markdown.resolve(),
         gallery_markdown=args.output_gallery_markdown.resolve(),
-        review=args.output_review.resolve(),
-        model_selection=args.output_model_selection.resolve(),
-        model_capabilities=args.output_model_capabilities.resolve(),
-        model_capabilities_json=args.output_model_capabilities_json.resolve(),
-        tsv=args.output_tsv.resolve(),
         jsonl=args.output_jsonl.resolve(),
         run_json=run_json_path,
         diagnostics=args.output_diagnostics.resolve(),
@@ -26305,7 +22937,7 @@ def _public_artifact_path(path: Path) -> str:
 
 
 def _build_report_artifact_specs(output_paths: ReportOutputPaths) -> tuple[ReportArtifactSpec, ...]:
-    """Return one ordered metadata source for generated report artifacts."""
+    """Return the exact retained report and machine-artifact contract."""
     return (
         ReportArtifactSpec(
             key="output_index",
@@ -26313,7 +22945,7 @@ def _build_report_artifact_specs(output_paths: ReportOutputPaths) -> tuple[Repor
             label="   Output Index:   ",
             path=output_paths.index,
             dashboard_label="Output Index",
-            dashboard_purpose="Start here for model users and maintainers",
+            dashboard_purpose="Links to retained run artifacts",
         ),
         ReportArtifactSpec(
             key="html",
@@ -26321,15 +22953,7 @@ def _build_report_artifact_specs(output_paths: ReportOutputPaths) -> tuple[Repor
             label="   HTML Report:     ",
             path=output_paths.html,
             dashboard_label="HTML Report",
-            dashboard_purpose="Interactive dashboard with charts & filters",
-        ),
-        ReportArtifactSpec(
-            key="markdown",
-            public_key="results_markdown",
-            label="   Markdown Report: ",
-            path=output_paths.markdown,
-            dashboard_label="Markdown Report",
-            dashboard_purpose="Mode-aware public run index",
+            dashboard_purpose="Standalone gallery and diagnostics",
         ),
         ReportArtifactSpec(
             key="markdown_gallery",
@@ -26340,36 +22964,12 @@ def _build_report_artifact_specs(output_paths: ReportOutputPaths) -> tuple[Repor
             dashboard_purpose="Complete per-model evidence",
         ),
         ReportArtifactSpec(
-            key="review",
-            public_key="review",
-            label="   Review Report:   ",
-            path=output_paths.review,
-            dashboard_label="Review Report",
-            dashboard_purpose="Insights summary & checklist",
-        ),
-        ReportArtifactSpec(
-            key="model_selection",
-            public_key="model_selection",
-            label="   Model Selection: ",
-            path=output_paths.model_selection,
-            dashboard_label="Model Selection",
-            dashboard_purpose="Ranked caption/metadata shortlist",
-        ),
-        ReportArtifactSpec(
-            key="model_capabilities",
-            public_key="model_capabilities",
-            label="   Capabilities:    ",
-            path=output_paths.model_capabilities,
-            dashboard_label="Capability Scorecard",
-            dashboard_purpose="Aggregated model capability matrix",
-        ),
-        ReportArtifactSpec(
-            key="tsv",
-            public_key="results_tsv",
-            label="   TSV Report:      ",
-            path=output_paths.tsv,
-            dashboard_label="TSV Metrics",
-            dashboard_purpose="Tab-separated raw metrics for import",
+            key="diagnostics",
+            public_key="diagnostics",
+            label="   Diagnostics:     ",
+            path=output_paths.diagnostics,
+            dashboard_label="Diagnostics",
+            dashboard_purpose="Current-run maintainer evidence",
         ),
         ReportArtifactSpec(
             key="jsonl",
@@ -26377,15 +22977,15 @@ def _build_report_artifact_specs(output_paths: ReportOutputPaths) -> tuple[Repor
             label="   JSONL Report:    ",
             path=output_paths.jsonl,
             dashboard_label="JSONL Data",
-            dashboard_purpose="Machine-readable per-model diagnostics",
+            dashboard_purpose="Machine-readable per-model evidence",
         ),
         ReportArtifactSpec(
             key="run_json",
             public_key="run_json",
-            label="   Run JSON:       ",
+            label="   Run JSON:        ",
             path=output_paths.run_json,
             dashboard_label="Run JSON",
-            dashboard_purpose="Stable run metadata contract",
+            dashboard_purpose="Run metadata and artifact manifest",
         ),
     )
 
@@ -26398,8 +22998,6 @@ def _public_output_artifact_map(output_paths: ReportOutputPaths) -> dict[str, st
     }
     artifacts.update(
         {
-            "model_capabilities_json": _public_artifact_path(output_paths.model_capabilities_json),
-            "diagnostics": _public_artifact_path(output_paths.diagnostics),
             "log": _public_artifact_path(output_paths.log),
             "environment": _public_artifact_path(output_paths.environment),
         }
@@ -26408,155 +23006,67 @@ def _public_output_artifact_map(output_paths: ReportOutputPaths) -> dict[str, st
 
 
 def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtifact, ...]:
-    """Build the ordered final report artifact plan."""
+    """Build the ordered retained artifact plan from the shared specifications."""
     output_paths = inputs.output_paths
-    specs = {spec.key: spec for spec in _build_report_artifact_specs(output_paths)}
-
-    return (
-        ReportArtifact(
-            key=specs["html"].key,
-            label=specs["html"].label,
-            path=specs["html"].path,
-            job=lambda: generate_html_report(
-                results=inputs.results,
-                filename=output_paths.html,
-                versions=inputs.library_versions,
-                prompt=inputs.prompt,
-                total_runtime_seconds=inputs.overall_time,
-                image_path=inputs.image_path,
-                report_context=inputs.report_context,
-                run_args=inputs.run_args,
-            ),
+    jobs: dict[str, Callable[[], None] | None] = {
+        "output_index": lambda: generate_output_index_report(
+            output_paths.index,
+            output_paths=output_paths,
         ),
-        ReportArtifact(
-            key=specs["markdown"].key,
-            label=specs["markdown"].label,
-            path=specs["markdown"].path,
-            job=lambda: generate_markdown_report(
-                results=inputs.results,
-                filename=output_paths.markdown,
-                versions=inputs.library_versions,
-                prompt=inputs.prompt,
-                total_runtime_seconds=inputs.overall_time,
-                image_path=inputs.image_path,
-                report_context=inputs.report_context,
-                model_selection_filename=output_paths.model_selection,
-                gallery_filename=output_paths.gallery_markdown,
-                review_filename=output_paths.review,
-                log_filename=output_paths.log,
-            ),
+        "html": lambda: generate_html_report(
+            results=inputs.results,
+            filename=output_paths.html,
+            versions=inputs.library_versions,
+            prompt=inputs.prompt,
+            total_runtime_seconds=inputs.overall_time,
+            image_path=inputs.image_path,
+            report_context=inputs.report_context,
+            run_args=inputs.run_args,
         ),
-        ReportArtifact(
-            key=specs["markdown_gallery"].key,
-            label=specs["markdown_gallery"].label,
-            path=specs["markdown_gallery"].path,
-            job=lambda: generate_markdown_gallery_report(
-                results=inputs.results,
-                filename=output_paths.gallery_markdown,
-                prompt=inputs.prompt,
-                metadata=inputs.metadata,
-                report_context=inputs.report_context,
-                versions=inputs.library_versions,
-            ),
+        "markdown_gallery": lambda: generate_markdown_gallery_report(
+            results=inputs.results,
+            filename=output_paths.gallery_markdown,
+            prompt=inputs.prompt,
+            metadata=inputs.metadata,
+            report_context=inputs.report_context,
+            versions=inputs.library_versions,
         ),
-        ReportArtifact(
-            key=specs["review"].key,
-            label=specs["review"].label,
-            path=specs["review"].path,
-            job=lambda: generate_review_report(
-                results=inputs.results,
-                filename=output_paths.review,
-                prompt=inputs.prompt,
-                report_context=inputs.report_context,
-                log_filename=output_paths.log,
-                gallery_filename=output_paths.gallery_markdown,
+        "diagnostics": None,
+        "jsonl": lambda: save_jsonl_report(
+            inputs.results,
+            output_paths.jsonl,
+            prompt=inputs.prompt,
+            system_info=inputs.system_info,
+            library_versions=inputs.library_versions,
+            runtime_fingerprint=inputs.runtime_fingerprint,
+            eval_mode=inputs.report_context.mode_policy.eval_mode,
+            metadata_exposed_to_prompt=(
+                inputs.report_context.mode_policy.metadata_exposed_to_prompt
             ),
+            requested_revision=inputs.model_revision,
+            report_context=inputs.report_context,
         ),
+        "run_json": lambda: save_run_json_report(
+            inputs.results,
+            output_paths.run_json,
+            versions=inputs.library_versions,
+            prompt=inputs.prompt,
+            total_runtime_seconds=inputs.overall_time,
+            report_context=inputs.report_context,
+            output_paths=_public_output_artifact_map(output_paths),
+            image_path=inputs.image_path,
+            trust_remote_code=inputs.trust_remote_code,
+            requested_revision=inputs.model_revision,
+        ),
+    }
+    return tuple(
         ReportArtifact(
-            key=specs["model_selection"].key,
-            label=specs["model_selection"].label,
-            path=specs["model_selection"].path,
-            job=lambda: generate_model_selection_report(
-                inputs.results,
-                output_paths.model_selection,
-                prompt=inputs.prompt,
-                metadata=inputs.metadata,
-                report_context=inputs.report_context,
-                gallery_filename=output_paths.gallery_markdown,
-                diagnostics_filename=output_paths.diagnostics,
-            ),
-        ),
-        ReportArtifact(
-            key=specs["model_capabilities"].key,
-            label=specs["model_capabilities"].label,
-            path=specs["model_capabilities"].path,
-            job=lambda: generate_model_capability_scorecard(
-                inputs.results,
-                output_paths.model_capabilities,
-                output_paths.model_capabilities_json,
-                prompt=inputs.prompt,
-                metadata=inputs.metadata,
-                report_context=inputs.report_context,
-                history_records=inputs.history_records,
-            ),
-        ),
-        ReportArtifact(
-            key=specs["tsv"].key,
-            label=specs["tsv"].label,
-            path=specs["tsv"].path,
-            job=lambda: generate_tsv_report(
-                results=inputs.results,
-                filename=output_paths.tsv,
-                report_context=inputs.report_context,
-            ),
-        ),
-        ReportArtifact(
-            key=specs["jsonl"].key,
-            label=specs["jsonl"].label,
-            path=specs["jsonl"].path,
-            job=lambda: save_jsonl_report(
-                inputs.results,
-                output_paths.jsonl,
-                prompt=inputs.prompt,
-                system_info=inputs.system_info,
-                library_versions=inputs.library_versions,
-                runtime_fingerprint=inputs.runtime_fingerprint,
-                eval_mode=inputs.report_context.mode_policy.eval_mode,
-                metadata_exposed_to_prompt=(
-                    inputs.report_context.mode_policy.metadata_exposed_to_prompt
-                ),
-                requested_revision=inputs.model_revision,
-                report_context=inputs.report_context,
-            ),
-        ),
-        ReportArtifact(
-            key=specs["run_json"].key,
-            label=specs["run_json"].label,
-            path=specs["run_json"].path,
-            job=lambda: save_run_json_report(
-                inputs.results,
-                output_paths.run_json,
-                versions=inputs.library_versions,
-                prompt=inputs.prompt,
-                total_runtime_seconds=inputs.overall_time,
-                report_context=inputs.report_context,
-                output_paths=_public_output_artifact_map(output_paths),
-                image_path=inputs.image_path,
-                trust_remote_code=inputs.trust_remote_code,
-                requested_revision=inputs.model_revision,
-            ),
-        ),
-        ReportArtifact(
-            key=specs["output_index"].key,
-            label=specs["output_index"].label,
-            path=specs["output_index"].path,
-            job=lambda: generate_output_index_report(
-                output_paths.index,
-                output_paths=output_paths,
-                report_context=inputs.report_context,
-                diagnostics_artifacts=inputs.diagnostics_artifacts,
-            ),
-        ),
+            key=spec.key,
+            label=spec.label,
+            path=spec.path,
+            job=jobs[spec.key],
+        )
+        for spec in _build_report_artifact_specs(output_paths)
     )
 
 
@@ -26607,14 +23117,9 @@ def _clean_stale_toplevel_reports(output_dir: Path, reports_dir: Path) -> int:
     top-level duplicates so only the canonical copies remain.
     """
     stale_names = (
-        "results.md",
         "results.html",
-        "results.tsv",
         "diagnostics.md",
         "model_gallery.md",
-        "model_selection.md",
-        "model_capabilities.md",
-        "review.md",
     )
     removed = 0
     for name in stale_names:
@@ -26767,7 +23272,6 @@ def _run_differential_reruns(
 
 def _print_reports_dashboard(
     output_paths: ReportOutputPaths,
-    diagnostics_artifacts: DiagnosticsArtifacts | None = None,
     history_path: Path | None = None,
 ) -> None:
     """Print a highly polished, unified console dashboard of all generated artifacts."""
@@ -26802,28 +23306,11 @@ def _print_reports_dashboard(
     for spec in _build_report_artifact_specs(output_paths):
         add_row(spec.dashboard_label, spec.dashboard_purpose, spec.path)
 
-    add_row(
-        "Capability JSON",
-        "Machine-readable capability summary",
-        output_paths.model_capabilities_json,
-    )
-
-    if diagnostics_artifacts and diagnostics_artifacts.diagnostics_written:
-        add_row("Diagnostics", "Upstream bug triage & package failures", output_paths.diagnostics)
-
     if history_path:
         add_row("Run History", "Persistent database of previous runs", history_path)
 
     add_row("System Log", "Step-by-step CLI trace log", output_paths.log)
     add_row("Environment Log", "Pip freeze & conda env config log", output_paths.environment)
-
-    if diagnostics_artifacts and diagnostics_artifacts.issue_reports:
-        for model_name, issue_path in sorted(diagnostics_artifacts.issue_reports.items()):
-            add_row(
-                issue_path.name,
-                f"Factual crash draft for {model_name}",
-                issue_path,
-            )
 
     panel = Panel(
         table,
@@ -26880,30 +23367,21 @@ def finalize_execution(
         output_paths = _resolve_report_output_paths(args)
         history_path = _history_path_for_jsonl(output_paths.jsonl)
         eval_mode = report_context.mode_policy.eval_mode
-        history_records_before_current = _history_records_for_eval_mode(
-            _load_history_run_records(history_path),
-            eval_mode,
-        )
-        previous_history = (
-            history_records_before_current[-1] if history_records_before_current else None
-        )
 
         for output_path in (
+            output_paths.index,
             output_paths.html,
-            output_paths.markdown,
             output_paths.gallery_markdown,
-            output_paths.review,
-            output_paths.model_selection,
-            output_paths.model_capabilities,
-            output_paths.model_capabilities_json,
-            output_paths.tsv,
             output_paths.jsonl,
             output_paths.run_json,
+            output_paths.diagnostics,
+            output_paths.log,
+            output_paths.environment,
         ):
             output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        # Append run history (append-only) and compare with previous run
-        current_history = append_history_record(
+        # Preserve raw append-only history without reading it into current reports.
+        append_history_record(
             history_path=history_path,
             results=results,
             prompt=prompt,
@@ -26912,16 +23390,9 @@ def finalize_execution(
             image_path=image_path,
             runtime_fingerprint=runtime_fingerprint,
             eval_mode=eval_mode,
-            report_context=report_context,
         )
 
         log_file_path(history_path, label="   History:     ")
-
-        history_records = _history_records_for_eval_mode(
-            _load_history_run_records(history_path),
-            eval_mode,
-        )
-        _log_history_comparison(previous_history, current_history, history_records[:-1])
 
         # Generate diagnostics after history append to keep final artifact ordering stable.
         diagnostics_artifacts = _write_diagnostics_artifacts(
@@ -26954,9 +23425,7 @@ def finalize_execution(
                     str(args.revision) if getattr(args, "revision", None) is not None else None
                 ),
                 trust_remote_code=bool(getattr(args, "trust_remote_code", True)),
-                history_records=tuple(history_records_before_current),
                 runtime_fingerprint=runtime_fingerprint,
-                diagnostics_artifacts=diagnostics_artifacts,
             ),
         )
 
@@ -26972,7 +23441,6 @@ def finalize_execution(
         # Print the beautiful report summary dashboard
         _print_reports_dashboard(
             output_paths=output_paths,
-            diagnostics_artifacts=diagnostics_artifacts,
             history_path=history_path,
         )
 
@@ -27213,39 +23681,9 @@ class OutputPathArgumentSpec:
 OUTPUT_PATH_ARGUMENT_SPECS: Final[tuple[OutputPathArgumentSpec, ...]] = (
     OutputPathArgumentSpec("--output-html", DEFAULT_HTML_OUTPUT, "Output HTML report filename."),
     OutputPathArgumentSpec(
-        "--output-markdown",
-        DEFAULT_MD_OUTPUT,
-        "Output GitHub Markdown report filename.",
-    ),
-    OutputPathArgumentSpec(
         "--output-gallery-markdown",
         DEFAULT_GALLERY_MD_OUTPUT,
-        "Output GitHub Markdown gallery filename for the standalone review artifact.",
-    ),
-    OutputPathArgumentSpec(
-        "--output-review",
-        DEFAULT_REVIEW_MD_OUTPUT,
-        "Output Markdown review digest filename.",
-    ),
-    OutputPathArgumentSpec(
-        "--output-model-selection",
-        DEFAULT_MODEL_SELECTION_OUTPUT,
-        "Output model selection report filename.",
-    ),
-    OutputPathArgumentSpec(
-        "--output-model-capabilities",
-        DEFAULT_MODEL_CAPABILITIES_OUTPUT,
-        "Output model capability scorecard Markdown filename.",
-    ),
-    OutputPathArgumentSpec(
-        "--output-model-capabilities-json",
-        DEFAULT_MODEL_CAPABILITIES_JSON_OUTPUT,
-        "Output model capability scorecard JSON filename.",
-    ),
-    OutputPathArgumentSpec(
-        "--output-tsv",
-        DEFAULT_TSV_OUTPUT,
-        "Output TSV (tab-separated values) report filename.",
+        "Output GitHub Markdown model gallery filename.",
     ),
     OutputPathArgumentSpec("--output-jsonl", DEFAULT_JSONL_OUTPUT, "Output JSONL report filename."),
     OutputPathArgumentSpec(

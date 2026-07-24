@@ -19,10 +19,7 @@ from check_models import (
     PerformanceResult,
     RuntimeDiagnostics,
     _history_path_for_jsonl,
-    _load_latest_history_record,
     append_history_record,
-    compare_history_records,
-    compare_history_window,
     save_jsonl_report,
 )
 from tools import safe_io
@@ -31,8 +28,6 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     import pytest
-
-    from check_models import HistoryModelResultRecord, HistoryRunRecord
 
 
 def _read_jsonl(path: Path) -> tuple[JsonlMetadataRecord, list[JsonlResultRecord]]:
@@ -67,34 +62,6 @@ class MockGeneration:
     active_memory: float | None = None
     cache_memory: float | None = None
     quality_analysis: object | None = None
-
-
-def _history_run(
-    model_success: dict[str, bool],
-    *,
-    timestamp: str = "2026-01-01 00:00:00 GMT",
-) -> HistoryRunRecord:
-    """Build a fully shaped history run record for typed history tests."""
-    model_results: dict[str, HistoryModelResultRecord] = {}
-    for model, success in model_success.items():
-        model_results[model] = {
-            "success": success,
-            "error_stage": None,
-            "error_type": None,
-            "error_package": None,
-        }
-
-    return {
-        "_type": "run",
-        "format_version": "1.0",
-        "timestamp": timestamp,
-        "prompt_hash": "hash",
-        "prompt_preview": "preview",
-        "image_path": None,
-        "model_results": model_results,
-        "system": {},
-        "library_versions": {},
-    }
 
 
 def test_save_jsonl_report_creates_file(tmp_path: Path) -> None:
@@ -214,11 +181,14 @@ def test_save_run_json_report_captures_public_snapshot_contract(
         trust_remote_code=False,
         requested_revision="release-branch",
         output_paths={
-            "results_markdown": "reports/results.md",
-            "model_selection": "reports/model_selection.md",
-            "model_capabilities": "reports/model_capabilities.md",
-            "model_capabilities_json": "model_capabilities.json",
+            "output_index": "index.md",
+            "results_html": "reports/results.html",
+            "model_gallery": "reports/model_gallery.md",
             "diagnostics": "reports/diagnostics.md",
+            "results_jsonl": "results.jsonl",
+            "run_json": "run.json",
+            "log": "check_models.log",
+            "environment": "environment.log",
         },
         producer={
             "name": "check_models",
@@ -261,9 +231,16 @@ def test_save_run_json_report_captures_public_snapshot_contract(
         "models_crashed": 0,
         "models_indeterminate": 0,
     }
-    assert payload["artifacts"]["model_selection"] == "reports/model_selection.md"
-    assert "model_capabilities" not in payload["artifacts"]
-    assert "model_capabilities_json" not in payload["artifacts"]
+    assert payload["artifacts"] == {
+        "output_index": "index.md",
+        "results_html": "reports/results.html",
+        "model_gallery": "reports/model_gallery.md",
+        "diagnostics": "reports/diagnostics.md",
+        "results_jsonl": "results.jsonl",
+        "run_json": "run.json",
+        "log": "check_models.log",
+        "environment": "environment.log",
+    }
     assert payload["library_versions"]["mlx-vlm"] == "0.6.3"
     assert payload["image"]["name"] == "catalogue.jpg"
     assert payload["image"]["width"] == 12
@@ -523,8 +500,8 @@ def test_jsonl_metrics_fall_back_to_generation_runtime_fields(tmp_path: Path) ->
     assert metrics["peak_memory_delta_gb"] == 0.5
 
 
-def test_working_set_percentage_reaches_jsonl_and_history(tmp_path: Path) -> None:
-    """JSONL and history should share one canonical working-set percentage."""
+def test_working_set_percentage_stays_in_current_run_jsonl(tmp_path: Path) -> None:
+    """Derived working-set percentages belong in current-run JSONL, not raw history."""
     result = PerformanceResult(
         model_name="test-model",
         generation=MockGeneration(peak_memory=1.0),
@@ -554,12 +531,11 @@ def test_working_set_percentage_reaches_jsonl_and_history(tmp_path: Path) -> Non
         prompt="test",
         system_info={},
         library_versions={},
-        report_context=context,
     )
-    assert history["model_results"]["test-model"]["peak_memory_working_set_pct"] == 50.0
+    assert "peak_memory_working_set_pct" not in history["model_results"]["test-model"]
 
 
-def test_missing_working_set_omits_jsonl_and_history_percentage(tmp_path: Path) -> None:
+def test_missing_working_set_omits_jsonl_percentage(tmp_path: Path) -> None:
     """An unavailable denominator should not create a guessed structured fact."""
     result = PerformanceResult(
         model_name="test-model",
@@ -583,16 +559,6 @@ def test_missing_working_set_omits_jsonl_and_history_percentage(tmp_path: Path) 
     )
     _header, rows = _read_jsonl(output_file)
     assert "peak_memory_working_set_pct" not in rows[0]["metrics"]
-
-    history = append_history_record(
-        history_path=tmp_path / "no-working-set.history.jsonl",
-        results=[result],
-        prompt="test",
-        system_info={},
-        library_versions={},
-        report_context=context,
-    )
-    assert "peak_memory_working_set_pct" not in history["model_results"]["test-model"]
 
 
 def test_save_jsonl_report_content(tmp_path: Path) -> None:
@@ -1204,10 +1170,10 @@ def test_append_history_record_creates_file(tmp_path: Path) -> None:
     assert record["model_results"]["test-model"]["success"] is True
 
 
-def test_append_history_record_captures_review_fields_for_quality_tracking(
+def test_append_history_record_contains_only_raw_execution_and_resource_facts(
     tmp_path: Path,
 ) -> None:
-    """History rows should keep enough review context for non-binary comparisons."""
+    """History rows must not persist current semantic fields or recommendations."""
     history_file = tmp_path / "results.history.jsonl"
     prompt = (
         "Analyze this image.\n"
@@ -1225,18 +1191,13 @@ def test_append_history_record_captures_review_fields_for_quality_tracking(
         prompt_tokens=320,
         generation_tokens=64,
     )
-    analysis = check_models.analyze_generation_text(
-        gen.text or "",
-        generated_tokens=64,
-        prompt_tokens=320,
-        prompt=prompt,
-        requested_max_tokens=128,
-    )
     result = PerformanceResult(
         model_name="test-model",
         generation=gen,
         success=True,
-        quality_analysis=analysis,
+        generation_time=1.25,
+        model_load_time=0.5,
+        total_time=1.75,
         requested_max_tokens=128,
     )
 
@@ -1251,155 +1212,25 @@ def test_append_history_record_captures_review_fields_for_quality_tracking(
 
     model_results = _require_present(record.get("model_results"), field_name="model_results")
     model_record = model_results["test-model"]
-    assert model_record.get("review_verdict") == analysis.verdict
-    assert model_record.get("review_owner") == "unknown"
-    assert model_record.get("review_user_bucket") == analysis.user_bucket
-    assert model_record.get("prompt_output_ratio") == 64 / 320
-
-
-def test_compare_history_records_detects_regressions_and_recoveries() -> None:
-    """Test regression/recovery detection between history records."""
-    previous = _history_run(
-        {
-            "model-a": True,
-            "model-b": False,
-            "model-c": True,
-        },
-    )
-    current = _history_run(
-        {
-            "model-a": False,
-            "model-b": True,
-            "model-d": True,
-        },
-        timestamp="2026-01-02 00:00:00 GMT",
-    )
-
-    summary = compare_history_records(previous, current)
-    assert summary["regressions"] == ["model-a"]
-    assert summary["recoveries"] == ["model-b"]
-    assert summary["new_models"] == ["model-d"]
-    assert summary["missing_models"] == ["model-c"]
-
-
-def test_compare_history_records_detects_quality_harness_and_owner_changes() -> None:
-    """Stable-success models should still report maintainer-relevant quality shifts."""
-    previous = _history_run({"model-a": True, "model-b": True})
-    current = _history_run({"model-a": True, "model-b": True})
-
-    previous_model_results = _require_present(
-        previous.get("model_results"),
-        field_name="model_results",
-    )
-    current_model_results = _require_present(
-        current.get("model_results"),
-        field_name="model_results",
-    )
-
-    previous_model_results["model-a"]["review_user_bucket"] = "recommended"
-    previous_model_results["model-a"]["review_verdict"] = "clean"
-    previous_model_results["model-a"]["review_owner"] = "model"
-
-    current_model_results["model-a"]["review_user_bucket"] = "avoid"
-    current_model_results["model-a"]["review_verdict"] = "context_budget"
-    current_model_results["model-a"]["review_owner"] = "mlx"
-    current_model_results["model-a"]["harness_issue_type"] = "long_context"
-
-    previous_model_results["model-b"]["review_user_bucket"] = "avoid"
-    previous_model_results["model-b"]["review_verdict"] = "harness"
-    previous_model_results["model-b"]["review_owner"] = "mlx-vlm"
-    previous_model_results["model-b"]["harness_issue_type"] = "token_leak"
-
-    current_model_results["model-b"]["review_user_bucket"] = "recommended"
-    current_model_results["model-b"]["review_verdict"] = "clean"
-    current_model_results["model-b"]["review_owner"] = "model"
-
-    summary = compare_history_records(previous, current)
-    assert summary["quality_regressions"] == ["model-a"]
-    assert summary["quality_recoveries"] == ["model-b"]
-    assert summary["harness_regressions"] == ["model-a"]
-    assert summary["harness_recoveries"] == ["model-b"]
-    assert summary["owner_changes"] == ["model-a", "model-b"]
-
-
-def test_compare_history_window_flags_two_week_generation_regression() -> None:
-    """Window comparison should find regressions beyond the immediately previous run."""
-    baseline = _history_run({"model-a": True}, timestamp="2026-04-26 12:00:00 BST")
-    noisy_previous = _history_run({"model-a": True}, timestamp="2026-05-16 12:00:00 BST")
-    current = _history_run({"model-a": True}, timestamp="2026-05-17 12:00:00 BST")
-
-    baseline_results = _require_present(baseline.get("model_results"), field_name="baseline")
-    noisy_results = _require_present(noisy_previous.get("model_results"), field_name="noisy")
-    current_results = _require_present(current.get("model_results"), field_name="current")
-
-    baseline_results["model-a"]["review_verdict"] = "clean"
-    baseline_results["model-a"]["review_user_bucket"] = "recommended"
-    baseline_results["model-a"]["stop_reason"] = "completed"
-    baseline["library_versions"] = {
-        "mlx": "0.32.0.dev20260426",
-        "mlx-vlm": "0.4.5",
-        "transformers": "5.6.2",
+    assert model_record == {
+        "success": True,
+        "failure_phase": None,
+        "error_stage": None,
+        "error_type": None,
+        "error_package": None,
+        "error_code": None,
+        "error_signature": None,
+        "generation_time_s": 1.25,
+        "model_load_time_s": 0.5,
+        "total_time_s": 1.75,
+        "prompt_tokens": 320,
+        "generation_tokens": 64,
+        "total_tokens": 30,
+        "generation_tps": 5.0,
+        "peak_memory_gb": 1.5,
+        "active_memory_gb": 0.0,
+        "cache_memory_gb": 0.0,
     }
-
-    noisy_results["model-a"]["review_verdict"] = "cutoff_degraded"
-    noisy_results["model-a"]["review_user_bucket"] = "avoid"
-    noisy_results["model-a"]["stop_reason"] = "max_tokens"
-
-    current_results["model-a"]["review_verdict"] = "cutoff_degraded"
-    current_results["model-a"]["review_user_bucket"] = "avoid"
-    current_results["model-a"]["stop_reason"] = "max_tokens"
-    current["library_versions"] = {
-        "mlx": "0.32.0.dev20260517",
-        "mlx-vlm": "0.5.0",
-        "transformers": "5.8.1",
-    }
-
-    summary = compare_history_window([baseline, noisy_previous], current, window_days=21)
-
-    assert summary["window_generation_regressions"] == ["model-a"]
-    assert "model-a" in summary["window_quality_regressions"]
-    assert any("mlx-vlm=0.4.5->0.5.0" in item for item in summary["window_version_deltas"])
-
-
-def test_history_transition_detail_text_prefers_first_two_changed_fields() -> None:
-    """Detail text should keep stable field priority and truncate to two segments."""
-    previous = _history_run({"model-a": True})
-    current = _history_run({"model-a": True})
-
-    previous_model = _require_present(previous.get("model_results"), field_name="model_results")
-    current_model = _require_present(current.get("model_results"), field_name="model_results")
-    prev_info = previous_model["model-a"]
-    curr_info = current_model["model-a"]
-
-    prev_info["review_user_bucket"] = "recommended"
-    curr_info["review_user_bucket"] = "avoid"
-    prev_info["review_verdict"] = "clean"
-    curr_info["review_verdict"] = "context_budget"
-    prev_info["harness_issue_type"] = "encoding"
-    curr_info["harness_issue_type"] = "stop_token"
-    prev_info["review_owner"] = "model"
-    curr_info["review_owner"] = "mlx-vlm"
-
-    assert check_models._history_transition_detail_text(prev_info, curr_info) == (
-        "bucket=recommended->avoid | verdict=clean->context_budget"
-    )
-
-
-def test_history_transition_detail_text_uses_harness_fallback_before_verdict() -> None:
-    """Fallback detail text should prefer harness, then verdict, then error stage."""
-    current = _history_run({"model-a": False})
-    current_model = _require_present(current.get("model_results"), field_name="model_results")
-    curr_info = current_model["model-a"]
-    curr_info["review_verdict"] = "runtime_failure"
-    curr_info["harness_issue_type"] = "stop_token"
-    curr_info["error_stage"] = "decode"
-
-    assert check_models._history_transition_detail_text(None, curr_info) == "harness=stop_token"
-
-
-# ---------------------------------------------------------------------------
-# _history_path_for_jsonl
-# ---------------------------------------------------------------------------
 
 
 def test_history_path_for_jsonl_derives_name(tmp_path: Path) -> None:
@@ -1415,96 +1246,6 @@ def test_history_path_for_jsonl_custom_stem(tmp_path: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
-# _load_latest_history_record
-# ---------------------------------------------------------------------------
-
-
-def test_load_latest_history_record_missing_file(tmp_path: Path) -> None:
-    """Return None when the history file does not exist."""
-    assert _load_latest_history_record(tmp_path / "missing.jsonl") is None
-
-
-def test_load_latest_history_record_empty_file(tmp_path: Path) -> None:
-    """Return None when the history file is empty."""
-    history = tmp_path / "empty.jsonl"
-    history.write_text("")
-    assert _load_latest_history_record(history) is None
-
-
-def test_load_latest_history_record_only_blank_lines(tmp_path: Path) -> None:
-    """Return None when the file contains only blank lines."""
-    history = tmp_path / "blanks.jsonl"
-    history.write_text("\n\n\n")
-    assert _load_latest_history_record(history) is None
-
-
-def test_load_latest_history_record_corrupted_lines(tmp_path: Path) -> None:
-    """Skip corrupted lines and return the valid record."""
-    history = tmp_path / "mixed.jsonl"
-    valid = json.dumps(_history_run({"m": True}))
-    history.write_text(f'{valid}\nNOT-JSON\n{{"bad": true}}\n')
-
-    record = _load_latest_history_record(history)
-    assert record is not None
-    assert record.get("_type") == "run"
-    assert "model_results" in record
-    model_results = record["model_results"]
-    assert model_results["m"]["success"] is True
-
-
-def test_load_latest_history_record_only_corrupted(tmp_path: Path) -> None:
-    """Return None when every line is invalid JSON."""
-    history = tmp_path / "corrupt.jsonl"
-    history.write_text("NOT-JSON-1\nNOT-JSON-2\n")
-    assert _load_latest_history_record(history) is None
-
-
-def test_load_latest_history_record_returns_last_run(tmp_path: Path) -> None:
-    """When multiple run records exist, return the last one."""
-    history = tmp_path / "multi.jsonl"
-    first = json.dumps(_history_run({"m": True}, timestamp="2026-01-01 00:00:00 GMT"))
-    second = json.dumps(_history_run({"m": False}, timestamp="2026-01-02 00:00:00 GMT"))
-    history.write_text(f"{first}\n{second}\n")
-
-    record = _load_latest_history_record(history)
-    assert record is not None
-    assert record.get("timestamp") == "2026-01-02 00:00:00 GMT"
-
-
-def test_load_latest_history_record_skips_non_run_types(tmp_path: Path) -> None:
-    """Skip records whose _type is not 'run'."""
-    history = tmp_path / "types.jsonl"
-    run_record = _history_run({"m": True}, timestamp="2026-01-03 00:00:00 GMT")
-    metadata = json.dumps({"_type": "metadata", "info": "x"})
-    history.write_text(f"{json.dumps(run_record)}\n{metadata}\n")
-
-    record = _load_latest_history_record(history)
-    assert record is not None
-    assert record.get("_type") == "run"
-    assert record.get("timestamp") == "2026-01-03 00:00:00 GMT"
-
-
-# ---------------------------------------------------------------------------
-# compare_history_records — baseline (no previous)
-# ---------------------------------------------------------------------------
-
-
-def test_compare_history_records_no_previous() -> None:
-    """With no previous record, all current models are 'new'."""
-    current = _history_run({"model-x": True, "model-y": False})
-
-    summary = compare_history_records(None, current)
-    assert summary["regressions"] == []
-    assert summary["recoveries"] == []
-    assert summary["quality_regressions"] == []
-    assert summary["quality_recoveries"] == []
-    assert summary["harness_regressions"] == []
-    assert summary["harness_recoveries"] == []
-    assert summary["owner_changes"] == []
-    assert summary["new_models"] == ["model-x", "model-y"]
-    assert summary["missing_models"] == []
-
-
 # --- Runtime Fingerprint Canary Tests ---
 
 
@@ -1754,24 +1495,6 @@ class TestSchemaVersioning:
         data = json.loads(hist.read_text().strip())
         assert data["format_version"] == "1.0"
         assert data["eval_mode"] == "blind"
-
-    def test_history_lane_filter_excludes_legacy_and_other_lane_records(self) -> None:
-        """Capability/history comparisons should consume only the selected lane."""
-        records: list[HistoryRunRecord] = [
-            _history_run({"org/legacy": True}),
-            cast(
-                "HistoryRunRecord",
-                {**_history_run({"org/blind": True}), "eval_mode": "blind"},
-            ),
-            cast(
-                "HistoryRunRecord",
-                {**_history_run({"org/assisted": True}), "eval_mode": "assisted"},
-            ),
-        ]
-
-        selected = check_models._history_records_for_eval_mode(records, "blind")
-
-        assert [record["eval_mode"] for record in selected] == ["blind"]
 
     def test_legacy_mode_is_resolved_before_history_persistence(self, tmp_path: Path) -> None:
         """Compatibility aliases should never appear as stored lane identities."""

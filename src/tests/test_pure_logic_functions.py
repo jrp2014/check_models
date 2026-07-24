@@ -130,17 +130,6 @@ class TestToolchainHelpers:
 
         assert mod._run_macos_toolchain_command(["/usr/bin/missing"]) is None
 
-    def test_decode_history_run_record_line_logs_malformed_json(
-        self,
-        mod: types.ModuleType,
-        caplog: pytest.LogCaptureFixture,
-    ) -> None:
-        """Malformed history JSONL lines should be intentionally skipped."""
-        caplog.set_level(logging.DEBUG, logger=mod.LOGGER_NAME)
-
-        assert mod._decode_history_run_record_line("{not json}", source="history") is None
-        assert "Skipping malformed history record in history" in caplog.text
-
 
 class TestDistributionMetadataHelpers:
     """Tests for installed distribution metadata helpers."""

@@ -351,50 +351,69 @@ class TestCliArgumentNormalization:
 
         assert args.eval_mode == "auto"
 
-    def test_output_model_selection_capabilities_and_run_json_defaults(self) -> None:
-        """Parser defaults should include selection, capability, and run JSON artifacts."""
+    def test_retained_output_defaults(self) -> None:
+        """Parser defaults should expose only the retained configurable artifacts."""
         parser = check_models._build_cli_parser()
         args = parser.parse_args([])
 
-        assert args.output_model_selection == (
-            check_models._SCRIPT_DIR / "output" / "reports" / "model_selection.md"
-        )
-        assert args.output_model_capabilities == (
-            check_models._SCRIPT_DIR / "output" / "reports" / "model_capabilities.md"
-        )
-        assert args.output_model_capabilities_json == (
-            check_models._SCRIPT_DIR / "output" / "model_capabilities.json"
-        )
-        assert args.output_run_json == check_models._SCRIPT_DIR / "output" / "run.json"
+        assert args.output_html == check_models.DEFAULT_HTML_OUTPUT
+        assert args.output_gallery_markdown == check_models.DEFAULT_GALLERY_MD_OUTPUT
+        assert args.output_jsonl == check_models.DEFAULT_JSONL_OUTPUT
+        assert args.output_run_json == check_models.DEFAULT_RUN_JSON_OUTPUT
+        assert args.output_diagnostics == check_models.DEFAULT_DIAGNOSTICS_OUTPUT
 
-    def test_output_model_selection_capabilities_and_run_json_can_be_overridden(
+    @pytest.mark.parametrize(
+        "retired_flag",
+        [
+            "--output-markdown",
+            "--output-review",
+            "--output-model-selection",
+            "--output-model-capabilities",
+            "--output-model-capabilities-json",
+            "--output-tsv",
+        ],
+    )
+    def test_retired_output_flags_are_rejected(self, retired_flag: str) -> None:
+        """Removed artifact flags must fail loudly instead of being accepted and ignored."""
+        parser = check_models._build_cli_parser()
+
+        with pytest.raises(SystemExit) as exc_info:
+            parser.parse_args([retired_flag, "retired-output"])
+
+        assert exc_info.value.code == 2
+
+    def test_retained_output_destinations_can_be_overridden(
         self,
         tmp_path: Path,
     ) -> None:
-        """Parser should accept explicit capability artifact destinations."""
+        """Parser should accept explicit retained artifact destinations."""
         parser = check_models._build_cli_parser()
-        model_selection = tmp_path / "selection.md"
-        model_capabilities = tmp_path / "capabilities.md"
-        model_capabilities_json = tmp_path / "capabilities.json"
+        html = tmp_path / "results.html"
+        gallery = tmp_path / "gallery.md"
+        jsonl = tmp_path / "results.jsonl"
         run_json = tmp_path / "run.json"
+        diagnostics = tmp_path / "diagnostics.md"
 
         args = parser.parse_args(
             [
-                "--output-model-selection",
-                str(model_selection),
-                "--output-model-capabilities",
-                str(model_capabilities),
-                "--output-model-capabilities-json",
-                str(model_capabilities_json),
+                "--output-html",
+                str(html),
+                "--output-gallery-markdown",
+                str(gallery),
+                "--output-jsonl",
+                str(jsonl),
                 "--output-run-json",
                 str(run_json),
+                "--output-diagnostics",
+                str(diagnostics),
             ],
         )
 
-        assert args.output_model_selection == model_selection
-        assert args.output_model_capabilities == model_capabilities
-        assert args.output_model_capabilities_json == model_capabilities_json
+        assert args.output_html == html
+        assert args.output_gallery_markdown == gallery
+        assert args.output_jsonl == jsonl
         assert args.output_run_json == run_json
+        assert args.output_diagnostics == diagnostics
 
     def test_auto_eval_mode_uses_assisted_lane_when_descriptive_metadata_exists(self) -> None:
         """Auto mode should use metadata-assisted cataloguing when references exist."""

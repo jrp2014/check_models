@@ -21,7 +21,6 @@ _OUTPUT_DIR = _SRC_DIR / "output"
 # Test-specific output files (excluded from git via .gitignore)
 _TEST_LOG = _OUTPUT_DIR / "test_cli_integration.log"
 _TEST_HTML = _OUTPUT_DIR / "test_cli_integration.html"
-_TEST_MD = _OUTPUT_DIR / "test_cli_integration.md"
 _TEST_GALLERY_MD = _OUTPUT_DIR / "test_cli_integration_gallery.md"
 _TEST_ENV = _OUTPUT_DIR / "test_cli_integration_environment.log"
 _TEST_JSONL = _OUTPUT_DIR / "test_cli_integration.jsonl"
@@ -56,8 +55,6 @@ def _get_test_output_args() -> list[str]:
         str(_TEST_LOG),
         "--output-html",
         str(_TEST_HTML),
-        "--output-markdown",
-        str(_TEST_MD),
         "--output-gallery-markdown",
         str(_TEST_GALLERY_MD),
         "--output-env",

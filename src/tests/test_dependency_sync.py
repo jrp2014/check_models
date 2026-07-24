@@ -1389,15 +1389,6 @@ def test_skylos_verify_script_wraps_repo_context_verifier() -> None:
     assert 'quality_run_python_tool skylos verify . --project-context "$@"' in script
 
 
-def test_tsv_output_tests_use_safe_text_reads_for_skylos_advisory_scan() -> None:
-    """TSV fixtures should use bounded no-follow reads instead of suppressing Skylos."""
-    test_source = (PKG_ROOT / "tests" / "test_tsv_output.py").read_text(encoding="utf-8")
-
-    assert "from tools import safe_io" in test_source
-    assert "safe_io.read_text_no_follow(path)" in test_source
-    assert "path.read_text" not in test_source
-
-
 def test_defusedxml_probe_avoids_unused_import_suppression() -> None:
     """The defusedxml availability probe should not require a dead import suppression."""
     check_models_source = (PKG_ROOT / "check_models.py").read_text(encoding="utf-8")
