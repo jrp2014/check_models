@@ -59,6 +59,54 @@ def _mlx_vlm_generate_contract_paths(typings_dir: Path) -> tuple[Path, Path]:
     )
 
 
+def _mlx_vlm_generate_helper_contract_issues(typings_dir: Path) -> list[str]:
+    """Return issues in the helper-based generate contract shipped by mlx-vlm."""
+    generate_dir = typings_dir / "mlx_vlm" / "generate"
+    required_tokens = {
+        generate_dir / "dispatch.pyi": (
+            "GenerateKwargs as GenerateKwargs",
+            "ProcessorLike as ProcessorLike",
+            "Unpack as Unpack",
+            "processor: ProcessorLike | PreTrainedTokenizer",
+            "image: str | list[str] | None = None",
+            "audio: str | list[str] | None = None",
+            "video: str | list[str] | None = None",
+            "**kwargs: Unpack[GenerateKwargs]",
+            "Generator[GenerationResult, None, None]",
+        ),
+        generate_dir / "types.pyi": (
+            "class ProcessorLike(Protocol):",
+            "class GenerateKwargs(TypedDict, total=False):",
+            "temperature: float",
+            "thinking_end_token: str",
+        ),
+        generate_dir / "ar.pyi": (
+            "processor: ProcessorLike",
+            "images: str | list[str] | None = None",
+            "audios: str | list[str] | None = None",
+            "prompts: list[str] | None = None",
+            "**kwargs: Unpack[GenerateKwargs]",
+        ),
+    }
+    issues: list[str] = []
+    for path, tokens in required_tokens.items():
+        if not path.exists():
+            issues.append(f"required stub file is missing: {path.relative_to(typings_dir)}")
+            continue
+        try:
+            text = read_text_no_follow(path)
+        except OSError as err:
+            issues.append(f"could not read {path.relative_to(typings_dir)}: {err}")
+            continue
+        missing_tokens = [token for token in tokens if token not in text]
+        if missing_tokens:
+            issues.append(
+                f"{path.relative_to(typings_dir)} is missing upstream generate contract markers: "
+                + ", ".join(missing_tokens)
+            )
+    return issues
+
+
 StubReplacement = tuple[re.Pattern[str], str]
 
 
@@ -182,6 +230,24 @@ def _patch_mlx_vlm_stubs(typings_dir: Path, *, audit: bool = False) -> list[str]
         )
     )
 
+    legacy_generate_path = mlx_root / "generate.pyi"
+    package_dispatch_path = mlx_root / "generate" / "dispatch.pyi"
+    has_package_dispatch = package_dispatch_path.exists()
+    upstream_generate_types_path = mlx_root / "generate" / "types.pyi"
+    if upstream_generate_types_path.exists():
+        if audit:
+            audit_issues.extend(_mlx_vlm_generate_helper_contract_issues(typings_dir))
+        if has_package_dispatch and legacy_generate_path.exists():
+            try:
+                legacy_generate_path.unlink()
+            except OSError as err:
+                logger.warning("[stubs] Failed to remove stale %s: %s", legacy_generate_path, err)
+            else:
+                logger.info(
+                    "[stubs] Removed stale %s", legacy_generate_path.relative_to(typings_dir)
+                )
+        return audit_issues
+
     generate_entry_patches: list[StubPatch] = [
         # Import ProcessorMixin so generate()/stream_generate() can model
         # the multimodal processors returned by mlx_vlm.utils.load().
@@ -264,9 +330,6 @@ def _patch_mlx_vlm_stubs(typings_dir: Path, *, audit: bool = False) -> list[str]
             r"\1Generator[GenerationResult, None, None]",
         ),
     ]
-    legacy_generate_path = mlx_root / "generate.pyi"
-    package_dispatch_path = mlx_root / "generate" / "dispatch.pyi"
-    has_package_dispatch = package_dispatch_path.exists()
     for generate_path in _mlx_vlm_generate_contract_paths(typings_dir):
         if has_package_dispatch and generate_path == legacy_generate_path:
             continue
@@ -458,7 +521,7 @@ logger = logging.getLogger("generate_stubs")
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TYPINGS_DIR = REPO_ROOT / "typings"
 STUB_MANIFEST = ".stub_manifest.json"
-STUB_TOOL_VERSION = "8"
+STUB_TOOL_VERSION = "9"
 
 DEFAULT_PACKAGES = ["mlx_lm", "mlx_vlm", "transformers", "tokenizers"]
 
@@ -714,6 +777,10 @@ def _verify_transformers_stub_contracts(typings_dir: Path) -> list[str]:
 
 def _verify_mlx_vlm_stub_contracts(typings_dir: Path) -> list[str]:
     """Verify that patched mlx_vlm stubs expose the generate contract we rely on."""
+    upstream_generate_types_path = typings_dir / "mlx_vlm" / "generate" / "types.pyi"
+    if upstream_generate_types_path.exists():
+        return _mlx_vlm_generate_helper_contract_issues(typings_dir)
+
     generate_candidates = _mlx_vlm_generate_contract_paths(typings_dir)
     generate_path = _first_existing_path(generate_candidates)
     if generate_path is None:

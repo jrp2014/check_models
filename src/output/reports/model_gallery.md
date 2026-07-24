@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-07-19 20:37:23 BST
+Generated on: 2026-07-21 08:38:01 BST
 
 Complete per-model evidence artifact with image metadata, the source prompt,
 summary tables, diagnostics, and full generated output for every attempted
@@ -10,8 +10,8 @@ _Action Snapshot: see [results.md](https://github.com/jrp2014/check_models/blob/
 
 ## Run Stamps
 
-- `mlx-vlm`: `0.6.5`
-- `mlx`: `0.32.1.dev20260719+b7c3dd6d`
+- `mlx-vlm`: `0.6.6`
+- `mlx`: `0.32.1.dev20260721+30a19f72`
 - `mlx-lm`: `0.31.3`
 - `transformers`: `5.14.1`
 - `tokenizers`: `0.22.2`
@@ -28,22 +28,22 @@ _Action Snapshot: see [results.md](https://github.com/jrp2014/check_models/blob/
 
 ## Image Metadata
 
-- _Title:_ , The Fenchurch Building (The Walkie-Talkie), London, England, UK,
-  GBR, Europe
-- _Description:_ Walkie Talkie building known formally as 20 Fenchurch Street.
-- _Keywords:_ Architecture, Building, Buildings, Cars, City, Cityscape,
-  Commuting, England, Europe, Fenchurch Street, Illuminated, London, Modern,
-  Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building
-  (The Walkie-Talkie), UK, Urban, Urban landscape, Walkie Talkie building,
-  Windows, bicycles, blue hour, british, business, capital, commercial,
-  contemporary, corporate, dark, design, district, downtown, english, evening,
-  exterior, facade, fchurch street, financial, glass, great britain, high,
-  landmark, lights, looking up, office, perspective, scenic, skyline,
-  skyscrapers, streetlights, structure, tall, tower, twilight, twilight sky,
-  united kingdom, view, walkie talkie
-- _Date:_ 2026-07-18 22:55:39 BST
-- _Time:_ 22:55:39
-- _GPS:_ 51.511300°N, 0.083400°W
+- _Title:_ , Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe
+- _Description:_ A lifeboats station with a ferris wheel in the background.
+- _Keywords:_ Adobe Stock, Any Vision, Asphalt, British seaside, Cloudy,
+  England, Essex, Europe, Fence, Flag, Hotel, Lifeboat Station, Modern
+  Architecture, Objects, Overcast, Overcast Sky, Pier, RNLI, Sign,
+  Southend-on-Sea, Thames Estuary, UK, Waterfront, amusement ride, antenna,
+  architecture, building, city, closed doors, cloudy sky, coast guard station,
+  coastal, coastal town, coastguard, curved roof, daytime, emergency,
+  emergency building, emergency services, empty, exterior, facade, ferris
+  wheel, garage doors, lifeboat, marine rescue, maritime, maritime rescue,
+  outdoors, parking lot, rescue, rescue station, roller shutters, safety, sea
+  rescue, seaside, seaside resort, shutters, street view, tourism, uk coast,
+  urban, vacation destination, windows, yellow lines
+- _Date:_ 2026-07-18 17:57:06 BST
+- _Time:_ 17:57:06
+- _GPS:_ 50.817441°N, 0.134547°W
 
 ## Prompt
 
@@ -94,21 +94,21 @@ _Action Snapshot: see [results.md](https://github.com/jrp2014/check_models/blob/
 > &#45; Do not output reasoning, notes, hedging, or extra sections.
 >
 > Context: Authoritative context:
-> &#45; Location terms: England, Europe, UK, district, united kingdom
-> &#45; Capture date/time: 2026-07-18 22:55:39 BST 22:55:39
-> &#45; GPS: 51.511300°N, 0.083400°W
+> &#45; Location terms: Adobe Stock, Any Vision, England, Europe, UK
+> &#45; Capture date/time: 2026-07-18 17:57:06 BST 17:57:06
+> &#45; GPS: 50.817441°N, 0.134547°W
 > &#45; Use this factual context where it improves the catalogue record; do not
 > claim that contextual facts are visually observable.
 >
 > &#8203;Draft descriptive metadata:
-> &#45; Existing title: The Fenchurch Building (The Walkie-Talkie), London,
-> England, UK, GBR, Europe
-> &#45; Existing description: Walkie Talkie building known formally as 20
-> Fenchurch Street.
-> &#45; Existing keywords: Architecture, Building, Buildings, Cars, City,
-> Cityscape, Commuting, Fenchurch Street, Illuminated, London, Modern, Night,
-> Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The
-> Walkie-Talkie), Urban, Urban landscape, Walkie Talkie building
+> &#45; Existing title: Lifeboat Station, Southend-on-Sea, England, UK, GBR,
+> Europe
+> &#45; Existing description: A lifeboats station with a ferris wheel in the
+> background.
+> &#45; Existing keywords: Asphalt, British seaside, Cloudy, Essex, Fence, Flag,
+> Hotel, Lifeboat Station, Modern Architecture, Objects, Overcast, Overcast
+> Sky, Pier, RNLI, Sign, Southend-on-Sea, Thames Estuary, Waterfront,
+> amusement ride, antenna
 > &#45; Treat this draft as fallible. Retain supported details, correct errors,
 > and add important visible information.
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
@@ -119,70 +119,70 @@ Every model in this run, with a concise output preview or failure diagnostic bes
 
 <!-- markdownlint-disable MD034 MD049 -->
 
-| Model                                                                                                                   | Result                            | Output preview / diagnostic                                                                                                                                                                                                                                                                          | Gen tok   | Total   | Gen TPS   | Peak GB                                          | Quality signal                                                                                                               |
-|-------------------------------------------------------------------------------------------------------------------------|-----------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|---------|-----------|--------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
-| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `not evaluated` / `indeterminate` | [unknown; network-error] Error: Network Error - Model loading failed: [Errno 54] Connection reset by peer                                                                                                                                                                                            | -         | 0.29s   | -         |                                                  | unknown; network-error                                                                                                       |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `avoid` / `runtime failure`       | [model-config; processor-error] Error: Processor Error - Model preflight failed for mlx-community/Step-3.7-Flash-oQ2e: Loaded processor has no image_processor; expected multimodal processor.                                                                                                       | -         | 11.39s  | -         |                                                  | model-config; processor-error                                                                                                |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `caveat` / `clean`                | Title: Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe Description: The Fenchurch Building, formally known as 20 Fenchurch Street, is a prominent skyscraper in London, England, United Kingdom. It is a modern architectural structure that stands out in t...             | 188       | 1.47s   | 509       | 1.5 GB (1.31% of 108 GB recommended working set) | low-draft-improvement                                                                                                        |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `caveat` / `clean`                | Title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe Description: Walkie Talkie building known formally as 20 Fenchurch Street. Keywords: Architecture, Building, Buildings, Cars, City, Cityscape, Commuting, Fenchurch Street, Illuminated, London,...              | 112       | 2.25s   | 346       | 2.8 GB (2.42% of 108 GB recommended working set) | context-echo; low-draft-improvement                                                                                          |
-| [`mlx-community/LFM2-VL-1.6B-8bit`](#model-mlx-community-lfm2-vl-16b-8bit)                                              | `caveat` / `clean`                | Title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe Description: The Fenchurch Building, also known as 20 Fenchurch Street, is a prominent skyscraper located in the heart of London, England. This modern architectural marvel stands tall against t...             | 201       | 1.71s   | 331       | 3.0 GB (2.58% of 108 GB recommended working set) | low-draft-improvement                                                                                                        |
-| [`HuggingFaceTB/SmolVLM-Instruct`](#model-huggingfacetb-smolvlm-instruct)                                               | `avoid` / `model shortcoming`     | The Fenchurch Street, London, England, UK, GBR, Europe.                                                                                                                                                                                                                                              | 18        | 2.15s   | 131       | 5.7 GB (4.96% of 108 GB recommended working set) | low-draft-improvement; missing-sections                                                                                      |
-| [`mlx-community/SmolVLM-Instruct-bf16`](#model-mlx-community-smolvlm-instruct-bf16)                                     | `avoid` / `model shortcoming`     | The Fenchurch Street, London, England, UK, GBR, Europe.                                                                                                                                                                                                                                              | 18        | 2.95s   | 124       | 5.7 GB (4.97% of 108 GB recommended working set) | low-draft-improvement; missing-sections                                                                                      |
-| [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava)                                                                       | `avoid` / `model shortcoming`     | Title: The Walkie-Talkie Building (The Walkie-Talkie), London, England, UK, GBR, Europe Description: A tall, tall building with a glass facade, the name "The Walkie-Talkie" written on its side. The building is located in London, England, UK, and is part of the Walkie-Talkie di...             | 91        | 2.51s   | 113       | 4.7 GB (4.08% of 108 GB recommended working set) | low-draft-improvement; missing-sections                                                                                      |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `avoid` / `model shortcoming`     | Title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe Description: The Fenchurch Building, also known as 20 Fenchurch Street, is a prominent example of modernist architecture in London, UK. The building is a 20-story skyscraper with a distinctive...              | 179       | 2.47s   | 343       | 2.2 GB (1.88% of 108 GB recommended working set) | low-draft-improvement; missing-sections                                                                                      |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `recommended` / `clean`           | Title: The Fenchurch Building in London at night Description: The curved glass facade of the Fenchurch Building towers over a dark urban street in London at night. Street lamps and building windows provide points of light against the deep blue night sky. Keywords: Architecture...             | 101       | 5.10s   | 123       | 17 GB (14.3% of 108 GB recommended working set)  | clean                                                                                                                        |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `caveat` / `clean`                | Title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe Description: The Walkie-Talkie building, formally known as 20 Fenchurch Street, is a modern skyscraper in the Fenchurch Street district of London, England, UK. It is illuminated at night and is...             | 158       | 3.26s   | 132       | 5.5 GB (4.75% of 108 GB recommended working set) | low-draft-improvement                                                                                                        |
-| [`mlx-community/paligemma2-10b-ft-docci-448-6bit`](#model-mlx-community-paligemma2-10b-ft-docci-448-6bit)               | `avoid` / `model shortcoming`     | - Do not copy prompt instructions into the Title, Description, or Keywords fields.                                                                                                                                                                                                                   | 17        | 4.32s   | 31.0      | 12 GB (10.5% of 108 GB recommended working set)  | low-draft-improvement; context-ignored; missing-sections                                                                     |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `caveat` / `clean`                | Title: The Walkie-Talkie Building at Night, Fenchurch Street, London Description: A modern skyscraper with a distinctive, asymmetrical design and glass facade dominates the night scene, its lights casting reflections on the surrounding urban streets. The area around 20 Fenchur...             | 151       | 3.70s   | 185       | 7.8 GB (6.76% of 108 GB recommended working set) | missing terms: Commuting, Nightscape, Street signs, The Fenchurch Building (The Walkie-Talkie), Urban landscape; keywords=22 |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `caveat` / `model shortcoming`    | <\|channel>thought <channel\|>Title: - 20 Fenchurch Street building at night in London Description: - The glass facade of 20 Fenchurch Street towers over a narrow urban street at dusk. The scene features modern architecture illuminated by street lamps and interior office windows...           | 104       | 6.65s   | 66.5      | 29 GB (25.4% of 108 GB recommended working set)  | missing-sections; formatting                                                                                                 |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `caveat` / `model shortcoming`    | The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe.<end_of_utterance>                                                                                                                                                                                                      | 26        | 4.97s   | 33.4      | 19 GB (16.6% of 108 GB recommended working set)  | low-draft-improvement; missing-sections; formatting                                                                          |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `caveat` / `model shortcoming`    | <\|channel>thought <channel\|>Title: - 20 Fenchurch Street building at night Description: - The curved skyscraper of 20 Fenchurch Street, known as the Walkie-Talkie, rises over a dark London street illuminated by streetlights and modern glass buildings. Keywords: - Architecture,...           | 100       | 6.56s   | 62.7      | 28 GB (24.6% of 108 GB recommended working set)  | low-draft-improvement; missing-sections; formatting                                                                          |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `recommended` / `clean`           | Title: The Walkie-Talkie Building, London, England Description: Modern skyscraper in London at night, illuminated with reflective glass facade, streetlights casting a warm glow, and a few cars on the road. Keywords: Architecture, Building, Buildings, Cars, City, Cityscape, Ill...             | 90        | 5.99s   | 34.2      | 18 GB (15.3% of 108 GB recommended working set)  | low-draft-improvement                                                                                                        |
-| [`mlx-community/gemma-3n-E2B-4bit`](#model-mlx-community-gemma-3n-e2b-4bit)                                             | `avoid` / `cutoff degraded`       | - Do not take it is a 2026-07-18 22:55:39 22:55:39 - Do not take it is a 22:55:39 22:55:39 - Do not take it is a 22:55:39 22:55:39 - Do not take it is a 22:55:39 22:55:39 - Do not take it is a 22:55:39 22:55:39 - Do not take it is a 22:55:39 22:55:39 - Do not take it is a 22:5...             | 500       | 7.22s   | 123       | 6.0 GB (5.21% of 108 GB recommended working set) | repetitive; unverified-context-copy; low-draft-improvement                                                                   |
-| [`meta-llama/Llama-3.2-11B-Vision-Instruct`](#model-meta-llama-llama-32-11b-vision-instruct)                            | `avoid` / `model shortcoming`     | The Fenchurch Building (The Walkie-Talkie)                                                                                                                                                                                                                                                           | 14        | 7.52s   | 5.39      | 25 GB (21.9% of 108 GB recommended working set)  | low-draft-improvement; missing-sections                                                                                      |
-| [`mlx-community/paligemma2-10b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-10b-ft-docci-448-bf16)               | `avoid` / `model shortcoming`     | - Do not copy prompt instructions into the Title, Description, or Keywords fields.                                                                                                                                                                                                                   | 17        | 8.13s   | 5.54      | 27 GB (23.3% of 108 GB recommended working set)  | low-draft-improvement; context-ignored; missing-sections                                                                     |
-| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `caveat` / `clean`                | Title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe Description: The Fenchurch Building (The Walkie-Talkie), a modern skyscraper in London, England, UK, is illuminated at night. The building is located on Fenchurch Street and is a prominent land...             | 161       | 7.10s   | 62.1      | 9.7 GB (8.41% of 108 GB recommended working set) | low-draft-improvement                                                                                                        |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `recommended` / `clean`           | **Title:** *20 Fenchurch Street at Night, London, England, UK* **Description:** A night-time view of 20 Fenchurch Street, also known as "Walkie-Talkie," a modern skyscraper in London’s financial district, illuminated against a dark blue sky. Visible details include adjacent bu...             | 158       | 7.10s   | 62.9      | 13 GB (11.7% of 108 GB recommended working set)  | missing terms: Cars, City, Commuting, Nightscape, Street signs                                                               |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `caveat` / `clean`                | Title: - 20 Fenchurch Street, London Description: - The illuminated skyscraper known as 20 Fenchurch Street, or the Walkie-Talkie building, stands prominently in a London street at night. Keywords: - Architecture, Building, Buildings, Cars, City, Cityscape, Fenchurch Street, I...             | 112       | 7.46s   | 39.2      | 16 GB (13.6% of 108 GB recommended working set)  | low-draft-improvement                                                                                                        |
-| [`mlx-community/InternVL3-14B-8bit`](#model-mlx-community-internvl3-14b-8bit)                                           | `recommended` / `clean`           | Title: The Fenchurch Building, London Night Description: The Fenchurch Building, also known as The Walkie-Talkie, stands prominently in London's cityscape at night, illuminated by interior lights. The scene captures a quiet urban street with modern architecture, streetlights,...              | 118       | 8.02s   | 32.1      | 18 GB (15.7% of 108 GB recommended working set)  | low-draft-improvement                                                                                                        |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `caveat` / `clean`                | Title: The Fenchurch Building (The Walkie-Talkie), London Description: The Fenchurch Building, formally known as 20 Fenchurch Street, is illuminated at night, dominating a street scene in London, England; the building’s distinctive curved facade is prominently visible. Keyword...             | 142       | 9.54s   | 30.9      | 18 GB (15.7% of 108 GB recommended working set)  | low-draft-improvement                                                                                                        |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `recommended` / `clean`           | Title: The Fenchurch Building (The Walkie-Talkie), London, England, UK Description: A night view of the modern skyscraper known as 20 Fenchurch Street, situated along a city street in London, England. The scene features illuminated office windows, street lighting, and parked b...             | 128       | 10.38s  | 26.4      | 20 GB (17.7% of 108 GB recommended working set)  | low-draft-improvement                                                                                                        |
-| [`mlx-community/pixtral-12b-bf16`](#model-mlx-community-pixtral-12b-bf16)                                               | `caveat` / `clean`                | Title: - 20 Fenchurch Street, London Description: - The illuminated 20 Fenchurch Street, also known as The Walkie-Talkie, stands prominently in a quiet London street at night. Keywords: - Architecture, Building, Buildings, City, Cityscape, Fenchurch Street, Illuminated, London...             | 99        | 11.01s  | 20.1      | 28 GB (23.9% of 108 GB recommended working set)  | low-draft-improvement                                                                                                        |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `avoid` / `model shortcoming`     | ## Image Description for Captioning **Title:** Night View of The Walkie-Talkie Building in London **Description:** A low-angle, wide shot captures the imposing silhouette of The Walkie-Talkie building at night in London. The skyscraper dominates the frame, its dark, reflective...             | 323       | 10.71s  | 48.2      | 17 GB (14.9% of 108 GB recommended working set)  | unverified-context-copy; metadata-borrowing                                                                                  |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `recommended` / `clean`           | Title: The Fenchurch Building (The Walkie-Talkie), London, England, UK Description: The image shows a night scene featuring the distinctive, angular glass facade of The Fenchurch Building (The Walkie-Talkie) in London. The street is relatively quiet with a few cars visible, st...             | 134       | 9.67s   | 80.0      | 8.6 GB (7.42% of 108 GB recommended working set) | clean                                                                                                                        |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `caveat` / `clean`                | &lt;think&gt; &lt;/think&gt; Title: Nighttime urban street with modern skyscraper Description: The image shows a modern urban street at night, featuring a prominent illuminated skyscraper under a dark sky, with surrounding buildings and street lighting. Visible details include parked bicy... | 94        | 9.75s   | 24.7      | 4.1 GB (3.53% of 108 GB recommended working set) | formatting                                                                                                                   |
-| [`jqlive/Kimi-VL-A3B-Thinking-2506-6bit`](#model-jqlive-kimi-vl-a3b-thinking-2506-6bit)                                 | `avoid` / `cutoff degraded`       | ◁think▷Okay, let's tackle this. First, I need to analyze the image and create a catalog record with the specified sections: Title, Description, and Keywords. The user wants it in British English, so I'll make sure to use British terms like "lorry" instead of "truck" if needed,...             | 500       | 10.86s  | 71.0      | 18 GB (15.6% of 108 GB recommended working set)  | unverified-context-copy; low-draft-improvement; metadata-borrowing                                                           |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `caveat` / `clean`                | Title: The Fenchurch Building (The Walkie-Talkie), London Description: The Fenchurch Building, also known as the Walkie-Talkie, stands illuminated at night in London, England. The distinctive curved glass facade reflects the surrounding city lights, with a quiet street below f...             | 136       | 11.06s  | 30.3      | 23 GB (19.9% of 108 GB recommended working set)  | low-draft-improvement                                                                                                        |
-| [`mlx-community/GLM-4.6V-Flash-6bit`](#model-mlx-community-glm-46v-flash-6bit)                                          | `caveat` / `context budget`       | <\|begin_of_box\|>Title: The Walkie-Talkie Building at Night Description: A nighttime urban scene featuring the distinctive, angular glass facade of the Walkie-Talkie building (20 Fenchurch Street) in London. The street is dimly lit with streetlights, showing a few vehicles with...           | 152       | 10.46s  | 57.7      | 11 GB (9.58% of 108 GB recommended working set)  | low-draft-improvement; context-budget; missing-sections                                                                      |
-| [`mlx-community/Kimi-VL-A3B-Thinking-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-8bit)                             | `avoid` / `cutoff degraded`       | ◁think▷Okay, let's tackle this metadata cataloging task. First, I need to analyze the image based on the given context and the draft metadata provided. The image shows a tall, modern skyscraper at night. The building has a distinctive curved glass facade with illuminated windo...             | 500       | 12.03s  | 62.6      | 22 GB (19% of 108 GB recommended working set)    | cutoff; thinking-trace; missing-sections                                                                                     |
-| [`microsoft/Phi-3.5-vision-instruct`](#model-microsoft-phi-35-vision-instruct)                                          | `avoid` / `cutoff degraded`       | Title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe Description: The iconic Fenchurch Building, also known as The Walkie-Talkie, stands tall in the heart of London's financial district. Its distinctive curved facade is illuminated against the ni...             | 500       | 10.77s  | 57.2      | 9.6 GB (8.3% of 108 GB recommended working set)  | repetitive; low-draft-improvement; cutoff                                                                                    |
-| [`mlx-community/gemma-3-27b-it-qat-8bit`](#model-mlx-community-gemma-3-27b-it-qat-8bit)                                 | `caveat` / `clean`                | Title: The Fenchurch Building (The Walkie-Talkie), London Description: The Fenchurch Building, also known as 20 Fenchurch Street, is illuminated at night, viewed from a street level perspective in London, with a dark blue sky overhead. Streetlights cast a warm glow on the pave...             | 140       | 14.22s  | 17.4      | 32 GB (27.4% of 108 GB recommended working set)  | low-draft-improvement                                                                                                        |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `avoid` / `cutoff degraded`       | Let's tackle this step by step. First, the title needs to be 5-10 words, concrete and factual. The authoritative context gives location as London, England, UK, and the building is The Fenchurch Building (The Walkie-Talkie). So the title should be something like "The Fenchurch...              | 500       | 15.85s  | 59.6      | 60 GB (52.1% of 108 GB recommended working set)  | low-draft-improvement; cutoff; missing-sections                                                                              |
-| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `avoid` / `cutoff degraded`       | - Do not output the description text after the label. - Do not output the title text after the label. - Do not output the description text after the label. - Do not output the title text after the label. - Do not output the description text after the label. - Do not output the...             | 500       | 15.79s  | 42.4      | 4.6 GB (3.96% of 108 GB recommended working set) | repetitive; low-draft-improvement; cutoff                                                                                    |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `caveat` / `context budget`       | 1000000                                                                                                                                                                                                                                                                                              | 9         | 15.34s  | 103       | 8.6 GB (7.44% of 108 GB recommended working set) | harness:long-context; low-draft-improvement; context-budget                                                                  |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `avoid` / `cutoff degraded`       | Here are my reasoning steps: We need to produce a catalog record with three sections: Title, Description, Keywords. The image is a nighttime cityscape of a tall skyscraper, likely the Walkie Talkie building (20 Fenchurch Street) in London. The authoritative context includes lo...             | 500       | 16.39s  | 42.7      | 15 GB (13% of 108 GB recommended working set)    | unverified-context-copy; metadata-borrowing; cutoff                                                                          |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `caveat` / `context budget`       | <\|begin_of_box\|>Title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe Description: Nighttime urban street scene featuring the Fenchurch Building (The Walkie-Talkie) skyscraper, with illuminated windows, modern architecture, and a quiet city street...           | 146       | 21.40s  | 43.0      | 78 GB (67.3% of 108 GB recommended working set)  | low-draft-improvement; context-budget; missing-sections                                                                      |
-| [`mlx-community/gemma-4-31b-bf16`](#model-mlx-community-gemma-4-31b-bf16)                                               | `avoid` / `model shortcoming`     | Image: - The image shows a tall, modern skyscraper with a distinctive curved design, illuminated at night. The building is surrounded by other urban structures, including smaller buildings and streetlights. The scene is set in a city environment, with a street visible in the f...             | 82        | 24.16s  | 7.5       | 65 GB (56% of 108 GB recommended working set)    | low-draft-improvement; missing-sections                                                                                      |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `avoid` / `model shortcoming`     | Title: - London, England, United Kingdom, 20 Fenchurch Street, The Walkie-Talkie, 20 Fenchurch Street, London, England, United Kingdom, GBR, Europe Description: - The Fenchurch Building (The Walkie-Talkie) is a prominent skyscraper located at 20 Fenchurch Street in London, Eng...             | 294       | 20.72s  | 18.0      | 4.1 GB (3.56% of 108 GB recommended working set) | unverified-context-copy; low-draft-improvement; metadata-borrowing                                                           |
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `avoid` / `cutoff degraded`       | - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -...             | 500       | 20.26s  | 93.3      | 8.6 GB (7.43% of 108 GB recommended working set) | harness:long-context; repetitive; low-draft-improvement                                                                      |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `caveat` / `context budget`       | <\|im_start\|> addCriterion("image:caption")                                                                                                                                                                                                                                                         | 9         | 21.48s  | 64.1      | 13 GB (11.7% of 108 GB recommended working set)  | harness:long-context; low-draft-improvement; context-budget                                                                  |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `recommended` / `clean`           | **Title:** Modern Skyscraper at Dusk, London Urban Street **Description:** A nighttime urban street in London features a distinctive, slanted-glass skyscraper with illuminated interiors, flanked by older buildings. The scene includes empty roads, streetlights, and a few parked...             | 122       | 28.24s  | 58.0      | 13 GB (11.3% of 108 GB recommended working set)  | missing terms: Cars, City, Commuting, Fenchurch Street, Nightscape                                                           |
-| [`mlx-community/paligemma2-3b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-3b-ft-docci-448-bf16)                 | `avoid` / `cutoff degraded`       | - Do not copy-prompt instructions into the Title, Description, or Keywords fields. - Do not infer identity, location, event, brand, species, time period, or intent. - Use this factual context where it improves the catalogue record; do not claim that contextual facts are visual...             | 500       | 29.66s  | 19.0      | 11 GB (9.71% of 108 GB recommended working set)  | low-draft-improvement; cutoff; context-ignored                                                                               |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `caveat` / `clean`                | Title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe Description: The image depicts the Fenchurch Building, also known as the Walkie-Talkie, in London, England, UK, at night. The building is a prominent feature of the city's skyline, with its dis...             | 187       | 39.33s  | 11.5      | 15 GB (13% of 108 GB recommended working set)    | low-draft-improvement                                                                                                        |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `avoid` / `cutoff degraded`       | Title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe Description: The iconic Fenchurch Building, also known as The Walkie-Talkie, stands tall in the heart of London's financial district. Its distinctive curved facade is illuminated against the ni...             | 500       | 48.11s  | 10.8      | 9.6 GB (8.31% of 108 GB recommended working set) | repetitive; low-draft-improvement; cutoff                                                                                    |
-| [`mlx-community/Molmo-7B-D-0924-bf16`](#model-mlx-community-molmo-7b-d-0924-bf16)                                       | `caveat` / `clean`                | Never output the prompt again. Title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe Description: The iconic Walkie Talkie building, formally known as 20 Fenchurch Street, stands illuminated against the night sky in London's financial district. It...             | 175       | 53.58s  | 14.2      | 48 GB (41.4% of 108 GB recommended working set)  | low-draft-improvement                                                                                                        |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `recommended` / `clean`           | Title: The Fenchurch Building, London, UK, Night Description: The Fenchurch Building, also known as 20 Fenchurch Street, is a modern skyscraper in London, England, visible at night with its distinctive curved glass façade and illuminated upper floors. The surrounding urban str...             | 137       | 58.55s  | 92.1      | 11 GB (9.94% of 108 GB recommended working set)  | clean                                                                                                                        |
-| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `avoid` / `cutoff degraded`       | - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -...             | 500       | 57.68s  | 92.3      | 8.6 GB (7.44% of 108 GB recommended working set) | harness:long-context; repetitive; low-draft-improvement                                                                      |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `recommended` / `clean`           | Title: The Fenchurch Building at night in London Description: The Fenchurch Building, also known as the Walkie-Talkie, dominates the evening skyline of London, England, with its distinctive curved glass facade reflecting the deep blue twilight. The street level is illuminated...              | 133       | 63.41s  | 107       | 26 GB (22.6% of 108 GB recommended working set)  | clean                                                                                                                        |
-| [`mlx-community/Qwen3.5-35B-A3B-6bit`](#model-mlx-community-qwen35-35b-a3b-6bit)                                        | `recommended` / `clean`           | Title: The Fenchurch Building at night in London Description: The Fenchurch Building, also known as the Walkie-Talkie, stands prominently in the City of London against a deep blue evening sky. The street level scene features illuminated shop fronts, parked bicycles, and road s...             | 132       | 66.04s  | 91.2      | 35 GB (30.1% of 108 GB recommended working set)  | clean                                                                                                                        |
-| [`mlx-community/Qwen3.5-35B-A3B-bf16`](#model-mlx-community-qwen35-35b-a3b-bf16)                                        | `recommended` / `clean`           | Title: The Fenchurch Building at night in London Description: The Fenchurch Building, located at 20 Fenchurch Street in London, England, is captured at night with its distinctive curved glass façade reflecting the deep blue sky. Street-level details include illuminated shop fr...             | 131       | 78.47s  | 65.8      | 76 GB (65.8% of 108 GB recommended working set)  | clean                                                                                                                        |
-| [`mlx-community/Qwen3.5-27B-4bit`](#model-mlx-community-qwen35-27b-4bit)                                                | `recommended` / `clean`           | Title: 20 Fenchurch Street, London, England, UK, Europe Description: A low-angle night view of the 20 Fenchurch Street skyscraper, known as the Walkie-Talkie, dominating the frame against a deep blue sky. The street below is illuminated by streetlights and vehicle headlights,...              | 136       | 75.00s  | 30.7      | 26 GB (22.4% of 108 GB recommended working set)  | clean                                                                                                                        |
-| [`mlx-community/Qwen3.5-27B-mxfp8`](#model-mlx-community-qwen35-27b-mxfp8)                                              | `recommended` / `clean`           | Title: The Walkie-Talkie Building, London, England, UK Description: A low-angle night view captures the distinctive curved glass facade of 20 Fenchurch Street, known as The Walkie-Talkie, towering over a quiet London street. The scene is illuminated by warm streetlights and sc...             | 141       | 80.20s  | 18.3      | 38 GB (33.3% of 108 GB recommended working set)  | clean                                                                                                                        |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `recommended` / `clean`           | Title: 20 Fenchurch Street, London, England, UK, Europe Description: A low-angle night view of 20 Fenchurch Street, known as the Walkie-Talkie, towering over a quiet urban street in London. The scene is illuminated by streetlights and the building's internal lights, with a row...             | 144       | 90.46s  | 17.7      | 38 GB (33.3% of 108 GB recommended working set)  | clean                                                                                                                        |
-| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `caveat` / `clean`                | Title: - 20 Fenchurch Street, London, England, UK, GBR, Europe Description: - 20 Fenchurch Street, also known as The Walkie-Talkie, is a distinctive skyscraper in London, England, UK, captured at night. The image shows the building's unique curved glass facade reflecting the d...             | 155       | 91.20s  | 1.83      | 27 GB (23.2% of 108 GB recommended working set)  | low-draft-improvement                                                                                                        |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `avoid` / `cutoff degraded`       | ◁think▷Okay, let's tackle this. First, I need to analyze the image and create a catalog record following the given instructions. The image shows a tall, modern skyscraper at night, which is the Walkie-Talkie building in London, England. The scene is urban, with streetlights, b...             | 500       | 112.35s | 4.69      | 40 GB (34.7% of 108 GB recommended working set)  | low-draft-improvement; cutoff; thinking-incomplete                                                                           |
-| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `recommended` / `clean`           | Title: - The Fenchurch Street skyscraper at night Description: - The Fenchurch Street skyscraper in London, England, rises against a deep blue night sky, its curved glass facade reflecting the surrounding city lights. Street-level details include illuminated shop fronts, parke...             | 126       | 144.77s | 57.3      | 76 GB (65.8% of 108 GB recommended working set)  | missing terms: Building, Buildings, Commuting, Modern, Nightscape                                                            |
-| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `avoid` / `cutoff degraded`       | -2026-07-18 22:55:39 BST 51.511300°N 0.083400°W 51.511300°N 0.083400°W 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BS...             | 500       | 250.86s | 225       | 5.1 GB (4.39% of 108 GB recommended working set) | harness:long-context; repetitive; unverified-context-copy                                                                    |
+| Model                                                                                                                   | Result                              | Output preview / diagnostic                                                                                                                                                                                                                                                                          | Gen tok   | Total   | Gen TPS   | Peak GB                                          | Quality signal                                              |
+|-------------------------------------------------------------------------------------------------------------------------|-------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|---------|-----------|--------------------------------------------------|-------------------------------------------------------------|
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `not evaluated` / `runtime failure` | [model-config; processor-error] Error: Processor Error - Model preflight failed for mlx-community/Step-3.7-Flash-oQ2e: Loaded processor has no image_processor; expected multimodal processor.                                                                                                       | -         | 7.19s   | -         |                                                  | model-config; processor-error                               |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `recommended` / `clean`             | Title: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe Description: A lifeboats station with a ferris wheel in the background. Keywords: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe, Fence, Flag, Hotel, Lifeboat Station, Modern Architecture, Objects,...             | 112       | 1.18s   | 506       | 1.5 GB (1.3% of 108 GB recommended working set)  | context-echo; low-draft-improvement                         |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `avoid` / `model shortcoming`       | Title: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe Description: A lifeboats station with a ferris wheel in the background.                                                                                                                                                           | 37        | 1.50s   | 338       | 2.9 GB (2.5% of 108 GB recommended working set)  | low-draft-improvement; missing-sections                     |
+| [`mlx-community/LFM2-VL-1.6B-8bit`](#model-mlx-community-lfm2-vl-16b-8bit)                                              | `recommended` / `clean`             | Title: Southend Lifeboat Station Description: The Southend Lifeboat Station is a modern structure with a ferris wheel visible in the background. The station is located in Southend-on-Sea, England, and is surrounded by various objects such as a fence, flag, and hotel. The sky i...             | 139       | 1.69s   | 328       | 3.0 GB (2.58% of 108 GB recommended working set) | low-draft-improvement                                       |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `recommended` / `clean`             | &lt;think&gt; &lt;/think&gt; Title: Lifeboat Station, Southend-on-Sea, England, UK Description: A lifeboat station with large garage doors and a ferris wheel in the background under an overcast sky. The setting includes urban and recreational elements. Keywords: asphalt, lifeboat station,... | 90        | 2.35s   | 275       | 4.1 GB (3.52% of 108 GB recommended working set) | formatting                                                  |
+| [`HuggingFaceTB/SmolVLM-Instruct`](#model-huggingfacetb-smolvlm-instruct)                                               | `avoid` / `model shortcoming`       | Title: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe Description: A lifeboats station with a ferris wheel in the background.                                                                                                                                                           | 40        | 2.23s   | 127       | 5.7 GB (4.96% of 108 GB recommended working set) | low-draft-improvement; missing-sections                     |
+| [`mlx-community/SmolVLM-Instruct-bf16`](#model-mlx-community-smolvlm-instruct-bf16)                                     | `avoid` / `model shortcoming`       | Title: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe Description: A lifeboats station with a ferris wheel in the background.                                                                                                                                                           | 40        | 2.20s   | 127       | 5.7 GB (4.97% of 108 GB recommended working set) | low-draft-improvement; missing-sections                     |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `recommended` / `clean`             | Title: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe Description: A lifeboats station with a ferris wheel in the background. Keywords: Asphalt, British seaside, Cloudy, Essex, Fence, Flag, Hotel, Lifeboat Station, Modern Architecture, Objects, Overcast, Overcast...              | 106       | 2.59s   | 135       | 5.5 GB (4.75% of 108 GB recommended working set) | context-echo; low-draft-improvement                         |
+| [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava)                                                                       | `avoid` / `model shortcoming`       | Title: Lifeboats Station, Southend-on-Sea, England, UK, GBR, Europe Description: A lifeboats station with a ferris wheel in the background. The station is located in Southend-on-Sea, England, UK, and is part of the GBR region in Europe. The station is equipped with modern faci...             | 111       | 2.82s   | 87.4      | 4.9 GB (4.21% of 108 GB recommended working set) | low-draft-improvement; missing-sections                     |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `caveat` / `model shortcoming`      | Title: - Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe Description: - A lifeboat station with a ferris wheel in the background, located in Southend-on-Sea, England, UK, GBR, Europe. - The station features a modern architectural design with a prominent lifeboat si...             | 270       | 2.73s   | 190       | 4.1 GB (3.56% of 108 GB recommended working set) | unverified-context-copy; metadata-borrowing                 |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `recommended` / `clean`             | Title: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe Description: A lifeboats station with a ferris wheel in the background. Keywords: Asphalt, British seaside, Cloudy, Essex, Fence, Flag, Hotel, Lifeboat Station, Modern Architecture, Objects, Overcast, Overcast...              | 284       | 2.85s   | 346       | 2.2 GB (1.88% of 108 GB recommended working set) | low-draft-improvement                                       |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `recommended` / `clean`             | Title: RNLI lifeboat station in Southend-on-Sea, England Description: An RNLI lifeboat station with two large green roller doors stands under an overcast sky, with a large ferris wheel visible in the background. The building features a curved roofline and a white sign with the...             | 127       | 4.69s   | 124       | 17 GB (14.3% of 108 GB recommended working set)  | clean                                                       |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `recommended` / `clean`             | Title: Lifeboat Station at Southend-on-Sea Description: The image shows a functional lifeboat station in Southend-on-Sea, England, with a modern industrial design featuring closed green rolling doors. The station is situated on a waterfront, adjacent to a fenced area and a lar...             | 146       | 3.34s   | 187       | 6.4 GB (5.55% of 108 GB recommended working set) | no flagged signals                                          |
+| [`mlx-community/paligemma2-10b-ft-docci-448-6bit`](#model-mlx-community-paligemma2-10b-ft-docci-448-6bit)               | `avoid` / `model shortcoming`       | - Do not copy prompt instructions into the Title, Description, or Keywords fields.                                                                                                                                                                                                                   | 17        | 4.14s   | 31.7      | 12 GB (10.5% of 108 GB recommended working set)  | low-draft-improvement; context-ignored; missing-sections    |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `avoid` / `model shortcoming`       | <\|channel>thought <channel\|>Title: - RNLI lifeboat station in Southend-on-Sea, England Description: A modern RNLI lifeboat station featuring two large green garage doors under a curved roof, set against a ferris wheel and a hotel building under an overcast sky. Keywords: Aspha...           | 103       | 5.90s   | 72.5      | 28 GB (24.6% of 108 GB recommended working set)  | missing-sections; formatting                                |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `avoid` / `model shortcoming`       | <\|channel>thought <channel\|>Title: - RNLI lifeboat station in Southend-on-Sea, Essex Description: An RNLI lifeboat station with two large green roller doors and a curved roof stands under an overcast sky. A large ferris wheel and a multi-story hotel are visible in the backgrou...           | 111       | 6.29s   | 66.0      | 29 GB (25.3% of 108 GB recommended working set)  | low-draft-improvement; missing-sections; formatting         |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `recommended` / `clean`             | Title: Lifeboat Station, Southend-on-Sea, England, UK Description: The Lifeboat Station in Southend-on-Sea, England, UK, is situated on a waterfront with a ferris wheel visible in the background. The station's entrance is marked by a sign and is adjacent to a building with a m...             | 161       | 4.84s   | 56.9      | 9.6 GB (8.31% of 108 GB recommended working set) | low-draft-improvement                                       |
+| [`microsoft/Phi-3.5-vision-instruct`](#model-microsoft-phi-35-vision-instruct)                                          | `recommended` / `clean`             | Title: Lifeboat Station, Southend-on-Sea, England, UK Description: The Lifeboat Station in Southend-on-Sea, England, UK, is situated on a waterfront with a ferris wheel visible in the background. The station's entrance is marked by a sign and is adjacent to a building with a m...             | 161       | 4.83s   | 56.7      | 9.6 GB (8.3% of 108 GB recommended working set)  | low-draft-improvement                                       |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `recommended` / `clean`             | Title: Lifeboat Station, Southend-on-Sea, England Description: A lifeboat station with a Ferris wheel and a hotel in the background, under an overcast sky. Keywords: Asphalt, British seaside, Cloudy, Essex, Fence, Flag, Hotel, Lifeboat Station, Modern Architecture, Objects, Ov...             | 107       | 6.73s   | 33.9      | 18 GB (15.7% of 108 GB recommended working set)  | low-draft-improvement                                       |
+| [`mlx-community/gemma-3n-E2B-4bit`](#model-mlx-community-gemma-3n-e2b-4bit)                                             | `avoid` / `cutoff degraded`         | - T-18-07-18 17:57:06 17:57:06 - 17:57:06 - 17:57:06 - 17:57:06 - 17:57:06 - 17:57:06 - 17:57:06 - 17:57:06 - 17:57:06 - 17:57:06 - 17:57:06 - 17:57:06 - 17:57:06 - 17:57:06 - 17:57:06 - 17:57:06 - 17:57:06 - 17:57:06 - 17:57:06 - 17:57:06 - 17:57:06 - 17:57:06 - 17:57:06 - 17...             | 500       | 6.49s   | 125       | 6.1 GB (5.26% of 108 GB recommended working set) | repetitive; unverified-context-copy; low-draft-improvement  |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `recommended` / `clean`             | **Title:** Lifeboat Station and Ferris Wheel, Southend-on-Sea, UK **Description:** A lifeboat station with a green garage door and curved roof, positioned near a pier, with a large amusement Ferris wheel and a multi-storey hotel visible in the background under an overcast sky....             | 148       | 6.50s   | 63.6      | 12 GB (10.5% of 108 GB recommended working set)  | clean                                                       |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `recommended` / `clean`             | **Title:** Lifeboat Station with Southend Pier Amusement Ride **Description:** The image shows the RNLI lifeboat station in Southend-on-Sea, England, featuring a modern single-storey building with a green garage door and a blue sign reading "Lifeboats." In the background, a la...             | 164       | 6.52s   | 66.9      | 12 GB (10.1% of 108 GB recommended working set)  | clean                                                       |
+| [`mlx-community/paligemma2-10b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-10b-ft-docci-448-bf16)               | `avoid` / `model shortcoming`       | - Do not copy prompt instructions into the Title, Description, or Keywords fields.                                                                                                                                                                                                                   | 17        | 7.69s   | 5.56      | 27 GB (23.3% of 108 GB recommended working set)  | low-draft-improvement; context-ignored; missing-sections    |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `recommended` / `clean`             | Title: - Lifeboat Station, Southend-on-Sea Description: - The lifeboat station in Southend-on-Sea, England, features a prominent RNLI sign and is situated near a ferris wheel and a multi-story hotel. Keywords: - Lifeboat Station, RNLI, Southend-on-Sea, Ferris Wheel, Hotel, Clo...             | 118       | 6.98s   | 39.6      | 15 GB (13.4% of 108 GB recommended working set)  | low-draft-improvement                                       |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `recommended` / `clean`             | Title: Lifeboat Station in Southend-on-Sea, England, UK Description: A lifeboat station featuring two large green roller shutters and a curved roof under an overcast sky. A large white Ferris wheel and a multi-storey hotel are visible in the background. Keywords: Lifeboat Stat...             | 106       | 8.84s   | 27.3      | 20 GB (17.6% of 108 GB recommended working set)  | clean                                                       |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `caveat` / `clean`                  | Title: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe. Description: A lifeboat station with a large green shuttered door and a sign reading "Lifeboats" above it, is situated in a coastal town with a ferris wheel visible in the background. The sky is overcast and t...             | 135       | 8.19s   | 31.7      | 19 GB (16.6% of 108 GB recommended working set)  | low-draft-improvement; formatting                           |
+| [`mlx-community/InternVL3-14B-8bit`](#model-mlx-community-internvl3-14b-8bit)                                           | `recommended` / `clean`             | Title: Lifeboat Station, Southend-on-Sea, UK Description: The image shows a lifeboat station with a large green garage door, situated near a pier with a Ferris wheel in the background. The sky is overcast, and a hotel building is visible to the right. Keywords: Asphalt, Britis...             | 119       | 8.23s   | 32.1      | 19 GB (16% of 108 GB recommended working set)    | low-draft-improvement                                       |
+| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `caveat` / `model shortcoming`      | Title: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe Description: A lifeboat station with a ferris wheel in the background. Keywords: Asphalt, British seaside, Cloudy, Essex, Fence, Flag, Hotel, Lifeboat Station, Modern Architecture, Objects, Overcast, Overcast S...             | 259       | 8.05s   | 62.2      | 9.7 GB (8.41% of 108 GB recommended working set) | instruction-echo; low-draft-improvement; reasoning-leak     |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `recommended` / `clean`             | Title: Lifeboat Station, Southend-on-Sea, England, UK Description: The Southend-on-Sea lifeboat station is a pale green building with a curved roof, situated on a paved waterfront with a large Ferris wheel visible in the background under a cloudy sky. A flag bearing the RNLI e...             | 159       | 9.47s   | 31.1      | 18 GB (15.7% of 108 GB recommended working set)  | no flagged signals                                          |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `recommended` / `clean`             | Title: Lifeboat Station, Southend-on-Sea, England Description: A RNLI lifeboat station with a large Ferris wheel visible in the background. The scene is set on a cloudy day at a British seaside location. Keywords: Lifeboat Station, RNLI, Southend-on-Sea, England, UK, Ferris wh...             | 109       | 8.77s   | 80.6      | 8.4 GB (7.29% of 108 GB recommended working set) | low-draft-improvement                                       |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `avoid` / `model shortcoming`       | ## Image Description: The image shows a lifeboat station in Southend-on-Sea, England, on an overcast day. The station is a low, white building with two large, closed green roller shutter doors. Above the doors, a sign reads "Lifeboats" in blue lettering on a white background,...              | 316       | 9.90s   | 48.8      | 17 GB (14.9% of 108 GB recommended working set)  | missing-sections                                            |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `recommended` / `clean`             | Title: Lifeboat Station, Southend-on-Sea Description: A lifeboat station with a green roller shutter and a sign reading "Lifeboats" in Southend-on-Sea, England, with a Ferris wheel and a multi-storey hotel visible in the background. Keywords: Asphalt, British seaside, Cloudy,...              | 125       | 10.27s  | 30.0      | 22 GB (18.7% of 108 GB recommended working set)  | context-echo; low-draft-improvement                         |
+| [`mlx-community/GLM-4.6V-Flash-6bit`](#model-mlx-community-glm-46v-flash-6bit)                                          | `caveat` / `clean`                  | <\|begin_of_box\|>Title: Lifeboat Station, Southend-on-Sea, England, UK Description: A RNLI lifeboat station with a large Ferris wheel visible in the background, set against an overcast sky. The station features a curved roofline, large green roller doors, and a blue "Lifeboats"...           | 121       | 9.62s   | 57.9      | 11 GB (9.57% of 108 GB recommended working set)  | special token wrapper                                       |
+| [`mlx-community/pixtral-12b-bf16`](#model-mlx-community-pixtral-12b-bf16)                                               | `recommended` / `clean`             | Title: - Lifeboat Station, Southend-on-Sea Description: - The lifeboat station in Southend-on-Sea, England, features a prominent RNLI sign and is situated near an amusement park with a Ferris wheel and a multi-story hotel. Keywords: - Lifeboat Station, RNLI, Southend-on-Sea, F...             | 123       | 10.86s  | 20.2      | 27 GB (23.7% of 108 GB recommended working set)  | low-draft-improvement                                       |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `recommended` / `clean`             | **Title:** Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe **Description:** A modern lifeboat station with a large garage door and a sign reading "Lifeboats" is situated in a parking lot, with a Ferris wheel visible in the background. The building's architecture is...             | 139       | 10.29s  | 21.8      | 15 GB (13.1% of 108 GB recommended working set)  | no flagged signals                                          |
+| [`jqlive/Kimi-VL-A3B-Thinking-2506-6bit`](#model-jqlive-kimi-vl-a3b-thinking-2506-6bit)                                 | `avoid` / `cutoff degraded`         | ◁think▷Got it, let's analyze the image step by step. First, the title needs to be 5-10 words, concrete and factual. The authoritative context mentions Southend-on-Sea, England, UK, so that's a key location. The main subject is a lifeboat station with a ferris wheel in the back...             | 500       | 10.79s  | 71.3      | 18 GB (15.5% of 108 GB recommended working set)  | low-draft-improvement; cutoff; thinking-incomplete          |
+| [`mlx-community/Kimi-VL-A3B-Thinking-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-8bit)                             | `avoid` / `cutoff degraded`         | ◁think▷Okay, let's tackle this metadata cataloguing task. First, I need to analyze the image and extract the metadata based on what's visible and the provided authoritative context. The user wants me to focus on visible details only, using the context where necessary but not i...             | 500       | 11.47s  | 66.1      | 22 GB (19% of 108 GB recommended working set)    | low-draft-improvement; cutoff; thinking-incomplete          |
+| [`mlx-community/gemma-3-27b-it-qat-8bit`](#model-mlx-community-gemma-3-27b-it-qat-8bit)                                 | `recommended` / `clean`             | Title: Lifeboat Station, Southend-on-Sea, England Description: The Southend-on-Sea lifeboat station, a pale green building with a curved roof, stands on the waterfront with a large Ferris wheel visible in the background under an overcast sky. A flag flies above the station, an...             | 149       | 13.93s  | 17.7      | 32 GB (27.4% of 108 GB recommended working set)  | no flagged signals                                          |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `avoid` / `cutoff degraded`         | Let's tackle this step by step. First, the title needs to be 5-10 words, concrete and factual. The authoritative context has Location terms including Southend-on-Sea, England, UK, GBR, Europe. The existing title is "Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe"...              | 500       | 16.57s  | 54.4      | 60 GB (52.1% of 108 GB recommended working set)  | low-draft-improvement; cutoff; missing-sections             |
+| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `avoid` / `cutoff degraded`         | - Do not output the title text after the label. - Do not output the description text after the label. - Do not output the description text after the label. - Do not output the description text after the label. - Do not output the description text after the label. - Do not outp...             | 500       | 13.87s  | 47.5      | 4.6 GB (3.96% of 108 GB recommended working set) | repetitive; low-draft-improvement; cutoff                   |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `avoid` / `cutoff degraded`         | Here are my reasoning steps: We need to produce a catalog record with three sections: Title, Description, Keywords. The title: 5-10 words, concrete and factual; can use authoritative context to supply identity and location. The existing title is "Lifeboat Station, Southend-on-...             | 500       | 16.11s  | 42.4      | 15 GB (12.7% of 108 GB recommended working set)  | low-draft-improvement; cutoff; reasoning-leak               |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `caveat` / `clean`                  | <\|begin_of_box\|>Title: Lifeboat Station, Southend-on-Sea, England, UK Description: A lifeboat station building with a large green roller door, a blue "Lifeboats" sign, and RNLI insignia, set against a cloudy sky with a Ferris wheel and a multi-story hotel visible in the backgr...           | 126       | 20.16s  | 43.4      | 78 GB (67.2% of 108 GB recommended working set)  | low-draft-improvement                                       |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `caveat` / `context budget`         | <\|im_start\|> addCriterion("image:caption")                                                                                                                                                                                                                                                         | 9         | 19.67s  | 62.5      | 14 GB (11.7% of 108 GB recommended working set)  | harness:long-context; low-draft-improvement; context-budget |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `avoid` / `context budget`          | The image shows a building with a sign that reads "Lifeboats" and a Ferris wheel in the background. The building has a green door and a blue sign with the word "Lifeboats" on it. The Ferris wheel is located to the left of the building, and there is a building with a sign that...              | 90        | 19.44s  | 93.9      | 8.6 GB (7.47% of 108 GB recommended working set) | low-draft-improvement; context-budget; missing-sections     |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `avoid` / `cutoff degraded`         | - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -...             | 500       | 20.48s  | 93.3      | 8.6 GB (7.46% of 108 GB recommended working set) | harness:long-context; repetitive; low-draft-improvement     |
+| [`meta-llama/Llama-3.2-11B-Vision-Instruct`](#model-meta-llama-llama-32-11b-vision-instruct)                            | `avoid` / `model shortcoming`       | Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe A lifeboat station with a modern architectural design, featuring a large garage door and a sign that reads "Lifeboats" in white letters on a blue background, is situated in a parking lot with yellow lines and a brick...              | 90        | 22.51s  | 5.1       | 25 GB (21.9% of 108 GB recommended working set)  | low-draft-improvement; missing-sections                     |
+| [`mlx-community/Molmo-7B-D-0924-bf16`](#model-mlx-community-molmo-7b-d-0924-bf16)                                       | `caveat` / `harness`                | No generated text captured.                                                                                                                                                                                                                                                                          | 1         | 22.44s  | 45,282    | 48 GB (41.4% of 108 GB recommended working set)  | harness:prompt-template                                     |
+| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `recommended` / `clean`             | Do not remove existing terms unless they are clearly contradicted by the image. Title: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe Description: A lifeboats station with a large ferris wheel in the background. The station features two green garage doors with "Li...             | 144       | 24.29s  | 51.8      | 41 GB (35.2% of 108 GB recommended working set)  | no flagged signals                                          |
+| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `avoid` / `cutoff degraded`         | - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -...             | 500       | 23.98s  | 91.4      | 8.6 GB (7.47% of 108 GB recommended working set) | harness:long-context; repetitive; low-draft-improvement     |
+| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `recommended` / `clean`             | Title: Lifeboat Station, Southend-on-Sea, England, UK Description: A lifeboat station with a large white building featuring a curved roof and green garage doors. A ferris wheel is visible in the background, and a flag with a red cross on a white background is flying from a fla...             | 138       | 29.02s  | 5.96      | 27 GB (23.1% of 108 GB recommended working set)  | low-draft-improvement                                       |
+| [`mlx-community/paligemma2-3b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-3b-ft-docci-448-bf16)                 | `avoid` / `cutoff degraded`         | - Do not copy-prompt instructions into the title, description, or keywords fields. - Do not infer identity, location, event, brand, or style. - Do not infer the text of the image. - Do not use the text of the image to create a new image. - Do not use the text of the image to c...             | 500       | 29.04s  | 19.0      | 11 GB (9.7% of 108 GB recommended working set)   | repetitive; low-draft-improvement; cutoff                   |
+| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `recommended` / `clean`             | Title: - RNLI Lifeboat Station with Ferris Wheel and Hotel Description: - A white RNLI lifeboat station with green roller doors stands in the foreground under an overcast sky, with a large white Ferris wheel visible to the left and a multi-storey hotel building to the right. K...             | 120       | 59.93s  | 63.0      | 76 GB (65.8% of 108 GB recommended working set)  | clean                                                       |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `recommended` / `clean`             | Title: RNLI Lifeboat Station Southend-on-Sea Description: A lifeboat station with closed green roller shutters and an RNLI sign stands in Southend-on-Sea, England, with a large Ferris wheel and hotel buildings visible in the background under an overcast sky. Keywords: RNLI, Li...             | 116       | 56.79s  | 108       | 26 GB (22.6% of 108 GB recommended working set)  | clean                                                       |
+| [`mlx-community/Qwen3.5-35B-A3B-6bit`](#model-mlx-community-qwen35-35b-a3b-6bit)                                        | `recommended` / `clean`             | Title: RNLI Lifeboat Station Southend-on-Sea England Description: A white RNLI lifeboat station with large green roller doors stands in the foreground under an overcast sky, with a large Ferris wheel visible to the left and a multi-storey hotel building in the background. Keyw...             | 118       | 58.52s  | 92.5      | 35 GB (30.1% of 108 GB recommended working set)  | clean                                                       |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `recommended` / `context budget`    | Title: RNLI Lifeboat Station, Southend-on-Sea, UK Description: A modern RNLI lifeboat station with green roller shutter doors and a curved white roof, situated in a paved forecourt under an overcast sky, with a large Ferris wheel and a multi-storey hotel visible in the backgro...             | 176       | 57.98s  | 93.0      | 11 GB (9.94% of 108 GB recommended working set)  | unverified-context-copy; metadata-borrowing; context-budget |
+| [`mlx-community/Qwen3.5-35B-A3B-bf16`](#model-mlx-community-qwen35-35b-a3b-bf16)                                        | `recommended` / `clean`             | Title: RNLI Lifeboat Station Southend-on-Sea England Description: A white RNLI lifeboat station with closed green roller shutters stands in the foreground under an overcast sky, with a large Ferris wheel and the Palace Hotel visible in the background. Keywords: RNLI, Lifeboats...             | 114       | 65.81s  | 66.5      | 76 GB (65.8% of 108 GB recommended working set)  | clean                                                       |
+| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `avoid` / `cutoff degraded`         | -001.jpg - 17:57:06 BST - 50.81744°N, 0.13454°W - 17:57:06 BST: The image is taken at 17:57:06 BST. The time is in the 17:57:06 format, which is the time in the BST (British Standard Time) zone. The time is in the 17:57:06 format, which is the time in the BST (British Standard...             | 500       | 68.01s  | 222       | 5.1 GB (4.41% of 108 GB recommended working set) | harness:long-context; repetitive; unverified-context-copy   |
+| [`mlx-community/gemma-4-31b-bf16`](#model-mlx-community-gemma-4-31b-bf16)                                               | `avoid` / `cutoff degraded`         | Image: - A lifeboat station with a ferris wheel in the background. - The image shows a lifeboat station with a ferris wheel in the background. The lifeboat station is a modern building with a curved roof and large green doors. The ferris wheel is a large, colorful structure wi...             | 500       | 78.77s  | 7.22      | 65 GB (56% of 108 GB recommended working set)    | repetitive; low-draft-improvement; cutoff                   |
+| [`mlx-community/Qwen3.5-27B-mxfp8`](#model-mlx-community-qwen35-27b-mxfp8)                                              | `recommended` / `clean`             | Title: RNLI Lifeboat Station, Southend-on-Sea, England Description: A modern white lifeboat station building with two large green roller doors stands under an overcast sky, featuring a blue "Lifeboats" sign with the RNLI logo. In the background, a large white Ferris wheel is v...             | 158       | 83.42s  | 17.5      | 38 GB (33.3% of 108 GB recommended working set)  | clean                                                       |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `recommended` / `clean`             | Title: RNLI Lifeboat Station, Southend-on-Sea, England Description: A white RNLI lifeboat station building with green roller doors stands in the foreground, featuring a blue sign and a flag on the roof. In the background, a large Ferris wheel and a multi-story hotel building a...             | 127       | 83.54s  | 18.1      | 38 GB (33.3% of 108 GB recommended working set)  | no flagged signals                                          |
+| [`mlx-community/Qwen3.5-27B-4bit`](#model-mlx-community-qwen35-27b-4bit)                                                | `recommended` / `clean`             | Title: RNLI Lifeboat Station, Southend-on-Sea, Essex, England Description: A modern white RNLI lifeboat station with two large green roller shutter doors stands in the foreground, featuring a blue sign with the organisation's logo. In the background, a large white Ferris wheel...             | 139       | 82.88s  | 31.0      | 26 GB (22.4% of 108 GB recommended working set)  | clean                                                       |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `avoid` / `cutoff degraded`         | ◁think▷Okay, let's tackle this. First, I need to analyze the image and create a catalog record with the specified sections: Title, Description, and Keywords. The user wants it in British English, so I should use terms like "Lifeboats" instead of "Lifeboat" and "Pier" instead o...             | 500       | 112.66s | 4.67      | 40 GB (34.7% of 108 GB recommended working set)  | repetitive; low-draft-improvement; cutoff                   |
 <!-- markdownlint-enable MD034 MD049 -->
 
 ## Quick Navigation
@@ -190,22 +190,21 @@ Every model in this run, with a concise output preview or failure diagnostic bes
 - _Successful outputs:_ [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16),
   [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit),
   [`mlx-community/LFM2-VL-1.6B-8bit`](#model-mlx-community-lfm2-vl-16b-8bit),
+  [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit),
   [`HuggingFaceTB/SmolVLM-Instruct`](#model-huggingfacetb-smolvlm-instruct),
   [`mlx-community/SmolVLM-Instruct-bf16`](#model-mlx-community-smolvlm-instruct-bf16),
-  [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava),
-  [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16),
-  [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit),
-  +52 more
-- _Flagged outputs:_ [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit),
-  [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e),
+  [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx),
+  [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava), +53 more
+- _Flagged outputs:_ [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e),
   [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16),
   [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit),
   [`mlx-community/LFM2-VL-1.6B-8bit`](#model-mlx-community-lfm2-vl-16b-8bit),
+  [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit),
   [`HuggingFaceTB/SmolVLM-Instruct`](#model-huggingfacetb-smolvlm-instruct),
   [`mlx-community/SmolVLM-Instruct-bf16`](#model-mlx-community-smolvlm-instruct-bf16),
-  [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava), +45 more
-- _Failed outputs:_ [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit),
-  [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)
+  [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx),
+  +44 more
+- _Failed outputs:_ [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)
 
 ## Model Gallery
 
@@ -213,164 +212,19 @@ Full generated output by model:
 
 <!-- markdownlint-disable MD033 MD034 -->
 
-<a id="model-mlx-community-molmo-7b-d-0924-8bit"></a>
-
-### ❔ mlx-community/Molmo-7B-D-0924-8bit
-
-- _Recommendation:_ not evaluated; review verdict: indeterminate
-- _Status:_ Failed (Network Error)
-- _Owner:_ likely owner `unknown`; reported package `unknown`; failure stage
-  `Network Error`; diagnostic code `UNKNOWN_MODEL_LOAD_NETWORK_ERROR`
-- _Next step:_ Retry when external connectivity is stable; the model was not
-  evaluated and the disconnect does not identify a faulty package.
-- _Error summary:_ Model loading failed: [Errno 54] Connection reset by peer
-- _Key signals:_ network error; unknown model load network error; external
-  connectivity
-- _Failure context:_ type `ValueError`; phase `model_load`; code
-  `UNKNOWN_MODEL_LOAD_NETWORK_ERROR`; package `unknown`
-- _Tokens:_ prompt n/a; estimated text n/a; estimated non-text n/a; generated
-  n/a; requested max 500 tok; stop reason exception
-
-
-<details>
-<summary>Full Traceback (click to expand)</summary>
-
-```python
-Traceback (most recent call last):
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
-    yield
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_transports/default.py", line 250, in handle_request
-    resp = self._pool.handle_request(req)
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
-    raise exc from None
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
-    response = connection.handle_request(
-        pool_request.request
-    )
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpcore/_sync/connection.py", line 103, in handle_request
-    return self._connection.handle_request(request)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpcore/_sync/http11.py", line 136, in handle_request
-    raise exc
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpcore/_sync/http11.py", line 106, in handle_request
-    ) = self._receive_response_headers(**kwargs)
-        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpcore/_sync/http11.py", line 177, in _receive_response_headers
-    event = self._receive_event(timeout=timeout)
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpcore/_sync/http11.py", line 217, in _receive_event
-    data = self._network_stream.read(
-        self.READ_NUM_BYTES, timeout=timeout
-    )
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpcore/_backends/sync.py", line 126, in read
-    with map_exceptions(exc_map):
-         ~~~~~~~~~~~~~~^^^^^^^^^
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/contextlib.py", line 162, in __exit__
-    self.gen.throw(value)
-    ~~~~~~~~~~~~~~^^^^^^^
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
-    raise to_exc(exc) from exc
-httpcore.ReadError: [Errno 54] Connection reset by peer
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 793, in load
-    model_path = get_model_path(
-        path_or_hf_repo, force_download=force_download, revision=revision
-    )
-  File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 444, in get_model_path
-    snapshot_download(
-    ~~~~~~~~~~~~~~~~~^
-        repo_id=path_or_hf_repo,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<11 lines>...
-        force_download=force_download,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/utils/_validators.py", line 88, in _inner_fn
-    return fn(*args, **kwargs)
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/_snapshot_download.py", line 259, in snapshot_download
-    repo_info = api.repo_info(repo_id=repo_id, repo_type=repo_type, revision=revision)
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/utils/_validators.py", line 88, in _inner_fn
-    return fn(*args, **kwargs)
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/hf_api.py", line 3630, in repo_info
-    return method(
-        repo_id,
-    ...<4 lines>...
-        files_metadata=files_metadata,
-    )
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/utils/_validators.py", line 88, in _inner_fn
-    return fn(*args, **kwargs)
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/hf_api.py", line 3309, in model_info
-    r = get_session().get(path, headers=headers, timeout=timeout, params=params)
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_client.py", line 1053, in get
-    return self.request(
-           ~~~~~~~~~~~~^
-        "GET",
-        ^^^^^^
-    ...<7 lines>...
-        extensions=extensions,
-        ^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_client.py", line 825, in request
-    return self.send(request, auth=auth, follow_redirects=follow_redirects)
-           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_client.py", line 914, in send
-    response = self._send_handling_auth(
-        request,
-    ...<2 lines>...
-        history=[],
-    )
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_client.py", line 942, in _send_handling_auth
-    response = self._send_handling_redirects(
-        request,
-        follow_redirects=follow_redirects,
-        history=history,
-    )
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
-    response = self._send_single_request(request)
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_client.py", line 1014, in _send_single_request
-    response = transport.handle_request(request)
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_transports/default.py", line 249, in handle_request
-    with map_httpcore_exceptions():
-         ~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/contextlib.py", line 162, in __exit__
-    self.gen.throw(value)
-    ~~~~~~~~~~~~~~^^^^^^^
-  File "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
-    raise mapped_exc(message) from exc
-httpx.ReadError: [Errno 54] Connection reset by peer
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-ValueError: Model loading failed: [Errno 54] Connection reset by peer
-```
-
-</details>
-
----
-
 <a id="model-mlx-community-step-37-flash-oq2e"></a>
 
-### ❌ mlx-community/Step-3.7-Flash-oQ2e
+### ❔ mlx-community/Step-3.7-Flash-oQ2e
 
-- _Recommendation:_ avoid for now; review verdict: runtime failure
+- _Verdict:_ runtime_failure | user=not_evaluated
 - _Status:_ Failed (Processor Error)
-- _Owner:_ likely owner `model-config`; reported package `model-config`;
-  failure stage `Processor Error`; diagnostic code
-  `MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR`
-- _Next step:_ Inspect the model repo processor/preprocessor config and
-  AutoProcessor mapping; the multimodal processor is missing or not exposing
-  the image processor expected by mlx-vlm.
+- _Maintainer:_ issue_ready | owner=model-config | confidence=medium
+- _Next action:_ File the retained reproduction evidence with the suspected
+  owner.
 - _Error summary:_ see error details below
-- _Key signals:_ processor error; model config processor load processor
+- _Why:_ execution failure
 - _Failure context:_ type `ValueError`; phase `processor_load`; code
   `MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR`; package `model-config`
-- _Tokens:_ prompt n/a; estimated text n/a; estimated non-text n/a; generated
-  n/a; requested max 500 tok; stop reason exception
 
 _Error details:_
 
@@ -396,194 +250,50 @@ ValueError: Model preflight failed for mlx-community/Step-3.7-Flash-oQ2e: Loaded
 
 <a id="model-liquidai-lfm25-vl-450m-mlx-bf16"></a>
 
-### ⚠️ LiquidAI/LFM2.5-VL-450M-MLX-bf16
+### ✅ LiquidAI/LFM2.5-VL-450M-MLX-bf16
 
-- _Recommendation:_ use with caveats; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: Cars, Commuting; keywords=23;
-  low-draft-improvement
-- _Timing:_ Load 0.44s; Gen 0.75s; Total 1.47s
-- _Throughput:_ Prompt 23,382 TPS (700 tok); Gen 509 TPS (188 tok)
-- _Tokens:_ prompt 700 tok; estimated text 517 tok; estimated non-text 183
-  tok; generated 188 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
 <summary>Complete generated output: LiquidAI/LFM2.5-VL-450M-MLX-bf16</summary>
 
 ```text
-Title: Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe
+Title: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe
 
-Description: The Fenchurch Building, formally known as 20 Fenchurch Street, is a prominent skyscraper in London, England, United Kingdom. It is a modern architectural structure that stands out in the cityscape. The building is illuminated at night, highlighting its sleek design and reflective glass facade. The Fenchurch Building is part of the London skyline and is a notable example of contemporary urban architecture.
+Description: A lifeboats station with a ferris wheel in the background.
 
-Keywords: Architecture, Building, Buildings, City, Cityscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walkie-Talkie), Urban, Urban landscape, Walkie Talkie building, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, London, UK, GBR, Europe
+Keywords: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe, Fence, Flag, Hotel, Lifeboat Station, Modern Architecture, Objects, Overcast, Overcast Sky, Pier, RNLI, Sign, Southend-on-Sea, Thames Estuary, Waterfront, amusement ride, antenna
 ```
 
 </details>
 
 ⚠️ _Quality Warnings:_
 
-- Description sentence violation (4; expected 1-2)
-- Keyword count violation (23; expected 10-18)
+- Keyword count violation (22; expected 10-18)
+- Context echo (47% overlap)
 - Low draft improvement
 
 ---
 
 <a id="model-mlx-community-nanollava-15-4bit"></a>
 
-### ⚠️ mlx-community/nanoLLaVA-1.5-4bit
+### ❌ mlx-community/nanoLLaVA-1.5-4bit
 
-- _Recommendation:_ use with caveats; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ keywords=20; context echo=76%; low-draft-improvement
-- _Timing:_ Load 1.04s; Gen 0.91s; Total 2.25s
-- _Throughput:_ Prompt 7,117 TPS (625 tok); Gen 346 TPS (112 tok)
-- _Tokens:_ prompt 625 tok; estimated text 517 tok; estimated non-text 108
-  tok; generated 112 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ model_shortcoming | user=avoid
+- _Why:_ missing required sections | irrelevant output smell | missing
+  sections: keywords
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
 <summary>Complete generated output: mlx-community/nanoLLaVA-1.5-4bit</summary>
 
 ```text
-Title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe
-Description: Walkie Talkie building known formally as 20 Fenchurch Street.
-Keywords: Architecture, Building, Buildings, Cars, City, Cityscape, Commuting, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walkie-Talkie), Urban, Urban landscape, Walkie Talkie building
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- Title length violation (11 words; expected 5-10)
-- Keyword count violation (20; expected 10-18)
-- Context echo (76% overlap)
-- Low draft improvement
-
----
-
-<a id="model-mlx-community-lfm2-vl-16b-8bit"></a>
-
-### ⚠️ mlx-community/LFM2-VL-1.6B-8bit
-
-- _Recommendation:_ use with caveats; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: formally; keywords=20; low-draft-improvement
-- _Timing:_ Load 0.33s; Gen 1.07s; Total 1.71s
-- _Throughput:_ Prompt 8,461 TPS (890 tok); Gen 331 TPS (201 tok)
-- _Tokens:_ prompt 890 tok; estimated text 517 tok; estimated non-text 373
-  tok; generated 201 tok; requested max 500 tok; stop reason completed
-
-<details>
-<summary>Complete generated output: mlx-community/LFM2-VL-1.6B-8bit</summary>
-
-```text
-Title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe
-
-Description: The Fenchurch Building, also known as 20 Fenchurch Street, is a prominent skyscraper located in the heart of London, England. This modern architectural marvel stands tall against the night sky, illuminated by its distinctive glass facade. The building is a testament to contemporary design, featuring sleek lines and a unique curved shape that sets it apart from its surroundings. The Fenchurch Building is not only an iconic landmark but also a hub of commercial activity, housing numerous offices and businesses.
-
-Keywords: Architecture, Building, Buildings, Cars, City, Cityscape, Commuting, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walkie-Talkie), Urban, Urban landscape, Walkie Talkie building
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- Title length violation (11 words; expected 5-10)
-- Description sentence violation (4; expected 1-2)
-- Keyword count violation (20; expected 10-18)
-- Low draft improvement
-
----
-
-<a id="model-huggingfacetb-smolvlm-instruct"></a>
-
-### ❌ HuggingFaceTB/SmolVLM-Instruct
-
-- _Recommendation:_ avoid for now; review verdict: model shortcoming
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ missing sections: title, description, keywords; missing
-  terms: Architecture, Building, Buildings, Cars, City; low-draft-improvement
-- _Timing:_ Load 0.74s; Gen 1.13s; Total 2.15s
-- _Throughput:_ Prompt 4,471 TPS (1,843 tok); Gen 131 TPS (18 tok)
-- _Tokens:_ prompt 1843 tok; estimated text 517 tok; estimated non-text 1326
-  tok; generated 18 tok; requested max 500 tok; stop reason completed
-
-<details>
-<summary>Complete generated output: HuggingFaceTB/SmolVLM-Instruct</summary>
-
-```text
- The Fenchurch Street, London, England, UK, GBR, Europe.
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- Missing sections (title, description, keywords)
-- Low draft improvement
-- Degrades trusted hints
-
----
-
-<a id="model-mlx-community-smolvlm-instruct-bf16"></a>
-
-### ❌ mlx-community/SmolVLM-Instruct-bf16
-
-- _Recommendation:_ avoid for now; review verdict: model shortcoming
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ missing sections: title, description, keywords; missing
-  terms: Architecture, Building, Buildings, Cars, City; low-draft-improvement
-- _Timing:_ Load 1.45s; Gen 1.20s; Total 2.95s
-- _Throughput:_ Prompt 4,432 TPS (1,843 tok); Gen 124 TPS (18 tok)
-- _Tokens:_ prompt 1843 tok; estimated text 517 tok; estimated non-text 1326
-  tok; generated 18 tok; requested max 500 tok; stop reason completed
-
-<details>
-<summary>Complete generated output: mlx-community/SmolVLM-Instruct-bf16</summary>
-
-```text
- The Fenchurch Street, London, England, UK, GBR, Europe.
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- Missing sections (title, description, keywords)
-- Low draft improvement
-- Degrades trusted hints
-
----
-
-<a id="model-qnguyen3-nanollava"></a>
-
-### ❌ qnguyen3/nanoLLaVA
-
-- _Recommendation:_ avoid for now; review verdict: model shortcoming
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ missing sections: keywords; missing terms: Architecture,
-  Cars, City, Cityscape, Commuting; low-draft-improvement
-- _Timing:_ Load 0.80s; Gen 1.41s; Total 2.51s
-- _Throughput:_ Prompt 6,166 TPS (625 tok); Gen 113 TPS (91 tok)
-- _Tokens:_ prompt 625 tok; estimated text 517 tok; estimated non-text 108
-  tok; generated 91 tok; requested max 500 tok; stop reason completed
-
-<details>
-<summary>Complete generated output: qnguyen3/nanoLLaVA</summary>
-
-```text
-Title: The Walkie-Talkie Building (The Walkie-Talkie), London, England, UK, GBR, Europe
-Description: A tall, tall building with a glass facade, the name "The Walkie-Talkie" written on its side. The building is located in London, England, UK, and is part of the Walkie-Talkie district. The building is made of glass and has a modern design.
+Title: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe
+Description: A lifeboats station with a ferris wheel in the background.
 ```
 
 </details>
@@ -592,34 +302,176 @@ Description: A tall, tall building with a glass facade, the name "The Walkie-Tal
 
 - Metadata alignment issue (low_metadata_alignment)
 - Missing sections (keywords)
-- Title length violation (12 words; expected 5-10)
-- Description sentence violation (3; expected 1-2)
 - Low draft improvement
-- Degrades trusted hints
 
 ---
 
-<a id="model-mlx-community-fastvlm-05b-bf16"></a>
+<a id="model-mlx-community-lfm2-vl-16b-8bit"></a>
 
-### ❌ mlx-community/FastVLM-0.5B-bf16
+### ✅ mlx-community/LFM2-VL-1.6B-8bit
 
-- _Recommendation:_ avoid for now; review verdict: model shortcoming
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ missing sections: keywords; missing terms: Cars, Cityscape,
-  Commuting, Modern, Nightscape; low-draft-improvement
-- _Timing:_ Load 0.61s; Gen 1.55s; Total 2.47s
-- _Throughput:_ Prompt 6,085 TPS (629 tok); Gen 343 TPS (179 tok)
-- _Tokens:_ prompt 629 tok; estimated text 517 tok; estimated non-text 112
-  tok; generated 179 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
-<summary>Complete generated output: mlx-community/FastVLM-0.5B-bf16</summary>
+<summary>Complete generated output: mlx-community/LFM2-VL-1.6B-8bit</summary>
 
 ```text
-Title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe
-Description: The Fenchurch Building, also known as 20 Fenchurch Street, is a prominent example of modernist architecture in London, UK. The building is a 20-story skyscraper with a distinctive curved facade and a glass exterior. It was completed in 1964 and is a well-known landmark in the city. The building is located in the Fenchurch district of London and is surrounded by other modernist buildings. The Fenchurch Building is a popular tourist attraction and is often featured in films and television shows. The building is illuminated at night and is a popular spot for tourists to take photos. The Fenchurch Building is a symbol of modernist architecture and is a key feature of the city's skyline.
+Title: Southend Lifeboat Station
+
+Description: The Southend Lifeboat Station is a modern structure with a ferris wheel visible in the background. The station is located in Southend-on-Sea, England, and is surrounded by various objects such as a fence, flag, and hotel. The sky is overcast, and the image was captured on July 18, 2026, at 5:57 PM BST.
+
+Keywords: Southend, lifeboat station, ferris wheel, England, UK, modern architecture, objects, overcast sky, Southend-on-Sea, Thames Estuary, waterfront, amusement ride, antenna
+```
+
+</details>
+
+⚠️ _Quality Warnings:_
+
+- Metadata alignment issue (low_metadata_alignment)
+- Title length violation (3 words; expected 5-10)
+- Description sentence violation (3; expected 1-2)
+- Low draft improvement
+
+---
+
+<a id="model-mlx-community-minicpm-v-46-8bit"></a>
+
+### ✅ mlx-community/MiniCPM-V-4.6-8bit
+
+- _Verdict:_ clean | user=recommended
+- _Why:_ Empty thinking wrapper present
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: mlx-community/MiniCPM-V-4.6-8bit</summary>
+
+```text
+<think>
+
+</think>
+
+Title:
+Lifeboat Station, Southend-on-Sea, England, UK
+
+Description: A lifeboat station with large garage doors and a ferris wheel in the background under an overcast sky. The setting includes urban and recreational elements.
+
+Keywords: asphalt, lifeboat station, ferris wheel, overcast, UK, England, urban, recreational, gate, flag, modern architecture, parking, brick, antenna
+```
+
+</details>
+
+⚠️ _Quality Warnings:_
+
+- Empty thinking wrapper present
+
+---
+
+<a id="model-huggingfacetb-smolvlm-instruct"></a>
+
+### ❌ HuggingFaceTB/SmolVLM-Instruct
+
+- _Verdict:_ model_shortcoming | user=avoid
+- _Why:_ missing required sections | irrelevant output smell | missing
+  sections: keywords
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: HuggingFaceTB/SmolVLM-Instruct</summary>
+
+```text
+ Title: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe
+Description: A lifeboats station with a ferris wheel in the background.
+```
+
+</details>
+
+⚠️ _Quality Warnings:_
+
+- Metadata alignment issue (low_metadata_alignment)
+- Missing sections (keywords)
+- Low draft improvement
+
+---
+
+<a id="model-mlx-community-smolvlm-instruct-bf16"></a>
+
+### ❌ mlx-community/SmolVLM-Instruct-bf16
+
+- _Verdict:_ model_shortcoming | user=avoid
+- _Why:_ missing required sections | irrelevant output smell | missing
+  sections: keywords
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: mlx-community/SmolVLM-Instruct-bf16</summary>
+
+```text
+ Title: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe
+Description: A lifeboats station with a ferris wheel in the background.
+```
+
+</details>
+
+⚠️ _Quality Warnings:_
+
+- Metadata alignment issue (low_metadata_alignment)
+- Missing sections (keywords)
+- Low draft improvement
+
+---
+
+<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
+
+### ✅ mlx-community/SmolVLM2-2.2B-Instruct-mlx
+
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
+
+```text
+ Title: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe
+
+Description: A lifeboats station with a ferris wheel in the background.
+
+Keywords: Asphalt, British seaside, Cloudy, Essex, Fence, Flag, Hotel, Lifeboat Station, Modern Architecture, Objects, Overcast, Overcast Sky, Pier, RNLI, Sign, Southend-on-Sea, Thames Estuary, Waterfront, amusement ride, antenna
+```
+
+</details>
+
+⚠️ _Quality Warnings:_
+
+- Keyword count violation (20; expected 10-18)
+- Context echo (77% overlap)
+- Low draft improvement
+
+---
+
+<a id="model-qnguyen3-nanollava"></a>
+
+### ❌ qnguyen3/nanoLLaVA
+
+- _Verdict:_ model_shortcoming | user=avoid
+- _Why:_ missing required sections | irrelevant output smell | missing
+  sections: keywords
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: qnguyen3/nanoLLaVA</summary>
+
+```text
+Title: Lifeboats Station, Southend-on-Sea, England, UK, GBR, Europe
+Description: A lifeboats station with a ferris wheel in the background. The station is located in Southend-on-Sea, England, UK, and is part of the GBR region in Europe. The station is equipped with modern facilities and is part of a larger complex that includes a ferris wheel and a waterfront. The station is situated in a picturesque location with a backdrop of the Thames Estuary and the South Coast of England.
 ```
 
 </details>
@@ -627,8 +479,79 @@ Description: The Fenchurch Building, also known as 20 Fenchurch Street, is a pro
 ⚠️ _Quality Warnings:_
 
 - Missing sections (keywords)
-- Title length violation (11 words; expected 5-10)
+- Description sentence violation (4; expected 1-2)
+- Low draft improvement
+
+---
+
+<a id="model-mlx-community-lfm25-vl-16b-bf16"></a>
+
+### ⚠️ mlx-community/LFM2.5-VL-1.6B-bf16
+
+- _Verdict:_ model_shortcoming | user=caveat
+- _Why:_ irrelevant output smell
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: mlx-community/LFM2.5-VL-1.6B-bf16</summary>
+
+```text
+Title:
+- Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe
+
+Description:
+- A lifeboat station with a ferris wheel in the background, located in Southend-on-Sea, England, UK, GBR, Europe.
+- The station features a modern architectural design with a prominent lifeboat sign and a flag flying atop the building.
+- The surrounding area includes a ferris wheel, suggesting the presence of an amusement park or fairground nearby.
+- The sky is overcast, indicating cloudy weather conditions.
+- The station is situated near a waterfront, with the Thames Estuary visible in the background.
+- The asphalt ground and parking area are visible in the foreground, with yellow lines marking the parking spaces.
+- The image was captured on 2026-07-18 at 17:57:06 BST.
+
+Keywords:
+- Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe, Modern Architecture, Ferris Wheel, Amusement Park, Overcast, Cloudy, Waterfront, Asphalt, British Seaside, Pier, Flag, Hotel, Sign, Thames Estuary, Parking, Overcast Sky, Station, RNLI, Objects, Southend-on-Sea, European City
+```
+
+</details>
+
+⚠️ _Quality Warnings:_
+
 - Description sentence violation (7; expected 1-2)
+- Keyword count violation (26; expected 10-18)
+- Unverified context copy
+
+---
+
+<a id="model-mlx-community-fastvlm-05b-bf16"></a>
+
+### ✅ mlx-community/FastVLM-0.5B-bf16
+
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: mlx-community/FastVLM-0.5B-bf16</summary>
+
+```text
+Title: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe
+Description: A lifeboats station with a ferris wheel in the background.
+Keywords: Asphalt, British seaside, Cloudy, Essex, Fence, Flag, Hotel, Lifeboat Station, Modern Architecture, Objects, Overcast, Overcast Sky, Pier, RNLI, Sign, Southend-on-Sea, Thames Estuary, Waterfront, amusement ride, antenna
+Draft metadata:
+- Existing title: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe
+- Existing description: A lifeboats station with a ferris wheel in the background.
+- Existing keywords: Asphalt, British seaside, Cloudy, Essex, Fence, Flag, Hotel, Lifeboat Station, Modern Architecture, Objects, Overcast, Overcast Sky, Pier, RNLI, Sign, Southend-on-Sea, Thames Estuary, Waterfront, amusement ride, antenna
+- The image shows a lifeboats station with a ferris wheel in the background, suggesting a coastal location. The station is part of the Southend-on-Sea, England, UK, GBR, Europe, and is associated with the RNLI (Royal National Lifeboat Institution). The weather is cloudy, and the image is taken during the day. The station appears to be a modern structure with a contemporary design.
+```
+
+</details>
+
+⚠️ _Quality Warnings:_
+
+- Keyword count violation (56; expected 10-18)
+- Keyword duplication (43% duplicated terms)
 - Low draft improvement
 
 ---
@@ -637,29 +560,23 @@ Description: The Fenchurch Building, also known as 20 Fenchurch Street, is a pro
 
 ### ✅ mlx-community/gemma-4-26b-a4b-it-4bit
 
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: Cars, City, Commuting, Street signs, The
-  Fenchurch Building (The Walkie-Talkie)
-- _Timing:_ Load 2.95s; Gen 1.82s; Total 5.10s
-- _Throughput:_ Prompt 1,784 TPS (905 tok); Gen 123 TPS (101 tok)
-- _Tokens:_ prompt 905 tok; estimated text 517 tok; estimated non-text 388
-  tok; generated 101 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
 <summary>Complete generated output: mlx-community/gemma-4-26b-a4b-it-4bit</summary>
 
 ```text
 Title:
-The Fenchurch Building in London at night
+RNLI lifeboat station in Southend-on-Sea, England
 
 Description:
-The curved glass facade of the Fenchurch Building towers over a dark urban street in London at night. Street lamps and building windows provide points of light against the deep blue night sky.
+An RNLI lifeboat station with two large green roller doors stands under an overcast sky, with a large ferris wheel visible in the background. The building features a curved roofline and a white sign with the word 'Lifeboats' and the RNLI logo.
 
 Keywords:
-Architecture, Building, Cityscape, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Urban, 20 Fenchurch Street, England, UK, Europe
+Asphalt, British seaside, cloudy, Essex, ferris wheel, flag, hotel, lifeboat station, modern architecture, overcast, pier, RNLI, sign, Southend-on-Sea, Thames Estuary, waterfront, amusement ride, antenna
 ```
 
 </details>
@@ -668,37 +585,34 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
+<a id="model-mlx-community-ministral-3-3b-instruct-2512-4bit"></a>
 
-### ⚠️ mlx-community/SmolVLM2-2.2B-Instruct-mlx
+### ✅ mlx-community/Ministral-3-3B-Instruct-2512-4bit
 
-- _Recommendation:_ use with caveats; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ keywords=20; low-draft-improvement
-- _Timing:_ Load 0.78s; Gen 2.18s; Total 3.26s
-- _Throughput:_ Prompt 2,192 TPS (743 tok); Gen 132 TPS (158 tok)
-- _Tokens:_ prompt 743 tok; estimated text 517 tok; estimated non-text 226
-  tok; generated 158 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
-<summary>Complete generated output: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
+<summary>Complete generated output: mlx-community/Ministral-3-3B-Instruct-2512-4bit</summary>
 
 ```text
- Title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe
+Title:
+Lifeboat Station at Southend-on-Sea
 
-Description: The Walkie-Talkie building, formally known as 20 Fenchurch Street, is a modern skyscraper in the Fenchurch Street district of London, England, UK. It is illuminated at night and is part of the Walkie-Talkie building complex.
+Description:
+The image shows a functional lifeboat station in Southend-on-Sea, England, with a modern industrial design featuring closed green rolling doors. The station is situated on a waterfront, adjacent to a fenced area and a large amusement ride, including a Ferris wheel, under an overcast sky.
 
-Keywords: Architecture, Building, Buildings, Cars, City, Cityscape, Commuting, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walkie-Talkie), Urban, Urban landscape, Walkie Talkie building
+Keywords:
+Lifeboat Station, Southend-on-Sea, Essex, RNLI, green doors, industrial architecture, fenced perimeter, Ferris wheel, amusement ride, antenna, overcast sky, waterfront, British seaside, signage, British flag, modern building, rolling doors, outdoor parking, cloudy conditions
 ```
 
 </details>
 
 ⚠️ _Quality Warnings:_
 
-- Title length violation (11 words; expected 5-10)
-- Keyword count violation (20; expected 10-18)
-- Low draft improvement
+- Keyword count violation (19; expected 10-18)
 
 ---
 
@@ -706,16 +620,11 @@ Keywords: Architecture, Building, Buildings, Cars, City, Cityscape, Commuting, F
 
 ### ❌ mlx-community/paligemma2-10b-ft-docci-448-6bit
 
-- _Recommendation:_ avoid for now; review verdict: model shortcoming
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ missing sections: title, description, keywords; missing
-  terms: Architecture, Building, Buildings, Cars, City; low-draft-improvement
-- _Timing:_ Load 1.72s; Gen 2.29s; Total 4.32s
-- _Throughput:_ Prompt 1,343 TPS (1,652 tok); Gen 31.0 TPS (17 tok)
-- _Tokens:_ prompt 1652 tok; estimated text 517 tok; estimated non-text 1135
-  tok; generated 17 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ model_shortcoming | user=avoid
+- _Why:_ missing required sections | irrelevant output smell | missing
+  sections: title, description, keywords
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
 <summary>Complete generated output: mlx-community/paligemma2-10b-ft-docci-448-6bit</summary>
@@ -728,141 +637,22 @@ Keywords: Architecture, Building, Buildings, Cars, City, Cityscape, Commuting, F
 
 ⚠️ _Quality Warnings:_
 
-- Context ignored (missing: Architecture, Building, Buildings, Cars, City)
+- No overlap with supplied context indicators
 - Metadata alignment issue (low_metadata_alignment)
 - Missing sections (title, description, keywords)
 - Low draft improvement
-- Ignores trusted hints
-
----
-
-<a id="model-mlx-community-ministral-3-3b-instruct-2512-4bit"></a>
-
-### ⚠️ mlx-community/Ministral-3-3B-Instruct-2512-4bit
-
-- _Recommendation:_ use with caveats; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: Commuting, Nightscape, Street signs, The
-  Fenchurch Building (The Walkie-Talkie), Urban landscape; keywords=22
-- _Timing:_ Load 0.92s; Gen 2.49s; Total 3.70s
-- _Throughput:_ Prompt 2,617 TPS (3,239 tok); Gen 185 TPS (151 tok)
-- _Tokens:_ prompt 3239 tok; estimated text 517 tok; estimated non-text 2722
-  tok; generated 151 tok; requested max 500 tok; stop reason completed
-
-<details>
-<summary>Complete generated output: mlx-community/Ministral-3-3B-Instruct-2512-4bit</summary>
-
-```text
-Title:
-The Walkie-Talkie Building at Night, Fenchurch Street, London
-
-Description:
-A modern skyscraper with a distinctive, asymmetrical design and glass facade dominates the night scene, its lights casting reflections on the surrounding urban streets. The area around 20 Fenchurch Street shows a mix of pedestrian activity, street lamps, and a partially obscured construction crane, with a quiet, late-night atmosphere.
-
-Keywords:
-architecture, asymmetrical, building, cars, city, cityscape, construction, crane, dark sky, Fenchurch Street, illuminated, London, modern, night, night lighting, skyscraper, street, street lamps, urban, urban setting, Walkie-Talkie, walkways
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- Keyword count violation (22; expected 10-18)
-
----
-
-<a id="model-mlx-community-diffusiongemma-26b-a4b-it-8bit"></a>
-
-### ⚠️ mlx-community/diffusiongemma-26B-A4B-it-8bit
-
-- _Recommendation:_ use with caveats; review verdict: model shortcoming
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ missing sections: title; missing terms: Cars, City,
-  Commuting, Street signs, The Fenchurch Building (The Walkie-Talkie);
-  formatting=Unknown tags: &lt;channel|&gt;
-- _Timing:_ Load 3.70s; Gen 2.61s; Total 6.65s
-- _Throughput:_ Prompt 2,247 TPS (901 tok); Gen 66.5 TPS (104 tok)
-- _Tokens:_ prompt 901 tok; estimated text 517 tok; estimated non-text 384
-  tok; generated 104 tok; requested max 500 tok; stop reason completed
-
-<details>
-<summary>Complete generated output: mlx-community/diffusiongemma-26B-A4B-it-8bit</summary>
-
-```text
-<|channel>thought
-<channel|>Title:
-- 20 Fenchurch Street building at night in London
-
-Description:
-- The glass facade of 20 Fenchurch Street towers over a narrow urban street at dusk. The scene features modern architecture illuminated by street lamps and interior office windows against a deep blue sky.
-
-Keywords:
-- Architecture, building, cityscape, Fenchurch Street, illuminated, London, modern, night, nightscape, skyscraper, street, urban, glass, England, United Kingdom
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- Metadata alignment issue (low_metadata_alignment)
-- Missing sections (title)
-- Unknown tags: <channel\|>
-
----
-
-<a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
-
-### ⚠️ mlx-community/Idefics3-8B-Llama3-bf16
-
-- _Recommendation:_ use with caveats; review verdict: model shortcoming
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ missing sections: title, description, keywords; missing
-  terms: Architecture, Cars, City, Cityscape, Commuting; formatting=Unknown
-  tags: &lt;end_of_utterance&gt;; low-draft-improvement
-- _Timing:_ Load 2.00s; Gen 2.63s; Total 4.97s
-- _Throughput:_ Prompt 2,369 TPS (2,907 tok); Gen 33.4 TPS (26 tok)
-- _Tokens:_ prompt 2907 tok; estimated text 517 tok; estimated non-text 2390
-  tok; generated 26 tok; requested max 500 tok; stop reason completed
-
-<details>
-<summary>Complete generated output: mlx-community/Idefics3-8B-Llama3-bf16</summary>
-
-```text
- The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe.<end_of_utterance>
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- Missing sections (title, description, keywords)
-- Low draft improvement
-- Degrades trusted hints
-- Unknown tags: <end_of_utterance>
 
 ---
 
 <a id="model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
 
-### ⚠️ mlx-community/diffusiongemma-26B-A4B-it-mxfp8
+### ❌ mlx-community/diffusiongemma-26B-A4B-it-mxfp8
 
-- _Recommendation:_ use with caveats; review verdict: model shortcoming
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ missing sections: title; missing terms: Cars, Cityscape,
-  Commuting, Street signs, The Fenchurch Building (The Walkie-Talkie);
-  formatting=Unknown tags: &lt;channel|&gt;; low-draft-improvement
-- _Timing:_ Load 3.59s; Gen 2.65s; Total 6.56s
-- _Throughput:_ Prompt 2,262 TPS (901 tok); Gen 62.7 TPS (100 tok)
-- _Tokens:_ prompt 901 tok; estimated text 517 tok; estimated non-text 384
-  tok; generated 100 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ model_shortcoming | user=avoid
+- _Why:_ missing required sections | irrelevant output smell | missing
+  sections: title | Unknown tags: <channel|>
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
 <summary>Complete generated output: mlx-community/diffusiongemma-26B-A4B-it-mxfp8</summary>
@@ -870,22 +660,116 @@ Keywords:
 ```text
 <|channel>thought
 <channel|>Title:
-- 20 Fenchurch Street building at night
+- RNLI lifeboat station in Southend-on-Sea, England
 
 Description:
-- The curved skyscraper of 20 Fenchurch Street, known as the Walkie-Talkie, rises over a dark London street illuminated by streetlights and modern glass buildings.
+A modern RNLI lifeboat station featuring two large green garage doors under a curved roof, set against a ferris wheel and a hotel building under an overcast sky.
 
 Keywords:
-- Architecture, Building, City, London, Modern, Night, Nightscape, Skyscraper, Street, Fenchurch Street, Urban, Glass, Evening, England, United Kingdom
+Asphalt, British seaside, Cloudy, Essex, Fence, Flag, Hotel, Lifeboat Station, Modern Architecture, RNLI, Sign, Southend-on-Sea, Waterfront, amusement ride, antenna
 ```
 
 </details>
 
 ⚠️ _Quality Warnings:_
 
+- Metadata alignment issue (low_metadata_alignment)
+- Missing sections (title)
+- Unknown tags: <channel\|>
+
+---
+
+<a id="model-mlx-community-diffusiongemma-26b-a4b-it-8bit"></a>
+
+### ❌ mlx-community/diffusiongemma-26B-A4B-it-8bit
+
+- _Verdict:_ model_shortcoming | user=avoid
+- _Why:_ missing required sections | irrelevant output smell | missing
+  sections: title | Unknown tags: <channel|>
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: mlx-community/diffusiongemma-26B-A4B-it-8bit</summary>
+
+```text
+<|channel>thought
+<channel|>Title:
+- RNLI lifeboat station in Southend-on-Sea, Essex
+
+Description:
+An RNLI lifeboat station with two large green roller doors and a curved roof stands under an overcast sky. A large ferris wheel and a multi-story hotel are visible in the background.
+
+Keywords:
+RNLI, lifeboat station, Southend-on-Sea, Essex, England UK, ferris wheel, architecture, overcast, cloudy, asphalt, coastal, flag, hotel, antenna, waterfront, seaside, urban
+```
+
+</details>
+
+⚠️ _Quality Warnings:_
+
+- Metadata alignment issue (low_metadata_alignment)
 - Missing sections (title)
 - Low draft improvement
 - Unknown tags: <channel\|>
+
+---
+
+<a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
+
+### ✅ mlx-community/Phi-3.5-vision-instruct-bf16
+
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: mlx-community/Phi-3.5-vision-instruct-bf16</summary>
+
+```text
+Title: Lifeboat Station, Southend-on-Sea, England, UK
+
+Description: The Lifeboat Station in Southend-on-Sea, England, UK, is situated on a waterfront with a ferris wheel visible in the background. The station's entrance is marked by a sign and is adjacent to a building with a modern architectural style.
+
+Keywords: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe, Waterfront, Modern Architecture, Ferris Wheel, British Seaside, Cloudy, Overcast, Thames Estuary, RNLI, Sign, Hotel, Antenna, Objects, Essex, Pier
+```
+
+</details>
+
+⚠️ _Quality Warnings:_
+
+- Keyword count violation (20; expected 10-18)
+- Low draft improvement
+
+---
+
+<a id="model-microsoft-phi-35-vision-instruct"></a>
+
+### ✅ microsoft/Phi-3.5-vision-instruct
+
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: microsoft/Phi-3.5-vision-instruct</summary>
+
+```text
+Title: Lifeboat Station, Southend-on-Sea, England, UK
+
+Description: The Lifeboat Station in Southend-on-Sea, England, UK, is situated on a waterfront with a ferris wheel visible in the background. The station's entrance is marked by a sign and is adjacent to a building with a modern architectural style.
+
+Keywords: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe, Waterfront, Modern Architecture, Ferris Wheel, British Seaside, Cloudy, Overcast, Thames Estuary, RNLI, Sign, Hotel, Antenna, Objects, Essex, Pier
+```
+
+</details>
+
+⚠️ _Quality Warnings:_
+
+- Keyword count violation (20; expected 10-18)
+- Low draft improvement
 
 ---
 
@@ -893,35 +777,30 @@ Keywords:
 
 ### ✅ mlx-community/InternVL3-8B-bf16
 
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: Commuting, Fenchurch Street, Nightscape, The
-  Fenchurch Building (The Walkie-Talkie), Fenchurch; low-draft-improvement
-- _Timing:_ Load 1.64s; Gen 4.05s; Total 5.99s
-- _Throughput:_ Prompt 2,789 TPS (2,408 tok); Gen 34.2 TPS (90 tok)
-- _Tokens:_ prompt 2408 tok; estimated text 517 tok; estimated non-text 1891
-  tok; generated 90 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
 <summary>Complete generated output: mlx-community/InternVL3-8B-bf16</summary>
 
 ```text
 Title:
-The Walkie-Talkie Building, London, England
+Lifeboat Station, Southend-on-Sea, England
 
 Description:
-Modern skyscraper in London at night, illuminated with reflective glass facade, streetlights casting a warm glow, and a few cars on the road.
+A lifeboat station with a Ferris wheel and a hotel in the background, under an overcast sky.
 
 Keywords:
-Architecture, Building, Buildings, Cars, City, Cityscape, Illuminated, London, Modern, Night, Skyscraper, Street, Street signs, Urban, Urban landscape, Walkie-Talkie Building
+Asphalt, British seaside, Cloudy, Essex, Fence, Flag, Hotel, Lifeboat Station, Modern Architecture, Objects, Overcast, Pier, RNLI, Sign, Southend-on-Sea, Waterfront, amusement ride, antenna, building, garage, gate, railing, satellite dish, structure, tower, window
 ```
 
 </details>
 
 ⚠️ _Quality Warnings:_
 
+- Keyword count violation (26; expected 10-18)
 - Low draft improvement
 
 ---
@@ -930,89 +809,135 @@ Architecture, Building, Buildings, Cars, City, Cityscape, Illuminated, London, M
 
 ### ❌ mlx-community/gemma-3n-E2B-4bit
 
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); missing sections: title, description,
-  keywords; missing terms: Architecture, Building, Buildings, Cars, City;
-  repetitive token=phrase: "- do not take..."
-- _Timing:_ Load 2.07s; Gen 4.84s; Total 7.22s
-- _Throughput:_ Prompt 2,737 TPS (891 tok); Gen 123 TPS (500 tok)
-- _Tokens:_ prompt 891 tok; estimated text 517 tok; estimated non-text 374
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+- _Verdict:_ cutoff_degraded | user=avoid
+- _Why:_ text repetition | missing required sections | token cap truncation |
+  hit token cap (500)
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
 <summary>Complete generated output: mlx-community/gemma-3n-E2B-4bit</summary>
 
 ```text
 
-- Do not take it is a 2026-07-18 22:55:39 22:55:39
-- Do not take it is a 22:55:39 22:55:39
-- Do not take it is a 22:55:39 22:55:39
-- Do not take it is a 22:55:39 22:55:39
-- Do not take it is a 22:55:39 22:55:39
-- Do not take it is a 22:55:39 22:55:39
-- Do not take it is a 22:55:39 22:55:39
-- Do not take it is a 22:55:39 22:55:39
-- Do not take it is a 22:55:39 22:55:39
-- Do not take it is a 22:55:39 22:55:39
-- Do not take it is a 22:55:39 22:55:39
-- Do not take it is a 22:55:39 22:55:39
-- Do not take it is a 22:55:39 22:55:39
-- Do not take it is a 22:55:39 22:55:39
-- Do not take it is a 22:55:39 22:55:39
-- Do not take it is a 22:55:39 22:55:39
-- Do not take it is a 22:55:39 22:55:39
-- Do not take it is a 22:55:39 22:55:39
-- Do not take it is a 22:55:39 22:
+- T-18-07-18 17:57:06 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57:06
+- 17:57
 ```
 
 </details>
 
 ⚠️ _Quality Warnings:_
 
-- Repetitive output (phrase: "- do not take...")
-- Context ignored (missing: Architecture, Building, Buildings, Cars, City)
+- Repetitive output (phrase: "17:57:06 - 17:57:06 -...")
+- Excessive bullet points (44)
+- No overlap with supplied context indicators
+- Text sanity issue (gibberish(token_noise))
 - Generation loop (repetitive_tail)
 - Metadata alignment issue (low_metadata_alignment)
 - Missing sections (title, description, keywords)
 - Unverified context copy
 - Low draft improvement
 - Likely capped by max token budget
-- Ignores trusted hints
 
 ---
 
-<a id="model-meta-llama-llama-32-11b-vision-instruct"></a>
+<a id="model-mlx-community-ministral-3-14b-instruct-2512-nvfp4"></a>
 
-### ❌ meta-llama/Llama-3.2-11B-Vision-Instruct
+### ✅ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
 
-- _Recommendation:_ avoid for now; review verdict: model shortcoming
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ missing sections: title, description, keywords; missing
-  terms: Architecture, Cars, City, Cityscape, Commuting; low-draft-improvement
-- _Timing:_ Load 2.22s; Gen 4.99s; Total 7.52s
-- _Throughput:_ Prompt 312 TPS (596 tok); Gen 5.39 TPS (14 tok)
-- _Tokens:_ prompt 596 tok; estimated text 517 tok; estimated non-text 79 tok;
-  generated 14 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
-<summary>Complete generated output: meta-llama/Llama-3.2-11B-Vision-Instruct</summary>
+<summary>Complete generated output: mlx-community/Ministral-3-14B-Instruct-2512-nvfp4</summary>
 
 ```text
-The Fenchurch Building (The Walkie-Talkie)
+**Title:**
+Lifeboat Station and Ferris Wheel, Southend-on-Sea, UK
+
+**Description:**
+A lifeboat station with a green garage door and curved roof, positioned near a pier, with a large amusement Ferris wheel and a multi-storey hotel visible in the background under an overcast sky. The station displays a Union Jack flag and an antenna on its roof.
+
+**Keywords:**
+Lifeboat Station, RNLI, Southend-on-Sea, Pier, Ferris Wheel, Pier Hotel, Overcast Sky, Green Garage Door, Union Jack Flag, Antenna, Modern Station, Pier Fencing, Thames Estuary, UK Seaside, Pier Amusement, Pierfront, Cloudy Weather
 ```
 
 </details>
 
-⚠️ _Quality Warnings:_
+_Quality Status:_ no quality issues detected in this run
 
-- Missing sections (title, description, keywords)
-- Low draft improvement
-- Degrades trusted hints
+---
+
+<a id="model-mlx-community-ministral-3-14b-instruct-2512-mxfp4"></a>
+
+### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
+
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: mlx-community/Ministral-3-14B-Instruct-2512-mxfp4</summary>
+
+```text
+**Title:**
+Lifeboat Station with Southend Pier Amusement Ride
+
+**Description:**
+The image shows the RNLI lifeboat station in Southend-on-Sea, England, featuring a modern single-storey building with a green garage door and a blue sign reading "Lifeboats." In the background, a large Ferris wheel and a multi-storey hotel are visible under an overcast sky, with the setting suggesting a coastal amusement pier.
+
+**Keywords:**
+Lifeboat Station, RNLI, Southend-on-Sea, UK, coastal architecture, green garage door, blue signage, Ferris wheel, amusement pier, overcast sky, modern building, multi-storey hotel, asphalt pavement, flagpole, antenna, barbed wire fence, Thames Estuary, British seaside
+```
+
+</details>
+
+_Quality Status:_ no quality issues detected in this run
 
 ---
 
@@ -1020,16 +945,11 @@ The Fenchurch Building (The Walkie-Talkie)
 
 ### ❌ mlx-community/paligemma2-10b-ft-docci-448-bf16
 
-- _Recommendation:_ avoid for now; review verdict: model shortcoming
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ missing sections: title, description, keywords; missing
-  terms: Architecture, Building, Buildings, Cars, City; low-draft-improvement
-- _Timing:_ Load 2.72s; Gen 5.10s; Total 8.13s
-- _Throughput:_ Prompt 1,092 TPS (1,652 tok); Gen 5.54 TPS (17 tok)
-- _Tokens:_ prompt 1652 tok; estimated text 517 tok; estimated non-text 1135
-  tok; generated 17 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ model_shortcoming | user=avoid
+- _Why:_ missing required sections | irrelevant output smell | missing
+  sections: title, description, keywords
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
 <summary>Complete generated output: mlx-community/paligemma2-10b-ft-docci-448-bf16</summary>
@@ -1042,197 +962,41 @@ The Fenchurch Building (The Walkie-Talkie)
 
 ⚠️ _Quality Warnings:_
 
-- Context ignored (missing: Architecture, Building, Buildings, Cars, City)
+- No overlap with supplied context indicators
 - Metadata alignment issue (low_metadata_alignment)
 - Missing sections (title, description, keywords)
 - Low draft improvement
-- Ignores trusted hints
-
----
-
-<a id="model-mlx-community-llava-v16-mistral-7b-8bit"></a>
-
-### ⚠️ mlx-community/llava-v1.6-mistral-7b-8bit
-
-- _Recommendation:_ use with caveats; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: known, formally, 20; keywords=20;
-  low-draft-improvement
-- _Timing:_ Load 1.42s; Gen 5.37s; Total 7.10s
-- _Throughput:_ Prompt 1,338 TPS (2,867 tok); Gen 62.1 TPS (161 tok)
-- _Tokens:_ prompt 2867 tok; estimated text 517 tok; estimated non-text 2350
-  tok; generated 161 tok; requested max 500 tok; stop reason completed
-
-<details>
-<summary>Complete generated output: mlx-community/llava-v1.6-mistral-7b-8bit</summary>
-
-```text
-Title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe
-
-Description: The Fenchurch Building (The Walkie-Talkie), a modern skyscraper in London, England, UK, is illuminated at night. The building is located on Fenchurch Street and is a prominent landmark in the city.
-
-Keywords: Architecture, Building, Buildings, Cars, City, Cityscape, Commuting, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walkie-Talkie), Urban, Urban landscape, Walkie Talkie building
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- Title length violation (11 words; expected 5-10)
-- Keyword count violation (20; expected 10-18)
-- Low draft improvement
-
----
-
-<a id="model-mlx-community-ministral-3-14b-instruct-2512-nvfp4"></a>
-
-### ✅ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: Cars, City, Commuting, Nightscape, Street
-  signs
-- _Timing:_ Load 1.39s; Gen 5.42s; Total 7.10s
-- _Throughput:_ Prompt 1,310 TPS (3,240 tok); Gen 62.9 TPS (158 tok)
-- _Tokens:_ prompt 3240 tok; estimated text 517 tok; estimated non-text 2723
-  tok; generated 158 tok; requested max 500 tok; stop reason completed
-
-<details>
-<summary>Complete generated output: mlx-community/Ministral-3-14B-Instruct-2512-nvfp4</summary>
-
-```text
-**Title:**
-*20 Fenchurch Street at Night, London, England, UK*
-
-**Description:**
-A night-time view of 20 Fenchurch Street, also known as "Walkie-Talkie," a modern skyscraper in London’s financial district, illuminated against a dark blue sky. Visible details include adjacent buildings, street lighting, a few parked e-bikes, road signs, and a nearly empty street with minimal evening activity.
-
-**Keywords:**
-Modern skyscraper, 20 Fenchurch Street, Walkie-Talkie, London, England, night photography, urban architecture, illuminated building, financial district, street lighting, road signs, e-bikes, dark blue sky, minimal traffic, European cityscape, commercial architecture
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- Metadata alignment issue (low_metadata_alignment)
 
 ---
 
 <a id="model-mlx-community-pixtral-12b-8bit"></a>
 
-### ⚠️ mlx-community/pixtral-12b-8bit
+### ✅ mlx-community/pixtral-12b-8bit
 
-- _Recommendation:_ use with caveats; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: Commuting, The Fenchurch Building (The
-  Walkie-Talkie), GBR, formally; keywords=19; low-draft-improvement
-- _Timing:_ Load 1.69s; Gen 5.45s; Total 7.46s
-- _Throughput:_ Prompt 1,600 TPS (3,433 tok); Gen 39.2 TPS (112 tok)
-- _Tokens:_ prompt 3433 tok; estimated text 517 tok; estimated non-text 2916
-  tok; generated 112 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
 <summary>Complete generated output: mlx-community/pixtral-12b-8bit</summary>
 
 ```text
 Title:
-- 20 Fenchurch Street, London
+- Lifeboat Station, Southend-on-Sea
 
 Description:
-- The illuminated skyscraper known as 20 Fenchurch Street, or the Walkie-Talkie building, stands prominently in a London street at night.
+- The lifeboat station in Southend-on-Sea, England, features a prominent RNLI sign and is situated near a ferris wheel and a multi-story hotel.
 
 Keywords:
-- Architecture, Building, Buildings, Cars, City, Cityscape, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building, Urban, Urban landscape, Walkie Talkie building
+- Lifeboat Station, RNLI, Southend-on-Sea, Ferris Wheel, Hotel, Cloudy Sky, Overcast, British Architecture, Signage, Flag, Asphalt, Fence, Modern Building, Waterfront, Pier, Amusement Ride, Antenna, Essex, Thames Estuary
 ```
 
 </details>
 
 ⚠️ _Quality Warnings:_
 
-- Title length violation (4 words; expected 5-10)
 - Keyword count violation (19; expected 10-18)
-- Low draft improvement
-
----
-
-<a id="model-mlx-community-internvl3-14b-8bit"></a>
-
-### ✅ mlx-community/InternVL3-14B-8bit
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: Cars, Commuting, The Fenchurch Building (The
-  Walkie-Talkie), GBR, formally; low-draft-improvement
-- _Timing:_ Load 1.72s; Gen 5.99s; Total 8.02s
-- _Throughput:_ Prompt 1,372 TPS (2,408 tok); Gen 32.1 TPS (118 tok)
-- _Tokens:_ prompt 2408 tok; estimated text 517 tok; estimated non-text 1891
-  tok; generated 118 tok; requested max 500 tok; stop reason completed
-
-<details>
-<summary>Complete generated output: mlx-community/InternVL3-14B-8bit</summary>
-
-```text
-Title:
-The Fenchurch Building, London Night
-
-Description:
-The Fenchurch Building, also known as The Walkie-Talkie, stands prominently in London's cityscape at night, illuminated by interior lights. The scene captures a quiet urban street with modern architecture, streetlights, and a few parked bicycles.
-
-Keywords:
-Architecture, Building, City, Cityscape, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building, Urban, Urban landscape, Walkie Talkie building
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- Low draft improvement
-
----
-
-<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
-
-### ⚠️ mlx-community/gemma-3-27b-it-qat-4bit
-
-- _Recommendation:_ use with caveats; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: Cars, Commuting, GBR; keywords=23;
-  low-draft-improvement
-- _Timing:_ Load 2.81s; Gen 6.42s; Total 9.54s
-- _Throughput:_ Prompt 663 TPS (900 tok); Gen 30.9 TPS (142 tok)
-- _Tokens:_ prompt 900 tok; estimated text 517 tok; estimated non-text 383
-  tok; generated 142 tok; requested max 500 tok; stop reason completed
-
-<details>
-<summary>Complete generated output: mlx-community/gemma-3-27b-it-qat-4bit</summary>
-
-```text
-Title:
-The Fenchurch Building (The Walkie-Talkie), London
-
-Description:
-The Fenchurch Building, formally known as 20 Fenchurch Street, is illuminated at night, dominating a street scene in London, England; the building’s distinctive curved facade is prominently visible.
-
-Keywords:
-Architecture, Building, Buildings, City, Cityscape, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walkie-Talkie), Urban, Urban landscape, Walkie Talkie building, Curved facade, Dark sky, Street lighting, Pedestrian crossing, Road surface
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- Keyword count violation (23; expected 10-18)
 - Low draft improvement
 
 ---
@@ -1241,152 +1005,20 @@ Architecture, Building, Buildings, City, Cityscape, Fenchurch Street, Illuminate
 
 ### ✅ mlx-community/gemma-4-31b-it-4bit
 
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: Cars, Commuting, Street signs, GBR, formally;
-  low-draft-improvement
-- _Timing:_ Load 3.02s; Gen 7.04s; Total 10.38s
-- _Throughput:_ Prompt 534 TPS (905 tok); Gen 26.4 TPS (128 tok)
-- _Tokens:_ prompt 905 tok; estimated text 517 tok; estimated non-text 388
-  tok; generated 128 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
 <summary>Complete generated output: mlx-community/gemma-4-31b-it-4bit</summary>
 
 ```text
-Title: The Fenchurch Building (The Walkie-Talkie), London, England, UK
+Title: Lifeboat Station in Southend-on-Sea, England, UK
 
-Description: A night view of the modern skyscraper known as 20 Fenchurch Street, situated along a city street in London, England. The scene features illuminated office windows, street lighting, and parked bicycles on the pavement.
+Description: A lifeboat station featuring two large green roller shutters and a curved roof under an overcast sky. A large white Ferris wheel and a multi-storey hotel are visible in the background.
 
-Keywords: Architecture, Building, City, Cityscape, England, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, The Fenchurch Building (The Walkie-Talkie), UK, Urban, Urban landscape, Walkie Talkie building
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- Low draft improvement
-
----
-
-<a id="model-mlx-community-pixtral-12b-bf16"></a>
-
-### ⚠️ mlx-community/pixtral-12b-bf16
-
-- _Recommendation:_ use with caveats; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: Cars, Commuting, Modern, The Fenchurch
-  Building (The Walkie-Talkie), Walkie Talkie building; low-draft-improvement
-- _Timing:_ Load 3.34s; Gen 7.37s; Total 11.01s
-- _Throughput:_ Prompt 1,703 TPS (3,433 tok); Gen 20.1 TPS (99 tok)
-- _Tokens:_ prompt 3433 tok; estimated text 517 tok; estimated non-text 2916
-  tok; generated 99 tok; requested max 500 tok; stop reason completed
-
-<details>
-<summary>Complete generated output: mlx-community/pixtral-12b-bf16</summary>
-
-```text
-Title:
-- 20 Fenchurch Street, London
-
-Description:
-- The illuminated 20 Fenchurch Street, also known as The Walkie-Talkie, stands prominently in a quiet London street at night.
-
-Keywords:
-- Architecture, Building, Buildings, City, Cityscape, Fenchurch Street, Illuminated, London, Night, Nightscape, Skyscraper, Street, Street signs, The Walkie-Talkie, Urban, Urban landscape
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- Title length violation (4 words; expected 5-10)
-- Low draft improvement
-
----
-
-<a id="model-mlx-community-gemma-3n-e4b-it-bf16"></a>
-
-### ❌ mlx-community/gemma-3n-E4B-it-bf16
-
-- _Recommendation:_ avoid for now; review verdict: model shortcoming
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: Commuting, Fenchurch Street, Nightscape,
-  Street signs, The Fenchurch Building (The Walkie-Talkie); keywords=25;
-  unverified-context-copy
-- _Timing:_ Load 2.78s; Gen 7.61s; Total 10.71s
-- _Throughput:_ Prompt 1,964 TPS (899 tok); Gen 48.2 TPS (323 tok)
-- _Tokens:_ prompt 899 tok; estimated text 517 tok; estimated non-text 382
-  tok; generated 323 tok; requested max 500 tok; stop reason completed
-
-<details>
-<summary>Complete generated output: mlx-community/gemma-3n-E4B-it-bf16</summary>
-
-```text
-## Image Description for Captioning
-
-**Title:** Night View of The Walkie-Talkie Building in London
-
-**Description:** A low-angle, wide shot captures the imposing silhouette of The Walkie-Talkie building at night in London. The skyscraper dominates the frame, its dark, reflective glass facade illuminated by the city lights. The building's distinctive curved top is clearly visible against the deep blue of the night sky, with faint stars scattered above.
-
-The street below is dimly lit by streetlights, with blurred headlights of passing cars creating streaks of light. The surrounding buildings are also visible, their windows glowing with warm interior lights, contrasting with the cool blue of the sky. A few parked bicycles are visible on the sidewalk in the foreground, adding a touch of everyday life to the urban scene.
-
-The overall atmosphere is one of a bustling city at night, with the modern architecture of The Walkie-Talkie standing as a prominent landmark. The image conveys a sense of urban grandeur and the energy of a major city.
-
-**Keywords:** London, The Walkie-Talkie, skyscraper, night, city, urban, architecture, building, street, lights, stars, modern, cityscape, evening, reflection, blue, dark, cars, bicycles.
-
-**Location:** London, England, UK
-
-**Date/Time:** 2026-07-18 22:55:39 BST
-
-**GPS:** 51.511300°N, 0.083400°W
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- Metadata alignment issue (low_metadata_alignment)
-- Description sentence violation (8; expected 1-2)
-- Keyword count violation (25; expected 10-18)
-- Unverified context copy
-- suspicious_precision: 2 overly precise numbers
-
----
-
-<a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
-
-### ✅ mlx-community/GLM-4.6V-Flash-mxfp4
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: Commuting, Fenchurch Street, Illuminated, GBR,
-  known
-- _Timing:_ Load 1.35s; Gen 8.01s; Total 9.67s
-- _Throughput:_ Prompt 1,129 TPS (6,647 tok); Gen 80.0 TPS (134 tok)
-- _Tokens:_ prompt 6647 tok; estimated text 517 tok; estimated non-text 6130
-  tok; generated 134 tok; requested max 500 tok; stop reason completed
-
-<details>
-<summary>Complete generated output: mlx-community/GLM-4.6V-Flash-mxfp4</summary>
-
-```text
-Title:
-The Fenchurch Building (The Walkie-Talkie), London, England, UK
-
-Description:
-The image shows a night scene featuring the distinctive, angular glass facade of The Fenchurch Building (The Walkie-Talkie) in London. The street is relatively quiet with a few cars visible, street lighting illuminating the area, and modern urban architecture surrounding the scene.
-
-Keywords:
-The Fenchurch Building (The Walkie-Talkie), Architecture, Building, Buildings, City, Cityscape, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, Urban, Urban landscape, Walkie Talkie building
+Keywords: Lifeboat Station, Southend-on-Sea, England, UK, Europe, Ferris wheel, amusement ride, green shutters, overcast sky, hotel, asphalt, antenna, flag, waterfront, British seaside, architecture, RNLI, sign
 ```
 
 </details>
@@ -1395,284 +1027,160 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-minicpm-v-46-8bit"></a>
+<a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
 
-### ⚠️ mlx-community/MiniCPM-V-4.6-8bit
+### ⚠️ mlx-community/Idefics3-8B-Llama3-bf16
 
-- _Recommendation:_ use with caveats; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: Cars, Cityscape, Commuting, Fenchurch Street,
-  Nightscape; formatting=Empty thinking wrapper present
-- _Timing:_ Load 0.96s; Gen 8.34s; Total 9.75s
-- _Throughput:_ Prompt 350 TPS (1,243 tok); Gen 24.7 TPS (94 tok)
-- _Tokens:_ prompt 1243 tok; estimated text 517 tok; estimated non-text 726
-  tok; generated 94 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ clean | user=caveat
+- _Why:_ special token wrapper | Unknown tags: <end_of_utterance>
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
-<summary>Complete generated output: mlx-community/MiniCPM-V-4.6-8bit</summary>
+<summary>Complete generated output: mlx-community/Idefics3-8B-Llama3-bf16</summary>
 
 ```text
-<think>
+ Title: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe.
 
-</think>
+Description: A lifeboat station with a large green shuttered door and a sign reading "Lifeboats" above it, is situated in a coastal town with a ferris wheel visible in the background. The sky is overcast and the station is surrounded by asphalt.
 
-Title:
-Nighttime urban street with modern skyscraper
-
-Description: The image shows a modern urban street at night, featuring a prominent illuminated skyscraper under a dark sky, with surrounding buildings and street lighting. Visible details include parked bicycles and street signs, indicating a bustling city environment.
-
-Keywords: Architecture, Buildings, Skyscraper, City, Street, Illuminated, Night, Modern, Urban, London, UK, Evening, Urban landscape
+Keywords: Asphalt, British seaside, Cloudy, Essex, Fence, Flag, Hotel, Lifeboat Station, Modern Architecture, Objects, Overcast, Overcast Sky, Pier, RNLI, Sign, Southend-on-Sea, Thames Estuary, Waterfront, amusement ride, antenna.<end_of_utterance>
 ```
 
 </details>
 
 ⚠️ _Quality Warnings:_
 
-- Metadata alignment issue (low_metadata_alignment)
-- Empty thinking wrapper present
-
----
-
-<a id="model-jqlive-kimi-vl-a3b-thinking-2506-6bit"></a>
-
-### ❌ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); missing sections: title, description,
-  keywords; missing terms: City, Commuting, Skyscraper, Urban landscape,
-  known; thinking trace incomplete
-- _Timing:_ Load 1.99s; Gen 8.55s; Total 10.86s
-- _Throughput:_ Prompt 1,677 TPS (1,623 tok); Gen 71.0 TPS (500 tok)
-- _Tokens:_ prompt 1623 tok; estimated text 517 tok; estimated non-text 1106
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-<details>
-<summary>Complete generated output: jqlive/Kimi-VL-A3B-Thinking-2506-6bit</summary>
-
-```text
-◁think▷Okay, let's tackle this. First, I need to analyze the image and create a catalog record with the specified sections: Title, Description, and Keywords. The user wants it in British English, so I'll make sure to use British terms like "lorry" instead of "truck" if needed, but here it's not necessary.
-
-Looking at the image, the main subject is the Walkie-Talkie building (20 Fenchurch Street) in London, UK. The image is a night scene with the building illuminated, showing its distinctive curved shape. The location is a street in London, England, UK. The time is 2026-07-18 22:55:39 BST, so it's nighttime. The lighting is dark with artificial lights from the building and streetlights. There are cars and bicycles visible, and the street is wet, reflecting lights. The building's glass facade is prominent.
-
-For the title, I need a 5-10 word title. The existing draft was "The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe". But maybe shorten it to "The Walkie-Talkie Building, London Nightscape" to be more concise.
-
-Description should be 1-2 sentences. It should mention the building, location, time, lighting, and key elements. So something like "A nighttime view of the Walkie-Talkie building (20 Fenchurch Street) illuminated at night, showcasing its distinctive curved glass facade, with streetlights, bicycles, and cars visible in the foreground, located in London, England, UK."
-
-Keywords need 10-18 terms. From the image: Walkie-Talkie building, London, England, UK, night, nightscape, illuminated, glass facade, streetlights, bicycles, cars, wet street, reflections, urban, modern architecture, cityscape, street signs, buildings, night lighting, dark sky, urban environment, architectural details.
-
-Check if all keywords are visible or from context. "Walkie-Talkie building" is visible. "London" is given. "Night" and "nightscape" are from the image. "Illuminated" is visible. "Glass facade" is visible. "Streetlights" and "bicycles" are visible. "Cars" are visible. "Wet street" and "reflections" from the wet pavement. "Urban"
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- Missing sections (title, description, keywords)
-- Thinking trace incomplete (expected model protocol; opened with ◁think▷)
-- Unverified context copy
+- Keyword count violation (20; expected 10-18)
 - Low draft improvement
-- Likely capped by max token budget
+- Unknown tags: <end_of_utterance>
 
 ---
 
-<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
+<a id="model-mlx-community-internvl3-14b-8bit"></a>
 
-### ⚠️ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+### ✅ mlx-community/InternVL3-14B-8bit
 
-- _Recommendation:_ use with caveats; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: Commuting, GBR, formally, 20; keywords=19;
-  low-draft-improvement
-- _Timing:_ Load 2.17s; Gen 8.58s; Total 11.06s
-- _Throughput:_ Prompt 749 TPS (2,707 tok); Gen 30.3 TPS (136 tok)
-- _Tokens:_ prompt 2707 tok; estimated text 517 tok; estimated non-text 2190
-  tok; generated 136 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
-<summary>Complete generated output: mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit</summary>
+<summary>Complete generated output: mlx-community/InternVL3-14B-8bit</summary>
 
 ```text
 Title:
-The Fenchurch Building (The Walkie-Talkie), London
+Lifeboat Station, Southend-on-Sea, UK
 
 Description:
-The Fenchurch Building, also known as the Walkie-Talkie, stands illuminated at night in London, England. The distinctive curved glass facade reflects the surrounding city lights, with a quiet street below featuring bicycles and traffic signs.
+The image shows a lifeboat station with a large green garage door, situated near a pier with a Ferris wheel in the background. The sky is overcast, and a hotel building is visible to the right.
 
 Keywords:
-Architecture, Building, Buildings, Cars, City, Cityscape, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walkie-Talkie), Urban, Urban landscape, Walkie Talkie building
+Asphalt, British seaside, Cloudy, Essex, Fence, Flag, Hotel, Lifeboat Station, Modern Architecture, Objects, Overcast, Overcast Sky, Pier, RNLI, Sign, Southend-on-Sea, Thames Estuary, Waterfront, amusement ride, antenna
 ```
 
 </details>
 
 ⚠️ _Quality Warnings:_
 
-- Keyword count violation (19; expected 10-18)
+- Keyword count violation (20; expected 10-18)
 - Low draft improvement
 
 ---
 
-<a id="model-mlx-community-glm-46v-flash-6bit"></a>
+<a id="model-mlx-community-llava-v16-mistral-7b-8bit"></a>
 
-### ⚠️ mlx-community/GLM-4.6V-Flash-6bit
+### ⚠️ mlx-community/llava-v1.6-mistral-7b-8bit
 
-- _Recommendation:_ use with caveats; review verdict: context budget
-- _Owner:_ likely owner `model`
-- _Next step:_ Run a controlled reduced-image or lower-visual-token comparison
-  before assigning the context-boundary behaviour to mlx, mlx-vlm, or the
-  model.
-- _Key signals:_ output/prompt=2.29%; visual input burden=92%; missing
-  sections: title; missing terms: Commuting, The Fenchurch Building (The
-  Walkie-Talkie), GBR, known, formally
-- _Timing:_ Load 1.41s; Gen 8.74s; Total 10.46s
-- _Throughput:_ Prompt 1,173 TPS (6,647 tok); Gen 57.7 TPS (152 tok)
-- _Tokens:_ prompt 6647 tok; estimated text 517 tok; estimated non-text 6130
-  tok; generated 152 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ model_shortcoming | user=caveat
+- _Why:_ irrelevant output smell
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
-<summary>Complete generated output: mlx-community/GLM-4.6V-Flash-6bit</summary>
+<summary>Complete generated output: mlx-community/llava-v1.6-mistral-7b-8bit</summary>
 
 ```text
-<|begin_of_box|>Title:
-The Walkie-Talkie Building at Night
+Title: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe
 
-Description:
-A nighttime urban scene featuring the distinctive, angular glass facade of the Walkie-Talkie building (20 Fenchurch Street) in London. The street is dimly lit with streetlights, showing a few vehicles with headlights on, and some green rental bikes parked on the left sidewalk.
+Description: A lifeboat station with a ferris wheel in the background.
 
-Keywords:
-Architecture, Building, Buildings, Cars, City, Cityscape, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Walkie-Talkie Building, Urban, Urban landscape, Walkie-Talkie building, Glass facade, Nighttime urban scene, Green rental bikes, Headlights on vehicles<|end_of_box|>
+Keywords: Asphalt, British seaside, Cloudy, Essex, Fence, Flag, Hotel, Lifeboat Station, Modern Architecture, Objects, Overcast, Overcast Sky, Pier, RNLI, Sign, Southend-on-Sea, Thames Estuary, Waterfront, amusement ride, antenna
+
+Rules:
+- Distinguish supplied authoritative facts from visible details; do not present contextual facts as though they were read from the image.
+- Reuse draft metadata when it is consistent with the image; authoritative context does not require separate visual proof.
+- If metadata and image disagree, follow the image.
+- Prefer omission to speculation.
+- Do not copy prompt instructions into the Title, Description, or Keywords fields.
+- Do not infer identity, location, event, brand, species, time period, or intent unless supplied as authoritative context or visually obvious.
+- Do not output reasoning, notes, hedging, or extra sections.
 ```
 
 </details>
 
 ⚠️ _Quality Warnings:_
 
-- ⚠️REVIEW:context_budget
-- Missing sections (title)
-- Keyword count violation (23; expected 10-18)
+- Keyword count violation (40; expected 10-18)
+- Reasoning leak (do not output reasoning)
+- Instruction echo
 - Low draft improvement
-- Contains unexpected table
 
 ---
 
-<a id="model-mlx-community-kimi-vl-a3b-thinking-8bit"></a>
+<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
 
-### ❌ mlx-community/Kimi-VL-A3B-Thinking-8bit
+### ✅ mlx-community/gemma-3-27b-it-qat-4bit
 
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); missing sections: title, description,
-  keywords; missing terms: Cars, City, Nightscape, Street signs, Urban;
-  thinking trace present
-- _Timing:_ Load 2.19s; Gen 9.53s; Total 12.03s
-- _Throughput:_ Prompt 1,668 TPS (1,623 tok); Gen 62.6 TPS (500 tok)
-- _Tokens:_ prompt 1623 tok; estimated text 517 tok; estimated non-text 1106
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
-<summary>Complete generated output: mlx-community/Kimi-VL-A3B-Thinking-8bit</summary>
-
-```text
-◁think▷Okay, let's tackle this metadata cataloging task. First, I need to analyze the image based on the given context and the draft metadata provided. The image shows a tall, modern skyscraper at night. The building has a distinctive curved glass facade with illuminated windows. The location is specified as England, UK, specifically in the district of London, near Fenchurch Street. The photo was taken on July 18, 2026, at 10:55 PM BST. The GPS coordinates are 51.5113°N, 0.0834°W.
-
-The existing draft metadata mentions "The Fenchurch Building (The Walkie-Talkie)" and "20 Fenchurch Street." The building is known for its unique shape, which resembles a walkie-talkie, hence the nickname. The image shows the building at night with its glass panels lit up, which is a key visual detail. The surrounding area includes a street scene with some vehicles and streetlights, but the main subject is clearly the skyscraper.
-
-For the title, I should keep "The Fenchurch Building (The Walkie-Talkie)" as it's the official name and nickname. The location is already provided in the context, so I can include that. The draft title is already accurate, so no changes needed there.
-
-For the description, I need to combine the authoritative context with visible details. The building's curved glass facade and illuminated windows are prominent. The street scene at night with vehicles and streetlights adds context. The GPS coordinates and date/time are part of the authoritative context but shouldn't be included in the description since they're not visually observable. The existing description mentions "Walkie Talkie building" which is correct, so I can use that. The keywords should include the official name, location, and other visible elements like architecture, night, cityscape, etc. I should avoid adding speculative terms like "commuting" unless it's clearly visible, which it isn't. The existing keywords are a good start but can be refined to include "glass facade" and "streetlights" based on the image.
-
-I need to ensure that I don't add any inferred details. The building's nickname is confirmed by the context, so that's safe. The image shows it's a skyscraper, so that's included. The keywords should be concise and accurate. Let me compile the final entries based on this analysis.◁/think▷Title: The Fenchurch
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- Excessive verbosity
-- Missing sections (title, description, keywords)
-- Thinking trace present (expected model protocol; ◁think▷)
-- Likely capped by max token budget
-- suspicious_precision: 2 overly precise numbers
-
----
-
-<a id="model-microsoft-phi-35-vision-instruct"></a>
-
-### ❌ microsoft/Phi-3.5-vision-instruct
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ hit token cap (500); missing terms: Cars, Commuting,
-  Fenchurch Street, Nightscape, Street; keyword duplication=83%; repetitive
-  token=phrase: "modern, illuminated, architect..."
-- _Timing:_ Load 0.92s; Gen 9.55s; Total 10.77s
-- _Throughput:_ Prompt 3,958 TPS (1,468 tok); Gen 57.2 TPS (500 tok)
-- _Tokens:_ prompt 1468 tok; estimated text 517 tok; estimated non-text 951
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-<details>
-<summary>Complete generated output: microsoft/Phi-3.5-vision-instruct</summary>
-
-```text
-Title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe
-
-Description: The iconic Fenchurch Building, also known as The Walkie-Talkie, stands tall in the heart of London's financial district. Its distinctive curved facade is illuminated against the night sky, creating a striking contrast with the surrounding modern architecture. The building's reflective glass surface mirrors the lights of the city, adding to its imposing presence.
-
-Keywords: Fenchurch Building, The Walkie-Talkie, London, England, UK, GBR, Europe, modern architecture, illuminated, cityscape, skyscraper, urban landscape, night, modern, illuminated, reflective glass, financial district, city lights, urban, architecture, buildings, illumination, nighttime, skyline, modern, urban, city, lighting, modern, illuminated, architecture, buildings, urban, cityscape, modern, illuminated, architecture, buildings, urban, city, lighting, modern, illuminated, architecture, buildings, urban, cityscape, modern, illuminated, architecture, buildings, urban, city, lighting, modern, illuminated, architecture, buildings, urban, cityscape, modern, illuminated, architecture, buildings, urban, city, lighting, modern, illuminated, architecture, buildings, urban, cityscape, modern, illuminated, architecture, buildings, urban, city, lighting, modern, illuminated, architecture, buildings, urban, cityscape, modern, illuminated, architecture, buildings, urban, city, lighting, modern, illuminated, architecture, buildings, urban, cityscape, modern, illuminated, architecture, buildings, urban, city, lighting, modern, illuminated, architecture, buildings, urban, cityscape, modern, illuminated, architecture, buildings, urban, city, lighting, modern, illuminated, architecture, buildings, urban, cityscape, modern, illuminated, architecture, buildings, urban, city, lighting, modern, illuminated, architecture, buildings, urban, cityscape, modern, illuminated, architecture, buildings, urban, city, lighting, modern,
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- Repetitive output (phrase: "modern, illuminated, architect...")
-- Generation loop (repetitive_tail)
-- Title length violation (11 words; expected 5-10)
-- Description sentence violation (3; expected 1-2)
-- Keyword count violation (146; expected 10-18)
-- Keyword duplication (83% duplicated terms)
-- Low draft improvement
-- Likely capped by max token budget
-
----
-
-<a id="model-mlx-community-gemma-3-27b-it-qat-8bit"></a>
-
-### ⚠️ mlx-community/gemma-3-27b-it-qat-8bit
-
-- _Recommendation:_ use with caveats; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: Cars, Commuting, Walkie Talkie building, GBR,
-  formally; keywords=21; low-draft-improvement
-- _Timing:_ Load 3.84s; Gen 10.07s; Total 14.22s
-- _Throughput:_ Prompt 583 TPS (900 tok); Gen 17.4 TPS (140 tok)
-- _Tokens:_ prompt 900 tok; estimated text 517 tok; estimated non-text 383
-  tok; generated 140 tok; requested max 500 tok; stop reason completed
-
-<details>
-<summary>Complete generated output: mlx-community/gemma-3-27b-it-qat-8bit</summary>
+<summary>Complete generated output: mlx-community/gemma-3-27b-it-qat-4bit</summary>
 
 ```text
 Title:
-The Fenchurch Building (The Walkie-Talkie), London
+Lifeboat Station, Southend-on-Sea, England, UK
 
 Description:
-The Fenchurch Building, also known as 20 Fenchurch Street, is illuminated at night, viewed from a street level perspective in London, with a dark blue sky overhead. Streetlights cast a warm glow on the pavement and surrounding buildings.
+The Southend-on-Sea lifeboat station is a pale green building with a curved roof, situated on a paved waterfront with a large Ferris wheel visible in the background under a cloudy sky. A flag bearing the RNLI emblem flies above the station entrance, and a brick outbuilding is visible to the left.
 
 Keywords:
-Architecture, Building, Buildings, City, Cityscape, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walkie-Talkie), Urban, Urban landscape, Dark sky, Exterior, Pavement, Street lighting
+Asphalt, British seaside, Cloudy, Essex, Fence, Flag, Lifeboat Station, Modern Architecture, Objects, Overcast, Overcast Sky, Pier, RNLI, Sign, Southend-on-Sea, Thames Estuary, Waterfront, amusement ride, antenna, brickwork, curved roof, grey sky, parking, pale green, paved area
+```
+
+</details>
+
+⚠️ _Quality Warnings:_
+
+- Keyword count violation (25; expected 10-18)
+
+---
+
+<a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
+
+### ✅ mlx-community/GLM-4.6V-Flash-mxfp4
+
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: mlx-community/GLM-4.6V-Flash-mxfp4</summary>
+
+```text
+Title:
+Lifeboat Station, Southend-on-Sea, England
+
+Description:
+A RNLI lifeboat station with a large Ferris wheel visible in the background. The scene is set on a cloudy day at a British seaside location.
+
+Keywords:
+Lifeboat Station, RNLI, Southend-on-Sea, England, UK, Ferris wheel, amusement ride, cloudy weather, waterfront, modern architecture, green garage doors, British seaside, Essex, overcast sky, antenna, flag, sign, parking lot, fence, hotel, waterfront
 ```
 
 </details>
@@ -1684,39 +1192,299 @@ Architecture, Building, Buildings, City, Cityscape, Fenchurch Street, Illuminate
 
 ---
 
-<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
+<a id="model-mlx-community-gemma-3n-e4b-it-bf16"></a>
 
-### ❌ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+### ❌ mlx-community/gemma-3n-E4B-it-bf16
 
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); missing sections: title, description,
-  keywords; missing terms: City, Commuting, GBR, known, formally;
-  text-sanity=numeric_loop
-- _Timing:_ Load 4.82s; Gen 10.72s; Total 15.85s
-- _Throughput:_ Prompt 1,092 TPS (1,956 tok); Gen 59.6 TPS (500 tok)
-- _Tokens:_ prompt 1956 tok; estimated text 517 tok; estimated non-text 1439
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+- _Verdict:_ model_shortcoming | user=avoid
+- _Why:_ missing required sections | irrelevant output smell | missing
+  sections: title, description, keywords
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
-<summary>Complete generated output: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16</summary>
+<summary>Complete generated output: mlx-community/gemma-3n-E4B-it-bf16</summary>
 
 ```text
-Let's tackle this step by step. First, the title needs to be 5-10 words, concrete and factual. The authoritative context gives location as London, England, UK, and the building is The Fenchurch Building (The Walkie-Talkie). So the title should be something like "The Fenchurch Building (The Walkie-Talkie), London, UK" – that's 7 words, fits the requirement.
+## Image Description:
 
-Next, the description. The draft says it's the Walkie-Talkie building at 20 Fenchurch Street. The image is a nightscape of the building, so I need to combine the authoritative context (location, building name) with the visible details (night, illuminated, skyscraper, street elements like lights, cars, bikes). Wait, the draft description is short, but let's make it more detailed but still factual. The image has the building's distinctive curved glass facade, lit up at night, with streetlights, cars, bikes, and the surrounding urban area. So the description should mention the building's name, location, night setting, illuminated facade, and key visible elements like streetlights, vehicles, and urban environment.
+The image shows a lifeboat station in Southend-on-Sea, England, on an overcast day. The station is a low, white building with two large, closed green roller shutter doors. Above the doors, a sign reads "Lifeboats" in blue lettering on a white background, flanked by the RNLI (Royal National Lifeboat Institution) logo. A small, arched window is situated above the sign.
 
-Then keywords. The draft has some, but let's check if they're accurate. The building is a skyscraper, modern, nightscape, cityscape, London, UK, Europe, architecture, illuminated, street, cars, bikes, street signs, urban landscape. Wait, the authoritative context includes GPS, but keywords should be visible or authoritative. Let's make sure they're unique and cover the main points. The building's name is important, so "Fenchurch Building (The Walkie-Talkie)" should be there. Also, "20 Fenchurch Street" is the address, which is authoritative. Let's list them: Architecture, Building, Fenchurch Building (The Walkie-Talkie), 20 Fenchurch Street, London, UK, Europe, Night, Nightscape, Skyscraper, Modern, Illuminated, Cityscape, Urban, Street, Cars, Bikes, Street Signs, Urban Landscape. Wait, but keywords need to be 10-18. Let's count: Architecture, Building, Fenchurch Building (The Walkie-Talk
+To the left of the lifeboat station, a brick building with a metal gate is visible. In the background, a large Ferris wheel stands prominently, suggesting a seaside location. The sky is uniformly grey, indicating cloudy weather. A British flag is flying on a pole attached to the lifeboat station.
+
+The foreground shows a paved area with yellow parking lines. The overall scene conveys a sense of a functional, yet somewhat weathered, maritime facility in a coastal town.
+
+## Visual Details:
+
+* **Main Subject:** A lifeboat station.
+* **Setting:** A coastal area, likely Southend-on-Sea, England.
+* **Weather:** Overcast, grey sky.
+* **Architecture:** A low, white building with green roller shutter doors and an arched window.
+* **Signage:** "Lifeboats" with the RNLI logo.
+* **Background Elements:** A large Ferris wheel, a brick building, a British flag.
+* **Foreground:** Paved area with yellow parking lines.
+* **Overall Impression:** A functional maritime facility in a seaside town on a cloudy day.
 ```
 
 </details>
 
 ⚠️ _Quality Warnings:_
 
-- Text sanity issue (numeric_loop)
-- Generation loop (numeric_loop)
+- Missing sections (title, description, keywords)
+
+---
+
+<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
+
+### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit</summary>
+
+```text
+Title:
+Lifeboat Station, Southend-on-Sea
+
+Description:
+A lifeboat station with a green roller shutter and a sign reading "Lifeboats" in Southend-on-Sea, England, with a Ferris wheel and a multi-storey hotel visible in the background.
+
+Keywords:
+Asphalt, British seaside, Cloudy, Essex, Fence, Flag, Hotel, Lifeboat Station, Modern Architecture, Objects, Overcast, Overcast Sky, Pier, RNLI, Sign, Southend-on-Sea, Thames Estuary, Waterfront, amusement ride, antenna
+```
+
+</details>
+
+⚠️ _Quality Warnings:_
+
+- Keyword count violation (20; expected 10-18)
+- Context echo (42% overlap)
+- Low draft improvement
+
+---
+
+<a id="model-mlx-community-glm-46v-flash-6bit"></a>
+
+### ⚠️ mlx-community/GLM-4.6V-Flash-6bit
+
+- _Verdict:_ clean | user=caveat
+- _Why:_ special token wrapper
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: mlx-community/GLM-4.6V-Flash-6bit</summary>
+
+```text
+<|begin_of_box|>Title:
+Lifeboat Station, Southend-on-Sea, England, UK
+
+Description:
+A RNLI lifeboat station with a large Ferris wheel visible in the background, set against an overcast sky. The station features a curved roofline, large green roller doors, and a blue "Lifeboats" sign with the RNLI emblem.
+
+Keywords:
+Asphalt, British seaside, Cloudy, Essex, Flag, Ferris wheel, Lifeboat Station, Modern Architecture, Overcast, Overcast Sky, RNLI, Sign, Southend-on-Sea, Waterfront, amusement ride<|end_of_box|>
+```
+
+</details>
+
+⚠️ _Quality Warnings:_
+
+- Metadata alignment issue (low_metadata_alignment)
+
+---
+
+<a id="model-mlx-community-pixtral-12b-bf16"></a>
+
+### ✅ mlx-community/pixtral-12b-bf16
+
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: mlx-community/pixtral-12b-bf16</summary>
+
+```text
+Title:
+- Lifeboat Station, Southend-on-Sea
+
+Description:
+- The lifeboat station in Southend-on-Sea, England, features a prominent RNLI sign and is situated near an amusement park with a Ferris wheel and a multi-story hotel.
+
+Keywords:
+- Lifeboat Station, RNLI, Southend-on-Sea, Ferris Wheel, Hotel, Cloudy Sky, Overcast, Flag, Sign, Modern Architecture, Asphalt, Pier, Fence, Amusement Ride, Antenna, British Seaside, Essex, Thames Estuary, Europe, UK
+```
+
+</details>
+
+⚠️ _Quality Warnings:_
+
+- Keyword count violation (20; expected 10-18)
+- Low draft improvement
+
+---
+
+<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
+
+### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: mlx-community/Llama-3.2-11B-Vision-Instruct-8bit</summary>
+
+```text
+**Title:** Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe
+
+**Description:** A modern lifeboat station with a large garage door and a sign reading "Lifeboats" is situated in a parking lot, with a Ferris wheel visible in the background. The building's architecture is characterized by its clean lines and minimal ornamentation, with a focus on functionality.
+
+**Keywords:** Asphalt, British seaside, Cloudy, Fence, Flag, Hotel, Lifeboat Station, Modern Architecture, Objects, Overcast, Overcast Sky, Pier, RNLI, Sign, Southend-on-Sea, Thames Estuary, Waterfront, amusement ride, antenna
+```
+
+</details>
+
+⚠️ _Quality Warnings:_
+
+- Keyword count violation (19; expected 10-18)
+
+---
+
+<a id="model-jqlive-kimi-vl-a3b-thinking-2506-6bit"></a>
+
+### ❌ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
+
+- _Verdict:_ cutoff_degraded | user=avoid
+- _Why:_ thinking trace | reasoning budget exhausted | missing required
+  sections | hit token cap (500)
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: jqlive/Kimi-VL-A3B-Thinking-2506-6bit</summary>
+
+```text
+◁think▷Got it, let's analyze the image step by step. First, the title needs to be 5-10 words, concrete and factual. The authoritative context mentions Southend-on-Sea, England, UK, so that's a key location. The main subject is a lifeboat station with a ferris wheel in the background. So the title could be "Lifeboat Station, Southend-on-Sea, England, UK" or similar.
+
+For the description, we need 1-2 factual sentences combining context and visible details. The lifeboat station building, the ferris wheel (amusement ride), the cloudy sky, the parking lot, the buildings in the background. So something like "A lifeboat station building with green doors and a 'Lifeboats' sign, a Ferris wheel, and buildings under an overcast sky in Southend-on-Sea, England."
+
+Keywords: Need 10-18 unique terms. From the image: Lifeboats, Southend-on-Sea, England, UK, Ferris wheel, cloudy, overcast, building, parking lot, flag, buildings, modern architecture, asphalt, fence, flagpole, satellite dish, antenna, Thames Estuary (from authoritative context). Let's list them: Lifeboats, Southend-on-Sea, England, UK, Ferris wheel, cloudy, overcast, building, parking lot, flag, buildings, modern architecture, asphalt, fence, flagpole, satellite dish, antenna, Thames Estuary, RNLI (from existing keywords but maybe not visible? Wait, the existing keywords had RNLI but maybe not visible. Wait, the image has "Lifeboats" sign, which is RNLI. So include that. Also, the flag is the English flag. So keywords: Lifeboats, Southend-on-Sea, England, UK, Ferris wheel, cloudy, overcast, building, parking lot, flag, buildings, modern architecture, asphalt, fence, flagpole, satellite dish, antenna, Thames Estuary, RNLI.
+
+Wait, check the existing draft keywords: Asphalt, British seaside, Cloudy, Essex, Fence, Flag, Hotel, Lifeboat Station, Modern Architecture, Objects, Overcast, Overcast Sky, Pier, RNLI, Sign, Southend-on-Sea, Thames Estuary, Waterfront, amusement ride, antenna. But the user says to treat the draft as fallible
+```
+
+</details>
+
+⚠️ _Quality Warnings:_
+
+- Metadata alignment issue (low_metadata_alignment)
+- Missing sections (title, description)
+- Keyword count violation (79; expected 10-18)
+- Keyword duplication (52% duplicated terms)
+- Thinking trace incomplete (expected model protocol; opened with ◁think▷)
+- Low draft improvement
+- Likely capped by max token budget
+
+---
+
+<a id="model-mlx-community-kimi-vl-a3b-thinking-8bit"></a>
+
+### ❌ mlx-community/Kimi-VL-A3B-Thinking-8bit
+
+- _Verdict:_ cutoff_degraded | user=avoid
+- _Why:_ thinking trace | reasoning budget exhausted | missing required
+  sections | hit token cap (500)
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: mlx-community/Kimi-VL-A3B-Thinking-8bit</summary>
+
+```text
+◁think▷Okay, let's tackle this metadata cataloguing task. First, I need to analyze the image and extract the metadata based on what's visible and the provided authoritative context. The user wants me to focus on visible details only, using the context where necessary but not inferring anything not clearly shown.
+
+Starting with the title. The existing draft title is "Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe". The image shows a lifeboat station building with a Ferris wheel in the background. The location is Southend-on-Sea, which matches the draft. The Ferris wheel might be part of an amusement area, but the image doesn't clearly show if it's a Ferris wheel or another type of ride. Since the draft includes "amusement ride" in keywords, maybe it's safe to include that. The title should be concise, so "Lifeboat Station, Southend-on-Sea, England, UK" seems accurate. The GBR and Europe tags are part of the authoritative context, so include them as they are part of the context, not inferred.
+
+Next, the description. The existing draft mentions a lifeboats station with a Ferris wheel in the background. The image confirms the lifeboat station, and the Ferris wheel is visible. The flag on the building is Union Jack, which is part of the authoritative context. The building has green garage doors and a sign. The sky is overcast, so "overcast" should be included. The Ferris wheel is a distinctive feature, so "Ferris wheel" is visible. The parking area with yellow lines is also visible. The description should combine these elements: "A lifeboat station with green garage doors and a Union Jack flag, situated in Southend-on-Sea, England, under an overcast sky, with a Ferris wheel visible in the background."
+
+For keywords, the existing ones include Lifeboat Station, Southend-on-Sea, Thames Estuary, Waterfront, etc. The Ferris wheel is visible, so add "Ferris wheel". The flag is Union Jack. The building has green garage doors, so "green garage doors". The parking area with yellow lines is visible. The overcast sky is there. The existing keywords include "amusement ride", so maybe "amusement ride" is acceptable even if it's a Ferris wheel. Also, "modern architecture" from the draft. The building's
+```
+
+</details>
+
+⚠️ _Quality Warnings:_
+
+- Output degeneration (incomplete_sentence: ends with 's')
+- Generation loop (degeneration)
+- Missing sections (title, description, keywords)
+- Thinking trace incomplete (expected model protocol; opened with ◁think▷)
+- Low draft improvement
+- Likely capped by max token budget
+
+---
+
+<a id="model-mlx-community-gemma-3-27b-it-qat-8bit"></a>
+
+### ✅ mlx-community/gemma-3-27b-it-qat-8bit
+
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: mlx-community/gemma-3-27b-it-qat-8bit</summary>
+
+```text
+Title:
+Lifeboat Station, Southend-on-Sea, England
+
+Description:
+The Southend-on-Sea lifeboat station, a pale green building with a curved roof, stands on the waterfront with a large Ferris wheel visible in the background under an overcast sky. A flag flies above the station, and a brick building is to the left, with a multi-storey hotel visible to the right.
+
+Keywords:
+Asphalt, British seaside, Cloudy, Essex, Fence, Flag, Ferris wheel, Hotel, Lifeboat Station, Modern Architecture, Overcast, Overcast Sky, Pier, RNLI, Sign, Southend-on-Sea, Thames Estuary, Waterfront, brickwork, curved roof, pale green
+```
+
+</details>
+
+⚠️ _Quality Warnings:_
+
+- Keyword count violation (21; expected 10-18)
+
+---
+
+<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
+
+### ❌ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+
+- _Verdict:_ cutoff_degraded | user=avoid
+- _Why:_ missing required sections | token cap truncation | hit token cap
+  (500) | missing sections: title, description, keywords
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16</summary>
+
+```text
+Let's tackle this step by step. First, the title needs to be 5-10 words, concrete and factual. The authoritative context has Location terms including Southend-on-Sea, England, UK, GBR, Europe. The existing title is "Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe" but that's a bit long. Wait, the rules say to use authoritative context where it improves the record. The main subject is the lifeboat station. Let's make it concise: "Lifeboat Station, Southend-on-Sea, England, UK" – that's 6 words, good.
+
+Next, the description. The existing one is "A lifeboats station with a ferris wheel in the background." But wait, the authoritative context has RNLI (Royal National Lifeboat Institution), which is a key part of the lifeboat station. Also, the image has a ferris wheel (amusement ride), cloudy sky, overcast, the station's building (white, arched roof, green doors?), the RNLI sign? Wait, the draft keywords have RNLI. Let's combine: "A Royal National Lifeboat Institution (RNLI) lifeboat station with a ferris wheel in the background, set against a cloudy sky." Wait, but does the image have the RNLI sign? The existing keywords include RNLI, so maybe it's visible. Also, the setting is a seaside area (Southend-on-Sea is a seaside town). Let's make it more accurate: "A Royal National Lifeboat Institution (RNLI) lifeboat station with a ferris wheel in the background, located in a seaside area under a cloudy sky." Wait, but the rules say to use authoritative context where it improves the record. The authoritative context has RNLI, so including that is good. Also, the existing description mentions the ferris wheel, which is in the image. Let's check the existing description: "A lifeboats station with a ferris wheel in the background." But "lifeboats station" should be "lifeboat station" (singular, as per RNLI's name). So correct that. Also, add the RNLI since it's authoritative context. So description: "A Royal National Lifeboat Institution (RN
+```
+
+</details>
+
+⚠️ _Quality Warnings:_
+
 - Missing sections (title, description, keywords)
 - Low draft improvement
 - Likely capped by max token budget
@@ -1727,64 +1495,58 @@ Then keywords. The draft has some, but let's check if they're accurate. The buil
 
 ### ❌ mlx-community/paligemma2-3b-pt-896-4bit
 
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); missing sections: title, description,
-  keywords; missing terms: Architecture, Building, Buildings, Cars, City;
-  excessive bullets=42
-- _Timing:_ Load 1.72s; Gen 13.75s; Total 15.79s
-- _Throughput:_ Prompt 3,893 TPS (4,724 tok); Gen 42.4 TPS (500 tok)
-- _Tokens:_ prompt 4724 tok; estimated text 517 tok; estimated non-text 4207
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+- _Verdict:_ cutoff_degraded | user=avoid
+- _Why:_ text repetition | missing required sections | token cap truncation |
+  hit token cap (500)
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
 <summary>Complete generated output: mlx-community/paligemma2-3b-pt-896-4bit</summary>
 
 ```text
-- Do not output the description text after the label.
 - Do not output the title text after the label.
 - Do not output the description text after the label.
-- Do not output the title text after the label.
 - Do not output the description text after the label.
-- Do not output the title text after the label.
 - Do not output the description text after the label.
-- Do not output the title text after the label.
 - Do not output the description text after the label.
-- Do not output the title text after the label.
 - Do not output the description text after the label.
-- Do not output the title text after the label.
 - Do not output the description text after the label.
-- Do not output the title text after the label.
 - Do not output the description text after the label.
-- Do not output the title text after the label.
 - Do not output the description text after the label.
-- Do not output the title text after the label.
 - Do not output the description text after the label.
-- Do not output the title text after the label.
 - Do not output the description text after the label.
-- Do not output the title text after the label.
 - Do not output the description text after the label.
-- Do not output the title text after the label.
 - Do not output the description text after the label.
-- Do not output the title text after the label.
 - Do not output the description text after the label.
-- Do not output the title text after the label.
 - Do not output the description text after the label.
-- Do not output the title text after the label.
 - Do not output the description text after the label.
-- Do not output the title text after the label.
 - Do not output the description text after the label.
-- Do not output the title text after the label.
 - Do not output the description text after the label.
-- Do not output the title text after the label.
 - Do not output the description text after the label.
-- Do not output the title text after the label.
 - Do not output the description text after the label.
-- Do not output the title text after the label.
 - Do not output the description text after the label.
-- Do not output the title text after
+- Do not output the description text after the label.
+- Do not output the description text after the label.
+- Do not output the description text after the label.
+- Do not output the description text after the label.
+- Do not output the description text after the label.
+- Do not output the description text after the label.
+- Do not output the description text after the label.
+- Do not output the description text after the label.
+- Do not output the description text after the label.
+- Do not output the description text after the label.
+- Do not output the description text after the label.
+- Do not output the description text after the label.
+- Do not output the description text after the label.
+- Do not output the description text after the label.
+- Do not output the description text after the label.
+- Do not output the description text after the label.
+- Do not output the description text after the label.
+- Do not output the description text after the label.
+- Do not output the description text after the label.
+- Do not output the description text after the label.
+- Do not output the description text after
 ```
 
 </details>
@@ -1793,52 +1555,12 @@ Then keywords. The draft has some, but let's check if they're accurate. The buil
 
 - Repetitive output (phrase: "- do not output...")
 - Excessive bullet points (42)
-- Context ignored (missing: Architecture, Building, Buildings, Cars, City)
+- No overlap with supplied context indicators
 - Generation loop (repetitive_tail)
 - Metadata alignment issue (low_metadata_alignment)
 - Missing sections (title, description, keywords)
 - Low draft improvement
 - Likely capped by max token budget
-- Ignores trusted hints
-
----
-
-<a id="model-mlx-community-qwen3-vl-2b-thinking-bf16"></a>
-
-### ⚠️ mlx-community/Qwen3-VL-2B-Thinking-bf16
-
-- _Recommendation:_ use with caveats; review verdict: context budget
-- _Owner:_ likely owner `mlx`; harness signal `long_context`
-- _Next step:_ Run a controlled reduced-image or lower-visual-token comparison
-  before assigning the context-boundary behaviour to mlx, mlx-vlm, or the
-  model.
-- _Key signals:_ Output appears truncated to about 9 tokens.; At mixed burden
-  (16844 tokens), output stayed unusually short (9 tokens; ratio 0.1%; weak
-  text signal truncated).; output/prompt=0.05%; mixed burden=97%
-- _Timing:_ Load 0.73s; Gen 14.30s; Total 15.34s
-- _Throughput:_ Prompt 1,252 TPS (16,844 tok); Gen 103 TPS (9 tok)
-- _Tokens:_ prompt 16844 tok; estimated text 517 tok; estimated non-text 16327
-  tok; generated 9 tok; requested max 500 tok; stop reason completed
-
-<details>
-<summary>Complete generated output: mlx-community/Qwen3-VL-2B-Thinking-bf16</summary>
-
-```text
- 1000000
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:context_budget
-- ⚠️HARNESS:long_context
-- Context ignored (missing: Architecture, Building, Buildings, Cars, City)
-- Metadata alignment issue (low_metadata_alignment)
-- Low draft improvement
-- Ignores trusted hints
-- output:truncated(9tok)
-- long_context_low_ratio(0.1%;16844->9;truncated)
 
 ---
 
@@ -1846,43 +1568,37 @@ Then keywords. The draft has some, but let's check if they're accurate. The buil
 
 ### ❌ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
 
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); missing sections: title, keywords;
-  missing terms: Architecture, Cars, City, Commuting, Modern; reasoning leak
-- _Timing:_ Load 1.66s; Gen 14.42s; Total 16.39s
-- _Throughput:_ Prompt 1,557 TPS (3,524 tok); Gen 42.7 TPS (500 tok)
-- _Tokens:_ prompt 3524 tok; estimated text 517 tok; estimated non-text 3007
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+- _Verdict:_ cutoff_degraded | user=avoid
+- _Why:_ missing required sections | token cap truncation | hit token cap
+  (500) | missing sections: description, keywords
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
 <summary>Complete generated output: mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX</summary>
 
 ```text
 Here are my reasoning steps:
-We need to produce a catalog record with three sections: Title, Description, Keywords. The image is a nighttime cityscape of a tall skyscraper, likely the Walkie Talkie building (20 Fenchurch Street) in London. The authoritative context includes location terms: England, Europe, UK, district, United Kingdom. Capture date/time: 2026-07-18 22:55:39 BST. GPS: 51.511300°N, 0.083400°W. The draft metadata includes title: "The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe". Description: "Walkie Talkie building known formally as 20 Fenchurch Street." Keywords: many.
+We need to produce a catalog record with three sections: Title, Description, Keywords. The title: 5-10 words, concrete and factual; can use authoritative context to supply identity and location. The existing title is "Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe". That's too many words (maybe 9 words? Let's count: Lifeboat (1) Station, (2) Southend-on-Sea, (3) England, (4) UK, (5) GBR, (6) Europe (7). That's 7 words, but includes many location terms. The instruction says 5-10 words, concrete and factual; we can keep "Lifeboat Station, Southend-on-Sea, England". That's 5 words? Let's count: Lifeboat (1) Station, (2) Southend-on-Sea, (3) England (4). Actually "Lifeboat Station, Southend-on-Sea, England" is 4 words? Let's count: "Lifeboat" (1), "Station," (2), "Southend-on-Sea," (3), "England" (4). That's 4 words, but we need 5-10 words. Could add "UK". So "Lifeboat Station, Southend-on-Sea, England, UK". That's 5 words? Count: Lifeboat (1), Station, (2), Southend-on-Sea, (3), England, (4), UK (5). Yes 5 words. That's fine.
 
-We need to produce a title of 5-10 words, concrete and factual; can use authoritative context. Title should be something like "20 Fenchurch Street (Walkie‑Talkie), London, England". That's 7 words? Let's count: "20" (1), "Fenchurch" (2), "Street" (3), "(Walkie‑Talkie)," (4), "London," (5), "England" (6). That's 6 words. That's within 5-10. Or "The Walkie‑Talkie, 20 Fenchurch Street, London". That's 8 words. Let's decide.
+But we need to ensure we don't repeat or paraphrase instructions. Title should be just the title text after the label. So we output:
 
-Description: 1-2 factual sentences combining supplied authoritative context with main visible subject, setting, lighting, action, distinctive visible details. So we need to mention that the image shows the Walkie Talkie building at night, illuminated, with surrounding streets, streetlights, etc. Use authoritative context: location is London, England, UK. Capture date/time: 2026-07-18 22:55:39 BST. But we should not claim that the date/time is visible; we can incorporate it as context. The description should be factual, not speculation. So something like: "The photograph captures 20 Fenchurch Street, the Walkie‑Talkie skyscraper in London, illuminated against a deep blue night sky, with surrounding streets and streetlights visible." That's one sentence. Could add second
+Title:
+Lifeboat Station, Southend-on-Sea, England, UK
+
+Now description: 1-2 factual sentences combining supplied authoritative context with main visible subject, setting, lighting, action, distinctive visible details. Must not claim contextual facts as visually observable. So we can say: "The image shows the RNLI lifeboat station in Southend-on-Sea, England, with a large green garage door and a sign reading 'Lifeboats'. In the background, a Ferris wheel rises above a cloudy sky, and a Union Jack flag flies on the building." That
 ```
 
 </details>
 
 ⚠️ _Quality Warnings:_
 
-- Excessive verbosity
-- Text sanity issue (numeric_loop)
-- Generation loop (numeric_loop)
 - Metadata alignment issue (low_metadata_alignment)
-- Missing sections (title, keywords)
-- Description sentence violation (8; expected 1-2)
+- Missing sections (description, keywords)
+- Title length violation (83 words; expected 5-10)
 - Reasoning leak (here are my reasoning steps)
-- Unverified context copy
+- Low draft improvement
 - Likely capped by max token budget
-- suspicious_precision: 2 overly precise numbers
 
 ---
 
@@ -1890,160 +1606,31 @@ Description: 1-2 factual sentences combining supplied authoritative context with
 
 ### ⚠️ mlx-community/GLM-4.6V-nvfp4
 
-- _Recommendation:_ use with caveats; review verdict: context budget
-- _Owner:_ likely owner `model`
-- _Next step:_ Run a controlled reduced-image or lower-visual-token comparison
-  before assigning the context-boundary behaviour to mlx, mlx-vlm, or the
-  model.
-- _Key signals:_ output/prompt=2.20%; visual input burden=92%; missing
-  sections: title; missing terms: Commuting, known, formally, 20
-- _Timing:_ Load 5.50s; Gen 15.53s; Total 21.40s
-- _Throughput:_ Prompt 569 TPS (6,647 tok); Gen 43.0 TPS (146 tok)
-- _Tokens:_ prompt 6647 tok; estimated text 517 tok; estimated non-text 6130
-  tok; generated 146 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ clean | user=caveat
+- _Why:_ special token wrapper
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
 <summary>Complete generated output: mlx-community/GLM-4.6V-nvfp4</summary>
 
 ```text
 <|begin_of_box|>Title:
-The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe
+Lifeboat Station, Southend-on-Sea, England, UK
 
 Description:
-Nighttime urban street scene featuring the Fenchurch Building (The Walkie-Talkie) skyscraper, with illuminated windows, modern architecture, and a quiet city street with parked bicycles, street signs, and distant moving cars under a dark blue sky.
+A lifeboat station building with a large green roller door, a blue "Lifeboats" sign, and RNLI insignia, set against a cloudy sky with a Ferris wheel and a multi-story hotel visible in the background.
 
 Keywords:
-Architecture, Building, Buildings, Cars, City, Cityscape, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walkie-Talkie), Urban, Urban landscape, Walkie Talkie building<|end_of_box|>
+Asphalt, British seaside, Cloudy, Essex, Fence, Flag, Hotel, Lifeboat Station, Modern Architecture, Objects, Overcast, Overcast Sky, Pier, RNLI, Sign, Southend-on-Sea, Thames Estuary, Waterfront, amusement ride, antenna<|end_of_box|>
 ```
 
 </details>
 
 ⚠️ _Quality Warnings:_
 
-- ⚠️REVIEW:context_budget
-- Missing sections (title)
-- Keyword count violation (19; expected 10-18)
+- Keyword count violation (20; expected 10-18)
 - Low draft improvement
-- Contains unexpected table
-
----
-
-<a id="model-mlx-community-gemma-4-31b-bf16"></a>
-
-### ❌ mlx-community/gemma-4-31b-bf16
-
-- _Recommendation:_ avoid for now; review verdict: model shortcoming
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ missing sections: title, description, keywords; missing
-  terms: Architecture, Cityscape, Commuting, Fenchurch Street, London;
-  low-draft-improvement
-- _Timing:_ Load 7.58s; Gen 16.27s; Total 24.16s
-- _Throughput:_ Prompt 185 TPS (893 tok); Gen 7.5 TPS (82 tok)
-- _Tokens:_ prompt 893 tok; estimated text 517 tok; estimated non-text 376
-  tok; generated 82 tok; requested max 500 tok; stop reason completed
-
-<details>
-<summary>Complete generated output: mlx-community/gemma-4-31b-bf16</summary>
-
-```text
-
-
-Image:
-- The image shows a tall, modern skyscraper with a distinctive curved design, illuminated at night. The building is surrounded by other urban structures, including smaller buildings and streetlights. The scene is set in a city environment, with a street visible in the foreground, featuring parked bicycles and a few cars. The sky is dark, indicating nighttime, and the overall atmosphere is urban and contemporary.
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- Missing sections (title, description, keywords)
-- Low draft improvement
-- Degrades trusted hints
-
----
-
-<a id="model-mlx-community-lfm25-vl-16b-bf16"></a>
-
-### ❌ mlx-community/LFM2.5-VL-1.6B-bf16
-
-- _Recommendation:_ avoid for now; review verdict: model shortcoming
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: formally; keywords=30;
-  unverified-context-copy; low-draft-improvement
-- _Timing:_ Load 1.59s; Gen 18.23s; Total 20.72s
-- _Throughput:_ Prompt 1,083 TPS (890 tok); Gen 18.0 TPS (294 tok)
-- _Tokens:_ prompt 890 tok; estimated text 517 tok; estimated non-text 373
-  tok; generated 294 tok; requested max 500 tok; stop reason completed
-
-<details>
-<summary>Complete generated output: mlx-community/LFM2.5-VL-1.6B-bf16</summary>
-
-```text
-Title:
-- London, England, United Kingdom, 20 Fenchurch Street, The Walkie-Talkie, 20 Fenchurch Street, London, England, United Kingdom, GBR, Europe
-
-Description:
-- The Fenchurch Building (The Walkie-Talkie) is a prominent skyscraper located at 20 Fenchurch Street in London, England, United Kingdom, GBR, Europe. The building is known for its distinctive curved glass façade and is a notable example of modern architecture in the city. The image captures the building at night, with its illuminated windows and sleek design standing out against the dark sky. The surrounding area appears to be a busy urban street, with other buildings and street signs visible. The photo was taken on 2026-07-18 at 22:55:39 BST, providing a clear view of the building's impressive height and sleek design.
-
-Keywords:
-- London, England, United Kingdom, 20 Fenchurch Street, The Walkie-Talkie, London, England, United Kingdom, GBR, Europe, Architecture, Building, Buildings, Cars, City, Cityscape, Commuting, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walkie-Talkie), Urban, Urban landscape, Walkie Talkie building
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- Title length violation (19 words; expected 5-10)
-- Description sentence violation (5; expected 1-2)
-- Keyword count violation (30; expected 10-18)
-- Unverified context copy
-- Low draft improvement
-
----
-
-<a id="model-qwen-qwen3-vl-2b-instruct"></a>
-
-### ❌ Qwen/Qwen3-VL-2B-Instruct
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `mlx`; harness signal `long_context`
-- _Next step:_ Inspect KV/cache behavior, memory pressure, and long-context
-  execution.
-- _Key signals:_ At mixed burden (16842 tokens), output became repetitive.;
-  hit token cap (500); missing sections: title, description, keywords; missing
-  terms: Architecture, Building, Buildings, Cars, City
-- _Timing:_ Load 0.68s; Gen 19.30s; Total 20.26s
-- _Throughput:_ Prompt 1,275 TPS (16,842 tok); Gen 93.3 TPS (500 tok)
-- _Tokens:_ prompt 16842 tok; estimated text 517 tok; estimated non-text 16325
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-<details>
-<summary>Complete generated output: Qwen/Qwen3-VL-2B-Instruct</summary>
-
-```text
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- ⚠️HARNESS:long_context
-- Repetitive output (-)
-- Context ignored (missing: Architecture, Building, Buildings, Cars, City)
-- Output degeneration (character_loop: ' -' repeated)
-- Text sanity issue (gibberish(token_noise))
-- Generation loop (repetitive_tail)
-- Metadata alignment issue (low_metadata_alignment)
-- Missing sections (title, description, keywords)
-- Low draft improvement
-- Likely capped by max token budget
-- Ignores trusted hints
-- long_context_repetition(16842tok)
 
 ---
 
@@ -2051,18 +1638,13 @@ Keywords:
 
 ### ⚠️ mlx-community/X-Reasoner-7B-8bit
 
-- _Recommendation:_ use with caveats; review verdict: context budget
-- _Owner:_ likely owner `mlx`; harness signal `long_context`
-- _Next step:_ Run a controlled reduced-image or lower-visual-token comparison
-  before assigning the context-boundary behaviour to mlx, mlx-vlm, or the
-  model.
-- _Key signals:_ Output appears truncated to about 9 tokens.; At mixed burden
-  (16853 tokens), output stayed unusually short (9 tokens; ratio 0.1%; weak
-  text signal truncated).; output/prompt=0.05%; mixed burden=97%
-- _Timing:_ Load 1.79s; Gen 19.38s; Total 21.48s
-- _Throughput:_ Prompt 911 TPS (16,853 tok); Gen 64.1 TPS (9 tok)
-- _Tokens:_ prompt 16853 tok; estimated text 517 tok; estimated non-text 16336
-  tok; generated 9 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ context_budget | user=caveat
+- _Why:_ Output appears truncated to about 9 tokens. | At mixed burden (16933
+  tokens), output stayed unusually short (9 tokens; ratio 0.1%; weak text
+  signal truncated). | special token wrapper | harness contract
+- _Maintainer:_ issue_ready | owner=mlx | confidence=high
+- _Next action:_ File the retained reproduction evidence with the suspected
+  owner.
 
 <details>
 <summary>Complete generated output: mlx-community/X-Reasoner-7B-8bit</summary>
@@ -2078,191 +1660,101 @@ Keywords:
 
 - ⚠️REVIEW:context_budget
 - ⚠️HARNESS:long_context
-- Context ignored (missing: Architecture, Building, Buildings, Cars, City)
+- No overlap with supplied context indicators
 - Metadata alignment issue (low_metadata_alignment)
 - Low draft improvement
-- Ignores trusted hints
 - output:truncated(9tok)
-- long_context_low_ratio(0.1%;16853->9;truncated)
+- long_context_low_ratio(0.1%;16933->9;truncated)
 
 ---
 
-<a id="model-mlx-community-ministral-3-14b-instruct-2512-mxfp4"></a>
+<a id="model-mlx-community-qwen3-vl-2b-thinking-bf16"></a>
 
-### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
+### ❌ mlx-community/Qwen3-VL-2B-Thinking-bf16
 
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: Cars, City, Commuting, Fenchurch Street,
-  Nightscape
-- _Timing:_ Load 3.45s; Gen 23.44s; Total 28.24s
-- _Throughput:_ Prompt 163 TPS (3,240 tok); Gen 58.0 TPS (122 tok)
-- _Tokens:_ prompt 3240 tok; estimated text 517 tok; estimated non-text 2723
-  tok; generated 122 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ context_budget | user=avoid
+- _Why:_ missing required sections | missing sections: title, description,
+  keywords
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
-<summary>Complete generated output: mlx-community/Ministral-3-14B-Instruct-2512-mxfp4</summary>
+<summary>Complete generated output: mlx-community/Qwen3-VL-2B-Thinking-bf16</summary>
 
 ```text
-**Title:**
-Modern Skyscraper at Dusk, London Urban Street
-
-**Description:**
-A nighttime urban street in London features a distinctive, slanted-glass skyscraper with illuminated interiors, flanked by older buildings. The scene includes empty roads, streetlights, and a few parked vehicles, with a pedestrian bridge connecting adjacent structures.
-
-**Keywords:**
-Skyscraper, night photography, urban street, London, modern architecture, glass facade, illuminated building, streetlights, empty road, pedestrian bridge, cityscape, European urban, dusk lighting, concrete structures, traffic signs
+The image shows a building with a sign that reads "Lifeboats" and a Ferris wheel in the background. The building has a green door and a blue sign with the word "Lifeboats" on it. The Ferris wheel is located to the left of the building, and there is a building with a sign that reads "Palace" in the background. The sky is overcast, and the ground is paved with yellow lines.
 ```
 
 </details>
 
 ⚠️ _Quality Warnings:_
 
-- Metadata alignment issue (low_metadata_alignment)
+- ⚠️REVIEW:context_budget
+- Missing sections (title, description, keywords)
+- Low draft improvement
 
 ---
 
-<a id="model-mlx-community-paligemma2-3b-ft-docci-448-bf16"></a>
+<a id="model-qwen-qwen3-vl-2b-instruct"></a>
 
-### ❌ mlx-community/paligemma2-3b-ft-docci-448-bf16
+### ❌ Qwen/Qwen3-VL-2B-Instruct
 
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); missing sections: title, description,
-  keywords; missing terms: Architecture, Building, Buildings, Cars, City;
-  low-draft-improvement
-- _Timing:_ Load 2.01s; Gen 27.34s; Total 29.66s
-- _Throughput:_ Prompt 3,399 TPS (1,652 tok); Gen 19.0 TPS (500 tok)
-- _Tokens:_ prompt 1652 tok; estimated text 517 tok; estimated non-text 1135
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+- _Verdict:_ cutoff_degraded | user=avoid
+- _Why:_ At mixed burden (16922 tokens), output became repetitive. | harness
+  contract | text repetition | missing required sections
+- _Maintainer:_ issue_ready | owner=mlx | confidence=high
+- _Next action:_ File the retained reproduction evidence with the suspected
+  owner.
 
 <details>
-<summary>Complete generated output: mlx-community/paligemma2-3b-ft-docci-448-bf16</summary>
+<summary>Complete generated output: Qwen/Qwen3-VL-2B-Instruct</summary>
 
 ```text
-- Do not copy-prompt instructions into the Title, Description, or Keywords fields.
-- Do not infer identity, location, event, brand, species, time period, or intent.
-- Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.
-- Do not copy-prompt instructions into the Title, Description, or Keywords fields.
-- Do not infer identity, location, event, brand, species, time period, or intent.
-- Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.
-- Do not copy-prompt instructions into the Title, Description, or Keywords fields.
-- Do not infer identity, location, event, brand, species, time period, or intent.
-- Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.
-- Do not copy-prompt instructions into the Title, Description, or Keywords fields.
-- Do not infer identity, location, event, brand, species, time period, or intent.
-- Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.
-- Do not copy-prompt instructions into the Title, Description, or Keywords fields.
-- Do not infer identity, location, event, brand, species, time period, or intent.
-- Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.
-- Do not copy-prompt instructions into the Title, Description, or Keywords fields.
-- Do not infer identity, location, event, brand, species, time period, or intent.
-- Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.
-- Do not copy-prompt instructions into the Title, Description, or Keywords fields.
-- Do not infer identity, location, event, brand, species, time period, or intent.
-- Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.
-- Do not copy-prompt instructions into the Title, Description, or Keywords fields.
-- Do not infer identity, location, event, brand, species, time period, or intent.
-- Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.
-- Do not copy
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ```
 
 </details>
 
 ⚠️ _Quality Warnings:_
 
-- Context ignored (missing: Architecture, Building, Buildings, Cars, City)
+- ⚠️HARNESS:long_context
+- Repetitive output (-)
+- Output degeneration (character_loop: ' -' repeated)
+- Text sanity issue (gibberish(token_noise))
+- Generation loop (repetitive_tail)
 - Metadata alignment issue (low_metadata_alignment)
 - Missing sections (title, description, keywords)
 - Low draft improvement
 - Likely capped by max token budget
-- Ignores trusted hints
+- long_context_repetition(16922tok)
 
 ---
 
-<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
+<a id="model-meta-llama-llama-32-11b-vision-instruct"></a>
 
-### ⚠️ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+### ❌ meta-llama/Llama-3.2-11B-Vision-Instruct
 
-- _Recommendation:_ use with caveats; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: formally, 20; keywords=20;
-  low-draft-improvement
-- _Timing:_ Load 2.11s; Gen 36.65s; Total 39.33s
-- _Throughput:_ Prompt 31.2 TPS (595 tok); Gen 11.5 TPS (187 tok)
-- _Tokens:_ prompt 595 tok; estimated text 517 tok; estimated non-text 78 tok;
-  generated 187 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ model_shortcoming | user=avoid
+- _Why:_ missing required sections | irrelevant output smell | missing
+  sections: title, description, keywords
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
-<summary>Complete generated output: mlx-community/Llama-3.2-11B-Vision-Instruct-8bit</summary>
+<summary>Complete generated output: meta-llama/Llama-3.2-11B-Vision-Instruct</summary>
 
 ```text
-Title:
-The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe
+Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe
 
-Description:
-The image depicts the Fenchurch Building, also known as the Walkie-Talkie, in London, England, UK, at night. The building is a prominent feature of the city's skyline, with its distinctive curved shape and modern architecture. The surrounding area is well-lit, with streetlights and building lights illuminating the scene. The image captures the urban landscape of London, with the Fenchurch Building standing out as a notable landmark.
-
-Keywords:
-Architecture, Building, Buildings, Cars, City, Cityscape, Commuting, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walkie-Talkie), Urban, Urban landscape, Walkie Talkie building
+A lifeboat station with a modern architectural design, featuring a large garage door and a sign that reads "Lifeboats" in white letters on a blue background, is situated in a parking lot with yellow lines and a brick wall to the left. In the background, a Ferris wheel and a hotel are visible, set against an overcast sky.
 ```
 
 </details>
 
 ⚠️ _Quality Warnings:_
 
-- Title length violation (11 words; expected 5-10)
-- Description sentence violation (4; expected 1-2)
-- Keyword count violation (20; expected 10-18)
+- Missing sections (title, description, keywords)
 - Low draft improvement
-
----
-
-<a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
-
-### ❌ mlx-community/Phi-3.5-vision-instruct-bf16
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ hit token cap (500); missing terms: Cars, Commuting,
-  Fenchurch Street, Nightscape, Street; keyword duplication=83%; repetitive
-  token=phrase: "modern, illuminated, architect..."
-- _Timing:_ Load 0.73s; Gen 47.09s; Total 48.11s
-- _Throughput:_ Prompt 3,538 TPS (1,468 tok); Gen 10.8 TPS (500 tok)
-- _Tokens:_ prompt 1468 tok; estimated text 517 tok; estimated non-text 951
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-<details>
-<summary>Complete generated output: mlx-community/Phi-3.5-vision-instruct-bf16</summary>
-
-```text
-Title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe
-
-Description: The iconic Fenchurch Building, also known as The Walkie-Talkie, stands tall in the heart of London's financial district. Its distinctive curved facade is illuminated against the night sky, creating a striking contrast with the surrounding modern architecture. The building's reflective glass surface mirrors the lights of the city, adding to its imposing presence.
-
-Keywords: Fenchurch Building, The Walkie-Talkie, London, England, UK, GBR, Europe, modern architecture, illuminated, cityscape, skyscraper, urban landscape, night, modern, illuminated, reflective glass, financial district, city lights, urban, architecture, buildings, illumination, nighttime, skyline, modern, urban, city, lighting, modern, illuminated, architecture, buildings, urban, cityscape, modern, illuminated, architecture, buildings, urban, city, lighting, modern, illuminated, architecture, buildings, urban, cityscape, modern, illuminated, architecture, buildings, urban, city, lighting, modern, illuminated, architecture, buildings, urban, cityscape, modern, illuminated, architecture, buildings, urban, city, lighting, modern, illuminated, architecture, buildings, urban, cityscape, modern, illuminated, architecture, buildings, urban, city, lighting, modern, illuminated, architecture, buildings, urban, cityscape, modern, illuminated, architecture, buildings, urban, city, lighting, modern, illuminated, architecture, buildings, urban, cityscape, modern, illuminated, architecture, buildings, urban, city, lighting, modern, illuminated, architecture, buildings, urban, cityscape, modern, illuminated, architecture, buildings, urban, city, lighting, modern, illuminated, architecture, buildings, urban, cityscape, modern, illuminated, architecture, buildings, urban, city, lighting, modern, illuminated, architecture, buildings, urban, cityscape, modern, illuminated, architecture, buildings, urban, city, lighting, modern,
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- Repetitive output (phrase: "modern, illuminated, architect...")
-- Generation loop (repetitive_tail)
-- Title length violation (11 words; expected 5-10)
-- Description sentence violation (3; expected 1-2)
-- Keyword count violation (146; expected 10-18)
-- Keyword duplication (83% duplicated terms)
-- Low draft improvement
-- Likely capped by max token budget
 
 ---
 
@@ -2270,71 +1762,54 @@ Keywords: Fenchurch Building, The Walkie-Talkie, London, England, UK, GBR, Europ
 
 ### ⚠️ mlx-community/Molmo-7B-D-0924-bf16
 
-- _Recommendation:_ use with caveats; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model-quality limitation for this prompt and image.
-- _Key signals:_ keywords=20; low-draft-improvement
-- _Timing:_ Load 2.14s; Gen 51.15s; Total 53.58s
-- _Throughput:_ Prompt 48.1 TPS (1,812 tok); Gen 14.2 TPS (175 tok)
-- _Tokens:_ prompt 1812 tok; estimated text 517 tok; estimated non-text 1295
-  tok; generated 175 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ harness | user=caveat
+- _Why:_ harness contract
+- _Maintainer:_ issue_ready | owner=model-config | confidence=high
+- _Next action:_ File the retained reproduction evidence with the suspected
+  owner.
 
 <details>
 <summary>Complete generated output: mlx-community/Molmo-7B-D-0924-bf16</summary>
 
 ```text
- Never output the prompt again.
 
-Title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe
-
-Description: The iconic Walkie Talkie building, formally known as 20 Fenchurch Street, stands illuminated against the night sky in London's financial district. Its distinctive curved glass facade reflects the surrounding cityscape, while a few cars and pedestrians are visible on the nearby street. The building's unique architecture and prominent location make it a recognizable landmark of the London skyline.
-
-Keywords: Architecture, Building, Buildings, Cars, City, Cityscape, Commuting, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walkie-Talkie), Urban, Urban landscape, Walkie Talkie building
 ```
 
 </details>
 
 ⚠️ _Quality Warnings:_
 
-- Title length violation (11 words; expected 5-10)
-- Description sentence violation (3; expected 1-2)
-- Keyword count violation (20; expected 10-18)
-- Low draft improvement
+- ⚠️HARNESS:prompt_template
+- output:empty(1tok)
 
 ---
 
-<a id="model-mlx-community-qwen35-9b-mlx-4bit"></a>
+<a id="model-mlx-community-molmo-7b-d-0924-8bit"></a>
 
-### ✅ mlx-community/Qwen3.5-9B-MLX-4bit
+### ✅ mlx-community/Molmo-7B-D-0924-8bit
 
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: Cars, Commuting, The Fenchurch Building (The
-  Walkie-Talkie), GBR, formally
-- _Timing:_ Load 1.76s; Gen 56.48s; Total 58.55s
-- _Throughput:_ Prompt 311 TPS (16,872 tok); Gen 92.1 TPS (137 tok)
-- _Tokens:_ prompt 16872 tok; estimated text 517 tok; estimated non-text 16355
-  tok; generated 137 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
-<summary>Complete generated output: mlx-community/Qwen3.5-9B-MLX-4bit</summary>
+<summary>Complete generated output: mlx-community/Molmo-7B-D-0924-8bit</summary>
 
 ```text
-Title:
-The Fenchurch Building, London, UK, Night
+ Do not remove existing terms unless they are clearly contradicted by the image.
+Title: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe
 
-Description:
-The Fenchurch Building, also known as 20 Fenchurch Street, is a modern skyscraper in London, England, visible at night with its distinctive curved glass façade and illuminated upper floors. The surrounding urban streetscape includes streetlights, road signs, parked bicycles, and nearby commercial buildings under a deep blue twilight sky.
+Description: A lifeboats station with a large ferris wheel in the background. The station features two green garage doors with "Lifeboats" written above them. A British flag is visible on the roof. The sky is overcast, and the scene includes a hotel and other buildings in the distance.
 
-Keywords:
-Architecture, Building, Buildings, City, Cityscape, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, Urban, Urban landscape, Walkie Talkie building
+Keywords: Asphalt, British seaside, Cloudy, Essex, Fence, Flag, Hotel, Lifeboat Station, Modern Architecture, Objects, Overcast, Overcast Sky, Pier, Thames Estuary, Waterfront, amusement ride, antenna
 ```
 
 </details>
 
-_Quality Status:_ no quality issues detected in this run
+⚠️ _Quality Warnings:_
+
+- Description sentence violation (4; expected 1-2)
 
 ---
 
@@ -2342,17 +1817,12 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ❌ mlx-community/Qwen3-VL-2B-Instruct-bf16
 
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `mlx`; harness signal `long_context`
-- _Next step:_ Inspect KV/cache behavior, memory pressure, and long-context
-  execution.
-- _Key signals:_ At mixed burden (16842 tokens), output became repetitive.;
-  hit token cap (500); missing sections: title, description, keywords; missing
-  terms: Architecture, Building, Buildings, Cars, City
-- _Timing:_ Load 0.56s; Gen 56.84s; Total 57.68s
-- _Throughput:_ Prompt 332 TPS (16,842 tok); Gen 92.3 TPS (500 tok)
-- _Tokens:_ prompt 16842 tok; estimated text 517 tok; estimated non-text 16325
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+- _Verdict:_ cutoff_degraded | user=avoid
+- _Why:_ At mixed burden (16922 tokens), output became repetitive. | harness
+  contract | text repetition | missing required sections
+- _Maintainer:_ issue_ready | owner=mlx | confidence=high
+- _Next action:_ File the retained reproduction evidence with the suspected
+  owner.
 
 <details>
 <summary>Complete generated output: mlx-community/Qwen3-VL-2B-Instruct-bf16</summary>
@@ -2367,7 +1837,6 @@ _Quality Status:_ no quality issues detected in this run
 
 - ⚠️HARNESS:long_context
 - Repetitive output (-)
-- Context ignored (missing: Architecture, Building, Buildings, Cars, City)
 - Output degeneration (character_loop: ' -' repeated)
 - Text sanity issue (gibberish(token_noise))
 - Generation loop (repetitive_tail)
@@ -2375,8 +1844,133 @@ _Quality Status:_ no quality issues detected in this run
 - Missing sections (title, description, keywords)
 - Low draft improvement
 - Likely capped by max token budget
-- Ignores trusted hints
-- long_context_repetition(16842tok)
+- long_context_repetition(16922tok)
+
+---
+
+<a id="model-mlx-community-molmopoint-8b-fp16"></a>
+
+### ✅ mlx-community/MolmoPoint-8B-fp16
+
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: mlx-community/MolmoPoint-8B-fp16</summary>
+
+```text
+Title:
+Lifeboat Station, Southend-on-Sea, England, UK
+
+Description:
+A lifeboat station with a large white building featuring a curved roof and green garage doors. A ferris wheel is visible in the background, and a flag with a red cross on a white background is flying from a flagpole. The scene is set on a cloudy day with an overcast sky.
+
+Keywords:
+Asphalt, British seaside, Cloudy, Essex, Fence, Flag, Hotel, Lifeboat Station, Modern Architecture, Objects, Overcast, Overcast Sky, Pier, RNLI, Sign, Southend-on-Sea, Thames Estuary, Waterfront, amusement ride, antenna
+```
+
+</details>
+
+⚠️ _Quality Warnings:_
+
+- Description sentence violation (3; expected 1-2)
+- Keyword count violation (20; expected 10-18)
+- Low draft improvement
+
+---
+
+<a id="model-mlx-community-paligemma2-3b-ft-docci-448-bf16"></a>
+
+### ❌ mlx-community/paligemma2-3b-ft-docci-448-bf16
+
+- _Verdict:_ cutoff_degraded | user=avoid
+- _Why:_ text repetition | missing required sections | token cap truncation |
+  hit token cap (500)
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: mlx-community/paligemma2-3b-ft-docci-448-bf16</summary>
+
+```text
+- Do not copy-prompt instructions into the title, description, or keywords fields.
+- Do not infer identity, location, event, brand, or style.
+- Do not infer the text of the image.
+- Do not use the text of the image to create a new image.
+- Do not use the text of the image to create a new description.
+- Do not use the text of the image to create a new brand.
+- Do not use the text of the image to create a new logo.
+- Do not use the text of the image to create a new brand.
+- Do not use the text of the image to create a new logo.
+- Do not use the text of the image to create a new brand.
+- Do not use the text of the image to create a new logo.
+- Do not use the text of the image to create a new brand.
+- Do not use the text of the image to create a new logo.
+- Do not use the text of the image to create a new brand.
+- Do not use the text of the image to create a new logo.
+- Do not use the text of the image to create a new brand.
+- Do not use the text of the image to create a new logo.
+- Do not use the text of the image to create a new brand.
+- Do not use the text of the image to create a new brand.
+- Do not use the text of the image to create a new logo.
+- Do not use the text of the image to create a new brand.
+- Do not use the text of the image to create a new logo.
+- Do not use the text of the image to create a new brand.
+- Do not use the text of the image to create a new logo.
+- Do not use the text of the image to create a new brand.
+- Do not use the text of the image to create a new logo.
+- Do not use the text of the image to create a new brand.
+- Do not use the text of the image to create a new logo.
+- Do not use the text of the image to create a new brand.
+- Do not use the text of the image to create a new brand.
+- Do not use the text of the image to create a new logo.
+- Do not use the text of
+```
+
+</details>
+
+⚠️ _Quality Warnings:_
+
+- Repetitive output (phrase: "the text of the...")
+- Excessive bullet points (32)
+- No overlap with supplied context indicators
+- Output degeneration (incomplete_sentence: ends with 'of')
+- Generation loop (repetitive_tail)
+- Metadata alignment issue (low_metadata_alignment)
+- Missing sections (title, description, keywords)
+- Low draft improvement
+- Likely capped by max token budget
+
+---
+
+<a id="model-mlx-community-ornith-10-35b-bf16"></a>
+
+### ✅ mlx-community/Ornith-1.0-35B-bf16
+
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: mlx-community/Ornith-1.0-35B-bf16</summary>
+
+```text
+Title:
+- RNLI Lifeboat Station with Ferris Wheel and Hotel
+
+Description:
+- A white RNLI lifeboat station with green roller doors stands in the foreground under an overcast sky, with a large white Ferris wheel visible to the left and a multi-storey hotel building to the right.
+
+Keywords:
+- Lifeboat Station, RNLI, Ferris Wheel, Hotel, Southend-on-Sea, England, UK, Overcast, Cloudy Sky, Green Doors, Sign, Flag, Antenna, Parking, Asphalt, Waterfront, Architecture, Seaside
+```
+
+</details>
+
+_Quality Status:_ no quality issues detected in this run
 
 ---
 
@@ -2384,29 +1978,20 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/Qwen3.5-35B-A3B-4bit
 
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: Cars, City, Commuting, Fenchurch Street,
-  Nightscape
-- _Timing:_ Load 2.85s; Gen 60.26s; Total 63.41s
-- _Throughput:_ Prompt 290 TPS (16,872 tok); Gen 107 TPS (133 tok)
-- _Tokens:_ prompt 16872 tok; estimated text 517 tok; estimated non-text 16355
-  tok; generated 133 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
 <summary>Complete generated output: mlx-community/Qwen3.5-35B-A3B-4bit</summary>
 
 ```text
-Title:
-The Fenchurch Building at night in London
+Title: RNLI Lifeboat Station Southend-on-Sea
 
-Description:
-The Fenchurch Building, also known as the Walkie-Talkie, dominates the evening skyline of London, England, with its distinctive curved glass facade reflecting the deep blue twilight. The street level is illuminated by warm streetlights and interior office lights, highlighting the entrance and surrounding urban infrastructure.
+Description: A lifeboat station with closed green roller shutters and an RNLI sign stands in Southend-on-Sea, England, with a large Ferris wheel and hotel buildings visible in the background under an overcast sky.
 
-Keywords:
-The Fenchurch Building, Walkie-Talkie, London, England, UK, Europe, Night, Skyscraper, Glass facade, Street lights, Urban landscape, Architecture, Cityscape, Blue sky, Office lights, Street level, Modern design, Metropolitan
+Keywords: RNLI, Lifeboat Station, Southend-on-Sea, England, UK, Ferris Wheel, Hotel, Green Shutters, Overcast Sky, Cloudy, Waterfront, Amusement Ride, Architecture, Sign, Flag, Antenna, Parking, Asphalt
 ```
 
 </details>
@@ -2419,34 +2004,62 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/Qwen3.5-35B-A3B-6bit
 
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: Cars, Cityscape, Commuting, Modern, The
-  Fenchurch Building (The Walkie-Talkie)
-- _Timing:_ Load 3.62s; Gen 62.11s; Total 66.04s
-- _Throughput:_ Prompt 282 TPS (16,872 tok); Gen 91.2 TPS (132 tok)
-- _Tokens:_ prompt 16872 tok; estimated text 517 tok; estimated non-text 16355
-  tok; generated 132 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
 <summary>Complete generated output: mlx-community/Qwen3.5-35B-A3B-6bit</summary>
 
 ```text
 Title:
-The Fenchurch Building at night in London
+RNLI Lifeboat Station Southend-on-Sea England
 
 Description:
-The Fenchurch Building, also known as the Walkie-Talkie, stands prominently in the City of London against a deep blue evening sky. The street level scene features illuminated shop fronts, parked bicycles, and road signage on a quiet urban thoroughfare.
+A white RNLI lifeboat station with large green roller doors stands in the foreground under an overcast sky, with a large Ferris wheel visible to the left and a multi-storey hotel building in the background.
 
 Keywords:
-The Fenchurch Building, Walkie-Talkie, 20 Fenchurch Street, London, City of London, England, UK, Europe, Night, Nightscape, Skyscraper, Architecture, Street, Street signs, Bicycles, Illuminated, Urban, Blue sky
+RNLI, Lifeboat Station, Southend-on-Sea, England, UK, Europe, Ferris Wheel, Hotel, Overcast Sky, Green Doors, White Building, Asphalt, Parking, Barbed Wire, Flag, Antenna, Seaside, Architecture
 ```
 
 </details>
 
 _Quality Status:_ no quality issues detected in this run
+
+---
+
+<a id="model-mlx-community-qwen35-9b-mlx-4bit"></a>
+
+### ✅ mlx-community/Qwen3.5-9B-MLX-4bit
+
+- _Verdict:_ context_budget | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: mlx-community/Qwen3.5-9B-MLX-4bit</summary>
+
+```text
+Title:
+RNLI Lifeboat Station, Southend-on-Sea, UK
+
+Description:
+A modern RNLI lifeboat station with green roller shutter doors and a curved white roof, situated in a paved forecourt under an overcast sky, with a large Ferris wheel and a multi-storey hotel visible in the background.
+
+Keywords:
+RNLI, Lifeboat Station, Southend-on-Sea, UK, Roller Shutter, Green Doors, White Roof, Curved Roof, Overcast Sky, Cloudy, Ferris Wheel, Amusement Ride, Hotel, Palace, Brick Wall, Fence, Barbed Wire, Antenna, Satellite Dish, Flag, Paved Forecourt, Parking Markings, Modern Architecture, Coastguard, Emergency Services, Waterfront, England, Europe, GBR, 2026-07-18
+```
+
+</details>
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:context_budget
+- Metadata alignment issue (low_metadata_alignment)
+- Keyword count violation (30; expected 10-18)
+- Unverified context copy
 
 ---
 
@@ -2454,29 +2067,18 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/Qwen3.5-35B-A3B-bf16
 
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: Cars, City, Commuting, Modern, The Fenchurch
-  Building (The Walkie-Talkie)
-- _Timing:_ Load 10.71s; Gen 67.45s; Total 78.47s
-- _Throughput:_ Prompt 261 TPS (16,872 tok); Gen 65.8 TPS (131 tok)
-- _Tokens:_ prompt 16872 tok; estimated text 517 tok; estimated non-text 16355
-  tok; generated 131 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
 <summary>Complete generated output: mlx-community/Qwen3.5-35B-A3B-bf16</summary>
 
 ```text
-Title:
-The Fenchurch Building at night in London
-
-Description:
-The Fenchurch Building, located at 20 Fenchurch Street in London, England, is captured at night with its distinctive curved glass façade reflecting the deep blue sky. Street-level details include illuminated shop fronts, parked bicycles, and traffic signage on the wet pavement.
-
-Keywords:
-The Fenchurch Building, 20 Fenchurch Street, London, England, UK, Europe, Night, Nightscape, Skyscraper, Architecture, Glass façade, Street, Urban, Cityscape, Street signs, Bicycles, Wet pavement, Blue sky
+Title: RNLI Lifeboat Station Southend-on-Sea England
+Description: A white RNLI lifeboat station with closed green roller shutters stands in the foreground under an overcast sky, with a large Ferris wheel and the Palace Hotel visible in the background.
+Keywords: RNLI, Lifeboats, Southend-on-Sea, England, UK, Europe, Ferris wheel, Palace Hotel, Amusement ride, Green shutters, Overcast sky, Cloudy, Waterfront, Seaside, Asphalt, Parking, Barbed wire, Antenna
 ```
 
 </details>
@@ -2485,37 +2087,76 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-qwen35-27b-4bit"></a>
+<a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
 
-### ✅ mlx-community/Qwen3.5-27B-4bit
+### ❌ mlx-community/Qwen2-VL-2B-Instruct-4bit
 
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: Building, Buildings, Cars, City, Commuting
-- _Timing:_ Load 2.33s; Gen 72.35s; Total 75.00s
-- _Throughput:_ Prompt 251 TPS (16,872 tok); Gen 30.7 TPS (136 tok)
-- _Tokens:_ prompt 16872 tok; estimated text 517 tok; estimated non-text 16355
-  tok; generated 136 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ cutoff_degraded | user=avoid
+- _Why:_ At mixed burden (16933 tokens), output became repetitive. | harness
+  contract | text repetition | missing required sections
+- _Maintainer:_ issue_ready | owner=mlx | confidence=high
+- _Next action:_ File the retained reproduction evidence with the suspected
+  owner.
 
 <details>
-<summary>Complete generated output: mlx-community/Qwen3.5-27B-4bit</summary>
+<summary>Complete generated output: mlx-community/Qwen2-VL-2B-Instruct-4bit</summary>
 
 ```text
-Title:
-20 Fenchurch Street, London, England, UK, Europe
-
-Description:
-A low-angle night view of the 20 Fenchurch Street skyscraper, known as the Walkie-Talkie, dominating the frame against a deep blue sky. The street below is illuminated by streetlights and vehicle headlights, with green rental bicycles parked on the pavement to the left.
-
-Keywords:
-20 Fenchurch Street, Architecture, Blue hour, Cityscape, England, London, Modern, Night, Skyscraper, Street, Urban, United Kingdom, Walkie-Talkie, Windows, Glass, Facade, Nighttime, Europe
+-001.jpg
+- 17:57:06 BST
+- 50.81744°N, 0.13454°W
+- 17:57:06 BST: The image is taken at 17:57:06 BST. The time is in the 17:57:06 format, which is the time in the BST (British Standard Time) zone. The time is in the 17:57:06 format, which is the time in the BST (British Standard Time) zone. The time is in the 17:57:06 format, which is the time in the BST (British Standard Time) zone. The time is in the 17:57:06 format, which is the time in the BST (British Standard Time) zone. The time is in the 17:57:06 format, which is the time in the BST (British Standard Time) zone. The time is in the 17:57:06 format, which is the time in the BST (British Standard Time) zone. The time is in the 17:57:06 format, which is the time in the BST (British Standard Time) zone. The time is in the 17:57:06 format, which is the time in the BST (British Standard Time) zone. The time is in the 17:57:06 format, which is the time in the BST (British Standard Time) zone. The time is in the 17:57:06 format, which is the time in the BST (British Standard Time) zone. The time is in the 17:57:06 format, which is the time in the BST (British Standard Time) zone. The time is in the 17:57:06 format, which is the time in the BST (British Standard Time) zone. The time is in the 17:57:06 format, which is the time in the BST (British Standard Time) zone. The time is in the 17:57:06 format, which is the time in the BST (British Standard Time) zone. The time is in the 17:5
 ```
 
 </details>
 
-_Quality Status:_ no quality issues detected in this run
+⚠️ _Quality Warnings:_
+
+- ⚠️HARNESS:long_context
+- Repetitive output (phrase: "the time is in...")
+- No overlap with supplied context indicators
+- Generation loop (repetitive_tail)
+- Metadata alignment issue (low_metadata_alignment)
+- Missing sections (title, description, keywords)
+- Unverified context copy
+- Low draft improvement
+- Likely capped by max token budget
+- suspicious_precision: 2 overly precise numbers
+- long_context_repetition(16933tok)
+
+---
+
+<a id="model-mlx-community-gemma-4-31b-bf16"></a>
+
+### ❌ mlx-community/gemma-4-31b-bf16
+
+- _Verdict:_ cutoff_degraded | user=avoid
+- _Why:_ text repetition | missing required sections | token cap truncation |
+  hit token cap (500)
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: mlx-community/gemma-4-31b-bf16</summary>
+
+```text
+
+
+Image:
+- A lifeboat station with a ferris wheel in the background.
+- The image shows a lifeboat station with a ferris wheel in the background. The lifeboat station is a modern building with a curved roof and large green doors. The ferris wheel is a large, colorful structure with many cabins. The sky is overcast, and the ground is covered with asphalt. There is a fence and a flag in the foreground. The image is taken from a low angle, and the perspective is slightly distorted. The colors are muted, and the lighting is flat. The composition is balanced, with the lifeboat station and ferris wheel on either side of the frame. The image is a photograph, and the style is realistic. The image is a good example of a modern lifeboat station and a ferris wheel in a seaside town. The image is a good example of a modern lifeboat station and a ferris wheel in a seaside town. The image is a good example of a modern lifeboat station and a ferris wheel in a seaside town. The image is a good example of a modern lifeboat station and a ferris wheel in a seaside town. The image is a good example of a modern lifeboat station and a ferris wheel in a seaside town. The image is a good example of a modern lifeboat station and a ferris wheel in a seaside town. The image is a good example of a modern lifeboat station and a ferris wheel in a seaside town. The image is a good example of a modern lifeboat station and a ferris wheel in a seaside town. The image is a good example of a modern lifeboat station and a ferris wheel in a seaside town. The image is a good example of a modern lifeboat station and a ferris wheel in a seaside town. The image is a good example of a modern lifeboat station and a ferris wheel in a seaside town. The image is a good example of a modern lifeboat station and a ferris wheel in a seaside town. The image is a good example of a modern lifeboat station and a ferris wheel in a seaside town. The image is a good example of a modern lifeboat station and a ferris wheel in a seaside town. The image is a good example of a modern lifeboat station and a ferris wheel in a seaside town. The image is a good example of a modern lifeboat station and a ferris wheel in a seaside town. The image is a good example of a modern lifeboat station and a ferris wheel in
+```
+
+</details>
+
+⚠️ _Quality Warnings:_
+
+- Repetitive output (phrase: "a ferris wheel in...")
+- Output degeneration (incomplete_sentence: ends with 'in')
+- Generation loop (repetitive_tail)
+- Missing sections (title, description, keywords)
+- Low draft improvement
+- Likely capped by max token budget
 
 ---
 
@@ -2523,29 +2164,23 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/Qwen3.5-27B-mxfp8
 
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: Cars, City, Commuting, Street signs, The
-  Fenchurch Building (The Walkie-Talkie)
-- _Timing:_ Load 3.52s; Gen 76.36s; Total 80.20s
-- _Throughput:_ Prompt 249 TPS (16,872 tok); Gen 18.3 TPS (141 tok)
-- _Tokens:_ prompt 16872 tok; estimated text 517 tok; estimated non-text 16355
-  tok; generated 141 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
 <summary>Complete generated output: mlx-community/Qwen3.5-27B-mxfp8</summary>
 
 ```text
 Title:
-The Walkie-Talkie Building, London, England, UK
+RNLI Lifeboat Station, Southend-on-Sea, England
 
 Description:
-A low-angle night view captures the distinctive curved glass facade of 20 Fenchurch Street, known as The Walkie-Talkie, towering over a quiet London street. The scene is illuminated by warm streetlights and scattered office windows, with a few parked bicycles and a distant vehicle visible on the wet pavement below.
+A modern white lifeboat station building with two large green roller doors stands under an overcast sky, featuring a blue "Lifeboats" sign with the RNLI logo. In the background, a large white Ferris wheel is visible to the left, while a multi-story cream building labeled "Palace" stands to the right, with barbed wire fencing lining the perimeter walls.
 
 Keywords:
-Architecture, Building, Cityscape, England, Europe, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, The Walkie-Talkie, Urban, United Kingdom, Walkie Talkie building
+RNLI, Lifeboat Station, Southend-on-Sea, England, Roller Doors, Ferris Wheel, Overcast Sky, Palace Hotel, Barbed Wire, Coastal Architecture, Green Shutters, Cloudy, UK, Seaside, Modern Building, Flag, Antenna, Asphalt
 ```
 
 </details>
@@ -2558,29 +2193,54 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/Qwen3.6-27B-mxfp8
 
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: Cars, City, Commuting, Street signs, The
-  Fenchurch Building (The Walkie-Talkie)
-- _Timing:_ Load 3.53s; Gen 86.59s; Total 90.46s
-- _Throughput:_ Prompt 217 TPS (16,872 tok); Gen 17.7 TPS (144 tok)
-- _Tokens:_ prompt 16872 tok; estimated text 517 tok; estimated non-text 16355
-  tok; generated 144 tok; requested max 500 tok; stop reason completed
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
 <summary>Complete generated output: mlx-community/Qwen3.6-27B-mxfp8</summary>
 
 ```text
 Title:
-20 Fenchurch Street, London, England, UK, Europe
+RNLI Lifeboat Station, Southend-on-Sea, England
 
 Description:
-A low-angle night view of 20 Fenchurch Street, known as the Walkie-Talkie, towering over a quiet urban street in London. The scene is illuminated by streetlights and the building's internal lights, with a row of green rental bicycles parked on the sidewalk in the foreground.
+A white RNLI lifeboat station building with green roller doors stands in the foreground, featuring a blue sign and a flag on the roof. In the background, a large Ferris wheel and a multi-story hotel building are visible under an overcast sky.
 
 Keywords:
-20 Fenchurch Street, Architecture, Bicycle, Cityscape, England, Europe, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, The Fenchurch Building, Urban, United Kingdom, Walkie-Talkie
+Lifeboat Station, RNLI, Southend-on-Sea, England, UK, Europe, Ferris wheel, Hotel, Overcast, Cloudy, Green, White, Architecture, Seaside, Flag, Roller door, Parking, Fence, Brick wall
+```
+
+</details>
+
+⚠️ _Quality Warnings:_
+
+- Keyword count violation (19; expected 10-18)
+
+---
+
+<a id="model-mlx-community-qwen35-27b-4bit"></a>
+
+### ✅ mlx-community/Qwen3.5-27B-4bit
+
+- _Verdict:_ clean | user=recommended
+- _Why:_ no flagged signals
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
+
+<details>
+<summary>Complete generated output: mlx-community/Qwen3.5-27B-4bit</summary>
+
+```text
+Title:
+RNLI Lifeboat Station, Southend-on-Sea, Essex, England
+
+Description:
+A modern white RNLI lifeboat station with two large green roller shutter doors stands in the foreground, featuring a blue sign with the organisation's logo. In the background, a large white Ferris wheel and a multi-story hotel building are visible against a cloudy, overcast sky.
+
+Keywords:
+RNLI, Lifeboat Station, Southend-on-Sea, Ferris wheel, Roller shutter, Hotel, Overcast sky, Modern architecture, Flag, Antenna, Parking bay, Brick wall, Barbed wire, Coastal, England, Europe, Amusement ride, Cloudy
 ```
 
 </details>
@@ -2589,160 +2249,35 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-molmopoint-8b-fp16"></a>
-
-### ⚠️ mlx-community/MolmoPoint-8B-fp16
-
-- _Recommendation:_ use with caveats; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: formally; keywords=20; low-draft-improvement
-- _Timing:_ Load 2.76s; Gen 88.14s; Total 91.20s
-- _Throughput:_ Prompt 1,330 TPS (3,440 tok); Gen 1.83 TPS (155 tok)
-- _Tokens:_ prompt 3440 tok; estimated text 517 tok; estimated non-text 2923
-  tok; generated 155 tok; requested max 500 tok; stop reason completed
-
-<details>
-<summary>Complete generated output: mlx-community/MolmoPoint-8B-fp16</summary>
-
-```text
-Title:
-- 20 Fenchurch Street, London, England, UK, GBR, Europe
-
-Description:
-- 20 Fenchurch Street, also known as The Walkie-Talkie, is a distinctive skyscraper in London, England, UK, captured at night. The image shows the building's unique curved glass facade reflecting the dark blue sky, with illuminated windows and streetlights visible in the foreground.
-
-Keywords:
-- Architecture, Building, Buildings, Cars, City, Cityscape, Commuting, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walkie-Talkie), Urban, Urban landscape, Walkie Talkie building
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- Keyword count violation (20; expected 10-18)
-- Low draft improvement
-
----
-
 <a id="model-mlx-community-kimi-vl-a3b-thinking-2506-bf16"></a>
 
 ### ❌ mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
 
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; the requested
-  output contract is not being met.
-- _Key signals:_ hit token cap (500); missing sections: title, description,
-  keywords; missing terms: known, formally, 20; thinking trace incomplete
-- _Timing:_ Load 3.29s; Gen 108.75s; Total 112.35s
-- _Throughput:_ Prompt 1,101 TPS (1,623 tok); Gen 4.69 TPS (500 tok)
-- _Tokens:_ prompt 1623 tok; estimated text 517 tok; estimated non-text 1106
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
+- _Verdict:_ cutoff_degraded | user=avoid
+- _Why:_ thinking trace | reasoning budget exhausted | text repetition | hit
+  token cap (500)
+- _Maintainer:_ not_applicable | owner=unknown | confidence=low
+- _Next action:_ No maintainer issue action is indicated by this run.
 
 <details>
 <summary>Complete generated output: mlx-community/Kimi-VL-A3B-Thinking-2506-bf16</summary>
 
 ```text
-◁think▷Okay, let's tackle this. First, I need to analyze the image and create a catalog record following the given instructions. The image shows a tall, modern skyscraper at night, which is the Walkie-Talkie building in London, England. The scene is urban, with streetlights, buildings, and a dark blue sky. The building has a distinctive curved top and illuminated windows.
+◁think▷Okay, let's tackle this. First, I need to analyze the image and create a catalog record with the specified sections: Title, Description, and Keywords. The user wants it in British English, so I should use terms like "Lifeboats" instead of "Lifeboat" and "Pier" instead of "Pier" if needed.
 
-For the title, I should keep it concise and factual. The existing draft title is "The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe". That seems accurate.
-
-Next, the description needs to combine the authoritative context with visible details. The building is the main subject, it's nighttime, illuminated, with a dark sky, streetlights, and the surrounding urban environment. So something like "The illuminated Walkie-Talkie building at night, a modern skyscraper in an urban street with streetlights and adjacent buildings under a dark blue sky."
-
-Keywords should include terms from the draft and visible elements. The draft has Architecture, Building, Buildings, Cars, City, Cityscape, Commuting, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walkie-Talkie), Urban, Urban landscape, Walkie Talkie building. I can add "Nighttime" and "Skyscraper" if needed, but the draft already has those. Maybe check if "Nightscape" is redundant with Night. Also, "Urban landscape" is covered by Urban. So the keywords would be: Architecture, Building, Buildings, Cars, City, Cityscape, Commuting, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walkie-Talkie), Urban, Walkie Talkie building.
-
-Wait, the draft already includes "Walkie Talkie building" and "The Fenchurch Building (The Walkie-Talkie)", so maybe keep those. Also, check if "Night" and "Nightscape" are both needed. Since the image is nighttime, both are appropriate. So the keywords list should be as per the draft but maybe adjust for uniqueness. Let me list them again: Architecture, Building, Buildings, Cars, City, Cityscape, Comm
+Looking at the image, the main subject is a lifeboat station building. The Ferris wheel is visible in the background, which is a key detail. The building has green doors, a "Lifeboats" sign, and there's a flag. The location is Southend-on-Sea, England, UK, as per the context. The sky is overcast. The parking lot in the foreground has yellow lines. The Ferris wheel is part of an amusement park, so maybe "amusement ride" is a keyword. The building has modern architecture with a curved roof. The flag is the English flag. The building is near the Thames Estuary, as per the context. The building is part of the RNLI, so "RNLI" should be included. The flag is the Union Jack. The Ferris wheel is a prominent feature. The parking area is asphalt. The building has a sign with "Lifeboats". The Ferris wheel is colorful with red accents. The building has a satellite dish on top. The Ferris wheel is large and white. The building has a modern design with large windows. The Ferris wheel is part of a pier or amusement park. The sky is cloudy. The parking lot is marked with yellow lines. The building is near a waterfront. The Ferris wheel is a prominent feature in the background. The building is a lifeboat station. The Ferrland is in Southend-on-Sea. The Ferris wheel is part of an amusement park. The building has a sign with "Lifeboats". The Ferris wheel is a large, white structure. The building has a curved roof. The Ferris wheel is visible behind the building. The building is part of the RNLI. The Ferris wheel is colorful. The parking lot is empty. The building has a satellite dish. The Ferris wheel is part of a pier. The building is near the Thames Estuary. The Ferris wheel is a prominent feature. The building has a sign with "Lifeboats". The Ferris wheel is a large structure. The building has a modern design
 ```
 
 </details>
 
 ⚠️ _Quality Warnings:_
 
+- Repetitive output (phrase: "the ferris wheel is...")
+- Generation loop (repetitive_tail)
 - Missing sections (title, description, keywords)
 - Thinking trace incomplete (expected model protocol; opened with ◁think▷)
 - Low draft improvement
 - Likely capped by max token budget
-
----
-
-<a id="model-mlx-community-ornith-10-35b-bf16"></a>
-
-### ✅ mlx-community/Ornith-1.0-35B-bf16
-
-- _Recommendation:_ recommended; review verdict: clean
-- _Owner:_ likely owner `model`
-- _Next step:_ Treat as a model limitation for this prompt; trusted hint
-  coverage is still weak.
-- _Key signals:_ missing terms: Building, Buildings, Commuting, Modern,
-  Nightscape
-- _Timing:_ Load 14.81s; Gen 129.56s; Total 144.77s
-- _Throughput:_ Prompt 134 TPS (16,872 tok); Gen 57.3 TPS (126 tok)
-- _Tokens:_ prompt 16872 tok; estimated text 517 tok; estimated non-text 16355
-  tok; generated 126 tok; requested max 500 tok; stop reason completed
-
-<details>
-<summary>Complete generated output: mlx-community/Ornith-1.0-35B-bf16</summary>
-
-```text
-Title:
-- The Fenchurch Street skyscraper at night
-
-Description:
-- The Fenchurch Street skyscraper in London, England, rises against a deep blue night sky, its curved glass facade reflecting the surrounding city lights. Street-level details include illuminated shop fronts, parked bicycles, and road signs, with a few cars visible on the wet pavement.
-
-Keywords:
-- Fenchurch Street, London, England, UK, Europe, Skyscraper, Night, Cityscape, Urban, Architecture, Glass, Reflections, Street, Cars, Bicycles, Road signs, Illuminated, Blue sky
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- Metadata alignment issue (low_metadata_alignment)
-
----
-
-<a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
-
-### ❌ mlx-community/Qwen2-VL-2B-Instruct-4bit
-
-- _Recommendation:_ avoid for now; review verdict: cutoff degraded
-- _Owner:_ likely owner `mlx`; harness signal `long_context`
-- _Next step:_ Inspect KV/cache behavior, memory pressure, and long-context
-  execution.
-- _Key signals:_ At mixed burden (16853 tokens), output became repetitive.;
-  hit token cap (500); missing sections: title, description, keywords; missing
-  terms: Architecture, Building, Buildings, Cars, City
-- _Timing:_ Load 0.55s; Gen 250.01s; Total 250.86s
-- _Throughput:_ Prompt 68.2 TPS (16,853 tok); Gen 225 TPS (500 tok)
-- _Tokens:_ prompt 16853 tok; estimated text 517 tok; estimated non-text 16336
-  tok; generated 500 tok; requested max 500 tok; stop reason max_tokens
-
-<details>
-<summary>Complete generated output: mlx-community/Qwen2-VL-2B-Instruct-4bit</summary>
-
-```text
--2026-07-18 22:55:39 BST 51.511300°N 0.083400°W 51.511300°N 0.083400°W 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22:55:39 BST 22
-```
-
-</details>
-
-⚠️ _Quality Warnings:_
-
-- ⚠️HARNESS:long_context
-- Repetitive output (phrase: "22:55:39 bst 22:55:39 bst...")
-- Context ignored (missing: Architecture, Building, Buildings, Cars, City)
-- Generation loop (repetitive_tail)
-- Metadata alignment issue (low_metadata_alignment)
-- Missing sections (title, description, keywords)
-- Unverified context copy
-- Low draft improvement
-- Likely capped by max token budget
-- Ignores trusted hints
-- suspicious_precision: 4 overly precise numbers
-- long_context_repetition(16853tok)
 
 ---
 

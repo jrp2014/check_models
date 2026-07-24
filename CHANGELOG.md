@@ -7,6 +7,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Accept `mlx-vlm`'s upstream `ProcessorLike` and `GenerateKwargs` type helpers
+  during stub generation and integrity checks, while retaining legacy signature
+  patches for older releases.
 - Publish the same canonical execution, recommendation, failure-origin,
   maintainer-readiness, reproduction, and keyword-overlap fields across HTML,
   TSV, history, and JSONL 2.1; limit chooser rankings to recommended models,

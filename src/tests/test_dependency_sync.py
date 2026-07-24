@@ -156,6 +156,53 @@ def _write_stub_manifest(
     )
 
 
+def _write_upstream_mlx_vlm_generate_stubs(typings_dir: Path) -> None:
+    """Write the helper-based generate contract emitted by current mlx-vlm."""
+    generate_dir = typings_dir / "mlx_vlm" / "generate"
+    generate_dir.mkdir(parents=True)
+    (generate_dir / "dispatch.pyi").write_text(
+        "import mlx.nn as nn\n"
+        "from .types import GenerateKwargs as GenerateKwargs, "
+        "ProcessorLike as ProcessorLike, Unpack as Unpack\n"
+        "from collections.abc import Generator\n"
+        "from transformers import PreTrainedTokenizer as PreTrainedTokenizer\n"
+        "\n"
+        "def stream_generate(model: nn.Module, "
+        "processor: ProcessorLike | PreTrainedTokenizer, prompt: str, "
+        "image: str | list[str] | None = None, "
+        "audio: str | list[str] | None = None, "
+        "video: str | list[str] | None = None, "
+        "**kwargs: Unpack[GenerateKwargs]) "
+        "-> Generator[GenerationResult, None, None]: ...\n"
+        "def generate(model: nn.Module, processor: ProcessorLike | PreTrainedTokenizer, "
+        "prompt: str, image: str | list[str] | None = None, "
+        "audio: str | list[str] | None = None, "
+        "video: str | list[str] | None = None, verbose: bool = False, "
+        "**kwargs: Unpack[GenerateKwargs]) -> GenerationResult: ...\n",
+        encoding="utf-8",
+    )
+    (generate_dir / "types.pyi").write_text(
+        "from typing import Protocol, TypedDict\n"
+        "from typing_extensions import Unpack as Unpack\n"
+        "\n"
+        "class ProcessorLike(Protocol): ...\n"
+        "class GenerateKwargs(TypedDict, total=False):\n"
+        "    temperature: float\n"
+        "    thinking_end_token: str\n",
+        encoding="utf-8",
+    )
+    (generate_dir / "ar.pyi").write_text(
+        "from .types import GenerateKwargs as GenerateKwargs, "
+        "ProcessorLike as ProcessorLike, Unpack as Unpack\n"
+        "def batch_generate(model: object, processor: ProcessorLike, "
+        "images: str | list[str] | None = None, "
+        "audios: str | list[str] | None = None, "
+        "prompts: list[str] | None = None, "
+        "**kwargs: Unpack[GenerateKwargs]) -> object: ...\n",
+        encoding="utf-8",
+    )
+
+
 def test_safe_io_read_text_no_follow_rejects_symlinked_file(tmp_path: Path) -> None:
     """Maintenance-tool text reads should not follow attacker-swapped symlinks."""
     target_path = tmp_path / "target.txt"
@@ -907,6 +954,24 @@ def test_stub_integrity_issues_accept_package_layout_mlx_vlm_generate_contract(
     assert issues == []
 
 
+def test_stub_integrity_accepts_upstream_mlx_vlm_generate_helpers(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Current mlx-vlm helper types should satisfy the local generate contract."""
+    versions = {"mlx-vlm": "0.6.8", "mypy": "2.3.0"}
+
+    def _installed_version(distribution: str) -> str | None:
+        return versions.get(distribution)
+
+    typings_dir = tmp_path / "typings"
+    _write_upstream_mlx_vlm_generate_stubs(typings_dir)
+    _write_stub_manifest(typings_dir, mlx_vlm_version="0.6.8", stubgen_version="2.3.0")
+    monkeypatch.setattr(generate_stubs, "_installed_distribution_version", _installed_version)
+
+    assert generate_stubs.get_stub_integrity_issues(["mlx_vlm"], typings_dir) == []
+
+
 def test_refresh_stub_manifest_from_existing_stubs_repairs_version_metadata(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -1088,6 +1153,20 @@ def test_patch_mlx_vlm_stubs_widens_package_layout_generate_types(tmp_path: Path
     assert "audios: str | list[str] | None = None" in patched_ar
     assert "prompts: list[str] | None = None" in patched_ar
     assert not legacy_generate_path.exists()
+
+
+def test_patch_mlx_vlm_stubs_accepts_upstream_generate_helpers(tmp_path: Path) -> None:
+    """Upstream helper types should replace legacy generate patch shims."""
+    typings_dir = tmp_path / "typings"
+    _write_upstream_mlx_vlm_generate_stubs(typings_dir)
+    dispatch_path = typings_dir / "mlx_vlm" / "generate" / "dispatch.pyi"
+    raw_dispatch = dispatch_path.read_text(encoding="utf-8")
+
+    issues = generate_stubs._patch_mlx_vlm_stubs(typings_dir, audit=True)
+
+    assert issues == []
+    assert dispatch_path.read_text(encoding="utf-8") == raw_dispatch
+    assert "ProcessorMixin" not in raw_dispatch
 
 
 def test_patch_stub_file_applies_replacements_and_reports_change(tmp_path: Path) -> None:

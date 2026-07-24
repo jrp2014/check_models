@@ -1,31 +1,35 @@
 <!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
 
-# \[model configuration/repository\]\[Model config: Processor load / processor error\] Model config: Processor load / processor error: Model preflight failed for mlx-community/Step affecting 1 model(s)
+# \[mlx-vlm / mlx\]\[Long-context collapse\] Long-context generation collapsed or became too short affecting 3 model(s)
 
 ## Summary
 
-1 model(s) show **Model config: Processor load / processor error** that should be filed against model configuration / repository.
+3 model(s) show **Long-context collapse** that should be filed against mlx-vlm first; MLX if cache/runtime reproduces.
 
-- **Observed problem:** Model config: Processor load / processor error: Model preflight failed for mlx-community/Step-3.7-Flash-oQ2e: Loaded processor has no image_processor; expected multimodal processor.
-- **Target:** model configuration / repository
-- **Affected models:** 1
-- **Fixed when:** Load/generation completes or fails with a narrower owner.
+- **Observed problem:** Long-context generation collapsed or became too short
+- **Target:** mlx-vlm first; MLX if cache/runtime reproduces
+- **Affected models:** 3
+- **Fixed when:** Full and reduced reruns avoid context collapse.
 
 
 ## Affected Models
 
 <!-- markdownlint-disable MD060 -->
 
-| Model                               | Observed Behavior                                                                   | Token Counts   | Optional Context                                                                                                                                                                                 |
-|-------------------------------------|-------------------------------------------------------------------------------------|----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/Step-3.7-Flash-oQ2e` | ValueError: Loaded processor has no image_processor; expected multimodal processor. | stop=exception | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260721T073757Z_001_mlx-community_Step-3.7-Flash-oQ2e_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_3c.json) |
+| Model                                     | Observed Behavior                      | Token Counts                                                                                       | Optional Context                                                                                                                                                                           |
+|-------------------------------------------|----------------------------------------|----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Qwen/Qwen3-VL-2B-Instruct`               | prompt_tokens=16922, repetitive output | prompt=16,922 \| output/prompt=2.95% \| mixed burden=97% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260721T073757Z_003_Qwen_Qwen3-VL-2B-Instruct_mlx_vlm_mlx_long_context_001.json)               |
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | prompt_tokens=16933, repetitive output | prompt=16,933 \| output/prompt=2.95% \| mixed burden=97% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260721T073757Z_006_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json) |
+| `mlx-community/Qwen3-VL-2B-Instruct-bf16` | prompt_tokens=16922, repetitive output | prompt=16,922 \| output/prompt=2.95% \| mixed burden=97% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260721T073757Z_005_mlx-community_Qwen3-VL-2B-Instruct-bf16_mlx_vlm_mlx_long_context_001.json) |
 <!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
 
-- `mlx-community/Step-3.7-Flash-oQ2e` fails with: ValueError: Loaded processor has no image_processor; expected multimodal processor.
-- Later exceptions: ValueError: Model preflight failed for mlx-community/Step-3.7-Flash-oQ2e: Loaded processor has no image_processor; expected multimodal processor.
+- `Qwen/Qwen3-VL-2B-Instruct`: At long prompt length (16922 tokens), output became repetitive.
+- `Qwen/Qwen3-VL-2B-Instruct`: token cap
+- Output excerpt: `- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -...`
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: At long prompt length (16933 tokens), output became repetitive.
 
 
 ## Minimal Reproduction
@@ -38,7 +42,7 @@ Image SHA256: `f4650e8f8fe8fc2d9926734489c5911b58364e9eba9182f75f81db6a3d1ee6c0`
 
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/Step-3.7-Flash-oQ2e --image 20260718-165706_DSC01017.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
+python -m mlx_vlm.generate --model Qwen/Qwen3-VL-2B-Instruct --image 20260718-165706_DSC01017.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
 
 Describe visible details faithfully. If a visual detail is uncertain, ambiguous, partially obscured, or too small to verify, leave it out rather than guessing.
 
@@ -88,7 +92,7 @@ from mlx_vlm.generate import generate
 from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load
 
-MODEL = 'mlx-community/Step-3.7-Flash-oQ2e'
+MODEL = 'Qwen/Qwen3-VL-2B-Instruct'
 IMAGE = '20260718-165706_DSC01017.jpg'
 PROMPT = 'Analyze this image for cataloguing metadata, using British English.\n\nDescribe visible details faithfully. If a visual detail is uncertain, ambiguous, partially obscured, or too small to verify, leave it out rather than guessing.\n\nUse authoritative context as supplied fact, and treat the descriptive metadata as a draft catalog record. Retain draft details that are consistent with the image, correct contradictions, and add important visible details. Authoritative context may supply identity and location even when they are not visually readable.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual; authoritative context may supply identity and location.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences combining supplied authoritative context with the main visible subject, setting, lighting, action, and distinctive visible details.\n- Output only the description text after the label.\n\nKeywords:\n- 10-18 unique comma-separated terms covering supplied authoritative context and clearly visible subjects, setting, colors, composition, and style.\n- Output only the keyword list after the label.\n\nRules:\n- Distinguish supplied authoritative facts from visible details; do not present contextual facts as though they were read from the image.\n- Reuse draft metadata when it is consistent with the image; authoritative context does not require separate visual proof.\n- If metadata and image disagree, follow the image.\n- Prefer omission to speculation.\n- Do not copy prompt instructions into the Title, Description, or Keywords fields.\n- Do not infer identity, location, event, brand, species, time period, or intent unless supplied as authoritative context or visually obvious.\n- Do not output reasoning, notes, hedging, or extra sections.\n\nContext: Authoritative context:\n- Location terms: Adobe Stock, Any Vision, England, Europe, UK\n- Capture date/time: 2026-07-18 17:57:06 BST 17:57:06\n- GPS: 50.817441°N, 0.134547°W\n- Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.\n\nDraft descriptive metadata:\n- Existing title: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe\n- Existing description: A lifeboats station with a ferris wheel in the background.\n- Existing keywords: Asphalt, British seaside, Cloudy, Essex, Fence, Flag, Hotel, Lifeboat Station, Modern Architecture, Objects, Overcast, Overcast Sky, Pier, RNLI, Sign, Southend-on-Sea, Thames Estuary, Waterfront, amusement ride, antenna\n- Treat this draft as fallible. Retain supported details, correct errors, and add important visible information.'
 LOAD_KWARGS = {'trust_remote_code': True}
@@ -165,28 +169,29 @@ Generation/load config:
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "mlx-community/Step-3.7-Flash-oQ2e"
+  "model": "Qwen/Qwen3-VL-2B-Instruct"
 }
 ```
 
 Optional advanced context:
 
-- `mlx-community/Step-3.7-Flash-oQ2e`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260721T073757Z_001_mlx-community_Step-3.7-Flash-oQ2e_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_3c.json)
+- `Qwen/Qwen3-VL-2B-Instruct`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260721T073757Z_003_Qwen_Qwen3-VL-2B-Instruct_mlx_vlm_mlx_long_context_001.json)
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260721T073757Z_006_mlx-community_Qwen2-VL-2B-Instruct-4bit_mlx_vlm_mlx_long_context_001.json)
+- `mlx-community/Qwen3-VL-2B-Instruct-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260721T073757Z_005_mlx-community_Qwen3-VL-2B-Instruct-bf16_mlx_vlm_mlx_long_context_001.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
 ## Expected Fix Signal
 
-- [ ] Affected reruns complete model load and generation, or fail with a narrower configuration/compatibility error that points to the owning layer.
+- [ ] A same-command rerun and a reduced image/text burden rerun show consistent prompt-token accounting and no long-context collapse.
 - [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem.
 
 
 ## Fix Checklist
 
-- [ ] Inspect the retained exception chain, upstream boundary, and attributed package.
-- [ ] Verify the requested and resolved model revisions against the captured environment.
-- [ ] Reproduce with the single affected model before changing compatibility logic.
-- [ ] Add a focused regression for the structured error signature when fixed.
+- [ ] Rerun with reduced image/text burden and compare output recovery.
+- [ ] Compare prompt-token accounting with text-only and image+text prompts.
+- [ ] Inspect cache allocation, prefill step size, and long-context generation behavior.
 
 
 ## Appendix: Environment
@@ -230,29 +235,71 @@ Optional advanced context:
 
 ## Appendix: Detailed Evidence
 
-### `mlx-community/Step-3.7-Flash-oQ2e`
+### `Qwen/Qwen3-VL-2B-Instruct`
 
-Observed error:
+Observed signals:
+
+- At long prompt length (16922 tokens), output became repetitive.
+- token cap
+- missing sections
+- repetitive tail
+- degeneration
+- text sanity
+- generation loop
+- low metadata alignment
+- low-draft-improvement
+- missing sections: title, description, keywords
+
+Sample output:
 
 ```text
-ValueError: Loaded processor has no image_processor; expected multimodal processor.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -...
 ```
 
-Exception chain:
+### `mlx-community/Qwen2-VL-2B-Instruct-4bit`
+
+Observed signals:
+
+- At long prompt length (16933 tokens), output became repetitive.
+- token cap
+- missing sections
+- repetitive tail
+- abrupt tail
+- no overlap
+- metadata terms
+- fabrication
+- generation loop
+- low metadata alignment
+- low-draft-improvement
+- missing sections: title, description, keywords
+
+Sample output:
 
 ```text
-ValueError: Model preflight failed for mlx-community/Step-3.7-Flash-oQ2e: Loaded processor has no image_processor; expected multimodal processor.
+-001.jpg
+- 17:57:06 BST
+- 50.81744°N, 0.13454°W
+- 17:57:06 BST: The image is taken at 17:57:06 BST. The time is in the 17:57:06 format, which is the time in the BST (British Standard Time) zone. Th...
 ```
 
-Traceback:
+### `mlx-community/Qwen3-VL-2B-Instruct-bf16`
+
+Observed signals:
+
+- At long prompt length (16922 tokens), output became repetitive.
+- token cap
+- missing sections
+- repetitive tail
+- degeneration
+- text sanity
+- generation loop
+- low metadata alignment
+- low-draft-improvement
+- missing sections: title, description, keywords
+
+Sample output:
 
 ```text
-Traceback (most recent call last):
-ValueError: Loaded processor has no image_processor; expected multimodal processor.
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-ValueError: Model preflight failed for mlx-community/Step-3.7-Flash-oQ2e: Loaded processor has no image_processor; expected multimodal processor.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -...
 ```
 

@@ -1,44 +1,45 @@
 <!-- markdownlint-disable MD012 MD013 MD033 MD060 -->
 
-# \[model\]\[Text-sanity / token-soup output\] Generated text is mixed-script token-soup affecting 1 model(s)
+# \[mlx-vlm / mlx\]\[Long-context collapse\] Long-context generation collapsed or became too short affecting 1 model(s)
 
 ## Summary
 
-1 model(s) show **Text-sanity / token-soup output** that should be filed against model repository.
+1 model(s) show **Long-context collapse** that should be filed against mlx-vlm first; MLX if cache/runtime reproduces.
 
-- **Observed problem:** Generated text is mixed-script token-soup
-- **Target:** model repository
+- **Observed problem:** Long-context generation collapsed or became too short
+- **Target:** mlx-vlm first; MLX if cache/runtime reproduces
 - **Affected models:** 1
-- **Fixed when:** Generated text is readable natural language, not token soup.
+- **Fixed when:** Full and reduced reruns avoid context collapse.
 
 
 ## Affected Models
 
 <!-- markdownlint-disable MD060 -->
 
-| Model                                              | Observed Behavior                            | Token Counts                                                                   | Optional Context                                                                                                                                                                             |
-|----------------------------------------------------|----------------------------------------------|--------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16` | token cap \| missing sections \| abrupt tail | prompt=1,956 \| output/prompt=25.56% \| stop=max_tokens \| hit token cap (500) | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260719T193722Z_003_mlx-community_ERNIE-4.5-VL-28B-A3B-Thinking-bf16_model_text_sanity_002.json) |
+| Model                              | Observed Behavior                                                                                   | Token Counts                                                               | Optional Context                                                                                                                                                                    |
+|------------------------------------|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mlx-community/X-Reasoner-7B-8bit` | generated_tokens~9 \| prompt_tokens=16933, output_tokens=9, output/prompt=0.1%, weak text=truncated | prompt=16,933 \| output/prompt=0.05% \| mixed burden=97% \| stop=completed | [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260721T073757Z_002_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_mlx_long_context_002.json) |
 <!-- markdownlint-enable MD060 -->
 
 
 ## Minimal Evidence
 
-- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
-- Output excerpt: `Let's tackle this step by step. First, the title needs to be 5-10 words, concrete and factual. The authoritative context gives location as London, England, UK, and the building is The Fenchurch Building (The Walkie-Talkie). So the title should be something like "The Fenchurch Building (The Walkie-Talkie), London, UK...`
+- `mlx-community/X-Reasoner-7B-8bit`: Output appears truncated to about 9 tokens.
+- `mlx-community/X-Reasoner-7B-8bit`: At long prompt length (16933 tokens), output stayed unusually short (9 tokens; ratio 0.1%; weak text signal truncated).
+- Output excerpt: `<\|im_start\|> addCriterion("image:caption")`
 
 
 ## Minimal Reproduction
 
 These commands use `mlx-vlm` directly so the issue can be reproduced without installing the `check_models` harness.
-Use a local copy of `20260718-215539_DSC01101_DxO.jpg` or replace it with an equivalent test image.
-Image SHA256: `210a59774a1ca56ab647a9a6d360c9ae355df72584935141e21feb228ab77bc6`
+Use a local copy of `20260718-165706_DSC01017.jpg` or replace it with an equivalent test image.
+Image SHA256: `f4650e8f8fe8fc2d9926734489c5911b58364e9eba9182f75f81db6a3d1ee6c0`
 
 ## Native mlx-vlm reproduction
 
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 --image 20260718-215539_DSC01101_DxO.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
+python -m mlx_vlm.generate --model mlx-community/X-Reasoner-7B-8bit --image 20260718-165706_DSC01017.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
 
 Describe visible details faithfully. If a visual detail is uncertain, ambiguous, partially obscured, or too small to verify, leave it out rather than guessing.
 
@@ -69,15 +70,15 @@ Rules:
 - Do not output reasoning, notes, hedging, or extra sections.
 
 Context: Authoritative context:
-- Location terms: England, Europe, UK, district, united kingdom
-- Capture date/time: 2026-07-18 22:55:39 BST 22:55:39
-- GPS: 51.511300°N, 0.083400°W
+- Location terms: Adobe Stock, Any Vision, England, Europe, UK
+- Capture date/time: 2026-07-18 17:57:06 BST 17:57:06
+- GPS: 50.817441°N, 0.134547°W
 - Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.
 
 Draft descriptive metadata:
-- Existing title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe
-- Existing description: Walkie Talkie building known formally as 20 Fenchurch Street.
-- Existing keywords: Architecture, Building, Buildings, Cars, City, Cityscape, Commuting, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walkie-Talkie), Urban, Urban landscape, Walkie Talkie building
+- Existing title: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe
+- Existing description: A lifeboats station with a ferris wheel in the background.
+- Existing keywords: Asphalt, British seaside, Cloudy, Essex, Fence, Flag, Hotel, Lifeboat Station, Modern Architecture, Objects, Overcast, Overcast Sky, Pier, RNLI, Sign, Southend-on-Sea, Thames Estuary, Waterfront, amusement ride, antenna
 - Treat this draft as fallible. Retain supported details, correct errors, and add important visible information.' --max-tokens 500 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
 ```
 
@@ -88,9 +89,9 @@ from mlx_vlm.generate import generate
 from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load
 
-MODEL = 'mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16'
-IMAGE = '20260718-215539_DSC01101_DxO.jpg'
-PROMPT = 'Analyze this image for cataloguing metadata, using British English.\n\nDescribe visible details faithfully. If a visual detail is uncertain, ambiguous, partially obscured, or too small to verify, leave it out rather than guessing.\n\nUse authoritative context as supplied fact, and treat the descriptive metadata as a draft catalog record. Retain draft details that are consistent with the image, correct contradictions, and add important visible details. Authoritative context may supply identity and location even when they are not visually readable.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual; authoritative context may supply identity and location.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences combining supplied authoritative context with the main visible subject, setting, lighting, action, and distinctive visible details.\n- Output only the description text after the label.\n\nKeywords:\n- 10-18 unique comma-separated terms covering supplied authoritative context and clearly visible subjects, setting, colors, composition, and style.\n- Output only the keyword list after the label.\n\nRules:\n- Distinguish supplied authoritative facts from visible details; do not present contextual facts as though they were read from the image.\n- Reuse draft metadata when it is consistent with the image; authoritative context does not require separate visual proof.\n- If metadata and image disagree, follow the image.\n- Prefer omission to speculation.\n- Do not copy prompt instructions into the Title, Description, or Keywords fields.\n- Do not infer identity, location, event, brand, species, time period, or intent unless supplied as authoritative context or visually obvious.\n- Do not output reasoning, notes, hedging, or extra sections.\n\nContext: Authoritative context:\n- Location terms: England, Europe, UK, district, united kingdom\n- Capture date/time: 2026-07-18 22:55:39 BST 22:55:39\n- GPS: 51.511300°N, 0.083400°W\n- Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.\n\nDraft descriptive metadata:\n- Existing title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe\n- Existing description: Walkie Talkie building known formally as 20 Fenchurch Street.\n- Existing keywords: Architecture, Building, Buildings, Cars, City, Cityscape, Commuting, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walkie-Talkie), Urban, Urban landscape, Walkie Talkie building\n- Treat this draft as fallible. Retain supported details, correct errors, and add important visible information.'
+MODEL = 'mlx-community/X-Reasoner-7B-8bit'
+IMAGE = '20260718-165706_DSC01017.jpg'
+PROMPT = 'Analyze this image for cataloguing metadata, using British English.\n\nDescribe visible details faithfully. If a visual detail is uncertain, ambiguous, partially obscured, or too small to verify, leave it out rather than guessing.\n\nUse authoritative context as supplied fact, and treat the descriptive metadata as a draft catalog record. Retain draft details that are consistent with the image, correct contradictions, and add important visible details. Authoritative context may supply identity and location even when they are not visually readable.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual; authoritative context may supply identity and location.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences combining supplied authoritative context with the main visible subject, setting, lighting, action, and distinctive visible details.\n- Output only the description text after the label.\n\nKeywords:\n- 10-18 unique comma-separated terms covering supplied authoritative context and clearly visible subjects, setting, colors, composition, and style.\n- Output only the keyword list after the label.\n\nRules:\n- Distinguish supplied authoritative facts from visible details; do not present contextual facts as though they were read from the image.\n- Reuse draft metadata when it is consistent with the image; authoritative context does not require separate visual proof.\n- If metadata and image disagree, follow the image.\n- Prefer omission to speculation.\n- Do not copy prompt instructions into the Title, Description, or Keywords fields.\n- Do not infer identity, location, event, brand, species, time period, or intent unless supplied as authoritative context or visually obvious.\n- Do not output reasoning, notes, hedging, or extra sections.\n\nContext: Authoritative context:\n- Location terms: Adobe Stock, Any Vision, England, Europe, UK\n- Capture date/time: 2026-07-18 17:57:06 BST 17:57:06\n- GPS: 50.817441°N, 0.134547°W\n- Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.\n\nDraft descriptive metadata:\n- Existing title: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe\n- Existing description: A lifeboats station with a ferris wheel in the background.\n- Existing keywords: Asphalt, British seaside, Cloudy, Essex, Fence, Flag, Hotel, Lifeboat Station, Modern Architecture, Objects, Overcast, Overcast Sky, Pier, RNLI, Sign, Southend-on-Sea, Thames Estuary, Waterfront, amusement ride, antenna\n- Treat this draft as fallible. Retain supported details, correct errors, and add important visible information.'
 LOAD_KWARGS = {'trust_remote_code': True}
 GENERATE_KWARGS = {'max_tokens': 500, 'temperature': 0.0, 'prefill_step_size': 4096}
 model, processor = load(MODEL, **LOAD_KWARGS)
@@ -140,15 +141,15 @@ Rules:
 - Do not output reasoning, notes, hedging, or extra sections.
 
 Context: Authoritative context:
-- Location terms: England, Europe, UK, district, united kingdom
-- Capture date/time: 2026-07-18 22:55:39 BST 22:55:39
-- GPS: 51.511300°N, 0.083400°W
+- Location terms: Adobe Stock, Any Vision, England, Europe, UK
+- Capture date/time: 2026-07-18 17:57:06 BST 17:57:06
+- GPS: 50.817441°N, 0.134547°W
 - Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.
 
 Draft descriptive metadata:
-- Existing title: The Fenchurch Building (The Walkie-Talkie), London, England, UK, GBR, Europe
-- Existing description: Walkie Talkie building known formally as 20 Fenchurch Street.
-- Existing keywords: Architecture, Building, Buildings, Cars, City, Cityscape, Commuting, Fenchurch Street, Illuminated, London, Modern, Night, Nightscape, Skyscraper, Street, Street signs, The Fenchurch Building (The Walkie-Talkie), Urban, Urban landscape, Walkie Talkie building
+- Existing title: Lifeboat Station, Southend-on-Sea, England, UK, GBR, Europe
+- Existing description: A lifeboats station with a ferris wheel in the background.
+- Existing keywords: Asphalt, British seaside, Cloudy, Essex, Fence, Flag, Hotel, Lifeboat Station, Modern Architecture, Objects, Overcast, Overcast Sky, Pier, RNLI, Sign, Southend-on-Sea, Thames Estuary, Waterfront, amusement ride, antenna
 - Treat this draft as fallible. Retain supported details, correct errors, and add important visible information.
 ```
 
@@ -161,40 +162,39 @@ Generation/load config:
     "prefill_step_size": 4096,
     "temperature": 0.0
   },
-  "image": "20260718-215539_DSC01101_DxO.jpg",
+  "image": "20260718-165706_DSC01017.jpg",
   "load_kwargs": {
     "trust_remote_code": true
   },
-  "model": "mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16"
+  "model": "mlx-community/X-Reasoner-7B-8bit"
 }
 ```
 
 Optional advanced context:
 
-- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260719T193722Z_003_mlx-community_ERNIE-4.5-VL-28B-A3B-Thinking-bf16_model_text_sanity_002.json)
+- `mlx-community/X-Reasoner-7B-8bit`: [optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/20260721T073757Z_002_mlx-community_X-Reasoner-7B-8bit_mlx_vlm_mlx_long_context_002.json)
 - JSON bundles contain extended local diagnostics only; the model, prompt, image reference, and generation settings needed to reproduce are inline above.
 
 
 ## Expected Fix Signal
 
-- [ ] Affected reruns produce readable natural-language output without mixed-script token soup or decode artifacts.
+- [ ] A same-command rerun and a reduced image/text burden rerun show consistent prompt-token accounting and no long-context collapse.
 - [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem.
 
 
 ## Fix Checklist
 
-- [ ] Reproduce with the native command and confirm whether token soup appears without the check_models harness.
-- [ ] Inspect tokenizer config, chat template, and decode cleanup for the model revision.
-- [ ] Compare against a nearby quantization or base model to isolate model weights from tokenizer/runtime behavior.
-- [ ] Add a focused regression check for mixed-script token-soup output if fixed.
+- [ ] Rerun with reduced image/text burden and compare output recovery.
+- [ ] Compare prompt-token accounting with text-only and image+text prompts.
+- [ ] Inspect cache allocation, prefill step size, and long-context generation behavior.
 
 
 ## Appendix: Environment
 
 | Component                  | Version                                                                                                                                         |
 |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
-| mlx-vlm                    | 0.6.5                                                                                                                                           |
-| mlx                        | 0.32.1.dev20260719+b7c3dd6d                                                                                                                     |
+| mlx-vlm                    | 0.6.6                                                                                                                                           |
+| mlx                        | 0.32.1.dev20260721+30a19f72                                                                                                                     |
 | mlx-lm                     | 0.31.3                                                                                                                                          |
 | mlx-audio                  | 0.4.4                                                                                                                                           |
 | transformers               | 5.14.1                                                                                                                                          |
@@ -224,21 +224,28 @@ Optional advanced context:
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                              |
 | MLX Core Extension         | ~/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
 | MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (162,449,848 bytes, sha256=1078bd042297dbbf704a414617a7988c55b0001ea69d7cb478bcafa2fdfdeecb) |
-| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,697,568 bytes, sha256=107989d6cb7f822e366d22e8259ea8eb2e68c15271ab6dc981da277ecf282cb0)  |
+| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,697,568 bytes, sha256=179f02b689129393feff8c019e656046eda1ba0b224e6fa58a83501dd9ce959b)  |
 | RAM                        | 128.0 GB                                                                                                                                        |
 
 
 ## Appendix: Detailed Evidence
 
-### `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`
+### `mlx-community/X-Reasoner-7B-8bit`
 
 Observed signals:
 
-- Output omitted required Title/Description/Keywords sections (title, description, keywords).
+- Output appears truncated to about 9 tokens.
+- At long prompt length (16933 tokens), output stayed unusually short (9 tokens; ratio 0.1%; weak text signal truncated).
+- long context
+- no overlap
+- special token wrapper
+- low metadata alignment
+- low-draft-improvement
 
 Sample output:
 
 ```text
-Let's tackle this step by step. First, the title needs to be 5-10 words, concrete and factual. The authoritative context gives location as London, England, UK, and the building is The Fenchurch Bui...
+<|im_start|>
+ addCriterion("image:caption")
 ```
 

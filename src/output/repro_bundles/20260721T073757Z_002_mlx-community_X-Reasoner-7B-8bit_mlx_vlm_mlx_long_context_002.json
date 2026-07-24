@@ -1,0 +1,311 @@
+{
+  "environment": {
+    "component_provenance": {
+      "Pillow": {
+        "direct_url": null,
+        "install_type": "wheel",
+        "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
+        "source_revision": null,
+        "vcs_revision": null,
+        "version": "12.3.0"
+      },
+      "check_models": {
+        "direct_url": null,
+        "install_type": "source-tree",
+        "source_location": "~/Documents/AI/mlx/check_models",
+        "source_revision": "0f6ded12de38137594ff1ee5eee6c96ec384f530",
+        "vcs_revision": null,
+        "version": "0.8.8"
+      },
+      "huggingface-hub": {
+        "direct_url": null,
+        "install_type": "wheel",
+        "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
+        "source_revision": null,
+        "vcs_revision": null,
+        "version": "1.24.0"
+      },
+      "mlx": {
+        "direct_url": "file://~/Documents/AI/mlx/mlx",
+        "install_type": "editable",
+        "source_location": "~/Documents/AI/mlx/mlx",
+        "source_revision": "30a19f7234abfb4d136af58623eaac289e63f5d2",
+        "vcs_revision": null,
+        "version": "0.32.1.dev20260721+30a19f72"
+      },
+      "mlx-audio": {
+        "direct_url": null,
+        "install_type": "wheel",
+        "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
+        "source_revision": null,
+        "vcs_revision": null,
+        "version": "0.4.4"
+      },
+      "mlx-lm": {
+        "direct_url": "file://~/Documents/AI/mlx/mlx-lm",
+        "install_type": "editable",
+        "source_location": "~/Documents/AI/mlx/mlx-lm",
+        "source_revision": "15b522f593b7ca5fbc0cac6f7572d40859d2d8fe",
+        "vcs_revision": null,
+        "version": "0.31.3"
+      },
+      "mlx-metal": {
+        "direct_url": null,
+        "install_type": "unknown",
+        "source_location": null,
+        "source_revision": null,
+        "vcs_revision": null,
+        "version": null
+      },
+      "mlx-vlm": {
+        "direct_url": "file://~/Documents/AI/mlx/mlx-vlm",
+        "install_type": "editable",
+        "source_location": "~/Documents/AI/mlx/mlx-vlm",
+        "source_revision": "c9e27b08311f9c1f38690c46034b04c7598d73ee",
+        "vcs_revision": null,
+        "version": "0.6.6"
+      },
+      "numpy": {
+        "direct_url": null,
+        "install_type": "wheel",
+        "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
+        "source_revision": null,
+        "vcs_revision": null,
+        "version": "2.5.1"
+      },
+      "tokenizers": {
+        "direct_url": null,
+        "install_type": "wheel",
+        "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
+        "source_revision": null,
+        "vcs_revision": null,
+        "version": "0.22.2"
+      },
+      "transformers": {
+        "direct_url": null,
+        "install_type": "wheel",
+        "source_location": "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
+        "source_revision": null,
+        "vcs_revision": null,
+        "version": "5.14.1"
+      }
+    },
+    "library_versions": {
+      "Pillow": "12.3.0",
+      "huggingface-hub": "1.24.0",
+      "mlx": "0.32.1.dev20260721+30a19f72",
+      "mlx-audio": "0.4.4",
+      "mlx-lm": "0.31.3",
+      "mlx-metal": null,
+      "mlx-vlm": "0.6.6",
+      "numpy": "2.5.1",
+      "tokenizers": "0.22.2",
+      "transformers": "5.14.1"
+    },
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "preflight_issues": [],
+    "system_info": {
+      "Active Developer Directory": "/Applications/Xcode.app/Contents/Developer",
+      "Apple Clang Version": "Apple clang version 21.0.0 (clang-2100.1.1.101)",
+      "Architecture": "arm64",
+      "CPU Cores (Logical)": "18",
+      "CPU Cores (Physical)": "18",
+      "Fused Attention": "Available",
+      "GPU Architecture": "applegpu_g17s",
+      "GPU Cores": "40",
+      "GPU/Chip": "Apple M5 Max",
+      "MLX Core Extension": "~/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so",
+      "MLX Device": "Apple M5 Max",
+      "MLX Distribution Root": "~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages",
+      "MLX Install Type": "editable local source",
+      "MLX Metallib": "~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (162,449,848 bytes, sha256=1078bd042297dbbf704a414617a7988c55b0001ea69d7cb478bcafa2fdfdeecb)",
+      "MLX libmlx.dylib": "~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,697,568 bytes, sha256=179f02b689129393feff8c019e656046eda1ba0b224e6fa58a83501dd9ce959b)",
+      "Metal Compiler Version": "Apple metal version 32023.883 (metalfe-32023.883)",
+      "Metal SDK": "MacOSX26.5.sdk",
+      "Metal Support": "Metal 4",
+      "Metallib Linker Version": "AIR-LLD 32023.883 (metalfe-32023.883) (compatible with legacy metallib linker)",
+      "OS": "Darwin 25.5.0",
+      "Python Version": "3.13.13",
+      "RAM": "128.0 GB",
+      "Recommended Working Set": "108 GB",
+      "SDK Path": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "SDK Version": "26.5",
+      "Xcode Build": "17F113",
+      "Xcode Version": "26.6",
+      "macOS Version": "26.5.2",
+      "mlx-metal Distribution": "not installed; local editable mlx supplies backend"
+    }
+  },
+  "failure": {
+    "captured_output": null,
+    "code": null,
+    "message": null,
+    "package": null,
+    "phase": null,
+    "signature": null,
+    "stage": null,
+    "traceback": null,
+    "type": null
+  },
+  "generated_at_utc": "2026-07-21T07:37:57+00:00",
+  "issue_cluster_id": "mlx-vlm-mlx_long-context_002",
+  "model": "mlx-community/X-Reasoner-7B-8bit",
+  "model_provenance": {
+    "model": "mlx-community/X-Reasoner-7B-8bit",
+    "requested_revision": null,
+    "resolved_revision": "21732e74613b465bc98e9d5ec210aba5c7adbcc1",
+    "snapshot_path": "~/.cache/huggingface/hub/models--mlx-community--X-Reasoner-7B-8bit/snapshots/21732e74613b465bc98e9d5ec210aba5c7adbcc1"
+  },
+  "repro": {
+    "args": {
+      "_check_models_preflight_issues": [],
+      "adapter_path": null,
+      "context_marker": "Context:",
+      "detailed_metrics": false,
+      "dry_run": false,
+      "enable_thinking": false,
+      "eos_tokens": null,
+      "eval_mode": "assisted",
+      "exclude": null,
+      "folder": "~/Pictures/Processed",
+      "force_color": false,
+      "force_download": false,
+      "frequency_context_size": 20,
+      "frequency_penalty": null,
+      "image": null,
+      "kv_bits": null,
+      "kv_group_size": 64,
+      "kv_quant_scheme": "uniform",
+      "lazy_load": false,
+      "link_style": "github",
+      "logit_bias": null,
+      "max_kv_size": null,
+      "max_tokens": 500,
+      "min_p": 0.0,
+      "models": null,
+      "no_color": false,
+      "open_report": false,
+      "output_diagnostics": "~/Documents/AI/mlx/check_models/src/output/reports/diagnostics.md",
+      "output_env": "~/Documents/AI/mlx/check_models/src/output/environment.log",
+      "output_gallery_markdown": "~/Documents/AI/mlx/check_models/src/output/reports/model_gallery.md",
+      "output_html": "~/Documents/AI/mlx/check_models/src/output/reports/results.html",
+      "output_jsonl": "~/Documents/AI/mlx/check_models/src/output/results.jsonl",
+      "output_log": "~/Documents/AI/mlx/check_models/src/output/check_models.log",
+      "output_markdown": "~/Documents/AI/mlx/check_models/src/output/reports/results.md",
+      "output_model_capabilities": "~/Documents/AI/mlx/check_models/src/output/reports/model_capabilities.md",
+      "output_model_capabilities_json": "~/Documents/AI/mlx/check_models/src/output/model_capabilities.json",
+      "output_model_selection": "~/Documents/AI/mlx/check_models/src/output/reports/model_selection.md",
+      "output_review": "~/Documents/AI/mlx/check_models/src/output/reports/review.md",
+      "output_run_json": "~/Documents/AI/mlx/check_models/src/output/run.json",
+      "output_tsv": "~/Documents/AI/mlx/check_models/src/output/reports/results.tsv",
+      "prefill_step_size": 4096,
+      "presence_context_size": 20,
+      "presence_penalty": null,
+      "processor_kwargs": null,
+      "prompt": null,
+      "prune_repro_days": 90,
+      "quality_config": null,
+      "quantize_activations": false,
+      "quantized_kv_start": 5000,
+      "repetition_context_size": 20,
+      "repetition_penalty": null,
+      "rerun_triage": false,
+      "resize_shape": null,
+      "revision": null,
+      "seed": null,
+      "skip_special_tokens": false,
+      "temperature": 0.0,
+      "thinking_budget": null,
+      "thinking_end_token": "</think>",
+      "thinking_start_token": null,
+      "timeout": 300.0,
+      "top_k": 0,
+      "top_p": 1.0,
+      "trust_remote_code": true,
+      "verbose": true,
+      "width": null
+    },
+    "cluster_repro_command": "python -m check_models --image 20260718-165706_DSC01017.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/X-Reasoner-7B-8bit",
+    "env_vars": {
+      "TOKENIZERS_PARALLELISM": "false"
+    },
+    "eval_mode": "assisted",
+    "image_path": "20260718-165706_DSC01017.jpg",
+    "image_ref_sha256": "ffa19886171871ba35d84f833ff9bad9d7838cc2358121e6c9e4ce1cfaab24a5",
+    "image_sha256": "f4650e8f8fe8fc2d9926734489c5911b58364e9eba9182f75f81db6a3d1ee6c0",
+    "prompt_diagnostics": {
+      "eos_token": "<|im_end|>",
+      "eos_token_id": 151645,
+      "generate_kwargs": {
+        "kv_bits": null,
+        "kv_group_size": 64,
+        "kv_quant_scheme": "uniform",
+        "max_kv_size": null,
+        "max_tokens": 500,
+        "prefill_step_size": 4096,
+        "quantized_kv_start": 5000,
+        "repetition_context_size": 20,
+        "repetition_penalty": null,
+        "temperature": 0.0,
+        "top_p": 1.0
+      },
+      "image_placeholder_count": 0,
+      "model_type": "qwen2_5_vl",
+      "processor_class": "mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor",
+      "rendered_prompt_chars": 2888,
+      "rendered_prompt_hash_sha256": "6a4820c6c3cc8779761e3e12af5608f2c520946b552fe26aece6b9625e290475",
+      "rendered_prompt_preview": "<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\n<|vision_start|><|image_pad|><|vision_end|>Analyze this image for cataloguing metadata, using British English.\n\nDescribe visible details faithfully. If a visual detail is uncertain, ambiguous, partially obscured, or too small to verify, leave it out rather than guessing.\n\nUse authoritative context as supplied fact, and treat the descriptive metadata as a draft catalog record. Retain draft details that are consistent with the image, correct contradictions, and add important visible details. Authoritative context may supply identity and location even when they are not visually readable.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual; authoritative context may supply ...",
+      "special_token_ids": [
+        151645,
+        151643
+      ],
+      "special_tokens": [
+        "<|im_end|>",
+        "<|endoftext|>"
+      ],
+      "tokenizer_class": "transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer"
+    },
+    "prompt_hash_sha256": "5913c0b84f12193b26a9cfa159eaa53a703f3171005784d026be5f43ef698b46",
+    "prompt_preview": "Analyze this image for cataloguing metadata, using British English.\n\nDescribe visible details faithfully. If a visual detail is uncertain, ambiguous, partially obscured, or too small to verify, leave it out rather than guessing.\n\nUse authoritative context as supplied fact, and treat the descriptive metadata as a draft catalog record. Retain draft details that are consistent with the image, correct...",
+    "rerun_command": "python -m check_models --image 20260718-165706_DSC01017.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --presence-context-size 20 --frequency-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/X-Reasoner-7B-8bit",
+    "seed": null
+  },
+  "result": {
+    "generated_text_preview": "<|im_start|>\n addCriterion(\"image:caption\")",
+    "maintainer_triage": {
+      "confidence": "high",
+      "evidence": [
+        "harness:long_context"
+      ],
+      "harness_details": [
+        "output:truncated(9tok)",
+        "long_context_low_ratio(0.1%;16933->9;truncated)"
+      ],
+      "hit_max_tokens": false,
+      "issue_kind": "context_budget",
+      "issue_readiness": "issue_ready",
+      "issue_subtype": "context_boundary",
+      "next_action": "File the retained reproduction evidence with the suspected owner.",
+      "nontext_prompt_ratio": 0.9698222405952873,
+      "prompt_burden_kind": "mixed",
+      "prompt_burden_source": "estimated_nontext",
+      "prompt_output_ratio": 0.0005315065257190103,
+      "prompt_tokens_total": 16933,
+      "requested_max_tokens": 500,
+      "stop_reason": "completed",
+      "summary": "harness:long_context",
+      "suspected_owner": "mlx",
+      "user_bucket": "caveat"
+    },
+    "quality_issues": [
+      "\u26a0\ufe0fharness(long_context)",
+      "long-context",
+      "low_metadata_alignment",
+      "low-draft-improvement",
+      "context-budget",
+      "context-ignored"
+    ],
+    "success": true
+  },
+  "schema_version": "1.0"
+}
