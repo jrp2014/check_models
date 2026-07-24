@@ -261,7 +261,7 @@ class TestE2ESmoke:
         # Second line is the model result
         record = records[1]
         assert record["model"] == FIXTURE_MODEL
-        assert record["success"] is True
+        assert record["assessment"]["execution"] == "completed"
 
     @pytest.mark.skipif(
         not _check_model_cached(FIXTURE_MODEL),
