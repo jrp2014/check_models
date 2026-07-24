@@ -371,8 +371,8 @@ def test_tsv_includes_canonical_enrichment_compatibility_and_owner(tmp_path: Pat
     assert "owner_confidence" not in record
 
 
-def test_tsv_uses_canonical_mixed_owner_failure_confidence(tmp_path: Path) -> None:
-    """TSV confidence should match the canonical wrapped-failure narrative."""
+def test_tsv_omits_owner_confidence_for_mixed_owner_failure(tmp_path: Path) -> None:
+    """TSV should retain factual ownership without a confidence estimate."""
     result = check_models.PerformanceResult(
         model_name="org/mixed-owner",
         generation=None,
@@ -401,10 +401,7 @@ def test_tsv_uses_canonical_mixed_owner_failure_confidence(tmp_path: Path) -> No
 
     check_models.generate_tsv_report([result], output_file, report_context=context)
     record = _read_tsv_record(output_file)
-    narrative = check_models._build_failure_narrative(result)
-
-    assert narrative.owner_confidence == "low"
-    assert record["owner_confidence"] == narrative.owner_confidence
+    assert "owner_confidence" not in record
 
 
 def test_tsv_empty_results(tmp_path: Path) -> None:

@@ -561,7 +561,6 @@ class TestProcessImageWithModelMock:
         narrative = check_models._build_failure_narrative(result)
         assert narrative.task_outcome == "crashed"
         assert narrative.suspected_owner == "unresolved: mlx/mlx-vlm"
-        assert narrative.owner_confidence == "low"
 
     def test_build_failure_result_preserves_quality_fields(self) -> None:
         """Failure builder should carry precomputed quality diagnostics when provided."""

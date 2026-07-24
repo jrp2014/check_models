@@ -40,11 +40,11 @@ The file is organized in this order — search for these exact landmark headers 
 | Formatting, escaping & detector helpers | `fmt_num`, report escapers, `_detect_repetitive_output`, harness detectors | `SECTION: FORMATTING, ESCAPING & DETECTOR HELPERS` |
 | Metrics, scoring & field formatting | `compute_vocabulary_diversity`, `compute_cataloging_utility`, `analyze_generation_text`, `format_field_value` | `SECTION: METRICS, SCORING & FIELD FORMATTING` |
 | Console, system & image metadata helpers | CLI Rich helpers, library/system info, EXIF/XMP extraction | `SECTION: CONSOLE, SYSTEM & IMAGE METADATA HELPERS` |
-| Diagnostics/report context builders | `DiagnosticsConfig`, `IssueCluster`, `ReportRenderContext`, repro command specs | `SECTION: DIAGNOSTICS/REPORT CONTEXT BUILDERS` |
+| Diagnostics/report context builders | `DiagnosticsConfig`, `ReportRenderContext`, native repro command specs | `SECTION: DIAGNOSTICS/REPORT CONTEXT BUILDERS` |
 | Report generators & runtime fingerprints | `generate_diagnostics_report`, `generate_html_report`, `generate_markdown_report`, `collect_runtime_fingerprint()` | `SECTION: REPORT GENERATORS & RUNTIME FINGERPRINTS` |
 | Model processing | CLI argument validation, cache scan, `_load_model`, `process_image_with_model` | `SECTION: MODEL PROCESSING` |
 | CLI run helpers & logging | `setup_environment`, `find_and_validate_image`, `process_models`, result logging | `SECTION: CLI RUN HELPERS & LOGGING` |
-| Result enrichment/history/finalization | quality enrichment, JSONL/history, issue drafts, repro bundles, `finalize_execution` | `SECTION: RESULT ENRICHMENT/HISTORY/FINALIZATION` |
+| Result enrichment/history/finalization | quality enrichment, JSONL/history, issue drafts, `finalize_execution` | `SECTION: RESULT ENRICHMENT/HISTORY/FINALIZATION` |
 | Main orchestration & argparse | `main()`, `main_cli()`, `_build_cli_parser()` | `SECTION: MAIN ORCHESTRATION & ARGPARSE` |
 
 ### 4. Architecture & patterns
@@ -55,7 +55,7 @@ The file is organized in this order — search for these exact landmark headers 
 - **Display normalization**: ALL metric formatting goes through `format_field_value(field_name, value)`. Do not format metrics inline.
 - **Type aliases**: `MetricValue = int | float | str | bool | None` is the value type for metrics.
 - **Protocols over ABCs**: typing for optional deps uses `Protocol` classes (e.g., `SupportsGenerationResult`).
-- **Reports write to** `src/output/reports/` (HTML, Markdown, TSV, diagnostics) and `src/output/` (JSONL, history, logs). Additional conditional outputs: `src/output/issues/` (generated GitHub issue templates), `src/output/repro_bundles/` (JSON reproduction bundles).
+- **Reports write to** `src/output/reports/` (HTML, Markdown, TSV, diagnostics) and `src/output/` (JSONL, history, logs). Hard crashes additionally create factual issue drafts under `src/output/issues/`.
 - **Security**: defaults to `--trust-remote-code` and warns when enabled. The CLI no longer mutates `transformers` backend-selection environment variables at startup.
 
 ### 5. Make targets (all run from repo root)

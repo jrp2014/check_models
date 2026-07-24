@@ -9,8 +9,10 @@ Notable changes to this project will be documented in this file.
 
 - Rebuild maintainer diagnostics from cached current-run assessments with complete
   traceback/output evidence and factual provenance, restrict issue drafts to one
-  per hard crash, remove inferred issue queues, link direct crash drafts, and
-  reproduce actual run settings without guessing resolved model revisions.
+  per hard crash, and remove the unused snapshot, issue-cluster, inferred queue,
+  repro-bundle, and bundle-retention pipeline. Native Python repros now preserve
+  explicit remote-code trust and thinking chat-template settings without guessing
+  resolved model revisions.
 - Rebuild the Markdown model gallery around the cached current-run assessment,
   deterministic avoid/memory/speed chooser policies, mechanically valid
   throughput samples, and complete expandable generated or crash evidence.
@@ -44,10 +46,10 @@ Notable changes to this project will be documented in this file.
   keyword branches, and duplicate review/triage advice; project human and machine
   reports from the canonical two-audience assessment while making
   `src/check_models.py` shorter than its pre-change baseline without suppressions.
-- Gate every issue cluster, queue entry, and draft on canonical `issue_ready`
-  evidence; keep needs-reproduction, harness, connectivity, and model-quality
-  observations in separate diagnostics sections with complete expandable output
-  and normalized full tracebacks.
+- Gate hard-crash issue drafts on canonical actionable-failure evidence; keep
+  needs-reproduction, harness, connectivity, and model-quality observations in
+  separate diagnostics sections with complete expandable output and normalized
+  full tracebacks.
 - Add narrow, immutable evidence and audience-specific assessment types, and
   retain explicit upstream load/generation entry boundaries so maintainer issue
   readiness distinguishes upstream failures, harness observations, and external

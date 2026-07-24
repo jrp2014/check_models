@@ -3,11 +3,10 @@
 from __future__ import annotations
 
 import base64
+import inspect
 import io
 import json
-import os
 import re
-import time
 from argparse import Namespace
 from dataclasses import dataclass, replace
 from pathlib import Path
@@ -27,7 +26,6 @@ from check_models import (
     _build_report_render_context,
     _clean_stale_toplevel_reports,
     _generate_github_issue_reports,
-    _prune_repro_bundles,
     generate_diagnostics_report,
     generate_html_report,
     generate_markdown_gallery_report,
@@ -283,11 +281,6 @@ def _generate_output_artifacts_for_link_style(
         log=output_dir / "check_models.log",
         environment=output_dir / "environment.log",
     )
-    bundle_path = output_dir / "repro_bundles" / "broken.json"
-    bundle_path.parent.mkdir(parents=True, exist_ok=True)
-    check_models._write_text_file(bundle_path, "{}")
-    repro_bundles = {failure.model_name: bundle_path}
-
     with patch.object(check_models._LinkStyleState, "value", link_style):
         generate_html_report(
             results=results,
@@ -335,7 +328,6 @@ def _generate_output_artifacts_for_link_style(
             report_context=report_context,
             log_filename=output_paths.log,
             gallery_filename=output_paths.gallery_markdown,
-            repro_bundles=repro_bundles,
         )
         generate_diagnostics_report(
             results,
@@ -380,7 +372,6 @@ def _generate_output_artifacts_for_link_style(
             diagnostics_artifacts=DiagnosticsArtifacts(
                 outcome_counts=check_models._run_outcome_counts(report_context.assessments),
                 diagnostics_written=True,
-                repro_bundles=repro_bundles,
                 issue_reports=issue_reports,
             ),
         )
@@ -439,8 +430,8 @@ def test_recommendation_view_excludes_crash_from_usable_policies() -> None:
     assert by_model["org/passed"].eligible is True
 
 
-def test_report_context_caches_cross_artifact_views() -> None:
-    """One context should own recommendations, diagnostics, and issue clusters."""
+def test_report_context_caches_only_live_cross_artifact_views() -> None:
+    """The shared context should not retain retired diagnostics classifications."""
     failed = _make_failure("org/crashed")
     passed = _make_success("org/passed")
 
@@ -454,9 +445,28 @@ def test_report_context_caches_cross_artifact_views() -> None:
         "org/crashed",
         "org/passed",
     ]
-    assert context.diagnostics_snapshot.failed == (failed,)
-    assert context.issue_clusters == check_models._build_issue_clusters(
-        context.diagnostics_snapshot
+    assert not hasattr(context, "diagnostics_snapshot")
+    assert not hasattr(context, "issue_clusters")
+
+
+def test_retired_cluster_and_repro_bundle_api_is_absent() -> None:
+    """Removed automatic artifacts must not survive as aliases or compatibility APIs."""
+    for symbol in (
+        "DiagnosticsSnapshot",
+        "IssueCluster",
+        "export_failure_repro_bundles",
+        "build_check_models_repro_command_spec",
+        "_build_repro_command_tokens",
+        "_prune_repro_bundles",
+        "_render_issue_queue_table",
+        "_maintainer_owner_confidence",
+        "MaintainerConfidence",
+    ):
+        assert not hasattr(check_models, symbol), symbol
+    assert "repro_bundles" not in DiagnosticsArtifacts.__dataclass_fields__
+    assert "repro_bundles" not in inspect.signature(generate_review_report).parameters
+    assert "regression/retry context in diagnostics" not in inspect.getsource(
+        check_models.finalize_execution
     )
 
 
@@ -777,10 +787,8 @@ def test_chained_failure_uses_primary_origin_and_reports_mixed_ownership() -> No
 
     assert narrative.primary_exception.startswith("IndexError:")
     assert narrative.suspected_owner == "unresolved: mlx/mlx-vlm"
-    assert narrative.owner_confidence == "low"
     assert cached.review_payload is not None
     assert cached.review_payload["owner"] == narrative.suspected_owner
-    assert context.issue_clusters[0].owner == narrative.suspected_owner
 
 
 def test_published_failure_artifacts_do_not_disclose_home_paths() -> None:
@@ -1801,6 +1809,61 @@ def test_maintainer_summary_logs_only_counts_and_direct_draft_paths(
     assert str(issue_two) in messages
     assert "owner" not in messages.casefold()
     assert "cluster" not in messages.casefold()
+
+
+def test_diagnostics_writer_never_exports_repro_bundles(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Finalization diagnostics should create reports and drafts without bundle artifacts."""
+    crash = _make_failure_with_details("org/crash", error_msg="decode failed")
+    context = _build_report_render_context(results=[crash], prompt="Describe the image.")
+
+    def fail_if_called(**_kwargs: object) -> None:
+        pytest.fail("retired repro-bundle exporter was called")
+
+    monkeypatch.setattr(
+        check_models,
+        "export_failure_repro_bundles",
+        fail_if_called,
+        raising=False,
+    )
+    artifacts = check_models._write_diagnostics_artifacts(
+        args=Namespace(
+            max_tokens=32,
+            temperature=0.0,
+            trust_remote_code=False,
+            revision=None,
+        ),
+        library_versions=_stub_versions(),
+        system_info={},
+        prompt="Describe the image.",
+        image_path=None,
+        diagnostics_path=tmp_path / "reports" / "diagnostics.md",
+        report_context=context,
+    )
+
+    assert artifacts.diagnostics_written is True
+    assert len(artifacts.issue_reports) == 1
+    assert not hasattr(artifacts, "repro_bundles")
+    assert not (tmp_path / "repro_bundles").exists()
+
+
+def test_retained_artifacts_have_no_owner_confidence_path(tmp_path: Path) -> None:
+    """Human and machine artifacts should omit inferred ownership confidence."""
+    failure = _make_failure_with_details("org/failure", error_msg="decode failed")
+    context = _build_report_render_context(results=[failure], prompt="Describe the image.")
+    tsv_path = tmp_path / "results.tsv"
+
+    generate_tsv_report([failure], tsv_path, report_context=context)
+
+    assert not hasattr(context.machine_facts[0], "owner_confidence")
+    narrative = dict(context.failure_narratives)[failure.model_name]
+    assert not hasattr(narrative, "owner_confidence")
+    assert all(
+        triage is None or "confidence" not in triage for _model, triage in context.maintainer_triage
+    )
+    assert "owner_confidence" not in tsv_path.read_text(encoding="utf-8")
 
 
 def test_review_shortlist_obeys_canonical_user_recommendation() -> None:
@@ -4621,33 +4684,6 @@ class TestMarkdownGalleryReport:
         assert "Canonical run log" in content
         assert "Treat as a model-quality limitation" not in content
 
-    def test_review_report_ignores_repro_bundles_without_legacy_issue_queue(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """A repro bundle must not recreate the removed inferred issue queue."""
-        out = tmp_path / "review.md"
-        risky = _with_confirmed_reproduction(
-            _make_harness_success(
-                "org/risky", harness_type="stop_token", harness_detail="token_leak:<s>"
-            )
-        )
-        report_context = _build_report_render_context(results=[risky], prompt="describe")
-        bundle_path = tmp_path / "repro_bundles" / "risky.json"
-
-        generate_review_report(
-            results=[risky],
-            filename=out,
-            prompt="describe",
-            report_context=report_context,
-            repro_bundles={risky.model_name: bundle_path},
-        )
-
-        content = out.read_text(encoding="utf-8")
-        assert "## Maintainer Escalations" not in content
-        assert "issues/index.md" not in content
-        assert "risky.json" not in content
-
     def test_review_report_marks_hint_handling_not_evaluated_without_metadata(
         self,
         tmp_path: Path,
@@ -5042,91 +5078,6 @@ class TestSharedReportSections:
 class TestReproCommandNormalization:
     """Tests for spec-driven repro command generation."""
 
-    def test_check_models_repro_command_uses_shared_spec_path(self, tmp_path: Path) -> None:
-        """Diagnostics and bundles should share canonical check_models command tokens."""
-        image_path = tmp_path / "sample image.jpg"
-        adapter_path = tmp_path / "adapter"
-        quality_config_path = tmp_path / "quality.yaml"
-        custom_end_marker = "</done>"
-        run_args = Namespace(
-            image=image_path,
-            folder=None,
-            models=["org/a", "org/b"],
-            exclude=["org/skip"],
-            trust_remote_code=True,
-            revision="main",
-            adapter_path=adapter_path,
-            prompt="Describe this.",
-            detailed_metrics=True,
-            lazy_load=True,
-            force_download=True,
-            quantize_activations=True,
-            skip_special_tokens=True,
-            enable_thinking=True,
-            max_tokens=123,
-            temperature=0.2,
-            top_p=0.8,
-            min_p=0.1,
-            top_k=4,
-            resize_shape=(64, 32),
-            eos_tokens=["</s>", "<|end|>"],
-            processor_kwargs={"cropping": False},
-            repetition_penalty=1.1,
-            repetition_context_size=64,
-            max_kv_size=4096,
-            kv_bits=4,
-            kv_quant_scheme="turboquant",
-            prefill_step_size=512,
-            thinking_budget=32,
-            thinking_start_token=THINKING_START_TOKEN,
-            thinking_end_token=custom_end_marker,
-            kv_group_size=32,
-            quantized_kv_start=128,
-            timeout=33.0,
-            verbose=True,
-            no_color=True,
-            force_color=False,
-            width=100,
-            quality_config=quality_config_path,
-            context_marker="Visible context:",
-        )
-
-        spec = check_models.build_check_models_repro_command_spec(
-            image_path=image_path,
-            run_args=run_args,
-            include_selection=True,
-        )
-        tokens = check_models._build_repro_command_tokens(
-            image_path=image_path,
-            run_args=run_args,
-            include_selection=True,
-        )
-
-        assert tokens == list(spec.tokens())
-        assert tokens[:5] == ["python", "-m", "check_models", "--image", str(image_path)]
-        assert "--models" in tokens
-        assert "--exclude" in tokens
-        assert "--processor-kwargs" in tokens
-        assert json.loads(tokens[tokens.index("--processor-kwargs") + 1]) == {"cropping": False}
-
-    def test_check_models_repro_command_emits_logit_bias_once(self, tmp_path: Path) -> None:
-        """Canonical check_models repro commands should not duplicate --logit-bias."""
-        image_path = tmp_path / "sample.jpg"
-        run_args = Namespace(
-            trust_remote_code=True,
-            logit_bias={42: -1.5},
-        )
-
-        spec = check_models.build_check_models_repro_command_spec(
-            image_path=image_path,
-            run_args=run_args,
-            include_selection=False,
-        )
-        tokens = list(spec.tokens())
-
-        assert tokens.count("--logit-bias") == 1
-        assert json.loads(tokens[tokens.index("--logit-bias") + 1]) == {"42": -1.5}
-
     def test_native_mlx_vlm_cli_omits_non_cli_generate_kwargs(self, tmp_path: Path) -> None:
         """Native CLI repros should not invent upstream flags absent from mlx-vlm CLI."""
         image_path = tmp_path / "probe.png"
@@ -5201,6 +5152,33 @@ class TestReproCommandNormalization:
         )
         assert "generate(model, processor, PROMPT" not in script
 
+    def test_native_python_repro_preserves_template_kwargs_and_false_trust(self) -> None:
+        """Canonical Python repros should match thinking setup and explicit trust policy."""
+        run_args = Namespace(
+            trust_remote_code=False,
+            enable_thinking=True,
+            thinking_budget=19,
+            thinking_start_token=THINKING_START_TOKEN,
+            thinking_end_token=CUSTOM_THINKING_END_TOKEN,
+            max_tokens=64,
+            temperature=0.1,
+        )
+
+        script = check_models._build_native_mlx_vlm_python_script(
+            model_name="org/model",
+            prompt="Describe this.",
+            image_ref="image.jpg",
+            run_args=run_args,
+        )
+
+        assert "LOAD_KWARGS = {'trust_remote_code': False}" in script
+        assert "TEMPLATE_KWARGS = {" in script
+        assert "'enable_thinking': True" in script
+        assert "'thinking_budget': 19" in script
+        assert f"'thinking_start_token': {THINKING_START_TOKEN!r}" in script
+        assert f"'thinking_end_token': {CUSTOM_THINKING_END_TOKEN!r}" in script
+        assert "    **TEMPLATE_KWARGS," in script
+
 
 def test_output_index_routes_maintainers_and_model_users(tmp_path: Path) -> None:
     """Run-level output index should tell each audience where to start."""
@@ -5233,7 +5211,6 @@ def test_output_index_routes_maintainers_and_model_users(tmp_path: Path) -> None
     artifacts = DiagnosticsArtifacts(
         outcome_counts=check_models._run_outcome_counts(report_context.assessments),
         diagnostics_written=True,
-        repro_bundles={"org/bad": output_dir / "repro_bundles" / "bad.json"},
         issue_reports={"org/bad": issues_dir / "issue_org_bad.md"},
     )
 
@@ -5414,56 +5391,6 @@ def test_generate_tsv_report_standalone_uses_prepared_table_path(tmp_path: Path)
     assert "org/bad" in content
 
 
-class TestPruneReproBundles:
-    """Regression coverage for repro bundle retention."""
-
-    def test_removes_old_bundles(self, tmp_path: Path) -> None:
-        """JSON bundles older than max_age_days are removed."""
-        old_file = tmp_path / "20240101T000000_001_model_sig.json"
-        old_file.write_text("{}", encoding="utf-8")
-        old_time = time.time() - 200 * 86400
-        os.utime(old_file, (old_time, old_time))
-        new_file = tmp_path / "20260401T000000_001_model_sig.json"
-        new_file.write_text("{}", encoding="utf-8")
-
-        removed = _prune_repro_bundles(tmp_path, 90, max_runs=100)
-
-        assert removed == 1
-        assert not old_file.exists()
-        assert new_file.exists()
-
-    def test_zero_days_disables_pruning(self, tmp_path: Path) -> None:
-        """max_age_days=0 disables pruning."""
-        (tmp_path / "20260401T000000_001_model_sig.json").write_text("{}", encoding="utf-8")
-        assert _prune_repro_bundles(tmp_path, 0) == 0
-
-    def test_nonexistent_dir(self, tmp_path: Path) -> None:
-        """A non-existent directory returns zero."""
-        assert _prune_repro_bundles(tmp_path / "nonexistent", 90) == 0
-
-    def test_prunes_json_files_by_run_count(self, tmp_path: Path) -> None:
-        """JSON bundle files beyond max_runs are pruned."""
-        for index, prefix in enumerate(("20260401T000000", "20260402T000000", "20260403T000000")):
-            (tmp_path / f"{prefix}_{index:03d}_model_sig.json").write_text(
-                "{}",
-                encoding="utf-8",
-            )
-
-        removed = _prune_repro_bundles(tmp_path, max_age_days=9999, max_runs=2)
-
-        assert removed == 1
-        assert not (tmp_path / "20260401T000000_000_model_sig.json").exists()
-        assert (tmp_path / "20260402T000000_001_model_sig.json").exists()
-        assert (tmp_path / "20260403T000000_002_model_sig.json").exists()
-
-    def test_removes_empty_directories(self, tmp_path: Path) -> None:
-        """Empty subdirectories are cleaned up."""
-        empty = tmp_path / "empty_dir"
-        empty.mkdir()
-        _prune_repro_bundles(tmp_path, max_age_days=9999, max_runs=100)
-        assert not empty.exists()
-
-
 class TestCleanStaleToplevelReports:
     """Regression coverage for stale top-level report cleanup."""
 
@@ -5494,6 +5421,56 @@ class TestCleanStaleToplevelReports:
 
         assert _clean_stale_toplevel_reports(tmp_path, reports_dir) == 0
         assert only_copy.exists()
+
+
+class TestGithubIssueReportsCleanup:
+    """Regression coverage for live stale crash-draft cleanup."""
+
+    def test_stale_issue_files_removed(self, tmp_path: Path) -> None:
+        """Old issue_*.md files are removed even when the next run has no crashes."""
+        issues_dir = tmp_path / "issues"
+        issues_dir.mkdir()
+        stale_crash = issues_dir / "issue_001_crash.md"
+        stale_harness = issues_dir / "issue_002_harness.md"
+        stale_index = issues_dir / "index.md"
+        readme = issues_dir / "README.md"
+        stale_crash.write_text("stale crash report", encoding="utf-8")
+        stale_harness.write_text("stale harness report", encoding="utf-8")
+        stale_index.write_text("stale index", encoding="utf-8")
+        readme.write_text("keep me", encoding="utf-8")
+        context = _build_report_render_context(results=[], prompt="Describe the image.")
+
+        generated = _generate_github_issue_reports(
+            report_context=context,
+            output_dir=tmp_path,
+            library_versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            prompt="Describe the image.",
+        )
+
+        assert generated == {}
+        assert not stale_crash.exists()
+        assert not stale_harness.exists()
+        assert not stale_index.exists()
+        assert readme.exists()
+
+
+class TestEmptyRecommendedBucketExplanation:
+    """Regression coverage for the empty recommended bucket explanation."""
+
+    def test_recommended_bucket_shows_explanation(self) -> None:
+        """Only the recommended bucket should explain why no model qualified."""
+        markdown: list[str] = []
+        check_models._append_review_user_buckets(
+            markdown,
+            {"recommended": [], "caveat": [], "needs_triage": [], "avoid": []},
+        )
+
+        none_lines = [line for line in markdown if line.startswith("- None")]
+        explanation_lines = [line for line in none_lines if "quality thresholds" in line]
+        plain_none_lines = [line for line in none_lines if line.strip() == "- None."]
+        assert len(explanation_lines) == 1
+        assert len(plain_none_lines) == 3
 
 
 def test_quality_signal_summary_reports_incomplete_thinking_without_fault_language() -> None:

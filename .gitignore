@@ -68,4 +68,3 @@ typings/
 src/output/test_*
 src/output/reports/test_*
 src/output/issues/test_*
-src/output/repro_bundles/test_*

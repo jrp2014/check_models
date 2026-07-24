@@ -118,7 +118,6 @@ clean: ## Remove generated files and caches
 	rm -f $(SRC)/output/review.md $(SRC)/output/results.tsv $(SRC)/output/diagnostics.md
 	rm -f $(SRC)/output/results.jsonl $(SRC)/output/results.history.jsonl
 	rm -f $(SRC)/output/check_models.log $(SRC)/output/environment.log
-	find $(SRC)/output/repro_bundles -mindepth 1 -maxdepth 1 -exec rm -rf {} + 2>/dev/null || true
 
 .PHONY: clean-all
 clean-all: clean ## Deep clean including build artifacts and stubs

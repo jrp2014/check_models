@@ -264,24 +264,18 @@ The tool generates multiple report formats in `output/` by default:
   check_models producer version/revision, source-image identity and dimensions,
   common generation settings, and artifact paths.
 - **Diagnostics** (`reports/diagnostics.md`): Self-contained, issue-ready mlx-vlm
-  report with native reproduction commands and complete affected-model output in
-  per-model expandable evidence blocks. Definite crashes are reported as outcomes;
+  report with native reproduction commands and complete affected-model output.
+  Definite crashes are reported as outcomes;
   external-connectivity interruptions are retained as indeterminate attempts and
   excluded from upstream issue drafts and evaluated/failure totals;
-  traceback evidence remains bounded, package ownership and confidence remain
-  cautious triage, and successful configuration/context observations that still
+  traceback evidence remains complete, and successful configuration/context observations that still
   need a controlled reproduction stay separate from the confirmed mlx-vlm issue
   matrix.
 - **Log** (`check_models.log`): Canonical comprehensive run artifact, including the full per-model review block and full output/captured failure output.
 - **History** (`results.history.jsonl`): Append-only run history for regressions/recoveries.
-- **Issue templates** (`issues/`): Ready-to-file GitHub issue markdown for clustered
-  `issue_ready` failures or controlled reproductions, including Model, Inputs,
-  Expected Behavior, and Actual Behavior sections. Harness observations and
-  unconfirmed output anomalies remain in diagnostics and do not create drafts.
-- **Repro bundles** (`repro_bundles/`): JSON reproduction bundles per issue cluster,
-  containing error or output-quality details, CLI args, and environment for
-  reproducibility. Local home paths are normalized and repro commands use portable
-  image references.
+- **Issue templates** (`issues/`): One factual GitHub issue draft per hard crash,
+  with complete recorded evidence and a native reproduction script. Successful
+  observations and indeterminate attempts remain in diagnostics and create no draft.
 
 The main Markdown report stays brief and points readers to `model_selection.md`,
 `model_gallery.md`, `review.md`, and `check_models.log` for decisions, evidence,
@@ -1007,8 +1001,8 @@ See module docstrings and `__all__` exports for complete API reference.
 ## Evaluation lanes
 
 Each invocation runs exactly one resolved evaluation lane. Reports, JSONL headers,
-run metadata, repro bundles, and history rows record that resolved lane, and
-historical comparisons never combine observations from different lanes.
+run metadata, and history rows record that resolved lane, and historical comparisons
+never combine observations from different lanes.
 
 | Lane | Prompt input | Default token cap | Intended use |
 | ---- | ------------ | ----------------- | ------------ |
@@ -1109,7 +1103,6 @@ python -m check_models --image photo.jpg --eval-mode assisted
 | `--width` | int | (auto) | Force a fixed output width (columns) for separators and wrapping. |
 | `-c`, `--quality-config` | Path | (none) | Path to custom quality configuration YAML file. |
 | `--context-marker` | str | `Context:` | Marker used to identify context section in prompt. |
-| `--prune-repro-days` | int | 90 | Delete repro bundles older than N days. Set 0 to disable pruning. |
 | `--rerun-triage` | flag | `False` | Rerun triage-worthy models with a simple prompt for secondary evidence. First-pass results are never overwritten. |
 | `-n`, `--dry-run` | flag | `False` | Validate arguments and show what would run without invoking models. |
 
@@ -1214,8 +1207,8 @@ Tab-separated values for programmatic analysis (spreadsheets, `awk`, pandas, etc
   Run-level timestamps and provenance live in `run.json`.
 - **Compact adaptive columns**: Stable caption/runtime and canonical
   execution/recommendation fields are always present. Compatibility, scoring,
-  prompt-detail, memory, owner-confidence, and error columns appear only when at
-  least one row has evidence. Output-preview and diffusion-only fields are omitted.
+  prompt-detail, memory, and error columns appear only when at least one row has
+  evidence. Output-preview and diffusion-only fields are omitted.
 - **Literal TSV**: Fields are written with real tab delimiters and CSV-compatible
   quoting. Embedded generated-output newlines are represented as literal `\n`, and
   the exact generated text is not shortened. Use JSONL for exhaustive diagnostics.
@@ -1238,14 +1231,14 @@ A comprehensive Markdown report focused on upstream debugging and issue reportin
 - **Generation**: Created automatically when failures, harness issues (e.g.,
   garbled output), text-sanity/semantic issues, or preflight compatibility
   warnings are detected.
-- **Failures Clustered**: Groups similar errors together to identify systemic issues.
+- **Hard crashes**: Records each actionable crash directly with complete evidence.
 - **Reproducibility**: Includes explicit commands to reproduce specific failures.
 - **Environment**: Captures full package versions and system specs.
 - **Issue readiness**: Definite failures are ready to file; successful thinking-token
   or context-boundary observations remain visible with complete evidence but require
   the stated controlled reproduction before they become issue drafts.
-- **Ready-to-File**: Confirmed issue clusters are formatted to be copy-pasted directly
-  into GitHub issues.
+- **Ready-to-File**: Each actionable hard crash gets a factual draft that can be
+  copied directly into a GitHub issue.
 
 ### Preflight Compatibility Warnings
 
@@ -1364,7 +1357,6 @@ check_models/
 │       │   ├── results.tsv
 │       │   └── diagnostics.md
 │       ├── issues/           # Generated GitHub issue templates
-│       ├── repro_bundles/    # JSON reproduction bundles
 │       ├── results.jsonl
 │       ├── model_capabilities.json
 │       ├── run.json

@@ -794,7 +794,6 @@ def test_output_artifact_policy_is_documented_and_gitignored() -> None:
         "src/output/test_*",
         "src/output/reports/test_*",
         "src/output/issues/test_*",
-        "src/output/repro_bundles/test_*",
     }.issubset(gitignore_lines)
 
 
@@ -1397,21 +1396,6 @@ def test_tsv_output_tests_use_safe_text_reads_for_skylos_advisory_scan() -> None
     assert "from tools import safe_io" in test_source
     assert "safe_io.read_text_no_follow(path)" in test_source
     assert "path.read_text" not in test_source
-
-
-def test_report_generation_link_style_helper_uses_safe_bundle_write() -> None:
-    """Report fixture bundle writes should not follow symlinks."""
-    test_source = (PKG_ROOT / "tests" / "test_report_generation.py").read_text(
-        encoding="utf-8",
-    )
-    helper_source = test_source[
-        test_source.index("def _generate_output_artifacts_for_link_style") : test_source.index(
-            "def _make_success",
-        )
-    ]
-
-    assert 'check_models._write_text_file(bundle_path, "{}")' in helper_source
-    assert "bundle_path.write_text" not in helper_source
 
 
 def test_defusedxml_probe_avoids_unused_import_suppression() -> None:
