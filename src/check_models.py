@@ -2052,6 +2052,7 @@ _PUBLISHED_REPORT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
 )
 _PUBLISHED_ROOT_OUTPUT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
     {
+        DEFAULT_OUTPUT_INDEX.name,
         DEFAULT_LOG_OUTPUT.name,
         DEFAULT_JSONL_OUTPUT.name,
         DEFAULT_RUN_JSON_OUTPUT.name,
@@ -11801,9 +11802,7 @@ def _published_output_repo_path(artifact_filename: Path) -> PurePosixPath | None
         return _PUBLISHED_OUTPUT_ROOT / "reports" / artifact_name
     if artifact_name in _PUBLISHED_ROOT_OUTPUT_ARTIFACT_NAMES:
         return _PUBLISHED_OUTPUT_ROOT / artifact_name
-    if artifact_name == "index.md" or (
-        artifact_name.startswith("issue_") and artifact_name.endswith(".md")
-    ):
+    if artifact_name.startswith("issue_") and artifact_name.endswith(".md"):
         return _PUBLISHED_OUTPUT_ROOT / "issues" / artifact_name
     return None
 

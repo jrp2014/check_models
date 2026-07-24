@@ -217,6 +217,22 @@ def _is_published_output_github_target(target: str) -> bool:
     return _PUBLISHED_OUTPUT_GITHUB_TARGET_RE.match(target.split("#", 1)[0]) is not None
 
 
+def test_custom_published_index_and_issue_drafts_use_distinct_repo_paths(
+    tmp_path: Path,
+) -> None:
+    """A retained index must publish at the output root while drafts stay under issues."""
+    custom_index = tmp_path / "custom-run" / "index.md"
+    issue_draft = tmp_path / "custom-run" / "issues" / "issue_org_model.md"
+
+    index_path = check_models._published_output_repo_path(custom_index)
+    issue_path = check_models._published_output_repo_path(issue_draft)
+
+    assert index_path is not None
+    assert issue_path is not None
+    assert index_path.as_posix() == "src/output/index.md"
+    assert issue_path.as_posix() == "src/output/issues/issue_org_model.md"
+
+
 def _relative_output_artifact_map(
     output_dir: Path,
     output_paths: check_models.ReportOutputPaths,

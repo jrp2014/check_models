@@ -215,6 +215,12 @@ class TestE2ESmoke:
         capsys: pytest.CaptureFixture[str],
     ) -> None:
         """Full inference run should complete successfully and produce outputs."""
+        default_index_existed = check_models.DEFAULT_OUTPUT_INDEX.exists()
+        default_index_before = (
+            safe_io.read_text_no_follow(check_models.DEFAULT_OUTPUT_INDEX)
+            if default_index_existed
+            else None
+        )
         args = [
             *_get_e2e_output_args(e2e_output_dir),
             "--image",
@@ -231,21 +237,38 @@ class TestE2ESmoke:
         result = _run_cli(args, capsys)
         assert result.exit_code == 0
 
-        # Verify output files were created
-        e2e_html = e2e_output_dir / "e2e.html"
-        e2e_gallery = e2e_output_dir / "e2e_gallery.md"
-        e2e_diagnostics = e2e_output_dir / "e2e_diagnostics.md"
-        e2e_jsonl = e2e_output_dir / "e2e.jsonl"
-        e2e_run_json = e2e_output_dir / "e2e_run.json"
-        assert e2e_html.exists()
-        assert e2e_gallery.exists()
-        assert e2e_diagnostics.exists()
-        assert e2e_jsonl.exists()
-        assert e2e_run_json.exists()
+        retained_paths = check_models.ReportOutputPaths(
+            index=e2e_output_dir / "index.md",
+            html=e2e_output_dir / "e2e.html",
+            gallery_markdown=e2e_output_dir / "e2e_gallery.md",
+            jsonl=e2e_output_dir / "e2e.jsonl",
+            run_json=e2e_output_dir / "e2e_run.json",
+            diagnostics=e2e_output_dir / "e2e_diagnostics.md",
+            log=e2e_output_dir / "e2e.log",
+            environment=e2e_output_dir / "e2e_env.log",
+        )
+        for output_path in (
+            retained_paths.index,
+            retained_paths.html,
+            retained_paths.gallery_markdown,
+            retained_paths.jsonl,
+            retained_paths.run_json,
+            retained_paths.diagnostics,
+            retained_paths.log,
+            retained_paths.environment,
+        ):
+            assert output_path.exists(), output_path
+
+        assert check_models.DEFAULT_OUTPUT_INDEX.exists() is default_index_existed
+        if default_index_before is not None:
+            assert (
+                safe_io.read_text_no_follow(check_models.DEFAULT_OUTPUT_INDEX)
+                == default_index_before
+            )
 
         records = [
             json.loads(line)
-            for line in safe_io.read_text_no_follow(e2e_jsonl).splitlines()
+            for line in safe_io.read_text_no_follow(retained_paths.jsonl).splitlines()
             if line.strip()
         ]
         assert len(records) >= 2  # metadata header + at least 1 result
