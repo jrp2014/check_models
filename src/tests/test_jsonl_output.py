@@ -7,7 +7,7 @@ import json
 from dataclasses import dataclass
 from types import SimpleNamespace
 from typing import TYPE_CHECKING, cast
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from PIL import Image
 
@@ -1500,23 +1500,40 @@ class TestRerunEvidence:
     """Tests for differential rerun evidence in JSONL output."""
 
     def test_select_rerun_candidates_picks_failures(self) -> None:
-        """_select_rerun_candidates picks failed models without verdicts."""
+        """Crashed models are selected from their current-run assessment."""
         ok = PerformanceResult(model_name="ok", generation=MockGeneration(), success=True)
         fail = PerformanceResult(model_name="fail", generation=None, success=False)
         candidates = check_models._select_rerun_candidates([ok, fail])
         assert len(candidates) == 1
         assert candidates[0].model_name == "fail"
 
-    def test_select_rerun_candidates_skips_deterministic_verdicts(self) -> None:
-        """Models with harness/model_shortcoming verdicts are not rerun candidates."""
-        # Create a mock quality_analysis with verdict="harness"
-        qa = MagicMock()
-        qa.verdict = "harness"
-        result = PerformanceResult(
-            model_name="harness-model",
-            generation=MockGeneration(),
+    def test_select_rerun_candidates_uses_typed_mechanical_observations(self) -> None:
+        """Completed observations, but not clean completions, merit a rerun."""
+        repeated_phrase = "loop"
+        observed = PerformanceResult(
+            model_name="observed-model",
+            generation=MockGeneration(text=f"{repeated_phrase} " * 100, generation_tokens=100),
             success=True,
-            quality_analysis=qa,
+            quality_analysis=check_models.GenerationQualityAnalysis(
+                is_repetitive=True,
+                repeated_token=repeated_phrase,
+                word_count=100,
+            ),
         )
-        candidates = check_models._select_rerun_candidates([result])
-        assert len(candidates) == 0
+        clean = PerformanceResult(
+            model_name="clean-model",
+            generation=MockGeneration(
+                text="A complete description of the visible scene.",
+                generation_tokens=20,
+            ),
+            success=True,
+            quality_analysis=check_models.GenerationQualityAnalysis(
+                is_repetitive=False,
+                repeated_token=None,
+                word_count=8,
+            ),
+        )
+
+        candidates = check_models._select_rerun_candidates([observed, clean])
+
+        assert [candidate.model_name for candidate in candidates] == ["observed-model"]

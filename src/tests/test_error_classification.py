@@ -3,18 +3,10 @@
 import pytest
 
 from check_models import (
-    ControlledReproductionStatus,
-    FailureOrigin,
-    MaintainerReadiness,
-    PerformanceResult,
-    UpstreamBoundary,
     _attribute_error_to_package,
     _build_canonical_error_code,
     _build_error_signature,
-    _build_failure_action_hint,
     _classify_error,
-    _failure_origin,
-    _maintainer_readiness,
 )
 
 
@@ -128,118 +120,3 @@ def test_error_signature_normalizes_numeric_variants() -> None:
         error_traceback=None,
     )
     assert sig_a == sig_b
-
-
-@pytest.mark.parametrize(
-    ("error_package", "failure_phase", "error_stage", "expected_phrases"),
-    [
-        (
-            "mlx-vlm",
-            "decode",
-            "Model Error",
-            ("mlx-vlm generation/integration path", "decode/generation", "model runtime failure"),
-        ),
-        (
-            "model-config",
-            "processor_load",
-            "Processor Error",
-            (
-                "model repository/config artifacts",
-                "processor/image-processor initialization",
-                "processor construction",
-            ),
-        ),
-    ],
-)
-def test_build_failure_action_hint_is_maintainer_actionable(
-    error_package: str,
-    failure_phase: str,
-    error_stage: str,
-    expected_phrases: tuple[str, str, str],
-) -> None:
-    """Failure hint should include owner, component, and likely-cause clues."""
-    hint = _build_failure_action_hint(
-        error_package=error_package,
-        failure_phase=failure_phase,
-        error_stage=error_stage,
-    )
-    hint_lower = hint.lower()
-    for phrase in expected_phrases:
-        assert phrase.lower() in hint_lower
-
-
-@pytest.mark.parametrize(
-    ("origin", "reproduction", "has_output_anomaly", "expected"),
-    [
-        ("harness_preflight", "not_run", False, "harness_observation"),
-        ("external_service", "not_run", False, "not_applicable"),
-        ("unknown", "not_run", False, "needs_reproduction"),
-        ("upstream_load", "not_run", False, "issue_ready"),
-        ("upstream_generation", "not_run", False, "issue_ready"),
-        ("unknown", "confirmed", True, "issue_ready"),
-        ("unknown", "not_reproduced", True, "not_applicable"),
-        ("unknown", "indeterminate", True, "needs_reproduction"),
-        ("unknown", "not_run", True, "needs_reproduction"),
-    ],
-)
-def test_maintainer_readiness_uses_origin_and_reproduction_evidence(
-    origin: FailureOrigin,
-    reproduction: ControlledReproductionStatus,
-    has_output_anomaly: bool,
-    expected: MaintainerReadiness,
-) -> None:
-    """Maintainer readiness must not collapse model-user and issue-fileability views."""
-    assert (
-        _maintainer_readiness(
-            failure_origin=origin,
-            reproduction_status=reproduction,
-            has_output_anomaly=has_output_anomaly,
-        )
-        == expected
-    )
-
-
-@pytest.mark.parametrize(
-    ("boundary", "phase", "message", "expected"),
-    [
-        ("not_started", "model_preflight", "invalid local image input", "harness_preflight"),
-        ("load_started", "model_load", "loader raised", "upstream_load"),
-        ("generation_started", "decode", "generator raised", "upstream_generation"),
-        (
-            "load_started",
-            "model_load",
-            "server disconnected without sending a response",
-            "external_service",
-        ),
-    ],
-)
-def test_failure_origin_follows_execution_boundary(
-    boundary: UpstreamBoundary,
-    phase: str,
-    message: str,
-    expected: FailureOrigin,
-) -> None:
-    """Failure ownership begins with the recorded upstream entry boundary."""
-    result = PerformanceResult(
-        model_name="example/model",
-        generation=None,
-        success=False,
-        failure_phase=phase,
-        error_message=message,
-        upstream_boundary=boundary,
-    )
-
-    assert _failure_origin(result) == expected
-
-
-def test_unknown_failure_origin_requires_trustworthy_boundary_evidence() -> None:
-    """An untagged failure must remain unknown rather than being blamed upstream."""
-    result = PerformanceResult(
-        model_name="example/model",
-        generation=None,
-        success=False,
-        failure_phase="unexpected_phase",
-        error_message="unclassified failure",
-    )
-
-    assert _failure_origin(result) == "unknown"

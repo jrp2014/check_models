@@ -10,7 +10,6 @@ thresholds:
   min_phrase_length: 4
   max_phrase_length: 10
   min_context_term_length: 2
-  min_keywords_for_duplication_check: 12
   min_tokens_for_substantial: 10
   min_words_for_filler_response: 15
   min_words_for_truncated: 5
@@ -25,22 +24,3 @@ thresholds:
   prompt_keyword_max_items: 20
   prompt_word_to_token_ratio: 1.3
   cutoff_tail_chars: 120
-
-patterns:
-  # Source/location words that are not reliable visual requirements.
-  nonvisual_location_terms:
-    - "deben estuary"
-    - "woodbridge"
-    - "town"
-    - "centre"
-    - "center"
-    - "village"
-    - "parish"
-    - "county"
-    - "borough"
-    - "district"
-    - "municipality"
-    - "province"
-    - "region"
-    - "state"
-    - "country"

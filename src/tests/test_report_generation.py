@@ -547,7 +547,7 @@ def test_all_caveated_html_omits_cataloging_aggregates_and_winner(
     assert "Best for cataloging" not in html_text
 
 
-def test_chained_failure_uses_primary_origin_and_reports_mixed_ownership() -> None:
+def test_chained_failure_retains_exact_exception_chain() -> None:
     failure = replace(
         _make_failure("org/chained", error_package="mlx"),
         exception_chain=(
@@ -566,10 +566,11 @@ def test_chained_failure_uses_primary_origin_and_reports_mixed_ownership() -> No
         ),
     )
 
-    narrative = check_models._build_failure_narrative(failure)
-
-    assert narrative.primary_exception.startswith("IndexError:")
-    assert narrative.suspected_owner == "unresolved: mlx/mlx-vlm"
+    assert [entry.exception_type for entry in failure.exception_chain] == [
+        "IndexError",
+        "RuntimeError",
+    ]
+    assert [entry.module for entry in failure.exception_chain] == ["builtins", "mlx.core"]
 
 
 def test_published_failure_artifacts_do_not_disclose_home_paths() -> None:
@@ -1114,9 +1115,9 @@ def test_retained_artifacts_have_no_owner_confidence_path(tmp_path: Path) -> Non
         report_context=context,
     )
 
-    narrative = check_models._build_failure_narrative(failure)
-    assert not hasattr(narrative, "owner_confidence")
-    assert "owner_confidence" not in jsonl_path.read_text(encoding="utf-8")
+    jsonl_text = jsonl_path.read_text(encoding="utf-8")
+    assert "owner_confidence" not in jsonl_text
+    assert "suspected_owner" not in jsonl_text
 
 
 class TestHtmlReportEdgeCases:

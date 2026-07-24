@@ -215,7 +215,6 @@ class TestProcessImageWithModelMock:
             result = check_models.process_image_with_model(params)
 
         assert result.upstream_boundary == "load_started"
-        assert check_models._failure_origin(result) == "upstream_load"
 
     def test_process_records_upstream_generation_failure(self, test_image: Path) -> None:
         """A decode exception should retain that upstream generation was entered."""
@@ -239,7 +238,6 @@ class TestProcessImageWithModelMock:
             result = check_models.process_image_with_model(params)
 
         assert result.upstream_boundary == "generation_started"
-        assert check_models._failure_origin(result) == "upstream_generation"
 
     def test_extract_generation_performance_data_uses_generation_result(self) -> None:
         """Performance snapshots should prefer upstream GenerationResult metrics."""
@@ -498,13 +496,11 @@ class TestProcessImageWithModelMock:
             "RuntimeError",
             "ValueError",
         ]
-        narrative = check_models._build_failure_narrative(result)
-        assert narrative.task_outcome == "crashed"
-        assert narrative.primary_exception == "IndexError: token id 999 outside detokenizer table"
-        assert narrative.secondary_exceptions == (
-            "RuntimeError: METAL command buffer out of memory",
-            "ValueError: generation failed",
-        )
+        assert [entry.message for entry in result.exception_chain] == [
+            "token id 999 outside detokenizer table",
+            "METAL command buffer out of memory",
+            "generation failed",
+        ]
 
     def test_build_failure_result_reuses_one_root_selection_traversal(self) -> None:
         """Failure building should reuse the canonical root selector over one chain walk."""
@@ -538,8 +534,8 @@ class TestProcessImageWithModelMock:
         assert result.root_error_type == "IndexError"
         assert result.root_error_message == "bad token"
 
-    def test_failure_narrative_marks_mixed_runtime_owners_unresolved(self) -> None:
-        """A mixed mlx-vlm/MLX chain should not be assigned confidently to one owner."""
+    def test_failure_result_preserves_mixed_runtime_exception_modules(self) -> None:
+        """A mixed runtime chain retains exact modules without an owner projection."""
         runtime_error = RuntimeError("kIOGPUCommandBufferCallbackErrorOutOfMemory")
         wrapper_error = ValueError("mlx_vlm/generate.py generation failed")
         wrapper_error.__cause__ = runtime_error
@@ -553,9 +549,10 @@ class TestProcessImageWithModelMock:
                 captured_output=None,
             )
 
-        narrative = check_models._build_failure_narrative(result)
-        assert narrative.task_outcome == "crashed"
-        assert narrative.suspected_owner == "unresolved: mlx/mlx-vlm"
+        assert [entry.module for entry in result.exception_chain] == [
+            "builtins",
+            "builtins",
+        ]
 
     def test_build_failure_result_preserves_quality_fields(self) -> None:
         """Failure builder should carry precomputed quality diagnostics when provided."""

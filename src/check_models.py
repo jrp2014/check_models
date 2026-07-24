@@ -387,7 +387,6 @@ class QualityThresholds:
     min_phrase_length: int = 4
     max_phrase_length: int = 10
     min_context_term_length: int = 2
-    min_keywords_for_duplication_check: int = 12
     min_tokens_for_substantial: int = 10
     min_words_for_filler_response: int = 15
     min_words_for_truncated: int = 5
@@ -402,7 +401,6 @@ class QualityThresholds:
     prompt_keyword_max_items: int = 20
     prompt_word_to_token_ratio: float = 1.3
     cutoff_tail_chars: int = 120
-    patterns: dict[str, list[str]] | None = None
 
     def __post_init__(self) -> None:
         """Validate the retained detector thresholds."""
@@ -427,29 +425,6 @@ class QualityThresholds:
             )
             raise ValueError(msg)
 
-        if self.patterns is not None:
-            if not isinstance(self.patterns, dict):
-                msg = "quality_config.yaml patterns section must be a mapping"
-                raise TypeError(msg)
-            for pattern_group, entries in self.patterns.items():
-                if not isinstance(entries, list):
-                    msg = f"quality_config.yaml patterns.{pattern_group} must be a list of strings"
-                    raise TypeError(msg)
-                for entry in entries:
-                    if not isinstance(entry, str):
-                        msg = (
-                            f"quality_config.yaml patterns.{pattern_group} entries must be strings"
-                        )
-                        raise TypeError(msg)
-                    try:
-                        re.compile(entry)
-                    except re.error as exc:
-                        msg = (
-                            "quality_config.yaml patterns."
-                            f"{pattern_group} contains invalid regex {entry!r}: {exc}"
-                        )
-                        raise ValueError(msg) from exc
-
     @classmethod
     def from_config(cls, config: Mapping[str, object]) -> QualityThresholds:
         """Create an instance from the packaged configuration mapping."""
@@ -457,17 +432,7 @@ class QualityThresholds:
             config.get("thresholds", {}),
             "quality_config.yaml thresholds section must be a mapping",
         )
-        patterns_value = config.get("patterns", {})
-        if patterns_value is None:
-            patterns: dict[str, list[str]] | None = None
-        else:
-            patterns_mapping = _require_str_object_mapping(
-                patterns_value,
-                "quality_config.yaml patterns section must be a mapping",
-            )
-            patterns = cast("dict[str, list[str]]", dict(patterns_mapping))
-
-        valid_fields = {field.name for field in fields(cls) if field.name != "patterns"}
+        valid_fields = {field.name for field in fields(cls)}
         filtered_thresholds = {
             key: value for key, value in thresholds.items() if key in valid_fields
         }
@@ -477,13 +442,13 @@ class QualityThresholds:
                 "Unrecognised keys in quality_config.yaml thresholds (ignored): %s",
                 ", ".join(sorted(unknown_threshold_keys)),
             )
-        unknown_sections = set(config) - {"thresholds", "patterns"}
+        unknown_sections = set(config) - {"thresholds"}
         if unknown_sections:
             logger.warning(
                 "Unrecognised top-level sections in quality_config.yaml (ignored): %s",
                 ", ".join(sorted(unknown_sections)),
             )
-        return cls(**cast("dict[str, Any]", filtered_thresholds), patterns=patterns)
+        return cls(**cast("dict[str, Any]", filtered_thresholds))
 
 
 # Instantiate singletons for runtime use
@@ -778,12 +743,6 @@ type LogitBiasDict = dict[int, float]
 type GPSDict = dict[str, ExifValue]  # GPS EXIF data structure
 type EvaluationLane = Literal["triage", "blind", "assisted"]
 type RequestedEvaluationMode = EvaluationLane | Literal["auto", "stress", "quality"]
-type ReportSelectionBasis = Literal[
-    "caption hygiene only",
-    "metadata-assisted visual verification",
-    "held-out trusted image metadata",
-    "ungrounded visual/cataloguing heuristics",
-]
 type SystemProfilerEntry = dict[str, object]
 type SystemProfilerDict = dict[
     str, list[SystemProfilerEntry]
@@ -948,25 +907,6 @@ type ObservationCode = Literal[
     "no_keyword_overlap",
 ]
 type UpstreamBoundary = Literal["not_started", "load_started", "generation_started"]
-type FailureOrigin = Literal[
-    "harness_preflight",
-    "upstream_load",
-    "upstream_generation",
-    "external_service",
-    "unknown",
-]
-type MaintainerReadiness = Literal[
-    "issue_ready",
-    "needs_reproduction",
-    "harness_observation",
-    "not_applicable",
-]
-type ControlledReproductionStatus = Literal[
-    "not_run",
-    "confirmed",
-    "not_reproduced",
-    "indeterminate",
-]
 type KeywordOverlapState = Literal["not_assessable", "no_overlap", "some_overlap"]
 
 
@@ -1729,18 +1669,6 @@ class FailureException:
     module: str
     message: str
     origin: str | None = None
-
-
-@dataclass(frozen=True)
-class FailureNarrative:
-    """Canonical task outcome and suspected ownership for a failed run."""
-
-    task_outcome: Literal["crashed"]
-    phase: str | None
-    stage: str | None
-    primary_exception: str
-    secondary_exceptions: tuple[str, ...]
-    suspected_owner: str
 
 
 @dataclass(frozen=True)
@@ -3433,84 +3361,6 @@ def _normalize_output_for_analysis(
     return NormalizedOutput(text=normalized, removed_wrappers=tuple(removed))
 
 
-CONTEXT_NOISE_TERMS: Final[frozenset[str]] = frozenset(
-    {
-        "capture",
-        "cataloguing",
-        "cataloging",
-        "context",
-        "description",
-        "existing",
-        "hint",
-        "hints",
-        "image",
-        "keyword",
-        "keywords",
-        "local",
-        "metadata",
-        "photo",
-        "picture",
-        "taken",
-        "title",
-        "trusted",
-        "visual",
-    },
-)
-
-CONTEXT_COMMON_WORDS: Final[frozenset[str]] = frozenset(
-    {
-        "the",
-        "a",
-        "an",
-        "and",
-        "or",
-        "but",
-        "in",
-        "on",
-        "at",
-        "to",
-        "for",
-        "of",
-        "with",
-        "by",
-        "from",
-        "about",
-        "as",
-        "this",
-        "that",
-        "these",
-        "those",
-        "is",
-        "are",
-        "was",
-        "were",
-        "be",
-        "been",
-        "being",
-        "have",
-        "has",
-        "had",
-        "do",
-        "does",
-        "did",
-        "will",
-        "would",
-        "should",
-        "could",
-        "may",
-        "might",
-        "must",
-        "can",
-    }.union(CONTEXT_NOISE_TERMS),
-)
-
-CONTEXT_TERM_ALIASES: Final[dict[str, tuple[str, ...]]] = {
-    "uk": ("united kingdom", "u k", "u.k."),
-    "united kingdom": ("uk", "u k", "u.k."),
-    "usa": ("united states", "u s a", "u.s.a."),
-    "united states": ("usa", "u s a", "u.s.a."),
-}
-
 PROMPT_ECHO_MARKERS: Final[tuple[str, ...]] = (
     "return exactly these three sections",
     "do not output reasoning",
@@ -3522,76 +3372,28 @@ PROMPT_ECHO_MARKERS: Final[tuple[str, ...]] = (
     "capture metadata:",
 )
 
-NONVISUAL_CONTEXT_TERMS: Final[frozenset[str]] = frozenset(
-    {
-        "adobe stock",
-        "any vision",
-        "borough",
-        "center",
-        "centre",
-        "country",
-        "county",
-        "district",
-        "england",
-        "europe",
-        "gps",
-        "hertfordshire",
-        "locations",
-        "municipality",
-        "parish",
-        "province",
-        "region",
-        "source",
-        "state",
-        "stock",
-        "taken",
-        "time",
-        "timestamp",
-        "town",
-        "uk",
-        "united kingdom",
-        "village",
-        "welwyn garden city",
-    },
-)
-
-NONVISUAL_CONTEXT_PATTERNS: Final[tuple[re.Pattern[str], ...]] = (
-    re.compile(r"\b(?:gps|lat(?:itude)?|lon(?:gitude)?|coordinate)s?\b", re.IGNORECASE),
-    re.compile(
-        r"\b(?:taken on|capture metadata|capture time|timestamp|local time)\b", re.IGNORECASE
-    ),
-    re.compile(r"\b\d{4}-\d{2}-\d{2}\b"),
-    re.compile(r"\b\d{1,2}:\d{2}(?::\d{2})?\b"),
-    re.compile(r"\b\d+(?:\.\d+)?°[nswe]\b", re.IGNORECASE),
-)
-
 
 @dataclass(frozen=True)
 class TrustedHintBundle:
-    """Split prompt context into reusable trusted hints and nonvisual metadata."""
+    """Explicit keyword hints that are eligible for the weak overlap check."""
 
-    trusted_text: str = ""
-    trusted_terms: tuple[str, ...] = ()
     trusted_keywords: tuple[str, ...] = ()
-    nonvisual_terms: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
 class MetadataProvenance:
     """Authoritative structured context plus fallible descriptive draft fields."""
 
-    authoritative_terms: tuple[str, ...] = ()
     capture_date: str | None = None
     capture_time: str | None = None
     gps: str | None = None
     draft_title: str | None = None
     draft_description: str | None = None
     draft_keywords: tuple[str, ...] = ()
-    draft_terms: tuple[str, ...] = ()
 
     @property
     def has_authoritative_context(self) -> bool:
-        return bool(self.authoritative_terms or self.capture_date or self.capture_time or self.gps)
+        return bool(self.capture_date or self.capture_time or self.gps)
 
     @property
     def has_draft(self) -> bool:
@@ -3608,33 +3410,19 @@ def _clean_metadata_text(value: str | None) -> str | None:
 def _build_metadata_provenance(metadata: MetadataDict | None) -> MetadataProvenance:
     if not metadata:
         return MetadataProvenance()
-    if QUALITY.patterns is None:
-        load_quality_config()
 
     title = _clean_metadata_text(metadata.get("title"))
     description = _clean_metadata_text(metadata.get("description"))
     keyword_text = _clean_metadata_text(metadata.get("keywords")) or ""
     keyword_terms = _split_catalog_keywords(keyword_text)
-    draft_keywords, authoritative_keywords = _partition_hint_terms(keyword_terms)
-
-    authoritative_terms = list(authoritative_keywords)
-    draft_terms = list(draft_keywords)
-    for free_text in (title, description):
-        if free_text is None:
-            continue
-        descriptive, contextual = _partition_hint_terms(_extract_hint_signal_terms(free_text))
-        draft_terms.extend(descriptive)
-        authoritative_terms.extend(contextual)
 
     return MetadataProvenance(
-        authoritative_terms=tuple(_dedupe_preserve_order(authoritative_terms)),
         capture_date=_clean_metadata_text(metadata.get("date")),
         capture_time=_clean_metadata_text(metadata.get("time")),
         gps=_clean_metadata_text(metadata.get("gps")),
         draft_title=title,
         draft_description=description,
-        draft_keywords=tuple(draft_keywords),
-        draft_terms=tuple(_dedupe_preserve_order(draft_terms)),
+        draft_keywords=tuple(keyword_terms),
     )
 
 
@@ -3699,28 +3487,6 @@ def _extract_prompt_context_text(prompt: str, context_marker: str = "Context:") 
     return ""
 
 
-def _context_term_present(term: str, normalized_text: str) -> bool:
-    """Return ``True`` when a context term (or alias) appears in normalized text."""
-    canonical: str = _normalize_phrase_for_matching(term)
-    if not canonical:
-        return False
-
-    variants: set[str] = {canonical}
-    variants.update(
-        _normalize_phrase_for_matching(v) for v in CONTEXT_TERM_ALIASES.get(canonical, ())
-    )
-    if canonical.endswith("s") and len(canonical) > QUALITY.min_context_term_length + 1:
-        variants.add(canonical[:-1])
-    elif len(canonical) > QUALITY.min_context_term_length:
-        variants.add(f"{canonical}s")
-    for variant in variants:
-        if not variant:
-            continue
-        if re.search(rf"\b{re.escape(variant)}\b", normalized_text):
-            return True
-    return False
-
-
 def _split_catalog_keywords(raw_keywords: str) -> list[str]:
     """Split keyword section text into normalized keyword terms."""
     if not raw_keywords:
@@ -3762,175 +3528,22 @@ def _keyword_overlap_state(
     return "some_overlap" if has_overlap else "no_overlap"
 
 
-def _is_nonvisual_context_term(term: str) -> bool:
-    """Return True for metadata/source/location terms we should not require visually."""
-    normalized = _normalize_phrase_for_matching(term)
-    if not normalized:
-        return False
-    if normalized in NONVISUAL_CONTEXT_TERMS:
-        return True
-    # Check config-loaded nonvisual location terms
-    if QUALITY.patterns:
-        config_terms = QUALITY.patterns.get("nonvisual_location_terms")
-        if config_terms and normalized in {t.lower() for t in config_terms}:
-            return True
-    return any(pattern.search(term) for pattern in NONVISUAL_CONTEXT_PATTERNS)
-
-
-def _extract_hint_signal_terms(text: str) -> list[str]:
-    """Extract simple reusable context terms from trusted hint text."""
-    if not text:
-        return []
-    terms: list[str] = []
-    for raw_term in re.findall(r"[A-Za-z0-9']+", text):
-        normalized = _normalize_phrase_for_matching(raw_term)
-        if (
-            not normalized
-            or len(normalized) < QUALITY.min_context_term_length
-            or normalized in CONTEXT_COMMON_WORDS
-        ):
-            continue
-        terms.append(raw_term)
-    return _dedupe_preserve_order(terms)
-
-
-def _strip_nonvisual_terms_from_text(text: str, nonvisual_terms: Sequence[str]) -> str:
-    """Remove explicitly nonvisual metadata terms from trusted hint prose."""
-    cleaned = text
-    normalized_term_set: set[str] = {
-        _normalize_phrase_for_matching(item) for item in nonvisual_terms
-    }
-    normalized_terms: list[str] = [term for term in normalized_term_set if term]
-    normalized_terms.sort(key=len, reverse=True)
-    for term in normalized_terms:
-        pattern = re.compile(rf"\b{re.escape(term)}\b", re.IGNORECASE)
-        cleaned = pattern.sub(" ", cleaned)
-    return re.sub(r"\s+", " ", cleaned).strip(" ,.;:-")
-
-
-def _parse_context_hint_lines(
-    context_text: str,
-) -> tuple[str, str, str, list[str]]:
-    """Parse prompt context lines into title/description/keywords/nonvisual buckets."""
-    title_hint = ""
-    description_hint = ""
-    keyword_hint_text = ""
-    nonvisual_lines: list[str] = []
-    prefix_targets: tuple[tuple[str, str], ...] = (
-        ("existing title:", "title"),
-        ("title hint:", "title"),
-        ("title:", "title"),
-        ("existing description:", "description"),
-        ("description hint:", "description"),
-        ("description:", "description"),
-        ("existing keywords:", "keywords"),
-        ("keyword hints:", "keywords"),
-        ("keywords:", "keywords"),
-        ("location terms:", "nonvisual"),
-        ("capture date/time:", "nonvisual"),
-        ("gps:", "nonvisual"),
-        ("capture metadata:", "nonvisual"),
-    )
-
-    for raw_line in context_text.splitlines():
-        stripped = raw_line.strip().lstrip("-").strip()
-        if not stripped:
-            continue
-        lowered = stripped.casefold()
-        for prefix, target in prefix_targets:
-            if not lowered.startswith(prefix):
-                continue
-            value = stripped[len(prefix) :].strip()
-            if target == "title":
-                title_hint = value
-            elif target == "description":
-                description_hint = value
-            elif target == "keywords":
-                keyword_hint_text = value
-            else:
-                nonvisual_lines.append(value)
-            break
-
-    return title_hint, description_hint, keyword_hint_text, nonvisual_lines
-
-
-def _partition_hint_terms(terms: Iterable[str]) -> tuple[list[str], list[str]]:
-    """Split hint terms into trusted and nonvisual groups."""
-    trusted_terms: list[str] = []
-    nonvisual_terms: list[str] = []
-    for term in terms:
-        if _is_nonvisual_context_term(term):
-            nonvisual_terms.append(term)
-        else:
-            trusted_terms.append(term)
-    return trusted_terms, nonvisual_terms
-
-
 def _extract_trusted_hint_bundle(
     prompt: str,
     *,
     context_marker: str = "Context:",
 ) -> TrustedHintBundle:
-    """Parse prompt context into trusted hints and explicitly nonvisual metadata."""
+    """Parse only explicitly labelled keyword hints for weak overlap detection."""
     context_text = _extract_prompt_context_text(prompt, context_marker=context_marker)
     if not context_text:
         return TrustedHintBundle()
-
-    title_hint, description_hint, keyword_hint_text, nonvisual_lines = _parse_context_hint_lines(
-        context_text,
-    )
-
-    trusted_keyword_terms = _split_catalog_keywords(keyword_hint_text)
-    trusted_terms, nonvisual_terms = _partition_hint_terms(trusted_keyword_terms)
-
-    for free_text in (title_hint, description_hint):
-        hint_terms, metadata_terms = _partition_hint_terms(_extract_hint_signal_terms(free_text))
-        trusted_terms.extend(hint_terms)
-        nonvisual_terms.extend(metadata_terms)
-
-    for line in nonvisual_lines:
-        nonvisual_terms.extend(_extract_hint_signal_terms(line))
-        nonvisual_terms.append(line)
-
-    filtered_title = _strip_nonvisual_terms_from_text(title_hint, nonvisual_terms)
-    filtered_description = _strip_nonvisual_terms_from_text(description_hint, nonvisual_terms)
-    if not _extract_hint_signal_terms(filtered_title):
-        filtered_title = ""
-    if not _extract_hint_signal_terms(filtered_description):
-        filtered_description = ""
-    filtered_keywords = [
-        term for term in trusted_keyword_terms if not _is_nonvisual_context_term(term)
-    ]
-
-    trusted_parts: list[str] = []
-    if filtered_title:
-        trusted_parts.append(f"Title: {filtered_title}")
-    if filtered_description:
-        trusted_parts.append(f"Description: {filtered_description}")
-    if filtered_keywords:
-        trusted_parts.append("Keywords: " + ", ".join(filtered_keywords))
-
-    return TrustedHintBundle(
-        trusted_text="\n".join(trusted_parts).strip(),
-        trusted_terms=tuple(_dedupe_preserve_order(trusted_terms)),
-        trusted_keywords=tuple(_dedupe_preserve_order(filtered_keywords)),
-        nonvisual_terms=tuple(_dedupe_preserve_order(nonvisual_terms)),
-    )
-
-
-def _count_factual_sentences(text: str) -> int:
-    """Count sentence-like units in description text with fallback for punctuation-free text."""
-    cleaned: str = text.strip()
-    if not cleaned:
-        return 0
-    sentence_like: list[str] = [
-        s for s in re.split(r"(?<=[.!?])\s+|\n+", cleaned) if re.search(r"\w", s)
-    ]
-    if sentence_like:
-        if len(sentence_like) == 1 and not re.search(r"[.!?]", cleaned):
-            return 1
-        return len(sentence_like)
-    return 1
+    prefix = "keyword hints:"
+    hinted_keywords: list[str] = []
+    for raw_line in context_text.splitlines():
+        stripped = raw_line.strip().lstrip("-").strip()
+        if stripped.casefold().startswith(prefix):
+            hinted_keywords.extend(_split_catalog_keywords(stripped[len(prefix) :]))
+    return TrustedHintBundle(tuple(_dedupe_preserve_order(hinted_keywords)))
 
 
 def _extract_catalog_sections(text: str) -> dict[str, str]:
@@ -3969,47 +3582,14 @@ def _prompt_requests_catalog_contract(prompt: str) -> bool:
     )
 
 
-def _analyze_catalog_contract(
-    text: str,
-) -> tuple[list[str], int | None, int | None, int | None, float | None]:
-    """Evaluate strict cataloging contract compliance from generated text."""
+def _missing_catalog_sections(text: str) -> list[str]:
+    """Return requested catalog sections that contain no output."""
     sections: dict[str, str] = _extract_catalog_sections(text)
-    missing_sections: list[str] = [
+    return [
         section
         for section in ("title", "description", "keywords")
         if not sections.get(section, "").strip()
     ]
-
-    title_word_count = None
-    description_sentence_count = None
-    keyword_count = None
-    keyword_dup_ratio = None
-
-    title_text: str = sections.get("title", "")
-    if title_text:
-        title_word_count = len(re.findall(r"[A-Za-z0-9']+", title_text))
-
-    description_text: str = sections.get("description", "")
-    if description_text:
-        description_sentence_count = _count_factual_sentences(description_text)
-
-    keywords_text: str = sections.get("keywords", "")
-    if keywords_text:
-        keyword_terms: list[str] = _split_catalog_keywords(keywords_text)
-        keyword_count = len(keyword_terms)
-        if keyword_count >= QUALITY.min_keywords_for_duplication_check and keyword_count > 0:
-            normalized: list[str] = [_normalize_phrase_for_matching(term) for term in keyword_terms]
-            normalized = [term for term in normalized if term]
-            if normalized:
-                keyword_dup_ratio = 1.0 - (len(set(normalized)) / len(normalized))
-
-    return (
-        missing_sections,
-        title_word_count,
-        description_sentence_count,
-        keyword_count,
-        keyword_dup_ratio,
-    )
 
 
 @dataclass(frozen=True)
@@ -4075,7 +3655,7 @@ def _estimate_prompt_tokens_from_text(prompt: str | None) -> int | None:
 def _detect_likely_cutoff(
     text: str,
     *,
-    generated_tokens: int,
+    generated_tokens: int | None,
     requested_max_tokens: int | None,
     is_repetitive: bool,
     missing_sections: Sequence[str],
@@ -4087,7 +3667,7 @@ def _detect_likely_cutoff(
     with no degradation reasons means the model produced structurally sound
     output that merely ran out of budget.
     """
-    if requested_max_tokens is None or requested_max_tokens <= 0:
+    if generated_tokens is None or requested_max_tokens is None or requested_max_tokens <= 0:
         return False, []
     if generated_tokens < requested_max_tokens:
         return False, []
@@ -4198,26 +3778,22 @@ def _minimal_output_weakness_label(reason: str) -> str:
 
 def _detect_minimal_output(
     text: str,
-    generated_tokens: int,
+    generated_tokens: int | None,
     prompt_tokens: int | None = None,
 ) -> tuple[bool, str | None]:
-    """Detect suspiciously minimal output suggesting prompt template issues.
-
-    When a model generates very few tokens despite a substantial prompt,
-    it often indicates:
-    - Wrong chat template applied
-    - Model thinks task is already complete
-    - Generation parameters misconfigured
+    """Detect mechanically minimal output only when token evidence is recorded.
 
     Args:
         text: Generated text
-        generated_tokens: Number of tokens generated
+        generated_tokens: Number of tokens generated, if recorded
         prompt_tokens: Number of tokens in prompt (if known)
 
     Returns:
         Tuple of (is_minimal, reason)
     """
-    # Zero tokens is always a harness issue
+    if generated_tokens is None:
+        return False, None
+
     if generated_tokens == 0:
         return True, "zero_tokens"
 
@@ -4227,18 +3803,17 @@ def _detect_minimal_output(
         if weak_reason is not None:
             return True, weak_reason
 
-    # Very low output/prompt ratio is only suspicious when the text is also weak.
+    # Both sides of the ratio must be recorded; missing counts stay unknown.
     if (
-        prompt_tokens
+        prompt_tokens is not None
         and prompt_tokens > QUALITY.min_prompt_tokens_for_ratio
         and generated_tokens < QUALITY.min_output_tokens_for_ratio
     ):
         ratio: float = generated_tokens / prompt_tokens
         if ratio < QUALITY.min_output_ratio:
             weak_reason = _minimal_output_weakness_reason(text, generated_tokens)
-            if weak_reason is not None:
-                weak_label = _minimal_output_weakness_label(weak_reason)
-                return True, f"output_ratio({ratio:.1%};{weak_label})"
+            detail = f";{_minimal_output_weakness_label(weak_reason)}" if weak_reason else ""
+            return True, f"output_ratio({ratio:.1%}{detail})"
 
     return False, None
 
@@ -4321,7 +3896,7 @@ def _collect_prompt_quality_signals(
     text: str,
     *,
     raw_text: str | None = None,
-    generated_tokens: int,
+    generated_tokens: int | None,
     prompt: str | None,
     context_marker: str,
     model_name: str | None,
@@ -4339,10 +3914,12 @@ def _collect_prompt_quality_signals(
 
     prompt_bundle = _extract_trusted_hint_bundle(prompt, context_marker=context_marker)
     missing_sections: list[str] = []
-    if generated_tokens >= QUALITY.min_tokens_for_substantial and _prompt_requests_catalog_contract(
-        prompt
+    if (
+        generated_tokens is not None
+        and generated_tokens >= QUALITY.min_tokens_for_substantial
+        and _prompt_requests_catalog_contract(prompt)
     ):
-        missing_sections, *_counts = _analyze_catalog_contract(text)
+        missing_sections = _missing_catalog_sections(text)
     generated_keywords = _split_catalog_keywords(
         _extract_catalog_sections(text).get("keywords", "")
     )
@@ -4363,7 +3940,7 @@ def _collect_prompt_quality_signals(
 
 def analyze_generation_text(
     text: str,
-    generated_tokens: int,
+    generated_tokens: int | None,
     prompt_tokens: int | None = None,
     prompt: str | None = None,
     requested_max_tokens: int | None = None,
@@ -4433,7 +4010,7 @@ def analyze_generation_text(
 
 def _analyze_text_quality(
     text: str,
-    generated_tokens: int,
+    generated_tokens: int | None,
     *,
     prompt_tokens: int | None = None,
     prompt: str | None = None,
@@ -4470,20 +4047,12 @@ def local_now_str(fmt: str = LOCAL_TIMESTAMP_FORMAT) -> str:
 _TIME_FIELDS: frozenset[str] = frozenset(
     {"total_time", "generation_time", "model_load_time"},
 )
-_BOOLEAN_FLAG_FIELDS: frozenset[str] = frozenset(
-    {
-        "is_repetitive",
-        "is_verbose",
-        "has_formatting_issues",
-        "has_hallucination_issues",
-        "has_excessive_bullets",
-        "is_context_ignored",
-    },
-)
 
 
 def _coerce_numeric_value(value: object) -> float | None:
     """Return a float for numeric or numeric-string values, else ``None``."""
+    if isinstance(value, bool):
+        return None
     if isinstance(value, int | float):
         return float(value)
     if isinstance(value, str):
@@ -4506,6 +4075,8 @@ def format_field_value(field_name: str, value: MetricValue) -> str:
     formatted_value: str
     if value is None:
         formatted_value = ""
+    elif isinstance(value, bool):
+        formatted_value = str(value)
     else:
         numeric_value = _coerce_numeric_value(value)
         if numeric_value is not None:
@@ -4515,8 +4086,6 @@ def format_field_value(field_name: str, value: MetricValue) -> str:
                 formatted_value = _format_tps(numeric_value)
             elif field_name in _TIME_FIELDS:
                 formatted_value = _format_time_seconds(numeric_value)
-            elif field_name in _BOOLEAN_FLAG_FIELDS:
-                formatted_value = "✓" if numeric_value else "-"
             else:
                 formatted_value = fmt_num(numeric_value)
         elif isinstance(value, str):
@@ -7252,19 +6821,6 @@ def _execution_outcome(result: PerformanceResult) -> ExecutionOutcome:
     return "completed" if result.success else "failed"
 
 
-def _failure_origin(result: PerformanceResult) -> FailureOrigin:
-    """Classify the failure from explicit upstream-entry and connectivity facts."""
-    if _is_indeterminate_connectivity_failure(result):
-        return "external_service"
-    if result.upstream_boundary == "generation_started":
-        return "upstream_generation"
-    if result.upstream_boundary == "load_started":
-        return "upstream_load"
-    if result.failure_phase in {"input_validation", "model_preflight"}:
-        return "harness_preflight"
-    return "unknown"
-
-
 def _advance_upstream_boundary(
     boundary: UpstreamBoundary,
     phase: str,
@@ -7275,27 +6831,6 @@ def _advance_upstream_boundary(
     if phase == "model_load" and boundary == "not_started":
         return "load_started"
     return boundary
-
-
-def _maintainer_readiness(
-    *,
-    failure_origin: FailureOrigin,
-    reproduction_status: ControlledReproductionStatus,
-    has_output_anomaly: bool,
-) -> MaintainerReadiness:
-    """Classify issue readiness from origin and controlled-reproduction evidence."""
-    if failure_origin == "harness_preflight":
-        return "harness_observation"
-    if failure_origin == "external_service" or reproduction_status == "not_reproduced":
-        return "not_applicable"
-    if (
-        failure_origin in {"upstream_load", "upstream_generation"}
-        or reproduction_status == "confirmed"
-    ):
-        return "issue_ready"
-    if failure_origin == "unknown" or reproduction_status == "indeterminate":
-        return "needs_reproduction"
-    return "needs_reproduction" if has_output_anomaly else "not_applicable"
 
 
 def _run_outcome_counts(
@@ -7668,14 +7203,6 @@ _DIAGNOSTICS_LIB_NAMES: Final[tuple[str, ...]] = (
 )
 
 
-type CompatibilityStatus = Literal[
-    "crashed",
-    "indeterminate",
-    "integration-warning",
-    "clean",
-]
-
-
 @dataclass(frozen=True)
 class ResultAssessment:
     """Minimal current-run assessment shared by all report consumers."""
@@ -7723,8 +7250,13 @@ def _assessment_observations(result: PerformanceResult) -> tuple[ObservationCode
     if not text.strip():
         observations.append("empty_output")
     else:
-        generated_tokens = _generation_int_metric(result.generation, "generation_tokens") or 0
-        is_minimal, _minimal_reason = _detect_minimal_output(text, generated_tokens)
+        generated_tokens = _generation_int_metric(result.generation, "generation_tokens")
+        prompt_tokens = _generation_int_metric(result.generation, "prompt_tokens")
+        is_minimal, _minimal_reason = _detect_minimal_output(
+            text,
+            generated_tokens,
+            prompt_tokens,
+        )
         if is_minimal:
             observations.append("minimal_output")
 
@@ -10886,42 +10418,6 @@ _PACKAGE_CODE_MAP: Final[dict[str, str]] = {
     "unknown": "UNKNOWN",
 }
 
-_PACKAGE_OWNER_HINTS: Final[dict[str, str]] = {
-    "mlx": "mlx core/runtime (memory, tensor ops, Metal backend)",
-    "mlx-vlm": "mlx-vlm generation/integration path",
-    "mlx-lm": "mlx-lm text-generation/runtime path",
-    "transformers": "transformers API/processor/tokenizer compatibility",
-    "huggingface-hub": "huggingface-hub fetch/cache/model-file resolution",
-    "model-config": "model repository/config artifacts (not core runtime)",
-    "unknown": "unable to attribute confidently (inspect traceback/signature)",
-}
-_FAILURE_PHASE_HINTS: Final[dict[str, str]] = {
-    "import": "runtime symbol/import checks",
-    "model_load": "model + weights loading",
-    "tokenizer_load": "tokenizer extraction/loading",
-    "processor_load": "processor/image-processor initialization",
-    "model_preflight": "model artifact/config preflight checks",
-    "prefill": "prompt templating/tokenization",
-    "decode": "decode/generation call (`mlx_vlm.generate`)",
-}
-_ERROR_STAGE_HINTS: Final[dict[str, str]] = {
-    "OOM": "out-of-memory pressure in backend runtime",
-    "Timeout": "operation exceeded configured timeout",
-    "Network Error": "external connectivity prevented a conclusive model attempt",
-    "Missing Dep": "missing required package(s) or extras",
-    "Lib Version": "incompatible library versions/import surface changed",
-    "API Drift": "required upstream runtime contract changed (missing symbol/signature/result fields)",
-    "API Mismatch": "upstream function signature changed",
-    "Config Missing": "required model config/artifact missing",
-    "No Chat Template": "chat template unavailable in processor/tokenizer",
-    "Weight Mismatch": "model weights/config do not match expected architecture",
-    "Type Cast Error": "MLX type/shape/runtime cast failure",
-    "Processor Error": "processor construction/processor config incompatibility",
-    "Tokenizer Error": "tokenizer class or tokenizer assets mismatch",
-    "Model Error": "model runtime failure in generation path",
-    "Error": "unclassified failure; inspect traceback/signature",
-}
-
 
 def _normalise_failure_phase(phase: str | None) -> str | None:
     """Return a normalized failure phase label or ``None`` when unavailable."""
@@ -11034,71 +10530,10 @@ def _exception_chain_json_field(
     return {"exception_chain": _serialize_exception_chain(chain)}
 
 
-def _failure_narrative_json_fields(result: PerformanceResult) -> dict[str, object]:
-    """Serialize canonical crash facts for failed repro payloads."""
-    if result.success:
-        return {}
-    narrative = _build_failure_narrative(result)
-    return {
-        "task_outcome": narrative.task_outcome,
-        "primary_exception": narrative.primary_exception,
-        "secondary_exceptions": list(narrative.secondary_exceptions),
-        "suspected_owner": narrative.suspected_owner,
-    }
-
-
-def _format_failure_exception(entry: FailureException) -> str:
-    """Format one exception consistently across failure surfaces."""
-    return f"{entry.exception_type}: {entry.message}"
-
-
-def _failure_exception_owner(entry: FailureException) -> str:
-    """Attribute one exception using its message, module, and traceback origin."""
+def _failure_exception_package(entry: FailureException) -> str:
+    """Identify the package recorded by an exception module or traceback origin."""
     origin = " ".join(part for part in (entry.module, entry.origin) if part)
     return _attribute_error_to_package(entry.message, origin)
-
-
-def _failure_owner_for_result(result: PerformanceResult) -> str:
-    """Return a primary owner or an explicit mixed-owner failure label."""
-    if _is_indeterminate_connectivity_failure(result):
-        return _UNKNOWN_OWNER
-    chain_owners = {
-        owner
-        for entry in result.exception_chain
-        if (owner := _failure_exception_owner(entry)) != _UNKNOWN_OWNER
-    }
-    if len(chain_owners) > 1:
-        return "unresolved: " + "/".join(sorted(chain_owners))
-    if chain_owners:
-        return next(iter(chain_owners))
-    return result.error_package or _UNKNOWN_OWNER
-
-
-def _build_failure_narrative(
-    result: PerformanceResult,
-) -> FailureNarrative:
-    """Derive one conclusive crash narrative and cautious owner attribution."""
-    chain = result.exception_chain
-    if chain:
-        primary = _format_failure_exception(chain[0])
-        secondary = tuple(_format_failure_exception(entry) for entry in chain[1:])
-    else:
-        primary = (
-            f"{result.root_error_type or result.error_type or 'Error'}: "
-            f"{result.root_error_message or result.error_message or 'Unknown failure'}"
-        )
-        secondary = ()
-
-    suspected_owner = _failure_owner_for_result(result)
-
-    return FailureNarrative(
-        task_outcome="crashed",
-        phase=result.failure_phase,
-        stage=result.error_stage,
-        primary_exception=primary,
-        secondary_exceptions=secondary,
-        suspected_owner=suspected_owner,
-    )
 
 
 def _extract_exception_prompt_diagnostics(
@@ -11119,34 +10554,6 @@ def _sanitize_error_token(value: str | None, *, default: str) -> str:
         return default
     token = re.sub(r"[^A-Za-z0-9]+", "_", value.strip().upper()).strip("_")
     return token or default
-
-
-def _build_failure_action_hint(
-    *,
-    error_package: str | None,
-    failure_phase: str | None,
-    error_stage: str | None,
-) -> str:
-    """Build an owner/component/cause hint for failed-model summary lines."""
-    package_key = (error_package or _UNKNOWN_OWNER).strip().lower() or _UNKNOWN_OWNER
-    owner_hint = _PACKAGE_OWNER_HINTS.get(
-        package_key,
-        f"{package_key} (upstream owner not in built-in hint map)",
-    )
-
-    phase_key = _normalise_failure_phase(failure_phase)
-    component_hint = _FAILURE_PHASE_HINTS.get(
-        phase_key or "",
-        f"{phase_key or 'unknown phase'}",
-    )
-
-    stage_key = error_stage or "Error"
-    cause_hint = _ERROR_STAGE_HINTS.get(
-        stage_key,
-        _ERROR_STAGE_HINTS["Error"],
-    )
-
-    return f"owner≈{owner_hint} | component={component_hint} | likely={cause_hint}"
 
 
 def _normalize_error_core_message(error_msg: str) -> str:
@@ -12223,10 +11630,10 @@ def _build_failure_result(
     classification_text = " ".join(part for part in (root_error_msg, error_msg) if part)
     resolved_phase = _extract_failure_phase(error, fallback=failure_phase)
     classified_stage = _classify_error(classification_text or error_msg)
-    primary_owner = _failure_exception_owner(root_error)
+    primary_package = _failure_exception_package(root_error)
     error_package = (
-        primary_owner
-        if primary_owner != _UNKNOWN_OWNER
+        primary_package
+        if primary_package != _UNKNOWN_OWNER
         else _attribute_error_to_package(classification_text or error_msg, tb_str)
     )
     error_code = _build_canonical_error_code(
@@ -12764,7 +12171,7 @@ def _preview_generation(
     if not gen:
         return
     text_val = _generation_text_value(gen)
-    gen_tokens = _generation_int_metric(gen, "generation_tokens") or 0
+    gen_tokens = _generation_int_metric(gen, "generation_tokens")
     prompt_tokens = _generation_int_metric(gen, "prompt_tokens")
     if analysis is None:
         analysis = analyze_generation_text(
@@ -12818,7 +12225,7 @@ def _log_verbose_success_details_mode(
 
     # Generated text has already been streamed by upstream generate(verbose=True).
     gen_text = getattr(res.generation, "text", None) or ""
-    gen_tokens = getattr(res.generation, "generation_tokens", 0)
+    gen_tokens = _generation_int_metric(res.generation, "generation_tokens")
 
     if analysis is None:
         prompt_tokens = getattr(res.generation, "prompt_tokens", None)
@@ -13646,12 +13053,6 @@ def _build_cataloguing_prompt(
     provenance = _build_metadata_provenance(metadata if include_metadata_hints else None)
     if provenance.has_authoritative_context:
         parts.extend(["", "Context: Authoritative context:"])
-        if provenance.authoritative_terms:
-            authoritative_hint = _summarize_prompt_keywords(
-                ", ".join(provenance.authoritative_terms)
-            )
-            if authoritative_hint:
-                parts.append(f"- Location terms: {authoritative_hint}")
         capture_value = " ".join(
             value for value in (provenance.capture_date, provenance.capture_time) if value
         )
@@ -14250,8 +13651,8 @@ def _populate_result_quality_analysis(
     if cached_analysis is not None and (not prompt or cached_analysis.prompt_checks_ran):
         return result
 
-    generated_tokens = getattr(result.generation, "generation_tokens", 0)
-    prompt_tokens = getattr(result.generation, "prompt_tokens", None)
+    generated_tokens = _generation_int_metric(result.generation, "generation_tokens")
+    prompt_tokens = _generation_int_metric(result.generation, "prompt_tokens")
     resolved_requested_max_tokens = (
         requested_max_tokens if requested_max_tokens is not None else result.requested_max_tokens
     )
@@ -14533,39 +13934,27 @@ def _log_performance_highlights(
 
 
 def _log_failed_models_summary(failed: list[PerformanceResult]) -> None:
-    """Log failed models and failure distribution for actionable triage."""
+    """Log only recorded failure fields and their exact distribution."""
     logger.info("❌ Failed Models (%d):", len(failed))
     for res in failed:
-        error_pkg = f" -> {res.error_package}" if res.error_package else ""
-        phase_suffix = f" [{res.failure_phase}]" if res.failure_phase else ""
-        code_suffix = f" {{{res.error_code}}}" if res.error_code else ""
         logger.info(
-            "  - %s (%s%s)%s%s",
+            "  - %s | phase=%s | stage=%s | module=%s | package=%s | code=%s | traceback=%s",
             res.model_name,
+            res.failure_phase or "unavailable",
             res.error_stage or "Unknown",
-            error_pkg,
-            phase_suffix,
-            code_suffix,
+            res.root_error_module or "unavailable",
+            res.error_package or "unavailable",
+            res.error_code or "unavailable",
+            "available" if res.error_traceback else "unavailable",
             extra={"style_hint": LogStyles.ERROR},
         )
-        action_hint = _build_failure_action_hint(
-            error_package=res.error_package,
-            failure_phase=res.failure_phase,
-            error_stage=res.error_stage,
-        )
-        logger.info(
-            "    -> %s",
-            action_hint,
-            extra={"style_hint": LogStyles.WARNING},
-        )
         if res.error_message:
-            symptom = _truncate_text_preview(
-                _normalize_error_core_message(res.error_message),
-                max_chars=160,
-            )
+            error_type = res.root_error_type or res.error_type or "Error"
+            error_message = res.root_error_message or res.error_message
             logger.info(
-                "    -> symptom: %s",
-                symptom,
+                "    -> error=%s: %s",
+                error_type,
+                _truncate_text_preview(error_message, max_chars=160),
                 extra={"style_hint": LogStyles.WARNING},
             )
 
@@ -15845,31 +15234,17 @@ RERUN_TRIAGE_PROMPT: Final[str] = "Describe this image briefly."
 RERUN_TRIAGE_MAX_TOKENS: Final[int] = 100
 RERUN_TRIAGE_TIMEOUT: Final[float] = 60.0
 
-_RERUN_ELIGIBLE_VERDICTS: Final[frozenset[str]] = frozenset(
-    {
-        "unknown_runtime_anomaly",
-        "runtime_failure",
-    }
-)
-
 
 def _select_rerun_candidates(
     results: list[PerformanceResult],
 ) -> list[PerformanceResult]:
-    """Select models that merit a differential rerun for secondary evidence.
-
-    Eligible models are those with verdicts indicating uncertain or transient
-    failures.  Successful models and models with deterministic failures
-    (e.g. ``harness``, ``model_shortcoming``) are never rerun.
-    """
-    candidates: list[PerformanceResult] = []
-    for result in results:
-        review = result.quality_analysis
-        verdict = getattr(review, "verdict", None) if review else None
-        # Also include failed models with no verdict (pure runtime failures)
-        if (not result.success and verdict is None) or verdict in _RERUN_ELIGIBLE_VERDICTS:
-            candidates.append(result)
-    return candidates
+    """Select crashes and completed runs with recorded mechanical observations."""
+    return [
+        result
+        for result in results
+        if _assess_result(result).maintainer_status
+        in {"actionable_failure", "observation_needs_reproduction"}
+    ]
 
 
 def _build_rerun_evidence(
@@ -16201,7 +15576,7 @@ def main(args: argparse.Namespace) -> None:
 
         results = process_models(args, image_path, prompt=prompt)
 
-        # Phase 5: Differential reruns for triage-worthy models
+        # Phase 5: Differential reruns for crashes and mechanical observations
         if getattr(args, "rerun_triage", False):
             candidates = _select_rerun_candidates(results)
             if candidates:
@@ -16782,8 +16157,8 @@ def _add_runtime_workflow_console_arguments(parser: argparse.ArgumentParser) -> 
         action="store_true",
         default=False,
         help=(
-            "After the first pass, rerun triage-worthy models (runtime failures and "
-            "unknown anomalies) with a simple prompt to gather secondary evidence. "
+            "After the first pass, rerun crashed models and completed models with "
+            "recorded mechanical observations using a simple prompt. "
             "First-pass results are never overwritten."
         ),
     )

@@ -12,7 +12,8 @@ import check_models
 @dataclass
 class _Generation:
     text: str
-    generation_tokens: int = 24
+    generation_tokens: int | None = 24
+    prompt_tokens: int | None = None
 
 
 def _result(
@@ -179,6 +180,48 @@ def test_token_cap_alone_is_neutral() -> None:
     )
 
 
+def test_missing_generation_count_does_not_make_complete_output_minimal() -> None:
+    result = check_models.PerformanceResult(
+        model_name="example/model",
+        success=True,
+        generation=_Generation(
+            "A complete description of a quiet lake beneath a clear evening sky.",
+            generation_tokens=None,
+            prompt_tokens=900,
+        ),
+    )
+
+    assert "minimal_output" not in check_models._assess_result(result).observations
+
+
+def test_recorded_low_output_to_prompt_ratio_is_minimal() -> None:
+    result = check_models.PerformanceResult(
+        model_name="example/model",
+        success=True,
+        generation=_Generation(
+            "A concise but complete description of the visible landscape.",
+            generation_tokens=10,
+            prompt_tokens=1_000,
+        ),
+    )
+
+    assert "minimal_output" in check_models._assess_result(result).observations
+
+
+def test_missing_token_counts_do_not_enable_ratio_inference() -> None:
+    result = check_models.PerformanceResult(
+        model_name="example/model",
+        success=True,
+        generation=_Generation(
+            "A concise but complete description of the visible landscape.",
+            generation_tokens=None,
+            prompt_tokens=None,
+        ),
+    )
+
+    assert "minimal_output" not in check_models._assess_result(result).observations
+
+
 def test_empty_thinking_wrapper_is_neutral() -> None:
     result = _result("<think></think> A complete response.", model_name="example/thinking-model")
 
@@ -202,6 +245,20 @@ def test_partial_keyword_overlap_is_neutral() -> None:
         "Description: A blue boat rests on calm water at dawn.\n"
         "Keywords: boat, water, blue, calm, dawn, lake, reflection, sky, shore, vessel",
         prompt="Context: Existing metadata hints:\n- Keyword hints: boat, mountain, forest\n",
+    )
+
+    assert "no_keyword_overlap" not in check_models._assess_result(result).observations
+
+
+def test_draft_metadata_keywords_do_not_become_output_requirements() -> None:
+    result = _result(
+        "Title: Boats at dusk\n"
+        "Description: Two boats rest on reflective water at dusk.\n"
+        "Keywords: boats, water, dusk, reflection, sky, shore, calm, travel, vessel, evening",
+        prompt=(
+            "Context: Draft descriptive metadata:\n"
+            "- Existing keywords: Example Harbour, Sample Village\n"
+        ),
     )
 
     assert "no_keyword_overlap" not in check_models._assess_result(result).observations

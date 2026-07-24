@@ -1,9 +1,7 @@
 """Unit tests for pure-logic functions that require no mlx-vlm runtime.
 
-Covers: validate_model_identifier, apply_exclusions, prepare_prompt,
-compute_vocabulary_diversity, compute_efficiency_metrics,
-detect_response_structure, compute_confidence_indicators,
-QualityThresholds.from_config, load_quality_config.
+Covers model selection, prompt construction, threshold loading, and retained
+mechanical helper behavior.
 """
 
 from __future__ import annotations
@@ -14,7 +12,7 @@ import importlib
 import json
 import logging
 import subprocess
-from dataclasses import dataclass, fields, replace
+from dataclasses import dataclass, fields
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Never, cast
 from unittest.mock import MagicMock, patch
@@ -467,48 +465,24 @@ class TestPreparePrompt:
         )
 
         assert "Authoritative context:" in prompt
-        assert "Location terms: Deben Estuary, Woodbridge" in prompt
         assert "Capture date/time: 2026-07-04 19:10:04" in prompt
         assert "Draft descriptive metadata:" in prompt
         assert "Existing description: Two boats on a river." in prompt
+        assert "Existing keywords: Deben Estuary, Woodbridge, boats, river" in prompt
         assert "Treat this draft as fallible" in prompt
 
-    def test_assisted_prompt_bounds_authoritative_context_terms(
+    def test_assisted_prompt_does_not_promote_keyword_names_to_authoritative_context(
         self,
         mod: types.ModuleType,
     ) -> None:
-        """Authoritative context should retain key terms within a deterministic bound."""
-        extra_locations = [f"Location {index:02d}" for index in range(60)]
-        configured_quality = replace(
-            mod.QUALITY,
-            patterns={
-                **(mod.QUALITY.patterns or {}),
-                "nonvisual_location_terms": [
-                    "deben estuary",
-                    "woodbridge",
-                    *(term.casefold() for term in extra_locations),
-                ],
-            },
+        """Arbitrary metadata keywords remain fallible draft text."""
+        prompt = mod.prepare_prompt(
+            argparse.Namespace(prompt=None, eval_mode="assisted"),
+            {"keywords": "Example Harbour, Sample Village, boats"},
         )
-        metadata = {
-            "keywords": ", ".join(["Deben Estuary", "Woodbridge", *extra_locations, "boats"]),
-        }
 
-        with patch.object(mod, "QUALITY", configured_quality):
-            prompt = mod.prepare_prompt(
-                argparse.Namespace(prompt=None, eval_mode="assisted"),
-                metadata,
-            )
-
-        location_line = next(
-            line for line in prompt.splitlines() if line.startswith("- Location terms:")
-        )
-        rendered_terms = location_line.removeprefix("- Location terms:").split(",")
-        assert "Authoritative context:" in prompt
-        assert "Deben Estuary" in location_line
-        assert "Woodbridge" in location_line
-        assert len(rendered_terms) <= configured_quality.prompt_keyword_max_items
-        assert "Location 59" not in location_line
+        assert "Authoritative context:" not in prompt
+        assert "Existing keywords: Example Harbour, Sample Village, boats" in prompt
 
 
 class TestQualityIssueTruncation:
@@ -612,7 +586,7 @@ class TestQualityThresholdsFromConfig:
     def test_valid_config(self, mod: types.ModuleType) -> None:
         """Valid config should set the specified threshold."""
         expected_ratio = 0.9
-        config = {"thresholds": {"repetition_ratio": expected_ratio}, "patterns": {}}
+        config = {"thresholds": {"repetition_ratio": expected_ratio}}
         qt = mod.QualityThresholds.from_config(config)
         assert qt.repetition_ratio == expected_ratio
 
@@ -624,7 +598,6 @@ class TestQualityThresholdsFromConfig:
         """Unknown threshold key should emit a warning."""
         config = {
             "thresholds": {"repetition_ration": 0.9, "repetition_ratio": 0.5},
-            "patterns": {},
         }
         with caplog.at_level(logging.WARNING):
             qt = mod.QualityThresholds.from_config(config)
@@ -639,7 +612,7 @@ class TestQualityThresholdsFromConfig:
         caplog: pytest.LogCaptureFixture,
     ) -> None:
         """Unknown top-level config section should emit a warning."""
-        config: dict[str, object] = {"thresholds": {}, "patterns": {}, "extra_section": {}}
+        config: dict[str, object] = {"thresholds": {}, "extra_section": {}}
         with caplog.at_level(logging.WARNING):
             mod.QualityThresholds.from_config(config)
         assert "extra_section" in caplog.text
@@ -658,22 +631,15 @@ class TestQualityThresholdsFromConfig:
             Path(__file__).resolve().parents[1] / "check_models_data" / "quality_config.yaml"
         )
         config = yaml.safe_load(config_path.read_text(encoding="utf-8"))
-        configured = mod.QualityThresholds.from_config(
-            {
-                "thresholds": config["thresholds"],
-                "patterns": {},
-            }
-        )
+        configured = mod.QualityThresholds.from_config({"thresholds": config["thresholds"]})
         fallback = mod.QualityThresholds()
 
         for field in fields(fallback):
-            if field.name == "patterns":
-                continue
             assert getattr(fallback, field.name) == getattr(configured, field.name), field.name
 
     def test_non_mapping_threshold_section_raises(self, mod: types.ModuleType) -> None:
         """Non-mapping threshold sections should fail with a clear schema error."""
-        config: dict[str, object] = {"thresholds": [], "patterns": {}}
+        config: dict[str, object] = {"thresholds": []}
 
         with pytest.raises(TypeError, match="thresholds section must be a mapping"):
             mod.QualityThresholds.from_config(config)
@@ -682,20 +648,9 @@ class TestQualityThresholdsFromConfig:
         """Inverted threshold bounds should fail fast instead of weakening checks."""
         config = {
             "thresholds": {"min_phrase_repetitions": 9, "max_phrase_repetitions": 4},
-            "patterns": {},
         }
 
         with pytest.raises(ValueError, match="invalid phrase repetitions bounds"):
-            mod.QualityThresholds.from_config(config)
-
-    def test_invalid_pattern_regex_raises(self, mod: types.ModuleType) -> None:
-        """Malformed detector patterns should be rejected at config-load time."""
-        config = {
-            "thresholds": {},
-            "patterns": {"hallucination_question_indicators": ["[unterminated"]},
-        }
-
-        with pytest.raises(ValueError, match="invalid regex"):
             mod.QualityThresholds.from_config(config)
 
 
@@ -717,7 +672,7 @@ class TestLoadQualityConfig:
 
     def test_valid_yaml_loads(self, mod: types.ModuleType, tmp_path: Path) -> None:
         """Valid YAML config should update thresholds."""
-        yaml_content = "thresholds:\n  repetition_ratio: 0.95\npatterns: {}\n"
+        yaml_content = "thresholds:\n  repetition_ratio: 0.95\n"
         config_file = tmp_path / "quality_config.yaml"
         config_file.write_text(yaml_content)
         original_quality = mod.QUALITY
@@ -766,7 +721,7 @@ class TestLoadQualityConfig:
         original_ratio = mod.QUALITY.repetition_ratio
         config_file = tmp_path / "quality_config.yaml"
         config_file.write_text(
-            "thresholds:\n  min_phrase_repetitions: 8\n  max_phrase_repetitions: 3\npatterns: {}\n",
+            "thresholds:\n  min_phrase_repetitions: 8\n  max_phrase_repetitions: 3\n",
             encoding="utf-8",
         )
 
@@ -785,7 +740,7 @@ class TestLoadQualityConfig:
         """Default loading should use the packaged config resource."""
         packaged_config = tmp_path / "quality_config.yaml"
         packaged_config.write_text(
-            "thresholds:\n  repetition_ratio: 0.91\npatterns: {}\n",
+            "thresholds:\n  repetition_ratio: 0.91\n",
             encoding="utf-8",
         )
         original_quality = mod.QUALITY

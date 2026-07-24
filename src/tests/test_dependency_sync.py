@@ -820,29 +820,52 @@ def test_validation_artifact_hygiene_policy_is_documented() -> None:
 
 
 def test_production_assessment_policy_has_no_fixture_specific_exceptions() -> None:
-    """Canonical classifiers must not special-case synthetic models or image subjects."""
+    """Policy feeders must not embed benchmark model, image, or location literals."""
     source = (PKG_ROOT / "check_models.py").read_text(encoding="utf-8")
-    classifier_source = source[
-        source.index("def _assessment_observations(") : source.index("def _assessment_to_json(")
-    ].casefold()
+    tree = ast.parse(source)
+    string_literals = {
+        node.value.casefold()
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Constant) and isinstance(node.value, str)
+    }
 
-    assert re.search(r"\borg/[a-z0-9_-]+", classifier_source) is None
-    for fixture_term in (
-        "granite",
-        "pink couch",
-        "tabby",
-        "brick storefront",
-        "harbor sunset",
-        "remote controls",
-    ):
-        assert fixture_term not in classifier_source
+    assert not any(re.fullmatch(r"org/[a-z0-9_-]+", value) for value in string_literals)
+    assert string_literals.isdisjoint(
+        {
+            "granite",
+            "pink couch",
+            "tabby",
+            "brick storefront",
+            "harbor sunset",
+            "remote controls",
+            "deben estuary",
+            "woodbridge",
+            "welwyn garden city",
+        }
+    )
+
+    config = yaml.safe_load(PACKAGED_QUALITY_CONFIG.read_text(encoding="utf-8"))
+    assert set(config) == {"thresholds"}
+    assert "min_keywords_for_duplication_check" not in config["thresholds"]
 
 
 def test_production_source_has_no_retired_semantic_scoring_api() -> None:
-    """The reduced assessment contract must not retain score compatibility APIs."""
+    """The reduced contract must not retain parallel semantic compatibility APIs."""
     source = (PKG_ROOT / "check_models.py").read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    identifiers = {node.id for node in ast.walk(tree) if isinstance(node, ast.Name)}
+    identifiers.update(
+        node.name
+        for node in ast.walk(tree)
+        if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef)
+    )
+    string_literals = {
+        node.value
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Constant) and isinstance(node.value, str)
+    }
 
-    for retired_name in (
+    retired_identifiers = {
         "GRADE_EMOJIS",
         "ModelRecommendationView",
         "ModelCapabilityRow",
@@ -853,8 +876,46 @@ def test_production_source_has_no_retired_semantic_scoring_api() -> None:
         "_score_metadata_title",
         "_score_metadata_description",
         "_score_metadata_keywords",
-    ):
-        assert retired_name not in source
+        "ReportSelectionBasis",
+        "FailureOrigin",
+        "MaintainerReadiness",
+        "ControlledReproductionStatus",
+        "CompatibilityStatus",
+        "FailureNarrative",
+        "_failure_origin",
+        "_maintainer_readiness",
+        "_failure_narrative_json_fields",
+        "_build_failure_action_hint",
+        "_failure_owner_for_result",
+        "_failure_exception_owner",
+        "_analyze_catalog_contract",
+        "_count_factual_sentences",
+        "_PACKAGE_OWNER_HINTS",
+        "_ERROR_STAGE_HINTS",
+        "_FAILURE_PHASE_HINTS",
+        "_RERUN_ELIGIBLE_VERDICTS",
+        "_BOOLEAN_FLAG_FIELDS",
+        "NONVISUAL_CONTEXT_TERMS",
+        "NONVISUAL_CONTEXT_PATTERNS",
+        "CONTEXT_NOISE_TERMS",
+        "CONTEXT_COMMON_WORDS",
+        "CONTEXT_TERM_ALIASES",
+        "_is_nonvisual_context_term",
+        "_partition_hint_terms",
+        "_strip_nonvisual_terms_from_text",
+        "_extract_hint_signal_terms",
+        "suspected_owner",
+    }
+    retired_formatter_fields = {
+        "is_verbose",
+        "has_formatting_issues",
+        "has_hallucination_issues",
+        "has_excessive_bullets",
+        "is_context_ignored",
+    }
+
+    assert identifiers.isdisjoint(retired_identifiers)
+    assert string_literals.isdisjoint(retired_formatter_fields)
 
 
 def test_stub_refresh_reason_is_none_for_fresh_manifest(

@@ -609,6 +609,41 @@ def test_log_summary_reports_execution_and_mechanical_observations(
     assert "Best keywording:" not in messages
 
 
+def test_log_summary_failure_uses_only_recorded_failure_facts(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Failure summaries must not infer an owner or likely cause."""
+    caplog.set_level(logging.INFO)
+    result = PerformanceResult(
+        model_name="broken/model",
+        generation=None,
+        success=False,
+        failure_phase="decode",
+        error_stage="Model Error",
+        error_code="MODEL_MLX_VLM_DECODE",
+        error_message="generation failed",
+        error_type="ValueError",
+        root_error_module="builtins",
+        error_package="mlx-vlm",
+        error_traceback="Traceback (most recent call last):\nValueError: generation failed",
+    )
+
+    log_summary([result])
+
+    messages = "\n".join(record.message for record in caplog.records)
+    assert (
+        "broken/model | phase=decode | stage=Model Error | module=builtins | "
+        "package=mlx-vlm | code=MODEL_MLX_VLM_DECODE | traceback=available"
+    ) in messages
+    assert "module=builtins" in messages
+    assert "error=ValueError: generation failed" in messages
+    assert "traceback=available" in messages
+    assert "owner≈" not in messages
+    assert "likely=" not in messages
+    assert "generation/integration path" not in messages
+    assert "model runtime failure" not in messages
+
+
 def test_print_model_result_failure_logs_actionable_details(
     caplog: pytest.LogCaptureFixture,
 ) -> None:

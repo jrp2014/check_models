@@ -633,7 +633,8 @@ pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.
 
 ### Advanced Configuration
 
-The tool uses a YAML configuration file to define thresholds for quality checks (hallucination, repetition, verbosity).
+The tool uses a YAML configuration file for retained mechanical observation
+thresholds and prompt-size limits.
 
 - **Default Config**: The tool ships with a bundled default `quality_config.yaml`. In this source tree, the canonical copy lives at `src/check_models_data/quality_config.yaml`.
 - **Custom Config**: You can provide your own config file via `--quality-config path/to/config.yaml`.
@@ -641,10 +642,11 @@ The tool uses a YAML configuration file to define thresholds for quality checks 
 **Key Configurable Areas:**
 
 - **Repetition**: Thresholds for token and phrase repetition.
-- **Hallucination**: Keywords and patterns that suggest hallucinated content (e.g., "based on the chart" when no chart exists).
-- **Verbosity**: Limits on output length and meta-commentary patterns.
-- **Formatting**: Rules for markdown headers, bullet points, and table structures.
-- **Prompt Compaction**: Limits for metadata hints injected into the default prompt (`prompt_title_max_chars`, `prompt_description_max_chars`, `prompt_keyword_max_items`, `prompt_keyword_item_max_chars`).
+- **Minimal output**: Recorded token-count and prompt/output-ratio thresholds.
+- **Prompt burden**: Recorded and estimated prompt-size thresholds.
+- **Prompt compaction**: Limits for metadata hints injected into the default prompt
+  (`prompt_title_max_chars`, `prompt_description_max_chars`,
+  `prompt_keyword_max_items`).
 
 See `src/check_models_data/quality_config.yaml` for the full schema and default values.
 
@@ -915,72 +917,47 @@ pip install -e ".[dev,extras,torch]"  # dev tools + optional model/runtime deps
 
 The package exports a clean public API for programmatic use:
 
-### Quality Analysis
+### Mechanical Output Analysis
 
 ```python
 from check_models import analyze_generation_text, GenerationQualityAnalysis
 
-# Analyze generated text for quality issues
+# Analyze generated text for mechanical observations
 text = "Model output goes here..."
 analysis = analyze_generation_text(text, generated_tokens=50)
 
-# Access analysis results
+# Access directly observed results
 if analysis.is_repetitive:
     print(f"Repetitive token: {analysis.repeated_token}")
-if analysis.hallucination_issues:
-    print(f"Hallucinations detected: {analysis.hallucination_issues}")
-if analysis.is_verbose:
-    print("Output is excessively verbose")
-if analysis.formatting_issues:
-    print(f"Formatting problems: {analysis.formatting_issues}")
-if analysis.has_excessive_bullets:
-    print(f"Too many bullets: {analysis.bullet_count}")
-
-# Check for harness/integration issues (mlx-vlm bugs vs model quality)
-if analysis.has_harness_issue:
-    print(f"⚠️ HARNESS ISSUE: {analysis.harness_issue_type}")
-    print(f"   Details: {analysis.harness_issue_details}")
-    # These indicate mlx-vlm integration bugs, not model quality problems
+if analysis.missing_sections:
+    print(f"Missing requested sections: {analysis.missing_sections}")
+if analysis.instruction_echo:
+    print("Prompt instructions appear verbatim in the output")
+if analysis.likely_capped:
+    print("The recorded output token count reached the requested cap")
+if analysis.unexpected_special_tokens:
+    print(f"Unexpected special tokens: {analysis.unexpected_special_tokens}")
 ```
 
-#### Harness Issue Detection
-
-The quality analysis distinguishes between **model quality issues** (repetition, hallucinations, verbosity) and **harness/integration issues** (bugs in how mlx-vlm loads or runs the model). Harness issues are prefixed with `⚠️HARNESS:` in reports.
-
-**Detected harness issues include:**
-
-| Issue Type | Symptom | Likely Cause |
-| ---------- | ------- | ------------ |
-| `token_encoding` | BPE artifacts like `Ġ` or `Ċ` in output | Tokenizer decode bug |
-| `special_token_leak` | `<\|end\|>`, `<\|endoftext\|>` visible | Stop token handling |
-| `minimal_output` | Zero tokens or filler-only response | Model loading issue |
-| `training_data_leak` | `# INSTRUCTION`, `### Response:` mid-output | Prompt template mismatch |
-
-**Configuration**: Harness detection thresholds are configurable in the bundled `quality_config.yaml` (`src/check_models_data/quality_config.yaml` in this repo):
+The analysis records narrow evidence; it does not infer semantic quality, a
+likely cause, or an owning package. Missing token counts remain unknown. The
+current thresholds are configurable in the bundled `quality_config.yaml`
+(`src/check_models_data/quality_config.yaml` in this repo):
 
 ```yaml
-# Harness/integration issue detection thresholds
-min_bpe_artifact_count: 5       # Min BPE artifacts to flag encoding issue
-min_tokens_for_substantial: 10  # Tokens below this are suspicious
-min_words_for_filler_response: 15  # Words below this in filler response
-long_prompt_tokens_threshold: 3000   # Prompt size where context-related failures become likely
-severe_prompt_tokens_threshold: 12000  # Extreme prompt size risk threshold
+thresholds:
+  min_tokens_for_substantial: 10
+  min_words_for_filler_response: 15
+  min_prompt_tokens_for_ratio: 100
+  min_output_tokens_for_ratio: 15
+  min_output_ratio: 0.02
+  long_prompt_tokens_threshold: 3000
 
-# Default prompt compaction thresholds
-prompt_title_max_chars: 120
-prompt_description_max_chars: 420
-prompt_keyword_max_items: 20
-prompt_keyword_item_max_chars: 36
+  # Default prompt compaction thresholds
+  prompt_title_max_chars: 120
+  prompt_description_max_chars: 420
+  prompt_keyword_max_items: 20
 ```
-
-**When you see harness issues**: These typically indicate upstream bugs in mlx-vlm or model-specific integration problems. Consider:
-
-1. Reporting the issue to [mlx-vlm](https://github.com/Blaizzy/mlx-vlm/issues)
-2. Checking if a newer model version exists
-3. Trying different prompt templates
-4. For Qwen3-VL Metal GPU address faults, using
-   `tools/qwen3_vl_sequential_repro.py --plan` to collect a minimal
-   upstream-only probe matrix before filing with MLX/MLX-VLM maintainers
 
 ### Core Functions
 
@@ -1006,8 +983,8 @@ never combine observations from different lanes.
 
 | Lane | Prompt input | Default token cap | Intended use |
 | ---- | ------------ | ----------------- | ------------ |
-| `triage` | Image only; brief caption request | 200 | Fast MLX-VLM compatibility and output-hygiene check. Structured cataloguing scores are suppressed. |
-| `blind` | Image only; structured title, description, and keywords request | 500 | Measures unaided visual cataloguing. Existing metadata, including EXIF capture date and GPS, is withheld from the model; descriptive metadata may still be used after generation as held-out scoring evidence. |
+| `triage` | Image only; brief caption request | 200 | Fast MLX-VLM compatibility and mechanical output check. |
+| `blind` | Image only; structured title, description, and keywords request | 500 | Exercises unaided visual cataloguing. Existing metadata, including EXIF capture date and GPS, is withheld from the model and current-run assessment. |
 | `assisted` | Image plus descriptive title, description, or keyword hints | 500 | Measures metadata-assisted visual verification and correction. Explicit selection requires descriptive metadata. |
 
 `--eval-mode auto` selects `assisted` when descriptive title, description, or
@@ -1103,7 +1080,7 @@ python -m check_models --image photo.jpg --eval-mode assisted
 | `--width` | int | (auto) | Force a fixed output width (columns) for separators and wrapping. |
 | `-c`, `--quality-config` | Path | (none) | Path to custom quality configuration YAML file. |
 | `--context-marker` | str | `Context:` | Marker used to identify context section in prompt. |
-| `--rerun-triage` | flag | `False` | Rerun triage-worthy models with a simple prompt for secondary evidence. First-pass results are never overwritten. |
+| `--rerun-triage` | flag | `False` | Rerun crashed models and completed models with recorded mechanical observations using a simple prompt. First-pass results are never overwritten. |
 | `-n`, `--dry-run` | flag | `False` | Validate arguments and show what would run without invoking models. |
 
 ### Selection Logic
