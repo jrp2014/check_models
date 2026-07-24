@@ -751,7 +751,12 @@ def test_failed_partial_output_keeps_runtime_failure_owner() -> None:
     assert "formatting" not in recommendation_caveats
     assert "text-sanity" not in recommendation_caveats
     assert check_models._format_table_field_value("quality_issues", cached) == ""
-    assert check_models._build_jsonl_result_record_base(cached)["quality_issues"] == []
+    assert check_models._assessment_to_json(dict(context.assessments)[cached.model_name]) == {
+        "execution": "crashed",
+        "usability": "not_evaluated",
+        "maintainer_status": "actionable_failure",
+        "observations": [],
+    }
 
 
 def test_chained_failure_uses_primary_origin_and_reports_mixed_ownership() -> None:
@@ -788,27 +793,9 @@ def test_chained_failure_uses_primary_origin_and_reports_mixed_ownership() -> No
     assert context.issue_clusters[0].owner == narrative.suspected_owner
 
 
-def test_published_failure_artifacts_match_canonical_runtime_triage() -> None:
-    """Checked-in issue-ready reports must not retain pre-fix quality classifications."""
+def test_published_failure_artifacts_do_not_disclose_home_paths() -> None:
+    """Checked-in human reports should not retain publication-private home paths."""
     output_dir = Path(__file__).parents[1] / "output"
-    records = [
-        json.loads(line)
-        for line in (output_dir / "results.jsonl").read_text(encoding="utf-8").splitlines()
-    ]
-    conclusive_failures = [
-        record
-        for record in records
-        if record.get("_type") == "result"
-        and not record["success"]
-        and record["review"]["verdict"] != "indeterminate"
-    ]
-    indeterminate = [
-        record
-        for record in records
-        if record.get("_type") == "result" and record["review"]["verdict"] == "indeterminate"
-    ]
-
-    assert any(record.get("_type") == "result" for record in records)
     diagnostics = (output_dir / "reports/diagnostics.md").read_text(encoding="utf-8")
     review_report = (output_dir / "reports/review.md").read_text(encoding="utf-8")
     gallery = (output_dir / "reports/model_gallery.md").read_text(encoding="utf-8")
@@ -817,46 +804,25 @@ def test_published_failure_artifacts_match_canonical_runtime_triage() -> None:
     assert str(Path.home()) not in review_report
     assert str(Path.home()) not in gallery
     assert str(Path.home()) not in html_report
-    assert all(record["compatibility_status"] == "indeterminate" for record in indeterminate)
-    assert all("issue_cluster_path" not in record["maintainer_triage"] for record in indeterminate)
-    for failure in conclusive_failures:
-        review = failure["review"]
-        triage = failure["maintainer_triage"]
-        assert review["verdict"] == "runtime_failure"
-        assert triage["issue_kind"] == "runtime_failure"
-        assert failure["compatibility_status"] == "crashed"
-        assert failure["quality_issues"] == []
-        assert review["owner"] == triage["suspected_owner"]
-        assert review["owner"] in diagnostics
-        assert f"`{failure['model']}`" in review_report
-        assert "runtime_failure" in review_report
-        assert (output_dir / triage["issue_cluster_path"]).is_file()
 
 
-def test_direct_serializers_build_one_local_review_cache(tmp_path: Path) -> None:
-    """Legacy direct serializers should classify once through their fallback context."""
-    result = _make_success("org/direct")
+def test_direct_jsonl_serializer_builds_one_local_assessment_cache(tmp_path: Path) -> None:
+    """Direct JSONL calls should build one context and classify each model once."""
+    results = [_make_success("org/direct-a"), _make_success("org/direct-b")]
 
     with patch.object(
         check_models,
-        "_build_jsonl_review_record",
-        wraps=check_models._build_jsonl_review_record,
-    ) as review_builder:
+        "_assess_result",
+        wraps=check_models._assess_result,
+    ) as assessment_builder:
         check_models.save_jsonl_report(
-            [result],
+            results,
             tmp_path / "direct.jsonl",
             prompt="Describe the image.",
             system_info={},
         )
-        check_models.append_history_record(
-            history_path=tmp_path / "direct.history.jsonl",
-            results=[result],
-            prompt="Describe the image.",
-            system_info={},
-            library_versions={},
-        )
 
-    assert review_builder.call_count == 2
+    assert assessment_builder.call_count == len(results)
 
 
 def test_recommendation_policies_gate_reliability_memory_and_dominance() -> None:
@@ -2895,14 +2861,13 @@ class TestMarkdownReportEdgeCases:
             assert "Generated Text" in tsv_lines[0]
             assert jsonl_records[0]["_type"] == "metadata"
             assert len(jsonl_records[1:]) == 2
-            assert run_payload["schema_version"] == "1.4"
+            assert run_payload["schema_version"] == "2.0"
             assert run_payload["producer"]["name"] == "check_models"
             assert run_payload["counts"] == {
                 "models_attempted": 2,
                 "models_evaluated": 2,
-                "models_total": 2,
-                "models_successful": 1,
-                "models_failed": 1,
+                "models_completed": 1,
+                "models_crashed": 1,
                 "models_indeterminate": 0,
             }
             assert len(capability_payload["models"]) == 2
@@ -3647,44 +3612,6 @@ class TestMarkdownReportEdgeCases:
             check_models._build_result_output_cues(result)
             == expected_order[: check_models.OUTPUT_PREVIEW_CUE_LIMIT]
         )
-
-    def test_jsonl_metadata_agreement_includes_assisted_enrichment_components(self) -> None:
-        """JSONL should expose available assisted enrichment component scores."""
-        metrics = check_models.MetadataAgreementMetrics(
-            overall_score=84.0,
-            context_integration_score=75.0,
-            draft_improvement_score=45.0,
-            visual_description_score=90.0,
-            assisted_enrichment_score=76.5,
-        )
-
-        payload = check_models._build_jsonl_metadata_agreement_record(metrics)
-
-        assert payload is not None
-        assert payload["context_integration_score"] == 75.0
-        assert payload["draft_improvement_score"] == 45.0
-        assert payload["visual_description_score"] == 90.0
-        assert payload["assisted_enrichment_score"] == 76.5
-
-    def test_authoritative_only_assisted_record_keeps_visual_description_component(self) -> None:
-        """Authoritative-only assisted records should retain visual-description scoring."""
-        metrics = check_models.compute_metadata_agreement(
-            (
-                "Title: Sailboats on Deben Estuary at Woodbridge\n"
-                "Description: Two white sailboats rest on calm water before a wooded bank.\n"
-                "Keywords: sailboats, estuary, Woodbridge, calm water, wooded bank"
-            ),
-            {"keywords": "Deben Estuary, Woodbridge"},
-        )
-
-        payload = check_models._build_jsonl_metadata_agreement_record(metrics)
-
-        assert metrics.context_integration_score is not None
-        assert metrics.draft_improvement_score is None
-        assert metrics.visual_description_score is not None
-        assert metrics.assisted_enrichment_score is not None
-        assert payload is not None
-        assert payload["visual_description_score"] == metrics.visual_description_score
 
     def test_review_surfaces_use_canonical_assisted_enrichment_evidence(self) -> None:
         """Review surfaces should reuse canonical assisted enrichment evidence."""

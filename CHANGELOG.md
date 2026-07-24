@@ -10,6 +10,9 @@ Notable changes to this project will be documented in this file.
 - Establish the minimal immutable current-run result-assessment contract with
   ordered factual observations while legacy report projections remain available
   during the staged migration.
+- Narrow JSONL and run JSON to breaking schema 2.0 contracts built from the
+  cached result assessment, complete captured evidence, raw execution facts,
+  provenance, and mutually consistent completed/crashed/indeterminate counts.
 - Keep the static-quality gate compatible with current Ruff releases by
   documenting the project-level copyright policy, calibrating the established
   report API's positional-argument threshold, and normalizing multiline string

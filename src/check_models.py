@@ -1270,21 +1270,6 @@ class JsonlMetricsRecord(TypedDict, total=False):
     peak_memory_delta_gb: float
 
 
-class JsonlQualityAnalysisMetrics(TypedDict):
-    """Subset of quality metrics included in JSONL output."""
-
-    word_count: int
-    unique_ratio: float
-    bullet_count: int
-
-
-class JsonlQualityAnalysisRecord(TypedDict):
-    """Quality-analysis payload attached to successful rows when available."""
-
-    issues: list[str]
-    metrics: JsonlQualityAnalysisMetrics
-
-
 type ExecutionOutcome = Literal["completed", "failed", "indeterminate"]
 type ExecutionStatus = Literal["completed", "crashed", "indeterminate"]
 type ModelUsability = Literal["usable", "usable_with_caveats", "unusable", "not_evaluated"]
@@ -1347,23 +1332,6 @@ type OutputAnomaly = Literal[
     "token_cap_truncation",
     "irrelevant_output_smell",
 ]
-
-
-class JsonlMetadataAgreementRecord(TypedDict):
-    """Metadata-agreement payload attached to successful rows when available."""
-
-    overall_score: float
-    title_score: float
-    description_score: float
-    keyword_score: float
-    nonvisual_penalty: float
-    matched_terms: list[str]
-    missed_terms: list[str]
-    nonvisual_hits: list[str]
-    context_integration_score: NotRequired[float | None]
-    draft_improvement_score: NotRequired[float | None]
-    visual_description_score: NotRequired[float | None]
-    assisted_enrichment_score: NotRequired[float | None]
 
 
 class JsonlReviewRecord(TypedDict):
@@ -1509,10 +1477,9 @@ class RunOutcomeCounts(TypedDict):
 
     models_attempted: int
     models_evaluated: int
-    models_failed: int
+    models_completed: int
+    models_crashed: int
     models_indeterminate: int
-    models_successful: int
-    models_total: int
 
 
 class RunImageRecord(TypedDict):
@@ -1540,14 +1507,11 @@ class RunPromptBurdenRecord(TypedDict):
 class RunJsonReportRecord(TypedDict):
     """Stable run-level machine artifact schema."""
 
-    schema_version: Literal["1.4"]
+    schema_version: Literal["2.0"]
     generated_at: str
     eval_mode: EvaluationLane
     prompt: str
     prompt_sha256: str
-    semantic_rankings_grounded: bool
-    selection_basis: ReportSelectionBasis
-    has_descriptive_metadata: bool
     metadata_exposed_to_prompt: bool
     total_runtime_seconds: float
     counts: RunOutcomeCounts
@@ -1562,70 +1526,43 @@ class RunJsonReportRecord(TypedDict):
     prompt_burden: dict[str, RunPromptBurdenRecord]
 
 
-class JsonlRerunSummary(TypedDict, total=False):
-    """Secondary rerun evidence attached to JSONL result rows."""
+class JsonlAssessmentRecord(TypedDict):
+    """One current-run assessment attached to a JSONL result row."""
 
-    rerun_success: Required[bool]
-    rerun_verdict: str
-    rerun_error_code: str
-    rerun_generated_chars: int
-    rerun_generation_time: float
-    rerun_prompt: str
+    execution: ExecutionStatus
+    usability: ModelUsability
+    maintainer_status: MaintainerStatus
+    observations: list[ObservationCode]
 
 
-class JsonlSignatureComponents(TypedDict, total=False):
-    """Structured components of the error signature for precise cross-run clustering."""
+class JsonlFailureRecord(TypedDict, total=False):
+    """Raw failure evidence retained for a non-completed model attempt."""
 
-    error_code: str
-    normalized_message: str
-    traceback_signature: str
+    phase: str | None
+    stage: str | None
+    code: str | None
+    message: str | None
+    exception_type: str | None
+    exception_module: str | None
+    package: str | None
+    traceback: str | None
+    exception_chain: list[dict[str, str]]
 
 
 class JsonlResultRecord(TypedDict):
-    """Per-model row shape for ``results.jsonl`` output."""
+    """Narrow per-model row shape for ``results.jsonl`` output."""
 
     _type: Literal["result"]
     model: str
-    success: bool
-    failure_phase: str | None
-    error_stage: str | None
-    error_code: str | None
-    error_signature: str | None
-    error_message: str | None
-    captured_output_on_fail: str | None
-    error_type: str | None
-    root_error_type: NotRequired[str]
-    root_error_module: NotRequired[str]
-    root_error_message: NotRequired[str]
-    exception_chain: NotRequired[list[dict[str, str]]]
-    error_package: str | None
-    error_traceback: str | None
-    quality_issues: list[str]
     timestamp: str
-    model_provenance: NotRequired[ModelProvenanceRecord]
+    assessment: JsonlAssessmentRecord
+    generated_text: str
+    captured_output_on_fail: str
+    failure: JsonlFailureRecord | None
     metrics: JsonlMetricsRecord
     timing: JsonlTimingRecord
-    generated_text: NotRequired[str]
-    quality_analysis: NotRequired[JsonlQualityAnalysisRecord]
-    metadata_agreement: NotRequired[JsonlMetadataAgreementRecord]
-    review: NotRequired[JsonlReviewRecord]
-    maintainer_triage: NotRequired[JsonlMaintainerTriageRecord]
-    prompt_diagnostics: NotRequired[dict[str, JsonLike]]
-    signature_components: NotRequired[JsonlSignatureComponents]
-    rerun_summary: NotRequired[JsonlRerunSummary]
-    compatibility_status: NotRequired[str]
-    current_recommendation: NotRequired[RecommendationStatus]
-    failure_origin: NotRequired[FailureOrigin]
-    maintainer_readiness: NotRequired[MaintainerReadiness]
-    reproduction_status: NotRequired[ControlledReproductionStatus]
-    keyword_overlap: NotRequired[KeywordOverlapState]
-    context_integration_score: NotRequired[float | None]
-    draft_improvement_score: NotRequired[float | None]
-    visual_description_score: NotRequired[float | None]
-    assisted_enrichment_score: NotRequired[float | None]
-    prompt_burden_kind: NotRequired[str]
-    prompt_burden_source: NotRequired[str]
-    owner_confidence: NotRequired[str]
+    model_provenance: ModelProvenanceRecord
+    prompt_diagnostics: dict[str, JsonLike] | None
 
 
 type FailedModelIssue = tuple[str, str | None, str | None]
@@ -12412,18 +12349,20 @@ def _recommendation_status_for_result(result: PerformanceResult) -> Recommendati
     return "caveat" if result.success else "avoid"
 
 
-def _run_outcome_counts(results: Sequence[PerformanceResult]) -> RunOutcomeCounts:
-    """Return counts without treating unreachable inputs as evaluated failures."""
-    indeterminate = sum(_is_indeterminate_connectivity_failure(result) for result in results)
-    successful = sum(result.success for result in results)
-    failed = len(results) - successful - indeterminate
+def _run_outcome_counts(
+    assessments: Sequence[tuple[str, ResultAssessment]],
+) -> RunOutcomeCounts:
+    """Count cached execution statuses without reclassifying report rows."""
+    statuses = [assessment.execution for _model, assessment in assessments]
+    completed = statuses.count("completed")
+    crashed = statuses.count("crashed")
+    indeterminate = statuses.count("indeterminate")
     return {
-        "models_attempted": len(results),
-        "models_evaluated": successful + failed,
-        "models_failed": failed,
+        "models_attempted": len(statuses),
+        "models_evaluated": completed + crashed,
+        "models_completed": completed,
+        "models_crashed": crashed,
         "models_indeterminate": indeterminate,
-        "models_successful": successful,
-        "models_total": len(results),
     }
 
 
@@ -13295,6 +13234,16 @@ def _assess_result(result: PerformanceResult) -> ResultAssessment:
         maintainer_status = "none"
 
     return ResultAssessment(execution, usability, maintainer_status, observations)
+
+
+def _assessment_to_json(assessment: ResultAssessment) -> JsonlAssessmentRecord:
+    """Serialize the sole current-run status record for machine artifacts."""
+    return {
+        "execution": assessment.execution,
+        "usability": assessment.usability,
+        "maintainer_status": assessment.maintainer_status,
+        "observations": list(assessment.observations),
+    }
 
 
 @dataclass(frozen=True)
@@ -16160,7 +16109,9 @@ def _diagnostics_impact_section(
     image_path: Path | None,
 ) -> list[str]:
     """Build issue-ready impact and run-condition context."""
-    counts = _run_outcome_counts(results)
+    indeterminate_count = sum(_is_indeterminate_connectivity_failure(result) for result in results)
+    completed_count = sum(result.success for result in results)
+    evaluated_count = len(results) - indeterminate_count
     image_ref = _issue_repro_image_ref(image_path=image_path, run_args=None)
     return render_report_markdown(
         (
@@ -16169,11 +16120,11 @@ def _diagnostics_impact_section(
                 blocks=(
                     ReportKeyValues(
                         rows=(
-                            ("Models attempted", str(counts["models_attempted"])),
-                            ("Models evaluated", str(counts["models_evaluated"])),
-                            ("Indeterminate", str(counts["models_indeterminate"])),
+                            ("Models attempted", str(len(results))),
+                            ("Models evaluated", str(evaluated_count)),
+                            ("Indeterminate", str(indeterminate_count)),
                             ("Crashed", str(len(snapshot.failed))),
-                            ("Completed", str(counts["models_successful"])),
+                            ("Completed", str(completed_count)),
                             ("Prompt", prompt),
                             ("Image", image_ref),
                         )
@@ -27248,7 +27199,7 @@ def _build_jsonl_metadata_record(
     resolved_eval_mode = _resolve_eval_mode(eval_mode, None)
     record: JsonlMetadataRecord = {
         "_type": "metadata",
-        "format_version": "2.1",
+        "format_version": "2.0",
         "prompt": prompt,
         "system": system_info,
         "timestamp": local_now_str(),
@@ -27265,27 +27216,87 @@ def _build_jsonl_metadata_record(
     return record
 
 
-def _build_jsonl_result_record_base(result: PerformanceResult) -> JsonlResultRecord:
-    """Build base per-model JSONL row with failure-safe defaults."""
+def _build_jsonl_result_record(
+    result: PerformanceResult,
+    assessment: ResultAssessment,
+    *,
+    requested_revision: str | None,
+    recommended_working_set_bytes: int | None = None,
+) -> JsonlResultRecord:
+    """Build one narrow JSONL row from cached assessment and captured facts."""
     runtime = result.runtime_diagnostics
+    metrics: JsonlMetricsRecord = {}
+    generation = result.generation
+    if generation is not None:
+        performance_data = _extract_generation_performance_data(generation)
+        metrics = {
+            "prompt_tokens": performance_data.prompt_tokens,
+            "generation_tokens": performance_data.generation_tokens,
+            "total_tokens": performance_data.total_tokens,
+            "prompt_tps": performance_data.prompt_tps,
+            "generation_tps": performance_data.generation_tps,
+            "peak_memory_gb": performance_data.peak_memory_gb,
+            "active_memory_gb": (
+                result.active_memory
+                if result.active_memory is not None
+                else performance_data.active_memory_gb
+            ),
+            "cache_memory_gb": (
+                result.cache_memory
+                if result.cache_memory is not None
+                else performance_data.cache_memory_gb
+            ),
+        }
+        model_load_active_memory_gb = (
+            runtime.model_load_active_memory_gb
+            if runtime is not None
+            else _object_model_load_active_memory_gb(generation)
+        )
+        if model_load_active_memory_gb is not None:
+            metrics["model_load_active_memory_gb"] = model_load_active_memory_gb
+        peak_memory_delta_gb = _peak_memory_delta_from_model_load_gb(result)
+        if peak_memory_delta_gb is not None:
+            metrics["peak_memory_delta_gb"] = peak_memory_delta_gb
+        working_set_pct = _peak_memory_working_set_pct(
+            performance_data.peak_memory_gb,
+            recommended_working_set_bytes,
+        )
+        if working_set_pct is not None:
+            metrics["peak_memory_working_set_pct"] = working_set_pct
+
+    failure: JsonlFailureRecord | None = None
+    if assessment.execution != "completed":
+        root_exception = result.exception_chain[0] if result.exception_chain else None
+        failure = {
+            "phase": result.failure_phase,
+            "stage": result.error_stage,
+            "code": result.error_code,
+            "message": result.error_message,
+            "exception_type": (
+                result.root_error_type
+                or (root_exception.exception_type if root_exception is not None else None)
+                or result.error_type
+            ),
+            "exception_module": (
+                result.root_error_module
+                or (root_exception.module if root_exception is not None else None)
+            ),
+            "package": result.error_package,
+            "traceback": result.error_traceback,
+        }
+        if result.exception_chain:
+            failure["exception_chain"] = _serialize_exception_chain(result.exception_chain)
+
+    prompt_diagnostics = _prompt_diagnostics_to_json(result.prompt_diagnostics)
     record: JsonlResultRecord = {
         "_type": "result",
         "model": result.model_name,
-        "success": result.success,
-        "failure_phase": result.failure_phase,
-        "error_stage": result.error_stage,
-        "error_code": result.error_code,
-        "error_signature": result.error_signature,
-        "error_message": result.error_message,
-        "captured_output_on_fail": result.captured_output_on_fail,
-        "error_type": result.error_type,
-        "error_package": result.error_package,
-        "error_traceback": result.error_traceback,
-        "quality_issues": (
-            _parse_quality_issues_to_list(result.quality_issues) if result.success else []
-        ),
         "timestamp": local_now_str(),
-        "metrics": {},
+        "assessment": _assessment_to_json(assessment),
+        "generated_text": _generation_text_value(generation),
+        "captured_output_on_fail": result.captured_output_on_fail or "",
+        "failure": failure,
+        "metrics": metrics,
         "timing": {
             "generation_time_s": result.generation_time,
             "model_load_time_s": result.model_load_time,
@@ -27300,144 +27311,13 @@ def _build_jsonl_result_record_base(result: PerformanceResult) -> JsonlResultRec
             ),
             "stop_reason": runtime.stop_reason if runtime is not None else None,
         },
+        "model_provenance": _collect_model_provenance(
+            result.model_name,
+            requested_revision=requested_revision,
+        ),
+        "prompt_diagnostics": prompt_diagnostics or None,
     }
-    # Attach structured signature components for failed results to enable
-    # precise cross-run clustering without re-parsing messages.
-    if not result.success and result.error_message is not None:
-        components: JsonlSignatureComponents = {}
-        if result.error_code is not None:
-            components["error_code"] = result.error_code
-        components["normalized_message"] = _normalize_error_core_message(
-            result.root_error_message or result.error_message
-        )
-        if result.error_traceback is not None:
-            components["traceback_signature"] = _normalize_traceback_signature(
-                result.error_traceback
-            )
-        record["signature_components"] = components
-    # Attach differential rerun evidence when available (G3: secondary only)
-    if result.rerun_evidence is not None:
-        ev = result.rerun_evidence
-        summary: JsonlRerunSummary = {"rerun_success": ev.rerun_success}
-        if ev.rerun_verdict is not None:
-            summary["rerun_verdict"] = ev.rerun_verdict
-        if ev.rerun_error_code is not None:
-            summary["rerun_error_code"] = ev.rerun_error_code
-        if ev.rerun_generated_chars is not None:
-            summary["rerun_generated_chars"] = ev.rerun_generated_chars
-        if ev.rerun_generation_time is not None:
-            summary["rerun_generation_time"] = ev.rerun_generation_time
-        if ev.rerun_prompt is not None:
-            summary["rerun_prompt"] = ev.rerun_prompt
-        record["rerun_summary"] = summary
-    if result.root_error_type is not None:
-        record["root_error_type"] = result.root_error_type
-    if result.root_error_module is not None:
-        record["root_error_module"] = result.root_error_module
-    if result.root_error_message is not None:
-        record["root_error_message"] = result.root_error_message
-    if result.exception_chain:
-        record["exception_chain"] = _serialize_exception_chain(result.exception_chain)
-    prompt_diagnostics = _prompt_diagnostics_to_json(result.prompt_diagnostics)
-    if prompt_diagnostics:
-        record["prompt_diagnostics"] = prompt_diagnostics
     return record
-
-
-def _build_jsonl_quality_analysis_record(
-    quality_analysis: object,
-) -> JsonlQualityAnalysisRecord | None:
-    """Build JSONL quality-analysis payload from generation analysis object."""
-    if quality_analysis is None:
-        return None
-    return {
-        "issues": list(getattr(quality_analysis, "issues", [])),
-        "metrics": {
-            "word_count": int(getattr(quality_analysis, "word_count", 0)),
-            "unique_ratio": float(getattr(quality_analysis, "unique_ratio", 0.0)),
-            "bullet_count": int(getattr(quality_analysis, "bullet_count", 0)),
-        },
-    }
-
-
-def _build_jsonl_metadata_agreement_record(
-    metadata_agreement: MetadataAgreementMetrics | None,
-) -> JsonlMetadataAgreementRecord | None:
-    """Build JSONL metadata-agreement payload from result-level benchmark data."""
-    if metadata_agreement is None:
-        return None
-    record: JsonlMetadataAgreementRecord = {
-        "overall_score": metadata_agreement.overall_score,
-        "title_score": metadata_agreement.title_score,
-        "description_score": metadata_agreement.description_score,
-        "keyword_score": metadata_agreement.keyword_score,
-        "nonvisual_penalty": metadata_agreement.nonvisual_penalty,
-        "matched_terms": list(metadata_agreement.matched_terms),
-        "missed_terms": list(metadata_agreement.missed_terms),
-        "nonvisual_hits": list(metadata_agreement.nonvisual_hits),
-    }
-    for field_name in (
-        "context_integration_score",
-        "draft_improvement_score",
-        "visual_description_score",
-        "assisted_enrichment_score",
-    ):
-        value = getattr(metadata_agreement, field_name)
-        if value is not None:
-            record[field_name] = value
-    return record
-
-
-def _populate_jsonl_result_generation_data(
-    record: JsonlResultRecord,
-    result: PerformanceResult,
-) -> None:
-    """Attach success-only generation metrics/text/quality data to JSONL row."""
-    if not result.generation:
-        return
-
-    generation = result.generation
-    performance_data = _extract_generation_performance_data(generation)
-    active_memory_gb = (
-        result.active_memory
-        if result.active_memory is not None
-        else performance_data.active_memory_gb
-    )
-    cache_memory_gb = (
-        result.cache_memory if result.cache_memory is not None else performance_data.cache_memory_gb
-    )
-    record["metrics"] = {
-        "prompt_tokens": performance_data.prompt_tokens,
-        "generation_tokens": performance_data.generation_tokens,
-        "total_tokens": performance_data.total_tokens,
-        "prompt_tps": performance_data.prompt_tps,
-        "generation_tps": performance_data.generation_tps,
-        "peak_memory_gb": performance_data.peak_memory_gb,
-        "active_memory_gb": active_memory_gb,
-        "cache_memory_gb": cache_memory_gb,
-    }
-    model_load_active_memory_gb = (
-        result.runtime_diagnostics.model_load_active_memory_gb
-        if result.runtime_diagnostics is not None
-        else _object_model_load_active_memory_gb(generation)
-    )
-    if model_load_active_memory_gb is not None:
-        record["metrics"]["model_load_active_memory_gb"] = model_load_active_memory_gb
-    peak_memory_delta_gb = _peak_memory_delta_from_model_load_gb(result)
-    if peak_memory_delta_gb is not None:
-        record["metrics"]["peak_memory_delta_gb"] = peak_memory_delta_gb
-
-    text = getattr(generation, "text", None)
-    if text is not None:
-        record["generated_text"] = text
-
-    quality_payload = _build_jsonl_quality_analysis_record(result.quality_analysis)
-    if quality_payload:
-        record["quality_analysis"] = quality_payload
-
-    metadata_agreement_payload = _build_jsonl_metadata_agreement_record(result.metadata_agreement)
-    if metadata_agreement_payload:
-        record["metadata_agreement"] = metadata_agreement_payload
 
 
 def save_jsonl_report(
@@ -27453,21 +27333,7 @@ def save_jsonl_report(
     requested_revision: str | None = None,
     report_context: ReportRenderContext | None = None,
 ) -> None:
-    """Save results to a JSONL file for programmatic analysis and AI issue generation.
-
-    The JSONL format includes all diagnostic information needed to generate
-    actionable GitHub issue reports, including:
-    - Full error tracebacks for debugging
-    - Error type classification for bucketing
-    - Package attribution for directing reports
-    - Quality analysis for successful models
-    - Timing metrics for performance analysis
-    - Shared library/runtime metadata for reproducible maintainer triage
-    - Per-result maintainer triage hints for actionable follow-up
-
-    Format (v2.1): First line is a metadata header containing prompt,
-    system_info, and shared runtime context. Per-model result lines follow.
-    """
+    """Save the narrow JSONL machine contract with complete captured evidence."""
     if report_context is None:
         report_context = _build_report_render_context(
             results=results,
@@ -27475,9 +27341,8 @@ def save_jsonl_report(
             eval_mode=eval_mode,
             system_info=system_info,
         )
-    issue_cluster_by_model = _issue_clusters_by_model(report_context.issue_clusters)
-    machine_facts = _machine_facts_by_model(report_context)
     cached_results = {result.model_name: result for result in report_context.result_set.results}
+    assessments = _assessments_by_model(report_context)
     try:
         # Write shared metadata header (avoids repeating prompt/system per row)
         header = _build_jsonl_metadata_record(
@@ -27492,52 +27357,12 @@ def save_jsonl_report(
 
         for original_result in results:
             result = cached_results.get(original_result.model_name, original_result)
-            record = _build_jsonl_result_record_base(result)
-            record["model_provenance"] = _collect_model_provenance(
-                result.model_name,
+            record = _build_jsonl_result_record(
+                result,
+                assessments[result.model_name],
                 requested_revision=requested_revision,
+                recommended_working_set_bytes=report_context.recommended_working_set_bytes,
             )
-            _populate_jsonl_result_generation_data(record, result)
-            facts = machine_facts.get(result.model_name)
-            review_payload = _review_for_result(result)
-            if review_payload:
-                record["review"] = review_payload
-                base_triage = _maintainer_triage_for_result(result)
-                if base_triage is not None:
-                    triage = cast("JsonlMaintainerTriageRecord", dict(base_triage))
-                    issue_cluster = issue_cluster_by_model.get(result.model_name)
-                    if issue_cluster is not None:
-                        triage["issue_cluster_id"] = issue_cluster.cluster_id
-                        triage["issue_cluster_path"] = _issue_cluster_path(issue_cluster)
-                        triage["acceptance_signal"] = issue_cluster.acceptance_signal
-                    if facts is not None and facts.suspected_owner is not None:
-                        triage["suspected_owner"] = facts.suspected_owner
-                    if facts is not None and facts.owner_confidence is not None:
-                        triage["confidence"] = facts.owner_confidence
-                    record["maintainer_triage"] = triage
-            if facts is not None:
-                if facts.peak_memory_working_set_pct is not None:
-                    record["metrics"]["peak_memory_working_set_pct"] = (
-                        facts.peak_memory_working_set_pct
-                    )
-                record["compatibility_status"] = facts.compatibility_status
-                record["current_recommendation"] = facts.current_recommendation
-                record["failure_origin"] = facts.failure_origin
-                record["maintainer_readiness"] = facts.maintainer_readiness
-                record["reproduction_status"] = facts.reproduction_status
-                record["keyword_overlap"] = facts.keyword_overlap
-                record["prompt_burden_kind"] = facts.prompt_burden_kind
-                record["prompt_burden_source"] = facts.prompt_burden_source
-                if facts.context_integration_score is not None:
-                    record["context_integration_score"] = facts.context_integration_score
-                if facts.draft_improvement_score is not None:
-                    record["draft_improvement_score"] = facts.draft_improvement_score
-                if facts.visual_description_score is not None:
-                    record["visual_description_score"] = facts.visual_description_score
-                if facts.assisted_enrichment_score is not None:
-                    record["assisted_enrichment_score"] = facts.assisted_enrichment_score
-                if facts.owner_confidence is not None:
-                    record["owner_confidence"] = facts.owner_confidence
             lines.append(json.dumps(record))
         _write_text_file(filename, "\n".join(lines) + "\n")
         # Logging handled in finalize_execution
@@ -27645,20 +27470,17 @@ def save_run_json_report(
 ) -> None:
     """Write stable run-level metadata for public benchmark snapshots."""
     policy = report_context.mode_policy
-    counts = _run_outcome_counts(results)
+    counts = _run_outcome_counts(report_context.assessments)
     payload: RunJsonReportRecord = {
-        "schema_version": "1.4",
+        "schema_version": "2.0",
         "generated_at": local_now_str(),
         "eval_mode": policy.eval_mode,
         "prompt": prompt,
         "prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
-        "semantic_rankings_grounded": policy.semantic_rankings_grounded,
-        "selection_basis": policy.selection_basis,
-        "has_descriptive_metadata": policy.has_descriptive_metadata,
         "metadata_exposed_to_prompt": policy.metadata_exposed_to_prompt,
         "total_runtime_seconds": round(total_runtime_seconds, 3),
         "counts": counts,
-        "artifacts": dict(output_paths),
+        "artifacts": {name: path for name, path in output_paths.items() if "capabilit" not in name},
         "library_versions": dict(versions),
         "component_provenance": _collect_component_provenance(versions),
         "producer": producer or _collect_check_models_provenance(),
@@ -27695,8 +27517,7 @@ def generate_output_index_report(
 ) -> None:
     """Write a generated landing page that routes readers to the right artifact."""
     policy = report_context.mode_policy
-    result_set = report_context.result_set
-    counts = _run_outcome_counts(result_set.results)
+    counts = _run_outcome_counts(report_context.assessments)
     diagnostics_written = (
         diagnostics_artifacts is not None and diagnostics_artifacts.diagnostics_written
     )
@@ -27720,8 +27541,8 @@ def generate_output_index_report(
         ),
         f"- Models attempted: {counts['models_attempted']}",
         f"- Models evaluated: {counts['models_evaluated']}",
-        f"- Successful: {counts['models_successful']}",
-        f"- Failed: {counts['models_failed']}",
+        f"- Successful: {counts['models_completed']}",
+        f"- Failed: {counts['models_crashed']}",
         f"- Indeterminate: {counts['models_indeterminate']}",
         "",
         "## Primary Artifacts",

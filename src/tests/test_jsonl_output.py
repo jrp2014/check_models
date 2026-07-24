@@ -113,7 +113,7 @@ def test_save_jsonl_report_creates_file(tmp_path: Path) -> None:
     assert output_file.exists()
     header, rows = _read_jsonl(output_file)
     assert header["_type"] == "metadata"
-    assert header["format_version"] == "2.1"
+    assert header["format_version"] == "2.0"
     assert header["prompt"] == "test"
     assert header["eval_mode"] == "blind"
     assert header["metadata_exposed_to_prompt"] is False
@@ -216,6 +216,8 @@ def test_save_run_json_report_captures_public_snapshot_contract(
         output_paths={
             "results_markdown": "reports/results.md",
             "model_selection": "reports/model_selection.md",
+            "model_capabilities": "reports/model_capabilities.md",
+            "model_capabilities_json": "model_capabilities.json",
             "diagnostics": "reports/diagnostics.md",
         },
         producer={
@@ -227,18 +229,22 @@ def test_save_run_json_report_captures_public_snapshot_contract(
     )
 
     payload = json.loads(out.read_text(encoding="utf-8"))
-    assert payload["schema_version"] == "1.4"
+    assert payload["schema_version"] == "2.0"
     assert payload["eval_mode"] == "triage"
-    assert payload["semantic_rankings_grounded"] is False
-    assert payload["selection_basis"] == "caption hygiene only"
+    assert "semantic_rankings_grounded" not in payload
+    assert "selection_basis" not in payload
+    assert "has_descriptive_metadata" not in payload
     assert payload["metadata_exposed_to_prompt"] is False
-    assert payload["counts"]["models_total"] == 1
-    assert payload["counts"]["models_attempted"] == 1
-    assert payload["counts"]["models_evaluated"] == 1
-    assert payload["counts"]["models_indeterminate"] == 0
-    assert payload["counts"]["models_successful"] == 1
-    assert payload["counts"]["models_failed"] == 0
+    assert payload["counts"] == {
+        "models_attempted": 1,
+        "models_evaluated": 1,
+        "models_completed": 1,
+        "models_crashed": 0,
+        "models_indeterminate": 0,
+    }
     assert payload["artifacts"]["model_selection"] == "reports/model_selection.md"
+    assert "model_capabilities" not in payload["artifacts"]
+    assert "model_capabilities_json" not in payload["artifacts"]
     assert payload["library_versions"]["mlx-vlm"] == "0.6.3"
     assert payload["image"]["name"] == "catalogue.jpg"
     assert payload["image"]["width"] == 12
@@ -274,11 +280,18 @@ def test_save_run_json_report_captures_public_snapshot_contract(
     }
 
 
-def test_run_json_excludes_connectivity_disconnects_from_evaluated_and_failed_counts(
+def test_run_json_counts_completed_crashed_and_indeterminate_results_consistently(
     tmp_path: Path,
 ) -> None:
-    """Unavailable external input should be counted as indeterminate, not a model failure."""
+    """Run counts should partition attempts while evaluated outcomes remain conclusive."""
     completed = PerformanceResult(model_name="org/completed", generation=None, success=True)
+    crashed = PerformanceResult(
+        model_name="org/crashed",
+        generation=None,
+        success=False,
+        error_stage="Generation",
+        error_message="decode failed",
+    )
     disconnected = PerformanceResult(
         model_name="org/not-reached",
         generation=None,
@@ -287,7 +300,7 @@ def test_run_json_excludes_connectivity_disconnects_from_evaluated_and_failed_co
         error_message="Model loading failed: Server disconnected without sending a response.",
         error_package="unknown",
     )
-    results = [completed, disconnected]
+    results = [completed, crashed, disconnected]
     context = check_models._build_report_render_context(results=results, prompt="Describe it.")
     out = tmp_path / "run.json"
 
@@ -309,13 +322,16 @@ def test_run_json_excludes_connectivity_disconnects_from_evaluated_and_failed_co
 
     counts = json.loads(out.read_text(encoding="utf-8"))["counts"]
     assert counts == {
-        "models_attempted": 2,
-        "models_evaluated": 1,
-        "models_failed": 0,
+        "models_attempted": 3,
+        "models_evaluated": 2,
+        "models_completed": 1,
+        "models_crashed": 1,
         "models_indeterminate": 1,
-        "models_successful": 1,
-        "models_total": 2,
     }
+    assert counts["models_attempted"] == (
+        counts["models_completed"] + counts["models_crashed"] + counts["models_indeterminate"]
+    )
+    assert counts["models_evaluated"] == (counts["models_completed"] + counts["models_crashed"])
 
 
 def test_check_models_provenance_degrades_without_install_or_git_metadata(
@@ -463,16 +479,8 @@ def test_jsonl_and_run_json_include_shared_component_provenance(
     assert rows[0]["model_provenance"]["requested_revision"] == "release-branch"
 
 
-def test_jsonl_metrics_fall_back_to_generation_runtime_fields() -> None:
+def test_jsonl_metrics_fall_back_to_generation_runtime_fields(tmp_path: Path) -> None:
     """JSONL metrics should use performance fields attached to GenerationResult."""
-    record = cast(
-        "JsonlResultRecord",
-        {
-            "_type": "result",
-            "model": "fake/model",
-            "success": True,
-        },
-    )
     result = PerformanceResult(
         model_name="fake/model",
         generation=MockGeneration(active_memory=0.75, cache_memory=0.25),
@@ -481,8 +489,10 @@ def test_jsonl_metrics_fall_back_to_generation_runtime_fields() -> None:
         cache_memory=None,
         runtime_diagnostics=RuntimeDiagnostics(model_load_active_memory_gb=1.0),
     )
-
-    check_models._populate_jsonl_result_generation_data(record, result)
+    output_file = tmp_path / "results.jsonl"
+    save_jsonl_report([result], output_file, prompt="describe", system_info={})
+    _header, rows = _read_jsonl(output_file)
+    record = rows[0]
 
     metrics = record["metrics"]
     assert metrics["prompt_tokens"] == 10
@@ -570,7 +580,9 @@ def test_save_jsonl_report_content(tmp_path: Path) -> None:
     """Test that save_jsonl_report writes correct content with generation."""
     output_file = tmp_path / "results.jsonl"
 
-    gen = MockGeneration()
+    gen = MockGeneration(
+        text="A detailed image description with enough words to be useful without caveats."
+    )
     result = PerformanceResult(
         model_name="test-model",
         generation=gen,
@@ -598,12 +610,31 @@ def test_save_jsonl_report_content(tmp_path: Path) -> None:
     assert len(rows) == 1
 
     data = rows[0]
+    assert set(data) == {
+        "_type",
+        "model",
+        "timestamp",
+        "assessment",
+        "generated_text",
+        "captured_output_on_fail",
+        "failure",
+        "metrics",
+        "timing",
+        "model_provenance",
+        "prompt_diagnostics",
+    }
     assert data["_type"] == "result"
     assert data["model"] == "test-model"
-    assert data["success"] is True
-    assert data["failure_phase"] is None
-    assert data["error_code"] is None
-    assert data["error_signature"] is None
+    assert data["assessment"] == {
+        "execution": "completed",
+        "usability": "usable",
+        "maintainer_status": "none",
+        "observations": [],
+    }
+    assert data["generated_text"] == gen.text
+    assert data["captured_output_on_fail"] == ""
+    assert data["failure"] is None
+    assert data["prompt_diagnostics"] is None
     metrics = data["metrics"]
     assert metrics.get("generation_tps") == 5.0
     assert metrics.get("prompt_tokens") == 10
@@ -616,8 +647,8 @@ def test_save_jsonl_report_content(tmp_path: Path) -> None:
     assert timing["stop_reason"] == "completed"
 
 
-def test_save_jsonl_report_includes_review_payload_for_success(tmp_path: Path) -> None:
-    """Successful rows should include the canonical automated review payload."""
+def test_save_jsonl_report_serializes_only_cached_result_assessment(tmp_path: Path) -> None:
+    """Successful rows should expose one assessment without legacy status projections."""
     output_file = tmp_path / "results.jsonl"
     prompt = (
         "Analyze this image.\n"
@@ -653,31 +684,21 @@ def test_save_jsonl_report_includes_review_payload_for_success(tmp_path: Path) -
     save_jsonl_report([result], output_file, prompt=prompt, system_info={})
 
     _header, rows = _read_jsonl(output_file)
-    review = _require_present(rows[0].get("review"), field_name="review")
-    triage = _require_present(rows[0].get("maintainer_triage"), field_name="maintainer_triage")
-    assert review["verdict"] in {"clean", "model_shortcoming", "context_budget"}
-    assert review["hint_relationship"] in {
-        "improves_trusted_hints",
-        "preserves_trusted_hints",
-        "degrades_trusted_hints",
-        "ignores_trusted_hints",
+    row = rows[0]
+    assert row["assessment"] == {
+        "execution": "completed",
+        "usability": "usable",
+        "maintainer_status": "none",
+        "observations": [],
     }
-    assert review["requested_max_tokens"] == 128
-    assert review["prompt_tokens_total"] == 320
-    assert review["prompt_tokens_text_est"] is not None
-    assert review["prompt_tokens_nontext_est"] is not None
-    assert triage["issue_kind"] == review["verdict"]
-    assert triage["suspected_owner"] == review["owner"]
-    assert triage["user_bucket"] == review["user_bucket"]
-    assert triage["summary"]
-    assert "issue_cluster_id" not in triage
-    assert "priority" not in json.dumps(triage).casefold()
-    if review["verdict"] == "clean":
-        assert triage["next_action"] == ("No maintainer issue action is indicated by this run.")
+    assert "review" not in row
+    assert "maintainer_triage" not in row
+    assert "current_recommendation" not in row
+    assert "compatibility_status" not in row
 
 
-def test_save_jsonl_report_includes_review_payload_for_failures(tmp_path: Path) -> None:
-    """Failure rows should still include owner and verdict review fields."""
+def test_save_jsonl_report_serializes_crash_assessment_and_failure(tmp_path: Path) -> None:
+    """Failure rows should separate the assessment from raw failure evidence."""
     output_file = tmp_path / "results.jsonl"
     result = PerformanceResult(
         model_name="failed-model",
@@ -693,31 +714,29 @@ def test_save_jsonl_report_includes_review_payload_for_failures(tmp_path: Path) 
     save_jsonl_report([result], output_file, prompt="test", system_info={})
 
     _header, rows = _read_jsonl(output_file)
-    review = _require_present(rows[0].get("review"), field_name="review")
-    triage = _require_present(rows[0].get("maintainer_triage"), field_name="maintainer_triage")
-    assert review["verdict"] == "runtime_failure"
-    assert review["owner"] == "mlx-vlm"
-    assert review["user_bucket"] == "not_evaluated"
-    assert review["evidence"]
-    assert triage["issue_kind"] == "runtime_failure"
-    assert triage.get("issue_subtype") == "MLX_VLM_DECODE_RUNTIME"
-    assert triage.get("issue_cluster_id") == "mlx-vlm_mlx-vlm-decode-runtime_001"
-    issue_cluster_path = _require_present(
-        triage.get("issue_cluster_path"),
-        field_name="issue_cluster_path",
-    )
-    assert issue_cluster_path.startswith("issues/issue_001_")
-    assert triage.get("acceptance_signal")
-    assert triage["confidence"] == "high"
-    assert triage["suspected_owner"] == "mlx-vlm"
-    assert triage["next_action"] == (
-        "File the retained reproduction evidence with the suspected owner."
-    )
-    assert "priority" not in json.dumps(triage).casefold()
+    row = rows[0]
+    assert row["assessment"] == {
+        "execution": "crashed",
+        "usability": "not_evaluated",
+        "maintainer_status": "actionable_failure",
+        "observations": [],
+    }
+    assert row["failure"] == {
+        "phase": None,
+        "stage": "Model Error",
+        "code": "MLX_VLM_DECODE_RUNTIME",
+        "message": "runtime error",
+        "exception_type": None,
+        "exception_module": None,
+        "package": "mlx-vlm",
+        "traceback": None,
+    }
+    assert "review" not in row
+    assert "maintainer_triage" not in row
 
 
-def test_save_jsonl_report_includes_metadata_agreement_payload(tmp_path: Path) -> None:
-    """Successful JSONL rows should carry metadata-agreement benchmark fields."""
+def test_save_jsonl_report_omits_semantic_score_payloads(tmp_path: Path) -> None:
+    """The narrow machine contract should not publish report-ranking scores."""
     output_file = tmp_path / "results.jsonl"
     result = PerformanceResult(
         model_name="test-model",
@@ -738,22 +757,15 @@ def test_save_jsonl_report_includes_metadata_agreement_payload(tmp_path: Path) -
     save_jsonl_report([result], output_file, prompt="test", system_info={})
 
     _header, rows = _read_jsonl(output_file)
-    payload = _require_present(
-        rows[0].get("metadata_agreement"),
-        field_name="metadata_agreement",
-    )
-    assert payload["overall_score"] == 82.5
-    assert payload["title_score"] == 100.0
-    assert payload["description_score"] == 75.0
-    assert payload["keyword_score"] == 80.0
-    assert payload["nonvisual_penalty"] == 6.7
-    assert payload["matched_terms"] == ["brick", "storefront", "outdoor seating"]
-    assert payload["missed_terms"] == ["pedestrians"]
-    assert payload["nonvisual_hits"] == ["51.5000,-0.1200"]
+    row = rows[0]
+    assert "metadata_agreement" not in row
+    assert "quality_analysis" not in row
+    assert "context_integration_score" not in row
+    assert "draft_improvement_score" not in row
 
 
 def test_save_jsonl_report_marks_external_connectivity_as_indeterminate(tmp_path: Path) -> None:
-    """Transport failures should remain ownerless because the cause is unknowable."""
+    """Transport failures should be recorded as indeterminate attempts."""
     output_file = tmp_path / "results.jsonl"
     result = PerformanceResult(
         model_name="failed-model",
@@ -772,11 +784,12 @@ def test_save_jsonl_report_marks_external_connectivity_as_indeterminate(tmp_path
     save_jsonl_report([result], output_file, prompt="test", system_info={})
 
     _header, rows = _read_jsonl(output_file)
-    review = _require_present(rows[0].get("review"), field_name="review")
-    assert review["verdict"] == "indeterminate"
-    assert review["owner"] == "unknown"
-    assert review["user_bucket"] == "not_evaluated"
-    assert "external_connectivity" in review["evidence"]
+    assert rows[0]["assessment"] == {
+        "execution": "indeterminate",
+        "usability": "not_evaluated",
+        "maintainer_status": "none",
+        "observations": [],
+    }
 
 
 def test_save_jsonl_report_no_generation(tmp_path: Path) -> None:
@@ -822,14 +835,20 @@ def test_save_jsonl_report_failed_model(tmp_path: Path) -> None:
     data = rows[0]
 
     assert data["model"] == "failed-model"
-    assert data["success"] is False
-    assert data["failure_phase"] is None
-    assert data["error_message"] == "Something went wrong"
-    assert data["error_stage"] == "Model Load"
+    assert data["failure"] == {
+        "phase": None,
+        "stage": "Model Load",
+        "code": None,
+        "message": "Something went wrong",
+        "exception_type": None,
+        "exception_module": None,
+        "package": None,
+        "traceback": None,
+    }
 
 
-def test_save_jsonl_report_includes_phase_code_and_signature(tmp_path: Path) -> None:
-    """Failure metadata fields should serialize for diagnostics tooling."""
+def test_save_jsonl_report_includes_failure_phase_and_code(tmp_path: Path) -> None:
+    """Failure metadata should remain nested raw evidence."""
     output_file = tmp_path / "results.jsonl"
     result = PerformanceResult(
         model_name="failed-model",
@@ -844,84 +863,10 @@ def test_save_jsonl_report_includes_phase_code_and_signature(tmp_path: Path) -> 
     save_jsonl_report([result], output_file, prompt="test", system_info={})
 
     _header, rows = _read_jsonl(output_file)
-    data = rows[0]
-    assert data["failure_phase"] == "decode"
-    assert data["error_code"] == "TRANSFORMERS_DECODE_API_MISMATCH"
-    assert data["error_signature"] == "TRANSFORMERS_DECODE_API_MISMATCH:abc123"
-
-
-def test_save_jsonl_report_quality_issues_as_list(tmp_path: Path) -> None:
-    """Test that quality_issues is saved as a list of strings in JSONL."""
-    output_file = tmp_path / "results.jsonl"
-
-    gen = MockGeneration()
-    result = PerformanceResult(
-        model_name="test-model",
-        generation=gen,
-        success=True,
-        quality_issues="repetitive(<s>), verbose, formatting",
-        generation_time=1.5,
-        model_load_time=0.5,
-        total_time=2.0,
-    )
-
-    results = [result]
-    save_jsonl_report(results, output_file, prompt="test", system_info={})
-
-    _header, rows = _read_jsonl(output_file)
-    data = rows[0]
-
-    assert data["model"] == "test-model"
-    assert isinstance(data["quality_issues"], list)
-    assert data["quality_issues"] == ["repetitive(<s>)", "verbose", "formatting"]
-
-
-def test_save_jsonl_report_quality_issues_with_internal_commas(tmp_path: Path) -> None:
-    """Commas inside one issue item (e.g., phrase preview) should not split that item."""
-    output_file = tmp_path / "results.jsonl"
-
-    gen = MockGeneration()
-    result = PerformanceResult(
-        model_name="test-model",
-        generation=gen,
-        success=True,
-        quality_issues='repetitive(phrase: "a, b..."), context-echo(0.91)',
-        generation_time=1.5,
-        model_load_time=0.5,
-        total_time=2.0,
-    )
-
-    save_jsonl_report([result], output_file, prompt="test", system_info={})
-
-    _header, rows = _read_jsonl(output_file)
-    data = rows[0]
-
-    assert data["quality_issues"] == ['repetitive(phrase: "a, b...")', "context-echo(0.91)"]
-
-
-def test_save_jsonl_report_no_quality_issues(tmp_path: Path) -> None:
-    """Test that quality_issues is an empty list when None."""
-    output_file = tmp_path / "results.jsonl"
-
-    gen = MockGeneration()
-    result = PerformanceResult(
-        model_name="test-model",
-        generation=gen,
-        success=True,
-        quality_issues=None,
-        generation_time=1.5,
-        model_load_time=0.5,
-        total_time=2.0,
-    )
-
-    results = [result]
-    save_jsonl_report(results, output_file, prompt="test", system_info={})
-
-    _header, rows = _read_jsonl(output_file)
-    data = rows[0]
-
-    assert data["model"] == "test-model"
-    assert data["quality_issues"] == []
+    failure = _require_present(rows[0]["failure"], field_name="failure")
+    assert failure["phase"] == "decode"
+    assert failure["code"] == "TRANSFORMERS_DECODE_API_MISMATCH"
+    assert "error_signature" not in rows[0]
 
 
 def test_save_jsonl_report_includes_traceback_and_type(tmp_path: Path) -> None:
@@ -946,11 +891,11 @@ def test_save_jsonl_report_includes_traceback_and_type(tmp_path: Path) -> None:
     data = rows[0]
 
     assert data["model"] == "failed-model"
-    assert data["success"] is False
-    assert data["error_type"] == "ValueError"
-    assert data["error_package"] == "mlx"
-    assert data["error_traceback"] is not None
-    assert "Traceback" in data["error_traceback"]
+    failure = _require_present(data["failure"], field_name="failure")
+    assert failure["exception_type"] == "ValueError"
+    assert failure["package"] == "mlx"
+    assert failure["traceback"] is not None
+    assert "Traceback" in failure["traceback"]
 
 
 def test_save_jsonl_report_includes_root_exception_fields(tmp_path: Path) -> None:
@@ -970,11 +915,10 @@ def test_save_jsonl_report_includes_root_exception_fields(tmp_path: Path) -> Non
     save_jsonl_report([result], output_file, prompt="test", system_info={})
     _header, rows = _read_jsonl(output_file)
 
-    data = rows[0]
-    assert data["error_type"] == "ValueError"
-    assert data.get("root_error_type") == "RuntimeError"
-    assert data.get("root_error_module") == "builtins"
-    assert data.get("root_error_message") == "upstream shape mismatch"
+    failure = _require_present(rows[0]["failure"], field_name="failure")
+    assert failure["exception_type"] == "RuntimeError"
+    assert failure["exception_module"] == "builtins"
+    assert failure["message"] == "Model loading failed: upstream shape mismatch"
 
 
 def test_save_jsonl_report_includes_exception_chain_in_chronological_order(
@@ -996,7 +940,8 @@ def test_save_jsonl_report_includes_exception_chain_in_chronological_order(
     save_jsonl_report([result], output_file, prompt="test", system_info={})
     _header, rows = _read_jsonl(output_file)
 
-    assert rows[0].get("exception_chain") == [
+    failure = _require_present(rows[0]["failure"], field_name="failure")
+    assert failure.get("exception_chain") == [
         {"type": "IndexError", "module": "builtins", "message": "bad token"},
         {"type": "ValueError", "module": "builtins", "message": "generation failed"},
     ]
@@ -1049,39 +994,9 @@ def test_save_jsonl_report_includes_prompt_diagnostics(tmp_path: Path) -> None:
     }
 
 
-def test_save_jsonl_report_includes_canonical_prompt_burden(tmp_path: Path) -> None:
+def test_jsonl_does_not_back_project_legacy_machine_facts(tmp_path: Path) -> None:
+    """Machine rows should expose the assessment without legacy report aliases."""
     output_file = tmp_path / "results.jsonl"
-    prompt = "Describe this image briefly."
-    analysis = check_models.analyze_generation_text(
-        "Cat.",
-        generated_tokens=3,
-        prompt_tokens=4103,
-        prompt=prompt,
-    )
-    result = PerformanceResult(
-        model_name="org/visual-heavy",
-        generation=MockGeneration(
-            text="Cat.",
-            prompt_tokens=4103,
-            generation_tokens=3,
-        ),
-        success=True,
-        quality_analysis=analysis,
-        prompt_diagnostics=check_models.PromptDiagnostics(image_placeholder_count=1),
-    )
-
-    save_jsonl_report([result], output_file, prompt=prompt, system_info={})
-    _header, rows = _read_jsonl(output_file)
-
-    review = _require_present(rows[0].get("review"), field_name="review")
-    assert review["prompt_burden_kind"] == "visual_input"
-    assert review["prompt_burden_source"] == "estimated_nontext"
-
-
-def test_jsonl_and_history_include_canonical_cross_artifact_facts(tmp_path: Path) -> None:
-    """Additive machine fields should mirror recommendation, burden, and owner facts."""
-    output_file = tmp_path / "results.jsonl"
-    history_file = tmp_path / "results.history.jsonl"
     prompt = "Create title, description, and keywords."
     analysis = check_models.analyze_generation_text(
         "Title: Cat\nDescription: A cat rests on a chair.\nKeywords: cat, chair",
@@ -1123,157 +1038,28 @@ def test_jsonl_and_history_include_canonical_cross_artifact_facts(tmp_path: Path
         metadata_exposed_to_prompt=True,
         report_context=context,
     )
-    history = append_history_record(
-        history_path=history_file,
-        results=[result],
-        prompt=prompt,
-        system_info={},
-        library_versions={},
-        eval_mode="assisted",
-        report_context=context,
-    )
     header, rows = _read_jsonl(output_file)
     row = rows[0]
-    history_row = history["model_results"]["org/enriched"]
-
-    assert header["format_version"] == "2.1"
-    assert history["format_version"] == "1.0"
-    for machine_row in (row, history_row):
-        assert machine_row["compatibility_status"] == "clean"
-        assert machine_row["current_recommendation"] == "recommended"
-        assert machine_row["failure_origin"] == "unknown"
-        assert machine_row["maintainer_readiness"] == "not_applicable"
-        assert machine_row["reproduction_status"] == "not_run"
-        assert machine_row["keyword_overlap"] == "not_assessable"
-        assert machine_row["context_integration_score"] == 81.0
-        assert machine_row["draft_improvement_score"] == 72.0
-        assert machine_row["visual_description_score"] == 91.0
-        assert machine_row["assisted_enrichment_score"] == 84.0
-        assert machine_row["prompt_burden_kind"] == "visual_input"
-        assert machine_row["prompt_burden_source"] == "estimated_nontext"
-        assert "owner_confidence" not in machine_row
-
-
-def test_jsonl_and_history_use_canonical_mixed_owner_failure_confidence(
-    tmp_path: Path,
-) -> None:
-    """Machine failure confidence should match the downgraded human narrative."""
-    result = PerformanceResult(
-        model_name="org/mixed-owner",
-        generation=None,
-        success=False,
-        error_message="wrapped generation failure",
-        error_package="mlx-vlm",
-        exception_chain=(
-            check_models.FailureException(
-                "RuntimeError",
-                "mlx.core",
-                "kIOGPUCommandBufferCallbackErrorOutOfMemory",
-            ),
-            check_models.FailureException(
-                "ValueError",
-                "builtins",
-                "mlx_vlm/generate.py wrapped generation failure",
-            ),
-        ),
-    )
-    prompt = "Describe the image."
-    context = check_models._build_report_render_context(
-        results=[result],
-        prompt=prompt,
-        eval_mode="blind",
-    )
-    output_file = tmp_path / "results.jsonl"
-    history_file = tmp_path / "results.history.jsonl"
-
-    save_jsonl_report(
-        [result],
-        output_file,
-        prompt=prompt,
-        system_info={},
-        report_context=context,
-    )
-    history = append_history_record(
-        history_path=history_file,
-        results=[result],
-        prompt=prompt,
-        system_info={},
-        library_versions={},
-        report_context=context,
-    )
-    _header, rows = _read_jsonl(output_file)
-    narrative = check_models._build_failure_narrative(result)
-
-    assert narrative.owner_confidence == "low"
-    assert rows[0]["owner_confidence"] == narrative.owner_confidence
-    assert rows[0]["maintainer_triage"]["confidence"] == narrative.owner_confidence
-    assert rows[0]["maintainer_triage"]["suspected_owner"] == narrative.suspected_owner
+    assert header["format_version"] == "2.0"
+    assert row["assessment"]["execution"] == "completed"
     assert (
-        history["model_results"][result.model_name]["owner_confidence"]
-        == narrative.owner_confidence
+        not {
+            "compatibility_status",
+            "current_recommendation",
+            "failure_origin",
+            "maintainer_readiness",
+            "reproduction_status",
+            "keyword_overlap",
+            "context_integration_score",
+            "draft_improvement_score",
+            "visual_description_score",
+            "assisted_enrichment_score",
+            "prompt_burden_kind",
+            "prompt_burden_source",
+            "owner_confidence",
+        }
+        & row.keys()
     )
-    assert history["model_results"][result.model_name]["review_owner"] == narrative.suspected_owner
-
-
-def test_jsonl_prompt_burden_reuses_generation_level_quality_analysis(tmp_path: Path) -> None:
-    output_file = tmp_path / "results.jsonl"
-    prompt = "Describe this image briefly."
-    analysis = check_models.analyze_generation_text(
-        "Cat.",
-        generated_tokens=3,
-        prompt_tokens=4103,
-        prompt=prompt,
-    )
-    generation = MockGeneration(
-        text="Cat.",
-        prompt_tokens=4103,
-        generation_tokens=3,
-        quality_analysis=analysis,
-    )
-    result = PerformanceResult(
-        model_name="org/legacy-analysis",
-        generation=generation,
-        success=True,
-        prompt_diagnostics=check_models.PromptDiagnostics(image_placeholder_count=1),
-    )
-
-    save_jsonl_report([result], output_file, prompt=prompt, system_info={})
-    _header, rows = _read_jsonl(output_file)
-
-    review = _require_present(rows[0].get("review"), field_name="review")
-    assert review["prompt_tokens_total"] == analysis.prompt_tokens_total
-    assert review["prompt_tokens_text_est"] == analysis.prompt_tokens_text_est
-    assert review["prompt_tokens_nontext_est"] == analysis.prompt_tokens_nontext_est
-    assert review["prompt_burden_kind"] == "visual_input"
-    assert review["prompt_burden_source"] == "estimated_nontext"
-
-
-def test_jsonl_prompt_burden_serializes_unavailable_reason(tmp_path: Path) -> None:
-    output_file = tmp_path / "results.jsonl"
-    analysis = dataclasses.replace(
-        check_models.analyze_generation_text(
-            "A concise image description.",
-            generated_tokens=6,
-            prompt_tokens=4200,
-            prompt="Describe this image.",
-        ),
-        prompt_tokens_text_est=None,
-        prompt_tokens_nontext_est=None,
-    )
-    result = PerformanceResult(
-        model_name="org/unavailable-components",
-        generation=MockGeneration(prompt_tokens=4200, generation_tokens=6),
-        success=True,
-        quality_analysis=analysis,
-    )
-
-    save_jsonl_report([result], output_file, prompt="Describe this image.", system_info={})
-    _header, rows = _read_jsonl(output_file)
-
-    review = _require_present(rows[0].get("review"), field_name="review")
-    assert review["prompt_burden_kind"] == "unavailable"
-    assert review["prompt_burden_source"] == "unavailable"
-    assert review["prompt_burden_reason"] == "component_estimates_unavailable"
 
 
 def test_save_jsonl_report_includes_captured_output(tmp_path: Path) -> None:
@@ -1322,11 +1108,16 @@ def test_save_jsonl_report_includes_timing(tmp_path: Path) -> None:
     assert data["timing"]["total_time_s"] == 3.5
 
 
-def test_save_jsonl_report_includes_generated_text(tmp_path: Path) -> None:
-    """Test that save_jsonl_report includes generated_text for successful models."""
+def test_save_jsonl_report_round_trips_complete_generated_text(tmp_path: Path) -> None:
+    """JSON escaping should preserve every captured output byte after decoding."""
     output_file = tmp_path / "results.jsonl"
-
-    gen = MockGeneration(text="This is the generated output text.")
+    output = (
+        "Title:\tCafé 雪\n"
+        "```markdown\n**unchanged**\n```\n"
+        "<think>HTML-looking, not markup</think>\n"
+        "Final line\n"
+    )
+    gen = MockGeneration(text=output)
     result = PerformanceResult(
         model_name="test-model",
         generation=gen,
@@ -1343,7 +1134,7 @@ def test_save_jsonl_report_includes_generated_text(tmp_path: Path) -> None:
     data = rows[0]
 
     assert "generated_text" in data
-    assert data["generated_text"] == "This is the generated output text."
+    assert data["generated_text"] == output
 
 
 def test_save_jsonl_report_preserves_empty_generated_text(tmp_path: Path) -> None:
@@ -1847,75 +1638,15 @@ class TestRuntimeFingerprint:
         assert header["runtime_fingerprint"]["metal_gpu"]["status"] == "ok"
 
 
-class TestSignatureComponents:
-    """Tests for structured diagnostic signature components in JSONL output."""
-
-    def test_failed_result_includes_signature_components(self, tmp_path: Path) -> None:
-        """Failed results emit signature_components with normalized fields."""
-        result = PerformanceResult(
-            model_name="org/broken",
-            generation=None,
-            success=False,
-            error_message="RuntimeError: shape mismatch [4, 128] vs [4, 256]",
-            error_code="MLX_DECODE_ERROR",
-            error_traceback="File model.py line 42\n  raise RuntimeError",
-        )
-        out = tmp_path / "results.jsonl"
-        check_models.save_jsonl_report([result], out, prompt="test", system_info={})
-        _, rows = _read_jsonl(out)
-        assert len(rows) == 1
-        components = rows[0].get("signature_components")
-        assert components is not None
-        assert components.get("error_code") == "MLX_DECODE_ERROR"
-        assert "normalized_message" in components
-        assert "traceback_signature" in components
-
-    def test_successful_result_omits_signature_components(self, tmp_path: Path) -> None:
-        """Successful results must not include signature_components."""
-        result = PerformanceResult(
-            model_name="org/good",
-            generation=MockGeneration(),
-            success=True,
-        )
-        out = tmp_path / "results.jsonl"
-        check_models.save_jsonl_report([result], out, prompt="test", system_info={})
-        _, rows = _read_jsonl(out)
-        assert "signature_components" not in rows[0]
-
-    def test_signature_components_normalized_message_is_stable(self) -> None:
-        """Normalized message strips variable numbers for stable clustering."""
-        record1 = check_models._build_jsonl_result_record_base(
-            PerformanceResult(
-                model_name="org/a",
-                generation=None,
-                success=False,
-                error_message="RuntimeError: shape [4, 128] mismatch",
-                error_code="ERR",
-            )
-        )
-        record2 = check_models._build_jsonl_result_record_base(
-            PerformanceResult(
-                model_name="org/b",
-                generation=None,
-                success=False,
-                error_message="RuntimeError: shape [8, 256] mismatch",
-                error_code="ERR",
-            )
-        )
-        c1 = record1.get("signature_components", {})
-        c2 = record2.get("signature_components", {})
-        assert c1.get("normalized_message") == c2.get("normalized_message")
-
-
 class TestSchemaVersioning:
     """Tests for JSONL schema versioning and round-trip integrity."""
 
     def test_metadata_format_version_is_2_0(self, tmp_path: Path) -> None:
-        """Current JSONL output uses format_version 2.1."""
+        """Current JSONL output uses the narrow 2.0 machine contract."""
         out = tmp_path / "results.jsonl"
         check_models.save_jsonl_report([], out, prompt="test", system_info={})
         header, _ = _read_jsonl(out)
-        assert header["format_version"] == "2.1"
+        assert header["format_version"] == "2.0"
 
     def test_round_trip_metadata_keys(self, tmp_path: Path) -> None:
         """Metadata record round-trips through JSON with expected keys."""
@@ -1952,12 +1683,11 @@ class TestSchemaVersioning:
         row = rows[0]
         assert row["_type"] == "result"
         assert row["model"] == "org/good"
-        assert row["success"] is True
-        assert row["error_signature"] is None
-        assert "signature_components" not in row
+        assert row["assessment"]["execution"] == "completed"
+        assert row["failure"] is None
 
     def test_round_trip_result_record_failure(self, tmp_path: Path) -> None:
-        """Failed result record round-trips with signature_components."""
+        """Failed result record round-trips with nested raw failure evidence."""
         result = PerformanceResult(
             model_name="org/bad",
             generation=None,
@@ -1970,15 +1700,10 @@ class TestSchemaVersioning:
         check_models.save_jsonl_report([result], out, prompt="t", system_info={})
         _, rows = _read_jsonl(out)
         row = rows[0]
-        assert row["success"] is False
-        assert row["error_code"] == "DECODE_ERR"
-        sc = _require_present(
-            row.get("signature_components"),
-            field_name="signature_components",
-        )
-        assert "normalized_message" in sc
-        assert "traceback_signature" in sc
-        assert sc.get("error_code") == "DECODE_ERR"
+        assert row["assessment"]["execution"] == "crashed"
+        failure = _require_present(row["failure"], field_name="failure")
+        assert failure["code"] == "DECODE_ERR"
+        assert failure["traceback"] == "File x.py line 1\n  raise ValueError"
 
     def test_round_trip_all_fields_json_serializable(self, tmp_path: Path) -> None:
         """Every field in the JSONL output is JSON-serializable (no crash)."""
@@ -2049,43 +1774,6 @@ class TestSchemaVersioning:
 
 class TestRerunEvidence:
     """Tests for differential rerun evidence in JSONL output."""
-
-    def test_rerun_summary_emitted_when_evidence_present(self, tmp_path: Path) -> None:
-        """JSONL result includes rerun_summary when rerun_evidence is set."""
-        evidence = check_models.RerunEvidence(
-            rerun_success=True,
-            rerun_generated_chars=42,
-            rerun_generation_time=1.5,
-            rerun_prompt="Describe this image briefly.",
-        )
-        result = PerformanceResult(
-            model_name="org/model",
-            generation=None,
-            success=False,
-            error_message="RuntimeError: something",
-            rerun_evidence=evidence,
-        )
-        out = tmp_path / "results.jsonl"
-        check_models.save_jsonl_report([result], out, prompt="t", system_info={})
-        _, rows = _read_jsonl(out)
-        summary = rows[0].get("rerun_summary")
-        assert summary is not None
-        assert summary["rerun_success"] is True
-        assert summary.get("rerun_generated_chars") == 42
-        assert summary.get("rerun_prompt") == "Describe this image briefly."
-
-    def test_no_rerun_summary_when_no_evidence(self, tmp_path: Path) -> None:
-        """JSONL result omits rerun_summary when no rerun was performed."""
-        result = PerformanceResult(
-            model_name="org/model",
-            generation=None,
-            success=False,
-            error_message="RuntimeError: something",
-        )
-        out = tmp_path / "results.jsonl"
-        check_models.save_jsonl_report([result], out, prompt="t", system_info={})
-        _, rows = _read_jsonl(out)
-        assert "rerun_summary" not in rows[0]
 
     def test_select_rerun_candidates_picks_failures(self) -> None:
         """_select_rerun_candidates picks failed models without verdicts."""
