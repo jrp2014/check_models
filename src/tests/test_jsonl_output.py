@@ -229,6 +229,25 @@ def test_save_run_json_report_captures_public_snapshot_contract(
     )
 
     payload = json.loads(out.read_text(encoding="utf-8"))
+    assert set(payload) == {
+        "schema_version",
+        "generated_at",
+        "eval_mode",
+        "prompt",
+        "prompt_sha256",
+        "metadata_exposed_to_prompt",
+        "total_runtime_seconds",
+        "counts",
+        "artifacts",
+        "library_versions",
+        "component_provenance",
+        "producer",
+        "image",
+        "generation_settings",
+        "trust_remote_code",
+        "model_provenance",
+        "prompt_burden",
+    }
     assert payload["schema_version"] == "2.0"
     assert payload["eval_mode"] == "triage"
     assert "semantic_rankings_grounded" not in payload
