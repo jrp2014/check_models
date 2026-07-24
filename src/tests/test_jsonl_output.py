@@ -15,7 +15,6 @@ import check_models
 from check_models import (
     JsonlMetadataRecord,
     JsonlResultRecord,
-    MetadataAgreementMetrics,
     PerformanceResult,
     RuntimeDiagnostics,
     _history_path_for_jsonl,
@@ -727,16 +726,6 @@ def test_save_jsonl_report_omits_semantic_score_payloads(tmp_path: Path) -> None
         model_name="test-model",
         generation=MockGeneration(),
         success=True,
-        metadata_agreement=MetadataAgreementMetrics(
-            overall_score=82.5,
-            title_score=100.0,
-            description_score=75.0,
-            keyword_score=80.0,
-            nonvisual_penalty=6.7,
-            matched_terms=("brick", "storefront", "outdoor seating"),
-            missed_terms=("pedestrians",),
-            nonvisual_hits=("51.5000,-0.1200",),
-        ),
     )
 
     save_jsonl_report([result], output_file, prompt="test", system_info={})
@@ -999,13 +988,6 @@ def test_jsonl_does_not_back_project_legacy_machine_facts(tmp_path: Path) -> Non
         success=True,
         quality_analysis=analysis,
         prompt_diagnostics=check_models.PromptDiagnostics(image_placeholder_count=1),
-        metadata_agreement=MetadataAgreementMetrics(
-            overall_score=88.0,
-            context_integration_score=81.0,
-            draft_improvement_score=72.0,
-            visual_description_score=91.0,
-            assisted_enrichment_score=84.0,
-        ),
     )
     context = check_models._build_report_render_context(
         results=[result],

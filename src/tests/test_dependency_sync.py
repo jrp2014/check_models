@@ -823,7 +823,7 @@ def test_production_assessment_policy_has_no_fixture_specific_exceptions() -> No
     """Canonical classifiers must not special-case synthetic models or image subjects."""
     source = (PKG_ROOT / "check_models.py").read_text(encoding="utf-8")
     classifier_source = source[
-        source.index("def _output_anomalies(") : source.index("def _model_user_presentation(")
+        source.index("def _assessment_observations(") : source.index("def _assessment_to_json(")
     ].casefold()
 
     assert re.search(r"\borg/[a-z0-9_-]+", classifier_source) is None
@@ -836,6 +836,25 @@ def test_production_assessment_policy_has_no_fixture_specific_exceptions() -> No
         "remote controls",
     ):
         assert fixture_term not in classifier_source
+
+
+def test_production_source_has_no_retired_semantic_scoring_api() -> None:
+    """The reduced assessment contract must not retain score compatibility APIs."""
+    source = (PKG_ROOT / "check_models.py").read_text(encoding="utf-8")
+
+    for retired_name in (
+        "GRADE_EMOJIS",
+        "ModelRecommendationView",
+        "ModelCapabilityRow",
+        "MachineArtifactFacts",
+        "_model_selection_score",
+        "_caption_usefulness_score",
+        "_recommendation_quality_score",
+        "_score_metadata_title",
+        "_score_metadata_description",
+        "_score_metadata_keywords",
+    ):
+        assert retired_name not in source
 
 
 def test_stub_refresh_reason_is_none_for_fresh_manifest(

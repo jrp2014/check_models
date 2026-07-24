@@ -8,7 +8,7 @@ import logging
 import time
 from contextlib import ExitStack
 from typing import TYPE_CHECKING
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from rich.console import Console
 
@@ -19,11 +19,9 @@ from check_models import (
     PerformanceResult,
     RuntimeDiagnostics,
     StyleAwareRichHandler,
-    _log_canonical_model_review,
     finalize_execution,
     log_summary,
     print_model_result,
-    print_model_stats,
 )
 
 if TYPE_CHECKING:  # pragma: no cover - only for type hints
@@ -109,7 +107,7 @@ def _run_finalize_with_report_patches(
     args: argparse.Namespace,
     result: PerformanceResult,
     overall_start_time: float,
-) -> MagicMock:
+) -> None:
     """Run finalization with report writers patched out for path/log assertions."""
     with ExitStack() as stack:
         for patch_target in _FINALIZE_REPORT_PATCHES:
@@ -119,7 +117,6 @@ def _run_finalize_with_report_patches(
             patch("check_models.append_history_record", return_value=_finalize_history_stub())
         )
         stack.enter_context(patch("check_models.generate_diagnostics_report", return_value=False))
-        mock_print_model_stats = stack.enter_context(patch("check_models.print_model_stats"))
         finalize_execution(
             args=args,
             results=[result],
@@ -129,7 +126,6 @@ def _run_finalize_with_report_patches(
             image_path=None,
             metadata=None,
         )
-    return mock_print_model_stats
 
 
 def _assert_logged_paths(messages: list[str], *paths: Path) -> None:
@@ -393,23 +389,6 @@ def test_print_model_result_non_verbose_labels_generated_text_preview(
     analysis = GenerationQualityAnalysis(
         is_repetitive=False,
         repeated_token=None,
-        hallucination_issues=[],
-        is_verbose=False,
-        formatting_issues=[],
-        has_excessive_bullets=False,
-        bullet_count=0,
-        is_context_ignored=False,
-        missing_context_terms=[],
-        is_refusal=False,
-        refusal_type=None,
-        is_generic=False,
-        specificity_score=0.0,
-        has_language_mixing=False,
-        language_mixing_issues=[],
-        has_degeneration=False,
-        degeneration_type=None,
-        has_fabrication=False,
-        fabrication_issues=[],
         missing_sections=["title", "description", "keywords"],
     )
     result = PerformanceResult(
@@ -498,7 +477,7 @@ def test_log_summary_emits_comparison_table_and_ascii_charts(
         ),
     ]
 
-    log_summary(results, prompt="Describe this image.")
+    log_summary(results)
 
     messages = "\n".join(record.message for record in caplog.records)
     assert "Model Comparison (current run):" in messages
@@ -536,7 +515,7 @@ def test_log_summary_contextualizes_comparison_and_average_peak_memory(
     ]
 
     with patch("check_models._get_recommended_working_set_bytes", return_value=2_000_000_000):
-        log_summary(results, prompt="Describe this image.")
+        log_summary(results)
 
     messages = "\n".join(record.message for record in caplog.records)
     assert "Recommended working set: 1.86 GB" in messages
@@ -557,7 +536,7 @@ def test_log_summary_single_model_omits_efficiency_chart(
         total_time=1.5,
     )
 
-    log_summary([result], prompt="Describe this image.")
+    log_summary([result])
 
     messages = "\n".join(record.message for record in caplog.records)
     assert "Model Comparison (current run):" in messages
@@ -580,7 +559,7 @@ def test_log_summary_comparison_table_preserves_unicode_notes(
         quality_issues="⚠️harness(stop_token), output:zero_tokens",
     )
 
-    log_summary([result], prompt="Describe this image.")
+    log_summary([result])
 
     # Collect the model-data row (contains "emoji-note") and all continuation
     # rows (│ … │ rows without "emoji-note" that immediately follow it).
@@ -601,66 +580,10 @@ def test_log_summary_comparison_table_preserves_unicode_notes(
     assert "stop_token" in table_text
 
 
-def test_log_summary_reports_metadata_baseline_delta_when_context_present(
+def test_log_summary_reports_execution_and_mechanical_observations(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    """Cataloging triage should report baseline and delta when prompt includes metadata context."""
-    caplog.set_level(logging.INFO)
-    prompt = (
-        "Analyze this image.\n\n"
-        "Context: Existing metadata hints (use only if visually consistent):\n"
-        "- Title hint: Sunset over mountain lake\n"
-        "- Description hint: A colorful sunset behind mountains with lake reflection and trees.\n"
-        "- Keyword hints: sunset, mountains, lake, reflection, trees, nature, landscape\n"
-        "\n"
-        "Prioritize what is visibly present."
-    )
-    results = [
-        PerformanceResult(
-            model_name="org/model-good",
-            generation=_StubGeneration(
-                generation_tps=24.0,
-                peak_memory=1.3,
-                generation_tokens=180,
-                text=(
-                    "Title: Golden alpine sunset over mirrored mountain lake\n"
-                    "Description: Warm orange light outlines the ridgeline while evergreen "
-                    "silhouettes frame a still alpine lake that mirrors streaked clouds.\n"
-                    "Keywords: alpine sunset, mirrored lake, mountain ridgeline, evergreen "
-                    "silhouettes, orange sky, reflection, wilderness, scenic vista"
-                ),
-            ),
-            success=True,
-            generation_time=1.0,
-            model_load_time=0.4,
-            total_time=1.4,
-        ),
-        PerformanceResult(
-            model_name="org/model-bad",
-            generation=_StubGeneration(
-                generation_tps=12.0,
-                peak_memory=1.1,
-                generation_tokens=12,
-                text="Title: Sunset. Description: sunset image. Keywords: sunset, mountain",
-            ),
-            success=True,
-            generation_time=1.1,
-            model_load_time=0.5,
-            total_time=1.6,
-        ),
-    ]
-
-    log_summary(results, prompt=prompt)
-
-    messages = "\n".join(record.message for record in caplog.records)
-    assert "Metadata baseline:" in messages
-    assert "Vs metadata:" in messages
-
-
-def test_log_summary_suppresses_cataloging_scores_in_triage_mode(
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    """Triage console summaries should not emit cataloging or keyword scorecards."""
+    """Run summaries should emit facts without semantic scorecards."""
     caplog.set_level(logging.INFO)
     result = PerformanceResult(
         model_name="org/caption-model",
@@ -675,38 +598,15 @@ def test_log_summary_suppresses_cataloging_scores_in_triage_mode(
         total_time=1.4,
     )
 
-    log_summary(
-        [result],
-        prompt="Describe this image briefly.",
-        eval_mode="triage",
-    )
+    log_summary([result])
 
     messages = "\n".join(record.message for record in caplog.records)
-    assert "Quality Signal Frequency:" in messages
+    assert "Execution outcomes: completed=1" in messages
+    assert "Mechanical observations: none" in messages
     assert "Cataloging Utility Snapshot:" not in messages
+    assert "Metadata baseline:" not in messages
     assert "Best description:" not in messages
     assert "Best keywording:" not in messages
-
-
-def test_print_model_stats_excludes_output_column(caplog: pytest.LogCaptureFixture) -> None:
-    """CLI performance table should avoid huge output-preview column."""
-    caplog.set_level(logging.INFO)
-    results = [
-        PerformanceResult(
-            model_name="model/table",
-            generation=_StubGeneration(text="very long " * 200),
-            success=True,
-            generation_time=1.0,
-            model_load_time=0.4,
-            total_time=1.4,
-            quality_issues="verbose",
-        ),
-    ]
-
-    print_model_stats(results)
-
-    all_messages = "\n".join(record.message for record in caplog.records)
-    assert "Output" not in all_messages
 
 
 def test_print_model_result_failure_logs_actionable_details(
@@ -778,34 +678,6 @@ def test_file_safe_formatter_uses_project_timestamp_shape() -> None:
     }
 
 
-def test_canonical_review_log_emits_verdict_block(
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    """Canonical review logging should emit the ordered verdict block and full output."""
-    caplog.set_level(logging.DEBUG)
-    result = PerformanceResult(
-        model_name="dummy/model",
-        generation=_StubGeneration(text="Title: Example output"),
-        success=True,
-        quality_analysis=check_models.analyze_generation_text(
-            "Title: Example output",
-            generated_tokens=6,
-            requested_max_tokens=32,
-        ),
-        requested_max_tokens=32,
-    )
-
-    _log_canonical_model_review(result)
-
-    messages = "\n".join(record.message for record in caplog.records)
-    assert "=== CANONICAL REVIEW: dummy/model ===" in messages
-    assert "Verdict:" in messages
-    assert "Why:" in messages
-    assert "Maintainer:" in messages
-    assert "Next action:" in messages
-    assert "Full output:" in messages
-
-
 def test_rich_debug_level_label_is_dim() -> None:
     """Only the DEBUG level label should render dim/gray."""
     handler = StyleAwareRichHandler(
@@ -859,13 +731,12 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
         total_time=1.5,
     )
 
-    mock_print_model_stats = _run_finalize_with_report_patches(
+    _run_finalize_with_report_patches(
         args=args,
         result=result,
         overall_start_time=time.perf_counter() - 0.5,
     )
 
-    mock_print_model_stats.assert_not_called()
     messages = [record.message for record in caplog.records]
     _assert_logged_paths(
         messages,

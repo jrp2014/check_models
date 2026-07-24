@@ -28,7 +28,6 @@ import sys
 import textwrap
 import time
 import traceback
-import unicodedata
 import webbrowser
 from collections import Counter
 from collections.abc import Callable, Generator, Iterable, Iterator, Mapping, Sequence
@@ -101,7 +100,6 @@ from check_models_data.dependency_policy import (
 )
 
 FLOAT_ZERO_EPSILON: Final[float] = 1e-9
-QUALITY_SCORE_MAX: Final[float] = 100.0
 
 # Optional dependency: psutil for system info; degrade gracefully if missing.
 # Keep a nullable module binding so downstream checks can stay simple.
@@ -369,10 +367,6 @@ class FormattingThresholds:
     # Dry-run output thresholds
     max_prompt_preview_lines: int = 10  # Max lines to show in prompt preview
 
-    # Output truncation thresholds
-    min_consecutive_repetitions_for_truncation: int = 10
-    max_preview_tags: int = 3
-
     # Layout constants
     min_separator_chars: int = 50
     markdown_hard_break_spaces: int = 2
@@ -382,185 +376,42 @@ class FormattingThresholds:
 
 @dataclass(frozen=True)
 class QualityThresholds:
-    """Centralized thresholds for quality analysis detection.
+    """Thresholds for retained mechanical output observations."""
 
-    Loaded from configuration file or defaults.
-    """
-
-    # Repetition detection
     repetition_ratio: float = 0.9
     min_text_length: int = 10
     min_token_count: int = 5
-
-    # Phrase repetition detection (n-grams)
     min_phrase_repetitions: int = 3
     max_phrase_repetitions: int = 10
     phrase_coverage_threshold: float = 0.4
-    min_phrase_length: int = 4  # Minimum n-gram length to check
-    max_phrase_length: int = 10  # Maximum n-gram length to check
-
-    # Hallucination detection
-    min_pipes_for_table: int = 4
-    min_table_rows: int = 2
-    min_mc_answers: int = 3
-    substantial_text_length: int = 200
-
-    # Formatting violations
-    max_markdown_headers: int = 5
-
-    # Context ignorance detection (additional)
+    min_phrase_length: int = 4
+    max_phrase_length: int = 10
     min_context_term_length: int = 2
-
-    # Verbosity detection
-    max_verbosity_tokens: int = 160
-    min_meta_patterns: int = 2
-    min_section_headers: int = 3
-
-    # Bullet point detection (set high for cataloging prompts with keyword lists)
-    max_bullets: int = 25
-
-    # Generic output detection
-    min_text_length_for_generic: int = 20
-    generic_filler_threshold: float = 0.20
-    min_specificity_indicators: int = 2
-
-    # Context ignorance detection
-    min_key_terms_threshold: int = 5
-    min_missing_ratio: float = 0.85
-
-    # Confidence thresholds for output analysis
-    high_confidence_threshold: float = 0.7
-    medium_confidence_threshold: float = 0.4
-
-    # Output degeneration detection thresholds
-    min_text_for_degeneration: int = 20  # Minimum text length to check
-    min_repeated_punctuation_run: int = 6  # Same punctuation repeated before flagging
-    min_cutoff_word_length: int = 2  # Words <= this at end may be cutoff
-    max_control_chars: int = 3  # Control chars threshold
-    non_ascii_ratio_threshold: float = 0.3  # Threshold for encoding shift detection
-    non_ascii_ratio_multiplier: int = 3  # Multiplier for tail vs head comparison
-    max_url_length: int = 100  # URLs longer than this are suspicious
-    min_precise_stats: int = 2  # Number of overly precise stats to flag
-
-    # Cataloging utility thresholds
-    min_useful_words: int = 5  # Minimum words for useful output
-    short_output_words: int = 15  # Output considered "short"
-    substantial_prose_words: int = 20  # Words needed for "substantial" prose
-    max_caption_words: int = 15  # Max words for implicit caption detection
-    min_title_words: int = 5  # Minimum words required in Title section
-    max_title_words: int = 10  # Maximum words allowed in Title section
-    min_description_sentences: int = 1  # Minimum factual description sentences
-    max_description_sentences: int = 2  # Maximum factual description sentences
-    min_keywords_count: int = 10  # Minimum number of keyword terms
-    max_keywords_count: int = 18  # Maximum number of keyword terms
-    min_keywords_for_duplication_check: int = 12  # Ignore duplication below this keyword count
-    keyword_duplication_ratio_threshold: float = 0.35  # Dup ratio threshold for keyword loops
-    min_useful_chars: int = 10  # Minimum chars for useful output
-    severe_echo_threshold: float = 0.8  # Echo ratio triggering severe penalty
-    moderate_echo_threshold: float = 0.5  # Echo ratio triggering moderate penalty
-    context_echo_min_words: int = 50  # Minimum output words before context-echo scoring
-    context_echo_vocab_ratio_threshold: float = 0.95  # Vocab overlap threshold for context echo
-    context_echo_ngram_size: int = 8  # N-gram size for verbatim context copy detection
-    context_echo_min_shared_ngrams: int = 3  # Minimum shared n-grams for context echo
-    context_echo_ngram_ratio_threshold: float = 0.40  # Shared n-gram ratio threshold
-    low_grounding_threshold: float = 0.3  # Visual grounding considered low
-    low_compliance_threshold: float = 0.5  # Task compliance considered low
-    low_info_gain_threshold: float = 0.3  # Information gain considered low
-    grade_a_threshold: float = 80.0  # Score for A grade
-    grade_b_threshold: float = 65.0  # Score for B grade
-    grade_c_threshold: float = 50.0  # Score for C grade
-    grade_d_threshold: float = 35.0  # Score for D grade
-    # Cataloging utility score composition
-    cataloging_weight_information_gain: float = 25.0
-    cataloging_weight_compliance: float = 30.0
-    cataloging_weight_grounding: float = 30.0
-    cataloging_weight_length: float = 15.0
-    # Cataloging utility penalties/factors
-    severe_echo_penalty: float = 0.5
-    moderate_echo_penalty: float = 0.8
-    very_short_length_factor: float = 0.2
-    short_length_factor: float = 0.6
-    metadata_agreement_weight_title: float = 0.2
-    metadata_agreement_weight_description: float = 0.4
-    metadata_agreement_weight_keywords: float = 0.4
-    metadata_agreement_nonvisual_penalty: float = 20.0
-    metadata_alignment_min_score: float = 25.0
-    metadata_alignment_partial_match_cap: int = 8
-    assisted_weight_visual_description: float = 0.35
-    assisted_weight_context_integration: float = 0.25
-    assisted_weight_draft_improvement: float = 0.20
-    assisted_weight_output_quality: float = 0.20
-    low_draft_improvement_score: float = 40.0
-    text_sanity_min_wordlike_ratio: float = 0.45
-    text_sanity_max_symbol_ratio: float = 0.35
-    text_sanity_mixed_script_min_symbol_ratio: float = 0.05
-    text_sanity_mixed_script_min_families: int = 4
-    text_sanity_mixed_script_max_tokens: int = 25
-    text_sanity_cjk_latin_min_cjk_chars: int = 3
-    text_sanity_cjk_latin_min_latin_chars: int = 8
-    text_sanity_cjk_latin_min_cjk_tokens: int = 2
-    text_sanity_min_tokens: int = 5
-    text_sanity_numeric_loop_min_count: int = 6
-
-    # Harness issue detection thresholds
-    min_bpe_artifact_count: int = 5  # Min BPE artifacts to flag encoding issue
-    min_tokens_for_substantial: int = 10  # Tokens below this are suspicious
-    min_words_for_filler_response: int = 15  # Words below this in filler response
-    min_words_for_truncated: int = 5  # Words below this = truncated output
-    min_prompt_tokens_for_ratio: int = 100  # Prompt tokens needed for ratio check
-    min_output_tokens_for_ratio: int = 15  # Generated-token counts below this are suspicious
-    min_output_ratio: float = 0.02  # Minimum output/prompt ratio (2%)
-    long_prompt_tokens_threshold: int = 3000  # Prompt tokens above this can degrade outputs
+    min_keywords_for_duplication_check: int = 12
+    min_tokens_for_substantial: int = 10
+    min_words_for_filler_response: int = 15
+    min_words_for_truncated: int = 5
+    min_prompt_tokens_for_ratio: int = 100
+    min_output_tokens_for_ratio: int = 15
+    min_output_ratio: float = 0.02
+    long_prompt_tokens_threshold: int = 3000
     heavy_nontext_prompt_ratio: float = 0.5
     mixed_prompt_burden_ratio_floor: float = 0.25
-    severe_prompt_tokens_threshold: int = 12000  # Extreme prompt token count risk threshold
-    prompt_title_max_chars: int = 120  # Max chars for metadata title hints in default prompt
-    prompt_description_max_chars: int = 420  # Max chars for metadata description hints
-    prompt_keyword_max_items: int = 20  # Max number of metadata keyword hints
-    min_text_for_leak_detection: int = 100  # Min text length for training leak detection
-    prompt_word_to_token_ratio: float = 1.3  # Lightweight prompt-token estimate multiplier
-    max_reported_missing_terms: int = 5  # Cap human-facing missing-term lists
-    cutoff_tail_chars: int = 120  # Tail window inspected for cutoff evidence
-
-    # Unknown anomaly detection
-    anomaly_min_output_chars: int = 20  # Near-empty threshold for anomaly promotion
-
-    # Patterns (loaded from config)
+    prompt_title_max_chars: int = 120
+    prompt_description_max_chars: int = 420
+    prompt_keyword_max_items: int = 20
+    prompt_word_to_token_ratio: float = 1.3
+    cutoff_tail_chars: int = 120
     patterns: dict[str, list[str]] | None = None
 
     def __post_init__(self) -> None:
-        """Validate loaded threshold values so bad config cannot degrade checks silently."""
+        """Validate the retained detector thresholds."""
         unit_interval_fields = {
             "repetition_ratio": self.repetition_ratio,
             "phrase_coverage_threshold": self.phrase_coverage_threshold,
-            "generic_filler_threshold": self.generic_filler_threshold,
-            "min_missing_ratio": self.min_missing_ratio,
-            "high_confidence_threshold": self.high_confidence_threshold,
-            "medium_confidence_threshold": self.medium_confidence_threshold,
-            "non_ascii_ratio_threshold": self.non_ascii_ratio_threshold,
-            "keyword_duplication_ratio_threshold": self.keyword_duplication_ratio_threshold,
-            "severe_echo_threshold": self.severe_echo_threshold,
-            "moderate_echo_threshold": self.moderate_echo_threshold,
-            "context_echo_vocab_ratio_threshold": self.context_echo_vocab_ratio_threshold,
-            "context_echo_ngram_ratio_threshold": self.context_echo_ngram_ratio_threshold,
-            "low_grounding_threshold": self.low_grounding_threshold,
-            "low_compliance_threshold": self.low_compliance_threshold,
-            "low_info_gain_threshold": self.low_info_gain_threshold,
             "min_output_ratio": self.min_output_ratio,
             "heavy_nontext_prompt_ratio": self.heavy_nontext_prompt_ratio,
             "mixed_prompt_burden_ratio_floor": self.mixed_prompt_burden_ratio_floor,
-            "metadata_agreement_weight_title": self.metadata_agreement_weight_title,
-            "metadata_agreement_weight_description": self.metadata_agreement_weight_description,
-            "metadata_agreement_weight_keywords": self.metadata_agreement_weight_keywords,
-            "assisted_weight_visual_description": self.assisted_weight_visual_description,
-            "assisted_weight_context_integration": self.assisted_weight_context_integration,
-            "assisted_weight_draft_improvement": self.assisted_weight_draft_improvement,
-            "assisted_weight_output_quality": self.assisted_weight_output_quality,
-            "text_sanity_min_wordlike_ratio": self.text_sanity_min_wordlike_ratio,
-            "text_sanity_max_symbol_ratio": self.text_sanity_max_symbol_ratio,
-            "text_sanity_mixed_script_min_symbol_ratio": (
-                self.text_sanity_mixed_script_min_symbol_ratio
-            ),
         }
         for field_name, value in unit_interval_fields.items():
             if not 0.0 <= value <= 1.0:
@@ -569,36 +420,12 @@ class QualityThresholds:
                     f"got {value}"
                 )
                 raise ValueError(msg)
-
-        ordered_pairs = [
-            ("phrase repetitions", self.min_phrase_repetitions, self.max_phrase_repetitions),
-            ("title words", self.min_title_words, self.max_title_words),
-            (
-                "description sentences",
-                self.min_description_sentences,
-                self.max_description_sentences,
-            ),
-            ("keywords", self.min_keywords_count, self.max_keywords_count),
-        ]
-        for label, lower, upper in ordered_pairs:
-            if lower > upper:
-                msg = f"quality_config.yaml has invalid {label} bounds: min={lower}, max={upper}"
-                raise ValueError(msg)
-
-        if self.medium_confidence_threshold > self.high_confidence_threshold:
+        if self.min_phrase_repetitions > self.max_phrase_repetitions:
             msg = (
-                "quality_config.yaml thresholds.medium_confidence_threshold must be <= "
-                "thresholds.high_confidence_threshold"
+                "quality_config.yaml has invalid phrase repetitions bounds: "
+                f"min={self.min_phrase_repetitions}, max={self.max_phrase_repetitions}"
             )
             raise ValueError(msg)
-        if self.moderate_echo_threshold > self.severe_echo_threshold:
-            msg = (
-                "quality_config.yaml thresholds.moderate_echo_threshold must be <= "
-                "thresholds.severe_echo_threshold"
-            )
-            raise ValueError(msg)
-
-        self._validate_metadata_agreement_thresholds()
 
         if self.patterns is not None:
             if not isinstance(self.patterns, dict):
@@ -623,113 +450,13 @@ class QualityThresholds:
                         )
                         raise ValueError(msg) from exc
 
-    def _validate_metadata_agreement_thresholds(self) -> None:
-        """Validate metadata-agreement scoring thresholds."""
-        metadata_weight_total = (
-            self.metadata_agreement_weight_title
-            + self.metadata_agreement_weight_description
-            + self.metadata_agreement_weight_keywords
-        )
-        if not math.isclose(metadata_weight_total, 1.0, rel_tol=0.0, abs_tol=0.01):
-            msg = (
-                "quality_config.yaml metadata agreement weights must sum to 1.0; "
-                f"got {metadata_weight_total:.3f}"
-            )
-            raise ValueError(msg)
-
-        assisted_weight_total = (
-            self.assisted_weight_visual_description
-            + self.assisted_weight_context_integration
-            + self.assisted_weight_draft_improvement
-            + self.assisted_weight_output_quality
-        )
-        if not math.isclose(
-            assisted_weight_total,
-            1.0,
-            rel_tol=0.0,
-            abs_tol=FLOAT_ZERO_EPSILON,
-        ):
-            msg = (
-                "quality_config.yaml assisted enrichment weights must sum to 1.0; "
-                f"got {assisted_weight_total:.3f}"
-            )
-            raise ValueError(msg)
-        if not 0.0 <= self.low_draft_improvement_score <= QUALITY_SCORE_MAX:
-            msg = (
-                "quality_config.yaml thresholds.low_draft_improvement_score must be between "
-                f"0 and 100; got {self.low_draft_improvement_score}"
-            )
-            raise ValueError(msg)
-
-        if self.metadata_agreement_nonvisual_penalty < 0.0:
-            msg = (
-                "quality_config.yaml thresholds.metadata_agreement_nonvisual_penalty must be "
-                f">= 0; got {self.metadata_agreement_nonvisual_penalty}"
-            )
-            raise ValueError(msg)
-        if self.metadata_alignment_min_score < 0.0:
-            msg = (
-                "quality_config.yaml thresholds.metadata_alignment_min_score must be >= 0; "
-                f"got {self.metadata_alignment_min_score}"
-            )
-            raise ValueError(msg)
-        if self.metadata_alignment_partial_match_cap <= 0:
-            msg = (
-                "quality_config.yaml thresholds.metadata_alignment_partial_match_cap must be "
-                f"> 0; got {self.metadata_alignment_partial_match_cap}"
-            )
-            raise ValueError(msg)
-        if self.text_sanity_mixed_script_min_families <= 1:
-            msg = (
-                "quality_config.yaml thresholds.text_sanity_mixed_script_min_families must be "
-                f"> 1; got {self.text_sanity_mixed_script_min_families}"
-            )
-            raise ValueError(msg)
-        if self.text_sanity_mixed_script_max_tokens <= 0:
-            msg = (
-                "quality_config.yaml thresholds.text_sanity_mixed_script_max_tokens must be > 0; "
-                f"got {self.text_sanity_mixed_script_max_tokens}"
-            )
-            raise ValueError(msg)
-        if self.text_sanity_cjk_latin_min_cjk_chars <= 0:
-            msg = (
-                "quality_config.yaml thresholds.text_sanity_cjk_latin_min_cjk_chars must be "
-                f"> 0; got {self.text_sanity_cjk_latin_min_cjk_chars}"
-            )
-            raise ValueError(msg)
-        if self.text_sanity_cjk_latin_min_latin_chars <= 0:
-            msg = (
-                "quality_config.yaml thresholds.text_sanity_cjk_latin_min_latin_chars must be "
-                f"> 0; got {self.text_sanity_cjk_latin_min_latin_chars}"
-            )
-            raise ValueError(msg)
-        if self.text_sanity_cjk_latin_min_cjk_tokens <= 0:
-            msg = (
-                "quality_config.yaml thresholds.text_sanity_cjk_latin_min_cjk_tokens must be "
-                f"> 0; got {self.text_sanity_cjk_latin_min_cjk_tokens}"
-            )
-            raise ValueError(msg)
-        if self.text_sanity_min_tokens <= 0:
-            msg = (
-                "quality_config.yaml thresholds.text_sanity_min_tokens must be > 0; "
-                f"got {self.text_sanity_min_tokens}"
-            )
-            raise ValueError(msg)
-        if self.text_sanity_numeric_loop_min_count <= 0:
-            msg = (
-                "quality_config.yaml thresholds.text_sanity_numeric_loop_min_count must be > 0; "
-                f"got {self.text_sanity_numeric_loop_min_count}"
-            )
-            raise ValueError(msg)
-
     @classmethod
     def from_config(cls, config: Mapping[str, object]) -> QualityThresholds:
-        """Create instance from configuration dictionary."""
+        """Create an instance from the packaged configuration mapping."""
         thresholds = _require_str_object_mapping(
             config.get("thresholds", {}),
             "quality_config.yaml thresholds section must be a mapping",
         )
-
         patterns_value = config.get("patterns", {})
         if patterns_value is None:
             patterns: dict[str, list[str]] | None = None
@@ -740,27 +467,22 @@ class QualityThresholds:
             )
             patterns = cast("dict[str, list[str]]", dict(patterns_mapping))
 
-        # Filter valid fields for the dataclass
-        valid_fields = {f.name for f in fields(cls) if f.name != "patterns"}
-        filtered_thresholds = {k: v for k, v in thresholds.items() if k in valid_fields}
-
-        # Warn about unrecognised YAML keys (likely typos)
+        valid_fields = {field.name for field in fields(cls) if field.name != "patterns"}
+        filtered_thresholds = {
+            key: value for key, value in thresholds.items() if key in valid_fields
+        }
         unknown_threshold_keys = set(thresholds) - valid_fields
         if unknown_threshold_keys:
             logger.warning(
                 "Unrecognised keys in quality_config.yaml thresholds (ignored): %s",
                 ", ".join(sorted(unknown_threshold_keys)),
             )
-
-        # Warn about unrecognised top-level config sections
-        known_sections = {"thresholds", "patterns"}
-        unknown_sections = set(config) - known_sections
+        unknown_sections = set(config) - {"thresholds", "patterns"}
         if unknown_sections:
             logger.warning(
                 "Unrecognised top-level sections in quality_config.yaml (ignored): %s",
                 ", ".join(sorted(unknown_sections)),
             )
-
         return cls(**cast("dict[str, Any]", filtered_thresholds), patterns=patterns)
 
 
@@ -1225,7 +947,6 @@ type ObservationCode = Literal[
     "thinking_trace_incomplete",
     "no_keyword_overlap",
 ]
-type RecommendationStatus = Literal["recommended", "caveat", "avoid", "not_evaluated"]
 type UpstreamBoundary = Literal["not_started", "load_started", "generation_started"]
 type FailureOrigin = Literal[
     "harness_preflight",
@@ -1247,76 +968,6 @@ type ControlledReproductionStatus = Literal[
     "indeterminate",
 ]
 type KeywordOverlapState = Literal["not_assessable", "no_overlap", "some_overlap"]
-type OutputAnomaly = Literal[
-    "special_token_wrapper",
-    "special_token_leak",
-    "harness_contract",
-    "thinking_trace",
-    "reasoning_budget_exhausted",
-    "text_repetition",
-    "numeric_repetition",
-    "mixed_script_corruption",
-    "encoding_corruption",
-    "missing_required_sections",
-    "token_cap_truncation",
-    "irrelevant_output_smell",
-]
-
-
-class JsonlReviewRecord(TypedDict):
-    """Canonical automated review payload attached to JSONL result rows."""
-
-    verdict: str
-    hint_relationship: str
-    instruction_echo: bool
-    metadata_borrowing: bool
-    likely_capped: bool
-    owner: str
-    user_bucket: str
-    evidence: list[str]
-    requested_max_tokens: int | None
-    hit_max_tokens: bool
-    prompt_tokens_total: int | None
-    prompt_tokens_text_est: int | None
-    prompt_tokens_nontext_est: int | None
-    prompt_output_ratio: float | None
-    nontext_prompt_ratio: float | None
-    prompt_burden_kind: NotRequired[str]
-    prompt_burden_source: NotRequired[str]
-    prompt_burden_reason: NotRequired[str | None]
-    processed_image_width: NotRequired[int | None]
-    processed_image_height: NotRequired[int | None]
-    image_patch_count: NotRequired[int | None]
-    missing_terms: list[str]
-    missing_sections: list[str]
-    harness_details: list[str]
-
-
-type IssueReadiness = MaintainerReadiness
-
-
-class JsonlMaintainerTriageRecord(TypedDict, total=False):
-    """Action-oriented maintainer triage payload attached to JSONL result rows."""
-
-    suspected_owner: Required[str]
-    issue_readiness: Required[IssueReadiness]
-    issue_kind: Required[str]
-    summary: Required[str]
-    next_action: Required[str]
-    user_bucket: Required[str]
-    evidence: Required[list[str]]
-    harness_details: Required[list[str]]
-    hit_max_tokens: Required[bool]
-    issue_subtype: str
-    error_stage: str | None
-    error_code: str | None
-    stop_reason: str | None
-    requested_max_tokens: int | None
-    prompt_tokens_total: int | None
-    prompt_output_ratio: float | None
-    nontext_prompt_ratio: float | None
-    prompt_burden_kind: str
-    prompt_burden_source: str
 
 
 class RuntimeProbeResult(TypedDict, total=False):
@@ -1489,20 +1140,6 @@ class JsonlResultRecord(TypedDict):
     prompt_diagnostics: dict[str, JsonLike] | None
 
 
-type FailedModelIssue = tuple[str, str | None, str | None]
-type RepetitiveModelIssue = tuple[str, str | None]
-type HallucinationModelIssue = tuple[str, list[str]]
-type VerboseModelIssue = tuple[str, int]
-type FormattingModelIssue = tuple[str, list[str]]
-type ExcessiveBulletsIssue = tuple[str, int]
-type LowUtilityModelIssue = tuple[str, float, str, str]
-type ModelScoreGrade = tuple[str, float, str]
-type CatalogingScoreRecord = tuple[str, float, str, str, float | None]
-type TopPerformerMetric = tuple[str, str, float, str]
-type ResourceUsageMetric = tuple[str, float, str]
-type AggregateStatRow = tuple[str, str, str, str]
-type QualityIssueEntry = tuple[str, str | None]
-type QualityIssueSection = tuple[str, str, list[QualityIssueEntry]]
 type RuntimePhaseName = Literal[
     "model_load",
     "prompt_prep",
@@ -1537,31 +1174,8 @@ class RuntimeAnalysisSummary(TypedDict):
 
 
 class ModelIssueSummary(TypedDict, total=False):
-    """Aggregated per-run model issue summary used in HTML/Markdown reports."""
+    """Small factual stats cache used by terminal performance logging."""
 
-    total_models: int
-    failed_models: list[FailedModelIssue]
-    indeterminate_models: list[FailedModelIssue]
-    repetitive_models: list[RepetitiveModelIssue]
-    hallucination_models: list[HallucinationModelIssue]
-    verbose_models: list[VerboseModelIssue]
-    formatting_issues: list[FormattingModelIssue]
-    excessive_bullets: list[ExcessiveBulletsIssue]
-    cataloging_grades: dict[str, list[str]]
-    cataloging_best: ModelScoreGrade | None
-    cataloging_worst: ModelScoreGrade | None
-    cataloging_best_description: tuple[str, float]
-    cataloging_best_keywords: tuple[str, float]
-    cataloging_avg_score: float
-    cataloging_scores: list[CatalogingScoreRecord]
-    runtime_analysis: RuntimeAnalysisSummary
-    metadata_baseline_score: float
-    metadata_baseline_grade: str
-    cataloging_avg_delta: float
-    cataloging_improves_metadata: list[str]
-    cataloging_neutral_vs_metadata: list[str]
-    cataloging_worse_than_metadata: list[str]
-    low_utility_models: list[LowUtilityModelIssue]
     fastest_model: tuple[str, float]
     most_efficient_model: tuple[str, float]
     fastest_load_model: tuple[str, float]
@@ -1576,31 +1190,6 @@ class ModelIssueSummary(TypedDict, total=False):
     image_memory_density_models: int
     average_peak_memory_delta_gb: float
     average_peak_memory_delta_mb_per_megapixel: float
-
-
-class NumericFieldStats(TypedDict):
-    """Simple numeric aggregate stats for one metric field."""
-
-    min: float
-    max: float
-    avg: float
-
-
-type PerformanceStats = dict[str, NumericFieldStats]
-
-
-@dataclass(frozen=True)
-class CatalogingSummaryData:
-    """Shared cataloging summary data consumed by HTML and Markdown renderers."""
-
-    grade_counts: tuple[str, ...] = ()
-    average_score: float | None = None
-    metadata_breakdown: tuple[float, str, float, int, int, int] | None = None
-    best_entry: ModelScoreGrade | None = None
-    worst_entry: ModelScoreGrade | None = None
-    best_description_entry: tuple[str, float] | None = None
-    best_keyword_entry: tuple[str, float] | None = None
-    low_utility_models: tuple[LowUtilityModelIssue, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -2074,7 +1663,6 @@ DEFAULT_TIMEOUT: Final[float] = 300.0  # Default timeout in seconds
 MAX_REASONABLE_TEMPERATURE: Final[float] = 2.0  # Warn if temperature exceeds this
 
 # Additional Application Constants
-GRADE_EMOJIS: Final[dict[str, str]] = {"A": "🏆", "B": "✅", "C": "🟡", "D": "🟠", "F": "❌"}
 IMAGE_OPEN_TIMEOUT: Final[float] = 5.0  # Timeout for opening/verifying image files
 SUPPORTED_IMAGE_EXTENSIONS: Final[frozenset[str]] = frozenset({".jpg", ".jpeg", ".png", ".webp"})
 
@@ -2173,9 +1761,8 @@ class PerformanceResult:
         model_load_time: Wall-clock time to load model into GPU memory
         total_time: End-to-end time including all stages
         error_type: Exception class name for error categorization in reports
-        quality_issues: Comma-separated list of detected output problems
-        quality_analysis: Structured quality-analysis result for triage/reporting
-        metadata_agreement: Post-generation score against trusted image metadata
+        quality_issues: Compact log-only mechanical observation labels
+        quality_analysis: Structured mechanical analysis used by ``ResultAssessment``
         active_memory: GPU memory in use (GB), from mx.get_active_memory()
         cache_memory: GPU memory in cache (GB), from mx.get_cache_memory()
         error_package: Which package raised the error (mlx, mlx-vlm, transformers)
@@ -2204,7 +1791,6 @@ class PerformanceResult:
     exception_chain: tuple[FailureException, ...] = ()
     quality_issues: str | None = None
     quality_analysis: GenerationQualityAnalysis | None = None
-    metadata_agreement: MetadataAgreementMetrics | None = None
     active_memory: float | None = None
     cache_memory: float | None = None
     error_package: str | None = None
@@ -2213,22 +1799,6 @@ class PerformanceResult:
     requested_max_tokens: int | None = None
     prompt_diagnostics: PromptDiagnostics | None = None
     rerun_evidence: RerunEvidence | None = None
-    review_payload: JsonlReviewRecord | None = dataclass_field(
-        default=None,
-        repr=False,
-        compare=False,
-    )
-    review_payload_ready: bool = dataclass_field(default=False, repr=False, compare=False)
-    maintainer_triage_payload: JsonlMaintainerTriageRecord | None = dataclass_field(
-        default=None,
-        repr=False,
-        compare=False,
-    )
-    maintainer_triage_payload_ready: bool = dataclass_field(
-        default=False,
-        repr=False,
-        compare=False,
-    )
 
 
 @dataclass(frozen=True)
@@ -2241,24 +1811,6 @@ class RerunEvidence:
     rerun_generated_chars: int | None = None
     rerun_generation_time: float | None = None
     rerun_prompt: str | None = None
-
-
-@dataclass(frozen=True)
-class MetadataAgreementMetrics:
-    """Post-generation agreement score against trusted image metadata."""
-
-    overall_score: float = 0.0
-    title_score: float = 0.0
-    description_score: float = 0.0
-    keyword_score: float = 0.0
-    nonvisual_penalty: float = 0.0
-    matched_terms: tuple[str, ...] = ()
-    missed_terms: tuple[str, ...] = ()
-    nonvisual_hits: tuple[str, ...] = ()
-    context_integration_score: float | None = None
-    draft_improvement_score: float | None = None
-    visual_description_score: float | None = None
-    assisted_enrichment_score: float | None = None
 
 
 @dataclass(frozen=True)
@@ -2855,16 +2407,6 @@ def _render_html_stanza(stanza: ReportStanza) -> list[str]:
         parts.append(f"<p><b>{html.escape(stanza.heading)}</b></p>")
     parts.extend(render_report_html((ReportKeyValues(stanza.rows),)))
     return parts
-
-
-def _append_markdown_review_block(
-    out: list[str],
-    *,
-    res: PerformanceResult,
-) -> None:
-    """Append the shared canonical review block to a Markdown artifact."""
-    rows = _build_review_block_rows(res)
-    _append_markdown_row_block(out, rows=rows)
 
 
 def _gallery_runtime_facts(
@@ -3560,29 +3102,16 @@ FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
 HEADER_SPLIT_LENGTH = 10
 ERROR_MESSAGE_TRUNCATE_LEN: Final[int] = 120  # Max chars for error messages in actionable reports
 MAX_QUALITY_ISSUES_LEN: Final[int] = 30  # Max chars for quality issues in Markdown tables
-MAX_OUTPUT_LINES: Final[int] = 3  # Max lines to show in summary table cells
 MAX_OUTPUT_PREVIEW_CHARS: Final[int] = 280  # Max chars for output previews in summary tables
 MIN_THROUGHPUT_SAMPLE_TOKENS: Final[int] = 16
-OUTPUT_PREVIEW_CUE_LIMIT: Final[int] = 3  # Max issue cues shown before compact output text
-OUTPUT_PREVIEW_MIN_HEAD_CHARS: Final[int] = 96  # Minimum chars reserved for preview head
-OUTPUT_PREVIEW_MIN_TAIL_CHARS: Final[int] = 48  # Minimum chars reserved for preview tail
-OUTPUT_PREVIEW_MIN_BODY_CHARS: Final[int] = 24  # Smallest useful body budget after cue prefix
 MAX_CAPTURED_OUTPUT_LOG_CHARS: Final[int] = 1200  # Max chars of captured stdout/stderr in logs
 SELF_LOGGED_FAILURE_PREFIX_RE: Final[re.Pattern[str]] = re.compile(
     r"^\[\d{2}:\d{2}:\d{2}\]\s+ERROR\s+Failed to load model\b"
 )
-MAX_TRIAGE_MODELS: Final[int] = 5  # Max model rows shown in triage subsections
-MODEL_SELECTION_MIN_CAPTION_WORDS: Final[int] = 5  # Below this, captions are usually too sparse
-MODEL_SELECTION_IDEAL_CAPTION_MIN_WORDS: Final[int] = 9  # Lower bound for useful brief captions
-MODEL_SELECTION_IDEAL_CAPTION_MAX_WORDS: Final[int] = 36  # Upper bound for useful brief captions
-MODEL_SELECTION_MAX_CAPTION_WORDS: Final[int] = 80  # Above this, caption briefs become unwieldy
-MODEL_SELECTION_RICHNESS_TARGET_TERMS: Final[int] = 16  # Terms needed for full richness credit
-MODEL_SELECTION_CONTENT_TERM_MIN_CHARS: Final[int] = 3  # Minimum token length for richness
 SUMMARY_CHART_WIDTH: Final[int] = 24  # Character width for compact Rich summary bars
 SUMMARY_MODEL_LABEL_MAX: Final[int] = 32  # Max model label length in summary tables/charts
 SUMMARY_CHART_MAX_ROWS: Final[int] = 8  # Max rows shown in summary charts
 MIN_MODELS_FOR_EFFICIENCY_CHART: Final[int] = 2  # Min successful rows for cross-model efficiency
-UTILITY_DELTA_NEUTRAL_BAND: Final[float] = 2.0  # Within ±band, model is neutral vs metadata
 
 # Numeric fields are automatically derived from FIELD_ABBREVIATIONS for consistency
 # Exclude non-numeric fields explicitly
@@ -3859,38 +3388,10 @@ def _detect_repetitive_output(text: str, threshold: float | None = None) -> tupl
     return False, None
 
 
-_TEXT_SANITY_SCRIPT_NAME_PREFIXES: Final[tuple[tuple[str, tuple[str, ...]], ...]] = (
-    ("latin", ("LATIN",)),
-    ("cyrillic", ("CYRILLIC",)),
-    ("arabic", ("ARABIC",)),
-    ("kana", ("HIRAGANA", "KATAKANA")),
-    ("cjk", ("CJK",)),
-    ("hangul", ("HANGUL",)),
-)
-_TEXT_SANITY_CHAR_NOISE_RE: Final[re.Pattern[str]] = re.compile(r"([#&_=(){}\[\]<>/\\|])\1{5,}")
-_TEXT_SANITY_LEADING_NOISE_RE: Final[re.Pattern[str]] = re.compile(r"^[^\w\s]{2,}")
-_TEXT_SANITY_NUMERIC_TOKEN_RE: Final[re.Pattern[str]] = re.compile(r"\b(?:19|20)\d{2}\b|\b\d+\b")
-_TEXT_SANITY_WORDLIKE_TOKEN_RE: Final[re.Pattern[str]] = re.compile(r"[A-Za-z][A-Za-z'-]{1,}")
-_TEXT_SANITY_STRUCTURAL_MARKER_RE: Final[re.Pattern[str]] = re.compile(r"[{}\[\]<>/\\|_=]{2,}")
-_TEXT_SANITY_CJK_CHAR_RE: Final[re.Pattern[str]] = re.compile(r"[\u3400-\u9fff]")
-_TEXT_SANITY_LATIN_CHAR_RE: Final[re.Pattern[str]] = re.compile(r"[A-Za-z]")
 _EMPTY_THINKING_WRAPPER_RE: Final[re.Pattern[str]] = re.compile(
     r"<think>\s*</think>",
     re.IGNORECASE,
 )
-_STRUCTURED_NUMERIC_METADATA_RE: Final[re.Pattern[str]] = re.compile(
-    r"(?:\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}:\d{2}(?::\d{2})?\b|"
-    r"[-+]?\d{1,3}(?:\.\d+)?\s*,\s*[-+]?\d{1,3}(?:\.\d+)?|"
-    r"\b\d{1,3}°\s*\d{1,2}['\u2032]\s*\d{1,2}(?:\.\d+)?[\"\u2033]\s*[NSEW]\b|"
-    r"\b\d{1,3}(?:\.\d+)?°\s*[NSEW]\b|\b\d+\s*[x\u00d7]\s*\d+\b|"
-    r"\b\d+\s*/\s*\d+\b)",
-    re.IGNORECASE,
-)
-
-
-def _remove_structured_numeric_metadata(text: str) -> str:
-    """Remove legitimate structured numeric fields before loop detection."""
-    return _STRUCTURED_NUMERIC_METADATA_RE.sub(" ", text)
 
 
 def _strip_empty_thinking_wrappers(text: str) -> str:
@@ -3900,15 +3401,10 @@ def _strip_empty_thinking_wrappers(text: str) -> str:
 
 @dataclass(frozen=True)
 class NormalizedOutput:
-    """Scoring-only output copy plus every removed literal wrapper token."""
+    """Mechanical-analysis copy plus configured wrappers removed from consideration."""
 
     text: str
     removed_wrappers: tuple[str, ...] = ()
-
-
-_GENERIC_SPECIAL_WRAPPER_RE: Final[re.Pattern[str]] = re.compile(
-    r"<\|/?[A-Za-z][\w.-]*\|>|</?[A-Za-z][\w.-]*(?:_token|_turn)>",
-)
 
 
 def _normalize_output_for_analysis(
@@ -3916,9 +3412,8 @@ def _normalize_output_for_analysis(
     *,
     known_special_tokens: Sequence[str] = (),
 ) -> NormalizedOutput:
-    """Return a semantic-scoring copy while retaining removed wrappers as evidence."""
+    """Remove only tokenizer/configured wrappers from the mechanical-analysis copy."""
     candidates = {token for token in known_special_tokens if token and token.startswith(("<", "["))}
-    candidates.update(_GENERIC_SPECIAL_WRAPPER_RE.findall(text))
     if not candidates:
         return NormalizedOutput(text=text.strip())
 
@@ -3936,390 +3431,6 @@ def _normalize_output_for_analysis(
     normalized = re.sub(r" *\n *", "\n", normalized)
     normalized = re.sub(r"\n{3,}", "\n\n", normalized).strip()
     return NormalizedOutput(text=normalized, removed_wrappers=tuple(removed))
-
-
-def _text_sanity_script_family(char: str) -> str | None:
-    """Return broad script families used to spot tokenizer-style script soup."""
-    if not char.isalpha():
-        return None
-    unicode_name = unicodedata.name(char, "")
-    return next(
-        (
-            family
-            for family, prefixes in _TEXT_SANITY_SCRIPT_NAME_PREFIXES
-            if unicode_name.startswith(prefixes)
-        ),
-        "other",
-    )
-
-
-def _text_sanity_numeric_loop_issue(cleaned: str) -> str | None:
-    """Return a numeric-loop label only for a contiguous run of one number."""
-    numeric_text = _remove_structured_numeric_metadata(cleaned)
-    matches = list(_TEXT_SANITY_NUMERIC_TOKEN_RE.finditer(numeric_text))
-    run_token: str | None = None
-    run_length = 0
-    previous_end = 0
-    for match in matches:
-        separator = numeric_text[previous_end : match.start()]
-        token = match.group(0)
-        contiguous = not separator.strip(" \t\r\n,;:|/-")
-        run_length = run_length + 1 if contiguous and token == run_token else 1
-        run_token = token
-        previous_end = match.end()
-        if run_length >= QUALITY.text_sanity_numeric_loop_min_count:
-            return "numeric_loop"
-    return None
-
-
-def _text_sanity_token_marker_issue(cleaned: str) -> str | None:
-    """Return a token-noise issue label for control/BPE/special-token leakage."""
-    semantic_text = _strip_empty_thinking_wrappers(cleaned)
-    control_or_bpe_issue, _encoding_type = _detect_token_encoding_issues(semantic_text)
-    special_token_leak, _leaked_tokens = _detect_special_token_leakage(semantic_text)
-    return "gibberish(token_noise)" if control_or_bpe_issue or special_token_leak else None
-
-
-def _text_sanity_wordlike_ratio(tokens: Sequence[str]) -> float:
-    """Return ratio of tokens that resemble ordinary Latin words."""
-    wordlike_tokens = [
-        token
-        for token in tokens
-        if _TEXT_SANITY_WORDLIKE_TOKEN_RE.search(token)
-        and not _TEXT_SANITY_STRUCTURAL_MARKER_RE.search(token)
-    ]
-    return len(wordlike_tokens) / len(tokens)
-
-
-def _text_sanity_symbol_ratio(cleaned: str) -> float:
-    """Return punctuation/symbol density for lexical noise checks."""
-    symbol_chars = sum(1 for char in cleaned if not (char.isalnum() or char.isspace()))
-    return symbol_chars / max(len(cleaned), 1)
-
-
-def _has_mixed_script_token_noise(
-    cleaned: str,
-    *,
-    token_count: int,
-    symbol_ratio: float,
-) -> bool:
-    """Return True when short output mixes many unrelated scripts with symbol noise."""
-    script_families = {
-        family for char in cleaned if (family := _text_sanity_script_family(char)) is not None
-    }
-    return (
-        len(script_families) >= QUALITY.text_sanity_mixed_script_min_families
-        and token_count <= QUALITY.text_sanity_mixed_script_max_tokens
-        and symbol_ratio >= QUALITY.text_sanity_mixed_script_min_symbol_ratio
-    )
-
-
-def _has_cjk_latin_token_soup(
-    cleaned: str,
-    tokens: Sequence[str],
-    *,
-    token_count: int,
-    symbol_ratio: float,
-) -> bool:
-    """Return True for short CJK/Latin fragments that look tokenized, not bilingual."""
-    if (
-        token_count > QUALITY.text_sanity_mixed_script_max_tokens
-        or symbol_ratio < QUALITY.text_sanity_mixed_script_min_symbol_ratio
-    ):
-        return False
-
-    cjk_chars = _TEXT_SANITY_CJK_CHAR_RE.findall(cleaned)
-    latin_chars = _TEXT_SANITY_LATIN_CHAR_RE.findall(cleaned)
-    if (
-        len(cjk_chars) < QUALITY.text_sanity_cjk_latin_min_cjk_chars
-        or len(latin_chars) < QUALITY.text_sanity_cjk_latin_min_latin_chars
-    ):
-        return False
-
-    cjk_tokens = [token for token in tokens if _TEXT_SANITY_CJK_CHAR_RE.search(token)]
-    mixed_tokens = [token for token in cjk_tokens if _TEXT_SANITY_LATIN_CHAR_RE.search(token)]
-    return bool(mixed_tokens) or (len(cjk_tokens) >= QUALITY.text_sanity_cjk_latin_min_cjk_tokens)
-
-
-def _has_general_token_noise(
-    *,
-    token_count: int,
-    wordlike_ratio: float,
-    symbol_ratio: float,
-    leading_token_noise: bool,
-) -> bool:
-    """Return True for lexical token noise independent of visual correctness."""
-    return (
-        wordlike_ratio < QUALITY.text_sanity_min_wordlike_ratio
-        or symbol_ratio > QUALITY.text_sanity_max_symbol_ratio
-        or (leading_token_noise and token_count <= QUALITY.short_output_words)
-    )
-
-
-def _detect_text_sanity_issue(text: str) -> tuple[bool, str | None]:
-    """Detect prompt-independent token noise that is not valid prose.
-
-    These checks intentionally stay lexical. They do not decide whether a
-    caption is visually correct; they catch outputs that are not credible
-    natural language diagnostics, such as tokenizer noise or numeric loops.
-    """
-    cleaned = text.strip()
-    if not cleaned or len(cleaned) < QUALITY.min_text_length:
-        return False, None
-
-    issue_type: str | None = None
-    if _TEXT_SANITY_CHAR_NOISE_RE.search(cleaned):
-        issue_type = "gibberish(char_noise)"
-    else:
-        tokens = re.findall(r"\S+", cleaned)
-        if len(tokens) >= QUALITY.text_sanity_min_tokens:
-            issue_type = _text_sanity_numeric_loop_issue(
-                cleaned
-            ) or _text_sanity_token_marker_issue(cleaned)
-            if issue_type is None:
-                wordlike_ratio = _text_sanity_wordlike_ratio(tokens)
-                symbol_ratio = _text_sanity_symbol_ratio(cleaned)
-                token_count = len(tokens)
-                if _has_mixed_script_token_noise(
-                    cleaned,
-                    token_count=token_count,
-                    symbol_ratio=symbol_ratio,
-                ) or _has_cjk_latin_token_soup(
-                    cleaned,
-                    tokens,
-                    token_count=token_count,
-                    symbol_ratio=symbol_ratio,
-                ):
-                    issue_type = "gibberish(mixed_script_noise)"
-                else:
-                    leading_token_noise = bool(_TEXT_SANITY_LEADING_NOISE_RE.match(cleaned))
-                    if _has_general_token_noise(
-                        token_count=token_count,
-                        wordlike_ratio=wordlike_ratio,
-                        symbol_ratio=symbol_ratio,
-                        leading_token_noise=leading_token_noise,
-                    ):
-                        issue_type = "gibberish(token_noise)"
-
-    return issue_type is not None, issue_type
-
-
-def _configured_regex_issues(
-    text: str,
-    rules: Sequence[tuple[str, tuple[str, ...], str, int]],
-    *,
-    debug_context: str,
-    quality_thresholds: QualityThresholds | None = None,
-) -> Iterator[str]:
-    """Yield issue labels whose configured regex lists match text."""
-    for pattern_key, fallback_patterns, issue_label, flags in rules:
-        if _matches_any_pattern(
-            text,
-            _get_quality_pattern_list(
-                pattern_key,
-                list(fallback_patterns),
-                quality_thresholds=quality_thresholds,
-            ),
-            debug_context=f"{debug_context} {issue_label}",
-            flags=flags,
-        ):
-            yield issue_label
-
-
-def _detect_hallucination_patterns(text: str) -> list[str]:
-    """Detect quiz/table artifacts that indicate task drift or hallucination.
-
-    Flags markdown tables, multiple-choice answer formats, quiz-style prompts,
-    and unrelated educational-content terms in otherwise descriptive output.
-    """
-    issues: list[str] = []
-
-    if not text:
-        return issues
-
-    text_lower: str = text.lower()
-
-    # Check for markdown tables (pipe-delimited)
-    if "|" in text and text.count("|") >= QUALITY.min_pipes_for_table:
-        # Likely a table if we see multiple pipes
-        lines_with_pipes: list[str] = [line for line in text.split("\n") if "|" in line]
-        if len(lines_with_pipes) >= QUALITY.min_table_rows:
-            issues.append("Contains unexpected table")
-
-    # Check for multiple choice patterns
-    mc_pattern: re.Pattern[str] = re.compile(r"^[A-D]\)", re.MULTILINE)
-    mc_matches: list[str] = mc_pattern.findall(text)
-    if len(mc_matches) >= QUALITY.min_mc_answers:
-        issues.append("Contains multiple choice pattern")
-
-    # Check for quiz/test questions
-    question_indicators: list[str] = _get_quality_pattern_list(
-        "hallucination_question_indicators",
-        ["what is", "how many", "based on the chart", "calculate"],
-    )
-    has_question: bool = any(indicator in text_lower for indicator in question_indicators)
-    if has_question and len(text) > QUALITY.substantial_text_length:
-        issues.append("Contains question/quiz content")
-
-    # Check for unrelated educational content keywords
-    edu_keywords: list[str] = _get_quality_pattern_list(
-        "hallucination_edu_keywords",
-        ["grade level", "students with adhd", "test scores", "homework"],
-    )
-    if any(keyword in text_lower for keyword in edu_keywords):
-        issues.append("Contains unrelated educational content")
-
-    return issues
-
-
-def _detect_excessive_verbosity(text: str, generated_tokens: int) -> bool:
-    """Detect if model output is excessively verbose.
-
-    Considers output verbose if:
-    - Generated tokens reach the configured substantial-length threshold
-    - Contains meta-commentary about the image/analysis
-    - Has multiple sections (###, ##) suggesting over-structure
-
-    Args:
-        text: Generated text to check
-        generated_tokens: Number of tokens generated
-
-    Returns:
-        True if output appears excessively verbose
-    """
-    if generated_tokens < QUALITY.max_verbosity_tokens:
-        return False
-
-    text_lower: str = text.lower()
-
-    # Check for meta-commentary patterns
-    meta_patterns: list[str] = _get_quality_pattern_list(
-        "meta_commentary",
-        [
-            "the image depicts",
-            "the image shows",
-            "the photograph captures",
-            "this image features",
-            "in conclusion",
-            "### analysis",
-            "### conclusion",
-            "based on the image",
-        ],
-    )
-
-    meta_count: int = sum(1 for pattern in meta_patterns if pattern in text_lower)
-
-    # Check for excessive sectioning
-    section_headers: int = text.count("###") + text.count("## ")
-
-    # Verbose if has meta-commentary + sections or just too many sections
-    return meta_count >= QUALITY.min_meta_patterns or section_headers >= QUALITY.min_section_headers
-
-
-def _detect_formatting_violations(text: str) -> list[str]:
-    """Detect rendering-related formatting artifacts in generated output.
-
-    Checks only HTML-like tags and markdown header overuse. Bullet density is
-    handled separately by ``_detect_excessive_bullets`` so callers can treat
-    list-heavy outputs differently from malformed formatting.
-
-    Args:
-        text: Generated text to check
-
-    Returns:
-        List of display-affecting formatting issues, excluding bullet counts
-    """
-    issues: list[str] = []
-
-    if not text:
-        return issues
-
-    semantic_text = text
-    if _EMPTY_THINKING_WRAPPER_RE.search(text):
-        issues.append("Empty thinking wrapper present")
-        semantic_text = _strip_empty_thinking_wrappers(text)
-
-    # Check for tags (beyond simple breaks) that may interfere with rendering
-    html_tags: list[str] = re.findall(
-        r"<(?!br>|/br>)[a-z]+[^>]*>",
-        semantic_text,
-        re.IGNORECASE,
-    )
-    if html_tags:
-        # Keep raw tags in analysis output; renderers escape them as needed for Markdown/HTML.
-        tags_preview: str = ", ".join(dict.fromkeys(html_tags[: FORMATTING.max_preview_tags]))
-        issues.append(f"Unknown tags: {tags_preview}")
-
-    # Check for excessive markdown structure
-    header_count: int = text.count("\n##") + text.count("\n###")
-    if header_count > QUALITY.max_markdown_headers:
-        issues.append(f"Excessive markdown headers ({header_count})")
-
-    return issues
-
-
-def _truncate_repetitive_output(text: str) -> str:
-    """Truncate outputs with excessive token repetition for display.
-
-    When a model produces many consecutive repetitions of the same token,
-    truncate for readability while indicating the total count.
-
-    Args:
-        text: Generated text
-
-    Returns:
-        Truncated text with repetition summary if applicable
-    """
-    if not text:
-        return text
-
-    # Quick inline check for repetition
-    is_repetitive, repeated_token = _detect_repetitive_output(text)
-    if not is_repetitive or not repeated_token:
-        return text
-
-    # Count consecutive repetitions of the token (with optional whitespace between)
-    pattern: str = re.escape(repeated_token)
-    min_reps = FORMATTING.min_consecutive_repetitions_for_truncation
-    match: re.Match[str] | None = re.search(rf"({pattern}(?:\s*{pattern}){{{min_reps},}})", text)
-
-    if match:
-        # Count total repetitions in the matched section
-        repetitions: int = match.group(0).count(repeated_token)
-        # Show first few occurrences + count + ellipsis
-        truncated_section: str = (
-            f"{repeated_token} {repeated_token} {repeated_token} "
-            f"... [{repetitions} total repetitions] ..."
-        )
-        return text.replace(match.group(0), truncated_section)
-
-    return text
-
-
-def _detect_excessive_bullets(text: str) -> tuple[bool, int]:
-    """Flag outputs whose bullet count exceeds the configured threshold.
-
-    This is a pure count-based check. Callers decide whether a dense bullet
-    list is acceptable for the current prompt.
-
-    Args:
-        text: Generated text to check
-
-    Returns:
-        Tuple of (has_excessive_bullets, bullet_count)
-    """
-    if not text:
-        return False, 0
-
-    bullet_prefixes: tuple[str, str, str] = ("- ", "* ", "• ")
-    bullet_lines: list[str] = [
-        line for line in text.split("\n") if line.strip().startswith(bullet_prefixes)
-    ]
-    bullet_count: int = len(bullet_lines)
-
-    # Use config threshold if available, otherwise default to 15 (lowered for cataloging)
-    threshold: int = QUALITY.max_bullets or 15
-    return bullet_count > threshold, bullet_count
 
 
 CONTEXT_NOISE_TERMS: Final[frozenset[str]] = frozenset(
@@ -4903,10 +4014,8 @@ def _analyze_catalog_contract(
 
 @dataclass(frozen=True)
 class ReasoningOutputSignals:
-    """Classify unexpected reasoning separately from expected thinking traces."""
+    """Record explicit thinking trace delimiters for thinking-model runs."""
 
-    has_reasoning_leak: bool = False
-    reasoning_leak_markers: tuple[str, ...] = ()
     has_thinking_trace: bool = False
     thinking_trace_incomplete: bool = False
     thinking_trace_markers: tuple[str, ...] = ()
@@ -4936,33 +4045,10 @@ def _detect_reasoning_output(
             else:
                 thinking_trace_incomplete = True
 
-    if thinking_trace_markers:
-        return ReasoningOutputSignals(
-            has_thinking_trace=True,
-            thinking_trace_incomplete=thinking_trace_incomplete,
-            thinking_trace_markers=tuple(thinking_trace_markers),
-        )
-
-    markers: list[str] = _get_quality_pattern_list(
-        "reasoning_leak_markers",
-        [
-            "<think>",
-            "◁think▷",
-            "◁/think▷",
-            "here are my reasoning steps",
-            "the user asks:",
-            "let's analyze the image",
-        ],
-    )
-
-    findings: list[str] = [
-        marker for marker in markers if marker and marker.casefold() in text_lower
-    ]
-    findings.extend(marker for marker in PROMPT_ECHO_MARKERS if marker in text_lower)
-    deduped: list[str] = _dedupe_preserve_order(findings)
     return ReasoningOutputSignals(
-        has_reasoning_leak=bool(deduped),
-        reasoning_leak_markers=tuple(deduped[:4]),
+        has_thinking_trace=bool(thinking_trace_markers),
+        thinking_trace_incomplete=thinking_trace_incomplete,
+        thinking_trace_markers=tuple(thinking_trace_markers),
     )
 
 
@@ -4974,108 +4060,6 @@ def _detect_instruction_echo(text: str) -> tuple[bool, list[str]]:
     findings = [marker for marker in PROMPT_ECHO_MARKERS if marker in text_lower]
     deduped = _dedupe_preserve_order(findings)
     return bool(deduped), deduped[:4]
-
-
-def _detect_context_echo(
-    text: str,
-    prompt: str,
-    context_marker: str = "Context:",
-) -> tuple[bool, float]:
-    """Detect likely context regurgitation rather than image-grounded synthesis."""
-    has_echo: bool = False
-    score: float = 0.0
-
-    if not text or not prompt:
-        return has_echo, score
-
-    text_lower: str = text.casefold()
-    has_inline_context_block: bool = "context:" in text_lower and any(
-        marker in text_lower for marker in ("title hint:", "description hint:", "capture metadata:")
-    )
-    if has_inline_context_block:
-        return True, 1.0
-
-    context_text: str = _extract_trusted_hint_bundle(
-        prompt,
-        context_marker=context_marker,
-    ).trusted_text
-    if context_text:
-        output_words: list[str] = re.findall(r"[a-z0-9']+", text_lower)
-        context_words: list[str] = re.findall(r"[a-z0-9']+", context_text.casefold())
-        if len(output_words) >= QUALITY.context_echo_min_words and context_words:
-            output_vocab: set[str] = set(output_words)
-            context_vocab: set[str] = set(context_words)
-            vocab_overlap: float = len(output_vocab & context_vocab) / max(len(output_vocab), 1)
-            score = round(vocab_overlap, 3)
-            if vocab_overlap >= QUALITY.context_echo_vocab_ratio_threshold:
-                has_echo = True
-            else:
-                ngram_size: int = max(2, QUALITY.context_echo_ngram_size)
-                if len(output_words) >= ngram_size and len(context_words) >= ngram_size:
-                    output_ngrams: set[tuple[str, ...]] = {
-                        tuple(output_words[idx : idx + ngram_size])
-                        for idx in range(len(output_words) - ngram_size + 1)
-                    }
-                    context_ngrams: set[tuple[str, ...]] = {
-                        tuple(context_words[idx : idx + ngram_size])
-                        for idx in range(len(context_words) - ngram_size + 1)
-                    }
-                    shared_ngrams: set[tuple[str, ...]] = output_ngrams & context_ngrams
-                    if shared_ngrams:
-                        shared_ratio: float = len(shared_ngrams) / max(len(output_ngrams), 1)
-                        score = round(shared_ratio, 3)
-                        has_echo = (
-                            len(shared_ngrams) >= QUALITY.context_echo_min_shared_ngrams
-                            and shared_ratio >= QUALITY.context_echo_ngram_ratio_threshold
-                        )
-
-    return has_echo, score
-
-
-def _detect_context_ignorance(
-    text: str,
-    prompt: str,
-    context_marker: str = "Context:",
-) -> tuple[bool, list[str]]:
-    """Detect when trusted hint content is mostly absent from the answer."""
-    if not text or not prompt:
-        return False, []
-
-    bundle = _extract_trusted_hint_bundle(prompt, context_marker=context_marker)
-    if not bundle.trusted_terms:
-        return False, []
-
-    normalized_text: str = _normalize_phrase_for_matching(text)
-    missing_terms: list[str] = [
-        term for term in bundle.trusted_terms if not _context_term_present(term, normalized_text)
-    ]
-    overlap = _keyword_overlap_state(
-        bundle.trusted_keywords or bundle.trusted_terms,
-        _extract_hint_signal_terms(text),
-    )
-    return overlap == "no_overlap", missing_terms[: QUALITY.max_reported_missing_terms]
-
-
-def _detect_metadata_borrowing(
-    text: str,
-    bundle: TrustedHintBundle,
-) -> tuple[bool, list[str]]:
-    """Detect unverified output claims copied from structured capture metadata."""
-    if not text or not bundle.nonvisual_terms:
-        return False, []
-    structured_terms = _dedupe_preserve_order(
-        [
-            match.group(0)
-            for term in bundle.nonvisual_terms
-            for match in _STRUCTURED_NUMERIC_METADATA_RE.finditer(term)
-        ]
-    )
-    if not structured_terms:
-        return False, []
-    normalized_text = _normalize_phrase_for_matching(text)
-    matches = [term for term in structured_terms if _context_term_present(term, normalized_text)]
-    deduped = _dedupe_preserve_order(matches)
-    return bool(deduped), deduped[: QUALITY.max_reported_missing_terms]
 
 
 def _estimate_prompt_tokens_from_text(prompt: str | None) -> int | None:
@@ -5122,587 +4106,6 @@ def _detect_likely_cutoff(
     return True, _dedupe_preserve_order(reasons)
 
 
-def _classify_hint_relationship(
-    text: str,
-    bundle: TrustedHintBundle,
-) -> tuple[str, list[str]]:
-    """Classify how the answer relates to trusted prompt hints."""
-    if not bundle.trusted_text:
-        return "not_evaluated", []
-
-    text_for_hint_eval = _strip_nonvisual_terms_from_text(text, bundle.nonvisual_terms) or text
-    visual_terms = [t for t in bundle.trusted_terms if not _is_nonvisual_context_term(t)]
-    overlap = _keyword_overlap_state(visual_terms, _extract_hint_signal_terms(text_for_hint_eval))
-    if overlap == "no_overlap":
-        return "no_overlap", ["no_overlap"]
-    if overlap == "not_assessable":
-        return "not_evaluated", []
-    baseline = compute_cataloging_utility(bundle.trusted_text, None)
-    baseline_score = float(baseline["utility_score"])
-    utility = compute_cataloging_utility(text_for_hint_eval, bundle.trusted_text)
-    score = float(utility["utility_score"])
-    delta = score - baseline_score
-
-    if delta > UTILITY_DELTA_NEUTRAL_BAND:
-        return "improves_trusted_hints", ["utility_delta_positive"]
-    return "preserves_trusted_hints", ["some_overlap"]
-
-
-def _classify_review_owner(
-    *,
-    harness_type: str | None,
-    failure_owner: str | None,
-) -> str:
-    """Return a compact single-owner label for canonical review output."""
-    if failure_owner:
-        owner_lower = failure_owner.casefold()
-        for needle, owner in _REVIEW_OWNER_BY_FAILURE_NEEDLE:
-            if needle in owner_lower:
-                return owner
-
-    harness_key = (harness_type or "").casefold()
-    mapped_owner = _REVIEW_OWNER_BY_HARNESS_TYPE.get(harness_key)
-    if mapped_owner is not None:
-        return mapped_owner
-    return "model"
-
-
-def _classify_review_verdict(
-    *,
-    has_harness_issue: bool,
-    harness_type: str | None,
-    likely_cutoff: bool,
-    cutoff_reasons: Sequence[str] = (),
-    prompt_tokens_total: int | None,
-    prompt_tokens_text_est: int | None,
-    prompt_tokens_nontext_est: int | None,
-    missing_sections: Sequence[str],
-    utility_grade: str,
-    instruction_echo: bool,
-    metadata_borrowing: bool,
-    has_hallucination: bool,
-    text_sanity_issue_type: str | None = None,
-) -> tuple[str, list[str]]:
-    """Return ordered verdict plus compact evidence labels.
-
-    Token-cap hits are split into two verdicts:
-
-    * ``"token_cap"`` — the model hit max_tokens but produced structurally
-      sound output (no degradation evidence such as missing sections,
-      repetitive tails, or abrupt stops).
-    * ``"cutoff_degraded"`` — the model hit max_tokens **and** the output
-      shows quality degradation.
-    """
-    evidence: list[str] = []
-    harness_key = harness_type or ""
-    if has_harness_issue and harness_key != "long_context":
-        if harness_type:
-            evidence.append(f"harness:{harness_type}")
-        return "harness", evidence
-
-    if likely_cutoff:
-        evidence.append("token_cap")
-        # Distinguish benign cap from degraded cap
-        _degradation_reasons = {
-            "missing_sections",
-            "repetitive_tail",
-            "unfinished_section",
-            "abrupt_tail",
-        }
-        if set(cutoff_reasons) & _degradation_reasons:
-            evidence.extend(cutoff_reasons)
-        verdict = "cutoff_degraded" if set(cutoff_reasons) & _degradation_reasons else "token_cap"
-        return verdict, evidence
-
-    if text_sanity_issue_type is not None:
-        evidence.extend(["text_sanity", text_sanity_issue_type])
-        return "semantic_mismatch", evidence
-
-    weak_signals = (
-        ("instruction_echo", instruction_echo),
-        ("unverified-context-copy", metadata_borrowing),
-        ("hallucination", has_hallucination),
-    )
-    weak_output = bool(missing_sections) or any(flag for _label, flag in weak_signals)
-
-    heavy_nontext_burden = False
-    prompt_token_values = (
-        prompt_tokens_total,
-        prompt_tokens_text_est,
-        prompt_tokens_nontext_est,
-    )
-    if None not in prompt_token_values:
-        total_tokens = cast("int", prompt_tokens_total)
-        nontext_tokens = cast("int", prompt_tokens_nontext_est)
-        heavy_nontext_burden = (
-            total_tokens >= QUALITY.long_prompt_tokens_threshold
-            and nontext_tokens / total_tokens >= QUALITY.heavy_nontext_prompt_ratio
-        )
-
-    context_budget_evidence: list[str] = []
-    if harness_key == "long_context":
-        context_budget_evidence.append("long_context")
-    if heavy_nontext_burden and weak_output:
-        context_budget_evidence.append("nontext_prompt_burden")
-    if context_budget_evidence:
-        return "context_budget", context_budget_evidence
-
-    if weak_output:
-        for label, flag in weak_signals:
-            if flag:
-                evidence.append(label)
-        if missing_sections:
-            evidence.append("contract")
-        if utility_grade in {"D", "F"}:
-            evidence.append(f"utility:{utility_grade}")
-        return "model_shortcoming", evidence
-
-    return "clean", evidence
-
-
-def _classify_user_bucket(
-    *,
-    verdict: str,
-    hint_relationship: str,
-    has_contract_issue: bool,
-    utility_grade: str = "",
-    has_presentation_warning: bool = False,
-) -> RecommendationStatus:
-    """Bucket outputs for end users based on verdict and utility signals.
-
-    Verdict-to-bucket mapping:
-
-    * ``harness`` / ``cutoff_degraded`` → ``"avoid"``
-    * ``token_cap`` → ``"caveat"`` because output is not presentation-ready
-    * ``context_budget`` → ``"caveat"``
-    * ``model_shortcoming`` or degraded hints → ``"avoid"``
-    * ``runtime_failure`` → ``"avoid"``
-    * ``unknown_runtime_anomaly`` → ``"caveat"``
-    * ``clean`` with positive hints and no contract issues → ``"recommended"``
-    * everything else → ``"caveat"``
-    """
-    del utility_grade  # Kept for caller compatibility; readiness is grade-independent.
-    if verdict in {"harness", "cutoff_degraded", "runtime_failure"}:
-        return "avoid"
-    if verdict == "token_cap" or has_presentation_warning:
-        return "caveat"
-    if verdict in {"context_budget", "unknown_runtime_anomaly"}:
-        return "caveat"
-    if (
-        verdict in {"model_shortcoming", "semantic_mismatch"}
-        or hint_relationship == "degrades_trusted_hints"
-    ):
-        return "avoid"
-    is_clean_recommended = (
-        verdict == "clean"
-        and hint_relationship
-        in {
-            "improves_trusted_hints",
-            "preserves_trusted_hints",
-            "not_evaluated",
-        }
-        and not has_contract_issue
-    )
-    return "recommended" if is_clean_recommended else "caveat"
-
-
-def _detect_refusal_patterns(text: str) -> tuple[bool, str | None]:
-    """Detect if model refused or expressed high uncertainty.
-
-    Catches cases where the model can't or won't process the image.
-
-    Args:
-        text: Generated text to check
-
-    Returns:
-        Tuple of (is_refusal, refusal_type)
-    """
-    if not text:
-        return False, None
-
-    text_lower: str = text.lower()
-
-    # Refusal patterns
-    refusal_patterns: list[tuple[str, list[str]]] = []
-
-    for refusal_type, pattern_key in (
-        ("explicit_refusal", "refusal_explicit"),
-        ("uncertainty", "refusal_uncertainty"),
-        ("insufficient_info", "refusal_insufficient_info"),
-    ):
-        patterns: list[str] = _get_quality_pattern_list(pattern_key, [])
-        if patterns:
-            refusal_patterns.append((refusal_type, patterns))
-
-    if not refusal_patterns:
-        # Fallback defaults
-
-        refusal_patterns = [
-            (
-                "explicit_refusal",
-                [
-                    "i cannot",
-                    "i can't",
-                    "i'm unable to",
-                    "i am unable to",
-                    "sorry, i can't",
-                    "sorry, i cannot",
-                ],
-            ),
-            (
-                "uncertainty",
-                [
-                    "it's unclear",
-                    "it's difficult to say",
-                    "i'm not sure",
-                    "i cannot determine",
-                    "unable to determine",
-                    "difficult to tell",
-                ],
-            ),
-            (
-                "insufficient_info",
-                [
-                    "not enough information",
-                    "insufficient detail",
-                    "cannot see clearly",
-                    "too blurry",
-                    "image quality",
-                ],
-            ),
-        ]
-
-    for refusal_type, patterns in refusal_patterns:
-        if any(pattern in text_lower for pattern in patterns):
-            return True, refusal_type
-
-    return False, None
-
-
-def _detect_generic_output(text: str) -> tuple[bool, float]:
-    """Detect overly generic or uninformative descriptions.
-
-    Identifies low-quality captions that lack specific details.
-
-    Args:
-        text: Generated text to check
-
-    Returns:
-        Tuple of (is_generic, specificity_score where lower = more generic)
-    """
-    if not text or len(text) < QUALITY.min_text_length_for_generic:
-        return False, 0.0
-
-    text_lower: str = text.lower()
-    word_count: int = len(text.split())
-
-    if word_count == 0:
-        return False, 0.0
-
-    # Count filler/hedge words
-    filler_words: list[str] = _get_quality_pattern_list(
-        "filler_words",
-        [
-            "appears to",
-            "seems to",
-            "looks like",
-            "might be",
-            "could be",
-            "some",
-            "several",
-            "various",
-            "many",
-            "few",
-            "very",
-            "quite",
-            "rather",
-            "somewhat",
-            "fairly",
-            "thing",
-            "stuff",
-            "item",
-            "object",
-        ],
-    )
-    filler_count: int = sum(text_lower.count(filler) for filler in filler_words)
-
-    # Calculate filler ratio
-    filler_ratio: float = filler_count / word_count
-
-    # Check for specific details (numbers, measurements, colors, names)
-    has_numbers: bool = bool(re.search(r"\d+", text))
-    has_specific_colors: bool = bool(
-        re.search(
-            r"\b(red|blue|green|yellow|orange|purple|pink|brown|black|white|gray|grey)\b",
-            text_lower,
-        ),
-    )
-    has_proper_nouns: bool = bool(re.search(r"\b[A-Z][a-z]+", text))
-
-    specificity_indicators: int = sum([has_numbers, has_specific_colors, has_proper_nouns])
-
-    # Generic if high filler ratio and low specificity
-    is_generic: bool = (
-        filler_ratio > QUALITY.generic_filler_threshold
-        and specificity_indicators < QUALITY.min_specificity_indicators
-    )
-
-    # Specificity score: higher = more specific (0-100)
-    specificity_score: float = max(
-        0.0,
-        100 - (filler_ratio * 200) + (specificity_indicators * 20),
-    )
-
-    return is_generic, round(specificity_score, 1)
-
-
-def _detect_language_mixing(
-    text: str,
-    quality_thresholds: QualityThresholds | None = None,
-) -> tuple[bool, list[str]]:
-    """Detect unexpected language switches and tokenizer-artifact text.
-
-    Natural-language mixing and leaked special tokens both surface as unreadable
-    output noise, so this helper reports them through the same issue channel.
-
-    Args:
-        text: Generated text to check
-        quality_thresholds: Optional configuration override for patterns and thresholds
-
-    Returns:
-        Tuple of (has_mixing, list of detected issues)
-    """
-    if not text:
-        return False, []
-
-    if quality_thresholds is None:
-        quality_thresholds = QUALITY
-
-    rules = (
-        (
-            "tokenizer_artifacts",
-            (
-                r"<\|endoftext\|>",
-                r"<\|end\|>",
-                r"<s>",
-                r"</s>",
-                r"\[SEP\]",
-                r"\[CLS\]",
-                r"\[PAD\]",
-                r"\[UNK\]",
-                r"\[MASK\]",
-                r"<pad>",
-                r"<unk>",
-                r"<mask>",
-            ),
-            "tokenizer_artifact",
-            re.IGNORECASE,
-        ),
-        (
-            "code_patterns",
-            (
-                r"\bdef\s+\w+\(",
-                r"\bfunction\s+\w+\(",
-                r"\bclass\s+\w+",
-                r"\bimport\s+\w+",
-                r"\breturn\s+",
-            ),
-            "code_snippet",
-            0,
-        ),
-    )
-    issues = list(
-        _configured_regex_issues(
-            text,
-            rules,
-            debug_context="language mixing",
-            quality_thresholds=quality_thresholds,
-        )
-    )
-
-    return bool(issues), issues
-
-
-def _detect_output_degeneration(text: str) -> tuple[bool, str | None]:
-    """Detect end-of-output degeneration (rubbish/nonsense at the end).
-
-    LLMs sometimes fail to stop properly and produce:
-    - Repeated special characters or punctuation
-    - Incomplete sentences cut off mid-word
-    - Unicode rubbish or control characters
-    - Repeated newlines/whitespace patterns
-
-    Args:
-        text: Generated text to check
-
-    Returns:
-        Tuple of (has_degeneration, degeneration_type)
-    """
-    if not text or len(text) < QUALITY.min_text_for_degeneration:
-        return False, None
-
-    # Check the last portion of the text (where degeneration typically appears)
-    tail_length: int = min(200, len(text) // 3)
-    tail: str = text[-tail_length:]
-    result: str | None = None
-
-    # 1. Detect repeated punctuation/special char loops at end. Require a true
-    # run of the same character so Markdown endings like "**Keywords:**" do not
-    # look like degenerate punctuation.
-    punctuation_run_pattern = (
-        r"([.?!,;:\-_=+*#])\1{"
-        f"{QUALITY.min_repeated_punctuation_run - 1},"
-        r"}\s*$"
-    )
-    punct_repeat: re.Match[str] | None = re.search(punctuation_run_pattern, tail)
-    if punct_repeat:
-        result = f"repeated_punctuation: '{punct_repeat.group(1)[:10]}...'"
-
-    # 2. Detect incomplete sentence (ends mid-word or with lowercase without punctuation)
-    if result is None:
-        stripped: str = text.rstrip()
-        if stripped:
-            last_char: str = stripped[-1]
-            # Normal endings: . ! ? ) " ' ] }
-            normal_endings: str = ".!?)]}'\"}"
-            if last_char not in normal_endings:
-                last_word_match: re.Match[str] | None = re.search(r"\b(\w+)$", stripped)
-                if last_word_match:
-                    last_word: str = last_word_match.group(1)
-                    if len(last_word) <= QUALITY.min_cutoff_word_length and last_word.islower():
-                        result = f"incomplete_sentence: ends with '{last_word}'"
-
-    # 3. Detect Unicode rubbish/control characters (excluding normal whitespace)
-    if result is None:
-        control_chars: list[str] = re.findall(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]", tail)
-        if len(control_chars) > QUALITY.max_control_chars:
-            result = f"control_characters: {len(control_chars)} found"
-
-    # 4. Detect repeated newline patterns (degenerate spacing)
-    if result is None and "\n\n\n\n\n\n" in tail:
-        result = "excessive_newlines"
-
-    # 5. Detect character-level repetition at the end
-    if result is None:
-        char_repeat: re.Match[str] | None = re.search(r"(.{1,3})\1{5,}\s*$", tail)
-        if char_repeat:
-            pattern: str = char_repeat.group(1)
-            result = f"character_loop: '{pattern}' repeated"
-
-    # 6. Detect sudden encoding shift
-    if result is None and len(text) > tail_length * 2:
-        head: str = text[:-tail_length]
-        ascii_max: int = 127  # Standard ASCII range
-        head_non_ascii: float = len([c for c in head if ord(c) > ascii_max]) / max(len(head), 1)
-        tail_non_ascii: float = len([c for c in tail if ord(c) > ascii_max]) / max(len(tail), 1)
-        if (
-            tail_non_ascii > QUALITY.non_ascii_ratio_threshold
-            and tail_non_ascii > head_non_ascii * QUALITY.non_ascii_ratio_multiplier
-        ):
-            result = "encoding_shift"
-
-    return (result is not None), result
-
-
-def _detect_fabricated_details(text: str) -> tuple[bool, list[str]]:
-    """Detect potentially fabricated specific details (hallucination).
-
-    LLMs sometimes invent specific details like:
-    - Fake dates (especially future dates or specific historical dates)
-    - Made-up URLs/links
-    - Invented statistics/percentages
-    - Fictional proper names in contexts where they shouldn't appear
-
-    Args:
-        text: Generated text to check
-
-    Returns:
-        Tuple of (has_fabrication, list of suspicious details)
-    """
-    if not text:
-        return False, []
-
-    issues: list[str] = []
-
-    # 1. Detect suspicious URLs (models often fabricate URLs)
-    url_patterns: list[str] = _get_quality_pattern_list(
-        "fabrication_url_patterns",
-        [r"https?://[^\s<>\"']+"],
-    )
-    urls: list[str] = _extract_pattern_matches(
-        text,
-        url_patterns,
-        debug_context="fabrication URL",
-        unique=True,
-    )
-
-    suspicious_url_keywords: list[str] = _get_quality_pattern_list(
-        "fabrication_suspicious_url_keywords",
-        ["example.com", "placeholder", "xxx", "fake"],
-    )
-    long_url_path_patterns: list[str] = _get_quality_pattern_list(
-        "fabrication_long_url_path_patterns",
-        [r"/[a-z0-9]{20,}/"],
-    )
-    for url in urls:
-        # Fabricated URLs often have suspicious patterns
-        if any(suspicious in url.lower() for suspicious in suspicious_url_keywords):
-            issues.append(f"suspicious_url: {url[:50]}")
-        # Very long URLs with random-looking paths
-        elif len(url) > QUALITY.max_url_length and _matches_any_pattern(
-            url.lower(),
-            long_url_path_patterns,
-            debug_context="fabrication long URL path",
-        ):
-            issues.append(f"fabricated_url: {url[:50]}...")
-
-    # 2. Detect invented precise statistics (suspiciously specific numbers)
-    # e.g., "exactly 73.847%" or "precisely 14,523 items"
-    precise_stat_patterns: list[str] = _get_quality_pattern_list(
-        "fabrication_precise_stat_patterns",
-        [r"\b(\d{1,3}(?:,\d{3})*\.\d{3,})\s*%?"],
-    )
-    precise_stats: list[str] = _extract_pattern_matches(
-        text,
-        precise_stat_patterns,
-        debug_context="fabrication precise stat",
-    )
-    if len(precise_stats) >= QUALITY.min_precise_stats:
-        issues.append(f"suspicious_precision: {len(precise_stats)} overly precise numbers")
-
-    # 3. Detect future dates (model can't know the future)
-    # Years 2030+ are definitely future
-    future_year_patterns: list[str] = _get_quality_pattern_list(
-        "fabrication_future_year_patterns",
-        [r"\b(20[3-9]\d|2[1-9]\d{2})\b"],
-    )
-    future_years: list[str] = _extract_pattern_matches(
-        text,
-        future_year_patterns,
-        debug_context="fabrication future year",
-        unique=True,
-    )
-    if future_years:
-        issues.append(f"future_date: {', '.join(future_years[:3])}")
-
-    # 4. Detect citations to non-existent sources (common hallucination)
-    # Patterns like "according to Smith et al. (2024)" or "(Johnson, 2025)"
-    citation_patterns: list[str] = _get_quality_pattern_list(
-        "fabrication_citation_patterns",
-        [r"\(([A-Z][a-z]+(?:\s+et\s+al\.?)?,?\s*\d{4})\)"],
-    )
-    fake_citations: list[str] = _extract_pattern_matches(
-        text,
-        citation_patterns,
-        debug_context="fabrication citation",
-        unique=True,
-    )
-    if fake_citations:
-        issues.append(f"unverifiable_citation: {', '.join(fake_citations[:2])}")
-
-    return bool(issues), issues
-
-
 # =============================================================================
 # SECTION: METRICS, SCORING & FIELD FORMATTING
 # =============================================================================
@@ -5737,65 +4140,6 @@ SPECIAL_TOKEN_LEAK_PATTERNS: Final[tuple[tuple[str, str], ...]] = (
     (r"\[CLS\]", "[CLS]"),
     (r"\[SEP\]", "[SEP]"),
 )
-
-
-def _detect_token_encoding_issues(text: str) -> tuple[bool, str | None]:
-    """Detect tokenizer decoding bugs where raw BPE tokens leak through.
-
-    Common pattern: Ġ (U+0120) appearing instead of spaces, indicating
-    the tokenizer's space-prefix marker wasn't decoded properly.
-
-    Args:
-        text: Generated text to check
-
-    Returns:
-        Tuple of (has_issue, issue_type)
-    """
-    if not text:
-        return False, None
-
-    # Check for Ġ (U+0120) - BPE space marker leak
-    # This is a specific HuggingFace tokenizer artifact
-    if "\u0120" in text:
-        space_leak_count: int = text.count("\u0120")
-        return True, f"bpe_space_leak({space_leak_count})"
-
-    # Check for Ċ (U+010A) - BPE newline marker leak
-    if "\u010a" in text:
-        newline_leak_count: int = text.count("\u010a")
-        return True, f"bpe_newline_leak({newline_leak_count})"
-
-    # Check for other common tokenizer artifacts that shouldn't be visible
-    for artifact, name in BPE_BYTE_ARTIFACTS:
-        if artifact in text and text.count(artifact) > QUALITY.min_bpe_artifact_count:
-            return True, f"bpe_byte_leak({name})"
-
-    return False, None
-
-
-def _sanitize_bpe_display(text: str, *, max_len: int = 120) -> str:
-    """Replace BPE marker characters with readable equivalents for display.
-
-    The result is truncated to *max_len* so it fits in issue titles and log
-    lines, while keeping marker leaks visible instead of rendering as blank
-    spaces.
-    """
-    marker_labels: list[str] = []
-    if "\u0120" in text:
-        marker_labels.append("BPE-space-marker")
-    if "\u010a" in text:
-        marker_labels.append("BPE-newline-marker")
-
-    cleaned = text.replace("\u0120", " ").replace("\u010a", "\\n")
-    for artifact, _name in BPE_BYTE_ARTIFACTS:
-        if artifact in cleaned:
-            marker_labels.append("BPE-byte-marker")
-            cleaned = cleaned.replace(artifact, "?")
-    if marker_labels:
-        cleaned = f"{cleaned} [markers: {', '.join(_dedupe_preserve_order(marker_labels))}]"
-    if len(cleaned) > max_len:
-        cleaned = cleaned[: max_len - 3].rstrip() + "..."
-    return cleaned
 
 
 def _detect_special_token_leakage(text: str) -> tuple[bool, list[str]]:
@@ -5899,232 +4243,6 @@ def _detect_minimal_output(
     return False, None
 
 
-def _detect_long_context_breakdown(
-    *,
-    prompt_tokens: int | None,
-    generated_tokens: int,
-    text: str,
-    is_repetitive: bool,
-    is_context_ignored: bool,
-    is_refusal: bool,
-) -> tuple[bool, str | None]:
-    """Detect likely long-context degradation that may indicate stack issues.
-
-    These signals are intentionally conservative and only trigger when prompt
-    token counts are high enough that prompt packing/prefill behavior can
-    dominate generation quality.
-    """
-    if prompt_tokens is None or prompt_tokens < QUALITY.long_prompt_tokens_threshold:
-        return False, None
-
-    safe_prompt_tokens: int = max(prompt_tokens, 1)
-    ratio: float = generated_tokens / safe_prompt_tokens
-    text_empty: bool = not text.strip()
-
-    if text_empty and generated_tokens == 0:
-        return True, f"long_context_empty({prompt_tokens}tok)"
-
-    if generated_tokens < QUALITY.min_output_tokens_for_ratio and ratio < QUALITY.min_output_ratio:
-        weak_reason = _minimal_output_weakness_reason(text, generated_tokens)
-        if weak_reason is not None:
-            weak_label = _minimal_output_weakness_label(weak_reason)
-            return True, (
-                f"long_context_low_ratio({ratio:.1%};{prompt_tokens}->{generated_tokens};"
-                f"{weak_label})"
-            )
-
-    if prompt_tokens >= QUALITY.severe_prompt_tokens_threshold and is_repetitive:
-        return True, f"long_context_repetition({prompt_tokens}tok)"
-
-    if (
-        prompt_tokens >= QUALITY.severe_prompt_tokens_threshold
-        and is_context_ignored
-        and not is_refusal
-    ):
-        return True, f"long_context_context_drop({prompt_tokens}tok)"
-
-    return False, None
-
-
-def _detect_training_data_leak(text: str) -> tuple[bool, str | None]:
-    """Detect training data or instruction template leaking into output.
-
-    Some models fail to stop and start generating what looks like
-    training examples or new instructions mid-output.
-
-    Args:
-        text: Generated text to check
-
-    Returns:
-        Tuple of (has_leak, leak_type)
-    """
-    if not text or len(text) < QUALITY.min_text_for_leak_detection:
-        return False, None
-
-    # Only check the latter portion of output (leaks happen after good output)
-    check_portion: str = text[len(text) // 3 :]
-    rules = (
-        (
-            "training_leak_instruction_header_patterns",
-            (r"\n# INSTRUCTION\b",),
-            "instruction_header",
-            re.DOTALL,
-        ),
-        (
-            "training_leak_task_header_patterns",
-            (r"\n## (Task|Question|Instructions?):",),
-            "task_header",
-            re.DOTALL,
-        ),
-        (
-            "training_leak_write_prompt_patterns",
-            (r"\nWrite a (?:short )?(?:story|essay|poem|code)",),
-            "write_prompt",
-            re.DOTALL,
-        ),
-        (
-            "training_leak_user_turn_patterns",
-            (r"\n(?:User|Human|Question):\s*\n",),
-            "user_turn",
-            re.DOTALL,
-        ),
-        (
-            "training_leak_code_example_patterns",
-            (r"\n```\w+\n.*?def \w+\(",),
-            "code_example",
-            re.DOTALL,
-        ),
-        ("training_leak_qa_pair_patterns", (r"\nQ:\s*\n.*?\nA:\s*\n",), "qa_pair", re.DOTALL),
-    )
-    leak_type = next(
-        _configured_regex_issues(
-            check_portion,
-            rules,
-            debug_context="training leak",
-        ),
-        None,
-    )
-    return leak_type is not None, leak_type
-
-
-def compute_vocabulary_diversity(text: str) -> tuple[float, int, int]:
-    """Compute lexical diversity as type-token ratio (TTR).
-
-    Tokenization uses lowercase alphabetic words, returning
-    ``(ttr, unique_words, total_words)``.
-    """
-    if not text:
-        return 0.0, 0, 0
-
-    # Normalize: lowercase, extract word tokens only
-    words: list[str] = re.findall(r"\b[a-z]+\b", text.lower())
-    total_words: int = len(words)
-
-    if total_words == 0:
-        return 0.0, 0, 0
-
-    unique_words: int = len(set(words))
-    ttr: float = unique_words / total_words
-
-    return round(ttr, 3), unique_words, total_words
-
-
-def compute_efficiency_metrics(
-    tokens_generated: int,
-    generation_time: float | None,
-    peak_memory_gb: float | None,
-) -> dict[str, float | None]:
-    """Compute efficiency metrics combining speed and memory usage.
-
-    Args:
-        tokens_generated: Number of tokens generated
-        generation_time: Time for generation in seconds
-        peak_memory_gb: Peak memory usage in GB
-
-    Returns:
-        Dict with computed efficiency metrics:
-        - tokens_per_second: Generation speed
-        - tokens_per_gb: Tokens generated per GB of memory (efficiency)
-        - tokens_per_second_per_gb: Combined efficiency metric
-    """
-    metrics: dict[str, float | None] = {
-        "tokens_per_second": None,
-        "tokens_per_gb": None,
-        "tokens_per_second_per_gb": None,
-    }
-
-    if generation_time and generation_time > 0:
-        metrics["tokens_per_second"] = round(tokens_generated / generation_time, 1)
-
-    if peak_memory_gb and peak_memory_gb > 0:
-        metrics["tokens_per_gb"] = round(tokens_generated / peak_memory_gb, 1)
-
-        if generation_time and generation_time > 0:
-            tps: float = tokens_generated / generation_time
-            metrics["tokens_per_second_per_gb"] = round(tps / peak_memory_gb, 2)
-
-    return metrics
-
-
-def detect_response_structure(text: str) -> dict[str, bool]:
-    """Detect if response contains expected structural elements.
-
-    For image cataloging tasks, we expect outputs to include captions,
-    keywords, and/or descriptions. This detects their presence.
-
-    This is a lightweight wrapper around compute_task_compliance() that
-    adds section detection and returns only boolean presence indicators.
-
-    Args:
-        text: Generated text to analyze
-
-    Returns:
-        Dict indicating presence of each structural element
-    """
-    if not text:
-        return {
-            "has_caption": False,
-            "has_keywords": False,
-            "has_description": False,
-            "has_sections": False,
-        }
-
-    # Reuse task compliance detection for the core elements
-    compliance: dict[str, bool | float] = compute_task_compliance(text)
-
-    # Add section detection (markdown headers)
-    has_sections: bool = bool(re.search(r"^#{1,3}\s+\w+", text, re.MULTILINE))
-
-    return {
-        "has_caption": bool(compliance["has_caption"]),
-        "has_keywords": bool(compliance["has_keywords"]),
-        "has_description": bool(compliance["has_description"]),
-        "has_sections": has_sections,
-    }
-
-
-def _get_quality_pattern_list(
-    pattern_key: str,
-    fallback: list[str],
-    *,
-    quality_thresholds: QualityThresholds | None = None,
-) -> list[str]:
-    """Return configured regex/pattern list for a key, falling back to defaults."""
-    if quality_thresholds is None:
-        quality_thresholds = QUALITY
-
-    if not quality_thresholds.patterns:
-        return fallback
-
-    configured: list[str] | None = quality_thresholds.patterns.get(pattern_key)
-    if not configured:
-        return fallback
-
-    # Guard against malformed YAML values while keeping detector behavior stable.
-    valid: list[str] = [p for p in configured if isinstance(p, str)]
-    return valid or fallback
-
-
 def _contains_labeled_section(text_lower: str, label_patterns: list[str]) -> bool:
     """Return True if text contains any configured section label pattern."""
     for pattern in label_patterns:
@@ -6159,1478 +4277,44 @@ def _compile_regex_for_detection(
     return compiled
 
 
-def _extract_pattern_matches(
-    text: str,
-    patterns: list[str],
-    *,
-    debug_context: str,
-    flags: int = 0,
-    unique: bool = False,
-) -> list[str]:
-    """Return regex matches for configured patterns, ignoring invalid regex entries."""
-    matches: list[str] = []
-    seen: set[str] = set()
-
-    for pattern in patterns:
-        compiled = _compile_regex_for_detection(
-            pattern,
-            debug_context=debug_context,
-            flags=flags,
-        )
-        if compiled is None:
-            continue
-        for match in compiled.finditer(text):
-            value: str = match.group(0)
-            if not value:
-                continue
-            if unique and value in seen:
-                continue
-            matches.append(value)
-            seen.add(value)
-
-    return matches
-
-
-def _matches_any_pattern(
-    text: str,
-    patterns: list[str],
-    *,
-    debug_context: str,
-    flags: int = 0,
-) -> bool:
-    """Return True if text matches at least one configured regex pattern."""
-    for pattern in patterns:
-        compiled = _compile_regex_for_detection(
-            pattern,
-            debug_context=debug_context,
-            flags=flags,
-        )
-        if compiled and compiled.search(text):
-            return True
-    return False
-
-
-def _count_pattern_matches(text: str, patterns: list[str]) -> int:
-    """Count total regex matches across all configured patterns."""
-    total: int = 0
-    for pattern in patterns:
-        compiled = _compile_regex_for_detection(pattern, debug_context="pattern")
-        if compiled is None:
-            continue
-        total += len(compiled.findall(text))
-    return total
-
-
-def compute_confidence_indicators(text: str) -> dict[str, float | int]:
-    """Analyze text for confidence/certainty indicators.
-
-    Hedge words indicate uncertainty; definitive language indicates confidence.
-    The ratio helps assess how certain the model is about its descriptions.
-
-    Args:
-        text: Generated text to analyze
-
-    Returns:
-        Dict with:
-        - hedge_count: Number of hedge words/phrases
-        - definitive_count: Number of definitive statements
-        - confidence_ratio: Ratio of definitive to (definitive + hedge)
-    """
-    if not text:
-        return {"hedge_count": 0, "definitive_count": 0, "confidence_ratio": 0.0}
-
-    text_lower: str = text.lower()
-
-    hedge_patterns: list[str] = _get_quality_pattern_list(
-        "confidence_hedge_patterns",
-        [
-            r"\bappears to\b",
-            r"\bseems to\b",
-            r"\blooks like\b",
-            r"\bmight be\b",
-            r"\bcould be\b",
-            r"\bpossibly\b",
-            r"\bperhaps\b",
-            r"\bprobably\b",
-            r"\blikely\b",
-            r"\bmaybe\b",
-            r"\bi think\b",
-            r"\bi believe\b",
-            r"\bit's unclear\b",
-            r"\buncertain\b",
-        ],
-    )
-    definitive_patterns: list[str] = _get_quality_pattern_list(
-        "confidence_definitive_patterns",
-        [
-            r"\bis a\b",
-            r"\bare \w+\b",
-            r"\bshows\b",
-            r"\bdepicts\b",
-            r"\bfeatures\b",
-            r"\bcontains\b",
-            r"\bdefinitely\b",
-            r"\bclearly\b",
-            r"\bobviously\b",
-        ],
-    )
-
-    hedge_count: int = _count_pattern_matches(text_lower, hedge_patterns)
-    definitive_count: int = _count_pattern_matches(text_lower, definitive_patterns)
-
-    total: int = hedge_count + definitive_count
-    confidence_ratio: float = definitive_count / total if total > 0 else 0.5
-
-    return {
-        "hedge_count": hedge_count,
-        "definitive_count": definitive_count,
-        "confidence_ratio": round(confidence_ratio, 2),
-    }
-
-
 # =============================================================================
 # CATALOGING-SPECIFIC QUALITY METRICS
 # =============================================================================
 
 
-def compute_information_gain(text: str, context: str | None) -> dict[str, float | int]:
-    """Measure novel information in output beyond what was provided in context.
-
-    For cataloging tasks, we want models to add value beyond just echoing the
-    context hint. This measures how much new information the model contributes.
-
-    Args:
-        text: Generated text to analyze
-        context: Original context/hint provided to the model
-
-    Returns:
-        Dict with:
-        - context_words: Words from context
-        - output_words: Words in output
-        - novel_words: Words in output not in context
-        - echo_ratio: Fraction of output that's just echoed context (lower = better)
-        - information_gain: Fraction of output that's novel (higher = better)
-    """
-    if not text:
-        return {
-            "context_words": 0,
-            "output_words": 0,
-            "novel_words": 0,
-            "echo_ratio": 0.0,
-            "information_gain": 0.0,
-        }
-
-    # Extract meaningful words (lowercase, alpha only, 3+ chars)
-    def extract_words(s: str) -> set[str]:
-        return {w.lower() for w in re.findall(r"\b[a-zA-Z]{3,}\b", s)}
-
-    output_words = extract_words(text)
-    context_words = extract_words(context) if context else set()
-
-    if not output_words:
-        return {
-            "context_words": len(context_words),
-            "output_words": 0,
-            "novel_words": 0,
-            "echo_ratio": 0.0,
-            "information_gain": 0.0,
-        }
-
-    # Words in output that came from context (echoed)
-    # Words in output that came from context (echoed)
-    echoed_words = output_words & context_words
-    # Words in output that are novel (not in context)
-    novel_words = output_words - context_words
-
-    echo_ratio = len(echoed_words) / len(output_words) if output_words else 0.0
-    information_gain = len(novel_words) / len(output_words) if output_words else 0.0
-
-    # Penalised echo: only count nonvisual/instructional context reuse.
-    # Models are expected to reuse visual hint terms (e.g. "church", "sunset")
-    # — only structural or metadata terms count as problematic echo.
-    nonvisual_context = {w for w in context_words if _is_nonvisual_context_term(w)}
-    penalized_echo = output_words & nonvisual_context
-    penalized_echo_ratio = len(penalized_echo) / len(output_words) if output_words else 0.0
-
-    return {
-        "context_words": len(context_words),
-        "output_words": len(output_words),
-        "novel_words": len(novel_words),
-        "echo_ratio": round(echo_ratio, 2),
-        "penalized_echo_ratio": round(penalized_echo_ratio, 2),
-        "information_gain": round(information_gain, 2),
-    }
-
-
-def compute_task_compliance(text: str) -> dict[str, bool | float]:
-    """Check if output follows the requested structure for cataloging tasks.
-
-    When asked for "caption, description, and keywords", models should provide
-    all three components. This measures compliance with that structure.
-
-    Args:
-        text: Generated text to analyze
-
-    Returns:
-        Dict with:
-        - has_caption: Contains a caption or title
-        - has_description: Contains descriptive text
-        - has_keywords: Contains keywords or tags
-        - compliance_score: 0-1 score based on components present
-    """
-    if not text:
-        return {
-            "has_caption": False,
-            "has_description": False,
-            "has_keywords": False,
-            "compliance_score": 0.0,
-        }
-
-    text_lower = text.lower()
-
-    caption_labels = _get_quality_pattern_list(
-        "task_caption_labels",
-        ["caption", "title"],
-    )
-    description_labels = _get_quality_pattern_list(
-        "task_description_labels",
-        ["description", "details?", "summary"],
-    )
-    keyword_labels = _get_quality_pattern_list(
-        "task_keyword_labels",
-        ["keywords?", "tags?"],
-    )
-
-    # Check for explicit labeled sections
-    has_explicit_caption = _contains_labeled_section(text_lower, caption_labels)
-    has_explicit_description = _contains_labeled_section(text_lower, description_labels)
-    has_explicit_keywords = _contains_labeled_section(text_lower, keyword_labels)
-
-    # Check for implicit structure (bullet lists for keywords, paragraphs for description)
-    has_bullet_list = bool(re.search(r"^[-•*]\s+\w+", text, re.MULTILINE))
-    has_paragraph = len(text.split()) > QUALITY.substantial_prose_words
-
-    # Combine explicit and implicit signals
-    has_caption = has_explicit_caption or (
-        # First line could be a caption if short and followed by more text
-        len(text.split("\n", maxsplit=1)[0].split()) <= QUALITY.max_caption_words
-        and len(text.split("\n")) > 1
-    )
-    has_description = has_explicit_description or has_paragraph
-    has_keywords = has_explicit_keywords or has_bullet_list
-
-    # Extract strict constraint data
-    (
-        _,
-        title_word_count,
-        description_sentence_count,
-        keyword_count,
-        keyword_dup_ratio,
-    ) = _analyze_catalog_contract(text)
-
-    score = 0.0
-
-    # Caption/Title scoring
-    if has_caption:
-        score += 0.16
-        if (
-            title_word_count is not None
-            and QUALITY.min_title_words <= title_word_count <= QUALITY.max_title_words
-        ):
-            score += 0.17
-
-    # Description scoring
-    if has_description:
-        score += 0.17
-        if (
-            description_sentence_count is not None
-            and QUALITY.min_description_sentences
-            <= description_sentence_count
-            <= QUALITY.max_description_sentences
-        ):
-            score += 0.17
-
-    # Keywords scoring
-    if has_keywords:
-        score += 0.16
-        if (
-            keyword_count is not None
-            and QUALITY.min_keywords_count <= keyword_count <= QUALITY.max_keywords_count
-        ):
-            keyword_score = 0.17
-            if (
-                keyword_dup_ratio is not None
-                and keyword_dup_ratio >= QUALITY.keyword_duplication_ratio_threshold
-            ):
-                keyword_score = 0.0
-            score += keyword_score
-
-    return {
-        "has_caption": has_caption,
-        "has_description": has_description,
-        "has_keywords": has_keywords,
-        "compliance_score": round(score, 2),
-    }
-
-
-def compute_visual_grounding(text: str, context: str | None) -> dict[str, float | int]:
-    """Measure references to actual visual elements vs. just context regurgitation.
-
-    Good cataloging descriptions should reference what's actually visible in the
-    image - colors, objects, people, actions, spatial relationships - not just
-    repeat location/date metadata from the context.
-
-    Args:
-        text: Generated text to analyze
-        context: Original context provided (to distinguish visual from contextual)
-
-    Returns:
-        Dict with:
-        - visual_terms: Count of visual description terms
-        - spatial_terms: Count of spatial relationship terms
-        - color_terms: Count of color references
-        - grounding_score: 0-1 overall visual grounding score
-    """
-    if not text:
-        return {
-            "visual_terms": 0,
-            "spatial_terms": 0,
-            "color_terms": 0,
-            "grounding_score": 0.0,
-        }
-
-    text_lower = text.lower()
-    context_lower = (context or "").lower()
-
-    # Visual object/element terms (things you can see)
-    visual_patterns = _get_quality_pattern_list(
-        "visual_grounding_visual_patterns",
-        [
-            r"\b(building|house|shop|store|street|road|car|vehicle|person|people|pedestrian)\b",
-            r"\b(sign|window|door|roof|wall|brick|stone|glass)\b",
-            r"\b(tree|sky|cloud|hill|mountain|grass|flower)\b",
-            r"\b(light|lamp|shadow|reflection|glow)\b",
-            r"\b(wearing|standing|sitting|walking|driving)\b",
-        ],
-    )
-
-    # Spatial relationship terms
-    spatial_patterns = _get_quality_pattern_list(
-        "visual_grounding_spatial_patterns",
-        [
-            r"\b(left|right|center|middle|foreground|background)\b",
-            r"\b(above|below|beside|behind|front|back)\b",
-            r"\b(near|far|distant|close|adjacent)\b",
-            r"\b(top|bottom|side|corner|edge)\b",
-        ],
-    )
-
-    # Color terms
-    color_patterns = _get_quality_pattern_list(
-        "visual_grounding_color_patterns",
-        [
-            r"\b(red|blue|green|yellow|orange|purple|pink|brown|black|white|gray|grey)\b",
-            r"\b(golden|silver|bronze|dark|light|bright|pale|vivid)\b",
-            r"\b(warm|cool|muted|saturated)\b",
-        ],
-    )
-
-    visual_count = _count_pattern_matches(text_lower, visual_patterns)
-    spatial_count = _count_pattern_matches(text_lower, spatial_patterns)
-    color_count = _count_pattern_matches(text_lower, color_patterns)
-
-    # Penalize if visual terms are just from context (not novel observations)
-    context_visual = _count_pattern_matches(context_lower, visual_patterns) if context else 0
-    novel_visual = max(0, visual_count - context_visual)
-
-    # Calculate grounding score (weighted combination)
-    # More weight to novel visual observations
-    word_count = len(text.split())
-    if word_count == 0:
-        grounding_score = 0.0
-    else:
-        # Normalize by output length, cap at 1.0
-        raw_score = (novel_visual * 2 + spatial_count + color_count) / max(word_count / 10, 1)
-        grounding_score = min(1.0, raw_score)
-
-    return {
-        "visual_terms": visual_count,
-        "spatial_terms": spatial_count,
-        "color_terms": color_count,
-        "grounding_score": round(grounding_score, 2),
-    }
-
-
-def _bounded_range_score(value: int, *, lower: int, upper: int) -> float:
-    """Score an integer against an inclusive target range on a 0-1 scale."""
-    if value <= 0:
-        return 0.0
-    if lower <= value <= upper:
-        return 1.0
-    if value < lower:
-        return min(value / max(lower, 1), 1.0)
-    return min(upper / max(value, 1), 1.0)
-
-
-def _extract_description_candidate(text: str) -> str:
-    """Extract the best available prose field for description scoring."""
-    if not text:
-        return ""
-
-    sections = _extract_catalog_sections(text)
-    for section_name in ("description", "title"):
-        candidate = sections.get(section_name, "").strip()
-        if candidate:
-            return candidate
-    return text.strip()
-
-
-def _extract_keyword_terms_for_scoring(text: str) -> list[str]:
-    """Extract explicit keyword terms from catalog-style output."""
-    if not text:
-        return []
-
-    sections = _extract_catalog_sections(text)
-    keywords_text = sections.get("keywords", "").strip()
-    if keywords_text:
-        return _split_catalog_keywords(keywords_text)
-
-    bullet_terms: list[str] = []
-    for raw_line in text.splitlines():
-        stripped = raw_line.strip()
-        if not stripped.startswith(("-", "*", "•")):
-            continue
-        candidate = stripped.lstrip("-*• ").strip()
-        if not candidate:
-            continue
-        if re.match(r"(?i)^(title|description|keywords)\s*:", candidate):
-            continue
-        bullet_terms.append(candidate)
-    if bullet_terms:
-        return _split_catalog_keywords("\n".join(bullet_terms))
-    return []
-
-
-def compute_description_quality(text: str, context: str | None) -> dict[str, float | int]:
-    """Score how useful the prose is for image description work."""
-    description_text = _extract_description_candidate(text)
-    if not description_text or len(description_text.strip()) < QUALITY.min_useful_chars:
-        return {
-            "description_score": 0.0,
-            "description_word_count": 0,
-            "description_sentence_count": 0,
-            "description_detail_coverage": 0.0,
-            "description_grounding_score": 0.0,
-            "description_specificity_score": 0.0,
-        }
-
-    word_count = len(re.findall(r"[A-Za-z0-9']+", description_text))
-    sentence_count = _count_factual_sentences(description_text)
-    grounding = compute_visual_grounding(description_text, context)
-    _is_generic, specificity_score = _detect_generic_output(description_text)
-
-    detail_hits = sum(
-        int(count > 0)
-        for count in (
-            int(grounding["visual_terms"]),
-            int(grounding["spatial_terms"]),
-            int(grounding["color_terms"]),
-        )
-    )
-    detail_coverage = detail_hits / 3
-    length_score = min(word_count / max(QUALITY.substantial_prose_words, 1), 1.0)
-    sentence_fit = _bounded_range_score(
-        sentence_count,
-        lower=QUALITY.min_description_sentences,
-        upper=QUALITY.max_description_sentences,
-    )
-
-    description_score = (
-        (
-            float(grounding["grounding_score"])
-            + detail_coverage
-            + min(specificity_score / 100.0, 1.0)
-            + length_score
-            + sentence_fit
-        )
-        / 5
-    ) * 100.0
-
-    return {
-        "description_score": round(description_score, 1),
-        "description_word_count": word_count,
-        "description_sentence_count": sentence_count,
-        "description_detail_coverage": round(detail_coverage, 2),
-        "description_grounding_score": float(grounding["grounding_score"]),
-        "description_specificity_score": round(specificity_score, 1),
-    }
-
-
-def compute_keyword_quality(text: str, context: str | None) -> dict[str, float | int]:
-    """Score how useful the keyword field is for image indexing work."""
-    keyword_terms = _extract_keyword_terms_for_scoring(text)
-    if not keyword_terms:
-        return {
-            "keyword_score": 0.0,
-            "keyword_term_count": 0,
-            "keyword_unique_terms": 0,
-            "keyword_duplication_ratio": 0.0,
-            "keyword_category_coverage": 0.0,
-            "keyword_grounding_score": 0.0,
-        }
-
-    normalized_terms = [_normalize_phrase_for_matching(term) for term in keyword_terms]
-    unique_pairs: list[tuple[str, str]] = []
-    seen_terms: set[str] = set()
-    for term, normalized in zip(keyword_terms, normalized_terms, strict=False):
-        if not normalized or normalized in seen_terms:
-            continue
-        seen_terms.add(normalized)
-        unique_pairs.append((term, normalized))
-
-    total_terms = len(keyword_terms)
-    unique_terms = len(unique_pairs)
-    duplication_ratio = 1.0 - (unique_terms / max(total_terms, 1))
-    unique_term_text = ", ".join(term for term, _normalized in unique_pairs)
-
-    composition_patterns = _get_quality_pattern_list(
-        "keyword_composition_patterns",
-        [
-            r"\b(close[- ]up|macro|wide angle|panoramic|aerial|overhead)\b",
-            r"\b(high angle|low angle|symmetry|copy space|selective focus|bokeh)\b",
-            r"\b(portrait|landscape format|minimalism|leading lines)\b",
-        ],
-    )
-    generic_keyword_patterns = _get_quality_pattern_list(
-        "keyword_generic_patterns",
-        [
-            r"\bimage\b",
-            r"\bphoto(graph)?\b",
-            r"\bpicture\b",
-            r"\bvisual\b",
-            r"\bscene\b",
-            r"\bbeautiful\b",
-            r"\bnice\b",
-        ],
-    )
-    grounding = compute_visual_grounding(unique_term_text, context)
-    composition_count = _count_pattern_matches(unique_term_text.casefold(), composition_patterns)
-    category_hits = sum(
-        (
-            int(int(grounding["visual_terms"]) > 0),
-            int(int(grounding["color_terms"]) > 0),
-            int(int(grounding["spatial_terms"]) > 0 or composition_count > 0),
-        ),
-    )
-    category_coverage = category_hits / 3
-    count_fit = _bounded_range_score(
-        total_terms,
-        lower=QUALITY.min_keywords_count,
-        upper=QUALITY.max_keywords_count,
-    )
-    minimum_multiword_term_tokens = 2
-    uniqueness_score = max(0.0, 1.0 - duplication_ratio)
-    generic_count = sum(
-        1
-        for term, _normalized in unique_pairs
-        if any(re.search(pattern, term, re.IGNORECASE) for pattern in generic_keyword_patterns)
-    )
-    multiword_count = sum(
-        1
-        for term, _normalized in unique_pairs
-        if len(re.findall(r"[A-Za-z0-9']+", term)) >= minimum_multiword_term_tokens
-    )
-    specificity_score = (
-        max(unique_terms - generic_count, 0) / max(unique_terms, 1)
-        + (multiword_count / max(unique_terms, 1))
-    ) / 2
-
-    keyword_score = (
-        (
-            count_fit
-            + uniqueness_score
-            + category_coverage
-            + specificity_score
-            + float(grounding["grounding_score"])
-        )
-        / 5
-    ) * 100.0
-
-    return {
-        "keyword_score": round(keyword_score, 1),
-        "keyword_term_count": total_terms,
-        "keyword_unique_terms": unique_terms,
-        "keyword_duplication_ratio": round(duplication_ratio, 2),
-        "keyword_category_coverage": round(category_coverage, 2),
-        "keyword_grounding_score": float(grounding["grounding_score"]),
-    }
-
-
-def compute_cataloging_utility(
-    text: str,
-    context: str | None,
-    *,
-    info_gain: dict[str, float | int] | None = None,
-    task_compliance: dict[str, bool | float] | None = None,
-    visual_grounding: dict[str, float | int] | None = None,
-) -> dict[str, float | int | str]:
-    """Compute overall cataloging utility score combining all metrics.
-
-    This is the primary "is this output useful for cataloging?" metric.
-
-    Args:
-        text: Generated text to analyze
-        context: Original context provided
-        info_gain: Pre-computed information gain (computed if None)
-        task_compliance: Pre-computed task compliance (computed if None)
-        visual_grounding: Pre-computed visual grounding (computed if None)
-
-    Returns:
-        Dict with:
-        - utility_score: 0-100 overall utility for cataloging
-        - utility_grade: Letter grade (A-F)
-        - primary_weakness: Main issue limiting utility
-    """
-    if not text or len(text.strip()) < QUALITY.min_useful_chars:
-        return {
-            "utility_score": 0.0,
-            "utility_grade": "F",
-            "primary_weakness": "Empty or minimal output",
-            "description_score": 0.0,
-            "keyword_score": 0.0,
-            "description_word_count": 0,
-            "keyword_term_count": 0,
-            "keyword_unique_terms": 0,
-            "keyword_duplication_ratio": 0.0,
-            "keyword_category_coverage": 0.0,
-        }
-
-    # Compute sub-metrics if not provided
-    if info_gain is None:
-        info_gain = compute_information_gain(text, context)
-    if task_compliance is None:
-        task_compliance = compute_task_compliance(text)
-    if visual_grounding is None:
-        visual_grounding = compute_visual_grounding(text, context)
-
-    # Extract key values
-    information_gain_score = float(info_gain.get("information_gain", 0.0))
-    echo_ratio = float(info_gain.get("penalized_echo_ratio", info_gain.get("echo_ratio", 0.0)))
-    compliance_score = float(task_compliance.get("compliance_score", 0.0))
-    grounding_score = float(visual_grounding.get("grounding_score", 0.0))
-    description_quality = compute_description_quality(text, context)
-    keyword_quality = compute_keyword_quality(text, context)
-    description_score = float(description_quality.get("description_score", 0.0))
-    keyword_score = float(keyword_quality.get("keyword_score", 0.0))
-
-    # Compute echo penalty inline
-    word_count = len(text.split())
-    if echo_ratio > QUALITY.severe_echo_threshold:
-        echo_penalty = QUALITY.severe_echo_penalty  # Severe penalty for mostly echoing
-    elif echo_ratio > QUALITY.moderate_echo_threshold:
-        echo_penalty = QUALITY.moderate_echo_penalty  # Moderate penalty
-    else:
-        echo_penalty = 1.0  # No penalty
-
-    # Compute length factor inline
-    if word_count < QUALITY.min_useful_words:
-        length_factor, length_weakness = (
-            QUALITY.very_short_length_factor,
-            "Output too short to be useful",
-        )
-    elif word_count < QUALITY.short_output_words:
-        length_factor, length_weakness = QUALITY.short_length_factor, "Output lacks detail"
-    else:
-        length_factor, length_weakness = 1.0, ""
-
-    # Weighted combination (out of 100)
-    raw_score = (
-        information_gain_score * QUALITY.cataloging_weight_information_gain
-        + compliance_score * QUALITY.cataloging_weight_compliance
-        + grounding_score * QUALITY.cataloging_weight_grounding
-        + min(word_count / 50, 1.0) * QUALITY.cataloging_weight_length
-    )
-
-    final_score = raw_score * echo_penalty * length_factor
-
-    # Identify primary weakness using threshold checks
-    weakness_checks = [
-        (bool(length_weakness), length_weakness),
-        (
-            echo_ratio > QUALITY.moderate_echo_threshold,
-            "Mostly echoes context without adding value",
-        ),
-        (
-            keyword_score < QUALITY.grade_d_threshold,
-            "Keywords are not specific or diverse enough",
-        ),
-        (
-            description_score < QUALITY.grade_d_threshold,
-            "Description lacks concrete visual detail",
-        ),
-        (grounding_score < QUALITY.low_grounding_threshold, "Lacks visual description of image"),
-        (compliance_score < QUALITY.low_compliance_threshold, "Missing requested structure"),
-        (information_gain_score < QUALITY.low_info_gain_threshold, "Limited novel information"),
-    ]
-    weakness = next((msg for cond, msg in weakness_checks if cond), "None identified")
-
-    # Convert score to grade using threshold lookup
-    grade_thresholds = [
-        (QUALITY.grade_a_threshold, "A"),
-        (QUALITY.grade_b_threshold, "B"),
-        (QUALITY.grade_c_threshold, "C"),
-        (QUALITY.grade_d_threshold, "D"),
-    ]
-    grade = next((g for thresh, g in grade_thresholds if final_score >= thresh), "F")
-
-    return {
-        "utility_score": round(final_score, 1),
-        "utility_grade": grade,
-        "primary_weakness": weakness,
-        "description_score": round(description_score, 1),
-        "keyword_score": round(keyword_score, 1),
-        "description_word_count": int(description_quality.get("description_word_count", 0)),
-        "keyword_term_count": int(keyword_quality.get("keyword_term_count", 0)),
-        "keyword_unique_terms": int(keyword_quality.get("keyword_unique_terms", 0)),
-        "keyword_duplication_ratio": float(
-            keyword_quality.get("keyword_duplication_ratio", 0.0),
-        ),
-        "keyword_category_coverage": float(keyword_quality.get("keyword_category_coverage", 0.0)),
-    }
-
-
-def _extract_metadata_baseline_text(context: str | None) -> str | None:
-    """Extract compact baseline text from prompt context metadata hints.
-
-    The prompt context may include wrapper labels (for example ``Title hint:``).
-    This helper strips wrappers so baseline utility is scored on metadata content.
-    """
-    if not context:
-        return None
-
-    label_prefixes: tuple[str, ...] = (
-        "title hint:",
-        "description hint:",
-        "keyword hints:",
-        "title:",
-        "description:",
-        "keywords:",
-    )
-    extracted_lines: list[str] = []
-    for raw_line in context.splitlines():
-        line = raw_line.strip().lstrip("-").strip()
-        if not line:
-            continue
-        if line.lower().startswith("existing metadata hints"):
-            continue
-        line_lower = line.lower()
-        if line_lower.startswith(("capture metadata:", "capture metadata hints:")):
-            continue
-        for prefix in label_prefixes:
-            if line_lower.startswith(prefix):
-                line = line[len(prefix) :].strip()
-                break
-        if line:
-            extracted_lines.append(line)
-
-    merged = " ".join(extracted_lines).strip()
-    return merged or None
-
-
-def _compute_metadata_baseline_utility(context: str | None) -> tuple[float, str] | None:
-    """Compute baseline utility score/grade from existing image metadata context."""
-    baseline_text = _extract_metadata_baseline_text(context)
-    if not baseline_text:
-        return None
-    baseline_utility = compute_cataloging_utility(baseline_text, None)
-    return (
-        float(baseline_utility["utility_score"]),
-        str(baseline_utility["utility_grade"]),
-    )
-
-
-def _build_metadata_scoring_inputs(
-    provenance: MetadataProvenance,
-) -> tuple[str | None, str | None, tuple[str, ...], tuple[str, ...]]:
-    """Extract trusted reference fields and nonvisual metadata terms for scoring."""
-    if not provenance.has_authoritative_context and not provenance.has_draft:
-        return None, None, (), ()
-
-    nonvisual_terms: list[str] = list(provenance.authoritative_terms)
-    for capture_value in (
-        provenance.capture_date,
-        provenance.capture_time,
-        provenance.gps,
-    ):
-        if capture_value:
-            nonvisual_terms.append(capture_value)
-            nonvisual_terms.extend(_extract_hint_signal_terms(capture_value))
-
-    deduped_nonvisual_terms = _dedupe_preserve_order(nonvisual_terms)
-    filtered_title = _strip_nonvisual_terms_from_text(
-        provenance.draft_title or "", deduped_nonvisual_terms
-    )
-    filtered_description = _strip_nonvisual_terms_from_text(
-        provenance.draft_description or "",
-        deduped_nonvisual_terms,
-    )
-
-    return (
-        filtered_title or None,
-        filtered_description or None,
-        provenance.draft_keywords,
-        tuple(deduped_nonvisual_terms),
-    )
-
-
-def _score_metadata_title(
-    generated_sections: dict[str, str],
-    reference_title: str | None,
-) -> tuple[float, set[str], set[str]]:
-    """Score recall of trusted title terms in the generated title field."""
-    if not reference_title:
-        return 0.0, set(), set()
-
-    generated_title = generated_sections.get("title", "").strip()
-    reference_terms, _nonvisual_terms = _partition_hint_terms(
-        _extract_hint_signal_terms(reference_title),
-    )
-    normalized_reference_terms = {
-        _normalize_phrase_for_matching(term)
-        for term in reference_terms
-        if _normalize_phrase_for_matching(term)
-    }
-    if not normalized_reference_terms:
-        normalized_reference = _normalize_phrase_for_matching(reference_title)
-        if normalized_reference:
-            normalized_reference_terms = {normalized_reference}
-
-    if not generated_title or not normalized_reference_terms:
-        return 0.0, set(), normalized_reference_terms
-
-    normalized_generated = _normalize_phrase_for_matching(generated_title)
-    normalized_reference_title = _normalize_phrase_for_matching(reference_title)
-    if normalized_reference_title and normalized_reference_title == normalized_generated:
-        return 100.0, normalized_reference_terms, set()
-
-    matched_terms = {
-        term
-        for term in normalized_reference_terms
-        if term and _context_term_present(term, normalized_generated)
-    }
-    recall = len(matched_terms) / len(normalized_reference_terms)
-    return round(recall * 100.0, 1), matched_terms, normalized_reference_terms - matched_terms
-
-
-def _score_metadata_description(
-    generated_sections: dict[str, str],
-    reference_terms: tuple[str, ...],
-) -> tuple[float, set[str], set[str]]:
-    """Score recall of salient metadata terms in the generated description field."""
-    normalized_reference_terms = {
-        _normalize_phrase_for_matching(term)
-        for term in reference_terms
-        if _normalize_phrase_for_matching(term)
-    }
-    if not normalized_reference_terms:
-        return 0.0, set(), set()
-
-    generated_description = generated_sections.get("description", "").strip()
-    if not generated_description:
-        return 0.0, set(), normalized_reference_terms
-
-    normalized_generated = _normalize_phrase_for_matching(generated_description)
-    matched_terms = {
-        term
-        for term in normalized_reference_terms
-        if term and _context_term_present(term, normalized_generated)
-    }
-    recall = len(matched_terms) / len(normalized_reference_terms)
-    return round(recall * 100.0, 1), matched_terms, normalized_reference_terms - matched_terms
-
-
-def _score_metadata_keywords(
-    generated_sections: dict[str, str],
-    reference_keywords: tuple[str, ...],
-) -> tuple[float, set[str], set[str]]:
-    """Score F1 overlap between generated keywords and metadata keywords."""
-    normalized_reference_terms = {
-        _normalize_phrase_for_matching(term)
-        for term in reference_keywords
-        if _normalize_phrase_for_matching(term)
-    }
-    if not normalized_reference_terms:
-        return 0.0, set(), set()
-
-    generated_keyword_text = generated_sections.get("keywords", "").strip()
-    if not generated_keyword_text:
-        return 0.0, set(), normalized_reference_terms
-
-    generated_keywords = _dedupe_preserve_order(_split_catalog_keywords(generated_keyword_text))
-    normalized_generated_terms = {
-        _normalize_phrase_for_matching(term)
-        for term in generated_keywords
-        if _normalize_phrase_for_matching(term)
-    }
-    if not normalized_generated_terms:
-        return 0.0, set(), normalized_reference_terms
-
-    matched_terms = normalized_reference_terms & normalized_generated_terms
-    precision = len(matched_terms) / len(normalized_generated_terms)
-    recall = len(matched_terms) / len(normalized_reference_terms)
-    f1_score = (
-        0.0 if (precision + recall) == 0.0 else (2 * precision * recall) / (precision + recall)
-    )
-    return round(f1_score * 100.0, 1), matched_terms, normalized_reference_terms - matched_terms
-
-
-def _score_nonvisual_metadata_leakage(
-    text: str,
-    provenance: MetadataProvenance,
-) -> tuple[float, tuple[str, ...]]:
-    """Penalize claims that copy capture date/time/GPS as visible image content."""
-    if not text:
-        return 0.0, ()
-
-    nonvisual_terms: list[str] = []
-    for capture_value in (provenance.capture_date, provenance.capture_time, provenance.gps):
-        if capture_value:
-            nonvisual_terms.append(capture_value)
-            nonvisual_terms.extend(_extract_hint_signal_terms(capture_value))
-    nonvisual_terms = _dedupe_preserve_order(nonvisual_terms)
-    if not nonvisual_terms:
-        return 0.0, ()
-
-    text_lower = text.casefold()
-    normalized_text = _normalize_phrase_for_matching(text)
-    hits = _dedupe_preserve_order(
-        [
-            term
-            for term in nonvisual_terms
-            if term.casefold() in text_lower or _context_term_present(term, normalized_text)
-        ],
-    )
-    if not hits:
-        return 0.0, ()
-
-    scaled_penalty = (min(len(hits), 3) / 3) * QUALITY.metadata_agreement_nonvisual_penalty
-    return round(scaled_penalty, 1), tuple(hits)
-
-
-def _score_authoritative_context(
-    text: str,
-    provenance: MetadataProvenance,
-) -> tuple[float | None, tuple[str, ...]]:
-    """Score correct integration of authoritative location/context terms."""
-    terms = tuple(_dedupe_preserve_order(provenance.authoritative_terms))
-    if not terms:
-        return None, ()
-    normalized = _normalize_phrase_for_matching(text)
-    matched = tuple(term for term in terms if _context_term_present(term, normalized))
-    target = min(len(terms), QUALITY.metadata_alignment_partial_match_cap)
-    return round(min(len(matched) / max(target, 1), 1.0) * 100.0, 1), matched
-
-
-def _score_draft_improvement(
-    text: str,
-    provenance: MetadataProvenance,
-) -> float | None:
-    """Score utility gain and descriptive novelty relative to fallible draft metadata."""
-    draft_parts = [
-        value for value in (provenance.draft_title, provenance.draft_description) if value
-    ]
-    if provenance.draft_keywords:
-        draft_parts.append(", ".join(provenance.draft_keywords))
-    if not draft_parts:
-        return None
-
-    baseline = compute_cataloging_utility("\n".join(draft_parts), None)
-    generated = compute_cataloging_utility(text, None)
-    delta = float(generated["utility_score"]) - float(baseline["utility_score"])
-    utility_improvement = max(0.0, min(100.0, 50.0 + delta))
-
-    normalized_draft_terms = {
-        _normalize_phrase_for_matching(term) for term in provenance.draft_terms if term
-    }
-    generated_terms = {
-        _normalize_phrase_for_matching(term) for term in _extract_hint_signal_terms(text)
-    }
-    generated_terms.discard("")
-    if not generated_terms:
-        return 0.0
-    novel_terms = generated_terms - normalized_draft_terms
-    novelty_ratio = len(novel_terms) / len(generated_terms)
-    novelty_factor = 0.25 + (0.75 * novelty_ratio)
-    return round(utility_improvement * novelty_factor, 1)
-
-
-def _weighted_available_score(
-    components: Sequence[tuple[float | None, float]],
-) -> float | None:
-    """Combine available components after normalizing their configured weights."""
-    available = [(value, weight) for value, weight in components if value is not None]
-    if not available:
-        return None
-    weight_total = sum(weight for _value, weight in available)
-    return round(sum(value * weight for value, weight in available) / weight_total, 1)
-
-
-def _score_assisted_enrichment(
-    text: str,
-    provenance: MetadataProvenance,
-) -> tuple[float | None, float | None, float | None, float | None]:
-    """Return provenance-aware assisted enrichment component scores."""
-    context_integration_score, _matched_context = _score_authoritative_context(text, provenance)
-    draft_improvement_score = _score_draft_improvement(text, provenance)
-    utility = compute_cataloging_utility(text, None)
-    visual_description_score = (
-        float(utility["description_score"])
-        if provenance.has_authoritative_context or provenance.has_draft
-        else None
-    )
-    output_quality_score = (
-        float(compute_task_compliance(text)["compliance_score"]) * 100.0
-        if provenance.has_authoritative_context or provenance.has_draft
-        else None
-    )
-    assisted_enrichment_score = _weighted_available_score(
-        (
-            (visual_description_score, QUALITY.assisted_weight_visual_description),
-            (context_integration_score, QUALITY.assisted_weight_context_integration),
-            (draft_improvement_score, QUALITY.assisted_weight_draft_improvement),
-            (output_quality_score, QUALITY.assisted_weight_output_quality),
-        ),
-    )
-    return (
-        context_integration_score,
-        draft_improvement_score,
-        visual_description_score,
-        assisted_enrichment_score,
-    )
-
-
-def _score_unstructured_metadata_caption(
-    text: str,
-    reference_terms: Sequence[str],
-) -> tuple[float, tuple[str, ...], tuple[str, ...]]:
-    """Score free-form caption overlap with trusted visual metadata terms."""
-    reference_terms = tuple(_dedupe_preserve_order(reference_terms))
-    if not text.strip() or not reference_terms:
-        return 0.0, (), tuple(reference_terms)
-
-    normalized_text = _normalize_phrase_for_matching(text)
-    matched_terms = tuple(
-        term for term in reference_terms if _context_term_present(term, normalized_text)
-    )
-    missed_terms = tuple(term for term in reference_terms if term not in matched_terms)
-    target_matches = min(QUALITY.metadata_alignment_partial_match_cap, len(reference_terms))
-    score = min(len(matched_terms) / max(target_matches, 1), 1.0) * 100.0
-    return round(score, 1), matched_terms, missed_terms
-
-
-def compute_metadata_agreement(
-    text: str,
-    metadata: MetadataDict | None,
-) -> MetadataAgreementMetrics:
-    """Compute post-generation agreement against trusted image metadata."""
-    if not text.strip() or not metadata:
-        return MetadataAgreementMetrics()
-
-    provenance = _build_metadata_provenance(metadata)
-    reference_title, reference_description, reference_keywords, _nonvisual_terms = (
-        _build_metadata_scoring_inputs(provenance)
-    )
-    (
-        context_integration_score,
-        draft_improvement_score,
-        visual_description_score,
-        assisted_enrichment_score,
-    ) = _score_assisted_enrichment(text, provenance)
-    generated_sections = _extract_catalog_sections(text)
-
-    reference_terms_display: list[str] = []
-    for free_text in filter(None, (reference_title, reference_description)):
-        trusted_terms, _nonvisual_hint_terms = _partition_hint_terms(
-            _extract_hint_signal_terms(free_text),
-        )
-        reference_terms_display.extend(trusted_terms)
-    reference_terms_display.extend(reference_keywords)
-    reference_terms_display = _dedupe_preserve_order(reference_terms_display)
-
-    if not generated_sections:
-        nonvisual_penalty, nonvisual_hits = _score_nonvisual_metadata_leakage(text, provenance)
-        caption_score, matched_terms, missed_terms = _score_unstructured_metadata_caption(
-            text,
-            reference_terms_display,
-        )
-        return MetadataAgreementMetrics(
-            overall_score=round(max(0.0, min(100.0, caption_score - nonvisual_penalty)), 1),
-            title_score=0.0,
-            description_score=caption_score,
-            keyword_score=0.0,
-            nonvisual_penalty=nonvisual_penalty,
-            matched_terms=matched_terms,
-            missed_terms=missed_terms,
-            nonvisual_hits=nonvisual_hits,
-            context_integration_score=context_integration_score,
-            draft_improvement_score=draft_improvement_score,
-            visual_description_score=visual_description_score,
-            assisted_enrichment_score=assisted_enrichment_score,
-        )
-
-    title_score, title_matched, _title_missed = _score_metadata_title(
-        generated_sections,
-        reference_title,
-    )
-    description_score, description_matched, _description_missed = _score_metadata_description(
-        generated_sections,
-        tuple(reference_terms_display),
-    )
-    keyword_score, keyword_matched, _keyword_missed = _score_metadata_keywords(
-        generated_sections,
-        reference_keywords,
-    )
-    nonvisual_penalty, nonvisual_hits = _score_nonvisual_metadata_leakage(text, provenance)
-
-    weighted_components: list[tuple[float, float]] = []
-    if reference_title:
-        weighted_components.append((title_score, QUALITY.metadata_agreement_weight_title))
-    if reference_terms_display:
-        weighted_components.append(
-            (description_score, QUALITY.metadata_agreement_weight_description),
-        )
-    if reference_keywords:
-        weighted_components.append((keyword_score, QUALITY.metadata_agreement_weight_keywords))
-
-    weighted_score = 0.0
-    if weighted_components:
-        weight_total = sum(weight for _score, weight in weighted_components)
-        weighted_score = sum(score * weight for score, weight in weighted_components) / weight_total
-
-    matched_normalized_terms = title_matched | description_matched | keyword_matched
-    matched_terms = tuple(
-        term
-        for term in reference_terms_display
-        if _normalize_phrase_for_matching(term) in matched_normalized_terms
-    )
-    missed_terms = tuple(
-        term
-        for term in reference_terms_display
-        if _normalize_phrase_for_matching(term) not in matched_normalized_terms
-    )
-
-    return MetadataAgreementMetrics(
-        overall_score=round(max(0.0, min(100.0, weighted_score - nonvisual_penalty)), 1),
-        title_score=title_score,
-        description_score=description_score,
-        keyword_score=keyword_score,
-        nonvisual_penalty=nonvisual_penalty,
-        matched_terms=matched_terms,
-        missed_terms=missed_terms,
-        nonvisual_hits=nonvisual_hits,
-        context_integration_score=context_integration_score,
-        draft_improvement_score=draft_improvement_score,
-        visual_description_score=visual_description_score,
-        assisted_enrichment_score=assisted_enrichment_score,
-    )
-
-
 @dataclass(frozen=True)
 class GenerationQualityAnalysis:
-    """Analysis results for generated text quality.
-
-    Consolidates all quality checks into a single structured result.
-    Each check detects a different failure mode:
-
-    - Repetition: Model stuck in a loop outputting same tokens
-    - Hallucination: Fabricated structures (tables, code) not in the image
-    - Verbosity: Excessive meta-commentary instead of content
-    - Formatting: HTML/Markdown artifacts breaking output display
-    - Context ignorance: Output doesn't reference provided context
-    - Refusal: Model declines to answer (capability or safety)
-    - Generic output: Boilerplate without image-specific content
-    - Language mixing: Unexpected language/script switches
-    - Degeneration: Garbage characters, encoding corruption
-    - Fabrication: Hallucinated specific details (dates, names, stats)
-    - Harness issues: mlx-vlm integration bugs, not model quality problems
-    """
+    """Mechanical observations and runtime facts used by ``ResultAssessment``."""
 
     is_repetitive: bool
     repeated_token: str | None
-    hallucination_issues: list[str]
-    is_verbose: bool
-    formatting_issues: list[str]
-    has_excessive_bullets: bool
-    bullet_count: int
-    is_context_ignored: bool
-    missing_context_terms: list[str]
-    is_refusal: bool
-    refusal_type: str | None
-    is_generic: bool
-    specificity_score: float
-    has_language_mixing: bool
-    language_mixing_issues: list[str]
-    has_degeneration: bool
-    degeneration_type: str | None
-    has_fabrication: bool
-    fabrication_issues: list[str]
-    text_sanity_issue_type: str | None = None
-    generation_loop_type: str | None = None
-    metadata_alignment_score: float | None = None
-    metadata_alignment_issue: str | None = None
-    draft_improvement_score: float | None = None
     missing_sections: list[str] = dataclass_field(default_factory=list)
-    title_word_count: int | None = None
-    description_sentence_count: int | None = None
-    keyword_count: int | None = None
-    keyword_duplication_ratio: float | None = None
-    has_reasoning_leak: bool = False
-    reasoning_leak_markers: list[str] = dataclass_field(default_factory=list)
     has_thinking_trace: bool = False
     thinking_trace_incomplete: bool = False
     thinking_trace_markers: list[str] = dataclass_field(default_factory=list)
-    has_context_echo: bool = False
-    context_echo_ratio: float = 0.0
-    # Harness issues indicate mlx-vlm integration bugs, not model quality problems
-    has_harness_issue: bool = False
-    harness_issue_type: str | None = None
-    harness_issue_details: list[str] = dataclass_field(default_factory=list)
-    # Lightweight metrics useful for JSONL/report triage
     word_count: int = 0
-    unique_ratio: float = 0.0
     prompt_checks_ran: bool = False
     instruction_echo: bool = False
-    metadata_borrowing: bool = False
-    hint_relationship: str = "not_evaluated"
-    verdict: str = "clean"
-    owner: str = "model"
-    user_bucket: str = "recommended"
-    evidence: list[str] = dataclass_field(default_factory=list)
     likely_capped: bool = False
     requested_max_tokens: int | None = None
     prompt_tokens_total: int | None = None
     prompt_tokens_text_est: int | None = None
     prompt_tokens_nontext_est: int | None = None
     special_token_wrappers: list[str] = dataclass_field(default_factory=list)
+    unexpected_special_tokens: list[str] = dataclass_field(default_factory=list)
     keyword_overlap: KeywordOverlapState = "not_assessable"
-
-    @property
-    def has_title_length_violation(self) -> bool:
-        """Return True when title word count violates configured bounds."""
-        return self.title_word_count is not None and not (
-            QUALITY.min_title_words <= self.title_word_count <= QUALITY.max_title_words
-        )
-
-    @property
-    def has_description_sentence_violation(self) -> bool:
-        """Return True when description sentence count violates configured bounds."""
-        return self.description_sentence_count is not None and not (
-            QUALITY.min_description_sentences
-            <= self.description_sentence_count
-            <= QUALITY.max_description_sentences
-        )
-
-    @property
-    def has_keyword_count_violation(self) -> bool:
-        """Return True when keyword count violates configured bounds."""
-        return self.keyword_count is not None and not (
-            QUALITY.min_keywords_count <= self.keyword_count <= QUALITY.max_keywords_count
-        )
-
-    @property
-    def has_keyword_duplication_violation(self) -> bool:
-        """Return True when keyword duplication exceeds configured threshold."""
-        return (
-            self.keyword_duplication_ratio is not None
-            and self.keyword_duplication_ratio >= QUALITY.keyword_duplication_ratio_threshold
-        )
-
-    def has_any_issues(self) -> bool:
-        """Return True if any quality issues were detected."""
-        issue_flags = (
-            self.is_repetitive,
-            bool(self.hallucination_issues),
-            self.is_verbose,
-            bool(self.formatting_issues),
-            self.has_excessive_bullets,
-            self.is_context_ignored,
-            self.is_refusal,
-            self.is_generic,
-            self.has_language_mixing,
-            self.has_degeneration,
-            self.has_fabrication,
-            self.text_sanity_issue_type is not None,
-            self.generation_loop_type is not None,
-            self.metadata_alignment_issue is not None,
-            bool(self.missing_sections),
-            self.has_title_length_violation,
-            self.has_description_sentence_violation,
-            self.has_keyword_count_violation,
-            self.has_keyword_duplication_violation,
-            self.has_reasoning_leak,
-            self.thinking_trace_incomplete,
-            self.has_context_echo,
-            self.has_harness_issue,
-            self.instruction_echo,
-            self.metadata_borrowing,
-            self.verdict != "clean",
-        )
-        return any(issue_flags)
-
-    @property
-    def issues(self) -> list[str]:
-        """Return a list of all detected quality issues as human-readable strings."""
-        issues_list: list[str] = []
-        keyword_duplication_label = (
-            f"Keyword duplication ({self.keyword_duplication_ratio:.0%} duplicated terms)"
-            if self.keyword_duplication_ratio is not None
-            else "Keyword duplication"
-        )
-        thinking_marker = (
-            self.thinking_trace_markers[0] if self.thinking_trace_markers else "marker"
-        )
-        thinking_trace_label = (
-            f"Thinking trace incomplete (expected model protocol; opened with {thinking_marker})"
-            if self.thinking_trace_incomplete
-            else f"Thinking trace present (expected model protocol; {thinking_marker})"
-        )
-
-        scalar_issues = [
-            (
-                self.is_repetitive,
-                f"Repetitive output ({self.repeated_token})",
-            ),
-            (self.is_verbose, "Excessive verbosity"),
-            (self.has_excessive_bullets, f"Excessive bullet points ({self.bullet_count})"),
-            (
-                self.is_context_ignored,
-                "No overlap with supplied context indicators",
-            ),
-            (self.is_refusal, f"Refusal detected ({self.refusal_type})"),
-            (
-                self.is_generic,
-                f"Generic output (specificity: {self.specificity_score:.2f})",
-            ),
-            (self.has_degeneration, f"Output degeneration ({self.degeneration_type})"),
-            (
-                self.text_sanity_issue_type is not None,
-                f"Text sanity issue ({self.text_sanity_issue_type})",
-            ),
-            (
-                self.generation_loop_type is not None,
-                f"Generation loop ({self.generation_loop_type})",
-            ),
-            (
-                self.metadata_alignment_issue is not None,
-                f"Metadata alignment issue ({self.metadata_alignment_issue})",
-            ),
-            (bool(self.missing_sections), f"Missing sections ({', '.join(self.missing_sections)})"),
-            (
-                self.has_title_length_violation,
-                (
-                    "Title length violation "
-                    f"({self.title_word_count} words; expected "
-                    f"{QUALITY.min_title_words}-{QUALITY.max_title_words})"
-                ),
-            ),
-            (
-                self.has_description_sentence_violation,
-                (
-                    "Description sentence violation "
-                    f"({self.description_sentence_count}; expected "
-                    f"{QUALITY.min_description_sentences}-{QUALITY.max_description_sentences})"
-                ),
-            ),
-            (
-                self.has_keyword_count_violation,
-                (
-                    "Keyword count violation "
-                    f"({self.keyword_count}; expected "
-                    f"{QUALITY.min_keywords_count}-{QUALITY.max_keywords_count})"
-                ),
-            ),
-            (
-                self.has_keyword_duplication_violation,
-                keyword_duplication_label,
-            ),
-            (
-                self.has_reasoning_leak,
-                (
-                    f"Reasoning leak ({', '.join(self.reasoning_leak_markers[:2])})"
-                    if self.reasoning_leak_markers
-                    else "Reasoning leak"
-                ),
-            ),
-            (self.has_thinking_trace, thinking_trace_label),
-            (self.has_context_echo, f"Context echo ({self.context_echo_ratio:.0%} overlap)"),
-            (self.instruction_echo, "Instruction echo"),
-            (self.metadata_borrowing, "Unverified context copy"),
-            (
-                self.draft_improvement_score is not None
-                and self.draft_improvement_score < QUALITY.low_draft_improvement_score,
-                "Low draft improvement",
-            ),
-            (self.likely_capped, "Likely capped by max token budget"),
-            (
-                self.hint_relationship == "ignores_trusted_hints",
-                "Ignores trusted hints",
-            ),
-            (
-                self.hint_relationship == "degrades_trusted_hints",
-                "Degrades trusted hints",
-            ),
-        ]
-        issues_list.extend(label for condition, label in scalar_issues if condition)
-        issues_list.extend(self.hallucination_issues)
-        issues_list.extend(self.formatting_issues)
-        issues_list.extend(self.language_mixing_issues)
-        issues_list.extend(self.fabrication_issues)
-
-        # Harness issues (prominently marked as integration problems)
-        if self.has_harness_issue:
-            harness_label = f"⚠️HARNESS:{self.harness_issue_type}"
-            issues_list.insert(0, harness_label)  # Put at front for visibility
-            issues_list.extend(self.harness_issue_details)
-        if self.verdict == "cutoff":
-            issues_list.insert(0, "⚠️REVIEW:cutoff")
-        elif self.verdict == "context_budget":
-            issues_list.insert(0, "⚠️REVIEW:context_budget")
-        return issues_list
 
 
 @dataclass(frozen=True)
 class PromptQualitySignals:
-    """Prompt-aware quality signals derived from trusted hints and contract checks."""
+    """Prompt-aware mechanical signals used by current-run assessment."""
 
-    prompt_bundle: TrustedHintBundle
-    is_context_ignored: bool = False
-    missing_context_terms: tuple[str, ...] = ()
-    has_reasoning_leak: bool = False
-    reasoning_leak_markers: tuple[str, ...] = ()
     has_thinking_trace: bool = False
     thinking_trace_incomplete: bool = False
     thinking_trace_markers: tuple[str, ...] = ()
-    has_context_echo: bool = False
-    context_echo_ratio: float = 0.0
     instruction_echo: bool = False
-    instruction_markers: tuple[str, ...] = ()
-    metadata_borrowing: bool = False
-    borrowed_metadata_terms: tuple[str, ...] = ()
     missing_sections: tuple[str, ...] = ()
-    title_word_count: int | None = None
-    description_sentence_count: int | None = None
-    keyword_count: int | None = None
-    keyword_duplication_ratio: float | None = None
     keyword_overlap: KeywordOverlapState = "not_assessable"
-
-
-@dataclass(frozen=True)
-class HarnessQualitySignals:
-    """Harness and integration signals derived from generated text."""
-
-    has_harness_issue: bool
-    harness_type: str | None
-    harness_issues: tuple[str, ...]
 
 
 def _collect_prompt_quality_signals(
@@ -7642,51 +4326,23 @@ def _collect_prompt_quality_signals(
     context_marker: str,
     model_name: str | None,
 ) -> PromptQualitySignals:
-    """Collect prompt-aware trusted-hint and contract signals."""
+    """Collect only prompt-aware signals used by the reduced assessment."""
     reasoning_signals = _detect_reasoning_output(raw_text or text, model_name=model_name)
-    instruction_echo, instruction_markers = _detect_instruction_echo(text)
+    instruction_echo, _instruction_markers = _detect_instruction_echo(text)
     if not prompt:
         return PromptQualitySignals(
-            prompt_bundle=TrustedHintBundle(),
-            has_reasoning_leak=reasoning_signals.has_reasoning_leak,
-            reasoning_leak_markers=reasoning_signals.reasoning_leak_markers,
             has_thinking_trace=reasoning_signals.has_thinking_trace,
             thinking_trace_incomplete=reasoning_signals.thinking_trace_incomplete,
             thinking_trace_markers=reasoning_signals.thinking_trace_markers,
             instruction_echo=instruction_echo,
-            instruction_markers=tuple(instruction_markers),
         )
 
     prompt_bundle = _extract_trusted_hint_bundle(prompt, context_marker=context_marker)
-    is_context_ignored, missing_context_terms = _detect_context_ignorance(
-        text,
-        prompt,
-        context_marker=context_marker,
-    )
-    has_context_echo, context_echo_ratio = _detect_context_echo(
-        text,
-        prompt,
-        context_marker=context_marker,
-    )
-    metadata_borrowing, borrowed_metadata_terms = _detect_metadata_borrowing(
-        text,
-        prompt_bundle,
-    )
     missing_sections: list[str] = []
-    title_word_count: int | None = None
-    description_sentence_count: int | None = None
-    keyword_count: int | None = None
-    keyword_duplication_ratio: float | None = None
     if generated_tokens >= QUALITY.min_tokens_for_substantial and _prompt_requests_catalog_contract(
         prompt
     ):
-        (
-            missing_sections,
-            title_word_count,
-            description_sentence_count,
-            keyword_count,
-            keyword_duplication_ratio,
-        ) = _analyze_catalog_contract(text)
+        missing_sections, *_counts = _analyze_catalog_contract(text)
     generated_keywords = _split_catalog_keywords(
         _extract_catalog_sections(text).get("keywords", "")
     )
@@ -7696,152 +4352,12 @@ def _collect_prompt_quality_signals(
     )
 
     return PromptQualitySignals(
-        prompt_bundle=prompt_bundle,
-        is_context_ignored=is_context_ignored,
-        missing_context_terms=tuple(missing_context_terms),
-        has_reasoning_leak=reasoning_signals.has_reasoning_leak,
-        reasoning_leak_markers=reasoning_signals.reasoning_leak_markers,
         has_thinking_trace=reasoning_signals.has_thinking_trace,
         thinking_trace_incomplete=reasoning_signals.thinking_trace_incomplete,
         thinking_trace_markers=reasoning_signals.thinking_trace_markers,
-        has_context_echo=has_context_echo,
-        context_echo_ratio=context_echo_ratio,
         instruction_echo=instruction_echo,
-        instruction_markers=tuple(instruction_markers),
-        metadata_borrowing=metadata_borrowing,
-        borrowed_metadata_terms=tuple(borrowed_metadata_terms),
         missing_sections=tuple(missing_sections),
-        title_word_count=title_word_count,
-        description_sentence_count=description_sentence_count,
-        keyword_count=keyword_count,
-        keyword_duplication_ratio=keyword_duplication_ratio,
         keyword_overlap=keyword_overlap,
-    )
-
-
-def _collect_harness_quality_signals(
-    text: str,
-    *,
-    ignored_special_tokens: Sequence[str] = (),
-    generated_tokens: int,
-    prompt_tokens: int | None,
-    is_repetitive: bool,
-    is_context_ignored: bool,
-    is_refusal: bool,
-) -> HarnessQualitySignals:
-    """Collect harness and integration failure signals."""
-    harness_issues: list[str] = []
-    harness_type: str | None = None
-
-    has_encoding_issue, encoding_type = _detect_token_encoding_issues(text)
-    if has_encoding_issue and encoding_type:
-        harness_type = harness_type or "encoding"
-        harness_issues.append(f"token_encoding:{encoding_type}")
-
-    leakage_text = text
-    for token in ignored_special_tokens:
-        leakage_text = leakage_text.replace(token, " ")
-    has_token_leak, leaked_tokens = _detect_special_token_leakage(
-        _strip_empty_thinking_wrappers(leakage_text),
-    )
-    if has_token_leak:
-        harness_type = harness_type or "stop_token"
-        harness_issues.extend([f"token_leak:{tok}" for tok in leaked_tokens[:3]])
-
-    has_minimal, minimal_type = _detect_minimal_output(
-        text,
-        generated_tokens,
-        prompt_tokens=prompt_tokens,
-    )
-    if has_minimal and minimal_type:
-        harness_type = harness_type or "prompt_template"
-        harness_issues.append(f"output:{minimal_type}")
-
-    has_long_context_breakdown, long_context_issue = _detect_long_context_breakdown(
-        prompt_tokens=prompt_tokens,
-        generated_tokens=generated_tokens,
-        text=text,
-        is_repetitive=is_repetitive,
-        is_context_ignored=is_context_ignored,
-        is_refusal=is_refusal,
-    )
-    if has_long_context_breakdown and long_context_issue:
-        if harness_type in {None, "prompt_template"}:
-            harness_type = "long_context"
-        harness_issues.append(long_context_issue)
-
-    has_training_leak, leak_type = _detect_training_data_leak(text)
-    if has_training_leak and leak_type:
-        harness_type = harness_type or "generation_loop"
-        harness_issues.append(f"training_leak:{leak_type}")
-
-    return HarnessQualitySignals(
-        has_harness_issue=bool(harness_issues),
-        harness_type=harness_type,
-        harness_issues=tuple(harness_issues),
-    )
-
-
-def _detect_generation_loop_type(
-    *,
-    likely_capped: bool,
-    cutoff_reasons: Sequence[str],
-    is_repetitive: bool,
-    has_degeneration: bool,
-    text_sanity_issue_type: str | None,
-) -> str | None:
-    """Return a concise generation-loop subtype for capped pathological output."""
-    if not likely_capped:
-        return None
-    if is_repetitive or "repetitive_tail" in cutoff_reasons:
-        return "repetitive_tail"
-    if text_sanity_issue_type == "numeric_loop":
-        return "numeric_loop"
-    if text_sanity_issue_type is not None:
-        return "token_noise"
-    if has_degeneration:
-        return "degeneration"
-    return None
-
-
-def _analysis_has_contract_issue(analysis: GenerationQualityAnalysis) -> bool:
-    """Return whether an analysis violates the structured catalog contract."""
-    return bool(analysis.missing_sections) or any(
-        (
-            analysis.has_title_length_violation,
-            analysis.has_description_sentence_violation,
-            analysis.has_keyword_count_violation,
-            analysis.has_keyword_duplication_violation,
-        ),
-    )
-
-
-def _prompt_signals_have_contract_issue(prompt_signals: PromptQualitySignals) -> bool:
-    """Return whether prompt-derived contract signals violate catalog expectations."""
-    return bool(prompt_signals.missing_sections) or any(
-        (
-            prompt_signals.title_word_count is not None
-            and not (
-                QUALITY.min_title_words
-                <= prompt_signals.title_word_count
-                <= QUALITY.max_title_words
-            ),
-            prompt_signals.description_sentence_count is not None
-            and not (
-                QUALITY.min_description_sentences
-                <= prompt_signals.description_sentence_count
-                <= QUALITY.max_description_sentences
-            ),
-            prompt_signals.keyword_count is not None
-            and not (
-                QUALITY.min_keywords_count
-                <= prompt_signals.keyword_count
-                <= QUALITY.max_keywords_count
-            ),
-            prompt_signals.keyword_duplication_ratio is not None
-            and prompt_signals.keyword_duplication_ratio
-            >= QUALITY.keyword_duplication_ratio_threshold,
-        ),
     )
 
 
@@ -7855,222 +4371,62 @@ def analyze_generation_text(
     model_name: str | None = None,
     known_special_tokens: Sequence[str] = (),
 ) -> GenerationQualityAnalysis:
-    """Analyze generated text for quality issues.
-
-    Consolidates all quality detection logic into a single function to avoid
-    duplication between preview and verbose output modes.
-
-    Args:
-        text: Generated text to analyze
-        generated_tokens: Number of tokens generated
-        prompt_tokens: Number of prompt/prefill tokens (if available)
-        prompt: Optional prompt text for context ignorance detection
-        requested_max_tokens: Requested max generation tokens for cutoff detection
-        context_marker: Marker for context section in prompt
-        model_name: Model identifier used to recognise expected thinking protocols
-        known_special_tokens: Tokenizer-reported wrappers excluded from semantic scoring
-
-    Returns:
-        GenerationQualityAnalysis with all detected issues
-    """
+    """Collect mechanical output observations and recorded runtime facts."""
     normalized = _normalize_output_for_analysis(
         text,
         known_special_tokens=known_special_tokens,
     )
-    scoring_text = normalized.text
-    is_repetitive, repeated_token = _detect_repetitive_output(scoring_text)
-    hallucination_issues = _detect_hallucination_patterns(scoring_text)
-    is_verbose = _detect_excessive_verbosity(scoring_text, generated_tokens)
-    formatting_issues = _detect_formatting_violations(text)
-    has_excessive_bullets, bullet_count = _detect_excessive_bullets(scoring_text)
+    analysis_text = normalized.text
+    is_repetitive, repeated_token = _detect_repetitive_output(analysis_text)
     prompt_signals = _collect_prompt_quality_signals(
-        scoring_text,
+        analysis_text,
         raw_text=text,
         generated_tokens=generated_tokens,
         prompt=prompt,
         context_marker=context_marker,
         model_name=model_name,
     )
-
-    # Refusal detection: model declines to answer
-    is_refusal, refusal_type = _detect_refusal_patterns(scoring_text)
-
-    # Generic output: boilerplate without image-specific content
-    is_generic, specificity_score = _detect_generic_output(scoring_text)
-
-    # Language mixing: unexpected language/script switches
-    has_language_mixing, language_mixing_issues = _detect_language_mixing(scoring_text)
-
-    # Output degeneration: rubbish characters, encoding corruption
-    has_degeneration, degeneration_type = _detect_output_degeneration(scoring_text)
-
-    # Fabrication: hallucinated specific details
-    has_fabrication, fabrication_issues = _detect_fabricated_details(scoring_text)
-
-    has_text_sanity_issue, text_sanity_issue_type = _detect_text_sanity_issue(scoring_text)
-    if not has_text_sanity_issue:
-        text_sanity_issue_type = None
-
-    harness_signals = _collect_harness_quality_signals(
-        text,
-        ignored_special_tokens=normalized.removed_wrappers,
-        generated_tokens=generated_tokens,
-        prompt_tokens=prompt_tokens,
-        is_repetitive=is_repetitive,
-        is_context_ignored=prompt_signals.is_context_ignored,
-        is_refusal=is_refusal,
-    )
-
-    _ttr, unique_words, total_words = compute_vocabulary_diversity(scoring_text)
-    unique_ratio = unique_words / total_words if total_words else 0.0
     prompt_tokens_text_est = _estimate_prompt_tokens_from_text(prompt)
     prompt_tokens_nontext_est = (
         max(prompt_tokens - prompt_tokens_text_est, 0)
         if (prompt_tokens is not None and prompt_tokens_text_est is not None)
         else None
     )
-    likely_capped, cutoff_reasons = _detect_likely_cutoff(
-        scoring_text,
+    likely_capped, _cutoff_reasons = _detect_likely_cutoff(
+        analysis_text,
         generated_tokens=generated_tokens,
         requested_max_tokens=requested_max_tokens,
         is_repetitive=is_repetitive,
         missing_sections=prompt_signals.missing_sections,
     )
-    generation_loop_type = _detect_generation_loop_type(
-        likely_capped=likely_capped,
-        cutoff_reasons=cutoff_reasons,
-        is_repetitive=is_repetitive,
-        has_degeneration=has_degeneration,
-        text_sanity_issue_type=text_sanity_issue_type,
+    leakage_text = text
+    for token in normalized.removed_wrappers:
+        leakage_text = leakage_text.replace(token, " ")
+    _has_special_tokens, unexpected_special_tokens = _detect_special_token_leakage(
+        _strip_empty_thinking_wrappers(leakage_text),
     )
-    utility_context = prompt_signals.prompt_bundle.trusted_text or None
-    utility_grade = str(compute_cataloging_utility(scoring_text, utility_context)["utility_grade"])
-    hint_relationship = "not_evaluated"
-    hint_evidence: list[str] = []
-    if prompt_signals.prompt_bundle.trusted_text:
-        hint_relationship, hint_evidence = _classify_hint_relationship(
-            scoring_text,
-            prompt_signals.prompt_bundle,
-        )
-    verdict, review_evidence = _classify_review_verdict(
-        has_harness_issue=harness_signals.has_harness_issue,
-        harness_type=harness_signals.harness_type,
-        likely_cutoff=likely_capped,
-        cutoff_reasons=cutoff_reasons,
-        prompt_tokens_total=prompt_tokens,
-        prompt_tokens_text_est=prompt_tokens_text_est,
-        prompt_tokens_nontext_est=prompt_tokens_nontext_est,
-        missing_sections=prompt_signals.missing_sections,
-        utility_grade=utility_grade,
-        instruction_echo=prompt_signals.instruction_echo,
-        metadata_borrowing=prompt_signals.metadata_borrowing,
-        has_hallucination=bool(hallucination_issues),
-        text_sanity_issue_type=text_sanity_issue_type,
-    )
-    # Promote clean+F to unknown_runtime_anomaly when output is near-empty,
-    # signalling an unexplained failure that warrants manual triage.
-    if (
-        verdict == "clean"
-        and utility_grade == "F"
-        and len(scoring_text) < QUALITY.anomaly_min_output_chars
-    ):
-        verdict = "unknown_runtime_anomaly"
-        review_evidence.append("utility:F")
-    has_contract_issue = _prompt_signals_have_contract_issue(prompt_signals)
-    owner = _classify_review_owner(
-        harness_type=harness_signals.harness_type,
-        failure_owner=None,
-    )
-    user_bucket = _classify_user_bucket(
-        verdict=verdict,
-        hint_relationship=hint_relationship,
-        has_contract_issue=has_contract_issue,
-        has_presentation_warning=bool(
-            prompt_signals.has_thinking_trace
-            or prompt_signals.has_reasoning_leak
-            or formatting_issues
-        ),
-    )
-    conditional_evidence = (
-        ("instruction_markers", bool(prompt_signals.instruction_markers)),
-        ("metadata_terms", bool(prompt_signals.borrowed_metadata_terms)),
-        ("reasoning_leak", prompt_signals.has_reasoning_leak),
-        ("thinking_incomplete", prompt_signals.thinking_trace_incomplete),
-        ("context_echo", prompt_signals.has_context_echo),
-        ("refusal", is_refusal),
-        ("generic", is_generic),
-        ("degeneration", has_degeneration),
-        ("fabrication", has_fabrication),
-        ("text_sanity", text_sanity_issue_type is not None),
-        ("generation_loop", generation_loop_type is not None),
-        ("special_token_wrapper", bool(normalized.removed_wrappers)),
-        (
-            "reasoning_budget_exhausted",
-            prompt_signals.thinking_trace_incomplete and likely_capped,
-        ),
-    )
-    evidence = _dedupe_preserve_order(
-        [
-            *review_evidence,
-            *cutoff_reasons,
-            *hint_evidence,
-            *(label for label, present in conditional_evidence if present),
-        ],
-    )
+    if prompt_signals.has_thinking_trace:
+        unexpected_special_tokens = [
+            wrapper for wrapper in unexpected_special_tokens if wrapper != "</think>"
+        ]
 
     return GenerationQualityAnalysis(
         is_repetitive=is_repetitive,
         repeated_token=repeated_token,
-        hallucination_issues=hallucination_issues,
-        is_verbose=is_verbose,
-        formatting_issues=formatting_issues,
-        has_excessive_bullets=has_excessive_bullets,
-        bullet_count=bullet_count,
-        is_context_ignored=prompt_signals.is_context_ignored,
-        missing_context_terms=list(prompt_signals.missing_context_terms),
-        is_refusal=is_refusal,
-        refusal_type=refusal_type,
-        is_generic=is_generic,
-        specificity_score=specificity_score,
-        has_language_mixing=has_language_mixing,
-        language_mixing_issues=language_mixing_issues,
-        has_degeneration=has_degeneration,
-        degeneration_type=degeneration_type,
-        has_fabrication=has_fabrication,
-        fabrication_issues=fabrication_issues,
-        text_sanity_issue_type=text_sanity_issue_type,
-        generation_loop_type=generation_loop_type,
         missing_sections=list(prompt_signals.missing_sections),
-        title_word_count=prompt_signals.title_word_count,
-        description_sentence_count=prompt_signals.description_sentence_count,
-        keyword_count=prompt_signals.keyword_count,
-        keyword_duplication_ratio=prompt_signals.keyword_duplication_ratio,
-        has_reasoning_leak=prompt_signals.has_reasoning_leak,
-        reasoning_leak_markers=list(prompt_signals.reasoning_leak_markers),
         has_thinking_trace=prompt_signals.has_thinking_trace,
         thinking_trace_incomplete=prompt_signals.thinking_trace_incomplete,
         thinking_trace_markers=list(prompt_signals.thinking_trace_markers),
-        has_context_echo=prompt_signals.has_context_echo,
-        context_echo_ratio=prompt_signals.context_echo_ratio,
-        has_harness_issue=harness_signals.has_harness_issue,
-        harness_issue_type=harness_signals.harness_type,
-        harness_issue_details=list(harness_signals.harness_issues),
-        word_count=total_words,
-        unique_ratio=round(unique_ratio, 3),
+        word_count=len(re.findall(r"\b\w+\b", analysis_text)),
         prompt_checks_ran=bool(prompt),
         instruction_echo=prompt_signals.instruction_echo,
-        metadata_borrowing=prompt_signals.metadata_borrowing,
-        hint_relationship=hint_relationship,
-        verdict=verdict,
-        owner=owner,
-        user_bucket=user_bucket,
-        evidence=evidence,
         likely_capped=likely_capped,
         requested_max_tokens=requested_max_tokens,
         prompt_tokens_total=prompt_tokens,
         prompt_tokens_text_est=prompt_tokens_text_est,
         prompt_tokens_nontext_est=prompt_tokens_nontext_est,
         special_token_wrappers=list(normalized.removed_wrappers),
+        unexpected_special_tokens=unexpected_special_tokens,
         keyword_overlap=prompt_signals.keyword_overlap,
     )
 
@@ -8086,7 +4442,7 @@ def _analyze_text_quality(
     model_name: str | None = None,
     known_special_tokens: Sequence[str] = (),
 ) -> tuple[GenerationQualityAnalysis, str | None]:
-    """Return structured quality analysis plus the normalized issue label string."""
+    """Return mechanical quality analysis plus a compact log-only label string."""
     analysis = analyze_generation_text(
         text,
         generated_tokens,
@@ -8159,8 +4515,6 @@ def format_field_value(field_name: str, value: MetricValue) -> str:
                 formatted_value = _format_tps(numeric_value)
             elif field_name in _TIME_FIELDS:
                 formatted_value = _format_time_seconds(numeric_value)
-            elif field_name == "quality_score":
-                formatted_value = f"{numeric_value:.1f}"
             elif field_name in _BOOLEAN_FLAG_FIELDS:
                 formatted_value = "✓" if numeric_value else "-"
             else:
@@ -10111,128 +6465,18 @@ def pretty_print_exif(
     log_rule(header_width, char="=", style="blue", bold=True)
 
 
-def _format_table_field_value(
-    field_name: str,
-    res: PerformanceResult,
-    *,
-    recommended_working_set_bytes: int | None = None,
-) -> str:
-    """Format one report-table field, including the field-specific shortcuts.
-
-    Args:
-        field_name: Table field name. ``model_name`` bypasses generic
-            formatting, ``output`` uses the shared preview builder, and
-            ``quality_issues`` is truncated after field-aware formatting.
-        res: Performance result supplying timing, generation, and issue data
-        recommended_working_set_bytes: Optional Metal recommended-working-set
-            ceiling used to contextualize peak-memory values.
-
-    Returns:
-        Formatted string value for the field
-    """
-    if field_name == "model_name":
-        return res.model_name
-
-    if field_name == "output":
-        return _build_result_output_preview(
-            res,
-            max_chars=MAX_OUTPUT_PREVIEW_CHARS,
+def _metadata_has_descriptive_reference(
+    metadata: Mapping[str, str | None] | None,
+) -> bool:
+    """Return whether title, description, or keyword metadata is available."""
+    return bool(
+        metadata
+        and any(
+            isinstance(metadata.get(field_name), str)
+            and bool((metadata.get(field_name) or "").strip())
+            for field_name in ("title", "description", "keywords")
         )
-
-    if field_name == "peak_memory":
-        return _format_peak_memory_context(
-            _generation_float_metric(res.generation, "peak_memory"),
-            recommended_working_set_bytes,
-        )
-
-    value = _get_field_value(res, field_name)
-    if field_name == "quality_issues":
-        if not res.success:
-            return ""
-        return _truncate_quality_issues(
-            format_field_value(field_name, value),
-        )
-
-    return format_field_value(field_name, value)
-
-
-def _build_prepared_table_data(
-    *,
-    result_set: ResultSet,
-    header_separator: str = "<br>",
-    include_output: bool = True,
-    recommended_working_set_bytes: int | None = None,
-) -> PreparedTableData:
-    """Build immutable cached table data from a sorted result set."""
-    field_names = ["model_name", *result_set.get_fields()]
-    if include_output:
-        field_names.append("output")
-
-    headers: list[str] = []
-    for field_name in field_names:
-        if field_name in FIELD_ABBREVIATIONS:
-            line1, line2 = FIELD_ABBREVIATIONS[field_name]
-            should_split = line2 and (
-                header_separator == "\n"
-                or len(line1) > HEADER_SPLIT_LENGTH
-                or len(line2) > HEADER_SPLIT_LENGTH
-            )
-            if should_split:
-                headers.append(f"{line1}{header_separator}{line2}")
-            elif line2:
-                headers.append(f"{line1} {line2}")
-            else:
-                headers.append(line1)
-        else:
-            headers.append(format_field_label(field_name))
-
-    rows: list[tuple[str, ...]] = []
-    for res in result_set.results:
-        row = tuple(
-            _format_table_field_value(
-                field_name,
-                res,
-                recommended_working_set_bytes=recommended_working_set_bytes,
-            )
-            for field_name in field_names
-        )
-        rows.append(row)
-
-    return PreparedTableData(
-        headers=tuple(headers),
-        rows=tuple(rows),
-        field_names=tuple(field_names),
     )
-
-
-def _materialize_prepared_table_data(
-    table_data: PreparedTableData,
-) -> tuple[list[str], list[list[str]], list[str]]:
-    """Return mutable copies of cached table data for renderer-specific edits."""
-    headers = list(table_data.headers)
-    rows = [list(row) for row in table_data.rows]
-    field_names = list(table_data.field_names)
-    return headers, rows, field_names
-
-
-def _metadata_has_descriptive_reference(metadata: Mapping[str, str | None] | None) -> bool:
-    """Return True when metadata contains visual title, description, or keywords."""
-    if not metadata:
-        return False
-    for field_name in ("title", "description", "keywords"):
-        value = metadata.get(field_name)
-        if isinstance(value, str) and value.strip():
-            return True
-    return False
-
-
-def _quality_reference_metadata(
-    *,
-    eval_mode: str,
-    metadata: MetadataDict | None,
-) -> MetadataDict | None:
-    """Exclude metadata agreement from the caption-hygiene-only triage lane."""
-    return None if _resolve_eval_mode(eval_mode, metadata) == "triage" else metadata
 
 
 def _prompt_builder_exposes_metadata(
@@ -10257,29 +6501,13 @@ def _build_report_mode_policy(
     metadata: MetadataDict | None = None,
     metadata_exposed_to_prompt: bool | None = None,
 ) -> ReportModePolicy:
-    """Return mode-aware report rules for human and machine artifacts."""
-    has_descriptive_metadata = _metadata_has_descriptive_reference(metadata)
+    """Return only factual evaluation-mode and prompt-exposure settings."""
     resolved_eval_mode = _resolve_eval_mode(eval_mode, metadata)
     resolved_metadata_exposure = (
         bool(metadata_exposed_to_prompt) and resolved_eval_mode == "assisted"
     )
-    suppress_cataloging_scores = resolved_eval_mode == "triage"
-    semantic_rankings_grounded = has_descriptive_metadata and not suppress_cataloging_scores
-    selection_basis: ReportSelectionBasis
-    if suppress_cataloging_scores:
-        selection_basis = "caption hygiene only"
-    elif resolved_metadata_exposure:
-        selection_basis = "metadata-assisted visual verification"
-    elif semantic_rankings_grounded:
-        selection_basis = "held-out trusted image metadata"
-    else:
-        selection_basis = "ungrounded visual/cataloguing heuristics"
     return ReportModePolicy(
         eval_mode=resolved_eval_mode,
-        has_descriptive_metadata=has_descriptive_metadata,
-        semantic_rankings_grounded=semantic_rankings_grounded,
-        suppress_cataloging_scores=suppress_cataloging_scores,
-        selection_basis=selection_basis,
         metadata_exposed_to_prompt=resolved_metadata_exposure,
     )
 
@@ -10296,132 +6524,32 @@ def _build_report_render_context(
     recommended_working_set_bytes: int | None = None,
     preflight_issues: Sequence[str] = (),
 ) -> ReportRenderContext:
-    """Build shared derived report data once for all renderers."""
-    resolved_preflight_issues = tuple(preflight_issues)
-    analyzed_results = [
+    """Analyze each result once and cache the sole current-run assessment."""
+    resolved_results = [
         _populate_result_quality_analysis(
             result,
             prompt=prompt,
         )
         for result in results
     ]
-    resolved_results: list[PerformanceResult] = []
-    assessments: list[tuple[str, ResultAssessment]] = []
-    legacy_assessments: list[tuple[str, CanonicalAssessment]] = []
-    review_payloads: list[tuple[str, JsonlReviewRecord | None]] = []
-    maintainer_triage_payloads: list[tuple[str, JsonlMaintainerTriageRecord | None]] = []
-    failure_narratives: list[tuple[str, FailureNarrative]] = []
-    for result in analyzed_results:
-        legacy_assessment = _build_canonical_assessment(_collect_observed_evidence(result), result)
-        assessment = _assess_result(result)
-        review = _build_jsonl_review_record(result)
-        if review is not None:
-            review["user_bucket"] = legacy_assessment.model_user.current_recommendation
-            review["owner"] = legacy_assessment.maintainer.suspected_owner or _UNKNOWN_OWNER
-            review["evidence"] = list(legacy_assessment.model_user.evidence_codes)
-        result_with_review = replace(
-            result,
-            review_payload=review,
-            review_payload_ready=True,
-        )
-        maintainer_triage = (
-            _build_jsonl_maintainer_triage_record(
-                result_with_review,
-                review,
-                assessment=legacy_assessment.maintainer,
-            )
-            if review is not None
-            else None
-        )
-        if maintainer_triage is not None:
-            maintainer_triage["issue_readiness"] = legacy_assessment.maintainer.maintainer_readiness
-            maintainer_triage["suspected_owner"] = (
-                legacy_assessment.maintainer.suspected_owner or _UNKNOWN_OWNER
-            )
-            maintainer_triage["next_action"] = legacy_assessment.maintainer.next_action
-            maintainer_triage["user_bucket"] = legacy_assessment.model_user.current_recommendation
-            maintainer_triage["evidence"] = list(legacy_assessment.maintainer.evidence_codes)
-            if result.success:
-                maintainer_triage["summary"] = (
-                    ", ".join(legacy_assessment.maintainer.evidence_codes)
-                    or "No maintainer finding in this run."
-                )
-            else:
-                narrative = _build_failure_narrative(result)
-                maintainer_triage["summary"] = narrative.primary_exception
-                failure_narratives.append((result.model_name, narrative))
-        resolved_result = replace(
-            result_with_review,
-            maintainer_triage_payload=maintainer_triage,
-            maintainer_triage_payload_ready=True,
-        )
-        resolved_results.append(resolved_result)
-        assessments.append((resolved_result.model_name, assessment))
-        legacy_assessments.append((resolved_result.model_name, legacy_assessment))
-        review_payloads.append((resolved_result.model_name, review))
-        maintainer_triage_payloads.append((resolved_result.model_name, maintainer_triage))
     result_set: ResultSet = ResultSet(resolved_results)
-    prompt_context = _extract_trusted_hint_bundle(prompt).trusted_text or None
     image_profile = _load_image_input_profile(image_path)
-    summary: ModelIssueSummary = analyze_model_issues(
-        resolved_results,
-        prompt_context,
-        image_profile=image_profile,
-    )
-    stats: PerformanceStats = compute_performance_statistics(resolved_results)
     resolved_system_info: dict[str, str] = (
         system_info if system_info is not None else get_system_characteristics()
     )
-    table_data: PreparedTableData = _build_prepared_table_data(
+    return ReportRenderContext(
         result_set=result_set,
-        recommended_working_set_bytes=recommended_working_set_bytes,
-    )
-    triage: ReportTriageContext = _build_report_triage_context(
-        [result for result in result_set.results if result.success],
-        prompt=prompt,
-    )
-    context = ReportRenderContext(
-        result_set=result_set,
-        table_data=table_data,
-        prompt_context=prompt_context,
-        summary=summary,
-        stats=stats,
         system_info=resolved_system_info,
-        triage=triage,
         recommended_working_set_bytes=recommended_working_set_bytes,
         image_profile=image_profile,
-        preflight_issues=resolved_preflight_issues,
+        preflight_issues=tuple(preflight_issues),
         mode_policy=_build_report_mode_policy(
             eval_mode=eval_mode,
             metadata=metadata,
             metadata_exposed_to_prompt=metadata_exposed_to_prompt,
         ),
-        failure_narratives=tuple(failure_narratives),
-        assessments=tuple(assessments),
-        reviews=tuple(review_payloads),
-        maintainer_triage=tuple(maintainer_triage_payloads),
-    )
-    recommendations = _build_model_recommendation_views(context)
-    aligned_summary = _align_summary_recommendation_highlights(
-        summary,
-        triage=triage,
-        recommendations=recommendations,
-    )
-    context = replace(
-        context,
-        summary=aligned_summary,
-        recommendations=recommendations,
-    )
-    legacy_assessment_by_model = dict(legacy_assessments)
-    return replace(
-        context,
-        machine_facts=tuple(
-            _machine_artifact_facts(
-                view,
-                legacy_assessment_by_model[view.result.model_name],
-                recommended_working_set_bytes=context.recommended_working_set_bytes,
-            )
-            for view in recommendations
+        assessments=tuple(
+            (result.model_name, _assess_result(result)) for result in result_set.results
         ),
     )
 
@@ -10483,237 +6611,6 @@ def _html_table(
     return "\n".join(parts)
 
 
-def _initialize_metadata_baseline_tracking(
-    summary: ModelIssueSummary,
-    *,
-    baseline_score: float | None,
-    baseline_grade: str | None,
-) -> tuple[list[str] | None, list[str] | None, list[str] | None]:
-    """Initialize metadata-baseline tracking lists when a baseline is available."""
-    if baseline_score is None or baseline_grade is None:
-        return None, None, None
-
-    improves_metadata: list[str] = []
-    neutral_vs_metadata: list[str] = []
-    worse_than_metadata: list[str] = []
-    summary["metadata_baseline_score"] = baseline_score
-    summary["metadata_baseline_grade"] = baseline_grade
-    summary["cataloging_improves_metadata"] = improves_metadata
-    summary["cataloging_neutral_vs_metadata"] = neutral_vs_metadata
-    summary["cataloging_worse_than_metadata"] = worse_than_metadata
-    return improves_metadata, neutral_vs_metadata, worse_than_metadata
-
-
-def _is_cataloging_pick_eligible(
-    result: PerformanceResult,
-    analysis: GenerationQualityAnalysis | None,
-) -> bool:
-    """Return whether a result can appear in user-facing best-model picks."""
-    if not result.success:
-        return False
-    if analysis is not None:
-        if analysis.has_harness_issue or analysis.user_bucket == "avoid":
-            return False
-        if analysis.verdict in {"harness", "runtime_failure"}:
-            return False
-
-    labels = _extract_quality_issue_labels(result.quality_issues)
-    return "harness" not in labels
-
-
-def _finalize_cataloging_summary(
-    summary: ModelIssueSummary,
-    utility_scores: list[CatalogingScoreRecord],
-    *,
-    baseline_score: float | None,
-) -> None:
-    """Populate summary cataloging aggregates from per-model utility scores."""
-    if not utility_scores:
-        return
-
-    best: CatalogingScoreRecord = max(utility_scores, key=lambda row: row[1])
-    worst: CatalogingScoreRecord = min(utility_scores, key=lambda row: row[1])
-    summary["cataloging_best"] = (best[0], best[1], best[2])
-    summary["cataloging_worst"] = (worst[0], worst[1], worst[2])
-    summary["cataloging_avg_score"] = sum(
-        score for _model, score, _grade, _weakness, _delta in utility_scores
-    ) / len(utility_scores)
-    if baseline_score is None:
-        return
-
-    deltas: list[float] = [delta for _m, _s, _g, _w, delta in utility_scores if delta is not None]
-    if deltas:
-        summary["cataloging_avg_delta"] = sum(deltas) / len(deltas)
-
-
-def _populate_cataloging_recommendation_highlights(
-    summary: ModelIssueSummary,
-    *,
-    description_scores: list[tuple[str, float]],
-    keyword_scores: list[tuple[str, float]],
-) -> None:
-    """Populate recommendation-eligible cataloging highlight picks."""
-    if description_scores:
-        summary["cataloging_best_description"] = max(
-            description_scores,
-            key=lambda item: (item[1], item[0]),
-        )
-    else:
-        summary.pop("cataloging_best_description", None)
-
-    if keyword_scores:
-        summary["cataloging_best_keywords"] = max(
-            keyword_scores,
-            key=lambda item: (item[1], item[0]),
-        )
-    else:
-        summary.pop("cataloging_best_keywords", None)
-
-
-def analyze_model_issues(
-    results: list[PerformanceResult],
-    context: str | None = None,
-    image_profile: ImageInputProfile | None = None,
-) -> ModelIssueSummary:
-    """Analyze results to identify common model issues and calculate performance highlights.
-
-    Args:
-        results: List of model performance results
-        context: Optional context string (from prompt) for cataloging utility analysis
-        image_profile: Optional image dimensions used for image-normalized memory metrics
-    """
-    baseline: tuple[float, str] | None = _compute_metadata_baseline_utility(context)
-    baseline_score: float | None = baseline[0] if baseline is not None else None
-    baseline_grade: str | None = baseline[1] if baseline is not None else None
-
-    failed_models: list[FailedModelIssue] = []
-    indeterminate_models: list[FailedModelIssue] = []
-    repetitive_models: list[RepetitiveModelIssue] = []
-    hallucination_models: list[HallucinationModelIssue] = []
-    verbose_models: list[VerboseModelIssue] = []
-    formatting_issues: list[FormattingModelIssue] = []
-    excessive_bullets: list[ExcessiveBulletsIssue] = []
-    cataloging_grades: dict[str, list[str]] = {}
-    low_utility_models: list[LowUtilityModelIssue] = []
-    utility_scores: list[CatalogingScoreRecord] = []
-    recommendation_description_scores: list[tuple[str, float]] = []
-    recommendation_keyword_scores: list[tuple[str, float]] = []
-
-    summary: ModelIssueSummary = {
-        "total_models": len(results),
-        "failed_models": failed_models,
-        "indeterminate_models": indeterminate_models,
-        "repetitive_models": repetitive_models,
-        "hallucination_models": hallucination_models,
-        "verbose_models": verbose_models,
-        "formatting_issues": formatting_issues,
-        "excessive_bullets": excessive_bullets,
-        "cataloging_grades": cataloging_grades,
-        "cataloging_best": None,
-        "cataloging_worst": None,
-        "cataloging_best_description": ("", 0.0),
-        "cataloging_best_keywords": ("", 0.0),
-        "cataloging_avg_score": 0.0,
-        "cataloging_scores": utility_scores,
-        "low_utility_models": low_utility_models,
-    }
-
-    improves_metadata: list[str] | None
-    neutral_vs_metadata: list[str] | None
-    worse_than_metadata: list[str] | None
-    improves_metadata, neutral_vs_metadata, worse_than_metadata = (
-        _initialize_metadata_baseline_tracking(
-            summary,
-            baseline_score=baseline_score,
-            baseline_grade=baseline_grade,
-        )
-    )
-
-    successful: list[PerformanceResult] = [r for r in results if r.success]
-    _populate_summary_performance_highlights(summary, successful)
-    _populate_summary_image_memory_density(
-        summary,
-        successful,
-        image_profile=image_profile,
-    )
-    runtime_analysis: RuntimeAnalysisSummary | None = _build_runtime_analysis_summary(results)
-    if runtime_analysis is not None:
-        summary["runtime_analysis"] = runtime_analysis
-
-    for res in results:
-        if not res.success:
-            destination = (
-                indeterminate_models
-                if _is_indeterminate_connectivity_failure(res)
-                else failed_models
-            )
-            destination.append((res.model_name, res.error_stage, res.error_message))
-            continue
-        if not res.generation:
-            continue
-
-        text: str = getattr(res.generation, "text", "") or ""
-        generation_tokens: int = getattr(res.generation, "generation_tokens", 0)
-        prompt_tokens: int | None = getattr(res.generation, "prompt_tokens", None)
-
-        analysis: GenerationQualityAnalysis | None = res.quality_analysis
-        if analysis is None:
-            analysis = analyze_generation_text(
-                text,
-                generation_tokens,
-                prompt_tokens=prompt_tokens,
-            )
-        _append_quality_issue_entries(
-            model_name=res.model_name,
-            analysis=analysis,
-            generation_tokens=generation_tokens,
-            repetitive_models=repetitive_models,
-            hallucination_models=hallucination_models,
-            verbose_models=verbose_models,
-            formatting_issues=formatting_issues,
-            excessive_bullets=excessive_bullets,
-        )
-
-        utility = compute_cataloging_utility(text, context)
-        score = float(utility["utility_score"])
-        grade = str(utility["utility_grade"])
-        weakness = str(utility["primary_weakness"])
-        delta = score - baseline_score if baseline_score is not None else None
-        utility_scores.append((res.model_name, score, grade, weakness, delta))
-        cataloging_grades.setdefault(grade, []).append(res.model_name)
-        description_score, keyword_score = (
-            float(utility.get("description_score", 0.0)),
-            float(utility.get("keyword_score", 0.0)),
-        )
-        if _is_cataloging_pick_eligible(res, analysis):
-            recommendation_description_scores.append((res.model_name, description_score))
-            recommendation_keyword_scores.append((res.model_name, keyword_score))
-
-        if grade in ("D", "F"):
-            low_utility_models.append((res.model_name, score, grade, weakness))
-
-        _bucket_metadata_delta(
-            model_name=res.model_name,
-            delta=delta,
-            improves_metadata=improves_metadata,
-            neutral_vs_metadata=neutral_vs_metadata,
-            worse_than_metadata=worse_than_metadata,
-        )
-
-    _finalize_cataloging_summary(
-        summary,
-        utility_scores,
-        baseline_score=baseline_score,
-    )
-    _populate_cataloging_recommendation_highlights(
-        summary,
-        description_scores=recommendation_description_scores,
-        keyword_scores=recommendation_keyword_scores,
-    )
-
-    return summary
-
-
 def _peak_memory_delta_from_model_load_gb(result: PerformanceResult) -> float | None:
     """Return peak-memory growth after model load for one successful run."""
     if result.generation is None:
@@ -10771,7 +6668,7 @@ def _populate_summary_performance_highlights(
     if not successful:
         return
 
-    _populate_summary_winner_highlights(summary, successful)
+    _populate_summary_performance_extrema(summary, successful)
 
     total_tps: float = sum(getattr(r.generation, "generation_tps", 0) or 0 for r in successful)
     summary["average_tps"] = total_tps / len(successful)
@@ -10789,11 +6686,11 @@ def _populate_summary_performance_highlights(
     summary["memory_efficiency"] = total_tokens / total_mem if total_mem > 0 else 0
 
 
-def _populate_summary_winner_highlights(
+def _populate_summary_performance_extrema(
     summary: ModelIssueSummary,
     candidates: Sequence[PerformanceResult],
 ) -> None:
-    """Populate winner labels from an explicitly policy-filtered candidate set."""
+    """Populate raw fastest-load, throughput, and memory extrema."""
     summary.pop("fastest_model", None)
     summary.pop("most_efficient_model", None)
     summary.pop("fastest_load_model", None)
@@ -10820,54 +6717,6 @@ def _populate_summary_winner_highlights(
     )
     load_time: float = getattr(fastest_load, "model_load_time", 0) or 0
     summary["fastest_load_model"] = (fastest_load.model_name, load_time)
-
-
-def _append_quality_issue_entries(
-    *,
-    model_name: str,
-    analysis: GenerationQualityAnalysis,
-    generation_tokens: int,
-    repetitive_models: list[RepetitiveModelIssue],
-    hallucination_models: list[HallucinationModelIssue],
-    verbose_models: list[VerboseModelIssue],
-    formatting_issues: list[FormattingModelIssue],
-    excessive_bullets: list[ExcessiveBulletsIssue],
-) -> None:
-    """Append generation quality flags into per-run issue buckets."""
-    if analysis.is_repetitive:
-        repetitive_models.append((model_name, analysis.repeated_token))
-    if analysis.hallucination_issues:
-        hallucination_models.append((model_name, analysis.hallucination_issues))
-    if analysis.is_verbose:
-        verbose_models.append((model_name, generation_tokens))
-    if analysis.formatting_issues:
-        formatting_issues.append((model_name, analysis.formatting_issues))
-    if analysis.has_excessive_bullets:
-        excessive_bullets.append((model_name, analysis.bullet_count))
-
-
-def _bucket_metadata_delta(
-    *,
-    model_name: str,
-    delta: float | None,
-    improves_metadata: list[str] | None,
-    neutral_vs_metadata: list[str] | None,
-    worse_than_metadata: list[str] | None,
-) -> None:
-    """Bucket utility delta vs metadata baseline when baseline buckets are active."""
-    if (
-        delta is None
-        or improves_metadata is None
-        or neutral_vs_metadata is None
-        or worse_than_metadata is None
-    ):
-        return
-    if delta > UTILITY_DELTA_NEUTRAL_BAND:
-        improves_metadata.append(model_name)
-    elif delta < -UTILITY_DELTA_NEUTRAL_BAND:
-        worse_than_metadata.append(model_name)
-    else:
-        neutral_vs_metadata.append(model_name)
 
 
 _RUNTIME_PHASE_KEYS: Final[tuple[RuntimePhaseName, ...]] = (
@@ -11207,563 +7056,6 @@ def _format_runtime_analysis_lines(runtime_analysis: RuntimeAnalysisSummary) -> 
     return lines
 
 
-def compute_performance_statistics(results: list[PerformanceResult]) -> PerformanceStats:
-    """Compute performance statistics (min, max, avg) for successful runs.
-
-    Uses single-pass aggregation to build stats for all fields at once
-    reducing overhead from repeated filtering and type conversions.
-    """
-    stats: PerformanceStats = {}
-    successful_results: list[PerformanceResult] = [r for r in results if r.success and r.generation]
-    if not successful_results:
-        return stats
-
-    fields_to_stat: list[str] = [
-        "generation_tps",
-        "peak_memory",
-        "total_time",
-        "generation_time",
-        "model_load_time",
-    ]
-
-    # Single-pass aggregation: build value lists for all fields at once
-    field_values: dict[str, list[float]] = {field: [] for field in fields_to_stat}
-
-    for res in successful_results:
-        for field in fields_to_stat:
-            value: MetricValue = _get_field_value(res, field)
-            numeric_value: float | None = _coerce_numeric_value(value)
-            if numeric_value is not None:
-                field_values[field].append(numeric_value)
-
-    # Compute min/max/avg for fields with data
-    for field, values in field_values.items():
-        if values:
-            stats[field] = NumericFieldStats(
-                min=min(values),
-                max=max(values),
-                avg=sum(values) / len(values),
-            )
-
-    return stats
-
-
-def _collect_top_performer_metrics(summary: ModelIssueSummary) -> list[TopPerformerMetric]:
-    """Collect top-performer rows shared by HTML/Markdown renderers."""
-    metrics: list[TopPerformerMetric] = []
-
-    fastest_model = summary.get("fastest_model")
-    if fastest_model is not None:
-        metrics.append(("Fastest", fastest_model[0], fastest_model[1], "{:.1f} tps"))
-
-    most_efficient_model = summary.get("most_efficient_model")
-    if most_efficient_model is not None:
-        metrics.append(
-            ("💾 Most efficient", most_efficient_model[0], most_efficient_model[1], "{:.1f} GB"),
-        )
-
-    fastest_load_model = summary.get("fastest_load_model")
-    if fastest_load_model is not None:
-        metrics.append(("⚡ Fastest load", fastest_load_model[0], fastest_load_model[1], "{:.2f}s"))
-
-    return metrics
-
-
-def _collect_resource_usage_metrics(summary: ModelIssueSummary) -> list[ResourceUsageMetric]:
-    """Collect aggregate resource rows shared by HTML/Markdown renderers."""
-    metrics: list[ResourceUsageMetric] = []
-
-    image_megapixels = summary.get("image_megapixels")
-    if image_megapixels is not None:
-        metrics.append(("Input image size", image_megapixels, "{:.2f} MP"))
-
-    average_peak_delta = summary.get("average_peak_memory_delta_gb")
-    if average_peak_delta is not None:
-        metrics.append(
-            (
-                "Average peak delta from post-load",
-                average_peak_delta,
-                "{:.2f} GB",
-            )
-        )
-
-    memory_delta_per_mp = summary.get("average_peak_memory_delta_mb_per_megapixel")
-    if memory_delta_per_mp is not None:
-        metrics.append(("Peak memory delta / MP", memory_delta_per_mp, "{:.0f} MB/MP"))
-
-    average_peak_memory = summary.get("average_peak_memory")
-    if average_peak_memory is not None:
-        metrics.append(("Average peak memory", average_peak_memory, "{:.1f} GB"))
-
-    memory_efficiency = summary.get("memory_efficiency")
-    if memory_efficiency is not None:
-        metrics.append(("Memory efficiency", memory_efficiency, "{:.0f} tokens/GB"))
-
-    return metrics
-
-
-def _collect_aggregate_statistics_rows(stats: PerformanceStats) -> list[AggregateStatRow]:
-    """Collect preformatted aggregate statistics rows shared by HTML/Markdown summaries."""
-    rows: list[AggregateStatRow] = []
-    for field, data in stats.items():
-        rows.append(
-            (
-                format_field_label(field),
-                format_field_value(field, data["avg"]),
-                format_field_value(field, data["min"]),
-                format_field_value(field, data["max"]),
-            ),
-        )
-    return rows
-
-
-def _format_top_performers(
-    summary: ModelIssueSummary,
-    *,
-    html_output: bool,
-) -> list[str]:
-    parts: list[str] = []
-    top_metrics = _collect_top_performer_metrics(summary)
-    average_tps = summary.get("average_tps")
-    successful_count = summary.get("successful_count")
-    if top_metrics or (average_tps is not None and successful_count is not None):
-        if html_output:
-            parts.append("<h3>🏆 Performance Highlights</h3><ul>")
-        else:
-            _append_markdown_section(parts, title="## 🏆 Performance Highlights")
-        for label, model, value, fmt in top_metrics:
-            if html_output:
-                parts.append(
-                    f"<li><b>{label}:</b> <code>{html.escape(model)}</code> "
-                    f"({fmt.format(value)})</li>",
-                )
-            else:
-                parts.append(f"- **{label}:** `{model}` ({fmt.format(value)})")
-        if average_tps is not None and successful_count is not None:
-            if html_output:
-                parts.append(
-                    f"<li><b>📊 Average TPS:</b> {average_tps:.1f} "
-                    f"across {successful_count} models</li>",
-                )
-            else:
-                parts.append(
-                    f"- **📊 Average TPS:** {average_tps:.1f} across {successful_count} models",
-                )
-        parts.append("</ul>" if html_output else "")
-
-    resource_metrics = _collect_resource_usage_metrics(summary)
-    if resource_metrics:
-        if html_output:
-            parts.append("<h3>📈 Resource Usage</h3><ul>")
-        else:
-            _append_markdown_section(parts, title="## 📈 Resource Usage")
-        for label, value, fmt in resource_metrics:
-            if html_output:
-                parts.append(f"<li><b>{label}:</b> {fmt.format(value)}</li>")
-            else:
-                parts.append(f"- **{label}:** {fmt.format(value)}")
-        parts.append("</ul>" if html_output else "")
-
-    return parts
-
-
-def _collect_quality_issue_sections(summary: ModelIssueSummary) -> list[QualityIssueSection]:
-    """Collect quality issue sections shared by HTML/Markdown summary renderers."""
-    sections: list[QualityIssueSection] = []
-
-    failed_models = summary.get("failed_models", [])
-    if failed_models:
-        sections.append(
-            (
-                "❌ Failed Models",
-                "metric-bad",
-                [(model, stage or "Unknown") for model, stage, _ in failed_models],
-            ),
-        )
-
-    indeterminate_models = summary.get("indeterminate_models", [])
-    if indeterminate_models:
-        sections.append(
-            (
-                "⚠️ Indeterminate Attempts",
-                "metric-neutral",
-                [(model, stage or "Network Error") for model, stage, _ in indeterminate_models],
-            ),
-        )
-
-    repetitive_models = summary.get("repetitive_models", [])
-    if repetitive_models:
-        sections.append(
-            (
-                "🔄 Repetitive Output",
-                "metric-warn",
-                [(model, f"token: {token or '?'}") for model, token in repetitive_models],
-            ),
-        )
-
-    hallucination_models = summary.get("hallucination_models", [])
-    if hallucination_models:
-        sections.append(
-            (
-                "👻 Hallucinations",
-                "metric-warn",
-                [(model, None) for model, _ in hallucination_models],
-            ),
-        )
-
-    formatting_issues = summary.get("formatting_issues", [])
-    if formatting_issues:
-        sections.append(
-            (
-                "📝 Formatting Issues",
-                "metric-warn",
-                [(model, None) for model, _ in formatting_issues],
-            ),
-        )
-
-    return sections
-
-
-def _format_quality_detail(detail: str, *, html_output: bool) -> str:
-    """Format detail text for HTML/Markdown quality rows while preserving token styling."""
-    if detail.startswith("token: "):
-        token_text = detail.removeprefix("token: ")
-        if html_output:
-            return f"token: <code>{html.escape(token_text)}</code>"
-        return f"token: `{token_text}`"
-    if html_output:
-        return html.escape(detail)
-    return f"`{detail}`"
-
-
-def _format_quality_issues(
-    summary: ModelIssueSummary,
-    *,
-    html_output: bool,
-) -> list[str]:
-    sections = _collect_quality_issue_sections(summary)
-    if not sections:
-        return []
-
-    quality_parts: list[str] = []
-    for title, css_class, entries in sections:
-        if html_output:
-            quality_parts.append(f"<li><b class='{css_class}'>{title} ({len(entries)}):</b><ul>")
-        else:
-            quality_parts.append(f"- **{title} ({len(entries)}):**")
-        for model, detail in entries:
-            if detail is None:
-                quality_parts.append(
-                    f"<li><code>{html.escape(model)}</code></li>"
-                    if html_output
-                    else f"  - `{model}`",
-                )
-            else:
-                detail_text = _format_quality_detail(detail, html_output=html_output)
-                if html_output:
-                    quality_parts.append(
-                        f"<li><code>{html.escape(model)}</code> ({detail_text})</li>",
-                    )
-                else:
-                    quality_parts.append(f"  - `{model}` ({detail_text})")
-        if html_output:
-            quality_parts.append("</ul></li>")
-
-    if html_output:
-        return ["<h3>⚠️ Quality Issues</h3><ul>", *quality_parts, "</ul>"]
-
-    parts: list[str] = []
-    _append_markdown_section(parts, title="## ⚠️ Quality Issues")
-    parts.extend(quality_parts)
-    parts.append("")
-    return parts
-
-
-def _cataloging_grade_distribution_items(summary: ModelIssueSummary) -> list[str]:
-    """Build grade-distribution labels shared by HTML/Markdown renderers."""
-    grades = summary.get("cataloging_grades", {})
-    if not grades:
-        return []
-    grade_counts: list[str] = []
-    for grade in ["A", "B", "C", "D", "F"]:
-        count = len(grades.get(grade, []))
-        if count > 0:
-            emoji = GRADE_EMOJIS.get(grade, "")
-            grade_counts.append(f"{emoji} {grade}: {count}")
-    return grade_counts
-
-
-def _cataloging_vs_metadata_breakdown(
-    summary: ModelIssueSummary,
-) -> tuple[float, str, float, int, int, int] | None:
-    """Return baseline/delta summary when metadata baseline is available."""
-    baseline_score = summary.get("metadata_baseline_score")
-    baseline_grade = summary.get("metadata_baseline_grade")
-    if baseline_score is None or baseline_grade is None:
-        return None
-    better = len(summary.get("cataloging_improves_metadata", []))
-    neutral = len(summary.get("cataloging_neutral_vs_metadata", []))
-    worse = len(summary.get("cataloging_worse_than_metadata", []))
-    avg_delta = summary.get("cataloging_avg_delta", 0.0)
-    return baseline_score, baseline_grade, avg_delta, better, neutral, worse
-
-
-def _collect_cataloging_summary_data(summary: ModelIssueSummary) -> CatalogingSummaryData | None:
-    """Collect shared cataloging summary data for HTML and Markdown renderers."""
-    best_entry = summary.get("cataloging_best")
-    if best_entry is None and not summary.get("cataloging_scores"):
-        return None
-
-    average_score = summary.get("cataloging_avg_score", 0.0)
-    return CatalogingSummaryData(
-        grade_counts=tuple(_cataloging_grade_distribution_items(summary)),
-        average_score=average_score if average_score > 0 else None,
-        metadata_breakdown=_cataloging_vs_metadata_breakdown(summary),
-        best_entry=best_entry,
-        worst_entry=summary.get("cataloging_worst"),
-        best_description_entry=summary.get("cataloging_best_description"),
-        best_keyword_entry=summary.get("cataloging_best_keywords"),
-        low_utility_models=tuple(summary.get("low_utility_models", [])),
-    )
-
-
-def _format_cataloging_summary(  # noqa: PLR0912, PLR0915 — dual-format renderer
-    data: CatalogingSummaryData,
-    *,
-    html_output: bool,
-) -> list[str]:
-    """Format cataloging utility summary as HTML or Markdown text."""
-    parts: list[str] = []
-
-    if html_output:
-        parts.append("<h3>📚 Cataloging Utility Summary</h3>")
-    else:
-        _append_markdown_section(parts, title="## 📚 Cataloging Utility Summary")
-
-    if data.grade_counts:
-        grade_line = f"{' | '.join(data.grade_counts)}"
-        if html_output:
-            parts.append(f"<p><b>Grade Distribution:</b> {grade_line}</p>")
-        else:
-            parts.append(f"**Grade Distribution:** {grade_line}")
-            parts.append("")
-
-    if data.average_score is not None:
-        score_text = f"{data.average_score:.0f}/100"
-        if html_output:
-            parts.append(f"<p><b>Average Utility Score:</b> {score_text}</p>")
-        else:
-            parts.append(f"**Average Utility Score:** {score_text}")
-            parts.append("")
-
-    if data.metadata_breakdown is not None:
-        baseline_score, baseline_grade, avg_delta, better, neutral, worse = data.metadata_breakdown
-        baseline_emoji = GRADE_EMOJIS.get(baseline_grade, "❌")
-        baseline_text = f"{baseline_emoji} {baseline_grade} ({baseline_score:.0f}/100)"
-        delta_text = (
-            f"Avg Δ {avg_delta:+.0f} | Better: {better}, Neutral: {neutral}, Worse: {worse}"
-        )
-        if html_output:
-            parts.append(f"<p><b>Existing Metadata Baseline:</b> {baseline_text}</p>")
-            parts.append(f"<p><b>Vs Existing Metadata:</b> {delta_text}</p>")
-        else:
-            parts.append(f"**Existing Metadata Baseline:** {baseline_text}")
-            parts.append(f"**Vs Existing Metadata:** {delta_text}")
-            parts.append("")
-
-    if html_output:
-        parts.append("<ul>")
-    if data.best_entry is not None:
-        model, score, grade = data.best_entry
-        emoji = GRADE_EMOJIS.get(grade, "")
-        score_str = f"{score:.0f}/100"
-        if html_output:
-            parts.append(
-                f"<li><b>Best for cataloging:</b> <code>{html.escape(model)}</code> "
-                f"({emoji} {grade}, {score_str})</li>",
-            )
-        else:
-            parts.append(
-                f"- **Best for cataloging:** `{model}` ({emoji} {grade}, {score_str})",
-            )
-    if data.best_description_entry is not None:
-        model, score = data.best_description_entry
-        score_str = f"{score:.0f}/100"
-        if html_output:
-            parts.append(
-                f"<li><b>Best descriptions:</b> <code>{html.escape(model)}</code> ({score_str})</li>",
-            )
-        else:
-            parts.append(f"- **Best descriptions:** `{model}` ({score_str})")
-    if data.best_keyword_entry is not None:
-        model, score = data.best_keyword_entry
-        score_str = f"{score:.0f}/100"
-        if html_output:
-            parts.append(
-                f"<li><b>Best keywording:</b> <code>{html.escape(model)}</code> ({score_str})</li>",
-            )
-        else:
-            parts.append(f"- **Best keywording:** `{model}` ({score_str})")
-    if data.worst_entry is not None:
-        model, score, grade = data.worst_entry
-        emoji = GRADE_EMOJIS.get(grade, "")
-        score_str = f"{score:.0f}/100"
-        if html_output:
-            parts.append(
-                f"<li><b>Worst for cataloging:</b> <code>{html.escape(model)}</code> "
-                f"({emoji} {grade}, {score_str})</li>",
-            )
-        else:
-            parts.append(
-                f"- **Worst for cataloging:** `{model}` ({emoji} {grade}, {score_str})",
-            )
-    if html_output:
-        parts.append("</ul>")
-    else:
-        parts.append("")
-
-    if data.low_utility_models:
-        count = len(data.low_utility_models)
-        if html_output:
-            parts.append(
-                f"<p><b class='metric-warn'>⚠️ {count} models with low utility (D/F):</b></p>",
-            )
-            parts.append("<ul>")
-        else:
-            parts.append(f"### ⚠️ {count} Models with Low Utility (D/F)")
-            parts.append("")
-        for model, score, grade, weakness in data.low_utility_models:
-            emoji = GRADE_EMOJIS.get(grade, "")
-            if html_output:
-                parts.append(
-                    f"<li><code>{html.escape(model)}</code>: "
-                    f"{emoji} {grade} ({score:.0f}/100) "
-                    f"- {html.escape(weakness)}</li>",
-                )
-            else:
-                parts.append(
-                    f"- `{model}`: {emoji} {grade} ({score:.0f}/100) - {weakness}",
-                )
-        if html_output:
-            parts.append("</ul>")
-        else:
-            parts.append("")
-
-    return parts
-
-
-def _format_aggregate_statistics(
-    stats: PerformanceStats,
-    *,
-    html_output: bool,
-) -> list[str]:
-    rows = _collect_aggregate_statistics_rows(stats)
-    if not rows:
-        return []
-
-    parts: list[str] = []
-    if html_output:
-        parts.append("<h3>📊 Aggregate Statistics (Successful Runs)</h3><ul>")
-    else:
-        _append_markdown_section(parts, title="## 📊 Aggregate Statistics (Successful Runs)")
-
-    for label, average_value, minimum_value, maximum_value in rows:
-        if html_output:
-            parts.append(
-                f"<li><b>{label}</b>: Avg: {average_value} | "
-                f"Min: {minimum_value} | Max: {maximum_value}</li>",
-            )
-        else:
-            parts.append(
-                f"- **{label}**: Avg: {average_value} | "
-                f"Min: {minimum_value} | Max: {maximum_value}",
-            )
-    parts.append("</ul>" if html_output else "")
-    return parts
-
-
-def _format_issues_summary_parts(
-    summary: ModelIssueSummary,
-    stats: PerformanceStats,
-    *,
-    html_output: bool,
-    include_cataloging_summary: bool = True,
-) -> list[str]:
-    parts: list[str] = []
-    cataloging_data = _collect_cataloging_summary_data(summary)
-    parts.extend(_format_top_performers(summary, html_output=html_output))
-    if include_cataloging_summary and cataloging_data is not None:
-        parts.extend(_format_cataloging_summary(cataloging_data, html_output=html_output))
-    parts.extend(_format_quality_issues(summary, html_output=html_output))
-    parts.extend(
-        _format_aggregate_statistics(
-            stats,
-            html_output=html_output,
-        ),
-    )
-    return parts
-
-
-def format_issues_summary_html(
-    summary: ModelIssueSummary,
-    stats: PerformanceStats,
-    *,
-    suppress_cataloging_scores: bool = False,
-) -> str:
-    """Format the issues and statistics summary as an HTML string."""
-    return "".join(
-        _format_issues_summary_parts(
-            summary,
-            stats,
-            html_output=True,
-            include_cataloging_summary=not suppress_cataloging_scores,
-        )
-    )
-
-
-def _format_run_contract_parts(
-    report_context: ReportRenderContext,
-    *,
-    html_output: bool,
-) -> list[str]:
-    """Render the mode and grounding contract for a run summary."""
-    policy = report_context.mode_policy
-    semantic_rankings = "grounded" if policy.semantic_rankings_grounded else "ungrounded"
-    semantic_rankings = f"{semantic_rankings} ({policy.selection_basis})"
-    primary_selection_tasks = (
-        "brief captions; structured title/description/keywords when descriptive image metadata "
-        "is available"
-    )
-    proxy_scope = "Automated metadata-assisted proxy; one image; no human visual ground truth."
-
-    if html_output:
-        return [
-            "<h3>Run Contract</h3>",
-            "<ul>",
-            f"<li><b>Evaluation lane:</b> {html.escape(policy.eval_mode)}</li>",
-            (
-                "<li><b>Metadata exposed to prompt:</b> "
-                f"{'yes' if policy.metadata_exposed_to_prompt else 'no'}</li>"
-            ),
-            f"<li><b>Semantic rankings:</b> {html.escape(semantic_rankings)}</li>",
-            f"<li><b>Primary selection tasks:</b> {html.escape(primary_selection_tasks)}</li>",
-            f"<li><b>Evidence scope:</b> {html.escape(proxy_scope)}</li>",
-            "</ul>",
-        ]
-
-    parts: list[str] = []
-    _append_markdown_section(parts, title="## Run Contract")
-    parts.append(f"- Evaluation lane: {policy.eval_mode}")
-    parts.append(
-        f"- Metadata exposed to prompt: {'yes' if policy.metadata_exposed_to_prompt else 'no'}"
-    )
-    parts.append(f"- Semantic rankings: {semantic_rankings}")
-    parts.append(f"- Primary selection tasks: {primary_selection_tasks}")
-    parts.append(f"- Evidence scope: {proxy_scope}")
-    parts.append("")
-    return parts
-
-
 def _relative_markdown_artifact_path(*, report_filename: Path, artifact_filename: Path) -> str:
     """Return a relative path for links between Markdown artifacts."""
     try:
@@ -11914,116 +7206,6 @@ def _quality_analysis_for_result(res: PerformanceResult) -> GenerationQualityAna
     )
 
 
-def _review_analysis_for_result(res: PerformanceResult) -> GenerationQualityAnalysis | None:
-    """Return output-quality evidence only for completed generations."""
-    return _quality_analysis_for_result(res) if res.success else None
-
-
-def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord | None:
-    """Build the canonical automated review payload for one result."""
-    analysis = _review_analysis_for_result(result)
-    generation = result.generation
-    generation_tokens = 0
-    if generation is not None:
-        generation_tokens = getattr(generation, "generation_tokens", 0) or 0
-    prompt_tokens_total = getattr(generation, "prompt_tokens", None) if generation else None
-    prompt_output_ratio = (
-        generation_tokens / prompt_tokens_total
-        if prompt_tokens_total is not None and prompt_tokens_total > 0
-        else None
-    )
-    prompt_burden = _prompt_burden_for_result(result, None)
-
-    if analysis is not None:
-        requested_max_tokens = analysis.requested_max_tokens or result.requested_max_tokens
-        nontext_prompt_ratio = (
-            analysis.prompt_tokens_nontext_est / analysis.prompt_tokens_total
-            if analysis.prompt_tokens_total is not None
-            and analysis.prompt_tokens_total > 0
-            and analysis.prompt_tokens_nontext_est is not None
-            else None
-        )
-        return {
-            "verdict": analysis.verdict,
-            "hint_relationship": analysis.hint_relationship,
-            "instruction_echo": analysis.instruction_echo,
-            "metadata_borrowing": analysis.metadata_borrowing,
-            "likely_capped": analysis.likely_capped,
-            "owner": analysis.owner,
-            "user_bucket": analysis.user_bucket,
-            "evidence": list(analysis.evidence),
-            "requested_max_tokens": requested_max_tokens,
-            "hit_max_tokens": bool(
-                requested_max_tokens is not None and generation_tokens >= requested_max_tokens
-            ),
-            "prompt_tokens_total": analysis.prompt_tokens_total,
-            "prompt_tokens_text_est": analysis.prompt_tokens_text_est,
-            "prompt_tokens_nontext_est": analysis.prompt_tokens_nontext_est,
-            "prompt_output_ratio": prompt_output_ratio,
-            "nontext_prompt_ratio": nontext_prompt_ratio,
-            "prompt_burden_kind": prompt_burden.kind,
-            "prompt_burden_source": prompt_burden.source,
-            "prompt_burden_reason": prompt_burden.reason,
-            "processed_image_width": prompt_burden.processed_width,
-            "processed_image_height": prompt_burden.processed_height,
-            "image_patch_count": prompt_burden.patch_count,
-            "missing_terms": list(analysis.missing_context_terms),
-            "missing_sections": list(analysis.missing_sections),
-            "harness_details": list(analysis.harness_issue_details),
-        }
-
-    if result.success:
-        return None
-
-    requested_max_tokens = result.requested_max_tokens
-    evidence: list[str] = _failure_review_evidence(result)
-    failure_owner = _failure_owner_for_result(result)
-    indeterminate = _is_indeterminate_connectivity_failure(result)
-    return {
-        "verdict": "indeterminate" if indeterminate else "runtime_failure",
-        "hint_relationship": "not_evaluated",
-        "instruction_echo": False,
-        "metadata_borrowing": False,
-        "likely_capped": bool(
-            requested_max_tokens is not None and generation_tokens >= requested_max_tokens
-        ),
-        "owner": (
-            "unknown"
-            if indeterminate
-            else failure_owner
-            if failure_owner.startswith("unresolved: ")
-            else _classify_review_owner(harness_type=None, failure_owner=failure_owner)
-        ),
-        "user_bucket": "not_evaluated" if indeterminate else "avoid",
-        "evidence": _dedupe_preserve_order(evidence) or ["runtime_failure"],
-        "requested_max_tokens": requested_max_tokens,
-        "hit_max_tokens": bool(
-            requested_max_tokens is not None and generation_tokens >= requested_max_tokens
-        ),
-        "prompt_tokens_total": prompt_tokens_total,
-        "prompt_tokens_text_est": None,
-        "prompt_tokens_nontext_est": None,
-        "prompt_output_ratio": prompt_output_ratio,
-        "nontext_prompt_ratio": None,
-        "prompt_burden_kind": prompt_burden.kind,
-        "prompt_burden_source": prompt_burden.source,
-        "prompt_burden_reason": prompt_burden.reason,
-        "processed_image_width": prompt_burden.processed_width,
-        "processed_image_height": prompt_burden.processed_height,
-        "image_patch_count": prompt_burden.patch_count,
-        "missing_terms": [],
-        "missing_sections": [],
-        "harness_details": [],
-    }
-
-
-def _review_for_result(result: PerformanceResult) -> JsonlReviewRecord | None:
-    """Return a context-cached review payload, classifying only for direct fallbacks."""
-    if result.review_payload_ready:
-        return result.review_payload
-    return _build_jsonl_review_record(result)
-
-
 _EXTERNAL_CONNECTIVITY_NEEDLES: Final[tuple[str, ...]] = (
     "server disconnected without sending a response",
     "remoteprotocolerror",
@@ -12116,19 +7298,6 @@ def _maintainer_readiness(
     return "needs_reproduction" if has_output_anomaly else "not_applicable"
 
 
-def _recommendation_status_for_result(result: PerformanceResult) -> RecommendationStatus:
-    """Return the canonical user recommendation independently of execution outcome."""
-    review = _review_for_result(result)
-    if review is not None:
-        bucket = review["user_bucket"]
-        match bucket:
-            case "recommended" | "caveat" | "avoid" | "not_evaluated":
-                return bucket
-    if _is_indeterminate_connectivity_failure(result):
-        return "not_evaluated"
-    return "caveat" if result.success else "avoid"
-
-
 def _run_outcome_counts(
     assessments: Sequence[tuple[str, ResultAssessment]],
 ) -> RunOutcomeCounts:
@@ -12144,279 +7313,6 @@ def _run_outcome_counts(
         "models_crashed": crashed,
         "models_indeterminate": indeterminate,
     }
-
-
-def _failure_review_evidence(result: PerformanceResult) -> list[str]:
-    """Build compact evidence labels for failed-result review payloads."""
-    evidence: list[str] = []
-    if result.error_stage:
-        evidence.append(re.sub(r"[^a-z0-9]+", "_", result.error_stage.casefold()).strip("_"))
-    if result.error_code:
-        evidence.append(result.error_code.casefold())
-    if _is_indeterminate_connectivity_failure(result):
-        evidence.append("external_connectivity")
-    return _dedupe_preserve_order(evidence) or ["runtime_failure"]
-
-
-def _has_template_opened_thinking(result: PerformanceResult) -> bool:
-    """Return whether a disabled-thinking run received a template-opened trace."""
-    diagnostics = result.prompt_diagnostics
-    analysis = _review_analysis_for_result(result)
-    if diagnostics is None or analysis is None or not analysis.has_thinking_trace:
-        return False
-    if diagnostics.generate_kwargs.get("enable_thinking") is True:
-        return False
-    preview = (diagnostics.rendered_prompt_preview or "").rstrip()
-    return any(preview.endswith(start) for start, _end in THINKING_TRACE_DELIMITER_PAIRS)
-
-
-def _review_issue_subtype(
-    result: PerformanceResult,
-    review: JsonlReviewRecord,
-    analysis: GenerationQualityAnalysis | None,
-) -> str | None:
-    """Return the most actionable subtype label for maintainer triage surfaces."""
-    subtype: str | None = None
-    if _has_template_opened_thinking(result):
-        subtype = "thinking_configuration"
-    elif review["verdict"] == "context_budget" and result.success:
-        subtype = "context_boundary"
-    elif analysis is not None and analysis.harness_issue_type:
-        subtype = analysis.harness_issue_type
-    elif result.error_code:
-        subtype = result.error_code
-    elif review["hit_max_tokens"]:
-        subtype = "token_cap"
-    elif review["missing_sections"]:
-        subtype = "contract_mismatch"
-    elif review["evidence"]:
-        subtype = review["evidence"][0]
-    return subtype
-
-
-def _review_next_action_for_result(
-    result: PerformanceResult,
-    review: JsonlReviewRecord,
-) -> str:
-    """Project the canonical maintainer action into legacy review surfaces."""
-    del review
-    return _classify_maintainer_assessment(
-        evidence=_collect_observed_evidence(result), result=result
-    ).next_action
-
-
-def _build_jsonl_maintainer_triage_record(
-    result: PerformanceResult,
-    review: JsonlReviewRecord,
-    *,
-    assessment: MaintainerAssessment | None = None,
-) -> JsonlMaintainerTriageRecord:
-    """Build an action-oriented maintainer triage payload for one result."""
-    analysis = _review_analysis_for_result(result)
-    resolved_assessment = assessment or _classify_maintainer_assessment(
-        evidence=_collect_observed_evidence(result), result=result
-    )
-    issue_readiness = resolved_assessment.maintainer_readiness
-    triage: JsonlMaintainerTriageRecord = {
-        "suspected_owner": resolved_assessment.suspected_owner or _UNKNOWN_OWNER,
-        "issue_readiness": issue_readiness,
-        "issue_kind": review["verdict"],
-        "summary": _review_focus_text(review, analysis),
-        "next_action": resolved_assessment.next_action,
-        "user_bucket": review["user_bucket"],
-        "evidence": list(review["evidence"]),
-        "harness_details": list(review["harness_details"]),
-        "hit_max_tokens": review["hit_max_tokens"],
-    }
-    issue_subtype = _review_issue_subtype(result, review, analysis)
-    stop_reason = result.runtime_diagnostics.stop_reason if result.runtime_diagnostics else None
-
-    if issue_subtype is not None:
-        triage["issue_subtype"] = issue_subtype
-    if result.error_stage is not None:
-        triage["error_stage"] = result.error_stage
-    if result.error_code is not None:
-        triage["error_code"] = result.error_code
-    if stop_reason is not None:
-        triage["stop_reason"] = stop_reason
-    if review["requested_max_tokens"] is not None:
-        triage["requested_max_tokens"] = review["requested_max_tokens"]
-    if review["prompt_tokens_total"] is not None:
-        triage["prompt_tokens_total"] = review["prompt_tokens_total"]
-    if review["prompt_output_ratio"] is not None:
-        triage["prompt_output_ratio"] = review["prompt_output_ratio"]
-    if review["nontext_prompt_ratio"] is not None:
-        triage["nontext_prompt_ratio"] = review["nontext_prompt_ratio"]
-    triage["prompt_burden_kind"] = review.get("prompt_burden_kind", "unknown")
-    triage["prompt_burden_source"] = review.get("prompt_burden_source", "unavailable")
-    return triage
-
-
-def _maintainer_triage_for_result(
-    result: PerformanceResult,
-) -> JsonlMaintainerTriageRecord | None:
-    """Return cached maintainer triage payload for a result when available."""
-    if result.maintainer_triage_payload_ready:
-        return result.maintainer_triage_payload
-    review = _review_for_result(result)
-    if review is None:
-        return None
-    return _build_jsonl_maintainer_triage_record(result, review)
-
-
-def _maintainer_triage_evidence_text(triage: JsonlMaintainerTriageRecord) -> str | None:
-    """Return human-readable evidence text for maintainer triage surfaces."""
-    items = [
-        evidence
-        for detail in triage["harness_details"][:2]
-        if (evidence := _evidence_harness_detail(detail))
-    ]
-    if not items:
-        items = [_humanize_review_evidence_label(label) for label in triage["evidence"][:3]]
-    unique_items = _dedupe_preserve_order(items)
-    return " | ".join(unique_items) if unique_items else None
-
-
-def _maintainer_triage_context_text(triage: JsonlMaintainerTriageRecord) -> str | None:
-    """Return prompt/output context from triage when available."""
-    context_parts: list[str] = []
-    prompt_tokens_total = triage.get("prompt_tokens_total")
-    if prompt_tokens_total is not None:
-        context_parts.append(f"prompt={fmt_num(prompt_tokens_total)}")
-    prompt_output_ratio = triage.get("prompt_output_ratio")
-    if prompt_output_ratio is not None:
-        context_parts.append(f"output/prompt={prompt_output_ratio:.2%}")
-    nontext_prompt_ratio = triage.get("nontext_prompt_ratio")
-    prompt_burden_kind = triage.get("prompt_burden_kind")
-    if prompt_burden_kind == "unavailable":
-        context_parts.append("prompt/input composition unavailable")
-    elif prompt_burden_kind and prompt_burden_kind not in {"normal", "unknown"}:
-        burden_label = prompt_burden_kind.replace("_", " ")
-        ratio_suffix = f"={nontext_prompt_ratio:.0%}" if nontext_prompt_ratio is not None else ""
-        context_parts.append(f"{burden_label} burden{ratio_suffix}")
-    stop_reason = triage.get("stop_reason")
-    if stop_reason is not None:
-        context_parts.append(f"stop={stop_reason}")
-    if triage["hit_max_tokens"]:
-        requested_max_tokens = triage.get("requested_max_tokens")
-        if requested_max_tokens is not None:
-            context_parts.append(f"hit token cap ({requested_max_tokens})")
-        else:
-            context_parts.append("hit token cap")
-    return " | ".join(context_parts) if context_parts else None
-
-
-def _triage_text_fingerprint(text: str) -> str:
-    """Normalize triage text enough to detect repeated rows."""
-    return re.sub(r"\W+", " ", html.unescape(text).casefold()).strip()
-
-
-def _humanize_review_evidence_label(label: str) -> str:
-    """Return a human-readable fallback label for compact review evidence."""
-    return label.replace("_", " ")
-
-
-def _review_focus_text(
-    review: JsonlReviewRecord,
-    analysis: GenerationQualityAnalysis | None,
-) -> str:
-    """Return a compact projection of retained review evidence."""
-    parts = _describe_harness_details(
-        review["harness_details"][:2],
-        prompt_burden_kind=review.get("prompt_burden_kind", "unknown"),
-    )
-    parts.extend(_humanize_review_evidence_label(label) for label in review["evidence"][:3])
-    if review["hit_max_tokens"]:
-        cap = review["requested_max_tokens"]
-        parts.append(f"hit token cap ({cap})" if cap is not None else "hit token cap")
-    if review["missing_sections"]:
-        parts.append("missing sections: " + ", ".join(review["missing_sections"]))
-    if analysis is not None and analysis.formatting_issues:
-        parts.append(_collapse_preview_whitespace(analysis.formatting_issues[0]))
-    return " | ".join(_dedupe_preserve_order(parts[:4])) or "no flagged signals"
-
-
-def _build_review_block_rows(result: PerformanceResult) -> list[tuple[str, str]]:
-    """Build a compact canonical-decision audit for the maximalist log."""
-    review = _review_for_result(result)
-    if review is None:
-        return []
-
-    signals = _review_focus_text(review, _review_analysis_for_result(result))
-    triage = _maintainer_triage_for_result(result)
-    return [
-        ("Verdict", f"{review['verdict']} | user={review['user_bucket']}"),
-        ("Why", signals),
-        (
-            "Maintainer",
-            (
-                f"{triage['issue_readiness']} | owner={triage['suspected_owner']}"
-                if triage is not None
-                else "not applicable"
-            ),
-        ),
-        ("Next action", _review_next_action_for_result(result, review)),
-    ]
-
-
-def _markdown_review_text(text: str) -> str:
-    """Return gallery-friendly text for compact review fragments."""
-    return text.replace(" | ", "; ")
-
-
-def _review_display_bucket_label(
-    bucket: str,
-    *,
-    policy: ReportModePolicy | None = None,
-    review: JsonlReviewRecord | None = None,
-) -> str:
-    """Return a human-facing bucket label without changing JSONL contracts."""
-    is_ungrounded = False
-    if policy is not None:
-        is_ungrounded = not policy.semantic_rankings_grounded
-    if review is not None and review["hint_relationship"] == "not_evaluated":
-        is_ungrounded = True
-    if bucket == "recommended" and is_ungrounded:
-        return "clean-triage-pass"
-    return bucket
-
-
-def _failure_review_text(result: PerformanceResult) -> str:
-    """Return the full failure text preserved in canonical log output."""
-    if result.captured_output_on_fail:
-        return result.captured_output_on_fail
-    if result.error_traceback:
-        return result.error_traceback
-    return result.error_message or "No captured failure output."
-
-
-def _log_canonical_model_review(result: PerformanceResult) -> None:
-    """Emit a full-fidelity per-model review block to the file log."""
-    logger.debug("", extra={"log_destination": "file"})
-    logger.debug(
-        "=== CANONICAL REVIEW: %s ===",
-        result.model_name,
-        extra={"log_destination": "file"},
-    )
-    for label, value in _build_review_block_rows(result):
-        logger.debug("%s: %s", label, value, extra={"log_destination": "file"})
-    if result.success and result.generation is not None:
-        logger.debug(
-            "Full output:\n%s",
-            getattr(result.generation, "text", "") or "",
-            extra={"log_destination": "file"},
-        )
-    else:
-        logger.debug(
-            "Full captured failure output:\n%s",
-            _failure_review_text(result),
-            extra={"log_destination": "file"},
-        )
-    logger.debug(
-        "=== END CANONICAL REVIEW: %s ===",
-        result.model_name,
-        extra={"log_destination": "file"},
-    )
 
 
 def _preview_model_references(
@@ -12772,28 +7668,6 @@ _DIAGNOSTICS_LIB_NAMES: Final[tuple[str, ...]] = (
 )
 
 
-@dataclass(frozen=True)
-class PreparedTableData:
-    """Immutable cached table data shared across report renderers."""
-
-    headers: tuple[str, ...]
-    rows: tuple[tuple[str, ...], ...]
-    field_names: tuple[str, ...]
-
-
-@dataclass(frozen=True)
-class ReportTriageContext:
-    """Shared quality/utility triage context reused across report renderers."""
-
-    quality_counts: tuple[tuple[str, int], ...] = ()
-    clean_count: int = 0
-    utility_rows: tuple[UtilityTriageRow, ...] = ()
-    useful_rows: tuple[UtilityTriageRow, ...] = ()
-    watchlist_rows: tuple[tuple[UtilityTriageRow, str], ...] = ()
-    baseline_score: float | None = None
-    baseline_grade: str | None = None
-
-
 type CompatibilityStatus = Literal[
     "crashed",
     "indeterminate",
@@ -12869,9 +7743,7 @@ def _assessment_observations(result: PerformanceResult) -> tuple[ObservationCode
         observations.append("token_cap_truncation")
     if analysis.instruction_echo:
         observations.append("prompt_instruction_echo")
-    _, leaked_tokens = _detect_special_token_leakage(_strip_empty_thinking_wrappers(text))
-    expected_thinking_tokens = {"</think>"} if analysis.has_thinking_trace else set()
-    if any(token not in expected_thinking_tokens for token in leaked_tokens):
+    if analysis.unexpected_special_tokens:
         observations.append("unexpected_special_token")
     if analysis.has_thinking_trace:
         observations.append("thinking_trace_present")
@@ -12916,356 +7788,10 @@ def _assessment_to_json(assessment: ResultAssessment) -> JsonlAssessmentRecord:
 
 
 @dataclass(frozen=True)
-class ObservedEvidence:
-    """Immutable runtime, output, and proxy facts without policy decisions."""
-
-    upstream_boundary: UpstreamBoundary
-    failure_phase: str | None
-    exception_origin: str | None
-    exception_chain: tuple[FailureException, ...]
-    raw_output: str
-    stop_reason: str | None
-    requested_tokens: int | None
-    generated_tokens: int | None
-    anomalies: tuple[OutputAnomaly, ...]
-    reproduction_status: ControlledReproductionStatus
-    keyword_overlap: KeywordOverlapState
-
-
-@dataclass(frozen=True)
-class ModelUserAssessment:
-    """Current-run usefulness decision for local model users."""
-
-    execution_outcome: ExecutionOutcome
-    compatibility_status: CompatibilityStatus
-    current_recommendation: RecommendationStatus
-    output_anomalies: tuple[OutputAnomaly, ...]
-    keyword_overlap: KeywordOverlapState
-    evidence_codes: tuple[str, ...]
-
-
-@dataclass(frozen=True)
-class MaintainerAssessment:
-    """Ownership and publication decision for library/model maintainers."""
-
-    failure_origin: FailureOrigin
-    maintainer_readiness: MaintainerReadiness
-    suspected_owner: str | None
-    reproduction_status: ControlledReproductionStatus
-    evidence_codes: tuple[str, ...]
-    next_action: str
-
-
-@dataclass(frozen=True)
-class CanonicalAssessment:
-    """The two purpose-specific decisions derived from one evidence record."""
-
-    model_user: ModelUserAssessment
-    maintainer: MaintainerAssessment
-
-
-@dataclass(frozen=True)
-class ModelUserPresentation:
-    """Human-facing projection of the model-user assessment."""
-
-    recommendation: RecommendationStatus
-    label: str
-    icon: str
-    reason: str
-
-
-@dataclass(frozen=True)
-class MaintainerPresentation:
-    """Human-facing projection of the maintainer assessment."""
-
-    suspected_owner: str | None
-    readiness: MaintainerReadiness
-    evidence: tuple[str, ...]
-    next_action: str
-
-
-def _controlled_reproduction_status(
-    rerun: RerunEvidence | None,
-) -> ControlledReproductionStatus:
-    """Map optional differential-rerun facts to a narrow reproduction status."""
-    if rerun is None:
-        return "not_run"
-    if rerun.rerun_verdict == "indeterminate":
-        return "indeterminate"
-    return "not_reproduced" if rerun.rerun_success else "confirmed"
-
-
-def _output_anomalies(result: PerformanceResult) -> tuple[OutputAnomaly, ...]:
-    """Project existing mechanical quality facts into canonical anomaly codes."""
-    analysis = result.quality_analysis
-    if analysis is None:
-        return ()
-    anomalies: list[OutputAnomaly] = []
-    harness_details = " ".join(analysis.harness_issue_details)
-    if analysis.special_token_wrappers:
-        anomalies.append("special_token_wrapper")
-    if "token_leak:" in harness_details:
-        anomalies.append("special_token_leak")
-    if analysis.has_harness_issue:
-        anomalies.append("harness_contract")
-    if analysis.has_thinking_trace:
-        anomalies.append("thinking_trace")
-    if analysis.thinking_trace_incomplete and analysis.likely_capped:
-        anomalies.append("reasoning_budget_exhausted")
-    if analysis.is_repetitive:
-        anomalies.append("text_repetition")
-    if analysis.text_sanity_issue_type == "numeric_loop":
-        anomalies.append("numeric_repetition")
-    elif analysis.text_sanity_issue_type == "gibberish(mixed_script_noise)":
-        anomalies.append("mixed_script_corruption")
-    if analysis.degeneration_type and "encoding" in analysis.degeneration_type:
-        anomalies.append("encoding_corruption")
-    if analysis.missing_sections:
-        anomalies.append("missing_required_sections")
-    if analysis.likely_capped:
-        anomalies.append("token_cap_truncation")
-    if analysis.verdict == "model_shortcoming":
-        anomalies.append("irrelevant_output_smell")
-    return tuple(dict.fromkeys(anomalies))
-
-
-def _collect_observed_evidence(result: PerformanceResult) -> ObservedEvidence:
-    """Collect immutable runtime and output facts without audience policy."""
-    runtime = result.runtime_diagnostics
-    return ObservedEvidence(
-        upstream_boundary=result.upstream_boundary,
-        failure_phase=result.failure_phase,
-        exception_origin=(result.exception_chain[0].origin if result.exception_chain else None),
-        exception_chain=result.exception_chain,
-        raw_output=(
-            _generation_text_value(result.generation)
-            if result.generation is not None
-            else result.captured_output_on_fail or ""
-        ),
-        stop_reason=runtime.stop_reason if runtime is not None else None,
-        requested_tokens=result.requested_max_tokens,
-        generated_tokens=_generation_int_metric(result.generation, "generation_tokens"),
-        anomalies=_output_anomalies(result),
-        reproduction_status=_controlled_reproduction_status(result.rerun_evidence),
-        keyword_overlap=(
-            result.quality_analysis.keyword_overlap
-            if result.quality_analysis is not None
-            else "not_assessable"
-        ),
-    )
-
-
-_SEVERE_MODEL_OUTPUT_ANOMALIES: Final[frozenset[OutputAnomaly]] = frozenset(
-    {
-        "missing_required_sections",
-        "text_repetition",
-        "numeric_repetition",
-        "mixed_script_corruption",
-        "encoding_corruption",
-    }
-)
-_UPSTREAM_DIAGNOSTIC_ANOMALIES: Final[frozenset[OutputAnomaly]] = frozenset(
-    {"special_token_leak", "mixed_script_corruption", "encoding_corruption"}
-)
-_MAINTAINER_NEXT_ACTIONS: Final[Mapping[MaintainerReadiness, str]] = {
-    "issue_ready": "File the retained reproduction evidence with the suspected owner.",
-    "needs_reproduction": "Run a controlled reproduction before assigning an upstream defect.",
-    "harness_observation": "Correct or verify the local harness preflight before upstream filing.",
-    "not_applicable": "No maintainer issue action is indicated by this run.",
-}
-
-
-def _classify_model_user_assessment(
-    *,
-    evidence: ObservedEvidence,
-    result: PerformanceResult,
-    execution_outcome: ExecutionOutcome,
-) -> ModelUserAssessment:
-    """Classify current-run usefulness without making maintainer decisions."""
-    del result
-    anomaly_set = frozenset(evidence.anomalies)
-    if execution_outcome != "completed":
-        recommendation: RecommendationStatus = "not_evaluated"
-    elif anomaly_set & _SEVERE_MODEL_OUTPUT_ANOMALIES or (
-        evidence.keyword_overlap == "no_overlap" and "irrelevant_output_smell" in anomaly_set
-    ):
-        recommendation = "avoid"
-    elif evidence.keyword_overlap == "no_overlap" or anomaly_set:
-        recommendation = "caveat"
-    else:
-        recommendation = "recommended"
-
-    if execution_outcome == "indeterminate":
-        compatibility: CompatibilityStatus = "indeterminate"
-    elif execution_outcome == "failed":
-        compatibility = "crashed"
-    elif anomaly_set & _UPSTREAM_DIAGNOSTIC_ANOMALIES:
-        compatibility = "integration-warning"
-    else:
-        compatibility = "clean"
-
-    evidence_codes: tuple[str, ...] = evidence.anomalies
-    if execution_outcome == "indeterminate":
-        evidence_codes += ("external_connectivity",)
-    elif execution_outcome == "failed":
-        evidence_codes += ("execution_failure",)
-    if evidence.keyword_overlap == "no_overlap":
-        evidence_codes += ("keyword_no_overlap",)
-    return ModelUserAssessment(
-        execution_outcome=execution_outcome,
-        compatibility_status=compatibility,
-        current_recommendation=recommendation,
-        output_anomalies=evidence.anomalies,
-        keyword_overlap=evidence.keyword_overlap,
-        evidence_codes=evidence_codes,
-    )
-
-
-def _classify_maintainer_assessment(
-    *,
-    evidence: ObservedEvidence,
-    result: PerformanceResult,
-) -> MaintainerAssessment:
-    """Classify issue actionability independently of model-user usefulness."""
-    failure_origin = _failure_origin(result)
-    diagnostic_anomalies = tuple(
-        anomaly for anomaly in evidence.anomalies if anomaly in _UPSTREAM_DIAGNOSTIC_ANOMALIES
-    )
-    harness_signal = (
-        result.success
-        and result.quality_analysis is not None
-        and result.quality_analysis.has_harness_issue
-    )
-    if result.success and not diagnostic_anomalies and not harness_signal:
-        readiness: MaintainerReadiness = "not_applicable"
-    else:
-        readiness = _maintainer_readiness(
-            failure_origin=failure_origin,
-            reproduction_status=evidence.reproduction_status,
-            has_output_anomaly=bool(diagnostic_anomalies) or harness_signal,
-        )
-
-    suspected_owner: str | None = None
-    if not result.success:
-        owner = _failure_owner_for_result(result)
-        suspected_owner = owner if owner != _UNKNOWN_OWNER else None
-    elif _has_template_opened_thinking(result):
-        suspected_owner = "model-config / mlx-vlm"
-    elif (diagnostic_anomalies or harness_signal) and result.quality_analysis is not None:
-        suspected_owner = result.quality_analysis.owner
-
-    next_action = _MAINTAINER_NEXT_ACTIONS[readiness]
-    if (
-        readiness == "needs_reproduction"
-        and result.quality_analysis is not None
-        and (result.quality_analysis.harness_issue_type == "long_context")
-    ):
-        next_action = "Run a controlled reproduction with a reduced-image comparison before assigning a defect."
-    return MaintainerAssessment(
-        failure_origin=failure_origin,
-        maintainer_readiness=readiness,
-        suspected_owner=suspected_owner,
-        reproduction_status=evidence.reproduction_status,
-        evidence_codes=tuple(diagnostic_anomalies)
-        + (
-            (f"harness:{result.quality_analysis.harness_issue_type or 'unknown'}",)
-            if harness_signal and result.quality_analysis is not None
-            else ()
-        ),
-        next_action=next_action,
-    )
-
-
-def _build_canonical_assessment(
-    evidence: ObservedEvidence,
-    result: PerformanceResult,
-) -> CanonicalAssessment:
-    """Build both audience decisions from one immutable evidence record."""
-    outcome = _execution_outcome(result)
-    return CanonicalAssessment(
-        model_user=_classify_model_user_assessment(
-            evidence=evidence,
-            result=result,
-            execution_outcome=outcome,
-        ),
-        maintainer=_classify_maintainer_assessment(evidence=evidence, result=result),
-    )
-
-
-def _model_user_presentation(assessment: ModelUserAssessment) -> ModelUserPresentation:
-    """Return the compact human label for a model-user assessment."""
-    labels: Final[dict[RecommendationStatus, tuple[str, str]]] = {
-        "recommended": ("Recommended", "✓"),
-        "caveat": ("Caveat", "△"),
-        "avoid": ("Avoid", "✗"),
-        "not_evaluated": ("Not evaluated", "—"),
-    }
-    label, icon = labels[assessment.current_recommendation]
-    reason = ", ".join(assessment.evidence_codes) or "no flagged evidence"
-    return ModelUserPresentation(assessment.current_recommendation, label, icon, reason)
-
-
-def _maintainer_presentation(assessment: MaintainerAssessment) -> MaintainerPresentation:
-    """Return the compact human projection of maintainer readiness."""
-    return MaintainerPresentation(
-        suspected_owner=assessment.suspected_owner,
-        readiness=assessment.maintainer_readiness,
-        evidence=assessment.evidence_codes,
-        next_action=assessment.next_action,
-    )
-
-
-@dataclass(frozen=True)
-class ModelRecommendationView:
-    """Canonical current-run facts used by model recommendation surfaces."""
-
-    result: PerformanceResult
-    compatibility: CompatibilityStatus
-    current_recommendation: RecommendationStatus
-    eligible: bool
-    eligibility_reason: str
-    visual_score: float | None
-    context_score: float | None
-    draft_improvement_score: float | None
-    output_score: float | None
-    assisted_enrichment_score: float | None
-    first_token_latency_s: float | None
-    total_time_s: float | None
-    generation_tps: float | None
-    peak_memory_gb: float | None
-    burden: PromptBurden
-    caveats: tuple[str, ...]
-
-
-@dataclass(frozen=True)
-class MachineArtifactFacts:
-    """Additive machine-readable facts shared by current-run artifacts."""
-
-    compatibility_status: CompatibilityStatus
-    current_recommendation: RecommendationStatus
-    failure_origin: FailureOrigin
-    maintainer_readiness: MaintainerReadiness
-    reproduction_status: ControlledReproductionStatus
-    keyword_overlap: KeywordOverlapState
-    context_integration_score: float | None
-    draft_improvement_score: float | None
-    visual_description_score: float | None
-    assisted_enrichment_score: float | None
-    peak_memory_working_set_pct: float | None
-    prompt_burden_kind: str
-    prompt_burden_source: str
-    suspected_owner: str | None
-
-
-@dataclass(frozen=True)
 class ReportModePolicy:
-    """Mode-aware report rules for score visibility and selection grounding."""
+    """Factual run-mode fields shared by retained machine artifacts."""
 
     eval_mode: EvaluationLane
-    has_descriptive_metadata: bool
-    semantic_rankings_grounded: bool
-    suppress_cataloging_scores: bool
-    selection_basis: ReportSelectionBasis
     metadata_exposed_to_prompt: bool
 
 
@@ -13279,22 +7805,12 @@ class ReportRenderContext:
     """Shared cached context for retained current-run report generation."""
 
     result_set: ResultSet
-    table_data: PreparedTableData
-    prompt_context: str | None
-    summary: ModelIssueSummary
-    stats: PerformanceStats
     system_info: dict[str, str]
-    triage: ReportTriageContext
     recommended_working_set_bytes: int | None = None
     image_profile: ImageInputProfile | None = None
     preflight_issues: tuple[str, ...] = ()
     mode_policy: ReportModePolicy = dataclass_field(default_factory=_default_report_mode_policy)
-    recommendations: tuple[ModelRecommendationView, ...] = ()
-    failure_narratives: tuple[tuple[str, FailureNarrative], ...] = ()
-    machine_facts: tuple[MachineArtifactFacts, ...] = ()
     assessments: tuple[tuple[str, ResultAssessment], ...] = ()
-    reviews: tuple[tuple[str, JsonlReviewRecord | None], ...] = ()
-    maintainer_triage: tuple[tuple[str, JsonlMaintainerTriageRecord | None], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -14051,20 +8567,6 @@ def _evidence_harness_detail(detail: str) -> str | None:
     return None
 
 
-def _summarize_quality_signals(qa: GenerationQualityAnalysis | None) -> list[str]:
-    """Convert retained quality evidence into concise diagnostic prose."""
-    if qa is None:
-        return []
-    messages = [label.replace("_", " ") for label in qa.evidence]
-    messages.extend(qa.formatting_issues[:2])
-    if qa.missing_sections:
-        messages.append("missing sections: " + ", ".join(qa.missing_sections))
-    if qa.has_thinking_trace:
-        qualifier = "incomplete" if qa.thinking_trace_incomplete else "present"
-        messages.append(f"Thinking trace {qualifier} in expected model protocol")
-    return _dedupe_preserve_order(messages)
-
-
 @dataclass(frozen=True)
 class ReproCommandSpec:
     """Canonical tokenized native reproduction command used by reports."""
@@ -14493,23 +8995,6 @@ def generate_diagnostics_report(
     while parts and parts[-1] == "":
         parts.pop()
     _write_text_file(filename, "\n".join(parts) + "\n")
-
-
-def format_issues_summary_text(
-    summary: ModelIssueSummary,
-    stats: PerformanceStats,
-    *,
-    suppress_cataloging_scores: bool = False,
-) -> str:
-    """Format the issues and statistics summary as a Markdown string."""
-    return "\n".join(
-        _format_issues_summary_parts(
-            summary,
-            stats,
-            html_output=False,
-            include_cataloging_summary=not suppress_cataloging_scores,
-        )
-    )
 
 
 def _html_model_link(model_name: str) -> str:
@@ -15151,31 +9636,6 @@ summary { color: #0645ad; cursor: pointer; font-weight: 600; }
     )
 
 
-def print_model_stats(results: list[PerformanceResult]) -> None:
-    """Print model performance statistics in a formatted table."""
-    if not results:
-        logger.info("No results to display.")
-        return
-
-    table_data = _build_prepared_table_data(
-        result_set=ResultSet(results),
-        header_separator="\n",
-        include_output=False,
-    )
-    headers, rows, field_names = _materialize_prepared_table_data(table_data)
-    if not headers or not rows:
-        logger.info("No data to display in stats table.")
-        return
-
-    _log_rich_table(
-        headers=headers,
-        rows=rows,
-        justifications=["right" if is_numeric_field(field) else "left" for field in field_names],
-        max_widths=[20 if field == "quality_issues" else None for field in field_names],
-        indent="",
-    )
-
-
 # =============================================================================
 # SECTION: REPORT GENERATORS & RUNTIME FINGERPRINTS
 # =============================================================================
@@ -15320,294 +9780,11 @@ def generate_markdown_gallery_report(
     _write_markdown_artifact(filename, md, artifact_name="Markdown gallery report")
 
 
-def _model_selection_score(result: PerformanceResult) -> float:
-    """Score output hygiene and practical caption usefulness without image semantics."""
-    review = _review_for_result(result)
-    if not result.success or result.generation is None or review is None:
-        return 0.0
-
-    text = str(getattr(result.generation, "text", "") or "").strip()
-    word_count = len(text.split())
-    labels = _extract_quality_issue_labels(result.quality_issues)
-    score = 100.0
-
-    if review["user_bucket"] == "avoid":
-        score -= 65.0
-    elif review["user_bucket"] == "caveat":
-        score -= 25.0
-
-    if labels & {
-        "harness",
-        "reasoning_leak",
-        "thinking_incomplete",
-        "generation_loop",
-        "repetitive",
-    }:
-        score -= 35.0
-    if labels & {"formatting", "cutoff", "text_sanity", "lang_mixing"}:
-        score -= 20.0
-
-    if word_count < MODEL_SELECTION_MIN_CAPTION_WORDS:
-        score -= 25.0
-    elif word_count > MODEL_SELECTION_MAX_CAPTION_WORDS:
-        score -= 15.0
-
-    return max(0.0, round(score, 1))
-
-
-def _caption_usefulness_score(text: str) -> float:
-    """Score ungrounded caption usefulness from output shape and descriptive richness."""
-    words = re.findall(r"[A-Za-z0-9']+", text)
-    word_count = len(words)
-    if word_count == 0:
-        return 0.0
-
-    if word_count < MODEL_SELECTION_MIN_CAPTION_WORDS:
-        length_score = 22.0 + (word_count * 6.0)
-    elif word_count < MODEL_SELECTION_IDEAL_CAPTION_MIN_WORDS:
-        length_score = 64.0
-    elif word_count <= MODEL_SELECTION_IDEAL_CAPTION_MAX_WORDS:
-        length_score = 82.0
-    elif word_count <= MODEL_SELECTION_MAX_CAPTION_WORDS:
-        length_score = 78.0 - min(
-            (word_count - MODEL_SELECTION_IDEAL_CAPTION_MAX_WORDS) * 0.45,
-            18.0,
-        )
-    else:
-        length_score = 48.0
-
-    normalized_words = {
-        word.casefold() for word in words if len(word) >= MODEL_SELECTION_CONTENT_TERM_MIN_CHARS
-    }
-    richness_score = (
-        min(
-            len(normalized_words) / MODEL_SELECTION_RICHNESS_TARGET_TERMS,
-            1.0,
-        )
-        * 14.0
-    )
-    boilerplate_penalty = (
-        8.0 if re.search(r"\b(?:here(?:'s| is)|brief description)\b", text, re.IGNORECASE) else 0.0
-    )
-    repetition_penalty = 12.0 if _detect_repetitive_output(text, threshold=0.25)[0] else 0.0
-
-    return max(
-        0.0,
-        min(
-            100.0,
-            round(length_score + richness_score - boilerplate_penalty - repetition_penalty, 1),
-        ),
-    )
-
-
-def _recommendation_eligibility(
-    assessment: ModelUserAssessment,
-    *,
-    has_output: bool,
-) -> tuple[CompatibilityStatus, str]:
-    """Return compatibility and the first current-run eligibility gate."""
-    if assessment.current_recommendation != "recommended":
-        return (
-            assessment.compatibility_status,
-            f"current recommendation is {assessment.current_recommendation}",
-        )
-    return (
-        assessment.compatibility_status,
-        "eligible" if has_output else "no usable output text",
-    )
-
-
-def _recommendation_visual_score(
-    *,
-    eval_mode: str,
-    caption_score: float | None,
-    agreement: MetadataAgreementMetrics | None,
-    utility: UtilityTriageRow | None,
-) -> float | None:
-    """Return the visual-quality fact appropriate to the current evaluation lane."""
-    if eval_mode == "assisted":
-        if agreement is not None and agreement.visual_description_score is not None:
-            return agreement.visual_description_score
-        return utility.description_score if utility is not None else None
-    if eval_mode == "blind" and agreement is not None:
-        return agreement.overall_score
-    return caption_score
-
-
-def _failure_narratives_by_model(
-    context: ReportRenderContext,
-) -> dict[str, FailureNarrative]:
-    """Index cached unescaped failure narratives by model identifier."""
-    return dict(context.failure_narratives)
-
-
-def _recommendation_caveats(
-    result: PerformanceResult,
-    review: JsonlReviewRecord | None,
-    analysis: GenerationQualityAnalysis | None,
-    *,
-    eligibility_reason: str,
-    failure_narrative: FailureNarrative | None = None,
-) -> tuple[str, ...]:
-    """Return deduplicated review and failure evidence for one recommendation."""
-    caveats: list[str] = []
-    if review is not None:
-        focus = _review_focus_text(review, analysis)
-        if focus != "no flagged signals":
-            caveats.append(focus)
-    if not result.success:
-        narrative = failure_narrative or _build_failure_narrative(result)
-        caveats.extend((f"Task outcome: {narrative.task_outcome}", narrative.primary_exception))
-    if eligibility_reason != "eligible":
-        caveats.append(eligibility_reason)
-    return tuple(_dedupe_preserve_order(caveats))
-
-
-def _build_model_recommendation_views(
-    context: ReportRenderContext,
-) -> tuple[ModelRecommendationView, ...]:
-    """Build one canonical recommendation view per current-run model."""
-    utility_by_model = {row.result.model_name: row for row in context.triage.utility_rows}
-    narrative_by_model = _failure_narratives_by_model(context)
-    assessments = _legacy_assessments_by_model(context)
-    views: list[ModelRecommendationView] = []
-    for result in context.result_set.results:
-        review = _review_for_result(result)
-        analysis = _review_analysis_for_result(result)
-        agreement = result.metadata_agreement
-        utility = utility_by_model.get(result.model_name)
-        text = _generation_text_value(result.generation).strip()
-        hygiene_score = _model_selection_score(result) if review is not None else None
-        model_user_assessment = assessments[result.model_name].model_user
-        compatibility, eligibility_reason = _recommendation_eligibility(
-            model_user_assessment,
-            has_output=bool(text),
-        )
-        caption_score = _caption_usefulness_score(text) if text else None
-        visual_score = _recommendation_visual_score(
-            eval_mode=context.mode_policy.eval_mode,
-            caption_score=caption_score,
-            agreement=agreement,
-            utility=utility,
-        )
-
-        runtime = result.runtime_diagnostics
-        views.append(
-            ModelRecommendationView(
-                result=result,
-                compatibility=compatibility,
-                current_recommendation=model_user_assessment.current_recommendation,
-                eligible=eligibility_reason == "eligible",
-                eligibility_reason=eligibility_reason,
-                visual_score=visual_score,
-                context_score=(agreement.context_integration_score if agreement else None),
-                draft_improvement_score=(agreement.draft_improvement_score if agreement else None),
-                output_score=hygiene_score,
-                assisted_enrichment_score=(
-                    agreement.assisted_enrichment_score
-                    if agreement is not None and context.mode_policy.eval_mode == "assisted"
-                    else None
-                ),
-                first_token_latency_s=(runtime.first_token_latency_s if runtime else None),
-                total_time_s=result.total_time,
-                generation_tps=_generation_float_metric(result.generation, "generation_tps"),
-                peak_memory_gb=_generation_float_metric(result.generation, "peak_memory"),
-                burden=_prompt_burden_for_result(result, context.image_profile),
-                caveats=_recommendation_caveats(
-                    result,
-                    review,
-                    analysis,
-                    eligibility_reason=eligibility_reason,
-                    failure_narrative=narrative_by_model.get(result.model_name),
-                ),
-            )
-        )
-    return tuple(views)
-
-
-def _machine_artifact_facts(
-    view: ModelRecommendationView,
-    assessment: CanonicalAssessment,
-    *,
-    recommended_working_set_bytes: int | None,
-) -> MachineArtifactFacts:
-    """Return one canonical additive machine payload from cached report views."""
-    agreement = view.result.metadata_agreement
-    return MachineArtifactFacts(
-        compatibility_status=assessment.model_user.compatibility_status,
-        current_recommendation=assessment.model_user.current_recommendation,
-        failure_origin=assessment.maintainer.failure_origin,
-        maintainer_readiness=assessment.maintainer.maintainer_readiness,
-        reproduction_status=assessment.maintainer.reproduction_status,
-        keyword_overlap=assessment.model_user.keyword_overlap,
-        context_integration_score=view.context_score,
-        draft_improvement_score=view.draft_improvement_score,
-        visual_description_score=(agreement.visual_description_score if agreement else None),
-        assisted_enrichment_score=view.assisted_enrichment_score,
-        peak_memory_working_set_pct=_peak_memory_working_set_pct(
-            view.peak_memory_gb,
-            recommended_working_set_bytes,
-        ),
-        prompt_burden_kind=view.burden.kind,
-        prompt_burden_source=view.burden.source,
-        suspected_owner=assessment.maintainer.suspected_owner,
-    )
-
-
 def _assessments_by_model(
     report_context: HtmlReportContext,
 ) -> dict[str, ResultAssessment]:
     """Index the cached minimal current-run assessment by model identifier."""
     return dict(report_context.assessments)
-
-
-def _legacy_assessments_by_model(
-    report_context: ReportRenderContext,
-) -> dict[str, CanonicalAssessment]:
-    """Build legacy assessments until their report consumers are migrated."""
-    return {
-        result.model_name: _build_canonical_assessment(_collect_observed_evidence(result), result)
-        for result in report_context.result_set.results
-    }
-
-
-def _align_summary_recommendation_highlights(
-    summary: ModelIssueSummary,
-    *,
-    triage: ReportTriageContext,
-    recommendations: Sequence[ModelRecommendationView],
-) -> ModelIssueSummary:
-    """Align legacy summary labels until Task 7 removes their final callers."""
-    aligned: ModelIssueSummary = summary.copy()
-    eligible = _eligible_recommendations(recommendations)
-    eligible_names = {view.result.model_name for view in eligible}
-    _populate_summary_winner_highlights(aligned, [view.result for view in eligible])
-    eligible_scores = [
-        row for row in aligned.get("cataloging_scores", []) if row[0] in eligible_names
-    ]
-    if eligible_scores:
-        best = max(eligible_scores, key=lambda row: (row[1], row[0]))
-        aligned["cataloging_best"] = (best[0], best[1], best[2])
-    else:
-        aligned["cataloging_best"] = None
-    eligible_utility = [
-        row for row in triage.utility_rows if row.result.model_name in eligible_names
-    ]
-    _populate_cataloging_recommendation_highlights(
-        aligned,
-        description_scores=[
-            (row.result.model_name, row.description_score) for row in eligible_utility
-        ],
-        keyword_scores=[(row.result.model_name, row.keyword_score) for row in eligible_utility],
-    )
-    return aligned
-
-
-def _eligible_recommendations(
-    views: Sequence[ModelRecommendationView],
-) -> list[ModelRecommendationView]:
-    """Return recommendation views that pass current-run reliability gates."""
-    return [view for view in views if view.eligible]
 
 
 def _wrap_bare_urls(text: str) -> str:
@@ -18599,11 +12776,6 @@ def _preview_generation(
         )
 
     if not text_val:
-        if analysis.has_harness_issue:
-            details = ", ".join(analysis.harness_issue_details[:2])
-            log_warning_note(
-                f"Likely harness issue ({analysis.harness_issue_type}): {details}",
-            )
         log_metric_label("Generated Text:", emoji="📝")
         logger.info(
             "<empty>",
@@ -18611,30 +12783,21 @@ def _preview_generation(
         )
         return
 
-    # Show brief inline warnings for quality issues
+    # Show brief inline warnings for directly observed mechanical conditions.
     if analysis.is_repetitive and analysis.repeated_token:
         log_warning_note(f"Repetitive: '{analysis.repeated_token}'")
-    if analysis.hallucination_issues:
-        issues_preview = ", ".join(analysis.hallucination_issues[:2])
-        log_warning_note(issues_preview)
-    if analysis.is_verbose:
-        log_warning_note(f"Verbose ({gen_tokens} tokens)")
-    if analysis.formatting_issues:
-        log_warning_note(analysis.formatting_issues[0])
-    if analysis.is_context_ignored:
-        log_warning_note("No overlap with supplied context indicators")
     if analysis.missing_sections:
         missing = ", ".join(analysis.missing_sections)
         log_warning_note(f"Missing sections: {missing}")
-    if analysis.has_reasoning_leak:
-        log_warning_note("Reasoning/prompt text leaked into output")
     if analysis.thinking_trace_incomplete:
         log_warning_note("Expected thinking trace did not reach a final answer")
-    if analysis.has_context_echo:
-        log_warning_note(f"Context echo ({analysis.context_echo_ratio:.0%} overlap)")
-    if analysis.has_harness_issue:
-        details = ", ".join(analysis.harness_issue_details[:2])
-        log_warning_note(f"Harness issue ({analysis.harness_issue_type}): {details}")
+    if analysis.instruction_echo:
+        log_warning_note("Instruction text appears in output")
+    if analysis.likely_capped:
+        log_warning_note(f"Output reached requested token limit ({gen_tokens} tokens)")
+    if analysis.unexpected_special_tokens:
+        tokens = ", ".join(analysis.unexpected_special_tokens[:2])
+        log_warning_note(f"Unexpected special token wrappers: {tokens}")
 
     # Show full output in trace (truncated in summary table)
     log_metric_label("Generated Text:", emoji="📝")
@@ -18669,34 +12832,16 @@ def _log_verbose_success_details_mode(
 
     log_blank()
 
-    # Warn about quality issues
+    # Log only directly observed mechanical conditions.
     if analysis.is_repetitive and analysis.repeated_token:
-        warning_msg = (
-            f"WARNING: Output appears to be rubbish (repetitive: '{analysis.repeated_token}')"
-        )
-        log_warning_note(warning_msg)
-
-    if analysis.hallucination_issues:
-        for issue in analysis.hallucination_issues:
-            log_warning_note(issue, prefix="⚠️  Note:")
-
-    if analysis.is_verbose:
         log_warning_note(
-            f"Note: Output is excessively verbose ({gen_tokens} tokens)",
-            prefix="⚠️",
+            f"Contiguous repetition detected: {analysis.repeated_token}",
         )
-
-    if analysis.formatting_issues:
-        for issue in analysis.formatting_issues[:2]:  # Show first 2 issues
-            log_warning_note(issue, prefix="⚠️  Note:")
-
-    if analysis.is_context_ignored:
-        log_warning_note("No overlap with supplied context indicators", prefix="⚠️")
-    if analysis.has_harness_issue:
-        details = ", ".join(analysis.harness_issue_details[:3])
+    if analysis.missing_sections:
+        log_warning_note(f"Missing requested sections: {', '.join(analysis.missing_sections)}")
+    if analysis.unexpected_special_tokens:
         log_warning_note(
-            f"Likely harness issue ({analysis.harness_issue_type}): {details}",
-            prefix="⚠️",
+            f"Unexpected special token(s): {', '.join(analysis.unexpected_special_tokens)}"
         )
 
     if not gen_text:
@@ -18847,173 +12992,23 @@ def _log_perf_block(res: PerformanceResult) -> None:
     _log_metric_tree("Memory:", entries, emoji="💾")
 
 
-def _log_output_analysis(
-    gen_text: str,
-    gen_tokens: int,
-    generation_time: float,
-    peak_mem: float,
-) -> None:
-    """Log output analysis section: vocabulary, efficiency, structure, confidence."""
-    entries: list[MetricTreeRow] = []
-
-    # Vocabulary diversity
-    ttr, unique_words, total_words = compute_vocabulary_diversity(gen_text)
-    entries.append(
-        (
-            "Vocabulary:",
-            f"TTR={ttr:.2f} ({unique_words}/{total_words} unique words)",
-        )
-    )
-
-    # Efficiency metrics
-    efficiency = compute_efficiency_metrics(gen_tokens, generation_time, peak_mem)
-    if efficiency["tokens_per_second_per_gb"]:
-        entries.append(
-            (
-                "Efficiency:",
-                f"{efficiency['tokens_per_second_per_gb']:.1f} tok/s/GB",
-            )
-        )
-
-    # Response structure
-    structure = detect_response_structure(gen_text)
-    structure_parts: list[str] = []
-    if structure["has_caption"]:
-        structure_parts.append("caption")
-    if structure["has_keywords"]:
-        structure_parts.append("keywords")
-    if structure["has_description"]:
-        structure_parts.append("description")
-    if structure["has_sections"]:
-        structure_parts.append("sections")
-
-    structure_str = ", ".join(structure_parts) if structure_parts else "unstructured"
-    entries.append(("Structure:", structure_str))
-
-    # Confidence indicators
-    confidence = compute_confidence_indicators(gen_text)
-    conf_ratio = confidence["confidence_ratio"]
-    if conf_ratio > QUALITY.high_confidence_threshold:
-        conf_label = "high"
-    elif conf_ratio > QUALITY.medium_confidence_threshold:
-        conf_label = "medium"
-    else:
-        conf_label = "low"
-    entries.append(("Confidence:", f"{conf_label} ({conf_ratio:.0%})"))
-    _log_metric_tree("Output Analysis:", entries, emoji="🔍")
-
-
-def _get_grade_display(grade: str) -> str:
-    """Return emoji-decorated grade display string."""
-    emoji = GRADE_EMOJIS.get(grade, "❌")
-    return f"{emoji} {grade}"
-
-
-def _log_cataloging_utility(gen_text: str, context: str | None) -> None:
-    """Log cataloging utility metrics section."""
-    entries: list[MetricTreeRow] = []
-
-    # Information gain
-    info_gain = compute_information_gain(gen_text, context)
-    echo_ratio = info_gain["echo_ratio"]
-    entries.append(
-        (
-            "Info Gain:",
-            (
-                f"{info_gain['information_gain']:.0%} novel "
-                f"({info_gain['novel_words']}/{info_gain['output_words']} words)"
-            ),
-        )
-    )
-    if echo_ratio > QUALITY.moderate_echo_threshold:
-        entries.append(("Context echo:", f"⚠️  {echo_ratio:.0%} echoed from context"))
-
-    # Task compliance
-    compliance = compute_task_compliance(gen_text)
-    compliance_parts = [
-        "✓ caption" if compliance["has_caption"] else "✗ caption",
-        "✓ desc" if compliance["has_description"] else "✗ desc",
-        "✓ keywords" if compliance["has_keywords"] else "✗ keywords",
-    ]
-    entries.append(
-        (
-            "Compliance:",
-            f"{', '.join(compliance_parts)} ({compliance['compliance_score']:.0%})",
-        )
-    )
-
-    description = compute_description_quality(gen_text, context)
-    entries.append(
-        (
-            "Description:",
-            (
-                f"{description['description_score']:.0f}/100 "
-                f"({description['description_word_count']} words, "
-                f"{description['description_sentence_count']} sentences, "
-                f"grounding={description['description_grounding_score']:.0%})"
-            ),
-        )
-    )
-
-    keywords = compute_keyword_quality(gen_text, context)
-    entries.append(
-        (
-            "Keywords:",
-            (
-                f"{keywords['keyword_score']:.0f}/100 "
-                f"({keywords['keyword_term_count']} terms, "
-                f"{keywords['keyword_unique_terms']} unique, "
-                f"coverage={keywords['keyword_category_coverage']:.0%})"
-            ),
-        )
-    )
-
-    grounding = compute_visual_grounding(gen_text, context)
-    utility = compute_cataloging_utility(
-        gen_text,
-        context,
-        info_gain=info_gain,
-        task_compliance=compliance,
-        visual_grounding=grounding,
-    )
-    grade = str(utility["utility_grade"])
-    grade_display = _get_grade_display(grade)
-    entries.append(
-        (
-            "UTILITY:",
-            f"{grade_display} ({utility['utility_score']:.0f}/100) - {utility['primary_weakness']}",
-        )
-    )
-    _log_metric_tree("Cataloging Utility:", entries, emoji="📚")
-
-
 def _log_additional_diagnostics(
     res: PerformanceResult,
     gen_text: str,
     *,
     prompt: str | None = None,
 ) -> None:
-    """Log additional output diagnostics for detailed metrics mode.
-
-    Displays:
-    - Vocabulary diversity (type-token ratio)
-    - Efficiency metrics (tokens per GB)
-    - Response structure indicators
-    - Confidence indicators
-    - Cataloging utility metrics (information gain, task compliance, visual grounding)
-    """
+    """Log retained mechanical output observations in detailed mode."""
+    del prompt
     if not gen_text:
         return
-
-    gen_tokens = getattr(res.generation, "generation_tokens", 0) or 0
-    generation_time = res.generation_time or 0.0
-    peak_mem = getattr(res.generation, "peak_memory", 0.0) or 0.0
-
-    _log_output_analysis(gen_text, gen_tokens, generation_time, peak_mem)
-
-    log_blank()
-    context = _extract_trusted_hint_bundle(prompt).trusted_text or None if prompt else None
-    _log_cataloging_utility(gen_text, context)
+    analysis = _quality_analysis_for_result(res)
+    if analysis is not None:
+        _log_metric_tree(
+            "Output Observations:",
+            (("Mechanical:", _format_quality_analysis_for_log(analysis)),),
+            emoji="🔍",
+        )
 
 
 def _format_compact_timing(
@@ -19959,7 +13954,6 @@ def process_models(
     image_path: Path,
     *,  # Force keyword-only arguments for clarity
     prompt: str,
-    metadata: MetadataDict | None = None,
 ) -> list[PerformanceResult]:
     """Resolve the definitive model list and execute each model run.
 
@@ -20081,15 +14075,11 @@ def process_models(
         )
         result: PerformanceResult = process_image_with_model(params)
 
-        # Calculate and log quality score for successful generations.
+        # Calculate and log mechanical observations for successful generations.
         if result.success and result.generation:
             result = _populate_result_quality_analysis(
                 result,
                 prompt=prompt,
-                metadata=_quality_reference_metadata(
-                    eval_mode=str(getattr(args, "eval_mode", DEFAULT_EVAL_MODE)),
-                    metadata=metadata,
-                ),
                 requested_max_tokens=args.max_tokens,
                 context_marker=args.context_marker,
             )
@@ -20111,7 +14101,6 @@ def process_models(
                 )
 
         results.append(result)
-        _log_canonical_model_review(result)
 
         print_model_result(
             result,
@@ -20139,28 +14128,6 @@ def _format_quality_log_flag(
     return f"{label}=True ({detail})"
 
 
-def _format_quality_log_metric(
-    label: str,
-    value: int | None,
-) -> str | None:
-    """Return a compact integer metric for quality-analysis logging."""
-    if value is None:
-        return None
-    return f"{label}={value}"
-
-
-def _format_quality_log_ratio(
-    label: str,
-    value: float | None,
-    *,
-    digits: int,
-) -> str | None:
-    """Return a compact float metric for quality-analysis logging."""
-    if value is None:
-        return None
-    return f"{label}={value:.{digits}f}"
-
-
 def _format_repetitive_quality_log_part(analysis: GenerationQualityAnalysis) -> str | None:
     """Return the repetitive-output log segment when present."""
     return _format_quality_log_flag(
@@ -20170,81 +14137,17 @@ def _format_repetitive_quality_log_part(analysis: GenerationQualityAnalysis) -> 
     )
 
 
-def _format_refusal_quality_log_part(analysis: GenerationQualityAnalysis) -> str | None:
-    """Return the refusal log segment when present."""
-    return _format_quality_log_flag(
-        "refusal",
-        analysis.is_refusal,
-        detail=(f"type={analysis.refusal_type}" if analysis.refusal_type else None),
-    )
-
-
-def _format_harness_quality_log_part(analysis: GenerationQualityAnalysis) -> str | None:
-    """Return the harness-issue log segment when present."""
-    harness_details = ",".join(analysis.harness_issue_details[:2])
-    return _format_quality_log_flag(
-        "harness",
-        analysis.has_harness_issue,
-        detail=f"{analysis.harness_issue_type}; {harness_details}",
-    )
-
-
 def _format_quality_analysis_for_log(analysis: GenerationQualityAnalysis) -> str:
-    """Serialize quality-analysis flags into a compact log string.
-
-    Includes only active flags plus lightweight counters to keep diagnostics
-    readable in one line.
-    """
-    reasoning_marker = (
-        analysis.reasoning_leak_markers[0] if analysis.reasoning_leak_markers else "marker"
-    )
+    """Serialize retained mechanical facts into a compact terminal log line."""
     thinking_marker = (
         analysis.thinking_trace_markers[0] if analysis.thinking_trace_markers else "marker"
     )
     parts_raw: tuple[str | None, ...] = (
         _format_repetitive_quality_log_part(analysis),
-        _format_refusal_quality_log_part(analysis),
-        _format_quality_log_flag("language_mixing", analysis.has_language_mixing),
-        _format_quality_log_flag("hallucination", bool(analysis.hallucination_issues)),
-        _format_quality_log_flag(
-            "generic",
-            analysis.is_generic,
-            detail=f"score={analysis.specificity_score:.1f}",
-        ),
-        _format_quality_log_flag("verbose", analysis.is_verbose),
-        _format_quality_log_flag("formatting_issues", bool(analysis.formatting_issues)),
-        _format_quality_log_flag(
-            "excessive_bullets",
-            analysis.has_excessive_bullets,
-            detail=f"count={analysis.bullet_count}",
-        ),
-        _format_quality_log_flag("context_ignored", analysis.is_context_ignored),
-        _format_quality_log_flag(
-            "degeneration",
-            analysis.has_degeneration,
-            detail=str(analysis.degeneration_type),
-        ),
-        _format_quality_log_flag("fabrication", analysis.has_fabrication),
         (
             f"missing_sections={'+'.join(analysis.missing_sections)}"
             if analysis.missing_sections
             else None
-        ),
-        _format_quality_log_metric("title_words", analysis.title_word_count),
-        _format_quality_log_metric(
-            "description_sentences",
-            analysis.description_sentence_count,
-        ),
-        _format_quality_log_metric("keywords", analysis.keyword_count),
-        _format_quality_log_ratio(
-            "keyword_dup",
-            analysis.keyword_duplication_ratio,
-            digits=2,
-        ),
-        _format_quality_log_flag(
-            "reasoning_leak",
-            analysis.has_reasoning_leak,
-            detail=reasoning_marker,
         ),
         _format_quality_log_flag(
             "thinking_trace",
@@ -20255,22 +14158,18 @@ def _format_quality_analysis_for_log(analysis: GenerationQualityAnalysis) -> str
             "thinking_incomplete",
             analysis.thinking_trace_incomplete,
         ),
-        _format_quality_log_flag(
-            "context_echo",
-            analysis.has_context_echo,
-            detail=f"{analysis.context_echo_ratio:.2f}",
-        ),
         _format_quality_log_flag("instruction_echo", analysis.instruction_echo),
-        _format_quality_log_flag("metadata_borrowing", analysis.metadata_borrowing),
+        _format_quality_log_flag("likely_capped", analysis.likely_capped),
+        _format_quality_log_flag(
+            "unexpected_special_token",
+            bool(analysis.unexpected_special_tokens),
+            detail=",".join(analysis.unexpected_special_tokens[:2]),
+        ),
         (
-            f"hint_relationship={analysis.hint_relationship}"
-            if analysis.hint_relationship not in {"preserves_trusted_hints", "not_evaluated"}
+            f"keyword_overlap={analysis.keyword_overlap}"
+            if analysis.keyword_overlap != "not_assessable"
             else None
         ),
-        f"verdict={analysis.verdict}" if analysis.verdict != "clean" else None,
-        (f"user_bucket={analysis.user_bucket}" if analysis.user_bucket != "recommended" else None),
-        _format_quality_log_flag("likely_capped", analysis.likely_capped),
-        _format_harness_quality_log_part(analysis),
     )
     parts = [part for part in parts_raw if part is not None]
     parts.append(f"words={analysis.word_count}")
@@ -20279,173 +14178,48 @@ def _format_quality_analysis_for_log(analysis: GenerationQualityAnalysis) -> str
 
 
 def _build_quality_issues_string(analysis: GenerationQualityAnalysis) -> str | None:
-    """Build prioritized, comma-separated issue labels from analysis flags.
-
-    Ordering is intentional for triage severity: harness/integration issues
-    first, then critical model quality issues, then lower-severity formatting.
-    """
-    issues: list[str] = []
-
-    # HIGHEST PRIORITY: Harness/integration issues (mlx-vlm bugs, not model quality)
-    # These get special prefix to clearly mark them as actionable infrastructure issues
-    if analysis.has_harness_issue:
-        harness_label = (
-            f"⚠️harness({analysis.harness_issue_type})"
-            if analysis.harness_issue_type
-            else "⚠️harness"
-        )
-        issues.append(harness_label)
-        if analysis.harness_issue_type == "long_context":
-            issues.append("long-context")
-
-    # Critical model quality issues
-    refusal_label = f"refusal({analysis.refusal_type})" if analysis.refusal_type else "refusal"
+    """Build a compact log-only label string from mechanical observations."""
     repetitive_label = (
         f"repetitive({analysis.repeated_token})" if analysis.repeated_token else "repetitive"
     )
-    keyword_duplication_label = (
-        f"keyword-duplication({analysis.keyword_duplication_ratio:.2f})"
-        if analysis.keyword_duplication_ratio is not None
-        else "keyword-duplication"
-    )
-    text_sanity_label = analysis.text_sanity_issue_type or "text_sanity"
-    generation_loop_label = (
-        f"generation_loop({analysis.generation_loop_type})"
-        if analysis.generation_loop_type
-        else "generation_loop"
-    )
-
     issue_candidates = [
-        (analysis.is_refusal, refusal_label),
         (analysis.is_repetitive, repetitive_label),
-        (analysis.generation_loop_type is not None, generation_loop_label),
-        (analysis.text_sanity_issue_type is not None, text_sanity_label),
-        (analysis.metadata_alignment_issue is not None, "low_metadata_alignment"),
-        (analysis.has_language_mixing, "lang_mixing"),
-        (bool(analysis.hallucination_issues), "hallucination"),
-        (analysis.has_degeneration, "degeneration"),
-        (analysis.has_fabrication, "fabrication"),
         (
             bool(analysis.missing_sections),
             f"missing-sections({'+'.join(analysis.missing_sections)})",
         ),
-        (
-            analysis.has_title_length_violation,
-            f"title-length({analysis.title_word_count})",
-        ),
-        (
-            analysis.has_description_sentence_violation,
-            f"description-sentences({analysis.description_sentence_count})",
-        ),
-        (
-            analysis.has_keyword_count_violation,
-            f"keyword-count({analysis.keyword_count})",
-        ),
-        (
-            analysis.has_keyword_duplication_violation,
-            keyword_duplication_label,
-        ),
-        (analysis.has_reasoning_leak, "reasoning-leak"),
-        (
-            analysis.thinking_trace_incomplete,
-            "thinking-incomplete",
-        ),
+        (analysis.thinking_trace_incomplete, "thinking-incomplete"),
         (
             analysis.has_thinking_trace and not analysis.thinking_trace_incomplete,
             "thinking-trace",
         ),
-        (analysis.has_context_echo, f"context-echo({analysis.context_echo_ratio:.2f})"),
         (analysis.instruction_echo, "instruction-echo"),
-        (analysis.metadata_borrowing, "unverified-context-copy"),
+        (bool(analysis.unexpected_special_tokens), "unexpected-special-token"),
         (
-            analysis.draft_improvement_score is not None
-            and analysis.draft_improvement_score < QUALITY.low_draft_improvement_score,
-            "low-draft-improvement",
+            analysis.likely_capped
+            and bool(
+                analysis.is_repetitive
+                or analysis.missing_sections
+                or analysis.thinking_trace_incomplete
+            ),
+            "token-cap-truncation",
         ),
-        (
-            analysis.hint_relationship == "ignores_trusted_hints",
-            "trusted-hints-ignored",
-        ),
-        (
-            analysis.hint_relationship == "degrades_trusted_hints",
-            "trusted-hints-degraded",
-        ),
-        (analysis.verdict == "cutoff_degraded", "cutoff"),
-        (analysis.verdict == "token_cap", "token-cap"),
-        (analysis.verdict == "context_budget", "context-budget"),
-        (analysis.is_generic, f"generic({analysis.specificity_score:.0f})"),
-        (analysis.is_verbose, "verbose"),
-        (bool(analysis.formatting_issues), "formatting"),
-        (analysis.has_excessive_bullets, f"bullets({analysis.bullet_count})"),
-        (analysis.is_context_ignored, "context-ignored"),
+        (analysis.keyword_overlap == "no_overlap", "no-keyword-overlap"),
     ]
-    issues.extend(label for condition, label in issue_candidates if condition)
-
+    issues = [label for condition, label in issue_candidates if condition]
     return ", ".join(issues) if issues else None
 
 
 QUALITY_ISSUE_PATTERNS: Final[dict[str, re.Pattern[str]]] = {
-    "harness": re.compile(r"⚠️?harness", re.IGNORECASE),
-    "long_context": re.compile(r"long[-_]context", re.IGNORECASE),
-    "refusal": re.compile(r"\brefusal\b", re.IGNORECASE),
     "repetitive": re.compile(r"\brepetitive\b", re.IGNORECASE),
-    "generation_loop": re.compile(r"\bgeneration_loop\b", re.IGNORECASE),
-    "text_sanity": re.compile(r"\bgibberish\b|\btext_sanity\b", re.IGNORECASE),
-    "low_metadata_alignment": re.compile(r"\blow_metadata_alignment\b", re.IGNORECASE),
-    "lang_mixing": re.compile(r"\blang_mixing\b", re.IGNORECASE),
-    "hallucination": re.compile(r"\bhallucination\b", re.IGNORECASE),
-    "degeneration": re.compile(r"\bdegeneration\b", re.IGNORECASE),
-    "fabrication": re.compile(r"\bfabrication\b", re.IGNORECASE),
     "missing_sections": re.compile(r"\bmissing-sections\b", re.IGNORECASE),
-    "title_length": re.compile(r"\btitle-length\b", re.IGNORECASE),
-    "description_length": re.compile(r"\bdescription-sentences\b", re.IGNORECASE),
-    "keyword_count": re.compile(r"\bkeyword-count\b", re.IGNORECASE),
-    "keyword_duplication": re.compile(r"\bkeyword-duplication\b", re.IGNORECASE),
-    "reasoning_leak": re.compile(r"\breasoning-leak\b", re.IGNORECASE),
     "thinking_incomplete": re.compile(r"\bthinking-incomplete\b", re.IGNORECASE),
     "thinking_trace": re.compile(r"\bthinking-trace\b", re.IGNORECASE),
-    "context_echo": re.compile(r"\bcontext-echo\b", re.IGNORECASE),
     "instruction_echo": re.compile(r"\binstruction-echo\b", re.IGNORECASE),
-    "metadata_borrowing": re.compile(r"\bmetadata-borrowing\b", re.IGNORECASE),
-    "unverified_context_copy": re.compile(r"\bunverified-context-copy\b", re.IGNORECASE),
-    "low_draft_improvement": re.compile(r"\blow-draft-improvement\b", re.IGNORECASE),
-    "trusted_hint_ignored": re.compile(r"\btrusted-hints-ignored\b", re.IGNORECASE),
-    "trusted_hint_degraded": re.compile(r"\btrusted-hints-degraded\b", re.IGNORECASE),
-    "cutoff": re.compile(r"\bcutoff\b", re.IGNORECASE),
-    "token_cap": re.compile(r"\btoken-cap\b", re.IGNORECASE),
-    "context_budget": re.compile(r"\bcontext-budget\b", re.IGNORECASE),
-    "generic": re.compile(r"\bgeneric\b", re.IGNORECASE),
-    "verbose": re.compile(r"\bverbose\b", re.IGNORECASE),
-    "formatting": re.compile(r"\bformatting\b", re.IGNORECASE),
-    "bullets": re.compile(r"\bbullets?\b", re.IGNORECASE),
-    "context_ignored": re.compile(r"context-ignored", re.IGNORECASE),
+    "unexpected_special_token": re.compile(r"unexpected-special-token", re.IGNORECASE),
+    "token_cap_truncation": re.compile(r"token-cap-truncation", re.IGNORECASE),
+    "no_keyword_overlap": re.compile(r"no-keyword-overlap", re.IGNORECASE),
 }
-
-QUALITY_BREAKING_LABELS: Final[frozenset[str]] = frozenset(
-    {
-        "harness",
-        "long_context",
-        "refusal",
-        "repetitive",
-        "generation_loop",
-        "text_sanity",
-        "low_metadata_alignment",
-        "hallucination",
-        "degeneration",
-        "context_ignored",
-        "missing_sections",
-        "reasoning_leak",
-        "thinking_incomplete",
-        "context_echo",
-        "instruction_echo",
-        "metadata_borrowing",
-        "unverified_context_copy",
-        "cutoff",
-        "trusted_hint_degraded",
-        "runtime_failure",
-        "unknown_runtime_anomaly",
-    },
-)
 
 
 def _truncate_text_preview(text: str, *, max_chars: int) -> str:
@@ -20455,147 +14229,26 @@ def _truncate_text_preview(text: str, *, max_chars: int) -> str:
     return text[: max_chars - 3].rstrip() + "..."
 
 
-def _center_text_preview_on_needles(
-    text: str,
-    *,
-    needles: Sequence[str],
-    max_chars: int,
-) -> str:
-    """Trim text around the first requested needle so evidence remains visible."""
-    if len(text) <= max_chars:
-        return text
-
-    matched_index: int | None = None
-    matched_needle = ""
-    for needle in needles:
-        if not needle:
-            continue
-        index = text.find(needle)
-        if index == -1:
-            index = text.casefold().find(needle.casefold())
-        if index != -1:
-            matched_index = index
-            matched_needle = needle
-            break
-
-    if matched_index is None:
-        return _truncate_text_preview(text, max_chars=max_chars)
-
-    ellipsis = "..."
-    available_chars = max(max_chars - (len(ellipsis) * 2), len(matched_needle))
-    start = max(matched_index - max((available_chars - len(matched_needle)) // 2, 0), 0)
-    end = min(start + available_chars, len(text))
-    if end - start < available_chars:
-        start = max(end - available_chars, 0)
-
-    preview = text[start:end].strip()
-    if start > 0:
-        preview = ellipsis + preview
-    if end < len(text):
-        preview = preview + ellipsis
-    return preview
-
-
 def _collapse_preview_whitespace(text: str) -> str:
     """Flatten whitespace for compact table/report previews."""
     return re.sub(r"\s+", " ", text).strip()
-
-
-def _metadata_agreement_has_visual_reference(
-    metadata_agreement: MetadataAgreementMetrics | None,
-) -> bool:
-    """Return whether metadata agreement had visual reference terms to compare."""
-    return bool(
-        metadata_agreement and (metadata_agreement.matched_terms or metadata_agreement.missed_terms)
-    )
-
-
-def _apply_metadata_alignment_to_analysis(
-    analysis: GenerationQualityAnalysis,
-    metadata_agreement: MetadataAgreementMetrics | None,
-) -> GenerationQualityAnalysis:
-    """Fold trusted-metadata agreement into clean-output diagnostics."""
-    if metadata_agreement is None:
-        return analysis
-
-    has_visual_reference = _metadata_agreement_has_visual_reference(metadata_agreement)
-    score = metadata_agreement.overall_score
-    metadata_issue: str | None = None
-    verdict = analysis.verdict
-    evidence = list(analysis.evidence)
-
-    if has_visual_reference and score < QUALITY.metadata_alignment_min_score:
-        metadata_issue = "low_metadata_alignment"
-        evidence.append(metadata_issue)
-    draft_improvement_score = metadata_agreement.draft_improvement_score
-    if (
-        draft_improvement_score is not None
-        and draft_improvement_score < QUALITY.low_draft_improvement_score
-    ):
-        evidence.append("low-draft-improvement")
-
-    user_bucket = _classify_user_bucket(
-        verdict=verdict,
-        hint_relationship=analysis.hint_relationship,
-        has_contract_issue=_analysis_has_contract_issue(analysis),
-        has_presentation_warning=bool(
-            analysis.has_thinking_trace or analysis.has_reasoning_leak or analysis.formatting_issues
-        ),
-    )
-    return replace(
-        analysis,
-        verdict=verdict,
-        user_bucket=user_bucket,
-        evidence=_dedupe_preserve_order(evidence),
-        metadata_alignment_score=score
-        if has_visual_reference
-        else analysis.metadata_alignment_score,
-        metadata_alignment_issue=metadata_issue,
-        draft_improvement_score=draft_improvement_score,
-    )
 
 
 def _populate_result_quality_analysis(
     result: PerformanceResult,
     *,
     prompt: str | None = None,
-    metadata: MetadataDict | None = None,
     requested_max_tokens: int | None = None,
     context_marker: str = "Context:",
 ) -> PerformanceResult:
-    """Attach structured quality analysis to successful results as soon as they exist."""
+    """Attach mechanical analysis to a completed result exactly once per prompt."""
     if not result.success or result.generation is None:
         return result
 
     text = str(getattr(result.generation, "text", ""))
-    needs_metadata_refresh = bool(metadata) and result.metadata_agreement is None
-
     cached_analysis = _quality_analysis_for_result(result)
-    if cached_analysis is not None:
-        needs_prompt_refresh = bool(prompt) and not cached_analysis.prompt_checks_ran
-        if not needs_prompt_refresh:
-            metadata_agreement = result.metadata_agreement
-            if needs_metadata_refresh:
-                metadata_agreement = compute_metadata_agreement(text, metadata)
-            refreshed_analysis = _apply_metadata_alignment_to_analysis(
-                cached_analysis,
-                metadata_agreement,
-            )
-            refreshed_quality_issues = _build_quality_issues_string(refreshed_analysis)
-            if result.quality_issues and metadata_agreement is None:
-                refreshed_quality_issues = result.quality_issues
-            if (
-                not needs_metadata_refresh
-                and result.quality_analysis == refreshed_analysis
-                and result.quality_issues == refreshed_quality_issues
-            ):
-                return result
-            return replace(
-                result,
-                quality_analysis=refreshed_analysis,
-                quality_issues=refreshed_quality_issues,
-                metadata_agreement=metadata_agreement,
-            )
+    if cached_analysis is not None and (not prompt or cached_analysis.prompt_checks_ran):
+        return result
 
     generated_tokens = getattr(result.generation, "generation_tokens", 0)
     prompt_tokens = getattr(result.generation, "prompt_tokens", None)
@@ -20614,180 +14267,16 @@ def _populate_result_quality_analysis(
             result.prompt_diagnostics.special_tokens if result.prompt_diagnostics else ()
         ),
     )
-    if cached_analysis is not None:
-        cached_quality_issues = result.quality_issues or _build_quality_issues_string(
-            cached_analysis,
-        )
-        if result.quality_issues and result.quality_issues != cached_quality_issues:
-            quality_issues = result.quality_issues
-
-    metadata_agreement = result.metadata_agreement
-    if needs_metadata_refresh:
-        metadata_agreement = compute_metadata_agreement(text, metadata)
-    analysis = _apply_metadata_alignment_to_analysis(analysis, metadata_agreement)
-    quality_issues = _build_quality_issues_string(analysis)
-    if result.quality_issues and metadata_agreement is None:
-        quality_issues = result.quality_issues
-
     return replace(
         result,
         quality_analysis=analysis,
         quality_issues=quality_issues,
-        metadata_agreement=metadata_agreement,
     )
-
-
-def _build_result_output_cues(result: PerformanceResult) -> list[str]:
-    """Return compact issue cues that explain why an output is suspicious."""
-    if not result.success:
-        failure_cues: list[str] = []
-        if result.error_package:
-            failure_cues.append(result.error_package)
-        if result.error_stage:
-            failure_cues.append(result.error_stage.lower().replace(" ", "-"))
-        return _dedupe_preserve_order(failure_cues)[:OUTPUT_PREVIEW_CUE_LIMIT]
-
-    quality_labels = _extract_quality_issue_labels(result.quality_issues)
-    analysis = _quality_analysis_for_result(result)
-    cues: list[str] = []
-
-    if "harness" in quality_labels or (analysis is not None and analysis.has_harness_issue):
-        harness_type = (
-            analysis.harness_issue_type.replace("_", "-")
-            if analysis is not None and analysis.harness_issue_type
-            else ""
-        )
-        cues.append(f"harness:{harness_type}" if harness_type else "harness")
-
-    cue_rules: tuple[tuple[str, str, str | None, str | None], ...] = (
-        ("repetitive", "repetitive", "is_repetitive", None),
-        ("context_echo", "context-echo", "has_context_echo", None),
-        ("instruction_echo", "instruction-echo", "instruction_echo", None),
-        (
-            "unverified_context_copy",
-            "unverified-context-copy",
-            None,
-            None,
-        ),
-        ("low_draft_improvement", "low-draft-improvement", None, None),
-        ("metadata_borrowing", "metadata-borrowing", "metadata_borrowing", None),
-        ("cutoff", "cutoff", None, "cutoff"),
-        ("context_budget", "context-budget", None, "context_budget"),
-        ("reasoning_leak", "reasoning-leak", "has_reasoning_leak", None),
-        (
-            "thinking_incomplete",
-            "thinking-incomplete",
-            "thinking_trace_incomplete",
-            None,
-        ),
-        ("thinking_trace", "thinking-trace", None, None),
-        ("degeneration", "degeneration", "has_degeneration", None),
-        ("context_ignored", "context-ignored", "is_context_ignored", None),
-        ("refusal", "refusal", "is_refusal", None),
-        ("missing_sections", "missing-sections", "missing_sections", None),
-        ("formatting", "formatting", "formatting_issues", None),
-        ("generic", "generic", "is_generic", None),
-    )
-
-    for quality_label, cue_label, analysis_flag, verdict in cue_rules:
-        if quality_label in quality_labels:
-            cues.append(cue_label)
-            continue
-        if analysis is None:
-            continue
-        if analysis_flag is not None and getattr(analysis, analysis_flag):
-            cues.append(cue_label)
-            continue
-        if verdict is not None and analysis.verdict == verdict:
-            cues.append(cue_label)
-
-    return _dedupe_preserve_order(cues)[:OUTPUT_PREVIEW_CUE_LIMIT]
 
 
 # =============================================================================
 # SECTION: RESULT ENRICHMENT/HISTORY/FINALIZATION
 # =============================================================================
-
-
-def _build_head_tail_preview(text: str, *, max_chars: int) -> str:
-    """Build a compact preview that exposes both the start and end of long output."""
-    if len(text) <= max_chars:
-        return text
-
-    separator = " ... [tail] "
-    min_total = OUTPUT_PREVIEW_MIN_HEAD_CHARS + OUTPUT_PREVIEW_MIN_TAIL_CHARS + len(separator)
-    if max_chars <= min_total:
-        return _truncate_text_preview(text, max_chars=max_chars)
-
-    head_budget = max(OUTPUT_PREVIEW_MIN_HEAD_CHARS, int(max_chars * 0.65))
-    head_budget = min(head_budget, max_chars - OUTPUT_PREVIEW_MIN_TAIL_CHARS - len(separator))
-    tail_budget = max_chars - head_budget - len(separator)
-
-    head = text[:head_budget].rstrip()
-    tail = text[-tail_budget:].lstrip()
-    if not tail or tail in head:
-        return _truncate_text_preview(text, max_chars=max_chars)
-    return f"{head}{separator}{tail}"
-
-
-def _build_output_preview_text(
-    text: str,
-    *,
-    cues: Sequence[str] = (),
-    max_chars: int,
-) -> str:
-    """Build a deterministic compact preview for current-run report tables."""
-    normalized_text = _collapse_preview_whitespace(text)
-    if not normalized_text:
-        return ""
-
-    cue_text = ""
-    if cues:
-        cue_text = f"[{'; '.join(cues[:OUTPUT_PREVIEW_CUE_LIMIT])}] "
-
-    available_chars = max_chars - len(cue_text)
-    if available_chars <= OUTPUT_PREVIEW_MIN_BODY_CHARS:
-        return _truncate_text_preview(cue_text + normalized_text, max_chars=max_chars)
-
-    preview_body = _build_head_tail_preview(normalized_text, max_chars=available_chars)
-    return cue_text + preview_body
-
-
-def _full_output_report_text(result: PerformanceResult) -> str:
-    """Return the full text shown when expanding output details."""
-    if result.success and result.generation is not None:
-        return str(getattr(result.generation, "text", ""))
-    if result.error_message:
-        error_stage = result.error_stage or "Error"
-        return f"Error: {error_stage} - {result.error_message}"
-    return "Unknown error"
-
-
-def _build_result_output_preview(
-    result: PerformanceResult,
-    *,
-    max_chars: int = MAX_OUTPUT_PREVIEW_CHARS,
-) -> str:
-    """Build a shared skim-first preview for compact report surfaces."""
-    full_text = _full_output_report_text(result)
-    cues = _build_result_output_cues(result)
-
-    if result.success:
-        preview_source = _truncate_repetitive_output(full_text)
-        lines = preview_source.splitlines()
-        if len(lines) > MAX_OUTPUT_LINES:
-            preview_source = "\n".join(lines[:MAX_OUTPUT_LINES]) + "\n..."
-        return _build_output_preview_text(
-            preview_source,
-            cues=cues,
-            max_chars=max_chars,
-        )
-
-    return _build_output_preview_text(
-        full_text,
-        cues=cues,
-        max_chars=max_chars,
-    )
 
 
 def _extract_quality_issue_labels(quality_issues: str | None) -> set[str]:
@@ -20845,20 +14334,6 @@ def _format_counter_items(counter: Counter[str], *, max_items: int = 6) -> str:
     if not counter:
         return "none"
     return ", ".join(f"{label}={count}" for label, count in counter.most_common(max_items))
-
-
-@dataclass(frozen=True)
-class UtilityTriageRow:
-    """Cataloging triage row for summary ranking/logging."""
-
-    result: PerformanceResult
-    score: float
-    description_score: float
-    keyword_score: float
-    grade: str
-    weakness: str
-    delta_vs_metadata: float | None
-    labels: frozenset[str]
 
 
 def _short_model_label(model_name: str, *, max_len: int = SUMMARY_MODEL_LABEL_MAX) -> str:
@@ -21057,734 +14532,6 @@ def _log_performance_highlights(
     logger.info("   Memory efficiency: %.0f tokens/GB", memory_efficiency)
 
 
-def _collect_quality_and_utility_rows(
-    successful: list[PerformanceResult],
-    *,
-    prompt: str | None,
-) -> tuple[Counter[str], int, list[UtilityTriageRow], float | None, str | None]:
-    """Collect quality counts and cataloging utility rows."""
-    quality_counts: Counter[str] = Counter()
-    clean_count = 0
-    context = _extract_trusted_hint_bundle(prompt).trusted_text or None if prompt else None
-    baseline = _compute_metadata_baseline_utility(context)
-    baseline_score = baseline[0] if baseline is not None else None
-    baseline_grade = baseline[1] if baseline is not None else None
-    rows: list[UtilityTriageRow] = []
-
-    for res in successful:
-        labels = frozenset(_extract_quality_issue_labels(res.quality_issues))
-        if labels:
-            for label in labels:
-                quality_counts[label] += 1
-        else:
-            clean_count += 1
-
-        if not res.generation:
-            continue
-        text = str(getattr(res.generation, "text", "") or "")
-        utility = compute_cataloging_utility(text, context)
-        score = float(utility["utility_score"])
-        grade = str(utility["utility_grade"])
-        weakness = str(utility["primary_weakness"])
-        delta = score - baseline_score if baseline_score is not None else None
-        rows.append(
-            UtilityTriageRow(
-                result=res,
-                score=score,
-                description_score=float(utility.get("description_score", 0.0)),
-                keyword_score=float(utility.get("keyword_score", 0.0)),
-                grade=grade,
-                weakness=weakness,
-                delta_vs_metadata=delta,
-                labels=labels,
-            ),
-        )
-
-    return quality_counts, clean_count, rows, baseline_score, baseline_grade
-
-
-def _log_quality_signal_summary(
-    quality_counts: Counter[str],
-    *,
-    clean_count: int,
-    successful_count: int,
-) -> None:
-    """Log quality issue frequency among successful models."""
-    logger.info("🧪 Quality Signal Frequency:")
-    logger.info("   %s", _format_counter_items(quality_counts))
-    logger.info("   Clean outputs: %d/%d", clean_count, successful_count)
-
-
-def _build_report_triage_context(
-    successful: Sequence[PerformanceResult],
-    *,
-    prompt: str | None,
-) -> ReportTriageContext:
-    """Build cached quality/utility triage data for report renderers."""
-    quality_counts, clean_count, utility_rows, baseline_score, baseline_grade = (
-        _collect_quality_and_utility_rows(
-            list(successful),
-            prompt=prompt,
-        )
-    )
-    useful_rows = _select_useful_rows(utility_rows)
-    watchlist_rows = _select_watchlist_rows(utility_rows)
-    sorted_quality_counts = tuple(quality_counts.most_common())
-    return ReportTriageContext(
-        quality_counts=sorted_quality_counts,
-        clean_count=clean_count,
-        utility_rows=tuple(utility_rows),
-        useful_rows=tuple(useful_rows),
-        watchlist_rows=tuple(watchlist_rows),
-        baseline_score=baseline_score,
-        baseline_grade=baseline_grade,
-    )
-
-
-def _grade_display_parts(grade: str, score: float) -> str:
-    """Return a compact grade/score label for report sections."""
-    emoji = GRADE_EMOJIS.get(grade, "")
-    return f"{emoji} {grade} ({score:.0f}/100)"
-
-
-def _humanize_watchlist_reason(reason: str) -> str:
-    """Convert internal watchlist reason labels into reviewer-facing text."""
-    if reason.startswith("worse-than-metadata"):
-        return "worse than metadata baseline"
-    return re.sub(
-        r"\s+",
-        " ",
-        reason.replace("_", " ").replace("-", " ").replace(",", ", "),
-    ).strip()
-
-
-def _format_review_shortlist_line(
-    row: UtilityTriageRow,
-    *,
-    include_reason: str | None = None,
-    html_output: bool = False,
-    include_cataloging_scores: bool = True,
-) -> str:
-    """Format one useful/watchlist row for shared report sections."""
-    details: list[str] = []
-    if include_cataloging_scores:
-        details.append(_grade_display_parts(row.grade, row.score))
-        details.append(f"Desc {row.description_score:.0f}")
-        details.append(f"Keywords {row.keyword_score:.0f}")
-    else:
-        details.append("caption-review candidate")
-    if include_cataloging_scores and row.delta_vs_metadata is not None:
-        details.append(f"Δ{row.delta_vs_metadata:+.0f}")
-    tps = getattr(row.result.generation, "generation_tps", None)
-    if isinstance(tps, int | float) and float(tps) > 0.0:
-        details.append(f"{float(tps):.1f} tps")
-    if include_reason is not None:
-        details.append(_humanize_watchlist_reason(include_reason))
-    if html_output:
-        return (
-            f"<code>{html.escape(row.result.model_name)}</code>: {html.escape(' | '.join(details))}"
-        )
-    return f"`{row.result.model_name}`: {' | '.join(details)}"
-
-
-def _format_review_priorities_parts(
-    report_context: ReportRenderContext,
-    *,
-    html_output: bool,
-    suppress_cataloging_scores: bool | None = None,
-) -> list[str]:
-    """Render shared reviewer-oriented shortlists for HTML/Markdown reports."""
-    triage = report_context.triage
-    useful_rows = [
-        row
-        for row in triage.useful_rows
-        if _recommendation_status_for_result(row.result) == "recommended"
-    ]
-    watchlist_rows = list(triage.watchlist_rows)
-    watchlist_models = {row.result.model_name for row, _reason in watchlist_rows}
-    watchlist_rows.extend(
-        (
-            row,
-            f"current-review-says-{_recommendation_status_for_result(row.result)}",
-        )
-        for row in triage.useful_rows
-        if row.result.model_name not in watchlist_models
-        and _recommendation_status_for_result(row.result) != "recommended"
-    )
-    if not useful_rows and not watchlist_rows:
-        return []
-    if suppress_cataloging_scores is None:
-        suppress_cataloging_scores = report_context.mode_policy.suppress_cataloging_scores
-    include_cataloging_scores = not suppress_cataloging_scores
-
-    parts: list[str] = []
-    if html_output:
-        parts.append("<h3>🧭 Review Shortlist</h3>")
-    else:
-        _append_markdown_section(parts, title="## 🧭 Review Shortlist")
-
-    if useful_rows:
-        if html_output:
-            parts.append("<p><b>Strong candidates:</b></p><ul>")
-            parts.extend(
-                "<li>"
-                f"{_format_review_shortlist_line(row, html_output=True, include_cataloging_scores=include_cataloging_scores)}"
-                "</li>"
-                for row in useful_rows[:MAX_TRIAGE_MODELS]
-            )
-            parts.append("</ul>")
-        else:
-            parts.append("### Strong Candidates")
-            parts.append("")
-            parts.extend(
-                "- "
-                f"{_format_review_shortlist_line(row, include_cataloging_scores=include_cataloging_scores)}"
-                for row in useful_rows[:MAX_TRIAGE_MODELS]
-            )
-            parts.append("")
-
-    if watchlist_rows:
-        if html_output:
-            parts.append("<p><b>Watchlist:</b></p><ul>")
-            parts.extend(
-                "<li>"
-                f"{_format_review_shortlist_line(row, include_reason=reason, html_output=True, include_cataloging_scores=include_cataloging_scores)}"
-                "</li>"
-                for row, reason in watchlist_rows[:MAX_TRIAGE_MODELS]
-            )
-            parts.append("</ul>")
-        else:
-            parts.append("### Watchlist")
-            parts.append("")
-            parts.extend(
-                "- "
-                f"{_format_review_shortlist_line(row, include_reason=reason, include_cataloging_scores=include_cataloging_scores)}"
-                for row, reason in watchlist_rows[:MAX_TRIAGE_MODELS]
-            )
-            parts.append("")
-
-    return parts
-
-
-def _build_action_snapshot_stanzas(
-    results: list[PerformanceResult],
-    report_context: ReportRenderContext,
-    *,
-    suppress_cataloging_claims: bool = False,
-) -> list[ReportStanza]:
-    """Build shared action-snapshot stanzas for Markdown and HTML reports."""
-    summary = report_context.summary
-    triage = report_context.triage
-    preflight_issues = report_context.preflight_issues
-    indeterminate = [result for result in results if _is_indeterminate_connectivity_failure(result)]
-    failed = [
-        result
-        for result in results
-        if not result.success and not _is_indeterminate_connectivity_failure(result)
-    ]
-    quality_counts = Counter(dict(triage.quality_counts))
-    harness_success_count = sum("harness" in row.labels for row in triage.utility_rows)
-    successful_count = len(triage.utility_rows)
-    runtime_analysis = summary.get("runtime_analysis")
-
-    failure_rows = _action_snapshot_failure_items(
-        failed,
-        indeterminate=indeterminate,
-        triage=triage,
-        harness_success_count=harness_success_count,
-        successful_count=successful_count,
-        suppress_cataloging_claims=suppress_cataloging_claims,
-    )
-    if preflight_issues:
-        failure_rows.extend(
-            [
-                (
-                    "Preflight compatibility",
-                    (
-                        f"{len(preflight_issues)} informational warning(s); "
-                        "do not treat these alone as run failures."
-                    ),
-                ),
-                (
-                    "Escalate only if",
-                    "they line up with API mismatches, startup hangs, or backend/runtime crashes.",
-                ),
-            ]
-        )
-
-    quality_rows: list[tuple[str, str | None]] = []
-    if (
-        not suppress_cataloging_claims
-        and triage.baseline_score is not None
-        and triage.baseline_grade is not None
-    ):
-        better = len(summary.get("cataloging_improves_metadata", []))
-        neutral = len(summary.get("cataloging_neutral_vs_metadata", []))
-        worse = len(summary.get("cataloging_worse_than_metadata", []))
-        quality_rows.append(
-            (
-                "Vs existing metadata",
-                (
-                    f"better={better}, neutral={neutral}, worse={worse} "
-                    f"(baseline {triage.baseline_grade} {triage.baseline_score:.0f}/100)."
-                ),
-            )
-        )
-    quality_rows.append(("Quality signal frequency", f"{_format_counter_items(quality_counts)}."))
-    termination_summary = ", ".join(
-        f"{reason}={count}"
-        for reason, count in sorted(
-            Counter(
-                "completed"
-                if result.success
-                else "indeterminate"
-                if _is_indeterminate_connectivity_failure(result)
-                else "exception"
-                for result in results
-            ).items(),
-        )
-    )
-    if runtime_analysis is None:
-        quality_rows.append(("Termination reasons", f"{termination_summary}."))
-
-    runtime_rows: list[tuple[str, str | None]] = []
-    if runtime_analysis is not None:
-        runtime_lines = [
-            *_format_runtime_analysis_lines(runtime_analysis),
-            *_format_runtime_timing_snapshot_lines(runtime_analysis),
-        ]
-        for line in runtime_lines:
-            if not line.startswith("- **") or ":** " not in line:
-                runtime_rows.append(("Runtime note", line.removeprefix("- ")))
-                continue
-            label, value = line.removeprefix("- **").split(":** ", maxsplit=1)
-            runtime_rows.append((label, value))
-
-    stanzas = [
-        _build_report_stanza("Failures & Triage", failure_rows),
-        _build_report_stanza("Quality & Metadata", quality_rows),
-        _build_report_stanza("Runtime", runtime_rows),
-    ]
-    return [stanza for stanza in stanzas if stanza.rows]
-
-
-def _format_action_snapshot_parts(
-    results: list[PerformanceResult],
-    report_context: ReportRenderContext,
-    *,
-    html_output: bool,
-    suppress_cataloging_claims: bool = False,
-) -> list[str]:
-    """Build a compact shared triage block for maintainers and reviewers.
-
-    The snapshot is split into three scannable groups:
-    **Failures & Triage** — hard failures and review queues.
-    **Quality & Metadata** — signal frequencies and baseline comparison.
-    **Runtime** — phase timing and decode dominance.
-    """
-    stanzas = _build_action_snapshot_stanzas(
-        results,
-        report_context,
-        suppress_cataloging_claims=suppress_cataloging_claims,
-    )
-
-    if html_output:
-        parts: list[str] = ["<h3>🎯 Action Snapshot</h3>"]
-        for stanza in stanzas:
-            parts.extend(_render_html_stanza(stanza))
-        return parts
-
-    parts = ["## 🎯 Action Snapshot", ""]
-    for stanza in stanzas:
-        _append_markdown_stanza(parts, stanza)
-    return parts
-
-
-def _action_snapshot_failure_items(
-    failed: list[PerformanceResult],
-    *,
-    indeterminate: Sequence[PerformanceResult] = (),
-    triage: ReportTriageContext,
-    harness_success_count: int,
-    successful_count: int,
-    suppress_cataloging_claims: bool = False,
-) -> list[tuple[str, str]]:
-    """Build label/value pairs for the Failures & Triage snapshot group."""
-    items: list[tuple[str, str]] = []
-    if failed:
-        owners = Counter(res.error_package or _UNKNOWN_OWNER for res in failed)
-        owner_summary = ", ".join(f"{owner}={count}" for owner, count in owners.most_common(3))
-        items.append(
-            ("Framework/runtime failures", f"{len(failed)} (top owners: {owner_summary}).")
-        )
-        items.append(
-            (
-                "Next action",
-                "review failure ownership below and use diagnostics.md for filing.",
-            )
-        )
-    else:
-        items.append(("Framework/runtime failures", "none."))
-
-    if indeterminate:
-        items.append(
-            (
-                "Indeterminate attempts",
-                f"{len(indeterminate)} (external connectivity prevented evaluation; retry).",
-            )
-        )
-
-    items.append(
-        (
-            "Maintainer signals",
-            (
-                f"harness-risk successes={harness_success_count}, "
-                f"mechanically clean outputs={triage.clean_count}/{successful_count}."
-            ),
-        )
-    )
-    if suppress_cataloging_claims:
-        useful_text = (
-            f"{len(triage.useful_rows)} model(s) shortlisted for caption review."
-            if triage.useful_rows
-            else "none (caption shortlist not populated for this run)."
-        )
-    else:
-        useful_text = (
-            f"{len(triage.useful_rows)} mechanically clean A/B model(s) with useful signals."
-            if triage.useful_rows
-            else "none (no mechanically clean A/B shortlist for this run)."
-        )
-    items.append(("Useful now", useful_text))
-    watchlist_text = (
-        f"{len(triage.watchlist_rows)} model(s) with breaking or lower-value output."
-        if triage.watchlist_rows
-        else "none."
-    )
-    items.append(("Review watchlist", watchlist_text))
-    return items
-
-
-def _group_failures_by_package(
-    results: Sequence[PerformanceResult],
-) -> list[tuple[str, list[PerformanceResult]]]:
-    """Group failures by originating package ordered by highest count first."""
-    failed = [
-        result
-        for result in results
-        if not result.success and not _is_indeterminate_connectivity_failure(result)
-    ]
-    by_package: dict[str, list[PerformanceResult]] = {}
-    for result in failed:
-        package = result.error_package or _UNKNOWN_OWNER
-        by_package.setdefault(package, []).append(result)
-    return sorted(by_package.items(), key=lambda item: -len(item[1]))
-
-
-def _failure_narrative_for_result(
-    result: PerformanceResult,
-    narratives: Mapping[str, FailureNarrative] | None,
-) -> FailureNarrative:
-    """Return a cached failure narrative, with a standalone-call fallback."""
-    if narratives is not None and (narrative := narratives.get(result.model_name)) is not None:
-        return narrative
-    return _build_failure_narrative(result)
-
-
-def _format_failures_by_package_parts(
-    results: list[PerformanceResult],
-    *,
-    html_output: bool,
-    failure_narratives: Mapping[str, FailureNarrative] | None = None,
-) -> list[str]:
-    """Render shared failure-ownership sections for HTML/Markdown reports."""
-    sorted_packages = _group_failures_by_package(results)
-    if not sorted_packages:
-        return []
-
-    if html_output:
-        parts: list[str] = [
-            "<h3>🚨 Failures by Package</h3>",
-            "<table>",
-            (
-                "<thead><tr><th>Package</th><th>Failures</th><th>Error Types</th>"
-                "<th>Affected Models</th></tr></thead>"
-            ),
-            "<tbody>",
-        ]
-        for package, failures in sorted_packages:
-            error_types = ", ".join(
-                sorted({result.error_stage or "unknown" for result in failures}),
-            )
-            models = ", ".join(result.model_name for result in failures)
-            parts.append(
-                "<tr>"
-                f"<td><code>{html.escape(package)}</code></td>"
-                f"<td>{len(failures)}</td>"
-                f"<td>{html.escape(error_types)}</td>"
-                f"<td>{html.escape(models)}</td>"
-                "</tr>",
-            )
-        parts.append("</tbody></table>")
-        parts.append("<p><b>Actionable Items by Package</b></p>")
-        for package, failures in sorted_packages:
-            parts.append(f"<h4>{html.escape(package)}</h4><ul>")
-            for result in failures:
-                narrative = _failure_narrative_for_result(result, failure_narratives)
-                error_message = narrative.primary_exception
-                if len(error_message) > ERROR_MESSAGE_TRUNCATE_LEN:
-                    error_message = error_message[: ERROR_MESSAGE_TRUNCATE_LEN - 3] + "..."
-                issue_parts = [html.escape(result.model_name)]
-                if result.error_stage:
-                    issue_parts.append(html.escape(result.error_stage))
-                issue_parts.append(html.escape(narrative.suspected_owner))
-                if error_message:
-                    issue_parts.append(html.escape(error_message))
-                parts.append(f"<li>{' | '.join(issue_parts)}</li>")
-            parts.append("</ul>")
-        return parts
-
-    parts = ["## 🚨 Failures by Package (Actionable)", ""]
-    rows: list[tuple[str, str, str, str]] = []
-    for package, failures in sorted_packages:
-        markdown_error_types = sorted({result.error_stage or "unknown" for result in failures})
-        markdown_models = [f"`{result.model_name}`" for result in failures]
-        rows.append(
-            (
-                f"`{package}`",
-                str(len(failures)),
-                ", ".join(markdown_error_types),
-                ", ".join(markdown_models),
-            )
-        )
-    parts.extend(
-        tabulate(
-            rows,
-            headers=("Package", "Failures", "Error Types", "Affected Models"),
-            tablefmt="github",
-        ).splitlines()
-    )
-
-    parts.append("")
-    parts.append("### Actionable Items by Package")
-    parts.append("")
-
-    for package, failures in sorted_packages:
-        parts.append(f"#### {package}")
-        parts.append("")
-        for result in failures:
-            narrative = _failure_narrative_for_result(result, failure_narratives)
-            parts.extend(
-                _wrap_markdown_text(
-                    f"{result.model_name} ({result.error_stage})",
-                    initial_indent="- ",
-                    subsequent_indent="  ",
-                )
-            )
-            error_message = narrative.primary_exception
-            if len(error_message) > ERROR_MESSAGE_TRUNCATE_LEN:
-                error_message = error_message[: ERROR_MESSAGE_TRUNCATE_LEN - 3] + "..."
-            escaped_message = DIAGNOSTICS_ESCAPER.escape(error_message)
-            parts.append(f"  - Error: `{escaped_message}`")
-            parts.append(f"  - Suspected owner: `{narrative.suspected_owner}`")
-        parts.append("")
-
-    return parts
-
-
-def _select_useful_rows(rows: list[UtilityTriageRow]) -> list[UtilityTriageRow]:
-    """Return shortlist of high-utility, non-breaking models."""
-    useful_rows = [
-        row
-        for row in rows
-        if row.grade in {"A", "B"}
-        and not (row.labels & QUALITY_BREAKING_LABELS)
-        and (row.delta_vs_metadata is None or row.delta_vs_metadata > 0)
-    ]
-    useful_rows.sort(
-        key=lambda row: (
-            row.delta_vs_metadata if row.delta_vs_metadata is not None else float("-inf"),
-            row.score,
-            getattr(row.result.generation, "generation_tps", 0) or 0,
-        ),
-        reverse=True,
-    )
-    return useful_rows
-
-
-def _select_watchlist_rows(rows: list[UtilityTriageRow]) -> list[tuple[UtilityTriageRow, str]]:
-    """Return successful-but-risky models with reason labels."""
-    watchlist_rows: list[tuple[UtilityTriageRow, str]] = []
-    for row in rows:
-        breaking = sorted(row.labels & QUALITY_BREAKING_LABELS)
-        if breaking:
-            watchlist_rows.append((row, ",".join(breaking)))
-            continue
-        if (
-            row.delta_vs_metadata is not None
-            and row.delta_vs_metadata < -UTILITY_DELTA_NEUTRAL_BAND
-        ):
-            watchlist_rows.append((row, f"worse-than-metadata(Δ{row.delta_vs_metadata:+.0f})"))
-            continue
-        if row.grade in {"D", "F"}:
-            watchlist_rows.append((row, row.weakness))
-
-    watchlist_rows.sort(
-        key=lambda item: (
-            0 if "harness" in item[0].labels else 1,
-            0
-            if (
-                item[0].delta_vs_metadata is not None
-                and item[0].delta_vs_metadata < -UTILITY_DELTA_NEUTRAL_BAND
-            )
-            else 1,
-            {"F": 0, "D": 1, "C": 2, "B": 3, "A": 4}.get(item[0].grade, 2),
-            item[0].score,
-        ),
-    )
-    return watchlist_rows
-
-
-def _metadata_delta_summary(rows: Sequence[UtilityTriageRow]) -> tuple[float, int, int, int]:
-    """Return average metadata delta plus better/neutral/worse counts."""
-    delta_total = 0.0
-    better = 0
-    neutral = 0
-    worse = 0
-
-    for row in rows:
-        delta = row.delta_vs_metadata
-        if delta is None:
-            continue
-        delta_total += delta
-        if delta > UTILITY_DELTA_NEUTRAL_BAND:
-            better += 1
-        elif delta < -UTILITY_DELTA_NEUTRAL_BAND:
-            worse += 1
-        else:
-            neutral += 1
-
-    delta_count = better + neutral + worse
-    avg_delta = delta_total / delta_count if delta_count else 0.0
-    return avg_delta, better, neutral, worse
-
-
-def _log_utility_triage(
-    rows: list[UtilityTriageRow],
-    *,
-    baseline_score: float | None = None,
-    baseline_grade: str | None = None,
-) -> None:
-    """Log utility grade distribution and shortlists."""
-    if not rows:
-        return
-
-    grade_counts: Counter[str] = Counter(row.grade for row in rows)
-    avg_utility = sum(row.score for row in rows) / len(rows)
-    n_ab = grade_counts.get("A", 0) + grade_counts.get("B", 0)
-    n_c = grade_counts.get("C", 0)
-    n_df = grade_counts.get("D", 0) + grade_counts.get("F", 0)
-
-    log_blank()
-    logger.info("📚 Cataloging Utility Snapshot:")
-    logger.info(
-        "   Avg score: %.0f/100 | A/B=%d, C=%d, D/F=%d",
-        avg_utility,
-        n_ab,
-        n_c,
-        n_df,
-    )
-    if baseline_score is not None:
-        baseline_display = _get_grade_display(baseline_grade or "F")
-        avg_delta, better, neutral, worse = _metadata_delta_summary(rows)
-        logger.info("   Metadata baseline: %s %.0f/100", baseline_display, baseline_score)
-        logger.info(
-            "   Vs metadata: Avg Δ %+.0f | better=%d, neutral=%d, worse=%d",
-            avg_delta,
-            better,
-            neutral,
-            worse,
-        )
-
-    candidate_rows = [
-        row
-        for row in rows
-        if _is_cataloging_pick_eligible(row.result, _quality_analysis_for_result(row.result))
-        and row.grade in {"A", "B", "C"}
-        and not (row.labels & QUALITY_BREAKING_LABELS)
-    ] or [
-        row
-        for row in rows
-        if _is_cataloging_pick_eligible(row.result, _quality_analysis_for_result(row.result))
-    ]
-    if candidate_rows:
-        best_description = max(
-            candidate_rows,
-            key=lambda row: (
-                row.description_score,
-                row.score,
-                getattr(row.result.generation, "generation_tps", 0) or 0,
-                row.result.model_name,
-            ),
-        )
-        best_keywords = max(
-            candidate_rows,
-            key=lambda row: (
-                row.keyword_score,
-                row.score,
-                getattr(row.result.generation, "generation_tps", 0) or 0,
-                row.result.model_name,
-            ),
-        )
-        logger.info(
-            "   Best description: %s (%.0f/100)",
-            best_description.result.model_name,
-            best_description.description_score,
-        )
-        logger.info(
-            "   Best keywording: %s (%.0f/100)",
-            best_keywords.result.model_name,
-            best_keywords.keyword_score,
-        )
-
-    useful_rows = _select_useful_rows(rows)
-    if useful_rows:
-        logger.info("   Useful now (top %d):", min(MAX_TRIAGE_MODELS, len(useful_rows)))
-        for row in useful_rows[:MAX_TRIAGE_MODELS]:
-            tps = getattr(row.result.generation, "generation_tps", 0) or 0
-            if row.delta_vs_metadata is None:
-                logger.info(
-                    "   - %s: %s %.0f/100 (%.1f tps)",
-                    row.result.model_name,
-                    row.grade,
-                    row.score,
-                    tps,
-                )
-            else:
-                logger.info(
-                    "   - %s: %s %.0f/100 (Δ%+.0f, %.1f tps)",
-                    row.result.model_name,
-                    row.grade,
-                    row.score,
-                    row.delta_vs_metadata,
-                    tps,
-                )
-    else:
-        logger.info("   Useful now: none (no mechanically clean A/B outputs)")
-
-    watchlist_rows = _select_watchlist_rows(rows)
-    if watchlist_rows:
-        logger.info("   Watchlist (top %d):", min(MAX_TRIAGE_MODELS, len(watchlist_rows)))
-        for row, reason in watchlist_rows[:MAX_TRIAGE_MODELS]:
-            logger.info(
-                "   - %s: %s %.0f/100 (%s)",
-                row.result.model_name,
-                row.grade,
-                row.score,
-                reason,
-            )
-
-
 def _log_failed_models_summary(failed: list[PerformanceResult]) -> None:
     """Log failed models and failure distribution for actionable triage."""
     logger.info("❌ Failed Models (%d):", len(failed))
@@ -21857,13 +14604,9 @@ def _log_successful_models_list(successful: list[PerformanceResult]) -> None:
 def log_summary(
     results: list[PerformanceResult],
     *,
-    prompt: str | None = None,
     image_path: Path | None = None,
-    eval_mode: str = DEFAULT_EVAL_MODE,
-    metadata: MetadataDict | None = None,
-    metadata_exposed_to_prompt: bool | None = None,
 ) -> None:
-    """Log run summary focused on diagnostics, quality, and model triage."""
+    """Log current-run execution, performance, and mechanical observations."""
     if not results:
         return
 
@@ -21876,6 +14619,15 @@ def log_summary(
     failed = [r for r in results if not r.success]
     recommended_working_set_bytes = _get_recommended_working_set_bytes()
 
+    assessment_counts: Counter[str] = Counter()
+    for result in results:
+        assessment_counts[_assess_result(result).execution] += 1
+    observation_counts: Counter[str] = Counter(
+        observation for result in successful for observation in _assess_result(result).observations
+    )
+    logger.info("Execution outcomes: %s", _format_counter_items(assessment_counts))
+    logger.info("Mechanical observations: %s", _format_counter_items(observation_counts))
+
     if successful:
         _log_performance_highlights(
             successful,
@@ -21883,41 +14635,6 @@ def log_summary(
             recommended_working_set_bytes=recommended_working_set_bytes,
         )
         log_blank()
-        (
-            quality_counts,
-            clean_count,
-            utility_rows,
-            baseline_score,
-            baseline_grade,
-        ) = _collect_quality_and_utility_rows(
-            successful,
-            prompt=prompt,
-        )
-        _log_quality_signal_summary(
-            quality_counts,
-            clean_count=clean_count,
-            successful_count=len(successful),
-        )
-        mode_policy = _build_report_mode_policy(
-            eval_mode=eval_mode,
-            metadata=metadata,
-            metadata_exposed_to_prompt=metadata_exposed_to_prompt,
-        )
-        if mode_policy.suppress_cataloging_scores:
-            log_blank()
-            logger.info("📌 Caption Selection Snapshot:")
-            logger.info("   Structured metadata scoring is suppressed in triage mode.")
-            logger.info("   Review generated captions directly; semantic rankings are ungrounded.")
-        else:
-            _log_utility_triage(
-                utility_rows,
-                baseline_score=baseline_score,
-                baseline_grade=baseline_grade,
-            )
-        log_blank()
-
-    if failed:
-        _log_failed_models_summary(failed)
         log_blank()
 
     _log_model_comparison_table_and_charts(
@@ -21928,6 +14645,9 @@ def log_summary(
 
     if successful:
         _log_successful_models_list(successful)
+    if failed:
+        log_blank()
+        _log_failed_models_summary(failed)
 
 
 def _history_path_for_jsonl(jsonl_path: Path) -> Path:
@@ -22410,20 +15130,6 @@ def _guard_markdownlint_block(lines: Sequence[str], *, rules: str) -> list[str]:
         *lines,
         f"<!-- markdownlint-enable {rules} -->",
     ]
-
-
-def _output_preview_needles(
-    analysis: GenerationQualityAnalysis | None,
-) -> tuple[str, ...]:
-    """Return exact output markers that issue excerpts should keep visible."""
-    if analysis is None:
-        return ()
-    needles = [
-        payload
-        for kind, payload in map(_split_harness_detail, analysis.harness_issue_details)
-        if kind == "token_leak"
-    ]
-    return tuple(_dedupe_preserve_order(needles))
 
 
 def _issue_repro_portable_path_ref(raw_ref: str, *, fallback: str) -> str:
@@ -23338,11 +16044,7 @@ def finalize_execution(
         metadata_exposed_to_prompt = _prompt_builder_exposes_metadata(args, metadata)
         log_summary(
             results,
-            prompt=prompt,
             image_path=image_path,
-            eval_mode=str(getattr(args, "eval_mode", DEFAULT_EVAL_MODE)),
-            metadata=metadata,
-            metadata_exposed_to_prompt=metadata_exposed_to_prompt,
         )
 
         # Gather system characteristics for reports
@@ -23497,7 +16199,7 @@ def main(args: argparse.Namespace) -> None:
         # Hard-fail before any model execution when core runtime deps are unavailable.
         _raise_for_missing_runtime_dependencies()
 
-        results = process_models(args, image_path, prompt=prompt, metadata=metadata)
+        results = process_models(args, image_path, prompt=prompt)
 
         # Phase 5: Differential reruns for triage-worthy models
         if getattr(args, "rerun_triage", False):

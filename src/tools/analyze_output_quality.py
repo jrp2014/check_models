@@ -26,10 +26,7 @@ from tools.safe_io import read_text_no_follow
 def _build_parser() -> argparse.ArgumentParser:
     """Create the CLI parser for output quality analysis."""
     parser = argparse.ArgumentParser(
-        description=(
-            "Test the project's VLM quality heuristics on arbitrary text. "
-            "Useful for debugging tokenizer artifacts, degeneration, and contract rules."
-        ),
+        description=("Inspect the project's mechanical VLM output observations on arbitrary text."),
     )
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--text", type=str, help="Text string to evaluate directly.")
@@ -121,10 +118,17 @@ def _analysis_status_text(
 ) -> str:
     """Return a fault, observation, or clean status without conflating them."""
     if issue_string:
-        return issue_string
+        prefix = "🔴 UNUSABLE" if _analysis_exit_code(analysis) else "🟡 OBSERVATION"
+        return f"{prefix} ({issue_string})"
     if analysis.special_token_wrappers:
         return "🟡 OBSERVATION (special-token wrapper retained)"
     return "🟢 CLEAN (No issues detected)"
+
+
+def _analysis_exit_code(analysis: GenerationQualityAnalysis) -> int:
+    """Return nonzero only for a mechanically unusable standalone sample."""
+    unusable = analysis.is_repetitive or bool(analysis.missing_sections)
+    return 1 if unusable else 0
 
 
 def _print_analysis_report(
@@ -134,59 +138,26 @@ def _print_analysis_report(
     estimated_tokens: int,
     prompt_tokens: int | None,
 ) -> None:
-    """Print the full CLI analysis report."""
+    """Print the retained mechanical analysis fields."""
     print("\n" + "=" * 60)
     print(f"Analyzing text (approx {word_count} words, ~{estimated_tokens} tokens)")
     if prompt_tokens is not None:
         print(f"With prompt context (approx ~{prompt_tokens} tokens)")
     print("=" * 60 + "\n")
 
-    print("Harness & Diagnostics Issues:")
-    _print_field("Has Harness Issue", analysis.has_harness_issue)
-    if analysis.has_harness_issue:
-        _print_field("Harness Issue Type", analysis.harness_issue_type)
-        _print_field("Harness Issue Details", analysis.harness_issue_details)
+    print("Mechanical Observations:")
     _print_diagnostic_observations(analysis)
-
-    print("\nQuality & Integrity Rule Violations:")
     _print_field("Is Repetitive", analysis.is_repetitive)
     if analysis.is_repetitive:
         _print_field("Repeated Token", analysis.repeated_token)
-    _print_field("Is Verbose", analysis.is_verbose)
-    _print_field("Has Formatting Issues", bool(analysis.formatting_issues))
-    if analysis.formatting_issues:
-        _print_field("Formatting Details", analysis.formatting_issues)
-    _print_field("Has Hallucination Issues", bool(analysis.hallucination_issues))
-    if analysis.hallucination_issues:
-        _print_field("Hallucination Details", analysis.hallucination_issues)
-    _print_field("Has Degeneration", analysis.has_degeneration)
-    if analysis.has_degeneration:
-        _print_field("Degeneration Type", analysis.degeneration_type)
-    _print_field("Has Fabrication", analysis.has_fabrication)
-    if analysis.has_fabrication:
-        _print_field("Fabrication Issues", analysis.fabrication_issues)
-    _print_field("Has Language Mixing", analysis.has_language_mixing)
-    if analysis.has_language_mixing:
-        _print_field("Mix Issues", analysis.language_mixing_issues)
-    _print_field("Has Excessive Bullets", analysis.has_excessive_bullets)
-    if analysis.has_excessive_bullets:
-        _print_field("Bullet Count", analysis.bullet_count)
-
-    print("\nPrompt Context Awareness:")
     _print_field("Prompt Checks Ran", analysis.prompt_checks_ran)
-    _print_field("Ignored Context", analysis.is_context_ignored)
-    if analysis.is_context_ignored:
-        _print_field("Missing Terms", analysis.missing_context_terms)
     _print_field("Missing Required Sections", analysis.missing_sections)
-    if analysis.missing_sections:
-        _print_field("Title Word Count", analysis.title_word_count)
-        _print_field("Keyword Count", analysis.keyword_count)
-    _print_field("Reasoning Leak Confirmed", analysis.has_reasoning_leak)
-    if analysis.has_reasoning_leak:
-        _print_field("Leak Markers", analysis.reasoning_leak_markers)
-    _print_field("Has Context Echo", analysis.has_context_echo)
-    if analysis.has_context_echo:
-        _print_field("Echo Ratio", f"{analysis.context_echo_ratio:.2%}")
+    _print_field("Instruction Echo", analysis.instruction_echo)
+    _print_field("Thinking Trace", analysis.has_thinking_trace)
+    _print_field("Thinking Incomplete", analysis.thinking_trace_incomplete)
+    _print_field("Likely Token Cap", analysis.likely_capped)
+    _print_field("Unexpected Special Tokens", analysis.unexpected_special_tokens)
+    _print_field("Keyword Overlap", analysis.keyword_overlap)
 
     print("\n" + "-" * 60)
     issue_string = _build_quality_issues_string(analysis)
@@ -204,11 +175,9 @@ def _build_json_payload(
 ) -> dict[str, object]:
     """Build a stable machine-readable JSON payload for CLI consumers."""
     issue_string = _build_quality_issues_string(analysis) or ""
-    exit_code = 1 if analysis.has_any_issues() else 0
+    exit_code = _analysis_exit_code(analysis)
     return {
-        "status": (
-            "issues" if exit_code else "observation" if analysis.special_token_wrappers else "clean"
-        ),
+        "status": ("unusable" if exit_code else "observation" if issue_string else "clean"),
         "exit_code": exit_code,
         "summary": {
             "word_count": word_count,
@@ -246,7 +215,7 @@ def main() -> int:
         prompt_tokens=prompt_tokens,
         context_marker=args.context_marker,
     )
-    exit_code = 1 if analysis.has_any_issues() else 0
+    exit_code = _analysis_exit_code(analysis)
     if args.json:
         print(
             json.dumps(

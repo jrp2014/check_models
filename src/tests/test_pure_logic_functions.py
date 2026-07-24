@@ -552,258 +552,20 @@ class TestQualityIssueTruncation:
         assert truncated == 'repetitive(phrase: "a...'
 
 
-@dataclass
-class _MetadataAgreementGeneration:
-    """Minimal generation stub for metadata-agreement enrichment tests."""
-
-    text: str
-    generation_tokens: int = 64
-    prompt_tokens: int = 32
-
-
-class TestMetadataAgreementIntegration:
-    """Tests for threading metadata agreement into cached quality analysis."""
-
-    def test_cached_quality_analysis_is_refreshed_with_metadata(
-        self,
-        mod: types.ModuleType,
-    ) -> None:
-        """Second-pass enrichment should add metadata agreement without rerunning analysis."""
-        text = (
-            "Title: Brick storefront\n"
-            "Description: A brick storefront with outdoor seating beside a pavement.\n"
-            "Keywords: brick storefront, outdoor seating, pavement, pedestrians"
-        )
-        metadata = {
-            "title": "Brick storefront",
-            "description": "A brick storefront with outdoor seating beside a pavement.",
-            "keywords": "brick storefront, outdoor seating, pavement, pedestrians",
-        }
-        result = mod.PerformanceResult(
-            model_name="test-model",
-            generation=_MetadataAgreementGeneration(text=text),
-            success=True,
-        )
-
-        first_pass = mod._populate_result_quality_analysis(result)
-        second_pass = mod._populate_result_quality_analysis(first_pass, metadata=metadata)
-
-        assert first_pass.metadata_agreement is None
-        assert first_pass.quality_analysis is not None
-        assert second_pass.quality_analysis is not None
-        normalized_second_analysis = replace(
-            second_pass.quality_analysis,
-            metadata_alignment_score=None,
-            draft_improvement_score=None,
-            evidence=[
-                label
-                for label in second_pass.quality_analysis.evidence
-                if label != "low-draft-improvement"
-            ],
-        )
-        assert normalized_second_analysis == first_pass.quality_analysis
-        assert second_pass.quality_analysis.metadata_alignment_score is not None
-        assert second_pass.quality_analysis.metadata_alignment_score > 0.0
-        assert second_pass.quality_analysis.draft_improvement_score is not None
-        assert "low-draft-improvement" in second_pass.quality_analysis.evidence
-        assert second_pass.metadata_agreement is not None
-        assert second_pass.metadata_agreement.overall_score > 0.0
-
-
 # ── compute_vocabulary_diversity ───────────────────────────────────────────
-
-
-class TestComputeVocabularyDiversity:
-    """Tests for compute_vocabulary_diversity()."""
-
-    def test_empty_string(self, mod: types.ModuleType) -> None:
-        """Empty string should return zero diversity."""
-        assert mod.compute_vocabulary_diversity("") == (0.0, 0, 0)
-
-    def test_all_unique(self, mod: types.ModuleType) -> None:
-        """All unique words should give TTR of 1.0."""
-        ttr, unique, total = mod.compute_vocabulary_diversity("apple banana cherry")
-        expected_words = 3
-        assert unique == expected_words
-        assert total == expected_words
-        assert ttr == 1.0
-
-    def test_repeated_words(self, mod: types.ModuleType) -> None:
-        """Repeated words should give low TTR."""
-        ttr, unique, total = mod.compute_vocabulary_diversity("yes yes yes yes")
-        expected_total = 4
-        expected_ttr = 0.25
-        assert unique == 1
-        assert total == expected_total
-        assert ttr == expected_ttr
-
-    def test_mixed_case_normalized(self, mod: types.ModuleType) -> None:
-        """Mixed case should be normalized for diversity calculation."""
-        _ttr, unique, total = mod.compute_vocabulary_diversity("Hello hello HELLO")
-        expected_total = 3
-        assert unique == 1
-        assert total == expected_total
 
 
 # ── compute_efficiency_metrics ─────────────────────────────────────────────
 
 
-class TestComputeEfficiencyMetrics:
-    """Tests for compute_efficiency_metrics()."""
-
-    def test_all_none_inputs(self, mod: types.ModuleType) -> None:
-        """All-None inputs should return None metrics."""
-        result = mod.compute_efficiency_metrics(100, None, None)
-        assert result["tokens_per_second"] is None
-        assert result["tokens_per_gb"] is None
-
-    def test_with_time(self, mod: types.ModuleType) -> None:
-        """With time only, tokens_per_second should be computed."""
-        result = mod.compute_efficiency_metrics(100, 2.0, None)
-        expected_tps = 50.0
-        assert result["tokens_per_second"] == expected_tps
-
-    def test_with_time_and_memory(self, mod: types.ModuleType) -> None:
-        """With both time and memory, all metrics should be computed."""
-        result = mod.compute_efficiency_metrics(100, 2.0, 4.0)
-        expected_tps = 50.0
-        expected_tpg = 25.0
-        assert result["tokens_per_second"] == expected_tps
-        assert result["tokens_per_gb"] == expected_tpg
-        assert result["tokens_per_second_per_gb"] is not None
-
-    def test_zero_time(self, mod: types.ModuleType) -> None:
-        """Zero time should return None for tokens_per_second."""
-        result = mod.compute_efficiency_metrics(100, 0.0, 4.0)
-        assert result["tokens_per_second"] is None
-
-
 # ── detect_response_structure ──────────────────────────────────────────────
-
-
-class TestDetectResponseStructure:
-    """Tests for detect_response_structure()."""
-
-    def test_empty_text(self, mod: types.ModuleType) -> None:
-        """Empty text should have no structure detected."""
-        result = mod.detect_response_structure("")
-        assert result["has_caption"] is False
-        assert result["has_keywords"] is False
-
-    def test_with_keywords(self, mod: types.ModuleType) -> None:
-        """Text with Keywords: label should be detected."""
-        text = "Caption: A cat.\nKeywords: cat, animal, pet\nDescription: A fluffy cat."
-        result = mod.detect_response_structure(text)
-        assert result["has_keywords"] is True
-
-    def test_with_sections(self, mod: types.ModuleType) -> None:
-        """Text with markdown headings should detect sections."""
-        text = "## Caption\nA cat on a mat.\n## Keywords\ncat, mat"
-        result = mod.detect_response_structure(text)
-        assert result["has_sections"] is True
 
 
 # ── compute_confidence_indicators ──────────────────────────────────────────
 
 
-class TestComputeConfidenceIndicators:
-    """Tests for compute_confidence_indicators()."""
-
-    def test_empty_text(self, mod: types.ModuleType) -> None:
-        """Empty text should have zero hedge and definitive counts."""
-        result = mod.compute_confidence_indicators("")
-        assert result["hedge_count"] == 0
-        assert result["definitive_count"] == 0
-        assert result["confidence_ratio"] == 0.0
-
-    def test_hedge_words(self, mod: types.ModuleType) -> None:
-        """Text with hedging language should have hedge_count >= 2."""
-        text = "It appears to be a cat. It might be sleeping. It seems to be outdoors."
-        result = mod.compute_confidence_indicators(text)
-        min_hedge_count = 2
-        assert result["hedge_count"] >= min_hedge_count
-
-    def test_definitive_text(self, mod: types.ModuleType) -> None:
-        """Definitive text should produce computable confidence ratio."""
-        text = "This is a red barn. The sky is blue. There are three horses."
-        result = mod.compute_confidence_indicators(text)
-        assert result["confidence_ratio"] >= 0.0  # at least computable
-
-    def test_config_driven_patterns(self, mod: types.ModuleType) -> None:
-        """Configured confidence patterns should override built-in defaults."""
-        new_quality = replace(
-            mod.QUALITY,
-            patterns={
-                "confidence_hedge_patterns": [r"\bhedgeword\b"],
-                "confidence_definitive_patterns": [r"\bdefword\b"],
-            },
-        )
-        with patch.object(mod, "QUALITY", new_quality):
-            result = mod.compute_confidence_indicators("hedgeword defword defword")
-            assert result["hedge_count"] == 1
-            assert result["definitive_count"] == 2
-            assert result["confidence_ratio"] == 0.67
-
-
-class TestConfigDrivenCatalogingDetectors:
-    """Tests for config-driven task-compliance and visual-grounding patterns."""
-
-    def test_task_compliance_uses_configured_labels(self, mod: types.ModuleType) -> None:
-        """Configured labels should be recognized as explicit task sections."""
-        new_quality = replace(
-            mod.QUALITY,
-            patterns={
-                "task_caption_labels": ["headline"],
-                "task_description_labels": ["notes"],
-                "task_keyword_labels": ["terms"],
-            },
-        )
-        with patch.object(mod, "QUALITY", new_quality):
-            text = "headline: Church tower\nnotes: Stone church in winter.\nterms: church, tower"
-            result = mod.compute_task_compliance(text)
-            assert result["has_caption"] is True
-            assert result["has_description"] is True
-            assert result["has_keywords"] is True
-
-    def test_visual_grounding_uses_configured_patterns(self, mod: types.ModuleType) -> None:
-        """Configured visual/spatial/color patterns should drive grounding counts."""
-        new_quality = replace(
-            mod.QUALITY,
-            patterns={
-                "visual_grounding_visual_patterns": [r"\bcustomobject\b"],
-                "visual_grounding_spatial_patterns": [r"\bcustomspot\b"],
-                "visual_grounding_color_patterns": [r"\bcustomcolor\b"],
-            },
-        )
-        with patch.object(mod, "QUALITY", new_quality):
-            result = mod.compute_visual_grounding(
-                "customobject at customspot with customcolor",
-                None,
-            )
-            assert result["visual_terms"] == 1
-            assert result["spatial_terms"] == 1
-            assert result["color_terms"] == 1
-            assert result["grounding_score"] > 0.0
-
-
 class TestRegexDetectionUtilities:
     """Tests for shared regex detection helpers."""
-
-    def test_extract_matches_ignores_invalid_regex(self, mod: types.ModuleType) -> None:
-        """Invalid configured regex entries should be ignored, not raised."""
-        matches = mod._extract_pattern_matches(
-            "token 123",
-            [r"\d+", r"[invalid"],
-            debug_context="test",
-        )
-        assert matches == ["123"]
-
-    def test_count_and_any_match_ignores_invalid_regex(self, mod: types.ModuleType) -> None:
-        """Pattern count/any helpers should skip invalid patterns safely."""
-        count = mod._count_pattern_matches("a1 b2 c3", [r"\d", r"[broken"])
-        has_match = mod._matches_any_pattern("alpha", [r"[broken", r"beta"], debug_context="test")
-        assert count == 3
-        assert has_match is False
 
     def test_compile_regex_cache_reuses_compiled_pattern(self, mod: types.ModuleType) -> None:
         """Regex compiler cache should return the same compiled object for same key."""
@@ -839,29 +601,6 @@ class TestDisplayWidthUtilities:
             assert width == 1
         else:
             assert width == 2
-
-
-class TestSanitizeBpeDisplay:
-    """Tests for _sanitize_bpe_display BPE artifact cleanup."""
-
-    def test_replaces_bpe_markers(self, mod: types.ModuleType) -> None:
-        """BPE markers are replaced with readable equivalents."""
-        raw = "Title:\u0120Stone\u0120Church\u010aDescription"
-        result = mod._sanitize_bpe_display(raw)
-        assert "\u0120" not in result
-        assert "\u010a" not in result
-        assert "Stone Church" in result
-
-    def test_truncates_long_text(self, mod: types.ModuleType) -> None:
-        """Text exceeding max_len is truncated with ellipsis."""
-        result = mod._sanitize_bpe_display("a" * 200, max_len=50)
-        assert len(result) <= 50
-        assert result.endswith("...")
-
-    def test_short_text_unchanged(self, mod: types.ModuleType) -> None:
-        """Clean text passes through without modification."""
-        result = mod._sanitize_bpe_display("clean text")
-        assert result == "clean text"
 
 
 # ── QualityThresholds.from_config (YAML schema validation) ────────────────
@@ -942,11 +681,11 @@ class TestQualityThresholdsFromConfig:
     def test_invalid_threshold_bounds_raise(self, mod: types.ModuleType) -> None:
         """Inverted threshold bounds should fail fast instead of weakening checks."""
         config = {
-            "thresholds": {"min_title_words": 9, "max_title_words": 4},
+            "thresholds": {"min_phrase_repetitions": 9, "max_phrase_repetitions": 4},
             "patterns": {},
         }
 
-        with pytest.raises(ValueError, match="invalid title words bounds"):
+        with pytest.raises(ValueError, match="invalid phrase repetitions bounds"):
             mod.QualityThresholds.from_config(config)
 
     def test_invalid_pattern_regex_raises(self, mod: types.ModuleType) -> None:
@@ -1027,7 +766,7 @@ class TestLoadQualityConfig:
         original_ratio = mod.QUALITY.repetition_ratio
         config_file = tmp_path / "quality_config.yaml"
         config_file.write_text(
-            "thresholds:\n  min_title_words: 8\n  max_title_words: 3\npatterns: {}\n",
+            "thresholds:\n  min_phrase_repetitions: 8\n  max_phrase_repetitions: 3\npatterns: {}\n",
             encoding="utf-8",
         )
 

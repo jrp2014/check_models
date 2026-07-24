@@ -28,7 +28,7 @@ def test_analyze_output_quality_help(capsys: pytest.CaptureFixture[str]) -> None
         sys.argv = original_argv
 
     captured = capsys.readouterr()
-    assert "Test the project's VLM quality heuristics" in captured.out
+    assert "mechanical VLM output observations" in captured.out
 
 
 def test_analyze_output_quality_clean_text(capsys: pytest.CaptureFixture[str]) -> None:
@@ -48,7 +48,7 @@ def test_analyze_output_quality_clean_text(capsys: pytest.CaptureFixture[str]) -
 
     captured = capsys.readouterr()
     assert "CLEAN (No issues detected)" in captured.out
-    assert "Has Harness Issue         : ❌ No" in captured.out
+    assert "Is Repetitive             : ❌ No" in captured.out
 
 
 def test_analyze_output_quality_special_token_observation(
@@ -69,9 +69,8 @@ def test_analyze_output_quality_special_token_observation(
         sys.argv = original_argv
 
     captured = capsys.readouterr()
-    assert "Has Harness Issue         : ❌ No" in captured.out
-    assert "Special Token Wrappers    : [<|endoftext|>]" in captured.out
-    assert "OBSERVATION (special-token wrapper retained)" in captured.out
+    assert "Unexpected Special Tokens : [<|endoftext|>]" in captured.out
+    assert "OBSERVATION (unexpected-special-token)" in captured.out
 
 
 def test_analyze_output_quality_with_file(
@@ -192,7 +191,7 @@ def test_analyze_output_quality_json_clean_output(
     assert payload["status"] == "clean"
     assert payload["exit_code"] == 0
     assert payload["summary"]["issue_string"] == ""
-    assert payload["analysis"]["has_harness_issue"] is False
+    assert payload["analysis"]["unexpected_special_tokens"] == []
 
 
 def test_analyze_output_quality_json_special_token_observation(
@@ -217,7 +216,5 @@ def test_analyze_output_quality_json_special_token_observation(
     payload = json.loads(captured.out)
     assert payload["status"] == "observation"
     assert payload["exit_code"] == 0
-    assert payload["analysis"]["has_harness_issue"] is False
-    assert payload["analysis"]["special_token_wrappers"] == ["<|endoftext|>"]
-    assert payload["analysis"]["evidence"] == ["special_token_wrapper"]
-    assert payload["summary"]["issue_string"] == ""
+    assert payload["analysis"]["unexpected_special_tokens"] == ["<|endoftext|>"]
+    assert payload["summary"]["issue_string"] == "unexpected-special-token"

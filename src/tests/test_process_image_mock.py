@@ -191,9 +191,8 @@ class TestProcessImageWithModelMock:
             result = check_models.process_image_with_model(params)
 
         assert result.upstream_boundary == "generation_started"
-        evidence = check_models._collect_observed_evidence(result)
-        assert evidence.raw_output == "Hello world"
-        assert evidence.upstream_boundary == "generation_started"
+        assert result.generation is not None
+        assert result.generation.text == "Hello world"
 
     def test_process_records_upstream_load_failure(self, test_image: Path) -> None:
         """A load exception should retain that upstream loading was entered."""
@@ -362,10 +361,6 @@ class TestProcessImageWithModelMock:
         assert result.captured_output_on_fail is not None
         assert "stdout marker" in result.captured_output_on_fail
         assert "stderr marker" in result.captured_output_on_fail
-        assert (
-            check_models._collect_observed_evidence(result).raw_output
-            == result.captured_output_on_fail
-        )
 
     def test_failure_capture_omits_self_logged_rich_traceback(
         self,
@@ -573,28 +568,7 @@ class TestProcessImageWithModelMock:
         analysis = check_models.GenerationQualityAnalysis(
             is_repetitive=True,
             repeated_token=repeated_phrase,
-            hallucination_issues=[],
-            is_verbose=False,
-            formatting_issues=[],
-            has_excessive_bullets=False,
-            bullet_count=0,
-            is_context_ignored=False,
-            missing_context_terms=[],
-            is_refusal=False,
-            refusal_type=None,
-            is_generic=False,
-            specificity_score=0.0,
-            has_language_mixing=False,
-            language_mixing_issues=[],
-            has_degeneration=False,
-            degeneration_type=None,
-            has_fabrication=False,
-            fabrication_issues=[],
-            has_harness_issue=False,
-            harness_issue_type=None,
-            harness_issue_details=[],
             word_count=25,
-            unique_ratio=0.1,
         )
         result: check_models.PerformanceResult
         try:

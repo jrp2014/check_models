@@ -418,29 +418,9 @@ def _make_quality_success(
     qa = GenerationQualityAnalysis(
         is_repetitive=False,
         repeated_token=None,
-        hallucination_issues=[],
-        is_verbose=False,
-        formatting_issues=["Formatting marker leak"] if with_quality_issue else [],
-        has_excessive_bullets=False,
-        bullet_count=0,
-        is_context_ignored=False,
-        missing_context_terms=[],
-        is_refusal=False,
-        refusal_type=None,
-        is_generic=False,
-        specificity_score=0.0,
-        has_language_mixing=False,
-        language_mixing_issues=[],
-        has_degeneration=False,
-        degeneration_type=None,
-        has_fabrication=False,
-        fabrication_issues=[],
-        has_harness_issue=False,
-        harness_issue_type=None,
-        harness_issue_details=[],
         word_count=20,
-        unique_ratio=0.9,
         prompt_checks_ran=True,
+        unexpected_special_tokens=["<|unexpected|>"] if with_quality_issue else [],
     )
     return PerformanceResult(
         model_name=name,
@@ -457,38 +437,8 @@ def _make_quality_success(
     )
 
 
-def _make_metadata_agreement_result(name: str = "org/model-grounded") -> PerformanceResult:
-    return replace(
-        _make_success(name),
-        metadata_agreement=check_models.MetadataAgreementMetrics(
-            overall_score=88.0,
-            title_score=80.0,
-            description_score=92.0,
-            keyword_score=85.0,
-            matched_terms=("brick storefront", "outdoor seating"),
-        ),
-    )
-
-
-def test_recommendation_view_excludes_crash_from_usable_policies() -> None:
-    failed = _make_failure("org/crashed")
-    passed = _make_success("org/passed")
-    context = _build_report_render_context(
-        results=[failed, passed],
-        prompt="Describe the image.",
-        eval_mode="blind",
-    )
-
-    views = check_models._build_model_recommendation_views(context)
-    by_model = {view.result.model_name: view for view in views}
-
-    assert by_model["org/crashed"].compatibility == "crashed"
-    assert by_model["org/crashed"].eligible is False
-    assert by_model["org/passed"].eligible is True
-
-
 def test_report_context_caches_only_live_cross_artifact_views() -> None:
-    """The shared context should not retain retired diagnostics classifications."""
+    """The shared context should retain only current-run factual assessments."""
     failed = _make_failure("org/crashed")
     passed = _make_success("org/passed")
 
@@ -498,10 +448,13 @@ def test_report_context_caches_only_live_cross_artifact_views() -> None:
         eval_mode="blind",
     )
 
-    assert [view.result.model_name for view in context.recommendations] == [
+    assert [model for model, _assessment in context.assessments] == [
         "org/crashed",
         "org/passed",
     ]
+    assert not hasattr(context, "recommendations")
+    assert not hasattr(context, "triage")
+    assert not hasattr(context, "machine_facts")
     assert not hasattr(context, "diagnostics_snapshot")
     assert not hasattr(context, "issue_clusters")
 
@@ -594,153 +547,6 @@ def test_all_caveated_html_omits_cataloging_aggregates_and_winner(
     assert "Best for cataloging" not in html_text
 
 
-def test_report_context_builds_machine_and_failure_facts_once_for_serializers(
-    tmp_path: Path,
-) -> None:
-    """Serializers should reuse context facts instead of rerunning classifiers."""
-    failure = replace(
-        _make_failure("org/wrapped", error_package="mlx-vlm"),
-        exception_chain=(
-            check_models.FailureException(
-                "RuntimeError",
-                "mlx.core",
-                "kIOGPUCommandBufferCallbackErrorOutOfMemory",
-            ),
-            check_models.FailureException(
-                "ValueError",
-                "builtins",
-                "mlx_vlm/generate.py wrapped generation failure",
-            ),
-        ),
-    )
-    results = [failure, _make_success("org/passed")]
-
-    with (
-        patch.object(
-            check_models,
-            "_build_jsonl_review_record",
-            wraps=check_models._build_jsonl_review_record,
-        ) as review_builder,
-        patch.object(
-            check_models,
-            "_build_jsonl_maintainer_triage_record",
-            wraps=check_models._build_jsonl_maintainer_triage_record,
-        ) as triage_builder,
-        patch.object(
-            check_models,
-            "_machine_artifact_facts",
-            wraps=check_models._machine_artifact_facts,
-        ) as facts_builder,
-        patch.object(
-            check_models,
-            "_build_failure_narrative",
-            wraps=check_models._build_failure_narrative,
-        ) as narrative_builder,
-    ):
-        context = _build_report_render_context(
-            results=results,
-            prompt="Describe the image.",
-            eval_mode="blind",
-        )
-        assert review_builder.call_count == len(results)
-        assert triage_builder.call_count == len(results)
-        assert facts_builder.call_count == len(results)
-        assert narrative_builder.call_count == 1
-        initial_review_calls = review_builder.call_count
-        initial_triage_calls = triage_builder.call_count
-        initial_facts_calls = facts_builder.call_count
-        initial_narrative_calls = narrative_builder.call_count
-
-        output_paths = check_models.ReportOutputPaths(
-            index=tmp_path / "index.md",
-            html=tmp_path / "results.html",
-            gallery_markdown=tmp_path / "model_gallery.md",
-            jsonl=tmp_path / "results.jsonl",
-            run_json=tmp_path / "run.json",
-            diagnostics=tmp_path / "diagnostics.md",
-            log=tmp_path / "check_models.log",
-            environment=tmp_path / "environment.log",
-        )
-        check_models.append_history_record(
-            history_path=tmp_path / "results.history.jsonl",
-            results=results,
-            prompt="Describe the image.",
-            system_info={},
-            library_versions={},
-        )
-        check_models._generate_reports_and_log_outputs(
-            check_models.ReportGenerationInputs(
-                results=results,
-                library_versions={},
-                prompt="Describe the image.",
-                metadata=None,
-                overall_time=1.0,
-                image_path=None,
-                system_info={},
-                report_context=context,
-                output_paths=output_paths,
-                run_args=Namespace(
-                    revision="cached-revision",
-                    max_tokens=17,
-                    temperature=0.17,
-                ),
-            )
-        )
-
-        html_report = html.unescape(output_paths.html.read_text(encoding="utf-8"))
-        assert "<td>Requested model revision</td>\n<td>cached-revision</td>" in html_report
-        assert "--max-tokens 17" in html_report
-        assert review_builder.call_count == initial_review_calls
-        assert triage_builder.call_count == initial_triage_calls
-        assert facts_builder.call_count == initial_facts_calls
-        assert narrative_builder.call_count == initial_narrative_calls
-
-
-def test_failed_partial_output_keeps_runtime_failure_owner() -> None:
-    """Partial generated text must not replace conclusive crash triage."""
-    quality_result = _make_quality_success("org/partial", with_quality_issue=True)
-    failure = replace(
-        _make_failure("org/partial", error_package="mlx"),
-        generation=quality_result.generation,
-        quality_analysis=quality_result.quality_analysis,
-        quality_issues=quality_result.quality_issues,
-    )
-
-    context = _build_report_render_context(
-        results=[failure],
-        prompt="Describe the image.",
-        eval_mode="assisted",
-    )
-    cached = context.result_set.results[0]
-
-    assert cached.review_payload is not None
-    assert cached.review_payload["verdict"] == "runtime_failure"
-    assert cached.review_payload["owner"] == "mlx"
-    assert cached.maintainer_triage_payload is not None
-    assert cached.maintainer_triage_payload["issue_kind"] == "runtime_failure"
-    assert cached.maintainer_triage_payload["suspected_owner"] == "mlx"
-    assert "boom" in cached.maintainer_triage_payload["summary"].casefold()
-    assert "formatting" not in cached.maintainer_triage_payload["summary"].casefold()
-    assert "text-sanity" not in cached.maintainer_triage_payload["summary"].casefold()
-
-    review_rows = dict(check_models._build_review_block_rows(cached))
-    assert review_rows["Why"] == "execution failure"
-    assert "formatting" not in review_rows["Why"].casefold()
-    assert "text-sanity" not in review_rows["Why"].casefold()
-
-    assert len(context.recommendations) == 1
-    recommendation_caveats = " | ".join(context.recommendations[0].caveats).casefold()
-    assert "formatting" not in recommendation_caveats
-    assert "text-sanity" not in recommendation_caveats
-    assert check_models._format_table_field_value("quality_issues", cached) == ""
-    assert check_models._assessment_to_json(dict(context.assessments)[cached.model_name]) == {
-        "execution": "crashed",
-        "usability": "not_evaluated",
-        "maintainer_status": "actionable_failure",
-        "observations": [],
-    }
-
-
 def test_chained_failure_uses_primary_origin_and_reports_mixed_ownership() -> None:
     failure = replace(
         _make_failure("org/chained", error_package="mlx"),
@@ -760,17 +566,10 @@ def test_chained_failure_uses_primary_origin_and_reports_mixed_ownership() -> No
         ),
     )
 
-    context = _build_report_render_context(
-        results=[failure],
-        prompt="Describe the image.",
-    )
-    cached = context.result_set.results[0]
-    narrative = dict(context.failure_narratives)[failure.model_name]
+    narrative = check_models._build_failure_narrative(failure)
 
     assert narrative.primary_exception.startswith("IndexError:")
     assert narrative.suspected_owner == "unresolved: mlx/mlx-vlm"
-    assert cached.review_payload is not None
-    assert cached.review_payload["owner"] == narrative.suspected_owner
 
 
 def test_published_failure_artifacts_do_not_disclose_home_paths() -> None:
@@ -815,33 +614,13 @@ def _make_harness_success(
     qa = GenerationQualityAnalysis(
         is_repetitive=False,
         repeated_token=None,
-        hallucination_issues=[],
-        is_verbose=False,
-        formatting_issues=[],
-        has_excessive_bullets=False,
-        bullet_count=0,
-        is_context_ignored=False,
-        missing_context_terms=[],
-        is_refusal=False,
-        refusal_type=None,
-        is_generic=False,
-        specificity_score=0.0,
-        has_language_mixing=False,
-        language_mixing_issues=[],
-        has_degeneration=False,
-        degeneration_type=None,
-        has_fabrication=False,
-        fabrication_issues=[],
-        has_harness_issue=True,
-        harness_issue_type=harness_type,
-        harness_issue_details=[harness_detail],
         word_count=0,
-        unique_ratio=0.0,
         prompt_checks_ran=True,
-        verdict="harness" if harness_type != "long_context" else "context_budget",
-        owner="mlx-vlm" if harness_type != "long_context" else "mlx",
-        user_bucket="avoid" if harness_type != "long_context" else "caveat",
-        evidence=[f"harness:{harness_type}"],
+        unexpected_special_tokens=(
+            [harness_detail.split(":", maxsplit=1)[-1]]
+            if harness_detail.startswith("token_leak:")
+            else []
+        ),
     )
     return PerformanceResult(
         model_name=name,
@@ -1335,58 +1114,9 @@ def test_retained_artifacts_have_no_owner_confidence_path(tmp_path: Path) -> Non
         report_context=context,
     )
 
-    assert not hasattr(context.machine_facts[0], "owner_confidence")
-    narrative = dict(context.failure_narratives)[failure.model_name]
+    narrative = check_models._build_failure_narrative(failure)
     assert not hasattr(narrative, "owner_confidence")
-    assert all(
-        triage is None or "confidence" not in triage for _model, triage in context.maintainer_triage
-    )
     assert "owner_confidence" not in jsonl_path.read_text(encoding="utf-8")
-
-
-def test_review_shortlist_obeys_canonical_user_recommendation() -> None:
-    """A legacy high utility score must not promote a canonically avoided model."""
-    base = PerformanceResult(
-        model_name="org/high-score-avoid",
-        success=True,
-        generation=_MockGeneration(
-            text="A detailed and useful image caption with specific visual evidence.",
-            prompt_tokens=20,
-            generation_tokens=12,
-        ),
-    )
-    base = check_models._populate_result_quality_analysis(base, prompt="Describe it.")
-    review = check_models._build_jsonl_review_record(base)
-    assert review is not None
-    result = replace(
-        base,
-        review_payload={**review, "user_bucket": "avoid"},
-        review_payload_ready=True,
-    )
-    row = check_models.UtilityTriageRow(
-        result=result,
-        score=95.0,
-        description_score=95.0,
-        keyword_score=90.0,
-        grade="A",
-        weakness="None identified",
-        delta_vs_metadata=20.0,
-        labels=frozenset(),
-    )
-    context = _build_report_render_context(results=[result], prompt="Describe it.")
-    context = replace(
-        context,
-        triage=check_models.ReportTriageContext(useful_rows=(row,)),
-    )
-
-    content = "\n".join(
-        check_models._format_review_priorities_parts(context, html_output=False),
-    )
-
-    assert "### Strong Candidates" not in content
-    assert "### Watchlist" in content
-    assert "org/high-score-avoid" in content
-    assert "current review says avoid" in content
 
 
 class TestHtmlReportEdgeCases:
@@ -1520,26 +1250,10 @@ class TestHtmlReportEdgeCases:
         result = _make_success("org/standalone")
         out = tmp_path / "standalone.html"
 
-        with (
-            patch.object(check_models, "_build_report_render_context", side_effect=AssertionError),
-            patch.object(check_models, "_build_canonical_assessment", side_effect=AssertionError),
-            patch.object(
-                check_models,
-                "_build_model_recommendation_views",
-                side_effect=AssertionError,
-            ),
-            patch.object(check_models, "analyze_model_issues", side_effect=AssertionError),
-            patch.object(
-                check_models,
-                "compute_performance_statistics",
-                side_effect=AssertionError,
-            ),
-            patch.object(
-                check_models,
-                "_build_report_triage_context",
-                side_effect=AssertionError,
-            ),
-            patch.object(check_models, "_machine_artifact_facts", side_effect=AssertionError),
+        with patch.object(
+            check_models,
+            "_build_report_render_context",
+            side_effect=AssertionError,
         ):
             generate_html_report(
                 [result],
@@ -2089,74 +1803,6 @@ class TestRetainedMarkdownArtifactEdges:
 
         assert mode_summaries["github"] == mode_summaries["relative"]
 
-    def test_build_result_output_cues_preserves_priority_order_and_limit(self) -> None:
-        """Cue helper should keep the stable cue order before compact preview truncation."""
-        result = _make_harness_success("org/cues", harness_type="stop_token")
-        assert result.quality_analysis is not None
-
-        analysis = replace(
-            result.quality_analysis,
-            is_repetitive=True,
-            has_context_echo=True,
-            instruction_echo=True,
-            metadata_borrowing=True,
-            has_reasoning_leak=True,
-            has_degeneration=True,
-            is_context_ignored=True,
-            missing_sections=["keywords"],
-            formatting_issues=["Formatting marker leak"],
-            is_generic=True,
-            verdict="cutoff",
-        )
-        result = replace(
-            result,
-            quality_analysis=analysis,
-            quality_issues=(
-                "⚠️harness(stop_token), repetitive(loop), context-echo(0.94), "
-                "instruction_echo, metadata_borrowing, cutoff, reasoning_leak, "
-                "degeneration, context_ignored, missing_sections(keywords), "
-                "formatting(marker), generic"
-            ),
-        )
-
-        expected_order = [
-            "harness:stop-token",
-            "repetitive",
-            "context-echo",
-            "instruction-echo",
-            "metadata-borrowing",
-            "cutoff",
-            "reasoning-leak",
-            "degeneration",
-            "context-ignored",
-            "missing-sections",
-            "formatting",
-            "generic",
-        ]
-
-        assert (
-            check_models._build_result_output_cues(result)
-            == expected_order[: check_models.OUTPUT_PREVIEW_CUE_LIMIT]
-        )
-
-    def test_review_surfaces_use_canonical_assisted_enrichment_evidence(self) -> None:
-        """Review surfaces should reuse canonical assisted enrichment evidence."""
-        analysis = replace(
-            check_models.analyze_generation_text("A concise river caption.", 6),
-            metadata_borrowing=True,
-            evidence=["unverified-context-copy", "low-draft-improvement"],
-        )
-        review = check_models._build_jsonl_review_record(
-            replace(_make_success("org/enrichment"), quality_analysis=analysis)
-        )
-
-        assert review is not None
-        focus_text = check_models._review_focus_text(review, analysis)
-        assert "unverified-context-copy" in focus_text
-        assert "low-draft-improvement" in focus_text
-        assert "nonvisual metadata reused" not in focus_text
-        assert "metadata borrowing" not in focus_text
-
 
 class TestMarkdownGalleryReport:
     """Coverage for the standalone markdown gallery artifact."""
@@ -2224,16 +1870,11 @@ class TestMarkdownGalleryReport:
         """Completed output should expose cached usability without recommendation policy."""
         text = "<think>Inspect.</think> A useful final caption."
         result = _make_success("org/thinking")
-        analysis = replace(
-            check_models.analyze_generation_text(
-                text,
-                generated_tokens=12,
-                model_name="org/thinking",
-                prompt="Describe this image.",
-            ),
-            has_reasoning_leak=False,
-            has_thinking_trace=True,
-            user_bucket="caveat",
+        analysis = check_models.analyze_generation_text(
+            text,
+            generated_tokens=12,
+            model_name="org/thinking",
+            prompt="Describe this image.",
         )
         result = replace(
             result,
@@ -2569,21 +2210,12 @@ class TestMarkdownGalleryReport:
         )
         out = tmp_path / "model_gallery.md"
 
-        with (
-            patch.object(check_models, "_review_for_result", side_effect=AssertionError),
-            patch.object(check_models, "_model_selection_score", side_effect=AssertionError),
-            patch.object(
-                check_models,
-                "_recommendation_status_for_result",
-                side_effect=AssertionError,
-            ),
-        ):
-            generate_markdown_gallery_report(
-                results=results,
-                filename=out,
-                prompt="Describe the image.",
-                report_context=context,
-            )
+        generate_markdown_gallery_report(
+            results=results,
+            filename=out,
+            prompt="Describe the image.",
+            report_context=context,
+        )
 
         content = out.read_text(encoding="utf-8")
         headings = [
@@ -2898,91 +2530,6 @@ class TestMarkdownGalleryReport:
         assert "_Stop reason:_ not captured" in evidence
         assert "_Processor:_ not captured" in evidence
         assert "_Tokenizer:_ not captured" in evidence
-
-    def test_clean_image_heavy_review_focus_omits_nontext_burden(self) -> None:
-        """Non-text prompt burden should be context, not key evidence, for clean captions."""
-        prompt = "Describe this image briefly."
-        text = "Two cats are sleeping on a pink blanket on a couch."
-        analysis = check_models.analyze_generation_text(
-            text,
-            generated_tokens=13,
-            prompt_tokens=1196,
-            prompt=prompt,
-            requested_max_tokens=200,
-        )
-        result = PerformanceResult(
-            model_name="org/plain-caption",
-            success=True,
-            generation=_MockGeneration(
-                text=text,
-                prompt_tokens=1196,
-                generation_tokens=13,
-            ),
-            quality_analysis=analysis,
-        )
-        review = check_models._build_jsonl_review_record(result)
-
-        assert review is not None
-        assert "nontext prompt burden" not in check_models._review_focus_text(review, analysis)
-
-    def test_context_budget_review_focus_keeps_nontext_burden(self) -> None:
-        """Real context-collapse cases should expose canonical image-token pressure."""
-        analysis = check_models.analyze_generation_text(
-            "Cat.",
-            generated_tokens=3,
-            prompt_tokens=4103,
-            prompt="Describe this image briefly.",
-            requested_max_tokens=200,
-        )
-        result = PerformanceResult(
-            model_name="org/context-collapse",
-            success=True,
-            generation=_MockGeneration(
-                text="Cat.",
-                prompt_tokens=4103,
-                generation_tokens=3,
-            ),
-            quality_analysis=analysis,
-            prompt_diagnostics=check_models.PromptDiagnostics(image_placeholder_count=1),
-        )
-        review = check_models._build_jsonl_review_record(result)
-
-        assert review is not None
-        focus = check_models._review_focus_text(review, analysis)
-        assert analysis.verdict == "context_budget"
-        assert "visual input burden" in focus
-        assert "nontext prompt burden" not in focus
-
-    def test_unavailable_prompt_components_do_not_claim_normal_burden(self) -> None:
-        """Unavailable component estimates should produce uncertainty-aware guidance."""
-        analysis = replace(
-            check_models.analyze_generation_text(
-                "Cat.",
-                generated_tokens=3,
-                prompt_tokens=4103,
-                prompt="Describe this image briefly.",
-            ),
-            prompt_tokens_text_est=None,
-            prompt_tokens_nontext_est=None,
-            verdict="context_budget",
-        )
-        result = PerformanceResult(
-            model_name="org/unavailable-components",
-            success=True,
-            generation=_MockGeneration(
-                text="Cat.",
-                prompt_tokens=4103,
-                generation_tokens=3,
-            ),
-            quality_analysis=analysis,
-        )
-        review = check_models._build_jsonl_review_record(result)
-
-        assert review is not None
-        guidance = check_models._review_next_action_for_result(result, review)
-        assert review["prompt_burden_kind"] == "unavailable"
-        assert "normal burden issue" not in guidance
-        assert "controlled" in guidance
 
     def test_gallery_keeps_chooser_and_per_model_factual_status(
         self,
