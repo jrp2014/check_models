@@ -5,9 +5,7 @@ from __future__ import annotations
 import base64
 import io
 import json
-import os
 import re
-import time
 from argparse import Namespace
 from dataclasses import dataclass, replace
 from pathlib import Path
@@ -20,23 +18,13 @@ from PIL import Image
 import check_models
 from check_models import (
     DiagnosticsArtifacts,
-    DiagnosticsHistoryInputs,
-    DiagnosticsSnapshot,
     GenerationQualityAnalysis,
     LibraryVersionDict,
     PerformanceResult,
     RuntimeDiagnostics,
-    _append_review_user_buckets,
-    _build_diagnostics_context,
     _build_diagnostics_snapshot,
     _build_report_render_context,
-    _clean_stale_toplevel_reports,
-    _cluster_failures_by_pattern,
-    _format_traceback_tail,
     _generate_github_issue_reports,
-    _log_maintainer_summary,
-    _prune_repro_bundles,
-    export_failure_repro_bundles,
     generate_diagnostics_report,
     generate_html_report,
     generate_markdown_gallery_report,
@@ -52,6 +40,7 @@ if TYPE_CHECKING:
 
 THINKING_START_TOKEN = "<think>"
 THINKING_END_TOKEN = "</think>"
+EOS_END_TOKEN = "</s>"
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -345,13 +334,12 @@ def _generate_output_artifacts_for_link_style(
             repro_bundles=repro_bundles,
         )
         generate_diagnostics_report(
-            results=results,
-            filename=output_paths.diagnostics,
-            versions=versions,
-            system_info=system_info,
+            results,
+            output_paths.diagnostics,
             prompt=prompt,
-            repro_bundles=repro_bundles,
-            diagnostics_snapshot=diagnostics_snapshot,
+            library_versions=versions,
+            system_info=system_info,
+            report_context=report_context,
         )
         generate_tsv_report(
             results=results,
@@ -375,12 +363,10 @@ def _generate_output_artifacts_for_link_style(
             output_paths=_relative_output_artifact_map(output_dir, output_paths),
         )
         issue_reports = _generate_github_issue_reports(
-            diagnostics_snapshot=diagnostics_snapshot,
+            report_context=report_context,
             output_dir=output_dir,
-            versions=versions,
+            library_versions=versions,
             system_info=system_info,
-            repro_bundles=repro_bundles,
-            run_args=None,
             prompt=prompt,
         )
         check_models.generate_output_index_report(
@@ -1399,228 +1385,209 @@ def _with_confirmed_reproduction(result: PerformanceResult) -> PerformanceResult
     )
 
 
-def test_thinking_template_mismatch_requires_reproduction_not_issue_draft() -> None:
-    """A template-opened complete trace is configuration evidence, not a stop-token fault."""
-    text = "<think>Inspecting the image.</think> A cat rests on a blanket."
-    result = replace(
-        _make_harness_success(
-            "org/thinking-model",
-            text=text,
-            prompt_tokens=120,
-            generation_tokens=20,
-            harness_type="stop_token",
-            harness_detail="token_leak:</think>",
-        ),
-        prompt_diagnostics=check_models.PromptDiagnostics(
-            rendered_prompt_preview="<|im_start|>assistant\n<think>\n",
-            special_tokens=("<|im_end|>", "</think>"),
-            generate_kwargs={"skip_special_tokens": False},
-        ),
-    )
-    assert result.quality_analysis is not None
-    result = replace(
-        result,
-        quality_analysis=replace(
-            result.quality_analysis,
-            has_thinking_trace=True,
-            thinking_trace_markers=["<think>", "</think>"],
-        ),
-    )
-
-    triage = check_models._maintainer_triage_for_result(result)
-    assert triage is not None
-    assert triage["issue_readiness"] == "needs_reproduction"
-    assert triage["issue_subtype"] == "thinking_configuration"
-    assert triage["confidence"] == "medium"
-    assert triage["suspected_owner"] == "model-config / mlx-vlm"
-    snapshot = DiagnosticsSnapshot(harness_results=((result, text),))
-    assert check_models._build_issue_clusters(snapshot) == ()
-    observation = "\n".join(check_models._diagnostics_reproduction_observations(snapshot))
-    assert "Observations Requiring Controlled Reproduction" in observation
-    assert "special_token_leak" in observation
-    assert "thinking_trace" in observation
-    assert "Complete generated output and evidence: org/thinking-model" in observation
-    assert text in observation
-    assert "rendered_prompt_preview" in observation
-
-
-def test_single_visual_context_boundary_requires_controlled_rerun() -> None:
-    """One weak visual-heavy result cannot establish an MLX long-context fault."""
-    result = _make_harness_success(
-        "org/pretrained-model",
-        text="Cat.",
-        prompt_tokens=4103,
-        generation_tokens=2,
-        harness_type="long_context",
-        harness_detail="long_context_low_ratio(0.0%;4103->2)",
-    )
-    analysis = result.quality_analysis
-    assert analysis is not None
-    result = replace(
-        result,
-        quality_analysis=replace(
-            analysis,
-            prompt_tokens_total=4103,
-            prompt_tokens_text_est=6,
-            prompt_tokens_nontext_est=4097,
-        ),
-        prompt_diagnostics=check_models.PromptDiagnostics(
-            processed_image_width=896,
-            processed_image_height=896,
-            generate_kwargs={"prefill_step_size": 4096},
-        ),
-    )
-
-    triage = check_models._maintainer_triage_for_result(result)
-    assert triage is not None
-    assert triage["issue_readiness"] == "needs_reproduction"
-    assert triage["issue_subtype"] == "context_boundary"
-    assert "reduced-image" in triage["next_action"]
-    snapshot = DiagnosticsSnapshot(harness_results=((result, "Cat."),))
-    assert check_models._build_issue_clusters(snapshot) == ()
-
-
-def test_capped_long_context_signal_still_requires_controlled_rerun() -> None:
-    """A token-capped collapse must not bypass the reduced-image evidence gate."""
-    result = _make_harness_success(
-        "org/capped-context",
-        text="- " * 500,
-        prompt_tokens=16822,
-        generation_tokens=500,
-        harness_type="long_context",
-        harness_detail="long_context_repetition(16822tok)",
-    )
-    analysis = result.quality_analysis
-    assert analysis is not None
-    result = replace(
-        result,
-        quality_analysis=replace(
-            analysis,
-            verdict="cutoff_degraded",
-            user_bucket="avoid",
-            prompt_tokens_total=16822,
-            prompt_tokens_text_est=493,
-            prompt_tokens_nontext_est=16329,
-        ),
-    )
-
-    triage = check_models._maintainer_triage_for_result(result)
-    assert triage is not None
-    assert triage["issue_readiness"] == "needs_reproduction"
-    assert (
-        check_models._build_issue_clusters(
-            DiagnosticsSnapshot(harness_results=((result, "- " * 500),)),
-        )
-        == ()
-    )
-
-
-@pytest.mark.parametrize(
-    ("readiness", "expected_drafts"),
-    [
-        ("issue_ready", 1),
-        ("needs_reproduction", 0),
-        ("harness_observation", 0),
-        ("not_applicable", 0),
-    ],
-)
-def test_issue_artifacts_publish_only_issue_ready_assessments(
+def test_simplified_diagnostics_partitions_cached_assessments_in_evidence_order(
     tmp_path: Path,
-    readiness: check_models.MaintainerReadiness,
-    expected_drafts: int,
 ) -> None:
-    """The canonical readiness gate should control every issue artifact."""
-    result = _make_harness_success(
-        f"org/{readiness}",
-        text="Complete diagnostic output <|end|>",
-        harness_type="stop_token",
-        harness_detail="token_leak:<|end|>",
-    )
-    assessment = check_models._build_canonical_assessment(
-        check_models._collect_observed_evidence(result),
-        result,
-    )
-    assessment = replace(
-        assessment,
-        maintainer=replace(
-            assessment.maintainer,
-            maintainer_readiness=readiness,
-        ),
-    )
-    snapshot = DiagnosticsSnapshot(
-        harness_results=((result, "Complete diagnostic output <|end|>"),)
-    )
-
-    clusters = check_models._build_issue_clusters(
-        snapshot,
-        assessments={result.model_name: assessment},
-    )
-    generated = _generate_github_issue_reports(
-        diagnostics_snapshot=snapshot,
-        output_dir=tmp_path,
-        versions=_stub_versions(),
-        system_info={},
-        repro_bundles={},
-        run_args=None,
-        issue_clusters=clusters,
-    )
-
-    assert len(clusters) == expected_drafts
-    assert len(generated) == expected_drafts
-    assert len(list((tmp_path / "issues").glob("issue_*.md"))) == expected_drafts
-    index = (tmp_path / "issues" / "index.md").read_text(encoding="utf-8")
-    assert ("No issue drafts were generated" in index) is (expected_drafts == 0)
-
-
-def test_upstream_crash_is_issue_ready_and_retains_complete_evidence(tmp_path: Path) -> None:
-    """An entered upstream crash needs no rerun and must retain unabridged evidence."""
-    traceback_text = "\n".join(
-        [
-            "Traceback (most recent call last):",
-            "EARLY-TRACE-EVIDENCE",
-            *(f'  File "frame_{index}.py", line {index}' for index in range(10)),
-            "RuntimeError: decoder failed",
-        ]
-    )
-    captured_output = "BEGIN-CAPTURE " + ("partial generation " * 30) + "END-CAPTURE"
-    result = replace(
+    """Diagnostics should expose the four current-run sections before provenance."""
+    crash = replace(
         _make_failure_with_details(
-            "org/upstream-crash",
+            "org/crash",
             error_msg="decoder failed",
-            error_package="mlx-vlm",
             failure_phase="decode",
-            traceback_str=traceback_text,
-            captured_output=captured_output,
+            traceback_str="Traceback (most recent call last):\nRuntimeError: decoder failed",
         ),
         upstream_boundary="generation_started",
     )
-    context = _build_report_render_context(
-        results=[result],
-        prompt="Describe the image.",
-        system_info={},
+    observation = PerformanceResult(
+        model_name="org/odd-output",
+        success=True,
+        generation=_MockGeneration(
+            text="bizarre-loop " * 180,
+            prompt_tokens=33,
+            generation_tokens=180,
+        ),
+        runtime_diagnostics=RuntimeDiagnostics(stop_reason="completed"),
+        requested_max_tokens=500,
     )
-    assessment = check_models._build_canonical_assessment(
-        check_models._collect_observed_evidence(context.result_set.results[0]),
-        context.result_set.results[0],
+    indeterminate = PerformanceResult(
+        model_name="org/network",
+        success=False,
+        generation=None,
+        error_message="503 Service Unavailable",
+    )
+    clean = _make_success("org/clean")
+    results = [clean, crash, observation, indeterminate]
+    context = _build_report_render_context(
+        results=results,
+        prompt="Describe the image.",
+        system_info={"GPU/Chip": "Apple M5"},
     )
     output = tmp_path / "diagnostics.md"
 
-    assert assessment.maintainer.maintainer_readiness == "issue_ready"
-    assert len(context.issue_clusters) == 1
-    assert generate_diagnostics_report(
-        results=list(context.result_set.results),
-        filename=output,
-        versions=_stub_versions(),
-        system_info={},
+    generate_diagnostics_report(
+        results,
+        output,
         prompt="Describe the image.",
-        diagnostics_snapshot=context.diagnostics_snapshot,
-        issue_clusters=context.issue_clusters,
+        library_versions=_stub_versions(),
+        system_info={"GPU/Chip": "Apple M5"},
+        report_context=context,
     )
 
     content = output.read_text(encoding="utf-8")
-    assert "<details>" in content
-    assert traceback_text in content
-    assert captured_output in content
+    headings = (
+        "## Run Outcome Counts",
+        "## Actionable Failures",
+        "## Successful Observations Requiring Reproduction",
+        "## Indeterminate Attempts",
+    )
+    assert all(heading in content for heading in headings)
+    assert content.index(headings[0]) < content.index(headings[1])
+    assert content.index(headings[1]) < content.index(headings[2])
+    assert content.index(headings[2]) < content.index(headings[3])
+    assert content.index(headings[3]) < content.index("## Provenance and Environment")
+    assert "actionable_failure" in content
+    assert "observation_needs_reproduction" in content
+    assert "indeterminate" in content
+
+
+def test_crash_diagnostics_and_issue_draft_keep_complete_primary_evidence_first(
+    tmp_path: Path,
+) -> None:
+    """A crash draft should repeat complete diagnostics evidence without truncation."""
+    traceback_text = "\n".join(
+        (
+            "Traceback (most recent call last):",
+            *(f'  File "frame_{index}.py", line {index}, in decode' for index in range(30)),
+            "RuntimeError: decoder exploded at the root",
+        )
+    )
+    partial_output = "BEGIN-PARTIAL " + ("decoded fragment " * 80) + "END-PARTIAL"
+    captured_stream = "=== STDERR ===\nBEGIN-STDERR\nupstream warning\nEND-STDERR"
+    crash = PerformanceResult(
+        model_name="org/crash-evidence",
+        generation=_MockGeneration(text=partial_output, prompt_tokens=91, generation_tokens=17),
+        success=False,
+        upstream_boundary="generation_started",
+        failure_phase="decode",
+        error_stage="Model Error",
+        error_type="RuntimeError",
+        root_error_type="RuntimeError",
+        root_error_module="mlx_vlm.generate",
+        root_error_message="decoder exploded at the root",
+        exception_chain=(
+            check_models.FailureException(
+                "RuntimeError",
+                "mlx_vlm.generate",
+                "decoder exploded at the root",
+            ),
+        ),
+        error_package="mlx-vlm",
+        error_traceback=traceback_text,
+        captured_output_on_fail=captured_stream,
+        requested_max_tokens=500,
+        runtime_diagnostics=RuntimeDiagnostics(stop_reason="error"),
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            processor_class="LlavaProcessor",
+            tokenizer_class="LlamaTokenizerFast",
+            eos_token_id=2,
+            eos_token=EOS_END_TOKEN,
+            generate_kwargs={
+                "thinking_start_token": "<think>",
+                "thinking_end_token": "</think>",
+            },
+        ),
+    )
+    context = _build_report_render_context(
+        results=[crash],
+        prompt="Describe the image.",
+        system_info={},
+    )
+    diagnostics = tmp_path / "diagnostics.md"
+    generate_diagnostics_report(
+        [crash],
+        diagnostics,
+        prompt="Describe the image.",
+        library_versions=_stub_versions(),
+        system_info={},
+        report_context=context,
+    )
+    generated = _generate_github_issue_reports(
+        report_context=context,
+        output_dir=tmp_path,
+        library_versions=_stub_versions(),
+        system_info={},
+        prompt="Describe the image.",
+    )
+
+    assert len(generated) == 1
+    diagnostics_content = diagnostics.read_text(encoding="utf-8")
+    issue_content = next(iter(generated.values())).read_text(encoding="utf-8")
+    for content in (diagnostics_content, issue_content):
+        assert "RuntimeError: decoder exploded at the root" in content
+        assert traceback_text in content
+        assert partial_output in content
+        assert captured_stream in content
+        assert "truncated" not in content.casefold()
+        assert content.index(traceback_text) < content.index(partial_output)
+        assert content.index(traceback_text) < content.index(captured_stream)
+        assert "mlx_vlm.generate" in content
+        assert "LlavaProcessor" in content
+        assert "LlamaTokenizerFast" in content
+        assert "python -m mlx_vlm.generate" in content
+    assert not (tmp_path / "issues" / "index.md").exists()
+
+
+def test_successful_anomaly_and_indeterminate_attempt_create_no_issue_draft(
+    tmp_path: Path,
+) -> None:
+    """Suspicious prose remains an unowned observation and never becomes a draft."""
+    complete_output = "STRANGE-BEGIN " + ("odd-loop " * 220) + " STRANGE-END"
+    observation = PerformanceResult(
+        model_name="org/strange",
+        success=True,
+        generation=_MockGeneration(
+            text=complete_output,
+            prompt_tokens=40,
+            generation_tokens=220,
+        ),
+        requested_max_tokens=500,
+    )
+    indeterminate = PerformanceResult(
+        model_name="org/network",
+        success=False,
+        generation=None,
+        error_message="server disconnected without sending a response",
+    )
+    context = _build_report_render_context(
+        results=[observation, indeterminate],
+        prompt="Describe the image.",
+        system_info={},
+    )
+    diagnostics = tmp_path / "diagnostics.md"
+
+    generate_diagnostics_report(
+        [observation, indeterminate],
+        diagnostics,
+        prompt="Describe the image.",
+        library_versions=_stub_versions(),
+        system_info={},
+        report_context=context,
+    )
+    generated = _generate_github_issue_reports(
+        report_context=context,
+        output_dir=tmp_path,
+        library_versions=_stub_versions(),
+        system_info={},
+        prompt="Describe the image.",
+    )
+
+    content = diagnostics.read_text(encoding="utf-8")
+    assert "observation_needs_reproduction" in content
+    assert complete_output in content
+    assert "suspected owner" not in content.casefold()
+    assert "owner confidence" not in content.casefold()
+    assert generated == {}
+    assert not list((tmp_path / "issues").glob("issue_*.md"))
 
 
 def test_review_shortlist_obeys_canonical_user_recommendation() -> None:
@@ -2536,17 +2503,19 @@ class TestHtmlReportEdgeCases:
             error_package="unknown",
             traceback_str="httpcore.RemoteProtocolError: Server disconnected without a response",
         )
-        snapshot = _build_diagnostics_snapshot(results=[result], prompt="Describe it.")
-
-        assert snapshot.failed == ()
-        assert snapshot.indeterminate == (result,)
-        generated = _generate_github_issue_reports(
-            diagnostics_snapshot=snapshot,
-            output_dir=tmp_path,
-            versions=_stub_versions(),
+        context = _build_report_render_context(
+            results=[result],
+            prompt="Describe it.",
             system_info={},
-            repro_bundles={},
-            run_args=Namespace(),
+        )
+
+        assert dict(context.assessments)[result.model_name].execution == "indeterminate"
+        generated = _generate_github_issue_reports(
+            report_context=context,
+            output_dir=tmp_path,
+            library_versions=_stub_versions(),
+            system_info={},
+            prompt="Describe it.",
         )
         assert generated == {}
         assert not list((tmp_path / "issues").glob("issue_*.md"))
@@ -2567,12 +2536,18 @@ class TestHtmlReportEdgeCases:
         diagnostics = tmp_path / "diagnostics.md"
         markdown = tmp_path / "results.md"
 
-        assert generate_diagnostics_report(
+        context = _build_report_render_context(
             results=results,
-            filename=diagnostics,
-            versions=_stub_versions(),
-            system_info={},
             prompt="Describe it.",
+            system_info={},
+        )
+        generate_diagnostics_report(
+            results,
+            diagnostics,
+            prompt="Describe it.",
+            library_versions=_stub_versions(),
+            system_info={},
+            report_context=context,
         )
         generate_markdown_report(
             results=results,
@@ -2584,10 +2559,10 @@ class TestHtmlReportEdgeCases:
 
         diagnostics_text = diagnostics.read_text(encoding="utf-8")
         report_text = markdown.read_text(encoding="utf-8")
-        assert "2 attempted" in diagnostics_text
-        assert "1 evaluated" in diagnostics_text
-        assert "1 indeterminate" in diagnostics_text
-        assert "0 hard failure(s)" in diagnostics_text
+        assert re.search(r"\|\s*Attempted\s*\|\s*2\s*\|", diagnostics_text)
+        assert re.search(r"\|\s*Evaluated\s*\|\s*1\s*\|", diagnostics_text)
+        assert re.search(r"\|\s*Indeterminate\s*\|\s*1\s*\|", diagnostics_text)
+        assert re.search(r"\|\s*Crashed\s*\|\s*0\s*\|", diagnostics_text)
         assert "Indeterminate attempts" in report_text
         assert "Framework/runtime failures:_ none" in report_text
 
@@ -2763,11 +2738,12 @@ class TestMarkdownReportEdgeCases:
             report_context=context,
         )
         generate_diagnostics_report(
-            results=[_make_failure_with_details("org/broken")],
-            filename=generated_paths[5],
-            versions=_stub_versions(),
-            system_info={},
+            [failure],
+            generated_paths[5],
             prompt=prompt,
+            library_versions=_stub_versions(),
+            system_info={},
+            report_context=context,
         )
 
         for path in generated_paths:
@@ -2780,7 +2756,7 @@ class TestMarkdownReportEdgeCases:
         """Generated artifacts should keep link-style rules while non-Markdown outputs stay stable."""
         expected_markdown_artifacts = {
             "index.md",
-            "issues/index.md",
+            "issues/issue_org_broken.md",
             "reports/diagnostics.md",
             "reports/model_capabilities.md",
             "reports/model_gallery.md",
@@ -4794,1930 +4770,6 @@ def _make_failure_with_details(
     )
 
 
-class TestDiagnosticsReport:
-    """Tests for generate_diagnostics_report and its helpers."""
-
-    def test_diagnostics_is_self_contained_mlx_vlm_issue(self, tmp_path: Path) -> None:
-        """Diagnostics should be directly pasteable as an mlx-vlm issue."""
-        failure = _make_failure_with_details(
-            "org/crashing-model",
-            error_msg="generation failed",
-            error_stage="Model Error",
-            error_package="mlx-vlm",
-            traceback_str="Traceback\nIndexError: token id out of range",
-        )
-        output = tmp_path / "diagnostics.md"
-
-        written = generate_diagnostics_report(
-            results=[failure],
-            filename=output,
-            versions={"mlx-vlm": "0.6.5", "mlx": "0.32.1"},
-            system_info={"GPU/Chip": "Apple M5 Max", "RAM": "128 GB"},
-            prompt="Describe the image.",
-            image_path=tmp_path / "fixture.jpg",
-            run_args=Namespace(max_tokens=500, temperature=0.0, top_p=1.0),
-        )
-
-        content = output.read_text(encoding="utf-8")
-        assert written is True
-        assert "## Crash / Failure Matrix" in content
-        assert "Task outcome: crashed" in content
-        assert "python -m mlx_vlm.generate" in content
-        assert "## Expected and Actual Behaviour" in content
-        assert "## Models Not Flagged" not in content
-        assert "Total model runtime (sum)" not in content
-
-    def test_diagnostics_run_contract_exposes_complete_public_provenance(
-        self,
-        tmp_path: Path,
-        monkeypatch: pytest.MonkeyPatch,
-    ) -> None:
-        """Issue evidence should state image, prompt, runtime, and revision conditions."""
-        image_path = tmp_path / "private input.jpg"
-        Image.new("RGB", (12, 8), "blue").save(image_path)
-        quality_result = _make_quality_success("org/provenance", with_quality_issue=False)
-        analysis = quality_result.quality_analysis
-        assert analysis is not None
-        result = replace(
-            quality_result,
-            success=False,
-            upstream_boundary="generation_started",
-            error_stage="Model Error",
-            error_message="generation failed",
-            error_type="RuntimeError",
-            error_package="mlx-vlm",
-            quality_analysis=replace(
-                analysis,
-                prompt_tokens_total=100,
-                prompt_tokens_text_est=20,
-                prompt_tokens_nontext_est=80,
-            ),
-            prompt_diagnostics=check_models.PromptDiagnostics(
-                processed_image_width=640,
-                processed_image_height=480,
-                image_patch_count=120,
-                generate_kwargs={"max_tokens": 500, "temperature": 0.0},
-            ),
-        )
-        monkeypatch.setattr(
-            check_models,
-            "_collect_component_provenance",
-            lambda _versions=None: {
-                "mlx-vlm": {
-                    "version": "0.6.5",
-                    "install_type": "editable",
-                    "source_location": "~/src/mlx-vlm",
-                    "source_revision": "component123",
-                    "direct_url": None,
-                    "vcs_revision": None,
-                }
-            },
-        )
-        monkeypatch.setattr(
-            check_models,
-            "_collect_check_models_provenance",
-            lambda: {
-                "name": "check_models",
-                "version": "0.8.8",
-                "git_revision": "producer123",
-                "install_type": "source-tree",
-            },
-        )
-        monkeypatch.setattr(
-            check_models,
-            "_collect_model_provenance",
-            lambda model, requested_revision=None: {
-                "model": model,
-                "requested_revision": requested_revision,
-                "resolved_revision": "snapshot123",
-                "snapshot_path": "~/.cache/snapshots/snapshot123",
-            },
-        )
-        output = tmp_path / "diagnostics.md"
-
-        generate_diagnostics_report(
-            results=[result],
-            filename=output,
-            versions={"mlx-vlm": "0.6.5"},
-            system_info={},
-            prompt="Describe the image.",
-            image_path=image_path,
-            run_args=Namespace(
-                trust_remote_code=False,
-                revision="release-branch",
-            ),
-        )
-
-        content = output.read_text(encoding="utf-8")
-        assert "## Run Conditions and Provenance" in content
-        assert "private input.jpg" in content
-        assert str(image_path) not in content
-        assert "12 x 8" in content
-        assert "0.00 MP" in content
-        image_sha256 = check_models._sha256_file(image_path)
-        assert image_sha256 is not None
-        assert image_sha256 in content
-        assert "trust_remote_code" in content
-        assert "false" in content
-        assert check_models._sha256_text("Describe the image.") in content
-        assert '"max_tokens": 500' in content
-        assert "640 x 480" in content
-        assert "100 / 20 / 80" in content
-        assert "120" in content
-        assert "release-branch" in content
-        assert "snapshot123" in content
-        assert "producer123" in content
-        assert "component123" in content
-
-    def test_diagnostics_processed_dimensions_unavailable_is_explicit(
-        self,
-    ) -> None:
-        """Missing processor evidence should be visible rather than omitted."""
-        result = _make_failure_with_details("org/no-processor-evidence")
-
-        content = "\n".join(
-            check_models._diagnostics_run_conditions_section(
-                results=[result],
-                versions={},
-                prompt="Describe the image.",
-                image_path=None,
-                run_args=Namespace(trust_remote_code=True),
-            )
-        )
-
-        model_row = next(
-            line for line in content.splitlines() if "org/no-processor-evidence" in line
-        )
-        assert "unavailable" in model_row
-
-    def test_model_only_text_quality_is_not_confirmed_mlx_vlm_issue(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Model-owned text quality should remain an observation."""
-        result = _make_quality_success("org/model-only", with_quality_issue=False)
-        analysis = result.quality_analysis
-        assert analysis is not None
-        result = replace(
-            result,
-            quality_analysis=replace(
-                analysis,
-                text_sanity_issue_type="numeric_loop",
-                owner="model",
-                user_bucket="avoid",
-            ),
-        )
-        output = tmp_path / "diagnostics.md"
-
-        generate_diagnostics_report(
-            results=[result],
-            filename=output,
-            versions={"mlx-vlm": "0.6.5"},
-            system_info={},
-            prompt="Describe the image.",
-        )
-
-        content = output.read_text(encoding="utf-8")
-        assert "mlx-vlm / MLX Issue Matrix" not in content
-        assert "Model/config observations" in content
-
-    def test_non_scope_crash_stays_in_crash_matrix_and_observations(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Every crash remains visible even when its owner is out of filing scope."""
-        output = tmp_path / "diagnostics.md"
-        failure = _make_failure_with_details(
-            "org/transformers-crash",
-            error_msg="processor API mismatch",
-            error_package="transformers",
-            error_stage="API Mismatch",
-        )
-
-        generate_diagnostics_report(
-            results=[failure],
-            filename=output,
-            versions={"mlx-vlm": "0.6.5", "transformers": "5.12.0"},
-            system_info={},
-            prompt="Describe the image.",
-        )
-
-        content = output.read_text(encoding="utf-8")
-        assert "## Crash / Failure Matrix" in content
-        assert "Task outcome: crashed" in content
-        assert "## mlx-vlm / MLX Issue Matrix" not in content
-        assert "## Other confirmed maintainer findings" in content
-        assert "org/transformers-crash" in content
-
-    def test_preflight_warnings_are_model_config_observations(self, tmp_path: Path) -> None:
-        """Preflight-only signals should stay outside confirmed upstream issues."""
-        output = tmp_path / "diagnostics.md"
-
-        written = generate_diagnostics_report(
-            results=[_make_success()],
-            filename=output,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="Describe the image.",
-            history=DiagnosticsHistoryInputs(
-                preflight_issues=(
-                    "transformers compatibility warning",
-                    "mlx runtime cache warning",
-                ),
-            ),
-        )
-
-        content = output.read_text(encoding="utf-8")
-        assert written is True
-        assert "## Preflight warnings" in content
-        assert "transformers compatibility warning" in content
-        assert "mlx runtime cache warning" in content
-        assert "## mlx-vlm / MLX Issue Matrix" not in content
-
-    def test_scoped_harness_cluster_is_inline_issue(self, tmp_path: Path) -> None:
-        """An mlx-vlm-owned harness cluster should include its complete issue body."""
-        output = tmp_path / "diagnostics.md"
-        result = _with_confirmed_reproduction(
-            _make_harness_success(
-                "org/stop-token",
-                text="caption <|end|>",
-                harness_type="stop_token",
-                harness_detail="token_leak:<|end|>",
-            )
-        )
-
-        generate_diagnostics_report(
-            results=[result],
-            filename=output,
-            versions={"mlx-vlm": "0.6.5"},
-            system_info={},
-            prompt="Describe the image.",
-        )
-
-        content = output.read_text(encoding="utf-8")
-        assert "## mlx-vlm / MLX Issue Matrix" in content
-        assert "- _Image:_ path/to/repro-image.jpg" in content
-        assert "## Run Conditions and Provenance" in content
-        assert "## Expected and Actual Behaviour" in content
-        assert "python -m mlx_vlm.generate" in content
-        assert "issues/index.md" not in content
-
-    def test_scoped_harness_cluster_includes_complete_expandable_output(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Diagnostics should retain complete model output behind a clickable summary."""
-        complete_text = (
-            "BEGIN-EVIDENCE " + ("model reasoning context " * 20) + "<|end|> END-EVIDENCE"
-        )
-        output = tmp_path / "diagnostics.md"
-        result = _with_confirmed_reproduction(
-            _make_harness_success(
-                "org/stop-token",
-                text=complete_text,
-                harness_type="stop_token",
-                harness_detail="token_leak:<|end|>",
-            )
-        )
-
-        generate_diagnostics_report(
-            results=[result],
-            filename=output,
-            versions={"mlx-vlm": "0.6.5"},
-            system_info={},
-            prompt="Describe the image.",
-        )
-
-        content = output.read_text(encoding="utf-8")
-        assert "### Generated Output Evidence" in content
-        assert "<details>" in content
-        assert "<summary>Complete generated output: org/stop-token</summary>" in content
-        assert "```text" in content
-        assert "BEGIN-EVIDENCE" in content
-        assert "END-EVIDENCE" in content
-        assert "[tail]" not in content
-
-    def test_failure_only_diagnostics_omit_generated_output_section(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """A conclusive crash should not require an empty generated-output section."""
-        output = tmp_path / "diagnostics.md"
-
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details(
-                    "org/crashing-model",
-                    error_msg="generation failed",
-                    error_stage="Model Error",
-                    error_package="mlx-vlm",
-                )
-            ],
-            filename=output,
-            versions={"mlx-vlm": "0.6.5"},
-            system_info={},
-            prompt="Describe the image.",
-        )
-
-        content = output.read_text(encoding="utf-8")
-        assert "Task outcome: crashed" in content
-        assert "### Generated Output Evidence" not in content
-
-    def test_text_sanity_cluster_requires_output_excerpt(self) -> None:
-        """A detector label without generated evidence should not form a text issue."""
-        result = _make_quality_success("org/no-excerpt", with_quality_issue=False)
-        analysis = result.quality_analysis
-        assert analysis is not None
-        result = replace(
-            result,
-            generation=replace(cast("_MockGeneration", result.generation), text=""),
-            quality_analysis=replace(analysis, text_sanity_issue_type="numeric_loop"),
-        )
-
-        snapshot = _build_diagnostics_snapshot(
-            results=[result],
-            prompt="Describe the image.",
-        )
-
-        assert snapshot.text_sanity_results == ()
-
-    def test_classify_review_owner_prefers_failure_owner_then_harness(self) -> None:
-        """Review ownership should keep failure-owner precedence and harness fallbacks."""
-        assert (
-            check_models._classify_review_owner(
-                harness_type="long_context",
-                failure_owner="transformers / mlx-vlm",
-            )
-            == "transformers"
-        )
-        assert (
-            check_models._classify_review_owner(
-                harness_type="prompt_template",
-                failure_owner=None,
-            )
-            == "model-config"
-        )
-        assert (
-            check_models._classify_review_owner(
-                harness_type=None,
-                failure_owner="huggingface-hub",
-            )
-            == "huggingface-hub"
-        )
-
-    def test_review_next_action_calls_out_indeterminate_connectivity(self) -> None:
-        """Canonical review text should avoid assigning an unreachable server to a package."""
-        result = _make_failure_with_details(
-            error_msg="Server disconnected without sending a response.",
-            error_package="unknown",
-        )
-        review = check_models._build_jsonl_review_record(result)
-        assert review is not None
-        action = check_models._review_next_action_for_result(result, review)
-        assert action == "No maintainer issue action is indicated by this run."
-
-    def test_diagnostics_next_action_uses_composite_owner_rules(self) -> None:
-        """Composite owner keys should keep their specialized next-step guidance."""
-        assert (
-            check_models._diagnostics_next_action("model-config / mlx-vlm")
-            == "validate chat-template/config expectations and mlx-vlm prompt formatting for this model."
-        )
-        assert (
-            check_models._diagnostics_next_action("mlx-vlm / mlx")
-            == "validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime."
-        )
-
-    def test_diagnostics_stack_routing_matches_exact_package_components(self) -> None:
-        """Composite MLX owners route upstream without substring false positives."""
-
-        def cluster(owner: str) -> check_models.IssueCluster:
-            return check_models.IssueCluster(
-                cluster_id="stack",
-                issue_filename="issue_stack.md",
-                owner=owner,
-                issue_kind="stack_signal",
-                issue_subtype="long_context",
-                symptom_family="context",
-                symptom="context collapse",
-                acceptance_signal="generation completes",
-                source="stack_signal",
-                sort_rank=1,
-            )
-
-        assert check_models._issue_cluster_is_mlx_vlm_scope(cluster("mlx-vlm / mlx"))
-        assert check_models._issue_cluster_is_mlx_vlm_scope(cluster("transformers / mlx-vlm"))
-        assert not check_models._issue_cluster_is_mlx_vlm_scope(cluster("not-mlx-vlm"))
-
-    def test_infer_harness_issue_owner_uses_detail_prefix_fallbacks(self) -> None:
-        """Harness owner inference should still honor detail-prefix fallbacks."""
-        training_leak = _make_harness_success(
-            "org/harness-generation-loop",
-            harness_type="generation_loop",
-            harness_detail="training_leak:instruction_header",
-        )
-        output_shape = _make_harness_success(
-            "org/harness-output-shape",
-            harness_type="stop_token",
-            harness_detail="output:zero_tokens",
-        )
-
-        assert check_models._infer_harness_issue_owner(training_leak) == "mlx-vlm / mlx-lm"
-        assert check_models._infer_harness_issue_owner(output_shape) == "model-config / mlx-vlm"
-
-    def test_diagnostics_harness_sample_output_keeps_late_leak_marker(self) -> None:
-        """Diagnostics samples should show the exact leaked marker, not only the output head."""
-        leaked_text = "background context " * 80 + "leaked control token <|end|> after."
-        result = _make_harness_success(
-            text=leaked_text,
-            harness_type="stop_token",
-            harness_detail="token_leak:<|end|>",
-        )
-
-        excerpt = check_models._issue_output_excerpt(result, max_chars=240)
-        assert "leaked control token <|end|> after" in excerpt
-
-    def test_no_report_when_all_succeed(self, tmp_path: Path) -> None:
-        """No diagnostics file when every model succeeds without harness issues."""
-        out = tmp_path / "diag.md"
-        result = generate_diagnostics_report(
-            results=[_make_success()],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13", "GPU/Chip": "M4"},
-            prompt="test",
-        )
-        assert result is False
-        assert not out.exists()
-
-    def test_report_written_on_failure(self, tmp_path: Path) -> None:
-        """Diagnostics file created when a model fails."""
-        out = tmp_path / "diag.md"
-        result = generate_diagnostics_report(
-            results=[
-                _make_success(),
-                _make_failure_with_details(
-                    "org/bad-model",
-                    error_msg="[broadcast_shapes] Shapes (3,1,2048) and (3,1,6065) mismatch",
-                ),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            prompt="test prompt",
-        )
-        assert result is True
-        content = out.read_text(encoding="utf-8")
-        assert "# Diagnostics Report" in content
-        assert "org/bad-model" in content
-        assert "broadcast_shapes" in content
-
-    def test_action_summary_escapes_double_underscore_error_text(self, tmp_path: Path) -> None:
-        """Diagnostics action summary should escape double underscores in failure text."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details(
-                    "org/bad-model",
-                    error_msg=(
-                        "Failed to process inputs with error: "
-                        "ImagesKwargs.__init__() got an unexpected keyword argument"
-                    ),
-                    error_package="transformers",
-                    error_stage="Processor Error",
-                ),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            prompt="test prompt",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "ImagesKwargs.\\_\\_init\\_\\_()" in content
-
-    def test_action_summary_escapes_full_multi_underscore_runs(self, tmp_path: Path) -> None:
-        """Diagnostics should fully escape odd-length underscore runs."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details(
-                    "org/bad-model",
-                    error_msg="Tokenizer produced _____ is _____ in summary output",
-                    error_package="transformers",
-                    error_stage="Processor Error",
-                ),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            prompt="test prompt",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert r"\_\_\_\_\_ is \_\_\_\_\_" in content
-        assert r"\_\_\_\__ is" not in content
-
-    def test_environment_table_includes_versions(self, tmp_path: Path) -> None:
-        """Environment table should include library versions and system info."""
-        out = tmp_path / "diag.md"
-        versions = _stub_versions()
-        versions["mlx-vlm"] = "0.3.11"
-        versions["mlx-metal"] = "0.3.11"
-        generate_diagnostics_report(
-            results=[_make_failure_with_details()],
-            filename=out,
-            versions=versions,
-            system_info={
-                "Python Version": "3.13.9",
-                "GPU/Chip": "Apple M4 Max",
-                "MLX Device": "Apple M4 Max",
-                "GPU Architecture": "applegpu_g16g",
-                "Recommended Working Set": "96 GB",
-                "Fused Attention": "available",
-                "SDK Version": "26.5",
-                "Xcode Version": "26.5",
-                "Xcode Build": "17F42",
-                "Metal Compiler Version": "Apple metal version 32023.883",
-                "Metallib Linker Version": "AIR-LLD 32023.883",
-                "MLX Install Type": "wheel/site-packages",
-                "MLX Metallib": "/site-packages/mlx/lib/mlx.metallib (sha256=abc123)",
-            },
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "mlx-vlm" in content
-        assert "0.3.11" in content
-        assert "mlx-metal" in content
-        assert "Python Version" in content
-        assert "3.13.9" in content
-        assert "GPU/Chip" in content
-        assert "Apple M4 Max" in content
-        assert "MLX Device" in content
-        assert "GPU Architecture" in content
-        assert "applegpu_g16g" in content
-        assert "Recommended Working Set" in content
-        assert "96 GB" in content
-        assert "Fused Attention" in content
-        assert "available" in content
-        assert "SDK Version" in content
-        assert "26.5" in content
-        assert "Xcode Version" in content
-        assert "Metal Compiler Version" in content
-        assert "AIR-LLD 32023.883" in content
-        assert "MLX Metallib" in content
-        assert "sha256=abc123" in content
-
-    def test_failure_clustering_groups_similar_errors(self, tmp_path: Path) -> None:
-        """Models with the same error pattern (differing only in numbers) should cluster."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details(
-                    "org/model-a",
-                    error_msg=(
-                        "[broadcast_shapes] Shapes (3,1,2048) and (3,1,6065) cannot be broadcast"
-                    ),
-                ),
-                _make_failure_with_details(
-                    "org/model-b",
-                    error_msg=(
-                        "[broadcast_shapes] Shapes (984,2048) and (1,0,2048) cannot be broadcast"
-                    ),
-                ),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert content.count("## Expected and Actual Behaviour") == 1
-        assert "Affected models:_ org/model-a, org/model-b" in content
-        assert "org/model-a" in content
-        assert "org/model-b" in content
-
-    def test_different_errors_get_separate_clusters(self, tmp_path: Path) -> None:
-        """Different error types should produce separate sections."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details(
-                    "org/model-a",
-                    error_msg="chat_template is not set",
-                    error_stage="No Chat Template",
-                ),
-                _make_failure_with_details(
-                    "org/model-b",
-                    error_msg="Missing 1 parameters: lm_head.weight",
-                    error_stage="Weight Mismatch",
-                    error_package="mlx",
-                ),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "chat_template is not set" in content
-        assert "Missing 1 parameters: lm_head.weight" in content
-
-    def test_multiple_diagnostic_clusters_use_lint_safe_heading_hierarchy(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Inline issue bodies should be distinct and Markdown-lint clean."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details(
-                    "org/model-a",
-                    error_msg="chat_template is not set",
-                    error_stage="No Chat Template",
-                ),
-                _make_failure_with_details(
-                    "org/model-b",
-                    error_msg="Missing 1 parameters: lm_head.weight",
-                    error_stage="Weight Mismatch",
-                    error_package="mlx",
-                ),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-
-        content = out.read_text(encoding="utf-8")
-        assert content.count("\n## Issue ") == 2
-        assert content.count("\n### Expected and Actual Behaviour\n") == 2
-        assert content.count("\n### Native mlx-vlm reproduction\n") == 2
-        assert content.count("\n### Expected Fix Signal\n") == 2
-        assert "\n- _Filing target:_ mlx-vlm\n\n### Native mlx-vlm reproduction\n" in content
-        assert "\n- _Filing target:_ mlx\n\n### Native mlx-vlm reproduction\n" in content
-
-    def test_captured_output_is_retained_in_expandable_diagnostics(self, tmp_path: Path) -> None:
-        """Captured stdout/stderr should remain available as complete crash evidence."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details(
-                    "org/m",
-                    error_msg="bad shape",
-                    captured_output=(
-                        "=== STDERR ===\n\x1b[31mTokenizer warning here\x1b[0m\rDownloading: 100%\n"
-                    ),
-                ),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "Detailed trace logs" not in content
-        assert "<details>" in content
-        assert "Tokenizer warning here" in content
-        assert "Downloading: 100%" in content
-        assert "`org/m`" in content
-
-    def test_failure_section_uses_upstream_traceback_not_local_wrappers(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Failure sections should surface upstream stack frames before harness wrappers."""
-        traceback_text = (
-            "Traceback (most recent call last):\n"
-            '  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", '
-            "line 19044, in _run_model_generation\n"
-            "    model, processor, config = _load_model(params)\n"
-            '  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", '
-            "line 534, in load_model\n"
-            "    model_config = apply_generation_config_defaults(model_config, config)\n"
-            '  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", '
-            "line 69, in apply_generation_config_defaults\n"
-            "    setattr(model_config, key, config[key])\n"
-            "AttributeError: property 'eos_token_id' of 'ModelConfig' object has no setter\n"
-        )
-        out = tmp_path / "diag.md"
-
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details(
-                    "org/upstream-fail",
-                    error_msg=(
-                        "Model loading failed: property 'eos_token_id' of "
-                        "'ModelConfig' object has no setter"
-                    ),
-                    traceback_str=traceback_text,
-                ),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-
-        content = out.read_text(encoding="utf-8")
-        failure_section = _extract_markdown_subsection(
-            content,
-            "## Crash / Failure Matrix",
-            end_headings=["## mlx-vlm / MLX Issue Matrix"],
-        )
-        assert "Crash evidence: org/upstream-fail" in failure_section
-        assert "mlx_vlm/utils.py" in failure_section
-        assert "AttributeError: property 'eos_token_id'" in failure_section
-        assert "check_models/src/check_models.py" not in failure_section
-        assert "_run_model_generation" not in failure_section
-
-    def test_diagnostics_make_local_paths_home_relative(self, tmp_path: Path) -> None:
-        """Public issue artifacts should not expose the local account path."""
-        home = str(Path.home())
-        traceback_text = (
-            "Traceback (most recent call last):\n"
-            f'  File "{home}/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", '
-            "line 69, in load\n"
-            "    raise ValueError('bad config')\n"
-            "ValueError: bad config\n"
-        )
-        out = tmp_path / "diag.md"
-
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details(
-                    "org/upstream-fail",
-                    error_msg="bad config",
-                    traceback_str=traceback_text,
-                ),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={
-                "MLX Distribution Root": f"{home}/miniconda3/envs/mlx-vlm/site-packages",
-            },
-            prompt="test",
-        )
-
-        content = out.read_text(encoding="utf-8")
-        assert home not in content
-        assert 'File "~/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py"' in content
-        assert "~/miniconda3/envs/mlx-vlm/site-packages" in content
-
-    def test_failure_section_uses_one_chronological_failure_narrative(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Failure reports should lead with the root and retain later wrappers."""
-        out = tmp_path / "diag.md"
-        failure = replace(
-            _make_failure_with_details(
-                "org/chained-fail",
-                error_msg="generation failed",
-            ),
-            exception_chain=(
-                check_models.FailureException(
-                    "IndexError",
-                    "builtins",
-                    "token id 999 outside detokenizer table",
-                ),
-                check_models.FailureException(
-                    "RuntimeError",
-                    "builtins",
-                    "METAL command buffer out of memory",
-                ),
-                check_models.FailureException(
-                    "ValueError",
-                    "builtins",
-                    "generation failed",
-                ),
-            ),
-        )
-
-        generate_diagnostics_report(
-            results=[failure],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-
-        content = out.read_text(encoding="utf-8")
-        assert "IndexError: token id 999 outside detokenizer table" in content
-        assert "RuntimeError: METAL command buffer out of memory" in content
-        assert "ValueError: generation failed" in content
-
-    def test_issue_queue_present(self, tmp_path: Path) -> None:
-        """Issue matrix should contain inline evidence without draft dependencies."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details(
-                    failure_phase="model_load",
-                    error_type="ValueError",
-                )
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert content.startswith("<!-- markdownlint-disable MD013 -->\n\n# Diagnostics Report")
-        assert "<!-- markdownlint-disable MD060 -->" in content
-        assert "<!-- markdownlint-enable MD060 -->" in content
-        assert "## mlx-vlm / MLX Issue Matrix" in content
-        assert "Target" in content
-        assert "Evidence Snapshot" in content
-        assert "Model Error" in content
-        assert "phase model_load" in content
-        assert "ValueError" in content
-        assert "Confidence" in content
-        assert "Evidence Type" in content
-        assert "Fixed When" in content
-        assert "issues/index.md" not in content
-        assert "issue draft" not in content.casefold()
-        assert "Priority" not in content
-        assert content.index("## Crash / Failure Matrix") < content.index(
-            "## mlx-vlm / MLX Issue Matrix"
-        )
-        assert content.index("## Native mlx-vlm reproduction") < content.index("## Environment")
-
-    def test_failure_observed_behavior_keeps_multiline_error_details(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Diagnostics should keep actionable details from multiline load errors."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details(
-                    error_msg=(
-                        "Model loading failed: Received 2 parameters not in model:\n"
-                        "multi_modal_projector.layer_norm.bias,\n"
-                        "multi_modal_projector.layer_norm.weight."
-                    ),
-                    error_type="ValueError",
-                    error_stage="Model Error",
-                    failure_phase="model_load",
-                )
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert (
-            "Received 2 parameters not in model: multi_modal_projector.layer_norm.bias,"
-        ) in content
-        assert "multi_modal_projector.layer_norm.weight." in content
-
-    def test_build_diagnostics_snapshot_classifies_prompt_backfilled_harness_run(self) -> None:
-        """Prompt-aware snapshot building should classify harness issues without cached analysis."""
-        failure = _make_failure_with_details("org/fail")
-        harness_candidate = PerformanceResult(
-            model_name="org/harness-implicit",
-            success=True,
-            generation=_MockGeneration(text="", prompt_tokens=5000, generation_tokens=0),
-            total_time=1.0,
-            generation_time=0.5,
-            model_load_time=0.5,
-        )
-
-        snapshot = _build_diagnostics_snapshot(
-            results=[failure, harness_candidate],
-            prompt="Describe the image.",
-        )
-
-        assert len(snapshot.harness_results) == 1
-        assert snapshot.harness_results[0][0].model_name == "org/harness-implicit"
-        assert not snapshot.unflagged_successful
-
-    def test_report_written_for_text_sanity_success_without_failures(self, tmp_path: Path) -> None:
-        """Successful token-soup generations should be detailed in diagnostics."""
-        out = tmp_path / "diag.md"
-        junk_text = (
-            'open对不同方面">black/ with小猫小猫kotPicture •0超高清比!y表面处理超经典的!'
-            "张图片'七- object Tno-go-head-or U0.C在其他 ** ,Not只!被i animal"
-        )
-        success = PerformanceResult(
-            model_name="org/token-soup",
-            success=True,
-            generation=_MockGeneration(
-                text=junk_text,
-                prompt_tokens=319,
-                generation_tokens=85,
-            ),
-            total_time=1.0,
-            generation_time=0.5,
-            model_load_time=0.5,
-        )
-
-        result = generate_diagnostics_report(
-            results=[success],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="Describe this image briefly.",
-        )
-
-        assert result is True
-        content = out.read_text(encoding="utf-8")
-        assert "## Observations Requiring Controlled Reproduction" in content
-        assert "org/token-soup" in content
-        assert "mixed_script_corruption" in content
-        assert "open对不同方面" in content
-        assert "## mlx-vlm / MLX Issue Matrix" not in content
-        assert "## Models Not Flagged" not in content
-
-    def test_unconfirmed_text_sanity_observations_do_not_create_issue_clusters(self) -> None:
-        """Serious output smells should remain observations until reproduced."""
-        junk_text = (
-            'open对不同方面">black/ with小猫小猫kotPicture •0超高清比!y表面处理超经典的!'
-            "张图片'七- object Tno-go-head-or U0.C在其他 ** ,Not只!"
-        )
-        results = [
-            PerformanceResult(
-                model_name=name,
-                success=True,
-                generation=_MockGeneration(
-                    text=junk_text,
-                    prompt_tokens=319,
-                    generation_tokens=85,
-                ),
-            )
-            for name in ("org-a/token-soup", "org-b/token-soup")
-        ]
-        snapshot = _build_diagnostics_snapshot(
-            results=results,
-            prompt="Describe this image briefly.",
-        )
-
-        assert check_models._build_issue_clusters(snapshot) == ()
-        observations = "\n".join(check_models._diagnostics_reproduction_observations(snapshot))
-        assert "org-a/token-soup" in observations
-        assert "org-b/token-soup" in observations
-
-    def test_failure_cluster_shows_generated_output_inline(self, tmp_path: Path) -> None:
-        """Failure clusters should show generated output inline when present."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details(
-                    "org/partial",
-                    error_msg="decoder crashed after partial output",
-                    generated_text="Partial decoded answer before crash.",
-                ),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "Crash evidence: org/partial" in content
-        assert "Partial decoded answer before crash." in content
-
-    def test_failure_repro_bundles_written(self, tmp_path: Path) -> None:
-        """Failure repros should add one narrative while preserving legacy fields."""
-        failure = replace(
-            _make_failure_with_details(
-                "org/broken-model",
-                error_msg="generation failed",
-                error_type="ValueError",
-                error_stage="Model Error",
-                error_package="mlx-vlm",
-                traceback_str="Traceback\nValueError: generation failed",
-            ),
-            exception_chain=(
-                check_models.FailureException(
-                    "RuntimeError",
-                    "mlx.core",
-                    "kIOGPUCommandBufferCallbackErrorOutOfMemory",
-                ),
-                check_models.FailureException(
-                    "ValueError",
-                    "builtins",
-                    "mlx_vlm/generate.py generation failed",
-                ),
-            ),
-        )
-        bundles = export_failure_repro_bundles(
-            results=[failure],
-            output_dir=tmp_path / "repro_bundles",
-            run_args=Namespace(eval_mode="blind"),
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            prompt="Describe this image.",
-            image_path=None,
-        )
-        assert "org/broken-model" in bundles
-        bundle_path = bundles["org/broken-model"]
-        assert bundle_path.exists()
-        payload = json.loads(bundle_path.read_text(encoding="utf-8"))
-        assert payload["model"] == "org/broken-model"
-        assert payload["failure"]["type"] == "ValueError"
-        assert payload["failure"]["package"] == "mlx-vlm"
-        assert payload["failure"]["message"] == "generation failed"
-        assert payload["failure"]["stage"] == "Model Error"
-        assert payload["failure"]["exception_chain"] == [
-            {
-                "type": "RuntimeError",
-                "module": "mlx.core",
-                "message": "kIOGPUCommandBufferCallbackErrorOutOfMemory",
-            },
-            {
-                "type": "ValueError",
-                "module": "builtins",
-                "message": "mlx_vlm/generate.py generation failed",
-            },
-        ]
-        assert payload["failure"]["task_outcome"] == "crashed"
-        assert (
-            payload["failure"]["primary_exception"]
-            == "RuntimeError: kIOGPUCommandBufferCallbackErrorOutOfMemory"
-        )
-        assert payload["failure"]["secondary_exceptions"] == [
-            "ValueError: mlx_vlm/generate.py generation failed"
-        ]
-        assert payload["failure"]["suspected_owner"] == "unresolved: mlx/mlx-vlm"
-        assert payload["failure"]["owner_confidence"] == "low"
-        assert (
-            payload["result"]["maintainer_triage"]["suspected_owner"] == "unresolved: mlx/mlx-vlm"
-        )
-        assert payload["repro"]["prompt_hash_sha256"]
-        assert payload["repro"]["eval_mode"] == "blind"
-
-    def test_repro_bundle_does_not_expose_local_home_paths(self, tmp_path: Path) -> None:
-        """Published repro JSON and commands should be portable across user accounts."""
-        home = Path.home()
-        image_path = home / "Pictures" / "benchmark-cat.jpg"
-        failure = _make_failure_with_details(
-            "org/broken-model",
-            error_msg=f"could not read {home}/Library/Caches/model.bin",
-            traceback_str=f'Traceback\n  File "{home}/src/runner.py", line 1\nValueError',
-        )
-        output_dir = tmp_path / "repro_bundles"
-
-        bundles = export_failure_repro_bundles(
-            results=[failure],
-            output_dir=output_dir,
-            run_args=Namespace(
-                eval_mode="blind",
-                output_html=home / "project" / "output" / "results.html",
-                image=image_path,
-            ),
-            versions=_stub_versions(),
-            system_info={"MLX Core Extension": f"{home}/mlx/core.so"},
-            prompt="Describe this image.",
-            image_path=image_path,
-        )
-
-        bundle_text = next(iter(bundles.values())).read_text(encoding="utf-8")
-        payload = json.loads(bundle_text)
-        assert str(home) not in bundle_text
-        assert payload["repro"]["image_path"] == "benchmark-cat.jpg"
-        assert "--image benchmark-cat.jpg" in payload["repro"]["rerun_command"]
-        assert payload["repro"]["args"]["output_html"].startswith("~")
-        assert payload["environment"]["system_info"]["MLX Core Extension"].startswith("~")
-
-    def test_harness_repro_bundles_written_and_linked(self, tmp_path: Path) -> None:
-        """Successful issue-clustered harness anomalies should get repro bundles."""
-        prompt = "Describe this image."
-        harness = _with_confirmed_reproduction(
-            replace(
-                _make_harness_success(
-                    "org/model-harness",
-                    text="<|end|> leaked control token",
-                    harness_type="prompt_template",
-                    harness_detail="output:zero_tokens",
-                ),
-                prompt_diagnostics=check_models.PromptDiagnostics(
-                    model_type="qwen2_vl",
-                    processor_class="transformers.AutoProcessor",
-                    tokenizer_class="transformers.PreTrainedTokenizerFast",
-                    rendered_prompt_hash_sha256="rendered-hash",
-                    rendered_prompt_preview="<|im_start|>user <image> Describe this image.",
-                    rendered_prompt_chars=44,
-                    image_placeholder_count=1,
-                    eos_token_id=151645,
-                    special_token_ids=(151645,),
-                    special_tokens=("<|end|>", "</think>"),
-                    generate_kwargs={
-                        "max_tokens": 500,
-                        "quantized_kv_start": check_models.DEFAULT_QUANTIZED_KV_START,
-                    },
-                ),
-            ),
-        )
-        bundles = export_failure_repro_bundles(
-            results=[harness],
-            output_dir=tmp_path / "repro_bundles",
-            run_args=Namespace(),
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            prompt=prompt,
-            image_path=None,
-        )
-
-        assert "org/model-harness" in bundles
-        bundle_path = bundles["org/model-harness"]
-        payload = json.loads(bundle_path.read_text(encoding="utf-8"))
-        assert payload["result"]["success"] is True
-        assert payload["issue_cluster_id"] == "model-config-mlx-vlm_prompt-template_001"
-        assert payload["repro"]["prompt_diagnostics"]["rendered_prompt_hash_sha256"] == (
-            "rendered-hash"
-        )
-        assert payload["repro"]["prompt_diagnostics"]["special_tokens"] == [
-            "<|end|>",
-            "</think>",
-        ]
-
-        issue_reports = _generate_github_issue_reports(
-            diagnostics_snapshot=_build_diagnostics_snapshot(results=[harness], prompt=prompt),
-            output_dir=tmp_path,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            repro_bundles=bundles,
-            run_args=Namespace(),
-        )
-        issue_content = next(iter(issue_reports.values())).read_text(encoding="utf-8")
-        assert bundle_path.name in issue_content
-        assert "Optional advanced context:" in issue_content
-
-    def test_repro_bundles_write_latest_cluster_index(self, tmp_path: Path) -> None:
-        """Current-run bundles should be indexed separately from the historical archive."""
-        failure = _make_failure_with_details(
-            "org/broken-model",
-            error_msg="bad shape",
-            error_stage="Model Error",
-            error_package="mlx-vlm",
-            traceback_str="Traceback\nValueError: bad shape",
-        )
-        output_dir = tmp_path / "repro_bundles"
-
-        bundles = export_failure_repro_bundles(
-            results=[failure],
-            output_dir=output_dir,
-            run_args=Namespace(),
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            prompt="Describe this image.",
-            image_path=None,
-        )
-
-        index_path = output_dir / "latest_by_cluster.json"
-        payload = json.loads(index_path.read_text(encoding="utf-8"))
-        assert "org/broken-model" in bundles
-        assert payload["schema_version"] == "1.0"
-        assert payload["models"]["org/broken-model"]["bundle"] == bundles["org/broken-model"].name
-        assert payload["models"]["org/broken-model"]["issue_cluster_id"]
-
-    def test_repro_bundle_index_writer_skips_empty_runs(self, tmp_path: Path) -> None:
-        """A run without bundles should not publish an empty latest-run index."""
-        check_models._write_latest_repro_bundle_index(
-            output_dir=tmp_path,
-            bundles={},
-            models={},
-            clusters={},
-        )
-
-        assert not (tmp_path / "latest_by_cluster.json").exists()
-
-    def test_repro_command_omits_upstream_quantized_kv_default(self) -> None:
-        """Default KV quantization start should not be forwarded as a repro override."""
-        tokens = check_models._build_repro_command_tokens(
-            image_path=None,
-            run_args=Namespace(
-                quantized_kv_start=check_models.DEFAULT_QUANTIZED_KV_START,
-                trust_remote_code=True,
-            ),
-            include_selection=False,
-        )
-        assert "--quantized-kv-start" not in tokens
-
-    def test_diagnostics_file_ends_with_single_trailing_newline(self, tmp_path: Path) -> None:
-        """Diagnostics markdown should end with a trailing newline for markdownlint."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[_make_failure_with_details("org/broken-model")],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert content.endswith("\n")
-
-    def test_reproducibility_section_includes_image_path_when_available(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Repro commands should include --image when run context contains an image path."""
-        out = tmp_path / "diag.md"
-        image_path = tmp_path / "sample image.jpg"
-        generate_diagnostics_report(
-            results=[_make_failure_with_details("org/broken-model")],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-            image_path=image_path,
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "--image 'sample image.jpg'" in content
-        assert str(image_path) not in content
-
-    def test_reproducibility_section_includes_sampling_and_runtime_flags(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Reproducibility should include the key generation/runtime CLI settings used."""
-        out = tmp_path / "diag.md"
-        run_args = Namespace(
-            image=None,
-            folder=None,
-            models=None,
-            exclude=None,
-            trust_remote_code=False,
-            revision=None,
-            adapter_path=None,
-            prompt=None,
-            detailed_metrics=False,
-            resize_shape=(768, 512),
-            eos_tokens=("</think>",),
-            skip_special_tokens=True,
-            processor_kwargs={"cropping": False},
-            force_download=True,
-            quantize_activations=True,
-            enable_thinking=True,
-            thinking_budget=96,
-            thinking_start_token=THINKING_START_TOKEN,
-            thinking_end_token=THINKING_END_TOKEN,
-            max_tokens=123,
-            temperature=0.7,
-            top_p=0.92,
-            min_p=0.08,
-            top_k=24,
-            repetition_penalty=1.1,
-            repetition_context_size=50,
-            lazy_load=False,
-            max_kv_size=None,
-            kv_bits=None,
-            kv_group_size=64,
-            quantized_kv_start=2048,
-            prefill_step_size=None,
-            timeout=42.0,
-            verbose=True,
-            no_color=False,
-            force_color=False,
-            width=None,
-            quality_config=None,
-            context_marker="Context:",
-        )
-        generate_diagnostics_report(
-            results=[_make_failure_with_details("org/broken-model")],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-            run_args=run_args,
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "--max-tokens 123" in content
-        assert "--temperature 0.7" in content
-        assert "--top-p" not in content
-        assert "--min-p" not in content
-        assert "--top-k" not in content
-        assert "--resize-shape 768 512" in content
-        assert "--eos-tokens '</think>'" in content
-        assert "--skip-special-tokens" in content
-        assert "--processor-kwargs '{\"cropping\": false}'" in content
-        assert "--force-download" in content
-        assert "--quantize-activations" in content
-        assert "--enable-thinking" in content
-        assert "--thinking-budget 96" in content
-        assert "--thinking-start-token '<think>'" in content
-        assert "--repetition-penalty" not in content
-        assert "--repetition-context-size" not in content
-        assert "--quantized-kv-start 2048" in content
-        assert "--timeout" not in content
-        assert "--no-trust-remote-code" not in content
-        assert "--verbose" not in content
-
-    def test_prompt_in_section(self, tmp_path: Path) -> None:
-        """Prompt text should be referenced instead of pasted into diagnostics."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[_make_failure_with_details()],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="Analyze this image carefully.",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "### Prompt Used" not in content
-        assert "## Impact and Run Conditions" in content
-        assert "Analyze this image carefully." in content
-
-    def test_multi_model_cluster_has_no_priority_label(self, tmp_path: Path) -> None:
-        """Clusters with multiple models should not emit priority labels."""
-        out = tmp_path / "diag.md"
-        generate_diagnostics_report(
-            results=[
-                _make_failure_with_details("org/a", error_msg="same error for all"),
-                _make_failure_with_details("org/b", error_msg="same error for all"),
-            ],
-            filename=out,
-            versions=_stub_versions(),
-            system_info={},
-            prompt="test",
-        )
-        content = out.read_text(encoding="utf-8")
-        assert "Affected models:_ org/a, org/b" in content
-        assert content.count("## Expected and Actual Behaviour") == 1
-        assert "Priority" not in content
-
-    def test_generate_markdown_report_uses_provided_report_context(self, tmp_path: Path) -> None:
-        """Markdown generation should reuse a supplied cached report context."""
-        out = tmp_path / "results.md"
-        results = [_make_success("org/good"), _make_failure("org/bad")]
-        report_context = _build_report_render_context(results=results, prompt="test prompt")
-
-        with (
-            patch.object(check_models, "_build_report_render_context", side_effect=AssertionError),
-            patch.object(check_models, "analyze_model_issues", side_effect=AssertionError),
-            patch.object(
-                check_models,
-                "compute_performance_statistics",
-                side_effect=AssertionError,
-            ),
-            patch.object(check_models, "get_system_characteristics", side_effect=AssertionError),
-        ):
-            generate_markdown_report(
-                results=results,
-                filename=out,
-                versions=_stub_versions(),
-                prompt="test prompt",
-                total_runtime_seconds=1.0,
-                report_context=report_context,
-            )
-
-        content = out.read_text(encoding="utf-8")
-        assert "# Model Performance Results" in content
-        assert "org/good" in content
-
-    def test_generate_tsv_report_uses_provided_report_context(self, tmp_path: Path) -> None:
-        """TSV generation should reuse a supplied cached report context."""
-        out = tmp_path / "results.tsv"
-        results = [_make_success("org/good"), _make_failure("org/bad")]
-        report_context = _build_report_render_context(results=results, prompt="test prompt")
-
-        with patch.object(check_models, "_build_report_render_context", side_effect=AssertionError):
-            generate_tsv_report(
-                results=results,
-                filename=out,
-                report_context=report_context,
-            )
-
-        content = out.read_text(encoding="utf-8")
-        assert "org/good" in content
-        assert "error_type" in content
-
-    def test_generate_tsv_report_includes_full_generated_text_for_analysis(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Spreadsheet output should preserve exact generated text separately from previews."""
-        out = tmp_path / "results.tsv"
-        full_text = (
-            "Two cats are sleeping on a pink couch. "
-            + "context words " * 40
-            + "</think> exact leak marker after a long reasoning preface."
-        )
-        result = PerformanceResult(
-            model_name="org/full-output",
-            success=True,
-            generation=_MockGeneration(
-                text=full_text,
-                prompt_tokens=317,
-                generation_tokens=196,
-            ),
-            total_time=1.0,
-            generation_time=0.5,
-            model_load_time=0.5,
-        )
-
-        generate_tsv_report(
-            results=[result],
-            filename=out,
-        )
-
-        content = out.read_text(encoding="utf-8")
-        assert "Generated Text" in content
-        assert "</think> exact leak marker" in content
-
-    def test_generate_tsv_report_standalone_uses_prepared_table_path(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Standalone TSV generation should still render results without cached context."""
-        out = tmp_path / "standalone.tsv"
-        results = [_make_success("org/good"), _make_failure("org/bad")]
-
-        generate_tsv_report(
-            results=results,
-            filename=out,
-        )
-
-        content = out.read_text(encoding="utf-8")
-        assert "org/good" in content
-        assert "org/bad" in content
-
-    def test_build_diagnostics_snapshot_partitions_results(self) -> None:
-        """Diagnostics snapshot should preserve failure and harness buckets once."""
-        failure = _make_failure_with_details("org/fail")
-        harness = _make_harness_success("org/harness", harness_type="long_context")
-        clean = _make_success("org/clean")
-
-        snapshot = _build_diagnostics_snapshot(
-            results=[failure, harness, clean],
-            preflight_issues=("mlx-vlm mismatch",),
-        )
-
-        assert len(snapshot.failed) == 1
-        assert len(snapshot.harness_results) == 1
-        assert len(snapshot.unflagged_successful) == 1
-        assert len(snapshot.preflight_issues) == 1
-        assert len(snapshot.failure_clusters) == 1
-
-    def test_log_maintainer_summary_includes_counts_and_paths(
-        self,
-        tmp_path: Path,
-        caplog: pytest.LogCaptureFixture,
-    ) -> None:
-        """Maintainer summary should emit concise diagnostics counts and artifact hints."""
-        diagnostics_path = tmp_path / "diagnostics.md"
-        diagnostics_path.write_text("summary\n", encoding="utf-8")
-        failure = _make_failure_with_details("org/fail", error_package="mlx-vlm")
-        snapshot = DiagnosticsSnapshot(
-            failed=(failure,),
-            harness_results=((_make_harness_success("org/harness"), "sample output"),),
-            preflight_issues=("transformers warning",),
-            failure_clusters=(("cluster", (failure,)),),
-        )
-        artifacts = DiagnosticsArtifacts(
-            snapshot=snapshot,
-            diagnostics_written=True,
-            repro_bundles={"org/fail": tmp_path / "repro.json"},
-        )
-
-        with caplog.at_level("INFO", logger=check_models.LOGGER_NAME):
-            _log_maintainer_summary(
-                artifacts=artifacts,
-                diagnostics_path=diagnostics_path,
-            )
-
-        assert (
-            "Diagnostics signals: failures=1, harness=1, stack=0, text_sanity=0, preflight=1"
-        ) in caplog.text
-        assert "Likely owners:" in caplog.text
-        assert "Repro bundles available for 1 issue-linked model(s)." in caplog.text
-
-    def test_log_maintainer_summary_mentions_stack_signal_owner_hint(
-        self,
-        tmp_path: Path,
-        caplog: pytest.LogCaptureFixture,
-    ) -> None:
-        """Maintainer summary should report inferred owners for stack-signal anomalies."""
-        diagnostics_path = tmp_path / "diagnostics.md"
-        diagnostics_path.write_text("summary\n", encoding="utf-8")
-        stack_result = PerformanceResult(
-            model_name="org/stack-transformers",
-            success=True,
-            generation=_MockGeneration(
-                text="echoed context",
-                prompt_tokens=15000,
-                generation_tokens=80,
-            ),
-            total_time=1.0,
-            generation_time=0.5,
-            model_load_time=0.5,
-        )
-        snapshot = DiagnosticsSnapshot(
-            stack_signals=(
-                (
-                    stack_result,
-                    "Context echo under extreme prompt length",
-                    "transformers / mlx-vlm",
-                ),
-            ),
-            preflight_issues=(
-                "transformers==5.4.0 is below minimum 5.7.0 required by check_models.",
-            ),
-        )
-        artifacts = DiagnosticsArtifacts(
-            snapshot=snapshot,
-            diagnostics_written=True,
-            repro_bundles={},
-        )
-
-        with caplog.at_level("INFO", logger=check_models.LOGGER_NAME):
-            _log_maintainer_summary(
-                artifacts=artifacts,
-                diagnostics_path=diagnostics_path,
-            )
-
-        assert (
-            "Long-context or stack-signal anomalies: 1 model(s) likely owned by "
-            "transformers / mlx-vlm."
-        ) in caplog.text
-
-    def test_log_maintainer_summary_mentions_harness_owner_hint(
-        self,
-        tmp_path: Path,
-        caplog: pytest.LogCaptureFixture,
-    ) -> None:
-        """Maintainer summary should report inferred owners for harness anomalies."""
-        diagnostics_path = tmp_path / "diagnostics.md"
-        diagnostics_path.write_text("summary\n", encoding="utf-8")
-        snapshot = DiagnosticsSnapshot(
-            harness_results=((_make_harness_success("org/harness-template"), ""),),
-        )
-        artifacts = DiagnosticsArtifacts(
-            snapshot=snapshot,
-            diagnostics_written=True,
-            repro_bundles={},
-        )
-
-        with caplog.at_level("INFO", logger=check_models.LOGGER_NAME):
-            _log_maintainer_summary(
-                artifacts=artifacts,
-                diagnostics_path=diagnostics_path,
-            )
-
-        assert (
-            "Harness/runtime anomalies: 1 model(s) likely owned by model-config / mlx-vlm."
-        ) in caplog.text
-
-    def test_log_maintainer_summary_splits_mixed_harness_owner_hints(
-        self,
-        tmp_path: Path,
-        caplog: pytest.LogCaptureFixture,
-    ) -> None:
-        """Maintainer summary should emit one harness line per inferred owner bucket."""
-        diagnostics_path = tmp_path / "diagnostics.md"
-        diagnostics_path.write_text("summary\n", encoding="utf-8")
-        snapshot = DiagnosticsSnapshot(
-            harness_results=(
-                (_make_harness_success("org/harness-template"), ""),
-                (
-                    _make_harness_success(
-                        "org/harness-runtime",
-                        harness_type="long_context",
-                        harness_detail="long_context_empty(5000tok)",
-                    ),
-                    "",
-                ),
-            ),
-        )
-        artifacts = DiagnosticsArtifacts(
-            snapshot=snapshot,
-            diagnostics_written=True,
-            repro_bundles={},
-        )
-
-        with caplog.at_level("INFO", logger=check_models.LOGGER_NAME):
-            _log_maintainer_summary(
-                artifacts=artifacts,
-                diagnostics_path=diagnostics_path,
-            )
-
-        assert (
-            "Harness/runtime anomalies: 1 model(s) likely owned by model-config / mlx-vlm. "
-            "Next: validate chat-template/config expectations and mlx-vlm prompt formatting for this model."
-        ) in caplog.text
-        assert (
-            "Harness/runtime anomalies: 1 model(s) likely owned by mlx-vlm / mlx. "
-            "Next: validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime."
-        ) in caplog.text
-
-    def test_log_maintainer_summary_splits_mixed_stack_and_preflight_owner_hints(
-        self,
-        tmp_path: Path,
-        caplog: pytest.LogCaptureFixture,
-    ) -> None:
-        """Maintainer summary should emit per-owner lines for stack and preflight signals."""
-        diagnostics_path = tmp_path / "diagnostics.md"
-        diagnostics_path.write_text("summary\n", encoding="utf-8")
-        stack_runtime = PerformanceResult(
-            model_name="org/stack-runtime",
-            success=True,
-            generation=_MockGeneration(text="echo", prompt_tokens=15000, generation_tokens=80),
-            total_time=1.0,
-            generation_time=0.5,
-            model_load_time=0.5,
-        )
-        stack_transformers = PerformanceResult(
-            model_name="org/stack-transformers",
-            success=True,
-            generation=_MockGeneration(text="echo", prompt_tokens=15000, generation_tokens=80),
-            total_time=1.0,
-            generation_time=0.5,
-            model_load_time=0.5,
-        )
-        snapshot = DiagnosticsSnapshot(
-            stack_signals=(
-                (
-                    stack_runtime,
-                    "Context echo under long prompt length",
-                    "mlx-vlm / mlx",
-                ),
-                (
-                    stack_transformers,
-                    "Context echo under extreme prompt length",
-                    "transformers / mlx-vlm",
-                ),
-            ),
-            preflight_issues=(
-                "transformers==5.4.0 is below minimum 5.7.0 required by check_models.",
-                "mlx runtime probe reported a suspicious cache incompatibility",
-            ),
-        )
-        artifacts = DiagnosticsArtifacts(
-            snapshot=snapshot,
-            diagnostics_written=True,
-            repro_bundles={},
-        )
-
-        with caplog.at_level("INFO", logger=check_models.LOGGER_NAME):
-            _log_maintainer_summary(
-                artifacts=artifacts,
-                diagnostics_path=diagnostics_path,
-            )
-
-        assert (
-            "Long-context or stack-signal anomalies: 1 model(s) likely owned by mlx-vlm / mlx. "
-            "Next: validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime."
-        ) in caplog.text
-        assert (
-            "Long-context or stack-signal anomalies: 1 model(s) likely owned by transformers / mlx-vlm. "
-            "Next: verify API compatibility and pinned version floor."
-        ) in caplog.text
-        assert (
-            "Preflight compatibility warnings: 1 issue(s) likely owned by mlx. "
-            "Next: check tensor/cache behavior and memory pressure handling."
-        ) in caplog.text
-        assert (
-            "Preflight compatibility warnings: 1 issue(s) likely owned by transformers. "
-            "Next: verify API compatibility and pinned version floor."
-        ) in caplog.text
-
-
-class TestClusterFailuresByPattern:
-    """Unit tests for the _cluster_failures_by_pattern helper."""
-
-    def test_strips_model_name_from_wrapper(self) -> None:
-        """Model-specific prefixes should be removed before clustering."""
-        results = [
-            _make_failure_with_details(
-                "org/model-a",
-                error_msg="Model generation failed for org/model-a: token mismatch",
-            ),
-            _make_failure_with_details(
-                "org/model-b",
-                error_msg="Model generation failed for org/model-b: token mismatch",
-            ),
-        ]
-        clusters = _cluster_failures_by_pattern(results)
-        assert len(clusters) == 1
-
-    def test_normalises_numbers(self) -> None:
-        """Varying numeric values (shape dimensions) should be normalised."""
-        results = [
-            _make_failure_with_details(
-                "org/a",
-                error_msg="Shapes (3,1,2048) and (3,1,6065) mismatch",
-            ),
-            _make_failure_with_details(
-                "org/b",
-                error_msg="Shapes (984,2048) and (1,0,2048) mismatch",
-            ),
-        ]
-        clusters = _cluster_failures_by_pattern(results)
-        assert len(clusters) == 1
-        assert len(next(iter(clusters.values()))) == 2
-
-    def test_different_patterns_separate(self) -> None:
-        """Fundamentally different errors should not cluster together."""
-        results = [
-            _make_failure_with_details("org/a", error_msg="chat_template is not set"),
-            _make_failure_with_details("org/b", error_msg="Missing 1 parameters"),
-        ]
-        clusters = _cluster_failures_by_pattern(results)
-        assert len(clusters) == 2
-
-
-class TestFormatTracebackTail:
-    """Unit tests for _format_traceback_tail."""
-
-    def test_none_input(self) -> None:
-        """None input returns None."""
-        assert _format_traceback_tail(None) is None
-
-    def test_empty_string(self) -> None:
-        """Empty string returns None."""
-        assert _format_traceback_tail("") is None
-
-    def test_extracts_tail(self) -> None:
-        """Long tracebacks are truncated to the tail lines."""
-        tb = "\n".join(f"line {i}" for i in range(20))
-        result = _format_traceback_tail(tb)
-        assert result is not None
-        lines = result.splitlines()
-        assert len(lines) == 6  # _DIAGNOSTICS_TRACEBACK_TAIL_LINES
-        assert "line 19" in lines[-1]
-
-    def test_short_traceback_returned_fully(self) -> None:
-        """Short tracebacks are returned without truncation."""
-        tb = "ValueError: bad\n  at foo.py:10"
-        result = _format_traceback_tail(tb)
-        assert result is not None
-        assert "ValueError: bad" in result
-
-    def test_chained_exception_prefers_upstream_traceback_segment(self) -> None:
-        """Wrapped local failures should not hide the upstream root traceback."""
-        tb = (
-            "Traceback (most recent call last):\n"
-            '  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", '
-            "line 19044, in _run_model_generation\n"
-            "    model, processor, config = _load_model(params)\n"
-            '  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", '
-            "line 534, in load_model\n"
-            "    model_config = apply_generation_config_defaults(model_config, config)\n"
-            '  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", '
-            "line 69, in apply_generation_config_defaults\n"
-            "    setattr(model_config, key, config[key])\n"
-            "AttributeError: property 'eos_token_id' of 'ModelConfig' object has no setter\n"
-            "\n"
-            "The above exception was the direct cause of the following exception:\n"
-            "\n"
-            "Traceback (most recent call last):\n"
-            '  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", '
-            "line 19285, in process_image_with_model\n"
-            "    output = _run_model_generation(params=params)\n"
-            '  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", '
-            "line 19059, in _run_model_generation\n"
-            "    raise ValueError(error_details) from load_err\n"
-            "ValueError: Model loading failed: property 'eos_token_id' of "
-            "'ModelConfig' object has no setter\n"
-        )
-
-        result = _format_traceback_tail(tb)
-
-        assert result is not None
-        assert "mlx_vlm/utils.py" in result
-        assert "AttributeError: property 'eos_token_id'" in result
-        assert "Model loading failed" not in result
-        assert "check_models/src/check_models.py" not in result
-
-
-class TestDiagnosticsContextBuilder:
-    """Unit tests for _build_diagnostics_context."""
-
-    def test_builds_sets_and_history_context(self) -> None:
-        """Context builder should materialize comparison sets and retry stats."""
-        history_records: list[HistoryRunRecord] = [
-            _history_run(
-                {"org/a": False, "org/b": True},
-                timestamp="2026-02-01 10:00:00 GMT",
-            ),
-            _history_run(
-                {"org/a": False, "org/b": False},
-                timestamp="2026-02-02 10:00:00 GMT",
-            ),
-        ]
-        comparison = cast(
-            "check_models.HistoryComparisonSummary",
-            {
-                "regressions": ["org/b"],
-                "recoveries": [],
-                "new_models": [],
-                "missing_models": ["org/c"],
-                "quality_regressions": [],
-                "quality_recoveries": [],
-                "harness_regressions": [],
-                "harness_recoveries": [],
-                "owner_changes": [],
-            },
-        )
-
-        context = _build_diagnostics_context(
-            failed_models={"org/a", "org/b"},
-            history_records=history_records,
-            comparison=comparison,
-        )
-
-        assert "org/b" in context.regressions
-        assert "org/c" in context.missing_models
-        assert context.failure_history["org/a"].first_failure_timestamp == "2026-02-01 10:00:00 GMT"
-        assert context.failure_history["org/a"].recent_failures == 2
-        assert context.failure_history["org/a"].recent_considered == 2
-
-
-class TestPruneReproBundles:
-    """Tests for _prune_repro_bundles."""
-
-    def test_removes_old_bundles(self, tmp_path: Path) -> None:
-        """JSON bundles older than max_age_days are removed."""
-        old_file = tmp_path / "20240101T000000_001_model_sig.json"
-        old_file.write_text("{}")
-        old_time = time.time() - 200 * 86400
-        os.utime(old_file, (old_time, old_time))
-
-        new_file = tmp_path / "20260401T000000_001_model_sig.json"
-        new_file.write_text("{}")
-
-        removed = _prune_repro_bundles(tmp_path, 90, max_runs=100)
-        assert removed == 1
-        assert not old_file.exists()
-        assert new_file.exists()
-
-    def test_zero_days_disables_pruning(self, tmp_path: Path) -> None:
-        """max_age_days=0 disables pruning."""
-        (tmp_path / "20260401T000000_001_model_sig.json").write_text("{}")
-        removed = _prune_repro_bundles(tmp_path, 0)
-        assert removed == 0
-
-    def test_nonexistent_dir(self, tmp_path: Path) -> None:
-        """Non-existent directory returns 0."""
-        removed = _prune_repro_bundles(tmp_path / "nonexistent", 90)
-        assert removed == 0
-
-    def test_prunes_json_files_by_run_count(self, tmp_path: Path) -> None:
-        """JSON bundle files beyond max_runs are pruned."""
-        # Create files from 3 different "runs" (distinct 16-char prefixes)
-        for i, prefix in enumerate(["20260401T000000", "20260402T000000", "20260403T000000"]):
-            f = tmp_path / f"{prefix}_{i:03d}_model_sig.json"
-            f.write_text("{}")
-        removed = _prune_repro_bundles(tmp_path, max_age_days=9999, max_runs=2)
-        assert removed == 1
-        # Oldest run should be gone
-        assert not (tmp_path / "20260401T000000_000_model_sig.json").exists()
-        assert (tmp_path / "20260402T000000_001_model_sig.json").exists()
-        assert (tmp_path / "20260403T000000_002_model_sig.json").exists()
-
-    def test_removes_empty_directories(self, tmp_path: Path) -> None:
-        """Empty subdirectories are cleaned up."""
-        empty = tmp_path / "empty_dir"
-        empty.mkdir()
-        _prune_repro_bundles(tmp_path, max_age_days=9999, max_runs=100)
-        assert not empty.exists()
-
-
-class TestCleanStaleToplevelReports:
-    """Tests for _clean_stale_toplevel_reports."""
-
-    def test_removes_stale_files_when_canonical_exists(self, tmp_path: Path) -> None:
-        """Stale top-level file removed when reports/ copy exists."""
-        reports_dir = tmp_path / "reports"
-        reports_dir.mkdir()
-        (tmp_path / "results.md").write_text("old")
-        (reports_dir / "results.md").write_text("canonical")
-        (tmp_path / "model_selection.md").write_text("old selection")
-        (reports_dir / "model_selection.md").write_text("canonical selection")
-        removed = _clean_stale_toplevel_reports(tmp_path, reports_dir)
-        assert removed == 2
-        assert not (tmp_path / "results.md").exists()
-        assert not (tmp_path / "model_selection.md").exists()
-
-    def test_keeps_file_when_no_canonical(self, tmp_path: Path) -> None:
-        """Top-level file kept when reports/ copy does not exist."""
-        reports_dir = tmp_path / "reports"
-        reports_dir.mkdir()
-        (tmp_path / "results.md").write_text("only copy")
-        removed = _clean_stale_toplevel_reports(tmp_path, reports_dir)
-        assert removed == 0
-        assert (tmp_path / "results.md").exists()
-
-
-class TestEmptyRecommendedBucketExplanation:
-    """Test that an empty 'recommended' bucket includes an explanation."""
-
-    def test_recommended_bucket_shows_explanation(self) -> None:
-        """Recommended bucket text explains why no models qualified."""
-        md: list[str] = []
-        _append_review_user_buckets(
-            md, {"recommended": [], "caveat": [], "needs_triage": [], "avoid": []}
-        )
-        text = "\n".join(md)
-        assert "quality thresholds" in text
-        # Other empty buckets should just say "None."
-        lines = [line for line in md if line.startswith("- None")]
-        explanation_lines = [ln for ln in lines if "quality thresholds" in ln]
-        plain_none_lines = [ln for ln in lines if ln.strip() == "- None."]
-        assert len(explanation_lines) == 1
-        assert len(plain_none_lines) == 3
-
-
 class TestSharedReportSections:
     """Tests for shared Markdown/HTML report section primitives."""
 
@@ -6922,12 +4974,6 @@ class TestReproCommandNormalization:
             image_ref=str(image_path),
             run_args=run_args,
         )
-        config_json = check_models._build_issue_inline_config_json(
-            model_name="org/model",
-            image_ref=str(image_path),
-            run_args=run_args,
-        )
-
         for unsupported_cli_flag in (
             "--top-p",
             "--min-p",
@@ -6955,662 +5001,6 @@ class TestReproCommandNormalization:
             in script
         )
         assert "generate(model, processor, PROMPT" not in script
-
-        config = json.loads(config_json)
-        assert config["generate_kwargs"]["top_p"] == 0.8
-        assert config["generate_kwargs"]["min_p"] == 0.1
-        assert config["generate_kwargs"]["top_k"] == 4
-        assert config["generate_kwargs"]["repetition_penalty"] == 1.1
-        assert config["generate_kwargs"]["repetition_context_size"] == 64
-
-
-class TestGithubIssueReportsCleanup:
-    """Tests for _generate_github_issue_reports stale file cleanup."""
-
-    def test_stale_issue_files_removed(self, tmp_path: Path) -> None:
-        """Old issue_*.md files are removed before writing new ones."""
-        issues_dir = tmp_path / "issues"
-        issues_dir.mkdir()
-        (issues_dir / "issue_001_crash.md").write_text("stale crash report")
-        (issues_dir / "issue_002_harness.md").write_text("stale harness report")
-        # A non-issue file should be left alone
-        (issues_dir / "README.md").write_text("keep me")
-
-        # Empty snapshot → no new issue files written
-        snapshot = DiagnosticsSnapshot()
-        _generate_github_issue_reports(
-            diagnostics_snapshot=snapshot,
-            output_dir=tmp_path,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            repro_bundles={},
-            run_args=None,
-        )
-
-        assert not (issues_dir / "issue_001_crash.md").exists()
-        assert not (issues_dir / "issue_002_harness.md").exists()
-        assert (issues_dir / "index.md").exists()
-        assert (issues_dir / "README.md").exists()
-
-
-class TestGithubIssueReportContent:
-    """Content checks for generated standalone GitHub issue reports."""
-
-    def test_issue_draft_uses_native_mlx_vlm_repro_and_prunes_internal_jargon(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Pasteable issue drafts should use native mlx-vlm repros, not harness commands."""
-        image_path = tmp_path / "sample.jpg"
-        image_path.write_text("placeholder", encoding="utf-8")
-        failed_result = PerformanceResult(
-            model_name="org/broken-model",
-            generation=None,
-            success=False,
-            error_message="RuntimeError: shape mismatch",
-            error_stage="Model Error",
-            error_code="MLX_VLM_DECODE_RUNTIME",
-            error_package="mlx-vlm",
-            error_signature="MLX_DECODE_ERROR:abc123",
-            upstream_boundary="generation_started",
-            error_traceback="Traceback (most recent call last):\nRuntimeError: shape mismatch",
-            total_time=0.5,
-        )
-        snapshot = DiagnosticsSnapshot(
-            failed=(failed_result,),
-            failure_clusters=(("MLX_DECODE_ERROR:abc123", (failed_result,)),),
-        )
-        run_args = Namespace(
-            image=image_path,
-            max_tokens=123,
-            temperature=0.0,
-            revision="main",
-            trust_remote_code=True,
-        )
-
-        generated = _generate_github_issue_reports(
-            diagnostics_snapshot=snapshot,
-            output_dir=tmp_path,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            repro_bundles={},
-            run_args=run_args,
-            prompt="Analyze this image.",
-            image_path=image_path,
-        )
-
-        content = next(iter(generated.values())).read_text(encoding="utf-8")
-        assert "python -m mlx_vlm.generate" in content
-        assert "--model org/broken-model" in content
-        assert "Analyze this image." in content
-        assert "from mlx_vlm.utils import load" in content
-        assert "from mlx_vlm.generate import generate" in content
-        assert "python -m check_models" not in content
-        assert "Raw cluster" not in content
-        assert "Issue kind" not in content
-        assert "Raw owner hint" not in content
-        assert "Why this classification is credible" not in content
-        assert "MLX_VLM_DECODE_RUNTIME" not in content
-
-    def test_issue_draft_uses_portable_image_reference_with_hash(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Pasteable upstream repros should not require the reporter's absolute paths."""
-        image_path = tmp_path / "cats.jpg"
-        image_path.write_bytes(b"fake image bytes")
-        failed_result = PerformanceResult(
-            model_name="org/broken-model",
-            generation=None,
-            success=False,
-            error_message="RuntimeError: shape mismatch",
-            error_stage="Model Error",
-            error_code="MLX_VLM_DECODE_RUNTIME",
-            error_package="mlx-vlm",
-            error_signature="MLX_DECODE_ERROR:abc123",
-            upstream_boundary="generation_started",
-            error_traceback="Traceback (most recent call last):\nRuntimeError: shape mismatch",
-            total_time=0.5,
-        )
-        snapshot = DiagnosticsSnapshot(
-            failed=(failed_result,),
-            failure_clusters=(("MLX_DECODE_ERROR:abc123", (failed_result,)),),
-        )
-
-        generated = _generate_github_issue_reports(
-            diagnostics_snapshot=snapshot,
-            output_dir=tmp_path,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            repro_bundles={},
-            run_args=Namespace(image=image_path, max_tokens=123, temperature=0.0),
-            prompt="Analyze this image.",
-            image_path=image_path,
-        )
-
-        content = next(iter(generated.values())).read_text(encoding="utf-8")
-        assert str(image_path) not in content
-        assert "--image cats.jpg" in content
-        assert '"image": "cats.jpg"' in content
-        assert "Image SHA256:" in content
-
-    def test_issue_index_includes_run_context_header(self, tmp_path: Path) -> None:
-        """Issue queue index should explain the run context before the table."""
-        failed_result = PerformanceResult(
-            model_name="org/broken-model",
-            generation=None,
-            success=False,
-            error_message="RuntimeError: shape mismatch",
-            error_stage="Model Error",
-            error_code="MLX_VLM_DECODE_RUNTIME",
-            error_package="mlx-vlm",
-            error_signature="MLX_DECODE_ERROR:abc123",
-            upstream_boundary="generation_started",
-            error_traceback="Traceback (most recent call last):\nRuntimeError: shape mismatch",
-            total_time=0.5,
-        )
-        snapshot = DiagnosticsSnapshot(
-            failed=(failed_result,),
-            failure_clusters=(("MLX_DECODE_ERROR:abc123", (failed_result,)),),
-        )
-
-        _generate_github_issue_reports(
-            diagnostics_snapshot=snapshot,
-            output_dir=tmp_path,
-            versions={**_stub_versions(), "mlx-vlm": "0.5.0"},
-            system_info={"OS": "macOS 26.4.1", "GPU/Chip": "Apple M5 Max"},
-            repro_bundles={},
-            run_args=None,
-        )
-
-        index = (tmp_path / "issues" / "index.md").read_text(encoding="utf-8")
-        assert index.startswith("# Check Models Issue Queue")
-        assert "Generated on:" in index
-        assert "Test Environment:" in index
-        assert "Apple M5 Max" in index
-        assert "mlx-vlm 0.5.0" in index
-        assert "Summary:" in index
-        assert "1 hard failure" in index
-        assert "Evidence Snapshot" in index
-        assert "Model Error" in index
-        assert "RuntimeError" in index
-
-    def test_issue_affected_models_use_failure_message_not_generic_evidence(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Issue affected-model rows should show the actionable runtime error."""
-        failed_result = PerformanceResult(
-            model_name="org/broken-model",
-            generation=None,
-            success=False,
-            error_message=(
-                "Model loading failed: Received 2 parameters not in model:\n"
-                "multi_modal_projector.layer_norm.bias,\n"
-                "multi_modal_projector.layer_norm.weight."
-            ),
-            root_error_message=(
-                "Received 2 parameters not in model:\n"
-                "multi_modal_projector.layer_norm.bias,\n"
-                "multi_modal_projector.layer_norm.weight."
-            ),
-            root_error_type="ValueError",
-            root_error_module="builtins",
-            error_stage="Model Error",
-            error_code="MLX_MODEL_LOAD_MODEL",
-            error_package="mlx",
-            error_signature="MLX_MODEL_LOAD_MODEL:abc123",
-            upstream_boundary="load_started",
-            error_traceback="Traceback (most recent call last):\nValueError: shape mismatch",
-            total_time=0.5,
-        )
-        snapshot = DiagnosticsSnapshot(
-            failed=(failed_result,),
-            failure_clusters=(("MLX_MODEL_LOAD_MODEL:abc123", (failed_result,)),),
-        )
-
-        generated = _generate_github_issue_reports(
-            diagnostics_snapshot=snapshot,
-            output_dir=tmp_path,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            repro_bundles={},
-            run_args=None,
-        )
-
-        content = next(iter(generated.values())).read_text(encoding="utf-8")
-        affected_models = _extract_markdown_subsection(
-            content,
-            "## Affected Models",
-            end_headings=["## Minimal Evidence"],
-        )
-        detailed_evidence = _extract_markdown_subsection(
-            content,
-            "## Appendix: Detailed Evidence",
-            end_headings=[],
-        )
-        assert "<!-- markdownlint-disable MD060 -->" in affected_models
-        assert "<!-- markdownlint-enable MD060 -->" in affected_models
-        assert "Received 2 parameters not in model" in affected_models
-        assert "multi_modal_projector.layer_norm.bias" not in affected_models
-        assert "multi_modal_projector.layer_norm.bias" in detailed_evidence
-        assert "model error | mlx model load model" not in affected_models
-
-    def test_issue_traceback_omits_local_check_models_frames(self, tmp_path: Path) -> None:
-        """Issue draft tracebacks should start at upstream frames when local wrappers exist."""
-        traceback_text = (
-            "Traceback (most recent call last):\n"
-            '  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", '
-            "line 17284, in _run_model_generation\n"
-            "    output = generate(...)\n"
-            '  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", '
-            "line 419, in load\n"
-            "    raise RuntimeError('shape mismatch')\n"
-            "RuntimeError: shape mismatch\n"
-        )
-        failed_result = PerformanceResult(
-            model_name="org/broken-model",
-            generation=None,
-            success=False,
-            error_message="RuntimeError: shape mismatch",
-            error_stage="Model Error",
-            error_code="MLX_VLM_DECODE_RUNTIME",
-            error_package="mlx-vlm",
-            error_signature="MLX_DECODE_ERROR:abc123",
-            upstream_boundary="generation_started",
-            error_traceback=traceback_text,
-            total_time=0.5,
-        )
-        snapshot = DiagnosticsSnapshot(
-            failed=(failed_result,),
-            failure_clusters=(("MLX_DECODE_ERROR:abc123", (failed_result,)),),
-        )
-
-        generated = _generate_github_issue_reports(
-            diagnostics_snapshot=snapshot,
-            output_dir=tmp_path,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            repro_bundles={},
-            run_args=None,
-        )
-
-        content = next(iter(generated.values())).read_text(encoding="utf-8")
-        assert "check_models.py" not in content
-        assert "output = generate(...)" not in content
-        assert "mlx_vlm/utils.py" in content
-
-    def test_crash_issue_includes_traceback_repro_bundle_and_environment(
-        self, tmp_path: Path
-    ) -> None:
-        """Crash issue templates should include traceback, repro bundle, and environment."""
-        failed_result = PerformanceResult(
-            model_name="org/broken-model",
-            generation=None,
-            success=False,
-            error_message="RuntimeError: shape mismatch",
-            error_stage="Model Error",
-            error_code="MLX_VLM_DECODE_RUNTIME",
-            error_package="mlx-vlm",
-            error_signature="MLX_DECODE_ERROR:abc123",
-            upstream_boundary="generation_started",
-            error_traceback="Traceback (most recent call last):\nRuntimeError: shape mismatch",
-            total_time=0.5,
-        )
-        snapshot = DiagnosticsSnapshot(
-            failed=(failed_result,),
-            failure_clusters=(("MLX_DECODE_ERROR:abc123", (failed_result,)),),
-        )
-        bundle_path = tmp_path / "repro_bundles" / "broken.json"
-        bundle_path.parent.mkdir()
-        bundle_path.write_text("{}", encoding="utf-8")
-
-        generated = _generate_github_issue_reports(
-            diagnostics_snapshot=snapshot,
-            output_dir=tmp_path,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            repro_bundles={"org/broken-model": bundle_path},
-            run_args=None,
-        )
-
-        assert len(generated) == 1
-        content = next(iter(generated.values())).read_text(encoding="utf-8")
-        assert content.startswith(
-            "<!-- markdownlint-disable MD012 MD013 MD033 MD060 -->\n\n"
-            "# \\[mlx-vlm\\]\\[MLX VLM decode runtime\\]"
-        )
-        assert "## Summary" in content
-        assert "## Affected Models" in content
-        assert "## Minimal Evidence" in content
-        assert "## Appendix: Detailed Evidence" in content
-        assert "## Minimal Reproduction" in content
-        assert "## Fix Checklist" in content
-        assert "## Expected Fix Signal" in content
-        assert "## Appendix: Environment" in content
-        assert "python -m mlx_vlm.generate" in content
-        assert "python -m check_models" not in content
-        assert "Raw cluster" not in content
-        assert "MLX_VLM_DECODE_RUNTIME" not in content
-        assert "runtime_failure" not in content
-        assert "Traceback (most recent call last)" in content
-        assert (
-            "[optional JSON](https://github.com/jrp2014/check_models/blob/main/src/output/repro_bundles/broken.json)"
-        ) in content
-
-        # Now test relative local links when the link-style state is "relative"
-        with patch.object(check_models._LinkStyleState, "value", "relative"):
-            generated_github = _generate_github_issue_reports(
-                diagnostics_snapshot=snapshot,
-                output_dir=tmp_path,
-                versions=_stub_versions(),
-                system_info={"Python Version": "3.13"},
-                repro_bundles={"org/broken-model": bundle_path},
-                run_args=None,
-            )
-            content_relative = next(iter(generated_github.values())).read_text(encoding="utf-8")
-            assert "[optional JSON](../repro_bundles/broken.json)" in content_relative
-        assert "Optional advanced context:" in content
-        assert "Python Version" in content
-        assert "Priority" not in content
-
-    def test_single_long_context_signal_stays_a_reproduction_observation(
-        self, tmp_path: Path
-    ) -> None:
-        """An unpaired long-context signal should not create an upstream issue draft."""
-        harness_result = _make_harness_success(
-            name="org/harness-empty",
-            harness_type="long_context",
-            harness_detail="long_context_empty(5000tok)",
-        )
-        snapshot = DiagnosticsSnapshot(
-            harness_results=((harness_result, "long_context"),),
-        )
-
-        generated = _generate_github_issue_reports(
-            diagnostics_snapshot=snapshot,
-            output_dir=tmp_path,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            repro_bundles={},
-            run_args=None,
-        )
-
-        assert generated == {}
-        content = "\n".join(check_models._diagnostics_reproduction_observations(snapshot))
-        assert "Observations Requiring Controlled Reproduction" in content
-        assert "harness:long_context" in content
-        assert "controlled reproduction" in content
-
-    def test_multiple_stop_token_models_produce_one_issue(self, tmp_path: Path) -> None:
-        """Multiple stop-token harness models should cluster into one issue draft."""
-        first = _with_confirmed_reproduction(
-            _make_harness_success(
-                name="org/stop-a",
-                text="caption <|end|>",
-                generation_tokens=32,
-                harness_type="stop_token",
-                harness_detail="token_leak:<|end|>",
-            )
-        )
-        second = _with_confirmed_reproduction(
-            _make_harness_success(
-                name="org/stop-b",
-                text="caption </think>",
-                generation_tokens=32,
-                harness_type="stop_token",
-                harness_detail="token_leak:</think>",
-            )
-        )
-        snapshot = DiagnosticsSnapshot(
-            harness_results=(
-                (first, cast("_MockGeneration", first.generation).text or ""),
-                (second, cast("_MockGeneration", second.generation).text or ""),
-            )
-        )
-
-        generated = _generate_github_issue_reports(
-            diagnostics_snapshot=snapshot,
-            output_dir=tmp_path,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            repro_bundles={},
-            run_args=None,
-        )
-
-        assert len(generated) == 1
-        issue_path = next(iter(generated.values()))
-        content = issue_path.read_text(encoding="utf-8")
-        assert "affecting 2 model(s)" in content
-        assert "org/stop-a" in content
-        assert "org/stop-b" in content
-        assert "mlx-vlm_stop-token_001" not in content
-        assert "&lt;\\|end\\|&gt;" in content
-        assert "&lt;/think&gt;" in content
-
-    def test_stop_token_issue_excerpt_keeps_late_leak_marker(self, tmp_path: Path) -> None:
-        """Issue excerpts should center on exact late leak markers instead of only the head."""
-        leaked_text = (
-            "A long answer starts with plausible visual details. "
-            + "background context " * 80
-            + "</think> leaked control token after the long preface."
-        )
-        result = _with_confirmed_reproduction(
-            _make_harness_success(
-                name="org/late-stop",
-                text=leaked_text,
-                generation_tokens=220,
-                harness_type="stop_token",
-                harness_detail="token_leak:</think>",
-            )
-        )
-        snapshot = DiagnosticsSnapshot(
-            harness_results=((result, leaked_text),),
-        )
-
-        generated = _generate_github_issue_reports(
-            diagnostics_snapshot=snapshot,
-            output_dir=tmp_path,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            repro_bundles={},
-            run_args=None,
-        )
-
-        content = next(iter(generated.values())).read_text(encoding="utf-8")
-        assert "</think> leaked control token" in content
-        assert "Output excerpt:" in content
-
-    def test_unrelated_harness_subtypes_produce_separate_issues(self, tmp_path: Path) -> None:
-        """Different harness subtypes should not be merged into one draft."""
-        stop = _with_confirmed_reproduction(
-            _make_harness_success(
-                name="org/stop",
-                text="caption <|end|>",
-                generation_tokens=32,
-                harness_type="stop_token",
-                harness_detail="token_leak:<|end|>",
-            )
-        )
-        encoding = _with_confirmed_reproduction(
-            _make_harness_success(
-                name="org/encoding",
-                text="A Ġcaption",
-                generation_tokens=32,
-                harness_type="encoding",
-                harness_detail="token_encoding:bpe_space_leak(1)",
-            )
-        )
-        snapshot = DiagnosticsSnapshot(
-            harness_results=(
-                (stop, cast("_MockGeneration", stop.generation).text or ""),
-                (encoding, cast("_MockGeneration", encoding.generation).text or ""),
-            )
-        )
-
-        generated = _generate_github_issue_reports(
-            diagnostics_snapshot=snapshot,
-            output_dir=tmp_path,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            repro_bundles={},
-            run_args=None,
-        )
-
-        assert len(generated) == 2
-        index = (tmp_path / "issues" / "index.md").read_text(encoding="utf-8")
-        assert "Stop/control tokens leaked into generated text" in index
-        assert "Tokenizer decode leaked BPE/byte markers" in index
-        assert "Issue Draft" in index
-        assert "Fixed When" in index
-        assert "Priority" not in index
-
-    def test_issue_queue_humanizes_runtime_error_codes(self, tmp_path: Path) -> None:
-        """Canonical runtime error-code subtypes should render as readable queue labels."""
-        failed_result = PerformanceResult(
-            model_name="org/broken-model",
-            generation=None,
-            success=False,
-            error_message="RuntimeError: shape mismatch",
-            error_stage="Model Error",
-            error_code="MLX_MODEL_LOAD_MODEL",
-            error_package="mlx",
-            error_signature="MLX_MODEL_LOAD_MODEL:abc123",
-            upstream_boundary="load_started",
-            error_traceback="Traceback (most recent call last):\nRuntimeError: shape mismatch",
-            total_time=0.5,
-        )
-        snapshot = DiagnosticsSnapshot(
-            failed=(failed_result,),
-            failure_clusters=(("MLX_MODEL_LOAD_MODEL:abc123", (failed_result,)),),
-        )
-
-        _generate_github_issue_reports(
-            diagnostics_snapshot=snapshot,
-            output_dir=tmp_path,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            repro_bundles={},
-            run_args=None,
-        )
-
-        index = (tmp_path / "issues" / "index.md").read_text(encoding="utf-8")
-        assert "MLX: Model load / model error" in index
-        assert "RuntimeError: shape mismatch" in index
-        assert "Priority" not in index
-
-    def test_issue_queue_summarizes_unsupported_model_failures(self, tmp_path: Path) -> None:
-        """Unsupported model-type failures should produce filing-ready wording/actions."""
-        failed_result = PerformanceResult(
-            model_name="org/granite-vlm",
-            generation=None,
-            success=False,
-            error_message=(
-                "Model loading failed: Model type granite not supported. "
-                "Error: No module named 'mlx_vlm.specifics'"
-            ),
-            root_error_message=(
-                "Model type granite not supported. Error: No module named 'mlx_vlm.specifics'"
-            ),
-            error_stage="Model Error",
-            error_code="MLX_VLM_MODEL_LOAD_MODEL",
-            error_package="mlx-vlm",
-            error_signature="MLX_VLM_MODEL_LOAD_MODEL:abc123",
-            upstream_boundary="load_started",
-            error_traceback="Traceback (most recent call last):\nModuleNotFoundError: no module",
-            total_time=0.5,
-        )
-        snapshot = DiagnosticsSnapshot(
-            failed=(failed_result,),
-            failure_clusters=(("MLX_VLM_MODEL_LOAD_MODEL:abc123", (failed_result,)),),
-        )
-
-        generated = _generate_github_issue_reports(
-            diagnostics_snapshot=snapshot,
-            output_dir=tmp_path,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            repro_bundles={},
-            run_args=None,
-        )
-
-        index = (tmp_path / "issues" / "index.md").read_text(encoding="utf-8")
-        content = next(iter(generated.values())).read_text(encoding="utf-8")
-        assert "mlx-vlm: Model load / model error" in index
-        assert "Model type granite not supported" in index
-        assert "retained exception chain" in content
-        assert "requested and resolved model revisions" in content
-
-    def test_issue_queue_summarizes_weight_mismatch_failures(self, tmp_path: Path) -> None:
-        """Weight/config mismatches should point maintainers at keys and loader compatibility."""
-        failed_result = PerformanceResult(
-            model_name="org/mismatch-vlm",
-            generation=None,
-            success=False,
-            error_message=(
-                "Model loading failed: received the following parameters not in model: "
-                "vision_model.merger.mlp.0.scale"
-            ),
-            root_error_message=(
-                "received the following parameters not in model: vision_model.merger.mlp.0.scale"
-            ),
-            error_stage="Weight Mismatch",
-            error_code="MLX_MODEL_LOAD_WEIGHT_MISMATCH",
-            error_package="mlx",
-            error_signature="MLX_MODEL_LOAD_WEIGHT_MISMATCH:abc123",
-            upstream_boundary="load_started",
-            error_traceback="Traceback (most recent call last):\nValueError: missing parameters",
-            total_time=0.5,
-        )
-        snapshot = DiagnosticsSnapshot(
-            failed=(failed_result,),
-            failure_clusters=(("MLX_MODEL_LOAD_WEIGHT_MISMATCH:abc123", (failed_result,)),),
-        )
-
-        generated = _generate_github_issue_reports(
-            diagnostics_snapshot=snapshot,
-            output_dir=tmp_path,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            repro_bundles={},
-            run_args=None,
-        )
-
-        index = (tmp_path / "issues" / "index.md").read_text(encoding="utf-8")
-        content = next(iter(generated.values())).read_text(encoding="utf-8")
-        assert "MLX: Model load / weight/config mismatch" in index
-        assert "parameters not in model" in index
-        assert "structured error signature" in content
-        assert "KV/cache behavior" not in content
-
-    def test_unconfirmed_stack_signal_does_not_produce_issue_draft(self, tmp_path: Path) -> None:
-        """A one-run stack symptom should not bypass canonical readiness."""
-        result = PerformanceResult(
-            model_name="org/stack-context",
-            success=True,
-            generation=_MockGeneration(
-                text="echoed context",
-                prompt_tokens=15000,
-                generation_tokens=80,
-            ),
-            total_time=1.0,
-            generation_time=0.5,
-            model_load_time=0.5,
-        )
-        snapshot = DiagnosticsSnapshot(
-            stack_signals=((result, "Context echo under long prompt length", "mlx-vlm / mlx"),)
-        )
-
-        generated = _generate_github_issue_reports(
-            diagnostics_snapshot=snapshot,
-            output_dir=tmp_path,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            repro_bundles={},
-            run_args=None,
-        )
-
-        assert generated == {}
 
 
 def test_output_index_routes_maintainers_and_model_users(tmp_path: Path) -> None:
@@ -7645,7 +5035,7 @@ def test_output_index_routes_maintainers_and_model_users(tmp_path: Path) -> None
         snapshot=_build_diagnostics_snapshot(results=[good, failure], prompt="describe"),
         diagnostics_written=True,
         repro_bundles={"org/bad": output_dir / "repro_bundles" / "bad.json"},
-        issue_reports={"cluster": issues_dir / "index.md"},
+        issue_reports={"org/bad": issues_dir / "issue_org_bad.md"},
     )
 
     check_models.generate_output_index_report(
@@ -7666,8 +5056,9 @@ def test_output_index_routes_maintainers_and_model_users(tmp_path: Path) -> None
     assert "## For Maintainers" in content
     assert "model_selection.md" in content
     assert "model_capabilities.md" in content
-    assert "issues/index.md" in content
-    assert "latest_by_cluster.json" in content
+    assert "issue_org_bad.md" in content
+    assert "issues/index.md" not in content
+    assert "latest_by_cluster.json" not in content
     assert "## Primary Artifacts" in content
     assert "## Supporting Artifacts" in content
     primary = _extract_markdown_subsection(
@@ -7694,74 +5085,9 @@ def test_output_index_routes_maintainers_and_model_users(tmp_path: Path) -> None
         "model_capabilities.md",
         "results.tsv",
         "results.history.jsonl",
-        "issues/index.md",
-        "latest_by_cluster.json",
+        "issue_org_bad.md",
     ):
         assert artifact in supporting
-
-
-class TestIssueDirectoryInvariants:
-    """Invariants: issue directory reflects exactly the current run."""
-
-    def test_issue_dir_contains_only_current_run_files(self, tmp_path: Path) -> None:
-        """After generation, issue_*.md files match exactly what was generated."""
-        issues_dir = tmp_path / "issues"
-        issues_dir.mkdir()
-        (issues_dir / "issue_001_crash.md").write_text("stale")
-        (issues_dir / "issue_099_harness.md").write_text("stale")
-        (issues_dir / "README.md").write_text("keep me")
-
-        # Build a snapshot with one crash cluster
-        failed_result = PerformanceResult(
-            model_name="org/broken-model",
-            generation=None,
-            success=False,
-            error_message="RuntimeError: shape mismatch",
-            error_signature="MLX_DECODE_ERROR:abc123",
-            upstream_boundary="generation_started",
-            total_time=0.5,
-        )
-        snapshot = DiagnosticsSnapshot(
-            failed=(failed_result,),
-            failure_clusters=(("MLX_DECODE_ERROR:abc123", (failed_result,)),),
-        )
-        generated = _generate_github_issue_reports(
-            diagnostics_snapshot=snapshot,
-            output_dir=tmp_path,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            repro_bundles={},
-            run_args=None,
-        )
-
-        issue_files = sorted(f.name for f in issues_dir.glob("issue_*.md"))
-        assert len(issue_files) == len(generated), (
-            f"Expected {len(generated)} issue files, found {issue_files}"
-        )
-        assert (issues_dir / "index.md").exists()
-        # Non-issue files must survive
-        assert (issues_dir / "README.md").exists()
-        # Stale files must be gone
-        assert not (issues_dir / "issue_099_harness.md").exists()
-
-    def test_empty_run_clears_all_issue_files(self, tmp_path: Path) -> None:
-        """A run with no failures must leave zero issue_*.md files and refresh index."""
-        issues_dir = tmp_path / "issues"
-        issues_dir.mkdir()
-        (issues_dir / "issue_001_crash.md").write_text("stale")
-
-        _generate_github_issue_reports(
-            diagnostics_snapshot=DiagnosticsSnapshot(),
-            output_dir=tmp_path,
-            versions=_stub_versions(),
-            system_info={"Python Version": "3.13"},
-            repro_bundles={},
-            run_args=None,
-        )
-
-        issue_files = list(issues_dir.glob("issue_*.md"))
-        assert issue_files == [], f"Expected no issue files, found {issue_files}"
-        assert (issues_dir / "index.md").exists()
 
 
 def test_quality_signal_summary_reports_incomplete_thinking_without_fault_language() -> None:

@@ -58,6 +58,20 @@ def test_table_escapers_preserve_their_whitespace_policies() -> None:
     assert check_models.DIAGNOSTICS_ESCAPER.escape(text) == "alpha  <br><br> beta\\|gamma"
 
 
+def test_complete_diagnostics_evidence_uses_a_non_truncating_safe_fence() -> None:
+    """Embedded fences must not shorten complete traceback or output evidence."""
+    evidence = "TRACE-BEGIN\n```text\ninner fence\n```\nTRACE-END"
+    lines: list[str] = []
+
+    check_models._append_markdown_code_block(lines, evidence, language="text")
+
+    rendered = "\n".join(lines)
+    assert evidence in rendered
+    assert "TRACE-BEGIN" in rendered
+    assert "TRACE-END" in rendered
+    assert "truncated" not in rendered.casefold()
+
+
 def test_format_failures_by_package_empty() -> None:
     """Should return empty list when no failures."""
     results = [

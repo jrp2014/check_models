@@ -1680,16 +1680,6 @@ class CatalogingSummaryData:
 
 
 @dataclass(frozen=True)
-class DiagnosticsHistoryInputs:
-    """Optional history inputs for diagnostics report generation."""
-
-    history_path: Path | None = None
-    previous_history: HistoryRunRecord | None = None
-    current_history: HistoryRunRecord | None = None
-    preflight_issues: tuple[str, ...] = ()
-
-
-@dataclass(frozen=True)
 class DiagnosticsArtifacts:
     """Diagnostics artifacts emitted at the end of a run."""
 
@@ -3131,7 +3121,7 @@ def _render_gallery_model(
         ),
         (
             "EOS token",
-            str(prompt.eos_token)
+            prompt.eos_token
             if prompt is not None and prompt.eos_token is not None
             else "not captured",
         ),
@@ -13095,17 +13085,8 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
 # =============================================================================
 
 
-@dataclass(frozen=True)
-class DiagnosticsConfig:
-    """Centralized configuration for diagnostics report behavior."""
-
-    traceback_tail_lines: int = 6  # Lines to keep from traceback tail
-    output_snippet_len: int = 200  # Max chars for sample output
-    recent_run_window: int = 3  # Runs used for reproducibility signal
-    history_max_records: int = 100  # History rows loaded for context
-
-
-DIAGNOSTICS: Final[DiagnosticsConfig] = DiagnosticsConfig()
+_TRACEBACK_TAIL_LINES: Final[int] = 6
+_HISTORY_MAX_RECORDS: Final[int] = 100
 
 # System info keys to include in the environment table (order matters)
 _DIAGNOSTICS_SYSTEM_KEYS: Final[tuple[str, ...]] = (
@@ -13151,30 +13132,6 @@ _DIAGNOSTICS_LIB_NAMES: Final[tuple[str, ...]] = (
 )
 
 ISSUE_EVIDENCE_MODEL_LIMIT: Final[int] = 3
-
-
-@dataclass(frozen=True)
-class FailureHistoryContext:
-    """History-derived context for a single failing model."""
-
-    first_failure_timestamp: str = "unknown"
-    recent_failures: int = 0
-    recent_considered: int = 0
-
-
-@dataclass(frozen=True)
-class DiagnosticsContext:
-    """Shared diagnostics context built once and consumed by renderers."""
-
-    regressions: frozenset[str] = frozenset()
-    recoveries: frozenset[str] = frozenset()
-    new_models: frozenset[str] = frozenset()
-    missing_models: frozenset[str] = frozenset()
-    window_quality_regressions: frozenset[str] = frozenset()
-    window_harness_regressions: frozenset[str] = frozenset()
-    window_generation_regressions: frozenset[str] = frozenset()
-    window_version_deltas: tuple[str, ...] = ()
-    failure_history: dict[str, FailureHistoryContext] = dataclass_field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -14186,85 +14143,8 @@ def _format_traceback_tail(traceback_str: str | None) -> str | None:
     )
     if not lines:
         return None
-    tail = lines[-DIAGNOSTICS.traceback_tail_lines :]
+    tail = lines[-_TRACEBACK_TAIL_LINES:]
     return "\n".join(tail)
-
-
-def _build_failure_history_context(
-    *,
-    failed_models: set[str],
-    history_records: list[HistoryRunRecord],
-) -> dict[str, FailureHistoryContext]:
-    """Compute first-seen and recent reproducibility stats for each failed model."""
-    context: dict[str, FailureHistoryContext] = {}
-
-    for model in failed_models:
-        first_failure_timestamp = "unknown"
-        for record in history_records:
-            model_results = record.get("model_results", {})
-            if not isinstance(model_results, dict):
-                continue
-            info = model_results.get(model)
-            if isinstance(info, dict) and info.get("success") is False:
-                timestamp = record.get("timestamp")
-                if isinstance(timestamp, str) and timestamp:
-                    first_failure_timestamp = timestamp
-                break
-
-        recent_considered = 0
-        recent_failures = 0
-        for record in reversed(history_records):
-            model_results = record.get("model_results", {})
-            if not isinstance(model_results, dict):
-                continue
-            info = model_results.get(model)
-            if not isinstance(info, dict):
-                continue
-            success = info.get("success")
-            if success not in {True, False}:
-                continue
-            recent_considered += 1
-            if success is False:
-                recent_failures += 1
-            if recent_considered >= DIAGNOSTICS.recent_run_window:
-                break
-
-        context[model] = FailureHistoryContext(
-            first_failure_timestamp=first_failure_timestamp,
-            recent_failures=recent_failures,
-            recent_considered=recent_considered,
-        )
-
-    return context
-
-
-def _build_diagnostics_context(
-    *,
-    failed_models: set[str],
-    history_records: list[HistoryRunRecord],
-    comparison: HistoryComparisonSummary | None,
-) -> DiagnosticsContext:
-    """Build immutable diagnostics context from history + comparison data."""
-    history_context = _build_failure_history_context(
-        failed_models=failed_models,
-        history_records=history_records,
-    )
-    if comparison is None:
-        return DiagnosticsContext(failure_history=history_context)
-
-    return DiagnosticsContext(
-        regressions=frozenset(comparison["regressions"]),
-        recoveries=frozenset(comparison["recoveries"]),
-        new_models=frozenset(comparison["new_models"]),
-        missing_models=frozenset(comparison["missing_models"]),
-        window_quality_regressions=frozenset(comparison.get("window_quality_regressions", [])),
-        window_harness_regressions=frozenset(comparison.get("window_harness_regressions", [])),
-        window_generation_regressions=frozenset(
-            comparison.get("window_generation_regressions", []),
-        ),
-        window_version_deltas=tuple(comparison.get("window_version_deltas", [])),
-        failure_history=history_context,
-    )
 
 
 def _build_diagnostics_snapshot(
@@ -14334,33 +14214,6 @@ def _snapshot_has_maintainer_signals(snapshot: DiagnosticsSnapshot) -> bool:
         or snapshot.text_sanity_results
         or snapshot.preflight_issues,
     )
-
-
-def _diagnostics_signal_results(
-    snapshot: DiagnosticsSnapshot,
-) -> tuple[PerformanceResult, ...]:
-    """Return each result with a diagnostics signal exactly once."""
-    by_model = {result.model_name: result for result in (*snapshot.failed, *snapshot.indeterminate)}
-    for result, _sample in (*snapshot.harness_results, *snapshot.text_sanity_results):
-        by_model.setdefault(result.model_name, result)
-    for result, _symptom, _owner in snapshot.stack_signals:
-        by_model.setdefault(result.model_name, result)
-    return tuple(by_model[model_name] for model_name in sorted(by_model))
-
-
-def _diagnostics_assessments(
-    snapshot: DiagnosticsSnapshot,
-    assessments: Mapping[str, CanonicalAssessment] | None = None,
-) -> dict[str, CanonicalAssessment]:
-    """Resolve canonical assessments for diagnostics without report-local policy."""
-    resolved = dict(assessments or {})
-    for result in _diagnostics_signal_results(snapshot):
-        if result.model_name not in resolved:
-            resolved[result.model_name] = _build_canonical_assessment(
-                _collect_observed_evidence(result),
-                result,
-            )
-    return resolved
 
 
 def _issue_component_slug(value: str) -> str:
@@ -14476,28 +14329,6 @@ def _issue_cluster_representative(cluster: IssueCluster) -> PerformanceResult | 
 def _issue_cluster_model_count(cluster: IssueCluster) -> int:
     """Return affected model count for an issue cluster."""
     return len(_issue_cluster_results(cluster))
-
-
-def _issue_cluster_confidence(cluster: IssueCluster) -> MaintainerConfidence:
-    """Return the strongest maintainer-triage confidence in an issue cluster."""
-    confidences = [
-        triage["confidence"]
-        for result in cluster.results
-        if (triage := _maintainer_triage_for_result(result)) is not None
-    ]
-    if "high" in confidences:
-        return "high"
-    if "medium" in confidences:
-        return "medium"
-    return "low"
-
-
-def _issue_cluster_is_mlx_vlm_scope(cluster: IssueCluster) -> bool:
-    """Return whether a cluster belongs in an mlx-vlm/MLX upstream issue."""
-    owner_packages = {
-        part.strip().removeprefix("unresolved: ") for part in cluster.owner.split("/")
-    }
-    return not owner_packages.isdisjoint({"mlx-vlm", "mlx"})
 
 
 def _issue_harness_symptom(
@@ -14860,17 +14691,6 @@ def _log_maintainer_summary(
         )
 
 
-def _format_recent_repro_ratio(history_info: FailureHistoryContext | None) -> str:
-    """Format reproducibility ratio string such as ``2/3 recent runs failed``."""
-    if not history_info:
-        return "n/a"
-    recent_failures = history_info.recent_failures
-    recent_considered = history_info.recent_considered
-    if recent_considered <= 0:
-        return "n/a"
-    return f"{recent_failures}/{recent_considered} recent runs failed"
-
-
 def _cluster_failures_by_pattern(
     results: list[PerformanceResult],
 ) -> dict[str, list[PerformanceResult]]:
@@ -15045,49 +14865,6 @@ def _collect_stack_issue_signals(
     return signals
 
 
-def _diagnostics_header(
-    *,
-    total: int,
-    n_failed: int,
-    n_indeterminate: int,
-    n_harness: int,
-    n_text_sanity: int,
-    n_preflight: int,
-    n_success: int,
-    versions: LibraryVersionDict,
-    image_path: Path | None,
-) -> list[str]:
-    """Build the compact title block for the diagnostics report."""
-    parts: list[str] = ["<!-- markdownlint-disable MD013 -->", ""]
-    version = versions.get("mlx-vlm") or "unknown"
-    parts.append(
-        f"# Diagnostics Report — {n_failed} failure(s), {n_indeterminate} indeterminate, "
-        f"{n_harness} harness issue(s), {n_text_sanity} text-sanity issue(s) "
-        f"(mlx-vlm {version})",
-    )
-    parts.append("")
-    parts.append(
-        f"**Run summary:** {total} attempted, {total - n_indeterminate} evaluated; "
-        f"{n_failed} hard failure(s), {n_harness} harness/integration issue(s), "
-        f"{n_text_sanity} text-sanity/semantic issue(s), "
-        f"{n_indeterminate} indeterminate, {n_preflight} preflight warning(s), "
-        f"{n_success} successful run(s)."
-    )
-    parts.append("")
-
-    if image_path and image_path.exists():
-        try:
-            size_mb = image_path.stat().st_size / (1024 * 1024)
-            parts.append(
-                f"Test image: `{image_path.name}` ({size_mb:.1f} MB).",
-            )
-            parts.append("")
-        except OSError:
-            pass
-
-    return parts
-
-
 def _diagnostics_environment_section(
     *,
     versions: LibraryVersionDict,
@@ -15140,125 +14917,6 @@ def _diagnostics_environment_section(
     return parts
 
 
-def _diagnostics_run_conditions_section(
-    *,
-    results: Sequence[PerformanceResult],
-    versions: LibraryVersionDict,
-    prompt: str,
-    image_path: Path | None,
-    run_args: argparse.Namespace | None,
-) -> list[str]:
-    """Render the public input, prompt, generation, and revision contract."""
-    image_profile = _load_image_input_profile(image_path)
-    image = _run_image_record(image_path, image_profile)
-    if image is None:
-        image_summary = "unavailable"
-    else:
-        dimensions = (
-            f"{image['width']} x {image['height']}"
-            if image["width"] is not None and image["height"] is not None
-            else "unavailable"
-        )
-        megapixels = (
-            f"{image['megapixels']:.2f} MP" if image["megapixels"] is not None else "unavailable"
-        )
-        size = f"{image['size_bytes']} bytes" if image["size_bytes"] is not None else "unavailable"
-        image_summary = (
-            f"{image['name']}; {dimensions}; {megapixels}; {size}; "
-            f"SHA-256 {image['sha256'] or 'unavailable'}"
-        )
-
-    trust_remote_code = bool(getattr(run_args, "trust_remote_code", True))
-    requested_revision = getattr(run_args, "revision", None)
-    requested_revision = str(requested_revision) if requested_revision is not None else None
-    contract_rows = (
-        ("Source image", image_summary),
-        ("Prompt SHA-256", _sha256_text(prompt)),
-        ("trust_remote_code", str(trust_remote_code).lower()),
-    )
-    model_rows: list[tuple[str, ...]] = []
-    for result in results:
-        burden = _prompt_burden_for_result(result, image_profile)
-        provenance = _collect_model_provenance(
-            result.model_name,
-            requested_revision=requested_revision,
-        )
-        processed = (
-            f"{burden.processed_width} x {burden.processed_height}"
-            if burden.processed_width is not None and burden.processed_height is not None
-            else "unavailable"
-        )
-        prompt_tokens = (
-            f"{burden.total_tokens} / {burden.text_tokens_est} / {burden.nontext_tokens_est}"
-            if burden.total_tokens is not None
-            and burden.text_tokens_est is not None
-            and burden.nontext_tokens_est is not None
-            else "unavailable"
-        )
-        model_rows.append(
-            (
-                result.model_name,
-                provenance["requested_revision"] or "unavailable",
-                provenance["resolved_revision"] or "unavailable",
-                processed,
-                str(burden.patch_count) if burden.patch_count is not None else "unavailable",
-                prompt_tokens,
-            )
-        )
-
-    producer = _collect_check_models_provenance()
-    provenance_rows: list[tuple[str, ...]] = [
-        (
-            producer["name"],
-            producer["version"],
-            producer["install_type"],
-            producer["git_revision"] or "unavailable",
-        )
-    ]
-    provenance_rows.extend(
-        (
-            component,
-            provenance["version"] or "unavailable",
-            provenance["install_type"],
-            provenance["source_revision"] or provenance["vcs_revision"] or "unavailable",
-        )
-        for component, provenance in _collect_component_provenance(versions).items()
-        if component != "check_models"
-    )
-    generation_settings = _common_generation_settings(results)
-    settings_block: ReportParagraph | ReportCodeBlock = (
-        ReportCodeBlock(json.dumps(generation_settings, indent=2, sort_keys=True), language="json")
-        if generation_settings
-        else ReportParagraph("Common generation settings: unavailable.")
-    )
-    blocks: tuple[object, ...] = (
-        ReportTable(headers=("Condition", "Value"), rows=contract_rows),
-        ReportParagraph("Common generation settings:"),
-        settings_block,
-        ReportTable(
-            headers=(
-                "Model",
-                "Requested revision",
-                "Resolved revision",
-                "Processed image",
-                "Patches",
-                "Prompt tokens total / text / non-text",
-            ),
-            rows=tuple(model_rows),
-        ),
-        ReportTable(
-            headers=("Component", "Version", "Install type", "Source revision"),
-            rows=tuple(provenance_rows),
-        ),
-    )
-    return _guard_markdownlint_block(
-        render_report_markdown(
-            (ReportSection(title="Run Conditions and Provenance", blocks=blocks),)
-        ),
-        rules=MARKDOWNLINT_TABLE_PIPE_RULES,
-    )
-
-
 def _build_environment_failure_diagnostics(
     *,
     error_message: str,
@@ -15288,35 +14946,6 @@ def _build_environment_failure_diagnostics(
         ),
     )
     return parts
-
-
-def _issue_target_for_package(
-    package: str,
-    *,
-    model_name: str,
-) -> tuple[str, str]:
-    """Map failure package attribution to a likely upstream issue tracker."""
-    target_map: dict[str, tuple[str, str]] = {
-        "mlx-vlm": ("mlx-vlm", "https://github.com/Blaizzy/mlx-vlm/issues/new"),
-        "mlx": ("mlx", "https://github.com/ml-explore/mlx/issues/new"),
-        "mlx-lm": ("mlx-lm", "https://github.com/ml-explore/mlx-lm/issues/new"),
-        ("transformers"): (
-            "transformers",
-            "https://github.com/huggingface/transformers/issues/new",
-        ),
-        ("huggingface-hub"): (
-            "huggingface_hub",
-            "https://github.com/huggingface/huggingface_hub/issues/new",
-        ),
-    }
-    if package in target_map:
-        return target_map[package]
-    if package == "model-config" and "/" in model_name:
-        return (
-            "model repository",
-            f"https://huggingface.co/{quote(model_name, safe='/')}",
-        )
-    return ("mlx-vlm", "https://github.com/Blaizzy/mlx-vlm/issues/new")
 
 
 def _guess_preflight_issue_package(issue: str) -> str:
@@ -16213,497 +15842,6 @@ def _render_issue_queue_table(
     )
 
 
-def _diagnostics_cluster_route(cluster: IssueCluster) -> str:
-    """Return the filing label for a cluster without changing model outcomes."""
-    return {
-        "high": "confirmed",
-        "medium": "probable",
-        "low": "untriaged",
-    }[_issue_cluster_confidence(cluster)]
-
-
-def _diagnostics_impact_section(
-    *,
-    results: Sequence[PerformanceResult],
-    snapshot: DiagnosticsSnapshot,
-    prompt: str,
-    image_path: Path | None,
-) -> list[str]:
-    """Build issue-ready impact and run-condition context."""
-    indeterminate_count = sum(_is_indeterminate_connectivity_failure(result) for result in results)
-    completed_count = sum(result.success for result in results)
-    evaluated_count = len(results) - indeterminate_count
-    image_ref = _issue_repro_image_ref(image_path=image_path, run_args=None)
-    return render_report_markdown(
-        (
-            ReportSection(
-                title="Impact and Run Conditions",
-                blocks=(
-                    ReportKeyValues(
-                        rows=(
-                            ("Models attempted", str(len(results))),
-                            ("Models evaluated", str(evaluated_count)),
-                            ("Indeterminate", str(indeterminate_count)),
-                            ("Crashed", str(len(snapshot.failed))),
-                            ("Completed", str(completed_count)),
-                            ("Prompt", prompt),
-                            ("Image", image_ref),
-                        )
-                    ),
-                ),
-            ),
-        )
-    )
-
-
-def _diagnostics_crash_matrix(failed: Sequence[PerformanceResult]) -> list[str]:
-    """Render every crash independently of filing confidence or owner scope."""
-    if not failed:
-        return []
-    rows: list[tuple[str, ...]] = []
-    details: list[object] = []
-    for result in sorted(failed, key=lambda item: item.model_name):
-        narrative = _build_failure_narrative(result)
-        rows.append(
-            (
-                result.model_name,
-                f"Task outcome: {narrative.task_outcome}",
-                narrative.phase or _UNKNOWN_OWNER,
-                narrative.stage or _UNKNOWN_OWNER,
-                _collapse_preview_whitespace(narrative.primary_exception),
-                f"{narrative.suspected_owner} ({narrative.owner_confidence})",
-            )
-        )
-        detail_blocks: list[object] = [
-            ReportCodeBlock(narrative.primary_exception, language="text")
-        ]
-        if narrative.secondary_exceptions:
-            detail_blocks.append(
-                ReportCodeBlock("\n".join(narrative.secondary_exceptions), language="text")
-            )
-        if normalized_traceback := _normalize_traceback_for_report(result.error_traceback):
-            detail_blocks.append(ReportCodeBlock(normalized_traceback, language="text"))
-        if captured_output := _collect_observed_evidence(result).raw_output.strip():
-            detail_blocks.append(ReportCodeBlock(captured_output, language="text"))
-        details.append(
-            ReportDetails(
-                summary=f"Crash evidence: {result.model_name}",
-                blocks=tuple(detail_blocks),
-            )
-        )
-    return _guard_markdownlint_block(
-        render_report_markdown(
-            (
-                ReportSection(
-                    title="Crash / Failure Matrix",
-                    blocks=(
-                        ReportTable(
-                            headers=(
-                                "Model",
-                                "Outcome",
-                                "Phase",
-                                "Stage",
-                                "Primary exception",
-                                "Suspected owner",
-                            ),
-                            rows=tuple(rows),
-                        ),
-                        *details,
-                    ),
-                ),
-            )
-        ),
-        rules=MARKDOWNLINT_TABLE_PIPE_RULES,
-    )
-
-
-def _diagnostics_indeterminate_matrix(
-    results: Sequence[PerformanceResult],
-) -> list[str]:
-    """Render attempts that could not evaluate a model because input was unreachable."""
-    if not results:
-        return []
-    rows = tuple(
-        (
-            result.model_name,
-            result.failure_phase or "model_load",
-            result.error_stage or "Network Error",
-            _collapse_preview_whitespace(
-                result.root_error_message or result.error_message or "Connectivity unavailable"
-            ),
-            "Retry; no package owner or model-quality conclusion.",
-        )
-        for result in sorted(results, key=lambda item: item.model_name)
-    )
-    return _guard_markdownlint_block(
-        render_report_markdown(
-            (
-                ReportSection(
-                    title="Indeterminate Attempts",
-                    blocks=(
-                        ReportParagraph(
-                            "External connectivity prevented evaluation. These attempts remain "
-                            "visible as evidence but are excluded from failures and issue drafts."
-                        ),
-                        ReportTable(
-                            headers=("Model", "Phase", "Status", "Evidence", "Action"),
-                            rows=rows,
-                        ),
-                    ),
-                ),
-            )
-        ),
-        rules=MARKDOWNLINT_TABLE_PIPE_RULES,
-    )
-
-
-def _diagnostics_observation_section(
-    *,
-    title: str,
-    description: str,
-    results: Sequence[PerformanceResult],
-    assessments: Mapping[str, CanonicalAssessment],
-) -> list[str]:
-    """Render one readiness-scoped observation table with complete evidence."""
-    if not results:
-        return []
-    rows: list[tuple[str, ...]] = []
-    details: list[ReportDetails] = []
-    for result in sorted(results, key=lambda item: item.model_name):
-        assessment = assessments[result.model_name]
-        maintainer = assessment.maintainer
-        observation = (
-            ", ".join((*assessment.model_user.output_anomalies, *maintainer.evidence_codes))
-            or maintainer.failure_origin
-        )
-        rows.append(
-            (
-                result.model_name,
-                observation,
-                maintainer.suspected_owner or _UNKNOWN_OWNER,
-                maintainer.owner_confidence or "unassigned",
-                maintainer.next_action,
-            )
-        )
-        evidence_blocks: list[object] = []
-        if prompt_diagnostics := _prompt_diagnostics_to_json(result.prompt_diagnostics):
-            evidence_blocks.append(
-                ReportCodeBlock(
-                    json.dumps(prompt_diagnostics, indent=2, sort_keys=True),
-                    language="json",
-                )
-            )
-        if normalized_traceback := _normalize_traceback_for_report(result.error_traceback):
-            evidence_blocks.append(ReportCodeBlock(normalized_traceback, language="text"))
-        if output := _collect_observed_evidence(result).raw_output.strip():
-            evidence_blocks.append(ReportCodeBlock(output, language="text"))
-        if evidence_blocks:
-            details.append(
-                ReportDetails(
-                    summary=f"Complete generated output and evidence: {result.model_name}",
-                    blocks=tuple(evidence_blocks),
-                )
-            )
-    return _guard_markdownlint_block(
-        render_report_markdown(
-            (
-                ReportSection(
-                    title=title,
-                    blocks=(
-                        ReportParagraph(description),
-                        ReportTable(
-                            headers=(
-                                "Model",
-                                "Observation",
-                                "Suspected owner",
-                                "Confidence",
-                                "Next action",
-                            ),
-                            rows=tuple(rows),
-                        ),
-                        *details,
-                    ),
-                ),
-            )
-        ),
-        rules=f"{MARKDOWNLINT_TABLE_PIPE_RULES} {MARKDOWNLINT_DETAILS_RULES}",
-    )
-
-
-def _diagnostics_reproduction_observations(
-    snapshot: DiagnosticsSnapshot,
-    assessments: Mapping[str, CanonicalAssessment] | None = None,
-) -> list[str]:
-    """Render signals that need a controlled run before issue filing."""
-    resolved = _diagnostics_assessments(snapshot, assessments)
-    results = tuple(
-        result
-        for result in _diagnostics_signal_results(snapshot)
-        if resolved[result.model_name].maintainer.maintainer_readiness == "needs_reproduction"
-    )
-    return _diagnostics_observation_section(
-        title="Observations Requiring Controlled Reproduction",
-        description=(
-            "These observations do not yet isolate an upstream fault and generate no issue draft."
-        ),
-        results=results,
-        assessments=resolved,
-    )
-
-
-def _diagnostics_issue_matrix(clusters: Sequence[IssueCluster]) -> list[str]:
-    """Render only mlx-vlm/MLX filing-scope clusters as a compact issue matrix."""
-    if not clusters:
-        return []
-    lines = render_report_markdown(
-        (
-            ReportSection(
-                title="mlx-vlm / MLX Issue Matrix",
-                blocks=(
-                    ReportParagraph(
-                        "Routing labels reflect evidence confidence only; a crash remains a "
-                        "conclusive failed task at every confidence level."
-                    ),
-                ),
-            ),
-        )
-    )
-    lines.extend(
-        _guard_markdownlint_block(
-            _render_issue_queue_table(
-                clusters,
-                escape_text=DIAGNOSTICS_ESCAPER.escape,
-                issue_link_for_cluster=_diagnostics_cluster_route,
-                evidence_link_for_cluster=lambda cluster: cluster.source,
-                headers=(
-                    "Target",
-                    "Problem",
-                    "Evidence Snapshot",
-                    "Affected Models",
-                    "Confidence",
-                    "Evidence Type",
-                    "Fixed When",
-                ),
-            ),
-            rules=MARKDOWNLINT_TABLE_PIPE_RULES,
-        )
-    )
-    return lines
-
-
-def _diagnostics_generated_output_section(cluster: IssueCluster) -> list[str]:
-    """Render complete captured model output as per-model expandable evidence."""
-    details: list[ReportDetails] = []
-    for result in _issue_cluster_results(cluster):
-        output = _collect_observed_evidence(result).raw_output
-        if not output.strip():
-            continue
-        details.append(
-            ReportDetails(
-                summary=f"Complete generated output: {result.model_name}",
-                blocks=(ReportCodeBlock(output, language="text"),),
-            )
-        )
-    if not details:
-        return []
-    return _guard_markdownlint_block(
-        render_report_markdown(
-            (
-                ReportSection(
-                    title="Generated Output Evidence",
-                    level=3,
-                    blocks=tuple(details),
-                ),
-            )
-        ),
-        rules=MARKDOWNLINT_DETAILS_RULES,
-    )
-
-
-def _diagnostics_cluster_issue_sections(
-    clusters: Sequence[IssueCluster],
-    *,
-    prompt: str,
-    image_path: Path | None,
-    run_args: argparse.Namespace | None,
-) -> list[str]:
-    """Build pasteable expected/actual/repro/acceptance blocks per scoped cluster."""
-    parts: list[str] = []
-    for issue_number, cluster in enumerate(clusters, start=1):
-        if parts and parts[-1] != "":
-            parts.append("")
-        parts.extend(
-            render_report_markdown(
-                (
-                    ReportSection(
-                        title=(
-                            f"Issue {issue_number}: "
-                            f"{_issue_filing_target_label(cluster.owner)} — "
-                            f"{_issue_subtype_display_label(cluster.issue_subtype)}"
-                        ),
-                        divider=True,
-                    ),
-                )
-            )
-        )
-        parts.append("")
-        parts.extend(_diagnostics_generated_output_section(cluster))
-        parts.append("")
-        parts.extend(
-            render_report_markdown(
-                (
-                    ReportSection(
-                        title="Expected and Actual Behaviour",
-                        level=3,
-                        blocks=(
-                            ReportKeyValues(
-                                rows=(
-                                    (
-                                        "Affected models",
-                                        ", ".join(_issue_cluster_model_names(cluster)),
-                                    ),
-                                    ("Expected", cluster.acceptance_signal),
-                                    ("Actual", _issue_problem_summary(cluster)),
-                                    ("Filing target", _issue_filing_target_label(cluster.owner)),
-                                )
-                            ),
-                        ),
-                    ),
-                )
-            )
-        )
-        parts.append("")
-        parts.extend(
-            render_report_markdown(
-                (
-                    _native_repro_block(
-                        cluster,
-                        prompt=prompt,
-                        image_path=image_path,
-                        run_args=run_args,
-                        heading_level=3,
-                    ),
-                )
-            )
-        )
-        parts.append("")
-        if image_hash_line := _issue_image_hash_line(image_path):
-            parts.extend(("", image_hash_line, ""))
-        parts.extend(_issue_acceptance_section(cluster, heading_level=3))
-    return parts
-
-
-def _diagnostics_prompt_burden_section(clusters: Sequence[IssueCluster]) -> list[str]:
-    """Render relevant prompt/input burden evidence without retokenizing."""
-    rows: list[tuple[str, ...]] = []
-    for cluster in clusters:
-        for result in _issue_cluster_results(cluster):
-            burden = _prompt_burden_for_result(result, None)
-            if burden.kind in {"normal", "unknown", "unavailable"}:
-                continue
-            rows.append(
-                (
-                    result.model_name,
-                    burden.kind,
-                    str(burden.total_tokens if burden.total_tokens is not None else _UNKNOWN_OWNER),
-                    str(
-                        burden.text_tokens_est
-                        if burden.text_tokens_est is not None
-                        else _UNKNOWN_OWNER
-                    ),
-                    str(
-                        burden.nontext_tokens_est
-                        if burden.nontext_tokens_est is not None
-                        else _UNKNOWN_OWNER
-                    ),
-                    burden.source,
-                )
-            )
-    if not rows:
-        return []
-    return _guard_markdownlint_block(
-        render_report_markdown(
-            (
-                ReportSection(
-                    title="Prompt / Input Burden Evidence",
-                    blocks=(
-                        ReportTable(
-                            headers=(
-                                "Model",
-                                "Burden",
-                                "Total tokens",
-                                "Text estimate",
-                                "Non-text estimate",
-                                "Source",
-                            ),
-                            rows=tuple(rows),
-                        ),
-                    ),
-                ),
-            )
-        ),
-        rules=MARKDOWNLINT_TABLE_PIPE_RULES,
-    )
-
-
-def _diagnostics_harness_observations(
-    snapshot: DiagnosticsSnapshot,
-    assessments: Mapping[str, CanonicalAssessment] | None = None,
-) -> list[str]:
-    """Render harness-owned evidence separately from upstream findings."""
-    resolved = _diagnostics_assessments(snapshot, assessments)
-    results = tuple(
-        result
-        for result in _diagnostics_signal_results(snapshot)
-        if resolved[result.model_name].maintainer.maintainer_readiness == "harness_observation"
-    )
-    lines = _diagnostics_observation_section(
-        title="Harness observations",
-        description=(
-            "These observations concern local preflight or harness behaviour and are not "
-            "upstream issue drafts."
-        ),
-        results=results,
-        assessments=resolved,
-    )
-    if snapshot.preflight_issues:
-        lines.extend(
-            render_report_markdown(
-                (
-                    ReportSection(
-                        title="Preflight warnings",
-                        level=3 if results else 2,
-                        blocks=(ReportBulletList(snapshot.preflight_issues),),
-                    ),
-                )
-            )
-        )
-    return lines
-
-
-def _diagnostics_model_config_observations(
-    snapshot: DiagnosticsSnapshot,
-    assessments: Mapping[str, CanonicalAssessment] | None = None,
-) -> list[str]:
-    """Render non-actionable model/output quality observations."""
-    resolved = _diagnostics_assessments(snapshot, assessments)
-    signalled_successes = {
-        result.model_name: result
-        for result in _diagnostics_signal_results(snapshot)
-        if result.success
-        and resolved[result.model_name].maintainer.maintainer_readiness == "not_applicable"
-    }
-    return _diagnostics_observation_section(
-        title="Model/config observations",
-        description=(
-            "These completed-run signals describe model or configuration quality and are "
-            "not presented as upstream library faults."
-        ),
-        results=tuple(signalled_successes.values()),
-        assessments=resolved,
-    )
-
-
 def _partition_success_diagnostics(
     *,
     successful: list[PerformanceResult],
@@ -17101,31 +16239,6 @@ def _collect_repro_env() -> dict[str, str]:
     return env
 
 
-def _write_latest_repro_bundle_index(
-    *,
-    output_dir: Path,
-    bundles: Mapping[str, Path],
-    models: Mapping[str, Mapping[str, str | None]],
-    clusters: Mapping[str, Mapping[str, list[str]]],
-) -> None:
-    """Write the current-run repro index when at least one bundle exists."""
-    if not bundles:
-        return
-    index_payload: dict[str, object] = {
-        "schema_version": "1.0",
-        "generated_at_utc": datetime.now(UTC).isoformat(timespec="seconds"),
-        "models": models,
-        "clusters": clusters,
-    }
-    try:
-        _write_text_file(
-            output_dir / "latest_by_cluster.json",
-            json.dumps(index_payload, indent=2, sort_keys=True) + "\n",
-        )
-    except OSError:
-        logger.exception("Failed to write latest repro-bundle index.")
-
-
 def export_failure_repro_bundles(
     *,
     results: list[PerformanceResult],
@@ -17139,8 +16252,6 @@ def export_failure_repro_bundles(
 ) -> dict[str, Path]:
     """Write reproducibility bundles for failed and issue-clustered results."""
     bundles: dict[str, Path] = {}
-    latest_index_models: dict[str, dict[str, str | None]] = {}
-    latest_index_clusters: dict[str, dict[str, list[str]]] = {}
     timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
 
     prompt_hash = _sha256_text(prompt)
@@ -17274,209 +16385,350 @@ def export_failure_repro_bundles(
             logger.exception("Failed to write repro bundle for %s", result.model_name)
             continue
         bundles[result.model_name] = bundle_path
-        issue_cluster_id = issue_cluster.cluster_id if issue_cluster is not None else None
-        latest_index_models[result.model_name] = {
-            "bundle": bundle_path.name,
-            "issue_cluster_id": issue_cluster_id,
-            "issue_kind": issue_cluster.issue_kind if issue_cluster is not None else None,
-        }
-        if issue_cluster_id is not None:
-            cluster_entry = latest_index_clusters.setdefault(
-                issue_cluster_id,
-                {"models": [], "bundles": []},
-            )
-            cluster_entry["models"].append(result.model_name)
-            cluster_entry["bundles"].append(bundle_path.name)
-
-    _write_latest_repro_bundle_index(
-        output_dir=output_dir,
-        bundles=bundles,
-        models=latest_index_models,
-        clusters=latest_index_clusters,
-    )
 
     return bundles
 
 
-def generate_diagnostics_report(
-    *,
-    results: list[PerformanceResult],
-    filename: Path,
-    versions: LibraryVersionDict,
-    system_info: dict[str, str],
-    prompt: str,
-    image_path: Path | None = None,
-    run_args: argparse.Namespace | None = None,
-    history: DiagnosticsHistoryInputs | None = None,
-    repro_bundles: Mapping[str, Path] | None = None,
-    diagnostics_snapshot: DiagnosticsSnapshot | None = None,
-    issue_clusters: Sequence[IssueCluster] | None = None,
-    assessments: Mapping[str, CanonicalAssessment] | None = None,
-) -> bool:
-    """Generate a Markdown diagnostics report structured for upstream issue filing.
-
-    The report is a self-contained, issue-ready mlx-vlm artifact: it clusters
-    failures by root-cause pattern, highlights integration/runtime signals from
-    successful models, and embeds the bounded trace, prompt, and native-repro
-    evidence needed for filing. Separate model/config observations remain in an
-    appendix instead of being presented as upstream mlx-vlm issues.
-
-    Args:
-        results: All PerformanceResult objects from the run.
-        filename: Output path for the diagnostics .md file.
-        versions: Library version mapping for the environment table.
-        system_info: System characteristics dict from get_system_characteristics().
-        prompt: The prompt that was used.
-        image_path: Path to the test image (for reproducibility section).
-        run_args: Optional parsed CLI args from this run for exact repro commands.
-        history: Optional history inputs for first-seen/repro/regression context.
-        repro_bundles: Optional model->bundle path mapping from repro export.
-        diagnostics_snapshot: Optional cached diagnostics classification for this run.
-        issue_clusters: Optional cached root-cause clusters derived from the snapshot.
-        assessments: Optional cached canonical assessments keyed by model name.
-
-    Returns:
-        True if the report was written (i.e. there was something to report),
-        False if skipped because there were no failures or harness issues.
-    """
-    del repro_bundles  # Kept in the public call contract; diagnostics now embeds evidence.
-
-    if diagnostics_snapshot is None:
-        diagnostics_snapshot = _build_diagnostics_snapshot(
-            results=results,
-            prompt=prompt,
-            preflight_issues=history.preflight_issues if history is not None else (),
-        )
-
-    failed = list(diagnostics_snapshot.failed)
-    indeterminate = list(diagnostics_snapshot.indeterminate)
-    harness_results = list(diagnostics_snapshot.harness_results)
-    stack_signals = list(diagnostics_snapshot.stack_signals)
-    text_sanity_results = list(diagnostics_snapshot.text_sanity_results)
-    preflight_issues = list(diagnostics_snapshot.preflight_issues)
-    successful_count = sum(result.success for result in results)
-
-    if (
-        not failed
-        and not indeterminate
-        and not harness_results
-        and not stack_signals
-        and not text_sanity_results
-        and not preflight_issues
-    ):
-        return False
-
-    resolved_assessments = _diagnostics_assessments(diagnostics_snapshot, assessments)
-    clusters = tuple(
-        issue_clusters
-        if issue_clusters is not None
-        else _build_issue_clusters(
-            diagnostics_snapshot,
-            assessments=resolved_assessments,
-        )
-    )
-    mlx_vlm_clusters = tuple(
-        cluster for cluster in clusters if _issue_cluster_is_mlx_vlm_scope(cluster)
-    )
-    observation_clusters = tuple(
-        cluster for cluster in clusters if not _issue_cluster_is_mlx_vlm_scope(cluster)
-    )
-    confirmed_failures = tuple(
+def _partition_diagnostics(
+    context: ReportRenderContext,
+) -> tuple[
+    tuple[PerformanceResult, ...],
+    tuple[PerformanceResult, ...],
+    tuple[PerformanceResult, ...],
+]:
+    """Partition maintainer evidence using only cached current-run assessments."""
+    assessments = dict(context.assessments)
+    actionable = tuple(
         result
-        for result in failed
-        if resolved_assessments[result.model_name].maintainer.maintainer_readiness == "issue_ready"
+        for result in context.result_set.results
+        if assessments[result.model_name].maintainer_status == "actionable_failure"
     )
-    other_confirmed_results = tuple(
-        result for cluster in observation_clusters for result in _issue_cluster_results(cluster)
+    observations = tuple(
+        result
+        for result in context.result_set.results
+        if assessments[result.model_name].maintainer_status == "observation_needs_reproduction"
+    )
+    indeterminate = tuple(
+        result
+        for result in context.result_set.results
+        if assessments[result.model_name].execution == "indeterminate"
+    )
+    return actionable, observations, indeterminate
+
+
+def _diagnostics_fact(value: object | None) -> str:
+    """Render one optional factual value without adding interpretation."""
+    if value is None or value == "":
+        return "unavailable"
+    if isinstance(value, bool):
+        return str(value).lower()
+    if isinstance(value, str):
+        return value
+    if isinstance(value, int | float):
+        return str(value)
+    return json.dumps(_jsonify_cli_value(value), sort_keys=True)
+
+
+def _diagnostics_exception_lines(result: PerformanceResult) -> tuple[str, ...]:
+    """Return the complete recorded exception chain in root-to-wrapper order."""
+    if result.exception_chain:
+        return tuple(
+            f"{item.module}.{item.exception_type}: {item.message}"
+            for item in result.exception_chain
+        )
+    exception_type = result.root_error_type or result.error_type
+    module = result.root_error_module
+    message = result.root_error_message or result.error_message
+    if exception_type is None and message is None:
+        return ("unavailable",)
+    qualified_type = (
+        f"{module}.{exception_type}"
+        if module is not None and exception_type is not None
+        else exception_type or module or "Exception"
+    )
+    return (f"{qualified_type}: {message or 'unavailable'}",)
+
+
+def _diagnostics_repro_command(
+    result: PerformanceResult,
+    *,
+    prompt: str,
+    image_path: Path | None,
+) -> str:
+    """Build a direct native repro command from recorded current-run facts."""
+    generation_kwargs = (
+        result.prompt_diagnostics.generate_kwargs if result.prompt_diagnostics is not None else {}
+    )
+    run_args = argparse.Namespace(
+        max_tokens=result.requested_max_tokens or DEFAULT_MAX_TOKENS,
+        temperature=generation_kwargs.get("temperature", DEFAULT_TEMPERATURE),
+        revision=generation_kwargs.get("revision"),
+        eos_tokens=generation_kwargs.get("eos_tokens"),
+        enable_thinking=generation_kwargs.get("enable_thinking", False),
+        thinking_budget=generation_kwargs.get("thinking_budget"),
+        thinking_start_token=generation_kwargs.get("thinking_start_token"),
+        thinking_end_token=generation_kwargs.get(
+            "thinking_end_token",
+            DEFAULT_THINKING_END_MARKER,
+        ),
+    )
+    image_ref = _issue_repro_image_ref(image_path=image_path, run_args=None)
+    return build_native_mlx_vlm_repro_command_spec(
+        model_name=result.model_name,
+        prompt=prompt,
+        image_ref=image_ref,
+        run_args=run_args,
+    ).shell_command()
+
+
+def _diagnostics_result_facts(
+    result: PerformanceResult,
+    assessment: ResultAssessment,
+) -> tuple[tuple[str, str], ...]:
+    """Return exact per-model runtime and provenance fields for maintainers."""
+    prompt_diagnostics = result.prompt_diagnostics
+    runtime = result.runtime_diagnostics
+    provenance = _collect_model_provenance(result.model_name)
+    generation_kwargs = prompt_diagnostics.generate_kwargs if prompt_diagnostics is not None else {}
+    return (
+        ("Execution", assessment.execution),
+        ("Maintainer status", assessment.maintainer_status),
+        ("Observations", ", ".join(assessment.observations) or "none"),
+        ("Phase", _diagnostics_fact(result.failure_phase)),
+        ("Stage", _diagnostics_fact(result.error_stage)),
+        ("Package", _diagnostics_fact(result.error_package)),
+        ("Model revision", _diagnostics_fact(provenance["resolved_revision"])),
+        (
+            "Processor class",
+            _diagnostics_fact(
+                prompt_diagnostics.processor_class if prompt_diagnostics is not None else None
+            ),
+        ),
+        (
+            "Tokenizer class",
+            _diagnostics_fact(
+                prompt_diagnostics.tokenizer_class if prompt_diagnostics is not None else None
+            ),
+        ),
+        (
+            "Stop reason",
+            _diagnostics_fact(runtime.stop_reason if runtime is not None else None),
+        ),
+        (
+            "Prompt tokens",
+            _diagnostics_fact(_generation_int_metric(result.generation, "prompt_tokens")),
+        ),
+        (
+            "Generation tokens",
+            _diagnostics_fact(_generation_int_metric(result.generation, "generation_tokens")),
+        ),
+        (
+            "Configured EOS token ID",
+            _diagnostics_fact(
+                prompt_diagnostics.eos_token_id if prompt_diagnostics is not None else None
+            ),
+        ),
+        (
+            "Configured EOS token",
+            _diagnostics_fact(
+                prompt_diagnostics.eos_token if prompt_diagnostics is not None else None
+            ),
+        ),
+        (
+            "Configured thinking start token",
+            _diagnostics_fact(generation_kwargs.get("thinking_start_token")),
+        ),
+        (
+            "Configured thinking end token",
+            _diagnostics_fact(generation_kwargs.get("thinking_end_token")),
+        ),
     )
 
-    parts: list[str] = _diagnostics_header(
-        total=len(results),
-        n_failed=len(failed),
-        n_indeterminate=len(indeterminate),
-        n_harness=len(harness_results),
-        n_text_sanity=len(text_sanity_results),
-        n_preflight=len(preflight_issues),
-        n_success=successful_count,
-        versions=versions,
-        image_path=image_path,
-    )
+
+def _diagnostics_model_entry(
+    result: PerformanceResult,
+    assessment: ResultAssessment,
+    *,
+    prompt: str,
+    image_path: Path | None,
+    heading_level: int,
+) -> list[str]:
+    """Render one model's complete maintainer evidence in priority order."""
+    parts = [f"{'#' * heading_level} {MARKDOWN_ESCAPER.escape(result.model_name)}", ""]
+    if assessment.execution == "crashed":
+        parts.extend([f"{'#' * (heading_level + 1)} Root exception and chain", ""])
+        _append_markdown_code_block(
+            parts,
+            "\n".join(_diagnostics_exception_lines(result)),
+            language="text",
+        )
+        parts.extend([f"{'#' * (heading_level + 1)} Complete traceback", ""])
+        _append_markdown_code_block(
+            parts,
+            _home_relative_report_text(result.error_traceback or "unavailable"),
+            language="text",
+        )
+
+    parts.extend([f"{'#' * (heading_level + 1)} Execution and provenance", ""])
     parts.extend(
-        _diagnostics_impact_section(
-            results=results,
-            snapshot=diagnostics_snapshot,
-            prompt=prompt,
-            image_path=image_path,
+        render_report_markdown((ReportKeyValues(_diagnostics_result_facts(result, assessment)),))
+    )
+
+    generated_output = _generation_text_value(result.generation)
+    output_label = (
+        "Complete partial output" if assessment.execution == "crashed" else "Complete output"
+    )
+    parts.extend([f"{'#' * (heading_level + 1)} {output_label}", ""])
+    _append_markdown_code_block(
+        parts,
+        generated_output or "(empty)",
+        language="text",
+    )
+    if result.captured_output_on_fail is not None:
+        parts.extend([f"{'#' * (heading_level + 1)} Captured stdout/stderr", ""])
+        _append_markdown_code_block(parts, result.captured_output_on_fail, language="text")
+
+    parts.extend([f"{'#' * (heading_level + 1)} Reproduction command", ""])
+    _append_markdown_code_block(
+        parts,
+        _diagnostics_repro_command(result, prompt=prompt, image_path=image_path),
+        language="bash",
+    )
+    return parts
+
+
+def _diagnostics_partition_section(
+    *,
+    title: str,
+    results: Sequence[PerformanceResult],
+    assessments: Mapping[str, ResultAssessment],
+    prompt: str,
+    image_path: Path | None,
+) -> list[str]:
+    """Render one direct current-run diagnostics partition."""
+    parts = [f"## {title}", ""]
+    if not results:
+        return [*parts, "None.", ""]
+    for result in results:
+        parts.extend(
+            _diagnostics_model_entry(
+                result,
+                assessments[result.model_name],
+                prompt=prompt,
+                image_path=image_path,
+                heading_level=3,
+            )
+        )
+    return parts
+
+
+def _diagnostics_provenance_environment(
+    *,
+    prompt: str,
+    library_versions: LibraryVersionDict,
+    system_info: Mapping[str, str],
+) -> list[str]:
+    """Render run prompt, component versions, and system facts after model evidence."""
+    parts = ["## Provenance and Environment", "", "### Prompt", ""]
+    _append_markdown_code_block(parts, prompt, language="text")
+    rows = tuple(
+        (component, value)
+        for component, value in _collect_report_component_rows(
+            versions=library_versions,
+            system_info=dict(system_info),
+            library_names=_DIAGNOSTICS_LIB_NAMES,
+            system_keys=_DIAGNOSTICS_SYSTEM_KEYS,
         )
     )
-    parts.append("")
-    parts.extend(
-        _diagnostics_run_conditions_section(
-            results=results,
-            versions=versions,
-            prompt=prompt,
-            image_path=image_path,
-            run_args=run_args,
+    parts.extend(["### Components", ""])
+    if rows:
+        parts.extend(
+            _guard_markdownlint_block(
+                render_report_markdown((ReportTable(headers=("Component", "Value"), rows=rows),)),
+                rules=MARKDOWNLINT_TABLE_PIPE_RULES,
+            )
         )
-    )
-    parts.append("")
-    parts.extend(_diagnostics_crash_matrix(confirmed_failures))
-    parts.extend(_diagnostics_issue_matrix(mlx_vlm_clusters))
+    else:
+        parts.extend(["Environment and component provenance unavailable.", ""])
+    return parts
+
+
+def generate_diagnostics_report(
+    results: Sequence[PerformanceResult],
+    filename: Path,
+    *,
+    prompt: str,
+    library_versions: LibraryVersionDict,
+    system_info: Mapping[str, str],
+    report_context: ReportRenderContext,
+    image_path: Path | None = None,
+) -> None:
+    """Write current-run maintainer evidence without reclassifying results."""
+    del results  # The cached context is the sole classification and result source.
+    assessments = dict(report_context.assessments)
+    actionable, observations, indeterminate = _partition_diagnostics(report_context)
+    counts = _run_outcome_counts(report_context.assessments)
+    parts = ["<!-- markdownlint-disable MD013 -->", "", "# Diagnostics", ""]
     parts.extend(
-        _diagnostics_cluster_issue_sections(
-            mlx_vlm_clusters,
-            prompt=prompt,
-            image_path=image_path,
-            run_args=run_args,
-        )
-    )
-    parts.extend(_diagnostics_prompt_burden_section(mlx_vlm_clusters))
-    parts.extend(
-        _diagnostics_observation_section(
-            title="Other confirmed maintainer findings",
-            description=(
-                "These confirmed findings are routed to maintainers outside the primary "
-                "mlx-vlm / MLX filing scope."
+        [
+            "## Run Outcome Counts",
+            "",
+            *_guard_markdownlint_block(
+                render_report_markdown(
+                    (
+                        ReportTable(
+                            headers=("Outcome", "Count"),
+                            rows=(
+                                ("Attempted", str(counts["models_attempted"])),
+                                ("Evaluated", str(counts["models_evaluated"])),
+                                ("Completed", str(counts["models_completed"])),
+                                ("Crashed", str(counts["models_crashed"])),
+                                ("Indeterminate", str(counts["models_indeterminate"])),
+                            ),
+                        ),
+                    )
+                ),
+                rules=MARKDOWNLINT_TABLE_PIPE_RULES,
             ),
-            results=other_confirmed_results,
-            assessments=resolved_assessments,
+        ]
+    )
+    parts.extend(
+        _diagnostics_partition_section(
+            title="Actionable Failures",
+            results=actionable,
+            assessments=assessments,
+            prompt=prompt,
+            image_path=image_path,
         )
     )
     parts.extend(
-        _diagnostics_reproduction_observations(
-            diagnostics_snapshot,
-            resolved_assessments,
+        _diagnostics_partition_section(
+            title="Successful Observations Requiring Reproduction",
+            results=observations,
+            assessments=assessments,
+            prompt=prompt,
+            image_path=image_path,
         )
     )
     parts.extend(
-        _diagnostics_harness_observations(
-            diagnostics_snapshot,
-            resolved_assessments,
-        )
-    )
-    parts.extend(_diagnostics_indeterminate_matrix(indeterminate))
-    parts.extend(
-        _diagnostics_model_config_observations(
-            diagnostics_snapshot,
-            resolved_assessments,
+        _diagnostics_partition_section(
+            title="Indeterminate Attempts",
+            results=indeterminate,
+            assessments=assessments,
+            prompt=prompt,
+            image_path=image_path,
         )
     )
     parts.extend(
-        _diagnostics_environment_section(
-            versions=versions,
+        _diagnostics_provenance_environment(
+            prompt=prompt,
+            library_versions=library_versions,
             system_info=system_info,
-        ),
+        )
     )
     while parts and parts[-1] == "":
         parts.pop()
-
-    try:
-        _write_text_file(filename, "\n".join(parts) + "\n")
-    except OSError:
-        logger.exception("Failed to write diagnostics report to %s", filename)
-        return False
-    else:
-        return True
+    _write_text_file(filename, "\n".join(parts) + "\n")
 
 
 def format_issues_summary_text(
@@ -26786,7 +26038,7 @@ def _load_latest_history_record(history_path: Path) -> HistoryRunRecord | None:
 def _load_history_run_records(
     history_path: Path | None,
     *,
-    max_records: int = DIAGNOSTICS.history_max_records,
+    max_records: int = _HISTORY_MAX_RECORDS,
 ) -> list[HistoryRunRecord]:
     """Load up to ``max_records`` run entries from append-only history JSONL."""
     if history_path is None or not history_path.exists():
@@ -27669,9 +26921,10 @@ def generate_output_index_report(
     diagnostics_written = (
         diagnostics_artifacts is not None and diagnostics_artifacts.diagnostics_written
     )
-    issue_index = output_paths.diagnostics.parent.parent / "issues" / "index.md"
-    repro_index = (
-        output_paths.diagnostics.parent.parent / "repro_bundles" / "latest_by_cluster.json"
+    issue_reports = (
+        tuple(sorted(diagnostics_artifacts.issue_reports.values()))
+        if diagnostics_artifacts is not None
+        else ()
     )
     md = [
         "# Check Models Output Index",
@@ -27762,21 +27015,14 @@ def generate_output_index_report(
             + " contains the stable run-level contract."
         ),
     ]
-    if diagnostics_written:
-        md.extend(
-            [
-                (
-                    "- "
-                    + _output_index_link(filename, issue_index, "issues/index.md")
-                    + " indexes supporting issue drafts."
-                ),
-                (
-                    "- "
-                    + _output_index_link(filename, repro_index, "latest_by_cluster.json")
-                    + " indexes supporting reproduction bundles."
-                ),
-            ]
+    md.extend(
+        (
+            "- "
+            + _output_index_link(filename, issue_path, issue_path.name)
+            + " is a factual crash issue draft."
         )
+        for issue_path in issue_reports
+    )
     md.extend(
         [
             "",
@@ -27807,24 +27053,18 @@ def generate_output_index_report(
         ]
     )
     if diagnostics_written:
+        md.append(
+            "- Start with "
+            + _output_index_link(filename, output_paths.diagnostics, "diagnostics.md")
+            + " for complete current-run maintainer evidence."
+        )
         md.extend(
-            [
-                (
-                    "- Start with "
-                    + _output_index_link(filename, output_paths.diagnostics, "diagnostics.md")
-                    + " for owner grouping, traceback excerpts, and failure clusters."
-                ),
-                (
-                    "- Use "
-                    + _output_index_link(filename, issue_index, "issues/index.md")
-                    + " for paste-ready upstream issue drafts."
-                ),
-                (
-                    "- Use "
-                    + _output_index_link(filename, repro_index, "latest_by_cluster.json")
-                    + " to find the current-run repro bundles without scanning the archive."
-                ),
-            ]
+            (
+                "- Use "
+                + _output_index_link(filename, issue_path, issue_path.name)
+                + " for the corresponding actionable crash."
+            )
+            for issue_path in issue_reports
         )
     else:
         md.append("- No maintainer issue queue was generated for this run.")
@@ -28314,94 +27554,6 @@ def _log_history_comparison(
         )
 
 
-def _issue_title(cluster: IssueCluster) -> str:
-    """Build the GitHub issue draft title for a cluster."""
-    symptom = _sanitize_bpe_display(_issue_problem_summary(cluster), max_len=96).strip().rstrip(".")
-    if not symptom:
-        symptom = _issue_subtype_display_label(cluster.issue_subtype)
-    owner_label = cluster.owner.replace("[", r"\[").replace("]", r"\]")
-    subtype_label = (
-        _issue_subtype_display_label(cluster.issue_subtype).replace("[", r"\[").replace("]", r"\]")
-    )
-    return (
-        f"\\[{owner_label}\\]\\[{subtype_label}\\] "
-        f"{symptom} affecting {_issue_cluster_model_count(cluster)} model(s)"
-    )
-
-
-def _issue_summary_section(cluster: IssueCluster) -> list[str]:
-    """Build the action-oriented Summary section for one issue cluster."""
-    parts = ["", "## Summary", ""]
-    model_count = _issue_cluster_model_count(cluster)
-    parts.append(
-        f"{model_count} model(s) show **{MARKDOWN_ESCAPER.escape(_issue_subtype_display_label(cluster.issue_subtype))}** "
-        f"that should be filed against {MARKDOWN_ESCAPER.escape(_issue_filing_target_label(cluster.owner))}."
-    )
-    parts.append("")
-    parts.append(
-        f"- **Observed problem:** {MARKDOWN_ESCAPER.escape(_issue_problem_summary(cluster))}"
-    )
-    parts.append(
-        f"- **Target:** {MARKDOWN_ESCAPER.escape(_issue_filing_target_label(cluster.owner))}"
-    )
-    parts.append(f"- **Affected models:** {model_count}")
-    parts.append(f"- **Fixed when:** {MARKDOWN_ESCAPER.escape(_issue_queue_fixed_when(cluster))}")
-    parts.append("")
-    return parts
-
-
-def _issue_bundle_link(
-    model_name: str,
-    repro_bundles: Mapping[str, Path],
-    *,
-    label: str = "optional JSON",
-) -> str:
-    """Return the issue-draft repro-bundle link for a model, if available."""
-    bundle = repro_bundles.get(model_name)
-    if bundle is None:
-        return ""
-    return f"[{MARKDOWN_ESCAPER.escape(label)}]({_github_published_output_url('repro_bundles', bundle.name)})"
-
-
-def _issue_model_signal(
-    result: PerformanceResult,
-    *,
-    stack_symptoms: Mapping[str, str],
-) -> str:
-    """Return the strongest per-model signal for an affected-model row."""
-    if result.model_name in stack_symptoms:
-        return stack_symptoms[result.model_name]
-    if not result.success:
-        narrative = _build_failure_narrative(result)
-        return _simplify_failure_message(
-            narrative.primary_exception,
-            model_name=result.model_name,
-        )
-    triage = _maintainer_triage_for_result(result)
-    if triage is not None:
-        if evidence_text := _maintainer_triage_evidence_text(triage):
-            return evidence_text
-        if triage["summary"] and triage["summary"] != "no flagged signals":
-            return triage["summary"]
-        issue_subtype = triage.get("issue_subtype")
-        return issue_subtype or triage["issue_kind"]
-    return result.error_message or "clustered issue signal"
-
-
-_PARAMETERS_NOT_IN_MODEL_ROW_RE: Final[re.Pattern[str]] = re.compile(
-    r"\b(Received\s+\d+\s+parameters?\s+not\s+in\s+model)\b",
-    re.IGNORECASE,
-)
-
-
-def _compact_issue_table_signal(signal: str) -> str:
-    """Trim verbose raw error text for compact issue-draft table rows."""
-    normalized = re.sub(r"\s+", " ", signal).strip()
-    if match := _PARAMETERS_NOT_IN_MODEL_ROW_RE.search(normalized):
-        return match.group(1)
-    return normalized
-
-
 def _guard_markdownlint_block(lines: Sequence[str], *, rules: str) -> list[str]:
     """Wrap Markdown lines with markdownlint disable/enable comments."""
     return [
@@ -28410,70 +27562,6 @@ def _guard_markdownlint_block(lines: Sequence[str], *, rules: str) -> list[str]:
         *lines,
         f"<!-- markdownlint-enable {rules} -->",
     ]
-
-
-def _issue_affected_models_section(
-    cluster: IssueCluster,
-    *,
-    repro_bundles: Mapping[str, Path],
-) -> list[str]:
-    """Build the Affected Models table for one issue cluster."""
-    stack_symptoms = {
-        result.model_name: symptom for result, symptom, _owner in cluster.stack_signals
-    }
-    rows: list[tuple[str, ...]] = []
-    for result in _issue_cluster_results(cluster):
-        triage = _maintainer_triage_for_result(result)
-        context = _maintainer_triage_context_text(triage) if triage is not None else None
-        rows.append(
-            (
-                f"`{MARKDOWN_ESCAPER.escape(result.model_name)}`",
-                MARKDOWN_ESCAPER.escape(
-                    _compact_issue_table_signal(
-                        _issue_model_signal(result, stack_symptoms=stack_symptoms)
-                    )
-                ),
-                MARKDOWN_ESCAPER.escape(context or ""),
-                _issue_bundle_link(result.model_name, repro_bundles),
-            )
-        )
-
-    parts = ["", "## Affected Models", ""]
-    parts.extend(
-        _guard_markdownlint_block(
-            render_report_markdown(
-                (
-                    ReportTable(
-                        headers=("Model", "Observed Behavior", "Token Counts", "Optional Context"),
-                        rows=tuple(rows),
-                        markdown_escaped=True,
-                    ),
-                )
-            ),
-            rules=MARKDOWNLINT_TABLE_PIPE_RULES,
-        )
-    )
-    parts.append("")
-    return parts
-
-
-def _issue_failure_evidence(result: PerformanceResult) -> list[str]:
-    """Build failure-specific evidence for one affected model."""
-    parts = [f"### `{MARKDOWN_ESCAPER.escape(result.model_name)}`", ""]
-    narrative = _build_failure_narrative(result)
-    parts.append("Observed error:")
-    _append_markdown_code_block(parts, narrative.primary_exception, language="text")
-    if narrative.secondary_exceptions:
-        parts.append("Exception chain:")
-        _append_markdown_code_block(
-            parts,
-            "\n".join(narrative.secondary_exceptions),
-            language="text",
-        )
-    if normalized_traceback := _normalize_traceback_for_report(result.error_traceback):
-        parts.append("Traceback:")
-        _append_markdown_code_block(parts, normalized_traceback, language="text")
-    return parts
 
 
 def _output_preview_needles(
@@ -28488,186 +27576,6 @@ def _output_preview_needles(
         if kind == "token_leak"
     ]
     return tuple(_dedupe_preserve_order(needles))
-
-
-def _issue_output_excerpt(
-    result: PerformanceResult,
-    *,
-    max_chars: int,
-) -> str:
-    """Return issue evidence output excerpt, centered on explicit leak markers when present."""
-    generation_text = (
-        str(getattr(result.generation, "text", "") or "").strip()
-        if result.generation is not None
-        else ""
-    )
-    if not generation_text:
-        return ""
-    return _center_text_preview_on_needles(
-        generation_text,
-        needles=_output_preview_needles(_quality_analysis_for_result(result)),
-        max_chars=max_chars,
-    )
-
-
-def _issue_harness_evidence(result: PerformanceResult) -> list[str]:
-    """Build harness-specific evidence for one affected model."""
-    parts = [f"### `{MARKDOWN_ESCAPER.escape(result.model_name)}`", ""]
-    analysis = _quality_analysis_for_result(result)
-    unique_observations = _dedupe_preserve_order(_harness_observations(analysis))
-    if unique_observations:
-        parts.append("Observed signals:")
-        parts.append("")
-        parts.extend(f"- {MARKDOWN_ESCAPER.escape(item)}" for item in unique_observations)
-        parts.append("")
-
-    sample_output = _issue_output_excerpt(result, max_chars=DIAGNOSTICS.output_snippet_len)
-    if sample_output:
-        parts.append("Sample output:")
-        _append_markdown_code_block(parts, sample_output, language="text")
-    return parts
-
-
-def _issue_stack_evidence(cluster: IssueCluster) -> list[str]:
-    """Build stack-signal evidence for clustered successful-run anomalies."""
-    if not cluster.stack_signals:
-        return []
-    rows: list[tuple[str, ...]] = []
-    for result, symptom, owner in cluster.stack_signals:
-        generation = result.generation
-        prompt_tokens = int(getattr(generation, "prompt_tokens", 0) or 0) if generation else 0
-        generated_tokens = (
-            int(getattr(generation, "generation_tokens", 0) or 0) if generation else 0
-        )
-        ratio = f"{(generated_tokens / prompt_tokens):.2%}" if prompt_tokens > 0 else "n/a"
-        rows.append(
-            (
-                f"`{MARKDOWN_ESCAPER.escape(result.model_name)}`",
-                fmt_num(prompt_tokens),
-                fmt_num(generated_tokens),
-                ratio,
-                MARKDOWN_ESCAPER.escape(symptom),
-                f"`{MARKDOWN_ESCAPER.escape(owner)}`",
-            )
-        )
-    parts = ["### Stack Signals", ""]
-    parts.extend(
-        render_report_markdown(
-            (
-                ReportTable(
-                    headers=(
-                        "Model",
-                        "Prompt Tok",
-                        "Output Tok",
-                        "Output/Prompt",
-                        "Symptom",
-                        "Owner",
-                    ),
-                    rows=tuple(rows),
-                    markdown_escaped=True,
-                ),
-            )
-        )
-    )
-    parts.append("")
-    return parts
-
-
-def _issue_minimal_evidence_for_result(
-    result: PerformanceResult,
-    *,
-    stack_symptoms: Mapping[str, str],
-) -> list[str]:
-    """Return a few standalone evidence bullets for the pasteable issue body."""
-    bullets: list[str] = []
-    if result.model_name in stack_symptoms:
-        bullets.append(
-            f"`{MARKDOWN_ESCAPER.escape(result.model_name)}`: "
-            f"{MARKDOWN_ESCAPER.escape(stack_symptoms[result.model_name])}"
-        )
-    elif not result.success:
-        narrative = _build_failure_narrative(result)
-        observed = _simplify_failure_message(
-            narrative.primary_exception,
-            model_name=result.model_name,
-        )
-        bullets.append(
-            f"`{MARKDOWN_ESCAPER.escape(result.model_name)}` fails with: "
-            f"{MARKDOWN_ESCAPER.escape(observed)}"
-        )
-        if narrative.secondary_exceptions:
-            secondary_text = _truncate_text_preview(
-                " -> ".join(narrative.secondary_exceptions),
-                max_chars=180,
-            )
-            bullets.append(f"Later exceptions: {MARKDOWN_ESCAPER.escape(secondary_text)}")
-    else:
-        analysis = _quality_analysis_for_result(result)
-        bullets.extend(
-            (
-                f"`{MARKDOWN_ESCAPER.escape(result.model_name)}`: "
-                f"{MARKDOWN_ESCAPER.escape(observation)}"
-            )
-            for observation in _dedupe_preserve_order(_harness_observations(analysis))[:2]
-        )
-
-    generation_text = _issue_output_excerpt(result, max_chars=320)
-    if generation_text:
-        preview = " ".join(generation_text.split())
-        bullets.append(f"Output excerpt: `{MARKDOWN_ESCAPER.escape(preview)}`")
-    return bullets
-
-
-def _issue_minimal_evidence_section(cluster: IssueCluster) -> list[str]:
-    """Build compact inline evidence before repro commands."""
-    parts = ["", "## Minimal Evidence", ""]
-    stack_symptoms = {
-        result.model_name: symptom for result, symptom, _owner in cluster.stack_signals
-    }
-    evidence_lines: list[str] = []
-    for result in _issue_cluster_results(cluster)[:2]:
-        evidence_lines.extend(
-            _issue_minimal_evidence_for_result(result, stack_symptoms=stack_symptoms)
-        )
-    if evidence_lines:
-        parts.extend(f"- {line}" for line in evidence_lines[:4])
-    else:
-        parts.append(f"- {MARKDOWN_ESCAPER.escape(cluster.symptom)}")
-    parts.append("")
-    return parts
-
-
-def _issue_evidence_section(cluster: IssueCluster) -> list[str]:
-    """Build the Evidence section for one issue cluster."""
-    parts = ["", "## Appendix: Detailed Evidence", ""]
-    if cluster.stack_signals:
-        parts.extend(_issue_stack_evidence(cluster))
-
-    for result in _issue_cluster_results(cluster)[:ISSUE_EVIDENCE_MODEL_LIMIT]:
-        if not result.success:
-            parts.extend(_issue_failure_evidence(result))
-        else:
-            parts.extend(_issue_harness_evidence(result))
-
-    if _issue_cluster_model_count(cluster) > ISSUE_EVIDENCE_MODEL_LIMIT:
-        parts.append("_Additional affected models are listed in the Affected Models table above._")
-        parts.append("")
-    return parts
-
-
-def _issue_repro_prompt(
-    *,
-    prompt: str | None,
-    run_args: argparse.Namespace | None,
-) -> str:
-    """Return the prompt text to inline in a maintainer-facing repro."""
-    if prompt:
-        return prompt
-    if run_args is not None:
-        arg_prompt = getattr(run_args, "prompt", None)
-        if isinstance(arg_prompt, str) and arg_prompt:
-            return arg_prompt
-    return "Describe this image."
 
 
 def _issue_repro_portable_path_ref(raw_ref: str, *, fallback: str) -> str:
@@ -28705,16 +27613,6 @@ def _issue_repro_image_ref(
     if not raw_ref:
         return "path/to/repro-image.jpg"
     return _issue_repro_portable_path_ref(raw_ref, fallback="path/to/repro-image.jpg")
-
-
-def _issue_image_hash_line(image_path: Path | None) -> str | None:
-    """Return a portable image hash note for issue repro sections."""
-    if image_path is None:
-        return None
-    image_hash = _sha256_file(image_path)
-    if image_hash is None:
-        return None
-    return f"Image SHA256: `{MARKDOWN_ESCAPER.escape(image_hash)}`"
 
 
 def _native_mlx_vlm_load_kwargs(run_args: argparse.Namespace | None) -> dict[str, object]:
@@ -29001,22 +27899,6 @@ def _build_native_mlx_vlm_python_script(
     )
 
 
-def _build_issue_inline_config_json(
-    *,
-    model_name: str,
-    image_ref: str,
-    run_args: argparse.Namespace | None,
-) -> str:
-    """Return JSON-formatted inline config for the native repro section."""
-    payload = {
-        "model": model_name,
-        "image": image_ref,
-        "load_kwargs": _native_mlx_vlm_load_kwargs(run_args),
-        "generate_kwargs": _native_mlx_vlm_generate_kwargs(run_args),
-    }
-    return json.dumps(_jsonify_cli_value(payload), indent=2, sort_keys=True)
-
-
 def _native_repro_block(
     cluster: IssueCluster,
     *,
@@ -29042,409 +27924,67 @@ def _native_repro_block(
     )
 
 
-def _issue_repro_section(
-    cluster: IssueCluster,
-    *,
-    repro_bundles: Mapping[str, Path],
-    run_args: argparse.Namespace | None,
-    prompt: str | None,
-    image_path: Path | None,
-) -> list[str]:
-    """Build native upstream repro commands and optional bundle links for one issue."""
-    models = _issue_cluster_model_names(cluster)
-    prompt_text = _issue_repro_prompt(prompt=prompt, run_args=run_args)
-    image_ref = _issue_repro_image_ref(image_path=image_path, run_args=run_args)
-    representative_model = models[0] if models else "owner/model"
-    script = _build_native_mlx_vlm_python_script(
-        model_name=representative_model,
-        prompt=prompt_text,
-        image_ref=image_ref,
-        run_args=run_args,
-    )
-    config_json = _build_issue_inline_config_json(
-        model_name=representative_model,
-        image_ref=image_ref,
-        run_args=run_args,
-    )
-
-    parts = ["", "## Minimal Reproduction", ""]
-    parts.append(
-        "These commands use `mlx-vlm` directly so the issue can be reproduced without "
-        "installing the `check_models` harness."
-    )
-    if image_ref != "path/to/repro-image.jpg":
-        parts.append(
-            f"Use a local copy of `{MARKDOWN_ESCAPER.escape(image_ref)}` or replace it with an "
-            "equivalent test image."
-        )
-    if image_hash_line := _issue_image_hash_line(image_path):
-        parts.append(image_hash_line)
-    parts.append("")
-    parts.extend(
-        render_report_markdown(
-            (
-                _native_repro_block(
-                    cluster,
-                    prompt=prompt_text,
-                    image_path=image_path,
-                    run_args=run_args,
-                ),
-            )
-        )
-    )
-    parts.append("")
-    parts.append("Minimal Python repro (representative model):")
-    _append_markdown_code_block(parts, script, language="python")
-    parts.append("Prompt:")
-    _append_markdown_code_block(parts, prompt_text, language="text")
-    parts.append("Generation/load config:")
-    _append_markdown_code_block(parts, config_json, language="json")
-
-    bundle_lines = [
-        f"- `{MARKDOWN_ESCAPER.escape(model)}`: {_issue_bundle_link(model, repro_bundles)}"
-        for model in models
-        if model in repro_bundles
-    ]
-    if bundle_lines:
-        parts.append("Optional advanced context:")
-        parts.append("")
-        parts.extend(bundle_lines)
-        parts.append(
-            "- JSON bundles contain extended local diagnostics only; the model, prompt, image "
-            "reference, and generation settings needed to reproduce are inline above."
-        )
-        parts.append("")
-    return parts
-
-
-def _issue_fix_checklist_items(cluster: IssueCluster) -> list[str]:
-    """Return subtype-specific fix checklist items for one issue cluster."""
-    subtype = cluster.issue_subtype.casefold()
-    checklist: list[str] | None = None
-    if subtype == "stop_token":
-        checklist = [
-            "Inspect model EOS token IDs and tokenizer special-token mappings.",
-            "Verify mlx-vlm stop criteria receive all configured EOS/stop tokens.",
-            "Check `skip_special_tokens` handling during decode.",
-            (
-                "Strip generated control tokens such as `<|end|>` and `</think>` only after "
-                "confirming generation stopped at the right boundary."
-            ),
-        ]
-    elif subtype == "encoding":
-        checklist = [
-            "Inspect tokenizer decode cleanup for byte-level/BPE marker leakage.",
-            "Compare `decode` and `batch_decode` behavior with `skip_special_tokens=True`.",
-            "Verify processor/tokenizer config does not require model-specific cleanup flags.",
-        ]
-    elif subtype == "prompt_template":
-        checklist = [
-            "Inspect chat template selection and rendered message roles.",
-            "Verify image placeholder count and order match the processor config.",
-            "Check EOS defaults and whether the template expects explicit assistant prefixes.",
-        ]
-    elif subtype in {"long_context", "context_budget", "token_cap"}:
-        checklist = [
-            "Rerun with reduced image/text burden and compare output recovery.",
-            "Compare prompt-token accounting with text-only and image+text prompts.",
-            "Inspect cache allocation, prefill step size, and long-context generation behavior.",
-        ]
-    elif subtype == "text_sanity":
-        checklist = [
-            (
-                "Reproduce with the native command and confirm whether token soup appears without "
-                "the check_models harness."
-            ),
-            "Inspect tokenizer config, chat template, and decode cleanup for the model revision.",
-            (
-                "Compare against a nearby quantization or base model to isolate model weights from "
-                "tokenizer/runtime behavior."
-            ),
-            "Add a focused regression check for mixed-script token-soup output if fixed.",
-        ]
-    elif cluster.issue_kind == "runtime_failure":
-        checklist = [
-            "Inspect the retained exception chain, upstream boundary, and attributed package.",
-            "Verify the requested and resolved model revisions against the captured environment.",
-            "Reproduce with the single affected model before changing compatibility logic.",
-            "Add a focused regression for the structured error signature when fixed.",
-        ]
-    if checklist is None:
-        checklist = [
-            "Reproduce with the cluster command.",
-            "Confirm owner attribution against traceback, tokenizer, processor, and runtime evidence.",
-            "Add a focused regression check for the affected symptom family.",
-        ]
-    return checklist
-
-
-def _issue_fix_checklist_section(cluster: IssueCluster) -> list[str]:
-    """Build the Fix Checklist section for one issue cluster."""
-    parts = ["", "## Fix Checklist", ""]
-    parts.extend(f"- [ ] {item}" for item in _issue_fix_checklist_items(cluster))
-    parts.append("")
-    return parts
-
-
-def _issue_acceptance_section(
-    cluster: IssueCluster,
-    *,
-    heading_level: int = 2,
-) -> list[str]:
-    """Build the expected fixed-state section for one issue cluster."""
-    parts = ["", f"{'#' * heading_level} Expected Fix Signal", ""]
-    parts.append(f"- [ ] {MARKDOWN_ESCAPER.escape(cluster.acceptance_signal)}")
-    parts.append(
-        "- [ ] The native `mlx-vlm` CLI/Python repro no longer shows the observed problem."
-    )
-    parts.append("")
-    return parts
-
-
-def _issue_environment_section(
-    *,
-    versions: LibraryVersionDict,
-    system_info: dict[str, str],
-) -> list[str]:
-    """Build a standalone Environment section for issue drafts."""
-    rows = [
-        (component, MARKDOWN_ESCAPER.escape(value))
-        for component, value in _collect_report_component_rows(
-            versions=versions,
-            system_info=system_info,
-            library_names=_DIAGNOSTICS_LIB_NAMES,
-            system_keys=_DIAGNOSTICS_SYSTEM_KEYS,
-        )
-    ]
-    parts = [""]
-    if rows:
-        parts.extend(
-            render_report_markdown(
-                (
-                    ReportSection(
-                        title="Appendix: Environment",
-                        level=2,
-                        blocks=(
-                            ReportTable(
-                                headers=("Component", "Version"),
-                                rows=tuple(rows),
-                                markdown_escaped=True,
-                            ),
-                        ),
-                    ),
-                )
-            )
-        )
-    else:
-        parts.extend(
-            render_report_markdown(
-                (
-                    ReportSection(
-                        title="Appendix: Environment",
-                        level=2,
-                        blocks=(ReportBulletList(("Environment details were not available.",)),),
-                    ),
-                )
-            )
-        )
-    parts.append("")
-    return parts
-
-
-def _issue_index_count_phrase(count: int, singular: str, plural: str | None = None) -> str:
-    """Return a compact count phrase with correct singular/plural wording."""
-    if count == 1:
-        return f"1 {singular}"
-    return f"{count} {plural or singular + 's'}"
-
-
-def _issue_index_environment_summary(
-    *,
-    versions: LibraryVersionDict,
-    system_info: dict[str, str],
-) -> str:
-    """Return a one-line environment summary for issues/index.md."""
-    parts: list[str] = []
-    os_name = system_info.get("OS") or system_info.get("macOS Version")
-    if os_name:
-        parts.append(os_name)
-    gpu_name = system_info.get("GPU/Chip")
-    if gpu_name:
-        parts.append(gpu_name)
-    if mlx_vlm_version := versions.get("mlx-vlm"):
-        parts.append(f"mlx-vlm {mlx_vlm_version}")
-    if mlx_version := versions.get("mlx"):
-        parts.append(f"mlx {mlx_version}")
-    return ", ".join(parts) if parts else "environment details unavailable"
-
-
-def _issue_index_header(
-    *,
-    snapshot: DiagnosticsSnapshot,
-    clusters: Sequence[IssueCluster],
-    versions: LibraryVersionDict,
-    system_info: dict[str, str],
-) -> list[str]:
-    """Build the contextual header for the standalone issue queue index."""
-    total_models = (
-        len(snapshot.failed)
-        + len(snapshot.harness_results)
-        + len(snapshot.stack_signals)
-        + len(snapshot.text_sanity_results)
-        + len(snapshot.unflagged_successful)
-    )
-    summary_parts = [
-        _issue_index_count_phrase(total_models, "model") + " tested",
-        _issue_index_count_phrase(len(snapshot.failed), "hard failure"),
-        _issue_index_count_phrase(len(snapshot.harness_results), "harness issue"),
-        _issue_index_count_phrase(len(snapshot.stack_signals), "stack signal"),
-        _issue_index_count_phrase(len(snapshot.text_sanity_results), "text-sanity issue"),
-        _issue_index_count_phrase(len(clusters), "issue draft"),
-    ]
-    return [
-        "# Check Models Issue Queue",
-        "",
-        f"Generated on: {local_now_str()}",
-        (
-            "Test Environment: "
-            + _issue_index_environment_summary(versions=versions, system_info=system_info)
-        ),
-        "Summary: " + ". ".join(summary_parts) + ".",
-        "",
-    ]
-
-
-def _build_issue_markdown(
-    cluster: IssueCluster,
-    *,
-    versions: LibraryVersionDict,
-    system_info: dict[str, str],
-    repro_bundles: Mapping[str, Path],
-    run_args: argparse.Namespace | None,
-    prompt: str | None = None,
-    image_path: Path | None = None,
-) -> list[str]:
-    """Build a complete clustered GitHub issue draft."""
-    parts = [
-        "<!-- markdownlint-disable MD012 MD013 MD033 MD060 -->",
-        "",
-        f"# {_issue_title(cluster)}",
-    ]
-    parts.extend(_issue_summary_section(cluster))
-    parts.extend(_issue_affected_models_section(cluster, repro_bundles=repro_bundles))
-    parts.extend(_issue_minimal_evidence_section(cluster))
-    parts.extend(
-        _issue_repro_section(
-            cluster,
-            repro_bundles=repro_bundles,
-            run_args=run_args,
-            prompt=prompt,
-            image_path=image_path,
-        )
-    )
-    parts.extend(_issue_acceptance_section(cluster))
-    parts.extend(_issue_fix_checklist_section(cluster))
-    parts.extend(_issue_environment_section(versions=versions, system_info=system_info))
-    parts.extend(_issue_evidence_section(cluster))
-    return parts
-
-
-def _write_issue_index(
-    *,
-    issues_dir: Path,
-    snapshot: DiagnosticsSnapshot,
-    clusters: Sequence[IssueCluster],
-    repro_bundles: Mapping[str, Path],
-    versions: LibraryVersionDict,
-    system_info: dict[str, str],
-) -> None:
-    """Write the issue queue index for the current run."""
-    parts = _issue_index_header(
-        snapshot=snapshot,
-        clusters=clusters,
-        versions=versions,
-        system_info=system_info,
-    )
-    if not clusters:
-        parts.extend(["No issue drafts were generated for this run.", ""])
-        _write_text_file(issues_dir / "index.md", "\n".join(parts))
-        return
-
-    parts.extend(
-        _render_issue_queue_table(
-            clusters,
-            escape_text=MARKDOWN_ESCAPER.escape,
-            issue_link_for_cluster=lambda cluster: (
-                f"[issue draft]({_github_published_output_url('issues', cluster.issue_filename)})"
-            ),
-            evidence_link_for_cluster=lambda cluster: _issue_cluster_bundle_link(
-                cluster,
-                repro_bundles,
-            ),
-        )
-    )
-    parts.append("")
-    _write_text_file(issues_dir / "index.md", "\n".join(parts) + "\n")
-
-
 def _generate_github_issue_reports(
     *,
-    diagnostics_snapshot: DiagnosticsSnapshot,
+    report_context: ReportRenderContext,
     output_dir: Path,
-    versions: LibraryVersionDict,
-    system_info: dict[str, str],
-    repro_bundles: Mapping[str, Path],
-    run_args: argparse.Namespace | None,
-    prompt: str | None = None,
+    library_versions: LibraryVersionDict,
+    system_info: Mapping[str, str],
+    prompt: str,
     image_path: Path | None = None,
-    issue_clusters: Sequence[IssueCluster] | None = None,
 ) -> Mapping[str, Path]:
-    """Generate clustered GitHub issue drafts and the issue queue index."""
+    """Write one factual issue draft per crashed actionable result."""
     issues_dir = output_dir / "issues"
-    if not issues_dir.exists():
-        issues_dir.mkdir(parents=True, exist_ok=True)
-
+    issues_dir.mkdir(parents=True, exist_ok=True)
     for stale in issues_dir.glob("issue_*.md"):
         stale.unlink()
     stale_index = issues_dir / "index.md"
     if stale_index.exists():
         stale_index.unlink()
 
-    clusters = tuple(
-        issue_clusters
-        if issue_clusters is not None
-        else _build_issue_clusters(diagnostics_snapshot)
+    assessments = dict(report_context.assessments)
+    actionable, _observations, _indeterminate = _partition_diagnostics(report_context)
+    crashes = tuple(
+        result for result in actionable if assessments[result.model_name].execution == "crashed"
     )
-    generated_reports: dict[str, Path] = {}
-    for cluster in clusters:
-        issue_path = issues_dir / cluster.issue_filename
-        _write_text_file(
-            issue_path,
-            "\n".join(
-                _build_issue_markdown(
-                    cluster,
-                    versions=versions,
-                    system_info=system_info,
-                    repro_bundles=repro_bundles,
-                    run_args=run_args,
-                    prompt=prompt,
-                    image_path=image_path,
-                )
+    generated: dict[str, Path] = {}
+    used_filenames: set[str] = set()
+    for result in crashes:
+        base_name = f"issue_{_sanitize_bundle_filename(result.model_name)}"
+        filename = f"{base_name}.md"
+        suffix = 2
+        while filename in used_filenames:
+            filename = f"{base_name}_{suffix}.md"
+            suffix += 1
+        used_filenames.add(filename)
+        issue_path = issues_dir / filename
+        parts = [
+            "<!-- markdownlint-disable MD013 -->",
+            "",
+            f"# Crash: {MARKDOWN_ESCAPER.escape(result.model_name)}",
+            "",
+        ]
+        parts.extend(
+            _diagnostics_model_entry(
+                result,
+                assessments[result.model_name],
+                prompt=prompt,
+                image_path=image_path,
+                heading_level=2,
             )
-            + "\n",
         )
-        generated_reports[cluster.cluster_id] = issue_path
-
-    _write_issue_index(
-        issues_dir=issues_dir,
-        snapshot=diagnostics_snapshot,
-        clusters=clusters,
-        repro_bundles=repro_bundles,
-        versions=versions,
-        system_info=system_info,
-    )
-
-    return generated_reports
+        parts.extend(
+            _diagnostics_provenance_environment(
+                prompt=prompt,
+                library_versions=library_versions,
+                system_info=system_info,
+            )
+        )
+        while parts and parts[-1] == "":
+            parts.pop()
+        _write_text_file(issue_path, "\n".join(parts) + "\n")
+        generated[result.model_name] = issue_path
+    return generated
 
 
 def _write_diagnostics_and_repro_artifacts(
@@ -29456,13 +27996,9 @@ def _write_diagnostics_and_repro_artifacts(
     prompt: str,
     image_path: Path | None,
     diagnostics_path: Path,
-    history_path: Path,
-    previous_history: HistoryRunRecord | None,
-    current_history: HistoryRunRecord | None,
     report_context: ReportRenderContext,
 ) -> DiagnosticsArtifacts:
     """Export repro bundles and diagnostics markdown after history append."""
-    preflight_issues = _get_run_preflight_issues(args)
     diagnostics_snapshot = report_context.diagnostics_snapshot
     issue_clusters = report_context.issue_clusters
     repro_bundles = export_failure_repro_bundles(
@@ -29480,35 +28016,22 @@ def _write_diagnostics_and_repro_artifacts(
         for model_name, bundle_path in sorted(repro_bundles.items()):
             log_file_path(bundle_path, label=f"   Repro Bundle ({model_name}):")
 
-    diagnostics_written = generate_diagnostics_report(
-        results=results,
-        filename=diagnostics_path,
-        versions=library_versions,
-        system_info=system_info,
+    generate_diagnostics_report(
+        results,
+        diagnostics_path,
         prompt=prompt,
+        library_versions=library_versions,
+        system_info=system_info,
+        report_context=report_context,
         image_path=image_path,
-        run_args=args,
-        history=DiagnosticsHistoryInputs(
-            history_path=history_path,
-            previous_history=previous_history,
-            current_history=current_history,
-            preflight_issues=preflight_issues,
-        ),
-        repro_bundles=repro_bundles,
-        diagnostics_snapshot=diagnostics_snapshot,
-        issue_clusters=issue_clusters,
-        assessments=_legacy_assessments_by_model(report_context),
     )
     issue_reports = _generate_github_issue_reports(
-        diagnostics_snapshot=diagnostics_snapshot,
+        report_context=report_context,
         output_dir=diagnostics_path.parent.parent,  # Diagnostics is in output/reports/ now
-        versions=library_versions,
+        library_versions=library_versions,
         system_info=system_info,
-        repro_bundles=repro_bundles,
-        run_args=args,
         prompt=prompt,
         image_path=image_path,
-        issue_clusters=issue_clusters,
     )
     if issue_reports:
         logger.info("GitHub Issue reports generated for %d issue(s).", len(issue_reports))
@@ -29517,7 +28040,7 @@ def _write_diagnostics_and_repro_artifacts(
 
     return DiagnosticsArtifacts(
         snapshot=diagnostics_snapshot,
-        diagnostics_written=diagnostics_written,
+        diagnostics_written=True,
         repro_bundles=repro_bundles,
         issue_reports=issue_reports,
     )
@@ -30282,9 +28805,6 @@ def finalize_execution(
             prompt=prompt,
             image_path=image_path,
             diagnostics_path=output_paths.diagnostics,
-            history_path=history_path,
-            previous_history=previous_history,
-            current_history=current_history,
             report_context=report_context,
         )
         _log_maintainer_summary(
