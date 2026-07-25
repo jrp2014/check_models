@@ -4,6 +4,8 @@
   "default": true,
   // Allow long lines (intentional for code blocks, tables, HTML/CSS)
   "MD013": false,
+  // Captured evidence in fenced code blocks must preserve hard tabs verbatim
+  "MD010": { "code_blocks": false },
   // Allow modest section breathing room, but still catch accidental blank-line drift
   "MD012": { "maximum": 2 },
   // We manually manage heading style consistency; allow mixed ATX where needed

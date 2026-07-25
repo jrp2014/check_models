@@ -5,17 +5,14 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-### Future work
-
-- Integrate mlx-vlm's typed generation-token metadata (`eos_tokens`,
-  `thinking_start_token`, `thinking_end_token`, and related fields) into token
-  diagnostics so configured protocol markers are distinguished from malformed,
-  incomplete, or unexpected leaked tokens without reintroducing semantic scoring.
-
 ### Changed
 
-- Correct the public Core Functions example to name the retained Markdown
-  gallery-report generator.
+- Make one validated current-run assessment/provenance context authoritative for
+  console summaries and every retained artifact; write canonical JSONL first and
+  isolate optional renderer failures without corrupting machine evidence.
+- Restrict minimal-output observations to recorded empty or one/two-word evidence,
+  detect explicit default and configured thinking delimiters independently of
+  model names, and preserve generated text (including tabs) byte-for-byte.
 - Replace the score-, grade-, winner-, and history-derived reporting pipeline with
   a facts-first current-run assessment shared by the retained HTML, gallery,
   diagnostics, JSONL, and run JSON artifacts. The assessment now exposes only exact
@@ -43,6 +40,13 @@ Notable changes to this project will be documented in this file.
 - Make generated reproduction commands checkout-runnable by retaining their exact
   source-image fixture, and pin them to the same resolved model revision recorded
   across diagnostics, JSONL, and run JSON while keeping requested revisions distinct.
+
+### Fixed
+
+- Keep completed-unusable runs neutral and out of performance rankings, distinguish
+  requested from resolved revisions in human reports, and sanitize operational paths
+  in public failures, provenance, captured streams, and artifact manifests while
+  retaining exact raw logs and model-generated text.
 
 ## [0.8.0] - 2026-06-06
 

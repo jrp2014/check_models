@@ -6,6 +6,7 @@ import base64
 import html
 import io
 import json
+import logging
 import re
 import subprocess
 import sys
@@ -616,6 +617,195 @@ def test_published_failure_artifacts_do_not_disclose_home_paths() -> None:
     assert str(Path.home()) not in html_report
 
 
+def test_public_failure_evidence_sanitizes_paths_without_mutating_model_text(
+    tmp_path: Path,
+) -> None:
+    """Public operational evidence is portable while generated text stays exact."""
+    generated_text = "Model says /Users/alice/source and /private/cache exactly."
+    success = replace(
+        _make_success("org/generated-paths"),
+        generation=_MockGeneration(text=generated_text, generation_tokens=20),
+    )
+    crash = replace(
+        _make_failure_with_details(
+            "org/crash-paths",
+            error_msg="failed under /Users/alice/project/model.py using /private/tmp/cache",
+            traceback_str=(
+                "Traceback (most recent call last):\n"
+                '  File "/Users/alice/project/model.py", line 7, in run\n'
+                "RuntimeError: cache /private/tmp/cache failed"
+            ),
+            captured_output=(
+                "stderr from /Users/alice/project/model.py\nprivate=/private/tmp/cache"
+            ),
+        ),
+        root_error_message="root at /Users/alice/project/model.py",
+        exception_chain=(
+            check_models.FailureException(
+                "RuntimeError",
+                "builtins",
+                "cache /private/tmp/cache failed",
+                origin="/Users/alice/project/model.py",
+            ),
+        ),
+    )
+    results = [success, crash]
+    provenance: dict[str, check_models.ModelProvenanceRecord] = {
+        result.model_name: check_models.ModelProvenanceRecord(
+            model=result.model_name,
+            requested_revision=None,
+            resolved_revision="sha",
+            snapshot_path="/Users/alice/.cache/models/snapshots/sha",
+        )
+        for result in results
+    }
+    context = _build_report_render_context(
+        results=results,
+        prompt="Describe the image.",
+        system_info={},
+        model_provenance=provenance,
+    )
+    gallery_path = tmp_path / "model_gallery.md"
+    diagnostics_path = tmp_path / "diagnostics.md"
+    html_path = tmp_path / "results.html"
+    jsonl_path = tmp_path / "results.jsonl"
+    run_path = tmp_path / "run.json"
+
+    generate_markdown_gallery_report(
+        results,
+        gallery_path,
+        prompt="Describe the image.",
+        report_context=context,
+    )
+    generate_diagnostics_report(
+        results,
+        diagnostics_path,
+        prompt="Describe the image.",
+        library_versions=_stub_versions(),
+        system_info={},
+        report_context=context,
+    )
+    generate_html_report(
+        results,
+        html_path,
+        _stub_versions(),
+        "Describe the image.",
+        1.0,
+        report_context=context,
+    )
+    check_models.save_jsonl_report(
+        results,
+        jsonl_path,
+        prompt="Describe the image.",
+        system_info={},
+        report_context=context,
+    )
+    check_models.save_run_json_report(
+        results,
+        run_path,
+        versions=_stub_versions(),
+        prompt="Describe the image.",
+        total_runtime_seconds=1.0,
+        report_context=context,
+        output_paths={
+            "external": "/Users/alice/published/results.html",
+            "private": "/private/tmp/results.jsonl",
+        },
+    )
+
+    gallery = gallery_path.read_text(encoding="utf-8")
+    diagnostics = diagnostics_path.read_text(encoding="utf-8")
+    html_report = html.unescape(html_path.read_text(encoding="utf-8"))
+    crash_gallery = _extract_markdown_model_section(gallery, crash.model_name)
+    assert generated_text in gallery
+    assert generated_text in html_report
+    for crash_evidence in (crash_gallery, diagnostics):
+        assert "/Users/alice/" not in crash_evidence
+        assert "/private/" not in crash_evidence
+        assert "~/project/model.py" in crash_evidence
+        assert "<private>/tmp/cache" in crash_evidence
+    crash_html_match = re.search(
+        r'<article id="model-org-crash-paths".*?</article>',
+        html_report,
+        re.DOTALL,
+    )
+    assert crash_html_match is not None
+    crash_html_articles = crash_html_match.group(0)
+    assert "/Users/alice/" not in crash_html_articles
+    assert "/private/" not in crash_html_articles
+
+    records = [json.loads(line) for line in jsonl_path.read_text(encoding="utf-8").splitlines()]
+    rows = {record["model"]: record for record in records if record.get("_type") == "result"}
+    assert rows[success.model_name]["generated_text"] == generated_text
+    crash_row = rows[crash.model_name]
+    assert "/Users/alice/" not in json.dumps(crash_row)
+    assert "/private/" not in json.dumps(crash_row)
+    assert crash_row["failure"]["exception_chain"][0]["origin"] == "~/project/model.py"
+    run_payload = json.loads(run_path.read_text(encoding="utf-8"))
+    assert run_payload["artifacts"] == {
+        "external": "~/published/results.html",
+        "private": "<private>/tmp/results.jsonl",
+    }
+
+
+def test_tabs_round_trip_across_every_public_model_evidence_artifact(tmp_path: Path) -> None:
+    """Hard tabs in captured model output must survive JSON, Markdown, and HTML."""
+    output = "left\tright"
+    result = replace(
+        _make_success("org/tabbed"),
+        generation=_MockGeneration(text=output, generation_tokens=2),
+    )
+    context = _build_report_render_context(results=[result], prompt="Describe the image.")
+    jsonl_path = tmp_path / "results.jsonl"
+    gallery_path = tmp_path / "model_gallery.md"
+    diagnostics_path = tmp_path / "diagnostics.md"
+    html_path = tmp_path / "results.html"
+
+    check_models.save_jsonl_report(
+        [result],
+        jsonl_path,
+        prompt="Describe the image.",
+        system_info={},
+        report_context=context,
+    )
+    generate_markdown_gallery_report(
+        [result],
+        gallery_path,
+        prompt="Describe the image.",
+        report_context=context,
+    )
+    generate_diagnostics_report(
+        [result],
+        diagnostics_path,
+        prompt="Describe the image.",
+        library_versions=_stub_versions(),
+        system_info={},
+        report_context=context,
+    )
+    generate_html_report(
+        [result],
+        html_path,
+        _stub_versions(),
+        "Describe the image.",
+        1.0,
+        report_context=context,
+    )
+
+    records = [json.loads(line) for line in jsonl_path.read_text(encoding="utf-8").splitlines()]
+    row = next(record for record in records if record.get("_type") == "result")
+    assert row["generated_text"] == output
+    assert output in gallery_path.read_text(encoding="utf-8")
+    assert output in diagnostics_path.read_text(encoding="utf-8")
+    html_report = html_path.read_text(encoding="utf-8")
+    match = re.search(
+        r"Complete generated output.*?<pre><code[^>]*>(.*?)</code></pre>",
+        html_report,
+        re.DOTALL,
+    )
+    assert match is not None
+    assert html.unescape(match.group(1)) == output
+
+
 def test_direct_jsonl_serializer_builds_one_local_assessment_cache(tmp_path: Path) -> None:
     """Direct JSONL calls should build one context and classify each model once."""
     results = [_make_success("org/direct-a"), _make_success("org/direct-b")]
@@ -636,7 +826,7 @@ def test_direct_jsonl_serializer_builds_one_local_assessment_cache(tmp_path: Pat
 
 
 def test_machine_reports_share_the_cached_resolved_model_provenance(tmp_path: Path) -> None:
-    """JSONL and run JSON should serialize the context's exact snapshot identity."""
+    """Every retained model artifact should serialize one exact snapshot identity."""
     result = _make_success("org/pinned")
     provenance: check_models.ModelProvenanceRecord = {
         "model": result.model_name,
@@ -651,6 +841,8 @@ def test_machine_reports_share_the_cached_resolved_model_provenance(tmp_path: Pa
     )
     jsonl_path = tmp_path / "results.jsonl"
     run_json_path = tmp_path / "run.json"
+    gallery_path = tmp_path / "model_gallery.md"
+    html_path = tmp_path / "results.html"
 
     with patch.object(check_models, "_collect_model_provenance", side_effect=AssertionError):
         check_models.save_jsonl_report(
@@ -671,11 +863,141 @@ def test_machine_reports_share_the_cached_resolved_model_provenance(tmp_path: Pa
             output_paths={},
             requested_revision="requested-tag",
         )
+        generate_markdown_gallery_report(
+            [result],
+            gallery_path,
+            prompt="Describe the image.",
+            report_context=context,
+        )
+        generate_html_report(
+            [result],
+            html_path,
+            _stub_versions(),
+            "Describe the image.",
+            1.0,
+            report_context=context,
+        )
 
     jsonl_record = json.loads(jsonl_path.read_text(encoding="utf-8").splitlines()[1])
     run_record = json.loads(run_json_path.read_text(encoding="utf-8"))
     assert jsonl_record["model_provenance"] == provenance
     assert run_record["model_provenance"] == {result.model_name: provenance}
+    gallery = gallery_path.read_text(encoding="utf-8")
+    html_report = html.unescape(html_path.read_text(encoding="utf-8"))
+    assert "_Requested model revision:_ requested-tag" in gallery
+    assert f"_Resolved model revision:_ {provenance['resolved_revision']}" in gallery
+    assert "<td>Requested model revision</td>\n<td>requested-tag</td>" in html_report
+    assert (
+        f"<td>Resolved model revision</td>\n<td>{provenance['resolved_revision']}</td>"
+    ) in html_report
+
+
+def test_run_context_validator_accepts_exact_mixed_partition() -> None:
+    """One validated context must partition every attempted model exactly once."""
+    results = [
+        _make_success("org/usable"),
+        replace(
+            _make_success("org/caveat"),
+            generation=_MockGeneration(text="Brief reply", generation_tokens=2),
+        ),
+        replace(
+            _make_success("org/unusable"),
+            generation=_MockGeneration(text="", generation_tokens=0),
+        ),
+        _make_failure_with_details("org/crashed", error_msg="decode crashed"),
+        _make_failure_with_details(
+            "org/indeterminate",
+            error_msg="Server disconnected without sending a response.",
+        ),
+    ]
+    provenance: dict[str, check_models.ModelProvenanceRecord] = {
+        result.model_name: {
+            "model": result.model_name,
+            "requested_revision": None,
+            "resolved_revision": f"sha-{index}",
+            "snapshot_path": f"~/.cache/snapshots/sha-{index}",
+        }
+        for index, result in enumerate(results)
+    }
+    context = _build_report_render_context(
+        results=results,
+        prompt="Describe the image.",
+        system_info={},
+        model_provenance=provenance,
+    )
+
+    check_models._validate_report_render_context(context)
+
+    assert check_models._run_outcome_counts(context.assessments) == {
+        "models_attempted": 5,
+        "models_evaluated": 4,
+        "models_completed": 3,
+        "models_crashed": 1,
+        "models_indeterminate": 1,
+    }
+
+
+def test_run_context_validator_rejects_duplicate_result_identity() -> None:
+    """Duplicate result keys must fail before tuple-to-dict conversion can hide them."""
+    result = _make_success("org/duplicate")
+    provenance: check_models.ModelProvenanceRecord = {
+        "model": result.model_name,
+        "requested_revision": None,
+        "resolved_revision": "sha",
+        "snapshot_path": "~/.cache/snapshots/sha",
+    }
+    context = _build_report_render_context(
+        results=[result, result],
+        prompt="Describe the image.",
+        system_info={},
+        model_provenance={result.model_name: provenance},
+    )
+
+    with pytest.raises(ValueError, match="duplicate"):
+        check_models._validate_report_render_context(context)
+
+
+def test_run_context_validator_rejects_key_misalignment() -> None:
+    """Result, assessment, and provenance identities must align exactly."""
+    result = _make_success("org/model")
+    context = _build_report_render_context(
+        results=[result],
+        prompt="Describe the image.",
+        system_info={},
+    )
+
+    with pytest.raises(ValueError, match="provenance"):
+        check_models._validate_report_render_context(context)
+
+
+def test_run_context_validator_rejects_illegal_axis_combination() -> None:
+    """Completed results cannot carry the not-evaluated usability axis."""
+    result = _make_success("org/model")
+    context = _build_report_render_context(
+        results=[result],
+        prompt="Describe the image.",
+        system_info={},
+        model_provenance={
+            result.model_name: {
+                "model": result.model_name,
+                "requested_revision": None,
+                "resolved_revision": "sha",
+                "snapshot_path": "~/.cache/snapshots/sha",
+            }
+        },
+    )
+    context = replace(
+        context,
+        assessments=(
+            (
+                result.model_name,
+                check_models.ResultAssessment("completed", "not_evaluated", "none", ()),
+            ),
+        ),
+    )
+
+    with pytest.raises(ValueError, match="illegal"):
+        check_models._validate_report_render_context(context)
 
 
 def _make_harness_success(
@@ -711,17 +1033,6 @@ def _make_harness_success(
         model_load_time=0.5,
         quality_issues=f"⚠️harness({harness_type})",
         quality_analysis=qa,
-    )
-
-
-def _with_confirmed_reproduction(result: PerformanceResult) -> PerformanceResult:
-    """Return a diagnostic anomaly confirmed by a same-path controlled rerun."""
-    return replace(
-        result,
-        rerun_evidence=check_models.RerunEvidence(
-            rerun_success=False,
-            rerun_verdict="harness",
-        ),
     )
 
 
@@ -777,7 +1088,7 @@ def test_simplified_diagnostics_partitions_cached_assessments_in_evidence_order(
     headings = (
         "## Run Outcome Counts",
         "## Actionable Failures",
-        "## Successful Observations Requiring Reproduction",
+        "## Completed Runs with Observations",
         "## Indeterminate Attempts",
     )
     assert all(heading in content for heading in headings)
@@ -1094,7 +1405,7 @@ def test_diagnostics_use_run_args_for_complete_native_reproduction(tmp_path: Pat
         next(iter(issue_reports.values())).read_text(encoding="utf-8"),
     ]
     for index, content in enumerate(contents):
-        assert f"- _Model revision:_ {resolved_revision}" in content
+        assert f"- _Resolved model revision:_ {resolved_revision}" in content
         assert "- _Requested model revision:_ run-revision" in content
         assert '- _Configured EOS token override:_ ["&lt;override-eos&gt;"]' in content
         assert "Supplemental CLI reproduction" in content
@@ -1238,8 +1549,10 @@ class TestHtmlReportEdgeCases:
     def test_html_mirrors_cached_assessments_across_retained_artifacts(
         self,
         tmp_path: Path,
+        caplog: pytest.LogCaptureFixture,
     ) -> None:
-        """JSONL and human reports should expose one exact cached status vocabulary."""
+        """Every retained consumer should expose one exact cached status vocabulary."""
+        caplog.set_level(logging.INFO)
         prompt = "Describe the image."
         results = [
             _make_success("org/usable"),
@@ -1292,6 +1605,7 @@ class TestHtmlReportEdgeCases:
         diagnostics_path = tmp_path / "diagnostics.md"
         gallery_path = tmp_path / "model_gallery.md"
         html_path = tmp_path / "results.html"
+        run_path = tmp_path / "run.json"
 
         with patch.object(check_models, "_assess_result", side_effect=AssertionError):
             check_models.save_jsonl_report(
@@ -1323,6 +1637,16 @@ class TestHtmlReportEdgeCases:
                 5.0,
                 report_context=context,
             )
+            check_models.save_run_json_report(
+                results,
+                run_path,
+                versions=_stub_versions(),
+                prompt=prompt,
+                total_runtime_seconds=5.0,
+                report_context=context,
+                output_paths={},
+            )
+            check_models.log_summary(results, assessments=expected)
 
         records = {
             record["model"]: record
@@ -1332,6 +1656,18 @@ class TestHtmlReportEdgeCases:
         diagnostics = diagnostics_path.read_text(encoding="utf-8")
         gallery = gallery_path.read_text(encoding="utf-8")
         html_report = html_path.read_text(encoding="utf-8")
+        run_report = json.loads(run_path.read_text(encoding="utf-8"))
+        assert run_report["counts"] == {
+            "models_attempted": 5,
+            "models_evaluated": 4,
+            "models_completed": 3,
+            "models_crashed": 1,
+            "models_indeterminate": 1,
+        }
+        log_text = "\n".join(record.message for record in caplog.records)
+        assert "status=OK" not in log_text
+        assert "Successful Models" not in log_text
+        assert "Execution outcomes: completed=3, crashed=1, indeterminate=1" in log_text
         for model, assessment in expected.items():
             serialized = records[model]["assessment"]
             assert serialized["execution"] == assessment.execution
@@ -1560,7 +1896,7 @@ class TestHtmlReportEdgeCases:
         assert "Complete Per-model Evidence" in content
         assert "Maintainer Diagnostics" in content
         assert "Actionable Failures" in content
-        assert "Successful Observations Requiring Reproduction" in content
+        assert "Completed Runs with Observations" in content
         assert "org/risky" in content
         assert "transformers" in content
 
@@ -1986,7 +2322,6 @@ class TestMarkdownGalleryReport:
         analysis = check_models.analyze_generation_text(
             text,
             generated_tokens=12,
-            model_name="org/thinking",
             prompt="Describe this image.",
         )
         result = replace(

@@ -11,11 +11,7 @@ thresholds:
   max_phrase_length: 10
   min_context_term_length: 2
   min_tokens_for_substantial: 10
-  min_words_for_filler_response: 15
-  min_words_for_truncated: 5
-  min_prompt_tokens_for_ratio: 100
-  min_output_tokens_for_ratio: 15
-  min_output_ratio: 0.02
+  max_words_for_minimal_output: 2
   long_prompt_tokens_threshold: 3000
   heavy_nontext_prompt_ratio: 0.50
   mixed_prompt_burden_ratio_floor: 0.25

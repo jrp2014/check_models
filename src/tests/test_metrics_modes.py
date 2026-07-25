@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import argparse
 import io
+import json
 import logging
 import time
 from contextlib import ExitStack
 from typing import TYPE_CHECKING
 from unittest.mock import patch
 
+import pytest
 from rich.console import Console
 
 import check_models
@@ -27,7 +29,6 @@ from check_models import (
 if TYPE_CHECKING:  # pragma: no cover - only for type hints
     from pathlib import Path
 
-    import pytest
     from rich.panel import Panel
 
 
@@ -49,7 +50,7 @@ class _StubGeneration:
         *,
         prompt_tokens: int = 10,
         prompt_tps: float = 100.0,
-        generation_tokens: int = 5,
+        generation_tokens: int = 20,
         generation_tps: float = 50.0,
         peak_memory: float = 0.25,
         text: str = "hello",
@@ -484,8 +485,9 @@ def test_log_summary_emits_comparison_table_and_ascii_charts(
     assert "Model Comparison (current run):" in messages
     assert "│ # │ Model" in messages
     assert "TPS │" in messages
-    assert "│ Total(s)" in messages
-    assert "│ PeakGB" in messages
+    assert "Execution" in messages
+    assert "completed" in messages
+    assert "usable" in messages
     assert "TPS comparison chart:" in messages
     assert "Efficiency chart (higher is faster overall):" in messages
     assert "Failure stage frequency:" in messages
@@ -568,17 +570,15 @@ def test_log_summary_comparison_table_preserves_unicode_notes(
         record.message for record in caplog.records if record.message.strip().startswith("│")
     ]
     assert all_table_rows
-    emoji_note_rows = [r for r in all_table_rows if "emoji-note" in r]
-    assert emoji_note_rows, "Model row not found in table output"
-
-    # Unicode emoji must survive on the primary model row.
-    assert "⚠" in emoji_note_rows[0]
-
-    # Notes cell content may wrap across continuation rows at narrow render widths;
-    # verify each significant token appears somewhere in the table section.
+    # Notes may wrap across continuation rows at narrow render widths.
     table_text = " ".join(all_table_rows)
-    assert "harness" in table_text
-    assert "stop_token" in table_text
+    assert "emoji" in table_text
+    assert "-note" in table_text
+    assert "⚠" in table_text
+    assert "har" in table_text
+    assert "ness" in table_text
+    assert "stop_" in table_text
+    assert "token" in table_text
 
 
 def test_log_summary_reports_execution_and_mechanical_observations(
@@ -610,6 +610,150 @@ def test_log_summary_reports_execution_and_mechanical_observations(
     assert "Best keywording:" not in messages
 
 
+def test_log_summary_uses_cached_axes_and_excludes_unusable_from_highlights(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Completed-unusable output must stay neutral and outside resource rankings."""
+    caplog.set_level(logging.INFO)
+    usable = PerformanceResult(
+        model_name="org/usable",
+        generation=_StubGeneration(
+            text="A complete usable caption with enough detail.",
+            generation_tokens=20,
+            generation_tps=20.0,
+            peak_memory=2.0,
+        ),
+        success=True,
+        model_load_time=0.5,
+        total_time=1.5,
+    )
+    caveated = PerformanceResult(
+        model_name="org/caveated",
+        generation=_StubGeneration(
+            text="Brief reply",
+            generation_tokens=20,
+            generation_tps=30.0,
+            peak_memory=1.5,
+        ),
+        success=True,
+        model_load_time=0.4,
+        total_time=1.2,
+    )
+    unusable = PerformanceResult(
+        model_name="org/unusable",
+        generation=_StubGeneration(
+            text="",
+            generation_tokens=0,
+            generation_tps=999.0,
+            peak_memory=0.1,
+        ),
+        success=True,
+        model_load_time=0.1,
+        total_time=0.2,
+    )
+    crashed = PerformanceResult(
+        model_name="org/crashed",
+        generation=None,
+        success=False,
+        error_message="boom",
+    )
+    indeterminate = PerformanceResult(
+        model_name="org/indeterminate",
+        generation=None,
+        success=False,
+        error_message="Server disconnected without sending a response.",
+    )
+    results = [usable, caveated, unusable, crashed, indeterminate]
+    assessments = {
+        "org/usable": check_models.ResultAssessment("completed", "usable", "none", ()),
+        "org/caveated": check_models.ResultAssessment(
+            "completed",
+            "usable_with_caveats",
+            "observation_needs_reproduction",
+            ("minimal_output",),
+        ),
+        "org/unusable": check_models.ResultAssessment(
+            "completed",
+            "unusable",
+            "observation_needs_reproduction",
+            ("empty_output",),
+        ),
+        "org/crashed": check_models.ResultAssessment(
+            "crashed", "not_evaluated", "actionable_failure", ()
+        ),
+        "org/indeterminate": check_models.ResultAssessment(
+            "indeterminate", "not_evaluated", "none", ()
+        ),
+    }
+
+    with patch.object(check_models, "_assess_result", side_effect=AssertionError):
+        log_summary(results, assessments=assessments)
+
+    messages = "\n".join(record.message for record in caplog.records)
+    assert "Execution outcomes: completed=3, crashed=1, indeterminate=1" in messages
+    assert "Usability outcomes: usable=1, usable_with_caveats=1, unusable=1" in messages
+    assert "Maintainer outcomes:" in messages
+    assert "Fastest: org/caveated (30.0 tps)" in messages
+    assert "Fastest: org/unusable" not in messages
+    assert "Successful Models" not in messages
+    assert "status=OK" not in messages
+    assert "org/unusable" in messages
+    assert "unusable" in messages
+
+
+def test_print_model_result_uses_neutral_cached_unusable_assessment(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """A completed unusable result must not receive generic success styling or OK copy."""
+    caplog.set_level(logging.INFO)
+    result = PerformanceResult(
+        model_name="org/unusable",
+        generation=_StubGeneration(text="", generation_tokens=0),
+        success=True,
+    )
+    assessment = check_models.ResultAssessment(
+        "completed",
+        "unusable",
+        "observation_needs_reproduction",
+        ("empty_output",),
+    )
+
+    print_model_result(result, assessment=assessment, verbose=False)
+
+    summary_records = [
+        record
+        for record in caplog.records
+        if "SUMMARY" in record.message or "maintainer=" in record.message
+    ]
+    summary = " ".join(record.message for record in summary_records)
+    assert "execution=completed" in summary
+    assert "usability=unusable" in summary
+    assert "maintainer=observation_needs_reproduction" in summary
+    assert "status=OK" not in summary
+    assert all(
+        getattr(record, "style_hint", None) != check_models.LogStyles.SUCCESS
+        for record in summary_records
+    )
+
+
+def test_raw_log_keeps_unsanitized_operational_failure_path(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Publication sanitization must not rewrite the maximalist raw log."""
+    caplog.set_level(logging.INFO)
+    result = PerformanceResult(
+        model_name="org/crashed",
+        generation=None,
+        success=False,
+        error_message="failed at /Users/alice/project/model.py",
+    )
+    assessment = check_models.ResultAssessment("crashed", "not_evaluated", "actionable_failure", ())
+
+    log_summary([result], assessments={result.model_name: assessment})
+
+    assert "/Users/alice/project/model.py" in "\n".join(record.message for record in caplog.records)
+
+
 def test_machine_summary_uses_observation_vocabulary() -> None:
     """Automation summaries should label mechanical facts without grading output."""
     result = PerformanceResult(
@@ -619,9 +763,15 @@ def test_machine_summary_uses_observation_vocabulary() -> None:
         quality_issues="repetitive, token-cap-truncation",
     )
 
-    parts = check_models._summary_parts(result, "caption-model")
+    assessment = check_models.ResultAssessment(
+        "completed",
+        "usable_with_caveats",
+        "observation_needs_reproduction",
+        ("repeated_output", "token_cap_truncation"),
+    )
+    parts = check_models._summary_parts(result, "caption-model", assessment)
 
-    assert "observations=repetitive+token_cap_truncation" in parts
+    assert "observations=repeated_output+token_cap_truncation" in parts
     assert not any(part.startswith("quality=") for part in parts)
 
 
@@ -863,6 +1013,103 @@ def test_report_generation_uses_single_artifact_plan(tmp_path: Path) -> None:
     ]
     assert all(artifact.path.is_absolute() for artifact in artifacts)
     assert all(artifact.job is not None for artifact in artifacts if artifact.key != "diagnostics")
+
+
+@pytest.mark.parametrize("failing_renderer", ["html", "diagnostics"])
+def test_canonical_jsonl_precedes_and_survives_optional_renderer_failure(
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+    monkeypatch: pytest.MonkeyPatch,
+    failing_renderer: str,
+) -> None:
+    """Optional presentation failures must leave canonical JSONL valid and report partial."""
+    caplog.set_level(logging.INFO)
+    args = argparse.Namespace(
+        output_html=tmp_path / "reports/results.html",
+        output_gallery_markdown=tmp_path / "reports/model_gallery.md",
+        output_jsonl=tmp_path / "results.jsonl",
+        output_run_json=tmp_path / "run.json",
+        output_diagnostics=tmp_path / "reports/diagnostics.md",
+        output_log=tmp_path / "check_models.log",
+        output_env=tmp_path / "environment.log",
+    )
+    result = PerformanceResult(
+        model_name="org/model",
+        generation=_StubGeneration(
+            text="A complete response with enough captured evidence.",
+            generation_tokens=20,
+        ),
+        success=True,
+    )
+    provenance: check_models.ModelProvenanceRecord = {
+        "model": result.model_name,
+        "requested_revision": None,
+        "resolved_revision": "sha",
+        "snapshot_path": "~/.cache/snapshots/sha",
+    }
+    context = check_models._build_report_render_context(
+        results=[result],
+        prompt="Describe the image.",
+        system_info={},
+        model_provenance={result.model_name: provenance},
+    )
+    paths = check_models._resolve_report_output_paths(args)
+    for path in (
+        paths.index,
+        paths.html,
+        paths.gallery_markdown,
+        paths.jsonl,
+        paths.run_json,
+        paths.diagnostics,
+    ):
+        path.parent.mkdir(parents=True, exist_ok=True)
+    inputs = check_models.ReportGenerationInputs(
+        results=[result],
+        library_versions={"mlx": "0.0.0"},
+        prompt="Describe the image.",
+        metadata=None,
+        overall_time=1.0,
+        image_path=None,
+        system_info={},
+        report_context=context,
+        output_paths=paths,
+        run_args=args,
+        runtime_fingerprint={},
+    )
+    events: list[str] = []
+    real_write_text = check_models._write_text_file
+
+    def record_writes(path: Path, content: str, *, append: bool = False) -> None:
+        if path == paths.jsonl and '"_type": "metadata"' in content:
+            events.append("jsonl")
+        real_write_text(path, content, append=append)
+
+    def fail_renderer(*_args: object, **_kwargs: object) -> None:
+        events.append(failing_renderer)
+        message = f"synthetic {failing_renderer} failure"
+        raise ValueError(message)
+
+    monkeypatch.setattr(check_models, "_write_text_file", record_writes)
+    monkeypatch.setattr(
+        check_models,
+        "generate_html_report" if failing_renderer == "html" else "generate_diagnostics_report",
+        fail_renderer,
+    )
+
+    outcomes = check_models._generate_reports_and_log_outputs(inputs)
+
+    assert events[0] == "jsonl"
+    assert failing_renderer in events
+    records = [json.loads(line) for line in paths.jsonl.read_text(encoding="utf-8").splitlines()]
+    assert records[0]["_type"] == "metadata"
+    assert records[1]["_type"] == "result"
+    assert records[1]["model"] == result.model_name
+    by_key = {outcome.key: outcome for outcome in outcomes}
+    assert by_key["jsonl"].succeeded is True
+    assert by_key[failing_renderer].succeeded is False
+    messages = "\n".join(record.message for record in caplog.records)
+    assert "Reports successfully generated" not in messages
+    assert "Reports generated with 1 failure" in messages
 
 
 def test_report_artifact_specs_are_the_metadata_source(tmp_path: Path) -> None:

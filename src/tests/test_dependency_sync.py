@@ -782,9 +782,15 @@ def test_agent_quality_guidance_avoids_redundant_pytest_after_quality() -> None:
 def test_agent_monolith_size_note_matches_current_file() -> None:
     """Agent-facing file map should not drift badly from the monolith size."""
     copilot_text = COPILOT_INSTRUCTIONS.read_text(encoding="utf-8")
+    source_lines = len((PKG_ROOT / "check_models.py").read_text(encoding="utf-8").splitlines())
+    match = re.search(
+        r"`src/check_models\.py` \| \*\*Single-file CLI monolith\*\* \(~([\d,]+) lines\)",
+        copilot_text,
+    )
 
-    assert "`src/check_models.py` | **Single-file CLI monolith** (~27,900 lines)" in copilot_text
-    assert "~23,900 lines" not in copilot_text
+    assert match is not None
+    documented_lines = int(match.group(1).replace(",", ""))
+    assert abs(source_lines - documented_lines) <= 500
 
 
 def test_output_artifact_policy_is_documented_and_gitignored() -> None:
@@ -991,12 +997,14 @@ def test_production_source_has_no_retired_semantic_scoring_api() -> None:
     assert string_literals.isdisjoint(retired_formatter_fields)
 
 
-def test_public_readme_uses_retained_markdown_gallery_api() -> None:
-    """The public API example must name the retained Markdown generator."""
+def test_public_readme_uses_only_exported_report_api() -> None:
+    """The public API example must not advertise internal report generators."""
     readme = (PKG_ROOT / "README.md").read_text(encoding="utf-8")
 
     assert "generate_markdown_report" not in readme
-    assert "generate_markdown_gallery_report" in readme
+    assert "generate_markdown_gallery_report" not in readme
+    assert "sortable columns" not in readme
+    assert "peak-memory\n  filters" not in readme
 
 
 def test_production_logs_use_facts_first_observation_labels() -> None:
@@ -1005,7 +1013,7 @@ def test_production_logs_use_facts_first_observation_labels() -> None:
 
     for retained in (
         "Mechanical observations for %s: %s",
-        'parts.append(f"observations={',
+        '"observations=none"',
         "Warnings are shown for repetitive output and token-cap truncation.",
     ):
         assert retained in source

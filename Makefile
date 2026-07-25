@@ -111,13 +111,17 @@ ty: ## Run Ty type checking with the resolved repo interpreter
 .PHONY: clean
 clean: ## Remove generated files and caches
 	@$(MAKE) -C $(SRC) clean
-	rm -f $(SRC)/output/reports/results.html $(SRC)/output/reports/results.md
-	rm -f $(SRC)/output/reports/model_gallery.md $(SRC)/output/reports/review.md
-	rm -f $(SRC)/output/reports/results.tsv $(SRC)/output/reports/diagnostics.md
-	rm -f $(SRC)/output/results.html $(SRC)/output/results.md $(SRC)/output/model_gallery.md
-	rm -f $(SRC)/output/review.md $(SRC)/output/results.tsv $(SRC)/output/diagnostics.md
+	# Current retained run artifacts (issue drafts exist only after actionable crashes)
+	rm -f $(SRC)/output/reports/results.html $(SRC)/output/reports/model_gallery.md
+	rm -f $(SRC)/output/reports/diagnostics.md $(SRC)/output/index.md $(SRC)/output/run.json
 	rm -f $(SRC)/output/results.jsonl $(SRC)/output/results.history.jsonl
 	rm -f $(SRC)/output/check_models.log $(SRC)/output/environment.log
+	rm -rf $(SRC)/output/issues
+	# Legacy pre-simplification outputs, retained here only for cleanup compatibility
+	rm -f $(SRC)/output/reports/results.md $(SRC)/output/reports/review.md
+	rm -f $(SRC)/output/reports/results.tsv
+	rm -f $(SRC)/output/results.html $(SRC)/output/results.md $(SRC)/output/model_gallery.md
+	rm -f $(SRC)/output/review.md $(SRC)/output/results.tsv $(SRC)/output/diagnostics.md
 
 .PHONY: clean-all
 clean-all: clean ## Deep clean including build artifacts and stubs

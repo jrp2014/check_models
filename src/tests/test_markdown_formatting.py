@@ -189,15 +189,15 @@ def test_gallery_blockquote_escapes_full_multi_underscore_runs() -> None:
     assert r"\_\_\_\__ is" not in md
 
 
-def test_markdown_code_block_expands_tabs_to_spaces() -> None:
-    """Fenced Markdown code blocks should normalize hard tabs."""
+def test_markdown_code_block_preserves_tabs_exactly() -> None:
+    """Fenced evidence must retain hard tabs from the captured text."""
     parts: list[str] = []
 
     check_models._append_markdown_code_block(parts, "left\tright")
 
     md = "\n".join(parts)
-    assert "\t" not in md
-    assert "left    right" in md
+    assert "left\tright" in md
+    assert "left    right" not in md
 
 
 def test_gallery_error_block_does_not_emit_extra_blank_lines_before_separator() -> None:

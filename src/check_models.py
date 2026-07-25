@@ -388,11 +388,7 @@ class QualityThresholds:
     max_phrase_length: int = 10
     min_context_term_length: int = 2
     min_tokens_for_substantial: int = 10
-    min_words_for_filler_response: int = 15
-    min_words_for_truncated: int = 5
-    min_prompt_tokens_for_ratio: int = 100
-    min_output_tokens_for_ratio: int = 15
-    min_output_ratio: float = 0.02
+    max_words_for_minimal_output: int = 2
     long_prompt_tokens_threshold: int = 3000
     heavy_nontext_prompt_ratio: float = 0.5
     mixed_prompt_burden_ratio_floor: float = 0.25
@@ -407,7 +403,6 @@ class QualityThresholds:
         unit_interval_fields = {
             "repetition_ratio": self.repetition_ratio,
             "phrase_coverage_threshold": self.phrase_coverage_threshold,
-            "min_output_ratio": self.min_output_ratio,
             "heavy_nontext_prompt_ratio": self.heavy_nontext_prompt_ratio,
             "mixed_prompt_burden_ratio_floor": self.mixed_prompt_burden_ratio_floor,
         }
@@ -886,7 +881,6 @@ class JsonlMetricsRecord(TypedDict, total=False):
     peak_memory_delta_gb: float
 
 
-type ExecutionOutcome = Literal["completed", "failed", "indeterminate"]
 type ExecutionStatus = Literal["completed", "crashed", "indeterminate"]
 type ModelUsability = Literal["usable", "usable_with_caveats", "unusable", "not_evaluated"]
 type MaintainerStatus = Literal[
@@ -1113,25 +1107,6 @@ class RuntimeAnalysisSummary(TypedDict):
     first_token_latency_models: int
 
 
-class ModelIssueSummary(TypedDict, total=False):
-    """Small factual stats cache used by terminal performance logging."""
-
-    fastest_model: tuple[str, float]
-    most_efficient_model: tuple[str, float]
-    fastest_load_model: tuple[str, float]
-    average_tps: float
-    successful_count: int
-    total_peak_memory: float
-    average_peak_memory: float
-    memory_efficiency: float
-    image_width: int
-    image_height: int
-    image_megapixels: float
-    image_memory_density_models: int
-    average_peak_memory_delta_gb: float
-    average_peak_memory_delta_mb_per_megapixel: float
-
-
 @dataclass(frozen=True)
 class DiagnosticsArtifacts:
     """Diagnostics artifacts emitted at the end of a run."""
@@ -1182,6 +1157,16 @@ class ReportArtifact:
     label: str
     path: Path
     job: Callable[[], None] | None = None
+
+
+@dataclass(frozen=True)
+class ReportArtifactOutcome:
+    """Observed outcome for one canonical or optional report artifact."""
+
+    key: str
+    path: Path
+    succeeded: bool
+    error_message: str | None = None
 
 
 @dataclass(frozen=True)
@@ -1636,7 +1621,6 @@ class RerunEvidence:
     """Secondary evidence from a differential rerun (never overwrites first-pass)."""
 
     rerun_success: bool
-    rerun_verdict: str | None = None
     rerun_error_code: str | None = None
     rerun_generated_chars: int | None = None
     rerun_generation_time: float | None = None
@@ -2317,7 +2301,10 @@ def _gallery_runtime_facts(
     )
 
 
-def _gallery_prompt_facts(result: PerformanceResult) -> tuple[tuple[str, str], ...]:
+def _gallery_prompt_facts(
+    result: PerformanceResult,
+    model_provenance: ModelProvenanceRecord | None,
+) -> tuple[tuple[str, str], ...]:
     """Return captured prompt, processor, and generation-setting facts."""
     prompt = result.prompt_diagnostics
     processed_image = "not captured"
@@ -2360,7 +2347,24 @@ def _gallery_prompt_facts(result: PerformanceResult) -> tuple[tuple[str, str], .
             if prompt is not None and prompt.tokenizer_class
             else "not captured",
         ),
-        ("Model revision", "not captured by this result"),
+        (
+            "Requested model revision",
+            model_provenance.get("requested_revision") or "not requested"
+            if model_provenance is not None
+            else "not captured",
+        ),
+        (
+            "Resolved model revision",
+            model_provenance.get("resolved_revision") or "not resolved"
+            if model_provenance is not None
+            else "not captured",
+        ),
+        (
+            "Resolved snapshot path",
+            model_provenance.get("snapshot_path") or "not captured"
+            if model_provenance is not None
+            else "not captured",
+        ),
         (
             "Generation settings",
             json.dumps(prompt.generate_kwargs, sort_keys=True)
@@ -2380,9 +2384,10 @@ def _gallery_model_facts(
     result: PerformanceResult,
     row: GalleryRow,
     assessment: ResultAssessment,
+    model_provenance: ModelProvenanceRecord | None,
 ) -> tuple[tuple[str, str | None], ...]:
     """Return factual per-model evidence shared by gallery renderers."""
-    return (
+    facts = (
         ("Execution", assessment.execution),
         ("Usability", row.usability),
         ("Maintainer status", assessment.maintainer_status),
@@ -2397,7 +2402,11 @@ def _gallery_model_facts(
         ("Root exception module", result.root_error_module),
         ("Root exception message", result.root_error_message),
         *_gallery_runtime_facts(result, row),
-        *_gallery_prompt_facts(result),
+        *_gallery_prompt_facts(result, model_provenance),
+    )
+    return tuple(
+        (label, _home_relative_report_text(value) if value is not None else None)
+        for label, value in facts
     )
 
 
@@ -2405,12 +2414,18 @@ def _render_gallery_model(
     result: PerformanceResult,
     row: GalleryRow,
     assessment: ResultAssessment,
+    model_provenance: ModelProvenanceRecord | None,
 ) -> list[str]:
     """Render complete captured evidence for one model without reclassification."""
     generation = result.generation
     escaped_facts = [
         (MARKDOWN_ESCAPER.escape(label), MARKDOWN_ESCAPER.escape(value))
-        for label, value in _gallery_model_facts(result, row, assessment)
+        for label, value in _gallery_model_facts(
+            result,
+            row,
+            assessment,
+            model_provenance,
+        )
         if value is not None
     ]
 
@@ -2434,7 +2449,11 @@ def _render_gallery_model(
     else:
         out.extend([_markdown_emphasis("Complete traceback:"), ""])
         if result.error_traceback:
-            _append_markdown_code_block(out, result.error_traceback, language="python")
+            _append_markdown_code_block(
+                out,
+                _home_relative_report_text(result.error_traceback),
+                language="python",
+            )
         else:
             out.extend(["traceback not captured", ""])
 
@@ -2444,7 +2463,10 @@ def _render_gallery_model(
             _append_markdown_code_block(out, partial_output)
         if result.captured_output_on_fail:
             out.extend([_markdown_emphasis("Captured upstream output:"), ""])
-            _append_markdown_code_block(out, result.captured_output_on_fail)
+            _append_markdown_code_block(
+                out,
+                _home_relative_report_text(result.captured_output_on_fail),
+            )
         if not partial_output and not result.captured_output_on_fail:
             out.extend(["No partial or captured output.", ""])
 
@@ -3506,26 +3528,30 @@ class ReasoningOutputSignals:
 def _detect_reasoning_output(
     text: str,
     *,
-    model_name: str | None = None,
+    delimiter_pairs: Sequence[tuple[str, str]] = THINKING_TRACE_DELIMITER_PAIRS,
 ) -> ReasoningOutputSignals:
-    """Detect unexpected reasoning or a documented thinking-model trace."""
+    """Detect explicit reasoning delimiters without inferring policy from model names."""
     if not text:
         return ReasoningOutputSignals()
 
-    semantic_text = _strip_empty_thinking_wrappers(text)
+    semantic_text = text
+    for start_marker, end_marker in delimiter_pairs:
+        empty_wrapper = re.compile(
+            rf"{re.escape(start_marker)}\s*{re.escape(end_marker)}",
+            re.IGNORECASE,
+        )
+        semantic_text = empty_wrapper.sub(" ", semantic_text)
     text_lower: str = semantic_text.casefold()
-    expected_thinking_model = "thinking" in (model_name or "").casefold()
     thinking_trace_markers: list[str] = []
     thinking_trace_incomplete = False
-    if expected_thinking_model:
-        for start_marker, end_marker in THINKING_TRACE_DELIMITER_PAIRS:
-            if start_marker.casefold() not in text_lower:
-                continue
-            thinking_trace_markers.append(start_marker)
-            if end_marker.casefold() in text_lower:
-                thinking_trace_markers.append(end_marker)
-            else:
-                thinking_trace_incomplete = True
+    for start_marker, end_marker in delimiter_pairs:
+        if start_marker.casefold() not in text_lower:
+            continue
+        thinking_trace_markers.append(start_marker)
+        if end_marker.casefold() in text_lower:
+            thinking_trace_markers.append(end_marker)
+        else:
+            thinking_trace_incomplete = True
 
     return ReasoningOutputSignals(
         has_thinking_trace=bool(thinking_trace_markers),
@@ -3648,74 +3674,23 @@ def _detect_special_token_leakage(text: str) -> tuple[bool, list[str]]:
     return bool(leaked_tokens), leaked_tokens
 
 
-def _minimal_output_weakness_reason(text: str, generated_tokens: int) -> str | None:
-    """Return a weak-output reason when short text is likely not useful content."""
-    text_stripped: str = text.strip()
-    if not text_stripped:
-        return f"empty({generated_tokens}tok)"
-
-    word_count: int = len(text_stripped.split())
-    text_lower: str = text_stripped.lower()
-
-    filler_responses: list[str] = [
-        "the image is a photograph",
-        "the image is in the public domain",
-        "i cannot",
-        "i can't",
-    ]
-    for filler in filler_responses:
-        if text_lower.startswith(filler) and word_count < QUALITY.min_words_for_filler_response:
-            return f"filler_response({generated_tokens}tok)"
-
-    if word_count < QUALITY.min_words_for_truncated:
-        return f"truncated({generated_tokens}tok)"
-
-    return None
-
-
-def _minimal_output_weakness_label(reason: str) -> str:
-    """Return a compact weak-output label safe to embed in structured detail strings."""
-    return reason.split("(", maxsplit=1)[0]
-
-
 def _detect_minimal_output(
     text: str,
     generated_tokens: int | None,
-    prompt_tokens: int | None = None,
 ) -> tuple[bool, str | None]:
-    """Detect mechanically minimal output only when token evidence is recorded.
-
-    Args:
-        text: Generated text
-        generated_tokens: Number of tokens generated, if recorded
-        prompt_tokens: Number of tokens in prompt (if known)
-
-    Returns:
-        Tuple of (is_minimal, reason)
-    """
+    """Detect only empty or one/two-word output with recorded token evidence."""
     if generated_tokens is None:
         return False, None
 
     if generated_tokens == 0:
         return True, "zero_tokens"
 
-    # Less than threshold tokens when we have a substantial prompt
-    if generated_tokens < QUALITY.min_tokens_for_substantial:
-        weak_reason = _minimal_output_weakness_reason(text, generated_tokens)
-        if weak_reason is not None:
-            return True, weak_reason
-
-    # Both sides of the ratio must be recorded; missing counts stay unknown.
+    word_count = len(text.strip().split())
     if (
-        prompt_tokens is not None
-        and prompt_tokens > QUALITY.min_prompt_tokens_for_ratio
-        and generated_tokens < QUALITY.min_output_tokens_for_ratio
+        word_count <= QUALITY.max_words_for_minimal_output
+        and generated_tokens < QUALITY.min_tokens_for_substantial
     ):
-        ratio: float = generated_tokens / prompt_tokens
-        if ratio < QUALITY.min_output_ratio:
-            weak_reason = _minimal_output_weakness_reason(text, generated_tokens)
-            detail = f";{_minimal_output_weakness_label(weak_reason)}" if weak_reason else ""
-            return True, f"output_ratio({ratio:.1%}{detail})"
+        return True, f"minimal_words({word_count}w;{generated_tokens}tok)"
 
     return False, None
 
@@ -3801,10 +3776,13 @@ def _collect_prompt_quality_signals(
     generated_tokens: int | None,
     prompt: str | None,
     context_marker: str,
-    model_name: str | None,
+    thinking_trace_delimiters: Sequence[tuple[str, str]],
 ) -> PromptQualitySignals:
     """Collect only prompt-aware signals used by the reduced assessment."""
-    reasoning_signals = _detect_reasoning_output(raw_text or text, model_name=model_name)
+    reasoning_signals = _detect_reasoning_output(
+        raw_text or text,
+        delimiter_pairs=thinking_trace_delimiters,
+    )
     instruction_echo, _instruction_markers = _detect_instruction_echo(text)
     if not prompt:
         return PromptQualitySignals(
@@ -3847,8 +3825,8 @@ def analyze_generation_text(
     prompt: str | None = None,
     requested_max_tokens: int | None = None,
     context_marker: str = "Context:",
-    model_name: str | None = None,
     known_special_tokens: Sequence[str] = (),
+    thinking_trace_delimiters: Sequence[tuple[str, str]] = THINKING_TRACE_DELIMITER_PAIRS,
 ) -> GenerationQualityAnalysis:
     """Collect mechanical output observations and recorded runtime facts."""
     normalized = _normalize_output_for_analysis(
@@ -3863,7 +3841,7 @@ def analyze_generation_text(
         generated_tokens=generated_tokens,
         prompt=prompt,
         context_marker=context_marker,
-        model_name=model_name,
+        thinking_trace_delimiters=thinking_trace_delimiters,
     )
     prompt_tokens_text_est = _estimate_prompt_tokens_from_text(prompt)
     prompt_tokens_nontext_est = (
@@ -3918,8 +3896,8 @@ def _analyze_text_quality(
     prompt: str | None = None,
     requested_max_tokens: int | None = None,
     context_marker: str = "Context:",
-    model_name: str | None = None,
     known_special_tokens: Sequence[str] = (),
+    thinking_trace_delimiters: Sequence[tuple[str, str]] = THINKING_TRACE_DELIMITER_PAIRS,
 ) -> tuple[GenerationQualityAnalysis, str | None]:
     """Return mechanical quality analysis plus a compact log-only label string."""
     analysis = analyze_generation_text(
@@ -3929,8 +3907,8 @@ def _analyze_text_quality(
         prompt=prompt,
         requested_max_tokens=requested_max_tokens,
         context_marker=context_marker,
-        model_name=model_name,
         known_special_tokens=known_special_tokens,
+        thinking_trace_delimiters=thinking_trace_delimiters,
     )
     return analysis, _build_quality_issues_string(analysis)
 
@@ -6029,6 +6007,74 @@ def _build_report_render_context(
     )
 
 
+def _validate_report_render_context(context: ReportRenderContext) -> None:
+    """Reject inconsistent cached identities or outcome axes before publication."""
+    result_names = tuple(result.model_name for result in context.result_set.results)
+    assessment_names = tuple(model_name for model_name, _assessment in context.assessments)
+    provenance_names = tuple(model_name for model_name, _record in context.model_provenance)
+    named_groups = {
+        "result": result_names,
+        "assessment": assessment_names,
+        "provenance": provenance_names,
+    }
+    for label, names in named_groups.items():
+        if len(names) != len(set(names)):
+            msg = f"report context contains duplicate {label} identities"
+            raise ValueError(msg)
+
+    result_keys = set(result_names)
+    for label, names in (
+        ("assessment", assessment_names),
+        ("provenance", provenance_names),
+    ):
+        if set(names) != result_keys:
+            msg = f"report context {label} keys do not match result keys"
+            raise ValueError(msg)
+
+    legal_axes: frozenset[tuple[ExecutionStatus, ModelUsability, MaintainerStatus]] = frozenset(
+        {
+            ("completed", "usable", "none"),
+            ("completed", "usable_with_caveats", "observation_needs_reproduction"),
+            ("completed", "unusable", "observation_needs_reproduction"),
+            ("crashed", "not_evaluated", "actionable_failure"),
+            ("indeterminate", "not_evaluated", "none"),
+        }
+    )
+    for model_name, assessment in context.assessments:
+        axes = (assessment.execution, assessment.usability, assessment.maintainer_status)
+        if axes not in legal_axes:
+            msg = f"report context has illegal outcome axes for {model_name}: {axes}"
+            raise ValueError(msg)
+        observations_expected = assessment.usability in {"usable_with_caveats", "unusable"}
+        if bool(assessment.observations) != observations_expected:
+            msg = f"report context has illegal observation partition for {model_name}"
+            raise ValueError(msg)
+
+    for model_name, provenance in context.model_provenance:
+        if provenance.get("model") != model_name:
+            msg = f"report context provenance record does not match key {model_name}"
+            raise ValueError(msg)
+
+    counts = _run_outcome_counts(context.assessments)
+    usability_counts = Counter(
+        assessment.usability for _model_name, assessment in context.assessments
+    )
+    expected_counts = {
+        "models_attempted": len(result_names),
+        "models_evaluated": counts["models_completed"] + counts["models_crashed"],
+        "models_completed": (
+            usability_counts["usable"]
+            + usability_counts["usable_with_caveats"]
+            + usability_counts["unusable"]
+        ),
+        "models_crashed": usability_counts["not_evaluated"] - counts["models_indeterminate"],
+        "models_indeterminate": counts["models_indeterminate"],
+    }
+    if counts != expected_counts:
+        msg = f"report context outcome partitions are inconsistent: {counts}"
+        raise ValueError(msg)
+
+
 def _html_attr(name: str, value: str) -> str:
     """Return a safely escaped HTML attribute."""
     return f' {name}="{html.escape(value, quote=True)}"'
@@ -6104,94 +6150,6 @@ def _peak_memory_delta_from_model_load_gb(result: PerformanceResult) -> float | 
     if not math.isfinite(peak_memory_gb) or not math.isfinite(model_load_active_gb):
         return None
     return max(peak_memory_gb - model_load_active_gb, 0.0)
-
-
-def _populate_summary_image_memory_density(
-    summary: ModelIssueSummary,
-    successful: Sequence[PerformanceResult],
-    *,
-    image_profile: ImageInputProfile | None,
-) -> None:
-    """Populate image-normalized memory metrics when image and baseline data exist."""
-    if image_profile is None or image_profile.megapixels <= 0.0:
-        return
-
-    peak_deltas_gb = [
-        delta
-        for result in successful
-        if (delta := _peak_memory_delta_from_model_load_gb(result)) is not None
-    ]
-    if not peak_deltas_gb:
-        return
-
-    average_delta_gb = sum(peak_deltas_gb) / len(peak_deltas_gb)
-    summary["image_width"] = image_profile.width
-    summary["image_height"] = image_profile.height
-    summary["image_megapixels"] = image_profile.megapixels
-    summary["image_memory_density_models"] = len(peak_deltas_gb)
-    summary["average_peak_memory_delta_gb"] = average_delta_gb
-    summary["average_peak_memory_delta_mb_per_megapixel"] = (
-        average_delta_gb * 1024 / image_profile.megapixels
-    )
-
-
-def _populate_summary_performance_highlights(
-    summary: ModelIssueSummary,
-    successful: list[PerformanceResult],
-) -> None:
-    """Populate speed/memory highlights and aggregate resource stats."""
-    if not successful:
-        return
-
-    _populate_summary_performance_extrema(summary, successful)
-
-    total_tps: float = sum(getattr(r.generation, "generation_tps", 0) or 0 for r in successful)
-    summary["average_tps"] = total_tps / len(successful)
-    summary["successful_count"] = len(successful)
-
-    total_mem: float = sum(getattr(r.generation, "peak_memory", 0) or 0 for r in successful)
-    summary["total_peak_memory"] = total_mem
-    summary["average_peak_memory"] = total_mem / len(successful)
-
-    total_tokens: int = sum(
-        (getattr(r.generation, "prompt_tokens", 0) or 0)
-        + (getattr(r.generation, "generation_tokens", 0) or 0)
-        for r in successful
-    )
-    summary["memory_efficiency"] = total_tokens / total_mem if total_mem > 0 else 0
-
-
-def _populate_summary_performance_extrema(
-    summary: ModelIssueSummary,
-    candidates: Sequence[PerformanceResult],
-) -> None:
-    """Populate raw fastest-load, throughput, and memory extrema."""
-    summary.pop("fastest_model", None)
-    summary.pop("most_efficient_model", None)
-    summary.pop("fastest_load_model", None)
-    if not candidates:
-        return
-
-    fastest: PerformanceResult = max(
-        candidates,
-        key=lambda r: getattr(r.generation, "generation_tps", 0) or 0,
-    )
-    fastest_tps: float = getattr(fastest.generation, "generation_tps", 0) or 0
-    summary["fastest_model"] = (fastest.model_name, fastest_tps)
-
-    most_efficient: PerformanceResult = min(
-        candidates,
-        key=lambda r: getattr(r.generation, "peak_memory", float("inf")) or float("inf"),
-    )
-    efficient_mem: float = getattr(most_efficient.generation, "peak_memory", 0) or 0
-    summary["most_efficient_model"] = (most_efficient.model_name, efficient_mem)
-
-    fastest_load: PerformanceResult = min(
-        candidates,
-        key=lambda r: getattr(r, "model_load_time", float("inf")) or float("inf"),
-    )
-    load_time: float = getattr(fastest_load, "model_load_time", 0) or 0
-    summary["fastest_load_model"] = (fastest_load.model_name, load_time)
 
 
 _RUNTIME_PHASE_KEYS: Final[tuple[RuntimePhaseName, ...]] = (
@@ -6623,18 +6581,6 @@ def _gallery_model_anchor(model_name: str) -> str:
     return f"model-{collapsed or 'entry'}"
 
 
-def _format_gallery_model_link(
-    model_name: str,
-    *,
-    gallery_link_target: str | None = None,
-) -> str:
-    """Format a Markdown link to a model entry in the gallery artifact."""
-    target = f"#{_gallery_model_anchor(model_name)}"
-    if gallery_link_target is not None:
-        target = f"{gallery_link_target}#{_gallery_model_anchor(model_name)}"
-    return f"[`{model_name}`]({target})"
-
-
 def _collect_report_component_rows(
     *,
     versions: LibraryVersionDict,
@@ -6664,7 +6610,22 @@ def _home_relative_report_text(value: str) -> str:
     """Replace local private prefixes in public report text."""
     home = str(Path.home())
     sanitized = value if home == "/" else value.replace(home, "~")
-    return sanitized.replace("/private/", "<private>/")
+    sanitized = re.sub(r"/(?:Users|home)/[^/\s\"'<>]+", "~", sanitized)
+    return re.sub(r"/private(?=/|$)", "<private>", sanitized)
+
+
+def _public_model_provenance(
+    record: ModelProvenanceRecord,
+) -> ModelProvenanceRecord:
+    """Return provenance with its operational snapshot path made portable."""
+    return {
+        **record,
+        "snapshot_path": (
+            _home_relative_report_text(record["snapshot_path"])
+            if record["snapshot_path"] is not None
+            else None
+        ),
+    }
 
 
 def _quality_analysis_for_result(res: PerformanceResult) -> GenerationQualityAnalysis | None:
@@ -6719,13 +6680,6 @@ def _is_indeterminate_connectivity_failure(result: PerformanceResult) -> bool:
     return _has_external_connectivity_signal(combined)
 
 
-def _execution_outcome(result: PerformanceResult) -> ExecutionOutcome:
-    """Return whether generation completed, failed conclusively, or was indeterminate."""
-    if _is_indeterminate_connectivity_failure(result):
-        return "indeterminate"
-    return "completed" if result.success else "failed"
-
-
 def _advance_upstream_boundary(
     boundary: UpstreamBoundary,
     phase: str,
@@ -6753,28 +6707,6 @@ def _run_outcome_counts(
         "models_crashed": crashed,
         "models_indeterminate": indeterminate,
     }
-
-
-def _preview_model_references(
-    model_names: Sequence[str],
-    *,
-    gallery_link_target: str | None = None,
-    max_items: int = 4,
-) -> str:
-    """Format a compact preview of model names, optionally linking to the gallery."""
-    unique_names = list(dict.fromkeys(model_names))
-    rendered_names = [
-        _format_gallery_model_link(
-            model_name,
-            gallery_link_target=gallery_link_target,
-        )
-        if gallery_link_target is not None
-        else f"`{model_name}`"
-        for model_name in unique_names[:max_items]
-    ]
-    if len(unique_names) > max_items:
-        rendered_names.append(f"+{len(unique_names) - max_items} more")
-    return ", ".join(rendered_names)
 
 
 GALLERY_STAMP_LIBRARY_NAMES: Final[tuple[str, ...]] = (
@@ -7156,11 +7088,9 @@ def _assessment_observations(result: PerformanceResult) -> tuple[ObservationCode
         observations.append("empty_output")
     else:
         generated_tokens = _generation_int_metric(result.generation, "generation_tokens")
-        prompt_tokens = _generation_int_metric(result.generation, "prompt_tokens")
         is_minimal, _minimal_reason = _detect_minimal_output(
             text,
             generated_tokens,
-            prompt_tokens,
         )
         if is_minimal:
             observations.append("minimal_output")
@@ -7298,7 +7228,7 @@ def _append_markdown_code_block(
     Uses a fence longer than any backtick run in ``content`` so nested
     Markdown/code fences remain valid when embedded.
     """
-    normalized_content = content.expandtabs(4)
+    normalized_content = content
     max_backtick_run = max(
         (len(m.group(0)) for m in re.finditer(r"`+", normalized_content)),
         default=0,
@@ -7481,20 +7411,10 @@ def _write_markdown_artifact(
     *,
     artifact_name: str,
 ) -> None:
-    """Normalize and write Markdown artifact content with consistent error handling."""
+    """Normalize and write Markdown artifact content."""
     markdown_content: str = normalize_markdown_trailing_spaces("\n".join(markdown_lines)) + "\n"
-
-    try:
-        _write_text_file(filename, markdown_content)
-        # Logging handled in finalize_execution
-    except OSError:
-        logger.exception("Failed to write %s to file %s.", artifact_name, str(filename))
-    except ValueError:
-        logger.exception(
-            "A value error occurred while writing %s %s",
-            artifact_name,
-            str(filename),
-        )
+    del artifact_name
+    _write_text_file(filename, markdown_content)
 
 
 def _append_markdown_section(
@@ -7750,7 +7670,7 @@ def _build_environment_failure_diagnostics(
                 "Run aborted before any model execution because core runtime "
                 "dependencies were unavailable."
             ),
-            f"**Error:** {DIAGNOSTICS_ESCAPER.escape(error_message)}",
+            f"**Error:** {DIAGNOSTICS_ESCAPER.escape(_home_relative_report_text(error_message))}",
         ],
     )
     parts.extend(
@@ -7760,42 +7680,6 @@ def _build_environment_failure_diagnostics(
         ),
     )
     return parts
-
-
-_TRAINING_LEAK_LABELS: Final[dict[str, str]] = {
-    "instruction_header": "instruction headers mid-output",
-    "task_header": "task/question headers mid-output",
-    "write_prompt": "new writing prompts mid-output",
-    "user_turn": "new user-turn delimiters mid-output",
-    "code_example": "example-code templates mid-output",
-    "qa_pair": "Q/A template patterns mid-output",
-}
-
-_REVIEW_OWNER_BY_FAILURE_NEEDLE: Final[tuple[tuple[str, str], ...]] = (
-    ("transformers", "transformers"),
-    ("huggingface-hub", "huggingface-hub"),
-    ("mlx-lm", "mlx-lm"),
-    ("mlx-vlm", "mlx-vlm"),
-    ("model-config", "model-config"),
-    ("mlx", "mlx"),
-)
-
-_REVIEW_OWNER_BY_HARNESS_TYPE: Final[dict[str, str]] = {
-    "prompt_template": "model-config",
-    "stop_token": "mlx-vlm",
-    "encoding": "mlx-vlm",
-    "generation_loop": "mlx-vlm",
-    "long_context": "mlx",
-}
-
-
-def _split_harness_detail(detail: str) -> tuple[str, str]:
-    """Return structured harness detail kind and payload."""
-    raw = detail or ""
-    for prefix in ("token_leak:", "token_encoding:", "output:", "training_leak:"):
-        if raw.startswith(prefix):
-            return prefix[:-1], raw.removeprefix(prefix)
-    return ("long_context", raw) if raw.startswith("long_context_") else ("unknown", raw)
 
 
 def _dedupe_preserve_order(items: Sequence[str]) -> list[str]:
@@ -7808,202 +7692,6 @@ def _dedupe_preserve_order(items: Sequence[str]) -> list[str]:
         seen.add(item)
         unique_items.append(item)
     return unique_items
-
-
-def _simplify_failure_message(error_message: str | None, *, model_name: str) -> str:
-    """Strip local wrapper prefixes to keep issue text maintainer-focused."""
-    if not error_message:
-        return "Unknown runtime failure."
-
-    message = _collapse_preview_whitespace(error_message.strip())
-    prefixes = (
-        f"Model generation failed for {model_name}: ",
-        f"Model preflight failed for {model_name}: ",
-    )
-    for prefix in prefixes:
-        if message.startswith(prefix):
-            return message.removeprefix(prefix).strip() or message
-    return message
-
-
-def _describe_token_encoding_detail(token_issue: str) -> str:
-    """Describe token-encoding harness anomalies in plain language."""
-    if match := re.fullmatch(r"bpe_space_leak\((\d+)\)", token_issue):
-        count = match.group(1)
-        return (
-            "Tokenizer space-marker artifacts (for example Ġ) appeared in output "
-            f"(about {count} occurrences)."
-        )
-    if match := re.fullmatch(r"bpe_newline_leak\((\d+)\)", token_issue):
-        count = match.group(1)
-        return (
-            "Tokenizer newline-marker artifacts (for example Ċ) appeared in output "
-            f"(about {count} occurrences)."
-        )
-    if token_issue.startswith("bpe_byte_leak("):
-        return "Byte-level tokenizer artifacts appeared in generated text."
-    return "Tokenizer decoding artifacts appeared in generated text."
-
-
-def _describe_output_detail(output_detail: str) -> str | None:
-    """Describe output-length harness anomalies in plain language."""
-    if output_detail == "zero_tokens":
-        return "No generated tokens were recorded."
-    if match := re.fullmatch(r"truncated\((\d+)tok\)", output_detail):
-        return f"Output appears truncated to about {match.group(1)} tokens."
-    if match := re.fullmatch(r"filler_response\((\d+)tok\)", output_detail):
-        return f"Output was a short generic filler response (about {match.group(1)} tokens)."
-    if match := re.fullmatch(r"output_ratio\(([^;)]+)(?:;([^)]+))?\)", output_detail):
-        ratio_text, weak_label = match.groups()
-        weak_text = f" with weak text signal '{weak_label}'" if weak_label else ""
-        return (
-            "Output is very short relative to prompt size "
-            f"({ratio_text}){weak_text}, suggesting possible early-stop or "
-            "prompt-handling issues."
-        )
-    return None
-
-
-def _describe_long_context_detail(
-    detail: str,
-    *,
-    prompt_burden_kind: str | None = None,
-) -> str | None:
-    """Describe long-context harness anomalies in plain language."""
-    burden_label = (
-        f"{prompt_burden_kind.replace('_', ' ')} burden"
-        if prompt_burden_kind and prompt_burden_kind not in {"normal", "unknown"}
-        else "long prompt length"
-    )
-    if match := re.fullmatch(r"long_context_empty\((\d+)tok\)", detail):
-        return f"At {burden_label} ({match.group(1)} tokens), generation returned empty output."
-    if match := re.fullmatch(
-        r"long_context_low_ratio\(([^;]+);(\d+)->(\d+)(?:;([^)]+))?\)",
-        detail,
-    ):
-        ratio_text, prompt_tok, output_tok, weak_label = match.groups()
-        weak_text = f"; weak text signal {weak_label}" if weak_label else ""
-        return (
-            f"At {burden_label} "
-            f"({prompt_tok} tokens), output stayed unusually short "
-            f"({output_tok} tokens; ratio {ratio_text}{weak_text})."
-        )
-    if match := re.fullmatch(r"long_context_repetition\((\d+)tok\)", detail):
-        return f"At {burden_label} ({match.group(1)} tokens), output became repetitive."
-    if match := re.fullmatch(r"long_context_context_drop\((\d+)tok\)", detail):
-        return (
-            f"At {burden_label} "
-            f"({match.group(1)} tokens), output may stop following prompt/image context."
-        )
-    return None
-
-
-def _describe_harness_detail(
-    detail: str,
-    *,
-    prompt_burden_kind: str | None = None,
-) -> str | None:
-    """Translate internal harness detail tokens into maintainer-friendly prose."""
-    kind, payload = _split_harness_detail(detail)
-    if kind == "token_leak":
-        token = html.escape(payload, quote=False)
-        return f"Special control token {token} appeared in generated text."
-    if kind == "token_encoding":
-        return _describe_token_encoding_detail(payload)
-    if kind == "output":
-        return _describe_output_detail(payload)
-    if kind == "long_context":
-        return _describe_long_context_detail(
-            payload,
-            prompt_burden_kind=prompt_burden_kind,
-        )
-    if kind == "training_leak":
-        leak_label = _TRAINING_LEAK_LABELS.get(payload, "instruction/template text")
-        return f"Generated text appears to continue into {leak_label}."
-    return None
-
-
-def _describe_harness_details(
-    details: Sequence[str],
-    *,
-    prompt_burden_kind: str | None = None,
-) -> list[str]:
-    """Translate harness detail tokens into maintainer-friendly prose."""
-    return [
-        desc
-        for detail in details
-        if (
-            desc := _describe_harness_detail(
-                detail,
-                prompt_burden_kind=prompt_burden_kind,
-            )
-        )
-    ]
-
-
-def _evidence_token_encoding_detail(token_issue: str) -> str | None:
-    """Return fact-style evidence for tokenizer artifact detections."""
-    if match := re.fullmatch(r"bpe_space_leak\((\d+)\)", token_issue):
-        return f"{match.group(1)} BPE space markers found in decoded text"
-    if match := re.fullmatch(r"bpe_newline_leak\((\d+)\)", token_issue):
-        return f"{match.group(1)} BPE newline markers found in decoded text"
-    if match := re.fullmatch(r"bpe_byte_leak\((\d+)\)", token_issue):
-        return f"{match.group(1)} byte-level tokenizer markers found in decoded text"
-    return None
-
-
-def _evidence_output_detail(output_detail: str) -> str | None:
-    """Return fact-style evidence for output-length harness detections."""
-    if output_detail == "zero_tokens":
-        return "generated_tokens=0"
-    if match := re.fullmatch(r"truncated\((\d+)tok\)", output_detail):
-        return f"generated_tokens~{match.group(1)}"
-    if match := re.fullmatch(r"filler_response\((\d+)tok\)", output_detail):
-        return f"generic filler response, generated_tokens~{match.group(1)}"
-    if match := re.fullmatch(r"output_ratio\(([^;)]+)(?:;([^)]+))?\)", output_detail):
-        ratio_text, weak_label = match.groups()
-        weak_text = f", weak text={weak_label}" if weak_label else ""
-        return f"output/prompt={ratio_text}{weak_text}"
-    return None
-
-
-def _evidence_long_context_detail(detail: str) -> str | None:
-    """Return fact-style evidence for long-context harness detections."""
-    if match := re.fullmatch(r"long_context_empty\((\d+)tok\)", detail):
-        return f"prompt_tokens={match.group(1)}, output_tokens=0"
-    if match := re.fullmatch(
-        r"long_context_low_ratio\(([^;]+);(\d+)->(\d+)(?:;([^)]+))?\)",
-        detail,
-    ):
-        ratio_text, prompt_tok, output_tok, weak_label = match.groups()
-        weak_text = f", weak text={weak_label}" if weak_label else ""
-        return (
-            f"prompt_tokens={prompt_tok}, output_tokens={output_tok}, "
-            f"output/prompt={ratio_text}{weak_text}"
-        )
-    if match := re.fullmatch(r"long_context_repetition\((\d+)tok\)", detail):
-        return f"prompt_tokens={match.group(1)}, repetitive output"
-    if match := re.fullmatch(r"long_context_context_drop\((\d+)tok\)", detail):
-        return f"prompt_tokens={match.group(1)}, prompt/image context dropped"
-    return None
-
-
-def _evidence_harness_detail(detail: str) -> str | None:
-    """Translate harness detail tokens into concise supporting facts."""
-    kind, payload = _split_harness_detail(detail)
-    if kind == "token_leak":
-        token = html.escape(payload, quote=False)
-        return f"decoded text contains control token {token}"
-    if kind == "token_encoding":
-        return _evidence_token_encoding_detail(payload)
-    if kind == "output":
-        return _evidence_output_detail(payload)
-    if kind == "long_context":
-        return _evidence_long_context_detail(payload)
-    if kind == "training_leak":
-        leak_label = _TRAINING_LEAK_LABELS.get(payload, "instruction/template text")
-        return f"decoded text continues into {leak_label}"
-    return None
 
 
 @dataclass(frozen=True)
@@ -8093,17 +7781,17 @@ def _diagnostics_fact(value: object | None) -> str:
     if isinstance(value, bool):
         return str(value).lower()
     if isinstance(value, str):
-        return value
+        return _home_relative_report_text(value)
     if isinstance(value, int | float):
         return str(value)
-    return json.dumps(_jsonify_cli_value(value), sort_keys=True)
+    return _home_relative_report_text(json.dumps(_jsonify_cli_value(value), sort_keys=True))
 
 
 def _diagnostics_exception_lines(result: PerformanceResult) -> tuple[str, ...]:
     """Return the complete recorded exception chain in root-to-wrapper order."""
     if result.exception_chain:
         return tuple(
-            f"{item.module}.{item.exception_type}: {item.message}"
+            _home_relative_report_text(f"{item.module}.{item.exception_type}: {item.message}")
             for item in result.exception_chain
         )
     exception_type = result.root_error_type or result.error_type
@@ -8116,7 +7804,7 @@ def _diagnostics_exception_lines(result: PerformanceResult) -> tuple[str, ...]:
         if module is not None and exception_type is not None
         else exception_type or module or "Exception"
     )
-    return (f"{qualified_type}: {message or 'unavailable'}",)
+    return (_home_relative_report_text(f"{qualified_type}: {message or 'unavailable'}"),)
 
 
 def _diagnostics_repro_command(
@@ -8160,7 +7848,7 @@ def _diagnostics_result_facts(
         ("Stage", _diagnostics_fact(result.error_stage)),
         ("Package", _diagnostics_fact(result.error_package)),
         (
-            "Model revision",
+            "Resolved model revision",
             _diagnostics_fact(
                 model_provenance["resolved_revision"] if model_provenance is not None else None
             ),
@@ -8284,7 +7972,7 @@ def _diagnostics_model_entry(
     parts.extend([f"{'#' * (heading_level + 1)} Captured stdout/stderr", ""])
     _append_markdown_code_block(
         parts,
-        result.captured_output_on_fail or "unavailable",
+        _home_relative_report_text(result.captured_output_on_fail or "unavailable"),
         language="text",
     )
 
@@ -8439,7 +8127,7 @@ def generate_diagnostics_report(
     )
     parts.extend(
         _diagnostics_partition_section(
-            title="Successful Observations Requiring Reproduction",
+            title="Completed Runs with Observations",
             results=observations,
             assessments=assessments,
             prompt=prompt,
@@ -8741,11 +8429,17 @@ def _html_gallery_model(
     result: PerformanceResult,
     row: GalleryRow,
     assessment: ResultAssessment,
+    model_provenance: ModelProvenanceRecord | None,
 ) -> str:
     """Render one complete, escaped model-evidence entry from shared gallery facts."""
     facts = tuple(
         (label, value)
-        for label, value in _gallery_model_facts(result, row, assessment)
+        for label, value in _gallery_model_facts(
+            result,
+            row,
+            assessment,
+            model_provenance,
+        )
         if value is not None
     )
     parts = [
@@ -8768,7 +8462,9 @@ def _html_gallery_model(
         parts.extend(
             (
                 "<h4>Complete traceback</h4>",
-                _html_code_block(result.error_traceback or "unavailable"),
+                _html_code_block(
+                    _home_relative_report_text(result.error_traceback or "unavailable")
+                ),
             )
         )
         partial_output = _generation_text_value(result.generation)
@@ -8778,7 +8474,7 @@ def _html_gallery_model(
             parts.extend(
                 (
                     "<h4>Captured upstream output</h4>",
-                    _html_code_block(result.captured_output_on_fail),
+                    _html_code_block(_home_relative_report_text(result.captured_output_on_fail)),
                 )
             )
         if not partial_output and not result.captured_output_on_fail:
@@ -8790,6 +8486,7 @@ def _html_gallery_model(
 def _html_complete_gallery(report_context: HtmlReportContext) -> str:
     """Render complete evidence in the same stable order as the Markdown gallery."""
     assessments = _assessments_by_model(report_context)
+    model_provenance = _model_provenance_by_model(report_context)
     rows_by_model = {
         result.model_name: _gallery_row(result, assessments[result.model_name])
         for result in report_context.result_set.results
@@ -8817,6 +8514,7 @@ def _html_complete_gallery(report_context: HtmlReportContext) -> str:
             result,
             rows_by_model[result.model_name],
             assessments[result.model_name],
+            model_provenance.get(result.model_name),
         )
         for result in ordered_results
     )
@@ -8877,7 +8575,9 @@ def _html_diagnostics_entry(
             f"<h5>{output_label}</h5>",
             _html_code_block(generated_output),
             "<h5>Captured stdout/stderr</h5>",
-            _html_code_block(result.captured_output_on_fail or "unavailable"),
+            _html_code_block(
+                _home_relative_report_text(result.captured_output_on_fail or "unavailable")
+            ),
             "<h5>Supplemental CLI reproduction</h5>",
             _html_code_block(
                 _diagnostics_repro_command(
@@ -8975,7 +8675,7 @@ def _html_maintainer_diagnostics(
             model_provenance=model_provenance,
         ),
         _html_diagnostics_partition(
-            title="Successful Observations Requiring Reproduction",
+            title="Completed Runs with Observations",
             results=observations,
             assessments=assessments,
             prompt=prompt,
@@ -9174,16 +8874,13 @@ def generate_html_report(
         run_args=run_args,
     )
 
-    try:
-        _write_text_file(filename, html_content)
-        # Logging handled in finalize_execution
-    except OSError:
-        logger.exception("Failed to write HTML report to %s", filename)
+    _write_text_file(filename, html_content)
 
 
 def _generate_model_gallery_section(report_context: ReportRenderContext) -> list[str]:
     """Render complete evidence in stable avoid-first, then usable order."""
     assessments = _assessments_by_model(report_context)
+    model_provenance = _model_provenance_by_model(report_context)
     results = report_context.result_set.results
     rows_by_model = {
         result.model_name: _gallery_row(result, assessments[result.model_name])
@@ -9214,6 +8911,7 @@ def _generate_model_gallery_section(report_context: ReportRenderContext) -> list
                 result,
                 rows_by_model[result.model_name],
                 assessments[result.model_name],
+                model_provenance.get(result.model_name),
             )
         )
         md.extend(["---", ""])
@@ -10517,21 +10215,12 @@ def _serialize_exception_chain(
         item = {
             "type": entry.exception_type,
             "module": entry.module,
-            "message": entry.message,
+            "message": _home_relative_report_text(entry.message),
         }
         if entry.origin is not None:
             item["origin"] = _home_relative_report_text(entry.origin)
         serialized.append(item)
     return serialized
-
-
-def _exception_chain_json_field(
-    chain: tuple[FailureException, ...],
-) -> dict[str, object]:
-    """Return the additive exception-chain field only when evidence exists."""
-    if not chain:
-        return {}
-    return {"exception_chain": _serialize_exception_chain(chain)}
 
 
 def _failure_exception_package(entry: FailureException) -> str:
@@ -11797,7 +11486,6 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
                     prompt=params.prompt,
                     requested_max_tokens=params.max_tokens,
                     context_marker=params.context_marker,
-                    model_name=params.model_identifier,
                 )
         if stderr_clean:
             captured_sections.append("=== STDERR ===\n" + stderr_clean)
@@ -12114,20 +11802,23 @@ def _log_metric_tree(
     _log_rich_renderable(tree, indent=indent)
 
 
-def _summary_parts(res: PerformanceResult, model_short: str) -> list[str]:
+def _summary_parts(
+    res: PerformanceResult,
+    model_short: str,
+    assessment: ResultAssessment,
+) -> list[str]:
     """Assemble key=value summary segments for per-run triage."""
     parts: list[str] = [
         f"model={model_short}",
-        f"status={'OK' if res.success else 'FAIL'}",
+        f"execution={assessment.execution}",
+        f"usability={assessment.usability}",
+        f"maintainer={assessment.maintainer_status}",
     ]
-    issue_labels = sorted(_extract_quality_issue_labels(res.quality_issues))
-    if res.success:
-        if issue_labels:
-            parts.append(f"observations={'+'.join(issue_labels)}")
-        else:
-            parts.append("observations=none")
-    elif issue_labels:
-        parts.append(f"observations={'+'.join(issue_labels)}")
+    parts.append(
+        f"observations={'+'.join(assessment.observations)}"
+        if assessment.observations
+        else "observations=none"
+    )
     if res.error_stage:
         parts.append(f"stage={res.error_stage}")
     if res.failure_phase:
@@ -12503,17 +12194,6 @@ def _log_compact_metrics(res: PerformanceResult) -> None:
         line2 = f"   Tokens: {tokens_part}{speed_part}"
         logger.info(line2, extra={"style_hint": LogStyles.METRIC_LABEL})
 
-    if (
-        prompt_tokens >= QUALITY.long_prompt_tokens_threshold
-        and gen_tokens < QUALITY.min_output_tokens_for_ratio
-    ):
-        ratio = gen_tokens / max(prompt_tokens, 1)
-        log_warning_note(
-            "Potential long-context degradation: "
-            f"prompt={fmt_num(prompt_tokens)} tok, "
-            f"output={fmt_num(gen_tokens)} tok ({ratio:.1%})",
-        )
-
 
 def log_metrics_legend(*, detailed: bool) -> None:
     """Emit a one-time legend at the beginning of processing for clarity."""
@@ -12567,6 +12247,7 @@ def _log_failure_details(result: PerformanceResult) -> None:
 def print_model_result(
     result: PerformanceResult,
     *,
+    assessment: ResultAssessment | None = None,
     verbose: bool = False,
     detailed_metrics: bool = False,
     run_index: int | None = None,
@@ -12575,15 +12256,25 @@ def print_model_result(
     context_marker: str = "Context:",
 ) -> None:
     """Print a concise summary + optional verbose block for a model result."""
+    resolved_assessment = assessment or _assess_result(result)
     run_prefix = "" if run_index is None else f"[RUN {run_index}/{total_runs}] "
-    summary = run_prefix + "SUMMARY " + " ".join(_summary_parts(result, result.model_name))
+    summary = (
+        run_prefix
+        + "SUMMARY "
+        + " ".join(_summary_parts(result, result.model_name, resolved_assessment))
+    )
     # Wrap summary to terminal width for readability
     width = get_terminal_width(max_width=100)
     for line in textwrap.wrap(summary, width=width, break_long_words=False, break_on_hyphens=False):
-        if result.success:
-            log_success(line, prefix="")
-        else:
+        if resolved_assessment.execution == "crashed":
             log_failure(line, prefix="")
+        else:
+            style = (
+                LogStyles.WARNING
+                if resolved_assessment.execution == "indeterminate"
+                else LogStyles.DETAIL
+            )
+            logger.info(line, extra={"style_hint": style})
     if result.success and not verbose:  # quick exit with preview only
         _preview_generation(
             result.generation,
@@ -13483,15 +13174,6 @@ def process_models(
 
         results.append(result)
 
-        print_model_result(
-            result,
-            verbose=args.verbose,
-            detailed_metrics=getattr(args, "detailed_metrics", False),
-            run_index=idx,
-            total_runs=len(model_identifiers),
-            prompt=prompt,
-            context_marker=args.context_marker,
-        )
     return results
 
 
@@ -13636,6 +13318,15 @@ def _populate_result_quality_analysis(
     resolved_requested_max_tokens = (
         requested_max_tokens if requested_max_tokens is not None else result.requested_max_tokens
     )
+    thinking_trace_delimiters = list(THINKING_TRACE_DELIMITER_PAIRS)
+    if result.prompt_diagnostics is not None:
+        generation_kwargs = result.prompt_diagnostics.generate_kwargs
+        start_marker = generation_kwargs.get("thinking_start_token")
+        end_marker = generation_kwargs.get("thinking_end_token")
+        if isinstance(start_marker, str) and isinstance(end_marker, str):
+            configured_pair = (start_marker, end_marker)
+            if all(configured_pair) and configured_pair not in thinking_trace_delimiters:
+                thinking_trace_delimiters.append(configured_pair)
     analysis, quality_issues = _analyze_text_quality(
         text,
         generated_tokens,
@@ -13643,10 +13334,10 @@ def _populate_result_quality_analysis(
         prompt=prompt,
         requested_max_tokens=resolved_requested_max_tokens,
         context_marker=context_marker,
-        model_name=result.model_name,
         known_special_tokens=(
             result.prompt_diagnostics.special_tokens if result.prompt_diagnostics else ()
         ),
+        thinking_trace_delimiters=thinking_trace_delimiters,
     )
     return replace(
         result,
@@ -13710,7 +13401,7 @@ def _truncate_quality_issues(
     return ", ".join(kept)
 
 
-def _format_counter_items(counter: Counter[str], *, max_items: int = 6) -> str:
+def _format_counter_items[T: str](counter: Counter[T], *, max_items: int = 6) -> str:
     """Format a counter as ``label=count`` pairs ordered by frequency."""
     if not counter:
         return "none"
@@ -13765,60 +13456,69 @@ def _log_rich_metric_chart(
 def _log_model_comparison_table_and_charts(
     results: list[PerformanceResult],
     *,
+    assessments: Mapping[str, ResultAssessment],
     recommended_working_set_bytes: int | None = None,
 ) -> None:
-    """Log per-model comparison table and compact Rich charts for this run."""
+    """Log cached outcome axes and rank only usable completed observations."""
     if not results:
         return
 
     def _sort_key(result: PerformanceResult) -> tuple[int, float, str]:
-        tps = float(getattr(result.generation, "generation_tps", 0.0) or 0.0)
-        return (0 if result.success else 1, -tps, result.model_name)
+        assessment = assessments[result.model_name]
+        execution_order = {"completed": 0, "crashed": 1, "indeterminate": 2}
+        tps = _valid_generation_tps(result) or 0.0
+        return (execution_order[assessment.execution], -tps, result.model_name)
 
     sorted_results = sorted(results, key=_sort_key)
     rows: list[list[str]] = []
     tps_entries: list[tuple[str, float]] = []
     total_time_entries: list[tuple[str, float]] = []
-    failed: list[PerformanceResult] = []
+    crashed: list[PerformanceResult] = []
 
     for idx, res in enumerate(sorted_results, start=1):
         model_label = _short_model_label(res.model_name)
-        if res.success and res.generation is not None:
-            tps = float(getattr(res.generation, "generation_tps", 0.0) or 0.0)
-            peak_mem = float(getattr(res.generation, "peak_memory", 0.0) or 0.0)
-            notes = _truncate_quality_issues(res.quality_issues, max_len=34) or "clean"
-            rows.append(
-                [
-                    str(idx),
-                    model_label,
-                    "OK",
-                    _format_float_or_dash(tps, digits=1),
-                    _format_float_or_dash(res.total_time, digits=2),
-                    _format_float_or_dash(res.model_load_time, digits=2),
-                    _format_float_or_dash(peak_mem if peak_mem > 0 else None, digits=2),
-                    notes,
-                ],
+        assessment = assessments[res.model_name]
+        tps = _valid_generation_tps(res)
+        peak_mem = _generation_optional_nonnegative_float_metric(res.generation, "peak_memory")
+        notes = _truncate_quality_issues(res.quality_issues, max_len=34)
+        if not notes:
+            notes = (
+                "+".join(assessment.observations)
+                if assessment.observations
+                else res.error_code or res.error_stage or res.error_message or "none"
             )
-            if tps > 0:
-                tps_entries.append((res.model_name, tps))
-            if res.total_time is not None and res.total_time > 0:
-                total_time_entries.append((res.model_name, res.total_time))
-        else:
-            error_note = res.error_code or res.error_stage or res.error_message or "failure"
-            error_note = _truncate_text_preview(error_note, max_chars=34)
-            rows.append(
-                [
-                    str(idx),
-                    model_label,
-                    "FAIL",
-                    "-",
-                    _format_float_or_dash(res.total_time, digits=2),
-                    _format_float_or_dash(res.model_load_time, digits=2),
-                    "-",
-                    error_note,
-                ],
-            )
-            failed.append(res)
+        rows.append(
+            [
+                str(idx),
+                model_label,
+                assessment.execution,
+                assessment.usability,
+                assessment.maintainer_status,
+                _format_float_or_dash(tps, digits=1),
+                _format_float_or_dash(res.total_time, digits=2),
+                _format_float_or_dash(res.model_load_time, digits=2),
+                _format_float_or_dash(
+                    peak_mem if peak_mem is not None and peak_mem > 0 else None,
+                    digits=2,
+                ),
+                _truncate_text_preview(notes, max_chars=34),
+            ],
+        )
+        eligible_for_ranking = assessment.execution == "completed" and assessment.usability in {
+            "usable",
+            "usable_with_caveats",
+        }
+        if eligible_for_ranking and tps is not None:
+            tps_entries.append((res.model_name, tps))
+        if (
+            eligible_for_ranking
+            and res.total_time is not None
+            and math.isfinite(res.total_time)
+            and res.total_time > 0
+        ):
+            total_time_entries.append((res.model_name, res.total_time))
+        if assessment.execution == "crashed":
+            crashed.append(res)
 
     logger.info("📋 Model Comparison (current run):")
     if recommended_working_set_bytes is not None:
@@ -13826,12 +13526,34 @@ def _log_model_comparison_table_and_charts(
             "   Recommended working set: %s GB",
             fmt_num(recommended_working_set_bytes / (1024**3)),
         )
-    headers = ["#", "Model", "Status", "TPS", "Total(s)", "Load(s)", "PeakGB", "Notes"]
+    headers = [
+        "#",
+        "Model",
+        "Execution",
+        "Usability",
+        "Maintainer",
+        "TPS",
+        "Total(s)",
+        "Load(s)",
+        "PeakGB",
+        "Notes",
+    ]
     _log_rich_table(
         headers=headers,
         rows=rows,
-        justifications=("right", "left", "left", "right", "right", "right", "right", "left"),
-        no_wrap_headers=frozenset({"#", "Status", "TPS"}),
+        justifications=(
+            "right",
+            "left",
+            "left",
+            "left",
+            "left",
+            "right",
+            "right",
+            "right",
+            "right",
+            "left",
+        ),
+        no_wrap_headers=frozenset({"#", "Execution", "TPS"}),
     )
 
     if tps_entries:
@@ -13846,8 +13568,8 @@ def _log_model_comparison_table_and_charts(
             digits=3,
         )
 
-    if failed:
-        stage_counts = Counter(res.error_stage or "Unknown" for res in failed)
+    if crashed:
+        stage_counts = Counter(res.error_stage or "Unknown" for res in crashed)
         _log_rich_metric_chart(
             "❌ Failure stage frequency:",
             [(stage, float(count)) for stage, count in stage_counts.items()],
@@ -13857,65 +13579,100 @@ def _log_model_comparison_table_and_charts(
 
 
 def _log_performance_highlights(
-    successful: list[PerformanceResult],
+    eligible_results: list[PerformanceResult],
     *,
     image_profile: ImageInputProfile | None = None,
     recommended_working_set_bytes: int | None = None,
 ) -> None:
-    """Log speed and memory highlights for successful runs."""
-    if not successful:
+    """Log valid metrics for completed usable or caveated observations only."""
+    if not eligible_results:
         return
 
-    summary: ModelIssueSummary = {}
-    _populate_summary_performance_highlights(summary, successful)
-    _populate_summary_image_memory_density(
-        summary,
-        successful,
-        image_profile=image_profile,
-    )
-
-    fastest_model = summary.get("fastest_model", ("<unknown>", 0.0))
-    most_efficient_model = summary.get("most_efficient_model", ("<unknown>", 0.0))
-    fastest_load_model = summary.get("fastest_load_model", ("<unknown>", 0.0))
-    average_tps = summary.get("average_tps", 0.0)
-    successful_count = summary.get("successful_count", 0)
-    average_peak_memory = summary.get("average_peak_memory", 0.0)
-    memory_efficiency = summary.get("memory_efficiency", 0.0)
-    image_megapixels = summary.get("image_megapixels")
-    average_peak_delta = summary.get("average_peak_memory_delta_gb")
-    memory_delta_per_mp = summary.get("average_peak_memory_delta_mb_per_megapixel")
+    tps_values = [
+        (result, tps)
+        for result in eligible_results
+        if (tps := _valid_generation_tps(result)) is not None and math.isfinite(tps)
+    ]
+    memory_values = [
+        (result, memory)
+        for result in eligible_results
+        if (
+            memory := _generation_optional_nonnegative_float_metric(
+                result.generation,
+                "peak_memory",
+            )
+        )
+        is not None
+        and memory > 0
+        and math.isfinite(memory)
+    ]
+    load_values = [
+        (result, result.model_load_time)
+        for result in eligible_results
+        if result.model_load_time is not None
+        and result.model_load_time >= 0
+        and math.isfinite(result.model_load_time)
+    ]
+    if not tps_values and not memory_values and not load_values:
+        return
 
     logger.info("🏆 Performance Highlights:")
-    logger.info("   Fastest: %s (%.1f tps)", fastest_model[0], fastest_model[1])
-    logger.info(
-        "   💾 Most efficient: %s (%.1f GB)",
-        most_efficient_model[0],
-        most_efficient_model[1],
-    )
-    logger.info("   ⚡ Fastest load: %s (%.2fs)", fastest_load_model[0], fastest_load_model[1])
-    logger.info("   📊 Average TPS: %.1f across %d models", average_tps, successful_count)
+    if tps_values:
+        fastest, fastest_tps = max(tps_values, key=lambda item: item[1])
+        logger.info("   Fastest: %s (%.1f tps)", fastest.model_name, fastest_tps)
+        logger.info(
+            "   📊 Average TPS: %.1f across %d models",
+            sum(tps for _result, tps in tps_values) / len(tps_values),
+            len(tps_values),
+        )
+    if memory_values:
+        most_efficient, efficient_memory = min(memory_values, key=lambda item: item[1])
+        logger.info(
+            "   💾 Lowest peak memory: %s (%.1f GB)",
+            most_efficient.model_name,
+            efficient_memory,
+        )
+    if load_values:
+        fastest_load, load_time = min(load_values, key=lambda item: item[1])
+        logger.info("   ⚡ Fastest load: %s (%.2fs)", fastest_load.model_name, load_time)
 
-    log_blank()
-    logger.info("📈 Resource Usage:")
-    if image_megapixels is not None:
-        logger.info("   Input image size: %.2f MP", image_megapixels)
-    if average_peak_delta is not None:
-        logger.info("   Average peak delta from post-load: %.2f GB", average_peak_delta)
-    if memory_delta_per_mp is not None:
-        logger.info("   Peak memory delta / MP: %.0f MB/MP", memory_delta_per_mp)
-    logger.info(
-        "   Average peak memory: %s",
-        _format_peak_memory_context(
-            average_peak_memory,
-            recommended_working_set_bytes,
-        ),
-    )
-    logger.info("   Memory efficiency: %.0f tokens/GB", memory_efficiency)
+    if memory_values:
+        average_peak_memory = sum(value for _result, value in memory_values) / len(memory_values)
+        total_tokens = sum(
+            _generation_nonnegative_int_metric(result.generation, "prompt_tokens")
+            + _generation_nonnegative_int_metric(result.generation, "generation_tokens")
+            for result, _memory in memory_values
+        )
+        total_memory = sum(value for _result, value in memory_values)
+        logger.info("📈 Resource Usage:")
+        logger.info(
+            "   Average peak memory: %s",
+            _format_peak_memory_context(
+                average_peak_memory,
+                recommended_working_set_bytes,
+            ),
+        )
+        logger.info("   Memory efficiency: %.0f tokens/GB", total_tokens / total_memory)
+
+    if image_profile is not None and image_profile.megapixels > 0:
+        peak_deltas_gb = [
+            delta
+            for result in eligible_results
+            if (delta := _peak_memory_delta_from_model_load_gb(result)) is not None
+        ]
+        if peak_deltas_gb:
+            average_delta_gb = sum(peak_deltas_gb) / len(peak_deltas_gb)
+            logger.info("   Input image size: %.2f MP", image_profile.megapixels)
+            logger.info("   Average peak delta from post-load: %.2f GB", average_delta_gb)
+            logger.info(
+                "   Peak memory delta / MP: %.0f MB/MP",
+                average_delta_gb * 1024 / image_profile.megapixels,
+            )
 
 
 def _log_failed_models_summary(failed: list[PerformanceResult]) -> None:
-    """Log only recorded failure fields and their exact distribution."""
-    logger.info("❌ Failed Models (%d):", len(failed))
+    """Log only recorded crash fields and their exact distribution."""
+    logger.info("❌ Crashed Models (%d):", len(failed))
     for res in failed:
         logger.info(
             "  - %s | phase=%s | stage=%s | module=%s | package=%s | code=%s | traceback=%s",
@@ -13946,60 +13703,101 @@ def _log_failed_models_summary(failed: list[PerformanceResult]) -> None:
     logger.info("   By stage: %s", _format_counter_items(stage_counts))
 
 
-def _log_successful_models_list(successful: list[PerformanceResult]) -> None:
-    """Log successful models sorted by generation throughput."""
-    logger.info("✅ Successful Models (%d):", len(successful))
-    sorted_success = sorted(
-        successful,
-        key=lambda r: getattr(r.generation, "generation_tps", 0) or 0,
-        reverse=True,
-    )
-    for res in sorted_success:
-        tps = getattr(res.generation, "generation_tps", 0) or 0
-        active_mem = res.active_memory or 0.0
-        cache_mem = res.cache_memory or 0.0
-        mem_info = ""
-        if active_mem > 0 or cache_mem > 0:
-            mem_info = f" (Active: {active_mem:.1f}GB, Cache: {cache_mem:.1f}GB)"
+def _log_completed_models_list(
+    completed: Sequence[PerformanceResult],
+    assessments: Mapping[str, ResultAssessment],
+) -> None:
+    """Log completed models with their cached axes and no generic success styling."""
+    logger.info("Completed Models (%d):", len(completed))
+    for result in sorted(completed, key=lambda item: item.model_name):
+        assessment = assessments[result.model_name]
         logger.info(
-            "  - %s: %.1f tps%s",
-            res.model_name,
-            tps,
-            mem_info,
-            extra={"style_hint": LogStyles.SUCCESS},
+            "  - %s | usability=%s | maintainer=%s | observations=%s",
+            result.model_name,
+            assessment.usability,
+            assessment.maintainer_status,
+            "+".join(assessment.observations) if assessment.observations else "none",
+            extra={"style_hint": LogStyles.DETAIL},
+        )
+
+
+def _log_indeterminate_models_summary(indeterminate: Sequence[PerformanceResult]) -> None:
+    """Log attempts whose external connectivity prevented a conclusive evaluation."""
+    logger.info("Indeterminate Models (%d):", len(indeterminate))
+    for result in indeterminate:
+        logger.info(
+            "  - %s | error=%s",
+            result.model_name,
+            result.error_message or "external connectivity failure",
+            extra={"style_hint": LogStyles.WARNING},
         )
 
 
 def log_summary(
     results: list[PerformanceResult],
     *,
+    assessments: Mapping[str, ResultAssessment] | None = None,
     image_path: Path | None = None,
 ) -> None:
     """Log current-run execution, performance, and mechanical observations."""
     if not results:
         return
 
+    resolved_assessments = (
+        dict(assessments)
+        if assessments is not None
+        else {result.model_name: _assess_result(result) for result in results}
+    )
+
     log_blank()
     log_rule(style="blue", bold=True)
     logger.info("Results Summary", extra={"style_hint": LogStyles.HEADER})
     log_rule(style="blue", bold=True)
 
-    successful = [r for r in results if r.success]
-    failed = [r for r in results if not r.success]
+    completed = [
+        result
+        for result in results
+        if resolved_assessments[result.model_name].execution == "completed"
+    ]
+    crashed = [
+        result
+        for result in results
+        if resolved_assessments[result.model_name].execution == "crashed"
+    ]
+    indeterminate = [
+        result
+        for result in results
+        if resolved_assessments[result.model_name].execution == "indeterminate"
+    ]
+    eligible_for_highlights = [
+        result
+        for result in completed
+        if resolved_assessments[result.model_name].usability in {"usable", "usable_with_caveats"}
+    ]
     recommended_working_set_bytes = _get_recommended_working_set_bytes()
 
-    assessment_counts: Counter[str] = Counter()
-    for result in results:
-        assessment_counts[_assess_result(result).execution] += 1
+    assessment_counts = Counter(
+        resolved_assessments[result.model_name].execution for result in results
+    )
+    usability_counts = Counter(
+        resolved_assessments[result.model_name].usability for result in completed
+    )
+    maintainer_counts = Counter(
+        resolved_assessments[result.model_name].maintainer_status for result in results
+    )
     observation_counts: Counter[str] = Counter(
-        observation for result in successful for observation in _assess_result(result).observations
+        observation
+        for result in completed
+        for observation in resolved_assessments[result.model_name].observations
     )
     logger.info("Execution outcomes: %s", _format_counter_items(assessment_counts))
+    logger.info("Usability outcomes: %s", _format_counter_items(usability_counts))
+    logger.info("Maintainer outcomes: %s", _format_counter_items(maintainer_counts))
     logger.info("Mechanical observations: %s", _format_counter_items(observation_counts))
 
-    if successful:
+    if eligible_for_highlights:
         _log_performance_highlights(
-            successful,
+            eligible_for_highlights,
             image_profile=_load_image_input_profile(image_path),
             recommended_working_set_bytes=recommended_working_set_bytes,
         )
@@ -14008,15 +13806,19 @@ def log_summary(
 
     _log_model_comparison_table_and_charts(
         results,
+        assessments=resolved_assessments,
         recommended_working_set_bytes=recommended_working_set_bytes,
     )
     log_blank()
 
-    if successful:
-        _log_successful_models_list(successful)
-    if failed:
+    if completed:
+        _log_completed_models_list(completed, resolved_assessments)
+    if crashed:
         log_blank()
-        _log_failed_models_summary(failed)
+        _log_failed_models_summary(crashed)
+    if indeterminate:
+        log_blank()
+        _log_indeterminate_models_summary(indeterminate)
 
 
 def _history_path_for_jsonl(jsonl_path: Path) -> Path:
@@ -14215,7 +14017,11 @@ def _build_jsonl_result_record(
             "phase": result.failure_phase,
             "stage": result.error_stage,
             "code": result.error_code,
-            "message": result.error_message,
+            "message": (
+                _home_relative_report_text(result.error_message)
+                if result.error_message is not None
+                else None
+            ),
             "exception_type": (
                 result.root_error_type
                 or (root_exception.exception_type if root_exception is not None else None)
@@ -14226,7 +14032,11 @@ def _build_jsonl_result_record(
                 or (root_exception.module if root_exception is not None else None)
             ),
             "package": result.error_package,
-            "traceback": result.error_traceback,
+            "traceback": (
+                _home_relative_report_text(result.error_traceback)
+                if result.error_traceback is not None
+                else None
+            ),
         }
         if result.exception_chain:
             failure["exception_chain"] = _serialize_exception_chain(result.exception_chain)
@@ -14238,7 +14048,7 @@ def _build_jsonl_result_record(
         "timestamp": local_now_str(),
         "assessment": _assessment_to_json(assessment),
         "generated_text": _generation_text_value(generation),
-        "captured_output_on_fail": result.captured_output_on_fail or "",
+        "captured_output_on_fail": _home_relative_report_text(result.captured_output_on_fail or ""),
         "failure": failure,
         "metrics": metrics,
         "timing": {
@@ -14255,10 +14065,12 @@ def _build_jsonl_result_record(
             ),
             "stop_reason": runtime.stop_reason if runtime is not None else None,
         },
-        "model_provenance": model_provenance
-        or _collect_model_provenance(
-            result.model_name,
-            requested_revision=requested_revision,
+        "model_provenance": _public_model_provenance(
+            model_provenance
+            or _collect_model_provenance(
+                result.model_name,
+                requested_revision=requested_revision,
+            )
         ),
         "prompt_diagnostics": prompt_diagnostics or None,
     }
@@ -14289,32 +14101,27 @@ def save_jsonl_report(
     cached_results = {result.model_name: result for result in report_context.result_set.results}
     assessments = _assessments_by_model(report_context)
     model_provenance = _model_provenance_by_model(report_context)
-    try:
-        # Write shared metadata header (avoids repeating prompt/system per row)
-        header = _build_jsonl_metadata_record(
-            prompt=prompt,
-            system_info=system_info,
-            library_versions=library_versions,
-            runtime_fingerprint=runtime_fingerprint,
-            eval_mode=eval_mode,
-            metadata_exposed_to_prompt=metadata_exposed_to_prompt,
-        )
-        lines = [json.dumps(header)]
+    header = _build_jsonl_metadata_record(
+        prompt=prompt,
+        system_info=system_info,
+        library_versions=library_versions,
+        runtime_fingerprint=runtime_fingerprint,
+        eval_mode=eval_mode,
+        metadata_exposed_to_prompt=metadata_exposed_to_prompt,
+    )
+    lines = [json.dumps(header)]
 
-        for original_result in results:
-            result = cached_results.get(original_result.model_name, original_result)
-            record = _build_jsonl_result_record(
-                result,
-                assessments[result.model_name],
-                requested_revision=requested_revision,
-                model_provenance=model_provenance.get(result.model_name),
-                recommended_working_set_bytes=report_context.recommended_working_set_bytes,
-            )
-            lines.append(json.dumps(record))
-        _write_text_file(filename, "\n".join(lines) + "\n")
-        # Logging handled in finalize_execution
-    except OSError:
-        logger.exception("Failed to write JSONL report to %s", filename)
+    for original_result in results:
+        result = cached_results.get(original_result.model_name, original_result)
+        record = _build_jsonl_result_record(
+            result,
+            assessments[result.model_name],
+            requested_revision=requested_revision,
+            model_provenance=model_provenance.get(result.model_name),
+            recommended_working_set_bytes=report_context.recommended_working_set_bytes,
+        )
+        lines.append(json.dumps(record))
+    _write_text_file(filename, "\n".join(lines) + "\n")
 
 
 def _collect_check_models_provenance() -> CheckModelsProvenanceRecord:
@@ -14427,7 +14234,9 @@ def save_run_json_report(
         "metadata_exposed_to_prompt": policy.metadata_exposed_to_prompt,
         "total_runtime_seconds": round(total_runtime_seconds, 3),
         "counts": counts,
-        "artifacts": dict(output_paths),
+        "artifacts": {
+            key: _home_relative_report_text(value) for key, value in output_paths.items()
+        },
         "library_versions": dict(versions),
         "component_provenance": _collect_component_provenance(versions),
         "producer": producer or _collect_check_models_provenance(),
@@ -14435,10 +14244,12 @@ def save_run_json_report(
         "generation_settings": _common_generation_settings(results),
         "trust_remote_code": trust_remote_code,
         "model_provenance": {
-            result.model_name: _model_provenance_by_model(report_context).get(result.model_name)
-            or _collect_model_provenance(
-                result.model_name,
-                requested_revision=requested_revision,
+            result.model_name: _public_model_provenance(
+                _model_provenance_by_model(report_context).get(result.model_name)
+                or _collect_model_provenance(
+                    result.model_name,
+                    requested_revision=requested_revision,
+                )
             )
             for result in results
         },
@@ -14474,26 +14285,6 @@ def generate_output_index_report(
     md = ["# Check Models Output Index", ""]
     md.extend(f"- {_output_index_link(filename, path, label)}" for path, label in links)
     _write_text_file(filename, "\n".join(md) + "\n")
-
-
-def _write_report_failure_jsonl(
-    *,
-    filename: Path,
-    failed_report: str,
-    error: Exception,
-) -> None:
-    """Write a minimal JSONL error record when report generation fails."""
-    record = {
-        "status": "error",
-        "error_stage": "report_generation",
-        "failed_report": failed_report,
-        "error_message": str(error),
-        "timestamp": local_now_str(),
-    }
-    try:
-        _write_text_file(filename, json.dumps(record) + "\n", append=True)
-    except OSError:
-        logger.exception("Failed to write report failure JSONL to %s", filename)
 
 
 def _guard_markdownlint_block(lines: Sequence[str], *, rules: str) -> list[str]:
@@ -15071,7 +14862,7 @@ def _public_artifact_path(path: Path) -> str:
         try:
             return str(PurePosixPath(*resolved.relative_to(_SCRIPT_DIR.resolve()).parts))
         except ValueError:
-            return str(path)
+            return _home_relative_report_text(str(path))
 
 
 def _build_report_artifact_specs(output_paths: ReportOutputPaths) -> tuple[ReportArtifactSpec, ...]:
@@ -15210,8 +15001,8 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
 
 def _generate_reports_and_log_outputs(
     inputs: ReportGenerationInputs,
-) -> None:
-    """Generate reports and log the emitted artifact paths."""
+) -> tuple[ReportArtifactOutcome, ...]:
+    """Write canonical JSONL first, then isolate every optional renderer."""
     cached_results = {
         result.model_name: result for result in inputs.report_context.result_set.results
     }
@@ -15220,31 +15011,92 @@ def _generate_reports_and_log_outputs(
         results=[cached_results.get(result.model_name, result) for result in inputs.results],
     )
     artifacts = _build_report_artifacts(inputs)
+    by_key = {artifact.key: artifact for artifact in artifacts}
+    outcomes: list[ReportArtifactOutcome] = []
 
-    try:
-        for artifact in artifacts:
-            if artifact.job is None:
-                continue
-            try:
-                artifact.job()
-            except (OSError, ValueError) as err:
-                logger.exception("Failed to generate %s report.", artifact.key)
-                _write_report_failure_jsonl(
-                    filename=inputs.output_paths.jsonl,
-                    failed_report=artifact.key,
-                    error=err,
+    def run_artifact(artifact: ReportArtifact) -> None:
+        if artifact.job is None:
+            return
+        try:
+            artifact.job()
+        except (OSError, TypeError, ValueError, RuntimeError) as error:
+            logger.exception("Failed to generate %s report.", artifact.key)
+            outcomes.append(
+                ReportArtifactOutcome(
+                    key=artifact.key,
+                    path=artifact.path,
+                    succeeded=False,
+                    error_message=str(error),
                 )
+            )
+        else:
+            outcomes.append(
+                ReportArtifactOutcome(
+                    key=artifact.key,
+                    path=artifact.path,
+                    succeeded=True,
+                )
+            )
 
-        logger.info("")
+    run_artifact(by_key["jsonl"])
+
+    diagnostics_artifacts = DiagnosticsArtifacts(
+        outcome_counts=_run_outcome_counts(inputs.report_context.assessments)
+    )
+    try:
+        diagnostics_artifacts = _write_diagnostics_artifacts(
+            args=inputs.run_args or argparse.Namespace(),
+            library_versions=inputs.library_versions,
+            system_info=inputs.system_info,
+            prompt=inputs.prompt,
+            image_path=inputs.image_path,
+            diagnostics_path=inputs.output_paths.diagnostics,
+            report_context=inputs.report_context,
+        )
+    except (OSError, TypeError, ValueError, RuntimeError) as error:
+        logger.exception("Failed to generate diagnostics report.")
+        outcomes.append(
+            ReportArtifactOutcome(
+                key="diagnostics",
+                path=inputs.output_paths.diagnostics,
+                succeeded=False,
+                error_message=str(error),
+            )
+        )
+    else:
+        outcomes.append(
+            ReportArtifactOutcome(
+                key="diagnostics",
+                path=inputs.output_paths.diagnostics,
+                succeeded=True,
+            )
+        )
+    _log_maintainer_summary(
+        artifacts=diagnostics_artifacts,
+        diagnostics_path=inputs.output_paths.diagnostics,
+    )
+
+    for artifact in artifacts:
+        if artifact.key not in {"jsonl", "diagnostics"}:
+            run_artifact(artifact)
+
+    failures = [outcome for outcome in outcomes if not outcome.succeeded]
+    logger.info("")
+    if failures:
+        logger.warning("Reports generated with %d failure(s):", len(failures))
+        for outcome in failures:
+            logger.warning("   %s: %s", outcome.key, outcome.error_message)
+    else:
         log_success("Reports successfully generated:", prefix="📊")
-        for artifact in artifacts:
+    successful_keys = {outcome.key for outcome in outcomes if outcome.succeeded}
+    for artifact in artifacts:
+        if artifact.key in successful_keys:
             log_file_path(artifact.path, label=artifact.label)
 
-        log_file_path(inputs.output_paths.log, label="   Log File:")
-        if inputs.output_paths.environment.exists():
-            log_file_path(inputs.output_paths.environment, label="   Environment:")
-    except (OSError, ValueError):
-        logger.exception("Failed to generate reports.")
+    log_file_path(inputs.output_paths.log, label="   Log File:")
+    if inputs.output_paths.environment.exists():
+        log_file_path(inputs.output_paths.environment, label="   Environment:")
+    return tuple(outcomes)
 
 
 def _clean_stale_toplevel_reports(output_dir: Path, reports_dir: Path) -> int:
@@ -15304,7 +15156,6 @@ def _build_rerun_evidence(
             gen_chars = len(text)
     return RerunEvidence(
         rerun_success=rerun_result.success,
-        rerun_verdict=_execution_outcome(rerun_result),
         rerun_error_code=rerun_result.error_code,
         rerun_generated_chars=gen_chars,
         rerun_generation_time=rerun_result.generation_time,
@@ -15461,10 +15312,6 @@ def finalize_execution(
     overall_time: float = time.perf_counter() - overall_start_time
     if results:
         metadata_exposed_to_prompt = _prompt_builder_exposes_metadata(args, metadata)
-        log_summary(
-            results,
-            image_path=image_path,
-        )
 
         # Gather system characteristics for reports
         system_info = get_system_characteristics()
@@ -15493,6 +15340,24 @@ def finalize_execution(
             model_provenance=model_provenance,
         )
         results = list(report_context.result_set.results)
+        _validate_report_render_context(report_context)
+        assessments = dict(report_context.assessments)
+        for index, result in enumerate(results, start=1):
+            print_model_result(
+                result,
+                assessment=assessments[result.model_name],
+                verbose=bool(getattr(args, "verbose", False)),
+                detailed_metrics=getattr(args, "detailed_metrics", False),
+                run_index=index,
+                total_runs=len(results),
+                prompt=prompt,
+                context_marker=str(getattr(args, "context_marker", "Context:")),
+            )
+        log_summary(
+            results,
+            assessments=assessments,
+            image_path=image_path,
+        )
 
         # Prepare output paths
         output_paths = _resolve_report_output_paths(args)
@@ -15524,21 +15389,6 @@ def finalize_execution(
         )
 
         log_file_path(history_path, label="   History:     ")
-
-        # Generate diagnostics after history append to keep final artifact ordering stable.
-        diagnostics_artifacts = _write_diagnostics_artifacts(
-            args=args,
-            library_versions=library_versions,
-            system_info=system_info,
-            prompt=prompt,
-            image_path=image_path,
-            diagnostics_path=output_paths.diagnostics,
-            report_context=report_context,
-        )
-        _log_maintainer_summary(
-            artifacts=diagnostics_artifacts,
-            diagnostics_path=output_paths.diagnostics,
-        )
 
         _generate_reports_and_log_outputs(
             ReportGenerationInputs(

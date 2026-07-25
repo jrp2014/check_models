@@ -19,13 +19,13 @@ For one-off commands without activating: `conda run -n mlx-vlm python ...`.
 
 | File | Purpose | Size |
 | ------ | --------- | ------ |
-| `src/check_models.py` | **Single-file CLI monolith** (~27,900 lines). All logic lives here. | ★ primary edit target |
+| `src/check_models.py` | **Single-file CLI monolith** (~16,300 lines). All logic lives here. | ★ primary edit target |
 | `src/check_models_data/quality_config.yaml` | Runtime thresholds loaded by `load_quality_config()` | Edit thresholds here, not in Python |
 | `src/pyproject.toml` | Packaging, dependencies, tool config (ruff, mypy, pytest) | Update when adding imports |
 | `src/tests/conftest.py` | Shared fixtures: `test_image`, `minimal_test_image`, `realistic_test_image`, `folder_with_images`, etc. | Use existing fixtures |
-| `src/tests/test_*.py` | ~15,100 lines across ~36 test files | Add tests to existing files |
+| `src/tests/test_*.py` | ~15,300 lines across 35 test files | Add tests to existing files |
 | `docs/IMPLEMENTATION_GUIDE.md` | Detailed coding standards and architecture decisions | Reference for conventions |
-| `src/README.md` | Full CLI docs, all flags, usage examples (~1,200 lines) | Reference for CLI behavior |
+| `src/README.md` | Full CLI docs, all flags, usage examples (~1,400 lines) | Reference for CLI behavior |
 
 ### 3. Navigating `src/check_models.py` (section map)
 
@@ -38,10 +38,10 @@ The file is organized in this order — search for these exact landmark headers 
 | App constants & core result types | `PerformanceResult`, `ResultSet`, `ProcessImageParams`, report block primitives | `SECTION: APP CONSTANTS & CORE RESULT TYPES` |
 | Timing, logging & Rich console plumbing | `PerfCounterTimer`, `TimeoutManager`, `LogStyles`, `StyleAwareRichHandler` | `SECTION: TIMING, LOGGING & RICH CONSOLE PLUMBING` |
 | Formatting, escaping & detector helpers | `fmt_num`, report escapers, `_detect_repetitive_output`, harness detectors | `SECTION: FORMATTING, ESCAPING & DETECTOR HELPERS` |
-| Metrics, scoring & field formatting | `compute_vocabulary_diversity`, `compute_cataloging_utility`, `analyze_generation_text`, `format_field_value` | `SECTION: METRICS, SCORING & FIELD FORMATTING` |
+| Metrics and field formatting | `analyze_generation_text`, mechanical observation helpers, `format_field_value` | `SECTION: METRICS, SCORING & FIELD FORMATTING` |
 | Console, system & image metadata helpers | CLI Rich helpers, library/system info, EXIF/XMP extraction | `SECTION: CONSOLE, SYSTEM & IMAGE METADATA HELPERS` |
 | Diagnostics/report context builders | `DiagnosticsConfig`, `ReportRenderContext`, native repro command specs | `SECTION: DIAGNOSTICS/REPORT CONTEXT BUILDERS` |
-| Report generators & runtime fingerprints | `generate_diagnostics_report`, `generate_html_report`, `generate_markdown_report`, `collect_runtime_fingerprint()` | `SECTION: REPORT GENERATORS & RUNTIME FINGERPRINTS` |
+| Report generators & runtime fingerprints | `generate_diagnostics_report`, `generate_html_report`, `generate_markdown_gallery_report`, `collect_runtime_fingerprint()` | `SECTION: REPORT GENERATORS & RUNTIME FINGERPRINTS` |
 | Model processing | CLI argument validation, cache scan, `_load_model`, `process_image_with_model` | `SECTION: MODEL PROCESSING` |
 | CLI run helpers & logging | `setup_environment`, `find_and_validate_image`, `process_models`, result logging | `SECTION: CLI RUN HELPERS & LOGGING` |
 | Result enrichment/history/finalization | quality enrichment, JSONL/history, issue drafts, `finalize_execution` | `SECTION: RESULT ENRICHMENT/HISTORY/FINALIZATION` |

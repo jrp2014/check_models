@@ -924,10 +924,7 @@ current thresholds are configurable in the bundled `quality_config.yaml`
 ```yaml
 thresholds:
   min_tokens_for_substantial: 10
-  min_words_for_filler_response: 15
-  min_prompt_tokens_for_ratio: 100
-  min_output_tokens_for_ratio: 15
-  min_output_ratio: 0.02
+  max_words_for_minimal_output: 2
   long_prompt_tokens_threshold: 3000
 
   # Default prompt compaction thresholds
@@ -941,7 +938,7 @@ thresholds:
 ```python
 from check_models import (
     process_image_with_model,  # Process single image with a model
-    generate_markdown_gallery_report,  # Create Markdown gallery report
+    generate_diagnostics_report,  # Create diagnostics Markdown
     generate_html_report,  # Create HTML report
     get_system_info,  # Get system information dict
     format_field_value,  # Format metric values consistently
@@ -1108,9 +1105,8 @@ Width and color controls:
 Report featuring:
 
 - Executive summary with test parameters
-- Compact performance table with sortable columns and expandable complete output
-- Model search plus exact execution, usability, maintainer-status, and peak-memory
-  filters
+- Compact performance table with expandable complete output
+- Model search plus exact execution, usability, and maintainer-status filters
 - Model outputs and diagnostics
 - System information and library versions
 - Failed rows are highlighted in red for quick identification

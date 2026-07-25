@@ -30,7 +30,6 @@ def _result(
         generated_tokens=generated_tokens,
         prompt=prompt,
         requested_max_tokens=requested_max_tokens,
-        model_name=model_name,
         known_special_tokens=known_special_tokens,
     )
     return check_models.PerformanceResult(
@@ -194,7 +193,7 @@ def test_missing_generation_count_does_not_make_complete_output_minimal() -> Non
     assert "minimal_output" not in check_models._assess_result(result).observations
 
 
-def test_recorded_low_output_to_prompt_ratio_is_minimal() -> None:
+def test_concise_complete_output_is_not_minimal_relative_to_prompt_length() -> None:
     result = check_models.PerformanceResult(
         model_name="example/model",
         success=True,
@@ -205,7 +204,20 @@ def test_recorded_low_output_to_prompt_ratio_is_minimal() -> None:
         ),
     )
 
-    assert "minimal_output" in check_models._assess_result(result).observations
+    assert "minimal_output" not in check_models._assess_result(result).observations
+
+
+def test_complete_image_phrase_is_not_semantic_minimal_output() -> None:
+    result = check_models.PerformanceResult(
+        model_name="example/model",
+        success=True,
+        generation=_Generation(
+            "The image is a photograph of two cats sleeping on a couch.",
+            generation_tokens=4,
+        ),
+    )
+
+    assert "minimal_output" not in check_models._assess_result(result).observations
 
 
 def test_missing_token_counts_do_not_enable_ratio_inference() -> None:
@@ -228,6 +240,42 @@ def test_empty_thinking_wrapper_is_neutral() -> None:
     assert check_models._assess_result(result) == check_models.ResultAssessment(
         "completed", "usable", "none", ()
     )
+
+
+def test_thinking_trace_observation_is_model_name_invariant() -> None:
+    text = "<think>Inspect the scene.</think> A blue boat rests on calm water."
+    plain = _result(text, model_name="example/plain-model")
+    named = _result(text, model_name="example/thinking-model")
+
+    assert check_models._assess_result(plain) == check_models._assess_result(named)
+    assert check_models._assess_result(plain).observations == ("thinking_trace_present",)
+
+
+def test_configured_thinking_delimiters_are_observed_without_model_name_policy() -> None:
+    result = check_models.PerformanceResult(
+        model_name="example/plain-model",
+        success=True,
+        generation=_Generation(
+            "<reason>Inspect the scene.</done> A blue boat rests on calm water.",
+            generation_tokens=18,
+        ),
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            generate_kwargs={
+                "enable_thinking": True,
+                "thinking_start_token": "<reason>",
+                "thinking_end_token": "</done>",
+            }
+        ),
+    )
+
+    context = check_models._build_report_render_context(
+        results=[result],
+        prompt="Describe the image.",
+        system_info={},
+    )
+
+    assessment = dict(context.assessments)[result.model_name]
+    assert assessment.observations == ("thinking_trace_present",)
 
 
 def test_configured_special_token_is_not_unexpected() -> None:
