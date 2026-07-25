@@ -215,7 +215,7 @@ python -m check_models \
   --temperature 0.1 \
   --timeout 600 \
   --output-html ~/reports/vlm_benchmark.html \
-  --output-markdown ~/reports/vlm_benchmark.md \
+  --output-gallery-markdown ~/reports/vlm_benchmark_gallery.md \
   --verbose
 
 # Memory optimization for large models (4-bit KV cache)
@@ -237,85 +237,62 @@ python -m check_models \
 
 ### Understanding the Output
 
-The tool generates multiple report formats in `output/` by default:
+The tool generates a deliberately small artifact set in `output/` by default:
 
 - **CLI**: Real-time colorized progress and metrics.
 - **HTML** (`reports/results.html`): Retained complete, self-contained report with
-  a compact caption-comparison table, sortable columns, model search,
-  status/compatibility/prompt-burden/recommendation filters, an optional peak-memory
-  ceiling, expandable full output, recommendations, and full run context.
-- **Markdown** (`reports/results.md`): Mode-aware public run index with links to canonical
-  evidence, model-selection, and review artifacts.
-- **Model Selection** (`reports/model_selection.md`): Ranked shortlist for brief-caption
-  and structured title/description/keywords decisions. This is not the complete run.
+  a current-run chooser, exact assessment filters, captured performance facts,
+  expandable complete output, maintainer diagnostics, and full run context.
 - **Gallery Markdown** (`reports/model_gallery.md`): Complete evidence-only artifact with
-  image metadata, the full prompt, a concise output/cost/quality summary,
-  diagnostics, and one expandable fenced full-output section for every attempted
-  model.
-- **Review Markdown** (`reports/review.md`): Short automated digest grouped by likely owner and user-facing utility bucket.
-- **TSV** (`reports/results.tsv`): Compact spreadsheet contract with caption/runtime
-  comparison fields, canonical execution/recommendation status, exact generated
-  text once, and optional columns only when the run contains relevant evidence.
+  image metadata, the full prompt, a facts-only chooser, diagnostics, and one
+  expandable fenced complete-output section for every attempted model.
 - **JSONL** (`results.jsonl`): Exhaustive machine-readable per-model diagnostics,
-  including fields intentionally omitted from the compact TSV, local component
-  installation identity, and each model's requested versus resolved cache revision.
-- **Run JSON** (`run.json`): Stable v1.4 run-level machine contract with mode, grounding,
+  schema `2.0` assessments, complete captured evidence, local component installation
+  identity, and each model's requested versus resolved cache revision.
+- **Run JSON** (`run.json`): Stable schema `2.0` run-level machine contract with mode,
   attempted/evaluated/indeterminate counts, component source/install provenance,
   check_models producer version/revision, source-image identity and dimensions,
   common generation settings, and artifact paths.
 - **Diagnostics** (`reports/diagnostics.md`): Self-contained, issue-ready mlx-vlm
   report with native reproduction commands and complete affected-model output.
-  Definite crashes are reported as outcomes;
-  external-connectivity interruptions are retained as indeterminate attempts and
-  excluded from upstream issue drafts and evaluated/failure totals;
-  traceback evidence remains complete, and successful configuration/context observations that still
-  need a controlled reproduction stay separate from the confirmed mlx-vlm issue
-  matrix.
-- **Log** (`check_models.log`): Canonical comprehensive run artifact, including the full per-model review block and full output/captured failure output.
-- **History** (`results.history.jsonl`): Append-only run history for regressions/recoveries.
-- **Issue templates** (`issues/`): One factual GitHub issue draft per hard crash,
-  with complete recorded evidence and a native reproduction script. Successful
-  observations and indeterminate attempts remain in diagnostics and create no draft.
-
-The main Markdown report stays brief and points readers to `model_selection.md`,
-`model_gallery.md`, `review.md`, and `check_models.log` for decisions, evidence,
-automated review, and the canonical run trace.
-
-The output index labels the primary artifacts for the current run:
-`diagnostics.md`, the retained `results.html`, `model_selection.md`,
-`model_gallery.md`, and `results.jsonl`. Supporting artifacts provide alternate
-views, compact tables, capability/history summaries, and generated issue or repro
-indexes; they do not replace the primary evidence. `model_selection.md` is a
-single-image shortlist. Capability wording in `model_capabilities.md` combines
-the current run with compatible, lane-matched history and must not be read as a
-claim based on the current image alone.
+  Definite crashes are outcomes; external-connectivity interruptions remain
+  indeterminate; and successful observations that need a controlled reproduction
+  stay separate from hard crashes.
+- **Index** (`index.md`): Tiny navigation page linking the seven current-run files.
+- **Log** (`check_models.log`): Canonical comprehensive run trace, including complete
+  generated or captured failure output.
+- **Environment** (`environment.log`): Full package and Conda environment capture.
+- **History** (`results.history.jsonl`): Append-only raw history for optional
+  out-of-band analysis. Current reports do not read it or derive advice from it.
+- **Issue drafts** (`issues/issue_*.md`): Conditional factual drafts, not a standing
+  report surface. Issue drafts are created only for hard actionable crashes.
 
 #### Decision semantics and evidence scope
 
-Reports keep four decisions separate: current recommendation (`recommended`,
-`caveat`, `avoid`, or `not_evaluated`), historical reliability (`stable`,
-`variable`, `insufficient_evidence`, or `consistently_unsuitable`), runtime
-compatibility, and maintainer readiness. A useful current output can coexist with
-an unconfirmed maintainer observation; history never rewrites the current-run
-recommendation. Only canonical `issue_ready` evidence creates an issue draft.
-An upstream-entry crash is sufficient evidence of a crash, while successful
-thinking, stop-token, or context observations require a controlled reproduction.
+Every current-run row uses one immutable assessment with three independent fields:
 
-Keyword overlap is deliberately weak evidence. Zero overlap with known-good
-indicators is a smell worth surfacing, but missing one or more individual keywords
-does not establish poor caption quality and cannot by itself demote a model.
-All quality scores are an automated, metadata-assisted proxy over one image with
-no human visual ground truth; they are shortlist indicators, not benchmark-grade
-confidence estimates.
+- `execution`: `completed`, `crashed`, or `indeterminate`
+- `usability`: `usable`, `usable_with_caveats`, `unusable`, or `not_evaluated`
+- `maintainer_status`: `actionable_failure`, `observation_needs_reproduction`, or `none`
 
-The Model Selection Quick Chooser ranks only current `recommended` rows. When a
-memory/speed tier has no such row, it may show one explicitly caveated fallback;
-quality-first, efficiency, and memory-tier tables state their sort policy. The
-expandable complete current-run matrix prevents exclusions from disappearing.
-Use `model_gallery.md` for complete generated output, `diagnostics.md` for
-maintainer evidence and reproduction state, `check_models.log` for maximalist
-capture, and run JSON/JSONL for image, prompt, generation, component, and model
-revision provenance.
+Complete model output is retained as evidence for every attempt.
+Crashes prioritize the complete traceback, followed by captured partial output and
+exact factual provenance. Reaching the configured token cap alone is neutral.
+Long complete output is not a fault. A cap becomes an observation only when mechanical evidence
+also shows repetition, missing requested sections, or an incomplete thinking trace.
+
+Zero keyword overlap is a weak caveat. Partial keyword overlap is neutral, and
+neither state claims semantic correctness.
+External connectivity failures are `indeterminate`, so they are retained without being counted as model crashes.
+Configured thinking tokens are not automatically faults; observed or incomplete
+thinking traces remain factual observations that may need controlled reproduction.
+The chooser reports `insufficient sample` when throughput lacks enough generated
+tokens for a meaningful comparison.
+
+Use `reports/model_gallery.md` for complete per-model evidence,
+`reports/diagnostics.md` for maintainer evidence and reproduction state,
+`check_models.log` for the full run trace, and `results.jsonl` plus `run.json` for
+exact machine-readable provenance and run arguments.
 
 Avoid lint/type suppressions wherever possible. Any unavoidable suppression must
 have a documented purpose and pass the repository suppression audit.
@@ -978,8 +955,8 @@ See module docstrings and `__all__` exports for complete API reference.
 ## Evaluation lanes
 
 Each invocation runs exactly one resolved evaluation lane. Reports, JSONL headers,
-run metadata, and history rows record that resolved lane, and historical comparisons
-never combine observations from different lanes.
+run metadata, and append-only history rows record that resolved lane. Raw history
+is secondary data and does not alter current-run assessment or report guidance.
 
 | Lane | Prompt input | Default token cap | Intended use |
 | ---- | ------------ | ----------------- | ------------ |
@@ -992,15 +969,11 @@ keywords are available and `blind` otherwise. `stress` and `quality` remain
 deprecated input aliases for compatibility, not additional lanes: both resolve
 to `assisted` or `blind`; `quality` retains its 1000-token default.
 
-Blind and assisted scores answer different questions and are never pooled.
-Blind scoring measures unaided cataloguing against held-out evidence. Assisted
-scoring measures whether a model integrates authoritative context and improves
-fallible draft metadata while remaining visually grounded. Location and capture
-context are authoritative inputs when available; existing title, description,
-and keywords are LLM-editable draft metadata, not ground truth. Authoritative
-identity and location may enrich an assisted result without being independently
-readable in the pixels; literal omission of optional draft terms is evidence, not
-by itself a semantic failure.
+Blind and assisted lanes expose different prompt context. Blind runs exercise
+unaided cataloguing; assisted runs ask a model to verify and improve fallible draft
+metadata while retaining authoritative location and capture context when present.
+Existing title, description, and keywords are editable hints, not ground truth.
+Literal omission of an optional hint term is evidence, not by itself a fault.
 
 Prompt burden is reported independently from quality as `visual input` (image or
 estimated non-text tokens dominate), `text` (text tokens dominate), `mixed`
@@ -1023,13 +996,7 @@ python -m check_models --image photo.jpg --eval-mode assisted
 | `-f`, `--folder` | Path | omitted | Folder to scan (non-recursive); the most recently modified image in that folder is used. If both `--folder` and `--image` are omitted, the most recently modified image in `~/Pictures/Processed` is used. |
 | `-i`, `--image` | Path | omitted | Path to a specific image file to process directly. Requires a value when provided. |
 | `--output-html` | Path | `output/reports/results.html` | HTML report output filename. |
-| `--output-markdown` | Path | `output/reports/results.md` | Markdown report output filename. |
 | `--output-gallery-markdown` | Path | `output/reports/model_gallery.md` | Evidence-only Markdown gallery report filename. |
-| `--output-review` | Path | `output/reports/review.md` | Markdown review digest grouped by owner and user bucket. |
-| `--output-model-selection` | Path | `output/reports/model_selection.md` | Markdown model-selection report filename. |
-| `--output-model-capabilities` | Path | `output/reports/model_capabilities.md` | Markdown model capability scorecard filename. |
-| `--output-model-capabilities-json` | Path | `output/model_capabilities.json` | Machine-readable model capability scorecard filename. |
-| `--output-tsv` | Path | `output/reports/results.tsv` | TSV (tab-separated values) report output filename. |
 | `--output-jsonl` | Path | `output/results.jsonl` | JSONL report output filename. |
 | `--output-run-json` | Path | `output/run.json` | Run-level JSON metadata filename. |
 | `--output-log` | Path | `output/check_models.log` | Command line output log filename. |
@@ -1142,53 +1109,26 @@ Report featuring:
 
 - Executive summary with test parameters
 - Compact performance table with sortable columns and expandable complete output
-- Model search plus status, compatibility, prompt-burden, recommendation, and
-  peak-memory filters
+- Model search plus exact execution, usability, maintainer-status, and peak-memory
+  filters
 - Model outputs and diagnostics
 - System information and library versions
 - Failed rows are highlighted in red for quick identification
-- Recommendation values use the same `recommended`, `caveat`, `avoid`, and
-  `not_evaluated` contract as the other report formats. Presentation warnings and
-  token-limit truncation are caveats rather than clean recommendations.
+- Assessment values use the same three status vocabularies as the Markdown and
+  machine-readable artifacts.
 - Responsive design for mobile viewing
-
-### Markdown Report
-
-GitHub-compatible format with:
-
-- Performance metrics in table format
-- Model outputs
-- System and library version information
-- Easy integration into documentation
-
-The main report also points to the standalone `model_gallery.md` artifact when it is
-generated, so reviewers can switch to the dedicated model-by-model output view.
 
 ### Gallery Markdown Report
 
-GitHub-compatible qualitative review artifact with:
+GitHub-compatible evidence artifact with:
 
 - Populated image metadata fields when present (title, description, keywords, date, time, GPS)
 - The full prompt in a fenced `text` block
-- One consolidated output/cost/quality summary with concise output previews
+- One facts-only current-run chooser with concise output previews
 - One easy-to-scan section per model with complete generated output in an
   expandable fenced code block
-- Existing success/failure gallery formatting reused from the main report path
-
-### TSV Report
-
-Tab-separated values for programmatic analysis (spreadsheets, `awk`, pandas, etc.):
-
-- **Standard header first**: The first line contains TSV column names, so ordinary
-  spreadsheet, `csv`, and dataframe readers require no comment-skipping option.
-  Run-level timestamps and provenance live in `run.json`.
-- **Compact adaptive columns**: Stable caption/runtime and canonical
-  execution/recommendation fields are always present. Compatibility, scoring,
-  prompt-detail, memory, and error columns appear only when at least one row has
-  evidence. Output-preview and diffusion-only fields are omitted.
-- **Literal TSV**: Fields are written with real tab delimiters and CSV-compatible
-  quoting. Embedded generated-output newlines are represented as literal `\n`, and
-  the exact generated text is not shortened. Use JSONL for exhaustive diagnostics.
+- The exact execution, usability, maintainer status, observations, timing, memory,
+  and token facts used by the HTML report
 
 ### JSONL Report
 
@@ -1196,25 +1136,24 @@ Line-delimited JSON for streaming ingestion:
 
 - **Metadata header**: The first record (line 1) contains shared metadata
   (prompt, system info, timestamp, versions, and component install/source
-  provenance) — JSONL v2.1 format.
-- **Per-model records**: One JSON object per model with all metrics, error details,
-  and requested/resolved model snapshot provenance when locally available.
+  provenance) — JSONL `2.0` format.
+- **Per-model records**: One JSON object per model with schema `2.0` assessment,
+  complete evidence, raw timing/resource facts, run arguments, error details, and
+  requested/resolved model snapshot provenance when locally available.
 
 
 ### Diagnostics Report
 
 A comprehensive Markdown report focused on upstream debugging and issue reporting:
 
-- **Generation**: Created automatically when failures, harness issues (e.g.,
-  garbled output), text-sanity/semantic issues, or preflight compatibility
-  warnings are detected.
+- **Generation**: Created automatically when crashes, mechanical observations,
+  indeterminate attempts, or preflight compatibility warnings are detected.
 - **Hard crashes**: Records each actionable crash directly with complete evidence.
 - **Reproducibility**: Includes explicit commands to reproduce specific failures.
 - **Environment**: Captures full package versions and system specs.
-- **Issue readiness**: Definite failures are ready to file; successful thinking-token
-  or context-boundary observations remain visible with complete evidence but require
-  the stated controlled reproduction before they become issue drafts.
-- **Ready-to-File**: Each actionable hard crash gets a factual draft that can be
+- **Issue readiness**: Successful thinking-token or context-boundary observations
+  remain visible with complete evidence but require controlled reproduction.
+- **Ready-to-file**: Each actionable hard crash gets a factual draft that can be
   copied directly into a GitHub issue.
 
 ### Preflight Compatibility Warnings
@@ -1324,22 +1263,17 @@ check_models/
 │   ├── tools/               # Helper scripts
 │   ├── tests/               # PyTest test suite
 │   └── output/              # Versioned benchmark snapshots
+│       ├── index.md          # Tiny current-run artifact index
 │       ├── reports/
 │       │   ├── results.html
-│       │   ├── results.md
-│       │   ├── model_selection.md
-│       │   ├── model_capabilities.md
 │       │   ├── model_gallery.md
-│       │   ├── review.md
-│       │   ├── results.tsv
 │       │   └── diagnostics.md
-│       ├── issues/           # Generated GitHub issue templates
 │       ├── results.jsonl
-│       ├── model_capabilities.json
 │       ├── run.json
 │       ├── results.history.jsonl
 │       ├── check_models.log
-│       └── environment.log
+│       ├── environment.log
+│       └── issues/           # Conditional hard-crash drafts only
 ├── docs/                    # Documentation
 ├── typings/                 # Generated type stubs (git-ignored)
 └── Makefile                 # Root orchestration
@@ -1347,30 +1281,17 @@ check_models/
 
 **Output behaviour**: By default, production outputs are written to `src/output/`
 and committed as public benchmark snapshots. Test and debug outputs use the
-`test_*` prefix and are git-ignored.
+`test_*` prefix and are git-ignored. Tracked production Markdown reports are linted by the quality gate;
+use the `test_` prefix for local validation and do not commit ad-hoc debug output.
 Validation tests must not rewrite tracked `src/output/` assets; override report
 and log paths to a temp directory or gitignored `test_*` paths so verification
 does not require restoring benchmark snapshots.
-Override with `--output-html`, `--output-markdown`, `--output-gallery-markdown`,
-`--output-review`, `--output-model-selection`, `--output-model-capabilities`,
-`--output-model-capabilities-json`, `--output-tsv`, `--output-jsonl`,
-`--output-run-json`, `--output-log`, `--output-env`, and `--output-diagnostics`.
-Human-readable reports (HTML, Markdown, TSV, diagnostics) default to `output/reports/`;
-machine-readable files (JSONL, capability JSON, run JSON, history) and logs remain in `output/`.
-
-- **Run index** (`reports/results.md`): public snapshot entry point. In triage mode it
-  suppresses cataloging and keyword scores and points to model-selection and diagnostics artifacts.
-- **Model Selection** (`reports/model_selection.md`): ranked shortlist for brief-caption
-  and structured metadata decisions. It is not the complete result set.
-- **Model Capability Scorecard** (`reports/model_capabilities.md`): concise matrix
-  aggregating current-run and capability-enriched history signals for captions,
-  keywording, metadata agreement, reliability, speed, and memory.
-- **Gallery Markdown** (`reports/model_gallery.md`): complete evidence-only generated
-  outputs and diagnostics for every attempted model.
-- **Run JSON** (`run.json`): stable run-level machine contract with resolved mode, grounding
-  policy, attempted/evaluated/indeterminate counts, component source/install
-  provenance, producer revision, source-image manifest, common generation settings,
-  and artifact paths (schema 1.3).
+Override configurable artifacts with `--output-html`,
+`--output-gallery-markdown`, `--output-jsonl`, `--output-run-json`,
+`--output-log`, `--output-env`, and `--output-diagnostics`. The tiny `index.md`
+and append-only raw history are derived beside the configured current-run outputs.
+HTML, gallery Markdown, and diagnostics default to `output/reports/`; JSONL, run
+JSON, history, logs, and the index remain in `output/`.
 
 ## Contributing
 

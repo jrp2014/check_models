@@ -789,7 +789,7 @@ def test_agent_monolith_size_note_matches_current_file() -> None:
 
 def test_output_artifact_policy_is_documented_and_gitignored() -> None:
     """Generated output docs should match the repo ignore policy."""
-    output_readme = (PKG_ROOT / "output" / "README.md").read_text(encoding="utf-8")
+    readme = README.read_text(encoding="utf-8")
     gitignore_lines = {
         line.strip() for line in (REPO_ROOT / ".gitignore").read_text(encoding="utf-8").splitlines()
     }
@@ -799,13 +799,75 @@ def test_output_artifact_policy_is_documented_and_gitignored() -> None:
         "use the `test_` prefix",
         "do not commit ad-hoc debug output",
     ):
-        assert phrase in output_readme
+        assert phrase in readme
 
     assert {
         "src/output/test_*",
         "src/output/reports/test_*",
         "src/output/issues/test_*",
     }.issubset(gitignore_lines)
+
+
+def test_readme_documents_only_the_simplified_report_contract() -> None:
+    """Public output documentation should expose only retained report artifacts."""
+    readme = README.read_text(encoding="utf-8")
+
+    for artifact in (
+        "reports/diagnostics.md",
+        "reports/model_gallery.md",
+        "reports/results.html",
+        "results.jsonl",
+        "run.json",
+        "index.md",
+        "check_models.log",
+        "environment.log",
+        "results.history.jsonl",
+    ):
+        assert f"`{artifact}`" in readme
+
+    for retired in (
+        "results.md",
+        "results.tsv",
+        "review.md",
+        "model_selection.md",
+        "model_capabilities.md",
+        "model_capabilities.json",
+        "repro_bundles",
+        "--output-markdown",
+        "--output-review",
+        "--output-model-selection",
+        "--output-model-capabilities",
+        "--output-model-capabilities-json",
+        "--output-tsv",
+    ):
+        assert retired not in readme
+
+    for vocabulary in (
+        "`execution`: `completed`, `crashed`, or `indeterminate`",
+        "`usability`: `usable`, `usable_with_caveats`, `unusable`, or `not_evaluated`",
+        ("`maintainer_status`: `actionable_failure`, `observation_needs_reproduction`, or `none`"),
+    ):
+        assert vocabulary in readme
+
+
+def test_readme_documents_facts_first_evidence_boundaries() -> None:
+    """Public docs should explain neutral, weak, and indeterminate evidence."""
+    readme = README.read_text(encoding="utf-8")
+
+    for phrase in (
+        "Complete model output is retained as evidence",
+        "Crashes prioritize the complete traceback",
+        "Reaching the configured token cap alone is neutral",
+        "Long complete output is not a fault",
+        "Zero keyword overlap is a weak caveat",
+        "Partial keyword overlap is neutral",
+        "External connectivity failures are `indeterminate`",
+        "Configured thinking tokens are not automatically faults",
+        "`insufficient sample`",
+        "Issue drafts are created only for hard actionable crashes",
+        "append-only raw history",
+    ):
+        assert phrase in readme
 
 
 def test_validation_artifact_hygiene_policy_is_documented() -> None:

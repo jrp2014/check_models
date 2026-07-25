@@ -233,6 +233,36 @@ def test_custom_published_index_and_issue_drafts_use_distinct_repo_paths(
     assert issue_path.as_posix() == "src/output/issues/issue_org_model.md"
 
 
+def test_output_index_links_only_current_run_artifacts(tmp_path: Path) -> None:
+    """The tiny index should link current evidence, not history or retired reports."""
+    output_dir = tmp_path / "output"
+    output_paths = check_models.ReportOutputPaths(
+        index=output_dir / "index.md",
+        html=output_dir / "reports" / "results.html",
+        gallery_markdown=output_dir / "reports" / "model_gallery.md",
+        jsonl=output_dir / "results.jsonl",
+        run_json=output_dir / "run.json",
+        diagnostics=output_dir / "reports" / "diagnostics.md",
+        log=output_dir / "check_models.log",
+        environment=output_dir / "environment.log",
+    )
+
+    with patch.object(check_models._LinkStyleState, "value", "relative"):
+        check_models.generate_output_index_report(output_paths.index, output_paths=output_paths)
+
+    assert output_paths.index.read_text(encoding="utf-8") == (
+        "# Check Models Output Index\n"
+        "\n"
+        "- [results.html](reports/results.html)\n"
+        "- [model_gallery.md](reports/model_gallery.md)\n"
+        "- [diagnostics.md](reports/diagnostics.md)\n"
+        "- [results.jsonl](results.jsonl)\n"
+        "- [run.json](run.json)\n"
+        "- [check_models.log](check_models.log)\n"
+        "- [environment.log](environment.log)\n"
+    )
+
+
 def _relative_output_artifact_map(
     output_dir: Path,
     output_paths: check_models.ReportOutputPaths,

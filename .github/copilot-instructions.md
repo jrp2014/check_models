@@ -49,13 +49,20 @@ The file is organized in this order — search for these exact landmark headers 
 
 ### 4. Architecture & patterns
 
-- **Single CLI runner**: discovers models (HF cache scan), runs each with per-model isolation (timeouts, try/except), generates multi-format reports (`HTML`, `Markdown`, `TSV`, `JSONL`).
+- **Single CLI runner**: discovers models (HF cache scan), runs each with per-model
+  isolation (timeouts, try/except), and generates retained HTML, gallery Markdown,
+  diagnostics Markdown, JSONL, run JSON, index, log, environment, and raw history
+  artifacts.
 - **Configuration hierarchy**: `src/check_models_data/quality_config.yaml` → `QualityThresholds` / `FormattingThresholds` dataclasses. Never sprinkle magic numbers.
 - **Dependencies**: optional packages are guarded with `try/except ImportError` → populate `MISSING_DEPENDENCIES`; core runtime deps (`mlx`, `mlx-vlm`, `mlx-lm`) now hard-fail before inference.
 - **Display normalization**: ALL metric formatting goes through `format_field_value(field_name, value)`. Do not format metrics inline.
 - **Type aliases**: `MetricValue = int | float | str | bool | None` is the value type for metrics.
 - **Protocols over ABCs**: typing for optional deps uses `Protocol` classes (e.g., `SupportsGenerationResult`).
-- **Reports write to** `src/output/reports/` (HTML, Markdown, TSV, diagnostics) and `src/output/` (JSONL, history, logs). Hard crashes additionally create factual issue drafts under `src/output/issues/`.
+- **Reports write to** `src/output/reports/` (`results.html`,
+  `model_gallery.md`, and `diagnostics.md`) and `src/output/` (`index.md`,
+  `results.jsonl`, `run.json`, `check_models.log`, `environment.log`, and
+  append-only `results.history.jsonl`). Hard actionable crashes additionally
+  create factual issue drafts under `src/output/issues/`.
 - **Security**: defaults to `--trust-remote-code` and warns when enabled. The CLI no longer mutates `transformers` backend-selection environment variables at startup.
 
 ### 5. Make targets (all run from repo root)
