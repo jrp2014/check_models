@@ -1,165 +1,165 @@
-2026-07-25 20:17:21 BST - INFO - Full environment dump written to:
-2026-07-25 20:17:21 BST - INFO - output/environment.log
-2026-07-25 20:17:21 BST - DEBUG - Environment details saved for reproducibility
-2026-07-25 20:17:21 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2026-07-25 20:17:21 BST - WARNING - ⚠️  SECURITY WARNING: --trust-remote-code is enabled.
-2026-07-25 20:17:21 BST - WARNING - ⚠️  This allows execution of remote code and may pose security risks.
-2026-07-25 20:17:21 BST - INFO - ====================================================================================================
-2026-07-25 20:17:21 BST - INFO - MLX Vision Language Model Check
-2026-07-25 20:17:21 BST - INFO - ====================================================================================================
-2026-07-25 20:17:21 BST - INFO - Image File:      /private/tmp/check_models-task9-fixture.jpg
-2026-07-25 20:17:21 BST - INFO - Image dimensions: 640x480 (0.3 MPixels)
-2026-07-25 20:17:21 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2026-07-25 20:17:21 BST - INFO - Image Metadata
-2026-07-25 20:17:21 BST - WARNING - No EXIF data found in /private/tmp/check_models-task9-fixture.jpg
-2026-07-25 20:17:21 BST - INFO - Date: 2026-07-25 19:46:34 BST
-2026-07-25 20:17:21 BST - INFO - Description: 
-2026-07-25 20:17:21 BST - INFO - GPS Location: 
-2026-07-25 20:17:21 BST - INFO - Auto eval mode selected 'blind' (no descriptive image metadata found).
-2026-07-25 20:17:21 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2026-07-25 20:17:21 BST - INFO - Prompt Configuration
-2026-07-25 20:17:21 BST - INFO - Using user-provided prompt from --prompt.
-2026-07-25 20:17:21 BST - INFO - User-provided prompt (--prompt): Describe the main elements in this image briefly.
-2026-07-25 20:17:21 BST - DEBUG - Full prompt:
+2026-07-25 23:08:05 BST - INFO - Full environment dump written to:
+2026-07-25 23:08:05 BST - INFO - output/environment.log
+2026-07-25 23:08:05 BST - DEBUG - Environment details saved for reproducibility
+2026-07-25 23:08:05 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-07-25 23:08:05 BST - WARNING - ⚠️  SECURITY WARNING: --trust-remote-code is enabled.
+2026-07-25 23:08:05 BST - WARNING - ⚠️  This allows execution of remote code and may pose security risks.
+2026-07-25 23:08:05 BST - INFO - ====================================================================================================
+2026-07-25 23:08:05 BST - INFO - MLX Vision Language Model Check
+2026-07-25 23:08:05 BST - INFO - ====================================================================================================
+2026-07-25 23:08:05 BST - INFO - Image File:      /Users/jrp/Documents/AI/mlx/check_models/.worktrees/subtractive-reporting-simplification/src/tests/fixtures/check_models-task9-fixture.jpg
+2026-07-25 23:08:05 BST - INFO - Image dimensions: 640x480 (0.3 MPixels)
+2026-07-25 23:08:05 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-07-25 23:08:05 BST - INFO - Image Metadata
+2026-07-25 23:08:05 BST - WARNING - No EXIF data found in /Users/jrp/Documents/AI/mlx/check_models/.worktrees/subtractive-reporting-simplification/src/tests/fixtures/check_models-task9-fixture.jpg
+2026-07-25 23:08:05 BST - INFO - Date: 2026-07-25 23:04:54 BST
+2026-07-25 23:08:05 BST - INFO - Description: 
+2026-07-25 23:08:05 BST - INFO - GPS Location: 
+2026-07-25 23:08:05 BST - INFO - Auto eval mode selected 'blind' (no descriptive image metadata found).
+2026-07-25 23:08:05 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-07-25 23:08:05 BST - INFO - Prompt Configuration
+2026-07-25 23:08:05 BST - INFO - Using user-provided prompt from --prompt.
+2026-07-25 23:08:05 BST - INFO - User-provided prompt (--prompt): Describe the main elements in this image briefly.
+2026-07-25 23:08:05 BST - DEBUG - Full prompt:
 Describe the main elements in this image briefly.
-2026-07-25 20:17:21 BST - INFO - Prompt length: 49 characters
-2026-07-25 20:17:21 BST - INFO - Processing specified models: qnguyen3/nanoLLaVA
-2026-07-25 20:17:21 BST - INFO - Processing 1 model(s)...
-2026-07-25 20:17:21 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2026-07-25 20:17:21 BST - INFO - 
-2026-07-25 20:17:21 BST - INFO - Processing Model [1/1]: qnguyen3/nanoLLaVA
-2026-07-25 20:17:21 BST - DEBUG - System: arm64, GPU: Apple M5 Max
-2026-07-25 20:17:21 BST - DEBUG - Legacy snapshot note for qnguyen3/nanoLLaVA: processor config missing from snapshot (preprocessor_config.json, processor_config.json).
-2026-07-25 20:17:22 BST - DEBUG - Cleaned up resources for model qnguyen3/nanoLLaVA
-2026-07-25 20:17:22 BST - DEBUG - Quality analysis for qnguyen3/nanoLLaVA: repetitive=True (token=phrase: "a red roof. the..."), likely_capped=True, words=88
-2026-07-25 20:17:22 BST - INFO - Mechanical observations for qnguyen3/nanoLLaVA: repetitive(phrase: "a red roof. the..."), token-cap-truncation
-2026-07-25 20:17:22 BST - INFO - [RUN 1/1] SUMMARY model=qnguyen3/nanoLLaVA status=OK observations=repetitive+token_cap_truncation
-2026-07-25 20:17:22 BST - WARNING - ⚠️  Repetitive: 'phrase: "a red roof. the..."'
-2026-07-25 20:17:22 BST - WARNING - ⚠️  Output reached requested token limit (100 tokens)
-2026-07-25 20:17:22 BST - INFO - Generated Text:
-2026-07-25 20:17:22 BST - INFO - The image primarily features a house with a red roof and a red roof. The house is surrounded by a
-2026-07-25 20:17:22 BST - INFO - green grassy field. The house has a red roof and a red roof. The house also has a red roof. The
-2026-07-25 20:17:22 BST - INFO - house has a red roof. The house has a red roof. The house has a red roof. The house has a red roof.
-2026-07-25 20:17:22 BST - INFO - The house has a red roof. The house has a red roof. The house has a red roof. The house has a red
-2026-07-25 20:17:22 BST - INFO - roof
-2026-07-25 20:17:22 BST - INFO - 
-2026-07-25 20:17:22 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2026-07-25 20:17:22 BST - INFO - Results Summary
-2026-07-25 20:17:22 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2026-07-25 20:17:22 BST - INFO - Execution outcomes: completed=1
-2026-07-25 20:17:22 BST - INFO - Mechanical observations: repeated_output=1, token_cap_truncation=1
-2026-07-25 20:17:22 BST - INFO - 🏆 Performance Highlights:
-2026-07-25 20:17:22 BST - INFO -    Fastest: qnguyen3/nanoLLaVA (115.6 tps)
-2026-07-25 20:17:22 BST - INFO -    💾 Most efficient: qnguyen3/nanoLLaVA (4.0 GB)
-2026-07-25 20:17:22 BST - INFO -    ⚡ Fastest load: qnguyen3/nanoLLaVA (0.38s)
-2026-07-25 20:17:22 BST - INFO -    📊 Average TPS: 115.6 across 1 models
-2026-07-25 20:17:22 BST - INFO - 
-2026-07-25 20:17:22 BST - INFO - 📈 Resource Usage:
-2026-07-25 20:17:22 BST - INFO -    Input image size: 0.31 MP
-2026-07-25 20:17:22 BST - INFO -    Average peak delta from post-load: 1.94 GB
-2026-07-25 20:17:22 BST - INFO -    Peak memory delta / MP: 6477 MB/MP
-2026-07-25 20:17:22 BST - INFO -    Average peak memory: 4.0 GB (3.5% of 108 GB recommended working set)
-2026-07-25 20:17:22 BST - INFO -    Memory efficiency: 31 tokens/GB
-2026-07-25 20:17:22 BST - INFO - 
-2026-07-25 20:17:22 BST - INFO - 
-2026-07-25 20:17:22 BST - INFO - 📋 Model Comparison (current run):
-2026-07-25 20:17:22 BST - INFO -    Recommended working set: 108 GB
-2026-07-25 20:17:22 BST - INFO -    ╭───┬───────────┬────────┬───────┬──────────┬─────────┬────────┬────────────╮
-2026-07-25 20:17:22 BST - INFO -    │ # │ Model     │ Status │   TPS │ Total(s) │ Load(s) │ PeakGB │ Notes      │
-2026-07-25 20:17:22 BST - INFO -    ├───┼───────────┼────────┼───────┼──────────┼─────────┼────────┼────────────┤
-2026-07-25 20:17:22 BST - INFO -    │ 1 │ nanoLLaVA │ OK     │ 115.6 │     1.41 │    0.38 │   4.04 │ repetitive │
-2026-07-25 20:17:22 BST - INFO -    │   │           │        │       │          │         │        │ (phrase:   │
-2026-07-25 20:17:22 BST - INFO -    │   │           │        │       │          │         │        │ "a red     │
-2026-07-25 20:17:22 BST - INFO -    │   │           │        │       │          │         │        │ roof....   │
-2026-07-25 20:17:22 BST - INFO -    ╰───┴───────────┴────────┴───────┴──────────┴─────────┴────────┴────────────╯
-2026-07-25 20:17:22 BST - INFO - 
-2026-07-25 20:17:22 BST - INFO - 📊 TPS comparison chart:
-2026-07-25 20:17:22 BST - INFO -    nanoLLaVA ████████████████████████ 115.6 tps
-2026-07-25 20:17:22 BST - INFO - 
-2026-07-25 20:17:22 BST - INFO - ✅ Successful Models (1):
-2026-07-25 20:17:22 BST - INFO -   - qnguyen3/nanoLLaVA: 115.6 tps (Active: 2.1GB, Cache: 1.6GB)
-2026-07-25 20:17:23 BST - INFO -    History:      /Users/jrp/Documents/AI/mlx/check_models/.worktrees/subtractive-reporting-simplification/src/output/results.history.jsonl
-2026-07-25 20:17:23 BST - INFO - 
-2026-07-25 20:17:23 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2026-07-25 20:17:23 BST - INFO - Maintainer Summary
-2026-07-25 20:17:23 BST - INFO - Run outcomes: attempted=1, evaluated=1, completed=1, crashed=0, indeterminate=0
-2026-07-25 20:17:23 BST - INFO -    Diagnostics:   /Users/jrp/Documents/AI/mlx/check_models/.worktrees/subtractive-reporting-simplification/src/output/reports/diagnostics.md
-2026-07-25 20:17:23 BST - INFO - 
-2026-07-25 20:17:23 BST - INFO - 📊 Reports successfully generated:
-2026-07-25 20:17:23 BST - INFO -    Output Index:    /Users/jrp/Documents/AI/mlx/check_models/.worktrees/subtractive-reporting-simplification/src/output/index.md
-2026-07-25 20:17:23 BST - INFO -    HTML Report:      /Users/jrp/Documents/AI/mlx/check_models/.worktrees/subtractive-reporting-simplification/src/output/reports/results.html
-2026-07-25 20:17:23 BST - INFO -    Gallery Report:   /Users/jrp/Documents/AI/mlx/check_models/.worktrees/subtractive-reporting-simplification/src/output/reports/model_gallery.md
-2026-07-25 20:17:23 BST - INFO -    Diagnostics:      /Users/jrp/Documents/AI/mlx/check_models/.worktrees/subtractive-reporting-simplification/src/output/reports/diagnostics.md
-2026-07-25 20:17:23 BST - INFO -    JSONL Report:     /Users/jrp/Documents/AI/mlx/check_models/.worktrees/subtractive-reporting-simplification/src/output/results.jsonl
-2026-07-25 20:17:23 BST - INFO -    Run JSON:         /Users/jrp/Documents/AI/mlx/check_models/.worktrees/subtractive-reporting-simplification/src/output/run.json
-2026-07-25 20:17:23 BST - INFO -    Log File: /Users/jrp/Documents/AI/mlx/check_models/.worktrees/subtractive-reporting-simplification/src/output/check_models.log
-2026-07-25 20:17:23 BST - INFO -    Environment: /Users/jrp/Documents/AI/mlx/check_models/.worktrees/subtractive-reporting-simplification/src/output/environment.log
-2026-07-25 20:17:23 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2026-07-25 20:17:23 BST - INFO - Final Summary
-2026-07-25 20:17:23 BST - INFO - 
-2026-07-25 20:17:23 BST - INFO - ⏱  Overall runtime: 1.80s
-2026-07-25 20:17:23 BST - INFO - --- Library Versions ---
-2026-07-25 20:17:23 BST - INFO -    ╭─────────────────┬──────────────────────────────╮
-2026-07-25 20:17:23 BST - INFO -    │ Library         │ Version                      │
-2026-07-25 20:17:23 BST - INFO -    ├─────────────────┼──────────────────────────────┤
-2026-07-25 20:17:23 BST - INFO -    │ Pillow          │ 12.3.0                       │
-2026-07-25 20:17:23 BST - INFO -    │ huggingface-hub │ 1.24.0                       │
-2026-07-25 20:17:23 BST - INFO -    │ mlx             │ 0.32.1.dev20260725+973e27f82 │
-2026-07-25 20:17:23 BST - INFO -    │ mlx-audio       │ 0.4.4                        │
-2026-07-25 20:17:23 BST - INFO -    │ mlx-lm          │ 0.31.3                       │
-2026-07-25 20:17:23 BST - INFO -    │ mlx-metal       │                              │
-2026-07-25 20:17:23 BST - INFO -    │ mlx-vlm         │ 0.6.8                        │
-2026-07-25 20:17:23 BST - INFO -    │ numpy           │ 2.5.1                        │
-2026-07-25 20:17:23 BST - INFO -    │ tokenizers      │ 0.22.2                       │
-2026-07-25 20:17:23 BST - INFO -    │ transformers    │ 5.14.1                       │
-2026-07-25 20:17:23 BST - INFO -    ╰─────────────────┴──────────────────────────────╯
-2026-07-25 20:17:23 BST - INFO - Generated: 2026-07-25 20:17:23 BST
-2026-07-25 20:17:23 BST - INFO - 
-2026-07-25 20:17:23 BST - INFO - --- System Information ---
-2026-07-25 20:17:23 BST - INFO -    ╭────────────────────────────┬──────────────────────────────────────────────╮
-2026-07-25 20:17:23 BST - INFO -    │ Property                   │ Value                                        │
-2026-07-25 20:17:23 BST - INFO -    ├────────────────────────────┼──────────────────────────────────────────────┤
-2026-07-25 20:17:23 BST - INFO -    │ OS                         │ Darwin 25.5.0                                │
-2026-07-25 20:17:23 BST - INFO -    │ macOS Version              │ 26.5.2                                       │
-2026-07-25 20:17:23 BST - INFO -    │ SDK Version                │ 26.5                                         │
-2026-07-25 20:17:23 BST - INFO -    │ Active Developer Directory │ /Applications/Xcode.app/Contents/Developer   │
-2026-07-25 20:17:23 BST - INFO -    │ Xcode Version              │ 26.6                                         │
-2026-07-25 20:17:23 BST - INFO -    │ Xcode Build                │ 17F113                                       │
-2026-07-25 20:17:23 BST - INFO -    │ SDK Path                   │ /Applications/Xcode.app/Contents/Developer/P │
-2026-07-25 20:17:23 BST - INFO -    │                            │ latforms/MacOSX.platform/Developer/SDKs/MacO │
-2026-07-25 20:17:23 BST - INFO -    │                            │ SX26.5.sdk                                   │
-2026-07-25 20:17:23 BST - INFO -    │ Metal SDK                  │ MacOSX26.5.sdk                               │
-2026-07-25 20:17:23 BST - INFO -    │ Metal Compiler Version     │ Apple metal version 32023.883                │
-2026-07-25 20:17:23 BST - INFO -    │                            │ (metalfe-32023.883)                          │
-2026-07-25 20:17:23 BST - INFO -    │ Metallib Linker Version    │ AIR-LLD 32023.883 (metalfe-32023.883)        │
-2026-07-25 20:17:23 BST - INFO -    │                            │ (compatible with legacy metallib linker)     │
-2026-07-25 20:17:23 BST - INFO -    │ Apple Clang Version        │ Apple clang version 21.0.0                   │
-2026-07-25 20:17:23 BST - INFO -    │                            │ (clang-2100.1.1.101)                         │
-2026-07-25 20:17:23 BST - INFO -    │ Python Version             │ 3.13.13                                      │
-2026-07-25 20:17:23 BST - INFO -    │ Architecture               │ arm64                                        │
-2026-07-25 20:17:23 BST - INFO -    │ GPU/Chip                   │ Apple M5 Max                                 │
-2026-07-25 20:17:23 BST - INFO -    │ MLX Device                 │ Apple M5 Max                                 │
-2026-07-25 20:17:23 BST - INFO -    │ GPU Architecture           │ applegpu_g17s                                │
-2026-07-25 20:17:23 BST - INFO -    │ GPU Cores                  │ 40                                           │
-2026-07-25 20:17:23 BST - INFO -    │ Metal Support              │ Metal 4                                      │
-2026-07-25 20:17:23 BST - INFO -    │ RAM                        │ 128.0 GB                                     │
-2026-07-25 20:17:23 BST - INFO -    │ Recommended Working Set    │ 108 GB                                       │
-2026-07-25 20:17:23 BST - INFO -    │ Fused Attention            │ Available                                    │
-2026-07-25 20:17:23 BST - INFO -    │ CPU Cores (Physical)       │ 18                                           │
-2026-07-25 20:17:23 BST - INFO -    │ CPU Cores (Logical)        │ 18                                           │
-2026-07-25 20:17:23 BST - INFO -    │ MLX Install Type           │ editable local source                        │
-2026-07-25 20:17:23 BST - INFO -    │ MLX Distribution Root      │ /Users/jrp/miniconda3/envs/mlx-vlm/lib/pytho │
-2026-07-25 20:17:23 BST - INFO -    │                            │ n3.13/site-packages                          │
-2026-07-25 20:17:23 BST - INFO -    │ mlx-metal Distribution     │ not installed; local editable mlx supplies   │
-2026-07-25 20:17:23 BST - INFO -    │                            │ backend                                      │
-2026-07-25 20:17:23 BST - INFO -    │ MLX Core Extension         │ /Users/jrp/Documents/AI/mlx/mlx/python/mlx/c │
-2026-07-25 20:17:23 BST - INFO -    │                            │ ore.cpython-313-darwin.so                    │
-2026-07-25 20:17:23 BST - INFO -    │ MLX Metallib               │ /Users/jrp/Documents/AI/mlx/mlx/python/mlx/l │
-2026-07-25 20:17:23 BST - INFO -    │                            │ ib/mlx.metallib (162,839,496 bytes,          │
-2026-07-25 20:17:23 BST - INFO -    │                            │ sha256=83384795fee317890b760a9e6d8c9745b136c │
-2026-07-25 20:17:23 BST - INFO -    │                            │ 41801d3bd4a1f6f18791efbfd61)                 │
-2026-07-25 20:17:23 BST - INFO -    │ MLX libmlx.dylib           │ /Users/jrp/Documents/AI/mlx/mlx/python/mlx/l │
-2026-07-25 20:17:23 BST - INFO -    │                            │ ib/libmlx.dylib (21,641,424 bytes,           │
-2026-07-25 20:17:23 BST - INFO -    │                            │ sha256=256fcbe4ccba983eca88a0df6e8b05cab41dd │
-2026-07-25 20:17:23 BST - INFO -    │                            │ 7989403bb4df5c81d2e26c1a406)                 │
-2026-07-25 20:17:23 BST - INFO -    ╰────────────────────────────┴──────────────────────────────────────────────╯
+2026-07-25 23:08:05 BST - INFO - Prompt length: 49 characters
+2026-07-25 23:08:05 BST - INFO - Processing specified models: qnguyen3/nanoLLaVA
+2026-07-25 23:08:05 BST - INFO - Processing 1 model(s)...
+2026-07-25 23:08:05 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-07-25 23:08:05 BST - INFO - 
+2026-07-25 23:08:05 BST - INFO - Processing Model [1/1]: qnguyen3/nanoLLaVA
+2026-07-25 23:08:05 BST - DEBUG - System: arm64, GPU: Apple M5 Max
+2026-07-25 23:08:06 BST - DEBUG - Legacy snapshot note for qnguyen3/nanoLLaVA: processor config missing from snapshot (preprocessor_config.json, processor_config.json).
+2026-07-25 23:08:07 BST - DEBUG - Cleaned up resources for model qnguyen3/nanoLLaVA
+2026-07-25 23:08:07 BST - DEBUG - Quality analysis for qnguyen3/nanoLLaVA: repetitive=True (token=phrase: "a red roof. the..."), likely_capped=True, words=88
+2026-07-25 23:08:07 BST - INFO - Mechanical observations for qnguyen3/nanoLLaVA: repetitive(phrase: "a red roof. the..."), token-cap-truncation
+2026-07-25 23:08:07 BST - INFO - [RUN 1/1] SUMMARY model=qnguyen3/nanoLLaVA status=OK observations=repetitive+token_cap_truncation
+2026-07-25 23:08:07 BST - WARNING - ⚠️  Repetitive: 'phrase: "a red roof. the..."'
+2026-07-25 23:08:07 BST - WARNING - ⚠️  Output reached requested token limit (100 tokens)
+2026-07-25 23:08:07 BST - INFO - Generated Text:
+2026-07-25 23:08:07 BST - INFO - The image primarily features a house with a red roof and a red roof. The house is surrounded by a
+2026-07-25 23:08:07 BST - INFO - green grassy field. The house has a red roof and a red roof. The house also has a red roof. The
+2026-07-25 23:08:07 BST - INFO - house has a red roof. The house has a red roof. The house has a red roof. The house has a red roof.
+2026-07-25 23:08:07 BST - INFO - The house has a red roof. The house has a red roof. The house has a red roof. The house has a red
+2026-07-25 23:08:07 BST - INFO - roof
+2026-07-25 23:08:07 BST - INFO - 
+2026-07-25 23:08:07 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-07-25 23:08:07 BST - INFO - Results Summary
+2026-07-25 23:08:07 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-07-25 23:08:07 BST - INFO - Execution outcomes: completed=1
+2026-07-25 23:08:07 BST - INFO - Mechanical observations: repeated_output=1, token_cap_truncation=1
+2026-07-25 23:08:07 BST - INFO - 🏆 Performance Highlights:
+2026-07-25 23:08:07 BST - INFO -    Fastest: qnguyen3/nanoLLaVA (95.6 tps)
+2026-07-25 23:08:07 BST - INFO -    💾 Most efficient: qnguyen3/nanoLLaVA (3.9 GB)
+2026-07-25 23:08:07 BST - INFO -    ⚡ Fastest load: qnguyen3/nanoLLaVA (0.88s)
+2026-07-25 23:08:07 BST - INFO -    📊 Average TPS: 95.6 across 1 models
+2026-07-25 23:08:07 BST - INFO - 
+2026-07-25 23:08:07 BST - INFO - 📈 Resource Usage:
+2026-07-25 23:08:07 BST - INFO -    Input image size: 0.31 MP
+2026-07-25 23:08:07 BST - INFO -    Average peak delta from post-load: 1.79 GB
+2026-07-25 23:08:07 BST - INFO -    Peak memory delta / MP: 5983 MB/MP
+2026-07-25 23:08:07 BST - INFO -    Average peak memory: 3.9 GB (3.37% of 108 GB recommended working set)
+2026-07-25 23:08:07 BST - INFO -    Memory efficiency: 32 tokens/GB
+2026-07-25 23:08:07 BST - INFO - 
+2026-07-25 23:08:07 BST - INFO - 
+2026-07-25 23:08:07 BST - INFO - 📋 Model Comparison (current run):
+2026-07-25 23:08:07 BST - INFO -    Recommended working set: 108 GB
+2026-07-25 23:08:07 BST - INFO -    ╭───┬───────────┬────────┬──────┬──────────┬─────────┬────────┬─────────────╮
+2026-07-25 23:08:07 BST - INFO -    │ # │ Model     │ Status │  TPS │ Total(s) │ Load(s) │ PeakGB │ Notes       │
+2026-07-25 23:08:07 BST - INFO -    ├───┼───────────┼────────┼──────┼──────────┼─────────┼────────┼─────────────┤
+2026-07-25 23:08:07 BST - INFO -    │ 1 │ nanoLLaVA │ OK     │ 95.6 │     2.27 │    0.88 │   3.90 │ repetitive( │
+2026-07-25 23:08:07 BST - INFO -    │   │           │        │      │          │         │        │ phrase: "a  │
+2026-07-25 23:08:07 BST - INFO -    │   │           │        │      │          │         │        │ red         │
+2026-07-25 23:08:07 BST - INFO -    │   │           │        │      │          │         │        │ roof....    │
+2026-07-25 23:08:07 BST - INFO -    ╰───┴───────────┴────────┴──────┴──────────┴─────────┴────────┴─────────────╯
+2026-07-25 23:08:07 BST - INFO - 
+2026-07-25 23:08:07 BST - INFO - 📊 TPS comparison chart:
+2026-07-25 23:08:07 BST - INFO -    nanoLLaVA ████████████████████████ 95.6 tps
+2026-07-25 23:08:07 BST - INFO - 
+2026-07-25 23:08:07 BST - INFO - ✅ Successful Models (1):
+2026-07-25 23:08:07 BST - INFO -   - qnguyen3/nanoLLaVA: 95.6 tps (Active: 2.1GB, Cache: 1.6GB)
+2026-07-25 23:08:08 BST - INFO -    History:      /Users/jrp/Documents/AI/mlx/check_models/.worktrees/subtractive-reporting-simplification/src/output/results.history.jsonl
+2026-07-25 23:08:08 BST - INFO - 
+2026-07-25 23:08:08 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-07-25 23:08:08 BST - INFO - Maintainer Summary
+2026-07-25 23:08:08 BST - INFO - Run outcomes: attempted=1, evaluated=1, completed=1, crashed=0, indeterminate=0
+2026-07-25 23:08:08 BST - INFO -    Diagnostics:   /Users/jrp/Documents/AI/mlx/check_models/.worktrees/subtractive-reporting-simplification/src/output/reports/diagnostics.md
+2026-07-25 23:08:08 BST - INFO - 
+2026-07-25 23:08:08 BST - INFO - 📊 Reports successfully generated:
+2026-07-25 23:08:08 BST - INFO -    Output Index:    /Users/jrp/Documents/AI/mlx/check_models/.worktrees/subtractive-reporting-simplification/src/output/index.md
+2026-07-25 23:08:08 BST - INFO -    HTML Report:      /Users/jrp/Documents/AI/mlx/check_models/.worktrees/subtractive-reporting-simplification/src/output/reports/results.html
+2026-07-25 23:08:08 BST - INFO -    Gallery Report:   /Users/jrp/Documents/AI/mlx/check_models/.worktrees/subtractive-reporting-simplification/src/output/reports/model_gallery.md
+2026-07-25 23:08:08 BST - INFO -    Diagnostics:      /Users/jrp/Documents/AI/mlx/check_models/.worktrees/subtractive-reporting-simplification/src/output/reports/diagnostics.md
+2026-07-25 23:08:08 BST - INFO -    JSONL Report:     /Users/jrp/Documents/AI/mlx/check_models/.worktrees/subtractive-reporting-simplification/src/output/results.jsonl
+2026-07-25 23:08:08 BST - INFO -    Run JSON:         /Users/jrp/Documents/AI/mlx/check_models/.worktrees/subtractive-reporting-simplification/src/output/run.json
+2026-07-25 23:08:08 BST - INFO -    Log File: /Users/jrp/Documents/AI/mlx/check_models/.worktrees/subtractive-reporting-simplification/src/output/check_models.log
+2026-07-25 23:08:08 BST - INFO -    Environment: /Users/jrp/Documents/AI/mlx/check_models/.worktrees/subtractive-reporting-simplification/src/output/environment.log
+2026-07-25 23:08:08 BST - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2026-07-25 23:08:08 BST - INFO - Final Summary
+2026-07-25 23:08:08 BST - INFO - 
+2026-07-25 23:08:08 BST - INFO - ⏱  Overall runtime: 2.70s
+2026-07-25 23:08:08 BST - INFO - --- Library Versions ---
+2026-07-25 23:08:08 BST - INFO -    ╭─────────────────┬──────────────────────────────╮
+2026-07-25 23:08:08 BST - INFO -    │ Library         │ Version                      │
+2026-07-25 23:08:08 BST - INFO -    ├─────────────────┼──────────────────────────────┤
+2026-07-25 23:08:08 BST - INFO -    │ Pillow          │ 12.3.0                       │
+2026-07-25 23:08:08 BST - INFO -    │ huggingface-hub │ 1.24.0                       │
+2026-07-25 23:08:08 BST - INFO -    │ mlx             │ 0.32.1.dev20260725+973e27f82 │
+2026-07-25 23:08:08 BST - INFO -    │ mlx-audio       │ 0.4.4                        │
+2026-07-25 23:08:08 BST - INFO -    │ mlx-lm          │ 0.31.3                       │
+2026-07-25 23:08:08 BST - INFO -    │ mlx-metal       │                              │
+2026-07-25 23:08:08 BST - INFO -    │ mlx-vlm         │ 0.6.8                        │
+2026-07-25 23:08:08 BST - INFO -    │ numpy           │ 2.5.1                        │
+2026-07-25 23:08:08 BST - INFO -    │ tokenizers      │ 0.22.2                       │
+2026-07-25 23:08:08 BST - INFO -    │ transformers    │ 5.14.1                       │
+2026-07-25 23:08:08 BST - INFO -    ╰─────────────────┴──────────────────────────────╯
+2026-07-25 23:08:08 BST - INFO - Generated: 2026-07-25 23:08:08 BST
+2026-07-25 23:08:09 BST - INFO - 
+2026-07-25 23:08:09 BST - INFO - --- System Information ---
+2026-07-25 23:08:09 BST - INFO -    ╭────────────────────────────┬──────────────────────────────────────────────╮
+2026-07-25 23:08:09 BST - INFO -    │ Property                   │ Value                                        │
+2026-07-25 23:08:09 BST - INFO -    ├────────────────────────────┼──────────────────────────────────────────────┤
+2026-07-25 23:08:09 BST - INFO -    │ OS                         │ Darwin 25.5.0                                │
+2026-07-25 23:08:09 BST - INFO -    │ macOS Version              │ 26.5.2                                       │
+2026-07-25 23:08:09 BST - INFO -    │ SDK Version                │ 26.5                                         │
+2026-07-25 23:08:09 BST - INFO -    │ Active Developer Directory │ /Applications/Xcode.app/Contents/Developer   │
+2026-07-25 23:08:09 BST - INFO -    │ Xcode Version              │ 26.6                                         │
+2026-07-25 23:08:09 BST - INFO -    │ Xcode Build                │ 17F113                                       │
+2026-07-25 23:08:09 BST - INFO -    │ SDK Path                   │ /Applications/Xcode.app/Contents/Developer/P │
+2026-07-25 23:08:09 BST - INFO -    │                            │ latforms/MacOSX.platform/Developer/SDKs/MacO │
+2026-07-25 23:08:09 BST - INFO -    │                            │ SX26.5.sdk                                   │
+2026-07-25 23:08:09 BST - INFO -    │ Metal SDK                  │ MacOSX26.5.sdk                               │
+2026-07-25 23:08:09 BST - INFO -    │ Metal Compiler Version     │ Apple metal version 32023.883                │
+2026-07-25 23:08:09 BST - INFO -    │                            │ (metalfe-32023.883)                          │
+2026-07-25 23:08:09 BST - INFO -    │ Metallib Linker Version    │ AIR-LLD 32023.883 (metalfe-32023.883)        │
+2026-07-25 23:08:09 BST - INFO -    │                            │ (compatible with legacy metallib linker)     │
+2026-07-25 23:08:09 BST - INFO -    │ Apple Clang Version        │ Apple clang version 21.0.0                   │
+2026-07-25 23:08:09 BST - INFO -    │                            │ (clang-2100.1.1.101)                         │
+2026-07-25 23:08:09 BST - INFO -    │ Python Version             │ 3.13.13                                      │
+2026-07-25 23:08:09 BST - INFO -    │ Architecture               │ arm64                                        │
+2026-07-25 23:08:09 BST - INFO -    │ GPU/Chip                   │ Apple M5 Max                                 │
+2026-07-25 23:08:09 BST - INFO -    │ MLX Device                 │ Apple M5 Max                                 │
+2026-07-25 23:08:09 BST - INFO -    │ GPU Architecture           │ applegpu_g17s                                │
+2026-07-25 23:08:09 BST - INFO -    │ GPU Cores                  │ 40                                           │
+2026-07-25 23:08:09 BST - INFO -    │ Metal Support              │ Metal 4                                      │
+2026-07-25 23:08:09 BST - INFO -    │ RAM                        │ 128.0 GB                                     │
+2026-07-25 23:08:09 BST - INFO -    │ Recommended Working Set    │ 108 GB                                       │
+2026-07-25 23:08:09 BST - INFO -    │ Fused Attention            │ Available                                    │
+2026-07-25 23:08:09 BST - INFO -    │ CPU Cores (Physical)       │ 18                                           │
+2026-07-25 23:08:09 BST - INFO -    │ CPU Cores (Logical)        │ 18                                           │
+2026-07-25 23:08:09 BST - INFO -    │ MLX Install Type           │ editable local source                        │
+2026-07-25 23:08:09 BST - INFO -    │ MLX Distribution Root      │ /Users/jrp/miniconda3/envs/mlx-vlm/lib/pytho │
+2026-07-25 23:08:09 BST - INFO -    │                            │ n3.13/site-packages                          │
+2026-07-25 23:08:09 BST - INFO -    │ mlx-metal Distribution     │ not installed; local editable mlx supplies   │
+2026-07-25 23:08:09 BST - INFO -    │                            │ backend                                      │
+2026-07-25 23:08:09 BST - INFO -    │ MLX Core Extension         │ /Users/jrp/Documents/AI/mlx/mlx/python/mlx/c │
+2026-07-25 23:08:09 BST - INFO -    │                            │ ore.cpython-313-darwin.so                    │
+2026-07-25 23:08:09 BST - INFO -    │ MLX Metallib               │ /Users/jrp/Documents/AI/mlx/mlx/python/mlx/l │
+2026-07-25 23:08:09 BST - INFO -    │                            │ ib/mlx.metallib (162,839,496 bytes,          │
+2026-07-25 23:08:09 BST - INFO -    │                            │ sha256=83384795fee317890b760a9e6d8c9745b136c │
+2026-07-25 23:08:09 BST - INFO -    │                            │ 41801d3bd4a1f6f18791efbfd61)                 │
+2026-07-25 23:08:09 BST - INFO -    │ MLX libmlx.dylib           │ /Users/jrp/Documents/AI/mlx/mlx/python/mlx/l │
+2026-07-25 23:08:09 BST - INFO -    │                            │ ib/libmlx.dylib (21,641,424 bytes,           │
+2026-07-25 23:08:09 BST - INFO -    │                            │ sha256=256fcbe4ccba983eca88a0df6e8b05cab41dd │
+2026-07-25 23:08:09 BST - INFO -    │                            │ 7989403bb4df5c81d2e26c1a406)                 │
+2026-07-25 23:08:09 BST - INFO -    ╰────────────────────────────┴──────────────────────────────────────────────╯

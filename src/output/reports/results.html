@@ -31,7 +31,7 @@ summary { color: #0645ad; cursor: pointer; font-weight: 600; }
 <section id="runtime">
 <h2>Runtime</h2>
 <p><b>Runtime</b></p>
-<ul><li><b>Overall runtime:</b> 1.80s</li><li><b>Generation total:</b> 0.99s across 1 model(s); upstream model prefill / first-token split available for 1/1 model(s).</li><li><b>Phase totals:</b> model load=0.38s, local prompt prep=0.04s, upstream model prefill / first-token=0.09s, input preparation + decode=0.89s, cleanup=0.07s.</li><li><b>Validation overhead:</b> 0.00s total (avg 0.00s across 1 model(s)).</li><li><b>Upstream model prefill / first-token time:</b> Avg 0.09s | Min 0.09s | Max 0.09s across 1 model(s).</li></ul>
+<ul><li><b>Overall runtime:</b> 2.70s</li><li><b>Generation total:</b> 1.33s across 1 model(s); upstream model prefill / first-token split available for 1/1 model(s).</li><li><b>Phase totals:</b> model load=0.88s, local prompt prep=0.06s, upstream model prefill / first-token=0.20s, input preparation + decode=1.13s, cleanup=0.07s.</li><li><b>Validation overhead:</b> 0.00s total (avg 0.00s across 1 model(s)).</li><li><b>Upstream model prefill / first-token time:</b> Avg 0.20s | Min 0.20s | Max 0.20s across 1 model(s).</li></ul>
 </section>
 <section id="current-run-chooser">
 <h2>Current-run Chooser</h2>
@@ -100,8 +100,8 @@ applyAssessmentFilters();
 <td>completed</td>
 <td>unusable</td>
 <td>observation_needs_reproduction</td>
-<td>116 tok/s</td>
-<td>4.0</td>
+<td>95.6 tok/s</td>
+<td>3.9</td>
 <td>100</td>
 <td>repeated output, token cap truncation</td>
 <td>The image primarily features a house with a red roof and a red roof. The house is surrounded by a green grassy field. The house has a red roof and a red roof. The house also has a red roof. The house has a red roof. The house has a red roof. The house has a red roof. The house...</td>
@@ -164,31 +164,31 @@ applyAssessmentFilters();
 </tr>
 <tr>
 <td>Model load time</td>
-<td>0.38s</td>
+<td>0.88s</td>
 </tr>
 <tr>
 <td>Generation time</td>
-<td>0.99s</td>
+<td>1.33s</td>
 </tr>
 <tr>
 <td>Total time</td>
-<td>1.41s</td>
+<td>2.27s</td>
 </tr>
 <tr>
 <td>Input validation time</td>
-<td>0.00129</td>
+<td>0.0038</td>
 </tr>
 <tr>
 <td>Prompt preparation time</td>
-<td>0.0364</td>
+<td>0.0565</td>
 </tr>
 <tr>
 <td>First-token latency</td>
-<td>0.0947</td>
+<td>0.203</td>
 </tr>
 <tr>
 <td>Cleanup time</td>
-<td>0.0715</td>
+<td>0.0699</td>
 </tr>
 <tr>
 <td>Prompt tokens</td>
@@ -204,15 +204,15 @@ applyAssessmentFilters();
 </tr>
 <tr>
 <td>Prompt throughput (raw)</td>
-<td>274 tok/s</td>
+<td>128 tok/s</td>
 </tr>
 <tr>
 <td>Generation throughput (raw)</td>
-<td>116 tok/s</td>
+<td>95.6 tok/s</td>
 </tr>
 <tr>
 <td>Peak memory</td>
-<td>4.0</td>
+<td>3.9</td>
 </tr>
 <tr>
 <td>Active memory</td>
@@ -351,7 +351,7 @@ applyAssessmentFilters();
 </tr>
 <tr>
 <td>Model revision</td>
-<td>unavailable</td>
+<td>13d60cec183a86755afed64da495fcc2c382ea80</td>
 </tr>
 <tr>
 <td>Requested model revision</td>
@@ -404,17 +404,18 @@ applyAssessmentFilters();
 <h5>Captured stdout/stderr</h5>
 <pre><code class="language-text">unavailable</code></pre>
 <h5>Supplemental CLI reproduction</h5>
-<pre><code class="language-bash">python -m mlx_vlm.generate --model qnguyen3/nanoLLaVA --image check_models-task9-fixture.jpg --prompt &#x27;Describe the main elements in this image briefly.&#x27; --max-tokens 100 --temperature 0.0 --trust-remote-code --prefill-step-size 4096</code></pre>
+<pre><code class="language-bash">python -m mlx_vlm.generate --model qnguyen3/nanoLLaVA --image src/tests/fixtures/check_models-task9-fixture.jpg --prompt &#x27;Describe the main elements in this image briefly.&#x27; --max-tokens 100 --temperature 0.0 --revision 13d60cec183a86755afed64da495fcc2c382ea80 --trust-remote-code --prefill-step-size 4096</code></pre>
 <h5>Canonical Python reproduction script</h5>
 <pre><code class="language-python">from mlx_vlm.generate import generate
 from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load
 
 MODEL = &quot;qnguyen3/nanoLLaVA&quot;
-IMAGE = &quot;check_models-task9-fixture.jpg&quot;
+IMAGE = &quot;src/tests/fixtures/check_models-task9-fixture.jpg&quot;
 PROMPT = &quot;Describe the main elements in this image briefly.&quot;
 LOAD_KWARGS = {
     &quot;trust_remote_code&quot;: True,
+    &quot;revision&quot;: &quot;13d60cec183a86755afed64da495fcc2c382ea80&quot;,
 }
 TEMPLATE_KWARGS = {}
 GENERATE_KWARGS = {

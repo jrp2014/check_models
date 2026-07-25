@@ -29,7 +29,7 @@ None.
 - _Phase:_ unavailable
 - _Stage:_ unavailable
 - _Package:_ unavailable
-- _Model revision:_ unavailable
+- _Model revision:_ 13d60cec183a86755afed64da495fcc2c382ea80
 - _Requested model revision:_ unavailable
 - _Processor class:_ transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - _Tokenizer class:_ transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
@@ -59,7 +59,7 @@ unavailable
 This form includes only settings supported by the native mlx-vlm CLI.
 
 ```bash
-python -m mlx_vlm.generate --model qnguyen3/nanoLLaVA --image check_models-task9-fixture.jpg --prompt 'Describe the main elements in this image briefly.' --max-tokens 100 --temperature 0.0 --trust-remote-code --prefill-step-size 4096
+python -m mlx_vlm.generate --model qnguyen3/nanoLLaVA --image src/tests/fixtures/check_models-task9-fixture.jpg --prompt 'Describe the main elements in this image briefly.' --max-tokens 100 --temperature 0.0 --revision 13d60cec183a86755afed64da495fcc2c382ea80 --trust-remote-code --prefill-step-size 4096
 ```
 
 #### Canonical Python reproduction script
@@ -70,10 +70,11 @@ from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load
 
 MODEL = "qnguyen3/nanoLLaVA"
-IMAGE = "check_models-task9-fixture.jpg"
+IMAGE = "src/tests/fixtures/check_models-task9-fixture.jpg"
 PROMPT = "Describe the main elements in this image briefly."
 LOAD_KWARGS = {
     "trust_remote_code": True,
+    "revision": "13d60cec183a86755afed64da495fcc2c382ea80",
 }
 TEMPLATE_KWARGS = {}
 GENERATE_KWARGS = {

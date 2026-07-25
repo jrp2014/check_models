@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-07-25 20:17:23 BST
+Generated on: 2026-07-25 23:08:08 BST
 
 Complete per-model evidence artifact with image metadata, the source prompt, a
 facts-only chooser, and full generated or crash output for every attempted
@@ -12,9 +12,9 @@ Current-run usability and captured resource facts only. Throughput requires at l
 
 <!-- markdownlint-disable MD034 MD049 -->
 
-| Model                                             | Usability   | Gen TPS   |   Peak GB |   Gen tok | Observations                          | Output preview                                                                                                                                                                                                                                                                           |
-|---------------------------------------------------|-------------|-----------|-----------|-----------|---------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava) | `unusable`  | 116 tok/s |         4 |       100 | repeated output, token cap truncation | The image primarily features a house with a red roof and a red roof. The house is surrounded by a green grassy field. The house has a red roof and a red roof. The house also has a red roof. The house has a red roof. The house has a red roof. The house has a red roof. The house... |
+| Model                                             | Usability   | Gen TPS    |   Peak GB |   Gen tok | Observations                          | Output preview                                                                                                                                                                                                                                                                           |
+|---------------------------------------------------|-------------|------------|-----------|-----------|---------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava) | `unusable`  | 95.6 tok/s |       3.9 |       100 | repeated output, token cap truncation | The image primarily features a house with a red roof and a red roof. The house is surrounded by a green grassy field. The house has a red roof and a red roof. The house also has a red roof. The house has a red roof. The house has a red roof. The house has a red roof. The house... |
 <!-- markdownlint-enable MD034 MD049 -->
 
 ## Avoid for This Run
@@ -56,8 +56,8 @@ No usable models in this run.
 
 ## Image Metadata
 
-- _Date:_ 2026-07-25 19:46:34 BST
-- _Time:_ 19:46:34
+- _Date:_ 2026-07-25 23:04:54 BST
+- _Time:_ 23:04:54
 
 ## Prompt
 
@@ -81,19 +81,19 @@ Complete generated or crash evidence for every attempted model.
 - _Usability:_ unusable
 - _Maintainer status:_ observation_needs_reproduction
 - _Observations:_ repeated output, token cap truncation
-- _Model load time:_ 0.38s
-- _Generation time:_ 0.99s
-- _Total time:_ 1.41s
-- _Input validation time:_ 0.00129
-- _Prompt preparation time:_ 0.0364
-- _First-token latency:_ 0.0947
-- _Cleanup time:_ 0.0715
+- _Model load time:_ 0.88s
+- _Generation time:_ 1.33s
+- _Total time:_ 2.27s
+- _Input validation time:_ 0.0038
+- _Prompt preparation time:_ 0.0565
+- _First-token latency:_ 0.203
+- _Cleanup time:_ 0.0699
 - _Prompt tokens:_ 26
 - _Generation tokens:_ 100
 - _Total tokens:_ 126
-- _Prompt throughput (raw):_ 274 tok/s
-- _Generation throughput (raw):_ 116 tok/s
-- _Peak memory:_ 4.0
+- _Prompt throughput (raw):_ 128 tok/s
+- _Generation throughput (raw):_ 95.6 tok/s
+- _Peak memory:_ 3.9
 - _Active memory:_ 2.1
 - _Cache memory:_ 1.6
 - _Model-load active memory:_ 2.1

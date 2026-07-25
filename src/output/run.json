@@ -22,7 +22,7 @@
       "direct_url": null,
       "install_type": "source-tree",
       "source_location": "~/Documents/AI/mlx/check_models/.worktrees/subtractive-reporting-simplification",
-      "source_revision": "5a17b1bdc705a3817008477d66ee332c0c30bb3d",
+      "source_revision": "3d6e4fd6ae3e772e3723a15252b47681ce7c15bb",
       "vcs_revision": null,
       "version": "0.8.8"
     },
@@ -107,7 +107,7 @@
     "models_indeterminate": 0
   },
   "eval_mode": "blind",
-  "generated_at": "2026-07-25 20:17:23 BST",
+  "generated_at": "2026-07-25 23:08:08 BST",
   "generation_settings": {
     "max_tokens": 100,
     "prefill_step_size": 4096,
@@ -145,7 +145,7 @@
     }
   },
   "producer": {
-    "git_revision": "5a17b1bdc705a3817008477d66ee332c0c30bb3d",
+    "git_revision": "3d6e4fd6ae3e772e3723a15252b47681ce7c15bb",
     "install_type": "source-tree",
     "name": "check_models",
     "version": "0.8.8"
@@ -163,6 +163,6 @@
   },
   "prompt_sha256": "d2fca50701fac7b66f3c8cc3ac0e845843a2c79eb8c13867bb74524b4d11d046",
   "schema_version": "2.0",
-  "total_runtime_seconds": 1.8,
+  "total_runtime_seconds": 2.699,
   "trust_remote_code": true
 }
