@@ -72,6 +72,30 @@ def _stub_defines_top_level_class(text: str, class_name: str) -> bool:
     )
 
 
+def _stub_imports_relative_symbol_as(
+    text: str,
+    *,
+    module_name: str,
+    symbol_name: str,
+    public_name: str,
+) -> bool:
+    """Return whether a stub explicitly re-exports one relative import name."""
+    try:
+        module = ast.parse(text)
+    except SyntaxError:
+        return False
+    return any(
+        isinstance(statement, ast.ImportFrom)
+        and statement.level == 1
+        and statement.module == module_name
+        and any(
+            imported.name == symbol_name and imported.asname == public_name
+            for imported in statement.names
+        )
+        for statement in module.body
+    )
+
+
 def _remove_top_level_stub_class(path: Path, class_name: str) -> bool:
     """Remove one stubgen-expanded imported class while preserving its import alias."""
     if not path.exists():
@@ -108,6 +132,7 @@ def _mlx_vlm_generate_helper_contract_issues(typings_dir: Path) -> list[str]:
     """Return issues in the helper-based generate contract shipped by mlx-vlm."""
     generate_dir = typings_dir / "mlx_vlm" / "generate"
     required_tokens = {
+        generate_dir / "__init__.pyi": (),
         generate_dir / "dispatch.pyi": (
             "GenerateKwargs as GenerateKwargs",
             "from .common import GenerationResult as GenerationResult",
@@ -150,6 +175,13 @@ def _mlx_vlm_generate_helper_contract_issues(typings_dir: Path) -> list[str]:
             issues.append(f"could not read {path.relative_to(typings_dir)}: {err}")
             continue
         missing_tokens = [token for token in tokens if token not in text]
+        if path.name == "__init__.pyi" and not _stub_imports_relative_symbol_as(
+            text,
+            module_name="types",
+            symbol_name="GenerateKwargs",
+            public_name="GenerateKwargs",
+        ):
+            missing_tokens.append("from .types import GenerateKwargs as GenerateKwargs")
         if path.name == "dispatch.pyi" and _stub_defines_top_level_class(text, "GenerationResult"):
             missing_tokens.append("imported common.GenerationResult without a duplicate class")
         if missing_tokens:

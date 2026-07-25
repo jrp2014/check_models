@@ -161,6 +161,10 @@ def _write_upstream_mlx_vlm_generate_stubs(typings_dir: Path) -> None:
     generate_dir = typings_dir / "mlx_vlm" / "generate"
     generate_dir.mkdir(parents=True)
     safe_io.write_text_no_follow(
+        generate_dir / "__init__.pyi",
+        "from .types import GenerateKwargs as GenerateKwargs\n",
+    )
+    safe_io.write_text_no_follow(
         generate_dir / "dispatch.pyi",
         "import mlx.nn as nn\n"
         "from .types import GenerateKwargs as GenerateKwargs, "
@@ -1056,6 +1060,31 @@ def test_stub_integrity_accepts_upstream_mlx_vlm_generate_helpers(
     monkeypatch.setattr(generate_stubs, "_installed_distribution_version", _installed_version)
 
     assert generate_stubs.get_stub_integrity_issues(["mlx_vlm"], typings_dir) == []
+
+
+@pytest.mark.parametrize(
+    "mutated_reexport",
+    [
+        "",
+        "from .types import GenerateKwargs\n",
+        "from .types import GenerateKwargs as ProcessorLike\n",
+    ],
+)
+def test_stub_integrity_requires_exact_generate_kwargs_reexport(
+    tmp_path: Path,
+    mutated_reexport: str,
+) -> None:
+    """The package stub must re-export GenerateKwargs under its public name."""
+    typings_dir = tmp_path / "typings"
+    _write_upstream_mlx_vlm_generate_stubs(typings_dir)
+    safe_io.write_text_no_follow(
+        typings_dir / "mlx_vlm" / "generate" / "__init__.pyi",
+        mutated_reexport,
+    )
+
+    issues = generate_stubs._mlx_vlm_generate_helper_contract_issues(typings_dir)
+
+    assert any("GenerateKwargs as GenerateKwargs" in issue for issue in issues)
 
 
 @pytest.mark.parametrize(
