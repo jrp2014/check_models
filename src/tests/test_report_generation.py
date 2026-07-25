@@ -7,6 +7,8 @@ import html
 import io
 import json
 import re
+import subprocess
+import sys
 from argparse import Namespace
 from dataclasses import dataclass, replace
 from pathlib import Path
@@ -1031,7 +1033,7 @@ def test_diagnostics_use_run_args_for_complete_native_reproduction(tmp_path: Pat
         output.read_text(encoding="utf-8"),
         next(iter(issue_reports.values())).read_text(encoding="utf-8"),
     ]
-    for content in contents:
+    for index, content in enumerate(contents):
         assert "- _Model revision:_ unavailable" in content
         assert "- _Requested model revision:_ run-revision" in content
         assert '- _Configured EOS token override:_ ["&lt;override-eos&gt;"]' in content
@@ -1041,16 +1043,32 @@ def test_diagnostics_use_run_args_for_complete_native_reproduction(tmp_path: Pat
         assert "--processor-kwargs" in content
         assert "--resize-shape 64 32" in content
         assert "--skip-special-tokens" in content
-        assert "'top_p': 0.81" in content
-        assert "'min_p': 0.12" in content
-        assert "'top_k': 7" in content
-        assert "'seed': 73" in content
-        assert "'repetition_penalty': 1.15" in content
-        assert "'presence_penalty': 0.3" in content
-        assert "'frequency_penalty': 0.2" in content
-        assert "'eos_tokens': ['<override-eos>']" in content
-        assert "'enable_thinking': True" in content
-        assert "'cropping': False" in content
+        assert 'MODEL = "org/repro"' in content
+        assert '    "top_p": 0.81,' in content
+        assert '    "min_p": 0.12,' in content
+        assert '    "top_k": 7,' in content
+        assert '    "seed": 73,' in content
+        assert '    "repetition_penalty": 1.15,' in content
+        assert '    "presence_penalty": 0.3,' in content
+        assert '    "frequency_penalty": 0.2,' in content
+        assert '    "eos_tokens": ["<override-eos>"],' in content
+        assert '    "enable_thinking": True,' in content
+        assert '    "cropping": False,' in content
+        assert re.search(
+            r"- _Configured thinking end token:_ unavailable\n\n#{3,4} Complete partial output",
+            content,
+        )
+        python_script = content.split("```python\n", maxsplit=1)[1].split("\n```", maxsplit=1)[0]
+        compile(python_script, "<native-repro>", "exec")
+        script_path = tmp_path / f"native_repro_{index}.py"
+        script_path.write_text(python_script + "\n", encoding="utf-8")
+        format_check = subprocess.run(  # noqa: S603 - fixed interpreter checks test output
+            [sys.executable, "-m", "ruff", "format", "--check", str(script_path)],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        assert format_check.returncode == 0, format_check.stdout + format_check.stderr
 
 
 def test_maintainer_summary_logs_only_counts_and_direct_draft_paths(
@@ -1338,11 +1356,11 @@ class TestHtmlReportEdgeCases:
         assert "--max-tokens 321" in content
         assert "--temperature 0.42" in content
         assert "--adapter-path adapter" in content
-        assert "LOAD_KWARGS = {'trust_remote_code': False" in content
-        assert "'revision': 'refs/pr/42'" in content
-        assert "TEMPLATE_KWARGS = {'enable_thinking': True" in content
-        assert "'thinking_budget': 19" in content
-        assert "'cropping': False" in content
+        assert 'LOAD_KWARGS = {\n    "trust_remote_code": False,' in content
+        assert '    "revision": "refs/pr/42",' in content
+        assert 'TEMPLATE_KWARGS = {\n    "enable_thinking": True,' in content
+        assert '    "thinking_budget": 19,' in content
+        assert '    "cropping": False,' in content
 
     def test_html_preserves_complete_escaped_output_in_expandable_evidence(
         self,

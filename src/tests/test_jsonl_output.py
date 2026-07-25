@@ -107,6 +107,46 @@ def test_save_jsonl_report_includes_library_versions_in_metadata(tmp_path: Path)
     assert rows == []
 
 
+def test_jsonl_system_provenance_is_public_safe_while_history_stays_raw(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Published JSONL should redact local roots without changing raw history evidence."""
+    monkeypatch.setattr(
+        check_models.Path,
+        "home",
+        classmethod(lambda _cls: check_models.Path("/Users/alice")),
+    )
+    system_info = {
+        "Home tool": "/Users/alice/projects/mlx/bin/tool",
+        "Private cache": "/private/var/folders/build/cache",
+        "OS": "Darwin 25.5.0",
+    }
+    output_file = tmp_path / "results.jsonl"
+
+    save_jsonl_report([], output_file, prompt="test", system_info=system_info)
+    header, rows = _read_jsonl(output_file)
+    history = append_history_record(
+        history_path=tmp_path / "results.history.jsonl",
+        results=[],
+        prompt="test",
+        system_info=system_info,
+        library_versions={},
+        image_path=check_models.Path("/private/tmp/source.jpg"),
+    )
+
+    assert header["system"] == {
+        "Home tool": "~/projects/mlx/bin/tool",
+        "Private cache": "<private>/var/folders/build/cache",
+        "OS": "Darwin 25.5.0",
+    }
+    assert "/Users/alice" not in output_file.read_text(encoding="utf-8")
+    assert "/private/" not in output_file.read_text(encoding="utf-8")
+    assert rows == []
+    assert history["system"] == system_info
+    assert history["image_path"] == "/private/tmp/source.jpg"
+
+
 def test_save_run_json_report_captures_public_snapshot_contract(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

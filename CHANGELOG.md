@@ -35,6 +35,9 @@ Notable changes to this project will be documented in this file.
 - Cap the optional `tokenizers` extra to the validated `0.22.x` line and retain the
   package/runtime provenance, Apple Silicon hardware context, dependency checks, and
   CLI validation hardening accumulated since `0.8.0`.
+- Make retained public run evidence publication-safe and exact by sanitizing JSONL
+  system paths, preserving explicit generation settings such as `--seed 0`, and
+  labeling logged output checks as mechanical observations rather than quality.
 
 ## [0.8.0] - 2026-06-06
 

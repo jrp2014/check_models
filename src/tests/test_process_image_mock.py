@@ -761,7 +761,7 @@ class TestProcessImageWithModelMock:
         """Server request controls shared with generate() should reach mlx_vlm.generate."""
         params = replace(
             _build_params(test_image),
-            seed=123,
+            seed=0,
             presence_penalty=0.25,
             presence_context_size=32,
             frequency_penalty=0.5,
@@ -789,12 +789,21 @@ class TestProcessImageWithModelMock:
 
         assert result is fake_generation
         generate_kwargs = mock_generate.call_args.kwargs
-        assert generate_kwargs["seed"] == 123
+        assert generate_kwargs["seed"] == 0
         assert generate_kwargs["presence_penalty"] == 0.25
         assert generate_kwargs["presence_context_size"] == 32
         assert generate_kwargs["frequency_penalty"] == 0.5
         assert generate_kwargs["frequency_context_size"] == 64
         assert generate_kwargs["logit_bias"] == {42: -1.5, 123: 2.0}
+        prompt_diagnostics = result._check_models_prompt_diagnostics
+        assert prompt_diagnostics is not None
+        assert prompt_diagnostics.generate_kwargs["seed"] == 0
+        assert prompt_diagnostics.generate_kwargs["presence_penalty"] == 0.25
+        assert prompt_diagnostics.generate_kwargs["presence_context_size"] == 32
+        assert prompt_diagnostics.generate_kwargs["frequency_penalty"] == 0.5
+        assert prompt_diagnostics.generate_kwargs["frequency_context_size"] == 64
+        assert prompt_diagnostics.generate_kwargs["logit_bias"] == {"42": -1.5, "123": 2.0}
+        assert "verbose" not in prompt_diagnostics.generate_kwargs
 
     def test_run_model_generation_retries_utf8_detokenizer_failure(self, test_image: Path) -> None:
         """Known mlx-vlm UTF-8 detokenizer failures should retry once with the patch."""

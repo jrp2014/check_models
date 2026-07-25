@@ -991,6 +991,25 @@ def test_production_source_has_no_retired_semantic_scoring_api() -> None:
     assert string_literals.isdisjoint(retired_formatter_fields)
 
 
+def test_production_logs_use_facts_first_observation_labels() -> None:
+    """Persisted log messages must describe mechanical facts without quality verdicts."""
+    source = (PKG_ROOT / "check_models.py").read_text(encoding="utf-8")
+
+    for retained in (
+        "Mechanical observations for %s: %s",
+        'parts.append(f"observations={',
+        "Warnings are shown for repetitive output and token-cap truncation.",
+    ):
+        assert retained in source
+
+    for retired in (
+        "Quality issues detected for %s: %s",
+        'parts.append(f"quality={',
+        "Warnings are shown for repetitive or hallucinated output.",
+    ):
+        assert retired not in source
+
+
 def test_stub_refresh_reason_is_none_for_fresh_manifest(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

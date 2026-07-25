@@ -28,6 +28,7 @@ if TYPE_CHECKING:  # pragma: no cover - only for type hints
     from pathlib import Path
 
     import pytest
+    from rich.panel import Panel
 
 
 class _StubGeneration:
@@ -607,6 +608,41 @@ def test_log_summary_reports_execution_and_mechanical_observations(
     assert "Metadata baseline:" not in messages
     assert "Best description:" not in messages
     assert "Best keywording:" not in messages
+
+
+def test_machine_summary_uses_observation_vocabulary() -> None:
+    """Automation summaries should label mechanical facts without grading output."""
+    result = PerformanceResult(
+        model_name="org/caption-model",
+        generation=_StubGeneration(),
+        success=True,
+        quality_issues="repetitive, token-cap-truncation",
+    )
+
+    parts = check_models._summary_parts(result, "caption-model")
+
+    assert "observations=repetitive+token_cap_truncation" in parts
+    assert not any(part.startswith("quality=") for part in parts)
+
+
+def test_metrics_legend_names_only_retained_mechanical_warnings(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The CLI legend should not claim that the harness detects hallucinations."""
+    panels: list[Panel] = []
+    monkeypatch.setattr(
+        check_models,
+        "_log_rich_renderable",
+        lambda panel, **_kwargs: panels.append(panel),
+    )
+    monkeypatch.setattr(check_models, "log_blank", lambda: None)
+
+    check_models.log_metrics_legend(detailed=False)
+
+    assert len(panels) == 1
+    legend = str(panels[0].renderable)
+    assert "repetitive output and token-cap truncation" in legend
+    assert "hallucinated" not in legend
 
 
 def test_log_summary_failure_uses_only_recorded_failure_facts(

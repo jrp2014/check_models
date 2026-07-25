@@ -6657,11 +6657,10 @@ def _collect_report_component_rows(
 
 
 def _home_relative_report_text(value: str) -> str:
-    """Replace the local home prefix in public report text with ``~``."""
+    """Replace local private prefixes in public report text."""
     home = str(Path.home())
-    if home == "/":
-        return value
-    return value.replace(home, "~")
+    sanitized = value if home == "/" else value.replace(home, "~")
+    return sanitized.replace("/private/", "<private>/")
 
 
 def _quality_analysis_for_result(res: PerformanceResult) -> GenerationQualityAnalysis | None:
@@ -8236,6 +8235,7 @@ def _diagnostics_model_entry(
             (ReportKeyValues(_diagnostics_result_facts(result, assessment, run_args=run_args)),)
         )
     )
+    parts.append("")
 
     generated_output = (
         "unavailable"
@@ -10058,30 +10058,36 @@ def _bounded_string_sequence(value: object) -> tuple[str, ...]:
     return tuple(str(item) for item in value[:_MAX_PROMPT_DIAGNOSTIC_ITEMS])
 
 
+_CONDITIONAL_GENERATION_CONTEXTS: Final[dict[str, str]] = {
+    "repetition_context_size": "repetition_penalty",
+    "presence_context_size": "presence_penalty",
+    "frequency_context_size": "frequency_penalty",
+}
+_CONDITIONAL_KV_GENERATION_SETTINGS: Final[frozenset[str]] = frozenset(
+    {
+        "kv_quant_scheme",
+        "kv_group_size",
+        "quantized_kv_start",
+    }
+)
+
+
 def _generation_kwargs_for_prompt_diagnostics(
     *,
-    params: ProcessImageParams,
-    extra_kwargs: GenerateKwargs,
+    generate_kwargs: Mapping[str, object],
     processor_passthrough_kwargs: Mapping[str, object],
 ) -> dict[str, JsonLike]:
-    """Return the generation kwargs forwarded to mlx-vlm in JSON-safe form."""
-    kwargs: dict[str, object] = {
-        "temperature": params.temperature,
-        "top_p": params.top_p,
-        "repetition_penalty": params.repetition_penalty,
-        "repetition_context_size": params.repetition_context_size,
-        "max_kv_size": params.max_kv_size,
-        "kv_bits": params.kv_bits,
-        "kv_quant_scheme": params.kv_quant_scheme,
-        "kv_group_size": params.kv_group_size,
-        "quantized_kv_start": params.quantized_kv_start,
-        "max_tokens": params.max_tokens,
-    }
-    if params.force_download:
-        kwargs["force_download"] = True
-    if params.quantize_activations:
-        kwargs["quantize_activations"] = True
-    kwargs.update(extra_kwargs)
+    """Return publication-relevant forwarded generation kwargs in JSON-safe form."""
+    kwargs: dict[str, object] = {}
+    for key, value in generate_kwargs.items():
+        if key == "verbose" or value is None:
+            continue
+        required_setting = _CONDITIONAL_GENERATION_CONTEXTS.get(key)
+        if required_setting is not None and generate_kwargs.get(required_setting) is None:
+            continue
+        if key in _CONDITIONAL_KV_GENERATION_SETTINGS and generate_kwargs.get("kv_bits") is None:
+            continue
+        kwargs[key] = value
     if processor_passthrough_kwargs:
         kwargs["processor_kwargs"] = dict(processor_passthrough_kwargs)
     return {key: _prompt_diag_json_value(value) for key, value in sorted(kwargs.items())}
@@ -10093,7 +10099,7 @@ def _build_prompt_diagnostics(
     processor: ProcessorMixin,
     config: PreTrainedConfig | Mapping[str, object] | None,
     formatted_prompt: str,
-    extra_kwargs: GenerateKwargs,
+    generate_kwargs: GenerateKwargs,
     processor_passthrough_kwargs: Mapping[str, object],
 ) -> PromptDiagnostics:
     """Collect bounded prompt/template diagnostics for retained machine reports."""
@@ -10121,8 +10127,7 @@ def _build_prompt_diagnostics(
         special_token_ids=_bounded_json_sequence(getattr(tokenizer, "all_special_ids", None)),
         special_tokens=_bounded_string_sequence(getattr(tokenizer, "all_special_tokens", None)),
         generate_kwargs=_generation_kwargs_for_prompt_diagnostics(
-            params=params,
-            extra_kwargs=extra_kwargs,
+            generate_kwargs=generate_kwargs,
             processor_passthrough_kwargs=processor_passthrough_kwargs,
         ),
     )
@@ -11442,12 +11447,13 @@ def _run_model_generation(
 
     extra_kwargs = _build_generate_extra_kwargs(params)
     processor_passthrough_kwargs = params.processor_kwargs or {}
+    generate_kwargs = _build_generate_kwargs(params, extra_kwargs)
     prompt_diagnostics = _build_prompt_diagnostics(
         params=params,
         processor=processor,
         config=config,
         formatted_prompt=formatted_prompt,
-        extra_kwargs=extra_kwargs,
+        generate_kwargs=generate_kwargs,
         processor_passthrough_kwargs=processor_passthrough_kwargs,
     )
     if _is_generation_processor(processor):
@@ -11458,7 +11464,6 @@ def _run_model_generation(
             msg = "mlx-vlm load returned no generation-compatible processor or tokenizer"
             raise TypeError(msg)
         generation_processor = tokenizer
-    generate_kwargs = _build_generate_kwargs(params, extra_kwargs)
     if TYPE_CHECKING:
         strict_generate = _mlx_vlm_generate_typecheck
     else:
@@ -12053,11 +12058,11 @@ def _summary_parts(res: PerformanceResult, model_short: str) -> list[str]:
     issue_labels = sorted(_extract_quality_issue_labels(res.quality_issues))
     if res.success:
         if issue_labels:
-            parts.append(f"quality={'+'.join(issue_labels)}")
+            parts.append(f"observations={'+'.join(issue_labels)}")
         else:
-            parts.append("quality=clean")
+            parts.append("observations=none")
     elif issue_labels:
-        parts.append(f"quality={'+'.join(issue_labels)}")
+        parts.append(f"observations={'+'.join(issue_labels)}")
     if res.error_stage:
         parts.append(f"stage={res.error_stage}")
     if res.failure_phase:
@@ -12454,7 +12459,7 @@ def log_metrics_legend(*, detailed: bool) -> None:
         else "Compact mode: tokens(total/prompt/gen) format with aligned keys"
     )
     panel = Panel(
-        f"{mode_line}\nWarnings are shown for repetitive or hallucinated output.",
+        f"{mode_line}\nWarnings are shown for repetitive output and token-cap truncation.",
         title="📖 Metrics Legend",
         border_style="blue",
         box=box.ROUNDED,
@@ -13406,7 +13411,7 @@ def process_models(
             )
             if result.quality_issues:
                 logger.info(
-                    "Quality issues detected for %s: %s",
+                    "Mechanical observations for %s: %s",
                     result.model_name,
                     result.quality_issues,
                 )
@@ -14074,7 +14079,7 @@ def _build_jsonl_metadata_record(
         "_type": "metadata",
         "format_version": "2.0",
         "prompt": prompt,
-        "system": system_info,
+        "system": {key: _home_relative_report_text(value) for key, value in system_info.items()},
         "timestamp": local_now_str(),
         "eval_mode": resolved_eval_mode,
         "metadata_exposed_to_prompt": (
@@ -14743,6 +14748,48 @@ def build_native_mlx_vlm_repro_command_spec(
     )
 
 
+def _python_repro_string_literal(value: str) -> str:
+    """Return a Ruff-stable Python string literal for native repro scripts."""
+    if '"' in value and "'" not in value:
+        return repr(value)
+    return json.dumps(value, ensure_ascii=False)
+
+
+def _python_repro_literal(value: object) -> str:
+    """Render the bounded native-repro value types as valid Python literals."""
+    if isinstance(value, str):
+        return _python_repro_string_literal(value)
+    if value is None or isinstance(value, bool | int | float):
+        return repr(value)
+    if isinstance(value, Mapping):
+        items = ", ".join(
+            f"{_python_repro_literal(key)}: {_python_repro_literal(item)}"
+            for key, item in value.items()
+        )
+        return f"{{{items}}}"
+    if isinstance(value, tuple):
+        items = ", ".join(_python_repro_literal(item) for item in value)
+        suffix = "," if len(value) == 1 else ""
+        return f"({items}{suffix})"
+    if isinstance(value, Sequence) and not isinstance(value, str | bytes | bytearray):
+        items = ", ".join(_python_repro_literal(item) for item in value)
+        return f"[{items}]"
+    return _python_repro_string_literal(str(value))
+
+
+def _python_repro_mapping_assignment(name: str, values: Mapping[str, object]) -> str:
+    """Render one formatter-stable multiline mapping assignment."""
+    if not values:
+        return f"{name} = {{}}"
+    lines = [f"{name} = {{"]
+    lines.extend(
+        f"    {_python_repro_literal(key)}: {_python_repro_literal(value)},"
+        for key, value in values.items()
+    )
+    lines.append("}")
+    return "\n".join(lines)
+
+
 def _build_native_mlx_vlm_python_script(
     *,
     model_name: str,
@@ -14760,12 +14807,12 @@ def _build_native_mlx_vlm_python_script(
             "from mlx_vlm.prompt_utils import apply_chat_template",
             "from mlx_vlm.utils import load",
             "",
-            f"MODEL = {model_name!r}",
-            f"IMAGE = {image_ref!r}",
-            f"PROMPT = {prompt!r}",
-            f"LOAD_KWARGS = {load_kwargs!r}",
-            f"TEMPLATE_KWARGS = {template_kwargs!r}",
-            f"GENERATE_KWARGS = {generate_kwargs!r}",
+            f"MODEL = {_python_repro_string_literal(model_name)}",
+            f"IMAGE = {_python_repro_string_literal(image_ref)}",
+            f"PROMPT = {_python_repro_string_literal(prompt)}",
+            _python_repro_mapping_assignment("LOAD_KWARGS", load_kwargs),
+            _python_repro_mapping_assignment("TEMPLATE_KWARGS", template_kwargs),
+            _python_repro_mapping_assignment("GENERATE_KWARGS", generate_kwargs),
             "model, processor = load(MODEL, **LOAD_KWARGS)",
             "formatted_prompt = apply_chat_template(",
             "    processor,",
