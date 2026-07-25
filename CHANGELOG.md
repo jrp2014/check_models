@@ -14,6 +14,8 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Correct the public Core Functions example to name the retained Markdown
+  gallery-report generator.
 - Replace the score-, grade-, winner-, and history-derived reporting pipeline with
   a facts-first current-run assessment shared by the retained HTML, gallery,
   diagnostics, JSONL, and run JSON artifacts. The assessment now exposes only exact

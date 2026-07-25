@@ -991,6 +991,14 @@ def test_production_source_has_no_retired_semantic_scoring_api() -> None:
     assert string_literals.isdisjoint(retired_formatter_fields)
 
 
+def test_public_readme_uses_retained_markdown_gallery_api() -> None:
+    """The public API example must name the retained Markdown generator."""
+    readme = (PKG_ROOT / "README.md").read_text(encoding="utf-8")
+
+    assert "generate_markdown_report" not in readme
+    assert "generate_markdown_gallery_report" in readme
+
+
 def test_production_logs_use_facts_first_observation_labels() -> None:
     """Persisted log messages must describe mechanical facts without quality verdicts."""
     source = (PKG_ROOT / "check_models.py").read_text(encoding="utf-8")
