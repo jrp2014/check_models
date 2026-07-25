@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-07-21 07:55:19 BST
+FULL ENVIRONMENT DUMP - 2026-07-25 20:17:21 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -11,7 +11,7 @@ aiohappyeyeballs==2.7.1
 aiohttp==3.14.2
 aiosignal==1.4.0
 annotated-doc==0.0.4
-annotated-types==0.7.0
+annotated-types==0.8.0
 anyio==4.14.2
 ast_serialize==0.6.0
 astroid==4.0.4
@@ -20,7 +20,7 @@ attrs==26.1.0
 blessed==1.47.0
 build==1.5.1
 ca9==0.5.0
-certifi==2026.6.17
+certifi==2026.7.22
 cffi==2.1.0
 cfgv==3.5.0
 charset-normalizer==3.4.9
@@ -38,11 +38,11 @@ docopt==0.6.2
 editor==1.8.0
 einops==0.8.2
 execnet==2.1.2
-fastapi==0.139.2
-filelock==3.31.2
+fastapi==0.140.0
+filelock==3.32.0
 flatbuffers==25.12.19
 frozenlist==1.8.0
-fsspec==2026.4.0
+fsspec==2026.6.0
 gast==0.7.0
 google-pasta==0.2.0
 grpcio==1.82.1
@@ -81,11 +81,11 @@ mdit-py-plugins==0.6.1
 mdurl==0.1.2
 miniaudio==1.71
 ml_dtypes==0.5.4
-mlx==0.32.1.dev20260721+30a19f72
-mlx==0.32.1.dev20260721+30a19f72
+mlx==0.32.1.dev20260725+973e27f82
+mlx==0.32.1.dev20260725+973e27f82
 mlx-audio==0.4.4
 mlx-lm==0.31.3
-mlx-vlm==0.6.6
+mlx-vlm==0.6.8
 more-itertools==11.1.0
 mpmath==1.3.0
 multidict==6.7.1
@@ -108,9 +108,9 @@ pathspec==1.1.1
 pfzy==0.3.4
 pillow==12.3.0
 pip==26.1.2
-platformdirs==4.10.1
+platformdirs==4.11.0
 pluggy==1.6.0
-pre_commit==4.6.0
+pre_commit==4.6.1
 prompt_toolkit==3.0.52
 propcache==0.5.2
 protobuf==7.35.1
@@ -130,7 +130,7 @@ pytest==9.1.1
 pytest-cov==7.1.0
 pytest-xdist==3.8.0
 python-dateutil==2.9.0.post0
-python-discovery==1.4.4
+python-discovery==1.5.0
 python-dotenv==1.2.2
 python-multipart==0.0.32
 PyYAML==6.0.3
@@ -141,7 +141,7 @@ regex==2026.7.19
 requests==2.34.2
 rich==15.0.0
 rpds-py==2026.6.3
-ruff==0.15.22
+ruff==0.16.0
 runs==1.3.0
 safetensors==0.8.0
 scipy==1.18.0
@@ -165,7 +165,7 @@ tomlkit==0.15.1
 torch==2.13.0
 torchaudio==2.11.0
 torchvision==0.28.0
-tqdm==4.69.0
+tqdm==4.69.1
 transformers==5.14.1
 tree-sitter==0.26.0
 tree-sitter-dart-orchard==0.5.0
@@ -174,16 +174,16 @@ tree-sitter-java==0.23.5
 tree-sitter-php==0.24.1
 tree-sitter-rust==0.24.2
 tree-sitter-typescript==0.23.2
-ty==0.0.61
+ty==0.0.63
 typer==0.27.0
 types-defusedxml==0.7.0.20260504
 types-psutil==7.2.2.20260518
-types-PyYAML==6.0.12.20260518
+types-PyYAML==6.0.12.20260724
 types-requests==2.33.0.20260712
-types-simplejson==3.20.0.20260518
+types-simplejson==4.1.0.20260724
 types-tabulate==0.10.0.20260508
 types-toml==0.10.8.20260518
-types-tqdm==4.69.0.20260720
+types-tqdm==4.69.0.20260724
 types-urllib3==1.26.25.14
 typing-inspection==0.4.2
 typing_extensions==4.16.0
@@ -191,7 +191,7 @@ tzlocal==5.4.4
 uc-micro-py==2.0.0
 urllib3==2.7.0
 uvicorn==0.51.0
-virtualenv==21.6.1
+virtualenv==21.7.0
 vulture==2.16
 wcwidth==0.8.2
 wheel==0.47.0
@@ -203,5 +203,5 @@ yarl==1.24.5
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-07-21 07:55:19 BST
+Environment dump completed at 2026-07-25 20:17:21 BST
 ================================================================================
