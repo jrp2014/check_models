@@ -160,10 +160,12 @@ def _write_upstream_mlx_vlm_generate_stubs(typings_dir: Path) -> None:
     """Write the helper-based generate contract emitted by current mlx-vlm."""
     generate_dir = typings_dir / "mlx_vlm" / "generate"
     generate_dir.mkdir(parents=True)
-    (generate_dir / "dispatch.pyi").write_text(
+    safe_io.write_text_no_follow(
+        generate_dir / "dispatch.pyi",
         "import mlx.nn as nn\n"
         "from .types import GenerateKwargs as GenerateKwargs, "
         "ProcessorLike as ProcessorLike, Unpack as Unpack\n"
+        "from .common import GenerationResult as GenerationResult\n"
         "from collections.abc import Generator\n"
         "from transformers import PreTrainedTokenizer as PreTrainedTokenizer\n"
         "\n"
@@ -179,19 +181,24 @@ def _write_upstream_mlx_vlm_generate_stubs(typings_dir: Path) -> None:
         "audio: str | list[str] | None = None, "
         "video: str | list[str] | None = None, verbose: bool = False, "
         "**kwargs: Unpack[GenerateKwargs]) -> GenerationResult: ...\n",
-        encoding="utf-8",
     )
-    (generate_dir / "types.pyi").write_text(
+    safe_io.write_text_no_follow(
+        generate_dir / "types.pyi",
         "from typing import Protocol, TypedDict\n"
         "from typing_extensions import Unpack as Unpack\n"
         "\n"
         "class ProcessorLike(Protocol): ...\n"
         "class GenerateKwargs(TypedDict, total=False):\n"
         "    temperature: float\n"
-        "    thinking_end_token: str\n",
-        encoding="utf-8",
+        "    eos_tokens: list[int] | list[str] | None\n"
+        "    skip_special_tokens: bool\n"
+        "    enable_thinking: bool\n"
+        "    thinking_start_token: str | None\n"
+        "    thinking_end_token: str\n"
+        "    thinking_budget: int | None\n",
     )
-    (generate_dir / "ar.pyi").write_text(
+    safe_io.write_text_no_follow(
+        generate_dir / "ar.pyi",
         "from .types import GenerateKwargs as GenerateKwargs, "
         "ProcessorLike as ProcessorLike, Unpack as Unpack\n"
         "def batch_generate(model: object, processor: ProcessorLike, "
@@ -199,7 +206,6 @@ def _write_upstream_mlx_vlm_generate_stubs(typings_dir: Path) -> None:
         "audios: str | list[str] | None = None, "
         "prompts: list[str] | None = None, "
         "**kwargs: Unpack[GenerateKwargs]) -> object: ...\n",
-        encoding="utf-8",
     )
 
 
@@ -560,7 +566,7 @@ def test_common_quality_finds_conda_executable_without_sourcing_conda_sh(tmp_pat
     )
     run_script.chmod(0o755)
 
-    result = subprocess.run(  # noqa: S603
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash runs a test-created script
         ["/bin/bash", str(run_script)],
         capture_output=True,
         text=True,
@@ -597,7 +603,7 @@ def test_common_quality_rejects_local_python_fallback_without_override(tmp_path:
     )
     run_script.chmod(0o755)
 
-    result = subprocess.run(  # noqa: S603
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash runs a test-created script
         ["/bin/bash", str(run_script)],
         capture_output=True,
         text=True,
@@ -642,7 +648,7 @@ def test_common_quality_python_tools_do_not_fall_back_to_path_by_default(tmp_pat
     )
     run_script.chmod(0o755)
 
-    result = subprocess.run(  # noqa: S603
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash runs a test-created script
         ["/bin/bash", str(run_script)],
         capture_output=True,
         text=True,
@@ -688,7 +694,7 @@ def test_built_wheel_includes_packaged_quality_config(tmp_path: Path) -> None:
     dist_dir.mkdir()
 
     # Fixed local command against the checked-in repo; no user input reaches subprocess.
-    result = subprocess.run(  # noqa: S603
+    result = subprocess.run(  # noqa: S603 - fixed interpreter builds the checked-in package
         [
             sys.executable,
             "-m",
@@ -742,9 +748,10 @@ def test_generated_markdown_lint_guards_use_named_rule_sets() -> None:
     """Report-specific markdownlint guards should stay centralized."""
     source = (PKG_ROOT / "check_models.py").read_text(encoding="utf-8")
 
-    assert 'MARKDOWNLINT_MAIN_TABLE_RULES: Final[str] = "MD033 MD034 MD037 MD049"' in source
     assert 'MARKDOWNLINT_GALLERY_SUMMARY_RULES: Final[str] = "MD034 MD049"' in source
     assert 'MARKDOWNLINT_TABLE_PIPE_RULES: Final[str] = "MD060"' in source
+    assert "MARKDOWNLINT_MAIN_TABLE_RULES" not in source
+    assert "MARKDOWNLINT_DETAILS_RULES" not in source
     assert "<!-- markdownlint-disable MD033 MD034 MD037 MD049 -->" not in source
     assert "<!-- markdownlint-enable MD033 MD034 MD037 MD049 -->" not in source
     assert "<!-- markdownlint-disable MD034 -->" not in source
@@ -1051,6 +1058,35 @@ def test_stub_integrity_accepts_upstream_mlx_vlm_generate_helpers(
     assert generate_stubs.get_stub_integrity_issues(["mlx_vlm"], typings_dir) == []
 
 
+@pytest.mark.parametrize(
+    "required_field",
+    [
+        "eos_tokens: list[int] | list[str] | None",
+        "skip_special_tokens: bool",
+        "enable_thinking: bool",
+        "thinking_start_token: str | None",
+        "thinking_end_token: str",
+        "thinking_budget: int | None",
+    ],
+)
+def test_stub_integrity_requires_upstream_generate_token_controls(
+    tmp_path: Path,
+    required_field: str,
+) -> None:
+    """The generated upstream TypedDict must retain every forwarded token control."""
+    typings_dir = tmp_path / "typings"
+    _write_upstream_mlx_vlm_generate_stubs(typings_dir)
+    types_path = typings_dir / "mlx_vlm" / "generate" / "types.pyi"
+    types_path.write_text(
+        types_path.read_text(encoding="utf-8").replace(f"    {required_field}\n", ""),
+        encoding="utf-8",
+    )
+
+    issues = generate_stubs._mlx_vlm_generate_helper_contract_issues(typings_dir)
+
+    assert any(required_field in issue for issue in issues)
+
+
 def test_refresh_stub_manifest_from_existing_stubs_repairs_version_metadata(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -1239,12 +1275,23 @@ def test_patch_mlx_vlm_stubs_accepts_upstream_generate_helpers(tmp_path: Path) -
     typings_dir = tmp_path / "typings"
     _write_upstream_mlx_vlm_generate_stubs(typings_dir)
     dispatch_path = typings_dir / "mlx_vlm" / "generate" / "dispatch.pyi"
+    dispatch_path.write_text(
+        dispatch_path.read_text(encoding="utf-8").replace(
+            "def stream_generate",
+            "@dataclass\nclass GenerationResult:\n    text: str = ...\n\ndef stream_generate",
+            1,
+        ),
+        encoding="utf-8",
+    )
     raw_dispatch = dispatch_path.read_text(encoding="utf-8")
 
     issues = generate_stubs._patch_mlx_vlm_stubs(typings_dir, audit=True)
 
     assert issues == []
-    assert dispatch_path.read_text(encoding="utf-8") == raw_dispatch
+    patched_dispatch = dispatch_path.read_text(encoding="utf-8")
+    assert patched_dispatch != raw_dispatch
+    assert not generate_stubs._stub_defines_top_level_class(patched_dispatch, "GenerationResult")
+    assert "from .common import GenerationResult as GenerationResult" in patched_dispatch
     assert "ProcessorMixin" not in raw_dispatch
 
 
@@ -1532,7 +1579,7 @@ def test_pyrefly_quality_gate_fails_on_warnings(tmp_path: Path) -> None:
     run_script.chmod(0o755)
     bash_path = Path("/bin/bash")
 
-    result = subprocess.run(  # noqa: S603
+    result = subprocess.run(  # noqa: S603 - fixed /bin/bash runs a test-created script
         [str(bash_path), str(run_script)],
         capture_output=True,
         text=True,

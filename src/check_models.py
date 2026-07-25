@@ -127,6 +127,8 @@ if TYPE_CHECKING:
 
     from mlx import nn
     from mlx_vlm.generate import GenerationResult
+    from mlx_vlm.generate import generate as _mlx_vlm_generate_typecheck
+    from mlx_vlm.generate.types import GenerateKwargs, ProcessorLike
     from PIL.Image import Image as PILImage
     from transformers import PreTrainedTokenizer
     from transformers.configuration_utils import PreTrainedConfig
@@ -191,9 +193,7 @@ __all__ = [
 
 LOGGER_NAME: Final[str] = "mlx-vlm-check"
 NOT_AVAILABLE: Final[str] = "N/A"
-MARKDOWNLINT_MAIN_TABLE_RULES: Final[str] = "MD033 MD034 MD037 MD049"
 MARKDOWNLINT_GALLERY_SUMMARY_RULES: Final[str] = "MD034 MD049"
-MARKDOWNLINT_DETAILS_RULES: Final[str] = "MD033"
 MARKDOWNLINT_TABLE_PIPE_RULES: Final[str] = "MD060"
 
 MISSING_DEPENDENCIES: dict[str, str] = {}
@@ -1212,21 +1212,6 @@ class LoadExtraKwargs(TypedDict, total=False):
     quantize_activations: bool
 
 
-class GenerateExtraKwargs(TypedDict, total=False):
-    """Optional upstream generate kwargs this CLI forwards explicitly."""
-
-    min_p: float
-    top_k: int
-    prefill_step_size: int
-    resize_shape: tuple[int, int]
-    eos_tokens: list[str]
-    skip_special_tokens: bool
-    enable_thinking: bool
-    thinking_end_token: str
-    thinking_budget: int
-    thinking_start_token: str
-
-
 class SupportsTextDecoder(Protocol):
     """Minimal tokenizer/processor decode interface used by preflight checks."""
 
@@ -1280,47 +1265,6 @@ class ApplyChatTemplateCallable(Protocol):
         raise NotImplementedError
 
 
-class StrictGenerateCallable(Protocol):
-    """Typed ``mlx_vlm.generate.generate`` surface for known kwargs."""
-
-    def __call__(
-        self,
-        model: nn.Module,
-        processor: ProcessorMixin | PreTrainedTokenizer,
-        prompt: str,
-        image: str | list[str] | None = None,
-        audio: str | list[str] | None = None,
-        video: str | list[str] | None = None,
-        verbose: bool = False,
-        *,
-        temperature: float = 0.0,
-        top_p: float = 1.0,
-        repetition_penalty: float | None = None,
-        repetition_context_size: int | None = 20,
-        seed: int | None = None,
-        presence_penalty: float | None = None,
-        presence_context_size: int | None = DEFAULT_PENALTY_CONTEXT_SIZE,
-        frequency_penalty: float | None = None,
-        frequency_context_size: int | None = DEFAULT_PENALTY_CONTEXT_SIZE,
-        logit_bias: LogitBiasDict | None = None,
-        max_kv_size: int | None = None,
-        kv_bits: float | None = None,
-        kv_quant_scheme: str = DEFAULT_KV_QUANT_SCHEME,
-        kv_group_size: int = DEFAULT_KV_GROUP_SIZE,
-        quantized_kv_start: int = DEFAULT_QUANTIZED_KV_START,
-        max_tokens: int = 500,
-        **kwargs: Unpack[GenerateExtraKwargs],
-    ) -> GenerationResult:
-        """Generate a caption/response with the known CLI-controlled kwargs."""
-        del model, processor, prompt, image, audio, video, verbose
-        del temperature, top_p, repetition_penalty, repetition_context_size
-        del seed, presence_penalty, presence_context_size
-        del frequency_penalty, frequency_context_size, logit_bias
-        del max_kv_size, kv_bits, kv_quant_scheme, kv_group_size, quantized_kv_start
-        del max_tokens, kwargs
-        raise NotImplementedError
-
-
 class LoadImageCallable(Protocol):
     """Typed ``mlx_vlm.utils.load_image`` surface used for validation."""
 
@@ -1328,48 +1272,6 @@ class LoadImageCallable(Protocol):
         """Load an image from a path or URL."""
         del image_source, timeout
         raise NotImplementedError
-
-
-if TYPE_CHECKING:
-    from mlx_vlm.generate import generate as _mlx_vlm_generate_typecheck
-
-    _TYPECHECK_MODEL = cast("nn.Module", None)
-    _TYPECHECK_GENERATE_PROCESSOR = cast("PreTrainedTokenizer", None)
-    _ = _mlx_vlm_generate_typecheck(
-        _TYPECHECK_MODEL,
-        _TYPECHECK_GENERATE_PROCESSOR,
-        "",
-        image="",
-        audio="",
-        video="",
-        verbose=False,
-        max_tokens=1,
-        temperature=0.0,
-        repetition_penalty=None,
-        repetition_context_size=20,
-        seed=None,
-        presence_penalty=None,
-        presence_context_size=DEFAULT_PENALTY_CONTEXT_SIZE,
-        frequency_penalty=None,
-        frequency_context_size=DEFAULT_PENALTY_CONTEXT_SIZE,
-        logit_bias=None,
-        top_p=1.0,
-        min_p=0.0,
-        top_k=0,
-        max_kv_size=None,
-        kv_bits=None,
-        kv_quant_scheme=DEFAULT_KV_QUANT_SCHEME,
-        kv_group_size=DEFAULT_KV_GROUP_SIZE,
-        quantized_kv_start=DEFAULT_QUANTIZED_KV_START,
-        prefill_step_size=None,
-        resize_shape=None,
-        eos_tokens=None,
-        skip_special_tokens=False,
-        enable_thinking=False,
-        thinking_budget=None,
-        thinking_end_token=DEFAULT_THINKING_END_MARKER,
-        thinking_start_token=None,
-    )
 
 
 @runtime_checkable
@@ -8463,7 +8365,7 @@ def generate_diagnostics_report(
     assessments = dict(report_context.assessments)
     actionable, observations, indeterminate = _partition_diagnostics(report_context)
     counts = _run_outcome_counts(report_context.assessments)
-    parts = ["<!-- markdownlint-disable MD013 -->", "", "# Diagnostics", ""]
+    parts = ["# Diagnostics", ""]
     parts.extend(
         [
             "## Run Outcome Counts",
@@ -9247,8 +9149,6 @@ def _generate_model_gallery_section(report_context: ReportRenderContext) -> list
         "",
         "Complete generated or crash evidence for every attempted model.",
         "",
-        "<!-- markdownlint-disable MD033 MD034 -->",
-        "",
     ]
     for result in ordered_results:
         md.extend(
@@ -9259,7 +9159,6 @@ def _generate_model_gallery_section(report_context: ReportRenderContext) -> list
             )
         )
         md.extend(["---", ""])
-    md.extend(["<!-- markdownlint-enable MD033 MD034 -->", ""])
     return md
 
 
@@ -9680,7 +9579,7 @@ def collect_runtime_fingerprint() -> dict[str, RuntimeProbeResult]:
             probes["metal_gpu"] = RuntimeProbeResult(
                 status="unavailable", detail="mlx not imported"
             )
-    except Exception as exc:  # noqa: BLE001
+    except (AttributeError, OSError, RuntimeError, TypeError, ValueError) as exc:
         probes["metal_gpu"] = RuntimeProbeResult(status="errored", detail=str(exc)[:120])
 
     # MLX framework version
@@ -9691,7 +9590,7 @@ def collect_runtime_fingerprint() -> dict[str, RuntimeProbeResult]:
             )
         else:
             probes["mlx_framework"] = RuntimeProbeResult(status="unavailable")
-    except Exception as exc:  # noqa: BLE001
+    except (AttributeError, OSError, RuntimeError, TypeError, ValueError) as exc:
         probes["mlx_framework"] = RuntimeProbeResult(status="errored", detail=str(exc)[:120])
 
     # mlx-vlm importability was captured during module initialization.
@@ -9712,7 +9611,7 @@ def collect_runtime_fingerprint() -> dict[str, RuntimeProbeResult]:
             )
         else:
             probes["gpu_memory"] = RuntimeProbeResult(status="unavailable")
-    except Exception as exc:  # noqa: BLE001
+    except (AttributeError, OSError, RuntimeError, TypeError, ValueError) as exc:
         probes["gpu_memory"] = RuntimeProbeResult(status="errored", detail=str(exc)[:120])
 
     probes["fused_attention"] = _probe_fused_attention()
@@ -10028,9 +9927,9 @@ def validate_cli_arguments(args: argparse.Namespace) -> None:
         )
 
 
-def _build_generate_extra_kwargs(params: ProcessImageParams) -> GenerateExtraKwargs:
+def _build_generate_extra_kwargs(params: ProcessImageParams) -> GenerateKwargs:
     """Collect optional generate kwargs for benchmark runs."""
-    extra_kwargs: GenerateExtraKwargs = {}
+    extra_kwargs: GenerateKwargs = {}
     if params.min_p > 0.0:
         extra_kwargs["min_p"] = params.min_p
     if params.top_k > 0:
@@ -10051,6 +9950,41 @@ def _build_generate_extra_kwargs(params: ProcessImageParams) -> GenerateExtraKwa
         if params.thinking_start_token is not None:
             extra_kwargs["thinking_start_token"] = params.thinking_start_token
     return extra_kwargs
+
+
+def _build_generate_kwargs(
+    params: ProcessImageParams,
+    extra_kwargs: GenerateKwargs,
+) -> GenerateKwargs:
+    """Build the complete typed keyword contract for one upstream generate call."""
+    generate_kwargs = extra_kwargs.copy()
+    generate_kwargs["verbose"] = params.verbose
+    generate_kwargs["temperature"] = params.temperature
+    generate_kwargs["top_p"] = params.top_p
+    generate_kwargs["repetition_penalty"] = params.repetition_penalty
+    generate_kwargs["repetition_context_size"] = params.repetition_context_size
+    generate_kwargs["seed"] = params.seed
+    generate_kwargs["presence_penalty"] = params.presence_penalty
+    generate_kwargs["presence_context_size"] = params.presence_context_size
+    generate_kwargs["frequency_penalty"] = params.frequency_penalty
+    generate_kwargs["frequency_context_size"] = params.frequency_context_size
+    generate_kwargs["logit_bias"] = params.logit_bias
+    generate_kwargs["max_kv_size"] = params.max_kv_size
+    generate_kwargs["kv_bits"] = params.kv_bits
+    generate_kwargs["kv_quant_scheme"] = params.kv_quant_scheme
+    generate_kwargs["kv_group_size"] = params.kv_group_size
+    generate_kwargs["quantized_kv_start"] = params.quantized_kv_start
+    generate_kwargs["max_tokens"] = params.max_tokens
+    return generate_kwargs
+
+
+def _is_generation_processor(
+    processor: object,
+) -> TypeGuard[ProcessorLike | PreTrainedTokenizer]:
+    """Return whether a processor matches either upstream generation branch."""
+    return hasattr(processor, "detokenizer") and (
+        hasattr(processor, "tokenizer") or _has_text_decoder_api(processor)
+    )
 
 
 def _build_chat_template_kwargs(params: ProcessImageParams) -> ChatTemplateKwargs:
@@ -10127,7 +10061,7 @@ def _bounded_string_sequence(value: object) -> tuple[str, ...]:
 def _generation_kwargs_for_prompt_diagnostics(
     *,
     params: ProcessImageParams,
-    extra_kwargs: Mapping[str, object],
+    extra_kwargs: GenerateKwargs,
     processor_passthrough_kwargs: Mapping[str, object],
 ) -> dict[str, JsonLike]:
     """Return the generation kwargs forwarded to mlx-vlm in JSON-safe form."""
@@ -10159,7 +10093,7 @@ def _build_prompt_diagnostics(
     processor: ProcessorMixin,
     config: PreTrainedConfig | Mapping[str, object] | None,
     formatted_prompt: str,
-    extra_kwargs: Mapping[str, object],
+    extra_kwargs: GenerateKwargs,
     processor_passthrough_kwargs: Mapping[str, object],
 ) -> PromptDiagnostics:
     """Collect bounded prompt/template diagnostics for retained machine reports."""
@@ -11330,10 +11264,10 @@ def _generate_with_processor_passthrough(
     *,
     generate_fn: Callable[..., GenerationResult],
     model: nn.Module,
-    processor: ProcessorMixin,
+    processor: ProcessorLike | PreTrainedTokenizer,
     params: ProcessImageParams,
     formatted_prompt: str,
-    extra_kwargs: GenerateExtraKwargs,
+    generate_kwargs: GenerateKwargs,
 ) -> GenerationResult:
     """Call upstream generate() with user-provided passthrough kwargs.
 
@@ -11346,26 +11280,8 @@ def _generate_with_processor_passthrough(
         processor=processor,
         prompt=formatted_prompt,
         image=str(params.image_path),
-        video=None,
-        verbose=params.verbose,
-        temperature=params.temperature,
-        top_p=params.top_p,
-        repetition_penalty=params.repetition_penalty,
-        repetition_context_size=params.repetition_context_size,
-        seed=params.seed,
-        presence_penalty=params.presence_penalty,
-        presence_context_size=params.presence_context_size,
-        frequency_penalty=params.frequency_penalty,
-        frequency_context_size=params.frequency_context_size,
-        logit_bias=params.logit_bias,
-        max_kv_size=params.max_kv_size,
-        kv_bits=params.kv_bits,
-        kv_quant_scheme=params.kv_quant_scheme,
-        kv_group_size=params.kv_group_size,
-        quantized_kv_start=params.quantized_kv_start,
-        max_tokens=params.max_tokens,
         **processor_kwargs,
-        **extra_kwargs,
+        **generate_kwargs,
     )
 
 
@@ -11534,42 +11450,36 @@ def _run_model_generation(
         extra_kwargs=extra_kwargs,
         processor_passthrough_kwargs=processor_passthrough_kwargs,
     )
-    strict_generate = cast("StrictGenerateCallable", generate)
+    if _is_generation_processor(processor):
+        generation_processor = processor
+    else:
+        tokenizer = _extract_processor_tokenizer(processor)
+        if tokenizer is None or not _is_generation_processor(tokenizer):
+            msg = "mlx-vlm load returned no generation-compatible processor or tokenizer"
+            raise TypeError(msg)
+        generation_processor = tokenizer
+    generate_kwargs = _build_generate_kwargs(params, extra_kwargs)
+    if TYPE_CHECKING:
+        strict_generate = _mlx_vlm_generate_typecheck
+    else:
+        strict_generate = generate
 
     def _generate_once() -> GenerationResult | SupportsGenerationResult:
         if processor_passthrough_kwargs:
             return _generate_with_processor_passthrough(
                 generate_fn=generate,
                 model=model,
-                processor=processor,
+                processor=generation_processor,
                 params=params,
                 formatted_prompt=formatted_prompt,
-                extra_kwargs=extra_kwargs,
+                generate_kwargs=generate_kwargs,
             )
         return strict_generate(
             model=model,
-            processor=processor,
+            processor=generation_processor,
             prompt=formatted_prompt,
             image=str(params.image_path),
-            video=None,
-            verbose=params.verbose,
-            temperature=params.temperature,
-            top_p=params.top_p,
-            repetition_penalty=params.repetition_penalty,
-            repetition_context_size=params.repetition_context_size,
-            seed=params.seed,
-            presence_penalty=params.presence_penalty,
-            presence_context_size=params.presence_context_size,
-            frequency_penalty=params.frequency_penalty,
-            frequency_context_size=params.frequency_context_size,
-            logit_bias=params.logit_bias,
-            max_kv_size=params.max_kv_size,
-            kv_bits=params.kv_bits,
-            kv_quant_scheme=params.kv_quant_scheme,
-            kv_group_size=params.kv_group_size,
-            quantized_kv_start=params.quantized_kv_start,
-            max_tokens=params.max_tokens,
-            **extra_kwargs,
+            **generate_kwargs,
         )
 
     timer.start()
@@ -14907,12 +14817,7 @@ def _generate_github_issue_reports(
             suffix += 1
         used_filenames.add(filename)
         issue_path = issues_dir / filename
-        parts = [
-            "<!-- markdownlint-disable MD013 -->",
-            "",
-            f"# Crash: {MARKDOWN_ESCAPER.escape(result.model_name)}",
-            "",
-        ]
+        parts = [f"# Crash: {MARKDOWN_ESCAPER.escape(result.model_name)}", ""]
         parts.extend(
             _diagnostics_model_entry(
                 result,

@@ -21,6 +21,7 @@ Notes:
 from __future__ import annotations
 
 import argparse
+import ast
 import importlib.metadata
 import json
 import logging
@@ -59,12 +60,57 @@ def _mlx_vlm_generate_contract_paths(typings_dir: Path) -> tuple[Path, Path]:
     )
 
 
+def _stub_defines_top_level_class(text: str, class_name: str) -> bool:
+    """Return whether valid stub source declares ``class_name`` at module scope."""
+    try:
+        module = ast.parse(text)
+    except SyntaxError:
+        return False
+    return any(
+        isinstance(statement, ast.ClassDef) and statement.name == class_name
+        for statement in module.body
+    )
+
+
+def _remove_top_level_stub_class(path: Path, class_name: str) -> bool:
+    """Remove one stubgen-expanded imported class while preserving its import alias."""
+    if not path.exists():
+        return False
+    text = read_text_no_follow(path)
+    try:
+        module = ast.parse(text)
+    except SyntaxError:
+        return False
+    class_node = next(
+        (
+            statement
+            for statement in module.body
+            if isinstance(statement, ast.ClassDef) and statement.name == class_name
+        ),
+        None,
+    )
+    if class_node is None or class_node.end_lineno is None:
+        return False
+
+    start_line = min(
+        (class_node.lineno, *(decorator.lineno for decorator in class_node.decorator_list))
+    )
+    lines = text.splitlines(keepends=True)
+    start_index = start_line - 1
+    end_index = class_node.end_lineno
+    while end_index < len(lines) and not lines[end_index].strip():
+        end_index += 1
+    write_text_no_follow(path, "".join(lines[:start_index] + lines[end_index:]))
+    return True
+
+
 def _mlx_vlm_generate_helper_contract_issues(typings_dir: Path) -> list[str]:
     """Return issues in the helper-based generate contract shipped by mlx-vlm."""
     generate_dir = typings_dir / "mlx_vlm" / "generate"
     required_tokens = {
         generate_dir / "dispatch.pyi": (
             "GenerateKwargs as GenerateKwargs",
+            "from .common import GenerationResult as GenerationResult",
             "ProcessorLike as ProcessorLike",
             "Unpack as Unpack",
             "processor: ProcessorLike | PreTrainedTokenizer",
@@ -78,7 +124,12 @@ def _mlx_vlm_generate_helper_contract_issues(typings_dir: Path) -> list[str]:
             "class ProcessorLike(Protocol):",
             "class GenerateKwargs(TypedDict, total=False):",
             "temperature: float",
+            "eos_tokens: list[int] | list[str] | None",
+            "skip_special_tokens: bool",
+            "enable_thinking: bool",
+            "thinking_start_token: str | None",
             "thinking_end_token: str",
+            "thinking_budget: int | None",
         ),
         generate_dir / "ar.pyi": (
             "processor: ProcessorLike",
@@ -99,6 +150,8 @@ def _mlx_vlm_generate_helper_contract_issues(typings_dir: Path) -> list[str]:
             issues.append(f"could not read {path.relative_to(typings_dir)}: {err}")
             continue
         missing_tokens = [token for token in tokens if token not in text]
+        if path.name == "dispatch.pyi" and _stub_defines_top_level_class(text, "GenerationResult"):
+            missing_tokens.append("imported common.GenerationResult without a duplicate class")
         if missing_tokens:
             issues.append(
                 f"{path.relative_to(typings_dir)} is missing upstream generate contract markers: "
@@ -235,6 +288,7 @@ def _patch_mlx_vlm_stubs(typings_dir: Path, *, audit: bool = False) -> list[str]
     has_package_dispatch = package_dispatch_path.exists()
     upstream_generate_types_path = mlx_root / "generate" / "types.pyi"
     if upstream_generate_types_path.exists():
+        _remove_top_level_stub_class(package_dispatch_path, "GenerationResult")
         if audit:
             audit_issues.extend(_mlx_vlm_generate_helper_contract_issues(typings_dir))
         if has_package_dispatch and legacy_generate_path.exists():
@@ -521,7 +575,7 @@ logger = logging.getLogger("generate_stubs")
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TYPINGS_DIR = REPO_ROOT / "typings"
 STUB_MANIFEST = ".stub_manifest.json"
-STUB_TOOL_VERSION = "9"
+STUB_TOOL_VERSION = "10"
 
 DEFAULT_PACKAGES = ["mlx_lm", "mlx_vlm", "transformers", "tokenizers"]
 

@@ -49,6 +49,27 @@ class _FakeModel:
         return []
 
 
+class _FakeProcessor:
+    """Minimal processor satisfying mlx-vlm's typed generation protocol."""
+
+    tokenizer: object = object()
+    detokenizer: object = object()
+
+
+class _FakeLegacyProcessor:
+    """Tokenizer-like processor accepted by mlx-vlm's legacy generation path."""
+
+    detokenizer: object = object()
+
+    @staticmethod
+    def decode(*_args: object, **_kwargs: object) -> str:
+        return ""
+
+    @staticmethod
+    def batch_decode(*_args: object, **_kwargs: object) -> list[str]:
+        return []
+
+
 class _FakeMxRuntime:
     """Minimal MLX runtime stand-in for mock-based generation tests."""
 
@@ -274,7 +295,7 @@ class TestProcessImageWithModelMock:
             quantize_activations=True,
         )
         fake_model = _FakeModel()
-        fake_processor = object()
+        fake_processor = _FakeProcessor()
 
         with patch.object(
             check_models,
@@ -624,7 +645,7 @@ class TestProcessImageWithModelMock:
         )
 
         fake_model = _FakeModel()
-        fake_processor = object()
+        fake_processor = _FakeProcessor()
         fake_generation = _FakeGenerationResult()
 
         with (
@@ -659,10 +680,39 @@ class TestProcessImageWithModelMock:
         assert prompt_diagnostics.processed_image_height == 512
         assert prompt_diagnostics.image_patch_count is None
 
+    def test_run_model_generation_accepts_legacy_tokenizer_processor(
+        self,
+        test_image: Path,
+    ) -> None:
+        """Tokenizer-like legacy processors should reach upstream generation unchanged."""
+        params = _build_params(test_image)
+        fake_model = _FakeModel()
+        fake_processor = _FakeLegacyProcessor()
+        fake_generation = _FakeGenerationResult()
+
+        with (
+            patch.object(check_models, "_ensure_generation_runtime_symbols"),
+            patch.object(
+                check_models,
+                "_load_model",
+                return_value=(fake_model, fake_processor, None),
+            ),
+            patch.object(check_models, "_run_model_preflight_validators"),
+            patch.object(check_models, "apply_chat_template", return_value="formatted prompt"),
+            patch.object(check_models, "generate", return_value=fake_generation) as mock_generate,
+            patch.object(check_models, "mx", _FakeMxRuntime()),
+        ):
+            result = check_models._run_model_generation(params)
+
+        assert result is fake_generation
+        assert mock_generate.call_args.kwargs["processor"] is fake_processor
+
     def test_run_model_generation_passes_thinking_kwargs(self, test_image: Path) -> None:
         """Thinking-mode flags should reach both chat templating and generation."""
         params = replace(
             _build_params(test_image),
+            eos_tokens=(CLOSE_THINK_MARKER,),
+            skip_special_tokens=True,
             enable_thinking=True,
             thinking_budget=96,
             thinking_start_token=OPEN_THINK_MARKER,
@@ -670,7 +720,7 @@ class TestProcessImageWithModelMock:
         )
 
         fake_model = _FakeModel()
-        fake_processor = object()
+        fake_processor = _FakeProcessor()
         fake_generation = _FakeGenerationResult()
 
         with (
@@ -697,6 +747,8 @@ class TestProcessImageWithModelMock:
         assert mock_template.call_args.kwargs["thinking_start_token"] == "<think>"
         assert mock_template.call_args.kwargs["thinking_end_token"] == "</think>"
         generate_kwargs = mock_generate.call_args.kwargs
+        assert generate_kwargs["eos_tokens"] == ["</think>"]
+        assert generate_kwargs["skip_special_tokens"] is True
         assert generate_kwargs["enable_thinking"] is True
         assert generate_kwargs["thinking_budget"] == 96
         assert generate_kwargs["thinking_start_token"] == "<think>"
@@ -718,7 +770,7 @@ class TestProcessImageWithModelMock:
         )
 
         fake_model = _FakeModel()
-        fake_processor = object()
+        fake_processor = _FakeProcessor()
         fake_generation = _FakeGenerationResult()
 
         with (
@@ -748,7 +800,7 @@ class TestProcessImageWithModelMock:
         """Known mlx-vlm UTF-8 detokenizer failures should retry once with the patch."""
         params = _build_params(test_image)
         fake_model = _FakeModel()
-        fake_processor = object()
+        fake_processor = _FakeProcessor()
         fake_generation = _FakeGenerationResult()
         generate_attempts: list[str] = []
         retry_patch_entries: list[str] = []
@@ -805,7 +857,7 @@ class TestProcessImageWithModelMock:
         """The lossy detokenizer workaround should be a single retry, not an open loop."""
         params = _build_params(test_image)
         fake_model = _FakeModel()
-        fake_processor = object()
+        fake_processor = _FakeProcessor()
         generate_attempts: list[str] = []
         retry_patch_entries: list[str] = []
         first_error = UnicodeDecodeError("utf-8", b"\xab", 0, 1, "invalid start byte")
@@ -863,7 +915,7 @@ class TestProcessImageWithModelMock:
         """Only the known upstream detokenizer failure should trigger a retry."""
         params = _build_params(test_image)
         fake_model = _FakeModel()
-        fake_processor = object()
+        fake_processor = _FakeProcessor()
         retry_patch_entries: list[str] = []
 
         @contextlib.contextmanager
@@ -916,7 +968,7 @@ class TestProcessImageWithModelMock:
         """Generation should sample active/cache memory without a local peak probe."""
         params = _build_params(test_image)
         fake_model = _FakeModel()
-        fake_processor = object()
+        fake_processor = _FakeProcessor()
         fake_generation = _FakeGenerationResult()
         runtime = _RecordingMxRuntime()
 
@@ -948,7 +1000,7 @@ class TestProcessImageWithModelMock:
         """Generation should retain a post-load memory baseline for image-density metrics."""
         params = _build_params(test_image)
         fake_model = _FakeModel()
-        fake_processor = object()
+        fake_processor = _FakeProcessor()
         fake_generation = _FakeGenerationResult()
         runtime = _SequencedMxRuntime(
             active_values=(
