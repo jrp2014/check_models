@@ -38,6 +38,9 @@ Notable changes to this project will be documented in this file.
 - Make retained public run evidence publication-safe and exact by sanitizing JSONL
   system paths, preserving explicit generation settings such as `--seed 0`, and
   labeling logged output checks as mechanical observations rather than quality.
+- Make generated reproduction commands checkout-runnable by retaining their exact
+  source-image fixture, and pin them to the same resolved model revision recorded
+  across diagnostics, JSONL, and run JSON while keeping requested revisions distinct.
 
 ## [0.8.0] - 2026-06-06
 

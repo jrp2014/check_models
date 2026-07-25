@@ -635,6 +635,49 @@ def test_direct_jsonl_serializer_builds_one_local_assessment_cache(tmp_path: Pat
     assert assessment_builder.call_count == len(results)
 
 
+def test_machine_reports_share_the_cached_resolved_model_provenance(tmp_path: Path) -> None:
+    """JSONL and run JSON should serialize the context's exact snapshot identity."""
+    result = _make_success("org/pinned")
+    provenance: check_models.ModelProvenanceRecord = {
+        "model": result.model_name,
+        "requested_revision": "requested-tag",
+        "resolved_revision": "abcdef0123456789abcdef0123456789abcdef01",
+        "snapshot_path": "~/.cache/snapshots/abcdef0123456789abcdef0123456789abcdef01",
+    }
+    context = _build_report_render_context(
+        results=[result],
+        prompt="Describe the image.",
+        model_provenance={result.model_name: provenance},
+    )
+    jsonl_path = tmp_path / "results.jsonl"
+    run_json_path = tmp_path / "run.json"
+
+    with patch.object(check_models, "_collect_model_provenance", side_effect=AssertionError):
+        check_models.save_jsonl_report(
+            [result],
+            jsonl_path,
+            prompt="Describe the image.",
+            system_info={},
+            requested_revision="requested-tag",
+            report_context=context,
+        )
+        check_models.save_run_json_report(
+            [result],
+            run_json_path,
+            versions=_stub_versions(),
+            prompt="Describe the image.",
+            total_runtime_seconds=1.0,
+            report_context=context,
+            output_paths={},
+            requested_revision="requested-tag",
+        )
+
+    jsonl_record = json.loads(jsonl_path.read_text(encoding="utf-8").splitlines()[1])
+    run_record = json.loads(run_json_path.read_text(encoding="utf-8"))
+    assert jsonl_record["model_provenance"] == provenance
+    assert run_record["model_provenance"] == {result.model_name: provenance}
+
+
 def _make_harness_success(
     name: str = "org/model-harness",
     *,
@@ -969,9 +1012,26 @@ def test_diagnostics_use_run_args_for_complete_native_reproduction(tmp_path: Pat
             generate_kwargs={"eos_tokens": [EOS_OVERRIDE_TOKEN]},
         ),
     )
-    context = _build_report_render_context(results=[result], prompt="Describe the image.")
+    resolved_revision = "0123456789abcdef0123456789abcdef01234567"
+    context = _build_report_render_context(
+        results=[result],
+        prompt="Describe the image.",
+        model_provenance={
+            result.model_name: {
+                "model": result.model_name,
+                "requested_revision": "run-revision",
+                "resolved_revision": resolved_revision,
+                "snapshot_path": f"~/.cache/snapshots/{resolved_revision}",
+            }
+        },
+    )
     output = tmp_path / "diagnostics.md"
-    image_path = tmp_path / "sample image.jpg"
+    image_path = Path(__file__).parent / "fixtures/check_models-task9-fixture.jpg"
+    assert image_path.is_file()
+    assert (
+        check_models._sha256_file(image_path)
+        == "251712968e443405f6e1ff145de15a91a082dc073209938c5305db0e8e80134c"
+    )
     run_args = Namespace(
         max_tokens=321,
         temperature=0.25,
@@ -1034,16 +1094,20 @@ def test_diagnostics_use_run_args_for_complete_native_reproduction(tmp_path: Pat
         next(iter(issue_reports.values())).read_text(encoding="utf-8"),
     ]
     for index, content in enumerate(contents):
-        assert "- _Model revision:_ unavailable" in content
+        assert f"- _Model revision:_ {resolved_revision}" in content
         assert "- _Requested model revision:_ run-revision" in content
         assert '- _Configured EOS token override:_ ["&lt;override-eos&gt;"]' in content
         assert "Supplemental CLI reproduction" in content
         assert "Canonical Python reproduction script" in content
-        assert "--revision run-revision" in content
+        assert "--image src/tests/fixtures/check_models-task9-fixture.jpg" in content
+        assert f"--revision {resolved_revision}" in content
+        assert "--revision run-revision" not in content
         assert "--processor-kwargs" in content
         assert "--resize-shape 64 32" in content
         assert "--skip-special-tokens" in content
         assert 'MODEL = "org/repro"' in content
+        assert 'IMAGE = "src/tests/fixtures/check_models-task9-fixture.jpg"' in content
+        assert f'    "revision": "{resolved_revision}",' in content
         assert '    "top_p": 0.81,' in content
         assert '    "min_p": 0.12,' in content
         assert '    "top_k": 7,' in content

@@ -5994,6 +5994,7 @@ def _build_report_render_context(
     system_info: dict[str, str] | None = None,
     recommended_working_set_bytes: int | None = None,
     preflight_issues: Sequence[str] = (),
+    model_provenance: Mapping[str, ModelProvenanceRecord] | None = None,
 ) -> ReportRenderContext:
     """Analyze each result once and cache the sole current-run assessment."""
     resolved_results = [
@@ -6021,6 +6022,9 @@ def _build_report_render_context(
         ),
         assessments=tuple(
             (result.model_name, _assess_result(result)) for result in result_set.results
+        ),
+        model_provenance=tuple(
+            (model_name, record.copy()) for model_name, record in (model_provenance or {}).items()
         ),
     )
 
@@ -7244,6 +7248,7 @@ class ReportRenderContext:
     preflight_issues: tuple[str, ...] = ()
     mode_policy: ReportModePolicy = dataclass_field(default_factory=_default_report_mode_policy)
     assessments: tuple[tuple[str, ResultAssessment], ...] = ()
+    model_provenance: tuple[tuple[str, ModelProvenanceRecord], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -7253,6 +7258,7 @@ class CanonicalHtmlReportContext:
     result_set: ResultSet
     system_info: dict[str, str]
     assessments: tuple[tuple[str, ResultAssessment], ...]
+    model_provenance: tuple[tuple[str, ModelProvenanceRecord], ...] = ()
 
 
 type HtmlReportContext = ReportRenderContext | CanonicalHtmlReportContext
@@ -8119,6 +8125,7 @@ def _diagnostics_repro_command(
     prompt: str,
     image_path: Path | None,
     run_args: argparse.Namespace | None,
+    model_provenance: ModelProvenanceRecord | None,
 ) -> str:
     """Build a direct native repro command from recorded current-run facts."""
     image_ref = _issue_repro_image_ref(image_path=image_path, run_args=run_args)
@@ -8127,6 +8134,9 @@ def _diagnostics_repro_command(
         prompt=prompt,
         image_ref=image_ref,
         run_args=run_args,
+        resolved_revision=(
+            model_provenance["resolved_revision"] if model_provenance is not None else None
+        ),
     ).shell_command()
 
 
@@ -8135,6 +8145,7 @@ def _diagnostics_result_facts(
     assessment: ResultAssessment,
     *,
     run_args: argparse.Namespace | None,
+    model_provenance: ModelProvenanceRecord | None,
 ) -> tuple[tuple[str, str], ...]:
     """Return exact per-model runtime and provenance fields for maintainers."""
     prompt_diagnostics = result.prompt_diagnostics
@@ -8148,10 +8159,19 @@ def _diagnostics_result_facts(
         ("Phase", _diagnostics_fact(result.failure_phase)),
         ("Stage", _diagnostics_fact(result.error_stage)),
         ("Package", _diagnostics_fact(result.error_package)),
-        ("Model revision", "unavailable"),
+        (
+            "Model revision",
+            _diagnostics_fact(
+                model_provenance["resolved_revision"] if model_provenance is not None else None
+            ),
+        ),
         (
             "Requested model revision",
-            _diagnostics_fact(getattr(run_args, "revision", None)),
+            _diagnostics_fact(
+                model_provenance["requested_revision"]
+                if model_provenance is not None
+                else getattr(run_args, "revision", None)
+            ),
         ),
         (
             "Processor class",
@@ -8211,6 +8231,7 @@ def _diagnostics_model_entry(
     prompt: str,
     image_path: Path | None,
     run_args: argparse.Namespace | None,
+    model_provenance: ModelProvenanceRecord | None,
     heading_level: int,
 ) -> list[str]:
     """Render one model's complete maintainer evidence in priority order."""
@@ -8232,7 +8253,16 @@ def _diagnostics_model_entry(
     parts.extend([f"{'#' * (heading_level + 1)} Execution and provenance", ""])
     parts.extend(
         render_report_markdown(
-            (ReportKeyValues(_diagnostics_result_facts(result, assessment, run_args=run_args)),)
+            (
+                ReportKeyValues(
+                    _diagnostics_result_facts(
+                        result,
+                        assessment,
+                        run_args=run_args,
+                        model_provenance=model_provenance,
+                    )
+                ),
+            )
         )
     )
     parts.append("")
@@ -8273,6 +8303,7 @@ def _diagnostics_model_entry(
             prompt=prompt,
             image_path=image_path,
             run_args=run_args,
+            model_provenance=model_provenance,
         ),
         language="bash",
     )
@@ -8285,6 +8316,9 @@ def _diagnostics_model_entry(
             prompt=prompt,
             image_ref=image_ref,
             run_args=run_args,
+            resolved_revision=(
+                model_provenance["resolved_revision"] if model_provenance is not None else None
+            ),
         ),
         language="python",
     )
@@ -8299,6 +8333,7 @@ def _diagnostics_partition_section(
     prompt: str,
     image_path: Path | None,
     run_args: argparse.Namespace | None,
+    model_provenance: Mapping[str, ModelProvenanceRecord],
 ) -> list[str]:
     """Render one direct current-run diagnostics partition."""
     parts = [f"## {title}", ""]
@@ -8312,6 +8347,7 @@ def _diagnostics_partition_section(
                 prompt=prompt,
                 image_path=image_path,
                 run_args=run_args,
+                model_provenance=model_provenance.get(result.model_name),
                 heading_level=3,
             )
         )
@@ -8363,6 +8399,7 @@ def generate_diagnostics_report(
     """Write current-run maintainer evidence without reclassifying results."""
     del results  # The cached context is the sole classification and result source.
     assessments = dict(report_context.assessments)
+    model_provenance = _model_provenance_by_model(report_context)
     actionable, observations, indeterminate = _partition_diagnostics(report_context)
     counts = _run_outcome_counts(report_context.assessments)
     parts = ["# Diagnostics", ""]
@@ -8397,6 +8434,7 @@ def generate_diagnostics_report(
             prompt=prompt,
             image_path=image_path,
             run_args=run_args,
+            model_provenance=model_provenance,
         )
     )
     parts.extend(
@@ -8407,6 +8445,7 @@ def generate_diagnostics_report(
             prompt=prompt,
             image_path=image_path,
             run_args=run_args,
+            model_provenance=model_provenance,
         )
     )
     parts.extend(
@@ -8417,6 +8456,7 @@ def generate_diagnostics_report(
             prompt=prompt,
             image_path=image_path,
             run_args=run_args,
+            model_provenance=model_provenance,
         )
     )
     parts.extend(
@@ -8791,6 +8831,7 @@ def _html_diagnostics_entry(
     prompt: str,
     image_path: Path | None,
     run_args: argparse.Namespace | None,
+    model_provenance: ModelProvenanceRecord | None,
 ) -> str:
     """Render one maintainer entry from shared factual diagnostic helpers."""
     parts = [
@@ -8814,7 +8855,12 @@ def _html_diagnostics_entry(
             _html_table(
                 caption=f"Maintainer facts for {result.model_name}",
                 headers=("Fact", "Value"),
-                rows=_diagnostics_result_facts(result, assessment, run_args=run_args),
+                rows=_diagnostics_result_facts(
+                    result,
+                    assessment,
+                    run_args=run_args,
+                    model_provenance=model_provenance,
+                ),
             ),
         )
     )
@@ -8839,6 +8885,7 @@ def _html_diagnostics_entry(
                     prompt=prompt,
                     image_path=image_path,
                     run_args=run_args,
+                    model_provenance=model_provenance,
                 ),
                 language="bash",
             ),
@@ -8849,6 +8896,11 @@ def _html_diagnostics_entry(
                     prompt=prompt,
                     image_ref=_issue_repro_image_ref(image_path=image_path, run_args=run_args),
                     run_args=run_args,
+                    resolved_revision=(
+                        model_provenance["resolved_revision"]
+                        if model_provenance is not None
+                        else None
+                    ),
                 ),
                 language="python",
             ),
@@ -8866,6 +8918,7 @@ def _html_diagnostics_partition(
     prompt: str,
     image_path: Path | None,
     run_args: argparse.Namespace | None,
+    model_provenance: Mapping[str, ModelProvenanceRecord],
 ) -> str:
     """Render one direct partition of maintainer evidence."""
     parts = [f"<h3>{html.escape(title, quote=True)}</h3>"]
@@ -8877,6 +8930,7 @@ def _html_diagnostics_partition(
                 prompt=prompt,
                 image_path=image_path,
                 run_args=run_args,
+                model_provenance=model_provenance.get(result.model_name),
             )
             for result in results
         )
@@ -8894,6 +8948,7 @@ def _html_maintainer_diagnostics(
 ) -> str:
     """Render diagnostics from the same cached assessment partitions as Markdown."""
     assessments = _assessments_by_model(report_context)
+    model_provenance = _model_provenance_by_model(report_context)
     actionable, observations, indeterminate = _partition_diagnostics(report_context)
     counts = _run_outcome_counts(report_context.assessments)
     parts = [
@@ -8917,6 +8972,7 @@ def _html_maintainer_diagnostics(
             prompt=prompt,
             image_path=image_path,
             run_args=run_args,
+            model_provenance=model_provenance,
         ),
         _html_diagnostics_partition(
             title="Successful Observations Requiring Reproduction",
@@ -8925,6 +8981,7 @@ def _html_maintainer_diagnostics(
             prompt=prompt,
             image_path=image_path,
             run_args=run_args,
+            model_provenance=model_provenance,
         ),
         _html_diagnostics_partition(
             title="Indeterminate Attempts",
@@ -8933,6 +8990,7 @@ def _html_maintainer_diagnostics(
             prompt=prompt,
             image_path=image_path,
             run_args=run_args,
+            model_provenance=model_provenance,
         ),
         "</section>",
     ]
@@ -9216,6 +9274,13 @@ def _assessments_by_model(
 ) -> dict[str, ResultAssessment]:
     """Index the cached minimal current-run assessment by model identifier."""
     return dict(report_context.assessments)
+
+
+def _model_provenance_by_model(
+    report_context: HtmlReportContext,
+) -> dict[str, ModelProvenanceRecord]:
+    """Index the cached requested and resolved model identities."""
+    return dict(report_context.model_provenance)
 
 
 def _wrap_bare_urls(text: str) -> str:
@@ -14099,6 +14164,7 @@ def _build_jsonl_result_record(
     assessment: ResultAssessment,
     *,
     requested_revision: str | None,
+    model_provenance: ModelProvenanceRecord | None = None,
     recommended_working_set_bytes: int | None = None,
 ) -> JsonlResultRecord:
     """Build one narrow JSONL row from cached assessment and captured facts."""
@@ -14189,7 +14255,8 @@ def _build_jsonl_result_record(
             ),
             "stop_reason": runtime.stop_reason if runtime is not None else None,
         },
-        "model_provenance": _collect_model_provenance(
+        "model_provenance": model_provenance
+        or _collect_model_provenance(
             result.model_name,
             requested_revision=requested_revision,
         ),
@@ -14221,6 +14288,7 @@ def save_jsonl_report(
         )
     cached_results = {result.model_name: result for result in report_context.result_set.results}
     assessments = _assessments_by_model(report_context)
+    model_provenance = _model_provenance_by_model(report_context)
     try:
         # Write shared metadata header (avoids repeating prompt/system per row)
         header = _build_jsonl_metadata_record(
@@ -14239,6 +14307,7 @@ def save_jsonl_report(
                 result,
                 assessments[result.model_name],
                 requested_revision=requested_revision,
+                model_provenance=model_provenance.get(result.model_name),
                 recommended_working_set_bytes=report_context.recommended_working_set_bytes,
             )
             lines.append(json.dumps(record))
@@ -14366,7 +14435,8 @@ def save_run_json_report(
         "generation_settings": _common_generation_settings(results),
         "trust_remote_code": trust_remote_code,
         "model_provenance": {
-            result.model_name: _collect_model_provenance(
+            result.model_name: _model_provenance_by_model(report_context).get(result.model_name)
+            or _collect_model_provenance(
                 result.model_name,
                 requested_revision=requested_revision,
             )
@@ -14473,18 +14543,26 @@ def _issue_repro_image_ref(
     return _issue_repro_portable_path_ref(raw_ref, fallback="path/to/repro-image.jpg")
 
 
-def _native_mlx_vlm_load_kwargs(run_args: argparse.Namespace | None) -> dict[str, object]:
+def _native_mlx_vlm_load_kwargs(
+    run_args: argparse.Namespace | None,
+    *,
+    resolved_revision: str | None = None,
+) -> dict[str, object]:
     """Return ``mlx_vlm.utils.load`` kwargs represented in native repro scripts."""
     kwargs: dict[str, object] = {
         "trust_remote_code": bool(getattr(run_args, "trust_remote_code", True))
     }
     if run_args is None:
+        if resolved_revision is not None:
+            kwargs["revision"] = resolved_revision
         return kwargs
 
-    for attr_name in ("adapter_path", "revision"):
-        value = getattr(run_args, attr_name, None)
-        if value is not None:
-            kwargs[attr_name] = str(value)
+    adapter_path = getattr(run_args, "adapter_path", None)
+    if adapter_path is not None:
+        kwargs["adapter_path"] = str(adapter_path)
+    revision = resolved_revision or getattr(run_args, "revision", None)
+    if revision is not None:
+        kwargs["revision"] = str(revision)
     if bool(getattr(run_args, "lazy_load", False)):
         kwargs["lazy"] = True
     if bool(getattr(run_args, "force_download", False)):
@@ -14608,6 +14686,7 @@ def _build_native_mlx_vlm_cli_tokens(
     prompt: str,
     image_ref: str,
     run_args: argparse.Namespace | None,
+    resolved_revision: str | None = None,
 ) -> list[str]:
     """Build a native ``python -m mlx_vlm.generate`` command for issue drafts."""
     tokens = [
@@ -14634,6 +14713,7 @@ def _build_native_mlx_vlm_cli_tokens(
         ),
     ]
     if run_args is None:
+        _append_native_cli_optional_pair(tokens, "--revision", resolved_revision)
         return tokens
 
     adapter_path = getattr(run_args, "adapter_path", None)
@@ -14696,7 +14776,11 @@ def _build_native_mlx_vlm_cli_tokens(
         tokens.append("--skip-special-tokens")
     if bool(getattr(run_args, "force_download", False)):
         tokens.append("--force-download")
-    _append_native_cli_optional_pair(tokens, "--revision", getattr(run_args, "revision", None))
+    _append_native_cli_optional_pair(
+        tokens,
+        "--revision",
+        resolved_revision or getattr(run_args, "revision", None),
+    )
     if bool(getattr(run_args, "trust_remote_code", True)):
         tokens.append("--trust-remote-code")
     if bool(getattr(run_args, "quantize_activations", False)):
@@ -14734,6 +14818,7 @@ def build_native_mlx_vlm_repro_command_spec(
     prompt: str,
     image_ref: str,
     run_args: argparse.Namespace | None,
+    resolved_revision: str | None = None,
 ) -> ReproCommandSpec:
     """Build a native ``mlx_vlm.generate`` CLI repro command spec."""
     tokens = _build_native_mlx_vlm_cli_tokens(
@@ -14741,6 +14826,7 @@ def build_native_mlx_vlm_repro_command_spec(
         prompt=prompt,
         image_ref=image_ref,
         run_args=run_args,
+        resolved_revision=resolved_revision,
     )
     return ReproCommandSpec(
         base_tokens=tuple(tokens[:3]),
@@ -14796,9 +14882,13 @@ def _build_native_mlx_vlm_python_script(
     prompt: str,
     image_ref: str,
     run_args: argparse.Namespace | None,
+    resolved_revision: str | None = None,
 ) -> str:
     """Build a compact native Python repro script for one representative model."""
-    load_kwargs = _native_mlx_vlm_load_kwargs(run_args)
+    load_kwargs = _native_mlx_vlm_load_kwargs(
+        run_args,
+        resolved_revision=resolved_revision,
+    )
     template_kwargs = _native_mlx_vlm_template_kwargs(run_args)
     generate_kwargs = _native_mlx_vlm_generate_kwargs(run_args)
     return "\n".join(
@@ -14849,6 +14939,7 @@ def _generate_github_issue_reports(
         stale_index.unlink()
 
     assessments = dict(report_context.assessments)
+    model_provenance = _model_provenance_by_model(report_context)
     actionable, _observations, _indeterminate = _partition_diagnostics(report_context)
     crashes = tuple(
         result for result in actionable if assessments[result.model_name].execution == "crashed"
@@ -14872,6 +14963,7 @@ def _generate_github_issue_reports(
                 prompt=prompt,
                 image_path=image_path,
                 run_args=run_args,
+                model_provenance=model_provenance.get(result.model_name),
                 heading_level=2,
             )
         )
@@ -15378,6 +15470,16 @@ def finalize_execution(
         system_info = get_system_characteristics()
         recommended_working_set_bytes = _get_recommended_working_set_bytes()
         runtime_fingerprint = collect_runtime_fingerprint()
+        requested_revision = (
+            str(args.revision) if getattr(args, "revision", None) is not None else None
+        )
+        model_provenance = {
+            result.model_name: _collect_model_provenance(
+                result.model_name,
+                requested_revision=requested_revision,
+            )
+            for result in results
+        }
         report_context = _build_report_render_context(
             results=results,
             prompt=prompt,
@@ -15388,6 +15490,7 @@ def finalize_execution(
             system_info=system_info,
             recommended_working_set_bytes=recommended_working_set_bytes,
             preflight_issues=_get_run_preflight_issues(args),
+            model_provenance=model_provenance,
         )
         results = list(report_context.result_set.results)
 
@@ -15449,9 +15552,7 @@ def finalize_execution(
                 report_context=report_context,
                 output_paths=output_paths,
                 run_args=args,
-                model_revision=(
-                    str(args.revision) if getattr(args, "revision", None) is not None else None
-                ),
+                model_revision=requested_revision,
                 trust_remote_code=bool(getattr(args, "trust_remote_code", True)),
                 runtime_fingerprint=runtime_fingerprint,
             ),
