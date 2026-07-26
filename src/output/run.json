@@ -21,10 +21,10 @@
     "check_models": {
       "direct_url": null,
       "install_type": "source-tree",
-      "source_location": "~/Documents/AI/mlx/check_models/.worktrees/subtractive-reporting-simplification",
-      "source_revision": "83d1a9ecabd2e8c66e7c34f95caae86257ff0c84",
+      "source_location": "~/Documents/AI/mlx/check_models",
+      "source_revision": "9225c527d4cfe3523b66b0e473b9bceba60a66ec",
       "vcs_revision": null,
-      "version": "0.8.8"
+      "version": "0.8.9"
     },
     "huggingface-hub": {
       "direct_url": null,
@@ -40,7 +40,7 @@
       "source_location": "~/Documents/AI/mlx/mlx",
       "source_revision": "973e27f82ffe68dbd626cda31ba34997045d1eb7",
       "vcs_revision": null,
-      "version": "0.32.1.dev20260725+973e27f82"
+      "version": "0.32.1.dev20260726+973e27f82"
     },
     "mlx-audio": {
       "direct_url": null,
@@ -54,7 +54,7 @@
       "direct_url": "file://~/Documents/AI/mlx/mlx-lm",
       "install_type": "editable",
       "source_location": "~/Documents/AI/mlx/mlx-lm",
-      "source_revision": "cf10f962b7a20e63a6df43dbf0faf06070153d40",
+      "source_revision": "e5baded8c1d286754edb479ffbde4655a68e2758",
       "vcs_revision": null,
       "version": "0.31.3"
     },
@@ -70,7 +70,7 @@
       "direct_url": "file://~/Documents/AI/mlx/mlx-vlm",
       "install_type": "editable",
       "source_location": "~/Documents/AI/mlx/mlx-vlm",
-      "source_revision": "eda1ec4f484ae8e1fb821d04c64d4eebe6958c0a",
+      "source_revision": "bd6cb1231743a8fa9c44afaea2bf5fe793668d98",
       "vcs_revision": null,
       "version": "0.6.8"
     },
@@ -101,13 +101,13 @@
   },
   "counts": {
     "models_attempted": 62,
-    "models_completed": 60,
+    "models_completed": 61,
     "models_crashed": 1,
-    "models_evaluated": 61,
-    "models_indeterminate": 1
+    "models_evaluated": 62,
+    "models_indeterminate": 0
   },
   "eval_mode": "blind",
-  "generated_at": "2026-07-26 05:26:15 BST",
+  "generated_at": "2026-07-26 21:27:35 BST",
   "generation_settings": {
     "max_tokens": 500,
     "prefill_step_size": 4096,
@@ -125,7 +125,7 @@
   "library_versions": {
     "Pillow": "12.3.0",
     "huggingface-hub": "1.24.0",
-    "mlx": "0.32.1.dev20260725+973e27f82",
+    "mlx": "0.32.1.dev20260726+973e27f82",
     "mlx-audio": "0.4.4",
     "mlx-lm": "0.31.3",
     "mlx-metal": null,
@@ -510,10 +510,10 @@
     }
   },
   "producer": {
-    "git_revision": "83d1a9ecabd2e8c66e7c34f95caae86257ff0c84",
+    "git_revision": "9225c527d4cfe3523b66b0e473b9bceba60a66ec",
     "install_type": "source-tree",
     "name": "check_models",
-    "version": "0.8.8"
+    "version": "0.8.9"
   },
   "prompt": "Analyze this image for cataloguing metadata, using British English.\n\nDescribe visible details faithfully. If a visual detail is uncertain, ambiguous, partially obscured, or too small to verify, leave it out rather than guessing.\n\nNo existing catalog metadata is supplied. Base every field only on visual evidence in the image.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual; authoritative context may supply identity and location.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences combining supplied authoritative context with the main visible subject, setting, lighting, action, and distinctive visible details.\n- Output only the description text after the label.\n\nKeywords:\n- 10-18 unique comma-separated terms covering supplied authoritative context and clearly visible subjects, setting, colors, composition, and style.\n- Output only the keyword list after the label.\n\nRules:\n- Include only details that are definitely visible in the image.\n- Do not infer or import metadata that is not visible in the image.\n- Prefer omission to speculation.\n- Do not copy prompt instructions into the Title, Description, or Keywords fields.\n- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.\n- Do not output reasoning, notes, hedging, or extra sections.",
   "prompt_burden": {
@@ -847,11 +847,11 @@
     },
     "mlx-community/SmolVLM2-2.2B-Instruct-mlx": {
       "image_patch_count": null,
-      "nontext_tokens_est": null,
+      "nontext_tokens_est": 123,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": null,
-      "total_tokens": null
+      "text_tokens_est": 285,
+      "total_tokens": 408
     },
     "mlx-community/Step-3.7-Flash-oQ2e": {
       "image_patch_count": null,
@@ -1016,6 +1016,6 @@
   },
   "prompt_sha256": "84f9458ea65939f61c63feb83ed60ce420f6e55fb64386da0bfb496d47b95615",
   "schema_version": "2.0",
-  "total_runtime_seconds": 708.135,
+  "total_runtime_seconds": 636.126,
   "trust_remote_code": true
 }
