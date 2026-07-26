@@ -106,8 +106,6 @@ A single medium-sized, well-commented function is often clearer than a web of on
     - `validate_env.py`: Diagnostics for dependencies and environment.
     - `update_readme_deps.py`: Syncs `pyproject.toml` deps to `README.md`.
     - `install_precommit_hook.py`: Sets up git hooks.
-    - `qwen3_vl_sequential_repro.py`: Upstream-only Qwen3-VL Metal fault
-      diagnostic with a non-executing `--plan` mode; not a normal test.
 - **`docs/`** - All documentation (CONTRIBUTING.md, IMPLEMENTATION_GUIDE.md, etc.)
 - **`docs/notes/`** - Design notes, reviews, and project evolution documentation
 - **`output/`** - Generated reports (HTML/Markdown, git-ignored)
