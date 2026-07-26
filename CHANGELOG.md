@@ -5,6 +5,8 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.8.9] - 2026-07-26
+
 ### Changed
 
 - Require deterministic focused/static/full quality gates before costly model
