@@ -2309,6 +2309,23 @@ def _gallery_runtime_facts(
     )
 
 
+def _gallery_fact(value: object | None, *, missing: str = "not captured") -> str:
+    """Render one optional gallery fact with its caller-selected missing label."""
+    return missing if value is None or value == "" else str(value)
+
+
+def _gallery_provenance_fact(
+    model_provenance: ModelProvenanceRecord | None,
+    key: Literal["requested_revision", "resolved_revision", "snapshot_path"],
+    *,
+    missing: str,
+) -> str:
+    """Distinguish absent provenance from an absent field in captured provenance."""
+    if model_provenance is None:
+        return "not captured"
+    return _gallery_fact(model_provenance.get(key), missing=missing)
+
+
 def _gallery_prompt_facts(
     result: PerformanceResult,
     model_provenance: ModelProvenanceRecord | None,
@@ -2323,55 +2340,51 @@ def _gallery_prompt_facts(
     ):
         processed_image = f"{prompt.processed_image_width} x {prompt.processed_image_height} px"
     return (
-        ("Requested maximum tokens", str(result.requested_max_tokens or "not captured")),
+        ("Requested maximum tokens", _gallery_fact(result.requested_max_tokens or None)),
         (
             "Rendered prompt characters",
-            str(prompt.rendered_prompt_chars)
-            if prompt is not None and prompt.rendered_prompt_chars is not None
-            else "not captured",
+            _gallery_fact(prompt.rendered_prompt_chars if prompt is not None else None),
         ),
         (
             "Image placeholders",
-            str(prompt.image_placeholder_count)
-            if prompt is not None and prompt.image_placeholder_count is not None
-            else "not captured",
+            _gallery_fact(prompt.image_placeholder_count if prompt is not None else None),
         ),
         ("Processed image", processed_image),
         (
             "Image patch count",
-            str(prompt.image_patch_count)
-            if prompt is not None and prompt.image_patch_count is not None
-            else "not captured",
+            _gallery_fact(prompt.image_patch_count if prompt is not None else None),
         ),
         (
             "Processor",
-            prompt.processor_class
-            if prompt is not None and prompt.processor_class
-            else "not captured",
+            _gallery_fact(prompt.processor_class if prompt is not None else None),
         ),
         (
             "Tokenizer",
-            prompt.tokenizer_class
-            if prompt is not None and prompt.tokenizer_class
-            else "not captured",
+            _gallery_fact(prompt.tokenizer_class if prompt is not None else None),
         ),
         (
             "Requested model revision",
-            model_provenance.get("requested_revision") or "not requested"
-            if model_provenance is not None
-            else "not captured",
+            _gallery_provenance_fact(
+                model_provenance,
+                "requested_revision",
+                missing="not requested",
+            ),
         ),
         (
             "Resolved model revision",
-            model_provenance.get("resolved_revision") or "not resolved"
-            if model_provenance is not None
-            else "not captured",
+            _gallery_provenance_fact(
+                model_provenance,
+                "resolved_revision",
+                missing="not resolved",
+            ),
         ),
         (
             "Resolved snapshot path",
-            model_provenance.get("snapshot_path") or "not captured"
-            if model_provenance is not None
-            else "not captured",
+            _gallery_provenance_fact(
+                model_provenance,
+                "snapshot_path",
+                missing="not captured",
+            ),
         ),
         (
             "Generation settings",
