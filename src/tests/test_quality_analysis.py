@@ -287,6 +287,50 @@ def test_configured_special_token_is_not_unexpected() -> None:
     assert "unexpected_special_token" not in check_models._assess_result(result).observations
 
 
+@pytest.mark.parametrize(
+    "wrapper",
+    ["<|im_start|>", "<|begin_of_box|>", "<|channel>", "<channel|>"],
+)
+def test_undeclared_control_wrapper_is_observed_generically(wrapper: str) -> None:
+    result = _result(f"{wrapper} A complete response.")
+
+    assert result.quality_analysis is not None
+    assert wrapper in result.quality_analysis.unexpected_special_tokens
+    assert "unexpected_special_token" in check_models._assess_result(result).observations
+
+
+def test_declared_generation_wrappers_are_neutral_without_model_name_policy() -> None:
+    wrappers = ("<|custom_eos|>", "<|custom_stop|>")
+    result = check_models.PerformanceResult(
+        model_name="example/plain-model",
+        success=True,
+        generation=_Generation(
+            f"{wrappers[0]}{wrappers[1]}<reason>Inspect the scene.</done> A complete response.",
+            generation_tokens=18,
+        ),
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            eos_token=wrappers[0],
+            generate_kwargs={
+                "eos_tokens": [wrappers[1]],
+                "enable_thinking": True,
+                "thinking_start_token": "<reason>",
+                "thinking_end_token": "</done>",
+            },
+        ),
+    )
+
+    context = check_models._build_report_render_context(
+        results=[result],
+        prompt="Describe the image.",
+        system_info={},
+    )
+
+    enriched = context.result_set.results[0]
+    assert enriched.quality_analysis is not None
+    assert enriched.quality_analysis.unexpected_special_tokens == []
+    assert dict(context.assessments)[result.model_name].observations == ("thinking_trace_present",)
+
+
 def test_partial_keyword_overlap_is_neutral() -> None:
     result = _result(
         "Title: A blue boat at dawn\n"

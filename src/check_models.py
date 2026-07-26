@@ -1520,6 +1520,11 @@ EXIF_DATE_TAGS: Final[tuple[str, ...]] = (
     "CreateDate",
     "DateTime",
 )
+EXIF_OFFSET_TAG_BY_DATE: Final[dict[str, str]] = {
+    "DateTimeOriginal": "OffsetTimeOriginal",
+    "CreateDate": "OffsetTimeDigitized",
+    "DateTime": "OffsetTime",
+}
 
 
 # =============================================================================
@@ -1834,7 +1839,7 @@ def _escape_markdown_underscore_runs(text: str) -> str:
 
 def _markdown_emphasis(text: str) -> str:
     """Return repo-style Markdown emphasis for formatter-owned labels."""
-    return f"_{text}_"
+    return f"*{text}*"
 
 
 def _markdown_generated_stamp(
@@ -1853,7 +1858,7 @@ def _append_markdown_labeled_value(
     value: str,
     bullet: bool = False,
 ) -> None:
-    """Append a wrapped Markdown label/value line using underscore emphasis."""
+    """Append a wrapped Markdown label/value line using repo-style emphasis."""
     prefix = (
         f"- {_markdown_emphasis(f'{label}:')} " if bullet else f"{_markdown_emphasis(f'{label}:')} "
     )
@@ -2953,7 +2958,6 @@ FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
 # Threshold for splitting long header text into multiple lines
 HEADER_SPLIT_LENGTH = 10
 ERROR_MESSAGE_TRUNCATE_LEN: Final[int] = 120  # Max chars for error messages in actionable reports
-MAX_QUALITY_ISSUES_LEN: Final[int] = 30  # Max chars for quality issues in Markdown tables
 MAX_OUTPUT_PREVIEW_CHARS: Final[int] = 280  # Max chars for output previews in summary tables
 MIN_THROUGHPUT_SAMPLE_TOKENS: Final[int] = 16
 MAX_CAPTURED_OUTPUT_LOG_CHARS: Final[int] = 1200  # Max chars of captured stdout/stderr in logs
@@ -3628,11 +3632,6 @@ BPE_BYTE_ARTIFACTS: Final[tuple[tuple[str, str], ...]] = (
 )
 
 SPECIAL_TOKEN_LEAK_PATTERNS: Final[tuple[tuple[str, str], ...]] = (
-    (r"<\|end\|>", "<|end|>"),
-    (r"<\|endoftext\|>", "<|endoftext|>"),
-    (r"<\|eot_id\|>", "<|eot_id|>"),
-    (r"<\|im_end\|>", "<|im_end|>"),
-    (r"<\|assistant\|>", "<|assistant|>"),
     (r"<end_of_turn>", "<end_of_turn>"),
     (r"</s>(?!\w)", "</s>"),
     (r"<s>(?!\w)", "<s>"),
@@ -3640,13 +3639,13 @@ SPECIAL_TOKEN_LEAK_PATTERNS: Final[tuple[tuple[str, str], ...]] = (
     (r"# SOLUTION", "# SOLUTION"),
     (r"\[INST\]", "[INST]"),
     (r"\[/INST\]", "[/INST]"),
-    (r"<\|think\|>", "<|think|>"),
     (r"</think>", "</think>"),
-    (r"<\|pad\|>", "<|pad|>"),
-    (r"<\|unk\|>", "<|unk|>"),
     (r"\[PAD\]", "[PAD]"),
     (r"\[CLS\]", "[CLS]"),
     (r"\[SEP\]", "[SEP]"),
+)
+CONTROL_TOKEN_WRAPPER_RE: Final[re.Pattern[str]] = re.compile(
+    r"<\|[^\s<>|]{1,80}(?:\|>|>)|<[^\s<>|]{1,80}\|>",
 )
 
 
@@ -3671,7 +3670,10 @@ def _detect_special_token_leakage(text: str) -> tuple[bool, list[str]]:
         if re.search(pattern, text):
             leaked_tokens.append(token_name)
 
-    return bool(leaked_tokens), leaked_tokens
+    leaked_tokens.extend(match.group(0) for match in CONTROL_TOKEN_WRAPPER_RE.finditer(text))
+
+    deduplicated = _dedupe_preserve_order(leaked_tokens)
+    return bool(deduplicated), deduplicated
 
 
 def _detect_minimal_output(
@@ -5252,23 +5254,29 @@ def _convert_gps_coordinate(
     return (components[0] or 0.0, components[1] or 0.0, components[2] or 0.0)
 
 
-def _first_exif_date_value(exif_data: ExifDict) -> ExifValue | None:
-    """Return the first populated EXIF date value using configured tag priority."""
+def _first_exif_datetime_values(
+    exif_data: ExifDict,
+) -> tuple[ExifValue | None, ExifValue | None]:
+    """Return the first EXIF wall-clock value and its corresponding UTC offset."""
     for tag in EXIF_DATE_TAGS:
         if value := exif_data.get(tag):
-            return value
-    return None
+            return value, exif_data.get(EXIF_OFFSET_TAG_BY_DATE[tag])
+    return None, None
 
 
-def _parse_exif_local_datetime(exif_date: ExifValue) -> datetime | None:
-    """Parse an EXIF date value and convert it to local timezone."""
+def _parse_exif_local_datetime(
+    exif_date: ExifValue,
+    exif_offset: ExifValue | None = None,
+) -> datetime | None:
+    """Parse an EXIF wall clock, attaching its declared or system-local zone."""
     exif_text = str(exif_date)
-    parsed: datetime | None = None
     for fmt in DATE_FORMATS:
+        if exif_offset:
+            with suppress(ValueError):
+                return datetime.strptime(f"{exif_text} {exif_offset}", f"{fmt} %z")
         with suppress(ValueError):
-            parsed = datetime.strptime(exif_text, fmt).replace(tzinfo=UTC).astimezone()
-            break
-    return parsed
+            return datetime.strptime(exif_text, fmt).astimezone()
+    return None
 
 
 def _extract_file_mtime_local(
@@ -5290,13 +5298,13 @@ def _extract_primary_exif_local_datetime(
     warning_message: str,
 ) -> tuple[datetime | None, str | None]:
     """Return parsed primary EXIF datetime plus the original raw value."""
-    exif_date = _first_exif_date_value(exif_data)
+    exif_date, exif_offset = _first_exif_datetime_values(exif_data)
     if not exif_date:
         return None, None
 
     raw_exif_date = str(exif_date)
     try:
-        return _parse_exif_local_datetime(exif_date), raw_exif_date
+        return _parse_exif_local_datetime(exif_date, exif_offset), raw_exif_date
     except (TypeError, UnicodeDecodeError) as err:
         logger.warning(warning_message, err)
         return None, raw_exif_date
@@ -9007,7 +9015,28 @@ def normalize_markdown_trailing_spaces(md_text: str) -> str:
       accidental MD009-style endings.
     """
     out_lines: list[str] = []
+    fence_char: str | None = None
+    fence_length = 0
     for ln in md_text.splitlines():
+        if fence_char is not None:
+            out_lines.append(ln)
+            closing = re.fullmatch(
+                rf" {{0,3}}{re.escape(fence_char)}{{{fence_length},}}[ \t]*",
+                ln,
+            )
+            if closing is not None:
+                fence_char = None
+                fence_length = 0
+            continue
+
+        opening = re.match(r"^ {0,3}(`{3,}|~{3,})", ln)
+        if opening is not None:
+            fence = opening.group(1)
+            fence_char = fence[0]
+            fence_length = len(fence)
+            out_lines.append(ln)
+            continue
+
         stripped = ln.rstrip(" \t\u00a0\u200b\u200c\u200d\u2060\ufeff")
         trailing = ln[len(stripped) :]
         if not trailing:
@@ -12724,9 +12753,12 @@ def _build_cataloguing_prompt(
     provenance = _build_metadata_provenance(metadata if include_metadata_hints else None)
     if provenance.has_authoritative_context:
         parts.extend(["", "Context: Authoritative context:"])
-        capture_value = " ".join(
-            value for value in (provenance.capture_date, provenance.capture_time) if value
-        )
+        capture_parts = [provenance.capture_date] if provenance.capture_date else []
+        if provenance.capture_time and provenance.capture_time not in (
+            provenance.capture_date or ""
+        ):
+            capture_parts.append(provenance.capture_time)
+        capture_value = " ".join(capture_parts)
         if capture_value:
             parts.append(f"- Capture date/time: {capture_value}")
         if provenance.gps:
@@ -13297,6 +13329,23 @@ def _collapse_preview_whitespace(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+def _configured_output_wrappers(diagnostics: PromptDiagnostics | None) -> tuple[str, ...]:
+    """Return wrappers declared by tokenizer metadata or mlx-vlm generation kwargs."""
+    if diagnostics is None:
+        return ()
+
+    wrappers = list(diagnostics.special_tokens)
+    if diagnostics.eos_token:
+        wrappers.append(diagnostics.eos_token)
+    for key in ("eos_tokens", "thinking_start_token", "thinking_end_token"):
+        value = diagnostics.generate_kwargs.get(key)
+        if isinstance(value, str):
+            wrappers.append(value)
+        elif isinstance(value, list):
+            wrappers.extend(item for item in value if isinstance(item, str))
+    return tuple(_dedupe_preserve_order(wrappers))
+
+
 def _populate_result_quality_analysis(
     result: PerformanceResult,
     *,
@@ -13334,9 +13383,7 @@ def _populate_result_quality_analysis(
         prompt=prompt,
         requested_max_tokens=resolved_requested_max_tokens,
         context_marker=context_marker,
-        known_special_tokens=(
-            result.prompt_diagnostics.special_tokens if result.prompt_diagnostics else ()
-        ),
+        known_special_tokens=_configured_output_wrappers(result.prompt_diagnostics),
         thinking_trace_delimiters=thinking_trace_delimiters,
     )
     return replace(
@@ -13362,50 +13409,11 @@ def _extract_quality_issue_labels(quality_issues: str | None) -> set[str]:
     return labels
 
 
-def _parse_quality_issues_to_list(quality_issues: str | None) -> list[str]:
-    """Split stored comma-separated quality issue text into normalized items."""
-    if not quality_issues:
-        return []
-    return [
-        issue.strip() for issue in re.split(r",\s*(?![^()]*\))", quality_issues) if issue.strip()
-    ]
-
-
-def _truncate_quality_issues(
-    quality_issues: str | None,
-    max_len: int = MAX_QUALITY_ISSUES_LEN,
-) -> str:
-    """Truncate quality issue text for narrow table cells.
-
-    Prefers whole parsed issue labels before falling back to hard clipping.
-    """
-    if not quality_issues:
-        return ""
-    if len(quality_issues) <= max_len:
-        return quality_issues
-
-    issues = _parse_quality_issues_to_list(quality_issues)
-    if not issues:
-        return quality_issues[: max_len - 3].rstrip() + "..."
-
-    kept: list[str] = []
-    for issue in issues:
-        candidate = ", ".join([*kept, issue])
-        if len(candidate) <= max_len:
-            kept.append(issue)
-            continue
-        if kept:
-            return ", ".join(kept) + ", ..."
-        return issue[: max_len - 3].rstrip() + "..."
-
-    return ", ".join(kept)
-
-
-def _format_counter_items[T: str](counter: Counter[T], *, max_items: int = 6) -> str:
+def _format_counter_items[T: str](counter: Counter[T]) -> str:
     """Format a counter as ``label=count`` pairs ordered by frequency."""
     if not counter:
         return "none"
-    return ", ".join(f"{label}={count}" for label, count in counter.most_common(max_items))
+    return ", ".join(f"{label}={count}" for label, count in counter.most_common())
 
 
 def _short_model_label(model_name: str, *, max_len: int = SUMMARY_MODEL_LABEL_MAX) -> str:
@@ -13470,39 +13478,52 @@ def _log_model_comparison_table_and_charts(
         return (execution_order[assessment.execution], -tps, result.model_name)
 
     sorted_results = sorted(results, key=_sort_key)
-    rows: list[list[str]] = []
+    rows: list[tuple[str, ...]] = []
     tps_entries: list[tuple[str, float]] = []
     total_time_entries: list[tuple[str, float]] = []
     crashed: list[PerformanceResult] = []
 
     for idx, res in enumerate(sorted_results, start=1):
-        model_label = _short_model_label(res.model_name)
+        model_label = _short_model_label(res.model_name, max_len=21)
         assessment = assessments[res.model_name]
         tps = _valid_generation_tps(res)
         peak_mem = _generation_optional_nonnegative_float_metric(res.generation, "peak_memory")
-        notes = _truncate_quality_issues(res.quality_issues, max_len=34)
-        if not notes:
-            notes = (
-                "+".join(assessment.observations)
-                if assessment.observations
-                else res.error_code or res.error_stage or res.error_message or "none"
-            )
+        runtime = res.runtime_diagnostics
+        execution_code = {"completed": "C", "crashed": "X", "indeterminate": "I"}[
+            assessment.execution
+        ]
+        usability_code = {
+            "usable": "U",
+            "usable_with_caveats": "C",
+            "unusable": "X",
+            "not_evaluated": "-",
+        }[assessment.usability]
         rows.append(
-            [
+            (
                 str(idx),
                 model_label,
-                assessment.execution,
-                assessment.usability,
-                assessment.maintainer_status,
+                f"{execution_code}/{usability_code}",
+                _format_float_or_dash(
+                    runtime.input_validation_time_s if runtime is not None else None
+                ),
+                _format_float_or_dash(
+                    runtime.model_load_time_s
+                    if runtime is not None and runtime.model_load_time_s is not None
+                    else res.model_load_time
+                ),
+                _format_float_or_dash(runtime.prompt_prep_time_s if runtime is not None else None),
+                _format_float_or_dash(
+                    runtime.first_token_latency_s if runtime is not None else None
+                ),
+                _format_float_or_dash(_runtime_generation_residual_time_s(runtime)),
+                _format_float_or_dash(runtime.cleanup_time_s if runtime is not None else None),
+                _format_float_or_dash(res.total_time),
                 _format_float_or_dash(tps, digits=1),
-                _format_float_or_dash(res.total_time, digits=2),
-                _format_float_or_dash(res.model_load_time, digits=2),
                 _format_float_or_dash(
                     peak_mem if peak_mem is not None and peak_mem > 0 else None,
                     digits=2,
                 ),
-                _truncate_text_preview(notes, max_chars=34),
-            ],
+            ),
         )
         eligible_for_ranking = assessment.execution == "completed" and assessment.usability in {
             "usable",
@@ -13526,35 +13547,29 @@ def _log_model_comparison_table_and_charts(
             "   Recommended working set: %s GB",
             fmt_num(recommended_working_set_bytes / (1024**3)),
         )
-    headers = [
+    logger.info("   E/U: execution C=completed, X=crashed, I=indeterminate")
+    logger.info("        usability U=usable, C=caveated, X=unusable, -=not evaluated")
+    logger.info("   First=prefill/first token; Remain=input preparation + decode")
+    logger.info(
+        "   %2s %-21s %-3s %5s %5s %5s %5s %5s %5s %5s %5s %5s",
         "#",
         "Model",
-        "Execution",
-        "Usability",
-        "Maintainer",
+        "E/U",
+        "Val",
+        "Load",
+        "Prep",
+        "First",
+        "Remain",
+        "Clean",
+        "Total",
         "TPS",
-        "Total(s)",
-        "Load(s)",
-        "PeakGB",
-        "Notes",
-    ]
-    _log_rich_table(
-        headers=headers,
-        rows=rows,
-        justifications=(
-            "right",
-            "left",
-            "left",
-            "left",
-            "left",
-            "right",
-            "right",
-            "right",
-            "right",
-            "left",
-        ),
-        no_wrap_headers=frozenset({"#", "Execution", "TPS"}),
+        "GB",
     )
+    for row in rows:
+        logger.info(
+            "   %2s %-21s %-3s %5s %5s %5s %5s %5s %5s %5s %5s %5s",
+            *row,
+        )
 
     if tps_entries:
         log_blank()
@@ -13780,7 +13795,7 @@ def log_summary(
         resolved_assessments[result.model_name].execution for result in results
     )
     usability_counts = Counter(
-        resolved_assessments[result.model_name].usability for result in completed
+        resolved_assessments[result.model_name].usability for result in results
     )
     maintainer_counts = Counter(
         resolved_assessments[result.model_name].maintainer_status for result in results

@@ -7,6 +7,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Require deterministic focused/static/full quality gates before costly model
+  matrices, including fixture-rendered Markdown preflights, and a repaired,
+  re-audited Run 1 before any comparative Run 2.
 - Make one validated current-run assessment/provenance context authoritative for
   console summaries and every retained artifact; write canonical JSONL first and
   isolate optional renderer failures without corrupting machine evidence.
@@ -43,6 +46,12 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Preserve EXIF capture wall clocks with their declared UTC offsets and avoid
+  repeating the extracted time in assisted prompts.
+- Preserve trailing whitespace inside fenced generated output, flag generic
+  undeclared control wrappers while accepting tokenizer/EOS/thinking metadata,
+  use repository-style Markdown emphasis, and keep compact run summaries
+  readable without dropping outcome counts.
 - Keep completed-unusable runs neutral and out of performance rankings, distinguish
   requested from resolved revisions in human reports, and sanitize operational paths
   in public failures, provenance, captured streams, and artifact manifests while

@@ -483,9 +483,9 @@ def test_log_summary_emits_comparison_table_and_ascii_charts(
 
     messages = "\n".join(record.message for record in caplog.records)
     assert "Model Comparison (current run):" in messages
-    assert "│ # │ Model" in messages
-    assert "TPS │" in messages
-    assert "Execution" in messages
+    assert "# Model                 E/U" in messages
+    assert "First Remain Clean Total   TPS    GB" in messages
+    assert "execution C=completed" in messages
     assert "completed" in messages
     assert "usable" in messages
     assert "TPS comparison chart:" in messages
@@ -547,38 +547,44 @@ def test_log_summary_single_model_omits_efficiency_chart(
     assert "Efficiency chart (higher is faster overall):" not in messages
 
 
-def test_log_summary_comparison_table_preserves_unicode_notes(
+def test_log_summary_comparison_table_is_one_row_per_model_at_realistic_width(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    """Rich comparison-table notes can keep Unicode without breaking alignment."""
+    """The persisted performance table should not fold cells into character rows."""
     caplog.set_level(logging.INFO)
     result = PerformanceResult(
-        model_name="org/emoji-note",
+        model_name="org/a-realistically-long-model-name-for-width-testing",
         generation=_StubGeneration(generation_tps=15.0, peak_memory=1.1, text="good output"),
         success=True,
         generation_time=1.0,
         model_load_time=0.5,
         total_time=1.5,
         quality_issues="⚠️harness(stop_token), output:zero_tokens",
+        runtime_diagnostics=RuntimeDiagnostics(
+            input_validation_time_s=0.12,
+            model_load_time_s=0.5,
+            prompt_prep_time_s=0.03,
+            decode_time_s=1.0,
+            cleanup_time_s=0.04,
+            first_token_latency_s=0.6,
+        ),
     )
 
-    log_summary([result])
+    with patch("check_models.get_terminal_width", return_value=100):
+        log_summary([result])
 
-    # Collect the model-data row (contains "emoji-note") and all continuation
-    # rows (│ … │ rows without "emoji-note" that immediately follow it).
-    all_table_rows = [
-        record.message for record in caplog.records if record.message.strip().startswith("│")
-    ]
-    assert all_table_rows
-    # Notes may wrap across continuation rows at narrow render widths.
-    table_text = " ".join(all_table_rows)
-    assert "emoji" in table_text
-    assert "-note" in table_text
-    assert "⚠" in table_text
-    assert "har" in table_text
-    assert "ness" in table_text
-    assert "stop_" in table_text
-    assert "token" in table_text
+    messages = [record.message for record in caplog.records]
+    header = next(message for message in messages if "Val" in message and "First" in message)
+    row = next(message for message in messages if message.lstrip().startswith("1 "))
+    assert "Load" in header
+    assert "Prep" in header
+    assert "Remain" in header
+    assert "Clean" in header
+    assert "Total" in header
+    assert "a-realistically-lo..." in row
+    assert all(value in row for value in ("0.12", "0.50", "0.03", "0.60", "0.40", "0.04"))
+    assert len(row) <= 86
+    assert "\n" not in row
 
 
 def test_log_summary_reports_execution_and_mechanical_observations(
@@ -691,7 +697,20 @@ def test_log_summary_uses_cached_axes_and_excludes_unusable_from_highlights(
 
     messages = "\n".join(record.message for record in caplog.records)
     assert "Execution outcomes: completed=3, crashed=1, indeterminate=1" in messages
-    assert "Usability outcomes: usable=1, usable_with_caveats=1, unusable=1" in messages
+    usability_summary = next(
+        record.message
+        for record in caplog.records
+        if record.message.startswith("Usability outcomes:")
+    )
+    assert all(
+        item in usability_summary
+        for item in (
+            "usable=1",
+            "usable_with_caveats=1",
+            "unusable=1",
+            "not_evaluated=2",
+        )
+    )
     assert "Maintainer outcomes:" in messages
     assert "Fastest: org/caveated (30.0 tps)" in messages
     assert "Fastest: org/unusable" not in messages
@@ -699,6 +718,48 @@ def test_log_summary_uses_cached_axes_and_excludes_unusable_from_highlights(
     assert "status=OK" not in messages
     assert "org/unusable" in messages
     assert "unusable" in messages
+
+
+def test_log_summary_lists_every_observation_kind(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Observation summaries must not silently drop lower-frequency kinds."""
+    caplog.set_level(logging.INFO)
+    observations: tuple[check_models.ObservationCode, ...] = (
+        "minimal_output",
+        "missing_requested_sections",
+        "prompt_instruction_echo",
+        "repeated_output",
+        "thinking_trace_incomplete",
+        "thinking_trace_present",
+        "token_cap_truncation",
+    )
+    results = [
+        PerformanceResult(
+            model_name=f"org/model-{index}",
+            generation=_StubGeneration(text="complete output"),
+            success=True,
+        )
+        for index, _observation in enumerate(observations)
+    ]
+    assessments = {
+        result.model_name: check_models.ResultAssessment(
+            "completed",
+            "usable_with_caveats",
+            "observation_needs_reproduction",
+            (observation,),
+        )
+        for result, observation in zip(results, observations, strict=True)
+    }
+
+    log_summary(results, assessments=assessments)
+
+    summary = next(
+        record.message
+        for record in caplog.records
+        if record.message.startswith("Mechanical observations:")
+    )
+    assert all(f"{observation}=1" in summary for observation in observations)
 
 
 def test_print_model_result_uses_neutral_cached_unusable_assessment(

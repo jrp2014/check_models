@@ -115,8 +115,8 @@ def test_gallery_evidence_block_keeps_raw_timing_metrics() -> None:
 
     md = _gallery_lines_for(result)
 
-    assert "_Generation time:_ 1.60s" in md
-    assert "_Generation throughput (raw):_ 5.51 tok/s" in md
+    assert "*Generation time:* 1.60s" in md
+    assert "*Generation throughput (raw):* 5.51 tok/s" in md
     assert "<summary>Complete evidence: test/model</summary>" in md
 
 
@@ -138,8 +138,8 @@ def test_gallery_evidence_block_marks_missing_metrics() -> None:
 
     md = _gallery_lines_for(result)
 
-    assert "_Model load time:_ -" in md
-    assert "_Generation throughput (raw):_ 29.7 tok/s" in md
+    assert "*Model load time:* -" in md
+    assert "*Generation throughput (raw):* 29.7 tok/s" in md
     assert "<summary>Complete evidence: test/model</summary>" in md
 
 
@@ -229,7 +229,7 @@ def test_multiline_metadata_renders_as_single_list_item() -> None:
     )
 
     md = "\n".join(parts)
-    assert "- _Description:_ First line" in md
+    assert "- *Description:* First line" in md
     assert "\n\n    Second line" in md
     assert "\n\n    Third paragraph." in md
 
@@ -358,9 +358,9 @@ def test_gallery_uses_short_observation_labels_without_review_prose(tmp_path: Pa
     )
     md = out.read_text(encoding="utf-8")
 
-    assert "_Why:_" not in md
-    assert "_Next action:_" not in md
-    assert "_Observations:_ none" in md
+    assert "*Why:*" not in md
+    assert "*Next action:*" not in md
+    assert "*Observations:* none" in md
     assert "Keyword count violation" not in md
 
 
@@ -393,6 +393,22 @@ def test_normalize_markdown_trailing_spaces_strips_trailing_bom_and_zero_width()
     normalized = check_models.normalize_markdown_trailing_spaces(md)
 
     assert normalized.splitlines() == ["alpha", "beta", "gamma", "delta  "]
+
+
+def test_normalize_markdown_trailing_spaces_preserves_fenced_output_exactly() -> None:
+    """Generated output in a code fence must retain trailing spaces and tabs."""
+    md = "outside \n```text\nfirst  \nsecond \t\n```\nafter\u00a0"
+
+    normalized = check_models.normalize_markdown_trailing_spaces(md)
+
+    assert normalized.splitlines() == [
+        "outside",
+        "```text",
+        "first  ",
+        "second \t",
+        "```",
+        "after",
+    ]
 
 
 def test_wrapped_blockquote_preserves_plain_bracket_text() -> None:
@@ -504,3 +520,8 @@ def test_error_text_escapes_underscore_emphasis_markers() -> None:
     md = _gallery_lines_for(result)
     assert "LanguageModel.\\_\\_call\\_\\_() got an unexpected keyword" in md
     assert "argument" in md
+
+
+def test_formatter_owned_markdown_emphasis_uses_repo_style() -> None:
+    """Generated labels should satisfy the repository's asterisk emphasis rule."""
+    assert check_models._markdown_emphasis("Execution:") == "*Execution:*"

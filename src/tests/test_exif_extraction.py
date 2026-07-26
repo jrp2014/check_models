@@ -69,6 +69,23 @@ def test_extract_exif_date_standard_format(tmp_path: Path) -> None:
     assert "14:30:45" in result
 
 
+def test_extract_exif_datetime_preserves_wall_clock_with_declared_offset(
+    tmp_path: Path,
+) -> None:
+    """An EXIF offset describes the recorded wall clock; it must not shift it."""
+    test_file = tmp_path / "offset.jpg"
+    test_file.touch()
+    exif_dict: dict[str | int, Any] = {
+        "DateTimeOriginal": "2026:07:25 18:33:16",
+        "OffsetTimeOriginal": "+01:00",
+    }
+
+    assert check_models._extract_exif_date(test_file, exif_dict) == (
+        "2026-07-25 18:33:16 UTC+01:00"
+    )
+    assert check_models._extract_exif_time(test_file, exif_dict) == "18:33:16"
+
+
 def test_process_exif_subifd_handles_non_int_tag_ids() -> None:
     """Unknown non-integer sub-IFD keys should fall back to their string form."""
     result = check_models._process_exif_subifd(_FakeExifWithSubIfd())

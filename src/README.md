@@ -62,6 +62,9 @@ python -m check_models --dry-run
 - **Selection Control**: Use `--exclude` to filter models from cache scan or explicit list
 - **Folder Mode**: Automatically selects most recently modified image from specified folder
 - **Metadata Extraction**: Multi-source metadata: EXIF + GPS + IPTC keywords/caption + XMP (dc:subject, dc:title) + Windows XP keywords, with fail-soft strategy for partially corrupt data
+- **Capture Time Fidelity**: EXIF wall-clock values retain their declared UTC
+  offset (or the system-local zone when no offset is recorded), and assisted
+  prompts include the resulting capture time only once
 - **Smart Prompting**: Generates structured cataloguing prompts (Title/Description/Keywords) that verify metadata against clearly visible image content, avoid speculation, and compact long metadata fields/keyword lists to keep prompt size manageable; `--prompt` overrides
 - **Performance Metrics**:
   - Timing: generation_time, model_load_time, total_time
@@ -73,8 +76,8 @@ python -m check_models --dry-run
 - **Multiple Output Formats**:
   - **CLI**: Colorized with compact or detailed metrics modes
   - **HTML**: Standalone report with inline CSS, failed row highlighting
-  - **Markdown**: Mode-aware run index, model-selection brief, and evidence gallery
-  - **TSV/JSONL**: Machine-readable exports for downstream analysis
+  - **Markdown**: Tiny run index, evidence gallery, and conditional diagnostics
+  - **JSONL**: Canonical machine-readable per-result export for downstream analysis
   - **Run JSON**: Stable run-level metadata contract for public snapshots
 - **Error Handling**: Per-model isolation with detailed diagnostics; graceful timeout/failure handling
 - **Machine Parsable**: SUMMARY lines with `key=value` format for automation
@@ -286,8 +289,18 @@ neither state claims semantic correctness.
 External connectivity failures are `indeterminate`, so they are retained without being counted as model crashes.
 Configured thinking tokens are not automatically faults; observed or incomplete
 thinking traces remain factual observations that may need controlled reproduction.
+Likewise, tokenizer special-token metadata, tokenizer EOS, explicit `eos_tokens`,
+and configured thinking start/end wrappers are treated as declared protocol.
+Control-wrapper syntax that appears in output without any of those declarations is
+retained as an `unexpected_special_token` observation; no model-name allowlist is
+used.
 The chooser reports `insufficient sample` when throughput lacks enough generated
 tokens for a meaningful comparison.
+
+EXIF timestamps are interpreted as capture wall clocks rather than as UTC instants.
+When `OffsetTimeOriginal`, `OffsetTimeDigitized`, or `OffsetTime` accompanies the
+selected EXIF date field, that offset is retained. Complete generated output in the
+Markdown evidence artifacts is fenced and preserves tabs and trailing spaces.
 
 Use `reports/model_gallery.md` for complete per-model evidence,
 `reports/diagnostics.md` for maintainer evidence and reproduction state,
@@ -296,6 +309,21 @@ exact machine-readable provenance and run arguments.
 
 Avoid lint/type suppressions wherever possible. Any unavoidable suppression must
 have a documented purpose and pass the repository suppression audit.
+
+Before a costly real-model matrix, run deterministic focused tests followed by
+`make format`, `make -C src lint-fix`, `make lint`, and `make quality`. Real-model
+runs are acceptance tests for runtime integration, report utility, exact evidence,
+cross-artifact consistency, memory, and performance; they do not replace ordinary
+tests. If Run 1 reveals a harness/report defect, fix and revalidate it, then rerun
+and audit Run 1 before beginning comparative Run 2.
+
+Generated Markdown should already satisfy the repository's markdownlint style:
+blank lines around headings, lists, and ordinary fences; unique headings; asterisk
+emphasis; language-tagged fences; and escaped table cells. Evidence fences retain
+captured model tabs and trailing spaces under only the narrow lint configuration
+needed for exact preservation. Render representative reports from fixtures into
+temporary or `test_*` paths and lint them before the model matrix; use shared render
+helpers and focused tests so production outputs never need hand editing.
 
 ### Metrics Explained
 
@@ -1083,7 +1111,18 @@ Real-time colorized output showing:
 - Performance metrics (tokens/second, memory usage, timing)
 - Generated text preview
 - Error diagnostics for failed models
-- Final performance summary table
+- Final one-model-per-row performance summary table
+
+The compact performance header is `#`, `Model`, `E/U`, `Val`, `Load`, `Prep`,
+`First`, `Remain`, `Clean`, `Total`, `TPS`, and `GB`. `E/U` abbreviates the
+execution/usability axes using the legend printed above the table. Timing columns
+are seconds: `Val` is local input validation, `Load` is model load, `Prep` is local
+preflight/chat-template preparation, and `First` is mlx-vlm's model-loop
+prefill/first-token timing (which excludes `prepare_inputs()`). `Remain` is the rest
+of the measured generation call after `First`, so it deliberately combines image
+and other input preparation with token decoding rather than attributing that time
+to either one without a dedicated upstream measurement. `Clean` and `Total` are
+cleanup and end-to-end time; `TPS` is generation throughput and `GB` is peak memory.
 
 Color conventions:
 

@@ -160,7 +160,7 @@ def test_html_and_gallery_render_same_captured_peak_memory(tmp_path: Path) -> No
     html_text = html_path.read_text(encoding="utf-8")
     assert "<td>Peak memory</td>\n<td>1.0</td>" in html_text
     assert "recommended working set" not in html_text
-    assert "_Peak memory:_ 1.0" in gallery_path.read_text(encoding="utf-8")
+    assert "*Peak memory:* 1.0" in gallery_path.read_text(encoding="utf-8")
 
 
 def _extract_markdown_subsection(
@@ -884,8 +884,8 @@ def test_machine_reports_share_the_cached_resolved_model_provenance(tmp_path: Pa
     assert run_record["model_provenance"] == {result.model_name: provenance}
     gallery = gallery_path.read_text(encoding="utf-8")
     html_report = html.unescape(html_path.read_text(encoding="utf-8"))
-    assert "_Requested model revision:_ requested-tag" in gallery
-    assert f"_Resolved model revision:_ {provenance['resolved_revision']}" in gallery
+    assert "*Requested model revision:* requested-tag" in gallery
+    assert f"*Resolved model revision:* {provenance['resolved_revision']}" in gallery
     assert "<td>Requested model revision</td>\n<td>requested-tag</td>" in html_report
     assert (
         f"<td>Resolved model revision</td>\n<td>{provenance['resolved_revision']}</td>"
@@ -1405,9 +1405,9 @@ def test_diagnostics_use_run_args_for_complete_native_reproduction(tmp_path: Pat
         next(iter(issue_reports.values())).read_text(encoding="utf-8"),
     ]
     for index, content in enumerate(contents):
-        assert f"- _Resolved model revision:_ {resolved_revision}" in content
-        assert "- _Requested model revision:_ run-revision" in content
-        assert '- _Configured EOS token override:_ ["&lt;override-eos&gt;"]' in content
+        assert f"- *Resolved model revision:* {resolved_revision}" in content
+        assert "- *Requested model revision:* run-revision" in content
+        assert '- *Configured EOS token override:* ["&lt;override-eos&gt;"]' in content
         assert "Supplemental CLI reproduction" in content
         assert "Canonical Python reproduction script" in content
         assert "--image src/tests/fixtures/check_models-task9-fixture.jpg" in content
@@ -1430,7 +1430,7 @@ def test_diagnostics_use_run_args_for_complete_native_reproduction(tmp_path: Pat
         assert '    "enable_thinking": True,' in content
         assert '    "cropping": False,' in content
         assert re.search(
-            r"- _Configured thinking end token:_ unavailable\n\n#{3,4} Complete partial output",
+            r"- \*Configured thinking end token:\* unavailable\n\n#{3,4} Complete partial output",
             content,
         )
         python_script = content.split("```python\n", maxsplit=1)[1].split("\n```", maxsplit=1)[0]
@@ -1674,9 +1674,9 @@ class TestHtmlReportEdgeCases:
             assert serialized["usability"] == assessment.usability
             assert serialized["maintainer_status"] == assessment.maintainer_status
             gallery_entry = _extract_markdown_model_section(gallery, model)
-            assert f"_Execution:_ {assessment.execution}" in gallery_entry
-            assert f"_Usability:_ {assessment.usability}" in gallery_entry
-            assert f"_Maintainer status:_ {assessment.maintainer_status}" in gallery_entry
+            assert f"*Execution:* {assessment.execution}" in gallery_entry
+            assert f"*Usability:* {assessment.usability}" in gallery_entry
+            assert f"*Maintainer status:* {assessment.maintainer_status}" in gallery_entry
             escaped_model = html.escape(model, quote=True)
             row_pattern = (
                 rf'data-model="{re.escape(escaped_model)}"[^>]*'
@@ -1687,9 +1687,9 @@ class TestHtmlReportEdgeCases:
             assert re.search(row_pattern, html_report) is not None
             if assessment.maintainer_status != "none" or assessment.execution == "indeterminate":
                 diagnostics_entry = _extract_markdown_model_section(diagnostics, model)
-                assert f"_Execution:_ {assessment.execution}" in diagnostics_entry
-                assert f"_Usability:_ {assessment.usability}" in diagnostics_entry
-                assert f"_Maintainer status:_ {assessment.maintainer_status}" in diagnostics_entry
+                assert f"*Execution:* {assessment.execution}" in diagnostics_entry
+                assert f"*Usability:* {assessment.usability}" in diagnostics_entry
+                assert f"*Maintainer status:* {assessment.maintainer_status}" in diagnostics_entry
 
     def test_standalone_html_does_not_build_legacy_semantic_context(
         self,
@@ -2289,12 +2289,12 @@ class TestMarkdownGalleryReport:
         content = out.read_text(encoding="utf-8")
         assert "# Model Output Gallery" in content
         assert "## Image Metadata" in content
-        assert "_Title:_ Harbor Sunset" in content
-        assert "_Description:_ Fishing boats at dusk." in content
-        assert "_Keywords:_ harbor, boats, sunset" in content
-        assert "_Date:_ 2026-03-08" in content
-        assert "_Time:_ 18:42:00" in content
-        assert "_GPS:_ 51.5000, -0.1200" in content
+        assert "*Title:* Harbor Sunset" in content
+        assert "*Description:* Fishing boats at dusk." in content
+        assert "*Keywords:* harbor, boats, sunset" in content
+        assert "*Date:* 2026-03-08" in content
+        assert "*Time:* 18:42:00" in content
+        assert "*GPS:* 51.5000, -0.1200" in content
         assert "ignored raw blob" not in content
         assert "## Prompt" in content
         assert "## Current-run Chooser" in content
@@ -2307,11 +2307,11 @@ class TestMarkdownGalleryReport:
         assert "<summary>Complete evidence: org/good</summary>" in content
         assert "```text" in content
         assert '<a id="model-org-good"></a>' in content
-        assert "_Usability:_" in content
-        assert "_Observations:_" in content
-        assert "_Verdict:_" not in content
-        assert "_Maintainer:_" not in content
-        assert "_Next action:_" not in content
+        assert "*Usability:*" in content
+        assert "*Observations:*" in content
+        assert "*Verdict:*" not in content
+        assert "*Maintainer:*" not in content
+        assert "*Next action:*" not in content
         assert "### org/good" in content
         assert "### org/bad" in content
 
@@ -2425,9 +2425,9 @@ class TestMarkdownGalleryReport:
         )
 
         content = out.read_text(encoding="utf-8")
-        assert "_Score:_" not in content
+        assert "*Score:*" not in content
         assert "Keywords are not specific" not in content
-        assert "_Review focus:_" not in content
+        assert "*Review focus:*" not in content
 
     def test_gallery_includes_consolidated_summary_and_version_stamps(
         self,
@@ -2466,9 +2466,9 @@ class TestMarkdownGalleryReport:
         assert "## Run Stamps" in content
         assert "- `mlx-vlm`: `0.1`" in content
         assert "- `mlx`: `0.1`" in content
-        assert "- _GPU Architecture:_ applegpu_g17s" in content
-        assert "- _Recommended Working Set:_ 96 GB" in content
-        assert "- _Fused Attention:_ available" in content
+        assert "- *GPU Architecture:* applegpu_g17s" in content
+        assert "- *Recommended Working Set:* 96 GB" in content
+        assert "- *Fused Attention:* available" in content
         assert "## Current-run Chooser" in content
         assert "## Model Quality Summary" not in content
         assert "## All Model Output and Cost Summary" not in content
@@ -2616,7 +2616,7 @@ class TestMarkdownGalleryReport:
             "### org/crashed",
             end_headings=("### org/full-caption", "### org/risky-output"),
         )
-        assert "_Total time:_ 0.33s" in crashed_evidence
+        assert "*Total time:* 0.33s" in crashed_evidence
 
     def test_gallery_uses_skim_first_chooser_order_and_cached_assessments(
         self,
@@ -2676,10 +2676,10 @@ class TestMarkdownGalleryReport:
         assert [content.index(heading) for heading in headings] == sorted(
             content.index(heading) for heading in headings
         )
-        assert "_Verdict:_" not in content
-        assert "_Maintainer:_" not in content
-        assert "_Next action:_" not in content
-        assert "_Score:_" not in content
+        assert "*Verdict:*" not in content
+        assert "*Maintainer:*" not in content
+        assert "*Next action:*" not in content
+        assert "*Score:*" not in content
 
     def test_gallery_complete_output_uses_safe_fence_without_shortening(
         self,
@@ -2784,9 +2784,9 @@ class TestMarkdownGalleryReport:
             "### org/short",
             end_headings=("### org/valid", "<!-- markdownlint-enable"),
         )
-        assert "_Generation time:_ 0.25s" in evidence
-        assert "_Generation throughput (raw):_ 999 tok/s" in evidence
-        assert "_Generation tokens:_ 8" in evidence
+        assert "*Generation time:* 0.25s" in evidence
+        assert "*Generation throughput (raw):* 999 tok/s" in evidence
+        assert "*Generation tokens:* 8" in evidence
 
     def test_gallery_resource_policies_are_deterministic(self, tmp_path: Path) -> None:
         """Avoid, memory, and speed policies should have explicit stable ordering."""
@@ -2908,9 +2908,9 @@ class TestMarkdownGalleryReport:
             "### org/crashed",
             end_headings=("<!-- markdownlint-enable",),
         )
-        assert "_Failure phase:_ decode" in evidence
-        assert "_Error code:_ generation-failed" in evidence
-        assert "_Error package:_ mlx-vlm" in evidence
+        assert "*Failure phase:* decode" in evidence
+        assert "*Error code:* generation-failed" in evidence
+        assert "*Error package:* mlx-vlm" in evidence
         assert evidence.index("RuntimeError: complete trace") < evidence.index(
             "complete captured stderr"
         )
@@ -2943,8 +2943,8 @@ class TestMarkdownGalleryReport:
         )
 
         content = out.read_text(encoding="utf-8")
-        assert "_Execution:_ indeterminate" in content
-        assert "_Execution:_ crashed" not in content
+        assert "*Execution:* indeterminate" in content
+        assert "*Execution:* crashed" not in content
 
     def test_gallery_marks_missing_nested_diagnostic_fields_not_captured(
         self,
@@ -2975,9 +2975,9 @@ class TestMarkdownGalleryReport:
             "### org/missing-nested",
             end_headings=("<!-- markdownlint-enable",),
         )
-        assert "_Stop reason:_ not captured" in evidence
-        assert "_Processor:_ not captured" in evidence
-        assert "_Tokenizer:_ not captured" in evidence
+        assert "*Stop reason:* not captured" in evidence
+        assert "*Processor:* not captured" in evidence
+        assert "*Tokenizer:* not captured" in evidence
 
     def test_gallery_keeps_chooser_and_per_model_factual_status(
         self,
@@ -3004,11 +3004,11 @@ class TestMarkdownGalleryReport:
         assert "Action Snapshot" not in content
         assert "## 🧭 Review Shortlist" not in content
         assert "## 🚨 Failures by Package (Actionable)" not in content
-        assert "_Review focus:_" not in content
-        assert "_Score:_" not in content
-        assert "_Usability:_" in content
-        assert "_Execution:_" in content
-        assert "_Next action:_" not in content
+        assert "*Review focus:*" not in content
+        assert "*Score:*" not in content
+        assert "*Usability:*" in content
+        assert "*Execution:*" in content
+        assert "*Next action:*" not in content
 
 
 # ===================================================================

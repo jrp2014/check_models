@@ -869,6 +869,11 @@ def test_readme_documents_facts_first_evidence_boundaries() -> None:
         "Partial keyword overlap is neutral",
         "External connectivity failures are `indeterminate`",
         "Configured thinking tokens are not automatically faults",
+        "explicit `eos_tokens`",
+        "no model-name allowlist",
+        "EXIF timestamps are interpreted as capture wall clocks",
+        "`First`, `Remain`, `Clean`, `Total`, `TPS`, and `GB`",
+        "combines image\nand other input preparation with token decoding",
         "`insufficient sample`",
         "Issue drafts are created only for hard actionable crashes",
         "append-only raw history",
@@ -896,6 +901,47 @@ def test_validation_artifact_hygiene_policy_is_documented() -> None:
 
     for label, text in docs.items():
         assert "temp directory" in text or "`test_*`" in text, label
+
+
+def test_canonical_agent_guidance_orders_matrix_acceptance_after_quality() -> None:
+    """Costly matrices must follow deterministic tests and use a valid Run 1 baseline."""
+    guidance = COPILOT_INSTRUCTIONS.read_text(encoding="utf-8")
+
+    for phrase in (
+        "Before a costly real-model matrix",
+        "deterministic\n  focused tests",
+        "full `make quality`",
+        "not as substitutes for ordinary tests",
+        "rerun and audit Run 1",
+        "before starting comparative Run 2",
+        "Never compare a known-invalid baseline",
+    ):
+        assert phrase in guidance
+
+
+def test_canonical_agent_guidance_requires_generated_markdown_preflight() -> None:
+    """Generated reports should satisfy repository Markdown style before a matrix."""
+    guidance = COPILOT_INSTRUCTIONS.read_text(encoding="utf-8")
+
+    for phrase in (
+        "Emit generated Markdown in the repository's markdownlint style directly",
+        "blank lines around headings and lists",
+        "unique headings or an explicitly configured sibling-heading structure",
+        "asterisks rather than underscores for emphasis",
+        "preserve model text, tabs, and trailing spaces",
+        "proper blank-line spacing and a language identifier",
+        "narrow report-local markdownlint configuration",
+        "escape table-cell content",
+        "representative reports from fixtures",
+        "temporary or `test_*` output paths",
+        "run markdownlint before the expensive matrix",
+        "must not need post-run hand editing",
+        "shared render helpers and focused tests",
+        "supported report-only regeneration path",
+        "existing canonical JSONL",
+        "before Run 1",
+    ):
+        assert phrase in guidance
 
 
 def test_production_assessment_policy_has_no_fixture_specific_exceptions() -> None:

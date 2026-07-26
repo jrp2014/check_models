@@ -471,6 +471,22 @@ class TestPreparePrompt:
         assert "Existing keywords: Deben Estuary, Woodbridge, boats, river" in prompt
         assert "Treat this draft as fallible" in prompt
 
+    def test_assisted_prompt_does_not_duplicate_time_embedded_in_capture_date(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """The full localized EXIF datetime should appear once in assisted context."""
+        prompt = mod.prepare_prompt(
+            argparse.Namespace(prompt=None, eval_mode="assisted"),
+            {
+                "date": "2026-07-25 18:33:16 UTC+01:00",
+                "time": "18:33:16",
+            },
+        )
+
+        assert "Capture date/time: 2026-07-25 18:33:16 UTC+01:00" in prompt
+        assert prompt.count("18:33:16") == 1
+
     def test_assisted_prompt_does_not_promote_keyword_names_to_authoritative_context(
         self,
         mod: types.ModuleType,
@@ -483,47 +499,6 @@ class TestPreparePrompt:
 
         assert "Authoritative context:" not in prompt
         assert "Existing keywords: Example Harbour, Sample Village, boats" in prompt
-
-
-class TestQualityIssueTruncation:
-    """Tests for quality issue parsing and truncation helpers."""
-
-    def test_parse_quality_issues_preserves_commas_inside_issue_payloads(
-        self,
-        mod: types.ModuleType,
-    ) -> None:
-        """Issue parsing should keep commas inside one parenthesized issue label."""
-        quality_issues = "missing-sections(title, description, keywords), context-ignored, cutoff"
-
-        parsed = mod._parse_quality_issues_to_list(quality_issues)
-
-        assert parsed == [
-            "missing-sections(title, description, keywords)",
-            "context-ignored",
-            "cutoff",
-        ]
-
-    def test_truncate_quality_issues_keeps_whole_issue_labels(
-        self,
-        mod: types.ModuleType,
-    ) -> None:
-        """Truncation should prefer complete parsed issue labels over raw comma cuts."""
-        quality_issues = "missing-sections(title, description, keywords), context-ignored, cutoff"
-
-        truncated = mod._truncate_quality_issues(quality_issues, max_len=52)
-
-        assert truncated == "missing-sections(title, description, keywords), ..."
-
-    def test_truncate_quality_issues_hard_clips_single_long_issue(
-        self,
-        mod: types.ModuleType,
-    ) -> None:
-        """Truncation should still hard-clip when the first issue alone exceeds the limit."""
-        quality_issues = 'repetitive(phrase: "alpha, beta, gamma, delta"), cutoff'
-
-        truncated = mod._truncate_quality_issues(quality_issues, max_len=24)
-
-        assert truncated == 'repetitive(phrase: "a...'
 
 
 # ── compute_vocabulary_diversity ───────────────────────────────────────────
