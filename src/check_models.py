@@ -14013,6 +14013,93 @@ def _build_jsonl_metadata_record(
     return record
 
 
+def _build_jsonl_metrics_record(
+    result: PerformanceResult,
+    recommended_working_set_bytes: int | None,
+) -> JsonlMetricsRecord:
+    """Build captured and derived performance metrics for one JSONL result."""
+    generation = result.generation
+    if generation is None:
+        return {}
+
+    runtime = result.runtime_diagnostics
+    performance_data = _extract_generation_performance_data(generation)
+    metrics: JsonlMetricsRecord = {
+        "prompt_tokens": performance_data.prompt_tokens,
+        "generation_tokens": performance_data.generation_tokens,
+        "total_tokens": performance_data.total_tokens,
+        "prompt_tps": performance_data.prompt_tps,
+        "generation_tps": performance_data.generation_tps,
+        "peak_memory_gb": performance_data.peak_memory_gb,
+        "active_memory_gb": (
+            result.active_memory
+            if result.active_memory is not None
+            else performance_data.active_memory_gb
+        ),
+        "cache_memory_gb": (
+            result.cache_memory
+            if result.cache_memory is not None
+            else performance_data.cache_memory_gb
+        ),
+    }
+    model_load_active_memory_gb = (
+        runtime.model_load_active_memory_gb
+        if runtime is not None
+        else _object_model_load_active_memory_gb(generation)
+    )
+    if model_load_active_memory_gb is not None:
+        metrics["model_load_active_memory_gb"] = model_load_active_memory_gb
+    peak_memory_delta_gb = _peak_memory_delta_from_model_load_gb(result)
+    if peak_memory_delta_gb is not None:
+        metrics["peak_memory_delta_gb"] = peak_memory_delta_gb
+    working_set_pct = _peak_memory_working_set_pct(
+        performance_data.peak_memory_gb,
+        recommended_working_set_bytes,
+    )
+    if working_set_pct is not None:
+        metrics["peak_memory_working_set_pct"] = working_set_pct
+    return metrics
+
+
+def _build_jsonl_failure_record(
+    result: PerformanceResult,
+    execution: ExecutionStatus,
+) -> JsonlFailureRecord | None:
+    """Build complete captured failure evidence for a non-completed result."""
+    if execution == "completed":
+        return None
+
+    root_exception = result.exception_chain[0] if result.exception_chain else None
+    failure: JsonlFailureRecord = {
+        "phase": result.failure_phase,
+        "stage": result.error_stage,
+        "code": result.error_code,
+        "message": (
+            _home_relative_report_text(result.error_message)
+            if result.error_message is not None
+            else None
+        ),
+        "exception_type": (
+            result.root_error_type
+            or (root_exception.exception_type if root_exception is not None else None)
+            or result.error_type
+        ),
+        "exception_module": (
+            result.root_error_module
+            or (root_exception.module if root_exception is not None else None)
+        ),
+        "package": result.error_package,
+        "traceback": (
+            _home_relative_report_text(result.error_traceback)
+            if result.error_traceback is not None
+            else None
+        ),
+    }
+    if result.exception_chain:
+        failure["exception_chain"] = _serialize_exception_chain(result.exception_chain)
+    return failure
+
+
 def _build_jsonl_result_record(
     result: PerformanceResult,
     assessment: ResultAssessment,
@@ -14023,75 +14110,9 @@ def _build_jsonl_result_record(
 ) -> JsonlResultRecord:
     """Build one narrow JSONL row from cached assessment and captured facts."""
     runtime = result.runtime_diagnostics
-    metrics: JsonlMetricsRecord = {}
     generation = result.generation
-    if generation is not None:
-        performance_data = _extract_generation_performance_data(generation)
-        metrics = {
-            "prompt_tokens": performance_data.prompt_tokens,
-            "generation_tokens": performance_data.generation_tokens,
-            "total_tokens": performance_data.total_tokens,
-            "prompt_tps": performance_data.prompt_tps,
-            "generation_tps": performance_data.generation_tps,
-            "peak_memory_gb": performance_data.peak_memory_gb,
-            "active_memory_gb": (
-                result.active_memory
-                if result.active_memory is not None
-                else performance_data.active_memory_gb
-            ),
-            "cache_memory_gb": (
-                result.cache_memory
-                if result.cache_memory is not None
-                else performance_data.cache_memory_gb
-            ),
-        }
-        model_load_active_memory_gb = (
-            runtime.model_load_active_memory_gb
-            if runtime is not None
-            else _object_model_load_active_memory_gb(generation)
-        )
-        if model_load_active_memory_gb is not None:
-            metrics["model_load_active_memory_gb"] = model_load_active_memory_gb
-        peak_memory_delta_gb = _peak_memory_delta_from_model_load_gb(result)
-        if peak_memory_delta_gb is not None:
-            metrics["peak_memory_delta_gb"] = peak_memory_delta_gb
-        working_set_pct = _peak_memory_working_set_pct(
-            performance_data.peak_memory_gb,
-            recommended_working_set_bytes,
-        )
-        if working_set_pct is not None:
-            metrics["peak_memory_working_set_pct"] = working_set_pct
-
-    failure: JsonlFailureRecord | None = None
-    if assessment.execution != "completed":
-        root_exception = result.exception_chain[0] if result.exception_chain else None
-        failure = {
-            "phase": result.failure_phase,
-            "stage": result.error_stage,
-            "code": result.error_code,
-            "message": (
-                _home_relative_report_text(result.error_message)
-                if result.error_message is not None
-                else None
-            ),
-            "exception_type": (
-                result.root_error_type
-                or (root_exception.exception_type if root_exception is not None else None)
-                or result.error_type
-            ),
-            "exception_module": (
-                result.root_error_module
-                or (root_exception.module if root_exception is not None else None)
-            ),
-            "package": result.error_package,
-            "traceback": (
-                _home_relative_report_text(result.error_traceback)
-                if result.error_traceback is not None
-                else None
-            ),
-        }
-        if result.exception_chain:
-            failure["exception_chain"] = _serialize_exception_chain(result.exception_chain)
+    metrics = _build_jsonl_metrics_record(result, recommended_working_set_bytes)
+    failure = _build_jsonl_failure_record(result, assessment.execution)
 
     prompt_diagnostics = _prompt_diagnostics_to_json(result.prompt_diagnostics)
     record: JsonlResultRecord = {
