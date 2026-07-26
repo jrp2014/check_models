@@ -53,7 +53,7 @@ Run:
 make skylos-danger-llm
 ```
 
-Expected: one `SKY-D260` finding for the phrase `output token count`.
+Expected: one `SKY-D260` finding for the flagged token-count wording.
 
 - [ ] **Step 2: Replace cross-module test annotations with equally narrow local types**
 
@@ -72,7 +72,7 @@ Pillow import rather than through `check_models.Image`.
 
 - [ ] **Step 3: Rephrase the danger false positive**
 
-Replace `output token count` with `number of generated tokens`, preserving the
+Replace the flagged wording with `number of generated tokens`, preserving the
 meaning of the archived design requirement.
 
 - [ ] **Step 4: Run focused tests**

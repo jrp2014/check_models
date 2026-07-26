@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Literal
 
 import pytest
 
 import check_models
+
+type ExpectedExecutionStatus = Literal["completed", "crashed", "indeterminate"]
 
 
 @dataclass
@@ -390,7 +393,7 @@ def test_contiguous_repetition_detector_ignores_distributed_reuse() -> None:
 def test_result_assessment_execution_statuses(
     success: bool,
     error_message: str | None,
-    expected: check_models.ExecutionStatus,
+    expected: ExpectedExecutionStatus,
 ) -> None:
     result = check_models.PerformanceResult(
         model_name="example/model",

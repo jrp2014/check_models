@@ -13,7 +13,7 @@ import sys
 from argparse import Namespace
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 from unittest.mock import patch
 
 import pytest
@@ -23,7 +23,6 @@ import check_models
 from check_models import (
     DiagnosticsArtifacts,
     GenerationQualityAnalysis,
-    LibraryVersionDict,
     PerformanceResult,
     RuntimeDiagnostics,
     _build_report_render_context,
@@ -36,6 +35,8 @@ from check_models import (
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
+
+type ExpectedUpstreamBoundary = Literal["not_started", "load_started", "generation_started"]
 
 THINKING_START_TOKEN = "<think>"
 THINKING_END_TOKEN = "</think>"
@@ -95,7 +96,7 @@ class _VerboseGeneration:
     diffusion_block_complete: bool = False
 
 
-def _stub_versions() -> LibraryVersionDict:
+def _stub_versions() -> dict[str, str | None]:
     return {
         "numpy": "1.0",
         "mlx": "0.1",
@@ -419,7 +420,7 @@ def _make_failure_with_details(
     traceback_str: str | None = None,
     captured_output: str | None = None,
     generated_text: str | None = None,
-    upstream_boundary: check_models.UpstreamBoundary = "generation_started",
+    upstream_boundary: ExpectedUpstreamBoundary = "generation_started",
 ) -> PerformanceResult:
     """Create a failure result with full error details for diagnostics tests."""
     generation = (

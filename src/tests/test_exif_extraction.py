@@ -110,7 +110,7 @@ def test_get_exif_data_downloads_http_image_with_urllib(
         return _FakeUrlImage()
 
     monkeypatch.setattr(check_models, "urlopen", fake_urlopen)
-    monkeypatch.setattr(check_models.Image, "open", fake_image_open)
+    monkeypatch.setattr(Image, "open", fake_image_open)
 
     exif_data = check_models.get_exif_data("https://example.com/test.jpg")
 

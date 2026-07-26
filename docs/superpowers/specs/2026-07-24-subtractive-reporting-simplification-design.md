@@ -257,7 +257,7 @@ The chooser shows:
 - current-run usability;
 - valid generation speed;
 - peak memory;
-- output token count;
+- number of generated tokens;
 - concise mechanical observations;
 - a short preview linked to the complete output.
 

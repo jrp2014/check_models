@@ -8,7 +8,7 @@ import json
 import logging
 import time
 from contextlib import ExitStack
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 from unittest.mock import patch
 
 import pytest
@@ -30,6 +30,19 @@ if TYPE_CHECKING:  # pragma: no cover - only for type hints
     from pathlib import Path
 
     from rich.panel import Panel
+
+type ExpectedObservationCode = Literal[
+    "empty_output",
+    "minimal_output",
+    "repeated_output",
+    "missing_requested_sections",
+    "token_cap_truncation",
+    "prompt_instruction_echo",
+    "unexpected_special_token",
+    "thinking_trace_present",
+    "thinking_trace_incomplete",
+    "no_keyword_overlap",
+]
 
 
 class _StubGeneration:
@@ -725,7 +738,7 @@ def test_log_summary_lists_every_observation_kind(
 ) -> None:
     """Observation summaries must not silently drop lower-frequency kinds."""
     caplog.set_level(logging.INFO)
-    observations: tuple[check_models.ObservationCode, ...] = (
+    observations: tuple[ExpectedObservationCode, ...] = (
         "minimal_output",
         "missing_requested_sections",
         "prompt_instruction_echo",
