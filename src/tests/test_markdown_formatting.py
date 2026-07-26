@@ -72,6 +72,43 @@ def test_complete_diagnostics_evidence_uses_a_non_truncating_safe_fence() -> Non
     assert "truncated" not in rendered.casefold()
 
 
+def test_shared_report_blocks_render_links_and_safe_model_output() -> None:
+    """Shared reports should link internally and retain readable, inert model text."""
+    captured = "## Heading\n\n- first\n- second\n\n@mlx-user <script>bad()</script>"
+    blocks: tuple[check_models.ReportBlock, ...] = (
+        check_models.ReportTable(
+            headers=("Model",),
+            rows=((check_models.ReportLink("org/model", "diagnostic-org-model"),),),
+        ),
+        check_models.ReportModelOutput(captured),
+    )
+
+    markdown = "\n".join(check_models.render_report_markdown(blocks))
+    html_output = "\n".join(check_models.render_report_html(blocks))
+
+    assert "[org/model](#diagnostic-org-model)" in markdown
+    assert "> ## Heading" in markdown
+    assert "> - first" in markdown
+    assert r"\@mlx-user" in markdown
+    assert "&lt;script&gt;bad()&lt;/script&gt;" in markdown
+    assert "<summary>Exact raw output</summary>" in markdown
+    assert captured in markdown
+    assert '<a href="#diagnostic-org-model">org/model</a>' in html_output
+    assert "&lt;script&gt;bad()&lt;/script&gt;" in html_output
+
+
+def test_model_output_raw_fence_preserves_difficult_text_exactly_once() -> None:
+    """The exact view must preserve whitespace and outgrow nested backtick fences."""
+    captured = "prefix\tvalue  \n````text\n`nested`\n````\ntrailing "
+
+    markdown = "\n".join(
+        check_models.render_report_markdown((check_models.ReportModelOutput(captured),))
+    )
+
+    assert markdown.count(captured) == 1
+    assert "`````text\n" + captured + "\n`````" in markdown
+
+
 # ── Bare URL wrapping (MD034) tests ────────────────────────────────────────
 
 _BARE_URL_RE = re.compile(r"(?<![<(])https?://")

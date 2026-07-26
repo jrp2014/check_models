@@ -1912,11 +1912,22 @@ class ReportBulletList:
 
 
 @dataclass(frozen=True)
+class ReportLink:
+    """Internal report link rendered safely in Markdown and HTML."""
+
+    label: str
+    anchor: str
+
+
+type ReportCell = str | ReportLink
+
+
+@dataclass(frozen=True)
 class ReportTable:
     """Simple table block with renderer-specific escaping."""
 
     headers: tuple[str, ...]
-    rows: tuple[tuple[str, ...], ...]
+    rows: tuple[tuple[ReportCell, ...], ...]
     markdown_escaped: bool = False
 
 
@@ -1933,7 +1944,7 @@ class ReportDetails:
     """Collapsible details block for technical evidence."""
 
     summary: str
-    blocks: tuple[object, ...]
+    blocks: tuple[ReportBlock, ...]
 
 
 @dataclass(frozen=True)
@@ -1949,9 +1960,30 @@ class ReportSection:
     """Shared report section rendered into Markdown or HTML at artifact boundaries."""
 
     title: str
-    blocks: tuple[object, ...] = ()
+    blocks: tuple[ReportBlock, ...] = ()
     level: int = 2
     divider: bool = False
+
+
+@dataclass(frozen=True)
+class ReportModelOutput:
+    """Readable presentation plus exact raw captured model output."""
+
+    content: str
+    raw_summary: str = "Exact raw output"
+
+
+type ReportBlock = (
+    ReportParagraph
+    | ReportKeyValues
+    | ReportBulletList
+    | ReportTable
+    | ReportCodeBlock
+    | ReportDetails
+    | ReportRaw
+    | ReportSection
+    | ReportModelOutput
+)
 
 
 class UnsupportedReportBlockError(TypeError):
@@ -2018,12 +2050,21 @@ def _render_report_table_markdown(block: ReportTable) -> list[str]:
         if block.markdown_escaped
         else [MARKDOWN_ESCAPER.escape(header) for header in block.headers]
     )
-    escaped_rows = (
-        list(block.rows)
-        if block.markdown_escaped
-        else [tuple(MARKDOWN_ESCAPER.escape(cell) for cell in row) for row in block.rows]
-    )
+    escaped_rows = [
+        tuple(_render_report_cell_markdown(cell, escaped=block.markdown_escaped) for cell in row)
+        for row in block.rows
+    ]
     return [*tabulate(escaped_rows, headers=escaped_headers, tablefmt="github").splitlines(), ""]
+
+
+def _render_report_cell_markdown(cell: ReportCell, *, escaped: bool) -> str:
+    """Render one table cell as safe Markdown."""
+    if isinstance(cell, ReportLink):
+        label = html.escape(cell.label, quote=False).replace("\\", "\\\\")
+        label = label.replace("[", r"\[").replace("]", r"\]")
+        anchor = html.escape(cell.anchor, quote=True).replace("(", "%28").replace(")", "%29")
+        return f"[{label}](#{anchor})"
+    return cell if escaped else MARKDOWN_ESCAPER.escape(cell)
 
 
 def _render_report_raw_markdown(block: ReportRaw) -> list[str]:
@@ -2034,7 +2075,23 @@ def _render_report_raw_markdown(block: ReportRaw) -> list[str]:
     return raw_lines
 
 
-def _render_report_markdown_block(block: object) -> list[str]:
+def _render_report_model_output_markdown(block: ReportModelOutput) -> list[str]:
+    """Render readable model Markdown and a byte-preserving collapsed raw view."""
+    presentation = html.escape(block.content, quote=False).replace("@", r"\@")
+    rendered = [f"{_markdown_emphasis('Readable output:')}", ""]
+    rendered.extend(
+        ">" if not line else f"> {line.rstrip()}  " for line in presentation.split("\n")
+    )
+    rendered.append("")
+    _append_markdown_details_block(
+        rendered,
+        summary=block.raw_summary,
+        body_lines=render_report_markdown((ReportCodeBlock(block.content),)),
+    )
+    return rendered
+
+
+def _render_report_markdown_block(block: ReportBlock) -> list[str]:
     """Render one shared report block as Markdown."""
     rendered: list[str]
     if isinstance(block, ReportSection):
@@ -2056,17 +2113,19 @@ def _render_report_markdown_block(block: object) -> list[str]:
         _append_markdown_details_block(rendered, summary=block.summary, body_lines=body_lines)
     elif isinstance(block, ReportRaw):
         rendered = _render_report_raw_markdown(block)
+    elif isinstance(block, ReportModelOutput):
+        rendered = _render_report_model_output_markdown(block)
     else:
         raise UnsupportedReportBlockError(block)
     return rendered
 
 
-def _append_report_markdown_block(parts: list[str], block: object) -> None:
+def _append_report_markdown_block(parts: list[str], block: ReportBlock) -> None:
     """Append one shared report block as Markdown."""
     parts.extend(_render_report_markdown_block(block))
 
 
-def render_report_markdown(blocks: Sequence[object]) -> list[str]:
+def render_report_markdown(blocks: Sequence[ReportBlock]) -> list[str]:
     """Render shared report blocks to GitHub-flavoured Markdown lines."""
     parts: list[str] = []
     for block in blocks:
@@ -2111,10 +2170,17 @@ def _render_report_table_html(block: ReportTable) -> list[str]:
     rendered.extend(["</tr>", "</thead>", "<tbody>"])
     for row in block.rows:
         rendered.append("<tr>")
-        rendered.extend(f"<td>{html.escape(cell)}</td>" for cell in row)
+        rendered.extend(f"<td>{_render_report_cell_html(cell)}</td>" for cell in row)
         rendered.append("</tr>")
     rendered.extend(["</tbody>", "</table>"])
     return rendered
+
+
+def _render_report_cell_html(cell: ReportCell) -> str:
+    """Render one table cell as escaped HTML."""
+    if isinstance(cell, ReportLink):
+        return f'<a href="#{html.escape(cell.anchor, quote=True)}">{html.escape(cell.label)}</a>'
+    return html.escape(cell)
 
 
 def _render_report_details_html(block: ReportDetails) -> list[str]:
@@ -2126,7 +2192,20 @@ def _render_report_details_html(block: ReportDetails) -> list[str]:
     return rendered
 
 
-def _render_report_html_block(block: object) -> list[str]:
+def _render_report_model_output_html(block: ReportModelOutput) -> list[str]:
+    """Render readable and exact escaped model output in HTML."""
+    escaped_content = html.escape(block.content)
+    return [
+        "<p><b>Readable output:</b></p>",
+        f'<pre class="model-output-readable">{escaped_content}</pre>',
+        "<details>",
+        f"<summary>{html.escape(block.raw_summary)}</summary>",
+        f'<pre><code class="language-text">{escaped_content}</code></pre>',
+        "</details>",
+    ]
+
+
+def _render_report_html_block(block: ReportBlock) -> list[str]:
     """Render one shared report block to escaped HTML lines."""
     rendered: list[str]
     if isinstance(block, ReportSection):
@@ -2146,12 +2225,14 @@ def _render_report_html_block(block: object) -> list[str]:
         rendered = _render_report_details_html(block)
     elif isinstance(block, ReportRaw):
         rendered = list(block.html_lines)
+    elif isinstance(block, ReportModelOutput):
+        rendered = _render_report_model_output_html(block)
     else:
         raise UnsupportedReportBlockError(block)
     return rendered
 
 
-def render_report_html(blocks: Sequence[object]) -> list[str]:
+def render_report_html(blocks: Sequence[ReportBlock]) -> list[str]:
     """Render shared report blocks to escaped HTML lines."""
     parts: list[str] = []
     for block in blocks:
@@ -7419,7 +7500,7 @@ def _append_markdown_section(
             rendered_body.extend(_wrap_markdown_text(body_line))
         rendered_body.append("")
 
-    blocks: tuple[object, ...] = (
+    blocks: tuple[ReportBlock, ...] = (
         (ReportRaw(markdown_lines=tuple(rendered_body)),) if rendered_body else ()
     )
     parts.extend(
