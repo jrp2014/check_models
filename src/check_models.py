@@ -13425,6 +13425,111 @@ def _log_rich_metric_chart(
     _log_rich_renderable(chart, indent="   ")
 
 
+@dataclass(frozen=True)
+class ModelComparisonData:
+    """Prepared rows and ranking inputs for the current-run comparison summary."""
+
+    rows: tuple[tuple[str, ...], ...]
+    tps_entries: tuple[tuple[str, float], ...]
+    total_time_entries: tuple[tuple[str, float], ...]
+    crashed: tuple[PerformanceResult, ...]
+
+
+def _model_comparison_sort_key(
+    result: PerformanceResult,
+    assessments: Mapping[str, ResultAssessment],
+) -> tuple[int, float, str]:
+    """Sort completed runs first, then generation speed and model name."""
+    assessment = assessments[result.model_name]
+    execution_order = {"completed": 0, "crashed": 1, "indeterminate": 2}
+    return (
+        execution_order[assessment.execution],
+        -(_valid_generation_tps(result) or 0.0),
+        result.model_name,
+    )
+
+
+def _model_comparison_row(
+    index: int,
+    result: PerformanceResult,
+    assessment: ResultAssessment,
+) -> tuple[str, ...]:
+    """Build one fixed-width console comparison row from captured metrics."""
+    runtime = result.runtime_diagnostics
+    tps = _valid_generation_tps(result)
+    peak_memory = _generation_optional_nonnegative_float_metric(result.generation, "peak_memory")
+    model_load_time = (
+        runtime.model_load_time_s
+        if runtime is not None and runtime.model_load_time_s is not None
+        else result.model_load_time
+    )
+    execution_code = {"completed": "C", "crashed": "X", "indeterminate": "I"}[assessment.execution]
+    usability_code = {
+        "usable": "U",
+        "usable_with_caveats": "C",
+        "unusable": "X",
+        "not_evaluated": "-",
+    }[assessment.usability]
+    return (
+        str(index),
+        _short_model_label(result.model_name, max_len=21),
+        f"{execution_code}/{usability_code}",
+        _format_float_or_dash(runtime.input_validation_time_s if runtime is not None else None),
+        _format_float_or_dash(model_load_time),
+        _format_float_or_dash(runtime.prompt_prep_time_s if runtime is not None else None),
+        _format_float_or_dash(runtime.first_token_latency_s if runtime is not None else None),
+        _format_float_or_dash(_runtime_generation_residual_time_s(runtime)),
+        _format_float_or_dash(runtime.cleanup_time_s if runtime is not None else None),
+        _format_float_or_dash(result.total_time),
+        _format_float_or_dash(tps, digits=1),
+        _format_float_or_dash(
+            peak_memory if peak_memory is not None and peak_memory > 0 else None,
+            digits=2,
+        ),
+    )
+
+
+def _collect_model_comparison_data(
+    results: Sequence[PerformanceResult],
+    assessments: Mapping[str, ResultAssessment],
+) -> ModelComparisonData:
+    """Collect display rows, ranking samples, and crashes in one ordered pass."""
+    rows: list[tuple[str, ...]] = []
+    tps_entries: list[tuple[str, float]] = []
+    total_time_entries: list[tuple[str, float]] = []
+    crashed: list[PerformanceResult] = []
+    sorted_results = sorted(
+        results, key=lambda result: _model_comparison_sort_key(result, assessments)
+    )
+
+    for index, result in enumerate(sorted_results, start=1):
+        assessment = assessments[result.model_name]
+        rows.append(_model_comparison_row(index, result, assessment))
+        eligible = assessment.execution == "completed" and assessment.usability in {
+            "usable",
+            "usable_with_caveats",
+        }
+        tps = _valid_generation_tps(result)
+        if eligible and tps is not None:
+            tps_entries.append((result.model_name, tps))
+        if (
+            eligible
+            and result.total_time is not None
+            and math.isfinite(result.total_time)
+            and result.total_time > 0
+        ):
+            total_time_entries.append((result.model_name, result.total_time))
+        if assessment.execution == "crashed":
+            crashed.append(result)
+
+    return ModelComparisonData(
+        rows=tuple(rows),
+        tps_entries=tuple(tps_entries),
+        total_time_entries=tuple(total_time_entries),
+        crashed=tuple(crashed),
+    )
+
+
 def _log_model_comparison_table_and_charts(
     results: list[PerformanceResult],
     *,
@@ -13435,75 +13540,7 @@ def _log_model_comparison_table_and_charts(
     if not results:
         return
 
-    def _sort_key(result: PerformanceResult) -> tuple[int, float, str]:
-        assessment = assessments[result.model_name]
-        execution_order = {"completed": 0, "crashed": 1, "indeterminate": 2}
-        tps = _valid_generation_tps(result) or 0.0
-        return (execution_order[assessment.execution], -tps, result.model_name)
-
-    sorted_results = sorted(results, key=_sort_key)
-    rows: list[tuple[str, ...]] = []
-    tps_entries: list[tuple[str, float]] = []
-    total_time_entries: list[tuple[str, float]] = []
-    crashed: list[PerformanceResult] = []
-
-    for idx, res in enumerate(sorted_results, start=1):
-        model_label = _short_model_label(res.model_name, max_len=21)
-        assessment = assessments[res.model_name]
-        tps = _valid_generation_tps(res)
-        peak_mem = _generation_optional_nonnegative_float_metric(res.generation, "peak_memory")
-        runtime = res.runtime_diagnostics
-        execution_code = {"completed": "C", "crashed": "X", "indeterminate": "I"}[
-            assessment.execution
-        ]
-        usability_code = {
-            "usable": "U",
-            "usable_with_caveats": "C",
-            "unusable": "X",
-            "not_evaluated": "-",
-        }[assessment.usability]
-        rows.append(
-            (
-                str(idx),
-                model_label,
-                f"{execution_code}/{usability_code}",
-                _format_float_or_dash(
-                    runtime.input_validation_time_s if runtime is not None else None
-                ),
-                _format_float_or_dash(
-                    runtime.model_load_time_s
-                    if runtime is not None and runtime.model_load_time_s is not None
-                    else res.model_load_time
-                ),
-                _format_float_or_dash(runtime.prompt_prep_time_s if runtime is not None else None),
-                _format_float_or_dash(
-                    runtime.first_token_latency_s if runtime is not None else None
-                ),
-                _format_float_or_dash(_runtime_generation_residual_time_s(runtime)),
-                _format_float_or_dash(runtime.cleanup_time_s if runtime is not None else None),
-                _format_float_or_dash(res.total_time),
-                _format_float_or_dash(tps, digits=1),
-                _format_float_or_dash(
-                    peak_mem if peak_mem is not None and peak_mem > 0 else None,
-                    digits=2,
-                ),
-            ),
-        )
-        eligible_for_ranking = assessment.execution == "completed" and assessment.usability in {
-            "usable",
-            "usable_with_caveats",
-        }
-        if eligible_for_ranking and tps is not None:
-            tps_entries.append((res.model_name, tps))
-        if (
-            eligible_for_ranking
-            and res.total_time is not None
-            and math.isfinite(res.total_time)
-            and res.total_time > 0
-        ):
-            total_time_entries.append((res.model_name, res.total_time))
-        if assessment.execution == "crashed":
-            crashed.append(res)
+    comparison = _collect_model_comparison_data(results, assessments)
 
     logger.info("📋 Model Comparison (current run):")
     if recommended_working_set_bytes is not None:
@@ -13529,17 +13566,22 @@ def _log_model_comparison_table_and_charts(
         "TPS",
         "GB",
     )
-    for row in rows:
+    for row in comparison.rows:
         logger.info(
             "   %2s %-21s %-3s %5s %5s %5s %5s %5s %5s %5s %5s %5s",
             *row,
         )
 
-    if tps_entries:
+    if comparison.tps_entries:
         log_blank()
-        _log_rich_metric_chart("📊 TPS comparison chart:", tps_entries, unit=" tps", digits=1)
-    if len(total_time_entries) >= MIN_MODELS_FOR_EFFICIENCY_CHART:
-        inverted = [(name, 1.0 / value) for name, value in total_time_entries if value > 0]
+        _log_rich_metric_chart(
+            "📊 TPS comparison chart:",
+            comparison.tps_entries,
+            unit=" tps",
+            digits=1,
+        )
+    if len(comparison.total_time_entries) >= MIN_MODELS_FOR_EFFICIENCY_CHART:
+        inverted = [(name, 1.0 / value) for name, value in comparison.total_time_entries]
         _log_rich_metric_chart(
             "⏱ Efficiency chart (higher is faster overall):",
             inverted,
@@ -13547,14 +13589,82 @@ def _log_model_comparison_table_and_charts(
             digits=3,
         )
 
-    if crashed:
-        stage_counts = Counter(res.error_stage or "Unknown" for res in crashed)
+    if comparison.crashed:
+        stage_counts = Counter(result.error_stage or "Unknown" for result in comparison.crashed)
         _log_rich_metric_chart(
             "❌ Failure stage frequency:",
             [(stage, float(count)) for stage, count in stage_counts.items()],
             unit=" x",
             digits=0,
         )
+
+
+type PerformanceMetricSample = tuple[PerformanceResult, float]
+
+
+@dataclass(frozen=True)
+class PerformanceMetricSamples:
+    """Validated samples used by the performance-highlight summary."""
+
+    tps: tuple[PerformanceMetricSample, ...]
+    memory: tuple[PerformanceMetricSample, ...]
+    load: tuple[PerformanceMetricSample, ...]
+
+
+def _collect_performance_metric_samples(
+    results: Sequence[PerformanceResult],
+) -> PerformanceMetricSamples:
+    """Collect finite, domain-valid samples for each highlighted metric."""
+    tps = tuple(
+        (result, value)
+        for result in results
+        if (value := _valid_generation_tps(result)) is not None and math.isfinite(value)
+    )
+    memory = tuple(
+        (result, value)
+        for result in results
+        if (
+            value := _generation_optional_nonnegative_float_metric(
+                result.generation,
+                "peak_memory",
+            )
+        )
+        is not None
+        and value > 0
+        and math.isfinite(value)
+    )
+    load = tuple(
+        (result, result.model_load_time)
+        for result in results
+        if result.model_load_time is not None
+        and result.model_load_time >= 0
+        and math.isfinite(result.model_load_time)
+    )
+    return PerformanceMetricSamples(tps=tps, memory=memory, load=load)
+
+
+def _log_image_memory_highlights(
+    results: Sequence[PerformanceResult],
+    image_profile: ImageInputProfile | None,
+) -> None:
+    """Log image-relative peak-memory facts when both inputs are captured."""
+    if image_profile is None or image_profile.megapixels <= 0:
+        return
+    peak_deltas_gb = tuple(
+        delta
+        for result in results
+        if (delta := _peak_memory_delta_from_model_load_gb(result)) is not None
+    )
+    if not peak_deltas_gb:
+        return
+
+    average_delta_gb = sum(peak_deltas_gb) / len(peak_deltas_gb)
+    logger.info("   Input image size: %.2f MP", image_profile.megapixels)
+    logger.info("   Average peak delta from post-load: %.2f GB", average_delta_gb)
+    logger.info(
+        "   Peak memory delta / MP: %.0f MB/MP",
+        average_delta_gb * 1024 / image_profile.megapixels,
+    )
 
 
 def _log_performance_highlights(
@@ -13567,62 +13677,38 @@ def _log_performance_highlights(
     if not eligible_results:
         return
 
-    tps_values = [
-        (result, tps)
-        for result in eligible_results
-        if (tps := _valid_generation_tps(result)) is not None and math.isfinite(tps)
-    ]
-    memory_values = [
-        (result, memory)
-        for result in eligible_results
-        if (
-            memory := _generation_optional_nonnegative_float_metric(
-                result.generation,
-                "peak_memory",
-            )
-        )
-        is not None
-        and memory > 0
-        and math.isfinite(memory)
-    ]
-    load_values = [
-        (result, result.model_load_time)
-        for result in eligible_results
-        if result.model_load_time is not None
-        and result.model_load_time >= 0
-        and math.isfinite(result.model_load_time)
-    ]
-    if not tps_values and not memory_values and not load_values:
+    samples = _collect_performance_metric_samples(eligible_results)
+    if not samples.tps and not samples.memory and not samples.load:
         return
 
     logger.info("🏆 Performance Highlights:")
-    if tps_values:
-        fastest, fastest_tps = max(tps_values, key=lambda item: item[1])
+    if samples.tps:
+        fastest, fastest_tps = max(samples.tps, key=lambda item: item[1])
         logger.info("   Fastest: %s (%.1f tps)", fastest.model_name, fastest_tps)
         logger.info(
             "   📊 Average TPS: %.1f across %d models",
-            sum(tps for _result, tps in tps_values) / len(tps_values),
-            len(tps_values),
+            sum(tps for _result, tps in samples.tps) / len(samples.tps),
+            len(samples.tps),
         )
-    if memory_values:
-        most_efficient, efficient_memory = min(memory_values, key=lambda item: item[1])
+    if samples.memory:
+        most_efficient, efficient_memory = min(samples.memory, key=lambda item: item[1])
         logger.info(
             "   💾 Lowest peak memory: %s (%.1f GB)",
             most_efficient.model_name,
             efficient_memory,
         )
-    if load_values:
-        fastest_load, load_time = min(load_values, key=lambda item: item[1])
+    if samples.load:
+        fastest_load, load_time = min(samples.load, key=lambda item: item[1])
         logger.info("   ⚡ Fastest load: %s (%.2fs)", fastest_load.model_name, load_time)
 
-    if memory_values:
-        average_peak_memory = sum(value for _result, value in memory_values) / len(memory_values)
+    if samples.memory:
+        average_peak_memory = sum(value for _result, value in samples.memory) / len(samples.memory)
         total_tokens = sum(
             _generation_nonnegative_int_metric(result.generation, "prompt_tokens")
             + _generation_nonnegative_int_metric(result.generation, "generation_tokens")
-            for result, _memory in memory_values
+            for result, _memory in samples.memory
         )
-        total_memory = sum(value for _result, value in memory_values)
+        total_memory = sum(value for _result, value in samples.memory)
         logger.info("📈 Resource Usage:")
         logger.info(
             "   Average peak memory: %s",
@@ -13633,20 +13719,7 @@ def _log_performance_highlights(
         )
         logger.info("   Memory efficiency: %.0f tokens/GB", total_tokens / total_memory)
 
-    if image_profile is not None and image_profile.megapixels > 0:
-        peak_deltas_gb = [
-            delta
-            for result in eligible_results
-            if (delta := _peak_memory_delta_from_model_load_gb(result)) is not None
-        ]
-        if peak_deltas_gb:
-            average_delta_gb = sum(peak_deltas_gb) / len(peak_deltas_gb)
-            logger.info("   Input image size: %.2f MP", image_profile.megapixels)
-            logger.info("   Average peak delta from post-load: %.2f GB", average_delta_gb)
-            logger.info(
-                "   Peak memory delta / MP: %.0f MB/MP",
-                average_delta_gb * 1024 / image_profile.megapixels,
-            )
+    _log_image_memory_highlights(eligible_results, image_profile)
 
 
 def _log_failed_models_summary(failed: list[PerformanceResult]) -> None:
