@@ -5,6 +5,15 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Preserve the production PEP 695 aliases while using equally narrow test-local
+  types that Skylos can resolve, and simplify four gallery, console-summary, and
+  JSONL builders below the configured complexity threshold without suppressions
+  or output-contract changes.
+- Document the ignored repo-local Node lockfile bootstrap required in fresh Git
+  worktrees before running dependency-policy or Markdown-lint checks.
+
 ## [0.8.9] - 2026-07-26
 
 ### Changed

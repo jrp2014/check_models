@@ -15,6 +15,17 @@ If the environment doesn't exist: `bash src/tools/setup_conda_env.sh`.
 For one-off commands without activating: `conda run -n mlx-vlm python ...`.
 **Never run bare `python` without the conda environment active.**
 
+For every fresh Git worktree, also bootstrap the ignored repo-local Node lockfile
+before running the quality gate:
+
+```bash
+npm install --ignore-scripts --prefix src
+```
+
+`src/package-lock.json` is deliberately untracked, but dependency-policy and
+Markdown-lint tests require a local copy. A missing lockfile in a fresh worktree
+is a setup failure, not a product regression.
+
 ### 2. Key files (read before editing)
 
 | File | Purpose | Size |
