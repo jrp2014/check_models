@@ -68,3 +68,25 @@ exclusion will be added.
 5. Require `make skylos-danger-llm` to report zero findings.
 6. Confirm no lint suppression, Skylos ignore, threshold, or tracked output change
    was introduced.
+
+## Follow-up archival
+
+After the Skylos cleanup is verified, reduce active maintenance surface without
+discarding useful history:
+
+- retire `src/tools/qwen3_vl_sequential_repro.py`, the only manual one-off
+  reproducer not used by Make, CI, hooks, setup, updates, or maintained analysis;
+- replace its active documentation and dedicated test references with one concise
+  historical note under `docs/notes/archive/`;
+- move completed Superpowers plans and specifications dated before 26 July 2026
+  into `docs/notes/archive/superpowers/`, while retaining the current Skylos plan
+  and design in their active directories;
+- delete the two byte-for-byte duplicate suppression-audit files whose names end
+  in `2.md` instead of retaining duplicate archive copies;
+- move the stale May 2026 Skylos quality backlog into `docs/notes/archive/` and
+  update the notes index;
+- retain the still-valid GPS/EXIF reference and every operational tool with an
+  active automation, setup, update, or maintained-analysis role.
+
+Archival must not change runtime behavior, generated output artifacts, or quality
+policy. Git history remains the authoritative source for the retired executable.
