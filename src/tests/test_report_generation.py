@@ -1800,7 +1800,7 @@ class TestHtmlReportEdgeCases:
 
         content = out.read_text(encoding="utf-8")
         escaped = html.escape(output, quote=True)
-        assert content.count(escaped) == 1
+        assert content.count(escaped) == 2
         match = re.search(
             r"<details><summary>Complete evidence: org/evidence</summary>.*?"
             r"Complete generated output.*?<pre><code[^>]*>(.*?)</code></pre>",
@@ -1809,6 +1809,40 @@ class TestHtmlReportEdgeCases:
         )
         assert match is not None
         assert html.unescape(match.group(1)) == output
+
+    def test_html_gallery_renders_readable_and_exact_escaped_model_output(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """HTML should expose both readable preformatted text and collapsed exact evidence."""
+        output = "## Title\n\n- cat\n\n@maintainer <details>unsafe</details>"
+        result = replace(
+            _make_success("org/formatted"),
+            generation=_MockGeneration(text=output, generation_tokens=80),
+        )
+        context = _build_report_render_context(results=[result], prompt="Describe.")
+        out = tmp_path / "formatted.html"
+
+        generate_html_report(
+            [result],
+            out,
+            _stub_versions(),
+            "Describe.",
+            1.0,
+            report_context=context,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        escaped = html.escape(output, quote=True)
+        model_entry = re.search(
+            r'<article id="model-org-formatted">.*?</article>',
+            content,
+            flags=re.DOTALL,
+        )
+        assert model_entry is not None
+        assert f'<pre class="model-output-readable">{escaped}</pre>' in model_entry.group(0)
+        assert "<summary>Exact raw output</summary>" in model_entry.group(0)
+        assert model_entry.group(0).count(escaped) == 2
 
     def test_html_contains_gallery_and_diagnostics_without_semantic_scores(
         self,
@@ -2494,11 +2528,11 @@ class TestMarkdownGalleryReport:
         assert "not_evaluated" in chooser
         assert "boom" in chooser
 
-    def test_gallery_keeps_complete_output_once_in_expandable_code_block(
+    def test_gallery_keeps_exact_output_in_expandable_code_block(
         self,
         tmp_path: Path,
     ) -> None:
-        """The gallery should keep full evidence once without making the summary unwieldy."""
+        """The gallery should keep exact evidence without making the chooser unwieldy."""
         complete_text = (
             "**BEGIN:** *model emphasis* " + ("distinct middle evidence " * 30) + "END-SENTINEL"
         )
@@ -2545,7 +2579,8 @@ class TestMarkdownGalleryReport:
         assert "Observations" in chooser
         assert "<summary>Complete evidence: org/complete-output</summary>" in content
         assert "```text" in content
-        assert content.count("END-SENTINEL") == 1
+        assert content.count(f"```text\n{complete_text}\n```") == 1
+        assert content.count("END-SENTINEL") == 2
 
     def test_gallery_includes_all_model_output_and_cost_summary(
         self,
@@ -2721,6 +2756,46 @@ class TestMarkdownGalleryReport:
         assert "````text\n" in evidence
         assert complete_text in evidence
         assert content.count(complete_text) == 1
+
+    def test_gallery_preserves_preview_lines_and_readable_model_formatting(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Chooser previews and complete evidence should retain useful line structure."""
+        formatted_output = (
+            "## Title\n\n"
+            "Two cats resting\n\n"
+            "- pink sofa\n"
+            "- remote control\n\n"
+            "@maintainer <details>unsafe</details>\n"
+            "```text\nnested\n```"
+        )
+        result = replace(
+            _make_success("org/formatted"),
+            generation=_MockGeneration(text=formatted_output, generation_tokens=80),
+        )
+        context = _build_report_render_context(results=[result], prompt="Describe the image.")
+        out = tmp_path / "model_gallery.md"
+
+        generate_markdown_gallery_report(
+            results=[result],
+            filename=out,
+            prompt="Describe the image.",
+            report_context=context,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        chooser = _extract_markdown_subsection(
+            content,
+            "## Current-run Chooser",
+            end_headings=("## Avoid for This Run",),
+        )
+        assert "## Title<br><br>Two cats resting" in chooser
+        assert "> ## Title" in content
+        assert "> - pink sofa" in content
+        assert r"\@maintainer &lt;details&gt;unsafe&lt;/details&gt;" in content
+        assert "<summary>Exact raw output</summary>" in content
+        assert content.count(formatted_output) == 1
 
     def test_short_generation_is_not_valid_throughput_but_keeps_raw_metrics(
         self,

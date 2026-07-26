@@ -195,8 +195,9 @@ def test_gallery_output_uses_expandable_fenced_evidence() -> None:
 
     assert "<summary>Complete evidence: test/model</summary>" in md
     assert "```text\nalpha\n\nbeta\n```" in md
-    assert md.count("alpha") == 1
-    assert md.count("beta") == 1
+    assert "> alpha" in md
+    assert "> beta" in md
+    assert md.count("```text\nalpha\n\nbeta\n```") == 1
 
 
 def test_gallery_anchor_and_heading_are_separated_by_blank_line() -> None:

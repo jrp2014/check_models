@@ -2544,10 +2544,10 @@ def _render_gallery_model(
 
     if result.success:
         output = _generation_text_value(generation)
-        out.extend([_markdown_emphasis("Complete generated output:"), ""])
         if not output:
-            out.extend(["empty output", ""])
-        _append_markdown_code_block(out, output)
+            out.extend([_markdown_emphasis("Complete generated output:"), "", "empty output", ""])
+        else:
+            out.extend(render_report_markdown((ReportModelOutput(output),)))
     else:
         out.extend([_markdown_emphasis("Complete traceback:"), ""])
         if result.error_traceback:
@@ -6851,7 +6851,7 @@ def _gallery_row(result: PerformanceResult, assessment: ResultAssessment) -> Gal
             or "no failure evidence captured"
         )
     output_preview = _truncate_text_preview(
-        _collapse_preview_whitespace(preview_source),
+        _collapse_preview_line_whitespace(preview_source),
         max_chars=MAX_OUTPUT_PREVIEW_CHARS,
     )
     peak_memory = _generation_float_metric(generation, "peak_memory")
@@ -8510,7 +8510,8 @@ def _html_gallery_model(
         parts.append("<h4>Complete generated output</h4>")
         if not output:
             parts.append("<p>empty output</p>")
-        parts.append(_html_code_block(output))
+        else:
+            parts.extend(render_report_html((ReportModelOutput(output),)))
     else:
         parts.extend(
             (
@@ -13372,6 +13373,12 @@ def _truncate_text_preview(text: str, *, max_chars: int) -> str:
 def _collapse_preview_whitespace(text: str) -> str:
     """Flatten whitespace for compact table/report previews."""
     return re.sub(r"\s+", " ", text).strip()
+
+
+def _collapse_preview_line_whitespace(text: str) -> str:
+    """Collapse horizontal whitespace while preserving source line boundaries."""
+    normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+    return "\n".join(" ".join(line.split()) for line in normalized.split("\n"))
 
 
 def _configured_output_wrappers(diagnostics: PromptDiagnostics | None) -> tuple[str, ...]:
