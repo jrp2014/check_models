@@ -81,7 +81,7 @@ torch = [
     "timm>=1.0.23",
 ]
 dev = [
-    "ruff>=0.1.0",
+    "ruff>=0.16.0",
     "mypy>=1.8.0",
     "ty",
     "pyrefly",
@@ -155,6 +155,7 @@ strict = false
 
 [tool.ruff]
 line-length = 100
+required-version = ">=0.16.0"
 exclude = [
     ".eggs",
     ".git",
@@ -184,8 +185,8 @@ quote-style = "double"
 skip-magic-trailing-comma = false
 
 [tool.ruff.lint]
-# Comprehensive linting - enable ALL rules, then selectively ignore conflicts
-# This is simpler and more maintainable than listing individual categories
+# Enable every stable rule in Ruff 0.16+ (including rules stabilised later), then
+# selectively ignore only formatter conflicts and documented project policies.
 select = ["ALL"]
 
 ignore = [

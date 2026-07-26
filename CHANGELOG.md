@@ -47,7 +47,9 @@ Notable changes to this project will be documented in this file.
 ### Fixed
 
 - Preserve EXIF capture wall clocks with their declared UTC offsets and avoid
-  repeating the extracted time in assisted prompts.
+  repeating the extracted time in assisted prompts; recognise Pillow's
+  `DateTimeDigitized` tag and omit unknown dates instead of substituting filesystem
+  modification time.
 - Preserve trailing whitespace inside fenced generated output, flag generic
   undeclared control wrappers while accepting tokenizer/EOS/thinking metadata,
   use repository-style Markdown emphasis, and keep compact run summaries
@@ -56,6 +58,12 @@ Notable changes to this project will be documented in this file.
   requested from resolved revisions in human reports, and sanitize operational paths
   in public failures, provenance, captured streams, and artifact manifests while
   retaining exact raw logs and model-generated text.
+
+### Tooling
+
+- Require Ruff 0.16 or newer and keep `select = ["ALL"]`, so every stable rule in
+  the supported Ruff release—and newly stabilised rules in later releases—is
+  enabled automatically.
 
 ## [0.8.0] - 2026-06-06
 

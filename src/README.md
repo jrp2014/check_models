@@ -299,8 +299,11 @@ tokens for a meaningful comparison.
 
 EXIF timestamps are interpreted as capture wall clocks rather than as UTC instants.
 When `OffsetTimeOriginal`, `OffsetTimeDigitized`, or `OffsetTime` accompanies the
-selected EXIF date field, that offset is retained. Complete generated output in the
-Markdown evidence artifacts is fenced and preserves tabs and trailing spaces.
+selected EXIF date field, that offset is retained. Pillow's `DateTimeDigitized` name
+and the `CreateDate` alias are both recognised. If no valid EXIF date is available,
+the prompt omits the date rather than treating filesystem modification time as
+capture metadata. Complete generated output in the Markdown evidence artifacts is
+fenced and preserves tabs and trailing spaces.
 
 Use `reports/model_gallery.md` for complete per-model evidence,
 `reports/diagnostics.md` for maintainer evidence and reproduction state,

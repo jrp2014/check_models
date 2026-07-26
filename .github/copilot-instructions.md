@@ -176,7 +176,7 @@ relevant `SKILL.md` **before** starting work of that kind.
 
 **Modify report output:**
 
-1. Edit `generate_html_report` or `generate_markdown_report` under `SECTION: REPORT GENERATORS & RUNTIME FINGERPRINTS`
+1. Edit `generate_html_report` or `generate_markdown_gallery_report` under `SECTION: REPORT GENERATORS & RUNTIME FINGERPRINTS`
 2. Update `src/output/` fixture files if test assertions reference them
 3. Run `pytest src/tests/test_html_formatting.py src/tests/test_markdown_formatting.py -q`
 

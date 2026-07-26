@@ -58,32 +58,26 @@ class _FakeUrlResponse:
         return self._payload
 
 
-def test_extract_exif_date_standard_format(tmp_path: Path) -> None:
+def test_extract_exif_date_standard_format() -> None:
     """Should parse standard EXIF datetime format."""
-    test_file = tmp_path / "test.jpg"
-    test_file.touch()
     exif_dict: dict[str | int, Any] = {"DateTime": "2024:01:15 14:30:45"}
-    result = check_models._extract_exif_date(test_file, exif_dict)
+    result, _ = check_models._extract_exif_datetime(exif_dict)
     assert result is not None
     assert "2024-01-15" in result
     assert "14:30:45" in result
 
 
-def test_extract_exif_datetime_preserves_wall_clock_with_declared_offset(
-    tmp_path: Path,
-) -> None:
+def test_extract_exif_datetime_preserves_wall_clock_with_declared_offset() -> None:
     """An EXIF offset describes the recorded wall clock; it must not shift it."""
-    test_file = tmp_path / "offset.jpg"
-    test_file.touch()
     exif_dict: dict[str | int, Any] = {
         "DateTimeOriginal": "2026:07:25 18:33:16",
         "OffsetTimeOriginal": "+01:00",
     }
 
-    assert check_models._extract_exif_date(test_file, exif_dict) == (
-        "2026-07-25 18:33:16 UTC+01:00"
+    assert check_models._extract_exif_datetime(exif_dict) == (
+        "2026-07-25 18:33:16 UTC+01:00",
+        "18:33:16",
     )
-    assert check_models._extract_exif_time(test_file, exif_dict) == "18:33:16"
 
 
 def test_process_exif_subifd_handles_non_int_tag_ids() -> None:
@@ -124,52 +118,72 @@ def test_get_exif_data_downloads_http_image_with_urllib(
     assert exif_data["ImageDescription"] == "Remote description"
 
 
-def test_extract_exif_date_datetime_original(tmp_path: Path) -> None:
+def test_extract_exif_date_datetime_original() -> None:
     """Should prefer DateTimeOriginal over DateTime."""
-    test_file = tmp_path / "test.jpg"
-    test_file.touch()
     exif_dict: dict[str | int, Any] = {
         "DateTime": "2024:01:15 14:30:45",
         "DateTimeOriginal": "2024:01:10 10:20:30",
     }
-    result = check_models._extract_exif_date(test_file, exif_dict)
+    result, _ = check_models._extract_exif_datetime(exif_dict)
     assert result is not None
     # Should use DateTimeOriginal (Jan 10) not DateTime (Jan 15)
     assert "2024-01-10" in result
 
 
-def test_extract_exif_date_create_date(tmp_path: Path) -> None:
+def test_extract_exif_date_create_date() -> None:
     """Should use CreateDate when DateTimeOriginal absent."""
-    test_file = tmp_path / "test.jpg"
-    test_file.touch()
     exif_dict: dict[str | int, Any] = {
         "CreateDate": "2024:01:12 12:00:00",
         "DateTime": "2024:01:15 14:30:45",
     }
-    result = check_models._extract_exif_date(test_file, exif_dict)
+    result, _ = check_models._extract_exif_datetime(exif_dict)
     assert result is not None
     # Should use CreateDate (Jan 12), which has priority over DateTime
     assert "2024-01-12" in result
 
 
-def test_extract_exif_date_fallback_to_mtime(tmp_path: Path) -> None:
-    """Should fallback to file mtime when no date fields present."""
+def test_pillow_datetime_digitized_precedes_generic_datetime(tmp_path: Path) -> None:
+    """Pillow's real digitized-date tag should supply the capture wall clock."""
+    test_file = tmp_path / "digitized.jpg"
+    exif = Image.Exif()
+    exif[0x0132] = "2024:01:15 14:30:45"
+    exif[0x9004] = "2024:01:12 12:00:00"
+    exif[0x9012] = "+01:00"
+    Image.new("RGB", (2, 2), color="white").save(test_file, exif=exif)
+
+    decoded = check_models.get_exif_data(test_file)
+
+    assert decoded is not None
+    assert decoded["DateTimeDigitized"] == "2024:01:12 12:00:00"
+    assert decoded["OffsetTimeDigitized"] == "+01:00"
+    assert check_models._extract_exif_datetime(decoded) == (
+        "2024-01-12 12:00:00 UTC+01:00",
+        "12:00:00",
+    )
+
+
+def test_extract_exif_date_omits_unknown_file_mtime(tmp_path: Path) -> None:
+    """Filesystem modification time must not masquerade as capture metadata."""
     test_file = tmp_path / "test.jpg"
-    test_file.touch()
+    Image.new("RGB", (2, 2), color="white").save(test_file)
     exif_dict: dict[str | int, Any] = {"Make": "Camera", "Model": "Test"}
-    result = check_models._extract_exif_date(test_file, exif_dict)
-    # Should return mtime as fallback
-    assert result is not None
+
+    assert check_models._extract_exif_datetime(exif_dict) == (None, None)
+
+    metadata = extract_image_metadata(test_file, exif_data=EXIF_NOT_EXTRACTED)
+    metadata["description"] = "Two cats resting indoors."
+    prompt = _build_cataloguing_prompt(metadata)
+
+    assert metadata["date"] is None
+    assert metadata["time"] is None
+    assert "Capture date/time:" not in prompt
 
 
-def test_extract_exif_date_invalid_format(tmp_path: Path) -> None:
-    """Should handle invalid datetime format gracefully."""
-    test_file = tmp_path / "test.jpg"
-    test_file.touch()
+def test_extract_exif_date_invalid_format() -> None:
+    """An invalid EXIF datetime is unknown and must not enter the prompt."""
     exif_dict: dict[str | int, Any] = {"DateTime": "invalid date"}
-    result = check_models._extract_exif_date(test_file, exif_dict)
-    # Should return the raw string when parsing fails
-    assert result is not None
+
+    assert check_models._extract_exif_datetime(exif_dict) == (None, None)
 
 
 def test_extract_description_image_description() -> None:

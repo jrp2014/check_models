@@ -499,6 +499,20 @@ def test_pydantic_is_managed_as_a_dev_dependency() -> None:
     assert '"pydantic>=2.0.0"' in setup_script
 
 
+def test_ruff_uses_current_floor_and_all_stable_rules() -> None:
+    """Every stable rule shipped by the supported Ruff release should be selected."""
+    pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
+    ruff_config = pyproject["tool"]["ruff"]
+    dev_deps = pyproject["project"]["optional-dependencies"]["dev"]
+
+    assert "ruff>=0.16.0" in dev_deps
+    assert ruff_config["required-version"] == ">=0.16.0"
+    assert ruff_config["lint"]["select"] == ["ALL"]
+
+    setup_script = (PKG_ROOT / "tools" / "setup_conda_env.sh").read_text(encoding="utf-8")
+    assert '"ruff>=0.16.0"' in setup_script
+
+
 def test_conda_setup_verifier_imports_declared_non_dev_dependencies() -> None:
     """The fresh setup smoke check should only import packages it just installed."""
     pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))

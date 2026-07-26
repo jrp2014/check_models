@@ -41,7 +41,7 @@ from contextlib import (
 )
 from dataclasses import dataclass, fields, is_dataclass, replace
 from dataclasses import field as dataclass_field
-from datetime import UTC, datetime
+from datetime import datetime
 from functools import lru_cache
 from importlib import import_module
 from importlib.metadata import (
@@ -1498,6 +1498,7 @@ SUPPORTED_IMAGE_EXTENSIONS: Final[frozenset[str]] = frozenset({".jpg", ".jpeg", 
 IMPORTANT_EXIF_TAGS: Final[frozenset[str]] = frozenset(
     {
         "DateTimeOriginal",
+        "DateTimeDigitized",
         "ImageDescription",
         "CreateDate",
         "Make",
@@ -1517,11 +1518,13 @@ DATE_FORMATS: Final[tuple[str, ...]] = (
 )
 EXIF_DATE_TAGS: Final[tuple[str, ...]] = (
     "DateTimeOriginal",
+    "DateTimeDigitized",
     "CreateDate",
     "DateTime",
 )
 EXIF_OFFSET_TAG_BY_DATE: Final[dict[str, str]] = {
     "DateTimeOriginal": "OffsetTimeOriginal",
+    "DateTimeDigitized": "OffsetTimeDigitized",
     "CreateDate": "OffsetTimeDigitized",
     "DateTime": "OffsetTime",
 }
@@ -5279,83 +5282,32 @@ def _parse_exif_local_datetime(
     return None
 
 
-def _extract_file_mtime_local(
-    img_path: PathLike,
-    *,
-    log_context: str = "",
-) -> datetime | None:
-    """Return file mtime as localized datetime, or ``None`` on filesystem errors."""
-    try:
-        return datetime.fromtimestamp(Path(img_path).stat().st_mtime, tz=UTC).astimezone()
-    except OSError as err:
-        logger.debug("Could not get file mtime%s: %s", log_context, err)
-        return None
-
-
 def _extract_primary_exif_local_datetime(
     exif_data: ExifDict,
     *,
     warning_message: str,
-) -> tuple[datetime | None, str | None]:
-    """Return parsed primary EXIF datetime plus the original raw value."""
+) -> datetime | None:
+    """Return the parsed primary EXIF datetime when it is valid."""
     exif_date, exif_offset = _first_exif_datetime_values(exif_data)
     if not exif_date:
-        return None, None
+        return None
 
-    raw_exif_date = str(exif_date)
     try:
-        return _parse_exif_local_datetime(exif_date, exif_offset), raw_exif_date
+        return _parse_exif_local_datetime(exif_date, exif_offset)
     except (TypeError, UnicodeDecodeError) as err:
         logger.warning(warning_message, err)
-        return None, raw_exif_date
+        return None
 
 
-def _extract_exif_date(img_path: PathLike, exif_data: ExifDict) -> str | None:
-    parsed, raw_exif_date = _extract_primary_exif_local_datetime(
+def _extract_exif_datetime(exif_data: ExifDict) -> tuple[str | None, str | None]:
+    """Return the known EXIF date/time pair without filesystem-derived guesses."""
+    parsed = _extract_primary_exif_local_datetime(
         exif_data,
         warning_message="Could not localize EXIF date: %s",
     )
-    return _format_exif_datetime_or_mtime(
-        parsed,
-        raw_exif_date,
-        img_path=img_path,
-        fmt="%Y-%m-%d %H:%M:%S %Z",
-        fallback_to_raw_exif=True,
-    )
-
-
-def _extract_exif_time(img_path: PathLike, exif_data: ExifDict) -> str | None:
-    """Extract local capture time (``HH:MM:SS``) from EXIF or file mtime."""
-    parsed, raw_exif_date = _extract_primary_exif_local_datetime(
-        exif_data,
-        warning_message="Could not extract time from EXIF date: %s",
-    )
-    return _format_exif_datetime_or_mtime(
-        parsed,
-        raw_exif_date,
-        img_path=img_path,
-        fmt="%H:%M:%S",
-        log_context=" for time",
-    )
-
-
-def _format_exif_datetime_or_mtime(
-    parsed: datetime | None,
-    raw_exif_date: str | None,
-    *,
-    img_path: PathLike,
-    fmt: str,
-    fallback_to_raw_exif: bool = False,
-    log_context: str = "",
-) -> str | None:
-    """Format parsed EXIF datetime or fall back to file mtime when unavailable."""
-    if raw_exif_date is not None:
-        if parsed is not None:
-            return parsed.strftime(fmt)
-        return raw_exif_date if fallback_to_raw_exif else None
-
-    mtime_local = _extract_file_mtime_local(img_path, log_context=log_context)
-    return mtime_local.strftime(fmt) if mtime_local is not None else None
+    if parsed is None:
+        return None, None
+    return parsed.strftime("%Y-%m-%d %H:%M:%S %Z"), parsed.strftime("%H:%M:%S")
 
 
 def _mojibake_marker_count(text: str) -> int:
@@ -5800,8 +5752,7 @@ def extract_image_metadata(
     xmp_keywords = _metadata_keyword_list(xmp, "xmp_keywords")
 
     # Date, Time, GPS
-    metadata["date"] = _extract_exif_date(img_path, resolved_exif_data)
-    metadata["time"] = _extract_exif_time(img_path, resolved_exif_data)
+    metadata["date"], metadata["time"] = _extract_exif_datetime(resolved_exif_data)
     metadata["gps"] = _extract_gps_str(resolved_exif_data.get("GPSInfo"))
 
     # Description: prefer IPTC caption → XMP description → EXIF ImageDescription

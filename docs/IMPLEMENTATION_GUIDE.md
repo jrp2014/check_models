@@ -570,7 +570,7 @@ For a targeted change, use "entry point -> pipeline -> renderer" navigation:
    - `compute_cataloging_utility`
    - `analyze_model_issues`
 4. Find output surfaces:
-   - `generate_html_report`, `generate_markdown_report`
+   - `generate_html_report`, `generate_markdown_gallery_report`
    - `log_summary`, diagnostics/history writers
 
 Recommended search commands:
@@ -1148,7 +1148,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "ruff>=0.1.0",
+    "ruff>=0.16.0",
     "mypy>=1.8.0",
     # ...
 ]
@@ -1169,7 +1169,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["ruff>=0.1.0", "mypy>=1.8.0", "pytest>=8.0.0"]
+dev = ["ruff>=0.16.0", "mypy>=1.8.0", "pytest>=8.0.0"]
 extras = ["tokenizers>=0.22.0,<=0.23.0", "sentencepiece!=0.1.92,>=0.1.91"]
 torch = ["torch>=2.4.0", "torchvision>=0.17.0"]
 ```
