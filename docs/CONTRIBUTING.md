@@ -276,11 +276,26 @@ All pull requests must pass:
 
 ### Quick Verification
 
-To verify that your environment and `mlx-vlm` are working correctly before running the full test suite, you can use the CLI:
+To verify that your environment and `mlx-vlm` are working correctly before running the full test suite, you can use the CLI (conda env active; **pip**, not `uv`):
 
 ```bash
 python -m mlx_vlm.generate --model mlx-community/nanoLLaVA --image /path/to/image.jpg
 ```
+
+For maintainer-facing upstream isolation, prefer:
+
+1. Retained crash drafts under `src/output/issues/` and the shared repro in
+   `src/output/reports/diagnostics.md` when a run already exists.
+2. A minimized native `python -m mlx_vlm.generate` command (greedy /
+   `--temperature 0.0`, bounded `--max-tokens`, pinned `--revision` when known).
+3. One model per process to avoid sequential Metal-state interactions.
+
+Agent workflows for native repros, HF cache filter alignment, and issue-ready
+Markdown live under `.agents/skills/` (`native-mlx-vlm-repro`,
+`hf-cache-mlx-vlm-models`, `upstream-mlx-vlm-issues`). Default model discovery
+matches the mlx-vlm server cache filter (`config.json`, `tokenizer_config.json`,
+safetensors on `main`); use `python -m check_models --dry-run` or
+`get_cached_model_ids()` rather than ad-hoc cache scanners.
 
 Alternatively, refer to the official smoke test script:
 

@@ -73,12 +73,20 @@ A single medium-sized, well-commented function is often clearer than a web of on
     - Run `make quality` to verify your changes (formatting, linting, typing,
       tests, shellcheck, and markdownlint).
     - **Do not** create new "test" scripts; use `python -m mlx_vlm.generate` or the official `test_smoke.py` for verification. Narrow diagnostic tools under `src/tools/` must be documented as diagnostics, kept out of CI, and include risk notes when they can trigger native runtime failures.
+    - For upstream isolation and issue drafting, follow the agent skills
+      `native-mlx-vlm-repro`, `upstream-mlx-vlm-issues`, and
+      `hf-cache-mlx-vlm-models` under `.agents/skills/` (pip/conda adaptations of
+      mlx-vlm support workflows). Prefer retained diagnostics and
+      `src/output/issues/` over inventing new repro tooling.
 3. **Environment Discipline**:
     - **ALWAYS** run python commands in the `mlx-vlm` conda environment.
     - Use `conda run -n mlx-vlm python ...` for single commands.
     - Or prefer `make` targets (e.g., `make run`, `make test`, `make quality`)
       which handle the environment automatically.
     - **NEVER** run `python` directly without ensuring the environment is active.
+    - This repository standardizes on **conda + pip**. Do not introduce `uv`
+      workflows, docs, or agent commands even when upstream mlx-vlm examples use
+      `uv run`.
 4. **Configuration over Hardcoding**:
     - **Never** hardcode magic numbers for thresholds (e.g., repetition limits, formatting precision).
     - Always use or extend `src/check_models_data/quality_config.yaml` and the `QualityThresholds` class.

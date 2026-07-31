@@ -429,6 +429,13 @@ structured outputs, tool calls, top-logprobs envelopes, and image
 generation/editing endpoints. Use `mlx_vlm.server` directly for those server
 surfaces; `check_models` uses direct generation for benchmark isolation.
 
+When filing or debugging upstream server-only behavior, start the server with
+`python -m mlx_vlm.server` under the conda `mlx-vlm` environment, prefer `curl`
+over client SDKs for minimal repros, and keep streaming vs non-streaming cases
+separate. This project documents **pip/conda** commands only (not `uv`). See
+`.agents/skills/native-mlx-vlm-repro/SKILL.md` and
+`.agents/skills/upstream-mlx-vlm-issues/SKILL.md`.
+
 #### Processor Passthrough and Generation Diagnostics
 
 `mlx-vlm` keeps processor options and generation options distinct. Use
@@ -1101,7 +1108,9 @@ The cache filter requires repo type `model`, a cached `main` revision,
 `config.json`, `tokenizer_config.json`, and safetensors weights. When
 `--models` is omitted, local cached repos skipped by that filter are highlighted
 with the reason before the run list. The script also warns about exclusions that
-don't match any local cached repo.
+don't match any local cached repo. Use `--dry-run` or `get_cached_model_ids()` to
+inspect the filtered set without generation; do not reimplement the scanner.
+Agent guidance: `.agents/skills/hf-cache-mlx-vlm-models/SKILL.md`.
 
 List-valued CLI flag semantics:
 

@@ -15,3 +15,6 @@ Key reminders:
 - Validation tests must not rewrite tracked `src/output/` assets; send generated
   files to a temp directory or gitignored `test_*` output paths
 - Keep `CHANGELOG.md` (`[Unreleased]`) up to date for maintainer-relevant changes, including refactors and tooling updates
+- For upstream mlx-vlm isolation/issues/cache discovery, read `.agents/skills/`
+  (`native-mlx-vlm-repro`, `upstream-mlx-vlm-issues`, `hf-cache-mlx-vlm-models`);
+  use conda + pip only (never `uv`)

@@ -17,6 +17,17 @@ useful to two audiences:
 This note does **not** change runtime behavior by itself. Implement from a
 focused design/plan before coding.
 
+For day-to-day agent workflows that already match upstream mlx-vlm operator
+habits (minimal native CLI repros, server `curl` isolation, issue templates, and
+the server-supported HF cache filter), see:
+
+- `.agents/skills/native-mlx-vlm-repro/SKILL.md`
+- `.agents/skills/upstream-mlx-vlm-issues/SKILL.md`
+- `.agents/skills/hf-cache-mlx-vlm-models/SKILL.md`
+
+Those skills use this repo’s **conda + pip** conventions, not upstream `uv run`
+examples.
+
 ## Current strengths (do not regress)
 
 The retained surfaces already provide the hard parts:

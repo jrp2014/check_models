@@ -10,6 +10,10 @@ Notable changes to this project will be documented in this file.
 - Document product recommendations for issue-ready diagnostics and model-selection
   galleries aimed at mlx-vlm maintainers and image-description users
   (`docs/notes/DIAGNOSTICS_USEFULNESS_RECOMMENDATIONS.md`).
+- Add agent skills for native mlx-vlm reproduction, HF cache discovery alignment,
+  and upstream issue drafting (pip/conda adaptations of Blaizzy/mlx-vlm#1343
+  support workflows) under `.agents/skills/`, with pointers in contributor and
+  implementation docs.
 
 ### Changed
 
