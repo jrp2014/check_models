@@ -17,6 +17,11 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Archive completed Superpowers plans and designs for issue-ready reporting,
+  Skylos cleanup, and diagnostics usability quick wins under
+  `docs/notes/archive/superpowers/`, and remove the empty active
+  `docs/superpowers/` tree.
+
 - Present usable and caveated models before unusable or unevaluated attempts in
   Markdown and HTML galleries; keep crash facts above collapsible exact traceback
   detail in direct issue drafts, link those drafts from the current-run output

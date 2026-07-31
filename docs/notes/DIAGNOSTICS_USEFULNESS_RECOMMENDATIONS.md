@@ -333,7 +333,7 @@ Even a tiny matrix beats single-image overfitting:
 
 ## Related docs
 
-- [Issue-ready reporting design](../superpowers/specs/2026-07-26-issue-ready-reporting-design.md)
+- [Issue-ready reporting design](archive/superpowers/specs/2026-07-26-issue-ready-reporting-design.md) (archived)
 - [Implementation guide](../IMPLEMENTATION_GUIDE.md)
 - [CLI / output contract](../../src/README.md)
 - [Contributing](../CONTRIBUTING.md)

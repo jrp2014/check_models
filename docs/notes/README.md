@@ -16,6 +16,11 @@ reports, retired tool notes, completed plans and specifications, restructure
 plans, migration notes, and resolved backlogs) preserved for reference. See
 filenames for dates and topics.
 
+Completed Superpowers plans and designs live under
+`archive/superpowers/{plans,specs}/`. There is no active `docs/superpowers/`
+tree; start new planning material there only while work is in flight, then move
+it into the archive when finished.
+
 ## Related Documentation
 
 For current development practices and guidelines, see:
