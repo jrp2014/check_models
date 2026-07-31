@@ -3465,7 +3465,7 @@ def _extract_prompt_context_text(prompt: str, context_marker: str = "Context:") 
 
     Supports inline-marker context (``Context: ...``) and multi-line bullet
     context blocks. Stops on the first blank line after context content starts,
-    except for the adjacent authoritative/draft sections emitted by assisted prompts.
+    except for adjacent authoritative/descriptive sections emitted by assisted prompts.
     """
     if not prompt:
         return ""
@@ -3486,7 +3486,7 @@ def _extract_prompt_context_text(prompt: str, context_marker: str = "Context:") 
             extracted.append(inline_remainder.lstrip("-").strip())
 
         follow_lines = lines[idx + 1 :]
-        allow_draft_section = inline_remainder.casefold() == "authoritative context:"
+        allow_descriptive_section = inline_remainder.casefold() == "authoritative context:"
         for follow_idx, follow in enumerate(follow_lines):
             stripped: str = follow.strip()
             if not stripped:
@@ -3496,11 +3496,11 @@ def _extract_prompt_context_text(prompt: str, context_marker: str = "Context:") 
                         (candidate.strip() for candidate in remaining_lines if candidate.strip()),
                         "",
                     )
-                    if (
-                        allow_draft_section
-                        and next_content.casefold() == "draft descriptive metadata:"
-                    ):
-                        allow_draft_section = False
+                    if allow_descriptive_section and next_content.casefold() in {
+                        "descriptive hints:",
+                        "draft descriptive metadata:",
+                    }:
+                        allow_descriptive_section = False
                         continue
                     break
                 continue
@@ -3916,16 +3916,17 @@ class PromptQualitySignals:
 
 
 _DRAFT_PROMPT_FIELD_PATTERN: Final[re.Pattern[str]] = re.compile(
-    r"(?im)^\s*-\s*Existing (title|description|keywords):\s*(.+?)\s*$"
+    r"(?im)^\s*-\s*(?:(?:Existing (title|description|keywords))|"
+    r"(?:(title|description|keyword) hints?)):\s*(.+?)\s*$"
 )
 
 
 def _unchanged_draft_fields(text: str, prompt: str) -> tuple[str, ...]:
     """Return all supplied draft fields only when the output preserves every one exactly."""
-    supplied = {
-        match.group(1).casefold(): match.group(2).strip()
-        for match in _DRAFT_PROMPT_FIELD_PATTERN.finditer(prompt)
-    }
+    supplied: dict[str, str] = {}
+    for match in _DRAFT_PROMPT_FIELD_PATTERN.finditer(prompt):
+        field = (match.group(1) or match.group(2)).casefold()
+        supplied["keywords" if field == "keyword" else field] = match.group(3).strip()
     if not supplied:
         return ()
 
@@ -12887,82 +12888,28 @@ def _build_cataloguing_prompt(
     *,
     include_metadata_hints: bool = True,
 ) -> str:
-    """Build a structured prompt optimised for stock-photo cataloguing.
-
-    Keeps instructions concise while preserving metadata grounding from
-    IPTC/XMP/EXIF fields. The ``Context:`` marker is retained for
-    context-ignorance diagnostics.
-    """
-    parts: list[str] = [
-        "Analyze this image for cataloguing metadata, using British English.",
-        "",
-        (
-            "Describe visible details faithfully. If a visual detail is uncertain, ambiguous, "
-            "partially obscured, or too small to verify, leave it out rather than guessing."
-        ),
-        "",
-        (
-            "Use authoritative context as supplied fact, and treat the descriptive metadata "
-            "as a draft catalog record. Retain draft details that are consistent with the "
-            "image, correct contradictions, and add important visible details. Authoritative "
-            "context may supply identity and location even when they are not visually readable."
-            if include_metadata_hints
-            else "No existing catalog metadata is supplied. Base every field only on visual "
-            "evidence in the image."
-        ),
-        "",
-        "Return exactly these three sections, and nothing else:",
-        "",
-        "Title:",
-        "- 5-10 words, concrete and factual; authoritative context may supply identity and location.",
-        "- Output only the title text after the label.",
-        "- Do not repeat or paraphrase these instructions in the title.",
-        "",
-        "Description:",
-        (
-            "- 1-2 factual sentences combining supplied authoritative context with the main "
-            "visible subject, setting, lighting, action, and distinctive visible details."
-        ),
-        "- Output only the description text after the label.",
-        "",
-        "Keywords:",
-        (
-            "- 10-18 unique comma-separated terms covering supplied authoritative context and "
-            "clearly visible subjects, setting, colors, composition, and style."
-        ),
-        "- Output only the keyword list after the label.",
-        "",
-        "Rules:",
-        (
-            "- Distinguish supplied authoritative facts from visible details; do not present "
-            "contextual facts as though they were read from the image."
-            if include_metadata_hints
-            else "- Include only details that are definitely visible in the image."
-        ),
-        (
-            "- Reuse draft metadata when it is consistent with the image; authoritative context "
-            "does not require separate visual proof."
-            if include_metadata_hints
-            else "- Do not infer or import metadata that is not visible in the image."
-        ),
-        *(
-            ["- If metadata and image disagree, follow the image."]
-            if include_metadata_hints
-            else []
-        ),
-        "- Prefer omission to speculation.",
-        "- Do not copy prompt instructions into the Title, Description, or Keywords fields.",
-        (
-            "- Do not infer identity, location, event, brand, species, time period, or intent "
-            "unless supplied as authoritative context or visually obvious."
-            if include_metadata_hints
-            else "- Do not infer identity, location, event, brand, species, time period, "
-            "or intent unless visually obvious."
-        ),
-        "- Do not output reasoning, notes, hedging, or extra sections.",
-    ]
-
     provenance = _build_metadata_provenance(metadata if include_metadata_hints else None)
+    parts: list[str]
+    if include_metadata_hints:
+        parts = [
+            "Create British-English catalogue metadata from the image and supplied context.",
+            "",
+            (
+                "Treat any capture date/time and GPS as authoritative facts, but do not claim "
+                "they are visible. Descriptive hints may be incomplete or wrong: retain details "
+                "supported by the image, correct conflicts, and add important visible details. "
+                "Prefer image evidence when a hint conflicts, and omit uncertain details."
+            ),
+        ]
+    else:
+        parts = [
+            (
+                "Create British-English catalogue metadata using only clearly visible facts. "
+                "Omit uncertain details and unsupported identity, location, event, brand, "
+                "species, period, or intent."
+            ),
+        ]
+
     if provenance.has_authoritative_context:
         parts.extend(["", "Context: Authoritative context:"])
         capture_parts = [provenance.capture_date] if provenance.capture_date else []
@@ -12975,38 +12922,57 @@ def _build_cataloguing_prompt(
             parts.append(f"- Capture date/time: {capture_value}")
         if provenance.gps:
             parts.append(f"- GPS: {provenance.gps}")
-        parts.append(
-            "- Use this factual context where it improves the catalogue record; do not "
-            "claim that contextual facts are visually observable."
-        )
 
     if provenance.has_draft:
-        draft_heading = (
-            "Draft descriptive metadata:"
+        hint_heading = (
+            "Descriptive hints:"
             if provenance.has_authoritative_context
-            else "Context: Draft descriptive metadata:"
+            else "Context: Descriptive hints:"
         )
-        parts.extend(["", draft_heading])
+        parts.extend(["", hint_heading])
         if provenance.draft_title:
             title_hint = _compact_prompt_text(
                 provenance.draft_title,
                 max_chars=QUALITY.prompt_title_max_chars,
             )
-            parts.append(f"- Existing title: {title_hint}")
+            parts.append(f"- Title hint: {title_hint}")
         if provenance.draft_description:
             description_hint = _compact_prompt_text(
                 provenance.draft_description,
                 max_chars=QUALITY.prompt_description_max_chars,
             )
-            parts.append(f"- Existing description: {description_hint}")
+            parts.append(f"- Description hint: {description_hint}")
         if provenance.draft_keywords:
             keyword_hint = _summarize_prompt_keywords(", ".join(provenance.draft_keywords))
             if keyword_hint:
-                parts.append(f"- Existing keywords: {keyword_hint}")
-        parts.append(
-            "- Treat this draft as fallible. Retain supported details, correct errors, "
-            "and add important visible information."
-        )
+                parts.append(f"- Keyword hints: {keyword_hint}")
+
+    description_requirement = (
+        "- a 1-2-sentence factual description combining relevant context with the main visible "
+        "subject, setting, action, lighting, and distinctive details;"
+        if include_metadata_hints
+        else "- a 1-2-sentence factual description of the main subject, setting, action, "
+        "lighting, and distinctive details;"
+    )
+    keyword_requirement = (
+        "- 10-18 unique, comma-separated keywords covering relevant context and visible details."
+        if include_metadata_hints
+        else "- 10-18 unique, comma-separated keywords."
+    )
+    parts.extend(
+        [
+            "",
+            "Write:",
+            "- a concrete 5-10-word title;",
+            description_requirement,
+            keyword_requirement,
+            "",
+            "Return exactly these three sections and nothing else:",
+            "Title:",
+            "Description:",
+            "Keywords:",
+        ]
+    )
 
     return "\n".join(parts)
 

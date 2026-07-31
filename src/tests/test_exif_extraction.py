@@ -366,25 +366,22 @@ def test_extract_image_metadata_respects_known_absent_exif_sentinel(
 # ---------------------------------------------------------------------------
 
 
-def test_build_prompt_empty_metadata() -> None:
-    """Prompt from empty metadata should still request cataloguing output."""
-    prompt = _build_cataloguing_prompt({})
-    assert "cataloguing" in prompt.lower()
-    assert "Title:" in prompt
-    assert "Description:" in prompt
-    assert "Keywords:" in prompt
-    assert "Do not output reasoning" in prompt
-    assert "unless supplied as authoritative context or visually obvious" in prompt
-    assert "- 5-10 words, concrete and factual" in prompt
-    assert "- 10-18 unique comma-separated terms" in prompt
-    assert "Do not repeat or paraphrase these instructions in the title." in prompt
-    assert (
-        "Do not copy prompt instructions into the Title, Description, or Keywords fields." in prompt
+def test_build_prompt_blind_lane_is_concise_and_ends_with_output_schema() -> None:
+    """Blind prompts should spend their small text budget only on visible evidence."""
+    prompt = _build_cataloguing_prompt({}, include_metadata_hints=False)
+
+    assert "catalogue metadata" in prompt.lower()
+    assert "authoritative" not in prompt.lower()
+    assert "Context:" not in prompt
+    assert "Rules:" not in prompt
+    assert len(prompt.split()) <= 90
+    assert prompt.endswith(
+        "Return exactly these three sections and nothing else:\nTitle:\nDescription:\nKeywords:"
     )
 
 
 def test_build_prompt_includes_metadata_fields() -> None:
-    """Prompt should incorporate all provided metadata fields."""
+    """Assisted prompts should distinguish authoritative facts from descriptive hints."""
     meta: dict[str, str | None] = {
         "description": "Sunset over cliffs",
         "title": "Coastal Sunset",
@@ -400,9 +397,18 @@ def test_build_prompt_includes_metadata_fields() -> None:
     assert "2025-10-01" in prompt
     assert "18:30" in prompt
     assert "51.0N, 0.9W" in prompt
-    assert "Draft descriptive metadata:" in prompt
-    assert "Treat this draft as fallible" in prompt
-    assert "Do not copy context hints verbatim." not in prompt
+    assert "Descriptive hints:" in prompt
+    assert "Title hint: Coastal Sunset" in prompt
+    assert "Description hint: Sunset over cliffs" in prompt
+    assert "Keyword hints: sunset, cliffs, ocean" in prompt
+    assert "hints may be incomplete or wrong" in prompt
+    assert "Existing title:" not in prompt
+    assert len(prompt.split()) <= 160
+    assert prompt.index("Context: Authoritative context:") < prompt.index("Descriptive hints:")
+    assert prompt.index("Descriptive hints:") < prompt.index("Write:")
+    assert prompt.endswith(
+        "Return exactly these three sections and nothing else:\nTitle:\nDescription:\nKeywords:"
+    )
 
 
 def test_build_prompt_context_marker_present() -> None:
@@ -427,7 +433,7 @@ def test_build_prompt_truncates_long_metadata_fields() -> None:
     assert long_desc not in prompt
     assert long_keywords not in prompt
     assert "..." in prompt
-    assert "Existing keywords:" in prompt
+    assert "Keyword hints:" in prompt
 
 
 def test_build_prompt_date_only_uses_authoritative_context() -> None:
