@@ -1826,6 +1826,9 @@ def test_diagnostics_use_run_args_for_complete_native_reproduction(tmp_path: Pat
     assert "--revision run-revision" not in issue_content
     assert "--processor-kwargs" in issue_content
     assert "--resize-shape 64 32" in issue_content
+    assert "--seed 73" in issue_content
+    assert "--repetition-penalty 1.15" in issue_content
+    assert "--repetition-context-size 48" in issue_content
     assert "--skip-special-tokens" in issue_content
     assert 'MODEL = "org/repro"' in issue_content
     assert 'IMAGE = "src/tests/fixtures/check_models-task9-fixture.jpg"' in issue_content
@@ -3155,6 +3158,12 @@ class TestMarkdownGalleryReport:
         ]
         assert [html_chooser.index(model) for model in expected_model_order] == sorted(
             html_chooser.index(model) for model in expected_model_order
+        )
+        html_complete_evidence = html_content[
+            html_content.index('<section id="complete-model-evidence">') :
+        ]
+        assert [html_complete_evidence.index(model) for model in expected_model_order] == sorted(
+            html_complete_evidence.index(model) for model in expected_model_order
         )
 
     def test_gallery_complete_output_uses_safe_fence_without_shortening(

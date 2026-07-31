@@ -20,6 +20,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Keep HTML complete model evidence in the same usable-first order as the Markdown
+  gallery, and preserve seed and repetition settings in supplemental native mlx-vlm
+  CLI reproduction commands.
 - Archive completed Superpowers plans and designs for issue-ready reporting,
   Skylos cleanup, and diagnostics usability quick wins under
   `docs/notes/archive/superpowers/`, and remove the empty active

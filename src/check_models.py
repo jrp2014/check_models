@@ -8822,16 +8822,10 @@ def _html_complete_gallery(report_context: HtmlReportContext) -> str:
         result.model_name: _gallery_row(result, assessments[result.model_name])
         for result in report_context.result_set.results
     }
-    usability_order: Mapping[ModelUsability, int] = {
-        "unusable": 0,
-        "not_evaluated": 1,
-        "usable": 2,
-        "usable_with_caveats": 2,
-    }
     ordered_results = sorted(
         report_context.result_set.results,
         key=lambda result: (
-            usability_order[rows_by_model[result.model_name].usability],
+            _gallery_usability_sort_key(rows_by_model[result.model_name].usability),
             result.model_name,
         ),
     )
@@ -14830,6 +14824,19 @@ def _build_native_mlx_vlm_cli_tokens(
         )
     _append_native_cli_sequence(tokens, "--resize-shape", getattr(run_args, "resize_shape", None))
     _append_native_cli_sequence(tokens, "--eos-tokens", getattr(run_args, "eos_tokens", None))
+    _append_native_cli_optional_pair(tokens, "--seed", getattr(run_args, "seed", None))
+    _append_native_cli_optional_pair(
+        tokens,
+        "--repetition-penalty",
+        getattr(run_args, "repetition_penalty", None),
+    )
+    repetition_context_size = getattr(
+        run_args,
+        "repetition_context_size",
+        DEFAULT_PENALTY_CONTEXT_SIZE,
+    )
+    if repetition_context_size != DEFAULT_PENALTY_CONTEXT_SIZE:
+        tokens.extend(["--repetition-context-size", str(repetition_context_size)])
     _append_native_cli_optional_pair(
         tokens, "--max-kv-size", getattr(run_args, "max_kv_size", None)
     )
