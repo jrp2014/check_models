@@ -2979,6 +2979,7 @@ class TestMarkdownGalleryReport:
         """Gallery order should move from chooser policy to complete evidence."""
         results = [
             _make_success("org/usable"),
+            _make_success("org/caveated"),
             _make_success("org/unusable"),
             _make_failure("org/not-evaluated"),
         ]
@@ -2989,6 +2990,10 @@ class TestMarkdownGalleryReport:
                 (
                     "org/usable",
                     check_models.ResultAssessment("completed", "usable", "none", ()),
+                ),
+                (
+                    "org/caveated",
+                    check_models.ResultAssessment("completed", "usable_with_caveats", "none", ()),
                 ),
                 (
                     "org/unusable",
@@ -3030,10 +3035,46 @@ class TestMarkdownGalleryReport:
         assert [content.index(heading) for heading in headings] == sorted(
             content.index(heading) for heading in headings
         )
+        chooser = _extract_markdown_subsection(
+            content,
+            "## Current-run Chooser",
+            end_headings=("## Avoid for This Run",),
+        )
+        expected_model_order = (
+            "org/usable",
+            "org/caveated",
+            "org/unusable",
+            "org/not-evaluated",
+        )
+        assert [chooser.index(model) for model in expected_model_order] == sorted(
+            chooser.index(model) for model in expected_model_order
+        )
+        assert [content.index(f"### {model}") for model in expected_model_order] == sorted(
+            content.index(f"### {model}") for model in expected_model_order
+        )
         assert "*Verdict:*" not in content
         assert "*Maintainer:*" not in content
         assert "*Next action:*" not in content
         assert "*Score:*" not in content
+
+        html_out = tmp_path / "results.html"
+        generate_html_report(
+            results,
+            html_out,
+            versions={},
+            prompt="Describe the image.",
+            total_runtime_seconds=1.0,
+            report_context=context,
+        )
+        html_content = html_out.read_text(encoding="utf-8")
+        html_chooser = html_content[
+            html_content.index('<div id="chooser-table">') : html_content.index(
+                "</div>", html_content.index('<div id="chooser-table">')
+            )
+        ]
+        assert [html_chooser.index(model) for model in expected_model_order] == sorted(
+            html_chooser.index(model) for model in expected_model_order
+        )
 
     def test_gallery_complete_output_uses_safe_fence_without_shortening(
         self,

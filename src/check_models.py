@@ -6956,6 +6956,16 @@ def _gallery_observation_labels(observations: Sequence[ObservationCode]) -> str:
     return ", ".join(code.replace("_", " ") for code in observations) or "none"
 
 
+def _gallery_usability_sort_key(usability: ModelUsability) -> int:
+    """Order selector evidence from directly usable to not evaluated."""
+    return {
+        "usable": 0,
+        "usable_with_caveats": 1,
+        "unusable": 2,
+        "not_evaluated": 3,
+    }[usability]
+
+
 def _gallery_metric(field_name: str, value: MetricValue) -> str:
     """Format one captured metric, using a dash when unavailable."""
     return format_field_value(field_name, value) or "-"
@@ -6992,13 +7002,10 @@ def _render_gallery_table(
 
 def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
     """Render the skim-first chooser, avoid list, and explicit resource policies."""
-    usability_order: Mapping[ModelUsability, int] = {
-        "unusable": 0,
-        "not_evaluated": 1,
-        "usable": 2,
-        "usable_with_caveats": 2,
-    }
-    ordered = sorted(rows, key=lambda row: (usability_order[row.usability], row.model))
+    ordered = sorted(
+        rows,
+        key=lambda row: (_gallery_usability_sort_key(row.usability), row.model),
+    )
     chooser_rows = [
         (
             _gallery_summary_model_link(row.model),
@@ -8568,13 +8575,10 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
         for result in report_context.result_set.results
     ]
     result_by_model = {result.model_name: result for result in report_context.result_set.results}
-    usability_order: Mapping[ModelUsability, int] = {
-        "unusable": 0,
-        "not_evaluated": 1,
-        "usable": 2,
-        "usable_with_caveats": 2,
-    }
-    ordered = sorted(rows, key=lambda row: (usability_order[row.usability], row.model))
+    ordered = sorted(
+        rows,
+        key=lambda row: (_gallery_usability_sort_key(row.usability), row.model),
+    )
     chooser_rows = [
         (
             _html_model_link(row.model),
@@ -9043,7 +9047,7 @@ def generate_html_report(
 
 
 def _generate_model_gallery_section(report_context: ReportRenderContext) -> list[str]:
-    """Render complete evidence in stable avoid-first, then usable order."""
+    """Render complete evidence in stable usable-first order."""
     assessments = _assessments_by_model(report_context)
     model_provenance = _model_provenance_by_model(report_context)
     results = report_context.result_set.results
@@ -9051,16 +9055,10 @@ def _generate_model_gallery_section(report_context: ReportRenderContext) -> list
         result.model_name: _gallery_row(result, assessments[result.model_name])
         for result in results
     }
-    usability_order: Mapping[ModelUsability, int] = {
-        "unusable": 0,
-        "not_evaluated": 1,
-        "usable": 2,
-        "usable_with_caveats": 2,
-    }
     ordered_results = sorted(
         results,
         key=lambda result: (
-            usability_order[rows_by_model[result.model_name].usability],
+            _gallery_usability_sort_key(rows_by_model[result.model_name].usability),
             result.model_name,
         ),
     )
