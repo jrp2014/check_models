@@ -14608,6 +14608,7 @@ def generate_output_index_report(
     filename: Path,
     *,
     output_paths: ReportOutputPaths,
+    issue_reports: Mapping[str, Path] | None = None,
 ) -> None:
     """Write a minimal navigation list for the retained artifacts."""
     links = (
@@ -14621,6 +14622,12 @@ def generate_output_index_report(
     )
     md = ["# Check Models Output Index", ""]
     md.extend(f"- {_output_index_link(filename, path, label)}" for path, label in links)
+    if issue_reports:
+        md.extend(("", "## Issue drafts", ""))
+        md.extend(
+            f"- {_output_index_link(filename, path, model_name)}"
+            for model_name, path in sorted(issue_reports.items())
+        )
     _write_text_file(filename, "\n".join(md) + "\n")
 
 
@@ -15600,8 +15607,17 @@ def _generate_reports_and_log_outputs(
         diagnostics_path=inputs.output_paths.diagnostics,
     )
 
+    index_artifact = replace(
+        by_key["output_index"],
+        job=lambda: generate_output_index_report(
+            inputs.output_paths.index,
+            output_paths=inputs.output_paths,
+            issue_reports=diagnostics_artifacts.issue_reports,
+        ),
+    )
+    run_artifact(index_artifact)
     for artifact in artifacts:
-        if artifact.key not in {"jsonl", "diagnostics"}:
+        if artifact.key not in {"output_index", "jsonl", "diagnostics"}:
             run_artifact(artifact)
 
     failures = [outcome for outcome in outcomes if not outcome.succeeded]
