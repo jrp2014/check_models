@@ -14,6 +14,9 @@ Notable changes to this project will be documented in this file.
   and upstream issue drafting (pip/conda adaptations of Blaizzy/mlx-vlm#1343
   support workflows) under `.agents/skills/`, with pointers in contributor and
   implementation docs.
+- Capture a human review of `src/check_models.py` compression, robustness, and
+  analyzer-friendly structure options
+  (`docs/notes/CHECK_MODELS_MONOLITH_COMPRESSION_REVIEW.md`).
 
 ### Changed
 
