@@ -248,8 +248,8 @@ The tool generates a deliberately small artifact set in `output/` by default:
   prefill/first-token timing, captured performance facts,
   expandable complete output, maintainer diagnostics, and full run context.
 - **Gallery Markdown** (`reports/model_gallery.md`): Model-comparison artifact with
-  a bounded, orientation-corrected reference-image preview, image metadata, the full prompt, a facts-only
-  chooser whose previews preserve line breaks, and readable plus exact raw complete
+  a bounded, orientation-corrected reference-image preview, image metadata, the full prompt, a usable-first,
+  facts-only chooser whose previews preserve line breaks, and readable plus exact raw complete
   output for every attempted model. End-to-end time precedes decode-only throughput.
 - **JSONL** (`results.jsonl`): Exhaustive machine-readable per-model diagnostics,
   schema `2.0` assessments, complete captured evidence, local component installation
@@ -989,7 +989,7 @@ is secondary data and does not alter current-run assessment or report guidance.
 
 | Lane | Prompt input | Default token cap | Intended use |
 | ---- | ------------ | ----------------- | ------------ |
-| `triage` | Image only; brief caption request | 200 | Fast MLX-VLM compatibility and mechanical output check. |
+| `triage` | Image only; brief caption request | 200 | Compares plain image-caption output while providing a fast MLX-VLM compatibility and mechanical output check. |
 | `blind` | Image only; structured title, description, and keywords request | 500 | Exercises unaided visual cataloguing. Existing metadata, including EXIF capture date and GPS, is withheld from the model and current-run assessment. |
 | `assisted` | Image plus descriptive title, description, or keyword hints | 500 | Measures metadata-assisted visual verification and correction. Explicit selection requires descriptive metadata. |
 
@@ -1011,6 +1011,9 @@ does not expose enough component measurements. Estimates stay labelled as
 estimates; missing components remain `null` rather than being inferred as normal.
 
 ```bash
+# Compare models as plain image captioners
+python -m check_models --image photo.jpg --eval-mode triage
+
 # Compare models without exposing any existing metadata to them
 python -m check_models --image photo.jpg --eval-mode blind
 

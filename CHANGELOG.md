@@ -13,6 +13,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Present usable and caveated models before unusable or unevaluated attempts in
+  Markdown and HTML galleries; keep crash facts above collapsible exact traceback
+  detail in direct issue drafts, link those drafts from the current-run output
+  index, and document `triage` as the plain-caption comparison lane.
 - Record active and cache allocator residue after every model cleanup, including
   crashed attempts, in human and machine evidence so gradual cross-model memory
   growth can be investigated. Add sortable HTML chooser columns, including the
