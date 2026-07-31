@@ -268,7 +268,13 @@ The tool generates a deliberately small artifact set in `output/` by default:
   Conservative repetition observations include the repeated fragment and complete
   output. Declared EOS/thinking wrappers and wholly unchanged draft metadata are
   neutral reproduction facts rather than inferred faults or quality scores.
-- **Index** (`index.md`): Tiny navigation page linking the seven current-run files.
+- **Run issue summary** (`issues/run_summary.md`): Conditional compact whole-run
+  GitHub issue body. It expands crashes with root exceptions and a parameterised
+  reproduction command, tables other surfaced results, counts clean completions,
+  and links to the complete retained evidence without copying full prompts,
+  outputs, tracebacks, or scripts.
+- **Index** (`index.md`): Tiny navigation page linking the current-run files and,
+  when generated, the run issue summary before individual crash drafts.
 - **Log** (`check_models.log`): Canonical comprehensive run trace, including complete
   generated or captured failure output.
 - **Environment** (`environment.log`): Full package and Conda environment capture.
@@ -276,6 +282,13 @@ The tool generates a deliberately small artifact set in `output/` by default:
   out-of-band analysis. Current reports do not read it or derive advice from it.
 - **Issue drafts** (`issues/issue_*.md`): Conditional factual drafts, not a standing
   report surface. Issue drafts are created only for hard actionable crashes.
+
+Regenerate only the compact issue body from an existing retained run, without
+model discovery or inference:
+
+```bash
+PYTHONPATH=src python -c 'from pathlib import Path; from check_models import regenerate_run_issue_summary; print(regenerate_run_issue_summary(Path("src/output")))'
+```
 
 #### Decision semantics and evidence scope
 
@@ -323,7 +336,8 @@ capture metadata. Complete generated output in the Markdown evidence artifacts i
 fenced and preserves tabs and trailing spaces.
 
 Use `reports/model_gallery.md` to choose models and compare complete readable and
-exact output; use `reports/diagnostics.md` as a skim-first mlx-vlm issue body.
+exact output; paste `issues/run_summary.md` for a compact whole-run issue, and use
+`reports/diagnostics.md` when complete maintainer evidence is needed.
 `check_models.log` retains the full operational trace, while `results.jsonl` and
 `run.json` retain exhaustive machine-readable evidence, provenance, and arguments.
 
@@ -1333,7 +1347,9 @@ check_models/
 │       ├── results.history.jsonl
 │       ├── check_models.log
 │       ├── environment.log
-│       └── issues/           # Conditional hard-crash drafts only
+│       └── issues/
+│           ├── run_summary.md # Conditional paste-ready whole-run issue
+│           └── issue_*.md     # Conditional hard-crash drafts
 ├── docs/                    # Documentation
 ├── typings/                 # Generated type stubs (git-ignored)
 └── Makefile                 # Root orchestration

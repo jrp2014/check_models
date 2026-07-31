@@ -110,6 +110,119 @@ def _stub_versions() -> dict[str, str | None]:
     }
 
 
+def _issue_summary_output_paths(output_dir: Path) -> check_models.ReportOutputPaths:
+    """Return canonical retained paths for aggregate issue-summary tests."""
+    return check_models.ReportOutputPaths(
+        index=output_dir / "index.md",
+        html=output_dir / "reports" / "results.html",
+        gallery_markdown=output_dir / "reports" / "model_gallery.md",
+        jsonl=output_dir / "results.jsonl",
+        run_json=output_dir / "run.json",
+        diagnostics=output_dir / "reports" / "diagnostics.md",
+        log=output_dir / "check_models.log",
+        environment=output_dir / "environment.log",
+    )
+
+
+def _issue_summary_result(
+    model: str,
+    *,
+    execution: str = "completed",
+    usability: str = "usable",
+    maintainer_status: str = "none",
+    observations: list[str] | None = None,
+) -> dict[str, object]:
+    """Build one literal schema-2.0 result without production serializers."""
+    crashed = execution == "crashed"
+    return {
+        "_type": "result",
+        "model": model,
+        "timestamp": "2026-07-31 12:01:00 BST",
+        "assessment": {
+            "execution": execution,
+            "usability": usability,
+            "maintainer_status": maintainer_status,
+            "observations": observations or [],
+        },
+        "generated_text": "generated output that must not be copied",
+        "captured_output_on_fail": "captured output that must not be copied",
+        "failure": (
+            {
+                "phase": "processor_load",
+                "stage": "Processor Error",
+                "message": "processor missing image support",
+                "exception_type": "ValueError",
+                "traceback": "Traceback (most recent call last):\nheavy evidence",
+                "exception_chain": [
+                    {
+                        "type": "ValueError",
+                        "module": "builtins",
+                        "message": "processor missing image support",
+                        "origin": "check_models.py",
+                    }
+                ],
+            }
+            if crashed
+            else None
+        ),
+        "metrics": {},
+        "timing": {},
+        "model_provenance": {
+            "model": model,
+            "requested_revision": None,
+            "resolved_revision": f"revision-{model.rsplit('/', maxsplit=1)[-1]}",
+            "snapshot_path": None,
+        },
+        "prompt_diagnostics": None,
+    }
+
+
+def _write_issue_summary_fixture(
+    output_paths: check_models.ReportOutputPaths,
+    *,
+    results: Sequence[dict[str, object]],
+) -> None:
+    """Write hand-authored retained input for issue-summary tests."""
+    output_paths.jsonl.parent.mkdir(parents=True, exist_ok=True)
+    metadata = {
+        "_type": "metadata",
+        "format_version": "2.0",
+        "prompt": "full prompt that must not be copied",
+        "system": {
+            "macOS Version": "26.6",
+            "GPU/Chip": "Apple M5 Max",
+            "Python Version": "3.13.13",
+        },
+        "timestamp": "2026-07-31 12:00:00 BST",
+        "eval_mode": "assisted",
+        "metadata_exposed_to_prompt": True,
+        "library_versions": {
+            "mlx-vlm": "0.6.8",
+            "mlx": "0.32.1",
+            "transformers": "5.14.1",
+        },
+        "component_provenance": {},
+        "runtime_fingerprint": {},
+    }
+    rows = (metadata, *results)
+    check_models._write_text_file(
+        output_paths.jsonl,
+        "".join(json.dumps(row) + "\n" for row in rows),
+    )
+    check_models._write_text_file(
+        output_paths.run_json,
+        json.dumps(
+            {
+                "generated_at": "2026-07-31 12:02:00 BST",
+                "eval_mode": "assisted",
+                "generation_settings": {"max_tokens": 500, "temperature": 0.0},
+                "image": {"name": "fixture.jpg"},
+            }
+        )
+        + "\n",
+    )
+
+
 def test_format_peak_memory_context_uses_significant_figures() -> None:
     """Human working-set context should follow project-wide significant figures."""
     assert check_models._format_peak_memory_context(18.2, 96 * 1024**3) == (
@@ -124,6 +237,279 @@ def test_format_peak_memory_context_preserves_bare_peak_without_denominator() ->
     """Missing capacity must preserve the established bare table value."""
     assert check_models._format_peak_memory_context(18.2, None) == "18"
     assert check_models._format_peak_memory_context(None, 96 * 1024**3) == ""
+
+
+def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Path) -> None:
+    """A paste-ready issue should prioritize crashes without copying heavy evidence."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    _write_issue_summary_fixture(
+        output_paths,
+        results=(
+            _issue_summary_result(
+                "org/crash",
+                execution="crashed",
+                usability="not_evaluated",
+                maintainer_status="actionable_failure",
+            ),
+            _issue_summary_result(
+                "org/observed",
+                usability="unusable",
+                maintainer_status="observation_needs_reproduction",
+                observations=["repeated_output"],
+            ),
+            _issue_summary_result("org/clean"),
+        ),
+    )
+    issue_draft = output_paths.index.parent / "issues" / "issue_org_crash.md"
+    issue_draft.parent.mkdir(parents=True, exist_ok=True)
+    check_models._write_text_file(issue_draft, "# Exact crash draft\n")
+
+    with patch.object(check_models._LinkStyleState, "value", "relative"):
+        summary = check_models.generate_run_issue_summary_report(
+            output_paths,
+            issue_reports={"org/crash": issue_draft},
+        )
+
+    assert summary == output_paths.index.parent / "issues" / "run_summary.md"
+    if summary is None:
+        pytest.fail("surfaced results must produce a run issue summary")
+    content = summary.read_text(encoding="utf-8")
+    assert content.startswith(
+        "# mlx-vlm compatibility findings across 3 cached vision-language models\n"
+    )
+    assert "## Run summary" in content
+    assert "mechanical facts from one image" in content
+    assert "## Actionable failures" in content
+    assert "### org/crash" in content
+    assert "processor_load" in content
+    assert "ValueError: processor missing image support" in content
+    assert "python reproduce.py org/crash" in content
+    assert "| org/observed | completed / unusable | repeated output |" in content
+    assert "../reports/diagnostics.md#diagnostic-org-observed" in content
+    assert "1 clean completion; see the [full model gallery]" in content
+    assert "org/clean" not in content
+    assert "Traceback (most recent call last)" not in content
+    assert "generated output that must not be copied" not in content
+    assert "full prompt that must not be copied" not in content
+
+
+def test_run_issue_summary_uses_cached_assessment_without_reclassification(
+    tmp_path: Path,
+) -> None:
+    """Report-only rendering must preserve cached schema-2.0 assessment values."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    _write_issue_summary_fixture(
+        output_paths,
+        results=(
+            _issue_summary_result(
+                "org/cached",
+                usability="usable_with_caveats",
+                maintainer_status="observation_needs_reproduction",
+                observations=["minimal_output"],
+            ),
+        ),
+    )
+
+    with (
+        patch.object(
+            check_models,
+            "_assess_result",
+            side_effect=AssertionError("cached assessment was reclassified"),
+        ),
+        patch.object(check_models._LinkStyleState, "value", "relative"),
+    ):
+        summary = check_models.generate_run_issue_summary_report(output_paths)
+
+    assert summary is not None
+    content = summary.read_text(encoding="utf-8")
+    assert "completed / usable with caveats" in content
+    assert "minimal output" in content
+
+
+def test_run_issue_summary_repro_prefers_resolved_revision(tmp_path: Path) -> None:
+    """Crash reproduction should pin the immutable resolved snapshot when available."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    result = _issue_summary_result(
+        "org/crash",
+        execution="crashed",
+        usability="not_evaluated",
+        maintainer_status="actionable_failure",
+    )
+    provenance = result["model_provenance"]
+    assert isinstance(provenance, dict)
+    provenance["requested_revision"] = "moving-branch"
+    provenance["resolved_revision"] = "immutable-commit"
+    _write_issue_summary_fixture(output_paths, results=(result,))
+
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+
+    if summary is None:
+        pytest.fail("the crash must produce a run issue summary")
+    content = summary.read_text(encoding="utf-8")
+    assert "--revision immutable-commit" in content
+    assert "--revision moving-branch" not in content
+
+
+def test_run_issue_summary_removes_stale_artifact_for_clean_run(tmp_path: Path) -> None:
+    """A run with no surfaced result should not leave an obsolete issue body."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    _write_issue_summary_fixture(
+        output_paths,
+        results=(_issue_summary_result("org/clean"),),
+    )
+    stale = output_paths.index.parent / "issues" / "run_summary.md"
+    stale.parent.mkdir(parents=True, exist_ok=True)
+    check_models._write_text_file(stale, "stale issue\n")
+
+    assert check_models.generate_run_issue_summary_report(output_paths) is None
+    assert not stale.exists()
+
+
+@pytest.mark.parametrize(
+    ("rows", "expected"),
+    [
+        ((), "Missing JSONL metadata"),
+        (({"_type": "metadata", "format_version": "1.0"},), "format_version 2.0"),
+        (
+            (
+                {
+                    "_type": "metadata",
+                    "format_version": "2.0",
+                    "prompt": "prompt",
+                    "system": {},
+                    "timestamp": "now",
+                },
+                {"_type": "result", "model": "org/model"},
+            ),
+            "cached assessment",
+        ),
+    ],
+)
+def test_run_issue_summary_rejects_invalid_jsonl_contract(
+    tmp_path: Path,
+    rows: tuple[dict[str, object], ...],
+    expected: str,
+) -> None:
+    """Missing metadata, wrong schemas, and missing assessments must fail clearly."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    output_paths.jsonl.parent.mkdir(parents=True, exist_ok=True)
+    check_models._write_text_file(
+        output_paths.jsonl,
+        "".join(json.dumps(row) + "\n" for row in rows),
+    )
+
+    with pytest.raises(ValueError, match=expected):
+        check_models.generate_run_issue_summary_report(output_paths)
+
+
+@pytest.mark.parametrize(
+    ("replacement", "expected"),
+    [
+        ({"model_provenance": "not a mapping"}, "model provenance"),
+        ({"model_provenance": {"model": "org/model", "resolved_revision": []}}, "revision"),
+        (
+            {
+                "model_provenance": {
+                    "model": "org/different-model",
+                    "requested_revision": None,
+                    "resolved_revision": "commit",
+                }
+            },
+            "does not match",
+        ),
+        ({"failure": "not a mapping"}, "failure"),
+        (
+            {
+                "failure": {
+                    "phase": "model_load",
+                    "exception_chain": ["not a mapping"],
+                }
+            },
+            "exception chain",
+        ),
+        (
+            {
+                "assessment": {
+                    "execution": [],
+                    "usability": "unusable",
+                    "maintainer_status": "observation_needs_reproduction",
+                    "observations": [],
+                }
+            },
+            "cached assessment",
+        ),
+    ],
+)
+def test_run_issue_summary_rejects_malformed_consumed_result_structures(
+    tmp_path: Path,
+    replacement: dict[str, object],
+    expected: str,
+) -> None:
+    """Every retained structure dereferenced by the renderer must be validated."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    result = _issue_summary_result(
+        "org/model",
+        execution="crashed",
+        usability="not_evaluated",
+        maintainer_status="actionable_failure",
+    )
+    result.update(replacement)
+    _write_issue_summary_fixture(output_paths, results=(result,))
+
+    with pytest.raises(ValueError, match=expected):
+        check_models.generate_run_issue_summary_report(output_paths)
+
+
+def test_run_issue_summary_ignores_malformed_optional_run_json(tmp_path: Path) -> None:
+    """Malformed optional enrichment must not block rendering cached assessments."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    _write_issue_summary_fixture(
+        output_paths,
+        results=(
+            _issue_summary_result(
+                "org/observed",
+                maintainer_status="observation_needs_reproduction",
+                observations=["minimal_output"],
+            ),
+        ),
+    )
+    check_models._write_text_file(output_paths.run_json, "{not json\n")
+
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+
+    assert summary is not None
+    assert "org/observed" in summary.read_text(encoding="utf-8")
+
+
+def test_regenerate_run_issue_summary_only_writes_derived_artifact(tmp_path: Path) -> None:
+    """Report-only regeneration must leave every retained source byte-identical."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    _write_issue_summary_fixture(
+        output_paths,
+        results=(
+            _issue_summary_result(
+                "org/crash",
+                execution="crashed",
+                usability="not_evaluated",
+                maintainer_status="actionable_failure",
+            ),
+        ),
+    )
+    issue_draft = output_paths.index.parent / "issues" / "issue_org_crash.md"
+    issue_draft.parent.mkdir(parents=True, exist_ok=True)
+    check_models._write_text_file(issue_draft, "# Existing crash draft\n")
+    retained = {
+        path: path.read_bytes() for path in (output_paths.jsonl, output_paths.run_json, issue_draft)
+    }
+
+    with patch.object(check_models._LinkStyleState, "value", "relative"):
+        generated = check_models.regenerate_run_issue_summary(output_paths.index.parent)
+
+    assert generated == output_paths.index.parent / "issues" / "run_summary.md"
+    if generated is None:
+        pytest.fail("the actionable retained run must regenerate an issue summary")
+    assert {path: path.read_bytes() for path in retained} == retained
+    assert "[crash draft](issue_org_crash.md)" in generated.read_text(encoding="utf-8")
 
 
 def test_html_and_gallery_render_same_captured_peak_memory(tmp_path: Path) -> None:
@@ -359,6 +745,14 @@ def test_output_index_links_current_run_issue_drafts_in_model_order(tmp_path: Pa
     assert content.index("[org/a]") < content.index("[org/z]")
 
 
+def _report_outcome(
+    outcomes: Sequence[check_models.ReportArtifactOutcome],
+    key: str,
+) -> check_models.ReportArtifactOutcome:
+    """Return one named report outcome for concise orchestration assertions."""
+    return next(outcome for outcome in outcomes if outcome.key == key)
+
+
 def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: Path) -> None:
     """Final report orchestration should index the drafts generated by diagnostics."""
     args = Namespace(
@@ -393,11 +787,158 @@ def test_report_orchestration_passes_generated_issue_drafts_to_index(tmp_path: P
     )
 
     with patch.object(check_models._LinkStyleState, "value", "relative"):
-        check_models._generate_reports_and_log_outputs(inputs)
+        outcomes = check_models._generate_reports_and_log_outputs(inputs)
 
-    assert "[org/broken](issues/issue_org_broken.md)" in output_paths.index.read_text(
-        encoding="utf-8"
+    index_content = output_paths.index.read_text(encoding="utf-8")
+    summary_path = output_paths.index.parent / "issues" / "run_summary.md"
+    assert "[Run issue summary](issues/run_summary.md)" in index_content
+    assert "[org/broken](issues/issue_org_broken.md)" in index_content
+    assert index_content.index("[Run issue summary]") < index_content.index("[org/broken]")
+    assert _report_outcome(outcomes, "run_issue_summary").succeeded
+
+    with patch.object(
+        check_models,
+        "generate_run_issue_summary_report",
+        side_effect=ValueError("summary fixture failure"),
+    ):
+        failed_summary_outcomes = check_models._generate_reports_and_log_outputs(inputs)
+
+    failed_summary = _report_outcome(failed_summary_outcomes, "run_issue_summary")
+    assert not failed_summary.succeeded
+    assert failed_summary.error_message == "summary fixture failure"
+    assert all(
+        path.exists()
+        for path in (
+            output_paths.index,
+            output_paths.html,
+            output_paths.gallery_markdown,
+            output_paths.jsonl,
+            output_paths.run_json,
+            output_paths.diagnostics,
+        )
     )
+    assert not summary_path.exists()
+
+    check_models._write_text_file(summary_path, "stale prior-run summary\n")
+    with (
+        patch.object(
+            check_models,
+            "save_jsonl_report",
+            side_effect=OSError("current JSONL write failed"),
+        ),
+        patch.object(
+            check_models,
+            "generate_run_issue_summary_report",
+            side_effect=AssertionError("summary must not read stale JSONL"),
+        ),
+    ):
+        stale_jsonl_outcomes = check_models._generate_reports_and_log_outputs(inputs)
+
+    assert not summary_path.exists()
+    assert not _report_outcome(stale_jsonl_outcomes, "jsonl").succeeded
+
+    check_models._write_text_file(summary_path, "undeletable stale summary\n")
+    cleanup_error = PermissionError("summary cleanup denied")
+    with (
+        patch.object(
+            check_models,
+            "save_jsonl_report",
+            side_effect=OSError("current JSONL write failed"),
+        ),
+        patch.object(check_models, "_remove_run_issue_summary", return_value=cleanup_error),
+    ):
+        cleanup_failure_outcomes = check_models._generate_reports_and_log_outputs(inputs)
+
+    assert summary_path.exists()
+    assert "Run issue summary" not in output_paths.index.read_text(encoding="utf-8")
+    cleanup_failure = _report_outcome(cleanup_failure_outcomes, "run_issue_summary")
+    assert not cleanup_failure.succeeded
+    assert "cleanup denied" in (cleanup_failure.error_message or "")
+
+    check_models._write_text_file(summary_path, "stale prior-run summary\n")
+    check_models._write_text_file(output_paths.diagnostics, "stale prior-run diagnostics\n")
+    with (
+        patch.object(
+            check_models,
+            "_write_diagnostics_artifacts",
+            side_effect=OSError("current diagnostics write failed"),
+        ),
+        patch.object(
+            check_models,
+            "generate_run_issue_summary_report",
+            side_effect=AssertionError("summary must not link stale diagnostics"),
+        ),
+    ):
+        stale_diagnostics_outcomes = check_models._generate_reports_and_log_outputs(inputs)
+
+    assert not summary_path.exists()
+    assert "Run issue summary" not in output_paths.index.read_text(encoding="utf-8")
+    assert not _report_outcome(stale_diagnostics_outcomes, "diagnostics").succeeded
+    stale_diagnostics_summary = _report_outcome(
+        stale_diagnostics_outcomes,
+        "run_issue_summary",
+    )
+    assert not stale_diagnostics_summary.succeeded
+    assert "diagnostics" in (stale_diagnostics_summary.error_message or "").lower()
+
+    check_models._write_text_file(
+        output_paths.run_json,
+        json.dumps(
+            {
+                "image": {"name": "stale-prior-run.jpg"},
+                "generation_settings": {"max_tokens": 9999},
+            }
+        ),
+    )
+    with patch.object(
+        check_models,
+        "save_run_json_report",
+        side_effect=OSError("current run JSON write failed"),
+    ):
+        stale_run_json_outcomes = check_models._generate_reports_and_log_outputs(inputs)
+
+    assert not _report_outcome(stale_run_json_outcomes, "run_json").succeeded
+    stale_run_json_summary = summary_path.read_text(encoding="utf-8")
+    assert "stale-prior-run.jpg" not in stale_run_json_summary
+    assert "run.json" not in stale_run_json_summary
+
+    check_models._write_text_file(
+        output_paths.gallery_markdown,
+        "stale prior-run gallery\n",
+    )
+    with patch.object(
+        check_models,
+        "generate_markdown_gallery_report",
+        side_effect=OSError("current gallery write failed"),
+    ):
+        stale_gallery_outcomes = check_models._generate_reports_and_log_outputs(inputs)
+
+    stale_gallery_summary = summary_path.read_text(encoding="utf-8")
+    assert "model_gallery.md" not in stale_gallery_summary
+    assert "full model gallery" not in stale_gallery_summary
+    assert not _report_outcome(stale_gallery_outcomes, "markdown_gallery").succeeded
+    assert _report_outcome(stale_gallery_outcomes, "run_issue_summary").succeeded
+
+
+def test_report_dashboard_only_shows_current_successful_run_summary(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """An existing stale summary must stay hidden unless this run produced it."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    stale_summary = output_paths.index.parent / "issues" / "run_summary.md"
+    check_models._write_text_file(stale_summary, "stale\n")
+
+    check_models._print_reports_dashboard(output_paths, run_issue_summary=None)
+    without_summary = capsys.readouterr().err
+    check_models._print_reports_dashboard(
+        output_paths,
+        run_issue_summary=stale_summary,
+    )
+    with_summary = capsys.readouterr().err
+
+    assert "Run Issue Summary" not in without_summary
+    assert "Run Issue Summary" in with_summary
 
 
 def _relative_output_artifact_map(

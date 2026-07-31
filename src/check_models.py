@@ -1110,6 +1110,20 @@ class JsonlResultRecord(TypedDict):
     prompt_diagnostics: dict[str, JsonLike] | None
 
 
+@dataclass(frozen=True)
+class RunIssueSummarySource:
+    """Validated retained inputs for the paste-ready whole-run issue summary."""
+
+    metadata: JsonlMetadataRecord
+    results: tuple[JsonlResultRecord, ...]
+    image_name: str | None = None
+    generation_settings: tuple[tuple[str, str], ...] = ()
+
+
+class RunIssueSummaryValidationError(ValueError):
+    """Raised when retained inputs cannot satisfy the summary contract."""
+
+
 type RuntimePhaseName = Literal[
     "model_load",
     "prompt_prep",
@@ -1150,6 +1164,7 @@ class DiagnosticsArtifacts:
     outcome_counts: RunOutcomeCounts | None = None
     diagnostics_written: bool = False
     issue_reports: Mapping[str, Path] = dataclass_field(default_factory=dict)
+    run_issue_summary: Path | None = None
 
 
 @dataclass(frozen=True)
@@ -1950,7 +1965,15 @@ class ReportLink:
     anchor: str
 
 
-type ReportCell = str | ReportLink
+@dataclass(frozen=True)
+class ReportTargetLink:
+    """Explicit artifact link rendered safely in Markdown and HTML."""
+
+    label: str
+    target: str
+
+
+type ReportCell = str | ReportLink | ReportTargetLink
 
 
 @dataclass(frozen=True)
@@ -1960,6 +1983,7 @@ class ReportTable:
     headers: tuple[str, ...]
     rows: tuple[tuple[ReportCell, ...], ...]
     markdown_escaped: bool = False
+    compact: bool = False
 
 
 @dataclass(frozen=True)
@@ -2088,6 +2112,11 @@ def _render_report_table_markdown(block: ReportTable) -> list[str]:
         tuple(_render_report_cell_markdown(cell, escaped=block.markdown_escaped) for cell in row)
         for row in block.rows
     ]
+    if block.compact:
+        header_line = f"| {' | '.join(escaped_headers)} |"
+        divider_line = f"| {' | '.join('---' for _header in escaped_headers)} |"
+        row_lines = [f"| {' | '.join(row)} |" for row in escaped_rows]
+        return [header_line, divider_line, *row_lines, ""]
     return [*tabulate(escaped_rows, headers=escaped_headers, tablefmt="github").splitlines(), ""]
 
 
@@ -2098,6 +2127,11 @@ def _render_report_cell_markdown(cell: ReportCell, *, escaped: bool) -> str:
         label = label.replace("[", r"\[").replace("]", r"\]")
         anchor = html.escape(cell.anchor, quote=True).replace("(", "%28").replace(")", "%29")
         return f"[{label}](#{anchor})"
+    if isinstance(cell, ReportTargetLink):
+        label = html.escape(cell.label, quote=False).replace("\\", "\\\\")
+        label = label.replace("[", r"\[").replace("]", r"\]")
+        target = html.escape(cell.target, quote=True).replace("(", "%28").replace(")", "%29")
+        return f"[{label}]({target})"
     return cell if escaped else MARKDOWN_ESCAPER.escape(cell)
 
 
@@ -2219,6 +2253,8 @@ def _render_report_cell_html(cell: ReportCell) -> str:
     """Render one table cell as escaped HTML."""
     if isinstance(cell, ReportLink):
         return f'<a href="#{html.escape(cell.anchor, quote=True)}">{html.escape(cell.label)}</a>'
+    if isinstance(cell, ReportTargetLink):
+        return f'<a href="{html.escape(cell.target, quote=True)}">{html.escape(cell.label)}</a>'
     return html.escape(cell)
 
 
@@ -14570,10 +14606,662 @@ def _output_index_link(index_filename: Path, artifact_path: Path, label: str) ->
     return f"[{MARKDOWN_ESCAPER.escape(label)}]({target})"
 
 
+_RUN_ISSUE_EXECUTION_VALUES: Final[frozenset[str]] = frozenset(
+    {"completed", "crashed", "indeterminate"}
+)
+_RUN_ISSUE_USABILITY_VALUES: Final[frozenset[str]] = frozenset(
+    {"usable", "usable_with_caveats", "unusable", "not_evaluated"}
+)
+_RUN_ISSUE_MAINTAINER_VALUES: Final[frozenset[str]] = frozenset(
+    {"actionable_failure", "observation_needs_reproduction", "none"}
+)
+_RUN_ISSUE_OBSERVATION_VALUES: Final[frozenset[str]] = frozenset(
+    {
+        "empty_output",
+        "minimal_output",
+        "repeated_output",
+        "missing_requested_sections",
+        "token_cap_truncation",
+        "prompt_instruction_echo",
+        "unexpected_catalog_preamble",
+        "unexpected_special_token",
+        "configured_wrapper_present",
+        "thinking_trace_present",
+        "thinking_trace_incomplete",
+        "role_boundary_token_present",
+        "no_keyword_overlap",
+        "draft_returned_unchanged",
+    }
+)
+
+
+def _parse_run_issue_jsonl_rows(jsonl_path: Path) -> list[JsonLike]:
+    """Read retained JSONL safely and return decoded rows with line-aware errors."""
+    lines = [line for line in _read_text_file(jsonl_path).splitlines() if line]
+    if not lines:
+        message = f"Missing JSONL metadata in {jsonl_path}"
+        raise ValueError(message)
+
+    parsed_rows: list[JsonLike] = []
+    for line_number, line in enumerate(lines, start=1):
+        try:
+            parsed_rows.append(json.loads(line))
+        except json.JSONDecodeError as error:
+            message = f"Invalid JSONL row {line_number} in {jsonl_path}: {error.msg}"
+            raise ValueError(message) from error
+    return parsed_rows
+
+
+def _validate_run_issue_metadata(
+    metadata_value: JsonLike,
+    jsonl_path: Path,
+) -> JsonlMetadataRecord:
+    """Validate and narrow the schema-2.0 metadata row."""
+    if not isinstance(metadata_value, dict) or metadata_value.get("_type") != "metadata":
+        message = f"First JSONL row in {jsonl_path} must be metadata"
+        raise ValueError(message)
+    if metadata_value.get("format_version") != "2.0":
+        message = "Run issue summary requires results.jsonl format_version 2.0"
+        raise ValueError(message)
+    system = metadata_value.get("system")
+    versions = metadata_value.get("library_versions")
+    if (
+        not isinstance(metadata_value.get("prompt"), str)
+        or not isinstance(metadata_value.get("timestamp"), str)
+        or not isinstance(system, dict)
+        or any(not isinstance(value, str) for value in system.values())
+        or (
+            versions is not None
+            and (
+                not isinstance(versions, dict)
+                or any(
+                    value is not None and not isinstance(value, str) for value in versions.values()
+                )
+            )
+        )
+    ):
+        message = "JSONL metadata is missing required run context"
+        raise ValueError(message)
+    return cast("JsonlMetadataRecord", metadata_value)
+
+
+def _validate_run_issue_failure(value: JsonLike, line_number: int) -> None:
+    """Validate the bounded failure fields consumed by the summary renderer."""
+    if value is None:
+        return
+    if not isinstance(value, dict):
+        message = f"JSONL result row {line_number} has invalid failure evidence"
+        raise RunIssueSummaryValidationError(message)
+    for key in ("phase", "stage", "exception_type", "message"):
+        field_value = value.get(key)
+        if field_value is not None and not isinstance(field_value, str):
+            message = f"JSONL result row {line_number} has invalid failure field {key}"
+            raise ValueError(message)
+    chain = value.get("exception_chain")
+    if chain is None:
+        return
+    if not isinstance(chain, list):
+        message = f"JSONL result row {line_number} has invalid exception chain"
+        raise RunIssueSummaryValidationError(message)
+    for entry in chain:
+        if not isinstance(entry, dict) or any(
+            entry.get(key) is not None and not isinstance(entry.get(key), str)
+            for key in ("type", "message")
+        ):
+            message = f"JSONL result row {line_number} has invalid exception chain entry"
+            raise ValueError(message)
+
+
+def _validate_run_issue_model_provenance(
+    value: JsonLike,
+    line_number: int,
+    expected_model: str,
+) -> None:
+    """Validate the model and revision fields consumed by the summary renderer."""
+    if not isinstance(value, dict) or not isinstance(value.get("model"), str):
+        message = f"JSONL result row {line_number} has invalid model provenance"
+        raise RunIssueSummaryValidationError(message)
+    if value["model"] != expected_model:
+        message = f"JSONL result row {line_number} model provenance does not match {expected_model}"
+        raise ValueError(message)
+    for key in ("requested_revision", "resolved_revision"):
+        revision = value.get(key)
+        if revision is not None and not isinstance(revision, str):
+            message = f"JSONL result row {line_number} has invalid {key.replace('_', ' ')}"
+            raise ValueError(message)
+
+
+def _validate_run_issue_result(value: JsonLike, line_number: int) -> JsonlResultRecord:
+    """Validate and narrow one cached per-model assessment row."""
+    if not isinstance(value, dict) or value.get("_type") != "result":
+        message = f"JSONL row {line_number} must be a result record"
+        raise ValueError(message)
+    if any(key not in value for key in ("model", "assessment", "failure", "model_provenance")):
+        message = f"JSONL result row {line_number} is missing its cached assessment"
+        raise ValueError(message)
+    model = value["model"]
+    assessment = value["assessment"]
+    if not isinstance(model, str) or not isinstance(assessment, dict):
+        message = f"JSONL result row {line_number} has invalid field types"
+        raise RunIssueSummaryValidationError(message)
+    execution = assessment.get("execution")
+    usability = assessment.get("usability")
+    maintainer_status = assessment.get("maintainer_status")
+    observations = assessment.get("observations")
+    if (
+        not isinstance(execution, str)
+        or execution not in _RUN_ISSUE_EXECUTION_VALUES
+        or not isinstance(usability, str)
+        or usability not in _RUN_ISSUE_USABILITY_VALUES
+        or not isinstance(maintainer_status, str)
+        or maintainer_status not in _RUN_ISSUE_MAINTAINER_VALUES
+        or not isinstance(observations, list)
+        or any(
+            not isinstance(item, str) or item not in _RUN_ISSUE_OBSERVATION_VALUES
+            for item in observations
+        )
+    ):
+        message = f"JSONL result row {line_number} has an invalid cached assessment"
+        raise ValueError(message)
+    _validate_run_issue_failure(value["failure"], line_number)
+    _validate_run_issue_model_provenance(
+        value["model_provenance"],
+        line_number,
+        model,
+    )
+    return cast("JsonlResultRecord", value)
+
+
+def _load_run_issue_enrichment(
+    run_json_path: Path,
+) -> tuple[str | None, tuple[tuple[str, str], ...]]:
+    """Load optional image/settings enrichment, ignoring absent or malformed run JSON."""
+    image_name: str | None = None
+    generation_settings: tuple[tuple[str, str], ...] = ()
+    try:
+        run_value: JsonLike = json.loads(_read_text_file(run_json_path))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        run_value = None
+    if isinstance(run_value, dict):
+        image = run_value.get("image")
+        run_image_name = image.get("name") if isinstance(image, dict) else None
+        if isinstance(run_image_name, str):
+            image_name = run_image_name
+        settings = run_value.get("generation_settings")
+        if isinstance(settings, dict):
+            generation_settings = tuple(
+                (key, json.dumps(value, ensure_ascii=False, sort_keys=True))
+                for key, value in sorted(settings.items())
+            )
+    return image_name, generation_settings
+
+
+def _load_run_issue_summary_source(
+    output_paths: ReportOutputPaths,
+    *,
+    include_run_json: bool = True,
+) -> RunIssueSummarySource:
+    """Load and validate the cached schema-2.0 inputs used by the issue summary."""
+    parsed_rows = _parse_run_issue_jsonl_rows(output_paths.jsonl)
+    metadata = _validate_run_issue_metadata(parsed_rows[0], output_paths.jsonl)
+    results = tuple(
+        _validate_run_issue_result(value, line_number)
+        for line_number, value in enumerate(parsed_rows[1:], start=2)
+    )
+    image_name, generation_settings = (
+        _load_run_issue_enrichment(output_paths.run_json) if include_run_json else (None, ())
+    )
+
+    return RunIssueSummarySource(
+        metadata=metadata,
+        results=results,
+        image_name=image_name,
+        generation_settings=generation_settings,
+    )
+
+
+def _run_issue_summary_path(output_paths: ReportOutputPaths) -> Path:
+    """Return the canonical paste-ready whole-run issue path."""
+    return output_paths.index.parent / "issues" / "run_summary.md"
+
+
+def _remove_run_issue_summary(output_paths: ReportOutputPaths) -> OSError | None:
+    """Remove a derived summary that cannot describe the current run safely."""
+    try:
+        _run_issue_summary_path(output_paths).unlink()
+    except FileNotFoundError:
+        return None
+    except OSError as error:
+        return error
+    return None
+
+
+def _github_issue_report_paths(
+    model_names: Sequence[str],
+    issues_dir: Path,
+) -> dict[str, Path]:
+    """Return collision-safe per-model issue paths using the canonical naming rule."""
+    paths: dict[str, Path] = {}
+    used_filenames: set[str] = set()
+    for model_name in model_names:
+        name = re.sub(r"[^A-Za-z0-9_.-]+", "_", model_name).strip("._") or "model"
+        base_name = f"issue_{name}"
+        filename = f"{base_name}.md"
+        suffix = 2
+        while filename in used_filenames:
+            filename = f"{base_name}_{suffix}.md"
+            suffix += 1
+        used_filenames.add(filename)
+        paths[model_name] = issues_dir / filename
+    return paths
+
+
+def _run_issue_summary_repro_command(
+    result: JsonlResultRecord,
+    source: RunIssueSummarySource,
+) -> str:
+    """Build the compact parameterized reproduction command for one crash."""
+    tokens = ["python", "reproduce.py", result["model"]]
+    provenance = result.get("model_provenance")
+    revision: str | None = None
+    if isinstance(provenance, dict):
+        revision = provenance.get("resolved_revision") or provenance.get("requested_revision")
+    if revision:
+        tokens.extend(("--revision", revision))
+    if source.image_name:
+        tokens.extend(("--image", source.image_name))
+    tokens.extend(("--prompt-file", "prompt.txt"))
+    return shlex_join(tokens)
+
+
+def _run_issue_summary_exception_lines(failure: JsonlFailureRecord | None) -> str:
+    """Return a compact exception chain without traceback or captured output."""
+    if failure is None:
+        return "No structured exception evidence captured."
+    chain = failure.get("exception_chain")
+    if chain:
+        lines = []
+        for entry in chain:
+            exception_type = entry.get("type") or "Exception"
+            message = entry.get("message") or "no message"
+            lines.append(f"{exception_type}: {message}")
+        return "\ncaused by: ".join(lines)
+    exception_type = failure.get("exception_type") or "Exception"
+    message = failure.get("message") or "no message"
+    return f"{exception_type}: {message}"
+
+
+def _run_issue_summary_artifact_link(
+    *,
+    summary_path: Path,
+    artifact_path: Path,
+    label: str,
+    anchor: str | None = None,
+) -> ReportTargetLink:
+    """Build one safely rendered link from the issue summary to retained evidence."""
+    return ReportTargetLink(
+        label,
+        _markdown_artifact_target(
+            report_filename=summary_path,
+            artifact_filename=artifact_path,
+            anchor=anchor,
+        ),
+    )
+
+
+def _pluralized_count(count: int, singular: str, plural: str | None = None) -> str:
+    """Render a compact count phrase with stable pluralization."""
+    return f"{count} {singular if count == 1 else plural or f'{singular}s'}"
+
+
+def _run_issue_summary_assessment_label(assessment: JsonlAssessmentRecord) -> str:
+    """Render cached execution and usability values as compact human labels."""
+    return (
+        f"{assessment['execution'].replace('_', ' ')} / {assessment['usability'].replace('_', ' ')}"
+    )
+
+
+def _run_issue_summary_crash_section(
+    result: JsonlResultRecord,
+    *,
+    source: RunIssueSummarySource,
+    output_paths: ReportOutputPaths,
+    summary_path: Path,
+    issue_reports: Mapping[str, Path],
+) -> ReportSection:
+    """Build the expanded, bounded evidence section for one actionable crash."""
+    failure = result.get("failure")
+    provenance = result.get("model_provenance")
+    requested_revision = provenance.get("requested_revision") if provenance else None
+    resolved_revision = provenance.get("resolved_revision") if provenance else None
+    facts = [
+        (
+            "Execution / usability",
+            _run_issue_summary_assessment_label(result["assessment"]),
+        ),
+    ]
+    if failure is not None:
+        facts.extend(
+            (label, value)
+            for label, value in (
+                ("Phase", failure.get("phase")),
+                ("Stage", failure.get("stage")),
+            )
+            if value
+        )
+    if requested_revision:
+        facts.append(("Requested revision", requested_revision))
+    if resolved_revision:
+        facts.append(("Resolved revision", resolved_revision))
+
+    evidence_rows: list[tuple[ReportCell, ...]] = [
+        (
+            "Full diagnostics",
+            _run_issue_summary_artifact_link(
+                summary_path=summary_path,
+                artifact_path=output_paths.diagnostics,
+                label="model evidence",
+                anchor=_diagnostics_model_anchor(result["model"]),
+            ),
+        )
+    ]
+    issue_path = issue_reports.get(result["model"])
+    if issue_path is not None:
+        evidence_rows.append(
+            (
+                "Detailed issue draft",
+                _run_issue_summary_artifact_link(
+                    summary_path=summary_path,
+                    artifact_path=issue_path,
+                    label="crash draft",
+                ),
+            )
+        )
+    return ReportSection(
+        result["model"],
+        (
+            ReportKeyValues(tuple(facts)),
+            ReportParagraph("Root exception chain"),
+            ReportCodeBlock(_run_issue_summary_exception_lines(failure)),
+            ReportParagraph("Parameterized reproduction"),
+            ReportCodeBlock(
+                _run_issue_summary_repro_command(result, source),
+                language="bash",
+            ),
+            ReportTable(("Evidence", "Link"), tuple(evidence_rows), compact=True),
+        ),
+        level=3,
+    )
+
+
+def _run_issue_summary_other_section(
+    results: Sequence[JsonlResultRecord],
+    *,
+    output_paths: ReportOutputPaths,
+    summary_path: Path,
+) -> ReportSection:
+    """Build the compact table for non-actionable surfaced results."""
+    rows: list[tuple[ReportCell, ...]] = []
+    for result in results:
+        assessment = result["assessment"]
+        rows.append(
+            (
+                result["model"],
+                _run_issue_summary_assessment_label(assessment),
+                _gallery_observation_labels(assessment["observations"]),
+                _run_issue_summary_artifact_link(
+                    summary_path=summary_path,
+                    artifact_path=output_paths.diagnostics,
+                    label="diagnostics",
+                    anchor=_diagnostics_model_anchor(result["model"]),
+                ),
+            )
+        )
+    return ReportSection(
+        "Other surfaced results",
+        (
+            ReportTable(
+                ("Model", "Execution / usability", "Observations", "Full evidence"),
+                tuple(rows),
+                compact=True,
+            ),
+        ),
+    )
+
+
+def _run_issue_summary_context_section(source: RunIssueSummarySource) -> ReportSection:
+    """Build compact run settings and environment context."""
+    rows: list[tuple[str, str]] = []
+    if source.image_name:
+        rows.append(("Image", source.image_name))
+    rows.extend((f"Generation: {key}", value) for key, value in source.generation_settings)
+    versions = source.metadata.get("library_versions", {})
+    if isinstance(versions, dict):
+        rows.extend(
+            (name, str(versions[name]))
+            for name in ("mlx-vlm", "mlx", "transformers")
+            if versions.get(name)
+        )
+    system = source.metadata["system"]
+    rows.extend(
+        (label, system[label])
+        for label in ("macOS Version", "GPU/Chip", "Python Version")
+        if system.get(label)
+    )
+    return ReportSection("Run context", (ReportKeyValues(tuple(rows)),))
+
+
+def _run_issue_summary_artifacts_section(
+    output_paths: ReportOutputPaths,
+    summary_path: Path,
+    *,
+    include_gallery_markdown: bool,
+    include_run_json: bool,
+) -> ReportSection:
+    """Build links to the complete retained artifacts."""
+    artifact_rows = [
+        ("Diagnostics", output_paths.diagnostics),
+    ]
+    if include_gallery_markdown:
+        artifact_rows.append(("Model gallery", output_paths.gallery_markdown))
+    artifact_rows.append(("Results JSONL", output_paths.jsonl))
+    if include_run_json:
+        artifact_rows.append(("Run JSON", output_paths.run_json))
+    artifact_rows.extend(
+        (
+            ("Environment", output_paths.environment),
+            ("Log", output_paths.log),
+        )
+    )
+    rows = tuple(
+        (
+            label,
+            _run_issue_summary_artifact_link(
+                summary_path=summary_path,
+                artifact_path=path,
+                label=path.name,
+            ),
+        )
+        for label, path in artifact_rows
+    )
+    return ReportSection(
+        "Full artifacts",
+        (ReportTable(("Artifact", "Link"), rows, compact=True),),
+    )
+
+
+def generate_run_issue_summary_report(
+    output_paths: ReportOutputPaths,
+    *,
+    issue_reports: Mapping[str, Path] | None = None,
+    include_gallery_markdown: bool = True,
+    include_run_json: bool = True,
+) -> Path | None:
+    """Generate a paste-ready whole-run issue from retained schema-2.0 artifacts."""
+    source = _load_run_issue_summary_source(
+        output_paths,
+        include_run_json=include_run_json,
+    )
+    summary_path = _run_issue_summary_path(output_paths)
+    actionable = tuple(
+        result
+        for result in source.results
+        if result["assessment"]["maintainer_status"] == "actionable_failure"
+    )
+    surfaced = tuple(
+        result
+        for result in source.results
+        if result["assessment"]["maintainer_status"] != "none"
+        or result["assessment"]["execution"] == "indeterminate"
+    )
+    other = tuple(result for result in surfaced if result not in actionable)
+    if not surfaced:
+        cleanup_error = _remove_run_issue_summary(output_paths)
+        if cleanup_error is not None:
+            raise cleanup_error
+        return None
+
+    counts = Counter(result["assessment"]["execution"] for result in source.results)
+    clean_count = sum(
+        result["assessment"]["execution"] == "completed"
+        and result["assessment"]["maintainer_status"] == "none"
+        for result in source.results
+    )
+    title = (
+        "# mlx-vlm compatibility findings across "
+        f"{len(source.results)} cached vision-language models"
+    )
+    blocks: list[ReportBlock] = [
+        ReportSection(
+            "Run summary",
+            (
+                ReportKeyValues(
+                    (
+                        ("Run timestamp", source.metadata["timestamp"]),
+                        ("Evaluation mode", str(source.metadata.get("eval_mode", "unknown"))),
+                        ("Models attempted", str(len(source.results))),
+                        ("Completed", str(counts["completed"])),
+                        ("Crashed", str(counts["crashed"])),
+                        ("Indeterminate", str(counts["indeterminate"])),
+                        ("Actionable failures", str(len(actionable))),
+                        ("Other surfaced results", str(len(other))),
+                    )
+                ),
+                ReportParagraph(
+                    "Observations are mechanical facts from one image, not general model-quality "
+                    "judgements."
+                ),
+            ),
+        )
+    ]
+
+    if actionable:
+        blocks.append(
+            ReportSection(
+                "Actionable failures",
+                tuple(
+                    _run_issue_summary_crash_section(
+                        result,
+                        source=source,
+                        output_paths=output_paths,
+                        summary_path=summary_path,
+                        issue_reports=issue_reports or {},
+                    )
+                    for result in actionable
+                ),
+            )
+        )
+
+    if other:
+        blocks.append(
+            _run_issue_summary_other_section(
+                other,
+                output_paths=output_paths,
+                summary_path=summary_path,
+            )
+        )
+
+    clean_sentence = f"{_pluralized_count(clean_count, 'clean completion')}."
+    if include_gallery_markdown:
+        gallery_link = _run_issue_summary_artifact_link(
+            summary_path=summary_path,
+            artifact_path=output_paths.gallery_markdown,
+            label="full model gallery",
+        )
+        clean_sentence = (
+            f"{_pluralized_count(clean_count, 'clean completion')}; see the "
+            f"{_render_report_cell_markdown(gallery_link, escaped=False)}."
+        )
+    blocks.append(
+        ReportSection(
+            "Clean completions",
+            (
+                ReportRaw(
+                    markdown_lines=(clean_sentence,),
+                ),
+            ),
+        )
+    )
+
+    blocks.extend(
+        (
+            _run_issue_summary_context_section(source),
+            _run_issue_summary_artifacts_section(
+                output_paths,
+                summary_path,
+                include_gallery_markdown=include_gallery_markdown,
+                include_run_json=include_run_json,
+            ),
+        )
+    )
+
+    summary_path.parent.mkdir(parents=True, exist_ok=True)
+    _write_markdown_artifact(
+        summary_path,
+        (title, "", *render_report_markdown(tuple(blocks))),
+        artifact_name="run issue summary",
+    )
+    return summary_path
+
+
+def regenerate_run_issue_summary(output_dir: Path) -> Path | None:
+    """Regenerate only the paste-ready issue body from retained run artifacts."""
+    output_paths = ReportOutputPaths(
+        index=output_dir / DEFAULT_OUTPUT_INDEX.name,
+        html=output_dir / "reports" / DEFAULT_HTML_OUTPUT.name,
+        gallery_markdown=output_dir / "reports" / DEFAULT_GALLERY_MD_OUTPUT.name,
+        jsonl=output_dir / DEFAULT_JSONL_OUTPUT.name,
+        run_json=output_dir / DEFAULT_RUN_JSON_OUTPUT.name,
+        diagnostics=output_dir / "reports" / DEFAULT_DIAGNOSTICS_OUTPUT.name,
+        log=output_dir / DEFAULT_LOG_OUTPUT.name,
+        environment=output_dir / DEFAULT_ENV_OUTPUT.name,
+    )
+    source = _load_run_issue_summary_source(output_paths)
+    crash_models = tuple(
+        result["model"]
+        for result in source.results
+        if result["assessment"]["execution"] == "crashed"
+        and result["assessment"]["maintainer_status"] == "actionable_failure"
+    )
+    issue_reports = {
+        model_name: path
+        for model_name, path in _github_issue_report_paths(
+            crash_models,
+            output_dir / "issues",
+        ).items()
+        if path.is_file()
+    }
+    return generate_run_issue_summary_report(
+        output_paths,
+        issue_reports=issue_reports,
+    )
+
+
 def generate_output_index_report(
     filename: Path,
     *,
     output_paths: ReportOutputPaths,
+    run_issue_summary: Path | None = None,
     issue_reports: Mapping[str, Path] | None = None,
 ) -> None:
     """Write a minimal navigation list for the retained artifacts."""
@@ -14588,6 +15276,9 @@ def generate_output_index_report(
     )
     md = ["# Check Models Output Index", ""]
     md.extend(f"- {_output_index_link(filename, path, label)}" for path, label in links)
+    if run_issue_summary is not None:
+        md.extend(("", "## Paste-ready run issue", ""))
+        md.append(f"- {_output_index_link(filename, run_issue_summary, 'Run issue summary')}")
     if issue_reports:
         md.extend(("", "## Issue drafts", ""))
         md.extend(
@@ -15188,17 +15879,12 @@ def _generate_github_issue_reports(
         result for result in actionable if assessments[result.model_name].execution == "crashed"
     )
     generated: dict[str, Path] = {}
-    used_filenames: set[str] = set()
+    issue_paths = _github_issue_report_paths(
+        tuple(result.model_name for result in crashes),
+        issues_dir,
+    )
     for result in crashes:
-        name = re.sub(r"[^A-Za-z0-9_.-]+", "_", result.model_name).strip("._") or "model"
-        base_name = f"issue_{name}"
-        filename = f"{base_name}.md"
-        suffix = 2
-        while filename in used_filenames:
-            filename = f"{base_name}_{suffix}.md"
-            suffix += 1
-        used_filenames.add(filename)
-        issue_path = issues_dir / filename
+        issue_path = issue_paths[result.model_name]
         parts = [f"# Crash: {MARKDOWN_ESCAPER.escape(result.model_name)}", ""]
         provenance = model_provenance.get(result.model_name)
         image_ref = _issue_repro_image_ref(image_path=image_path, run_args=run_args)
@@ -15496,6 +16182,84 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
     )
 
 
+def _generate_run_issue_summary_output(
+    inputs: ReportGenerationInputs,
+    *,
+    issue_reports: Mapping[str, Path],
+    jsonl_succeeded: bool,
+    diagnostics_succeeded: bool,
+    gallery_succeeded: bool,
+    run_json_succeeded: bool,
+) -> tuple[Path | None, ReportArtifactOutcome | None]:
+    """Generate the optional summary only from current-run canonical inputs."""
+    summary_path = _run_issue_summary_path(inputs.output_paths)
+    if not jsonl_succeeded:
+        cleanup_error = _remove_run_issue_summary(inputs.output_paths)
+        error_message = "Skipped because current JSONL generation failed."
+        if cleanup_error is not None:
+            error_message += f" Stale summary cleanup failed: {cleanup_error}"
+        return None, ReportArtifactOutcome(
+            key="run_issue_summary",
+            path=summary_path,
+            succeeded=False,
+            error_message=error_message,
+        )
+    summary_required = any(
+        assessment.maintainer_status != "none" or assessment.execution == "indeterminate"
+        for _, assessment in inputs.report_context.assessments
+    )
+    if not summary_required:
+        cleanup_error = _remove_run_issue_summary(inputs.output_paths)
+        if cleanup_error is None:
+            return None, None
+        return None, ReportArtifactOutcome(
+            key="run_issue_summary",
+            path=summary_path,
+            succeeded=False,
+            error_message=f"Stale summary cleanup failed: {cleanup_error}",
+        )
+    if not diagnostics_succeeded:
+        cleanup_error = _remove_run_issue_summary(inputs.output_paths)
+        error_message = "Skipped because current diagnostics generation failed."
+        if cleanup_error is not None:
+            error_message += f" Stale summary cleanup failed: {cleanup_error}"
+        return None, ReportArtifactOutcome(
+            key="run_issue_summary",
+            path=summary_path,
+            succeeded=False,
+            error_message=error_message,
+        )
+    try:
+        generated = generate_run_issue_summary_report(
+            inputs.output_paths,
+            issue_reports=issue_reports,
+            include_gallery_markdown=gallery_succeeded,
+            include_run_json=run_json_succeeded,
+        )
+    except (OSError, TypeError, ValueError, RuntimeError) as error:
+        cleanup_error = _remove_run_issue_summary(inputs.output_paths)
+        logger.exception("Failed to generate paste-ready run issue summary.")
+        error_message = str(error)
+        if cleanup_error is not None:
+            error_message += f"; stale summary cleanup failed: {cleanup_error}"
+        return None, ReportArtifactOutcome(
+            key="run_issue_summary",
+            path=summary_path,
+            succeeded=False,
+            error_message=error_message,
+        )
+    outcome = (
+        ReportArtifactOutcome(
+            key="run_issue_summary",
+            path=generated,
+            succeeded=True,
+        )
+        if generated is not None
+        else None
+    )
+    return generated, outcome
+
+
 def _generate_reports_and_log_outputs(
     inputs: ReportGenerationInputs,
 ) -> tuple[ReportArtifactOutcome, ...]:
@@ -15511,9 +16275,9 @@ def _generate_reports_and_log_outputs(
     by_key = {artifact.key: artifact for artifact in artifacts}
     outcomes: list[ReportArtifactOutcome] = []
 
-    def run_artifact(artifact: ReportArtifact) -> None:
+    def run_artifact(artifact: ReportArtifact) -> bool:
         if artifact.job is None:
-            return
+            return False
         try:
             artifact.job()
         except (OSError, TypeError, ValueError, RuntimeError) as error:
@@ -15526,6 +16290,7 @@ def _generate_reports_and_log_outputs(
                     error_message=str(error),
                 )
             )
+            return False
         else:
             outcomes.append(
                 ReportArtifactOutcome(
@@ -15534,12 +16299,14 @@ def _generate_reports_and_log_outputs(
                     succeeded=True,
                 )
             )
+            return True
 
-    run_artifact(by_key["jsonl"])
+    jsonl_succeeded = run_artifact(by_key["jsonl"])
 
     diagnostics_artifacts = DiagnosticsArtifacts(
         outcome_counts=_run_outcome_counts(inputs.report_context.assessments)
     )
+    diagnostics_succeeded = False
     try:
         diagnostics_artifacts = _write_diagnostics_artifacts(
             args=inputs.run_args or argparse.Namespace(),
@@ -15561,6 +16328,7 @@ def _generate_reports_and_log_outputs(
             )
         )
     else:
+        diagnostics_succeeded = True
         outcomes.append(
             ReportArtifactOutcome(
                 key="diagnostics",
@@ -15573,17 +16341,43 @@ def _generate_reports_and_log_outputs(
         diagnostics_path=inputs.output_paths.diagnostics,
     )
 
+    run_json_succeeded = run_artifact(by_key["run_json"])
+    gallery_succeeded = run_artifact(by_key["markdown_gallery"])
+
+    run_issue_summary, summary_outcome = _generate_run_issue_summary_output(
+        inputs,
+        issue_reports=diagnostics_artifacts.issue_reports,
+        jsonl_succeeded=jsonl_succeeded,
+        diagnostics_succeeded=diagnostics_succeeded,
+        gallery_succeeded=gallery_succeeded,
+        run_json_succeeded=run_json_succeeded,
+    )
+    if summary_outcome is not None:
+        outcomes.append(summary_outcome)
+    if run_issue_summary is not None:
+        diagnostics_artifacts = replace(
+            diagnostics_artifacts,
+            run_issue_summary=run_issue_summary,
+        )
+
     index_artifact = replace(
         by_key["output_index"],
         job=lambda: generate_output_index_report(
             inputs.output_paths.index,
             output_paths=inputs.output_paths,
+            run_issue_summary=run_issue_summary,
             issue_reports=diagnostics_artifacts.issue_reports,
         ),
     )
     run_artifact(index_artifact)
     for artifact in artifacts:
-        if artifact.key not in {"output_index", "jsonl", "diagnostics"}:
+        if artifact.key not in {
+            "output_index",
+            "jsonl",
+            "run_json",
+            "diagnostics",
+            "markdown_gallery",
+        }:
             run_artifact(artifact)
 
     failures = [outcome for outcome in outcomes if not outcome.succeeded]
@@ -15598,6 +16392,8 @@ def _generate_reports_and_log_outputs(
     for artifact in artifacts:
         if artifact.key in successful_keys:
             log_file_path(artifact.path, label=artifact.label)
+    if run_issue_summary is not None:
+        log_file_path(run_issue_summary, label="   Run Issue:       ")
 
     log_file_path(inputs.output_paths.log, label="   Log File:")
     if inputs.output_paths.environment.exists():
@@ -15754,6 +16550,8 @@ def _run_differential_reruns(
 def _print_reports_dashboard(
     output_paths: ReportOutputPaths,
     history_path: Path | None = None,
+    *,
+    run_issue_summary: Path | None = None,
 ) -> None:
     """Print a highly polished, unified console dashboard of all generated artifacts."""
     colors_enabled = _rich_color_enabled()
@@ -15786,6 +16584,12 @@ def _print_reports_dashboard(
 
     for spec in _build_report_artifact_specs(output_paths):
         add_row(spec.dashboard_label, spec.dashboard_purpose, spec.path)
+
+    add_row(
+        "Run Issue Summary",
+        "Paste-ready whole-run GitHub issue body",
+        run_issue_summary,
+    )
 
     if history_path:
         add_row("Run History", "Persistent database of previous runs", history_path)
@@ -15896,7 +16700,7 @@ def finalize_execution(
 
         log_file_path(history_path, label="   History:     ")
 
-        _generate_reports_and_log_outputs(
+        report_outcomes = _generate_reports_and_log_outputs(
             ReportGenerationInputs(
                 results=results,
                 library_versions=library_versions,
@@ -15913,6 +16717,14 @@ def finalize_execution(
                 runtime_fingerprint=runtime_fingerprint,
             ),
         )
+        run_issue_summary = next(
+            (
+                outcome.path
+                for outcome in report_outcomes
+                if outcome.key == "run_issue_summary" and outcome.succeeded
+            ),
+            None,
+        )
 
         # Remove stale top-level report copies superseded by reports/ subdirectory
         reports_dir = output_paths.diagnostics.parent
@@ -15927,6 +16739,7 @@ def finalize_execution(
         _print_reports_dashboard(
             output_paths=output_paths,
             history_path=history_path,
+            run_issue_summary=run_issue_summary,
         )
 
         # Open HTML report in default browser if requested

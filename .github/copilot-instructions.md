@@ -30,7 +30,7 @@ is a setup failure, not a product regression.
 
 | File | Purpose | Size |
 | ------ | --------- | ------ |
-| `src/check_models.py` | **Single-file CLI monolith** (~16,300 lines). All logic lives here. | ★ primary edit target |
+| `src/check_models.py` | **Single-file CLI monolith** (~17,200 lines). All logic lives here. | ★ primary edit target |
 | `src/check_models_data/quality_config.yaml` | Runtime thresholds loaded by `load_quality_config()` | Edit thresholds here, not in Python |
 | `src/pyproject.toml` | Packaging, dependencies, tool config (ruff, mypy, pytest) | Update when adding imports |
 | `src/tests/conftest.py` | Shared fixtures: `test_image`, `minimal_test_image`, `realistic_test_image`, `folder_with_images`, etc. | Use existing fixtures |
@@ -156,12 +156,19 @@ The file is organized in this order — search for these exact landmark headers 
 6. If you added/changed CLI flags → update the CLI reference table in `src/README.md` (§ Command Line Reference)
 7. `make format` — apply Ruff formatting before the full quality gate
 8. `make -C src lint-fix` — apply safe Ruff fixes when lint reports fixable issues
-9. `make lint` — clear Ruff lint errors before running the full gate
-10. `bash src/tools/run_commit_hygiene.sh` — verify local commit hygiene
-11. `make quality` — run the full quality gate check, including the full pytest suite
-12. If report formats changed → update `src/output/` fixtures intentionally; validation tests must not rewrite tracked `src/output/` assets just to prove a change
-13. Update `CHANGELOG.md` under `[Unreleased]` for any maintainer-relevant change (features, fixes, refactors, tooling/docs workflow updates)
-14. `git commit -m "feat: description"` and push
+9. If manual correction would be slower, optionally preview Ruff's unsafe fixes
+   with `cd src && ruff check --unsafe-fixes --diff check_models.py tests tools`.
+   Apply them with `cd src && ruff check --fix --unsafe-fixes check_models.py tests tools`
+   only after understanding every proposed semantic change. Critically inspect the
+   resulting `git diff`, repair or revert questionable transformations, and run
+   targeted tests. This is an escape hatch, not a routine extra workflow step or
+   permission to accept unsafe fixes on the nod.
+10. `make lint` — clear Ruff lint errors before running the full gate
+11. `bash src/tools/run_commit_hygiene.sh` — verify local commit hygiene
+12. `make quality` — run the full quality gate check, including the full pytest suite
+13. If report formats changed → update `src/output/` fixtures intentionally; validation tests must not rewrite tracked `src/output/` assets just to prove a change
+14. Update `CHANGELOG.md` under `[Unreleased]` for any maintainer-relevant change (features, fixes, refactors, tooling/docs workflow updates)
+15. `git commit -m "feat: description"` and push
 
 ### 10. Agentic skills (`.agents/skills/`)
 

@@ -8,6 +8,10 @@
 - [check_models.log](https://github.com/jrp2014/check_models/blob/main/src/output/check_models.log)
 - [environment.log](https://github.com/jrp2014/check_models/blob/main/src/output/environment.log)
 
+## Paste-ready run issue
+
+- [Run issue summary](https://github.com/jrp2014/check_models/blob/main/src/output/issues/run_summary.md)
+
 ## Issue drafts
 
 - [mlx-community/Step-3.7-Flash-oQ2e](https://github.com/jrp2014/check_models/blob/main/src/output/issues/issue_mlx-community_Step-3.7-Flash-oQ2e.md)
