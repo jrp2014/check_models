@@ -1499,6 +1499,13 @@ def test_crash_diagnostics_and_issue_draft_keep_complete_primary_evidence_first(
         assert "LlamaTokenizerFast" in content
     assert "python -m mlx_vlm.generate" not in diagnostics_content
     assert "Canonical parameterised Python reproduction" in diagnostics_content
+    for content in (diagnostics_content, issue_content):
+        assert content.index("#### Root exception and chain") < content.index(
+            "#### Execution and provenance"
+        )
+        assert content.index("#### Execution and provenance") < content.index("Complete traceback")
+    assert "<summary>Complete traceback</summary>" in issue_content
+    assert "<summary>Complete traceback</summary>" not in diagnostics_content
     assert "python -m mlx_vlm.generate" in issue_content
     assert "```\n\n## Provenance and Environment" in issue_content
     assert not (tmp_path / "issues" / "index.md").exists()

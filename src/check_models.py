@@ -8107,6 +8107,7 @@ def _diagnostics_model_blocks(
     *,
     run_args: argparse.Namespace | None,
     model_provenance: ModelProvenanceRecord | None,
+    collapse_traceback: bool = False,
 ) -> tuple[ReportBlock, ...]:
     """Build one model's complete maintainer evidence in priority order."""
     blocks: list[ReportBlock] = []
@@ -8118,15 +8119,6 @@ def _diagnostics_model_blocks(
                 level=4,
             )
         )
-        if result.error_traceback:
-            blocks.append(
-                _report_section(
-                    "Complete traceback",
-                    ReportCodeBlock(_home_relative_report_text(result.error_traceback)),
-                    level=4,
-                )
-            )
-
     blocks.append(
         _report_section(
             "Execution and provenance",
@@ -8141,6 +8133,18 @@ def _diagnostics_model_blocks(
             level=4,
         )
     )
+    if assessment.execution == "crashed" and result.error_traceback:
+        traceback_block = ReportCodeBlock(_home_relative_report_text(result.error_traceback))
+        if collapse_traceback:
+            blocks.append(ReportDetails("Complete traceback", (traceback_block,)))
+        else:
+            blocks.append(
+                _report_section(
+                    "Complete traceback",
+                    traceback_block,
+                    level=4,
+                )
+            )
     if result.generation is not None:
         generated_output = _generation_text_value(result.generation) or "(empty)"
         if assessment.execution == "completed":
@@ -15235,6 +15239,7 @@ def _generate_github_issue_reports(
                         assessments[result.model_name],
                         run_args=run_args,
                         model_provenance=provenance,
+                        collapse_traceback=True,
                     ),
                     level=3,
                 ),
