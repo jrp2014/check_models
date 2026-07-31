@@ -278,7 +278,10 @@ def test_configured_thinking_delimiters_are_observed_without_model_name_policy()
     )
 
     assessment = dict(context.assessments)[result.model_name]
-    assert assessment.observations == ("thinking_trace_present",)
+    assert assessment.observations == (
+        "configured_wrapper_present",
+        "thinking_trace_present",
+    )
 
 
 def test_configured_special_token_is_not_unexpected() -> None:
@@ -331,7 +334,67 @@ def test_declared_generation_wrappers_are_neutral_without_model_name_policy() ->
     enriched = context.result_set.results[0]
     assert enriched.quality_analysis is not None
     assert enriched.quality_analysis.unexpected_special_tokens == []
-    assert dict(context.assessments)[result.model_name].observations == ("thinking_trace_present",)
+    assert enriched.quality_analysis.configured_generation_wrappers == [
+        "<|custom_eos|>",
+        "<|custom_stop|>",
+        "<reason>",
+        "</done>",
+    ]
+    assert dict(context.assessments)[result.model_name].observations == (
+        "configured_wrapper_present",
+        "thinking_trace_present",
+    )
+
+
+def test_assisted_output_returning_every_supplied_draft_field_is_observed_exactly() -> None:
+    """An unchanged descriptive draft is chooser evidence, not a semantic score."""
+    prompt = check_models._build_cataloguing_prompt(
+        {
+            "title": "Harbour boats at dusk",
+            "description": "Two boats rest on calm water at dusk.",
+            "keywords": "boats, harbour, water, dusk, reflection, sky, shore, calm, travel, vessel",
+        }
+    )
+    result = _result(
+        "Title: Harbour boats at dusk\n"
+        "Description: Two boats rest on calm water at dusk.\n"
+        "Keywords: boats, harbour, water, dusk, reflection, sky, shore, calm, travel, vessel",
+        prompt=prompt,
+    )
+
+    assert result.quality_analysis is not None
+    assert result.quality_analysis.unchanged_draft_fields == [
+        "title",
+        "description",
+        "keywords",
+    ]
+    assert check_models._assess_result(result) == check_models.ResultAssessment(
+        "completed",
+        "usable_with_caveats",
+        "observation_needs_reproduction",
+        ("draft_returned_unchanged",),
+    )
+
+
+def test_assisted_output_that_changes_one_draft_field_is_not_called_unchanged() -> None:
+    """The exact draft observation must not infer whether a rewrite is better or worse."""
+    prompt = check_models._build_cataloguing_prompt(
+        {
+            "title": "Harbour boats at dusk",
+            "description": "Two boats rest on calm water at dusk.",
+            "keywords": "boats, harbour, water, dusk, reflection, sky, shore, calm, travel, vessel",
+        }
+    )
+    result = _result(
+        "Title: Harbour boats beneath a violet sky\n"
+        "Description: Two boats rest on calm water at dusk.\n"
+        "Keywords: boats, harbour, water, dusk, reflection, sky, shore, calm, travel, vessel",
+        prompt=prompt,
+    )
+
+    assert result.quality_analysis is not None
+    assert result.quality_analysis.unchanged_draft_fields == []
+    assert "draft_returned_unchanged" not in check_models._assess_result(result).observations
 
 
 def test_configured_user_role_token_mid_output_is_observed_as_a_boundary() -> None:

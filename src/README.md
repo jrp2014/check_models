@@ -71,7 +71,7 @@ python -m check_models --dry-run
   - Detailed verbose timing: input validation, prompt prep, cleanup, upstream
     model prefill/first-token time (excluding input preparation), and stop reason
   - Tokens: total, prompt, generated with tokens/sec
-  - Memory: peak, active delta, cached delta (GB)
+  - Memory: peak, active/cache snapshots, and post-cleanup active/cache residue (GB)
 - **Structured Logging**: Formatter-driven styling with LogStyles for consistent CLI output
 - **Multiple Output Formats**:
   - **CLI**: Colorized with compact or detailed metrics modes
@@ -244,7 +244,8 @@ The tool generates a deliberately small artifact set in `output/` by default:
 
 - **CLI**: Real-time colorized progress and metrics.
 - **HTML** (`reports/results.html`): Retained complete, self-contained report with
-  a current-run chooser, exact assessment filters, captured performance facts,
+  a sortable current-run chooser, exact assessment filters, per-model
+  prefill/first-token timing, captured performance facts,
   expandable complete output, maintainer diagnostics, and full run context.
 - **Gallery Markdown** (`reports/model_gallery.md`): Model-comparison artifact with
   a bounded, orientation-corrected reference-image preview, image metadata, the full prompt, a facts-only
@@ -264,6 +265,9 @@ The tool generates a deliberately small artifact set in `output/` by default:
   observations and indeterminate attempts, compact clean-run context, and one
   shared parameterised native reproduction. Definite crashes are outcomes;
   external-connectivity interruptions remain indeterminate.
+  Conservative repetition observations include the repeated fragment and complete
+  output. Declared EOS/thinking wrappers and wholly unchanged draft metadata are
+  neutral reproduction facts rather than inferred faults or quality scores.
 - **Index** (`index.md`): Tiny navigation page linking the seven current-run files.
 - **Log** (`check_models.log`): Canonical comprehensive run trace, including complete
   generated or captured failure output.
@@ -1176,7 +1180,8 @@ Line-delimited JSON for streaming ingestion:
   provenance) — JSONL `2.0` format.
 - **Per-model records**: One JSON object per model with schema `2.0` assessment,
   exact observation details, actual completion timestamp, complete evidence, raw
-  timing/resource facts, run arguments, error details, and
+  timing/resource facts (including allocator state after cleanup even for crashes),
+  run arguments, error details, and
   requested/resolved model snapshot provenance when locally available.
 
 
@@ -1190,6 +1195,8 @@ A comprehensive Markdown report focused on upstream debugging and issue reportin
 - **Other evidence**: Collapses complete observed and indeterminate evidence, with
   generated output included once as exact code evidence; clean completions contribute
   only compact runtime and performance context.
+- **Neutral observations**: Records declared EOS/thinking wrappers and draft fields
+  returned unchanged exactly as captured, without assigning fault or a quality score.
 - **Reproducibility**: Records the prompt, highlighted model revisions, common
   settings, environment, and one parameterised single-model reproduction once.
 - **Issue readiness**: Successful thinking-token or context-boundary observations

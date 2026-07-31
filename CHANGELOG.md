@@ -5,8 +5,25 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Document product recommendations for issue-ready diagnostics and model-selection
+  galleries aimed at mlx-vlm maintainers and image-description users
+  (`docs/notes/DIAGNOSTICS_USEFULNESS_RECOMMENDATIONS.md`).
+
 ### Changed
 
+- Record active and cache allocator residue after every model cleanup, including
+  crashed attempts, in human and machine evidence so gradual cross-model memory
+  growth can be investigated. Add sortable HTML chooser columns, including the
+  upstream prefill/first-token interval, without widening the Markdown chooser.
+- Surface exact, neutral observations when a model returns every supplied draft
+  metadata field unchanged or emits EOS/thinking wrappers declared by current
+  mlx-vlm generation types. Keep those facts separate from semantic scoring,
+  unexpected-token leakage, and unusable-output classification.
+- Preserve the deliberately conservative repetition detector while ensuring
+  duplicate-dominated or repeated output remains highlighted with its repeated
+  fragment and complete model output in issue-ready diagnostics.
 - Make current-run usability reject copied prompt instructions, structurally
   invalid catalog sections, unexpected text before the requested Title, and
   duplicate-dominated keyword output; accept conventional bold Markdown labels

@@ -1222,6 +1222,7 @@ def test_diagnostics_are_skim_first_and_share_reproduction_context_once(
             tokenizer_class="transformers.CrashTokenizer",
         ),
     )
+    repeated_fragment = 'phrase: "OBSERVED-OUTPUT-MUST-APPEAR"'
     observed = PerformanceResult(
         model_name="org/observed",
         success=True,
@@ -1236,6 +1237,11 @@ def test_diagnostics_are_skim_first_and_share_reproduction_context_once(
             processor_class="mlx_vlm.processors.ObservedProcessor",
         ),
         runtime_diagnostics=RuntimeDiagnostics(stop_reason="eos"),
+        quality_analysis=check_models.GenerationQualityAnalysis(
+            is_repetitive=True,
+            repeated_token=repeated_fragment,
+            prompt_checks_ran=True,
+        ),
     )
     indeterminate = PerformanceResult(
         model_name="org/network",
@@ -1344,13 +1350,14 @@ def test_diagnostics_are_skim_first_and_share_reproduction_context_once(
     assert diagnostics.index("TRACEBACK-FIRST") < diagnostics.index("CRASH-PARTIAL")
     assert "<summary>org/observed" in diagnostics
     assert "<summary>org/network" in diagnostics
-    assert "### org/observed" in diagnostics
     assert "| repeated output |       1 |\n\n## Triage" in diagnostics
     assert re.search(
         r"\| \[org/network\].*\|\n\n## Actionable Failures",
         diagnostics,
     )
     assert "OBSERVED-OUTPUT-MUST-APPEAR" in diagnostics
+    assert diagnostics.count("#### Complete output") == 1
+    assert "Repeated fragment" in diagnostics
     assert "SERVER-COULD-NOT-BE-CONTACTED" in diagnostics
     assert "<summary>Clean completions</summary>" in diagnostics
     assert "000000000004" in diagnostics
@@ -1378,6 +1385,33 @@ def test_diagnostics_are_skim_first_and_share_reproduction_context_once(
     assert "OBSERVED-OUTPUT-MUST-APPEAR" in maintainer_html
     assert 'href="#diagnostic-org-crash"' in maintainer_html
     assert html_report.count("from mlx_vlm.generate import generate") == 1
+
+
+def test_html_chooser_is_sortable_and_surfaces_prefill_first_token_time(
+    tmp_path: Path,
+) -> None:
+    """HTML alone should expose sortable per-model prefill/first-token latency."""
+    result = replace(
+        _make_success("org/timed"),
+        runtime_diagnostics=RuntimeDiagnostics(first_token_latency_s=0.375),
+    )
+    html_path = tmp_path / "results.html"
+
+    generate_html_report(
+        [result],
+        html_path,
+        _stub_versions(),
+        "Describe the image.",
+        1.0,
+    )
+
+    content = html_path.read_text(encoding="utf-8")
+    chooser = content.split('<section id="current-run-chooser">', maxsplit=1)[1]
+    chooser = chooser.split("</section>", maxsplit=1)[0]
+    assert "Prefill/first s" in chooser
+    assert 'data-sort-column="6"' in chooser
+    assert 'data-sort-value="0.375"' in chooser
+    assert "sortChooserColumn" in chooser
 
 
 def test_crash_diagnostics_and_issue_draft_keep_complete_primary_evidence_first(

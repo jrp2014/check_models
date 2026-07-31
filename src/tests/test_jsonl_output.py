@@ -86,6 +86,27 @@ def test_save_jsonl_report_creates_file(tmp_path: Path) -> None:
     assert rows == []
 
 
+def test_jsonl_records_post_cleanup_memory_for_crashed_attempt(tmp_path: Path) -> None:
+    """Allocator cleanup evidence must survive even when generation produced no result."""
+    output_file = tmp_path / "results.jsonl"
+    result = PerformanceResult(
+        model_name="org/crashed",
+        generation=None,
+        success=False,
+        error_message="failed",
+        runtime_diagnostics=RuntimeDiagnostics(
+            post_cleanup_active_memory_gb=0.125,
+            post_cleanup_cache_memory_gb=0.25,
+        ),
+    )
+
+    save_jsonl_report([result], output_file, prompt="test", system_info={})
+
+    _header, rows = _read_jsonl(output_file)
+    assert rows[0]["metrics"]["post_cleanup_active_memory_gb"] == 0.125
+    assert rows[0]["metrics"]["post_cleanup_cache_memory_gb"] == 0.25
+
+
 def test_save_jsonl_report_includes_library_versions_in_metadata(tmp_path: Path) -> None:
     """Metadata header should preserve the shared library-version snapshot."""
     output_file = tmp_path / "results.jsonl"

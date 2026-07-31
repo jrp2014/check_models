@@ -1115,6 +1115,38 @@ class TestProcessImageWithModelMock:
         assert result.success is False
         assert cleanup_flags == [True]
 
+    @pytest.mark.parametrize("generation_fails", [False, True])
+    def test_process_image_with_model_records_post_cleanup_memory_after_every_attempt(
+        self,
+        test_image: Path,
+        *,
+        generation_fails: bool,
+    ) -> None:
+        """Successful and crashed attempts should expose allocator state after cleanup."""
+        params = _build_params(test_image)
+        runtime = _SequencedMxRuntime(
+            active_values=(0.125 * check_models.DECIMAL_GB,),
+            cache_value=0.25 * check_models.DECIMAL_GB,
+        )
+        run_outcome: _FakeGenerationResult | ValueError = (
+            ValueError("bad config") if generation_fails else _FakeGenerationResult()
+        )
+
+        with (
+            patch.object(check_models, "mx", runtime),
+            patch.object(
+                check_models,
+                "_run_model_generation",
+                side_effect=run_outcome if generation_fails else None,
+                return_value=None if generation_fails else run_outcome,
+            ),
+        ):
+            result = check_models.process_image_with_model(params)
+
+        assert result.runtime_diagnostics is not None
+        assert result.runtime_diagnostics.post_cleanup_active_memory_gb == 0.125
+        assert result.runtime_diagnostics.post_cleanup_cache_memory_gb == 0.25
+
     def test_log_perf_block_reads_cache_memory_field(self) -> None:
         """Compact memory logging should use the stored cache_memory field name."""
         result = check_models.PerformanceResult(

@@ -126,6 +126,15 @@ repeated fragments, and token strings) instead of adding inference-heavy ranking
 Treat authoritative context and draft metadata as reusable data rather than prompt
 instructions. Accept conventional Markdown emphasis around catalog labels, but
 record non-wrapper text before the first requested label as exact preamble evidence.
+Keep repetition detection conservative: obvious repeated fragments should enter
+diagnostics with complete output, but do not grow a general-purpose "gibberish"
+classifier. Treat EOS/thinking wrappers declared by mlx-vlm generation types and
+wholly unchanged draft fields as neutral reproducibility evidence, distinct from
+unexpected token leakage and semantic scoring. Sample allocator active/cache memory
+after every cleanup, including failures, so sequential runs can reveal residue;
+do not infer a leak from one sample. The HTML chooser may expose sortable diagnostic
+columns such as prefill/first-token latency while the narrow Markdown chooser remains
+optimized for GitHub skimming.
 Report image assets are bounded previews; do not copy full-resolution source images
 into the report tree.
 

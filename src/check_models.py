@@ -841,6 +841,8 @@ class HistoryModelResultRecord(TypedDict):
     peak_memory_gb: NotRequired[float | None]
     active_memory_gb: NotRequired[float | None]
     cache_memory_gb: NotRequired[float | None]
+    post_cleanup_active_memory_gb: NotRequired[float | None]
+    post_cleanup_cache_memory_gb: NotRequired[float | None]
     generation_time_s: NotRequired[float | None]
     model_load_time_s: NotRequired[float | None]
     total_time_s: NotRequired[float | None]
@@ -889,6 +891,8 @@ class JsonlMetricsRecord(TypedDict, total=False):
     cache_memory_gb: float
     model_load_active_memory_gb: float
     peak_memory_delta_gb: float
+    post_cleanup_active_memory_gb: float
+    post_cleanup_cache_memory_gb: float
 
 
 type ExecutionStatus = Literal["completed", "crashed", "indeterminate"]
@@ -907,13 +911,16 @@ type ObservationCode = Literal[
     "prompt_instruction_echo",
     "unexpected_catalog_preamble",
     "unexpected_special_token",
+    "configured_wrapper_present",
     "thinking_trace_present",
     "thinking_trace_incomplete",
     "role_boundary_token_present",
     "no_keyword_overlap",
+    "draft_returned_unchanged",
 ]
 type UpstreamBoundary = Literal["not_started", "load_started", "generation_started"]
 type KeywordOverlapState = Literal["not_assessable", "no_overlap", "some_overlap"]
+type MlxMemoryGetterName = Literal["get_active_memory", "get_cache_memory"]
 
 
 class RuntimeProbeResult(TypedDict, total=False):
@@ -1066,9 +1073,11 @@ class JsonlObservationDetailsRecord(TypedDict, total=False):
     instruction_echo_fragments: list[str]
     unexpected_catalog_preamble: str
     unexpected_special_tokens: list[str]
+    configured_generation_wrappers: list[str]
     thinking_trace_markers: list[str]
     role_boundary_tokens: list[str]
     token_cap_reasons: list[str]
+    unchanged_draft_fields: list[str]
 
 
 class JsonlFailureRecord(TypedDict, total=False):
@@ -1678,6 +1687,9 @@ class RuntimeDiagnostics:
     # Upstream model-loop time through first token; excludes prepare_inputs().
     first_token_latency_s: float | None = None
     stop_reason: str | None = None
+    # Allocator residue sampled after the per-model cleanup sequence.
+    post_cleanup_active_memory_gb: float | None = None
+    post_cleanup_cache_memory_gb: float | None = None
 
 
 @dataclass(frozen=True)
@@ -2341,6 +2353,20 @@ def _gallery_runtime_facts(
             _gallery_metric(
                 "model_load_active_memory_gb",
                 runtime.model_load_active_memory_gb if runtime is not None else None,
+            ),
+        ),
+        (
+            "Post-cleanup active memory",
+            _gallery_metric(
+                "post_cleanup_active_memory_gb",
+                runtime.post_cleanup_active_memory_gb if runtime is not None else None,
+            ),
+        ),
+        (
+            "Post-cleanup cache memory",
+            _gallery_metric(
+                "post_cleanup_cache_memory_gb",
+                runtime.post_cleanup_cache_memory_gb if runtime is not None else None,
             ),
         ),
         (
@@ -3867,9 +3893,11 @@ class GenerationQualityAnalysis:
     prompt_tokens_text_est: int | None = None
     prompt_tokens_nontext_est: int | None = None
     special_token_wrappers: list[str] = dataclass_field(default_factory=list)
+    configured_generation_wrappers: list[str] = dataclass_field(default_factory=list)
     role_boundary_tokens: list[str] = dataclass_field(default_factory=list)
     unexpected_special_tokens: list[str] = dataclass_field(default_factory=list)
     keyword_overlap: KeywordOverlapState = "not_assessable"
+    unchanged_draft_fields: list[str] = dataclass_field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -3884,6 +3912,46 @@ class PromptQualitySignals:
     unexpected_catalog_preamble: str | None = None
     missing_sections: tuple[str, ...] = ()
     keyword_overlap: KeywordOverlapState = "not_assessable"
+    unchanged_draft_fields: tuple[str, ...] = ()
+
+
+_DRAFT_PROMPT_FIELD_PATTERN: Final[re.Pattern[str]] = re.compile(
+    r"(?im)^\s*-\s*Existing (title|description|keywords):\s*(.+?)\s*$"
+)
+
+
+def _unchanged_draft_fields(text: str, prompt: str) -> tuple[str, ...]:
+    """Return all supplied draft fields only when the output preserves every one exactly."""
+    supplied = {
+        match.group(1).casefold(): match.group(2).strip()
+        for match in _DRAFT_PROMPT_FIELD_PATTERN.finditer(prompt)
+    }
+    if not supplied:
+        return ()
+
+    generated = _extract_catalog_sections(text)
+    ordered_fields = tuple(
+        field for field in ("title", "description", "keywords") if field in supplied
+    )
+    for field in ordered_fields:
+        output_value = generated.get(field)
+        if not output_value:
+            return ()
+        if field == "keywords":
+            supplied_value = tuple(
+                _normalize_phrase_for_matching(value)
+                for value in _split_catalog_keywords(supplied[field])
+            )
+            output_normalized = tuple(
+                _normalize_phrase_for_matching(value)
+                for value in _split_catalog_keywords(output_value)
+            )
+        else:
+            supplied_value = (_normalize_phrase_for_matching(supplied[field]),)
+            output_normalized = (_normalize_phrase_for_matching(output_value),)
+        if output_normalized != supplied_value:
+            return ()
+    return ordered_fields
 
 
 def _collect_prompt_quality_signals(
@@ -3922,6 +3990,7 @@ def _collect_prompt_quality_signals(
         prompt_bundle.trusted_keywords,
         generated_keywords,
     )
+    unchanged_draft_fields = _unchanged_draft_fields(text, prompt)
 
     return PromptQualitySignals(
         has_thinking_trace=reasoning_signals.has_thinking_trace,
@@ -3932,6 +4001,7 @@ def _collect_prompt_quality_signals(
         unexpected_catalog_preamble=unexpected_preamble,
         missing_sections=tuple(missing_sections),
         keyword_overlap=keyword_overlap,
+        unchanged_draft_fields=unchanged_draft_fields,
     )
 
 
@@ -3943,6 +4013,7 @@ def analyze_generation_text(
     requested_max_tokens: int | None = None,
     context_marker: str = "Context:",
     known_special_tokens: Sequence[str] = (),
+    configured_generation_wrappers: Sequence[str] = (),
     thinking_trace_delimiters: Sequence[tuple[str, str]] = THINKING_TRACE_DELIMITER_PAIRS,
 ) -> GenerationQualityAnalysis:
     """Collect mechanical output observations and recorded runtime facts."""
@@ -3982,6 +4053,11 @@ def analyze_generation_text(
         unexpected_special_tokens = [
             wrapper for wrapper in unexpected_special_tokens if wrapper != "</think>"
         ]
+    present_configured_wrappers = [
+        wrapper
+        for wrapper in _dedupe_preserve_order(configured_generation_wrappers)
+        if wrapper and wrapper in text
+    ]
 
     return GenerationQualityAnalysis(
         is_repetitive=is_repetitive,
@@ -4002,9 +4078,11 @@ def analyze_generation_text(
         prompt_tokens_text_est=prompt_tokens_text_est,
         prompt_tokens_nontext_est=prompt_tokens_nontext_est,
         special_token_wrappers=list(normalized.removed_wrappers),
+        configured_generation_wrappers=present_configured_wrappers,
         role_boundary_tokens=_configured_role_boundaries(text, normalized.removed_wrappers),
         unexpected_special_tokens=unexpected_special_tokens,
         keyword_overlap=prompt_signals.keyword_overlap,
+        unchanged_draft_fields=list(prompt_signals.unchanged_draft_fields),
     )
 
 
@@ -4017,6 +4095,7 @@ def _analyze_text_quality(
     requested_max_tokens: int | None = None,
     context_marker: str = "Context:",
     known_special_tokens: Sequence[str] = (),
+    configured_generation_wrappers: Sequence[str] = (),
     thinking_trace_delimiters: Sequence[tuple[str, str]] = THINKING_TRACE_DELIMITER_PAIRS,
 ) -> tuple[GenerationQualityAnalysis, str | None]:
     """Return mechanical quality analysis plus a compact log-only label string."""
@@ -4028,6 +4107,7 @@ def _analyze_text_quality(
         requested_max_tokens=requested_max_tokens,
         context_marker=context_marker,
         known_special_tokens=known_special_tokens,
+        configured_generation_wrappers=configured_generation_wrappers,
         thinking_trace_delimiters=thinking_trace_delimiters,
     )
     return analysis, _build_quality_issues_string(analysis)
@@ -6173,17 +6253,41 @@ def _html_table(
     rows: Sequence[Sequence[str]],
     row_attrs: Sequence[str] = (),
     raw_columns: frozenset[int] = frozenset(),
+    sort_values: Sequence[Sequence[str | int | float | None]] = (),
+    sortable: bool = False,
 ) -> str:
     """Render a compact escaped table, allowing explicitly built internal-link cells."""
     parts = ["<table>", f"<caption>{html.escape(caption, quote=True)}</caption>", "<thead><tr>"]
-    parts.extend(f'<th scope="col">{html.escape(header, quote=True)}</th>' for header in headers)
+    if sortable:
+        parts.extend(
+            (
+                '<th scope="col"><button type="button" class="sort-button" '
+                f'data-sort-column="{column_index}" onclick="sortChooserColumn(this)">'
+                f"{html.escape(header, quote=True)}</button></th>"
+            )
+            for column_index, header in enumerate(headers)
+        )
+    else:
+        parts.extend(
+            f'<th scope="col">{html.escape(header, quote=True)}</th>' for header in headers
+        )
     parts.extend(["</tr></thead>", "<tbody>"])
     for row_index, row in enumerate(rows):
         attrs = row_attrs[row_index] if row_index < len(row_attrs) else ""
         parts.append(f"<tr{attrs}>")
         for column_index, value in enumerate(row):
             cell = value if column_index in raw_columns else html.escape(value, quote=True)
-            parts.append(f"<td>{cell}</td>")
+            sort_value = (
+                sort_values[row_index][column_index]
+                if row_index < len(sort_values) and column_index < len(sort_values[row_index])
+                else None
+            )
+            sort_attr = (
+                _html_attr("data-sort-value", "" if sort_value is None else str(sort_value))
+                if sortable
+                else ""
+            )
+            parts.append(f"<td{sort_attr}>{cell}</td>")
         parts.append("</tr>")
     parts.extend(["</tbody>", "</table>"])
     return "\n".join(parts)
@@ -6836,6 +6940,11 @@ def _gallery_row(result: PerformanceResult, assessment: ResultAssessment) -> Gal
             result.total_time if result.total_time is not None and result.total_time >= 0 else None
         ),
         generation_tps=_valid_generation_tps(result),
+        first_token_latency_s=(
+            result.runtime_diagnostics.first_token_latency_s
+            if result.runtime_diagnostics is not None
+            else None
+        ),
         peak_memory_gb=(peak_memory if peak_memory is not None and peak_memory >= 0 else None),
         generation_tokens=_generation_int_metric(generation, "generation_tokens"),
         output_preview=output_preview,
@@ -7096,6 +7205,7 @@ class GalleryRow:
     observations: tuple[ObservationCode, ...]
     total_time_s: float | None
     generation_tps: float | None
+    first_token_latency_s: float | None
     peak_memory_gb: float | None
     generation_tokens: int | None
     output_preview: str
@@ -7142,26 +7252,26 @@ def _assessment_observations(result: PerformanceResult) -> tuple[ObservationCode
         observations.append("repeated_output")
     if analysis is None:
         return tuple(observations)
-    if analysis.missing_sections:
-        observations.append("missing_requested_sections")
-    if analysis.likely_capped and (
-        is_repetitive or analysis.missing_sections or analysis.thinking_trace_incomplete
-    ):
-        observations.append("token_cap_truncation")
-    if analysis.instruction_echo:
-        observations.append("prompt_instruction_echo")
-    if analysis.unexpected_catalog_preamble:
-        observations.append("unexpected_catalog_preamble")
-    if analysis.unexpected_special_tokens:
-        observations.append("unexpected_special_token")
-    if analysis.has_thinking_trace:
-        observations.append("thinking_trace_present")
-    if analysis.thinking_trace_incomplete:
-        observations.append("thinking_trace_incomplete")
-    if analysis.role_boundary_tokens:
-        observations.append("role_boundary_token_present")
-    if analysis.keyword_overlap == "no_overlap":
-        observations.append("no_keyword_overlap")
+    candidates: tuple[tuple[bool, ObservationCode], ...] = (
+        (bool(analysis.missing_sections), "missing_requested_sections"),
+        (
+            analysis.likely_capped
+            and bool(
+                is_repetitive or analysis.missing_sections or analysis.thinking_trace_incomplete
+            ),
+            "token_cap_truncation",
+        ),
+        (analysis.instruction_echo, "prompt_instruction_echo"),
+        (bool(analysis.unexpected_catalog_preamble), "unexpected_catalog_preamble"),
+        (bool(analysis.unexpected_special_tokens), "unexpected_special_token"),
+        (bool(analysis.configured_generation_wrappers), "configured_wrapper_present"),
+        (analysis.has_thinking_trace, "thinking_trace_present"),
+        (analysis.thinking_trace_incomplete, "thinking_trace_incomplete"),
+        (bool(analysis.role_boundary_tokens), "role_boundary_token_present"),
+        (analysis.keyword_overlap == "no_overlap", "no_keyword_overlap"),
+        (bool(analysis.unchanged_draft_fields), "draft_returned_unchanged"),
+    )
+    observations.extend(code for condition, code in candidates if condition)
     return tuple(observations)
 
 
@@ -7204,12 +7314,16 @@ def _observation_details(result: PerformanceResult) -> JsonlObservationDetailsRe
         details["unexpected_catalog_preamble"] = analysis.unexpected_catalog_preamble
     if analysis.unexpected_special_tokens:
         details["unexpected_special_tokens"] = list(analysis.unexpected_special_tokens)
+    if analysis.configured_generation_wrappers:
+        details["configured_generation_wrappers"] = list(analysis.configured_generation_wrappers)
     if analysis.thinking_trace_markers:
         details["thinking_trace_markers"] = list(analysis.thinking_trace_markers)
     if analysis.role_boundary_tokens:
         details["role_boundary_tokens"] = list(analysis.role_boundary_tokens)
     if analysis.token_cap_reasons:
         details["token_cap_reasons"] = list(analysis.token_cap_reasons)
+    if analysis.unchanged_draft_fields:
+        details["unchanged_draft_fields"] = list(analysis.unchanged_draft_fields)
     return details
 
 
@@ -7926,9 +8040,11 @@ def _diagnostics_result_facts(
         "instruction_echo_fragments": "Echoed instruction fragments",
         "unexpected_catalog_preamble": "Unexpected text before Title",
         "unexpected_special_tokens": "Unexpected special tokens",
+        "configured_generation_wrappers": "Declared generation wrappers in output",
         "thinking_trace_markers": "Thinking trace markers",
         "role_boundary_tokens": "Role-boundary tokens in output",
         "token_cap_reasons": "Token-cap degradation evidence",
+        "unchanged_draft_fields": "Draft fields returned unchanged",
     }
     rows.extend(
         (detail_labels[key], _diagnostics_fact(value))
@@ -7947,6 +8063,14 @@ def _diagnostics_result_facts(
         ("Processor class", processor),
         ("Tokenizer class", tokenizer),
         ("Stop reason", runtime.stop_reason if runtime is not None else None),
+        (
+            "Post-cleanup active memory (GB)",
+            runtime.post_cleanup_active_memory_gb if runtime is not None else None,
+        ),
+        (
+            "Post-cleanup cache memory (GB)",
+            runtime.post_cleanup_cache_memory_gb if runtime is not None else None,
+        ),
         ("Prompt tokens", _generation_int_metric(result.generation, "prompt_tokens")),
         ("Generation tokens", _generation_int_metric(result.generation, "generation_tokens")),
         (
@@ -8096,7 +8220,22 @@ def _diagnostics_clean_row(
     else:
         throughput = "-"
     peak_memory = _generation_float_metric(result.generation, "peak_memory")
-    memory = f"{_gallery_metric('peak_memory', peak_memory)} GB" if peak_memory is not None else "-"
+    memory = (
+        f"{_gallery_metric('peak_memory', peak_memory)} GB peak" if peak_memory is not None else "-"
+    )
+    if runtime is not None and (
+        runtime.post_cleanup_active_memory_gb is not None
+        or runtime.post_cleanup_cache_memory_gb is not None
+    ):
+        active = _gallery_metric(
+            "post_cleanup_active_memory_gb",
+            runtime.post_cleanup_active_memory_gb,
+        )
+        cache = _gallery_metric(
+            "post_cleanup_cache_memory_gb",
+            runtime.post_cleanup_cache_memory_gb,
+        )
+        memory = f"{memory}; cleanup {active}/{cache} GB active/cache"
     return result.model_name, identity, f"{token_summary}; {throughput}; {memory}"
 
 
@@ -8337,6 +8476,34 @@ function applyAssessmentFilters() {
     document.getElementById('filter-info').textContent =
         `Showing ${visible} of ${rows.length} rows`;
 }
+function sortChooserColumn(button) {
+    const table = document.querySelector('#chooser-table table');
+    if (!table || !table.tBodies.length) return;
+    const column = Number(button.dataset.sortColumn);
+    const ascending = button.dataset.sortDirection !== 'ascending';
+    table.querySelectorAll('.sort-button').forEach(candidate => {
+        candidate.removeAttribute('data-sort-direction');
+    });
+    table.querySelectorAll('th[aria-sort]').forEach(heading => heading.removeAttribute('aria-sort'));
+    button.dataset.sortDirection = ascending ? 'ascending' : 'descending';
+    button.closest('th').setAttribute('aria-sort', button.dataset.sortDirection);
+    const rows = Array.from(table.tBodies[0].rows);
+    rows.sort((left, right) => {
+        const leftValue = left.cells[column].dataset.sortValue || '';
+        const rightValue = right.cells[column].dataset.sortValue || '';
+        if (!leftValue || !rightValue) {
+            if (!leftValue && !rightValue) return 0;
+            return !leftValue ? 1 : -1;
+        }
+        const leftNumber = Number(leftValue);
+        const rightNumber = Number(rightValue);
+        const comparison = Number.isFinite(leftNumber) && Number.isFinite(rightNumber)
+            ? leftNumber - rightNumber
+            : leftValue.localeCompare(rightValue, undefined, {numeric: true});
+        return ascending ? comparison : -comparison;
+    });
+    rows.forEach(row => table.tBodies[0].appendChild(row));
+}
 document.querySelectorAll('.filter-controls input, .filter-controls select')
     .forEach(control => control.addEventListener('input', applyAssessmentFilters));
 applyAssessmentFilters();
@@ -8416,6 +8583,7 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
             assessments[row.model].maintainer_status,
             _gallery_total_time_cell(row),
             _gallery_throughput_cell(row),
+            _format_float_or_dash(row.first_token_latency_s, digits=2),
             _gallery_metric("peak_memory", row.peak_memory_gb),
             _gallery_metric("generation_tokens", row.generation_tokens),
             _gallery_observation_labels(row.observations),
@@ -8425,6 +8593,22 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
     ]
     chooser_attrs = [
         _html_status_attrs(result_by_model[row.model], assessments[row.model]) for row in ordered
+    ]
+    chooser_sort_values = [
+        (
+            row.model,
+            assessments[row.model].execution,
+            row.usability,
+            assessments[row.model].maintainer_status,
+            row.total_time_s,
+            row.generation_tps,
+            row.first_token_latency_s,
+            row.peak_memory_gb,
+            row.generation_tokens,
+            _gallery_observation_labels(row.observations),
+            row.output_preview,
+        )
+        for row in ordered
     ]
     parts = [
         '<section id="current-run-chooser">',
@@ -8445,6 +8629,7 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
                 "Maintainer status",
                 "Total s",
                 "Gen TPS",
+                "Prefill/first s",
                 "Peak GB",
                 "Gen tok",
                 "Observations",
@@ -8453,6 +8638,8 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
             rows=chooser_rows,
             row_attrs=chooser_attrs,
             raw_columns=frozenset({0}),
+            sort_values=chooser_sort_values,
+            sortable=True,
         ),
         "</div>",
         "<h3>Avoid for This Run</h3>",
@@ -8752,6 +8939,10 @@ table { border-collapse: collapse; margin: 1rem 0 2rem; width: 100%; }
 caption { font-weight: 600; text-align: left; }
 th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; vertical-align: top; }
 th { background: #f2f2f2; }
+.sort-button { background: transparent; border: 0; color: inherit; cursor: pointer; font: inherit; font-weight: bold; padding: 0; text-align: left; }
+.sort-button::after { color: #666; content: " ↕"; }
+.sort-button[data-sort-direction="ascending"]::after { content: " ↑"; }
+.sort-button[data-sort-direction="descending"]::after { content: " ↓"; }
 pre { background: #f7f7f7; border-left: 3px solid #666; overflow-x: auto; padding: 0.75rem; white-space: pre-wrap; }
 details { margin: 0.75rem 0 1.5rem; }
 summary { color: #0645ad; cursor: pointer; font-weight: 600; }
@@ -10922,6 +11113,8 @@ def _build_runtime_diagnostics(
     stop_reason: str | None,
     first_token_latency_s: float | None = None,
     model_load_active_memory_gb: float | None = None,
+    post_cleanup_active_memory_gb: float | None = None,
+    post_cleanup_cache_memory_gb: float | None = None,
 ) -> RuntimeDiagnostics:
     """Build immutable runtime diagnostics from a phase timer snapshot."""
     return RuntimeDiagnostics(
@@ -10933,6 +11126,8 @@ def _build_runtime_diagnostics(
         cleanup_time_s=phase_timer.duration("cleanup"),
         first_token_latency_s=first_token_latency_s,
         stop_reason=stop_reason,
+        post_cleanup_active_memory_gb=post_cleanup_active_memory_gb,
+        post_cleanup_cache_memory_gb=post_cleanup_cache_memory_gb,
     )
 
 
@@ -11062,15 +11257,34 @@ def _generate_with_processor_passthrough(
     )
 
 
+def _sample_mlx_memory_gb(getter_name: MlxMemoryGetterName) -> float | None:
+    """Best-effort sample one non-negative MLX allocator metric in decimal GB."""
+    getter = cast("Callable[[], object] | None", getattr(mx, getter_name, None))
+    if getter is None or not callable(getter):
+        return None
+    try:
+        raw_value = getter()
+    except (AttributeError, OSError, RuntimeError, SystemError, TypeError, ValueError):
+        logger.debug("Unable to sample mx.%s", getter_name, exc_info=True)
+        return None
+    if isinstance(raw_value, bool) or not isinstance(raw_value, int | float) or raw_value < 0:
+        return None
+    return float(raw_value) / DECIMAL_GB
+
+
 def _sample_active_memory_gb() -> float | None:
     """Sample MLX active memory in GB when the runtime exposes the metric."""
-    get_active_memory_fn = getattr(mx, "get_active_memory", None)
-    if not callable(get_active_memory_fn):
-        return None
-    active_mem_raw = get_active_memory_fn()
-    if not isinstance(active_mem_raw, int | float) or active_mem_raw < 0:
-        return None
-    return float(active_mem_raw) / DECIMAL_GB
+    return _sample_mlx_memory_gb("get_active_memory")
+
+
+def _sample_cache_memory_gb() -> float | None:
+    """Sample MLX cache memory in GB when the runtime exposes the metric."""
+    return _sample_mlx_memory_gb("get_cache_memory")
+
+
+def _sample_post_cleanup_memory_gb() -> tuple[float | None, float | None]:
+    """Return the active/cache allocator state after one model cleanup."""
+    return _sample_active_memory_gb(), _sample_cache_memory_gb()
 
 
 def _attach_model_load_memory_baseline(
@@ -11090,16 +11304,10 @@ def _attach_generation_runtime_metrics(
     duration: float,
 ) -> SupportsGenerationResult:
     """Attach local timing and allocator snapshot metrics to a generation result."""
-    get_cache_memory_fn = getattr(mx, "get_cache_memory", None)
-
-    cache_mem_raw = get_cache_memory_fn() if callable(get_cache_memory_fn) else 0.0
-
-    cache_mem_bytes = float(cache_mem_raw) if isinstance(cache_mem_raw, int | float) else 0.0
-
     result = cast("SupportsGenerationResult", output)
     result.time = duration
     result.active_memory = _sample_active_memory_gb() or 0.0
-    result.cache_memory = cache_mem_bytes / DECIMAL_GB
+    result.cache_memory = _sample_cache_memory_gb() or 0.0
     return result
 
 
@@ -11112,6 +11320,8 @@ def _finalize_process_result(
     current_phase: str,
     total_start_time: float,
     upstream_boundary: UpstreamBoundary = "not_started",
+    post_cleanup_active_memory_gb: float | None = None,
+    post_cleanup_cache_memory_gb: float | None = None,
 ) -> PerformanceResult:
     """Attach final runtime diagnostics after cleanup has completed."""
     runtime_diagnostics = _build_runtime_diagnostics(
@@ -11131,6 +11341,8 @@ def _finalize_process_result(
             if result_payload is not None and result_payload.runtime_diagnostics is not None
             else None
         ),
+        post_cleanup_active_memory_gb=post_cleanup_active_memory_gb,
+        post_cleanup_cache_memory_gb=post_cleanup_cache_memory_gb,
     )
     if result_payload is None:
         fallback_error = RuntimeError(
@@ -11407,6 +11619,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     stop_reason: str | None = None
     cleanup_requires_sync = True
     upstream_boundary: UpstreamBoundary = "not_started"
+    post_cleanup_active_memory_gb, post_cleanup_cache_memory_gb = None, None
 
     def _update_phase(phase: str) -> None:
         nonlocal current_phase, upstream_boundary
@@ -11530,7 +11743,9 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         _update_phase("cleanup")
         with phase_timer.track("cleanup"):
             _cleanup_runtime_resources(synchronize_first=cleanup_requires_sync)
-        logger.debug("Cleaned up resources for model %s", params.model_identifier)
+        post_cleanup_active_memory_gb, post_cleanup_cache_memory_gb = (
+            _sample_post_cleanup_memory_gb()
+        )
 
     return _finalize_process_result(
         result_payload=result_payload,
@@ -11540,6 +11755,8 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         current_phase=current_phase,
         total_start_time=total_start_time,
         upstream_boundary=upstream_boundary,
+        post_cleanup_active_memory_gb=post_cleanup_active_memory_gb,
+        post_cleanup_cache_memory_gb=post_cleanup_cache_memory_gb,
     )
 
 
@@ -13321,7 +13538,18 @@ def _configured_output_wrappers(diagnostics: PromptDiagnostics | None) -> tuple[
     if diagnostics is None:
         return ()
 
-    wrappers = list(diagnostics.special_tokens)
+    wrappers = [*diagnostics.special_tokens, *_configured_generation_wrappers(diagnostics)]
+    return tuple(_dedupe_preserve_order(wrappers))
+
+
+def _configured_generation_wrappers(
+    diagnostics: PromptDiagnostics | None,
+) -> tuple[str, ...]:
+    """Return string wrappers declared by tokenizer EOS and mlx-vlm generation types."""
+    if diagnostics is None:
+        return ()
+
+    wrappers: list[str] = []
     if diagnostics.eos_token:
         wrappers.append(diagnostics.eos_token)
     for key in ("eos_tokens", "thinking_start_token", "thinking_end_token"):
@@ -13371,6 +13599,7 @@ def _populate_result_quality_analysis(
         requested_max_tokens=resolved_requested_max_tokens,
         context_marker=context_marker,
         known_special_tokens=_configured_output_wrappers(result.prompt_diagnostics),
+        configured_generation_wrappers=_configured_generation_wrappers(result.prompt_diagnostics),
         thinking_trace_delimiters=thinking_trace_delimiters,
     )
     return replace(
@@ -13929,6 +14158,12 @@ def _history_model_result_from_result(result: PerformanceResult) -> HistoryModel
         )
     if result.runtime_diagnostics is not None:
         record["stop_reason"] = result.runtime_diagnostics.stop_reason
+        record["post_cleanup_active_memory_gb"] = (
+            result.runtime_diagnostics.post_cleanup_active_memory_gb
+        )
+        record["post_cleanup_cache_memory_gb"] = (
+            result.runtime_diagnostics.post_cleanup_cache_memory_gb
+        )
     return record
 
 
@@ -14027,30 +14262,39 @@ def _build_jsonl_metrics_record(
     recommended_working_set_bytes: int | None,
 ) -> JsonlMetricsRecord:
     """Build captured and derived performance metrics for one JSONL result."""
+    runtime = result.runtime_diagnostics
+    metrics: JsonlMetricsRecord = {}
+    if runtime is not None:
+        if runtime.post_cleanup_active_memory_gb is not None:
+            metrics["post_cleanup_active_memory_gb"] = runtime.post_cleanup_active_memory_gb
+        if runtime.post_cleanup_cache_memory_gb is not None:
+            metrics["post_cleanup_cache_memory_gb"] = runtime.post_cleanup_cache_memory_gb
+
     generation = result.generation
     if generation is None:
-        return {}
+        return metrics
 
-    runtime = result.runtime_diagnostics
     performance_data = _extract_generation_performance_data(generation)
-    metrics: JsonlMetricsRecord = {
-        "prompt_tokens": performance_data.prompt_tokens,
-        "generation_tokens": performance_data.generation_tokens,
-        "total_tokens": performance_data.total_tokens,
-        "prompt_tps": performance_data.prompt_tps,
-        "generation_tps": performance_data.generation_tps,
-        "peak_memory_gb": performance_data.peak_memory_gb,
-        "active_memory_gb": (
-            result.active_memory
-            if result.active_memory is not None
-            else performance_data.active_memory_gb
-        ),
-        "cache_memory_gb": (
-            result.cache_memory
-            if result.cache_memory is not None
-            else performance_data.cache_memory_gb
-        ),
-    }
+    metrics.update(
+        {
+            "prompt_tokens": performance_data.prompt_tokens,
+            "generation_tokens": performance_data.generation_tokens,
+            "total_tokens": performance_data.total_tokens,
+            "prompt_tps": performance_data.prompt_tps,
+            "generation_tps": performance_data.generation_tps,
+            "peak_memory_gb": performance_data.peak_memory_gb,
+            "active_memory_gb": (
+                result.active_memory
+                if result.active_memory is not None
+                else performance_data.active_memory_gb
+            ),
+            "cache_memory_gb": (
+                result.cache_memory
+                if result.cache_memory is not None
+                else performance_data.cache_memory_gb
+            ),
+        }
+    )
     model_load_active_memory_gb = (
         runtime.model_load_active_memory_gb
         if runtime is not None
