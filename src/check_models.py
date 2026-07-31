@@ -13354,7 +13354,7 @@ def _populate_result_quality_analysis(
     resolved_requested_max_tokens = (
         requested_max_tokens if requested_max_tokens is not None else result.requested_max_tokens
     )
-    thinking_trace_delimiters = list(THINKING_TRACE_DELIMITER_PAIRS)
+    thinking_trace_delimiters: list[tuple[str, str]] = list(THINKING_TRACE_DELIMITER_PAIRS)
     if result.prompt_diagnostics is not None:
         generation_kwargs = result.prompt_diagnostics.generate_kwargs
         start_marker = generation_kwargs.get("thinking_start_token")
@@ -13627,25 +13627,22 @@ def _collect_performance_metric_samples(
     results: Sequence[PerformanceResult],
 ) -> PerformanceMetricSamples:
     """Collect finite, domain-valid samples for each highlighted metric."""
-    tps = tuple(
+    tps: tuple[PerformanceMetricSample, ...] = tuple(
         (result, value)
         for result in results
         if (value := _valid_generation_tps(result)) is not None and math.isfinite(value)
     )
-    memory = tuple(
-        (result, value)
-        for result in results
-        if (
-            value := _generation_optional_nonnegative_float_metric(
-                result.generation,
-                "peak_memory",
-            )
+    memory_samples: list[PerformanceMetricSample] = []
+    for result in results:
+        value = _generation_optional_nonnegative_float_metric(
+            result.generation,
+            "peak_memory",
         )
-        is not None
-        and value > 0
-        and math.isfinite(value)
-    )
-    load = tuple(
+        if value is None or value <= 0 or not math.isfinite(value):
+            continue
+        memory_samples.append((result, value))
+    memory = tuple(memory_samples)
+    load: tuple[PerformanceMetricSample, ...] = tuple(
         (result, result.model_load_time)
         for result in results
         if result.model_load_time is not None

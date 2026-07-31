@@ -20,6 +20,9 @@ Notable changes to this project will be documented in this file.
 - Record producer worktree dirtiness and per-model completion timestamps, label
   conclusive outcomes unambiguously in human reports, and distinguish configured
   role-boundary tokens from unknown special-token leakage.
+- Widen the configured thinking-delimiter collection explicitly and narrow
+  validated memory samples before construction so Pylance agrees with the mypy,
+  ty, and Pyrefly contracts without casts or suppressions.
 - Make the gallery preserve line breaks and present model-authored formatting while
   retaining exact raw output, and make diagnostics a skim-first mlx-vlm issue body
   with expanded crashes, collapsed highlighted evidence, compact clean-run context,
