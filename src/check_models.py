@@ -262,7 +262,7 @@ def _reject_symlink_parent(path: Path) -> None:
             raise OSError(msg)
 
 
-def _canonical_text_file_path(path: Path) -> Path:
+def _canonical_file_path(path: Path) -> Path:
     """Resolve existing parent links without following the final artifact path."""
     return path.parent.resolve(strict=False) / path.name
 
@@ -290,23 +290,28 @@ def _open_regular_file_no_symlink(path: Path, flags: int, mode: int = 0o666) -> 
     return fd
 
 
-def _write_text_file(path: Path, content: str, *, append: bool = False) -> None:
-    """Write UTF-8 text to a regular file without following symlinks."""
+def _write_bytes_file(path: Path, content: bytes, *, append: bool = False) -> None:
+    """Write bytes to a regular file without following symlinks."""
     _reject_symlink_parent(path)
-    path = _canonical_text_file_path(path)
+    path = _canonical_file_path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     _reject_symlink_parent(path)
 
     flags = os.O_WRONLY | os.O_CREAT | (os.O_APPEND if append else os.O_TRUNC)
     fd = _open_regular_file_no_symlink(path, flags)
     with os.fdopen(fd, "ab") as handle:
-        handle.write(content.encode("utf-8"))
+        handle.write(content)
+
+
+def _write_text_file(path: Path, content: str, *, append: bool = False) -> None:
+    """Write UTF-8 text to a regular file without following symlinks."""
+    _write_bytes_file(path, content.encode("utf-8"), append=append)
 
 
 def _read_text_file(path: Path, *, max_bytes: int = MAX_SAFE_TEXT_FILE_BYTES) -> str:
     """Read UTF-8 text from a regular file with a byte-size cap."""
     _reject_symlink_parent(path)
-    path = _canonical_text_file_path(path)
+    path = _canonical_file_path(path)
     _reject_symlink_parent(path)
     fd = _open_regular_file_no_symlink(path, os.O_RDONLY)
     try:
@@ -372,6 +377,7 @@ class FormattingThresholds:
     markdown_hard_break_spaces: int = 2
     markdown_wrap_width: int = 78
     generation_wrap_width: int = 100
+    revision_preview_chars: int = 12
 
 
 @dataclass(frozen=True)
@@ -386,6 +392,9 @@ class QualityThresholds:
     phrase_coverage_threshold: float = 0.4
     min_phrase_length: int = 4
     max_phrase_length: int = 10
+    min_catalog_keywords_for_repeat: int = 10
+    min_catalog_keyword_repetitions: int = 3
+    catalog_keyword_duplicate_ratio: float = 0.4
     min_context_term_length: int = 2
     min_tokens_for_substantial: int = 10
     max_words_for_minimal_output: int = 2
@@ -403,6 +412,7 @@ class QualityThresholds:
         unit_interval_fields = {
             "repetition_ratio": self.repetition_ratio,
             "phrase_coverage_threshold": self.phrase_coverage_threshold,
+            "catalog_keyword_duplicate_ratio": self.catalog_keyword_duplicate_ratio,
             "heavy_nontext_prompt_ratio": self.heavy_nontext_prompt_ratio,
             "mixed_prompt_burden_ratio_floor": self.mixed_prompt_burden_ratio_floor,
         }
@@ -831,6 +841,8 @@ class HistoryModelResultRecord(TypedDict):
     peak_memory_gb: NotRequired[float | None]
     active_memory_gb: NotRequired[float | None]
     cache_memory_gb: NotRequired[float | None]
+    post_cleanup_active_memory_gb: NotRequired[float | None]
+    post_cleanup_cache_memory_gb: NotRequired[float | None]
     generation_time_s: NotRequired[float | None]
     model_load_time_s: NotRequired[float | None]
     total_time_s: NotRequired[float | None]
@@ -879,6 +891,8 @@ class JsonlMetricsRecord(TypedDict, total=False):
     cache_memory_gb: float
     model_load_active_memory_gb: float
     peak_memory_delta_gb: float
+    post_cleanup_active_memory_gb: float
+    post_cleanup_cache_memory_gb: float
 
 
 type ExecutionStatus = Literal["completed", "crashed", "indeterminate"]
@@ -895,13 +909,18 @@ type ObservationCode = Literal[
     "missing_requested_sections",
     "token_cap_truncation",
     "prompt_instruction_echo",
+    "unexpected_catalog_preamble",
     "unexpected_special_token",
+    "configured_wrapper_present",
     "thinking_trace_present",
     "thinking_trace_incomplete",
+    "role_boundary_token_present",
     "no_keyword_overlap",
+    "draft_returned_unchanged",
 ]
 type UpstreamBoundary = Literal["not_started", "load_started", "generation_started"]
 type KeywordOverlapState = Literal["not_assessable", "no_overlap", "some_overlap"]
+type MlxMemoryGetterName = Literal["get_active_memory", "get_cache_memory"]
 
 
 class RuntimeProbeResult(TypedDict, total=False):
@@ -955,6 +974,7 @@ class CheckModelsProvenanceRecord(TypedDict):
     version: str
     git_revision: str | None
     install_type: Literal["editable", "installed", "source-tree", "unknown"]
+    dirty: NotRequired[bool | None]
 
 
 class JsonlMetadataRecord(TypedDict, total=False):
@@ -1042,6 +1062,22 @@ class JsonlAssessmentRecord(TypedDict):
     usability: ModelUsability
     maintainer_status: MaintainerStatus
     observations: list[ObservationCode]
+    details: NotRequired[JsonlObservationDetailsRecord]
+
+
+class JsonlObservationDetailsRecord(TypedDict, total=False):
+    """Exact mechanical evidence behind compact observation codes."""
+
+    missing_sections: list[str]
+    repeated_fragment: str
+    instruction_echo_fragments: list[str]
+    unexpected_catalog_preamble: str
+    unexpected_special_tokens: list[str]
+    configured_generation_wrappers: list[str]
+    thinking_trace_markers: list[str]
+    role_boundary_tokens: list[str]
+    token_cap_reasons: list[str]
+    unchanged_draft_fields: list[str]
 
 
 class JsonlFailureRecord(TypedDict, total=False):
@@ -1622,6 +1658,7 @@ class PerformanceResult:
     requested_max_tokens: int | None = None
     prompt_diagnostics: PromptDiagnostics | None = None
     rerun_evidence: RerunEvidence | None = None
+    completed_at: str | None = None
 
 
 @dataclass(frozen=True)
@@ -1650,6 +1687,9 @@ class RuntimeDiagnostics:
     # Upstream model-loop time through first token; excludes prepare_inputs().
     first_token_latency_s: float | None = None
     stop_reason: str | None = None
+    # Allocator residue sampled after the per-model cleanup sequence.
+    post_cleanup_active_memory_gb: float | None = None
+    post_cleanup_cache_memory_gb: float | None = None
 
 
 @dataclass(frozen=True)
@@ -1845,15 +1885,6 @@ def _markdown_emphasis(text: str) -> str:
     return f"*{text}*"
 
 
-def _markdown_generated_stamp(
-    *,
-    label: str = "Generated on",
-    suffix: str = "",
-) -> str:
-    """Return generated-artifact timestamp metadata without heading-like emphasis."""
-    return f"{label}: {local_now_str()}{suffix}"
-
-
 def _append_markdown_labeled_value(
     parts: list[str],
     *,
@@ -1912,11 +1943,22 @@ class ReportBulletList:
 
 
 @dataclass(frozen=True)
+class ReportLink:
+    """Internal report link rendered safely in Markdown and HTML."""
+
+    label: str
+    anchor: str
+
+
+type ReportCell = str | ReportLink
+
+
+@dataclass(frozen=True)
 class ReportTable:
     """Simple table block with renderer-specific escaping."""
 
     headers: tuple[str, ...]
-    rows: tuple[tuple[str, ...], ...]
+    rows: tuple[tuple[ReportCell, ...], ...]
     markdown_escaped: bool = False
 
 
@@ -1933,7 +1975,7 @@ class ReportDetails:
     """Collapsible details block for technical evidence."""
 
     summary: str
-    blocks: tuple[object, ...]
+    blocks: tuple[ReportBlock, ...]
 
 
 @dataclass(frozen=True)
@@ -1949,9 +1991,30 @@ class ReportSection:
     """Shared report section rendered into Markdown or HTML at artifact boundaries."""
 
     title: str
-    blocks: tuple[object, ...] = ()
+    blocks: tuple[ReportBlock, ...] = ()
     level: int = 2
     divider: bool = False
+
+
+@dataclass(frozen=True)
+class ReportModelOutput:
+    """Readable presentation plus exact raw captured model output."""
+
+    content: str
+    raw_summary: str = "Exact raw output"
+
+
+type ReportBlock = (
+    ReportParagraph
+    | ReportKeyValues
+    | ReportBulletList
+    | ReportTable
+    | ReportCodeBlock
+    | ReportDetails
+    | ReportRaw
+    | ReportSection
+    | ReportModelOutput
+)
 
 
 class UnsupportedReportBlockError(TypeError):
@@ -1973,7 +2036,10 @@ def _render_report_section_markdown(block: ReportSection) -> list[str]:
     rendered.append(f"{'#' * level} {_escape_report_markdown_heading(block.title)}")
     rendered.append("")
     for child in block.blocks:
-        rendered.extend(_render_report_markdown_block(child))
+        child_lines = _render_report_markdown_block(child)
+        if rendered[-1] == "" and child_lines and child_lines[0] == "":
+            child_lines.pop(0)
+        rendered.extend(child_lines)
     return rendered
 
 
@@ -2018,12 +2084,21 @@ def _render_report_table_markdown(block: ReportTable) -> list[str]:
         if block.markdown_escaped
         else [MARKDOWN_ESCAPER.escape(header) for header in block.headers]
     )
-    escaped_rows = (
-        list(block.rows)
-        if block.markdown_escaped
-        else [tuple(MARKDOWN_ESCAPER.escape(cell) for cell in row) for row in block.rows]
-    )
+    escaped_rows = [
+        tuple(_render_report_cell_markdown(cell, escaped=block.markdown_escaped) for cell in row)
+        for row in block.rows
+    ]
     return [*tabulate(escaped_rows, headers=escaped_headers, tablefmt="github").splitlines(), ""]
+
+
+def _render_report_cell_markdown(cell: ReportCell, *, escaped: bool) -> str:
+    """Render one table cell as safe Markdown."""
+    if isinstance(cell, ReportLink):
+        label = html.escape(cell.label, quote=False).replace("\\", "\\\\")
+        label = label.replace("[", r"\[").replace("]", r"\]")
+        anchor = html.escape(cell.anchor, quote=True).replace("(", "%28").replace(")", "%29")
+        return f"[{label}](#{anchor})"
+    return cell if escaped else MARKDOWN_ESCAPER.escape(cell)
 
 
 def _render_report_raw_markdown(block: ReportRaw) -> list[str]:
@@ -2034,7 +2109,27 @@ def _render_report_raw_markdown(block: ReportRaw) -> list[str]:
     return raw_lines
 
 
-def _render_report_markdown_block(block: object) -> list[str]:
+def _render_report_model_output_markdown(block: ReportModelOutput) -> list[str]:
+    """Render readable model Markdown and a byte-preserving collapsed raw view."""
+    readable = "\n".join(line.rstrip() for line in block.content.split("\n"))
+    presentation = html.escape(readable, quote=False).replace("`", "&#96;").replace("@", "&#64;")
+    rendered = [
+        f"{_markdown_emphasis('Readable output:')}",
+        "",
+        '<pre class="model-output-readable">',
+        presentation,
+        "</pre>",
+        "",
+    ]
+    _append_markdown_details_block(
+        rendered,
+        summary=block.raw_summary,
+        body_lines=render_report_markdown((ReportCodeBlock(block.content),)),
+    )
+    return rendered
+
+
+def _render_report_markdown_block(block: ReportBlock) -> list[str]:
     """Render one shared report block as Markdown."""
     rendered: list[str]
     if isinstance(block, ReportSection):
@@ -2056,21 +2151,24 @@ def _render_report_markdown_block(block: object) -> list[str]:
         _append_markdown_details_block(rendered, summary=block.summary, body_lines=body_lines)
     elif isinstance(block, ReportRaw):
         rendered = _render_report_raw_markdown(block)
+    elif isinstance(block, ReportModelOutput):
+        rendered = _render_report_model_output_markdown(block)
     else:
         raise UnsupportedReportBlockError(block)
     return rendered
 
 
-def _append_report_markdown_block(parts: list[str], block: object) -> None:
+def _append_report_markdown_block(parts: list[str], block: ReportBlock) -> None:
     """Append one shared report block as Markdown."""
     parts.extend(_render_report_markdown_block(block))
 
 
-def render_report_markdown(blocks: Sequence[object]) -> list[str]:
+def render_report_markdown(blocks: Sequence[ReportBlock]) -> list[str]:
     """Render shared report blocks to GitHub-flavoured Markdown lines."""
     parts: list[str] = []
     for block in blocks:
         _append_report_markdown_block(parts, block)
+    while parts and parts[-1] == "":
         parts.pop()
     return parts
 
@@ -2111,10 +2209,17 @@ def _render_report_table_html(block: ReportTable) -> list[str]:
     rendered.extend(["</tr>", "</thead>", "<tbody>"])
     for row in block.rows:
         rendered.append("<tr>")
-        rendered.extend(f"<td>{html.escape(cell)}</td>" for cell in row)
+        rendered.extend(f"<td>{_render_report_cell_html(cell)}</td>" for cell in row)
         rendered.append("</tr>")
     rendered.extend(["</tbody>", "</table>"])
     return rendered
+
+
+def _render_report_cell_html(cell: ReportCell) -> str:
+    """Render one table cell as escaped HTML."""
+    if isinstance(cell, ReportLink):
+        return f'<a href="#{html.escape(cell.anchor, quote=True)}">{html.escape(cell.label)}</a>'
+    return html.escape(cell)
 
 
 def _render_report_details_html(block: ReportDetails) -> list[str]:
@@ -2126,7 +2231,20 @@ def _render_report_details_html(block: ReportDetails) -> list[str]:
     return rendered
 
 
-def _render_report_html_block(block: object) -> list[str]:
+def _render_report_model_output_html(block: ReportModelOutput) -> list[str]:
+    """Render readable and exact escaped model output in HTML."""
+    escaped_content = html.escape(block.content)
+    return [
+        "<p><b>Readable output:</b></p>",
+        f'<pre class="model-output-readable">{escaped_content}</pre>',
+        "<details>",
+        f"<summary>{html.escape(block.raw_summary)}</summary>",
+        f'<pre><code class="language-text">{escaped_content}</code></pre>',
+        "</details>",
+    ]
+
+
+def _render_report_html_block(block: ReportBlock) -> list[str]:
     """Render one shared report block to escaped HTML lines."""
     rendered: list[str]
     if isinstance(block, ReportSection):
@@ -2146,12 +2264,14 @@ def _render_report_html_block(block: object) -> list[str]:
         rendered = _render_report_details_html(block)
     elif isinstance(block, ReportRaw):
         rendered = list(block.html_lines)
+    elif isinstance(block, ReportModelOutput):
+        rendered = _render_report_model_output_html(block)
     else:
         raise UnsupportedReportBlockError(block)
     return rendered
 
 
-def render_report_html(blocks: Sequence[object]) -> list[str]:
+def render_report_html(blocks: Sequence[ReportBlock]) -> list[str]:
     """Render shared report blocks to escaped HTML lines."""
     parts: list[str] = []
     for block in blocks:
@@ -2159,76 +2279,9 @@ def render_report_html(blocks: Sequence[object]) -> list[str]:
     return parts
 
 
-def _append_markdown_row_block(
-    parts: list[str],
-    *,
-    rows: Sequence[tuple[str, str]],
-    heading: str | None = None,
-) -> None:
-    """Append a compact Markdown stanza rendered as bullet rows."""
-    if not rows:
-        return
-    if heading is not None:
-        parts.extend([heading, ""])
-    parts.extend(render_report_markdown((ReportKeyValues(tuple(rows), markdown_escaped=True),)))
-    parts.append("")
-
-
-@dataclass(frozen=True)
-class ReportStanza:
-    """Small shared payload for scan-friendly human-facing report sections."""
-
-    heading: str | None
-    rows: tuple[tuple[str, str], ...]
-
-
-def _build_report_stanza(
-    heading: str | None,
-    rows: Sequence[tuple[str, str | None]],
-) -> ReportStanza:
-    """Build a stanza while dropping empty optional rows."""
-    return ReportStanza(
-        heading=heading,
-        rows=tuple((label, value) for label, value in rows if value),
-    )
-
-
-def _append_markdown_stanza(
-    parts: list[str],
-    stanza: ReportStanza,
-    *,
-    heading_level: int = 3,
-) -> None:
-    """Append a reusable stanza as a short heading plus labeled bullet rows."""
-    if not stanza.rows:
-        return
-    if stanza.heading is None:
-        parts.extend(render_report_markdown((ReportKeyValues(stanza.rows),)))
-        parts.append("")
-        return
-    parts.extend(
-        render_report_markdown(
-            (
-                ReportSection(
-                    title=stanza.heading,
-                    level=heading_level,
-                    blocks=(ReportKeyValues(stanza.rows),),
-                ),
-            )
-        )
-    )
-    parts.append("")
-
-
-def _render_html_stanza(stanza: ReportStanza) -> list[str]:
-    """Render a reusable stanza as a heading paragraph plus HTML list."""
-    if not stanza.rows:
-        return []
-    parts: list[str] = []
-    if stanza.heading is not None:
-        parts.append(f"<p><b>{html.escape(stanza.heading)}</b></p>")
-    parts.extend(render_report_html((ReportKeyValues(stanza.rows),)))
-    return parts
+def _report_section(title: str, *blocks: ReportBlock, level: int = 2) -> ReportSection:
+    """Build a typed section without repetitive tuple scaffolding."""
+    return ReportSection(title, blocks, level)
 
 
 def _gallery_runtime_facts(
@@ -2300,6 +2353,20 @@ def _gallery_runtime_facts(
             _gallery_metric(
                 "model_load_active_memory_gb",
                 runtime.model_load_active_memory_gb if runtime is not None else None,
+            ),
+        ),
+        (
+            "Post-cleanup active memory",
+            _gallery_metric(
+                "post_cleanup_active_memory_gb",
+                runtime.post_cleanup_active_memory_gb if runtime is not None else None,
+            ),
+        ),
+        (
+            "Post-cleanup cache memory",
+            _gallery_metric(
+                "post_cleanup_cache_memory_gb",
+                runtime.post_cleanup_cache_memory_gb if runtime is not None else None,
             ),
         ),
         (
@@ -2459,14 +2526,17 @@ def _render_gallery_model(
         f"<summary>Complete evidence: {html.escape(result.model_name)}</summary>",
         "",
     ]
-    _append_markdown_row_block(out, rows=escaped_facts)
+    out.extend(
+        render_report_markdown((ReportKeyValues(tuple(escaped_facts), markdown_escaped=True),))
+    )
+    out.append("")
 
     if result.success:
         output = _generation_text_value(generation)
-        out.extend([_markdown_emphasis("Complete generated output:"), ""])
         if not output:
-            out.extend(["empty output", ""])
-        _append_markdown_code_block(out, output)
+            out.extend([_markdown_emphasis("Complete generated output:"), "", "empty output", ""])
+        else:
+            out.extend(render_report_markdown((ReportModelOutput(output),)))
     else:
         out.extend([_markdown_emphasis("Complete traceback:"), ""])
         if result.error_traceback:
@@ -3212,12 +3282,8 @@ def _detect_repetitive_output(text: str, threshold: float | None = None) -> tupl
     if threshold is None:
         threshold = QUALITY.repetition_ratio
 
-    if not text or len(text) < QUALITY.min_text_length:
-        return False, None
-
-    # 1. Check for single token repetition
     tokens = text.split()
-    if len(tokens) < QUALITY.min_token_count:
+    if not text or len(text) < QUALITY.min_text_length or len(tokens) < QUALITY.min_token_count:
         return False, None
 
     token_counts = Counter(tokens)
@@ -3225,6 +3291,10 @@ def _detect_repetitive_output(text: str, threshold: float | None = None) -> tupl
         most_common_token, count = token_counts.most_common(1)[0]
         if count / len(tokens) >= threshold:
             return True, most_common_token
+
+    repeated_item = _repeated_catalog_keyword(text)
+    if repeated_item is not None:
+        return True, f'keyword: "{repeated_item[:30]}"'
 
     # 2. Check for phrase repetition (n-grams)
     # Look for repeated sequences of configurable length (default 4+ tokens)
@@ -3305,8 +3375,23 @@ def _normalize_output_for_analysis(
     return NormalizedOutput(text=normalized, removed_wrappers=tuple(removed))
 
 
+def _configured_role_boundaries(text: str, wrappers: Sequence[str]) -> list[str]:
+    """Return configured conversation-role tokens that escaped into model output."""
+    leading_start = len(text) - len(text.lstrip())
+    boundaries: list[str] = []
+    for token in wrappers:
+        token_lower = token.casefold()
+        position = text.find(token)
+        if position < 0 or not any(role in token_lower for role in ("user", "assistant", "system")):
+            continue
+        if "assistant" not in token_lower or position > leading_start:
+            boundaries.append(token)
+    return _dedupe_preserve_order(boundaries)
+
+
 PROMPT_ECHO_MARKERS: Final[tuple[str, ...]] = (
     "return exactly these three sections",
+    "prompt instructions",
     "do not output reasoning",
     "do not copy context hints verbatim",
     "context: existing metadata hints",
@@ -3443,6 +3528,26 @@ def _split_catalog_keywords(raw_keywords: str) -> list[str]:
     return keywords
 
 
+def _repeated_catalog_keyword(text: str) -> str | None:
+    """Return a repeated keyword when a catalog list is dominated by duplicates."""
+    raw_keywords = _extract_catalog_sections(text).get("keywords", "")
+    keywords = [
+        _normalize_phrase_for_matching(item) for item in _split_catalog_keywords(raw_keywords)
+    ]
+    keywords = [item for item in keywords if item]
+    if len(keywords) < QUALITY.min_catalog_keywords_for_repeat:
+        return None
+    counts = Counter(keywords)
+    repeated, count = counts.most_common(1)[0]
+    duplicate_ratio = (len(keywords) - len(counts)) / len(keywords)
+    return (
+        repeated
+        if count >= QUALITY.min_catalog_keyword_repetitions
+        and duplicate_ratio >= QUALITY.catalog_keyword_duplicate_ratio
+        else None
+    )
+
+
 def _keyword_overlap_state(
     reference: Sequence[str],
     generated: Sequence[str],
@@ -3490,15 +3595,18 @@ def _extract_trusted_hint_bundle(
     return TrustedHintBundle(tuple(_dedupe_preserve_order(hinted_keywords)))
 
 
+CATALOG_SECTION_PATTERN: Final[re.Pattern[str]] = re.compile(
+    r"(?im)^\s*(?:[#>*-]\s*)?\*{0,2}\s*(title|description|keywords)"
+    r"(?::\s*\*{0,2}|\*{0,2}\s*:)\s*(.*)$",
+)
+
+
 def _extract_catalog_sections(text: str) -> dict[str, str]:
     """Extract ``Title/Description/Keywords`` sections from model output."""
     if not text:
         return {}
 
-    pattern: re.Pattern[str] = re.compile(
-        r"(?im)^\s*(?:[#>*-]\s*)?(?:\*{0,2})\s*(title|description|keywords)(?:\*{0,2})\s*:\s*(.*)$",
-    )
-    matches: list[re.Match[str]] = list(pattern.finditer(text))
+    matches: list[re.Match[str]] = list(CATALOG_SECTION_PATTERN.finditer(text))
     if not matches:
         return {}
 
@@ -3527,13 +3635,24 @@ def _prompt_requests_catalog_contract(prompt: str) -> bool:
 
 
 def _missing_catalog_sections(text: str) -> list[str]:
-    """Return requested catalog sections that contain no output."""
+    """Return requested catalog sections that are absent or structurally empty."""
     sections: dict[str, str] = _extract_catalog_sections(text)
-    return [
-        section
-        for section in ("title", "description", "keywords")
-        if not sections.get(section, "").strip()
+    missing = [
+        section for section in ("title", "description", "keywords") if not sections.get(section)
     ]
+    title_lines = [line.strip() for line in sections.get("title", "").splitlines() if line.strip()]
+    if len(title_lines) > 1:
+        missing.append("title")
+    return _dedupe_preserve_order(missing)
+
+
+def _unexpected_catalog_preamble(text: str) -> str | None:
+    """Return non-wrapper text emitted before the first requested catalog section."""
+    first_section = CATALOG_SECTION_PATTERN.search(text)
+    if first_section is None:
+        return None
+    preamble = _strip_empty_thinking_wrappers(text[: first_section.start()]).strip()
+    return preamble or None
 
 
 @dataclass(frozen=True)
@@ -3580,12 +3699,46 @@ def _detect_reasoning_output(
     )
 
 
-def _detect_instruction_echo(text: str) -> tuple[bool, list[str]]:
+def _shared_normalized_word_span(text: str, prompt: str, *, size: int = 8) -> str | None:
+    """Return one substantial word span copied from the prompt into the output."""
+    text_words = _normalize_phrase_for_matching(text).split()
+    if len(text_words) < size:
+        return None
+    context_labels = (
+        "context:",
+        "capture date/time:",
+        "gps:",
+        "title hint:",
+        "description hint:",
+        "keyword hints:",
+        "existing title:",
+        "existing description:",
+        "existing keywords:",
+    )
+    prompt_spans: set[tuple[str, ...]] = set()
+    for line in prompt.splitlines():
+        stripped = line.strip().lstrip("-*• ").casefold()
+        if not stripped or stripped.startswith(context_labels):
+            continue
+        words = _normalize_phrase_for_matching(stripped).split()
+        prompt_spans.update(
+            tuple(words[index : index + size]) for index in range(len(words) - size + 1)
+        )
+    for index in range(len(text_words) - size + 1):
+        span = tuple(text_words[index : index + size])
+        if span in prompt_spans:
+            return " ".join(span)
+    return None
+
+
+def _detect_instruction_echo(text: str, prompt: str | None = None) -> tuple[bool, list[str]]:
     """Detect direct reuse of prompt/task instructions in the answer."""
     if not text:
         return False, []
     text_lower = text.casefold()
     findings = [marker for marker in PROMPT_ECHO_MARKERS if marker in text_lower]
+    if prompt and (shared_span := _shared_normalized_word_span(text, prompt)):
+        findings.append(shared_span)
     deduped = _dedupe_preserve_order(findings)
     return bool(deduped), deduped[:4]
 
@@ -3713,40 +3866,6 @@ def _detect_minimal_output(
     return False, None
 
 
-def _contains_labeled_section(text_lower: str, label_patterns: list[str]) -> bool:
-    """Return True if text contains any configured section label pattern."""
-    for pattern in label_patterns:
-        compiled = _compile_regex_for_detection(
-            rf"\b(?:{pattern})\s*:",
-            debug_context="section label",
-        )
-        if compiled and compiled.search(text_lower):
-            return True
-    return False
-
-
-@lru_cache(maxsize=2048)
-def _compile_regex_cached(pattern: str, flags: int) -> re.Pattern[str] | None:
-    """Compile and cache regex patterns used in detector utilities."""
-    try:
-        return re.compile(pattern, flags)
-    except re.error:
-        return None
-
-
-def _compile_regex_for_detection(
-    pattern: str,
-    *,
-    debug_context: str,
-    flags: int = 0,
-) -> re.Pattern[str] | None:
-    """Return compiled regex or log-and-skip invalid configured patterns."""
-    compiled = _compile_regex_cached(pattern, flags)
-    if compiled is None:
-        logger.debug("Ignoring invalid %s regex: %s", debug_context, pattern)
-    return compiled
-
-
 # =============================================================================
 # CATALOGING-SPECIFIC QUALITY METRICS
 # =============================================================================
@@ -3765,14 +3884,20 @@ class GenerationQualityAnalysis:
     word_count: int = 0
     prompt_checks_ran: bool = False
     instruction_echo: bool = False
+    instruction_echo_fragments: list[str] = dataclass_field(default_factory=list)
+    unexpected_catalog_preamble: str | None = None
     likely_capped: bool = False
+    token_cap_reasons: list[str] = dataclass_field(default_factory=list)
     requested_max_tokens: int | None = None
     prompt_tokens_total: int | None = None
     prompt_tokens_text_est: int | None = None
     prompt_tokens_nontext_est: int | None = None
     special_token_wrappers: list[str] = dataclass_field(default_factory=list)
+    configured_generation_wrappers: list[str] = dataclass_field(default_factory=list)
+    role_boundary_tokens: list[str] = dataclass_field(default_factory=list)
     unexpected_special_tokens: list[str] = dataclass_field(default_factory=list)
     keyword_overlap: KeywordOverlapState = "not_assessable"
+    unchanged_draft_fields: list[str] = dataclass_field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -3783,15 +3908,56 @@ class PromptQualitySignals:
     thinking_trace_incomplete: bool = False
     thinking_trace_markers: tuple[str, ...] = ()
     instruction_echo: bool = False
+    instruction_echo_fragments: tuple[str, ...] = ()
+    unexpected_catalog_preamble: str | None = None
     missing_sections: tuple[str, ...] = ()
     keyword_overlap: KeywordOverlapState = "not_assessable"
+    unchanged_draft_fields: tuple[str, ...] = ()
+
+
+_DRAFT_PROMPT_FIELD_PATTERN: Final[re.Pattern[str]] = re.compile(
+    r"(?im)^\s*-\s*Existing (title|description|keywords):\s*(.+?)\s*$"
+)
+
+
+def _unchanged_draft_fields(text: str, prompt: str) -> tuple[str, ...]:
+    """Return all supplied draft fields only when the output preserves every one exactly."""
+    supplied = {
+        match.group(1).casefold(): match.group(2).strip()
+        for match in _DRAFT_PROMPT_FIELD_PATTERN.finditer(prompt)
+    }
+    if not supplied:
+        return ()
+
+    generated = _extract_catalog_sections(text)
+    ordered_fields = tuple(
+        field for field in ("title", "description", "keywords") if field in supplied
+    )
+    for field in ordered_fields:
+        output_value = generated.get(field)
+        if not output_value:
+            return ()
+        if field == "keywords":
+            supplied_value = tuple(
+                _normalize_phrase_for_matching(value)
+                for value in _split_catalog_keywords(supplied[field])
+            )
+            output_normalized = tuple(
+                _normalize_phrase_for_matching(value)
+                for value in _split_catalog_keywords(output_value)
+            )
+        else:
+            supplied_value = (_normalize_phrase_for_matching(supplied[field]),)
+            output_normalized = (_normalize_phrase_for_matching(output_value),)
+        if output_normalized != supplied_value:
+            return ()
+    return ordered_fields
 
 
 def _collect_prompt_quality_signals(
     text: str,
     *,
     raw_text: str | None = None,
-    generated_tokens: int | None,
     prompt: str | None,
     context_marker: str,
     thinking_trace_delimiters: Sequence[tuple[str, str]],
@@ -3801,23 +3967,22 @@ def _collect_prompt_quality_signals(
         raw_text or text,
         delimiter_pairs=thinking_trace_delimiters,
     )
-    instruction_echo, _instruction_markers = _detect_instruction_echo(text)
+    instruction_echo, instruction_markers = _detect_instruction_echo(text, prompt)
     if not prompt:
         return PromptQualitySignals(
             has_thinking_trace=reasoning_signals.has_thinking_trace,
             thinking_trace_incomplete=reasoning_signals.thinking_trace_incomplete,
             thinking_trace_markers=reasoning_signals.thinking_trace_markers,
             instruction_echo=instruction_echo,
+            instruction_echo_fragments=tuple(instruction_markers),
         )
 
     prompt_bundle = _extract_trusted_hint_bundle(prompt, context_marker=context_marker)
     missing_sections: list[str] = []
-    if (
-        generated_tokens is not None
-        and generated_tokens >= QUALITY.min_tokens_for_substantial
-        and _prompt_requests_catalog_contract(prompt)
-    ):
+    unexpected_preamble: str | None = None
+    if _prompt_requests_catalog_contract(prompt):
         missing_sections = _missing_catalog_sections(text)
+        unexpected_preamble = _unexpected_catalog_preamble(text)
     generated_keywords = _split_catalog_keywords(
         _extract_catalog_sections(text).get("keywords", "")
     )
@@ -3825,14 +3990,18 @@ def _collect_prompt_quality_signals(
         prompt_bundle.trusted_keywords,
         generated_keywords,
     )
+    unchanged_draft_fields = _unchanged_draft_fields(text, prompt)
 
     return PromptQualitySignals(
         has_thinking_trace=reasoning_signals.has_thinking_trace,
         thinking_trace_incomplete=reasoning_signals.thinking_trace_incomplete,
         thinking_trace_markers=reasoning_signals.thinking_trace_markers,
         instruction_echo=instruction_echo,
+        instruction_echo_fragments=tuple(instruction_markers),
+        unexpected_catalog_preamble=unexpected_preamble,
         missing_sections=tuple(missing_sections),
         keyword_overlap=keyword_overlap,
+        unchanged_draft_fields=unchanged_draft_fields,
     )
 
 
@@ -3844,6 +4013,7 @@ def analyze_generation_text(
     requested_max_tokens: int | None = None,
     context_marker: str = "Context:",
     known_special_tokens: Sequence[str] = (),
+    configured_generation_wrappers: Sequence[str] = (),
     thinking_trace_delimiters: Sequence[tuple[str, str]] = THINKING_TRACE_DELIMITER_PAIRS,
 ) -> GenerationQualityAnalysis:
     """Collect mechanical output observations and recorded runtime facts."""
@@ -3856,7 +4026,6 @@ def analyze_generation_text(
     prompt_signals = _collect_prompt_quality_signals(
         analysis_text,
         raw_text=text,
-        generated_tokens=generated_tokens,
         prompt=prompt,
         context_marker=context_marker,
         thinking_trace_delimiters=thinking_trace_delimiters,
@@ -3867,7 +4036,7 @@ def analyze_generation_text(
         if (prompt_tokens is not None and prompt_tokens_text_est is not None)
         else None
     )
-    likely_capped, _cutoff_reasons = _detect_likely_cutoff(
+    likely_capped, cutoff_reasons = _detect_likely_cutoff(
         analysis_text,
         generated_tokens=generated_tokens,
         requested_max_tokens=requested_max_tokens,
@@ -3884,6 +4053,11 @@ def analyze_generation_text(
         unexpected_special_tokens = [
             wrapper for wrapper in unexpected_special_tokens if wrapper != "</think>"
         ]
+    present_configured_wrappers = [
+        wrapper
+        for wrapper in _dedupe_preserve_order(configured_generation_wrappers)
+        if wrapper and wrapper in text
+    ]
 
     return GenerationQualityAnalysis(
         is_repetitive=is_repetitive,
@@ -3895,14 +4069,20 @@ def analyze_generation_text(
         word_count=len(re.findall(r"\b\w+\b", analysis_text)),
         prompt_checks_ran=bool(prompt),
         instruction_echo=prompt_signals.instruction_echo,
+        instruction_echo_fragments=list(prompt_signals.instruction_echo_fragments),
+        unexpected_catalog_preamble=prompt_signals.unexpected_catalog_preamble,
         likely_capped=likely_capped,
+        token_cap_reasons=cutoff_reasons,
         requested_max_tokens=requested_max_tokens,
         prompt_tokens_total=prompt_tokens,
         prompt_tokens_text_est=prompt_tokens_text_est,
         prompt_tokens_nontext_est=prompt_tokens_nontext_est,
         special_token_wrappers=list(normalized.removed_wrappers),
+        configured_generation_wrappers=present_configured_wrappers,
+        role_boundary_tokens=_configured_role_boundaries(text, normalized.removed_wrappers),
         unexpected_special_tokens=unexpected_special_tokens,
         keyword_overlap=prompt_signals.keyword_overlap,
+        unchanged_draft_fields=list(prompt_signals.unchanged_draft_fields),
     )
 
 
@@ -3915,6 +4095,7 @@ def _analyze_text_quality(
     requested_max_tokens: int | None = None,
     context_marker: str = "Context:",
     known_special_tokens: Sequence[str] = (),
+    configured_generation_wrappers: Sequence[str] = (),
     thinking_trace_delimiters: Sequence[tuple[str, str]] = THINKING_TRACE_DELIMITER_PAIRS,
 ) -> tuple[GenerationQualityAnalysis, str | None]:
     """Return mechanical quality analysis plus a compact log-only label string."""
@@ -3926,6 +4107,7 @@ def _analyze_text_quality(
         requested_max_tokens=requested_max_tokens,
         context_marker=context_marker,
         known_special_tokens=known_special_tokens,
+        configured_generation_wrappers=configured_generation_wrappers,
         thinking_trace_delimiters=thinking_trace_delimiters,
     )
     return analysis, _build_quality_issues_string(analysis)
@@ -4844,13 +5026,6 @@ def _get_available_fields(results: list[PerformanceResult]) -> list[str]:
     return gen_fields + PERFORMANCE_TIMING_FIELDS
 
 
-def _get_field_value(result: PerformanceResult, field_name: str) -> MetricValue:
-    """Get field value from either GenerationResult or PerformanceResult."""
-    if field_name in PERFORMANCE_TIMING_FIELDS:
-        return getattr(result, field_name, None)
-    return getattr(result.generation, field_name, None) if result.generation else None
-
-
 def _sort_results_by_time(results: list[PerformanceResult]) -> list[PerformanceResult]:
     """Return results ordered by effective generation time.
 
@@ -5555,16 +5730,6 @@ def _require_str_object_mapping(value: object, error_message: str) -> Mapping[st
     return mapping
 
 
-def _nested_mapping_value(
-    container: Mapping[str, object] | None,
-    key: str,
-) -> Mapping[str, object] | None:
-    """Return a nested mapping value from a string-keyed metadata mapping."""
-    if container is None:
-        return None
-    return _as_str_object_mapping(container.get(key, {}))
-
-
 def _xmp_value(container: Mapping[str, object], qualified_key: str) -> object | None:
     """Return an XMP value across namespace-qualified and Pillow-normalized keys."""
     if qualified_key in container:
@@ -6088,17 +6253,41 @@ def _html_table(
     rows: Sequence[Sequence[str]],
     row_attrs: Sequence[str] = (),
     raw_columns: frozenset[int] = frozenset(),
+    sort_values: Sequence[Sequence[str | int | float | None]] = (),
+    sortable: bool = False,
 ) -> str:
     """Render a compact escaped table, allowing explicitly built internal-link cells."""
     parts = ["<table>", f"<caption>{html.escape(caption, quote=True)}</caption>", "<thead><tr>"]
-    parts.extend(f'<th scope="col">{html.escape(header, quote=True)}</th>' for header in headers)
+    if sortable:
+        parts.extend(
+            (
+                '<th scope="col"><button type="button" class="sort-button" '
+                f'data-sort-column="{column_index}" onclick="sortChooserColumn(this)">'
+                f"{html.escape(header, quote=True)}</button></th>"
+            )
+            for column_index, header in enumerate(headers)
+        )
+    else:
+        parts.extend(
+            f'<th scope="col">{html.escape(header, quote=True)}</th>' for header in headers
+        )
     parts.extend(["</tr></thead>", "<tbody>"])
     for row_index, row in enumerate(rows):
         attrs = row_attrs[row_index] if row_index < len(row_attrs) else ""
         parts.append(f"<tr{attrs}>")
         for column_index, value in enumerate(row):
             cell = value if column_index in raw_columns else html.escape(value, quote=True)
-            parts.append(f"<td>{cell}</td>")
+            sort_value = (
+                sort_values[row_index][column_index]
+                if row_index < len(sort_values) and column_index < len(sort_values[row_index])
+                else None
+            )
+            sort_attr = (
+                _html_attr("data-sort-value", "" if sort_value is None else str(sort_value))
+                if sortable
+                else ""
+            )
+            parts.append(f"<td{sort_attr}>{cell}</td>")
         parts.append("</tr>")
     parts.extend(["</tbody>", "</table>"])
     return "\n".join(parts)
@@ -6430,37 +6619,6 @@ def _format_runtime_timing_snapshot_lines(runtime_analysis: RuntimeAnalysisSumma
     return lines
 
 
-def _format_runtime_analysis_lines(runtime_analysis: RuntimeAnalysisSummary) -> list[str]:
-    """Build concise Markdown bullets explaining runtime timing implications."""
-    dominant_phase: RuntimePhaseName = runtime_analysis["dominant_phase"]
-    dominant_label: str = _RUNTIME_PHASE_LABELS.get(dominant_phase, dominant_phase)
-    dominant_share: float = runtime_analysis["dominant_phase_share"]
-    dominant_count: int = runtime_analysis["dominant_phase_count"]
-    measured_models: int = runtime_analysis["measured_models"]
-    termination_counts: dict[str, int] = runtime_analysis["termination_counts"]
-    termination_summary: str = ", ".join(
-        f"{name}={count}" for name, count in sorted(termination_counts.items())
-    )
-
-    lines: list[str] = [
-        (
-            f"- **Runtime pattern:** {dominant_label} dominates measured phase time "
-            f"({dominant_share:.0%}; {dominant_count}/{measured_models} measured model(s))."
-        ),
-        f"- **What this likely means:** {runtime_analysis['interpretation']}",
-        f"- **Suggested next action:** {runtime_analysis['next_action']}",
-    ]
-    phase_totals_line = _format_runtime_phase_totals_line(runtime_analysis)
-    if phase_totals_line is not None:
-        lines.insert(1, phase_totals_line)
-    generation_total_line = _format_runtime_generation_total_line(runtime_analysis)
-    if generation_total_line is not None:
-        lines.insert(2, generation_total_line)
-    if termination_summary:
-        lines.append(f"- **Termination reasons:** {termination_summary}.")
-    return lines
-
-
 def _relative_markdown_artifact_path(*, report_filename: Path, artifact_filename: Path) -> str:
     """Return a relative path for links between Markdown artifacts."""
     try:
@@ -6770,7 +6928,7 @@ def _gallery_row(result: PerformanceResult, assessment: ResultAssessment) -> Gal
             or "no failure evidence captured"
         )
     output_preview = _truncate_text_preview(
-        _collapse_preview_whitespace(preview_source),
+        _collapse_preview_line_whitespace(preview_source),
         max_chars=MAX_OUTPUT_PREVIEW_CHARS,
     )
     peak_memory = _generation_float_metric(generation, "peak_memory")
@@ -6778,7 +6936,15 @@ def _gallery_row(result: PerformanceResult, assessment: ResultAssessment) -> Gal
         model=result.model_name,
         usability=assessment.usability,
         observations=assessment.observations,
+        total_time_s=(
+            result.total_time if result.total_time is not None and result.total_time >= 0 else None
+        ),
         generation_tps=_valid_generation_tps(result),
+        first_token_latency_s=(
+            result.runtime_diagnostics.first_token_latency_s
+            if result.runtime_diagnostics is not None
+            else None
+        ),
         peak_memory_gb=(peak_memory if peak_memory is not None and peak_memory >= 0 else None),
         generation_tokens=_generation_int_metric(generation, "generation_tokens"),
         output_preview=output_preview,
@@ -6802,6 +6968,11 @@ def _gallery_throughput_cell(row: GalleryRow) -> str:
     if row.generation_tokens is not None and row.generation_tokens < MIN_THROUGHPUT_SAMPLE_TOKENS:
         return "insufficient sample"
     return "-"
+
+
+def _gallery_total_time_cell(row: GalleryRow) -> str:
+    """Render captured end-to-end model time ahead of decode-only throughput."""
+    return _format_time_seconds(row.total_time_s) if row.total_time_s is not None else "-"
 
 
 def _render_gallery_table(
@@ -6832,6 +7003,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
         (
             _gallery_summary_model_link(row.model),
             _markdown_inline_code(row.usability),
+            _gallery_total_time_cell(row),
             _gallery_throughput_cell(row),
             _gallery_metric("peak_memory", row.peak_memory_gb),
             _gallery_metric("generation_tokens", row.generation_tokens),
@@ -6844,7 +7016,8 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
         "## Current-run Chooser",
         "",
         (
-            "Current-run usability and captured resource facts only. Throughput requires "
+            "Current-run usability and captured resource facts only. Total time is end-to-end; "
+            "throughput covers generation only and requires "
             f"at least {MIN_THROUGHPUT_SAMPLE_TOKENS} generated tokens."
         ),
         "",
@@ -6852,6 +7025,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
             headers=(
                 "Model",
                 "Usability",
+                "Total s",
                 "Gen TPS",
                 "Peak GB",
                 "Gen tok",
@@ -7029,7 +7203,9 @@ class GalleryRow:
     model: str
     usability: ModelUsability
     observations: tuple[ObservationCode, ...]
+    total_time_s: float | None
     generation_tps: float | None
+    first_token_latency_s: float | None
     peak_memory_gb: float | None
     generation_tokens: int | None
     output_preview: str
@@ -7040,6 +7216,8 @@ _UNUSABLE_OBSERVATIONS: Final[frozenset[ObservationCode]] = frozenset(
         "empty_output",
         "repeated_output",
         "missing_requested_sections",
+        "prompt_instruction_echo",
+        "unexpected_catalog_preamble",
     }
 )
 
@@ -7074,22 +7252,26 @@ def _assessment_observations(result: PerformanceResult) -> tuple[ObservationCode
         observations.append("repeated_output")
     if analysis is None:
         return tuple(observations)
-    if analysis.missing_sections:
-        observations.append("missing_requested_sections")
-    if analysis.likely_capped and (
-        is_repetitive or analysis.missing_sections or analysis.thinking_trace_incomplete
-    ):
-        observations.append("token_cap_truncation")
-    if analysis.instruction_echo:
-        observations.append("prompt_instruction_echo")
-    if analysis.unexpected_special_tokens:
-        observations.append("unexpected_special_token")
-    if analysis.has_thinking_trace:
-        observations.append("thinking_trace_present")
-    if analysis.thinking_trace_incomplete:
-        observations.append("thinking_trace_incomplete")
-    if analysis.keyword_overlap == "no_overlap":
-        observations.append("no_keyword_overlap")
+    candidates: tuple[tuple[bool, ObservationCode], ...] = (
+        (bool(analysis.missing_sections), "missing_requested_sections"),
+        (
+            analysis.likely_capped
+            and bool(
+                is_repetitive or analysis.missing_sections or analysis.thinking_trace_incomplete
+            ),
+            "token_cap_truncation",
+        ),
+        (analysis.instruction_echo, "prompt_instruction_echo"),
+        (bool(analysis.unexpected_catalog_preamble), "unexpected_catalog_preamble"),
+        (bool(analysis.unexpected_special_tokens), "unexpected_special_token"),
+        (bool(analysis.configured_generation_wrappers), "configured_wrapper_present"),
+        (analysis.has_thinking_trace, "thinking_trace_present"),
+        (analysis.thinking_trace_incomplete, "thinking_trace_incomplete"),
+        (bool(analysis.role_boundary_tokens), "role_boundary_token_present"),
+        (analysis.keyword_overlap == "no_overlap", "no_keyword_overlap"),
+        (bool(analysis.unchanged_draft_fields), "draft_returned_unchanged"),
+    )
+    observations.extend(code for condition, code in candidates if condition)
     return tuple(observations)
 
 
@@ -7116,14 +7298,49 @@ def _assess_result(result: PerformanceResult) -> ResultAssessment:
     return ResultAssessment(execution, usability, maintainer_status, observations)
 
 
-def _assessment_to_json(assessment: ResultAssessment) -> JsonlAssessmentRecord:
+def _observation_details(result: PerformanceResult) -> JsonlObservationDetailsRecord:
+    """Return non-empty exact evidence for the result's mechanical observations."""
+    analysis = result.quality_analysis
+    if analysis is None:
+        return {}
+    details: JsonlObservationDetailsRecord = {}
+    if analysis.missing_sections:
+        details["missing_sections"] = list(analysis.missing_sections)
+    if analysis.repeated_token:
+        details["repeated_fragment"] = analysis.repeated_token
+    if analysis.instruction_echo_fragments:
+        details["instruction_echo_fragments"] = list(analysis.instruction_echo_fragments)
+    if analysis.unexpected_catalog_preamble:
+        details["unexpected_catalog_preamble"] = analysis.unexpected_catalog_preamble
+    if analysis.unexpected_special_tokens:
+        details["unexpected_special_tokens"] = list(analysis.unexpected_special_tokens)
+    if analysis.configured_generation_wrappers:
+        details["configured_generation_wrappers"] = list(analysis.configured_generation_wrappers)
+    if analysis.thinking_trace_markers:
+        details["thinking_trace_markers"] = list(analysis.thinking_trace_markers)
+    if analysis.role_boundary_tokens:
+        details["role_boundary_tokens"] = list(analysis.role_boundary_tokens)
+    if analysis.token_cap_reasons:
+        details["token_cap_reasons"] = list(analysis.token_cap_reasons)
+    if analysis.unchanged_draft_fields:
+        details["unchanged_draft_fields"] = list(analysis.unchanged_draft_fields)
+    return details
+
+
+def _assessment_to_json(
+    assessment: ResultAssessment,
+    result: PerformanceResult | None = None,
+) -> JsonlAssessmentRecord:
     """Serialize the sole current-run status record for machine artifacts."""
-    return {
+    record: JsonlAssessmentRecord = {
         "execution": assessment.execution,
         "usability": assessment.usability,
         "maintainer_status": assessment.maintainer_status,
         "observations": list(assessment.observations),
     }
+    if result is not None and (details := _observation_details(result)):
+        record["details"] = details
+    return record
 
 
 @dataclass(frozen=True)
@@ -7419,7 +7636,7 @@ def _append_markdown_section(
             rendered_body.extend(_wrap_markdown_text(body_line))
         rendered_body.append("")
 
-    blocks: tuple[object, ...] = (
+    blocks: tuple[ReportBlock, ...] = (
         (ReportRaw(markdown_lines=tuple(rendered_body)),) if rendered_body else ()
     )
     parts.extend(
@@ -7451,18 +7668,6 @@ def _append_markdown_details_block(
         parts.append("")
     parts.append("</details>")
     parts.append("")
-
-
-def _begin_diagnostics_section(
-    *,
-    title: str | None = None,
-    body_lines: list[str] | None = None,
-) -> list[str]:
-    """Return a diagnostics section buffer with the standard divider and optional heading."""
-    parts: list[str] = ["---", ""]
-    if title is not None:
-        _append_markdown_section(parts, title=title, body_lines=body_lines)
-    return parts
 
 
 _LOCAL_RUNNER_TRACEBACK_FRAME_RE: Final[re.Pattern[str]] = re.compile(
@@ -7713,19 +7918,17 @@ def _sha256_file(path: Path) -> str | None:
         return None
 
 
-def _sanitize_issue_filename_component(model_name: str) -> str:
-    """Create a filesystem-safe issue-draft component from a model identifier."""
-    cleaned = re.sub(r"[^A-Za-z0-9_.-]+", "_", model_name).strip("._")
-    return cleaned or "model"
+@dataclass(frozen=True)
+class DiagnosticsPartitions:
+    """Direct cached-assessment partitions for maintainer presentation."""
+
+    actionable: tuple[PerformanceResult, ...]
+    observations: tuple[PerformanceResult, ...]
+    indeterminate: tuple[PerformanceResult, ...]
+    clean: tuple[PerformanceResult, ...]
 
 
-def _partition_diagnostics(
-    context: HtmlReportContext,
-) -> tuple[
-    tuple[PerformanceResult, ...],
-    tuple[PerformanceResult, ...],
-    tuple[PerformanceResult, ...],
-]:
+def _partition_diagnostics(context: HtmlReportContext) -> DiagnosticsPartitions:
     """Partition maintainer evidence using only cached current-run assessments."""
     assessments = dict(context.assessments)
     actionable = tuple(
@@ -7743,7 +7946,13 @@ def _partition_diagnostics(
         for result in context.result_set.results
         if assessments[result.model_name].execution == "indeterminate"
     )
-    return actionable, observations, indeterminate
+    clean = tuple(
+        result
+        for result in context.result_set.results
+        if assessments[result.model_name].execution == "completed"
+        and assessments[result.model_name].maintainer_status == "none"
+    )
+    return DiagnosticsPartitions(actionable, observations, indeterminate, clean)
 
 
 def _diagnostics_fact(value: object | None) -> str:
@@ -7811,238 +8020,372 @@ def _diagnostics_result_facts(
     prompt_diagnostics = result.prompt_diagnostics
     runtime = result.runtime_diagnostics
     generation_kwargs = prompt_diagnostics.generate_kwargs if prompt_diagnostics is not None else {}
-    return (
+    resolved_revision = (
+        model_provenance["resolved_revision"] if model_provenance is not None else None
+    )
+    requested_revision = (
+        model_provenance["requested_revision"] if model_provenance is not None else None
+    ) or getattr(run_args, "revision", None)
+    processor = prompt_diagnostics.processor_class if prompt_diagnostics is not None else None
+    tokenizer = prompt_diagnostics.tokenizer_class if prompt_diagnostics is not None else None
+    rows: list[tuple[str, str]] = [
         ("Execution", assessment.execution),
         ("Usability", assessment.usability),
         ("Maintainer status", assessment.maintainer_status),
         ("Observations", ", ".join(assessment.observations) or "none"),
-        ("Phase", _diagnostics_fact(result.failure_phase)),
-        ("Stage", _diagnostics_fact(result.error_stage)),
-        ("Package", _diagnostics_fact(result.error_package)),
+    ]
+    detail_labels = {
+        "missing_sections": "Missing sections",
+        "repeated_fragment": "Repeated fragment",
+        "instruction_echo_fragments": "Echoed instruction fragments",
+        "unexpected_catalog_preamble": "Unexpected text before Title",
+        "unexpected_special_tokens": "Unexpected special tokens",
+        "configured_generation_wrappers": "Declared generation wrappers in output",
+        "thinking_trace_markers": "Thinking trace markers",
+        "role_boundary_tokens": "Role-boundary tokens in output",
+        "token_cap_reasons": "Token-cap degradation evidence",
+        "unchanged_draft_fields": "Draft fields returned unchanged",
+    }
+    rows.extend(
+        (detail_labels[key], _diagnostics_fact(value))
+        for key, value in _observation_details(result).items()
+    )
+    optional_facts = (
+        ("Phase", result.failure_phase),
+        ("Stage", result.error_stage),
+        ("Package", result.error_package),
+        ("Error type", result.error_type),
+        ("Error message", result.error_message),
+        ("Root error type", result.root_error_type),
+        ("Root error message", result.root_error_message),
+        ("Resolved model revision", resolved_revision),
+        ("Requested model revision", requested_revision),
+        ("Processor class", processor),
+        ("Tokenizer class", tokenizer),
+        ("Stop reason", runtime.stop_reason if runtime is not None else None),
         (
-            "Resolved model revision",
-            _diagnostics_fact(
-                model_provenance["resolved_revision"] if model_provenance is not None else None
-            ),
+            "Post-cleanup active memory (GB)",
+            runtime.post_cleanup_active_memory_gb if runtime is not None else None,
         ),
         (
-            "Requested model revision",
-            _diagnostics_fact(
-                model_provenance["requested_revision"]
-                if model_provenance is not None
-                else getattr(run_args, "revision", None)
-            ),
+            "Post-cleanup cache memory (GB)",
+            runtime.post_cleanup_cache_memory_gb if runtime is not None else None,
         ),
-        (
-            "Processor class",
-            _diagnostics_fact(
-                prompt_diagnostics.processor_class if prompt_diagnostics is not None else None
-            ),
-        ),
-        (
-            "Tokenizer class",
-            _diagnostics_fact(
-                prompt_diagnostics.tokenizer_class if prompt_diagnostics is not None else None
-            ),
-        ),
-        (
-            "Stop reason",
-            _diagnostics_fact(runtime.stop_reason if runtime is not None else None),
-        ),
-        (
-            "Prompt tokens",
-            _diagnostics_fact(_generation_int_metric(result.generation, "prompt_tokens")),
-        ),
-        (
-            "Generation tokens",
-            _diagnostics_fact(_generation_int_metric(result.generation, "generation_tokens")),
-        ),
+        ("Prompt tokens", _generation_int_metric(result.generation, "prompt_tokens")),
+        ("Generation tokens", _generation_int_metric(result.generation, "generation_tokens")),
         (
             "Configured EOS token ID",
-            _diagnostics_fact(
-                prompt_diagnostics.eos_token_id if prompt_diagnostics is not None else None
-            ),
+            prompt_diagnostics.eos_token_id if prompt_diagnostics else None,
         ),
-        (
-            "Configured EOS token",
-            _diagnostics_fact(
-                prompt_diagnostics.eos_token if prompt_diagnostics is not None else None
-            ),
-        ),
-        (
-            "Configured EOS token override",
-            _diagnostics_fact(generation_kwargs.get("eos_tokens")),
-        ),
-        (
-            "Configured thinking start token",
-            _diagnostics_fact(generation_kwargs.get("thinking_start_token")),
-        ),
-        (
-            "Configured thinking end token",
-            _diagnostics_fact(generation_kwargs.get("thinking_end_token")),
-        ),
+        ("Configured EOS token", prompt_diagnostics.eos_token if prompt_diagnostics else None),
+        ("Configured EOS token override", generation_kwargs.get("eos_tokens")),
+        ("Configured thinking start token", generation_kwargs.get("thinking_start_token")),
+        ("Configured thinking end token", generation_kwargs.get("thinking_end_token")),
     )
+    rows.extend(
+        (label, _diagnostics_fact(value)) for label, value in optional_facts if value is not None
+    )
+    return tuple(rows)
 
 
-def _diagnostics_model_entry(
+def _diagnostics_model_anchor(model_name: str) -> str:
+    """Return the stable evidence anchor for one diagnostics entry."""
+    gallery_anchor = _gallery_model_anchor(model_name)
+    return f"diagnostic-{gallery_anchor.removeprefix('model-')}"
+
+
+def _diagnostics_model_blocks(
     result: PerformanceResult,
     assessment: ResultAssessment,
     *,
-    prompt: str,
-    image_path: Path | None,
     run_args: argparse.Namespace | None,
     model_provenance: ModelProvenanceRecord | None,
-    heading_level: int,
-) -> list[str]:
-    """Render one model's complete maintainer evidence in priority order."""
-    parts = [f"{'#' * heading_level} {MARKDOWN_ESCAPER.escape(result.model_name)}", ""]
+) -> tuple[ReportBlock, ...]:
+    """Build one model's complete maintainer evidence in priority order."""
+    blocks: list[ReportBlock] = []
     if assessment.execution == "crashed":
-        parts.extend([f"{'#' * (heading_level + 1)} Root exception and chain", ""])
-        _append_markdown_code_block(
-            parts,
-            "\n".join(_diagnostics_exception_lines(result)),
-            language="text",
-        )
-        parts.extend([f"{'#' * (heading_level + 1)} Complete traceback", ""])
-        _append_markdown_code_block(
-            parts,
-            _home_relative_report_text(result.error_traceback or "unavailable"),
-            language="text",
-        )
-
-    parts.extend([f"{'#' * (heading_level + 1)} Execution and provenance", ""])
-    parts.extend(
-        render_report_markdown(
-            (
-                ReportKeyValues(
-                    _diagnostics_result_facts(
-                        result,
-                        assessment,
-                        run_args=run_args,
-                        model_provenance=model_provenance,
-                    )
-                ),
+        blocks.append(
+            _report_section(
+                "Root exception and chain",
+                ReportCodeBlock("\n".join(_diagnostics_exception_lines(result))),
+                level=4,
             )
         )
-    )
-    parts.append("")
+        if result.error_traceback:
+            blocks.append(
+                _report_section(
+                    "Complete traceback",
+                    ReportCodeBlock(_home_relative_report_text(result.error_traceback)),
+                    level=4,
+                )
+            )
 
-    generated_output = (
-        "unavailable"
-        if result.generation is None
-        else _generation_text_value(result.generation) or "(empty)"
+    blocks.append(
+        _report_section(
+            "Execution and provenance",
+            ReportKeyValues(
+                _diagnostics_result_facts(
+                    result,
+                    assessment,
+                    run_args=run_args,
+                    model_provenance=model_provenance,
+                )
+            ),
+            level=4,
+        )
     )
-    output_label = (
-        "Complete partial output" if assessment.execution == "crashed" else "Complete output"
+    if result.generation is not None:
+        generated_output = _generation_text_value(result.generation) or "(empty)"
+        if assessment.execution == "completed":
+            output_block: ReportBlock = ReportCodeBlock(generated_output)
+            output_title = "Complete output"
+        else:
+            output_block = ReportCodeBlock(generated_output)
+            output_title = "Complete partial output"
+        blocks.append(_report_section(output_title, output_block, level=4))
+    if result.captured_output_on_fail:
+        blocks.append(
+            _report_section(
+                "Captured stdout/stderr",
+                ReportCodeBlock(_home_relative_report_text(result.captured_output_on_fail)),
+                level=4,
+            )
+        )
+    return tuple(blocks)
+
+
+def _diagnostics_counts_blocks(
+    context: HtmlReportContext,
+) -> tuple[ReportBlock, ...]:
+    """Build compact outcome and cached-assessment count tables."""
+    assessments = [assessment for _model, assessment in context.assessments]
+    outcomes = _run_outcome_counts(context.assessments)
+    maintainer_counts = Counter(assessment.maintainer_status for assessment in assessments)
+    usability_counts = Counter(assessment.usability for assessment in assessments)
+    observation_counts = Counter(
+        observation for assessment in assessments for observation in assessment.observations
     )
-    parts.extend([f"{'#' * (heading_level + 1)} {output_label}", ""])
-    _append_markdown_code_block(
-        parts,
-        generated_output,
-        language="text",
-    )
-    parts.extend([f"{'#' * (heading_level + 1)} Captured stdout/stderr", ""])
-    _append_markdown_code_block(
-        parts,
-        _home_relative_report_text(result.captured_output_on_fail or "unavailable"),
-        language="text",
+    outcome_rows = (
+        ("Attempted", str(outcomes["models_attempted"])),
+        ("Conclusive outcomes", str(outcomes["models_evaluated"])),
+        ("Completed", str(outcomes["models_completed"])),
+        ("Crashed", str(outcomes["models_crashed"])),
+        ("Indeterminate", str(outcomes["models_indeterminate"])),
     )
 
-    parts.extend(
-        [
-            f"{'#' * (heading_level + 1)} Supplemental CLI reproduction",
-            "",
-            "This form includes only settings supported by the native mlx-vlm CLI.",
-            "",
-        ]
+    def count_blocks[T: str](
+        label: str, heading: str, counts: Mapping[T, int]
+    ) -> tuple[ReportBlock, ReportBlock]:
+        rows = tuple((key.replace("_", " "), str(value)) for key, value in sorted(counts.items()))
+        return ReportParagraph(label), ReportTable(
+            (heading, "Count"), rows or (("none recorded", "0"),)
+        )
+
+    return (
+        ReportParagraph("Outcome counts"),
+        ReportTable(("Outcome", "Count"), outcome_rows),
+        *count_blocks("Maintainer status counts", "Maintainer status", maintainer_counts),
+        *count_blocks("Usability counts", "Usability", usability_counts),
+        *count_blocks("Observation counts", "Observation", observation_counts),
     )
-    _append_markdown_code_block(
-        parts,
-        _diagnostics_repro_command(
+
+
+def _diagnostics_clean_row(
+    result: PerformanceResult,
+    model_provenance: ModelProvenanceRecord | None,
+) -> tuple[str, str, str]:
+    """Build one compact clean-completion context row."""
+    revision = model_provenance["resolved_revision"] if model_provenance is not None else None
+    revision_preview = revision[: FORMATTING.revision_preview_chars] if revision else "-"
+    prompt_diagnostics = result.prompt_diagnostics
+    processor = (
+        prompt_diagnostics.processor_class.rsplit(".", maxsplit=1)[-1]
+        if prompt_diagnostics is not None and prompt_diagnostics.processor_class
+        else "-"
+    )
+    runtime = result.runtime_diagnostics
+    stop_reason = runtime.stop_reason if runtime is not None and runtime.stop_reason else "-"
+    identity = f"rev {revision_preview}; {processor}; stop {stop_reason}"
+    prompt_tokens = _generation_int_metric(result.generation, "prompt_tokens")
+    generation_tokens = _generation_int_metric(result.generation, "generation_tokens")
+    token_summary = (
+        f"{prompt_tokens if prompt_tokens is not None else '-'} prompt / "
+        f"{generation_tokens if generation_tokens is not None else '-'} generated"
+    )
+    generation_tps = _valid_generation_tps(result)
+    if generation_tps is not None:
+        throughput = f"{_gallery_metric('generation_tps', generation_tps)} tok/s"
+    elif generation_tokens is not None and generation_tokens < MIN_THROUGHPUT_SAMPLE_TOKENS:
+        throughput = "insufficient sample"
+    else:
+        throughput = "-"
+    peak_memory = _generation_float_metric(result.generation, "peak_memory")
+    memory = (
+        f"{_gallery_metric('peak_memory', peak_memory)} GB peak" if peak_memory is not None else "-"
+    )
+    if runtime is not None and (
+        runtime.post_cleanup_active_memory_gb is not None
+        or runtime.post_cleanup_cache_memory_gb is not None
+    ):
+        active = _gallery_metric(
+            "post_cleanup_active_memory_gb",
+            runtime.post_cleanup_active_memory_gb,
+        )
+        cache = _gallery_metric(
+            "post_cleanup_cache_memory_gb",
+            runtime.post_cleanup_cache_memory_gb,
+        )
+        memory = f"{memory}; cleanup {active}/{cache} GB active/cache"
+    return result.model_name, identity, f"{token_summary}; {throughput}; {memory}"
+
+
+type DiagnosticsPresentation = Literal["expanded", "observation", "indeterminate"]
+
+
+def _diagnostics_partition_blocks(
+    results: Sequence[PerformanceResult],
+    *,
+    presentation: DiagnosticsPresentation,
+    assessments: Mapping[str, ResultAssessment],
+    provenance: Mapping[str, ModelProvenanceRecord],
+    run_args: argparse.Namespace | None,
+) -> tuple[ReportBlock, ...]:
+    """Build one expanded or collapsed cached-assessment partition."""
+    blocks: list[ReportBlock] = []
+    for result in results:
+        assessment = assessments[result.model_name]
+        anchor = html.escape(_diagnostics_model_anchor(result.model_name), quote=True)
+        anchor_block = ReportRaw(
+            markdown_lines=(f'<a id="{anchor}"></a>',),
+            html_lines=(f'<a id="{anchor}"></a>',),
+        )
+        evidence = _diagnostics_model_blocks(
             result,
-            prompt=prompt,
-            image_path=image_path,
+            assessment,
             run_args=run_args,
-            model_provenance=model_provenance,
-        ),
-        language="bash",
+            model_provenance=provenance.get(result.model_name),
+        )
+        if presentation == "expanded":
+            entry: ReportBlock = ReportSection(result.model_name, evidence, level=3)
+        else:
+            detail = (
+                _gallery_observation_labels(assessment.observations)
+                if presentation == "observation"
+                else "indeterminate"
+            )
+            entry = ReportDetails(
+                f"{result.model_name} — {assessment.usability} — {detail}",
+                (ReportSection(result.model_name, evidence, level=3),),
+            )
+        blocks.extend((anchor_block, entry))
+    return tuple(blocks) or (ReportParagraph("None."),)
+
+
+def _diagnostics_evidence_blocks(
+    report_context: HtmlReportContext,
+    *,
+    run_args: argparse.Namespace | None,
+) -> tuple[ReportBlock, ...]:
+    """Build the shared skim-first diagnostics hierarchy from cached assessments."""
+    assessments = _assessments_by_model(report_context)
+    provenance = _model_provenance_by_model(report_context)
+    partitions = _partition_diagnostics(report_context)
+    highlighted = (*partitions.actionable, *partitions.observations, *partitions.indeterminate)
+    triage_rows = tuple(
+        (
+            ReportLink(result.model_name, _diagnostics_model_anchor(result.model_name)),
+            assessments[result.model_name].execution,
+            assessments[result.model_name].usability,
+            assessments[result.model_name].maintainer_status,
+            _gallery_observation_labels(assessments[result.model_name].observations),
+        )
+        for result in highlighted
     )
-    image_ref = _issue_repro_image_ref(image_path=image_path, run_args=run_args)
-    parts.extend([f"{'#' * (heading_level + 1)} Canonical Python reproduction script", ""])
-    _append_markdown_code_block(
-        parts,
-        _build_native_mlx_vlm_python_script(
-            model_name=result.model_name,
-            prompt=prompt,
-            image_ref=image_ref,
-            run_args=run_args,
-            resolved_revision=(
-                model_provenance["resolved_revision"] if model_provenance is not None else None
+    triage: ReportBlock = (
+        ReportTable(
+            ("Model", "Execution", "Usability", "Maintainer status", "Observations"),
+            triage_rows,
+        )
+        if triage_rows
+        else ReportParagraph("No highlighted attempts.")
+    )
+    blocks: list[ReportBlock] = [
+        _report_section("Run Summary", *_diagnostics_counts_blocks(report_context)),
+        _report_section("Triage", triage),
+        _report_section(
+            "Actionable Failures",
+            *_diagnostics_partition_blocks(
+                partitions.actionable,
+                presentation="expanded",
+                assessments=assessments,
+                provenance=provenance,
+                run_args=run_args,
             ),
         ),
-        language="python",
-    )
-    return parts
-
-
-def _diagnostics_partition_section(
-    *,
-    title: str,
-    results: Sequence[PerformanceResult],
-    assessments: Mapping[str, ResultAssessment],
-    prompt: str,
-    image_path: Path | None,
-    run_args: argparse.Namespace | None,
-    model_provenance: Mapping[str, ModelProvenanceRecord],
-) -> list[str]:
-    """Render one direct current-run diagnostics partition."""
-    parts = [f"## {title}", ""]
-    if not results:
-        return [*parts, "None.", ""]
-    for result in results:
-        parts.extend(
-            _diagnostics_model_entry(
-                result,
-                assessments[result.model_name],
-                prompt=prompt,
-                image_path=image_path,
+        _report_section(
+            "Completed Runs with Observations",
+            *_diagnostics_partition_blocks(
+                partitions.observations,
+                presentation="observation",
+                assessments=assessments,
+                provenance=provenance,
                 run_args=run_args,
-                model_provenance=model_provenance.get(result.model_name),
-                heading_level=3,
-            )
+            ),
+        ),
+        _report_section(
+            "Indeterminate Attempts",
+            *_diagnostics_partition_blocks(
+                partitions.indeterminate,
+                presentation="indeterminate",
+                assessments=assessments,
+                provenance=provenance,
+                run_args=run_args,
+            ),
+        ),
+    ]
+    clean_rows = tuple(
+        _diagnostics_clean_row(result, provenance.get(result.model_name))
+        for result in partitions.clean
+    )
+    clean: ReportBlock = (
+        ReportDetails(
+            "Clean completions",
+            (ReportTable(("Model", "Runtime identity", "Performance"), clean_rows),),
         )
-    return parts
+        if clean_rows
+        else ReportParagraph("No clean completions.")
+    )
+    blocks.append(_report_section("Clean Completion Context", clean))
+    return tuple(blocks)
 
 
-def _diagnostics_provenance_environment(
+def _issue_provenance_blocks(
     *,
     prompt: str,
     library_versions: LibraryVersionDict,
     system_info: Mapping[str, str],
-) -> list[str]:
-    """Render run prompt, component versions, and system facts after model evidence."""
-    parts = ["## Provenance and Environment", "", "### Prompt", ""]
-    _append_markdown_code_block(parts, prompt, language="text")
+) -> tuple[ReportBlock, ...]:
+    """Build prompt and environment blocks for a direct crash issue draft."""
     rows = tuple(
-        (component, value)
-        for component, value in _collect_report_component_rows(
+        _collect_report_component_rows(
             versions=library_versions,
             system_info=dict(system_info),
             library_names=_DIAGNOSTICS_LIB_NAMES,
             system_keys=_DIAGNOSTICS_SYSTEM_KEYS,
         )
     )
-    parts.extend(["### Components", ""])
-    if rows:
-        parts.extend(
-            _guard_markdownlint_block(
-                render_report_markdown((ReportTable(headers=("Component", "Value"), rows=rows),)),
-                rules=MARKDOWNLINT_TABLE_PIPE_RULES,
-            )
-        )
-    else:
-        parts.extend(["Environment and component provenance unavailable.", ""])
-    return parts
+    components: ReportBlock = (
+        ReportTable(("Component", "Value"), rows)
+        if rows
+        else ReportParagraph("Environment and component provenance unavailable.")
+    )
+    return (
+        _report_section(
+            "Provenance and Environment",
+            _report_section("Prompt", ReportCodeBlock(prompt), level=3),
+            _report_section("Components", components, level=3),
+        ),
+    )
 
 
 def generate_diagnostics_report(
@@ -8058,74 +8401,26 @@ def generate_diagnostics_report(
 ) -> None:
     """Write current-run maintainer evidence without reclassifying results."""
     del results  # The cached context is the sole classification and result source.
-    assessments = dict(report_context.assessments)
     model_provenance = _model_provenance_by_model(report_context)
-    actionable, observations, indeterminate = _partition_diagnostics(report_context)
-    counts = _run_outcome_counts(report_context.assessments)
-    parts = ["# Diagnostics", ""]
-    parts.extend(
-        [
-            "## Run Outcome Counts",
-            "",
-            *_guard_markdownlint_block(
-                render_report_markdown(
-                    (
-                        ReportTable(
-                            headers=("Outcome", "Count"),
-                            rows=(
-                                ("Attempted", str(counts["models_attempted"])),
-                                ("Evaluated", str(counts["models_evaluated"])),
-                                ("Completed", str(counts["models_completed"])),
-                                ("Crashed", str(counts["models_crashed"])),
-                                ("Indeterminate", str(counts["models_indeterminate"])),
-                            ),
-                        ),
-                    )
-                ),
-                rules=MARKDOWNLINT_TABLE_PIPE_RULES,
-            ),
-        ]
+    partitions = _partition_diagnostics(report_context)
+    highlighted = (
+        *partitions.actionable,
+        *partitions.observations,
+        *partitions.indeterminate,
     )
-    parts.extend(
-        _diagnostics_partition_section(
-            title="Actionable Failures",
-            results=actionable,
-            assessments=assessments,
+    blocks = (
+        *_diagnostics_evidence_blocks(report_context, run_args=run_args),
+        *_diagnostics_shared_context_blocks(
             prompt=prompt,
-            image_path=image_path,
-            run_args=run_args,
+            highlighted_results=highlighted,
             model_provenance=model_provenance,
-        )
-    )
-    parts.extend(
-        _diagnostics_partition_section(
-            title="Completed Runs with Observations",
-            results=observations,
-            assessments=assessments,
-            prompt=prompt,
-            image_path=image_path,
-            run_args=run_args,
-            model_provenance=model_provenance,
-        )
-    )
-    parts.extend(
-        _diagnostics_partition_section(
-            title="Indeterminate Attempts",
-            results=indeterminate,
-            assessments=assessments,
-            prompt=prompt,
-            image_path=image_path,
-            run_args=run_args,
-            model_provenance=model_provenance,
-        )
-    )
-    parts.extend(
-        _diagnostics_provenance_environment(
-            prompt=prompt,
             library_versions=library_versions,
             system_info=system_info,
-        )
+            image_path=image_path,
+            run_args=run_args,
+        ),
     )
+    parts = ["# Diagnostics", "", *render_report_markdown(blocks)]
     while parts and parts[-1] == "":
         parts.pop()
     _write_text_file(filename, "\n".join(parts) + "\n")
@@ -8181,6 +8476,34 @@ function applyAssessmentFilters() {
     document.getElementById('filter-info').textContent =
         `Showing ${visible} of ${rows.length} rows`;
 }
+function sortChooserColumn(button) {
+    const table = document.querySelector('#chooser-table table');
+    if (!table || !table.tBodies.length) return;
+    const column = Number(button.dataset.sortColumn);
+    const ascending = button.dataset.sortDirection !== 'ascending';
+    table.querySelectorAll('.sort-button').forEach(candidate => {
+        candidate.removeAttribute('data-sort-direction');
+    });
+    table.querySelectorAll('th[aria-sort]').forEach(heading => heading.removeAttribute('aria-sort'));
+    button.dataset.sortDirection = ascending ? 'ascending' : 'descending';
+    button.closest('th').setAttribute('aria-sort', button.dataset.sortDirection);
+    const rows = Array.from(table.tBodies[0].rows);
+    rows.sort((left, right) => {
+        const leftValue = left.cells[column].dataset.sortValue || '';
+        const rightValue = right.cells[column].dataset.sortValue || '';
+        if (!leftValue || !rightValue) {
+            if (!leftValue && !rightValue) return 0;
+            return !leftValue ? 1 : -1;
+        }
+        const leftNumber = Number(leftValue);
+        const rightNumber = Number(rightValue);
+        const comparison = Number.isFinite(leftNumber) && Number.isFinite(rightNumber)
+            ? leftNumber - rightNumber
+            : leftValue.localeCompare(rightValue, undefined, {numeric: true});
+        return ascending ? comparison : -comparison;
+    });
+    rows.forEach(row => table.tBodies[0].appendChild(row));
+}
 document.querySelectorAll('.filter-controls input, .filter-controls select')
     .forEach(control => control.addEventListener('input', applyAssessmentFilters));
 applyAssessmentFilters();
@@ -8188,50 +8511,53 @@ applyAssessmentFilters();
 """
 
 
+def _report_image_preview(image_path: Path | None) -> tuple[str, str, bytes] | None:
+    """Return a bounded, orientation-corrected preview shared by report formats."""
+    if image_path is None or not image_path.is_file():
+        return None
+    output_formats: Mapping[str, tuple[str, str, str]] = {
+        ".jpg": (".jpg", "JPEG", "image/jpeg"),
+        ".jpeg": (".jpeg", "JPEG", "image/jpeg"),
+        ".png": (".png", "PNG", "image/png"),
+        ".gif": (".gif", "GIF", "image/gif"),
+        ".webp": (".webp", "WEBP", "image/webp"),
+    }
+    suffix, image_format, mime_type = output_formats.get(
+        image_path.suffix.casefold(),
+        (".jpg", "JPEG", "image/jpeg"),
+    )
+    try:
+        with Image.open(image_path) as img_original:
+            img_to_save: PILImage = ImageOps.exif_transpose(img_original).copy()
+        try:
+            img_to_save.thumbnail((1024, 1024), Image.Resampling.LANCZOS)
+            if image_format == "JPEG" and img_to_save.mode not in {"RGB", "L"}:
+                converted = img_to_save.convert("RGB")
+                img_to_save.close()
+                img_to_save = converted
+            img_buffer = io.BytesIO()
+            img_to_save.save(img_buffer, format=image_format)
+        finally:
+            img_to_save.close()
+    except (OSError, ValueError):
+        logger.warning("Failed to prepare report image preview: %s", image_path)
+        return None
+    return suffix, mime_type, img_buffer.getvalue()
+
+
 def _html_embedded_image(image_path: Path | None) -> str:
     """Return an orientation-corrected embedded preview when an image is available."""
-    if image_path is None or not image_path.exists():
+    preview = _report_image_preview(image_path)
+    if preview is None:
         return ""
-    try:
-        with (
-            Image.open(image_path) as img_original,
-            ImageOps.exif_transpose(img_original) as img_oriented,
-        ):
-            max_size = 1024
-            img_to_save: PILImage = img_oriented
-            if img_oriented.width > max_size or img_oriented.height > max_size:
-                ratio = min(max_size / img_oriented.width, max_size / img_oriented.height)
-                img_to_save = img_oriented.resize(
-                    (int(img_oriented.width * ratio), int(img_oriented.height * ratio)),
-                    Image.Resampling.LANCZOS,
-                )
-            img_buffer = io.BytesIO()
-            extension = image_path.suffix.lower()
-            image_format = {
-                ".jpg": "JPEG",
-                ".jpeg": "JPEG",
-                ".png": "PNG",
-                ".gif": "GIF",
-                ".webp": "WEBP",
-            }.get(extension, "JPEG")
-            img_to_save.save(img_buffer, format=image_format)
-            image_data = base64.b64encode(img_buffer.getvalue()).decode("utf-8")
-            mime_type = {
-                ".jpg": "image/jpeg",
-                ".jpeg": "image/jpeg",
-                ".png": "image/png",
-                ".gif": "image/gif",
-                ".webp": "image/webp",
-            }.get(extension, "image/jpeg")
-            return (
-                '<section id="test-image"><h2>Test Image</h2>'
-                f'<img src="data:{html.escape(mime_type, quote=True)};base64,'
-                f'{html.escape(image_data, quote=True)}" class="embedded-image" '
-                'alt="Test image used for model evaluation"></section>'
-            )
-    except (OSError, ValueError):
-        logger.warning("Failed to embed image: %s", image_path)
-        return ""
+    _suffix, mime_type, image_bytes = preview
+    image_data = base64.b64encode(image_bytes).decode("utf-8")
+    return (
+        '<section id="test-image"><h2>Test Image</h2>'
+        f'<img src="data:{html.escape(mime_type, quote=True)};base64,'
+        f'{html.escape(image_data, quote=True)}" class="embedded-image" '
+        'alt="Test image used for model evaluation"></section>'
+    )
 
 
 def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
@@ -8255,7 +8581,9 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
             assessments[row.model].execution,
             row.usability,
             assessments[row.model].maintainer_status,
+            _gallery_total_time_cell(row),
             _gallery_throughput_cell(row),
+            _format_float_or_dash(row.first_token_latency_s, digits=2),
             _gallery_metric("peak_memory", row.peak_memory_gb),
             _gallery_metric("generation_tokens", row.generation_tokens),
             _gallery_observation_labels(row.observations),
@@ -8266,11 +8594,28 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
     chooser_attrs = [
         _html_status_attrs(result_by_model[row.model], assessments[row.model]) for row in ordered
     ]
+    chooser_sort_values = [
+        (
+            row.model,
+            assessments[row.model].execution,
+            row.usability,
+            assessments[row.model].maintainer_status,
+            row.total_time_s,
+            row.generation_tps,
+            row.first_token_latency_s,
+            row.peak_memory_gb,
+            row.generation_tokens,
+            _gallery_observation_labels(row.observations),
+            row.output_preview,
+        )
+        for row in ordered
+    ]
     parts = [
         '<section id="current-run-chooser">',
         "<h2>Current-run Chooser</h2>",
         (
-            "<p>Current-run usability and captured resource facts only. Throughput requires "
+            "<p>Current-run usability and captured resource facts only. Total time is "
+            "end-to-end; throughput covers generation only and requires "
             f"at least {MIN_THROUGHPUT_SAMPLE_TOKENS} generated tokens.</p>"
         ),
         _html_filter_controls(),
@@ -8282,7 +8627,9 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
                 "Execution",
                 "Usability",
                 "Maintainer status",
+                "Total s",
                 "Gen TPS",
+                "Prefill/first s",
                 "Peak GB",
                 "Gen tok",
                 "Observations",
@@ -8291,6 +8638,8 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
             rows=chooser_rows,
             row_attrs=chooser_attrs,
             raw_columns=frozenset({0}),
+            sort_values=chooser_sort_values,
+            sortable=True,
         ),
         "</div>",
         "<h3>Avoid for This Run</h3>",
@@ -8429,7 +8778,8 @@ def _html_gallery_model(
         parts.append("<h4>Complete generated output</h4>")
         if not output:
             parts.append("<p>empty output</p>")
-        parts.append(_html_code_block(output))
+        else:
+            parts.extend(render_report_html((ReportModelOutput(output),)))
     else:
         parts.extend(
             (
@@ -8494,176 +8844,16 @@ def _html_complete_gallery(report_context: HtmlReportContext) -> str:
     return "\n".join(parts)
 
 
-def _html_diagnostics_entry(
-    result: PerformanceResult,
-    assessment: ResultAssessment,
-    *,
-    prompt: str,
-    image_path: Path | None,
-    run_args: argparse.Namespace | None,
-    model_provenance: ModelProvenanceRecord | None,
-) -> str:
-    """Render one maintainer entry from shared factual diagnostic helpers."""
-    parts = [
-        f"<article><h4>{html.escape(result.model_name, quote=True)}</h4>",
-        f"<details><summary>Maintainer evidence: {html.escape(result.model_name, quote=True)}</summary>",
-    ]
-    if assessment.execution == "crashed":
-        parts.extend(
-            (
-                "<h5>Root exception and chain</h5>",
-                _html_code_block("\n".join(_diagnostics_exception_lines(result))),
-                "<h5>Complete traceback</h5>",
-                _html_code_block(
-                    _home_relative_report_text(result.error_traceback or "unavailable")
-                ),
-            )
-        )
-    parts.extend(
-        (
-            "<h5>Execution and provenance</h5>",
-            _html_table(
-                caption=f"Maintainer facts for {result.model_name}",
-                headers=("Fact", "Value"),
-                rows=_diagnostics_result_facts(
-                    result,
-                    assessment,
-                    run_args=run_args,
-                    model_provenance=model_provenance,
-                ),
-            ),
-        )
-    )
-    generated_output = (
-        "unavailable"
-        if result.generation is None
-        else _generation_text_value(result.generation) or "(empty)"
-    )
-    output_label = (
-        "Complete partial output" if assessment.execution == "crashed" else "Complete output"
-    )
-    parts.extend(
-        (
-            f"<h5>{output_label}</h5>",
-            _html_code_block(generated_output),
-            "<h5>Captured stdout/stderr</h5>",
-            _html_code_block(
-                _home_relative_report_text(result.captured_output_on_fail or "unavailable")
-            ),
-            "<h5>Supplemental CLI reproduction</h5>",
-            _html_code_block(
-                _diagnostics_repro_command(
-                    result,
-                    prompt=prompt,
-                    image_path=image_path,
-                    run_args=run_args,
-                    model_provenance=model_provenance,
-                ),
-                language="bash",
-            ),
-            "<h5>Canonical Python reproduction script</h5>",
-            _html_code_block(
-                _build_native_mlx_vlm_python_script(
-                    model_name=result.model_name,
-                    prompt=prompt,
-                    image_ref=_issue_repro_image_ref(image_path=image_path, run_args=run_args),
-                    run_args=run_args,
-                    resolved_revision=(
-                        model_provenance["resolved_revision"]
-                        if model_provenance is not None
-                        else None
-                    ),
-                ),
-                language="python",
-            ),
-            "</details></article>",
-        )
-    )
-    return "\n".join(parts)
-
-
-def _html_diagnostics_partition(
-    *,
-    title: str,
-    results: Sequence[PerformanceResult],
-    assessments: Mapping[str, ResultAssessment],
-    prompt: str,
-    image_path: Path | None,
-    run_args: argparse.Namespace | None,
-    model_provenance: Mapping[str, ModelProvenanceRecord],
-) -> str:
-    """Render one direct partition of maintainer evidence."""
-    parts = [f"<h3>{html.escape(title, quote=True)}</h3>"]
-    if results:
-        parts.extend(
-            _html_diagnostics_entry(
-                result,
-                assessments[result.model_name],
-                prompt=prompt,
-                image_path=image_path,
-                run_args=run_args,
-                model_provenance=model_provenance.get(result.model_name),
-            )
-            for result in results
-        )
-    else:
-        parts.append("<p>None.</p>")
-    return "\n".join(parts)
-
-
 def _html_maintainer_diagnostics(
     report_context: HtmlReportContext,
     *,
-    prompt: str,
-    image_path: Path | None,
     run_args: argparse.Namespace | None,
 ) -> str:
-    """Render diagnostics from the same cached assessment partitions as Markdown."""
-    assessments = _assessments_by_model(report_context)
-    model_provenance = _model_provenance_by_model(report_context)
-    actionable, observations, indeterminate = _partition_diagnostics(report_context)
-    counts = _run_outcome_counts(report_context.assessments)
+    """Render the same cached diagnostic block hierarchy used by Markdown."""
     parts = [
         '<section id="maintainer-diagnostics">',
         "<h2>Maintainer Diagnostics</h2>",
-        _html_table(
-            caption="Run outcome counts",
-            headers=("Outcome", "Count"),
-            rows=(
-                ("Attempted", str(counts["models_attempted"])),
-                ("Evaluated", str(counts["models_evaluated"])),
-                ("Completed", str(counts["models_completed"])),
-                ("Crashed", str(counts["models_crashed"])),
-                ("Indeterminate", str(counts["models_indeterminate"])),
-            ),
-        ),
-        _html_diagnostics_partition(
-            title="Actionable Failures",
-            results=actionable,
-            assessments=assessments,
-            prompt=prompt,
-            image_path=image_path,
-            run_args=run_args,
-            model_provenance=model_provenance,
-        ),
-        _html_diagnostics_partition(
-            title="Completed Runs with Observations",
-            results=observations,
-            assessments=assessments,
-            prompt=prompt,
-            image_path=image_path,
-            run_args=run_args,
-            model_provenance=model_provenance,
-        ),
-        _html_diagnostics_partition(
-            title="Indeterminate Attempts",
-            results=indeterminate,
-            assessments=assessments,
-            prompt=prompt,
-            image_path=image_path,
-            run_args=run_args,
-            model_provenance=model_provenance,
-        ),
+        *render_report_html(_diagnostics_evidence_blocks(report_context, run_args=run_args)),
         "</section>",
     ]
     return "\n".join(parts)
@@ -8700,33 +8890,32 @@ def _html_runtime_facts(
 
 def _html_provenance(
     *,
+    report_context: HtmlReportContext,
     versions: LibraryVersionDict,
-    system_info: Mapping[str, str],
     prompt: str,
+    image_path: Path | None,
+    run_args: argparse.Namespace | None,
 ) -> str:
-    """Render prompt, component versions, and system facts in deterministic order."""
-    version_rows = tuple((name, value or "unavailable") for name, value in sorted(versions.items()))
-    system_rows = tuple(
-        (name, _home_relative_report_text(value)) for name, value in sorted(system_info.items())
+    """Render the same single-copy reproduction context used by Markdown."""
+    partitions = _partition_diagnostics(report_context)
+    highlighted = (
+        *partitions.actionable,
+        *partitions.observations,
+        *partitions.indeterminate,
+    )
+    blocks = _diagnostics_shared_context_blocks(
+        prompt=prompt,
+        highlighted_results=highlighted,
+        model_provenance=_model_provenance_by_model(report_context),
+        library_versions=versions,
+        system_info=report_context.system_info,
+        image_path=image_path,
+        run_args=run_args,
     )
     return "\n".join(
         (
             '<section id="provenance">',
-            "<h2>Provenance and Environment</h2>",
-            "<h3>Prompt</h3>",
-            _html_code_block(prompt),
-            "<h3>Library Versions</h3>",
-            _html_table(
-                caption="Library versions",
-                headers=("Library", "Version"),
-                rows=version_rows,
-            ),
-            "<h3>System Information</h3>",
-            _html_table(
-                caption="System information",
-                headers=("Fact", "Value"),
-                rows=system_rows,
-            ),
+            *render_report_html(blocks),
             "</section>",
         )
     )
@@ -8750,6 +8939,10 @@ table { border-collapse: collapse; margin: 1rem 0 2rem; width: 100%; }
 caption { font-weight: 600; text-align: left; }
 th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; vertical-align: top; }
 th { background: #f2f2f2; }
+.sort-button { background: transparent; border: 0; color: inherit; cursor: pointer; font: inherit; font-weight: bold; padding: 0; text-align: left; }
+.sort-button::after { color: #666; content: " ↕"; }
+.sort-button[data-sort-direction="ascending"]::after { content: " ↑"; }
+.sort-button[data-sort-direction="descending"]::after { content: " ↓"; }
 pre { background: #f7f7f7; border-left: 3px solid #666; overflow-x: auto; padding: 0.75rem; white-space: pre-wrap; }
 details { margin: 0.75rem 0 1.5rem; }
 summary { color: #0645ad; cursor: pointer; font-weight: 600; }
@@ -8785,14 +8978,14 @@ summary { color: #0645ad; cursor: pointer; font-weight: 600; }
             _html_complete_gallery(report_context),
             _html_maintainer_diagnostics(
                 report_context,
-                prompt=prompt,
-                image_path=image_path,
                 run_args=run_args,
             ),
             _html_provenance(
+                report_context=report_context,
                 versions=versions,
-                system_info=report_context.system_info,
                 prompt=prompt,
+                image_path=image_path,
+                run_args=run_args,
             ),
             "</body>",
             "</html>",
@@ -8897,6 +9090,7 @@ def generate_markdown_gallery_report(
     metadata: MetadataDict | None = None,
     report_context: ReportRenderContext | None = None,
     versions: LibraryVersionDict | None = None,
+    image_path: Path | None = None,
 ) -> None:
     """Write the facts-only current-run chooser and complete model evidence."""
     if not results:
@@ -8915,7 +9109,7 @@ def generate_markdown_gallery_report(
     md: list[str] = []
     md.append("# Model Output Gallery")
     md.append("")
-    md.append(_markdown_generated_stamp())
+    md.append(f"Generated on: {local_now_str()}")
     md.append("")
     md.extend(
         _wrap_markdown_text(
@@ -8924,6 +9118,23 @@ def generate_markdown_gallery_report(
         ),
     )
     md.append("")
+    if (preview := _report_image_preview(image_path)) is not None:
+        suffix, _mime_type, image_bytes = preview
+        asset = filename.parent / "assets" / f"source-image{suffix}"
+        try:
+            asset.parent.mkdir(parents=True, exist_ok=True)
+            _write_bytes_file(asset, image_bytes)
+        except OSError:
+            logger.warning("Failed to publish gallery reference image: %s", asset)
+        else:
+            md.extend(
+                (
+                    "## Reference Image",
+                    "",
+                    f"![Reference image](assets/{asset.name})",
+                    "",
+                )
+            )
     md.extend(_render_gallery_chooser(gallery_rows))
     md.extend(
         _build_gallery_stamps_section(
@@ -9031,7 +9242,12 @@ def get_system_info() -> tuple[str, str | None]:
     return arch, gpu_info
 
 
-def _run_macos_toolchain_command(command: Sequence[str], *, timeout: int = 2) -> str | None:
+def _run_macos_toolchain_command(
+    command: Sequence[str],
+    *,
+    timeout: int = 2,
+    empty_output: str | None = None,
+) -> str | None:
     """Run a macOS toolchain probe and return stripped stdout on success."""
     try:
         result = subprocess.run(  # noqa: S603 - fixed macOS toolchain probes only
@@ -9046,7 +9262,7 @@ def _run_macos_toolchain_command(command: Sequence[str], *, timeout: int = 2) ->
     if result.returncode != 0:
         return None
     output = result.stdout.strip()
-    return output or None
+    return output or empty_output
 
 
 @lru_cache(maxsize=1)
@@ -10897,6 +11113,8 @@ def _build_runtime_diagnostics(
     stop_reason: str | None,
     first_token_latency_s: float | None = None,
     model_load_active_memory_gb: float | None = None,
+    post_cleanup_active_memory_gb: float | None = None,
+    post_cleanup_cache_memory_gb: float | None = None,
 ) -> RuntimeDiagnostics:
     """Build immutable runtime diagnostics from a phase timer snapshot."""
     return RuntimeDiagnostics(
@@ -10908,6 +11126,8 @@ def _build_runtime_diagnostics(
         cleanup_time_s=phase_timer.duration("cleanup"),
         first_token_latency_s=first_token_latency_s,
         stop_reason=stop_reason,
+        post_cleanup_active_memory_gb=post_cleanup_active_memory_gb,
+        post_cleanup_cache_memory_gb=post_cleanup_cache_memory_gb,
     )
 
 
@@ -11037,15 +11257,34 @@ def _generate_with_processor_passthrough(
     )
 
 
+def _sample_mlx_memory_gb(getter_name: MlxMemoryGetterName) -> float | None:
+    """Best-effort sample one non-negative MLX allocator metric in decimal GB."""
+    getter = cast("Callable[[], object] | None", getattr(mx, getter_name, None))
+    if getter is None or not callable(getter):
+        return None
+    try:
+        raw_value = getter()
+    except (AttributeError, OSError, RuntimeError, SystemError, TypeError, ValueError):
+        logger.debug("Unable to sample mx.%s", getter_name, exc_info=True)
+        return None
+    if isinstance(raw_value, bool) or not isinstance(raw_value, int | float) or raw_value < 0:
+        return None
+    return float(raw_value) / DECIMAL_GB
+
+
 def _sample_active_memory_gb() -> float | None:
     """Sample MLX active memory in GB when the runtime exposes the metric."""
-    get_active_memory_fn = getattr(mx, "get_active_memory", None)
-    if not callable(get_active_memory_fn):
-        return None
-    active_mem_raw = get_active_memory_fn()
-    if not isinstance(active_mem_raw, int | float) or active_mem_raw < 0:
-        return None
-    return float(active_mem_raw) / DECIMAL_GB
+    return _sample_mlx_memory_gb("get_active_memory")
+
+
+def _sample_cache_memory_gb() -> float | None:
+    """Sample MLX cache memory in GB when the runtime exposes the metric."""
+    return _sample_mlx_memory_gb("get_cache_memory")
+
+
+def _sample_post_cleanup_memory_gb() -> tuple[float | None, float | None]:
+    """Return the active/cache allocator state after one model cleanup."""
+    return _sample_active_memory_gb(), _sample_cache_memory_gb()
 
 
 def _attach_model_load_memory_baseline(
@@ -11065,16 +11304,10 @@ def _attach_generation_runtime_metrics(
     duration: float,
 ) -> SupportsGenerationResult:
     """Attach local timing and allocator snapshot metrics to a generation result."""
-    get_cache_memory_fn = getattr(mx, "get_cache_memory", None)
-
-    cache_mem_raw = get_cache_memory_fn() if callable(get_cache_memory_fn) else 0.0
-
-    cache_mem_bytes = float(cache_mem_raw) if isinstance(cache_mem_raw, int | float) else 0.0
-
     result = cast("SupportsGenerationResult", output)
     result.time = duration
     result.active_memory = _sample_active_memory_gb() or 0.0
-    result.cache_memory = cache_mem_bytes / DECIMAL_GB
+    result.cache_memory = _sample_cache_memory_gb() or 0.0
     return result
 
 
@@ -11087,6 +11320,8 @@ def _finalize_process_result(
     current_phase: str,
     total_start_time: float,
     upstream_boundary: UpstreamBoundary = "not_started",
+    post_cleanup_active_memory_gb: float | None = None,
+    post_cleanup_cache_memory_gb: float | None = None,
 ) -> PerformanceResult:
     """Attach final runtime diagnostics after cleanup has completed."""
     runtime_diagnostics = _build_runtime_diagnostics(
@@ -11106,6 +11341,8 @@ def _finalize_process_result(
             if result_payload is not None and result_payload.runtime_diagnostics is not None
             else None
         ),
+        post_cleanup_active_memory_gb=post_cleanup_active_memory_gb,
+        post_cleanup_cache_memory_gb=post_cleanup_cache_memory_gb,
     )
     if result_payload is None:
         fallback_error = RuntimeError(
@@ -11382,6 +11619,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     stop_reason: str | None = None
     cleanup_requires_sync = True
     upstream_boundary: UpstreamBoundary = "not_started"
+    post_cleanup_active_memory_gb, post_cleanup_cache_memory_gb = None, None
 
     def _update_phase(phase: str) -> None:
         nonlocal current_phase, upstream_boundary
@@ -11505,7 +11743,9 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         _update_phase("cleanup")
         with phase_timer.track("cleanup"):
             _cleanup_runtime_resources(synchronize_first=cleanup_requires_sync)
-        logger.debug("Cleaned up resources for model %s", params.model_identifier)
+        post_cleanup_active_memory_gb, post_cleanup_cache_memory_gb = (
+            _sample_post_cleanup_memory_gb()
+        )
 
     return _finalize_process_result(
         result_payload=result_payload,
@@ -11515,6 +11755,8 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         current_phase=current_phase,
         total_start_time=total_start_time,
         upstream_boundary=upstream_boundary,
+        post_cleanup_active_memory_gb=post_cleanup_active_memory_gb,
+        post_cleanup_cache_memory_gb=post_cleanup_cache_memory_gb,
     )
 
 
@@ -11864,6 +12106,8 @@ def _preview_generation(
         log_warning_note("Expected thinking trace did not reach a final answer")
     if analysis.instruction_echo:
         log_warning_note("Instruction text appears in output")
+    if analysis.unexpected_catalog_preamble:
+        log_warning_note("Unexpected text appears before the Title section")
     if analysis.likely_capped:
         log_warning_note(f"Output reached requested token limit ({gen_tokens} tokens)")
     if analysis.unexpected_special_tokens:
@@ -11914,6 +12158,8 @@ def _log_verbose_success_details_mode(
         log_warning_note(
             f"Unexpected special token(s): {', '.join(analysis.unexpected_special_tokens)}"
         )
+    if analysis.unexpected_catalog_preamble:
+        log_warning_note("Unexpected text appears before the Title section")
 
     if not gen_text:
         log_metric_label("Generated Text:", emoji="📝")
@@ -13168,7 +13414,7 @@ def process_models(
                     result.quality_issues,
                 )
 
-        results.append(result)
+        results.append(replace(result, completed_at=local_now_str()))
 
     return results
 
@@ -13218,6 +13464,10 @@ def _format_quality_analysis_for_log(analysis: GenerationQualityAnalysis) -> str
             analysis.thinking_trace_incomplete,
         ),
         _format_quality_log_flag("instruction_echo", analysis.instruction_echo),
+        _format_quality_log_flag(
+            "unexpected_catalog_preamble",
+            bool(analysis.unexpected_catalog_preamble),
+        ),
         _format_quality_log_flag("likely_capped", analysis.likely_capped),
         _format_quality_log_flag(
             "unexpected_special_token",
@@ -13253,6 +13503,7 @@ def _build_quality_issues_string(analysis: GenerationQualityAnalysis) -> str | N
             "thinking-trace",
         ),
         (analysis.instruction_echo, "instruction-echo"),
+        (bool(analysis.unexpected_catalog_preamble), "unexpected-catalog-preamble"),
         (bool(analysis.unexpected_special_tokens), "unexpected-special-token"),
         (
             analysis.likely_capped
@@ -13269,18 +13520,6 @@ def _build_quality_issues_string(analysis: GenerationQualityAnalysis) -> str | N
     return ", ".join(issues) if issues else None
 
 
-QUALITY_ISSUE_PATTERNS: Final[dict[str, re.Pattern[str]]] = {
-    "repetitive": re.compile(r"\brepetitive\b", re.IGNORECASE),
-    "missing_sections": re.compile(r"\bmissing-sections\b", re.IGNORECASE),
-    "thinking_incomplete": re.compile(r"\bthinking-incomplete\b", re.IGNORECASE),
-    "thinking_trace": re.compile(r"\bthinking-trace\b", re.IGNORECASE),
-    "instruction_echo": re.compile(r"\binstruction-echo\b", re.IGNORECASE),
-    "unexpected_special_token": re.compile(r"unexpected-special-token", re.IGNORECASE),
-    "token_cap_truncation": re.compile(r"token-cap-truncation", re.IGNORECASE),
-    "no_keyword_overlap": re.compile(r"no-keyword-overlap", re.IGNORECASE),
-}
-
-
 def _truncate_text_preview(text: str, *, max_chars: int) -> str:
     """Trim text previews to a fixed character budget."""
     if len(text) <= max_chars:
@@ -13288,9 +13527,10 @@ def _truncate_text_preview(text: str, *, max_chars: int) -> str:
     return text[: max_chars - 3].rstrip() + "..."
 
 
-def _collapse_preview_whitespace(text: str) -> str:
-    """Flatten whitespace for compact table/report previews."""
-    return re.sub(r"\s+", " ", text).strip()
+def _collapse_preview_line_whitespace(text: str) -> str:
+    """Collapse horizontal whitespace while preserving source line boundaries."""
+    normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+    return "\n".join(" ".join(line.split()) for line in normalized.split("\n"))
 
 
 def _configured_output_wrappers(diagnostics: PromptDiagnostics | None) -> tuple[str, ...]:
@@ -13298,7 +13538,18 @@ def _configured_output_wrappers(diagnostics: PromptDiagnostics | None) -> tuple[
     if diagnostics is None:
         return ()
 
-    wrappers = list(diagnostics.special_tokens)
+    wrappers = [*diagnostics.special_tokens, *_configured_generation_wrappers(diagnostics)]
+    return tuple(_dedupe_preserve_order(wrappers))
+
+
+def _configured_generation_wrappers(
+    diagnostics: PromptDiagnostics | None,
+) -> tuple[str, ...]:
+    """Return string wrappers declared by tokenizer EOS and mlx-vlm generation types."""
+    if diagnostics is None:
+        return ()
+
+    wrappers: list[str] = []
     if diagnostics.eos_token:
         wrappers.append(diagnostics.eos_token)
     for key in ("eos_tokens", "thinking_start_token", "thinking_end_token"):
@@ -13331,7 +13582,7 @@ def _populate_result_quality_analysis(
     resolved_requested_max_tokens = (
         requested_max_tokens if requested_max_tokens is not None else result.requested_max_tokens
     )
-    thinking_trace_delimiters = list(THINKING_TRACE_DELIMITER_PAIRS)
+    thinking_trace_delimiters: list[tuple[str, str]] = list(THINKING_TRACE_DELIMITER_PAIRS)
     if result.prompt_diagnostics is not None:
         generation_kwargs = result.prompt_diagnostics.generate_kwargs
         start_marker = generation_kwargs.get("thinking_start_token")
@@ -13348,6 +13599,7 @@ def _populate_result_quality_analysis(
         requested_max_tokens=resolved_requested_max_tokens,
         context_marker=context_marker,
         known_special_tokens=_configured_output_wrappers(result.prompt_diagnostics),
+        configured_generation_wrappers=_configured_generation_wrappers(result.prompt_diagnostics),
         thinking_trace_delimiters=thinking_trace_delimiters,
     )
     return replace(
@@ -13360,17 +13612,6 @@ def _populate_result_quality_analysis(
 # =============================================================================
 # SECTION: RESULT ENRICHMENT/HISTORY/FINALIZATION
 # =============================================================================
-
-
-def _extract_quality_issue_labels(quality_issues: str | None) -> set[str]:
-    """Extract normalized quality labels from a free-form issue string."""
-    if not quality_issues:
-        return set()
-    labels: set[str] = set()
-    for label, pattern in QUALITY_ISSUE_PATTERNS.items():
-        if pattern.search(quality_issues):
-            labels.add(label)
-    return labels
 
 
 def _format_counter_items[T: str](counter: Counter[T]) -> str:
@@ -13615,25 +13856,22 @@ def _collect_performance_metric_samples(
     results: Sequence[PerformanceResult],
 ) -> PerformanceMetricSamples:
     """Collect finite, domain-valid samples for each highlighted metric."""
-    tps = tuple(
+    tps: tuple[PerformanceMetricSample, ...] = tuple(
         (result, value)
         for result in results
         if (value := _valid_generation_tps(result)) is not None and math.isfinite(value)
     )
-    memory = tuple(
-        (result, value)
-        for result in results
-        if (
-            value := _generation_optional_nonnegative_float_metric(
-                result.generation,
-                "peak_memory",
-            )
+    memory_samples: list[PerformanceMetricSample] = []
+    for result in results:
+        value = _generation_optional_nonnegative_float_metric(
+            result.generation,
+            "peak_memory",
         )
-        is not None
-        and value > 0
-        and math.isfinite(value)
-    )
-    load = tuple(
+        if value is None or value <= 0 or not math.isfinite(value):
+            continue
+        memory_samples.append((result, value))
+    memory = tuple(memory_samples)
+    load: tuple[PerformanceMetricSample, ...] = tuple(
         (result, result.model_load_time)
         for result in results
         if result.model_load_time is not None
@@ -13920,6 +14158,12 @@ def _history_model_result_from_result(result: PerformanceResult) -> HistoryModel
         )
     if result.runtime_diagnostics is not None:
         record["stop_reason"] = result.runtime_diagnostics.stop_reason
+        record["post_cleanup_active_memory_gb"] = (
+            result.runtime_diagnostics.post_cleanup_active_memory_gb
+        )
+        record["post_cleanup_cache_memory_gb"] = (
+            result.runtime_diagnostics.post_cleanup_cache_memory_gb
+        )
     return record
 
 
@@ -14018,30 +14262,39 @@ def _build_jsonl_metrics_record(
     recommended_working_set_bytes: int | None,
 ) -> JsonlMetricsRecord:
     """Build captured and derived performance metrics for one JSONL result."""
+    runtime = result.runtime_diagnostics
+    metrics: JsonlMetricsRecord = {}
+    if runtime is not None:
+        if runtime.post_cleanup_active_memory_gb is not None:
+            metrics["post_cleanup_active_memory_gb"] = runtime.post_cleanup_active_memory_gb
+        if runtime.post_cleanup_cache_memory_gb is not None:
+            metrics["post_cleanup_cache_memory_gb"] = runtime.post_cleanup_cache_memory_gb
+
     generation = result.generation
     if generation is None:
-        return {}
+        return metrics
 
-    runtime = result.runtime_diagnostics
     performance_data = _extract_generation_performance_data(generation)
-    metrics: JsonlMetricsRecord = {
-        "prompt_tokens": performance_data.prompt_tokens,
-        "generation_tokens": performance_data.generation_tokens,
-        "total_tokens": performance_data.total_tokens,
-        "prompt_tps": performance_data.prompt_tps,
-        "generation_tps": performance_data.generation_tps,
-        "peak_memory_gb": performance_data.peak_memory_gb,
-        "active_memory_gb": (
-            result.active_memory
-            if result.active_memory is not None
-            else performance_data.active_memory_gb
-        ),
-        "cache_memory_gb": (
-            result.cache_memory
-            if result.cache_memory is not None
-            else performance_data.cache_memory_gb
-        ),
-    }
+    metrics.update(
+        {
+            "prompt_tokens": performance_data.prompt_tokens,
+            "generation_tokens": performance_data.generation_tokens,
+            "total_tokens": performance_data.total_tokens,
+            "prompt_tps": performance_data.prompt_tps,
+            "generation_tps": performance_data.generation_tps,
+            "peak_memory_gb": performance_data.peak_memory_gb,
+            "active_memory_gb": (
+                result.active_memory
+                if result.active_memory is not None
+                else performance_data.active_memory_gb
+            ),
+            "cache_memory_gb": (
+                result.cache_memory
+                if result.cache_memory is not None
+                else performance_data.cache_memory_gb
+            ),
+        }
+    )
     model_load_active_memory_gb = (
         runtime.model_load_active_memory_gb
         if runtime is not None
@@ -14118,8 +14371,8 @@ def _build_jsonl_result_record(
     record: JsonlResultRecord = {
         "_type": "result",
         "model": result.model_name,
-        "timestamp": local_now_str(),
-        "assessment": _assessment_to_json(assessment),
+        "timestamp": result.completed_at or local_now_str(),
+        "assessment": _assessment_to_json(assessment, result),
         "generated_text": _generation_text_value(generation),
         "captured_output_on_fail": _home_relative_report_text(result.captured_output_on_fail or ""),
         "failure": failure,
@@ -14218,11 +14471,20 @@ def _collect_check_models_provenance() -> CheckModelsProvenanceRecord:
         install_type = "installed"
     else:
         install_type = "unknown"
+    status = (
+        _run_macos_toolchain_command(
+            ("git", "-C", str(_REPO_ROOT), "status", "--porcelain", "--untracked-files=no"),
+            empty_output="",
+        )
+        if revision is not None
+        else None
+    )
     return {
         "name": "check_models",
         "version": package_version,
         "git_revision": revision,
         "install_type": install_type,
+        "dirty": bool(status) if status is not None else None,
     }
 
 
@@ -14783,6 +15045,148 @@ def _build_native_mlx_vlm_python_script(
     )
 
 
+def _build_parameterized_mlx_vlm_python_script(
+    *,
+    prompt_file_name: str,
+    image_ref: str,
+    run_args: argparse.Namespace | None,
+) -> str:
+    """Build one native mlx-vlm script parameterised by model and revision."""
+    load_kwargs = _native_mlx_vlm_load_kwargs(run_args)
+    load_kwargs.pop("revision", None)
+    template_kwargs = _native_mlx_vlm_template_kwargs(run_args)
+    generate_kwargs = _native_mlx_vlm_generate_kwargs(run_args)
+    return "\n".join(
+        (
+            "import argparse",
+            "from pathlib import Path",
+            "",
+            "from mlx_vlm.generate import generate",
+            "from mlx_vlm.prompt_utils import apply_chat_template",
+            "from mlx_vlm.utils import load",
+            "",
+            _python_repro_mapping_assignment("LOAD_KWARGS", load_kwargs),
+            _python_repro_mapping_assignment("TEMPLATE_KWARGS", template_kwargs),
+            _python_repro_mapping_assignment("GENERATE_KWARGS", generate_kwargs),
+            "",
+            "parser = argparse.ArgumentParser()",
+            'parser.add_argument("model")',
+            'parser.add_argument("--revision")',
+            'parser.add_argument("--image", required=True)',
+            'parser.add_argument("--prompt-file", required=True)',
+            "args = parser.parse_args()",
+            'prompt = Path(args.prompt_file).read_text(encoding="utf-8")',
+            "load_kwargs = LOAD_KWARGS.copy()",
+            "if args.revision:",
+            '    load_kwargs["revision"] = args.revision',
+            "model, processor = load(args.model, **load_kwargs)",
+            "formatted_prompt = apply_chat_template(",
+            "    processor,",
+            "    model.config,",
+            "    prompt,",
+            "    num_images=1,",
+            "    **TEMPLATE_KWARGS,",
+            ")",
+            "if isinstance(formatted_prompt, list):",
+            '    formatted_prompt = "\\n".join(str(message) for message in formatted_prompt)',
+            "result = generate(",
+            "    model,",
+            "    processor,",
+            "    formatted_prompt,",
+            "    image=args.image,",
+            "    **GENERATE_KWARGS,",
+            ")",
+            "print(result.text)",
+            "",
+            f"# Defaults used in the report: {prompt_file_name}, {image_ref}",
+        )
+    )
+
+
+def _diagnostics_shared_context_blocks(
+    *,
+    prompt: str,
+    highlighted_results: Sequence[PerformanceResult],
+    model_provenance: Mapping[str, ModelProvenanceRecord],
+    library_versions: LibraryVersionDict,
+    system_info: Mapping[str, str],
+    image_path: Path | None,
+    run_args: argparse.Namespace | None,
+) -> tuple[ReportBlock, ...]:
+    """Build single-copy prompt, reproduction, and environment context."""
+    prompt_file_name = "prompt.txt"
+    image_ref = _issue_repro_image_ref(image_path=image_path, run_args=run_args)
+    model_rows = tuple(
+        (
+            result.model_name,
+            _diagnostics_fact(
+                model_provenance[result.model_name]["resolved_revision"]
+                if result.model_name in model_provenance
+                else None
+            ),
+        )
+        for result in highlighted_results
+    )
+    component_rows = tuple(
+        _collect_report_component_rows(
+            versions=library_versions,
+            system_info=dict(system_info),
+            library_names=_DIAGNOSTICS_LIB_NAMES,
+            system_keys=_DIAGNOSTICS_SYSTEM_KEYS,
+        )
+    )
+    example_tokens = [
+        "python",
+        "reproduce.py",
+        "MODEL_ID",
+        "--revision",
+        "RESOLVED_REVISION",
+        "--image",
+        image_ref,
+        "--prompt-file",
+        prompt_file_name,
+    ]
+    model_block: ReportBlock = (
+        ReportTable(("Model", "Resolved revision"), model_rows)
+        if model_rows
+        else ReportParagraph("No highlighted models.")
+    )
+    component_block: ReportBlock = (
+        ReportTable(("Component", "Value"), component_rows)
+        if component_rows
+        else ReportParagraph("Environment and component provenance unavailable.")
+    )
+    return (
+        _report_section(
+            "Shared Reproduction and Provenance",
+            _report_section(
+                "Prompt",
+                ReportParagraph(f"Save this exact prompt as {prompt_file_name}."),
+                ReportCodeBlock(prompt),
+                level=3,
+            ),
+            _report_section("Highlighted model revisions", model_block, level=3),
+            _report_section(
+                "Canonical parameterised Python reproduction",
+                ReportParagraph(
+                    "Run one model per process to avoid sequential Metal-state interactions."
+                ),
+                ReportCodeBlock(shlex_join(example_tokens), language="bash"),
+                ReportCodeBlock(
+                    _build_parameterized_mlx_vlm_python_script(
+                        prompt_file_name=prompt_file_name,
+                        image_ref=image_ref,
+                        run_args=run_args,
+                    ),
+                    language="python",
+                ),
+                level=3,
+            ),
+            _report_section("Components and system", component_block, level=3),
+        ),
+    )
+
+
 def _generate_github_issue_reports(
     *,
     report_context: ReportRenderContext,
@@ -14804,14 +15208,15 @@ def _generate_github_issue_reports(
 
     assessments = dict(report_context.assessments)
     model_provenance = _model_provenance_by_model(report_context)
-    actionable, _observations, _indeterminate = _partition_diagnostics(report_context)
+    actionable = _partition_diagnostics(report_context).actionable
     crashes = tuple(
         result for result in actionable if assessments[result.model_name].execution == "crashed"
     )
     generated: dict[str, Path] = {}
     used_filenames: set[str] = set()
     for result in crashes:
-        base_name = f"issue_{_sanitize_issue_filename_component(result.model_name)}"
+        name = re.sub(r"[^A-Za-z0-9_.-]+", "_", result.model_name).strip("._") or "model"
+        base_name = f"issue_{name}"
         filename = f"{base_name}.md"
         suffix = 2
         while filename in used_filenames:
@@ -14820,22 +15225,64 @@ def _generate_github_issue_reports(
         used_filenames.add(filename)
         issue_path = issues_dir / filename
         parts = [f"# Crash: {MARKDOWN_ESCAPER.escape(result.model_name)}", ""]
-        parts.extend(
-            _diagnostics_model_entry(
-                result,
-                assessments[result.model_name],
-                prompt=prompt,
-                image_path=image_path,
-                run_args=run_args,
-                model_provenance=model_provenance.get(result.model_name),
-                heading_level=2,
-            )
+        provenance = model_provenance.get(result.model_name)
+        image_ref = _issue_repro_image_ref(image_path=image_path, run_args=run_args)
+        issue_blocks: tuple[ReportBlock, ...] = (
+            _report_section(
+                "Maintainer evidence",
+                ReportSection(
+                    result.model_name,
+                    _diagnostics_model_blocks(
+                        result,
+                        assessments[result.model_name],
+                        run_args=run_args,
+                        model_provenance=provenance,
+                    ),
+                    level=3,
+                ),
+            ),
+            _report_section(
+                "Supplemental CLI reproduction",
+                ReportParagraph(
+                    "This form includes only settings supported by the native mlx-vlm CLI."
+                ),
+                ReportCodeBlock(
+                    _diagnostics_repro_command(
+                        result,
+                        prompt=prompt,
+                        image_path=image_path,
+                        run_args=run_args,
+                        model_provenance=provenance,
+                    ),
+                    language="bash",
+                ),
+            ),
+            _report_section(
+                "Canonical Python reproduction script",
+                ReportCodeBlock(
+                    _build_native_mlx_vlm_python_script(
+                        model_name=result.model_name,
+                        prompt=prompt,
+                        image_ref=image_ref,
+                        run_args=run_args,
+                        resolved_revision=(
+                            provenance["resolved_revision"] if provenance is not None else None
+                        ),
+                    ),
+                    language="python",
+                ),
+            ),
         )
         parts.extend(
-            _diagnostics_provenance_environment(
-                prompt=prompt,
-                library_versions=library_versions,
-                system_info=system_info,
+            render_report_markdown(
+                (
+                    *issue_blocks,
+                    *_issue_provenance_blocks(
+                        prompt=prompt,
+                        library_versions=library_versions,
+                        system_info=system_info,
+                    ),
+                )
             )
         )
         while parts and parts[-1] == "":
@@ -15032,6 +15479,7 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
             metadata=inputs.metadata,
             report_context=inputs.report_context,
             versions=inputs.library_versions,
+            image_path=inputs.image_path,
         ),
         "diagnostics": None,
         "jsonl": lambda: save_jsonl_report(

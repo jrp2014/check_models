@@ -164,6 +164,52 @@ def test_html_and_gallery_render_same_captured_peak_memory(tmp_path: Path) -> No
     assert "*Peak memory:* 1.0" in gallery_path.read_text(encoding="utf-8")
 
 
+def test_markdown_gallery_publishes_reference_image_beside_report(tmp_path: Path) -> None:
+    image_path = tmp_path / "input.jpg"
+    Image.new("RGB", (2048, 1024), color="purple").save(image_path)
+    gallery_path = tmp_path / "reports" / "model_gallery.md"
+    result = _make_success("org/model")
+    context = _build_report_render_context(results=[result], prompt="Describe the image.")
+
+    generate_markdown_gallery_report(
+        [result],
+        gallery_path,
+        "Describe the image.",
+        report_context=context,
+        image_path=image_path,
+    )
+
+    assert "![Reference image](assets/source-image.jpg)" in gallery_path.read_text(encoding="utf-8")
+    with Image.open(gallery_path.parent / "assets" / "source-image.jpg") as preview:
+        assert preview.size == (1024, 512)
+
+
+def test_markdown_gallery_does_not_follow_reference_asset_symlink(tmp_path: Path) -> None:
+    image_path = tmp_path / "input.jpg"
+    Image.new("RGB", (16, 8), color="purple").save(image_path)
+    gallery_path = tmp_path / "reports" / "model_gallery.md"
+    asset = gallery_path.parent / "assets" / "source-image.jpg"
+    asset.parent.mkdir(parents=True)
+    victim = tmp_path / "victim.jpg"
+    victim.write_bytes(b"keep-me")
+    asset.symlink_to(victim)
+    result = _make_success("org/model")
+
+    generate_markdown_gallery_report(
+        [result],
+        gallery_path,
+        "Describe the image.",
+        report_context=_build_report_render_context(
+            results=[result],
+            prompt="Describe the image.",
+        ),
+        image_path=image_path,
+    )
+
+    assert victim.read_bytes() == b"keep-me"
+    assert "![Reference image]" not in gallery_path.read_text(encoding="utf-8")
+
+
 def _extract_markdown_subsection(
     content: str,
     heading: str,
@@ -188,6 +234,20 @@ def _extract_markdown_model_section(content: str, model_name: str) -> str:
     )
     assert match is not None, f"Missing Markdown section for {model_name}"
     return match.group(0)
+
+
+def _extract_markdown_diagnostic_entry(content: str, model_name: str) -> str:
+    """Return one diagnostics entry through its triage-table evidence link."""
+    link = re.search(rf"\[{re.escape(model_name)}\]\(#([^)]+)\)", content)
+    assert link is not None, f"Missing diagnostics link for {model_name}"
+    marker = f'<a id="{link.group(1)}"></a>'
+    start = content.index(marker)
+    tail = content[start + len(marker) :]
+    boundaries = [
+        index for token in ('<a id="diagnostic-', "\n## ") if (index := tail.find(token)) >= 0
+    ]
+    end = start + len(marker) + min(boundaries) if boundaries else len(content)
+    return content[start:end]
 
 
 _GENERATED_STAMP_EMPHASIS_HEADING_RE = re.compile(
@@ -1087,19 +1147,271 @@ def test_simplified_diagnostics_partitions_cached_assessments_in_evidence_order(
 
     content = output.read_text(encoding="utf-8")
     headings = (
-        "## Run Outcome Counts",
+        "## Run Summary",
+        "## Triage",
         "## Actionable Failures",
         "## Completed Runs with Observations",
         "## Indeterminate Attempts",
+        "## Clean Completion Context",
     )
     assert all(heading in content for heading in headings)
     assert content.index(headings[0]) < content.index(headings[1])
     assert content.index(headings[1]) < content.index(headings[2])
     assert content.index(headings[2]) < content.index(headings[3])
-    assert content.index(headings[3]) < content.index("## Provenance and Environment")
+    assert content.index(headings[-1]) < content.index("## Shared Reproduction and Provenance")
     assert "actionable_failure" in content
     assert "observation_needs_reproduction" in content
     assert "indeterminate" in content
+
+
+def test_diagnostics_facts_surface_exact_observation_evidence_without_empty_noise() -> None:
+    repeated_fragment = 'keyword: "remote control"'
+    analysis = check_models.GenerationQualityAnalysis(
+        is_repetitive=True,
+        repeated_token=repeated_fragment,
+        missing_sections=["title"],
+        instruction_echo=True,
+        instruction_echo_fragments=["prompt instructions"],
+        unexpected_special_tokens=["<|im_user|>"],
+    )
+    result = PerformanceResult(
+        model_name="org/observed",
+        success=True,
+        generation=_MockGeneration(text="output", generation_tokens=20),
+        quality_analysis=analysis,
+    )
+    assessment = check_models.ResultAssessment(
+        "completed",
+        "unusable",
+        "observation_needs_reproduction",
+        ("repeated_output", "missing_requested_sections", "prompt_instruction_echo"),
+    )
+
+    facts = dict(
+        check_models._diagnostics_result_facts(
+            result,
+            assessment,
+            run_args=None,
+            model_provenance=None,
+        )
+    )
+
+    assert facts["Missing sections"] == '["title"]'
+    assert facts["Repeated fragment"] == 'keyword: "remote control"'
+    assert facts["Echoed instruction fragments"] == '["prompt instructions"]'
+    assert facts["Unexpected special tokens"] == '["<|im_user|>"]'
+    assert "Error type" not in facts
+    assert "Configured EOS token" not in facts
+
+
+def test_diagnostics_are_skim_first_and_share_reproduction_context_once(
+    tmp_path: Path,
+) -> None:
+    """Issue-ready diagnostics should expand faults, collapse context, and avoid repetition."""
+    prompt = "Exact multiline prompt.\nSecond distinctive line."
+    crash = replace(
+        _make_failure_with_details(
+            "org/crash",
+            error_msg="decoder failed",
+            generated_text="CRASH-PARTIAL",
+            traceback_str="TRACEBACK-FIRST\nRuntimeError: decoder failed",
+            captured_output="CAPTURED-AFTER-PARTIAL",
+        ),
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            processor_class="mlx_vlm.processors.CrashProcessor",
+            tokenizer_class="transformers.CrashTokenizer",
+        ),
+    )
+    repeated_fragment = 'phrase: "OBSERVED-OUTPUT-MUST-APPEAR"'
+    observed = PerformanceResult(
+        model_name="org/observed",
+        success=True,
+        generation=_MockGeneration(
+            text="OBSERVED-OUTPUT-MUST-APPEAR",
+            prompt_tokens=30,
+            generation_tokens=80,
+            generation_tps=20.0,
+            peak_memory=2.0,
+        ),
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            processor_class="mlx_vlm.processors.ObservedProcessor",
+        ),
+        runtime_diagnostics=RuntimeDiagnostics(stop_reason="eos"),
+        quality_analysis=check_models.GenerationQualityAnalysis(
+            is_repetitive=True,
+            repeated_token=repeated_fragment,
+            prompt_checks_ran=True,
+        ),
+    )
+    indeterminate = PerformanceResult(
+        model_name="org/network",
+        success=False,
+        generation=None,
+        error_message="503 Service Unavailable — INDETERMINATE-EVIDENCE",
+        captured_output_on_fail="SERVER-COULD-NOT-BE-CONTACTED",
+    )
+    clean_one = replace(
+        _make_success("org/clean-one"),
+        generation=_MockGeneration(
+            text="CLEAN-OUTPUT-MUST-NOT-APPEAR",
+            prompt_tokens=44,
+            generation_tokens=40,
+            generation_tps=16.5,
+            peak_memory=1.5,
+        ),
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            processor_class="mlx_vlm.processors.CleanProcessor",
+        ),
+        runtime_diagnostics=RuntimeDiagnostics(stop_reason="eos"),
+    )
+    clean_two = replace(
+        _make_success("org/clean-two"),
+        generation=_MockGeneration(
+            text="SECOND-CLEAN-OUTPUT-MUST-NOT-APPEAR",
+            prompt_tokens=50,
+            generation_tokens=8,
+            generation_tps=999.0,
+            peak_memory=3.0,
+        ),
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            processor_class="OtherProcessor",
+        ),
+        runtime_diagnostics=RuntimeDiagnostics(stop_reason="length"),
+    )
+    results = [crash, observed, indeterminate, clean_one, clean_two]
+    assessments = {
+        "org/crash": check_models.ResultAssessment(
+            "crashed", "not_evaluated", "actionable_failure", ()
+        ),
+        "org/observed": check_models.ResultAssessment(
+            "completed", "unusable", "observation_needs_reproduction", ("repeated_output",)
+        ),
+        "org/network": check_models.ResultAssessment("indeterminate", "not_evaluated", "none", ()),
+        "org/clean-one": check_models.ResultAssessment("completed", "usable", "none", ()),
+        "org/clean-two": check_models.ResultAssessment("completed", "usable", "none", ()),
+    }
+    revisions: dict[str, check_models.ModelProvenanceRecord] = {
+        result.model_name: {
+            "model": result.model_name,
+            "requested_revision": None,
+            "resolved_revision": f"{index:012d}full-revision",
+            "snapshot_path": None,
+        }
+        for index, result in enumerate(results, start=1)
+    }
+    context = _build_report_render_context(
+        results=results,
+        prompt=prompt,
+        system_info={"GPU/Chip": "Apple M5"},
+        model_provenance=revisions,
+    )
+    context = replace(context, assessments=tuple(assessments.items()))
+    markdown_path = tmp_path / "diagnostics.md"
+    html_path = tmp_path / "results.html"
+
+    generate_diagnostics_report(
+        results,
+        markdown_path,
+        prompt=prompt,
+        library_versions=_stub_versions(),
+        system_info=context.system_info,
+        report_context=context,
+    )
+    generate_html_report(
+        results,
+        html_path,
+        _stub_versions(),
+        prompt,
+        5.0,
+        report_context=context,
+    )
+
+    diagnostics = markdown_path.read_text(encoding="utf-8")
+    html_report = html_path.read_text(encoding="utf-8")
+    assert all(
+        label in diagnostics
+        for label in (
+            "Outcome counts",
+            "Maintainer status counts",
+            "Usability counts",
+            "Observation counts",
+        )
+    )
+    assert "[org/crash](#diagnostic-org-crash)" in diagnostics
+    assert "[org/observed](#diagnostic-org-observed)" in diagnostics
+    assert "[org/network](#diagnostic-org-network)" in diagnostics
+    triage = _extract_markdown_subsection(
+        diagnostics,
+        "## Triage",
+        end_headings=("## Actionable Failures",),
+    )
+    assert "org/clean-one" not in triage
+    assert "org/clean-two" not in triage
+    assert diagnostics.index("TRACEBACK-FIRST") < diagnostics.index("CRASH-PARTIAL")
+    assert "<summary>org/observed" in diagnostics
+    assert "<summary>org/network" in diagnostics
+    assert "| repeated output |       1 |\n\n## Triage" in diagnostics
+    assert re.search(
+        r"\| \[org/network\].*\|\n\n## Actionable Failures",
+        diagnostics,
+    )
+    assert "OBSERVED-OUTPUT-MUST-APPEAR" in diagnostics
+    assert diagnostics.count("#### Complete output") == 1
+    assert "Repeated fragment" in diagnostics
+    assert "SERVER-COULD-NOT-BE-CONTACTED" in diagnostics
+    assert "<summary>Clean completions</summary>" in diagnostics
+    assert "000000000004" in diagnostics
+    assert "CleanProcessor" in diagnostics
+    assert "eos" in diagnostics
+    assert "44 prompt / 40 generated" in diagnostics
+    assert "16.5 tok/s" in diagnostics
+    assert "1.5 GB" in diagnostics
+    assert "insufficient sample" in diagnostics
+    assert "CLEAN-OUTPUT-MUST-NOT-APPEAR" not in diagnostics
+    assert "SECOND-CLEAN-OUTPUT-MUST-NOT-APPEAR" not in diagnostics
+    assert diagnostics.count(prompt) == 1
+    assert diagnostics.count("from mlx_vlm.generate import generate") == 1
+    assert diagnostics.count("Canonical parameterised Python reproduction") == 1
+    assert "--prompt-file prompt.txt" in diagnostics
+    assert "python -m mlx_vlm.generate" not in diagnostics
+    for model in ("org/crash", "org/observed", "org/network"):
+        assert model in diagnostics
+        revision = revisions[model]["resolved_revision"]
+        assert revision is not None
+        assert revision in diagnostics
+    maintainer_html = html_report.split('<section id="maintainer-diagnostics">', maxsplit=1)[1]
+    maintainer_html = maintainer_html.split("</section>", maxsplit=1)[0]
+    assert "CLEAN-OUTPUT-MUST-NOT-APPEAR" not in maintainer_html
+    assert "OBSERVED-OUTPUT-MUST-APPEAR" in maintainer_html
+    assert 'href="#diagnostic-org-crash"' in maintainer_html
+    assert html_report.count("from mlx_vlm.generate import generate") == 1
+
+
+def test_html_chooser_is_sortable_and_surfaces_prefill_first_token_time(
+    tmp_path: Path,
+) -> None:
+    """HTML alone should expose sortable per-model prefill/first-token latency."""
+    result = replace(
+        _make_success("org/timed"),
+        runtime_diagnostics=RuntimeDiagnostics(first_token_latency_s=0.375),
+    )
+    html_path = tmp_path / "results.html"
+
+    generate_html_report(
+        [result],
+        html_path,
+        _stub_versions(),
+        "Describe the image.",
+        1.0,
+    )
+
+    content = html_path.read_text(encoding="utf-8")
+    chooser = content.split('<section id="current-run-chooser">', maxsplit=1)[1]
+    chooser = chooser.split("</section>", maxsplit=1)[0]
+    assert "Prefill/first s" in chooser
+    assert 'data-sort-column="6"' in chooser
+    assert 'data-sort-value="0.375"' in chooser
+    assert "sortChooserColumn" in chooser
 
 
 def test_crash_diagnostics_and_issue_draft_keep_complete_primary_evidence_first(
@@ -1185,7 +1497,10 @@ def test_crash_diagnostics_and_issue_draft_keep_complete_primary_evidence_first(
         assert "mlx_vlm.generate" in content
         assert "LlavaProcessor" in content
         assert "LlamaTokenizerFast" in content
-        assert "python -m mlx_vlm.generate" in content
+    assert "python -m mlx_vlm.generate" not in diagnostics_content
+    assert "Canonical parameterised Python reproduction" in diagnostics_content
+    assert "python -m mlx_vlm.generate" in issue_content
+    assert "```\n\n## Provenance and Environment" in issue_content
     assert not (tmp_path / "issues" / "index.md").exists()
 
 
@@ -1306,12 +1621,13 @@ def test_diagnostics_distinguish_empty_output_from_unavailable_evidence(tmp_path
     missing_entry = _extract_markdown_subsection(
         content,
         "### org/no-evidence",
-        end_headings=("## Successful Observations Requiring Reproduction",),
+        end_headings=("## Completed Runs with Observations",),
     )
     assert "Complete partial output\n\n```text\n(empty)" in empty_entry
-    assert "Complete traceback\n\n```text\nunavailable" in missing_entry
-    assert "Complete partial output\n\n```text\nunavailable" in missing_entry
-    assert "Captured stdout/stderr\n\n```text\nunavailable" in missing_entry
+    assert "generation failed before output" in missing_entry
+    assert "Complete traceback" not in missing_entry
+    assert "Complete partial output" not in missing_entry
+    assert "Captured stdout/stderr" not in missing_entry
 
 
 def test_diagnostics_use_run_args_for_complete_native_reproduction(tmp_path: Path) -> None:
@@ -1401,25 +1717,12 @@ def test_diagnostics_use_run_args_for_complete_native_reproduction(tmp_path: Pat
             run_args=run_args,
         )
 
-    contents = [
-        output.read_text(encoding="utf-8"),
-        next(iter(issue_reports.values())).read_text(encoding="utf-8"),
-    ]
-    for index, content in enumerate(contents):
+    diagnostics_content = output.read_text(encoding="utf-8")
+    issue_content = next(iter(issue_reports.values())).read_text(encoding="utf-8")
+    for content in (diagnostics_content, issue_content):
         assert f"- *Resolved model revision:* {resolved_revision}" in content
         assert "- *Requested model revision:* run-revision" in content
         assert '- *Configured EOS token override:* ["&lt;override-eos&gt;"]' in content
-        assert "Supplemental CLI reproduction" in content
-        assert "Canonical Python reproduction script" in content
-        assert "--image src/tests/fixtures/check_models-task9-fixture.jpg" in content
-        assert f"--revision {resolved_revision}" in content
-        assert "--revision run-revision" not in content
-        assert "--processor-kwargs" in content
-        assert "--resize-shape 64 32" in content
-        assert "--skip-special-tokens" in content
-        assert 'MODEL = "org/repro"' in content
-        assert 'IMAGE = "src/tests/fixtures/check_models-task9-fixture.jpg"' in content
-        assert f'    "revision": "{resolved_revision}",' in content
         assert '    "top_p": 0.81,' in content
         assert '    "min_p": 0.12,' in content
         assert '    "top_k": 7,' in content
@@ -1430,10 +1733,23 @@ def test_diagnostics_use_run_args_for_complete_native_reproduction(tmp_path: Pat
         assert '    "eos_tokens": ["<override-eos>"],' in content
         assert '    "enable_thinking": True,' in content
         assert '    "cropping": False,' in content
-        assert re.search(
-            r"- \*Configured thinking end token:\* unavailable\n\n#{3,4} Complete partial output",
-            content,
-        )
+    assert "Supplemental CLI reproduction" not in diagnostics_content
+    assert "Canonical parameterised Python reproduction" in diagnostics_content
+    assert "--prompt-file prompt.txt" in diagnostics_content
+    assert resolved_revision in diagnostics_content
+    assert 'parser.add_argument("model")' in diagnostics_content
+    assert "Supplemental CLI reproduction" in issue_content
+    assert "Canonical Python reproduction script" in issue_content
+    assert "--image src/tests/fixtures/check_models-task9-fixture.jpg" in issue_content
+    assert f"--revision {resolved_revision}" in issue_content
+    assert "--revision run-revision" not in issue_content
+    assert "--processor-kwargs" in issue_content
+    assert "--resize-shape 64 32" in issue_content
+    assert "--skip-special-tokens" in issue_content
+    assert 'MODEL = "org/repro"' in issue_content
+    assert 'IMAGE = "src/tests/fixtures/check_models-task9-fixture.jpg"' in issue_content
+    assert f'    "revision": "{resolved_revision}",' in issue_content
+    for index, content in enumerate((diagnostics_content, issue_content)):
         python_script = content.split("```python\n", maxsplit=1)[1].split("\n```", maxsplit=1)[0]
         compile(python_script, "<native-repro>", "exec")
         script_path = tmp_path / f"native_repro_{index}.py"
@@ -1687,7 +2003,7 @@ class TestHtmlReportEdgeCases:
             )
             assert re.search(row_pattern, html_report) is not None
             if assessment.maintainer_status != "none" or assessment.execution == "indeterminate":
-                diagnostics_entry = _extract_markdown_model_section(diagnostics, model)
+                diagnostics_entry = _extract_markdown_diagnostic_entry(diagnostics, model)
                 assert f"*Execution:* {assessment.execution}" in diagnostics_entry
                 assert f"*Usability:* {assessment.usability}" in diagnostics_entry
                 assert f"*Maintainer status:* {assessment.maintainer_status}" in diagnostics_entry
@@ -1722,7 +2038,7 @@ class TestHtmlReportEdgeCases:
         self,
         tmp_path: Path,
     ) -> None:
-        """HTML maintainer facts and repros should retain the actual run configuration."""
+        """HTML maintainer facts and shared repro should retain the run configuration."""
         result = _make_failure_with_details("org/repro", error_msg="decode failed")
         context = _build_report_render_context(results=[result], prompt="Describe the image.")
         output = tmp_path / "results.html"
@@ -1752,13 +2068,14 @@ class TestHtmlReportEdgeCases:
         )
 
         content = html.unescape(output.read_text(encoding="utf-8"))
-        assert "<td>Requested model revision</td>\n<td>refs/pr/42</td>" in content
-        assert "--revision refs/pr/42" in content
-        assert "--max-tokens 321" in content
-        assert "--temperature 0.42" in content
-        assert "--adapter-path adapter" in content
+        assert "<li><b>Requested model revision:</b> refs/pr/42</li>" in content
+        assert "Canonical parameterised Python reproduction" in content
+        assert '    "max_tokens": 321,' in content
+        assert '    "temperature": 0.42,' in content
+        assert '    "adapter_path":' in content
         assert 'LOAD_KWARGS = {\n    "trust_remote_code": False,' in content
-        assert '    "revision": "refs/pr/42",' in content
+        assert '    "revision": "refs/pr/42",' not in content
+        assert 'load_kwargs["revision"] = args.revision' in content
         assert 'TEMPLATE_KWARGS = {\n    "enable_thinking": True,' in content
         assert '    "thinking_budget": 19,' in content
         assert '    "cropping": False,' in content
@@ -1800,7 +2117,7 @@ class TestHtmlReportEdgeCases:
 
         content = out.read_text(encoding="utf-8")
         escaped = html.escape(output, quote=True)
-        assert content.count(escaped) == 1
+        assert content.count(escaped) == 2
         match = re.search(
             r"<details><summary>Complete evidence: org/evidence</summary>.*?"
             r"Complete generated output.*?<pre><code[^>]*>(.*?)</code></pre>",
@@ -1809,6 +2126,40 @@ class TestHtmlReportEdgeCases:
         )
         assert match is not None
         assert html.unescape(match.group(1)) == output
+
+    def test_html_gallery_renders_readable_and_exact_escaped_model_output(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """HTML should expose both readable preformatted text and collapsed exact evidence."""
+        output = "## Title\n\n- cat\n\n@maintainer <details>unsafe</details>"
+        result = replace(
+            _make_success("org/formatted"),
+            generation=_MockGeneration(text=output, generation_tokens=80),
+        )
+        context = _build_report_render_context(results=[result], prompt="Describe.")
+        out = tmp_path / "formatted.html"
+
+        generate_html_report(
+            [result],
+            out,
+            _stub_versions(),
+            "Describe.",
+            1.0,
+            report_context=context,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        escaped = html.escape(output, quote=True)
+        model_entry = re.search(
+            r'<article id="model-org-formatted">.*?</article>',
+            content,
+            flags=re.DOTALL,
+        )
+        assert model_entry is not None
+        assert f'<pre class="model-output-readable">{escaped}</pre>' in model_entry.group(0)
+        assert "<summary>Exact raw output</summary>" in model_entry.group(0)
+        assert model_entry.group(0).count(escaped) == 2
 
     def test_html_contains_gallery_and_diagnostics_without_semantic_scores(
         self,
@@ -2090,7 +2441,7 @@ class TestHtmlReportEdgeCases:
 
         diagnostics_text = diagnostics.read_text(encoding="utf-8")
         assert re.search(r"\|\s*Attempted\s*\|\s*2\s*\|", diagnostics_text)
-        assert re.search(r"\|\s*Evaluated\s*\|\s*1\s*\|", diagnostics_text)
+        assert re.search(r"\|\s*Conclusive outcomes\s*\|\s*1\s*\|", diagnostics_text)
         assert re.search(r"\|\s*Indeterminate\s*\|\s*1\s*\|", diagnostics_text)
         assert re.search(r"\|\s*Crashed\s*\|\s*0\s*\|", diagnostics_text)
 
@@ -2494,11 +2845,11 @@ class TestMarkdownGalleryReport:
         assert "not_evaluated" in chooser
         assert "boom" in chooser
 
-    def test_gallery_keeps_complete_output_once_in_expandable_code_block(
+    def test_gallery_keeps_exact_output_in_expandable_code_block(
         self,
         tmp_path: Path,
     ) -> None:
-        """The gallery should keep full evidence once without making the summary unwieldy."""
+        """The gallery should keep exact evidence without making the chooser unwieldy."""
         complete_text = (
             "**BEGIN:** *model emphasis* " + ("distinct middle evidence " * 30) + "END-SENTINEL"
         )
@@ -2540,12 +2891,14 @@ class TestMarkdownGalleryReport:
         assert "BEGIN" in chooser
         assert "END-SENTINEL" not in chooser
         assert "<!-- markdownlint-disable MD034 MD049 -->" in chooser
+        assert chooser.index("Total s") < chooser.index("Gen TPS")
         assert "Gen tok" in chooser
         assert "Peak GB" in chooser
         assert "Observations" in chooser
         assert "<summary>Complete evidence: org/complete-output</summary>" in content
         assert "```text" in content
-        assert content.count("END-SENTINEL") == 1
+        assert content.count(f"```text\n{complete_text}\n```") == 1
+        assert content.count("END-SENTINEL") == 2
 
     def test_gallery_includes_all_model_output_and_cost_summary(
         self,
@@ -2721,6 +3074,47 @@ class TestMarkdownGalleryReport:
         assert "````text\n" in evidence
         assert complete_text in evidence
         assert content.count(complete_text) == 1
+
+    def test_gallery_preserves_preview_lines_and_readable_model_formatting(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Chooser previews and complete evidence should retain useful line structure."""
+        formatted_output = (
+            "## Title\n\n"
+            "Two cats resting\n\n"
+            "- pink sofa\n"
+            "- remote control\n\n"
+            "@maintainer <details>unsafe</details>\n"
+            "```text\nnested\n```"
+        )
+        result = replace(
+            _make_success("org/formatted"),
+            generation=_MockGeneration(text=formatted_output, generation_tokens=80),
+        )
+        context = _build_report_render_context(results=[result], prompt="Describe the image.")
+        out = tmp_path / "model_gallery.md"
+
+        generate_markdown_gallery_report(
+            results=[result],
+            filename=out,
+            prompt="Describe the image.",
+            report_context=context,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        chooser = _extract_markdown_subsection(
+            content,
+            "## Current-run Chooser",
+            end_headings=("## Avoid for This Run",),
+        )
+        assert "## Title<br><br>Two cats resting" in chooser
+        assert '<pre class="model-output-readable">' in content
+        assert "## Title\n\nTwo cats resting\n\n- pink sofa" in content
+        assert "&#96;&#96;&#96;text" in content
+        assert "&#64;maintainer &lt;details&gt;unsafe&lt;/details&gt;" in content
+        assert "<summary>Exact raw output</summary>" in content
+        assert content.count(formatted_output) == 1
 
     def test_short_generation_is_not_valid_throughput_but_keeps_raw_metrics(
         self,

@@ -114,6 +114,30 @@ A single medium-sized, well-commented function is often clearer than a web of on
 - **`README.md`** - Project overview and quick start guide (repo root)
 - **`src/README.md`** - Detailed package usage and CLI documentation
 
+Retained report roles are intentionally distinct: `model_gallery.md` is the
+model-selection surface with readable and exact complete output;
+`diagnostics.md` is a skim-first, self-contained mlx-vlm issue report with
+complete evidence only for highlighted attempts and one shared reproduction;
+`results.jsonl` and `check_models.log` retain exhaustive machine and operational
+evidence. Keep those responsibilities separate when changing report assembly.
+Chooser usability is a narrow mechanical contract result from the current image,
+never a semantic quality score. Preserve exact detector evidence (section names,
+repeated fragments, and token strings) instead of adding inference-heavy rankings.
+Treat authoritative context and draft metadata as reusable data rather than prompt
+instructions. Accept conventional Markdown emphasis around catalog labels, but
+record non-wrapper text before the first requested label as exact preamble evidence.
+Keep repetition detection conservative: obvious repeated fragments should enter
+diagnostics with complete output, but do not grow a general-purpose "gibberish"
+classifier. Treat EOS/thinking wrappers declared by mlx-vlm generation types and
+wholly unchanged draft fields as neutral reproducibility evidence, distinct from
+unexpected token leakage and semantic scoring. Sample allocator active/cache memory
+after every cleanup, including failures, so sequential runs can reveal residue;
+do not infer a leak from one sample. The HTML chooser may expose sortable diagnostic
+columns such as prefill/first-token latency while the narrow Markdown chooser remains
+optimized for GitHub skimming.
+Report image assets are bounded previews; do not copy full-resolution source images
+into the report tree.
+
 ### Generated Artifacts
 
 - Generated artifacts (e.g., `typings/`) are **not committed**
@@ -449,9 +473,21 @@ make quality-strict   # Verifies markdownlint availability before the full gate
 Markdown consistency is enforced (optionally) via `markdownlint-cli2` using the configuration in `.markdownlint.jsonc`:
 
 - Long lines (MD013) are disabled to allow readable HTML/CSS blocks and wide tables
-- Inline HTML is allowed (MD033) because the codebase already sanitizes/escapes disallowed tags
+- Inline HTML is restricted to the small generated-report allowlist (`a`, `br`,
+  `details`, `summary`, and escaped `pre` model output)
 - Duplicate headings (MD024) are permitted; some conceptual repeats are intentional
 - Follow existing heading spacing (blank line before/after) and prefer asterisk `*` for unordered lists
+
+Build issue-ready diagnostics once from the typed report-block representation
+and render that hierarchy to Markdown and HTML. Emit run-wide prompt,
+reproduction, settings, and environment context once per aggregate report, not
+once per model. Direct crash issue drafts may retain a single-model copy/paste
+reproduction.
+For completed observations, render the exact model output once in diagnostics;
+reserve the gallery's second, readable view for model comparison. Omit optional
+per-model facts rather than repeating `unavailable`, and keep clean completions in
+the compact context table. Render model-authored Markdown inside inert `<pre>`
+content so headings and lists cannot break generated-document lint.
 
 ### Ruff Configuration
 

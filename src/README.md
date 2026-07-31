@@ -71,7 +71,7 @@ python -m check_models --dry-run
   - Detailed verbose timing: input validation, prompt prep, cleanup, upstream
     model prefill/first-token time (excluding input preparation), and stop reason
   - Tokens: total, prompt, generated with tokens/sec
-  - Memory: peak, active delta, cached delta (GB)
+  - Memory: peak, active/cache snapshots, and post-cleanup active/cache residue (GB)
 - **Structured Logging**: Formatter-driven styling with LogStyles for consistent CLI output
 - **Multiple Output Formats**:
   - **CLI**: Colorized with compact or detailed metrics modes
@@ -244,23 +244,30 @@ The tool generates a deliberately small artifact set in `output/` by default:
 
 - **CLI**: Real-time colorized progress and metrics.
 - **HTML** (`reports/results.html`): Retained complete, self-contained report with
-  a current-run chooser, exact assessment filters, captured performance facts,
+  a sortable current-run chooser, exact assessment filters, per-model
+  prefill/first-token timing, captured performance facts,
   expandable complete output, maintainer diagnostics, and full run context.
-- **Gallery Markdown** (`reports/model_gallery.md`): Complete evidence-only artifact with
-  image metadata, the full prompt, a facts-only chooser, diagnostics, and one
-  expandable fenced complete-output section for every attempted model.
+- **Gallery Markdown** (`reports/model_gallery.md`): Model-comparison artifact with
+  a bounded, orientation-corrected reference-image preview, image metadata, the full prompt, a facts-only
+  chooser whose previews preserve line breaks, and readable plus exact raw complete
+  output for every attempted model. End-to-end time precedes decode-only throughput.
 - **JSONL** (`results.jsonl`): Exhaustive machine-readable per-model diagnostics,
   schema `2.0` assessments, complete captured evidence, local component installation
-  identity, and each model's requested versus resolved cache revision.
+  identity, per-model completion time, exact observation evidence, and each model's
+  requested versus resolved cache revision.
 - **Run JSON** (`run.json`): Stable schema `2.0` run-level machine contract with mode,
   attempted/evaluated/indeterminate counts, component source/install provenance,
-  check_models producer version/revision, source-image identity and dimensions,
+  check_models producer version/revision and dirty-worktree state, source-image
+  identity and dimensions,
   common generation settings, and artifact paths.
 - **Diagnostics** (`reports/diagnostics.md`): Self-contained, issue-ready mlx-vlm
-  report with native reproduction commands and complete affected-model output.
-  Definite crashes are outcomes; external-connectivity interruptions remain
-  indeterminate; and successful observations that need a controlled reproduction
-  stay separate from hard crashes.
+  report with a triage table, expanded crashes, collapsed complete evidence for
+  observations and indeterminate attempts, compact clean-run context, and one
+  shared parameterised native reproduction. Definite crashes are outcomes;
+  external-connectivity interruptions remain indeterminate.
+  Conservative repetition observations include the repeated fragment and complete
+  output. Declared EOS/thinking wrappers and wholly unchanged draft metadata are
+  neutral reproduction facts rather than inferred faults or quality scores.
 - **Index** (`index.md`): Tiny navigation page linking the seven current-run files.
 - **Log** (`check_models.log`): Canonical comprehensive run trace, including complete
   generated or captured failure output.
@@ -278,6 +285,9 @@ Every current-run row uses one immutable assessment with three independent field
 - `usability`: `usable`, `usable_with_caveats`, `unusable`, or `not_evaluated`
 - `maintainer_status`: `actionable_failure`, `observation_needs_reproduction`, or `none`
 
+These are mechanical contract labels from one image, not semantic caption scores or
+claims that a model is generally accurate. Human comparison remains necessary.
+
 Complete model output is retained as evidence for every attempt.
 Crashes prioritize the complete traceback, followed by captured partial output and
 exact factual provenance. Reaching the configured token cap alone is neutral.
@@ -291,9 +301,16 @@ Configured thinking tokens are not automatically faults; observed or incomplete
 thinking traces remain factual observations that may need controlled reproduction.
 Likewise, tokenizer special-token metadata, tokenizer EOS, explicit `eos_tokens`,
 and configured thinking start/end wrappers are treated as declared protocol.
+Configured conversation-role tokens remain declared rather than “unknown”; when a
+new user/assistant/system boundary occurs inside generated content, its exact token
+is retained as a separate role-boundary observation.
 Control-wrapper syntax that appears in output without any of those declarations is
 retained as an `unexpected_special_token` observation; no model-name allowlist is
 used.
+For strict catalog prompts, non-wrapper text before the requested `Title` label is
+retained as an `unexpected_catalog_preamble` observation. Conventional Markdown
+label emphasis such as `**Title:**` is accepted, and authoritative context values
+are never treated as copied instructions merely because a model reuses them.
 The chooser reports `insufficient sample` when throughput lacks enough generated
 tokens for a meaningful comparison.
 
@@ -305,10 +322,10 @@ the prompt omits the date rather than treating filesystem modification time as
 capture metadata. Complete generated output in the Markdown evidence artifacts is
 fenced and preserves tabs and trailing spaces.
 
-Use `reports/model_gallery.md` for complete per-model evidence,
-`reports/diagnostics.md` for maintainer evidence and reproduction state,
-`check_models.log` for the full run trace, and `results.jsonl` plus `run.json` for
-exact machine-readable provenance and run arguments.
+Use `reports/model_gallery.md` to choose models and compare complete readable and
+exact output; use `reports/diagnostics.md` as a skim-first mlx-vlm issue body.
+`check_models.log` retains the full operational trace, while `results.jsonl` and
+`run.json` retain exhaustive machine-readable evidence, provenance, and arguments.
 
 Avoid lint/type suppressions wherever possible. Any unavoidable suppression must
 have a documented purpose and pass the repository suppression audit.
@@ -1147,8 +1164,10 @@ GitHub-compatible evidence artifact with:
 - Populated image metadata fields when present (title, description, keywords, date, time, GPS)
 - The full prompt in a fenced `text` block
 - One facts-only current-run chooser with concise output previews
-- One easy-to-scan section per model with complete generated output in an
-  expandable fenced code block
+- An orientation-corrected reference preview, bounded to 1024 pixels, beside the
+  report for portable side-by-side review without copying a large source image
+- One easy-to-scan section per model with inert preformatted readable output and the exact
+  captured text in an expandable, dynamically fenced raw block
 - The exact execution, usability, maintainer status, observations, timing, memory,
   and token facts used by the HTML report
 
@@ -1160,7 +1179,9 @@ Line-delimited JSON for streaming ingestion:
   (prompt, system info, timestamp, versions, and component install/source
   provenance) — JSONL `2.0` format.
 - **Per-model records**: One JSON object per model with schema `2.0` assessment,
-  complete evidence, raw timing/resource facts, run arguments, error details, and
+  exact observation details, actual completion timestamp, complete evidence, raw
+  timing/resource facts (including allocator state after cleanup even for crashes),
+  run arguments, error details, and
   requested/resolved model snapshot provenance when locally available.
 
 
@@ -1170,9 +1191,14 @@ A comprehensive Markdown report focused on upstream debugging and issue reportin
 
 - **Generation**: Created automatically when crashes, mechanical observations,
   indeterminate attempts, or preflight compatibility warnings are detected.
-- **Hard crashes**: Records each actionable crash directly with complete evidence.
-- **Reproducibility**: Includes explicit commands to reproduce specific failures.
-- **Environment**: Captures full package versions and system specs.
+- **Hard crashes**: Expands each actionable crash with traceback-first complete evidence.
+- **Other evidence**: Collapses complete observed and indeterminate evidence, with
+  generated output included once as exact code evidence; clean completions contribute
+  only compact runtime and performance context.
+- **Neutral observations**: Records declared EOS/thinking wrappers and draft fields
+  returned unchanged exactly as captured, without assigning fault or a quality score.
+- **Reproducibility**: Records the prompt, highlighted model revisions, common
+  settings, environment, and one parameterised single-model reproduction once.
 - **Issue readiness**: Successful thinking-token or context-boundary observations
   remain visible with complete evidence but require controlled reproduction.
 - **Ready-to-file**: Each actionable hard crash gets a factual draft that can be

@@ -15,5 +15,5 @@
   // Don't require top-level heading in some auxiliary docs if added later
   "MD041": false,
   // Permit only the GitHub-supported HTML that this repo intentionally emits
-  "MD033": { "allowed_elements": ["a", "br", "details", "summary"] }
+  "MD033": { "allowed_elements": ["a", "br", "details", "pre", "summary"] }
 }

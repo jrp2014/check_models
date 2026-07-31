@@ -7,6 +7,7 @@ once fully resolved.
 ## Active Documents
 
 - **[GPS_DATA_FORMAT_EXPLANATION.md](GPS_DATA_FORMAT_EXPLANATION.md)** — GPS/EXIF data format reference
+- **[DIAGNOSTICS_USEFULNESS_RECOMMENDATIONS.md](DIAGNOSTICS_USEFULNESS_RECOMMENDATIONS.md)** — Product recommendations for issue-ready diagnostics (mlx-vlm maintainers) and model-selection galleries (image description)
 
 ## Archive
 

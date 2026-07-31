@@ -5,8 +5,48 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Document product recommendations for issue-ready diagnostics and model-selection
+  galleries aimed at mlx-vlm maintainers and image-description users
+  (`docs/notes/DIAGNOSTICS_USEFULNESS_RECOMMENDATIONS.md`).
+
 ### Changed
 
+- Record active and cache allocator residue after every model cleanup, including
+  crashed attempts, in human and machine evidence so gradual cross-model memory
+  growth can be investigated. Add sortable HTML chooser columns, including the
+  upstream prefill/first-token interval, without widening the Markdown chooser.
+- Surface exact, neutral observations when a model returns every supplied draft
+  metadata field unchanged or emits EOS/thinking wrappers declared by current
+  mlx-vlm generation types. Keep those facts separate from semantic scoring,
+  unexpected-token leakage, and unusable-output classification.
+- Preserve the deliberately conservative repetition detector while ensuring
+  duplicate-dominated or repeated output remains highlighted with its repeated
+  fragment and complete model output in issue-ready diagnostics.
+- Make current-run usability reject copied prompt instructions, structurally
+  invalid catalog sections, unexpected text before the requested Title, and
+  duplicate-dominated keyword output; accept conventional bold Markdown labels
+  and exclude reusable context values from instruction-echo matching. Retain exact
+  observation evidence without introducing semantic caption scoring.
+- Make diagnostics smaller and more actionable by omitting empty per-model facts
+  and duplicate readable/raw output, while the gallery gains a publishable source
+  image preview bounded to 1024 pixels, lint-safe preformatted model text, and
+  end-to-end time ahead of decode throughput. Keep crash issue-draft section
+  boundaries Markdown-lint safe.
+- Record producer worktree dirtiness and per-model completion timestamps, label
+  conclusive outcomes unambiguously in human reports, and distinguish configured
+  role-boundary tokens from unknown special-token leakage.
+- Widen the configured thinking-delimiter collection explicitly and narrow
+  validated memory samples before construction so Pylance agrees with the mypy,
+  ty, and Pyrefly contracts without casts or suppressions.
+- Make the gallery preserve line breaks and present model-authored formatting while
+  retaining exact raw output, and make diagnostics a skim-first mlx-vlm issue body
+  with expanded crashes, collapsed highlighted evidence, compact clean-run context,
+  and one shared parameterised reproduction and provenance section.
+- Render Markdown and HTML diagnostics from one narrowly typed recursive report
+  representation, tighten table/link/output block annotations, and remove
+  superseded helpers without weakening types or adding lint suppressions.
 - Preserve the production PEP 695 aliases while using equally narrow test-local
   types that Skylos can resolve, and simplify four gallery, console-summary, and
   JSONL builders below the configured complexity threshold without suppressions
@@ -16,6 +56,9 @@ Notable changes to this project will be documented in this file.
 
 ### Removed
 
+- Remove superseded definition-only report-stanza, detection, metric, metadata,
+  runtime-prose, diagnostics-framing, and quality-label helpers and their obsolete
+  cache-only test, plus the unused duplicate quality-issue regex registry.
 - Archive the hazardous one-off Qwen3-VL sequential Metal probe and completed
   development plans, specifications, and Skylos backlog so active tooling and
   guidance describe only maintained workflows.

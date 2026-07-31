@@ -513,17 +513,6 @@ class TestPreparePrompt:
 # ── compute_confidence_indicators ──────────────────────────────────────────
 
 
-class TestRegexDetectionUtilities:
-    """Tests for shared regex detection helpers."""
-
-    def test_compile_regex_cache_reuses_compiled_pattern(self, mod: types.ModuleType) -> None:
-        """Regex compiler cache should return the same compiled object for same key."""
-        first = mod._compile_regex_cached(r"\d+", 0)
-        second = mod._compile_regex_cached(r"\d+", 0)
-        assert first is not None
-        assert first is second
-
-
 class TestDisplayWidthUtilities:
     """Tests for wcwidth-aware terminal width helpers."""
 
