@@ -106,6 +106,14 @@ The file is organized in this order — search for these exact landmark headers 
 - **Add tests to existing files** (e.g., `test_parameter_validation.py` for new CLI flags, `test_html_formatting.py` for report changes). Do not create standalone test scripts.
 - **Validation artifact hygiene**: Validation tests must not rewrite tracked `src/output/` assets. Route generated outputs to `tmp_path`, another temp directory, or gitignored `src/output/test_*` paths so `make quality` never requires restoring benchmark snapshots after it runs.
 - **Generated Markdown style**: Emit generated Markdown in the repository's markdownlint style directly: keep blank lines around headings and lists; use unique headings or an explicitly configured sibling-heading structure; use asterisks rather than underscores for emphasis; give ordinary fenced blocks proper blank-line spacing and a language identifier; and escape table-cell content. Exact evidence fences must preserve model text, tabs, and trailing spaces byte-for-byte, using only narrow report-local markdownlint configuration where a rule conflicts with that evidence contract.
+- **Issue-ready report assembly**: Build aggregate diagnostics from the existing
+  typed report blocks and render that same hierarchy to Markdown and HTML. Do not
+  create parallel format-specific diagnostic builders or repeat run-wide prompt,
+  reproduction, settings, or environment context for every highlighted model.
+  Completed observed output appears once as exact code evidence; do not duplicate
+  the gallery's readable/raw pair or emit empty `unavailable` fact rows. Keep
+  assessment rules mechanical and image-independent, and preserve the exact facts
+  behind each observation code in machine and maintainer artifacts.
 - **Generated-report preflight**: Render representative reports from fixtures into temporary or `test_*` output paths and run markdownlint before the expensive matrix. Generated outputs must not need post-run hand editing. Prefer shared render helpers and focused tests over cleanup passes. If the checkout provides a supported report-only regeneration path, use existing canonical JSONL to repair stale tracked reports before Run 1; do not rerun models merely to reformat captured evidence.
 - **Acceptance order**: Before a costly real-model matrix, pass deterministic
   focused tests and the prescribed format, lint-fix/lint, and full `make quality`

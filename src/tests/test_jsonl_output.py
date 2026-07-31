@@ -387,7 +387,22 @@ def test_check_models_provenance_degrades_without_install_or_git_metadata(
         "version": "unknown",
         "git_revision": None,
         "install_type": "unknown",
+        "dirty": None,
     }
+
+
+def test_check_models_provenance_records_dirty_source_tree(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(check_models, "version", lambda _name: "0.9.0")
+    monkeypatch.setattr(check_models, "_distribution_is_editable", lambda _name: True)
+
+    def git_probe(command: tuple[str, ...], **_kwargs: object) -> str:
+        return " M src/check_models.py" if "status" in command else "abc123"
+
+    monkeypatch.setattr(check_models, "_run_macos_toolchain_command", git_probe)
+
+    assert check_models._collect_check_models_provenance()["dirty"] is True
 
 
 def test_component_provenance_captures_editable_source_without_home_disclosure(
@@ -614,6 +629,7 @@ def test_save_jsonl_report_content(tmp_path: Path) -> None:
         generation_time=1.5,
         model_load_time=0.5,
         total_time=2.0,
+        completed_at="2026-07-31 12:34:56 BST",
         runtime_diagnostics=RuntimeDiagnostics(
             input_validation_time_s=0.1,
             model_load_time_s=0.5,
@@ -649,6 +665,7 @@ def test_save_jsonl_report_content(tmp_path: Path) -> None:
     }
     assert data["_type"] == "result"
     assert data["model"] == "test-model"
+    assert data["timestamp"] == "2026-07-31 12:34:56 BST"
     assert data["assessment"] == {
         "execution": "completed",
         "usability": "usable",
@@ -669,6 +686,39 @@ def test_save_jsonl_report_content(tmp_path: Path) -> None:
     assert timing["prompt_prep_time_s"] == 0.2
     assert timing["cleanup_time_s"] == 0.05
     assert timing["stop_reason"] == "completed"
+
+
+def test_jsonl_assessment_retains_factual_observation_evidence(tmp_path: Path) -> None:
+    output_file = tmp_path / "results.jsonl"
+    prompt = (
+        "Return exactly these three sections, and nothing else:\n"
+        "Title: 5-10 words.\nDescription: 1-2 sentences.\nKeywords: 10-18 terms."
+    )
+    text = "<think>inspect</think> <|im_user|> prompt instructions " + "cat " * 80
+    analysis = check_models.analyze_generation_text(
+        text,
+        generated_tokens=80,
+        prompt=prompt,
+        requested_max_tokens=80,
+    )
+    result = PerformanceResult(
+        model_name="org/observed",
+        generation=MockGeneration(text=text, generation_tokens=80),
+        success=True,
+        quality_analysis=analysis,
+        requested_max_tokens=80,
+    )
+
+    save_jsonl_report([result], output_file, prompt=prompt, system_info={})
+
+    _header, rows = _read_jsonl(output_file)
+    details = rows[0]["assessment"]["details"]
+    assert details["missing_sections"] == ["title", "description", "keywords"]
+    assert details["repeated_fragment"] == "cat"
+    assert details["instruction_echo_fragments"] == ["prompt instructions"]
+    assert details["unexpected_special_tokens"] == ["<|im_user|>"]
+    assert details["thinking_trace_markers"] == ["<think>", "</think>"]
+    assert "repetitive_tail" in details["token_cap_reasons"]
 
 
 def test_save_jsonl_report_serializes_only_cached_result_assessment(tmp_path: Path) -> None:

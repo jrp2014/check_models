@@ -7,6 +7,26 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Make current-run usability reject copied prompt instructions, structurally
+  invalid catalog sections, unexpected text before the requested Title, and
+  duplicate-dominated keyword output; accept conventional bold Markdown labels
+  and exclude reusable context values from instruction-echo matching. Retain exact
+  observation evidence without introducing semantic caption scoring.
+- Make diagnostics smaller and more actionable by omitting empty per-model facts
+  and duplicate readable/raw output, while the gallery gains a publishable source
+  image preview bounded to 1024 pixels, lint-safe preformatted model text, and
+  end-to-end time ahead of decode throughput. Keep crash issue-draft section
+  boundaries Markdown-lint safe.
+- Record producer worktree dirtiness and per-model completion timestamps, label
+  conclusive outcomes unambiguously in human reports, and distinguish configured
+  role-boundary tokens from unknown special-token leakage.
+- Make the gallery preserve line breaks and present model-authored formatting while
+  retaining exact raw output, and make diagnostics a skim-first mlx-vlm issue body
+  with expanded crashes, collapsed highlighted evidence, compact clean-run context,
+  and one shared parameterised reproduction and provenance section.
+- Render Markdown and HTML diagnostics from one narrowly typed recursive report
+  representation, tighten table/link/output block annotations, and remove
+  superseded helpers without weakening types or adding lint suppressions.
 - Preserve the production PEP 695 aliases while using equally narrow test-local
   types that Skylos can resolve, and simplify four gallery, console-summary, and
   JSONL builders below the configured complexity threshold without suppressions
@@ -16,6 +36,9 @@ Notable changes to this project will be documented in this file.
 
 ### Removed
 
+- Remove superseded definition-only report-stanza, detection, metric, metadata,
+  runtime-prose, diagnostics-framing, and quality-label helpers and their obsolete
+  cache-only test, plus the unused duplicate quality-issue regex registry.
 - Archive the hazardous one-off Qwen3-VL sequential Metal probe and completed
   development plans, specifications, and Skylos backlog so active tooling and
   guidance describe only maintained workflows.

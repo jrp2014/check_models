@@ -1,19 +1,21 @@
 # Crash: mlx-community/Step-3.7-Flash-oQ2e
 
-## mlx-community/Step-3.7-Flash-oQ2e
+## Maintainer evidence
 
-### Root exception and chain
+### mlx-community/Step-3.7-Flash-oQ2e
+
+#### Root exception and chain
 
 ```text
 builtins.ValueError: Loaded processor has no image_processor; expected multimodal processor.
 builtins.ValueError: Model preflight failed for mlx-community/Step-3.7-Flash-oQ2e: Loaded processor has no image_processor; expected multimodal processor.
 ```
 
-### Complete traceback
+#### Complete traceback
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 10914, in _prepare_generation_prompt
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 10916, in _prepare_generation_prompt
     _run_model_preflight_validators(
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         model_identifier=params.model_identifier,
@@ -23,7 +25,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 10706, in _run_model_preflight_validators
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 10708, in _run_model_preflight_validators
     _raise_preflight_error(
     ~~~~~~~~~~~~~~~~~~~~~~^
         "Loaded processor has no image_processor; expected multimodal processor.",
@@ -32,14 +34,14 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 10639, in _raise_preflight_error
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 10641, in _raise_preflight_error
     raise _tag_exception_failure_phase(ValueError(message), phase)
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11399, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11401, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -50,19 +52,19 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11166, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11168, in _run_model_generation
     formatted_prompt = _prepare_generation_prompt(
         params=params,
     ...<3 lines>...
         phase_timer=phase_timer,
     )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 10955, in _prepare_generation_prompt
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 10957, in _prepare_generation_prompt
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/Step-3.7-Flash-oQ2e: Loaded processor has no image_processor; expected multimodal processor.
 
 ```
 
-### Execution and provenance
+#### Execution and provenance
 
 - *Execution:* crashed
 - *Usability:* not_evaluated
@@ -71,51 +73,42 @@ ValueError: Model preflight failed for mlx-community/Step-3.7-Flash-oQ2e: Loaded
 - *Phase:* processor_load
 - *Stage:* Processor Error
 - *Package:* model-config
+- *Error type:* ValueError
+- *Error message:* Model preflight failed for
+  mlx-community/Step-3.7-Flash-oQ2e: Loaded processor has no image_processor;
+  expected multimodal processor.
+- *Root error type:* ValueError
+- *Root error message:* Loaded processor has no image_processor; expected
+  multimodal processor.
 - *Resolved model revision:* 3dacb46f724ac89725bcd922fb779c7ed1499fe7
-- *Requested model revision:* unavailable
-- *Processor class:* unavailable
-- *Tokenizer class:* unavailable
 - *Stop reason:* exception
-- *Prompt tokens:* unavailable
-- *Generation tokens:* unavailable
-- *Configured EOS token ID:* unavailable
-- *Configured EOS token:* unavailable
-- *Configured EOS token override:* unavailable
-- *Configured thinking start token:* unavailable
-- *Configured thinking end token:* unavailable
 
-### Complete partial output
-
-```text
-unavailable
-```
-
-### Captured stdout/stderr
+#### Captured stdout/stderr
 
 ```text
 === STDERR ===
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 24 files:   0%|          | 0/24 [00:00<?, ?it/s]
-Fetching 24 files: 100%|##########| 24/24 [00:00<00:00, 2907.75it/s]
+Fetching 24 files: 100%|##########| 24/24 [00:00<00:00, 3699.22it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[21:24:21] ERROR    Model preflight validation failed for mlx-community/Step-3.7-Flash-oQ2e
+[17:01:33] ERROR    Model preflight validation failed for mlx-community/Step-3.7-Flash-oQ2e
                     ValueError: Loaded processor has no image_processor; expected multimodal processor.
 ```
 
-### Supplemental CLI reproduction
+## Supplemental CLI reproduction
 
 This form includes only settings supported by the native mlx-vlm CLI.
 
 ```bash
-python -m mlx_vlm.generate --model mlx-community/Step-3.7-Flash-oQ2e --image cats.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
+python -m mlx_vlm.generate --model mlx-community/Step-3.7-Flash-oQ2e --image 20260725-183316_DSC01175.jpg --prompt 'Analyze this image for cataloguing metadata, using British English.
 
 Describe visible details faithfully. If a visual detail is uncertain, ambiguous, partially obscured, or too small to verify, leave it out rather than guessing.
 
-No existing catalog metadata is supplied. Base every field only on visual evidence in the image.
+Use authoritative context as supplied fact, and treat the descriptive metadata as a draft catalog record. Retain draft details that are consistent with the image, correct contradictions, and add important visible details. Authoritative context may supply identity and location even when they are not visually readable.
 
 Return exactly these three sections, and nothing else:
 
@@ -133,15 +126,27 @@ Keywords:
 - Output only the keyword list after the label.
 
 Rules:
-- Include only details that are definitely visible in the image.
-- Do not infer or import metadata that is not visible in the image.
+- Distinguish supplied authoritative facts from visible details; do not present contextual facts as though they were read from the image.
+- Reuse draft metadata when it is consistent with the image; authoritative context does not require separate visual proof.
+- If metadata and image disagree, follow the image.
 - Prefer omission to speculation.
 - Do not copy prompt instructions into the Title, Description, or Keywords fields.
-- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.
-- Do not output reasoning, notes, hedging, or extra sections.' --max-tokens 500 --temperature 0.0 --revision 3dacb46f724ac89725bcd922fb779c7ed1499fe7 --trust-remote-code --prefill-step-size 4096
+- Do not infer identity, location, event, brand, species, time period, or intent unless supplied as authoritative context or visually obvious.
+- Do not output reasoning, notes, hedging, or extra sections.
+
+Context: Authoritative context:
+- Capture date/time: 2026-07-25 18:33:16 UTC+01:00
+- GPS: 51.358240°N, 1.432820°E
+- Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.
+
+Draft descriptive metadata:
+- Existing title: Viking Bay, Broadstairs, England, UK, GBR, Europe
+- Existing description: A wide shot looking down at a beautiful English coastal town scene in Broadstairs, Kent. On a sunny summers day holiday makers relax on the sandy Viking Bay beach with the town skyline and castle in the background and wind turbines out to sea in the hazy distance.
+- Existing keywords: Adobe Stock, Adults, Any Vision, Blue sky, Britain, Buildings, Bushes, Children, Coast, Crowd, England, Europe, Holiday, Horizon, Kent, Objects, People, Relaxing, Sitting, Sky
+- Treat this draft as fallible. Retain supported details, correct errors, and add important visible information.' --max-tokens 500 --temperature 0.0 --revision 3dacb46f724ac89725bcd922fb779c7ed1499fe7 --trust-remote-code --prefill-step-size 4096
 ```
 
-### Canonical Python reproduction script
+## Canonical Python reproduction script
 
 ```python
 from mlx_vlm.generate import generate
@@ -149,8 +154,8 @@ from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load
 
 MODEL = "mlx-community/Step-3.7-Flash-oQ2e"
-IMAGE = "cats.jpg"
-PROMPT = "Analyze this image for cataloguing metadata, using British English.\n\nDescribe visible details faithfully. If a visual detail is uncertain, ambiguous, partially obscured, or too small to verify, leave it out rather than guessing.\n\nNo existing catalog metadata is supplied. Base every field only on visual evidence in the image.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual; authoritative context may supply identity and location.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences combining supplied authoritative context with the main visible subject, setting, lighting, action, and distinctive visible details.\n- Output only the description text after the label.\n\nKeywords:\n- 10-18 unique comma-separated terms covering supplied authoritative context and clearly visible subjects, setting, colors, composition, and style.\n- Output only the keyword list after the label.\n\nRules:\n- Include only details that are definitely visible in the image.\n- Do not infer or import metadata that is not visible in the image.\n- Prefer omission to speculation.\n- Do not copy prompt instructions into the Title, Description, or Keywords fields.\n- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.\n- Do not output reasoning, notes, hedging, or extra sections."
+IMAGE = "20260725-183316_DSC01175.jpg"
+PROMPT = "Analyze this image for cataloguing metadata, using British English.\n\nDescribe visible details faithfully. If a visual detail is uncertain, ambiguous, partially obscured, or too small to verify, leave it out rather than guessing.\n\nUse authoritative context as supplied fact, and treat the descriptive metadata as a draft catalog record. Retain draft details that are consistent with the image, correct contradictions, and add important visible details. Authoritative context may supply identity and location even when they are not visually readable.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual; authoritative context may supply identity and location.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences combining supplied authoritative context with the main visible subject, setting, lighting, action, and distinctive visible details.\n- Output only the description text after the label.\n\nKeywords:\n- 10-18 unique comma-separated terms covering supplied authoritative context and clearly visible subjects, setting, colors, composition, and style.\n- Output only the keyword list after the label.\n\nRules:\n- Distinguish supplied authoritative facts from visible details; do not present contextual facts as though they were read from the image.\n- Reuse draft metadata when it is consistent with the image; authoritative context does not require separate visual proof.\n- If metadata and image disagree, follow the image.\n- Prefer omission to speculation.\n- Do not copy prompt instructions into the Title, Description, or Keywords fields.\n- Do not infer identity, location, event, brand, species, time period, or intent unless supplied as authoritative context or visually obvious.\n- Do not output reasoning, notes, hedging, or extra sections.\n\nContext: Authoritative context:\n- Capture date/time: 2026-07-25 18:33:16 UTC+01:00\n- GPS: 51.358240°N, 1.432820°E\n- Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.\n\nDraft descriptive metadata:\n- Existing title: Viking Bay, Broadstairs, England, UK, GBR, Europe\n- Existing description: A wide shot looking down at a beautiful English coastal town scene in Broadstairs, Kent. On a sunny summers day holiday makers relax on the sandy Viking Bay beach with the town skyline and castle in the background and wind turbines out to sea in the hazy distance.\n- Existing keywords: Adobe Stock, Adults, Any Vision, Blue sky, Britain, Buildings, Bushes, Children, Coast, Crowd, England, Europe, Holiday, Horizon, Kent, Objects, People, Relaxing, Sitting, Sky\n- Treat this draft as fallible. Retain supported details, correct errors, and add important visible information."
 LOAD_KWARGS = {
     "trust_remote_code": True,
     "revision": "3dacb46f724ac89725bcd922fb779c7ed1499fe7",
@@ -184,7 +189,7 @@ Analyze this image for cataloguing metadata, using British English.
 
 Describe visible details faithfully. If a visual detail is uncertain, ambiguous, partially obscured, or too small to verify, leave it out rather than guessing.
 
-No existing catalog metadata is supplied. Base every field only on visual evidence in the image.
+Use authoritative context as supplied fact, and treat the descriptive metadata as a draft catalog record. Retain draft details that are consistent with the image, correct contradictions, and add important visible details. Authoritative context may supply identity and location even when they are not visually readable.
 
 Return exactly these three sections, and nothing else:
 
@@ -202,30 +207,40 @@ Keywords:
 - Output only the keyword list after the label.
 
 Rules:
-- Include only details that are definitely visible in the image.
-- Do not infer or import metadata that is not visible in the image.
+- Distinguish supplied authoritative facts from visible details; do not present contextual facts as though they were read from the image.
+- Reuse draft metadata when it is consistent with the image; authoritative context does not require separate visual proof.
+- If metadata and image disagree, follow the image.
 - Prefer omission to speculation.
 - Do not copy prompt instructions into the Title, Description, or Keywords fields.
-- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.
+- Do not infer identity, location, event, brand, species, time period, or intent unless supplied as authoritative context or visually obvious.
 - Do not output reasoning, notes, hedging, or extra sections.
+
+Context: Authoritative context:
+- Capture date/time: 2026-07-25 18:33:16 UTC+01:00
+- GPS: 51.358240°N, 1.432820°E
+- Use this factual context where it improves the catalogue record; do not claim that contextual facts are visually observable.
+
+Draft descriptive metadata:
+- Existing title: Viking Bay, Broadstairs, England, UK, GBR, Europe
+- Existing description: A wide shot looking down at a beautiful English coastal town scene in Broadstairs, Kent. On a sunny summers day holiday makers relax on the sandy Viking Bay beach with the town skyline and castle in the background and wind turbines out to sea in the hazy distance.
+- Existing keywords: Adobe Stock, Adults, Any Vision, Blue sky, Britain, Buildings, Bushes, Children, Coast, Crowd, England, Europe, Holiday, Horizon, Kent, Objects, People, Relaxing, Sitting, Sky
+- Treat this draft as fallible. Retain supported details, correct errors, and add important visible information.
 ```
 
 ### Components
 
-<!-- markdownlint-disable MD060 -->
-
 | Component                  | Value                                                                                                                                           |
 |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | mlx-vlm                    | 0.6.8                                                                                                                                           |
-| mlx                        | 0.32.1.dev20260726+973e27f82                                                                                                                    |
+| mlx                        | 0.32.1.dev20260731+2ad0d4d31                                                                                                                    |
 | mlx-lm                     | 0.31.3                                                                                                                                          |
 | mlx-audio                  | 0.4.4                                                                                                                                           |
 | transformers               | 5.14.1                                                                                                                                          |
 | tokenizers                 | 0.22.2                                                                                                                                          |
-| huggingface-hub            | 1.24.0                                                                                                                                          |
+| huggingface-hub            | 1.26.0                                                                                                                                          |
 | Python Version             | 3.13.13                                                                                                                                         |
-| OS                         | Darwin 25.5.0                                                                                                                                   |
-| macOS Version              | 26.5.2                                                                                                                                          |
+| OS                         | Darwin 25.6.0                                                                                                                                   |
+| macOS Version              | 26.6                                                                                                                                            |
 | SDK Version                | 26.5                                                                                                                                            |
 | SDK Path                   | /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk                                              |
 | Xcode Version              | 26.6                                                                                                                                            |
@@ -246,7 +261,6 @@ Rules:
 | MLX Distribution Root      | ~/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages                                                                                          |
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                              |
 | MLX Core Extension         | ~/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
-| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (162,839,496 bytes, sha256=83384795fee317890b760a9e6d8c9745b136c41801d3bd4a1f6f18791efbfd61) |
-| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,641,424 bytes, sha256=6f1d21bc20a7a99dde80ae58c8cd0f36b6514dc1389b3aa179c4ea7b5f483904)  |
+| MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (162,842,200 bytes, sha256=6a34bf1f3b542a904c4cf464bc95d7e419ca42a33175da64477eea57a9d90f2e) |
+| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,642,704 bytes, sha256=7373366a6342e33f9449d9ea8c55045dd0e4e24edf00fec70c525c7cae446de1)  |
 | RAM                        | 128.0 GB                                                                                                                                        |
-<!-- markdownlint-enable MD060 -->

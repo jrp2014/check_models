@@ -87,9 +87,9 @@ def test_shared_report_blocks_render_links_and_safe_model_output() -> None:
     html_output = "\n".join(check_models.render_report_html(blocks))
 
     assert "[org/model](#diagnostic-org-model)" in markdown
-    assert "> ## Heading" in markdown
-    assert "> - first" in markdown
-    assert r"\@mlx-user" in markdown
+    assert '<pre class="model-output-readable">' in markdown
+    assert "## Heading\n\n- first\n- second" in markdown
+    assert "@mlx-user" in markdown
     assert "&lt;script&gt;bad()&lt;/script&gt;" in markdown
     assert "<summary>Exact raw output</summary>" in markdown
     assert captured in markdown
@@ -195,8 +195,7 @@ def test_gallery_output_uses_expandable_fenced_evidence() -> None:
 
     assert "<summary>Complete evidence: test/model</summary>" in md
     assert "```text\nalpha\n\nbeta\n```" in md
-    assert "> alpha" in md
-    assert "> beta" in md
+    assert '<pre class="model-output-readable">\nalpha\n\nbeta\n</pre>' in md
     assert md.count("```text\nalpha\n\nbeta\n```") == 1
 
 

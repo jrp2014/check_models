@@ -164,6 +164,52 @@ def test_html_and_gallery_render_same_captured_peak_memory(tmp_path: Path) -> No
     assert "*Peak memory:* 1.0" in gallery_path.read_text(encoding="utf-8")
 
 
+def test_markdown_gallery_publishes_reference_image_beside_report(tmp_path: Path) -> None:
+    image_path = tmp_path / "input.jpg"
+    Image.new("RGB", (2048, 1024), color="purple").save(image_path)
+    gallery_path = tmp_path / "reports" / "model_gallery.md"
+    result = _make_success("org/model")
+    context = _build_report_render_context(results=[result], prompt="Describe the image.")
+
+    generate_markdown_gallery_report(
+        [result],
+        gallery_path,
+        "Describe the image.",
+        report_context=context,
+        image_path=image_path,
+    )
+
+    assert "![Reference image](assets/source-image.jpg)" in gallery_path.read_text(encoding="utf-8")
+    with Image.open(gallery_path.parent / "assets" / "source-image.jpg") as preview:
+        assert preview.size == (1024, 512)
+
+
+def test_markdown_gallery_does_not_follow_reference_asset_symlink(tmp_path: Path) -> None:
+    image_path = tmp_path / "input.jpg"
+    Image.new("RGB", (16, 8), color="purple").save(image_path)
+    gallery_path = tmp_path / "reports" / "model_gallery.md"
+    asset = gallery_path.parent / "assets" / "source-image.jpg"
+    asset.parent.mkdir(parents=True)
+    victim = tmp_path / "victim.jpg"
+    victim.write_bytes(b"keep-me")
+    asset.symlink_to(victim)
+    result = _make_success("org/model")
+
+    generate_markdown_gallery_report(
+        [result],
+        gallery_path,
+        "Describe the image.",
+        report_context=_build_report_render_context(
+            results=[result],
+            prompt="Describe the image.",
+        ),
+        image_path=image_path,
+    )
+
+    assert victim.read_bytes() == b"keep-me"
+    assert "![Reference image]" not in gallery_path.read_text(encoding="utf-8")
+
+
 def _extract_markdown_subsection(
     content: str,
     heading: str,
@@ -1118,6 +1164,46 @@ def test_simplified_diagnostics_partitions_cached_assessments_in_evidence_order(
     assert "indeterminate" in content
 
 
+def test_diagnostics_facts_surface_exact_observation_evidence_without_empty_noise() -> None:
+    repeated_fragment = 'keyword: "remote control"'
+    analysis = check_models.GenerationQualityAnalysis(
+        is_repetitive=True,
+        repeated_token=repeated_fragment,
+        missing_sections=["title"],
+        instruction_echo=True,
+        instruction_echo_fragments=["prompt instructions"],
+        unexpected_special_tokens=["<|im_user|>"],
+    )
+    result = PerformanceResult(
+        model_name="org/observed",
+        success=True,
+        generation=_MockGeneration(text="output", generation_tokens=20),
+        quality_analysis=analysis,
+    )
+    assessment = check_models.ResultAssessment(
+        "completed",
+        "unusable",
+        "observation_needs_reproduction",
+        ("repeated_output", "missing_requested_sections", "prompt_instruction_echo"),
+    )
+
+    facts = dict(
+        check_models._diagnostics_result_facts(
+            result,
+            assessment,
+            run_args=None,
+            model_provenance=None,
+        )
+    )
+
+    assert facts["Missing sections"] == '["title"]'
+    assert facts["Repeated fragment"] == 'keyword: "remote control"'
+    assert facts["Echoed instruction fragments"] == '["prompt instructions"]'
+    assert facts["Unexpected special tokens"] == '["<|im_user|>"]'
+    assert "Error type" not in facts
+    assert "Configured EOS token" not in facts
+
+
 def test_diagnostics_are_skim_first_and_share_reproduction_context_once(
     tmp_path: Path,
 ) -> None:
@@ -1258,6 +1344,12 @@ def test_diagnostics_are_skim_first_and_share_reproduction_context_once(
     assert diagnostics.index("TRACEBACK-FIRST") < diagnostics.index("CRASH-PARTIAL")
     assert "<summary>org/observed" in diagnostics
     assert "<summary>org/network" in diagnostics
+    assert "### org/observed" in diagnostics
+    assert "| repeated output |       1 |\n\n## Triage" in diagnostics
+    assert re.search(
+        r"\| \[org/network\].*\|\n\n## Actionable Failures",
+        diagnostics,
+    )
     assert "OBSERVED-OUTPUT-MUST-APPEAR" in diagnostics
     assert "SERVER-COULD-NOT-BE-CONTACTED" in diagnostics
     assert "<summary>Clean completions</summary>" in diagnostics
@@ -1277,7 +1369,9 @@ def test_diagnostics_are_skim_first_and_share_reproduction_context_once(
     assert "python -m mlx_vlm.generate" not in diagnostics
     for model in ("org/crash", "org/observed", "org/network"):
         assert model in diagnostics
-        assert revisions[model]["resolved_revision"] in diagnostics
+        revision = revisions[model]["resolved_revision"]
+        assert revision is not None
+        assert revision in diagnostics
     maintainer_html = html_report.split('<section id="maintainer-diagnostics">', maxsplit=1)[1]
     maintainer_html = maintainer_html.split("</section>", maxsplit=1)[0]
     assert "CLEAN-OUTPUT-MUST-NOT-APPEAR" not in maintainer_html
@@ -1372,6 +1466,7 @@ def test_crash_diagnostics_and_issue_draft_keep_complete_primary_evidence_first(
     assert "python -m mlx_vlm.generate" not in diagnostics_content
     assert "Canonical parameterised Python reproduction" in diagnostics_content
     assert "python -m mlx_vlm.generate" in issue_content
+    assert "```\n\n## Provenance and Environment" in issue_content
     assert not (tmp_path / "issues" / "index.md").exists()
 
 
@@ -2312,7 +2407,7 @@ class TestHtmlReportEdgeCases:
 
         diagnostics_text = diagnostics.read_text(encoding="utf-8")
         assert re.search(r"\|\s*Attempted\s*\|\s*2\s*\|", diagnostics_text)
-        assert re.search(r"\|\s*Evaluated\s*\|\s*1\s*\|", diagnostics_text)
+        assert re.search(r"\|\s*Conclusive outcomes\s*\|\s*1\s*\|", diagnostics_text)
         assert re.search(r"\|\s*Indeterminate\s*\|\s*1\s*\|", diagnostics_text)
         assert re.search(r"\|\s*Crashed\s*\|\s*0\s*\|", diagnostics_text)
 
@@ -2762,6 +2857,7 @@ class TestMarkdownGalleryReport:
         assert "BEGIN" in chooser
         assert "END-SENTINEL" not in chooser
         assert "<!-- markdownlint-disable MD034 MD049 -->" in chooser
+        assert chooser.index("Total s") < chooser.index("Gen TPS")
         assert "Gen tok" in chooser
         assert "Peak GB" in chooser
         assert "Observations" in chooser
@@ -2979,9 +3075,10 @@ class TestMarkdownGalleryReport:
             end_headings=("## Avoid for This Run",),
         )
         assert "## Title<br><br>Two cats resting" in chooser
-        assert "> ## Title" in content
-        assert "> - pink sofa" in content
-        assert r"\@maintainer &lt;details&gt;unsafe&lt;/details&gt;" in content
+        assert '<pre class="model-output-readable">' in content
+        assert "## Title\n\nTwo cats resting\n\n- pink sofa" in content
+        assert "&#96;&#96;&#96;text" in content
+        assert "&#64;maintainer &lt;details&gt;unsafe&lt;/details&gt;" in content
         assert "<summary>Exact raw output</summary>" in content
         assert content.count(formatted_output) == 1
 

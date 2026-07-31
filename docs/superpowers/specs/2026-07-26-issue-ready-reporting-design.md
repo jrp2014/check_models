@@ -34,9 +34,9 @@ context.
 4. Show model output readably in the gallery while retaining an exact raw copy.
 5. Reuse the cached assessment and existing report-block infrastructure without
    adding classification or scoring heuristics.
-6. Simplify the touched reporting implementation and finish with
-   `src/check_models.py` shorter than its 16,214-line baseline without weakening
-   its types.
+6. Simplify touched reporting paths, remove superseded code, and keep every new
+   interface fully and narrowly typed. Record source growth honestly when later
+   approved evidence contracts expand the original scope.
 
 ## Non-goals
 
@@ -146,9 +146,9 @@ table. Truncation remains presentation-only; the complete output is unaffected.
 
 For completed output, show two views derived from the same captured string:
 
-1. **Readable output**: GitHub-flavoured Markdown presentation inside a
-   blockquote. Preserve headings, paragraphs, lists, emphasis, and source line
-   breaks. Escape raw HTML and neutralise GitHub `@` mentions before rendering.
+1. **Readable output**: inert escaped `<pre>` presentation. Preserve source line
+   breaks and spacing without allowing model-authored headings, lists, HTML, or
+   mentions to affect the surrounding report.
 2. **Exact raw output**: the unmodified captured text once, inside a collapsed,
    dynamically sized fenced code block.
 
@@ -175,7 +175,7 @@ shared builders make it redundant.
 Use one small output-presentation helper for gallery and diagnostic evidence.
 Keep format-specific escaping at the rendering boundary:
 
-- Markdown readable output: escaped, mention-neutralised blockquote lines;
+- Markdown readable output: escaped inert `<pre>` content;
 - Markdown raw output: existing safe dynamic fence;
 - HTML output: existing escaped `<pre><code>` rendering.
 
@@ -184,8 +184,9 @@ the shared parameterised script. Do not create a second argument-construction
 path.
 
 The refactor must remain inside the intentional `check_models.py` monolith. It
-should reduce total file length below the recorded 16,214-line baseline and
-must retain full, narrow parameter and return annotations.
+must remove superseded paths, avoid duplicate abstractions, and retain full,
+narrow parameter and return annotations. Line count is a review signal rather
+than an acceptance proxy once approved follow-ups add new evidence contracts.
 
 ## Failure and safety behaviour
 
@@ -246,8 +247,28 @@ The change is complete when:
 2. representative generated Markdown passes repo-local Markdown lint;
 3. full `make quality` passes;
 4. Skylos audit and danger scans remain clean without new suppressions;
-5. a recorded `wc -l` check shows `src/check_models.py` below 16,214 lines,
-   without adding a brittle source-length unit test, and the report-block types
-   are narrow;
+5. a recorded `wc -l` and diff check account for source growth, no superseded
+   duplicate path remains, and the report-block and evidence types are narrow;
 6. tracked current-run outputs have not been modified by validation; and
 7. documentation and `[Unreleased]` changelog entries describe the new roles.
+
+## Approved follow-up: classification and provenance hardening
+
+The post-run review extends this design without adding semantic scoring:
+
+- strict catalog prompts apply even to short non-empty output;
+- copied instruction spans, multi-item title fields, and duplicate-dominated
+  keyword lists are mechanically unusable;
+- authoritative context values are excluded from instruction-echo spans,
+  conventional bold Markdown labels remain valid, and unexpected catalog preamble
+  text is mechanically unusable;
+- configured role tokens are distinguished from unknown-token leakage, while a
+  role boundary inside output is retained as factual evidence;
+- observation details retain exact section names, fragments, and tokens;
+- diagnostics include each highlighted completed output once and omit empty fact
+  rows; the gallery keeps the readable plus exact views;
+- Markdown galleries publish a bounded reference preview and lead with end-to-end
+  time;
+- run provenance records producer dirtiness and per-model completion timestamps;
+- human counts call completed-plus-crashed results “conclusive outcomes,” while the
+  stable schema `2.0` field name remains unchanged for compatibility.

@@ -262,7 +262,7 @@ def _reject_symlink_parent(path: Path) -> None:
             raise OSError(msg)
 
 
-def _canonical_text_file_path(path: Path) -> Path:
+def _canonical_file_path(path: Path) -> Path:
     """Resolve existing parent links without following the final artifact path."""
     return path.parent.resolve(strict=False) / path.name
 
@@ -290,23 +290,28 @@ def _open_regular_file_no_symlink(path: Path, flags: int, mode: int = 0o666) -> 
     return fd
 
 
-def _write_text_file(path: Path, content: str, *, append: bool = False) -> None:
-    """Write UTF-8 text to a regular file without following symlinks."""
+def _write_bytes_file(path: Path, content: bytes, *, append: bool = False) -> None:
+    """Write bytes to a regular file without following symlinks."""
     _reject_symlink_parent(path)
-    path = _canonical_text_file_path(path)
+    path = _canonical_file_path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     _reject_symlink_parent(path)
 
     flags = os.O_WRONLY | os.O_CREAT | (os.O_APPEND if append else os.O_TRUNC)
     fd = _open_regular_file_no_symlink(path, flags)
     with os.fdopen(fd, "ab") as handle:
-        handle.write(content.encode("utf-8"))
+        handle.write(content)
+
+
+def _write_text_file(path: Path, content: str, *, append: bool = False) -> None:
+    """Write UTF-8 text to a regular file without following symlinks."""
+    _write_bytes_file(path, content.encode("utf-8"), append=append)
 
 
 def _read_text_file(path: Path, *, max_bytes: int = MAX_SAFE_TEXT_FILE_BYTES) -> str:
     """Read UTF-8 text from a regular file with a byte-size cap."""
     _reject_symlink_parent(path)
-    path = _canonical_text_file_path(path)
+    path = _canonical_file_path(path)
     _reject_symlink_parent(path)
     fd = _open_regular_file_no_symlink(path, os.O_RDONLY)
     try:
@@ -387,6 +392,9 @@ class QualityThresholds:
     phrase_coverage_threshold: float = 0.4
     min_phrase_length: int = 4
     max_phrase_length: int = 10
+    min_catalog_keywords_for_repeat: int = 10
+    min_catalog_keyword_repetitions: int = 3
+    catalog_keyword_duplicate_ratio: float = 0.4
     min_context_term_length: int = 2
     min_tokens_for_substantial: int = 10
     max_words_for_minimal_output: int = 2
@@ -404,6 +412,7 @@ class QualityThresholds:
         unit_interval_fields = {
             "repetition_ratio": self.repetition_ratio,
             "phrase_coverage_threshold": self.phrase_coverage_threshold,
+            "catalog_keyword_duplicate_ratio": self.catalog_keyword_duplicate_ratio,
             "heavy_nontext_prompt_ratio": self.heavy_nontext_prompt_ratio,
             "mixed_prompt_burden_ratio_floor": self.mixed_prompt_burden_ratio_floor,
         }
@@ -896,9 +905,11 @@ type ObservationCode = Literal[
     "missing_requested_sections",
     "token_cap_truncation",
     "prompt_instruction_echo",
+    "unexpected_catalog_preamble",
     "unexpected_special_token",
     "thinking_trace_present",
     "thinking_trace_incomplete",
+    "role_boundary_token_present",
     "no_keyword_overlap",
 ]
 type UpstreamBoundary = Literal["not_started", "load_started", "generation_started"]
@@ -956,6 +967,7 @@ class CheckModelsProvenanceRecord(TypedDict):
     version: str
     git_revision: str | None
     install_type: Literal["editable", "installed", "source-tree", "unknown"]
+    dirty: NotRequired[bool | None]
 
 
 class JsonlMetadataRecord(TypedDict, total=False):
@@ -1043,6 +1055,20 @@ class JsonlAssessmentRecord(TypedDict):
     usability: ModelUsability
     maintainer_status: MaintainerStatus
     observations: list[ObservationCode]
+    details: NotRequired[JsonlObservationDetailsRecord]
+
+
+class JsonlObservationDetailsRecord(TypedDict, total=False):
+    """Exact mechanical evidence behind compact observation codes."""
+
+    missing_sections: list[str]
+    repeated_fragment: str
+    instruction_echo_fragments: list[str]
+    unexpected_catalog_preamble: str
+    unexpected_special_tokens: list[str]
+    thinking_trace_markers: list[str]
+    role_boundary_tokens: list[str]
+    token_cap_reasons: list[str]
 
 
 class JsonlFailureRecord(TypedDict, total=False):
@@ -1623,6 +1649,7 @@ class PerformanceResult:
     requested_max_tokens: int | None = None
     prompt_diagnostics: PromptDiagnostics | None = None
     rerun_evidence: RerunEvidence | None = None
+    completed_at: str | None = None
 
 
 @dataclass(frozen=True)
@@ -2072,12 +2099,16 @@ def _render_report_raw_markdown(block: ReportRaw) -> list[str]:
 
 def _render_report_model_output_markdown(block: ReportModelOutput) -> list[str]:
     """Render readable model Markdown and a byte-preserving collapsed raw view."""
-    presentation = html.escape(block.content, quote=False).replace("@", r"\@")
-    rendered = [f"{_markdown_emphasis('Readable output:')}", ""]
-    rendered.extend(
-        ">" if not line else f"> {line.rstrip()}  " for line in presentation.split("\n")
-    )
-    rendered.append("")
+    readable = "\n".join(line.rstrip() for line in block.content.split("\n"))
+    presentation = html.escape(readable, quote=False).replace("`", "&#96;").replace("@", "&#64;")
+    rendered = [
+        f"{_markdown_emphasis('Readable output:')}",
+        "",
+        '<pre class="model-output-readable">',
+        presentation,
+        "</pre>",
+        "",
+    ]
     _append_markdown_details_block(
         rendered,
         summary=block.raw_summary,
@@ -2125,6 +2156,7 @@ def render_report_markdown(blocks: Sequence[ReportBlock]) -> list[str]:
     parts: list[str] = []
     for block in blocks:
         _append_report_markdown_block(parts, block)
+    while parts and parts[-1] == "":
         parts.pop()
     return parts
 
@@ -3224,12 +3256,8 @@ def _detect_repetitive_output(text: str, threshold: float | None = None) -> tupl
     if threshold is None:
         threshold = QUALITY.repetition_ratio
 
-    if not text or len(text) < QUALITY.min_text_length:
-        return False, None
-
-    # 1. Check for single token repetition
     tokens = text.split()
-    if len(tokens) < QUALITY.min_token_count:
+    if not text or len(text) < QUALITY.min_text_length or len(tokens) < QUALITY.min_token_count:
         return False, None
 
     token_counts = Counter(tokens)
@@ -3237,6 +3265,10 @@ def _detect_repetitive_output(text: str, threshold: float | None = None) -> tupl
         most_common_token, count = token_counts.most_common(1)[0]
         if count / len(tokens) >= threshold:
             return True, most_common_token
+
+    repeated_item = _repeated_catalog_keyword(text)
+    if repeated_item is not None:
+        return True, f'keyword: "{repeated_item[:30]}"'
 
     # 2. Check for phrase repetition (n-grams)
     # Look for repeated sequences of configurable length (default 4+ tokens)
@@ -3317,8 +3349,23 @@ def _normalize_output_for_analysis(
     return NormalizedOutput(text=normalized, removed_wrappers=tuple(removed))
 
 
+def _configured_role_boundaries(text: str, wrappers: Sequence[str]) -> list[str]:
+    """Return configured conversation-role tokens that escaped into model output."""
+    leading_start = len(text) - len(text.lstrip())
+    boundaries: list[str] = []
+    for token in wrappers:
+        token_lower = token.casefold()
+        position = text.find(token)
+        if position < 0 or not any(role in token_lower for role in ("user", "assistant", "system")):
+            continue
+        if "assistant" not in token_lower or position > leading_start:
+            boundaries.append(token)
+    return _dedupe_preserve_order(boundaries)
+
+
 PROMPT_ECHO_MARKERS: Final[tuple[str, ...]] = (
     "return exactly these three sections",
+    "prompt instructions",
     "do not output reasoning",
     "do not copy context hints verbatim",
     "context: existing metadata hints",
@@ -3455,6 +3502,26 @@ def _split_catalog_keywords(raw_keywords: str) -> list[str]:
     return keywords
 
 
+def _repeated_catalog_keyword(text: str) -> str | None:
+    """Return a repeated keyword when a catalog list is dominated by duplicates."""
+    raw_keywords = _extract_catalog_sections(text).get("keywords", "")
+    keywords = [
+        _normalize_phrase_for_matching(item) for item in _split_catalog_keywords(raw_keywords)
+    ]
+    keywords = [item for item in keywords if item]
+    if len(keywords) < QUALITY.min_catalog_keywords_for_repeat:
+        return None
+    counts = Counter(keywords)
+    repeated, count = counts.most_common(1)[0]
+    duplicate_ratio = (len(keywords) - len(counts)) / len(keywords)
+    return (
+        repeated
+        if count >= QUALITY.min_catalog_keyword_repetitions
+        and duplicate_ratio >= QUALITY.catalog_keyword_duplicate_ratio
+        else None
+    )
+
+
 def _keyword_overlap_state(
     reference: Sequence[str],
     generated: Sequence[str],
@@ -3502,15 +3569,18 @@ def _extract_trusted_hint_bundle(
     return TrustedHintBundle(tuple(_dedupe_preserve_order(hinted_keywords)))
 
 
+CATALOG_SECTION_PATTERN: Final[re.Pattern[str]] = re.compile(
+    r"(?im)^\s*(?:[#>*-]\s*)?\*{0,2}\s*(title|description|keywords)"
+    r"(?::\s*\*{0,2}|\*{0,2}\s*:)\s*(.*)$",
+)
+
+
 def _extract_catalog_sections(text: str) -> dict[str, str]:
     """Extract ``Title/Description/Keywords`` sections from model output."""
     if not text:
         return {}
 
-    pattern: re.Pattern[str] = re.compile(
-        r"(?im)^\s*(?:[#>*-]\s*)?(?:\*{0,2})\s*(title|description|keywords)(?:\*{0,2})\s*:\s*(.*)$",
-    )
-    matches: list[re.Match[str]] = list(pattern.finditer(text))
+    matches: list[re.Match[str]] = list(CATALOG_SECTION_PATTERN.finditer(text))
     if not matches:
         return {}
 
@@ -3539,13 +3609,24 @@ def _prompt_requests_catalog_contract(prompt: str) -> bool:
 
 
 def _missing_catalog_sections(text: str) -> list[str]:
-    """Return requested catalog sections that contain no output."""
+    """Return requested catalog sections that are absent or structurally empty."""
     sections: dict[str, str] = _extract_catalog_sections(text)
-    return [
-        section
-        for section in ("title", "description", "keywords")
-        if not sections.get(section, "").strip()
+    missing = [
+        section for section in ("title", "description", "keywords") if not sections.get(section)
     ]
+    title_lines = [line.strip() for line in sections.get("title", "").splitlines() if line.strip()]
+    if len(title_lines) > 1:
+        missing.append("title")
+    return _dedupe_preserve_order(missing)
+
+
+def _unexpected_catalog_preamble(text: str) -> str | None:
+    """Return non-wrapper text emitted before the first requested catalog section."""
+    first_section = CATALOG_SECTION_PATTERN.search(text)
+    if first_section is None:
+        return None
+    preamble = _strip_empty_thinking_wrappers(text[: first_section.start()]).strip()
+    return preamble or None
 
 
 @dataclass(frozen=True)
@@ -3592,12 +3673,46 @@ def _detect_reasoning_output(
     )
 
 
-def _detect_instruction_echo(text: str) -> tuple[bool, list[str]]:
+def _shared_normalized_word_span(text: str, prompt: str, *, size: int = 8) -> str | None:
+    """Return one substantial word span copied from the prompt into the output."""
+    text_words = _normalize_phrase_for_matching(text).split()
+    if len(text_words) < size:
+        return None
+    context_labels = (
+        "context:",
+        "capture date/time:",
+        "gps:",
+        "title hint:",
+        "description hint:",
+        "keyword hints:",
+        "existing title:",
+        "existing description:",
+        "existing keywords:",
+    )
+    prompt_spans: set[tuple[str, ...]] = set()
+    for line in prompt.splitlines():
+        stripped = line.strip().lstrip("-*• ").casefold()
+        if not stripped or stripped.startswith(context_labels):
+            continue
+        words = _normalize_phrase_for_matching(stripped).split()
+        prompt_spans.update(
+            tuple(words[index : index + size]) for index in range(len(words) - size + 1)
+        )
+    for index in range(len(text_words) - size + 1):
+        span = tuple(text_words[index : index + size])
+        if span in prompt_spans:
+            return " ".join(span)
+    return None
+
+
+def _detect_instruction_echo(text: str, prompt: str | None = None) -> tuple[bool, list[str]]:
     """Detect direct reuse of prompt/task instructions in the answer."""
     if not text:
         return False, []
     text_lower = text.casefold()
     findings = [marker for marker in PROMPT_ECHO_MARKERS if marker in text_lower]
+    if prompt and (shared_span := _shared_normalized_word_span(text, prompt)):
+        findings.append(shared_span)
     deduped = _dedupe_preserve_order(findings)
     return bool(deduped), deduped[:4]
 
@@ -3743,12 +3858,16 @@ class GenerationQualityAnalysis:
     word_count: int = 0
     prompt_checks_ran: bool = False
     instruction_echo: bool = False
+    instruction_echo_fragments: list[str] = dataclass_field(default_factory=list)
+    unexpected_catalog_preamble: str | None = None
     likely_capped: bool = False
+    token_cap_reasons: list[str] = dataclass_field(default_factory=list)
     requested_max_tokens: int | None = None
     prompt_tokens_total: int | None = None
     prompt_tokens_text_est: int | None = None
     prompt_tokens_nontext_est: int | None = None
     special_token_wrappers: list[str] = dataclass_field(default_factory=list)
+    role_boundary_tokens: list[str] = dataclass_field(default_factory=list)
     unexpected_special_tokens: list[str] = dataclass_field(default_factory=list)
     keyword_overlap: KeywordOverlapState = "not_assessable"
 
@@ -3761,6 +3880,8 @@ class PromptQualitySignals:
     thinking_trace_incomplete: bool = False
     thinking_trace_markers: tuple[str, ...] = ()
     instruction_echo: bool = False
+    instruction_echo_fragments: tuple[str, ...] = ()
+    unexpected_catalog_preamble: str | None = None
     missing_sections: tuple[str, ...] = ()
     keyword_overlap: KeywordOverlapState = "not_assessable"
 
@@ -3769,7 +3890,6 @@ def _collect_prompt_quality_signals(
     text: str,
     *,
     raw_text: str | None = None,
-    generated_tokens: int | None,
     prompt: str | None,
     context_marker: str,
     thinking_trace_delimiters: Sequence[tuple[str, str]],
@@ -3779,23 +3899,22 @@ def _collect_prompt_quality_signals(
         raw_text or text,
         delimiter_pairs=thinking_trace_delimiters,
     )
-    instruction_echo, _instruction_markers = _detect_instruction_echo(text)
+    instruction_echo, instruction_markers = _detect_instruction_echo(text, prompt)
     if not prompt:
         return PromptQualitySignals(
             has_thinking_trace=reasoning_signals.has_thinking_trace,
             thinking_trace_incomplete=reasoning_signals.thinking_trace_incomplete,
             thinking_trace_markers=reasoning_signals.thinking_trace_markers,
             instruction_echo=instruction_echo,
+            instruction_echo_fragments=tuple(instruction_markers),
         )
 
     prompt_bundle = _extract_trusted_hint_bundle(prompt, context_marker=context_marker)
     missing_sections: list[str] = []
-    if (
-        generated_tokens is not None
-        and generated_tokens >= QUALITY.min_tokens_for_substantial
-        and _prompt_requests_catalog_contract(prompt)
-    ):
+    unexpected_preamble: str | None = None
+    if _prompt_requests_catalog_contract(prompt):
         missing_sections = _missing_catalog_sections(text)
+        unexpected_preamble = _unexpected_catalog_preamble(text)
     generated_keywords = _split_catalog_keywords(
         _extract_catalog_sections(text).get("keywords", "")
     )
@@ -3809,6 +3928,8 @@ def _collect_prompt_quality_signals(
         thinking_trace_incomplete=reasoning_signals.thinking_trace_incomplete,
         thinking_trace_markers=reasoning_signals.thinking_trace_markers,
         instruction_echo=instruction_echo,
+        instruction_echo_fragments=tuple(instruction_markers),
+        unexpected_catalog_preamble=unexpected_preamble,
         missing_sections=tuple(missing_sections),
         keyword_overlap=keyword_overlap,
     )
@@ -3834,7 +3955,6 @@ def analyze_generation_text(
     prompt_signals = _collect_prompt_quality_signals(
         analysis_text,
         raw_text=text,
-        generated_tokens=generated_tokens,
         prompt=prompt,
         context_marker=context_marker,
         thinking_trace_delimiters=thinking_trace_delimiters,
@@ -3845,7 +3965,7 @@ def analyze_generation_text(
         if (prompt_tokens is not None and prompt_tokens_text_est is not None)
         else None
     )
-    likely_capped, _cutoff_reasons = _detect_likely_cutoff(
+    likely_capped, cutoff_reasons = _detect_likely_cutoff(
         analysis_text,
         generated_tokens=generated_tokens,
         requested_max_tokens=requested_max_tokens,
@@ -3873,12 +3993,16 @@ def analyze_generation_text(
         word_count=len(re.findall(r"\b\w+\b", analysis_text)),
         prompt_checks_ran=bool(prompt),
         instruction_echo=prompt_signals.instruction_echo,
+        instruction_echo_fragments=list(prompt_signals.instruction_echo_fragments),
+        unexpected_catalog_preamble=prompt_signals.unexpected_catalog_preamble,
         likely_capped=likely_capped,
+        token_cap_reasons=cutoff_reasons,
         requested_max_tokens=requested_max_tokens,
         prompt_tokens_total=prompt_tokens,
         prompt_tokens_text_est=prompt_tokens_text_est,
         prompt_tokens_nontext_est=prompt_tokens_nontext_est,
         special_token_wrappers=list(normalized.removed_wrappers),
+        role_boundary_tokens=_configured_role_boundaries(text, normalized.removed_wrappers),
         unexpected_special_tokens=unexpected_special_tokens,
         keyword_overlap=prompt_signals.keyword_overlap,
     )
@@ -6708,6 +6832,9 @@ def _gallery_row(result: PerformanceResult, assessment: ResultAssessment) -> Gal
         model=result.model_name,
         usability=assessment.usability,
         observations=assessment.observations,
+        total_time_s=(
+            result.total_time if result.total_time is not None and result.total_time >= 0 else None
+        ),
         generation_tps=_valid_generation_tps(result),
         peak_memory_gb=(peak_memory if peak_memory is not None and peak_memory >= 0 else None),
         generation_tokens=_generation_int_metric(generation, "generation_tokens"),
@@ -6732,6 +6859,11 @@ def _gallery_throughput_cell(row: GalleryRow) -> str:
     if row.generation_tokens is not None and row.generation_tokens < MIN_THROUGHPUT_SAMPLE_TOKENS:
         return "insufficient sample"
     return "-"
+
+
+def _gallery_total_time_cell(row: GalleryRow) -> str:
+    """Render captured end-to-end model time ahead of decode-only throughput."""
+    return _format_time_seconds(row.total_time_s) if row.total_time_s is not None else "-"
 
 
 def _render_gallery_table(
@@ -6762,6 +6894,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
         (
             _gallery_summary_model_link(row.model),
             _markdown_inline_code(row.usability),
+            _gallery_total_time_cell(row),
             _gallery_throughput_cell(row),
             _gallery_metric("peak_memory", row.peak_memory_gb),
             _gallery_metric("generation_tokens", row.generation_tokens),
@@ -6774,7 +6907,8 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
         "## Current-run Chooser",
         "",
         (
-            "Current-run usability and captured resource facts only. Throughput requires "
+            "Current-run usability and captured resource facts only. Total time is end-to-end; "
+            "throughput covers generation only and requires "
             f"at least {MIN_THROUGHPUT_SAMPLE_TOKENS} generated tokens."
         ),
         "",
@@ -6782,6 +6916,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
             headers=(
                 "Model",
                 "Usability",
+                "Total s",
                 "Gen TPS",
                 "Peak GB",
                 "Gen tok",
@@ -6959,6 +7094,7 @@ class GalleryRow:
     model: str
     usability: ModelUsability
     observations: tuple[ObservationCode, ...]
+    total_time_s: float | None
     generation_tps: float | None
     peak_memory_gb: float | None
     generation_tokens: int | None
@@ -6970,6 +7106,8 @@ _UNUSABLE_OBSERVATIONS: Final[frozenset[ObservationCode]] = frozenset(
         "empty_output",
         "repeated_output",
         "missing_requested_sections",
+        "prompt_instruction_echo",
+        "unexpected_catalog_preamble",
     }
 )
 
@@ -7012,12 +7150,16 @@ def _assessment_observations(result: PerformanceResult) -> tuple[ObservationCode
         observations.append("token_cap_truncation")
     if analysis.instruction_echo:
         observations.append("prompt_instruction_echo")
+    if analysis.unexpected_catalog_preamble:
+        observations.append("unexpected_catalog_preamble")
     if analysis.unexpected_special_tokens:
         observations.append("unexpected_special_token")
     if analysis.has_thinking_trace:
         observations.append("thinking_trace_present")
     if analysis.thinking_trace_incomplete:
         observations.append("thinking_trace_incomplete")
+    if analysis.role_boundary_tokens:
+        observations.append("role_boundary_token_present")
     if analysis.keyword_overlap == "no_overlap":
         observations.append("no_keyword_overlap")
     return tuple(observations)
@@ -7046,14 +7188,45 @@ def _assess_result(result: PerformanceResult) -> ResultAssessment:
     return ResultAssessment(execution, usability, maintainer_status, observations)
 
 
-def _assessment_to_json(assessment: ResultAssessment) -> JsonlAssessmentRecord:
+def _observation_details(result: PerformanceResult) -> JsonlObservationDetailsRecord:
+    """Return non-empty exact evidence for the result's mechanical observations."""
+    analysis = result.quality_analysis
+    if analysis is None:
+        return {}
+    details: JsonlObservationDetailsRecord = {}
+    if analysis.missing_sections:
+        details["missing_sections"] = list(analysis.missing_sections)
+    if analysis.repeated_token:
+        details["repeated_fragment"] = analysis.repeated_token
+    if analysis.instruction_echo_fragments:
+        details["instruction_echo_fragments"] = list(analysis.instruction_echo_fragments)
+    if analysis.unexpected_catalog_preamble:
+        details["unexpected_catalog_preamble"] = analysis.unexpected_catalog_preamble
+    if analysis.unexpected_special_tokens:
+        details["unexpected_special_tokens"] = list(analysis.unexpected_special_tokens)
+    if analysis.thinking_trace_markers:
+        details["thinking_trace_markers"] = list(analysis.thinking_trace_markers)
+    if analysis.role_boundary_tokens:
+        details["role_boundary_tokens"] = list(analysis.role_boundary_tokens)
+    if analysis.token_cap_reasons:
+        details["token_cap_reasons"] = list(analysis.token_cap_reasons)
+    return details
+
+
+def _assessment_to_json(
+    assessment: ResultAssessment,
+    result: PerformanceResult | None = None,
+) -> JsonlAssessmentRecord:
     """Serialize the sole current-run status record for machine artifacts."""
-    return {
+    record: JsonlAssessmentRecord = {
         "execution": assessment.execution,
         "usability": assessment.usability,
         "maintainer_status": assessment.maintainer_status,
         "observations": list(assessment.observations),
     }
+    if result is not None and (details := _observation_details(result)):
+        record["details"] = details
+    return record
 
 
 @dataclass(frozen=True)
@@ -7741,52 +7914,54 @@ def _diagnostics_result_facts(
     ) or getattr(run_args, "revision", None)
     processor = prompt_diagnostics.processor_class if prompt_diagnostics is not None else None
     tokenizer = prompt_diagnostics.tokenizer_class if prompt_diagnostics is not None else None
-    return (
+    rows: list[tuple[str, str]] = [
         ("Execution", assessment.execution),
         ("Usability", assessment.usability),
         ("Maintainer status", assessment.maintainer_status),
         ("Observations", ", ".join(assessment.observations) or "none"),
-        ("Phase", _diagnostics_fact(result.failure_phase)),
-        ("Stage", _diagnostics_fact(result.error_stage)),
-        ("Package", _diagnostics_fact(result.error_package)),
-        ("Error type", _diagnostics_fact(result.error_type)),
-        ("Error message", _diagnostics_fact(result.error_message)),
-        ("Root error type", _diagnostics_fact(result.root_error_type)),
-        ("Root error message", _diagnostics_fact(result.root_error_message)),
-        ("Resolved model revision", _diagnostics_fact(resolved_revision)),
-        ("Requested model revision", _diagnostics_fact(requested_revision)),
-        ("Processor class", _diagnostics_fact(processor)),
-        ("Tokenizer class", _diagnostics_fact(tokenizer)),
-        ("Stop reason", _diagnostics_fact(runtime.stop_reason if runtime is not None else None)),
-        (
-            "Prompt tokens",
-            _diagnostics_fact(_generation_int_metric(result.generation, "prompt_tokens")),
-        ),
-        (
-            "Generation tokens",
-            _diagnostics_fact(_generation_int_metric(result.generation, "generation_tokens")),
-        ),
+    ]
+    detail_labels = {
+        "missing_sections": "Missing sections",
+        "repeated_fragment": "Repeated fragment",
+        "instruction_echo_fragments": "Echoed instruction fragments",
+        "unexpected_catalog_preamble": "Unexpected text before Title",
+        "unexpected_special_tokens": "Unexpected special tokens",
+        "thinking_trace_markers": "Thinking trace markers",
+        "role_boundary_tokens": "Role-boundary tokens in output",
+        "token_cap_reasons": "Token-cap degradation evidence",
+    }
+    rows.extend(
+        (detail_labels[key], _diagnostics_fact(value))
+        for key, value in _observation_details(result).items()
+    )
+    optional_facts = (
+        ("Phase", result.failure_phase),
+        ("Stage", result.error_stage),
+        ("Package", result.error_package),
+        ("Error type", result.error_type),
+        ("Error message", result.error_message),
+        ("Root error type", result.root_error_type),
+        ("Root error message", result.root_error_message),
+        ("Resolved model revision", resolved_revision),
+        ("Requested model revision", requested_revision),
+        ("Processor class", processor),
+        ("Tokenizer class", tokenizer),
+        ("Stop reason", runtime.stop_reason if runtime is not None else None),
+        ("Prompt tokens", _generation_int_metric(result.generation, "prompt_tokens")),
+        ("Generation tokens", _generation_int_metric(result.generation, "generation_tokens")),
         (
             "Configured EOS token ID",
-            _diagnostics_fact(prompt_diagnostics.eos_token_id if prompt_diagnostics else None),
+            prompt_diagnostics.eos_token_id if prompt_diagnostics else None,
         ),
-        (
-            "Configured EOS token",
-            _diagnostics_fact(prompt_diagnostics.eos_token if prompt_diagnostics else None),
-        ),
-        (
-            "Configured EOS token override",
-            _diagnostics_fact(generation_kwargs.get("eos_tokens")),
-        ),
-        (
-            "Configured thinking start token",
-            _diagnostics_fact(generation_kwargs.get("thinking_start_token")),
-        ),
-        (
-            "Configured thinking end token",
-            _diagnostics_fact(generation_kwargs.get("thinking_end_token")),
-        ),
+        ("Configured EOS token", prompt_diagnostics.eos_token if prompt_diagnostics else None),
+        ("Configured EOS token override", generation_kwargs.get("eos_tokens")),
+        ("Configured thinking start token", generation_kwargs.get("thinking_start_token")),
+        ("Configured thinking end token", generation_kwargs.get("thinking_end_token")),
     )
+    rows.extend(
+        (label, _diagnostics_fact(value)) for label, value in optional_facts if value is not None
+    )
+    return tuple(rows)
 
 
 def _diagnostics_model_anchor(model_name: str) -> str:
@@ -7838,7 +8013,7 @@ def _diagnostics_model_blocks(
     if result.generation is not None:
         generated_output = _generation_text_value(result.generation) or "(empty)"
         if assessment.execution == "completed":
-            output_block: ReportBlock = ReportModelOutput(generated_output)
+            output_block: ReportBlock = ReportCodeBlock(generated_output)
             output_title = "Complete output"
         else:
             output_block = ReportCodeBlock(generated_output)
@@ -7868,7 +8043,7 @@ def _diagnostics_counts_blocks(
     )
     outcome_rows = (
         ("Attempted", str(outcomes["models_attempted"])),
-        ("Evaluated", str(outcomes["models_evaluated"])),
+        ("Conclusive outcomes", str(outcomes["models_evaluated"])),
         ("Completed", str(outcomes["models_completed"])),
         ("Crashed", str(outcomes["models_crashed"])),
         ("Indeterminate", str(outcomes["models_indeterminate"])),
@@ -7960,7 +8135,8 @@ def _diagnostics_partition_blocks(
                 else "indeterminate"
             )
             entry = ReportDetails(
-                f"{result.model_name} — {assessment.usability} — {detail}", evidence
+                f"{result.model_name} — {assessment.usability} — {detail}",
+                (ReportSection(result.model_name, evidence, level=3),),
             )
         blocks.extend((anchor_block, entry))
     return tuple(blocks) or (ReportParagraph("None."),)
@@ -8168,50 +8344,53 @@ applyAssessmentFilters();
 """
 
 
+def _report_image_preview(image_path: Path | None) -> tuple[str, str, bytes] | None:
+    """Return a bounded, orientation-corrected preview shared by report formats."""
+    if image_path is None or not image_path.is_file():
+        return None
+    output_formats: Mapping[str, tuple[str, str, str]] = {
+        ".jpg": (".jpg", "JPEG", "image/jpeg"),
+        ".jpeg": (".jpeg", "JPEG", "image/jpeg"),
+        ".png": (".png", "PNG", "image/png"),
+        ".gif": (".gif", "GIF", "image/gif"),
+        ".webp": (".webp", "WEBP", "image/webp"),
+    }
+    suffix, image_format, mime_type = output_formats.get(
+        image_path.suffix.casefold(),
+        (".jpg", "JPEG", "image/jpeg"),
+    )
+    try:
+        with Image.open(image_path) as img_original:
+            img_to_save: PILImage = ImageOps.exif_transpose(img_original).copy()
+        try:
+            img_to_save.thumbnail((1024, 1024), Image.Resampling.LANCZOS)
+            if image_format == "JPEG" and img_to_save.mode not in {"RGB", "L"}:
+                converted = img_to_save.convert("RGB")
+                img_to_save.close()
+                img_to_save = converted
+            img_buffer = io.BytesIO()
+            img_to_save.save(img_buffer, format=image_format)
+        finally:
+            img_to_save.close()
+    except (OSError, ValueError):
+        logger.warning("Failed to prepare report image preview: %s", image_path)
+        return None
+    return suffix, mime_type, img_buffer.getvalue()
+
+
 def _html_embedded_image(image_path: Path | None) -> str:
     """Return an orientation-corrected embedded preview when an image is available."""
-    if image_path is None or not image_path.exists():
+    preview = _report_image_preview(image_path)
+    if preview is None:
         return ""
-    try:
-        with (
-            Image.open(image_path) as img_original,
-            ImageOps.exif_transpose(img_original) as img_oriented,
-        ):
-            max_size = 1024
-            img_to_save: PILImage = img_oriented
-            if img_oriented.width > max_size or img_oriented.height > max_size:
-                ratio = min(max_size / img_oriented.width, max_size / img_oriented.height)
-                img_to_save = img_oriented.resize(
-                    (int(img_oriented.width * ratio), int(img_oriented.height * ratio)),
-                    Image.Resampling.LANCZOS,
-                )
-            img_buffer = io.BytesIO()
-            extension = image_path.suffix.lower()
-            image_format = {
-                ".jpg": "JPEG",
-                ".jpeg": "JPEG",
-                ".png": "PNG",
-                ".gif": "GIF",
-                ".webp": "WEBP",
-            }.get(extension, "JPEG")
-            img_to_save.save(img_buffer, format=image_format)
-            image_data = base64.b64encode(img_buffer.getvalue()).decode("utf-8")
-            mime_type = {
-                ".jpg": "image/jpeg",
-                ".jpeg": "image/jpeg",
-                ".png": "image/png",
-                ".gif": "image/gif",
-                ".webp": "image/webp",
-            }.get(extension, "image/jpeg")
-            return (
-                '<section id="test-image"><h2>Test Image</h2>'
-                f'<img src="data:{html.escape(mime_type, quote=True)};base64,'
-                f'{html.escape(image_data, quote=True)}" class="embedded-image" '
-                'alt="Test image used for model evaluation"></section>'
-            )
-    except (OSError, ValueError):
-        logger.warning("Failed to embed image: %s", image_path)
-        return ""
+    _suffix, mime_type, image_bytes = preview
+    image_data = base64.b64encode(image_bytes).decode("utf-8")
+    return (
+        '<section id="test-image"><h2>Test Image</h2>'
+        f'<img src="data:{html.escape(mime_type, quote=True)};base64,'
+        f'{html.escape(image_data, quote=True)}" class="embedded-image" '
+        'alt="Test image used for model evaluation"></section>'
+    )
 
 
 def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
@@ -8235,6 +8414,7 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
             assessments[row.model].execution,
             row.usability,
             assessments[row.model].maintainer_status,
+            _gallery_total_time_cell(row),
             _gallery_throughput_cell(row),
             _gallery_metric("peak_memory", row.peak_memory_gb),
             _gallery_metric("generation_tokens", row.generation_tokens),
@@ -8250,7 +8430,8 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
         '<section id="current-run-chooser">',
         "<h2>Current-run Chooser</h2>",
         (
-            "<p>Current-run usability and captured resource facts only. Throughput requires "
+            "<p>Current-run usability and captured resource facts only. Total time is "
+            "end-to-end; throughput covers generation only and requires "
             f"at least {MIN_THROUGHPUT_SAMPLE_TOKENS} generated tokens.</p>"
         ),
         _html_filter_controls(),
@@ -8262,6 +8443,7 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
                 "Execution",
                 "Usability",
                 "Maintainer status",
+                "Total s",
                 "Gen TPS",
                 "Peak GB",
                 "Gen tok",
@@ -8717,6 +8899,7 @@ def generate_markdown_gallery_report(
     metadata: MetadataDict | None = None,
     report_context: ReportRenderContext | None = None,
     versions: LibraryVersionDict | None = None,
+    image_path: Path | None = None,
 ) -> None:
     """Write the facts-only current-run chooser and complete model evidence."""
     if not results:
@@ -8744,6 +8927,23 @@ def generate_markdown_gallery_report(
         ),
     )
     md.append("")
+    if (preview := _report_image_preview(image_path)) is not None:
+        suffix, _mime_type, image_bytes = preview
+        asset = filename.parent / "assets" / f"source-image{suffix}"
+        try:
+            asset.parent.mkdir(parents=True, exist_ok=True)
+            _write_bytes_file(asset, image_bytes)
+        except OSError:
+            logger.warning("Failed to publish gallery reference image: %s", asset)
+        else:
+            md.extend(
+                (
+                    "## Reference Image",
+                    "",
+                    f"![Reference image](assets/{asset.name})",
+                    "",
+                )
+            )
     md.extend(_render_gallery_chooser(gallery_rows))
     md.extend(
         _build_gallery_stamps_section(
@@ -8851,7 +9051,12 @@ def get_system_info() -> tuple[str, str | None]:
     return arch, gpu_info
 
 
-def _run_macos_toolchain_command(command: Sequence[str], *, timeout: int = 2) -> str | None:
+def _run_macos_toolchain_command(
+    command: Sequence[str],
+    *,
+    timeout: int = 2,
+    empty_output: str | None = None,
+) -> str | None:
     """Run a macOS toolchain probe and return stripped stdout on success."""
     try:
         result = subprocess.run(  # noqa: S603 - fixed macOS toolchain probes only
@@ -8866,7 +9071,7 @@ def _run_macos_toolchain_command(command: Sequence[str], *, timeout: int = 2) ->
     if result.returncode != 0:
         return None
     output = result.stdout.strip()
-    return output or None
+    return output or empty_output
 
 
 @lru_cache(maxsize=1)
@@ -11684,6 +11889,8 @@ def _preview_generation(
         log_warning_note("Expected thinking trace did not reach a final answer")
     if analysis.instruction_echo:
         log_warning_note("Instruction text appears in output")
+    if analysis.unexpected_catalog_preamble:
+        log_warning_note("Unexpected text appears before the Title section")
     if analysis.likely_capped:
         log_warning_note(f"Output reached requested token limit ({gen_tokens} tokens)")
     if analysis.unexpected_special_tokens:
@@ -11734,6 +11941,8 @@ def _log_verbose_success_details_mode(
         log_warning_note(
             f"Unexpected special token(s): {', '.join(analysis.unexpected_special_tokens)}"
         )
+    if analysis.unexpected_catalog_preamble:
+        log_warning_note("Unexpected text appears before the Title section")
 
     if not gen_text:
         log_metric_label("Generated Text:", emoji="📝")
@@ -12988,7 +13197,7 @@ def process_models(
                     result.quality_issues,
                 )
 
-        results.append(result)
+        results.append(replace(result, completed_at=local_now_str()))
 
     return results
 
@@ -13038,6 +13247,10 @@ def _format_quality_analysis_for_log(analysis: GenerationQualityAnalysis) -> str
             analysis.thinking_trace_incomplete,
         ),
         _format_quality_log_flag("instruction_echo", analysis.instruction_echo),
+        _format_quality_log_flag(
+            "unexpected_catalog_preamble",
+            bool(analysis.unexpected_catalog_preamble),
+        ),
         _format_quality_log_flag("likely_capped", analysis.likely_capped),
         _format_quality_log_flag(
             "unexpected_special_token",
@@ -13073,6 +13286,7 @@ def _build_quality_issues_string(analysis: GenerationQualityAnalysis) -> str | N
             "thinking-trace",
         ),
         (analysis.instruction_echo, "instruction-echo"),
+        (bool(analysis.unexpected_catalog_preamble), "unexpected-catalog-preamble"),
         (bool(analysis.unexpected_special_tokens), "unexpected-special-token"),
         (
             analysis.likely_capped
@@ -13087,18 +13301,6 @@ def _build_quality_issues_string(analysis: GenerationQualityAnalysis) -> str | N
     ]
     issues = [label for condition, label in issue_candidates if condition]
     return ", ".join(issues) if issues else None
-
-
-QUALITY_ISSUE_PATTERNS: Final[dict[str, re.Pattern[str]]] = {
-    "repetitive": re.compile(r"\brepetitive\b", re.IGNORECASE),
-    "missing_sections": re.compile(r"\bmissing-sections\b", re.IGNORECASE),
-    "thinking_incomplete": re.compile(r"\bthinking-incomplete\b", re.IGNORECASE),
-    "thinking_trace": re.compile(r"\bthinking-trace\b", re.IGNORECASE),
-    "instruction_echo": re.compile(r"\binstruction-echo\b", re.IGNORECASE),
-    "unexpected_special_token": re.compile(r"unexpected-special-token", re.IGNORECASE),
-    "token_cap_truncation": re.compile(r"token-cap-truncation", re.IGNORECASE),
-    "no_keyword_overlap": re.compile(r"no-keyword-overlap", re.IGNORECASE),
-}
 
 
 def _truncate_text_preview(text: str, *, max_chars: int) -> str:
@@ -13928,8 +14130,8 @@ def _build_jsonl_result_record(
     record: JsonlResultRecord = {
         "_type": "result",
         "model": result.model_name,
-        "timestamp": local_now_str(),
-        "assessment": _assessment_to_json(assessment),
+        "timestamp": result.completed_at or local_now_str(),
+        "assessment": _assessment_to_json(assessment, result),
         "generated_text": _generation_text_value(generation),
         "captured_output_on_fail": _home_relative_report_text(result.captured_output_on_fail or ""),
         "failure": failure,
@@ -14028,11 +14230,20 @@ def _collect_check_models_provenance() -> CheckModelsProvenanceRecord:
         install_type = "installed"
     else:
         install_type = "unknown"
+    status = (
+        _run_macos_toolchain_command(
+            ("git", "-C", str(_REPO_ROOT), "status", "--porcelain", "--untracked-files=no"),
+            empty_output="",
+        )
+        if revision is not None
+        else None
+    )
     return {
         "name": "check_models",
         "version": package_version,
         "git_revision": revision,
         "install_type": install_type,
+        "dirty": bool(status) if status is not None else None,
     }
 
 
@@ -14821,13 +15032,15 @@ def _generate_github_issue_reports(
                 ),
             ),
         )
-        parts.extend(render_report_markdown(issue_blocks))
         parts.extend(
             render_report_markdown(
-                _issue_provenance_blocks(
-                    prompt=prompt,
-                    library_versions=library_versions,
-                    system_info=system_info,
+                (
+                    *issue_blocks,
+                    *_issue_provenance_blocks(
+                        prompt=prompt,
+                        library_versions=library_versions,
+                        system_info=system_info,
+                    ),
                 )
             )
         )
@@ -15025,6 +15238,7 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
             metadata=inputs.metadata,
             report_context=inputs.report_context,
             versions=inputs.library_versions,
+            image_path=inputs.image_path,
         ),
         "diagnostics": None,
         "jsonl": lambda: save_jsonl_report(

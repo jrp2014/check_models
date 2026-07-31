@@ -105,7 +105,7 @@ CATALOG_PROMPT = (
             ),
             check_models.ResultAssessment(
                 "completed",
-                "usable_with_caveats",
+                "unusable",
                 "observation_needs_reproduction",
                 ("prompt_instruction_echo",),
             ),
@@ -334,6 +334,19 @@ def test_declared_generation_wrappers_are_neutral_without_model_name_policy() ->
     assert dict(context.assessments)[result.model_name].observations == ("thinking_trace_present",)
 
 
+def test_configured_user_role_token_mid_output_is_observed_as_a_boundary() -> None:
+    result = _result(
+        "Title: Two cats\nDescription: Two cats rest indoors.\n"
+        "Keywords: cats, indoor, resting, sofa, pets, home, tabby, fur, furniture, calm"
+        "<|im_user|>Solve an unrelated equation.",
+        known_special_tokens=("<|im_user|>",),
+    )
+
+    assert result.quality_analysis is not None
+    assert result.quality_analysis.role_boundary_tokens == ["<|im_user|>"]
+    assert "role_boundary_token_present" in check_models._assess_result(result).observations
+
+
 def test_partial_keyword_overlap_is_neutral() -> None:
     result = _result(
         "Title: A blue boat at dawn\n"
@@ -369,6 +382,136 @@ def test_requested_section_parser_is_prompt_gated() -> None:
 
     assert plain.missing_sections == []
     assert requested.missing_sections == ["title", "description", "keywords"]
+
+
+def test_short_catalog_response_still_has_to_satisfy_requested_sections() -> None:
+    result = _result(
+        "Do not output the prompt instructions.",
+        generated_tokens=8,
+        prompt=CATALOG_PROMPT,
+    )
+
+    assert check_models._assess_result(result).usability == "unusable"
+    assert check_models._assess_result(result).observations == (
+        "missing_requested_sections",
+        "prompt_instruction_echo",
+    )
+
+
+def test_multiple_title_list_items_do_not_satisfy_catalog_contract() -> None:
+    result = _result(
+        "Title:\n- remote control\n- cat\n- sofa\n"
+        "Description: A cat sits beside a remote control.\n"
+        "Keywords: cat, sofa, remote, indoor, pet, furniture, resting, home, animal, room",
+        prompt=CATALOG_PROMPT,
+    )
+
+    assert result.quality_analysis is not None
+    assert result.quality_analysis.missing_sections == ["title"]
+    assert check_models._assess_result(result).usability == "unusable"
+
+
+def test_instruction_echo_detects_normalized_prompt_span() -> None:
+    prompt = (
+        f"{CATALOG_PROMPT}\n"
+        "Keywords: 10-18 unique comma-separated terms covering supplied authoritative "
+        "context and clearly visible subjects, setting, colors, composition, and style."
+    )
+    result = _result(
+        "Title: Two cats on a sofa\n"
+        "Description: Two cats rest together indoors.\n"
+        "Keywords: supplied authoritative context and clearly visible subjects, setting, "
+        "colors, composition, and style",
+        prompt=prompt,
+    )
+
+    assert result.quality_analysis is not None
+    assert result.quality_analysis.instruction_echo is True
+    assert check_models._assess_result(result).usability == "unusable"
+
+
+def test_instruction_echo_ignores_authoritative_context_values() -> None:
+    prompt = (
+        f"{CATALOG_PROMPT}\n\n"
+        "Context: Authoritative context:\n"
+        "- Capture date/time: 2026-07-25 18:33:16 UTC+01:00\n"
+        "- GPS: 51.358240°N, 1.432820°E\n\n"
+        "Draft descriptive metadata:\n"
+        "- Existing title: Viking Bay, Broadstairs, England, UK\n"
+        "- Existing description: A sunny beach in Broadstairs, Kent.\n"
+        "- Existing keywords: beach, Broadstairs, Kent, coast"
+    )
+    result = _result(
+        "Title: Viking Bay, 2026-07-25 18:33:16 UTC+01:00\n"
+        "Description: A sunny beach in Broadstairs, Kent.\n"
+        "Keywords: beach, Broadstairs, Kent, coast, sand, sea, people, sky, "
+        "buildings, summer",
+        prompt=prompt,
+    )
+
+    assert result.quality_analysis is not None
+    assert result.quality_analysis.instruction_echo is False
+    assert check_models._assess_result(result).usability == "usable"
+
+
+def test_markdown_bold_catalog_labels_satisfy_requested_sections() -> None:
+    result = _result(
+        "**Title:**\nViking Bay Beach, Broadstairs, Kent\n\n"
+        "**Description:**\nA sunny beach scene with people and colourful huts.\n\n"
+        "**Keywords:**\nbeach, Broadstairs, Kent, coast, sand, sea, people, sky, "
+        "buildings, summer",
+        prompt=CATALOG_PROMPT,
+    )
+
+    assert result.quality_analysis is not None
+    assert result.quality_analysis.missing_sections == []
+    assert check_models._assess_result(result).usability == "usable"
+
+
+def test_text_before_catalog_sections_is_reported_as_unusable() -> None:
+    result = _result(
+        "Remove non-visual information.\n\n"
+        "Title: Viking Bay Beach, Broadstairs, Kent\n"
+        "Description: A sunny beach scene with people and colourful huts.\n"
+        "Keywords: beach, Broadstairs, Kent, coast, sand, sea, people, sky, "
+        "buildings, summer",
+        prompt=CATALOG_PROMPT,
+    )
+
+    assert result.quality_analysis is not None
+    assert result.quality_analysis.unexpected_catalog_preamble == ("Remove non-visual information.")
+    assert check_models._assess_result(result).observations == ("unexpected_catalog_preamble",)
+    assert check_models._assess_result(result).usability == "unusable"
+
+
+def test_empty_thinking_wrapper_before_catalog_sections_is_neutral() -> None:
+    result = _result(
+        "<think></think>\n"
+        "Title: Viking Bay Beach, Broadstairs, Kent\n"
+        "Description: A sunny beach scene with people and colourful huts.\n"
+        "Keywords: beach, Broadstairs, Kent, coast, sand, sea, people, sky, "
+        "buildings, summer",
+        prompt=CATALOG_PROMPT,
+    )
+
+    assert result.quality_analysis is not None
+    assert result.quality_analysis.unexpected_catalog_preamble is None
+    assert check_models._assess_result(result).usability == "usable"
+
+
+def test_repeated_keyword_cycle_is_repetitive_output() -> None:
+    cycle = "cat, sofa, indoor, pet, resting, animal, home, furniture, whiskers, fur"
+    result = _result(
+        "Title: Two cats resting indoors\n"
+        "Description: Two cats rest on a sofa.\n"
+        f"Keywords: {cycle}, {cycle}, {cycle}",
+        prompt=CATALOG_PROMPT,
+        generated_tokens=80,
+    )
+
+    assert result.quality_analysis is not None
+    assert result.quality_analysis.is_repetitive is True
+    assert check_models._assess_result(result).usability == "unusable"
 
 
 def test_contiguous_repetition_detector_ignores_distributed_reuse() -> None:

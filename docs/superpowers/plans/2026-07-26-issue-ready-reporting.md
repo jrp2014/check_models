@@ -21,7 +21,9 @@
 - Do not add lint or type suppressions. Remove newly obsolete code and suppressions where possible.
 - Validation tests must render into `tmp_path` or ignored test paths and must not modify tracked `src/output/` artefacts.
 - Do not hand-edit or reconstruct the current retained run reports.
-- Record `wc -l src/check_models.py` before and after implementation; the final count must be below the 16,214-line baseline without a brittle line-count unit test.
+- Record `wc -l src/check_models.py` before and after implementation. Use it to
+  challenge duplication, but do not trade narrow evidence contracts for an
+  arbitrary line target after approved follow-ups expand the original scope.
 - Run `make format`, `make -C src lint-fix`, and `make lint` before `make quality`.
 - Update `CHANGELOG.md` under `[Unreleased]` for the report and refactor changes.
 
@@ -580,7 +582,7 @@ git diff --stat
 
 Expected:
 
-- `src/check_models.py` is fewer than 16,214 lines;
+- source growth is accounted for and no superseded duplicate path remains;
 - `src/output/` has no validation-induced changes;
 - no whitespace errors exist;
 - the deleted format-specific diagnostic/reproduction code outweighs the new
@@ -599,3 +601,11 @@ Run `make quality`, `cd src && skylos . -a --llm`, and
 `make skylos-danger-llm` again on the exact committed tree. Confirm a clean
 working tree and report the final line-count delta. Do not regenerate the model
 matrix as part of this deterministic implementation plan.
+
+- [ ] **Step 9: Apply the approved post-run hardening amendment**
+
+Add focused regressions and implement the design appendix covering false-negative
+contract checks, exact observation details, single-copy diagnostics output,
+lint-safe readable output, reference-image publication, end-to-end chooser timing,
+configured role boundaries, dirty-worktree provenance, and completion timestamps.
+Then repeat Steps 3-6 without rewriting tracked benchmark outputs.
