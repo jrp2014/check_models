@@ -21,7 +21,9 @@ Notable changes to this project will be documented in this file.
   Skylos cleanup, and diagnostics usability quick wins under
   `docs/notes/archive/superpowers/`, and remove the empty active
   `docs/superpowers/` tree.
-
+- Shorten the default blind and assisted catalogue prompts, present existing title,
+  description, and keyword metadata explicitly as fallible hints, and keep prompt-aware
+  diagnostics compatible with retained prompts that use the former draft labels.
 - Present usable and caveated models before unusable or unevaluated attempts in
   Markdown and HTML galleries; keep crash facts above collapsible exact traceback
   detail in direct issue drafts, link those drafts from the current-run output

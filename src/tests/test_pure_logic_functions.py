@@ -442,7 +442,8 @@ class TestPreparePrompt:
             },
         )
 
-        assert "Draft descriptive metadata:" in result
+        assert "Context: Descriptive hints:" in result
+        assert "Title hint: Brick storefront" in result
         assert "Brick storefront" in result
         assert "Outdoor seating" in result
 
@@ -466,10 +467,10 @@ class TestPreparePrompt:
 
         assert "Authoritative context:" in prompt
         assert "Capture date/time: 2026-07-04 19:10:04" in prompt
-        assert "Draft descriptive metadata:" in prompt
-        assert "Existing description: Two boats on a river." in prompt
-        assert "Existing keywords: Deben Estuary, Woodbridge, boats, river" in prompt
-        assert "Treat this draft as fallible" in prompt
+        assert "Descriptive hints:" in prompt
+        assert "Description hint: Two boats on a river." in prompt
+        assert "Keyword hints: Deben Estuary, Woodbridge, boats, river" in prompt
+        assert "hints may be incomplete or wrong" in prompt
 
     def test_assisted_prompt_does_not_duplicate_time_embedded_in_capture_date(
         self,
@@ -498,7 +499,7 @@ class TestPreparePrompt:
         )
 
         assert "Authoritative context:" not in prompt
-        assert "Existing keywords: Example Harbour, Sample Village, boats" in prompt
+        assert "Keyword hints: Example Harbour, Sample Village, boats" in prompt
 
 
 # ── compute_vocabulary_diversity ───────────────────────────────────────────

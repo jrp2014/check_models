@@ -397,6 +397,49 @@ def test_assisted_output_that_changes_one_draft_field_is_not_called_unchanged() 
     assert "draft_returned_unchanged" not in check_models._assess_result(result).observations
 
 
+def test_historical_existing_labels_still_detect_unchanged_draft_fields() -> None:
+    """Retained prompts should remain analysable after generated labels change."""
+    prompt = (
+        f"{CATALOG_PROMPT}\n\n"
+        "Context: Draft descriptive metadata:\n"
+        "- Existing title: Harbour boats at dusk\n"
+        "- Existing description: Two boats rest on calm water at dusk.\n"
+        "- Existing keywords: boats, harbour, water"
+    )
+    result = _result(
+        "Title: Harbour boats at dusk\n"
+        "Description: Two boats rest on calm water at dusk.\n"
+        "Keywords: boats, harbour, water",
+        prompt=prompt,
+    )
+
+    assert result.quality_analysis is not None
+    assert result.quality_analysis.unchanged_draft_fields == [
+        "title",
+        "description",
+        "keywords",
+    ]
+
+
+def test_authoritative_context_keeps_adjacent_keyword_hints_assessable() -> None:
+    """The second assisted context block must reach weak keyword-overlap analysis."""
+    prompt = check_models._build_cataloguing_prompt(
+        {
+            "date": "2026-07-31",
+            "keywords": "boat, harbour, water",
+        }
+    )
+    result = _result(
+        "Title: Mountain path beneath cloud\n"
+        "Description: A rocky path crosses a mountain slope beneath cloud.\n"
+        "Keywords: mountain, path, rocks, cloud, slope, landscape, hiking, grey, outdoors, trail",
+        prompt=prompt,
+    )
+
+    assert result.quality_analysis is not None
+    assert result.quality_analysis.keyword_overlap == "no_overlap"
+
+
 def test_configured_user_role_token_mid_output_is_observed_as_a_boundary() -> None:
     result = _result(
         "Title: Two cats\nDescription: Two cats rest indoors.\n"

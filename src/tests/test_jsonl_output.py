@@ -754,7 +754,7 @@ def test_save_jsonl_report_serializes_only_cached_result_assessment(tmp_path: Pa
     )
     gen = MockGeneration(
         text=(
-            "Title: Brick storefront with outdoor seating\n"
+            "Title: Brick storefront seating beside the pavement\n"
             "Description: A brick storefront has outdoor seating beside a sidewalk.\n"
             "Keywords: brick storefront, outdoor seating, sidewalk, people"
         ),
