@@ -25,6 +25,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Make human-facing observation labels explanatory and severity-ordered, split the
+  compact run issue summary into completed, crashed, and indeterminate review
+  tables while keeping actionable crashes expanded, and preserve canonical GitHub
+  evidence links when issue-ready Markdown is pasted outside the repository.
 - Keep HTML complete model evidence in the same usable-first order as the Markdown
   gallery, and preserve seed and repetition settings in supplemental native mlx-vlm
   CLI reproduction commands.
@@ -82,6 +86,12 @@ Notable changes to this project will be documented in this file.
   or output-contract changes.
 - Document the ignored repo-local Node lockfile bootstrap required in fresh Git
   worktrees before running dependency-policy or Markdown-lint checks.
+
+### Fixed
+
+- Recognise conventional one-to-six-hash Markdown headings such as `### Title:` as
+  valid structured catalogue fields instead of incorrectly reporting their Title,
+  Description, and Keywords sections as missing.
 
 ### Removed
 

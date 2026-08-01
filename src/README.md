@@ -265,14 +265,18 @@ The tool generates a deliberately small artifact set in `output/` by default:
   observations and indeterminate attempts, compact clean-run context, and one
   shared parameterised native reproduction. Definite crashes are outcomes;
   external-connectivity interruptions remain indeterminate.
-  Conservative repetition observations include the repeated fragment and complete
-  output. Declared EOS/thinking wrappers and wholly unchanged draft metadata are
-  neutral reproduction facts rather than inferred faults or quality scores.
+  Human-facing observations use explanatory wording and list likely output-breaking
+  symptoms first. Conservative repetition observations include the repeated
+  fragment and complete output. Declared EOS/thinking wrappers and wholly unchanged
+  draft metadata are neutral reproduction facts rather than inferred faults or
+  quality scores.
 - **Run issue summary** (`issues/run_summary.md`): Conditional compact whole-run
   GitHub issue body. It expands crashes with root exceptions and a parameterised
-  reproduction command, tables other surfaced results, counts clean completions,
-  and links to the complete retained evidence without copying full prompts,
-  outputs, tracebacks, or scripts.
+  reproduction command, separates completed, crashed, and indeterminate attempts
+  requiring review into compact tables, counts clean completions, and links to the
+  complete retained evidence without copying full prompts, outputs, tracebacks, or
+  scripts. Its cross-file links always use canonical GitHub repository URLs so they
+  still work when the report is pasted into an issue.
 - **Index** (`index.md`): Tiny navigation page linking the current-run files and,
   when generated, the run issue summary before individual crash drafts.
 - **Log** (`check_models.log`): Canonical comprehensive run trace, including complete
@@ -322,8 +326,9 @@ retained as an `unexpected_special_token` observation; no model-name allowlist i
 used.
 For strict catalog prompts, non-wrapper text before the requested `Title` label is
 retained as an `unexpected_catalog_preamble` observation. Conventional Markdown
-label emphasis such as `**Title:**` is accepted, and authoritative context values
-are never treated as copied instructions merely because a model reuses them.
+label emphasis such as `**Title:**` and one-to-six-hash headings such as
+`### Title:` are accepted, and authoritative context values are never treated as
+copied instructions merely because a model reuses them.
 The chooser reports `insufficient sample` when throughput lacks enough generated
 tokens for a meaningful comparison.
 
@@ -1055,6 +1060,7 @@ python -m check_models --image photo.jpg --eval-mode assisted
 | `--output-log` | Path | `output/check_models.log` | Command line output log filename. |
 | `--output-env` | Path | `output/environment.log` | Environment log filename (pip freeze, conda list). |
 | `--output-diagnostics` | Path | `output/reports/diagnostics.md` | Diagnostics report filename (generated on failures, harness issues, text-sanity issues, or preflight warnings). |
+| `--link-style` | str | `github` | Link format for local-navigation Markdown artifacts: `github` uses canonical repository URLs; `relative` uses offline-friendly local paths. Issue-ready cross-file links remain canonical GitHub URLs in either mode so pasted issue text keeps working. |
 | `-m`, `--models` | list[str] | (none) | Explicit model IDs/paths; disables cache discovery. May be repeated; model lists accumulate across occurrences. |
 | `-e`, `--exclude` | list[str] | (none) | Models to exclude (applies to cache scan or explicit list). May be repeated; exclusions accumulate across occurrences. |
 | `--trust-remote-code` / `--no-trust-remote-code` | flag | `True` | Allow/disallow custom code from Hub models. Use `--no-trust-remote-code` for security. |
