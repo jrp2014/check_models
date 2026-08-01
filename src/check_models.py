@@ -1119,6 +1119,7 @@ class RunIssueSummarySource:
     results: tuple[JsonlResultRecord, ...]
     image: RunImageRecord | None = None
     generation_settings: tuple[tuple[str, str], ...] = ()
+    trust_remote_code: bool | None = None
 
 
 class RunIssueSummaryValidationError(ValueError):
@@ -14857,9 +14858,14 @@ def _narrow_run_issue_image(value: JsonLike) -> RunImageRecord | None:
     width = value.get("width")
     height = value.get("height")
     megapixels = value.get("megapixels")
+    valid_sha256 = (
+        sha256.lower()
+        if isinstance(sha256, str) and re.fullmatch(r"[0-9a-fA-F]{64}", sha256)
+        else None
+    )
     record: RunImageRecord = {
         "name": name,
-        "sha256": sha256 if isinstance(sha256, str) else None,
+        "sha256": valid_sha256,
         "size_bytes": (
             size_bytes if isinstance(size_bytes, int) and not isinstance(size_bytes, bool) else None
         ),
@@ -14880,23 +14886,27 @@ def _narrow_run_issue_image(value: JsonLike) -> RunImageRecord | None:
 
 def _load_run_issue_enrichment(
     run_json_path: Path,
-) -> tuple[RunImageRecord | None, tuple[tuple[str, str], ...]]:
+) -> tuple[RunImageRecord | None, tuple[tuple[str, str], ...], bool | None]:
     """Load optional image/settings enrichment, ignoring absent or malformed run JSON."""
     image_record: RunImageRecord | None = None
     generation_settings: tuple[tuple[str, str], ...] = ()
+    trust_remote_code: bool | None = None
     try:
         run_value: JsonLike = json.loads(_read_text_file(run_json_path))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError):
         run_value = None
     if isinstance(run_value, dict):
         image_record = _narrow_run_issue_image(run_value.get("image"))
+        raw_trust_remote_code = run_value.get("trust_remote_code")
+        if isinstance(raw_trust_remote_code, bool):
+            trust_remote_code = raw_trust_remote_code
         settings = run_value.get("generation_settings")
         if isinstance(settings, dict):
             generation_settings = tuple(
                 (key, json.dumps(value, ensure_ascii=False, sort_keys=True))
                 for key, value in sorted(settings.items())
             )
-    return image_record, generation_settings
+    return image_record, generation_settings, trust_remote_code
 
 
 def _load_run_issue_summary_source(
@@ -14911,8 +14921,8 @@ def _load_run_issue_summary_source(
         _validate_run_issue_result(value, line_number)
         for line_number, value in enumerate(parsed_rows[1:], start=2)
     )
-    image, generation_settings = (
-        _load_run_issue_enrichment(output_paths.run_json) if include_run_json else (None, ())
+    image, generation_settings, trust_remote_code = (
+        _load_run_issue_enrichment(output_paths.run_json) if include_run_json else (None, (), None)
     )
 
     return RunIssueSummarySource(
@@ -14920,6 +14930,7 @@ def _load_run_issue_summary_source(
         results=results,
         image=image,
         generation_settings=generation_settings,
+        trust_remote_code=trust_remote_code,
     )
 
 
@@ -14983,19 +14994,19 @@ def _reproduction_image_facts(image: RunImageRecord | None) -> tuple[tuple[str, 
 
 def _public_reproduction_filename(image: RunImageRecord, source_url: str) -> str:
     """Return a safe basename for downloading the public reproduction image."""
-    source_name = PurePosixPath(urlparse(source_url).path).name
-    safe_name = re.sub(r"[^A-Za-z0-9_.-]+", "_", source_name).strip("._")
-    if safe_name:
-        return safe_name
-    suffix = Path(image["name"]).suffix.lower()
+    source_suffix = PurePosixPath(urlparse(source_url).path).suffix.lower()
+    suffix = source_suffix if re.fullmatch(r"\.[a-z0-9]{1,8}", source_suffix) else ""
+    if not suffix:
+        image_suffix = Path(image["name"]).suffix.lower()
+        suffix = image_suffix if re.fullmatch(r"\.[a-z0-9]{1,8}", image_suffix) else ""
     return f"repro-image{suffix or '.img'}"
 
 
 def _retained_generation_args(source: RunIssueSummarySource) -> argparse.Namespace:
     """Restore JSON-rendered common generation values for native CLI rendering."""
-    return argparse.Namespace(
-        **{key: json.loads(value) for key, value in source.generation_settings}
-    )
+    values = {key: json.loads(value) for key, value in source.generation_settings}
+    values["trust_remote_code"] = source.trust_remote_code is True
+    return argparse.Namespace(**values)
 
 
 def _reproduction_input_blocks(
@@ -15022,8 +15033,19 @@ def _reproduction_input_blocks(
         )
         return tuple(blocks)
 
+    sha256 = image["sha256"]
+    if sha256 is None:
+        blocks.append(
+            ReportParagraph(
+                "A valid SHA-256 digest is unavailable, so the public source cannot be "
+                "verified as the exact input and this report withholds a reproduction command."
+            )
+        )
+        return tuple(blocks)
+
     filename = _public_reproduction_filename(image, source_url)
     commands = [
+        "set -euo pipefail",
         shlex_join(
             (
                 "curl",
@@ -15033,11 +15055,10 @@ def _reproduction_input_blocks(
                 filename,
                 source_url,
             )
-        )
+        ),
     ]
-    if image["sha256"] is not None:
-        hash_record = f"{image['sha256']}  {filename}"
-        commands.append(f"{shlex_join(('printf', '%s\\n', hash_record))} | shasum -a 256 --check")
+    hash_record = f"{sha256}  {filename}"
+    commands.append(f"{shlex_join(('printf', '%s\\n', hash_record))} | shasum -a 256 --check")
     commands.append(
         build_native_mlx_vlm_repro_command_spec(
             model_name=model_name,

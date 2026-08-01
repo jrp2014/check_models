@@ -184,6 +184,8 @@ def _write_issue_summary_fixture(
     *,
     results: Sequence[dict[str, object]],
     image_source_url: str | None = None,
+    image_sha256: str | None = "a" * 64,
+    trust_remote_code: bool | None = False,
 ) -> None:
     """Write hand-authored retained input for issue-summary tests."""
     output_paths.jsonl.parent.mkdir(parents=True, exist_ok=True)
@@ -214,7 +216,7 @@ def _write_issue_summary_fixture(
     )
     image: dict[str, object] = {
         "name": "fixture.jpg",
-        "sha256": "abc123",
+        "sha256": image_sha256,
         "size_bytes": 12_345,
         "width": 640,
         "height": 480,
@@ -230,6 +232,11 @@ def _write_issue_summary_fixture(
                 "eval_mode": "assisted",
                 "generation_settings": {"max_tokens": 500, "temperature": 0.0},
                 "image": image,
+                **(
+                    {"trust_remote_code": trust_remote_code}
+                    if trust_remote_code is not None
+                    else {}
+                ),
             }
         )
         + "\n",
@@ -343,7 +350,7 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
     assert "JPEG" in content
     assert "640 x 480" in content
     assert "12,345 bytes" in content
-    assert "abc123" in content
+    assert "a" * 64 in content
     assert "full prompt that must not be copied" in content
     assert "reproduce.py" not in content
     assert "prompt.txt" not in content
@@ -389,6 +396,7 @@ def test_run_issue_summary_builds_complete_public_image_reproduction(tmp_path: P
         output_paths,
         results=(result,),
         image_source_url="https://example.test/images/cats.jpg",
+        trust_remote_code=True,
     )
 
     summary = check_models.generate_run_issue_summary_report(output_paths)
@@ -398,14 +406,78 @@ def test_run_issue_summary_builds_complete_public_image_reproduction(tmp_path: P
     content = summary.read_text(encoding="utf-8")
     assert "https://example.test/images/cats.jpg" in content
     assert "curl --fail --location" in content
+    assert "set -euo pipefail\ncurl --fail --location" in content
     assert "shasum -a 256 --check" in content
     assert "python -m mlx_vlm.generate" in content
     assert "--model org/crash" in content
     assert "--revision revision-crash" in content
     assert "--prompt 'full prompt that must not be copied'" in content
-    assert "--image cats.jpg" in content
+    assert "--image repro-image.jpg" in content
+    assert "--trust-remote-code" in content
     assert "reproduce.py" not in content
     assert "prompt.txt" not in content
+
+
+@pytest.mark.parametrize("image_sha256", [None, "abc123"])
+def test_run_issue_summary_withholds_command_without_valid_digest(
+    tmp_path: Path,
+    image_sha256: str | None,
+) -> None:
+    """A public URL alone must not be presented as a verified exact input."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    result = _issue_summary_result(
+        "org/crash",
+        execution="crashed",
+        usability="not_evaluated",
+        maintainer_status="actionable_failure",
+    )
+    _write_issue_summary_fixture(
+        output_paths,
+        results=(result,),
+        image_source_url="https://example.test/images/cats.jpg",
+        image_sha256=image_sha256,
+    )
+
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+
+    if summary is None:
+        pytest.fail("the crash must produce a run issue summary")
+    content = summary.read_text(encoding="utf-8")
+    assert "A valid SHA-256 digest is unavailable" in content
+    assert "python -m mlx_vlm.generate" not in content
+    assert "shasum -a 256 --check" not in content
+
+
+@pytest.mark.parametrize(
+    ("trust_remote_code", "expected_flag"),
+    [(True, True), (False, False), (None, False)],
+)
+def test_run_issue_summary_preserves_remote_code_policy(
+    tmp_path: Path,
+    trust_remote_code: bool | None,
+    expected_flag: bool,
+) -> None:
+    """A retained reproduction must not silently broaden remote-code trust."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    result = _issue_summary_result(
+        "org/crash",
+        execution="crashed",
+        usability="not_evaluated",
+        maintainer_status="actionable_failure",
+    )
+    _write_issue_summary_fixture(
+        output_paths,
+        results=(result,),
+        image_source_url="https://example.test/images/cats.jpg",
+        trust_remote_code=trust_remote_code,
+    )
+
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+
+    if summary is None:
+        pytest.fail("the crash must produce a run issue summary")
+    content = summary.read_text(encoding="utf-8")
+    assert ("--trust-remote-code" in content) is expected_flag
 
 
 def test_run_issue_summary_uses_cached_assessment_without_reclassification(
@@ -2555,12 +2627,13 @@ def test_crash_issue_draft_builds_complete_public_image_reproduction(tmp_path: P
     content = next(iter(issue_reports.values())).read_text(encoding="utf-8")
     assert "https://example.test/images/cats.jpg" in content
     assert "curl --fail --location" in content
+    assert "set -euo pipefail\ncurl --fail --location" in content
     assert "shasum -a 256 --check" in content
     assert "python -m mlx_vlm.generate" in content
     assert "--model org/public-repro" in content
     assert f"--revision {resolved_revision}" in content
     assert "--prompt 'Describe the image exactly.'" in content
-    assert "--image cats.jpg" in content
+    assert "--image repro-image.jpg" in content
     assert "reproduce.py" not in content
     assert "prompt.txt" not in content
 
