@@ -13,7 +13,7 @@ import sys
 from argparse import Namespace
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, get_args
 from unittest.mock import patch
 
 import pytest
@@ -239,6 +239,35 @@ def test_format_peak_memory_context_preserves_bare_peak_without_denominator() ->
     assert check_models._format_peak_memory_context(None, 96 * 1024**3) == ""
 
 
+def test_human_observation_labels_are_readable_and_severity_ordered() -> None:
+    labels = check_models._human_observation_labels(
+        (
+            "no_keyword_overlap",
+            "missing_requested_sections",
+            "unexpected_special_token",
+            "repeated_output",
+        ),
+        details={"missing_sections": ["title", "keywords"]},
+    )
+
+    assert labels == (
+        "Response repeats the same text; "
+        "Unrecognised model control tokens remain visible; "
+        "Missing or empty fields: Title, Keywords; "
+        "Keywords do not overlap the supplied keyword hints"
+    )
+
+
+def test_human_observation_labels_cover_every_stable_code() -> None:
+    all_codes = get_args(check_models.ObservationCode.__value__)
+
+    labels = check_models._human_observation_labels(all_codes)
+
+    assert labels.count("; ") == len(all_codes) - 1
+    assert "_" not in labels
+    assert "catalogue instructions" not in labels.casefold()
+
+
 def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Path) -> None:
     """A paste-ready issue should prioritize crashes without copying heavy evidence."""
     output_paths = _issue_summary_output_paths(tmp_path / "output")
@@ -284,7 +313,7 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
     assert "processor_load" in content
     assert "ValueError: processor missing image support" in content
     assert "python reproduce.py org/crash" in content
-    assert "| org/observed | completed / unusable | repeated output |" in content
+    assert "| org/observed | completed / unusable | Response repeats the same text |" in content
     assert "../reports/diagnostics.md#diagnostic-org-observed" in content
     assert "1 clean completion; see the [full model gallery]" in content
     assert "org/clean" not in content
@@ -323,7 +352,7 @@ def test_run_issue_summary_uses_cached_assessment_without_reclassification(
     assert summary is not None
     content = summary.read_text(encoding="utf-8")
     assert "completed / usable with caveats" in content
-    assert "minimal output" in content
+    assert "Response is unusually short" in content
 
 
 def test_run_issue_summary_repro_prefers_resolved_revision(tmp_path: Path) -> None:
@@ -1965,7 +1994,7 @@ def test_diagnostics_are_skim_first_and_share_reproduction_context_once(
     assert diagnostics.index("TRACEBACK-FIRST") < diagnostics.index("CRASH-PARTIAL")
     assert "<summary>org/observed" in diagnostics
     assert "<summary>org/network" in diagnostics
-    assert "| repeated output |       1 |\n\n## Triage" in diagnostics
+    assert "| Response repeats the same text |       1 |\n\n## Triage" in diagnostics
     assert re.search(
         r"\| \[org/network\].*\|\n\n## Actionable Failures",
         diagnostics,
@@ -3463,7 +3492,7 @@ class TestMarkdownGalleryReport:
         assert "[`org/good`](#model-org-good)" in chooser
         assert "quality output" in chooser
         assert "[`org/risky`](#model-org-risky)" in chooser
-        assert "unexpected special token" in chooser
+        assert "Unrecognised model control tokens remain visible" in chooser
         assert r"answer with \| pipe" in chooser
         assert "&lt;think&gt;leaked marker&lt;/think&gt;" in chooser
         assert "[`org/bad`](#model-org-bad)" in chooser

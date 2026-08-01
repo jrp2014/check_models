@@ -6989,9 +6989,69 @@ def _gallery_row(result: PerformanceResult, assessment: ResultAssessment) -> Gal
     )
 
 
+_OBSERVATION_DISPLAY_PRIORITY: Final[tuple[ObservationCode, ...]] = (
+    "empty_output",
+    "repeated_output",
+    "unexpected_special_token",
+    "missing_requested_sections",
+    "prompt_instruction_echo",
+    "unexpected_catalog_preamble",
+    "token_cap_truncation",
+    "thinking_trace_incomplete",
+    "role_boundary_token_present",
+    "thinking_trace_present",
+    "configured_wrapper_present",
+    "minimal_output",
+    "draft_returned_unchanged",
+    "no_keyword_overlap",
+)
+
+_OBSERVATION_DISPLAY_LABELS: Final[dict[ObservationCode, str]] = {
+    "empty_output": "No response text was returned",
+    "minimal_output": "Response is unusually short",
+    "repeated_output": "Response repeats the same text",
+    "missing_requested_sections": "Required fields are missing or empty",
+    "token_cap_truncation": "Response appears cut off at the token limit",
+    "prompt_instruction_echo": (
+        "Response repeats the task instructions instead of only returning the requested fields"
+    ),
+    "unexpected_catalog_preamble": "Extra text appears before the Title field",
+    "unexpected_special_token": "Unrecognised model control tokens remain visible",
+    "configured_wrapper_present": "Expected model wrapper tokens remain visible",
+    "thinking_trace_present": "Internal reasoning text remains visible",
+    "thinking_trace_incomplete": "Internal reasoning block appears incomplete",
+    "role_boundary_token_present": "Conversation-role control tokens remain visible",
+    "no_keyword_overlap": "Keywords do not overlap the supplied keyword hints",
+    "draft_returned_unchanged": (
+        "Title, Description and Keywords copy all supplied hints unchanged"
+    ),
+}
+
+
+def _human_observation_labels(
+    observations: Sequence[ObservationCode],
+    *,
+    details: JsonlObservationDetailsRecord | None = None,
+) -> str:
+    """Render stable observation codes as explanatory severity-ordered labels."""
+    observed = set(observations)
+    labels: list[str] = []
+    for code in _OBSERVATION_DISPLAY_PRIORITY:
+        if code not in observed:
+            continue
+        label = _OBSERVATION_DISPLAY_LABELS[code]
+        if code == "missing_requested_sections" and details is not None:
+            missing_sections = details.get("missing_sections")
+            if missing_sections:
+                fields = ", ".join(field.title() for field in missing_sections)
+                label = f"Missing or empty fields: {fields}"
+        labels.append(label)
+    return "; ".join(labels) or "none"
+
+
 def _gallery_observation_labels(observations: Sequence[ObservationCode]) -> str:
-    """Render stable observation codes as compact mechanical labels."""
-    return ", ".join(code.replace("_", " ") for code in observations) or "none"
+    """Render observations for human-facing gallery and diagnostic reports."""
+    return _human_observation_labels(observations)
 
 
 def _gallery_usability_sort_key(usability: ModelUsability) -> int:
