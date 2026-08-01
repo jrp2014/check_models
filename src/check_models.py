@@ -14845,6 +14845,39 @@ def _validate_run_issue_result(value: JsonLike, line_number: int) -> JsonlResult
     return cast("JsonlResultRecord", value)
 
 
+def _narrow_run_issue_image(value: JsonLike) -> RunImageRecord | None:
+    """Narrow optional retained image facts into the publication-safe contract."""
+    if not isinstance(value, dict):
+        return None
+    name = value.get("name")
+    if not isinstance(name, str):
+        return None
+    sha256 = value.get("sha256")
+    size_bytes = value.get("size_bytes")
+    width = value.get("width")
+    height = value.get("height")
+    megapixels = value.get("megapixels")
+    record: RunImageRecord = {
+        "name": name,
+        "sha256": sha256 if isinstance(sha256, str) else None,
+        "size_bytes": (
+            size_bytes if isinstance(size_bytes, int) and not isinstance(size_bytes, bool) else None
+        ),
+        "width": width if isinstance(width, int) and not isinstance(width, bool) else None,
+        "height": height if isinstance(height, int) and not isinstance(height, bool) else None,
+        "megapixels": (
+            float(megapixels)
+            if isinstance(megapixels, int | float) and not isinstance(megapixels, bool)
+            else None
+        ),
+    }
+    source_url = value.get("source_url")
+    if isinstance(source_url, str):
+        with suppress(argparse.ArgumentTypeError):
+            record["source_url"] = _parse_public_image_source_url(source_url)
+    return record
+
+
 def _load_run_issue_enrichment(
     run_json_path: Path,
 ) -> tuple[RunImageRecord | None, tuple[tuple[str, str], ...]]:
@@ -14856,40 +14889,7 @@ def _load_run_issue_enrichment(
     except (OSError, UnicodeDecodeError, json.JSONDecodeError):
         run_value = None
     if isinstance(run_value, dict):
-        image = run_value.get("image")
-        if isinstance(image, dict) and isinstance(image.get("name"), str):
-            image_record = {
-                "name": image["name"],
-                "sha256": image.get("sha256") if isinstance(image.get("sha256"), str) else None,
-                "size_bytes": (
-                    image.get("size_bytes")
-                    if isinstance(image.get("size_bytes"), int)
-                    and not isinstance(image.get("size_bytes"), bool)
-                    else None
-                ),
-                "width": (
-                    image.get("width")
-                    if isinstance(image.get("width"), int)
-                    and not isinstance(image.get("width"), bool)
-                    else None
-                ),
-                "height": (
-                    image.get("height")
-                    if isinstance(image.get("height"), int)
-                    and not isinstance(image.get("height"), bool)
-                    else None
-                ),
-                "megapixels": (
-                    float(image["megapixels"])
-                    if isinstance(image.get("megapixels"), int | float)
-                    and not isinstance(image.get("megapixels"), bool)
-                    else None
-                ),
-            }
-            source_url = image.get("source_url")
-            if isinstance(source_url, str):
-                with suppress(argparse.ArgumentTypeError):
-                    image_record["source_url"] = _parse_public_image_source_url(source_url)
+        image_record = _narrow_run_issue_image(run_value.get("image"))
         settings = run_value.get("generation_settings")
         if isinstance(settings, dict):
             generation_settings = tuple(

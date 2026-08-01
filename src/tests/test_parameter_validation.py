@@ -243,12 +243,12 @@ class TestCliArgumentNormalization:
 
     @pytest.mark.parametrize(
         "value",
-        (
+        [
             "cats.jpg",
             "file:///tmp/cats.jpg",
             "ftp://example.test/cats.jpg",
             "https:///cats.jpg",
-        ),
+        ],
     )
     def test_image_source_url_rejects_non_public_sources(self, value: str) -> None:
         """Source metadata must identify an absolute HTTP(S) location."""
