@@ -225,6 +225,38 @@ class TestCliArgumentNormalization:
 
         assert args.eos_tokens == ("</think>", "\n", "<END>")
 
+    def test_image_source_url_accepts_absolute_https_metadata(self) -> None:
+        """A public source URL should be retained separately from the local input."""
+        parser = check_models._build_cli_parser()
+
+        args = parser.parse_args(
+            [
+                "--image",
+                "local.jpg",
+                "--image-source-url",
+                "https://example.test/images/cats.jpg",
+            ]
+        )
+
+        assert args.image == Path("local.jpg")
+        assert args.image_source_url == "https://example.test/images/cats.jpg"
+
+    @pytest.mark.parametrize(
+        "value",
+        (
+            "cats.jpg",
+            "file:///tmp/cats.jpg",
+            "ftp://example.test/cats.jpg",
+            "https:///cats.jpg",
+        ),
+    )
+    def test_image_source_url_rejects_non_public_sources(self, value: str) -> None:
+        """Source metadata must identify an absolute HTTP(S) location."""
+        parser = check_models._build_cli_parser()
+
+        with pytest.raises(SystemExit):
+            parser.parse_args(["--image-source-url", value])
+
     def test_cli_argument_normalization_accepts_server_shared_request_controls(self) -> None:
         """Server request controls shared with generate() should parse and validate."""
         parser = __import__("check_models")._build_cli_parser()

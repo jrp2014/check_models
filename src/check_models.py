@@ -1015,6 +1015,7 @@ class RunImageRecord(TypedDict):
     """Publication-safe source-image identity for a benchmark run."""
 
     name: str
+    source_url: NotRequired[str]
     sha256: str | None
     size_bytes: int | None
     width: int | None
@@ -5315,6 +5316,15 @@ def _validate_image_url_scheme(image_str: str) -> bool:
         msg = f"Unsupported URL scheme for image: {parsed_url.scheme}"
         raise ValueError(msg)
     return True
+
+
+def _parse_public_image_source_url(value: str) -> str:
+    """Parse an absolute HTTP(S) URL recorded as reproduction metadata."""
+    parsed_url = urlparse(value)
+    if parsed_url.scheme.lower() not in {"http", "https"} or not parsed_url.netloc:
+        msg = "image source URL must be an absolute HTTP(S) URL"
+        raise argparse.ArgumentTypeError(msg)
+    return value
 
 
 def _open_image_for_exif(image_path: PathLike, image_str: str, *, is_url: bool) -> Any:
@@ -14586,6 +14596,8 @@ def _common_generation_settings(results: Sequence[PerformanceResult]) -> dict[st
 def _run_image_record(
     image_path: Path | None,
     image_profile: ImageInputProfile | None,
+    *,
+    source_url: str | None = None,
 ) -> RunImageRecord | None:
     """Return a publication-safe source-image manifest without exposing local paths."""
     if image_path is None:
@@ -14594,7 +14606,7 @@ def _run_image_record(
         size_bytes = image_path.stat().st_size
     except OSError:
         size_bytes = None
-    return {
+    record: RunImageRecord = {
         "name": image_path.name,
         "sha256": _sha256_file(image_path),
         "size_bytes": size_bytes,
@@ -14602,6 +14614,9 @@ def _run_image_record(
         "height": image_profile.height if image_profile is not None else None,
         "megapixels": image_profile.megapixels if image_profile is not None else None,
     }
+    if source_url is not None:
+        record["source_url"] = source_url
+    return record
 
 
 def _run_prompt_burden_records(
@@ -14633,6 +14648,7 @@ def save_run_json_report(
     report_context: ReportRenderContext,
     output_paths: Mapping[str, str],
     image_path: Path | None = None,
+    image_source_url: str | None = None,
     producer: CheckModelsProvenanceRecord | None = None,
     trust_remote_code: bool = True,
     requested_revision: str | None = None,
@@ -14655,7 +14671,11 @@ def save_run_json_report(
         "library_versions": dict(versions),
         "component_provenance": _collect_component_provenance(versions),
         "producer": producer or _collect_check_models_provenance(),
-        "image": _run_image_record(image_path, report_context.image_profile),
+        "image": _run_image_record(
+            image_path,
+            report_context.image_profile,
+            source_url=image_source_url,
+        ),
         "generation_settings": _common_generation_settings(results),
         "trust_remote_code": trust_remote_code,
         "model_provenance": {
@@ -16272,6 +16292,11 @@ def _build_report_artifacts(inputs: ReportGenerationInputs) -> tuple[ReportArtif
             report_context=inputs.report_context,
             output_paths=_public_output_artifact_map(output_paths),
             image_path=inputs.image_path,
+            image_source_url=(
+                getattr(inputs.run_args, "image_source_url", None)
+                if inputs.run_args is not None
+                else None
+            ),
             trust_remote_code=inputs.trust_remote_code,
             requested_revision=inputs.model_revision,
         ),
@@ -17146,6 +17171,15 @@ def _add_input_arguments(parser: argparse.ArgumentParser) -> None:
         type=Path,
         default=None,
         help=("Path to a specific image file to process directly. Requires a path when provided."),
+    )
+    input_group.add_argument(
+        "--image-source-url",
+        type=_parse_public_image_source_url,
+        default=None,
+        help=(
+            "Public HTTP(S) location of the exact selected image, recorded only as "
+            "reproduction metadata; the URL is never used as the inference input."
+        ),
     )
 
 

@@ -238,6 +238,7 @@ def test_save_run_json_report_captures_public_snapshot_contract(
         total_runtime_seconds=3.0,
         report_context=context,
         image_path=image_path,
+        image_source_url="https://example.test/images/catalogue.jpg",
         trust_remote_code=False,
         requested_revision="release-branch",
         output_paths={
@@ -303,10 +304,12 @@ def test_save_run_json_report_captures_public_snapshot_contract(
     }
     assert payload["library_versions"]["mlx-vlm"] == "0.6.3"
     assert payload["image"]["name"] == "catalogue.jpg"
+    assert payload["image"]["source_url"] == "https://example.test/images/catalogue.jpg"
     assert payload["image"]["width"] == 12
     assert payload["image"]["height"] == 8
     assert payload["image"]["sha256"]
     assert payload["image"]["size_bytes"] > 0
+    assert str(tmp_path) not in out.read_text(encoding="utf-8")
     assert payload["generation_settings"] == {
         "max_tokens": 500,
         "prefill_step_size": 4096,
