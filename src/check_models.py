@@ -14981,9 +14981,9 @@ def _reproduction_image_facts(image: RunImageRecord | None) -> tuple[tuple[str, 
     return tuple(rows)
 
 
-def _public_reproduction_filename(image: RunImageRecord) -> str:
+def _public_reproduction_filename(image: RunImageRecord, source_url: str) -> str:
     """Return a safe basename for downloading the public reproduction image."""
-    source_name = PurePosixPath(urlparse(image["source_url"]).path).name
+    source_name = PurePosixPath(urlparse(source_url).path).name
     safe_name = re.sub(r"[^A-Za-z0-9_.-]+", "_", source_name).strip("._")
     if safe_name:
         return safe_name
@@ -15011,7 +15011,8 @@ def _reproduction_input_blocks(
         ReportKeyValues(_reproduction_image_facts(image)),
         ReportDetails("Exact prompt", (ReportCodeBlock(prompt),)),
     ]
-    if image is None or image.get("source_url") is None:
+    source_url = image.get("source_url") if image is not None else None
+    if image is None or source_url is None:
         blocks.append(
             ReportParagraph(
                 "The original local input is not published, so this report does not claim "
@@ -15021,8 +15022,7 @@ def _reproduction_input_blocks(
         )
         return tuple(blocks)
 
-    filename = _public_reproduction_filename(image)
-    source_url = image["source_url"]
+    filename = _public_reproduction_filename(image, source_url)
     commands = [
         shlex_join(
             (
