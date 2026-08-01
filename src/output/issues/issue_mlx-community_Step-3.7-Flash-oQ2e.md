@@ -29,7 +29,7 @@ builtins.ValueError: Model preflight failed for mlx-community/Step-3.7-Flash-oQ2
   multimodal processor.
 - *Resolved model revision:* 3dacb46f724ac89725bcd922fb779c7ed1499fe7
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.014091406
+- *Post-cleanup active memory (GB):* 0.01459931
 - *Post-cleanup cache memory (GB):* 0.0
 
 <details>
@@ -37,7 +37,7 @@ builtins.ValueError: Model preflight failed for mlx-community/Step-3.7-Flash-oQ2
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11262, in _prepare_generation_prompt
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11250, in _prepare_generation_prompt
     _run_model_preflight_validators(
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         model_identifier=params.model_identifier,
@@ -47,7 +47,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11050, in _run_model_preflight_validators
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11038, in _run_model_preflight_validators
     _raise_preflight_error(
     ~~~~~~~~~~~~~~~~~~~~~~^
         "Loaded processor has no image_processor; expected multimodal processor.",
@@ -56,14 +56,14 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 10983, in _raise_preflight_error
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 10971, in _raise_preflight_error
     raise _tag_exception_failure_phase(ValueError(message), phase)
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11765, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11753, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -74,13 +74,13 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11531, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11519, in _run_model_generation
     formatted_prompt = _prepare_generation_prompt(
         params=params,
     ...<3 lines>...
         phase_timer=phase_timer,
     )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11303, in _prepare_generation_prompt
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11291, in _prepare_generation_prompt
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/Step-3.7-Flash-oQ2e: Loaded processor has no image_processor; expected multimodal processor.
 
@@ -92,65 +92,27 @@ ValueError: Model preflight failed for mlx-community/Step-3.7-Flash-oQ2e: Loaded
 
 ```text
 === STDERR ===
-[22:49:27] ERROR    Model preflight validation failed for mlx-community/Step-3.7-Flash-oQ2e
+Downloading bytes:           |  0.00B
+Reconstructing (incomplete total...): |          |  0.00B /  0.00B
+Fetching 24 files:   0%|          | 0/24 [00:00<?, ?it/s]
+Fetching 24 files: 100%|##########| 24/24 [00:00<00:00, 3397.46it/s]
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+Download complete: :           |  0.00B
+Reconstruction complete: |          |  0.00B /  0.00B
+[00:24:59] ERROR    Model preflight validation failed for mlx-community/Step-3.7-Flash-oQ2e
                     ValueError: Loaded processor has no image_processor; expected multimodal processor.
 ```
 
-## Supplemental CLI reproduction
+## Reproduction inputs
 
-This form includes only settings supported by the native mlx-vlm CLI.
+- *Image format:* JPEG
+- *Image dimensions:* 640 x 480 pixels
+- *Image size:* 173,131 bytes
+- *Image SHA-256:* dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e
 
-```bash
-python -m mlx_vlm.generate --model mlx-community/Step-3.7-Flash-oQ2e --image cats.jpg --prompt 'Create British-English catalogue metadata using only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent.
-
-Write:
-- a concrete 5-10-word title;
-- a 1-2-sentence factual description of the main subject, setting, action, lighting, and distinctive details;
-- 10-18 unique, comma-separated keywords.
-
-Return exactly these three sections and nothing else:
-Title:
-Description:
-Keywords:' --max-tokens 500 --temperature 0.0 --revision 3dacb46f724ac89725bcd922fb779c7ed1499fe7 --trust-remote-code --prefill-step-size 4096
-```
-
-## Canonical Python reproduction script
-
-```python
-from mlx_vlm.generate import generate
-from mlx_vlm.prompt_utils import apply_chat_template
-from mlx_vlm.utils import load
-
-MODEL = "mlx-community/Step-3.7-Flash-oQ2e"
-IMAGE = "cats.jpg"
-PROMPT = "Create British-English catalogue metadata using only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent.\n\nWrite:\n- a concrete 5-10-word title;\n- a 1-2-sentence factual description of the main subject, setting, action, lighting, and distinctive details;\n- 10-18 unique, comma-separated keywords.\n\nReturn exactly these three sections and nothing else:\nTitle:\nDescription:\nKeywords:"
-LOAD_KWARGS = {
-    "trust_remote_code": True,
-    "revision": "3dacb46f724ac89725bcd922fb779c7ed1499fe7",
-}
-TEMPLATE_KWARGS = {}
-GENERATE_KWARGS = {
-    "max_tokens": 500,
-    "temperature": 0.0,
-    "prefill_step_size": 4096,
-}
-model, processor = load(MODEL, **LOAD_KWARGS)
-formatted_prompt = apply_chat_template(
-    processor,
-    model.config,
-    PROMPT,
-    num_images=1,
-    **TEMPLATE_KWARGS,
-)
-if isinstance(formatted_prompt, list):
-    formatted_prompt = "\n".join(str(message) for message in formatted_prompt)
-result = generate(model, processor, formatted_prompt, image=IMAGE, **GENERATE_KWARGS)
-print(result.text)
-```
-
-## Provenance and Environment
-
-### Prompt
+<details>
+<summary>Exact prompt</summary>
 
 ```text
 Create British-English catalogue metadata using only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent.
@@ -166,12 +128,20 @@ Description:
 Keywords:
 ```
 
+</details>
+
+The original local input is not published, so this report does not claim a
+complete reproduction command. Use a shareable equivalent image or add the
+original image before filing.
+
+## Provenance and Environment
+
 ### Components
 
 | Component                  | Value                                                                                                                                           |
 |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | mlx-vlm                    | 0.6.8                                                                                                                                           |
-| mlx                        | 0.32.1.dev20260801+fb5133e10                                                                                                                    |
+| mlx                        | 0.32.1.dev20260802+fb5133e10                                                                                                                    |
 | mlx-lm                     | 0.31.3                                                                                                                                          |
 | mlx-audio                  | 0.4.4                                                                                                                                           |
 | transformers               | 5.14.1                                                                                                                                          |
@@ -201,5 +171,5 @@ Keywords:
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                              |
 | MLX Core Extension         | ~/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
 | MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (162,842,200 bytes, sha256=6a34bf1f3b542a904c4cf464bc95d7e419ca42a33175da64477eea57a9d90f2e) |
-| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,642,704 bytes, sha256=e2f952b6c4669c8769780a29c38680001853b6c0076bace7d45a77bb01ebc95e)  |
+| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,642,704 bytes, sha256=16951e19288070f611f39be301a4a3507e3b8c67db7ebd17d7fd7a9b0e3211dc)  |
 | RAM                        | 128.0 GB                                                                                                                                        |
