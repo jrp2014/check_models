@@ -7,75 +7,74 @@ Outcome counts
 | Outcome             |   Count |
 |---------------------|---------|
 | Attempted           |      62 |
-| Conclusive outcomes |      62 |
-| Completed           |      61 |
+| Conclusive outcomes |      61 |
+| Completed           |      60 |
 | Crashed             |       1 |
-| Indeterminate       |       0 |
+| Indeterminate       |       1 |
 
 Maintainer status counts
 
 | Maintainer status              |   Count |
 |--------------------------------|---------|
 | actionable failure             |       1 |
-| none                           |      33 |
-| observation needs reproduction |      28 |
+| none                           |      35 |
+| observation needs reproduction |      26 |
 
 Usability counts
 
 | Usability     |   Count |
 |---------------|---------|
-| not evaluated |       1 |
-| unusable      |      28 |
-| usable        |      33 |
+| not evaluated |       2 |
+| unusable      |      26 |
+| usable        |      34 |
 
 Observation counts
 
-| Observation                 |   Count |
-|-----------------------------|---------|
-| empty output                |       1 |
-| missing requested sections  |      26 |
-| prompt instruction echo     |       4 |
-| repeated output             |       4 |
-| role boundary token present |       1 |
-| thinking trace incomplete   |       1 |
-| thinking trace present      |       3 |
-| token cap truncation        |      10 |
-| unexpected catalog preamble |      12 |
-| unexpected special token    |       4 |
+| Observation                                                                           |   Count |
+|---------------------------------------------------------------------------------------|---------|
+| Conversation-role control tokens remain visible                                       |       1 |
+| Extra text appears before the Title field                                             |      12 |
+| Internal reasoning block appears incomplete                                           |       1 |
+| Internal reasoning text remains visible                                               |       3 |
+| No response text was returned                                                         |       1 |
+| Required fields are missing or empty                                                  |      24 |
+| Response appears cut off at the token limit                                           |      10 |
+| Response repeats the same text                                                        |       4 |
+| Response repeats the task instructions instead of only returning the requested fields |       4 |
+| Unrecognised model control tokens remain visible                                      |       4 |
 
 ## Triage
 
-| Model                                                                                                           | Execution   | Usability     | Maintainer status              | Observations                                                                                                                                                |
-|-----------------------------------------------------------------------------------------------------------------|-------------|---------------|--------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [mlx-community/Step-3.7-Flash-oQ2e](#diagnostic-mlx-community-step-37-flash-oq2e)                               | crashed     | not_evaluated | actionable_failure             | none                                                                                                                                                        |
-| [mlx-community/nanoLLaVA-1.5-4bit](#diagnostic-mlx-community-nanollava-15-4bit)                                 | completed   | unusable      | observation_needs_reproduction | missing requested sections                                                                                                                                  |
-| [mlx-community/MiniCPM-V-4.6-8bit](#diagnostic-mlx-community-minicpm-v-46-8bit)                                 | completed   | unusable      | observation_needs_reproduction | missing requested sections, unexpected catalog preamble                                                                                                     |
-| [mlx-community/FastVLM-0.5B-bf16](#diagnostic-mlx-community-fastvlm-05b-bf16)                                   | completed   | unusable      | observation_needs_reproduction | missing requested sections                                                                                                                                  |
-| [qnguyen3/nanoLLaVA](#diagnostic-qnguyen3-nanollava)                                                            | completed   | unusable      | observation_needs_reproduction | missing requested sections                                                                                                                                  |
-| [mlx-community/LFM2.5-VL-1.6B-bf16](#diagnostic-mlx-community-lfm25-vl-16b-bf16)                                | completed   | unusable      | observation_needs_reproduction | missing requested sections                                                                                                                                  |
-| [HuggingFaceTB/SmolVLM-Instruct](#diagnostic-huggingfacetb-smolvlm-instruct)                                    | completed   | unusable      | observation_needs_reproduction | missing requested sections                                                                                                                                  |
-| [mlx-community/SmolVLM-Instruct-bf16](#diagnostic-mlx-community-smolvlm-instruct-bf16)                          | completed   | unusable      | observation_needs_reproduction | missing requested sections                                                                                                                                  |
-| [mlx-community/GLM-4.6V-Flash-6bit](#diagnostic-mlx-community-glm-46v-flash-6bit)                               | completed   | unusable      | observation_needs_reproduction | missing requested sections, unexpected catalog preamble, unexpected special token                                                                           |
-| [mlx-community/Idefics3-8B-Llama3-bf16](#diagnostic-mlx-community-idefics3-8b-llama3-bf16)                      | completed   | unusable      | observation_needs_reproduction | missing requested sections                                                                                                                                  |
-| [mlx-community/diffusiongemma-26B-A4B-it-mxfp8](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)      | completed   | unusable      | observation_needs_reproduction | missing requested sections, unexpected catalog preamble, unexpected special token                                                                           |
-| [mlx-community/gemma-4-31b-bf16](#diagnostic-mlx-community-gemma-4-31b-bf16)                                    | completed   | unusable      | observation_needs_reproduction | empty output, missing requested sections                                                                                                                    |
-| [mlx-community/diffusiongemma-26B-A4B-it-8bit](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit)        | completed   | unusable      | observation_needs_reproduction | missing requested sections, unexpected catalog preamble, unexpected special token                                                                           |
-| [mlx-community/pixtral-12b-8bit](#diagnostic-mlx-community-pixtral-12b-8bit)                                    | completed   | unusable      | observation_needs_reproduction | missing requested sections                                                                                                                                  |
-| [mlx-community/GLM-4.6V-nvfp4](#diagnostic-mlx-community-glm-46v-nvfp4)                                         | completed   | unusable      | observation_needs_reproduction | missing requested sections, unexpected catalog preamble, unexpected special token                                                                           |
-| [mlx-community/Qwen3-VL-2B-Thinking-bf16](#diagnostic-mlx-community-qwen3-vl-2b-thinking-bf16)                  | completed   | unusable      | observation_needs_reproduction | missing requested sections, token cap truncation, prompt instruction echo, unexpected catalog preamble                                                      |
-| [mlx-community/gemma-3n-E2B-4bit](#diagnostic-mlx-community-gemma-3n-e2b-4bit)                                  | completed   | unusable      | observation_needs_reproduction | missing requested sections, token cap truncation                                                                                                            |
-| [mlx-community/pixtral-12b-bf16](#diagnostic-mlx-community-pixtral-12b-bf16)                                    | completed   | unusable      | observation_needs_reproduction | missing requested sections                                                                                                                                  |
-| [mlx-community/paligemma2-10b-ft-docci-448-6bit](#diagnostic-mlx-community-paligemma2-10b-ft-docci-448-6bit)    | completed   | unusable      | observation_needs_reproduction | missing requested sections                                                                                                                                  |
-| [jqlive/Kimi-VL-A3B-Thinking-2506-6bit](#diagnostic-jqlive-kimi-vl-a3b-thinking-2506-6bit)                      | completed   | unusable      | observation_needs_reproduction | token cap truncation, unexpected catalog preamble, thinking trace present, thinking trace incomplete                                                        |
-| [mlx-community/Kimi-VL-A3B-Thinking-8bit](#diagnostic-mlx-community-kimi-vl-a3b-thinking-8bit)                  | completed   | unusable      | observation_needs_reproduction | missing requested sections, token cap truncation, prompt instruction echo, unexpected catalog preamble, thinking trace present, role boundary token present |
-| [mlx-community/paligemma2-3b-ft-docci-448-bf16](#diagnostic-mlx-community-paligemma2-3b-ft-docci-448-bf16)      | completed   | unusable      | observation_needs_reproduction | missing requested sections                                                                                                                                  |
-| [mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16](#diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | completed   | unusable      | observation_needs_reproduction | missing requested sections, token cap truncation                                                                                                            |
-| [mlx-community/llava-v1.6-mistral-7b-8bit](#diagnostic-mlx-community-llava-v16-mistral-7b-8bit)                 | completed   | unusable      | observation_needs_reproduction | repeated output, missing requested sections, token cap truncation                                                                                           |
-| [mlx-community/paligemma2-3b-pt-896-4bit](#diagnostic-mlx-community-paligemma2-3b-pt-896-4bit)                  | completed   | unusable      | observation_needs_reproduction | repeated output, missing requested sections, token cap truncation, prompt instruction echo, unexpected catalog preamble                                     |
-| [mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX](#diagnostic-mlx-community-apriel-15-15b-thinker-6bit-mlx)       | completed   | unusable      | observation_needs_reproduction | missing requested sections, token cap truncation, prompt instruction echo, unexpected catalog preamble                                                      |
-| [mlx-community/Llama-3.2-11B-Vision-Instruct-8bit](#diagnostic-mlx-community-llama-32-11b-vision-instruct-8bit) | completed   | unusable      | observation_needs_reproduction | repeated output, token cap truncation, unexpected catalog preamble                                                                                          |
-| [mlx-community/paligemma2-10b-ft-docci-448-bf16](#diagnostic-mlx-community-paligemma2-10b-ft-docci-448-bf16)    | completed   | unusable      | observation_needs_reproduction | missing requested sections                                                                                                                                  |
-| [mlx-community/Kimi-VL-A3B-Thinking-2506-bf16](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16)        | completed   | unusable      | observation_needs_reproduction | repeated output, missing requested sections, token cap truncation, unexpected catalog preamble, thinking trace present                                      |
+| Model                                                                                                           | Execution     | Usability     | Maintainer status              | Observations                                                                                                                                                                                                                                                                                                  |
+|-----------------------------------------------------------------------------------------------------------------|---------------|---------------|--------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [mlx-community/Step-3.7-Flash-oQ2e](#diagnostic-mlx-community-step-37-flash-oq2e)                               | crashed       | not_evaluated | actionable_failure             | none                                                                                                                                                                                                                                                                                                          |
+| [mlx-community/FastVLM-0.5B-bf16](#diagnostic-mlx-community-fastvlm-05b-bf16)                                   | completed     | unusable      | observation_needs_reproduction | Required fields are missing or empty                                                                                                                                                                                                                                                                          |
+| [mlx-community/MiniCPM-V-4.6-8bit](#diagnostic-mlx-community-minicpm-v-46-8bit)                                 | completed     | unusable      | observation_needs_reproduction | Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                                                                               |
+| [mlx-community/nanoLLaVA-1.5-4bit](#diagnostic-mlx-community-nanollava-15-4bit)                                 | completed     | unusable      | observation_needs_reproduction | Required fields are missing or empty                                                                                                                                                                                                                                                                          |
+| [qnguyen3/nanoLLaVA](#diagnostic-qnguyen3-nanollava)                                                            | completed     | unusable      | observation_needs_reproduction | Required fields are missing or empty                                                                                                                                                                                                                                                                          |
+| [mlx-community/LFM2.5-VL-1.6B-bf16](#diagnostic-mlx-community-lfm25-vl-16b-bf16)                                | completed     | unusable      | observation_needs_reproduction | Required fields are missing or empty                                                                                                                                                                                                                                                                          |
+| [HuggingFaceTB/SmolVLM-Instruct](#diagnostic-huggingfacetb-smolvlm-instruct)                                    | completed     | unusable      | observation_needs_reproduction | Required fields are missing or empty                                                                                                                                                                                                                                                                          |
+| [mlx-community/SmolVLM-Instruct-bf16](#diagnostic-mlx-community-smolvlm-instruct-bf16)                          | completed     | unusable      | observation_needs_reproduction | Required fields are missing or empty                                                                                                                                                                                                                                                                          |
+| [mlx-community/GLM-4.6V-Flash-6bit](#diagnostic-mlx-community-glm-46v-flash-6bit)                               | completed     | unusable      | observation_needs_reproduction | Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                             |
+| [mlx-community/Idefics3-8B-Llama3-bf16](#diagnostic-mlx-community-idefics3-8b-llama3-bf16)                      | completed     | unusable      | observation_needs_reproduction | Required fields are missing or empty                                                                                                                                                                                                                                                                          |
+| [mlx-community/diffusiongemma-26B-A4B-it-mxfp8](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)      | completed     | unusable      | observation_needs_reproduction | Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                             |
+| [mlx-community/diffusiongemma-26B-A4B-it-8bit](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit)        | completed     | unusable      | observation_needs_reproduction | Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                             |
+| [mlx-community/Qwen3-VL-2B-Thinking-bf16](#diagnostic-mlx-community-qwen3-vl-2b-thinking-bf16)                  | completed     | unusable      | observation_needs_reproduction | Required fields are missing or empty; Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit                                                                                           |
+| [mlx-community/gemma-3n-E2B-4bit](#diagnostic-mlx-community-gemma-3n-e2b-4bit)                                  | completed     | unusable      | observation_needs_reproduction | Required fields are missing or empty; Response appears cut off at the token limit                                                                                                                                                                                                                             |
+| [mlx-community/paligemma2-10b-ft-docci-448-6bit](#diagnostic-mlx-community-paligemma2-10b-ft-docci-448-6bit)    | completed     | unusable      | observation_needs_reproduction | Required fields are missing or empty                                                                                                                                                                                                                                                                          |
+| [mlx-community/gemma-4-31b-bf16](#diagnostic-mlx-community-gemma-4-31b-bf16)                                    | completed     | unusable      | observation_needs_reproduction | No response text was returned; Required fields are missing or empty                                                                                                                                                                                                                                           |
+| [jqlive/Kimi-VL-A3B-Thinking-2506-6bit](#diagnostic-jqlive-kimi-vl-a3b-thinking-2506-6bit)                      | completed     | unusable      | observation_needs_reproduction | Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Internal reasoning text remains visible                                                                                                                                  |
+| [mlx-community/paligemma2-3b-ft-docci-448-bf16](#diagnostic-mlx-community-paligemma2-3b-ft-docci-448-bf16)      | completed     | unusable      | observation_needs_reproduction | Required fields are missing or empty                                                                                                                                                                                                                                                                          |
+| [mlx-community/GLM-4.6V-nvfp4](#diagnostic-mlx-community-glm-46v-nvfp4)                                         | completed     | unusable      | observation_needs_reproduction | Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                             |
+| [mlx-community/Kimi-VL-A3B-Thinking-8bit](#diagnostic-mlx-community-kimi-vl-a3b-thinking-8bit)                  | completed     | unusable      | observation_needs_reproduction | Required fields are missing or empty; Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit; Conversation-role control tokens remain visible; Internal reasoning text remains visible |
+| [mlx-community/llava-v1.6-mistral-7b-8bit](#diagnostic-mlx-community-llava-v16-mistral-7b-8bit)                 | completed     | unusable      | observation_needs_reproduction | Response repeats the same text; Required fields are missing or empty; Response appears cut off at the token limit                                                                                                                                                                                             |
+| [mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX](#diagnostic-mlx-community-apriel-15-15b-thinker-6bit-mlx)       | completed     | unusable      | observation_needs_reproduction | Required fields are missing or empty; Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit                                                                                           |
+| [mlx-community/paligemma2-3b-pt-896-4bit](#diagnostic-mlx-community-paligemma2-3b-pt-896-4bit)                  | completed     | unusable      | observation_needs_reproduction | Response repeats the same text; Required fields are missing or empty; Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit                                                           |
+| [mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16](#diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | completed     | unusable      | observation_needs_reproduction | Required fields are missing or empty; Response appears cut off at the token limit                                                                                                                                                                                                                             |
+| [mlx-community/paligemma2-10b-ft-docci-448-bf16](#diagnostic-mlx-community-paligemma2-10b-ft-docci-448-bf16)    | completed     | unusable      | observation_needs_reproduction | Required fields are missing or empty                                                                                                                                                                                                                                                                          |
+| [mlx-community/Llama-3.2-11B-Vision-Instruct-8bit](#diagnostic-mlx-community-llama-32-11b-vision-instruct-8bit) | completed     | unusable      | observation_needs_reproduction | Response repeats the same text; Extra text appears before the Title field; Response appears cut off at the token limit                                                                                                                                                                                        |
+| [mlx-community/Kimi-VL-A3B-Thinking-2506-bf16](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16)        | completed     | unusable      | observation_needs_reproduction | Response repeats the same text; Required fields are missing or empty; Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning text remains visible                                                                                                         |
+| [mlx-community/Qwen3.5-35B-A3B-bf16](#diagnostic-mlx-community-qwen35-35b-a3b-bf16)                             | indeterminate | not_evaluated | none                           | none                                                                                                                                                                                                                                                                                                          |
 
 ## Actionable Failures
 
@@ -108,14 +107,14 @@ builtins.ValueError: Model preflight failed for mlx-community/Step-3.7-Flash-oQ2
   multimodal processor.
 - *Resolved model revision:* 3dacb46f724ac89725bcd922fb779c7ed1499fe7
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.01459931
+- *Post-cleanup active memory (GB):* 0.014091406
 - *Post-cleanup cache memory (GB):* 0.0
 
 #### Complete traceback
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11180, in _prepare_generation_prompt
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11262, in _prepare_generation_prompt
     _run_model_preflight_validators(
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         model_identifier=params.model_identifier,
@@ -125,7 +124,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 10968, in _run_model_preflight_validators
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11050, in _run_model_preflight_validators
     _raise_preflight_error(
     ~~~~~~~~~~~~~~~~~~~~~~^
         "Loaded processor has no image_processor; expected multimodal processor.",
@@ -134,14 +133,14 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 10901, in _raise_preflight_error
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 10983, in _raise_preflight_error
     raise _tag_exception_failure_phase(ValueError(message), phase)
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11683, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11765, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -152,13 +151,13 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11449, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11531, in _run_model_generation
     formatted_prompt = _prepare_generation_prompt(
         params=params,
     ...<3 lines>...
         phase_timer=phase_timer,
     )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11221, in _prepare_generation_prompt
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11303, in _prepare_generation_prompt
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/Step-3.7-Flash-oQ2e: Loaded processor has no image_processor; expected multimodal processor.
 
@@ -168,26 +167,18 @@ ValueError: Model preflight failed for mlx-community/Step-3.7-Flash-oQ2e: Loaded
 
 ```text
 === STDERR ===
-Downloading bytes:           |  0.00B
-Reconstructing (incomplete total...): |          |  0.00B /  0.00B
-Fetching 24 files:   0%|          | 0/24 [00:00<?, ?it/s]
-Fetching 24 files: 100%|##########| 24/24 [00:00<00:00, 3037.97it/s]
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-[11:42:00] ERROR    Model preflight validation failed for mlx-community/Step-3.7-Flash-oQ2e
+[22:49:27] ERROR    Model preflight validation failed for mlx-community/Step-3.7-Flash-oQ2e
                     ValueError: Loaded processor has no image_processor; expected multimodal processor.
 ```
 
 ## Completed Runs with Observations
 
-<a id="diagnostic-mlx-community-nanollava-15-4bit"></a>
+<a id="diagnostic-mlx-community-fastvlm-05b-bf16"></a>
 
 <details>
-<summary>mlx-community/nanoLLaVA-1.5-4bit — unusable — missing requested sections</summary>
+<summary>mlx-community/FastVLM-0.5B-bf16 — unusable — Required fields are missing or empty</summary>
 
-### mlx-community/nanoLLaVA-1.5-4bit
+### mlx-community/FastVLM-0.5B-bf16
 
 #### Execution and provenance
 
@@ -195,23 +186,22 @@ Reconstruction complete: |          |  0.00B /  0.00B
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* missing_requested_sections
-- *Missing sections:* ["keywords"]
-- *Resolved model revision:* 5240204744963d72823e5de933c528c4aa82dfca
-- *Processor class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Missing sections:* ["title", "description", "keywords"]
+- *Resolved model revision:* 81ffe929046666c43de53691147b1669ba0f3a4c
+- *Processor class:* mlx_vlm.models.fastvlm.processing.FastVLMProcessor
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.01933436
+- *Post-cleanup active memory (GB):* 0.002851938
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 116
-- *Generation tokens:* 97
+- *Prompt tokens:* 120
+- *Generation tokens:* 32
 - *Configured EOS token ID:* 151645
 - *Configured EOS token:* &lt;|im_end|&gt;
 
 #### Complete output
 
 ```text
-Title: "A Study in Stripes"
-Description: A close-up of a person wearing a striped shirt, with a focus on the pattern and color of the fabric. The image is set against a pink background, and the person is lying on a bed covered with a pink blanket. The lighting is soft, and the person is facing away from the camera, giving a sense of intimacy. The image is a straightforward representation of the subject, with no additional details or context provided.
+A serene moment of feline tranquility on a vibrant pink couch, with two cats in peaceful slumber, surrounded by the soft glow of ambient lighting.
 ```
 
 </details>
@@ -219,7 +209,7 @@ Description: A close-up of a person wearing a striped shirt, with a focus on the
 <a id="diagnostic-mlx-community-minicpm-v-46-8bit"></a>
 
 <details>
-<summary>mlx-community/MiniCPM-V-4.6-8bit — unusable — missing requested sections, unexpected catalog preamble</summary>
+<summary>mlx-community/MiniCPM-V-4.6-8bit — unusable — Required fields are missing or empty; Extra text appears before the Title field</summary>
 
 ### mlx-community/MiniCPM-V-4.6-8bit
 
@@ -255,12 +245,12 @@ Keywords: cats, sleeping, pink blanket, remote controls, tabby, relaxation, comf
 
 </details>
 
-<a id="diagnostic-mlx-community-fastvlm-05b-bf16"></a>
+<a id="diagnostic-mlx-community-nanollava-15-4bit"></a>
 
 <details>
-<summary>mlx-community/FastVLM-0.5B-bf16 — unusable — missing requested sections</summary>
+<summary>mlx-community/nanoLLaVA-1.5-4bit — unusable — Required fields are missing or empty</summary>
 
-### mlx-community/FastVLM-0.5B-bf16
+### mlx-community/nanoLLaVA-1.5-4bit
 
 #### Execution and provenance
 
@@ -268,22 +258,23 @@ Keywords: cats, sleeping, pink blanket, remote controls, tabby, relaxation, comf
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* missing_requested_sections
-- *Missing sections:* ["title", "description", "keywords"]
-- *Resolved model revision:* 81ffe929046666c43de53691147b1669ba0f3a4c
-- *Processor class:* mlx_vlm.models.fastvlm.processing.FastVLMProcessor
+- *Missing sections:* ["keywords"]
+- *Resolved model revision:* 5240204744963d72823e5de933c528c4aa82dfca
+- *Processor class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.002851938
+- *Post-cleanup active memory (GB):* 0.018826456
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 120
-- *Generation tokens:* 32
+- *Prompt tokens:* 116
+- *Generation tokens:* 97
 - *Configured EOS token ID:* 151645
 - *Configured EOS token:* &lt;|im_end|&gt;
 
 #### Complete output
 
 ```text
-A serene moment of feline tranquility on a vibrant pink couch, with two cats in peaceful slumber, surrounded by the soft glow of ambient lighting.
+Title: "A Study in Stripes"
+Description: A close-up of a person wearing a striped shirt, with a focus on the pattern and color of the fabric. The image is set against a pink background, and the person is lying on a bed covered with a pink blanket. The lighting is soft, and the person is facing away from the camera, giving a sense of intimacy. The image is a straightforward representation of the subject, with no additional details or context provided.
 ```
 
 </details>
@@ -291,7 +282,7 @@ A serene moment of feline tranquility on a vibrant pink couch, with two cats in 
 <a id="diagnostic-qnguyen3-nanollava"></a>
 
 <details>
-<summary>qnguyen3/nanoLLaVA — unusable — missing requested sections</summary>
+<summary>qnguyen3/nanoLLaVA — unusable — Required fields are missing or empty</summary>
 
 ### qnguyen3/nanoLLaVA
 
@@ -306,7 +297,7 @@ A serene moment of feline tranquility on a vibrant pink couch, with two cats in 
 - *Processor class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.024610036
+- *Post-cleanup active memory (GB):* 0.024102132
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 116
 - *Generation tokens:* 40
@@ -325,7 +316,7 @@ Description: A cat is laying on a couch, with its tail and paws visible. The cat
 <a id="diagnostic-mlx-community-lfm25-vl-16b-bf16"></a>
 
 <details>
-<summary>mlx-community/LFM2.5-VL-1.6B-bf16 — unusable — missing requested sections</summary>
+<summary>mlx-community/LFM2.5-VL-1.6B-bf16 — unusable — Required fields are missing or empty</summary>
 
 ### mlx-community/LFM2.5-VL-1.6B-bf16
 
@@ -362,7 +353,7 @@ Cats, blanket, remote control, collar, sleeping, pink, indoor, cozy, furry, rela
 <a id="diagnostic-huggingfacetb-smolvlm-instruct"></a>
 
 <details>
-<summary>HuggingFaceTB/SmolVLM-Instruct — unusable — missing requested sections</summary>
+<summary>HuggingFaceTB/SmolVLM-Instruct — unusable — Required fields are missing or empty</summary>
 
 ### HuggingFaceTB/SmolVLM-Instruct
 
@@ -395,7 +386,7 @@ Cats, blanket, remote control, collar, sleeping, pink, indoor, cozy, furry, rela
 <a id="diagnostic-mlx-community-smolvlm-instruct-bf16"></a>
 
 <details>
-<summary>mlx-community/SmolVLM-Instruct-bf16 — unusable — missing requested sections</summary>
+<summary>mlx-community/SmolVLM-Instruct-bf16 — unusable — Required fields are missing or empty</summary>
 
 ### mlx-community/SmolVLM-Instruct-bf16
 
@@ -410,7 +401,7 @@ Cats, blanket, remote control, collar, sleeping, pink, indoor, cozy, furry, rela
 - *Processor class:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
 - *Tokenizer class:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.014484622
+- *Post-cleanup active memory (GB):* 0.013976718
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 1304
 - *Generation tokens:* 9
@@ -428,7 +419,7 @@ Cats, blanket, remote control, collar, sleeping, pink, indoor, cozy, furry, rela
 <a id="diagnostic-mlx-community-glm-46v-flash-6bit"></a>
 
 <details>
-<summary>mlx-community/GLM-4.6V-Flash-6bit — unusable — missing requested sections, unexpected catalog preamble, unexpected special token</summary>
+<summary>mlx-community/GLM-4.6V-Flash-6bit — unusable — Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field</summary>
 
 ### mlx-community/GLM-4.6V-Flash-6bit
 
@@ -468,7 +459,7 @@ Keywords: tabby cats, pink couch, remote controls, resting cats, domestic cats<|
 <a id="diagnostic-mlx-community-idefics3-8b-llama3-bf16"></a>
 
 <details>
-<summary>mlx-community/Idefics3-8B-Llama3-bf16 — unusable — missing requested sections</summary>
+<summary>mlx-community/Idefics3-8B-Llama3-bf16 — unusable — Required fields are missing or empty</summary>
 
 ### mlx-community/Idefics3-8B-Llama3-bf16
 
@@ -501,7 +492,7 @@ Keywords: tabby cats, pink couch, remote controls, resting cats, domestic cats<|
 <a id="diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
 
 <details>
-<summary>mlx-community/diffusiongemma-26B-A4B-it-mxfp8 — unusable — missing requested sections, unexpected catalog preamble, unexpected special token</summary>
+<summary>mlx-community/diffusiongemma-26B-A4B-it-mxfp8 — unusable — Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field</summary>
 
 ### mlx-community/diffusiongemma-26B-A4B-it-mxfp8
 
@@ -520,10 +511,10 @@ Keywords: tabby cats, pink couch, remote controls, resting cats, domestic cats<|
 - *Processor class:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.014910628
+- *Post-cleanup active memory (GB):* 0.014402724
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 386
-- *Generation tokens:* 75
+- *Generation tokens:* 71
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 
@@ -532,41 +523,8 @@ Keywords: tabby cats, pink couch, remote controls, resting cats, domestic cats<|
 ```text
 <|channel>thought
 <channel|>Title: Two tabby cats sleeping on a pink blanket
-Description: Two tabby cats are lying down on a pink blanket over a red sofa. Two remote controls are visible next to the cats.
-Keywords: cats, tabby, sleeping, lying, pink, blanket, sofa, remote, control, indoor, feline, resting, fur, striped, domestic
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-gemma-4-31b-bf16"></a>
-
-<details>
-<summary>mlx-community/gemma-4-31b-bf16 — unusable — empty output, missing requested sections</summary>
-
-### mlx-community/gemma-4-31b-bf16
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* empty_output, missing_requested_sections
-- *Missing sections:* ["title", "description", "keywords"]
-- *Resolved model revision:* 19f0f1af698c51edaf1e93b3a3a5435b282de30f
-- *Processor class:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
-- *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.01812194
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 378
-- *Generation tokens:* 1
-- *Configured EOS token ID:* 1
-- *Configured EOS token:* &lt;eos&gt;
-
-#### Complete output
-
-```text
-(empty)
+Description: Two striped tabby cats are lying down on a pink fabric-covered sofa. Two remote controls are visible near them.
+Keywords: cats, tabby, striped, sleeping, pink, blanket, sofa, remote, controls, indoor, resting, pets, feline, domestic
 ```
 
 </details>
@@ -574,7 +532,7 @@ Keywords: cats, tabby, sleeping, lying, pink, blanket, sofa, remote, control, in
 <a id="diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit"></a>
 
 <details>
-<summary>mlx-community/diffusiongemma-26B-A4B-it-8bit — unusable — missing requested sections, unexpected catalog preamble, unexpected special token</summary>
+<summary>mlx-community/diffusiongemma-26B-A4B-it-8bit — unusable — Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field</summary>
 
 ### mlx-community/diffusiongemma-26B-A4B-it-8bit
 
@@ -593,10 +551,10 @@ Keywords: cats, tabby, sleeping, lying, pink, blanket, sofa, remote, control, in
 - *Processor class:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.014910628
+- *Post-cleanup active memory (GB):* 0.014402724
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 386
-- *Generation tokens:* 75
+- *Generation tokens:* 74
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 
@@ -605,88 +563,8 @@ Keywords: cats, tabby, sleeping, lying, pink, blanket, sofa, remote, control, in
 ```text
 <|channel>thought
 <channel|>Title: Two tabby cats sleeping on a pink blanket
-Description: Two striped tabby cats lie sleeping on a bright pink blanket over a red sofa. Two remote controls are visible near the cats.
-Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, red, indoor, domestic, striped, feline, lounging, comfort, pets
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-pixtral-12b-8bit"></a>
-
-<details>
-<summary>mlx-community/pixtral-12b-8bit — unusable — missing requested sections</summary>
-
-### mlx-community/pixtral-12b-8bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* missing_requested_sections
-- *Missing sections:* ["title", "description", "keywords"]
-- *Resolved model revision:* 79e24b66302d4ac5e75491767f8914b2aa6ac1f8
-- *Processor class:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.023725298
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 1335
-- *Generation tokens:* 89
-- *Configured EOS token ID:* 2
-- *Configured EOS token:* &lt;/s&gt;
-
-#### Complete output
-
-```text
-### Title:
-Two Cats Lounging on Red Couch
-
-### Description:
-Two cats, one lying on its back and the other on its side, relax on a red couch. Remote controls are placed nearby.
-
-### Keywords:
-cats, lounging, red couch, remote controls, relaxed, indoor, comfort, feline, domestic, paws, stretch, lounge, resting, home, soft, purring, peaceful
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-glm-46v-nvfp4"></a>
-
-<details>
-<summary>mlx-community/GLM-4.6V-nvfp4 — unusable — missing requested sections, unexpected catalog preamble, unexpected special token</summary>
-
-### mlx-community/GLM-4.6V-nvfp4
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* missing_requested_sections, unexpected_catalog_preamble,
-  unexpected_special_token
-- *Missing sections:* ["title"]
-- *Unexpected text before Title:* &lt;|begin_of_box|&gt;Title: Two cats on a
-  pink couch
-- *Unexpected special tokens:* ["&lt;|begin_of_box|&gt;",
-  "&lt;|end_of_box|&gt;"]
-- *Resolved model revision:* 2da6855d4e28a0e61c84543262074bc17ac27d6e
-- *Processor class:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.003785834
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 499
-- *Generation tokens:* 89
-- *Configured EOS token ID:* 151329
-- *Configured EOS token:* &lt;|endoftext|&gt;
-
-#### Complete output
-
-```text
-<|begin_of_box|>Title: Two cats on a pink couch
-Description: Two cats lie on a pink couch, each near a remote control, with one cat’s head resting on the fabric and the other stretched out with eyes closed.
-Keywords: cats, pink couch, remote controls, sleeping, relaxed, striped fur, feline, domestic, indoor, pets, lounging, two animals, soft fabric, calm, cozy, household, companionship<|end_of_box|>
+Description: Two tabby cats lie side-by-side sleeping on a pink blanket atop a red sofa. Two remote controls are visible nearby.
+Keywords: cats, tabby, sleeping, pink, blanket, red, sofa, indoor, domestic, resting, feline, fur, striped, lounging
 ```
 
 </details>
@@ -694,7 +572,7 @@ Keywords: cats, pink couch, remote controls, sleeping, relaxed, striped fur, fel
 <a id="diagnostic-mlx-community-qwen3-vl-2b-thinking-bf16"></a>
 
 <details>
-<summary>mlx-community/Qwen3-VL-2B-Thinking-bf16 — unusable — missing requested sections, token cap truncation, prompt instruction echo, unexpected catalog preamble</summary>
+<summary>mlx-community/Qwen3-VL-2B-Thinking-bf16 — unusable — Required fields are missing or empty; Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit</summary>
 
 ### mlx-community/Qwen3-VL-2B-Thinking-bf16
 
@@ -758,7 +636,7 @@ Now keywords: 10-18 unique, comma-separated. Need to list distinct things. Let's
 <a id="diagnostic-mlx-community-gemma-3n-e2b-4bit"></a>
 
 <details>
-<summary>mlx-community/gemma-3n-E2B-4bit — unusable — missing requested sections, token cap truncation</summary>
+<summary>mlx-community/gemma-3n-E2B-4bit — unusable — Required fields are missing or empty; Response appears cut off at the token limit</summary>
 
 ### mlx-community/gemma-3n-E2B-4bit
 
@@ -774,7 +652,7 @@ Now keywords: 10-18 unique, comma-separated. Need to list distinct things. Let's
 - *Processor class:* mlx_vlm.models.gemma3n.processing_gemma3n.Gemma3nProcessor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.01653267
+- *Post-cleanup active memory (GB):* 0.016024766
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 370
 - *Generation tokens:* 500
@@ -790,50 +668,10 @@ Now keywords: 10-18 unique, comma-separated. Need to list distinct things. Let's
 
 </details>
 
-<a id="diagnostic-mlx-community-pixtral-12b-bf16"></a>
-
-<details>
-<summary>mlx-community/pixtral-12b-bf16 — unusable — missing requested sections</summary>
-
-### mlx-community/pixtral-12b-bf16
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* missing_requested_sections
-- *Missing sections:* ["title", "description", "keywords"]
-- *Resolved model revision:* 378cf65efd79647fc324a079c141fd92cb29916e
-- *Processor class:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.023987442
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 1335
-- *Generation tokens:* 83
-- *Configured EOS token ID:* 2
-- *Configured EOS token:* &lt;/s&gt;
-
-#### Complete output
-
-```text
-### Title:
-Two Cats Lounging on Red Couch
-
-### Description:
-Two cats, one lying on its back and the other on its side, relax on a red couch. Remote controls are placed nearby.
-
-### Keywords:
-cat, lounging, red couch, remote control, relaxed, lying down, comfortable, indoor, domestic, paws, fur, sofa, peaceful, home, resting
-```
-
-</details>
-
 <a id="diagnostic-mlx-community-paligemma2-10b-ft-docci-448-6bit"></a>
 
 <details>
-<summary>mlx-community/paligemma2-10b-ft-docci-448-6bit — unusable — missing requested sections</summary>
+<summary>mlx-community/paligemma2-10b-ft-docci-448-6bit — unusable — Required fields are missing or empty</summary>
 
 ### mlx-community/paligemma2-10b-ft-docci-448-6bit
 
@@ -848,7 +686,7 @@ cat, lounging, red couch, remote control, relaxed, lying down, comfortable, indo
 - *Processor class:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.020366572
+- *Post-cleanup active memory (GB):* 0.019858668
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 1135
 - *Generation tokens:* 155
@@ -863,10 +701,43 @@ A top-down view of two cats lying on a pink blanket. The cat on the left is lyin
 
 </details>
 
+<a id="diagnostic-mlx-community-gemma-4-31b-bf16"></a>
+
+<details>
+<summary>mlx-community/gemma-4-31b-bf16 — unusable — No response text was returned; Required fields are missing or empty</summary>
+
+### mlx-community/gemma-4-31b-bf16
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* empty_output, missing_requested_sections
+- *Missing sections:* ["title", "description", "keywords"]
+- *Resolved model revision:* 19f0f1af698c51edaf1e93b3a3a5435b282de30f
+- *Processor class:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
+- *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Stop reason:* completed
+- *Post-cleanup active memory (GB):* 0.017614036
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 378
+- *Generation tokens:* 1
+- *Configured EOS token ID:* 1
+- *Configured EOS token:* &lt;eos&gt;
+
+#### Complete output
+
+```text
+(empty)
+```
+
+</details>
+
 <a id="diagnostic-jqlive-kimi-vl-a3b-thinking-2506-6bit"></a>
 
 <details>
-<summary>jqlive/Kimi-VL-A3B-Thinking-2506-6bit — unusable — token cap truncation, unexpected catalog preamble, thinking trace present, thinking trace incomplete</summary>
+<summary>jqlive/Kimi-VL-A3B-Thinking-2506-6bit — unusable — Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Internal reasoning text remains visible</summary>
 
 ### jqlive/Kimi-VL-A3B-Thinking-2506-6bit
 
@@ -934,10 +805,83 @@ Keywords: tabby cats, pink fabric, remote controls, bright lighting, relaxed pos
 
 </details>
 
+<a id="diagnostic-mlx-community-paligemma2-3b-ft-docci-448-bf16"></a>
+
+<details>
+<summary>mlx-community/paligemma2-3b-ft-docci-448-bf16 — unusable — Required fields are missing or empty</summary>
+
+### mlx-community/paligemma2-3b-ft-docci-448-bf16
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* missing_requested_sections
+- *Missing sections:* ["title", "description", "keywords"]
+- *Resolved model revision:* f66333527ce75342b09d4df81873f65272ec2f30
+- *Processor class:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
+- *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Stop reason:* completed
+- *Post-cleanup active memory (GB):* 0.021923052
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 1135
+- *Generation tokens:* 151
+- *Configured EOS token ID:* 1
+- *Configured EOS token:* &lt;eos&gt;
+
+#### Complete output
+
+```text
+A top-down view of two cats sleeping on a red couch. The cat on the left is a gray tabby with black stripes. It is lying on its side, with its head facing the bottom left corner of the image. Its front left leg is stretched out in front of its body. Its tail is sticking out behind it on the left side of the image. The cat on the right is lying on its side, with its head facing the right side of the image. Its front right leg is stretched out in front of its body. Its tail is sticking out behind it on the right side of the image. There is a white and gray remote control between the two cats. The couch is casting a shadow over the cats and the remote.
+```
+
+</details>
+
+<a id="diagnostic-mlx-community-glm-46v-nvfp4"></a>
+
+<details>
+<summary>mlx-community/GLM-4.6V-nvfp4 — unusable — Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field</summary>
+
+### mlx-community/GLM-4.6V-nvfp4
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* missing_requested_sections, unexpected_catalog_preamble,
+  unexpected_special_token
+- *Missing sections:* ["title"]
+- *Unexpected text before Title:* &lt;|begin_of_box|&gt;Title: Two cats on a
+  pink couch
+- *Unexpected special tokens:* ["&lt;|begin_of_box|&gt;",
+  "&lt;|end_of_box|&gt;"]
+- *Resolved model revision:* 2da6855d4e28a0e61c84543262074bc17ac27d6e
+- *Processor class:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
+- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Stop reason:* completed
+- *Post-cleanup active memory (GB):* 0.003785834
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 499
+- *Generation tokens:* 89
+- *Configured EOS token ID:* 151329
+- *Configured EOS token:* &lt;|endoftext|&gt;
+
+#### Complete output
+
+```text
+<|begin_of_box|>Title: Two cats on a pink couch
+Description: Two cats lie on a pink couch, each near a remote control, with one cat’s head resting on the fabric and the other stretched out with eyes closed.
+Keywords: cats, pink couch, remote controls, sleeping, relaxed, striped fur, feline, domestic, indoor, pets, lounging, two animals, soft fabric, calm, cozy, household, companionship<|end_of_box|>
+```
+
+</details>
+
 <a id="diagnostic-mlx-community-kimi-vl-a3b-thinking-8bit"></a>
 
 <details>
-<summary>mlx-community/Kimi-VL-A3B-Thinking-8bit — unusable — missing requested sections, token cap truncation, prompt instruction echo, unexpected catalog preamble, thinking trace present, role boundary token present</summary>
+<summary>mlx-community/Kimi-VL-A3B-Thinking-8bit — unusable — Required fields are missing or empty; Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit; Conversation-role control tokens remain visible; Internal reasoning text remains visible</summary>
 
 ### mlx-community/Kimi-VL-A3B-Thinking-8bit
 
@@ -1004,85 +948,10 @@ Keywords: cats, pink fabric, remote controls, vibrant colors, striped patterns, 
 
 </details>
 
-<a id="diagnostic-mlx-community-paligemma2-3b-ft-docci-448-bf16"></a>
-
-<details>
-<summary>mlx-community/paligemma2-3b-ft-docci-448-bf16 — unusable — missing requested sections</summary>
-
-### mlx-community/paligemma2-3b-ft-docci-448-bf16
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* missing_requested_sections
-- *Missing sections:* ["title", "description", "keywords"]
-- *Resolved model revision:* f66333527ce75342b09d4df81873f65272ec2f30
-- *Processor class:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
-- *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.022430956
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 1135
-- *Generation tokens:* 151
-- *Configured EOS token ID:* 1
-- *Configured EOS token:* &lt;eos&gt;
-
-#### Complete output
-
-```text
-A top-down view of two cats sleeping on a red couch. The cat on the left is a gray tabby with black stripes. It is lying on its side, with its head facing the bottom left corner of the image. Its front left leg is stretched out in front of its body. Its tail is sticking out behind it on the left side of the image. The cat on the right is lying on its side, with its head facing the right side of the image. Its front right leg is stretched out in front of its body. Its tail is sticking out behind it on the right side of the image. There is a white and gray remote control between the two cats. The couch is casting a shadow over the cats and the remote.
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
-
-<details>
-<summary>mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 — unusable — missing requested sections, token cap truncation</summary>
-
-### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* missing_requested_sections, token_cap_truncation
-- *Missing sections:* ["title", "description", "keywords"]
-- *Token-cap degradation evidence:* ["missing_sections", "abrupt_tail"]
-- *Resolved model revision:* 32dae5c38006e20ac158bc94cd1d5967d19b2652
-- *Processor class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
-- *Tokenizer class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
-- *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.00254064
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 545
-- *Generation tokens:* 500
-- *Configured EOS token ID:* 2
-- *Configured EOS token:* &lt;/s&gt;
-
-#### Complete output
-
-```text
-Alright, let's get to work. I need to generate some metadata for this image, and the instructions are very specific. First, I need a title, a description, and a list of keywords. The title has to be between five and ten words, and the description needs to be a short, factual paragraph. The keywords are crucial; they have to be unique and relevant, and I can only use what's *clearly* visible. No guessing, no assumptions.
-
-Okay, let's break down the image. I see two cats, definitely. One is a calico, and the other is a tabby. They're on a red couch, and there's a remote control nearby. The lighting seems to be indoor, probably from a lamp or the sun. The cats are sleeping, and the image is a bit blurry.
-
-Now, the title. I need something short and descriptive. "Two cats sleeping on a red couch" is a good start, but I can do better. "Calico and tabby cats resting on a red couch" is more specific, but maybe too long. "Two cats sleeping on a red couch with a remote" is also good. I'll go with "Two cats sleeping on a red couch with a remote." It's concise and accurate.
-
-Next, the description. I need to cover the main subject, setting, action, lighting, and any distinctive details. The main subjects are the two cats. The setting is a red couch. They're sleeping. The lighting is soft, and the image is a bit blurry. The distinctive details are the calico and tabby patterns, the red couch, and the remote. I'll write: "A calico cat and a tabby cat are sleeping side-by-side on a red couch. A remote control lies nearby. The image is slightly blurry, capturing a quiet moment indoors." That's two sentences, factual, and covers everything.
-
-Finally, the keywords. I need to be very careful here. I'll list the obvious things: cat, cats, calico, tabby, couch, red couch, pet, animal, sleeping, resting, couch, sofa, remote, television, television remote, blurry, indoor, home, furniture, pet cat, domestic cat, animal sleeping, and couch. I'll make sure they are all
-```
-
-</details>
-
 <a id="diagnostic-mlx-community-llava-v16-mistral-7b-8bit"></a>
 
 <details>
-<summary>mlx-community/llava-v1.6-mistral-7b-8bit — unusable — repeated output, missing requested sections, token cap truncation</summary>
+<summary>mlx-community/llava-v1.6-mistral-7b-8bit — unusable — Response repeats the same text; Required fields are missing or empty; Response appears cut off at the token limit</summary>
 
 ### mlx-community/llava-v1.6-mistral-7b-8bit
 
@@ -1100,7 +969,7 @@ Finally, the keywords. I need to be very careful here. I'll list the obvious thi
 - *Processor class:* mlx_vlm.models.llava_next.processing_llava_next.LlavaNextProcessor
 - *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.018711768
+- *Post-cleanup active memory (GB):* 0.018203864
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 2469
 - *Generation tokens:* 500
@@ -1115,10 +984,73 @@ cat, sleeping, pink blanket, remote control, striped, tabby, kitten, cozy, domes
 
 </details>
 
+<a id="diagnostic-mlx-community-apriel-15-15b-thinker-6bit-mlx"></a>
+
+<details>
+<summary>mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX — unusable — Required fields are missing or empty; Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit</summary>
+
+### mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* missing_requested_sections, token_cap_truncation,
+  prompt_instruction_echo, unexpected_catalog_preamble
+- *Missing sections:* ["title", "description"]
+- *Echoed instruction fragments:* ["return exactly these three sections",
+  "create british english catalogue metadata using only clearly"]
+- *Unexpected text before Title:* Here are my reasoning steps: The user asks:
+  "Create British-English catalogue metadata using only clearly visible facts.
+  Omit uncertain details and unsupported identity, location, event, brand,
+  species, period, or intent.  Write: - a concrete 5-10-word title; - a
+  1-2-sentence factual description of the main subject, setting, action,
+  lighting, and distinctive details; - 10-18 unique, comma-separated keywords.
+  Return exactly these three sections and nothing else:
+- *Token-cap degradation evidence:* ["missing_sections"]
+- *Resolved model revision:* 24cb8fef6052e8d6e0dd7d467cf2d3db2dec19b2
+- *Processor class:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
+- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Stop reason:* max_tokens
+- *Post-cleanup active memory (GB):* 0.002065504
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 1426
+- *Generation tokens:* 500
+- *Configured EOS token ID:* 2
+- *Configured EOS token:* &lt;/s&gt;
+
+#### Complete output
+
+```text
+Here are my reasoning steps:
+The user asks: "Create British-English catalogue metadata using only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent.
+
+Write:
+- a concrete 5-10-word title;
+- a 1-2-sentence factual description of the main subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords.
+
+Return exactly these three sections and nothing else:
+Title:
+Description:
+Keywords:"
+
+We need to produce a title (5-10 words), a description (1-2 sentences), and a list of 10-18 unique keywords, separated by commas.
+
+We must use only clearly visible facts from the image. The image shows two cats lying on a pink couch, sleeping. There's a remote control on the couch near them. The cats are tabby, with brown, black, and tan stripes. They appear to be sleeping, curled up. The couch is pink. The remote is a typical TV remote with buttons. The lighting appears to be natural or indoor, but we can say "soft indoor lighting" maybe. The cats are lying on their sides, one is curled up with its head on the couch, the other is lying on its side with its head near the remote. The remote is a standard TV remote, but we cannot assume brand. The couch is a pink fabric. The cats are domestic short-haired tabby. The image is presumably taken from above, showing the cats from a top-down perspective.
+
+We need to avoid uncertain details: we cannot assume location (like "living room") unless it's clearly visible. The couch is pink, but we cannot be sure it's a living room. We can say "couch" or "sofa". The remote is present, but we cannot assume it's a TV remote? It looks like a remote control, but we can say "remote control". The cats are sleeping. The lighting is soft, maybe "ambient indoor lighting". The cats are tabby. The couch is pink. The remote is white with colored buttons. The cats are curled up. The cats are domestic. The cats are lying on a pink surface. The remote is placed near them.
+
+We need to produce British English catalogue metadata. So we need to use British spelling, e.g., "colour" vs "color".
+```
+
+</details>
+
 <a id="diagnostic-mlx-community-paligemma2-3b-pt-896-4bit"></a>
 
 <details>
-<summary>mlx-community/paligemma2-3b-pt-896-4bit — unusable — repeated output, missing requested sections, token cap truncation, prompt instruction echo, unexpected catalog preamble</summary>
+<summary>mlx-community/paligemma2-3b-pt-896-4bit — unusable — Response repeats the same text; Required fields are missing or empty; Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit</summary>
 
 ### mlx-community/paligemma2-3b-pt-896-4bit
 
@@ -1140,7 +1072,7 @@ cat, sleeping, pink blanket, remote control, striped, tabby, kitten, cozy, domes
 - *Processor class:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
 - *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.023463148
+- *Post-cleanup active memory (GB):* 0.022955244
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 4207
 - *Generation tokens:* 500
@@ -1203,38 +1135,28 @@ Description:
 
 </details>
 
-<a id="diagnostic-mlx-community-apriel-15-15b-thinker-6bit-mlx"></a>
+<a id="diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
 
 <details>
-<summary>mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX — unusable — missing requested sections, token cap truncation, prompt instruction echo, unexpected catalog preamble</summary>
+<summary>mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 — unusable — Required fields are missing or empty; Response appears cut off at the token limit</summary>
 
-### mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
+### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
 
 #### Execution and provenance
 
 - *Execution:* completed
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
-- *Observations:* missing_requested_sections, token_cap_truncation,
-  prompt_instruction_echo, unexpected_catalog_preamble
-- *Missing sections:* ["description"]
-- *Echoed instruction fragments:* ["return exactly these three sections",
-  "create british english catalogue metadata using only clearly"]
-- *Unexpected text before Title:* Here are my reasoning steps: The user asks:
-  "Create British-English catalogue metadata using only clearly visible facts.
-  Omit uncertain details and unsupported identity, location, event, brand,
-  species, period, or intent.  Write: - a concrete 5-10-word title; - a
-  1-2-sentence factual description of the main subject, setting, action,
-  lighting, and distinctive details; - 10-18 unique, comma-separated keywords.
-  Return exactly these three sections and nothing else:
-- *Token-cap degradation evidence:* ["missing_sections"]
-- *Resolved model revision:* 24cb8fef6052e8d6e0dd7d467cf2d3db2dec19b2
-- *Processor class:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Observations:* missing_requested_sections, token_cap_truncation
+- *Missing sections:* ["title", "description", "keywords"]
+- *Token-cap degradation evidence:* ["missing_sections", "abrupt_tail"]
+- *Resolved model revision:* 32dae5c38006e20ac158bc94cd1d5967d19b2652
+- *Processor class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
+- *Tokenizer class:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
 - *Stop reason:* max_tokens
-- *Post-cleanup active memory (GB):* 0.002065504
+- *Post-cleanup active memory (GB):* 0.00254064
 - *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 1426
+- *Prompt tokens:* 545
 - *Generation tokens:* 500
 - *Configured EOS token ID:* 2
 - *Configured EOS token:* &lt;/s&gt;
@@ -1242,26 +1164,48 @@ Description:
 #### Complete output
 
 ```text
-Here are my reasoning steps:
-The user asks: "Create British-English catalogue metadata using only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent.
+Alright, let's get to work. I need to generate some metadata for this image, and the instructions are very specific. First, I need a title, a description, and a list of keywords. The title has to be between five and ten words, and the description needs to be a short, factual paragraph. The keywords are crucial; they have to be unique and relevant, and I can only use what's *clearly* visible. No guessing, no assumptions.
 
-Write:
-- a concrete 5-10-word title;
-- a 1-2-sentence factual description of the main subject, setting, action, lighting, and distinctive details;
-- 10-18 unique, comma-separated keywords.
+Okay, let's break down the image. I see two cats, definitely. One is a calico, and the other is a tabby. They're on a red couch, and there's a remote control nearby. The lighting seems to be indoor, probably from a lamp or the sun. The cats are sleeping, and the image is a bit blurry.
 
-Return exactly these three sections and nothing else:
-Title:
-Description:
-Keywords:"
+Now, the title. I need something short and descriptive. "Two cats sleeping on a red couch" is a good start, but I can do better. "Calico and tabby cats resting on a red couch" is more specific, but maybe too long. "Two cats sleeping on a red couch with a remote" is also good. I'll go with "Two cats sleeping on a red couch with a remote." It's concise and accurate.
 
-We need to produce a title (5-10 words), a description (1-2 sentences), and a list of 10-18 unique keywords, separated by commas.
+Next, the description. I need to cover the main subject, setting, action, lighting, and any distinctive details. The main subjects are the two cats. The setting is a red couch. They're sleeping. The lighting is soft, and the image is a bit blurry. The distinctive details are the calico and tabby patterns, the red couch, and the remote. I'll write: "A calico cat and a tabby cat are sleeping side-by-side on a red couch. A remote control lies nearby. The image is slightly blurry, capturing a quiet moment indoors." That's two sentences, factual, and covers everything.
 
-We must use only clearly visible facts from the image. The image shows two cats lying on a pink couch, sleeping. There's a remote control on the couch near them. The cats are tabby, with brown, black, and tan stripes. They appear to be sleeping, curled up. The couch is pink. The remote is a typical TV remote with buttons. The lighting appears to be natural or indoor, but we can say "soft indoor lighting" maybe. The cats are lying on their sides, one is curled up with its head on the couch, the other is lying on its side with its head near the remote. The remote is a standard TV remote, but we cannot assume brand. The couch is a pink fabric. The cats are domestic short-haired tabby. The image is presumably taken from above, showing the cats from a top-down perspective.
+Finally, the keywords. I need to be very careful here. I'll list the obvious things: cat, cats, calico, tabby, couch, red couch, pet, animal, sleeping, resting, couch, sofa, remote, television, television remote, blurry, indoor, home, furniture, pet cat, domestic cat, animal sleeping, and couch. I'll make sure they are all
+```
 
-We need to avoid uncertain details: we cannot assume location (like "living room") unless it's clearly visible. The couch is pink, but we cannot be sure it's a living room. We can say "couch" or "sofa". The remote is present, but we cannot assume it's a TV remote? It looks like a remote control, but we can say "remote control". The cats are sleeping. The lighting is soft, maybe "ambient indoor lighting". The cats are tabby. The couch is pink. The remote is white with colored buttons. The cats are curled up. The cats are domestic. The cats are lying on a pink surface. The remote is placed near them.
+</details>
 
-We need to produce British English catalogue metadata. So we need to use British spelling, e.g., "colour" vs "color".
+<a id="diagnostic-mlx-community-paligemma2-10b-ft-docci-448-bf16"></a>
+
+<details>
+<summary>mlx-community/paligemma2-10b-ft-docci-448-bf16 — unusable — Required fields are missing or empty</summary>
+
+### mlx-community/paligemma2-10b-ft-docci-448-bf16
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* missing_requested_sections
+- *Missing sections:* ["title", "description", "keywords"]
+- *Resolved model revision:* 7c412694b919432784c730b62fadafb1c2e15d0d
+- *Processor class:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
+- *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Stop reason:* completed
+- *Post-cleanup active memory (GB):* 0.02089086
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 1135
+- *Generation tokens:* 159
+- *Configured EOS token ID:* 1
+- *Configured EOS token:* &lt;eos&gt;
+
+#### Complete output
+
+```text
+A top-down view of two cats lying on a pink blanket. The cat on the left is lying on its side, and its head is facing the top left corner of the image. Its body is facing the top right corner of the image. Its tail is sticking out to the left of the image. The cat on the right is lying on its side, and its head is facing the top right corner of the image. Its body is facing the top left corner of the Two remote controls are on the pink blanket, one on the left side of the image and one on the right side of the image. The cat on the left is lying between the two remote controls. The cat on the right is lying to the right of the remote control on the right side of the image.
 ```
 
 </details>
@@ -1269,7 +1213,7 @@ We need to produce British English catalogue metadata. So we need to use British
 <a id="diagnostic-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
 
 <details>
-<summary>mlx-community/Llama-3.2-11B-Vision-Instruct-8bit — unusable — repeated output, token cap truncation, unexpected catalog preamble</summary>
+<summary>mlx-community/Llama-3.2-11B-Vision-Instruct-8bit — unusable — Response repeats the same text; Extra text appears before the Title field; Response appears cut off at the token limit</summary>
 
 ### mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
 
@@ -1309,43 +1253,10 @@ Here is the information in the format you requested:
 
 </details>
 
-<a id="diagnostic-mlx-community-paligemma2-10b-ft-docci-448-bf16"></a>
-
-<details>
-<summary>mlx-community/paligemma2-10b-ft-docci-448-bf16 — unusable — missing requested sections</summary>
-
-### mlx-community/paligemma2-10b-ft-docci-448-bf16
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* missing_requested_sections
-- *Missing sections:* ["title", "description", "keywords"]
-- *Resolved model revision:* 7c412694b919432784c730b62fadafb1c2e15d0d
-- *Processor class:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
-- *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.021398764
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 1135
-- *Generation tokens:* 159
-- *Configured EOS token ID:* 1
-- *Configured EOS token:* &lt;eos&gt;
-
-#### Complete output
-
-```text
-A top-down view of two cats lying on a pink blanket. The cat on the left is lying on its side, and its head is facing the top left corner of the image. Its body is facing the top right corner of the image. Its tail is sticking out to the left of the image. The cat on the right is lying on its side, and its head is facing the top right corner of the image. Its body is facing the top left corner of the Two remote controls are on the pink blanket, one on the left side of the image and one on the right side of the image. The cat on the left is lying between the two remote controls. The cat on the right is lying to the right of the remote control on the right side of the image.
-```
-
-</details>
-
 <a id="diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16"></a>
 
 <details>
-<summary>mlx-community/Kimi-VL-A3B-Thinking-2506-bf16 — unusable — repeated output, missing requested sections, token cap truncation, unexpected catalog preamble, thinking trace present</summary>
+<summary>mlx-community/Kimi-VL-A3B-Thinking-2506-bf16 — unusable — Response repeats the same text; Required fields are missing or empty; Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning text remains visible</summary>
 
 ### mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
 
@@ -1397,7 +1308,39 @@ Description: Two tabby cats
 
 ## Indeterminate Attempts
 
-None.
+<a id="diagnostic-mlx-community-qwen35-35b-a3b-bf16"></a>
+
+<details>
+<summary>mlx-community/Qwen3.5-35B-A3B-bf16 — not_evaluated — indeterminate</summary>
+
+### mlx-community/Qwen3.5-35B-A3B-bf16
+
+#### Execution and provenance
+
+- *Execution:* indeterminate
+- *Usability:* not_evaluated
+- *Maintainer status:* none
+- *Observations:* none
+- *Phase:* model_load
+- *Stage:* Network Error
+- *Package:* unknown
+- *Error type:* ValueError
+- *Error message:* Model loading failed: [Errno 54] Connection reset by peer
+- *Root error type:* ReadError
+- *Root error message:* [Errno 54] Connection reset by peer
+- *Resolved model revision:* 731d09ba3597261e84c28881116558364bb8b97c
+- *Stop reason:* exception
+- *Post-cleanup active memory (GB):* 0.012846222
+- *Post-cleanup cache memory (GB):* 0.0
+
+#### Captured stdout/stderr
+
+```text
+=== STDERR ===
+[22:49:01] DEBUG    HF Cache Info for mlx-community/Qwen3.5-35B-A3B-bf16: size=66987.4 MB, files=26
+```
+
+</details>
 
 ## Clean Completion Context
 
@@ -1406,38 +1349,39 @@ None.
 
 | Model                                                 | Runtime identity                                        | Performance                                                                              |
 |-------------------------------------------------------|---------------------------------------------------------|------------------------------------------------------------------------------------------|
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16                      | rev 6c33f49ebc0b; Lfm2VlProcessor; stop completed       | 179 prompt / 48 generated; 523 tok/s; 1.1 GB peak; cleanup 0.000247/0.0 GB active/cache  |
-| mlx-community/Qwen2-VL-2B-Instruct-4bit               | rev 01af461cdb95; Qwen2VLProcessor; stop completed      | 511 prompt / 40 generated; 316 tok/s; 2.5 GB peak; cleanup 0.0102/0.0 GB active/cache    |
-| mlx-community/LFM2-VL-1.6B-8bit                       | rev 294b90e5ae23; Lfm2VlProcessor; stop completed       | 368 prompt / 86 generated; 332 tok/s; 3.0 GB peak; cleanup 0.00611/0.0 GB active/cache   |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed     | 1069 prompt / 85 generated; 201 tok/s; 4.5 GB peak; cleanup 0.00806/0.0 GB active/cache  |
-| Qwen/Qwen3-VL-2B-Instruct                             | rev 89644892e4d8; Qwen3VLProcessor; stop completed      | 409 prompt / 82 generated; 138 tok/s; 5.2 GB peak; cleanup 0.000558/0.0 GB active/cache  |
-| mlx-community/Qwen3-VL-2B-Instruct-bf16               | rev c8a67a843274; Qwen3VLProcessor; stop completed      | 409 prompt / 82 generated; 134 tok/s; 5.3 GB peak; cleanup 0.0105/0.0 GB active/cache    |
-| mlx-community/SmolVLM2-2.2B-Instruct-mlx              | rev 844516024a1c; SmolVLMProcessor; stop completed      | 205 prompt / 55 generated; 128 tok/s; 5.5 GB peak; cleanup 0.0146/0.0 GB active/cache    |
-| mlx-community/gemma-4-26b-a4b-it-4bit                 | rev 0d77464eeb23; Gemma4Processor; stop completed       | 390 prompt / 73 generated; 128 tok/s; 16 GB peak; cleanup 0.0176/0.0 GB active/cache     |
-| mlx-community/GLM-4.6V-Flash-mxfp4                    | rev 773591fa7388; Glm46VProcessor; stop completed       | 499 prompt / 61 generated; 92.2 tok/s; 7.8 GB peak; cleanup 0.00347/0.0 GB active/cache  |
-| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed      | 421 prompt / 89 generated; 121 tok/s; 21 GB peak; cleanup 0.0123/0.0 GB active/cache     |
-| mlx-community/Qwen3.5-9B-MLX-4bit                     | rev 938d8919941c; Qwen3VLProcessor; stop completed      | 421 prompt / 86 generated; 101 tok/s; 7.1 GB peak; cleanup 0.0139/0.0 GB active/cache    |
-| mlx-community/Phi-3.5-vision-instruct-bf16            | rev d8da684308c2; Phi3VProcessor; stop completed        | 883 prompt / 68 generated; 58.5 tok/s; 9.4 GB peak; cleanup 0.00988/0.0 GB active/cache  |
-| microsoft/Phi-3.5-vision-instruct                     | rev 12b77fb40b63; Phi3VProcessor; stop completed        | 883 prompt / 68 generated; 58.2 tok/s; 9.4 GB peak; cleanup 0.0018/0.0 GB active/cache   |
-| mlx-community/Qwen3.5-35B-A3B-6bit                    | rev b729d115bb2c; Qwen3VLProcessor; stop completed      | 421 prompt / 109 generated; 101 tok/s; 30 GB peak; cleanup 0.0128/0.0 GB active/cache    |
-| mlx-community/gemma-3n-E4B-it-bf16                    | rev d9c02d0b2fa8; Gemma3nProcessor; stop completed      | 378 prompt / 61 generated; 48.0 tok/s; 17 GB peak; cleanup 0.0171/0.0 GB active/cache    |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed     | 1070 prompt / 81 generated; 69.4 tok/s; 9.8 GB peak; cleanup 0.00754/0.0 GB active/cache |
-| mlx-community/X-Reasoner-7B-8bit                      | rev 21732e74613b; Qwen2_5_VLProcessor; stop completed   | 511 prompt / 106 generated; 65.3 tok/s; 10 GB peak; cleanup 0.0149/0.0 GB active/cache   |
-| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4     | rev 28777b889d84; Mistral3Processor; stop completed     | 1070 prompt / 106 generated; 66.2 tok/s; 10 GB peak; cleanup 0.0078/0.0 GB active/cache  |
-| mlx-community/InternVL3-8B-bf16                       | rev e0df3dd79263; InternVLChatProcessor; stop completed | 3435 prompt / 59 generated; 34.5 tok/s; 18 GB peak; cleanup 0.00467/0.0 GB active/cache  |
-| mlx-community/Qwen3.5-35B-A3B-bf16                    | rev 731d09ba3597; Qwen3VLProcessor; stop completed      | 421 prompt / 107 generated; 70.6 tok/s; 71 GB peak; cleanup 0.0134/0.0 GB active/cache   |
-| mlx-community/gemma-3-27b-it-qat-4bit                 | rev fc4e000f32af; Gemma3Processor; stop completed       | 379 prompt / 90 generated; 31.4 tok/s; 18 GB peak; cleanup 0.0155/0.0 GB active/cache    |
-| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed       | 390 prompt / 80 generated; 27.2 tok/s; 20 GB peak; cleanup 0.0186/0.0 GB active/cache    |
-| mlx-community/Ornith-1.0-35B-bf16                     | rev 9ef631ad2d0c; Qwen3VLProcessor; stop completed      | 421 prompt / 133 generated; 67.7 tok/s; 71 GB peak; cleanup 0.00982/0.0 GB active/cache  |
-| mlx-community/Qwen3.5-27B-4bit                        | rev 45797d2985a1; Qwen3VLProcessor; stop completed      | 421 prompt / 106 generated; 33.5 tok/s; 19 GB peak; cleanup 0.0113/0.0 GB active/cache   |
-| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed     | 537 prompt / 100 generated; 31.2 tok/s; 20 GB peak; cleanup 0.00233/0.0 GB active/cache  |
-| mlx-community/InternVL3-14B-8bit                      | rev 50efc568c7df; InternVLChatProcessor; stop completed | 3435 prompt / 75 generated; 32.0 tok/s; 19 GB peak; cleanup 0.00436/0.0 GB active/cache  |
-| mlx-community/gemma-3-27b-it-qat-8bit                 | rev c408904bc9a0; Gemma3Processor; stop completed       | 379 prompt / 87 generated; 17.6 tok/s; 32 GB peak; cleanup 0.016/0.0 GB active/cache     |
-| mlx-community/Qwen3.6-27B-mxfp8                       | rev 5db9fd9c38ce; Qwen3VLProcessor; stop completed      | 421 prompt / 107 generated; 19.1 tok/s; 30 GB peak; cleanup 0.0144/0.0 GB active/cache   |
-| mlx-community/Molmo-7B-D-0924-8bit                    | rev 90a14ed7a230; MolmoProcessor; stop completed        | 839 prompt / 96 generated; 53.2 tok/s; 20 GB peak; cleanup 0.00837/0.0 GB active/cache   |
-| mlx-community/Qwen3.5-27B-mxfp8                       | rev 2d6caf2325c2; Qwen3VLProcessor; stop completed      | 421 prompt / 115 generated; 18.8 tok/s; 30 GB peak; cleanup 0.0118/0.0 GB active/cache   |
-| mlx-community/Molmo-7B-D-0924-bf16                    | rev d871cbdb87a4; MolmoProcessor; stop completed        | 839 prompt / 93 generated; 30.3 tok/s; 27 GB peak; cleanup 0.00868/0.0 GB active/cache   |
-| mlx-community/MolmoPoint-8B-fp16                      | rev 0a60033b4e48; MolmoPointProcessor; stop completed   | 860 prompt / 78 generated; 5.92 tok/s; 23 GB peak; cleanup 0.00931/0.0 GB active/cache   |
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16                      | rev 6c33f49ebc0b; Lfm2VlProcessor; stop completed       | 179 prompt / 48 generated; 524 tok/s; 1.1 GB peak; cleanup 0.000247/0.0 GB active/cache  |
+| mlx-community/Qwen2-VL-2B-Instruct-4bit               | rev 01af461cdb95; Qwen2VLProcessor; stop completed      | 511 prompt / 40 generated; 209 tok/s; 2.5 GB peak; cleanup 0.0102/0.0 GB active/cache    |
+| mlx-community/LFM2-VL-1.6B-8bit                       | rev 294b90e5ae23; Lfm2VlProcessor; stop completed       | 368 prompt / 86 generated; 301 tok/s; 3.0 GB peak; cleanup 0.00611/0.0 GB active/cache   |
+| Qwen/Qwen3-VL-2B-Instruct                             | rev 89644892e4d8; Qwen3VLProcessor; stop completed      | 409 prompt / 82 generated; 137 tok/s; 4.7 GB peak; cleanup 0.000558/0.0 GB active/cache  |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed     | 1069 prompt / 85 generated; 180 tok/s; 4.5 GB peak; cleanup 0.00806/0.0 GB active/cache  |
+| mlx-community/SmolVLM2-2.2B-Instruct-mlx              | rev 844516024a1c; SmolVLMProcessor; stop completed      | 205 prompt / 55 generated; 125 tok/s; 5.5 GB peak; cleanup 0.0141/0.0 GB active/cache    |
+| mlx-community/Qwen3-VL-2B-Instruct-bf16               | rev c8a67a843274; Qwen3VLProcessor; stop completed      | 409 prompt / 82 generated; 116 tok/s; 5.0 GB peak; cleanup 0.0105/0.0 GB active/cache    |
+| mlx-community/gemma-4-26b-a4b-it-4bit                 | rev 0d77464eeb23; Gemma4Processor; stop completed       | 390 prompt / 73 generated; 121 tok/s; 16 GB peak; cleanup 0.0171/0.0 GB active/cache     |
+| mlx-community/GLM-4.6V-Flash-mxfp4                    | rev 773591fa7388; Glm46VProcessor; stop completed       | 499 prompt / 61 generated; 79.0 tok/s; 7.8 GB peak; cleanup 0.00347/0.0 GB active/cache  |
+| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed      | 421 prompt / 89 generated; 108 tok/s; 21 GB peak; cleanup 0.0123/0.0 GB active/cache     |
+| mlx-community/Qwen3.5-9B-MLX-4bit                     | rev 938d8919941c; Qwen3VLProcessor; stop completed      | 421 prompt / 86 generated; 91.3 tok/s; 7.1 GB peak; cleanup 0.0134/0.0 GB active/cache   |
+| microsoft/Phi-3.5-vision-instruct                     | rev 12b77fb40b63; Phi3VProcessor; stop completed        | 883 prompt / 68 generated; 57.5 tok/s; 9.4 GB peak; cleanup 0.0018/0.0 GB active/cache   |
+| mlx-community/Phi-3.5-vision-instruct-bf16            | rev d8da684308c2; Phi3VProcessor; stop completed        | 883 prompt / 68 generated; 51.9 tok/s; 9.3 GB peak; cleanup 0.00988/0.0 GB active/cache  |
+| mlx-community/Qwen3.5-35B-A3B-6bit                    | rev b729d115bb2c; Qwen3VLProcessor; stop completed      | 421 prompt / 109 generated; 93.3 tok/s; 30 GB peak; cleanup 0.0128/0.0 GB active/cache   |
+| mlx-community/gemma-3n-E4B-it-bf16                    | rev d9c02d0b2fa8; Gemma3nProcessor; stop completed      | 378 prompt / 61 generated; 40.7 tok/s; 17 GB peak; cleanup 0.0166/0.0 GB active/cache    |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed     | 1070 prompt / 81 generated; 62.6 tok/s; 9.8 GB peak; cleanup 0.00754/0.0 GB active/cache |
+| mlx-community/X-Reasoner-7B-8bit                      | rev 21732e74613b; Qwen2_5_VLProcessor; stop completed   | 511 prompt / 106 generated; 62.1 tok/s; 10 GB peak; cleanup 0.0144/0.0 GB active/cache   |
+| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4     | rev 28777b889d84; Mistral3Processor; stop completed     | 1070 prompt / 106 generated; 61.7 tok/s; 10 GB peak; cleanup 0.0078/0.0 GB active/cache  |
+| mlx-community/pixtral-12b-8bit                        | rev 79e24b66302d; PixtralProcessor; stop completed      | 1335 prompt / 89 generated; 40.2 tok/s; 15 GB peak; cleanup 0.0232/0.0 GB active/cache   |
+| mlx-community/gemma-3-27b-it-qat-4bit                 | rev fc4e000f32af; Gemma3Processor; stop completed       | 379 prompt / 90 generated; 29.8 tok/s; 18 GB peak; cleanup 0.0149/0.0 GB active/cache    |
+| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed       | 390 prompt / 80 generated; 24.9 tok/s; 20 GB peak; cleanup 0.0181/0.0 GB active/cache    |
+| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed     | 537 prompt / 100 generated; 28.3 tok/s; 20 GB peak; cleanup 0.00233/0.0 GB active/cache  |
+| mlx-community/InternVL3-8B-bf16                       | rev e0df3dd79263; InternVLChatProcessor; stop completed | 3435 prompt / 59 generated; 33.6 tok/s; 18 GB peak; cleanup 0.00467/0.0 GB active/cache  |
+| mlx-community/pixtral-12b-bf16                        | rev 378cf65efd79; PixtralProcessor; stop completed      | 1335 prompt / 83 generated; 20.2 tok/s; 27 GB peak; cleanup 0.0235/0.0 GB active/cache   |
+| mlx-community/Qwen3.5-27B-4bit                        | rev 45797d2985a1; Qwen3VLProcessor; stop completed      | 421 prompt / 106 generated; 23.8 tok/s; 19 GB peak; cleanup 0.0113/0.0 GB active/cache   |
+| mlx-community/Molmo-7B-D-0924-8bit                    | rev 90a14ed7a230; MolmoProcessor; stop completed        | 839 prompt / 88 generated; 46.2 tok/s; 20 GB peak; cleanup 0.00837/0.0 GB active/cache   |
+| mlx-community/InternVL3-14B-8bit                      | rev 50efc568c7df; InternVLChatProcessor; stop completed | 3435 prompt / 75 generated; 30.5 tok/s; 19 GB peak; cleanup 0.00436/0.0 GB active/cache  |
+| mlx-community/gemma-3-27b-it-qat-8bit                 | rev c408904bc9a0; Gemma3Processor; stop completed       | 379 prompt / 87 generated; 16.6 tok/s; 32 GB peak; cleanup 0.0155/0.0 GB active/cache    |
+| mlx-community/Qwen3.6-27B-mxfp8                       | rev 5db9fd9c38ce; Qwen3VLProcessor; stop completed      | 421 prompt / 107 generated; 17.9 tok/s; 30 GB peak; cleanup 0.0139/0.0 GB active/cache   |
+| mlx-community/Molmo-7B-D-0924-bf16                    | rev d871cbdb87a4; MolmoProcessor; stop completed        | 839 prompt / 90 generated; 28.7 tok/s; 27 GB peak; cleanup 0.00868/0.0 GB active/cache   |
+| mlx-community/Qwen3.5-27B-mxfp8                       | rev 2d6caf2325c2; Qwen3VLProcessor; stop completed      | 421 prompt / 115 generated; 16.5 tok/s; 30 GB peak; cleanup 0.0118/0.0 GB active/cache   |
+| mlx-community/Ornith-1.0-35B-bf16                     | rev 9ef631ad2d0c; Qwen3VLProcessor; stop completed      | 421 prompt / 133 generated; 51.5 tok/s; 71 GB peak; cleanup 0.00982/0.0 GB active/cache  |
+| mlx-community/MolmoPoint-8B-fp16                      | rev 0a60033b4e48; MolmoPointProcessor; stop completed   | 860 prompt / 78 generated; 5.78 tok/s; 23 GB peak; cleanup 0.00931/0.0 GB active/cache   |
 | meta-llama/Llama-3.2-11B-Vision-Instruct              | rev 9eb2daaa8597; MllamaProcessor; stop completed       | 108 prompt / 105 generated; 5.03 tok/s; 25 GB peak; cleanup 0.00174/0.0 GB active/cache  |
 
 </details>
@@ -1467,9 +1411,9 @@ Keywords:
 | Model                                            | Resolved revision                        |
 |--------------------------------------------------|------------------------------------------|
 | mlx-community/Step-3.7-Flash-oQ2e                | 3dacb46f724ac89725bcd922fb779c7ed1499fe7 |
-| mlx-community/nanoLLaVA-1.5-4bit                 | 5240204744963d72823e5de933c528c4aa82dfca |
-| mlx-community/MiniCPM-V-4.6-8bit                 | 03721395f6b82cd000cc74cde28fcff8abd9a04c |
 | mlx-community/FastVLM-0.5B-bf16                  | 81ffe929046666c43de53691147b1669ba0f3a4c |
+| mlx-community/MiniCPM-V-4.6-8bit                 | 03721395f6b82cd000cc74cde28fcff8abd9a04c |
+| mlx-community/nanoLLaVA-1.5-4bit                 | 5240204744963d72823e5de933c528c4aa82dfca |
 | qnguyen3/nanoLLaVA                               | 13d60cec183a86755afed64da495fcc2c382ea80 |
 | mlx-community/LFM2.5-VL-1.6B-bf16                | 16a710cf8afca206ff16a95a4ad6fe657f876ce1 |
 | HuggingFaceTB/SmolVLM-Instruct                   | 81cd9a775a4d644f2faf4e7becff4559b46b14c7 |
@@ -1477,24 +1421,23 @@ Keywords:
 | mlx-community/GLM-4.6V-Flash-6bit                | df9464782d3452e0dfd86afe0984f1c9eca75ca1 |
 | mlx-community/Idefics3-8B-Llama3-bf16            | 8c2a30c48864f3251701b7bde40f601d25535098 |
 | mlx-community/diffusiongemma-26B-A4B-it-mxfp8    | ded389e478f86d498ad9e7f47666e83b166a28f1 |
-| mlx-community/gemma-4-31b-bf16                   | 19f0f1af698c51edaf1e93b3a3a5435b282de30f |
 | mlx-community/diffusiongemma-26B-A4B-it-8bit     | 7b95e3887078ba56283c24f2578d6e5a06b9d7e8 |
-| mlx-community/pixtral-12b-8bit                   | 79e24b66302d4ac5e75491767f8914b2aa6ac1f8 |
-| mlx-community/GLM-4.6V-nvfp4                     | 2da6855d4e28a0e61c84543262074bc17ac27d6e |
 | mlx-community/Qwen3-VL-2B-Thinking-bf16          | c325e5ea14c215bb08fa0d668c81fa2581f9050b |
 | mlx-community/gemma-3n-E2B-4bit                  | ec68dc186276e20e4bed30b96a2b5c667e0a81e3 |
-| mlx-community/pixtral-12b-bf16                   | 378cf65efd79647fc324a079c141fd92cb29916e |
 | mlx-community/paligemma2-10b-ft-docci-448-6bit   | 1485fa9b3c7adb360cd354a29a401f0d441ec728 |
+| mlx-community/gemma-4-31b-bf16                   | 19f0f1af698c51edaf1e93b3a3a5435b282de30f |
 | jqlive/Kimi-VL-A3B-Thinking-2506-6bit            | 4b3b11ce0874c36a99e13e17e355049042f8620a |
-| mlx-community/Kimi-VL-A3B-Thinking-8bit          | 85daf3dc2490c0f824143338f08ba45f475c9ce4 |
 | mlx-community/paligemma2-3b-ft-docci-448-bf16    | f66333527ce75342b09d4df81873f65272ec2f30 |
-| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 | 32dae5c38006e20ac158bc94cd1d5967d19b2652 |
+| mlx-community/GLM-4.6V-nvfp4                     | 2da6855d4e28a0e61c84543262074bc17ac27d6e |
+| mlx-community/Kimi-VL-A3B-Thinking-8bit          | 85daf3dc2490c0f824143338f08ba45f475c9ce4 |
 | mlx-community/llava-v1.6-mistral-7b-8bit         | b8df5f329d95a7abe6429ed46093f9b84e8e6396 |
-| mlx-community/paligemma2-3b-pt-896-4bit          | a26bac48c7a661dfdafe1799c90177f818e79925 |
 | mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX    | 24cb8fef6052e8d6e0dd7d467cf2d3db2dec19b2 |
-| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit | 8451adc50203b50b8f4199e75e753fb9c06e2af6 |
+| mlx-community/paligemma2-3b-pt-896-4bit          | a26bac48c7a661dfdafe1799c90177f818e79925 |
+| mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 | 32dae5c38006e20ac158bc94cd1d5967d19b2652 |
 | mlx-community/paligemma2-10b-ft-docci-448-bf16   | 7c412694b919432784c730b62fadafb1c2e15d0d |
+| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit | 8451adc50203b50b8f4199e75e753fb9c06e2af6 |
 | mlx-community/Kimi-VL-A3B-Thinking-2506-bf16     | fb254434d4026bee7aa840dea1c5d59feea8fd48 |
+| mlx-community/Qwen3.5-35B-A3B-bf16               | 731d09ba3597261e84c28881116558364bb8b97c |
 
 ### Canonical parameterised Python reproduction
 
@@ -1559,7 +1502,7 @@ print(result.text)
 | Component                  | Value                                                                                                                                           |
 |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | mlx-vlm                    | 0.6.8                                                                                                                                           |
-| mlx                        | 0.32.1.dev20260731+fb5133e10                                                                                                                    |
+| mlx                        | 0.32.1.dev20260801+fb5133e10                                                                                                                    |
 | mlx-lm                     | 0.31.3                                                                                                                                          |
 | mlx-audio                  | 0.4.4                                                                                                                                           |
 | transformers               | 5.14.1                                                                                                                                          |
@@ -1589,5 +1532,5 @@ print(result.text)
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                              |
 | MLX Core Extension         | ~/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
 | MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (162,842,200 bytes, sha256=6a34bf1f3b542a904c4cf464bc95d7e419ca42a33175da64477eea57a9d90f2e) |
-| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,642,704 bytes, sha256=021af97ab68e66a84dc18ac1923422802a47a79dcea086489556b58c8ae90df9)  |
+| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,642,704 bytes, sha256=e2f952b6c4669c8769780a29c38680001853b6c0076bace7d45a77bb01ebc95e)  |
 | RAM                        | 128.0 GB                                                                                                                                        |

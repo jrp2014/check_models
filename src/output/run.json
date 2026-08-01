@@ -22,7 +22,7 @@
       "direct_url": null,
       "install_type": "source-tree",
       "source_location": "~/Documents/AI/mlx/check_models",
-      "source_revision": "d8c9c449939b572790366e3ee58689371ed6821c",
+      "source_revision": "c44e100eb20fe5f12d54729d95337ce484a190db",
       "vcs_revision": null,
       "version": "0.8.9"
     },
@@ -40,7 +40,7 @@
       "source_location": "~/Documents/AI/mlx/mlx",
       "source_revision": "fb5133e1049cc1482a330cd3a7135fda62a74b0d",
       "vcs_revision": null,
-      "version": "0.32.1.dev20260731+fb5133e10"
+      "version": "0.32.1.dev20260801+fb5133e10"
     },
     "mlx-audio": {
       "direct_url": null,
@@ -70,7 +70,7 @@
       "direct_url": "file://~/Documents/AI/mlx/mlx-vlm",
       "install_type": "editable",
       "source_location": "~/Documents/AI/mlx/mlx-vlm",
-      "source_revision": "07bd830e7b46cd88ef90b859d5d4c145abff3dd5",
+      "source_revision": "67bc41d818ea77908599d21510ea29f352e7a417",
       "vcs_revision": null,
       "version": "0.6.8"
     },
@@ -101,13 +101,13 @@
   },
   "counts": {
     "models_attempted": 62,
-    "models_completed": 61,
+    "models_completed": 60,
     "models_crashed": 1,
-    "models_evaluated": 62,
-    "models_indeterminate": 0
+    "models_evaluated": 61,
+    "models_indeterminate": 1
   },
   "eval_mode": "blind",
-  "generated_at": "2026-08-01 11:44:29 BST",
+  "generated_at": "2026-08-01 22:52:47 BST",
   "generation_settings": {
     "max_tokens": 500,
     "prefill_step_size": 4096,
@@ -125,7 +125,7 @@
   "library_versions": {
     "Pillow": "12.3.0",
     "huggingface-hub": "1.26.0",
-    "mlx": "0.32.1.dev20260731+fb5133e10",
+    "mlx": "0.32.1.dev20260801+fb5133e10",
     "mlx-audio": "0.4.4",
     "mlx-lm": "0.31.3",
     "mlx-metal": null,
@@ -511,7 +511,7 @@
   },
   "producer": {
     "dirty": true,
-    "git_revision": "d8c9c449939b572790366e3ee58689371ed6821c",
+    "git_revision": "c44e100eb20fe5f12d54729d95337ce484a190db",
     "install_type": "source-tree",
     "name": "check_models",
     "version": "0.8.9"
@@ -816,11 +816,11 @@
     },
     "mlx-community/Qwen3.5-35B-A3B-bf16": {
       "image_patch_count": null,
-      "nontext_tokens_est": 344,
+      "nontext_tokens_est": null,
       "processed_image_height": null,
       "processed_image_width": null,
-      "text_tokens_est": 77,
-      "total_tokens": 421
+      "text_tokens_est": null,
+      "total_tokens": null
     },
     "mlx-community/Qwen3.5-9B-MLX-4bit": {
       "image_patch_count": null,
@@ -1017,6 +1017,6 @@
   },
   "prompt_sha256": "30c9a84b2d1e2936a381e9025c6144d4cc4f436e6ab5c531fa8682af8d95e593",
   "schema_version": "2.0",
-  "total_runtime_seconds": 524.295,
+  "total_runtime_seconds": 656.394,
   "trust_remote_code": true
 }

@@ -29,7 +29,7 @@ builtins.ValueError: Model preflight failed for mlx-community/Step-3.7-Flash-oQ2
   multimodal processor.
 - *Resolved model revision:* 3dacb46f724ac89725bcd922fb779c7ed1499fe7
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.01459931
+- *Post-cleanup active memory (GB):* 0.014091406
 - *Post-cleanup cache memory (GB):* 0.0
 
 <details>
@@ -37,7 +37,7 @@ builtins.ValueError: Model preflight failed for mlx-community/Step-3.7-Flash-oQ2
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11180, in _prepare_generation_prompt
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11262, in _prepare_generation_prompt
     _run_model_preflight_validators(
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         model_identifier=params.model_identifier,
@@ -47,7 +47,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 10968, in _run_model_preflight_validators
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11050, in _run_model_preflight_validators
     _raise_preflight_error(
     ~~~~~~~~~~~~~~~~~~~~~~^
         "Loaded processor has no image_processor; expected multimodal processor.",
@@ -56,14 +56,14 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 10901, in _raise_preflight_error
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 10983, in _raise_preflight_error
     raise _tag_exception_failure_phase(ValueError(message), phase)
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11683, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11765, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -74,13 +74,13 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11449, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11531, in _run_model_generation
     formatted_prompt = _prepare_generation_prompt(
         params=params,
     ...<3 lines>...
         phase_timer=phase_timer,
     )
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11221, in _prepare_generation_prompt
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11303, in _prepare_generation_prompt
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/Step-3.7-Flash-oQ2e: Loaded processor has no image_processor; expected multimodal processor.
 
@@ -92,15 +92,7 @@ ValueError: Model preflight failed for mlx-community/Step-3.7-Flash-oQ2e: Loaded
 
 ```text
 === STDERR ===
-Downloading bytes:           |  0.00B
-Reconstructing (incomplete total...): |          |  0.00B /  0.00B
-Fetching 24 files:   0%|          | 0/24 [00:00<?, ?it/s]
-Fetching 24 files: 100%|##########| 24/24 [00:00<00:00, 3037.97it/s]
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-[11:42:00] ERROR    Model preflight validation failed for mlx-community/Step-3.7-Flash-oQ2e
+[22:49:27] ERROR    Model preflight validation failed for mlx-community/Step-3.7-Flash-oQ2e
                     ValueError: Loaded processor has no image_processor; expected multimodal processor.
 ```
 
@@ -179,7 +171,7 @@ Keywords:
 | Component                  | Value                                                                                                                                           |
 |----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | mlx-vlm                    | 0.6.8                                                                                                                                           |
-| mlx                        | 0.32.1.dev20260731+fb5133e10                                                                                                                    |
+| mlx                        | 0.32.1.dev20260801+fb5133e10                                                                                                                    |
 | mlx-lm                     | 0.31.3                                                                                                                                          |
 | mlx-audio                  | 0.4.4                                                                                                                                           |
 | transformers               | 5.14.1                                                                                                                                          |
@@ -209,5 +201,5 @@ Keywords:
 | mlx-metal Distribution     | not installed; local editable mlx supplies backend                                                                                              |
 | MLX Core Extension         | ~/Documents/AI/mlx/mlx/python/mlx/core.cpython-313-darwin.so                                                                                    |
 | MLX Metallib               | ~/Documents/AI/mlx/mlx/python/mlx/lib/mlx.metallib (162,842,200 bytes, sha256=6a34bf1f3b542a904c4cf464bc95d7e419ca42a33175da64477eea57a9d90f2e) |
-| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,642,704 bytes, sha256=021af97ab68e66a84dc18ac1923422802a47a79dcea086489556b58c8ae90df9)  |
+| MLX libmlx.dylib           | ~/Documents/AI/mlx/mlx/python/mlx/lib/libmlx.dylib (21,642,704 bytes, sha256=e2f952b6c4669c8769780a29c38680001853b6c0076bace7d45a77bb01ebc95e)  |
 | RAM                        | 128.0 GB                                                                                                                                        |
