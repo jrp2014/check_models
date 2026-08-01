@@ -8291,6 +8291,10 @@ def _diagnostics_counts_blocks(
     observation_counts = Counter(
         observation for assessment in assessments for observation in assessment.observations
     )
+    observation_label_counts = {
+        _human_observation_labels((observation,)): count
+        for observation, count in observation_counts.items()
+    }
     outcome_rows = (
         ("Attempted", str(outcomes["models_attempted"])),
         ("Conclusive outcomes", str(outcomes["models_evaluated"])),
@@ -8312,7 +8316,7 @@ def _diagnostics_counts_blocks(
         ReportTable(("Outcome", "Count"), outcome_rows),
         *count_blocks("Maintainer status counts", "Maintainer status", maintainer_counts),
         *count_blocks("Usability counts", "Usability", usability_counts),
-        *count_blocks("Observation counts", "Observation", observation_counts),
+        *count_blocks("Observation counts", "Observation", observation_label_counts),
     )
 
 

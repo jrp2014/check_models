@@ -2034,7 +2034,10 @@ def test_diagnostics_are_skim_first_and_share_reproduction_context_once(
     assert diagnostics.index("TRACEBACK-FIRST") < diagnostics.index("CRASH-PARTIAL")
     assert "<summary>org/observed" in diagnostics
     assert "<summary>org/network" in diagnostics
-    assert "| Response repeats the same text |       1 |\n\n## Triage" in diagnostics
+    assert re.search(
+        r"\| Response repeats the same text\s+\|\s+1 \|\n\n## Triage",
+        diagnostics,
+    )
     assert re.search(
         r"\| \[org/network\].*\|\n\n## Actionable Failures",
         diagnostics,
