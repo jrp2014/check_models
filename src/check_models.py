@@ -3632,8 +3632,9 @@ def _extract_trusted_hint_bundle(
 
 
 CATALOG_SECTION_PATTERN: Final[re.Pattern[str]] = re.compile(
-    r"(?im)^\s*(?:[#>*-]\s*)?\*{0,2}\s*(title|description|keywords)"
-    r"(?::\s*\*{0,2}|\*{0,2}\s*:)\s*(.*)$",
+    r"(?im)^[ \t]*(?:(?:#{1,6})[ \t]+|[>*-][ \t]*)?"
+    r"\*{0,2}[ \t]*(title|description|keywords)"
+    r"(?::[ \t]*\*{0,2}|\*{0,2}[ \t]*:)[ \t]*(.*)$",
 )
 
 

@@ -574,6 +574,22 @@ def test_markdown_bold_catalog_labels_satisfy_requested_sections() -> None:
     assert check_models._assess_result(result).usability == "usable"
 
 
+@pytest.mark.parametrize("heading", ["#", "###", "######"])
+def test_markdown_heading_catalog_labels_satisfy_requested_sections(heading: str) -> None:
+    result = _result(
+        f"{heading} Title:\nTwo Cats Lounging on Red Couch\n\n"
+        f"{heading} Description:\nTwo cats relax together on a red couch.\n\n"
+        f"{heading} Keywords:\n"
+        "cats, lounging, red couch, remote controls, relaxed, indoor, comfort, "
+        "feline, domestic, resting",
+        prompt=CATALOG_PROMPT,
+    )
+
+    assert result.quality_analysis is not None
+    assert result.quality_analysis.missing_sections == []
+    assert check_models._assess_result(result).usability == "usable"
+
+
 def test_text_before_catalog_sections_is_reported_as_unusable() -> None:
     result = _result(
         "Remove non-visual information.\n\n"
