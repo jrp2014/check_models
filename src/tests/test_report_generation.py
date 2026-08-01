@@ -183,6 +183,7 @@ def _write_issue_summary_fixture(
     output_paths: check_models.ReportOutputPaths,
     *,
     results: Sequence[dict[str, object]],
+    image_source_url: str | None = None,
 ) -> None:
     """Write hand-authored retained input for issue-summary tests."""
     output_paths.jsonl.parent.mkdir(parents=True, exist_ok=True)
@@ -211,6 +212,16 @@ def _write_issue_summary_fixture(
         output_paths.jsonl,
         "".join(json.dumps(row) + "\n" for row in rows),
     )
+    image: dict[str, object] = {
+        "name": "fixture.jpg",
+        "sha256": "abc123",
+        "size_bytes": 12_345,
+        "width": 640,
+        "height": 480,
+        "megapixels": 0.3072,
+    }
+    if image_source_url is not None:
+        image["source_url"] = image_source_url
     check_models._write_text_file(
         output_paths.run_json,
         json.dumps(
@@ -218,7 +229,7 @@ def _write_issue_summary_fixture(
                 "generated_at": "2026-07-31 12:02:00 BST",
                 "eval_mode": "assisted",
                 "generation_settings": {"max_tokens": 500, "temperature": 0.0},
-                "image": {"name": "fixture.jpg"},
+                "image": image,
             }
         )
         + "\n",
@@ -328,7 +339,15 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
     assert "### org/crash" in content
     assert "processor_load" in content
     assert "ValueError: processor missing image support" in content
-    assert "python reproduce.py org/crash" in content
+    assert "The original local input is not published" in content
+    assert "JPEG" in content
+    assert "640 x 480" in content
+    assert "12,345 bytes" in content
+    assert "abc123" in content
+    assert "full prompt that must not be copied" in content
+    assert "reproduce.py" not in content
+    assert "prompt.txt" not in content
+    assert "--image fixture.jpg" not in content
     assert "## Completed attempts requiring review" in content
     assert "## Crashed attempts requiring review" in content
     assert "## Indeterminate attempts requiring review" in content
@@ -355,7 +374,38 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
     assert "org/clean" not in content
     assert "Traceback (most recent call last)" not in content
     assert "generated output that must not be copied" not in content
-    assert "full prompt that must not be copied" not in content
+
+
+def test_run_issue_summary_builds_complete_public_image_reproduction(tmp_path: Path) -> None:
+    """A public source should make the aggregate crash reproduction runnable."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    result = _issue_summary_result(
+        "org/crash",
+        execution="crashed",
+        usability="not_evaluated",
+        maintainer_status="actionable_failure",
+    )
+    _write_issue_summary_fixture(
+        output_paths,
+        results=(result,),
+        image_source_url="https://example.test/images/cats.jpg",
+    )
+
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+
+    if summary is None:
+        pytest.fail("the crash must produce a run issue summary")
+    content = summary.read_text(encoding="utf-8")
+    assert "https://example.test/images/cats.jpg" in content
+    assert "curl --fail --location" in content
+    assert "shasum -a 256 --check" in content
+    assert "python -m mlx_vlm.generate" in content
+    assert "--model org/crash" in content
+    assert "--revision revision-crash" in content
+    assert "--prompt 'full prompt that must not be copied'" in content
+    assert "--image cats.jpg" in content
+    assert "reproduce.py" not in content
+    assert "prompt.txt" not in content
 
 
 def test_run_issue_summary_uses_cached_assessment_without_reclassification(
@@ -405,7 +455,11 @@ def test_run_issue_summary_repro_prefers_resolved_revision(tmp_path: Path) -> No
     assert isinstance(provenance, dict)
     provenance["requested_revision"] = "moving-branch"
     provenance["resolved_revision"] = "immutable-commit"
-    _write_issue_summary_fixture(output_paths, results=(result,))
+    _write_issue_summary_fixture(
+        output_paths,
+        results=(result,),
+        image_source_url="https://example.test/images/cats.jpg",
+    )
 
     summary = check_models.generate_run_issue_summary_report(output_paths)
 
@@ -2193,8 +2247,11 @@ def test_crash_diagnostics_and_issue_draft_keep_complete_primary_evidence_first(
         assert content.index("#### Execution and provenance") < content.index("Complete traceback")
     assert "<summary>Complete traceback</summary>" in issue_content
     assert "<summary>Complete traceback</summary>" not in diagnostics_content
-    assert "python -m mlx_vlm.generate" in issue_content
-    assert "```\n\n## Provenance and Environment" in issue_content
+    assert "The original local input is not published" in issue_content
+    assert "python -m mlx_vlm.generate" not in issue_content
+    assert issue_content.index("## Reproduction inputs") < issue_content.index(
+        "## Provenance and Environment"
+    )
     assert not (tmp_path / "issues" / "index.md").exists()
 
 
@@ -2417,47 +2474,95 @@ def test_diagnostics_use_run_args_for_complete_native_reproduction(tmp_path: Pat
         assert f"- *Resolved model revision:* {resolved_revision}" in content
         assert "- *Requested model revision:* run-revision" in content
         assert '- *Configured EOS token override:* ["&lt;override-eos&gt;"]' in content
-        assert '    "top_p": 0.81,' in content
-        assert '    "min_p": 0.12,' in content
-        assert '    "top_k": 7,' in content
-        assert '    "seed": 73,' in content
-        assert '    "repetition_penalty": 1.15,' in content
-        assert '    "presence_penalty": 0.3,' in content
-        assert '    "frequency_penalty": 0.2,' in content
-        assert '    "eos_tokens": ["<override-eos>"],' in content
-        assert '    "enable_thinking": True,' in content
-        assert '    "cropping": False,' in content
+    for setting in (
+        '    "top_p": 0.81,',
+        '    "min_p": 0.12,',
+        '    "top_k": 7,',
+        '    "seed": 73,',
+        '    "repetition_penalty": 1.15,',
+        '    "presence_penalty": 0.3,',
+        '    "frequency_penalty": 0.2,',
+        '    "eos_tokens": ["<override-eos>"],',
+        '    "enable_thinking": True,',
+        '    "cropping": False,',
+    ):
+        assert setting in diagnostics_content
     assert "Supplemental CLI reproduction" not in diagnostics_content
     assert "Canonical parameterised Python reproduction" in diagnostics_content
     assert "--prompt-file prompt.txt" in diagnostics_content
     assert resolved_revision in diagnostics_content
     assert 'parser.add_argument("model")' in diagnostics_content
-    assert "Supplemental CLI reproduction" in issue_content
-    assert "Canonical Python reproduction script" in issue_content
-    assert "--image src/tests/fixtures/check_models-task9-fixture.jpg" in issue_content
-    assert f"--revision {resolved_revision}" in issue_content
-    assert "--revision run-revision" not in issue_content
-    assert "--processor-kwargs" in issue_content
-    assert "--resize-shape 64 32" in issue_content
-    assert "--seed 73" in issue_content
-    assert "--repetition-penalty 1.15" in issue_content
-    assert "--repetition-context-size 48" in issue_content
-    assert "--skip-special-tokens" in issue_content
-    assert 'MODEL = "org/repro"' in issue_content
-    assert 'IMAGE = "src/tests/fixtures/check_models-task9-fixture.jpg"' in issue_content
-    assert f'    "revision": "{resolved_revision}",' in issue_content
-    for index, content in enumerate((diagnostics_content, issue_content)):
-        python_script = content.split("```python\n", maxsplit=1)[1].split("\n```", maxsplit=1)[0]
-        compile(python_script, "<native-repro>", "exec")
-        script_path = tmp_path / f"native_repro_{index}.py"
-        script_path.write_text(python_script + "\n", encoding="utf-8")
-        format_check = subprocess.run(  # noqa: S603 - fixed interpreter checks test output
-            [sys.executable, "-m", "ruff", "format", "--check", str(script_path)],
-            check=False,
-            capture_output=True,
-            text=True,
-        )
-        assert format_check.returncode == 0, format_check.stdout + format_check.stderr
+    assert "Reproduction inputs" in issue_content
+    assert "The original local input is not published" in issue_content
+    assert "JPEG" in issue_content
+    assert "17,235 bytes" in issue_content
+    assert "251712968e443405f6e1ff145de15a91a082dc073209938c5305db0e8e80134c" in issue_content
+    assert "Supplemental CLI reproduction" not in issue_content
+    assert "Canonical Python reproduction script" not in issue_content
+    assert "check_models-task9-fixture.jpg" not in issue_content
+
+    python_script = diagnostics_content.split("```python\n", maxsplit=1)[1].split(
+        "\n```", maxsplit=1
+    )[0]
+    compile(python_script, "<native-repro>", "exec")
+    script_path = tmp_path / "native_repro.py"
+    script_path.write_text(python_script + "\n", encoding="utf-8")
+    format_check = subprocess.run(  # noqa: S603 - fixed interpreter checks test output
+        [sys.executable, "-m", "ruff", "format", "--check", str(script_path)],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert format_check.returncode == 0, format_check.stdout + format_check.stderr
+
+
+def test_crash_issue_draft_builds_complete_public_image_reproduction(tmp_path: Path) -> None:
+    """A direct crash draft should fetch, verify, and use a public exact input."""
+    result = _make_failure_with_details("org/public-repro", error_msg="decode failed")
+    resolved_revision = "0123456789abcdef0123456789abcdef01234567"
+    image_path = Path(__file__).parent / "fixtures/check_models-task9-fixture.jpg"
+    context = _build_report_render_context(
+        results=[result],
+        prompt="Describe the image exactly.",
+        image_path=image_path,
+        model_provenance={
+            result.model_name: {
+                "model": result.model_name,
+                "requested_revision": "main",
+                "resolved_revision": resolved_revision,
+                "snapshot_path": None,
+            }
+        },
+    )
+    run_args = Namespace(
+        image_source_url="https://example.test/images/cats.jpg",
+        max_tokens=321,
+        temperature=0.0,
+        revision="main",
+        trust_remote_code=True,
+    )
+
+    issue_reports = _generate_github_issue_reports(
+        report_context=context,
+        output_dir=tmp_path,
+        library_versions=_stub_versions(),
+        system_info={},
+        prompt="Describe the image exactly.",
+        image_path=image_path,
+        run_args=run_args,
+    )
+
+    content = next(iter(issue_reports.values())).read_text(encoding="utf-8")
+    assert "https://example.test/images/cats.jpg" in content
+    assert "curl --fail --location" in content
+    assert "shasum -a 256 --check" in content
+    assert "python -m mlx_vlm.generate" in content
+    assert "--model org/public-repro" in content
+    assert f"--revision {resolved_revision}" in content
+    assert "--prompt 'Describe the image exactly.'" in content
+    assert "--image cats.jpg" in content
+    assert "reproduce.py" not in content
+    assert "prompt.txt" not in content
 
 
 def test_maintainer_summary_logs_only_counts_and_direct_draft_paths(

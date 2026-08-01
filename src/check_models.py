@@ -1117,7 +1117,7 @@ class RunIssueSummarySource:
 
     metadata: JsonlMetadataRecord
     results: tuple[JsonlResultRecord, ...]
-    image_name: str | None = None
+    image: RunImageRecord | None = None
     generation_settings: tuple[tuple[str, str], ...] = ()
 
 
@@ -8120,27 +8120,6 @@ def _diagnostics_exception_lines(result: PerformanceResult) -> tuple[str, ...]:
     return (_home_relative_report_text(f"{qualified_type}: {message or 'unavailable'}"),)
 
 
-def _diagnostics_repro_command(
-    result: PerformanceResult,
-    *,
-    prompt: str,
-    image_path: Path | None,
-    run_args: argparse.Namespace | None,
-    model_provenance: ModelProvenanceRecord | None,
-) -> str:
-    """Build a direct native repro command from recorded current-run facts."""
-    image_ref = _issue_repro_image_ref(image_path=image_path, run_args=run_args)
-    return build_native_mlx_vlm_repro_command_spec(
-        model_name=result.model_name,
-        prompt=prompt,
-        image_ref=image_ref,
-        run_args=run_args,
-        resolved_revision=(
-            model_provenance["resolved_revision"] if model_provenance is not None else None
-        ),
-    ).shell_command()
-
-
 def _diagnostics_result_facts(
     result: PerformanceResult,
     assessment: ResultAssessment,
@@ -8501,7 +8480,6 @@ def _diagnostics_evidence_blocks(
 
 def _issue_provenance_blocks(
     *,
-    prompt: str,
     library_versions: LibraryVersionDict,
     system_info: Mapping[str, str],
 ) -> tuple[ReportBlock, ...]:
@@ -8522,7 +8500,6 @@ def _issue_provenance_blocks(
     return (
         _report_section(
             "Provenance and Environment",
-            _report_section("Prompt", ReportCodeBlock(prompt), level=3),
             _report_section("Components", components, level=3),
         ),
     )
@@ -14870,9 +14847,9 @@ def _validate_run_issue_result(value: JsonLike, line_number: int) -> JsonlResult
 
 def _load_run_issue_enrichment(
     run_json_path: Path,
-) -> tuple[str | None, tuple[tuple[str, str], ...]]:
+) -> tuple[RunImageRecord | None, tuple[tuple[str, str], ...]]:
     """Load optional image/settings enrichment, ignoring absent or malformed run JSON."""
-    image_name: str | None = None
+    image_record: RunImageRecord | None = None
     generation_settings: tuple[tuple[str, str], ...] = ()
     try:
         run_value: JsonLike = json.loads(_read_text_file(run_json_path))
@@ -14880,16 +14857,46 @@ def _load_run_issue_enrichment(
         run_value = None
     if isinstance(run_value, dict):
         image = run_value.get("image")
-        run_image_name = image.get("name") if isinstance(image, dict) else None
-        if isinstance(run_image_name, str):
-            image_name = run_image_name
+        if isinstance(image, dict) and isinstance(image.get("name"), str):
+            image_record = {
+                "name": image["name"],
+                "sha256": image.get("sha256") if isinstance(image.get("sha256"), str) else None,
+                "size_bytes": (
+                    image.get("size_bytes")
+                    if isinstance(image.get("size_bytes"), int)
+                    and not isinstance(image.get("size_bytes"), bool)
+                    else None
+                ),
+                "width": (
+                    image.get("width")
+                    if isinstance(image.get("width"), int)
+                    and not isinstance(image.get("width"), bool)
+                    else None
+                ),
+                "height": (
+                    image.get("height")
+                    if isinstance(image.get("height"), int)
+                    and not isinstance(image.get("height"), bool)
+                    else None
+                ),
+                "megapixels": (
+                    float(image["megapixels"])
+                    if isinstance(image.get("megapixels"), int | float)
+                    and not isinstance(image.get("megapixels"), bool)
+                    else None
+                ),
+            }
+            source_url = image.get("source_url")
+            if isinstance(source_url, str):
+                with suppress(argparse.ArgumentTypeError):
+                    image_record["source_url"] = _parse_public_image_source_url(source_url)
         settings = run_value.get("generation_settings")
         if isinstance(settings, dict):
             generation_settings = tuple(
                 (key, json.dumps(value, ensure_ascii=False, sort_keys=True))
                 for key, value in sorted(settings.items())
             )
-    return image_name, generation_settings
+    return image_record, generation_settings
 
 
 def _load_run_issue_summary_source(
@@ -14904,14 +14911,14 @@ def _load_run_issue_summary_source(
         _validate_run_issue_result(value, line_number)
         for line_number, value in enumerate(parsed_rows[1:], start=2)
     )
-    image_name, generation_settings = (
+    image, generation_settings = (
         _load_run_issue_enrichment(output_paths.run_json) if include_run_json else (None, ())
     )
 
     return RunIssueSummarySource(
         metadata=metadata,
         results=results,
-        image_name=image_name,
+        image=image,
         generation_settings=generation_settings,
     )
 
@@ -14952,22 +14959,103 @@ def _github_issue_report_paths(
     return paths
 
 
-def _run_issue_summary_repro_command(
-    result: JsonlResultRecord,
-    source: RunIssueSummarySource,
-) -> str:
-    """Build the compact parameterized reproduction command for one crash."""
-    tokens = ["python", "reproduce.py", result["model"]]
-    provenance = result.get("model_provenance")
-    revision: str | None = None
-    if isinstance(provenance, dict):
-        revision = provenance.get("resolved_revision") or provenance.get("requested_revision")
-    if revision:
-        tokens.extend(("--revision", revision))
-    if source.image_name:
-        tokens.extend(("--image", source.image_name))
-    tokens.extend(("--prompt-file", "prompt.txt"))
-    return shlex_join(tokens)
+def _reproduction_image_format(image: RunImageRecord) -> str:
+    """Return a concise image format inferred from the publication-safe name."""
+    suffix = Path(image["name"]).suffix.removeprefix(".").upper()
+    return "JPEG" if suffix in {"JPG", "JPEG"} else suffix or "unavailable"
+
+
+def _reproduction_image_facts(image: RunImageRecord | None) -> tuple[tuple[str, str], ...]:
+    """Return publication-safe image characteristics for an issue report."""
+    if image is None:
+        return (("Image input", "characteristics unavailable"),)
+    rows: list[tuple[str, str]] = [("Image format", _reproduction_image_format(image))]
+    if image["width"] is not None and image["height"] is not None:
+        rows.append(("Image dimensions", f"{image['width']:,} x {image['height']:,} pixels"))
+    if image["size_bytes"] is not None:
+        rows.append(("Image size", f"{image['size_bytes']:,} bytes"))
+    if image["sha256"] is not None:
+        rows.append(("Image SHA-256", image["sha256"]))
+    if source_url := image.get("source_url"):
+        rows.append(("Public source", source_url))
+    return tuple(rows)
+
+
+def _public_reproduction_filename(image: RunImageRecord) -> str:
+    """Return a safe basename for downloading the public reproduction image."""
+    source_name = PurePosixPath(urlparse(image["source_url"]).path).name
+    safe_name = re.sub(r"[^A-Za-z0-9_.-]+", "_", source_name).strip("._")
+    if safe_name:
+        return safe_name
+    suffix = Path(image["name"]).suffix.lower()
+    return f"repro-image{suffix or '.img'}"
+
+
+def _retained_generation_args(source: RunIssueSummarySource) -> argparse.Namespace:
+    """Restore JSON-rendered common generation values for native CLI rendering."""
+    return argparse.Namespace(
+        **{key: json.loads(value) for key, value in source.generation_settings}
+    )
+
+
+def _reproduction_input_blocks(
+    *,
+    model_name: str,
+    prompt: str,
+    image: RunImageRecord | None,
+    run_args: argparse.Namespace | None,
+    resolved_revision: str | None,
+) -> tuple[ReportBlock, ...]:
+    """Describe exact inputs and render a command only for a published image."""
+    blocks: list[ReportBlock] = [
+        ReportKeyValues(_reproduction_image_facts(image)),
+        ReportDetails("Exact prompt", (ReportCodeBlock(prompt),)),
+    ]
+    if image is None or image.get("source_url") is None:
+        blocks.append(
+            ReportParagraph(
+                "The original local input is not published, so this report does not claim "
+                "a complete reproduction command. Use a shareable equivalent image or add "
+                "the original image before filing."
+            )
+        )
+        return tuple(blocks)
+
+    filename = _public_reproduction_filename(image)
+    source_url = image["source_url"]
+    commands = [
+        shlex_join(
+            (
+                "curl",
+                "--fail",
+                "--location",
+                "--output",
+                filename,
+                source_url,
+            )
+        )
+    ]
+    if image["sha256"] is not None:
+        hash_record = f"{image['sha256']}  {filename}"
+        commands.append(f"{shlex_join(('printf', '%s\\n', hash_record))} | shasum -a 256 --check")
+    commands.append(
+        build_native_mlx_vlm_repro_command_spec(
+            model_name=model_name,
+            prompt=prompt,
+            image_ref=filename,
+            run_args=run_args,
+            resolved_revision=resolved_revision,
+        ).shell_command()
+    )
+    blocks.extend(
+        (
+            ReportParagraph(
+                "Download and verify the exact public input, then run one native mlx-vlm process."
+            ),
+            ReportCodeBlock("\n".join(commands), language="bash"),
+        )
+    )
+    return tuple(blocks)
 
 
 def _run_issue_summary_exception_lines(failure: JsonlFailureRecord | None) -> str:
@@ -15079,10 +15167,16 @@ def _run_issue_summary_crash_section(
             ReportKeyValues(tuple(facts)),
             ReportParagraph("Root exception chain"),
             ReportCodeBlock(_run_issue_summary_exception_lines(failure)),
-            ReportParagraph("Parameterized reproduction"),
-            ReportCodeBlock(
-                _run_issue_summary_repro_command(result, source),
-                language="bash",
+            ReportSection(
+                "Reproduction inputs",
+                _reproduction_input_blocks(
+                    model_name=result["model"],
+                    prompt=source.metadata["prompt"],
+                    image=source.image,
+                    run_args=_retained_generation_args(source),
+                    resolved_revision=resolved_revision or requested_revision,
+                ),
+                level=4,
             ),
             ReportTable(("Evidence", "Link"), tuple(evidence_rows), compact=True),
         ),
@@ -15144,8 +15238,13 @@ def _run_issue_summary_surfaced_sections(
 def _run_issue_summary_context_section(source: RunIssueSummarySource) -> ReportSection:
     """Build compact run settings and environment context."""
     rows: list[tuple[str, str]] = []
-    if source.image_name:
-        rows.append(("Image", source.image_name))
+    if source.image is not None:
+        rows.append(
+            (
+                "Image",
+                ", ".join(value for _, value in _reproduction_image_facts(source.image)[:3]),
+            )
+        )
     rows.extend((f"Generation: {key}", value) for key, value in source.generation_settings)
     versions = source.metadata.get("library_versions", {})
     if isinstance(versions, dict):
@@ -15445,6 +15544,17 @@ def _issue_repro_image_ref(
     if not raw_ref:
         return "path/to/repro-image.jpg"
     return _issue_repro_portable_path_ref(raw_ref, fallback="path/to/repro-image.jpg")
+
+
+def _issue_public_image_source_url(run_args: argparse.Namespace | None) -> str | None:
+    """Return validated public source metadata from an executed argument set."""
+    source_url = getattr(run_args, "image_source_url", None) if run_args is not None else None
+    if not isinstance(source_url, str):
+        return None
+    try:
+        return _parse_public_image_source_url(source_url)
+    except argparse.ArgumentTypeError:
+        return None
 
 
 def _native_mlx_vlm_load_kwargs(
@@ -15793,49 +15903,6 @@ def _python_repro_mapping_assignment(name: str, values: Mapping[str, object]) ->
     return "\n".join(lines)
 
 
-def _build_native_mlx_vlm_python_script(
-    *,
-    model_name: str,
-    prompt: str,
-    image_ref: str,
-    run_args: argparse.Namespace | None,
-    resolved_revision: str | None = None,
-) -> str:
-    """Build a compact native Python repro script for one representative model."""
-    load_kwargs = _native_mlx_vlm_load_kwargs(
-        run_args,
-        resolved_revision=resolved_revision,
-    )
-    template_kwargs = _native_mlx_vlm_template_kwargs(run_args)
-    generate_kwargs = _native_mlx_vlm_generate_kwargs(run_args)
-    return "\n".join(
-        (
-            "from mlx_vlm.generate import generate",
-            "from mlx_vlm.prompt_utils import apply_chat_template",
-            "from mlx_vlm.utils import load",
-            "",
-            f"MODEL = {_python_repro_string_literal(model_name)}",
-            f"IMAGE = {_python_repro_string_literal(image_ref)}",
-            f"PROMPT = {_python_repro_string_literal(prompt)}",
-            _python_repro_mapping_assignment("LOAD_KWARGS", load_kwargs),
-            _python_repro_mapping_assignment("TEMPLATE_KWARGS", template_kwargs),
-            _python_repro_mapping_assignment("GENERATE_KWARGS", generate_kwargs),
-            "model, processor = load(MODEL, **LOAD_KWARGS)",
-            "formatted_prompt = apply_chat_template(",
-            "    processor,",
-            "    model.config,",
-            "    PROMPT,",
-            "    num_images=1,",
-            "    **TEMPLATE_KWARGS,",
-            ")",
-            "if isinstance(formatted_prompt, list):",
-            '    formatted_prompt = "\\n".join(str(message) for message in formatted_prompt)',
-            "result = generate(model, processor, formatted_prompt, image=IMAGE, **GENERATE_KWARGS)",
-            "print(result.text)",
-        )
-    )
-
-
 def _build_parameterized_mlx_vlm_python_script(
     *,
     prompt_file_name: str,
@@ -16008,11 +16075,15 @@ def _generate_github_issue_reports(
         tuple(result.model_name for result in crashes),
         issues_dir,
     )
+    issue_image = _run_image_record(
+        image_path,
+        report_context.image_profile or _load_image_input_profile(image_path),
+        source_url=_issue_public_image_source_url(run_args),
+    )
     for result in crashes:
         issue_path = issue_paths[result.model_name]
         parts = [f"# Crash: {MARKDOWN_ESCAPER.escape(result.model_name)}", ""]
         provenance = model_provenance.get(result.model_name)
-        image_ref = _issue_repro_image_ref(image_path=image_path, run_args=run_args)
         issue_blocks: tuple[ReportBlock, ...] = (
             _report_section(
                 "Maintainer evidence",
@@ -16029,34 +16100,15 @@ def _generate_github_issue_reports(
                 ),
             ),
             _report_section(
-                "Supplemental CLI reproduction",
-                ReportParagraph(
-                    "This form includes only settings supported by the native mlx-vlm CLI."
-                ),
-                ReportCodeBlock(
-                    _diagnostics_repro_command(
-                        result,
-                        prompt=prompt,
-                        image_path=image_path,
-                        run_args=run_args,
-                        model_provenance=provenance,
+                "Reproduction inputs",
+                *_reproduction_input_blocks(
+                    model_name=result.model_name,
+                    prompt=prompt,
+                    image=issue_image,
+                    run_args=run_args,
+                    resolved_revision=(
+                        provenance["resolved_revision"] if provenance is not None else None
                     ),
-                    language="bash",
-                ),
-            ),
-            _report_section(
-                "Canonical Python reproduction script",
-                ReportCodeBlock(
-                    _build_native_mlx_vlm_python_script(
-                        model_name=result.model_name,
-                        prompt=prompt,
-                        image_ref=image_ref,
-                        run_args=run_args,
-                        resolved_revision=(
-                            provenance["resolved_revision"] if provenance is not None else None
-                        ),
-                    ),
-                    language="python",
                 ),
             ),
         )
@@ -16065,7 +16117,6 @@ def _generate_github_issue_reports(
                 (
                     *issue_blocks,
                     *_issue_provenance_blocks(
-                        prompt=prompt,
                         library_versions=library_versions,
                         system_info=system_info,
                     ),
