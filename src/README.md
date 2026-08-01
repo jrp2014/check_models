@@ -1053,6 +1053,7 @@ python -m check_models --image photo.jpg --eval-mode assisted
 | ---- | ---- | ------- | ----------- |
 | `-f`, `--folder` | Path | omitted | Folder to scan (non-recursive); the most recently modified image in that folder is used. If both `--folder` and `--image` are omitted, the most recently modified image in `~/Pictures/Processed` is used. |
 | `-i`, `--image` | Path | omitted | Path to a specific image file to process directly. Requires a value when provided. |
+| `--image-source-url` | URL | omitted | Public HTTP(S) location of the exact local image used by the run; recorded for issue reproduction only and never downloaded as the inference input. |
 | `--output-html` | Path | `output/reports/results.html` | HTML report output filename. |
 | `--output-gallery-markdown` | Path | `output/reports/model_gallery.md` | Evidence-only Markdown gallery report filename. |
 | `--output-jsonl` | Path | `output/results.jsonl` | JSONL report output filename. |
@@ -1116,6 +1117,13 @@ Image selection logic:
 1. If neither `--folder` nor `--image` is specified, the script uses the most recently modified image in the default folder (`~/Pictures/Processed`) and logs a diagnostic message.
 2. If `--image` is provided, that image is processed directly.
 3. If `--folder` is provided, the most recently modified image in the folder is used.
+
+When the selected image is already public, pass its stable URL with
+`--image-source-url`. Paste-ready crash reports can then download the exact
+input, verify its SHA-256 digest, and run a native mlx-vlm command with the exact
+prompt. If the flag is omitted, reports publish the local image's format,
+dimensions, byte size, and digest, state that the original is unavailable, and
+do not present a misleading runnable command.
 
 Model selection logic:
 

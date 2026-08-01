@@ -25,6 +25,11 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Make paste-ready crash reproductions self-contained when the exact input image
+  has a recorded public HTTP(S) source: include download and SHA-256 verification
+  commands plus a native mlx-vlm invocation with the exact prompt. For unpublished
+  local images, report format, dimensions, byte size, and digest while explicitly
+  withholding a misleading command that refers to private or synthetic files.
 - Make human-facing observation labels explanatory and severity-ordered, split the
   compact run issue summary into completed, crashed, and indeterminate review
   tables while keeping actionable crashes expanded, and preserve canonical GitHub
