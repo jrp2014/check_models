@@ -89,6 +89,9 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Preserve `ObservationCode` key typing while building diagnostics counts so
+  Pylance agrees with the other supported type checkers at the label-rendering
+  boundary.
 - Recognise conventional one-to-six-hash Markdown headings such as `### Title:` as
   valid structured catalogue fields instead of incorrectly reporting their Title,
   Description, and Keywords sections as missing.

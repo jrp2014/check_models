@@ -8288,7 +8288,7 @@ def _diagnostics_counts_blocks(
     outcomes = _run_outcome_counts(context.assessments)
     maintainer_counts = Counter(assessment.maintainer_status for assessment in assessments)
     usability_counts = Counter(assessment.usability for assessment in assessments)
-    observation_counts = Counter(
+    observation_counts: Counter[ObservationCode] = Counter(
         observation for assessment in assessments for observation in assessment.observations
     )
     observation_label_counts = {
