@@ -6741,6 +6741,23 @@ def _markdown_artifact_target(
     return target
 
 
+def _issue_markdown_artifact_target(
+    *,
+    report_filename: Path,
+    artifact_filename: Path,
+    anchor: str | None = None,
+) -> str:
+    """Return a repository URL for a cross-file link pasted into a GitHub issue."""
+    github_url = _github_output_artifact_url(artifact_filename, anchor=anchor)
+    if github_url is not None:
+        return github_url
+    return _markdown_artifact_target(
+        report_filename=report_filename,
+        artifact_filename=artifact_filename,
+        anchor=anchor,
+    )
+
+
 def _gallery_model_anchor(model_name: str) -> str:
     """Build a stable anchor for model sections in the gallery artifact."""
     normalized_name = model_name.lower().replace("/", " ")
@@ -14956,7 +14973,7 @@ def _run_issue_summary_artifact_link(
     """Build one safely rendered link from the issue summary to retained evidence."""
     return ReportTargetLink(
         label,
-        _markdown_artifact_target(
+        _issue_markdown_artifact_target(
             report_filename=summary_path,
             artifact_filename=artifact_path,
             anchor=anchor,
@@ -15049,39 +15066,55 @@ def _run_issue_summary_crash_section(
     )
 
 
-def _run_issue_summary_other_section(
+def _run_issue_summary_surfaced_sections(
     results: Sequence[JsonlResultRecord],
     *,
     output_paths: ReportOutputPaths,
     summary_path: Path,
-) -> ReportSection:
-    """Build the compact table for non-actionable surfaced results."""
-    rows: list[tuple[ReportCell, ...]] = []
-    for result in results:
-        assessment = result["assessment"]
-        rows.append(
-            (
-                result["model"],
-                _run_issue_summary_assessment_label(assessment),
-                _gallery_observation_labels(assessment["observations"]),
-                _run_issue_summary_artifact_link(
-                    summary_path=summary_path,
-                    artifact_path=output_paths.diagnostics,
-                    label="diagnostics",
-                    anchor=_diagnostics_model_anchor(result["model"]),
-                ),
+) -> tuple[ReportSection, ...]:
+    """Build one compact review table for each non-actionable execution status."""
+    heading_by_execution: dict[ExecutionStatus, str] = {
+        "completed": "Completed attempts requiring review",
+        "crashed": "Crashed attempts requiring review",
+        "indeterminate": "Indeterminate attempts requiring review",
+    }
+    sections: list[ReportSection] = []
+    for execution, heading in heading_by_execution.items():
+        rows: list[tuple[ReportCell, ...]] = []
+        for result in results:
+            assessment = result["assessment"]
+            if assessment["execution"] != execution:
+                continue
+            rows.append(
+                (
+                    result["model"],
+                    assessment["usability"].replace("_", " "),
+                    _human_observation_labels(
+                        assessment["observations"],
+                        details=assessment.get("details"),
+                    ),
+                    _run_issue_summary_artifact_link(
+                        summary_path=summary_path,
+                        artifact_path=output_paths.diagnostics,
+                        label="diagnostics",
+                        anchor=_diagnostics_model_anchor(result["model"]),
+                    ),
+                )
             )
-        )
-    return ReportSection(
-        "Other surfaced results",
-        (
-            ReportTable(
-                ("Model", "Execution / usability", "Observations", "Full evidence"),
-                tuple(rows),
-                compact=True,
-            ),
-        ),
-    )
+        if rows:
+            sections.append(
+                ReportSection(
+                    heading,
+                    (
+                        ReportTable(
+                            ("Model", "Usability", "Observed result", "Evidence"),
+                            tuple(rows),
+                            compact=True,
+                        ),
+                    ),
+                )
+            )
+    return tuple(sections)
 
 
 def _run_issue_summary_context_section(source: RunIssueSummarySource) -> ReportSection:
@@ -15198,8 +15231,8 @@ def generate_run_issue_summary_report(
                         ("Completed", str(counts["completed"])),
                         ("Crashed", str(counts["crashed"])),
                         ("Indeterminate", str(counts["indeterminate"])),
-                        ("Actionable failures", str(len(actionable))),
-                        ("Other surfaced results", str(len(other))),
+                        ("Crashes requiring action", str(len(actionable))),
+                        ("Other results requiring review", str(len(other))),
                     )
                 ),
                 ReportParagraph(
@@ -15213,7 +15246,7 @@ def generate_run_issue_summary_report(
     if actionable:
         blocks.append(
             ReportSection(
-                "Actionable failures",
+                "Crashes requiring action",
                 tuple(
                     _run_issue_summary_crash_section(
                         result,
@@ -15228,8 +15261,8 @@ def generate_run_issue_summary_report(
         )
 
     if other:
-        blocks.append(
-            _run_issue_summary_other_section(
+        blocks.extend(
+            _run_issue_summary_surfaced_sections(
                 other,
                 output_paths=output_paths,
                 summary_path=summary_path,

@@ -131,6 +131,7 @@ def _issue_summary_result(
     usability: str = "usable",
     maintainer_status: str = "none",
     observations: list[str] | None = None,
+    details: dict[str, object] | None = None,
 ) -> dict[str, object]:
     """Build one literal schema-2.0 result without production serializers."""
     crashed = execution == "crashed"
@@ -143,6 +144,7 @@ def _issue_summary_result(
             "usability": usability,
             "maintainer_status": maintainer_status,
             "observations": observations or [],
+            **({"details": details} if details is not None else {}),
         },
         "generated_text": "generated output that must not be copied",
         "captured_output_on_fail": "captured output that must not be copied",
@@ -284,7 +286,21 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
                 "org/observed",
                 usability="unusable",
                 maintainer_status="observation_needs_reproduction",
-                observations=["repeated_output"],
+                observations=["missing_requested_sections", "repeated_output"],
+                details={"missing_sections": ["title", "keywords"]},
+            ),
+            _issue_summary_result(
+                "org/crashed-observed",
+                execution="crashed",
+                usability="not_evaluated",
+                maintainer_status="observation_needs_reproduction",
+                observations=["unexpected_special_token"],
+            ),
+            _issue_summary_result(
+                "org/indeterminate",
+                execution="indeterminate",
+                usability="not_evaluated",
+                observations=["empty_output"],
             ),
             _issue_summary_result("org/clean"),
         ),
@@ -304,17 +320,37 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
         pytest.fail("surfaced results must produce a run issue summary")
     content = summary.read_text(encoding="utf-8")
     assert content.startswith(
-        "# mlx-vlm compatibility findings across 3 cached vision-language models\n"
+        "# mlx-vlm compatibility findings across 5 cached vision-language models\n"
     )
     assert "## Run summary" in content
     assert "mechanical facts from one image" in content
-    assert "## Actionable failures" in content
+    assert "## Crashes requiring action" in content
     assert "### org/crash" in content
     assert "processor_load" in content
     assert "ValueError: processor missing image support" in content
     assert "python reproduce.py org/crash" in content
-    assert "| org/observed | completed / unusable | Response repeats the same text |" in content
-    assert "../reports/diagnostics.md#diagnostic-org-observed" in content
+    assert "## Completed attempts requiring review" in content
+    assert "## Crashed attempts requiring review" in content
+    assert "## Indeterminate attempts requiring review" in content
+    assert content.count("| Model | Usability | Observed result | Evidence |") == 3
+    assert "| Model | Execution / usability | Observations | Full evidence |" not in content
+    assert (
+        "| org/observed | unusable | Response repeats the same text; "
+        "Missing or empty fields: Title, Keywords |"
+    ) in content
+    crashed_table = _extract_markdown_subsection(
+        content,
+        "## Crashed attempts requiring review",
+        end_headings=("## Indeterminate attempts requiring review",),
+    )
+    assert "org/crashed-observed" in crashed_table
+    assert "| org/crash |" not in crashed_table
+    link_targets = _extract_markdown_link_targets(content)
+    assert link_targets
+    assert all(
+        target.startswith("https://github.com/jrp2014/check_models/blob/main/src/output/")
+        for target in link_targets
+    )
     assert "1 clean completion; see the [full model gallery]" in content
     assert "org/clean" not in content
     assert "Traceback (most recent call last)" not in content
@@ -351,7 +387,8 @@ def test_run_issue_summary_uses_cached_assessment_without_reclassification(
 
     assert summary is not None
     content = summary.read_text(encoding="utf-8")
-    assert "completed / usable with caveats" in content
+    assert "## Completed attempts requiring review" in content
+    assert "| org/cached | usable with caveats |" in content
     assert "Response is unusually short" in content
 
 
@@ -538,7 +575,10 @@ def test_regenerate_run_issue_summary_only_writes_derived_artifact(tmp_path: Pat
     if generated is None:
         pytest.fail("the actionable retained run must regenerate an issue summary")
     assert {path: path.read_bytes() for path in retained} == retained
-    assert "[crash draft](issue_org_crash.md)" in generated.read_text(encoding="utf-8")
+    assert (
+        "[crash draft](https://github.com/jrp2014/check_models/blob/main/"
+        "src/output/issues/issue_org_crash.md)"
+    ) in generated.read_text(encoding="utf-8")
 
 
 def test_html_and_gallery_render_same_captured_peak_memory(tmp_path: Path) -> None:
