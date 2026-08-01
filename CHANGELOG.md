@@ -7,6 +7,11 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- Add a conditional, paste-ready whole-run GitHub issue summary with expanded
+  crashes, a compact table of other surfaced results, clean-completion counts,
+  and links to full retained evidence. Generate it during normal finalization,
+  link it before individual crash drafts, and support report-only regeneration
+  from schema-2.0 JSONL and optional run JSON without rerunning models.
 - Document product recommendations for issue-ready diagnostics and model-selection
   galleries aimed at mlx-vlm maintainers and image-description users
   (`docs/notes/DIAGNOSTICS_USEFULNESS_RECOMMENDATIONS.md`).
@@ -23,6 +28,9 @@ Notable changes to this project will be documented in this file.
 - Keep HTML complete model evidence in the same usable-first order as the Markdown
   gallery, and preserve seed and repetition settings in supplemental native mlx-vlm
   CLI reproduction commands.
+- Document Ruff's unsafe fixes as an optional, preview-first shortcut only when
+  they are faster than manual lint correction, with critical diff review and
+  targeted verification required before retaining any semantic change.
 - Archive completed Superpowers plans and designs for issue-ready reporting,
   Skylos cleanup, and diagnostics usability quick wins under
   `docs/notes/archive/superpowers/`, and remove the empty active

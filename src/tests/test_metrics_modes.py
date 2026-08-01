@@ -132,6 +132,9 @@ def _run_finalize_with_report_patches(
             patch("check_models.append_history_record", return_value=_finalize_history_stub())
         )
         stack.enter_context(patch("check_models.generate_diagnostics_report", return_value=False))
+        stack.enter_context(
+            patch("check_models.generate_run_issue_summary_report", return_value=None)
+        )
         finalize_execution(
             args=args,
             results=[result],
