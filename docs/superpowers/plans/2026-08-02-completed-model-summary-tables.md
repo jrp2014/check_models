@@ -120,3 +120,19 @@ git add CHANGELOG.md src/check_models.py src/tests/test_metrics_modes.py
 git commit -m "feat: tabulate completed model summary"
 git push origin main
 ```
+
+---
+
+### Task 2: Separate replayed per-model result blocks
+
+**Files:**
+
+- Modify: `src/tests/test_metrics_modes.py`
+- Modify: `src/check_models.py` (`finalize_execution`)
+- Modify: `CHANGELOG.md` (`[Unreleased]`)
+
+- [x] Add a behavioural finalization test requiring one horizontal rule after
+  model 1's metrics and before model 2's summary.
+- [x] Insert the existing `print_cli_separator()` only between consecutive
+  per-model blocks.
+- [x] Run focused and full quality gates.

@@ -17218,6 +17218,8 @@ def finalize_execution(
         _validate_report_render_context(report_context)
         assessments = dict(report_context.assessments)
         for index, result in enumerate(results, start=1):
+            if index > 1:
+                print_cli_separator()
             print_model_result(
                 result,
                 assessment=assessments[result.model_name],

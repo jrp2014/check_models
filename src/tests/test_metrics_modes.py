@@ -120,7 +120,7 @@ def _finalize_history_stub() -> dict[str, object]:
 def _run_finalize_with_report_patches(
     *,
     args: argparse.Namespace,
-    result: PerformanceResult,
+    results: list[PerformanceResult],
     overall_start_time: float,
 ) -> None:
     """Run finalization with report writers patched out for path/log assertions."""
@@ -137,7 +137,7 @@ def _run_finalize_with_report_patches(
         )
         finalize_execution(
             args=args,
-            results=[result],
+            results=results,
             library_versions={"mlx": "0.0.0", "mlx-vlm": "0.0.0"},
             overall_start_time=overall_start_time,
             prompt="test prompt",
@@ -1087,7 +1087,7 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
 
     _run_finalize_with_report_patches(
         args=args,
-        result=result,
+        results=[result],
         overall_start_time=time.perf_counter() - 0.5,
     )
 
@@ -1100,6 +1100,59 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
         args.output_diagnostics,
     )
     _assert_report_artifact_log_order(messages)
+
+
+def test_finalize_execution_separates_each_model_result_block(
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """A model's metrics should end before the next model summary begins."""
+    caplog.set_level(logging.INFO)
+    args = argparse.Namespace(
+        verbose=True,
+        output_html=tmp_path / "report.html",
+        output_gallery_markdown=tmp_path / "gallery.md",
+        output_jsonl=tmp_path / "report.jsonl",
+        output_run_json=tmp_path / "run.json",
+        output_diagnostics=tmp_path / "diagnostics.md",
+        output_log=tmp_path / "check_models.log",
+        output_env=tmp_path / "environment.log",
+    )
+    results = [
+        PerformanceResult(
+            model_name="dummy/first",
+            generation=_StubGeneration(text="first result"),
+            success=True,
+        ),
+        PerformanceResult(
+            model_name="dummy/second",
+            generation=_StubGeneration(text="second result"),
+            success=True,
+        ),
+    ]
+
+    _run_finalize_with_report_patches(
+        args=args,
+        results=results,
+        overall_start_time=time.perf_counter() - 0.5,
+    )
+
+    messages = [record.message for record in caplog.records]
+    first_summary = _message_index(messages, "[RUN 1/2] SUMMARY model=dummy/first")
+    second_summary = _message_index(messages, "[RUN 2/2] SUMMARY model=dummy/second")
+    first_timing = next(
+        index
+        for index, message in enumerate(messages[first_summary:second_summary], first_summary)
+        if "Timing:" in message
+    )
+    separators = [
+        index
+        for index, message in enumerate(messages[first_summary:second_summary], first_summary)
+        if message and set(message) == {"─"}
+    ]
+
+    assert len(separators) == 1
+    assert first_timing < separators[0] < second_summary
 
 
 def test_report_generation_uses_single_artifact_plan(tmp_path: Path) -> None:
@@ -1337,7 +1390,7 @@ def test_finalize_execution_does_not_read_history_for_current_reports(tmp_path: 
     ):
         _run_finalize_with_report_patches(
             args=args,
-            result=result,
+            results=[result],
             overall_start_time=time.perf_counter() - 0.5,
         )
 
