@@ -25,6 +25,15 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Make run issue summaries more actionable by sorting each execution table by
+  likely output impact, spelling out structured failures when no observation is
+  available, recording remote-code and producer provenance, and ignoring generated
+  `src/output/` changes when calculating producer dirtiness. Detailed crash drafts
+  now keep only runtime-relevant environment facts and link to the complete
+  repository environment artifact.
+- Record out-of-range catalogue title/keyword counts and duplicate keywords as
+  structured repairable caveats, and recognise configured turn, message, and
+  utterance delimiters as visible role-boundary tokens.
 - Make paste-ready crash reproductions self-contained when the exact input image
   has a recorded public HTTP(S) source: include download and SHA-256 verification
   commands plus a native mlx-vlm invocation with the exact prompt. For unpublished
@@ -96,6 +105,12 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Accept callable custom mlx-vlm processors that support images without exposing
+  Transformers' optional `image_processor` attribute, and retry connectivity-only
+  Hub load failures from a matching resolved local snapshot when downloads were
+  not forced.
+- Exclude ignored `.worktrees/` checkouts from suppression and Markdown audits so
+  an isolated upstream checkout cannot contaminate check_models quality results.
 - Preserve `ObservationCode` key typing while building diagnostics counts so
   Pylance agrees with the other supported type checkers at the label-rendering
   boundary.

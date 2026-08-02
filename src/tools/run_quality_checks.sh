@@ -115,7 +115,8 @@ if [ "$QUALITY_MODE" = "fast" ]; then
         --config .markdownlint.jsonc \
         "**/*.md" \
         "!src/node_modules/**" \
-        "!**/node_modules/**"
+        "!**/node_modules/**" \
+        "!**/.worktrees/**"
 
     echo ""
     echo "✅ Fast quality checks passed!"
@@ -143,7 +144,8 @@ quality_run_markdownlint \
     --config .markdownlint.jsonc \
     "**/*.md" \
     "!src/node_modules/**" \
-    "!**/node_modules/**"
+    "!**/node_modules/**" \
+    "!**/.worktrees/**"
 
 echo ""
 echo "✅ All quality checks passed!"

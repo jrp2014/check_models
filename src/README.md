@@ -273,10 +273,12 @@ The tool generates a deliberately small artifact set in `output/` by default:
 - **Run issue summary** (`issues/run_summary.md`): Conditional compact whole-run
   GitHub issue body. It expands crashes with root exceptions and a parameterised
   reproduction command, separates completed, crashed, and indeterminate attempts
-  requiring review into compact tables, counts clean completions, and links to the
-  complete retained evidence without copying full prompts, outputs, tracebacks, or
-  scripts. Its cross-file links always use canonical GitHub repository URLs so they
-  still work when the report is pasted into an issue.
+  requiring review into severity-ordered compact tables, explains structured
+  failures even when no output observation exists, counts clean completions, and
+  records remote-code and producer provenance. It links to complete retained
+  evidence without copying full prompts, outputs, tracebacks, or scripts. Its
+  cross-file links always use canonical GitHub repository URLs so they still work
+  when the report is pasted into an issue.
 - **Index** (`index.md`): Tiny navigation page linking the current-run files and,
   when generated, the run issue summary before individual crash drafts.
 - **Log** (`check_models.log`): Canonical comprehensive run trace, including complete
@@ -285,7 +287,9 @@ The tool generates a deliberately small artifact set in `output/` by default:
 - **History** (`results.history.jsonl`): Append-only raw history for optional
   out-of-band analysis. Current reports do not read it or derive advice from it.
 - **Issue drafts** (`issues/issue_*.md`): Conditional factual drafts, not a standing
-  report surface. Issue drafts are created only for hard actionable crashes.
+  report surface. Issue drafts are created only for hard actionable crashes. Their
+  inline environment table is limited to runtime-relevant components and links to
+  the complete retained `environment.log` inventory.
 
 Regenerate only the compact issue body from an existing retained run, without
 model discovery or inference:
@@ -319,8 +323,8 @@ thinking traces remain factual observations that may need controlled reproductio
 Likewise, tokenizer special-token metadata, tokenizer EOS, explicit `eos_tokens`,
 and configured thinking start/end wrappers are treated as declared protocol.
 Configured conversation-role tokens remain declared rather than “unknown”; when a
-new user/assistant/system boundary occurs inside generated content, its exact token
-is retained as a separate role-boundary observation.
+new user/assistant/system/turn/message/utterance boundary occurs inside generated
+content, its exact token is retained as a separate role-boundary observation.
 Control-wrapper syntax that appears in output without any of those declarations is
 retained as an `unexpected_special_token` observation; no model-name allowlist is
 used.
@@ -329,6 +333,9 @@ retained as an `unexpected_catalog_preamble` observation. Conventional Markdown
 label emphasis such as `**Title:**` and one-to-six-hash headings such as
 `### Title:` are accepted, and authoritative context values are never treated as
 copied instructions merely because a model reuses them.
+When the prompt explicitly requests catalogue ranges and unique keywords, complete
+three-field outputs also record out-of-range title/keyword counts and duplicate
+keywords as repairable caveats rather than unusable results.
 The chooser reports `insufficient sample` when throughput lacks enough generated
 tokens for a meaningful comparison.
 

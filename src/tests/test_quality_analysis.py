@@ -182,6 +182,106 @@ def test_token_cap_alone_is_neutral() -> None:
     )
 
 
+@pytest.mark.parametrize(
+    ("title", "keywords", "expected_title_words", "expected_keyword_count", "duplicates"),
+    [
+        (
+            "Four Word Title Here",
+            "one, two, three, four, five, six, seven, eight, nine, ten",
+            4,
+            10,
+            [],
+        ),
+        (
+            "Five Word Catalogue Title Here",
+            (
+                "one, two, three, four, five, six, seven, eight, nine, ten, eleven, "
+                "twelve, thirteen, fourteen, fifteen, sixteen, seventeen, eighteen, nineteen"
+            ),
+            5,
+            19,
+            [],
+        ),
+        (
+            "Five Word Catalogue Title Here",
+            "Halesworth, sky, brick, windows, sign, gravel, clouds, arts, building, halesworth",
+            5,
+            10,
+            ["halesworth"],
+        ),
+    ],
+)
+def test_catalog_constraint_violations_are_repairable_caveats(
+    title: str,
+    keywords: str,
+    expected_title_words: int,
+    expected_keyword_count: int,
+    duplicates: list[str],
+) -> None:
+    """Counts and duplicates should qualify otherwise complete catalogue output."""
+    result = _result(
+        f"Title: {title}\n"
+        "Description: A factual description of the visible building.\n"
+        f"Keywords: {keywords}",
+        prompt=CATALOG_PROMPT,
+    )
+
+    assert result.quality_analysis is not None
+    assert result.quality_analysis.title_word_count == expected_title_words
+    assert result.quality_analysis.keyword_count == expected_keyword_count
+    assert result.quality_analysis.duplicate_keywords == duplicates
+    assert check_models._assess_result(result) == check_models.ResultAssessment(
+        "completed",
+        "usable_with_caveats",
+        "observation_needs_reproduction",
+        ("catalog_constraint_violation",),
+    )
+
+
+def test_compliant_catalog_constraints_remain_clean() -> None:
+    result = _result(
+        "Title: Five Word Catalogue Title Here\n"
+        "Description: A factual description of the visible building.\n"
+        "Keywords: one, two, three, four, five, six, seven, eight, nine, ten",
+        prompt=CATALOG_PROMPT,
+    )
+
+    assert check_models._assess_result(result) == check_models.ResultAssessment(
+        "completed", "usable", "none", ()
+    )
+
+
+def test_catalog_constraints_are_not_inferred_for_an_unrelated_prompt() -> None:
+    result = _result(
+        "Title: Brief title\nDescription: A factual description.\nKeywords: repeated, repeated",
+        prompt="Describe the response format used in this example.",
+    )
+
+    assert result.quality_analysis is not None
+    assert result.quality_analysis.title_word_count is None
+    assert result.quality_analysis.keyword_count is None
+    assert result.quality_analysis.duplicate_keywords == []
+    assert "catalog_constraint_violation" not in check_models._assess_result(result).observations
+
+
+def test_configured_utterance_boundary_is_reported_when_visible() -> None:
+    text = (
+        "Title: Five Word Catalogue Title Here\n"
+        "Description: A factual description of the visible building.\n"
+        "Keywords: one, two, three, four, five, six, seven, eight, nine, ten"
+        "<end_of_utterance>"
+    )
+    result = _result(
+        text,
+        prompt=CATALOG_PROMPT,
+        known_special_tokens=("<end_of_utterance>",),
+    )
+
+    assert result.quality_analysis is not None
+    assert result.quality_analysis.role_boundary_tokens == ["<end_of_utterance>"]
+    assert check_models._assess_result(result).observations == ("role_boundary_token_present",)
+
+
 def test_missing_generation_count_does_not_make_complete_output_minimal() -> None:
     result = check_models.PerformanceResult(
         model_name="example/model",
@@ -372,7 +472,7 @@ def test_assisted_output_returning_every_supplied_draft_field_is_observed_exactl
         "completed",
         "usable_with_caveats",
         "observation_needs_reproduction",
-        ("draft_returned_unchanged",),
+        ("catalog_constraint_violation", "draft_returned_unchanged"),
     )
 
 
