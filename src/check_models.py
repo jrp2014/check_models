@@ -3687,9 +3687,18 @@ def _catalog_requested_range(
     prompt: str,
     field: Literal["title", "keyword"],
 ) -> tuple[int, int] | None:
-    """Return an explicit numeric range from a prompt line about one field."""
-    for line in prompt.splitlines():
+    """Return an explicit numeric range from a catalogue requirement line."""
+    prompt_lines = prompt.splitlines()
+    write_index = next(
+        (index for index, line in enumerate(prompt_lines) if line.strip().casefold() == "write:"),
+        None,
+    )
+    candidate_lines = prompt_lines[write_index + 1 :] if write_index is not None else prompt_lines
+    hint_label = re.compile(rf"\b{field}s?\s+hints?\s*:", re.IGNORECASE)
+    for line in candidate_lines:
         if field not in line.casefold():
+            continue
+        if hint_label.search(line):
             continue
         match = re.search(r"\b(\d+)\s*[-\u2013]\s*(\d+)\b", line)
         if match is None:

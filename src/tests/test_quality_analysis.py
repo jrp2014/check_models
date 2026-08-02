@@ -251,6 +251,33 @@ def test_compliant_catalog_constraints_remain_clean() -> None:
     )
 
 
+def test_catalog_constraint_ranges_ignore_numeric_metadata_hints() -> None:
+    prompt = (
+        "Context: Descriptive hints:\n"
+        "- Title hint: Studies 1-2 at Halesworth\n"
+        "- Keyword hints: archive 3-4, building\n\n"
+        "Write:\n"
+        "- a concrete 5-10-word title;\n"
+        "- a 1-2-sentence factual description;\n"
+        "- 10-18 unique, comma-separated keywords.\n\n"
+        "Return exactly these three sections and nothing else:\n"
+        "Title:\nDescription:\nKeywords:"
+    )
+    result = _result(
+        "Title: Five Word Catalogue Title Here\n"
+        "Description: A factual description of the visible building.\n"
+        "Keywords: archive, building, three, four, five, six, seven, eight, nine, ten",
+        prompt=prompt,
+    )
+
+    assert result.quality_analysis is not None
+    assert result.quality_analysis.title_word_range == (5, 10)
+    assert result.quality_analysis.keyword_count_range == (10, 18)
+    assert check_models._assess_result(result) == check_models.ResultAssessment(
+        "completed", "usable", "none", ()
+    )
+
+
 def test_catalog_constraints_are_not_inferred_for_an_unrelated_prompt() -> None:
     result = _result(
         "Title: Brief title\nDescription: A factual description.\nKeywords: repeated, repeated",

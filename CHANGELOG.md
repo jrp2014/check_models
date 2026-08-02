@@ -25,6 +25,8 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Ignore numeric ranges in descriptive metadata hints when validating catalogue
+  title and keyword constraints against their prompt requirements.
 - Make run issue summaries more actionable by sorting each execution table by
   likely output impact, spelling out structured failures when no observation is
   available, recording remote-code and producer provenance, and ignoring generated
