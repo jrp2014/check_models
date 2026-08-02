@@ -14292,17 +14292,43 @@ def _log_completed_models_list(
     completed: Sequence[PerformanceResult],
     assessments: Mapping[str, ResultAssessment],
 ) -> None:
-    """Log completed models with their cached axes and no generic success styling."""
+    """Log completed models in compact actionability-ordered tables."""
     logger.info("Completed Models (%d):", len(completed))
-    for result in sorted(completed, key=lambda item: item.model_name):
-        assessment = assessments[result.model_name]
-        logger.info(
-            "  - %s | usability=%s | maintainer=%s | observations=%s",
-            result.model_name,
-            assessment.usability,
-            assessment.maintainer_status,
-            "+".join(assessment.observations) if assessment.observations else "none",
-            extra={"style_hint": LogStyles.DETAIL},
+    groups: tuple[tuple[ModelUsability, str], ...] = (
+        ("unusable", "Unusable"),
+        ("usable_with_caveats", "Usable with caveats"),
+        ("usable", "Usable"),
+    )
+    for usability, label in groups:
+        grouped = sorted(
+            (
+                result
+                for result in completed
+                if assessments[result.model_name].usability == usability
+            ),
+            key=lambda item: item.model_name,
+        )
+        if not grouped:
+            continue
+        logger.info("%s (%d):", label, len(grouped))
+        if usability == "usable":
+            _log_rich_table(
+                headers=("Model",),
+                rows=tuple((result.model_name,) for result in grouped),
+                max_widths=(100,),
+            )
+            continue
+        _log_rich_table(
+            headers=("Model", "Maintainer", "Observations"),
+            rows=tuple(
+                (
+                    result.model_name,
+                    assessments[result.model_name].maintainer_status.replace("_", " "),
+                    _gallery_observation_labels(assessments[result.model_name].observations),
+                )
+                for result in grouped
+            ),
+            max_widths=(48, 32, None),
         )
 
 

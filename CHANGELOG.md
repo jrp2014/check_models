@@ -25,6 +25,8 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Replace the final pipe-delimited completed-model list with compact Rich tables
+  grouped by usability and ordered by likely actionability.
 - Prevent diagnostics finalization from crashing when catalogue constraint
   observations include structured title, keyword-count, or duplicate evidence.
 - Ignore numeric ranges in descriptive metadata hints when validating catalogue

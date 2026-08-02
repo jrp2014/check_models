@@ -778,6 +778,62 @@ def test_log_summary_lists_every_observation_kind(
     assert all(f"{observation}=1" in summary for observation in observations)
 
 
+def test_completed_model_summary_uses_actionability_ordered_tables(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    caplog.set_level(logging.INFO)
+    results = [
+        PerformanceResult(
+            model_name=model_name,
+            generation=_StubGeneration(text="complete output"),
+            success=True,
+        )
+        for model_name in (
+            "org/usable",
+            "org/z-caveat",
+            "org/unusable",
+            "org/a-caveat",
+        )
+    ]
+    assessments = {
+        "org/usable": check_models.ResultAssessment("completed", "usable", "none", ()),
+        "org/z-caveat": check_models.ResultAssessment(
+            "completed",
+            "usable_with_caveats",
+            "observation_needs_reproduction",
+            ("minimal_output",),
+        ),
+        "org/unusable": check_models.ResultAssessment(
+            "completed",
+            "unusable",
+            "observation_needs_reproduction",
+            ("missing_requested_sections", "repeated_output"),
+        ),
+        "org/a-caveat": check_models.ResultAssessment(
+            "completed",
+            "usable_with_caveats",
+            "observation_needs_reproduction",
+            ("minimal_output",),
+        ),
+    }
+
+    with patch.object(check_models, "get_terminal_width", return_value=180):
+        check_models._log_completed_models_list(results, assessments)
+
+    messages = "\n".join(record.message for record in caplog.records)
+    assert "Completed Models (4):" in messages
+    assert messages.index("Unusable (1):") < messages.index("Usable with caveats (2):")
+    assert messages.index("Usable with caveats (2):") < messages.index("Usable (1):")
+    assert messages.index("Response repeats the same text") < messages.index(
+        "Required fields are missing or empty"
+    )
+    assert messages.index("org/a-caveat") < messages.index("org/z-caveat")
+    assert "| usability=" not in messages
+    clean_group = messages[messages.index("Usable (1):") :]
+    assert "Maintainer" not in clean_group
+    assert "Observations" not in clean_group
+
+
 def test_print_model_result_uses_neutral_cached_unusable_assessment(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
