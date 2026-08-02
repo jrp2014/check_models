@@ -237,6 +237,13 @@ def _write_issue_summary_fixture(
                     if trust_remote_code is not None
                     else {}
                 ),
+                "producer": {
+                    "name": "check_models",
+                    "version": "0.8.9",
+                    "git_revision": "abc123",
+                    "install_type": "source-tree",
+                    "dirty": False,
+                },
             }
         )
         + "\n",
@@ -378,9 +385,85 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
         for target in link_targets
     )
     assert "1 clean completion; see the [full model gallery]" in content
+    assert "Trust remote code" in content
+    assert "check_models" in content
+    assert "0.8.9" in content
+    assert "abc123" in content
+    assert "GitHub links" in content
+    assert "mutable" in content
     assert "org/clean" not in content
     assert "Traceback (most recent call last)" not in content
     assert "generated output that must not be copied" not in content
+
+
+def test_run_issue_summary_uses_failure_reason_when_observations_are_empty(
+    tmp_path: Path,
+) -> None:
+    """An indeterminate row should say what prevented evaluation."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    result = _issue_summary_result(
+        "org/network",
+        execution="indeterminate",
+        usability="not_evaluated",
+    )
+    result["failure"] = {
+        "phase": "model_load",
+        "stage": "Network Error",
+        "code": "UNKNOWN_MODEL_LOAD_NETWORK_ERROR",
+        "message": "Model loading failed: [Errno 54] Connection reset by peer",
+        "exception_type": "ReadError",
+        "exception_module": "httpx",
+        "package": "unknown",
+        "traceback": "heavy evidence",
+        "exception_chain": [],
+    }
+    _write_issue_summary_fixture(output_paths, results=(result,))
+
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+
+    if summary is None:
+        pytest.fail("the indeterminate result must produce a summary")
+    content = summary.read_text(encoding="utf-8")
+    assert "Network connection reset during model loading" in content
+    assert "| org/network | not evaluated | none |" not in content
+
+
+def test_run_issue_summary_sorts_review_rows_by_observation_severity(tmp_path: Path) -> None:
+    """Grossly unusable outputs should be visible before repairable caveats."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    _write_issue_summary_fixture(
+        output_paths,
+        results=(
+            _issue_summary_result(
+                "org/count-caveat",
+                usability="usable_with_caveats",
+                maintainer_status="observation_needs_reproduction",
+                observations=["catalog_constraint_violation"],
+                details={"title_word_count": 4, "title_word_range": [5, 10]},
+            ),
+            _issue_summary_result(
+                "org/missing",
+                usability="unusable",
+                maintainer_status="observation_needs_reproduction",
+                observations=["missing_requested_sections"],
+            ),
+            _issue_summary_result(
+                "org/repeated",
+                usability="unusable",
+                maintainer_status="observation_needs_reproduction",
+                observations=["repeated_output"],
+            ),
+        ),
+    )
+
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+
+    if summary is None:
+        pytest.fail("the observed results must produce a summary")
+    content = summary.read_text(encoding="utf-8")
+    assert content.index("| org/repeated |") < content.index("| org/missing |")
+    assert content.index("| org/missing |") < content.index("| org/count-caveat |")
+    assert "Title has 4 words (requested 5-10)" in content
 
 
 def test_run_issue_summary_builds_complete_public_image_reproduction(tmp_path: Path) -> None:
@@ -2229,8 +2312,27 @@ def test_html_chooser_is_sortable_and_surfaces_prefill_first_token_time(
 
 def test_crash_diagnostics_and_issue_draft_keep_complete_primary_evidence_first(
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """A crash draft should repeat complete diagnostics evidence without truncation."""
+    monkeypatch.setattr(
+        check_models,
+        "_collect_check_models_provenance",
+        lambda: {
+            "name": "check_models",
+            "version": "0.8.9",
+            "git_revision": "abc123def456",
+            "install_type": "source-tree",
+            "dirty": False,
+        },
+    )
+    system_info = {
+        "Python Version": "3.13.13",
+        "macOS Version": "26.6",
+        "GPU/Chip": "Apple M5 Max",
+        "SDK Version": "26.0",
+        "Apple Clang Version": "17.0.0",
+    }
     traceback_text = "\n".join(
         (
             "Traceback (most recent call last):",
@@ -2277,7 +2379,7 @@ def test_crash_diagnostics_and_issue_draft_keep_complete_primary_evidence_first(
     context = _build_report_render_context(
         results=[crash],
         prompt="Describe the image.",
-        system_info={},
+        system_info=system_info,
     )
     diagnostics = tmp_path / "diagnostics.md"
     generate_diagnostics_report(
@@ -2285,14 +2387,14 @@ def test_crash_diagnostics_and_issue_draft_keep_complete_primary_evidence_first(
         diagnostics,
         prompt="Describe the image.",
         library_versions=_stub_versions(),
-        system_info={},
+        system_info=system_info,
         report_context=context,
     )
     generated = _generate_github_issue_reports(
         report_context=context,
         output_dir=tmp_path,
         library_versions=_stub_versions(),
-        system_info={},
+        system_info=system_info,
         prompt="Describe the image.",
     )
 
@@ -2324,6 +2426,20 @@ def test_crash_diagnostics_and_issue_draft_keep_complete_primary_evidence_first(
     assert issue_content.index("## Reproduction inputs") < issue_content.index(
         "## Provenance and Environment"
     )
+    for expected in (
+        "mlx-vlm",
+        "mlx",
+        "transformers",
+        "tokenizers",
+        "Python Version",
+        "macOS Version",
+        "GPU/Chip",
+        "abc123def456",
+        "https://github.com/jrp2014/check_models/blob/main/src/output/environment.log",
+    ):
+        assert expected in issue_content
+    assert "SDK Version" not in issue_content
+    assert "Apple Clang Version" not in issue_content
     assert not (tmp_path / "issues" / "index.md").exists()
 
 
@@ -3445,7 +3561,9 @@ class TestRetainedMarkdownArtifactEdges:
                 assert relative_targets == []
             else:
                 assert relative_targets
-                assert github_output_targets == []
+                assert github_output_targets == [
+                    "https://github.com/jrp2014/check_models/blob/main/src/output/environment.log"
+                ]
 
             html_content = output_paths.html.read_text(encoding="utf-8")
             jsonl_records = [

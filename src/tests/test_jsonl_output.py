@@ -429,6 +429,23 @@ def test_check_models_provenance_records_dirty_source_tree(
     assert check_models._collect_check_models_provenance()["dirty"] is True
 
 
+def test_check_models_provenance_ignores_generated_output_changes(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Writing retained artifacts must not make the producer mark itself dirty."""
+    monkeypatch.setattr(check_models, "version", lambda _name: "0.9.0")
+    monkeypatch.setattr(check_models, "_distribution_is_editable", lambda _name: True)
+
+    def git_probe(command: tuple[str, ...], **_kwargs: object) -> str:
+        if "status" not in command:
+            return "abc123"
+        return "" if ":(exclude)src/output" in command else " M src/output/run.json"
+
+    monkeypatch.setattr(check_models, "_run_macos_toolchain_command", git_probe)
+
+    assert check_models._collect_check_models_provenance()["dirty"] is False
+
+
 def test_component_provenance_captures_editable_source_without_home_disclosure(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -490,6 +507,41 @@ def test_model_provenance_distinguishes_requested_and_resolved_revision(
         "requested_revision": "main",
         "resolved_revision": snapshot_sha,
         "snapshot_path": ("~/.cache/huggingface/hub/models--org--model/snapshots/" + snapshot_sha),
+    }
+
+
+def test_catalog_constraint_details_are_emitted_only_for_a_violation() -> None:
+    """Routine counts must not bloat rows without the matching observation."""
+    compliant = PerformanceResult(
+        model_name="org/compliant",
+        generation=MockGeneration(),
+        success=True,
+        quality_analysis=check_models.GenerationQualityAnalysis(
+            is_repetitive=False,
+            repeated_token=None,
+            title_word_count=5,
+            title_word_range=(5, 10),
+            keyword_count=10,
+            keyword_count_range=(10, 18),
+        ),
+    )
+    violation = dataclasses.replace(
+        compliant,
+        model_name="org/violation",
+        quality_analysis=dataclasses.replace(
+            _require_present(compliant.quality_analysis, field_name="quality_analysis"),
+            title_word_count=4,
+            duplicate_keywords=["halesworth"],
+        ),
+    )
+
+    assert check_models._observation_details(compliant) == {}
+    assert check_models._observation_details(violation) == {
+        "title_word_count": 4,
+        "title_word_range": [5, 10],
+        "keyword_count": 10,
+        "keyword_count_range": [10, 18],
+        "duplicate_keywords": ["halesworth"],
     }
 
 

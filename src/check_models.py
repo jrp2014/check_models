@@ -915,6 +915,7 @@ type ObservationCode = Literal[
     "thinking_trace_present",
     "thinking_trace_incomplete",
     "role_boundary_token_present",
+    "catalog_constraint_violation",
     "no_keyword_overlap",
     "draft_returned_unchanged",
 ]
@@ -1077,6 +1078,11 @@ class JsonlObservationDetailsRecord(TypedDict, total=False):
     configured_generation_wrappers: list[str]
     thinking_trace_markers: list[str]
     role_boundary_tokens: list[str]
+    title_word_count: int
+    title_word_range: list[int]
+    keyword_count: int
+    keyword_count_range: list[int]
+    duplicate_keywords: list[str]
     token_cap_reasons: list[str]
     unchanged_draft_fields: list[str]
 
@@ -1120,6 +1126,7 @@ class RunIssueSummarySource:
     image: RunImageRecord | None = None
     generation_settings: tuple[tuple[str, str], ...] = ()
     trust_remote_code: bool | None = None
+    producer: CheckModelsProvenanceRecord | None = None
 
 
 class RunIssueSummaryValidationError(ValueError):
@@ -3420,7 +3427,10 @@ def _configured_role_boundaries(text: str, wrappers: Sequence[str]) -> list[str]
     for token in wrappers:
         token_lower = token.casefold()
         position = text.find(token)
-        if position < 0 or not any(role in token_lower for role in ("user", "assistant", "system")):
+        if position < 0 or not any(
+            boundary in token_lower
+            for boundary in ("user", "assistant", "system", "turn", "message", "utterance")
+        ):
             continue
         if "assistant" not in token_lower or position > leading_start:
             boundaries.append(token)
@@ -3671,6 +3681,23 @@ def _prompt_requests_catalog_contract(prompt: str) -> bool:
     return has_required_labels and (
         "return exactly these three sections" in prompt_lower or "catalog" in prompt_lower
     )
+
+
+def _catalog_requested_range(
+    prompt: str,
+    field: Literal["title", "keyword"],
+) -> tuple[int, int] | None:
+    """Return an explicit numeric range from a prompt line about one field."""
+    for line in prompt.splitlines():
+        if field not in line.casefold():
+            continue
+        match = re.search(r"\b(\d+)\s*[-\u2013]\s*(\d+)\b", line)
+        if match is None:
+            continue
+        lower, upper = (int(match.group(1)), int(match.group(2)))
+        if 0 <= lower <= upper:
+            return lower, upper
+    return None
 
 
 def _missing_catalog_sections(text: str) -> list[str]:
@@ -3934,6 +3961,11 @@ class GenerationQualityAnalysis:
     special_token_wrappers: list[str] = dataclass_field(default_factory=list)
     configured_generation_wrappers: list[str] = dataclass_field(default_factory=list)
     role_boundary_tokens: list[str] = dataclass_field(default_factory=list)
+    title_word_count: int | None = None
+    title_word_range: tuple[int, int] | None = None
+    keyword_count: int | None = None
+    keyword_count_range: tuple[int, int] | None = None
+    duplicate_keywords: list[str] = dataclass_field(default_factory=list)
     unexpected_special_tokens: list[str] = dataclass_field(default_factory=list)
     keyword_overlap: KeywordOverlapState = "not_assessable"
     unchanged_draft_fields: list[str] = dataclass_field(default_factory=list)
@@ -3950,6 +3982,11 @@ class PromptQualitySignals:
     instruction_echo_fragments: tuple[str, ...] = ()
     unexpected_catalog_preamble: str | None = None
     missing_sections: tuple[str, ...] = ()
+    title_word_count: int | None = None
+    title_word_range: tuple[int, int] | None = None
+    keyword_count: int | None = None
+    keyword_count_range: tuple[int, int] | None = None
+    duplicate_keywords: tuple[str, ...] = ()
     keyword_overlap: KeywordOverlapState = "not_assessable"
     unchanged_draft_fields: tuple[str, ...] = ()
 
@@ -4020,12 +4057,33 @@ def _collect_prompt_quality_signals(
     prompt_bundle = _extract_trusted_hint_bundle(prompt, context_marker=context_marker)
     missing_sections: list[str] = []
     unexpected_preamble: str | None = None
-    if _prompt_requests_catalog_contract(prompt):
+    title_word_count: int | None = None
+    title_word_range: tuple[int, int] | None = None
+    keyword_count: int | None = None
+    keyword_count_range: tuple[int, int] | None = None
+    duplicate_keywords: tuple[str, ...] = ()
+    catalog_contract_requested = _prompt_requests_catalog_contract(prompt)
+    if catalog_contract_requested:
         missing_sections = _missing_catalog_sections(text)
         unexpected_preamble = _unexpected_catalog_preamble(text)
-    generated_keywords = _split_catalog_keywords(
-        _extract_catalog_sections(text).get("keywords", "")
-    )
+    sections = _extract_catalog_sections(text)
+    generated_keywords = _split_catalog_keywords(sections.get("keywords", ""))
+    if (
+        catalog_contract_requested
+        and not missing_sections
+        and all(sections.get(field) for field in ("title", "description", "keywords"))
+    ):
+        title_word_count = len(
+            re.findall(r"\b\w+(?:[-\u2019']\w+)*\b", sections["title"], re.UNICODE)
+        )
+        title_word_range = _catalog_requested_range(prompt, "title")
+        keyword_count = len(generated_keywords)
+        keyword_count_range = _catalog_requested_range(prompt, "keyword")
+        normalized_keywords = [
+            _normalize_phrase_for_matching(keyword) for keyword in generated_keywords
+        ]
+        counts = Counter(keyword for keyword in normalized_keywords if keyword)
+        duplicate_keywords = tuple(keyword for keyword, count in counts.items() if count > 1)
     keyword_overlap = _keyword_overlap_state(
         prompt_bundle.trusted_keywords,
         generated_keywords,
@@ -4040,6 +4098,11 @@ def _collect_prompt_quality_signals(
         instruction_echo_fragments=tuple(instruction_markers),
         unexpected_catalog_preamble=unexpected_preamble,
         missing_sections=tuple(missing_sections),
+        title_word_count=title_word_count,
+        title_word_range=title_word_range,
+        keyword_count=keyword_count,
+        keyword_count_range=keyword_count_range,
+        duplicate_keywords=duplicate_keywords,
         keyword_overlap=keyword_overlap,
         unchanged_draft_fields=unchanged_draft_fields,
     )
@@ -4120,6 +4183,11 @@ def analyze_generation_text(
         special_token_wrappers=list(normalized.removed_wrappers),
         configured_generation_wrappers=present_configured_wrappers,
         role_boundary_tokens=_configured_role_boundaries(text, normalized.removed_wrappers),
+        title_word_count=prompt_signals.title_word_count,
+        title_word_range=prompt_signals.title_word_range,
+        keyword_count=prompt_signals.keyword_count,
+        keyword_count_range=prompt_signals.keyword_count_range,
+        duplicate_keywords=list(prompt_signals.duplicate_keywords),
         unexpected_special_tokens=unexpected_special_tokens,
         keyword_overlap=prompt_signals.keyword_overlap,
         unchanged_draft_fields=list(prompt_signals.unchanged_draft_fields),
@@ -7029,6 +7097,7 @@ _OBSERVATION_DISPLAY_PRIORITY: Final[tuple[ObservationCode, ...]] = (
     "role_boundary_token_present",
     "thinking_trace_present",
     "configured_wrapper_present",
+    "catalog_constraint_violation",
     "minimal_output",
     "draft_returned_unchanged",
     "no_keyword_overlap",
@@ -7049,11 +7118,13 @@ _OBSERVATION_DISPLAY_LABELS: Final[dict[ObservationCode, str]] = {
     "thinking_trace_present": "Internal reasoning text remains visible",
     "thinking_trace_incomplete": "Internal reasoning block appears incomplete",
     "role_boundary_token_present": "Conversation-role control tokens remain visible",
+    "catalog_constraint_violation": "Title or keywords do not meet requested constraints",
     "no_keyword_overlap": "Keywords do not overlap the supplied keyword hints",
     "draft_returned_unchanged": (
         "Title, Description and Keywords copy all supplied hints unchanged"
     ),
 }
+_RANGE_ENDPOINT_COUNT: Final[int] = 2
 
 
 def _human_observation_labels(
@@ -7073,6 +7144,34 @@ def _human_observation_labels(
             if missing_sections:
                 fields = ", ".join(field.title() for field in missing_sections)
                 label = f"Missing or empty fields: {fields}"
+        elif code == "catalog_constraint_violation" and details is not None:
+            constraint_labels: list[str] = []
+            title_count = details.get("title_word_count")
+            title_range = details.get("title_word_range")
+            if (
+                title_count is not None
+                and title_range is not None
+                and len(title_range) == _RANGE_ENDPOINT_COUNT
+            ):
+                constraint_labels.append(
+                    f"Title has {title_count} words (requested {title_range[0]}-{title_range[1]})"
+                )
+            keyword_count = details.get("keyword_count")
+            keyword_range = details.get("keyword_count_range")
+            if (
+                keyword_count is not None
+                and keyword_range is not None
+                and len(keyword_range) == _RANGE_ENDPOINT_COUNT
+            ):
+                constraint_labels.append(
+                    "Keyword list has "
+                    f"{keyword_count} terms (requested {keyword_range[0]}-{keyword_range[1]})"
+                )
+            duplicate_keywords = details.get("duplicate_keywords")
+            if duplicate_keywords:
+                constraint_labels.append(f"Duplicate keywords: {', '.join(duplicate_keywords)}")
+            if constraint_labels:
+                label = "; ".join(constraint_labels)
         labels.append(label)
     return "; ".join(labels) or "none"
 
@@ -7318,6 +7417,22 @@ _DIAGNOSTICS_LIB_NAMES: Final[tuple[str, ...]] = (
     "huggingface-hub",
 )
 
+_ISSUE_RELEVANT_LIB_NAMES: Final[tuple[str, ...]] = (
+    "mlx-vlm",
+    "mlx",
+    "mlx-metal",
+    "mlx-lm",
+    "transformers",
+    "tokenizers",
+    "huggingface-hub",
+    "Pillow",
+)
+_ISSUE_RELEVANT_SYSTEM_KEYS: Final[tuple[str, ...]] = (
+    "Python Version",
+    "macOS Version",
+    "GPU/Chip",
+)
+
 
 @dataclass(frozen=True)
 class ResultAssessment:
@@ -7362,6 +7477,29 @@ def _execution_status(result: PerformanceResult) -> ExecutionStatus:
     return "completed" if result.success else "crashed"
 
 
+def _has_catalog_constraint_violation(analysis: GenerationQualityAnalysis) -> bool:
+    """Return whether recorded catalogue counts breach the requested contract."""
+    title_count_outside_range = (
+        analysis.title_word_count is not None
+        and analysis.title_word_range is not None
+        and not analysis.title_word_range[0]
+        <= analysis.title_word_count
+        <= analysis.title_word_range[1]
+    )
+    keyword_count_outside_range = (
+        analysis.keyword_count is not None
+        and analysis.keyword_count_range is not None
+        and not analysis.keyword_count_range[0]
+        <= analysis.keyword_count
+        <= analysis.keyword_count_range[1]
+    )
+    return (
+        title_count_outside_range
+        or keyword_count_outside_range
+        or bool(analysis.duplicate_keywords)
+    )
+
+
 def _assessment_observations(result: PerformanceResult) -> tuple[ObservationCode, ...]:
     """Project approved current-run facts into stable ordered observation codes."""
     text = _generation_text_value(result.generation)
@@ -7401,6 +7539,10 @@ def _assessment_observations(result: PerformanceResult) -> tuple[ObservationCode
         (analysis.has_thinking_trace, "thinking_trace_present"),
         (analysis.thinking_trace_incomplete, "thinking_trace_incomplete"),
         (bool(analysis.role_boundary_tokens), "role_boundary_token_present"),
+        (
+            _has_catalog_constraint_violation(analysis),
+            "catalog_constraint_violation",
+        ),
         (analysis.keyword_overlap == "no_overlap", "no_keyword_overlap"),
         (bool(analysis.unchanged_draft_fields), "draft_returned_unchanged"),
     )
@@ -7431,6 +7573,24 @@ def _assess_result(result: PerformanceResult) -> ResultAssessment:
     return ResultAssessment(execution, usability, maintainer_status, observations)
 
 
+def _catalog_constraint_observation_details(
+    analysis: GenerationQualityAnalysis,
+) -> JsonlObservationDetailsRecord:
+    """Return present catalogue-count evidence without adding empty fields."""
+    details: JsonlObservationDetailsRecord = {}
+    if analysis.title_word_count is not None:
+        details["title_word_count"] = analysis.title_word_count
+    if analysis.title_word_range is not None:
+        details["title_word_range"] = list(analysis.title_word_range)
+    if analysis.keyword_count is not None:
+        details["keyword_count"] = analysis.keyword_count
+    if analysis.keyword_count_range is not None:
+        details["keyword_count_range"] = list(analysis.keyword_count_range)
+    if analysis.duplicate_keywords:
+        details["duplicate_keywords"] = list(analysis.duplicate_keywords)
+    return details
+
+
 def _observation_details(result: PerformanceResult) -> JsonlObservationDetailsRecord:
     """Return non-empty exact evidence for the result's mechanical observations."""
     analysis = result.quality_analysis
@@ -7453,6 +7613,8 @@ def _observation_details(result: PerformanceResult) -> JsonlObservationDetailsRe
         details["thinking_trace_markers"] = list(analysis.thinking_trace_markers)
     if analysis.role_boundary_tokens:
         details["role_boundary_tokens"] = list(analysis.role_boundary_tokens)
+    if _has_catalog_constraint_violation(analysis):
+        details.update(_catalog_constraint_observation_details(analysis))
     if analysis.token_cap_reasons:
         details["token_cap_reasons"] = list(analysis.token_cap_reasons)
     if analysis.unchanged_draft_fields:
@@ -8485,23 +8647,45 @@ def _issue_provenance_blocks(
     system_info: Mapping[str, str],
 ) -> tuple[ReportBlock, ...]:
     """Build prompt and environment blocks for a direct crash issue draft."""
-    rows = tuple(
+    rows = list(
         _collect_report_component_rows(
             versions=library_versions,
             system_info=dict(system_info),
-            library_names=_DIAGNOSTICS_LIB_NAMES,
-            system_keys=_DIAGNOSTICS_SYSTEM_KEYS,
+            library_names=_ISSUE_RELEVANT_LIB_NAMES,
+            system_keys=_ISSUE_RELEVANT_SYSTEM_KEYS,
         )
     )
+    producer = _collect_check_models_provenance()
+    producer_parts = [producer["version"]]
+    if producer["git_revision"]:
+        producer_parts.append(f"revision {producer['git_revision']}")
+    dirty = producer.get("dirty")
+    if dirty is not None:
+        producer_parts.append("dirty" if dirty else "clean")
+    rows.append(("check_models", "; ".join(producer_parts)))
     components: ReportBlock = (
-        ReportTable(("Component", "Value"), rows)
+        ReportTable(("Component", "Value"), tuple(rows))
         if rows
         else ReportParagraph("Environment and component provenance unavailable.")
+    )
+    full_environment = ReportTable(
+        ("Evidence", "Link"),
+        (
+            (
+                "Complete dependency and toolchain inventory",
+                ReportTargetLink(
+                    "environment.log",
+                    _github_repo_artifact_url(_PUBLISHED_OUTPUT_ROOT / DEFAULT_ENV_OUTPUT.name),
+                ),
+            ),
+        ),
+        compact=True,
     )
     return (
         _report_section(
             "Provenance and Environment",
             _report_section("Components", components, level=3),
+            _report_section("Full environment evidence", full_environment, level=3),
         ),
     )
 
@@ -10861,15 +11045,49 @@ def _load_model(
         Tuple of ``(model, processor, config)`` where ``processor`` is an
         ``transformers.ProcessorMixin`` and ``config`` may be ``None``.
     """
-    model, processor = load(
-        path_or_hf_repo=params.model_identifier,
-        adapter_path=params.adapter_path,
-        lazy=params.lazy,
-        revision=params.revision,
-        trust_remote_code=params.trust_remote_code,
-        force_download=params.force_download,
-        quantize_activations=params.quantize_activations,
-    )
+    try:
+        model, processor = load(
+            path_or_hf_repo=params.model_identifier,
+            adapter_path=params.adapter_path,
+            lazy=params.lazy,
+            revision=params.revision,
+            trust_remote_code=params.trust_remote_code,
+            force_download=params.force_download,
+            quantize_activations=params.quantize_activations,
+        )
+    except Exception as load_error:
+        chain_text = " ".join(
+            f"{type(error).__name__}: {error}" for error in _exception_chain(load_error)
+        )
+        snapshot_path = (
+            _resolve_model_snapshot_path(params.model_identifier)
+            if not params.force_download and _has_external_connectivity_signal(chain_text)
+            else None
+        )
+        revision_matches = params.revision is None or (
+            snapshot_path is not None and snapshot_path.name == params.revision
+        )
+        if (
+            snapshot_path is None
+            or not snapshot_path.is_dir()
+            or str(snapshot_path) == params.model_identifier
+            or not revision_matches
+        ):
+            raise
+        logger.warning(
+            "Hub access failed while loading %s; retrying resolved local snapshot %s.",
+            params.model_identifier,
+            snapshot_path,
+        )
+        model, processor = load(
+            path_or_hf_repo=str(snapshot_path),
+            adapter_path=params.adapter_path,
+            lazy=params.lazy,
+            revision=None,
+            trust_remote_code=params.trust_remote_code,
+            force_download=False,
+            quantize_activations=params.quantize_activations,
+        )
     config = cast(
         "PreTrainedConfig | Mapping[str, object] | None",
         getattr(model, "config", None),
@@ -11032,11 +11250,6 @@ def _run_model_preflight_validators(
     if not callable(processor):
         _raise_preflight_error(
             "Loaded processor is not callable.",
-            phase="processor_load",
-        )
-    if getattr(processor, "image_processor", None) is None:
-        _raise_preflight_error(
-            "Loaded processor has no image_processor; expected multimodal processor.",
             phase="processor_load",
         )
 
@@ -14541,7 +14754,17 @@ def _collect_check_models_provenance() -> CheckModelsProvenanceRecord:
         install_type = "unknown"
     status = (
         _run_macos_toolchain_command(
-            ("git", "-C", str(_REPO_ROOT), "status", "--porcelain", "--untracked-files=no"),
+            (
+                "git",
+                "-C",
+                str(_REPO_ROOT),
+                "status",
+                "--porcelain",
+                "--untracked-files=no",
+                "--",
+                ".",
+                ":(exclude)src/output",
+            ),
             empty_output="",
         )
         if revision is not None
@@ -14703,6 +14926,7 @@ _RUN_ISSUE_OBSERVATION_VALUES: Final[frozenset[str]] = frozenset(
         "thinking_trace_present",
         "thinking_trace_incomplete",
         "role_boundary_token_present",
+        "catalog_constraint_violation",
         "no_keyword_overlap",
         "draft_returned_unchanged",
     }
@@ -14884,19 +15108,56 @@ def _narrow_run_issue_image(value: JsonLike) -> RunImageRecord | None:
     return record
 
 
+def _narrow_run_issue_producer(value: JsonLike) -> CheckModelsProvenanceRecord | None:
+    """Narrow optional producer facts used by the paste-ready run context."""
+    if not isinstance(value, dict):
+        return None
+    version_value = value.get("version")
+    if value.get("name") != "check_models" or not isinstance(version_value, str):
+        return None
+    install_type = value.get("install_type")
+    if install_type not in {"editable", "installed", "source-tree", "unknown"}:
+        return None
+    revision = value.get("git_revision")
+    dirty = value.get("dirty")
+    if revision is not None and not isinstance(revision, str):
+        return None
+    if dirty is not None and not isinstance(dirty, bool):
+        return None
+    record: CheckModelsProvenanceRecord = {
+        "name": "check_models",
+        "version": version_value,
+        "git_revision": revision,
+        "install_type": cast(
+            "Literal['editable', 'installed', 'source-tree', 'unknown']",
+            install_type,
+        ),
+    }
+    if "dirty" in value:
+        record["dirty"] = dirty
+    return record
+
+
 def _load_run_issue_enrichment(
     run_json_path: Path,
-) -> tuple[RunImageRecord | None, tuple[tuple[str, str], ...], bool | None]:
+) -> tuple[
+    RunImageRecord | None,
+    tuple[tuple[str, str], ...],
+    bool | None,
+    CheckModelsProvenanceRecord | None,
+]:
     """Load optional image/settings enrichment, ignoring absent or malformed run JSON."""
     image_record: RunImageRecord | None = None
     generation_settings: tuple[tuple[str, str], ...] = ()
     trust_remote_code: bool | None = None
+    producer: CheckModelsProvenanceRecord | None = None
     try:
         run_value: JsonLike = json.loads(_read_text_file(run_json_path))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError):
         run_value = None
     if isinstance(run_value, dict):
         image_record = _narrow_run_issue_image(run_value.get("image"))
+        producer = _narrow_run_issue_producer(run_value.get("producer"))
         raw_trust_remote_code = run_value.get("trust_remote_code")
         if isinstance(raw_trust_remote_code, bool):
             trust_remote_code = raw_trust_remote_code
@@ -14906,7 +15167,7 @@ def _load_run_issue_enrichment(
                 (key, json.dumps(value, ensure_ascii=False, sort_keys=True))
                 for key, value in sorted(settings.items())
             )
-    return image_record, generation_settings, trust_remote_code
+    return image_record, generation_settings, trust_remote_code, producer
 
 
 def _load_run_issue_summary_source(
@@ -14921,8 +15182,10 @@ def _load_run_issue_summary_source(
         _validate_run_issue_result(value, line_number)
         for line_number, value in enumerate(parsed_rows[1:], start=2)
     )
-    image, generation_settings, trust_remote_code = (
-        _load_run_issue_enrichment(output_paths.run_json) if include_run_json else (None, (), None)
+    image, generation_settings, trust_remote_code, producer = (
+        _load_run_issue_enrichment(output_paths.run_json)
+        if include_run_json
+        else (None, (), None, None)
     )
 
     return RunIssueSummarySource(
@@ -14931,6 +15194,7 @@ def _load_run_issue_summary_source(
         image=image,
         generation_settings=generation_settings,
         trust_remote_code=trust_remote_code,
+        producer=producer,
     )
 
 
@@ -15217,10 +15481,54 @@ def _run_issue_summary_surfaced_sections(
         "crashed": "Crashed attempts requiring review",
         "indeterminate": "Indeterminate attempts requiring review",
     }
+    priority = {code: index for index, code in enumerate(_OBSERVATION_DISPLAY_PRIORITY)}
+
+    usability_priority = {
+        "unusable": 0,
+        "usable_with_caveats": 1,
+        "usable": 2,
+        "not_evaluated": 3,
+    }
+
+    def _sort_key(result: JsonlResultRecord) -> tuple[int, int, str]:
+        observations = result["assessment"]["observations"]
+        severity = min((priority[code] for code in observations), default=len(priority))
+        usability = usability_priority[result["assessment"]["usability"]]
+        return severity, usability, result["model"].casefold()
+
+    def _observed_result(result: JsonlResultRecord) -> str:
+        assessment = result["assessment"]
+        if assessment["observations"]:
+            return _human_observation_labels(
+                assessment["observations"],
+                details=assessment.get("details"),
+            )
+        failure = result.get("failure")
+        if failure is None:
+            return "No assessment evidence was captured"
+        phase = failure.get("phase")
+        phase_label = {
+            "model_load": "model loading",
+            "processor_load": "processor loading",
+            "tokenizer_load": "tokenizer loading",
+            "prefill": "prompt preparation",
+            "decode": "generation",
+        }.get(phase or "", (phase or "execution").replace("_", " "))
+        message = failure.get("message") or ""
+        if "connection reset" in message.casefold():
+            return f"Network connection reset during {phase_label}"
+        stage = failure.get("stage")
+        if stage:
+            return f"{stage} during {phase_label}"
+        exception_type = failure.get("exception_type")
+        if exception_type:
+            return f"{exception_type} during {phase_label}"
+        return f"Attempt stopped during {phase_label}"
+
     sections: list[ReportSection] = []
     for execution, heading in heading_by_execution.items():
         rows: list[tuple[ReportCell, ...]] = []
-        for result in results:
+        for result in sorted(results, key=_sort_key):
             assessment = result["assessment"]
             if assessment["execution"] != execution:
                 continue
@@ -15228,10 +15536,7 @@ def _run_issue_summary_surfaced_sections(
                 (
                     result["model"],
                     assessment["usability"].replace("_", " "),
-                    _human_observation_labels(
-                        assessment["observations"],
-                        details=assessment.get("details"),
-                    ),
+                    _observed_result(result),
                     _run_issue_summary_artifact_link(
                         summary_path=summary_path,
                         artifact_path=output_paths.diagnostics,
@@ -15267,6 +15572,15 @@ def _run_issue_summary_context_section(source: RunIssueSummarySource) -> ReportS
             )
         )
     rows.extend((f"Generation: {key}", value) for key, value in source.generation_settings)
+    if source.trust_remote_code is not None:
+        rows.append(("Trust remote code", str(source.trust_remote_code).lower()))
+    if source.producer is not None:
+        producer = source.producer
+        rows.append(("check_models version", producer["version"]))
+        if producer["git_revision"] is not None:
+            rows.append(("check_models revision", producer["git_revision"]))
+        if (dirty := producer.get("dirty")) is not None:
+            rows.append(("check_models source dirty", str(dirty).lower()))
     versions = source.metadata.get("library_versions", {})
     if isinstance(versions, dict):
         rows.extend(
@@ -15280,7 +15594,16 @@ def _run_issue_summary_context_section(source: RunIssueSummarySource) -> ReportS
         for label in ("macOS Version", "GPU/Chip", "Python Version")
         if system.get(label)
     )
-    return ReportSection("Run context", (ReportKeyValues(tuple(rows)),))
+    return ReportSection(
+        "Run context",
+        (
+            ReportKeyValues(tuple(rows)),
+            ReportParagraph(
+                "GitHub links target the repository's mutable main branch; use the committed "
+                "output snapshot when durable issue evidence is required."
+            ),
+        ),
+    )
 
 
 def _run_issue_summary_artifacts_section(

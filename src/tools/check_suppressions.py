@@ -32,6 +32,7 @@ SHELL_SUFFIXES: Final[frozenset[str]] = frozenset({".sh"})
 EXCLUDED_PATH_PARTS: Final[frozenset[str]] = frozenset(
     {
         ".conda",
+        ".worktrees",
         "__pycache__",
         ".pytest_cache",
         "node_modules",

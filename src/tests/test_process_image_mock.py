@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 from unittest.mock import patch
 
 import pytest
+from transformers.processing_utils import ProcessorMixin
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Sequence
@@ -68,6 +69,16 @@ class _FakeLegacyProcessor:
     @staticmethod
     def batch_decode(*_args: object, **_kwargs: object) -> list[str]:
         return []
+
+
+class _FakeStepProcessor(_FakeLegacyProcessor, ProcessorMixin):
+    """Callable image processor without an ``image_processor`` attribute."""
+
+    def __init__(self) -> None:
+        """Skip ProcessorMixin construction; the preflight needs only interfaces."""
+
+    def __call__(self, *_args: object, **_kwargs: object) -> dict[str, object]:
+        return {}
 
 
 class _FakeMxRuntime:
@@ -309,6 +320,86 @@ class TestProcessImageWithModelMock:
         assert config is fake_model.config
         assert mock_load.call_args.kwargs["force_download"] is True
         assert mock_load.call_args.kwargs["quantize_activations"] is True
+
+    def test_load_model_retries_connectivity_failure_from_local_snapshot(
+        self,
+        test_image: Path,
+        tmp_path: Path,
+    ) -> None:
+        """A transient Hub read must not block an already-cached model."""
+        params = _build_params(test_image)
+        snapshot = tmp_path / "snapshots" / "abc123"
+        snapshot.mkdir(parents=True)
+        fake_model = _FakeModel()
+        fake_processor = _FakeProcessor()
+
+        with (
+            patch.object(
+                check_models,
+                "load",
+                side_effect=[OSError("connection reset by peer"), (fake_model, fake_processor)],
+            ) as mock_load,
+            patch.object(
+                check_models,
+                "_resolve_model_snapshot_path",
+                return_value=snapshot,
+            ),
+        ):
+            model, processor, config = check_models._load_model(params)
+
+        assert model is fake_model
+        assert processor is fake_processor
+        assert config is fake_model.config
+        assert [call.kwargs["path_or_hf_repo"] for call in mock_load.call_args_list] == [
+            params.model_identifier,
+            str(snapshot),
+        ]
+
+    @pytest.mark.parametrize(
+        ("load_error", "revision", "force_download"),
+        [
+            (ValueError("unsupported model config"), None, False),
+            (OSError("connection reset by peer"), "different-revision", False),
+            (OSError("connection reset by peer"), None, True),
+        ],
+    )
+    def test_load_model_does_not_retry_unsafe_local_fallbacks(
+        self,
+        test_image: Path,
+        tmp_path: Path,
+        load_error: Exception,
+        revision: str | None,
+        force_download: bool,
+    ) -> None:
+        """Only unpinned ordinary connectivity failures may use cached state."""
+        params = replace(
+            _build_params(test_image),
+            revision=revision,
+            force_download=force_download,
+        )
+        snapshot = tmp_path / "snapshots" / "abc123"
+        snapshot.mkdir(parents=True)
+
+        with (
+            patch.object(check_models, "load", side_effect=load_error) as mock_load,
+            patch.object(
+                check_models,
+                "_resolve_model_snapshot_path",
+                return_value=snapshot,
+            ),
+            pytest.raises(type(load_error), match=str(load_error)),
+        ):
+            check_models._load_model(params)
+
+        assert mock_load.call_count == 1
+
+    def test_preflight_accepts_custom_image_processor_without_attribute(self) -> None:
+        """Native-compatible custom processors need not expose HF internals."""
+        check_models._run_model_preflight_validators(
+            model_identifier="org/step",
+            processor=_FakeStepProcessor(),
+            config={"model_type": "step3p7"},
+        )
 
     def test_timeout_returns_failure(self, test_image: Path) -> None:
         """TimeoutError during generation should produce success=False."""
