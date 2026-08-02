@@ -29,7 +29,7 @@ builtins.ValueError: Model preflight failed for mlx-community/Step-3.7-Flash-oQ2
   multimodal processor.
 - *Resolved model revision:* 3dacb46f724ac89725bcd922fb779c7ed1499fe7
 - *Stop reason:* exception
-- *Post-cleanup active memory (GB):* 0.01459931
+- *Post-cleanup active memory (GB):* 0.014517394
 - *Post-cleanup cache memory (GB):* 0.0
 
 <details>
@@ -92,35 +92,38 @@ ValueError: Model preflight failed for mlx-community/Step-3.7-Flash-oQ2e: Loaded
 
 ```text
 === STDERR ===
-Downloading bytes:           |  0.00B
-Reconstructing (incomplete total...): |          |  0.00B /  0.00B
-Fetching 24 files:   0%|          | 0/24 [00:00<?, ?it/s]
-Fetching 24 files: 100%|##########| 24/24 [00:00<00:00, 3397.46it/s]
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-Download complete: :           |  0.00B
-Reconstruction complete: |          |  0.00B /  0.00B
-[00:24:59] ERROR    Model preflight validation failed for mlx-community/Step-3.7-Flash-oQ2e
+[01:10:27] ERROR    Model preflight validation failed for mlx-community/Step-3.7-Flash-oQ2e
                     ValueError: Loaded processor has no image_processor; expected multimodal processor.
 ```
 
 ## Reproduction inputs
 
 - *Image format:* JPEG
-- *Image dimensions:* 640 x 480 pixels
-- *Image size:* 173,131 bytes
-- *Image SHA-256:* dea9e7ef97386345f7cff32f9055da4982da5471c48d575146c796ab4563b04e
+- *Image dimensions:* 9,984 x 6,240 pixels
+- *Image size:* 61,337,614 bytes
+- *Image SHA-256:* a907e72a592bcdbdc026c71ac8a508d6cf87ee27222afaf7cc26f96145151f89
 
 <details>
 <summary>Exact prompt</summary>
 
 ```text
-Create British-English catalogue metadata using only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent.
+Create British-English catalogue metadata from the image and supplied context.
+
+Treat any capture date/time and GPS as authoritative facts, but do not claim they are visible. Descriptive hints may be incomplete or wrong: retain details supported by the image, correct conflicts, and add important visible details. Prefer image evidence when a hint conflicts, and omit uncertain details.
+
+Context: Authoritative context:
+- Capture date/time: 2026-08-01 16:28:40 UTC+01:00
+- GPS: 52.345200°N, 1.503700°E
+
+Descriptive hints:
+- Title hint: Town centre, Halesworth, England, UK, GBR, Europe
+- Description hint: The Cut in Halesworth, Suffolk in the UK
+- Keyword hints: Adobe Stock, Any Vision, Arts centre, Blue sky, Brickwork, Bushes, Car, Clouds, England, Europe, Gravel, Halesworth, Industrial, Locations, Mill, Red Brick Building, Roof, Sign, Sky, Suffolk
 
 Write:
 - a concrete 5-10-word title;
-- a 1-2-sentence factual description of the main subject, setting, action, lighting, and distinctive details;
-- 10-18 unique, comma-separated keywords.
+- a 1-2-sentence factual description combining relevant context with the main visible subject, setting, action, lighting, and distinctive details;
+- 10-18 unique, comma-separated keywords covering relevant context and visible details.
 
 Return exactly these three sections and nothing else:
 Title:
