@@ -2097,6 +2097,45 @@ def test_diagnostics_facts_surface_exact_observation_evidence_without_empty_nois
     assert "Configured EOS token" not in facts
 
 
+def test_diagnostics_facts_render_catalog_constraint_evidence() -> None:
+    analysis = check_models.GenerationQualityAnalysis(
+        is_repetitive=False,
+        repeated_token=None,
+        title_word_count=4,
+        title_word_range=(5, 10),
+        keyword_count=10,
+        keyword_count_range=(10, 18),
+        duplicate_keywords=["building"],
+    )
+    result = PerformanceResult(
+        model_name="org/catalog-constraint",
+        success=True,
+        generation=_MockGeneration(text="catalogue output", generation_tokens=20),
+        quality_analysis=analysis,
+    )
+    assessment = check_models.ResultAssessment(
+        "completed",
+        "usable_with_caveats",
+        "observation_needs_reproduction",
+        ("catalog_constraint_violation",),
+    )
+
+    facts = dict(
+        check_models._diagnostics_result_facts(
+            result,
+            assessment,
+            run_args=None,
+            model_provenance=None,
+        )
+    )
+
+    assert facts["Title word count"] == "4"
+    assert facts["Requested title word range"] == "[5, 10]"
+    assert facts["Keyword count"] == "10"
+    assert facts["Requested keyword count range"] == "[10, 18]"
+    assert facts["Duplicate keywords"] == '["building"]'
+
+
 def test_diagnostics_are_skim_first_and_share_reproduction_context_once(
     tmp_path: Path,
 ) -> None:

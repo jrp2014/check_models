@@ -8326,11 +8326,16 @@ def _diagnostics_result_facts(
         "configured_generation_wrappers": "Declared generation wrappers in output",
         "thinking_trace_markers": "Thinking trace markers",
         "role_boundary_tokens": "Role-boundary tokens in output",
+        "title_word_count": "Title word count",
+        "title_word_range": "Requested title word range",
+        "keyword_count": "Keyword count",
+        "keyword_count_range": "Requested keyword count range",
+        "duplicate_keywords": "Duplicate keywords",
         "token_cap_reasons": "Token-cap degradation evidence",
         "unchanged_draft_fields": "Draft fields returned unchanged",
     }
     rows.extend(
-        (detail_labels[key], _diagnostics_fact(value))
+        (detail_labels.get(key, key.replace("_", " ").capitalize()), _diagnostics_fact(value))
         for key, value in _observation_details(result).items()
     )
     optional_facts = (
