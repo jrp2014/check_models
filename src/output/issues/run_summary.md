@@ -2,7 +2,7 @@
 
 ## Run summary
 
-- *Run timestamp:* 2026-08-02 22:03:27 BST
+- *Run timestamp:* 2026-08-02 22:46:09 BST
 - *Evaluation mode:* blind
 - *Models attempted:* 63
 - *Completed:* 63
@@ -67,7 +67,7 @@ judgements.
 - *Generation: top_p:* 1.0
 - *Trust remote code:* true
 - *check_models version:* 0.8.9
-- *check_models revision:* cffd3ea1ea031355bd7d5a213254110dad163e19
+- *check_models revision:* 3599a4baa107c687bc992190808e5e4545f69b6b
 - *check_models source dirty:* false
 - *mlx-vlm:* 0.6.8
 - *mlx:* 0.32.1.dev20260802+fb5133e10

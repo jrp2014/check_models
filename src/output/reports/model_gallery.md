@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-08-02 22:03:28 BST
+Generated on: 2026-08-02 22:46:10 BST
 
 Complete per-model evidence artifact with image metadata, the source prompt, a
 facts-only chooser, and full generated or crash output for every attempted
@@ -18,69 +18,69 @@ Current-run usability and captured resource facts only. Total time is end-to-end
 
 | Model                                                                                                                   | Usability             | Total s   | Gen TPS             |   Peak GB |   Gen tok | Observations                                                                                                                                                                                                                                                                                                  | Output preview                                                                                                                                                                                                                                                                                                                                      |
 |-------------------------------------------------------------------------------------------------------------------------|-----------------------|-----------|---------------------|-----------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable`              | 1.47s     | 138 tok/s           |       5.2 |        82 | none                                                                                                                                                                                                                                                                                                          | Title: Two cats on a pink couch<br><br>Description: Two tabby cats are lying on a bright pink couch, sleeping peacefully with remote controls beside them. The scene is lit with soft, natural light, highlighting the cats' relaxed postures and the cozy setting.<br><br>Keywords: cats, couch,...                                                |
-| [`meta-llama/Llama-3.2-11B-Vision-Instruct`](#model-meta-llama-llama-32-11b-vision-instruct)                            | `usable`              | 24.80s    | 5.04 tok/s          |      25   |       105 | none                                                                                                                                                                                                                                                                                                          | **Title:** Two Feline Friends in a Cozy Setting<br><br>**Description:**<br>Two tabby cats are sleeping on a pink blanket, surrounded by two remote controls, with one cat lying on its back and the other on its side, both with their eyes closed, in a dimly lit room with a red couch in th...                                                   |
-| [`microsoft/Phi-3.5-vision-instruct`](#model-microsoft-phi-35-vision-instruct)                                          | `usable`              | 2.31s     | 58.7 tok/s          |       9.4 |        68 | none                                                                                                                                                                                                                                                                                                          | Title: Two Cats Sleeping on Sofa<br><br>Description: Two cats are sleeping on a pink sofa with remote controls beside them.<br><br>Keywords: cats, sleeping, sofa, remote controls, pink, relaxed, comfortable, indoor, domestic, pet, resting                                                                                                      |
-| [`mlx-community/InternVL3-14B-8bit`](#model-mlx-community-internvl3-14b-8bit)                                           | `usable`              | 6.59s     | 31.9 tok/s          |      19   |        75 | none                                                                                                                                                                                                                                                                                                          | Title:<br>Two Cats Sleeping on a Sofa<br><br>Description:<br>Two cats are sleeping on a pink sofa with a remote control nearby. The lighting is soft, and the cats appear relaxed.<br><br>Keywords:<br>cats, sleeping, sofa, pink, remote control, striped, relaxed, domestic, pets, indoors, cozy, restin...                                       |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | 4.63s     | 34.3 tok/s          |      18   |        59 | none                                                                                                                                                                                                                                                                                                          | Title: Two Cats Sleeping on a Couch<br>Description: Two tabby cats are lying on a pink blanket, resting beside remote controls. The scene is softly lit.<br>Keywords: cats, sleeping, pink blanket, couch, remote controls, tabby, resting, soft lighting, pets, relaxation                                                                         |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 3.21s     | 70.1 tok/s          |       9.8 |        81 | none                                                                                                                                                                                                                                                                                                          | Title:<br>Two Cats Relaxing on Pink Cushioned Surface<br><br>Description:<br>Two cats lie stretched out on a pink cushioned surface, positioned near remote controls. The lighting is natural, and the cats appear calm and at ease.<br><br>Keywords:<br>cats, pink cushioned surface, remote controls, re...                                       |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable`              | 3.65s     | 66.7 tok/s          |      10   |       106 | none                                                                                                                                                                                                                                                                                                          | **Title:**<br>Relaxed Tabby Kittens on Pink Cushion<br><br>**Description:**<br>Two tabby kittens lie stretched out on a pink cushion, positioned near remote controls. Their relaxed postures and soft fur highlight a calm, indoor setting.<br><br>**Keywords:**<br>kittens, tabby, pink cushion, remote...                                        |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 1.68s     | 203 tok/s           |       4.5 |        85 | none                                                                                                                                                                                                                                                                                                          | Title:<br>Two Sleeping Tabby Kittens on Pink Couch<br><br>Description:<br>Two young tabby cats lie relaxed on a bright pink sofa cushion, each with remote controls beside them. Soft lighting casts gentle shadows across their fur.<br><br>Keywords:<br>pink sofa, remote controls, young tabbies, indoo...                                       |
-| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable`              | 7.80s     | 53.6 tok/s          |      20   |        92 | none                                                                                                                                                                                                                                                                                                          | Title: Two cats resting on a couch<br><br>Description: Two cats lie on a pink blanket-covered couch. One cat wears a green collar. Two remote controls are visible between the cats. The scene is brightly lit, suggesting daytime. The cats appear relaxed and comfortable.<br><br>Keywords: Cat...                                                |
-| [`mlx-community/Molmo-7B-D-0924-bf16`](#model-mlx-community-molmo-7b-d-0924-bf16)                                       | `usable`              | 9.87s     | 30.6 tok/s          |      27   |        96 | none                                                                                                                                                                                                                                                                                                          | Title: Two cats resting on a couch<br><br>Description: Two cats lie on a pink blanket-covered couch. One cat wears a green collar. Two remote controls are visible between the cats. The scene is brightly lit, suggesting daytime. The cats appear relaxed and comfortable.<br><br>Keywords: Cat...                                                |
-| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `usable`              | 16.32s    | 5.95 tok/s          |      23   |        78 | none                                                                                                                                                                                                                                                                                                          | Title: Two Cats Resting on Pink Blanket with Remote Controls<br><br>Description: Two cats are sleeping on a pink blanket. A pink couch is visible in the background. Two remote controls are placed on the blanket. The cats appear to be in a relaxed state.<br><br>Keywords: cats, pink blanket...                                                |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | 2.34s     | 57.8 tok/s          |       9.4 |        68 | none                                                                                                                                                                                                                                                                                                          | Title: Two Cats Sleeping on Sofa<br><br>Description: Two cats are sleeping on a pink sofa with remote controls beside them.<br><br>Keywords: cats, sleeping, sofa, remote controls, pink, relaxed, comfortable, indoor, domestic, pet, resting                                                                                                      |
-| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable`              | 1.47s     | 134 tok/s           |       5.3 |        82 | none                                                                                                                                                                                                                                                                                                          | Title: Two cats on a pink couch<br><br>Description: Two tabby cats are lying on a bright pink couch, sleeping peacefully with remote controls beside them. The scene is lit with soft, natural light, highlighting the cats' relaxed postures and the cozy setting.<br><br>Keywords: cats, couch,...                                                |
-| [`mlx-community/Qwen3.5-27B-4bit`](#model-mlx-community-qwen35-27b-4bit)                                                | `usable`              | 6.04s     | 33.4 tok/s          |      19   |       106 | none                                                                                                                                                                                                                                                                                                          | Title: Two Tabby Cats Resting on Pink Sofa<br><br>Description: Two tabby cats lie side by side on a bright pink sofa, each near a white remote control; natural lighting highlights their striped coats and relaxed postures.<br><br>Keywords: tabby cats, pink sofa, remote controls, striped fu...                                                |
-| [`mlx-community/Qwen3.5-27B-mxfp8`](#model-mlx-community-qwen35-27b-mxfp8)                                              | `usable`              | 9.86s     | 19.3 tok/s          |      30   |       115 | none                                                                                                                                                                                                                                                                                                          | Title:<br>Two Tabby Cats Sleeping on Pink Sofa<br><br>Description:<br>Two tabby cats are resting on a bright pink sofa, each positioned near a white remote control. The scene is well-lit, highlighting the striped fur patterns and relaxed postures of the cats.<br><br>Keywords:<br>tabby cats, pink s...                                       |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 3.61s     | 117 tok/s           |      21   |        89 | none                                                                                                                                                                                                                                                                                                          | Title: Two Tabby Cats Sleeping on Pink Sofa<br><br>Description: Two tabby cats lie asleep on a bright pink sofa, each positioned near a white remote control. The scene is lit by even indoor lighting, highlighting the cats’ striped fur and relaxed postures.<br><br>Keywords: tabby cats, pin...                                                |
-| [`mlx-community/Qwen3.5-35B-A3B-6bit`](#model-mlx-community-qwen35-35b-a3b-6bit)                                        | `usable`              | 4.66s     | 101 tok/s           |      30   |       109 | none                                                                                                                                                                                                                                                                                                          | Title: Two Tabby Cats Resting on Pink Sofa<br><br>Description: Two tabby cats lie sprawled on a bright pink sofa, one curled near a white remote control, the other stretched out beside a second remote. The scene is lit evenly, highlighting their striped fur and relaxed postures.<br><br>Ke...                                                |
-| [`mlx-community/Qwen3.5-35B-A3B-bf16`](#model-mlx-community-qwen35-35b-a3b-bf16)                                        | `usable`              | 12.92s    | 70.1 tok/s          |      71   |       107 | none                                                                                                                                                                                                                                                                                                          | Title: Two Tabby Cats Resting on Pink Sofa<br><br>Description: Two tabby cats lie sprawled on a vibrant pink sofa, one curled near a white remote control, the other stretched out beside a second remote. Soft indoor lighting highlights their striped fur and relaxed postures.<br><br>Keyword...                                                |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 2.62s     | 98.6 tok/s          |       7.1 |        86 | none                                                                                                                                                                                                                                                                                                          | Title: Two Cats Sleeping on a Pink Couch<br><br>Description: Two tabby cats are lying on a pink couch, each with a remote control nearby. The scene is well-lit, highlighting the texture of the couch and the fur of the cats.<br><br>Keywords: cats, tabby, pink couch, remote control, sleepin...                                                |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 9.40s     | 19.3 tok/s          |      30   |       107 | none                                                                                                                                                                                                                                                                                                          | Title: Two Tabby Cats Resting on Pink Sofa<br><br>Description: Two tabby cats are lying on a pink sofa, one near a white remote control and the other beside a blue remote. The scene is brightly lit, highlighting the cats' striped fur and relaxed postures.<br><br>Keywords: tabby cats, pink...                                                |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | 10.30s    | 45.5 tok/s          |      65   |        94 | none                                                                                                                                                                                                                                                                                                          | Title:<br>Two cats sleeping on a pink blanket<br><br>Description:<br>Two cats are lying on a pink blanket with remote controls nearby. One cat is smaller with a green collar, while the other is larger with a striped coat. Both appear to be resting comfortably.<br><br>Keywords:<br>cats, pink blanke...                                       |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable`              | 3.13s     | 66.1 tok/s          |      10   |       106 | none                                                                                                                                                                                                                                                                                                          | Title: Cats Sleeping on Pink Couch with Remotes<br><br>Description: Two tabby cats lie on a pink couch, one curled up, the other stretched out, with a remote control between them. The setting is indoors, with soft lighting highlighting their relaxed postures. The couch's vibrant pin...                                                      |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | 6.14s     | 29.5 tok/s          |      18   |        90 | none                                                                                                                                                                                                                                                                                                          | Title: Two Tabby Cats Resting on Pink Fabric<br><br>Description: Two tabby cats lie prone on a pink fabric surface, each with a remote control nearby. Both cats are asleep with paws extended, exhibiting striped fur patterns.<br><br>Keywords: cats, tabby, pink, fabric, remote control, slee...                                                |
-| [`mlx-community/gemma-3-27b-it-qat-8bit`](#model-mlx-community-gemma-3-27b-it-qat-8bit)                                 | `usable`              | 9.07s     | 17.9 tok/s          |      32   |        87 | none                                                                                                                                                                                                                                                                                                          | Title: Two Tabby Cats Resting on Pink Sofa<br>Description: Two tabby cats lie on a pink sofa, each with a remote control nearby. Both cats are lying on their backs, appearing relaxed in daylight.<br>Keywords: cats, tabby, pink, sofa, remote controls, daylight, domestic animals, lyin...                                                      |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 3.32s     | 129 tok/s           |      16   |        73 | none                                                                                                                                                                                                                                                                                                          | Title: Two tabby cats lying on a pink surface<br><br>Description: Two tabby cats lie on a bright pink fabric surface next to two remote controls. The cats are positioned with their heads facing in opposite directions.<br><br>Keywords: tabby, cats, pink, fabric, remote control, lying, indo...                                                |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 6.29s     | 28.1 tok/s          |      20   |        80 | none                                                                                                                                                                                                                                                                                                          | Title: Two tabby cats lying on a pink blanket<br>Description: Two tabby cats lie on a pink blanket atop a red sofa next to two remote controls. The scene is captured under bright, direct lighting.<br>Keywords: cats, tabby, pink blanket, red sofa, remote controls, lying down, pets, i...                                                      |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | 4.71s     | 40.4 tok/s          |      15   |        89 | none                                                                                                                                                                                                                                                                                                          | ### Title:<br>Two Cats Lounging on Red Couch<br><br>### Description:<br>Two cats, one lying on its back and the other on its side, relax on a red couch. Remote controls are placed nearby.<br><br>### Keywords:<br>cats, lounging, red couch, remote controls, relaxed, indoor, comfort, feline, domestic...                                       |
-| [`mlx-community/pixtral-12b-bf16`](#model-mlx-community-pixtral-12b-bf16)                                               | `usable`              | 7.41s     | 20.3 tok/s          |      27   |        83 | none                                                                                                                                                                                                                                                                                                          | ### Title:<br>Two Cats Lounging on Red Couch<br><br>### Description:<br>Two cats, one lying on its back and the other on its side, relax on a red couch. Remote controls are placed nearby.<br><br>### Keywords:<br>cat, lounging, red couch, remote control, relaxed, lying down, comfortable, indoor, do...                                       |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable_with_caveats` | 0.47s     | 527 tok/s           |       1.1 |        48 | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           | Title:<br>Cats on a Pink Couch<br><br>Description:<br>Two tabby cats are lounging on a bright pink couch, appearing relaxed and comfortable.<br><br>Keywords:<br>cats, pink couch, lounging, relaxed, tabby                                                                                                                                         |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` | 6.22s     | 30.4 tok/s          |      20   |       100 | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           | Title:<br>Two cats resting on a pink sofa<br><br>Description:<br>Two tabby cats are lying on a pink sofa, one on its back and the other on its side, with a remote control nearby. The lighting is natural, and the cats have distinctive striped fur patterns.<br><br>Keywords: cats, tabby, sofa, pin...                                          |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable_with_caveats` | 2.26s     | 92.3 tok/s          |       7.8 |        61 | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           | Title: Two Cats on Pink Sofa<br>Description: Two tabby cats rest on a pink fabric sofa. One cat lies on its side with a remote control nearby. The other cat is positioned with its head down.<br>Keywords: two tabby cats, pink fabric sofa, remote control, head down                                                                             |
-| [`mlx-community/LFM2-VL-1.6B-8bit`](#model-mlx-community-lfm2-vl-16b-8bit)                                              | `usable_with_caveats` | 0.83s     | 332 tok/s           |       3   |        86 | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           | Title: "Cats on a Pink Blanket"<br><br>Description: Two tabby cats are peacefully sleeping on a pink blanket, one lying on its side and the other on its back. The cats are surrounded by two remote controls, suggesting a cozy, relaxed atmosphere.<br><br>Keywords: cats, pink blanket, sleepi...                                                |
-| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable_with_caveats` | 13.14s    | 66.8 tok/s          |      71   |       133 | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           | Title: Two Tabby Cats Sleeping on Pink Sofa with Remotes<br><br>Description: Two tabby cats are lying side by side on a bright pink sofa, each near a white remote control. The cat on the left is stretched out with its tail curled, while the one on the right is curled up with its hea...                                                      |
-| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable_with_caveats` | 0.91s     | 312 tok/s           |       2.5 |        40 | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           | Title: Two Cats Sleeping on a Pink Couch<br>Description: Two tabby cats are sleeping on a pink couch with two remote controls nearby.<br>Keywords: cats, sleeping, pink couch, remote controls                                                                                                                                                      |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable_with_caveats` | 1.42s     | 130 tok/s           |       5.5 |        55 | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           | Title:<br>A black and white cat is lying on a red couch.<br>Description:<br>The cat is resting on the couch, its head resting on its paws. The couch is red and the cat is black and white.<br>Keywords: cat, couch, red                                                                                                                            |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `usable_with_caveats` | 3.86s     | 48.5 tok/s          |      17   |        61 | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           | **Title:** Cozy Cat Nap<br><br>**Description:** Two tabby cats are peacefully sleeping on a pink couch, each with a remote control nearby.<br><br>**Keywords:** cats, sleeping, couch, remote, tabby, pets, rest, relaxation, home, comfort, domestic, furry, peaceful, indoors.                                                                    |
-| [`HuggingFaceTB/SmolVLM-Instruct`](#model-huggingfacetb-smolvlm-instruct)                                               | `unusable`            | 1.19s     | insufficient sample |       5.6 |         9 | Required fields are missing or empty                                                                                                                                                                                                                                                                          | Two Cats on a Pink Couch.                                                                                                                                                                                                                                                                                                                           |
-| [`jqlive/Kimi-VL-A3B-Thinking-2506-6bit`](#model-jqlive-kimi-vl-a3b-thinking-2506-6bit)                                 | `unusable`            | 8.88s     | 76.7 tok/s          |      16   |       500 | Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Internal reasoning text remains visible; Title or keywords do not meet requested constraints                                                                             | ◁think▷So, let's analyze the image. The main subject is two tabby cats on a pink fabric surface. There are two remote controls (one blue, one silver) near them. The cats are lying down, one facing left, the other facing down. The lighting is bright, making colors vivid. Distin...                                                            |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 13.97s    | 43.9 tok/s          |      14   |       500 | Required fields are missing or empty; Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit                                                                                           | Here are my reasoning steps:<br>The user asks: "Create British-English catalogue metadata using only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent.<br><br>Write:<br>- a concrete 5-10-word title;<br>- a 1-2-sentence...                                              |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | 14.06s    | 63.8 tok/s          |      60   |       500 | Required fields are missing or empty; Response appears cut off at the token limit                                                                                                                                                                                                                             | Alright, let's get to work. I need to generate some metadata for this image, and the instructions are very specific. First, I need a title, a description, and a list of keywords. The title has to be between five and ten words, and the description needs to be a short, factual p...                                                            |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 0.79s     | 339 tok/s           |       2.2 |        32 | Required fields are missing or empty                                                                                                                                                                                                                                                                          | A serene moment of feline tranquility on a vibrant pink couch, with two cats in peaceful slumber, surrounded by the soft glow of ambient lighting.                                                                                                                                                                                                  |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 12.09s    | 50.8 tok/s          |      13   |       500 | Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Internal reasoning text remains visible; Title or keywords do not meet requested constraints                                                                             | &lt;think&gt;Got it, let's tackle this. First, the title needs to be 5-10 words, concrete. Looking at the image: two cats on a pink blanket with remotes. So maybe "Cats on Pink Blanket with Remotes" or something similar. Then description: need to mention the main subject (two cats),...                                                      |
-| [`mlx-community/GLM-4.6V-Flash-6bit`](#model-mlx-community-glm-46v-flash-6bit)                                          | `unusable`            | 2.50s     | 64.3 tok/s          |      10   |        47 | Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                             | <\|begin_of_box\|>Title: Two tabby cats on pink couch<br>Description: Two tabby cats rest on a pink couch, with remote controls nearby.<br>Keywords: tabby cats, pink couch, remote controls, resting cats, domestic cats<\|end_of_box\|>                                                                                                           |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `unusable`            | 9.50s     | 51.7 tok/s          |      63   |        89 | Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                             | <\|begin_of_box\|>Title: Two cats on a pink couch<br>Description: Two cats lie on a pink couch, each near a remote control, with one cat’s head resting on the fabric and the other stretched out with eyes closed.<br>Keywords: cats, pink couch, remote controls, sleeping, relaxed, stripe...                                                    |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `unusable`            | 3.37s     | insufficient sample |      19   |        13 | Required fields are missing or empty; Conversation-role control tokens remain visible                                                                                                                                                                                                                         | Two cats laying on a pink blanket with remotes.<end_of_utterance>                                                                                                                                                                                                                                                                                   |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `unusable`            | 110.61s   | 4.71 tok/s          |      39   |       500 | Response repeats the same text; Required fields are missing or empty; Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning text remains visible                                                                                                         | ◁think▷So, let's analyze the image. The image shows two tabby cats on a pink fabric surface. There are two remote controls, one near each cat. The cats are lying down, one facing left, the other facing down. The lighting is bright, making colors vivid. The scene is indoors, li...                                                            |
-| [`mlx-community/Kimi-VL-A3B-Thinking-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-8bit)                             | `unusable`            | 9.35s     | 73.5 tok/s          |      20   |       500 | Required fields are missing or empty; Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit; Conversation-role control tokens remain visible; Internal reasoning text remains visible | ◁think▷Okay, let's tackle this query. The user wants me to create British-English catalogue metadata based on the provided image. The instructions are clear: use only visible facts, omit uncertain details, and avoid things like identity, location, event, brand, species, period...                                                            |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `unusable`            | 1.01s     | 192 tok/s           |       4.1 |        69 | Required fields are missing or empty                                                                                                                                                                                                                                                                          | Two cats sleeping on a pink blanket, one with a remote control nearby, the other with a collar.<br><br>The cats are lying on a pink blanket, one with a remote control nearby, the other with a collar.<br><br>Cats, blanket, remote control, collar, sleeping, pink, indoor, cozy, furry, relaxed                                                  |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `unusable`            | 30.20s    | 18.4 tok/s          |      15   |       500 | Response repeats the same text; Extra text appears before the Title field; Response appears cut off at the token limit; Title or keywords do not meet requested constraints                                                                                                                                   | Here is the information in the format you requested:<br><br>**Title:** Two Cats on a Pink Blanket<br><br>**Description:** Two tabby cats are sleeping on a pink blanket, with two remote controls nearby. The cats are lying on their backs, with their paws stretched out and their eyes closed....                                                |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | 1.22s     | 282 tok/s           |       3   |        58 | Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                                                                               | Two cats sleeping on pink blanket with remote controls<br><br>Description: Two tabby cats rest on a pink fabric, with remote controls nearby; soft lighting and cozy setting.<br><br>Keywords: cats, sleeping, pink blanket, remote controls, tabby, relaxation, comfort, domestic, soft lighting                                                   |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `unusable`            | 4.66s     | 131 tok/s           |       5.3 |       500 | Required fields are missing or empty; Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit                                                                                           | Got it, let's tackle this. First, the title needs to be concrete and 5-10 words. The image has two cats on a pink couch with remotes. So maybe "Two tabby cats resting on pink couch with remotes" but that's 10 words. Wait, "Two tabby cats resting on pink couch with remote contr...                                                            |
-| [`mlx-community/SmolVLM-Instruct-bf16`](#model-mlx-community-smolvlm-instruct-bf16)                                     | `unusable`            | 1.17s     | insufficient sample |       5.6 |         9 | Required fields are missing or empty                                                                                                                                                                                                                                                                          | Two Cats on a Pink Couch.                                                                                                                                                                                                                                                                                                                           |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `unusable`            | 5.93s     | 44.3 tok/s          |      29   |        76 | Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                             | <\|channel>thought<br><channel\|>Title: Two tabby cats sleeping on a pink blanket<br>Description: Two striped tabby cats lie on a pink blanket draped over a red sofa. Two remote controls are positioned near the cats.<br>Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, red,...                                                  |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `unusable`            | 5.01s     | 56.9 tok/s          |      28   |        75 | Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                             | <\|channel>thought<br><channel\|>Title: Two tabby cats sleeping on a pink blanket<br>Description: Two striped tabby cats lie curled on a bright pink fabric next to two television remote controls. The lighting is bright and even.<br>Keywords: cats, tabby, sleeping, pink, blanket, couch, i...                                                 |
-| [`mlx-community/gemma-3n-E2B-4bit`](#model-mlx-community-gemma-3n-e2b-4bit)                                             | `unusable`            | 5.68s     | 126 tok/s           |       6   |       500 | Required fields are missing or empty; Response appears cut off at the token limit                                                                                                                                                                                                                             | <br>- a 1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-29-30-31-32-33-34-35-36-37-38-39-40-41-42-43-44-45-46-47-48-49-50-51-52-53-54-55-56-57-58-59-60-61-62-63-64-65-66-67-68-69-70-71-72-73-74-75-76-77-76-78-79-80-81-82-83-84-85-86-87-88-89-90-91-92-93...                                                         |
-| [`mlx-community/gemma-4-31b-bf16`](#model-mlx-community-gemma-4-31b-bf16)                                               | `unusable`            | 8.65s     | insufficient sample |      63   |         1 | No response text was returned; Required fields are missing or empty                                                                                                                                                                                                                                           | empty output                                                                                                                                                                                                                                                                                                                                        |
-| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | 11.67s    | 59.6 tok/s          |       9.7 |       500 | Response repeats the same text; Required fields are missing or empty; Response appears cut off at the token limit                                                                                                                                                                                             | cat, sleeping, pink blanket, remote control, striped, tabby, kitten, cozy, domestic, indoor, relaxation, comfort, home, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, felin...                                                            |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | 0.86s     | 377 tok/s           |       2.1 |        97 | Required fields are missing or empty                                                                                                                                                                                                                                                                          | Title: "A Study in Stripes"<br>Description: A close-up of a person wearing a striped shirt, with a focus on the pattern and color of the fabric. The image is set against a pink background, and the person is lying on a bed covered with a pink blanket. The lighting is soft, and the...                                                         |
-| [`mlx-community/paligemma2-10b-ft-docci-448-6bit`](#model-mlx-community-paligemma2-10b-ft-docci-448-6bit)               | `unusable`            | 7.28s     | 33.4 tok/s          |      11   |       155 | Required fields are missing or empty                                                                                                                                                                                                                                                                          | A top-down view of two cats lying on a pink blanket. The cat on the left is lying on its side with its head facing the top left corner of the image. Its body is facing the top right corner of the image. Its head is turned slightly to the left. Its tail is sticking out of the b...                                                            |
-| [`mlx-community/paligemma2-10b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-10b-ft-docci-448-bf16)               | `unusable`            | 33.09s    | 5.4 tok/s           |      26   |       159 | Required fields are missing or empty                                                                                                                                                                                                                                                                          | A top-down view of two cats lying on a pink blanket. The cat on the left is lying on its side, and its head is facing the top left corner of the image. Its body is facing the top right corner of the image. Its tail is sticking out to the left of the image. The cat on the right...                                                            |
-| [`mlx-community/paligemma2-3b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-3b-ft-docci-448-bf16)                 | `unusable`            | 9.59s     | 19.4 tok/s          |      11   |       151 | Required fields are missing or empty                                                                                                                                                                                                                                                                          | A top-down view of two cats sleeping on a red couch. The cat on the left is a gray tabby with black stripes. It is lying on its side, with its head facing the bottom left corner of the image. Its front left leg is stretched out in front of its body. Its tail is sticking out be...                                                            |
-| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | 12.22s    | 51.6 tok/s          |       4.6 |       500 | Response repeats the same text; Required fields are missing or empty; Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit                                                           | Action:<br>Lighting:<br>Brand:<br>Species:<br>Period:<br>Event:<br>Date:<br>Name:<br>Intent:<br>Brand:<br>Date:<br>Name:<br>Description:<br>Action:<br>Lighting:<br>Keywords:<br>Return exactly these three sections and nothing else:<br>Title:<br>Description:<br>- 10-18 unique, comma-separated keywords.<br>- 10-18 unique, comma-separated... |
-| [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava)                                                                       | `unusable`            | 1.09s     | 116 tok/s           |       4.3 |        40 | Required fields are missing or empty                                                                                                                                                                                                                                                                          | Title: A Cat Laying on a Couch<br>Description: A cat is laying on a couch, with its tail and paws visible. The cat is wearing a green and white striped shirt.                                                                                                                                                                                      |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable`              | 1.40s     | 137 tok/s           |       5.2 |        82 | none                                                                                                                                                                                                                                                                                                          | Title: Two cats on a pink couch<br><br>Description: Two tabby cats are lying on a bright pink couch, sleeping peacefully with remote controls beside them. The scene is lit with soft, natural light, highlighting the cats' relaxed postures and the cozy setting.<br><br>Keywords: cats, couch,...                                                |
+| [`meta-llama/Llama-3.2-11B-Vision-Instruct`](#model-meta-llama-llama-32-11b-vision-instruct)                            | `usable`              | 24.71s    | 5.06 tok/s          |      25   |       105 | none                                                                                                                                                                                                                                                                                                          | **Title:** Two Feline Friends in a Cozy Setting<br><br>**Description:**<br>Two tabby cats are sleeping on a pink blanket, surrounded by two remote controls, with one cat lying on its back and the other on its side, both with their eyes closed, in a dimly lit room with a red couch in th...                                                   |
+| [`microsoft/Phi-3.5-vision-instruct`](#model-microsoft-phi-35-vision-instruct)                                          | `usable`              | 2.32s     | 59.5 tok/s          |       9.4 |        68 | none                                                                                                                                                                                                                                                                                                          | Title: Two Cats Sleeping on Sofa<br><br>Description: Two cats are sleeping on a pink sofa with remote controls beside them.<br><br>Keywords: cats, sleeping, sofa, remote controls, pink, relaxed, comfortable, indoor, domestic, pet, resting                                                                                                      |
+| [`mlx-community/InternVL3-14B-8bit`](#model-mlx-community-internvl3-14b-8bit)                                           | `usable`              | 7.04s     | 31.9 tok/s          |      19   |        75 | none                                                                                                                                                                                                                                                                                                          | Title:<br>Two Cats Sleeping on a Sofa<br><br>Description:<br>Two cats are sleeping on a pink sofa with a remote control nearby. The lighting is soft, and the cats appear relaxed.<br><br>Keywords:<br>cats, sleeping, sofa, pink, remote control, striped, relaxed, domestic, pets, indoors, cozy, restin...                                       |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | 5.03s     | 34.7 tok/s          |      18   |        59 | none                                                                                                                                                                                                                                                                                                          | Title: Two Cats Sleeping on a Couch<br>Description: Two tabby cats are lying on a pink blanket, resting beside remote controls. The scene is softly lit.<br>Keywords: cats, sleeping, pink blanket, couch, remote controls, tabby, resting, soft lighting, pets, relaxation                                                                         |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 3.18s     | 69.8 tok/s          |       9.8 |        81 | none                                                                                                                                                                                                                                                                                                          | Title:<br>Two Cats Relaxing on Pink Cushioned Surface<br><br>Description:<br>Two cats lie stretched out on a pink cushioned surface, positioned near remote controls. The lighting is natural, and the cats appear calm and at ease.<br><br>Keywords:<br>cats, pink cushioned surface, remote controls, re...                                       |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable`              | 3.76s     | 66.4 tok/s          |      10   |       106 | none                                                                                                                                                                                                                                                                                                          | **Title:**<br>Relaxed Tabby Kittens on Pink Cushion<br><br>**Description:**<br>Two tabby kittens lie stretched out on a pink cushion, positioned near remote controls. Their relaxed postures and soft fur highlight a calm, indoor setting.<br><br>**Keywords:**<br>kittens, tabby, pink cushion, remote...                                        |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 1.61s     | 201 tok/s           |       4.5 |        85 | none                                                                                                                                                                                                                                                                                                          | Title:<br>Two Sleeping Tabby Kittens on Pink Couch<br><br>Description:<br>Two young tabby cats lie relaxed on a bright pink sofa cushion, each with remote controls beside them. Soft lighting casts gentle shadows across their fur.<br><br>Keywords:<br>pink sofa, remote controls, young tabbies, indoo...                                       |
+| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable`              | 7.84s     | 53.4 tok/s          |      20   |        96 | none                                                                                                                                                                                                                                                                                                          | Title: Two cats resting on a couch<br><br>Description: Two cats lie on a pink blanket-covered couch. One cat wears a green collar. Two remote controls are visible between the cats. The scene is brightly lit, suggesting daytime. The cats appear relaxed and comfortable.<br><br>Keywords: Cat...                                                |
+| [`mlx-community/Molmo-7B-D-0924-bf16`](#model-mlx-community-molmo-7b-d-0924-bf16)                                       | `usable`              | 9.88s     | 30.7 tok/s          |      27   |        96 | none                                                                                                                                                                                                                                                                                                          | Title: Two cats resting on a couch<br><br>Description: Two cats lie on a pink blanket-covered couch. One cat wears a green collar. Two remote controls are visible between the cats. The scene is brightly lit, suggesting daytime. The cats appear relaxed and comfortable.<br><br>Keywords: Cat...                                                |
+| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `usable`              | 16.25s    | 5.97 tok/s          |      23   |        78 | none                                                                                                                                                                                                                                                                                                          | Title: Two Cats Resting on Pink Blanket with Remote Controls<br><br>Description: Two cats are sleeping on a pink blanket. A pink couch is visible in the background. Two remote controls are placed on the blanket. The cats appear to be in a relaxed state.<br><br>Keywords: cats, pink blanket...                                                |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | 2.48s     | 58.1 tok/s          |       9.4 |        68 | none                                                                                                                                                                                                                                                                                                          | Title: Two Cats Sleeping on Sofa<br><br>Description: Two cats are sleeping on a pink sofa with remote controls beside them.<br><br>Keywords: cats, sleeping, sofa, remote controls, pink, relaxed, comfortable, indoor, domestic, pet, resting                                                                                                      |
+| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable`              | 1.54s     | 134 tok/s           |       5.3 |        82 | none                                                                                                                                                                                                                                                                                                          | Title: Two cats on a pink couch<br><br>Description: Two tabby cats are lying on a bright pink couch, sleeping peacefully with remote controls beside them. The scene is lit with soft, natural light, highlighting the cats' relaxed postures and the cozy setting.<br><br>Keywords: cats, couch,...                                                |
+| [`mlx-community/Qwen3.5-27B-4bit`](#model-mlx-community-qwen35-27b-4bit)                                                | `usable`              | 6.08s     | 33.2 tok/s          |      19   |       106 | none                                                                                                                                                                                                                                                                                                          | Title: Two Tabby Cats Resting on Pink Sofa<br><br>Description: Two tabby cats lie side by side on a bright pink sofa, each near a white remote control; natural lighting highlights their striped coats and relaxed postures.<br><br>Keywords: tabby cats, pink sofa, remote controls, striped fu...                                                |
+| [`mlx-community/Qwen3.5-27B-mxfp8`](#model-mlx-community-qwen35-27b-mxfp8)                                              | `usable`              | 10.02s    | 19.3 tok/s          |      30   |       115 | none                                                                                                                                                                                                                                                                                                          | Title:<br>Two Tabby Cats Sleeping on Pink Sofa<br><br>Description:<br>Two tabby cats are resting on a bright pink sofa, each positioned near a white remote control. The scene is well-lit, highlighting the striped fur patterns and relaxed postures of the cats.<br><br>Keywords:<br>tabby cats, pink s...                                       |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 3.67s     | 120 tok/s           |      21   |        89 | none                                                                                                                                                                                                                                                                                                          | Title: Two Tabby Cats Sleeping on Pink Sofa<br><br>Description: Two tabby cats lie asleep on a bright pink sofa, each positioned near a white remote control. The scene is lit by even indoor lighting, highlighting the cats’ striped fur and relaxed postures.<br><br>Keywords: tabby cats, pin...                                                |
+| [`mlx-community/Qwen3.5-35B-A3B-6bit`](#model-mlx-community-qwen35-35b-a3b-6bit)                                        | `usable`              | 4.63s     | 102 tok/s           |      30   |       109 | none                                                                                                                                                                                                                                                                                                          | Title: Two Tabby Cats Resting on Pink Sofa<br><br>Description: Two tabby cats lie sprawled on a bright pink sofa, one curled near a white remote control, the other stretched out beside a second remote. The scene is lit evenly, highlighting their striped fur and relaxed postures.<br><br>Ke...                                                |
+| [`mlx-community/Qwen3.5-35B-A3B-bf16`](#model-mlx-community-qwen35-35b-a3b-bf16)                                        | `usable`              | 13.29s    | 70.1 tok/s          |      71   |       107 | none                                                                                                                                                                                                                                                                                                          | Title: Two Tabby Cats Resting on Pink Sofa<br><br>Description: Two tabby cats lie sprawled on a vibrant pink sofa, one curled near a white remote control, the other stretched out beside a second remote. Soft indoor lighting highlights their striped fur and relaxed postures.<br><br>Keyword...                                                |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 2.60s     | 100 tok/s           |       7.1 |        86 | none                                                                                                                                                                                                                                                                                                          | Title: Two Cats Sleeping on a Pink Couch<br><br>Description: Two tabby cats are lying on a pink couch, each with a remote control nearby. The scene is well-lit, highlighting the texture of the couch and the fur of the cats.<br><br>Keywords: cats, tabby, pink couch, remote control, sleepin...                                                |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 10.72s    | 19.2 tok/s          |      30   |       107 | none                                                                                                                                                                                                                                                                                                          | Title: Two Tabby Cats Resting on Pink Sofa<br><br>Description: Two tabby cats are lying on a pink sofa, one near a white remote control and the other beside a blue remote. The scene is brightly lit, highlighting the cats' striped fur and relaxed postures.<br><br>Keywords: tabby cats, pink...                                                |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | 10.53s    | 46.0 tok/s          |      65   |        94 | none                                                                                                                                                                                                                                                                                                          | Title:<br>Two cats sleeping on a pink blanket<br><br>Description:<br>Two cats are lying on a pink blanket with remote controls nearby. One cat is smaller with a green collar, while the other is larger with a striped coat. Both appear to be resting comfortably.<br><br>Keywords:<br>cats, pink blanke...                                       |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable`              | 3.14s     | 65.3 tok/s          |      10   |       106 | none                                                                                                                                                                                                                                                                                                          | Title: Cats Sleeping on Pink Couch with Remotes<br><br>Description: Two tabby cats lie on a pink couch, one curled up, the other stretched out, with a remote control between them. The setting is indoors, with soft lighting highlighting their relaxed postures. The couch's vibrant pin...                                                      |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | 6.07s     | 30.0 tok/s          |      18   |        90 | none                                                                                                                                                                                                                                                                                                          | Title: Two Tabby Cats Resting on Pink Fabric<br><br>Description: Two tabby cats lie prone on a pink fabric surface, each with a remote control nearby. Both cats are asleep with paws extended, exhibiting striped fur patterns.<br><br>Keywords: cats, tabby, pink, fabric, remote control, slee...                                                |
+| [`mlx-community/gemma-3-27b-it-qat-8bit`](#model-mlx-community-gemma-3-27b-it-qat-8bit)                                 | `usable`              | 9.14s     | 17.8 tok/s          |      32   |        87 | none                                                                                                                                                                                                                                                                                                          | Title: Two Tabby Cats Resting on Pink Sofa<br>Description: Two tabby cats lie on a pink sofa, each with a remote control nearby. Both cats are lying on their backs, appearing relaxed in daylight.<br>Keywords: cats, tabby, pink, sofa, remote controls, daylight, domestic animals, lyin...                                                      |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 3.31s     | 128 tok/s           |      16   |        73 | none                                                                                                                                                                                                                                                                                                          | Title: Two tabby cats lying on a pink surface<br><br>Description: Two tabby cats lie on a bright pink fabric surface next to two remote controls. The cats are positioned with their heads facing in opposite directions.<br><br>Keywords: tabby, cats, pink, fabric, remote control, lying, indo...                                                |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 6.47s     | 28.0 tok/s          |      20   |        80 | none                                                                                                                                                                                                                                                                                                          | Title: Two tabby cats lying on a pink blanket<br>Description: Two tabby cats lie on a pink blanket atop a red sofa next to two remote controls. The scene is captured under bright, direct lighting.<br>Keywords: cats, tabby, pink blanket, red sofa, remote controls, lying down, pets, i...                                                      |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | 4.90s     | 40.1 tok/s          |      15   |        89 | none                                                                                                                                                                                                                                                                                                          | ### Title:<br>Two Cats Lounging on Red Couch<br><br>### Description:<br>Two cats, one lying on its back and the other on its side, relax on a red couch. Remote controls are placed nearby.<br><br>### Keywords:<br>cats, lounging, red couch, remote controls, relaxed, indoor, comfort, feline, domestic...                                       |
+| [`mlx-community/pixtral-12b-bf16`](#model-mlx-community-pixtral-12b-bf16)                                               | `usable`              | 7.61s     | 20.1 tok/s          |      27   |        83 | none                                                                                                                                                                                                                                                                                                          | ### Title:<br>Two Cats Lounging on Red Couch<br><br>### Description:<br>Two cats, one lying on its back and the other on its side, relax on a red couch. Remote controls are placed nearby.<br><br>### Keywords:<br>cat, lounging, red couch, remote control, relaxed, lying down, comfortable, indoor, do...                                       |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable_with_caveats` | 0.47s     | 525 tok/s           |       1.1 |        48 | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           | Title:<br>Cats on a Pink Couch<br><br>Description:<br>Two tabby cats are lounging on a bright pink couch, appearing relaxed and comfortable.<br><br>Keywords:<br>cats, pink couch, lounging, relaxed, tabby                                                                                                                                         |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` | 6.19s     | 31.0 tok/s          |      20   |       100 | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           | Title:<br>Two cats resting on a pink sofa<br><br>Description:<br>Two tabby cats are lying on a pink sofa, one on its back and the other on its side, with a remote control nearby. The lighting is natural, and the cats have distinctive striped fur patterns.<br><br>Keywords: cats, tabby, sofa, pin...                                          |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable_with_caveats` | 2.27s     | 92.4 tok/s          |       7.8 |        61 | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           | Title: Two Cats on Pink Sofa<br>Description: Two tabby cats rest on a pink fabric sofa. One cat lies on its side with a remote control nearby. The other cat is positioned with its head down.<br>Keywords: two tabby cats, pink fabric sofa, remote control, head down                                                                             |
+| [`mlx-community/LFM2-VL-1.6B-8bit`](#model-mlx-community-lfm2-vl-16b-8bit)                                              | `usable_with_caveats` | 0.91s     | 331 tok/s           |       3   |        86 | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           | Title: "Cats on a Pink Blanket"<br><br>Description: Two tabby cats are peacefully sleeping on a pink blanket, one lying on its side and the other on its back. The cats are surrounded by two remote controls, suggesting a cozy, relaxed atmosphere.<br><br>Keywords: cats, pink blanket, sleepi...                                                |
+| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable_with_caveats` | 13.83s    | 68.0 tok/s          |      71   |       133 | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           | Title: Two Tabby Cats Sleeping on Pink Sofa with Remotes<br><br>Description: Two tabby cats are lying side by side on a bright pink sofa, each near a white remote control. The cat on the left is stretched out with its tail curled, while the one on the right is curled up with its hea...                                                      |
+| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable_with_caveats` | 0.83s     | 319 tok/s           |       2.5 |        40 | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           | Title: Two Cats Sleeping on a Pink Couch<br>Description: Two tabby cats are sleeping on a pink couch with two remote controls nearby.<br>Keywords: cats, sleeping, pink couch, remote controls                                                                                                                                                      |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable_with_caveats` | 1.44s     | 130 tok/s           |       5.5 |        55 | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           | Title:<br>A black and white cat is lying on a red couch.<br>Description:<br>The cat is resting on the couch, its head resting on its paws. The couch is red and the cat is black and white.<br>Keywords: cat, couch, red                                                                                                                            |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `usable_with_caveats` | 3.95s     | 48.2 tok/s          |      17   |        61 | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           | **Title:** Cozy Cat Nap<br><br>**Description:** Two tabby cats are peacefully sleeping on a pink couch, each with a remote control nearby.<br><br>**Keywords:** cats, sleeping, couch, remote, tabby, pets, rest, relaxation, home, comfort, domestic, furry, peaceful, indoors.                                                                    |
+| [`HuggingFaceTB/SmolVLM-Instruct`](#model-huggingfacetb-smolvlm-instruct)                                               | `unusable`            | 1.29s     | insufficient sample |       5.6 |         9 | Required fields are missing or empty                                                                                                                                                                                                                                                                          | Two Cats on a Pink Couch.                                                                                                                                                                                                                                                                                                                           |
+| [`jqlive/Kimi-VL-A3B-Thinking-2506-6bit`](#model-jqlive-kimi-vl-a3b-thinking-2506-6bit)                                 | `unusable`            | 8.82s     | 76.8 tok/s          |      16   |       500 | Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Internal reasoning text remains visible; Title or keywords do not meet requested constraints                                                                             | ◁think▷So, let's analyze the image. The main subject is two tabby cats on a pink fabric surface. There are two remote controls (one blue, one silver) near them. The cats are lying down, one facing left, the other facing down. The lighting is bright, making colors vivid. Distin...                                                            |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 13.90s    | 44.1 tok/s          |      14   |       500 | Required fields are missing or empty; Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit                                                                                           | Here are my reasoning steps:<br>The user asks: "Create British-English catalogue metadata using only clearly visible facts. Omit uncertain details and unsupported identity, location, event, brand, species, period, or intent.<br><br>Write:<br>- a concrete 5-10-word title;<br>- a 1-2-sentence...                                              |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | 14.27s    | 64.2 tok/s          |      60   |       500 | Required fields are missing or empty; Response appears cut off at the token limit                                                                                                                                                                                                                             | Alright, let's get to work. I need to generate some metadata for this image, and the instructions are very specific. First, I need a title, a description, and a list of keywords. The title has to be between five and ten words, and the description needs to be a short, factual p...                                                            |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `unusable`            | 0.84s     | 345 tok/s           |       2.2 |        32 | Required fields are missing or empty                                                                                                                                                                                                                                                                          | A serene moment of feline tranquility on a vibrant pink couch, with two cats in peaceful slumber, surrounded by the soft glow of ambient lighting.                                                                                                                                                                                                  |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `unusable`            | 11.85s    | 51.0 tok/s          |      13   |       500 | Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Internal reasoning text remains visible; Title or keywords do not meet requested constraints                                                                             | &lt;think&gt;Got it, let's tackle this. First, the title needs to be 5-10 words, concrete. Looking at the image: two cats on a pink blanket with remotes. So maybe "Cats on Pink Blanket with Remotes" or something similar. Then description: need to mention the main subject (two cats),...                                                      |
+| [`mlx-community/GLM-4.6V-Flash-6bit`](#model-mlx-community-glm-46v-flash-6bit)                                          | `unusable`            | 2.58s     | 64.3 tok/s          |      10   |        47 | Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                             | <\|begin_of_box\|>Title: Two tabby cats on pink couch<br>Description: Two tabby cats rest on a pink couch, with remote controls nearby.<br>Keywords: tabby cats, pink couch, remote controls, resting cats, domestic cats<\|end_of_box\|>                                                                                                           |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `unusable`            | 9.68s     | 52.4 tok/s          |      63   |        89 | Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                             | <\|begin_of_box\|>Title: Two cats on a pink couch<br>Description: Two cats lie on a pink couch, each near a remote control, with one cat’s head resting on the fabric and the other stretched out with eyes closed.<br>Keywords: cats, pink couch, remote controls, sleeping, relaxed, stripe...                                                    |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `unusable`            | 3.56s     | insufficient sample |      19   |        13 | Required fields are missing or empty; Conversation-role control tokens remain visible                                                                                                                                                                                                                         | Two cats laying on a pink blanket with remotes.<end_of_utterance>                                                                                                                                                                                                                                                                                   |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `unusable`            | 110.80s   | 4.69 tok/s          |      39   |       500 | Response repeats the same text; Required fields are missing or empty; Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning text remains visible                                                                                                         | ◁think▷So, let's analyze the image. The image shows two tabby cats on a pink fabric surface. There are two remote controls, one near each cat. The cats are lying down, one facing left, the other facing down. The lighting is bright, making colors vivid. The scene is indoors, li...                                                            |
+| [`mlx-community/Kimi-VL-A3B-Thinking-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-8bit)                             | `unusable`            | 9.72s     | 70.5 tok/s          |      20   |       500 | Required fields are missing or empty; Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit; Conversation-role control tokens remain visible; Internal reasoning text remains visible | ◁think▷Okay, let's tackle this query. The user wants me to create British-English catalogue metadata based on the provided image. The instructions are clear: use only visible facts, omit uncertain details, and avoid things like identity, location, event, brand, species, period...                                                            |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `unusable`            | 1.08s     | 190 tok/s           |       4.1 |        69 | Required fields are missing or empty                                                                                                                                                                                                                                                                          | Two cats sleeping on a pink blanket, one with a remote control nearby, the other with a collar.<br><br>The cats are lying on a pink blanket, one with a remote control nearby, the other with a collar.<br><br>Cats, blanket, remote control, collar, sleeping, pink, indoor, cozy, furry, relaxed                                                  |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `unusable`            | 31.50s    | 17.5 tok/s          |      15   |       500 | Response repeats the same text; Extra text appears before the Title field; Response appears cut off at the token limit; Title or keywords do not meet requested constraints                                                                                                                                   | Here is the information in the format you requested:<br><br>**Title:** Two Cats on a Pink Blanket<br><br>**Description:** Two tabby cats are sleeping on a pink blanket, with two remote controls nearby. The cats are lying on their backs, with their paws stretched out and their eyes closed....                                                |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | 1.25s     | 280 tok/s           |       3   |        58 | Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                                                                               | Two cats sleeping on pink blanket with remote controls<br><br>Description: Two tabby cats rest on a pink fabric, with remote controls nearby; soft lighting and cozy setting.<br><br>Keywords: cats, sleeping, pink blanket, remote controls, tabby, relaxation, comfort, domestic, soft lighting                                                   |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `unusable`            | 4.74s     | 132 tok/s           |       5.3 |       500 | Required fields are missing or empty; Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit                                                                                           | Got it, let's tackle this. First, the title needs to be concrete and 5-10 words. The image has two cats on a pink couch with remotes. So maybe "Two tabby cats resting on pink couch with remotes" but that's 10 words. Wait, "Two tabby cats resting on pink couch with remote contr...                                                            |
+| [`mlx-community/SmolVLM-Instruct-bf16`](#model-mlx-community-smolvlm-instruct-bf16)                                     | `unusable`            | 1.16s     | insufficient sample |       5.6 |         9 | Required fields are missing or empty                                                                                                                                                                                                                                                                          | Two Cats on a Pink Couch.                                                                                                                                                                                                                                                                                                                           |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `unusable`            | 5.41s     | 43.2 tok/s          |      29   |        72 | Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                             | <\|channel>thought<br><channel\|>Title: Two tabby cats sleeping on a pink blanket<br>Description: Two striped tabby cats lie on a bright pink blanket on a sofa next to remote controls. Bright light illuminates the scene.<br>Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, i...                                                 |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `unusable`            | 4.80s     | 62.8 tok/s          |      28   |        72 | Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                             | <\|channel>thought<br><channel\|>Title: Two tabby cats sleeping on a pink blanket<br>Description: Two patterned tabby cats are lying on a pink fabric surface on a sofa. Two remote controls are visible near the cats.<br>Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote,...                                                 |
+| [`mlx-community/gemma-3n-E2B-4bit`](#model-mlx-community-gemma-3n-e2b-4bit)                                             | `unusable`            | 5.71s     | 127 tok/s           |       6   |       500 | Required fields are missing or empty; Response appears cut off at the token limit                                                                                                                                                                                                                             | <br>- a 1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-29-30-31-32-33-34-35-36-37-38-39-40-41-42-43-44-45-46-47-48-49-50-51-52-53-54-55-56-57-58-59-60-61-62-63-64-65-66-67-68-69-70-71-72-73-74-75-76-77-76-78-79-80-81-82-83-84-85-86-87-88-89-90-91-92-93...                                                         |
+| [`mlx-community/gemma-4-31b-bf16`](#model-mlx-community-gemma-4-31b-bf16)                                               | `unusable`            | 9.30s     | insufficient sample |      63   |         1 | No response text was returned; Required fields are missing or empty                                                                                                                                                                                                                                           | empty output                                                                                                                                                                                                                                                                                                                                        |
+| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `unusable`            | 11.59s    | 60.2 tok/s          |       9.7 |       500 | Response repeats the same text; Required fields are missing or empty; Response appears cut off at the token limit                                                                                                                                                                                             | cat, sleeping, pink blanket, remote control, striped, tabby, kitten, cozy, domestic, indoor, relaxation, comfort, home, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, felin...                                                            |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `unusable`            | 0.92s     | 387 tok/s           |       2.1 |        97 | Required fields are missing or empty                                                                                                                                                                                                                                                                          | Title: "A Study in Stripes"<br>Description: A close-up of a person wearing a striped shirt, with a focus on the pattern and color of the fabric. The image is set against a pink background, and the person is lying on a bed covered with a pink blanket. The lighting is soft, and the...                                                         |
+| [`mlx-community/paligemma2-10b-ft-docci-448-6bit`](#model-mlx-community-paligemma2-10b-ft-docci-448-6bit)               | `unusable`            | 7.33s     | 33.3 tok/s          |      11   |       155 | Required fields are missing or empty                                                                                                                                                                                                                                                                          | A top-down view of two cats lying on a pink blanket. The cat on the left is lying on its side with its head facing the top left corner of the image. Its body is facing the top right corner of the image. Its head is turned slightly to the left. Its tail is sticking out of the b...                                                            |
+| [`mlx-community/paligemma2-10b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-10b-ft-docci-448-bf16)               | `unusable`            | 33.33s    | 5.37 tok/s          |      26   |       159 | Required fields are missing or empty                                                                                                                                                                                                                                                                          | A top-down view of two cats lying on a pink blanket. The cat on the left is lying on its side, and its head is facing the top left corner of the image. Its body is facing the top right corner of the image. Its tail is sticking out to the left of the image. The cat on the right...                                                            |
+| [`mlx-community/paligemma2-3b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-3b-ft-docci-448-bf16)                 | `unusable`            | 9.69s     | 19.4 tok/s          |      11   |       151 | Required fields are missing or empty                                                                                                                                                                                                                                                                          | A top-down view of two cats sleeping on a red couch. The cat on the left is a gray tabby with black stripes. It is lying on its side, with its head facing the bottom left corner of the image. Its front left leg is stretched out in front of its body. Its tail is sticking out be...                                                            |
+| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `unusable`            | 12.52s    | 50.5 tok/s          |       4.6 |       500 | Response repeats the same text; Required fields are missing or empty; Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit                                                           | Action:<br>Lighting:<br>Brand:<br>Species:<br>Period:<br>Event:<br>Date:<br>Name:<br>Intent:<br>Brand:<br>Date:<br>Name:<br>Description:<br>Action:<br>Lighting:<br>Keywords:<br>Return exactly these three sections and nothing else:<br>Title:<br>Description:<br>- 10-18 unique, comma-separated keywords.<br>- 10-18 unique, comma-separated... |
+| [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava)                                                                       | `unusable`            | 1.04s     | 116 tok/s           |       4.3 |        40 | Required fields are missing or empty                                                                                                                                                                                                                                                                          | Title: A Cat Laying on a Couch<br>Description: A cat is laying on a couch, with its tail and paws visible. The cat is wearing a green and white striped shirt.                                                                                                                                                                                      |
 <!-- markdownlint-enable MD034 MD049 -->
 
 ## Avoid for This Run
@@ -105,8 +105,8 @@ Current-run usability and captured resource facts only. Total time is end-to-end
 | [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                 | `unusable`  | Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                                                                               | Two cats sleeping on pink blanket with remote controls<br><br>Description: Two tabby cats rest on a pink fabric, with remote controls nearby; soft lighting and cozy setting.<br><br>Keywords: cats, sleeping, pink blanket, remote controls, tabby, relaxation, comfort, domestic, soft lighting                                                   |
 | [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                  | `unusable`  | Required fields are missing or empty; Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit                                                                                           | Got it, let's tackle this. First, the title needs to be concrete and 5-10 words. The image has two cats on a pink couch with remotes. So maybe "Two tabby cats resting on pink couch with remotes" but that's 10 words. Wait, "Two tabby cats resting on pink couch with remote contr...                                                            |
 | [`mlx-community/SmolVLM-Instruct-bf16`](#model-mlx-community-smolvlm-instruct-bf16)                          | `unusable`  | Required fields are missing or empty                                                                                                                                                                                                                                                                          | Two Cats on a Pink Couch.                                                                                                                                                                                                                                                                                                                           |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)        | `unusable`  | Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                             | <\|channel>thought<br><channel\|>Title: Two tabby cats sleeping on a pink blanket<br>Description: Two striped tabby cats lie on a pink blanket draped over a red sofa. Two remote controls are positioned near the cats.<br>Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, red,...                                                  |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)      | `unusable`  | Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                             | <\|channel>thought<br><channel\|>Title: Two tabby cats sleeping on a pink blanket<br>Description: Two striped tabby cats lie curled on a bright pink fabric next to two television remote controls. The lighting is bright and even.<br>Keywords: cats, tabby, sleeping, pink, blanket, couch, i...                                                 |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)        | `unusable`  | Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                             | <\|channel>thought<br><channel\|>Title: Two tabby cats sleeping on a pink blanket<br>Description: Two striped tabby cats lie on a bright pink blanket on a sofa next to remote controls. Bright light illuminates the scene.<br>Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, i...                                                 |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)      | `unusable`  | Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                             | <\|channel>thought<br><channel\|>Title: Two tabby cats sleeping on a pink blanket<br>Description: Two patterned tabby cats are lying on a pink fabric surface on a sofa. Two remote controls are visible near the cats.<br>Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote,...                                                 |
 | [`mlx-community/gemma-3n-E2B-4bit`](#model-mlx-community-gemma-3n-e2b-4bit)                                  | `unusable`  | Required fields are missing or empty; Response appears cut off at the token limit                                                                                                                                                                                                                             | <br>- a 1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-29-30-31-32-33-34-35-36-37-38-39-40-41-42-43-44-45-46-47-48-49-50-51-52-53-54-55-56-57-58-59-60-61-62-63-64-65-66-67-68-69-70-71-72-73-74-75-76-77-76-78-79-80-81-82-83-84-85-86-87-88-89-90-91-92-93...                                                         |
 | [`mlx-community/gemma-4-31b-bf16`](#model-mlx-community-gemma-4-31b-bf16)                                    | `unusable`  | No response text was returned; Required fields are missing or empty                                                                                                                                                                                                                                           | empty output                                                                                                                                                                                                                                                                                                                                        |
 | [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                 | `unusable`  | Response repeats the same text; Required fields are missing or empty; Response appears cut off at the token limit                                                                                                                                                                                             | cat, sleeping, pink blanket, remote control, striped, tabby, kitten, cozy, domestic, indoor, relaxation, comfort, home, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, feline, felin...                                                            |
@@ -147,7 +147,7 @@ Current-run usability and captured resource facts only. Total time is end-to-end
 | [`mlx-community/Qwen3.5-27B-4bit`](#model-mlx-community-qwen35-27b-4bit)                                                | `usable`              |      19   |       106 |
 | [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              |      20   |        80 |
 | [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` |      20   |       100 |
-| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable`              |      20   |        92 |
+| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable`              |      20   |        96 |
 | [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              |      21   |        89 |
 | [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `usable`              |      23   |        78 |
 | [`meta-llama/Llama-3.2-11B-Vision-Instruct`](#model-meta-llama-llama-32-11b-vision-instruct)                            | `usable`              |      25   |       105 |
@@ -164,50 +164,50 @@ Current-run usability and captured resource facts only. Total time is end-to-end
 
 ## Fastest Valid Generation
 
-Fastest valid generation: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 527 tok/s
+Fastest valid generation: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 525 tok/s
 
-Average valid generation throughput: 90.6 tok/s
+Average valid generation throughput: 90.9 tok/s
 
 <!-- markdownlint-disable MD034 MD049 -->
 
 | Model                                                                                                                   | Usability             | Gen TPS    |   Gen tok |
 |-------------------------------------------------------------------------------------------------------------------------|-----------------------|------------|-----------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable_with_caveats` | 527 tok/s  |        48 |
-| [`mlx-community/LFM2-VL-1.6B-8bit`](#model-mlx-community-lfm2-vl-16b-8bit)                                              | `usable_with_caveats` | 332 tok/s  |        86 |
-| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable_with_caveats` | 312 tok/s  |        40 |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 203 tok/s  |        85 |
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable`              | 138 tok/s  |        82 |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable_with_caveats` | 525 tok/s  |        48 |
+| [`mlx-community/LFM2-VL-1.6B-8bit`](#model-mlx-community-lfm2-vl-16b-8bit)                                              | `usable_with_caveats` | 331 tok/s  |        86 |
+| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable_with_caveats` | 319 tok/s  |        40 |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 201 tok/s  |        85 |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable`              | 137 tok/s  |        82 |
 | [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable`              | 134 tok/s  |        82 |
 | [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable_with_caveats` | 130 tok/s  |        55 |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 129 tok/s  |        73 |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 117 tok/s  |        89 |
-| [`mlx-community/Qwen3.5-35B-A3B-6bit`](#model-mlx-community-qwen35-35b-a3b-6bit)                                        | `usable`              | 101 tok/s  |       109 |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 98.6 tok/s |        86 |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable_with_caveats` | 92.3 tok/s |        61 |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 128 tok/s  |        73 |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 120 tok/s  |        89 |
+| [`mlx-community/Qwen3.5-35B-A3B-6bit`](#model-mlx-community-qwen35-35b-a3b-6bit)                                        | `usable`              | 102 tok/s  |       109 |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 100 tok/s  |        86 |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable_with_caveats` | 92.4 tok/s |        61 |
 | [`mlx-community/Qwen3.5-35B-A3B-bf16`](#model-mlx-community-qwen35-35b-a3b-bf16)                                        | `usable`              | 70.1 tok/s |       107 |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 70.1 tok/s |        81 |
-| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable_with_caveats` | 66.8 tok/s |       133 |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable`              | 66.7 tok/s |       106 |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable`              | 66.1 tok/s |       106 |
-| [`microsoft/Phi-3.5-vision-instruct`](#model-microsoft-phi-35-vision-instruct)                                          | `usable`              | 58.7 tok/s |        68 |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | 57.8 tok/s |        68 |
-| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable`              | 53.6 tok/s |        92 |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `usable_with_caveats` | 48.5 tok/s |        61 |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | 45.5 tok/s |        94 |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | 40.4 tok/s |        89 |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | 34.3 tok/s |        59 |
-| [`mlx-community/Qwen3.5-27B-4bit`](#model-mlx-community-qwen35-27b-4bit)                                                | `usable`              | 33.4 tok/s |       106 |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 69.8 tok/s |        81 |
+| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable_with_caveats` | 68.0 tok/s |       133 |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable`              | 66.4 tok/s |       106 |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable`              | 65.3 tok/s |       106 |
+| [`microsoft/Phi-3.5-vision-instruct`](#model-microsoft-phi-35-vision-instruct)                                          | `usable`              | 59.5 tok/s |        68 |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | 58.1 tok/s |        68 |
+| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable`              | 53.4 tok/s |        96 |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `usable_with_caveats` | 48.2 tok/s |        61 |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | 46.0 tok/s |        94 |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | 40.1 tok/s |        89 |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | 34.7 tok/s |        59 |
+| [`mlx-community/Qwen3.5-27B-4bit`](#model-mlx-community-qwen35-27b-4bit)                                                | `usable`              | 33.2 tok/s |       106 |
 | [`mlx-community/InternVL3-14B-8bit`](#model-mlx-community-internvl3-14b-8bit)                                           | `usable`              | 31.9 tok/s |        75 |
-| [`mlx-community/Molmo-7B-D-0924-bf16`](#model-mlx-community-molmo-7b-d-0924-bf16)                                       | `usable`              | 30.6 tok/s |        96 |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` | 30.4 tok/s |       100 |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | 29.5 tok/s |        90 |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 28.1 tok/s |        80 |
-| [`mlx-community/pixtral-12b-bf16`](#model-mlx-community-pixtral-12b-bf16)                                               | `usable`              | 20.3 tok/s |        83 |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 19.3 tok/s |       107 |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable_with_caveats` | 31.0 tok/s |       100 |
+| [`mlx-community/Molmo-7B-D-0924-bf16`](#model-mlx-community-molmo-7b-d-0924-bf16)                                       | `usable`              | 30.7 tok/s |        96 |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | 30.0 tok/s |        90 |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 28.0 tok/s |        80 |
+| [`mlx-community/pixtral-12b-bf16`](#model-mlx-community-pixtral-12b-bf16)                                               | `usable`              | 20.1 tok/s |        83 |
 | [`mlx-community/Qwen3.5-27B-mxfp8`](#model-mlx-community-qwen35-27b-mxfp8)                                              | `usable`              | 19.3 tok/s |       115 |
-| [`mlx-community/gemma-3-27b-it-qat-8bit`](#model-mlx-community-gemma-3-27b-it-qat-8bit)                                 | `usable`              | 17.9 tok/s |        87 |
-| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `usable`              | 5.95 tok/s |        78 |
-| [`meta-llama/Llama-3.2-11B-Vision-Instruct`](#model-meta-llama-llama-32-11b-vision-instruct)                            | `usable`              | 5.04 tok/s |       105 |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 19.2 tok/s |       107 |
+| [`mlx-community/gemma-3-27b-it-qat-8bit`](#model-mlx-community-gemma-3-27b-it-qat-8bit)                                 | `usable`              | 17.8 tok/s |        87 |
+| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `usable`              | 5.97 tok/s |        78 |
+| [`meta-llama/Llama-3.2-11B-Vision-Instruct`](#model-meta-llama-llama-32-11b-vision-instruct)                            | `usable`              | 5.06 tok/s |       105 |
 <!-- markdownlint-enable MD034 MD049 -->
 
 ## Run Stamps
@@ -263,18 +263,18 @@ Complete generated or crash evidence for every attempted model.
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.74s
+- *Model load time:* 0.67s
 - *Generation time:* 0.72s
-- *Total time:* 1.47s
-- *Input validation time:* 0.00157
-- *Prompt preparation time:* 0.00893
-- *First-token latency:* 0.0946
-- *Cleanup time:* 0.0658
+- *Total time:* 1.40s
+- *Input validation time:* 0.00159
+- *Prompt preparation time:* 0.00912
+- *First-token latency:* 0.0909
+- *Cleanup time:* 0.066
 - *Prompt tokens:* 409
 - *Generation tokens:* 82
 - *Total tokens:* 491
-- *Prompt throughput (raw):* 4,324 tok/s
-- *Generation throughput (raw):* 138 tok/s
+- *Prompt throughput (raw):* 4,499 tok/s
+- *Generation throughput (raw):* 137 tok/s
 - *Peak memory:* 5.2
 - *Active memory:* 4.3
 - *Cache memory:* 0.07
@@ -334,18 +334,18 @@ Keywords: cats, couch, sleeping, remote, pink, tabby, relaxation, soft light, co
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 2.19s
-- *Generation time:* 22.57s
-- *Total time:* 24.80s
-- *Input validation time:* 0.0241
-- *Prompt preparation time:* 0.00478
-- *First-token latency:* 1.69
-- *Cleanup time:* 0.0995
+- *Model load time:* 2.23s
+- *Generation time:* 22.44s
+- *Total time:* 24.71s
+- *Input validation time:* 0.0225
+- *Prompt preparation time:* 0.00485
+- *First-token latency:* 1.68
+- *Cleanup time:* 0.0975
 - *Prompt tokens:* 108
 - *Generation tokens:* 105
 - *Total tokens:* 213
-- *Prompt throughput (raw):* 63.8 tok/s
-- *Generation throughput (raw):* 5.04 tok/s
+- *Prompt throughput (raw):* 64.3 tok/s
+- *Generation throughput (raw):* 5.06 tok/s
 - *Peak memory:* 25
 - *Active memory:* 21
 - *Cache memory:* 3.4
@@ -409,18 +409,18 @@ Tabby cats, remote controls, pink blanket, sleeping, dim lighting, red couch, fe
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.87s
-- *Generation time:* 1.43s
-- *Total time:* 2.31s
-- *Input validation time:* 0.00168
-- *Prompt preparation time:* 0.00092
-- *First-token latency:* 0.214
-- *Cleanup time:* 0.0707
+- *Model load time:* 0.90s
+- *Generation time:* 1.41s
+- *Total time:* 2.32s
+- *Input validation time:* 0.00165
+- *Prompt preparation time:* 0.000889
+- *First-token latency:* 0.212
+- *Cleanup time:* 0.0704
 - *Prompt tokens:* 883
 - *Generation tokens:* 68
 - *Total tokens:* 951
-- *Prompt throughput (raw):* 4,131 tok/s
-- *Generation throughput (raw):* 58.7 tok/s
+- *Prompt throughput (raw):* 4,166 tok/s
+- *Generation throughput (raw):* 59.5 tok/s
 - *Peak memory:* 9.4
 - *Active memory:* 8.3
 - *Cache memory:* 0.42
@@ -480,17 +480,17 @@ Keywords: cats, sleeping, sofa, remote controls, pink, relaxed, comfortable, ind
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.64s
-- *Generation time:* 4.94s
-- *Total time:* 6.59s
-- *Input validation time:* 0.0017
-- *Prompt preparation time:* 0.00176
-- *First-token latency:* 2.56
-- *Cleanup time:* 0.109
+- *Model load time:* 1.66s
+- *Generation time:* 5.37s
+- *Total time:* 7.04s
+- *Input validation time:* 0.00168
+- *Prompt preparation time:* 0.00167
+- *First-token latency:* 2.99
+- *Cleanup time:* 0.107
 - *Prompt tokens:* 3,435
 - *Generation tokens:* 75
 - *Total tokens:* 3,510
-- *Prompt throughput (raw):* 1,343 tok/s
+- *Prompt throughput (raw):* 1,149 tok/s
 - *Generation throughput (raw):* 31.9 tok/s
 - *Peak memory:* 19
 - *Active memory:* 16
@@ -557,18 +557,18 @@ cats, sleeping, sofa, pink, remote control, striped, relaxed, domestic, pets, in
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.58s
-- *Generation time:* 3.04s
-- *Total time:* 4.63s
-- *Input validation time:* 0.00167
-- *Prompt preparation time:* 0.00021
-- *First-token latency:* 1.28
-- *Cleanup time:* 0.0981
+- *Model load time:* 1.76s
+- *Generation time:* 3.26s
+- *Total time:* 5.03s
+- *Input validation time:* 0.00164
+- *Prompt preparation time:* 0.000192
+- *First-token latency:* 1.53
+- *Cleanup time:* 0.103
 - *Prompt tokens:* 3,435
 - *Generation tokens:* 59
 - *Total tokens:* 3,494
-- *Prompt throughput (raw):* 2,676 tok/s
-- *Generation throughput (raw):* 34.3 tok/s
+- *Prompt throughput (raw):* 2,241 tok/s
+- *Generation throughput (raw):* 34.7 tok/s
 - *Peak memory:* 18
 - *Active memory:* 16
 - *Cache memory:* 0.27
@@ -624,18 +624,18 @@ Keywords: cats, sleeping, pink blanket, couch, remote controls, tabby, resting, 
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.33s
+- *Model load time:* 1.30s
 - *Generation time:* 1.87s
-- *Total time:* 3.21s
+- *Total time:* 3.18s
 - *Input validation time:* 0.0016
-- *Prompt preparation time:* 0.00651
-- *First-token latency:* 0.696
-- *Cleanup time:* 0.0814
+- *Prompt preparation time:* 0.00643
+- *First-token latency:* 0.691
+- *Cleanup time:* 0.0828
 - *Prompt tokens:* 1,070
 - *Generation tokens:* 81
 - *Total tokens:* 1,151
-- *Prompt throughput (raw):* 1,537 tok/s
-- *Generation throughput (raw):* 70.1 tok/s
+- *Prompt throughput (raw):* 1,547 tok/s
+- *Generation throughput (raw):* 69.8 tok/s
 - *Peak memory:* 9.8
 - *Active memory:* 8.0
 - *Cache memory:* 0.23
@@ -701,18 +701,18 @@ cats, pink cushioned surface, remote controls, relaxed posture, indoor setting, 
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.34s
-- *Generation time:* 2.31s
-- *Total time:* 3.65s
-- *Input validation time:* 0.00156
-- *Prompt preparation time:* 0.000213
-- *First-token latency:* 0.703
-- *Cleanup time:* 0.0813
+- *Model load time:* 1.45s
+- *Generation time:* 2.30s
+- *Total time:* 3.76s
+- *Input validation time:* 0.00157
+- *Prompt preparation time:* 0.00025
+- *First-token latency:* 0.693
+- *Cleanup time:* 0.0823
 - *Prompt tokens:* 1,070
 - *Generation tokens:* 106
 - *Total tokens:* 1,176
-- *Prompt throughput (raw):* 1,521 tok/s
-- *Generation throughput (raw):* 66.7 tok/s
+- *Prompt throughput (raw):* 1,543 tok/s
+- *Generation throughput (raw):* 66.4 tok/s
 - *Peak memory:* 10
 - *Active memory:* 8.4
 - *Cache memory:* 0.23
@@ -778,18 +778,18 @@ kittens, tabby, pink cushion, remote controls, relaxed posture, indoor setting, 
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.97s
+- *Model load time:* 0.89s
 - *Generation time:* 0.70s
-- *Total time:* 1.68s
-- *Input validation time:* 0.0016
-- *Prompt preparation time:* 0.00645
-- *First-token latency:* 0.25
-- *Cleanup time:* 0.0707
+- *Total time:* 1.61s
+- *Input validation time:* 0.00168
+- *Prompt preparation time:* 0.00657
+- *First-token latency:* 0.249
+- *Cleanup time:* 0.0725
 - *Prompt tokens:* 1,069
 - *Generation tokens:* 85
 - *Total tokens:* 1,154
-- *Prompt throughput (raw):* 4,278 tok/s
-- *Generation throughput (raw):* 203 tok/s
+- *Prompt throughput (raw):* 4,292 tok/s
+- *Generation throughput (raw):* 201 tok/s
 - *Peak memory:* 4.5
 - *Active memory:* 2.8
 - *Cache memory:* 0.16
@@ -855,18 +855,18 @@ pink sofa, remote controls, young tabbies, indoor setting, cozy scene, pet photo
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.25s
-- *Generation time:* 6.54s
-- *Total time:* 7.80s
+- *Model load time:* 1.18s
+- *Generation time:* 6.65s
+- *Total time:* 7.84s
 - *Input validation time:* 0.00161
 - *Prompt preparation time:* 0.000141
-- *First-token latency:* 4.8
-- *Cleanup time:* 0.0768
+- *First-token latency:* 4.82
+- *Cleanup time:* 0.0766
 - *Prompt tokens:* 839
-- *Generation tokens:* 92
-- *Total tokens:* 931
-- *Prompt throughput (raw):* 175 tok/s
-- *Generation throughput (raw):* 53.6 tok/s
+- *Generation tokens:* 96
+- *Total tokens:* 935
+- *Prompt throughput (raw):* 174 tok/s
+- *Generation throughput (raw):* 53.4 tok/s
 - *Peak memory:* 20
 - *Active memory:* 9.0
 - *Cache memory:* 0.08
@@ -895,7 +895,7 @@ pink sofa, remote controls, young tabbies, indoor setting, cozy scene, pet photo
 
 Description: Two cats lie on a pink blanket-covered couch. One cat wears a green collar. Two remote controls are visible between the cats. The scene is brightly lit, suggesting daytime. The cats appear relaxed and comfortable.
 
-Keywords: Cats, Couch, Pink, Blanket, Remote controls, Green collar, Daylight, Relaxed, Comfortable, Pet, Home, Furniture, Technology, Resting, Soft
+Keywords: Cats, Couch, Pink, Blanket, Remote controls, Green collar, Daytime, Relaxed, Comfortable, Pet, Home, Furniture, Lighting, Resting, Striped, Cozy
 </pre>
 
 <details>
@@ -906,7 +906,7 @@ Keywords: Cats, Couch, Pink, Blanket, Remote controls, Green collar, Daylight, R
 
 Description: Two cats lie on a pink blanket-covered couch. One cat wears a green collar. Two remote controls are visible between the cats. The scene is brightly lit, suggesting daytime. The cats appear relaxed and comfortable.
 
-Keywords: Cats, Couch, Pink, Blanket, Remote controls, Green collar, Daylight, Relaxed, Comfortable, Pet, Home, Furniture, Technology, Resting, Soft
+Keywords: Cats, Couch, Pink, Blanket, Remote controls, Green collar, Daytime, Relaxed, Comfortable, Pet, Home, Furniture, Lighting, Resting, Striped, Cozy
 ```
 
 </details>
@@ -926,18 +926,18 @@ Keywords: Cats, Couch, Pink, Blanket, Remote controls, Green collar, Daylight, R
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.69s
-- *Generation time:* 8.18s
-- *Total time:* 9.87s
-- *Input validation time:* 0.00198
-- *Prompt preparation time:* 9.44e-05
+- *Model load time:* 1.71s
+- *Generation time:* 8.16s
+- *Total time:* 9.88s
+- *Input validation time:* 0.0017
+- *Prompt preparation time:* 9.99e-05
 - *First-token latency:* 5.01
 - *Cleanup time:* 0.0821
 - *Prompt tokens:* 839
 - *Generation tokens:* 96
 - *Total tokens:* 935
-- *Prompt throughput (raw):* 167 tok/s
-- *Generation throughput (raw):* 30.6 tok/s
+- *Prompt throughput (raw):* 168 tok/s
+- *Generation throughput (raw):* 30.7 tok/s
 - *Peak memory:* 27
 - *Active memory:* 16
 - *Cache memory:* 0.08
@@ -997,18 +997,18 @@ Keywords: Cats, Couch, Pink, Blanket, Remote controls, Green collar, Daytime, Re
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 2.21s
-- *Generation time:* 14.10s
-- *Total time:* 16.32s
-- *Input validation time:* 0.00163
-- *Prompt preparation time:* 0.0052
-- *First-token latency:* 0.854
-- *Cleanup time:* 0.115
+- *Model load time:* 2.20s
+- *Generation time:* 14.03s
+- *Total time:* 16.25s
+- *Input validation time:* 0.00171
+- *Prompt preparation time:* 0.00485
+- *First-token latency:* 0.845
+- *Cleanup time:* 0.0961
 - *Prompt tokens:* 860
 - *Generation tokens:* 78
 - *Total tokens:* 938
-- *Prompt throughput (raw):* 1,007 tok/s
-- *Generation throughput (raw):* 5.95 tok/s
+- *Prompt throughput (raw):* 1,018 tok/s
+- *Generation throughput (raw):* 5.97 tok/s
 - *Peak memory:* 23
 - *Active memory:* 19
 - *Cache memory:* 4.3
@@ -1068,18 +1068,18 @@ Keywords: cats, pink blanket, remote controls, couch, sleeping, relaxed, feline,
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.87s
-- *Generation time:* 1.47s
-- *Total time:* 2.34s
-- *Input validation time:* 0.00165
-- *Prompt preparation time:* 0.00082
-- *First-token latency:* 0.22
-- *Cleanup time:* 0.0802
+- *Model load time:* 1.03s
+- *Generation time:* 1.45s
+- *Total time:* 2.48s
+- *Input validation time:* 0.00166
+- *Prompt preparation time:* 0.000831
+- *First-token latency:* 0.265
+- *Cleanup time:* 0.0764
 - *Prompt tokens:* 883
 - *Generation tokens:* 68
 - *Total tokens:* 951
-- *Prompt throughput (raw):* 4,021 tok/s
-- *Generation throughput (raw):* 57.8 tok/s
+- *Prompt throughput (raw):* 3,334 tok/s
+- *Generation throughput (raw):* 58.1 tok/s
 - *Peak memory:* 9.4
 - *Active memory:* 8.3
 - *Cache memory:* 0.42
@@ -1139,17 +1139,17 @@ Keywords: cats, sleeping, sofa, remote controls, pink, relaxed, comfortable, ind
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.73s
+- *Model load time:* 0.80s
 - *Generation time:* 0.74s
-- *Total time:* 1.47s
-- *Input validation time:* 0.00154
+- *Total time:* 1.54s
+- *Input validation time:* 0.0016
 - *Prompt preparation time:* 0.000191
-- *First-token latency:* 0.0894
-- *Cleanup time:* 0.0769
+- *First-token latency:* 0.0885
+- *Cleanup time:* 0.0765
 - *Prompt tokens:* 409
 - *Generation tokens:* 82
 - *Total tokens:* 491
-- *Prompt throughput (raw):* 4,575 tok/s
+- *Prompt throughput (raw):* 4,619 tok/s
 - *Generation throughput (raw):* 134 tok/s
 - *Peak memory:* 5.3
 - *Active memory:* 4.3
@@ -1210,18 +1210,18 @@ Keywords: cats, couch, sleeping, remote, pink, tabby, relaxation, soft light, co
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 2.11s
-- *Generation time:* 3.90s
-- *Total time:* 6.04s
-- *Input validation time:* 0.00169
+- *Model load time:* 2.13s
+- *Generation time:* 3.93s
+- *Total time:* 6.08s
+- *Input validation time:* 0.00161
 - *Prompt preparation time:* 0.0141
-- *First-token latency:* 0.717
+- *First-token latency:* 0.721
 - *Cleanup time:* 0.113
 - *Prompt tokens:* 421
 - *Generation tokens:* 106
 - *Total tokens:* 527
-- *Prompt throughput (raw):* 587 tok/s
-- *Generation throughput (raw):* 33.4 tok/s
+- *Prompt throughput (raw):* 584 tok/s
+- *Generation throughput (raw):* 33.2 tok/s
 - *Peak memory:* 19
 - *Active memory:* 18
 - *Cache memory:* 0.24
@@ -1281,17 +1281,17 @@ Keywords: tabby cats, pink sofa, remote controls, striped fur, resting, domestic
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 3.05s
+- *Model load time:* 3.21s
 - *Generation time:* 6.78s
-- *Total time:* 9.86s
-- *Input validation time:* 0.00173
-- *Prompt preparation time:* 0.0147
-- *First-token latency:* 0.805
-- *Cleanup time:* 0.126
+- *Total time:* 10.02s
+- *Input validation time:* 0.00166
+- *Prompt preparation time:* 0.0145
+- *First-token latency:* 0.798
+- *Cleanup time:* 0.128
 - *Prompt tokens:* 421
 - *Generation tokens:* 115
 - *Total tokens:* 536
-- *Prompt throughput (raw):* 523 tok/s
+- *Prompt throughput (raw):* 527 tok/s
 - *Generation throughput (raw):* 19.3 tok/s
 - *Peak memory:* 30
 - *Active memory:* 29
@@ -1358,18 +1358,18 @@ tabby cats, pink sofa, remote controls, sleeping, striped fur, relaxed, indoor s
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 2.44s
-- *Generation time:* 1.16s
-- *Total time:* 3.61s
-- *Input validation time:* 0.0016
-- *Prompt preparation time:* 0.000276
-- *First-token latency:* 0.393
-- *Cleanup time:* 0.111
+- *Model load time:* 2.51s
+- *Generation time:* 1.14s
+- *Total time:* 3.67s
+- *Input validation time:* 0.00179
+- *Prompt preparation time:* 0.000242
+- *First-token latency:* 0.391
+- *Cleanup time:* 0.113
 - *Prompt tokens:* 421
 - *Generation tokens:* 89
 - *Total tokens:* 510
-- *Prompt throughput (raw):* 1,071 tok/s
-- *Generation throughput (raw):* 117 tok/s
+- *Prompt throughput (raw):* 1,078 tok/s
+- *Generation throughput (raw):* 120 tok/s
 - *Peak memory:* 21
 - *Active memory:* 21
 - *Cache memory:* 0.10
@@ -1429,18 +1429,18 @@ Keywords: tabby cats, pink sofa, sleeping cats, remote controls, domestic interi
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 3.09s
-- *Generation time:* 1.56s
-- *Total time:* 4.66s
-- *Input validation time:* 0.00176
-- *Prompt preparation time:* 0.000267
-- *First-token latency:* 0.465
-- *Cleanup time:* 0.131
+- *Model load time:* 3.08s
+- *Generation time:* 1.54s
+- *Total time:* 4.63s
+- *Input validation time:* 0.00164
+- *Prompt preparation time:* 0.000242
+- *First-token latency:* 0.462
+- *Cleanup time:* 0.132
 - *Prompt tokens:* 421
 - *Generation tokens:* 109
 - *Total tokens:* 530
-- *Prompt throughput (raw):* 905 tok/s
-- *Generation throughput (raw):* 101 tok/s
+- *Prompt throughput (raw):* 912 tok/s
+- *Generation throughput (raw):* 102 tok/s
 - *Peak memory:* 30
 - *Active memory:* 30
 - *Cache memory:* 0.10
@@ -1500,17 +1500,17 @@ Keywords: tabby cats, pink sofa, remote controls, resting animals, domestic sett
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 7.83s
-- *Generation time:* 5.08s
-- *Total time:* 12.92s
-- *Input validation time:* 0.00164
-- *Prompt preparation time:* 0.000259
-- *First-token latency:* 3.53
-- *Cleanup time:* 0.211
+- *Model load time:* 7.97s
+- *Generation time:* 5.31s
+- *Total time:* 13.29s
+- *Input validation time:* 0.00159
+- *Prompt preparation time:* 0.000261
+- *First-token latency:* 3.77
+- *Cleanup time:* 0.208
 - *Prompt tokens:* 421
 - *Generation tokens:* 107
 - *Total tokens:* 528
-- *Prompt throughput (raw):* 119 tok/s
+- *Prompt throughput (raw):* 112 tok/s
 - *Generation throughput (raw):* 70.1 tok/s
 - *Peak memory:* 71
 - *Active memory:* 70
@@ -1572,17 +1572,17 @@ Keywords: tabby cats, pink sofa, remote controls, resting felines, domestic inte
 - *Maintainer status:* none
 - *Observations:* none
 - *Model load time:* 1.41s
-- *Generation time:* 1.19s
-- *Total time:* 2.62s
-- *Input validation time:* 0.00175
-- *Prompt preparation time:* 0.000253
-- *First-token latency:* 0.259
-- *Cleanup time:* 0.097
+- *Generation time:* 1.18s
+- *Total time:* 2.60s
+- *Input validation time:* 0.00163
+- *Prompt preparation time:* 0.000277
+- *First-token latency:* 0.261
+- *Cleanup time:* 0.083
 - *Prompt tokens:* 421
 - *Generation tokens:* 86
 - *Total tokens:* 507
-- *Prompt throughput (raw):* 1,627 tok/s
-- *Generation throughput (raw):* 98.6 tok/s
+- *Prompt throughput (raw):* 1,614 tok/s
+- *Generation throughput (raw):* 100 tok/s
 - *Peak memory:* 7.1
 - *Active memory:* 6.7
 - *Cache memory:* 0.11
@@ -1642,18 +1642,18 @@ Keywords: cats, tabby, pink couch, remote control, sleeping, fur, texture, light
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 3.02s
-- *Generation time:* 6.35s
-- *Total time:* 9.40s
-- *Input validation time:* 0.00158
-- *Prompt preparation time:* 0.0142
-- *First-token latency:* 0.801
-- *Cleanup time:* 0.126
+- *Model load time:* 4.30s
+- *Generation time:* 6.39s
+- *Total time:* 10.72s
+- *Input validation time:* 0.00198
+- *Prompt preparation time:* 0.0141
+- *First-token latency:* 0.802
+- *Cleanup time:* 0.125
 - *Prompt tokens:* 421
 - *Generation tokens:* 107
 - *Total tokens:* 528
 - *Prompt throughput (raw):* 525 tok/s
-- *Generation throughput (raw):* 19.3 tok/s
+- *Generation throughput (raw):* 19.2 tok/s
 - *Peak memory:* 30
 - *Active memory:* 29
 - *Cache memory:* 0.23
@@ -1713,18 +1713,18 @@ Keywords: tabby cats, pink sofa, remote controls, striped fur, resting, bright l
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 5.41s
-- *Generation time:* 4.87s
-- *Total time:* 10.30s
-- *Input validation time:* 0.00158
-- *Prompt preparation time:* 0.0159
-- *First-token latency:* 2.75
-- *Cleanup time:* 0.204
+- *Model load time:* 5.47s
+- *Generation time:* 5.04s
+- *Total time:* 10.53s
+- *Input validation time:* 0.00175
+- *Prompt preparation time:* 0.0137
+- *First-token latency:* 2.94
+- *Cleanup time:* 0.199
 - *Prompt tokens:* 286
 - *Generation tokens:* 94
 - *Total tokens:* 380
-- *Prompt throughput (raw):* 104 tok/s
-- *Generation throughput (raw):* 45.5 tok/s
+- *Prompt throughput (raw):* 97.2 tok/s
+- *Generation throughput (raw):* 46.0 tok/s
 - *Peak memory:* 65
 - *Active memory:* 63
 - *Cache memory:* 0.11
@@ -1790,18 +1790,18 @@ cats, pink blanket, remote controls, sleeping, striped coat, green collar, pet, 
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.19s
-- *Generation time:* 1.93s
-- *Total time:* 3.13s
-- *Input validation time:* 0.00166
-- *Prompt preparation time:* 0.000248
+- *Model load time:* 1.18s
+- *Generation time:* 1.95s
+- *Total time:* 3.14s
+- *Input validation time:* 0.00168
+- *Prompt preparation time:* 0.000263
 - *First-token latency:* 0.255
-- *Cleanup time:* 0.0936
+- *Cleanup time:* 0.0928
 - *Prompt tokens:* 511
 - *Generation tokens:* 106
 - *Total tokens:* 617
-- *Prompt throughput (raw):* 2,002 tok/s
-- *Generation throughput (raw):* 66.1 tok/s
+- *Prompt throughput (raw):* 2,001 tok/s
+- *Generation throughput (raw):* 65.3 tok/s
 - *Peak memory:* 10
 - *Active memory:* 9.5
 - *Cache memory:* 0.06
@@ -1861,18 +1861,18 @@ Keywords: cats, sleeping, pink couch, tabby, remote control, indoor, relaxed, st
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 2.25s
-- *Generation time:* 3.87s
-- *Total time:* 6.14s
-- *Input validation time:* 0.00167
-- *Prompt preparation time:* 0.00275
-- *First-token latency:* 0.802
-- *Cleanup time:* 0.12
+- *Model load time:* 2.24s
+- *Generation time:* 3.82s
+- *Total time:* 6.07s
+- *Input validation time:* 0.00165
+- *Prompt preparation time:* 0.00274
+- *First-token latency:* 0.8
+- *Cleanup time:* 0.123
 - *Prompt tokens:* 379
 - *Generation tokens:* 90
 - *Total tokens:* 469
-- *Prompt throughput (raw):* 472 tok/s
-- *Generation throughput (raw):* 29.5 tok/s
+- *Prompt throughput (raw):* 474 tok/s
+- *Generation throughput (raw):* 30.0 tok/s
 - *Peak memory:* 18
 - *Active memory:* 16
 - *Cache memory:* 0.33
@@ -1932,18 +1932,18 @@ Keywords: cats, tabby, pink, fabric, remote control, sleeping, lying down, indoo
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 3.25s
-- *Generation time:* 5.82s
-- *Total time:* 9.07s
-- *Input validation time:* 0.00161
-- *Prompt preparation time:* 0.000212
-- *First-token latency:* 0.924
-- *Cleanup time:* 0.149
+- *Model load time:* 3.30s
+- *Generation time:* 5.83s
+- *Total time:* 9.14s
+- *Input validation time:* 0.00163
+- *Prompt preparation time:* 0.000187
+- *First-token latency:* 0.922
+- *Cleanup time:* 0.148
 - *Prompt tokens:* 379
 - *Generation tokens:* 87
 - *Total tokens:* 466
-- *Prompt throughput (raw):* 410 tok/s
-- *Generation throughput (raw):* 17.9 tok/s
+- *Prompt throughput (raw):* 411 tok/s
+- *Generation throughput (raw):* 17.8 tok/s
 - *Peak memory:* 32
 - *Active memory:* 30
 - *Cache memory:* 0.33
@@ -1999,18 +1999,18 @@ Keywords: cats, tabby, pink, sofa, remote controls, daylight, domestic animals, 
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 2.31s
+- *Model load time:* 2.30s
 - *Generation time:* 0.98s
-- *Total time:* 3.32s
-- *Input validation time:* 0.00161
-- *Prompt preparation time:* 0.0204
-- *First-token latency:* 0.404
-- *Cleanup time:* 0.111
+- *Total time:* 3.31s
+- *Input validation time:* 0.00172
+- *Prompt preparation time:* 0.0202
+- *First-token latency:* 0.399
+- *Cleanup time:* 0.113
 - *Prompt tokens:* 390
 - *Generation tokens:* 73
 - *Total tokens:* 463
-- *Prompt throughput (raw):* 966 tok/s
-- *Generation throughput (raw):* 129 tok/s
+- *Prompt throughput (raw):* 977 tok/s
+- *Generation throughput (raw):* 128 tok/s
 - *Peak memory:* 16
 - *Active memory:* 15
 - *Cache memory:* 0.16
@@ -2070,18 +2070,18 @@ Keywords: tabby, cats, pink, fabric, remote control, lying, indoor, domestic, st
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 2.56s
-- *Generation time:* 3.72s
-- *Total time:* 6.29s
-- *Input validation time:* 0.00165
-- *Prompt preparation time:* 0.000296
-- *First-token latency:* 0.86
+- *Model load time:* 2.71s
+- *Generation time:* 3.74s
+- *Total time:* 6.47s
+- *Input validation time:* 0.00174
+- *Prompt preparation time:* 0.000292
+- *First-token latency:* 0.868
 - *Cleanup time:* 0.13
 - *Prompt tokens:* 390
 - *Generation tokens:* 80
 - *Total tokens:* 470
-- *Prompt throughput (raw):* 453 tok/s
-- *Generation throughput (raw):* 28.1 tok/s
+- *Prompt throughput (raw):* 449 tok/s
+- *Generation throughput (raw):* 28.0 tok/s
 - *Peak memory:* 20
 - *Active memory:* 18
 - *Cache memory:* 0.59
@@ -2137,18 +2137,18 @@ Keywords: cats, tabby, pink blanket, red sofa, remote controls, lying down, pets
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.68s
-- *Generation time:* 3.01s
-- *Total time:* 4.71s
-- *Input validation time:* 0.00181
-- *Prompt preparation time:* 0.00258
-- *First-token latency:* 0.799
-- *Cleanup time:* 0.0931
+- *Model load time:* 1.86s
+- *Generation time:* 3.03s
+- *Total time:* 4.90s
+- *Input validation time:* 0.00186
+- *Prompt preparation time:* 0.00262
+- *First-token latency:* 0.802
+- *Cleanup time:* 0.0957
 - *Prompt tokens:* 1,335
 - *Generation tokens:* 89
 - *Total tokens:* 1,424
-- *Prompt throughput (raw):* 1,670 tok/s
-- *Generation throughput (raw):* 40.4 tok/s
+- *Prompt throughput (raw):* 1,666 tok/s
+- *Generation throughput (raw):* 40.1 tok/s
 - *Peak memory:* 15
 - *Active memory:* 14
 - *Cache memory:* 0.27
@@ -2214,18 +2214,18 @@ cats, lounging, red couch, remote controls, relaxed, indoor, comfort, feline, do
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 2.48s
-- *Generation time:* 4.92s
-- *Total time:* 7.41s
-- *Input validation time:* 0.00164
-- *Prompt preparation time:* 0.000193
-- *First-token latency:* 0.827
-- *Cleanup time:* 0.112
+- *Model load time:* 2.64s
+- *Generation time:* 4.96s
+- *Total time:* 7.61s
+- *Input validation time:* 0.00175
+- *Prompt preparation time:* 0.000196
+- *First-token latency:* 0.826
+- *Cleanup time:* 0.115
 - *Prompt tokens:* 1,335
 - *Generation tokens:* 83
 - *Total tokens:* 1,418
-- *Prompt throughput (raw):* 1,614 tok/s
-- *Generation throughput (raw):* 20.3 tok/s
+- *Prompt throughput (raw):* 1,615 tok/s
+- *Generation throughput (raw):* 20.1 tok/s
 - *Peak memory:* 27
 - *Active memory:* 25
 - *Cache memory:* 0.27
@@ -2291,18 +2291,18 @@ cat, lounging, red couch, remote control, relaxed, lying down, comfortable, indo
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Title or keywords do not meet requested constraints
-- *Model load time:* 0.33s
+- *Model load time:* 0.34s
 - *Generation time:* 0.13s
 - *Total time:* 0.47s
-- *Input validation time:* 0.00164
-- *Prompt preparation time:* 0.0054
-- *First-token latency:* 0.0232
-- *Cleanup time:* 0.0538
+- *Input validation time:* 0.00155
+- *Prompt preparation time:* 0.00562
+- *First-token latency:* 0.0226
+- *Cleanup time:* 0.0542
 - *Prompt tokens:* 179
 - *Generation tokens:* 48
 - *Total tokens:* 227
-- *Prompt throughput (raw):* 7,731 tok/s
-- *Generation throughput (raw):* 527 tok/s
+- *Prompt throughput (raw):* 7,935 tok/s
+- *Generation throughput (raw):* 525 tok/s
 - *Peak memory:* 1.1
 - *Active memory:* 0.90
 - *Cache memory:* 0.01
@@ -2368,18 +2368,18 @@ cats, pink couch, lounging, relaxed, tabby
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Title or keywords do not meet requested constraints
-- *Model load time:* 2.09s
-- *Generation time:* 4.12s
-- *Total time:* 6.22s
+- *Model load time:* 2.11s
+- *Generation time:* 4.07s
+- *Total time:* 6.19s
 - *Input validation time:* 0.00163
-- *Prompt preparation time:* 0.00711
-- *First-token latency:* 0.813
-- *Cleanup time:* 0.096
+- *Prompt preparation time:* 0.00657
+- *First-token latency:* 0.826
+- *Cleanup time:* 0.0957
 - *Prompt tokens:* 537
 - *Generation tokens:* 100
 - *Total tokens:* 637
-- *Prompt throughput (raw):* 660 tok/s
-- *Generation throughput (raw):* 30.4 tok/s
+- *Prompt throughput (raw):* 650 tok/s
+- *Generation throughput (raw):* 31.0 tok/s
 - *Peak memory:* 20
 - *Active memory:* 18
 - *Cache memory:* 0.14
@@ -2444,17 +2444,17 @@ Keywords: cats, tabby, sofa, pink, remote control, resting, lying, natural light
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Title or keywords do not meet requested constraints
 - *Model load time:* 1.27s
-- *Generation time:* 0.98s
-- *Total time:* 2.26s
-- *Input validation time:* 0.00167
-- *Prompt preparation time:* 0.000225
-- *First-token latency:* 0.31
-- *Cleanup time:* 0.0799
+- *Generation time:* 0.99s
+- *Total time:* 2.27s
+- *Input validation time:* 0.0016
+- *Prompt preparation time:* 0.000237
+- *First-token latency:* 0.318
+- *Cleanup time:* 0.0777
 - *Prompt tokens:* 499
 - *Generation tokens:* 61
 - *Total tokens:* 560
-- *Prompt throughput (raw):* 1,607 tok/s
-- *Generation throughput (raw):* 92.3 tok/s
+- *Prompt throughput (raw):* 1,571 tok/s
+- *Generation throughput (raw):* 92.4 tok/s
 - *Peak memory:* 7.8
 - *Active memory:* 6.8
 - *Cache memory:* 0.05
@@ -2510,18 +2510,18 @@ Keywords: two tabby cats, pink fabric sofa, remote control, head down
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Title or keywords do not meet requested constraints
-- *Model load time:* 0.47s
+- *Model load time:* 0.56s
 - *Generation time:* 0.35s
-- *Total time:* 0.83s
-- *Input validation time:* 0.00162
-- *Prompt preparation time:* 0.00111
-- *First-token latency:* 0.067
-- *Cleanup time:* 0.067
+- *Total time:* 0.91s
+- *Input validation time:* 0.00165
+- *Prompt preparation time:* 0.00115
+- *First-token latency:* 0.0687
+- *Cleanup time:* 0.0679
 - *Prompt tokens:* 368
 - *Generation tokens:* 86
 - *Total tokens:* 454
-- *Prompt throughput (raw):* 5,493 tok/s
-- *Generation throughput (raw):* 332 tok/s
+- *Prompt throughput (raw):* 5,357 tok/s
+- *Generation throughput (raw):* 331 tok/s
 - *Peak memory:* 3.0
 - *Active memory:* 2.1
 - *Cache memory:* 0.02
@@ -2581,18 +2581,18 @@ Keywords: cats, pink blanket, sleeping, tabby, remote controls, cozy, relaxed, c
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Title or keywords do not meet requested constraints
-- *Model load time:* 7.80s
-- *Generation time:* 5.32s
-- *Total time:* 13.14s
-- *Input validation time:* 0.00166
-- *Prompt preparation time:* 0.0134
-- *First-token latency:* 3.31
-- *Cleanup time:* 0.208
+- *Model load time:* 8.16s
+- *Generation time:* 5.64s
+- *Total time:* 13.83s
+- *Input validation time:* 0.00165
+- *Prompt preparation time:* 0.0132
+- *First-token latency:* 3.67
+- *Cleanup time:* 0.214
 - *Prompt tokens:* 421
 - *Generation tokens:* 133
 - *Total tokens:* 554
-- *Prompt throughput (raw):* 127 tok/s
-- *Generation throughput (raw):* 66.8 tok/s
+- *Prompt throughput (raw):* 115 tok/s
+- *Generation throughput (raw):* 68.0 tok/s
 - *Peak memory:* 71
 - *Active memory:* 70
 - *Cache memory:* 0.10
@@ -2652,18 +2652,18 @@ Keywords: tabby cats, pink sofa, sleeping cats, remote controls, feline relaxati
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Title or keywords do not meet requested constraints
-- *Model load time:* 0.60s
-- *Generation time:* 0.30s
-- *Total time:* 0.91s
-- *Input validation time:* 0.00167
-- *Prompt preparation time:* 0.00336
-- *First-token latency:* 0.148
-- *Cleanup time:* 0.072
+- *Model load time:* 0.53s
+- *Generation time:* 0.29s
+- *Total time:* 0.83s
+- *Input validation time:* 0.00149
+- *Prompt preparation time:* 0.00326
+- *First-token latency:* 0.143
+- *Cleanup time:* 0.0727
 - *Prompt tokens:* 511
 - *Generation tokens:* 40
 - *Total tokens:* 551
-- *Prompt throughput (raw):* 3,459 tok/s
-- *Generation throughput (raw):* 312 tok/s
+- *Prompt throughput (raw):* 3,562 tok/s
+- *Generation throughput (raw):* 319 tok/s
 - *Peak memory:* 2.5
 - *Active memory:* 1.3
 - *Cache memory:* 0.03
@@ -2719,17 +2719,17 @@ Keywords: cats, sleeping, pink couch, remote controls
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Title or keywords do not meet requested constraints
-- *Model load time:* 0.64s
+- *Model load time:* 0.66s
 - *Generation time:* 0.78s
-- *Total time:* 1.42s
-- *Input validation time:* 0.00182
-- *Prompt preparation time:* 0.001
-- *First-token latency:* 0.283
-- *Cleanup time:* 0.0717
+- *Total time:* 1.44s
+- *Input validation time:* 0.00154
+- *Prompt preparation time:* 0.00093
+- *First-token latency:* 0.281
+- *Cleanup time:* 0.0714
 - *Prompt tokens:* 205
 - *Generation tokens:* 55
 - *Total tokens:* 260
-- *Prompt throughput (raw):* 724 tok/s
+- *Prompt throughput (raw):* 730 tok/s
 - *Generation throughput (raw):* 130 tok/s
 - *Peak memory:* 5.5
 - *Active memory:* 4.5
@@ -2790,18 +2790,18 @@ Keywords: cat, couch, red
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Title or keywords do not meet requested constraints
-- *Model load time:* 2.26s
-- *Generation time:* 1.59s
-- *Total time:* 3.86s
-- *Input validation time:* 0.00169
-- *Prompt preparation time:* 0.00289
-- *First-token latency:* 0.324
-- *Cleanup time:* 0.117
+- *Model load time:* 2.34s
+- *Generation time:* 1.61s
+- *Total time:* 3.95s
+- *Input validation time:* 0.00182
+- *Prompt preparation time:* 0.00282
+- *First-token latency:* 0.327
+- *Cleanup time:* 0.118
 - *Prompt tokens:* 378
 - *Generation tokens:* 61
 - *Total tokens:* 439
-- *Prompt throughput (raw):* 1,166 tok/s
-- *Generation throughput (raw):* 48.5 tok/s
+- *Prompt throughput (raw):* 1,156 tok/s
+- *Generation throughput (raw):* 48.2 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
 - *Cache memory:* 0.04
@@ -2861,18 +2861,18 @@ Keywords: cat, couch, red
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Required fields are missing or empty
-- *Model load time:* 0.68s
+- *Model load time:* 0.78s
 - *Generation time:* 0.50s
-- *Total time:* 1.19s
-- *Input validation time:* 0.00221
-- *Prompt preparation time:* 0.00175
-- *First-token latency:* 0.378
-- *Cleanup time:* 0.0622
+- *Total time:* 1.29s
+- *Input validation time:* 0.00172
+- *Prompt preparation time:* 0.00176
+- *First-token latency:* 0.38
+- *Cleanup time:* 0.0631
 - *Prompt tokens:* 1,304
 - *Generation tokens:* 9
 - *Total tokens:* 1,313
-- *Prompt throughput (raw):* 3,445 tok/s
-- *Generation throughput (raw):* 134 tok/s
+- *Prompt throughput (raw):* 3,431 tok/s
+- *Generation throughput (raw):* 133 tok/s
 - *Peak memory:* 5.6
 - *Active memory:* 4.5
 - *Cache memory:* 0.35
@@ -2927,18 +2927,18 @@ Keywords: cat, couch, red
   cut off at the token limit; Internal reasoning block appears incomplete;
   Internal reasoning text remains visible; Title or keywords do not meet
   requested constraints
-- *Model load time:* 1.97s
-- *Generation time:* 6.90s
-- *Total time:* 8.88s
+- *Model load time:* 1.92s
+- *Generation time:* 6.89s
+- *Total time:* 8.82s
 - *Input validation time:* 0.00153
-- *Prompt preparation time:* 0.00176
-- *First-token latency:* 0.293
-- *Cleanup time:* 0.0852
+- *Prompt preparation time:* 0.00166
+- *First-token latency:* 0.294
+- *Cleanup time:* 0.0957
 - *Prompt tokens:* 489
 - *Generation tokens:* 500
 - *Total tokens:* 989
-- *Prompt throughput (raw):* 1,671 tok/s
-- *Generation throughput (raw):* 76.7 tok/s
+- *Prompt throughput (raw):* 1,666 tok/s
+- *Generation throughput (raw):* 76.8 tok/s
 - *Peak memory:* 16
 - *Active memory:* 14
 - *Cache memory:* 0.84
@@ -3052,18 +3052,18 @@ Keywords: tabby cats, pink fabric, remote controls, bright lighting, relaxed pos
 - *Observations:* Required fields are missing or empty; Response repeats the
   task instructions instead of only returning the requested fields; Extra text
   appears before the Title field; Response appears cut off at the token limit
-- *Model load time:* 1.57s
-- *Generation time:* 12.39s
-- *Total time:* 13.97s
+- *Model load time:* 1.55s
+- *Generation time:* 12.33s
+- *Total time:* 13.90s
 - *Input validation time:* 0.00164
-- *Prompt preparation time:* 0.00659
-- *First-token latency:* 0.975
-- *Cleanup time:* 0.0856
+- *Prompt preparation time:* 0.00674
+- *First-token latency:* 0.97
+- *Cleanup time:* 0.0874
 - *Prompt tokens:* 1,426
 - *Generation tokens:* 500
 - *Total tokens:* 1,926
-- *Prompt throughput (raw):* 1,462 tok/s
-- *Generation throughput (raw):* 43.9 tok/s
+- *Prompt throughput (raw):* 1,471 tok/s
+- *Generation throughput (raw):* 44.1 tok/s
 - *Peak memory:* 14
 - *Active memory:* 13
 - *Cache memory:* 0.41
@@ -3154,18 +3154,18 @@ We need to produce British English catalogue metadata. So we need to use British
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Required fields are missing or empty; Response appears cut
   off at the token limit
-- *Model load time:* 4.79s
-- *Generation time:* 9.26s
-- *Total time:* 14.06s
-- *Input validation time:* 0.00176
-- *Prompt preparation time:* 0.00789
-- *First-token latency:* 1.4
-- *Cleanup time:* 0.18
+- *Model load time:* 4.87s
+- *Generation time:* 9.38s
+- *Total time:* 14.27s
+- *Input validation time:* 0.00153
+- *Prompt preparation time:* 0.00803
+- *First-token latency:* 1.59
+- *Cleanup time:* 0.184
 - *Prompt tokens:* 545
 - *Generation tokens:* 500
 - *Total tokens:* 1,045
-- *Prompt throughput (raw):* 388 tok/s
-- *Generation throughput (raw):* 63.8 tok/s
+- *Prompt throughput (raw):* 343 tok/s
+- *Generation throughput (raw):* 64.2 tok/s
 - *Peak memory:* 60
 - *Active memory:* 59
 - *Cache memory:* 0.08
@@ -3233,21 +3233,21 @@ Finally, the keywords. I need to be very careful here. I'll list the obvious thi
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Required fields are missing or empty
-- *Model load time:* 0.58s
+- *Model load time:* 0.63s
 - *Generation time:* 0.21s
-- *Total time:* 0.79s
-- *Input validation time:* 0.00175
-- *Prompt preparation time:* 0.00157
-- *First-token latency:* 0.0794
-- *Cleanup time:* 0.0714
+- *Total time:* 0.84s
+- *Input validation time:* 0.00169
+- *Prompt preparation time:* 0.00155
+- *First-token latency:* 0.0837
+- *Cleanup time:* 0.0716
 - *Prompt tokens:* 120
 - *Generation tokens:* 32
 - *Total tokens:* 152
-- *Prompt throughput (raw):* 1,511 tok/s
-- *Generation throughput (raw):* 339 tok/s
+- *Prompt throughput (raw):* 1,433 tok/s
+- *Generation throughput (raw):* 345 tok/s
 - *Peak memory:* 2.2
 - *Active memory:* 1.2
-- *Cache memory:* 0.03
+- *Cache memory:* 0.02
 - *Model-load active memory:* 1.25
 - *Post-cleanup active memory:* 0.00285
 - *Post-cleanup cache memory:* 0.0
@@ -3299,18 +3299,18 @@ A serene moment of feline tranquility on a vibrant pink couch, with two cats in 
   cut off at the token limit; Internal reasoning block appears incomplete;
   Internal reasoning text remains visible; Title or keywords do not meet
   requested constraints
-- *Model load time:* 1.84s
-- *Generation time:* 10.25s
-- *Total time:* 12.09s
-- *Input validation time:* 0.00179
-- *Prompt preparation time:* 0.00168
-- *First-token latency:* 0.381
-- *Cleanup time:* 0.0909
+- *Model load time:* 1.64s
+- *Generation time:* 10.20s
+- *Total time:* 11.85s
+- *Input validation time:* 0.00163
+- *Prompt preparation time:* 0.00163
+- *First-token latency:* 0.375
+- *Cleanup time:* 0.0862
 - *Prompt tokens:* 495
 - *Generation tokens:* 500
 - *Total tokens:* 995
-- *Prompt throughput (raw):* 1,298 tok/s
-- *Generation throughput (raw):* 50.8 tok/s
+- *Prompt throughput (raw):* 1,320 tok/s
+- *Generation throughput (raw):* 51.0 tok/s
 - *Peak memory:* 13
 - *Active memory:* 12
 - *Cache memory:* 0.05
@@ -3399,17 +3399,17 @@ Keywords: cats, blanket, couch, remotes, pink, lying, domestic, feline, relaxed,
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Unrecognised model control tokens remain visible; Required
   fields are missing or empty; Extra text appears before the Title field
-- *Model load time:* 1.39s
+- *Model load time:* 1.47s
 - *Generation time:* 1.10s
-- *Total time:* 2.50s
-- *Input validation time:* 0.00166
-- *Prompt preparation time:* 0.00732
-- *First-token latency:* 0.355
-- *Cleanup time:* 0.0879
+- *Total time:* 2.58s
+- *Input validation time:* 0.00168
+- *Prompt preparation time:* 0.00666
+- *First-token latency:* 0.353
+- *Cleanup time:* 0.0877
 - *Prompt tokens:* 499
 - *Generation tokens:* 47
 - *Total tokens:* 546
-- *Prompt throughput (raw):* 1,405 tok/s
+- *Prompt throughput (raw):* 1,412 tok/s
 - *Generation throughput (raw):* 64.3 tok/s
 - *Peak memory:* 10
 - *Active memory:* 9.4
@@ -3467,18 +3467,18 @@ Keywords: tabby cats, pink couch, remote controls, resting cats, domestic cats<|
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Unrecognised model control tokens remain visible; Required
   fields are missing or empty; Extra text appears before the Title field
-- *Model load time:* 5.53s
-- *Generation time:* 3.96s
-- *Total time:* 9.50s
-- *Input validation time:* 0.00154
-- *Prompt preparation time:* 0.00678
-- *First-token latency:* 2.22
-- *Cleanup time:* 0.211
+- *Model load time:* 5.52s
+- *Generation time:* 4.15s
+- *Total time:* 9.68s
+- *Input validation time:* 0.00159
+- *Prompt preparation time:* 0.00671
+- *First-token latency:* 2.44
+- *Cleanup time:* 0.207
 - *Prompt tokens:* 499
 - *Generation tokens:* 89
 - *Total tokens:* 588
-- *Prompt throughput (raw):* 224 tok/s
-- *Generation throughput (raw):* 51.7 tok/s
+- *Prompt throughput (raw):* 205 tok/s
+- *Generation throughput (raw):* 52.4 tok/s
 - *Peak memory:* 63
 - *Active memory:* 62
 - *Cache memory:* 0.16
@@ -3535,18 +3535,18 @@ Keywords: cats, pink couch, remote controls, sleeping, relaxed, striped fur, fel
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Required fields are missing or empty; Conversation-role
   control tokens remain visible
-- *Model load time:* 1.88s
-- *Generation time:* 1.49s
-- *Total time:* 3.37s
-- *Input validation time:* 0.00178
+- *Model load time:* 1.87s
+- *Generation time:* 1.68s
+- *Total time:* 3.56s
+- *Input validation time:* 0.00165
 - *Prompt preparation time:* 0.00118
-- *First-token latency:* 1.06
-- *Cleanup time:* 0.099
+- *First-token latency:* 1.27
+- *Cleanup time:* 0.098
 - *Prompt tokens:* 2,418
 - *Generation tokens:* 13
 - *Total tokens:* 2,431
-- *Prompt throughput (raw):* 2,286 tok/s
-- *Generation throughput (raw):* 34.5 tok/s
+- *Prompt throughput (raw):* 1,899 tok/s
+- *Generation throughput (raw):* 36.4 tok/s
 - *Peak memory:* 19
 - *Active memory:* 17
 - *Cache memory:* 0.39
@@ -3600,18 +3600,18 @@ Keywords: cats, pink couch, remote controls, sleeping, relaxed, striped fur, fel
 - *Observations:* Response repeats the same text; Required fields are missing
   or empty; Extra text appears before the Title field; Response appears cut
   off at the token limit; Internal reasoning text remains visible
-- *Model load time:* 3.31s
-- *Generation time:* 107.30s
-- *Total time:* 110.61s
-- *Input validation time:* 0.00174
-- *Prompt preparation time:* 0.00154
-- *First-token latency:* 0.83
-- *Cleanup time:* 0.145
+- *Model load time:* 3.20s
+- *Generation time:* 107.59s
+- *Total time:* 110.80s
+- *Input validation time:* 0.00172
+- *Prompt preparation time:* 0.00162
+- *First-token latency:* 0.831
+- *Cleanup time:* 0.185
 - *Prompt tokens:* 489
 - *Generation tokens:* 500
 - *Total tokens:* 989
 - *Prompt throughput (raw):* 589 tok/s
-- *Generation throughput (raw):* 4.71 tok/s
+- *Generation throughput (raw):* 4.69 tok/s
 - *Peak memory:* 39
 - *Active memory:* 33
 - *Cache memory:* 5.1
@@ -3681,18 +3681,18 @@ Description: Two tabby cats
   appears before the Title field; Response appears cut off at the token limit;
   Conversation-role control tokens remain visible; Internal reasoning text
   remains visible
-- *Model load time:* 2.11s
-- *Generation time:* 7.23s
-- *Total time:* 9.35s
-- *Input validation time:* 0.00169
-- *Prompt preparation time:* 0.00155
+- *Model load time:* 2.19s
+- *Generation time:* 7.52s
+- *Total time:* 9.72s
+- *Input validation time:* 0.00165
+- *Prompt preparation time:* 0.00154
 - *First-token latency:* 0.297
-- *Cleanup time:* 0.0951
+- *Cleanup time:* 0.123
 - *Prompt tokens:* 489
 - *Generation tokens:* 500
 - *Total tokens:* 989
-- *Prompt throughput (raw):* 1,644 tok/s
-- *Generation throughput (raw):* 73.5 tok/s
+- *Prompt throughput (raw):* 1,646 tok/s
+- *Generation throughput (raw):* 70.5 tok/s
 - *Peak memory:* 20
 - *Active memory:* 18
 - *Cache memory:* 0.76
@@ -3760,18 +3760,18 @@ Keywords: cats, pink fabric, remote controls, vibrant colors, striped patterns, 
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Required fields are missing or empty
-- *Model load time:* 0.55s
-- *Generation time:* 0.45s
-- *Total time:* 1.01s
-- *Input validation time:* 0.0016
-- *Prompt preparation time:* 0.00328
-- *First-token latency:* 0.0679
-- *Cleanup time:* 0.068
+- *Model load time:* 0.61s
+- *Generation time:* 0.46s
+- *Total time:* 1.08s
+- *Input validation time:* 0.00194
+- *Prompt preparation time:* 0.00339
+- *First-token latency:* 0.0688
+- *Cleanup time:* 0.0672
 - *Prompt tokens:* 368
 - *Generation tokens:* 69
 - *Total tokens:* 437
-- *Prompt throughput (raw):* 5,423 tok/s
-- *Generation throughput (raw):* 192 tok/s
+- *Prompt throughput (raw):* 5,350 tok/s
+- *Generation throughput (raw):* 190 tok/s
 - *Peak memory:* 4.1
 - *Active memory:* 3.2
 - *Cache memory:* 0.01
@@ -3833,18 +3833,18 @@ Cats, blanket, remote control, collar, sleeping, pink, indoor, cozy, furry, rela
 - *Observations:* Response repeats the same text; Extra text appears before
   the Title field; Response appears cut off at the token limit; Title or
   keywords do not meet requested constraints
-- *Model load time:* 1.56s
-- *Generation time:* 28.62s
-- *Total time:* 30.20s
-- *Input validation time:* 0.00201
-- *Prompt preparation time:* 0.00124
-- *First-token latency:* 1.37
-- *Cleanup time:* 0.0908
+- *Model load time:* 1.51s
+- *Generation time:* 29.98s
+- *Total time:* 31.50s
+- *Input validation time:* 0.0016
+- *Prompt preparation time:* 0.00123
+- *First-token latency:* 1.38
+- *Cleanup time:* 0.0879
 - *Prompt tokens:* 107
 - *Generation tokens:* 500
 - *Total tokens:* 607
-- *Prompt throughput (raw):* 78.2 tok/s
-- *Generation throughput (raw):* 18.4 tok/s
+- *Prompt throughput (raw):* 77.8 tok/s
+- *Generation throughput (raw):* 17.5 tok/s
 - *Peak memory:* 15
 - *Active memory:* 11
 - *Cache memory:* 0.65
@@ -3909,18 +3909,18 @@ Here is the information in the format you requested:
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Required fields are missing or empty; Extra text appears
   before the Title field
-- *Model load time:* 0.85s
+- *Model load time:* 0.89s
 - *Generation time:* 0.35s
-- *Total time:* 1.22s
-- *Input validation time:* 0.00164
-- *Prompt preparation time:* 0.00853
-- *First-token latency:* 0.104
-- *Cleanup time:* 0.0774
+- *Total time:* 1.25s
+- *Input validation time:* 0.00171
+- *Prompt preparation time:* 0.0077
+- *First-token latency:* 0.107
+- *Cleanup time:* 0.0809
 - *Prompt tokens:* 330
 - *Generation tokens:* 58
 - *Total tokens:* 388
-- *Prompt throughput (raw):* 3,178 tok/s
-- *Generation throughput (raw):* 282 tok/s
+- *Prompt throughput (raw):* 3,077 tok/s
+- *Generation throughput (raw):* 280 tok/s
 - *Peak memory:* 3.0
 - *Active memory:* 2.3
 - *Cache memory:* 0.05
@@ -3982,18 +3982,18 @@ Keywords: cats, sleeping, pink blanket, remote controls, tabby, relaxation, comf
 - *Observations:* Required fields are missing or empty; Response repeats the
   task instructions instead of only returning the requested fields; Extra text
   appears before the Title field; Response appears cut off at the token limit
-- *Model load time:* 0.69s
-- *Generation time:* 3.95s
-- *Total time:* 4.66s
-- *Input validation time:* 0.00177
-- *Prompt preparation time:* 0.011
-- *First-token latency:* 0.0904
-- *Cleanup time:* 0.0786
+- *Model load time:* 0.82s
+- *Generation time:* 3.90s
+- *Total time:* 4.74s
+- *Input validation time:* 0.00161
+- *Prompt preparation time:* 0.0107
+- *First-token latency:* 0.0895
+- *Cleanup time:* 0.0781
 - *Prompt tokens:* 411
 - *Generation tokens:* 500
 - *Total tokens:* 911
-- *Prompt throughput (raw):* 4,548 tok/s
-- *Generation throughput (raw):* 131 tok/s
+- *Prompt throughput (raw):* 4,590 tok/s
+- *Generation throughput (raw):* 132 tok/s
 - *Peak memory:* 5.3
 - *Active memory:* 4.3
 - *Cache memory:* 0.13
@@ -4065,18 +4065,18 @@ Now keywords: 10-18 unique, comma-separated. Need to list distinct things. Let's
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Required fields are missing or empty
-- *Model load time:* 0.65s
-- *Generation time:* 0.51s
-- *Total time:* 1.17s
-- *Input validation time:* 0.00178
-- *Prompt preparation time:* 0.00118
-- *First-token latency:* 0.368
-- *Cleanup time:* 0.0782
+- *Model load time:* 0.66s
+- *Generation time:* 0.50s
+- *Total time:* 1.16s
+- *Input validation time:* 0.00163
+- *Prompt preparation time:* 0.00117
+- *First-token latency:* 0.355
+- *Cleanup time:* 0.0754
 - *Prompt tokens:* 1,304
 - *Generation tokens:* 9
 - *Total tokens:* 1,313
-- *Prompt throughput (raw):* 3,548 tok/s
-- *Generation throughput (raw):* 129 tok/s
+- *Prompt throughput (raw):* 3,671 tok/s
+- *Generation throughput (raw):* 127 tok/s
 - *Peak memory:* 5.6
 - *Active memory:* 4.5
 - *Cache memory:* 0.35
@@ -4129,18 +4129,18 @@ Now keywords: 10-18 unique, comma-separated. Need to list distinct things. Let's
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Unrecognised model control tokens remain visible; Required
   fields are missing or empty; Extra text appears before the Title field
-- *Model load time:* 3.70s
-- *Generation time:* 2.19s
-- *Total time:* 5.93s
-- *Input validation time:* 0.00182
-- *Prompt preparation time:* 0.0204
-- *First-token latency:* 0.321
+- *Model load time:* 3.23s
+- *Generation time:* 2.15s
+- *Total time:* 5.41s
+- *Input validation time:* 0.00178
+- *Prompt preparation time:* 0.0203
+- *First-token latency:* 0.319
 - *Cleanup time:* 0.129
 - *Prompt tokens:* 386
-- *Generation tokens:* 76
-- *Total tokens:* 462
-- *Prompt throughput (raw):* 1,204 tok/s
-- *Generation throughput (raw):* 44.3 tok/s
+- *Generation tokens:* 72
+- *Total tokens:* 458
+- *Prompt throughput (raw):* 1,209 tok/s
+- *Generation throughput (raw):* 43.2 tok/s
 - *Peak memory:* 29
 - *Active memory:* 28
 - *Cache memory:* 0.01
@@ -4167,8 +4167,8 @@ Now keywords: 10-18 unique, comma-separated. Need to list distinct things. Let's
 <pre class="model-output-readable">
 &lt;|channel&gt;thought
 &lt;channel|&gt;Title: Two tabby cats sleeping on a pink blanket
-Description: Two striped tabby cats lie on a pink blanket draped over a red sofa. Two remote controls are positioned near the cats.
-Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, red, indoor, domestic, feline, striped, fur, remote, fabric, relaxation
+Description: Two striped tabby cats lie on a bright pink blanket on a sofa next to remote controls. Bright light illuminates the scene.
+Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, indoor, domestic, animals, striped, fur, lounging, controls
 </pre>
 
 <details>
@@ -4177,8 +4177,8 @@ Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, red, indoor, dome
 ```text
 <|channel>thought
 <channel|>Title: Two tabby cats sleeping on a pink blanket
-Description: Two striped tabby cats lie on a pink blanket draped over a red sofa. Two remote controls are positioned near the cats.
-Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, red, indoor, domestic, feline, striped, fur, remote, fabric, relaxation
+Description: Two striped tabby cats lie on a bright pink blanket on a sofa next to remote controls. Bright light illuminates the scene.
+Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, indoor, domestic, animals, striped, fur, lounging, controls
 ```
 
 </details>
@@ -4199,18 +4199,18 @@ Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, red, indoor, dome
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Unrecognised model control tokens remain visible; Required
   fields are missing or empty; Extra text appears before the Title field
-- *Model load time:* 3.19s
-- *Generation time:* 1.81s
-- *Total time:* 5.01s
-- *Input validation time:* 0.00165
-- *Prompt preparation time:* 0.000305
-- *First-token latency:* 0.332
-- *Cleanup time:* 0.116
+- *Model load time:* 3.17s
+- *Generation time:* 1.62s
+- *Total time:* 4.80s
+- *Input validation time:* 0.00161
+- *Prompt preparation time:* 0.000286
+- *First-token latency:* 0.314
+- *Cleanup time:* 0.126
 - *Prompt tokens:* 386
-- *Generation tokens:* 75
-- *Total tokens:* 461
-- *Prompt throughput (raw):* 1,161 tok/s
-- *Generation throughput (raw):* 56.9 tok/s
+- *Generation tokens:* 72
+- *Total tokens:* 458
+- *Prompt throughput (raw):* 1,228 tok/s
+- *Generation throughput (raw):* 62.8 tok/s
 - *Peak memory:* 28
 - *Active memory:* 27
 - *Cache memory:* 0.01
@@ -4237,8 +4237,8 @@ Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, red, indoor, dome
 <pre class="model-output-readable">
 &lt;|channel&gt;thought
 &lt;channel|&gt;Title: Two tabby cats sleeping on a pink blanket
-Description: Two striped tabby cats lie curled on a bright pink fabric next to two television remote controls. The lighting is bright and even.
-Keywords: cats, tabby, sleeping, pink, blanket, couch, indoor, remote, controls, striped, fur, resting, fur, domestic, domestic
+Description: Two patterned tabby cats are lying on a pink fabric surface on a sofa. Two remote controls are visible near the cats.
+Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote, controls, lounging, resting, domestic, fur, patterned
 </pre>
 
 <details>
@@ -4247,8 +4247,8 @@ Keywords: cats, tabby, sleeping, pink, blanket, couch, indoor, remote, controls,
 ```text
 <|channel>thought
 <channel|>Title: Two tabby cats sleeping on a pink blanket
-Description: Two striped tabby cats lie curled on a bright pink fabric next to two television remote controls. The lighting is bright and even.
-Keywords: cats, tabby, sleeping, pink, blanket, couch, indoor, remote, controls, striped, fur, resting, fur, domestic, domestic
+Description: Two patterned tabby cats are lying on a pink fabric surface on a sofa. Two remote controls are visible near the cats.
+Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote, controls, lounging, resting, domestic, fur, patterned
 ```
 
 </details>
@@ -4269,18 +4269,18 @@ Keywords: cats, tabby, sleeping, pink, blanket, couch, indoor, remote, controls,
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Required fields are missing or empty; Response appears cut
   off at the token limit
-- *Model load time:* 1.45s
-- *Generation time:* 4.22s
-- *Total time:* 5.68s
-- *Input validation time:* 0.00166
-- *Prompt preparation time:* 0.000188
-- *First-token latency:* 0.245
-- *Cleanup time:* 0.0984
+- *Model load time:* 1.52s
+- *Generation time:* 4.18s
+- *Total time:* 5.71s
+- *Input validation time:* 0.00167
+- *Prompt preparation time:* 0.00018
+- *First-token latency:* 0.242
+- *Cleanup time:* 0.0974
 - *Prompt tokens:* 370
 - *Generation tokens:* 500
 - *Total tokens:* 870
-- *Prompt throughput (raw):* 1,511 tok/s
-- *Generation throughput (raw):* 126 tok/s
+- *Prompt throughput (raw):* 1,526 tok/s
+- *Generation throughput (raw):* 127 tok/s
 - *Peak memory:* 6.0
 - *Active memory:* 4.5
 - *Cache memory:* 0.04
@@ -4335,18 +4335,18 @@ Keywords: cats, tabby, sleeping, pink, blanket, couch, indoor, remote, controls,
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* No response text was returned; Required fields are missing
   or empty
-- *Model load time:* 6.08s
-- *Generation time:* 2.56s
-- *Total time:* 8.65s
-- *Input validation time:* 0.00171
-- *Prompt preparation time:* 0.000132
-- *First-token latency:* 2.54
-- *Cleanup time:* 0.23
+- *Model load time:* 6.31s
+- *Generation time:* 2.98s
+- *Total time:* 9.30s
+- *Input validation time:* 0.00172
+- *Prompt preparation time:* 0.000138
+- *First-token latency:* 2.96
+- *Cleanup time:* 0.237
 - *Prompt tokens:* 378
 - *Generation tokens:* 1
 - *Total tokens:* 379
-- *Prompt throughput (raw):* 149 tok/s
-- *Generation throughput (raw):* 49,383 tok/s
+- *Prompt throughput (raw):* 128 tok/s
+- *Generation throughput (raw):* 60,150 tok/s
 - *Peak memory:* 63
 - *Active memory:* 63
 - *Cache memory:* 0.58
@@ -4388,18 +4388,18 @@ empty output
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Response repeats the same text; Required fields are missing
   or empty; Response appears cut off at the token limit
-- *Model load time:* 0.91s
-- *Generation time:* 10.75s
-- *Total time:* 11.67s
-- *Input validation time:* 0.00164
-- *Prompt preparation time:* 0.00153
-- *First-token latency:* 2.3
-- *Cleanup time:* 0.0926
+- *Model load time:* 0.98s
+- *Generation time:* 10.60s
+- *Total time:* 11.59s
+- *Input validation time:* 0.00171
+- *Prompt preparation time:* 0.00156
+- *First-token latency:* 2.23
+- *Cleanup time:* 0.0923
 - *Prompt tokens:* 2,469
 - *Generation tokens:* 500
 - *Total tokens:* 2,969
-- *Prompt throughput (raw):* 1,075 tok/s
-- *Generation throughput (raw):* 59.6 tok/s
+- *Prompt throughput (raw):* 1,109 tok/s
+- *Generation throughput (raw):* 60.2 tok/s
 - *Peak memory:* 9.7
 - *Active memory:* 8.1
 - *Cache memory:* 0.85
@@ -4451,18 +4451,18 @@ cat, sleeping, pink blanket, remote control, striped, tabby, kitten, cozy, domes
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Required fields are missing or empty
-- *Model load time:* 0.50s
+- *Model load time:* 0.57s
 - *Generation time:* 0.35s
-- *Total time:* 0.86s
-- *Input validation time:* 0.00198
+- *Total time:* 0.92s
+- *Input validation time:* 0.00205
 - *Prompt preparation time:* 0.00146
-- *First-token latency:* 0.0746
-- *Cleanup time:* 0.0806
+- *First-token latency:* 0.0751
+- *Cleanup time:* 0.0822
 - *Prompt tokens:* 116
 - *Generation tokens:* 97
 - *Total tokens:* 213
-- *Prompt throughput (raw):* 1,554 tok/s
-- *Generation throughput (raw):* 377 tok/s
+- *Prompt throughput (raw):* 1,544 tok/s
+- *Generation throughput (raw):* 387 tok/s
 - *Peak memory:* 2.1
 - *Active memory:* 0.62
 - *Cache memory:* 0.25
@@ -4516,18 +4516,18 @@ Description: A close-up of a person wearing a striped shirt, with a focus on the
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Required fields are missing or empty
-- *Model load time:* 1.66s
-- *Generation time:* 5.60s
-- *Total time:* 7.28s
-- *Input validation time:* 0.00166
-- *Prompt preparation time:* 0.000172
-- *First-token latency:* 0.828
-- *Cleanup time:* 0.122
+- *Model load time:* 1.68s
+- *Generation time:* 5.64s
+- *Total time:* 7.33s
+- *Input validation time:* 0.00155
+- *Prompt preparation time:* 0.000182
+- *First-token latency:* 0.84
+- *Cleanup time:* 0.121
 - *Prompt tokens:* 1,135
 - *Generation tokens:* 155
 - *Total tokens:* 1,290
-- *Prompt throughput (raw):* 1,370 tok/s
-- *Generation throughput (raw):* 33.4 tok/s
+- *Prompt throughput (raw):* 1,351 tok/s
+- *Generation throughput (raw):* 33.3 tok/s
 - *Peak memory:* 11
 - *Active memory:* 7.9
 - *Cache memory:* 1.7
@@ -4579,18 +4579,18 @@ A top-down view of two cats lying on a pink blanket. The cat on the left is lyin
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Required fields are missing or empty
-- *Model load time:* 2.47s
-- *Generation time:* 30.61s
-- *Total time:* 33.09s
-- *Input validation time:* 0.00175
-- *Prompt preparation time:* 0.000121
-- *First-token latency:* 1.13
-- *Cleanup time:* 0.133
+- *Model load time:* 2.50s
+- *Generation time:* 30.81s
+- *Total time:* 33.33s
+- *Input validation time:* 0.00173
+- *Prompt preparation time:* 0.000115
+- *First-token latency:* 1.14
+- *Cleanup time:* 0.132
 - *Prompt tokens:* 1,135
 - *Generation tokens:* 159
 - *Total tokens:* 1,294
-- *Prompt throughput (raw):* 1,006 tok/s
-- *Generation throughput (raw):* 5.4 tok/s
+- *Prompt throughput (raw):* 993 tok/s
+- *Generation throughput (raw):* 5.37 tok/s
 - *Peak memory:* 26
 - *Active memory:* 19
 - *Cache memory:* 6.2
@@ -4642,17 +4642,17 @@ A top-down view of two cats lying on a pink blanket. The cat on the left is lyin
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Required fields are missing or empty
-- *Model load time:* 1.41s
-- *Generation time:* 8.17s
-- *Total time:* 9.59s
-- *Input validation time:* 0.00174
+- *Model load time:* 1.50s
+- *Generation time:* 8.18s
+- *Total time:* 9.69s
+- *Input validation time:* 0.00167
 - *Prompt preparation time:* 0.000113
-- *First-token latency:* 0.375
-- *Cleanup time:* 0.0971
+- *First-token latency:* 0.379
+- *Cleanup time:* 0.0978
 - *Prompt tokens:* 1,135
 - *Generation tokens:* 151
 - *Total tokens:* 1,286
-- *Prompt throughput (raw):* 3,026 tok/s
+- *Prompt throughput (raw):* 2,995 tok/s
 - *Generation throughput (raw):* 19.4 tok/s
 - *Peak memory:* 11
 - *Active memory:* 6.1
@@ -4708,18 +4708,18 @@ A top-down view of two cats sleeping on a red couch. The cat on the left is a gr
   or empty; Response repeats the task instructions instead of only returning
   the requested fields; Extra text appears before the Title field; Response
   appears cut off at the token limit
-- *Model load time:* 1.13s
-- *Generation time:* 11.08s
-- *Total time:* 12.22s
-- *Input validation time:* 0.00173
-- *Prompt preparation time:* 0.00013
-- *First-token latency:* 1.17
-- *Cleanup time:* 0.164
+- *Model load time:* 1.22s
+- *Generation time:* 11.28s
+- *Total time:* 12.52s
+- *Input validation time:* 0.00161
+- *Prompt preparation time:* 0.000112
+- *First-token latency:* 1.16
+- *Cleanup time:* 0.172
 - *Prompt tokens:* 4,207
 - *Generation tokens:* 500
 - *Total tokens:* 4,707
-- *Prompt throughput (raw):* 3,604 tok/s
-- *Generation throughput (raw):* 51.6 tok/s
+- *Prompt throughput (raw):* 3,618 tok/s
+- *Generation throughput (raw):* 50.5 tok/s
 - *Peak memory:* 4.6
 - *Active memory:* 1.7
 - *Cache memory:* 1.8
@@ -4867,17 +4867,17 @@ Description:
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Required fields are missing or empty
-- *Model load time:* 0.63s
+- *Model load time:* 0.58s
 - *Generation time:* 0.46s
-- *Total time:* 1.09s
-- *Input validation time:* 0.00175
-- *Prompt preparation time:* 0.000555
-- *First-token latency:* 0.0875
-- *Cleanup time:* 0.0829
+- *Total time:* 1.04s
+- *Input validation time:* 0.00165
+- *Prompt preparation time:* 0.000568
+- *First-token latency:* 0.0902
+- *Cleanup time:* 0.0869
 - *Prompt tokens:* 116
 - *Generation tokens:* 40
 - *Total tokens:* 156
-- *Prompt throughput (raw):* 1,326 tok/s
+- *Prompt throughput (raw):* 1,286 tok/s
 - *Generation throughput (raw):* 116 tok/s
 - *Peak memory:* 4.3
 - *Active memory:* 2.1

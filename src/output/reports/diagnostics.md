@@ -51,8 +51,8 @@ Observation counts
 | [mlx-community/FastVLM-0.5B-bf16](#diagnostic-mlx-community-fastvlm-05b-bf16)                                              | completed   | unusable            | observation_needs_reproduction | Required fields are missing or empty                                                                                                                                                                                                                                                                          |
 | [mlx-community/Qwen2-VL-2B-Instruct-4bit](#diagnostic-mlx-community-qwen2-vl-2b-instruct-4bit)                             | completed   | usable_with_caveats | observation_needs_reproduction | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           |
 | [mlx-community/MiniCPM-V-4.6-8bit](#diagnostic-mlx-community-minicpm-v-46-8bit)                                            | completed   | unusable            | observation_needs_reproduction | Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                                                                               |
-| [mlx-community/LFM2-VL-1.6B-8bit](#diagnostic-mlx-community-lfm2-vl-16b-8bit)                                              | completed   | usable_with_caveats | observation_needs_reproduction | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           |
 | [mlx-community/nanoLLaVA-1.5-4bit](#diagnostic-mlx-community-nanollava-15-4bit)                                            | completed   | unusable            | observation_needs_reproduction | Required fields are missing or empty                                                                                                                                                                                                                                                                          |
+| [mlx-community/LFM2-VL-1.6B-8bit](#diagnostic-mlx-community-lfm2-vl-16b-8bit)                                              | completed   | usable_with_caveats | observation_needs_reproduction | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           |
 | [mlx-community/LFM2.5-VL-1.6B-bf16](#diagnostic-mlx-community-lfm25-vl-16b-bf16)                                           | completed   | unusable            | observation_needs_reproduction | Required fields are missing or empty                                                                                                                                                                                                                                                                          |
 | [qnguyen3/nanoLLaVA](#diagnostic-qnguyen3-nanollava)                                                                       | completed   | unusable            | observation_needs_reproduction | Required fields are missing or empty                                                                                                                                                                                                                                                                          |
 | [HuggingFaceTB/SmolVLM-Instruct](#diagnostic-huggingfacetb-smolvlm-instruct)                                               | completed   | unusable            | observation_needs_reproduction | Required fields are missing or empty                                                                                                                                                                                                                                                                          |
@@ -60,17 +60,17 @@ Observation counts
 | [mlx-community/SmolVLM2-2.2B-Instruct-mlx](#diagnostic-mlx-community-smolvlm2-22b-instruct-mlx)                            | completed   | usable_with_caveats | observation_needs_reproduction | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           |
 | [mlx-community/GLM-4.6V-Flash-mxfp4](#diagnostic-mlx-community-glm-46v-flash-mxfp4)                                        | completed   | usable_with_caveats | observation_needs_reproduction | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           |
 | [mlx-community/GLM-4.6V-Flash-6bit](#diagnostic-mlx-community-glm-46v-flash-6bit)                                          | completed   | unusable            | observation_needs_reproduction | Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                             |
-| [mlx-community/Idefics3-8B-Llama3-bf16](#diagnostic-mlx-community-idefics3-8b-llama3-bf16)                                 | completed   | unusable            | observation_needs_reproduction | Required fields are missing or empty; Conversation-role control tokens remain visible                                                                                                                                                                                                                         |
 | [mlx-community/gemma-3n-E4B-it-bf16](#diagnostic-mlx-community-gemma-3n-e4b-it-bf16)                                       | completed   | usable_with_caveats | observation_needs_reproduction | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           |
 | [mlx-community/diffusiongemma-26B-A4B-it-mxfp8](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | completed   | unusable            | observation_needs_reproduction | Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                             |
+| [mlx-community/Idefics3-8B-Llama3-bf16](#diagnostic-mlx-community-idefics3-8b-llama3-bf16)                                 | completed   | unusable            | observation_needs_reproduction | Required fields are missing or empty; Conversation-role control tokens remain visible                                                                                                                                                                                                                         |
 | [mlx-community/diffusiongemma-26B-A4B-it-8bit](#diagnostic-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | completed   | unusable            | observation_needs_reproduction | Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                             |
 | [mlx-community/gemma-4-31b-bf16](#diagnostic-mlx-community-gemma-4-31b-bf16)                                               | completed   | unusable            | observation_needs_reproduction | No response text was returned; Required fields are missing or empty                                                                                                                                                                                                                                           |
 | [mlx-community/Qwen3-VL-2B-Thinking-bf16](#diagnostic-mlx-community-qwen3-vl-2b-thinking-bf16)                             | completed   | unusable            | observation_needs_reproduction | Required fields are missing or empty; Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit                                                                                           |
-| [mlx-community/GLM-4.6V-nvfp4](#diagnostic-mlx-community-glm-46v-nvfp4)                                                    | completed   | unusable            | observation_needs_reproduction | Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                             |
 | [mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit](#diagnostic-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | completed   | usable_with_caveats | observation_needs_reproduction | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           |
+| [mlx-community/GLM-4.6V-nvfp4](#diagnostic-mlx-community-glm-46v-nvfp4)                                                    | completed   | unusable            | observation_needs_reproduction | Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field                                                                                                                                                                             |
 | [mlx-community/gemma-3n-E2B-4bit](#diagnostic-mlx-community-gemma-3n-e2b-4bit)                                             | completed   | unusable            | observation_needs_reproduction | Required fields are missing or empty; Response appears cut off at the token limit                                                                                                                                                                                                                             |
-| [mlx-community/Ornith-1.0-35B-bf16](#diagnostic-mlx-community-ornith-10-35b-bf16)                                          | completed   | usable_with_caveats | observation_needs_reproduction | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           |
 | [mlx-community/paligemma2-10b-ft-docci-448-6bit](#diagnostic-mlx-community-paligemma2-10b-ft-docci-448-6bit)               | completed   | unusable            | observation_needs_reproduction | Required fields are missing or empty                                                                                                                                                                                                                                                                          |
+| [mlx-community/Ornith-1.0-35B-bf16](#diagnostic-mlx-community-ornith-10-35b-bf16)                                          | completed   | usable_with_caveats | observation_needs_reproduction | Title or keywords do not meet requested constraints                                                                                                                                                                                                                                                           |
 | [jqlive/Kimi-VL-A3B-Thinking-2506-6bit](#diagnostic-jqlive-kimi-vl-a3b-thinking-2506-6bit)                                 | completed   | unusable            | observation_needs_reproduction | Extra text appears before the Title field; Response appears cut off at the token limit; Internal reasoning block appears incomplete; Internal reasoning text remains visible; Title or keywords do not meet requested constraints                                                                             |
 | [mlx-community/Kimi-VL-A3B-Thinking-8bit](#diagnostic-mlx-community-kimi-vl-a3b-thinking-8bit)                             | completed   | unusable            | observation_needs_reproduction | Required fields are missing or empty; Response repeats the task instructions instead of only returning the requested fields; Extra text appears before the Title field; Response appears cut off at the token limit; Conversation-role control tokens remain visible; Internal reasoning text remains visible |
 | [mlx-community/paligemma2-3b-ft-docci-448-bf16](#diagnostic-mlx-community-paligemma2-3b-ft-docci-448-bf16)                 | completed   | unusable            | observation_needs_reproduction | Required fields are missing or empty                                                                                                                                                                                                                                                                          |
@@ -242,6 +242,40 @@ Keywords: cats, sleeping, pink blanket, remote controls, tabby, relaxation, comf
 
 </details>
 
+<a id="diagnostic-mlx-community-nanollava-15-4bit"></a>
+
+<details>
+<summary>mlx-community/nanoLLaVA-1.5-4bit — unusable — Required fields are missing or empty</summary>
+
+### mlx-community/nanoLLaVA-1.5-4bit
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* missing_requested_sections
+- *Missing sections:* ["keywords"]
+- *Resolved model revision:* 5240204744963d72823e5de933c528c4aa82dfca
+- *Processor class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Stop reason:* completed
+- *Post-cleanup active memory (GB):* 0.019907828
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 116
+- *Generation tokens:* 97
+- *Configured EOS token ID:* 151645
+- *Configured EOS token:* &lt;|im_end|&gt;
+
+#### Complete output
+
+```text
+Title: "A Study in Stripes"
+Description: A close-up of a person wearing a striped shirt, with a focus on the pattern and color of the fabric. The image is set against a pink background, and the person is lying on a bed covered with a pink blanket. The lighting is soft, and the person is facing away from the camera, giving a sense of intimacy. The image is a straightforward representation of the subject, with no additional details or context provided.
+```
+
+</details>
+
 <a id="diagnostic-mlx-community-lfm2-vl-16b-8bit"></a>
 
 <details>
@@ -279,40 +313,6 @@ Title: "Cats on a Pink Blanket"
 Description: Two tabby cats are peacefully sleeping on a pink blanket, one lying on its side and the other on its back. The cats are surrounded by two remote controls, suggesting a cozy, relaxed atmosphere.
 
 Keywords: cats, pink blanket, sleeping, tabby, remote controls, cozy, relaxed, cats, side, back, peaceful
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-nanollava-15-4bit"></a>
-
-<details>
-<summary>mlx-community/nanoLLaVA-1.5-4bit — unusable — Required fields are missing or empty</summary>
-
-### mlx-community/nanoLLaVA-1.5-4bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* missing_requested_sections
-- *Missing sections:* ["keywords"]
-- *Resolved model revision:* 5240204744963d72823e5de933c528c4aa82dfca
-- *Processor class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.019907828
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 116
-- *Generation tokens:* 97
-- *Configured EOS token ID:* 151645
-- *Configured EOS token:* &lt;|im_end|&gt;
-
-#### Complete output
-
-```text
-Title: "A Study in Stripes"
-Description: A close-up of a person wearing a striped shirt, with a focus on the pattern and color of the fabric. The image is set against a pink background, and the person is lying on a bed covered with a pink blanket. The lighting is soft, and the person is facing away from the camera, giving a sense of intimacy. The image is a straightforward representation of the subject, with no additional details or context provided.
 ```
 
 </details>
@@ -572,40 +572,6 @@ Keywords: tabby cats, pink couch, remote controls, resting cats, domestic cats<|
 
 </details>
 
-<a id="diagnostic-mlx-community-idefics3-8b-llama3-bf16"></a>
-
-<details>
-<summary>mlx-community/Idefics3-8B-Llama3-bf16 — unusable — Required fields are missing or empty; Conversation-role control tokens remain visible</summary>
-
-### mlx-community/Idefics3-8B-Llama3-bf16
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* missing_requested_sections, role_boundary_token_present
-- *Missing sections:* ["title", "description", "keywords"]
-- *Role-boundary tokens in output:* ["&lt;end_of_utterance&gt;"]
-- *Resolved model revision:* 8c2a30c48864f3251701b7bde40f601d25535098
-- *Processor class:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.004359274
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 2418
-- *Generation tokens:* 13
-- *Configured EOS token ID:* 128001
-- *Configured EOS token:* &lt;|end_of_text|&gt;
-
-#### Complete output
-
-```text
- Two cats laying on a pink blanket with remotes.<end_of_utterance>
-```
-
-</details>
-
 <a id="diagnostic-mlx-community-gemma-3n-e4b-it-bf16"></a>
 
 <details>
@@ -671,7 +637,7 @@ Keywords: tabby cats, pink couch, remote controls, resting cats, domestic cats<|
 - *Post-cleanup active memory (GB):* 0.015484096
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 386
-- *Generation tokens:* 75
+- *Generation tokens:* 72
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 
@@ -680,8 +646,42 @@ Keywords: tabby cats, pink couch, remote controls, resting cats, domestic cats<|
 ```text
 <|channel>thought
 <channel|>Title: Two tabby cats sleeping on a pink blanket
-Description: Two striped tabby cats lie curled on a bright pink fabric next to two television remote controls. The lighting is bright and even.
-Keywords: cats, tabby, sleeping, pink, blanket, couch, indoor, remote, controls, striped, fur, resting, fur, domestic, domestic
+Description: Two patterned tabby cats are lying on a pink fabric surface on a sofa. Two remote controls are visible near the cats.
+Keywords: cats, tabby, sleeping, pink, blanket, sofa, indoor, remote, controls, lounging, resting, domestic, fur, patterned
+```
+
+</details>
+
+<a id="diagnostic-mlx-community-idefics3-8b-llama3-bf16"></a>
+
+<details>
+<summary>mlx-community/Idefics3-8B-Llama3-bf16 — unusable — Required fields are missing or empty; Conversation-role control tokens remain visible</summary>
+
+### mlx-community/Idefics3-8B-Llama3-bf16
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* missing_requested_sections, role_boundary_token_present
+- *Missing sections:* ["title", "description", "keywords"]
+- *Role-boundary tokens in output:* ["&lt;end_of_utterance&gt;"]
+- *Resolved model revision:* 8c2a30c48864f3251701b7bde40f601d25535098
+- *Processor class:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
+- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Stop reason:* completed
+- *Post-cleanup active memory (GB):* 0.004359274
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 2418
+- *Generation tokens:* 13
+- *Configured EOS token ID:* 128001
+- *Configured EOS token:* &lt;|end_of_text|&gt;
+
+#### Complete output
+
+```text
+ Two cats laying on a pink blanket with remotes.<end_of_utterance>
 ```
 
 </details>
@@ -711,7 +711,7 @@ Keywords: cats, tabby, sleeping, pink, blanket, couch, indoor, remote, controls,
 - *Post-cleanup active memory (GB):* 0.015484096
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 386
-- *Generation tokens:* 76
+- *Generation tokens:* 72
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 
@@ -720,8 +720,8 @@ Keywords: cats, tabby, sleeping, pink, blanket, couch, indoor, remote, controls,
 ```text
 <|channel>thought
 <channel|>Title: Two tabby cats sleeping on a pink blanket
-Description: Two striped tabby cats lie on a pink blanket draped over a red sofa. Two remote controls are positioned near the cats.
-Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, red, indoor, domestic, feline, striped, fur, remote, fabric, relaxation
+Description: Two striped tabby cats lie on a bright pink blanket on a sofa next to remote controls. Bright light illuminates the scene.
+Keywords: cats, tabby, sleeping, resting, pink, blanket, sofa, indoor, domestic, animals, striped, fur, lounging, controls
 ```
 
 </details>
@@ -823,46 +823,6 @@ Now keywords: 10-18 unique, comma-separated. Need to list distinct things. Let's
 
 </details>
 
-<a id="diagnostic-mlx-community-glm-46v-nvfp4"></a>
-
-<details>
-<summary>mlx-community/GLM-4.6V-nvfp4 — unusable — Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field</summary>
-
-### mlx-community/GLM-4.6V-nvfp4
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* missing_requested_sections, unexpected_catalog_preamble,
-  unexpected_special_token
-- *Missing sections:* ["title"]
-- *Unexpected text before Title:* &lt;|begin_of_box|&gt;Title: Two cats on a
-  pink couch
-- *Unexpected special tokens:* ["&lt;|begin_of_box|&gt;",
-  "&lt;|end_of_box|&gt;"]
-- *Resolved model revision:* 2da6855d4e28a0e61c84543262074bc17ac27d6e
-- *Processor class:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.00409713
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 499
-- *Generation tokens:* 89
-- *Configured EOS token ID:* 151329
-- *Configured EOS token:* &lt;|endoftext|&gt;
-
-#### Complete output
-
-```text
-<|begin_of_box|>Title: Two cats on a pink couch
-Description: Two cats lie on a pink couch, each near a remote control, with one cat’s head resting on the fabric and the other stretched out with eyes closed.
-Keywords: cats, pink couch, remote controls, sleeping, relaxed, striped fur, feline, domestic, indoor, pets, lounging, two animals, soft fabric, calm, cozy, household, companionship<|end_of_box|>
-```
-
-</details>
-
 <a id="diagnostic-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
 
 <details>
@@ -905,6 +865,46 @@ Keywords: cats, tabby, sofa, pink, remote control, resting, lying, natural light
 
 </details>
 
+<a id="diagnostic-mlx-community-glm-46v-nvfp4"></a>
+
+<details>
+<summary>mlx-community/GLM-4.6V-nvfp4 — unusable — Unrecognised model control tokens remain visible; Required fields are missing or empty; Extra text appears before the Title field</summary>
+
+### mlx-community/GLM-4.6V-nvfp4
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* missing_requested_sections, unexpected_catalog_preamble,
+  unexpected_special_token
+- *Missing sections:* ["title"]
+- *Unexpected text before Title:* &lt;|begin_of_box|&gt;Title: Two cats on a
+  pink couch
+- *Unexpected special tokens:* ["&lt;|begin_of_box|&gt;",
+  "&lt;|end_of_box|&gt;"]
+- *Resolved model revision:* 2da6855d4e28a0e61c84543262074bc17ac27d6e
+- *Processor class:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
+- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Stop reason:* completed
+- *Post-cleanup active memory (GB):* 0.00409713
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 499
+- *Generation tokens:* 89
+- *Configured EOS token ID:* 151329
+- *Configured EOS token:* &lt;|endoftext|&gt;
+
+#### Complete output
+
+```text
+<|begin_of_box|>Title: Two cats on a pink couch
+Description: Two cats lie on a pink couch, each near a remote control, with one cat’s head resting on the fabric and the other stretched out with eyes closed.
+Keywords: cats, pink couch, remote controls, sleeping, relaxed, striped fur, feline, domestic, indoor, pets, lounging, two animals, soft fabric, calm, cozy, household, companionship<|end_of_box|>
+```
+
+</details>
+
 <a id="diagnostic-mlx-community-gemma-3n-e2b-4bit"></a>
 
 <details>
@@ -936,6 +936,39 @@ Keywords: cats, tabby, sofa, pink, remote control, resting, lying, natural light
 ```text
 
 - a 1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-29-30-31-32-33-34-35-36-37-38-39-40-41-42-43-44-45-46-47-48-49-50-51-52-53-54-55-56-57-58-59-60-61-62-63-64-65-66-67-68-69-70-71-72-73-74-75-76-77-76-78-79-80-81-82-83-84-85-86-87-88-89-90-91-92-93-94-95-96-97-98-99-100-101-102-103-104-105-106-107-108-109-110-111-112-113-114-115-116-117-118-119-120-121-122-123-124-125-126-127-128-129-130-131-132-133-134-135-136-137-138-139-140-141-142-143-144-145-146-147-148-149-150-1
+```
+
+</details>
+
+<a id="diagnostic-mlx-community-paligemma2-10b-ft-docci-448-6bit"></a>
+
+<details>
+<summary>mlx-community/paligemma2-10b-ft-docci-448-6bit — unusable — Required fields are missing or empty</summary>
+
+### mlx-community/paligemma2-10b-ft-docci-448-6bit
+
+#### Execution and provenance
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* missing_requested_sections
+- *Missing sections:* ["title", "description", "keywords"]
+- *Resolved model revision:* 1485fa9b3c7adb360cd354a29a401f0d441ec728
+- *Processor class:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
+- *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Stop reason:* completed
+- *Post-cleanup active memory (GB):* 0.02094004
+- *Post-cleanup cache memory (GB):* 0.0
+- *Prompt tokens:* 1135
+- *Generation tokens:* 155
+- *Configured EOS token ID:* 1
+- *Configured EOS token:* &lt;eos&gt;
+
+#### Complete output
+
+```text
+A top-down view of two cats lying on a pink blanket. The cat on the left is lying on its side with its head facing the top left corner of the image. Its body is facing the top right corner of the image. Its head is turned slightly to the left. Its tail is sticking out of the bottom left corner of the image. The cat on the right is lying on its side with its head facing the top right corner of the image. Its body is facing the bottom left corner of the image. Its head is turned slightly to the left. Its tail is sticking out of the bottom right corner of the image. There is a gray remote control on the left side of the image and a gray remote control on the right side of the image.
 ```
 
 </details>
@@ -976,39 +1009,6 @@ Title: Two Tabby Cats Sleeping on Pink Sofa with Remotes
 Description: Two tabby cats are lying side by side on a bright pink sofa, each near a white remote control. The cat on the left is stretched out with its tail curled, while the one on the right is curled up with its head down.
 
 Keywords: tabby cats, pink sofa, sleeping cats, remote controls, feline relaxation, striped fur, cozy setting, indoor scene, pet comfort, soft lighting, domestic life, animal companionship, resting pets, home environment, tranquil moment, feline behavior, sofa bedding, remote placement, cat napping, peaceful atmosphere
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-paligemma2-10b-ft-docci-448-6bit"></a>
-
-<details>
-<summary>mlx-community/paligemma2-10b-ft-docci-448-6bit — unusable — Required fields are missing or empty</summary>
-
-### mlx-community/paligemma2-10b-ft-docci-448-6bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* missing_requested_sections
-- *Missing sections:* ["title", "description", "keywords"]
-- *Resolved model revision:* 1485fa9b3c7adb360cd354a29a401f0d441ec728
-- *Processor class:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
-- *Tokenizer class:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.02094004
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 1135
-- *Generation tokens:* 155
-- *Configured EOS token ID:* 1
-- *Configured EOS token:* &lt;eos&gt;
-
-#### Complete output
-
-```text
-A top-down view of two cats lying on a pink blanket. The cat on the left is lying on its side with its head facing the top left corner of the image. Its body is facing the top right corner of the image. Its head is turned slightly to the left. Its tail is sticking out of the bottom left corner of the image. The cat on the right is lying on its side with its head facing the top right corner of the image. Its body is facing the bottom left corner of the image. Its head is turned slightly to the left. Its tail is sticking out of the bottom right corner of the image. There is a gray remote control on the left side of the image and a gray remote control on the right side of the image.
 ```
 
 </details>
@@ -1633,34 +1633,34 @@ None.
 
 | Model                                             | Runtime identity                                        | Performance                                                                              |
 |---------------------------------------------------|---------------------------------------------------------|------------------------------------------------------------------------------------------|
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit   | rev a962dcb09eee; Mistral3Processor; stop completed     | 1069 prompt / 85 generated; 203 tok/s; 4.5 GB peak; cleanup 0.00837/0.0 GB active/cache  |
-| Qwen/Qwen3-VL-2B-Instruct                         | rev 89644892e4d8; Qwen3VLProcessor; stop completed      | 409 prompt / 82 generated; 138 tok/s; 5.2 GB peak; cleanup 0.000558/0.0 GB active/cache  |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit   | rev a962dcb09eee; Mistral3Processor; stop completed     | 1069 prompt / 85 generated; 201 tok/s; 4.5 GB peak; cleanup 0.00837/0.0 GB active/cache  |
+| Qwen/Qwen3-VL-2B-Instruct                         | rev 89644892e4d8; Qwen3VLProcessor; stop completed      | 409 prompt / 82 generated; 137 tok/s; 5.2 GB peak; cleanup 0.000558/0.0 GB active/cache  |
 | mlx-community/Qwen3-VL-2B-Instruct-bf16           | rev c8a67a843274; Qwen3VLProcessor; stop completed      | 409 prompt / 82 generated; 134 tok/s; 5.3 GB peak; cleanup 0.0108/0.0 GB active/cache    |
-| mlx-community/gemma-4-26b-a4b-it-4bit             | rev 0d77464eeb23; Gemma4Processor; stop completed       | 390 prompt / 73 generated; 129 tok/s; 16 GB peak; cleanup 0.0182/0.0 GB active/cache     |
-| mlx-community/Qwen3.5-35B-A3B-4bit                | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed      | 421 prompt / 89 generated; 117 tok/s; 21 GB peak; cleanup 0.0126/0.0 GB active/cache     |
-| mlx-community/Qwen3.5-9B-MLX-4bit                 | rev 938d8919941c; Qwen3VLProcessor; stop completed      | 421 prompt / 86 generated; 98.6 tok/s; 7.1 GB peak; cleanup 0.0142/0.0 GB active/cache   |
-| microsoft/Phi-3.5-vision-instruct                 | rev 12b77fb40b63; Phi3VProcessor; stop completed        | 883 prompt / 68 generated; 58.7 tok/s; 9.4 GB peak; cleanup 0.0018/0.0 GB active/cache   |
-| mlx-community/Phi-3.5-vision-instruct-bf16        | rev d8da684308c2; Phi3VProcessor; stop completed        | 883 prompt / 68 generated; 57.8 tok/s; 9.4 GB peak; cleanup 0.0102/0.0 GB active/cache   |
-| mlx-community/Qwen3.5-35B-A3B-6bit                | rev b729d115bb2c; Qwen3VLProcessor; stop completed      | 421 prompt / 109 generated; 101 tok/s; 30 GB peak; cleanup 0.0132/0.0 GB active/cache    |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 | rev 7c992876448f; Mistral3Processor; stop completed     | 1070 prompt / 81 generated; 70.1 tok/s; 9.8 GB peak; cleanup 0.00785/0.0 GB active/cache |
-| mlx-community/X-Reasoner-7B-8bit                  | rev 21732e74613b; Qwen2_5_VLProcessor; stop completed   | 511 prompt / 106 generated; 66.1 tok/s; 10 GB peak; cleanup 0.0155/0.0 GB active/cache   |
-| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4 | rev 28777b889d84; Mistral3Processor; stop completed     | 1070 prompt / 106 generated; 66.7 tok/s; 10 GB peak; cleanup 0.00811/0.0 GB active/cache |
-| mlx-community/pixtral-12b-8bit                    | rev 79e24b66302d; PixtralProcessor; stop completed      | 1335 prompt / 89 generated; 40.4 tok/s; 15 GB peak; cleanup 0.0243/0.0 GB active/cache   |
-| mlx-community/InternVL3-8B-bf16                   | rev e0df3dd79263; InternVLChatProcessor; stop completed | 3435 prompt / 59 generated; 34.3 tok/s; 18 GB peak; cleanup 0.00498/0.0 GB active/cache  |
-| mlx-community/gemma-4-31b-it-4bit                 | rev 696d436c4047; Gemma4Processor; stop completed       | 390 prompt / 80 generated; 28.1 tok/s; 20 GB peak; cleanup 0.0192/0.0 GB active/cache    |
-| mlx-community/gemma-3-27b-it-qat-4bit             | rev fc4e000f32af; Gemma3Processor; stop completed       | 379 prompt / 90 generated; 29.5 tok/s; 18 GB peak; cleanup 0.016/0.0 GB active/cache     |
-| mlx-community/Qwen3.5-27B-4bit                    | rev 45797d2985a1; Qwen3VLProcessor; stop completed      | 421 prompt / 106 generated; 33.4 tok/s; 19 GB peak; cleanup 0.0116/0.0 GB active/cache   |
-| mlx-community/Step-3.7-Flash-oQ2e                 | rev 3dacb46f724a; Step3VLProcessor; stop completed      | 286 prompt / 94 generated; 45.5 tok/s; 65 GB peak; cleanup 0.0152/0.0 GB active/cache    |
-| mlx-community/pixtral-12b-bf16                    | rev 378cf65efd79; PixtralProcessor; stop completed      | 1335 prompt / 83 generated; 20.3 tok/s; 27 GB peak; cleanup 0.0246/0.0 GB active/cache   |
-| mlx-community/InternVL3-14B-8bit                  | rev 50efc568c7df; InternVLChatProcessor; stop completed | 3435 prompt / 75 generated; 31.9 tok/s; 19 GB peak; cleanup 0.00467/0.0 GB active/cache  |
+| mlx-community/gemma-4-26b-a4b-it-4bit             | rev 0d77464eeb23; Gemma4Processor; stop completed       | 390 prompt / 73 generated; 128 tok/s; 16 GB peak; cleanup 0.0182/0.0 GB active/cache     |
+| mlx-community/Qwen3.5-35B-A3B-4bit                | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed      | 421 prompt / 89 generated; 120 tok/s; 21 GB peak; cleanup 0.0126/0.0 GB active/cache     |
+| mlx-community/Qwen3.5-9B-MLX-4bit                 | rev 938d8919941c; Qwen3VLProcessor; stop completed      | 421 prompt / 86 generated; 100 tok/s; 7.1 GB peak; cleanup 0.0142/0.0 GB active/cache    |
+| microsoft/Phi-3.5-vision-instruct                 | rev 12b77fb40b63; Phi3VProcessor; stop completed        | 883 prompt / 68 generated; 59.5 tok/s; 9.4 GB peak; cleanup 0.0018/0.0 GB active/cache   |
+| mlx-community/Phi-3.5-vision-instruct-bf16        | rev d8da684308c2; Phi3VProcessor; stop completed        | 883 prompt / 68 generated; 58.1 tok/s; 9.4 GB peak; cleanup 0.0102/0.0 GB active/cache   |
+| mlx-community/Qwen3.5-35B-A3B-6bit                | rev b729d115bb2c; Qwen3VLProcessor; stop completed      | 421 prompt / 109 generated; 102 tok/s; 30 GB peak; cleanup 0.0132/0.0 GB active/cache    |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4 | rev 7c992876448f; Mistral3Processor; stop completed     | 1070 prompt / 81 generated; 69.8 tok/s; 9.8 GB peak; cleanup 0.00785/0.0 GB active/cache |
+| mlx-community/X-Reasoner-7B-8bit                  | rev 21732e74613b; Qwen2_5_VLProcessor; stop completed   | 511 prompt / 106 generated; 65.3 tok/s; 10 GB peak; cleanup 0.0155/0.0 GB active/cache   |
+| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4 | rev 28777b889d84; Mistral3Processor; stop completed     | 1070 prompt / 106 generated; 66.4 tok/s; 10 GB peak; cleanup 0.00811/0.0 GB active/cache |
+| mlx-community/pixtral-12b-8bit                    | rev 79e24b66302d; PixtralProcessor; stop completed      | 1335 prompt / 89 generated; 40.1 tok/s; 15 GB peak; cleanup 0.0243/0.0 GB active/cache   |
+| mlx-community/InternVL3-8B-bf16                   | rev e0df3dd79263; InternVLChatProcessor; stop completed | 3435 prompt / 59 generated; 34.7 tok/s; 18 GB peak; cleanup 0.00498/0.0 GB active/cache  |
+| mlx-community/gemma-4-31b-it-4bit                 | rev 696d436c4047; Gemma4Processor; stop completed       | 390 prompt / 80 generated; 28.0 tok/s; 20 GB peak; cleanup 0.0192/0.0 GB active/cache    |
+| mlx-community/gemma-3-27b-it-qat-4bit             | rev fc4e000f32af; Gemma3Processor; stop completed       | 379 prompt / 90 generated; 30.0 tok/s; 18 GB peak; cleanup 0.016/0.0 GB active/cache     |
+| mlx-community/Qwen3.5-27B-4bit                    | rev 45797d2985a1; Qwen3VLProcessor; stop completed      | 421 prompt / 106 generated; 33.2 tok/s; 19 GB peak; cleanup 0.0116/0.0 GB active/cache   |
+| mlx-community/pixtral-12b-bf16                    | rev 378cf65efd79; PixtralProcessor; stop completed      | 1335 prompt / 83 generated; 20.1 tok/s; 27 GB peak; cleanup 0.0246/0.0 GB active/cache   |
+| mlx-community/Step-3.7-Flash-oQ2e                 | rev 3dacb46f724a; Step3VLProcessor; stop completed      | 286 prompt / 94 generated; 46.0 tok/s; 65 GB peak; cleanup 0.0152/0.0 GB active/cache    |
 | mlx-community/Qwen3.5-35B-A3B-bf16                | rev 731d09ba3597; Qwen3VLProcessor; stop completed      | 421 prompt / 107 generated; 70.1 tok/s; 71 GB peak; cleanup 0.0137/0.0 GB active/cache   |
-| mlx-community/gemma-3-27b-it-qat-8bit             | rev c408904bc9a0; Gemma3Processor; stop completed       | 379 prompt / 87 generated; 17.9 tok/s; 32 GB peak; cleanup 0.0166/0.0 GB active/cache    |
-| mlx-community/Qwen3.6-27B-mxfp8                   | rev 5db9fd9c38ce; Qwen3VLProcessor; stop completed      | 421 prompt / 107 generated; 19.3 tok/s; 30 GB peak; cleanup 0.0147/0.0 GB active/cache   |
-| mlx-community/Molmo-7B-D-0924-8bit                | rev 90a14ed7a230; MolmoProcessor; stop completed        | 839 prompt / 92 generated; 53.6 tok/s; 20 GB peak; cleanup 0.00868/0.0 GB active/cache   |
+| mlx-community/InternVL3-14B-8bit                  | rev 50efc568c7df; InternVLChatProcessor; stop completed | 3435 prompt / 75 generated; 31.9 tok/s; 19 GB peak; cleanup 0.00467/0.0 GB active/cache  |
+| mlx-community/gemma-3-27b-it-qat-8bit             | rev c408904bc9a0; Gemma3Processor; stop completed       | 379 prompt / 87 generated; 17.8 tok/s; 32 GB peak; cleanup 0.0166/0.0 GB active/cache    |
+| mlx-community/Qwen3.6-27B-mxfp8                   | rev 5db9fd9c38ce; Qwen3VLProcessor; stop completed      | 421 prompt / 107 generated; 19.2 tok/s; 30 GB peak; cleanup 0.0147/0.0 GB active/cache   |
+| mlx-community/Molmo-7B-D-0924-8bit                | rev 90a14ed7a230; MolmoProcessor; stop completed        | 839 prompt / 96 generated; 53.4 tok/s; 20 GB peak; cleanup 0.00868/0.0 GB active/cache   |
 | mlx-community/Qwen3.5-27B-mxfp8                   | rev 2d6caf2325c2; Qwen3VLProcessor; stop completed      | 421 prompt / 115 generated; 19.3 tok/s; 30 GB peak; cleanup 0.0121/0.0 GB active/cache   |
-| mlx-community/Molmo-7B-D-0924-bf16                | rev d871cbdb87a4; MolmoProcessor; stop completed        | 839 prompt / 96 generated; 30.6 tok/s; 27 GB peak; cleanup 0.009/0.0 GB active/cache     |
-| mlx-community/MolmoPoint-8B-fp16                  | rev 0a60033b4e48; MolmoPointProcessor; stop completed   | 860 prompt / 78 generated; 5.95 tok/s; 23 GB peak; cleanup 0.00962/0.0 GB active/cache   |
-| meta-llama/Llama-3.2-11B-Vision-Instruct          | rev 9eb2daaa8597; MllamaProcessor; stop completed       | 108 prompt / 105 generated; 5.04 tok/s; 25 GB peak; cleanup 0.00174/0.0 GB active/cache  |
+| mlx-community/Molmo-7B-D-0924-bf16                | rev d871cbdb87a4; MolmoProcessor; stop completed        | 839 prompt / 96 generated; 30.7 tok/s; 27 GB peak; cleanup 0.009/0.0 GB active/cache     |
+| mlx-community/MolmoPoint-8B-fp16                  | rev 0a60033b4e48; MolmoPointProcessor; stop completed   | 860 prompt / 78 generated; 5.97 tok/s; 23 GB peak; cleanup 0.00962/0.0 GB active/cache   |
+| meta-llama/Llama-3.2-11B-Vision-Instruct          | rev 9eb2daaa8597; MllamaProcessor; stop completed       | 108 prompt / 105 generated; 5.06 tok/s; 25 GB peak; cleanup 0.00174/0.0 GB active/cache  |
 
 </details>
 
@@ -1692,8 +1692,8 @@ Keywords:
 | mlx-community/FastVLM-0.5B-bf16                       | 81ffe929046666c43de53691147b1669ba0f3a4c |
 | mlx-community/Qwen2-VL-2B-Instruct-4bit               | 01af461cdb9574acc09084a0ef94e216e142b085 |
 | mlx-community/MiniCPM-V-4.6-8bit                      | 03721395f6b82cd000cc74cde28fcff8abd9a04c |
-| mlx-community/LFM2-VL-1.6B-8bit                       | 294b90e5ae2389ecb61a9427b4572975eef614fe |
 | mlx-community/nanoLLaVA-1.5-4bit                      | 5240204744963d72823e5de933c528c4aa82dfca |
+| mlx-community/LFM2-VL-1.6B-8bit                       | 294b90e5ae2389ecb61a9427b4572975eef614fe |
 | mlx-community/LFM2.5-VL-1.6B-bf16                     | 16a710cf8afca206ff16a95a4ad6fe657f876ce1 |
 | qnguyen3/nanoLLaVA                                    | 13d60cec183a86755afed64da495fcc2c382ea80 |
 | HuggingFaceTB/SmolVLM-Instruct                        | 81cd9a775a4d644f2faf4e7becff4559b46b14c7 |
@@ -1701,17 +1701,17 @@ Keywords:
 | mlx-community/SmolVLM2-2.2B-Instruct-mlx              | 844516024a1c4400d34489b89ee067d794e432ed |
 | mlx-community/GLM-4.6V-Flash-mxfp4                    | 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b |
 | mlx-community/GLM-4.6V-Flash-6bit                     | df9464782d3452e0dfd86afe0984f1c9eca75ca1 |
-| mlx-community/Idefics3-8B-Llama3-bf16                 | 8c2a30c48864f3251701b7bde40f601d25535098 |
 | mlx-community/gemma-3n-E4B-it-bf16                    | d9c02d0b2fa8cf26c1cb5dd9e756db59cdbe8a4a |
 | mlx-community/diffusiongemma-26B-A4B-it-mxfp8         | ded389e478f86d498ad9e7f47666e83b166a28f1 |
+| mlx-community/Idefics3-8B-Llama3-bf16                 | 8c2a30c48864f3251701b7bde40f601d25535098 |
 | mlx-community/diffusiongemma-26B-A4B-it-8bit          | 7b95e3887078ba56283c24f2578d6e5a06b9d7e8 |
 | mlx-community/gemma-4-31b-bf16                        | 19f0f1af698c51edaf1e93b3a3a5435b282de30f |
 | mlx-community/Qwen3-VL-2B-Thinking-bf16               | c325e5ea14c215bb08fa0d668c81fa2581f9050b |
-| mlx-community/GLM-4.6V-nvfp4                          | 2da6855d4e28a0e61c84543262074bc17ac27d6e |
 | mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | 0a970d20ad7da57b0e2accc35c5b8628f5d02063 |
+| mlx-community/GLM-4.6V-nvfp4                          | 2da6855d4e28a0e61c84543262074bc17ac27d6e |
 | mlx-community/gemma-3n-E2B-4bit                       | ec68dc186276e20e4bed30b96a2b5c667e0a81e3 |
-| mlx-community/Ornith-1.0-35B-bf16                     | 9ef631ad2d0c4c26783d4f94d0a0de9516e41a4b |
 | mlx-community/paligemma2-10b-ft-docci-448-6bit        | 1485fa9b3c7adb360cd354a29a401f0d441ec728 |
+| mlx-community/Ornith-1.0-35B-bf16                     | 9ef631ad2d0c4c26783d4f94d0a0de9516e41a4b |
 | jqlive/Kimi-VL-A3B-Thinking-2506-6bit                 | 4b3b11ce0874c36a99e13e17e355049042f8620a |
 | mlx-community/Kimi-VL-A3B-Thinking-8bit               | 85daf3dc2490c0f824143338f08ba45f475c9ce4 |
 | mlx-community/paligemma2-3b-ft-docci-448-bf16         | f66333527ce75342b09d4df81873f65272ec2f30 |
