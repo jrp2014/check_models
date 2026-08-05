@@ -7146,6 +7146,9 @@ _OBSERVATION_DISPLAY_PRIORITY: Final[tuple[ObservationCode, ...]] = (
     "draft_returned_unchanged",
     "no_keyword_overlap",
 )
+_OBSERVATION_DISPLAY_RANK: Final[dict[ObservationCode, int]] = {
+    code: index for index, code in enumerate(_OBSERVATION_DISPLAY_PRIORITY)
+}
 
 _OBSERVATION_DISPLAY_LABELS: Final[dict[ObservationCode, str]] = {
     "empty_output": "No response text was returned",
@@ -7170,6 +7173,28 @@ _OBSERVATION_DISPLAY_LABELS: Final[dict[ObservationCode, str]] = {
     ),
 }
 _RANGE_ENDPOINT_COUNT: Final[int] = 2
+_USABILITY_DISPLAY_PRIORITY: Final[dict[ModelUsability, int]] = {
+    "unusable": 0,
+    "usable_with_caveats": 1,
+    "usable": 2,
+    "not_evaluated": 3,
+}
+
+
+def _assessment_actionability_key(
+    model_name: str,
+    usability: ModelUsability,
+    observations: Sequence[ObservationCode],
+) -> tuple[int, int, str]:
+    """Order gross observations before repairable caveats, then by model."""
+    severity = min(
+        (
+            _OBSERVATION_DISPLAY_RANK.get(code, len(_OBSERVATION_DISPLAY_RANK))
+            for code in observations
+        ),
+        default=len(_OBSERVATION_DISPLAY_RANK),
+    )
+    return severity, _USABILITY_DISPLAY_PRIORITY[usability], model_name.casefold()
 
 
 def _human_observation_labels(
@@ -7334,7 +7359,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
         )
     else:
         parts.append("No unusable or not-evaluated models in this run.")
-    parts.extend(["", "## Lowest-memory Usable Models", ""])
+    parts.extend(["", "## Lowest-memory Usable Models (Including Caveats)", ""])
 
     usable = [row for row in rows if row.usability in {"usable", "usable_with_caveats"}]
     by_memory = sorted(
@@ -7362,7 +7387,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
         )
     else:
         parts.append("No usable models in this run.")
-    parts.extend(["", "## Fastest Valid Generation", ""])
+    parts.extend(["", "## Fastest Usable Models (Including Caveats)", ""])
 
     by_speed = sorted(
         usable,
@@ -8274,26 +8299,56 @@ class DiagnosticsPartitions:
 def _partition_diagnostics(context: HtmlReportContext) -> DiagnosticsPartitions:
     """Partition maintainer evidence using only cached current-run assessments."""
     assessments = dict(context.assessments)
+
+    def sort_key(result: PerformanceResult) -> tuple[int, int, str]:
+        assessment = assessments[result.model_name]
+        return _assessment_actionability_key(
+            result.model_name,
+            assessment.usability,
+            assessment.observations,
+        )
+
     actionable = tuple(
-        result
-        for result in context.result_set.results
-        if assessments[result.model_name].maintainer_status == "actionable_failure"
+        sorted(
+            (
+                result
+                for result in context.result_set.results
+                if assessments[result.model_name].maintainer_status == "actionable_failure"
+            ),
+            key=sort_key,
+        )
     )
     observations = tuple(
-        result
-        for result in context.result_set.results
-        if assessments[result.model_name].maintainer_status == "observation_needs_reproduction"
+        sorted(
+            (
+                result
+                for result in context.result_set.results
+                if assessments[result.model_name].maintainer_status
+                == "observation_needs_reproduction"
+            ),
+            key=sort_key,
+        )
     )
     indeterminate = tuple(
-        result
-        for result in context.result_set.results
-        if assessments[result.model_name].execution == "indeterminate"
+        sorted(
+            (
+                result
+                for result in context.result_set.results
+                if assessments[result.model_name].execution == "indeterminate"
+            ),
+            key=sort_key,
+        )
     )
     clean = tuple(
-        result
-        for result in context.result_set.results
-        if assessments[result.model_name].execution == "completed"
-        and assessments[result.model_name].maintainer_status == "none"
+        sorted(
+            (
+                result
+                for result in context.result_set.results
+                if assessments[result.model_name].execution == "completed"
+                and assessments[result.model_name].maintainer_status == "none"
+            ),
+            key=sort_key,
+        )
     )
     return DiagnosticsPartitions(actionable, observations, indeterminate, clean)
 
@@ -8648,7 +8703,7 @@ def _diagnostics_evidence_blocks(
         _report_section("Run Summary", *_diagnostics_counts_blocks(report_context)),
         _report_section("Triage", triage),
         _report_section(
-            "Actionable Failures",
+            "Crashes requiring action",
             *_diagnostics_partition_blocks(
                 partitions.actionable,
                 presentation="expanded",
@@ -9026,7 +9081,7 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
             row.model,
         ),
     )
-    parts.append("<h3>Lowest-memory Usable Models</h3>")
+    parts.append("<h3>Lowest-memory Usable Models (Including Caveats)</h3>")
     if by_memory:
         parts.append(
             _html_table(
@@ -9056,7 +9111,7 @@ def _html_gallery_chooser(report_context: HtmlReportContext) -> str:
         ),
     )
     valid_rows = [row for row in by_speed if row.generation_tps is not None]
-    parts.append("<h3>Fastest Valid Generation</h3>")
+    parts.append("<h3>Fastest Usable Models (Including Caveats)</h3>")
     if valid_rows:
         fastest = valid_rows[0]
         average = sum(cast("float", row.generation_tps) for row in valid_rows) / len(valid_rows)
@@ -14124,26 +14179,24 @@ def _log_model_comparison_table_and_charts(
     logger.info("   E/U: execution C=completed, X=crashed, I=indeterminate")
     logger.info("        usability U=usable, C=caveated, X=unusable, -=not evaluated")
     logger.info("   First=prefill/first token; Remain=input preparation + decode")
-    logger.info(
-        "   %2s %-21s %-3s %5s %5s %5s %5s %5s %5s %5s %5s %5s",
-        "#",
-        "Model",
-        "E/U",
-        "Val",
-        "Load",
-        "Prep",
-        "First",
-        "Remain",
-        "Clean",
-        "Total",
-        "TPS",
-        "GB",
+    _log_rich_table(
+        headers=(
+            "#",
+            "Model",
+            "E/U",
+            "Val",
+            "Load",
+            "Prep",
+            "First",
+            "Remain",
+            "Clean",
+            "Total",
+            "TPS",
+            "GB",
+        ),
+        rows=comparison.rows,
+        max_widths=(2, 21, 3, 5, 5, 5, 5, 6, 5, 5, 5, 5),
     )
-    for row in comparison.rows:
-        logger.info(
-            "   %2s %-21s %-3s %5s %5s %5s %5s %5s %5s %5s %5s %5s",
-            *row,
-        )
 
     if comparison.tps_entries:
         log_blank()
@@ -14343,7 +14396,11 @@ def _log_completed_models_list(
                 for result in completed
                 if assessments[result.model_name].usability == usability
             ),
-            key=lambda item: item.model_name,
+            key=lambda item: _assessment_actionability_key(
+                item.model_name,
+                assessments[item.model_name].usability,
+                assessments[item.model_name].observations,
+            ),
         )
         if not grouped:
             continue
@@ -14356,16 +14413,15 @@ def _log_completed_models_list(
             )
             continue
         _log_rich_table(
-            headers=("Model", "Maintainer", "Observations"),
+            headers=("Model", "Observations"),
             rows=tuple(
                 (
                     result.model_name,
-                    assessments[result.model_name].maintainer_status.replace("_", " "),
                     _gallery_observation_labels(assessments[result.model_name].observations),
                 )
                 for result in grouped
             ),
-            max_widths=(48, 32, None),
+            max_widths=(64, None),
         )
 
 
@@ -15559,20 +15615,6 @@ def _run_issue_summary_surfaced_sections(
         "crashed": "Crashed attempts requiring review",
         "indeterminate": "Indeterminate attempts requiring review",
     }
-    priority = {code: index for index, code in enumerate(_OBSERVATION_DISPLAY_PRIORITY)}
-
-    usability_priority = {
-        "unusable": 0,
-        "usable_with_caveats": 1,
-        "usable": 2,
-        "not_evaluated": 3,
-    }
-
-    def _sort_key(result: JsonlResultRecord) -> tuple[int, int, str]:
-        observations = result["assessment"]["observations"]
-        severity = min((priority[code] for code in observations), default=len(priority))
-        usability = usability_priority[result["assessment"]["usability"]]
-        return severity, usability, result["model"].casefold()
 
     def _observed_result(result: JsonlResultRecord) -> str:
         assessment = result["assessment"]
@@ -15606,7 +15648,14 @@ def _run_issue_summary_surfaced_sections(
     sections: list[ReportSection] = []
     for execution, heading in heading_by_execution.items():
         rows: list[tuple[ReportCell, ...]] = []
-        for result in sorted(results, key=_sort_key):
+        for result in sorted(
+            results,
+            key=lambda result: _assessment_actionability_key(
+                result["model"],
+                result["assessment"]["usability"],
+                result["assessment"]["observations"],
+            ),
+        ):
             assessment = result["assessment"]
             if assessment["execution"] != execution:
                 continue

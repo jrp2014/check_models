@@ -495,12 +495,29 @@ def test_log_summary_emits_comparison_table_and_ascii_charts(
         ),
     ]
 
-    log_summary(results)
+    with patch.object(check_models, "_log_rich_table") as rich_table:
+        log_summary(results)
 
     messages = "\n".join(record.message for record in caplog.records)
     assert "Model Comparison (current run):" in messages
-    assert "# Model                 E/U" in messages
-    assert "First Remain Clean Total   TPS    GB" in messages
+    assert any(
+        call.kwargs["headers"]
+        == (
+            "#",
+            "Model",
+            "E/U",
+            "Val",
+            "Load",
+            "Prep",
+            "First",
+            "Remain",
+            "Clean",
+            "Total",
+            "TPS",
+            "GB",
+        )
+        for call in rich_table.call_args_list
+    )
     assert "execution C=completed" in messages
     assert "completed" in messages
     assert "usable" in messages
@@ -586,21 +603,20 @@ def test_log_summary_comparison_table_is_one_row_per_model_at_realistic_width(
         ),
     )
 
-    with patch("check_models.get_terminal_width", return_value=100):
+    with (
+        patch("check_models.get_terminal_width", return_value=100),
+        patch.object(check_models, "_log_rich_table") as rich_table,
+    ):
         log_summary([result])
 
-    messages = [record.message for record in caplog.records]
-    header = next(message for message in messages if "Val" in message and "First" in message)
-    row = next(message for message in messages if message.lstrip().startswith("1 "))
-    assert "Load" in header
-    assert "Prep" in header
-    assert "Remain" in header
-    assert "Clean" in header
-    assert "Total" in header
+    comparison = next(
+        call
+        for call in rich_table.call_args_list
+        if call.kwargs["headers"][0:3] == ("#", "Model", "E/U")
+    )
+    row = comparison.kwargs["rows"][0]
     assert "a-realistically-lo..." in row
     assert all(value in row for value in ("0.12", "0.50", "0.03", "0.60", "0.40", "0.04"))
-    assert len(row) <= 86
-    assert "\n" not in row
 
 
 def test_log_summary_reports_execution_and_mechanical_observations(
@@ -791,7 +807,8 @@ def test_completed_model_summary_uses_actionability_ordered_tables(
         for model_name in (
             "org/usable",
             "org/z-caveat",
-            "org/unusable",
+            "org/z-repeated",
+            "org/a-missing",
             "org/a-caveat",
         )
     ]
@@ -803,11 +820,17 @@ def test_completed_model_summary_uses_actionability_ordered_tables(
             "observation_needs_reproduction",
             ("minimal_output",),
         ),
-        "org/unusable": check_models.ResultAssessment(
+        "org/z-repeated": check_models.ResultAssessment(
             "completed",
             "unusable",
             "observation_needs_reproduction",
-            ("missing_requested_sections", "repeated_output"),
+            ("repeated_output",),
+        ),
+        "org/a-missing": check_models.ResultAssessment(
+            "completed",
+            "unusable",
+            "observation_needs_reproduction",
+            ("missing_requested_sections",),
         ),
         "org/a-caveat": check_models.ResultAssessment(
             "completed",
@@ -821,16 +844,17 @@ def test_completed_model_summary_uses_actionability_ordered_tables(
         check_models._log_completed_models_list(results, assessments)
 
     messages = "\n".join(record.message for record in caplog.records)
-    assert "Completed Models (4):" in messages
-    assert messages.index("Unusable (1):") < messages.index("Usable with caveats (2):")
+    assert "Completed Models (5):" in messages
+    assert messages.index("Unusable (2):") < messages.index("Usable with caveats (2):")
     assert messages.index("Usable with caveats (2):") < messages.index("Usable (1):")
     assert messages.index("Response repeats the same text") < messages.index(
         "Required fields are missing or empty"
     )
+    assert messages.index("org/z-repeated") < messages.index("org/a-missing")
     assert messages.index("org/a-caveat") < messages.index("org/z-caveat")
     assert "| usability=" not in messages
+    assert "Maintainer" not in messages
     clean_group = messages[messages.index("Usable (1):") :]
-    assert "Maintainer" not in clean_group
     assert "Observations" not in clean_group
 
 

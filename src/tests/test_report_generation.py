@@ -466,6 +466,50 @@ def test_run_issue_summary_sorts_review_rows_by_observation_severity(tmp_path: P
     assert "Title has 4 words (requested 5-10)" in content
 
 
+def test_diagnostics_sorts_triage_and_evidence_by_actionability(tmp_path: Path) -> None:
+    """Grossly unusable output should precede less severe observations everywhere."""
+    minimal = PerformanceResult(
+        model_name="org/a-minimal",
+        success=True,
+        generation=_MockGeneration(text="Cat", generation_tokens=1),
+    )
+    repeated = PerformanceResult(
+        model_name="org/z-repeated",
+        success=True,
+        generation=_MockGeneration(text="word " * 100, generation_tokens=100),
+    )
+    results = [minimal, repeated]
+    context = _build_report_render_context(
+        results=results,
+        prompt="Describe this image.",
+        system_info={},
+    )
+    output = tmp_path / "diagnostics.md"
+
+    generate_diagnostics_report(
+        results,
+        output,
+        prompt="Describe this image.",
+        library_versions=_stub_versions(),
+        system_info={},
+        report_context=context,
+    )
+
+    content = output.read_text(encoding="utf-8")
+    triage = _extract_markdown_subsection(
+        content,
+        "## Triage",
+        end_headings=("## Crashes requiring action",),
+    )
+    observations = _extract_markdown_subsection(
+        content,
+        "## Completed Runs with Observations",
+        end_headings=("## Indeterminate Attempts",),
+    )
+    assert triage.index("org/z-repeated") < triage.index("org/a-minimal")
+    assert observations.index("org/z-repeated") < observations.index("org/a-minimal")
+
+
 def test_run_issue_summary_builds_complete_public_image_reproduction(tmp_path: Path) -> None:
     """A public source should make the aggregate crash reproduction runnable."""
     output_paths = _issue_summary_output_paths(tmp_path / "output")
@@ -2042,7 +2086,7 @@ def test_simplified_diagnostics_partitions_cached_assessments_in_evidence_order(
     headings = (
         "## Run Summary",
         "## Triage",
-        "## Actionable Failures",
+        "## Crashes requiring action",
         "## Completed Runs with Observations",
         "## Indeterminate Attempts",
         "## Clean Completion Context",
@@ -2275,7 +2319,7 @@ def test_diagnostics_are_skim_first_and_share_reproduction_context_once(
     triage = _extract_markdown_subsection(
         diagnostics,
         "## Triage",
-        end_headings=("## Actionable Failures",),
+        end_headings=("## Crashes requiring action",),
     )
     assert "org/clean-one" not in triage
     assert "org/clean-two" not in triage
@@ -2287,7 +2331,7 @@ def test_diagnostics_are_skim_first_and_share_reproduction_context_once(
         diagnostics,
     )
     assert re.search(
-        r"\| \[org/network\].*\|\n\n## Actionable Failures",
+        r"\| \[org/network\].*\|\n\n## Crashes requiring action",
         diagnostics,
     )
     assert "OBSERVED-OUTPUT-MUST-APPEAR" in diagnostics
@@ -3219,7 +3263,7 @@ class TestHtmlReportEdgeCases:
         assert "Current-run Chooser" in content
         assert "Complete Per-model Evidence" in content
         assert "Maintainer Diagnostics" in content
-        assert "Actionable Failures" in content
+        assert "Crashes requiring action" in content
         lowered = content.casefold()
         for retired_phrase in (
             "quality score",
@@ -3277,7 +3321,7 @@ class TestHtmlReportEdgeCases:
         assert "Current-run Chooser" in content
         assert "Complete Per-model Evidence" in content
         assert "Maintainer Diagnostics" in content
-        assert "Actionable Failures" in content
+        assert "Crashes requiring action" in content
         assert "Completed Runs with Observations" in content
         assert "org/risky" in content
         assert "transformers" in content
@@ -3683,8 +3727,8 @@ class TestMarkdownGalleryReport:
         assert "## Prompt" in content
         assert "## Current-run Chooser" in content
         assert "## Avoid for This Run" in content
-        assert "## Lowest-memory Usable Models" in content
-        assert "## Fastest Valid Generation" in content
+        assert "## Lowest-memory Usable Models (Including Caveats)" in content
+        assert "## Fastest Usable Models (Including Caveats)" in content
         assert "> [!NOTE]" not in content
         assert "Describe this image fully." in content
         assert "```text\nDescribe this image fully." not in content
@@ -3725,7 +3769,8 @@ class TestMarkdownGalleryReport:
 
         content = out.read_text(encoding="utf-8")
         chooser_row = next(line for line in content.splitlines() if "org/thinking" in line)
-        assert "usable_with_caveats" in chooser_row
+        assert "`usable`" in chooser_row
+        assert "none" in chooser_row
         assert "### org/thinking" in content
         assert "### ⚠️ org/thinking" not in content
 
@@ -4060,8 +4105,8 @@ class TestMarkdownGalleryReport:
         headings = [
             "## Current-run Chooser",
             "## Avoid for This Run",
-            "## Lowest-memory Usable Models",
-            "## Fastest Valid Generation",
+            "## Lowest-memory Usable Models (Including Caveats)",
+            "## Fastest Usable Models (Including Caveats)",
             "## Complete Per-model Evidence",
         ]
         assert [content.index(heading) for heading in headings] == sorted(
@@ -4333,16 +4378,16 @@ class TestMarkdownGalleryReport:
         avoid = _extract_markdown_subsection(
             content,
             "## Avoid for This Run",
-            end_headings=("## Lowest-memory Usable Models",),
+            end_headings=("## Lowest-memory Usable Models (Including Caveats)",),
         )
         memory = _extract_markdown_subsection(
             content,
-            "## Lowest-memory Usable Models",
-            end_headings=("## Fastest Valid Generation",),
+            "## Lowest-memory Usable Models (Including Caveats)",
+            end_headings=("## Fastest Usable Models (Including Caveats)",),
         )
         speed = _extract_markdown_subsection(
             content,
-            "## Fastest Valid Generation",
+            "## Fastest Usable Models (Including Caveats)",
             end_headings=("## Complete Per-model Evidence",),
         )
         assert avoid.index("org/a-unusable") < avoid.index("org/z-unusable")
