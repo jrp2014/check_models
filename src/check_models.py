@@ -14990,6 +14990,12 @@ def save_run_json_report(
     """Write stable run-level metadata for public benchmark snapshots."""
     policy = report_context.mode_policy
     counts = _run_outcome_counts(report_context.assessments)
+    artifacts = {key: _home_relative_report_text(value) for key, value in output_paths.items()}
+    if any(
+        assessment.execution == "indeterminate" or assessment.maintainer_status != "none"
+        for _model_name, assessment in report_context.assessments
+    ):
+        artifacts["run_issue_summary"] = "issues/run_summary.md"
     payload: RunJsonReportRecord = {
         "schema_version": "2.0",
         "generated_at": local_now_str(),
@@ -14999,9 +15005,7 @@ def save_run_json_report(
         "metadata_exposed_to_prompt": policy.metadata_exposed_to_prompt,
         "total_runtime_seconds": round(total_runtime_seconds, 3),
         "counts": counts,
-        "artifacts": {
-            key: _home_relative_report_text(value) for key, value in output_paths.items()
-        },
+        "artifacts": artifacts,
         "library_versions": dict(versions),
         "component_provenance": _collect_component_provenance(versions),
         "producer": producer or _collect_check_models_provenance(),
@@ -15991,32 +15995,6 @@ def _issue_repro_portable_path_ref(raw_ref: str, *, fallback: str) -> str:
         return candidate_path.name or fallback
 
 
-def _issue_repro_image_ref(
-    *,
-    image_path: Path | None,
-    run_args: argparse.Namespace | None,
-) -> str:
-    """Return an image reference suitable for native upstream repro commands."""
-    raw_ref: str | None = None
-    if image_path is not None:
-        raw_ref = str(image_path)
-    elif run_args is not None:
-        arg_image = getattr(run_args, "image", None)
-        if isinstance(arg_image, Path):
-            raw_ref = str(arg_image)
-        elif isinstance(arg_image, str) and arg_image:
-            raw_ref = arg_image
-        elif isinstance(arg_image, Sequence) and not isinstance(arg_image, str | bytes | bytearray):
-            for candidate in arg_image:
-                if candidate:
-                    raw_ref = str(candidate)
-                    break
-
-    if not raw_ref:
-        return "path/to/repro-image.jpg"
-    return _issue_repro_portable_path_ref(raw_ref, fallback="path/to/repro-image.jpg")
-
-
 def _issue_public_image_source_url(run_args: argparse.Namespace | None) -> str | None:
     """Return validated public source metadata from an executed argument set."""
     source_url = getattr(run_args, "image_source_url", None) if run_args is not None else None
@@ -16332,106 +16310,6 @@ def build_native_mlx_vlm_repro_command_spec(
     )
 
 
-def _python_repro_string_literal(value: str) -> str:
-    """Return a Ruff-stable Python string literal for native repro scripts."""
-    if '"' in value and "'" not in value:
-        return repr(value)
-    return json.dumps(value, ensure_ascii=False)
-
-
-def _python_repro_literal(value: object) -> str:
-    """Render the bounded native-repro value types as valid Python literals."""
-    if isinstance(value, str):
-        return _python_repro_string_literal(value)
-    if value is None or isinstance(value, bool | int | float):
-        return repr(value)
-    if isinstance(value, Mapping):
-        items = ", ".join(
-            f"{_python_repro_literal(key)}: {_python_repro_literal(item)}"
-            for key, item in value.items()
-        )
-        return f"{{{items}}}"
-    if isinstance(value, tuple):
-        items = ", ".join(_python_repro_literal(item) for item in value)
-        suffix = "," if len(value) == 1 else ""
-        return f"({items}{suffix})"
-    if isinstance(value, Sequence) and not isinstance(value, str | bytes | bytearray):
-        items = ", ".join(_python_repro_literal(item) for item in value)
-        return f"[{items}]"
-    return _python_repro_string_literal(str(value))
-
-
-def _python_repro_mapping_assignment(name: str, values: Mapping[str, object]) -> str:
-    """Render one formatter-stable multiline mapping assignment."""
-    if not values:
-        return f"{name} = {{}}"
-    lines = [f"{name} = {{"]
-    lines.extend(
-        f"    {_python_repro_literal(key)}: {_python_repro_literal(value)},"
-        for key, value in values.items()
-    )
-    lines.append("}")
-    return "\n".join(lines)
-
-
-def _build_parameterized_mlx_vlm_python_script(
-    *,
-    prompt_file_name: str,
-    image_ref: str,
-    run_args: argparse.Namespace | None,
-) -> str:
-    """Build one native mlx-vlm script parameterised by model and revision."""
-    load_kwargs = _native_mlx_vlm_load_kwargs(run_args)
-    load_kwargs.pop("revision", None)
-    template_kwargs = _native_mlx_vlm_template_kwargs(run_args)
-    generate_kwargs = _native_mlx_vlm_generate_kwargs(run_args)
-    return "\n".join(
-        (
-            "import argparse",
-            "from pathlib import Path",
-            "",
-            "from mlx_vlm.generate import generate",
-            "from mlx_vlm.prompt_utils import apply_chat_template",
-            "from mlx_vlm.utils import load",
-            "",
-            _python_repro_mapping_assignment("LOAD_KWARGS", load_kwargs),
-            _python_repro_mapping_assignment("TEMPLATE_KWARGS", template_kwargs),
-            _python_repro_mapping_assignment("GENERATE_KWARGS", generate_kwargs),
-            "",
-            "parser = argparse.ArgumentParser()",
-            'parser.add_argument("model")',
-            'parser.add_argument("--revision")',
-            'parser.add_argument("--image", required=True)',
-            'parser.add_argument("--prompt-file", required=True)',
-            "args = parser.parse_args()",
-            'prompt = Path(args.prompt_file).read_text(encoding="utf-8")',
-            "load_kwargs = LOAD_KWARGS.copy()",
-            "if args.revision:",
-            '    load_kwargs["revision"] = args.revision',
-            "model, processor = load(args.model, **load_kwargs)",
-            "formatted_prompt = apply_chat_template(",
-            "    processor,",
-            "    model.config,",
-            "    prompt,",
-            "    num_images=1,",
-            "    **TEMPLATE_KWARGS,",
-            ")",
-            "if isinstance(formatted_prompt, list):",
-            '    formatted_prompt = "\\n".join(str(message) for message in formatted_prompt)',
-            "result = generate(",
-            "    model,",
-            "    processor,",
-            "    formatted_prompt,",
-            "    image=args.image,",
-            "    **GENERATE_KWARGS,",
-            ")",
-            "print(result.text)",
-            "",
-            f"# Defaults used in the report: {prompt_file_name}, {image_ref}",
-        )
-    )
-
-
 def _diagnostics_shared_context_blocks(
     *,
     prompt: str,
@@ -16443,8 +16321,11 @@ def _diagnostics_shared_context_blocks(
     run_args: argparse.Namespace | None,
 ) -> tuple[ReportBlock, ...]:
     """Build single-copy prompt, reproduction, and environment context."""
-    prompt_file_name = "prompt.txt"
-    image_ref = _issue_repro_image_ref(image_path=image_path, run_args=run_args)
+    image = _run_image_record(
+        image_path,
+        _load_image_input_profile(image_path),
+        source_url=_issue_public_image_source_url(run_args),
+    )
     model_rows = tuple(
         (
             result.model_name,
@@ -16464,17 +16345,6 @@ def _diagnostics_shared_context_blocks(
             system_keys=_DIAGNOSTICS_SYSTEM_KEYS,
         )
     )
-    example_tokens = [
-        "python",
-        "reproduce.py",
-        "MODEL_ID",
-        "--revision",
-        "RESOLVED_REVISION",
-        "--image",
-        image_ref,
-        "--prompt-file",
-        prompt_file_name,
-    ]
     model_block: ReportBlock = (
         ReportTable(("Model", "Resolved revision"), model_rows)
         if model_rows
@@ -16489,28 +16359,17 @@ def _diagnostics_shared_context_blocks(
         _report_section(
             "Shared Reproduction and Provenance",
             _report_section(
-                "Prompt",
-                ReportParagraph(f"Save this exact prompt as {prompt_file_name}."),
-                ReportCodeBlock(prompt),
+                "Reproduction inputs",
+                *_reproduction_input_blocks(
+                    model_name="MODEL_ID",
+                    prompt=prompt,
+                    image=image,
+                    run_args=run_args,
+                    resolved_revision="RESOLVED_REVISION",
+                ),
                 level=3,
             ),
             _report_section("Highlighted model revisions", model_block, level=3),
-            _report_section(
-                "Canonical parameterised Python reproduction",
-                ReportParagraph(
-                    "Run one model per process to avoid sequential Metal-state interactions."
-                ),
-                ReportCodeBlock(shlex_join(example_tokens), language="bash"),
-                ReportCodeBlock(
-                    _build_parameterized_mlx_vlm_python_script(
-                        prompt_file_name=prompt_file_name,
-                        image_ref=image_ref,
-                        run_args=run_args,
-                    ),
-                    language="python",
-                ),
-                level=3,
-            ),
             _report_section("Components and system", component_block, level=3),
         ),
     )

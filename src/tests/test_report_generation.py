@@ -8,8 +8,6 @@ import io
 import json
 import logging
 import re
-import subprocess
-import sys
 from argparse import Namespace
 from dataclasses import dataclass, replace
 from pathlib import Path
@@ -1743,6 +1741,7 @@ def test_public_failure_evidence_sanitizes_paths_without_mutating_model_text(
     assert run_payload["artifacts"] == {
         "external": "~/published/results.html",
         "private": "<private>/tmp/results.jsonl",
+        "run_issue_summary": "issues/run_summary.md",
     }
 
 
@@ -2349,9 +2348,10 @@ def test_diagnostics_are_skim_first_and_share_reproduction_context_once(
     assert "CLEAN-OUTPUT-MUST-NOT-APPEAR" not in diagnostics
     assert "SECOND-CLEAN-OUTPUT-MUST-NOT-APPEAR" not in diagnostics
     assert diagnostics.count(prompt) == 1
-    assert diagnostics.count("from mlx_vlm.generate import generate") == 1
-    assert diagnostics.count("Canonical parameterised Python reproduction") == 1
-    assert "--prompt-file prompt.txt" in diagnostics
+    assert diagnostics.count("The original local input is not published") == 1
+    assert diagnostics.count("Exact prompt") == 1
+    assert "reproduce.py" not in diagnostics
+    assert "prompt.txt" not in diagnostics
     assert "python -m mlx_vlm.generate" not in diagnostics
     for model in ("org/crash", "org/observed", "org/network"):
         assert model in diagnostics
@@ -2363,7 +2363,9 @@ def test_diagnostics_are_skim_first_and_share_reproduction_context_once(
     assert "CLEAN-OUTPUT-MUST-NOT-APPEAR" not in maintainer_html
     assert "OBSERVED-OUTPUT-MUST-APPEAR" in maintainer_html
     assert 'href="#diagnostic-org-crash"' in maintainer_html
-    assert html_report.count("from mlx_vlm.generate import generate") == 1
+    assert html_report.count("The original local input is not published") == 1
+    assert "reproduce.py" not in html_report
+    assert "prompt.txt" not in html_report
 
 
 def test_html_chooser_is_sortable_and_surfaces_prefill_first_token_time(
@@ -2496,7 +2498,9 @@ def test_crash_diagnostics_and_issue_draft_keep_complete_primary_evidence_first(
         assert "LlavaProcessor" in content
         assert "LlamaTokenizerFast" in content
     assert "python -m mlx_vlm.generate" not in diagnostics_content
-    assert "Canonical parameterised Python reproduction" in diagnostics_content
+    assert "The original local input is not published" in diagnostics_content
+    assert "reproduce.py" not in diagnostics_content
+    assert "prompt.txt" not in diagnostics_content
     for content in (diagnostics_content, issue_content):
         assert content.index("#### Root exception and chain") < content.index(
             "#### Execution and provenance"
@@ -2652,8 +2656,10 @@ def test_diagnostics_distinguish_empty_output_from_unavailable_evidence(tmp_path
     assert "Captured stdout/stderr" not in missing_entry
 
 
-def test_diagnostics_use_run_args_for_complete_native_reproduction(tmp_path: Path) -> None:
-    """Diagnostics should preserve the actual run's CLI and Python reproduction settings."""
+def test_diagnostics_describe_local_reproduction_input_without_fake_command(
+    tmp_path: Path,
+) -> None:
+    """Diagnostics should preserve local input facts without inventing a runnable command."""
     result = replace(
         _make_failure_with_details("org/repro", error_msg="decode failed"),
         prompt_diagnostics=check_models.PromptDiagnostics(
@@ -2745,24 +2751,17 @@ def test_diagnostics_use_run_args_for_complete_native_reproduction(tmp_path: Pat
         assert f"- *Resolved model revision:* {resolved_revision}" in content
         assert "- *Requested model revision:* run-revision" in content
         assert '- *Configured EOS token override:* ["&lt;override-eos&gt;"]' in content
-    for setting in (
-        '    "top_p": 0.81,',
-        '    "min_p": 0.12,',
-        '    "top_k": 7,',
-        '    "seed": 73,',
-        '    "repetition_penalty": 1.15,',
-        '    "presence_penalty": 0.3,',
-        '    "frequency_penalty": 0.2,',
-        '    "eos_tokens": ["<override-eos>"],',
-        '    "enable_thinking": True,',
-        '    "cropping": False,',
-    ):
-        assert setting in diagnostics_content
     assert "Supplemental CLI reproduction" not in diagnostics_content
-    assert "Canonical parameterised Python reproduction" in diagnostics_content
-    assert "--prompt-file prompt.txt" in diagnostics_content
+    assert "The original local input is not published" in diagnostics_content
+    assert "reproduce.py" not in diagnostics_content
+    assert "prompt.txt" not in diagnostics_content
+    assert "python -m mlx_vlm.generate" not in diagnostics_content
     assert resolved_revision in diagnostics_content
-    assert 'parser.add_argument("model")' in diagnostics_content
+    assert "Reproduction inputs" in diagnostics_content
+    assert "JPEG" in diagnostics_content
+    assert "17,235 bytes" in diagnostics_content
+    assert "251712968e443405f6e1ff145de15a91a082dc073209938c5305db0e8e80134c" in diagnostics_content
+    assert "check_models-task9-fixture.jpg" not in diagnostics_content
     assert "Reproduction inputs" in issue_content
     assert "The original local input is not published" in issue_content
     assert "JPEG" in issue_content
@@ -2771,20 +2770,6 @@ def test_diagnostics_use_run_args_for_complete_native_reproduction(tmp_path: Pat
     assert "Supplemental CLI reproduction" not in issue_content
     assert "Canonical Python reproduction script" not in issue_content
     assert "check_models-task9-fixture.jpg" not in issue_content
-
-    python_script = diagnostics_content.split("```python\n", maxsplit=1)[1].split(
-        "\n```", maxsplit=1
-    )[0]
-    compile(python_script, "<native-repro>", "exec")
-    script_path = tmp_path / "native_repro.py"
-    script_path.write_text(python_script + "\n", encoding="utf-8")
-    format_check = subprocess.run(  # noqa: S603 - fixed interpreter checks test output
-        [sys.executable, "-m", "ruff", "format", "--check", str(script_path)],
-        check=False,
-        capture_output=True,
-        text=True,
-    )
-    assert format_check.returncode == 0, format_check.stdout + format_check.stderr
 
 
 def test_crash_issue_draft_builds_complete_public_image_reproduction(tmp_path: Path) -> None:
@@ -3117,6 +3102,7 @@ class TestHtmlReportEdgeCases:
         context = _build_report_render_context(results=[result], prompt="Describe the image.")
         output = tmp_path / "results.html"
         image_path = tmp_path / "sample image.jpg"
+        Image.new("RGB", (12, 8), "blue").save(image_path)
         run_args = Namespace(
             adapter_path=tmp_path / "adapter",
             revision="refs/pr/42",
@@ -3128,6 +3114,7 @@ class TestHtmlReportEdgeCases:
             max_tokens=321,
             temperature=0.42,
             processor_kwargs={"cropping": False},
+            image_source_url="https://example.test/images/cats.jpg",
         )
 
         generate_html_report(
@@ -3143,16 +3130,13 @@ class TestHtmlReportEdgeCases:
 
         content = html.unescape(output.read_text(encoding="utf-8"))
         assert "<li><b>Requested model revision:</b> refs/pr/42</li>" in content
-        assert "Canonical parameterised Python reproduction" in content
-        assert '    "max_tokens": 321,' in content
-        assert '    "temperature": 0.42,' in content
-        assert '    "adapter_path":' in content
-        assert 'LOAD_KWARGS = {\n    "trust_remote_code": False,' in content
-        assert '    "revision": "refs/pr/42",' not in content
-        assert 'load_kwargs["revision"] = args.revision' in content
-        assert 'TEMPLATE_KWARGS = {\n    "enable_thinking": True,' in content
-        assert '    "thinking_budget": 19,' in content
-        assert '    "cropping": False,' in content
+        assert "curl --fail --location" in content
+        assert "shasum -a 256 --check" in content
+        assert "python -m mlx_vlm.generate" in content
+        assert "MODEL_ID" in content
+        assert "RESOLVED_REVISION" in content
+        assert "reproduce.py" not in content
+        assert "prompt.txt" not in content
 
     def test_html_preserves_complete_escaped_output_in_expandable_evidence(
         self,

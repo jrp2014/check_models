@@ -339,6 +339,43 @@ def test_save_run_json_report_captures_public_snapshot_contract(
     }
 
 
+def test_run_json_artifact_manifest_includes_summary_only_for_surfaced_results(
+    tmp_path: Path,
+) -> None:
+    """The optional paste-ready issue artifact should follow the cached assessment."""
+    result = PerformanceResult(
+        model_name="org/empty-output",
+        generation=MockGeneration(text="", generation_tokens=0),
+        success=True,
+    )
+    context = check_models._build_report_render_context(
+        results=[result],
+        prompt="Describe this image.",
+    )
+    out = tmp_path / "run.json"
+
+    check_models.save_run_json_report(
+        [result],
+        out,
+        versions={},
+        prompt="Describe this image.",
+        total_runtime_seconds=1.0,
+        report_context=context,
+        output_paths={"run_json": "run.json"},
+        producer={
+            "name": "check_models",
+            "version": "test",
+            "git_revision": None,
+            "install_type": "unknown",
+        },
+    )
+
+    assert json.loads(out.read_text(encoding="utf-8"))["artifacts"] == {
+        "run_issue_summary": "issues/run_summary.md",
+        "run_json": "run.json",
+    }
+
+
 def test_run_json_counts_completed_crashed_and_indeterminate_results_consistently(
     tmp_path: Path,
 ) -> None:
