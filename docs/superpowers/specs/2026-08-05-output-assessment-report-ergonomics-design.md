@@ -80,12 +80,26 @@ Generated reports in tests go to temporary paths. The fresh tracked
 `src/output/` run is not regenerated or edited. After focused tests, run the
 repository-prescribed format, safe lint-fix/lint, and full quality gates.
 
-## Follow-up skills inventory
+## Project guidance adaptation
 
-After the implementation, capture a separate project note that identifies the
-existing mlx-vlm skills worth retaining and the highest-value missing recurring
-workflows. This is an inventory and prioritised follow-up, not an expansion into
-multiple new skill implementations in this change.
+Before implementation, selectively adapt the existing project guidance instead
+of importing complete external skills:
+
+- add the agreed thinking-output and reproduction preferences to the canonical
+  repository instructions;
+- teach `native-mlx-vlm-repro` to distinguish a valid closed thinking section
+  from missing, incomplete, or truncated final output and to distinguish an exact
+  public input from a sanitised preview;
+- teach `upstream-mlx-vlm-issues` not to treat a closed thinking section as an
+  upstream defect and to require native evidence for missing or malformed final
+  output;
+- leave `hf-cache-mlx-vlm-models` focused on cache eligibility because these
+  conventions are outside its trigger boundary.
+
+After implementation, record any remaining high-value recurring workflow gaps.
+Do not create a new skill unless the work demonstrates a reusable judgment-heavy
+procedure that is not already covered by repository instructions or the adapted
+skills.
 
 ## Documentation hygiene
 
