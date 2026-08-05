@@ -126,12 +126,7 @@ CATALOG_PROMPT = (
                 "<think>Inspect the scene.</think> A blue boat rests on calm water.",
                 model_name="example/thinking-model",
             ),
-            check_models.ResultAssessment(
-                "completed",
-                "usable_with_caveats",
-                "observation_needs_reproduction",
-                ("thinking_trace_present",),
-            ),
+            check_models.ResultAssessment("completed", "usable", "none", ()),
             id="thinking-trace",
         ),
         pytest.param(
@@ -141,9 +136,9 @@ CATALOG_PROMPT = (
             ),
             check_models.ResultAssessment(
                 "completed",
-                "usable_with_caveats",
+                "unusable",
                 "observation_needs_reproduction",
-                ("thinking_trace_present", "thinking_trace_incomplete"),
+                ("thinking_trace_incomplete",),
             ),
             id="incomplete-thinking-trace",
         ),
@@ -372,13 +367,76 @@ def test_empty_thinking_wrapper_is_neutral() -> None:
     )
 
 
-def test_thinking_trace_observation_is_model_name_invariant() -> None:
+def test_closed_thinking_trace_is_neutral_and_model_name_invariant() -> None:
     text = "<think>Inspect the scene.</think> A blue boat rests on calm water."
     plain = _result(text, model_name="example/plain-model")
     named = _result(text, model_name="example/thinking-model")
 
     assert check_models._assess_result(plain) == check_models._assess_result(named)
-    assert check_models._assess_result(plain).observations == ("thinking_trace_present",)
+    assert check_models._assess_result(plain) == check_models.ResultAssessment(
+        "completed", "usable", "none", ()
+    )
+    assert check_models._observation_details(plain)["thinking_trace_markers"] == [
+        "<think>",
+        "</think>",
+    ]
+
+
+def test_closed_thinking_trace_without_final_answer_is_unusable() -> None:
+    result = _result("<think>Inspect the scene.</think>")
+
+    assert check_models._assess_result(result) == check_models.ResultAssessment(
+        "completed",
+        "unusable",
+        "observation_needs_reproduction",
+        ("missing_final_answer",),
+    )
+
+
+def test_prompt_seeded_thinking_open_is_closed_by_generated_marker() -> None:
+    result = check_models.PerformanceResult(
+        model_name="example/seeded-thinking",
+        success=True,
+        generation=_Generation(
+            "Inspect the scene.</done> Two cats sleep on a pink couch.",
+            generation_tokens=18,
+        ),
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            rendered_prompt_preview="<image>Describe this image.<reason>",
+            generate_kwargs={
+                "thinking_start_token": "<reason>",
+                "thinking_end_token": "</done>",
+            },
+        ),
+    )
+
+    context = check_models._build_report_render_context(
+        results=[result],
+        prompt="Describe this image.",
+        system_info={},
+    )
+    enriched = context.result_set.results[0]
+    assert dict(context.assessments)[result.model_name] == check_models.ResultAssessment(
+        "completed", "usable", "none", ()
+    )
+    assert check_models._observation_details(enriched)["thinking_trace_markers"] == [
+        "<reason>",
+        "</done>",
+    ]
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "The image contains two resting cats, and the next detail is The",
+        "Based on the image, here is the requested description:\n\n*   **",
+    ],
+)
+def test_degraded_token_cap_is_unusable(text: str) -> None:
+    result = _result(text, generated_tokens=500, requested_max_tokens=500)
+
+    assert check_models._assess_result(result).usability == "unusable"
+    assert "token_cap_truncation" in check_models._assess_result(result).observations
 
 
 def test_configured_thinking_delimiters_are_observed_without_model_name_policy() -> None:
@@ -405,10 +463,7 @@ def test_configured_thinking_delimiters_are_observed_without_model_name_policy()
     )
 
     assessment = dict(context.assessments)[result.model_name]
-    assert assessment.observations == (
-        "configured_wrapper_present",
-        "thinking_trace_present",
-    )
+    assert assessment == check_models.ResultAssessment("completed", "usable", "none", ())
 
 
 def test_configured_special_token_is_not_unexpected() -> None:
@@ -469,7 +524,6 @@ def test_declared_generation_wrappers_are_neutral_without_model_name_policy() ->
     ]
     assert dict(context.assessments)[result.model_name].observations == (
         "configured_wrapper_present",
-        "thinking_trace_present",
     )
 
 

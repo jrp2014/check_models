@@ -906,6 +906,7 @@ type ObservationCode = Literal[
     "empty_output",
     "minimal_output",
     "repeated_output",
+    "missing_final_answer",
     "missing_requested_sections",
     "token_cap_truncation",
     "prompt_instruction_echo",
@@ -3736,6 +3737,7 @@ class ReasoningOutputSignals:
 
     has_thinking_trace: bool = False
     thinking_trace_incomplete: bool = False
+    thinking_only_output: bool = False
     thinking_trace_markers: tuple[str, ...] = ()
 
 
@@ -3743,6 +3745,7 @@ def _detect_reasoning_output(
     text: str,
     *,
     delimiter_pairs: Sequence[tuple[str, str]] = THINKING_TRACE_DELIMITER_PAIRS,
+    seeded_text: str = "",
 ) -> ReasoningOutputSignals:
     """Detect explicit reasoning delimiters without inferring policy from model names."""
     if not text:
@@ -3756,21 +3759,35 @@ def _detect_reasoning_output(
         )
         semantic_text = empty_wrapper.sub(" ", semantic_text)
     text_lower: str = semantic_text.casefold()
+    seeded_lower = seeded_text.casefold()
     thinking_trace_markers: list[str] = []
     thinking_trace_incomplete = False
+    thinking_only_output = False
     for start_marker, end_marker in delimiter_pairs:
-        if start_marker.casefold() not in text_lower:
+        start_lower = start_marker.casefold()
+        end_lower = end_marker.casefold()
+        start_position = text_lower.find(start_lower)
+        if start_position < 0 and start_lower not in seeded_lower:
             continue
         thinking_trace_markers.append(start_marker)
-        if end_marker.casefold() in text_lower:
+        end_position = text_lower.find(
+            end_lower,
+            start_position + len(start_marker) if start_position >= 0 else 0,
+        )
+        if end_position >= 0:
             thinking_trace_markers.append(end_marker)
+            final_text = semantic_text[end_position + len(end_marker) :]
+            thinking_only_output = thinking_only_output or not bool(
+                re.search(r"[^\W_]", final_text, re.UNICODE)
+            )
         else:
             thinking_trace_incomplete = True
 
     return ReasoningOutputSignals(
         has_thinking_trace=bool(thinking_trace_markers),
         thinking_trace_incomplete=thinking_trace_incomplete,
-        thinking_trace_markers=tuple(thinking_trace_markers),
+        thinking_only_output=thinking_only_output,
+        thinking_trace_markers=tuple(_dedupe_preserve_order(thinking_trace_markers)),
     )
 
 
@@ -3835,6 +3852,7 @@ def _detect_likely_cutoff(
     requested_max_tokens: int | None,
     is_repetitive: bool,
     missing_sections: Sequence[str],
+    thinking_trace_incomplete: bool = False,
 ) -> tuple[bool, list[str]]:
     """Detect likely early termination at the generation cap.
 
@@ -3854,11 +3872,15 @@ def _detect_likely_cutoff(
         reasons.append("missing_sections")
     if is_repetitive:
         reasons.append("repetitive_tail")
+    if thinking_trace_incomplete:
+        reasons.append("incomplete_thinking_trace")
     if tail:
         if re.search(r"(title|description|keywords)\s*:?\s*$", tail, re.IGNORECASE):
             reasons.append("unfinished_section")
         if tail[-1].isalnum() and not re.search(r"[.!?\"')\]]\s*$", tail):
             reasons.append("abrupt_tail")
+        if re.search(r"(?:^|\n)\s*(?:[-+*]|\d+[.)])(?:\s+\*{1,3})?\s*$", tail):
+            reasons.append("dangling_markdown")
     return True, _dedupe_preserve_order(reasons)
 
 
@@ -3955,6 +3977,7 @@ class GenerationQualityAnalysis:
     missing_sections: list[str] = dataclass_field(default_factory=list)
     has_thinking_trace: bool = False
     thinking_trace_incomplete: bool = False
+    thinking_only_output: bool = False
     thinking_trace_markers: list[str] = dataclass_field(default_factory=list)
     word_count: int = 0
     prompt_checks_ran: bool = False
@@ -3986,6 +4009,7 @@ class PromptQualitySignals:
 
     has_thinking_trace: bool = False
     thinking_trace_incomplete: bool = False
+    thinking_only_output: bool = False
     thinking_trace_markers: tuple[str, ...] = ()
     instruction_echo: bool = False
     instruction_echo_fragments: tuple[str, ...] = ()
@@ -4047,17 +4071,20 @@ def _collect_prompt_quality_signals(
     prompt: str | None,
     context_marker: str,
     thinking_trace_delimiters: Sequence[tuple[str, str]],
+    seeded_thinking_text: str,
 ) -> PromptQualitySignals:
     """Collect only prompt-aware signals used by the reduced assessment."""
     reasoning_signals = _detect_reasoning_output(
         raw_text or text,
         delimiter_pairs=thinking_trace_delimiters,
+        seeded_text=seeded_thinking_text,
     )
     instruction_echo, instruction_markers = _detect_instruction_echo(text, prompt)
     if not prompt:
         return PromptQualitySignals(
             has_thinking_trace=reasoning_signals.has_thinking_trace,
             thinking_trace_incomplete=reasoning_signals.thinking_trace_incomplete,
+            thinking_only_output=reasoning_signals.thinking_only_output,
             thinking_trace_markers=reasoning_signals.thinking_trace_markers,
             instruction_echo=instruction_echo,
             instruction_echo_fragments=tuple(instruction_markers),
@@ -4102,6 +4129,7 @@ def _collect_prompt_quality_signals(
     return PromptQualitySignals(
         has_thinking_trace=reasoning_signals.has_thinking_trace,
         thinking_trace_incomplete=reasoning_signals.thinking_trace_incomplete,
+        thinking_only_output=reasoning_signals.thinking_only_output,
         thinking_trace_markers=reasoning_signals.thinking_trace_markers,
         instruction_echo=instruction_echo,
         instruction_echo_fragments=tuple(instruction_markers),
@@ -4127,6 +4155,7 @@ def analyze_generation_text(
     known_special_tokens: Sequence[str] = (),
     configured_generation_wrappers: Sequence[str] = (),
     thinking_trace_delimiters: Sequence[tuple[str, str]] = THINKING_TRACE_DELIMITER_PAIRS,
+    seeded_thinking_text: str = "",
 ) -> GenerationQualityAnalysis:
     """Collect mechanical output observations and recorded runtime facts."""
     normalized = _normalize_output_for_analysis(
@@ -4141,6 +4170,7 @@ def analyze_generation_text(
         prompt=prompt,
         context_marker=context_marker,
         thinking_trace_delimiters=thinking_trace_delimiters,
+        seeded_thinking_text=seeded_thinking_text,
     )
     prompt_tokens_text_est = _estimate_prompt_tokens_from_text(prompt)
     prompt_tokens_nontext_est = (
@@ -4154,6 +4184,7 @@ def analyze_generation_text(
         requested_max_tokens=requested_max_tokens,
         is_repetitive=is_repetitive,
         missing_sections=prompt_signals.missing_sections,
+        thinking_trace_incomplete=prompt_signals.thinking_trace_incomplete,
     )
     leakage_text = text
     for token in normalized.removed_wrappers:
@@ -4177,6 +4208,7 @@ def analyze_generation_text(
         missing_sections=list(prompt_signals.missing_sections),
         has_thinking_trace=prompt_signals.has_thinking_trace,
         thinking_trace_incomplete=prompt_signals.thinking_trace_incomplete,
+        thinking_only_output=prompt_signals.thinking_only_output,
         thinking_trace_markers=list(prompt_signals.thinking_trace_markers),
         word_count=len(re.findall(r"\b\w+\b", analysis_text)),
         prompt_checks_ran=bool(prompt),
@@ -4214,6 +4246,7 @@ def _analyze_text_quality(
     known_special_tokens: Sequence[str] = (),
     configured_generation_wrappers: Sequence[str] = (),
     thinking_trace_delimiters: Sequence[tuple[str, str]] = THINKING_TRACE_DELIMITER_PAIRS,
+    seeded_thinking_text: str = "",
 ) -> tuple[GenerationQualityAnalysis, str | None]:
     """Return mechanical quality analysis plus a compact log-only label string."""
     analysis = analyze_generation_text(
@@ -4226,6 +4259,7 @@ def _analyze_text_quality(
         known_special_tokens=known_special_tokens,
         configured_generation_wrappers=configured_generation_wrappers,
         thinking_trace_delimiters=thinking_trace_delimiters,
+        seeded_thinking_text=seeded_thinking_text,
     )
     return analysis, _build_quality_issues_string(analysis)
 
@@ -7097,6 +7131,7 @@ def _gallery_row(result: PerformanceResult, assessment: ResultAssessment) -> Gal
 _OBSERVATION_DISPLAY_PRIORITY: Final[tuple[ObservationCode, ...]] = (
     "empty_output",
     "repeated_output",
+    "missing_final_answer",
     "unexpected_special_token",
     "missing_requested_sections",
     "prompt_instruction_echo",
@@ -7116,6 +7151,7 @@ _OBSERVATION_DISPLAY_LABELS: Final[dict[ObservationCode, str]] = {
     "empty_output": "No response text was returned",
     "minimal_output": "Response is unusually short",
     "repeated_output": "Response repeats the same text",
+    "missing_final_answer": "Internal reasoning is present but no final answer was returned",
     "missing_requested_sections": "Required fields are missing or empty",
     "token_cap_truncation": "Response appears cut off at the token limit",
     "prompt_instruction_echo": (
@@ -7472,9 +7508,12 @@ _UNUSABLE_OBSERVATIONS: Final[frozenset[ObservationCode]] = frozenset(
     {
         "empty_output",
         "repeated_output",
+        "missing_final_answer",
         "missing_requested_sections",
+        "token_cap_truncation",
         "prompt_instruction_echo",
         "unexpected_catalog_preamble",
+        "thinking_trace_incomplete",
     }
 )
 
@@ -7532,20 +7571,20 @@ def _assessment_observations(result: PerformanceResult) -> tuple[ObservationCode
         observations.append("repeated_output")
     if analysis is None:
         return tuple(observations)
+    non_thinking_wrappers = set(analysis.configured_generation_wrappers).difference(
+        analysis.thinking_trace_markers
+    )
     candidates: tuple[tuple[bool, ObservationCode], ...] = (
         (bool(analysis.missing_sections), "missing_requested_sections"),
         (
-            analysis.likely_capped
-            and bool(
-                is_repetitive or analysis.missing_sections or analysis.thinking_trace_incomplete
-            ),
+            analysis.likely_capped and bool(analysis.token_cap_reasons),
             "token_cap_truncation",
         ),
         (analysis.instruction_echo, "prompt_instruction_echo"),
         (bool(analysis.unexpected_catalog_preamble), "unexpected_catalog_preamble"),
         (bool(analysis.unexpected_special_tokens), "unexpected_special_token"),
-        (bool(analysis.configured_generation_wrappers), "configured_wrapper_present"),
-        (analysis.has_thinking_trace, "thinking_trace_present"),
+        (bool(non_thinking_wrappers), "configured_wrapper_present"),
+        (analysis.thinking_only_output, "missing_final_answer"),
         (analysis.thinking_trace_incomplete, "thinking_trace_incomplete"),
         (bool(analysis.role_boundary_tokens), "role_boundary_token_present"),
         (
@@ -13793,20 +13832,12 @@ def _build_quality_issues_string(analysis: GenerationQualityAnalysis) -> str | N
             f"missing-sections({'+'.join(analysis.missing_sections)})",
         ),
         (analysis.thinking_trace_incomplete, "thinking-incomplete"),
-        (
-            analysis.has_thinking_trace and not analysis.thinking_trace_incomplete,
-            "thinking-trace",
-        ),
+        (analysis.thinking_only_output, "missing-final-answer"),
         (analysis.instruction_echo, "instruction-echo"),
         (bool(analysis.unexpected_catalog_preamble), "unexpected-catalog-preamble"),
         (bool(analysis.unexpected_special_tokens), "unexpected-special-token"),
         (
-            analysis.likely_capped
-            and bool(
-                analysis.is_repetitive
-                or analysis.missing_sections
-                or analysis.thinking_trace_incomplete
-            ),
+            analysis.likely_capped and bool(analysis.token_cap_reasons),
             "token-cap-truncation",
         ),
         (analysis.keyword_overlap == "no_overlap", "no-keyword-overlap"),
@@ -13896,6 +13927,12 @@ def _populate_result_quality_analysis(
         known_special_tokens=_configured_output_wrappers(result.prompt_diagnostics),
         configured_generation_wrappers=_configured_generation_wrappers(result.prompt_diagnostics),
         thinking_trace_delimiters=thinking_trace_delimiters,
+        seeded_thinking_text=(
+            result.prompt_diagnostics.rendered_prompt_preview
+            if result.prompt_diagnostics is not None
+            and result.prompt_diagnostics.rendered_prompt_preview is not None
+            else ""
+        ),
     )
     return replace(
         result,
@@ -14957,6 +14994,7 @@ _RUN_ISSUE_OBSERVATION_VALUES: Final[frozenset[str]] = frozenset(
         "empty_output",
         "minimal_output",
         "repeated_output",
+        "missing_final_answer",
         "missing_requested_sections",
         "token_cap_truncation",
         "prompt_instruction_echo",

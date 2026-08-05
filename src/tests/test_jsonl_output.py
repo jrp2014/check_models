@@ -797,6 +797,30 @@ def test_jsonl_assessment_retains_factual_observation_evidence(tmp_path: Path) -
     assert "repetitive_tail" in details["token_cap_reasons"]
 
 
+def test_jsonl_retains_neutral_thinking_markers_without_review_observation(
+    tmp_path: Path,
+) -> None:
+    output_file = tmp_path / "results.jsonl"
+    text = "<think>inspect</think> Two cats sleep on a pink couch."
+    result = PerformanceResult(
+        model_name="org/neutral-thinking",
+        generation=MockGeneration(text=text, generation_tokens=16),
+        success=True,
+        quality_analysis=check_models.analyze_generation_text(text, generated_tokens=16),
+    )
+
+    save_jsonl_report([result], output_file, prompt="Describe this image.", system_info={})
+
+    _header, rows = _read_jsonl(output_file)
+    assert rows[0]["assessment"] == {
+        "execution": "completed",
+        "usability": "usable",
+        "maintainer_status": "none",
+        "observations": [],
+        "details": {"thinking_trace_markers": ["<think>", "</think>"]},
+    }
+
+
 def test_save_jsonl_report_serializes_only_cached_result_assessment(tmp_path: Path) -> None:
     """Successful rows should expose one assessment without legacy status projections."""
     output_file = tmp_path / "results.jsonl"
