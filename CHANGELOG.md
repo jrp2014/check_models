@@ -25,6 +25,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Keep prompt-seeded, already-closed empty thinking wrappers as neutral evidence;
+  omit conclusively stale logs from paste-ready issue summaries; compact large
+  unexpected-parameter lists there; and narrow Markdown chooser tables by
+  removing duplicated output previews while retaining complete model evidence.
 - Reuse a fresh full-gate result when a branch integration is a clean
   fast-forward to the exact tested commit, while retaining revalidation for every
   integration that produces or exposes a different tree.

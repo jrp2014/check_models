@@ -41,7 +41,7 @@ from contextlib import (
 )
 from dataclasses import dataclass, fields, is_dataclass, replace
 from dataclasses import field as dataclass_field
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 from functools import lru_cache
 from importlib import import_module
 from importlib.metadata import (
@@ -1128,6 +1128,7 @@ class RunIssueSummarySource:
     generation_settings: tuple[tuple[str, str], ...] = ()
     trust_remote_code: bool | None = None
     producer: CheckModelsProvenanceRecord | None = None
+    run_window: tuple[datetime, datetime] | None = None
 
 
 class RunIssueSummaryValidationError(ValueError):
@@ -2929,6 +2930,9 @@ def _make_rich_console(*, width: int | None = None) -> Console:
 
 
 LOCAL_TIMESTAMP_FORMAT: Final[str] = "%Y-%m-%d %H:%M:%S %Z"
+_LOCAL_TIMESTAMP_RE: Final[re.Pattern[str]] = re.compile(
+    r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} [A-Z]{2,5}"
+)
 CONSOLE_LOG_TIME_FORMAT: Final[str] = "[%H:%M:%S]"
 # Display width consumed by the Rich log handler prefix when show_level=True:
 # "[HH:MM:SS]" (10) + " " (1) + level padded to 8 chars (8) + " " (1) = 20.
@@ -3767,7 +3771,12 @@ def _detect_reasoning_output(
         start_lower = start_marker.casefold()
         end_lower = end_marker.casefold()
         start_position = text_lower.find(start_lower)
-        if start_position < 0 and start_lower not in seeded_lower:
+        seeded_start_position = seeded_lower.rfind(start_lower)
+        seeded_end_position = seeded_lower.rfind(end_lower)
+        seeded_trace_open = (
+            seeded_start_position >= 0 and seeded_end_position < seeded_start_position
+        )
+        if start_position < 0 and not seeded_trace_open:
             continue
         thinking_trace_markers.append(start_marker)
         end_position = text_lower.find(
@@ -4272,6 +4281,17 @@ def local_now_str(fmt: str = LOCAL_TIMESTAMP_FORMAT) -> str:
     variants) trivial.
     """
     return datetime.now().astimezone().strftime(fmt)
+
+
+def _parse_local_timestamp(value: object, *, embedded: bool = False) -> datetime | None:
+    """Parse one project timestamp, optionally from surrounding log text."""
+    if not isinstance(value, str):
+        return None
+    match = (_LOCAL_TIMESTAMP_RE.search if embedded else _LOCAL_TIMESTAMP_RE.fullmatch)(value)
+    if match is not None:
+        with suppress(ValueError):
+            return datetime.strptime(match[0][:19], "%Y-%m-%d %H:%M:%S").replace(tzinfo=UTC)
+    return None
 
 
 # Field name patterns for format dispatch
@@ -7310,7 +7330,6 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
             _gallery_metric("peak_memory", row.peak_memory_gb),
             _gallery_metric("generation_tokens", row.generation_tokens),
             MARKDOWN_ESCAPER.escape(_gallery_observation_labels(row.observations)),
-            MARKDOWN_ESCAPER.escape(row.output_preview),
         )
         for row in ordered
     ]
@@ -7332,7 +7351,6 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
                 "Peak GB",
                 "Gen tok",
                 "Observations",
-                "Output preview",
             ),
             rows=chooser_rows,
         ),
@@ -7345,13 +7363,12 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
     if avoided:
         parts.extend(
             _render_gallery_table(
-                headers=("Model", "Usability", "Observations", "Output preview"),
+                headers=("Model", "Usability", "Observations"),
                 rows=[
                     (
                         _gallery_summary_model_link(row.model),
                         _markdown_inline_code(row.usability),
                         MARKDOWN_ESCAPER.escape(_gallery_observation_labels(row.observations)),
-                        MARKDOWN_ESCAPER.escape(row.output_preview),
                     )
                     for row in avoided
                 ],
@@ -15283,12 +15300,14 @@ def _load_run_issue_enrichment(
     tuple[tuple[str, str], ...],
     bool | None,
     CheckModelsProvenanceRecord | None,
+    tuple[datetime, datetime] | None,
 ]:
     """Load optional image/settings enrichment, ignoring absent or malformed run JSON."""
     image_record: RunImageRecord | None = None
     generation_settings: tuple[tuple[str, str], ...] = ()
     trust_remote_code: bool | None = None
     producer: CheckModelsProvenanceRecord | None = None
+    run_window: tuple[datetime, datetime] | None = None
     try:
         run_value: JsonLike = json.loads(_read_text_file(run_json_path))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError):
@@ -15305,7 +15324,16 @@ def _load_run_issue_enrichment(
                 (key, json.dumps(value, ensure_ascii=False, sort_keys=True))
                 for key, value in sorted(settings.items())
             )
-    return image_record, generation_settings, trust_remote_code, producer
+        run_end = _parse_local_timestamp(run_value.get("generated_at"))
+        runtime = run_value.get("total_runtime_seconds")
+        if (
+            run_end is not None
+            and isinstance(runtime, int | float)
+            and not isinstance(runtime, bool)
+            and runtime >= 0
+        ):
+            run_window = run_end - timedelta(seconds=runtime), run_end
+    return image_record, generation_settings, trust_remote_code, producer, run_window
 
 
 def _load_run_issue_summary_source(
@@ -15320,10 +15348,10 @@ def _load_run_issue_summary_source(
         _validate_run_issue_result(value, line_number)
         for line_number, value in enumerate(parsed_rows[1:], start=2)
     )
-    image, generation_settings, trust_remote_code, producer = (
+    image, generation_settings, trust_remote_code, producer, run_window = (
         _load_run_issue_enrichment(output_paths.run_json)
         if include_run_json
-        else (None, (), None, None)
+        else (None, (), None, None, None)
     )
 
     return RunIssueSummarySource(
@@ -15333,6 +15361,7 @@ def _load_run_issue_summary_source(
         generation_settings=generation_settings,
         trust_remote_code=trust_remote_code,
         producer=producer,
+        run_window=run_window,
     )
 
 
@@ -15481,6 +15510,28 @@ def _reproduction_input_blocks(
     return tuple(blocks)
 
 
+def _compact_run_issue_exception_message(message: str) -> str:
+    """Collapse a large repeated unexpected-parameter list in the aggregate report."""
+    match = re.fullmatch(
+        r"(?P<prefix>.*?)(?P<label>Received (?P<count>\d+) parameters not in model):\s*"
+        r"(?P<parameters>.+)",
+        message,
+        re.DOTALL,
+    )
+    if match is None:
+        return message
+    parameters = [item.strip().removesuffix(".") for item in match["parameters"].split(",")]
+    inline_parameter_limit = 6
+    if len(parameters) <= inline_parameter_limit:
+        return message
+    families = _dedupe_preserve_order([item.partition(".")[0] for item in parameters])
+    sample = ", ".join(parameters[:3])
+    return (
+        f"{match['prefix']}{match['label']}; "
+        f"families: {', '.join(families)}; representative parameters: {sample}."
+    )
+
+
 def _run_issue_summary_exception_lines(failure: JsonlFailureRecord | None) -> str:
     """Return a compact exception chain without traceback or captured output."""
     if failure is None:
@@ -15490,11 +15541,11 @@ def _run_issue_summary_exception_lines(failure: JsonlFailureRecord | None) -> st
         lines = []
         for entry in chain:
             exception_type = entry.get("type") or "Exception"
-            message = entry.get("message") or "no message"
+            message = _compact_run_issue_exception_message(entry.get("message") or "no message")
             lines.append(f"{exception_type}: {message}")
         return "\ncaused by: ".join(lines)
     exception_type = failure.get("exception_type") or "Exception"
-    message = failure.get("message") or "no message"
+    message = _compact_run_issue_exception_message(failure.get("message") or "no message")
     return f"{exception_type}: {message}"
 
 
@@ -15737,10 +15788,35 @@ def _run_issue_summary_context_section(source: RunIssueSummarySource) -> ReportS
     )
 
 
+def _run_issue_artifact_is_stale(
+    path: Path,
+    run_window: tuple[datetime, datetime] | None,
+) -> bool:
+    """Return whether a retained text artifact is conclusively from another run."""
+    if run_window is None:
+        return False
+    try:
+        _reject_symlink_parent(path)
+        canonical_path = _canonical_file_path(path)
+        _reject_symlink_parent(canonical_path)
+        fd = _open_regular_file_no_symlink(canonical_path, os.O_RDONLY)
+        with os.fdopen(fd, "rb") as handle:
+            prefix = b"".join(handle.readline(4096) for _ in range(4)).decode("utf-8")
+    except (OSError, UnicodeDecodeError):
+        return False
+    artifact_time = _parse_local_timestamp(prefix, embedded=True)
+    if artifact_time is None:
+        return False
+    run_start, run_end = run_window
+    tolerance = timedelta(minutes=1)
+    return artifact_time < run_start - tolerance or artifact_time > run_end + tolerance
+
+
 def _run_issue_summary_artifacts_section(
     output_paths: ReportOutputPaths,
     summary_path: Path,
     *,
+    source: RunIssueSummarySource,
     include_gallery_markdown: bool,
     include_run_json: bool,
 ) -> ReportSection:
@@ -15753,11 +15829,14 @@ def _run_issue_summary_artifacts_section(
     artifact_rows.append(("Results JSONL", output_paths.jsonl))
     if include_run_json:
         artifact_rows.append(("Run JSON", output_paths.run_json))
+    retained_logs = (("Environment", output_paths.environment), ("Log", output_paths.log))
+    stale_names = {
+        path.name
+        for _label, path in retained_logs
+        if _run_issue_artifact_is_stale(path, source.run_window)
+    }
     artifact_rows.extend(
-        (
-            ("Environment", output_paths.environment),
-            ("Log", output_paths.log),
-        )
+        (label, path) for label, path in retained_logs if path.name not in stale_names
     )
     rows = tuple(
         (
@@ -15770,10 +15849,17 @@ def _run_issue_summary_artifacts_section(
         )
         for label, path in artifact_rows
     )
-    return ReportSection(
-        "Full artifacts",
-        (ReportTable(("Artifact", "Link"), rows, compact=True),),
-    )
+    content: list[ReportBlock] = []
+    if stale_names:
+        omitted = ", ".join(f"`{name}`" for name in sorted(stale_names))
+        content.append(
+            ReportParagraph(
+                f"Stale retained artifacts omitted because their timestamps fall outside this "
+                f"run: {omitted}."
+            )
+        )
+    content.append(ReportTable(("Artifact", "Link"), rows, compact=True))
+    return ReportSection("Full artifacts", tuple(content))
 
 
 def generate_run_issue_summary_report(
@@ -15895,6 +15981,7 @@ def generate_run_issue_summary_report(
             _run_issue_summary_artifacts_section(
                 output_paths,
                 summary_path,
+                source=source,
                 include_gallery_markdown=include_gallery_markdown,
                 include_run_json=include_run_json,
             ),

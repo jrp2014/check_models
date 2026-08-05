@@ -425,6 +425,62 @@ def test_prompt_seeded_thinking_open_is_closed_by_generated_marker() -> None:
     ]
 
 
+def test_complete_prompt_seeded_empty_thinking_wrapper_is_neutral() -> None:
+    result = check_models.PerformanceResult(
+        model_name="example/seeded-no-thinking",
+        success=True,
+        generation=_Generation(
+            "Two cats sleep on a pink couch beside two remote controls.",
+            generation_tokens=14,
+        ),
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            rendered_prompt_preview="<image>Describe this image.<reason></done>",
+            generate_kwargs={
+                "thinking_start_token": "<reason>",
+                "thinking_end_token": "</done>",
+            },
+        ),
+    )
+
+    context = check_models._build_report_render_context(
+        results=[result],
+        prompt="Describe this image.",
+        system_info={},
+    )
+
+    assert dict(context.assessments)[result.model_name] == check_models.ResultAssessment(
+        "completed", "usable", "none", ()
+    )
+
+
+def test_prompt_seeded_thinking_open_without_generated_close_is_unusable() -> None:
+    result = check_models.PerformanceResult(
+        model_name="example/seeded-unclosed-thinking",
+        success=True,
+        generation=_Generation(
+            "Inspecting the scene without ever ending the reasoning trace.",
+            generation_tokens=12,
+        ),
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            rendered_prompt_preview="<image>Describe this image.<reason>",
+            generate_kwargs={
+                "thinking_start_token": "<reason>",
+                "thinking_end_token": "</done>",
+            },
+        ),
+    )
+
+    context = check_models._build_report_render_context(
+        results=[result],
+        prompt="Describe this image.",
+        system_info={},
+    )
+    assessment = dict(context.assessments)[result.model_name]
+
+    assert assessment.usability == "unusable"
+    assert assessment.observations == ("thinking_trace_incomplete",)
+
+
 @pytest.mark.parametrize(
     "text",
     [

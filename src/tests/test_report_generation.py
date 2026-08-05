@@ -184,6 +184,7 @@ def _write_issue_summary_fixture(
     image_source_url: str | None = None,
     image_sha256: str | None = "a" * 64,
     trust_remote_code: bool | None = False,
+    total_runtime_seconds: float | None = None,
 ) -> None:
     """Write hand-authored retained input for issue-summary tests."""
     output_paths.jsonl.parent.mkdir(parents=True, exist_ok=True)
@@ -227,6 +228,11 @@ def _write_issue_summary_fixture(
         json.dumps(
             {
                 "generated_at": "2026-07-31 12:02:00 BST",
+                **(
+                    {"total_runtime_seconds": total_runtime_seconds}
+                    if total_runtime_seconds is not None
+                    else {}
+                ),
                 "eval_mode": "assisted",
                 "generation_settings": {"max_tokens": 500, "temperature": 0.0},
                 "image": image,
@@ -541,6 +547,127 @@ def test_run_issue_summary_builds_complete_public_image_reproduction(tmp_path: P
     assert "--trust-remote-code" in content
     assert "reproduce.py" not in content
     assert "prompt.txt" not in content
+
+
+def test_run_issue_summary_withholds_stale_log_and_environment_links(tmp_path: Path) -> None:
+    """Issue-ready evidence must not attribute prior-run logs to the current run."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    _write_issue_summary_fixture(
+        output_paths,
+        results=(
+            _issue_summary_result(
+                "org/observed",
+                usability="usable_with_caveats",
+                maintainer_status="observation_needs_reproduction",
+                observations=["minimal_output"],
+            ),
+        ),
+        total_runtime_seconds=120.0,
+    )
+    check_models._write_text_file(
+        output_paths.log,
+        "2026-07-31 11:00:00 BST - INFO - prior run\n",
+    )
+    check_models._write_text_file(
+        output_paths.environment,
+        "FULL ENVIRONMENT DUMP - 2026-07-31 11:00:00 BST\n",
+    )
+
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+
+    assert summary is not None
+    content = summary.read_text(encoding="utf-8")
+    assert "Stale retained artifacts omitted" in content
+    assert "check_models.log" in content
+    assert "environment.log" in content
+    assert "src/output/check_models.log" not in content
+    assert "src/output/environment.log" not in content
+    assert "| Environment |" not in content
+    assert "| Log |" not in content
+
+
+def test_run_issue_summary_keeps_current_log_and_environment_links(tmp_path: Path) -> None:
+    """Artifacts beginning inside the retained run window should remain linked."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    _write_issue_summary_fixture(
+        output_paths,
+        results=(
+            _issue_summary_result(
+                "org/observed",
+                usability="usable_with_caveats",
+                maintainer_status="observation_needs_reproduction",
+                observations=["minimal_output"],
+            ),
+        ),
+        total_runtime_seconds=120.0,
+    )
+    check_models._write_text_file(
+        output_paths.log,
+        "2026-07-31 12:00:00 BST - INFO - current run\n",
+    )
+    check_models._write_text_file(
+        output_paths.environment,
+        "FULL ENVIRONMENT DUMP - 2026-07-31 12:00:00 BST\n",
+    )
+
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+
+    assert summary is not None
+    content = summary.read_text(encoding="utf-8")
+    assert "Stale retained artifacts omitted" not in content
+    assert "src/output/check_models.log" in content
+    assert "src/output/environment.log" in content
+    assert "| Environment |" in content
+    assert "| Log |" in content
+
+
+def test_run_issue_summary_compacts_large_unexpected_parameter_errors(tmp_path: Path) -> None:
+    """Aggregate crash evidence should group repeated parameter paths."""
+    output_paths = _issue_summary_output_paths(tmp_path / "output")
+    result = _issue_summary_result(
+        "org/crash",
+        execution="crashed",
+        usability="not_evaluated",
+        maintainer_status="actionable_failure",
+    )
+    parameters = [
+        "audio_tower.encoder.biases",
+        "audio_tower.encoder.scales",
+        *(
+            f"language_model.model.layers.{layer}.mlp.experts.down_proj.weight"
+            for layer in range(10)
+        ),
+    ]
+    message = "Received 12 parameters not in model: \n" + ",\n".join(parameters) + "."
+    failure = result["failure"]
+    assert isinstance(failure, dict)
+    failure["message"] = message
+    failure["exception_chain"] = [
+        {
+            "type": "ValueError",
+            "module": "builtins",
+            "message": message,
+            "origin": "check_models.py",
+        },
+        {
+            "type": "ValueError",
+            "module": "builtins",
+            "message": f"Model loading failed: {message}",
+            "origin": "check_models.py",
+        },
+    ]
+    _write_issue_summary_fixture(output_paths, results=(result,))
+
+    summary = check_models.generate_run_issue_summary_report(output_paths)
+
+    assert summary is not None
+    content = summary.read_text(encoding="utf-8")
+    assert "ValueError: Received 12 parameters not in model" in content
+    assert "audio_tower" in content
+    assert "language_model" in content
+    assert parameters[0] in content
+    assert parameters[-1] not in content
+    assert "model evidence" in content
 
 
 @pytest.mark.parametrize("image_sha256", [None, "abc123"])
@@ -3897,16 +4024,23 @@ class TestMarkdownGalleryReport:
             "## Current-run Chooser",
             end_headings=("## Avoid for This Run",),
         )
-        assert "Output preview" in chooser
+        assert "Output preview" not in chooser
         assert "[`org/good`](#model-org-good)" in chooser
-        assert "quality output" in chooser
+        assert "quality output" not in chooser
         assert "[`org/risky`](#model-org-risky)" in chooser
         assert "Unrecognised model control tokens remain visible" in chooser
-        assert r"answer with \| pipe" in chooser
-        assert "&lt;think&gt;leaked marker&lt;/think&gt;" in chooser
+        assert r"answer with \| pipe" not in chooser
+        assert "&lt;think&gt;leaked marker&lt;/think&gt;" not in chooser
         assert "[`org/bad`](#model-org-bad)" in chooser
         assert "not_evaluated" in chooser
-        assert "boom" in chooser
+        assert "boom" not in chooser
+        avoid = _extract_markdown_subsection(
+            content,
+            "## Avoid for This Run",
+            end_headings=("## Lowest-memory Usable Models (Including Caveats)",),
+        )
+        assert "Output preview" not in avoid
+        assert "boom" not in avoid
 
     def test_gallery_keeps_exact_output_in_expandable_code_block(
         self,
@@ -3951,7 +4085,8 @@ class TestMarkdownGalleryReport:
         )
         assert "## Model Quality Summary" not in content
         assert "## All Model Output and Cost Summary" not in content
-        assert "BEGIN" in chooser
+        assert "Output preview" not in chooser
+        assert "BEGIN" not in chooser
         assert "END-SENTINEL" not in chooser
         assert "<!-- markdownlint-disable MD034 MD049 -->" in chooser
         assert chooser.index("Total s") < chooser.index("Gen TPS")
@@ -4015,19 +4150,19 @@ class TestMarkdownGalleryReport:
             "## Current-run Chooser",
             end_headings=("## Avoid for This Run",),
         )
-        assert "Output preview" in chooser
+        assert "Output preview" not in chooser
         assert "Peak GB" in chooser
         assert "Observations" in chooser
         assert "[`org/full-caption`](#model-org-full-caption)" in chooser
-        assert "Two cats sit together on a pink sofa" in chooser
+        assert "Two cats sit together on a pink sofa" not in chooser
         assert "24" in chooser
         assert "42.0" in chooser
         assert "2.5" in chooser
         risky_row = next(line for line in chooser.splitlines() if "org/risky-output" in line)
-        assert "| cats " in risky_row
+        assert "| cats " not in risky_row
         assert "insufficient sample" in risky_row
         assert "[`org/crashed`](#model-org-crashed)" in chooser
-        assert "boom" in chooser
+        assert "boom" not in chooser
         crashed_evidence = _extract_markdown_subsection(
             content,
             "### org/crashed",
@@ -4185,11 +4320,11 @@ class TestMarkdownGalleryReport:
         assert complete_text in evidence
         assert content.count(complete_text) == 1
 
-    def test_gallery_preserves_preview_lines_and_readable_model_formatting(
+    def test_gallery_omits_preview_but_preserves_readable_model_formatting(
         self,
         tmp_path: Path,
     ) -> None:
-        """Chooser previews and complete evidence should retain useful line structure."""
+        """Complete evidence should retain useful formatting without chooser duplication."""
         formatted_output = (
             "## Title\n\n"
             "Two cats resting\n\n"
@@ -4218,7 +4353,7 @@ class TestMarkdownGalleryReport:
             "## Current-run Chooser",
             end_headings=("## Avoid for This Run",),
         )
-        assert "## Title<br><br>Two cats resting" in chooser
+        assert "## Title<br><br>Two cats resting" not in chooser
         assert '<pre class="model-output-readable">' in content
         assert "## Title\n\nTwo cats resting\n\n- pink sofa" in content
         assert "&#96;&#96;&#96;text" in content
