@@ -73,6 +73,13 @@ Prefer factual language:
 - Distinguish harness preflight failures from native generate failures.
 - Neutral observations (declared EOS/thinking wrappers, unchanged draft fields)
   are reproduction facts, not automatic bug claims.
+- A properly closed thinking block followed by substantive final text is neutral,
+  including when the rendered prompt seeded its opening delimiter. File only the
+  independently reproduced defect: an incomplete block, exhausted token budget,
+  absent final answer, or undeclared control/role token.
+- Do not use a sanitised gallery preview as the exact media input unless its
+  digest matches the retained run manifest. With local-only media, include its
+  characteristics and say that the exact input is not published.
 
 ## Issue template
 

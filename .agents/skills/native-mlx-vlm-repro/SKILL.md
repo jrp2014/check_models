@@ -112,12 +112,28 @@ print(result.text)
 - Preserve shell quoting exactly (JSON prompts, thinking delimiters, newlines).
 - Prefer portable paths in filed issues; strip private home directories when
   pasting externally.
+- Treat a retained gallery `source-image` as a sanitised preview unless its
+  digest matches the recorded inference input. A public URL plus matching
+  SHA-256 can support an exact download-and-verify command. For local-only media,
+  report format, dimensions, byte size, and digest without claiming a complete
+  reproduction command.
 - If failure depends on media, record dimensions (and duration/codec for
   audio/video) and whether a small synthetic input still fails.
 - Run **one model per process** to avoid sequential Metal-state interactions.
 - Prefer the harness’s effective generation kwargs from diagnostics/JSONL over
   guessed flags. Only include native-CLI-supported settings in CLI repros;
   put harness-only settings in the Python block or prose.
+
+## Thinking-output checks
+
+- A properly closed configured thinking block followed by substantive final text
+  is valid output evidence, not a failure by itself.
+- Check the rendered prompt for a seeded opening delimiter before treating a
+  generated closing delimiter as stray output.
+- Reproduce natively when the block is unclosed, consumes the token budget, lacks
+  a final answer, or exposes an undeclared control/role token. State which of
+  those observable conditions is unexpected; do not report “thinking present”
+  as the defect.
 
 ## Failure routing
 

@@ -114,6 +114,19 @@ The file is organized in this order — search for these exact landmark headers 
   the gallery's readable/raw pair or emit empty `unavailable` fact rows. Keep
   assessment rules mechanical and image-independent, and preserve the exact facts
   behind each observation code in machine and maintainer artifacts.
+- **Thinking-output semantics**: A properly closed thinking block followed by a
+  substantive final answer is neutral machine evidence, not a usability caveat.
+  Downgrade incomplete, truncated, or thinking-only output instead. Account for
+  opening delimiters seeded by the rendered prompt before calling a generated
+  closing delimiter an unexpected token.
+- **Reproduction media**: A sanitised gallery preview is not automatically the
+  exact inference input. Emit a runnable media reproduction only for a public URL
+  whose bytes match the retained SHA-256. For local-only inputs, publish the exact
+  prompt plus format, dimensions, byte size, and digest without inventing a local
+  filename an issue reader cannot obtain.
+- **Report ergonomics**: Prefer shared Rich/tabulate renderers, shared
+  actionability ordering, and existing report blocks over fixed-width strings or
+  format-specific builders. Remove redundant columns before adding width logic.
 - **Generated-report preflight**: Render representative reports from fixtures into temporary or `test_*` output paths and run markdownlint before the expensive matrix. Generated outputs must not need post-run hand editing. Prefer shared render helpers and focused tests over cleanup passes. If the checkout provides a supported report-only regeneration path, use existing canonical JSONL to repair stale tracked reports before Run 1; do not rerun models merely to reformat captured evidence.
 - **Acceptance order**: Before a costly real-model matrix, pass deterministic
   focused tests and the prescribed format, lint-fix/lint, and full `make quality`
