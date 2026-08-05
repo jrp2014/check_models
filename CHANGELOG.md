@@ -14,17 +14,29 @@ Notable changes to this project will be documented in this file.
   from schema-2.0 JSONL and optional run JSON without rerunning models.
 - Document product recommendations for issue-ready diagnostics and model-selection
   galleries aimed at mlx-vlm maintainers and image-description users
-  (`docs/notes/DIAGNOSTICS_USEFULNESS_RECOMMENDATIONS.md`).
+  (`docs/notes/archive/DIAGNOSTICS_USEFULNESS_RECOMMENDATIONS.md`).
 - Add agent skills for native mlx-vlm reproduction, HF cache discovery alignment,
   and upstream issue drafting (pip/conda adaptations of Blaizzy/mlx-vlm#1343
   support workflows) under `.agents/skills/`, with pointers in contributor and
   implementation docs.
 - Capture a human review of `src/check_models.py` compression, robustness, and
   analyzer-friendly structure options
-  (`docs/notes/CHECK_MODELS_MONOLITH_COMPRESSION_REVIEW.md`).
+  (`docs/notes/archive/CHECK_MODELS_MONOLITH_COMPRESSION_REVIEW.md`).
 
 ### Changed
 
+- Treat a properly closed configured thinking block followed by substantive final
+  text as neutral machine evidence, while classifying incomplete thinking,
+  thinking-only output, and credible token-cap truncation as unusable incomplete
+  responses. Prompt-seeded and custom thinking delimiters use the run parameters.
+- Consolidate diagnostics and crash-report reproduction around one
+  publication-safe builder: local inputs expose exact characteristics without a
+  fake command, while public digest-verified inputs receive a native one-process
+  mlx-vlm command. Advertise the paste-ready run summary in `run.json` only when
+  cached assessments surface a result.
+- Render comparison and completed-model terminal summaries with compact Rich
+  tables, use one severity-first ordering across terminal and retained reports,
+  and clarify crash and usable-with-caveats headings.
 - Replace the final pipe-delimited completed-model list with compact Rich tables
   grouped by usability and ordered by likely actionability, and separate replayed
   per-model result blocks so warnings and metrics remain visibly associated with

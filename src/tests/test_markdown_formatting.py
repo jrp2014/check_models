@@ -397,7 +397,8 @@ def test_gallery_uses_short_observation_labels_without_review_prose(tmp_path: Pa
 
     assert "*Why:*" not in md
     assert "*Next action:*" not in md
-    assert "*Observations:* Title or keywords do not meet requested constraints" in md
+    assert "*Observations:* Response appears cut off at the token limit" in md
+    assert "Title or keywords do not meet requested constraints" in md
     assert "Keyword count violation" not in md
 
 

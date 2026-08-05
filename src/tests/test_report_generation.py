@@ -2350,9 +2350,10 @@ def test_diagnostics_are_skim_first_and_share_reproduction_context_once(
     assert diagnostics.count(prompt) == 1
     assert diagnostics.count("The original local input is not published") == 1
     assert diagnostics.count("Exact prompt") == 1
-    assert "reproduce.py" not in diagnostics
-    assert "prompt.txt" not in diagnostics
-    assert "python -m mlx_vlm.generate" not in diagnostics
+    assert all(
+        unavailable_ref not in diagnostics
+        for unavailable_ref in ("reproduce.py", "prompt.txt", "python -m mlx_vlm.generate")
+    )
     for model in ("org/crash", "org/observed", "org/network"):
         assert model in diagnostics
         revision = revisions[model]["resolved_revision"]
@@ -2364,8 +2365,9 @@ def test_diagnostics_are_skim_first_and_share_reproduction_context_once(
     assert "OBSERVED-OUTPUT-MUST-APPEAR" in maintainer_html
     assert 'href="#diagnostic-org-crash"' in maintainer_html
     assert html_report.count("The original local input is not published") == 1
-    assert "reproduce.py" not in html_report
-    assert "prompt.txt" not in html_report
+    assert all(
+        unavailable_ref not in html_report for unavailable_ref in ("reproduce.py", "prompt.txt")
+    )
 
 
 def test_html_chooser_is_sortable_and_surfaces_prefill_first_token_time(
