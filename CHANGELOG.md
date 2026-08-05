@@ -25,6 +25,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Reuse a fresh full-gate result when a branch integration is a clean
+  fast-forward to the exact tested commit, while retaining revalidation for every
+  integration that produces or exposes a different tree.
 - Treat a properly closed configured thinking block followed by substantive final
   text as neutral machine evidence, while classifying incomplete thinking,
   thinking-only output, and credible token-cap truncation as unusable incomplete

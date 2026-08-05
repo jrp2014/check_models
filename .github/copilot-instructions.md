@@ -133,6 +133,11 @@ The file is organized in this order — search for these exact landmark headers 
   gates. Treat real-model runs as acceptance tests for runtime integration,
   output/report utility, exact evidence preservation, cross-artifact consistency,
   memory, and performance—not as substitutes for ordinary tests.
+- **Integration verification reuse**: Record the commit SHA that passed the full
+  gate. After a true fast-forward, do not rerun that gate when `HEAD` is exactly
+  the already-tested commit and both index and worktree are clean. Rerun whenever
+  the target moved, Git created a merge commit, conflicts were resolved, the tree
+  changed, or the earlier result did not cover the commit now being integrated.
 - **Comparative runs**: If Run 1 exposes a harness or report defect, add a focused
   regression test, fix it, repeat the static/full gates, then rerun and audit Run 1
   before starting comparative Run 2. Never compare a known-invalid baseline.
