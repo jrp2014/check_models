@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-08-05 22:52:02 BST
+Generated on: 2026-08-06 00:39:55 BST
 
 Complete per-model evidence artifact with image metadata, the source prompt, a
 facts-only chooser, and full generated or crash output for every attempted
@@ -16,98 +16,85 @@ Current-run usability and captured resource facts only. Total time is end-to-end
 
 <!-- markdownlint-disable MD034 MD049 -->
 
-| Model                                                                                                                   | Usability             | Total s   | Gen TPS             | Peak GB   | Gen tok   | Observations                                                                             | Output preview                                                                                                                                                                                                                                                                                             |
-|-------------------------------------------------------------------------------------------------------------------------|-----------------------|-----------|---------------------|-----------|-----------|------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`HuggingFaceTB/SmolVLM-Instruct`](#model-huggingfacetb-smolvlm-instruct)                                               | `usable`              | 1.81s     | 129 tok/s           | 5.5       | 63        | none                                                                                     | Two cats are lying on a pink blanket on a couch. The cat on the left is curled up with its head on the cat on the right's back. The cat on the right is stretched out with its head on the cat on the left's back. There are two remote controls on the blanket.                                           |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | 0.71s     | 519 tok/s           | 1.0       | 169       | none                                                                                     | In this detailed photograph, two cats are lounging on a pink, wrinkled couch. The cat on the left is a tabby with a mix of black, brown, and white fur, lying on its side with its head resting on its paws. Its tail is curled up behind it, and it has a white patch on its chest....                    |
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable`              | 3.25s     | 136 tok/s           | 4.7       | 281       | none                                                                                     | This is a photograph of two cats resting on a bright pink couch. The scene is calm and cozy, with the cats appearing to be asleep or very relaxed.<br><br>- **The Cats**: There are two cats, both with tabby patterns.<br>- The cat on the left is a smaller, younger-looking tabby with a mi...          |
-| [`meta-llama/Llama-3.2-11B-Vision-Instruct`](#model-meta-llama-llama-32-11b-vision-instruct)                            | `usable`              | 31.79s    | 5.02 tok/s          | 25        | 130       | none                                                                                     | The image shows two cats lying on a pink blanket, with two remote controls placed on the couch behind them. The cat on the left is a small, fluffy kitten with a long tail and a green collar, while the cat on the right is a larger, tabby cat with a short tail. Both cats are lyi...                   |
-| [`microsoft/Phi-3.5-vision-instruct`](#model-microsoft-phi-35-vision-instruct)                                          | `usable`              | 1.50s     | 59.2 tok/s          | 9.3       | 20        | none                                                                                     | The image shows two cats lying on a pink couch with remote controls beside them.                                                                                                                                                                                                                           |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable`              | 6.26s     | 31.0 tok/s          | 20        | 107       | none                                                                                     | The image features two cats lying on a pink surface, likely a couch or bed. The cat on the left is positioned with its back arched and head raised, while the cat on the right is lying flat with its head turned to the side. Both cats have a tabby pattern with stripes and spots,...                   |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `usable`              | 1.95s     | 358 tok/s           | 2.1       | 428       | none                                                                                     | The image depicts two cats lying on a pink couch. The couch is a bright pink color, and the cats are positioned side by side, facing opposite directions. The cat on the left is a tabby with a mix of black, brown, and white stripes. It is lying on its side with its head resting...                   |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `usable`              | 7.92s     | 51.2 tok/s          | 13        | 301       | none                                                                                     | &lt;think&gt;Got it, let's describe the image. First, there are two cats lying on a pink blanket, which is on a red couch. The cat on the left is a smaller one, maybe a kitten, with a mix of brown and black stripes, lying on its side with eyes closed, looking relaxed. The cat on the...             |
-| [`mlx-community/InternVL3-14B-8bit`](#model-mlx-community-internvl3-14b-8bit)                                           | `usable`              | 6.68s     | 31.8 tok/s          | 19        | 77        | none                                                                                     | The image shows two cats lying on a pink blanket on a red couch. Both cats are sleeping. The cat on the left is a tabby with a striped pattern, and the cat on the right is also a tabby with a similar pattern but with more orange tones. There are two remote controls on the couc...                   |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | 5.82s     | 34.1 tok/s          | 18        | 99        | none                                                                                     | The image shows two cats sleeping on a pink blanket. The cat on the left is a smaller kitten, lying on its side with its head resting on the blanket. The cat on the right is a larger adult cat, also lying on its side with its head resting on the blanket. Both cats have striped...                   |
-| [`mlx-community/LFM2-VL-1.6B-8bit`](#model-mlx-community-lfm2-vl-16b-8bit)                                              | `usable`              | 0.90s     | 316 tok/s           | 3.0       | 103       | none                                                                                     | The image depicts two cats lying on a bright pink blanket, which is spread over a red couch. The cat on the left is a gray tabby with black stripes, while the cat on the right is a brown tabby with black stripes. Both cats are stretched out and appear to be sleeping. The pink...                    |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable`              | 1.21s     | 189 tok/s           | 4.1       | 108       | none                                                                                     | The image depicts two cats lying on a pink blanket spread over a red couch. The cat on the left is a tabby with black stripes and a green collar, while the cat on the right is a calico with a mix of brown, black, and white fur. Both cats are sleeping peacefully, with their eye...                   |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `usable`              | 12.41s    | 16.7 tok/s          | 15        | 155       | none                                                                                     | The image shows two cats lying on a pink blanket, with two remote controls placed on the couch behind them. The cat on the left is a small, fluffy kitten with a long tail and a green collar. The cat on the right is a larger, tabby cat with a striped coat and a short tail. Both...                   |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 4.26s     | 68.8 tok/s          | 9.8       | 155       | none                                                                                     | This image shows two cats lounging on a pink blanket or cushion. Both cats are lying on their backs, with their legs stretched out in a relaxed pose.<br><br>- The cat on the left appears to be a smaller kitten with a tabby pattern (striped fur with swirling patches). It has its head...             |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable`              | 4.55s     | 65.0 tok/s          | 10        | 156       | none                                                                                     | This image features two tabby cats lounging on a pink cushion, likely part of a couch. Both cats appear relaxed and comfortable:<br><br>- **Left Cat (smaller one):** Stretched out on its side, with its front legs extended forward and its head resting on its paws. Its fur pattern inc...             |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 2.24s     | 192 tok/s           | 4.5       | 178       | none                                                                                     | This image depicts two cats lying comfortably on a soft, pink surface, likely a couch or bed.<br><br>The cat on the left appears to be a kitten, judging by its smaller size, fluffier fur, and the tag around its neck, which is common for pet identification. Its fur has a mix of light...             |
-| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable`              | 4.99s     | 52.4 tok/s          | 11        | 174       | none                                                                                     | In this detailed image, two cats are peacefully sleeping on a red couch, which is covered with a pink blanket. The cat on the left is a slender, gray and black striped feline with a white belly and a black tail. It is lying on its side with its front paws stretched out and its...                   |
-| [`mlx-community/Molmo-7B-D-0924-bf16`](#model-mlx-community-molmo-7b-d-0924-bf16)                                       | `usable`              | 8.66s     | 31.1 tok/s          | 18        | 199       | none                                                                                     | In this detailed image, two cats are peacefully sleeping on a red couch, which is covered with a pink blanket. The cat on the left is a slender, gray and black striped feline with a white belly and a black tail. It is lying on its side with its front paws stretched out and its...                   |
-| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `usable`              | 29.28s    | 6.06 tok/s          | 23        | 158       | none                                                                                     | In this detailed photograph, two cats are peacefully sleeping on a pink blanket that covers a red couch. The cats, both with a mix of brown, black, and white fur, are positioned side by side, facing each other. The cat on the left is lying on its side with its head resting on...                    |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | 1.45s     | 61.7 tok/s          | 9.3       | 20        | none                                                                                     | The image shows two cats lying on a pink couch with remote controls beside them.                                                                                                                                                                                                                           |
-| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable`              | 0.87s     | 327 tok/s           | 2.5       | 69        | none                                                                                     | In the image, there are two cats lying on a pink blanket. One cat is on the left side, and the other cat is on the right side. Both cats appear to be sleeping or resting. There are two remote controls placed on the blanket, one on the left side and the other on the right side,...                   |
-| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable`              | 2.98s     | 132 tok/s           | 5.3       | 281       | none                                                                                     | This is a photograph of two cats resting on a bright pink couch. The scene is calm and cozy, with the cats appearing to be asleep or very relaxed.<br><br>- **The Cats**: There are two cats, both with tabby patterns.<br>- The cat on the left is a smaller, younger-looking tabby with a mi...          |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable`              | 3.91s     | 130 tok/s           | 5.3       | 401       | none                                                                                     | So, let's see. The image shows two cats lying on a bright pink couch. First, I need to describe the main elements. There are two cats, both with tabby patterns—striped fur. The cat on the left has a mix of brown, black, and maybe some gray, with a green tag on its ear. The cat...                   |
-| [`mlx-community/SmolVLM-Instruct-bf16`](#model-mlx-community-smolvlm-instruct-bf16)                                     | `usable`              | 1.56s     | 125 tok/s           | 5.5       | 63        | none                                                                                     | Two cats are lying on a pink blanket on a couch. The cat on the left is curled up with its head on the cat on the right's back. The cat on the right is stretched out with its head on the cat on the left's back. There are two remote controls on the blanket.                                           |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable`              | 2.07s     | 131 tok/s           | 5.5       | 143       | none                                                                                     | The image depicts a scene featuring a cat and a remote control. The cat, which appears to be a tabby with a mix of black, white, and gray fur, is lying on a red couch. The cat's body is mostly covered by the couch, with its head resting on the armrest. The remote control, whic...                   |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable`              | 3.04s     | 66.1 tok/s          | 10        | 104       | none                                                                                     | The image shows two cats lying on a pink couch. Both cats have a tabby pattern with brown, black, and white fur. The cat on the left is curled up with its head resting on the back of the couch, while the cat on the right is stretched out on its side. Between them are two remot...                   |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | 13.76s    | 28.1 tok/s          | 18        | 303       | none                                                                                     | Here's a description of the image:<br><br>**Overall Impression:**<br><br>The image is a charming and humorous snapshot of two tabby cats lounging on a bright pink surface, likely a couch cushion or blanket. They are positioned as if they are "controlling" the TV with remote controls.<br><br>**D... |
-| [`mlx-community/gemma-3-27b-it-qat-8bit`](#model-mlx-community-gemma-3-27b-it-qat-8bit)                                 | `usable`              | 21.08s    | 17.1 tok/s          | 32        | 289       | none                                                                                     | Here's a description of the image:<br><br>**Overall Impression:**<br><br>The image is a charming and playful shot of two tabby kittens lounging on a bright pink surface, likely a couch cushion or blanket. They are positioned as if they are "watching TV," with remote controls placed near t...       |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `usable`              | 4.75s     | 48.9 tok/s          | 17        | 106       | none                                                                                     | Two tabby cats are peacefully napping on a bright pink couch. The cat on the left is lying on its back with its paws outstretched, while the cat on the right is curled up on its side, also seemingly asleep.<br><br>Between the two cats are two television remotes, one white and one bl...             |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 3.90s     | 129 tok/s           | 16        | 148       | none                                                                                     | A high-angle, medium shot shows two tabby cats lying on a pink blanket on a red couch. The cat on the left is lying on its side, facing right, with its head towards the top right corner. It has dark brown and black stripes on its body and a dark tail. Its front paws are tucked...                   |
-| [`mlx-community/gemma-4-31b-bf16`](#model-mlx-community-gemma-4-31b-bf16)                                               | `usable`              | 11.85s    | insufficient sample | 63        | 15        | none                                                                                     | in a single sentence.Both cats are sleeping on a pink blanket.                                                                                                                                                                                                                                             |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 6.79s     | 28.0 tok/s          | 19        | 98        | none                                                                                     | A high-angle, medium shot shows two brown tabby cats lying on a bright pink blanket on a red couch. The cat on the left is lying on its side, facing right, with its head resting on a blue remote control. The cat on the right is lying on its back, facing left, with its head res...                   |
-| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `usable`              | 4.65s     | 62.6 tok/s          | 9.7       | 82        | none                                                                                     | The image shows two cats lying on a pink blanket. The cat on the left is a kitten with a black and white striped coat, while the cat on the right is a tabby cat with a brown and black coat. Both cats are sleeping or resting. In the background, there is a remote control on the...                    |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `usable`              | 0.88s     | 373 tok/s           | 1.9       | 123       | none                                                                                     | The image shows a close-up view of two cats lying down on a pink fabric surface. Both cats are wearing striped-patterned clothing, and they are positioned in such a way that they appear to be sleeping. The cats are facing the camera, and their eyes are wide open, indicating th...                   |
-| [`mlx-community/paligemma2-10b-ft-docci-448-6bit`](#model-mlx-community-paligemma2-10b-ft-docci-448-6bit)               | `usable`              | 8.01s     | 33.4 tok/s          | 11        | 180       | none                                                                                     | Two cats are laying on a pink blanket. The cat on the left is a gray tabby cat with black stripes. The cat on the right is a brown tabby cat with black stripes. Both cats are laying on their sides. The cat on the left is facing the right side of the image. The cat on the right...                   |
-| [`mlx-community/paligemma2-10b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-10b-ft-docci-448-bf16)               | `usable`              | 33.23s    | 5.36 tok/s          | 26        | 159       | none                                                                                     | A top-down view of two cats laying on a pink blanket. The cat on the left is a gray tabby cat with black stripes and a black tail. It is laying on its side with its head on the pink blanket and its body facing the left side of the image. Its front legs are stretched out in fro...                   |
-| [`mlx-community/paligemma2-3b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-3b-ft-docci-448-bf16)                 | `usable`              | 8.50s     | 19.0 tok/s          | 10        | 126       | none                                                                                     | A top-down view of two cats sleeping on a pink blanket. The cat on the left is a gray and black color and is laying on its side with its head facing the right side of the image. Its front paws are stretched out in front of it. The cat's tail is sticking out to the left of the...                    |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | 7.53s     | 39.0 tok/s          | 15        | 199       | none                                                                                     | In the tranquil setting of this image, two feline companions, one adult and one kitten, are enjoying a peaceful slumber on a vibrant red couch. The adult cat, with its brown and black stripes, is lying on its side, its head comfortably resting on the armrest of the couch. Its...                    |
-| [`mlx-community/pixtral-12b-bf16`](#model-mlx-community-pixtral-12b-bf16)                                               | `usable`              | 13.32s    | 20.4 tok/s          | 27        | 204       | none                                                                                     | In the tranquil setting of this image, two feline companions, one a tabby cat and the other a Bengal cat, are enjoying a peaceful slumber on a vibrant red couch. The tabby cat, with its distinctive striped coat, is sprawled out on its side, its head comfortably resting on the...                    |
-| [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava)                                                                       | `usable`              | 1.04s     | 112 tok/s           | 4.0       | 44        | none                                                                                     | This image features two cats lying on a couch. One cat is a light brown and the other is a dark brown. They both have green eyes and a black nose. The cats are lying on a pink blanket.                                                                                                                   |
-| [`jqlive/Kimi-VL-A3B-Thinking-2506-6bit`](#model-jqlive-kimi-vl-a3b-thinking-2506-6bit)                                 | `usable_with_caveats` | 8.07s     | 80.0 tok/s          | 16        | 221       | Conversation-role control tokens remain visible                                          | ◁think▷So, let's analyze the image. The image shows two tabby cats lying on a pink fabric surface. There are two remote controls, one near each cat. The cats have a mix of brown, black, and white fur. The lighting is high-contrast, giving a stylized, almost posterized look. Th...                   |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable_with_caveats` | 13.96s    | 32.2 tok/s          | 19        | 354       | Conversation-role control tokens remain visible                                          | The image depicts two cats lying on a pink fabric, possibly a blanket or a piece of clothing, which is draped over a piece of furniture, likely a couch or a chair. The cats are positioned side by side, and they appear to be in a relaxed state, possibly sleeping or resting. The...                   |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable_with_caveats` | 56.07s    | 4.65 tok/s          | 39        | 241       | Conversation-role control tokens remain visible                                          | ◁think▷So, let's analyze the image. The image shows two tabby cats lying on a pink fabric surface. There are two remote controls, one near each cat. The cats have a mix of brown, black, and white fur. The lighting is high-contrast, making the colors very vivid. The scene is li...                   |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | 5.21s     | 59.4 tok/s          | 29        | 89        | Unrecognised model control tokens remain visible                                         | <\|channel>thought<br><channel\|>A high-angle, eye-level shot shows two tabby cats sleeping on a pink blanket on a red couch. The cat on the left is smaller and lying on its side with its head tucked in and its paws curled. The cat on the right is larger and lying on its stomach wi...              |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | 4.80s     | 75.7 tok/s          | 28        | 87        | Unrecognised model control tokens remain visible                                         | <\|channel>thought<br><channel\|>A high-angle, medium shot shows two brown tabby cats sleeping on a pink blanket on a red couch. The cat on the left is smaller and lying on its side with its head turned up and its paws tucked in. The cat on the right is larger and lying on its stom...              |
-| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `usable_with_caveats` | 2.40s     | insufficient sample | 4.6       | 2         | Response is unusually short                                                              | Cat                                                                                                                                                                                                                                                                                                        |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 13.93s    | 43.9 tok/s          | 14        | 500       | Response appears cut off at the token limit                                              | Here are my reasoning steps:<br>The user asks: "Describe this image". The image is of two cats sleeping on a pink couch, with a remote control and a DVD case (or something) on the couch. The cats are both tabby, with similar patterns. They are lying on their sides, curled up, wit...                |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | 24.51s    | 63.8 tok/s          | 60        | 500       | Response appears cut off at the token limit                                              | Alright, let's get to work. The user wants a detailed description of this image, and I'm the one to provide it. First, I need to break down the request. The user has given me a complex prompt, a jumble of words that I need to decipher. It's a classic case of "gibberish," but I...                   |
-| [`mlx-community/GLM-4.6V-Flash-6bit`](#model-mlx-community-glm-46v-flash-6bit)                                          | `unusable`            | 4.85s     | 63.4 tok/s          | 10        | 197       | Internal reasoning block appears incomplete                                              | The image depicts two tabby cats resting on a bright pink couch. The couch has a smooth, slightly wrinkled fabric, and the backrest is a deeper red.<br><br>- **Left Cat**: A smaller tabby with a mix of brown, black, and tan stripes. It lies on its side, eyes closed, appearing relaxe...             |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `unusable`            | 3.82s     | 91.8 tok/s          | 7.7       | 205       | Internal reasoning block appears incomplete                                              | This image features two tabby cats resting on a bright pink couch.<br><br>- **Left Cat**: A slender tabby with a mix of brown, black, and white fur. It lies on its side, head resting on the couch, eyes closed in a relaxed state. Its tail is long and dark, curving slightly.<br><br>- **Righ...       |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `unusable`            | 12.03s    | 52.6 tok/s          | 63        | 172       | Internal reasoning block appears incomplete                                              | The image shows two tabby cats resting on a bright pink blanket spread over a red couch. The cat on the is lying on its side, with its head turned slightly downward and eyes closed, appearing relaxed. Its fur displays a mix of brown, black, and tan stripes, and it has a pinkis...                   |
-| [`mlx-community/Kimi-VL-A3B-Thinking-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-8bit)                             | `unusable`            | 10.04s    | 67.3 tok/s          | 20        | 500       | Response appears cut off at the token limit; Internal reasoning block appears incomplete | ◁think▷Okay, let me try to figure out how to describe this image. First, I need to look at the image carefully. There are two cats on a pink surface, maybe a blanket or a bed. Both cats seem to be lying down. The one on the left is a tabby with gray and black stripes, and the...                    |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `unusable`            | 1.41s     | 283 tok/s           | 3.0       | 112       | Internal reasoning block appears incomplete                                              | The image shows two tabby cats resting comfortably on a bright pink blanket or couch. Both cats appear to be asleep or deeply relaxed, with their bodies stretched out. One cat is on the left side, lying with its legs extended and a remote control placed nearby. The other cat i...                   |
-| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `unusable`            | 19.54s    | 67.7 tok/s          | 71        | 305       | Internal reasoning block appears incomplete                                              | This is a cozy, overhead photograph of two tabby cats sleeping peacefully on a vibrant pink couch.<br><br>**The Cats:**<br>- **Left Cat:** A smaller tabby cat with classic brown and black stripes lies stretched out on its side, facing right. Its tail curls near its hind legs, and one f...          |
-| [`mlx-community/Qwen3.5-27B-4bit`](#model-mlx-community-qwen35-27b-4bit)                                                | `unusable`            | 12.37s    | 32.7 tok/s          | 19        | 315       | Internal reasoning block appears incomplete                                              | This is a cozy, overhead photograph of two tabby cats lounging on a vibrant pink blanket that covers a red couch or sofa.<br><br>- **The Cat on the Left**: This is a smaller, younger-looking tabby cat with classic black and brown stripes over a lighter tan coat. It’s lying on its ba...             |
-| [`mlx-community/Qwen3.5-27B-mxfp8`](#model-mlx-community-qwen35-27b-mxfp8)                                              | `unusable`            | 20.79s    | 18.0 tok/s          | 30        | 305       | Internal reasoning block appears incomplete                                              | This is a cozy, heartwarming image of two tabby cats lounging on a vibrant pink couch or blanket.<br><br>- **The Cats**:<br>- On the left is a smaller, younger-looking tabby cat (possibly a kitten) with classic black and brown stripes on a lighter background. It’s stretched out on its...           |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `unusable`            | 5.73s     | 113 tok/s           | 21        | 326       | Internal reasoning block appears incomplete                                              | This is a cozy, endearing photograph of two tabby cats sleeping peacefully on a bright pink couch.<br><br>- **The Cats**: Both cats are tabbies with similar brown and black striped patterns, though the one on the right appears slightly larger and more mature. They are lying close to...             |
-| [`mlx-community/Qwen3.5-35B-A3B-6bit`](#model-mlx-community-qwen35-35b-a3b-6bit)                                        | `unusable`            | 6.52s     | 101 tok/s           | 30        | 299       | Internal reasoning block appears incomplete                                              | This is a cozy, overhead photograph of two cats sleeping on a vibrant pink blanket draped over a red couch.<br><br>- **The Cats**:<br>- On the left is a smaller cat, likely a kitten or young tabby, with classic brown and black stripes. It’s stretched out on its side, paws extended, wit...          |
-| [`mlx-community/Qwen3.5-35B-A3B-bf16`](#model-mlx-community-qwen35-35b-a3b-bf16)                                        | `unusable`            | 18.22s    | 69.2 tok/s          | 71        | 299       | Internal reasoning block appears incomplete                                              | This is a cozy, overhead photograph of two tabby cats sleeping peacefully on a vibrant pink couch or blanket.<br><br>- **The Cats**:<br>- Both cats are classic brown tabbies with black stripes and swirls.<br>- The cat on the left is stretched out diagonally, lying on its side with its hea...       |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `unusable`            | 4.26s     | 99.7 tok/s          | 7.0       | 265       | Internal reasoning block appears incomplete                                              | This is a cozy, heartwarming photograph of two tabby cats sleeping peacefully on a bright pink blanket or couch cover.<br><br>**Details:**<br><br>- **Cats:** Both are tabby cats with classic striped coats — one appears to be a younger kitten (on the left), and the other an adult cat (on t...       |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `unusable`            | 18.95s    | 18.6 tok/s          | 30        | 283       | Internal reasoning block appears incomplete                                              | This is a cozy, overhead photograph of two tabby cats lounging on a vibrant pink couch or blanket.<br><br>- **The Cats**: Both cats have classic tabby markings — stripes and swirls in shades of brown, black, and tan. The cat on the left is stretched out on its side, appearing to be...              |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `unusable`            | 13.79s    | 44.2 tok/s          | 65        | 172       | Internal reasoning block appears incomplete                                              | The image shows two cats sleeping on a pink blanket or sheet. The cat on the left is a tabby cat with a green collar, lying on its side with its head resting on a folded part of the blanket. The cat on the right is a larger tabby cat, also lying on its side, facing the same di...                   |
-| [`mlx-community/gemma-3n-E2B-4bit`](#model-mlx-community-gemma-3n-e2b-4bit)                                             | `unusable`            | 5.69s     | 125 tok/s           | 5.8       | 500       | Response repeats the same text; Response appears cut off at the token limit              | this image this image this image this image this image this image this image this image this image this image this image this image this image this image this image this image this image this image this image this image this image this image this image this image this image th...                   |
-| [`mlx-community/Inkling-Small-mlx-4bit`](#model-mlx-community-inkling-small-mlx-4bit)                                   | `not_evaluated`       | 0.18s     | -                   | -         | -         | none                                                                                     | Model loading failed: Received 362 parameters not in model:<br>audio_tower.encoder.biases,<br>audio_tower.encoder.scales,<br>language_model.model.layers.10.mlp.experts.down_proj.biases,<br>language_model.model.layers.10.mlp.experts.down_proj.scales,<br>language_model.model.layers.10.mlp.expe...    |
+| Model                                                                                                                   | Usability             | Total s   | Gen TPS             | Peak GB   | Gen tok   | Observations                                                                             |
+|-------------------------------------------------------------------------------------------------------------------------|-----------------------|-----------|---------------------|-----------|-----------|------------------------------------------------------------------------------------------|
+| [`HuggingFaceTB/SmolVLM-Instruct`](#model-huggingfacetb-smolvlm-instruct)                                               | `usable`              | 1.59s     | 126 tok/s           | 5.5       | 63        | none                                                                                     |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | 0.70s     | 520 tok/s           | 1.0       | 169       | none                                                                                     |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable`              | 2.92s     | 133 tok/s           | 5.2       | 281       | none                                                                                     |
+| [`meta-llama/Llama-3.2-11B-Vision-Instruct`](#model-meta-llama-llama-32-11b-vision-instruct)                            | `usable`              | 29.61s    | 5.06 tok/s          | 25        | 130       | none                                                                                     |
+| [`microsoft/Phi-3.5-vision-instruct`](#model-microsoft-phi-35-vision-instruct)                                          | `usable`              | 1.56s     | 60.9 tok/s          | 9.3       | 20        | none                                                                                     |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable`              | 6.36s     | 31.3 tok/s          | 20        | 107       | none                                                                                     |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `usable`              | 1.92s     | 360 tok/s           | 2.2       | 428       | none                                                                                     |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `usable`              | 7.89s     | 51.3 tok/s          | 13        | 301       | none                                                                                     |
+| [`mlx-community/GLM-4.6V-Flash-6bit`](#model-mlx-community-glm-46v-flash-6bit)                                          | `usable`              | 4.86s     | 63.6 tok/s          | 10        | 197       | none                                                                                     |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable`              | 3.82s     | 91.8 tok/s          | 7.7       | 205       | none                                                                                     |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable`              | 14.05s    | 52.5 tok/s          | 63        | 172       | none                                                                                     |
+| [`mlx-community/InternVL3-14B-8bit`](#model-mlx-community-internvl3-14b-8bit)                                           | `usable`              | 6.53s     | 32.1 tok/s          | 19        | 77        | none                                                                                     |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | 5.82s     | 34.1 tok/s          | 18        | 99        | none                                                                                     |
+| [`mlx-community/LFM2-VL-1.6B-8bit`](#model-mlx-community-lfm2-vl-16b-8bit)                                              | `usable`              | 0.97s     | 330 tok/s           | 3.0       | 103       | none                                                                                     |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable`              | 1.26s     | 186 tok/s           | 4.1       | 108       | none                                                                                     |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `usable`              | 12.22s    | 16.6 tok/s          | 15        | 155       | none                                                                                     |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `usable`              | 1.44s     | 285 tok/s           | 3.0       | 112       | none                                                                                     |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 4.26s     | 69.1 tok/s          | 9.8       | 155       | none                                                                                     |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable`              | 4.68s     | 63.0 tok/s          | 10        | 156       | none                                                                                     |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 2.21s     | 187 tok/s           | 4.5       | 178       | none                                                                                     |
+| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable`              | 4.98s     | 53.5 tok/s          | 11        | 174       | none                                                                                     |
+| [`mlx-community/Molmo-7B-D-0924-bf16`](#model-mlx-community-molmo-7b-d-0924-bf16)                                       | `usable`              | 8.58s     | 30.9 tok/s          | 18        | 199       | none                                                                                     |
+| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `usable`              | 29.69s    | 5.95 tok/s          | 23        | 158       | none                                                                                     |
+| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              | 20.28s    | 67.4 tok/s          | 71        | 305       | none                                                                                     |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | 1.58s     | 61.9 tok/s          | 9.3       | 20        | none                                                                                     |
+| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable`              | 0.90s     | 331 tok/s           | 2.5       | 69        | none                                                                                     |
+| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable`              | 3.12s     | 132 tok/s           | 5.3       | 281       | none                                                                                     |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable`              | 4.03s     | 131 tok/s           | 5.3       | 401       | none                                                                                     |
+| [`mlx-community/Qwen3.5-27B-4bit`](#model-mlx-community-qwen35-27b-4bit)                                                | `usable`              | 12.32s    | 33.3 tok/s          | 19        | 315       | none                                                                                     |
+| [`mlx-community/Qwen3.5-27B-mxfp8`](#model-mlx-community-qwen35-27b-mxfp8)                                              | `usable`              | 20.65s    | 18.3 tok/s          | 30        | 305       | none                                                                                     |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 5.59s     | 122 tok/s           | 21        | 326       | none                                                                                     |
+| [`mlx-community/Qwen3.5-35B-A3B-6bit`](#model-mlx-community-qwen35-35b-a3b-6bit)                                        | `usable`              | 6.68s     | 102 tok/s           | 30        | 299       | none                                                                                     |
+| [`mlx-community/Qwen3.5-35B-A3B-bf16`](#model-mlx-community-qwen35-35b-a3b-bf16)                                        | `usable`              | 18.79s    | 68.8 tok/s          | 71        | 299       | none                                                                                     |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 4.34s     | 100 tok/s           | 7.0       | 265       | none                                                                                     |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 19.39s    | 18.2 tok/s          | 30        | 283       | none                                                                                     |
+| [`mlx-community/SmolVLM-Instruct-bf16`](#model-mlx-community-smolvlm-instruct-bf16)                                     | `usable`              | 1.58s     | 127 tok/s           | 5.5       | 63        | none                                                                                     |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable`              | 2.04s     | 132 tok/s           | 5.5       | 143       | none                                                                                     |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | 14.50s    | 43.7 tok/s          | 65        | 172       | none                                                                                     |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable`              | 3.05s     | 66.3 tok/s          | 10        | 104       | none                                                                                     |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | 13.23s    | 29.8 tok/s          | 18        | 303       | none                                                                                     |
+| [`mlx-community/gemma-3-27b-it-qat-8bit`](#model-mlx-community-gemma-3-27b-it-qat-8bit)                                 | `usable`              | 21.54s    | 16.6 tok/s          | 32        | 289       | none                                                                                     |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `usable`              | 4.97s     | 48.4 tok/s          | 17        | 106       | none                                                                                     |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 3.98s     | 129 tok/s           | 16        | 148       | none                                                                                     |
+| [`mlx-community/gemma-4-31b-bf16`](#model-mlx-community-gemma-4-31b-bf16)                                               | `usable`              | 12.54s    | insufficient sample | 63        | 15        | none                                                                                     |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 6.88s     | 27.2 tok/s          | 19        | 98        | none                                                                                     |
+| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `usable`              | 4.90s     | 62.5 tok/s          | 9.7       | 82        | none                                                                                     |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `usable`              | 0.96s     | 378 tok/s           | 1.8       | 123       | none                                                                                     |
+| [`mlx-community/paligemma2-10b-ft-docci-448-6bit`](#model-mlx-community-paligemma2-10b-ft-docci-448-6bit)               | `usable`              | 8.08s     | 32.6 tok/s          | 11        | 180       | none                                                                                     |
+| [`mlx-community/paligemma2-10b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-10b-ft-docci-448-bf16)               | `usable`              | 33.30s    | 5.41 tok/s          | 26        | 159       | none                                                                                     |
+| [`mlx-community/paligemma2-3b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-3b-ft-docci-448-bf16)                 | `usable`              | 8.20s     | 19.7 tok/s          | 10        | 126       | none                                                                                     |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | 7.47s     | 40.2 tok/s          | 15        | 199       | none                                                                                     |
+| [`mlx-community/pixtral-12b-bf16`](#model-mlx-community-pixtral-12b-bf16)                                               | `usable`              | 13.60s    | 20.0 tok/s          | 27        | 204       | none                                                                                     |
+| [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava)                                                                       | `usable`              | 1.00s     | 116 tok/s           | 4.2       | 44        | none                                                                                     |
+| [`jqlive/Kimi-VL-A3B-Thinking-2506-6bit`](#model-jqlive-kimi-vl-a3b-thinking-2506-6bit)                                 | `usable_with_caveats` | 5.22s     | 77.6 tok/s          | 16        | 221       | Conversation-role control tokens remain visible                                          |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable_with_caveats` | 14.00s    | 32.2 tok/s          | 19        | 354       | Conversation-role control tokens remain visible                                          |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable_with_caveats` | 55.58s    | 4.7 tok/s           | 39        | 241       | Conversation-role control tokens remain visible                                          |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | 5.57s     | 53.4 tok/s          | 29        | 88        | Unrecognised model control tokens remain visible                                         |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | 4.95s     | 67.9 tok/s          | 28        | 89        | Unrecognised model control tokens remain visible                                         |
+| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `usable_with_caveats` | 2.27s     | insufficient sample | 4.6       | 2         | Response is unusually short                                                              |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 13.83s    | 44.3 tok/s          | 14        | 500       | Response appears cut off at the token limit                                              |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | 15.72s    | 64.9 tok/s          | 60        | 500       | Response appears cut off at the token limit                                              |
+| [`mlx-community/Kimi-VL-A3B-Thinking-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-8bit)                             | `unusable`            | 10.14s    | 68.2 tok/s          | 20        | 500       | Response appears cut off at the token limit; Internal reasoning block appears incomplete |
+| [`mlx-community/gemma-3n-E2B-4bit`](#model-mlx-community-gemma-3n-e2b-4bit)                                             | `unusable`            | 5.86s     | 126 tok/s           | 5.8       | 500       | Response repeats the same text; Response appears cut off at the token limit              |
+| [`mlx-community/Inkling-Small-mlx-4bit`](#model-mlx-community-inkling-small-mlx-4bit)                                   | `not_evaluated`       | 0.22s     | -                   | -         | -         | none                                                                                     |
 <!-- markdownlint-enable MD034 MD049 -->
 
 ## Avoid for This Run
 
 <!-- markdownlint-disable MD034 MD049 -->
 
-| Model                                                                                                        | Usability       | Observations                                                                             | Output preview                                                                                                                                                                                                                                                                                          |
-|--------------------------------------------------------------------------------------------------------------|-----------------|------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)       | `unusable`      | Response appears cut off at the token limit                                              | Here are my reasoning steps:<br>The user asks: "Describe this image". The image is of two cats sleeping on a pink couch, with a remote control and a DVD case (or something) on the couch. The cats are both tabby, with similar patterns. They are lying on their sides, curled up, wit...             |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | `unusable`      | Response appears cut off at the token limit                                              | Alright, let's get to work. The user wants a detailed description of this image, and I'm the one to provide it. First, I need to break down the request. The user has given me a complex prompt, a jumble of words that I need to decipher. It's a classic case of "gibberish," but I...                |
-| [`mlx-community/GLM-4.6V-Flash-6bit`](#model-mlx-community-glm-46v-flash-6bit)                               | `unusable`      | Internal reasoning block appears incomplete                                              | The image depicts two tabby cats resting on a bright pink couch. The couch has a smooth, slightly wrinkled fabric, and the backrest is a deeper red.<br><br>- **Left Cat**: A smaller tabby with a mix of brown, black, and tan stripes. It lies on its side, eyes closed, appearing relaxe...          |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                             | `unusable`      | Internal reasoning block appears incomplete                                              | This image features two tabby cats resting on a bright pink couch.<br><br>- **Left Cat**: A slender tabby with a mix of brown, black, and white fur. It lies on its side, head resting on the couch, eyes closed in a relaxed state. Its tail is long and dark, curving slightly.<br><br>- **Righ...    |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                         | `unusable`      | Internal reasoning block appears incomplete                                              | The image shows two tabby cats resting on a bright pink blanket spread over a red couch. The cat on the is lying on its side, with its head turned slightly downward and eyes closed, appearing relaxed. Its fur displays a mix of brown, black, and tan stripes, and it has a pinkis...                |
-| [`mlx-community/Kimi-VL-A3B-Thinking-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-8bit)                  | `unusable`      | Response appears cut off at the token limit; Internal reasoning block appears incomplete | ◁think▷Okay, let me try to figure out how to describe this image. First, I need to look at the image carefully. There are two cats on a pink surface, maybe a blanket or a bed. Both cats seem to be lying down. The one on the left is a tabby with gray and black stripes, and the...                 |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                 | `unusable`      | Internal reasoning block appears incomplete                                              | The image shows two tabby cats resting comfortably on a bright pink blanket or couch. Both cats appear to be asleep or deeply relaxed, with their bodies stretched out. One cat is on the left side, lying with its legs extended and a remote control placed nearby. The other cat i...                |
-| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                               | `unusable`      | Internal reasoning block appears incomplete                                              | This is a cozy, overhead photograph of two tabby cats sleeping peacefully on a vibrant pink couch.<br><br>**The Cats:**<br>- **Left Cat:** A smaller tabby cat with classic brown and black stripes lies stretched out on its side, facing right. Its tail curls near its hind legs, and one f...       |
-| [`mlx-community/Qwen3.5-27B-4bit`](#model-mlx-community-qwen35-27b-4bit)                                     | `unusable`      | Internal reasoning block appears incomplete                                              | This is a cozy, overhead photograph of two tabby cats lounging on a vibrant pink blanket that covers a red couch or sofa.<br><br>- **The Cat on the Left**: This is a smaller, younger-looking tabby cat with classic black and brown stripes over a lighter tan coat. It’s lying on its ba...          |
-| [`mlx-community/Qwen3.5-27B-mxfp8`](#model-mlx-community-qwen35-27b-mxfp8)                                   | `unusable`      | Internal reasoning block appears incomplete                                              | This is a cozy, heartwarming image of two tabby cats lounging on a vibrant pink couch or blanket.<br><br>- **The Cats**:<br>- On the left is a smaller, younger-looking tabby cat (possibly a kitten) with classic black and brown stripes on a lighter background. It’s stretched out on its...        |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                             | `unusable`      | Internal reasoning block appears incomplete                                              | This is a cozy, endearing photograph of two tabby cats sleeping peacefully on a bright pink couch.<br><br>- **The Cats**: Both cats are tabbies with similar brown and black striped patterns, though the one on the right appears slightly larger and more mature. They are lying close to...          |
-| [`mlx-community/Qwen3.5-35B-A3B-6bit`](#model-mlx-community-qwen35-35b-a3b-6bit)                             | `unusable`      | Internal reasoning block appears incomplete                                              | This is a cozy, overhead photograph of two cats sleeping on a vibrant pink blanket draped over a red couch.<br><br>- **The Cats**:<br>- On the left is a smaller cat, likely a kitten or young tabby, with classic brown and black stripes. It’s stretched out on its side, paws extended, wit...       |
-| [`mlx-community/Qwen3.5-35B-A3B-bf16`](#model-mlx-community-qwen35-35b-a3b-bf16)                             | `unusable`      | Internal reasoning block appears incomplete                                              | This is a cozy, overhead photograph of two tabby cats sleeping peacefully on a vibrant pink couch or blanket.<br><br>- **The Cats**:<br>- Both cats are classic brown tabbies with black stripes and swirls.<br>- The cat on the left is stretched out diagonally, lying on its side with its hea...    |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                               | `unusable`      | Internal reasoning block appears incomplete                                              | This is a cozy, heartwarming photograph of two tabby cats sleeping peacefully on a bright pink blanket or couch cover.<br><br>**Details:**<br><br>- **Cats:** Both are tabby cats with classic striped coats — one appears to be a younger kitten (on the left), and the other an adult cat (on t...    |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                   | `unusable`      | Internal reasoning block appears incomplete                                              | This is a cozy, overhead photograph of two tabby cats lounging on a vibrant pink couch or blanket.<br><br>- **The Cats**: Both cats have classic tabby markings — stripes and swirls in shades of brown, black, and tan. The cat on the left is stretched out on its side, appearing to be...           |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                               | `unusable`      | Internal reasoning block appears incomplete                                              | The image shows two cats sleeping on a pink blanket or sheet. The cat on the left is a tabby cat with a green collar, lying on its side with its head resting on a folded part of the blanket. The cat on the right is a larger tabby cat, also lying on its side, facing the same di...                |
-| [`mlx-community/gemma-3n-E2B-4bit`](#model-mlx-community-gemma-3n-e2b-4bit)                                  | `unusable`      | Response repeats the same text; Response appears cut off at the token limit              | this image this image this image this image this image this image this image this image this image this image this image this image this image this image this image this image this image this image this image this image this image this image this image this image this image th...                |
-| [`mlx-community/Inkling-Small-mlx-4bit`](#model-mlx-community-inkling-small-mlx-4bit)                        | `not_evaluated` | none                                                                                     | Model loading failed: Received 362 parameters not in model:<br>audio_tower.encoder.biases,<br>audio_tower.encoder.scales,<br>language_model.model.layers.10.mlp.experts.down_proj.biases,<br>language_model.model.layers.10.mlp.experts.down_proj.scales,<br>language_model.model.layers.10.mlp.expe... |
+| Model                                                                                                        | Usability       | Observations                                                                             |
+|--------------------------------------------------------------------------------------------------------------|-----------------|------------------------------------------------------------------------------------------|
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)       | `unusable`      | Response appears cut off at the token limit                                              |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | `unusable`      | Response appears cut off at the token limit                                              |
+| [`mlx-community/Kimi-VL-A3B-Thinking-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-8bit)                  | `unusable`      | Response appears cut off at the token limit; Internal reasoning block appears incomplete |
+| [`mlx-community/gemma-3n-E2B-4bit`](#model-mlx-community-gemma-3n-e2b-4bit)                                  | `unusable`      | Response repeats the same text; Response appears cut off at the token limit              |
+| [`mlx-community/Inkling-Small-mlx-4bit`](#model-mlx-community-inkling-small-mlx-4bit)                        | `not_evaluated` | none                                                                                     |
 <!-- markdownlint-enable MD034 MD049 -->
 
 ## Lowest-memory Usable Models (Including Caveats)
@@ -117,26 +104,30 @@ Current-run usability and captured resource facts only. Total time is end-to-end
 | Model                                                                                                                   | Usability             |   Peak GB |   Gen tok |
 |-------------------------------------------------------------------------------------------------------------------------|-----------------------|-----------|-----------|
 | [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              |       1   |       169 |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `usable`              |       1.9 |       123 |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `usable`              |       2.1 |       428 |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `usable`              |       1.8 |       123 |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `usable`              |       2.2 |       428 |
 | [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable`              |       2.5 |        69 |
 | [`mlx-community/LFM2-VL-1.6B-8bit`](#model-mlx-community-lfm2-vl-16b-8bit)                                              | `usable`              |       3   |       103 |
-| [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava)                                                                       | `usable`              |       4   |        44 |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `usable`              |       3   |       112 |
 | [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable`              |       4.1 |       108 |
+| [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava)                                                                       | `usable`              |       4.2 |        44 |
 | [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              |       4.5 |       178 |
 | [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `usable_with_caveats` |       4.6 |         2 |
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable`              |       4.7 |       281 |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable`              |       5.3 |       401 |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable`              |       5.2 |       281 |
 | [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable`              |       5.3 |       281 |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable`              |       5.3 |       401 |
 | [`HuggingFaceTB/SmolVLM-Instruct`](#model-huggingfacetb-smolvlm-instruct)                                               | `usable`              |       5.5 |        63 |
 | [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable`              |       5.5 |       143 |
 | [`mlx-community/SmolVLM-Instruct-bf16`](#model-mlx-community-smolvlm-instruct-bf16)                                     | `usable`              |       5.5 |        63 |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              |       7   |       265 |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable`              |       7.7 |       205 |
 | [`microsoft/Phi-3.5-vision-instruct`](#model-microsoft-phi-35-vision-instruct)                                          | `usable`              |       9.3 |        20 |
 | [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              |       9.3 |        20 |
 | [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `usable`              |       9.7 |        82 |
 | [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              |       9.8 |       155 |
 | [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable`              |      10   |       156 |
 | [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable`              |      10   |       104 |
+| [`mlx-community/GLM-4.6V-Flash-6bit`](#model-mlx-community-glm-46v-flash-6bit)                                          | `usable`              |      10   |       197 |
 | [`mlx-community/paligemma2-3b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-3b-ft-docci-448-bf16)                 | `usable`              |      10   |       126 |
 | [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable`              |      11   |       174 |
 | [`mlx-community/paligemma2-10b-ft-docci-448-6bit`](#model-mlx-community-paligemma2-10b-ft-docci-448-6bit)               | `usable`              |      11   |       180 |
@@ -151,73 +142,95 @@ Current-run usability and captured resource facts only. Total time is end-to-end
 | [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              |      18   |        99 |
 | [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable_with_caveats` |      19   |       354 |
 | [`mlx-community/InternVL3-14B-8bit`](#model-mlx-community-internvl3-14b-8bit)                                           | `usable`              |      19   |        77 |
+| [`mlx-community/Qwen3.5-27B-4bit`](#model-mlx-community-qwen35-27b-4bit)                                                | `usable`              |      19   |       315 |
 | [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              |      19   |        98 |
 | [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable`              |      20   |       107 |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              |      21   |       326 |
 | [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `usable`              |      23   |       158 |
 | [`meta-llama/Llama-3.2-11B-Vision-Instruct`](#model-meta-llama-llama-32-11b-vision-instruct)                            | `usable`              |      25   |       130 |
 | [`mlx-community/paligemma2-10b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-10b-ft-docci-448-bf16)               | `usable`              |      26   |       159 |
 | [`mlx-community/pixtral-12b-bf16`](#model-mlx-community-pixtral-12b-bf16)                                               | `usable`              |      27   |       204 |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` |      28   |        87 |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` |      29   |        89 |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` |      28   |        89 |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` |      29   |        88 |
+| [`mlx-community/Qwen3.5-27B-mxfp8`](#model-mlx-community-qwen35-27b-mxfp8)                                              | `usable`              |      30   |       305 |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              |      30   |       283 |
+| [`mlx-community/Qwen3.5-35B-A3B-6bit`](#model-mlx-community-qwen35-35b-a3b-6bit)                                        | `usable`              |      30   |       299 |
 | [`mlx-community/gemma-3-27b-it-qat-8bit`](#model-mlx-community-gemma-3-27b-it-qat-8bit)                                 | `usable`              |      32   |       289 |
 | [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable_with_caveats` |      39   |       241 |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable`              |      63   |       172 |
 | [`mlx-community/gemma-4-31b-bf16`](#model-mlx-community-gemma-4-31b-bf16)                                               | `usable`              |      63   |        15 |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              |      65   |       172 |
+| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              |      71   |       305 |
+| [`mlx-community/Qwen3.5-35B-A3B-bf16`](#model-mlx-community-qwen35-35b-a3b-bf16)                                        | `usable`              |      71   |       299 |
 <!-- markdownlint-enable MD034 MD049 -->
 
 ## Fastest Usable Models (Including Caveats)
 
-Fastest valid generation: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 519 tok/s
+Fastest valid generation: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 520 tok/s
 
-Average valid generation throughput: 101 tok/s
+Average valid generation throughput: 96.6 tok/s
 
 <!-- markdownlint-disable MD034 MD049 -->
 
 | Model                                                                                                                   | Usability             | Gen TPS             |   Gen tok |
 |-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------------------|-----------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | 519 tok/s           |       169 |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `usable`              | 373 tok/s           |       123 |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `usable`              | 358 tok/s           |       428 |
-| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable`              | 327 tok/s           |        69 |
-| [`mlx-community/LFM2-VL-1.6B-8bit`](#model-mlx-community-lfm2-vl-16b-8bit)                                              | `usable`              | 316 tok/s           |       103 |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 192 tok/s           |       178 |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable`              | 189 tok/s           |       108 |
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable`              | 136 tok/s           |       281 |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | 520 tok/s           |       169 |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `usable`              | 378 tok/s           |       123 |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `usable`              | 360 tok/s           |       428 |
+| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable`              | 331 tok/s           |        69 |
+| [`mlx-community/LFM2-VL-1.6B-8bit`](#model-mlx-community-lfm2-vl-16b-8bit)                                              | `usable`              | 330 tok/s           |       103 |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `usable`              | 285 tok/s           |       112 |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 187 tok/s           |       178 |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable`              | 186 tok/s           |       108 |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable`              | 133 tok/s           |       281 |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable`              | 132 tok/s           |       143 |
 | [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable`              | 132 tok/s           |       281 |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable`              | 131 tok/s           |       143 |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable`              | 130 tok/s           |       401 |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable`              | 131 tok/s           |       401 |
 | [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 129 tok/s           |       148 |
-| [`HuggingFaceTB/SmolVLM-Instruct`](#model-huggingfacetb-smolvlm-instruct)                                               | `usable`              | 129 tok/s           |        63 |
-| [`mlx-community/SmolVLM-Instruct-bf16`](#model-mlx-community-smolvlm-instruct-bf16)                                     | `usable`              | 125 tok/s           |        63 |
-| [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava)                                                                       | `usable`              | 112 tok/s           |        44 |
-| [`jqlive/Kimi-VL-A3B-Thinking-2506-6bit`](#model-jqlive-kimi-vl-a3b-thinking-2506-6bit)                                 | `usable_with_caveats` | 80.0 tok/s          |       221 |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | 75.7 tok/s          |        87 |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 68.8 tok/s          |       155 |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable`              | 66.1 tok/s          |       104 |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable`              | 65.0 tok/s          |       156 |
-| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `usable`              | 62.6 tok/s          |        82 |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | 61.7 tok/s          |        20 |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | 59.4 tok/s          |        89 |
-| [`microsoft/Phi-3.5-vision-instruct`](#model-microsoft-phi-35-vision-instruct)                                          | `usable`              | 59.2 tok/s          |        20 |
-| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable`              | 52.4 tok/s          |       174 |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `usable`              | 51.2 tok/s          |       301 |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `usable`              | 48.9 tok/s          |       106 |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | 39.0 tok/s          |       199 |
+| [`mlx-community/SmolVLM-Instruct-bf16`](#model-mlx-community-smolvlm-instruct-bf16)                                     | `usable`              | 127 tok/s           |        63 |
+| [`HuggingFaceTB/SmolVLM-Instruct`](#model-huggingfacetb-smolvlm-instruct)                                               | `usable`              | 126 tok/s           |        63 |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 122 tok/s           |       326 |
+| [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava)                                                                       | `usable`              | 116 tok/s           |        44 |
+| [`mlx-community/Qwen3.5-35B-A3B-6bit`](#model-mlx-community-qwen35-35b-a3b-6bit)                                        | `usable`              | 102 tok/s           |       299 |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 100 tok/s           |       265 |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable`              | 91.8 tok/s          |       205 |
+| [`jqlive/Kimi-VL-A3B-Thinking-2506-6bit`](#model-jqlive-kimi-vl-a3b-thinking-2506-6bit)                                 | `usable_with_caveats` | 77.6 tok/s          |       221 |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 69.1 tok/s          |       155 |
+| [`mlx-community/Qwen3.5-35B-A3B-bf16`](#model-mlx-community-qwen35-35b-a3b-bf16)                                        | `usable`              | 68.8 tok/s          |       299 |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | 67.9 tok/s          |        89 |
+| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              | 67.4 tok/s          |       305 |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable`              | 66.3 tok/s          |       104 |
+| [`mlx-community/GLM-4.6V-Flash-6bit`](#model-mlx-community-glm-46v-flash-6bit)                                          | `usable`              | 63.6 tok/s          |       197 |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable`              | 63.0 tok/s          |       156 |
+| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `usable`              | 62.5 tok/s          |        82 |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | 61.9 tok/s          |        20 |
+| [`microsoft/Phi-3.5-vision-instruct`](#model-microsoft-phi-35-vision-instruct)                                          | `usable`              | 60.9 tok/s          |        20 |
+| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable`              | 53.5 tok/s          |       174 |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | 53.4 tok/s          |        88 |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable`              | 52.5 tok/s          |       172 |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `usable`              | 51.3 tok/s          |       301 |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `usable`              | 48.4 tok/s          |       106 |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | 43.7 tok/s          |       172 |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | 40.2 tok/s          |       199 |
 | [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | 34.1 tok/s          |        99 |
-| [`mlx-community/paligemma2-10b-ft-docci-448-6bit`](#model-mlx-community-paligemma2-10b-ft-docci-448-6bit)               | `usable`              | 33.4 tok/s          |       180 |
+| [`mlx-community/Qwen3.5-27B-4bit`](#model-mlx-community-qwen35-27b-4bit)                                                | `usable`              | 33.3 tok/s          |       315 |
+| [`mlx-community/paligemma2-10b-ft-docci-448-6bit`](#model-mlx-community-paligemma2-10b-ft-docci-448-6bit)               | `usable`              | 32.6 tok/s          |       180 |
 | [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable_with_caveats` | 32.2 tok/s          |       354 |
-| [`mlx-community/InternVL3-14B-8bit`](#model-mlx-community-internvl3-14b-8bit)                                           | `usable`              | 31.8 tok/s          |        77 |
-| [`mlx-community/Molmo-7B-D-0924-bf16`](#model-mlx-community-molmo-7b-d-0924-bf16)                                       | `usable`              | 31.1 tok/s          |       199 |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable`              | 31.0 tok/s          |       107 |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | 28.1 tok/s          |       303 |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 28.0 tok/s          |        98 |
-| [`mlx-community/pixtral-12b-bf16`](#model-mlx-community-pixtral-12b-bf16)                                               | `usable`              | 20.4 tok/s          |       204 |
-| [`mlx-community/paligemma2-3b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-3b-ft-docci-448-bf16)                 | `usable`              | 19.0 tok/s          |       126 |
-| [`mlx-community/gemma-3-27b-it-qat-8bit`](#model-mlx-community-gemma-3-27b-it-qat-8bit)                                 | `usable`              | 17.1 tok/s          |       289 |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `usable`              | 16.7 tok/s          |       155 |
-| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `usable`              | 6.06 tok/s          |       158 |
-| [`mlx-community/paligemma2-10b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-10b-ft-docci-448-bf16)               | `usable`              | 5.36 tok/s          |       159 |
-| [`meta-llama/Llama-3.2-11B-Vision-Instruct`](#model-meta-llama-llama-32-11b-vision-instruct)                            | `usable`              | 5.02 tok/s          |       130 |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable_with_caveats` | 4.65 tok/s          |       241 |
+| [`mlx-community/InternVL3-14B-8bit`](#model-mlx-community-internvl3-14b-8bit)                                           | `usable`              | 32.1 tok/s          |        77 |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable`              | 31.3 tok/s          |       107 |
+| [`mlx-community/Molmo-7B-D-0924-bf16`](#model-mlx-community-molmo-7b-d-0924-bf16)                                       | `usable`              | 30.9 tok/s          |       199 |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | 29.8 tok/s          |       303 |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 27.2 tok/s          |        98 |
+| [`mlx-community/pixtral-12b-bf16`](#model-mlx-community-pixtral-12b-bf16)                                               | `usable`              | 20.0 tok/s          |       204 |
+| [`mlx-community/paligemma2-3b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-3b-ft-docci-448-bf16)                 | `usable`              | 19.7 tok/s          |       126 |
+| [`mlx-community/Qwen3.5-27B-mxfp8`](#model-mlx-community-qwen35-27b-mxfp8)                                              | `usable`              | 18.3 tok/s          |       305 |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 18.2 tok/s          |       283 |
+| [`mlx-community/gemma-3-27b-it-qat-8bit`](#model-mlx-community-gemma-3-27b-it-qat-8bit)                                 | `usable`              | 16.6 tok/s          |       289 |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `usable`              | 16.6 tok/s          |       155 |
+| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `usable`              | 5.95 tok/s          |       158 |
+| [`mlx-community/paligemma2-10b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-10b-ft-docci-448-bf16)               | `usable`              | 5.41 tok/s          |       159 |
+| [`meta-llama/Llama-3.2-11B-Vision-Instruct`](#model-meta-llama-llama-32-11b-vision-instruct)                            | `usable`              | 5.06 tok/s          |       130 |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable_with_caveats` | 4.7 tok/s           |       241 |
 | [`mlx-community/gemma-4-31b-bf16`](#model-mlx-community-gemma-4-31b-bf16)                                               | `usable`              | insufficient sample |        15 |
 | [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `usable_with_caveats` | insufficient sample |         2 |
 <!-- markdownlint-enable MD034 MD049 -->
@@ -262,18 +275,18 @@ Complete generated or crash evidence for every attempted model.
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.69s
-- *Generation time:* 1.12s
-- *Total time:* 1.81s
-- *Input validation time:* 0.00223
-- *Prompt preparation time:* 0.00177
-- *First-token latency:* 0.572
-- *Cleanup time:* 0.072
+- *Model load time:* 0.68s
+- *Generation time:* 0.91s
+- *Total time:* 1.59s
+- *Input validation time:* 0.0016
+- *Prompt preparation time:* 0.00175
+- *First-token latency:* 0.365
+- *Cleanup time:* 0.0707
 - *Prompt tokens:* 1,194
 - *Generation tokens:* 63
 - *Total tokens:* 1,257
-- *Prompt throughput (raw):* 2,087 tok/s
-- *Generation throughput (raw):* 129 tok/s
+- *Prompt throughput (raw):* 3,267 tok/s
+- *Generation throughput (raw):* 126 tok/s
 - *Peak memory:* 5.5
 - *Active memory:* 4.5
 - *Cache memory:* 0.30
@@ -325,18 +338,18 @@ Complete generated or crash evidence for every attempted model.
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.33s
-- *Generation time:* 0.37s
-- *Total time:* 0.71s
-- *Input validation time:* 0.0015
-- *Prompt preparation time:* 0.00544
-- *First-token latency:* 0.023
-- *Cleanup time:* 0.0554
+- *Model load time:* 0.34s
+- *Generation time:* 0.36s
+- *Total time:* 0.70s
+- *Input validation time:* 0.00178
+- *Prompt preparation time:* 0.00549
+- *First-token latency:* 0.0215
+- *Cleanup time:* 0.0588
 - *Prompt tokens:* 78
 - *Generation tokens:* 169
 - *Total tokens:* 247
-- *Prompt throughput (raw):* 3,397 tok/s
-- *Generation throughput (raw):* 519 tok/s
+- *Prompt throughput (raw):* 3,632 tok/s
+- *Generation throughput (raw):* 520 tok/s
 - *Peak memory:* 1.0
 - *Active memory:* 0.90
 - *Cache memory:* 0.01
@@ -388,19 +401,19 @@ In this detailed photograph, two cats are lounging on a pink, wrinkled couch. Th
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.91s
-- *Generation time:* 2.32s
-- *Total time:* 3.25s
-- *Input validation time:* 0.00169
-- *Prompt preparation time:* 0.00886
-- *First-token latency:* 0.206
-- *Cleanup time:* 0.0685
+- *Model load time:* 0.68s
+- *Generation time:* 2.22s
+- *Total time:* 2.92s
+- *Input validation time:* 0.00149
+- *Prompt preparation time:* 0.00971
+- *First-token latency:* 0.0828
+- *Cleanup time:* 0.0742
 - *Prompt tokens:* 313
 - *Generation tokens:* 281
 - *Total tokens:* 594
-- *Prompt throughput (raw):* 1,519 tok/s
-- *Generation throughput (raw):* 136 tok/s
-- *Peak memory:* 4.7
+- *Prompt throughput (raw):* 3,778 tok/s
+- *Generation throughput (raw):* 133 tok/s
+- *Peak memory:* 5.2
 - *Active memory:* 4.3
 - *Cache memory:* 0.10
 - *Model-load active memory:* 4.26
@@ -475,18 +488,18 @@ This is a photograph of two cats resting on a bright pink couch. The scene is ca
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 3.24s
-- *Generation time:* 28.54s
-- *Total time:* 31.79s
-- *Input validation time:* 0.00162
-- *Prompt preparation time:* 0.00468
-- *First-token latency:* 2.64
-- *Cleanup time:* 0.115
+- *Model load time:* 2.19s
+- *Generation time:* 27.41s
+- *Total time:* 29.61s
+- *Input validation time:* 0.00201
+- *Prompt preparation time:* 0.00511
+- *First-token latency:* 1.68
+- *Cleanup time:* 0.0983
 - *Prompt tokens:* 15
 - *Generation tokens:* 130
 - *Total tokens:* 145
-- *Prompt throughput (raw):* 5.68 tok/s
-- *Generation throughput (raw):* 5.02 tok/s
+- *Prompt throughput (raw):* 8.92 tok/s
+- *Generation throughput (raw):* 5.06 tok/s
 - *Peak memory:* 25
 - *Active memory:* 21
 - *Cache memory:* 3.4
@@ -538,18 +551,18 @@ The image shows two cats lying on a pink blanket, with two remote controls place
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.89s
-- *Generation time:* 0.60s
-- *Total time:* 1.50s
-- *Input validation time:* 0.0017
-- *Prompt preparation time:* 0.000916
-- *First-token latency:* 0.18
-- *Cleanup time:* 0.0753
+- *Model load time:* 0.99s
+- *Generation time:* 0.56s
+- *Total time:* 1.56s
+- *Input validation time:* 0.00166
+- *Prompt preparation time:* 0.000886
+- *First-token latency:* 0.218
+- *Cleanup time:* 0.0715
 - *Prompt tokens:* 768
 - *Generation tokens:* 20
 - *Total tokens:* 788
-- *Prompt throughput (raw):* 4,272 tok/s
-- *Generation throughput (raw):* 59.2 tok/s
+- *Prompt throughput (raw):* 3,516 tok/s
+- *Generation throughput (raw):* 60.9 tok/s
 - *Peak memory:* 9.3
 - *Active memory:* 8.3
 - *Cache memory:* 0.41
@@ -601,18 +614,18 @@ The image shows two cats lying on a pink couch with remote controls beside them.
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 2.07s
-- *Generation time:* 4.17s
-- *Total time:* 6.26s
-- *Input validation time:* 0.00162
-- *Prompt preparation time:* 0.00635
-- *First-token latency:* 0.706
-- *Cleanup time:* 0.105
+- *Model load time:* 2.24s
+- *Generation time:* 4.11s
+- *Total time:* 6.36s
+- *Input validation time:* 0.00163
+- *Prompt preparation time:* 0.00656
+- *First-token latency:* 0.67
+- *Cleanup time:* 0.0961
 - *Prompt tokens:* 439
 - *Generation tokens:* 107
 - *Total tokens:* 546
-- *Prompt throughput (raw):* 622 tok/s
-- *Generation throughput (raw):* 31.0 tok/s
+- *Prompt throughput (raw):* 655 tok/s
+- *Generation throughput (raw):* 31.3 tok/s
 - *Peak memory:* 20
 - *Active memory:* 18
 - *Cache memory:* 0.14
@@ -664,19 +677,19 @@ The image features two cats lying on a pink surface, likely a couch or bed. The 
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.63s
-- *Generation time:* 1.31s
-- *Total time:* 1.95s
-- *Input validation time:* 0.00167
-- *Prompt preparation time:* 0.0016
-- *First-token latency:* 0.0773
-- *Cleanup time:* 0.0724
+- *Model load time:* 0.61s
+- *Generation time:* 1.30s
+- *Total time:* 1.92s
+- *Input validation time:* 0.00184
+- *Prompt preparation time:* 0.00161
+- *First-token latency:* 0.0805
+- *Cleanup time:* 0.0708
 - *Prompt tokens:* 24
 - *Generation tokens:* 428
 - *Total tokens:* 452
-- *Prompt throughput (raw):* 310 tok/s
-- *Generation throughput (raw):* 358 tok/s
-- *Peak memory:* 2.1
+- *Prompt throughput (raw):* 298 tok/s
+- *Generation throughput (raw):* 360 tok/s
+- *Peak memory:* 2.2
 - *Active memory:* 1.2
 - *Cache memory:* 0.03
 - *Model-load active memory:* 1.25
@@ -747,18 +760,18 @@ In summary, the image shows two tabby cats lying on a pink couch, with their eye
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.65s
-- *Generation time:* 6.26s
-- *Total time:* 7.92s
-- *Input validation time:* 0.00164
-- *Prompt preparation time:* 0.00164
-- *First-token latency:* 0.36
-- *Cleanup time:* 0.0848
+- *Model load time:* 1.64s
+- *Generation time:* 6.24s
+- *Total time:* 7.89s
+- *Input validation time:* 0.00172
+- *Prompt preparation time:* 0.00162
+- *First-token latency:* 0.356
+- *Cleanup time:* 0.0849
 - *Prompt tokens:* 402
 - *Generation tokens:* 301
 - *Total tokens:* 703
-- *Prompt throughput (raw):* 1,116 tok/s
-- *Generation throughput (raw):* 51.2 tok/s
+- *Prompt throughput (raw):* 1,130 tok/s
+- *Generation throughput (raw):* 51.3 tok/s
 - *Peak memory:* 13
 - *Active memory:* 12
 - *Cache memory:* 0.04
@@ -799,6 +812,227 @@ In summary, the image shows two tabby cats lying on a pink couch, with their eye
 
 ---
 
+<a id="model-mlx-community-glm-46v-flash-6bit"></a>
+
+### mlx-community/GLM-4.6V-Flash-6bit
+
+<details>
+<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-6bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 1.40s
+- *Generation time:* 3.45s
+- *Total time:* 4.86s
+- *Input validation time:* 0.0018
+- *Prompt preparation time:* 0.00665
+- *First-token latency:* 0.338
+- *Cleanup time:* 0.0849
+- *Prompt tokens:* 406
+- *Generation tokens:* 197
+- *Total tokens:* 603
+- *Prompt throughput (raw):* 1,200 tok/s
+- *Generation throughput (raw):* 63.6 tok/s
+- *Peak memory:* 10
+- *Active memory:* 9.4
+- *Cache memory:* 0.05
+- *Model-load active memory:* 9.43
+- *Post-cleanup active memory:* 0.00351
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 121
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* df9464782d3452e0dfd86afe0984f1c9eca75ca1
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-6bit/snapshots/df9464782d3452e0dfd86afe0984f1c9eca75ca1
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|endoftext\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+The image depicts two tabby cats resting on a bright pink couch. The couch has a smooth, slightly wrinkled fabric, and the backrest is a deeper red.
+
+- **Left Cat**: A smaller tabby with a mix of brown, black, and tan stripes. It lies on its side, eyes closed, appearing relaxed. Its tail is curled at the end, and a green collar is visible around its neck.
+
+- **Right Cat**: A larger tabby with similar brown, black, and tan striping. It lies on its side, head lowered toward the couch, eyes partially closed, also appearing relaxed.
+
+- **Remotes**: Two remote controls are placed on the couch between the cats. The left remote is light blue with dark buttons, while the right remote is white with colorful buttons (red, green, blue, yellow).
+
+The overall scene is cozy and relaxed, with the cats appearing comfortable and at ease on the vibrant pink couch.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+The image depicts two tabby cats resting on a bright pink couch. The couch has a smooth, slightly wrinkled fabric, and the backrest is a deeper red.  
+
+- **Left Cat**: A smaller tabby with a mix of brown, black, and tan stripes. It lies on its side, eyes closed, appearing relaxed. Its tail is curled at the end, and a green collar is visible around its neck.  
+
+- **Right Cat**: A larger tabby with similar brown, black, and tan striping. It lies on its side, head lowered toward the couch, eyes partially closed, also appearing relaxed.  
+
+- **Remotes**: Two remote controls are placed on the couch between the cats. The left remote is light blue with dark buttons, while the right remote is white with colorful buttons (red, green, blue, yellow).  
+
+The overall scene is cozy and relaxed, with the cats appearing comfortable and at ease on the vibrant pink couch.
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
+
+### mlx-community/GLM-4.6V-Flash-mxfp4
+
+<details>
+<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-mxfp4</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 1.28s
+- *Generation time:* 2.54s
+- *Total time:* 3.82s
+- *Input validation time:* 0.00171
+- *Prompt preparation time:* 0.000213
+- *First-token latency:* 0.297
+- *Cleanup time:* 0.079
+- *Prompt tokens:* 406
+- *Generation tokens:* 205
+- *Total tokens:* 611
+- *Prompt throughput (raw):* 1,367 tok/s
+- *Generation throughput (raw):* 91.8 tok/s
+- *Peak memory:* 7.7
+- *Active memory:* 6.8
+- *Cache memory:* 0.05
+- *Model-load active memory:* 6.78
+- *Post-cleanup active memory:* 0.00383
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 121
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-mxfp4/snapshots/773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|endoftext\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+This image features two tabby cats resting on a bright pink couch.
+
+- **Left Cat**: A slender tabby with a mix of brown, black, and white fur. It lies on its side, head resting on the couch, eyes closed in a relaxed state. Its tail is long and dark, curving slightly.
+
+- **Right Cat**: A plump tabby with a more uniform brown and black patterned fur. It lies on its side, head lowered toward the couch, eyes partially open or closed, appearing calm. Its front paw is extended forward, while the hind leg is relaxed.
+
+- **Remotes and Couch**: Two remote controls are visible: a light blue remote on the left side of the couch, and a white remote with colorful buttons near the right cat. The couch itself is a vibrant pink, with a smooth, slightly wrinkled fabric surface.
+
+The overall scene conveys a sense of calm and domestic comfort, with the two cats appearing content in their shared space.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+This image features two tabby cats resting on a bright pink couch.  
+
+- **Left Cat**: A slender tabby with a mix of brown, black, and white fur. It lies on its side, head resting on the couch, eyes closed in a relaxed state. Its tail is long and dark, curving slightly.  
+
+- **Right Cat**: A plump tabby with a more uniform brown and black patterned fur. It lies on its side, head lowered toward the couch, eyes partially open or closed, appearing calm. Its front paw is extended forward, while the hind leg is relaxed.  
+
+- **Remotes and Couch**: Two remote controls are visible: a light blue remote on the left side of the couch, and a white remote with colorful buttons near the right cat. The couch itself is a vibrant pink, with a smooth, slightly wrinkled fabric surface.  
+
+The overall scene conveys a sense of calm and domestic comfort, with the two cats appearing content in their shared space.
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-glm-46v-nvfp4"></a>
+
+### mlx-community/GLM-4.6V-nvfp4
+
+<details>
+<summary>Complete evidence: mlx-community/GLM-4.6V-nvfp4</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 6.92s
+- *Generation time:* 7.12s
+- *Total time:* 14.05s
+- *Input validation time:* 0.00161
+- *Prompt preparation time:* 0.00685
+- *First-token latency:* 3.83
+- *Cleanup time:* 0.228
+- *Prompt tokens:* 406
+- *Generation tokens:* 172
+- *Total tokens:* 578
+- *Prompt throughput (raw):* 106 tok/s
+- *Generation throughput (raw):* 52.5 tok/s
+- *Peak memory:* 63
+- *Active memory:* 62
+- *Cache memory:* 0.16
+- *Model-load active memory:* 61.9
+- *Post-cleanup active memory:* 0.00416
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 121
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 2da6855d4e28a0e61c84543262074bc17ac27d6e
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-nvfp4/snapshots/2da6855d4e28a0e61c84543262074bc17ac27d6e
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|endoftext\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+The image shows two tabby cats resting on a bright pink blanket spread over a red couch. The cat on the is lying on its side, with its head turned slightly downward and eyes closed, appearing relaxed. Its fur displays a mix of brown, black, and tan stripes, and it has a pinkish underbelly. The cat on the left is stretched out in a more elongated position, also with eyes closed, and its body angled toward the right. This cat has a similar striped pattern but with a lighter, more muted color palette, and it wears a small green collar. Between them, two remote controls lie on the pink fabric: one is light blue with numerous buttons, and the other is white with colorful buttons. The overall scene conveys a calm, cozy atmosphere, with the cats seemingly at ease in their shared resting spot.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+The image shows two tabby cats resting on a bright pink blanket spread over a red couch. The cat on the is lying on its side, with its head turned slightly downward and eyes closed, appearing relaxed. Its fur displays a mix of brown, black, and tan stripes, and it has a pinkish underbelly. The cat on the left is stretched out in a more elongated position, also with eyes closed, and its body angled toward the right. This cat has a similar striped pattern but with a lighter, more muted color palette, and it wears a small green collar. Between them, two remote controls lie on the pink fabric: one is light blue with numerous buttons, and the other is white with colorful buttons. The overall scene conveys a calm, cozy atmosphere, with the cats seemingly at ease in their shared resting spot.
+```
+
+</details>
+
+</details>
+
+---
+
 <a id="model-mlx-community-internvl3-14b-8bit"></a>
 
 ### mlx-community/InternVL3-14B-8bit
@@ -810,18 +1044,18 @@ In summary, the image shows two tabby cats lying on a pink couch, with their eye
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.75s
-- *Generation time:* 4.92s
-- *Total time:* 6.68s
-- *Input validation time:* 0.00173
-- *Prompt preparation time:* 0.00165
-- *First-token latency:* 2.47
-- *Cleanup time:* 0.107
+- *Model load time:* 1.63s
+- *Generation time:* 4.88s
+- *Total time:* 6.53s
+- *Input validation time:* 0.00162
+- *Prompt preparation time:* 0.00177
+- *First-token latency:* 2.45
+- *Cleanup time:* 0.106
 - *Prompt tokens:* 3,340
 - *Generation tokens:* 77
 - *Total tokens:* 3,417
-- *Prompt throughput (raw):* 1,353 tok/s
-- *Generation throughput (raw):* 31.8 tok/s
+- *Prompt throughput (raw):* 1,363 tok/s
+- *Generation throughput (raw):* 32.1 tok/s
 - *Peak memory:* 19
 - *Active memory:* 16
 - *Cache memory:* 0.78
@@ -873,17 +1107,17 @@ The image shows two cats lying on a pink blanket on a red couch. Both cats are s
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.59s
-- *Generation time:* 4.22s
+- *Model load time:* 1.61s
+- *Generation time:* 4.20s
 - *Total time:* 5.82s
-- *Input validation time:* 0.00162
-- *Prompt preparation time:* 0.000197
-- *First-token latency:* 1.28
-- *Cleanup time:* 0.106
+- *Input validation time:* 0.00165
+- *Prompt preparation time:* 0.000181
+- *First-token latency:* 1.27
+- *Cleanup time:* 0.104
 - *Prompt tokens:* 3,340
 - *Generation tokens:* 99
 - *Total tokens:* 3,439
-- *Prompt throughput (raw):* 2,612 tok/s
+- *Prompt throughput (raw):* 2,631 tok/s
 - *Generation throughput (raw):* 34.1 tok/s
 - *Peak memory:* 18
 - *Active memory:* 16
@@ -936,18 +1170,18 @@ The image shows two cats sleeping on a pink blanket. The cat on the left is a sm
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.47s
-- *Generation time:* 0.42s
-- *Total time:* 0.90s
-- *Input validation time:* 0.00166
-- *Prompt preparation time:* 0.00112
-- *First-token latency:* 0.0751
-- *Cleanup time:* 0.0681
+- *Model load time:* 0.56s
+- *Generation time:* 0.40s
+- *Total time:* 0.97s
+- *Input validation time:* 0.00201
+- *Prompt preparation time:* 0.00113
+- *First-token latency:* 0.0679
+- *Cleanup time:* 0.0673
 - *Prompt tokens:* 267
 - *Generation tokens:* 103
 - *Total tokens:* 370
-- *Prompt throughput (raw):* 3,556 tok/s
-- *Generation throughput (raw):* 316 tok/s
+- *Prompt throughput (raw):* 3,931 tok/s
+- *Generation throughput (raw):* 330 tok/s
 - *Peak memory:* 3.0
 - *Active memory:* 2.1
 - *Cache memory:* 0.02
@@ -999,18 +1233,18 @@ The image depicts two cats lying on a bright pink blanket, which is spread over 
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.54s
-- *Generation time:* 0.67s
-- *Total time:* 1.21s
-- *Input validation time:* 0.00184
-- *Prompt preparation time:* 0.00345
-- *First-token latency:* 0.07
-- *Cleanup time:* 0.0803
+- *Model load time:* 0.58s
+- *Generation time:* 0.68s
+- *Total time:* 1.26s
+- *Input validation time:* 0.00179
+- *Prompt preparation time:* 0.00333
+- *First-token latency:* 0.0683
+- *Cleanup time:* 0.0673
 - *Prompt tokens:* 267
 - *Generation tokens:* 108
 - *Total tokens:* 375
-- *Prompt throughput (raw):* 3,812 tok/s
-- *Generation throughput (raw):* 189 tok/s
+- *Prompt throughput (raw):* 3,907 tok/s
+- *Generation throughput (raw):* 186 tok/s
 - *Peak memory:* 4.1
 - *Active memory:* 3.2
 - *Cache memory:* 0.01
@@ -1062,18 +1296,18 @@ The image depicts two cats lying on a pink blanket spread over a red couch. The 
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.53s
-- *Generation time:* 10.87s
-- *Total time:* 12.41s
-- *Input validation time:* 0.00204
-- *Prompt preparation time:* 0.00129
-- *First-token latency:* 1.59
-- *Cleanup time:* 0.0908
+- *Model load time:* 1.46s
+- *Generation time:* 10.75s
+- *Total time:* 12.22s
+- *Input validation time:* 0.00156
+- *Prompt preparation time:* 0.00131
+- *First-token latency:* 1.4
+- *Cleanup time:* 0.0895
 - *Prompt tokens:* 14
 - *Generation tokens:* 155
 - *Total tokens:* 169
-- *Prompt throughput (raw):* 8.83 tok/s
-- *Generation throughput (raw):* 16.7 tok/s
+- *Prompt throughput (raw):* 10.0 tok/s
+- *Generation throughput (raw):* 16.6 tok/s
 - *Peak memory:* 15
 - *Active memory:* 11
 - *Cache memory:* 0.52
@@ -1114,6 +1348,69 @@ The image shows two cats lying on a pink blanket, with two remote controls place
 
 ---
 
+<a id="model-mlx-community-minicpm-v-46-8bit"></a>
+
+### mlx-community/MiniCPM-V-4.6-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/MiniCPM-V-4.6-8bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 0.89s
+- *Generation time:* 0.53s
+- *Total time:* 1.44s
+- *Input validation time:* 0.00178
+- *Prompt preparation time:* 0.00795
+- *First-token latency:* 0.105
+- *Cleanup time:* 0.0795
+- *Prompt tokens:* 226
+- *Generation tokens:* 112
+- *Total tokens:* 338
+- *Prompt throughput (raw):* 2,145 tok/s
+- *Generation throughput (raw):* 285 tok/s
+- *Peak memory:* 3.0
+- *Active memory:* 2.3
+- *Cache memory:* 0.05
+- *Model-load active memory:* 2.32
+- *Post-cleanup active memory:* 0.00767
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 108
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 03721395f6b82cd000cc74cde28fcff8abd9a04c
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-8bit/snapshots/03721395f6b82cd000cc74cde28fcff8abd9a04c
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+The image shows two tabby cats resting comfortably on a bright pink blanket or couch. Both cats appear to be asleep or deeply relaxed, with their bodies stretched out. One cat is on the left side, lying with its legs extended and a remote control placed nearby. The other cat is on the right, also in a relaxed position, with its paws slightly spread. The background includes a red or dark-colored couch, adding a cozy and warm atmosphere to the scene. The overall mood is peaceful and tranquil, capturing a moment of rest for the cats.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+The image shows two tabby cats resting comfortably on a bright pink blanket or couch. Both cats appear to be asleep or deeply relaxed, with their bodies stretched out. One cat is on the left side, lying with its legs extended and a remote control placed nearby. The other cat is on the right, also in a relaxed position, with its paws slightly spread. The background includes a red or dark-colored couch, adding a cozy and warm atmosphere to the scene. The overall mood is peaceful and tranquil, capturing a moment of rest for the cats.
+```
+
+</details>
+
+</details>
+
+---
+
 <a id="model-mlx-community-ministral-3-14b-instruct-2512-mxfp4"></a>
 
 ### mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
@@ -1125,18 +1422,18 @@ The image shows two cats lying on a pink blanket, with two remote controls place
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.29s
-- *Generation time:* 2.96s
+- *Model load time:* 1.32s
+- *Generation time:* 2.92s
 - *Total time:* 4.26s
-- *Input validation time:* 0.00158
-- *Prompt preparation time:* 0.00659
-- *First-token latency:* 0.693
-- *Cleanup time:* 0.0817
+- *Input validation time:* 0.00175
+- *Prompt preparation time:* 0.00648
+- *First-token latency:* 0.665
+- *Cleanup time:* 0.0831
 - *Prompt tokens:* 972
 - *Generation tokens:* 155
 - *Total tokens:* 1,127
-- *Prompt throughput (raw):* 1,403 tok/s
-- *Generation throughput (raw):* 68.8 tok/s
+- *Prompt throughput (raw):* 1,461 tok/s
+- *Generation throughput (raw):* 69.1 tok/s
 - *Peak memory:* 9.8
 - *Active memory:* 8.0
 - *Cache memory:* 0.23
@@ -1198,18 +1495,18 @@ In the background, there are two remote controls placed on either side of the ca
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.36s
-- *Generation time:* 3.18s
-- *Total time:* 4.55s
-- *Input validation time:* 0.00197
-- *Prompt preparation time:* 0.000228
-- *First-token latency:* 0.763
-- *Cleanup time:* 0.0834
+- *Model load time:* 1.43s
+- *Generation time:* 3.25s
+- *Total time:* 4.68s
+- *Input validation time:* 0.00161
+- *Prompt preparation time:* 0.00025
+- *First-token latency:* 0.76
+- *Cleanup time:* 0.0824
 - *Prompt tokens:* 972
 - *Generation tokens:* 156
 - *Total tokens:* 1,128
-- *Prompt throughput (raw):* 1,275 tok/s
-- *Generation throughput (raw):* 65.0 tok/s
+- *Prompt throughput (raw):* 1,280 tok/s
+- *Generation throughput (raw):* 63.0 tok/s
 - *Peak memory:* 10
 - *Active memory:* 8.4
 - *Cache memory:* 0.23
@@ -1273,18 +1570,18 @@ Both cats seem to be enjoying their time, perhaps watching something on a televi
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.01s
-- *Generation time:* 1.22s
-- *Total time:* 2.24s
-- *Input validation time:* 0.00181
-- *Prompt preparation time:* 0.0066
-- *First-token latency:* 0.277
-- *Cleanup time:* 0.0845
+- *Model load time:* 0.93s
+- *Generation time:* 1.27s
+- *Total time:* 2.21s
+- *Input validation time:* 0.00163
+- *Prompt preparation time:* 0.00635
+- *First-token latency:* 0.281
+- *Cleanup time:* 0.0717
 - *Prompt tokens:* 971
 - *Generation tokens:* 178
 - *Total tokens:* 1,149
-- *Prompt throughput (raw):* 3,502 tok/s
-- *Generation throughput (raw):* 192 tok/s
+- *Prompt throughput (raw):* 3,456 tok/s
+- *Generation throughput (raw):* 187 tok/s
 - *Peak memory:* 4.5
 - *Active memory:* 2.8
 - *Cache memory:* 0.16
@@ -1348,18 +1645,18 @@ Both cats are positioned near what look like remote controls, suggesting a cozy,
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.23s
-- *Generation time:* 3.75s
-- *Total time:* 4.99s
-- *Input validation time:* 0.00157
-- *Prompt preparation time:* 0.00137
-- *First-token latency:* 0.405
-- *Cleanup time:* 0.0852
+- *Model load time:* 1.29s
+- *Generation time:* 3.68s
+- *Total time:* 4.98s
+- *Input validation time:* 0.00156
+- *Prompt preparation time:* 0.00132
+- *First-token latency:* 0.399
+- *Cleanup time:* 0.0836
 - *Prompt tokens:* 747
 - *Generation tokens:* 174
 - *Total tokens:* 921
-- *Prompt throughput (raw):* 1,844 tok/s
-- *Generation throughput (raw):* 52.4 tok/s
+- *Prompt throughput (raw):* 1,872 tok/s
+- *Generation throughput (raw):* 53.5 tok/s
 - *Peak memory:* 11
 - *Active memory:* 9.0
 - *Cache memory:* 0.08
@@ -1411,18 +1708,18 @@ Both cats are positioned near what look like remote controls, suggesting a cozy,
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.80s
-- *Generation time:* 6.85s
-- *Total time:* 8.66s
-- *Input validation time:* 0.00189
-- *Prompt preparation time:* 0.00124
-- *First-token latency:* 0.42
-- *Cleanup time:* 0.123
+- *Model load time:* 1.68s
+- *Generation time:* 6.89s
+- *Total time:* 8.58s
+- *Input validation time:* 0.00158
+- *Prompt preparation time:* 0.00123
+- *First-token latency:* 0.424
+- *Cleanup time:* 0.105
 - *Prompt tokens:* 747
 - *Generation tokens:* 199
 - *Total tokens:* 946
-- *Prompt throughput (raw):* 1,777 tok/s
-- *Generation throughput (raw):* 31.1 tok/s
+- *Prompt throughput (raw):* 1,760 tok/s
+- *Generation throughput (raw):* 30.9 tok/s
 - *Peak memory:* 18
 - *Active memory:* 16
 - *Cache memory:* 0.08
@@ -1474,18 +1771,18 @@ Both cats are positioned near what look like remote controls, suggesting a cozy,
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 2.27s
-- *Generation time:* 27.00s
-- *Total time:* 29.28s
-- *Input validation time:* 0.00287
-- *Prompt preparation time:* 0.00474
-- *First-token latency:* 0.771
-- *Cleanup time:* 0.113
+- *Model load time:* 2.22s
+- *Generation time:* 27.46s
+- *Total time:* 29.69s
+- *Input validation time:* 0.00164
+- *Prompt preparation time:* 0.00487
+- *First-token latency:* 0.765
+- *Cleanup time:* 0.0965
 - *Prompt tokens:* 764
 - *Generation tokens:* 158
 - *Total tokens:* 922
-- *Prompt throughput (raw):* 991 tok/s
-- *Generation throughput (raw):* 6.06 tok/s
+- *Prompt throughput (raw):* 999 tok/s
+- *Generation throughput (raw):* 5.95 tok/s
 - *Peak memory:* 23
 - *Active memory:* 19
 - *Cache memory:* 4.3
@@ -1526,6 +1823,99 @@ In this detailed photograph, two cats are peacefully sleeping on a pink blanket 
 
 ---
 
+<a id="model-mlx-community-ornith-10-35b-bf16"></a>
+
+### mlx-community/Ornith-1.0-35B-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/Ornith-1.0-35B-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 10.05s
+- *Generation time:* 10.21s
+- *Total time:* 20.28s
+- *Input validation time:* 0.00164
+- *Prompt preparation time:* 0.0133
+- *First-token latency:* 5.67
+- *Cleanup time:* 0.279
+- *Prompt tokens:* 317
+- *Generation tokens:* 305
+- *Total tokens:* 622
+- *Prompt throughput (raw):* 55.9 tok/s
+- *Generation throughput (raw):* 67.4 tok/s
+- *Peak memory:* 71
+- *Active memory:* 70
+- *Cache memory:* 0.10
+- *Model-load active memory:* 70.2
+- *Post-cleanup active memory:* 0.0102
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 131
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 9ef631ad2d0c4c26783d4f94d0a0de9516e41a4b
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ornith-1.0-35B-bf16/snapshots/9ef631ad2d0c4c26783d4f94d0a0de9516e41a4b
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+This is a cozy, overhead photograph of two tabby cats sleeping peacefully on a vibrant pink couch.
+
+**The Cats:**
+- **Left Cat:** A smaller tabby cat with classic brown and black stripes lies stretched out on its side, facing right. Its tail curls near its hind legs, and one front paw is extended forward. It appears to be in a deep sleep.
+- **Right Cat:** A larger tabby cat, possibly the same breed or mix, lies curled up more compactly on its side, facing left. Its head is tucked down, and its body forms a gentle arc. The fur shows rich brown, black, and tan markings.
+
+**The Setting:**
+- They are resting on a bright, fuchsia-pink fabric — likely a blanket or the couch upholstery itself — which creates a striking contrast with their earth-toned fur.
+- Two remote controls are visible:
+  - One white remote with blue buttons lies near the head of the smaller cat.
+  - Another white remote, slightly longer and with green and blue buttons, is positioned between the two cats.
+
+**Overall Mood:**
+The image exudes warmth, comfort, and tranquility. The cats look completely relaxed and content in their shared space, suggesting a close bond between them. The bold pink background adds a playful, cheerful touch to the serene scene.
+
+It’s a charming snapshot of domestic life — cats napping together on a colorful sofa, surrounded by the tools of human entertainment.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+This is a cozy, overhead photograph of two tabby cats sleeping peacefully on a vibrant pink couch.
+
+**The Cats:**
+- **Left Cat:** A smaller tabby cat with classic brown and black stripes lies stretched out on its side, facing right. Its tail curls near its hind legs, and one front paw is extended forward. It appears to be in a deep sleep.
+- **Right Cat:** A larger tabby cat, possibly the same breed or mix, lies curled up more compactly on its side, facing left. Its head is tucked down, and its body forms a gentle arc. The fur shows rich brown, black, and tan markings.
+
+**The Setting:**
+- They are resting on a bright, fuchsia-pink fabric — likely a blanket or the couch upholstery itself — which creates a striking contrast with their earth-toned fur.
+- Two remote controls are visible:
+  - One white remote with blue buttons lies near the head of the smaller cat.
+  - Another white remote, slightly longer and with green and blue buttons, is positioned between the two cats.
+
+**Overall Mood:**
+The image exudes warmth, comfort, and tranquility. The cats look completely relaxed and content in their shared space, suggesting a close bond between them. The bold pink background adds a playful, cheerful touch to the serene scene.
+
+It’s a charming snapshot of domestic life — cats napping together on a colorful sofa, surrounded by the tools of human entertainment.
+```
+
+</details>
+
+</details>
+
+---
+
 <a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
 
 ### mlx-community/Phi-3.5-vision-instruct-bf16
@@ -1537,18 +1927,18 @@ In this detailed photograph, two cats are peacefully sleeping on a pink blanket 
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.86s
+- *Model load time:* 1.00s
 - *Generation time:* 0.58s
-- *Total time:* 1.45s
-- *Input validation time:* 0.00168
-- *Prompt preparation time:* 0.000828
-- *First-token latency:* 0.182
-- *Cleanup time:* 0.0792
+- *Total time:* 1.58s
+- *Input validation time:* 0.00474
+- *Prompt preparation time:* 0.000826
+- *First-token latency:* 0.238
+- *Cleanup time:* 0.0806
 - *Prompt tokens:* 768
 - *Generation tokens:* 20
 - *Total tokens:* 788
-- *Prompt throughput (raw):* 4,221 tok/s
-- *Generation throughput (raw):* 61.7 tok/s
+- *Prompt throughput (raw):* 3,228 tok/s
+- *Generation throughput (raw):* 61.9 tok/s
 - *Peak memory:* 9.3
 - *Active memory:* 8.3
 - *Cache memory:* 0.41
@@ -1600,18 +1990,18 @@ The image shows two cats lying on a pink couch with remote controls beside them.
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.49s
-- *Generation time:* 0.38s
-- *Total time:* 0.87s
-- *Input validation time:* 0.00181
-- *Prompt preparation time:* 0.0037
-- *First-token latency:* 0.141
-- *Cleanup time:* 0.0832
+- *Model load time:* 0.52s
+- *Generation time:* 0.37s
+- *Total time:* 0.90s
+- *Input validation time:* 0.00152
+- *Prompt preparation time:* 0.0033
+- *First-token latency:* 0.14
+- *Cleanup time:* 0.0733
 - *Prompt tokens:* 415
 - *Generation tokens:* 69
 - *Total tokens:* 484
-- *Prompt throughput (raw):* 2,943 tok/s
-- *Generation throughput (raw):* 327 tok/s
+- *Prompt throughput (raw):* 2,960 tok/s
+- *Generation throughput (raw):* 331 tok/s
 - *Peak memory:* 2.5
 - *Active memory:* 1.3
 - *Cache memory:* 0.03
@@ -1663,17 +2053,17 @@ In the image, there are two cats lying on a pink blanket. One cat is on the left
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.72s
-- *Generation time:* 2.26s
-- *Total time:* 2.98s
-- *Input validation time:* 0.00204
-- *Prompt preparation time:* 0.00019
-- *First-token latency:* 0.0825
-- *Cleanup time:* 0.0777
+- *Model load time:* 0.86s
+- *Generation time:* 2.25s
+- *Total time:* 3.12s
+- *Input validation time:* 0.00155
+- *Prompt preparation time:* 0.000204
+- *First-token latency:* 0.0824
+- *Cleanup time:* 0.078
 - *Prompt tokens:* 313
 - *Generation tokens:* 281
 - *Total tokens:* 594
-- *Prompt throughput (raw):* 3,794 tok/s
+- *Prompt throughput (raw):* 3,797 tok/s
 - *Generation throughput (raw):* 132 tok/s
 - *Peak memory:* 5.3
 - *Active memory:* 4.3
@@ -1750,18 +2140,18 @@ This is a photograph of two cats resting on a bright pink couch. The scene is ca
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.70s
-- *Generation time:* 3.20s
-- *Total time:* 3.91s
-- *Input validation time:* 0.00179
-- *Prompt preparation time:* 0.0111
-- *First-token latency:* 0.0811
-- *Cleanup time:* 0.0771
+- *Model load time:* 0.83s
+- *Generation time:* 3.19s
+- *Total time:* 4.03s
+- *Input validation time:* 0.00173
+- *Prompt preparation time:* 0.0109
+- *First-token latency:* 0.0825
+- *Cleanup time:* 0.0767
 - *Prompt tokens:* 315
 - *Generation tokens:* 401
 - *Total tokens:* 716
-- *Prompt throughput (raw):* 3,886 tok/s
-- *Generation throughput (raw):* 130 tok/s
+- *Prompt throughput (raw):* 3,817 tok/s
+- *Generation throughput (raw):* 131 tok/s
 - *Peak memory:* 5.3
 - *Active memory:* 4.3
 - *Cache memory:* 0.10
@@ -1808,2184 +2198,6 @@ The image depicts two tabby cats resting on a vibrant pink couch. Both cats are 
 
 ---
 
-<a id="model-mlx-community-smolvlm-instruct-bf16"></a>
-
-### mlx-community/SmolVLM-Instruct-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/SmolVLM-Instruct-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Model load time:* 0.58s
-- *Generation time:* 0.97s
-- *Total time:* 1.56s
-- *Input validation time:* 0.00165
-- *Prompt preparation time:* 0.00116
-- *First-token latency:* 0.394
-- *Cleanup time:* 0.0762
-- *Prompt tokens:* 1,194
-- *Generation tokens:* 63
-- *Total tokens:* 1,257
-- *Prompt throughput (raw):* 3,027 tok/s
-- *Generation throughput (raw):* 125 tok/s
-- *Peak memory:* 5.5
-- *Active memory:* 4.5
-- *Cache memory:* 0.30
-- *Model-load active memory:* 4.51
-- *Post-cleanup active memory:* 0.0149
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 72
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
-- *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* cae61cdedd0602419b43b6102dc33cd9f1e929a6
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--SmolVLM-Instruct-bf16/snapshots/cae61cdedd0602419b43b6102dc33cd9f1e929a6
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <end_of_utterance>
-
-*Readable output:*
-
-<pre class="model-output-readable">
- Two cats are lying on a pink blanket on a couch. The cat on the left is curled up with its head on the cat on the right's back. The cat on the right is stretched out with its head on the cat on the left's back. There are two remote controls on the blanket.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
- Two cats are lying on a pink blanket on a couch. The cat on the left is curled up with its head on the cat on the right's back. The cat on the right is stretched out with its head on the cat on the left's back. There are two remote controls on the blanket.
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
-
-### mlx-community/SmolVLM2-2.2B-Instruct-mlx
-
-<details>
-<summary>Complete evidence: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Model load time:* 0.62s
-- *Generation time:* 1.44s
-- *Total time:* 2.07s
-- *Input validation time:* 0.0016
-- *Prompt preparation time:* 0.000937
-- *First-token latency:* 0.28
-- *Cleanup time:* 0.0726
-- *Prompt tokens:* 95
-- *Generation tokens:* 143
-- *Total tokens:* 238
-- *Prompt throughput (raw):* 339 tok/s
-- *Generation throughput (raw):* 131 tok/s
-- *Peak memory:* 5.5
-- *Active memory:* 4.5
-- *Cache memory:* 0.09
-- *Model-load active memory:* 4.51
-- *Post-cleanup active memory:* 0.015
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 72
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--SmolVLM2-2.2B-Instruct-mlx/snapshots/844516024a1c4400d34489b89ee067d794e432ed
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <end_of_utterance>
-
-*Readable output:*
-
-<pre class="model-output-readable">
- The image depicts a scene featuring a cat and a remote control. The cat, which appears to be a tabby with a mix of black, white, and gray fur, is lying on a red couch. The cat's body is mostly covered by the couch, with its head resting on the armrest. The remote control, which is white with a blue and red button, is placed on the armrest of the couch, close to the cat's head. The remote control is positioned horizontally, with the buttons facing upwards. The couch itself is red, and it appears to be a standard piece of furniture with a simple design. The overall scene suggests a relaxed and comfortable setting, possibly a home environment.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
- The image depicts a scene featuring a cat and a remote control. The cat, which appears to be a tabby with a mix of black, white, and gray fur, is lying on a red couch. The cat's body is mostly covered by the couch, with its head resting on the armrest. The remote control, which is white with a blue and red button, is placed on the armrest of the couch, close to the cat's head. The remote control is positioned horizontally, with the buttons facing upwards. The couch itself is red, and it appears to be a standard piece of furniture with a simple design. The overall scene suggests a relaxed and comfortable setting, possibly a home environment.
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
-
-### mlx-community/X-Reasoner-7B-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/X-Reasoner-7B-8bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Model load time:* 1.14s
-- *Generation time:* 1.89s
-- *Total time:* 3.04s
-- *Input validation time:* 0.00168
-- *Prompt preparation time:* 0.000252
-- *First-token latency:* 0.236
-- *Cleanup time:* 0.0957
-- *Prompt tokens:* 415
-- *Generation tokens:* 104
-- *Total tokens:* 519
-- *Prompt throughput (raw):* 1,757 tok/s
-- *Generation throughput (raw):* 66.1 tok/s
-- *Peak memory:* 10
-- *Active memory:* 9.5
-- *Cache memory:* 0.06
-- *Model-load active memory:* 9.46
-- *Post-cleanup active memory:* 0.0156
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 170
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 21732e74613b465bc98e9d5ec210aba5c7adbcc1
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--X-Reasoner-7B-8bit/snapshots/21732e74613b465bc98e9d5ec210aba5c7adbcc1
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-The image shows two cats lying on a pink couch. Both cats have a tabby pattern with brown, black, and white fur. The cat on the left is curled up with its head resting on the back of the couch, while the cat on the right is stretched out on its side. Between them are two remote controls, one near each cat. The couch appears to be a vibrant pink color, and the overall scene conveys a cozy and relaxed atmosphere. The cats seem to be resting or napping.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-The image shows two cats lying on a pink couch. Both cats have a tabby pattern with brown, black, and white fur. The cat on the left is curled up with its head resting on the back of the couch, while the cat on the right is stretched out on its side. Between them are two remote controls, one near each cat. The couch appears to be a vibrant pink color, and the overall scene conveys a cozy and relaxed atmosphere. The cats seem to be resting or napping.
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
-
-### mlx-community/gemma-3-27b-it-qat-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/gemma-3-27b-it-qat-4bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Model load time:* 2.22s
-- *Generation time:* 11.53s
-- *Total time:* 13.76s
-- *Input validation time:* 0.00187
-- *Prompt preparation time:* 0.00281
-- *First-token latency:* 0.722
-- *Cleanup time:* 0.123
-- *Prompt tokens:* 273
-- *Generation tokens:* 303
-- *Total tokens:* 576
-- *Prompt throughput (raw):* 378 tok/s
-- *Generation throughput (raw):* 28.1 tok/s
-- *Peak memory:* 18
-- *Active memory:* 16
-- *Cache memory:* 0.41
-- *Model-load active memory:* 16.1
-- *Post-cleanup active memory:* 0.0161
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 95
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.gemma3.processing_gemma3.Gemma3Processor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* fc4e000f32af1b7b6779294e490a7d2a80bac611
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-3-27b-it-qat-4bit/snapshots/fc4e000f32af1b7b6779294e490a7d2a80bac611
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Here's a description of the image:
-
-**Overall Impression:**
-
-The image is a charming and humorous snapshot of two tabby cats lounging on a bright pink surface, likely a couch cushion or blanket. They are positioned as if they are "controlling" the TV with remote controls.
-
-**Detailed Description:**
-
-*   **Cats:** There are two tabby cats. Both have striped fur patterns, but with slightly different shades and markings. The cat on the left has darker, more defined stripes and a more silver tone. The cat on the right has warmer, more golden tones in its stripes. Both cats are lying on their backs, appearing very relaxed and sleepy.
-*   **Remote Controls:** Each cat has a remote control positioned near them, as if they are holding or using it. This adds to the playful and humorous nature of the image.
-*   **Surface:** The cats are lying on a vibrant pink surface. It looks soft and comfortable, likely a couch cushion or blanket.
-*   **Composition:** The cats are the clear focal point of the image. The bright pink background provides a strong contrast, making them stand out. The positioning of the remote controls adds to the narrative of the image.
-*   **Mood:** The image evokes a feeling of warmth, comfort, and playfulness. It's a lighthearted and endearing scene.
-
-In essence, it's a cute and funny picture of cats enjoying a lazy day, seemingly in control of their entertainment!
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Here's a description of the image:
-
-**Overall Impression:**
-
-The image is a charming and humorous snapshot of two tabby cats lounging on a bright pink surface, likely a couch cushion or blanket. They are positioned as if they are "controlling" the TV with remote controls.
-
-**Detailed Description:**
-
-*   **Cats:** There are two tabby cats. Both have striped fur patterns, but with slightly different shades and markings. The cat on the left has darker, more defined stripes and a more silver tone. The cat on the right has warmer, more golden tones in its stripes. Both cats are lying on their backs, appearing very relaxed and sleepy.
-*   **Remote Controls:** Each cat has a remote control positioned near them, as if they are holding or using it. This adds to the playful and humorous nature of the image.
-*   **Surface:** The cats are lying on a vibrant pink surface. It looks soft and comfortable, likely a couch cushion or blanket.
-*   **Composition:** The cats are the clear focal point of the image. The bright pink background provides a strong contrast, making them stand out. The positioning of the remote controls adds to the narrative of the image.
-*   **Mood:** The image evokes a feeling of warmth, comfort, and playfulness. It's a lighthearted and endearing scene.
-
-In essence, it's a cute and funny picture of cats enjoying a lazy day, seemingly in control of their entertainment!
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-gemma-3-27b-it-qat-8bit"></a>
-
-### mlx-community/gemma-3-27b-it-qat-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/gemma-3-27b-it-qat-8bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Model load time:* 3.28s
-- *Generation time:* 17.80s
-- *Total time:* 21.08s
-- *Input validation time:* 0.00165
-- *Prompt preparation time:* 0.000211
-- *First-token latency:* 0.837
-- *Cleanup time:* 0.155
-- *Prompt tokens:* 273
-- *Generation tokens:* 289
-- *Total tokens:* 562
-- *Prompt throughput (raw):* 326 tok/s
-- *Generation throughput (raw):* 17.1 tok/s
-- *Peak memory:* 32
-- *Active memory:* 30
-- *Cache memory:* 0.41
-- *Model-load active memory:* 29.7
-- *Post-cleanup active memory:* 0.0166
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 95
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.gemma3.processing_gemma3.Gemma3Processor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* c408904bc9a0b7e996173d3cbe1bfe30e04e678d
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-3-27b-it-qat-8bit/snapshots/c408904bc9a0b7e996173d3cbe1bfe30e04e678d
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Here's a description of the image:
-
-**Overall Impression:**
-
-The image is a charming and playful shot of two tabby kittens lounging on a bright pink surface, likely a couch cushion or blanket. They are positioned as if they are "watching TV," with remote controls placed near them.
-
-**Detailed Description:**
-
-*   **Kittens:** There are two kittens, both with classic tabby markings (stripes and swirls). One kitten has a more grey/brown tabby pattern, while the other is a warmer, more orange-toned tabby. Both kittens are lying on their backs with their paws curled up, appearing very relaxed and sleepy. They both have collars on.
-*   **Positioning:** The kittens are positioned side-by-side, with each one having a remote control nearby. It looks like they are mimicking people watching television.
-*   **Remote Controls:** Two remote controls are visible, one grey and one beige, placed near each kitten.
-*   **Surface:** The kittens are lying on a vibrant pink surface. The texture appears soft, suggesting a couch cushion or blanket.
-*   **Lighting:** The lighting is fairly even, and the colors are bright and clear.
-*   **Overall Tone:** The image is lighthearted, cute, and humorous. It evokes a feeling of warmth and relaxation.
-
-It's a very endearing picture that captures the playful nature of kittens!
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Here's a description of the image:
-
-**Overall Impression:**
-
-The image is a charming and playful shot of two tabby kittens lounging on a bright pink surface, likely a couch cushion or blanket. They are positioned as if they are "watching TV," with remote controls placed near them.
-
-**Detailed Description:**
-
-*   **Kittens:** There are two kittens, both with classic tabby markings (stripes and swirls). One kitten has a more grey/brown tabby pattern, while the other is a warmer, more orange-toned tabby. Both kittens are lying on their backs with their paws curled up, appearing very relaxed and sleepy. They both have collars on.
-*   **Positioning:** The kittens are positioned side-by-side, with each one having a remote control nearby. It looks like they are mimicking people watching television.
-*   **Remote Controls:** Two remote controls are visible, one grey and one beige, placed near each kitten.
-*   **Surface:** The kittens are lying on a vibrant pink surface. The texture appears soft, suggesting a couch cushion or blanket.
-*   **Lighting:** The lighting is fairly even, and the colors are bright and clear.
-*   **Overall Tone:** The image is lighthearted, cute, and humorous. It evokes a feeling of warmth and relaxation.
-
-It's a very endearing picture that captures the playful nature of kittens!
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-gemma-3n-e4b-it-bf16"></a>
-
-### mlx-community/gemma-3n-E4B-it-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/gemma-3n-E4B-it-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Model load time:* 2.23s
-- *Generation time:* 2.50s
-- *Total time:* 4.75s
-- *Input validation time:* 0.00163
-- *Prompt preparation time:* 0.00301
-- *First-token latency:* 0.318
-- *Cleanup time:* 0.117
-- *Prompt tokens:* 272
-- *Generation tokens:* 106
-- *Total tokens:* 378
-- *Prompt throughput (raw):* 854 tok/s
-- *Generation throughput (raw):* 48.9 tok/s
-- *Peak memory:* 17
-- *Active memory:* 16
-- *Cache memory:* 0.04
-- *Model-load active memory:* 15.7
-- *Post-cleanup active memory:* 0.0177
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 97
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.gemma3n.processing_gemma3n.Gemma3nProcessor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* d9c02d0b2fa8cf26c1cb5dd9e756db59cdbe8a4a
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-3n-E4B-it-bf16/snapshots/d9c02d0b2fa8cf26c1cb5dd9e756db59cdbe8a4a
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Two tabby cats are peacefully napping on a bright pink couch. The cat on the left is lying on its back with its paws outstretched, while the cat on the right is curled up on its side, also seemingly asleep.
-
-Between the two cats are two television remotes, one white and one blue. The couch appears to be made of a soft, plush material. The lighting in the image is soft and natural, suggesting it might be daytime. The overall mood of the image is one of tranquility and relaxation.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Two tabby cats are peacefully napping on a bright pink couch. The cat on the left is lying on its back with its paws outstretched, while the cat on the right is curled up on its side, also seemingly asleep. 
-
-Between the two cats are two television remotes, one white and one blue. The couch appears to be made of a soft, plush material. The lighting in the image is soft and natural, suggesting it might be daytime. The overall mood of the image is one of tranquility and relaxation.
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-gemma-4-26b-a4b-it-4bit"></a>
-
-### mlx-community/gemma-4-26b-a4b-it-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/gemma-4-26b-a4b-it-4bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Model load time:* 2.33s
-- *Generation time:* 1.54s
-- *Total time:* 3.90s
-- *Input validation time:* 0.00161
-- *Prompt preparation time:* 0.0203
-- *First-token latency:* 0.383
-- *Cleanup time:* 0.116
-- *Prompt tokens:* 284
-- *Generation tokens:* 148
-- *Total tokens:* 432
-- *Prompt throughput (raw):* 742 tok/s
-- *Generation throughput (raw):* 129 tok/s
-- *Peak memory:* 16
-- *Active memory:* 15
-- *Cache memory:* 0.13
-- *Model-load active memory:* 15.4
-- *Post-cleanup active memory:* 0.0183
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 94
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 0d77464eeb233a2da68ebf9d7dc4edaac7db956d
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-4-26b-a4b-it-4bit/snapshots/0d77464eeb233a2da68ebf9d7dc4edaac7db956d
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-A high-angle, medium shot shows two tabby cats lying on a pink blanket on a red couch. The cat on the left is lying on its side, facing right, with its head towards the top right corner. It has dark brown and black stripes on its body and a dark tail. Its front paws are tucked under its body. The cat on the right is lying on its side, facing left, with its head towards the bottom left corner. It has light brown and black stripes on its body and a dark tail. Its front paws are stretched out towards the bottom right corner. A silver remote control is lying on the pink blanket between the two cats. The background is a red couch. The lighting is bright and even.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-A high-angle, medium shot shows two tabby cats lying on a pink blanket on a red couch. The cat on the left is lying on its side, facing right, with its head towards the top right corner. It has dark brown and black stripes on its body and a dark tail. Its front paws are tucked under its body. The cat on the right is lying on its side, facing left, with its head towards the bottom left corner. It has light brown and black stripes on its body and a dark tail. Its front paws are stretched out towards the bottom right corner. A silver remote control is lying on the pink blanket between the two cats. The background is a red couch. The lighting is bright and even.
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-gemma-4-31b-bf16"></a>
-
-### mlx-community/gemma-4-31b-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/gemma-4-31b-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Model load time:* 6.59s
-- *Generation time:* 5.25s
-- *Total time:* 11.85s
-- *Input validation time:* 0.00163
-- *Prompt preparation time:* 0.000157
-- *First-token latency:* 3.34
-- *Cleanup time:* 0.229
-- *Prompt tokens:* 272
-- *Generation tokens:* 15
-- *Total tokens:* 287
-- *Prompt throughput (raw):* 81.5 tok/s
-- *Generation throughput (raw):* 7.96 tok/s
-- *Peak memory:* 63
-- *Active memory:* 63
-- *Cache memory:* 0.49
-- *Model-load active memory:* 62.6
-- *Post-cleanup active memory:* 0.0188
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 29
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 19f0f1af698c51edaf1e93b3a3a5435b282de30f
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-4-31b-bf16/snapshots/19f0f1af698c51edaf1e93b3a3a5435b282de30f
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
- in a single sentence.Both cats are sleeping on a pink blanket.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
- in a single sentence.Both cats are sleeping on a pink blanket.
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-gemma-4-31b-it-4bit"></a>
-
-### mlx-community/gemma-4-31b-it-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/gemma-4-31b-it-4bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Model load time:* 2.55s
-- *Generation time:* 4.22s
-- *Total time:* 6.79s
-- *Input validation time:* 0.00168
-- *Prompt preparation time:* 0.000308
-- *First-token latency:* 0.713
-- *Cleanup time:* 0.129
-- *Prompt tokens:* 284
-- *Generation tokens:* 98
-- *Total tokens:* 382
-- *Prompt throughput (raw):* 398 tok/s
-- *Generation throughput (raw):* 28.0 tok/s
-- *Peak memory:* 19
-- *Active memory:* 18
-- *Cache memory:* 0.50
-- *Model-load active memory:* 18.4
-- *Post-cleanup active memory:* 0.0193
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 94
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 696d436c404745a59f30e4939a658162b0a9e57f
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-4-31b-it-4bit/snapshots/696d436c404745a59f30e4939a658162b0a9e57f
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-A high-angle, medium shot shows two brown tabby cats lying on a bright pink blanket on a red couch. The cat on the left is lying on its side, facing right, with its head resting on a blue remote control. The cat on the right is lying on its back, facing left, with its head resting on a white remote control. Both cats have their eyes closed and appear to be sleeping. The background is a red couch. The lighting is bright and even.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-A high-angle, medium shot shows two brown tabby cats lying on a bright pink blanket on a red couch. The cat on the left is lying on its side, facing right, with its head resting on a blue remote control. The cat on the right is lying on its back, facing left, with its head resting on a white remote control. Both cats have their eyes closed and appear to be sleeping. The background is a red couch. The lighting is bright and even.
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-llava-v16-mistral-7b-8bit"></a>
-
-### mlx-community/llava-v1.6-mistral-7b-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/llava-v1.6-mistral-7b-8bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Model load time:* 0.92s
-- *Generation time:* 3.73s
-- *Total time:* 4.65s
-- *Input validation time:* 0.00166
-- *Prompt preparation time:* 0.00153
-- *First-token latency:* 2.35
-- *Cleanup time:* 0.0944
-- *Prompt tokens:* 2,354
-- *Generation tokens:* 82
-- *Total tokens:* 2,436
-- *Prompt throughput (raw):* 1,002 tok/s
-- *Generation throughput (raw):* 62.6 tok/s
-- *Peak memory:* 9.7
-- *Active memory:* 8.1
-- *Cache memory:* 0.83
-- *Model-load active memory:* 8.06
-- *Post-cleanup active memory:* 0.0194
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 42
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.llava_next.processing_llava_next.LlavaNextProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* b8df5f329d95a7abe6429ed46093f9b84e8e6396
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--llava-v1.6-mistral-7b-8bit/snapshots/b8df5f329d95a7abe6429ed46093f9b84e8e6396
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-The image shows two cats lying on a pink blanket. The cat on the left is a kitten with a black and white striped coat, while the cat on the right is a tabby cat with a brown and black coat. Both cats are sleeping or resting. In the background, there is a remote control on the blanket. The cats are on a couch, and the blanket is pink.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-The image shows two cats lying on a pink blanket. The cat on the left is a kitten with a black and white striped coat, while the cat on the right is a tabby cat with a brown and black coat. Both cats are sleeping or resting. In the background, there is a remote control on the blanket. The cats are on a couch, and the blanket is pink. 
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-nanollava-15-4bit"></a>
-
-### mlx-community/nanoLLaVA-1.5-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/nanoLLaVA-1.5-4bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Model load time:* 0.46s
-- *Generation time:* 0.42s
-- *Total time:* 0.88s
-- *Input validation time:* 0.00206
-- *Prompt preparation time:* 0.00144
-- *First-token latency:* 0.0678
-- *Cleanup time:* 0.0783
-- *Prompt tokens:* 20
-- *Generation tokens:* 123
-- *Total tokens:* 143
-- *Prompt throughput (raw):* 295 tok/s
-- *Generation throughput (raw):* 373 tok/s
-- *Peak memory:* 1.9
-- *Active memory:* 0.62
-- *Cache memory:* 0.24
-- *Model-load active memory:* 0.618
-- *Post-cleanup active memory:* 0.02
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 126
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 5240204744963d72823e5de933c528c4aa82dfca
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--nanoLLaVA-1.5-4bit/snapshots/5240204744963d72823e5de933c528c4aa82dfca
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-The image shows a close-up view of two cats lying down on a pink fabric surface. Both cats are wearing striped-patterned clothing, and they are positioned in such a way that they appear to be sleeping. The cats are facing the camera, and their eyes are wide open, indicating they are alert and aware of their surroundings. The background of the image is a solid pink color, providing a contrast to the cats and the fabric surface. There are no texts or other objects in the image. The style of the image is a straightforward and unembellished photograph, capturing the cats in a relaxed state.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-The image shows a close-up view of two cats lying down on a pink fabric surface. Both cats are wearing striped-patterned clothing, and they are positioned in such a way that they appear to be sleeping. The cats are facing the camera, and their eyes are wide open, indicating they are alert and aware of their surroundings. The background of the image is a solid pink color, providing a contrast to the cats and the fabric surface. There are no texts or other objects in the image. The style of the image is a straightforward and unembellished photograph, capturing the cats in a relaxed state.
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-paligemma2-10b-ft-docci-448-6bit"></a>
-
-### mlx-community/paligemma2-10b-ft-docci-448-6bit
-
-<details>
-<summary>Complete evidence: mlx-community/paligemma2-10b-ft-docci-448-6bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Model load time:* 1.66s
-- *Generation time:* 6.34s
-- *Total time:* 8.01s
-- *Input validation time:* 0.00153
-- *Prompt preparation time:* 0.000203
-- *First-token latency:* 0.779
-- *Cleanup time:* 0.129
-- *Prompt tokens:* 1,029
-- *Generation tokens:* 180
-- *Total tokens:* 1,209
-- *Prompt throughput (raw):* 1,322 tok/s
-- *Generation throughput (raw):* 33.4 tok/s
-- *Peak memory:* 11
-- *Active memory:* 7.9
-- *Cache memory:* 1.5
-- *Model-load active memory:* 7.88
-- *Post-cleanup active memory:* 0.021
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 26
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 1485fa9b3c7adb360cd354a29a401f0d441ec728
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--paligemma2-10b-ft-docci-448-6bit/snapshots/1485fa9b3c7adb360cd354a29a401f0d441ec728
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Two cats are laying on a pink blanket. The cat on the left is a gray tabby cat with black stripes. The cat on the right is a brown tabby cat with black stripes. Both cats are laying on their sides. The cat on the left is facing the right side of the image. The cat on the right is facing the left side of the image. The cat on the left has its head down, and its body is stretched out. Its head is facing the top left corner of the image. Its tail is hanging off the edge of the blanket. The cat on the right has its head down, and its body is stretched out. Its head is facing the bottom left corner of the image. Its tail is hanging off the edge of the blanket. There is a gray remote control on the left side of the image and a gray remote control on the right side of the image.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Two cats are laying on a pink blanket. The cat on the left is a gray tabby cat with black stripes. The cat on the right is a brown tabby cat with black stripes. Both cats are laying on their sides. The cat on the left is facing the right side of the image. The cat on the right is facing the left side of the image. The cat on the left has its head down, and its body is stretched out. Its head is facing the top left corner of the image. Its tail is hanging off the edge of the blanket. The cat on the right has its head down, and its body is stretched out. Its head is facing the bottom left corner of the image. Its tail is hanging off the edge of the blanket. There is a gray remote control on the left side of the image and a gray remote control on the right side of the image.
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-paligemma2-10b-ft-docci-448-bf16"></a>
-
-### mlx-community/paligemma2-10b-ft-docci-448-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/paligemma2-10b-ft-docci-448-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Model load time:* 2.41s
-- *Generation time:* 30.81s
-- *Total time:* 33.23s
-- *Input validation time:* 0.00167
-- *Prompt preparation time:* 0.00011
-- *First-token latency:* 1.12
-- *Cleanup time:* 0.131
-- *Prompt tokens:* 1,029
-- *Generation tokens:* 159
-- *Total tokens:* 1,188
-- *Prompt throughput (raw):* 921 tok/s
-- *Generation throughput (raw):* 5.36 tok/s
-- *Peak memory:* 26
-- *Active memory:* 19
-- *Cache memory:* 6.2
-- *Model-load active memory:* 19.3
-- *Post-cleanup active memory:* 0.0221
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 26
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 7c412694b919432784c730b62fadafb1c2e15d0d
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--paligemma2-10b-ft-docci-448-bf16/snapshots/7c412694b919432784c730b62fadafb1c2e15d0d
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-A top-down view of two cats laying on a pink blanket. The cat on the left is a gray tabby cat with black stripes and a black tail. It is laying on its side with its head on the pink blanket and its body facing the left side of the image. Its front legs are stretched out in front of it, and its back legs are curled up. The cat on the right is a brown tabby cat with black stripes. It is laying on its side with its head on the pink blanket and its body facing the right side of the image. Its front legs are stretched out in front of it, and its back legs are curled up. There is a gray remote control on the left side of the image and a gray remote control on the right side of the image.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-A top-down view of two cats laying on a pink blanket. The cat on the left is a gray tabby cat with black stripes and a black tail. It is laying on its side with its head on the pink blanket and its body facing the left side of the image. Its front legs are stretched out in front of it, and its back legs are curled up. The cat on the right is a brown tabby cat with black stripes. It is laying on its side with its head on the pink blanket and its body facing the right side of the image. Its front legs are stretched out in front of it, and its back legs are curled up. There is a gray remote control on the left side of the image and a gray remote control on the right side of the image.
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-paligemma2-3b-ft-docci-448-bf16"></a>
-
-### mlx-community/paligemma2-3b-ft-docci-448-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/paligemma2-3b-ft-docci-448-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Model load time:* 1.45s
-- *Generation time:* 7.04s
-- *Total time:* 8.50s
-- *Input validation time:* 0.00167
-- *Prompt preparation time:* 0.000123
-- *First-token latency:* 0.376
-- *Cleanup time:* 0.1
-- *Prompt tokens:* 1,029
-- *Generation tokens:* 126
-- *Total tokens:* 1,155
-- *Prompt throughput (raw):* 2,735 tok/s
-- *Generation throughput (raw):* 19.0 tok/s
-- *Peak memory:* 10
-- *Active memory:* 6.1
-- *Cache memory:* 3.6
-- *Model-load active memory:* 6.09
-- *Post-cleanup active memory:* 0.0231
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 26
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* f66333527ce75342b09d4df81873f65272ec2f30
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--paligemma2-3b-ft-docci-448-bf16/snapshots/f66333527ce75342b09d4df81873f65272ec2f30
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-A top-down view of two cats sleeping on a pink blanket. The cat on the left is a gray and black color and is laying on its side with its head facing the right side of the image. Its front paws are stretched out in front of it. The cat's tail is sticking out to the left of the blanket. The cat on the right is lying on its side with its head facing the left side of the image. Its front paws are stretched out in front of it. Its tail is sticking out to the left of the blanket. There is a white and gray remote control between the two cats.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-A top-down view of two cats sleeping on a pink blanket. The cat on the left is a gray and black color and is laying on its side with its head facing the right side of the image. Its front paws are stretched out in front of it. The cat's tail is sticking out to the left of the blanket. The cat on the right is lying on its side with its head facing the left side of the image. Its front paws are stretched out in front of it. Its tail is sticking out to the left of the blanket. There is a white and gray remote control between the two cats.
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-pixtral-12b-8bit"></a>
-
-### mlx-community/pixtral-12b-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/pixtral-12b-8bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Model load time:* 1.64s
-- *Generation time:* 5.89s
-- *Total time:* 7.53s
-- *Input validation time:* 0.00196
-- *Prompt preparation time:* 0.00261
-- *First-token latency:* 0.772
-- *Cleanup time:* 0.104
-- *Prompt tokens:* 1,237
-- *Generation tokens:* 199
-- *Total tokens:* 1,436
-- *Prompt throughput (raw):* 1,603 tok/s
-- *Generation throughput (raw):* 39.0 tok/s
-- *Peak memory:* 15
-- *Active memory:* 14
-- *Cache memory:* 0.27
-- *Model-load active memory:* 13.5
-- *Post-cleanup active memory:* 0.0244
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 40
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 79e24b66302d4ac5e75491767f8914b2aa6ac1f8
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--pixtral-12b-8bit/snapshots/79e24b66302d4ac5e75491767f8914b2aa6ac1f8
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-In the tranquil setting of this image, two feline companions, one adult and one kitten, are enjoying a peaceful slumber on a vibrant red couch. The adult cat, with its brown and black stripes, is lying on its side, its head comfortably resting on the armrest of the couch. Its body is relaxed, embodying the essence of serenity.
-
-Beside it, the kitten, mirroring the adult's brown and black stripes, is curled up in a perfect circle. Its head is gently resting on the seat of the couch, adding to the overall calmness of the scene.
-
-The couch they're on is a striking red, providing a warm contrast to the cats' brown and black fur. On the armrest of the couch, there are two remote controls, perhaps indicating a recent human presence. The precise location of these objects and their relative positions to each other and the cats add depth to the image, creating a snapshot of a quiet moment in time.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-In the tranquil setting of this image, two feline companions, one adult and one kitten, are enjoying a peaceful slumber on a vibrant red couch. The adult cat, with its brown and black stripes, is lying on its side, its head comfortably resting on the armrest of the couch. Its body is relaxed, embodying the essence of serenity.
-
-Beside it, the kitten, mirroring the adult's brown and black stripes, is curled up in a perfect circle. Its head is gently resting on the seat of the couch, adding to the overall calmness of the scene.
-
-The couch they're on is a striking red, providing a warm contrast to the cats' brown and black fur. On the armrest of the couch, there are two remote controls, perhaps indicating a recent human presence. The precise location of these objects and their relative positions to each other and the cats add depth to the image, creating a snapshot of a quiet moment in time.
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-pixtral-12b-bf16"></a>
-
-### mlx-community/pixtral-12b-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/pixtral-12b-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Model load time:* 2.50s
-- *Generation time:* 10.81s
-- *Total time:* 13.32s
-- *Input validation time:* 0.00202
-- *Prompt preparation time:* 0.000226
-- *First-token latency:* 0.796
-- *Cleanup time:* 0.122
-- *Prompt tokens:* 1,237
-- *Generation tokens:* 204
-- *Total tokens:* 1,441
-- *Prompt throughput (raw):* 1,555 tok/s
-- *Generation throughput (raw):* 20.4 tok/s
-- *Peak memory:* 27
-- *Active memory:* 25
-- *Cache memory:* 0.27
-- *Model-load active memory:* 25.4
-- *Post-cleanup active memory:* 0.0247
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 40
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 378cf65efd79647fc324a079c141fd92cb29916e
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--pixtral-12b-bf16/snapshots/378cf65efd79647fc324a079c141fd92cb29916e
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-In the tranquil setting of this image, two feline companions, one a tabby cat and the other a Bengal cat, are enjoying a peaceful slumber on a vibrant red couch. The tabby cat, with its distinctive striped coat, is sprawled out on its side, its head comfortably resting on the armrest of the couch. Its body is relaxed, embodying the essence of serenity.
-
-Beside it, the Bengal cat is curled up in a perfect circle, its head nestled on its paws. The intricate patterns on its coat blend harmoniously with the red of the couch, creating a picture of tranquility.
-
-Two remote controls lie on the couch, silent witnesses to the cats' slumber. One is near the tabby cat, while the other is closer to the Bengal cat. Their presence adds a touch of everyday life to this serene scene.
-
-The image captures a moment of pure peace and comfort, as these two cats enjoy their rest in a warm and inviting environment.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-In the tranquil setting of this image, two feline companions, one a tabby cat and the other a Bengal cat, are enjoying a peaceful slumber on a vibrant red couch. The tabby cat, with its distinctive striped coat, is sprawled out on its side, its head comfortably resting on the armrest of the couch. Its body is relaxed, embodying the essence of serenity.
-
-Beside it, the Bengal cat is curled up in a perfect circle, its head nestled on its paws. The intricate patterns on its coat blend harmoniously with the red of the couch, creating a picture of tranquility.
-
-Two remote controls lie on the couch, silent witnesses to the cats' slumber. One is near the tabby cat, while the other is closer to the Bengal cat. Their presence adds a touch of everyday life to this serene scene.
-
-The image captures a moment of pure peace and comfort, as these two cats enjoy their rest in a warm and inviting environment.
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-qnguyen3-nanollava"></a>
-
-### qnguyen3/nanoLLaVA
-
-<details>
-<summary>Complete evidence: qnguyen3/nanoLLaVA</summary>
-
-- *Execution:* completed
-- *Usability:* usable
-- *Maintainer status:* none
-- *Observations:* none
-- *Model load time:* 0.52s
-- *Generation time:* 0.52s
-- *Total time:* 1.04s
-- *Input validation time:* 0.00169
-- *Prompt preparation time:* 0.000589
-- *First-token latency:* 0.095
-- *Cleanup time:* 0.109
-- *Prompt tokens:* 20
-- *Generation tokens:* 44
-- *Total tokens:* 64
-- *Prompt throughput (raw):* 211 tok/s
-- *Generation throughput (raw):* 112 tok/s
-- *Peak memory:* 4.0
-- *Active memory:* 2.1
-- *Cache memory:* 1.6
-- *Model-load active memory:* 2.13
-- *Post-cleanup active memory:* 0.0253
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 126
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 13d60cec183a86755afed64da495fcc2c382ea80
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--qnguyen3--nanoLLaVA/snapshots/13d60cec183a86755afed64da495fcc2c382ea80
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-This image features two cats lying on a couch. One cat is a light brown and the other is a dark brown. They both have green eyes and a black nose. The cats are lying on a pink blanket.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-This image features two cats lying on a couch. One cat is a light brown and the other is a dark brown. They both have green eyes and a black nose. The cats are lying on a pink blanket.
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-jqlive-kimi-vl-a3b-thinking-2506-6bit"></a>
-
-### jqlive/Kimi-VL-A3B-Thinking-2506-6bit
-
-<details>
-<summary>Complete evidence: jqlive/Kimi-VL-A3B-Thinking-2506-6bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Conversation-role control tokens remain visible
-- *Model load time:* 4.35s
-- *Generation time:* 3.71s
-- *Total time:* 8.07s
-- *Input validation time:* 0.00178
-- *Prompt preparation time:* 0.00167
-- *First-token latency:* 0.339
-- *Cleanup time:* 0.0894
-- *Prompt tokens:* 397
-- *Generation tokens:* 221
-- *Total tokens:* 618
-- *Prompt throughput (raw):* 1,171 tok/s
-- *Generation throughput (raw):* 80.0 tok/s
-- *Peak memory:* 16
-- *Active memory:* 14
-- *Cache memory:* 0.70
-- *Model-load active memory:* 13.8
-- *Post-cleanup active memory:* 0.00121
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 227
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 4b3b11ce0874c36a99e13e17e355049042f8620a
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--jqlive--Kimi-VL-A3B-Thinking-2506-6bit/snapshots/4b3b11ce0874c36a99e13e17e355049042f8620a
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* [EOS]
-
-*Readable output:*
-
-<pre class="model-output-readable">
-◁think▷So, let's analyze the image. The image shows two tabby cats lying on a pink fabric surface. There are two remote controls, one near each cat. The cats have a mix of brown, black, and white fur. The lighting is high-contrast, giving a stylized, almost posterized look. The scene is vibrant with the pink background. The cats appear relaxed, possibly sleeping or resting. The remotes are light blue with buttons, typical of TV or other electronic remotes. The overall style is artistic with strong color saturation.◁/think▷The image depicts two tabby cats resting on a vibrant pink fabric surface. One cat is positioned on the left, with a light blue remote control nearby, while the other cat is on the right, with a similar remote. Both cats have a mix of brown, black, and white fur patterns. The image has a stylized, high-contrast, posterized aesthetic, emphasizing vivid colors and sharp details. The cats appear relaxed, likely sleeping or resting, against the bright pink background.&lt;|im_assistant|&gt;
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-◁think▷So, let's analyze the image. The image shows two tabby cats lying on a pink fabric surface. There are two remote controls, one near each cat. The cats have a mix of brown, black, and white fur. The lighting is high-contrast, giving a stylized, almost posterized look. The scene is vibrant with the pink background. The cats appear relaxed, possibly sleeping or resting. The remotes are light blue with buttons, typical of TV or other electronic remotes. The overall style is artistic with strong color saturation.◁/think▷The image depicts two tabby cats resting on a vibrant pink fabric surface. One cat is positioned on the left, with a light blue remote control nearby, while the other cat is on the right, with a similar remote. Both cats have a mix of brown, black, and white fur patterns. The image has a stylized, high-contrast, posterized aesthetic, emphasizing vivid colors and sharp details. The cats appear relaxed, likely sleeping or resting, against the bright pink background.<|im_assistant|>
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
-
-### mlx-community/Idefics3-8B-Llama3-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/Idefics3-8B-Llama3-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Conversation-role control tokens remain visible
-- *Model load time:* 1.86s
-- *Generation time:* 12.10s
-- *Total time:* 13.96s
-- *Input validation time:* 0.00171
-- *Prompt preparation time:* 0.00117
-- *First-token latency:* 1.05
-- *Cleanup time:* 0.1
-- *Prompt tokens:* 2,325
-- *Generation tokens:* 354
-- *Total tokens:* 2,679
-- *Prompt throughput (raw):* 2,221 tok/s
-- *Generation throughput (raw):* 32.2 tok/s
-- *Peak memory:* 19
-- *Active memory:* 17
-- *Cache memory:* 0.43
-- *Model-load active memory:* 16.9
-- *Post-cleanup active memory:* 0.00442
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 77
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 8c2a30c48864f3251701b7bde40f601d25535098
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Idefics3-8B-Llama3-bf16/snapshots/8c2a30c48864f3251701b7bde40f601d25535098
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|end_of_text\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
- The image depicts two cats lying on a pink fabric, possibly a blanket or a piece of clothing, which is draped over a piece of furniture, likely a couch or a chair. The cats are positioned side by side, and they appear to be in a relaxed state, possibly sleeping or resting. The fabric is a solid pink color, and it is smooth and soft-looking, suggesting it is made of a comfortable material like cotton or fleece.
-
-The cats are both of a similar size and have a similar color pattern. They have a mix of brown and black stripes, with the brown stripes being more prominent. Their fur appears to be short and well-groomed, indicating that they are well-cared for. The cats' eyes are closed, and their ears are slightly tilted back, which is a common posture for cats when they are relaxed or sleeping.
-
-In the background, there are two remote controls, one on each side of the cats. The remotes are white with black buttons, and they are placed on the pink fabric. The remotes are not in use, and they are simply resting on the fabric.
-
-The overall scene is calm and serene, with the cats and remotes creating a cozy and comfortable setting. The pink fabric adds a soft and warm touch to the image, making it feel inviting and relaxing. The cats' presence adds a sense of companionship and warmth to the scene, making it a pleasant and homely image.
-
-In summary, the image features two cats lying on a pink fabric, with two remotes in the background, creating a cozy and relaxed atmosphere. The cats are well-groomed and appear to be sleeping or resting, while the pink fabric and remotes add to the comfort and homeliness of the scene.&lt;end_of_utterance&gt;
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
- The image depicts two cats lying on a pink fabric, possibly a blanket or a piece of clothing, which is draped over a piece of furniture, likely a couch or a chair. The cats are positioned side by side, and they appear to be in a relaxed state, possibly sleeping or resting. The fabric is a solid pink color, and it is smooth and soft-looking, suggesting it is made of a comfortable material like cotton or fleece.
-
-The cats are both of a similar size and have a similar color pattern. They have a mix of brown and black stripes, with the brown stripes being more prominent. Their fur appears to be short and well-groomed, indicating that they are well-cared for. The cats' eyes are closed, and their ears are slightly tilted back, which is a common posture for cats when they are relaxed or sleeping.
-
-In the background, there are two remote controls, one on each side of the cats. The remotes are white with black buttons, and they are placed on the pink fabric. The remotes are not in use, and they are simply resting on the fabric.
-
-The overall scene is calm and serene, with the cats and remotes creating a cozy and comfortable setting. The pink fabric adds a soft and warm touch to the image, making it feel inviting and relaxing. The cats' presence adds a sense of companionship and warmth to the scene, making it a pleasant and homely image.
-
-In summary, the image features two cats lying on a pink fabric, with two remotes in the background, creating a cozy and relaxed atmosphere. The cats are well-groomed and appear to be sleeping or resting, while the pink fabric and remotes add to the comfort and homeliness of the scene.<end_of_utterance>
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-kimi-vl-a3b-thinking-2506-bf16"></a>
-
-### mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/Kimi-VL-A3B-Thinking-2506-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Conversation-role control tokens remain visible
-- *Model load time:* 3.21s
-- *Generation time:* 52.85s
-- *Total time:* 56.07s
-- *Input validation time:* 0.00178
-- *Prompt preparation time:* 0.00156
-- *First-token latency:* 0.806
-- *Cleanup time:* 0.163
-- *Prompt tokens:* 397
-- *Generation tokens:* 241
-- *Total tokens:* 638
-- *Prompt throughput (raw):* 493 tok/s
-- *Generation throughput (raw):* 4.65 tok/s
-- *Peak memory:* 39
-- *Active memory:* 33
-- *Cache memory:* 4.9
-- *Model-load active memory:* 32.8
-- *Post-cleanup active memory:* 0.0057
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 227
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* fb254434d4026bee7aa840dea1c5d59feea8fd48
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Kimi-VL-A3B-Thinking-2506-bf16/snapshots/fb254434d4026bee7aa840dea1c5d59feea8fd48
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* [EOS]
-
-*Readable output:*
-
-<pre class="model-output-readable">
-◁think▷So, let's analyze the image. The image shows two tabby cats lying on a pink fabric surface. There are two remote controls, one near each cat. The cats have a mix of brown, black, and white fur. The lighting is high-contrast, making the colors very vivid. The scene is likely a cozy indoor setting, maybe a couch or bed. The cats appear relaxed, possibly sleeping or resting. The remotes are light blue with buttons, typical of TV or other electronic remotes. The overall style is a bit stylized with high saturation, giving it a vibrant look.◁/think▷The image depicts two tabby cats resting on a pink fabric surface. One cat is positioned on the left, with a light blue remote control near its head, while the other cat is on the right, with a similar remote control closer to its body. Both cats have a mix of brown, black, and white fur patterns. The scene has a high-contrast, stylized appearance with vivid colors, suggesting a cozy indoor setting, likely a couch or bed. The lighting emphasizes the cats' fur details and the texture of the fabric.&lt;|im_assistant|&gt;
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-◁think▷So, let's analyze the image. The image shows two tabby cats lying on a pink fabric surface. There are two remote controls, one near each cat. The cats have a mix of brown, black, and white fur. The lighting is high-contrast, making the colors very vivid. The scene is likely a cozy indoor setting, maybe a couch or bed. The cats appear relaxed, possibly sleeping or resting. The remotes are light blue with buttons, typical of TV or other electronic remotes. The overall style is a bit stylized with high saturation, giving it a vibrant look.◁/think▷The image depicts two tabby cats resting on a pink fabric surface. One cat is positioned on the left, with a light blue remote control near its head, while the other cat is on the right, with a similar remote control closer to its body. Both cats have a mix of brown, black, and white fur patterns. The scene has a high-contrast, stylized appearance with vivid colors, suggesting a cozy indoor setting, likely a couch or bed. The lighting emphasizes the cats' fur details and the texture of the fabric.<|im_assistant|>
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-diffusiongemma-26b-a4b-it-8bit"></a>
-
-### mlx-community/diffusiongemma-26B-A4B-it-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/diffusiongemma-26B-A4B-it-8bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Unrecognised model control tokens remain visible
-- *Model load time:* 3.22s
-- *Generation time:* 1.96s
-- *Total time:* 5.21s
-- *Input validation time:* 0.00181
-- *Prompt preparation time:* 0.0201
-- *First-token latency:* 0.296
-- *Cleanup time:* 0.137
-- *Prompt tokens:* 280
-- *Generation tokens:* 89
-- *Total tokens:* 369
-- *Prompt throughput (raw):* 946 tok/s
-- *Generation throughput (raw):* 59.4 tok/s
-- *Peak memory:* 29
-- *Active memory:* 28
-- *Cache memory:* 0.01
-- *Model-load active memory:* 28
-- *Post-cleanup active memory:* 0.0156
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 66
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 7b95e3887078ba56283c24f2578d6e5a06b9d7e8
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--diffusiongemma-26B-A4B-it-8bit/snapshots/7b95e3887078ba56283c24f2578d6e5a06b9d7e8
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-&lt;|channel&gt;thought
-&lt;channel|&gt;A high-angle, eye-level shot shows two tabby cats sleeping on a pink blanket on a red couch. The cat on the left is smaller and lying on its side with its head tucked in and its paws curled. The cat on the right is larger and lying on its stomach with its head turned and its paws stretched. Two remote controls are on the couch near the cats. The lighting is bright and even.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-<|channel>thought
-<channel|>A high-angle, eye-level shot shows two tabby cats sleeping on a pink blanket on a red couch. The cat on the left is smaller and lying on its side with its head tucked in and its paws curled. The cat on the right is larger and lying on its stomach with its head turned and its paws stretched. Two remote controls are on the couch near the cats. The lighting is bright and even.
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
-
-### mlx-community/diffusiongemma-26B-A4B-it-mxfp8
-
-<details>
-<summary>Complete evidence: mlx-community/diffusiongemma-26B-A4B-it-mxfp8</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Unrecognised model control tokens remain visible
-- *Model load time:* 3.18s
-- *Generation time:* 1.62s
-- *Total time:* 4.80s
-- *Input validation time:* 0.00198
-- *Prompt preparation time:* 0.00032
-- *First-token latency:* 0.291
-- *Cleanup time:* 0.125
-- *Prompt tokens:* 280
-- *Generation tokens:* 87
-- *Total tokens:* 367
-- *Prompt throughput (raw):* 962 tok/s
-- *Generation throughput (raw):* 75.7 tok/s
-- *Peak memory:* 28
-- *Active memory:* 27
-- *Cache memory:* 0.01
-- *Model-load active memory:* 27.2
-- *Post-cleanup active memory:* 0.0156
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 66
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* ded389e478f86d498ad9e7f47666e83b166a28f1
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--diffusiongemma-26B-A4B-it-mxfp8/snapshots/ded389e478f86d498ad9e7f47666e83b166a28f1
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-&lt;|channel&gt;thought
-&lt;channel|&gt;A high-angle, medium shot shows two brown tabby cats sleeping on a pink blanket on a red couch. The cat on the left is smaller and lying on its side with its head turned up and its paws tucked in. The cat on the right is larger and lying on its stomach with its head turned down. There are two remote controls on the couch between the cats. The lighting is bright and even.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-<|channel>thought
-<channel|>A high-angle, medium shot shows two brown tabby cats sleeping on a pink blanket on a red couch. The cat on the left is smaller and lying on its side with its head turned up and its paws tucked in. The cat on the right is larger and lying on its stomach with its head turned down. There are two remote controls on the couch between the cats. The lighting is bright and even.
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-paligemma2-3b-pt-896-4bit"></a>
-
-### mlx-community/paligemma2-3b-pt-896-4bit
-
-<details>
-<summary>Complete evidence: mlx-community/paligemma2-3b-pt-896-4bit</summary>
-
-- *Execution:* completed
-- *Usability:* usable_with_caveats
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response is unusually short
-- *Model load time:* 1.18s
-- *Generation time:* 1.21s
-- *Total time:* 2.40s
-- *Input validation time:* 0.00163
-- *Prompt preparation time:* 0.000145
-- *First-token latency:* 1.17
-- *Cleanup time:* 0.0972
-- *Prompt tokens:* 4,101
-- *Generation tokens:* 2
-- *Total tokens:* 4,103
-- *Prompt throughput (raw):* 3,511 tok/s
-- *Generation throughput (raw):* 85.3 tok/s
-- *Peak memory:* 4.6
-- *Active memory:* 1.7
-- *Cache memory:* 1.7
-- *Model-load active memory:* 1.74
-- *Post-cleanup active memory:* 0.0241
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 26
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
-- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* a26bac48c7a661dfdafe1799c90177f818e79925
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--paligemma2-3b-pt-896-4bit/snapshots/a26bac48c7a661dfdafe1799c90177f818e79925
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;eos&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Cat
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Cat
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-apriel-15-15b-thinker-6bit-mlx"></a>
-
-### mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
-
-<details>
-<summary>Complete evidence: mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX</summary>
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response appears cut off at the token limit
-- *Model load time:* 1.59s
-- *Generation time:* 12.33s
-- *Total time:* 13.93s
-- *Input validation time:* 0.00156
-- *Prompt preparation time:* 0.00709
-- *First-token latency:* 0.93
-- *Cleanup time:* 0.0913
-- *Prompt tokens:* 1,329
-- *Generation tokens:* 500
-- *Total tokens:* 1,829
-- *Prompt throughput (raw):* 1,428 tok/s
-- *Generation throughput (raw):* 43.9 tok/s
-- *Peak memory:* 14
-- *Active memory:* 13
-- *Cache memory:* 0.41
-- *Model-load active memory:* 12.6
-- *Post-cleanup active memory:* 0.00207
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* max_tokens
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 414
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 24cb8fef6052e8d6e0dd7d467cf2d3db2dec19b2
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Apriel-1.5-15b-Thinker-6bit-MLX/snapshots/24cb8fef6052e8d6e0dd7d467cf2d3db2dec19b2
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Here are my reasoning steps:
-The user asks: "Describe this image". The image is of two cats sleeping on a pink couch, with a remote control and a DVD case (or something) on the couch. The cats are both tabby, with similar patterns. They are lying on their sides, curled up, with paws extended. The remote is on the left side, the DVD case on the right side. The couch is pink. The cats appear to be sleeping. The cat on the left is lying on its side with its head turned slightly upward, its front paws stretched out, and its tail curled around its body. The cat on the right is lying on its side, with its head turned to the left, its front paws tucked under its chest, and its tail draped over its back. The remote is a typical TV remote with colored buttons. The DVD case is partially visible, showing a blue spine with some text. The couch is plush. The lighting is soft. The cats have a mix of brown, black, and tan stripes. The overall scene is cozy and relaxed.
-
-We need to produce a description. The user didn't ask for anything else. So we can give a detailed description. The user is presumably just wanting a description. There's no disallowed content. So we can comply.
-
-We should be mindful of the policy: no disallowed content. It's a normal image. So we can comply.
-
-We can also mention the cat's positions relative to each other and the objects. The cat on the left is near the remote, the cat on the right near the DVD case. The couch is pink. The cats are tabby. The remote is white with black and colored buttons. The DVD case is blue with white text. The cats are sleeping. The scene is cozy.
-
-We can also mention the cat's fur pattern: stripes, spots, etc. The cat's eyes are closed. The cat's ears are perked. The cat's paws are visible. The cat's tail is visible. The cat's whiskers are visible. The cat's nose is visible. The cat's ears are pointed. The cat's fur is fluffy.
-
-We can also mention the couch's texture: plush, soft. The lighting is warm. The scene is likely in a living room.
-
-We can also mention the remote is a typical TV remote with a power button, volume, channel, etc. The
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Here are my reasoning steps:
-The user asks: "Describe this image". The image is of two cats sleeping on a pink couch, with a remote control and a DVD case (or something) on the couch. The cats are both tabby, with similar patterns. They are lying on their sides, curled up, with paws extended. The remote is on the left side, the DVD case on the right side. The couch is pink. The cats appear to be sleeping. The cat on the left is lying on its side with its head turned slightly upward, its front paws stretched out, and its tail curled around its body. The cat on the right is lying on its side, with its head turned to the left, its front paws tucked under its chest, and its tail draped over its back. The remote is a typical TV remote with colored buttons. The DVD case is partially visible, showing a blue spine with some text. The couch is plush. The lighting is soft. The cats have a mix of brown, black, and tan stripes. The overall scene is cozy and relaxed.
-
-We need to produce a description. The user didn't ask for anything else. So we can give a detailed description. The user is presumably just wanting a description. There's no disallowed content. So we can comply.
-
-We should be mindful of the policy: no disallowed content. It's a normal image. So we can comply.
-
-We can also mention the cat's positions relative to each other and the objects. The cat on the left is near the remote, the cat on the right near the DVD case. The couch is pink. The cats are tabby. The remote is white with black and colored buttons. The DVD case is blue with white text. The cats are sleeping. The scene is cozy.
-
-We can also mention the cat's fur pattern: stripes, spots, etc. The cat's eyes are closed. The cat's ears are perked. The cat's paws are visible. The cat's tail is visible. The cat's whiskers are visible. The cat's nose is visible. The cat's ears are pointed. The cat's fur is fluffy.
-
-We can also mention the couch's texture: plush, soft. The lighting is warm. The scene is likely in a living room.
-
-We can also mention the remote is a typical TV remote with a power button, volume, channel, etc. The
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
-
-### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response appears cut off at the token limit
-- *Model load time:* 8.97s
-- *Generation time:* 15.53s
-- *Total time:* 24.51s
-- *Input validation time:* 0.00162
-- *Prompt preparation time:* 0.00881
-- *First-token latency:* 7.67
-- *Cleanup time:* 0.213
-- *Prompt tokens:* 437
-- *Generation tokens:* 500
-- *Total tokens:* 937
-- *Prompt throughput (raw):* 57.0 tok/s
-- *Generation throughput (raw):* 63.8 tok/s
-- *Peak memory:* 60
-- *Active memory:* 59
-- *Cache memory:* 0.06
-- *Model-load active memory:* 58.8
-- *Post-cleanup active memory:* 0.00256
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* max_tokens
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 230
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
-- *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 32dae5c38006e20ac158bc94cd1d5967d19b2652
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-bf16/snapshots/32dae5c38006e20ac158bc94cd1d5967d19b2652
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* &lt;/s&gt;
-
-*Readable output:*
-
-<pre class="model-output-readable">
-Alright, let's get to work. The user wants a detailed description of this image, and I'm the one to provide it. First, I need to break down the request. The user has given me a complex prompt, a jumble of words that I need to decipher. It's a classic case of "gibberish," but I can handle it.
-
-My initial step is to analyze the user's input. I see a jumble of words, a mix of cat breeds, colors, and objects. It's a mess, but I can see the core elements: cats, a couch, and a remote. The user wants a description, so I need to extract the meaning from this chaos.
-
-Next, I'll sift through the text, pulling out the key elements. I'll identify the cats, the couch, and the remote. I'll also note the colors and positions. I'll ignore the gibberish, the nonsensical phrases.
-
-Now, I'll synthesize the information. I'll start with the main subject: two cats on a couch. I'll describe their appearance, focusing on the colors and breeds. Then, I'll describe the setting: the couch, the remote, and the overall atmosphere. I'll make sure to mention the relaxed, cozy vibe.
-
-Finally, I'll structure the description. I'll start with a general overview, then go into detail about the cats, the couch, and the remote. I'll use descriptive language to paint a picture. I'll make sure the description is clear, concise, and engaging. I'll also make sure to mention the "gibberish" in the prompt, but I won't let it dominate the description.
-
-I'll review the final description to ensure it's accurate, comprehensive, and captures the essence of the image. I'll make sure it's well-written and easy to understand. I'll also make sure to mention the "gibberish" in the prompt, but I won't let it dominate the description.
-&lt;/think&gt;
-
-Based on the image provided, here is a description of the scene:
-
-This is a heartwarming and cozy image of two cats relaxing together on a plush, red couch.
-
-*   **
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-Alright, let's get to work. The user wants a detailed description of this image, and I'm the one to provide it. First, I need to break down the request. The user has given me a complex prompt, a jumble of words that I need to decipher. It's a classic case of "gibberish," but I can handle it.
-
-My initial step is to analyze the user's input. I see a jumble of words, a mix of cat breeds, colors, and objects. It's a mess, but I can see the core elements: cats, a couch, and a remote. The user wants a description, so I need to extract the meaning from this chaos.
-
-Next, I'll sift through the text, pulling out the key elements. I'll identify the cats, the couch, and the remote. I'll also note the colors and positions. I'll ignore the gibberish, the nonsensical phrases.
-
-Now, I'll synthesize the information. I'll start with the main subject: two cats on a couch. I'll describe their appearance, focusing on the colors and breeds. Then, I'll describe the setting: the couch, the remote, and the overall atmosphere. I'll make sure to mention the relaxed, cozy vibe.
-
-Finally, I'll structure the description. I'll start with a general overview, then go into detail about the cats, the couch, and the remote. I'll use descriptive language to paint a picture. I'll make sure the description is clear, concise, and engaging. I'll also make sure to mention the "gibberish" in the prompt, but I won't let it dominate the description.
-
-I'll review the final description to ensure it's accurate, comprehensive, and captures the essence of the image. I'll make sure it's well-written and easy to understand. I'll also make sure to mention the "gibberish" in the prompt, but I won't let it dominate the description.
-</think>
-
-Based on the image provided, here is a description of the scene:
-
-This is a heartwarming and cozy image of two cats relaxing together on a plush, red couch.
-
-*   **
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-glm-46v-flash-6bit"></a>
-
-### mlx-community/GLM-4.6V-Flash-6bit
-
-<details>
-<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-6bit</summary>
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Internal reasoning block appears incomplete
-- *Model load time:* 1.39s
-- *Generation time:* 3.46s
-- *Total time:* 4.85s
-- *Input validation time:* 0.00186
-- *Prompt preparation time:* 0.00698
-- *First-token latency:* 0.335
-- *Cleanup time:* 0.0878
-- *Prompt tokens:* 406
-- *Generation tokens:* 197
-- *Total tokens:* 603
-- *Prompt throughput (raw):* 1,213 tok/s
-- *Generation throughput (raw):* 63.4 tok/s
-- *Peak memory:* 10
-- *Active memory:* 9.4
-- *Cache memory:* 0.05
-- *Model-load active memory:* 9.43
-- *Post-cleanup active memory:* 0.00351
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 121
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* df9464782d3452e0dfd86afe0984f1c9eca75ca1
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-6bit/snapshots/df9464782d3452e0dfd86afe0984f1c9eca75ca1
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|endoftext\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-The image depicts two tabby cats resting on a bright pink couch. The couch has a smooth, slightly wrinkled fabric, and the backrest is a deeper red.
-
-- **Left Cat**: A smaller tabby with a mix of brown, black, and tan stripes. It lies on its side, eyes closed, appearing relaxed. Its tail is curled at the end, and a green collar is visible around its neck.
-
-- **Right Cat**: A larger tabby with similar brown, black, and tan striping. It lies on its side, head lowered toward the couch, eyes partially closed, also appearing relaxed.
-
-- **Remotes**: Two remote controls are placed on the couch between the cats. The left remote is light blue with dark buttons, while the right remote is white with colorful buttons (red, green, blue, yellow).
-
-The overall scene is cozy and relaxed, with the cats appearing comfortable and at ease on the vibrant pink couch.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-The image depicts two tabby cats resting on a bright pink couch. The couch has a smooth, slightly wrinkled fabric, and the backrest is a deeper red.  
-
-- **Left Cat**: A smaller tabby with a mix of brown, black, and tan stripes. It lies on its side, eyes closed, appearing relaxed. Its tail is curled at the end, and a green collar is visible around its neck.  
-
-- **Right Cat**: A larger tabby with similar brown, black, and tan striping. It lies on its side, head lowered toward the couch, eyes partially closed, also appearing relaxed.  
-
-- **Remotes**: Two remote controls are placed on the couch between the cats. The left remote is light blue with dark buttons, while the right remote is white with colorful buttons (red, green, blue, yellow).  
-
-The overall scene is cozy and relaxed, with the cats appearing comfortable and at ease on the vibrant pink couch.
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
-
-### mlx-community/GLM-4.6V-Flash-mxfp4
-
-<details>
-<summary>Complete evidence: mlx-community/GLM-4.6V-Flash-mxfp4</summary>
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Internal reasoning block appears incomplete
-- *Model load time:* 1.27s
-- *Generation time:* 2.54s
-- *Total time:* 3.82s
-- *Input validation time:* 0.00158
-- *Prompt preparation time:* 0.000225
-- *First-token latency:* 0.296
-- *Cleanup time:* 0.082
-- *Prompt tokens:* 406
-- *Generation tokens:* 205
-- *Total tokens:* 611
-- *Prompt throughput (raw):* 1,372 tok/s
-- *Generation throughput (raw):* 91.8 tok/s
-- *Peak memory:* 7.7
-- *Active memory:* 6.8
-- *Cache memory:* 0.05
-- *Model-load active memory:* 6.78
-- *Post-cleanup active memory:* 0.00383
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 121
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-Flash-mxfp4/snapshots/773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|endoftext\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-This image features two tabby cats resting on a bright pink couch.
-
-- **Left Cat**: A slender tabby with a mix of brown, black, and white fur. It lies on its side, head resting on the couch, eyes closed in a relaxed state. Its tail is long and dark, curving slightly.
-
-- **Right Cat**: A plump tabby with a more uniform brown and black patterned fur. It lies on its side, head lowered toward the couch, eyes partially open or closed, appearing calm. Its front paw is extended forward, while the hind leg is relaxed.
-
-- **Remotes and Couch**: Two remote controls are visible: a light blue remote on the left side of the couch, and a white remote with colorful buttons near the right cat. The couch itself is a vibrant pink, with a smooth, slightly wrinkled fabric surface.
-
-The overall scene conveys a sense of calm and domestic comfort, with the two cats appearing content in their shared space.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-This image features two tabby cats resting on a bright pink couch.  
-
-- **Left Cat**: A slender tabby with a mix of brown, black, and white fur. It lies on its side, head resting on the couch, eyes closed in a relaxed state. Its tail is long and dark, curving slightly.  
-
-- **Right Cat**: A plump tabby with a more uniform brown and black patterned fur. It lies on its side, head lowered toward the couch, eyes partially open or closed, appearing calm. Its front paw is extended forward, while the hind leg is relaxed.  
-
-- **Remotes and Couch**: Two remote controls are visible: a light blue remote on the left side of the couch, and a white remote with colorful buttons near the right cat. The couch itself is a vibrant pink, with a smooth, slightly wrinkled fabric surface.  
-
-The overall scene conveys a sense of calm and domestic comfort, with the two cats appearing content in their shared space.
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-glm-46v-nvfp4"></a>
-
-### mlx-community/GLM-4.6V-nvfp4
-
-<details>
-<summary>Complete evidence: mlx-community/GLM-4.6V-nvfp4</summary>
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Internal reasoning block appears incomplete
-- *Model load time:* 6.14s
-- *Generation time:* 5.88s
-- *Total time:* 12.03s
-- *Input validation time:* 0.00161
-- *Prompt preparation time:* 0.0071
-- *First-token latency:* 2.59
-- *Cleanup time:* 0.22
-- *Prompt tokens:* 406
-- *Generation tokens:* 172
-- *Total tokens:* 578
-- *Prompt throughput (raw):* 157 tok/s
-- *Generation throughput (raw):* 52.6 tok/s
-- *Peak memory:* 63
-- *Active memory:* 62
-- *Cache memory:* 0.16
-- *Model-load active memory:* 61.9
-- *Post-cleanup active memory:* 0.00416
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 121
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 2da6855d4e28a0e61c84543262074bc17ac27d6e
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--GLM-4.6V-nvfp4/snapshots/2da6855d4e28a0e61c84543262074bc17ac27d6e
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|endoftext\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-The image shows two tabby cats resting on a bright pink blanket spread over a red couch. The cat on the is lying on its side, with its head turned slightly downward and eyes closed, appearing relaxed. Its fur displays a mix of brown, black, and tan stripes, and it has a pinkish underbelly. The cat on the left is stretched out in a more elongated position, also with eyes closed, and its body angled toward the right. This cat has a similar striped pattern but with a lighter, more muted color palette, and it wears a small green collar. Between them, two remote controls lie on the pink fabric: one is light blue with numerous buttons, and the other is white with colorful buttons. The overall scene conveys a calm, cozy atmosphere, with the cats seemingly at ease in their shared resting spot.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-The image shows two tabby cats resting on a bright pink blanket spread over a red couch. The cat on the is lying on its side, with its head turned slightly downward and eyes closed, appearing relaxed. Its fur displays a mix of brown, black, and tan stripes, and it has a pinkish underbelly. The cat on the left is stretched out in a more elongated position, also with eyes closed, and its body angled toward the right. This cat has a similar striped pattern but with a lighter, more muted color palette, and it wears a small green collar. Between them, two remote controls lie on the pink fabric: one is light blue with numerous buttons, and the other is white with colorful buttons. The overall scene conveys a calm, cozy atmosphere, with the cats seemingly at ease in their shared resting spot.
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-kimi-vl-a3b-thinking-8bit"></a>
-
-### mlx-community/Kimi-VL-A3B-Thinking-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/Kimi-VL-A3B-Thinking-8bit</summary>
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Response appears cut off at the token limit; Internal
-  reasoning block appears incomplete
-- *Model load time:* 2.17s
-- *Generation time:* 7.86s
-- *Total time:* 10.04s
-- *Input validation time:* 0.00175
-- *Prompt preparation time:* 0.00158
-- *First-token latency:* 0.294
-- *Cleanup time:* 0.101
-- *Prompt tokens:* 397
-- *Generation tokens:* 500
-- *Total tokens:* 897
-- *Prompt throughput (raw):* 1,350 tok/s
-- *Generation throughput (raw):* 67.3 tok/s
-- *Peak memory:* 20
-- *Active memory:* 18
-- *Cache memory:* 0.76
-- *Model-load active memory:* 17.8
-- *Post-cleanup active memory:* 0.00636
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* max_tokens
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 227
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
-- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Requested model revision:* not requested
-- *Resolved model revision:* 85daf3dc2490c0f824143338f08ba45f475c9ce4
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Kimi-VL-A3B-Thinking-8bit/snapshots/85daf3dc2490c0f824143338f08ba45f475c9ce4
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* [EOS]
-
-*Readable output:*
-
-<pre class="model-output-readable">
-◁think▷Okay, let me try to figure out how to describe this image. First, I need to look at the image carefully. There are two cats on a pink surface, maybe a blanket or a bed. Both cats seem to be lying down. The one on the left is a tabby with gray and black stripes, and the one on the right is a darker tabby, maybe a bit bigger. They both look like they're sleeping or resting. There's a remote control near the left cat and another one near the right cat. The background is pink, which might be a couch or a bed. The image is a bit blurry, especially around the edges, which makes it look like a low-resolution or heavily compressed image. The colors are a bit oversaturated, especially the pink background. The cats' fur has some highlights, maybe from light reflecting off them. The cats seem to be in a relaxed position, maybe after playing or moving around since one is stretched out. The remotes are standard TV remotes, which adds a bit of context that this might be a cozy indoor setting. The image might have been taken in a living room. The lighting seems artificial, maybe from a lamp or overhead light. The cats' eyes aren't clearly visible because they're closed. The overall mood is calm and relaxed. I should mention the colors, the subjects (cats and remotes), the setting, and the image quality issues like blurriness and color saturation. Also, the composition with the remotes adds a bit of a humorous touch, like the cats are ignoring the remotes. Maybe mention the possible breeds of the cats, but I'm not sure. The image might have been edited or filtered, given the color enhancements. The pink background contrasts with the cats' fur colors. The cats' positions suggest they might have been moving before settling down. The remotes are standard, not specialized, so maybe they're in a typical living room. The image could be a candid shot capturing a quiet moment. The blurriness might be due to motion or a low-quality camera. The lighting is even, not harsh shadows, so maybe it's evening or night time. The cats seem comfortable, indicating they feel safe. The image might be meant to be cute or humorous because of the remotes next to them. The pink background makes the cats stand out. The image could be shared on social media or as a pet owner's photo. The cats' poses are natural, not posed.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-◁think▷Okay, let me try to figure out how to describe this image. First, I need to look at the image carefully. There are two cats on a pink surface, maybe a blanket or a bed. Both cats seem to be lying down. The one on the left is a tabby with gray and black stripes, and the one on the right is a darker tabby, maybe a bit bigger. They both look like they're sleeping or resting. There's a remote control near the left cat and another one near the right cat. The background is pink, which might be a couch or a bed. The image is a bit blurry, especially around the edges, which makes it look like a low-resolution or heavily compressed image. The colors are a bit oversaturated, especially the pink background. The cats' fur has some highlights, maybe from light reflecting off them. The cats seem to be in a relaxed position, maybe after playing or moving around since one is stretched out. The remotes are standard TV remotes, which adds a bit of context that this might be a cozy indoor setting. The image might have been taken in a living room. The lighting seems artificial, maybe from a lamp or overhead light. The cats' eyes aren't clearly visible because they're closed. The overall mood is calm and relaxed. I should mention the colors, the subjects (cats and remotes), the setting, and the image quality issues like blurriness and color saturation. Also, the composition with the remotes adds a bit of a humorous touch, like the cats are ignoring the remotes. Maybe mention the possible breeds of the cats, but I'm not sure. The image might have been edited or filtered, given the color enhancements. The pink background contrasts with the cats' fur colors. The cats' positions suggest they might have been moving before settling down. The remotes are standard, not specialized, so maybe they're in a typical living room. The image could be a candid shot capturing a quiet moment. The blurriness might be due to motion or a low-quality camera. The lighting is even, not harsh shadows, so maybe it's evening or night time. The cats seem comfortable, indicating they feel safe. The image might be meant to be cute or humorous because of the remotes next to them. The pink background makes the cats stand out. The image could be shared on social media or as a pet owner's photo. The cats' poses are natural, not posed.
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-minicpm-v-46-8bit"></a>
-
-### mlx-community/MiniCPM-V-4.6-8bit
-
-<details>
-<summary>Complete evidence: mlx-community/MiniCPM-V-4.6-8bit</summary>
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Internal reasoning block appears incomplete
-- *Model load time:* 0.85s
-- *Generation time:* 0.54s
-- *Total time:* 1.41s
-- *Input validation time:* 0.0021
-- *Prompt preparation time:* 0.00803
-- *First-token latency:* 0.105
-- *Cleanup time:* 0.0783
-- *Prompt tokens:* 226
-- *Generation tokens:* 112
-- *Total tokens:* 338
-- *Prompt throughput (raw):* 2,162 tok/s
-- *Generation throughput (raw):* 283 tok/s
-- *Peak memory:* 3.0
-- *Active memory:* 2.3
-- *Cache memory:* 0.05
-- *Model-load active memory:* 2.32
-- *Post-cleanup active memory:* 0.00767
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 108
-- *Image placeholders:* 1
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 03721395f6b82cd000cc74cde28fcff8abd9a04c
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--MiniCPM-V-4.6-8bit/snapshots/03721395f6b82cd000cc74cde28fcff8abd9a04c
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-The image shows two tabby cats resting comfortably on a bright pink blanket or couch. Both cats appear to be asleep or deeply relaxed, with their bodies stretched out. One cat is on the left side, lying with its legs extended and a remote control placed nearby. The other cat is on the right, also in a relaxed position, with its paws slightly spread. The background includes a red or dark-colored couch, adding a cozy and warm atmosphere to the scene. The overall mood is peaceful and tranquil, capturing a moment of rest for the cats.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-The image shows two tabby cats resting comfortably on a bright pink blanket or couch. Both cats appear to be asleep or deeply relaxed, with their bodies stretched out. One cat is on the left side, lying with its legs extended and a remote control placed nearby. The other cat is on the right, also in a relaxed position, with its paws slightly spread. The background includes a red or dark-colored couch, adding a cozy and warm atmosphere to the scene. The overall mood is peaceful and tranquil, capturing a moment of rest for the cats.
-```
-
-</details>
-
-</details>
-
----
-
-<a id="model-mlx-community-ornith-10-35b-bf16"></a>
-
-### mlx-community/Ornith-1.0-35B-bf16
-
-<details>
-<summary>Complete evidence: mlx-community/Ornith-1.0-35B-bf16</summary>
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Internal reasoning block appears incomplete
-- *Model load time:* 9.75s
-- *Generation time:* 9.76s
-- *Total time:* 19.54s
-- *Input validation time:* 0.00166
-- *Prompt preparation time:* 0.0134
-- *First-token latency:* 5.24
-- *Cleanup time:* 0.267
-- *Prompt tokens:* 317
-- *Generation tokens:* 305
-- *Total tokens:* 622
-- *Prompt throughput (raw):* 60.5 tok/s
-- *Generation throughput (raw):* 67.7 tok/s
-- *Peak memory:* 71
-- *Active memory:* 70
-- *Cache memory:* 0.10
-- *Model-load active memory:* 70.2
-- *Post-cleanup active memory:* 0.0102
-- *Post-cleanup cache memory:* 0.0
-- *Stop reason:* completed
-- *Requested maximum tokens:* 500
-- *Rendered prompt characters:* 131
-- *Image placeholders:* 0
-- *Processed image:* not captured
-- *Image patch count:* not captured
-- *Processor:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Requested model revision:* not requested
-- *Resolved model revision:* 9ef631ad2d0c4c26783d4f94d0a0de9516e41a4b
-- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Ornith-1.0-35B-bf16/snapshots/9ef631ad2d0c4c26783d4f94d0a0de9516e41a4b
-- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
-  "temperature": 0.0, "top_p": 1.0}
-- *EOS token:* <\|im_end\|>
-
-*Readable output:*
-
-<pre class="model-output-readable">
-This is a cozy, overhead photograph of two tabby cats sleeping peacefully on a vibrant pink couch.
-
-**The Cats:**
-- **Left Cat:** A smaller tabby cat with classic brown and black stripes lies stretched out on its side, facing right. Its tail curls near its hind legs, and one front paw is extended forward. It appears to be in a deep sleep.
-- **Right Cat:** A larger tabby cat, possibly the same breed or mix, lies curled up more compactly on its side, facing left. Its head is tucked down, and its body forms a gentle arc. The fur shows rich brown, black, and tan markings.
-
-**The Setting:**
-- They are resting on a bright, fuchsia-pink fabric — likely a blanket or the couch upholstery itself — which creates a striking contrast with their earth-toned fur.
-- Two remote controls are visible:
-  - One white remote with blue buttons lies near the head of the smaller cat.
-  - Another white remote, slightly longer and with green and blue buttons, is positioned between the two cats.
-
-**Overall Mood:**
-The image exudes warmth, comfort, and tranquility. The cats look completely relaxed and content in their shared space, suggesting a close bond between them. The bold pink background adds a playful, cheerful touch to the serene scene.
-
-It’s a charming snapshot of domestic life — cats napping together on a colorful sofa, surrounded by the tools of human entertainment.
-</pre>
-
-<details>
-<summary>Exact raw output</summary>
-
-```text
-This is a cozy, overhead photograph of two tabby cats sleeping peacefully on a vibrant pink couch.
-
-**The Cats:**
-- **Left Cat:** A smaller tabby cat with classic brown and black stripes lies stretched out on its side, facing right. Its tail curls near its hind legs, and one front paw is extended forward. It appears to be in a deep sleep.
-- **Right Cat:** A larger tabby cat, possibly the same breed or mix, lies curled up more compactly on its side, facing left. Its head is tucked down, and its body forms a gentle arc. The fur shows rich brown, black, and tan markings.
-
-**The Setting:**
-- They are resting on a bright, fuchsia-pink fabric — likely a blanket or the couch upholstery itself — which creates a striking contrast with their earth-toned fur.
-- Two remote controls are visible:
-  - One white remote with blue buttons lies near the head of the smaller cat.
-  - Another white remote, slightly longer and with green and blue buttons, is positioned between the two cats.
-
-**Overall Mood:**
-The image exudes warmth, comfort, and tranquility. The cats look completely relaxed and content in their shared space, suggesting a close bond between them. The bold pink background adds a playful, cheerful touch to the serene scene.
-
-It’s a charming snapshot of domestic life — cats napping together on a colorful sofa, surrounded by the tools of human entertainment.
-```
-
-</details>
-
-</details>
-
----
-
 <a id="model-mlx-community-qwen35-27b-4bit"></a>
 
 ### mlx-community/Qwen3.5-27B-4bit
@@ -3994,21 +2206,21 @@ It’s a charming snapshot of domestic life — cats napping together on a color
 <summary>Complete evidence: mlx-community/Qwen3.5-27B-4bit</summary>
 
 - *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Internal reasoning block appears incomplete
-- *Model load time:* 2.09s
-- *Generation time:* 10.24s
-- *Total time:* 12.37s
-- *Input validation time:* 0.00154
-- *Prompt preparation time:* 0.0141
-- *First-token latency:* 0.6
-- *Cleanup time:* 0.13
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 2.21s
+- *Generation time:* 10.08s
+- *Total time:* 12.32s
+- *Input validation time:* 0.00169
+- *Prompt preparation time:* 0.0139
+- *First-token latency:* 0.604
+- *Cleanup time:* 0.11
 - *Prompt tokens:* 317
 - *Generation tokens:* 315
 - *Total tokens:* 632
-- *Prompt throughput (raw):* 528 tok/s
-- *Generation throughput (raw):* 32.7 tok/s
+- *Prompt throughput (raw):* 525 tok/s
+- *Generation throughput (raw):* 33.3 tok/s
 - *Peak memory:* 19
 - *Active memory:* 18
 - *Cache memory:* 0.24
@@ -4077,21 +2289,21 @@ It’s a delightful moment captured — two cats, two remotes, and a splash of p
 <summary>Complete evidence: mlx-community/Qwen3.5-27B-mxfp8</summary>
 
 - *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Internal reasoning block appears incomplete
-- *Model load time:* 3.08s
-- *Generation time:* 17.68s
-- *Total time:* 20.79s
-- *Input validation time:* 0.00195
-- *Prompt preparation time:* 0.0145
-- *First-token latency:* 0.722
-- *Cleanup time:* 0.135
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 3.21s
+- *Generation time:* 17.41s
+- *Total time:* 20.65s
+- *Input validation time:* 0.00174
+- *Prompt preparation time:* 0.0148
+- *First-token latency:* 0.705
+- *Cleanup time:* 0.129
 - *Prompt tokens:* 317
 - *Generation tokens:* 305
 - *Total tokens:* 622
-- *Prompt throughput (raw):* 439 tok/s
-- *Generation throughput (raw):* 18.0 tok/s
+- *Prompt throughput (raw):* 450 tok/s
+- *Generation throughput (raw):* 18.3 tok/s
 - *Peak memory:* 30
 - *Active memory:* 29
 - *Cache memory:* 0.23
@@ -4170,21 +2382,21 @@ Overall, the image conveys a sense of comfort, tranquility, and feline companion
 <summary>Complete evidence: mlx-community/Qwen3.5-35B-A3B-4bit</summary>
 
 - *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Internal reasoning block appears incomplete
-- *Model load time:* 2.45s
-- *Generation time:* 3.27s
-- *Total time:* 5.73s
-- *Input validation time:* 0.00208
-- *Prompt preparation time:* 0.000247
-- *First-token latency:* 0.382
-- *Cleanup time:* 0.121
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 2.51s
+- *Generation time:* 3.06s
+- *Total time:* 5.59s
+- *Input validation time:* 0.00179
+- *Prompt preparation time:* 0.00025
+- *First-token latency:* 0.378
+- *Cleanup time:* 0.12
 - *Prompt tokens:* 317
 - *Generation tokens:* 326
 - *Total tokens:* 643
-- *Prompt throughput (raw):* 831 tok/s
-- *Generation throughput (raw):* 113 tok/s
+- *Prompt throughput (raw):* 839 tok/s
+- *Generation throughput (raw):* 122 tok/s
 - *Peak memory:* 21
 - *Active memory:* 21
 - *Cache memory:* 0.10
@@ -4261,21 +2473,21 @@ Overall, it’s a charming snapshot of feline relaxation — perfect for anyone 
 <summary>Complete evidence: mlx-community/Qwen3.5-35B-A3B-6bit</summary>
 
 - *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Internal reasoning block appears incomplete
-- *Model load time:* 3.08s
-- *Generation time:* 3.43s
-- *Total time:* 6.52s
-- *Input validation time:* 0.00192
-- *Prompt preparation time:* 0.000264
-- *First-token latency:* 0.454
-- *Cleanup time:* 0.135
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 3.28s
+- *Generation time:* 3.39s
+- *Total time:* 6.68s
+- *Input validation time:* 0.00165
+- *Prompt preparation time:* 0.000244
+- *First-token latency:* 0.445
+- *Cleanup time:* 0.134
 - *Prompt tokens:* 317
 - *Generation tokens:* 299
 - *Total tokens:* 616
-- *Prompt throughput (raw):* 698 tok/s
-- *Generation throughput (raw):* 101 tok/s
+- *Prompt throughput (raw):* 712 tok/s
+- *Generation throughput (raw):* 102 tok/s
 - *Peak memory:* 30
 - *Active memory:* 30
 - *Cache memory:* 0.10
@@ -4354,21 +2566,21 @@ Overall, it’s a charming snapshot of feline relaxation and domestic peace.
 <summary>Complete evidence: mlx-community/Qwen3.5-35B-A3B-bf16</summary>
 
 - *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Internal reasoning block appears incomplete
-- *Model load time:* 8.85s
-- *Generation time:* 9.36s
-- *Total time:* 18.22s
-- *Input validation time:* 0.00169
-- *Prompt preparation time:* 0.000233
-- *First-token latency:* 5.02
-- *Cleanup time:* 0.279
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 9.17s
+- *Generation time:* 9.61s
+- *Total time:* 18.79s
+- *Input validation time:* 0.00182
+- *Prompt preparation time:* 0.00026
+- *First-token latency:* 5.25
+- *Cleanup time:* 0.257
 - *Prompt tokens:* 317
 - *Generation tokens:* 299
 - *Total tokens:* 616
-- *Prompt throughput (raw):* 63.1 tok/s
-- *Generation throughput (raw):* 69.2 tok/s
+- *Prompt throughput (raw):* 60.4 tok/s
+- *Generation throughput (raw):* 68.8 tok/s
 - *Peak memory:* 71
 - *Active memory:* 70
 - *Cache memory:* 0.10
@@ -4451,21 +2663,21 @@ The overall mood of the image is warm, relaxed, and domestic — capturing a qui
 <summary>Complete evidence: mlx-community/Qwen3.5-9B-MLX-4bit</summary>
 
 - *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Internal reasoning block appears incomplete
-- *Model load time:* 1.32s
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 1.40s
 - *Generation time:* 2.93s
-- *Total time:* 4.26s
-- *Input validation time:* 0.00165
-- *Prompt preparation time:* 0.000226
-- *First-token latency:* 0.217
-- *Cleanup time:* 0.0842
+- *Total time:* 4.34s
+- *Input validation time:* 0.00166
+- *Prompt preparation time:* 0.000241
+- *First-token latency:* 0.225
+- *Cleanup time:* 0.083
 - *Prompt tokens:* 317
 - *Generation tokens:* 265
 - *Total tokens:* 582
-- *Prompt throughput (raw):* 1,461 tok/s
-- *Generation throughput (raw):* 99.7 tok/s
+- *Prompt throughput (raw):* 1,406 tok/s
+- *Generation throughput (raw):* 100 tok/s
 - *Peak memory:* 7.0
 - *Active memory:* 6.7
 - *Cache memory:* 0.11
@@ -4542,21 +2754,21 @@ It’s a charming snapshot of everyday pet life, filled with warmth and simplici
 <summary>Complete evidence: mlx-community/Qwen3.6-27B-mxfp8</summary>
 
 - *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Internal reasoning block appears incomplete
-- *Model load time:* 3.02s
-- *Generation time:* 15.90s
-- *Total time:* 18.95s
-- *Input validation time:* 0.00155
-- *Prompt preparation time:* 0.0144
-- *First-token latency:* 0.688
-- *Cleanup time:* 0.127
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 3.08s
+- *Generation time:* 16.29s
+- *Total time:* 19.39s
+- *Input validation time:* 0.00179
+- *Prompt preparation time:* 0.0139
+- *First-token latency:* 0.687
+- *Cleanup time:* 0.13
 - *Prompt tokens:* 317
 - *Generation tokens:* 283
 - *Total tokens:* 600
 - *Prompt throughput (raw):* 461 tok/s
-- *Generation throughput (raw):* 18.6 tok/s
+- *Generation throughput (raw):* 18.2 tok/s
 - *Peak memory:* 30
 - *Active memory:* 29
 - *Cache memory:* 0.23
@@ -4617,6 +2829,132 @@ Overall, it’s a charming snapshot of feline relaxation in a colorful, everyday
 
 ---
 
+<a id="model-mlx-community-smolvlm-instruct-bf16"></a>
+
+### mlx-community/SmolVLM-Instruct-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/SmolVLM-Instruct-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 0.60s
+- *Generation time:* 0.98s
+- *Total time:* 1.58s
+- *Input validation time:* 0.00167
+- *Prompt preparation time:* 0.00115
+- *First-token latency:* 0.405
+- *Cleanup time:* 0.077
+- *Prompt tokens:* 1,194
+- *Generation tokens:* 63
+- *Total tokens:* 1,257
+- *Prompt throughput (raw):* 2,945 tok/s
+- *Generation throughput (raw):* 127 tok/s
+- *Peak memory:* 5.5
+- *Active memory:* 4.5
+- *Cache memory:* 0.30
+- *Model-load active memory:* 4.51
+- *Post-cleanup active memory:* 0.0149
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 72
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
+- *Tokenizer:* transformers.models.gpt2.tokenization_gpt2.GPT2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* cae61cdedd0602419b43b6102dc33cd9f1e929a6
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--SmolVLM-Instruct-bf16/snapshots/cae61cdedd0602419b43b6102dc33cd9f1e929a6
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <end_of_utterance>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+ Two cats are lying on a pink blanket on a couch. The cat on the left is curled up with its head on the cat on the right's back. The cat on the right is stretched out with its head on the cat on the left's back. There are two remote controls on the blanket.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+ Two cats are lying on a pink blanket on a couch. The cat on the left is curled up with its head on the cat on the right's back. The cat on the right is stretched out with its head on the cat on the left's back. There are two remote controls on the blanket.
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
+
+### mlx-community/SmolVLM2-2.2B-Instruct-mlx
+
+<details>
+<summary>Complete evidence: mlx-community/SmolVLM2-2.2B-Instruct-mlx</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 0.60s
+- *Generation time:* 1.43s
+- *Total time:* 2.04s
+- *Input validation time:* 0.0016
+- *Prompt preparation time:* 0.000945
+- *First-token latency:* 0.278
+- *Cleanup time:* 0.0728
+- *Prompt tokens:* 95
+- *Generation tokens:* 143
+- *Total tokens:* 238
+- *Prompt throughput (raw):* 342 tok/s
+- *Generation throughput (raw):* 132 tok/s
+- *Peak memory:* 5.5
+- *Active memory:* 4.5
+- *Cache memory:* 0.09
+- *Model-load active memory:* 4.51
+- *Post-cleanup active memory:* 0.015
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 72
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.smolvlm.processing_smolvlm.SmolVLMProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 844516024a1c4400d34489b89ee067d794e432ed
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--SmolVLM2-2.2B-Instruct-mlx/snapshots/844516024a1c4400d34489b89ee067d794e432ed
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <end_of_utterance>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+ The image depicts a scene featuring a cat and a remote control. The cat, which appears to be a tabby with a mix of black, white, and gray fur, is lying on a red couch. The cat's body is mostly covered by the couch, with its head resting on the armrest. The remote control, which is white with a blue and red button, is placed on the armrest of the couch, close to the cat's head. The remote control is positioned horizontally, with the buttons facing upwards. The couch itself is red, and it appears to be a standard piece of furniture with a simple design. The overall scene suggests a relaxed and comfortable setting, possibly a home environment.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+ The image depicts a scene featuring a cat and a remote control. The cat, which appears to be a tabby with a mix of black, white, and gray fur, is lying on a red couch. The cat's body is mostly covered by the couch, with its head resting on the armrest. The remote control, which is white with a blue and red button, is placed on the armrest of the couch, close to the cat's head. The remote control is positioned horizontally, with the buttons facing upwards. The couch itself is red, and it appears to be a standard piece of furniture with a simple design. The overall scene suggests a relaxed and comfortable setting, possibly a home environment.
+```
+
+</details>
+
+</details>
+
+---
+
 <a id="model-mlx-community-step-37-flash-oq2e"></a>
 
 ### mlx-community/Step-3.7-Flash-oQ2e
@@ -4625,21 +2963,21 @@ Overall, it’s a charming snapshot of feline relaxation in a colorful, everyday
 <summary>Complete evidence: mlx-community/Step-3.7-Flash-oQ2e</summary>
 
 - *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* Internal reasoning block appears incomplete
-- *Model load time:* 6.31s
-- *Generation time:* 7.46s
-- *Total time:* 13.79s
-- *Input validation time:* 0.00157
-- *Prompt preparation time:* 0.0132
-- *First-token latency:* 3.52
-- *Cleanup time:* 0.23
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 6.57s
+- *Generation time:* 7.91s
+- *Total time:* 14.50s
+- *Input validation time:* 0.00173
+- *Prompt preparation time:* 0.0133
+- *First-token latency:* 3.91
+- *Cleanup time:* 0.228
 - *Prompt tokens:* 188
 - *Generation tokens:* 172
 - *Total tokens:* 360
-- *Prompt throughput (raw):* 53.4 tok/s
-- *Generation throughput (raw):* 44.2 tok/s
+- *Prompt throughput (raw):* 48.1 tok/s
+- *Generation throughput (raw):* 43.7 tok/s
 - *Peak memory:* 65
 - *Active memory:* 63
 - *Cache memory:* 0.10
@@ -4680,6 +3018,1681 @@ The image shows two cats sleeping on a pink blanket or sheet. The cat on the lef
 
 ---
 
+<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
+
+### mlx-community/X-Reasoner-7B-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/X-Reasoner-7B-8bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 1.15s
+- *Generation time:* 1.89s
+- *Total time:* 3.05s
+- *Input validation time:* 0.00164
+- *Prompt preparation time:* 0.000257
+- *First-token latency:* 0.239
+- *Cleanup time:* 0.0928
+- *Prompt tokens:* 415
+- *Generation tokens:* 104
+- *Total tokens:* 519
+- *Prompt throughput (raw):* 1,737 tok/s
+- *Generation throughput (raw):* 66.3 tok/s
+- *Peak memory:* 10
+- *Active memory:* 9.5
+- *Cache memory:* 0.06
+- *Model-load active memory:* 9.46
+- *Post-cleanup active memory:* 0.0156
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 170
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.qwen2_5_vl.processing_qwen2_5_vl.Qwen2_5_VLProcessor
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 21732e74613b465bc98e9d5ec210aba5c7adbcc1
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--X-Reasoner-7B-8bit/snapshots/21732e74613b465bc98e9d5ec210aba5c7adbcc1
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+The image shows two cats lying on a pink couch. Both cats have a tabby pattern with brown, black, and white fur. The cat on the left is curled up with its head resting on the back of the couch, while the cat on the right is stretched out on its side. Between them are two remote controls, one near each cat. The couch appears to be a vibrant pink color, and the overall scene conveys a cozy and relaxed atmosphere. The cats seem to be resting or napping.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+The image shows two cats lying on a pink couch. Both cats have a tabby pattern with brown, black, and white fur. The cat on the left is curled up with its head resting on the back of the couch, while the cat on the right is stretched out on its side. Between them are two remote controls, one near each cat. The couch appears to be a vibrant pink color, and the overall scene conveys a cozy and relaxed atmosphere. The cats seem to be resting or napping.
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
+
+### mlx-community/gemma-3-27b-it-qat-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/gemma-3-27b-it-qat-4bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 2.32s
+- *Generation time:* 10.89s
+- *Total time:* 13.23s
+- *Input validation time:* 0.00164
+- *Prompt preparation time:* 0.00272
+- *First-token latency:* 0.704
+- *Cleanup time:* 0.119
+- *Prompt tokens:* 273
+- *Generation tokens:* 303
+- *Total tokens:* 576
+- *Prompt throughput (raw):* 388 tok/s
+- *Generation throughput (raw):* 29.8 tok/s
+- *Peak memory:* 18
+- *Active memory:* 16
+- *Cache memory:* 0.41
+- *Model-load active memory:* 16.1
+- *Post-cleanup active memory:* 0.0161
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 95
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.gemma3.processing_gemma3.Gemma3Processor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* fc4e000f32af1b7b6779294e490a7d2a80bac611
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-3-27b-it-qat-4bit/snapshots/fc4e000f32af1b7b6779294e490a7d2a80bac611
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Here's a description of the image:
+
+**Overall Impression:**
+
+The image is a charming and humorous snapshot of two tabby cats lounging on a bright pink surface, likely a couch cushion or blanket. They are positioned as if they are "controlling" the TV with remote controls.
+
+**Detailed Description:**
+
+*   **Cats:** There are two tabby cats. Both have striped fur patterns, but with slightly different shades and markings. The cat on the left has darker, more defined stripes and a more silver tone. The cat on the right has warmer, more golden tones in its stripes. Both cats are lying on their backs, appearing very relaxed and sleepy.
+*   **Remote Controls:** Each cat has a remote control positioned near them, as if they are holding or using it. This adds to the playful and humorous nature of the image.
+*   **Surface:** The cats are lying on a vibrant pink surface. It looks soft and comfortable, likely a couch cushion or blanket.
+*   **Composition:** The cats are the clear focal point of the image. The bright pink background provides a strong contrast, making them stand out. The positioning of the remote controls adds to the narrative of the image.
+*   **Mood:** The image evokes a feeling of warmth, comfort, and playfulness. It's a lighthearted and endearing scene.
+
+In essence, it's a cute and funny picture of cats enjoying a lazy day, seemingly in control of their entertainment!
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Here's a description of the image:
+
+**Overall Impression:**
+
+The image is a charming and humorous snapshot of two tabby cats lounging on a bright pink surface, likely a couch cushion or blanket. They are positioned as if they are "controlling" the TV with remote controls.
+
+**Detailed Description:**
+
+*   **Cats:** There are two tabby cats. Both have striped fur patterns, but with slightly different shades and markings. The cat on the left has darker, more defined stripes and a more silver tone. The cat on the right has warmer, more golden tones in its stripes. Both cats are lying on their backs, appearing very relaxed and sleepy.
+*   **Remote Controls:** Each cat has a remote control positioned near them, as if they are holding or using it. This adds to the playful and humorous nature of the image.
+*   **Surface:** The cats are lying on a vibrant pink surface. It looks soft and comfortable, likely a couch cushion or blanket.
+*   **Composition:** The cats are the clear focal point of the image. The bright pink background provides a strong contrast, making them stand out. The positioning of the remote controls adds to the narrative of the image.
+*   **Mood:** The image evokes a feeling of warmth, comfort, and playfulness. It's a lighthearted and endearing scene.
+
+In essence, it's a cute and funny picture of cats enjoying a lazy day, seemingly in control of their entertainment!
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-gemma-3-27b-it-qat-8bit"></a>
+
+### mlx-community/gemma-3-27b-it-qat-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/gemma-3-27b-it-qat-8bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 3.27s
+- *Generation time:* 18.26s
+- *Total time:* 21.54s
+- *Input validation time:* 0.00204
+- *Prompt preparation time:* 0.000204
+- *First-token latency:* 0.838
+- *Cleanup time:* 0.149
+- *Prompt tokens:* 273
+- *Generation tokens:* 289
+- *Total tokens:* 562
+- *Prompt throughput (raw):* 326 tok/s
+- *Generation throughput (raw):* 16.6 tok/s
+- *Peak memory:* 32
+- *Active memory:* 30
+- *Cache memory:* 0.41
+- *Model-load active memory:* 29.7
+- *Post-cleanup active memory:* 0.0166
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 95
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.gemma3.processing_gemma3.Gemma3Processor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* c408904bc9a0b7e996173d3cbe1bfe30e04e678d
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-3-27b-it-qat-8bit/snapshots/c408904bc9a0b7e996173d3cbe1bfe30e04e678d
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Here's a description of the image:
+
+**Overall Impression:**
+
+The image is a charming and playful shot of two tabby kittens lounging on a bright pink surface, likely a couch cushion or blanket. They are positioned as if they are "watching TV," with remote controls placed near them.
+
+**Detailed Description:**
+
+*   **Kittens:** There are two kittens, both with classic tabby markings (stripes and swirls). One kitten has a more grey/brown tabby pattern, while the other is a warmer, more orange-toned tabby. Both kittens are lying on their backs with their paws curled up, appearing very relaxed and sleepy. They both have collars on.
+*   **Positioning:** The kittens are positioned side-by-side, with each one having a remote control nearby. It looks like they are mimicking people watching television.
+*   **Remote Controls:** Two remote controls are visible, one grey and one beige, placed near each kitten.
+*   **Surface:** The kittens are lying on a vibrant pink surface. The texture appears soft, suggesting a couch cushion or blanket.
+*   **Lighting:** The lighting is fairly even, and the colors are bright and clear.
+*   **Overall Tone:** The image is lighthearted, cute, and humorous. It evokes a feeling of warmth and relaxation.
+
+It's a very endearing picture that captures the playful nature of kittens!
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Here's a description of the image:
+
+**Overall Impression:**
+
+The image is a charming and playful shot of two tabby kittens lounging on a bright pink surface, likely a couch cushion or blanket. They are positioned as if they are "watching TV," with remote controls placed near them.
+
+**Detailed Description:**
+
+*   **Kittens:** There are two kittens, both with classic tabby markings (stripes and swirls). One kitten has a more grey/brown tabby pattern, while the other is a warmer, more orange-toned tabby. Both kittens are lying on their backs with their paws curled up, appearing very relaxed and sleepy. They both have collars on.
+*   **Positioning:** The kittens are positioned side-by-side, with each one having a remote control nearby. It looks like they are mimicking people watching television.
+*   **Remote Controls:** Two remote controls are visible, one grey and one beige, placed near each kitten.
+*   **Surface:** The kittens are lying on a vibrant pink surface. The texture appears soft, suggesting a couch cushion or blanket.
+*   **Lighting:** The lighting is fairly even, and the colors are bright and clear.
+*   **Overall Tone:** The image is lighthearted, cute, and humorous. It evokes a feeling of warmth and relaxation.
+
+It's a very endearing picture that captures the playful nature of kittens!
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-gemma-3n-e4b-it-bf16"></a>
+
+### mlx-community/gemma-3n-E4B-it-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/gemma-3n-E4B-it-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 2.43s
+- *Generation time:* 2.53s
+- *Total time:* 4.97s
+- *Input validation time:* 0.00175
+- *Prompt preparation time:* 0.00292
+- *First-token latency:* 0.325
+- *Cleanup time:* 0.117
+- *Prompt tokens:* 272
+- *Generation tokens:* 106
+- *Total tokens:* 378
+- *Prompt throughput (raw):* 837 tok/s
+- *Generation throughput (raw):* 48.4 tok/s
+- *Peak memory:* 17
+- *Active memory:* 16
+- *Cache memory:* 0.04
+- *Model-load active memory:* 15.7
+- *Post-cleanup active memory:* 0.0177
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 97
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.gemma3n.processing_gemma3n.Gemma3nProcessor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* d9c02d0b2fa8cf26c1cb5dd9e756db59cdbe8a4a
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-3n-E4B-it-bf16/snapshots/d9c02d0b2fa8cf26c1cb5dd9e756db59cdbe8a4a
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Two tabby cats are peacefully napping on a bright pink couch. The cat on the left is lying on its back with its paws outstretched, while the cat on the right is curled up on its side, also seemingly asleep.
+
+Between the two cats are two television remotes, one white and one blue. The couch appears to be made of a soft, plush material. The lighting in the image is soft and natural, suggesting it might be daytime. The overall mood of the image is one of tranquility and relaxation.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Two tabby cats are peacefully napping on a bright pink couch. The cat on the left is lying on its back with its paws outstretched, while the cat on the right is curled up on its side, also seemingly asleep. 
+
+Between the two cats are two television remotes, one white and one blue. The couch appears to be made of a soft, plush material. The lighting in the image is soft and natural, suggesting it might be daytime. The overall mood of the image is one of tranquility and relaxation.
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-gemma-4-26b-a4b-it-4bit"></a>
+
+### mlx-community/gemma-4-26b-a4b-it-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/gemma-4-26b-a4b-it-4bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 2.40s
+- *Generation time:* 1.55s
+- *Total time:* 3.98s
+- *Input validation time:* 0.00163
+- *Prompt preparation time:* 0.021
+- *First-token latency:* 0.388
+- *Cleanup time:* 0.119
+- *Prompt tokens:* 284
+- *Generation tokens:* 148
+- *Total tokens:* 432
+- *Prompt throughput (raw):* 732 tok/s
+- *Generation throughput (raw):* 129 tok/s
+- *Peak memory:* 16
+- *Active memory:* 15
+- *Cache memory:* 0.13
+- *Model-load active memory:* 15.4
+- *Post-cleanup active memory:* 0.0183
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 94
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 0d77464eeb233a2da68ebf9d7dc4edaac7db956d
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-4-26b-a4b-it-4bit/snapshots/0d77464eeb233a2da68ebf9d7dc4edaac7db956d
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+A high-angle, medium shot shows two tabby cats lying on a pink blanket on a red couch. The cat on the left is lying on its side, facing right, with its head towards the top right corner. It has dark brown and black stripes on its body and a dark tail. Its front paws are tucked under its body. The cat on the right is lying on its side, facing left, with its head towards the bottom left corner. It has light brown and black stripes on its body and a dark tail. Its front paws are stretched out towards the bottom right corner. A silver remote control is lying on the pink blanket between the two cats. The background is a red couch. The lighting is bright and even.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+A high-angle, medium shot shows two tabby cats lying on a pink blanket on a red couch. The cat on the left is lying on its side, facing right, with its head towards the top right corner. It has dark brown and black stripes on its body and a dark tail. Its front paws are tucked under its body. The cat on the right is lying on its side, facing left, with its head towards the bottom left corner. It has light brown and black stripes on its body and a dark tail. Its front paws are stretched out towards the bottom right corner. A silver remote control is lying on the pink blanket between the two cats. The background is a red couch. The lighting is bright and even.
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-gemma-4-31b-bf16"></a>
+
+### mlx-community/gemma-4-31b-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/gemma-4-31b-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 6.96s
+- *Generation time:* 5.57s
+- *Total time:* 12.54s
+- *Input validation time:* 0.00164
+- *Prompt preparation time:* 0.000148
+- *First-token latency:* 3.65
+- *Cleanup time:* 0.237
+- *Prompt tokens:* 272
+- *Generation tokens:* 15
+- *Total tokens:* 287
+- *Prompt throughput (raw):* 74.5 tok/s
+- *Generation throughput (raw):* 7.92 tok/s
+- *Peak memory:* 63
+- *Active memory:* 63
+- *Cache memory:* 0.49
+- *Model-load active memory:* 62.6
+- *Post-cleanup active memory:* 0.0188
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 29
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 19f0f1af698c51edaf1e93b3a3a5435b282de30f
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-4-31b-bf16/snapshots/19f0f1af698c51edaf1e93b3a3a5435b282de30f
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+ in a single sentence.Both cats are sleeping on a pink blanket.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+ in a single sentence.Both cats are sleeping on a pink blanket.
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-gemma-4-31b-it-4bit"></a>
+
+### mlx-community/gemma-4-31b-it-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/gemma-4-31b-it-4bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 2.54s
+- *Generation time:* 4.33s
+- *Total time:* 6.88s
+- *Input validation time:* 0.00173
+- *Prompt preparation time:* 0.000279
+- *First-token latency:* 0.712
+- *Cleanup time:* 0.131
+- *Prompt tokens:* 284
+- *Generation tokens:* 98
+- *Total tokens:* 382
+- *Prompt throughput (raw):* 399 tok/s
+- *Generation throughput (raw):* 27.2 tok/s
+- *Peak memory:* 19
+- *Active memory:* 18
+- *Cache memory:* 0.50
+- *Model-load active memory:* 18.4
+- *Post-cleanup active memory:* 0.0193
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 94
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.gemma4.processing_gemma4.Gemma4Processor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 696d436c404745a59f30e4939a658162b0a9e57f
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--gemma-4-31b-it-4bit/snapshots/696d436c404745a59f30e4939a658162b0a9e57f
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+A high-angle, medium shot shows two brown tabby cats lying on a bright pink blanket on a red couch. The cat on the left is lying on its side, facing right, with its head resting on a blue remote control. The cat on the right is lying on its back, facing left, with its head resting on a white remote control. Both cats have their eyes closed and appear to be sleeping. The background is a red couch. The lighting is bright and even.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+A high-angle, medium shot shows two brown tabby cats lying on a bright pink blanket on a red couch. The cat on the left is lying on its side, facing right, with its head resting on a blue remote control. The cat on the right is lying on its back, facing left, with its head resting on a white remote control. Both cats have their eyes closed and appear to be sleeping. The background is a red couch. The lighting is bright and even.
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-llava-v16-mistral-7b-8bit"></a>
+
+### mlx-community/llava-v1.6-mistral-7b-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/llava-v1.6-mistral-7b-8bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 0.92s
+- *Generation time:* 3.98s
+- *Total time:* 4.90s
+- *Input validation time:* 0.00163
+- *Prompt preparation time:* 0.00157
+- *First-token latency:* 2.6
+- *Cleanup time:* 0.0939
+- *Prompt tokens:* 2,354
+- *Generation tokens:* 82
+- *Total tokens:* 2,436
+- *Prompt throughput (raw):* 906 tok/s
+- *Generation throughput (raw):* 62.5 tok/s
+- *Peak memory:* 9.7
+- *Active memory:* 8.1
+- *Cache memory:* 0.83
+- *Model-load active memory:* 8.06
+- *Post-cleanup active memory:* 0.0194
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 42
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.llava_next.processing_llava_next.LlavaNextProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* b8df5f329d95a7abe6429ed46093f9b84e8e6396
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--llava-v1.6-mistral-7b-8bit/snapshots/b8df5f329d95a7abe6429ed46093f9b84e8e6396
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+The image shows two cats lying on a pink blanket. The cat on the left is a kitten with a black and white striped coat, while the cat on the right is a tabby cat with a brown and black coat. Both cats are sleeping or resting. In the background, there is a remote control on the blanket. The cats are on a couch, and the blanket is pink.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+The image shows two cats lying on a pink blanket. The cat on the left is a kitten with a black and white striped coat, while the cat on the right is a tabby cat with a brown and black coat. Both cats are sleeping or resting. In the background, there is a remote control on the blanket. The cats are on a couch, and the blanket is pink. 
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-nanollava-15-4bit"></a>
+
+### mlx-community/nanoLLaVA-1.5-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/nanoLLaVA-1.5-4bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 0.55s
+- *Generation time:* 0.41s
+- *Total time:* 0.96s
+- *Input validation time:* 0.00174
+- *Prompt preparation time:* 0.00143
+- *First-token latency:* 0.0674
+- *Cleanup time:* 0.079
+- *Prompt tokens:* 20
+- *Generation tokens:* 123
+- *Total tokens:* 143
+- *Prompt throughput (raw):* 297 tok/s
+- *Generation throughput (raw):* 378 tok/s
+- *Peak memory:* 1.8
+- *Active memory:* 0.62
+- *Cache memory:* 0.24
+- *Model-load active memory:* 0.618
+- *Post-cleanup active memory:* 0.02
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 126
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 5240204744963d72823e5de933c528c4aa82dfca
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--nanoLLaVA-1.5-4bit/snapshots/5240204744963d72823e5de933c528c4aa82dfca
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+The image shows a close-up view of two cats lying down on a pink fabric surface. Both cats are wearing striped-patterned clothing, and they are positioned in such a way that they appear to be sleeping. The cats are facing the camera, and their eyes are wide open, indicating they are alert and aware of their surroundings. The background of the image is a solid pink color, providing a contrast to the cats and the fabric surface. There are no texts or other objects in the image. The style of the image is a straightforward and unembellished photograph, capturing the cats in a relaxed state.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+The image shows a close-up view of two cats lying down on a pink fabric surface. Both cats are wearing striped-patterned clothing, and they are positioned in such a way that they appear to be sleeping. The cats are facing the camera, and their eyes are wide open, indicating they are alert and aware of their surroundings. The background of the image is a solid pink color, providing a contrast to the cats and the fabric surface. There are no texts or other objects in the image. The style of the image is a straightforward and unembellished photograph, capturing the cats in a relaxed state.
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-paligemma2-10b-ft-docci-448-6bit"></a>
+
+### mlx-community/paligemma2-10b-ft-docci-448-6bit
+
+<details>
+<summary>Complete evidence: mlx-community/paligemma2-10b-ft-docci-448-6bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 1.58s
+- *Generation time:* 6.49s
+- *Total time:* 8.08s
+- *Input validation time:* 0.00155
+- *Prompt preparation time:* 0.000178
+- *First-token latency:* 0.782
+- *Cleanup time:* 0.127
+- *Prompt tokens:* 1,029
+- *Generation tokens:* 180
+- *Total tokens:* 1,209
+- *Prompt throughput (raw):* 1,316 tok/s
+- *Generation throughput (raw):* 32.6 tok/s
+- *Peak memory:* 11
+- *Active memory:* 7.9
+- *Cache memory:* 1.5
+- *Model-load active memory:* 7.88
+- *Post-cleanup active memory:* 0.021
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 26
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 1485fa9b3c7adb360cd354a29a401f0d441ec728
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--paligemma2-10b-ft-docci-448-6bit/snapshots/1485fa9b3c7adb360cd354a29a401f0d441ec728
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Two cats are laying on a pink blanket. The cat on the left is a gray tabby cat with black stripes. The cat on the right is a brown tabby cat with black stripes. Both cats are laying on their sides. The cat on the left is facing the right side of the image. The cat on the right is facing the left side of the image. The cat on the left has its head down, and its body is stretched out. Its head is facing the top left corner of the image. Its tail is hanging off the edge of the blanket. The cat on the right has its head down, and its body is stretched out. Its head is facing the bottom left corner of the image. Its tail is hanging off the edge of the blanket. There is a gray remote control on the left side of the image and a gray remote control on the right side of the image.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Two cats are laying on a pink blanket. The cat on the left is a gray tabby cat with black stripes. The cat on the right is a brown tabby cat with black stripes. Both cats are laying on their sides. The cat on the left is facing the right side of the image. The cat on the right is facing the left side of the image. The cat on the left has its head down, and its body is stretched out. Its head is facing the top left corner of the image. Its tail is hanging off the edge of the blanket. The cat on the right has its head down, and its body is stretched out. Its head is facing the bottom left corner of the image. Its tail is hanging off the edge of the blanket. There is a gray remote control on the left side of the image and a gray remote control on the right side of the image.
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-paligemma2-10b-ft-docci-448-bf16"></a>
+
+### mlx-community/paligemma2-10b-ft-docci-448-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/paligemma2-10b-ft-docci-448-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 2.75s
+- *Generation time:* 30.54s
+- *Total time:* 33.30s
+- *Input validation time:* 0.00171
+- *Prompt preparation time:* 0.00013
+- *First-token latency:* 1.12
+- *Cleanup time:* 0.131
+- *Prompt tokens:* 1,029
+- *Generation tokens:* 159
+- *Total tokens:* 1,188
+- *Prompt throughput (raw):* 923 tok/s
+- *Generation throughput (raw):* 5.41 tok/s
+- *Peak memory:* 26
+- *Active memory:* 19
+- *Cache memory:* 6.2
+- *Model-load active memory:* 19.3
+- *Post-cleanup active memory:* 0.0221
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 26
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 7c412694b919432784c730b62fadafb1c2e15d0d
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--paligemma2-10b-ft-docci-448-bf16/snapshots/7c412694b919432784c730b62fadafb1c2e15d0d
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+A top-down view of two cats laying on a pink blanket. The cat on the left is a gray tabby cat with black stripes and a black tail. It is laying on its side with its head on the pink blanket and its body facing the left side of the image. Its front legs are stretched out in front of it, and its back legs are curled up. The cat on the right is a brown tabby cat with black stripes. It is laying on its side with its head on the pink blanket and its body facing the right side of the image. Its front legs are stretched out in front of it, and its back legs are curled up. There is a gray remote control on the left side of the image and a gray remote control on the right side of the image.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+A top-down view of two cats laying on a pink blanket. The cat on the left is a gray tabby cat with black stripes and a black tail. It is laying on its side with its head on the pink blanket and its body facing the left side of the image. Its front legs are stretched out in front of it, and its back legs are curled up. The cat on the right is a brown tabby cat with black stripes. It is laying on its side with its head on the pink blanket and its body facing the right side of the image. Its front legs are stretched out in front of it, and its back legs are curled up. There is a gray remote control on the left side of the image and a gray remote control on the right side of the image.
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-paligemma2-3b-ft-docci-448-bf16"></a>
+
+### mlx-community/paligemma2-3b-ft-docci-448-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/paligemma2-3b-ft-docci-448-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 1.42s
+- *Generation time:* 6.78s
+- *Total time:* 8.20s
+- *Input validation time:* 0.00164
+- *Prompt preparation time:* 0.00013
+- *First-token latency:* 0.374
+- *Cleanup time:* 0.0975
+- *Prompt tokens:* 1,029
+- *Generation tokens:* 126
+- *Total tokens:* 1,155
+- *Prompt throughput (raw):* 2,753 tok/s
+- *Generation throughput (raw):* 19.7 tok/s
+- *Peak memory:* 10
+- *Active memory:* 6.1
+- *Cache memory:* 3.6
+- *Model-load active memory:* 6.09
+- *Post-cleanup active memory:* 0.0231
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 26
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* f66333527ce75342b09d4df81873f65272ec2f30
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--paligemma2-3b-ft-docci-448-bf16/snapshots/f66333527ce75342b09d4df81873f65272ec2f30
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+A top-down view of two cats sleeping on a pink blanket. The cat on the left is a gray and black color and is laying on its side with its head facing the right side of the image. Its front paws are stretched out in front of it. The cat's tail is sticking out to the left of the blanket. The cat on the right is lying on its side with its head facing the left side of the image. Its front paws are stretched out in front of it. Its tail is sticking out to the left of the blanket. There is a white and gray remote control between the two cats.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+A top-down view of two cats sleeping on a pink blanket. The cat on the left is a gray and black color and is laying on its side with its head facing the right side of the image. Its front paws are stretched out in front of it. The cat's tail is sticking out to the left of the blanket. The cat on the right is lying on its side with its head facing the left side of the image. Its front paws are stretched out in front of it. Its tail is sticking out to the left of the blanket. There is a white and gray remote control between the two cats.
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-pixtral-12b-8bit"></a>
+
+### mlx-community/pixtral-12b-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/pixtral-12b-8bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 1.73s
+- *Generation time:* 5.73s
+- *Total time:* 7.47s
+- *Input validation time:* 0.00163
+- *Prompt preparation time:* 0.00223
+- *First-token latency:* 0.77
+- *Cleanup time:* 0.0981
+- *Prompt tokens:* 1,237
+- *Generation tokens:* 199
+- *Total tokens:* 1,436
+- *Prompt throughput (raw):* 1,606 tok/s
+- *Generation throughput (raw):* 40.2 tok/s
+- *Peak memory:* 15
+- *Active memory:* 14
+- *Cache memory:* 0.27
+- *Model-load active memory:* 13.5
+- *Post-cleanup active memory:* 0.0244
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 40
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 79e24b66302d4ac5e75491767f8914b2aa6ac1f8
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--pixtral-12b-8bit/snapshots/79e24b66302d4ac5e75491767f8914b2aa6ac1f8
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+In the tranquil setting of this image, two feline companions, one adult and one kitten, are enjoying a peaceful slumber on a vibrant red couch. The adult cat, with its brown and black stripes, is lying on its side, its head comfortably resting on the armrest of the couch. Its body is relaxed, embodying the essence of serenity.
+
+Beside it, the kitten, mirroring the adult's brown and black stripes, is curled up in a perfect circle. Its head is gently resting on the seat of the couch, adding to the overall calmness of the scene.
+
+The couch they're on is a striking red, providing a warm contrast to the cats' brown and black fur. On the armrest of the couch, there are two remote controls, perhaps indicating a recent human presence. The precise location of these objects and their relative positions to each other and the cats add depth to the image, creating a snapshot of a quiet moment in time.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+In the tranquil setting of this image, two feline companions, one adult and one kitten, are enjoying a peaceful slumber on a vibrant red couch. The adult cat, with its brown and black stripes, is lying on its side, its head comfortably resting on the armrest of the couch. Its body is relaxed, embodying the essence of serenity.
+
+Beside it, the kitten, mirroring the adult's brown and black stripes, is curled up in a perfect circle. Its head is gently resting on the seat of the couch, adding to the overall calmness of the scene.
+
+The couch they're on is a striking red, providing a warm contrast to the cats' brown and black fur. On the armrest of the couch, there are two remote controls, perhaps indicating a recent human presence. The precise location of these objects and their relative positions to each other and the cats add depth to the image, creating a snapshot of a quiet moment in time.
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-pixtral-12b-bf16"></a>
+
+### mlx-community/pixtral-12b-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/pixtral-12b-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 2.60s
+- *Generation time:* 11.00s
+- *Total time:* 13.60s
+- *Input validation time:* 0.00183
+- *Prompt preparation time:* 0.000195
+- *First-token latency:* 0.785
+- *Cleanup time:* 0.11
+- *Prompt tokens:* 1,237
+- *Generation tokens:* 204
+- *Total tokens:* 1,441
+- *Prompt throughput (raw):* 1,577 tok/s
+- *Generation throughput (raw):* 20.0 tok/s
+- *Peak memory:* 27
+- *Active memory:* 25
+- *Cache memory:* 0.27
+- *Model-load active memory:* 25.4
+- *Post-cleanup active memory:* 0.0247
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 40
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 378cf65efd79647fc324a079c141fd92cb29916e
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--pixtral-12b-bf16/snapshots/378cf65efd79647fc324a079c141fd92cb29916e
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+In the tranquil setting of this image, two feline companions, one a tabby cat and the other a Bengal cat, are enjoying a peaceful slumber on a vibrant red couch. The tabby cat, with its distinctive striped coat, is sprawled out on its side, its head comfortably resting on the armrest of the couch. Its body is relaxed, embodying the essence of serenity.
+
+Beside it, the Bengal cat is curled up in a perfect circle, its head nestled on its paws. The intricate patterns on its coat blend harmoniously with the red of the couch, creating a picture of tranquility.
+
+Two remote controls lie on the couch, silent witnesses to the cats' slumber. One is near the tabby cat, while the other is closer to the Bengal cat. Their presence adds a touch of everyday life to this serene scene.
+
+The image captures a moment of pure peace and comfort, as these two cats enjoy their rest in a warm and inviting environment.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+In the tranquil setting of this image, two feline companions, one a tabby cat and the other a Bengal cat, are enjoying a peaceful slumber on a vibrant red couch. The tabby cat, with its distinctive striped coat, is sprawled out on its side, its head comfortably resting on the armrest of the couch. Its body is relaxed, embodying the essence of serenity.
+
+Beside it, the Bengal cat is curled up in a perfect circle, its head nestled on its paws. The intricate patterns on its coat blend harmoniously with the red of the couch, creating a picture of tranquility.
+
+Two remote controls lie on the couch, silent witnesses to the cats' slumber. One is near the tabby cat, while the other is closer to the Bengal cat. Their presence adds a touch of everyday life to this serene scene.
+
+The image captures a moment of pure peace and comfort, as these two cats enjoy their rest in a warm and inviting environment.
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-qnguyen3-nanollava"></a>
+
+### qnguyen3/nanoLLaVA
+
+<details>
+<summary>Complete evidence: qnguyen3/nanoLLaVA</summary>
+
+- *Execution:* completed
+- *Usability:* usable
+- *Maintainer status:* none
+- *Observations:* none
+- *Model load time:* 0.50s
+- *Generation time:* 0.50s
+- *Total time:* 1.00s
+- *Input validation time:* 0.00185
+- *Prompt preparation time:* 0.000565
+- *First-token latency:* 0.0895
+- *Cleanup time:* 0.0891
+- *Prompt tokens:* 20
+- *Generation tokens:* 44
+- *Total tokens:* 64
+- *Prompt throughput (raw):* 223 tok/s
+- *Generation throughput (raw):* 116 tok/s
+- *Peak memory:* 4.2
+- *Active memory:* 2.1
+- *Cache memory:* 1.6
+- *Model-load active memory:* 2.13
+- *Post-cleanup active memory:* 0.0253
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 126
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Tokenizer:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 13d60cec183a86755afed64da495fcc2c382ea80
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--qnguyen3--nanoLLaVA/snapshots/13d60cec183a86755afed64da495fcc2c382ea80
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|im_end\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+This image features two cats lying on a couch. One cat is a light brown and the other is a dark brown. They both have green eyes and a black nose. The cats are lying on a pink blanket.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+This image features two cats lying on a couch. One cat is a light brown and the other is a dark brown. They both have green eyes and a black nose. The cats are lying on a pink blanket.
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-jqlive-kimi-vl-a3b-thinking-2506-6bit"></a>
+
+### jqlive/Kimi-VL-A3B-Thinking-2506-6bit
+
+<details>
+<summary>Complete evidence: jqlive/Kimi-VL-A3B-Thinking-2506-6bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Conversation-role control tokens remain visible
+- *Model load time:* 1.97s
+- *Generation time:* 3.25s
+- *Total time:* 5.22s
+- *Input validation time:* 0.00182
+- *Prompt preparation time:* 0.00182
+- *First-token latency:* 0.288
+- *Cleanup time:* 0.0928
+- *Prompt tokens:* 397
+- *Generation tokens:* 221
+- *Total tokens:* 618
+- *Prompt throughput (raw):* 1,380 tok/s
+- *Generation throughput (raw):* 77.6 tok/s
+- *Peak memory:* 16
+- *Active memory:* 14
+- *Cache memory:* 0.70
+- *Model-load active memory:* 13.8
+- *Post-cleanup active memory:* 0.00121
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 227
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 4b3b11ce0874c36a99e13e17e355049042f8620a
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--jqlive--Kimi-VL-A3B-Thinking-2506-6bit/snapshots/4b3b11ce0874c36a99e13e17e355049042f8620a
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* [EOS]
+
+*Readable output:*
+
+<pre class="model-output-readable">
+◁think▷So, let's analyze the image. The image shows two tabby cats lying on a pink fabric surface. There are two remote controls, one near each cat. The cats have a mix of brown, black, and white fur. The lighting is high-contrast, giving a stylized, almost posterized look. The scene is vibrant with the pink background. The cats appear relaxed, possibly sleeping or resting. The remotes are light blue with buttons, typical of TV or other electronic remotes. The overall style is artistic with strong color saturation.◁/think▷The image depicts two tabby cats resting on a vibrant pink fabric surface. One cat is positioned on the left, with a light blue remote control nearby, while the other cat is on the right, with a similar remote. Both cats have a mix of brown, black, and white fur patterns. The image has a stylized, high-contrast, posterized aesthetic, emphasizing vivid colors and sharp details. The cats appear relaxed, likely sleeping or resting, against the bright pink background.&lt;|im_assistant|&gt;
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+◁think▷So, let's analyze the image. The image shows two tabby cats lying on a pink fabric surface. There are two remote controls, one near each cat. The cats have a mix of brown, black, and white fur. The lighting is high-contrast, giving a stylized, almost posterized look. The scene is vibrant with the pink background. The cats appear relaxed, possibly sleeping or resting. The remotes are light blue with buttons, typical of TV or other electronic remotes. The overall style is artistic with strong color saturation.◁/think▷The image depicts two tabby cats resting on a vibrant pink fabric surface. One cat is positioned on the left, with a light blue remote control nearby, while the other cat is on the right, with a similar remote. Both cats have a mix of brown, black, and white fur patterns. The image has a stylized, high-contrast, posterized aesthetic, emphasizing vivid colors and sharp details. The cats appear relaxed, likely sleeping or resting, against the bright pink background.<|im_assistant|>
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
+
+### mlx-community/Idefics3-8B-Llama3-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/Idefics3-8B-Llama3-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Conversation-role control tokens remain visible
+- *Model load time:* 1.90s
+- *Generation time:* 12.10s
+- *Total time:* 14.00s
+- *Input validation time:* 0.00166
+- *Prompt preparation time:* 0.00115
+- *First-token latency:* 1.04
+- *Cleanup time:* 0.0996
+- *Prompt tokens:* 2,325
+- *Generation tokens:* 354
+- *Total tokens:* 2,679
+- *Prompt throughput (raw):* 2,225 tok/s
+- *Generation throughput (raw):* 32.2 tok/s
+- *Peak memory:* 19
+- *Active memory:* 17
+- *Cache memory:* 0.43
+- *Model-load active memory:* 16.9
+- *Post-cleanup active memory:* 0.00442
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 77
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.idefics3.processing_idefics3.Idefics3Processor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 8c2a30c48864f3251701b7bde40f601d25535098
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Idefics3-8B-Llama3-bf16/snapshots/8c2a30c48864f3251701b7bde40f601d25535098
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* <\|end_of_text\|>
+
+*Readable output:*
+
+<pre class="model-output-readable">
+ The image depicts two cats lying on a pink fabric, possibly a blanket or a piece of clothing, which is draped over a piece of furniture, likely a couch or a chair. The cats are positioned side by side, and they appear to be in a relaxed state, possibly sleeping or resting. The fabric is a solid pink color, and it is smooth and soft-looking, suggesting it is made of a comfortable material like cotton or fleece.
+
+The cats are both of a similar size and have a similar color pattern. They have a mix of brown and black stripes, with the brown stripes being more prominent. Their fur appears to be short and well-groomed, indicating that they are well-cared for. The cats' eyes are closed, and their ears are slightly tilted back, which is a common posture for cats when they are relaxed or sleeping.
+
+In the background, there are two remote controls, one on each side of the cats. The remotes are white with black buttons, and they are placed on the pink fabric. The remotes are not in use, and they are simply resting on the fabric.
+
+The overall scene is calm and serene, with the cats and remotes creating a cozy and comfortable setting. The pink fabric adds a soft and warm touch to the image, making it feel inviting and relaxing. The cats' presence adds a sense of companionship and warmth to the scene, making it a pleasant and homely image.
+
+In summary, the image features two cats lying on a pink fabric, with two remotes in the background, creating a cozy and relaxed atmosphere. The cats are well-groomed and appear to be sleeping or resting, while the pink fabric and remotes add to the comfort and homeliness of the scene.&lt;end_of_utterance&gt;
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+ The image depicts two cats lying on a pink fabric, possibly a blanket or a piece of clothing, which is draped over a piece of furniture, likely a couch or a chair. The cats are positioned side by side, and they appear to be in a relaxed state, possibly sleeping or resting. The fabric is a solid pink color, and it is smooth and soft-looking, suggesting it is made of a comfortable material like cotton or fleece.
+
+The cats are both of a similar size and have a similar color pattern. They have a mix of brown and black stripes, with the brown stripes being more prominent. Their fur appears to be short and well-groomed, indicating that they are well-cared for. The cats' eyes are closed, and their ears are slightly tilted back, which is a common posture for cats when they are relaxed or sleeping.
+
+In the background, there are two remote controls, one on each side of the cats. The remotes are white with black buttons, and they are placed on the pink fabric. The remotes are not in use, and they are simply resting on the fabric.
+
+The overall scene is calm and serene, with the cats and remotes creating a cozy and comfortable setting. The pink fabric adds a soft and warm touch to the image, making it feel inviting and relaxing. The cats' presence adds a sense of companionship and warmth to the scene, making it a pleasant and homely image.
+
+In summary, the image features two cats lying on a pink fabric, with two remotes in the background, creating a cozy and relaxed atmosphere. The cats are well-groomed and appear to be sleeping or resting, while the pink fabric and remotes add to the comfort and homeliness of the scene.<end_of_utterance>
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-kimi-vl-a3b-thinking-2506-bf16"></a>
+
+### mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/Kimi-VL-A3B-Thinking-2506-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Conversation-role control tokens remain visible
+- *Model load time:* 3.24s
+- *Generation time:* 52.33s
+- *Total time:* 55.58s
+- *Input validation time:* 0.00179
+- *Prompt preparation time:* 0.0016
+- *First-token latency:* 0.802
+- *Cleanup time:* 0.171
+- *Prompt tokens:* 397
+- *Generation tokens:* 241
+- *Total tokens:* 638
+- *Prompt throughput (raw):* 495 tok/s
+- *Generation throughput (raw):* 4.7 tok/s
+- *Peak memory:* 39
+- *Active memory:* 33
+- *Cache memory:* 4.9
+- *Model-load active memory:* 32.8
+- *Post-cleanup active memory:* 0.0057
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 227
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* fb254434d4026bee7aa840dea1c5d59feea8fd48
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Kimi-VL-A3B-Thinking-2506-bf16/snapshots/fb254434d4026bee7aa840dea1c5d59feea8fd48
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* [EOS]
+
+*Readable output:*
+
+<pre class="model-output-readable">
+◁think▷So, let's analyze the image. The image shows two tabby cats lying on a pink fabric surface. There are two remote controls, one near each cat. The cats have a mix of brown, black, and white fur. The lighting is high-contrast, making the colors very vivid. The scene is likely a cozy indoor setting, maybe a couch or bed. The cats appear relaxed, possibly sleeping or resting. The remotes are light blue with buttons, typical of TV or other electronic remotes. The overall style is a bit stylized with high saturation, giving it a vibrant look.◁/think▷The image depicts two tabby cats resting on a pink fabric surface. One cat is positioned on the left, with a light blue remote control near its head, while the other cat is on the right, with a similar remote control closer to its body. Both cats have a mix of brown, black, and white fur patterns. The scene has a high-contrast, stylized appearance with vivid colors, suggesting a cozy indoor setting, likely a couch or bed. The lighting emphasizes the cats' fur details and the texture of the fabric.&lt;|im_assistant|&gt;
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+◁think▷So, let's analyze the image. The image shows two tabby cats lying on a pink fabric surface. There are two remote controls, one near each cat. The cats have a mix of brown, black, and white fur. The lighting is high-contrast, making the colors very vivid. The scene is likely a cozy indoor setting, maybe a couch or bed. The cats appear relaxed, possibly sleeping or resting. The remotes are light blue with buttons, typical of TV or other electronic remotes. The overall style is a bit stylized with high saturation, giving it a vibrant look.◁/think▷The image depicts two tabby cats resting on a pink fabric surface. One cat is positioned on the left, with a light blue remote control near its head, while the other cat is on the right, with a similar remote control closer to its body. Both cats have a mix of brown, black, and white fur patterns. The scene has a high-contrast, stylized appearance with vivid colors, suggesting a cozy indoor setting, likely a couch or bed. The lighting emphasizes the cats' fur details and the texture of the fabric.<|im_assistant|>
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-diffusiongemma-26b-a4b-it-8bit"></a>
+
+### mlx-community/diffusiongemma-26B-A4B-it-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/diffusiongemma-26B-A4B-it-8bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Unrecognised model control tokens remain visible
+- *Model load time:* 3.44s
+- *Generation time:* 2.11s
+- *Total time:* 5.57s
+- *Input validation time:* 0.00169
+- *Prompt preparation time:* 0.02
+- *First-token latency:* 0.291
+- *Cleanup time:* 0.129
+- *Prompt tokens:* 280
+- *Generation tokens:* 88
+- *Total tokens:* 368
+- *Prompt throughput (raw):* 962 tok/s
+- *Generation throughput (raw):* 53.4 tok/s
+- *Peak memory:* 29
+- *Active memory:* 28
+- *Cache memory:* 0.01
+- *Model-load active memory:* 28
+- *Post-cleanup active memory:* 0.0156
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 66
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 7b95e3887078ba56283c24f2578d6e5a06b9d7e8
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--diffusiongemma-26B-A4B-it-8bit/snapshots/7b95e3887078ba56283c24f2578d6e5a06b9d7e8
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+&lt;|channel&gt;thought
+&lt;channel|&gt;A high-angle eye-level shot shows two tabby cats sleeping on a pink blanket on a red couch. The cat on the left is smaller and lying on its side with its head turned up and its paws curled. The cat on the right is larger and is lying on its stomach with its head turned down. There are two remote controls on the couch next to the cats. The lighting is bright and even.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+<|channel>thought
+<channel|>A high-angle eye-level shot shows two tabby cats sleeping on a pink blanket on a red couch. The cat on the left is smaller and lying on its side with its head turned up and its paws curled. The cat on the right is larger and is lying on its stomach with its head turned down. There are two remote controls on the couch next to the cats. The lighting is bright and even.
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8"></a>
+
+### mlx-community/diffusiongemma-26B-A4B-it-mxfp8
+
+<details>
+<summary>Complete evidence: mlx-community/diffusiongemma-26B-A4B-it-mxfp8</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Unrecognised model control tokens remain visible
+- *Model load time:* 3.17s
+- *Generation time:* 1.78s
+- *Total time:* 4.95s
+- *Input validation time:* 0.00166
+- *Prompt preparation time:* 0.00029
+- *First-token latency:* 0.289
+- *Cleanup time:* 0.124
+- *Prompt tokens:* 280
+- *Generation tokens:* 89
+- *Total tokens:* 369
+- *Prompt throughput (raw):* 970 tok/s
+- *Generation throughput (raw):* 67.9 tok/s
+- *Peak memory:* 28
+- *Active memory:* 27
+- *Cache memory:* 0.01
+- *Model-load active memory:* 27.2
+- *Post-cleanup active memory:* 0.0156
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 66
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.diffusion_gemma.processing_diffusion_gemma.DiffusionGemma4Processor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* ded389e478f86d498ad9e7f47666e83b166a28f1
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--diffusiongemma-26B-A4B-it-mxfp8/snapshots/ded389e478f86d498ad9e7f47666e83b166a28f1
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+&lt;|channel&gt;thought
+&lt;channel|&gt;A high-angle, medium shot shows two tabby cats sleeping on a pink blanket on a red couch. The cat on the left is smaller and is lying on its side with its head turned and its paws tucked in. The cat on the right is larger and is lying on its stomach with its head down and legs stretched out. Two remote controls are on the couch between the cats. The lighting is bright and even.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+<|channel>thought
+<channel|>A high-angle, medium shot shows two tabby cats sleeping on a pink blanket on a red couch. The cat on the left is smaller and is lying on its side with its head turned and its paws tucked in. The cat on the right is larger and is lying on its stomach with its head down and legs stretched out. Two remote controls are on the couch between the cats. The lighting is bright and even.
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-paligemma2-3b-pt-896-4bit"></a>
+
+### mlx-community/paligemma2-3b-pt-896-4bit
+
+<details>
+<summary>Complete evidence: mlx-community/paligemma2-3b-pt-896-4bit</summary>
+
+- *Execution:* completed
+- *Usability:* usable_with_caveats
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Response is unusually short
+- *Model load time:* 1.13s
+- *Generation time:* 1.12s
+- *Total time:* 2.27s
+- *Input validation time:* 0.00176
+- *Prompt preparation time:* 0.000104
+- *First-token latency:* 1.08
+- *Cleanup time:* 0.0956
+- *Prompt tokens:* 4,101
+- *Generation tokens:* 2
+- *Total tokens:* 4,103
+- *Prompt throughput (raw):* 3,802 tok/s
+- *Generation throughput (raw):* 87.8 tok/s
+- *Peak memory:* 4.6
+- *Active memory:* 1.7
+- *Cache memory:* 1.7
+- *Model-load active memory:* 1.74
+- *Post-cleanup active memory:* 0.0241
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* completed
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 26
+- *Image placeholders:* 1
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.paligemma.processing_paligemma.PaliGemmaProcessor
+- *Tokenizer:* transformers.models.gemma.tokenization_gemma.GemmaTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* a26bac48c7a661dfdafe1799c90177f818e79925
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--paligemma2-3b-pt-896-4bit/snapshots/a26bac48c7a661dfdafe1799c90177f818e79925
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;eos&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Cat
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Cat
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-apriel-15-15b-thinker-6bit-mlx"></a>
+
+### mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
+
+<details>
+<summary>Complete evidence: mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX</summary>
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Response appears cut off at the token limit
+- *Model load time:* 1.61s
+- *Generation time:* 12.21s
+- *Total time:* 13.83s
+- *Input validation time:* 0.00161
+- *Prompt preparation time:* 0.00658
+- *First-token latency:* 0.91
+- *Cleanup time:* 0.0842
+- *Prompt tokens:* 1,329
+- *Generation tokens:* 500
+- *Total tokens:* 1,829
+- *Prompt throughput (raw):* 1,460 tok/s
+- *Generation throughput (raw):* 44.3 tok/s
+- *Peak memory:* 14
+- *Active memory:* 13
+- *Cache memory:* 0.41
+- *Model-load active memory:* 12.6
+- *Post-cleanup active memory:* 0.00207
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* max_tokens
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 414
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.pixtral.processing_pixtral.PixtralProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 24cb8fef6052e8d6e0dd7d467cf2d3db2dec19b2
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Apriel-1.5-15b-Thinker-6bit-MLX/snapshots/24cb8fef6052e8d6e0dd7d467cf2d3db2dec19b2
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Here are my reasoning steps:
+The user asks: "Describe this image". The image is of two cats sleeping on a pink couch, with a remote control and a DVD case (or something) on the couch. The cats are both tabby, with similar patterns. They are lying on their sides, curled up, with paws extended. The remote is on the left side, the DVD case on the right side. The couch is pink. The cats appear to be sleeping. The cat on the left is lying on its side with its head turned slightly upward, its front paws stretched out, and its tail curled around its body. The cat on the right is lying on its side, with its head turned to the left, its front paws tucked under its chest, and its tail draped over its back. The remote is a typical TV remote with colored buttons. The DVD case is partially visible, showing a blue spine with some text. The couch is plush. The lighting is soft. The cats have a mix of brown, black, and tan stripes. The overall scene is cozy and relaxed.
+
+We need to produce a description. The user didn't ask for anything else. So we can give a detailed description. The user is presumably just wanting a description. There's no disallowed content. So we can comply.
+
+We should be mindful of the policy: no disallowed content. It's a normal image. So we can comply.
+
+We can also mention the cat's positions relative to each other and the objects. The cat on the left is near the remote, the cat on the right near the DVD case. The couch is pink. The cats are tabby. The remote is white with black and colored buttons. The DVD case is blue with white text. The cats are sleeping. The scene is cozy.
+
+We can also mention the cat's fur pattern: stripes, spots, etc. The cat's eyes are closed. The cat's ears are perked. The cat's paws are visible. The cat's tail is visible. The cat's whiskers are visible. The cat's nose is visible. The cat's ears are pointed. The cat's fur is fluffy.
+
+We can also mention the couch's texture: plush, soft. The lighting is warm. The scene is likely in a living room.
+
+We can also mention the remote is a typical TV remote with a power button, volume, channel, etc. The
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Here are my reasoning steps:
+The user asks: "Describe this image". The image is of two cats sleeping on a pink couch, with a remote control and a DVD case (or something) on the couch. The cats are both tabby, with similar patterns. They are lying on their sides, curled up, with paws extended. The remote is on the left side, the DVD case on the right side. The couch is pink. The cats appear to be sleeping. The cat on the left is lying on its side with its head turned slightly upward, its front paws stretched out, and its tail curled around its body. The cat on the right is lying on its side, with its head turned to the left, its front paws tucked under its chest, and its tail draped over its back. The remote is a typical TV remote with colored buttons. The DVD case is partially visible, showing a blue spine with some text. The couch is plush. The lighting is soft. The cats have a mix of brown, black, and tan stripes. The overall scene is cozy and relaxed.
+
+We need to produce a description. The user didn't ask for anything else. So we can give a detailed description. The user is presumably just wanting a description. There's no disallowed content. So we can comply.
+
+We should be mindful of the policy: no disallowed content. It's a normal image. So we can comply.
+
+We can also mention the cat's positions relative to each other and the objects. The cat on the left is near the remote, the cat on the right near the DVD case. The couch is pink. The cats are tabby. The remote is white with black and colored buttons. The DVD case is blue with white text. The cats are sleeping. The scene is cozy.
+
+We can also mention the cat's fur pattern: stripes, spots, etc. The cat's eyes are closed. The cat's ears are perked. The cat's paws are visible. The cat's tail is visible. The cat's whiskers are visible. The cat's nose is visible. The cat's ears are pointed. The cat's fur is fluffy.
+
+We can also mention the couch's texture: plush, soft. The lighting is warm. The scene is likely in a living room.
+
+We can also mention the remote is a typical TV remote with a power button, volume, channel, etc. The
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
+
+### mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+
+<details>
+<summary>Complete evidence: mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16</summary>
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Response appears cut off at the token limit
+- *Model load time:* 5.48s
+- *Generation time:* 10.23s
+- *Total time:* 15.72s
+- *Input validation time:* 0.00166
+- *Prompt preparation time:* 0.00774
+- *First-token latency:* 2.51
+- *Cleanup time:* 0.207
+- *Prompt tokens:* 437
+- *Generation tokens:* 500
+- *Total tokens:* 937
+- *Prompt throughput (raw):* 174 tok/s
+- *Generation throughput (raw):* 64.9 tok/s
+- *Peak memory:* 60
+- *Active memory:* 59
+- *Cache memory:* 0.06
+- *Model-load active memory:* 58.8
+- *Post-cleanup active memory:* 0.00256
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* max_tokens
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 230
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLProcessor
+- *Tokenizer:* mlx_vlm.models.ernie4_5_moe_vl.processing_ernie4_5_moe_vl.Ernie4_5_VLTokenizer
+- *Requested model revision:* not requested
+- *Resolved model revision:* 32dae5c38006e20ac158bc94cd1d5967d19b2652
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--ERNIE-4.5-VL-28B-A3B-Thinking-bf16/snapshots/32dae5c38006e20ac158bc94cd1d5967d19b2652
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* &lt;/s&gt;
+
+*Readable output:*
+
+<pre class="model-output-readable">
+Alright, let's get to work. The user wants a detailed description of this image, and I'm the one to provide it. First, I need to break down the request. The user has given me a complex prompt, a jumble of words that I need to decipher. It's a classic case of "gibberish," but I can handle it.
+
+My initial step is to analyze the user's input. I see a jumble of words, a mix of cat breeds, colors, and objects. It's a mess, but I can see the core elements: cats, a couch, and a remote. The user wants a description, so I need to extract the meaning from this chaos.
+
+Next, I'll sift through the text, pulling out the key elements. I'll identify the cats, the couch, and the remote. I'll also note the colors and positions. I'll ignore the gibberish, the nonsensical phrases.
+
+Now, I'll synthesize the information. I'll start with the main subject: two cats on a couch. I'll describe their appearance, focusing on the colors and breeds. Then, I'll describe the setting: the couch, the remote, and the overall atmosphere. I'll make sure to mention the relaxed, cozy vibe.
+
+Finally, I'll structure the description. I'll start with a general overview, then go into detail about the cats, the couch, and the remote. I'll use descriptive language to paint a picture. I'll make sure the description is clear, concise, and engaging. I'll also make sure to mention the "gibberish" in the prompt, but I won't let it dominate the description.
+
+I'll review the final description to ensure it's accurate, comprehensive, and captures the essence of the image. I'll make sure it's well-written and easy to understand. I'll also make sure to mention the "gibberish" in the prompt, but I won't let it dominate the description.
+&lt;/think&gt;
+
+Based on the image provided, here is a description of the scene:
+
+This is a heartwarming and cozy image of two cats relaxing together on a plush, red couch.
+
+*   **
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+Alright, let's get to work. The user wants a detailed description of this image, and I'm the one to provide it. First, I need to break down the request. The user has given me a complex prompt, a jumble of words that I need to decipher. It's a classic case of "gibberish," but I can handle it.
+
+My initial step is to analyze the user's input. I see a jumble of words, a mix of cat breeds, colors, and objects. It's a mess, but I can see the core elements: cats, a couch, and a remote. The user wants a description, so I need to extract the meaning from this chaos.
+
+Next, I'll sift through the text, pulling out the key elements. I'll identify the cats, the couch, and the remote. I'll also note the colors and positions. I'll ignore the gibberish, the nonsensical phrases.
+
+Now, I'll synthesize the information. I'll start with the main subject: two cats on a couch. I'll describe their appearance, focusing on the colors and breeds. Then, I'll describe the setting: the couch, the remote, and the overall atmosphere. I'll make sure to mention the relaxed, cozy vibe.
+
+Finally, I'll structure the description. I'll start with a general overview, then go into detail about the cats, the couch, and the remote. I'll use descriptive language to paint a picture. I'll make sure the description is clear, concise, and engaging. I'll also make sure to mention the "gibberish" in the prompt, but I won't let it dominate the description.
+
+I'll review the final description to ensure it's accurate, comprehensive, and captures the essence of the image. I'll make sure it's well-written and easy to understand. I'll also make sure to mention the "gibberish" in the prompt, but I won't let it dominate the description.
+</think>
+
+Based on the image provided, here is a description of the scene:
+
+This is a heartwarming and cozy image of two cats relaxing together on a plush, red couch.
+
+*   **
+```
+
+</details>
+
+</details>
+
+---
+
+<a id="model-mlx-community-kimi-vl-a3b-thinking-8bit"></a>
+
+### mlx-community/Kimi-VL-A3B-Thinking-8bit
+
+<details>
+<summary>Complete evidence: mlx-community/Kimi-VL-A3B-Thinking-8bit</summary>
+
+- *Execution:* completed
+- *Usability:* unusable
+- *Maintainer status:* observation_needs_reproduction
+- *Observations:* Response appears cut off at the token limit; Internal
+  reasoning block appears incomplete
+- *Model load time:* 2.39s
+- *Generation time:* 7.74s
+- *Total time:* 10.14s
+- *Input validation time:* 0.00166
+- *Prompt preparation time:* 0.00157
+- *First-token latency:* 0.282
+- *Cleanup time:* 0.192
+- *Prompt tokens:* 397
+- *Generation tokens:* 500
+- *Total tokens:* 897
+- *Prompt throughput (raw):* 1,408 tok/s
+- *Generation throughput (raw):* 68.2 tok/s
+- *Peak memory:* 20
+- *Active memory:* 18
+- *Cache memory:* 0.76
+- *Model-load active memory:* 17.8
+- *Post-cleanup active memory:* 0.00636
+- *Post-cleanup cache memory:* 0.0
+- *Stop reason:* max_tokens
+- *Requested maximum tokens:* 500
+- *Rendered prompt characters:* 227
+- *Image placeholders:* 0
+- *Processed image:* not captured
+- *Image patch count:* not captured
+- *Processor:* mlx_vlm.models.kimi_vl.processing_kimi_vl.KimiVLProcessor
+- *Tokenizer:* transformers.tokenization_utils_tokenizers.TokenizersBackend
+- *Requested model revision:* not requested
+- *Resolved model revision:* 85daf3dc2490c0f824143338f08ba45f475c9ce4
+- *Resolved snapshot path:* ~/.cache/huggingface/hub/models--mlx-community--Kimi-VL-A3B-Thinking-8bit/snapshots/85daf3dc2490c0f824143338f08ba45f475c9ce4
+- *Generation settings:* {"max_tokens": 500, "prefill_step_size": 4096,
+  "temperature": 0.0, "top_p": 1.0}
+- *EOS token:* [EOS]
+
+*Readable output:*
+
+<pre class="model-output-readable">
+◁think▷Okay, let me try to figure out how to describe this image. First, I need to look at the image carefully. There are two cats on a pink surface, maybe a blanket or a bed. Both cats seem to be lying down. The one on the left is a tabby with gray and black stripes, and the one on the right is a darker tabby, maybe a bit bigger. They both look like they're sleeping or resting. There's a remote control near the left cat and another one near the right cat. The background is pink, which might be a couch or a bed. The image is a bit blurry, especially around the edges, which makes it look like a low-resolution or heavily compressed image. The colors are a bit oversaturated, especially the pink background. The cats' fur has some highlights, maybe from light reflecting off them. The cats seem to be in a relaxed position, maybe after playing or moving around since one is stretched out. The remotes are standard TV remotes, which adds a bit of context that this might be a cozy indoor setting. The image might have been taken in a living room. The lighting seems artificial, maybe from a lamp or overhead light. The cats' eyes aren't clearly visible because they're closed. The overall mood is calm and relaxed. I should mention the colors, the subjects (cats and remotes), the setting, and the image quality issues like blurriness and color saturation. Also, the composition with the remotes adds a bit of a humorous touch, like the cats are ignoring the remotes. Maybe mention the possible breeds of the cats, but I'm not sure. The image might have been edited or filtered, given the color enhancements. The pink background contrasts with the cats' fur colors. The cats' positions suggest they might have been moving before settling down. The remotes are standard, not specialized, so maybe they're in a typical living room. The image could be a candid shot capturing a quiet moment. The blurriness might be due to motion or a low-quality camera. The lighting is even, not harsh shadows, so maybe it's evening or night time. The cats seem comfortable, indicating they feel safe. The image might be meant to be cute or humorous because of the remotes next to them. The pink background makes the cats stand out. The image could be shared on social media or as a pet owner's photo. The cats' poses are natural, not posed.
+</pre>
+
+<details>
+<summary>Exact raw output</summary>
+
+```text
+◁think▷Okay, let me try to figure out how to describe this image. First, I need to look at the image carefully. There are two cats on a pink surface, maybe a blanket or a bed. Both cats seem to be lying down. The one on the left is a tabby with gray and black stripes, and the one on the right is a darker tabby, maybe a bit bigger. They both look like they're sleeping or resting. There's a remote control near the left cat and another one near the right cat. The background is pink, which might be a couch or a bed. The image is a bit blurry, especially around the edges, which makes it look like a low-resolution or heavily compressed image. The colors are a bit oversaturated, especially the pink background. The cats' fur has some highlights, maybe from light reflecting off them. The cats seem to be in a relaxed position, maybe after playing or moving around since one is stretched out. The remotes are standard TV remotes, which adds a bit of context that this might be a cozy indoor setting. The image might have been taken in a living room. The lighting seems artificial, maybe from a lamp or overhead light. The cats' eyes aren't clearly visible because they're closed. The overall mood is calm and relaxed. I should mention the colors, the subjects (cats and remotes), the setting, and the image quality issues like blurriness and color saturation. Also, the composition with the remotes adds a bit of a humorous touch, like the cats are ignoring the remotes. Maybe mention the possible breeds of the cats, but I'm not sure. The image might have been edited or filtered, given the color enhancements. The pink background contrasts with the cats' fur colors. The cats' positions suggest they might have been moving before settling down. The remotes are standard, not specialized, so maybe they're in a typical living room. The image could be a candid shot capturing a quiet moment. The blurriness might be due to motion or a low-quality camera. The lighting is even, not harsh shadows, so maybe it's evening or night time. The cats seem comfortable, indicating they feel safe. The image might be meant to be cute or humorous because of the remotes next to them. The pink background makes the cats stand out. The image could be shared on social media or as a pet owner's photo. The cats' poses are natural, not posed.
+```
+
+</details>
+
+</details>
+
+---
+
 <a id="model-mlx-community-gemma-3n-e2b-4bit"></a>
 
 ### mlx-community/gemma-3n-E2B-4bit
@@ -4692,18 +4705,18 @@ The image shows two cats sleeping on a pink blanket or sheet. The cat on the lef
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Response repeats the same text; Response appears cut off at
   the token limit
-- *Model load time:* 1.43s
-- *Generation time:* 4.25s
-- *Total time:* 5.69s
-- *Input validation time:* 0.00168
-- *Prompt preparation time:* 0.000185
-- *First-token latency:* 0.226
-- *Cleanup time:* 0.0938
+- *Model load time:* 1.62s
+- *Generation time:* 4.22s
+- *Total time:* 5.86s
+- *Input validation time:* 0.00165
+- *Prompt preparation time:* 0.000169
+- *First-token latency:* 0.229
+- *Cleanup time:* 0.0974
 - *Prompt tokens:* 264
 - *Generation tokens:* 500
 - *Total tokens:* 764
-- *Prompt throughput (raw):* 1,168 tok/s
-- *Generation throughput (raw):* 125 tok/s
+- *Prompt throughput (raw):* 1,151 tok/s
+- *Generation throughput (raw):* 126 tok/s
 - *Peak memory:* 5.8
 - *Active memory:* 4.5
 - *Cache memory:* 0.03
@@ -4766,13 +4779,13 @@ The image shows two cats sleeping on a pink blanket or sheet. The cat on the lef
 - *Root exception module:* builtins
 - *Root exception message:* Received 362 parameters not in model:
   <br>audio_tower.encoder.biases,<br>audio_tower.encoder.scales,<br>language_model.model.layers.10.mlp.experts.down_proj.biases,<br>language_model.model.layers.10.mlp.experts.down_proj.scales,<br>language_model.model.layers.10.mlp.experts.down_proj.weight,<br>language_model.model.layers.10.mlp.experts.gate_proj.biases,<br>language_model.model.layers.10.mlp.experts.gate_proj.scales,<br>language_model.model.layers.10.mlp.experts.gate_proj.weight,<br>language_model.model.layers.10.mlp.experts.up_proj.biases,<br>language_model.model.layers.10.mlp.experts.up_proj.scales,<br>language_model.model.layers.10.mlp.experts.up_proj.weight,<br>language_model.model.layers.11.mlp.experts.down_proj.biases,<br>language_model.model.layers.11.mlp.experts.down_proj.scales,<br>language_model.model.layers.11.mlp.experts.down_proj.weight,<br>language_model.model.layers.11.mlp.experts.gate_proj.biases,<br>language_model.model.layers.11.mlp.experts.gate_proj.scales,<br>language_model.model.layers.11.mlp.experts.gate_proj.weight,<br>language_model.model.layers.11.mlp.experts.up_proj.biases,<br>language_model.model.layers.11.mlp.experts.up_proj.scales,<br>language_model.model.layers.11.mlp.experts.up_proj.weight,<br>language_model.model.layers.12.mlp.experts.down_proj.biases,<br>language_model.model.layers.12.mlp.experts.down_proj.scales,<br>language_model.model.layers.12.mlp.experts.down_proj.weight,<br>language_model.model.layers.12.mlp.experts.gate_proj.biases,<br>language_model.model.layers.12.mlp.experts.gate_proj.scales,<br>language_model.model.layers.12.mlp.experts.gate_proj.weight,<br>language_model.model.layers.12.mlp.experts.up_proj.biases,<br>language_model.model.layers.12.mlp.experts.up_proj.scales,<br>language_model.model.layers.12.mlp.experts.up_proj.weight,<br>language_model.model.layers.13.mlp.experts.down_proj.biases,<br>language_model.model.layers.13.mlp.experts.down_proj.scales,<br>language_model.model.layers.13.mlp.experts.down_proj.weight,<br>language_model.model.layers.13.mlp.experts.gate_proj.biases,<br>language_model.model.layers.13.mlp.experts.gate_proj.scales,<br>language_model.model.layers.13.mlp.experts.gate_proj.weight,<br>language_model.model.layers.13.mlp.experts.up_proj.biases,<br>language_model.model.layers.13.mlp.experts.up_proj.scales,<br>language_model.model.layers.13.mlp.experts.up_proj.weight,<br>language_model.model.layers.14.mlp.experts.down_proj.biases,<br>language_model.model.layers.14.mlp.experts.down_proj.scales,<br>language_model.model.layers.14.mlp.experts.down_proj.weight,<br>language_model.model.layers.14.mlp.experts.gate_proj.biases,<br>language_model.model.layers.14.mlp.experts.gate_proj.scales,<br>language_model.model.layers.14.mlp.experts.gate_proj.weight,<br>language_model.model.layers.14.mlp.experts.up_proj.biases,<br>language_model.model.layers.14.mlp.experts.up_proj.scales,<br>language_model.model.layers.14.mlp.experts.up_proj.weight,<br>language_model.model.layers.15.mlp.experts.down_proj.biases,<br>language_model.model.layers.15.mlp.experts.down_proj.scales,<br>language_model.model.layers.15.mlp.experts.down_proj.weight,<br>language_model.model.layers.15.mlp.experts.gate_proj.biases,<br>language_model.model.layers.15.mlp.experts.gate_proj.scales,<br>language_model.model.layers.15.mlp.experts.gate_proj.weight,<br>language_model.model.layers.15.mlp.experts.up_proj.biases,<br>language_model.model.layers.15.mlp.experts.up_proj.scales,<br>language_model.model.layers.15.mlp.experts.up_proj.weight,<br>language_model.model.layers.16.mlp.experts.down_proj.biases,<br>language_model.model.layers.16.mlp.experts.down_proj.scales,<br>language_model.model.layers.16.mlp.experts.down_proj.weight,<br>language_model.model.layers.16.mlp.experts.gate_proj.biases,<br>language_model.model.layers.16.mlp.experts.gate_proj.scales,<br>language_model.model.layers.16.mlp.experts.gate_proj.weight,<br>language_model.model.layers.16.mlp.experts.up_proj.biases,<br>language_model.model.layers.16.mlp.experts.up_proj.scales,<br>language_model.model.layers.16.mlp.experts.up_proj.weight,<br>language_model.model.layers.17.mlp.experts.down_proj.biases,<br>language_model.model.layers.17.mlp.experts.down_proj.scales,<br>language_model.model.layers.17.mlp.experts.down_proj.weight,<br>language_model.model.layers.17.mlp.experts.gate_proj.biases,<br>language_model.model.layers.17.mlp.experts.gate_proj.scales,<br>language_model.model.layers.17.mlp.experts.gate_proj.weight,<br>language_model.model.layers.17.mlp.experts.up_proj.biases,<br>language_model.model.layers.17.mlp.experts.up_proj.scales,<br>language_model.model.layers.17.mlp.experts.up_proj.weight,<br>language_model.model.layers.18.mlp.experts.down_proj.biases,<br>language_model.model.layers.18.mlp.experts.down_proj.scales,<br>language_model.model.layers.18.mlp.experts.down_proj.weight,<br>language_model.model.layers.18.mlp.experts.gate_proj.biases,<br>language_model.model.layers.18.mlp.experts.gate_proj.scales,<br>language_model.model.layers.18.mlp.experts.gate_proj.weight,<br>language_model.model.layers.18.mlp.experts.up_proj.biases,<br>language_model.model.layers.18.mlp.experts.up_proj.scales,<br>language_model.model.layers.18.mlp.experts.up_proj.weight,<br>language_model.model.layers.19.mlp.experts.down_proj.biases,<br>language_model.model.layers.19.mlp.experts.down_proj.scales,<br>language_model.model.layers.19.mlp.experts.down_proj.weight,<br>language_model.model.layers.19.mlp.experts.gate_proj.biases,<br>language_model.model.layers.19.mlp.experts.gate_proj.scales,<br>language_model.model.layers.19.mlp.experts.gate_proj.weight,<br>language_model.model.layers.19.mlp.experts.up_proj.biases,<br>language_model.model.layers.19.mlp.experts.up_proj.scales,<br>language_model.model.layers.19.mlp.experts.up_proj.weight,<br>language_model.model.layers.2.mlp.experts.down_proj.biases,<br>language_model.model.layers.2.mlp.experts.down_proj.scales,<br>language_model.model.layers.2.mlp.experts.down_proj.weight,<br>language_model.model.layers.2.mlp.experts.gate_proj.biases,<br>language_model.model.layers.2.mlp.experts.gate_proj.scales,<br>language_model.model.layers.2.mlp.experts.gate_proj.weight,<br>language_model.model.layers.2.mlp.experts.up_proj.biases,<br>language_model.model.layers.2.mlp.experts.up_proj.scales,<br>language_model.model.layers.2.mlp.experts.up_proj.weight,<br>language_model.model.layers.20.mlp.experts.down_proj.biases,<br>language_model.model.layers.20.mlp.experts.down_proj.scales,<br>language_model.model.layers.20.mlp.experts.down_proj.weight,<br>language_model.model.layers.20.mlp.experts.gate_proj.biases,<br>language_model.model.layers.20.mlp.experts.gate_proj.scales,<br>language_model.model.layers.20.mlp.experts.gate_proj.weight,<br>language_model.model.layers.20.mlp.experts.up_proj.biases,<br>language_model.model.layers.20.mlp.experts.up_proj.scales,<br>language_model.model.layers.20.mlp.experts.up_proj.weight,<br>language_model.model.layers.21.mlp.experts.down_proj.biases,<br>language_model.model.layers.21.mlp.experts.down_proj.scales,<br>language_model.model.layers.21.mlp.experts.down_proj.weight,<br>language_model.model.layers.21.mlp.experts.gate_proj.biases,<br>language_model.model.layers.21.mlp.experts.gate_proj.scales,<br>language_model.model.layers.21.mlp.experts.gate_proj.weight,<br>language_model.model.layers.21.mlp.experts.up_proj.biases,<br>language_model.model.layers.21.mlp.experts.up_proj.scales,<br>language_model.model.layers.21.mlp.experts.up_proj.weight,<br>language_model.model.layers.22.mlp.experts.down_proj.biases,<br>language_model.model.layers.22.mlp.experts.down_proj.scales,<br>language_model.model.layers.22.mlp.experts.down_proj.weight,<br>language_model.model.layers.22.mlp.experts.gate_proj.biases,<br>language_model.model.layers.22.mlp.experts.gate_proj.scales,<br>language_model.model.layers.22.mlp.experts.gate_proj.weight,<br>language_model.model.layers.22.mlp.experts.up_proj.biases,<br>language_model.model.layers.22.mlp.experts.up_proj.scales,<br>language_model.model.layers.22.mlp.experts.up_proj.weight,<br>language_model.model.layers.23.mlp.experts.down_proj.biases,<br>language_model.model.layers.23.mlp.experts.down_proj.scales,<br>language_model.model.layers.23.mlp.experts.down_proj.weight,<br>language_model.model.layers.23.mlp.experts.gate_proj.biases,<br>language_model.model.layers.23.mlp.experts.gate_proj.scales,<br>language_model.model.layers.23.mlp.experts.gate_proj.weight,<br>language_model.model.layers.23.mlp.experts.up_proj.biases,<br>language_model.model.layers.23.mlp.experts.up_proj.scales,<br>language_model.model.layers.23.mlp.experts.up_proj.weight,<br>language_model.model.layers.24.mlp.experts.down_proj.biases,<br>language_model.model.layers.24.mlp.experts.down_proj.scales,<br>language_model.model.layers.24.mlp.experts.down_proj.weight,<br>language_model.model.layers.24.mlp.experts.gate_proj.biases,<br>language_model.model.layers.24.mlp.experts.gate_proj.scales,<br>language_model.model.layers.24.mlp.experts.gate_proj.weight,<br>language_model.model.layers.24.mlp.experts.up_proj.biases,<br>language_model.model.layers.24.mlp.experts.up_proj.scales,<br>language_model.model.layers.24.mlp.experts.up_proj.weight,<br>language_model.model.layers.25.mlp.experts.down_proj.biases,<br>language_model.model.layers.25.mlp.experts.down_proj.scales,<br>language_model.model.layers.25.mlp.experts.down_proj.weight,<br>language_model.model.layers.25.mlp.experts.gate_proj.biases,<br>language_model.model.layers.25.mlp.experts.gate_proj.scales,<br>language_model.model.layers.25.mlp.experts.gate_proj.weight,<br>language_model.model.layers.25.mlp.experts.up_proj.biases,<br>language_model.model.layers.25.mlp.experts.up_proj.scales,<br>language_model.model.layers.25.mlp.experts.up_proj.weight,<br>language_model.model.layers.26.mlp.experts.down_proj.biases,<br>language_model.model.layers.26.mlp.experts.down_proj.scales,<br>language_model.model.layers.26.mlp.experts.down_proj.weight,<br>language_model.model.layers.26.mlp.experts.gate_proj.biases,<br>language_model.model.layers.26.mlp.experts.gate_proj.scales,<br>language_model.model.layers.26.mlp.experts.gate_proj.weight,<br>language_model.model.layers.26.mlp.experts.up_proj.biases,<br>language_model.model.layers.26.mlp.experts.up_proj.scales,<br>language_model.model.layers.26.mlp.experts.up_proj.weight,<br>language_model.model.layers.27.mlp.experts.down_proj.biases,<br>language_model.model.layers.27.mlp.experts.down_proj.scales,<br>language_model.model.layers.27.mlp.experts.down_proj.weight,<br>language_model.model.layers.27.mlp.experts.gate_proj.biases,<br>language_model.model.layers.27.mlp.experts.gate_proj.scales,<br>language_model.model.layers.27.mlp.experts.gate_proj.weight,<br>language_model.model.layers.27.mlp.experts.up_proj.biases,<br>language_model.model.layers.27.mlp.experts.up_proj.scales,<br>language_model.model.layers.27.mlp.experts.up_proj.weight,<br>language_model.model.layers.28.mlp.experts.down_proj.biases,<br>language_model.model.layers.28.mlp.experts.down_proj.scales,<br>language_model.model.layers.28.mlp.experts.down_proj.weight,<br>language_model.model.layers.28.mlp.experts.gate_proj.biases,<br>language_model.model.layers.28.mlp.experts.gate_proj.scales,<br>language_model.model.layers.28.mlp.experts.gate_proj.weight,<br>language_model.model.layers.28.mlp.experts.up_proj.biases,<br>language_model.model.layers.28.mlp.experts.up_proj.scales,<br>language_model.model.layers.28.mlp.experts.up_proj.weight,<br>language_model.model.layers.29.mlp.experts.down_proj.biases,<br>language_model.model.layers.29.mlp.experts.down_proj.scales,<br>language_model.model.layers.29.mlp.experts.down_proj.weight,<br>language_model.model.layers.29.mlp.experts.gate_proj.biases,<br>language_model.model.layers.29.mlp.experts.gate_proj.scales,<br>language_model.model.layers.29.mlp.experts.gate_proj.weight,<br>language_model.model.layers.29.mlp.experts.up_proj.biases,<br>language_model.model.layers.29.mlp.experts.up_proj.scales,<br>language_model.model.layers.29.mlp.experts.up_proj.weight,<br>language_model.model.layers.3.mlp.experts.down_proj.biases,<br>language_model.model.layers.3.mlp.experts.down_proj.scales,<br>language_model.model.layers.3.mlp.experts.down_proj.weight,<br>language_model.model.layers.3.mlp.experts.gate_proj.biases,<br>language_model.model.layers.3.mlp.experts.gate_proj.scales,<br>language_model.model.layers.3.mlp.experts.gate_proj.weight,<br>language_model.model.layers.3.mlp.experts.up_proj.biases,<br>language_model.model.layers.3.mlp.experts.up_proj.scales,<br>language_model.model.layers.3.mlp.experts.up_proj.weight,<br>language_model.model.layers.30.mlp.experts.down_proj.biases,<br>language_model.model.layers.30.mlp.experts.down_proj.scales,<br>language_model.model.layers.30.mlp.experts.down_proj.weight,<br>language_model.model.layers.30.mlp.experts.gate_proj.biases,<br>language_model.model.layers.30.mlp.experts.gate_proj.scales,<br>language_model.model.layers.30.mlp.experts.gate_proj.weight,<br>language_model.model.layers.30.mlp.experts.up_proj.biases,<br>language_model.model.layers.30.mlp.experts.up_proj.scales,<br>language_model.model.layers.30.mlp.experts.up_proj.weight,<br>language_model.model.layers.31.mlp.experts.down_proj.biases,<br>language_model.model.layers.31.mlp.experts.down_proj.scales,<br>language_model.model.layers.31.mlp.experts.down_proj.weight,<br>language_model.model.layers.31.mlp.experts.gate_proj.biases,<br>language_model.model.layers.31.mlp.experts.gate_proj.scales,<br>language_model.model.layers.31.mlp.experts.gate_proj.weight,<br>language_model.model.layers.31.mlp.experts.up_proj.biases,<br>language_model.model.layers.31.mlp.experts.up_proj.scales,<br>language_model.model.layers.31.mlp.experts.up_proj.weight,<br>language_model.model.layers.32.mlp.experts.down_proj.biases,<br>language_model.model.layers.32.mlp.experts.down_proj.scales,<br>language_model.model.layers.32.mlp.experts.down_proj.weight,<br>language_model.model.layers.32.mlp.experts.gate_proj.biases,<br>language_model.model.layers.32.mlp.experts.gate_proj.scales,<br>language_model.model.layers.32.mlp.experts.gate_proj.weight,<br>language_model.model.layers.32.mlp.experts.up_proj.biases,<br>language_model.model.layers.32.mlp.experts.up_proj.scales,<br>language_model.model.layers.32.mlp.experts.up_proj.weight,<br>language_model.model.layers.33.mlp.experts.down_proj.biases,<br>language_model.model.layers.33.mlp.experts.down_proj.scales,<br>language_model.model.layers.33.mlp.experts.down_proj.weight,<br>language_model.model.layers.33.mlp.experts.gate_proj.biases,<br>language_model.model.layers.33.mlp.experts.gate_proj.scales,<br>language_model.model.layers.33.mlp.experts.gate_proj.weight,<br>language_model.model.layers.33.mlp.experts.up_proj.biases,<br>language_model.model.layers.33.mlp.experts.up_proj.scales,<br>language_model.model.layers.33.mlp.experts.up_proj.weight,<br>language_model.model.layers.34.mlp.experts.down_proj.biases,<br>language_model.model.layers.34.mlp.experts.down_proj.scales,<br>language_model.model.layers.34.mlp.experts.down_proj.weight,<br>language_model.model.layers.34.mlp.experts.gate_proj.biases,<br>language_model.model.layers.34.mlp.experts.gate_proj.scales,<br>language_model.model.layers.34.mlp.experts.gate_proj.weight,<br>language_model.model.layers.34.mlp.experts.up_proj.biases,<br>language_model.model.layers.34.mlp.experts.up_proj.scales,<br>language_model.model.layers.34.mlp.experts.up_proj.weight,<br>language_model.model.layers.35.mlp.experts.down_proj.biases,<br>language_model.model.layers.35.mlp.experts.down_proj.scales,<br>language_model.model.layers.35.mlp.experts.down_proj.weight,<br>language_model.model.layers.35.mlp.experts.gate_proj.biases,<br>language_model.model.layers.35.mlp.experts.gate_proj.scales,<br>language_model.model.layers.35.mlp.experts.gate_proj.weight,<br>language_model.model.layers.35.mlp.experts.up_proj.biases,<br>language_model.model.layers.35.mlp.experts.up_proj.scales,<br>language_model.model.layers.35.mlp.experts.up_proj.weight,<br>language_model.model.layers.36.mlp.experts.down_proj.biases,<br>language_model.model.layers.36.mlp.experts.down_proj.scales,<br>language_model.model.layers.36.mlp.experts.down_proj.weight,<br>language_model.model.layers.36.mlp.experts.gate_proj.biases,<br>language_model.model.layers.36.mlp.experts.gate_proj.scales,<br>language_model.model.layers.36.mlp.experts.gate_proj.weight,<br>language_model.model.layers.36.mlp.experts.up_proj.biases,<br>language_model.model.layers.36.mlp.experts.up_proj.scales,<br>language_model.model.layers.36.mlp.experts.up_proj.weight,<br>language_model.model.layers.37.mlp.experts.down_proj.biases,<br>language_model.model.layers.37.mlp.experts.down_proj.scales,<br>language_model.model.layers.37.mlp.experts.down_proj.weight,<br>language_model.model.layers.37.mlp.experts.gate_proj.biases,<br>language_model.model.layers.37.mlp.experts.gate_proj.scales,<br>language_model.model.layers.37.mlp.experts.gate_proj.weight,<br>language_model.model.layers.37.mlp.experts.up_proj.biases,<br>language_model.model.layers.37.mlp.experts.up_proj.scales,<br>language_model.model.layers.37.mlp.experts.up_proj.weight,<br>language_model.model.layers.38.mlp.experts.down_proj.biases,<br>language_model.model.layers.38.mlp.experts.down_proj.scales,<br>language_model.model.layers.38.mlp.experts.down_proj.weight,<br>language_model.model.layers.38.mlp.experts.gate_proj.biases,<br>language_model.model.layers.38.mlp.experts.gate_proj.scales,<br>language_model.model.layers.38.mlp.experts.gate_proj.weight,<br>language_model.model.layers.38.mlp.experts.up_proj.biases,<br>language_model.model.layers.38.mlp.experts.up_proj.scales,<br>language_model.model.layers.38.mlp.experts.up_proj.weight,<br>language_model.model.layers.39.mlp.experts.down_proj.biases,<br>language_model.model.layers.39.mlp.experts.down_proj.scales,<br>language_model.model.layers.39.mlp.experts.down_proj.weight,<br>language_model.model.layers.39.mlp.experts.gate_proj.biases,<br>language_model.model.layers.39.mlp.experts.gate_proj.scales,<br>language_model.model.layers.39.mlp.experts.gate_proj.weight,<br>language_model.model.layers.39.mlp.experts.up_proj.biases,<br>language_model.model.layers.39.mlp.experts.up_proj.scales,<br>language_model.model.layers.39.mlp.experts.up_proj.weight,<br>language_model.model.layers.4.mlp.experts.down_proj.biases,<br>language_model.model.layers.4.mlp.experts.down_proj.scales,<br>language_model.model.layers.4.mlp.experts.down_proj.weight,<br>language_model.model.layers.4.mlp.experts.gate_proj.biases,<br>language_model.model.layers.4.mlp.experts.gate_proj.scales,<br>language_model.model.layers.4.mlp.experts.gate_proj.weight,<br>language_model.model.layers.4.mlp.experts.up_proj.biases,<br>language_model.model.layers.4.mlp.experts.up_proj.scales,<br>language_model.model.layers.4.mlp.experts.up_proj.weight,<br>language_model.model.layers.40.mlp.experts.down_proj.biases,<br>language_model.model.layers.40.mlp.experts.down_proj.scales,<br>language_model.model.layers.40.mlp.experts.down_proj.weight,<br>language_model.model.layers.40.mlp.experts.gate_proj.biases,<br>language_model.model.layers.40.mlp.experts.gate_proj.scales,<br>language_model.model.layers.40.mlp.experts.gate_proj.weight,<br>language_model.model.layers.40.mlp.experts.up_proj.biases,<br>language_model.model.layers.40.mlp.experts.up_proj.scales,<br>language_model.model.layers.40.mlp.experts.up_proj.weight,<br>language_model.model.layers.41.mlp.experts.down_proj.biases,<br>language_model.model.layers.41.mlp.experts.down_proj.scales,<br>language_model.model.layers.41.mlp.experts.down_proj.weight,<br>language_model.model.layers.41.mlp.experts.gate_proj.biases,<br>language_model.model.layers.41.mlp.experts.gate_proj.scales,<br>language_model.model.layers.41.mlp.experts.gate_proj.weight,<br>language_model.model.layers.41.mlp.experts.up_proj.biases,<br>language_model.model.layers.41.mlp.experts.up_proj.scales,<br>language_model.model.layers.41.mlp.experts.up_proj.weight,<br>language_model.model.layers.5.mlp.experts.down_proj.biases,<br>language_model.model.layers.5.mlp.experts.down_proj.scales,<br>language_model.model.layers.5.mlp.experts.down_proj.weight,<br>language_model.model.layers.5.mlp.experts.gate_proj.biases,<br>language_model.model.layers.5.mlp.experts.gate_proj.scales,<br>language_model.model.layers.5.mlp.experts.gate_proj.weight,<br>language_model.model.layers.5.mlp.experts.up_proj.biases,<br>language_model.model.layers.5.mlp.experts.up_proj.scales,<br>language_model.model.layers.5.mlp.experts.up_proj.weight,<br>language_model.model.layers.6.mlp.experts.down_proj.biases,<br>language_model.model.layers.6.mlp.experts.down_proj.scales,<br>language_model.model.layers.6.mlp.experts.down_proj.weight,<br>language_model.model.layers.6.mlp.experts.gate_proj.biases,<br>language_model.model.layers.6.mlp.experts.gate_proj.scales,<br>language_model.model.layers.6.mlp.experts.gate_proj.weight,<br>language_model.model.layers.6.mlp.experts.up_proj.biases,<br>language_model.model.layers.6.mlp.experts.up_proj.scales,<br>language_model.model.layers.6.mlp.experts.up_proj.weight,<br>language_model.model.layers.7.mlp.experts.down_proj.biases,<br>language_model.model.layers.7.mlp.experts.down_proj.scales,<br>language_model.model.layers.7.mlp.experts.down_proj.weight,<br>language_model.model.layers.7.mlp.experts.gate_proj.biases,<br>language_model.model.layers.7.mlp.experts.gate_proj.scales,<br>language_model.model.layers.7.mlp.experts.gate_proj.weight,<br>language_model.model.layers.7.mlp.experts.up_proj.biases,<br>language_model.model.layers.7.mlp.experts.up_proj.scales,<br>language_model.model.layers.7.mlp.experts.up_proj.weight,<br>language_model.model.layers.8.mlp.experts.down_proj.biases,<br>language_model.model.layers.8.mlp.experts.down_proj.scales,<br>language_model.model.layers.8.mlp.experts.down_proj.weight,<br>language_model.model.layers.8.mlp.experts.gate_proj.biases,<br>language_model.model.layers.8.mlp.experts.gate_proj.scales,<br>language_model.model.layers.8.mlp.experts.gate_proj.weight,<br>language_model.model.layers.8.mlp.experts.up_proj.biases,<br>language_model.model.layers.8.mlp.experts.up_proj.scales,<br>language_model.model.layers.8.mlp.experts.up_proj.weight,<br>language_model.model.layers.9.mlp.experts.down_proj.biases,<br>language_model.model.layers.9.mlp.experts.down_proj.scales,<br>language_model.model.layers.9.mlp.experts.down_proj.weight,<br>language_model.model.layers.9.mlp.experts.gate_proj.biases,<br>language_model.model.layers.9.mlp.experts.gate_proj.scales,<br>language_model.model.layers.9.mlp.experts.gate_proj.weight,<br>language_model.model.layers.9.mlp.experts.up_proj.biases,<br>language_model.model.layers.9.mlp.experts.up_proj.scales,<br>language_model.model.layers.9.mlp.experts.up_proj.weight.
-- *Model load time:* 0.18s
+- *Model load time:* 0.21s
 - *Generation time:* -
-- *Total time:* 0.18s
-- *Input validation time:* 0.00168
+- *Total time:* 0.22s
+- *Input validation time:* 0.00174
 - *Prompt preparation time:* -
 - *First-token latency:* -
-- *Cleanup time:* 0.0625
+- *Cleanup time:* 0.0622
 - *Prompt tokens:* -
 - *Generation tokens:* -
 - *Total tokens:* -
@@ -4802,10 +4815,10 @@ The image shows two cats sleeping on a pink blanket or sheet. The cat on the lef
 
 ```python
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11821, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11838, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11157, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11174, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -5201,7 +5214,7 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12074, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12091, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -5212,7 +5225,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11836, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11853, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 362 parameters not in model: 
 audio_tower.encoder.biases,
@@ -5587,12 +5600,12 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 6419.49it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 5009.23it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[22:44:33] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+[00:32:22] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
 ```
 
 </details>

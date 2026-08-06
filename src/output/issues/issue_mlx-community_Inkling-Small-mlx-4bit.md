@@ -1480,10 +1480,10 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11821, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11838, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11157, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11174, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -1879,7 +1879,7 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12074, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12091, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -1890,7 +1890,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11836, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11853, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 362 parameters not in model: 
 audio_tower.encoder.biases,
@@ -2267,12 +2267,12 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 6419.49it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 5009.23it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[22:44:33] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+[00:32:22] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
 ```
 
 ## Reproduction inputs
@@ -2311,7 +2311,7 @@ original image before filing.
 | Python Version  | 3.13.13                                                         |
 | macOS Version   | 26.6                                                            |
 | GPU/Chip        | Apple M5 Max                                                    |
-| check_models    | 0.8.9; revision 48b73d7b0a3f65b1e5822400dcb0e603a029959d; clean |
+| check_models    | 0.8.9; revision 7b5f166ee0b4a2f02b9fcc91c09731a06825d6fa; clean |
 
 ### Full environment evidence
 

@@ -17,16 +17,16 @@ Maintainer status counts
 | Maintainer status              |   Count |
 |--------------------------------|---------|
 | actionable failure             |       1 |
-| none                           |      40 |
-| observation needs reproduction |      23 |
+| none                           |      53 |
+| observation needs reproduction |      10 |
 
 Usability counts
 
 | Usability           |   Count |
 |---------------------|---------|
 | not evaluated       |       1 |
-| unusable            |      17 |
-| usable              |      40 |
+| unusable            |       4 |
+| usable              |      53 |
 | usable with caveats |       6 |
 
 Observation counts
@@ -34,7 +34,7 @@ Observation counts
 | Observation                                      |   Count |
 |--------------------------------------------------|---------|
 | Conversation-role control tokens remain visible  |       3 |
-| Internal reasoning block appears incomplete      |      14 |
+| Internal reasoning block appears incomplete      |       1 |
 | Response appears cut off at the token limit      |       4 |
 | Response is unusually short                      |       1 |
 | Response repeats the same text                   |       1 |
@@ -51,19 +51,6 @@ Observation counts
 | [mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX](#diagnostic-mlx-community-apriel-15-15b-thinker-6bit-mlx)       | completed   | unusable            | observation_needs_reproduction | Response appears cut off at the token limit                                              |
 | [mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16](#diagnostic-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | completed   | unusable            | observation_needs_reproduction | Response appears cut off at the token limit                                              |
 | [mlx-community/Kimi-VL-A3B-Thinking-8bit](#diagnostic-mlx-community-kimi-vl-a3b-thinking-8bit)                  | completed   | unusable            | observation_needs_reproduction | Response appears cut off at the token limit; Internal reasoning block appears incomplete |
-| [mlx-community/GLM-4.6V-Flash-6bit](#diagnostic-mlx-community-glm-46v-flash-6bit)                               | completed   | unusable            | observation_needs_reproduction | Internal reasoning block appears incomplete                                              |
-| [mlx-community/GLM-4.6V-Flash-mxfp4](#diagnostic-mlx-community-glm-46v-flash-mxfp4)                             | completed   | unusable            | observation_needs_reproduction | Internal reasoning block appears incomplete                                              |
-| [mlx-community/GLM-4.6V-nvfp4](#diagnostic-mlx-community-glm-46v-nvfp4)                                         | completed   | unusable            | observation_needs_reproduction | Internal reasoning block appears incomplete                                              |
-| [mlx-community/MiniCPM-V-4.6-8bit](#diagnostic-mlx-community-minicpm-v-46-8bit)                                 | completed   | unusable            | observation_needs_reproduction | Internal reasoning block appears incomplete                                              |
-| [mlx-community/Ornith-1.0-35B-bf16](#diagnostic-mlx-community-ornith-10-35b-bf16)                               | completed   | unusable            | observation_needs_reproduction | Internal reasoning block appears incomplete                                              |
-| [mlx-community/Qwen3.5-27B-4bit](#diagnostic-mlx-community-qwen35-27b-4bit)                                     | completed   | unusable            | observation_needs_reproduction | Internal reasoning block appears incomplete                                              |
-| [mlx-community/Qwen3.5-27B-mxfp8](#diagnostic-mlx-community-qwen35-27b-mxfp8)                                   | completed   | unusable            | observation_needs_reproduction | Internal reasoning block appears incomplete                                              |
-| [mlx-community/Qwen3.5-35B-A3B-4bit](#diagnostic-mlx-community-qwen35-35b-a3b-4bit)                             | completed   | unusable            | observation_needs_reproduction | Internal reasoning block appears incomplete                                              |
-| [mlx-community/Qwen3.5-35B-A3B-6bit](#diagnostic-mlx-community-qwen35-35b-a3b-6bit)                             | completed   | unusable            | observation_needs_reproduction | Internal reasoning block appears incomplete                                              |
-| [mlx-community/Qwen3.5-35B-A3B-bf16](#diagnostic-mlx-community-qwen35-35b-a3b-bf16)                             | completed   | unusable            | observation_needs_reproduction | Internal reasoning block appears incomplete                                              |
-| [mlx-community/Qwen3.5-9B-MLX-4bit](#diagnostic-mlx-community-qwen35-9b-mlx-4bit)                               | completed   | unusable            | observation_needs_reproduction | Internal reasoning block appears incomplete                                              |
-| [mlx-community/Qwen3.6-27B-mxfp8](#diagnostic-mlx-community-qwen36-27b-mxfp8)                                   | completed   | unusable            | observation_needs_reproduction | Internal reasoning block appears incomplete                                              |
-| [mlx-community/Step-3.7-Flash-oQ2e](#diagnostic-mlx-community-step-37-flash-oq2e)                               | completed   | unusable            | observation_needs_reproduction | Internal reasoning block appears incomplete                                              |
 | [jqlive/Kimi-VL-A3B-Thinking-2506-6bit](#diagnostic-jqlive-kimi-vl-a3b-thinking-2506-6bit)                      | completed   | usable_with_caveats | observation_needs_reproduction | Conversation-role control tokens remain visible                                          |
 | [mlx-community/Idefics3-8B-Llama3-bf16](#diagnostic-mlx-community-idefics3-8b-llama3-bf16)                      | completed   | usable_with_caveats | observation_needs_reproduction | Conversation-role control tokens remain visible                                          |
 | [mlx-community/Kimi-VL-A3B-Thinking-2506-bf16](#diagnostic-mlx-community-kimi-vl-a3b-thinking-2506-bf16)        | completed   | usable_with_caveats | observation_needs_reproduction | Conversation-role control tokens remain visible                                          |
@@ -1550,10 +1537,10 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 
 ```text
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11821, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11838, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11157, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11174, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -1949,7 +1936,7 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12074, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12091, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -1960,7 +1947,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11836, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11853, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 362 parameters not in model: 
 audio_tower.encoder.biases,
@@ -2335,12 +2322,12 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 6419.49it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 5009.23it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[22:44:33] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+[00:32:22] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
 ```
 
 ## Completed Runs with Observations
@@ -2400,7 +2387,7 @@ Reconstruction complete: |          |  0.00B /  0.00B
 - *Post-cleanup active memory (GB):* 0.015566016
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 280
-- *Generation tokens:* 89
+- *Generation tokens:* 88
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 
@@ -2408,7 +2395,7 @@ Reconstruction complete: |          |  0.00B /  0.00B
 
 ```text
 <|channel>thought
-<channel|>A high-angle, eye-level shot shows two tabby cats sleeping on a pink blanket on a red couch. The cat on the left is smaller and lying on its side with its head tucked in and its paws curled. The cat on the right is larger and lying on its stomach with its head turned and its paws stretched. Two remote controls are on the couch near the cats. The lighting is bright and even.
+<channel|>A high-angle eye-level shot shows two tabby cats sleeping on a pink blanket on a red couch. The cat on the left is smaller and lying on its side with its head turned up and its paws curled. The cat on the right is larger and is lying on its stomach with its head turned down. There are two remote controls on the couch next to the cats. The lighting is bright and even.
 ```
 
 </details>
@@ -2434,7 +2421,7 @@ Reconstruction complete: |          |  0.00B /  0.00B
 - *Post-cleanup active memory (GB):* 0.015566016
 - *Post-cleanup cache memory (GB):* 0.0
 - *Prompt tokens:* 280
-- *Generation tokens:* 87
+- *Generation tokens:* 89
 - *Configured EOS token ID:* 1
 - *Configured EOS token:* &lt;eos&gt;
 
@@ -2442,7 +2429,7 @@ Reconstruction complete: |          |  0.00B /  0.00B
 
 ```text
 <|channel>thought
-<channel|>A high-angle, medium shot shows two brown tabby cats sleeping on a pink blanket on a red couch. The cat on the left is smaller and lying on its side with its head turned up and its paws tucked in. The cat on the right is larger and lying on its stomach with its head turned down. There are two remote controls on the couch between the cats. The lighting is bright and even.
+<channel|>A high-angle, medium shot shows two tabby cats sleeping on a pink blanket on a red couch. The cat on the left is smaller and is lying on its side with its head turned and its paws tucked in. The cat on the right is larger and is lying on its stomach with its head down and legs stretched out. Two remote controls are on the couch between the cats. The lighting is bright and even.
 ```
 
 </details>
@@ -2574,561 +2561,6 @@ This is a heartwarming and cozy image of two cats relaxing together on a plush, 
 
 ```text
 ◁think▷Okay, let me try to figure out how to describe this image. First, I need to look at the image carefully. There are two cats on a pink surface, maybe a blanket or a bed. Both cats seem to be lying down. The one on the left is a tabby with gray and black stripes, and the one on the right is a darker tabby, maybe a bit bigger. They both look like they're sleeping or resting. There's a remote control near the left cat and another one near the right cat. The background is pink, which might be a couch or a bed. The image is a bit blurry, especially around the edges, which makes it look like a low-resolution or heavily compressed image. The colors are a bit oversaturated, especially the pink background. The cats' fur has some highlights, maybe from light reflecting off them. The cats seem to be in a relaxed position, maybe after playing or moving around since one is stretched out. The remotes are standard TV remotes, which adds a bit of context that this might be a cozy indoor setting. The image might have been taken in a living room. The lighting seems artificial, maybe from a lamp or overhead light. The cats' eyes aren't clearly visible because they're closed. The overall mood is calm and relaxed. I should mention the colors, the subjects (cats and remotes), the setting, and the image quality issues like blurriness and color saturation. Also, the composition with the remotes adds a bit of a humorous touch, like the cats are ignoring the remotes. Maybe mention the possible breeds of the cats, but I'm not sure. The image might have been edited or filtered, given the color enhancements. The pink background contrasts with the cats' fur colors. The cats' positions suggest they might have been moving before settling down. The remotes are standard, not specialized, so maybe they're in a typical living room. The image could be a candid shot capturing a quiet moment. The blurriness might be due to motion or a low-quality camera. The lighting is even, not harsh shadows, so maybe it's evening or night time. The cats seem comfortable, indicating they feel safe. The image might be meant to be cute or humorous because of the remotes next to them. The pink background makes the cats stand out. The image could be shared on social media or as a pet owner's photo. The cats' poses are natural, not posed.
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-glm-46v-flash-6bit"></a>
-
-<details>
-<summary>mlx-community/GLM-4.6V-Flash-6bit — unusable — Internal reasoning block appears incomplete</summary>
-
-### mlx-community/GLM-4.6V-Flash-6bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* thinking_trace_incomplete
-- *Thinking trace markers:* ["&lt;think&gt;"]
-- *Resolved model revision:* df9464782d3452e0dfd86afe0984f1c9eca75ca1
-- *Processor class:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.003507298
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 406
-- *Generation tokens:* 197
-- *Configured EOS token ID:* 151329
-- *Configured EOS token:* &lt;|endoftext|&gt;
-
-#### Complete output
-
-```text
-The image depicts two tabby cats resting on a bright pink couch. The couch has a smooth, slightly wrinkled fabric, and the backrest is a deeper red.  
-
-- **Left Cat**: A smaller tabby with a mix of brown, black, and tan stripes. It lies on its side, eyes closed, appearing relaxed. Its tail is curled at the end, and a green collar is visible around its neck.  
-
-- **Right Cat**: A larger tabby with similar brown, black, and tan striping. It lies on its side, head lowered toward the couch, eyes partially closed, also appearing relaxed.  
-
-- **Remotes**: Two remote controls are placed on the couch between the cats. The left remote is light blue with dark buttons, while the right remote is white with colorful buttons (red, green, blue, yellow).  
-
-The overall scene is cozy and relaxed, with the cats appearing comfortable and at ease on the vibrant pink couch.
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-glm-46v-flash-mxfp4"></a>
-
-<details>
-<summary>mlx-community/GLM-4.6V-Flash-mxfp4 — unusable — Internal reasoning block appears incomplete</summary>
-
-### mlx-community/GLM-4.6V-Flash-mxfp4
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* thinking_trace_incomplete
-- *Thinking trace markers:* ["&lt;think&gt;"]
-- *Resolved model revision:* 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b
-- *Processor class:* mlx_vlm.models.glm4v.processing.Glm46VProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.003834978
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 406
-- *Generation tokens:* 205
-- *Configured EOS token ID:* 151329
-- *Configured EOS token:* &lt;|endoftext|&gt;
-
-#### Complete output
-
-```text
-This image features two tabby cats resting on a bright pink couch.  
-
-- **Left Cat**: A slender tabby with a mix of brown, black, and white fur. It lies on its side, head resting on the couch, eyes closed in a relaxed state. Its tail is long and dark, curving slightly.  
-
-- **Right Cat**: A plump tabby with a more uniform brown and black patterned fur. It lies on its side, head lowered toward the couch, eyes partially open or closed, appearing calm. Its front paw is extended forward, while the hind leg is relaxed.  
-
-- **Remotes and Couch**: Two remote controls are visible: a light blue remote on the left side of the couch, and a white remote with colorful buttons near the right cat. The couch itself is a vibrant pink, with a smooth, slightly wrinkled fabric surface.  
-
-The overall scene conveys a sense of calm and domestic comfort, with the two cats appearing content in their shared space.
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-glm-46v-nvfp4"></a>
-
-<details>
-<summary>mlx-community/GLM-4.6V-nvfp4 — unusable — Internal reasoning block appears incomplete</summary>
-
-### mlx-community/GLM-4.6V-nvfp4
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* thinking_trace_incomplete
-- *Thinking trace markers:* ["&lt;think&gt;"]
-- *Resolved model revision:* 2da6855d4e28a0e61c84543262074bc17ac27d6e
-- *Processor class:* mlx_vlm.models.glm4v_moe.processing.Glm46VMoEProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.004162666
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 406
-- *Generation tokens:* 172
-- *Configured EOS token ID:* 151329
-- *Configured EOS token:* &lt;|endoftext|&gt;
-
-#### Complete output
-
-```text
-The image shows two tabby cats resting on a bright pink blanket spread over a red couch. The cat on the is lying on its side, with its head turned slightly downward and eyes closed, appearing relaxed. Its fur displays a mix of brown, black, and tan stripes, and it has a pinkish underbelly. The cat on the left is stretched out in a more elongated position, also with eyes closed, and its body angled toward the right. This cat has a similar striped pattern but with a lighter, more muted color palette, and it wears a small green collar. Between them, two remote controls lie on the pink fabric: one is light blue with numerous buttons, and the other is white with colorful buttons. The overall scene conveys a calm, cozy atmosphere, with the cats seemingly at ease in their shared resting spot.
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-minicpm-v-46-8bit"></a>
-
-<details>
-<summary>mlx-community/MiniCPM-V-4.6-8bit — unusable — Internal reasoning block appears incomplete</summary>
-
-### mlx-community/MiniCPM-V-4.6-8bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* thinking_trace_incomplete
-- *Thinking trace markers:* ["&lt;think&gt;"]
-- *Resolved model revision:* 03721395f6b82cd000cc74cde28fcff8abd9a04c
-- *Processor class:* mlx_vlm.models.minicpmv4_6.processing_minicpmv4_6.MiniCPMVProcessor
-- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.007668852
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 226
-- *Generation tokens:* 112
-- *Configured EOS token ID:* 248046
-- *Configured EOS token:* &lt;|im_end|&gt;
-
-#### Complete output
-
-```text
-The image shows two tabby cats resting comfortably on a bright pink blanket or couch. Both cats appear to be asleep or deeply relaxed, with their bodies stretched out. One cat is on the left side, lying with its legs extended and a remote control placed nearby. The other cat is on the right, also in a relaxed position, with its paws slightly spread. The background includes a red or dark-colored couch, adding a cozy and warm atmosphere to the scene. The overall mood is peaceful and tranquil, capturing a moment of rest for the cats.
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-ornith-10-35b-bf16"></a>
-
-<details>
-<summary>mlx-community/Ornith-1.0-35B-bf16 — unusable — Internal reasoning block appears incomplete</summary>
-
-### mlx-community/Ornith-1.0-35B-bf16
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* thinking_trace_incomplete
-- *Thinking trace markers:* ["&lt;think&gt;"]
-- *Resolved model revision:* 9ef631ad2d0c4c26783d4f94d0a0de9516e41a4b
-- *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer class:* transformers.models.qwen2.tokenization_qwen2.Qwen2Tokenizer
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.010208388
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 317
-- *Generation tokens:* 305
-- *Configured EOS token ID:* 248046
-- *Configured EOS token:* &lt;|im_end|&gt;
-
-#### Complete output
-
-```text
-This is a cozy, overhead photograph of two tabby cats sleeping peacefully on a vibrant pink couch.
-
-**The Cats:**
-- **Left Cat:** A smaller tabby cat with classic brown and black stripes lies stretched out on its side, facing right. Its tail curls near its hind legs, and one front paw is extended forward. It appears to be in a deep sleep.
-- **Right Cat:** A larger tabby cat, possibly the same breed or mix, lies curled up more compactly on its side, facing left. Its head is tucked down, and its body forms a gentle arc. The fur shows rich brown, black, and tan markings.
-
-**The Setting:**
-- They are resting on a bright, fuchsia-pink fabric — likely a blanket or the couch upholstery itself — which creates a striking contrast with their earth-toned fur.
-- Two remote controls are visible:
-  - One white remote with blue buttons lies near the head of the smaller cat.
-  - Another white remote, slightly longer and with green and blue buttons, is positioned between the two cats.
-
-**Overall Mood:**
-The image exudes warmth, comfort, and tranquility. The cats look completely relaxed and content in their shared space, suggesting a close bond between them. The bold pink background adds a playful, cheerful touch to the serene scene.
-
-It’s a charming snapshot of domestic life — cats napping together on a colorful sofa, surrounded by the tools of human entertainment.
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-qwen35-27b-4bit"></a>
-
-<details>
-<summary>mlx-community/Qwen3.5-27B-4bit — unusable — Internal reasoning block appears incomplete</summary>
-
-### mlx-community/Qwen3.5-27B-4bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* thinking_trace_incomplete
-- *Thinking trace markers:* ["&lt;think&gt;"]
-- *Resolved model revision:* 45797d2985a12c55e6473686e9ea91b95e959553
-- *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.011715726
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 317
-- *Generation tokens:* 315
-- *Configured EOS token ID:* 248046
-- *Configured EOS token:* &lt;|im_end|&gt;
-
-#### Complete output
-
-```text
-This is a cozy, overhead photograph of two tabby cats lounging on a vibrant pink blanket that covers a red couch or sofa.
-
-- **The Cat on the Left**: This is a smaller, younger-looking tabby cat with classic black and brown stripes over a lighter tan coat. It’s lying on its back in a relaxed, playful pose, with its paws curled up and its head tilted to the side. A small green collar is visible around its neck. Its eyes are closed, suggesting it’s asleep or very content.
-
-- **The Cat on the Right**: This is a larger, adult tabby cat with similar striping but more prominent orange-brown tones mixed with black. It’s curled up on its side, facing away from the camera, with its head resting near its front paws. It also appears to be sleeping peacefully.
-
-- **The Setting**: The cats are nestled on a bright, saturated pink fleece or microfiber blanket, which contrasts vividly with the deep red fabric of the couch beneath it. Two white remote controls lie between the cats — one near each cat — adding a touch of everyday domestic life to the scene.
-
-- **Overall Mood**: The image exudes warmth, comfort, and tranquility. The soft textures, the relaxed postures of the cats, and the bold color palette create a charming and heartwarming snapshot of feline companionship and rest.
-
-It’s a delightful moment captured — two cats, two remotes, and a splash of pink, all sharing a quiet afternoon nap.
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-qwen35-27b-mxfp8"></a>
-
-<details>
-<summary>mlx-community/Qwen3.5-27B-mxfp8 — unusable — Internal reasoning block appears incomplete</summary>
-
-### mlx-community/Qwen3.5-27B-mxfp8
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* thinking_trace_incomplete
-- *Thinking trace markers:* ["&lt;think&gt;"]
-- *Resolved model revision:* 2d6caf2325c24e7dd3074e76a6608e9facaee36f
-- *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.01222363
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 317
-- *Generation tokens:* 305
-- *Configured EOS token ID:* 248046
-- *Configured EOS token:* &lt;|im_end|&gt;
-
-#### Complete output
-
-```text
-This is a cozy, heartwarming image of two tabby cats lounging on a vibrant pink couch or blanket.
-
-- **The Cats**:
-  - On the left is a smaller, younger-looking tabby cat (possibly a kitten) with classic black and brown stripes on a lighter background. It’s stretched out on its side, appearing to be asleep or very relaxed, with one paw slightly raised.
-  - On the right is a larger, adult tabby cat, also striped but with more orange/brown tones mixed in. It’s curled up slightly, facing downward, seemingly dozing off as well.
-  - Both cats have similar coloring patterns, suggesting they might be related — perhaps mother and kitten.
-
-- **The Setting**:
-  - They’re lying on a bright, saturated pink fabric — likely a couch cover or throw blanket — which contrasts beautifully with their earthy fur tones.
-  - Behind them is a deep red or maroon cushion or backrest of the sofa.
-
-- **Additional Details**:
-  - Two white remote controls are visible: one near the kitten’s head and another between the two cats. Their presence adds a touch of everyday domestic life to the scene.
-  - The lighting is soft and even, highlighting the texture of the cats’ fur and the plushness of the fabric.
-
-Overall, the image conveys a sense of comfort, tranquility, and feline companionship — a perfect snapshot of lazy afternoon relaxation at home.
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-qwen35-35b-a3b-4bit"></a>
-
-<details>
-<summary>mlx-community/Qwen3.5-35B-A3B-4bit — unusable — Internal reasoning block appears incomplete</summary>
-
-### mlx-community/Qwen3.5-35B-A3B-4bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* thinking_trace_incomplete
-- *Thinking trace markers:* ["&lt;think&gt;"]
-- *Resolved model revision:* 1e20fd8d42056f870933bf98ca6211024744f7ec
-- *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.012731534
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 317
-- *Generation tokens:* 326
-- *Configured EOS token ID:* 248046
-- *Configured EOS token:* &lt;|im_end|&gt;
-
-#### Complete output
-
-```text
-This is a cozy, endearing photograph of two tabby cats sleeping peacefully on a bright pink couch.
-
-- **The Cats**: Both cats are tabbies with similar brown and black striped patterns, though the one on the right appears slightly larger and more mature. They are lying close together, almost mirror images in their relaxed poses.
-    - The cat on the left is stretched out on its side, head resting near a white remote control, with its tail curled slightly. It has a small green tag on its collar.
-    - The cat on the right is curled up more compactly, facing downward, with its paws tucked in. Its eyes are closed, and it looks deeply asleep.
-
-- **The Setting**: The cats are lounging on a vibrant, fuchsia-pink fabric surface — likely a couch or blanket. The soft texture of the fabric contrasts nicely with the cats’ fur.
-
-- **Objects**: Two remote controls are visible:
-    - A larger, white remote with many buttons lies next to the left cat.
-    - A smaller, slimmer white remote (possibly for a TV or cable box) is positioned between the two cats.
-
-- **Mood & Composition**: The image conveys warmth, comfort, and tranquility. The bright pink background makes the scene pop, while the cats’ peaceful slumber adds a sense of calm and domestic bliss. The composition is balanced, with the cats and remotes arranged naturally across the frame.
-
-Overall, it’s a charming snapshot of feline relaxation — perfect for anyone who loves cats and cozy home scenes.
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-qwen35-35b-a3b-6bit"></a>
-
-<details>
-<summary>mlx-community/Qwen3.5-35B-A3B-6bit — unusable — Internal reasoning block appears incomplete</summary>
-
-### mlx-community/Qwen3.5-35B-A3B-6bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* thinking_trace_incomplete
-- *Thinking trace markers:* ["&lt;think&gt;"]
-- *Resolved model revision:* b729d115bb2cfea696e390dd6bb898528c66b6e9
-- *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.013239438
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 317
-- *Generation tokens:* 299
-- *Configured EOS token ID:* 248046
-- *Configured EOS token:* &lt;|im_end|&gt;
-
-#### Complete output
-
-```text
-This is a cozy, overhead photograph of two cats sleeping on a vibrant pink blanket draped over a red couch.
-
-- **The Cats**:
-  - On the left is a smaller cat, likely a kitten or young tabby, with classic brown and black stripes. It’s stretched out on its side, paws extended, with a fluffy tail curled near its hind legs. A small green collar is visible around its neck.
-  - On the right is a larger, adult tabby cat with similar striped markings but more pronounced orange-brown tones. It’s curled up in a tight ball, head tucked down, appearing deeply asleep.
-
-- **The Setting**:
-  - The cats are resting on a soft, bright pink fleece-like blanket that covers most of the frame.
-  - Behind them, the deep red fabric of the couch cushions is visible.
-  - Two remote controls lie between and beside the cats — one white remote near the kitten’s head, and another white remote with colorful buttons positioned between the two cats.
-
-- **Mood & Composition**:
-  - The image exudes warmth, comfort, and tranquility. The contrasting colors — pink blanket, red couch, and the cats’ natural tabby patterns — create a visually appealing scene.
-  - The casual placement of the remotes suggests a lived-in, relaxed home environment where pets are welcome companions.
-
-Overall, it’s a charming snapshot of feline relaxation and domestic peace.
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-qwen35-35b-a3b-bf16"></a>
-
-<details>
-<summary>mlx-community/Qwen3.5-35B-A3B-bf16 — unusable — Internal reasoning block appears incomplete</summary>
-
-### mlx-community/Qwen3.5-35B-A3B-bf16
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* thinking_trace_incomplete
-- *Thinking trace markers:* ["&lt;think&gt;"]
-- *Resolved model revision:* 731d09ba3597261e84c28881116558364bb8b97c
-- *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.013747342
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 317
-- *Generation tokens:* 299
-- *Configured EOS token ID:* 248046
-- *Configured EOS token:* &lt;|im_end|&gt;
-
-#### Complete output
-
-```text
-This is a cozy, overhead photograph of two tabby cats sleeping peacefully on a vibrant pink couch or blanket.
-
-- **The Cats**:
-  - Both cats are classic brown tabbies with black stripes and swirls.
-  - The cat on the left is stretched out diagonally, lying on its side with its head near the top left corner. Its tail curls slightly at the bottom. It appears to be wearing a small green collar.
-  - The cat on the right is curled more compactly, facing downward toward the bottom right, with its head tucked in. Its body forms a gentle curve.
-  - Both appear deeply asleep, exuding comfort and tranquility.
-
-- **The Setting**:
-  - They’re resting on a bright, fuchsia-pink fabric that looks soft — possibly a fleece blanket or the upholstery of a sofa.
-  - Behind them, you can see the red or maroon backrest of the couch.
-
-- **Objects**:
-  - Two remote controls are visible:
-    - One white remote lies horizontally near the top left, next to the first cat’s head.
-    - Another white remote (with colorful buttons) is placed vertically between the two cats.
-
-The overall mood of the image is warm, relaxed, and domestic — capturing a quiet moment of feline contentment. The contrast between the bold pink background and the natural tones of the cats makes for a visually striking and endearing scene.
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-qwen35-9b-mlx-4bit"></a>
-
-<details>
-<summary>mlx-community/Qwen3.5-9B-MLX-4bit — unusable — Internal reasoning block appears incomplete</summary>
-
-### mlx-community/Qwen3.5-9B-MLX-4bit
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* thinking_trace_incomplete
-- *Thinking trace markers:* ["&lt;think&gt;"]
-- *Resolved model revision:* 938d8919941c6e7efd3c7150eff7fe9d12afa631
-- *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.014255246
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 317
-- *Generation tokens:* 265
-- *Configured EOS token ID:* 248046
-- *Configured EOS token:* &lt;|im_end|&gt;
-
-#### Complete output
-
-```text
-This is a cozy, heartwarming photograph of two tabby cats sleeping peacefully on a bright pink blanket or couch cover.
-
-**Details:**
-
-- **Cats:** Both are tabby cats with classic striped coats — one appears to be a younger kitten (on the left), and the other an adult cat (on the right). The kitten has a green collar and is curled up on its side, while the adult cat is lying on its back with paws stretched out, looking very relaxed.
-  
-- **Positioning:** They are lying next to each other, almost mirroring each other’s poses, which gives the image a sense of companionship and comfort.
-
-- **Remote Controls:** Two white remote controls are placed between them — one near the kitten’s head and one near the adult cat’s head — suggesting they might be watching TV together before falling asleep.
-
-- **Background:** The background is a vibrant, solid pink fabric — likely a sofa or cushion — which contrasts beautifully with the brown-and-black striped fur of the cats, making them stand out.
-
-- **Mood:** The overall mood is tranquil, domestic, and affectionate — capturing a quiet moment of rest and bonding between two pets.
-
-It’s a charming snapshot of everyday pet life, filled with warmth and simplicity.
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-qwen36-27b-mxfp8"></a>
-
-<details>
-<summary>mlx-community/Qwen3.6-27B-mxfp8 — unusable — Internal reasoning block appears incomplete</summary>
-
-### mlx-community/Qwen3.6-27B-mxfp8
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* thinking_trace_incomplete
-- *Thinking trace markers:* ["&lt;think&gt;"]
-- *Resolved model revision:* 5db9fd9c38ce083048ee12217eceed7482ca7ad4
-- *Processor class:* mlx_vlm.models.qwen3_vl.processing_qwen3_vl.Qwen3VLProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.01476315
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 317
-- *Generation tokens:* 283
-- *Configured EOS token ID:* 248046
-- *Configured EOS token:* &lt;|im_end|&gt;
-
-#### Complete output
-
-```text
-This is a cozy, overhead photograph of two tabby cats lounging on a vibrant pink couch or blanket.
-
-- **The Cats**: Both cats have classic tabby markings — stripes and swirls in shades of brown, black, and tan. The cat on the left is stretched out on its side, appearing to be asleep with its eyes closed. It has a green collar around its neck. The cat on the right is curled up more compactly, also seemingly asleep, with its head tucked down and paws tucked near its body.
-
-- **The Setting**: They are resting on a bright, saturated pink fabric that covers what appears to be a sofa or cushioned surface. The color creates a strong contrast with the earthy tones of the cats’ fur.
-
-- **Objects**: Two remote controls are visible on the pink surface — one near the head of the left cat (white with blue buttons) and another between the two cats (white with colorful buttons). Their presence suggests this is a living room setting where someone might have been watching TV before the cats claimed the space.
-
-- **Mood**: The image conveys a sense of peace, comfort, and domestic tranquility. The cats look completely relaxed and content, embodying the lazy, sleepy vibe of a quiet afternoon at home.
-
-Overall, it’s a charming snapshot of feline relaxation in a colorful, everyday environment.
-```
-
-</details>
-
-<a id="diagnostic-mlx-community-step-37-flash-oq2e"></a>
-
-<details>
-<summary>mlx-community/Step-3.7-Flash-oQ2e — unusable — Internal reasoning block appears incomplete</summary>
-
-### mlx-community/Step-3.7-Flash-oQ2e
-
-#### Execution and provenance
-
-- *Execution:* completed
-- *Usability:* unusable
-- *Maintainer status:* observation_needs_reproduction
-- *Observations:* thinking_trace_incomplete
-- *Thinking trace markers:* ["&lt;think&gt;"]
-- *Resolved model revision:* 3dacb46f724ac89725bcd922fb779c7ed1499fe7
-- *Processor class:* mlx_vlm.models.step3p7.processing_step3p7.Step3VLProcessor
-- *Tokenizer class:* transformers.tokenization_utils_tokenizers.TokenizersBackend
-- *Stop reason:* completed
-- *Post-cleanup active memory (GB):* 0.015254698
-- *Post-cleanup cache memory (GB):* 0.0
-- *Prompt tokens:* 188
-- *Generation tokens:* 172
-- *Configured EOS token ID:* 128007
-- *Configured EOS token:* &lt;|im_end|&gt;
-
-#### Complete output
-
-```text
-The image shows two cats sleeping on a pink blanket or sheet. The cat on the left is a tabby cat with a green collar, lying on its side with its head resting on a folded part of the blanket. The cat on the right is a larger tabby cat, also lying on its side, facing the same direction as the smaller cat. Both cats appear to be in a relaxed, sleeping state. There are two remote controls placed near the cats, one on each side of them. The remote on the left is a standard TV remote with multiple buttons, and the one on the right is a simpler, white remote with fewer buttons. The background includes a red cushion or sofa behind the cats, adding a contrasting color to the scene. The overall atmosphere is calm and cozy, with the cats seemingly comfortable and at ease in their resting positions.
 ```
 
 </details>
@@ -3285,46 +2717,59 @@ None.
 
 | Model                                                 | Runtime identity                                        | Performance                                                                                    |
 |-------------------------------------------------------|---------------------------------------------------------|------------------------------------------------------------------------------------------------|
-| HuggingFaceTB/SmolVLM-Instruct                        | rev 81cd9a775a4d; Idefics3Processor; stop completed     | 1194 prompt / 63 generated; 129 tok/s; 5.5 GB peak; cleanup 0.000116/0.0 GB active/cache       |
-| LiquidAI/LFM2.5-VL-450M-MLX-bf16                      | rev 6c33f49ebc0b; Lfm2VlProcessor; stop completed       | 78 prompt / 169 generated; 519 tok/s; 1.0 GB peak; cleanup 0.000247/0.0 GB active/cache        |
-| meta-llama/Llama-3.2-11B-Vision-Instruct              | rev 9eb2daaa8597; MllamaProcessor; stop completed       | 15 prompt / 130 generated; 5.02 tok/s; 25 GB peak; cleanup 0.00174/0.0 GB active/cache         |
-| microsoft/Phi-3.5-vision-instruct                     | rev 12b77fb40b63; Phi3VProcessor; stop completed        | 768 prompt / 20 generated; 59.2 tok/s; 9.3 GB peak; cleanup 0.0018/0.0 GB active/cache         |
-| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed     | 439 prompt / 107 generated; 31.0 tok/s; 20 GB peak; cleanup 0.00233/0.0 GB active/cache        |
-| mlx-community/FastVLM-0.5B-bf16                       | rev 81ffe9290466; FastVLMProcessor; stop completed      | 24 prompt / 428 generated; 358 tok/s; 2.1 GB peak; cleanup 0.00287/0.0 GB active/cache         |
-| mlx-community/gemma-3-27b-it-qat-4bit                 | rev fc4e000f32af; Gemma3Processor; stop completed       | 273 prompt / 303 generated; 28.1 tok/s; 18 GB peak; cleanup 0.0161/0.0 GB active/cache         |
-| mlx-community/gemma-3-27b-it-qat-8bit                 | rev c408904bc9a0; Gemma3Processor; stop completed       | 273 prompt / 289 generated; 17.1 tok/s; 32 GB peak; cleanup 0.0166/0.0 GB active/cache         |
-| mlx-community/gemma-3n-E4B-it-bf16                    | rev d9c02d0b2fa8; Gemma3nProcessor; stop completed      | 272 prompt / 106 generated; 48.9 tok/s; 17 GB peak; cleanup 0.0177/0.0 GB active/cache         |
+| HuggingFaceTB/SmolVLM-Instruct                        | rev 81cd9a775a4d; Idefics3Processor; stop completed     | 1194 prompt / 63 generated; 126 tok/s; 5.5 GB peak; cleanup 0.000116/0.0 GB active/cache       |
+| LiquidAI/LFM2.5-VL-450M-MLX-bf16                      | rev 6c33f49ebc0b; Lfm2VlProcessor; stop completed       | 78 prompt / 169 generated; 520 tok/s; 1.0 GB peak; cleanup 0.000247/0.0 GB active/cache        |
+| meta-llama/Llama-3.2-11B-Vision-Instruct              | rev 9eb2daaa8597; MllamaProcessor; stop completed       | 15 prompt / 130 generated; 5.06 tok/s; 25 GB peak; cleanup 0.00174/0.0 GB active/cache         |
+| microsoft/Phi-3.5-vision-instruct                     | rev 12b77fb40b63; Phi3VProcessor; stop completed        | 768 prompt / 20 generated; 60.9 tok/s; 9.3 GB peak; cleanup 0.0018/0.0 GB active/cache         |
+| mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit | rev 0a970d20ad7d; Mistral3Processor; stop completed     | 439 prompt / 107 generated; 31.3 tok/s; 20 GB peak; cleanup 0.00233/0.0 GB active/cache        |
+| mlx-community/FastVLM-0.5B-bf16                       | rev 81ffe9290466; FastVLMProcessor; stop completed      | 24 prompt / 428 generated; 360 tok/s; 2.2 GB peak; cleanup 0.00287/0.0 GB active/cache         |
+| mlx-community/gemma-3-27b-it-qat-4bit                 | rev fc4e000f32af; Gemma3Processor; stop completed       | 273 prompt / 303 generated; 29.8 tok/s; 18 GB peak; cleanup 0.0161/0.0 GB active/cache         |
+| mlx-community/gemma-3-27b-it-qat-8bit                 | rev c408904bc9a0; Gemma3Processor; stop completed       | 273 prompt / 289 generated; 16.6 tok/s; 32 GB peak; cleanup 0.0166/0.0 GB active/cache         |
+| mlx-community/gemma-3n-E4B-it-bf16                    | rev d9c02d0b2fa8; Gemma3nProcessor; stop completed      | 272 prompt / 106 generated; 48.4 tok/s; 17 GB peak; cleanup 0.0177/0.0 GB active/cache         |
 | mlx-community/gemma-4-26b-a4b-it-4bit                 | rev 0d77464eeb23; Gemma4Processor; stop completed       | 284 prompt / 148 generated; 129 tok/s; 16 GB peak; cleanup 0.0183/0.0 GB active/cache          |
 | mlx-community/gemma-4-31b-bf16                        | rev 19f0f1af698c; Gemma4Processor; stop completed       | 272 prompt / 15 generated; insufficient sample; 63 GB peak; cleanup 0.0188/0.0 GB active/cache |
-| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed       | 284 prompt / 98 generated; 28.0 tok/s; 19 GB peak; cleanup 0.0193/0.0 GB active/cache          |
-| mlx-community/GLM-4.1V-9B-Thinking-8bit               | rev 9677807f1065; Glm46VProcessor; stop completed       | 402 prompt / 301 generated; 51.2 tok/s; 13 GB peak; cleanup 0.00318/0.0 GB active/cache        |
-| mlx-community/InternVL3-14B-8bit                      | rev 50efc568c7df; InternVLChatProcessor; stop completed | 3340 prompt / 77 generated; 31.8 tok/s; 19 GB peak; cleanup 0.00474/0.0 GB active/cache        |
+| mlx-community/gemma-4-31b-it-4bit                     | rev 696d436c4047; Gemma4Processor; stop completed       | 284 prompt / 98 generated; 27.2 tok/s; 19 GB peak; cleanup 0.0193/0.0 GB active/cache          |
+| mlx-community/GLM-4.1V-9B-Thinking-8bit               | rev 9677807f1065; Glm46VProcessor; stop completed       | 402 prompt / 301 generated; 51.3 tok/s; 13 GB peak; cleanup 0.00318/0.0 GB active/cache        |
+| mlx-community/GLM-4.6V-Flash-6bit                     | rev df9464782d34; Glm46VProcessor; stop completed       | 406 prompt / 197 generated; 63.6 tok/s; 10 GB peak; cleanup 0.00351/0.0 GB active/cache        |
+| mlx-community/GLM-4.6V-Flash-mxfp4                    | rev 773591fa7388; Glm46VProcessor; stop completed       | 406 prompt / 205 generated; 91.8 tok/s; 7.7 GB peak; cleanup 0.00383/0.0 GB active/cache       |
+| mlx-community/GLM-4.6V-nvfp4                          | rev 2da6855d4e28; Glm46VMoEProcessor; stop completed    | 406 prompt / 172 generated; 52.5 tok/s; 63 GB peak; cleanup 0.00416/0.0 GB active/cache        |
+| mlx-community/InternVL3-14B-8bit                      | rev 50efc568c7df; InternVLChatProcessor; stop completed | 3340 prompt / 77 generated; 32.1 tok/s; 19 GB peak; cleanup 0.00474/0.0 GB active/cache        |
 | mlx-community/InternVL3-8B-bf16                       | rev e0df3dd79263; InternVLChatProcessor; stop completed | 3340 prompt / 99 generated; 34.1 tok/s; 18 GB peak; cleanup 0.00505/0.0 GB active/cache        |
-| mlx-community/LFM2-VL-1.6B-8bit                       | rev 294b90e5ae23; Lfm2VlProcessor; stop completed       | 267 prompt / 103 generated; 316 tok/s; 3.0 GB peak; cleanup 0.00649/0.0 GB active/cache        |
-| mlx-community/LFM2.5-VL-1.6B-bf16                     | rev 16a710cf8afc; Lfm2VlProcessor; stop completed       | 267 prompt / 108 generated; 189 tok/s; 4.1 GB peak; cleanup 0.00662/0.0 GB active/cache        |
-| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit      | rev 8451adc50203; MllamaProcessor; stop completed       | 14 prompt / 155 generated; 16.7 tok/s; 15 GB peak; cleanup 0.00714/0.0 GB active/cache         |
-| mlx-community/llava-v1.6-mistral-7b-8bit              | rev b8df5f329d95; LlavaNextProcessor; stop completed    | 2354 prompt / 82 generated; 62.6 tok/s; 9.7 GB peak; cleanup 0.0194/0.0 GB active/cache        |
-| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed     | 972 prompt / 155 generated; 68.8 tok/s; 9.8 GB peak; cleanup 0.00793/0.0 GB active/cache       |
-| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4     | rev 28777b889d84; Mistral3Processor; stop completed     | 972 prompt / 156 generated; 65.0 tok/s; 10 GB peak; cleanup 0.00819/0.0 GB active/cache        |
-| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed     | 971 prompt / 178 generated; 192 tok/s; 4.5 GB peak; cleanup 0.00846/0.0 GB active/cache        |
-| mlx-community/Molmo-7B-D-0924-8bit                    | rev 90a14ed7a230; MolmoProcessor; stop completed        | 747 prompt / 174 generated; 52.4 tok/s; 11 GB peak; cleanup 0.00877/0.0 GB active/cache        |
-| mlx-community/Molmo-7B-D-0924-bf16                    | rev d871cbdb87a4; MolmoProcessor; stop completed        | 747 prompt / 199 generated; 31.1 tok/s; 18 GB peak; cleanup 0.00908/0.0 GB active/cache        |
-| mlx-community/MolmoPoint-8B-fp16                      | rev 0a60033b4e48; MolmoPointProcessor; stop completed   | 764 prompt / 158 generated; 6.06 tok/s; 23 GB peak; cleanup 0.0097/0.0 GB active/cache         |
-| mlx-community/nanoLLaVA-1.5-4bit                      | rev 524020474496; Qwen2Tokenizer; stop completed        | 20 prompt / 123 generated; 373 tok/s; 1.9 GB peak; cleanup 0.02/0.0 GB active/cache            |
-| mlx-community/paligemma2-10b-ft-docci-448-6bit        | rev 1485fa9b3c7a; PaliGemmaProcessor; stop completed    | 1029 prompt / 180 generated; 33.4 tok/s; 11 GB peak; cleanup 0.021/0.0 GB active/cache         |
-| mlx-community/paligemma2-10b-ft-docci-448-bf16        | rev 7c412694b919; PaliGemmaProcessor; stop completed    | 1029 prompt / 159 generated; 5.36 tok/s; 26 GB peak; cleanup 0.0221/0.0 GB active/cache        |
-| mlx-community/paligemma2-3b-ft-docci-448-bf16         | rev f66333527ce7; PaliGemmaProcessor; stop completed    | 1029 prompt / 126 generated; 19.0 tok/s; 10 GB peak; cleanup 0.0231/0.0 GB active/cache        |
-| mlx-community/Phi-3.5-vision-instruct-bf16            | rev d8da684308c2; Phi3VProcessor; stop completed        | 768 prompt / 20 generated; 61.7 tok/s; 9.3 GB peak; cleanup 0.0103/0.0 GB active/cache         |
-| mlx-community/pixtral-12b-8bit                        | rev 79e24b66302d; PixtralProcessor; stop completed      | 1237 prompt / 199 generated; 39.0 tok/s; 15 GB peak; cleanup 0.0244/0.0 GB active/cache        |
-| mlx-community/pixtral-12b-bf16                        | rev 378cf65efd79; PixtralProcessor; stop completed      | 1237 prompt / 204 generated; 20.4 tok/s; 27 GB peak; cleanup 0.0247/0.0 GB active/cache        |
-| mlx-community/Qwen2-VL-2B-Instruct-4bit               | rev 01af461cdb95; Qwen2VLProcessor; stop completed      | 415 prompt / 69 generated; 327 tok/s; 2.5 GB peak; cleanup 0.0106/0.0 GB active/cache          |
+| mlx-community/LFM2-VL-1.6B-8bit                       | rev 294b90e5ae23; Lfm2VlProcessor; stop completed       | 267 prompt / 103 generated; 330 tok/s; 3.0 GB peak; cleanup 0.00649/0.0 GB active/cache        |
+| mlx-community/LFM2.5-VL-1.6B-bf16                     | rev 16a710cf8afc; Lfm2VlProcessor; stop completed       | 267 prompt / 108 generated; 186 tok/s; 4.1 GB peak; cleanup 0.00662/0.0 GB active/cache        |
+| mlx-community/Llama-3.2-11B-Vision-Instruct-8bit      | rev 8451adc50203; MllamaProcessor; stop completed       | 14 prompt / 155 generated; 16.6 tok/s; 15 GB peak; cleanup 0.00714/0.0 GB active/cache         |
+| mlx-community/llava-v1.6-mistral-7b-8bit              | rev b8df5f329d95; LlavaNextProcessor; stop completed    | 2354 prompt / 82 generated; 62.5 tok/s; 9.7 GB peak; cleanup 0.0194/0.0 GB active/cache        |
+| mlx-community/MiniCPM-V-4.6-8bit                      | rev 03721395f6b8; MiniCPMVProcessor; stop completed     | 226 prompt / 112 generated; 285 tok/s; 3.0 GB peak; cleanup 0.00767/0.0 GB active/cache        |
+| mlx-community/Ministral-3-14B-Instruct-2512-mxfp4     | rev 7c992876448f; Mistral3Processor; stop completed     | 972 prompt / 155 generated; 69.1 tok/s; 9.8 GB peak; cleanup 0.00793/0.0 GB active/cache       |
+| mlx-community/Ministral-3-14B-Instruct-2512-nvfp4     | rev 28777b889d84; Mistral3Processor; stop completed     | 972 prompt / 156 generated; 63.0 tok/s; 10 GB peak; cleanup 0.00819/0.0 GB active/cache        |
+| mlx-community/Ministral-3-3B-Instruct-2512-4bit       | rev a962dcb09eee; Mistral3Processor; stop completed     | 971 prompt / 178 generated; 187 tok/s; 4.5 GB peak; cleanup 0.00846/0.0 GB active/cache        |
+| mlx-community/Molmo-7B-D-0924-8bit                    | rev 90a14ed7a230; MolmoProcessor; stop completed        | 747 prompt / 174 generated; 53.5 tok/s; 11 GB peak; cleanup 0.00877/0.0 GB active/cache        |
+| mlx-community/Molmo-7B-D-0924-bf16                    | rev d871cbdb87a4; MolmoProcessor; stop completed        | 747 prompt / 199 generated; 30.9 tok/s; 18 GB peak; cleanup 0.00908/0.0 GB active/cache        |
+| mlx-community/MolmoPoint-8B-fp16                      | rev 0a60033b4e48; MolmoPointProcessor; stop completed   | 764 prompt / 158 generated; 5.95 tok/s; 23 GB peak; cleanup 0.0097/0.0 GB active/cache         |
+| mlx-community/nanoLLaVA-1.5-4bit                      | rev 524020474496; Qwen2Tokenizer; stop completed        | 20 prompt / 123 generated; 378 tok/s; 1.8 GB peak; cleanup 0.02/0.0 GB active/cache            |
+| mlx-community/Ornith-1.0-35B-bf16                     | rev 9ef631ad2d0c; Qwen3VLProcessor; stop completed      | 317 prompt / 305 generated; 67.4 tok/s; 71 GB peak; cleanup 0.0102/0.0 GB active/cache         |
+| mlx-community/paligemma2-10b-ft-docci-448-6bit        | rev 1485fa9b3c7a; PaliGemmaProcessor; stop completed    | 1029 prompt / 180 generated; 32.6 tok/s; 11 GB peak; cleanup 0.021/0.0 GB active/cache         |
+| mlx-community/paligemma2-10b-ft-docci-448-bf16        | rev 7c412694b919; PaliGemmaProcessor; stop completed    | 1029 prompt / 159 generated; 5.41 tok/s; 26 GB peak; cleanup 0.0221/0.0 GB active/cache        |
+| mlx-community/paligemma2-3b-ft-docci-448-bf16         | rev f66333527ce7; PaliGemmaProcessor; stop completed    | 1029 prompt / 126 generated; 19.7 tok/s; 10 GB peak; cleanup 0.0231/0.0 GB active/cache        |
+| mlx-community/Phi-3.5-vision-instruct-bf16            | rev d8da684308c2; Phi3VProcessor; stop completed        | 768 prompt / 20 generated; 61.9 tok/s; 9.3 GB peak; cleanup 0.0103/0.0 GB active/cache         |
+| mlx-community/pixtral-12b-8bit                        | rev 79e24b66302d; PixtralProcessor; stop completed      | 1237 prompt / 199 generated; 40.2 tok/s; 15 GB peak; cleanup 0.0244/0.0 GB active/cache        |
+| mlx-community/pixtral-12b-bf16                        | rev 378cf65efd79; PixtralProcessor; stop completed      | 1237 prompt / 204 generated; 20.0 tok/s; 27 GB peak; cleanup 0.0247/0.0 GB active/cache        |
+| mlx-community/Qwen2-VL-2B-Instruct-4bit               | rev 01af461cdb95; Qwen2VLProcessor; stop completed      | 415 prompt / 69 generated; 331 tok/s; 2.5 GB peak; cleanup 0.0106/0.0 GB active/cache          |
 | mlx-community/Qwen3-VL-2B-Instruct-bf16               | rev c8a67a843274; Qwen3VLProcessor; stop completed      | 313 prompt / 281 generated; 132 tok/s; 5.3 GB peak; cleanup 0.0109/0.0 GB active/cache         |
-| mlx-community/Qwen3-VL-2B-Thinking-bf16               | rev c325e5ea14c2; Qwen3VLProcessor; stop completed      | 315 prompt / 401 generated; 130 tok/s; 5.3 GB peak; cleanup 0.0112/0.0 GB active/cache         |
-| mlx-community/SmolVLM-Instruct-bf16                   | rev cae61cdedd06; Idefics3Processor; stop completed     | 1194 prompt / 63 generated; 125 tok/s; 5.5 GB peak; cleanup 0.0149/0.0 GB active/cache         |
-| mlx-community/SmolVLM2-2.2B-Instruct-mlx              | rev 844516024a1c; SmolVLMProcessor; stop completed      | 95 prompt / 143 generated; 131 tok/s; 5.5 GB peak; cleanup 0.015/0.0 GB active/cache           |
-| mlx-community/X-Reasoner-7B-8bit                      | rev 21732e74613b; Qwen2_5_VLProcessor; stop completed   | 415 prompt / 104 generated; 66.1 tok/s; 10 GB peak; cleanup 0.0156/0.0 GB active/cache         |
-| qnguyen3/nanoLLaVA                                    | rev 13d60cec183a; Qwen2Tokenizer; stop completed        | 20 prompt / 44 generated; 112 tok/s; 4.0 GB peak; cleanup 0.0253/0.0 GB active/cache           |
-| Qwen/Qwen3-VL-2B-Instruct                             | rev 89644892e4d8; Qwen3VLProcessor; stop completed      | 313 prompt / 281 generated; 136 tok/s; 4.7 GB peak; cleanup 0.000558/0.0 GB active/cache       |
+| mlx-community/Qwen3-VL-2B-Thinking-bf16               | rev c325e5ea14c2; Qwen3VLProcessor; stop completed      | 315 prompt / 401 generated; 131 tok/s; 5.3 GB peak; cleanup 0.0112/0.0 GB active/cache         |
+| mlx-community/Qwen3.5-27B-4bit                        | rev 45797d2985a1; Qwen3VLProcessor; stop completed      | 317 prompt / 315 generated; 33.3 tok/s; 19 GB peak; cleanup 0.0117/0.0 GB active/cache         |
+| mlx-community/Qwen3.5-27B-mxfp8                       | rev 2d6caf2325c2; Qwen3VLProcessor; stop completed      | 317 prompt / 305 generated; 18.3 tok/s; 30 GB peak; cleanup 0.0122/0.0 GB active/cache         |
+| mlx-community/Qwen3.5-35B-A3B-4bit                    | rev 1e20fd8d4205; Qwen3VLProcessor; stop completed      | 317 prompt / 326 generated; 122 tok/s; 21 GB peak; cleanup 0.0127/0.0 GB active/cache          |
+| mlx-community/Qwen3.5-35B-A3B-6bit                    | rev b729d115bb2c; Qwen3VLProcessor; stop completed      | 317 prompt / 299 generated; 102 tok/s; 30 GB peak; cleanup 0.0132/0.0 GB active/cache          |
+| mlx-community/Qwen3.5-35B-A3B-bf16                    | rev 731d09ba3597; Qwen3VLProcessor; stop completed      | 317 prompt / 299 generated; 68.8 tok/s; 71 GB peak; cleanup 0.0137/0.0 GB active/cache         |
+| mlx-community/Qwen3.5-9B-MLX-4bit                     | rev 938d8919941c; Qwen3VLProcessor; stop completed      | 317 prompt / 265 generated; 100 tok/s; 7.0 GB peak; cleanup 0.0143/0.0 GB active/cache         |
+| mlx-community/Qwen3.6-27B-mxfp8                       | rev 5db9fd9c38ce; Qwen3VLProcessor; stop completed      | 317 prompt / 283 generated; 18.2 tok/s; 30 GB peak; cleanup 0.0148/0.0 GB active/cache         |
+| mlx-community/SmolVLM-Instruct-bf16                   | rev cae61cdedd06; Idefics3Processor; stop completed     | 1194 prompt / 63 generated; 127 tok/s; 5.5 GB peak; cleanup 0.0149/0.0 GB active/cache         |
+| mlx-community/SmolVLM2-2.2B-Instruct-mlx              | rev 844516024a1c; SmolVLMProcessor; stop completed      | 95 prompt / 143 generated; 132 tok/s; 5.5 GB peak; cleanup 0.015/0.0 GB active/cache           |
+| mlx-community/Step-3.7-Flash-oQ2e                     | rev 3dacb46f724a; Step3VLProcessor; stop completed      | 188 prompt / 172 generated; 43.7 tok/s; 65 GB peak; cleanup 0.0153/0.0 GB active/cache         |
+| mlx-community/X-Reasoner-7B-8bit                      | rev 21732e74613b; Qwen2_5_VLProcessor; stop completed   | 415 prompt / 104 generated; 66.3 tok/s; 10 GB peak; cleanup 0.0156/0.0 GB active/cache         |
+| qnguyen3/nanoLLaVA                                    | rev 13d60cec183a; Qwen2Tokenizer; stop completed        | 20 prompt / 44 generated; 116 tok/s; 4.2 GB peak; cleanup 0.0253/0.0 GB active/cache           |
+| Qwen/Qwen3-VL-2B-Instruct                             | rev 89644892e4d8; Qwen3VLProcessor; stop completed      | 313 prompt / 281 generated; 133 tok/s; 5.2 GB peak; cleanup 0.000558/0.0 GB active/cache       |
 
 </details>
 
@@ -3361,19 +2806,6 @@ original image before filing.
 | mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX    | 24cb8fef6052e8d6e0dd7d467cf2d3db2dec19b2 |
 | mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16 | 32dae5c38006e20ac158bc94cd1d5967d19b2652 |
 | mlx-community/Kimi-VL-A3B-Thinking-8bit          | 85daf3dc2490c0f824143338f08ba45f475c9ce4 |
-| mlx-community/GLM-4.6V-Flash-6bit                | df9464782d3452e0dfd86afe0984f1c9eca75ca1 |
-| mlx-community/GLM-4.6V-Flash-mxfp4               | 773591fa7388b5f0db2f5ec11ed9dc3a23779f1b |
-| mlx-community/GLM-4.6V-nvfp4                     | 2da6855d4e28a0e61c84543262074bc17ac27d6e |
-| mlx-community/MiniCPM-V-4.6-8bit                 | 03721395f6b82cd000cc74cde28fcff8abd9a04c |
-| mlx-community/Ornith-1.0-35B-bf16                | 9ef631ad2d0c4c26783d4f94d0a0de9516e41a4b |
-| mlx-community/Qwen3.5-27B-4bit                   | 45797d2985a12c55e6473686e9ea91b95e959553 |
-| mlx-community/Qwen3.5-27B-mxfp8                  | 2d6caf2325c24e7dd3074e76a6608e9facaee36f |
-| mlx-community/Qwen3.5-35B-A3B-4bit               | 1e20fd8d42056f870933bf98ca6211024744f7ec |
-| mlx-community/Qwen3.5-35B-A3B-6bit               | b729d115bb2cfea696e390dd6bb898528c66b6e9 |
-| mlx-community/Qwen3.5-35B-A3B-bf16               | 731d09ba3597261e84c28881116558364bb8b97c |
-| mlx-community/Qwen3.5-9B-MLX-4bit                | 938d8919941c6e7efd3c7150eff7fe9d12afa631 |
-| mlx-community/Qwen3.6-27B-mxfp8                  | 5db9fd9c38ce083048ee12217eceed7482ca7ad4 |
-| mlx-community/Step-3.7-Flash-oQ2e                | 3dacb46f724ac89725bcd922fb779c7ed1499fe7 |
 | jqlive/Kimi-VL-A3B-Thinking-2506-6bit            | 4b3b11ce0874c36a99e13e17e355049042f8620a |
 | mlx-community/Idefics3-8B-Llama3-bf16            | 8c2a30c48864f3251701b7bde40f601d25535098 |
 | mlx-community/Kimi-VL-A3B-Thinking-2506-bf16     | fb254434d4026bee7aa840dea1c5d59feea8fd48 |

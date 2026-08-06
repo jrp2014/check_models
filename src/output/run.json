@@ -23,7 +23,7 @@
       "direct_url": null,
       "install_type": "source-tree",
       "source_location": "~/Documents/AI/mlx/check_models",
-      "source_revision": "48b73d7b0a3f65b1e5822400dcb0e603a029959d",
+      "source_revision": "7b5f166ee0b4a2f02b9fcc91c09731a06825d6fa",
       "vcs_revision": null,
       "version": "0.8.9"
     },
@@ -108,7 +108,7 @@
     "models_indeterminate": 0
   },
   "eval_mode": "blind",
-  "generated_at": "2026-08-05 22:52:02 BST",
+  "generated_at": "2026-08-06 00:39:55 BST",
   "generation_settings": {
     "max_tokens": 500,
     "prefill_step_size": 4096,
@@ -524,7 +524,7 @@
   },
   "producer": {
     "dirty": false,
-    "git_revision": "48b73d7b0a3f65b1e5822400dcb0e603a029959d",
+    "git_revision": "7b5f166ee0b4a2f02b9fcc91c09731a06825d6fa",
     "install_type": "source-tree",
     "name": "check_models",
     "version": "0.8.9"
@@ -1046,6 +1046,6 @@
   },
   "prompt_sha256": "1d38bb7cb66d092afaf6eb724e8ca0886502cd26f30f57d6e1ed2d5c99193059",
   "schema_version": "2.0",
-  "total_runtime_seconds": 586.268,
+  "total_runtime_seconds": 578.437,
   "trust_remote_code": true
 }
