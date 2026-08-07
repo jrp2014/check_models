@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-Generated on: 2026-08-06 00:39:55 BST
+Generated on: 2026-08-07 18:50:49 BST
 
 Complete per-model evidence artifact with image metadata, the source prompt, a
 facts-only chooser, and full generated or crash output for every attempted
@@ -12,89 +12,89 @@ model.
 
 ## Current-run Chooser
 
-Current-run usability and captured resource facts only. Total time is end-to-end; throughput covers generation only and requires at least 16 generated tokens.
+Current-run usability and captured resource facts only. Total time is end-to-end; throughput covers generation only and requires at least 16 generated tokens. Prefill/first is first-token latency when captured.
 
 <!-- markdownlint-disable MD034 MD049 -->
 
-| Model                                                                                                                   | Usability             | Total s   | Gen TPS             | Peak GB   | Gen tok   | Observations                                                                             |
-|-------------------------------------------------------------------------------------------------------------------------|-----------------------|-----------|---------------------|-----------|-----------|------------------------------------------------------------------------------------------|
-| [`HuggingFaceTB/SmolVLM-Instruct`](#model-huggingfacetb-smolvlm-instruct)                                               | `usable`              | 1.59s     | 126 tok/s           | 5.5       | 63        | none                                                                                     |
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | 0.70s     | 520 tok/s           | 1.0       | 169       | none                                                                                     |
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable`              | 2.92s     | 133 tok/s           | 5.2       | 281       | none                                                                                     |
-| [`meta-llama/Llama-3.2-11B-Vision-Instruct`](#model-meta-llama-llama-32-11b-vision-instruct)                            | `usable`              | 29.61s    | 5.06 tok/s          | 25        | 130       | none                                                                                     |
-| [`microsoft/Phi-3.5-vision-instruct`](#model-microsoft-phi-35-vision-instruct)                                          | `usable`              | 1.56s     | 60.9 tok/s          | 9.3       | 20        | none                                                                                     |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable`              | 6.36s     | 31.3 tok/s          | 20        | 107       | none                                                                                     |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `usable`              | 1.92s     | 360 tok/s           | 2.2       | 428       | none                                                                                     |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `usable`              | 7.89s     | 51.3 tok/s          | 13        | 301       | none                                                                                     |
-| [`mlx-community/GLM-4.6V-Flash-6bit`](#model-mlx-community-glm-46v-flash-6bit)                                          | `usable`              | 4.86s     | 63.6 tok/s          | 10        | 197       | none                                                                                     |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable`              | 3.82s     | 91.8 tok/s          | 7.7       | 205       | none                                                                                     |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable`              | 14.05s    | 52.5 tok/s          | 63        | 172       | none                                                                                     |
-| [`mlx-community/InternVL3-14B-8bit`](#model-mlx-community-internvl3-14b-8bit)                                           | `usable`              | 6.53s     | 32.1 tok/s          | 19        | 77        | none                                                                                     |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | 5.82s     | 34.1 tok/s          | 18        | 99        | none                                                                                     |
-| [`mlx-community/LFM2-VL-1.6B-8bit`](#model-mlx-community-lfm2-vl-16b-8bit)                                              | `usable`              | 0.97s     | 330 tok/s           | 3.0       | 103       | none                                                                                     |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable`              | 1.26s     | 186 tok/s           | 4.1       | 108       | none                                                                                     |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `usable`              | 12.22s    | 16.6 tok/s          | 15        | 155       | none                                                                                     |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `usable`              | 1.44s     | 285 tok/s           | 3.0       | 112       | none                                                                                     |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 4.26s     | 69.1 tok/s          | 9.8       | 155       | none                                                                                     |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable`              | 4.68s     | 63.0 tok/s          | 10        | 156       | none                                                                                     |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 2.21s     | 187 tok/s           | 4.5       | 178       | none                                                                                     |
-| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable`              | 4.98s     | 53.5 tok/s          | 11        | 174       | none                                                                                     |
-| [`mlx-community/Molmo-7B-D-0924-bf16`](#model-mlx-community-molmo-7b-d-0924-bf16)                                       | `usable`              | 8.58s     | 30.9 tok/s          | 18        | 199       | none                                                                                     |
-| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `usable`              | 29.69s    | 5.95 tok/s          | 23        | 158       | none                                                                                     |
-| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              | 20.28s    | 67.4 tok/s          | 71        | 305       | none                                                                                     |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | 1.58s     | 61.9 tok/s          | 9.3       | 20        | none                                                                                     |
-| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable`              | 0.90s     | 331 tok/s           | 2.5       | 69        | none                                                                                     |
-| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable`              | 3.12s     | 132 tok/s           | 5.3       | 281       | none                                                                                     |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable`              | 4.03s     | 131 tok/s           | 5.3       | 401       | none                                                                                     |
-| [`mlx-community/Qwen3.5-27B-4bit`](#model-mlx-community-qwen35-27b-4bit)                                                | `usable`              | 12.32s    | 33.3 tok/s          | 19        | 315       | none                                                                                     |
-| [`mlx-community/Qwen3.5-27B-mxfp8`](#model-mlx-community-qwen35-27b-mxfp8)                                              | `usable`              | 20.65s    | 18.3 tok/s          | 30        | 305       | none                                                                                     |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 5.59s     | 122 tok/s           | 21        | 326       | none                                                                                     |
-| [`mlx-community/Qwen3.5-35B-A3B-6bit`](#model-mlx-community-qwen35-35b-a3b-6bit)                                        | `usable`              | 6.68s     | 102 tok/s           | 30        | 299       | none                                                                                     |
-| [`mlx-community/Qwen3.5-35B-A3B-bf16`](#model-mlx-community-qwen35-35b-a3b-bf16)                                        | `usable`              | 18.79s    | 68.8 tok/s          | 71        | 299       | none                                                                                     |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 4.34s     | 100 tok/s           | 7.0       | 265       | none                                                                                     |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 19.39s    | 18.2 tok/s          | 30        | 283       | none                                                                                     |
-| [`mlx-community/SmolVLM-Instruct-bf16`](#model-mlx-community-smolvlm-instruct-bf16)                                     | `usable`              | 1.58s     | 127 tok/s           | 5.5       | 63        | none                                                                                     |
-| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable`              | 2.04s     | 132 tok/s           | 5.5       | 143       | none                                                                                     |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | 14.50s    | 43.7 tok/s          | 65        | 172       | none                                                                                     |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable`              | 3.05s     | 66.3 tok/s          | 10        | 104       | none                                                                                     |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | 13.23s    | 29.8 tok/s          | 18        | 303       | none                                                                                     |
-| [`mlx-community/gemma-3-27b-it-qat-8bit`](#model-mlx-community-gemma-3-27b-it-qat-8bit)                                 | `usable`              | 21.54s    | 16.6 tok/s          | 32        | 289       | none                                                                                     |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `usable`              | 4.97s     | 48.4 tok/s          | 17        | 106       | none                                                                                     |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 3.98s     | 129 tok/s           | 16        | 148       | none                                                                                     |
-| [`mlx-community/gemma-4-31b-bf16`](#model-mlx-community-gemma-4-31b-bf16)                                               | `usable`              | 12.54s    | insufficient sample | 63        | 15        | none                                                                                     |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 6.88s     | 27.2 tok/s          | 19        | 98        | none                                                                                     |
-| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `usable`              | 4.90s     | 62.5 tok/s          | 9.7       | 82        | none                                                                                     |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `usable`              | 0.96s     | 378 tok/s           | 1.8       | 123       | none                                                                                     |
-| [`mlx-community/paligemma2-10b-ft-docci-448-6bit`](#model-mlx-community-paligemma2-10b-ft-docci-448-6bit)               | `usable`              | 8.08s     | 32.6 tok/s          | 11        | 180       | none                                                                                     |
-| [`mlx-community/paligemma2-10b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-10b-ft-docci-448-bf16)               | `usable`              | 33.30s    | 5.41 tok/s          | 26        | 159       | none                                                                                     |
-| [`mlx-community/paligemma2-3b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-3b-ft-docci-448-bf16)                 | `usable`              | 8.20s     | 19.7 tok/s          | 10        | 126       | none                                                                                     |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | 7.47s     | 40.2 tok/s          | 15        | 199       | none                                                                                     |
-| [`mlx-community/pixtral-12b-bf16`](#model-mlx-community-pixtral-12b-bf16)                                               | `usable`              | 13.60s    | 20.0 tok/s          | 27        | 204       | none                                                                                     |
-| [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava)                                                                       | `usable`              | 1.00s     | 116 tok/s           | 4.2       | 44        | none                                                                                     |
-| [`jqlive/Kimi-VL-A3B-Thinking-2506-6bit`](#model-jqlive-kimi-vl-a3b-thinking-2506-6bit)                                 | `usable_with_caveats` | 5.22s     | 77.6 tok/s          | 16        | 221       | Conversation-role control tokens remain visible                                          |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable_with_caveats` | 14.00s    | 32.2 tok/s          | 19        | 354       | Conversation-role control tokens remain visible                                          |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable_with_caveats` | 55.58s    | 4.7 tok/s           | 39        | 241       | Conversation-role control tokens remain visible                                          |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | 5.57s     | 53.4 tok/s          | 29        | 88        | Unrecognised model control tokens remain visible                                         |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | 4.95s     | 67.9 tok/s          | 28        | 89        | Unrecognised model control tokens remain visible                                         |
-| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `usable_with_caveats` | 2.27s     | insufficient sample | 4.6       | 2         | Response is unusually short                                                              |
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 13.83s    | 44.3 tok/s          | 14        | 500       | Response appears cut off at the token limit                                              |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | 15.72s    | 64.9 tok/s          | 60        | 500       | Response appears cut off at the token limit                                              |
-| [`mlx-community/Kimi-VL-A3B-Thinking-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-8bit)                             | `unusable`            | 10.14s    | 68.2 tok/s          | 20        | 500       | Response appears cut off at the token limit; Internal reasoning block appears incomplete |
-| [`mlx-community/gemma-3n-E2B-4bit`](#model-mlx-community-gemma-3n-e2b-4bit)                                             | `unusable`            | 5.86s     | 126 tok/s           | 5.8       | 500       | Response repeats the same text; Response appears cut off at the token limit              |
-| [`mlx-community/Inkling-Small-mlx-4bit`](#model-mlx-community-inkling-small-mlx-4bit)                                   | `not_evaluated`       | 0.22s     | -                   | -         | -         | none                                                                                     |
+| Model                                                                                                                   | Usability             | Total s   | Gen TPS             | Prefill/first s   | Peak GB   | Gen tok   | Observations                                      |
+|-------------------------------------------------------------------------------------------------------------------------|-----------------------|-----------|---------------------|-------------------|-----------|-----------|---------------------------------------------------|
+| [`HuggingFaceTB/SmolVLM-Instruct`](#model-huggingfacetb-smolvlm-instruct)                                               | `usable`              | 1.72s     | 128 tok/s           | 0.37              | 5.5       | 63        | none                                              |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | 0.73s     | 523 tok/s           | 0.02              | 1.0       | 169       | none                                              |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable`              | 2.87s     | 136 tok/s           | 0.09              | 5.2       | 281       | none                                              |
+| [`meta-llama/Llama-3.2-11B-Vision-Instruct`](#model-meta-llama-llama-32-11b-vision-instruct)                            | `usable`              | 33.74s    | 4.96 tok/s          | 3.86              | 25        | 130       | none                                              |
+| [`microsoft/Phi-3.5-vision-instruct`](#model-microsoft-phi-35-vision-instruct)                                          | `usable`              | 1.69s     | 51.9 tok/s          | 0.27              | 9.3       | 20        | none                                              |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable`              | 7.51s     | 25.1 tok/s          | 0.82              | 20        | 107       | none                                              |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `usable`              | 2.14s     | 351 tok/s           | 0.08              | 2.0       | 428       | none                                              |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `usable`              | 8.35s     | 48.1 tok/s          | 0.38              | 13        | 301       | none                                              |
+| [`mlx-community/GLM-4.6V-Flash-6bit`](#model-mlx-community-glm-46v-flash-6bit)                                          | `usable`              | 4.94s     | 63.6 tok/s          | 0.35              | 10        | 197       | none                                              |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable`              | 3.84s     | 91.7 tok/s          | 0.30              | 7.7       | 205       | none                                              |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable`              | 21.49s    | 51.3 tok/s          | 8.25              | 63        | 172       | none                                              |
+| [`mlx-community/InternVL3-14B-8bit`](#model-mlx-community-internvl3-14b-8bit)                                           | `usable`              | 8.20s     | 28.2 tok/s          | 2.43              | 19        | 77        | none                                              |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | 6.18s     | 32.3 tok/s          | 1.27              | 18        | 99        | none                                              |
+| [`mlx-community/LFM2-VL-1.6B-8bit`](#model-mlx-community-lfm2-vl-16b-8bit)                                              | `usable`              | 0.98s     | 315 tok/s           | 0.07              | 3.0       | 103       | none                                              |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable`              | 1.31s     | 185 tok/s           | 0.07              | 4.1       | 108       | none                                              |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `usable`              | 12.45s    | 16.5 tok/s          | 1.45              | 15        | 155       | none                                              |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `usable`              | 1.54s     | 252 tok/s           | 0.10              | 3.0       | 112       | none                                              |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 4.62s     | 65.1 tok/s          | 0.72              | 9.8       | 155       | none                                              |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable`              | 4.80s     | 60.0 tok/s          | 0.80              | 10        | 156       | none                                              |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 2.27s     | 188 tok/s           | 0.31              | 4.5       | 178       | none                                              |
+| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable`              | 5.22s     | 50.2 tok/s          | 0.42              | 11        | 174       | none                                              |
+| [`mlx-community/Molmo-7B-D-0924-bf16`](#model-mlx-community-molmo-7b-d-0924-bf16)                                       | `usable`              | 9.10s     | 29.5 tok/s          | 0.46              | 18        | 199       | none                                              |
+| [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `usable`              | 29.82s    | 5.95 tok/s          | 0.79              | 23        | 158       | none                                              |
+| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              | 26.76s    | 59.7 tok/s          | 8.26              | 71        | 305       | none                                              |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | 1.59s     | 59.0 tok/s          | 0.26              | 9.3       | 20        | none                                              |
+| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable`              | 0.98s     | 317 tok/s           | 0.14              | 2.5       | 69        | none                                              |
+| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable`              | 3.17s     | 121 tok/s           | 0.08              | 5.2       | 281       | none                                              |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable`              | 4.21s     | 123 tok/s           | 0.08              | 5.3       | 401       | none                                              |
+| [`mlx-community/Qwen3.5-27B-4bit`](#model-mlx-community-qwen35-27b-4bit)                                                | `usable`              | 13.62s    | 29.6 tok/s          | 0.66              | 19        | 315       | none                                              |
+| [`mlx-community/Qwen3.5-27B-mxfp8`](#model-mlx-community-qwen35-27b-mxfp8)                                              | `usable`              | 21.77s    | 17.2 tok/s          | 0.74              | 30        | 305       | none                                              |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 6.23s     | 103 tok/s           | 0.40              | 21        | 326       | none                                              |
+| [`mlx-community/Qwen3.5-35B-A3B-6bit`](#model-mlx-community-qwen35-35b-a3b-6bit)                                        | `usable`              | 7.16s     | 90.0 tok/s          | 0.48              | 30        | 299       | none                                              |
+| [`mlx-community/Qwen3.5-35B-A3B-bf16`](#model-mlx-community-qwen35-35b-a3b-bf16)                                        | `usable`              | 19.80s    | 70.0 tok/s          | 5.67              | 71        | 299       | none                                              |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 4.35s     | 98.9 tok/s          | 0.22              | 7.0       | 265       | none                                              |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 18.45s    | 19.3 tok/s          | 0.69              | 30        | 283       | none                                              |
+| [`mlx-community/SmolVLM-Instruct-bf16`](#model-mlx-community-smolvlm-instruct-bf16)                                     | `usable`              | 1.58s     | 125 tok/s           | 0.35              | 5.5       | 63        | none                                              |
+| [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable`              | 2.09s     | 132 tok/s           | 0.28              | 5.5       | 143       | none                                              |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | 13.82s    | 47.2 tok/s          | 4.38              | 65        | 113       | none                                              |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable`              | 3.54s     | 66.1 tok/s          | 0.23              | 10        | 104       | none                                              |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | 12.90s    | 30.5 tok/s          | 0.71              | 18        | 303       | none                                              |
+| [`mlx-community/gemma-3-27b-it-qat-8bit`](#model-mlx-community-gemma-3-27b-it-qat-8bit)                                 | `usable`              | 21.23s    | 17.0 tok/s          | 0.85              | 32        | 288       | none                                              |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `usable`              | 4.85s     | 48.2 tok/s          | 0.33              | 17        | 106       | none                                              |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 3.87s     | 131 tok/s           | 0.39              | 16        | 148       | none                                              |
+| [`mlx-community/gemma-4-31b-bf16`](#model-mlx-community-gemma-4-31b-bf16)                                               | `usable`              | 13.18s    | insufficient sample | 4.06              | 63        | 15        | none                                              |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 6.96s     | 26.9 tok/s          | 0.71              | 19        | 98        | none                                              |
+| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `usable`              | 4.43s     | 62.0 tok/s          | 2.10              | 9.7       | 82        | none                                              |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `usable`              | 0.91s     | 365 tok/s           | 0.07              | 1.8       | 123       | none                                              |
+| [`mlx-community/paligemma2-10b-ft-docci-448-6bit`](#model-mlx-community-paligemma2-10b-ft-docci-448-6bit)               | `usable`              | 7.98s     | 33.3 tok/s          | 0.78              | 11        | 180       | none                                              |
+| [`mlx-community/paligemma2-10b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-10b-ft-docci-448-bf16)               | `usable`              | 33.46s    | 5.34 tok/s          | 1.12              | 26        | 159       | none                                              |
+| [`mlx-community/paligemma2-3b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-3b-ft-docci-448-bf16)                 | `usable`              | 8.66s     | 18.8 tok/s          | 0.42              | 10        | 126       | none                                              |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | 8.56s     | 34.2 tok/s          | 0.82              | 15        | 199       | none                                              |
+| [`mlx-community/pixtral-12b-bf16`](#model-mlx-community-pixtral-12b-bf16)                                               | `usable`              | 15.13s    | 18.3 tok/s          | 1.09              | 27        | 204       | none                                              |
+| [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava)                                                                       | `usable`              | 1.31s     | 91.0 tok/s          | 0.11              | 4.0       | 44        | none                                              |
+| [`jqlive/Kimi-VL-A3B-Thinking-2506-6bit`](#model-jqlive-kimi-vl-a3b-thinking-2506-6bit)                                 | `usable_with_caveats` | 5.96s     | 78.0 tok/s          | 0.32              | 16        | 221       | role tokens visible                               |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable_with_caveats` | 14.28s    | 31.5 tok/s          | 1.04              | 19        | 354       | role tokens visible                               |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable_with_caveats` | 57.91s    | 4.55 tok/s          | 0.86              | 39        | 241       | role tokens visible                               |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | 5.24s     | 59.1 tok/s          | 0.29              | 29        | 88        | control tokens visible                            |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | 4.95s     | 71.7 tok/s          | 0.29              | 28        | 85        | control tokens visible                            |
+| [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `usable_with_caveats` | 2.62s     | insufficient sample | 1.27              | 4.6       | 2         | very short response                               |
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)                  | `unusable`            | 17.02s    | 35.8 tok/s          | 1.03              | 14        | 500       | cut off at token limit                            |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16)            | `unusable`            | 28.35s    | 57.9 tok/s          | 7.60              | 60        | 500       | cut off at token limit                            |
+| [`mlx-community/Kimi-VL-A3B-Thinking-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-8bit)                             | `unusable`            | 10.42s    | 66.0 tok/s          | 0.29              | 20        | 500       | cut off at token limit; incomplete thinking block |
+| [`mlx-community/gemma-3n-E2B-4bit`](#model-mlx-community-gemma-3n-e2b-4bit)                                             | `unusable`            | 5.78s     | 124 tok/s           | 0.23              | 5.8       | 500       | repeated text; cut off at token limit             |
+| [`mlx-community/Inkling-Small-mlx-4bit`](#model-mlx-community-inkling-small-mlx-4bit)                                   | `not_evaluated`       | 0.33s     | -                   | -                 | -         | -         | none                                              |
 <!-- markdownlint-enable MD034 MD049 -->
 
 ## Avoid for This Run
 
 <!-- markdownlint-disable MD034 MD049 -->
 
-| Model                                                                                                        | Usability       | Observations                                                                             |
-|--------------------------------------------------------------------------------------------------------------|-----------------|------------------------------------------------------------------------------------------|
-| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)       | `unusable`      | Response appears cut off at the token limit                                              |
-| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | `unusable`      | Response appears cut off at the token limit                                              |
-| [`mlx-community/Kimi-VL-A3B-Thinking-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-8bit)                  | `unusable`      | Response appears cut off at the token limit; Internal reasoning block appears incomplete |
-| [`mlx-community/gemma-3n-E2B-4bit`](#model-mlx-community-gemma-3n-e2b-4bit)                                  | `unusable`      | Response repeats the same text; Response appears cut off at the token limit              |
-| [`mlx-community/Inkling-Small-mlx-4bit`](#model-mlx-community-inkling-small-mlx-4bit)                        | `not_evaluated` | none                                                                                     |
+| Model                                                                                                        | Usability       | Observations                                      |
+|--------------------------------------------------------------------------------------------------------------|-----------------|---------------------------------------------------|
+| [`mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`](#model-mlx-community-apriel-15-15b-thinker-6bit-mlx)       | `unusable`      | cut off at token limit                            |
+| [`mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`](#model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16) | `unusable`      | cut off at token limit                            |
+| [`mlx-community/Kimi-VL-A3B-Thinking-8bit`](#model-mlx-community-kimi-vl-a3b-thinking-8bit)                  | `unusable`      | cut off at token limit; incomplete thinking block |
+| [`mlx-community/gemma-3n-E2B-4bit`](#model-mlx-community-gemma-3n-e2b-4bit)                                  | `unusable`      | repeated text; cut off at token limit             |
+| [`mlx-community/Inkling-Small-mlx-4bit`](#model-mlx-community-inkling-small-mlx-4bit)                        | `not_evaluated` | none                                              |
 <!-- markdownlint-enable MD034 MD049 -->
 
 ## Lowest-memory Usable Models (Including Caveats)
@@ -105,16 +105,16 @@ Current-run usability and captured resource facts only. Total time is end-to-end
 |-------------------------------------------------------------------------------------------------------------------------|-----------------------|-----------|-----------|
 | [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              |       1   |       169 |
 | [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `usable`              |       1.8 |       123 |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `usable`              |       2.2 |       428 |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `usable`              |       2   |       428 |
 | [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable`              |       2.5 |        69 |
 | [`mlx-community/LFM2-VL-1.6B-8bit`](#model-mlx-community-lfm2-vl-16b-8bit)                                              | `usable`              |       3   |       103 |
 | [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `usable`              |       3   |       112 |
+| [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava)                                                                       | `usable`              |       4   |        44 |
 | [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable`              |       4.1 |       108 |
-| [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava)                                                                       | `usable`              |       4.2 |        44 |
 | [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              |       4.5 |       178 |
 | [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `usable_with_caveats` |       4.6 |         2 |
+| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable`              |       5.2 |       281 |
 | [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable`              |       5.2 |       281 |
-| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable`              |       5.3 |       281 |
 | [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable`              |       5.3 |       401 |
 | [`HuggingFaceTB/SmolVLM-Instruct`](#model-huggingfacetb-smolvlm-instruct)                                               | `usable`              |       5.5 |        63 |
 | [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable`              |       5.5 |       143 |
@@ -150,87 +150,87 @@ Current-run usability and captured resource facts only. Total time is end-to-end
 | [`meta-llama/Llama-3.2-11B-Vision-Instruct`](#model-meta-llama-llama-32-11b-vision-instruct)                            | `usable`              |      25   |       130 |
 | [`mlx-community/paligemma2-10b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-10b-ft-docci-448-bf16)               | `usable`              |      26   |       159 |
 | [`mlx-community/pixtral-12b-bf16`](#model-mlx-community-pixtral-12b-bf16)                                               | `usable`              |      27   |       204 |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` |      28   |        89 |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` |      28   |        85 |
 | [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` |      29   |        88 |
 | [`mlx-community/Qwen3.5-27B-mxfp8`](#model-mlx-community-qwen35-27b-mxfp8)                                              | `usable`              |      30   |       305 |
 | [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              |      30   |       283 |
 | [`mlx-community/Qwen3.5-35B-A3B-6bit`](#model-mlx-community-qwen35-35b-a3b-6bit)                                        | `usable`              |      30   |       299 |
-| [`mlx-community/gemma-3-27b-it-qat-8bit`](#model-mlx-community-gemma-3-27b-it-qat-8bit)                                 | `usable`              |      32   |       289 |
+| [`mlx-community/gemma-3-27b-it-qat-8bit`](#model-mlx-community-gemma-3-27b-it-qat-8bit)                                 | `usable`              |      32   |       288 |
 | [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable_with_caveats` |      39   |       241 |
 | [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable`              |      63   |       172 |
 | [`mlx-community/gemma-4-31b-bf16`](#model-mlx-community-gemma-4-31b-bf16)                                               | `usable`              |      63   |        15 |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              |      65   |       172 |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              |      65   |       113 |
 | [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              |      71   |       305 |
 | [`mlx-community/Qwen3.5-35B-A3B-bf16`](#model-mlx-community-qwen35-35b-a3b-bf16)                                        | `usable`              |      71   |       299 |
 <!-- markdownlint-enable MD034 MD049 -->
 
 ## Fastest Usable Models (Including Caveats)
 
-Fastest valid generation: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 520 tok/s
+Fastest valid generation: `LiquidAI/LFM2.5-VL-450M-MLX-bf16` at 523 tok/s
 
-Average valid generation throughput: 96.6 tok/s
+Average valid generation throughput: 93.1 tok/s
 
 <!-- markdownlint-disable MD034 MD049 -->
 
 | Model                                                                                                                   | Usability             | Gen TPS             |   Gen tok |
 |-------------------------------------------------------------------------------------------------------------------------|-----------------------|---------------------|-----------|
-| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | 520 tok/s           |       169 |
-| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `usable`              | 378 tok/s           |       123 |
-| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `usable`              | 360 tok/s           |       428 |
-| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable`              | 331 tok/s           |        69 |
-| [`mlx-community/LFM2-VL-1.6B-8bit`](#model-mlx-community-lfm2-vl-16b-8bit)                                              | `usable`              | 330 tok/s           |       103 |
-| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `usable`              | 285 tok/s           |       112 |
-| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 187 tok/s           |       178 |
-| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable`              | 186 tok/s           |       108 |
-| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable`              | 133 tok/s           |       281 |
+| [`LiquidAI/LFM2.5-VL-450M-MLX-bf16`](#model-liquidai-lfm25-vl-450m-mlx-bf16)                                            | `usable`              | 523 tok/s           |       169 |
+| [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)                                            | `usable`              | 365 tok/s           |       123 |
+| [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)                                              | `usable`              | 351 tok/s           |       428 |
+| [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)                             | `usable`              | 317 tok/s           |        69 |
+| [`mlx-community/LFM2-VL-1.6B-8bit`](#model-mlx-community-lfm2-vl-16b-8bit)                                              | `usable`              | 315 tok/s           |       103 |
+| [`mlx-community/MiniCPM-V-4.6-8bit`](#model-mlx-community-minicpm-v-46-8bit)                                            | `usable`              | 252 tok/s           |       112 |
+| [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)             | `usable`              | 188 tok/s           |       178 |
+| [`mlx-community/LFM2.5-VL-1.6B-bf16`](#model-mlx-community-lfm25-vl-16b-bf16)                                           | `usable`              | 185 tok/s           |       108 |
+| [`Qwen/Qwen3-VL-2B-Instruct`](#model-qwen-qwen3-vl-2b-instruct)                                                         | `usable`              | 136 tok/s           |       281 |
 | [`mlx-community/SmolVLM2-2.2B-Instruct-mlx`](#model-mlx-community-smolvlm2-22b-instruct-mlx)                            | `usable`              | 132 tok/s           |       143 |
-| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable`              | 132 tok/s           |       281 |
-| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable`              | 131 tok/s           |       401 |
-| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 129 tok/s           |       148 |
-| [`mlx-community/SmolVLM-Instruct-bf16`](#model-mlx-community-smolvlm-instruct-bf16)                                     | `usable`              | 127 tok/s           |        63 |
-| [`HuggingFaceTB/SmolVLM-Instruct`](#model-huggingfacetb-smolvlm-instruct)                                               | `usable`              | 126 tok/s           |        63 |
-| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 122 tok/s           |       326 |
-| [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava)                                                                       | `usable`              | 116 tok/s           |        44 |
-| [`mlx-community/Qwen3.5-35B-A3B-6bit`](#model-mlx-community-qwen35-35b-a3b-6bit)                                        | `usable`              | 102 tok/s           |       299 |
-| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 100 tok/s           |       265 |
-| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable`              | 91.8 tok/s          |       205 |
-| [`jqlive/Kimi-VL-A3B-Thinking-2506-6bit`](#model-jqlive-kimi-vl-a3b-thinking-2506-6bit)                                 | `usable_with_caveats` | 77.6 tok/s          |       221 |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 69.1 tok/s          |       155 |
-| [`mlx-community/Qwen3.5-35B-A3B-bf16`](#model-mlx-community-qwen35-35b-a3b-bf16)                                        | `usable`              | 68.8 tok/s          |       299 |
-| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | 67.9 tok/s          |        89 |
-| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              | 67.4 tok/s          |       305 |
-| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable`              | 66.3 tok/s          |       104 |
+| [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)                                 | `usable`              | 131 tok/s           |       148 |
+| [`HuggingFaceTB/SmolVLM-Instruct`](#model-huggingfacetb-smolvlm-instruct)                                               | `usable`              | 128 tok/s           |        63 |
+| [`mlx-community/SmolVLM-Instruct-bf16`](#model-mlx-community-smolvlm-instruct-bf16)                                     | `usable`              | 125 tok/s           |        63 |
+| [`mlx-community/Qwen3-VL-2B-Thinking-bf16`](#model-mlx-community-qwen3-vl-2b-thinking-bf16)                             | `usable`              | 123 tok/s           |       401 |
+| [`mlx-community/Qwen3-VL-2B-Instruct-bf16`](#model-mlx-community-qwen3-vl-2b-instruct-bf16)                             | `usable`              | 121 tok/s           |       281 |
+| [`mlx-community/Qwen3.5-35B-A3B-4bit`](#model-mlx-community-qwen35-35b-a3b-4bit)                                        | `usable`              | 103 tok/s           |       326 |
+| [`mlx-community/Qwen3.5-9B-MLX-4bit`](#model-mlx-community-qwen35-9b-mlx-4bit)                                          | `usable`              | 98.9 tok/s          |       265 |
+| [`mlx-community/GLM-4.6V-Flash-mxfp4`](#model-mlx-community-glm-46v-flash-mxfp4)                                        | `usable`              | 91.7 tok/s          |       205 |
+| [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava)                                                                       | `usable`              | 91.0 tok/s          |        44 |
+| [`mlx-community/Qwen3.5-35B-A3B-6bit`](#model-mlx-community-qwen35-35b-a3b-6bit)                                        | `usable`              | 90.0 tok/s          |       299 |
+| [`jqlive/Kimi-VL-A3B-Thinking-2506-6bit`](#model-jqlive-kimi-vl-a3b-thinking-2506-6bit)                                 | `usable_with_caveats` | 78.0 tok/s          |       221 |
+| [`mlx-community/diffusiongemma-26B-A4B-it-mxfp8`](#model-mlx-community-diffusiongemma-26b-a4b-it-mxfp8)                 | `usable_with_caveats` | 71.7 tok/s          |        85 |
+| [`mlx-community/Qwen3.5-35B-A3B-bf16`](#model-mlx-community-qwen35-35b-a3b-bf16)                                        | `usable`              | 70.0 tok/s          |       299 |
+| [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)                                           | `usable`              | 66.1 tok/s          |       104 |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)         | `usable`              | 65.1 tok/s          |       155 |
 | [`mlx-community/GLM-4.6V-Flash-6bit`](#model-mlx-community-glm-46v-flash-6bit)                                          | `usable`              | 63.6 tok/s          |       197 |
-| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable`              | 63.0 tok/s          |       156 |
-| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `usable`              | 62.5 tok/s          |        82 |
-| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | 61.9 tok/s          |        20 |
-| [`microsoft/Phi-3.5-vision-instruct`](#model-microsoft-phi-35-vision-instruct)                                          | `usable`              | 60.9 tok/s          |        20 |
-| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable`              | 53.5 tok/s          |       174 |
-| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | 53.4 tok/s          |        88 |
-| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable`              | 52.5 tok/s          |       172 |
-| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `usable`              | 51.3 tok/s          |       301 |
-| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `usable`              | 48.4 tok/s          |       106 |
-| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | 43.7 tok/s          |       172 |
-| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | 40.2 tok/s          |       199 |
-| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | 34.1 tok/s          |        99 |
-| [`mlx-community/Qwen3.5-27B-4bit`](#model-mlx-community-qwen35-27b-4bit)                                                | `usable`              | 33.3 tok/s          |       315 |
-| [`mlx-community/paligemma2-10b-ft-docci-448-6bit`](#model-mlx-community-paligemma2-10b-ft-docci-448-6bit)               | `usable`              | 32.6 tok/s          |       180 |
-| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable_with_caveats` | 32.2 tok/s          |       354 |
-| [`mlx-community/InternVL3-14B-8bit`](#model-mlx-community-internvl3-14b-8bit)                                           | `usable`              | 32.1 tok/s          |        77 |
-| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable`              | 31.3 tok/s          |       107 |
-| [`mlx-community/Molmo-7B-D-0924-bf16`](#model-mlx-community-molmo-7b-d-0924-bf16)                                       | `usable`              | 30.9 tok/s          |       199 |
-| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | 29.8 tok/s          |       303 |
-| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 27.2 tok/s          |        98 |
-| [`mlx-community/pixtral-12b-bf16`](#model-mlx-community-pixtral-12b-bf16)                                               | `usable`              | 20.0 tok/s          |       204 |
-| [`mlx-community/paligemma2-3b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-3b-ft-docci-448-bf16)                 | `usable`              | 19.7 tok/s          |       126 |
-| [`mlx-community/Qwen3.5-27B-mxfp8`](#model-mlx-community-qwen35-27b-mxfp8)                                              | `usable`              | 18.3 tok/s          |       305 |
-| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 18.2 tok/s          |       283 |
-| [`mlx-community/gemma-3-27b-it-qat-8bit`](#model-mlx-community-gemma-3-27b-it-qat-8bit)                                 | `usable`              | 16.6 tok/s          |       289 |
-| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `usable`              | 16.6 tok/s          |       155 |
+| [`mlx-community/llava-v1.6-mistral-7b-8bit`](#model-mlx-community-llava-v16-mistral-7b-8bit)                            | `usable`              | 62.0 tok/s          |        82 |
+| [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)         | `usable`              | 60.0 tok/s          |       156 |
+| [`mlx-community/Ornith-1.0-35B-bf16`](#model-mlx-community-ornith-10-35b-bf16)                                          | `usable`              | 59.7 tok/s          |       305 |
+| [`mlx-community/diffusiongemma-26B-A4B-it-8bit`](#model-mlx-community-diffusiongemma-26b-a4b-it-8bit)                   | `usable_with_caveats` | 59.1 tok/s          |        88 |
+| [`mlx-community/Phi-3.5-vision-instruct-bf16`](#model-mlx-community-phi-35-vision-instruct-bf16)                        | `usable`              | 59.0 tok/s          |        20 |
+| [`microsoft/Phi-3.5-vision-instruct`](#model-microsoft-phi-35-vision-instruct)                                          | `usable`              | 51.9 tok/s          |        20 |
+| [`mlx-community/GLM-4.6V-nvfp4`](#model-mlx-community-glm-46v-nvfp4)                                                    | `usable`              | 51.3 tok/s          |       172 |
+| [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)                                       | `usable`              | 50.2 tok/s          |       174 |
+| [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)                                       | `usable`              | 48.2 tok/s          |       106 |
+| [`mlx-community/GLM-4.1V-9B-Thinking-8bit`](#model-mlx-community-glm-41v-9b-thinking-8bit)                              | `usable`              | 48.1 tok/s          |       301 |
+| [`mlx-community/Step-3.7-Flash-oQ2e`](#model-mlx-community-step-37-flash-oq2e)                                          | `usable`              | 47.2 tok/s          |       113 |
+| [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)                                               | `usable`              | 34.2 tok/s          |       199 |
+| [`mlx-community/paligemma2-10b-ft-docci-448-6bit`](#model-mlx-community-paligemma2-10b-ft-docci-448-6bit)               | `usable`              | 33.3 tok/s          |       180 |
+| [`mlx-community/InternVL3-8B-bf16`](#model-mlx-community-internvl3-8b-bf16)                                             | `usable`              | 32.3 tok/s          |        99 |
+| [`mlx-community/Idefics3-8B-Llama3-bf16`](#model-mlx-community-idefics3-8b-llama3-bf16)                                 | `usable_with_caveats` | 31.5 tok/s          |       354 |
+| [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)                                 | `usable`              | 30.5 tok/s          |       303 |
+| [`mlx-community/Qwen3.5-27B-4bit`](#model-mlx-community-qwen35-27b-4bit)                                                | `usable`              | 29.6 tok/s          |       315 |
+| [`mlx-community/Molmo-7B-D-0924-bf16`](#model-mlx-community-molmo-7b-d-0924-bf16)                                       | `usable`              | 29.5 tok/s          |       199 |
+| [`mlx-community/InternVL3-14B-8bit`](#model-mlx-community-internvl3-14b-8bit)                                           | `usable`              | 28.2 tok/s          |        77 |
+| [`mlx-community/gemma-4-31b-it-4bit`](#model-mlx-community-gemma-4-31b-it-4bit)                                         | `usable`              | 26.9 tok/s          |        98 |
+| [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit) | `usable`              | 25.1 tok/s          |       107 |
+| [`mlx-community/Qwen3.6-27B-mxfp8`](#model-mlx-community-qwen36-27b-mxfp8)                                              | `usable`              | 19.3 tok/s          |       283 |
+| [`mlx-community/paligemma2-3b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-3b-ft-docci-448-bf16)                 | `usable`              | 18.8 tok/s          |       126 |
+| [`mlx-community/pixtral-12b-bf16`](#model-mlx-community-pixtral-12b-bf16)                                               | `usable`              | 18.3 tok/s          |       204 |
+| [`mlx-community/Qwen3.5-27B-mxfp8`](#model-mlx-community-qwen35-27b-mxfp8)                                              | `usable`              | 17.2 tok/s          |       305 |
+| [`mlx-community/gemma-3-27b-it-qat-8bit`](#model-mlx-community-gemma-3-27b-it-qat-8bit)                                 | `usable`              | 17.0 tok/s          |       288 |
+| [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](#model-mlx-community-llama-32-11b-vision-instruct-8bit)            | `usable`              | 16.5 tok/s          |       155 |
 | [`mlx-community/MolmoPoint-8B-fp16`](#model-mlx-community-molmopoint-8b-fp16)                                           | `usable`              | 5.95 tok/s          |       158 |
-| [`mlx-community/paligemma2-10b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-10b-ft-docci-448-bf16)               | `usable`              | 5.41 tok/s          |       159 |
-| [`meta-llama/Llama-3.2-11B-Vision-Instruct`](#model-meta-llama-llama-32-11b-vision-instruct)                            | `usable`              | 5.06 tok/s          |       130 |
-| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable_with_caveats` | 4.7 tok/s           |       241 |
+| [`mlx-community/paligemma2-10b-ft-docci-448-bf16`](#model-mlx-community-paligemma2-10b-ft-docci-448-bf16)               | `usable`              | 5.34 tok/s          |       159 |
+| [`meta-llama/Llama-3.2-11B-Vision-Instruct`](#model-meta-llama-llama-32-11b-vision-instruct)                            | `usable`              | 4.96 tok/s          |       130 |
+| [`mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`](#model-mlx-community-kimi-vl-a3b-thinking-2506-bf16)                   | `usable_with_caveats` | 4.55 tok/s          |       241 |
 | [`mlx-community/gemma-4-31b-bf16`](#model-mlx-community-gemma-4-31b-bf16)                                               | `usable`              | insufficient sample |        15 |
 | [`mlx-community/paligemma2-3b-pt-896-4bit`](#model-mlx-community-paligemma2-3b-pt-896-4bit)                             | `usable_with_caveats` | insufficient sample |         2 |
 <!-- markdownlint-enable MD034 MD049 -->
@@ -238,11 +238,11 @@ Average valid generation throughput: 96.6 tok/s
 ## Run Stamps
 
 - `mlx-vlm`: `0.6.11`
-- `mlx`: `0.32.1.dev20260805+2c46b953d`
+- `mlx`: `0.32.1.dev20260807+8056817bd`
 - `mlx-lm`: `0.31.3`
 - `transformers`: `5.14.1`
 - `tokenizers`: `0.22.2`
-- `huggingface-hub`: `1.26.0`
+- `huggingface-hub`: `1.27.0`
 - *Python Version:* 3.13.13
 - *OS:* Darwin 25.6.0
 - *macOS Version:* 26.6
@@ -275,18 +275,18 @@ Complete generated or crash evidence for every attempted model.
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.68s
-- *Generation time:* 0.91s
-- *Total time:* 1.59s
-- *Input validation time:* 0.0016
-- *Prompt preparation time:* 0.00175
-- *First-token latency:* 0.365
-- *Cleanup time:* 0.0707
+- *Model load time:* 0.80s
+- *Generation time:* 0.92s
+- *Total time:* 1.72s
+- *Input validation time:* 0.00262
+- *Prompt preparation time:* 0.00176
+- *First-token latency:* 0.368
+- *Cleanup time:* 0.0631
 - *Prompt tokens:* 1,194
 - *Generation tokens:* 63
 - *Total tokens:* 1,257
-- *Prompt throughput (raw):* 3,267 tok/s
-- *Generation throughput (raw):* 126 tok/s
+- *Prompt throughput (raw):* 3,246 tok/s
+- *Generation throughput (raw):* 128 tok/s
 - *Peak memory:* 5.5
 - *Active memory:* 4.5
 - *Cache memory:* 0.30
@@ -338,18 +338,18 @@ Complete generated or crash evidence for every attempted model.
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.34s
-- *Generation time:* 0.36s
-- *Total time:* 0.70s
-- *Input validation time:* 0.00178
-- *Prompt preparation time:* 0.00549
-- *First-token latency:* 0.0215
-- *Cleanup time:* 0.0588
+- *Model load time:* 0.36s
+- *Generation time:* 0.37s
+- *Total time:* 0.73s
+- *Input validation time:* 0.00153
+- *Prompt preparation time:* 0.00537
+- *First-token latency:* 0.0224
+- *Cleanup time:* 0.0552
 - *Prompt tokens:* 78
 - *Generation tokens:* 169
 - *Total tokens:* 247
-- *Prompt throughput (raw):* 3,632 tok/s
-- *Generation throughput (raw):* 520 tok/s
+- *Prompt throughput (raw):* 3,487 tok/s
+- *Generation throughput (raw):* 523 tok/s
 - *Peak memory:* 1.0
 - *Active memory:* 0.90
 - *Cache memory:* 0.01
@@ -402,17 +402,17 @@ In this detailed photograph, two cats are lounging on a pink, wrinkled couch. Th
 - *Maintainer status:* none
 - *Observations:* none
 - *Model load time:* 0.68s
-- *Generation time:* 2.22s
-- *Total time:* 2.92s
-- *Input validation time:* 0.00149
-- *Prompt preparation time:* 0.00971
-- *First-token latency:* 0.0828
-- *Cleanup time:* 0.0742
+- *Generation time:* 2.18s
+- *Total time:* 2.87s
+- *Input validation time:* 0.00152
+- *Prompt preparation time:* 0.009
+- *First-token latency:* 0.0855
+- *Cleanup time:* 0.0657
 - *Prompt tokens:* 313
 - *Generation tokens:* 281
 - *Total tokens:* 594
-- *Prompt throughput (raw):* 3,778 tok/s
-- *Generation throughput (raw):* 133 tok/s
+- *Prompt throughput (raw):* 3,660 tok/s
+- *Generation throughput (raw):* 136 tok/s
 - *Peak memory:* 5.2
 - *Active memory:* 4.3
 - *Cache memory:* 0.10
@@ -488,18 +488,18 @@ This is a photograph of two cats resting on a bright pink couch. The scene is ca
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 2.19s
-- *Generation time:* 27.41s
-- *Total time:* 29.61s
-- *Input validation time:* 0.00201
-- *Prompt preparation time:* 0.00511
-- *First-token latency:* 1.68
-- *Cleanup time:* 0.0983
+- *Model load time:* 3.60s
+- *Generation time:* 30.12s
+- *Total time:* 33.74s
+- *Input validation time:* 0.00166
+- *Prompt preparation time:* 0.00498
+- *First-token latency:* 3.86
+- *Cleanup time:* 0.199
 - *Prompt tokens:* 15
 - *Generation tokens:* 130
 - *Total tokens:* 145
-- *Prompt throughput (raw):* 8.92 tok/s
-- *Generation throughput (raw):* 5.06 tok/s
+- *Prompt throughput (raw):* 3.89 tok/s
+- *Generation throughput (raw):* 4.96 tok/s
 - *Peak memory:* 25
 - *Active memory:* 21
 - *Cache memory:* 3.4
@@ -551,18 +551,18 @@ The image shows two cats lying on a pink blanket, with two remote controls place
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.99s
-- *Generation time:* 0.56s
-- *Total time:* 1.56s
-- *Input validation time:* 0.00166
-- *Prompt preparation time:* 0.000886
-- *First-token latency:* 0.218
-- *Cleanup time:* 0.0715
+- *Model load time:* 1.00s
+- *Generation time:* 0.68s
+- *Total time:* 1.69s
+- *Input validation time:* 0.00255
+- *Prompt preparation time:* 0.00116
+- *First-token latency:* 0.266
+- *Cleanup time:* 0.132
 - *Prompt tokens:* 768
 - *Generation tokens:* 20
 - *Total tokens:* 788
-- *Prompt throughput (raw):* 3,516 tok/s
-- *Generation throughput (raw):* 60.9 tok/s
+- *Prompt throughput (raw):* 2,883 tok/s
+- *Generation throughput (raw):* 51.9 tok/s
 - *Peak memory:* 9.3
 - *Active memory:* 8.3
 - *Cache memory:* 0.41
@@ -614,18 +614,18 @@ The image shows two cats lying on a pink couch with remote controls beside them.
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 2.24s
-- *Generation time:* 4.11s
-- *Total time:* 6.36s
-- *Input validation time:* 0.00163
-- *Prompt preparation time:* 0.00656
-- *First-token latency:* 0.67
-- *Cleanup time:* 0.0961
+- *Model load time:* 2.38s
+- *Generation time:* 5.11s
+- *Total time:* 7.51s
+- *Input validation time:* 0.00271
+- *Prompt preparation time:* 0.00928
+- *First-token latency:* 0.823
+- *Cleanup time:* 0.114
 - *Prompt tokens:* 439
 - *Generation tokens:* 107
 - *Total tokens:* 546
-- *Prompt throughput (raw):* 655 tok/s
-- *Generation throughput (raw):* 31.3 tok/s
+- *Prompt throughput (raw):* 533 tok/s
+- *Generation throughput (raw):* 25.1 tok/s
 - *Peak memory:* 20
 - *Active memory:* 18
 - *Cache memory:* 0.14
@@ -677,19 +677,19 @@ The image features two cats lying on a pink surface, likely a couch or bed. The 
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.61s
-- *Generation time:* 1.30s
-- *Total time:* 1.92s
-- *Input validation time:* 0.00184
-- *Prompt preparation time:* 0.00161
-- *First-token latency:* 0.0805
-- *Cleanup time:* 0.0708
+- *Model load time:* 0.78s
+- *Generation time:* 1.34s
+- *Total time:* 2.14s
+- *Input validation time:* 0.00528
+- *Prompt preparation time:* 0.00193
+- *First-token latency:* 0.0792
+- *Cleanup time:* 0.0818
 - *Prompt tokens:* 24
 - *Generation tokens:* 428
 - *Total tokens:* 452
-- *Prompt throughput (raw):* 298 tok/s
-- *Generation throughput (raw):* 360 tok/s
-- *Peak memory:* 2.2
+- *Prompt throughput (raw):* 303 tok/s
+- *Generation throughput (raw):* 351 tok/s
+- *Peak memory:* 2.0
 - *Active memory:* 1.2
 - *Cache memory:* 0.03
 - *Model-load active memory:* 1.25
@@ -760,18 +760,18 @@ In summary, the image shows two tabby cats lying on a pink couch, with their eye
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.64s
-- *Generation time:* 6.24s
-- *Total time:* 7.89s
-- *Input validation time:* 0.00172
-- *Prompt preparation time:* 0.00162
-- *First-token latency:* 0.356
-- *Cleanup time:* 0.0849
+- *Model load time:* 1.69s
+- *Generation time:* 6.65s
+- *Total time:* 8.35s
+- *Input validation time:* 0.00158
+- *Prompt preparation time:* 0.00169
+- *First-token latency:* 0.379
+- *Cleanup time:* 0.0865
 - *Prompt tokens:* 402
 - *Generation tokens:* 301
 - *Total tokens:* 703
-- *Prompt throughput (raw):* 1,130 tok/s
-- *Generation throughput (raw):* 51.3 tok/s
+- *Prompt throughput (raw):* 1,062 tok/s
+- *Generation throughput (raw):* 48.1 tok/s
 - *Peak memory:* 13
 - *Active memory:* 12
 - *Cache memory:* 0.04
@@ -823,17 +823,17 @@ In summary, the image shows two tabby cats lying on a pink couch, with their eye
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.40s
-- *Generation time:* 3.45s
-- *Total time:* 4.86s
-- *Input validation time:* 0.0018
-- *Prompt preparation time:* 0.00665
-- *First-token latency:* 0.338
-- *Cleanup time:* 0.0849
+- *Model load time:* 1.47s
+- *Generation time:* 3.46s
+- *Total time:* 4.94s
+- *Input validation time:* 0.00159
+- *Prompt preparation time:* 0.00674
+- *First-token latency:* 0.349
+- *Cleanup time:* 0.0873
 - *Prompt tokens:* 406
 - *Generation tokens:* 197
 - *Total tokens:* 603
-- *Prompt throughput (raw):* 1,200 tok/s
+- *Prompt throughput (raw):* 1,163 tok/s
 - *Generation throughput (raw):* 63.6 tok/s
 - *Peak memory:* 10
 - *Active memory:* 9.4
@@ -902,18 +902,18 @@ The overall scene is cozy and relaxed, with the cats appearing comfortable and a
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.28s
-- *Generation time:* 2.54s
-- *Total time:* 3.82s
-- *Input validation time:* 0.00171
-- *Prompt preparation time:* 0.000213
-- *First-token latency:* 0.297
-- *Cleanup time:* 0.079
+- *Model load time:* 1.29s
+- *Generation time:* 2.55s
+- *Total time:* 3.84s
+- *Input validation time:* 0.00173
+- *Prompt preparation time:* 0.00023
+- *First-token latency:* 0.3
+- *Cleanup time:* 0.0799
 - *Prompt tokens:* 406
 - *Generation tokens:* 205
 - *Total tokens:* 611
-- *Prompt throughput (raw):* 1,367 tok/s
-- *Generation throughput (raw):* 91.8 tok/s
+- *Prompt throughput (raw):* 1,354 tok/s
+- *Generation throughput (raw):* 91.7 tok/s
 - *Peak memory:* 7.7
 - *Active memory:* 6.8
 - *Cache memory:* 0.05
@@ -981,18 +981,18 @@ The overall scene conveys a sense of calm and domestic comfort, with the two cat
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 6.92s
-- *Generation time:* 7.12s
-- *Total time:* 14.05s
-- *Input validation time:* 0.00161
-- *Prompt preparation time:* 0.00685
-- *First-token latency:* 3.83
-- *Cleanup time:* 0.228
+- *Model load time:* 9.86s
+- *Generation time:* 11.61s
+- *Total time:* 21.49s
+- *Input validation time:* 0.00162
+- *Prompt preparation time:* 0.00711
+- *First-token latency:* 8.25
+- *Cleanup time:* 0.251
 - *Prompt tokens:* 406
 - *Generation tokens:* 172
 - *Total tokens:* 578
-- *Prompt throughput (raw):* 106 tok/s
-- *Generation throughput (raw):* 52.5 tok/s
+- *Prompt throughput (raw):* 49.2 tok/s
+- *Generation throughput (raw):* 51.3 tok/s
 - *Peak memory:* 63
 - *Active memory:* 62
 - *Cache memory:* 0.16
@@ -1044,18 +1044,18 @@ The image shows two tabby cats resting on a bright pink blanket spread over a re
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.63s
-- *Generation time:* 4.88s
-- *Total time:* 6.53s
-- *Input validation time:* 0.00162
-- *Prompt preparation time:* 0.00177
-- *First-token latency:* 2.45
-- *Cleanup time:* 0.106
+- *Model load time:* 2.99s
+- *Generation time:* 5.19s
+- *Total time:* 8.20s
+- *Input validation time:* 0.00218
+- *Prompt preparation time:* 0.00215
+- *First-token latency:* 2.43
+- *Cleanup time:* 0.137
 - *Prompt tokens:* 3,340
 - *Generation tokens:* 77
 - *Total tokens:* 3,417
-- *Prompt throughput (raw):* 1,363 tok/s
-- *Generation throughput (raw):* 32.1 tok/s
+- *Prompt throughput (raw):* 1,377 tok/s
+- *Generation throughput (raw):* 28.2 tok/s
 - *Peak memory:* 19
 - *Active memory:* 16
 - *Cache memory:* 0.78
@@ -1107,18 +1107,18 @@ The image shows two cats lying on a pink blanket on a red couch. Both cats are s
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.61s
-- *Generation time:* 4.20s
-- *Total time:* 5.82s
-- *Input validation time:* 0.00165
-- *Prompt preparation time:* 0.000181
+- *Model load time:* 1.79s
+- *Generation time:* 4.38s
+- *Total time:* 6.18s
+- *Input validation time:* 0.00246
+- *Prompt preparation time:* 0.000276
 - *First-token latency:* 1.27
-- *Cleanup time:* 0.104
+- *Cleanup time:* 0.122
 - *Prompt tokens:* 3,340
 - *Generation tokens:* 99
 - *Total tokens:* 3,439
-- *Prompt throughput (raw):* 2,631 tok/s
-- *Generation throughput (raw):* 34.1 tok/s
+- *Prompt throughput (raw):* 2,626 tok/s
+- *Generation throughput (raw):* 32.3 tok/s
 - *Peak memory:* 18
 - *Active memory:* 16
 - *Cache memory:* 0.26
@@ -1171,17 +1171,17 @@ The image shows two cats sleeping on a pink blanket. The cat on the left is a sm
 - *Maintainer status:* none
 - *Observations:* none
 - *Model load time:* 0.56s
-- *Generation time:* 0.40s
-- *Total time:* 0.97s
-- *Input validation time:* 0.00201
-- *Prompt preparation time:* 0.00113
-- *First-token latency:* 0.0679
-- *Cleanup time:* 0.0673
+- *Generation time:* 0.42s
+- *Total time:* 0.98s
+- *Input validation time:* 0.0027
+- *Prompt preparation time:* 0.0012
+- *First-token latency:* 0.0657
+- *Cleanup time:* 0.0755
 - *Prompt tokens:* 267
 - *Generation tokens:* 103
 - *Total tokens:* 370
-- *Prompt throughput (raw):* 3,931 tok/s
-- *Generation throughput (raw):* 330 tok/s
+- *Prompt throughput (raw):* 4,065 tok/s
+- *Generation throughput (raw):* 315 tok/s
 - *Peak memory:* 3.0
 - *Active memory:* 2.1
 - *Cache memory:* 0.02
@@ -1233,18 +1233,18 @@ The image depicts two cats lying on a bright pink blanket, which is spread over 
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.58s
-- *Generation time:* 0.68s
-- *Total time:* 1.26s
-- *Input validation time:* 0.00179
-- *Prompt preparation time:* 0.00333
-- *First-token latency:* 0.0683
-- *Cleanup time:* 0.0673
+- *Model load time:* 0.61s
+- *Generation time:* 0.70s
+- *Total time:* 1.31s
+- *Input validation time:* 0.00184
+- *Prompt preparation time:* 0.00421
+- *First-token latency:* 0.0718
+- *Cleanup time:* 0.0836
 - *Prompt tokens:* 267
 - *Generation tokens:* 108
 - *Total tokens:* 375
-- *Prompt throughput (raw):* 3,907 tok/s
-- *Generation throughput (raw):* 186 tok/s
+- *Prompt throughput (raw):* 3,716 tok/s
+- *Generation throughput (raw):* 185 tok/s
 - *Peak memory:* 4.1
 - *Active memory:* 3.2
 - *Cache memory:* 0.01
@@ -1296,18 +1296,18 @@ The image depicts two cats lying on a pink blanket spread over a red couch. The 
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.46s
-- *Generation time:* 10.75s
-- *Total time:* 12.22s
-- *Input validation time:* 0.00156
-- *Prompt preparation time:* 0.00131
-- *First-token latency:* 1.4
-- *Cleanup time:* 0.0895
+- *Model load time:* 1.58s
+- *Generation time:* 10.86s
+- *Total time:* 12.45s
+- *Input validation time:* 0.00175
+- *Prompt preparation time:* 0.0013
+- *First-token latency:* 1.45
+- *Cleanup time:* 0.13
 - *Prompt tokens:* 14
 - *Generation tokens:* 155
 - *Total tokens:* 169
-- *Prompt throughput (raw):* 10.0 tok/s
-- *Generation throughput (raw):* 16.6 tok/s
+- *Prompt throughput (raw):* 9.64 tok/s
+- *Generation throughput (raw):* 16.5 tok/s
 - *Peak memory:* 15
 - *Active memory:* 11
 - *Cache memory:* 0.52
@@ -1359,21 +1359,21 @@ The image shows two cats lying on a pink blanket, with two remote controls place
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.89s
-- *Generation time:* 0.53s
-- *Total time:* 1.44s
-- *Input validation time:* 0.00178
-- *Prompt preparation time:* 0.00795
-- *First-token latency:* 0.105
-- *Cleanup time:* 0.0795
+- *Model load time:* 0.93s
+- *Generation time:* 0.59s
+- *Total time:* 1.54s
+- *Input validation time:* 0.00207
+- *Prompt preparation time:* 0.00834
+- *First-token latency:* 0.103
+- *Cleanup time:* 0.108
 - *Prompt tokens:* 226
 - *Generation tokens:* 112
 - *Total tokens:* 338
-- *Prompt throughput (raw):* 2,145 tok/s
-- *Generation throughput (raw):* 285 tok/s
+- *Prompt throughput (raw):* 2,197 tok/s
+- *Generation throughput (raw):* 252 tok/s
 - *Peak memory:* 3.0
 - *Active memory:* 2.3
-- *Cache memory:* 0.05
+- *Cache memory:* 0.04
 - *Model-load active memory:* 2.32
 - *Post-cleanup active memory:* 0.00767
 - *Post-cleanup cache memory:* 0.0
@@ -1422,18 +1422,18 @@ The image shows two tabby cats resting comfortably on a bright pink blanket or c
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.32s
-- *Generation time:* 2.92s
-- *Total time:* 4.26s
-- *Input validation time:* 0.00175
-- *Prompt preparation time:* 0.00648
-- *First-token latency:* 0.665
-- *Cleanup time:* 0.0831
+- *Model load time:* 1.48s
+- *Generation time:* 3.12s
+- *Total time:* 4.62s
+- *Input validation time:* 0.00196
+- *Prompt preparation time:* 0.00761
+- *First-token latency:* 0.725
+- *Cleanup time:* 0.118
 - *Prompt tokens:* 972
 - *Generation tokens:* 155
 - *Total tokens:* 1,127
-- *Prompt throughput (raw):* 1,461 tok/s
-- *Generation throughput (raw):* 69.1 tok/s
+- *Prompt throughput (raw):* 1,341 tok/s
+- *Generation throughput (raw):* 65.1 tok/s
 - *Peak memory:* 9.8
 - *Active memory:* 8.0
 - *Cache memory:* 0.23
@@ -1495,18 +1495,18 @@ In the background, there are two remote controls placed on either side of the ca
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.43s
-- *Generation time:* 3.25s
-- *Total time:* 4.68s
-- *Input validation time:* 0.00161
-- *Prompt preparation time:* 0.00025
-- *First-token latency:* 0.76
-- *Cleanup time:* 0.0824
+- *Model load time:* 1.38s
+- *Generation time:* 3.41s
+- *Total time:* 4.80s
+- *Input validation time:* 0.00295
+- *Prompt preparation time:* 0.000242
+- *First-token latency:* 0.797
+- *Cleanup time:* 0.116
 - *Prompt tokens:* 972
 - *Generation tokens:* 156
 - *Total tokens:* 1,128
-- *Prompt throughput (raw):* 1,280 tok/s
-- *Generation throughput (raw):* 63.0 tok/s
+- *Prompt throughput (raw):* 1,219 tok/s
+- *Generation throughput (raw):* 60.0 tok/s
 - *Peak memory:* 10
 - *Active memory:* 8.4
 - *Cache memory:* 0.23
@@ -1570,18 +1570,18 @@ Both cats seem to be enjoying their time, perhaps watching something on a televi
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.93s
-- *Generation time:* 1.27s
-- *Total time:* 2.21s
-- *Input validation time:* 0.00163
-- *Prompt preparation time:* 0.00635
-- *First-token latency:* 0.281
-- *Cleanup time:* 0.0717
+- *Model load time:* 0.98s
+- *Generation time:* 1.28s
+- *Total time:* 2.27s
+- *Input validation time:* 0.0018
+- *Prompt preparation time:* 0.00817
+- *First-token latency:* 0.313
+- *Cleanup time:* 0.112
 - *Prompt tokens:* 971
 - *Generation tokens:* 178
 - *Total tokens:* 1,149
-- *Prompt throughput (raw):* 3,456 tok/s
-- *Generation throughput (raw):* 187 tok/s
+- *Prompt throughput (raw):* 3,103 tok/s
+- *Generation throughput (raw):* 188 tok/s
 - *Peak memory:* 4.5
 - *Active memory:* 2.8
 - *Cache memory:* 0.16
@@ -1645,18 +1645,18 @@ Both cats are positioned near what look like remote controls, suggesting a cozy,
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.29s
-- *Generation time:* 3.68s
-- *Total time:* 4.98s
-- *Input validation time:* 0.00156
-- *Prompt preparation time:* 0.00132
-- *First-token latency:* 0.399
-- *Cleanup time:* 0.0836
+- *Model load time:* 1.30s
+- *Generation time:* 3.91s
+- *Total time:* 5.22s
+- *Input validation time:* 0.00259
+- *Prompt preparation time:* 0.0014
+- *First-token latency:* 0.417
+- *Cleanup time:* 0.11
 - *Prompt tokens:* 747
 - *Generation tokens:* 174
 - *Total tokens:* 921
-- *Prompt throughput (raw):* 1,872 tok/s
-- *Generation throughput (raw):* 53.5 tok/s
+- *Prompt throughput (raw):* 1,792 tok/s
+- *Generation throughput (raw):* 50.2 tok/s
 - *Peak memory:* 11
 - *Active memory:* 9.0
 - *Cache memory:* 0.08
@@ -1708,18 +1708,18 @@ Both cats are positioned near what look like remote controls, suggesting a cozy,
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.68s
-- *Generation time:* 6.89s
-- *Total time:* 8.58s
-- *Input validation time:* 0.00158
-- *Prompt preparation time:* 0.00123
-- *First-token latency:* 0.424
-- *Cleanup time:* 0.105
+- *Model load time:* 1.85s
+- *Generation time:* 7.24s
+- *Total time:* 9.10s
+- *Input validation time:* 0.00209
+- *Prompt preparation time:* 0.00154
+- *First-token latency:* 0.465
+- *Cleanup time:* 0.134
 - *Prompt tokens:* 747
 - *Generation tokens:* 199
 - *Total tokens:* 946
-- *Prompt throughput (raw):* 1,760 tok/s
-- *Generation throughput (raw):* 30.9 tok/s
+- *Prompt throughput (raw):* 1,607 tok/s
+- *Generation throughput (raw):* 29.5 tok/s
 - *Peak memory:* 18
 - *Active memory:* 16
 - *Cache memory:* 0.08
@@ -1771,17 +1771,17 @@ Both cats are positioned near what look like remote controls, suggesting a cozy,
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 2.22s
-- *Generation time:* 27.46s
-- *Total time:* 29.69s
-- *Input validation time:* 0.00164
-- *Prompt preparation time:* 0.00487
-- *First-token latency:* 0.765
-- *Cleanup time:* 0.0965
+- *Model load time:* 2.29s
+- *Generation time:* 27.51s
+- *Total time:* 29.82s
+- *Input validation time:* 0.00276
+- *Prompt preparation time:* 0.00513
+- *First-token latency:* 0.786
+- *Cleanup time:* 0.138
 - *Prompt tokens:* 764
 - *Generation tokens:* 158
 - *Total tokens:* 922
-- *Prompt throughput (raw):* 999 tok/s
+- *Prompt throughput (raw):* 972 tok/s
 - *Generation throughput (raw):* 5.95 tok/s
 - *Peak memory:* 23
 - *Active memory:* 19
@@ -1834,18 +1834,18 @@ In this detailed photograph, two cats are peacefully sleeping on a pink blanket 
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 10.05s
-- *Generation time:* 10.21s
-- *Total time:* 20.28s
-- *Input validation time:* 0.00164
-- *Prompt preparation time:* 0.0133
-- *First-token latency:* 5.67
-- *Cleanup time:* 0.279
+- *Model load time:* 13.35s
+- *Generation time:* 13.38s
+- *Total time:* 26.76s
+- *Input validation time:* 0.0018
+- *Prompt preparation time:* 0.0148
+- *First-token latency:* 8.26
+- *Cleanup time:* 0.292
 - *Prompt tokens:* 317
 - *Generation tokens:* 305
 - *Total tokens:* 622
-- *Prompt throughput (raw):* 55.9 tok/s
-- *Generation throughput (raw):* 67.4 tok/s
+- *Prompt throughput (raw):* 38.4 tok/s
+- *Generation throughput (raw):* 59.7 tok/s
 - *Peak memory:* 71
 - *Active memory:* 70
 - *Cache memory:* 0.10
@@ -1927,18 +1927,18 @@ It’s a charming snapshot of domestic life — cats napping together on a color
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.00s
-- *Generation time:* 0.58s
-- *Total time:* 1.58s
-- *Input validation time:* 0.00474
-- *Prompt preparation time:* 0.000826
-- *First-token latency:* 0.238
-- *Cleanup time:* 0.0806
+- *Model load time:* 0.96s
+- *Generation time:* 0.62s
+- *Total time:* 1.59s
+- *Input validation time:* 0.00194
+- *Prompt preparation time:* 0.000994
+- *First-token latency:* 0.259
+- *Cleanup time:* 0.124
 - *Prompt tokens:* 768
 - *Generation tokens:* 20
 - *Total tokens:* 788
-- *Prompt throughput (raw):* 3,228 tok/s
-- *Generation throughput (raw):* 61.9 tok/s
+- *Prompt throughput (raw):* 2,964 tok/s
+- *Generation throughput (raw):* 59.0 tok/s
 - *Peak memory:* 9.3
 - *Active memory:* 8.3
 - *Cache memory:* 0.41
@@ -1990,18 +1990,18 @@ The image shows two cats lying on a pink couch with remote controls beside them.
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.52s
-- *Generation time:* 0.37s
-- *Total time:* 0.90s
-- *Input validation time:* 0.00152
-- *Prompt preparation time:* 0.0033
-- *First-token latency:* 0.14
-- *Cleanup time:* 0.0733
+- *Model load time:* 0.59s
+- *Generation time:* 0.38s
+- *Total time:* 0.98s
+- *Input validation time:* 0.002
+- *Prompt preparation time:* 0.00349
+- *First-token latency:* 0.141
+- *Cleanup time:* 0.0825
 - *Prompt tokens:* 415
 - *Generation tokens:* 69
 - *Total tokens:* 484
-- *Prompt throughput (raw):* 2,960 tok/s
-- *Generation throughput (raw):* 331 tok/s
+- *Prompt throughput (raw):* 2,937 tok/s
+- *Generation throughput (raw):* 317 tok/s
 - *Peak memory:* 2.5
 - *Active memory:* 1.3
 - *Cache memory:* 0.03
@@ -2053,19 +2053,19 @@ In the image, there are two cats lying on a pink blanket. One cat is on the left
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.86s
-- *Generation time:* 2.25s
-- *Total time:* 3.12s
-- *Input validation time:* 0.00155
-- *Prompt preparation time:* 0.000204
-- *First-token latency:* 0.0824
-- *Cleanup time:* 0.078
+- *Model load time:* 0.72s
+- *Generation time:* 2.44s
+- *Total time:* 3.17s
+- *Input validation time:* 0.0016
+- *Prompt preparation time:* 0.000212
+- *First-token latency:* 0.0844
+- *Cleanup time:* 0.0929
 - *Prompt tokens:* 313
 - *Generation tokens:* 281
 - *Total tokens:* 594
-- *Prompt throughput (raw):* 3,797 tok/s
-- *Generation throughput (raw):* 132 tok/s
-- *Peak memory:* 5.3
+- *Prompt throughput (raw):* 3,707 tok/s
+- *Generation throughput (raw):* 121 tok/s
+- *Peak memory:* 5.2
 - *Active memory:* 4.3
 - *Cache memory:* 0.10
 - *Model-load active memory:* 4.27
@@ -2140,18 +2140,18 @@ This is a photograph of two cats resting on a bright pink couch. The scene is ca
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.83s
-- *Generation time:* 3.19s
-- *Total time:* 4.03s
-- *Input validation time:* 0.00173
-- *Prompt preparation time:* 0.0109
-- *First-token latency:* 0.0825
-- *Cleanup time:* 0.0767
+- *Model load time:* 0.81s
+- *Generation time:* 3.38s
+- *Total time:* 4.21s
+- *Input validation time:* 0.0017
+- *Prompt preparation time:* 0.0115
+- *First-token latency:* 0.0799
+- *Cleanup time:* 0.0872
 - *Prompt tokens:* 315
 - *Generation tokens:* 401
 - *Total tokens:* 716
-- *Prompt throughput (raw):* 3,817 tok/s
-- *Generation throughput (raw):* 131 tok/s
+- *Prompt throughput (raw):* 3,944 tok/s
+- *Generation throughput (raw):* 123 tok/s
 - *Peak memory:* 5.3
 - *Active memory:* 4.3
 - *Cache memory:* 0.10
@@ -2209,18 +2209,18 @@ The image depicts two tabby cats resting on a vibrant pink couch. Both cats are 
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 2.21s
-- *Generation time:* 10.08s
-- *Total time:* 12.32s
-- *Input validation time:* 0.00169
-- *Prompt preparation time:* 0.0139
-- *First-token latency:* 0.604
-- *Cleanup time:* 0.11
+- *Model load time:* 2.26s
+- *Generation time:* 11.33s
+- *Total time:* 13.62s
+- *Input validation time:* 0.00187
+- *Prompt preparation time:* 0.0169
+- *First-token latency:* 0.656
+- *Cleanup time:* 0.155
 - *Prompt tokens:* 317
 - *Generation tokens:* 315
 - *Total tokens:* 632
-- *Prompt throughput (raw):* 525 tok/s
-- *Generation throughput (raw):* 33.3 tok/s
+- *Prompt throughput (raw):* 483 tok/s
+- *Generation throughput (raw):* 29.6 tok/s
 - *Peak memory:* 19
 - *Active memory:* 18
 - *Cache memory:* 0.24
@@ -2292,18 +2292,18 @@ It’s a delightful moment captured — two cats, two remotes, and a splash of p
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 3.21s
-- *Generation time:* 17.41s
-- *Total time:* 20.65s
-- *Input validation time:* 0.00174
-- *Prompt preparation time:* 0.0148
-- *First-token latency:* 0.705
-- *Cleanup time:* 0.129
+- *Model load time:* 3.23s
+- *Generation time:* 18.51s
+- *Total time:* 21.77s
+- *Input validation time:* 0.0022
+- *Prompt preparation time:* 0.0151
+- *First-token latency:* 0.736
+- *Cleanup time:* 0.179
 - *Prompt tokens:* 317
 - *Generation tokens:* 305
 - *Total tokens:* 622
-- *Prompt throughput (raw):* 450 tok/s
-- *Generation throughput (raw):* 18.3 tok/s
+- *Prompt throughput (raw):* 431 tok/s
+- *Generation throughput (raw):* 17.2 tok/s
 - *Peak memory:* 30
 - *Active memory:* 29
 - *Cache memory:* 0.23
@@ -2385,18 +2385,18 @@ Overall, the image conveys a sense of comfort, tranquility, and feline companion
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 2.51s
-- *Generation time:* 3.06s
-- *Total time:* 5.59s
-- *Input validation time:* 0.00179
-- *Prompt preparation time:* 0.00025
-- *First-token latency:* 0.378
-- *Cleanup time:* 0.12
+- *Model load time:* 2.65s
+- *Generation time:* 3.58s
+- *Total time:* 6.23s
+- *Input validation time:* 0.0022
+- *Prompt preparation time:* 0.000262
+- *First-token latency:* 0.396
+- *Cleanup time:* 0.122
 - *Prompt tokens:* 317
 - *Generation tokens:* 326
 - *Total tokens:* 643
-- *Prompt throughput (raw):* 839 tok/s
-- *Generation throughput (raw):* 122 tok/s
+- *Prompt throughput (raw):* 801 tok/s
+- *Generation throughput (raw):* 103 tok/s
 - *Peak memory:* 21
 - *Active memory:* 21
 - *Cache memory:* 0.10
@@ -2476,21 +2476,21 @@ Overall, it’s a charming snapshot of feline relaxation — perfect for anyone 
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 3.28s
-- *Generation time:* 3.39s
-- *Total time:* 6.68s
-- *Input validation time:* 0.00165
-- *Prompt preparation time:* 0.000244
-- *First-token latency:* 0.445
-- *Cleanup time:* 0.134
+- *Model load time:* 3.34s
+- *Generation time:* 3.81s
+- *Total time:* 7.16s
+- *Input validation time:* 0.0017
+- *Prompt preparation time:* 0.000305
+- *First-token latency:* 0.478
+- *Cleanup time:* 0.146
 - *Prompt tokens:* 317
 - *Generation tokens:* 299
 - *Total tokens:* 616
-- *Prompt throughput (raw):* 712 tok/s
-- *Generation throughput (raw):* 102 tok/s
+- *Prompt throughput (raw):* 663 tok/s
+- *Generation throughput (raw):* 90.0 tok/s
 - *Peak memory:* 30
 - *Active memory:* 30
-- *Cache memory:* 0.10
+- *Cache memory:* 0.09
 - *Model-load active memory:* 29.1
 - *Post-cleanup active memory:* 0.0132
 - *Post-cleanup cache memory:* 0.0
@@ -2569,18 +2569,18 @@ Overall, it’s a charming snapshot of feline relaxation and domestic peace.
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 9.17s
-- *Generation time:* 9.61s
-- *Total time:* 18.79s
-- *Input validation time:* 0.00182
-- *Prompt preparation time:* 0.00026
-- *First-token latency:* 5.25
-- *Cleanup time:* 0.257
+- *Model load time:* 9.82s
+- *Generation time:* 9.96s
+- *Total time:* 19.80s
+- *Input validation time:* 0.00196
+- *Prompt preparation time:* 0.000293
+- *First-token latency:* 5.67
+- *Cleanup time:* 0.281
 - *Prompt tokens:* 317
 - *Generation tokens:* 299
 - *Total tokens:* 616
-- *Prompt throughput (raw):* 60.4 tok/s
-- *Generation throughput (raw):* 68.8 tok/s
+- *Prompt throughput (raw):* 55.9 tok/s
+- *Generation throughput (raw):* 70.0 tok/s
 - *Peak memory:* 71
 - *Active memory:* 70
 - *Cache memory:* 0.10
@@ -2666,18 +2666,18 @@ The overall mood of the image is warm, relaxed, and domestic — capturing a qui
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.40s
-- *Generation time:* 2.93s
-- *Total time:* 4.34s
-- *Input validation time:* 0.00166
-- *Prompt preparation time:* 0.000241
-- *First-token latency:* 0.225
-- *Cleanup time:* 0.083
+- *Model load time:* 1.38s
+- *Generation time:* 2.96s
+- *Total time:* 4.35s
+- *Input validation time:* 0.00457
+- *Prompt preparation time:* 0.000263
+- *First-token latency:* 0.222
+- *Cleanup time:* 0.108
 - *Prompt tokens:* 317
 - *Generation tokens:* 265
 - *Total tokens:* 582
-- *Prompt throughput (raw):* 1,406 tok/s
-- *Generation throughput (raw):* 100 tok/s
+- *Prompt throughput (raw):* 1,427 tok/s
+- *Generation throughput (raw):* 98.9 tok/s
 - *Peak memory:* 7.0
 - *Active memory:* 6.7
 - *Cache memory:* 0.11
@@ -2757,18 +2757,18 @@ It’s a charming snapshot of everyday pet life, filled with warmth and simplici
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 3.08s
-- *Generation time:* 16.29s
-- *Total time:* 19.39s
-- *Input validation time:* 0.00179
-- *Prompt preparation time:* 0.0139
-- *First-token latency:* 0.687
-- *Cleanup time:* 0.13
+- *Model load time:* 3.05s
+- *Generation time:* 15.38s
+- *Total time:* 18.45s
+- *Input validation time:* 0.00161
+- *Prompt preparation time:* 0.0143
+- *First-token latency:* 0.695
+- *Cleanup time:* 0.131
 - *Prompt tokens:* 317
 - *Generation tokens:* 283
 - *Total tokens:* 600
-- *Prompt throughput (raw):* 461 tok/s
-- *Generation throughput (raw):* 18.2 tok/s
+- *Prompt throughput (raw):* 456 tok/s
+- *Generation throughput (raw):* 19.3 tok/s
 - *Peak memory:* 30
 - *Active memory:* 29
 - *Cache memory:* 0.23
@@ -2840,18 +2840,18 @@ Overall, it’s a charming snapshot of feline relaxation in a colorful, everyday
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.60s
-- *Generation time:* 0.98s
+- *Model load time:* 0.64s
+- *Generation time:* 0.94s
 - *Total time:* 1.58s
-- *Input validation time:* 0.00167
-- *Prompt preparation time:* 0.00115
-- *First-token latency:* 0.405
-- *Cleanup time:* 0.077
+- *Input validation time:* 0.00166
+- *Prompt preparation time:* 0.0012
+- *First-token latency:* 0.352
+- *Cleanup time:* 0.0766
 - *Prompt tokens:* 1,194
 - *Generation tokens:* 63
 - *Total tokens:* 1,257
-- *Prompt throughput (raw):* 2,945 tok/s
-- *Generation throughput (raw):* 127 tok/s
+- *Prompt throughput (raw):* 3,391 tok/s
+- *Generation throughput (raw):* 125 tok/s
 - *Peak memory:* 5.5
 - *Active memory:* 4.5
 - *Cache memory:* 0.30
@@ -2903,17 +2903,17 @@ Overall, it’s a charming snapshot of feline relaxation in a colorful, everyday
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.60s
-- *Generation time:* 1.43s
-- *Total time:* 2.04s
-- *Input validation time:* 0.0016
-- *Prompt preparation time:* 0.000945
-- *First-token latency:* 0.278
-- *Cleanup time:* 0.0728
+- *Model load time:* 0.65s
+- *Generation time:* 1.44s
+- *Total time:* 2.09s
+- *Input validation time:* 0.00161
+- *Prompt preparation time:* 0.000956
+- *First-token latency:* 0.276
+- *Cleanup time:* 0.0727
 - *Prompt tokens:* 95
 - *Generation tokens:* 143
 - *Total tokens:* 238
-- *Prompt throughput (raw):* 342 tok/s
+- *Prompt throughput (raw):* 344 tok/s
 - *Generation throughput (raw):* 132 tok/s
 - *Peak memory:* 5.5
 - *Active memory:* 4.5
@@ -2966,18 +2966,18 @@ Overall, it’s a charming snapshot of feline relaxation in a colorful, everyday
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 6.57s
-- *Generation time:* 7.91s
-- *Total time:* 14.50s
-- *Input validation time:* 0.00173
-- *Prompt preparation time:* 0.0133
-- *First-token latency:* 3.91
-- *Cleanup time:* 0.228
+- *Model load time:* 6.96s
+- *Generation time:* 6.84s
+- *Total time:* 13.82s
+- *Input validation time:* 0.00161
+- *Prompt preparation time:* 0.0135
+- *First-token latency:* 4.38
+- *Cleanup time:* 0.237
 - *Prompt tokens:* 188
-- *Generation tokens:* 172
-- *Total tokens:* 360
-- *Prompt throughput (raw):* 48.1 tok/s
-- *Generation throughput (raw):* 43.7 tok/s
+- *Generation tokens:* 113
+- *Total tokens:* 301
+- *Prompt throughput (raw):* 42.9 tok/s
+- *Generation throughput (raw):* 47.2 tok/s
 - *Peak memory:* 65
 - *Active memory:* 63
 - *Cache memory:* 0.10
@@ -3002,14 +3002,14 @@ Overall, it’s a charming snapshot of feline relaxation in a colorful, everyday
 *Readable output:*
 
 <pre class="model-output-readable">
-The image shows two cats sleeping on a pink blanket or sheet. The cat on the left is a tabby cat with a green collar, lying on its side with its head resting on a folded part of the blanket. The cat on the right is a larger tabby cat, also lying on its side, facing the same direction as the smaller cat. Both cats appear to be in a relaxed, sleeping state. There are two remote controls placed near the cats, one on each side of them. The remote on the left is a standard TV remote with multiple buttons, and the one on the right is a simpler, white remote with fewer buttons. The background includes a red cushion or sofa behind the cats, adding a contrasting color to the scene. The overall atmosphere is calm and cozy, with the cats seemingly comfortable and at ease in their resting positions.
+The image shows two cats sleeping on a pink blanket or sheet. The cat on the left is a tabby cat with a green collar, lying on its side with its head resting on a folded part of the blanket. The cat on the right is a larger tabby cat, also sleeping on its side, facing the left cat. There are two remote controls placed near the cats, one on each side of them. The background includes a red cushion or sofa behind the pink blanket. The scene is cozy and domestic, with the cats appearing relaxed and comfortable.
 </pre>
 
 <details>
 <summary>Exact raw output</summary>
 
 ```text
-The image shows two cats sleeping on a pink blanket or sheet. The cat on the left is a tabby cat with a green collar, lying on its side with its head resting on a folded part of the blanket. The cat on the right is a larger tabby cat, also lying on its side, facing the same direction as the smaller cat. Both cats appear to be in a relaxed, sleeping state. There are two remote controls placed near the cats, one on each side of them. The remote on the left is a standard TV remote with multiple buttons, and the one on the right is a simpler, white remote with fewer buttons. The background includes a red cushion or sofa behind the cats, adding a contrasting color to the scene. The overall atmosphere is calm and cozy, with the cats seemingly comfortable and at ease in their resting positions.
+The image shows two cats sleeping on a pink blanket or sheet. The cat on the left is a tabby cat with a green collar, lying on its side with its head resting on a folded part of the blanket. The cat on the right is a larger tabby cat, also sleeping on its side, facing the left cat. There are two remote controls placed near the cats, one on each side of them. The background includes a red cushion or sofa behind the pink blanket. The scene is cozy and domestic, with the cats appearing relaxed and comfortable.
 ```
 
 </details>
@@ -3029,18 +3029,18 @@ The image shows two cats sleeping on a pink blanket or sheet. The cat on the lef
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.15s
+- *Model load time:* 1.65s
 - *Generation time:* 1.89s
-- *Total time:* 3.05s
-- *Input validation time:* 0.00164
-- *Prompt preparation time:* 0.000257
-- *First-token latency:* 0.239
-- *Cleanup time:* 0.0928
+- *Total time:* 3.54s
+- *Input validation time:* 0.00167
+- *Prompt preparation time:* 0.00026
+- *First-token latency:* 0.235
+- *Cleanup time:* 0.0927
 - *Prompt tokens:* 415
 - *Generation tokens:* 104
 - *Total tokens:* 519
-- *Prompt throughput (raw):* 1,737 tok/s
-- *Generation throughput (raw):* 66.3 tok/s
+- *Prompt throughput (raw):* 1,767 tok/s
+- *Generation throughput (raw):* 66.1 tok/s
 - *Peak memory:* 10
 - *Active memory:* 9.5
 - *Cache memory:* 0.06
@@ -3092,18 +3092,18 @@ The image shows two cats lying on a pink couch. Both cats have a tabby pattern w
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 2.32s
-- *Generation time:* 10.89s
-- *Total time:* 13.23s
-- *Input validation time:* 0.00164
-- *Prompt preparation time:* 0.00272
-- *First-token latency:* 0.704
-- *Cleanup time:* 0.119
+- *Model load time:* 2.23s
+- *Generation time:* 10.66s
+- *Total time:* 12.90s
+- *Input validation time:* 0.00203
+- *Prompt preparation time:* 0.00249
+- *First-token latency:* 0.713
+- *Cleanup time:* 0.124
 - *Prompt tokens:* 273
 - *Generation tokens:* 303
 - *Total tokens:* 576
-- *Prompt throughput (raw):* 388 tok/s
-- *Generation throughput (raw):* 29.8 tok/s
+- *Prompt throughput (raw):* 383 tok/s
+- *Generation throughput (raw):* 30.5 tok/s
 - *Peak memory:* 18
 - *Active memory:* 16
 - *Cache memory:* 0.41
@@ -3183,18 +3183,18 @@ In essence, it's a cute and funny picture of cats enjoying a lazy day, seemingly
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 3.27s
-- *Generation time:* 18.26s
-- *Total time:* 21.54s
-- *Input validation time:* 0.00204
-- *Prompt preparation time:* 0.000204
-- *First-token latency:* 0.838
-- *Cleanup time:* 0.149
+- *Model load time:* 3.43s
+- *Generation time:* 17.79s
+- *Total time:* 21.23s
+- *Input validation time:* 0.00193
+- *Prompt preparation time:* 0.00024
+- *First-token latency:* 0.847
+- *Cleanup time:* 0.155
 - *Prompt tokens:* 273
-- *Generation tokens:* 289
-- *Total tokens:* 562
-- *Prompt throughput (raw):* 326 tok/s
-- *Generation throughput (raw):* 16.6 tok/s
+- *Generation tokens:* 288
+- *Total tokens:* 561
+- *Prompt throughput (raw):* 322 tok/s
+- *Generation throughput (raw):* 17.0 tok/s
 - *Peak memory:* 32
 - *Active memory:* 30
 - *Cache memory:* 0.41
@@ -3227,14 +3227,14 @@ The image is a charming and playful shot of two tabby kittens lounging on a brig
 
 **Detailed Description:**
 
-*   **Kittens:** There are two kittens, both with classic tabby markings (stripes and swirls). One kitten has a more grey/brown tabby pattern, while the other is a warmer, more orange-toned tabby. Both kittens are lying on their backs with their paws curled up, appearing very relaxed and sleepy. They both have collars on.
+*   **Kittens:** There are two kittens, both with classic tabby markings (stripes and swirls). One kitten has a more grey/brown tabby pattern, while the other is a warmer, more orange-toned tabby. Both are lying on their backs with their paws outstretched, appearing very relaxed and sleepy. They both have collars on.
 *   **Positioning:** The kittens are positioned side-by-side, with each one having a remote control nearby. It looks like they are mimicking people watching television.
-*   **Remote Controls:** Two remote controls are visible, one grey and one beige, placed near each kitten.
+*   **Remote Controls:** Two standard television remote controls are visible, one near each kitten.
 *   **Surface:** The kittens are lying on a vibrant pink surface. The texture appears soft, suggesting a couch cushion or blanket.
 *   **Lighting:** The lighting is fairly even, and the colors are bright and clear.
-*   **Overall Tone:** The image is lighthearted, cute, and humorous. It evokes a feeling of warmth and relaxation.
+*   **Mood:** The image evokes a feeling of warmth, comfort, and playfulness. It's a cute and endearing scene.
 
-It's a very endearing picture that captures the playful nature of kittens!
+Overall, it's a delightful picture that captures the relaxed and amusing nature of kittens.
 </pre>
 
 <details>
@@ -3249,14 +3249,14 @@ The image is a charming and playful shot of two tabby kittens lounging on a brig
 
 **Detailed Description:**
 
-*   **Kittens:** There are two kittens, both with classic tabby markings (stripes and swirls). One kitten has a more grey/brown tabby pattern, while the other is a warmer, more orange-toned tabby. Both kittens are lying on their backs with their paws curled up, appearing very relaxed and sleepy. They both have collars on.
+*   **Kittens:** There are two kittens, both with classic tabby markings (stripes and swirls). One kitten has a more grey/brown tabby pattern, while the other is a warmer, more orange-toned tabby. Both are lying on their backs with their paws outstretched, appearing very relaxed and sleepy. They both have collars on.
 *   **Positioning:** The kittens are positioned side-by-side, with each one having a remote control nearby. It looks like they are mimicking people watching television.
-*   **Remote Controls:** Two remote controls are visible, one grey and one beige, placed near each kitten.
+*   **Remote Controls:** Two standard television remote controls are visible, one near each kitten.
 *   **Surface:** The kittens are lying on a vibrant pink surface. The texture appears soft, suggesting a couch cushion or blanket.
 *   **Lighting:** The lighting is fairly even, and the colors are bright and clear.
-*   **Overall Tone:** The image is lighthearted, cute, and humorous. It evokes a feeling of warmth and relaxation.
+*   **Mood:** The image evokes a feeling of warmth, comfort, and playfulness. It's a cute and endearing scene.
 
-It's a very endearing picture that captures the playful nature of kittens!
+Overall, it's a delightful picture that captures the relaxed and amusing nature of kittens.
 ```
 
 </details>
@@ -3276,18 +3276,18 @@ It's a very endearing picture that captures the playful nature of kittens!
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 2.43s
-- *Generation time:* 2.53s
-- *Total time:* 4.97s
-- *Input validation time:* 0.00175
-- *Prompt preparation time:* 0.00292
-- *First-token latency:* 0.325
+- *Model load time:* 2.29s
+- *Generation time:* 2.54s
+- *Total time:* 4.85s
+- *Input validation time:* 0.00165
+- *Prompt preparation time:* 0.00297
+- *First-token latency:* 0.332
 - *Cleanup time:* 0.117
 - *Prompt tokens:* 272
 - *Generation tokens:* 106
 - *Total tokens:* 378
-- *Prompt throughput (raw):* 837 tok/s
-- *Generation throughput (raw):* 48.4 tok/s
+- *Prompt throughput (raw):* 819 tok/s
+- *Generation throughput (raw):* 48.2 tok/s
 - *Peak memory:* 17
 - *Active memory:* 16
 - *Cache memory:* 0.04
@@ -3343,18 +3343,18 @@ Between the two cats are two television remotes, one white and one blue. The cou
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 2.40s
-- *Generation time:* 1.55s
-- *Total time:* 3.98s
-- *Input validation time:* 0.00163
-- *Prompt preparation time:* 0.021
-- *First-token latency:* 0.388
-- *Cleanup time:* 0.119
+- *Model load time:* 2.32s
+- *Generation time:* 1.53s
+- *Total time:* 3.87s
+- *Input validation time:* 0.00151
+- *Prompt preparation time:* 0.02
+- *First-token latency:* 0.387
+- *Cleanup time:* 0.121
 - *Prompt tokens:* 284
 - *Generation tokens:* 148
 - *Total tokens:* 432
-- *Prompt throughput (raw):* 732 tok/s
-- *Generation throughput (raw):* 129 tok/s
+- *Prompt throughput (raw):* 733 tok/s
+- *Generation throughput (raw):* 131 tok/s
 - *Peak memory:* 16
 - *Active memory:* 15
 - *Cache memory:* 0.13
@@ -3406,18 +3406,18 @@ A high-angle, medium shot shows two tabby cats lying on a pink blanket on a red 
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 6.96s
-- *Generation time:* 5.57s
-- *Total time:* 12.54s
-- *Input validation time:* 0.00164
+- *Model load time:* 7.17s
+- *Generation time:* 6.00s
+- *Total time:* 13.18s
+- *Input validation time:* 0.0016
 - *Prompt preparation time:* 0.000148
-- *First-token latency:* 3.65
-- *Cleanup time:* 0.237
+- *First-token latency:* 4.06
+- *Cleanup time:* 0.246
 - *Prompt tokens:* 272
 - *Generation tokens:* 15
 - *Total tokens:* 287
-- *Prompt throughput (raw):* 74.5 tok/s
-- *Generation throughput (raw):* 7.92 tok/s
+- *Prompt throughput (raw):* 67.0 tok/s
+- *Generation throughput (raw):* 7.83 tok/s
 - *Peak memory:* 63
 - *Active memory:* 63
 - *Cache memory:* 0.49
@@ -3469,18 +3469,18 @@ A high-angle, medium shot shows two tabby cats lying on a pink blanket on a red 
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 2.54s
-- *Generation time:* 4.33s
-- *Total time:* 6.88s
-- *Input validation time:* 0.00173
-- *Prompt preparation time:* 0.000279
-- *First-token latency:* 0.712
-- *Cleanup time:* 0.131
+- *Model load time:* 2.58s
+- *Generation time:* 4.38s
+- *Total time:* 6.96s
+- *Input validation time:* 0.00167
+- *Prompt preparation time:* 0.000302
+- *First-token latency:* 0.715
+- *Cleanup time:* 0.132
 - *Prompt tokens:* 284
 - *Generation tokens:* 98
 - *Total tokens:* 382
-- *Prompt throughput (raw):* 399 tok/s
-- *Generation throughput (raw):* 27.2 tok/s
+- *Prompt throughput (raw):* 397 tok/s
+- *Generation throughput (raw):* 26.9 tok/s
 - *Peak memory:* 19
 - *Active memory:* 18
 - *Cache memory:* 0.50
@@ -3532,18 +3532,18 @@ A high-angle, medium shot shows two brown tabby cats lying on a bright pink blan
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.92s
-- *Generation time:* 3.98s
-- *Total time:* 4.90s
-- *Input validation time:* 0.00163
-- *Prompt preparation time:* 0.00157
-- *First-token latency:* 2.6
-- *Cleanup time:* 0.0939
+- *Model load time:* 0.97s
+- *Generation time:* 3.45s
+- *Total time:* 4.43s
+- *Input validation time:* 0.00176
+- *Prompt preparation time:* 0.00155
+- *First-token latency:* 2.1
+- *Cleanup time:* 0.0949
 - *Prompt tokens:* 2,354
 - *Generation tokens:* 82
 - *Total tokens:* 2,436
-- *Prompt throughput (raw):* 906 tok/s
-- *Generation throughput (raw):* 62.5 tok/s
+- *Prompt throughput (raw):* 1,119 tok/s
+- *Generation throughput (raw):* 62.0 tok/s
 - *Peak memory:* 9.7
 - *Active memory:* 8.1
 - *Cache memory:* 0.83
@@ -3595,21 +3595,21 @@ The image shows two cats lying on a pink blanket. The cat on the left is a kitte
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.55s
-- *Generation time:* 0.41s
-- *Total time:* 0.96s
-- *Input validation time:* 0.00174
+- *Model load time:* 0.48s
+- *Generation time:* 0.42s
+- *Total time:* 0.91s
+- *Input validation time:* 0.00172
 - *Prompt preparation time:* 0.00143
-- *First-token latency:* 0.0674
-- *Cleanup time:* 0.079
+- *First-token latency:* 0.0679
+- *Cleanup time:* 0.0789
 - *Prompt tokens:* 20
 - *Generation tokens:* 123
 - *Total tokens:* 143
-- *Prompt throughput (raw):* 297 tok/s
-- *Generation throughput (raw):* 378 tok/s
+- *Prompt throughput (raw):* 294 tok/s
+- *Generation throughput (raw):* 365 tok/s
 - *Peak memory:* 1.8
 - *Active memory:* 0.62
-- *Cache memory:* 0.24
+- *Cache memory:* 0.25
 - *Model-load active memory:* 0.618
 - *Post-cleanup active memory:* 0.02
 - *Post-cleanup cache memory:* 0.0
@@ -3658,18 +3658,18 @@ The image shows a close-up view of two cats lying down on a pink fabric surface.
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.58s
-- *Generation time:* 6.49s
-- *Total time:* 8.08s
-- *Input validation time:* 0.00155
-- *Prompt preparation time:* 0.000178
-- *First-token latency:* 0.782
-- *Cleanup time:* 0.127
+- *Model load time:* 1.60s
+- *Generation time:* 6.37s
+- *Total time:* 7.98s
+- *Input validation time:* 0.00151
+- *Prompt preparation time:* 0.000177
+- *First-token latency:* 0.783
+- *Cleanup time:* 0.141
 - *Prompt tokens:* 1,029
 - *Generation tokens:* 180
 - *Total tokens:* 1,209
-- *Prompt throughput (raw):* 1,316 tok/s
-- *Generation throughput (raw):* 32.6 tok/s
+- *Prompt throughput (raw):* 1,315 tok/s
+- *Generation throughput (raw):* 33.3 tok/s
 - *Peak memory:* 11
 - *Active memory:* 7.9
 - *Cache memory:* 1.5
@@ -3721,18 +3721,18 @@ Two cats are laying on a pink blanket. The cat on the left is a gray tabby cat w
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 2.75s
-- *Generation time:* 30.54s
-- *Total time:* 33.30s
-- *Input validation time:* 0.00171
-- *Prompt preparation time:* 0.00013
+- *Model load time:* 2.51s
+- *Generation time:* 30.94s
+- *Total time:* 33.46s
+- *Input validation time:* 0.00166
+- *Prompt preparation time:* 0.000125
 - *First-token latency:* 1.12
-- *Cleanup time:* 0.131
+- *Cleanup time:* 0.133
 - *Prompt tokens:* 1,029
 - *Generation tokens:* 159
 - *Total tokens:* 1,188
-- *Prompt throughput (raw):* 923 tok/s
-- *Generation throughput (raw):* 5.41 tok/s
+- *Prompt throughput (raw):* 916 tok/s
+- *Generation throughput (raw):* 5.34 tok/s
 - *Peak memory:* 26
 - *Active memory:* 19
 - *Cache memory:* 6.2
@@ -3784,18 +3784,18 @@ A top-down view of two cats laying on a pink blanket. The cat on the left is a g
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.42s
-- *Generation time:* 6.78s
-- *Total time:* 8.20s
-- *Input validation time:* 0.00164
-- *Prompt preparation time:* 0.00013
-- *First-token latency:* 0.374
-- *Cleanup time:* 0.0975
+- *Model load time:* 1.51s
+- *Generation time:* 7.14s
+- *Total time:* 8.66s
+- *Input validation time:* 0.00163
+- *Prompt preparation time:* 0.000128
+- *First-token latency:* 0.418
+- *Cleanup time:* 0.102
 - *Prompt tokens:* 1,029
 - *Generation tokens:* 126
 - *Total tokens:* 1,155
-- *Prompt throughput (raw):* 2,753 tok/s
-- *Generation throughput (raw):* 19.7 tok/s
+- *Prompt throughput (raw):* 2,464 tok/s
+- *Generation throughput (raw):* 18.8 tok/s
 - *Peak memory:* 10
 - *Active memory:* 6.1
 - *Cache memory:* 3.6
@@ -3847,18 +3847,18 @@ A top-down view of two cats sleeping on a pink blanket. The cat on the left is a
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 1.73s
-- *Generation time:* 5.73s
-- *Total time:* 7.47s
-- *Input validation time:* 0.00163
-- *Prompt preparation time:* 0.00223
-- *First-token latency:* 0.77
-- *Cleanup time:* 0.0981
+- *Model load time:* 1.90s
+- *Generation time:* 6.65s
+- *Total time:* 8.56s
+- *Input validation time:* 0.00183
+- *Prompt preparation time:* 0.00269
+- *First-token latency:* 0.817
+- *Cleanup time:* 0.122
 - *Prompt tokens:* 1,237
 - *Generation tokens:* 199
 - *Total tokens:* 1,436
-- *Prompt throughput (raw):* 1,606 tok/s
-- *Generation throughput (raw):* 40.2 tok/s
+- *Prompt throughput (raw):* 1,514 tok/s
+- *Generation throughput (raw):* 34.2 tok/s
 - *Peak memory:* 15
 - *Active memory:* 14
 - *Cache memory:* 0.27
@@ -3918,18 +3918,18 @@ The couch they're on is a striking red, providing a warm contrast to the cats' b
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 2.60s
-- *Generation time:* 11.00s
-- *Total time:* 13.60s
-- *Input validation time:* 0.00183
-- *Prompt preparation time:* 0.000195
-- *First-token latency:* 0.785
-- *Cleanup time:* 0.11
+- *Model load time:* 2.88s
+- *Generation time:* 12.23s
+- *Total time:* 15.13s
+- *Input validation time:* 0.00171
+- *Prompt preparation time:* 0.000224
+- *First-token latency:* 1.09
+- *Cleanup time:* 0.132
 - *Prompt tokens:* 1,237
 - *Generation tokens:* 204
 - *Total tokens:* 1,441
-- *Prompt throughput (raw):* 1,577 tok/s
-- *Generation throughput (raw):* 20.0 tok/s
+- *Prompt throughput (raw):* 1,135 tok/s
+- *Generation throughput (raw):* 18.3 tok/s
 - *Peak memory:* 27
 - *Active memory:* 25
 - *Cache memory:* 0.27
@@ -3993,19 +3993,19 @@ The image captures a moment of pure peace and comfort, as these two cats enjoy t
 - *Usability:* usable
 - *Maintainer status:* none
 - *Observations:* none
-- *Model load time:* 0.50s
-- *Generation time:* 0.50s
-- *Total time:* 1.00s
-- *Input validation time:* 0.00185
-- *Prompt preparation time:* 0.000565
-- *First-token latency:* 0.0895
-- *Cleanup time:* 0.0891
+- *Model load time:* 0.67s
+- *Generation time:* 0.62s
+- *Total time:* 1.31s
+- *Input validation time:* 0.00166
+- *Prompt preparation time:* 0.000645
+- *First-token latency:* 0.106
+- *Cleanup time:* 0.107
 - *Prompt tokens:* 20
 - *Generation tokens:* 44
 - *Total tokens:* 64
-- *Prompt throughput (raw):* 223 tok/s
-- *Generation throughput (raw):* 116 tok/s
-- *Peak memory:* 4.2
+- *Prompt throughput (raw):* 190 tok/s
+- *Generation throughput (raw):* 91.0 tok/s
+- *Peak memory:* 4.0
 - *Active memory:* 2.1
 - *Cache memory:* 1.6
 - *Model-load active memory:* 2.13
@@ -4056,18 +4056,18 @@ This image features two cats lying on a couch. One cat is a light brown and the 
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Conversation-role control tokens remain visible
-- *Model load time:* 1.97s
-- *Generation time:* 3.25s
-- *Total time:* 5.22s
-- *Input validation time:* 0.00182
-- *Prompt preparation time:* 0.00182
-- *First-token latency:* 0.288
-- *Cleanup time:* 0.0928
+- *Model load time:* 2.65s
+- *Generation time:* 3.29s
+- *Total time:* 5.96s
+- *Input validation time:* 0.0016
+- *Prompt preparation time:* 0.00184
+- *First-token latency:* 0.315
+- *Cleanup time:* 0.109
 - *Prompt tokens:* 397
 - *Generation tokens:* 221
 - *Total tokens:* 618
-- *Prompt throughput (raw):* 1,380 tok/s
-- *Generation throughput (raw):* 77.6 tok/s
+- *Prompt throughput (raw):* 1,259 tok/s
+- *Generation throughput (raw):* 78.0 tok/s
 - *Peak memory:* 16
 - *Active memory:* 14
 - *Cache memory:* 0.70
@@ -4119,18 +4119,18 @@ This image features two cats lying on a couch. One cat is a light brown and the 
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Conversation-role control tokens remain visible
-- *Model load time:* 1.90s
-- *Generation time:* 12.10s
-- *Total time:* 14.00s
-- *Input validation time:* 0.00166
-- *Prompt preparation time:* 0.00115
+- *Model load time:* 1.94s
+- *Generation time:* 12.33s
+- *Total time:* 14.28s
+- *Input validation time:* 0.00461
+- *Prompt preparation time:* 0.0013
 - *First-token latency:* 1.04
-- *Cleanup time:* 0.0996
+- *Cleanup time:* 0.132
 - *Prompt tokens:* 2,325
 - *Generation tokens:* 354
 - *Total tokens:* 2,679
-- *Prompt throughput (raw):* 2,225 tok/s
-- *Generation throughput (raw):* 32.2 tok/s
+- *Prompt throughput (raw):* 2,246 tok/s
+- *Generation throughput (raw):* 31.5 tok/s
 - *Peak memory:* 19
 - *Active memory:* 17
 - *Cache memory:* 0.43
@@ -4198,18 +4198,18 @@ In summary, the image features two cats lying on a pink fabric, with two remotes
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Conversation-role control tokens remain visible
-- *Model load time:* 3.24s
-- *Generation time:* 52.33s
-- *Total time:* 55.58s
-- *Input validation time:* 0.00179
-- *Prompt preparation time:* 0.0016
-- *First-token latency:* 0.802
-- *Cleanup time:* 0.171
+- *Model load time:* 3.68s
+- *Generation time:* 54.21s
+- *Total time:* 57.91s
+- *Input validation time:* 0.00183
+- *Prompt preparation time:* 0.00168
+- *First-token latency:* 0.857
+- *Cleanup time:* 0.193
 - *Prompt tokens:* 397
 - *Generation tokens:* 241
 - *Total tokens:* 638
-- *Prompt throughput (raw):* 495 tok/s
-- *Generation throughput (raw):* 4.7 tok/s
+- *Prompt throughput (raw):* 463 tok/s
+- *Generation throughput (raw):* 4.55 tok/s
 - *Peak memory:* 39
 - *Active memory:* 33
 - *Cache memory:* 4.9
@@ -4261,18 +4261,18 @@ In summary, the image features two cats lying on a pink fabric, with two remotes
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Unrecognised model control tokens remain visible
-- *Model load time:* 3.44s
-- *Generation time:* 2.11s
-- *Total time:* 5.57s
-- *Input validation time:* 0.00169
-- *Prompt preparation time:* 0.02
-- *First-token latency:* 0.291
-- *Cleanup time:* 0.129
+- *Model load time:* 3.25s
+- *Generation time:* 1.96s
+- *Total time:* 5.24s
+- *Input validation time:* 0.00211
+- *Prompt preparation time:* 0.0202
+- *First-token latency:* 0.292
+- *Cleanup time:* 0.127
 - *Prompt tokens:* 280
 - *Generation tokens:* 88
 - *Total tokens:* 368
-- *Prompt throughput (raw):* 962 tok/s
-- *Generation throughput (raw):* 53.4 tok/s
+- *Prompt throughput (raw):* 958 tok/s
+- *Generation throughput (raw):* 59.1 tok/s
 - *Peak memory:* 29
 - *Active memory:* 28
 - *Cache memory:* 0.01
@@ -4298,7 +4298,7 @@ In summary, the image features two cats lying on a pink fabric, with two remotes
 
 <pre class="model-output-readable">
 &lt;|channel&gt;thought
-&lt;channel|&gt;A high-angle eye-level shot shows two tabby cats sleeping on a pink blanket on a red couch. The cat on the left is smaller and lying on its side with its head turned up and its paws curled. The cat on the right is larger and is lying on its stomach with its head turned down. There are two remote controls on the couch next to the cats. The lighting is bright and even.
+&lt;channel|&gt;A high-angle, eye-level shot shows two tabby cats sleeping on a pink blanket on a red couch. The cat on the left is a dark brown tabby, lying on its side with its head tucked in. The cat on the right is a lighter brown and tan tabby, lying on its side with its head turned down. There are two remote controls between the cats. The lighting is bright and even.
 </pre>
 
 <details>
@@ -4306,7 +4306,7 @@ In summary, the image features two cats lying on a pink fabric, with two remotes
 
 ```text
 <|channel>thought
-<channel|>A high-angle eye-level shot shows two tabby cats sleeping on a pink blanket on a red couch. The cat on the left is smaller and lying on its side with its head turned up and its paws curled. The cat on the right is larger and is lying on its stomach with its head turned down. There are two remote controls on the couch next to the cats. The lighting is bright and even.
+<channel|>A high-angle, eye-level shot shows two tabby cats sleeping on a pink blanket on a red couch. The cat on the left is a dark brown tabby, lying on its side with its head tucked in. The cat on the right is a lighter brown and tan tabby, lying on its side with its head turned down. There are two remote controls between the cats. The lighting is bright and even.
 ```
 
 </details>
@@ -4326,18 +4326,18 @@ In summary, the image features two cats lying on a pink fabric, with two remotes
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Unrecognised model control tokens remain visible
-- *Model load time:* 3.17s
-- *Generation time:* 1.78s
+- *Model load time:* 3.27s
+- *Generation time:* 1.67s
 - *Total time:* 4.95s
-- *Input validation time:* 0.00166
-- *Prompt preparation time:* 0.00029
-- *First-token latency:* 0.289
+- *Input validation time:* 0.00165
+- *Prompt preparation time:* 0.000297
+- *First-token latency:* 0.29
 - *Cleanup time:* 0.124
 - *Prompt tokens:* 280
-- *Generation tokens:* 89
-- *Total tokens:* 369
-- *Prompt throughput (raw):* 970 tok/s
-- *Generation throughput (raw):* 67.9 tok/s
+- *Generation tokens:* 85
+- *Total tokens:* 365
+- *Prompt throughput (raw):* 964 tok/s
+- *Generation throughput (raw):* 71.7 tok/s
 - *Peak memory:* 28
 - *Active memory:* 27
 - *Cache memory:* 0.01
@@ -4363,7 +4363,7 @@ In summary, the image features two cats lying on a pink fabric, with two remotes
 
 <pre class="model-output-readable">
 &lt;|channel&gt;thought
-&lt;channel|&gt;A high-angle, medium shot shows two tabby cats sleeping on a pink blanket on a red couch. The cat on the left is smaller and is lying on its side with its head turned and its paws tucked in. The cat on the right is larger and is lying on its stomach with its head down and legs stretched out. Two remote controls are on the couch between the cats. The lighting is bright and even.
+&lt;channel|&gt;A high-angle medium-shot shows two tabby cats sleeping on a pink blanket on a red couch. The cat on the left is lying on its side with its head curled up and its paws tucked in. The cat on the right is lying on its side with its head down and its legs stretched out. Two remote controls are on the couch between the cats. The lighting is bright and even.
 </pre>
 
 <details>
@@ -4371,7 +4371,7 @@ In summary, the image features two cats lying on a pink fabric, with two remotes
 
 ```text
 <|channel>thought
-<channel|>A high-angle, medium shot shows two tabby cats sleeping on a pink blanket on a red couch. The cat on the left is smaller and is lying on its side with its head turned and its paws tucked in. The cat on the right is larger and is lying on its stomach with its head down and legs stretched out. Two remote controls are on the couch between the cats. The lighting is bright and even.
+<channel|>A high-angle medium-shot shows two tabby cats sleeping on a pink blanket on a red couch. The cat on the left is lying on its side with its head curled up and its paws tucked in. The cat on the right is lying on its side with its head down and its legs stretched out. Two remote controls are on the couch between the cats. The lighting is bright and even.
 ```
 
 </details>
@@ -4391,18 +4391,18 @@ In summary, the image features two cats lying on a pink fabric, with two remotes
 - *Usability:* usable_with_caveats
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Response is unusually short
-- *Model load time:* 1.13s
-- *Generation time:* 1.12s
-- *Total time:* 2.27s
-- *Input validation time:* 0.00176
-- *Prompt preparation time:* 0.000104
-- *First-token latency:* 1.08
-- *Cleanup time:* 0.0956
+- *Model load time:* 1.29s
+- *Generation time:* 1.32s
+- *Total time:* 2.62s
+- *Input validation time:* 0.00165
+- *Prompt preparation time:* 0.000127
+- *First-token latency:* 1.27
+- *Cleanup time:* 0.132
 - *Prompt tokens:* 4,101
 - *Generation tokens:* 2
 - *Total tokens:* 4,103
-- *Prompt throughput (raw):* 3,802 tok/s
-- *Generation throughput (raw):* 87.8 tok/s
+- *Prompt throughput (raw):* 3,238 tok/s
+- *Generation throughput (raw):* 75.9 tok/s
 - *Peak memory:* 4.6
 - *Active memory:* 1.7
 - *Cache memory:* 1.7
@@ -4454,18 +4454,18 @@ Cat
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Response appears cut off at the token limit
-- *Model load time:* 1.61s
-- *Generation time:* 12.21s
-- *Total time:* 13.83s
-- *Input validation time:* 0.00161
-- *Prompt preparation time:* 0.00658
-- *First-token latency:* 0.91
-- *Cleanup time:* 0.0842
+- *Model load time:* 1.97s
+- *Generation time:* 15.03s
+- *Total time:* 17.02s
+- *Input validation time:* 0.00266
+- *Prompt preparation time:* 0.0102
+- *First-token latency:* 1.03
+- *Cleanup time:* 0.141
 - *Prompt tokens:* 1,329
 - *Generation tokens:* 500
 - *Total tokens:* 1,829
-- *Prompt throughput (raw):* 1,460 tok/s
-- *Generation throughput (raw):* 44.3 tok/s
+- *Prompt throughput (raw):* 1,292 tok/s
+- *Generation throughput (raw):* 35.8 tok/s
 - *Peak memory:* 14
 - *Active memory:* 13
 - *Cache memory:* 0.41
@@ -4543,18 +4543,18 @@ We can also mention the remote is a typical TV remote with a power button, volum
 - *Usability:* unusable
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Response appears cut off at the token limit
-- *Model load time:* 5.48s
-- *Generation time:* 10.23s
-- *Total time:* 15.72s
-- *Input validation time:* 0.00166
-- *Prompt preparation time:* 0.00774
-- *First-token latency:* 2.51
-- *Cleanup time:* 0.207
+- *Model load time:* 12.09s
+- *Generation time:* 16.25s
+- *Total time:* 28.35s
+- *Input validation time:* 0.00183
+- *Prompt preparation time:* 0.00902
+- *First-token latency:* 7.6
+- *Cleanup time:* 0.249
 - *Prompt tokens:* 437
 - *Generation tokens:* 500
 - *Total tokens:* 937
-- *Prompt throughput (raw):* 174 tok/s
-- *Generation throughput (raw):* 64.9 tok/s
+- *Prompt throughput (raw):* 57.5 tok/s
+- *Generation throughput (raw):* 57.9 tok/s
 - *Peak memory:* 60
 - *Active memory:* 59
 - *Cache memory:* 0.06
@@ -4641,18 +4641,18 @@ This is a heartwarming and cozy image of two cats relaxing together on a plush, 
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Response appears cut off at the token limit; Internal
   reasoning block appears incomplete
-- *Model load time:* 2.39s
-- *Generation time:* 7.74s
-- *Total time:* 10.14s
-- *Input validation time:* 0.00166
-- *Prompt preparation time:* 0.00157
-- *First-token latency:* 0.282
-- *Cleanup time:* 0.192
+- *Model load time:* 2.38s
+- *Generation time:* 8.03s
+- *Total time:* 10.42s
+- *Input validation time:* 0.00195
+- *Prompt preparation time:* 0.00175
+- *First-token latency:* 0.294
+- *Cleanup time:* 0.152
 - *Prompt tokens:* 397
 - *Generation tokens:* 500
 - *Total tokens:* 897
-- *Prompt throughput (raw):* 1,408 tok/s
-- *Generation throughput (raw):* 68.2 tok/s
+- *Prompt throughput (raw):* 1,351 tok/s
+- *Generation throughput (raw):* 66.0 tok/s
 - *Peak memory:* 20
 - *Active memory:* 18
 - *Cache memory:* 0.76
@@ -4705,18 +4705,18 @@ This is a heartwarming and cozy image of two cats relaxing together on a plush, 
 - *Maintainer status:* observation_needs_reproduction
 - *Observations:* Response repeats the same text; Response appears cut off at
   the token limit
-- *Model load time:* 1.62s
-- *Generation time:* 4.22s
-- *Total time:* 5.86s
-- *Input validation time:* 0.00165
-- *Prompt preparation time:* 0.000169
+- *Model load time:* 1.49s
+- *Generation time:* 4.28s
+- *Total time:* 5.78s
+- *Input validation time:* 0.00182
+- *Prompt preparation time:* 0.000181
 - *First-token latency:* 0.229
-- *Cleanup time:* 0.0974
+- *Cleanup time:* 0.096
 - *Prompt tokens:* 264
 - *Generation tokens:* 500
 - *Total tokens:* 764
 - *Prompt throughput (raw):* 1,151 tok/s
-- *Generation throughput (raw):* 126 tok/s
+- *Generation throughput (raw):* 124 tok/s
 - *Peak memory:* 5.8
 - *Active memory:* 4.5
 - *Cache memory:* 0.03
@@ -4779,13 +4779,13 @@ This is a heartwarming and cozy image of two cats relaxing together on a plush, 
 - *Root exception module:* builtins
 - *Root exception message:* Received 362 parameters not in model:
   <br>audio_tower.encoder.biases,<br>audio_tower.encoder.scales,<br>language_model.model.layers.10.mlp.experts.down_proj.biases,<br>language_model.model.layers.10.mlp.experts.down_proj.scales,<br>language_model.model.layers.10.mlp.experts.down_proj.weight,<br>language_model.model.layers.10.mlp.experts.gate_proj.biases,<br>language_model.model.layers.10.mlp.experts.gate_proj.scales,<br>language_model.model.layers.10.mlp.experts.gate_proj.weight,<br>language_model.model.layers.10.mlp.experts.up_proj.biases,<br>language_model.model.layers.10.mlp.experts.up_proj.scales,<br>language_model.model.layers.10.mlp.experts.up_proj.weight,<br>language_model.model.layers.11.mlp.experts.down_proj.biases,<br>language_model.model.layers.11.mlp.experts.down_proj.scales,<br>language_model.model.layers.11.mlp.experts.down_proj.weight,<br>language_model.model.layers.11.mlp.experts.gate_proj.biases,<br>language_model.model.layers.11.mlp.experts.gate_proj.scales,<br>language_model.model.layers.11.mlp.experts.gate_proj.weight,<br>language_model.model.layers.11.mlp.experts.up_proj.biases,<br>language_model.model.layers.11.mlp.experts.up_proj.scales,<br>language_model.model.layers.11.mlp.experts.up_proj.weight,<br>language_model.model.layers.12.mlp.experts.down_proj.biases,<br>language_model.model.layers.12.mlp.experts.down_proj.scales,<br>language_model.model.layers.12.mlp.experts.down_proj.weight,<br>language_model.model.layers.12.mlp.experts.gate_proj.biases,<br>language_model.model.layers.12.mlp.experts.gate_proj.scales,<br>language_model.model.layers.12.mlp.experts.gate_proj.weight,<br>language_model.model.layers.12.mlp.experts.up_proj.biases,<br>language_model.model.layers.12.mlp.experts.up_proj.scales,<br>language_model.model.layers.12.mlp.experts.up_proj.weight,<br>language_model.model.layers.13.mlp.experts.down_proj.biases,<br>language_model.model.layers.13.mlp.experts.down_proj.scales,<br>language_model.model.layers.13.mlp.experts.down_proj.weight,<br>language_model.model.layers.13.mlp.experts.gate_proj.biases,<br>language_model.model.layers.13.mlp.experts.gate_proj.scales,<br>language_model.model.layers.13.mlp.experts.gate_proj.weight,<br>language_model.model.layers.13.mlp.experts.up_proj.biases,<br>language_model.model.layers.13.mlp.experts.up_proj.scales,<br>language_model.model.layers.13.mlp.experts.up_proj.weight,<br>language_model.model.layers.14.mlp.experts.down_proj.biases,<br>language_model.model.layers.14.mlp.experts.down_proj.scales,<br>language_model.model.layers.14.mlp.experts.down_proj.weight,<br>language_model.model.layers.14.mlp.experts.gate_proj.biases,<br>language_model.model.layers.14.mlp.experts.gate_proj.scales,<br>language_model.model.layers.14.mlp.experts.gate_proj.weight,<br>language_model.model.layers.14.mlp.experts.up_proj.biases,<br>language_model.model.layers.14.mlp.experts.up_proj.scales,<br>language_model.model.layers.14.mlp.experts.up_proj.weight,<br>language_model.model.layers.15.mlp.experts.down_proj.biases,<br>language_model.model.layers.15.mlp.experts.down_proj.scales,<br>language_model.model.layers.15.mlp.experts.down_proj.weight,<br>language_model.model.layers.15.mlp.experts.gate_proj.biases,<br>language_model.model.layers.15.mlp.experts.gate_proj.scales,<br>language_model.model.layers.15.mlp.experts.gate_proj.weight,<br>language_model.model.layers.15.mlp.experts.up_proj.biases,<br>language_model.model.layers.15.mlp.experts.up_proj.scales,<br>language_model.model.layers.15.mlp.experts.up_proj.weight,<br>language_model.model.layers.16.mlp.experts.down_proj.biases,<br>language_model.model.layers.16.mlp.experts.down_proj.scales,<br>language_model.model.layers.16.mlp.experts.down_proj.weight,<br>language_model.model.layers.16.mlp.experts.gate_proj.biases,<br>language_model.model.layers.16.mlp.experts.gate_proj.scales,<br>language_model.model.layers.16.mlp.experts.gate_proj.weight,<br>language_model.model.layers.16.mlp.experts.up_proj.biases,<br>language_model.model.layers.16.mlp.experts.up_proj.scales,<br>language_model.model.layers.16.mlp.experts.up_proj.weight,<br>language_model.model.layers.17.mlp.experts.down_proj.biases,<br>language_model.model.layers.17.mlp.experts.down_proj.scales,<br>language_model.model.layers.17.mlp.experts.down_proj.weight,<br>language_model.model.layers.17.mlp.experts.gate_proj.biases,<br>language_model.model.layers.17.mlp.experts.gate_proj.scales,<br>language_model.model.layers.17.mlp.experts.gate_proj.weight,<br>language_model.model.layers.17.mlp.experts.up_proj.biases,<br>language_model.model.layers.17.mlp.experts.up_proj.scales,<br>language_model.model.layers.17.mlp.experts.up_proj.weight,<br>language_model.model.layers.18.mlp.experts.down_proj.biases,<br>language_model.model.layers.18.mlp.experts.down_proj.scales,<br>language_model.model.layers.18.mlp.experts.down_proj.weight,<br>language_model.model.layers.18.mlp.experts.gate_proj.biases,<br>language_model.model.layers.18.mlp.experts.gate_proj.scales,<br>language_model.model.layers.18.mlp.experts.gate_proj.weight,<br>language_model.model.layers.18.mlp.experts.up_proj.biases,<br>language_model.model.layers.18.mlp.experts.up_proj.scales,<br>language_model.model.layers.18.mlp.experts.up_proj.weight,<br>language_model.model.layers.19.mlp.experts.down_proj.biases,<br>language_model.model.layers.19.mlp.experts.down_proj.scales,<br>language_model.model.layers.19.mlp.experts.down_proj.weight,<br>language_model.model.layers.19.mlp.experts.gate_proj.biases,<br>language_model.model.layers.19.mlp.experts.gate_proj.scales,<br>language_model.model.layers.19.mlp.experts.gate_proj.weight,<br>language_model.model.layers.19.mlp.experts.up_proj.biases,<br>language_model.model.layers.19.mlp.experts.up_proj.scales,<br>language_model.model.layers.19.mlp.experts.up_proj.weight,<br>language_model.model.layers.2.mlp.experts.down_proj.biases,<br>language_model.model.layers.2.mlp.experts.down_proj.scales,<br>language_model.model.layers.2.mlp.experts.down_proj.weight,<br>language_model.model.layers.2.mlp.experts.gate_proj.biases,<br>language_model.model.layers.2.mlp.experts.gate_proj.scales,<br>language_model.model.layers.2.mlp.experts.gate_proj.weight,<br>language_model.model.layers.2.mlp.experts.up_proj.biases,<br>language_model.model.layers.2.mlp.experts.up_proj.scales,<br>language_model.model.layers.2.mlp.experts.up_proj.weight,<br>language_model.model.layers.20.mlp.experts.down_proj.biases,<br>language_model.model.layers.20.mlp.experts.down_proj.scales,<br>language_model.model.layers.20.mlp.experts.down_proj.weight,<br>language_model.model.layers.20.mlp.experts.gate_proj.biases,<br>language_model.model.layers.20.mlp.experts.gate_proj.scales,<br>language_model.model.layers.20.mlp.experts.gate_proj.weight,<br>language_model.model.layers.20.mlp.experts.up_proj.biases,<br>language_model.model.layers.20.mlp.experts.up_proj.scales,<br>language_model.model.layers.20.mlp.experts.up_proj.weight,<br>language_model.model.layers.21.mlp.experts.down_proj.biases,<br>language_model.model.layers.21.mlp.experts.down_proj.scales,<br>language_model.model.layers.21.mlp.experts.down_proj.weight,<br>language_model.model.layers.21.mlp.experts.gate_proj.biases,<br>language_model.model.layers.21.mlp.experts.gate_proj.scales,<br>language_model.model.layers.21.mlp.experts.gate_proj.weight,<br>language_model.model.layers.21.mlp.experts.up_proj.biases,<br>language_model.model.layers.21.mlp.experts.up_proj.scales,<br>language_model.model.layers.21.mlp.experts.up_proj.weight,<br>language_model.model.layers.22.mlp.experts.down_proj.biases,<br>language_model.model.layers.22.mlp.experts.down_proj.scales,<br>language_model.model.layers.22.mlp.experts.down_proj.weight,<br>language_model.model.layers.22.mlp.experts.gate_proj.biases,<br>language_model.model.layers.22.mlp.experts.gate_proj.scales,<br>language_model.model.layers.22.mlp.experts.gate_proj.weight,<br>language_model.model.layers.22.mlp.experts.up_proj.biases,<br>language_model.model.layers.22.mlp.experts.up_proj.scales,<br>language_model.model.layers.22.mlp.experts.up_proj.weight,<br>language_model.model.layers.23.mlp.experts.down_proj.biases,<br>language_model.model.layers.23.mlp.experts.down_proj.scales,<br>language_model.model.layers.23.mlp.experts.down_proj.weight,<br>language_model.model.layers.23.mlp.experts.gate_proj.biases,<br>language_model.model.layers.23.mlp.experts.gate_proj.scales,<br>language_model.model.layers.23.mlp.experts.gate_proj.weight,<br>language_model.model.layers.23.mlp.experts.up_proj.biases,<br>language_model.model.layers.23.mlp.experts.up_proj.scales,<br>language_model.model.layers.23.mlp.experts.up_proj.weight,<br>language_model.model.layers.24.mlp.experts.down_proj.biases,<br>language_model.model.layers.24.mlp.experts.down_proj.scales,<br>language_model.model.layers.24.mlp.experts.down_proj.weight,<br>language_model.model.layers.24.mlp.experts.gate_proj.biases,<br>language_model.model.layers.24.mlp.experts.gate_proj.scales,<br>language_model.model.layers.24.mlp.experts.gate_proj.weight,<br>language_model.model.layers.24.mlp.experts.up_proj.biases,<br>language_model.model.layers.24.mlp.experts.up_proj.scales,<br>language_model.model.layers.24.mlp.experts.up_proj.weight,<br>language_model.model.layers.25.mlp.experts.down_proj.biases,<br>language_model.model.layers.25.mlp.experts.down_proj.scales,<br>language_model.model.layers.25.mlp.experts.down_proj.weight,<br>language_model.model.layers.25.mlp.experts.gate_proj.biases,<br>language_model.model.layers.25.mlp.experts.gate_proj.scales,<br>language_model.model.layers.25.mlp.experts.gate_proj.weight,<br>language_model.model.layers.25.mlp.experts.up_proj.biases,<br>language_model.model.layers.25.mlp.experts.up_proj.scales,<br>language_model.model.layers.25.mlp.experts.up_proj.weight,<br>language_model.model.layers.26.mlp.experts.down_proj.biases,<br>language_model.model.layers.26.mlp.experts.down_proj.scales,<br>language_model.model.layers.26.mlp.experts.down_proj.weight,<br>language_model.model.layers.26.mlp.experts.gate_proj.biases,<br>language_model.model.layers.26.mlp.experts.gate_proj.scales,<br>language_model.model.layers.26.mlp.experts.gate_proj.weight,<br>language_model.model.layers.26.mlp.experts.up_proj.biases,<br>language_model.model.layers.26.mlp.experts.up_proj.scales,<br>language_model.model.layers.26.mlp.experts.up_proj.weight,<br>language_model.model.layers.27.mlp.experts.down_proj.biases,<br>language_model.model.layers.27.mlp.experts.down_proj.scales,<br>language_model.model.layers.27.mlp.experts.down_proj.weight,<br>language_model.model.layers.27.mlp.experts.gate_proj.biases,<br>language_model.model.layers.27.mlp.experts.gate_proj.scales,<br>language_model.model.layers.27.mlp.experts.gate_proj.weight,<br>language_model.model.layers.27.mlp.experts.up_proj.biases,<br>language_model.model.layers.27.mlp.experts.up_proj.scales,<br>language_model.model.layers.27.mlp.experts.up_proj.weight,<br>language_model.model.layers.28.mlp.experts.down_proj.biases,<br>language_model.model.layers.28.mlp.experts.down_proj.scales,<br>language_model.model.layers.28.mlp.experts.down_proj.weight,<br>language_model.model.layers.28.mlp.experts.gate_proj.biases,<br>language_model.model.layers.28.mlp.experts.gate_proj.scales,<br>language_model.model.layers.28.mlp.experts.gate_proj.weight,<br>language_model.model.layers.28.mlp.experts.up_proj.biases,<br>language_model.model.layers.28.mlp.experts.up_proj.scales,<br>language_model.model.layers.28.mlp.experts.up_proj.weight,<br>language_model.model.layers.29.mlp.experts.down_proj.biases,<br>language_model.model.layers.29.mlp.experts.down_proj.scales,<br>language_model.model.layers.29.mlp.experts.down_proj.weight,<br>language_model.model.layers.29.mlp.experts.gate_proj.biases,<br>language_model.model.layers.29.mlp.experts.gate_proj.scales,<br>language_model.model.layers.29.mlp.experts.gate_proj.weight,<br>language_model.model.layers.29.mlp.experts.up_proj.biases,<br>language_model.model.layers.29.mlp.experts.up_proj.scales,<br>language_model.model.layers.29.mlp.experts.up_proj.weight,<br>language_model.model.layers.3.mlp.experts.down_proj.biases,<br>language_model.model.layers.3.mlp.experts.down_proj.scales,<br>language_model.model.layers.3.mlp.experts.down_proj.weight,<br>language_model.model.layers.3.mlp.experts.gate_proj.biases,<br>language_model.model.layers.3.mlp.experts.gate_proj.scales,<br>language_model.model.layers.3.mlp.experts.gate_proj.weight,<br>language_model.model.layers.3.mlp.experts.up_proj.biases,<br>language_model.model.layers.3.mlp.experts.up_proj.scales,<br>language_model.model.layers.3.mlp.experts.up_proj.weight,<br>language_model.model.layers.30.mlp.experts.down_proj.biases,<br>language_model.model.layers.30.mlp.experts.down_proj.scales,<br>language_model.model.layers.30.mlp.experts.down_proj.weight,<br>language_model.model.layers.30.mlp.experts.gate_proj.biases,<br>language_model.model.layers.30.mlp.experts.gate_proj.scales,<br>language_model.model.layers.30.mlp.experts.gate_proj.weight,<br>language_model.model.layers.30.mlp.experts.up_proj.biases,<br>language_model.model.layers.30.mlp.experts.up_proj.scales,<br>language_model.model.layers.30.mlp.experts.up_proj.weight,<br>language_model.model.layers.31.mlp.experts.down_proj.biases,<br>language_model.model.layers.31.mlp.experts.down_proj.scales,<br>language_model.model.layers.31.mlp.experts.down_proj.weight,<br>language_model.model.layers.31.mlp.experts.gate_proj.biases,<br>language_model.model.layers.31.mlp.experts.gate_proj.scales,<br>language_model.model.layers.31.mlp.experts.gate_proj.weight,<br>language_model.model.layers.31.mlp.experts.up_proj.biases,<br>language_model.model.layers.31.mlp.experts.up_proj.scales,<br>language_model.model.layers.31.mlp.experts.up_proj.weight,<br>language_model.model.layers.32.mlp.experts.down_proj.biases,<br>language_model.model.layers.32.mlp.experts.down_proj.scales,<br>language_model.model.layers.32.mlp.experts.down_proj.weight,<br>language_model.model.layers.32.mlp.experts.gate_proj.biases,<br>language_model.model.layers.32.mlp.experts.gate_proj.scales,<br>language_model.model.layers.32.mlp.experts.gate_proj.weight,<br>language_model.model.layers.32.mlp.experts.up_proj.biases,<br>language_model.model.layers.32.mlp.experts.up_proj.scales,<br>language_model.model.layers.32.mlp.experts.up_proj.weight,<br>language_model.model.layers.33.mlp.experts.down_proj.biases,<br>language_model.model.layers.33.mlp.experts.down_proj.scales,<br>language_model.model.layers.33.mlp.experts.down_proj.weight,<br>language_model.model.layers.33.mlp.experts.gate_proj.biases,<br>language_model.model.layers.33.mlp.experts.gate_proj.scales,<br>language_model.model.layers.33.mlp.experts.gate_proj.weight,<br>language_model.model.layers.33.mlp.experts.up_proj.biases,<br>language_model.model.layers.33.mlp.experts.up_proj.scales,<br>language_model.model.layers.33.mlp.experts.up_proj.weight,<br>language_model.model.layers.34.mlp.experts.down_proj.biases,<br>language_model.model.layers.34.mlp.experts.down_proj.scales,<br>language_model.model.layers.34.mlp.experts.down_proj.weight,<br>language_model.model.layers.34.mlp.experts.gate_proj.biases,<br>language_model.model.layers.34.mlp.experts.gate_proj.scales,<br>language_model.model.layers.34.mlp.experts.gate_proj.weight,<br>language_model.model.layers.34.mlp.experts.up_proj.biases,<br>language_model.model.layers.34.mlp.experts.up_proj.scales,<br>language_model.model.layers.34.mlp.experts.up_proj.weight,<br>language_model.model.layers.35.mlp.experts.down_proj.biases,<br>language_model.model.layers.35.mlp.experts.down_proj.scales,<br>language_model.model.layers.35.mlp.experts.down_proj.weight,<br>language_model.model.layers.35.mlp.experts.gate_proj.biases,<br>language_model.model.layers.35.mlp.experts.gate_proj.scales,<br>language_model.model.layers.35.mlp.experts.gate_proj.weight,<br>language_model.model.layers.35.mlp.experts.up_proj.biases,<br>language_model.model.layers.35.mlp.experts.up_proj.scales,<br>language_model.model.layers.35.mlp.experts.up_proj.weight,<br>language_model.model.layers.36.mlp.experts.down_proj.biases,<br>language_model.model.layers.36.mlp.experts.down_proj.scales,<br>language_model.model.layers.36.mlp.experts.down_proj.weight,<br>language_model.model.layers.36.mlp.experts.gate_proj.biases,<br>language_model.model.layers.36.mlp.experts.gate_proj.scales,<br>language_model.model.layers.36.mlp.experts.gate_proj.weight,<br>language_model.model.layers.36.mlp.experts.up_proj.biases,<br>language_model.model.layers.36.mlp.experts.up_proj.scales,<br>language_model.model.layers.36.mlp.experts.up_proj.weight,<br>language_model.model.layers.37.mlp.experts.down_proj.biases,<br>language_model.model.layers.37.mlp.experts.down_proj.scales,<br>language_model.model.layers.37.mlp.experts.down_proj.weight,<br>language_model.model.layers.37.mlp.experts.gate_proj.biases,<br>language_model.model.layers.37.mlp.experts.gate_proj.scales,<br>language_model.model.layers.37.mlp.experts.gate_proj.weight,<br>language_model.model.layers.37.mlp.experts.up_proj.biases,<br>language_model.model.layers.37.mlp.experts.up_proj.scales,<br>language_model.model.layers.37.mlp.experts.up_proj.weight,<br>language_model.model.layers.38.mlp.experts.down_proj.biases,<br>language_model.model.layers.38.mlp.experts.down_proj.scales,<br>language_model.model.layers.38.mlp.experts.down_proj.weight,<br>language_model.model.layers.38.mlp.experts.gate_proj.biases,<br>language_model.model.layers.38.mlp.experts.gate_proj.scales,<br>language_model.model.layers.38.mlp.experts.gate_proj.weight,<br>language_model.model.layers.38.mlp.experts.up_proj.biases,<br>language_model.model.layers.38.mlp.experts.up_proj.scales,<br>language_model.model.layers.38.mlp.experts.up_proj.weight,<br>language_model.model.layers.39.mlp.experts.down_proj.biases,<br>language_model.model.layers.39.mlp.experts.down_proj.scales,<br>language_model.model.layers.39.mlp.experts.down_proj.weight,<br>language_model.model.layers.39.mlp.experts.gate_proj.biases,<br>language_model.model.layers.39.mlp.experts.gate_proj.scales,<br>language_model.model.layers.39.mlp.experts.gate_proj.weight,<br>language_model.model.layers.39.mlp.experts.up_proj.biases,<br>language_model.model.layers.39.mlp.experts.up_proj.scales,<br>language_model.model.layers.39.mlp.experts.up_proj.weight,<br>language_model.model.layers.4.mlp.experts.down_proj.biases,<br>language_model.model.layers.4.mlp.experts.down_proj.scales,<br>language_model.model.layers.4.mlp.experts.down_proj.weight,<br>language_model.model.layers.4.mlp.experts.gate_proj.biases,<br>language_model.model.layers.4.mlp.experts.gate_proj.scales,<br>language_model.model.layers.4.mlp.experts.gate_proj.weight,<br>language_model.model.layers.4.mlp.experts.up_proj.biases,<br>language_model.model.layers.4.mlp.experts.up_proj.scales,<br>language_model.model.layers.4.mlp.experts.up_proj.weight,<br>language_model.model.layers.40.mlp.experts.down_proj.biases,<br>language_model.model.layers.40.mlp.experts.down_proj.scales,<br>language_model.model.layers.40.mlp.experts.down_proj.weight,<br>language_model.model.layers.40.mlp.experts.gate_proj.biases,<br>language_model.model.layers.40.mlp.experts.gate_proj.scales,<br>language_model.model.layers.40.mlp.experts.gate_proj.weight,<br>language_model.model.layers.40.mlp.experts.up_proj.biases,<br>language_model.model.layers.40.mlp.experts.up_proj.scales,<br>language_model.model.layers.40.mlp.experts.up_proj.weight,<br>language_model.model.layers.41.mlp.experts.down_proj.biases,<br>language_model.model.layers.41.mlp.experts.down_proj.scales,<br>language_model.model.layers.41.mlp.experts.down_proj.weight,<br>language_model.model.layers.41.mlp.experts.gate_proj.biases,<br>language_model.model.layers.41.mlp.experts.gate_proj.scales,<br>language_model.model.layers.41.mlp.experts.gate_proj.weight,<br>language_model.model.layers.41.mlp.experts.up_proj.biases,<br>language_model.model.layers.41.mlp.experts.up_proj.scales,<br>language_model.model.layers.41.mlp.experts.up_proj.weight,<br>language_model.model.layers.5.mlp.experts.down_proj.biases,<br>language_model.model.layers.5.mlp.experts.down_proj.scales,<br>language_model.model.layers.5.mlp.experts.down_proj.weight,<br>language_model.model.layers.5.mlp.experts.gate_proj.biases,<br>language_model.model.layers.5.mlp.experts.gate_proj.scales,<br>language_model.model.layers.5.mlp.experts.gate_proj.weight,<br>language_model.model.layers.5.mlp.experts.up_proj.biases,<br>language_model.model.layers.5.mlp.experts.up_proj.scales,<br>language_model.model.layers.5.mlp.experts.up_proj.weight,<br>language_model.model.layers.6.mlp.experts.down_proj.biases,<br>language_model.model.layers.6.mlp.experts.down_proj.scales,<br>language_model.model.layers.6.mlp.experts.down_proj.weight,<br>language_model.model.layers.6.mlp.experts.gate_proj.biases,<br>language_model.model.layers.6.mlp.experts.gate_proj.scales,<br>language_model.model.layers.6.mlp.experts.gate_proj.weight,<br>language_model.model.layers.6.mlp.experts.up_proj.biases,<br>language_model.model.layers.6.mlp.experts.up_proj.scales,<br>language_model.model.layers.6.mlp.experts.up_proj.weight,<br>language_model.model.layers.7.mlp.experts.down_proj.biases,<br>language_model.model.layers.7.mlp.experts.down_proj.scales,<br>language_model.model.layers.7.mlp.experts.down_proj.weight,<br>language_model.model.layers.7.mlp.experts.gate_proj.biases,<br>language_model.model.layers.7.mlp.experts.gate_proj.scales,<br>language_model.model.layers.7.mlp.experts.gate_proj.weight,<br>language_model.model.layers.7.mlp.experts.up_proj.biases,<br>language_model.model.layers.7.mlp.experts.up_proj.scales,<br>language_model.model.layers.7.mlp.experts.up_proj.weight,<br>language_model.model.layers.8.mlp.experts.down_proj.biases,<br>language_model.model.layers.8.mlp.experts.down_proj.scales,<br>language_model.model.layers.8.mlp.experts.down_proj.weight,<br>language_model.model.layers.8.mlp.experts.gate_proj.biases,<br>language_model.model.layers.8.mlp.experts.gate_proj.scales,<br>language_model.model.layers.8.mlp.experts.gate_proj.weight,<br>language_model.model.layers.8.mlp.experts.up_proj.biases,<br>language_model.model.layers.8.mlp.experts.up_proj.scales,<br>language_model.model.layers.8.mlp.experts.up_proj.weight,<br>language_model.model.layers.9.mlp.experts.down_proj.biases,<br>language_model.model.layers.9.mlp.experts.down_proj.scales,<br>language_model.model.layers.9.mlp.experts.down_proj.weight,<br>language_model.model.layers.9.mlp.experts.gate_proj.biases,<br>language_model.model.layers.9.mlp.experts.gate_proj.scales,<br>language_model.model.layers.9.mlp.experts.gate_proj.weight,<br>language_model.model.layers.9.mlp.experts.up_proj.biases,<br>language_model.model.layers.9.mlp.experts.up_proj.scales,<br>language_model.model.layers.9.mlp.experts.up_proj.weight.
-- *Model load time:* 0.21s
+- *Model load time:* 0.32s
 - *Generation time:* -
-- *Total time:* 0.22s
-- *Input validation time:* 0.00174
+- *Total time:* 0.33s
+- *Input validation time:* 0.00216
 - *Prompt preparation time:* -
 - *First-token latency:* -
-- *Cleanup time:* 0.0622
+- *Cleanup time:* 0.0843
 - *Prompt tokens:* -
 - *Generation tokens:* -
 - *Total tokens:* -
@@ -4815,10 +4815,10 @@ This is a heartwarming and cozy image of two cats relaxing together on a plush, 
 
 ```python
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11838, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11977, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11174, in _load_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11313, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -4828,7 +4828,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 711, in _typed_mlx_vlm_load
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 712, in _typed_mlx_vlm_load
     loaded: tuple[nn.Module, ProcessorMixin] = _mlx_vlm_load(
                                                ~~~~~~~~~~~~~^
         path_or_hf_repo=path_or_hf_repo,
@@ -5214,7 +5214,7 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12091, in process_image_with_model
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 12230, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -5225,7 +5225,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11853, in _run_model_generation
+  File "~/Documents/AI/mlx/check_models/src/check_models.py", line 11992, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 362 parameters not in model: 
 audio_tower.encoder.biases,
@@ -5600,12 +5600,12 @@ language_model.model.layers.9.mlp.experts.up_proj.weight.
 Downloading bytes:           |  0.00B
 Reconstructing (incomplete total...): |          |  0.00B /  0.00B
 Fetching 54 files:   0%|          | 0/54 [00:00<?, ?it/s]
-Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 5009.23it/s]
+Fetching 54 files: 100%|##########| 54/54 [00:00<00:00, 3343.46it/s]
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
 Download complete: :           |  0.00B
 Reconstruction complete: |          |  0.00B /  0.00B
-[00:32:22] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
+[18:42:53] DEBUG    HF Cache Info for mlx-community/Inkling-Small-mlx-4bit: size=146358.0 MB, files=58
 ```
 
 </details>
