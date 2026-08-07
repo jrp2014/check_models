@@ -71,6 +71,7 @@ from typing import (
     TypeGuard,
     Unpack,
     cast,
+    get_args,
     runtime_checkable,
 )
 from urllib.error import URLError
@@ -1520,6 +1521,7 @@ DEFAULT_DIAGNOSTICS_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "
 _PREFLIGHT_ISSUES_ARG_ATTR: Final[str] = "_check_models_preflight_issues"
 _GITHUB_REPO_URL: Final[str] = "https://github.com/jrp2014/check_models"
 _GITHUB_DEFAULT_BRANCH: Final[str] = "main"
+_GITHUB_REF_OVERRIDE: str | None = None
 _PUBLISHED_OUTPUT_ROOT: Final[PurePosixPath] = PurePosixPath("src/output")
 _PUBLISHED_REPORT_ARTIFACT_NAMES: Final[frozenset[str]] = frozenset(
     {
@@ -2526,7 +2528,13 @@ def _gallery_model_facts(
         ("Execution", assessment.execution),
         ("Usability", row.usability),
         ("Maintainer status", assessment.maintainer_status),
-        ("Observations", _gallery_observation_labels(row.observations)),
+        (
+            "Observations",
+            _human_observation_labels(
+                row.observations,
+                details=_observation_details(result),
+            ),
+        ),
         ("Failure phase", result.failure_phase),
         ("Error stage", result.error_stage),
         ("Error code", result.error_code),
@@ -6807,6 +6815,26 @@ def _relative_markdown_artifact_path(*, report_filename: Path, artifact_filename
         return str(artifact_filename)
 
 
+def _github_blob_ref() -> str:
+    """Return the preferred GitHub blob/tree ref for tracked artifact links.
+
+    Prefer an explicit override, then a clean producer git revision, else the
+    default branch. Dirty worktrees stay on the branch tip so links do not point
+    at a commit that never contained the published bytes.
+    """
+    if _GITHUB_REF_OVERRIDE:
+        return _GITHUB_REF_OVERRIDE
+    try:
+        provenance = _collect_check_models_provenance()
+    except (OSError, RuntimeError, ValueError, TypeError):
+        return _GITHUB_DEFAULT_BRANCH
+    revision = provenance.get("git_revision")
+    dirty = provenance.get("dirty")
+    if isinstance(revision, str) and revision and dirty is False:
+        return revision
+    return _GITHUB_DEFAULT_BRANCH
+
+
 def _github_repo_artifact_url(
     repo_relative_path: PurePosixPath,
     *,
@@ -6816,7 +6844,7 @@ def _github_repo_artifact_url(
     """Return a GitHub URL for a tracked artifact path within this repository."""
     encoded_path = "/".join(quote(part) for part in repo_relative_path.parts)
     view_name = "tree" if tree else "blob"
-    url = f"{_GITHUB_REPO_URL}/{view_name}/{_GITHUB_DEFAULT_BRANCH}/{encoded_path}"
+    url = f"{_GITHUB_REPO_URL}/{view_name}/{_github_blob_ref()}/{encoded_path}"
     if anchor is not None:
         return f"{url}#{anchor}"
     return url
@@ -7148,50 +7176,125 @@ def _gallery_row(result: PerformanceResult, assessment: ResultAssessment) -> Gal
     )
 
 
-_OBSERVATION_DISPLAY_PRIORITY: Final[tuple[ObservationCode, ...]] = (
-    "empty_output",
-    "repeated_output",
-    "missing_final_answer",
-    "unexpected_special_token",
-    "missing_requested_sections",
-    "prompt_instruction_echo",
-    "unexpected_catalog_preamble",
-    "token_cap_truncation",
-    "thinking_trace_incomplete",
-    "role_boundary_token_present",
-    "thinking_trace_present",
-    "configured_wrapper_present",
-    "catalog_constraint_violation",
-    "minimal_output",
-    "draft_returned_unchanged",
-    "no_keyword_overlap",
+@dataclass(frozen=True, slots=True)
+class ObservationDisplaySpec:
+    """Single source of truth for one mechanical observation code."""
+
+    code: ObservationCode
+    maintainer_label: str
+    selector_gloss: str
+    unusable: bool = False
+
+
+# Display priority is list order: gross unusable signals first, then caveats.
+_OBSERVATION_DISPLAY_SPECS: Final[tuple[ObservationDisplaySpec, ...]] = (
+    ObservationDisplaySpec(
+        "empty_output",
+        "No response text was returned",
+        "empty response",
+        unusable=True,
+    ),
+    ObservationDisplaySpec(
+        "repeated_output",
+        "Response repeats the same text",
+        "repeated text",
+        unusable=True,
+    ),
+    ObservationDisplaySpec(
+        "missing_final_answer",
+        "Internal reasoning is present but no final answer was returned",
+        "thinking only, no answer",
+        unusable=True,
+    ),
+    ObservationDisplaySpec(
+        "unexpected_special_token",
+        "Unrecognised model control tokens remain visible",
+        "control tokens visible",
+    ),
+    ObservationDisplaySpec(
+        "missing_requested_sections",
+        "Required fields are missing or empty",
+        "missing required fields",
+        unusable=True,
+    ),
+    ObservationDisplaySpec(
+        "prompt_instruction_echo",
+        "Response repeats the task instructions instead of only returning the requested fields",
+        "echoes instructions",
+        unusable=True,
+    ),
+    ObservationDisplaySpec(
+        "unexpected_catalog_preamble",
+        "Extra text appears before the Title field",
+        "extra text before Title",
+        unusable=True,
+    ),
+    ObservationDisplaySpec(
+        "token_cap_truncation",
+        "Response appears cut off at the token limit",
+        "cut off at token limit",
+        unusable=True,
+    ),
+    ObservationDisplaySpec(
+        "thinking_trace_incomplete",
+        "Internal reasoning block appears incomplete",
+        "incomplete thinking block",
+        unusable=True,
+    ),
+    ObservationDisplaySpec(
+        "role_boundary_token_present",
+        "Conversation-role control tokens remain visible",
+        "role tokens visible",
+    ),
+    ObservationDisplaySpec(
+        "thinking_trace_present",
+        "Internal reasoning text remains visible",
+        "thinking text visible",
+    ),
+    ObservationDisplaySpec(
+        "configured_wrapper_present",
+        "Expected model wrapper tokens remain visible",
+        "wrapper tokens visible",
+    ),
+    ObservationDisplaySpec(
+        "catalog_constraint_violation",
+        "Title or keywords do not meet requested constraints",
+        "title/keyword constraints failed",
+    ),
+    ObservationDisplaySpec(
+        "minimal_output",
+        "Response is unusually short",
+        "very short response",
+    ),
+    ObservationDisplaySpec(
+        "draft_returned_unchanged",
+        "Title, Description and Keywords copy all supplied hints unchanged",
+        "draft hints copied unchanged",
+    ),
+    ObservationDisplaySpec(
+        "no_keyword_overlap",
+        "Keywords do not overlap the supplied keyword hints",
+        "no keyword overlap",
+    ),
+)
+_OBSERVATION_DISPLAY_BY_CODE: Final[dict[ObservationCode, ObservationDisplaySpec]] = {
+    spec.code: spec for spec in _OBSERVATION_DISPLAY_SPECS
+}
+_OBSERVATION_DISPLAY_PRIORITY: Final[tuple[ObservationCode, ...]] = tuple(
+    spec.code for spec in _OBSERVATION_DISPLAY_SPECS
 )
 _OBSERVATION_DISPLAY_RANK: Final[dict[ObservationCode, int]] = {
     code: index for index, code in enumerate(_OBSERVATION_DISPLAY_PRIORITY)
 }
-
 _OBSERVATION_DISPLAY_LABELS: Final[dict[ObservationCode, str]] = {
-    "empty_output": "No response text was returned",
-    "minimal_output": "Response is unusually short",
-    "repeated_output": "Response repeats the same text",
-    "missing_final_answer": "Internal reasoning is present but no final answer was returned",
-    "missing_requested_sections": "Required fields are missing or empty",
-    "token_cap_truncation": "Response appears cut off at the token limit",
-    "prompt_instruction_echo": (
-        "Response repeats the task instructions instead of only returning the requested fields"
-    ),
-    "unexpected_catalog_preamble": "Extra text appears before the Title field",
-    "unexpected_special_token": "Unrecognised model control tokens remain visible",
-    "configured_wrapper_present": "Expected model wrapper tokens remain visible",
-    "thinking_trace_present": "Internal reasoning text remains visible",
-    "thinking_trace_incomplete": "Internal reasoning block appears incomplete",
-    "role_boundary_token_present": "Conversation-role control tokens remain visible",
-    "catalog_constraint_violation": "Title or keywords do not meet requested constraints",
-    "no_keyword_overlap": "Keywords do not overlap the supplied keyword hints",
-    "draft_returned_unchanged": (
-        "Title, Description and Keywords copy all supplied hints unchanged"
-    ),
+    spec.code: spec.maintainer_label for spec in _OBSERVATION_DISPLAY_SPECS
 }
+_OBSERVATION_SELECTOR_GLOSSES: Final[dict[ObservationCode, str]] = {
+    spec.code: spec.selector_gloss for spec in _OBSERVATION_DISPLAY_SPECS
+}
+_UNUSABLE_OBSERVATIONS: Final[frozenset[ObservationCode]] = frozenset(
+    spec.code for spec in _OBSERVATION_DISPLAY_SPECS if spec.unusable
+)
 _RANGE_ENDPOINT_COUNT: Final[int] = 2
 _USABILITY_DISPLAY_PRIORITY: Final[dict[ModelUsability, int]] = {
     "unusable": 0,
@@ -7199,6 +7302,29 @@ _USABILITY_DISPLAY_PRIORITY: Final[dict[ModelUsability, int]] = {
     "usable": 2,
     "not_evaluated": 3,
 }
+
+
+def _literal_values(alias: object) -> frozenset[str]:
+    """Return the string members of a PEP 695 `type X = Literal[...]` alias."""
+    value = getattr(alias, "__value__", alias)
+    return frozenset(cast("tuple[str, ...]", get_args(value)))
+
+
+_EXECUTION_STATUS_VALUES: Final[frozenset[str]] = _literal_values(ExecutionStatus)
+_MODEL_USABILITY_VALUES: Final[frozenset[str]] = _literal_values(ModelUsability)
+_MAINTAINER_STATUS_VALUES: Final[frozenset[str]] = _literal_values(MaintainerStatus)
+_OBSERVATION_CODE_VALUES: Final[frozenset[str]] = _literal_values(ObservationCode)
+
+if set(_OBSERVATION_DISPLAY_BY_CODE) != _OBSERVATION_CODE_VALUES or len(
+    _OBSERVATION_DISPLAY_SPECS
+) != len(_OBSERVATION_CODE_VALUES):
+    missing = sorted(_OBSERVATION_CODE_VALUES - set(_OBSERVATION_DISPLAY_BY_CODE))
+    extra = sorted(set(_OBSERVATION_DISPLAY_BY_CODE) - _OBSERVATION_CODE_VALUES)
+    message = (
+        "Observation display registry must cover ObservationCode exactly; "
+        f"missing={missing!r} extra={extra!r}"
+    )
+    raise RuntimeError(message)
 
 
 def _assessment_actionability_key(
@@ -7267,8 +7393,14 @@ def _human_observation_labels(
 
 
 def _gallery_observation_labels(observations: Sequence[ObservationCode]) -> str:
-    """Render observations for human-facing gallery and diagnostic reports."""
-    return _human_observation_labels(observations)
+    """Render short selector-facing observation glosses in severity order."""
+    observed = set(observations)
+    glosses = [
+        _OBSERVATION_SELECTOR_GLOSSES[code]
+        for code in _OBSERVATION_DISPLAY_PRIORITY
+        if code in observed
+    ]
+    return "; ".join(glosses) or "none"
 
 
 def _gallery_usability_sort_key(usability: ModelUsability) -> int:
@@ -7327,6 +7459,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
             _markdown_inline_code(row.usability),
             _gallery_total_time_cell(row),
             _gallery_throughput_cell(row),
+            _format_float_or_dash(row.first_token_latency_s, digits=2),
             _gallery_metric("peak_memory", row.peak_memory_gb),
             _gallery_metric("generation_tokens", row.generation_tokens),
             MARKDOWN_ESCAPER.escape(_gallery_observation_labels(row.observations)),
@@ -7339,7 +7472,8 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
         (
             "Current-run usability and captured resource facts only. Total time is end-to-end; "
             "throughput covers generation only and requires "
-            f"at least {MIN_THROUGHPUT_SAMPLE_TOKENS} generated tokens."
+            f"at least {MIN_THROUGHPUT_SAMPLE_TOKENS} generated tokens. "
+            "Prefill/first is first-token latency when captured."
         ),
         "",
         *_render_gallery_table(
@@ -7348,6 +7482,7 @@ def _render_gallery_chooser(rows: Sequence[GalleryRow]) -> list[str]:
                 "Usability",
                 "Total s",
                 "Gen TPS",
+                "Prefill/first s",
                 "Peak GB",
                 "Gen tok",
                 "Observations",
@@ -7544,20 +7679,6 @@ class GalleryRow:
     peak_memory_gb: float | None
     generation_tokens: int | None
     output_preview: str
-
-
-_UNUSABLE_OBSERVATIONS: Final[frozenset[ObservationCode]] = frozenset(
-    {
-        "empty_output",
-        "repeated_output",
-        "missing_final_answer",
-        "missing_requested_sections",
-        "token_cap_truncation",
-        "prompt_instruction_echo",
-        "unexpected_catalog_preamble",
-        "thinking_trace_incomplete",
-    }
-)
 
 
 def _execution_status(result: PerformanceResult) -> ExecutionStatus:
@@ -8384,10 +8505,13 @@ def _diagnostics_fact(value: object | None) -> str:
 
 
 def _diagnostics_exception_lines(result: PerformanceResult) -> tuple[str, ...]:
-    """Return the complete recorded exception chain in root-to-wrapper order."""
+    """Return the recorded exception chain, compacting large parameter lists."""
     if result.exception_chain:
         return tuple(
-            _home_relative_report_text(f"{item.module}.{item.exception_type}: {item.message}")
+            _home_relative_report_text(
+                f"{item.module}.{item.exception_type}: "
+                f"{_compact_run_issue_exception_message(item.message)}"
+            )
             for item in result.exception_chain
         )
     exception_type = result.root_error_type or result.error_type
@@ -8400,7 +8524,8 @@ def _diagnostics_exception_lines(result: PerformanceResult) -> tuple[str, ...]:
         if module is not None and exception_type is not None
         else exception_type or module or "Exception"
     )
-    return (_home_relative_report_text(f"{qualified_type}: {message or 'unavailable'}"),)
+    compacted = _compact_run_issue_exception_message(message or "unavailable")
+    return (_home_relative_report_text(f"{qualified_type}: {compacted}"),)
 
 
 def _diagnostics_result_facts(
@@ -8454,9 +8579,23 @@ def _diagnostics_result_facts(
         ("Stage", result.error_stage),
         ("Package", result.error_package),
         ("Error type", result.error_type),
-        ("Error message", result.error_message),
+        (
+            "Error message",
+            (
+                _compact_run_issue_exception_message(result.error_message)
+                if result.error_message is not None
+                else None
+            ),
+        ),
         ("Root error type", result.root_error_type),
-        ("Root error message", result.root_error_message),
+        (
+            "Root error message",
+            (
+                _compact_run_issue_exception_message(result.root_error_message)
+                if result.root_error_message is not None
+                else None
+            ),
+        ),
         ("Resolved model revision", resolved_revision),
         ("Requested model revision", requested_revision),
         ("Processor class", processor),
@@ -15057,35 +15196,11 @@ def _output_index_link(index_filename: Path, artifact_path: Path, label: str) ->
     return f"[{MARKDOWN_ESCAPER.escape(label)}]({target})"
 
 
-_RUN_ISSUE_EXECUTION_VALUES: Final[frozenset[str]] = frozenset(
-    {"completed", "crashed", "indeterminate"}
-)
-_RUN_ISSUE_USABILITY_VALUES: Final[frozenset[str]] = frozenset(
-    {"usable", "usable_with_caveats", "unusable", "not_evaluated"}
-)
-_RUN_ISSUE_MAINTAINER_VALUES: Final[frozenset[str]] = frozenset(
-    {"actionable_failure", "observation_needs_reproduction", "none"}
-)
-_RUN_ISSUE_OBSERVATION_VALUES: Final[frozenset[str]] = frozenset(
-    {
-        "empty_output",
-        "minimal_output",
-        "repeated_output",
-        "missing_final_answer",
-        "missing_requested_sections",
-        "token_cap_truncation",
-        "prompt_instruction_echo",
-        "unexpected_catalog_preamble",
-        "unexpected_special_token",
-        "configured_wrapper_present",
-        "thinking_trace_present",
-        "thinking_trace_incomplete",
-        "role_boundary_token_present",
-        "catalog_constraint_violation",
-        "no_keyword_overlap",
-        "draft_returned_unchanged",
-    }
-)
+# Derived from the canonical Literals / observation registry (F1).
+_RUN_ISSUE_EXECUTION_VALUES: Final[frozenset[str]] = _EXECUTION_STATUS_VALUES
+_RUN_ISSUE_USABILITY_VALUES: Final[frozenset[str]] = _MODEL_USABILITY_VALUES
+_RUN_ISSUE_MAINTAINER_VALUES: Final[frozenset[str]] = _MAINTAINER_STATUS_VALUES
+_RUN_ISSUE_OBSERVATION_VALUES: Final[frozenset[str]] = _OBSERVATION_CODE_VALUES
 
 
 def _parse_run_issue_jsonl_rows(jsonl_path: Path) -> list[JsonLike]:
@@ -15658,6 +15773,85 @@ def _run_issue_summary_crash_section(
     )
 
 
+def _run_issue_summary_observed_result(result: JsonlResultRecord) -> str:
+    """Render one model row's observed result for the paste-ready review tables."""
+    assessment = result["assessment"]
+    if assessment["observations"]:
+        return _human_observation_labels(
+            assessment["observations"],
+            details=assessment.get("details"),
+        )
+    failure = result.get("failure")
+    if failure is None:
+        return "No assessment evidence was captured"
+    phase = failure.get("phase")
+    phase_label = {
+        "model_load": "model loading",
+        "processor_load": "processor loading",
+        "tokenizer_load": "tokenizer loading",
+        "prefill": "prompt preparation",
+        "decode": "generation",
+    }.get(phase or "", (phase or "execution").replace("_", " "))
+    message = failure.get("message") or ""
+    if "connection reset" in message.casefold():
+        return f"Network connection reset during {phase_label}"
+    stage = failure.get("stage")
+    if stage:
+        return f"{stage} during {phase_label}"
+    exception_type = failure.get("exception_type")
+    if exception_type:
+        return f"{exception_type} during {phase_label}"
+    return f"Attempt stopped during {phase_label}"
+
+
+def _run_issue_observation_cluster_key(result: JsonlResultRecord) -> tuple[str, ...]:
+    """Return a stable observation signature for cluster counting."""
+    observations = result["assessment"]["observations"]
+    if not observations:
+        return ()
+    ordered = tuple(code for code in _OBSERVATION_DISPLAY_PRIORITY if code in set(observations))
+    return ordered or tuple(observations)
+
+
+def _run_issue_summary_observation_cluster_section(
+    results: Sequence[JsonlResultRecord],
+) -> ReportSection | None:
+    """Summarize repeated observation signatures above the per-model review tables."""
+    counts: Counter[tuple[str, ...]] = Counter()
+    for result in results:
+        key = _run_issue_observation_cluster_key(result)
+        if key:
+            counts[key] += 1
+    if not counts:
+        return None
+    rows = tuple(
+        (
+            _human_observation_labels(cast("Sequence[ObservationCode]", signature)),
+            str(count),
+        )
+        for signature, count in sorted(
+            counts.items(),
+            key=lambda item: (
+                -item[1],
+                _assessment_actionability_key(
+                    "",
+                    "unusable",
+                    cast("Sequence[ObservationCode]", item[0]),
+                ),
+            ),
+        )
+    )
+    return ReportSection(
+        "Observation clusters",
+        (
+            ReportParagraph(
+                "Repeated mechanical observation signatures among results requiring review."
+            ),
+            ReportTable(("Observed result", "Models"), rows, compact=True),
+        ),
+    )
+
+
 def _run_issue_summary_surfaced_sections(
     results: Sequence[JsonlResultRecord],
     *,
@@ -15671,36 +15865,10 @@ def _run_issue_summary_surfaced_sections(
         "indeterminate": "Indeterminate attempts requiring review",
     }
 
-    def _observed_result(result: JsonlResultRecord) -> str:
-        assessment = result["assessment"]
-        if assessment["observations"]:
-            return _human_observation_labels(
-                assessment["observations"],
-                details=assessment.get("details"),
-            )
-        failure = result.get("failure")
-        if failure is None:
-            return "No assessment evidence was captured"
-        phase = failure.get("phase")
-        phase_label = {
-            "model_load": "model loading",
-            "processor_load": "processor loading",
-            "tokenizer_load": "tokenizer loading",
-            "prefill": "prompt preparation",
-            "decode": "generation",
-        }.get(phase or "", (phase or "execution").replace("_", " "))
-        message = failure.get("message") or ""
-        if "connection reset" in message.casefold():
-            return f"Network connection reset during {phase_label}"
-        stage = failure.get("stage")
-        if stage:
-            return f"{stage} during {phase_label}"
-        exception_type = failure.get("exception_type")
-        if exception_type:
-            return f"{exception_type} during {phase_label}"
-        return f"Attempt stopped during {phase_label}"
-
     sections: list[ReportSection] = []
+    cluster_section = _run_issue_summary_observation_cluster_section(results)
+    if cluster_section is not None:
+        sections.append(cluster_section)
     for execution, heading in heading_by_execution.items():
         rows: list[tuple[ReportCell, ...]] = []
         for result in sorted(
@@ -15718,7 +15886,7 @@ def _run_issue_summary_surfaced_sections(
                 (
                     result["model"],
                     assessment["usability"].replace("_", " "),
-                    _observed_result(result),
+                    _run_issue_summary_observed_result(result),
                     _run_issue_summary_artifact_link(
                         summary_path=summary_path,
                         artifact_path=output_paths.diagnostics,

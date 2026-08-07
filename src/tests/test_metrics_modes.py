@@ -847,11 +847,11 @@ def test_completed_model_summary_uses_actionability_ordered_tables(
     assert "Completed Models (5):" in messages
     assert messages.index("Unusable (2):") < messages.index("Usable with caveats (2):")
     assert messages.index("Usable with caveats (2):") < messages.index("Usable (1):")
-    assert messages.index("Response repeats the same text") < messages.index(
-        "Required fields are missing or empty"
-    )
+    # Console summary uses short selector glosses in actionability order.
+    assert messages.index("repeated text") < messages.index("missing required fields")
     assert messages.index("org/z-repeated") < messages.index("org/a-missing")
     assert messages.index("org/a-caveat") < messages.index("org/z-caveat")
+    assert "very short response" in messages
     assert "| usability=" not in messages
     assert "Maintainer" not in messages
     clean_group = messages[messages.index("Usable (1):") :]

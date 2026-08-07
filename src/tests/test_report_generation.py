@@ -371,6 +371,11 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
     assert "## Indeterminate attempts requiring review" in content
     assert content.count("| Model | Usability | Observed result | Evidence |") == 3
     assert "| Model | Execution / usability | Observations | Full evidence |" not in content
+    assert "## Observation clusters" in content
+    # Clusters group by observation codes only (no per-model detail expansion).
+    assert (
+        "| Response repeats the same text; Required fields are missing or empty | 1 |"
+    ) in content
     assert (
         "| org/observed | unusable | Response repeats the same text; "
         "Missing or empty fields: Title, Keywords |"
@@ -384,10 +389,11 @@ def test_run_issue_summary_expands_crash_and_tables_other_findings(tmp_path: Pat
     assert "| org/crash |" not in crashed_table
     link_targets = _extract_markdown_link_targets(content)
     assert link_targets
-    assert all(
-        target.startswith("https://github.com/jrp2014/check_models/blob/main/src/output/")
-        for target in link_targets
+    blob_prefix = (
+        "https://github.com/jrp2014/check_models/blob/"
+        f"{check_models._github_blob_ref()}/src/output/"
     )
+    assert all(target.startswith(blob_prefix) for target in link_targets)
     assert "1 clean completion; see the [full model gallery]" in content
     assert "Trust remote code" in content
     assert "check_models" in content
@@ -668,6 +674,114 @@ def test_run_issue_summary_compacts_large_unexpected_parameter_errors(tmp_path: 
     assert parameters[0] in content
     assert parameters[-1] not in content
     assert "model evidence" in content
+
+
+def test_diagnostics_and_issue_draft_compact_large_unexpected_parameter_errors(
+    tmp_path: Path,
+) -> None:
+    """Maintainer paste surfaces should compact large unexpected-parameter lists."""
+    parameters = [
+        "audio_tower.encoder.biases",
+        "audio_tower.encoder.scales",
+        *(
+            f"language_model.model.layers.{layer}.mlp.experts.down_proj.weight"
+            for layer in range(10)
+        ),
+    ]
+    message = "Received 12 parameters not in model: \n" + ",\n".join(parameters) + "."
+    crash = PerformanceResult(
+        model_name="org/param-mismatch",
+        generation=None,
+        success=False,
+        failure_phase="model_load",
+        error_stage="Model Error",
+        error_type="ValueError",
+        error_message=message,
+        root_error_type="ValueError",
+        root_error_module="builtins",
+        root_error_message=message,
+        exception_chain=(check_models.FailureException("ValueError", "builtins", message),),
+        error_package="mlx-vlm",
+        error_traceback=f"Traceback (most recent call last):\nValueError: {message}",
+    )
+    context = _build_report_render_context(
+        results=[crash],
+        prompt="Describe the image.",
+        system_info={"Python Version": "3.13.13"},
+    )
+    diagnostics = tmp_path / "diagnostics.md"
+    generate_diagnostics_report(
+        [crash],
+        diagnostics,
+        prompt="Describe the image.",
+        library_versions=_stub_versions(),
+        system_info={"Python Version": "3.13.13"},
+        report_context=context,
+    )
+    generated = _generate_github_issue_reports(
+        report_context=context,
+        output_dir=tmp_path,
+        library_versions=_stub_versions(),
+        system_info={"Python Version": "3.13.13"},
+        prompt="Describe the image.",
+    )
+
+    diagnostics_content = diagnostics.read_text(encoding="utf-8")
+    issue_content = next(iter(generated.values())).read_text(encoding="utf-8")
+    for content in (diagnostics_content, issue_content):
+        assert "Received 12 parameters not in model" in content
+        assert "families: audio_tower, language_model" in content
+        assert "representative parameters:" in content
+        # Compacted exception presentation keeps a short sample, not the full list.
+        assert parameters[0] in content
+    # Full traceback remains available for deep inspection.
+    assert parameters[-1] in diagnostics_content
+    assert parameters[-1] in issue_content
+
+
+def test_github_blob_ref_uses_clean_producer_revision(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Clean producer revisions should pin GitHub artifact links to that commit."""
+    monkeypatch.setattr(check_models, "_GITHUB_REF_OVERRIDE", None)
+    monkeypatch.setattr(
+        check_models,
+        "_collect_check_models_provenance",
+        lambda: {
+            "name": "check_models",
+            "version": "0.8.9",
+            "git_revision": "deadbeefcafebabe",
+            "install_type": "source-tree",
+            "dirty": False,
+        },
+    )
+    assert check_models._github_blob_ref() == "deadbeefcafebabe"
+    monkeypatch.setattr(
+        check_models,
+        "_collect_check_models_provenance",
+        lambda: {
+            "name": "check_models",
+            "version": "0.8.9",
+            "git_revision": "deadbeefcafebabe",
+            "install_type": "source-tree",
+            "dirty": True,
+        },
+    )
+    assert check_models._github_blob_ref() == check_models._GITHUB_DEFAULT_BRANCH
+
+
+def test_observation_display_registry_covers_literal_codes() -> None:
+    """Observation display metadata must stay aligned with ObservationCode."""
+    codes = check_models._literal_values(check_models.ObservationCode)
+    assert set(check_models._OBSERVATION_DISPLAY_BY_CODE) == codes
+    assert codes == check_models._RUN_ISSUE_OBSERVATION_VALUES
+    assert check_models._RUN_ISSUE_EXECUTION_VALUES == check_models._EXECUTION_STATUS_VALUES
+    assert "empty_output" in check_models._UNUSABLE_OBSERVATIONS
+    assert "thinking_trace_present" not in check_models._UNUSABLE_OBSERVATIONS
+    assert (
+        check_models._gallery_observation_labels(("token_cap_truncation", "repeated_output"))
+        == "repeated text; cut off at token limit"
+    )
 
 
 @pytest.mark.parametrize("image_sha256", [None, "abc123"])
@@ -953,10 +1067,11 @@ def test_regenerate_run_issue_summary_only_writes_derived_artifact(tmp_path: Pat
     if generated is None:
         pytest.fail("the actionable retained run must regenerate an issue summary")
     assert {path: path.read_bytes() for path in retained} == retained
-    assert (
-        "[crash draft](https://github.com/jrp2014/check_models/blob/main/"
-        "src/output/issues/issue_org_crash.md)"
-    ) in generated.read_text(encoding="utf-8")
+    crash_draft_url = (
+        "https://github.com/jrp2014/check_models/blob/"
+        f"{check_models._github_blob_ref()}/src/output/issues/issue_org_crash.md"
+    )
+    assert f"[crash draft]({crash_draft_url})" in generated.read_text(encoding="utf-8")
 
 
 def test_html_and_gallery_render_same_captured_peak_memory(tmp_path: Path) -> None:
@@ -1090,7 +1205,8 @@ _MARKDOWN_LINK_TARGET_RE = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 _URL_SCHEME_RE = re.compile(r"^[a-z][a-z0-9+.-]*:", re.IGNORECASE)
 _PUBLISHED_OUTPUT_GITHUB_TARGET_RE = re.compile(
     rf"^{re.escape(check_models._GITHUB_REPO_URL)}/(?:blob|tree)/"
-    rf"{re.escape(check_models._GITHUB_DEFAULT_BRANCH)}/src/output(?:/|$)"
+    rf"(?:{re.escape(check_models._GITHUB_DEFAULT_BRANCH)}|[0-9a-f]{{7,40}})/"
+    r"src/output(?:/|$)"
 )
 
 
@@ -2642,6 +2758,10 @@ def test_crash_diagnostics_and_issue_draft_keep_complete_primary_evidence_first(
     assert issue_content.index("## Reproduction inputs") < issue_content.index(
         "## Provenance and Environment"
     )
+    environment_url = (
+        "https://github.com/jrp2014/check_models/blob/"
+        f"{check_models._github_blob_ref()}/src/output/environment.log"
+    )
     for expected in (
         "mlx-vlm",
         "mlx",
@@ -2651,7 +2771,7 @@ def test_crash_diagnostics_and_issue_draft_keep_complete_primary_evidence_first(
         "macOS Version",
         "GPU/Chip",
         "abc123def456",
-        "https://github.com/jrp2014/check_models/blob/main/src/output/environment.log",
+        environment_url,
     ):
         assert expected in issue_content
     assert "SDK Version" not in issue_content
@@ -3757,9 +3877,11 @@ class TestRetainedMarkdownArtifactEdges:
                 assert relative_targets == []
             else:
                 assert relative_targets
-                assert github_output_targets == [
-                    "https://github.com/jrp2014/check_models/blob/main/src/output/environment.log"
-                ]
+                environment_url = (
+                    "https://github.com/jrp2014/check_models/blob/"
+                    f"{check_models._github_blob_ref()}/src/output/environment.log"
+                )
+                assert github_output_targets == [environment_url]
 
             html_content = output_paths.html.read_text(encoding="utf-8")
             jsonl_records = [
@@ -4028,7 +4150,8 @@ class TestMarkdownGalleryReport:
         assert "[`org/good`](#model-org-good)" in chooser
         assert "quality output" not in chooser
         assert "[`org/risky`](#model-org-risky)" in chooser
-        assert "Unrecognised model control tokens remain visible" in chooser
+        assert "control tokens visible" in chooser
+        assert "Prefill/first s" in chooser
         assert r"answer with \| pipe" not in chooser
         assert "&lt;think&gt;leaked marker&lt;/think&gt;" not in chooser
         assert "[`org/bad`](#model-org-bad)" in chooser
@@ -4152,6 +4275,7 @@ class TestMarkdownGalleryReport:
         )
         assert "Output preview" not in chooser
         assert "Peak GB" in chooser
+        assert "Prefill/first s" in chooser
         assert "Observations" in chooser
         assert "[`org/full-caption`](#model-org-full-caption)" in chooser
         assert "Two cats sit together on a pink sofa" not in chooser

@@ -25,6 +25,12 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Consolidate mechanical observation metadata into one display registry, derive
+  run-issue assessment vocabularies from the canonical Literals, compact large
+  unexpected-parameter lists in diagnostics and crash drafts as well as the
+  paste-ready run summary, pin clean-worktree GitHub artifact links to the
+  producer commit SHA, add observation cluster counts above review tables, and
+  give Markdown choosers short selector glosses plus a Prefill/first-token column.
 - Keep prompt-seeded, already-closed empty thinking wrappers as neutral evidence;
   omit conclusively stale logs from paste-ready issue summaries; compact large
   unexpected-parameter lists there; and narrow Markdown chooser tables by
